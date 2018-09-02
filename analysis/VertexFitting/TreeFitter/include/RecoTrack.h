@@ -27,16 +27,16 @@ namespace TreeFitter {
     virtual ~RecoTrack() {};
 
     /**   init with mother particle (replacing initPar2)  */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams);
 
     /** init without mother particle   */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** init covariance matrix of this particle constraint */
-    ErrCode initCovariance(FitParams* fitparams) const;
+    ErrCode initCovariance(FitParams& fitparams) const;
 
     /** update m_flt */
-    ErrCode updFltToMotherCopy(const FitParams& fitparams);
+    ErrCode updFltToMotherCopy(const FitParams* fitparams);
 
     /**   project the constraint (calculate residuals)  */
     virtual ErrCode projectRecoConstraint(const FitParams&, Projection&) const;
@@ -56,7 +56,7 @@ namespace TreeFitter {
     /** add to the list of constraints */
     virtual void addToConstraintList(constraintlist& alist, int depth) const
     {
-      alist.push_back(Constraint(this, Constraint::track, depth, dimM())) ;
+      alist.push_back(Constraint(this, Constraint::track, depth, dimM(), 1)) ;
     }
 
     /** update flight length to mother */

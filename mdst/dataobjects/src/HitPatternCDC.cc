@@ -70,6 +70,7 @@ void HitPatternCDC::setNHits(unsigned short nHits)
 
 ULong64_t HitPatternCDC::getInteger() const
 {
+  // cppcheck-suppress knownConditionTrueFalse
   if (sizeof(unsigned long) >= 8) {
     return m_pattern.to_ulong();
   } else {

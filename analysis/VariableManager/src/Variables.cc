@@ -10,11 +10,13 @@
 
 // Own include
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/EventVariables.h>
+#include <analysis/VariableManager/VertexVariables.h>
+#include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
@@ -39,6 +41,7 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/Conversion.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/InputController.h>
 
@@ -46,6 +49,8 @@
 #include <TRandom.h>
 #include <TVectorF.h>
 #include <TVector3.h>
+
+#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -62,19 +67,13 @@ namespace Belle2 {
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).P();
+
     }
 
     double particleE(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).E();
-    }
-
-    double particleEoverP(const Particle* part)
-    {
-      const double p = particleP(part);
-      if (0 == p) {return std::nan("");}
-      return particleE(part) / p;
     }
 
     double particleClusterEUncertainty(const Particle* part)
@@ -383,6 +382,45 @@ namespace Belle2 {
       return theta_Bd;
     }
 
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
+    {
+      int idau = 0;
+      if (arguments.size() == 1) {
+        try {
+          idau = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2FATAL("The argument of cosHelicityAngleWrtCMSFrame must be an integer!");
+          return nullptr;
+        }
+      } else {
+        B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheMother");
+      }
+      auto func = [idau](const Particle * mother) -> double {
+        const Particle* part = mother->getDaughter(idau);
+        if (!part)
+        {
+          B2FATAL("Couldn't find the " << idau << "th daughter");
+          return -999.0;
+        }
+
+        TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
+        TLorentzVector part4Vector = part->get4Vector();
+        TLorentzVector mother4Vector = mother->get4Vector();
+
+        TVector3 motherBoost = -(mother4Vector.BoostVector());
+
+        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame;
+        beam4Vector_motherFrame = beam4Vector;
+        part4Vector_motherFrame = part4Vector;
+
+        beam4Vector_motherFrame.Boost(motherBoost);
+        part4Vector_motherFrame.Boost(motherBoost);
+
+        return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
+      };
+      return func;
+    }
+
     double cosHelicityAngle(const Particle* part)
     {
 
@@ -495,89 +533,8 @@ namespace Belle2 {
       } else return 0;
     }
 
-// vertex or POCA in respect to IP ------------------------------
 
-    double particleDX(const Particle* part)
-    {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).X();
-    }
 
-    double particleDY(const Particle* part)
-    {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Y();
-    }
-
-    double particleDZ(const Particle* part)
-    {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Z();
-    }
-
-    inline double getParticleUncertaintyByIndex(const Particle* part, unsigned int index)
-    {
-      if (!part) {
-        B2FATAL("The particle provide does not exist.");
-      }
-      const auto& errMatrix = part->getVertexErrorMatrix();
-      return std::sqrt(errMatrix(index, index));
-    }
-
-    double particleDXUncertainty(const Particle* part)
-    {
-      return getParticleUncertaintyByIndex(part, 0);
-    }
-
-    double particleDYUncertainty(const Particle* part)
-    {
-      return getParticleUncertaintyByIndex(part, 1);
-    }
-
-    double particleDZUncertainty(const Particle* part)
-    {
-      return getParticleUncertaintyByIndex(part, 2);
-    }
-
-    double particleDRho(const Particle* part)
-    {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Perp();
-    }
-
-    double particleDPhi(const Particle* part)
-    {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Phi();
-    }
-
-    double particleDCosTheta(const Particle* part)
-    {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).CosTheta();
-    }
-
-    double particleDistance(const Particle* part)
-    {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part).Mag();
-    }
-
-    double particleDistanceSignificance(const Particle* part)
-    {
-      // significance is defined as s = r/sigma_r, therefore:
-      // s &= \frac{r}{\sqrt{ \sum_{ij} \frac{\partial r}{x_i} V_{ij} \frac{\partial r}{x_j}}}
-      //   &= \frac{r^2}{\sqrt{\vec{x}V\vec{x}}}
-      // where:
-      // r &= \sqrt{\vec{x}*\vec{x}}
-      // and V_{ij} is the covariance matrix
-      const auto& frame = ReferenceFrame::GetCurrent();
-      const auto& vertex = frame.getVertex(part);
-      auto denominator = vertex * (part->getVertexErrorMatrix() * vertex);
-      if (denominator <= 0)
-        return -1;
-      return vertex.Mag2() / sqrt(denominator);
-    }
 
 // mass ------------------------------------------------------------
 
@@ -1131,11 +1088,43 @@ namespace Belle2 {
       }
     }
 
+    double goodBelleKshort(const Particle* KS)
+    {
+      // check input
+      if (KS->getNDaughters() != 2) {
+        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
+        return 0.0;
+      }
+      const Particle* d0 = KS->getDaughter(0);
+      const Particle* d1 = KS->getDaughter(1);
+      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
+        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
+        return 0.0;
+      }
+      if (abs(KS->getPDGCode()) != 310)
+        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
+
+      // Belle selection
+      double p = particleP(KS);
+      double fl = particleDRho(KS);
+      double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
+                           KS) + particlePy(KS) * particlePy(KS))));
+      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double zdist = v0DaughterZ0Diff(KS);
+
+      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
+      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
+      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
+
+      if (low || mid || high) {
+        return 1.0;
+      } else
+        return 0.0;
+    }
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
-    REGISTER_VARIABLE("EoverP", particleEoverP, "E/P");
 
     REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
@@ -1175,6 +1164,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
                       cosThetaBetweenParticleAndTrueB,
                       "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheMother", cosHelicityAngleIfCMSIsTheMother,
+                      "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
+                      "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
+                      "automatically loaded by the function, given the accelerators conditions.");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"
@@ -1190,22 +1183,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
-    REGISTER_VARIABLE("distance", particleDistance,
-                      "3D distance relative to interaction point");
-    REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
-                      "significance of distance relative to interaction point(-1 in case of numerical problems)");
-    REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
-    REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
-    REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
-    REGISTER_VARIABLE("x", particleDX, "x coordinate of vertex");
-    REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
-    REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
-    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x");
-    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y");
-    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z");
-    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
-    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
-    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
 
     REGISTER_VARIABLE("M", particleMass,
                       "invariant mass(determined from particle's 4-momentum vector)");
@@ -1295,8 +1272,10 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
-
-
+    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
+                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
+                      "a momentum-binned selection including requirements on impact parameter of, and"
+                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
     VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,

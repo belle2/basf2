@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
@@ -28,8 +29,6 @@ namespace Belle2 {
      */
     double particleE(const Particle* part);
 
-    /** return EoverP */
-    double particleEoverP(const Particle* part);
 
     /**
      * return momentum component x
@@ -134,6 +133,13 @@ namespace Belle2 {
     double cosThetaBetweenParticleAndTrueB(const Particle* part);
 
     /**
+     * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided"
+     * assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are
+     * automatically loaded by the function, given the accelerators conditions.
+     */
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
+
+    /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
      * of the two daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
      * If the given particle has three daughters: cosine of the angle between the normal vector of the plane
@@ -149,46 +155,7 @@ namespace Belle2 {
      */
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
-    /**
-     * return distance relative to interaction point
-     */
-    double particleDistance(const Particle* part);
 
-    /**
-     * return significance of distance relative to interaction point
-     * (distance relative to interaction point)/ ( error on distance measurement )
-     */
-    double particleDistanceSignificance(const Particle* part);
-
-    /**
-     * return position in x relative to interaction point
-     */
-    double particleDX(const Particle* part);
-
-    /**
-     * return position in y relative to interaction point
-     */
-    double particleDY(const Particle* part);
-
-    /**
-     * return position in z relative to interaction point
-     */
-    double particleDZ(const Particle* part);
-
-    /**
-     * return transverse distance relative to interaction point
-     */
-    double particleDRho(const Particle* part);
-
-    /**
-     * return vertex azimuthal angle
-     */
-    double particleDPhi(const Particle* part);
-
-    /**
-     * return vertex polar angle
-     */
-    double particleDCosTheta(const Particle* part);
 
     /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix
@@ -550,6 +517,12 @@ namespace Belle2 {
      * returns the phi angle (lab) that is back-to-back (cms) to the particle
      */
     double b2bPhi(const Particle* particle);
+
+    /**
+     * return Kshort using Belle goodKS algorithm
+     */
+    double goodBelleKshort(const Particle* KS);
+
 
   }
 } // Belle2 namespace

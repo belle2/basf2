@@ -74,6 +74,13 @@ RFEventProcessor::RFEventProcessor(string conffile)
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
 
+  // 7. Clear PID list
+  m_pid_sender = 0;
+  m_pid_basf2 = 0;
+  m_pid_receiver = 0;
+  m_pid_hrecv = 0;
+  m_pid_hrelay = 0;
+
 }
 
 RFEventProcessor::~RFEventProcessor()

@@ -36,13 +36,13 @@ namespace TreeFitter {
     initParams() ;
   }
 
-  ErrCode RecoKlong::initParticleWithMother(FitParams* fitparams)
+  ErrCode RecoKlong::initParticleWithMother(FitParams& fitparams)
   {
     const int posindexmother = mother()->posIndex();
 
     Eigen::Matrix<double, 1, 3> vertexToCluster = Eigen::Matrix<double, 1, 3>::Zero(1, 3);
     for (unsigned int i = 0; i < 3; ++i) {
-      vertexToCluster(i) = m_clusterPars(i) - fitparams->getStateVector()(posindexmother + i);
+      vertexToCluster(i) = m_clusterPars(i) - fitparams.getStateVector()(posindexmother + i);
     }
 
     const double distanceToMother = vertexToCluster.norm();
@@ -55,20 +55,20 @@ namespace TreeFitter {
 
     for (unsigned int i = 0; i < 3; ++i) {
       //px = |p| dx/|dx|
-      fitparams->getStateVector()(momindex + i) = absMom * vertexToCluster(i) / distanceToMother;
+      fitparams.getStateVector()(momindex + i) = absMom * vertexToCluster(i) / distanceToMother;
     }
 
-    fitparams->getStateVector()(momindex + 3) = energy ;
+    fitparams.getStateVector()(momindex + 3) = energy ;
 
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoKlong::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
+  ErrCode RecoKlong::initMotherlessParticle([[gnu::unused]] FitParams& fitparams)
   {
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoKlong::initCovariance(FitParams* fitparams) const
+  ErrCode RecoKlong::initCovariance(FitParams& fitparams) const
   {
     const int momindex = momIndex();
     const int posindex  = mother()->posIndex();
@@ -76,10 +76,10 @@ namespace TreeFitter {
     const double factorE = 1000 * m_covariance(3, 3);
     const double factorX = 1000; // ~ 10cm error on initial vertex
 
-    fitparams->getCovariance().block<4, 4>(momindex, momindex) =
+    fitparams.getCovariance().block<4, 4>(momindex, momindex) =
       Eigen::Matrix<double, 4, 4>::Identity(4, 4) * factorE;
 
-    fitparams->getCovariance().block<3, 3>(posindex, posindex) =
+    fitparams.getCovariance().block<3, 3>(posindex, posindex) =
       Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
 
     return ErrCode(ErrCode::Status::success);
@@ -102,7 +102,7 @@ namespace TreeFitter {
       }
     }
 
-    /** currently the energy in KLM is calculated as n2dHits in cluster  times 0.214 GeV
+    /** currently the energy in KLM is calculated as n2dHits in cluster times 0.214 GeV
      *  at time of writing - 8.3.18 - the KLMCluster returns 0 for the E covariance
      * */
     if (0 == m_covariance(3, 3)) {m_covariance(3, 3) = .214;}

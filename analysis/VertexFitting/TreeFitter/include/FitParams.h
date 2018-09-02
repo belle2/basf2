@@ -11,8 +11,8 @@
 
 #include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 #include <Eigen/Core>
-
 #include <vector>
+#include <framework/logging/Logger.h>
 
 namespace TreeFitter {
 
@@ -28,6 +28,15 @@ namespace TreeFitter {
 
     /** Destructor */
     ~FitParams() {};
+
+    /** copy constructor */
+    FitParams(const FitParams& toCopy)
+    {
+      this->m_globalState =
+        Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > (toCopy.m_globalState);
+      this->m_globalCovariance =
+        Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance);
+    }
 
     /** getter for the states covariance */
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > & getCovariance()
@@ -74,20 +83,13 @@ namespace TreeFitter {
     /** get dimension sum of constraints */
     int getNConstraints() {return m_nConstraints;}
 
-    /** get degress of freedom */
-    int getNDOF() {return m_nConstraints - m_dim; }
-
     /** test if the covariance makes sense */
     bool testCovariance() const;
 
     /** increment nconstraints vec */
     int& incrementNConstraintsVec(int row) { return m_nConstraintsVec[row];}
 
-    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value.
-     *  FIXME this is stupid.
-     *    replace with with setter.
-     *    only used in resetCov and KalmanCalculator.cc
-     * */
+    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value. */
     int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1]; }
 
     /** get dimension od statevector */
@@ -100,7 +102,7 @@ namespace TreeFitter {
     int nConstraints() const { return m_nConstraints; }
 
     /** get numer of degrees of freedom */
-    int nDof() const { return std::abs(nConstraints() - dim()); }// FIXME why can this be negative?
+    int nDof() const;
 
     /** resize (enlarge!) the statevector */
     void resize(int newdim);
@@ -110,6 +112,9 @@ namespace TreeFitter {
 
     /** check if global cov makes sense*/
     bool testCov() const;
+
+    /** some constraints are special the geometric for example */
+    void addNConstraint(int value) { m_nConstraints += value; }
 
     /** increment global chi2 */
     void addChiSquare(double chisq, int nconstraints)
@@ -149,6 +154,9 @@ namespace TreeFitter {
 
     /** number of conatraints */
     int m_nConstraints;
+
+    /** reduce the ndf used in the chi2 by this count */
+    int m_dimensionReduction;
 
     /** vector with the number of constraints per parameter */
     std::vector<int> m_nConstraintsVec;

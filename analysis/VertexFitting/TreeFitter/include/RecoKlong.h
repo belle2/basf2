@@ -24,13 +24,13 @@ namespace TreeFitter {
     virtual ~RecoKlong() {};
 
     /** init particle with mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams);
 
     /** init particle without mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** init covariance */
-    ErrCode initCovariance(FitParams* fitparams) const;
+    ErrCode initCovariance(FitParams& fitparams) const;
 
     /** update or init params */
     ErrCode initParams();

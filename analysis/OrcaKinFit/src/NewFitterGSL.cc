@@ -175,7 +175,8 @@ namespace Belle2 {
       fillx(x);
 
       assembleConstDer(M);
-      determineLambdas(x, M, x, W, v1);
+      int ifailL = determineLambdas(x, M, x, W, v1);
+      if (ifailL) return -1;
 
       // Get starting values into x
 //  gsl_vector_memcpy (x, xold);
@@ -278,19 +279,21 @@ namespace Belle2 {
 
       if (!ierr) {
 
-        calcCovMatrix(W, permW, x);
+        int ifailw = calcCovMatrix(W, permW, x);
 
-        // update errors in fitobjects
-        for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-          for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-            int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
-            for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
-              int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
-              if (iglobal >= 0 && jglobal >= 0)
-                fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
+        if (!ifailw) {
+          // update errors in fitobjects
+          for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
+            for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
+              int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
+              for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
+                int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
+                if (iglobal >= 0 && jglobal >= 0)
+                  fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
+              }
             }
           }
-        }
+        } else ierr = 999;
       }
 
 
@@ -756,7 +759,7 @@ namespace Belle2 {
       gsl_vector_mul(vecyscal, vece);
     }
 
-    void NewFitterGSL::assembleChi2Der(gsl_vector* vecy)
+    int NewFitterGSL::assembleChi2Der(gsl_vector* vecy)
     {
       assert(vecy);
       assert(vecy->size == idim);
@@ -766,8 +769,9 @@ namespace Belle2 {
       for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
         BaseFitObject* fo = *i;
         assert(fo);
-//  B2INFO("In New assembleChi2Der FitObject:  "<< fo->getName());
-        fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
+        //  B2INFO("In New assembleChi2Der FitObject:  "<< fo->getName());
+        int ifail = fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
+        if (ifail) return ifail;
       }
 
       // Treat the soft constraints
@@ -777,6 +781,7 @@ namespace Belle2 {
         assert(bsc);
         bsc->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
       }
+      return 0;
     }
 
     void NewFitterGSL::addConstraints(gsl_vector* vecy)
@@ -1379,9 +1384,9 @@ namespace Belle2 {
     }
 
 
-    void NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
-                                     gsl_permutation* permw,
-                                     gsl_vector* vecx)
+    int NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
+                                    gsl_permutation* permw,
+                                    gsl_vector* vecx)
     {
       // Set up equation system M*dadeta + dydeta = 0
       // here, dadeta is d a / d eta, i.e. the derivatives of the fitted
@@ -1437,7 +1442,12 @@ namespace Belle2 {
       }
 
       // Calculate inverse of M, store in M3
+      gsl_set_error_handler_off();
       int ifail = gsl_linalg_LU_invert(MatW, permw, M3);
+      if (ifail) {
+        B2WARNING("NewFitterGSL: MatW matrix is singular!");
+        return ifail;
+      }
 
       if (debug > 13) {
         B2INFO("calcCovMatrix: gsl_linalg_LU_invert ifail=" << ifail);
@@ -1486,12 +1496,13 @@ namespace Belle2 {
         }
       }
       covValid = true;
+      return 0;
     }
 
-    void NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
-                                        const gsl_matrix* MatM, const gsl_vector* vecx,
-                                        gsl_matrix* MatW, gsl_vector* vecw,
-                                        double eps)
+    int NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
+                                       const gsl_matrix* MatM, const gsl_vector* vecx,
+                                       gsl_matrix* MatW, gsl_vector* vecw,
+                                       double eps)
     {
       assert(vecxnew);
       assert(vecxnew->size == idim);
@@ -1526,7 +1537,8 @@ namespace Belle2 {
       gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, &A.matrix, &A.matrix, 0, &ATA.matrix);
 
       // put grad(f) into vecw
-      assembleChi2Der(vecw);
+      int isfail = assembleChi2Der(vecw);
+      if (isfail) return isfail;
 
 
       // ATgradf = -1*A^T*gradf + 0*ATgradf
@@ -1571,6 +1583,7 @@ namespace Belle2 {
         B2INFO("lambdanew: ");
         gsl_vector_fprintf(stdout, &lambdanew.vector, "%f");
       }
+      return 0;
     }
 
     void NewFitterGSL::MoorePenroseInverse(gsl_matrix* Ainv, gsl_matrix* A,

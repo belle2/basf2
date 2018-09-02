@@ -59,7 +59,7 @@ void EventT0CombinerModule::event()
     B2DEBUG(20, "Setting CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty <<
             " as new final value.");
     //set CDC value, if available
-    m_eventT0->setEventT0(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, cdcBestT0.detectorSet);
+    m_eventT0->setEventT0(cdcBestT0);
   } else if (m_paramCombinationMode == m_combinationModeCombineCDCandECL) {
     // start comparing with all available ECL hypothesis
     auto eclHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL);
@@ -89,12 +89,12 @@ void EventT0CombinerModule::event()
     // combine and update final value
     if (foundMatch) {
       const auto combined = computeCombination({ eclBestMatch, cdcBestT0 });
-      m_eventT0->setEventT0(combined.eventT0, combined.eventT0Uncertainty, combined.detectorSet);
+      m_eventT0->setEventT0(combined);
       B2DEBUG(20, "Combined T0 from CDC and ECL is t0 = " << combined.eventT0 << " +- " << combined.eventT0Uncertainty);
     } else {
 
       //set CDC value, if available
-      m_eventT0->setEventT0(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, cdcBestT0.detectorSet);
+      m_eventT0->setEventT0(cdcBestT0);
 
       B2DEBUG(20, "No sufficient match found between CDC and ECL timing, setting best CDC t0 = " << cdcBestT0.eventT0 << " +- " <<
               cdcBestT0.eventT0Uncertainty);

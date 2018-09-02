@@ -1215,8 +1215,8 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     PrintData(GetBuffer(n), *(GetBuffer(n) + tmp_header.POS_NWORDS));
-    printf("[FATAL] ERROR_EVENT : PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
-           *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+    printf("[FATAL] ERROR_EVENT : PRE CRC16 error : slot %c B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
+           65 + finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
       printf("%.8x ", temp_buf[ k ]);

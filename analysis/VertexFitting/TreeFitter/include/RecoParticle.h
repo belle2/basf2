@@ -25,7 +25,7 @@ namespace TreeFitter {
     virtual ~RecoParticle() {};
 
     /** init particle without mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** dimension of the constraint */
     virtual int dimM() const = 0;

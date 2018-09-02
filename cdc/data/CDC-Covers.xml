@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Covers desc="Parameters of CDC covers">
-  <!--<Cover id="0" desc="Backward main cover">
+  <Cover id="0" desc="Backward main cover">
     <Name>BackwardCover</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">466.4</InnerR1>
     <InnerR2 desc="Inner radius far from IP" unit="mm">466.4</InnerR2>
@@ -17,7 +17,7 @@
     <OuterR2 desc="Outer radius far from IP" unit="mm">442.0</OuterR2>
     <Thickness desc="The thickness of the cover" unit="mm">3.5</Thickness>
     <PosZ desc="Z position near IP" unit="mm">-925.0</PosZ>
-  </Cover>-->
+  </Cover>
   <Cover id="2" desc="Backward outer ring">
     <Name>BackwardCover</Name>
     <InnerR1 desc="Inner radius near IP" unit="mm">1125.6</InnerR1>
@@ -44,9 +44,11 @@
     <InnerR2 desc="Inner radius far from IP" unit="mm">160.0</InnerR2>
     <OuterR1 desc="Outer radius near IP" unit="mm">165.5</OuterR1>
     <OuterR2 desc="Outer radius far from IP" unit="mm">165.5</OuterR2>
-    <Thickness desc="The thickness of the cover" unit="mm">62.0</Thickness>
+    <!--<Thickness desc="The thickness of the cover" unit="mm">62.0</Thickness> 2018.05.30 Nakano -->
+    <Thickness desc="The thickness of the cover" unit="mm">63.0</Thickness>
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
-    <PosZ desc="Z position near IP" unit="mm">-323.1</PosZ>
+    <!--<PosZ desc="Z position near IP" unit="mm">-323.1</PosZ> 2018.05.30 Nakano-->
+    <PosZ desc="Z position near IP" unit="mm">-322.1</PosZ>
   </Cover>
   <Cover id="5" desc="Backward inner ring 2">
     <Name>BackwardCover</Name>
@@ -143,7 +145,8 @@
     <InnerR2 desc="Inner radius far from IP" unit="mm">160.0</InnerR2>
     <OuterR1 desc="Outer radius near IP" unit="mm">165.5</OuterR1>
     <OuterR2 desc="Outer radius far from IP" unit="mm">165.5</OuterR2>
-    <Thickness desc="The thickness of the cover" unit="mm">62.0</Thickness>
+    <!--<Thickness desc="The thickness of the cover" unit="mm">62.0</Thickness> 2018.05.30 Nakano -->
+    <Thickness desc="The thickness of the cover" unit="mm">63.0</Thickness>
     <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
     <PosZ desc="Z position near IP" unit="mm">645.1</PosZ>
   </Cover>
@@ -817,7 +820,7 @@ Rib6 (trapezoid-tube)
     <PosZ desc="Z position near IP" unit="mm">1649.5</PosZ>
     <Offset desc="Number of divisions">0</Offset>
     <NDiv desc="Number of divisions">24</NDiv>
-  </Rib>-->
+  </Rib> 2018.05.18 Nakano -->
   <Rib id="2" desc="L Angle 1-1">
     <Name>LAngle1</Name>
     <Length desc="LAngle1 length (X)" unit="mm">3.0</Length>

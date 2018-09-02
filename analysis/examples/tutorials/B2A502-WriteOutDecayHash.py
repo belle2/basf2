@@ -24,14 +24,16 @@
 from basf2 import *
 from modularAnalysis import *
 from decayHash import DecayHashMap
+from beamparameters import add_beamparameters
 
 # set the log level
 set_log_level(LogLevel.WARNING)
+beamparameters = add_beamparameters(analysis_main, "Y4S")
 
 # Bd_JpsiKL_ee Signal MC file
 # Generated for release-01-00-00
 inputFile = "/group/belle2/tutorial/release_01-00-00/1111540100.dst.root"
-inputMdstList('default', inputFile)
+inputMdstList('MC9', inputFile)
 
 
 # reconstruct the decay
@@ -52,7 +54,7 @@ var = ['M',
        'extraInfo(DecayHashExtended)',
        ]
 
-variablesToNTuple('J/psi', var, filename='Jpsi.root')
+variablesToNtuple('J/psi', var, filename='Jpsi.root')
 
 # process the events
 process(analysis_main)

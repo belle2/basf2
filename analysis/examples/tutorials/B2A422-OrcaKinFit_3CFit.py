@@ -30,7 +30,7 @@ print_params(beamparameters)
 
 # Input file(s).
 filelistSIG = ['/gpfs/group/belle2/tutorial/orcakinfit/out-1.root']
-inputMdstList('default', filelistSIG)
+inputMdstList('MC9', filelistSIG)
 
 # Creates a list of photons
 stdPhotons('loose')

@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Manca Mrvar, Thomas Kuhr                                 *
+ * Contributors: Manca Mrvar, Thomas Kuhr, Leonid Burmistrov              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +12,7 @@
 #include <arich/calibration/ARICHDatabaseTools.h>
 #include <arich/dbobjects/ARICHAerogelMap.h>
 #include <arich/dbobjects/ARICHAerogelInfo.h>
+#include <arich/dbobjects/ARICHAerogelRayleighScatteringFit.h>
 #include <arich/dbobjects/ARICHAsicInfo.h>
 #include <arich/dbobjects/ARICHHapdQA.h>
 #include <arich/dbobjects/ARICHFebTest.h>
@@ -79,7 +80,6 @@
 
 using namespace std;
 using namespace Belle2;
-
 
 ARICHDatabaseImporter::ARICHDatabaseImporter(const vector<string>& inputFilesHapdQA, const vector<string>& inputFilesAsicRoot,
                                              const vector<string>& inputFilesAsicTxt, const vector<string>& inputFilesHapdQE, const vector<string>& inputFilesFebTest)
@@ -475,6 +475,7 @@ void ARICHDatabaseImporter::importAeroTilesInfo()
     std::string aeroID = "";
     float refractiveIndex = 0.;
     float transmissionLength = 0.;
+    float thickness = 0.;
     for (int layer = 0; layer < 2; layer++) {
       for (const auto& element : elements) {
         if (element.getAerogelLayer(layer) == 1 && element.getAerogelRingID() == ring
@@ -484,12 +485,16 @@ void ARICHDatabaseImporter::importAeroTilesInfo()
         if (elementInfo.getAerogelSN() == aeroID) {
           refractiveIndex = elementInfo.getAerogelRefractiveIndex();
           transmissionLength = elementInfo.getAerogelTransmissionLength();
+          thickness = elementInfo.getAerogelThickness();
         }
       }
 
-      B2INFO("adding mapping... slot " << slot << ", layer " << layer << ", refIn " << refractiveIndex << ", transLen " <<
-             transmissionLength << '\n');
-      tilesInfo.addMapping(slot, layer, refractiveIndex, transmissionLength);
+      B2INFO("adding mapping... slot " << slot
+             << ", layer " << layer
+             << ", refIn " << refractiveIndex
+             << ", transLen " << transmissionLength
+             << ", thick " << thickness << '\n');
+      tilesInfo.addMapping(slot, layer, refractiveIndex, transmissionLength, thickness);
 
     }
   }
@@ -951,9 +956,57 @@ void ARICHDatabaseImporter::dumpAerogelOpticalProperties(std::string outRootFile
   rootFile->Close();
 }
 
+//class for ARICH aerogel Rayleigh scattering fit parameters
+void ARICHDatabaseImporter::importAeroRayleighScatteringFit(std::string commentSingleWord)
+{
+  GearDir content = GearDir("/aerogelFit");
+
+  //cout<<" ARICHDatabaseImporter::importAeroRayleighScatteringFit "<<endl;
+
+  // define data array
+  TClonesArray agelFitConstants("Belle2::ARICHAerogelRayleighScatteringFit");
+  int agel = 0;
+  string serial;
+  float version = (float) content.getDouble("version");
+
+  // loop over xml files and extract the data
+  for (const auto& aerogel : content.getNodes("aerogeltile")) {
+    //cout<<agel<<" serial : "<<<<endl;
+    serial = aerogel.getString("serial");
+    vector<float> vPar;
+    vPar.push_back((float)aerogel.getDouble("p0"));
+    vPar.push_back((float)aerogel.getDouble("p1"));
+    vPar.push_back((float)aerogel.getDouble("p2"));
+    vPar.push_back((float)aerogel.getDouble("p3"));
+    vPar.push_back((float)aerogel.getDouble("p4"));
+    vPar.push_back((float)aerogel.getDouble("p5"));
+    vPar.push_back((float)aerogel.getDouble("p6"));
+    ARICHAerogelRayleighScatteringFit* aeroRayScatFit = new ARICHAerogelRayleighScatteringFit(version, serial, commentSingleWord, vPar);
+    //if(agel == 0)
+    //  aeroRayScatFit->printContent(true);
+    //else
+    //  aeroRayScatFit->printContent();
+    agelFitConstants[agel] = aeroRayScatFit;
+    agel++;
+  }
+
+  // define interval of validity
+  // IOV (0,0,-1,-1) is valid for all runs and experiments
+  IntervalOfValidity iov(0, 0, -1, -1);
+
+  // store under default name:
+  // Database::Instance().storeData(&agelConstants, iov);
+  // store under user defined name:
+  TString coreName = "ARICHAerogelRayleighScatteringFit";
+  TString coreNameSuffix = commentSingleWord;
+  if (coreNameSuffix != "")
+    coreName += coreNameSuffix;
+  Database::Instance().storeData(coreName.Data(), &agelFitConstants, iov);
+
+}
 
 // classes for quality assessment and test data
-void ARICHDatabaseImporter::importAerogelInfo()
+void ARICHDatabaseImporter::importAerogelInfo(TString coreNameSuffix)
 {
   GearDir content = GearDir("/ArichData/AllData/AerogelData/Content");
 
@@ -984,13 +1037,16 @@ void ARICHDatabaseImporter::importAerogelInfo()
   }
 
   // define interval of validity
-//  IntervalOfValidity iov(0, 0, 1, 99);
+  // IntervalOfValidity iov(0, 0, 1, 99);
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
 
   // store under default name:
   // Database::Instance().storeData(&agelConstants, iov);
   // store under user defined name:
-  Database::Instance().storeData("ARICHAerogelInfo", &agelConstants, iov);
+  TString coreName = "ARICHAerogelInfo";
+  if (coreNameSuffix != "")
+    coreName += coreNameSuffix;
+  Database::Instance().storeData(coreName.Data(), &agelConstants, iov);
 }
 
 void ARICHDatabaseImporter::exportAerogelInfo(int verboseLevel)

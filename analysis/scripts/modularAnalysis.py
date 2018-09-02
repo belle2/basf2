@@ -649,36 +649,60 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main,
                       enforceFitHypothesis=False):
     """
-    Creates Particles of the desired types from the corresponding MDST dataobjects,
+    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
-    via list tuples (decayString, cut), like for example
-    kaons = ('K+:std', 'kaonID>0.1')
-    pions = ('pi+:std', 'pionID>0.1')
-    fillParticleLists([kaons, pions])
+    via list tuples (decayString, cut), for example
+
+    .. code-block:: python
+
+        kaons = ('K+:mykaons', 'kaonID>0.1')
+        pions = ('pi+:mypions','pionID>0.1')
+        fillParticleLists([kaons, pions])
+
+    If you are unsure what selection you want, you might like to see the
+    `StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the MDST dataobject that is used as an input is determined from the type of
+    The type of the `mdst` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    - charged final state particles (input MDST type = Tracks)
-       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
+    * charged final state particles (input `mdst` type = Tracks)
+        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    - neutral final state particles
-       - gamma         (input MDST type = ECLCluster)
-       - K_S0, Lambda0 (input MDST type = V0)
-       - K_L0          (input MDST type = KLMCluster)
+    * neutral final state particles
+        - "gamma"           (input `mdst` type = ECLCluster)
+        - "K_S0", "Lambda0" (input `mdst` type = V0)
+        - "K_L0"            (input `mdst` type = KLMCluster)
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
-    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
-                                using a mass hypothesis of the exact type passed to fillParticleLists().
-                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
-                                in terms of mass difference will be used if the fit using exact particle
-                                type is not available.
+    Note:
+        For "K_S0" and "Lambda0" you must specify the daughter ordering.
+
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0s:
+
+    .. code-block:: python
+
+        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
+        fillParticleLists([kaons, pions, v0lambdas])
+
+    Parameters:
+        decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
+                                     The decay string determines the type of Particle
+                                     and determines the of the ParticleList.
+                                     If the input MDST type is V0 the whole
+                                     decay chain needs to be specified, so that
+                                     the user decides and controls the daughters
+                                     ' order (e.g. `K_S0 -> pi+ pi-`)
+                                     The cut is the selection criteria
+                                     to be added to the ParticleList. It can be an empty string.
+        writeOut (bool):             whether RootOutput module should save the created ParticleList
+        path (basf2.Path):           modules are added to this path
+        enforceFitHypothesis (bool): If true, Particles will be created only for the tracks which have been fitted
+                                     using a mass hypothesis of the exact type passed to fillParticleLists().
+                                     If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                     in terms of mass difference will be used if the fit using exact particle
+                                     type is not available.
     """
 
     pload = register_module('ParticleLoader')
@@ -697,32 +721,46 @@ def fillParticleList(
     enforceFitHypothesis=False
 ):
     """
-    Creates Particles of the desired type from the corresponding MDST dataobjects,
+    Creates Particles of the desired type from the corresponding `mdst` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
+    See also:
+        the `StandardParticles` functions.
+
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the MDST dataobject that is used as an input is determined from the type of
+    The type of the `mdst` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    - charged final state particles (input MDST type = Tracks)
-       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
+    * charged final state particles (input `mdst` type = Tracks)
+        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    - neutral final state particles
-       - gamma         (input MDST type = ECLCluster)
-       - K_S0, Lambda0 (input MDST type = V0)
-       - K_L0          (input MDST type = KLMCluster)
+    * neutral final state particles
+        - "gamma"           (input `mdst` type = ECLCluster)
+        - "K_S0", "Lambda0" (input `mdst` type = V0)
+        - "K_L0"            (input `mdst` type = KLMCluster)
 
-    Use 'fillConvertedPhotonsList' function to load converted photons from the V0 StoreArray.
+    Note:
+        For "K_S0" and "Lambda0" you must specify the daughter ordering.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
-    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
-                                using a mass hypothesis of the exact type passed to fillParticleLists().
-                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
-                                in terms of mass difference will be used if the fit using exact particle
-                                type is not available.
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0ss:
+
+    .. code-block:: python
+
+        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
+        fillParticleLists([kaons, pions, v0lambdas])
+
+    Parameters:
+        decayString (str):           Type of Particle and determines the name of the ParticleList.
+                                     If the input MDST type is V0 the whole decay chain needs to be specified, so that
+                                     the user decides and controls the daughters' order (e.g. `K_S0 -> pi+ pi-`)
+        cut (str):                   Particles need to pass these selection criteria to be added to the ParticleList
+        writeOut (bool):             whether RootOutput module should save the created ParticleList
+        path (basf2.Path):           modules are added to this path
+        enforceFitHypothesis (bool): If true, Particles will be created only for the tracks which have been fitted
+                                     using a mass hypothesis of the exact type passed to fillParticleLists().
+                                     If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                     in terms of mass difference will be used if the fit using exact particle
+                                     type is not available.
     """
 
     pload = register_module('ParticleLoader')
@@ -774,10 +812,20 @@ def fillConvertedPhotonsList(
     """
     Creates photon Particle object for each e+e- combination in the V0 StoreArray.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        You must specify the daughter ordering.
+
+    .. code-block:: python
+
+        fillConvertedPhotonsList('gamma:converted -> e+ e-', '')
+
+    Parameters:
+        decayString (str): Must be gamma to an e+e- pair. You muse specify the daughter ordering.
+                           Will also determine the name of the particleList.
+        cut (str):         Particles need to pass these selection criteria to be added to the ParticleList
+        writeOut (bool):   whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
+
     """
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
@@ -1202,11 +1250,24 @@ def printList(list_name, full, path=analysis_main):
 
 def ntupleFile(file_name, path=analysis_main):
     """
+    Warning:
+        NtupleTools are going to be deprecated from release-03 and we aim to
+        remove them from release-04.  Please see
+        `modularAnalysis.variablesToNtuple` for the recommended alternative.
+
     Creates new ROOT file to which the flat ntuples will be saved.
 
-    @param file_name file name of the output root file
-    @param path      modules are added to this path
+    Parameters:
+        file_name (str): file name of the output root file
+        path (basf2.Path): modules are added to this path
     """
+
+    message = (
+        "NtupleTools are going to be deprecated from release-03 and we"
+        " aim to remove them from release-04.\nPlease see "
+        "modularAnalysis.variablesToNtuple for the recommended alternative."
+    )
+    B2WARNING(message)
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
@@ -1221,12 +1282,25 @@ def ntupleTree(
     path=analysis_main,
 ):
     """
+    Warning:
+        NtupleTools are going to be deprecated from release-03 and we aim to
+        remove them from release-04.  Please see
+        `modularAnalysis.variablesToNtuple` for the recommended alternative.
+
     Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
 
-    @param tree_name output nutple (TTree) name
-    @param list_name input ParticleList name
-    @param tools     list of Ntuple tools to be included
+    Parameters:
+        tree_name (str): the output nutple (TTree) name
+        list_name (str): input ParticleList name
+        tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
     """
+
+    message = (
+        "NtupleTools are going to be deprecated from release-03 and we"
+        " aim to remove them from release-04.\nPlease see "
+        "modularAnalysis.variablesToNtuple for the recommended alternative."
+    )
+    B2WARNING(message)
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
@@ -1244,12 +1318,16 @@ def variablesToNtuple(
     path=analysis_main,
 ):
     """
-    Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
-    @param treename name of the ntuple tree
-    @param filename which is used to store the variables
-    @param path basf2 path
+    Creates and fills a flat ntuple with the specified variables from the VariableManager.
+    If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
+    If an empty decayString is provided, there will be one entry per event (useful for trigger studies, etc).
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        treename (str): name of the ntuple tree
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToNtuple')
@@ -1261,27 +1339,6 @@ def variablesToNtuple(
     path.add_module(output)
 
 
-def variablesToNTuple(
-    decayString,
-    variables,
-    treename='variables',
-    filename='ntuple.root',
-    path=analysis_main,
-):
-    """"
-    Alias of variablesToNtuple for backward compatibility whilst fixing inconsistent naming
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
-    @param treename name of the ntuple tree
-    @param filename which is used to store the variables
-    @param path basf2 path
-    """
-
-    B2WARNING("variablesToNTuple spelling is deprecated, call variablesToNtuple with same arguments (consistent capitalization)")
-
-    return variablesToNtuple(decayString, variables, treename, filename, path)
-
-
 def variablesToHistogram(
     decayString,
     variables,
@@ -1291,11 +1348,13 @@ def variablesToHistogram(
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString  specifies type of Particles and determines the name of the ParticleList
-    @param variables variables + binning which must be registered in the VariableManager
-    @param variables_2d pair of variables + binning for each which must be registered in the VariableManager
-    @param filename which is used to store the variables
-    @param path basf2 path
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of tuple): variables + binning which must be registered in the VariableManager
+        variables_2d (list of tuple): pair of variables + binning for each which must be registered in the VariableManager
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToHistogram')
@@ -2056,7 +2115,7 @@ def writePi0EtaVeto(
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
-        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2TDist)')
 
     PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
 
@@ -2172,3 +2231,41 @@ def labelTauPairMC(path=analysis_main):
     tauDecayMarker.set_name('TauDecayMarker_')
 
     path.add_module(tauDecayMarker)
+
+
+def tagCurlTracks(particleLists,
+                  belleFlag=False,
+                  mcStatsFlag=False,
+                  pVal=0.5,
+                  selectorType='cut',
+                  ptCut=0.4,
+                  path=analysis_main):
+    """
+    Warning:
+        This module is not yet calibrated with Belle II data and should not be used without extensive study.
+
+    Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
+    For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
+
+      .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
+
+    @param particleLists: list of particle lists to check for curls
+    @param belleFlag:     bool flag for belle or belle2 data/mc
+    @param mcStatsFlag:   bool flag to output some truth based information
+    @param pVal:          float pVal cut for whether two tracks are identified as curls of each other.
+                          Note 'cut' selector is binary 0/1
+    @param selectorType:  string name of selector to use. Only 'cut' selection based on BN1079 is currently available
+    @param ptCut:         pre-selection cut on transverse momentum.
+    @param path:          module is added to this path
+    """
+
+    curlTagger = register_module('CurlTagger')
+    curlTagger.set_name('CurlTagger_')
+    curlTagger.param('particleLists', particleLists)
+    curlTagger.param('belleFlag', belleFlag)
+    curlTagger.param('mcStatsFlag', mcStatsFlag)
+    curlTagger.param('pVal', pVal)
+    curlTagger.param('selectorType', selectorType)
+    curlTagger.param('ptCut', ptCut)
+
+    path.add_module(curlTagger)

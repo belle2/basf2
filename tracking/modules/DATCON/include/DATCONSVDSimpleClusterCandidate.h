@@ -85,7 +85,7 @@ namespace Belle2 {
      */
     float getPosition() const { return m_position; }
 
-    /** TODO */
+    /** Getter for the index (0...5) of the seed strip inside this cluster candidate */
     unsigned short getSeedStripIndex() const { return m_seedStripIndex; }
 
     /**
@@ -114,22 +114,22 @@ namespace Belle2 {
     unsigned short m_maxClusterSize;
 
     /** Charge of the cluster */
-    unsigned short m_charge;
+    unsigned short m_charge = 0;
 
     /** Seed Charge of the cluster */
-    unsigned short m_seedCharge;
+    unsigned short m_seedCharge = 0;
 
     /** Position of the cluster */
-    float m_position;
+    float m_position = 0;
 
     /** SVD strip (i.e. 0...511 or 0...767) that is considered the seed strip of the cluster */
-    unsigned short m_seedStrip;
+    unsigned short m_seedStrip = 0;
 
     /** Size of the cluster */
-    unsigned short m_size;
+    unsigned short m_size = 0;
 
     /** Index of the seed strip of the cluster (0...m_Size) */
-    unsigned short m_seedStripIndex;
+    unsigned short m_seedStripIndex = 0;
 
     /** Vector containing strips (DATCONSVDDigits) that are added */
     std::vector<unsigned short> m_strips;

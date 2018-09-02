@@ -69,6 +69,11 @@ namespace Belle2 {
     */
     Manager::FunctionPtr pidMissingProbabilityExpert(const std::vector<std::string>& arguments);
 
+    /**
+     * @return The particle ID (of the particle's own hypothesis)
+     */
+    double particleID(const Particle* part);
+
 
     /**
      * return electron ID to be used in the physics analyses

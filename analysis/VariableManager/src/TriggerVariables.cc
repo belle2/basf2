@@ -88,6 +88,29 @@ namespace Belle2 {
       return isL1Trigger;
     }
 
+    double L1InputBit(const Particle*, const std::vector<double>& bit)
+    {
+      double isL1Trigger = 0.0;
+
+      if (bit.size() != 1) return isL1Trigger;
+
+      // The number of trigger words is hardcoded in the mdst dataobject and no getter for the full array exists
+      const unsigned int trgWordSize = 32;
+      const unsigned int ntrgWords = 10;
+      if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return isL1Trigger;
+
+      // Get the trigger word that contains this bit (we could also convert the full array into a bitset or vector<bool> but that is a bit slower)
+      const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
+
+      // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
+      StoreObjPtr<TRGSummary> trg;
+      const unsigned int trgWord = trg->getInputBits(ntrgWord);
+      const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
+      isL1Trigger = (trgWord >> bitInWord) & 1;
+
+      return isL1Trigger;
+    }
+
     double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit)
     {
       double prescale = 0.0;
@@ -175,9 +198,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
                       "Returns 1 if at least one PSNM L1 trigger bit is true.");
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit ,
-                      "Returns the PSNM status of i-th trigger bit.");
+                      "Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.");
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit ,
-                      "Returns the FTDL (Final Trigger Decision Logic before prescale) status of i-th trigger bit.");
+                      "Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.");
+    REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
+                      "Returns the input bit status of the i-th input trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
                       "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
     //-------------------------------------------------------------------------

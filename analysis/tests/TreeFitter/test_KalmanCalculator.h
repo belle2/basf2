@@ -41,9 +41,9 @@ namespace Belle2 {
     residuals << .1, .2, .3;
     const Eigen::Matrix<double, 3, 1>& c_r = residuals;
 
-    kalman.calculateGainMatrix(c_r, c_G, &fitParDim6, nullptr, 0);
+    kalman.calculateGainMatrix(c_r, c_G, fitParDim6, nullptr, 0);
 
-    kalman.updateState(&fitParDim6);
+    kalman.updateState(fitParDim6);
 
     Eigen::Matrix<double, 6, 1> expectedUpdatedFitpars;
     expectedUpdatedFitpars << -0.05, -0.1, -0.15, -0.05, -0.1, -0.15;
@@ -54,7 +54,7 @@ namespace Belle2 {
     expectedUpdatedCov.diagonal < -3 > () << -1, -1, -1;
     expectedUpdatedCov.diagonal<3>() << -1, -1, -1;
 
-    kalman.updateCovariance(&fitParDim6);
+    kalman.updateCovariance(fitParDim6);
     Eigen::Matrix<double, 6, 6> updatedCov = fitParDim6.getCovariance().selfadjointView<Eigen::Lower>();
 
 

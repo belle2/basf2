@@ -49,15 +49,15 @@ if __name__ == "__main__":
     # Add your root files here
     f = 'mdst_002001_prod00000789_task00004203.root'
     path = reconstruction_path([f])
-    variablesToNTuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
     path = reconstruction_path([f])
-    variablesToNTuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
     path = reconstruction_path([f])
-    variablesToNTuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
     process(path)

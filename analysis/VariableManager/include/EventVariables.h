@@ -34,9 +34,20 @@ namespace Belle2 {
     double nTracks(const Particle*);
 
     /**
+     * return number of problematic charge 0 tracks in event
+     * (these get skipped when making particle lists)
+     */
+    double nChargeZeroTrackFits(const Particle*);
+
+    /**
      * return number of ECL clusters in event
      */
     double nECLClusters(const Particle*);
+
+    /**
+     * return legacy total energy in ECL clusters in event as used for Belle 1 analysis
+     */
+    double belleECLEnergy(const Particle*);
 
     /**
      * return number of KLM clusters in event
@@ -47,6 +58,11 @@ namespace Belle2 {
      * return total energy in KLM clusters in event
      */
     double KLMEnergy(const Particle*);
+
+    /**
+     * return number MCParticles in event
+     */
+    double nMCParticles(const Particle*);
 
     /**
     * return experiment number
@@ -217,6 +233,32 @@ namespace Belle2 {
     * return the energy of the photons of all the event
     */
     double totalPhotonsEnergyOfEvent(const Particle*);
+
+    /**
+     * return the event date
+     */
+    double eventYearMonthDay(const Particle*);
+
+    /**
+     * return the event year
+     */
+    double eventYear(const Particle*);
+
+    /**
+     * return the event time
+     */
+    double eventTimeSeconds(const Particle*);
+
+    /**
+     * return the event time fractions remainder
+     */
+    double eventTimeSecondsFractionRemainder(const Particle*);
+
+    /**
+    * return the event T0
+    */
+    double eventT0(const Particle*);
+
   }
 } // Belle2 namespace
 

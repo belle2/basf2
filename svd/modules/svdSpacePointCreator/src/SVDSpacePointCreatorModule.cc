@@ -45,6 +45,14 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 
   addParam("MinClusterTime", m_minClusterTime, "clusters with time below this value are not considered to make spacePoints.",
            float(-20));
+  addParam("inputPDF", m_inputPDF,
+           "Path containing pdf root file", std::string("/data/svd/spacePointQICalibration.root"));
+  addParam("useQualityEstimator", m_useQualityEstimator,
+           "Standard is true. If turned off spacepoints will not be assigned a quality in their pairing.", bool(false));
+
+  addParam("useLegacyNaming", m_useLegacyNaming,
+           "Use old PDF name convention?", bool(true));
+
 }
 
 
@@ -64,6 +72,21 @@ void SVDSpacePointCreatorModule::initialize()
           "\nsvdClusters: " << m_svdClusters.getName() <<
           "\nspacePoints: " << m_spacePoints.getName());
 
+  if (m_useQualityEstimator == true) {
+    if (m_inputPDF.empty()) {
+      B2ERROR("Input PDF filename not set");
+    } else {
+      std::string fullPath = FileSystem::findFile(m_inputPDF);
+      if (fullPath.empty()) {
+        B2ERROR("PDF file:" << m_inputPDF << "not located! Check filename input matches name of PDF file!");
+      }
+      m_inputPDF = fullPath;
+    }
+
+    m_calibrationFile = new TFile(m_inputPDF.c_str(), "READ");
+    if (!m_calibrationFile->IsOpen())
+      B2FATAL("Couldn't open pdf file:" << m_inputPDF);
+  }
 
   // set some counters for output:
   InitializeCounters();
@@ -74,11 +97,14 @@ void SVDSpacePointCreatorModule::initialize()
 void SVDSpacePointCreatorModule::event()
 {
 
+
+
   if (m_onlySingleClusterSpacePoints == true) {
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_minClusterTime);
+    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_minClusterTime, m_useQualityEstimator, m_calibrationFile,
+                                  m_useLegacyNaming);
   }
 
 
@@ -101,6 +127,7 @@ void SVDSpacePointCreatorModule::event()
 
   m_TESTERSVDClusterCtr += m_svdClusters.getEntries();
   m_TESTERSpacePointCtr += m_spacePoints.getEntries();
+
 }
 
 
@@ -110,6 +137,9 @@ void SVDSpacePointCreatorModule::terminate()
   B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
           ", svdClusters: " << m_TESTERSVDClusterCtr <<
           ", spacePoints: " << m_TESTERSpacePointCtr);
+  if (m_useQualityEstimator == true) {
+    m_calibrationFile->Delete();
+  }
 }
 
 

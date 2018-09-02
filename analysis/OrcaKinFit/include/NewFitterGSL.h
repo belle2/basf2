@@ -85,13 +85,13 @@ namespace Belle2 {
       virtual void setDebug(int debuglevel);
 
       /// Determine best lambda values
-      virtual void determineLambdas(gsl_vector* vecxnew,         ///< vector with new lambda values
-                                    const gsl_matrix* MatM,     ///< matrix with constraint derivatives
-                                    const gsl_vector* vecx,     ///< vector with current x values
-                                    gsl_matrix* MatW,           ///< work matrix
-                                    gsl_vector* vecw,           ///< work vector
-                                    double eps = 0              ///< Singular values < eps*(max(abs(s_i))) are set to 0
-                                   );
+      virtual int determineLambdas(gsl_vector* vecxnew,         ///< vector with new lambda values
+                                   const gsl_matrix* MatM,     ///< matrix with constraint derivatives
+                                   const gsl_vector* vecx,     ///< vector with current x values
+                                   gsl_matrix* MatW,           ///< work matrix
+                                   gsl_vector* vecw,           ///< work vector
+                                   double eps = 0              ///< Singular values < eps*(max(abs(s_i))) are set to 0
+                                  );
 
       /// Calculate 2nd order correction step
       virtual void calc2ndOrderCorr(gsl_vector* vecdxhat,        ///< the correction step
@@ -158,7 +158,7 @@ namespace Belle2 {
       void scaley(gsl_vector* vecyscal, const gsl_vector* vecy, const gsl_vector* vece);
 
       // Fill chi2 derivatives into vector y
-      void assembleChi2Der(gsl_vector* vecy);
+      int assembleChi2Der(gsl_vector* vecy);
 
       // Fill vector y with values of constraints
       void addConstraints(gsl_vector* vecy);
@@ -243,7 +243,7 @@ namespace Belle2 {
 
       int invertM();
 
-      void calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, gsl_vector* vecx);
+      int calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, gsl_vector* vecx);
 
       enum {NPARMAX = 50, NCONMAX = 10, NUNMMAX = 10};
 

@@ -283,7 +283,7 @@ void ECLBhabhaTCollectorModule::collect()
     time  = ecl_dig->getTimeFit() * TICKS_TO_NS - t0;
 
     // Offset time by electronics calibration and flight time calibration.
-    time += ElectronicsTime[cid - 1] * TICKS_TO_NS;
+    time -= ElectronicsTime[cid - 1] * TICKS_TO_NS;
     time -= FlightTime[cid - 1];
 
     // Cell ID should be within specified range.

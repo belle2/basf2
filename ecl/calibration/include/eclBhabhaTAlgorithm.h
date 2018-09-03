@@ -45,8 +45,6 @@ namespace Belle2 {
       virtual EResult calibrate();
 
     private:
-      /** Sum of all TimevsCrys histograms. */
-      TH2F* m_TimevsCrys_tot;
       /** Number of processed runs */
       unsigned int m_run_count;
     };

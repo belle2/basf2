@@ -22,7 +22,6 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   debugOutput(true),
   debugFilename("eclBhabhaTAlgorithm.root"),
   // Private members
-  m_TimevsCrys_tot(0),
   m_run_count(0)
 {
   setDescription(
@@ -35,19 +34,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   /** Put root into batch mode so that we don't try to open a graphics window */
   gROOT->SetBatch();
 
-  /**-----------------------------------------------------------------------------------------------*/
-  /***  Sum data from all runs into m_TimevsCrys_tot ***/
-
   /* Histogram with the data collected by eclBhabhaTCollectorModule */
   auto TimevsCrys = getObjectPtr<TH2F>("TimevsCrys");
-
-  /* Add one more histogram to the total */
-  if (!m_TimevsCrys_tot) m_TimevsCrys_tot = new TH2F(*TimevsCrys);
-  else m_TimevsCrys_tot->Add(TimevsCrys.get());
-
-  /* Perform fit only after we merged data from all of the runs */
-  m_run_count++;
-  if (m_run_count < getRunListFromAllData().size()) return c_NotEnoughData;
+  if (!TimevsCrys) return c_Failure;
 
   /**-----------------------------------------------------------------------------------------------*/
 
@@ -72,7 +61,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     histfile = new TFile("eclBhabhaTAlgorithm.root", "recreate");
     tree     = new TTree("tree", "Debug data from bhabha time calibration algorithm");
 
-    m_TimevsCrys_tot->Write();
+    TimevsCrys->Write();
 
     tree->Branch("cid", &tree_cid)->SetTitle("Cell ID, 1..8736");
     tree->Branch("coef", &peak)->SetTitle("Time offset, ns");
@@ -91,7 +80,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   const double TICKS_TO_NS = 0.4931; // ns/clock
 
   for (int crys_id = cellIDLo; crys_id <= cellIDHi; crys_id++) {
-    TH1D* h_time = m_TimevsCrys_tot->ProjectionY("h_time", crys_id + 1, crys_id + 1);
+    TH1D* h_time = TimevsCrys->ProjectionY("h_time", crys_id + 1, crys_id + 1);
 
     TF1* gaus = new TF1("func", "gaus(0)", hist_xmin, hist_xmax);
     gaus->SetParNames("normalization", "peak", "sigma");
@@ -188,10 +177,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     t_offsets.push_back(peak / TICKS_TO_NS);
     t_offsets_unc.push_back(peak_unc / TICKS_TO_NS);
 
-    // Set bin errors to 0 to make bins more visible
-    // for (int i = 0; i < h_time->GetNbinsX(); i++) {
-    //   h_time->SetBinError(i, 0);
-    // }
     histfile->WriteTObject(h_time, (std::string("h_time_") + std::to_string(crys_id + 1)).c_str());
 
     tree_cid  = crys_id + 1;

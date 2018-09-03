@@ -87,10 +87,6 @@ namespace Belle2 {
        * @return SensorInfo object for the desired sensor.
        */
       inline const PXD::SensorInfo& getInfo(VxdID sensorID) const;
-      /** Return thickness of the sensor with the given sensor ID */
-      inline double getSensorThickness(VxdID sensorID) const;
-      /** Return mass of the sensor with the given sensor ID */
-      inline double getSensorMass(VxdID sensorID) const;
       /** Return area of the sensor with the given sensor ID */
       inline double getSensorArea(VxdID sensorID) const;
 
@@ -110,22 +106,13 @@ namespace Belle2 {
 
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
       std::map<unsigned long long int,  std::map<VxdID, SensorData> > m_buffer; /**< Struct to hold sensor-wise background data. */
+      std::map<VxdID, int> m_sensitivePixelMap; /**< Struct to hold sensor-wise number of sensitive pixels */
+      std::map<VxdID, double> m_sensitiveAreaMap; /**< Struct to hold sensor-wise sensitive area */
     };
 
     inline const PXD::SensorInfo& PXDBgTupleProducerModule::getInfo(VxdID sensorID) const
     {
       return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    }
-
-    inline  double PXDBgTupleProducerModule::getSensorThickness(VxdID sensorID) const
-    {
-      return getInfo(sensorID).getThickness();
-    }
-
-    inline  double PXDBgTupleProducerModule::getSensorMass(VxdID sensorID) const
-    {
-      const PXD::SensorInfo& info = getInfo(sensorID);
-      return info.getWidth() * info.getLength() * info.getThickness() * c_densitySi;
     }
 
     inline  double PXDBgTupleProducerModule::getSensorArea(VxdID sensorID) const

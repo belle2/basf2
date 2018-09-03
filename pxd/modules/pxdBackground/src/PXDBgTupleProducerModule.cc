@@ -96,7 +96,31 @@ void PXDBgTupleProducerModule::initialize()
   }
 }
 
-void PXDBgTupleProducerModule::beginRun() {}
+void PXDBgTupleProducerModule::beginRun()
+{
+  // Compute the sensitive area for all PXD sensors
+  for (auto const& pair2 : m_sensorData) {
+    auto const& sensorID = pair2.first;
+    auto info = getInfo(sensorID);
+
+    m_sensitivePixelMap[sensorID] = info.getUCells() * info.getVCells();
+    m_sensitiveAreaMap[sensorID] = getSensorArea(sensorID);
+
+    for (int ui = 0; ui < info.getUCells(); ++ui) {
+      for (int vi = 0; vi < info.getVCells(); ++vi) {
+        if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, ui, vi)
+            || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, ui, vi)) {
+          m_sensitivePixelMap[sensorID] -= 1;
+          m_sensitiveAreaMap[sensorID] -= info.getVPitch(info.getVCellPosition(vi)) * info.getUPitch();
+        }
+      }
+    }
+
+    if (m_sensitivePixelMap[sensorID] == 0) {
+      B2WARNING("All pixels from Sensor=" << sensorID << " are masked.");
+    }
+  }
+}
 
 void PXDBgTupleProducerModule::event()
 {
@@ -116,26 +140,19 @@ void PXDBgTupleProducerModule::event()
     m_buffer[ts] = m_sensorData;
   }
 
-  // We accumulate data in one second blocks
-  VxdID currentSensorID(0);
-  int currentSensorPixels(0);
-
   // Empty map for computing event wise occupancy
   std::map<VxdID, double> occupancyMap;
 
   for (const PXDDigit& storeDigit : storeDigits) {
     VxdID sensorID = storeDigit.getSensorID();
-    if (sensorID != currentSensorID) {
-      currentSensorID = sensorID;
-      auto info = getInfo(sensorID);
-      currentSensorPixels = info.getUCells() * info.getVCells();
-    }
     double ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, storeDigit.getUCellID(), storeDigit.getVCellID());
     double hitEnergy = storeDigit.getCharge() * ADUToEnergy;
 
-    occupancyMap[currentSensorID] += 1.0 / currentSensorPixels;
-    m_buffer[ts][currentSensorID].m_dose += (hitEnergy / Unit::J);
-    m_buffer[ts][currentSensorID].m_expo += hitEnergy;
+    if (m_sensitivePixelMap[sensorID] != 0) {
+      occupancyMap[sensorID] += 1.0 / m_sensitivePixelMap[sensorID];
+    }
+    m_buffer[ts][sensorID].m_dose += (hitEnergy / Unit::J);
+    m_buffer[ts][sensorID].m_expo += hitEnergy;
   }
 
   for (auto& pair : m_buffer[ts]) {
@@ -214,16 +231,20 @@ void PXDBgTupleProducerModule::terminate()
       auto const& sensorID = pair2.first;
       auto const& bgdata = pair2.second;
       double currentComponentTime = bgdata.m_nEvents * m_integrationTime;
-      double currentSensorMass = getSensorMass(sensorID);
-      double currentSensorArea = getSensorArea(sensorID);
+      const PXD::SensorInfo& info = getInfo(sensorID);
+      double currentSensorMass = m_sensitiveAreaMap[sensorID] * info.getThickness() * c_densitySi;
+      double currentSensorArea = m_sensitiveAreaMap[sensorID];
       m_sensorData[sensorID] = bgdata;
       // Some bg rates are still in wrong units. We have to fix this now.
       m_sensorData[sensorID].m_occupancy = bgdata.m_occupancy / bgdata.m_nEvents;
-      m_sensorData[sensorID].m_dose *= (1.0 / currentComponentTime) * (1000 / currentSensorMass);
-      m_sensorData[sensorID].m_expo *= (1.0 / currentSensorArea) * (1.0  / (currentComponentTime / Unit::s));
-      m_sensorData[sensorID].m_softPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
-      m_sensorData[sensorID].m_hardPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
-      m_sensorData[sensorID].m_chargedParticleFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+
+      if (currentSensorArea > 0) {
+        m_sensorData[sensorID].m_dose *= (1.0 / currentComponentTime) * (1000 / currentSensorMass);
+        m_sensorData[sensorID].m_expo *= (1.0 / currentSensorArea) * (1.0  / (currentComponentTime / Unit::s));
+        m_sensorData[sensorID].m_softPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+        m_sensorData[sensorID].m_hardPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+        m_sensorData[sensorID].m_chargedParticleFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+      }
     }
 
     // Dump variables into tree

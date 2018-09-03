@@ -226,7 +226,7 @@ namespace Belle2 {
     int m_coml1;
 
     /** the class title */
-    ClassDef(TRGGDLUnpackerStore, 1);
+    ClassDef(TRGGDLUnpackerStore, 2);
 
   };
 

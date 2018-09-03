@@ -6,6 +6,7 @@
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string>
 
 #include <TH2I.h>
 #include <TH1I.h>
@@ -68,12 +69,30 @@ namespace Belle2 {
     TH1I* h_psn;
     //! timtype
     TH1I* h_timtype;
+    //! event by event psnm timing distribution
+    TH2I* h_p;
+    //! event by event ftdl timing distribution
+    TH2I* h_f;
+    //! event by event input timing distribution
+    TH2I* h_i;
 
     TDirectory* oldDir;
     TDirectory* dirDQM;
 
+    bool m_eventByEventTimingHistRecord;
+    bool m_dumpVcdFile;
+    unsigned m_vcdEventStart;
+    unsigned m_vcdNumberOfEvents;
+    std::string m_bitConditionToDumpVcd;
+
+    void genVcd(void);
+    bool anaBitCondition(void);
+    bool isFired(std::string bitname);
+    unsigned n_clocks;
+    unsigned evtno;
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
+
   };
 
 }

@@ -50,61 +50,77 @@ TrgBit::~TrgBit()
 }
 
 bool
-TrgBit::get(input a) const
+TrgBit::isFired(const char* bitname) const
+{
+  for (unsigned i = 0; i < N_BITS_RESERVED; i++) {
+    if (! strcmp(_inputBitNames[i], bitname)) {
+      return isFired((input) i);
+    }
+  }
+  for (unsigned i = 0; i < N_BITS_RESERVED; i++) {
+    if (! strcmp(_outputBitNames[i], bitname)) {
+      return isFired((output) i);
+    }
+  }
+  return false;
+}
+
+bool
+TrgBit::isFired(input a) const
 {
   unsigned bit = _inputMap[nconf_input][a];
   if (bit == 999) return false;
-  return _input.get(bit);
+  return _input.isFired(bit);
 }
 
 bool
-TrgBit::getInput(input a) const
+TrgBit::isFiredInput(input a) const
 {
   unsigned bit = _inputMap[nconf_input][a];
   if (bit == 999) return false;
-  return _input.get(bit);
+  return _input.isFired(bit);
 }
 
 bool
-TrgBit::getInput(unsigned ith_bit) const
-{
-  return _input.get(ith_bit);
-}
-
-bool
-TrgBit::get(output a) const
+TrgBit::isFired(output a) const
 {
   unsigned bit = _outputMap[nconf_ftdl][a];
   if (bit == 999) return false;
-  return _ftdl.get(bit);
+  return _ftdl.isFired(bit);
 }
 
 bool
-TrgBit::getOutput(output a) const
+TrgBit::isFiredOutput(output a) const
 {
   unsigned bit = _outputMap[nconf_ftdl][a];
   if (bit == 999) return false;
-  return _ftdl.get(bit);
+  return _ftdl.isFired(bit);
 }
 
 bool
-TrgBit::getOutput(unsigned ith_bit) const
+TrgBit::isFiredInput(unsigned ith_bit) const
 {
-  return _input.get(ith_bit);
+  return _input.isFired(ith_bit);
 }
 
 bool
-TrgBit::getPSNM(output a) const
+TrgBit::isFiredOutput(unsigned ith_bit) const
+{
+  return _ftdl.isFired(ith_bit);
+}
+
+bool
+TrgBit::isFiredPSNM(output a) const
 {
   unsigned bit = _outputMap[nconf_ftdl][a];
   if (bit == 999) return false;
-  return _psnm.get(bit);
+  return _psnm.isFired(bit);
 }
 
 bool
-TrgBit::getPSNM(unsigned ith_bit) const
+TrgBit::isFiredPSNM(unsigned ith_bit) const
 {
-  return _psnm.get(ith_bit);
+  return _psnm.isFired(ith_bit);
 }
 
 TRGSummary::ETimingType
@@ -138,7 +154,7 @@ TrgBit::OutputBitPattern::set(unsigned a, unsigned b)
 }
 
 bool
-TrgBit::InputBitPattern::get(unsigned bit) const
+TrgBit::InputBitPattern::isFired(unsigned bit) const
 {
   unsigned wd = bit / 32;
   unsigned position = bit % 32;
@@ -146,7 +162,7 @@ TrgBit::InputBitPattern::get(unsigned bit) const
 }
 
 bool
-TrgBit::OutputBitPattern::get(unsigned bit) const
+TrgBit::OutputBitPattern::isFired(unsigned bit) const
 {
   unsigned wd = bit / 32;
   unsigned position = bit % 32;
@@ -178,7 +194,7 @@ TrgBit::OutputBitPattern::operator [](unsigned a)
 const char*
 TrgBit::getInputBitName(unsigned ith_bit) const
 {
-  for (unsigned i = 0; i < 192; i++) {
+  for (unsigned i = 0; i < N_BITS_RESERVED; i++) {
     unsigned j = _inputMap[nconf_input][i];
     if (ith_bit == j) return _inputBitNames[i];
   }
@@ -188,7 +204,7 @@ TrgBit::getInputBitName(unsigned ith_bit) const
 const char*
 TrgBit::getOutputBitName(unsigned ith_bit) const
 {
-  for (unsigned i = 0; i < 192; i++) {
+  for (unsigned i = 0; i < N_BITS_RESERVED; i++) {
     unsigned j = _outputMap[nconf_ftdl][i];
     if (ith_bit == j) return _outputBitNames[i];
   }
@@ -199,7 +215,7 @@ void
 TrgBit::printPreScaleValues(void) const
 {
   for (unsigned i = 0; i < n_output; i++) {
-    for (unsigned j = 0; j < 192; j++) {
+    for (unsigned j = 0; j < N_BITS_RESERVED; j++) {
       unsigned k = _outputMap[nconf_ftdl][j];
       if (i == k) {
         printf("%3d %10s %d\n", i, _outputBitNames[j], _psnmValues[nconf_psnm][i]);
@@ -208,3 +224,44 @@ TrgBit::printPreScaleValues(void) const
     }
   }
 }
+
+void
+TrgBit::printConf(void) const
+{
+  printf("TrgBit class: exp(%d), run(%d), nconf_psnm(%d), nconf_ftdl(%d), nconf_input(%d), n_input(%d), n_output(%d)\n", _exp, _run,
+         nconf_psnm, nconf_ftdl, nconf_input, n_input, n_output);
+}
+
+int
+TrgBit::getBitNum(const char* bitname) const
+{
+  int inum = getInputBitNum(bitname);
+  if (inum == 999) {
+    return getOutputBitNum(bitname);
+  } else {
+    return inum;
+  }
+}
+
+unsigned
+TrgBit::getInputBitNum(const char* bitname) const
+{
+  for (unsigned i = 0; i < N_BITS_RESERVED; i++) {
+    if (! strcmp(_inputBitNames[i], bitname)) {
+      return _inputMap[nconf_input][i];
+    }
+  }
+  return 999;
+}
+
+unsigned
+TrgBit::getOutputBitNum(const char* bitname) const
+{
+  for (unsigned i = 0; i < N_BITS_RESERVED; i++) {
+    if (! strcmp(_outputBitNames[i], bitname)) {
+      return _outputMap[nconf_ftdl][i];
+    }
+  }
+  return 999;
+}
+

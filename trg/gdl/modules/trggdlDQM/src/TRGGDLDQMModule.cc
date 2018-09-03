@@ -17,16 +17,27 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/gdl/TrgBit.h>
 #include <framework/dbobjects/RunInfo.h>
-
+#include <framework/datastore/DataStore.h>
 
 #include <TDirectory.h>
 #include <TRandom3.h>
 #include <unistd.h>
+#include <iostream>
+#include <fstream>
+#include <framework/logging/Logger.h>
+#include <boost/algorithm/string.hpp>
 
+using namespace std;
 using namespace Belle2;
 using namespace GDL;
 
 REG_MODULE(TRGGDLDQM);
+
+/*
+   Fired data in TrgBit not available because
+   of absence of TRGSummary class.
+   TrgBit class only for bit configuration.
+*/
 
 
 TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
@@ -34,6 +45,27 @@ TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
 
   setDescription("DQM for GDL Trigger system");
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("eventByEventTimingHistRecord", m_eventByEventTimingHistRecord,
+           "Recording event by event timing distribution histogram or not",
+           false);
+  addParam("dumpVcdFile", m_dumpVcdFile,
+           "Dumping vcd file or not",
+           false);
+  addParam("bitConditionToDumpVcd", m_bitConditionToDumpVcd,
+           "Condition for vcd. alg format with !/+/*.",
+           string(""));
+  addParam("vcdEventStart", m_vcdEventStart,
+           "Start equential event number",
+           unsigned(0));
+  addParam("vcdNumberOfEvents", m_vcdNumberOfEvents,
+           "Number of events to dump vcd file",
+           unsigned(10));
+  B2DEBUG(20, "eventByEventTimingFlag(" << m_eventByEventTimingHistRecord
+          << "), m_dumpVcdFile(" << m_dumpVcdFile
+          << "), m_bitConditionToDumpVcd(" << m_bitConditionToDumpVcd
+          << "), m_vcdEventStart(" << m_vcdEventStart
+          << "), m_vcdNumberOfEvents(" << m_vcdNumberOfEvents);
 
 }
 
@@ -83,7 +115,8 @@ void TRGGDLDQMModule::beginRun()
 {
 
   TrgBit tb;
-  tb.printPreScaleValues();
+  // tb.printPreScaleValues();
+  tb.printConf();
 
   dirDQM->cd();
 
@@ -117,17 +150,18 @@ void TRGGDLDQMModule::initialize()
 void TRGGDLDQMModule::event()
 {
 
-  int n_clocks = 0;
+  TrgBit tb;
+  static unsigned nvcd = 0;
   int n_leafs = 0;
   int n_leafsExtra = 0;
   int ee_psn[10] = {0};
   int ee_ftd[10] = {0};
   int ee_itd[10] = {0};
-  int nword_input = 3;
-  int nword_output = 3;
-  int _e_timtype = 0;
+  unsigned nword_input = 3;
+  unsigned nword_output = 3;
+  unsigned _e_timtype = 0;
   void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
-  int _e_gdll1rvc = 0;
+  unsigned _e_gdll1rvc = 0;
   StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) return;
 
@@ -211,16 +245,21 @@ void TRGGDLDQMModule::event()
   const double clkTo2ns = 1. / .508877;
   const double clkTo1ns = 0.5 / .508877;
   TH2I* h_0;
-  TH2I* h_p;
-  TH2I* h_f;
-  TH2I* h_i;
 
   dirDQM->cd();
-  h_0 = new TH2I(Form("hgdl%08d", entAry[0]->m_evt), "", n_clocks, 0, n_clocks, n_leafs + n_leafsExtra, 0,
+  evtno = entAry[0]->m_evt;
+  h_0 = new TH2I(Form("hgdl%08d", evtno), "", n_clocks, 0, n_clocks, n_leafs + n_leafsExtra, 0,
                  n_leafs + n_leafsExtra);
-  h_p = new TH2I(Form("hpsn%08d", entAry[0]->m_evt), "", n_clocks, 0, n_clocks, 96, 0, 96);
-  h_f = new TH2I(Form("hftd%08d", entAry[0]->m_evt), "", n_clocks, 0, n_clocks, 96, 0, 96);
-  h_i = new TH2I(Form("hitd%08d", entAry[0]->m_evt), "", n_clocks, 0, n_clocks, 160, 0, 160);
+  h_p = new TH2I(Form("hpsn%08d", evtno), "", n_clocks, 0, n_clocks, 96, 0, 96);
+  h_f = new TH2I(Form("hftd%08d", evtno), "", n_clocks, 0, n_clocks, 96, 0, 96);
+  h_i = new TH2I(Form("hitd%08d", evtno), "", n_clocks, 0, n_clocks, 160, 0, 160);
+  for (unsigned i = 0; i < tb.getInputN(); i++) {
+    h_i->GetYaxis()->SetBinLabel(i + 1, tb.getInputBitName(i));
+  }
+  for (unsigned i = 0; i < tb.getOutputN(); i++) {
+    h_f->GetYaxis()->SetBinLabel(i + 1, tb.getOutputBitName(i));
+    h_p->GetYaxis()->SetBinLabel(i + 1, tb.getOutputBitName(i));
+  }
 
   oldDir->cd();
 
@@ -309,11 +348,11 @@ void TRGGDLDQMModule::event()
   int c2_top_timing = c1_top_timing >> 1;
 
   int gdll1_rvc = h_0->GetBinContent(h_0->GetXaxis()->FindBin(n_clocks - 0.5), 1 + _e_gdll1rvc);
-  for (int clk = 1; clk <= n_clocks; clk++) {
+  for (unsigned clk = 1; clk <= n_clocks; clk++) {
     int psn_tmp[3] = {0};
     int ftd_tmp[3] = {0};
     int itd_tmp[5] = {0};
-    for (int j = 0; j < nword_input; j++) {
+    for (unsigned j = 0; j < nword_input; j++) {
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
@@ -338,7 +377,7 @@ void TRGGDLDQMModule::event()
         if (ftd_tmp[1] & (1 << i)) h_f->SetBinContent(clk, i + 1 + 32, 1);
       }
     } else {
-      for (int j = 0; j < nword_output; j++) {
+      for (unsigned j = 0; j < nword_output; j++) {
         psn_tmp[j] = h_0->GetBinContent(clk, 1 + ee_psn[j]);
         ftd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_ftd[j]);
         psn[j] |= psn_tmp[j];
@@ -360,10 +399,10 @@ void TRGGDLDQMModule::event()
   h_ftd->Fill(-0.5);
   h_psn->Fill(-0.5);
   for (int i = 0; i < 32; i++) {
-    for (int j = 0; j < nword_input; j++) {
+    for (unsigned j = 0; j < nword_input; j++) {
       if (itd[j] & (1 << i)) h_itd->Fill(i + 0.5 + 32 * j);
     }
-    for (int j = 0; j < nword_output; j++) {
+    for (unsigned j = 0; j < nword_output; j++) {
       if (ftd[j] & (1 << i)) h_ftd->Fill(i + 0.5 + 32 * j);
       if (psn[j] & (1 << i)) h_psn->Fill(i + 0.5 + 32 * j);
     }
@@ -410,4 +449,247 @@ void TRGGDLDQMModule::event()
                          c2_cdc_timing - c2_top_timing :
                          c2_cdc_timing - c2_top_timing + (1280 << 2);
   h_ns_topTocdc->Fill(c2_diff_topTocdc *  clkTo2ns);
+
+  if (m_dumpVcdFile) {
+    if (anaBitCondition()) {
+      nvcd++;
+      if (m_vcdEventStart <= nvcd && nvcd < m_vcdEventStart + m_vcdNumberOfEvents) {
+        genVcd();
+      }
+    }
+  }
+
+  if (! m_eventByEventTimingHistRecord) {
+    h_0->Delete();
+    h_p->Delete();
+    h_f->Delete();
+    h_i->Delete();
+  }
+}
+
+bool TRGGDLDQMModule::anaBitCondition(void)
+{
+  if (m_bitConditionToDumpVcd.length() == 0) return true;
+  TrgBit tb;
+  const char* cst = m_bitConditionToDumpVcd.c_str();
+  bool reading_word = false;
+  bool result_the_term = true; // init value must be true
+  bool not_flag = false;
+  unsigned begin_word = 0;
+  unsigned word_length = 0;
+  // notation steeing side must follow
+  //  no blank between '!' and word
+  for (unsigned i = 0; i < m_bitConditionToDumpVcd.length(); i++) {
+    if (('a' <= cst[i] && cst[i] <= 'z') ||
+        ('A' <= cst[i] && cst[i] <= 'Z') ||
+        ('_' == cst[i]) || ('!' == cst[i]) ||
+        ('0' <= cst[i] && cst[i] <= '9')) {
+      if (reading_word) { // must not be '!'
+        word_length++;
+        if (i == m_bitConditionToDumpVcd.length() - 1) {
+          bool fired = isFired(m_bitConditionToDumpVcd.substr(begin_word, word_length));
+          B2DEBUG(20,
+                  m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
+                  << "(" << fired << ")");
+          if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
+            return true;
+          }
+        }
+      } else {
+        // start of new word
+        reading_word = true;
+        if ('!' == cst[i]) {
+          begin_word = i + 1;
+          not_flag = true;
+          word_length = 0;
+        } else {
+          begin_word = i;
+          not_flag = false;
+          word_length = 1;
+          if (i == m_bitConditionToDumpVcd.length() - 1) {
+            // one char bit ('f',...) comes end of conditions, 'xxx+f'
+            bool fired = isFired(m_bitConditionToDumpVcd.substr(begin_word, word_length));
+            B2DEBUG(20,
+                    m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
+                    << "(" << fired << ")");
+            if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
+              return true;
+            }
+          }
+        }
+      }
+    } else if ('+' == cst[i] || i == m_bitConditionToDumpVcd.length() - 1) {
+      // End of the term.
+      if (reading_word) { // 'xxx+'
+        if (result_the_term) {
+          bool fired = isFired(m_bitConditionToDumpVcd.substr(begin_word, word_length));
+          B2DEBUG(20,
+                  m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
+                  << "(" << fired << ")");
+          if ((!not_flag && fired) || (not_flag && !fired)) {
+            return true;
+          } else {
+            // this term is denied by the latest bit
+          }
+        } else {
+          // already false.
+        }
+        reading_word = false;
+      } else {
+        // prior char is blank, 'xxx  +'
+        if (result_the_term) {
+          return true;
+        } else {
+          // already false
+        }
+      }
+      result_the_term = true; //  go to next term
+    } else {
+      // can be blank (white space) or any delimiter.
+      if (reading_word) {
+        // end of a word, 'xxxx '
+        reading_word = false;
+        if (result_the_term) {
+          // worth to try
+          bool fired = isFired(m_bitConditionToDumpVcd.substr(begin_word, word_length));
+          B2DEBUG(20,
+                  m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
+                  << "(" << fired << ")");
+          if ((!not_flag && fired) || (not_flag && !fired)) {
+            // go to next word
+          } else {
+            result_the_term = false;
+          }
+        } else {
+          // already false
+        }
+        reading_word = false;
+      } else {
+        // 2nd blank 'xx  ' or leading blanck '^ '
+      }
+    }
+  }
+  return false;
+}
+
+void TRGGDLDQMModule::genVcd(void)
+{
+  TrgBit tb;
+  int prev_i[400] = {0};
+  int prev_f[400] = {0};
+  int prev_p[400] = {0};
+//int prev_g[400]={0};
+  StoreObjPtr<EventMetaData> bevt;
+  int _exp = bevt->getExperiment();
+  int _run = bevt->getRun();
+  ofstream outf(Form("vcd/e%02dr%08de%08d.vcd", _exp, _run, evtno));
+  outf << "$date" << endl;
+  outf << "   Aug 20, 2018 17:53:52" << endl;
+  outf << "$end" << endl;
+  outf << "$version" << endl;
+  outf << "   ChipScope Pro Analyzer  14.7 P.20131013 (Build 14700.13.286.464)" << endl;
+  outf << "$end" << endl;
+  outf << "$timescale" << endl;
+  if (n_clocks == 32) {
+    outf << "    32ns" << endl;
+  } else if (n_clocks == 48) {
+    outf << "    8ns" << endl;
+  } else {
+    outf << "    1ns" << endl;
+  }
+  outf << "$end" << endl;
+  outf << "" << endl;
+  outf << "$scope module gdl0067d_icn $end" << endl;
+  int seqnum = 0;
+  for (unsigned j = 0; j < tb.getInputN(); j++) {
+    outf << "$var wire  1  n" << seqnum++ << " " << tb.getInputBitName(j) << " $end" << endl;
+  }
+  for (unsigned j = 0; j < tb.getOutputN(); j++) {
+    outf << "$var wire  1  n" << seqnum++ << " ftd." << tb.getOutputBitName(j) << " $end" << endl;
+  }
+  for (unsigned j = 0; j < tb.getOutputN(); j++) {
+    outf << "$var wire  1  n" << seqnum++ << " psn." << tb.getOutputBitName(j) << " $end" << endl;
+  }
+  /*
+  for(unsigned j=0; j<n_gdlbits; j++){
+    outf << "$var wire  " << EBitWidth[j] << "  n" << seqnum++ << " " << CGNAME[j] << " $end" << endl;
+  }
+  */
+  outf << "$upscope $end" << endl;
+  outf << "$enddefinitions $end" << endl << endl;
+
+  for (unsigned clk = 1; clk <= n_clocks; clk++) {
+    seqnum = 0;
+    outf << "#" << clk - 1 << endl;
+    for (unsigned k = 1; k <= tb.getInputN(); k++) {
+      if (clk == 1 || prev_i[k - 1] != h_i->GetBinContent(clk, k)) {
+        prev_i[k - 1] = h_i->GetBinContent(clk, k);
+        outf << h_i->GetBinContent(clk, k) << "n" << seqnum << endl;
+      }
+      seqnum++;
+    }
+    for (unsigned k = 1; k <= tb.getOutputN(); k++) {
+      if (clk == 1 || prev_f[k - 1] != h_f->GetBinContent(clk, k)) {
+        prev_f[k - 1] = h_f->GetBinContent(clk, k);
+        outf << h_f->GetBinContent(clk, k) << "n" << seqnum << endl;
+      }
+      seqnum++;
+    }
+    for (unsigned k = 1; k <= tb.getOutputN(); k++) {
+      if (clk == 1 || prev_p[k - 1] != h_p->GetBinContent(clk, k)) {
+        prev_p[k - 1] = h_p->GetBinContent(clk, k);
+        outf << h_p->GetBinContent(clk, k) << "n" << seqnum << endl;
+      }
+      seqnum++;
+    }
+    /*
+    for(unsigned k=1; k<=n_gdlbits; k++){
+      if(clk == 1 || prev_g[k-1] != hg->GetBinContent(clk, k)){
+    prev_g[k-1] = hg->GetBinContent(clk, k);
+    if(EBitWidth[k-1] != 1){
+    char ans[33];
+    if(k-1 == e_rvc){
+      dec2binstring(hg->GetBinContent(clk, k), ans, true);
+    }else{
+      dec2binstring(hg->GetBinContent(clk, k), ans);
+    }
+    outf << "b" << ans << " n" << seqnum << endl;
+    }else{
+    outf << hg->GetBinContent(clk, k) << "n" << seqnum << endl;
+    }
+      }
+      seqnum++;
+    }
+    */
+  }
+  outf.close();
+}
+
+bool
+TRGGDLDQMModule::isFired(std::string bitname)
+{
+  TrgBit tb;
+  bool isPsnm = false;
+  for (unsigned i = 0; i < bitname.length(); i++) {
+    if ('A' <= bitname[i] && bitname[i] <= 'Z') {
+      isPsnm = true;
+    }
+  }
+  boost::algorithm::to_lower(bitname);
+  int bn = tb.getBitNum(bitname.c_str());
+  for (unsigned clk = 0; clk < n_clocks; clk++) {
+    if (bn < 0) {
+      if (isPsnm) {
+        if (h_p->GetBinContent(clk + 1, abs(bn)) > 0)
+          return true;
+      } else {
+        if (h_f->GetBinContent(clk + 1, abs(bn)) > 0)
+          return true;
+      }
+    } else {
+      if (h_i->GetBinContent(clk + 1, bn + 1) > 0)
+        return true;
+    }
+  }
+  return false;
 }

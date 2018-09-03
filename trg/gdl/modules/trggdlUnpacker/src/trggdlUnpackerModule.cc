@@ -391,6 +391,7 @@ void TRGGDLUnpackerModule::fillTreeGDL6(int* buf, int evt)
   int n_leafsExtra = GDLCONF6::nLeafsExtra;
 
   StoreArray<TRGGDLUnpackerStore> storeAry;
+  if (storeAry.isValid()) storeAry.clear();
   for (int clk = 0; clk < n_clocks; clk++) {
 
     storeAry.appendNew();

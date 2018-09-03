@@ -3,6 +3,7 @@
 #define N_INPUT_ARRAY 5
 #define N_OUTPUT_ARRAY 5
 #define N_PSNM_ARRAY 10
+#define N_BITS_RESERVED 200
 
 #include <string>
 #include <framework/dataobjects/EventMetaData.h>
@@ -42,7 +43,7 @@ namespace Belle2 {
       void set(unsigned pattern, unsigned wordPosition);
 
       /// get fired or not
-      bool get(unsigned bit) const;
+      bool isFired(unsigned bit) const;
 
     public:// Operators
       /// Comparison
@@ -74,7 +75,7 @@ namespace Belle2 {
       void set(unsigned pattern, unsigned wordPosition);
 
       /// get fired or not
-      bool get(unsigned bit) const;
+      bool isFired(unsigned bit) const;
 
     public:// Operators
 
@@ -114,24 +115,38 @@ namespace Belle2 {
     unsigned preScaleValue(output A) const;
     unsigned preScaleValue(unsigned i) const;
 
-    /// print
+    /// print prescale values
     void printPreScaleValues(void) const;
+    /// print configuration values
+    void printConf(void) const;
 
     /// returns true if the bit is fired.
-    bool get(input bitname) const;
-    bool getInput(input bitname) const;
-    bool get(output bitname) const;
-    bool getOutput(output bitname) const;
-    bool getInput(unsigned ith_bit) const;
-    bool getOutput(unsigned ith_bit) const;
-    bool getPSNM(unsigned ith_bit) const;
-    bool getPSNM(output bitname) const;
+    bool isFired(input bitname) const;
+    bool isFiredInput(input bitname) const;
+    bool isFired(output bitname) const;
+    bool isFired(const char* bitname) const;
+    bool isFiredOutput(output bitname) const;
+    bool isFiredInput(unsigned ith_bit) const;
+    bool isFiredOutput(unsigned ith_bit) const;
+    bool isFiredPSNM(unsigned ith_bit) const;
+    bool isFiredPSNM(output bitname) const;
+    /// return number of used bits
+    unsigned getInputN(void) {return n_input;}
+    unsigned getOutputN(void) {return n_output;}
+    /// returns bit number
+    unsigned getOutputBitNum(const char* bitname) const;
+    /// returns bit number
+    unsigned getInputBitNum(const char* bitname) const;
+    /// returns bit number for the exprun,
+    /// if >=0 it is input_bitnum
+    /// if  <0 it is -output_bitnum-1
+    int getBitNum(const char* bitname) const;
 
-    // returns bit name
+    /// returns bit name
     const char* getInputBitName(unsigned ith_bit) const;
     const char* getOutputBitName(unsigned ith_bit) const;
 
-    // returns timing source
+    /// returns timing source
     TRGSummary::ETimingType getTimingSource(void) const;
 
   public:
@@ -148,11 +163,11 @@ namespace Belle2 {
   private:
 
     static const std::string _ftdlVersion[2];
-    static const unsigned _inputMap[N_INPUT_ARRAY][192];
-    static const unsigned _outputMap[N_OUTPUT_ARRAY][192];
-    static const unsigned _psnmValues[N_PSNM_ARRAY][192];
-    static const char* _inputBitNames[192];
-    static const char* _outputBitNames[192];
+    static const unsigned _inputMap[N_INPUT_ARRAY][N_BITS_RESERVED];
+    static const unsigned _outputMap[N_OUTPUT_ARRAY][N_BITS_RESERVED];
+    static const unsigned _psnmValues[N_PSNM_ARRAY][N_BITS_RESERVED];
+    static const char* _inputBitNames[N_BITS_RESERVED];
+    static const char* _outputBitNames[N_BITS_RESERVED];
 
     TRGSummary::ETimingType timtype;
 

@@ -1,18 +1,14 @@
 #include <pxd/modules/pxdBackground/PXDBgTupleProducerModule.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-#include <framework/core/InputController.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
+#include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <cmath>
-#include <fstream>
-#include <set>
 #include <algorithm>
 #include <numeric>
 #include <boost/format.hpp>
@@ -45,8 +41,7 @@ PXDBgTupleProducerModule::PXDBgTupleProducerModule() :
 {
   //Set module properties
   setDescription("PXD background tuple producer module");
-  setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("integrationTime", m_integrationTime, "PXD integration time", m_integrationTime);
+  addParam("integrationTime", m_integrationTime, "PXD integration time in micro seconds", m_integrationTime);
   addParam("outputFileName", m_outputFileName, "Output file name", m_outputFileName);
 }
 
@@ -90,11 +85,14 @@ void PXDBgTupleProducerModule::initialize()
   if (gTools->getNumberOfPXDLayers() == 0) {
     B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
   }
-
   int nPXDSensors = gTools->getNumberOfPXDSensors();
+
+  // Initialize m_sensorData with empty sensorData for all sensors
   for (int i = 0; i < nPXDSensors; i++) {
     VxdID sensorID = gTools->getSensorIDFromPXDIndex(i);
     m_sensorData[sensorID] = SensorData();
+    // Start value for minOccupancy should be one not zero
+    m_sensorData[sensorID].m_minOccupancy = 1.0;
   }
 }
 
@@ -112,20 +110,18 @@ void PXDBgTupleProducerModule::event()
   // Compute the curent one second timestamp
   unsigned long long int ts = eventMetaDataPtr->getTime() / 1000000000;
 
+  // If needed, add a new one second block to buffer
   auto iter = m_buffer.find(ts);
   if (iter == m_buffer.end()) {
     m_buffer[ts] = m_sensorData;
   }
 
-  for (auto&   pair : m_buffer[ts]) {
-    auto& bgdata = pair.second;
-    bgdata.m_run = eventMetaDataPtr->getRun();
-    bgdata.m_nEvents += 1;
-  }
-
   // We accumulate data in one second blocks
   VxdID currentSensorID(0);
   int currentSensorPixels(0);
+
+  // Empty map for computing event wise occupancy
+  std::map<VxdID, double> occupancyMap;
 
   for (const PXDDigit& storeDigit : storeDigits) {
     VxdID sensorID = storeDigit.getSensorID();
@@ -137,18 +133,32 @@ void PXDBgTupleProducerModule::event()
     double ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, storeDigit.getUCellID(), storeDigit.getVCellID());
     double hitEnergy = storeDigit.getCharge() * ADUToEnergy;
 
-    m_buffer[ts][currentSensorID].m_occupancy += 1.0 / currentSensorPixels;
+    occupancyMap[currentSensorID] += 1.0 / currentSensorPixels;
     m_buffer[ts][currentSensorID].m_dose += (hitEnergy / Unit::J);
     m_buffer[ts][currentSensorID].m_expo += hitEnergy;
+  }
+
+  for (auto& pair : m_buffer[ts]) {
+    auto& sensorID = pair.first;
+    auto& bgdata = pair.second;
+    bgdata.m_run = eventMetaDataPtr->getRun();
+    // Check if there is actually data for this sensor
+    if (occupancyMap.find(sensorID) != occupancyMap.end()) {
+      bgdata.m_nEvents += 1;
+      bgdata.m_occupancy += occupancyMap[sensorID];
+      if (occupancyMap[sensorID] > bgdata.m_maxOccupancy) {
+        bgdata.m_maxOccupancy = occupancyMap[sensorID];
+      }
+      if (occupancyMap[sensorID] < bgdata.m_minOccupancy) {
+        bgdata.m_minOccupancy = occupancyMap[sensorID];
+      }
+    }
   }
 
   for (const PXDCluster& cluster : storeClusters) {
     // Update if we have a new sensor
     VxdID sensorID = cluster.getSensorID();
     auto info = getInfo(sensorID);
-    if (sensorID != currentSensorID) {
-      currentSensorID = sensorID;
-    }
 
     auto cluster_uID = info.getUCellID(cluster.getU());
     auto cluster_vID = info.getVCellID(cluster.getV());
@@ -156,11 +166,11 @@ void PXDBgTupleProducerModule::event()
     double clusterEnergy = cluster.getCharge() * ADUToEnergy;
 
     if (cluster.getSize() == 1 && clusterEnergy < 10000 * Unit::eV && clusterEnergy > 6000 * Unit::eV) {
-      m_buffer[ts][currentSensorID].m_softPhotonFlux += 1.0;
+      m_buffer[ts][sensorID].m_softPhotonFlux += 1.0;
     } else if (cluster.getSize() == 1 && clusterEnergy > 10000 * Unit::eV) {
-      m_buffer[ts][currentSensorID].m_hardPhotonFlux += 1.0;
+      m_buffer[ts][sensorID].m_hardPhotonFlux += 1.0;
     } else if (cluster.getSize() > 1 && clusterEnergy > 10000 * Unit::eV) {
-      m_buffer[ts][currentSensorID].m_chargedParticleFlux += 1.0;
+      m_buffer[ts][sensorID].m_chargedParticleFlux += 1.0;
     }
   }
 }
@@ -170,7 +180,6 @@ void PXDBgTupleProducerModule::endRun() {}
 
 void PXDBgTupleProducerModule::terminate()
 {
-
   TFile* rfile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TTree* treeBEAST = new TTree("tout", "BEAST data tree");
 
@@ -181,19 +190,18 @@ void PXDBgTupleProducerModule::terminate()
     auto& sensorID = pair.first;
     auto& bgdata = pair.second;
     string sensorDescr = sensorID;
-    treeBEAST->Branch(str(format("sensor_%1%_run") % sensorDescr).c_str(), &(bgdata.m_run));
-    treeBEAST->Branch(str(format("sensor_%1%_nEvents") % sensorDescr).c_str(), &(bgdata.m_nEvents));
-    treeBEAST->Branch(str(format("sensor_%1%_occupancy") % sensorDescr).c_str(), &(bgdata.m_occupancy));
-    treeBEAST->Branch(str(format("sensor_%1%_exposition") % sensorDescr).c_str(), &(bgdata.m_expo));
-    treeBEAST->Branch(str(format("sensor_%1%_dose") % sensorDescr).c_str(), &(bgdata.m_dose));
-    treeBEAST->Branch(str(format("sensor_%1%_softPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_softPhotonFlux));
-    treeBEAST->Branch(str(format("sensor_%1%_hardPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_hardPhotonFlux));
-    treeBEAST->Branch(str(format("sensor_%1%_chargedParticleFlux") % sensorDescr).c_str(),
+    treeBEAST->Branch(str(format("pxd_%1%_run") % sensorDescr).c_str(), &(bgdata.m_run));
+    treeBEAST->Branch(str(format("pxd_%1%_nEvents") % sensorDescr).c_str(), &(bgdata.m_nEvents));
+    treeBEAST->Branch(str(format("pxd_%1%_minOccupancy") % sensorDescr).c_str(), &(bgdata.m_minOccupancy));
+    treeBEAST->Branch(str(format("pxd_%1%_maxOccupancy") % sensorDescr).c_str(), &(bgdata.m_maxOccupancy));
+    treeBEAST->Branch(str(format("pxd_%1%_occupancy") % sensorDescr).c_str(), &(bgdata.m_occupancy));
+    treeBEAST->Branch(str(format("pxd_%1%_exposition") % sensorDescr).c_str(), &(bgdata.m_expo));
+    treeBEAST->Branch(str(format("pxd_%1%_dose") % sensorDescr).c_str(), &(bgdata.m_dose));
+    treeBEAST->Branch(str(format("pxd_%1%_softPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_softPhotonFlux));
+    treeBEAST->Branch(str(format("pxd_%1%_hardPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_hardPhotonFlux));
+    treeBEAST->Branch(str(format("pxd_%1%_chargedParticleFlux") % sensorDescr).c_str(),
                       &(bgdata.m_chargedParticleFlux));
   }
-
-  // Compute the first second of the run
-  //unsigned long long int ts_run_start = m_buffer.begin()->first;
 
   // Write timestamp and background rates into TTree
   for (auto const& pair1 : m_buffer) {
@@ -201,7 +209,7 @@ void PXDBgTupleProducerModule::terminate()
     auto const& sensors = pair1.second;
 
     // Set variables for dumping into tree
-    ts = timestamp; // - ts_run_start;
+    ts = timestamp;
     for (auto const& pair2 : sensors) {
       auto const& sensorID = pair2.first;
       auto const& bgdata = pair2.second;

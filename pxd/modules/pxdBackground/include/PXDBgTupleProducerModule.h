@@ -22,7 +22,6 @@
 #include <map>
 
 
-
 namespace Belle2 {
 
   namespace PXD {
@@ -44,7 +43,11 @@ namespace Belle2 {
         int m_run;
         /** Number of Belle 2 events per second */
         int m_nEvents;
-        /** Average occupancy*/
+        /** Minimum occupancy of all events inside one second block*/
+        int m_minOccupancy;
+        /** Maximum occupancy of all events inside one second block*/
+        int m_maxOccupancy;
+        /** Average occupancy of all events inside one second block */
         double m_occupancy;
         /** Exposition (energy deposited per cm2 and second) */
         double m_expo;

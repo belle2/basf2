@@ -22,6 +22,7 @@
 #include <ecl/dataobjects/ECLTrig.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <TH2F.h>
@@ -203,12 +204,29 @@ void ECLBhabhaTCollectorModule::collect()
 
   m_tracks = 0;
   for (int i = 0; i < tracks.getEntries(); i++) {
-    auto reco_track = tracks[i]->getRelated<RecoTrack>();
+    auto track = tracks[i];
+    const TrackFitResult* fit_result = track->getTrackFitResult(Const::ChargedStable(211));
 
+    if (!fit_result) continue;
+
+    double pt = fit_result->getTransverseMomentum();
+    double z0 = fit_result->getZ0();
+    double d0 = fit_result->getD0();
+    double pValue = fit_result->getPValue();
+    int nCDChits = fit_result->getHitPatternCDC().getNHits();
+
+    if (pt < 0.15) continue;
+    if (abs(z0) > 2.0) continue;
+    if (abs(d0) > 0.5) continue;
+    if (nCDChits <= 0) continue;
+
+    // TODO: checking for reco_track might not be necessary
+    auto reco_track = track->getRelated<RecoTrack>();
     // Skip tracks that don't have related RecoTrack
     if (!reco_track) continue;
+
     // Skip tracks that don't have related ECLCluster
-    if (!tracks[i]->getRelated<ECLCluster>()) continue;
+    if (!track->getRelated<ECLCluster>()) continue;
 
     // Skip tracks where fit hasn't converged.
     if (!reco_track->getTrackFitStatus()->isFitConvergedFully()) continue;
@@ -229,8 +247,8 @@ void ECLBhabhaTCollectorModule::collect()
     }
   }
 
-  // Skip events with less than 1 good track.
-  if (m_tracks < 1) return;
+  // Skip events with less than 2 good tracks.
+  if (m_tracks < 2) return;
 
   //=== Get total energy deposition in ECL for event
 

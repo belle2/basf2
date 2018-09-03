@@ -79,7 +79,6 @@ namespace Belle2 {
       Mask(std::string name = "", std::string origin = "unknown"): m_name(name),
         m_origin(origin)
       {
-        B2INFO("Mask " + m_name + " has been initialized");
         m_isValid = false;
       };
       /**
@@ -358,22 +357,20 @@ namespace Belle2 {
 
     // persistent data members
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
-    std::vector<Mask> m_masks;
+    std::vector<Mask> m_masks;         /**< List of the ROE masks */
+    /**
+     *  Checks if a particle has its copy in the provided list
+     */
     bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const;
+
+    /**
+     *  Helper method to find ROE mask
+     */
     Mask* findMask(std::string& name);
     /**
      * Prints indices in the given set in a single line
      */
     void printIndices(std::set<int> indices) const;
-
-    /**
-     * Copies indices (elements) from "from" vector to "to" set
-     */
-    void addIndices(std::vector<int>& from, std::set<int>& to)
-    {
-      for (unsigned i = 0; i < from.size(); i++)
-        to.insert(from[i]);
-    }
 
     ClassDef(RestOfEvent, 5) /**< class definition */
 

@@ -98,13 +98,11 @@ namespace Belle2 {
     if (listType == Particle::EParticleType::c_Composite) {
       updateMasksWithV0(roe, particlesToUpdate);
     }
-    roe->print();
-    //deprecatedEvent();
   }
   void RestOfEventUpdaterModule::updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate)
   {
     if (particlesToUpdate.size() == 0) {
-      B2INFO("No particles in list provided, nothing to do");
+      B2DEBUG(10, "No particles in list provided, nothing to do");
       return;
     }
     for (auto& maskToUpdate : m_maskNamesForUpdating) {

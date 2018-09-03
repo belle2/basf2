@@ -129,8 +129,8 @@ void RestOfEvent::updateMaskWithCuts(std::string maskName, std::shared_ptr<Varia
     // if mask already exists, take its particles to update
     sourceName = maskName;
   }
-  // get all initial ROE particles
-  std::vector<const Particle*> allROEParticles = getParticles(sourceName);
+  // get all initial ROE particles, don't touch the possible V0s, otherwise, some daughters may be excluded, and some not... This may be revisited if needed
+  std::vector<const Particle*> allROEParticles = getParticles(sourceName, false);
   std::vector<const Particle*> maskedParticles;
   // First check particle type, then check cuts, if no cuts provided, take all particles of this type
   for (auto* particle : allROEParticles) {
@@ -173,14 +173,14 @@ void RestOfEvent::updateMaskWithV0(std::string name, const Particle* particleV0)
     }
   }
   if (daughtersV0.size() != indicesToErase.size()) {
-    B2INFO("Only " << indicesToErase.size() << " daughters are excluded from mask particles. Abort");
+    B2DEBUG(10, "Only " << indicesToErase.size() << " daughters are excluded from mask particles. Abort");
     return;
   }
   std::string toprint = "We will erase next indices from " + name + " mask: ";
   for (auto& i : indicesToErase) {
     toprint += std::to_string(i) + " ";
   }
-  B2INFO(toprint);
+  B2DEBUG(10, toprint);
   // If everything is good, we add
   mask->addV0(particleV0, indicesToErase);
 }

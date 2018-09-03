@@ -106,7 +106,6 @@ namespace Belle2 {
         roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), nullptr, m_update);
         roe->updateChargedStableFractions(maskName, m_setOfFractions.at(maskName));
       }
-      roe->print();
     }
   }
 

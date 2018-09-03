@@ -237,7 +237,7 @@ TrgBit::getBitNum(const char* bitname) const
 {
   int inum = getInputBitNum(bitname);
   if (inum == 999) {
-    return getOutputBitNum(bitname);
+    return -getOutputBitNum(bitname) - 1;
   } else {
     return inum;
   }

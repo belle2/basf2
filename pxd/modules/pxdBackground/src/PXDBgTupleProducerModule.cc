@@ -37,12 +37,14 @@ REG_MODULE(PXDBgTupleProducer)
 
 PXDBgTupleProducerModule::PXDBgTupleProducerModule() :
   Module(), m_outputFileName("beast_tuple.root"),
-  m_integrationTime(20)
+  m_integrationTime(20),
+  m_maskDeadPixels(true)
 {
   //Set module properties
   setDescription("PXD background tuple producer module");
   addParam("integrationTime", m_integrationTime, "PXD integration time in micro seconds", m_integrationTime);
   addParam("outputFileName", m_outputFileName, "Output file name", m_outputFileName);
+  addParam("maskDeadPixels", m_maskDeadPixels, "Correct bg rates by known dead pixels", m_maskDeadPixels);
 }
 
 const TVector3& PXDBgTupleProducerModule::pointToGlobal(VxdID sensorID, const TVector3& local)
@@ -106,12 +108,14 @@ void PXDBgTupleProducerModule::beginRun()
     m_sensitivePixelMap[sensorID] = info.getUCells() * info.getVCells();
     m_sensitiveAreaMap[sensorID] = getSensorArea(sensorID);
 
-    for (int ui = 0; ui < info.getUCells(); ++ui) {
-      for (int vi = 0; vi < info.getVCells(); ++vi) {
-        if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, ui, vi)
-            || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, ui, vi)) {
-          m_sensitivePixelMap[sensorID] -= 1;
-          m_sensitiveAreaMap[sensorID] -= info.getVPitch(info.getVCellPosition(vi)) * info.getUPitch();
+    if (m_maskDeadPixels) {
+      for (int ui = 0; ui < info.getUCells(); ++ui) {
+        for (int vi = 0; vi < info.getVCells(); ++vi) {
+          if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, ui, vi)
+              || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, ui, vi)) {
+            m_sensitivePixelMap[sensorID] -= 1;
+            m_sensitiveAreaMap[sensorID] -= info.getVPitch(info.getVCellPosition(vi)) * info.getUPitch();
+          }
         }
       }
     }

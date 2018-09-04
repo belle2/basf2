@@ -32,6 +32,9 @@ namespace Belle2 {
 
       /// Print the tracks.
       void apply(std::vector<CDCTrack>& tracks) final;
+
+      /// Remove tracks with no stereo hits
+      void removeIncompleteTracks(std::vector<CDCTrack>& tracks);
     };
   }
 }

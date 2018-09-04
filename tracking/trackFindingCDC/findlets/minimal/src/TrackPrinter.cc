@@ -27,7 +27,12 @@ std::string TrackPrinter::getDescription()
 
 void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
 {
+  removeIncompleteTracks(tracks);
   static int nevent(0);
+  if (tracks.size() == 0) {
+    nevent++;
+    return; //Nothing to draw
+  }
   TCanvas canvA("axialCanvas", "CDC axial hits in an event", 0, 0, 1440, 1080);
   TCanvas canvS("stereoCanvas", "CDC stereo hits in an event", 0, 0, 1440, 1080);
   TMultiGraph* mgA = new TMultiGraph("axialTracks", "CDC axial tracks in the event;X, cm;Y, cm");
@@ -71,4 +76,20 @@ void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
     canvS.SaveAs(Form("CDCstereoTracks_%i.png", nevent));
   }
   nevent++;
+}
+
+void TrackPrinter::removeIncompleteTracks(std::vector<CDCTrack>& tracks)
+{
+  for (auto it = tracks.begin(); it != tracks.end();) {
+    bool stereoHitsPresent =
+      false; //If stereo hit matcher can't find more hits than its threshold, it doesn't add any, but keeps the track
+    for (CDCRecoHit3D& hit : *it) {
+      if (not hit.isAxial()) stereoHitsPresent = true;
+    }
+    if (not stereoHitsPresent) {
+      it = tracks.erase(it); //TODO mask hits or something?
+    } else {
+      ++it;
+    }
+  }
 }

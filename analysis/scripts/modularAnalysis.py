@@ -1202,7 +1202,7 @@ def rankByLowest(
     path.add_module(bcs)
 
 
-def printDataStore(eventNumber=-1, path=analysis_main):
+def printDataStore(eventNumber=0, path=analysis_main):
     """
     Prints the contents of DataStore in all events (or a specific event number).
     Will list all objects and arrays (including size).

@@ -41,8 +41,6 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
-DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule() { }
-
 void DQMHistAnalysisPXDEffModule::initialize()
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();

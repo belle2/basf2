@@ -31,7 +31,6 @@ namespace Belle2 {
     //! Constructor / Destructor
     DQMHistAnalysisPXDEffModule();
   private:
-    ~DQMHistAnalysisPXDEffModule() override final;
 
     //! Module functions to be called from main process
     void initialize() override final;

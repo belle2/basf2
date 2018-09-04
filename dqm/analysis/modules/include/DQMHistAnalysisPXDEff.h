@@ -51,10 +51,6 @@ namespace Belle2 {
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    //IDs of only the sensors of layer 1/2, to iterate the summary histograms
-    std::vector<VxdID> m_PXDLayer1;
-    std::vector<VxdID> m_PXDLayer2;
-
     //Individual efficiency for each module
     std::map<VxdID, TH2D*> m_hEffModules;
     std::map<VxdID, TCanvas*> m_cEffModules;
@@ -64,10 +60,8 @@ namespace Belle2 {
     std::map<std::string, TCanvas*> m_cEffMerge;
 
     //One bin for each module in the geometry, one histogram for each layer
-    TH1D* m_hEffAll1;
-    TCanvas* m_cEffAll1;
-    TH1D* m_hEffAll2;
-    TCanvas* m_cEffAll2;
+    TH1D* m_hEffAll;
+    TCanvas* m_cEffAll;
 
     TH1* GetHisto(TString a);
 

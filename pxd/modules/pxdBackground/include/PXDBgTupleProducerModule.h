@@ -44,9 +44,9 @@ namespace Belle2 {
         /** Number of Belle 2 events per second */
         int m_nEvents;
         /** Minimum occupancy of all events inside one second block*/
-        int m_minOccupancy;
+        double m_minOccupancy;
         /** Maximum occupancy of all events inside one second block*/
-        int m_maxOccupancy;
+        double m_maxOccupancy;
         /** Average occupancy of all events inside one second block */
         double m_occupancy;
         /** Exposition (energy deposited per cm2 and second) */

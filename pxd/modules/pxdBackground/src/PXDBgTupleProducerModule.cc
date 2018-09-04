@@ -222,7 +222,7 @@ void PXDBgTupleProducerModule::terminate()
     treeBEAST->Branch(str(format("pxd_%1%_nEvents") % sensorDescr).c_str(), &(bgdata.m_nEvents));
     treeBEAST->Branch(str(format("pxd_%1%_minOccupancy") % sensorDescr).c_str(), &(bgdata.m_minOccupancy));
     treeBEAST->Branch(str(format("pxd_%1%_maxOccupancy") % sensorDescr).c_str(), &(bgdata.m_maxOccupancy));
-    treeBEAST->Branch(str(format("pxd_%1%_occupancy") % sensorDescr).c_str(), &(bgdata.m_occupancy));
+    treeBEAST->Branch(str(format("pxd_%1%_meanOccupancy") % sensorDescr).c_str(), &(bgdata.m_occupancy));
     treeBEAST->Branch(str(format("pxd_%1%_exposition") % sensorDescr).c_str(), &(bgdata.m_expo));
     treeBEAST->Branch(str(format("pxd_%1%_dose") % sensorDescr).c_str(), &(bgdata.m_dose));
     treeBEAST->Branch(str(format("pxd_%1%_softPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_softPhotonFlux));

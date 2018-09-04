@@ -192,6 +192,7 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   addParam("TriggerThreshold", m_TriggerThreshold,
            "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.02);
+  addParam("Chi2Threshold", m_chi2Threshold, "chi2 threshold to classify offline fit as good fit.", 60.0);
   addParam("CovarianceMatrix", m_CovarianceMatrix,
            "Option to use crystal dependent covariance matrices (false uses identity matrix).", true);
 }
@@ -387,14 +388,14 @@ void ECLWaveformFitModule::event()
 
 
     //if hadron fit failed try hadron + background photon (fit type = 1)
-    if (p2_chi2 >= 60) {
+    if (p2_chi2 >= m_chi2Threshold) {
 
       fitType = 1;
       p2_chi2 = -1;
       Fit2hExtraPhoton(p2_b, p2_a, p2_t, p2_a1, p_extraPhotonEnergy, p_extraPhotonTime, p2_chi2);
 
       //hadron + background photon fit failed try diode fit (fit type = 2)
-      if (p2_chi2 >= 60) {
+      if (p2_chi2 >= m_chi2Threshold) {
         g_sih = &m_si[0][2];//set second component to diode
         fitType = 2;
         p2_chi2 = -1;
@@ -404,7 +405,7 @@ void ECLWaveformFitModule::event()
     }
 
     //fitType = -1 indicates all fits tried had bad chi2
-    if (p2_chi2 >= 60) fitType = -1;
+    if (p2_chi2 >= m_chi2Threshold) fitType = -1;
 
     //storing fit results
     aECLDsp.setTwoComponentTotalAmp(p2_a + p2_a1);

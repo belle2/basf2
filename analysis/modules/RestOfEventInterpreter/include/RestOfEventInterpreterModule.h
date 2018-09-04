@@ -37,10 +37,10 @@ namespace Belle2 {
      */
     RestOfEventInterpreterModule();
 
-    /**  */
+    /** Overriden initialize method */
     virtual void initialize() override;
 
-    /** n */
+    /** Overriden event method */
     virtual void event() override;
 
 

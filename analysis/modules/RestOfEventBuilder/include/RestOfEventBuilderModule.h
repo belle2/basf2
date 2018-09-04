@@ -32,10 +32,10 @@ namespace Belle2 {
      */
     RestOfEventBuilderModule();
 
-    /**  */
+    /** Overriden initialize method */
     virtual void initialize() override;
 
-    /** n */
+    /** Overriden event method */
     virtual void event() override;
 
 
@@ -44,7 +44,12 @@ namespace Belle2 {
     std::string m_particleList;  /**< Name of the ParticleList */
     std::vector<std::string> m_particleListsInput;  /**< Name of the input particle lists of pi+ gamma and Klongs*/
 
-
+    /**
+     * Compares the stored particle with a daughter to check that the mdst source is not the same
+     * @param The ROE particle
+     * @param The FSP daughter
+     * @returns true if a copy, false if not
+     */
     bool compareParticles(const Particle* storedParticle, const Particle* fspDaughter);
     /**
     * Adds all particles from input particle lists that are not used in reconstruction of given particle.

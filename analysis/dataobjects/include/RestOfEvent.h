@@ -70,34 +70,34 @@ namespace Belle2 {
     struct Mask {
     public:
       /**
-      * Default constructor.
-      * All private members are set to 0 (all vectors are empty).
-      * TODO: Get rid of the default name,
-      * @param name of mask
-      * @param origin of mask, for debug
-      */
+       * Default constructor.
+       * All private members are set to 0 (all vectors are empty).
+       * TODO: Get rid of the default name,
+       * @param name of mask
+       * @param origin of mask, for debug
+       */
       Mask(std::string name = "", std::string origin = "unknown"): m_name(name),
         m_origin(origin)
       {
         m_isValid = false;
       };
       /**
-      * Get mask name
-      */
+       * Get mask name
+       */
       std::string getName() const
       {
         return m_name;
       }
       /**
-      * Get mask validity
-      */
+       * Get mask validity
+       */
       bool isValid() const
       {
         return m_isValid;
       }
       /**
-      *  Add selected particles to the mask
-      */
+       *  Add selected particles to the mask
+       */
       void addParticles(std::vector<const Particle*>& particles)
       {
         if (isValid()) {
@@ -115,22 +115,22 @@ namespace Belle2 {
         }
       }
       /**
-      *  Get selected particles associated to the mask
-      */
+       *  Get selected particles associated to the mask
+       */
       std::set<int> getParticles() const
       {
         return m_maskedParticleIndices;
       }
       /**
-      *  Get selected particles associated to the V0 of mask
-      */
+       *  Get selected particles associated to the V0 of mask
+       */
       std::set<int> getV0s() const
       {
         return m_maskedV0Indices;
       }
       /**
-      *  Get selected particles associated to the V0 of mask
-      */
+       *  Get selected particles associated to the V0 of mask
+       */
       void addV0(const Particle* v0, std::vector<int>& toErase)
       {
         m_maskedV0Indices.insert(v0->getArrayIndex());
@@ -140,15 +140,15 @@ namespace Belle2 {
         m_maskedParticleIndices.insert(v0->getArrayIndex());
       }
       /**
-      *  Has selected particles associated to the mask
-      */
+       *  Has selected particles associated to the mask
+       */
       bool hasV0(const Particle* v0) const
       {
         return m_maskedV0Indices.count(v0->getArrayIndex()) > 0;
       }
       /**
-      *  Clear selected particles associated to the mask
-      */
+       *  Clear selected particles associated to the mask
+       */
 
       void clearParticles()
       {
@@ -157,22 +157,22 @@ namespace Belle2 {
         m_isValid = false;
       }
       /**
-      *  Sets ChargedStable fractions
-      */
+       *  Sets ChargedStable fractions
+       */
       void setChargedStableFractions(std::vector<double>& chargedStableFractions)
       {
         m_chargedStableFractions = chargedStableFractions;
       }
       /**
-      *  Gets ChargedStable fractions
-      */
+       *  Gets ChargedStable fractions
+       */
       std::vector<double> getChargedStableFractions() const
       {
         return m_chargedStableFractions;
       }
       /**
-      *  Print mask and selected particles associated to the mask
-      */
+       *  Print mask and selected particles associated to the mask
+       */
       void print()
       {
         B2INFO("Mask name: " + m_name + " originating from " + m_origin);
@@ -214,35 +214,49 @@ namespace Belle2 {
     void addParticle(const Particle* particle);
     /**
      * Check if ROE has StoreArray index of given  to the list of unused tracks in the event.
-     *
      * @param Pointer to the Particle
+     * @param Name of the mask to work with
      */
     bool hasParticle(const Particle* particle, std::string maskName = "") const;
     /**
      * Initialize new mask
-    */
+     * @param Name of the mask to work with
+     * @param Name of the creator module
+     */
     void initializeMask(std::string name, std::string origin = "unknown");
     /**
      * Update mask with cuts
-    */
+     * @param Name of the mask to work with
+     * @param Cut on Track particles
+     * @param Cut on ECL particles
+     * @param Cut on KLM particles
+     * @param Update existing mask if true or not if false
+     */
     void updateMaskWithCuts(std::string name, std::shared_ptr<Variable::Cut> trackCut = nullptr,
                             std::shared_ptr<Variable::Cut> eclCut = nullptr, std::shared_ptr<Variable::Cut> klmCut = nullptr, bool updateExisting = false);
     /**
      * Update mask by keeping or excluding particles
-    */
+     * @param Name of the mask to work with
+     * @param Reference to particle collection
+     * @param ParticleType of the collection
+     * @param Update the ROE mask by passing or discarding particles in the provided particle list
+     */
     void excludeParticlesFromMask(std::string maskName, std::vector<const Particle*>& particles, Particle::EParticleType listType,
                                   bool discard);
     /**
      * True if this ROE object has mask
-    */
+     * @param Name of the mask to work with
+     */
     bool hasMask(std::string name) const;
     /**
-     * Update mask with V0
-    */
+     * Update mask with composite particle
+     * @param Name of the mask to work with
+     * @param Pointer to composite particle
+     */
     void updateMaskWithV0(std::string name, const Particle* particleV0);
     /**
      * Check if V0 can be added, maybe should be moved to private
-    */
+     */
     bool checkCompatibilityOfMaskAndV0(std::string name, const Particle* particleV0);
     /**
      * Get charged stable fractions with a specific mask name
@@ -286,6 +300,7 @@ namespace Belle2 {
     /**
      * Get vector of all unused KLMClusters.
      *
+     * @param name of mask
      * @return vector of pointers to unused KLMClusters
      */
     std::vector<const KLMCluster*> getKLMClusters(std::string maskName = "") const;
@@ -333,12 +348,14 @@ namespace Belle2 {
     /**
      * Get number of all remaining KLM clusters.
      *
+     * @param name of mask
      * @return number of all remaining KLM clusters
      */
     int getNKLMClusters(std::string maskName = "") const;
 
     /**
      * Get vector of all mask names of the ROE object
+     * @return list of all mask names
      */
     std::vector<std::string> getMaskNames() const;
 
@@ -358,6 +375,7 @@ namespace Belle2 {
     // persistent data members
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
     std::vector<Mask> m_masks;         /**< List of the ROE masks */
+    // Private methods
     /**
      *  Checks if a particle has its copy in the provided list
      */

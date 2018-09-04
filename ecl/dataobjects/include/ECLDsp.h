@@ -24,16 +24,26 @@ namespace Belle2 {
 
   class ECLDsp : public RelationsObject {
   public:
+
+    /**< Offline two component fit type */
+    enum TwoComponentFitType {
+      poorChi2 = -1,
+      photonHadron = 0,
+      photonHadronBackgroundPhoton = 1,
+      photonDiodeCrossing = 2
+    };
+
     /** default constructor for ROOT */
     ECLDsp() : m_DspAVector(31, 0)
     {
+
+      m_TwoComponentFitType = poorChi2;  /**< Offline two component fit type */
       m_CellId = 0;    /**< cell id */
       m_TwoComponentTotalAmp = -1;  /**< Offline two component total amplitude */
       m_TwoComponentHadronAmp = -1; /**< Offline two component hadron amplitude */
       m_TwoComponentChi2 = -1;  /**< Offline two component chi2*/
       m_TwoComponentTime = 1;  /**< Offline two component time */
       m_TwoComponentBaseline = 1;  /**< Offline two component baseline */
-      m_TwoComponentFitType = -1;  /**< Offline two component fit type */
       m_IsData = false;  /**< Data = true MC = false */
     }
 
@@ -109,7 +119,7 @@ namespace Belle2 {
 
     /*! Set fit type
      */
-    void setTwoComponentFitType(int ft) { m_TwoComponentFitType = ft; }
+    void setTwoComponentFitType(TwoComponentFitType ft) { m_TwoComponentFitType = ft; }
 
     /*! Get Cell ID
      * @return cell ID
@@ -164,7 +174,7 @@ namespace Belle2 {
     /*! get two comp fit type
      * @return two comp fit type
      */
-    int getTwoComponentFitType() const { return m_TwoComponentFitType; }
+    TwoComponentFitType getTwoComponentFitType() const { return m_TwoComponentFitType; }
 
     /*! get pile up photon energy
      * @return pile up photon energy
@@ -204,11 +214,7 @@ namespace Belle2 {
     double m_TwoComponentBaseline; /**< Two comp baseline*/
     double m_backgroundPhotonEnergy;  /**< Pile-up photon energy*/
     double m_backgroundPhotonTime;  /**< Pile-up photon time*/
-    int m_TwoComponentFitType;  /**< offline fit hypothesis.
-                           -1 = All hypothesis have poor chi2 (chi2>60)
-                            0 = photon + hadron
-                            1 = photon + hadron + pile-up photon
-                            2 = photon + diode  */
+    TwoComponentFitType m_TwoComponentFitType;  /**< offline fit hypothesis.*/
     std::vector <int> m_DspAVector; /**< Dsp array vith variable length for calibration, tests, etc.  */
 
     /*2 dspa array with variable length*/

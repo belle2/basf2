@@ -334,7 +334,7 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentChi2(-1);
     aECLDsp.setTwoComponentTime(-1);
     aECLDsp.setTwoComponentBaseline(-1);
-    aECLDsp.setTwoComponentFitType(-1);
+    aECLDsp.setTwoComponentFitType(ECLDsp::poorChi2);
 
     const int id = aECLDsp.getCellId() - 1;
 
@@ -382,7 +382,7 @@ void ECLWaveformFitModule::event()
 
     //Calling optimized fit photon template + hadron template (fit type = 0)
     double p2_b, p2_a, p2_t, p2_a1, p2_chi2, p_extraPhotonEnergy, p_extraPhotonTime;
-    int fitType = 0;
+    ECLDsp::TwoComponentFitType fitType = ECLDsp::photonHadron;
     p2_chi2 = -1;
     Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
 
@@ -390,26 +390,26 @@ void ECLWaveformFitModule::event()
     //if hadron fit failed try hadron + background photon (fit type = 1)
     if (p2_chi2 >= m_chi2Threshold) {
 
-      fitType = 1;
+      fitType = ECLDsp::photonHadronBackgroundPhoton;
       p2_chi2 = -1;
       Fit2hExtraPhoton(p2_b, p2_a, p2_t, p2_a1, p_extraPhotonEnergy, p_extraPhotonTime, p2_chi2);
 
       //hadron + background photon fit failed try diode fit (fit type = 2)
       if (p2_chi2 >= m_chi2Threshold) {
         g_sih = &m_si[0][2];//set second component to diode
-        fitType = 2;
+        fitType = ECLDsp::photonDiodeCrossing;
         p2_chi2 = -1;
         Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
       }
 
     }
 
-    //fitType = -1 indicates all fits tried had bad chi2
-    if (p2_chi2 >= m_chi2Threshold) fitType = -1;
+    //indicates all fits tried had bad chi2
+    if (p2_chi2 >= m_chi2Threshold) fitType = ECLDsp::poorChi2;
 
     //storing fit results
     aECLDsp.setTwoComponentTotalAmp(p2_a + p2_a1);
-    if (fitType == 2) {
+    if (fitType == ECLDsp::photonDiodeCrossing) {
       aECLDsp.setTwoComponentHadronAmp(0.0);
       aECLDsp.setTwoComponentDiodeAmp(p2_a1);
     } else {
@@ -420,7 +420,7 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentTime(p2_t);
     aECLDsp.setTwoComponentBaseline(p2_b);
     aECLDsp.setTwoComponentFitType(fitType);
-    if (fitType == 1) {
+    if (fitType == ECLDsp::photonHadronBackgroundPhoton) {
       aECLDsp.setbackgroundPhotonEnergy(p_extraPhotonEnergy);
       aECLDsp.setbackgroundPhotonTime(p_extraPhotonTime);
     }

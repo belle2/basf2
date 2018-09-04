@@ -276,7 +276,7 @@ void ECLDigitCalibratorModule::event()
         const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];
         const double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
-        const int twoComponentFitType = aECLDsp->getTwoComponentFitType();
+        const ECLDsp::TwoComponentFitType twoComponentFitType = aECLDsp->getTwoComponentFitType();
 
         aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
         aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);

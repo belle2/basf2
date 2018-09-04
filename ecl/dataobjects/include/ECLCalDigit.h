@@ -14,6 +14,8 @@
 #define ECLCALDIGIT_H
 
 #include <framework/datastore/RelationsObject.h>
+#include <ecl/dataobjects/ECLDsp.h>
+
 namespace Belle2 {
 
   /*! Class to store calibrated ECLDigits: ECLCalDigits
@@ -43,7 +45,7 @@ namespace Belle2 {
       m_TwoComponentHadronEnergy = 0; /**< Offline Two Component Hadron Energy*/
       m_TwoComponentDiodeEnergy = 0; /**< Offline Two Component Diode Energy*/
       m_TwoComponentChi2 = 0; /**< Offline Two Component chi2*/
-      m_TwoComponentFitType = -1; /**< Offline Two Component fit type*/
+      m_TwoComponentFitType = ECLDsp::poorChi2; /**< Offline Two Component fit type*/
     }
 
     /*! Set  Cell ID
@@ -72,7 +74,7 @@ namespace Belle2 {
 
     /*! Set two component fit type
      */
-    void setTwoComponentFitType(int ft) { m_TwoComponentFitType = ft; }
+    void setTwoComponentFitType(ECLDsp::TwoComponentFitType ft) { m_TwoComponentFitType = ft; }
 
     /*! Set Calibrated Time
      */
@@ -127,7 +129,7 @@ namespace Belle2 {
     /*! Get two componnent fit type
      * @return two componnent fit type
      */
-    double getTwoComponentFitType() const { return m_TwoComponentFitType; }
+    ECLDsp::TwoComponentFitType getTwoComponentFitType() const { return m_TwoComponentFitType; }
 
     /*! Get Calibrated Time
      * @return Calibrated Time
@@ -180,11 +182,7 @@ namespace Belle2 {
     double m_TwoComponentHadronEnergy; /**< Calibrated Hadron Component Energy */
     double m_TwoComponentDiodeEnergy; /**< Calibrated Diode Component Energy */
     double m_TwoComponentChi2; /**< Two Component chi2*/
-    int m_TwoComponentFitType;  /**< offline fit hypothesis.
-                           -1 = All hypothesis have poor chi2 (chi2>60)
-                            0 = photon + hadron
-                            1 = photon + hadron + pile-up photon
-                            2 = photon + diode  */
+    ECLDsp::TwoComponentFitType m_TwoComponentFitType;  /**< offline fit hypothesis.*/
 
     // 1: first version (TF)
     // 2: added m_TimeResolution (TF)

@@ -204,7 +204,7 @@ void PXDBgTupleProducerModule::terminate()
   TFile* rfile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TTree* treeBEAST = new TTree("tout", "BEAST data tree");
 
-  unsigned long long int ts = 0;
+  unsigned int ts = 0;
   treeBEAST->Branch("ts", &(ts));
 
   for (auto&   pair : m_sensorData) {

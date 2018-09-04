@@ -59,7 +59,6 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
                                       const std::vector<const CDCWireHit*>& axialWireHits,
                                       std::vector<CDCTrack>& tracks)
 {
-  B2WARNING(eclClusters.size() <<  " clusters found!");
   for (const ECLCluster* cluster : eclClusters) {
     if (cluster->getEnergy() < m_param_minEnergy) continue;
     float phi = cluster->getPhi();
@@ -68,10 +67,7 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
     CDCTrack track;
     guidingTrajectory2D.setLocalOrigin(Vector2D(0, 0));
     std::vector<const CDCWireHit*> foundHits = search(axialWireHits, guidingTrajectory2D);
-    if (foundHits.size() < m_param_minNHits) {
-      B2WARNING("Skipping track");
-      continue;
-    }
+    if (foundHits.size() < m_param_minNHits) continue;
     // Fit trajectory
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter(true, true);
     CDCTrajectory2D trajectory2D = fitter.fit(foundHits);
@@ -84,7 +80,6 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
       track.push_back(std::move(recoHit3D));
     }
     track.sortByArcLength2D();
-    B2WARNING(track.size() <<  " track size!");
     tracks.emplace_back(std::move(track));
   }
 }

@@ -268,14 +268,15 @@ void ECLDigitCalibratorModule::event()
       if (aECLDsp->getTwoComponentChi2() > 0) {
         //require offline waveform to have offline fit result
 
-        double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
-                                                   v_calibrationCrystalEnergy[cellid - 1];
-        double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid - 1] *
-                                                    v_calibrationCrystalEnergy[cellid - 1];
-        double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
-                                                   v_calibrationCrystalEnergy[cellid - 1];
-        double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
-        int twoComponentFitType = aECLDsp->getTwoComponentFitType();
+        const double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                         v_calibrationCrystalEnergy[cellid - 1];
+        const double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid -
+                                                          1] *
+                                                          v_calibrationCrystalEnergy[cellid - 1];
+        const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                         v_calibrationCrystalEnergy[cellid - 1];
+        const double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
+        const int twoComponentFitType = aECLDsp->getTwoComponentFitType();
 
         aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
         aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);

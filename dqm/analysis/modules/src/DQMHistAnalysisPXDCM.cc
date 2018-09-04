@@ -34,6 +34,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("HistoDir", m_histodir, "Name of Histogram dir", std::string("pxd"));
   B2DEBUG(1, "DQMHistAnalysisPXDCM: Constructor done.");
 
+  /// FIXME we should get the active boards from geometry
   for (auto i = 0, j = 0; i < 64; i++) {
     auto layer = (((i >> 5) & 0x1) + 1);
     auto ladder = ((i >> 1) & 0xF);
@@ -74,6 +75,8 @@ void DQMHistAnalysisPXDCMModule::beginRun()
   m_cCommonMode->Clear();
   m_cCommonMode->SetLogz();
   if (m_hCommonMode) m_hCommonMode->Draw("colz");
+
+  /// FIXME were to put the lines depends ...
   m_line1 = new TLine(0, 10, 40, 10);
   m_line2 = new TLine(0, 16, 40, 16);
   m_line3 = new TLine(0, 3, 40, 3);
@@ -155,7 +158,7 @@ void DQMHistAnalysisPXDCMModule::event()
     }
     if (hh1) {
       B2INFO("Histo " << a << " found in mem");
-      for (int bin = 0; bin < 64; bin++) {
+      for (int bin = 1; bin <= 64; bin++) {
         float v;
         v = hh1->GetBinContent(bin);
         m_hCommonMode->Fill(i, bin, v);
@@ -183,10 +186,12 @@ void DQMHistAnalysisPXDCMModule::event()
     m_cCommonMode->Pad()->SetFillColor(0);// White
   }
 
-  if (m_hCommonMode) m_hCommonMode->Draw("colz");
-  m_line1->Draw();
-  m_line2->Draw();
-  m_line3->Draw();
+  if (m_hCommonMode) {
+    m_hCommonMode->Draw("colz");
+    m_line1->Draw();
+    m_line2->Draw();
+    m_line3->Draw();
+  }
 
   m_cCommonMode->Modified();
   m_cCommonMode->Update();

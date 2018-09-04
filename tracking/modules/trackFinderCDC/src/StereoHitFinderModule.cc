@@ -21,6 +21,6 @@ TFCDC_StereoHitFinderModule::TFCDC_StereoHitFinderModule()
 }
 
 TFCDC_MonopoleStereoHitFinderModule::TFCDC_MonopoleStereoHitFinderModule()
-  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }

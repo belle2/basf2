@@ -45,11 +45,11 @@ TFCDC_AxialTrackCreatorMCTruthModule::TFCDC_AxialTrackCreatorMCTruthModule()
 }
 
 TFCDC_MonopoleAxialTrackFinderLegendreModule::TFCDC_MonopoleAxialTrackFinderLegendreModule()
-  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }
 
 TFCDC_AxialStraightTrackFinderModule::TFCDC_AxialStraightTrackFinderModule()
-  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }

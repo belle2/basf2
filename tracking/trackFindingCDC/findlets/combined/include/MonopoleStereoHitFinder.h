@@ -24,7 +24,7 @@
 #include <tracking/trackFindingCDC/utilities/HitComperator.h>
 
 #include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackPrinter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackInspector.h>
 
 #include <vector>
 
@@ -74,7 +74,7 @@ namespace Belle2 {
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
       // Print found tracks
-      TrackPrinter m_printer;
+      TrackInspector m_inspector;
       /// Fit the tracks after creation TODO the fitter obviously should be different
 //       TrackSZFitter m_szFitter;
 

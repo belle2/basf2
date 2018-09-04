@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/minimal/TrackPrinter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackInspector.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -20,12 +20,12 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-std::string TrackPrinter::getDescription()
+std::string TrackInspector::getDescription()
 {
   return "Findlet for printing out CDCtracks";
 }
 
-void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
+void TrackInspector::apply(std::vector<CDCTrack>& tracks)
 {
   removeIncompleteTracks(tracks);
   static int nevent(0);
@@ -33,6 +33,7 @@ void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
     nevent++;
     return; //Nothing to draw
   }
+  if (not m_param_debugDraw) return;  //Nothing to draw
   TCanvas canvA("axialCanvas", "CDC axial hits in an event", 0, 0, 1440, 1080);
   TCanvas canvS("stereoCanvas", "CDC stereo hits in an event", 0, 0, 1440, 1080);
   TMultiGraph* mgA = new TMultiGraph("axialTracks", "CDC axial tracks in the event;X, cm;Y, cm");
@@ -78,7 +79,7 @@ void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
   nevent++;
 }
 
-void TrackPrinter::removeIncompleteTracks(std::vector<CDCTrack>& tracks)
+void TrackInspector::removeIncompleteTracks(std::vector<CDCTrack>& tracks)
 {
   for (auto it = tracks.begin(); it != tracks.end();) {
     bool stereoHitsPresent =

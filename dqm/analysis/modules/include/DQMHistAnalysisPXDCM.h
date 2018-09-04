@@ -6,8 +6,7 @@
 // Date : 2018
 //-
 
-#ifndef _Belle2_DQMHistAnalysisPXDCM_h
-#define _Belle2_DQMHistAnalysisPXDCM_h
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -48,10 +47,10 @@ namespace Belle2 {
 
     TH2F* m_hCommonMode;
     TCanvas* m_cCommonMode;
+    TLine* m_line1, *m_line2, *m_line3;
 
     TH1* findHistLocal(TString& a);
 
   };
 } // end namespace Belle2
 
-#endif

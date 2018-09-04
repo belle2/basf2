@@ -55,9 +55,15 @@ void DQMHistAnalysisPXDCMModule::initialize()
   B2DEBUG(1, "DQMHistAnalysisPXDCM: initialized.");
 
   m_cCommonMode = new TCanvas("c_CommonMode");
-  m_hCommonMode = new TH2F("CommonMode", "CommonMode", 40, 0, 40, 64, 0, 64);
+  m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", 40, 0, 40, 64, 0, 64);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
+
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel("PXD:DQM:CommonMode", NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
 
 
@@ -67,6 +73,19 @@ void DQMHistAnalysisPXDCMModule::beginRun()
 
   m_cCommonMode->Clear();
   m_cCommonMode->SetLogz();
+  if (m_hCommonMode) m_hCommonMode->Draw("colz");
+  m_line1 = new TLine(0, 10, 40, 10);
+  m_line2 = new TLine(0, 16, 40, 16);
+  m_line3 = new TLine(0, 3, 40, 3);
+  m_line1->SetHorizontal(true);
+  m_line1->SetLineColor(3);// Green
+  m_line1->SetLineWidth(3);
+  m_line2->SetHorizontal(true);
+  m_line2->SetLineColor(1);// Black
+  m_line2->SetLineWidth(3);
+  m_line3->SetHorizontal(true);
+  m_line3->SetLineColor(1);
+  m_line3->SetLineWidth(3);
 }
 
 
@@ -107,6 +126,7 @@ TH1* DQMHistAnalysisPXDCMModule::findHistLocal(TString& a)
 
 void DQMHistAnalysisPXDCMModule::event()
 {
+  double data = 0.0;
   if (!m_cCommonMode) return;
   m_hCommonMode->Reset(); // dont sum up!!!
 
@@ -134,22 +154,52 @@ void DQMHistAnalysisPXDCMModule::event()
       hh1 = findHistLocal(a);
     }
     if (hh1) {
+      B2INFO("Histo " << a << " found in mem");
       for (int bin = 0; bin < 64; bin++) {
         float v;
         v = hh1->GetBinContent(bin);
-        m_hCommonMode->Fill(i, v);
+        m_hCommonMode->Fill(i, bin, v);
       }
+
+      /// FIXME: integration intervalls depend on CM default value
+      data += hh1->Integral(16, 64);
+//   B2INFO("data inc hi "<<data);
+      data += hh1->Integral(0, 5);
+//   B2INFO("data inc lo "<<data);
     }
   }
   m_cCommonMode->cd();
-  if (m_hCommonMode) m_hCommonMode->Draw("col");
+
+
+  // not enough Entries
+  // it->canvas->Pad()->SetFillColor(6);// Magenta
+//   B2INFO("data "<<data);
+  /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
+  if (data > 100.) {
+    m_cCommonMode->Pad()->SetFillColor(2);// Red
+  } else if (data > 50.) {
+    m_cCommonMode->Pad()->SetFillColor(5);// Yellow
+  } else {
+    m_cCommonMode->Pad()->SetFillColor(0);// White
+  }
+
+  if (m_hCommonMode) m_hCommonMode->Draw("colz");
+  m_line1->Draw();
+  m_line2->Draw();
+  m_line3->Draw();
+
   m_cCommonMode->Modified();
   m_cCommonMode->Update();
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_put(DBR_DOUBLE, &mychid, (void*)&data), "ca_set failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
 
 void DQMHistAnalysisPXDCMModule::endRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDCM : endRun called");
+  m_cCommonMode->Print("c1.pdf");// for testing
 }
 
 

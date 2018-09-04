@@ -48,7 +48,7 @@ float Belle2::PXD::PXDGainCalibrator::getADUToEnergy(Belle2::VxdID id, unsigned 
   // They should be obtained from GeoCache and ultimately from the condDB.
   float ADCUnit = 130.0;
   float Gq = 0.6;
-  return Const::ehEnergy * (ADCUnit / Gq / getGainCorrection(id, uid, vid));
+  return Const::ehEnergy * ADCUnit / Gq / getGainCorrection(id, uid, vid);
 }
 
 

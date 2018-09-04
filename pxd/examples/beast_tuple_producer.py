@@ -17,8 +17,6 @@
 
 NUMBER_OF_PROCESSES = 20
 
-_beast_tuple_dir = '/ghi/fs01/belle2/bdata/users/benni/beast-pxd-tuple/e003'
-
 from basf2 import *
 set_log_level(LogLevel.ERROR)
 
@@ -36,10 +34,11 @@ from ROOT import Belle2
 
 
 class CalculationProcess(multiprocessing.Process):
-    def __init__(self, iov, file_paths):
+    def __init__(self, iov, file_paths, output_dir):
         super(CalculationProcess, self).__init__()
         self.iov = iov
         self.file_paths = file_paths
+        self.output_dir = output_dir
 
     def run(self):
 
@@ -56,7 +55,7 @@ class CalculationProcess(multiprocessing.Process):
         pxdclusterizer.param('SeedSN', 9.0)
         pxdtupleproducer = register_module('PXDBgTupleProducer')
         pxdtupleproducer.param('outputFileName',
-                               '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(_beast_tuple_dir,
+                               '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(self.output_dir,
                                                                               self.iov.exp_low,
                                                                               self.iov.run_low))
 
@@ -83,9 +82,9 @@ class CalculationProcess(multiprocessing.Process):
 #
 
 def worker(task_q, done_q):
-    for iov, file_paths in iter(task_q.get, 'STOP'):
+    for iov, file_paths, output_dir in iter(task_q.get, 'STOP'):
         print("Start processing IoV={}".format(str(iov)))
-        p = CalculationProcess(iov, file_paths)
+        p = CalculationProcess(iov, file_paths, output_dir)
         p.start()
         p.join()
         done_q.put(iov)
@@ -99,6 +98,7 @@ if __name__ == "__main__":
     parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
     parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
     parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
+    parser.add_argument('--outputDir', default='./', type=str, help='Name of output directory for tuples')
     args = parser.parse_args()
 
     # Set the IoV range for this calibration
@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
     # Submit tasks
     for iov, file_paths in iovs_to_files.items():
-        task_queue.put((iov, file_paths))
+        task_queue.put((iov, file_paths, args.outputDir))
 
     # Start worker processes
     for i in range(NUMBER_OF_PROCESSES):

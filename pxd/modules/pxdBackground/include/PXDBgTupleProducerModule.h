@@ -63,19 +63,15 @@ namespace Belle2 {
 
       /** Constructor */
       PXDBgTupleProducerModule();
-      /** Destructor */
-      virtual ~PXDBgTupleProducerModule();
 
       /* Initialize module */
-      virtual void initialize();
+      void initialize() override final;
       /* Start-of-run initializations */
-      virtual void beginRun();
+      void beginRun() override final;
       /* Event processing */
-      virtual void event();
-      /* End-of-run tasks */
-      virtual void endRun();
+      void event() override final;
       /* Final summary and cleanup */
-      virtual void terminate();
+      void terminate() override final;
 
     private:
 

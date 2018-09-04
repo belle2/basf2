@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Benjamin Schwenker                                       *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+
+
 #include <pxd/modules/pxdBackground/PXDBgTupleProducerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -64,8 +76,6 @@ const TVector3& PXDBgTupleProducerModule::vectorToGlobal(VxdID sensorID, const T
   result = info.vectorToGlobal(local);
   return result;
 }
-
-PXDBgTupleProducerModule::~PXDBgTupleProducerModule() {}
 
 void PXDBgTupleProducerModule::initialize()
 {
@@ -195,9 +205,6 @@ void PXDBgTupleProducerModule::event()
     }
   }
 }
-
-void PXDBgTupleProducerModule::endRun() {}
-
 
 void PXDBgTupleProducerModule::terminate()
 {

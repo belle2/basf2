@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;
@@ -34,31 +35,52 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("HistoDir", m_histodir, "Name of Histogram dir", std::string("pxd"));
   B2DEBUG(1, "DQMHistAnalysisPXDCM: Constructor done.");
 
-  /// FIXME we should get the active boards from geometry
-  for (auto i = 0, j = 0; i < 64; i++) {
-    auto layer = (((i >> 5) & 0x1) + 1);
-    auto ladder = ((i >> 1) & 0xF);
-    if (ladder == 0) continue; // numbering starts at 1
-    if (layer == 1 && ladder > 8) continue; // 8 inner ladders
-    if (layer == 2 && ladder > 12) continue; // 12 outer ladders
-    m_id_to_inx[i] = j; // i = id , j - index
-    m_inx_to_id[j] = i;
-    j++;
-    if (j == NUM_MODULES) break;
-  }
 }
-
-
-DQMHistAnalysisPXDCMModule::~DQMHistAnalysisPXDCMModule() { }
 
 void DQMHistAnalysisPXDCMModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDCM: initialized.");
 
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  //collect the list of all PXD Modules in the geometry here
+  std::vector<VxdID> sensors = geo.getListOfSensors();
+  for (VxdID& aVxdID : sensors) {
+    VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
+    // B2DEBUG(20,"VXD " << aVxdID);
+    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
+    m_PXDModules.push_back(aVxdID); // reorder, sort would be better
+
+  }
+  std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
+
+  gROOT->cd(); // this seems to be important, or strange things happen
+
   m_cCommonMode = new TCanvas("c_CommonMode");
-  m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", 40, 0, 40, 64, 0, 64);
+  m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 64, 0, 64);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    TString ModuleName = (std::string)m_PXDModules[i];
+    m_hCommonMode->GetXaxis()->SetBinLabel(i + 1, ModuleName);
+  }
+  //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
+  m_hCommonMode->Draw("colz");
+
+  /// FIXME were to put the lines depends ...
+  m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
+  m_line2 = new TLine(0, 16, m_PXDModules.size(), 16);
+  m_line3 = new TLine(0, 3, m_PXDModules.size(), 3);
+  m_line1->SetHorizontal(true);
+  m_line1->SetLineColor(3);// Green
+  m_line1->SetLineWidth(3);
+  m_line2->SetHorizontal(true);
+  m_line2->SetLineColor(1);// Black
+  m_line2->SetLineWidth(3);
+  m_line3->SetHorizontal(true);
+  m_line3->SetLineColor(1);
+  m_line3->SetLineWidth(3);
+
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
@@ -74,21 +96,6 @@ void DQMHistAnalysisPXDCMModule::beginRun()
 
   m_cCommonMode->Clear();
   m_cCommonMode->SetLogz();
-  if (m_hCommonMode) m_hCommonMode->Draw("colz");
-
-  /// FIXME were to put the lines depends ...
-  m_line1 = new TLine(0, 10, 40, 10);
-  m_line2 = new TLine(0, 16, 40, 16);
-  m_line3 = new TLine(0, 3, 40, 3);
-  m_line1->SetHorizontal(true);
-  m_line1->SetLineColor(3);// Green
-  m_line1->SetLineWidth(3);
-  m_line2->SetHorizontal(true);
-  m_line2->SetLineColor(1);// Black
-  m_line2->SetLineWidth(3);
-  m_line3->SetHorizontal(true);
-  m_line3->SetLineColor(1);
-  m_line3->SetLineWidth(3);
 }
 
 
@@ -133,27 +140,25 @@ void DQMHistAnalysisPXDCMModule::event()
   if (!m_cCommonMode) return;
   m_hCommonMode->Reset(); // dont sum up!!!
 
-  // search for hist is missing in this example look at Fitter code
-  for (auto i = 0; i < NUM_MODULES; i++) {
-    auto id = m_inx_to_id[i];
-    auto layer = (((id >> 5) & 0x1) + 1);
-    auto ladder = ((id >> 1) & 0xF);
-    auto sensor = ((id & 0x1) + 1);
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    VxdID& aModule = m_PXDModules[i ];
+
+    TString buff = (std::string)aModule;
+//     buff.ReplaceAll(".", "_");
 
     TH1* hh1 = NULL;
-    string s2 = str(format("%d.%d.%d") % layer % ladder % sensor);
 
-    TString a = "PXDDAQCM2_" + s2;
+    TString a = "PXDDAQCM2_" + buff;
     hh1 = findHist(a.Data());
     if (hh1 == NULL) {
       hh1 = findHistLocal(a);
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/PXDDAQCM2_" + s2;
+      a = m_histodir + "/PXDDAQCM2_" + buff;
       hh1 = findHist(a.Data());
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/PXDDAQCM2_" + s2;
+      a = m_histodir + "/PXDDAQCM2_" + buff;
       hh1 = findHistLocal(a);
     }
     if (hh1) {
@@ -204,14 +209,13 @@ void DQMHistAnalysisPXDCMModule::event()
 void DQMHistAnalysisPXDCMModule::endRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDCM : endRun called");
-  m_cCommonMode->Print("c1.pdf");// for testing
 }
 
 
 void DQMHistAnalysisPXDCMModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDCM: terminate called");
-
+  // m_cCommonMode->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
 }
 

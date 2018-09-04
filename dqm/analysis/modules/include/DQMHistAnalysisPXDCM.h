@@ -12,6 +12,8 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
+#include <vxd/geometry/SensorInfoBase.h>
+
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -28,7 +30,6 @@ namespace Belle2 {
     //! Constructor / Destructor
     DQMHistAnalysisPXDCMModule();
   private:
-    ~DQMHistAnalysisPXDCMModule() override final;
 
     //! Module functions to be called from main process
     void initialize(void) override final;
@@ -40,10 +41,10 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data members
-    enum { NUM_MODULES = 40}; // we want that from geometry
     std::string m_histodir;
-    std::map <int, int> m_id_to_inx;
-    std::map <int, int> m_inx_to_id;
+
+    //IDs of all PXD Modules to iterate over
+    std::vector<VxdID> m_PXDModules;
 
     TH2F* m_hCommonMode;
     TCanvas* m_cCommonMode;

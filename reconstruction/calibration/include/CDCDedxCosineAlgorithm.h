@@ -33,6 +33,12 @@ namespace Belle2 {
      */
     virtual ~CDCDedxCosineAlgorithm() {}
 
+    /** * function to make flag active for method of sep */
+    void setMethodSep(bool value = true) {isMethodSep = value;}
+
+    /** * function to make flag active for plotting */
+    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+
   protected:
 
     /**
@@ -41,6 +47,9 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
+
+    bool isMethodSep = false; /**< if e+e- need to be consider sep */
+    bool isMakePlots = false; /**< produce plots for status */
 
   };
 } // namespace Belle2

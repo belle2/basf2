@@ -14,6 +14,13 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <TF1.h>
+#include <TLine.h>
+#include <TMath.h>
+#include <TH1F.h>
+#include <TString.h>
+#include <TCanvas.h>
+
 namespace Belle2 {
   /**
    * A calibration algorithm for CDC dE/dx electron cos(theta) dependence
@@ -33,12 +40,27 @@ namespace Belle2 {
      */
     virtual ~CDCDedx1DCellAlgorithm() {}
 
+    /**<Local vs Global bin map settings for enta*/
+    void GlobalToLocalEntaBinMap(Bool_t seeMap);
+
   protected:
 
     /**
      * Run algorithm
      */
     virtual EResult calibrate();
+
+    /**<Set etna angle bins, Global */
+    void setGlobalEntaBins(int value) {fnEntaBinG = value;}
+
+    /**<Set etna angle bins, locally */
+    void setLocalEntaBins(int value) {fnEntaBinL = value;}
+
+    /**<Set asym bins flag to on or off */
+    void setAsymmetricBins(bool value) {IsLocalBin = value;}
+
+    /*** funtion to set flag active for plotting*/
+    void setMonitoringPlots(bool value = false) {IsMakePlots = value;}
 
   private:
 
@@ -48,7 +70,19 @@ namespace Belle2 {
      * @param removeLowest      lowest fraction of hits to remove (0.05)
      * @param removeHighest     highest fraction of hits to remove (0.25)
      */
-    double calculateMean(const std::vector<double>& dedx, double removeLowest, double removeHighest) const;
+    int fnEntaBinG; /**<etna angle bins, Global */
+    int fnEntaBinL; /**<etna angle bins, Local */
+
+    Double_t feaLE; /**< Lower edge of enta angle */
+    Double_t feaUE; /**< Upper edge of enta angle */
+    Double_t feaBS; /**< Binwidth edge of enta angle */
+
+    std::vector<int> fEntaBinNums;  /**< Vector for enta asym bin values */
+    std::vector<double> fEntaBinValues;  /**< Vector for doca asym bin values */
+
+    bool IsLocalBin;  /**< if local asym bin  */
+    bool IsPrintBinMap;  /**< print glocal to loca bin mapping for etna and doca */
+    bool IsMakePlots; /**< produce plots for status */
 
   };
 } // namespace Belle2

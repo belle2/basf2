@@ -1487,9 +1487,9 @@ endloop:
                       "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame,
                       "Returns the value of the variable using the lab frame as current reference frame.\n"
-                      "The lab frame is the default reference frame, usually you don't need to use this meta-variable.\n"
-                      "E.g. useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
-                      "     useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.");
+                      "The lab frame is the default reference frame, usually you don't need to use this meta-variable. E.g.\n"
+                      "  - useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
+                      "  - useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.\n\n");
     REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
                       "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
                       "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
@@ -1516,9 +1516,9 @@ endloop:
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
-                      "Returns value of variable for the i-th daughter."
-                      "E.g. daughter(0, p) returns the total momentum of the first daughter.\n"
-                      "     daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n"
+                      "Returns value of variable for the i-th daughter. E.g.\n"
+                      "  - daughter(0, p) returns the total momentum of the first daughter.\n"
+                      "  - daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n\n"
                       "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
                       "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"

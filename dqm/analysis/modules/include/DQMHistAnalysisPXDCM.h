@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisPXDCM.h
-// Description : Analysis of PXD Common Modes
+// Description : DAQM Analysis for PXD Common Modes
 //
 // Author : Bjoern Spruck, University Mainz
 // Date : 2018
@@ -18,7 +18,7 @@
 #include <TLine.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /*! DQM Histogram Analysis for PXD Common Modes */
 
   class DQMHistAnalysisPXDCMModule : public DQMHistAnalysisModule {
 
@@ -27,19 +27,19 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistAnalysisPXDCMModule();
-    virtual ~DQMHistAnalysisPXDCMModule();
+  private:
+    ~DQMHistAnalysisPXDCMModule() override final;
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize(void) override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun(void) override final;
+    void event(void) override final;
+    void endRun(void) override final;
+    void terminate(void) override final;
 
     // Data members
-  private:
     enum { NUM_MODULES = 40}; // we want that from geometry
     std::string m_histodir;
     std::map <int, int> m_id_to_inx;

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Matic Lubej                                 *
+ * Contributors: Anze Zupanc, Matic Lubej, Sviatoslav Bilokin             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

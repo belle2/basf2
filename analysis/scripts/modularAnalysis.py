@@ -1204,18 +1204,20 @@ def rankByLowest(
 
 def printDataStore(eventNumber=-1, path=analysis_main):
     """
-    Prints the contents of DataStore in all events (or a specific event number).
+    Prints the contents of DataStore in the first event (or a specific event number or all events).
     Will list all objects and arrays (including size).
-
-    Warning:
-        This will print a lot of output if you process many events.
 
     See also:
         The command line tool: ``b2file-size``.
 
     Parameters:
-        eventNumber (int): Print the datastore only for this event. The default is only for first events.
+        eventNumber (int): Print the datastore only for this event. The default
+            (-1) prints only the first event, 0 means print for all events (can produce large output)
         path (basf2.Path): the PrintCollections module is added to this path
+
+    Warning:
+        This will print a lot of output if you print it for all events and process many events.
+
     """
 
     printDS = register_module('PrintCollections')

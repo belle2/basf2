@@ -31,7 +31,7 @@ namespace Belle2 {
    *   timType
    *     types of trigger timing source defined in b2tt firmware
    */
-  class TRGSummary : public RelationsObject {
+  class TRGSummary final : public RelationsObject {
 
   public:
 
@@ -78,17 +78,13 @@ namespace Belle2 {
     };
 
     /*! default constructor: xxx */
-    TRGSummary() {;}
+    TRGSummary() = default;
 
     /*! constructor: xxx */
     TRGSummary(unsigned int inputBits[10],
                unsigned int ftdlBits[10],
                unsigned int psnmBits[10],
                ETimingType timType);
-
-    /** Destructor.
-     */
-    ~TRGSummary() {}
 
     /*! setter
      * @param xxx explanation

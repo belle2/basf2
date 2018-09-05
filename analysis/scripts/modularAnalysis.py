@@ -1202,7 +1202,7 @@ def rankByLowest(
     path.add_module(bcs)
 
 
-def printDataStore(eventNumber=0, path=analysis_main):
+def printDataStore(eventNumber=-1, path=analysis_main):
     """
     Prints the contents of DataStore in all events (or a specific event number).
     Will list all objects and arrays (including size).
@@ -1214,7 +1214,7 @@ def printDataStore(eventNumber=0, path=analysis_main):
         The command line tool: ``b2file-size``.
 
     Parameters:
-        eventNumber (int): Print the datastore only for this event. The default is all events.
+        eventNumber (int): Print the datastore only for this event. The default is only for first events.
         path (basf2.Path): the PrintCollections module is added to this path
     """
 

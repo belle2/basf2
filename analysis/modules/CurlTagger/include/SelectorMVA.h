@@ -26,7 +26,7 @@
 namespace Belle2 {
   namespace CurlTagger {
 
-    /** Simple cut based selector for curl tracks taken from Belle note 1079 */
+    /** MVA based selector for tagging curl tracks in Belle and Belle II */
     class SelectorMVA : public Selector {
 
     public:
@@ -45,8 +45,8 @@ namespace Belle2 {
       /** initialize whatever needs to be initalized (root file etc)  */
       virtual void initialize();
 
-      /** output training event data to ttree*/
-      virtual void collect(Particle* iPart, Particle* jPart);
+      /** collect training data and save to a root file*/
+      virtual void collectTrainingInfo(Particle* iPart, Particle* jPart);
 
       /** finalize whatever needs to be finalized (train the MVA) */
       virtual void finalize();
@@ -59,34 +59,58 @@ namespace Belle2 {
       /** applying mva or training it */
       bool m_TrainFlag;
 
-      //
-      MVA::GeneralOptions m_generalOptions;
-      MVA::FastBDTExpert m_expert;
-
-      // Objects
+      /** name of output file for training data */
       std::string m_TFileName;
+
+      /**output file for training data */
       TFile* m_TFile;
+
+      /**training data tree */
       TTree* m_TTree;
+
+      /** mva general options (for the expert)*/
+      MVA::GeneralOptions m_generalOptions;
+
+      /** mva expert */
+      MVA::FastBDTExpert m_expert;
 
 
       // General Options data - just use same names
+      /** mva identifier */
       std::string m_identifier;
+
+      /** name of datafile */
       std::vector<std::string> m_datafiles;
+
+      /** names of variables used by mva */
       std::vector<std::string> m_variables;
+
+      /** name of target variable (isCurl) */
       std::string m_target_variable;
+
 
       // MVA Variables
       /** */
       Float_t m_PtDiff;
       Float_t m_PzDiff;
       Float_t m_PPhi;
-      Float_t m_D0Diff;
-      Float_t m_Z0Diff;
-      Float_t m_PvalDiff;
+      Float_t m_TrackD0Diff;
+      Float_t m_TrackZ0Diff;
+      Float_t m_TrackPValueDiff;
       Float_t m_TrackTanLambdaDiff;
       Float_t m_ChargeMult;
+      Float_t m_TrackPhi0Diff;
+      Float_t m_TrackOmegaDiff;
 
-      //truth
+      Float_t m_PtDiffEW;
+      Float_t m_PzDiffEW;
+      Float_t m_TrackD0DiffEW;
+      Float_t m_TrackZ0DiffEW;
+      Float_t m_TrackTanLambdaDiffEW;
+      Float_t m_TrackPhi0DiffEW;
+      Float_t m_TrackOmegaDiffEW;
+
+      /** isCurl Truth */
       Float_t m_IsCurl;
     }; //class
 

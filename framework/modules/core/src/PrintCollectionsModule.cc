@@ -35,8 +35,7 @@ PrintCollectionsModule::PrintCollectionsModule()
   setDescription("Prints the contents of the DataStore in each event, listing all objects and arrays (including size).");
 
   addParam("printForEvent", m_printForEvent,
-           "Print the collections only for a specific event number. "
-           "If set to -1 (default) only the collections of the first event will be printed, if set to 0, the collections of all events will be printed, which might be a lot of output.",
+           "Print the collections only for a specific event number.  If set to -1 (default) only the collections of the first event will be printed, if set to 0, the collections of all events will be printed, which might be a lot of output.",
            m_printForEvent);
 }
 

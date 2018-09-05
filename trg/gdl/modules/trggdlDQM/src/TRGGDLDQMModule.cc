@@ -53,7 +53,7 @@ TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
            "Dumping vcd file or not",
            false);
   addParam("bitConditionToDumpVcd", m_bitConditionToDumpVcd,
-           "Condition for vcd. alg format with !/+/*.",
+           "Condition for vcd. alg format with '!' and '+'.",
            string(""));
   addParam("vcdEventStart", m_vcdEventStart,
            "Start equential event number",
@@ -253,10 +253,10 @@ void TRGGDLDQMModule::event()
   h_p = new TH2I(Form("hpsn%08d", evtno), "", n_clocks, 0, n_clocks, 96, 0, 96);
   h_f = new TH2I(Form("hftd%08d", evtno), "", n_clocks, 0, n_clocks, 96, 0, 96);
   h_i = new TH2I(Form("hitd%08d", evtno), "", n_clocks, 0, n_clocks, 160, 0, 160);
-  for (unsigned i = 0; i < tb.getInputN(); i++) {
+  for (unsigned i = 0; i < tb.getNumOfInputs(); i++) {
     h_i->GetYaxis()->SetBinLabel(i + 1, tb.getInputBitName(i));
   }
-  for (unsigned i = 0; i < tb.getOutputN(); i++) {
+  for (unsigned i = 0; i < tb.getNumOfOutputs(); i++) {
     h_f->GetYaxis()->SetBinLabel(i + 1, tb.getOutputBitName(i));
     h_p->GetYaxis()->SetBinLabel(i + 1, tb.getOutputBitName(i));
   }
@@ -453,6 +453,7 @@ void TRGGDLDQMModule::event()
   if (m_dumpVcdFile) {
     if (anaBitCondition()) {
       nvcd++;
+      B2DEBUG(20, "anaBitCondition fired, evt(" << evtno << ")");
       if (m_vcdEventStart <= nvcd && nvcd < m_vcdEventStart + m_vcdNumberOfEvents) {
         genVcd();
       }
@@ -601,13 +602,13 @@ void TRGGDLDQMModule::genVcd(void)
   outf << "" << endl;
   outf << "$scope module gdl0067d_icn $end" << endl;
   int seqnum = 0;
-  for (unsigned j = 0; j < tb.getInputN(); j++) {
+  for (unsigned j = 0; j < tb.getNumOfInputs(); j++) {
     outf << "$var wire  1  n" << seqnum++ << " " << tb.getInputBitName(j) << " $end" << endl;
   }
-  for (unsigned j = 0; j < tb.getOutputN(); j++) {
+  for (unsigned j = 0; j < tb.getNumOfOutputs(); j++) {
     outf << "$var wire  1  n" << seqnum++ << " ftd." << tb.getOutputBitName(j) << " $end" << endl;
   }
-  for (unsigned j = 0; j < tb.getOutputN(); j++) {
+  for (unsigned j = 0; j < tb.getNumOfOutputs(); j++) {
     outf << "$var wire  1  n" << seqnum++ << " psn." << tb.getOutputBitName(j) << " $end" << endl;
   }
   /*
@@ -621,21 +622,21 @@ void TRGGDLDQMModule::genVcd(void)
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
     seqnum = 0;
     outf << "#" << clk - 1 << endl;
-    for (unsigned k = 1; k <= tb.getInputN(); k++) {
+    for (unsigned k = 1; k <= tb.getNumOfInputs(); k++) {
       if (clk == 1 || prev_i[k - 1] != h_i->GetBinContent(clk, k)) {
         prev_i[k - 1] = h_i->GetBinContent(clk, k);
         outf << h_i->GetBinContent(clk, k) << "n" << seqnum << endl;
       }
       seqnum++;
     }
-    for (unsigned k = 1; k <= tb.getOutputN(); k++) {
+    for (unsigned k = 1; k <= tb.getNumOfOutputs(); k++) {
       if (clk == 1 || prev_f[k - 1] != h_f->GetBinContent(clk, k)) {
         prev_f[k - 1] = h_f->GetBinContent(clk, k);
         outf << h_f->GetBinContent(clk, k) << "n" << seqnum << endl;
       }
       seqnum++;
     }
-    for (unsigned k = 1; k <= tb.getOutputN(); k++) {
+    for (unsigned k = 1; k <= tb.getNumOfOutputs(); k++) {
       if (clk == 1 || prev_p[k - 1] != h_p->GetBinContent(clk, k)) {
         prev_p[k - 1] = h_p->GetBinContent(clk, k);
         outf << h_p->GetBinContent(clk, k) << "n" << seqnum << endl;

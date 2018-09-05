@@ -22,6 +22,7 @@ TrgBit::versionFTDL(void) const
 TrgBit::TrgBit(void)
   : _exp(0),
     _run(0),
+    _isFiredFilled(false),
     nconf_input(0),
     nconf_ftdl(0),
     nconf_psnm(0)
@@ -37,11 +38,20 @@ TrgBit::TrgBit(void)
   StoreObjPtr<TRGSummary> trgsum;
   if (trgsum.isValid()) {
     for (unsigned i = 0; i < 6; i++) {
-      _input.set(trgsum->getInputBits(i), i);
-      _ftdl.set(trgsum->getFtdlBits(i), i);
-      _psnm.set(trgsum->getPsnmBits(i), i);
+      unsigned i32b = trgsum->getInputBits(i);
+      unsigned f32b = trgsum->getFtdlBits(i);
+      unsigned p32b = trgsum->getPsnmBits(i);
+      _input.set(i32b, i);
+      _ftdl.set(f32b, i);
+      _psnm.set(p32b, i);
+      for (unsigned j = 0; j < 32; j++) {
+        if (j + i * 32 < n_input) _itdVector.push_back((i32b & (1 << j)) ? 1 : 0);
+        if (j + i * 32 < n_output) _ftdVector.push_back((f32b & (1 << j)) ? 1 : 0);
+        if (j + i * 32 < n_output) _psnVector.push_back((p32b & (1 << j)) ? 1 : 0);
+      }
     }
     timtype = trgsum->getTimType();
+    _isFiredFilled = true;
   }
 }
 
@@ -90,7 +100,7 @@ TrgBit::isFired(output a) const
 }
 
 bool
-TrgBit::isFiredOutput(output a) const
+TrgBit::isFiredFtdl(output a) const
 {
   unsigned bit = _outputMap[nconf_ftdl][a];
   if (bit == 999) return false;
@@ -104,13 +114,13 @@ TrgBit::isFiredInput(unsigned ith_bit) const
 }
 
 bool
-TrgBit::isFiredOutput(unsigned ith_bit) const
+TrgBit::isFiredFtdl(unsigned ith_bit) const
 {
   return _ftdl.isFired(ith_bit);
 }
 
 bool
-TrgBit::isFiredPSNM(output a) const
+TrgBit::isFiredPsnm(output a) const
 {
   unsigned bit = _outputMap[nconf_ftdl][a];
   if (bit == 999) return false;
@@ -118,7 +128,7 @@ TrgBit::isFiredPSNM(output a) const
 }
 
 bool
-TrgBit::isFiredPSNM(unsigned ith_bit) const
+TrgBit::isFiredPsnm(unsigned ith_bit) const
 {
   return _psnm.isFired(ith_bit);
 }
@@ -263,5 +273,32 @@ TrgBit::getOutputBitNum(const char* bitname) const
     }
   }
   return 999;
+}
+
+bool
+TrgBit::isUsed(input a) const
+{
+  unsigned bit = _inputMap[nconf_input][a];
+  if (bit == 999) return false;
+  return true;
+}
+
+bool
+TrgBit::isUsed(output a) const
+{
+  unsigned bit = _outputMap[nconf_ftdl][a];
+  if (bit == 999) return false;
+  return true;
+}
+
+bool
+TrgBit::isUsed(const char* bitname) const
+{
+  if (getInputBitNum(bitname) != 999) {
+    return true;
+  } else if (getOutputBitNum(bitname) != 999) {
+    return true;
+  }
+  return false;
 }
 

@@ -106,6 +106,10 @@ namespace Belle2 {
     unsigned n_input;
     unsigned n_output;
 
+    // Whether hit information is filled or not.
+    // This is true when TRGSummary class is available.
+    bool _isFiredFilled;
+
   public:// Selectors
 
     /// returns TrgBit version;
@@ -120,27 +124,43 @@ namespace Belle2 {
     /// print configuration values
     void printConf(void) const;
 
+    /// returns true if the psnm bit is fired.
+    bool isFired(output bitname) const;
+    /// returns true if the input or psnm bit is fired.
+    bool isFired(const char* bitname) const;
     /// returns true if the bit is fired.
     bool isFired(input bitname) const;
-    bool isFiredInput(input bitname) const;
-    bool isFired(output bitname) const;
-    bool isFired(const char* bitname) const;
-    bool isFiredOutput(output bitname) const;
     bool isFiredInput(unsigned ith_bit) const;
-    bool isFiredOutput(unsigned ith_bit) const;
-    bool isFiredPSNM(unsigned ith_bit) const;
-    bool isFiredPSNM(output bitname) const;
+    bool isFiredInput(input bitname) const;
+    bool isFiredFtdl(unsigned ith_bit) const;
+    bool isFiredFtdl(output bitname) const;
+    bool isFiredPsnm(unsigned ith_bit) const;
+    bool isFiredPsnm(output bitname) const;
+
     /// return number of used bits
-    unsigned getInputN(void) {return n_input;}
-    unsigned getOutputN(void) {return n_output;}
+    unsigned getNumOfInputs(void) {return n_input;}
+    unsigned getNumOfOutputs(void) {return n_output;}
+
     /// returns bit number
     unsigned getOutputBitNum(const char* bitname) const;
+    unsigned getOutputBitNum(output a) {return _outputMap[nconf_ftdl][a];}
+
     /// returns bit number
     unsigned getInputBitNum(const char* bitname) const;
+    unsigned getInputBitNum(input a) {return _inputMap[nconf_input][a];}
+
     /// returns bit number for the exprun,
     /// if >=0 it is input_bitnum
     /// if  <0 it is -output_bitnum-1
     int getBitNum(const char* bitname) const;
+
+    /// Whether hit information is available or not.
+    bool isFiredFilled(void) {return _isFiredFilled;}
+
+    /// Whether the bit exists for the run.
+    bool isUsed(input a) const;
+    bool isUsed(output a) const;
+    bool isUsed(const char* bitname) const;
 
     /// returns bit name
     const char* getInputBitName(unsigned ith_bit) const;
@@ -148,6 +168,11 @@ namespace Belle2 {
 
     /// returns timing source
     TRGSummary::ETimingType getTimingSource(void) const;
+
+    /// return hit information in vector
+    std::vector<unsigned> getInputVector(void) {return _itdVector;}
+    std::vector<unsigned> getFtdlVector(void) {return _ftdVector;}
+    std::vector<unsigned> getPsnmVector(void) {return _psnVector;}
 
   public:
 
@@ -174,6 +199,11 @@ namespace Belle2 {
     InputBitPattern _input;
     OutputBitPattern _ftdl;
     OutputBitPattern _psnm;
+
+    /// hit information in vector
+    std::vector<unsigned> _itdVector;
+    std::vector<unsigned> _ftdVector;
+    std::vector<unsigned> _psnVector;
 
   };
 

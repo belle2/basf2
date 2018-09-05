@@ -53,15 +53,15 @@ trggdldqm.param('eventByEventTimingHistRecord', False)
 # event by event bit-vs-clock TH2I hist for itd, ftdl, psnm in ROOT file.
 
 # dump vcd file
-dumpVcdFileTrue = True
+dumpVcdFileTrue = False
 trggdldqm.param('dumpVcdFile', dumpVcdFileTrue)
 if dumpVcdFileTrue:
     if not os.path.isdir('vcd'):
         os.mkdir('vcd')
-    trggdldqm.param('bitConditionToDumpVcd', 't2_0 !track+t2_1 !track')
+    trggdldqm.param('bitConditionToDumpVcd', 'fff + !fffo')
     # '+' means logical OR. '!' is logical NOT.
-    # Bit names is delimitted by space. No space after '!'.
-    # Parenthesis, A (B+!C) not allowed. Must be expanded as 'A B+A !C'.
+    # Bit names is delimited by space. No space after '!'.
+    # Parenthesis, A (B+!C) not allowed. Must be expanded to 'A B+A !C'.
     # If one of characters is capital, the bit is regarded as psnm bit,
     # otherwise ftdl bit: 'hie' is ftdl hie bit. 'hIE' is psnm hie bit.
     trggdldqm.param('vcdEventStart', 10)

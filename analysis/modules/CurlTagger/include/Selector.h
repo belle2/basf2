@@ -10,7 +10,6 @@
 
 #pragma once
 
-
 #include<analysis/dataobjects/Particle.h>
 #include<vector>
 
@@ -28,10 +27,10 @@ namespace Belle2 {
       ~Selector() {};
 
       /** returns prob that two particles are actual from same mc/data particle */
-      virtual float getProbability(Particle* iPart, Particle* jPart) {return -1.;};
+      virtual float getProbability(Particle*, Particle*) = 0;
 
       /** returns vector of variables used by the selector */
-      virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) {return { -1., -1., -1.};};
+      virtual std::vector<float> getVariables(Particle*, Particle*) = 0;
 
       /** initialise selector if needed */
       virtual void initialize() {};
@@ -40,7 +39,7 @@ namespace Belle2 {
       virtual void finalize() {};
 
       /** collect information for training for mva or other selectors*/
-      virtual void collect(Particle* iPart, Particle* jPart) {};
+      virtual void collectTrainingInfo(Particle*, Particle*)  {};
     }; //class
   } // CurlTagger namespace
 } // Belle 2 namespace

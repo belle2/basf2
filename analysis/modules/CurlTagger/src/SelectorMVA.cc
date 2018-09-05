@@ -16,10 +16,6 @@
 
 #include <mva/methods/FastBDT.h>
 #include <mva/interface/Interface.h>
-//#include <mva/interface/Dataset.h> // shouldnt be needed
-//#include <mva/interface/Options.h>
-//#include <mva/interface/Teacher.h>
-//#include <mva/interface/Weightfile.h>
 
 //Root includes
 #include "TLorentzVector.h"
@@ -51,25 +47,44 @@ void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
   if (m_TrainFlag) {
     m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? 1 : 0);
   }
+  m_ChargeMult = iPart->getCharge() * jPart->getCharge();
+  m_PPhi  = iPart->getMomentum().Angle(jPart->getMomentum());
+  /*
   m_PtDiff = abs(Variable::particlePt(iPart) - Variable::particlePt(jPart));
   m_PzDiff = abs(Variable::particlePz(iPart) - Variable::particlePz(jPart));
-  m_PPhi   = iPart->getMomentum().Angle(jPart->getMomentum());
-  m_D0Diff = abs(Variable::trackD0(iPart) - Variable::trackD0(jPart));
-  m_Z0Diff = abs(Variable::trackZ0(iPart) - Variable::trackZ0(jPart));
-  m_ChargeMult = iPart->getCharge() * jPart->getCharge();
-  m_PvalDiff = abs(iPart->getPValue() - jPart->getPValue());
-  // This is defined in TrackVariables.cc but not TrackVariables.h, Intentional?
-  //m_TrackTanLambdaDiff = abs(trackTanLambda(iPart) - trackTanLambda(jPart));
+  m_TrackD0Diff = abs(Variable::trackD0(iPart) - Variable::trackD0(jPart));
+  m_TrackZ0Diff = abs(Variable::trackZ0(iPart) - Variable::trackZ0(jPart));
+  m_TrackPValueDiff = abs(Variable::trackPValue(iPart) - Variable::trackPValue(jPart)); // get rid of this eventually
+  m_TrackTanLambdaDiff = abs(Variable::trackTanLambda(iPart) - Variable::trackTanLambda(jPart));
+  m_TrackPhi0Diff = abs(Variable::trackPhi0(iPart) - Variable::trackPhi0(jPart));
+  m_TrackOmegaDiff = abs(Variable::trackOmega(iPart) - Variable::trackOmega(jPart));
+  */
+  m_PtDiffEW = abs(Variable::particlePt(iPart) - Variable::particlePt(jPart)) / (Variable::particlePtErr(
+                 iPart) + Variable::particlePtErr(jPart));
+  m_PzDiffEW = abs(Variable::particlePz(iPart) - Variable::particlePz(jPart)) / (Variable::particlePzErr(
+                 iPart) + Variable::particlePzErr(jPart));
+  m_TrackD0DiffEW = abs(Variable::trackD0(iPart) - Variable::trackD0(jPart)) / (Variable::trackD0Error(
+                      iPart) + Variable::trackD0Error(jPart));
+  m_TrackZ0DiffEW = abs(Variable::trackZ0(iPart) - Variable::trackZ0(jPart)) / (Variable::trackZ0Error(
+                      iPart) + Variable::trackZ0Error(jPart));
+  m_TrackTanLambdaDiffEW = abs(Variable::trackTanLambda(iPart) - Variable::trackTanLambda(jPart)) / (Variable::trackTanLambdaError(
+                             iPart) + Variable::trackTanLambdaError(jPart));
+  m_TrackPhi0DiffEW = abs(Variable::trackPhi0(iPart) - Variable::trackPhi0(jPart)) / (Variable::trackPhi0Error(
+                        iPart) + Variable::trackPhi0Error(jPart));
+  m_TrackOmegaDiffEW = abs(Variable::trackOmega(iPart) - Variable::trackOmega(jPart)) / (Variable::trackOmegaError(
+                         iPart) + Variable::trackOmegaError(jPart));
+
 }
 
 std::vector<float> SelectorMVA::getVariables(Particle* iPart, Particle* jPart)
 {
   // Do I actually need this function?
   updateVariables(iPart, jPart);
-  return {m_PtDiff, m_PzDiff, m_PPhi, m_D0Diff, m_Z0Diff, m_ChargeMult, m_PvalDiff};
+  //return {m_PtDiff, m_PzDiff, m_PPhi, m_TrackD0Diff, m_TrackZ0Diff, m_ChargeMult, m_TrackPValueDiff, m_TrackTanLambdaDiff, m_TrackPhi0Diff, m_TrackOmegaDiff,    m_PtDiffEW, m_PzDiffEW, m_TrackD0DiffEW, m_TrackZ0DiffEW, m_TrackTanLambdaDiffEW, m_TrackPhi0DiffEW, m_TrackOmegaDiffEW};
+  return {m_PPhi, m_ChargeMult, m_PtDiffEW, m_PzDiffEW, m_TrackD0DiffEW, m_TrackZ0DiffEW, m_TrackTanLambdaDiffEW, m_TrackPhi0DiffEW, m_TrackOmegaDiffEW};
 }
 
-void SelectorMVA::collect(Particle* iPart, Particle* jPart)
+void SelectorMVA::collectTrainingInfo(Particle* iPart, Particle* jPart)
 {
   updateVariables(iPart, jPart);
   m_TTree -> Fill();
@@ -84,16 +99,27 @@ void SelectorMVA::initialize()
     m_TTree -> Branch("PtDiff", &m_PtDiff, "PtDiff/F");
     m_TTree -> Branch("PzDiff", &m_PzDiff, "PzDiff/F");
     m_TTree -> Branch("PPhi"  , &m_PPhi, "PPhi/F");
-    m_TTree -> Branch("D0Diff", &m_D0Diff, "D0Diff/F");
-    m_TTree -> Branch("Z0Diff", &m_Z0Diff, "Z0Diff/F");
+    m_TTree -> Branch("TrackD0Diff", &m_TrackD0Diff, "TrackD0Diff/F");
+    m_TTree -> Branch("TrackZ0Diff", &m_TrackZ0Diff, "TrackZ0Diff/F");
     m_TTree -> Branch("ChargeMult", &m_ChargeMult, "ChargeMult/F");
-    m_TTree -> Branch("PvalDiff",   &m_PvalDiff, "PvalDiff/F");
-    //m_TTree -> Branch("TrackTanLambdaDiff", &m_TrackTanLambdaDiff);
+    m_TTree -> Branch("TrackPValueDiff",   &m_TrackPValueDiff, "TrackPValueDiff/F");
+    m_TTree -> Branch("TrackTanLambdaDiff", &m_TrackTanLambdaDiff, "TrackTanLambdaDiff/F");
+    m_TTree -> Branch("TrackPhi0Diff", &m_TrackPhi0Diff, "TrackPhi0Diff/F");
+    m_TTree -> Branch("TrackOmegaDiff", &m_TrackOmegaDiff, "TrackOmegaDiff/F");
+
+    m_TTree -> Branch("PtDiffEW", &m_PtDiffEW, "PtDiffEW/F");
+    m_TTree -> Branch("PzDiffEW", &m_PzDiffEW, "PzDiffEW/F");
+    m_TTree -> Branch("TrackD0DiffEW", &m_TrackD0DiffEW, "TrackD0DiffEW/F");
+    m_TTree -> Branch("TrackZ0DiffEW", &m_TrackZ0DiffEW, "TrackZ0DiffEW/F");
+    m_TTree -> Branch("TrackTanLambdaDiffEW", &m_TrackTanLambdaDiffEW, "TrackTanLambdaDiffEW/F");
+    m_TTree -> Branch("TrackPhi0DiffEW", &m_TrackPhi0DiffEW, "TrackPhi0DiffEW/F");
+    m_TTree -> Branch("TrackOmegaDiffEW", &m_TrackOmegaDiffEW, "TrackOmegaDiffEW/F");
 
     m_TTree -> Branch("IsCurl", &m_IsCurl, "IsCurl/F");
 
     m_target_variable = "IsCurl";
-    m_variables = {"PtDiff", "PzDiff", "PPhi", "D0Diff", "Z0Diff", "ChargeMult", "PvalDiff"}; // ,"TrackTanLambdaDiff"};
+    //m_variables = {"PtDiff", "PzDiff", "PPhi", "TrackD0Diff", "TrackZ0Diff", "ChargeMult", "TrackPValueDiff", "TrackTanLambdaDiff", "TrackPhi0Diff", "TrackOmegaDiff",        "PtDiffEW", "PzDiffEW", "TrackD0DiffEW", "TrackZ0DiffEW","TrackTanLambdaDiffEW", "TrackPhi0DiffEW", "TrackOmegaDiffEW"};
+    m_variables = {"PPhi", "ChargeMult", "PtDiffEW", "PzDiffEW", "TrackD0DiffEW", "TrackZ0DiffEW", "TrackTanLambdaDiffEW", "TrackPhi0DiffEW", "TrackOmegaDiffEW"};
   } else { // normal application
     //load MVA
     auto weightfile = MVA::Weightfile::loadFromDatabase(m_identifier);
@@ -122,11 +148,12 @@ void SelectorMVA::finalize()
     MVA::ROOTDataset dataset(generalOptions);
 
     MVA::FastBDTOptions specificOptions;
-    specificOptions.m_nTrees = 100;
-    specificOptions.m_nCuts = 8;
-    specificOptions. m_nLevels = 3;
+    specificOptions.m_nTrees = 1000;
+    //specificOptions.m_shrinkage = 0.10;
+    specificOptions.m_nCuts = 16;
+    specificOptions. m_nLevels = 4;
 
-    auto teacher = new MVA::FastBDTTeacher(generalOptions, specificOptions); // does this train it?
+    auto teacher = new MVA::FastBDTTeacher(generalOptions, specificOptions);
     auto weightfile = teacher->train(dataset);
     MVA::Weightfile::saveToDatabase(weightfile, m_identifier);
     MVA::Weightfile::saveToXMLFile(weightfile, "test.xml");

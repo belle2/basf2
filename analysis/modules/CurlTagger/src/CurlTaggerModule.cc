@@ -198,7 +198,7 @@ void CurlTaggerModule::event()
           if (i == j) {continue;}
           if (!passesPreSelection(jPart)) {continue;}
 
-          m_Selector->collect(iPart, jPart);
+          m_Selector->collectTrainingInfo(iPart, jPart);
         } //jPart
       } //iPart
     } // Training events

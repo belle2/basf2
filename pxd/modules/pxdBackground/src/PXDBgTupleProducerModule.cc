@@ -109,7 +109,7 @@ void PXDBgTupleProducerModule::beginRun()
     m_sensitiveAreaMap[sensorID] = getSensorArea(sensorID);
 
     for (int uBin = 0; uBin < m_nBinsU; ++uBin) {
-      for (int vBin = 0; vBin < m_nBinsU; ++vBin)  {
+      for (int vBin = 0; vBin < m_nBinsV; ++vBin)  {
         std::pair<VxdID, int> key(sensorID, getRegionID(uBin, vBin));
         // Compute nominal number of pixel per sensor subregion
         m_regionSensitivePixelMap[key] = info.getUCells() * info.getVCells() / m_nBinsU / m_nBinsV;
@@ -140,7 +140,7 @@ void PXDBgTupleProducerModule::beginRun()
     }
 
     for (int uBin = 0; uBin < m_nBinsU; ++uBin) {
-      for (int vBin = 0; vBin < m_nBinsU; ++vBin)  {
+      for (int vBin = 0; vBin < m_nBinsV; ++vBin)  {
         std::pair<VxdID, int> key(sensorID, getRegionID(uBin, vBin));
         if (m_regionSensitivePixelMap[key] == 0) {
           B2WARNING("All pixels from subregion uBin=" << uBin << " vBin=" << vBin << " on Sensor=" << sensorID << " are masked.");
@@ -258,7 +258,7 @@ void PXDBgTupleProducerModule::terminate()
                       &(bgdata.m_chargedParticleFlux));
 
     for (int uBin = 0; uBin < m_nBinsU; ++uBin) {
-      for (int vBin = 0; vBin < m_nBinsU; ++vBin)  {
+      for (int vBin = 0; vBin < m_nBinsV; ++vBin)  {
         int regionID = getRegionID(uBin, vBin);
         treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_exposition") % sensorDescr % uBin % vBin).c_str(),
                           &(bgdata.m_regionExpoMap[regionID]));

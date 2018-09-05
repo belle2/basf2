@@ -60,7 +60,7 @@ namespace Belle2 {
       unsigned int m_param_minNHits = 5;
 
       // Maximum distance from hits to the track
-      float m_param_maxDistance = 1.0; //cm, NOTE for conventional tracking it is 0.2
+      float m_param_maxDistance = 0.5; //cm, NOTE for conventional tracking it is 0.2
     };
   }
 }

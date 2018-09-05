@@ -76,7 +76,6 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
     // Reconstruct and add hits
     for (const CDCWireHit* wireHit : foundHits) {
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
-      //TODO set taken flag?
       track.push_back(std::move(recoHit3D));
     }
     track.sortByArcLength2D();
@@ -89,10 +88,12 @@ std::vector<const CDCWireHit*> AxialStraightTrackCreator::search(const std::vect
 {
   std::vector<const CDCWireHit*> foundHits;
   for (const CDCWireHit* hit : axialWireHits) {
-    //TODO check for taken hits?
+    AutomatonCell& automatonCell = hit->getAutomatonCell();
+    if (automatonCell.hasTakenFlag()) continue; // Ignore hits already taken by normal tracking
+
     const Vector2D point = hit->reconstruct2D(trajectory);
     float arc = trajectory.calcArcLength2D(point);
-    if (arc < 0) continue; //NOTE no b2b tracks
+    if (arc < 0) continue; // No b2b tracks
     float distance = trajectory.getDist2D(point);
     if (std::fabs(distance) < m_param_maxDistance) {
       foundHits.push_back(hit);

@@ -39,7 +39,7 @@ namespace Belle2 {
       /** Probability that this pair of particles come from the same mc/actual particle */
       virtual float getProbability(Particle* iPart, Particle* jPart);
 
-      /** returns vector of variables used by this selector. Not really useful here but included to be consistent with eventual MVA method. */
+      /** returns vector of variables used by this selector. */
       virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart);
 
       /** initialize whatever needs to be initalized (root file etc)  */
@@ -90,29 +90,36 @@ namespace Belle2 {
 
 
       // MVA Variables
-      /** */
-      Float_t m_PtDiff;
-      Float_t m_PzDiff;
+      /** angle between particle momentum vectors */
       Float_t m_PPhi;
-      Float_t m_TrackD0Diff;
-      Float_t m_TrackZ0Diff;
-      Float_t m_TrackPValueDiff;
-      Float_t m_TrackTanLambdaDiff;
-      Float_t m_ChargeMult;
-      Float_t m_TrackPhi0Diff;
-      Float_t m_TrackOmegaDiff;
 
+      /** charge(p1) * charge(p2) */
+      Float_t m_ChargeMult;
+
+      /** error weighted particle Pt difference */
       Float_t m_PtDiffEW;
+
+      /** error weighted particle Pz difference */
       Float_t m_PzDiffEW;
+
+      /** error weighted track D0 difference */
       Float_t m_TrackD0DiffEW;
+
+      /** error weighted track Z0 difference */
       Float_t m_TrackZ0DiffEW;
+
+      /** error weighted track tan lambda diff difference */
       Float_t m_TrackTanLambdaDiffEW;
+
+      /** error weighted track Phi0 difference */
       Float_t m_TrackPhi0DiffEW;
+
+      /** error weighted track Omega difference */
       Float_t m_TrackOmegaDiffEW;
 
       /** isCurl Truth */
       Float_t m_IsCurl;
-    }; //class
+    }; //selectorMVA class
 
   } // curlTagger Module namespace
 }// Belle 2 namespace

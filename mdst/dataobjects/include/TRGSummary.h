@@ -102,10 +102,10 @@ namespace Belle2 {
     void setPsnmBits(int i, int word) {m_psnmBits[i] = word;}
 
     /** get the trigger result, each word has 32 bits*/
-    unsigned int getTRGSummary(int i) {return m_ftdlBits[i];}
+    unsigned int getTRGSummary(int i) const {return m_ftdlBits[i];}
 
     /** get the prescale factor which the bit is corresponding*/
-    unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
+    unsigned int getPreScale(int i, int bit) const {return m_prescaleBits[i][bit];}
 
     /**set the timType */
     void setTimType(ETimingType timType) {m_timType = timType;}

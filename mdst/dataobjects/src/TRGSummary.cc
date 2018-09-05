@@ -1,5 +1,10 @@
 #include <mdst/dataobjects/TRGSummary.h>
 
+#include <TROOT.h>
+#include <TColor.h>
+
+#include <sstream>
+
 using namespace Belle2;
 
 TRGSummary::TRGSummary(unsigned int inputBits[10],

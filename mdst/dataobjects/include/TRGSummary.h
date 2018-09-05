@@ -13,11 +13,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <TROOT.h>
-#include <TColor.h>
-
-#include <sstream>
-
 namespace Belle2 {
 
   /**

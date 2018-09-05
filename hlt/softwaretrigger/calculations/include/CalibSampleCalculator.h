@@ -47,7 +47,6 @@ namespace Belle2 {
 
       /** required input for monopoles*/
       StoreArray<RecoTrack> m_recoTracksMpl;
-      //NOTE tentatively have put this here, as "calib" trigger seemed most suitable
 
       /** the name of particle list */
       std::vector<std::string> m_particlelist;

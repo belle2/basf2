@@ -86,9 +86,7 @@ namespace Belle2 {
                unsigned int psnmBits[10],
                ETimingType timType);
 
-    /*! setter
-     * @param xxx explanation
-     */
+    /**set the Final Trigger Decision Logic bit*/
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
 
     /**set the prescale factor of each bit*/

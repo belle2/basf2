@@ -53,11 +53,11 @@ CurlTaggerModule::CurlTaggerModule() : Module()
 
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("belleFlag", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", false);
+  addParam("belle", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", false);
   addParam("ptCut", m_PtCut, "preselection pt Cut", 0.4);
   addParam("selectorType", m_SelectorType,
            "gives the name of the selector to use, currently only cut based ('cut') selection is available", std::string("cut"));
-  addParam("mcStatsFlag", m_McStatsFlag, "outputs extra stats based on MC truth", false);
+  addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);
   addParam("pVal", m_PVal, "min allowed pVal for a match", 0.5);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
 }
@@ -79,15 +79,15 @@ void CurlTaggerModule::initialize()
   //initialise the selection function chosen by user
   if (m_SelectorType.compare("cut") == 0) {
     m_Selector = new CurlTagger::SelectorCut(m_BelleFlag);
+    //Only really works for belle data right now
+    if (!m_BelleFlag) {
+      B2WARNING("Curl Tagger 'cut' selector is only calibrated for Belle");
+    }
+
   } else if (m_SelectorType.compare("mva") == 0) {
     m_Selector = new CurlTagger::SelectorMVA(m_BelleFlag, m_TrainFlag);
   } else {
     B2ERROR("Curl Track Tagger - Selector type does not exists.");
-  }
-
-  //Only really works for belle data right now
-  if (!m_BelleFlag) {
-    B2WARNING("Curl Tagger Module currently only works Belle data/mc");
   }
 
   //initialse the selector if it has an initialize function

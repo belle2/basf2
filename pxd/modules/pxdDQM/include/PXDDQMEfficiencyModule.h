@@ -93,6 +93,8 @@ namespace Belle2 {
 
     bool m_maskDeadPixels;
 
+    bool m_cutBorders;
+
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
 
@@ -112,8 +114,9 @@ namespace Belle2 {
 
     double m_distcut; //distance cut in cm!
     double m_pcut; //pValue-Cut for tracks
-    double m_momCut;
-    unsigned int m_minSVDHits;
+    double m_momCut; //Cut on fitted track momentum
+    unsigned int m_minSVDHits; //Required hits in SVD strips for tracks
+    int m_maskedDistance; //Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency
     std::map<VxdID, TH2D*> m_h_track_hits;

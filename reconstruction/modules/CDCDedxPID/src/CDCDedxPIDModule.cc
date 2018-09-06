@@ -395,9 +395,10 @@ void CDCDedxPIDModule::event()
         const double dot   = wx * px + wy * py;
         double entAng = atan2(cross, dot);
 
+        // re-scaled (RS) doca and entAng variable: map to square cell
         double cellR = 2 * cellHalfWidth / cellHeight;
         double tana = 100.0;
-        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100; //avoid infinity at pi/2
+        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100 * (entAng / std::abs(entAng)); //avoid infinity at pi/2
         else tana =  std::tan(entAng);
         double docaRS = doca * std::sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
         double entAngRS = std::atan(tana / cellR);
@@ -418,7 +419,7 @@ void CDCDedxPIDModule::event()
 
         // now calculate the path length for this hit
         // std::cout << "--Jitendra0: doca = " << doca << ", docaRS = " << docaRS << ", entAng = " << entAng << ", entAngRS = " << entAngRS << std::endl;
-        double celldx = c.dx(docaRS, entAngRS);
+        double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
           // get the wire gain constant
           double wiregain = (m_DBWireGains && m_usePrediction && numMCParticles == 0) ? m_DBWireGains->getWireGain(iwire) : 1.0;

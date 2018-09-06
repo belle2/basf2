@@ -23,7 +23,7 @@
 
 namespace Belle2 {
   /**
-   * A calibration algorithm for CDC dE/dx electron cos(theta) dependence
+   * A calibration algorithm for CDC dE/dx electron: 1D enta cleanup correction
    *
    */
   class CDCDedx1DCellAlgorithm : public CalibrationAlgorithm {
@@ -46,7 +46,7 @@ namespace Belle2 {
   protected:
 
     /**
-     * Run algorithm
+     * 1D cell algorithm
      */
     virtual EResult calibrate();
 

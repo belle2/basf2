@@ -42,7 +42,7 @@ namespace Belle2 {
   protected:
 
     /**
-     * Run algorithm
+     * Cosine algorithm
      */
     virtual EResult calibrate();
 

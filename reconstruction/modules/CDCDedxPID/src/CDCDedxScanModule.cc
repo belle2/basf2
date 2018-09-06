@@ -124,9 +124,10 @@ void CDCDedxScanModule::event()
         double doca = j * cellHalfWidth / 50.0 - cellHalfWidth;
         double entAng = k * 3.14159265 / 100.0 - 3.14159265 / 2.0;
 
+        // re-scaled (RS) doca and entAng variable: map to square cell
         double cellR = 2 * cellHalfWidth / cellHeight;
         double tana = 100.0;
-        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100; //avoid infinity at pi/2
+        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100 * (entAng / std::abs(entAng)); //avoid infinity at pi/2
         else tana =  std::tan(entAng);
         double docaRS = doca * std::sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
         double entAngRS = std::atan(tana / cellR);

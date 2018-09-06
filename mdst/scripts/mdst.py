@@ -38,6 +38,7 @@ def add_mdst_output(
         'KLMClustersToKlIds',
         'TRGSummary',
         'SoftwareTriggerResult',
+        'BremPhotons',
     ]
     persistentBranches = ['FileMetaData']
     if mc:

@@ -1,6 +1,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogMethod.h>
 #include <framework/utilities/TestHelpers.h>
+#include <framework/logging/LogVariableStream.h>
 
 #include <gtest/gtest.h>
 
@@ -41,4 +42,17 @@ namespace {
     else { /* .. */ }
 
   }
+
+  TEST(LoggingTest, VariableLogging)
+  {
+    LogVariableStream lv;
+
+    //lv << endl;
+    lv << "Some Text" << endl << "which is constant" << LogVar("intVar", 23) << LogVar("floatVar", 3.14) << LogVar("strVar",
+        "someString");
+
+    cout << lv.str();
+    EXPECT_EQ("Some Text\nwhich is constant\n\tintVar = 23\n\tfloatVar = 3.1400000000000001\n\tstrVar = someString", lv.str());
+  }
+
 }  // namespace

@@ -22,23 +22,27 @@ c--   alignment iteration
       REAL SECND(NP,NP)
       REAL*8 UUU(NP,NP)
       REAL*8 VM(NP,NP)
+      LOGICAL FIX(NP)
       LOGICAL OK
       INTEGER I, K
       EXTERNAL TOP_LOGL
       REAL TOP_LOGL
-      
+
       IER=-2
       IF(N_RTRA.NE.1) RETURN
-      CALL SET_PDF_OPT(0)
 
       IER=-1
       CALL CALC_DERIV(TOP_LOGL,NP,PAR,STEP,FIRST,SECND,OK)
       IF(.NOT.OK) RETURN
 
+      DO I=1,NP
+         FIX(I)=STEP(I).EQ.0
+      ENDDO
+      
       UM=UM-SECND
-      CALL TOP_MDECO(UM,UUU,NP,IER)
+      CALL TOP_MDECO(UM,UUU,FIX,NP,IER)
       IF(IER.EQ.0) THEN
-         CALL TOP_MINVERS(UUU,VM,NP)
+         CALL TOP_MINVERS(UUU,VM,FIX,NP)
          DO I=1,NP
             DPAR(I)=0
             DO K=1,NP
@@ -61,6 +65,8 @@ c--   returns log likelihood for given alignment parameters
       LOGICAL OK                ! status [out]
 #include "TOP_RTRA.fi"
 #include "TOP_PIK.fi"
+#include "TOP_GEO.fi"
+#include "TOP_DGEO.fi"
       INTEGER MDN
       REAL DX, DY, DZ, RX, RY, RZ, T0
       REAL GET_LOGL
@@ -84,6 +90,7 @@ c--   returns log likelihood for given alignment parameters
       CALL TOP_RECO
       TOP_LOGL=GET_LOGL(T0,T_MIN,T_MAX,0.0)
       OK=RTRA_FLAG(1).EQ.1
+      DGEO_FLAG(MDN)=.FALSE.    ! turn off alignment
       
       END
       
@@ -107,9 +114,14 @@ c--   calculate numerically first and second derivatives of an external function
 
       F0=FUN(VAR0,NVAR,OK)
       IF(.NOT.OK) RETURN
+
+      FIRST=0
+      SECND=0
       
       VAR=VAR0
       DO K=1,NVAR
+         IF(STEP(K).EQ.0) CYCLE
+         
          VAR(K)=VAR0(K)+STEP(K)
          FP=FUN(VAR,NVAR,OK)
          IF(.NOT.OK) RETURN
@@ -125,7 +137,10 @@ c--   calculate numerically first and second derivatives of an external function
       ENDDO
 
       DO K=1,NVAR
+         IF(STEP(K).EQ.0) CYCLE
          DO J=K+1,NVAR
+            IF(STEP(J).EQ.0) CYCLE
+
             VAR(K)=VAR0(K)+STEP(K)
             VAR(J)=VAR0(J)+STEP(J)
             FPP=FUN(VAR,NVAR,OK)
@@ -155,7 +170,7 @@ c--   calculate numerically first and second derivatives of an external function
       END
 
       
-      SUBROUTINE TOP_MDECO(A,U,N,IER)
+      SUBROUTINE TOP_MDECO(A,U,FIX,N,IER)
 
 c--   symmetrical matrix decomposition (Choletski)
 
@@ -164,13 +179,16 @@ c--   symmetrical matrix decomposition (Choletski)
       INTEGER N                 ! dimension of matrix [in]
       REAL*8 A(N,N)             ! symmetric matrix [in]
       REAL*8 U(N,N)             ! upper triangular matrix [out]
+      LOGICAL FIX(N)            ! true if parameter is fixed
       INTEGER IER               ! 0=OK, on error IER=row where error [out]
 
       REAL*8 S
       INTEGER I,J,K
 
       IER=0
+      U=0
       DO I=1,N
+         IF(FIX(I)) CYCLE
          S=0.
          DO J=1,I-1
             S=S+U(J,I)**2
@@ -183,6 +201,7 @@ c--   symmetrical matrix decomposition (Choletski)
             U(I,I)=SQRT(S)
          ENDIF
          DO K=I+1,N
+            IF(FIX(K)) CYCLE
             S=0.
             DO J=1,I-1
                S=S+U(J,I)*U(J,K)
@@ -194,7 +213,7 @@ c--   symmetrical matrix decomposition (Choletski)
       END
 
 
-      SUBROUTINE TOP_MINVERS(U,AI,N)
+      SUBROUTINE TOP_MINVERS(U,AI,FIX,N)
 
 c--   matrix inversion after decomposition
 
@@ -203,11 +222,14 @@ c--   matrix inversion after decomposition
       INTEGER N                 ! dimension [in]
       REAL*8 U(N,N)             ! upper triangular matrix (from decomposition) [in]
       REAL*8 AI(N,N)            ! inverse matrix [out]
+      LOGICAL FIX(N)            ! true if parameter is fixed
 
       REAL*8 S
       INTEGER I,K,J
 
+      AI=0
       DO J=1,N
+         IF(FIX(J)) CYCLE
          DO I=1,J-1
             AI(I,J)=0.
          ENDDO
@@ -218,6 +240,7 @@ c--   matrix inversion after decomposition
          ENDDO
          AI(I,J)=(1.-S)/U(I,I)
          DO I=J+1,N
+            IF(FIX(I)) CYCLE
             S=0.
             DO K=1,I-1
                S=S+U(K,I)*AI(K,J)
@@ -225,6 +248,7 @@ c--   matrix inversion after decomposition
             AI(I,J)=(-S)/U(I,I)
          ENDDO
          DO I=N,1,-1
+            IF(FIX(I)) CYCLE
             S=0.
             DO K=I+1,N
                S=S+U(I,K)*AI(K,J)

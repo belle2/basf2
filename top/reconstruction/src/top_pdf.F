@@ -72,6 +72,8 @@
          IF(C_THC(I).GE.1) RETURN
          S_THC(I)=SQRT(1.-C_THC(I)**2)
       ENDDO
+      CALL SET_CER_GRID(BETA)
+      
       FOT0=N_ZERO*T_LEN/2./PI*S_THC(0)**2
       PTOT=SQRT(1.-1./REF_IND**2)
       IF(QBAR_RADL.GT.0) THEN
@@ -486,6 +488,75 @@ c--   calculate PDF parameters
 
       END
 
+
+      SUBROUTINE SET_CER_GRID(BETA)
+
+      IMPLICIT NONE
+      REAL BETA                 ! particle beta
+#include "TOP_GRID.fi"
+      REAL E1, E2, DE, E, S
+      REAL PHASE_INDEX, GROUP_INDEX
+      INTEGER I, N
+      
+      IF(G_NC.EQ.0) RETURN
+
+      N=MAX(100/G_NC, 1)
+      CALL QE_RANGE(E1,E2)
+      DE=(E2-E1)/G_NC
+      DO I=1,G_NC
+         E2=E1+DE
+         CALL MEAN_PH_ENERGY(E1,E2,N,BETA,E,S)
+         E1=E2
+         G_EPH(I)=E
+         G_CTHC(I)=MIN(1./BETA/PHASE_INDEX(E), 1.0)
+         G_STHC(I)=SQRT(1.-G_CTHC(I)**2)
+         G_IND(I)=GROUP_INDEX(E)
+         G_FRAC(I)=S
+      ENDDO
+
+      S=0
+      DO I=1,G_NC
+         S=S+G_FRAC(I)
+      ENDDO
+      IF(S.EQ.0) RETURN
+      DO I=1,G_NC
+         G_FRAC(I)=G_FRAC(I)/S
+      ENDDO
+
+      END
+
+
+      SUBROUTINE MEAN_PH_ENERGY(E1,E2,N,BETA,EM,S)
+
+      IMPLICIT NONE
+      REAL E1, E2               ! energy range
+      INTEGER N                 ! integration points (N>0!)
+      REAL BETA                 ! particle beta
+      REAL EM, S                ! mean energy and area (unnormalized fraction)
+
+      INTEGER I
+      REAL DE, E, CTH, P
+      REAL PHASE_INDEX, QE_PMT
+      
+      EM=0
+      S=0
+      DE=(E2-E1)/N
+      DO I=1,N
+         E=E1+DE*(I-0.5)
+         CTH=1./BETA/PHASE_INDEX(E)
+         IF(CTH.GE.1) CYCLE
+         P=QE_PMT(E)*(1-CTH**2)
+         EM=EM+E*P
+         S=S+P
+      ENDDO
+      IF(S.GT.0) THEN
+         EM=EM/S
+      ELSE
+         EM=(E1+E2)/2
+      ENDIF
+
+      END
+      
 
       SUBROUTINE SET_XYCH(M)
 

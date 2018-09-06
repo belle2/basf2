@@ -28,6 +28,10 @@
 // analysis
 #include <analysis/utility/PCmsLabTransform.h>
 
+// root
+#include <TH2F.h>
+
+
 using namespace std;
 
 namespace Belle2 {
@@ -75,6 +79,22 @@ namespace Belle2 {
     addParam("outFileName", m_outFileName,
              "Root output file name containing alignment results",
              std::string("TopAlignPars.root"));
+    addParam("stepPosition", m_stepPosition, "step size for translations", 1.0);
+    addParam("stepAngle", m_stepAngle, "step size for rotations", 0.01);
+    addParam("stepTime", m_stepTime, "step size for t0", 0.05);
+    addParam("gridSize", m_gridSize,
+             "size of a 2D grid for time-of-propagation averaging in analytic PDF: "
+             "[number of emission points along track, number of Cerenkov angles]. "
+             "No grid used if list is empty.", m_gridSize);
+    std::string names;
+    for (const auto& parName : m_align.getParameterNames()) names += parName + ", ";
+    names.pop_back();
+    names.pop_back();
+    addParam("parInit", m_parInit,
+             "initial parameter values in the order [" + names + "]. "
+             "If list is too short, the missing ones are set to 0.", m_parInit);
+    addParam("parFixed", m_parFixed, "list of names of parameters to be fixed. "
+             "Valid names are: " + names, m_parFixed);
 
   }
 
@@ -100,7 +120,15 @@ namespace Belle2 {
 
     // create alignment object for a given target module
 
-    m_align = TOPalign(m_targetMid);
+    m_align = TOPalign(m_targetMid, m_stepPosition, m_stepAngle, m_stepTime);
+    if (m_gridSize.size() == 2) {
+      m_align.setGrid(m_gridSize[0], m_gridSize[1]);
+      B2INFO("TOPAligner: grid for time-of-propagation averaging is set");
+    }
+    m_align.setParameters(m_parInit);
+    for (const auto& parName : m_parFixed) {
+      m_align.fixParameter(parName);
+    }
 
     // configure detector in reconstruction code
 
@@ -190,7 +218,7 @@ namespace Belle2 {
       } else {
         B2INFO("Reached maximum allowed number of failed iterations. "
                "Resetting TOPalign object");
-        m_align = TOPalign(m_targetMid);
+        m_align.reset();
         m_countFails = 0;
       }
 
@@ -233,6 +261,31 @@ namespace Belle2 {
 
     m_file->cd();
     m_alignTree->Write();
+
+    int npar = m_align.getParameters().size();
+    const auto& errMatrix = m_align.getErrorMatrix();
+    TH2F h1("errMatrix", "error matrix", npar, 0, npar, npar, 0, npar);
+    for (int i = 0; i < npar; i++) {
+      for (int k = 0; k < npar; k++) {
+        h1.SetBinContent(i + 1, k + 1, errMatrix[i + npar * k]);
+      }
+    }
+    h1.Write();
+
+    TH2F h2("corMatrix", "correlation matrix", npar, 0, npar, npar, 0, npar);
+    std::vector<double> diag;
+    for (int i = 0; i < npar; i++) {
+      double d = errMatrix[i * (1 + npar)];
+      if (d != 0) d = 1.0 / sqrt(d);
+      diag.push_back(d);
+    }
+    for (int i = 0; i < npar; i++) {
+      for (int k = 0; k < npar; k++) {
+        h2.SetBinContent(i + 1, k + 1, diag[i] * diag[k] * errMatrix[i + npar * k]);
+      }
+    }
+    h2.Write();
+
     m_file->Close();
 
   }

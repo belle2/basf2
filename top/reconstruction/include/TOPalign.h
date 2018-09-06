@@ -12,7 +12,10 @@
 
 #include <top/reconstruction/TOPtrack.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 #include <vector>
+#include <string>
+#include <algorithm>
 
 namespace Belle2 {
   namespace TOP {
@@ -22,11 +25,6 @@ namespace Belle2 {
      */
     class TOPalign {
     public:
-
-      /**
-       * Number of free parameters
-       */
-      enum {c_numPar = 7};
 
       /**
        * Constructor
@@ -63,26 +61,65 @@ namespace Belle2 {
       static void setPhotonYields(double bkgPerModule, double scaleN0 = 1);
 
       /**
-       * Sets initial values of parameters (overwrites parameters!)
-       * @param dx translation in x
-       * @param dy translation in y
-       * @param dz translation in z
-       * @param alpha rotation around x
-       * @param beta rotation around y
-       * @param gamma rotation around z
-       * @param t0 time zero
+       * Sets grid for averaging of time-of-propagation in analytic PDF
+       * @param NP number of emission points along track
+       * @param NC number of Cerenkov angles
        */
-      void setParameters(double dx, double dy, double dz,
-                         double alpha, double beta, double gamma,
-                         double t0)
+      void setGrid(int NP, int NC)
       {
-        m_par[0] = dx;
-        m_par[1] = dy;
-        m_par[2] = dz;
-        m_par[3] = alpha;
-        m_par[4] = beta;
-        m_par[5] = gamma;
-        m_par[6] = t0;
+        m_NP = NP;
+        m_NC = NC;
+      }
+
+      /**
+       * Sets initial values of parameters (overwrites the parameters!)
+       * Order is: translations in x, y, z, rotation angles around x, y, z, time zero
+       * @param parInit initial values
+       */
+      void setParameters(const std::vector<double>& parInit)
+      {
+        for (size_t i = 0; i < std::min(parInit.size(), m_parInit.size()); i++) {
+          m_parInit[i] = parInit[i];
+        }
+        m_par = m_parInit;
+      }
+
+      /**
+       * Fixes parameter with its name given as argument
+       * @param name parameter name
+       */
+      void fixParameter(const std::string& name)
+      {
+        for (unsigned i = 0; i < m_parNames.size(); i++) {
+          if (name == m_parNames[i]) {
+            m_fixed[i] = true;
+            return;
+          }
+        }
+        B2ERROR("TOPalign::fixParameter: invalid parameter name '" << name << "'");
+      }
+
+      /**
+       * Unfixes parameter with its name given as argument
+       * @param name parameter name
+       */
+      void unfixParameter(const std::string& name)
+      {
+        for (unsigned i = 0; i < m_parNames.size(); i++) {
+          if (name == m_parNames[i]) {
+            m_fixed[i] = false;
+            return;
+          }
+        }
+        B2ERROR("TOPalign::unfixParameter: invalid parameter name '" << name << "'");
+      }
+
+      /**
+       * Unfixes all parameters
+       */
+      void unfixAll()
+      {
+        for (unsigned i = 0; i < m_fixed.size(); i++) m_fixed[i] = false;
       }
 
       /**
@@ -92,6 +129,11 @@ namespace Belle2 {
        * @return error status (0 = OK, < 0 no track hit, > 0 matrix not pos. definite)
        */
       int iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis);
+
+      /**
+       * Reset the object
+       */
+      void reset();
 
       /**
        * Returns module ID
@@ -105,6 +147,12 @@ namespace Belle2 {
        * @return parameters
        */
       const std::vector<float>& getParameters() const {return m_par;}
+
+      /**
+       * Returns alignment parameter names
+       * @return parameter names
+       */
+      const std::vector<std::string>& getParameterNames() const {return m_parNames;}
 
       /**
        * Returns errors on alignment parameters.
@@ -134,9 +182,15 @@ namespace Belle2 {
     private:
 
       int m_moduleID = 0; /**< module ID */
+      int m_opt = 0; /**< PDF option (=rough) */
+      int m_NP = 0;  /**< grid for averaging: number of emission points along track */
+      int m_NC = 0;  /**< grid for averaging: number of Cerenkov angles */
 
-      std::vector<float> m_par;  /**< parameters */
+      std::vector<std::string> m_parNames; /**< parameter names */
+      std::vector<float> m_par;  /**< current parameter values */
+      std::vector<float> m_parInit;  /**< initial parameter values */
       std::vector<float> m_step; /**< step sizes */
+      std::vector<bool> m_fixed; /**< true if parameter is fixed */
       std::vector<float> m_COV;  /**< covariance matrix */
       int m_numTracks = 0;  /**< number of tracks used */
       bool m_valid = false; /**< validity of results */

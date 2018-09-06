@@ -93,6 +93,12 @@ namespace Belle2 {
     double m_minZ; /**< minimal local z of extrapolated hit */
     double m_maxZ; /**< maximal local z of extrapolated hit */
     std::string m_outFileName; /**< Root output file name containing results */
+    double m_stepPosition; /**< step size for translations */
+    double m_stepAngle; /**< step size for rotations */
+    double m_stepTime; /**< step size for t0 */
+    std::vector<int> m_gridSize; /**< grid size */
+    std::vector<double> m_parInit; /**< initial parameter values */
+    std::vector<std::string> m_parFixed; /**< names of parameters to be fixed */
 
     // alignment procedure
     TOP::TOPalign m_align;     /**< alignment object */

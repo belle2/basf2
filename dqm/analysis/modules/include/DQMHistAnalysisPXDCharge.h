@@ -42,6 +42,8 @@ namespace Belle2 {
 
     // Data members
     std::string m_histodir;
+    double m_rangeLow;
+    double m_rangeHigh;
 
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

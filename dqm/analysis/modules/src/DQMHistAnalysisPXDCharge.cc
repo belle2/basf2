@@ -33,6 +33,8 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
 {
   //Parameter definition
   addParam("HistoDir", m_histodir, "Name of Histogram dir", std::string("pxd"));
+  addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
+  addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
   B2DEBUG(1, "DQMHistAnalysisPXDCharge: Constructor done.");
 
 }
@@ -83,7 +85,7 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 
   /// FIXME : define the range, because its not a landau but now its hard to notice what happens outside!
 
-  m_fLandau = new TF1("f_Landau", "landau", 25, 85);
+  m_fLandau = new TF1("f_Landau", "landau", m_rangeLow, m_rangeHigh);
   m_fLandau->SetParameter(0, 1000);
   m_fLandau->SetParameter(1, 50);
   m_fLandau->SetParameter(2, 10);

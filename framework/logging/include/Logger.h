@@ -13,6 +13,7 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogSystem.h>
+#include <framework/logging/LogVariableStream.h>
 
 #include <sstream>
 
@@ -46,7 +47,7 @@
 
 /** send generic log message. */
 #define _B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line) { \
-    std::ostringstream stringBuffer; stringBuffer << streamText; \
+    LogVariableStream stringBuffer; stringBuffer << streamText; \
     Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, stringBuffer.str(), package, function, file, line, debuglevel)); \
   }
 

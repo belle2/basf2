@@ -22,8 +22,8 @@ from glob import glob
 algo = Belle2.ECL.eclBhabhaTAlgorithm()
 algo.setInputFileNames(['eclBhabhaTCollector.root'])
 
-algo.cellIDLo = 0
-algo.cellIDHi = 8735
+algo.cellIDLo = 1
+algo.cellIDHi = 8736
 algo.maxIterations = 10
 algo.debugOutput = True
 algo.debugFilename = "eclBhabhaTAlgorithm.root"

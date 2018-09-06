@@ -16,8 +16,8 @@ using namespace ECL;
 eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   // Parameters
   CalibrationAlgorithm("ECLBhabhaTCollector"),
-  cellIDLo(0),
-  cellIDHi(8735),
+  cellIDLo(1),
+  cellIDHi(8736),
   maxIterations(15),
   debugOutput(true),
   debugFilename("eclBhabhaTAlgorithm.root"),
@@ -80,7 +80,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   const double TICKS_TO_NS = 0.4931; // ns/clock
 
   for (int crys_id = cellIDLo; crys_id <= cellIDHi; crys_id++) {
-    TH1D* h_time = TimevsCrys->ProjectionY("h_time", crys_id + 1, crys_id + 1);
+    TH1D* h_time = TimevsCrys->ProjectionY("h_time", crys_id, crys_id);
 
     TF1* gaus = new TF1("func", "gaus(0)", hist_xmin, hist_xmax);
     gaus->SetParNames("normalization", "peak", "sigma");
@@ -177,19 +177,19 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     t_offsets.push_back(peak / TICKS_TO_NS);
     t_offsets_unc.push_back(peak_unc / TICKS_TO_NS);
 
-    histfile->WriteTObject(h_time, (std::string("h_time_") + std::to_string(crys_id + 1)).c_str());
+    histfile->WriteTObject(h_time, (std::string("h_time_") + std::to_string(crys_id)).c_str());
 
-    tree_cid  = crys_id + 1;
+    tree_cid  = crys_id;
     tree->Fill();
   }
 
   // Set time offset for crystal that weren't fitted to zero.
   // TODO: Instead, use data from previous calibration.
-  for (int i = 0; i < cellIDLo; i++) {
+  for (int i = 1; i < cellIDLo; i++) {
     t_offsets.insert(t_offsets.begin(), 0);
     t_offsets_unc.insert(t_offsets_unc.begin(), -1);
   }
-  for (int i = cellIDHi + 1; i < 8736; i++) {
+  for (int i = cellIDHi + 1; i <= 8736; i++) {
     t_offsets.push_back(0);
     t_offsets_unc.push_back(-1);
   }

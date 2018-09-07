@@ -11,6 +11,9 @@
 #pragma once
 
 #include <sstream>
+#include <vector>
+#include <string>
+#include <map>
 #include <boost/lexical_cast.hpp>
 
 /**
@@ -48,18 +51,36 @@ public:
     return m_name;
   }
 
+  /**
+   * Custom comparison operator
+   */
+  bool operator==(const LogVar& lv) const
+  {
+    return (lv.m_name == this->m_name) && (lv.m_value == this->m_value);
+  }
+
+  /**
+   * Custom assignment operator
+   */
+  LogVar& operator=(const LogVar& lvs)
+  {
+    this->m_name = lvs.m_name;
+    this->m_value = lvs.m_value;
+    return *this;
+  }
+
 private:
   /** Stores the name of the variable. Best is a short string to describe which
    * variable is presented, like "node number" etc. */
-  const std::string m_name;
+  std::string m_name;
 
   /** String conversion of
    *  the value. */
-  const std::string m_value;
+  std::string m_value;
 };
 
 /**
- * Specialized implementation of a ostream-like class where the << operator can be used to insert values.
+ * Specialized implementation of an ostream-like class where the << operator can be used to insert values.
  * In addition to the regular ostream usage, this class also accepts the LogVar class, which contains
  * the name of a variable and its value. If string part and variable part of a log message are separated in
  * that manner, it is much easier to filter and aggregate messages.
@@ -77,6 +98,29 @@ public:
 
   /** basic_ofstream which is used with ostream's utility functions */
   typedef std::basic_ostream<std::stringstream::char_type, std::stringstream::traits_type > __basic_ostream_type;
+
+  /** Default constructor with empty text and no variables */
+  LogVariableStream() = default;
+
+  /** Constructor which sets an initial text for this stream
+   * @param text Initial text
+   * */
+  LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
+  {
+    m_stringStream << text;
+    for (auto const& kv : variables) {
+      m_variables.emplace_back(LogVar(kv.first, kv.second));
+    }
+  }
+
+  /**
+   * Implement custom copy-constructor, because stringstream's one is deleted.
+   */
+  LogVariableStream(const LogVariableStream& other) :  m_variables(other.m_variables)
+  {
+    // copy manually because stringstream has no copy-constructor
+    m_stringStream << other.m_stringStream.rdbuf();
+  }
 
   /**
    * operator override for ostream modifier functions like std::endl who are directly
@@ -107,6 +151,25 @@ public:
   LogVariableStream& operator<<(TText const& text)
   {
     m_stringStream << text;
+    return *this;
+  }
+
+  /**
+   * Custom comparison operator
+   */
+  bool operator==(const LogVariableStream& lvs) const
+  {
+    return (lvs.m_variables == this->m_variables) && (lvs.m_stringStream.str() == this->m_stringStream.str());
+  }
+
+  /**
+   * Custom assignment-operator, thanks to stringsream's incompetence ...
+   */
+  LogVariableStream&  operator=(const LogVariableStream& lvs)
+  {
+    this->m_stringStream = std::stringstream();
+    this->m_stringStream << lvs.m_stringStream.rdbuf();
+    this->m_variables = lvs.m_variables;
     return *this;
   }
 

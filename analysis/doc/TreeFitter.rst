@@ -27,7 +27,7 @@ Some notes to keep in mind:
 
    With :math:`E_{\gamma}>0.05~GeV` and :b2:var:`pionID`>0.5 and :b2:var:`chiProb`>0.001 Jo-Frederik Krohn got this efficiency (2017)
 
-.. figure:: BtoPiPiPi0_masswindowEfficiency.png
+.. figure:: BtoPiPiPi0_masswindowEfficiency.pdf
   :width: 40em
   :align: center
 

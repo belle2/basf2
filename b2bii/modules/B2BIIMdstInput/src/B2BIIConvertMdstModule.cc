@@ -1763,10 +1763,6 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
 
         if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
           // found the correct  mdst_charged
-          // if this is a connected region cluster we set the track id as connected region id
-          if (mECLTRK.type() == 2) {
-            eclClusters[mdstEcl.get_ID() - 1]->setConnectedRegionId(mTRK.get_ID());
-          }
           eclClustersToTracks.add(mdstEcl.get_ID() - 1, mChar.get_ID() - 1, 1.0);
           break;
         }

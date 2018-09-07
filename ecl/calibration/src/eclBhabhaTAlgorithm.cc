@@ -71,8 +71,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     tree->SetAutoSave(10);
   }
 
-  double hist_xmin = TimevsCrys->GetXaxis()->GetXmin();
-  double hist_xmax = TimevsCrys->GetXaxis()->GetXmax();
+  double hist_tmin = TimevsCrys->GetYaxis()->GetXmin();
+  double hist_tmax = TimevsCrys->GetYaxis()->GetXmax();
 
   // TODO: It's better to use ECL integer time for this algorithm.
   //       This way, there will be no problems with binning.
@@ -82,7 +82,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   for (int crys_id = cellIDLo; crys_id <= cellIDHi; crys_id++) {
     TH1D* h_time = TimevsCrys->ProjectionY("h_time", crys_id, crys_id);
 
-    TF1* gaus = new TF1("func", "gaus(0)", hist_xmin, hist_xmax);
+    TF1* gaus = new TF1("func", "gaus(0)", hist_tmin, hist_tmax);
     gaus->SetParNames("normalization", "peak", "sigma");
     gaus->ReleaseParameter(0);
     gaus->ReleaseParameter(1);
@@ -140,8 +140,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
       }
 
       // Setting ranges to interval where f(x) >= norm * 0.2
-      left  = std::max(peak - sigma * 1.27, -80.);
-      right = std::min(peak + sigma * 1.27,  80.);
+      left  = std::max(peak - sigma * 1.27, hist_tmin);
+      right = std::min(peak + sigma * 1.27, hist_tmax);
 
       // Peak should stay within central 40% of fit area.
       peak_min = left  + 0.3 * (right - left);

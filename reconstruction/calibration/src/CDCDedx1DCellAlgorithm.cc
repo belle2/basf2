@@ -56,7 +56,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
   ttree->SetBranchAddress("dedxhit", &dedxhit);
   ttree->SetBranchAddress("layer", &layer);
-  ttree->SetBranchAddress("enta", &enta);
+  ttree->SetBranchAddress("entaRS", &enta);
 
   // Setting up bins for entra angle
   feaBS = (feaUE - feaLE) / fnEntaBinG;

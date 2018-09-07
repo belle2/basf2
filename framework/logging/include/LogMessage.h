@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/logging/LogConfig.h>
+#include <framework/logging/LogVariableStream.h>
 
 #include <string>
 #include <iosfwd>
@@ -37,6 +38,19 @@ namespace Belle2 {
      * @param line The line number in the source code where the message was sent from.
      */
     LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
+               const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
+
+    /**
+     * The LogMessage constructor taking a LogVariableStream which can contains name/value pairs
+     *
+     * @param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
+     * @param messageStream The LogVariableStream which should be send.
+     * @param package The package name where the message was sent from (can be NULL)
+     * @param function The function name where the message was sent from.
+     * @param file The file name where the message was sent from.
+     * @param line The line number in the source code where the message was sent from.
+     */
+    LogMessage(LogConfig::ELogLevel logLevel, const LogVariableStream& messageStream, const char* package,
                const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
 
     /**
@@ -68,7 +82,7 @@ namespace Belle2 {
      *
      * @return Returns the message text;
      */
-    const std::string& getMessage() const { return m_message; }
+    const std::string getMessage() const { return m_message.str(); }
 
     /**
      * Configure which information should be printed.
@@ -90,8 +104,8 @@ namespace Belle2 {
 
   private:
 
-    LogConfig::ELogLevel m_logLevel;  /**< The log level of the message. */
-    std::string m_message;    /**< The message string which should be sent. */
+    LogConfig::ELogLevel m_logLevel; /**< The log level of the message. */
+    LogVariableStream m_message;     /**< The message stream which should be sent. */
     std::string m_module;     /**< The module name where the message was sent from. */
     std::string m_package;    /**< The package name where the message was sent from. */
     std::string m_function;   /**< The function name where the message was sent from. */

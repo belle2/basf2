@@ -79,14 +79,14 @@ MAX_EN = 10.0
 # High energy cut for max total energy in event (GeV)
 MAX_TOTAL_EN = 15.0
 # Events with abs(time_ECL-time_CDC) > TIME_ABS_MAX are excluded
-TIME_ABS_MAX = 120
+TIME_ABS_MAX = 250
 # Events with ECLDigits.getEntries() > NENTRIES_MAX are excluded
 # (currently unused -- set to arbitrarily high value)
 NENTRIES_MAX = 9999
 
 # If true, output file will contain TTree "tree" with detailed
 # event information.
-SAVE_TREE = True
+SAVE_TREE = False
 # If true, fill histogram with weight min(energy**2, 1 GeV)
 WEIGHTED_HIST = True
 

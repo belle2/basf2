@@ -24,7 +24,7 @@ namespace Belle2 {
         B2ERROR("Can't open file " << filename);
       }
 
-      ECLDspData* data = new ECLDspData(boardNumber, 0);
+      ECLDspData* data = new ECLDspData(boardNumber);
 
       // Word size
       const int nsiz = 2;

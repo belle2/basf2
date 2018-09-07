@@ -25,7 +25,7 @@ namespace Belle2 {
   class ECLDspData: public TObject {
   private:
     /** ShaperDSP board number, 0..11 */
-    int m_boardNumber;
+    const int m_boardNumber;
     /** Number of bits for FG31, FG41 */
     short int m_ka;
     /** Number of bits for FG32 */
@@ -69,13 +69,29 @@ namespace Belle2 {
     /**
      * @brief Initialize DSP coefficients class from binary file.
      * @param board_number Id of specific shaperDSP, 0..11
-     * @param filename Name of binary file with coefficients (Usually "dsp*.dat")
      */
-    ECLDspData(int board_number, const char* filename);
+    ECLDspData(int board_number) :
+      m_boardNumber(board_number),
+      m_ka(0),
+      m_kb(0),
+      m_kc(0),
+      m_y0Startr(0),
+      m_chiThresh(0),
+      m_k1Chi(0),
+      m_k2Chi(0),
+      m_hitThresh(0),
+      m_lowAmpThresh(0),
+      m_skipThresh(0),
+      m_fg31(49152),
+      m_fg32(49152),
+      m_fg33(49152),
+      m_fg41(6144),
+      m_fg43(6144),
+      m_f(49152),
+      m_f1(49152)
+    {}
     /** */
-    ~ECLDspData();
-
-    void write(const char* filename);
+    ~ECLDspData() {};
 
     /*************/
     /** GETTERS **/

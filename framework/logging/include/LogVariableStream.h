@@ -12,12 +12,19 @@
 
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/replace.hpp>
 
-#include <ios>
-
+/**
+ * Class to store variables with their name which were sent to
+ * the logging service.
+ */
 class LogVar {
 public:
+  /**
+   * Constructor which accepts any type as value and relies on boost lexical cast.
+   * @param name String to identify the logged value
+   * @param v Value to log, can be of any type which boost::lexical_cast is able to
+   *          convert to a string.
+   */
   template<class TVarType>
   LogVar(std::string name, TVarType v) :
     m_name(name),
@@ -25,89 +32,88 @@ public:
   {
   }
 
+  /**
+   * Returns the value stored for this variable.
+   */
   std::string getValue() const
   {
     return m_value;
   }
 
+  /**
+   * Returns the name stored for this variable.
+   */
   std::string getName() const
   {
     return m_name;
   }
 
 private:
+  /** Stores the name of the variable. Best is a short string to describe which
+   * variable is presented, like "node number" etc. */
   const std::string m_name;
+
+  /** String conversion of
+   *  the value. */
   const std::string m_value;
 };
 
-class LogVariableStream { /*: public std::stringstream*/
+/**
+ * Specialized implementation of a ostream-like class where the << operator can be used to insert values.
+ * In addition to the regular ostream usage, this class also accepts the LogVar class, which contains
+ * the name of a variable and its value. If string part and variable part of a log message are separated in
+ * that manner, it is much easier to filter and aggregate messages.
+ *
+ * Here is an example on the usage:
+ *           LogVariableStream lvs;
+ *           lvs << "Inconsistent data size between COPPER and CDC FEE."
+ *               << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+ *               << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
+ *           std::string lvsAsString = lvs.str();
+ *
+ */
+class LogVariableStream {
 public:
-  LogVariableStream() = default;
 
-  LogVariableStream(std::string withText,
-                    std::vector<LogVar> variables = { }) :
-    m_variables(variables)
+  /** basic_ofstream which is used with ostream's utility functions */
+  typedef std::basic_ostream<std::stringstream::char_type, std::stringstream::traits_type > __basic_ostream_type;
+
+  /**
+   * operator override for ostream modifier functions like std::endl who are directly
+   * applied to the underlying string stream.
+   */
+  LogVariableStream& operator<<(__basic_ostream_type & (*__pf)(__basic_ostream_type&))
   {
-    m_stringStream << withText;
+    // execute provided function on the string stream
+    __pf(m_stringStream);
+    return *this;
   }
 
+  /**
+   * Operator override which stores the LogVar information instead of putting it
+   * directly in the sstream
+   */
+  LogVariableStream& operator<<(LogVar const& var)
+  {
+    m_variables.push_back(var);
+    return *this;
+  }
+
+  /**
+   * Catch-all operator which will forward all other
+   * input types to the internal stringstream object
+   */
   template<class TText>
   LogVariableStream& operator<<(TText const& text)
   {
     m_stringStream << text;
-
     return *this;
   }
-  /*
-    LogVariable
 
-    template<class TText>
-    LogVariableStream& operator<<(TText & text) {
-      m_stringStream << text;
-
-      return *this;
-    }*/
-
-  typedef std::basic_ios<std::stringstream::char_type, std::stringstream::traits_type >__ios_type;
-  typedef std::basic_ostream<std::stringstream::char_type, std::stringstream::traits_type > __basic_ostream_type;
-
-
-  LogVariableStream& operator<<(__basic_ostream_type & (*__pf)(__basic_ostream_type&))
-  {
-    //m_variables.push_back(var);
-    __pf(m_stringStream);
-
-    return *this;
-  }
-  /*
-    LogVariableStream& operator<<(__ios_type& (*__pf)(__ios_type&) ) {
-      //m_variables.push_back(var);
-
-      return *this;
-    }
-
-    LogVariableStream& operator<<(std::ios_base& (*__pf)(std::ios_base&) ) {
-      //m_variables.push_back(var);
-
-      //__pf(*this);
-
-      return *this;
-    }*/
-
-
-  LogVariableStream& operator<<(LogVar const& var)
-  {
-    m_variables.push_back(var);
-
-    return *this;
-  }
-  /*
-    LogVariableStream& operator<<(LogVar const& var) {
-      m_variables.push_back(var);
-
-      return *this;
-    }*/
-
+  /**
+   * Return the content of the stream as string. First the stringstream part
+   * and then a list of the variables
+   */
   std::string str() const
   {
     // little optimization, so we don't need to copy the whole string
@@ -116,6 +122,7 @@ public:
       return m_stringStream.str();
 
     std::stringstream s;
+    // put the string first
     s <<  m_stringStream.str();
     for (auto const& v : m_variables) {
       s << std::endl << "\t" << v.getName() << " = " << v.getValue();
@@ -124,6 +131,10 @@ public:
   }
 
 private:
+
+  /** All non-LogVar items are directly forwarded to this stringstream */
   std::stringstream m_stringStream;
+
+  /** List of LogVars which were accepted so far */
   std::vector<LogVar> m_variables;
 };

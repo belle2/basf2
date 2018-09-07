@@ -118,6 +118,8 @@ namespace Belle2 {
       std::map<VxdID, double> m_sensitiveAreaMap; /**< Struct to hold sensor-wise sensitive area */
       std::map<std::pair<VxdID, int>, int> m_regionSensitivePixelMap; /**< Struct to hold region-wise number of sensitive pixels */
       std::map<std::pair<VxdID, int>, double> m_regionSensitiveAreaMap; /**< Struct to hold region-wise sensitive area */
+      bool m_hasPXDData; /**< Flag to indicate there was at least one PXDDigit in the run */
+
     };
 
     inline int PXDBgTupleProducerModule::getRegionID(int uBin, int vBin) const

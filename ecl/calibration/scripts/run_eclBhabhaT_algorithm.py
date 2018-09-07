@@ -11,7 +11,9 @@
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
 
-# Usage: basf2 run_eclBhabhaT_algorithm.py
+# Usage: basf2 run_eclBhabhaT_algorithm.py [input_file]
+# Glob expression can be passed as an input file.
+# Example: basf2 run_eclBhabhaT_algorithm.py "exp_0003_run_*.root"
 
 import os
 import sys
@@ -20,7 +22,12 @@ from ROOT import Belle2
 from glob import glob
 
 algo = Belle2.ECL.eclBhabhaTAlgorithm()
-algo.setInputFileNames(['eclBhabhaTCollector.root'])
+
+fileNames = ['eclBhabhaTCollector.root']
+narg = len(sys.argv)
+if(narg >= 2):
+    fileNames = glob(sys.argv[1])
+algo.setInputFileNames(fileNames)
 
 algo.cellIDLo = 1
 algo.cellIDHi = 8736

@@ -695,27 +695,19 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
     TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
+    Particle* newV0 = nullptr;
     if (belleV0.kind() == 1) { // K0s -> pi+ pi-
       Particle KS(v0Momentum, 310);
       KS.appendDaughter(newDaugP);
       KS.appendDaughter(newDaugM);
       KS.setVertex(v0Vertex);
-      Particle* newKS = particles.appendNew(KS);
-      ksPList->addParticle(newKS);
+      newV0 = particles.appendNew(KS);
+      ksPList->addParticle(newV0);
 
       // append extra info: goodKs flag
       Belle::FindKs belleKSFinder;
       belleKSFinder.candidates(belleV0, Belle::IpProfile::position(1));
-      newKS->addExtraInfo("goodKs", belleKSFinder.goodKs());
-
-      // append extra info: nisKsFinder quality indicators
-      Belle::nisKsFinder ksnb;
-      double protIDP = atcPID(pidP, 2, 4);
-      double protIDM = atcPID(pidM, 2, 4);
-      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
-      newKS->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
-      newKS->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
-      newKS->addExtraInfo("ksnbStandard", ksnb.standard());
+      newV0->addExtraInfo("goodKs", belleKSFinder.goodKs());
 
       /*
       std::cout << " ---- B1 Ks ---- " << std::endl;
@@ -756,22 +748,35 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.appendDaughter(newDaugP);
       Lambda0.appendDaughter(newDaugM);
       Lambda0.setVertex(v0Vertex);
-      Particle* newLambda0 = particles.appendNew(Lambda0);
-      lambda0PList->addParticle(newLambda0);
+      newV0 = particles.appendNew(Lambda0);
+      lambda0PList->addParticle(newV0);
     } else if (belleV0.kind() == 3) { // anti-Lambda -> pi+ anti-p
       Particle antiLambda0(v0Momentum, -3122);
       antiLambda0.appendDaughter(newDaugM);
       antiLambda0.appendDaughter(newDaugP);
       antiLambda0.setVertex(v0Vertex);
-      Particle* newAntiLambda0 = particles.appendNew(antiLambda0);
-      antiLambda0PList->addParticle(newAntiLambda0);
+      newV0 = particles.appendNew(antiLambda0);
+      antiLambda0PList->addParticle(newV0);
     } else if (belleV0.kind() == 4) { // gamma -> e+ e-
       Particle gamma(v0Momentum, 22);
       gamma.appendDaughter(newDaugP);
       gamma.appendDaughter(newDaugM);
       gamma.setVertex(v0Vertex);
-      Particle* newGamma = particles.appendNew(gamma);
-      convGammaPList->addParticle(newGamma);
+      newV0 = particles.appendNew(gamma);
+      convGammaPList->addParticle(newV0);
+    }
+    // append extra info: nisKsFinder quality indicators
+    if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
+      Belle::nisKsFinder ksnb;
+      double protIDP = atcPID(pidP, 2, 4);
+      double protIDM = atcPID(pidM, 2, 4);
+      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
+      // K_S0 and Lambda (inverse cut on ksnbNoLam for Lambda selection).
+      newV0->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
+      newV0->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
+      // K_S0 only
+      if (belleV0.kind() == 1)
+        newV0->addExtraInfo("ksnbStandard", ksnb.standard());
     }
   }
 

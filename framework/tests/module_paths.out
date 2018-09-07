@@ -32,17 +32,6 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] Setting return value to False
 [INFO] EXP:        1        RUN:        2        EVT:        1
-[INFO] ============================================================================
-[INFO] DataStore collections in event 1
-[INFO] ============================================================================
-[INFO] Type                 Name                       #Entries           <Event>
-[INFO] EventMetaData        EventMetaData
-[INFO] 
-[INFO] ----------------------------------------------------------------------------
-[INFO] Type                 Name                       #Entries      <Persistent>
-[INFO] ProcessStatistics    ProcessStatistics
-[INFO] 
-[INFO] ============================================================================
 [ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
 [ERROR] In module final  { module: final }
 [INFO] ------------------------------------------------------------------------
@@ -90,17 +79,6 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] Setting return value to False
 [INFO] EXP:        1        RUN:        2        EVT:        1
-[INFO] ============================================================================
-[INFO] DataStore collections in event 1
-[INFO] ============================================================================
-[INFO] Type                 Name                       #Entries           <Event>
-[INFO] EventMetaData        EventMetaData
-[INFO] 
-[INFO] ----------------------------------------------------------------------------
-[INFO] Type                 Name                       #Entries      <Persistent>
-[INFO] ProcessStatistics    ProcessStatistics
-[INFO] 
-[INFO] ============================================================================
 [ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
 [ERROR] In module final  { module: final }
 [INFO] ------------------------------------------------------------------------
@@ -116,3 +94,4 @@
 [INFO] ================================================================================
 
 [[[]] -> EventInfoSetter -> [SelectOddEvents(? >=1[Progress -> [[]]] ) -> EventInfoPrinter] -> PrintCollections -> ReturnFalse(? <1[ReturnFalse1Condition] ) -> final]
+[?1034h

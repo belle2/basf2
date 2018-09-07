@@ -74,41 +74,47 @@ namespace Belle2 {
     ECLDspData(int board_number, const char* filename);
     /** */
     ~ECLDspData();
+
+    void write(const char* filename);
+
+    /*************/
+    /** GETTERS **/
+    /*************/
+
     /**
      * Array with tabulated signal waveform.
-     *
      */
-    const std::vector<short int>& getF() const { return m_f; }
+    std::vector<short int>& getF() { return m_f; }
     /**
      * Array with tabulated derivative of signal waveform
      */
-    const std::vector<short int>& getF1() const { return m_f1; }
+    std::vector<short int>& getF1() { return m_f1; }
     /**
      * Array FG31, used to estimate signal amplitude.
      * Calculated from F and covariance matrix.
      */
-    const std::vector<short int>& getF31() const { return m_fg31; }
+    std::vector<short int>& getF31() { return m_fg31; }
     /**
      * Array FG32, used to estimate A * delta_t.
      * (A -- amplitude, delta_t -- time shift for linearization)
      *
      * Calculated from F and covariance matrix.
      */
-    const std::vector<short int>& getF32() const { return m_fg32; }
+    std::vector<short int>& getF32() { return m_fg32; }
     /**
      * Array FG33, used to estimate pedestal height in signal.
      *
      * Calculated from F and covariance matrix.
      */
-    const std::vector<short int>& getF33() const { return m_fg33; }
+    std::vector<short int>& getF33() { return m_fg33; }
     /**
      * Alternative for FG31 for signals with small amplitude.
      */
-    const std::vector<short int>& getF41() const { return m_fg41; }
+    std::vector<short int>& getF41() { return m_fg41; }
     /**
      * Alternative for FG33 for signals with small amplitude.
      */
-    const std::vector<short int>& getF43() const { return m_fg43; }
+    std::vector<short int>& getF43() { return m_fg43; }
     /**
      * @return Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
@@ -121,37 +127,54 @@ namespace Belle2 {
      * @return Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
     short int getthT() const { return m_hitThresh; }
-    /**
-     * multipliers power of 2 for f, f1
-     */
+    /** chi2 threshold for fit quality flag */
+    short int getchiThresh() const { return m_chiThresh; }
+    /** multipliers power of 2 for f, f1 */
     short int getk1() const { return m_k1Chi; }
-    /**
-     * multipliers power of 2 for chi2 calculation
-     */
+    /** multipliers power of 2 for chi2 calculation */
     short int getk2() const { return m_k2Chi; }
-    /**
-     * Number of bits for FG31, FG41
-     */
+    /** Number of bits for FG31, FG41 */
     short int getka() const { return m_ka; }
-    /**
-     * Number of bits for FG32
-     */
+    /** Number of bits for FG32 */
     short int getkb() const { return m_kb; }
-    /**
-     * Number of bits for FG33, FG43
-     */
+    /** Number of bits for FG33, FG43 */
     short int getkc() const { return m_kc; }
-    /**
-     * start point for pedestal calculation
-     */
-    short int getky0s() const { return m_y0Startr; }
+    /** start point for pedestal calculation */
+    short int gety0Startr() const { return m_y0Startr; }
+
     /** Return ShaperDSP board number, 0..11 */
     int getBoardNumber() const { return m_boardNumber; }
 
+    /*************/
+    /** SETTERS **/
+    /*************/
+
     /**
-     * Save DSP coefficients back to binary file.
+     * Set Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
-    void write(const char* filename);
+    void setlAT(short int val) { m_lowAmpThresh = val; }
+    /**
+     * Set Skip threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     */
+    void setsT(short int val) { m_skipThresh = val; }
+    /**
+     * Set Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     */
+    void setthT(short int val) { m_hitThresh = val; }
+    /** Set chi2 threshold for fit quality flag */
+    void setchiThresh(short int val) { m_chiThresh = val; }
+    /** Set multipliers power of 2 for f, f1 */
+    void setk1(short int val) { m_k1Chi = val; }
+    /** Set multipliers power of 2 for chi2 calculation */
+    void setk2(short int val) { m_k2Chi = val; }
+    /** Set number of bits for FG31, FG41 */
+    void setka(short int val) { m_ka = val; }
+    /** Set number of bits for FG32 */
+    void setkb(short int val) { m_kb = val; }
+    /** Set number of bits for FG33, FG43 */
+    void setkc(short int val) { m_kc = val; }
+    /** Set start point for pedestal calculation */
+    void sety0Startr(short int val) { m_y0Startr = val; }
 
     ClassDef(ECLDspData, 1);
   };

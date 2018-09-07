@@ -26,6 +26,9 @@ ECLDspData::ECLDspData(int boardNumber, const char* filename):
   m_f(49152),
   m_f1(49152)
 {
+  // TODO: delet this
+  if (!filename) return;
+
   FILE* fl;
   fl = fopen(filename, "rb");
   if (fl == NULL) {

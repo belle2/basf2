@@ -74,6 +74,9 @@ void PXDBgTupleProducerModule::initialize()
   // PXD integration time
   m_integrationTime *= Unit::us;
 
+  // So far, we did not see PXD data
+  m_hasPXDData = false;
+
   //Pointer to GeoTools instance
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfPXDLayers() == 0) {
@@ -172,6 +175,11 @@ void PXDBgTupleProducerModule::event()
   // Empty map for computing event wise occupancy
   std::map<VxdID, double> occupancyMap;
 
+  // Check if there is PXD data
+  if (storeDigits.getEntries() > 0) {
+    m_hasPXDData = true;
+  }
+
   for (const PXDDigit& storeDigit : storeDigits) {
     VxdID sensorID = storeDigit.getSensorID();
     double ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, storeDigit.getUCellID(), storeDigit.getVCellID());
@@ -235,92 +243,94 @@ void PXDBgTupleProducerModule::event()
 
 void PXDBgTupleProducerModule::terminate()
 {
-  TFile* rfile = new TFile(m_outputFileName.c_str(), "RECREATE");
-  TTree* treeBEAST = new TTree("tout", "BEAST data tree");
+  // Create beast tuple
+  if (m_hasPXDData) {
+    TFile* rfile = new TFile(m_outputFileName.c_str(), "RECREATE");
+    TTree* treeBEAST = new TTree("tout", "BEAST data tree");
 
-  unsigned int ts = 0;
-  treeBEAST->Branch("ts", &(ts));
+    unsigned int ts = 0;
+    treeBEAST->Branch("ts", &(ts));
 
-  for (auto&   pair : m_sensorData) {
-    auto& sensorID = pair.first;
-    auto& bgdata = pair.second;
-    string sensorDescr = sensorID;
-    treeBEAST->Branch(str(format("pxd_%1%_run") % sensorDescr).c_str(), &(bgdata.m_run));
-    treeBEAST->Branch(str(format("pxd_%1%_nEvents") % sensorDescr).c_str(), &(bgdata.m_nEvents));
-    treeBEAST->Branch(str(format("pxd_%1%_minOccupancy") % sensorDescr).c_str(), &(bgdata.m_minOccupancy));
-    treeBEAST->Branch(str(format("pxd_%1%_maxOccupancy") % sensorDescr).c_str(), &(bgdata.m_maxOccupancy));
-    treeBEAST->Branch(str(format("pxd_%1%_meanOccupancy") % sensorDescr).c_str(), &(bgdata.m_meanOccupancy));
-    treeBEAST->Branch(str(format("pxd_%1%_exposition") % sensorDescr).c_str(), &(bgdata.m_expo));
-    treeBEAST->Branch(str(format("pxd_%1%_dose") % sensorDescr).c_str(), &(bgdata.m_dose));
-    treeBEAST->Branch(str(format("pxd_%1%_softPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_softPhotonFlux));
-    treeBEAST->Branch(str(format("pxd_%1%_hardPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_hardPhotonFlux));
-    treeBEAST->Branch(str(format("pxd_%1%_chargedParticleFlux") % sensorDescr).c_str(),
-                      &(bgdata.m_chargedParticleFlux));
+    for (auto&   pair : m_sensorData) {
+      auto& sensorID = pair.first;
+      auto& bgdata = pair.second;
+      string sensorDescr = sensorID;
+      treeBEAST->Branch(str(format("pxd_%1%_run") % sensorDescr).c_str(), &(bgdata.m_run));
+      treeBEAST->Branch(str(format("pxd_%1%_nEvents") % sensorDescr).c_str(), &(bgdata.m_nEvents));
+      treeBEAST->Branch(str(format("pxd_%1%_minOccupancy") % sensorDescr).c_str(), &(bgdata.m_minOccupancy));
+      treeBEAST->Branch(str(format("pxd_%1%_maxOccupancy") % sensorDescr).c_str(), &(bgdata.m_maxOccupancy));
+      treeBEAST->Branch(str(format("pxd_%1%_meanOccupancy") % sensorDescr).c_str(), &(bgdata.m_meanOccupancy));
+      treeBEAST->Branch(str(format("pxd_%1%_exposition") % sensorDescr).c_str(), &(bgdata.m_expo));
+      treeBEAST->Branch(str(format("pxd_%1%_dose") % sensorDescr).c_str(), &(bgdata.m_dose));
+      treeBEAST->Branch(str(format("pxd_%1%_softPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_softPhotonFlux));
+      treeBEAST->Branch(str(format("pxd_%1%_hardPhotonFlux") % sensorDescr).c_str(), &(bgdata.m_hardPhotonFlux));
+      treeBEAST->Branch(str(format("pxd_%1%_chargedParticleFlux") % sensorDescr).c_str(),
+                        &(bgdata.m_chargedParticleFlux));
 
-    for (int uBin = 0; uBin < m_nBinsU; ++uBin) {
-      for (int vBin = 0; vBin < m_nBinsV; ++vBin)  {
-        int regionID = getRegionID(uBin, vBin);
-        treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_exposition") % sensorDescr % uBin % vBin).c_str(),
-                          &(bgdata.m_regionExpoMap[regionID]));
-        treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_dose") % sensorDescr % uBin % vBin).c_str(),
-                          &(bgdata.m_regionDoseMap[regionID]));
-        treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_softPhotonFlux") % sensorDescr % uBin % vBin).c_str(),
-                          &(bgdata.m_regionSoftPhotonFluxMap[regionID]));
-        treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_hardPhotonFlux") % sensorDescr % uBin % vBin).c_str(),
-                          &(bgdata.m_regionHardPhotonFluxMap[regionID]));
-        treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_chargedParticleFlux") % sensorDescr % uBin % vBin).c_str(),
-                          &(bgdata.m_regionChargedParticleFluxMap[regionID]));
-      }
-    }
-  }
-
-  // Write timestamp and background rates into TTree
-  for (auto const& pair1 : m_buffer) {
-    auto const& timestamp = pair1.first;
-    auto const& sensors = pair1.second;
-
-    // Set variables for dumping into tree
-    ts = timestamp;
-    for (auto const& pair2 : sensors) {
-      auto const& sensorID = pair2.first;
-      auto const& bgdata = pair2.second;
-      double currentComponentTime = bgdata.m_nEvents * m_integrationTime;
-      const PXD::SensorInfo& info = getInfo(sensorID);
-      double currentSensorMass = m_sensitiveAreaMap[sensorID] * info.getThickness() * c_densitySi;
-      double currentSensorArea = m_sensitiveAreaMap[sensorID];
-      m_sensorData[sensorID] = bgdata;
-      // Some bg rates are still in wrong units. We have to fix this now.
-      m_sensorData[sensorID].m_meanOccupancy = bgdata.m_meanOccupancy / bgdata.m_nEvents;
-
-      if (currentSensorArea > 0) {
-        m_sensorData[sensorID].m_dose *= (1.0 / currentComponentTime) * (1000 / currentSensorMass);
-        m_sensorData[sensorID].m_expo *= (1.0 / currentSensorArea) * (1.0  / (currentComponentTime / Unit::s));
-        m_sensorData[sensorID].m_softPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
-        m_sensorData[sensorID].m_hardPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
-        m_sensorData[sensorID].m_chargedParticleFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
-
-        for (int regionID = 0; regionID < m_nBinsU * m_nBinsV; ++regionID) {
-          std::pair<VxdID, int> key(sensorID, regionID);
-          double currentRegionMass = m_regionSensitiveAreaMap[key] * info.getThickness() * c_densitySi;
-          double currentRegionArea = m_regionSensitiveAreaMap[key];
-          if (currentRegionArea > 0) {
-            m_sensorData[sensorID].m_regionDoseMap[regionID] *= (1.0 / currentComponentTime) * (1000 / currentRegionMass);
-            m_sensorData[sensorID].m_regionExpoMap[regionID] *= (1.0 / currentRegionArea) * (1.0  / (currentComponentTime / Unit::s));
-            m_sensorData[sensorID].m_regionSoftPhotonFluxMap[regionID] *= (1.0 / currentRegionArea) * (1.0 / (currentComponentTime / Unit::s));
-            m_sensorData[sensorID].m_regionHardPhotonFluxMap[regionID] *= (1.0 / currentRegionArea) * (1.0 / (currentComponentTime / Unit::s));
-            m_sensorData[sensorID].m_regionChargedParticleFluxMap[regionID] *= (1.0 / currentRegionArea) * (1.0 /
-                (currentComponentTime / Unit::s));
-          }
+      for (int uBin = 0; uBin < m_nBinsU; ++uBin) {
+        for (int vBin = 0; vBin < m_nBinsV; ++vBin)  {
+          int regionID = getRegionID(uBin, vBin);
+          treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_exposition") % sensorDescr % uBin % vBin).c_str(),
+                            &(bgdata.m_regionExpoMap[regionID]));
+          treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_dose") % sensorDescr % uBin % vBin).c_str(),
+                            &(bgdata.m_regionDoseMap[regionID]));
+          treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_softPhotonFlux") % sensorDescr % uBin % vBin).c_str(),
+                            &(bgdata.m_regionSoftPhotonFluxMap[regionID]));
+          treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_hardPhotonFlux") % sensorDescr % uBin % vBin).c_str(),
+                            &(bgdata.m_regionHardPhotonFluxMap[regionID]));
+          treeBEAST->Branch(str(format("pxd_%1%_region_%2%_%3%_chargedParticleFlux") % sensorDescr % uBin % vBin).c_str(),
+                            &(bgdata.m_regionChargedParticleFluxMap[regionID]));
         }
       }
     }
 
-    // Dump variables into tree
-    treeBEAST->Fill();
-  }
+    // Write timestamp and background rates into TTree
+    for (auto const& pair1 : m_buffer) {
+      auto const& timestamp = pair1.first;
+      auto const& sensors = pair1.second;
 
-  // Write output tuple
-  rfile->cd();
-  treeBEAST->Write();
-  rfile->Close();
+      // Set variables for dumping into tree
+      ts = timestamp;
+      for (auto const& pair2 : sensors) {
+        auto const& sensorID = pair2.first;
+        auto const& bgdata = pair2.second;
+        double currentComponentTime = bgdata.m_nEvents * m_integrationTime;
+        const PXD::SensorInfo& info = getInfo(sensorID);
+        double currentSensorMass = m_sensitiveAreaMap[sensorID] * info.getThickness() * c_densitySi;
+        double currentSensorArea = m_sensitiveAreaMap[sensorID];
+        m_sensorData[sensorID] = bgdata;
+        // Some bg rates are still in wrong units. We have to fix this now.
+        m_sensorData[sensorID].m_meanOccupancy = bgdata.m_meanOccupancy / bgdata.m_nEvents;
+
+        if (currentSensorArea > 0) {
+          m_sensorData[sensorID].m_dose *= (1.0 / currentComponentTime) * (1000 / currentSensorMass);
+          m_sensorData[sensorID].m_expo *= (1.0 / currentSensorArea) * (1.0  / (currentComponentTime / Unit::s));
+          m_sensorData[sensorID].m_softPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+          m_sensorData[sensorID].m_hardPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+          m_sensorData[sensorID].m_chargedParticleFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+
+          for (int regionID = 0; regionID < m_nBinsU * m_nBinsV; ++regionID) {
+            std::pair<VxdID, int> key(sensorID, regionID);
+            double currentRegionMass = m_regionSensitiveAreaMap[key] * info.getThickness() * c_densitySi;
+            double currentRegionArea = m_regionSensitiveAreaMap[key];
+            if (currentRegionArea > 0) {
+              m_sensorData[sensorID].m_regionDoseMap[regionID] *= (1.0 / currentComponentTime) * (1000 / currentRegionMass);
+              m_sensorData[sensorID].m_regionExpoMap[regionID] *= (1.0 / currentRegionArea) * (1.0  / (currentComponentTime / Unit::s));
+              m_sensorData[sensorID].m_regionSoftPhotonFluxMap[regionID] *= (1.0 / currentRegionArea) * (1.0 / (currentComponentTime / Unit::s));
+              m_sensorData[sensorID].m_regionHardPhotonFluxMap[regionID] *= (1.0 / currentRegionArea) * (1.0 / (currentComponentTime / Unit::s));
+              m_sensorData[sensorID].m_regionChargedParticleFluxMap[regionID] *= (1.0 / currentRegionArea) * (1.0 /
+                  (currentComponentTime / Unit::s));
+            }
+          }
+        }
+      }
+      // Dump variables into tree
+      treeBEAST->Fill();
+    }
+
+    // Write output tuple
+    rfile->cd();
+    treeBEAST->Write();
+    rfile->Close();
+  }
 }

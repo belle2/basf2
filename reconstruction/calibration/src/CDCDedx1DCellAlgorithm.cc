@@ -338,9 +338,9 @@ void CDCDedx1DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
 
     if (ibin <= fnEntaBinG1by4 / 4) {
       Factor = 1;
-      ibinL = 1;
+      ibinL = 0;
       ibinH = fnEntaBinG1by4 / 4;
-      L1 = int((ibinH - ibinL + 1) / Factor);
+      L1 = int((ibinH - ibinL) / Factor);
       jbin = L1 - int((ibinH - ibin) / Factor);
       a = jbin;
       iBinLocal = a;
@@ -348,7 +348,7 @@ void CDCDedx1DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
       Factor = 2;
       ibinL = fnEntaBinG1by4 / 4;
       ibinH = fnEntaBinG1by4 / 2;
-      L2 = int((ibinH - ibinL + 1) / Factor);
+      L2 = int((ibinH - ibinL) / Factor);
       jbin = L2 - int((ibinH - ibin) / Factor);
       b = a + jbin;
       iBinLocal = b;
@@ -356,7 +356,7 @@ void CDCDedx1DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
       Factor = 4;
       ibinL = fnEntaBinG1by4 / 2;
       ibinH = fnEntaBinG1by4 / 1;
-      L3 = int((ibinH - ibinL + 1) / Factor);
+      L3 = int((ibinH - ibinL) / Factor);
       jbin = L3 - int((ibinH - ibin) / Factor);
       c = b + jbin;
       iBinLocal = c;
@@ -383,7 +383,7 @@ void CDCDedx1DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
   fEntaBinNums = EntaBinNums1;
   fEntaBinNums.insert(fEntaBinNums.end(), EntaBinNums2.begin(), EntaBinNums2.end());
   if (seeMap)for (unsigned int it = 0; it < fEntaBinNums.size();
-                    ++it)std::cout << "EntA: GlobalBin = " << it << ", LocalBin = " << fEntaBinNums.at(it) << std::endl;
+                    ++it)std::cout << "1DCell-EntA: GlobalBin = " << it << ", LocalBin = " << fEntaBinNums.at(it) << std::endl;
 
 
   TH1F* tempEnta = new TH1F("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);

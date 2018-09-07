@@ -43,13 +43,6 @@ namespace Belle2 {
     /**<Local vs Global bin map settings for enta*/
     void GlobalToLocalEntaBinMap(Bool_t seeMap);
 
-  protected:
-
-    /**
-     * 1D cell algorithm
-     */
-    virtual EResult calibrate();
-
     /**<Set etna angle bins, Global */
     void setGlobalEntaBins(int value) {fnEntaBinG = value;}
 
@@ -61,6 +54,13 @@ namespace Belle2 {
 
     /*** funtion to set flag active for plotting*/
     void setMonitoringPlots(bool value = false) {IsMakePlots = value;}
+
+  protected:
+    /**
+     * 1D cell algorithm
+     */
+    virtual EResult calibrate();
+
 
   private:
 

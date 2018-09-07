@@ -23,9 +23,9 @@ using namespace Belle2;
 CDCDedx2DCellAlgorithm::CDCDedx2DCellAlgorithm():
   CalibrationAlgorithm("CDCDedxElectronCollector"),
   fnEntaBinG(128),
-  fnDocaBinG(60),
+  fnDocaBinG(64),
   fnEntaBinL(64),
-  fnDocaBinL(24),
+  fnDocaBinL(28),
   feaLE(-TMath::Pi() / 2),
   feaUE(+TMath::Pi() / 2),
   fdocaLE(-1.50),
@@ -54,8 +54,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
 
   ttree->SetBranchAddress("dedxhit", &dedxhit);
   ttree->SetBranchAddress("layer", &layer);
-  ttree->SetBranchAddress("doca", &doca);
-  ttree->SetBranchAddress("enta", &enta);
+  ttree->SetBranchAddress("docaRS", &doca);
+  ttree->SetBranchAddress("entaRS", &enta);
 
   // Setting up bins for doca and entra angle
   feaBS = (feaUE - feaLE) / fnEntaBinG;
@@ -291,7 +291,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
         if (htemp->Integral() < 10) truncMean  = 1.0; //low stats
         else {
           for (int ibin = startfrom; ibin <= endat; ibin++) {
-            std::cout << " dedxhit bin = " << ibin << ", Entries =" << htemp->GetBinContent(ibin) << std::endl;
+            //std::cout << " dedxhit bin = " << ibin << ", Entries =" << htemp->GetBinContent(ibin) << std::endl;
             if (htemp->GetBinContent(ibin) >= 0) {
               binweights += (htemp->GetBinContent(ibin) * htemp->GetBinCenter(ibin));
               sumofbc += htemp->GetBinContent(ibin);
@@ -364,7 +364,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalDocaBinMap(Bool_t seeMap)
 
 
   if (fnDocaBinG % 8 != 0) {
-    std::cout << "-- Fix bins: doca should multiple of 8.. Exiting.." << std::endl;
+    std::cout << "-- Fix bins: doca should multiple of 8.. Exiting.." << fnDocaBinG << std::endl;
     return;
   }
 
@@ -378,26 +378,26 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalDocaBinMap(Bool_t seeMap)
   for (Int_t ibin = 1; ibin <= fnDocaBinG1by2; ibin++) {
 
     if (ibin <= fnDocaBinG1by2 / 2) {
-      Factor = fnDocaBinG1by2 / 2;
-      ibinL = 1;
+      Factor = fnDocaBinG1by2 / 4;
+      ibinL = 0;
       ibinH = fnDocaBinG1by2 / 2;
-      L1 = int((ibinH - ibinL + 1) / Factor);
+      L1 = int((ibinH - ibinL) / Factor);
       jbin = L1 - int((ibinH - ibin) / Factor);
       a = jbin;
       iBinLocal = a;
     } else if (ibin > fnDocaBinG1by2 / 2 && ibin <= 3 * fnDocaBinG1by2 / 4) {
-      Factor = 4;
+      Factor = 2;
       ibinL = fnDocaBinG1by2 / 2;
-      ibinH = fnDocaBinG1by2 / 4;
-      L2 = int((ibinH - ibinL + 1) / Factor);
+      ibinH = 3 * fnDocaBinG1by2 / 4;
+      L2 = int((ibinH - ibinL) / Factor);
       jbin = L2 - int((ibinH - ibin) / Factor);
       b = a + jbin;
       iBinLocal = b;
-    } else if (ibin > 3 * fnDocaBinG1by2 / 4 && ibin <= fnDocaBinG1by2) {
+    } else if (ibin > 3 * fnDocaBinG1by2 / 4) {
       Factor = 1;
-      ibinL = fnDocaBinG1by2 / 4;
+      ibinL = 3 * fnDocaBinG1by2 / 4;
       ibinH = fnDocaBinG1by2 / 1;
-      L3 = int((ibinH - ibinL + 1) / Factor);
+      L3 = int((ibinH - ibinL) / Factor);
       jbin = L3 - int((ibinH - ibin) / Factor);
       c = b + jbin;
       iBinLocal = c;
@@ -418,7 +418,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalDocaBinMap(Bool_t seeMap)
   for (unsigned int it = 0; it < fDocaBinNums.size(); ++it)fDocaBinNums.at(it) = fDocaBinNums.at(it) - 1;
 
   if (seeMap)for (unsigned int it = 0; it < fDocaBinNums.size();
-                    ++it)std::cout << "Doca: GlobalBin = " << it << ", LocalBin = " << fDocaBinNums.at(it) << std::endl;
+                    ++it)std::cout << "2DCell-Doca: GlobalBin = " << it << ", LocalBin = " << fDocaBinNums.at(it) << std::endl;
 
   TH1F* tempDoca = new TH1F("tempDoca", "tempDoca", fnEntaBinG, fdocaLE, fdocaUE);
   fDocaBinValues.push_back(tempDoca->GetBinLowEdge(1));
@@ -454,9 +454,9 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
 
     if (ibin <= fnEntaBinG1by4 / 4) {
       Factor = 1;
-      ibinL = 1;
+      ibinL = 0;
       ibinH = fnEntaBinG1by4 / 4;
-      L1 = int((ibinH - ibinL + 1) / Factor);
+      L1 = int((ibinH - ibinL) / Factor);
       jbin = L1 - int((ibinH - ibin) / Factor);
       a = jbin;
       iBinLocal = a;
@@ -464,7 +464,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
       Factor = 2;
       ibinL = fnEntaBinG1by4 / 4;
       ibinH = fnEntaBinG1by4 / 2;
-      L2 = int((ibinH - ibinL + 1) / Factor);
+      L2 = int((ibinH - ibinL) / Factor);
       jbin = L2 - int((ibinH - ibin) / Factor);
       b = a + jbin;
       iBinLocal = b;
@@ -472,7 +472,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
       Factor = 4;
       ibinL = fnEntaBinG1by4 / 2;
       ibinH = fnEntaBinG1by4 / 1;
-      L3 = int((ibinH - ibinL + 1) / Factor);
+      L3 = int((ibinH - ibinL) / Factor);
       jbin = L3 - int((ibinH - ibin) / Factor);
       c = b + jbin;
       iBinLocal = c;
@@ -499,7 +499,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
   fEntaBinNums = EntaBinNums1;
   fEntaBinNums.insert(fEntaBinNums.end(), EntaBinNums2.begin(), EntaBinNums2.end());
   if (seeMap)for (unsigned int it = 0; it < fEntaBinNums.size();
-                    ++it)std::cout << "EntA: GlobalBin = " << it << ", LocalBin = " << fEntaBinNums.at(it) << std::endl;
+                    ++it)std::cout << "2DCell-EntA: GlobalBin = " << it << ", LocalBin = " << fEntaBinNums.at(it) << std::endl;
 
 
   TH1F* tempEnta = new TH1F("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);

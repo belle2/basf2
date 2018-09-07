@@ -79,6 +79,7 @@ namespace Belle2 {
       Mask(std::string name = "", std::string origin = "unknown"): m_name(name),
         m_origin(origin)
       {
+        B2DEBUG(10, "Mask " << name << " is being initialized by " << origin);
         m_isValid = false;
       };
       /**
@@ -212,6 +213,12 @@ namespace Belle2 {
      * @param Pointer to the unused Particle
      */
     void addParticle(const Particle* particle);
+    /**
+     * Add StoreArray index of given Particle to the list of unused tracks in the event.
+     *
+     * @param Pointer to the unused Particle
+     */
+    void addParticles(const std::vector<const Particle*>& particle);
     /**
      * Check if ROE has StoreArray index of given  to the list of unused tracks in the event.
      * @param Pointer to the Particle
@@ -369,6 +376,10 @@ namespace Belle2 {
      */
     void print() const;
 
+    /**
+     * Compares particles. TODO: This doesn't belong here
+     */
+    static bool compareParticles(const Particle* roeParticle, const Particle* toAddParticle);
 
   private:
 
@@ -389,7 +400,6 @@ namespace Belle2 {
      * Prints indices in the given set in a single line
      */
     void printIndices(std::set<int> indices) const;
-
     ClassDef(RestOfEvent, 5) /**< class definition */
 
   };

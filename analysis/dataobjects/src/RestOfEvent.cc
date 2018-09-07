@@ -29,12 +29,56 @@ void RestOfEvent::addParticle(const Particle* particle)
 {
   m_particleIndices.insert(particle->getArrayIndex());
 }
+void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAdd)
+{
+  StoreArray<Particle> allParticles;
+  for (auto* particleToAdd : particlesToAdd) {
+    bool toAdd = true;
+    for (auto& myIndex : m_particleIndices) {
+      //if(particleToAdd->isCopyOf(allParticles[myIndex])) {
+      if (compareParticles(allParticles[myIndex], particleToAdd)) {
+        toAdd = false;
+        break;
+      }
+    }
+    if (toAdd) {
+      B2DEBUG(10, "\t\tAdding particle with PDG " << particleToAdd->getPDGCode());
+      m_particleIndices.insert(particleToAdd->getArrayIndex());
+    }
+  }
+}
+bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* toAddParticle)
+{
+  if (roeParticle->isCopyOf(toAddParticle)) {
+    return true;
+  }
+  if (roeParticle->getParticleType() != toAddParticle->getParticleType()) {
+    return false;
+  }
+  if (roeParticle->getTrack() && toAddParticle->getTrack() &&
+      roeParticle->getTrack()->getArrayIndex() != toAddParticle->getTrack()->getArrayIndex()) {
+    return false;
+  }
+  if (roeParticle->getECLCluster() && toAddParticle->getECLCluster()
+      && roeParticle->getECLCluster()->getArrayIndex() != toAddParticle->getECLCluster()->getArrayIndex()) {
+    return false;
+  }
+  if (roeParticle->getKLMCluster() && toAddParticle->getKLMCluster()
+      && roeParticle->getKLMCluster()->getArrayIndex() != toAddParticle->getKLMCluster()->getArrayIndex()) {
+    return false;
+  }
+  return true;
+}
 
 std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName, bool unpackComposite) const
 {
   std::vector<const Particle*> result;
   StoreArray<Particle> allParticles;
   std::set<int> source;
+  if (m_particleIndices.size() == 0) {
+    B2DEBUG(10, "ROE contains no particles, masks are empty too");
+    return result;
+  }
   if (maskName == "") {
     // if no mask provided work with internal source
     source = m_particleIndices;

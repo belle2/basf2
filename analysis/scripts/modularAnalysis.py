@@ -1551,11 +1551,11 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
                               target_list_name are excluded from ROE object
     @param path      modules are added to this path
     """
-    if (len(inputParticlelists) < 3):
-        fillParticleList('pi+:myroe', '')
-        fillParticleList('gamma:myroe', '')
-        fillParticleList('K_L0:myroe', '')
-        inputParticlelists = ['pi+:myroe', 'gamma:myroe', 'K_L0:myroe']
+    # if (len(inputParticlelists) < 3):
+    fillParticleList('pi+:myroe', '')
+    fillParticleList('gamma:myroe', '')
+    fillParticleList('K_L0:myroe', '')
+    inputParticlelists += ['pi+:myroe', 'gamma:myroe', 'K_L0:myroe']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)

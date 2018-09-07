@@ -420,7 +420,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalDocaBinMap(Bool_t seeMap)
   if (seeMap)for (unsigned int it = 0; it < fDocaBinNums.size();
                     ++it)std::cout << "2DCell-Doca: GlobalBin = " << it << ", LocalBin = " << fDocaBinNums.at(it) << std::endl;
 
-  TH1F* tempDoca = new TH1F("tempDoca", "tempDoca", fnEntaBinG, fdocaLE, fdocaUE);
+  TH1F* tempDoca = new TH1F("tempDoca", "tempDoca", fnDocaBinG, fdocaLE, fdocaUE);
   fDocaBinValues.push_back(tempDoca->GetBinLowEdge(1));
   for (unsigned int i = 0; i < fDocaBinNums.size() - 1; ++i) {
     if (fDocaBinNums.at(i) < fDocaBinNums.at(i + 1)) {
@@ -429,7 +429,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalDocaBinMap(Bool_t seeMap)
       fDocaBinValues.push_back(binval);
     } else continue;
   }
-  fDocaBinValues.push_back(tempDoca->GetBinLowEdge(fnEntaBinG) + tempDoca->GetBinWidth(fnEntaBinG));
+  fDocaBinValues.push_back(tempDoca->GetBinLowEdge(fnDocaBinG) + tempDoca->GetBinWidth(fnDocaBinG));
   delete tempDoca;
 }
 

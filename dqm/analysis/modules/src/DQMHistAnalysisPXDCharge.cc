@@ -31,12 +31,14 @@ REG_MODULE(DQMHistAnalysisPXDCharge)
 DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   : DQMHistAnalysisModule()
 {
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
-  addParam("HistoDir", m_histodir, "Name of Histogram dir", std::string("pxd"));
+  addParam("HistoDir", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
   B2DEBUG(1, "DQMHistAnalysisPXDCharge: Constructor done.");
-
 }
 
 void DQMHistAnalysisPXDChargeModule::initialize()
@@ -93,6 +95,18 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   m_fLandau->SetNpx(60);
   m_fLandau->SetNumberFitPoints(60);
 
+  m_fMean = new TF1("f_Mean", "pol0", 0.5, m_PXDModules.size() - 0.5);
+  m_fMean->SetParameter(0, 50);
+  m_fMean->SetLineColor(5);
+  m_fMean->SetNpx(m_PXDModules.size());
+  m_fMean->SetNumberFitPoints(m_PXDModules.size());
+
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
 
 
@@ -161,22 +175,23 @@ void DQMHistAnalysisPXDChargeModule::event()
       hh1 = findHistLocal(a);
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/DQMER_PXD_" + buff + "_ClusterCharge";
+      a = m_histogramDirectoryName + "/DQMER_PXD_" + buff + "_ClusterCharge";
       hh1 = findHist(a.Data());
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/DQMER_PXD_" + buff + "_ClusterCharge";
+      a = m_histogramDirectoryName + "/DQMER_PXD_" + buff + "_ClusterCharge";
       hh1 = findHistLocal(a);
     }
     if (hh1) {
       B2INFO("Histo " << a << " found in mem");
-      /// FIXME Replave by a nice fit
+      /// FIXME Replace by a nice fit
       m_fLandau->SetParameter(0, 1000);
       m_fLandau->SetParameter(1, 50);
       m_fLandau->SetParameter(2, 10);
       hh1->Fit(m_fLandau, "R");
       m_hCharge->SetBinContent(i + 1, m_fLandau->GetParameter(1));
-      m_hCharge->SetBinError(i + 1, m_fLandau->GetParameter(2) * 0.25); // arbitrary scaling
+      m_hCharge->SetBinError(i + 1, m_fLandau->GetParError(1));
+      // m_hCharge->SetBinError(i + 1, m_fLandau->GetParameter(2) * 0.25); // arbitrary scaling
       // cout << m_fLandau->GetParameter(0) << " " << m_fLandau->GetParameter(1) << " " << m_fLandau->GetParameter(2) << endl;
 
       // m_hCharge->Fill(i, hh1->GetMean());
@@ -205,15 +220,29 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_cCharge->Pad()->SetFillColor(0);// White
   }
 
+  double data = 0;
+  double diff = 0;
   if (m_hCharge) {
+    double currentMin, currentMax;
     m_hCharge->Draw("");
 //     m_line1->Draw();
 //     m_line2->Draw();
 //     m_line3->Draw();
+    m_hCharge->Fit(m_fMean, "R");
+    data = m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
+    diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
+    B2INFO("Mean: " << data << " Max Diff: " << diff);
   }
 
   m_cCharge->Modified();
   m_cCharge->Update();
+
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
 
 void DQMHistAnalysisPXDChargeModule::endRun()
@@ -224,8 +253,13 @@ void DQMHistAnalysisPXDChargeModule::endRun()
 
 void DQMHistAnalysisPXDChargeModule::terminate()
 {
-  B2DEBUG(1, "DQMHistAnalysisPXDCharge: terminate called");
-  m_cCharge->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_clear_channel(mychid[0]), "ca_clear_channel failure");
+  SEVCHK(ca_clear_channel(mychid[1]), "ca_clear_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  ca_context_destroy();
+#endif
+  B2DEBUG(1, "DQMHistAnalysisPXDCharge: terminate called");
 }
 

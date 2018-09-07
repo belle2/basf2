@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
+
 #include <framework/core/Module.h>
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
@@ -41,20 +46,25 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data members
-    std::string m_histodir;
+    std::string m_histogramDirectoryName;
+    std::string m_pvPrefix;
     double m_rangeLow;
     double m_rangeHigh;
 
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    TF1* m_fLandau;// only one fit function
+    TF1* m_fLandau;// only one fit function for all Landaus
+    TF1* m_fMean;// Fit the Mean for all modules
     TH1F* m_hCharge;
     TCanvas* m_cCharge;
 //     TLine* m_line1, *m_line2, *m_line3;
 
     TH1* findHistLocal(TString& a);
 
+#ifdef _BELLE2_EPICS
+    chid  mychid[2];// two PVs, Mean and maximum deviation
+#endif
   };
 } // end namespace Belle2
 

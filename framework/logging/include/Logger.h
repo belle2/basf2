@@ -15,7 +15,6 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/logging/LogVariableStream.h>
 
-#include <sstream>
 
 /**
  * \def _B2_DO_NOTHING()

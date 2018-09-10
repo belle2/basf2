@@ -56,7 +56,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   addParam("belle", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", false);
   addParam("ptCut", m_PtCut, "preselection pt Cut", 0.4);
   addParam("selectorType", m_SelectorType,
-           "gives the name of the selector to use, currently only cut based ('cut') selection is available", std::string("cut"));
+           "gives the name of the selector to use, available : 'cut', 'mva'", std::string("cut"));
   addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);
   addParam("pVal", m_PVal, "min allowed pVal for a match", 0.5);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);

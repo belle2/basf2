@@ -258,5 +258,9 @@ namespace Belle2 {
     */
     Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
+    /**
+    * Returns function which returns maximum Pt in the given particle Lists.
+    */
+    Manager::FunctionPtr maxPtInLists(const std::vector<std::string>& arguments);
   }
 }

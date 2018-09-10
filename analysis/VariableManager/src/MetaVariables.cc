@@ -1537,6 +1537,31 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxPtInList");
+          double totalPz = 0;
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          double maxPt = 0;
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            const double Pt = frame.getMomentum(part).Pt();
+            if (Pt > maxPt) maxPt = Pt;
+          }
+          return maxPt;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function maxPtInList");
+      }
+    }
 
 
     VARIABLE_GROUP("MetaFunctions");
@@ -1720,5 +1745,7 @@ endloop:
                       "Returns the invariant mass of the combination of particles in the given particle lists.");
     REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
                       "Returns the total ECL energy of particles in the given particle List.");
+    REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
+                      "Returns maximum Pt in the given particle List.");
   }
 }

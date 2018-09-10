@@ -55,11 +55,11 @@ namespace Belle2 {
       /// Set time walk mode
       void setMode(unsigned short mode)
       {
-        m_twParamMode_new = mode;
+        m_twParamMode = mode;
         if (mode == 0)
-          m_nTwParams_new = 1;
+          m_nTwParams = 1;
         else if (mode == 1)
-          m_nTwParams_new = 2;
+          m_nTwParams = 2;
         else
           B2FATAL("Mode hasn't implemented yet");
       }
@@ -99,20 +99,18 @@ namespace Belle2 {
       double m_minPval = 0.;                         /**< minimum number of Prob(chi2) of fitted track. */
       double m_constTerm[300] = {0.};                /**< const term in fitting, it will be added to T0 instead tw */
       unsigned short m_flag[300];                    /**< flag for fit status */
-      std::vector<float> m_tw_old[300];              /**< prior tw list. */
-      std::vector<float> m_tw_new[300];              /**< new tw list. */
+      std::vector<float> m_tw_old[300];              /**< tw list before calibration. */
+      std::vector<float> m_tw_new[300];              /**< tw list after calibration. */
       bool m_storeHisto = true;                      /**< Store all Histogram or not*/
       std::string m_inputTWFileName = "tw.dat";      /**< Old tw file name. */
       std::string m_inputT0FileName = "t0.dat";      /**< Old t0 file name. */
       std::string m_outputTWFileName = "tw_new.dat"; /**<  tw file name after calibration. */
       std::string m_outputT0FileName = "t0_new.dat"; /**< t0 file name after calibration. */
-      std::string m_histName = "histTW.root";     /**< root file name */
+      std::string m_histName = "histTW.root";        /**< root file name */
       bool m_debug = false;                          /**< run debug or not.*/
       bool m_textOutput = false;                     /**< output text file if true */
-      unsigned short m_twParamMode_old;              /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
-      unsigned short m_twParamMode_new = 0;          /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
-      unsigned short m_nTwParams_new = 1;            /**< No. of tw parameters. for new database*/
-      unsigned short m_nTwParams_old;                /**< No. of tw parameters. in old database */
+      unsigned short m_twParamMode = 1;              /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
+      unsigned short m_nTwParams = 2;                /**< No. of tw parameters. for new database*/
       DBObjPtr<CDCGeometry> m_cdcGeo;                /** Geometry of CDC */
     };
   }

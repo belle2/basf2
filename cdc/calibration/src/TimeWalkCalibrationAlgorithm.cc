@@ -112,9 +112,9 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   createHisto();
 
   TF1* fold = nullptr;
-  if (m_twParamMode_old == 0)
+  if (m_twParamMode == 0)
     fold = new TF1("fold", "[0]/sqrt(x)", 0, 500);
-  else if (m_twParamMode_old == 1)
+  else if (m_twParamMode == 1)
     fold = new TF1("fold", "[0]*exp(-1*[1]*x)", 0, 500);
 
   if (fold == nullptr) {
@@ -122,9 +122,9 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   }
 
 
-  B2INFO("Old time walk formular: ");
+  B2INFO("time walk formular: ");
   [](TF1 * f) { auto title = f->GetTitle(); B2INFO("Expression : " << title);}(fold);
-  B2INFO("New time walk mode : " << m_twParamMode_new << " with " << m_nTwParams_new << " parameters");
+  //  B2INFO("New time walk mode : " << m_twParamMode_new << " with " << m_nTwParams_new << " parameters");
 
   for (int ib = 1; ib < 300; ++ib) {
     m_flag[ib] = 1;
@@ -149,26 +149,26 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
     }
 
     // Add previous correction to this
-    for (int p = 0; p < m_nTwParams_old; ++p) {
+    for (int p = 0; p < m_nTwParams; ++p) {
       fold->SetParameter(p, m_tw_old[ib][p]);
     }
 
     m_h1[ib]->Add(fold);
-    if (m_twParamMode_new == 0) {
+    if (m_twParamMode == 0) {
       TF1* func = new TF1("func", "[0]+[1]/sqrt(x)", 0, 500);
       func->SetParameters(-4, 28);
       m_h1[ib]->Fit("func", "MQ", "", 20, 150);
-    } else if (m_twParamMode_new == 1) {
+    } else if (m_twParamMode == 1) {
       fitToExponentialFunc(m_h1[ib]);
     } else {
-      B2FATAL("Mode " << m_twParamMode_new << " is not available, please check again");
+      B2FATAL("Mode " << m_twParamMode << " is not available, please check again");
     }
 
     // Read fitted parameters
     TF1* f1 = m_h1[ib]->GetFunction("func");
     if (!f1) { m_flag[ib] = 0; continue;}
     m_constTerm[ib] = f1->GetParameter(0);
-    for (int i = 1; i <= m_nTwParams_new; ++i) {
+    for (int i = 1; i <= m_nTwParams; ++i) {
       m_tw_new[ib][i - 1] = f1->GetParameter(i);
     }
 
@@ -249,13 +249,11 @@ void TimeWalkCalibrationAlgorithm::write()
     if (m_flag[ib] != 1) {
       nfailure += 1;
     }
-    if (m_twParamMode_old == m_twParamMode_new) {
-      const int num = static_cast<int>(m_tw_old[ib].size());
-      for (int i = 0; i < num; ++i) {
-        m_tw_new[ib][i] += m_tw_old[ib][i];
-      }
-      dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
+    const int num = static_cast<int>(m_tw_old[ib].size());
+    for (int i = 0; i < num; ++i) {
+      m_tw_new[ib][i] += m_tw_old[ib][i];
     }
+    dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
   }
 
   if (m_textOutput == true) {
@@ -273,21 +271,18 @@ void TimeWalkCalibrationAlgorithm::prepare()
   B2INFO("Prepare calibration");
 
   DBObjPtr<CDCTimeWalks> dbTw;
-  m_twParamMode_old = dbTw->getTwParamMode();
+  m_twParamMode = dbTw->getTwParamMode();
 
-  if (!(m_twParamMode_old == 0 || m_twParamMode_old == 1)) {
-    B2FATAL("Mode " << m_twParamMode_old << " haven't implemented yet.");
+  if (!(m_twParamMode == 0 || m_twParamMode == 1)) {
+    B2FATAL("Mode " << m_twParamMode << " haven't implemented yet.");
   }
-  if (m_twParamMode_old != m_twParamMode_new) {
-    B2FATAL("parameter modes are different");
-  }
-  B2INFO("old tw param mode " << m_twParamMode_old);
+
+  B2INFO("tw param mode " << m_twParamMode);
   const int nEntries = dbTw->getEntries();
   for (int ib = 0; ib < nEntries; ++ib) {
     m_tw_old[ib] = dbTw->getTimeWalkParams(ib);
-    m_tw_new[ib].resize(m_nTwParams_new, 0.0);
+    m_tw_new[ib].resize(m_nTwParams, 0.0);
   }
-
 }
 
 void TimeWalkCalibrationAlgorithm::updateT0()

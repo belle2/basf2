@@ -230,7 +230,7 @@ namespace Belle2 {
       int nOKSamples = 0;
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
       for (int k = 0; k < this->getNSamples(); k ++)
-        if (samples_vec[k] > cutMinSignal)
+        if (samples_vec[k] >= cutMinSignal)
           nOKSamples++;
 
       if (nOKSamples >= nSamples)

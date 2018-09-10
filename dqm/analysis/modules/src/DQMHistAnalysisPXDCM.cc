@@ -31,10 +31,12 @@ REG_MODULE(DQMHistAnalysisPXDCM)
 DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   : DQMHistAnalysisModule()
 {
-  //Parameter definition
-  addParam("HistoDir", m_histodir, "Name of Histogram dir", std::string("pxd"));
-  B2DEBUG(1, "DQMHistAnalysisPXDCM: Constructor done.");
+  // This module CAN NOT be run in parallel!
 
+  //Parameter definition
+  addParam("HistoDir", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode"));
+  B2DEBUG(1, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
 void DQMHistAnalysisPXDCMModule::initialize()
@@ -84,7 +86,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel("PXD:DQM:CommonMode", NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
@@ -154,11 +156,11 @@ void DQMHistAnalysisPXDCMModule::event()
       hh1 = findHistLocal(a);
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/PXDDAQCM2_" + buff;
+      a = m_histogramDirectoryName + "/PXDDAQCM2_" + buff;
       hh1 = findHist(a.Data());
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/PXDDAQCM2_" + buff;
+      a = m_histogramDirectoryName + "/PXDDAQCM2_" + buff;
       hh1 = findHistLocal(a);
     }
     if (hh1) {
@@ -201,16 +203,10 @@ void DQMHistAnalysisPXDCMModule::event()
   m_cCommonMode->Modified();
   m_cCommonMode->Update();
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_DOUBLE, &mychid, (void*)&data), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
-
-void DQMHistAnalysisPXDCMModule::endRun()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDCM : endRun called");
-}
-
 
 void DQMHistAnalysisPXDCMModule::terminate()
 {

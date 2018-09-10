@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
+
 #include <framework/core/Module.h>
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
@@ -37,11 +42,11 @@ namespace Belle2 {
     //! Module functions to be called from event process
     void beginRun(void) override final;
     void event(void) override final;
-    void endRun(void) override final;
     void terminate(void) override final;
 
     // Data members
-    std::string m_histodir;
+    std::string m_histogramDirectoryName;
+    std::string m_pvPrefix;
 
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -52,6 +57,9 @@ namespace Belle2 {
 
     TH1* findHistLocal(TString& a);
 
+#ifdef _BELLE2_EPICS
+    chid  mychid;
+#endif
   };
 } // end namespace Belle2
 

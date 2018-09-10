@@ -31,10 +31,12 @@ REG_MODULE(DQMHistAnalysisPXDReduction)
 DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   : DQMHistAnalysisModule()
 {
-  //Parameter definition
-  addParam("HistoDir", m_histodir, "Name of Histogram dir", std::string("pxd"));
-  B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
+  // This module CAN NOT be run in parallel!
 
+  //Parameter definition
+  addParam("HistoDir", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:ReductionFlag"));
+  B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
 void DQMHistAnalysisPXDReductionModule::initialize()
@@ -81,6 +83,12 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 //   m_line3->SetLineColor(1);
 //   m_line3->SetLineWidth(3);
 
+
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
 
 
@@ -149,11 +157,11 @@ void DQMHistAnalysisPXDReductionModule::event()
       hh1 = findHistLocal(a);
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/PXDDAQDHEDataReduction_" + buff;
+      a = m_histogramDirectoryName + "/PXDDAQDHEDataReduction_" + buff;
       hh1 = findHist(a.Data());
     }
     if (hh1 == NULL) {
-      a = m_histodir + "/PXDDAQDHEDataReduction_" + buff;
+      a = m_histogramDirectoryName + "/PXDDAQDHEDataReduction_" + buff;
       hh1 = findHistLocal(a);
     }
     if (hh1) {
@@ -164,6 +172,7 @@ void DQMHistAnalysisPXDReductionModule::event()
   }
   m_cReduction->cd();
 
+  double data = 0; // what do we want to return?
 
   // not enough Entries
   if (!enough) {
@@ -188,18 +197,16 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   m_cReduction->Modified();
   m_cReduction->Update();
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
-
-void DQMHistAnalysisPXDReductionModule::endRun()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDReduction : endRun called");
-}
-
 
 void DQMHistAnalysisPXDReductionModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
-  m_cReduction->Print("c1.pdf");
+  // m_cReduction->Print("c1.pdf");
   // should delete canvas here, maybe hist, too? Who owns it?
 }
 

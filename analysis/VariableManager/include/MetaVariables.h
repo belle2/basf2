@@ -39,6 +39,11 @@ namespace Belle2 {
     Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns 1 if the particle is contained in the particle list
+     */
+    Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
      * given particle Lists.
      */
@@ -178,11 +183,31 @@ namespace Belle2 {
 
 
     /**
-     * Returns function which returns the variable of the nth daughter of the given particle
+     * Returns function which returns the variable of the nth daughter of the given particle.
      * First argument in the argument vector must be an integer corresponding to the nth daughter.
      * Second argument the name of the variable.
      */
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the variable of the nth Monte Carlo daughter of the given particle.
+     * First argument in the argument vector must be an integer corresponding to the nth Monte Carlo daughter.
+     * As the order of the Monte Carlo daughter generally differs from the order of the reconstructed
+     * daughters, one might need to write out additional information to identify the Monte Carlo Daugther
+     * particles.
+     * Second argument must be a valid variable.
+     * If the particle is not matched to a MC particle or does not have a nth MC daughter -999 is returned.
+     */
+    Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments);
+
+
+    /**
+     * Returns function which returns the variable for the Monte Carlo mother of the given particle.
+     * The argument of the function must be a valid variable name.
+     * If the particle is not matched with a Monte Carlo particle, or does not have a Monte Carlo
+     * mother, -999 will be returned.
+     */
+    Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments);
 
     /**
      * Returns a specific variable according to its rank in a particle list.

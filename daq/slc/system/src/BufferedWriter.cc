@@ -5,9 +5,9 @@
 using namespace Belle2;
 
 BufferedWriter::BufferedWriter()
-throw() : m_memory(NULL), m_size(0), m_pos(0), m_allocated(false) {}
+  : m_memory(NULL), m_size(0), m_pos(0), m_allocated(false) {}
 
-BufferedWriter::BufferedWriter(size_t size, unsigned char* memory) throw()
+BufferedWriter::BufferedWriter(size_t size, unsigned char* memory)
   : m_memory(memory), m_size(size), m_pos(0), m_allocated(false)
 {
   if (memory == NULL) {
@@ -16,7 +16,7 @@ BufferedWriter::BufferedWriter(size_t size, unsigned char* memory) throw()
   }
 }
 
-BufferedWriter::BufferedWriter(const BufferedWriter& writer) throw()
+BufferedWriter::BufferedWriter(const BufferedWriter& writer)
   : m_memory(NULL), m_size(writer.m_size),
     m_pos(writer.m_pos), m_allocated(writer.m_allocated)
 {
@@ -30,12 +30,12 @@ BufferedWriter::BufferedWriter(const BufferedWriter& writer) throw()
   m_pos = writer.m_pos;
 }
 
-BufferedWriter::~BufferedWriter() throw()
+BufferedWriter::~BufferedWriter()
 {
   if (m_allocated && m_memory != NULL) delete [] m_memory;
 }
 
-const BufferedWriter& BufferedWriter::operator=(const BufferedWriter& writer) throw()
+const BufferedWriter& BufferedWriter::operator=(const BufferedWriter& writer)
 {
   if (m_allocated) {
     delete [] m_memory;
@@ -52,7 +52,7 @@ const BufferedWriter& BufferedWriter::operator=(const BufferedWriter& writer) th
   return *this;
 }
 
-size_t BufferedWriter::write(const void* buf, const size_t count) throw(IOException)
+size_t BufferedWriter::write(const void* buf, const size_t count)
 {
   if (m_pos + count > m_size) {
     throw (IOException("out of buffer range: %d+%d>%d",

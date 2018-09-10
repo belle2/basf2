@@ -10,6 +10,9 @@
       * with multiple entries and some text in *italic* and even **bold**.
         The bullet list items can span multiple lines which are indented
 
+      .. warning:: bullet (as well as enumerated) list have to start and end
+         with an empty line
+
       1. Single backquotes are for **references** to other documented items.
          For example `basf2.Module` will link to the documentation of the class
          Module in the python module basf2. A different link name and link

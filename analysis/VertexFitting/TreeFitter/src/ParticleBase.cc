@@ -24,12 +24,13 @@
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
-#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 
 namespace TreeFitter {
 
   bool massConstraintType;
   std::vector<int> massConstraintListPDG;
+  std::vector<std::string> removeConstraintList;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),
@@ -98,7 +99,7 @@ namespace TreeFitter {
 
   void ParticleBase::updateIndex(int& offset)
   {
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       daughter->updateIndex(offset);
     }
     m_index = offset;
@@ -204,20 +205,16 @@ namespace TreeFitter {
 
     if (pdgcode && !(particle->getMdstArrayIndex())) {
       switch (pdgcode) {
-
-        case 22: //TODO converted photons ???
+        case 22:  //photon conversion
           rc = false;
           break ;
 
-        case -11: //this is meant for bremsstrahlung do we need this TODO?
+        case -11: //bremsstrahlung
         case 11:
-
           rc = true ;
           break ;
 
-        default:
-
-          //everything with boosted flight length less than 1 micrometer
+        default: //everything with boosted flight length less than 1 micrometer
           rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
       }
     }
@@ -230,30 +227,30 @@ namespace TreeFitter {
       particles.push_back(this);
     }
 
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       daughter->collectVertexDaughters(particles, posindex);
     }
   }
 
-  ErrCode ParticleBase::initCovariance(FitParams* fitparams) const
+  ErrCode ParticleBase::initCovariance(FitParams& fitparams) const
   {
     ErrCode status;
 
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams->getCovariance()(posindex + i, posindex + i) = 400;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 50;
       }
     }
 
     // momentum
     const int momindex = momIndex();
     if (momindex >= 0) {
-      const double initVal = 1;
+      const double initVal = 0.5;
       const int maxrow = hasEnergy() ? 4 : 3;
 
       for (int i = 0; i < maxrow; ++i) {
-        fitparams->getCovariance()(momindex + i, momindex + i) = initVal;
+        fitparams.getCovariance()(momindex + i, momindex + i) = initVal;
       }
     }
 
@@ -262,27 +259,14 @@ namespace TreeFitter {
     if (tauindex >= 0) {
 
       /** cant multiply by momentum here because unknown but average mom is 3 Gev */
+      /** if pdgMass = 0 then tauindex is always = -1, so this is safe */
+
+      const double maxDecayLengthSigma = 1000;
       double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass() * 3;
+      double sigtau = tau > 0 ? std::min(20 * tau, maxDecayLengthSigma)  : maxDecayLengthSigma;
 
-      double sigtau = tau > 0 ? 20 * tau : 999;
-
-      const double maxDecayLength = 2000;
-      double mom = particle()->getP();
-
-      if (mom > 0.0) {
-        sigtau = std::min(maxDecayLength, sigtau);
-      }
-
-      if (tau > 0) {
-        sigtau = 20 * tau;
-
-      } else {
-        sigtau = 1000;
-
-      }
-      fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
+      fitparams.getCovariance()(tauindex, tauindex) = sigtau * sigtau;
     }
-
     return status;
   }
 
@@ -307,7 +291,7 @@ namespace TreeFitter {
   {
     const ParticleBase* rc = (m_particle == particle) ? this : 0;
     if (!rc) {
-      for (auto daughter : m_daughters) {
+      for (auto* daughter : m_daughters) {
         rc = daughter->locate(particle);
         if (rc) {break;}
       }
@@ -318,17 +302,16 @@ namespace TreeFitter {
   void ParticleBase::retrieveIndexMap(indexmap& indexmap) const
   {
     indexmap.push_back(std::pair<const ParticleBase*, int>(this, index()));
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       daughter->retrieveIndexMap(indexmap);
     }
   }
 
-  double ParticleBase::chiSquare(const FitParams* fitparams) const
+  double ParticleBase::chiSquare(const FitParams& fitparams) const
   {
     double rc = 0;
-    for (auto daughter : m_daughters) {
-      double  chi2 = daughter->chiSquare(fitparams);
-      rc += chi2;
+    for (auto* daughter : m_daughters) {
+      rc += daughter->chiSquare(fitparams);
     }
     return rc;
   }
@@ -336,7 +319,7 @@ namespace TreeFitter {
   int ParticleBase::nFinalChargedCandidates() const
   {
     int rc = 0;
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       rc += daughter->nFinalChargedCandidates();
     }
     return rc;
@@ -388,7 +371,6 @@ namespace TreeFitter {
 
     p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
     p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
-
     return ErrCode(ErrCode::Status::success);
   }
 
@@ -402,7 +384,6 @@ namespace TreeFitter {
       }
     }
   }
-
 
   ErrCode ParticleBase::projectMassConstraintDaughters(const FitParams& fitparams,
                                                        Projection& p) const
@@ -449,7 +430,6 @@ namespace TreeFitter {
       if (daughter->hasEnergy()) {
         p.getH()(0, momindex + 3) = -2.0 * E;
       } else {
-        //FIXME this is slow by stupid design
         const double px_daughter = fitparams.getStateVector()(momindex);
         const double py_daughter = fitparams.getStateVector()(momindex + 1);
         const double pz_daughter = fitparams.getStateVector()(momindex + 2);
@@ -480,12 +460,12 @@ namespace TreeFitter {
     /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
-    p.getResiduals()(0) = mass2 -  E * E + px * px + py * py + pz * pz;
+    p.getResiduals()(0) = -mass2 + E * E - px * px - py * py - pz * pz;
 
-    p.getH()(0, momindex)     = 2.0 * px;
-    p.getH()(0, momindex + 1) = 2.0 * py;
-    p.getH()(0, momindex + 2) = 2.0 * pz;
-    p.getH()(0, momindex + 3) = -2.0 * E;
+    p.getH()(0, momindex)     = -2.0 * px;
+    p.getH()(0, momindex + 1) = -2.0 * py;
+    p.getH()(0, momindex + 2) = -2.0 * pz;
+    p.getH()(0, momindex + 3) = 2.0 * E;
 
     return ErrCode(ErrCode::Status::success);
   }
@@ -511,18 +491,12 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::badsetup);
   }
 
-  double ParticleBase::bFieldOverC() //FT: (to do) BField is already called in RecoTrack, unify
+  double ParticleBase::bFieldOverC()
   {
-    // in BaBar, BField::cmTeslaToGeVc = Constants::c/1.0E3
-    // but is badly named as units are mm, ns, MeV, T
-    // this is all very confusing, but we try to get it right
-    // Conversion from Tesla to Belle2 units is already done, so no need for Unit::T (unlike in RecoTrack)
-    static const double Bz  = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() * Belle2::Const::speedOfLight;
-    B2DEBUG(12, "ParticleBase::bFieldOverC = " << Bz);
-    return Bz;
+    return (Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() * Belle2::Const::speedOfLight);
   }
 
-  ErrCode ParticleBase::initTau(FitParams* fitparams) const
+  ErrCode ParticleBase::initTau(FitParams& fitparams) const
   {
     const int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {
@@ -535,7 +509,7 @@ namespace TreeFitter {
        * */
       const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
 
-      fitparams->getStateVector()(tauindex) = value;
+      fitparams.getStateVector()(tauindex) = value;
     }
 
     return ErrCode(ErrCode::Status::success);

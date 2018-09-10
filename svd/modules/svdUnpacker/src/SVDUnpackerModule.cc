@@ -167,7 +167,6 @@ void SVDUnpackerModule::event()
     nFADCmatch = false;
   }
 
-
   for (unsigned int i = 0; i < nEntries_rawSVD; i++) {
 
     unsigned int numEntries_rawSVD = rawSVDList[ i ]->GetNumEntries();
@@ -386,6 +385,9 @@ void SVDUnpackerModule::event()
             seenAPVHeaders.clear();
 
             ftbFlags = m_FADCTrailer.FTBFlags;
+            if (ftbFlags != 0)
+              B2WARNING(" Something is wrong with FTB Flags: " << ftbFlags << " on FADC number " << fadc);
+
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
             for (auto* finalDAQDiagnostic : diagnosticVector) {
@@ -430,6 +432,7 @@ void SVDUnpackerModule::event()
     } // end event loop
 
   }
+
   // Detect upset APVs and report/treat
   auto major_apv = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
                                [](const decltype(apvsByPipeline)::value_type & p1,
@@ -473,6 +476,7 @@ void SVDUnpackerModule::event()
       continue;
     shaperDigits.appendNew(p.first)->addRelationTo(p.second);
   }
+
 } //end event function
 #ifndef __clang__
 #pragma GCC diagnostic pop

@@ -17,7 +17,7 @@ namespace TreeFitter {
   RecoParticle::RecoParticle(Belle2::Particle* particle, const ParticleBase* mother)
     : ParticleBase(particle, mother) {}
 
-  ErrCode RecoParticle::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
+  ErrCode RecoParticle::initMotherlessParticle([[gnu::unused]] FitParams& fitparams)
   {
     return ErrCode(ErrCode::Status::success);
   }

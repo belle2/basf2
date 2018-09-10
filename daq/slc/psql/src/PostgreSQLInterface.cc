@@ -17,14 +17,14 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
                                          const std::string& database,
                                          const std::string& user,
                                          const std::string& password,
-                                         int port) throw()
+                                         int port)
 {
   init(host, database, user, password, port);
   m_sq_conn = NULL;
   m_sq_result = NULL;
 }
 
-PostgreSQLInterface::PostgreSQLInterface() throw()
+PostgreSQLInterface::PostgreSQLInterface()
 {
   ConfigFile config("slowcontrol");
   init(config.get("database.host"),
@@ -36,7 +36,7 @@ PostgreSQLInterface::PostgreSQLInterface() throw()
   m_sq_result = NULL;
 }
 
-void PostgreSQLInterface::connect() throw(DBHandlerException)
+void PostgreSQLInterface::connect()
 {
 #ifndef NOT_USE_PSQL
   if (isConnected()) return;
@@ -57,7 +57,7 @@ void PostgreSQLInterface::connect() throw(DBHandlerException)
 #endif
 }
 
-bool PostgreSQLInterface::isConnected() throw()
+bool PostgreSQLInterface::isConnected()
 {
 #ifndef NOT_USE_PSQL
   m_mutex.lock();
@@ -70,7 +70,6 @@ bool PostgreSQLInterface::isConnected() throw()
 }
 
 void PostgreSQLInterface::execute_imp(const char* command)
-throw(DBHandlerException)
 {
   clear();
 #ifndef NOT_USE_PSQL
@@ -88,7 +87,7 @@ throw(DBHandlerException)
 #endif
 }
 
-DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
+DBRecordList PostgreSQLInterface::loadRecords()
 {
 #ifndef NOT_USE_PSQL
   m_mutex.lock();
@@ -123,7 +122,7 @@ DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 #endif
 }
 
-void PostgreSQLInterface::clear() throw()
+void PostgreSQLInterface::clear()
 {
 #ifndef NOT_USE_PSQL
   m_mutex.lock();
@@ -137,7 +136,7 @@ void PostgreSQLInterface::clear() throw()
 #endif
 }
 
-void PostgreSQLInterface::close() throw(DBHandlerException)
+void PostgreSQLInterface::close()
 {
   clear();
 #ifndef NOT_USE_PSQL
@@ -152,7 +151,7 @@ void PostgreSQLInterface::close() throw(DBHandlerException)
 #endif
 }
 
-bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandlerException)
+bool PostgreSQLInterface::checkTable(const std::string& tablename)
 {
 #ifndef NOT_USE_PSQL
   execute("select relname from pg_stat_user_tables where relname='%s';",
@@ -165,7 +164,6 @@ bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandl
 }
 
 DBFieldTypeList PostgreSQLInterface::getTableContents(const std::string& tablename)
-throw(DBHandlerException)
 {
 #ifndef NOT_USE_PSQL
   DBFieldTypeList name_m;

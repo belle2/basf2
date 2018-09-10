@@ -48,18 +48,20 @@ namespace Belle2 {
 //
   TRGECLModule::TRGECLModule()
     : Module::Module(),
-      _debugLevel(0), _Bhabha(0), _Clustering(1), _EventTiming(2), _TimeWindow(250.0), _OverlapWindow(125.0), _NofTopTC(3),
+      _debugLevel(0), _Bhabha(0), _Clustering(1), _ClusterLimit(6), _EventTiming(2), _TimeWindow(250.0), _OverlapWindow(125.0),
+      _NofTopTC(3),
       _SelectEvent(1)
   {
 
     string desc = "TRGECLModule(" + version() + ")";
     setDescription(desc);
-    //   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
     addParam("Bhabha", _Bhabha, "TRGECL Bhabha method  0 : Belle I, 1 :belle II(defult)", _Bhabha);
     addParam("Clustering", _Clustering, "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Defult)", _Clustering);
+    addParam("ClusterLimit", _ClusterLimit, "The Limit number of cluster (Defult:6)", _ClusterLimit);
+
     addParam("EventTiming", _EventTiming,
              "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (defult)", _EventTiming);
     addParam("NofTopTC", _NofTopTC, "TRGECL # of considered TC in energy weighted Timing method(Only work for EvenTiming Method 2)",
@@ -142,6 +144,7 @@ namespace Belle2 {
 
     _ecl-> initialize(m_nEvent);
     _ecl-> setClusterMethod(_Clustering);
+    _ecl-> setClusterLimit(_ClusterLimit);
     _ecl-> setBhabhaMethod(_Bhabha);
     _ecl-> setEventTimingMethod(_EventTiming);
     _ecl -> setTimeWindow(_TimeWindow);

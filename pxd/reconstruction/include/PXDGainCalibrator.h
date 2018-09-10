@@ -43,6 +43,14 @@ namespace Belle2 {
        */
       float getGainCorrection(VxdID id, unsigned int uid, unsigned int vid) const;
 
+      /** Get conversion factor from ADU to energy
+       * @param sensorID unique ID of the sensor
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @return ADUToEnergy conversion factor
+       */
+      float getADUToEnergy(VxdID id, unsigned int uid, unsigned int vid) const;
+
       /** Get gain correction bin along sensor u side
        * @param sensorID unique ID of the sensor
        * @param uid uCell of single pixel

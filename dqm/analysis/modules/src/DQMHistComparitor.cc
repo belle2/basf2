@@ -9,6 +9,7 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
+#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TStyle.h>
@@ -201,14 +202,46 @@ void DQMHistComparitorModule::beginRun()
   B2DEBUG(20, "DQMHistComparitor: beginRun called.");
 }
 
-void DQMHistComparitorModule::event()
+DQMHistComparitorModule::CMPNODE* DQMHistComparitorModule::find_pnode(TString a)
 {
   for (auto& it : m_pnode) {
+    if (it->histo1 == a)
+      return it;
+  }
+  return NULL;
+}
+
+void DQMHistComparitorModule::event()
+{
+  const HistList& hlist = getHistList();
+  for (HistList::const_iterator ihl = hlist.begin(); ihl != hlist.end(); ihl++) {
+    TString a = ihl->first;
+
+    CMPNODE* it = find_pnode(a);
+    if (it == NULL) { // new CMPNODE
+      it = new CMPNODE;
+
+      it->histo1 = a;
+      it->histo2 = "ref/" + a;
+      StringList s = StringUtil::split(a.Data(), '/');
+      std::string dirname = s[0];
+      std::string hname = s[1];
+      TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
+      it->canvas = c;
+
+      it->min_entries = 100;
+      it->warning = 0.9;
+      it->error = 0.6;
+      it->epicsflag = false;
+
+      m_pnode.push_back(it);
+    }
+
 
     TH1* hist1, *hist2;
 
     B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
-    hist1 = GetHisto(it->histo1);
+    hist1 = ihl->second;
     if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
     hist2 = GetHisto(it->histo2);
     if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
@@ -222,9 +255,9 @@ void DQMHistComparitorModule::event()
 
     double data = 0.0;
     data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
-//     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
-//     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
-//     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
+    //     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
+    //     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
+    //     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
 #ifdef _BELLE2_EPICS
     if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, it->mychid, (void*)&data), "ca_set failure");
 #endif
@@ -255,10 +288,10 @@ void DQMHistComparitorModule::event()
     }
     it->canvas->Modified();
     it->canvas->Update();
-  }
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
+  }
 }
 
 void DQMHistComparitorModule::endRun()

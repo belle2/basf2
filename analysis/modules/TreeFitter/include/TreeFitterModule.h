@@ -51,6 +51,9 @@ namespace Belle2 {
     /** unused    */
     std::vector<int> m_massConstraintList;
 
+    /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental! */
+    int m_massConstraintType;
+
     /** Use x-y-z beamspot constraint.
      * The Beamspot will be treated as the mother of the particle you feed. */
     bool  m_ipConstraint;
@@ -71,11 +74,17 @@ namespace Belle2 {
     /** use a custom vertex as the production vertex of the highest hierarchy particle */
     bool m_customOrigin;
 
+    /** use referencing */
+    bool m_useReferencing;
+
     /** vertex coordinates of the custom origin  */
     std::vector<double> m_customOriginVertex;
 
     /** covariance of the custom origin */
     std::vector<double> m_customOriginCovariance;
+
+    /** list of constraints not to be applied in tree fit */
+    std::vector<std::string> m_removeConstraintList;
 
   };
 }

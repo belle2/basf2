@@ -16,6 +16,7 @@
 # "-d 1" for unpacker debug info (data headers are printed, >1 raw data bits are printed)
 # "-t 1" include CDC track reconstruction (reconstructed tracks are stored into output )
 # "-a 1" store only data from events with track hit in arich
+# "-g 1" include GDL unpacker to have TRGSummary
 #
 # Author: Luka Santelj
 
@@ -40,6 +41,7 @@ parser.add_option('-o', '--output', dest='output', default='ARICHHits.root')
 parser.add_option('-d', '--debug', dest='debug', default=0)
 parser.add_option('-t', '--tracking', dest='tracking', default=0)
 parser.add_option('-a', '--arichtrk', dest='arichtrk', default=0)
+parser.add_option('-g', '--gdl', dest='gdl', default=0)
 (options, args) = parser.parse_args()
 
 # create paths
@@ -83,6 +85,12 @@ if int(options.tracking):
     main.add_module(cdcunpacker)
     add_cosmics_reconstruction(main, 'CDC', False)
 
+if int(options.gdl):
+    trggdlUnpacker = register_module("TRGGDLUnpacker")
+    main.add_module(trggdlUnpacker)
+    trggdlsummary = register_module('TRGGDLSummary')
+    main.add_module(trggdlsummary)
+
 # create simple DQM histograms
 arichHists = register_module('ARICHDQM')
 main.add_module(arichHists)
@@ -90,9 +98,11 @@ main.add_module(arichHists)
 # store the dataobjects
 output = register_module('RootOutput')
 output.param('outputFileName', options.output)
-branches = ['ARICHDigits', 'ARICHHits']
+branches = ['ARICHDigits', 'ARICHHits', 'ARICHInfo']
 if int(options.tracking):
     branches.extend(['Tracks', 'TrackFitResults', 'RecoTracks', 'RecoHitInformations', 'ExtHits'])
+if int(options.gdl):
+    branches.append('TRGSummary')
 output.param('branchNames', branches)
 if int(options.arichtrk):
     store.add_module(output)

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -46,28 +46,24 @@ void DatabaseChain::addDatabase(Database* database)
 }
 
 
-pair<TObject*, IntervalOfValidity> DatabaseChain::getData(const EventMetaData& event, const string& name)
+bool DatabaseChain::getData(const EventMetaData& event, DBQuery& query)
 {
-  pair<TObject*, IntervalOfValidity> result;
-  result.first = 0;
-
   // loop over database backends and try to find a matching payload
   for (unsigned int i = 0; i < m_databases.size(); i++) {
-    result = m_databases[i]->getData(event, name);
-    if (result.first) {
+    if (m_databases[i]->getData(event, query)) {
       if (m_resetIoVs && (i > 0)) {
-        result.second = IntervalOfValidity(event.getExperiment(), event.getRun(), event.getExperiment(), event.getRun());
+        query.iov = IntervalOfValidity(event.getExperiment(), event.getRun(), event.getExperiment(), event.getRun());
       }
       if (m_invertLogging)
-        B2LOG(m_logLevel, 0, "Obtained " << name << " from database chain. IoV=" << result.second);
-      return result;
+        B2LOG(m_logLevel, 35, "Obtained " << query.name << " from database chain. IoV=" << query.iov);
+      return true;
     }
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to get " << name << " from database chain. "
+    B2LOG(m_logLevel, 35, "Failed to get " << query.name << " from database chain. "
           "No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
-  return result;
+  return false;
 }
 
 bool DatabaseChain::storeData(const std::string& name, TObject* object,

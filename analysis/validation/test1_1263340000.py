@@ -167,14 +167,16 @@ inputMdstList('default', fileList)
 
 
 # now the FEI reconstruction is done
-
+stdPi('95eff')
+stdK('85eff')
+stdE('90eff')
+stdMu('90eff')
 
 # Calling standard particle lists
-fillParticleList('pi+:95eff', 'pt>0.05')
-fillParticleList('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<2.8')
-fillParticleList('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3 <useCMSFrame(p)<1.8')
-fillParticleList('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<1.8')
-
+applyCuts('pi+:95eff', 'pt>0.05')
+applyCuts('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 
 stdPi0s('eff40')
 cutAndCopyList('pi+:sig', 'pi+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
@@ -267,7 +269,7 @@ Bsig_BpDstar_tool += ['InvMass', '^B+:sig -> ^D*0:sigDstar ^tau+:mytau ']
 Bsig_BpDstar_tool += ['EventMetaData', '^B+:sig']
 Bsig_BpDstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]', '^B+:sig ->^D*0:sigDstar tau+:mytau']
 Bsig_BpDstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
     '^B+:sig ->D*0:sigDstar tau+:mytau']
 
 Y4S_BpDstar_tool = ['MCTruth', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar ^tau-:mytau] ^B+:tag']
@@ -282,7 +284,7 @@ Y4S_BpDstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]',
                      'Upsilon(4S) -> [^B-:sig ->^D*0:sigDstar ^tau-:mytau] ^B+:tag']
 Y4S_BpDstar_tool += ['CustomFloats[m2Recoil:decayAngle(0,1)]', 'Upsilon(4S) -> ^B-:sig B+:tag']
 Y4S_BpDstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
     'Upsilon(4S) -> ^B-:sig B+:tag']
 Y4S_BpDstar_tool += ['CustomFloats[daughter(0,dr):daughter(0,dz):daughter(0,pt):daughter(0,p)]',
                      'Upsilon(4S) -> [B-:sig -> D*0:sigDstar ^tau-:mytau ] B+:tag']

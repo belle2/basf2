@@ -1,0 +1,35 @@
+# EventType: 1150020001
+# Descriptor: [B0 -> K0 nu anti-nu ]cc
+# NickName: Bd_K0nunubar
+# Documentation: b->s nu nubar rare process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: James Kahn
+# Email: kahn.jms@gmail.com, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20180331
+#
+
+# Need to define B0 mass eigenstates for VSS_BMIX model
+Define dm 0.510e12
+
+# Set the Upsilon(4S) to decay entirely into our signal B's
+Decay Upsilon(4S)
+1.0 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
+Enddecay
+
+# Set the signal side B decay, need the other side to decay generically for tagging
+Decay B0sig
+1.0 K0 nu_e anti-nu_e PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+#
+#
+Decay K0
+1.0000 K_S0         PHOTOS PHSP ;
+Enddecay
+CDecay anti-K0
+
+
+# Signal EOF
+End

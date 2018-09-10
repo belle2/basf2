@@ -6,3 +6,4 @@ dbstore/BKLMADCThreshold 1 0,0,-1,-1
 dbstore/BKLMTimeWindow 1 0,0,-1,-1
 dbstore/BKLMElectronicMappings 1 0,0,-1,-1
 dbstore/BKLMElectronicMappings 2 0,0,-1,-1
+dbstore/BKLMElectronicMappings 3 0,0,-1,-1

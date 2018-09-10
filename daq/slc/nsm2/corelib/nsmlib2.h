@@ -63,11 +63,7 @@ struct NSMcontext_struct {
   /* seq */
   int  seq;
 
-  /* errc:
-     error code (when can't be returned), or
-     errno of the system call, or
-     timeout count
-     */
+  /* error code (when can't be returned) */
   int  errc;
   char errs[1024]; /* error string in case of NSMEUNEXPECTED */
 
@@ -143,8 +139,9 @@ NSMcontext* nsmlib_init(const char* nodename, const char* host,
                         int port, int shmkey);
 void nsmlib_usesig(NSMcontext* nsmc, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
-NSMcontext* nsmlib_selectu(int usesig, unsigned int msec, unsigned int usec);
 void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
+NSMparse* nsmlib_parsefile(const char* datname, int revision,
+                           const char* incpath, char* fmtstr, int* revisionp);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
 __dummy_open_bracket_to_cheat_emacs_auto_indent {

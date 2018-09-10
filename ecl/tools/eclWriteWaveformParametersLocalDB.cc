@@ -27,7 +27,7 @@ int main()
   WaveformParametersTree->SetBranchAddress("HadronPar", &treeHadronPar11);
   WaveformParametersTree->SetBranchAddress("DiodePar", &treeDiodePar11);
   //
-  bool ParameterCheck = true;
+
   //
   Belle2::DBImportObjPtr<Belle2::ECLDigitWaveformParameters> importer("ECLDigitWaveformParameters");
   importer.construct();

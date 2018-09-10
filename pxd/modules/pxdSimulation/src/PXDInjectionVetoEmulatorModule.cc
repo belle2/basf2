@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdSimulation/PXDInjectionVetoEmulatorModule.h>
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/GeoTools.h>
 
 #include <vector>
 
@@ -41,7 +43,7 @@ PXDInjectionVetoEmulatorModule::PXDInjectionVetoEmulatorModule() : Module()
   addParam("noiseBunchRevolutionTime",
            m_revolutionTime, "Noise bunch revolution time in ns", 10000.0);
   addParam("pxdGatedModeLumiFraction",
-           m_pxdGatedModeLumiFraction, "Fraction of events which are affected by PXD gated mode", 0.18);
+           m_pxdGatedModeLumiFraction, "Fraction of events which are affected by PXD gated mode", 0.2);
 
 }
 
@@ -50,8 +52,9 @@ void PXDInjectionVetoEmulatorModule::initialize()
   //Register output collections
   m_storePXDIBTiming.registerInDataStore(m_PXDIBTimingName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
 
-  // Number of PXD gates
-  m_nGates = 192;
+  // Get number of PXD gates
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  m_nGates = gTools->getNumberOfPXDReadoutGates();
 }
 
 void PXDInjectionVetoEmulatorModule::event()

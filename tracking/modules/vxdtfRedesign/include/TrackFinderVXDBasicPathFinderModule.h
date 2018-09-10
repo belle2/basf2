@@ -100,7 +100,7 @@ namespace Belle2 {
     unsigned short m_PARAMmaxFamilies = 10000;
 
     /** Maximal number of paths per event; if exceeded, the execution of the trackfinder will be stopped. */
-    unsigned int m_PARAMmaxPaths = 300000;
+    unsigned int m_PARAMmaxPaths = 400000;
 
     /// member variables
     /** CA algorithm */

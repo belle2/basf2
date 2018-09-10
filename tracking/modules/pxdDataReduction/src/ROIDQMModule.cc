@@ -659,7 +659,7 @@ void ROIDQMModule::createHistosDictionaries()
                                   (Belle2::VxdID)*itPxdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
-        [this, itPxdSensors](TH1 * hPtr, const PXDIntercept * inter) {
+        [this](TH1 * hPtr, const PXDIntercept * inter) {
           for (auto& it : m_pxdDigits) {
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());

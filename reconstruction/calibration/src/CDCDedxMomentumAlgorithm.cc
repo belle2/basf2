@@ -70,19 +70,20 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
   psname.str(""); psname << "dedx_momentum.ps";
 
   // fit histograms to get gains in bins of cos(theta)
-  int size = (m_DBMomentumCor) ? m_DBMomentumCor->getSize() : 0;
   std::vector<double> momentum;
   for (unsigned int i = 0; i < nbins; ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
     dedxp[i].DrawCopy("hist");
 
-    double mean = (nbins == size) ? m_DBMomentumCor->getMean(i) : 1.0;
+    double mean = 1.0;
     if (dedxp[i].Integral() < 10)
       momentum.push_back(mean); // FIXME! --> should return not enough data
     else {
       if (dedxp[i].Fit("gaus")) {
+        B2WARNING("Fit failed...");
         momentum.push_back(mean); // FIXME! --> should return not enough data
       } else {
+        B2WARNING("Fit succeeded: " << mean << "\t" << dedxp[i].GetFunction("gaus")->GetParameter(1));
         mean *= dedxp[i].GetFunction("gaus")->GetParameter(1);
         momentum.push_back(mean);
       }
@@ -95,6 +96,7 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
   ctmp->Print(psname.str().c_str());
 
   B2INFO("dE/dx Calibration done for CDC dE/dx momentum correction");
+  std::cout << "dE/dx Calibration done for CDC dE/dx momentum correction" << std::endl;
 
   CDCDedxMomentumCor* gain = new CDCDedxMomentumCor(momentum);
   saveCalibration(gain, "CDCDedxMomentumCor");

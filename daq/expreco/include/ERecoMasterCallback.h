@@ -20,23 +20,23 @@ namespace Belle2 {
   class ERecoMasterCallback : public RCCallback {
 
   public:
-    ERecoMasterCallback() throw();
-    virtual ~ERecoMasterCallback() throw() {}
+    ERecoMasterCallback();
+    virtual ~ERecoMasterCallback() {}
 
   public:
-    virtual void initialize(const DBObject& obj) throw(RCHandlerException);
-    virtual void configure(const DBObject& obj) throw(RCHandlerException);
-    virtual void monitor() throw(RCHandlerException);
-    virtual void ok(const char* node, const char* data) throw();
-    virtual void error(const char* node, const char* data) throw();
-    virtual void load(const DBObject& obj) throw(RCHandlerException);
-    virtual void start(int expno, int runno) throw(RCHandlerException);
-    virtual void stop() throw(RCHandlerException);
-    virtual void recover(const DBObject& obj) throw(RCHandlerException);
-    virtual bool resume(int subno) throw(RCHandlerException);
-    virtual bool pause() throw(RCHandlerException);
-    virtual void abort() throw(RCHandlerException);
-    virtual bool perform(NSMCommunicator& com) throw();
+    virtual void initialize(const DBObject& obj);
+    virtual void configure(const DBObject& obj);
+    virtual void monitor();
+    virtual void ok(const char* node, const char* data);
+    virtual void error(const char* node, const char* data);
+    virtual void load(const DBObject& obj, const std::string& runtype);
+    virtual void start(int expno, int runno);
+    virtual void stop();
+    virtual void recover(const DBObject& obj, const std::string& runtype);
+    virtual bool resume(int subno);
+    virtual bool pause();
+    virtual void abort();
+    virtual bool perform(NSMCommunicator& com);
 
   public:
     void setState(NSMNode& node, const RCState& state);

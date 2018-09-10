@@ -185,7 +185,7 @@ roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', iden
 expertVars = ['extraInfo(Deep_CS)', 'transformedNetworkOutput(Deep_CS,0.1,1.0)']
 
 # Create output file with all sets of variables.
-variablesToNTuple('B0', variables + expertVars, treename='tree', filename=outfile, path=roe_path)
+variablesToNtuple('B0', variables + expertVars, treename='tree', filename=outfile, path=roe_path)
 
 analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

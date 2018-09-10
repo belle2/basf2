@@ -32,7 +32,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] timeShift Time shift.
      */
-    EKLMTimeCalibrationData(float timeShift);
+    explicit EKLMTimeCalibrationData(float timeShift);
 
     /**
      * Destructor.
@@ -47,7 +47,7 @@ namespace Belle2 {
     /**
      * Get time shift.
      */
-    float getTimeShift();
+    float getTimeShift() const;
 
   private:
 

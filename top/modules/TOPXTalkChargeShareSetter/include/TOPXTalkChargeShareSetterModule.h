@@ -91,8 +91,9 @@ namespace Belle2 {
       10; /**< the number of samples by which the second peak should exist from the CFD timing, used for cross talk identification */
 
     bool m_checkPreValleyForXTalkId =
-      true; /** require existence of pre-valley. If any negative values are given for m_preValleyDepthLoose, m_preValleyDepthTight, or m_nSampleBefore, this will be false */
+      true; /**< require existence of pre-valley. If any negative values are given for m_preValleyDepthLoose, m_preValleyDepthTight, or m_nSampleBefore, this will be false */
+
     bool m_checkPostValleyForXTalkId =
-      true; /** require existence of post-valley and 2nd peak. If any negative values are given for m_2ndPeakAmplitudeLoose, m_2ndPeakAmplitudeRatioTight, or m_nSampleAfter, this will be false */
+      true; /**< require existence of post-valley and 2nd peak. If any negative values are given for m_2ndPeakAmplitudeLoose, m_2ndPeakAmplitudeRatioTight, or m_nSampleAfter, this will be false */
   };
 };

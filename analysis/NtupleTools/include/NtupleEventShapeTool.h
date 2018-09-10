@@ -36,7 +36,8 @@ namespace Belle2 {
     float m_fMissingMomentumCMS[3];  /**< The missing momentum of the event in the CMS  */
     float m_fMissingEnergyCMS;       /**< The missing energy of the event in the CMS  */
     float m_fMissingMass2 ;          /**< The missing mass squared  */
-    float m_fVisibleEnergy;          /**< The visible energy of the event in the CMS  */
+    float m_fVisibleEnergyCMS;       /**< The visible energy of the event in the CMS  */
+    float m_fTotalPhotonsEnergy;     /**< Total energy of the photons in the event in lab system  */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

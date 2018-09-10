@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Thomas Hauth                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,12 @@
 #ifndef TRGSUMMARY_H
 #define TRGSUMMARY_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
+
+#include <TROOT.h>
+#include <TColor.h>
+
+#include <sstream>
 
 namespace Belle2 {
 
@@ -26,9 +31,15 @@ namespace Belle2 {
    *   timType
    *     types of trigger timing source defined in b2tt firmware
    */
-  class TRGSummary : public TObject {
+  class TRGSummary : public RelationsObject {
 
   public:
+
+    /** size of a l1 trigger word */
+    static const unsigned int c_trgWordSize = 32;
+
+    /** number of l1 trigger words */
+    static const unsigned int c_ntrgWords = 10;
 
     /** types of trigger timing source defined in b2tt firmware */
     enum ETimingType {
@@ -95,6 +106,9 @@ namespace Belle2 {
     /**set the prescale factor of each bit*/
     void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
 
+    /**set the input bits*/
+    void setInputBits(int i, int word) {m_inputBits[i] = word;}
+
     /**set the ftdl bits, the same as setTRGSummary(int i, int word)*/
     void setFtdlBits(int i, int word) {m_ftdlBits[i] = word;}
 
@@ -106,6 +120,9 @@ namespace Belle2 {
 
     /** get the prescale factor which the bit is corresponding*/
     unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
+
+    /**set the timType */
+    void setTimType(ETimingType timType) {m_timType = timType;}
 
     /*! get input bits
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
@@ -142,7 +159,54 @@ namespace Belle2 {
       return m_timType;
     }
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const override
+    {
+      std::stringstream htmlOutput;
+
+      htmlOutput << "<table>";
+      htmlOutput << "<tr><td></td><td bgcolor='#cccccc'>GDL Input</td><td bgcolor='#cccccc' colspan='2'>GDL Output</td></tr>";
+      htmlOutput << "<tr><td>Bit</td><td>Input Bits</td><td>Final Trg DL</td><td>Prescaled Trg and Mask</td></tr>";
+
+      for (unsigned int currentBit = 0; currentBit < (c_ntrgWords * c_trgWordSize);
+           currentBit++) {
+        htmlOutput << "<tr>";
+
+        const auto currentWord = currentBit / c_trgWordSize;
+        const auto currentBitInWord = currentBit % c_trgWordSize;
+
+        const auto ftdlBit = (getFtdlBits(currentWord)
+                              & (1 << currentBitInWord)) > 0;
+        const auto psnmBit = (getPsnmBits(currentWord)
+                              & (1 << currentBitInWord)) > 0;
+        const auto inputBit = (getInputBits(currentWord)
+                               & (1 << currentBitInWord)) > 0;
+
+        htmlOutput << "<td>" << currentBit << "(word " << currentWord
+                   << " bit " << currentBitInWord << ")</td>";
+        htmlOutput << outputBitWithColor(inputBit);
+        htmlOutput << outputBitWithColor(ftdlBit);
+        htmlOutput << outputBitWithColor(psnmBit);
+        htmlOutput << "</tr>";
+      }
+      htmlOutput << "</table>";
+
+      return htmlOutput.str();
+    }
+
   private:
+
+    /** return the td part of an HTML table with green of the bit is > 0 */
+    std::string outputBitWithColor(bool bit) const
+    {
+      const std::string colorNeutral = gROOT->GetColor(kWhite)->AsHexString();
+      const std::string colorAccept = gROOT->GetColor(kGreen)->AsHexString();
+
+      std::string color = bit > 0 ? colorAccept : colorNeutral;
+      std::stringstream outStream;
+      outStream << "<td bgcolor=\"" << color << "\">" << bit << "</td>";
+      return outStream.str();
+    }
 
     /**
      * version of this code
@@ -150,24 +214,24 @@ namespace Belle2 {
     static const int c_Version = 1;
 
     /** input bits from subdetectors */
-    unsigned int m_inputBits[10] = {0};
+    unsigned int m_inputBits[c_ntrgWords] = {0};
 
     /** ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
-    unsigned int m_ftdlBits[10] = {0};
+    unsigned int m_ftdlBits[c_ntrgWords] = {0};
 
     /*! psnm (PreScale aNd Mask) bits. Prescaled ftdl bits
      * For instance, if the prescale factor is 20 of a ftdl bit, only 1/20 of its psnm bit would be fired.
      */
-    unsigned int m_psnmBits[10] = {0};
+    unsigned int m_psnmBits[c_ntrgWords] = {0};
 
     /** types of trigger timing source defined in b2tt firmware */
     ETimingType m_timType = TTYP_NONE;
 
     /** the prescale factor of each bit*/
-    unsigned int m_prescaleBits[10][32] = {0};
+    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
-    ClassDef(TRGSummary, 3);
+    ClassDefOverride(TRGSummary, 4);
 
   };
 

@@ -17,12 +17,18 @@
 #include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
 
+
+extern "C" {
+  void set_alignment_(int*, float*, float*, float*, float*, float*, float*);
+}
+
 using namespace std;
 
 namespace Belle2 {
   namespace TOP {
 
     bool TOPconfigure::m_configured(false);
+    DBObjPtr<TOPCalModuleAlignment> TOPconfigure::m_alignment;
 
     TOPconfigure::TOPconfigure()
     {
@@ -113,10 +119,41 @@ namespace Belle2 {
         arrangePMT(id, c_Left, pmtArray.getSizeX(), pmtArray.getSizeY(), x0, y0);
       }
 
+      // alignment
+      setAlignmentConstants();
+      m_alignment.addCallback(&setAlignmentConstants);
+
       m_configured = TOPfinalize(0);
       if (!m_configured) B2ERROR("TOPconfigure: configuration failed");
 
     }
+
+    void TOPconfigure::setAlignmentConstants()
+    {
+      if (!m_alignment.isValid()) {
+        B2ERROR("TOPconfigure: No valid alignment for TOP found in database");
+        return;
+      }
+
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      for (unsigned i = 0; i < geo->getNumModules(); i++) {
+        int moduleID = i + 1;
+        if (m_alignment->isCalibrated(moduleID)) {
+          int id = i;
+          float dx = m_alignment->getX(moduleID);
+          float dy = m_alignment->getY(moduleID);
+          float dz = m_alignment->getZ(moduleID);
+          float alfa = m_alignment->getAlpha(moduleID);
+          float beta = m_alignment->getBeta(moduleID);
+          float gama = m_alignment->getGamma(moduleID);
+          set_alignment_(&id, &dx, &dy, &dz, &alfa, &beta, &gama);
+        }
+      }
+
+      B2INFO("TOPconfigure: Alignment constants are set in reconstruction");
+
+    }
+
 
   } // top namespace
 } // Belle2 namespace

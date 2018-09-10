@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
@@ -27,6 +28,7 @@ namespace Belle2 {
      * return energy
      */
     double particleE(const Particle* part);
+
 
     /**
      * return momentum component x
@@ -104,17 +106,23 @@ namespace Belle2 {
     double particlePhiErr(const Particle* part);
 
     /**
+     * return the particle scaled momentum, i.e. the particle's momentum divided by the
+     * maximum momentum allowed for a particle of its mass.
+     */
+    double particleXp(const Particle* part);
+
+    /**
      * return particle's pdg code
      */
     double particlePDGCode(const Particle* part);
 
     /**
-     * return cosine of angle between momentum and vertex vector in xy-plane (vector connecting ip and fitted vertex) of this particle
+     * return cosine of angle between momentum and vertex vector in particle xy-plane in LAB frame (origin of vertex vector is IP)
      */
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part);
 
     /**
-     * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
+     * return cosine of angle between momentum and vertex vector of particle in LAB frame (origin of vertex vector is IP)
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
@@ -123,6 +131,13 @@ namespace Belle2 {
      * if only a single massless particle like a neutrino is missing in the reconstruction.
      */
     double cosThetaBetweenParticleAndNominalB(const Particle* part);
+
+    /**
+     * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided"
+     * assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are
+     * automatically loaded by the function, given the accelerators conditions.
+     */
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
 
     /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
@@ -140,51 +155,7 @@ namespace Belle2 {
      */
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
-    /**
-     * return scaled mometnum
-     */
-    double particleXp(const Particle* part);
 
-    /**
-     * return distance relative to interaction point
-     */
-    double particleDistance(const Particle* part);
-
-    /**
-     * return significance of distance relative to interaction point
-     * (distance relative to interaction point)/ ( error on distance measurement )
-     */
-    double particleDistanceSignificance(const Particle* part);
-
-    /**
-     * return position in x relative to interaction point
-     */
-    double particleDX(const Particle* part);
-
-    /**
-     * return position in y relative to interaction point
-     */
-    double particleDY(const Particle* part);
-
-    /**
-     * return position in z relative to interaction point
-     */
-    double particleDZ(const Particle* part);
-
-    /**
-     * return transverse distance relative to interaction point
-     */
-    double particleDRho(const Particle* part);
-
-    /**
-     * return vertex azimuthal angle
-     */
-    double particleDPhi(const Particle* part);
-
-    /**
-     * return vertex polar angle
-     */
-    double particleDCosTheta(const Particle* part);
 
     /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix
@@ -233,28 +204,6 @@ namespace Belle2 {
      * return signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass
      */
     double particleInvariantMassBeforeFitSignificance(const Particle* part);
-
-    /**
-     * returns the squared missing mass of the signal side which is calculated in the CMS frame under the assumption that the signal and
-     * tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and
-     * the tag side must be the first, the signal side the second daughter!
-     */
-    double missingMass(const Particle* part);
-
-    /**
-     * returns the difference of the beam momentum and the particle momentum in the lab system
-     */
-    double missingMomentum(const Particle* part);
-
-    /**
-     * returns the polar angle of the missing momentum vector between the beam and the particle in the lab system
-     */
-    double missingMomentumTheta(const Particle* part);
-
-    /**
-     * returns the azimuthal angle of the missing momentum vector between the beam and the particle in the lab system
-     */
-    double missingMomentumPhi(const Particle* part);
 
     /**
      * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
@@ -312,6 +261,157 @@ namespace Belle2 {
     double particleCharge(const Particle* part);
 
     /**
+    <<<<<<< Updated upstream
+    =======
+     * return 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCInitialParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCVirtualParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non-FSR MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCFSRParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCPhotosParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non-ISR MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCISRParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
+     */
+    double isSignal(const Particle* part);
+
+    /**
+     * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
+     * Misidentification of charged FSP is allowed.
+     */
+    double isExtendedSignal(const Particle* part);
+
+    /**
+     * return 1 if Particle is correctly reconstructed (SIGNAL including misssing neutrino), 0 otherwise
+     */
+    double isSignalAcceptMissingNeutrino(const Particle* part);
+
+    /**
+     * check the PDG code of a particles MC mother
+     */
+    double genMotherPDG(const Particle* particle);
+
+    /**
+     * check the array index of a particle's MC mother
+     */
+    double genMotherIndex(const Particle* particle);
+
+    /**
+     * generated momentum of a particles MC mother
+     */
+    double genMotherP(const Particle* particle);
+
+    /**
+     * check the array index of a particle's related MCParticle
+     */
+    double genParticleIndex(const Particle* particle);
+
+    /**
+     * return PDG code of matched MCParticle
+     */
+    double particleMCMatchPDGCode(const Particle* particle);
+
+    /**
+     * return combination of MCMatching::MCErrorFlags flags.
+     */
+    double particleMCErrors(const Particle* particle);
+
+    /**
+     * return the weight of the Particle -> MCParticle relation (only for the first Relation = largest weight)
+     */
+    double particleMCMatchWeight(const Particle* particle);
+
+    /**
+     * return the number of relations of this Particle to MCParticle
+     */
+    double particleNumberOfMCMatch(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCPrimaryParticle(const Particle* particle);
+
+    /**
+     * return the true momentum transfer to lepton pair in a B (semi-) leptonic B meson decay
+     */
+    double particleMCMomentumTransfer2(const Particle* part);
+
+    /**
+     * return decay time of matched MCParticle (-999.0 if the particle is not matched)
+     * note this is the delta time between decay of the particle and collision
+     */
+    double particleMCMatchDecayTime(const Particle* particle);
+
+    /**
+     * return life time of matched mc particle in CMS frame.
+     */
+    double particleMCMatchLifeTime(const Particle* particle);
+
+    /**
+     * return px of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchPX(const Particle* particle);
+
+    /**
+     * return py of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchPY(const Particle* particle);
+
+    /**
+     * return pz of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchPZ(const Particle* particle);
+
+    /**
+     * return decay x-Vertex of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchDX(const Particle* particle);
+
+    /**
+     * return decay y-Vertex of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchDY(const Particle* particle);
+
+    /**
+     * return decay z-Vertex of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchDZ(const Particle* particle);
+
+    /**
+     * return Energy of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchE(const Particle* particle);
+
+    /**
+     * return total momentum of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchP(const Particle* particle);
+
+    /**
+     * return recoiling mass against the particles appended as particle's daughters.
+     * MC truth values are used in the calculations.
+     */
+    double particleMCRecoilMass(const Particle* particle);
+
+    /**
+    >>>>>>> Stashed changes
      * return component x of 3-momentum recoiling against given Particle
      */
     double recoilPx(const Particle* particle);
@@ -330,6 +430,23 @@ namespace Belle2 {
      * return magnitude of 3-momentum recoiling against given Particle
      */
     double recoilMomentum(const Particle* particle);
+
+    /**
+     * returns the polar angle of the missing momentum vector between the beam and the particle in the lab system
+     */
+    double recoilMomentumTheta(const Particle* part);
+
+    /**
+     * returns the azimuthal angle of the missing momentum vector between the beam and the particle in the lab system
+     */
+    double recoilMomentumPhi(const Particle* part);
+
+    /**
+     * returns the squared missing mass of the signal side which is calculated in the CMS frame under the assumption that the signal and
+     * tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and
+     * the tag side must be the first, the signal side the second daughter!
+     */
+    double m2RecoilSignalSide(const Particle* part);
 
     /**
      * returns the impact parameter D of the given particle in the xy plane
@@ -382,9 +499,14 @@ namespace Belle2 {
     double infinity(const Particle*);
 
     /**
-     * return a random number between 0 and 1
+     * return a random number between 0 and 1 for each candidate
      */
     double random(const Particle*);
+
+    /**
+     * return a random number between 0 and 1 for each event
+     */
+    double eventRandom(const Particle*);
 
     /**
      * returns the theta angle (lab) that is back-to-back (cms) to the particle
@@ -398,8 +520,9 @@ namespace Belle2 {
 
     /**
      * return Kshort using Belle goodKS algorithm
-    */
+     */
     double goodBelleKshort(const Particle* KS);
+
 
   }
 } // Belle2 namespace

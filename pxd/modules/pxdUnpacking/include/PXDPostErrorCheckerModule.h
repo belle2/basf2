@@ -11,9 +11,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
-
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDRawROIs.h>
+#include <pxd/dataobjects/PXDRawCluster.h>
 
 namespace Belle2 {
 
@@ -35,10 +39,30 @@ namespace Belle2 {
       void event() override final;
 
     private:
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
+      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
+      std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
+      std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
+      std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
+
+      /** Critical error mask which defines return value of task */
+      uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+
+      /** Flag: Ignore different triggergate between DHEs */
+      bool m_ignoreTriggerGate;
+      /** Flag: Ignore different dhp frame between DHEs */
+      bool m_ignoreDHPFrame;
 
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
-
+      /** Output array for Raw Hits. */
+      StoreArray<PXDRawHit> m_storeRawHits;
+      /** Output array for Raw ROIs. */
+      StoreArray<PXDRawROIs> m_storeROIs;
+      /** Output array for Raw Adcs. */
+      StoreArray<PXDRawAdc> m_storeRawAdc;
+      /** Output array for Clusters. */
+      StoreArray<PXDRawCluster> m_storeRawCluster;
     };//end class declaration
 
 

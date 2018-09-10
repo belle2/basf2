@@ -808,7 +808,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
         hist_avr_rB0bar.Fill(abs(dilutionB0bar2[i]), abs(dilutionB0bar2[i]) * back[i])
         # filling histogram with abs(qr)**2 special weighted - needed for std dev of r calculation
         hist_ms_rB0.Fill(abs(dilutionB02[i]), abs(dilutionB02[i] * dilutionB02[i]) * signal[i])
-        hist_ms_rB0bar.Fill(abs(dilutionB0bar2[i]), abs(dilutionB0bar2[i] * dilutionB02[i]) * back[i])
+        hist_ms_rB0bar.Fill(abs(dilutionB0bar2[i]), abs(dilutionB0bar2[i] * dilutionB0bar2[i]) * back[i])
 
     # hist_avr_rB0bar contains now the average r-value
     hist_avr_rB0.Divide(histo_entries_per_binB0)

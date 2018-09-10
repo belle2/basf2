@@ -6,7 +6,7 @@
 #
 # Execute as: basf2 hotpixel_caf_onsen.py -- --filepath_pattern='/whatever/*.root'
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
@@ -52,14 +52,12 @@ hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration 
 # We can play around with hotpixelkiller parameters
 hotpixelkiller.forceContinueMasking = True   # Continue masking even when few/no events were collected
 hotpixelkiller.minEvents = 30000             # Minimum number of events = typical size of one subrun
-hotpixelkiller.minHits = 5                   # Only consider pixels for masking with certain minimum number of hits
-hotpixelkiller.pixelMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.minHits = 15                   # Only consider pixels for masking with certain minimum number of hits
+hotpixelkiller.pixelMultiplier = 5          # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskDrains = True             # Set True to allow masking of hot drain lines
-hotpixelkiller.minHitsDrain = 50             # Only consider drain lines for masking with certain minimum number of hits
-hotpixelkiller.drainMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.drainMultiplier = 5          # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskRows = True               # Set True to allow masking of hot rows
-hotpixelkiller.minHitsRow = 50               # Only consider rows for masking with certain minimum number of hits
-hotpixelkiller.rowMultiplier = 10            # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.rowMultiplier = 5            # Occupancy threshold is median occupancy x multiplier
 # We want to use a specific collector collecting from raw hits
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
 
@@ -84,7 +82,7 @@ cal.max_files_per_collector_job = 1
 cal_fw = CAF()
 cal_fw.add_calibration(cal)
 # cal_fw.backend = backends.LSF()
-cal_fw.backend = backends.Local(max_processes=2)
+cal_fw.backend = backends.Local(max_processes=6)
 # Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
 cal_fw.heartbeat = 30
 # Can change where your calibration runs

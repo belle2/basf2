@@ -42,7 +42,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         cutAndCopyList(
             'gamma:loose',
             'gamma:all',
-            'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]',
+            'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]',
             True,
             path)
     # additional region dependent energy cuts
@@ -58,7 +58,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff20',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.075] or [clusterReg == 3 and E > 0.075]] and \
             [abs(clusterTiming) < formula(0.1 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
             True,
@@ -67,7 +67,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff30',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.075]] and \
             [abs(clusterTiming) < formula(0.5 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
             True,
@@ -76,7 +76,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff40',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.03] or [clusterReg == 3 and E > 0.075]] and \
             [abs(clusterTiming) < formula(0.5 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.5 or E > 0.1] ',
             True,
@@ -85,7 +85,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff50',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.05] or [clusterReg == 2 and E > 0.03] or [clusterReg == 3 and E > 0.05]] and \
             [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
             True,
@@ -94,7 +94,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff60',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
             [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
             True,
@@ -109,6 +109,16 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
 # Used in skimming code
 def loadStdSkimPhoton(path=analysis_main):
+    """
+    Function to prepare the skim photon lists.
+
+    Warning:
+        Should only be used by skims.
+
+    Parameters:
+        path (basf2.Path): modules are added to this path
+
+    """
     stdPhotons('loose', path)
     cutAndCopyList(
         'gamma:skim',
@@ -121,6 +131,13 @@ def loadStdSkimPhoton(path=analysis_main):
 
 
 def loadStdGoodBellePhoton(path=analysis_main):
+    """
+    Load the Belle goodBelle list. Creates a ParticleList named
+    'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'
+
+    Parameters:
+        path (basf2.Path): the path to load the modules
+    """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)
 
@@ -128,10 +145,18 @@ def loadStdGoodBellePhoton(path=analysis_main):
 
 
 def loadStdPhotonE12(path=analysis_main):
+    """
+    Warning:
+        This function is deprecated.
+    """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:E12', 'gamma:all', '1.2 < E < 100', True, path)
 
 
 def loadStdPhotonE15(path=analysis_main):
+    """
+    Warning:
+        This function is deprecated.
+    """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:E15', 'gamma:all', '1.5 < E < 100', True, path)

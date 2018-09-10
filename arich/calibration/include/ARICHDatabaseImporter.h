@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Manca Mrvar, Thomas Kuhr, Luka Santel, Leonid Burmistrov *
+ *               Rok Pestotnik                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +13,7 @@
 
 #include <TObject.h>
 #include <TGraph.h>
+#include <TH1.h>
 #include <TH2F.h>
 #include <TH3F.h>
 #include <TTimeStamp.h>
@@ -19,7 +21,7 @@
 #include <tuple>
 #include <vector>
 #include <iostream>
-
+#include <string>
 
 namespace Belle2 {
 
@@ -94,6 +96,14 @@ namespace Belle2 {
     void importChannelMask();
 
     /**
+     * Import channel mask from the calibration histogram  ( list of dead and hot channels )
+     * to ARICHChannelMask class into database.
+     * @param h   TH1F root histogram with 420*144 bins
+     */
+    void importChannelMask(TH1* h, int firstExp, int lastExp, int firstRun, int lastRun);
+
+
+    /**
      * Print channel mask of all HAPD modules from the database (lightweight class for sim/rec)
      */
     void printChannelMask();
@@ -160,6 +170,11 @@ namespace Belle2 {
     void importAeroTilesInfo();
 
     /**
+    * Import optical information of aerogel tiles into database
+    */
+    void importAeroRayleighScatteringFit(std::string commentSingleWord = "");
+
+    /**
      * Get aerogel ring number from global indetifier
      */
     int getAeroTileRing(int slot);
@@ -173,7 +188,6 @@ namespace Belle2 {
      * Prints mapping of aerogel tiles and their optical properties
      */
     void printAeroTileInfo();
-
 
     // DAQ classes
 
@@ -234,7 +248,7 @@ namespace Belle2 {
     /**
      * Import ARICH aerogel data in the database.
      */
-    void importAerogelInfo();
+    void importAerogelInfo(TString coreNameSuffix = "");
 
     /**
      * Export ARICH aerogel data from the database.

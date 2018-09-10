@@ -35,6 +35,8 @@ void HitLevelInfoWriterModule::initialize()
   m_dedxTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
+  m_eclClusters.isOptional();
+  m_klmClusters.isOptional();
 
   // build a map to relate input strings to the right particle type
   std::map<std::string, std::string> pdgMap = {{"pi+", "211"}, {"K+", "321"}, {"mu+", "13"}, {"e+", "11"}, {"p+", "2212"}, {"deuteron", "1000010020"}};
@@ -86,6 +88,16 @@ void HitLevelInfoWriterModule::event()
       m_expID = evtMetaData->getExperiment();
       m_runID = evtMetaData->getRun();
       m_eventID = evtMetaData->getEvent();
+
+      // fill the E/P
+      const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
+      if (eclCluster) {
+        m_eop = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+
+        // fill the muon depth
+        const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();
+        if (klmCluster) m_klmLayers = klmCluster->getLayers();
+      }
 
       // fill the TTree with the Track information
       fillTrack(fitResult);
@@ -158,6 +170,16 @@ void HitLevelInfoWriterModule::event()
       m_runID = evtMetaData->getRun();
       m_eventID = evtMetaData->getEvent();
 
+      // fill the E/P
+      const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
+      if (eclCluster) {
+        m_eop = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+
+        // fill the muon depth
+        const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();
+        if (klmCluster) m_klmLayers = klmCluster->getLayers();
+      }
+
       // fill the TTree with the Track information
       fillTrack(fitResult);
 
@@ -189,6 +211,7 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   TVector3 trackMom = fitResult->getMomentum();
   TVector3 trackPos = fitResult->getPosition();
 
+  m_pIP = trackMom.Mag();
   m_phi = trackMom.Phi();
 
   m_vx0 = trackPos.x();
@@ -213,7 +236,10 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_PDG = dedxTrack->getPDG();
 
   m_p = dedxTrack->getMomentum();
-  if (m_charge < 0) m_p *= -1;
+  if (m_charge < 0) {
+    m_p *= -1;
+    m_pIP *= -1;
+  }
 
   h_nhits = dedxTrack->size();
   l_nhits = dedxTrack->getNLayerHits();
@@ -221,12 +247,20 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
 
   m_mean = dedxTrack->getDedxMean();
   m_trunc = dedxTrack->getDedx();
+  m_truncNoSat = dedxTrack->getDedxNoSat();
   m_error = dedxTrack->getDedxError();
 
   // Get the calibration constants
   m_scale = m_DBScaleFactor->getScaleFactor();
   m_runGain = m_DBRunGain->getRunGain();
   m_cosCor = m_DBCosineCor->getMean(m_cosTheta);
+
+  m_chie = dedxTrack->getChi(0);
+  m_chimu = dedxTrack->getChi(1);
+  m_chipi = dedxTrack->getChi(2);
+  m_chik = dedxTrack->getChi(3);
+  m_chip = dedxTrack->getChi(4);
+  m_chid = dedxTrack->getChi(5);
 
   // Get the vector of dE/dx values for all layers
   double lout = 0, lin = 0, increment = 0;
@@ -323,9 +357,12 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("charge", &m_charge, "charge/I");
   m_tree[i]->Branch("costh", &m_cosTheta, "costh/D");
   m_tree[i]->Branch("pF", &m_p, "pF/D");
-  m_tree[i]->Branch("eopst", &m_eopst, "eopst/D"); // placeholder for Widget
   m_tree[i]->Branch("pdg", &m_PDG, "pdg/D");
   m_tree[i]->Branch("ioasym", &m_ioasym, "ioasym/D");
+
+  // other track level information
+  m_tree[i]->Branch("eop", &m_eop, "eop/D");
+  m_tree[i]->Branch("klmLayers", &m_klmLayers, "klmLayers/I");
 
   // calibration constants
   m_tree[i]->Branch("scale", &m_scale, "scale/D");
@@ -335,9 +372,16 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   // track level dE/dx measurements
   m_tree[i]->Branch("mean", &m_mean, "mean/D");
   m_tree[i]->Branch("dedx", &m_trunc, "dedx/D");
-  m_tree[i]->Branch("dedxsat", &m_trunc, "dedxsat/D"); // placeholder for Widget
+  m_tree[i]->Branch("dedxnosat", &m_truncNoSat, "dedxnosat/D");
   m_tree[i]->Branch("dedxerr", &m_error, "dedxerr/D");
-  m_tree[i]->Branch("chiPi", &m_chipi, "chiPi/D"); // placeholder for Widget
+
+  // PID values
+  m_tree[i]->Branch("chiE", &m_chie, "chiE/D");
+  m_tree[i]->Branch("chiMu", &m_chimu, "chiMu/D");
+  m_tree[i]->Branch("chiPi", &m_chipi, "chiPi/D");
+  m_tree[i]->Branch("chiK", &m_chik, "chiK/D");
+  m_tree[i]->Branch("chiP", &m_chip, "chiP/D");
+  m_tree[i]->Branch("chiD", &m_chid, "chiD/D");
 
   // layer level information
   m_tree[i]->Branch("lNHits", &l_nhits, "lNHits/I");

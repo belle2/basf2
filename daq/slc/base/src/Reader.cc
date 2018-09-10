@@ -6,7 +6,7 @@
 
 using namespace Belle2;
 
-void Reader::reverse(void* buf, size_t len) throw()
+void Reader::reverse(void* buf, size_t len)
 {
   char tmp;
   for (int c = 0 ; c < (int)len / 2 ; c ++) {
@@ -16,28 +16,28 @@ void Reader::reverse(void* buf, size_t len) throw()
   }
 }
 
-bool Reader::readBool() throw(IOException)
+bool Reader::readBool()
 {
   bool v;
   read(&v, sizeof(bool));
   return v;
 }
 
-char Reader::readChar() throw(IOException)
+char Reader::readChar()
 {
   char v;
   read(&v, sizeof(char));
   return v;
 }
 
-unsigned char Reader::readUChar() throw(IOException)
+unsigned char Reader::readUChar()
 {
   unsigned char v;
   read(&v, sizeof(unsigned char));
   return v;
 }
 
-short Reader::readShort() throw(IOException)
+short Reader::readShort()
 {
   short v;
   read(&v, sizeof(short));
@@ -47,7 +47,7 @@ short Reader::readShort() throw(IOException)
   return v;
 }
 
-unsigned short Reader::readUShort() throw(IOException)
+unsigned short Reader::readUShort()
 {
   unsigned short v;
   read(&v, sizeof(unsigned short));
@@ -57,7 +57,7 @@ unsigned short Reader::readUShort() throw(IOException)
   return v;
 }
 
-int Reader::readInt() throw(IOException)
+int Reader::readInt()
 {
   int v;
   read(&v, sizeof(int));
@@ -67,7 +67,7 @@ int Reader::readInt() throw(IOException)
   return v;
 }
 
-unsigned int Reader::readUInt() throw(IOException)
+unsigned int Reader::readUInt()
 {
   unsigned int v;
   read(&v, sizeof(unsigned int));
@@ -77,7 +77,7 @@ unsigned int Reader::readUInt() throw(IOException)
   return v;
 }
 
-long long Reader::readLong() throw(IOException)
+long long Reader::readLong()
 {
   long long v;
   read(&v, sizeof(long long));
@@ -87,7 +87,7 @@ long long Reader::readLong() throw(IOException)
   return v;
 }
 
-unsigned long long Reader::readULong() throw(IOException)
+unsigned long long Reader::readULong()
 {
   unsigned long long v;
   read(&v, sizeof(unsigned long long));
@@ -97,7 +97,7 @@ unsigned long long Reader::readULong() throw(IOException)
   return v;
 }
 
-float Reader::readFloat() throw(IOException)
+float Reader::readFloat()
 {
   float v;
   read(&v, sizeof(float));
@@ -107,7 +107,7 @@ float Reader::readFloat() throw(IOException)
   return v;
 }
 
-double Reader::readDouble() throw(IOException)
+double Reader::readDouble()
 {
   double v;
   read(&v, sizeof(double));
@@ -117,7 +117,7 @@ double Reader::readDouble() throw(IOException)
   return v;
 }
 
-const std::string Reader::readString() throw(IOException)
+const std::string Reader::readString()
 {
   int count = readInt();
   char str[1025];
@@ -131,7 +131,7 @@ const std::string Reader::readString() throw(IOException)
   return v;
 }
 
-void Reader::readObject(Serializable& v) throw(IOException)
+void Reader::readObject(Serializable& v)
 {
   v.readObject(*this);
 }

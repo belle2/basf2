@@ -10,7 +10,7 @@
  * out of time digits above a certain energy threshold.                   *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -208,8 +208,6 @@ void ECLDigitCalibratorModule::event()
   // Loop over the input array
   for (auto& aECLDigit : m_eclDigits) {
 
-    // create eclCalDigits if they dont exist already
-
     bool is_pure_csi = 0;
 
     // append an ECLCalDigit to the storearray
@@ -243,7 +241,7 @@ void ECLDigitCalibratorModule::event()
 
     // perform the digit timing calibration: t = c * (tfit - Te - Ts)
     const int time = aECLDigit.getTimeFit();
-    double calibratedTime = 0;
+    double calibratedTime = c_timeForFitFailed;
     if (time == -2048) {
       aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
     } else { //only calibrate digit time if we have a good waveform fit

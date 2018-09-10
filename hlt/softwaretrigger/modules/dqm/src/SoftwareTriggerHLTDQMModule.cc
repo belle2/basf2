@@ -16,6 +16,8 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 
+#include <algorithm>
+
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
@@ -134,9 +136,14 @@ void SoftwareTriggerHLTDQMModule::event()
 
       for (const std::string& cutName : cuts) {
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
-        const int cutResult = static_cast<int>(m_triggerResult->getResult(fullCutIdentifier));
 
-        m_cutResultHistograms[baseIdentifier]->Fill(cutName.c_str(), cutResult);
+        // check if the cutResult is in the list, be graceful when not available
+        auto const cutEntry = m_triggerResult->getResults().find(fullCutIdentifier);
+
+        if (cutEntry != m_triggerResult->getResults().end()) {
+          const int cutResult = cutEntry->second;
+          m_cutResultHistograms[baseIdentifier]->Fill(cutName.c_str(), cutResult);
+        }
       }
 
       const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(baseIdentifier);
@@ -149,3 +156,12 @@ void SoftwareTriggerHLTDQMModule::event()
     m_cutResultHistograms["total_result"]->Fill("total_result", totalResult);
   }
 }
+
+void SoftwareTriggerHLTDQMModule::beginRun()
+{
+  std::for_each(m_cutResultHistograms.begin(), m_cutResultHistograms.end(),
+  [](auto & it) {it.second->Reset();});
+  std::for_each(m_triggerVariablesHistograms.begin(), m_triggerVariablesHistograms.end(),
+  [](auto & it) {it.second->Reset();});
+}
+

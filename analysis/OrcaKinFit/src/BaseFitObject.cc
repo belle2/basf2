@@ -263,7 +263,7 @@ namespace Belle2 {
       covinvvalid = (result == 0);
 
       if (!covinvvalid) {
-        B2INFO("ERROR, COULD NOT INVERT COV MATR!");
+        B2WARNING("ERROR, COULD NOT INVERT COV MATR!");
 
         B2INFO("COV ");
         for (int i = 0; i < n; ++i) {
@@ -459,7 +459,6 @@ namespace Belle2 {
     void BaseFitObject::addToGlobalChi2DerMatrix(double* M, int idim) const
     {
       if (!covinvvalid) calculateCovInv();
-      assert(covinvvalid);
       for (int ilocal = 0; ilocal < getNPar(); ++ilocal) {
         if (!isParamFixed(ilocal) && isParamMeasured(ilocal)) {
           int iglobal = getGlobalParNum(ilocal);
@@ -477,12 +476,12 @@ namespace Belle2 {
     }
 
 
-    void BaseFitObject::addToGlobalChi2DerVector(double* y, int idim) const
+    int BaseFitObject::addToGlobalChi2DerVector(double* y, int idim) const
     {
       // This adds the dChi2/dpar piece
       assert(getNPar() <= BaseDefs::MAXPAR);
       if (!covinvvalid) calculateCovInv();
-      assert(covinvvalid);
+      if (!covinvvalid) return 1;
       for (int ilocal = 0; ilocal < getNPar(); ++ilocal) {
         if (!isParamFixed(ilocal) && isParamMeasured(ilocal)) {
           int iglobal = getGlobalParNum(ilocal);
@@ -490,6 +489,7 @@ namespace Belle2 {
           y[iglobal] += getDChi2DParam(ilocal);
         }
       }
+      return 0;
     }
 
 

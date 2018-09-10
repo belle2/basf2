@@ -270,7 +270,7 @@ tools4SBplusHad += [
     'CustomFloats[missPz(ROEclusters,0):missPy(ROEclusters,0):missPx(ROEclusters,0):missP(R0Eclusters,0)]',
     '^Upsilon(4S):BhadBsigp ->B+:genericRank B-:all']
 tools4SBplusHad += [
-    'CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]',
+    'CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
     '^Upsilon(4S):BhadBsigp']
 tools4SBplusHad += ['CustomFloats[d0_costheta:d0_d0_costheta:d0_costhetaCMS:d0_d0_costhetaCMS]',
                     'Upsilon(4S):BhadBsigp ->  B+:genericRank ^B-:all']
@@ -304,7 +304,7 @@ tools4SBplusSL += ['CustomFloats[missPz(ROEclusters,0):missPy(ROEclusters,0):mis
                    '^Upsilon(4S):BslBsigp ->B+:semileptonicRank B-:all']
 
 tools4SBplusSL += [
-    'CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]',
+    'CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
     '^Upsilon(4S):BslBsigp']
 tools4SBplusSL += ['CustomFloats[d0_costheta:d0_d0_costheta:d0_costhetaCMS:d0_d0_costhetaCMS]',
                    'Upsilon(4S):BslBsigp ->  B+:semileptonicRank ^B-:all']

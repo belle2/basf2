@@ -34,7 +34,7 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() : CalibrationAlgorithm("CDCDedx
 CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
 
-  B2INFO("Preparing dE/dx calibration done for CDC dE/dx electron saturation");
+  B2INFO("Preparing dE/dx calibration for CDC dE/dx electron saturation");
 
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
@@ -73,20 +73,22 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   psname.str(""); psname << "dedx_cosine.ps";
 
   // fit histograms to get gains in bins of cos(theta)
-  int size = (m_DBCosineCor) ? m_DBCosineCor->getSize() : 0;
   std::vector<double> cosine;
   for (unsigned int i = 0; i < nbins; ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
     dedxcosth[i].DrawCopy("hist");
 
-    double mean = (nbins == size) ? m_DBCosineCor->getMean(i) : 1.0;
+    TF1* mygaus = new TF1("mygaus", "gaus", 0, 2);
+    mygaus->SetParameters(10, 1.0, 0.1);
+
+    double mean = 1.0;
     if (dedxcosth[i].Integral() < 10)
       cosine.push_back(mean); // FIXME! --> should return not enough data
     else {
-      if (dedxcosth[i].Fit("gaus")) {
+      if (dedxcosth[i].Fit("mygaus")) {
         cosine.push_back(mean); // FIXME! --> should return not enough data
       } else {
-        mean *= dedxcosth[i].GetFunction("gaus")->GetParameter(1);
+        mean *= dedxcosth[i].GetFunction("mygaus")->GetParameter(1);
         cosine.push_back(mean);
       }
     }

@@ -9,6 +9,8 @@
 #include <TGraph.h>
 #include <iostream>
 #include <ecl/digitization/OfflineFitFunction.h>
+#include <assert.h>
+
 //
 // See eclComputePulseTemplates_Step0.cc for README instructions.
 //
@@ -104,6 +106,7 @@ int main(int argc, char* argv[])
     return -1;
   }
   //
+  assert(argc == 3);
   int LowCellID = atoi(argv[1]);
   int HighCellID = atoi(argv[2]);
   //

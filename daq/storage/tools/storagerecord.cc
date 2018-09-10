@@ -119,13 +119,13 @@ public:
     system(("mkdir -p " + filedir).c_str());
     m_filename = StringUtil::form("%s.%4.4d.%5.5d.%s.f%5.5d.sroot",
                                   m_runtype.c_str(), expno, runno, m_host.c_str(), m_fileid);
+    m_path = filedir + m_filename;
+    m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (g_diskid > 0 && g_diskid != m_diskid) {
       B2FATAL("disk-" << m_diskid << " is already full! Terminating process..");
       exit(1);
     }
     g_diskid = m_diskid;
-    m_path = filedir + m_filename;
-    m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (m_file < 0) {
       B2FATAL("Failed to open file : " << m_path);
       exit(1);
@@ -169,12 +169,12 @@ public:
 
   int write(char* evtbuf, int nbyte, bool isstreamer = false)
   {
+    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     int ret = ::write(m_file, evtbuf, nbyte);
     m_filesize += nbyte;
     if (!isstreamer) {
       m_nevents++;
     }
-    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     return ret;
   }
 
@@ -223,6 +223,7 @@ int main(int argc, char** argv)
   const int ibufsize = atoi(argv[2]);
   const char* hostname = argv[3];
   const char* runtype = argv[4];
+  const bool not_record = std::string(runtype) == "null";
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];
@@ -281,6 +282,7 @@ int main(int argc, char** argv)
       int nbyte = evtbuf[0];
       int nword = (nbyte - 1) / 4 + 1;
       bool isnew = false;
+      //      if (not_record) continue;
       if (hd.type == MSG_STREAMERINFO) {
         memcpy(g_streamerinfo, evtbuf, nbyte);
         g_streamersize = nbyte;
@@ -312,12 +314,14 @@ int main(int argc, char** argv)
         oheader->expno = expno;
         oheader->runno = runno;
         obuf.unlock();
-        if (file) {
-          file.close();
+        if (!not_record) {
+          if (file) {
+            file.close();
+          }
+          file.open(path, ndisks, expno, runno, fileid);
+          nbyte_out += nbyte;
+          fileid++;
         }
-        file.open(path, ndisks, expno, runno, fileid);
-        nbyte_out += nbyte;
-        fileid++;
         continue;
       }
       if (use_info) {
@@ -336,10 +340,6 @@ int main(int argc, char** argv)
         }
         file.write((char*)evtbuf, nbyte);
         nbyte_out += nbyte;
-        if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
-          obuf.write(evtbuf, nword, true);
-        }
-        count_out++;
         if (use_info) {
           info.addOutputCount(1);
           info.addOutputNBytes(nbyte);
@@ -353,6 +353,11 @@ int main(int argc, char** argv)
         }
         ecount = 1;
       }
+      // Dump data into output buffer
+      if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
+        obuf.write(evtbuf, nword, true);
+      }
+      count_out++;
     }
   }
   return 0;

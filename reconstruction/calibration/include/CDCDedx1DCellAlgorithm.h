@@ -42,8 +42,6 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object to get existing constants*/
-
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *
      * @param dedx              input values

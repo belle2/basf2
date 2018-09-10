@@ -15,7 +15,7 @@ bool SharedMemory::unlink(const std::string& path)
   return (::shm_unlink(path.c_str()) == -1);
 }
 
-SharedMemory::SharedMemory() throw()
+SharedMemory::SharedMemory()
   : m_fd(-1), m_path(), m_size(0), m_addr(NULL) {}
 
 SharedMemory::SharedMemory(const std::string& path, size_t size)
@@ -24,10 +24,10 @@ SharedMemory::SharedMemory(const std::string& path, size_t size)
 }
 
 SharedMemory::SharedMemory(const SharedMemory& file)
-throw() : m_fd(file.m_fd),  m_path(file.m_path),
-  m_size(file.m_size), m_addr(file.m_addr) {}
+  : m_fd(file.m_fd),  m_path(file.m_path),
+    m_size(file.m_size), m_addr(file.m_addr) {}
 
-SharedMemory::~SharedMemory() throw() {}
+SharedMemory::~SharedMemory() {}
 
 bool SharedMemory::open(const std::string& path, size_t size)
 {
@@ -64,7 +64,7 @@ void SharedMemory::close()
   }
 }
 
-bool SharedMemory::truncate(size_t size) throw()
+bool SharedMemory::truncate(size_t size)
 {
   if (size > 0) {
     ::ftruncate(m_fd, size);
@@ -115,12 +115,12 @@ bool SharedMemory::seekBy(size_t offset)
   return (lseek(m_fd, offset, SEEK_CUR) == -1);
 }
 
-bool SharedMemory::isOpened() throw()
+bool SharedMemory::isOpened()
 {
   return (m_fd != 0);
 }
 
-const SharedMemory& SharedMemory::operator=(const SharedMemory& file) throw()
+const SharedMemory& SharedMemory::operator=(const SharedMemory& file)
 {
   m_fd = file.m_fd;
   m_path = file.m_path;

@@ -30,7 +30,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # will roughly run for 10 hours
 eventinfosetter.param('evtNumList', [40000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # beam parameters

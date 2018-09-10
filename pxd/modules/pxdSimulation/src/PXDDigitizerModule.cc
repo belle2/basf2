@@ -9,6 +9,7 @@
 
 #include <pxd/modules/pxdSimulation/PXDDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/GeoTools.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -76,13 +77,12 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("ADCUnit", m_ADCUnit, "Slope of the linear ADC transfer curve in nA/ADU", 130.0);
   addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
   addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
-
-
   addParam("GatingTime", m_gatingTime,
-           "Time window during which the PXD is not collecting charge in nano seconds", 1400.0);
+           "Time window during which the PXD is not collecting charge in nano seconds", 400.0);
   addParam("GatingWithoutReadout", m_gatingWithoutReadout,
            "Digits from gated rows not sent to DHH ", true);
-
+  addParam("GatingWithoutReadoutTime", m_gatingWithoutReadoutTime,
+           "Time window during which digits from gated rows are not sent to DHH in nano seconds", 1400.0);
   addParam("HardwareDelay", m_hwdelay,
            "Constant time delay between bunch crossing and switching on triggergate in nano seconds", 0.0);
 
@@ -120,8 +120,10 @@ void PXDDigitizerModule::initialize()
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
 
-  // Number of PXD gates
-  m_nGates = 192;
+  // Get number of PXD gates
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  m_nGates = gTools->getNumberOfPXDReadoutGates();
+
   // Active integration time (per gate) in ns
   m_pxdIntegrationTime = 20000.0;
   // Readout time per gate (sample - clear - cycle of rolling shutter) in ns
@@ -193,7 +195,7 @@ void PXDDigitizerModule::event()
           // Compute the gate where gating started. Note the wrap around of the rolling shutter
           int firstGated = (m_triggerGate + int(gatingStartTime / m_timePerGate)) % m_nGates ;
           // Compute the gate where gating stopped. Note the wrap around of the rolling shutter
-          int lastGated = (m_triggerGate + int((gatingStartTime + m_gatingTime) / m_timePerGate)) % m_nGates ;
+          int lastGated = (m_triggerGate + int((gatingStartTime + m_gatingWithoutReadoutTime) / m_timePerGate)) % m_nGates ;
 
           if (lastGated  >= firstGated) {
             // Gated channels in the same frame

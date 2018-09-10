@@ -372,6 +372,7 @@ namespace Belle2 {
     _mcHits.clear();
 
     _signal.clear();
+    _signal.name(name());
   }
 
   string

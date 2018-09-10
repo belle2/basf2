@@ -64,6 +64,13 @@ namespace Belle2 {
     virtual void event();
 
     /**
+     * Apply correction to hit position due to non-perpendicular component of magnetic field
+     * @param hit local position of simhit
+     * @param copyno copy number of hapd
+     */
+    void magFieldDistorsion(TVector2& hit, int copyno);
+
+    /**
      * End-of-run action.
      *
      * Save run-related stuff, such as statistics.
@@ -99,6 +106,7 @@ namespace Belle2 {
     double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
     double m_timeWindow;             /**< Readout time window width */
     double m_bkgLevel;               /**< Number of background hits ped hapd per readout (electronics noise) */
+    int m_bdistort;                  /**< apply distorsion due to magnetic field */
 
   };
 

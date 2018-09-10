@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Luka Santelj, Leonid Burmistrov                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -35,11 +35,27 @@ namespace Belle2 {
 
     /**
      * Struct to hold aerogel layer parameters
+     * Only for averaged properties of the aerogel tiles/layers
      */
     struct layer {
       double thickness;
       double refIndex;
       double trLength;
+      std::string material;
+    };
+
+    /**
+     * Struct to hold individual aerogel tile parameters
+     * layer : 0 - up
+     * layer : 1 - down
+     */
+    struct tilestr {
+      int ring;
+      int column;
+      int layer;
+      double n;
+      double transmL;
+      double thick;
       std::string material;
     };
 
@@ -98,6 +114,21 @@ namespace Belle2 {
      * @param gap gap size
      */
     void setTileGap(double gap) {m_tileGap = gap;}
+
+    /**
+     * Add parameters of individual tile
+     * @param ring aerogel tile ring ID (range : [1;4])
+     * @param column aerogel tile column ID (range : [1;22] [1;28] [1;34] [1;40])
+     * @param layer aerogel tile layer ID (layer : 0 - up; layer : 1 - down)
+     * @param n aerogel tile refractive index
+     * @param transmL aerogel tile rayleigh scattering length
+     * @param thick aerogel tile thickness
+     * @param material aerogel tile material name
+     */
+    void addTileParameters(int ring, int column, int layerN, double n, double transmL, double thick, const std::string& material)
+    {
+      m_tiles.push_back({ ring, column, layerN, n, transmL, thick, material });
+    }
 
     /**
      * get position vector of aerogel plane in ARICH local frame
@@ -207,6 +238,12 @@ namespace Belle2 {
     }
 
     /**
+     * Set vector of numbers of aerogel slots in individual ring
+     * @param nAeroSlotsIndividualRing vector of numbers of aerogel slots in individual ring
+     */
+    void setNAeroSlotsIndividualRing(std::vector<int>& nAeroSlotsIndividualRing) { m_nAeroSlotsIndividualRing = nAeroSlotsIndividualRing; }
+
+    /**
      * Get number of aerogel layers
      * @return number of aerogel layers
      */
@@ -299,6 +336,15 @@ namespace Belle2 {
     }
 
     /**
+     * Get vector of numbers of aerogel slots in individual ring
+     * @param nAeroSlotsIndividualRing vector of numbers of aerogel slots in individual ring
+     */
+    const std::vector<int>& getNAeroSlotsIndividualRing() const
+    {
+      return m_nAeroSlotsIndividualRing;
+    }
+
+    /**
      * Get starting Z position of first aerogel layer
      * @return starting z
      */
@@ -306,6 +352,131 @@ namespace Belle2 {
     {
       return m_z / s_unit - (m_wallHeight / s_unit - m_thickness / s_unit) / 2.;
     }
+
+    /**
+     * Set full aerogel material description key.
+     * 1 - use material explicitly for each aerogel tile.
+     * Any integer (but not 1) - uses two types of aerogel material for upstream and downstream.
+     * @param fullAerogelMaterialDescriptionKey - full aerogel material description key.
+     */
+    void setFullAerogelMaterialDescriptionKey(int fullAerogelMaterialDescriptionKey)
+    {
+      m_fullAerogelMaterialDescriptionKey = fullAerogelMaterialDescriptionKey;
+    }
+
+    /**
+     * Get full aerogel material description key.
+     * 1 - use material explicitly for each aerogel tile.
+     * Any integer (but not 1) - uses two types of aerogel material for upstream and downstream.
+     * @return full aerogel material description key
+     */
+    int getFullAerogelMaterialDescriptionKey() const
+    {
+      return m_fullAerogelMaterialDescriptionKey;
+    }
+
+    /**
+     * Get parameters of individual tile
+     * @param ring aerogel tile ring ID (range : [1;4])
+     * @param column aerogel tile column ID (range : [1;22] [1;28] [1;34] [1;40])
+     * @param layer aerogel tile layer ID (layer : 0 - up; layer : 1 - down)
+     * @param &n address of the variable : n aerogel tile refractive index
+     * @param &transmL address of the variable : transmL aerogel tile rayleigh scattering length
+     * @param &thick address of the variable : thick aerogel tile thickness
+     * @param &material address of the variable : material aerogel tile material name
+     * @return entry id number
+     */
+    unsigned getTileParameters(int ring, int column, int layerN, double& n, double& transmL, double& thick,
+                               std::string& material) const;
+
+    /**
+     * Get thickness of individual tile
+     * @param ring aerogel tile ring ID (range : [1;4])
+     * @param column aerogel tile column ID (range : [1;22] [1;28] [1;34] [1;40])
+     * @param layer aerogel tile layer ID (layer : 0 - up; layer : 1 - down)
+     * @return thickness of individual tile
+     */
+    double getTileThickness(int ring, int column, int layerN) const;
+
+    /**
+     * Get material name of individual tile
+     * @param ring aerogel tile ring ID (range : [1;4])
+     * @param column aerogel tile column ID (range : [1;22] [1;28] [1;34] [1;40])
+     * @param layer aerogel tile layer ID (layer : 0 - up; layer : 1 - down)
+     * @return material name of individual tile
+     */
+    std::string getTileMaterialName(int ring, int column, int layerN) const;
+
+    /**
+     * Get total thickness of the aerogel tiles tile_up + tile_down for a given slot
+     * @param ring aerogel tile ring ID
+     * @param column aerogel tile column ID
+     * @return total thickness of the aerogel tiles tile_up + tile_down
+     */
+    double getTotalTileThickness(int ring, int column) const;
+
+    /**
+     * Get maximum total thickness of the aerogel tiles tile_up + tile_down for all the slots
+     * @return maximum total thickness of the aerogel tiles tile_up + tile_down for all the slots
+     */
+    double getMaximumTotalTileThickness() const;
+
+    /**
+     * Set imaginary tube thikness just after aerogel layers used
+     * as volume to which tracks are extrapolated.
+     * @param imgTubeThickness imaginary tube thikness.
+     */
+    void setImgTubeThickness(double imgTubeThickness)
+    {
+      m_imgTubeThickness = imgTubeThickness;
+    }
+
+    /**
+     * Get imaginary tube thikness just after aerogel layers used
+     * as volume to which tracks are extrapolated.
+     * @return imaginary tube thikness
+     */
+    double getImgTubeThickness() const
+    {
+      return m_imgTubeThickness;
+    }
+
+    /**
+     * Set minimum thickness of the compensation volume with ARICH air
+     * @param compensationARICHairVolumeThick_min minimum thickness of the compensation volume with ARICH air.
+     */
+    void setCompensationARICHairVolumeThick_min(double compensationARICHairVolumeThick_min)
+    {
+      m_compensationARICHairVolumeThick_min = compensationARICHairVolumeThick_min;
+    }
+
+    /**
+     * Get minimum thickness of the compensation volume with ARICH air
+     * @return thickness of the compensation volume
+     */
+    double getCompensationARICHairVolumeThick_min() const
+    {
+      return m_compensationARICHairVolumeThick_min;
+    }
+
+    /**
+     * Print the content of the m_tiles vector of tilestr structure
+     * it contains position of the tile its refractive index, rayleigh scattering length, thickness
+     * @param title title to be printed
+     */
+    void printTileParameters(const std::string& title = "Aerogel tiles parameters:") const;
+
+    /**
+     * Print the content of the single tilestr structure
+     * it contains position of the tile its refractive index, rayleigh scattering length, thickness
+     * @param i entry counter
+     */
+    void printSingleTileParameters(unsigned i) const;
+
+    /**
+     * This function tests the getTileParameters function
+     */
+    void testGetTileParametersFunction() const;
 
   private:
 
@@ -320,8 +491,10 @@ namespace Belle2 {
 
     std::vector<double> m_r;      /**< "r" aluminum wall radiuses */
     std::vector<double> m_dPhi;   /**< "phi" aluminum wall distances in tile ring */
+    std::vector<int> m_nAeroSlotsIndividualRing; /**< Number of aerogel slots in individual ring */
 
-    std::vector<layer> m_layers;  /**< parameters of aerogel tile layers */
+    std::vector<layer> m_layers;  /**< parameters averaged properties of the aerogel tiles/layers (up and down) */
+    std::vector<tilestr> m_tiles; /**< parameters of the individual aerogel tiles */
 
     double m_tileGap = 0;         /**< gap between aerogel tiles and aluminum walls */
 
@@ -340,7 +513,15 @@ namespace Belle2 {
     bool m_simple = 0;
     std::vector<double> m_simpleParams;
 
-    ClassDef(ARICHGeoAerogelPlane, 1); /**< ClassDef */
+    int m_fullAerogelMaterialDescriptionKey =
+      0; /**< Full aerogel material description key : 1 - use material explicitly for each aerogel tile, 0 - use two types of aerogel material */
+
+    double m_imgTubeThickness =
+      0.0; /**< imaginary tube thikness just after aerogel layers used as volume to which tracks are extrapolated */
+
+    double m_compensationARICHairVolumeThick_min; /**< Minimum thickness of the compensation volume with ARICH air */
+
+    ClassDef(ARICHGeoAerogelPlane, 3); /**< ClassDef */
 
   };
 

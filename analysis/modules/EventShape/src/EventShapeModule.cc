@@ -82,8 +82,11 @@ void EventShapeModule::event()
   float missingMass2 = missingEnergyCMS * missingEnergyCMS - missingMomentumCMS.Mag() * missingMomentumCMS.Mag();
   eventShape->addMissingMass2(missingMass2);
 
-  float visibleEnergy = EventShapeModule::getVisibleEnergy();
-  eventShape->addVisibleEnergy(visibleEnergy);
+  float visibleEnergyCMS = EventShapeModule::getVisibleEnergyCMS();
+  eventShape->addVisibleEnergyCMS(visibleEnergyCMS);
+
+  float totalPhotonsEnergy = EventShapeModule::getTotalPhotonsEnergy();
+  eventShape->addTotalPhotonsEnergy(totalPhotonsEnergy);
 }
 
 void EventShapeModule::endRun()
@@ -99,6 +102,7 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
   PCmsLabTransform T;
 
   m_particleMomentumList.clear();
+  m_photonsMomentumList.clear();
   m_particleMomentumListCMS.clear();
 
   int nParticleLists = particleLists.size();
@@ -114,6 +118,9 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
 
       TLorentzVector p_lab = part->get4Vector();
       m_particleMomentumList.push_back(p_lab);
+
+      if (part->getParticleType() == Particle::EParticleType::c_ECLCluster)
+        m_photonsMomentumList.push_back(p_lab);
 
       TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
       m_particleMomentumListCMS.push_back(p_cms);
@@ -167,7 +174,7 @@ float EventShapeModule::getMissingEnergyCMS()
   return ECMS;
 }
 
-float EventShapeModule::getVisibleEnergy()
+float EventShapeModule::getVisibleEnergyCMS()
 {
   float visibleE = 0.0;
   int nParticles = m_particleMomentumListCMS.size();
@@ -175,4 +182,15 @@ float EventShapeModule::getVisibleEnergy()
     visibleE += m_particleMomentumListCMS.at(i).E();
   }
   return visibleE;
+}
+
+float EventShapeModule::getTotalPhotonsEnergy()
+{
+  float photonsEnergy = 0.0;
+  int nParticles = m_photonsMomentumList.size();
+  for (int i = 0; i < nParticles; ++i) {
+    photonsEnergy += m_photonsMomentumList.at(i).E();
+  }
+  return photonsEnergy;
+
 }

@@ -1,3 +1,8 @@
+/* ---------------------------------------------------------------------- *\
+   belle2nsm.h
+
+   revision history can be found in belle2nsm.c
+\* ---------------------------------------------------------------------- */
 
 #ifndef __belle2nsm_h__
 #define __belle2nsm_h__
@@ -11,10 +16,13 @@ extern "C" {
 }
 #endif
 
+const void* b2nsm_getwrapptr();
+int b2nsm_setwrapptr(const void* ptr);
 int b2nsm_addincpath(const char* path);
 const char* b2nsm_nodename(int nodeid);
 int b2nsm_nodeid(const char* nodename);
 int b2nsm_nodepid(const char* nodename);
+int b2nsm_reqid(const char* reqname);
 int b2nsm_loghook(NSMmsg* msg, NSMcontext* nsmc);
 void b2nsm_checkpoint(NSMcontext* nsmc, int val);
 int b2nsm_debuglevel(int val);

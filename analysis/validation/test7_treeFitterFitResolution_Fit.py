@@ -39,8 +39,6 @@ matchMCTruth('B0:jpsiks')
 vertexTree(
     list_name='B0:jpsiks',
     conf_level=-1,
-    massConstraint=[],
-    ipConstraintDim=0,
     updateAllDaughters=True,
     path=analysis_main,
 )

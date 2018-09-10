@@ -103,6 +103,10 @@ void CKFToSVDFindlet::apply()
 
   B2DEBUG(50, "Now have " << m_spacePointVector.size() << " hits.");
 
+  if (m_spacePointVector.empty() or m_cdcRecoTrackVector.empty()) {
+    return;
+  }
+
   m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
   m_relationCreator.apply(m_seedStates, m_states, m_relations);

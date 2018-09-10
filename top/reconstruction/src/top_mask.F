@@ -99,3 +99,28 @@
       END
 
       
+      LOGICAL FUNCTION ALL_INACTIVE(MODUL)
+c--   returns true if all channels of a module are inactive
+
+      IMPLICIT NONE
+      INTEGER MODUL               ! module ID
+
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+#include "TOP_PMT.fi"
+      INTEGER NUMCH, ICH
+      
+      ALL_INACTIVE=.TRUE.
+      IF(MODUL.LT.0.OR.MODUL.GE.NUM_MOD) RETURN
+
+      NUMCH=PMT_NX*PMT_NY*(N_PMT(0,MODUL)+N_PMT(1,MODUL))
+      ALL_INACTIVE=.FALSE.
+      DO ICH=0,NUMCH-1
+         IF(CH_MASK(ICH,MODUL)) RETURN
+      ENDDO
+      ALL_INACTIVE=.TRUE.
+      
+      END
+
+      

@@ -22,12 +22,15 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShape.h>
+#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+
+#include <framework/dataobjects/EventT0.h>
 
 // cluster utils
 #include <analysis/ClusterUtility/ClusterUtils.h>
@@ -79,10 +82,29 @@ namespace Belle2 {
       return 0.0;
     }
 
+    double nMCParticles(const Particle*)
+    {
+      StoreArray<MCParticle> mcps;
+      if (!mcps)  {
+        B2DEBUG(19, "Cannot find MCParticles array.");
+        return 0.0;
+      }
+      return mcps.getEntries();
+    }
+
     double nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
       return tracks.getEntries();
+    }
+
+    double nChargeZeroTrackFits(const Particle*)
+    {
+      StoreArray<TrackFitResult> tfrs;
+      int out = 0;
+      for (const auto& t : tfrs)
+        if (t.getChargeSign() == 0) out++;
+      return double(out);
     }
 
     double nECLClusters(const Particle*)
@@ -91,13 +113,7 @@ namespace Belle2 {
       return eclClusters.getEntries();
     }
 
-    double nKLMClusters(const Particle*)
-    {
-      StoreArray<KLMCluster> klmClusters;
-      return klmClusters.getEntries();
-    }
-
-    double ECLEnergy(const Particle*)
+    double belleECLEnergy(const Particle*)
     {
       StoreArray<ECLCluster> eclClusters;
       double result = 0;
@@ -111,6 +127,12 @@ namespace Belle2 {
       return result;
     }
 
+    double nKLMClusters(const Particle*)
+    {
+      StoreArray<KLMCluster> klmClusters;
+      return klmClusters.getEntries();
+    }
+
     double KLMEnergy(const Particle*)
     {
       StoreArray<KLMCluster> klmClusters;
@@ -119,39 +141,6 @@ namespace Belle2 {
         result += klmClusters[i]->getMomentum().Energy();
       }
       return result;
-    }
-
-    double uniqueEventID(const Particle*)
-    {
-
-      // We want to construct a quantity which is different for each event
-      // even if the experiment and run are all 0 (which
-      // happens for Belle II MC).
-      std::hash<std::string> m_hasher;
-
-      std::string to_hash;
-      to_hash = std::to_string(expNum(nullptr));
-      to_hash += std::to_string(evtNum(nullptr));
-      to_hash += std::to_string(runNum(nullptr));
-      to_hash += std::to_string(productionIdentifier(nullptr));
-      to_hash += std::to_string(nECLClusters(nullptr));
-      to_hash += std::to_string(nKLMClusters(nullptr));
-      to_hash += std::to_string(nTracks(nullptr));
-      to_hash += std::to_string(ECLEnergy(nullptr));
-      to_hash += std::to_string(KLMEnergy(nullptr));
-
-      // Convert unsigned int decay hash into a float keeping the same bit pattern
-      assert(sizeof(float) == sizeof(uint32_t));
-
-      union convert {
-        uint32_t i;
-        float f;
-      };
-      convert bitconverter;
-
-      bitconverter.i = m_hasher(to_hash);
-      return bitconverter.f;
-
     }
 
     double expNum(const Particle*)
@@ -411,6 +400,17 @@ namespace Belle2 {
       return missing;
     }
 
+    double missingMomentumOfEventCMS_theta(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double theta = evtShape->getMissingMomentumCMS().Theta();
+      return theta;
+    }
+
     double missingEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
@@ -433,16 +433,100 @@ namespace Belle2 {
       return missing;
     }
 
-    double visibleEnergyOfEvent(const Particle*)
+    double visibleEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getVisibleEnergy();
-      return missing;
+      double visible = evtShape->getVisibleEnergyCMS();
+      return visible;
     }
+
+    double totalPhotonsEnergyOfEvent(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
+      return energyOfPhotons;
+    }
+
+    double eventYearMonthDay(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      if (!evtMetaData) {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      std::time_t rawtime = trunc(evtMetaData->getTime() / 1e9);
+      auto tt = std::gmtime(&rawtime);  // GMT
+      int y = tt->tm_year + 1900; // years since 1900
+      int m = tt->tm_mon + 1;     // months since January
+      int d = tt->tm_mday;        // day of the month
+      return (y * 1e4) + (m * 1e2) + d;
+    }
+
+    double eventYear(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      if (!evtMetaData) {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      std::time_t rawtime = trunc(evtMetaData->getTime() / 1e9);
+      auto tt = std::gmtime(&rawtime);
+      return tt->tm_year + 1900;
+    }
+
+    double eventTimeSeconds(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      double evtTime = 0.;
+
+      if (!evtMetaData) {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      evtTime = trunc(evtMetaData->getTime() / 1e9);
+
+      return evtTime;
+    }
+
+    double eventTimeSecondsFractionRemainder(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      double evtTimeFrac = 0.;
+
+      if (!evtMetaData) {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double evtTime = trunc(evtMetaData->getTime() / 1e9);
+
+      evtTimeFrac = (evtMetaData->getTime() - evtTime * 1e9) / 1e9;
+
+      return evtTimeFrac;
+    }
+
+    double eventT0(const Particle*)
+    {
+      StoreObjPtr<EventT0> evtT0;
+      double t0 = 0.;
+
+      if (!evtT0) {
+        B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      if (evtT0->hasEventT0()) {
+        t0 = evtT0->getEventT0();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return t0;
+    }
+
+
 
     VARIABLE_GROUP("Event");
 
@@ -454,20 +538,24 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");
+    REGISTER_VARIABLE("nChargeZeroTrackFits", nChargeZeroTrackFits,
+                      "[Eventbased] number of track fits with a zero charge."
+                      "Sometimes this can happen if background or non IP originating "
+                      "tracks (for example) are fit from the IP. These tracks are "
+                      "removed from particle lists but a large number charge zero "
+                      "fits them may indicate problems with whole event constraints "
+                      "or abnominally high beam backgrounds and/or noisy events.")
     REGISTER_VARIABLE("nECLClusters", nECLClusters,
                       "[Eventbased] number of ECL in the event");
+    REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy,
+                      "[Eventbased] legacy total energy in ECL in the event as used in Belle 1 analyses. For Belle II "
+                      "consider totalEnergyOfParticlesInList(gamma:all) instead");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] number of KLM in the event");
-    REGISTER_VARIABLE("ECLEnergy", ECLEnergy,
-                      "[Eventbased] total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
                       "[Eventbased] total energy in KLM in the event");
-
-    REGISTER_VARIABLE("uniqueEventID", uniqueEventID,
-                      "[Eventbased] In some MC the expNum and runNum are 0, hence it is difficult to distinguish"
-                      " if candidates are reconstructed from the same or a different event. This variable constructs"
-                      " a hash from expNum, runNum, evtNum and other event-based variables, to create a unique identifier"
-                      " for each event. Consider using the eventCached MetaVariable if you write out this quantity for each candidate.");
+    REGISTER_VARIABLE("nMCParticles", nMCParticles,
+                      "[Eventbased] number of MCParticles in the event");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");
@@ -506,7 +594,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz,
                       "[Eventbased] The z component of the missing momentum in lab obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEvent_theta", missingMomentumOfEvent_theta,
-                      "[Eventbased] Missing momentum theta of the event obtained with EventShape module in lab")
+                      "[Eventbased] The theta angle of the missing momentum of the event in lab obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS,
                       "[Eventbased] The magnitude of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px,
@@ -515,11 +603,31 @@ namespace Belle2 {
                       "[Eventbased] The y component of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Pz", missingMomentumOfEventCMS_Pz,
                       "[Eventbased] The z component of the missing momentum in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("missingMomentumOfEventCMS_theta", missingMomentumOfEventCMS_theta,
+                      "[Eventbased] The theta angle of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS,
                       "[Eventbased] The missing energy in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,
                       "[Eventbased] The missing mass squared obtained with EventShape module")
-    REGISTER_VARIABLE("visibleEnergyOfEvent", visibleEnergyOfEvent,
+    REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS,
                       "[Eventbased] The visible energy in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
+                      "[Eventbased] The energy in lab of all the photons obtained with EventShape module");
+    REGISTER_VARIABLE("date", eventYearMonthDay,
+                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
+                      " See also eventYear, provided for convenience."
+                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+    REGISTER_VARIABLE("year", eventYear,
+                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
+                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+    REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
+                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
+    REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
+                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
+                      "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
+
+    VARIABLE_GROUP("Event (cDST only)");
+    REGISTER_VARIABLE("eventT0", eventT0,
+                      "[Eventbased][Calibration] Event T0 relative to trigger time in ns");
   }
 }

@@ -44,8 +44,6 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object to get existing constants*/
-
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *
      * @param dedx              input values

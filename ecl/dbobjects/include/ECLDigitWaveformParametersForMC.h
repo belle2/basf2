@@ -26,7 +26,15 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ECLDigitWaveformParametersForMC() {};
+    ECLDigitWaveformParametersForMC()
+    {
+      for (int i = 0; i < 11; i++) {
+        m_PhotonPars[i] = 0.;
+        m_HadronPars[i] = 0.;
+        m_DiodePars[i] = 0.;
+      }
+
+    };
 
     /** Get array of photon template parameters. 11 entries. */
     const float* getPhotonParameters() const {return m_PhotonPars;};

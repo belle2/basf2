@@ -27,7 +27,18 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ECLDigitWaveformParameters() {};
+    ECLDigitWaveformParameters()
+    {
+
+      for (int i = 0; i < 11; i++) {
+        for (int j = 0; j < 8736; j++) {
+          m_PhotonPars[j][i] = 0.;
+          m_HadronPars[j][i] = 0.;
+          m_DiodePars[j][i] = 0.;
+        }
+      }
+
+    };
 
     /** Get array of photon template parameters. 11 entries per crystal. */
     const float* getPhotonParameters(int cellID) const {return m_PhotonPars[cellID - 1];};

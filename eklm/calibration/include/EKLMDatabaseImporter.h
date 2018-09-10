@@ -13,7 +13,6 @@
 
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
-#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBImportObjPtr.h>
 
@@ -55,28 +54,6 @@ namespace Belle2 {
      * Import simulation parameters.
      */
     void importSimulationParameters();
-
-    /**
-     * Load default channel data.
-     */
-    void loadDefaultChannelData();
-
-    /**
-     * Set channel data.
-     * @param[in] endcap      Endcap number.
-     * @param[in] layer       Layer number.
-     * @param[in] sector      Sector number.
-     * @param[in] plane       Plane number.
-     * @param[in] strip       Strip number.
-     * @param[in] channelData Channel data.
-     */
-    void setChannelData(int endcap, int layer, int sector, int plane,
-                        int strip, EKLMChannelData* channelData);
-
-    /**
-     * Import channel data.
-     */
-    void importChannelData();
 
     /**
      * Load default displacement data (zeros).
@@ -144,9 +121,6 @@ namespace Belle2 {
     void importTimeConversion();
 
   private:
-
-    /** Channel data. */
-    DBImportObjPtr<EKLMChannels> m_Channels;
 
     /** Displacement. */
     DBImportObjPtr<EKLMAlignment> m_Displacement;

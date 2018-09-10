@@ -24,7 +24,7 @@ main = create_path()
 emptypath = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[1])
+main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[0])
 
 # generate Bhabha events
 main.add_module('BabayagaNLOInput')

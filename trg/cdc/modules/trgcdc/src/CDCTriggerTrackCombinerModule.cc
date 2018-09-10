@@ -20,7 +20,7 @@ CDCTriggerTrackCombinerModule::CDCTriggerTrackCombinerModule() : Module::Module(
     "Combined tracks are not produced for tracks without 3D information "
     "from either 3D fitter or neuro.\n"
   );
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("finder2DCollectionName", m_2DfinderCollectionName,
            "Name of the 2D finder track list.",
            string("TRGCDC2DFinderTracks"));

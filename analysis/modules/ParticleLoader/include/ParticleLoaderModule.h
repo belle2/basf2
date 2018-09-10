@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLELOADERMODULE_H
-#define PARTICLELOADERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -88,6 +87,12 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+    /**
+     * Terminate the Module.
+     * This method is called at the end of data processing.
+     */
+    virtual void terminate() override;
+
   private:
 
     /**
@@ -151,8 +156,8 @@ namespace Belle2 {
 
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
+
+    std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
   };
 
 } // Belle2 namespace
-
-#endif

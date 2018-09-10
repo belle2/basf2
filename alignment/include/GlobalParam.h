@@ -239,18 +239,15 @@ namespace Belle2 {
       /// Also resets if the object has been changed
       virtual void loadFromDB(EventMetaData event) override final
       {
-
-        std::list<Database::DBQuery> query = {Database::DBQuery(getDefaultName())};
-
-        Database::Instance().getData(event, query);
-        // TODO: do not make copy? is this safe with objects with private members made of pointers to other objects?
-        if (!query.front().object) {
+        auto info = Database::Instance().getData(event, getDefaultName());
+        DBObjType* ptr = dynamic_cast<DBObjType*>(info.first);
+        if (!ptr) {
           B2ERROR("Could not fetch object " << getDefaultName() << " from DB.");
           return;
         }
-        m_object.reset(new DBObjType(*(dynamic_cast<DBObjType*>(query.front().object))));
+        // don't make a copy, you own the object.
+        m_object.reset(ptr);
         hasBeenChangedInDB();  // will set m_hasBeenChangedInDB to false, ignore return value;
-
       }
 
       /// Construct the internal object using default constructor

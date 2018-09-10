@@ -9,7 +9,36 @@
 #  basf2 display/example/displaytrigger.py -i MyInputFile.root
 
 from basf2 import *
+import ROOT
 from ROOT import Belle2
+
+
+class DisplayHLTTags(Module):
+    """Test DisplayData"""
+
+    def initialize(self):
+        """reimplementation of Module::initialize()."""
+
+        Belle2.PyStoreObj("DisplayData").registerInDataStore()
+
+    def event(self):
+        """reimplementation of Module::event()."""
+
+        displayData = Belle2.PyStoreObj("DisplayData")
+        displayData.create()
+
+        print("HLT Tags:")
+        displayData.obj().addLabel('HLT Tags:', ROOT.TVector3(200, 220, -300))
+        trigger_result = Belle2.PyStoreObj('SoftwareTriggerResult')
+        dz_pos = 0
+        for name, result in trigger_result.getResults():
+            prefix = 'software_trigger_cut&hlt&accept_'
+            if result == 1 and name.startswith(prefix):
+                name = name[len(prefix):]
+                displayData.obj().addLabel(name, ROOT.TVector3(200, 200 - dz_pos, -300))
+                dz_pos += 15
+                print(name)
+
 
 # create paths
 main = create_path()
@@ -31,6 +60,8 @@ geometry.param('excludedComponents', ['ECL'])
 main.add_module(rootinput)
 main.add_module(gearbox)
 main.add_module(geometry)
+
+main.add_module(DisplayHLTTags())
 
 display = register_module('Display')
 # --- MC options ---

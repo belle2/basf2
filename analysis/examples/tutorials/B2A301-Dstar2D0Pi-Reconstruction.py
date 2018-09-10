@@ -25,14 +25,16 @@ from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from stdCharged import *
+from beamparameters import add_beamparameters
 
+beamparameters = add_beamparameters(analysis_main, "Y4S")
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
     ['/group/belle2/tutorial/release_01-00-00/mdst-dstars.root'
      ]
 
-inputMdstList('default', filelistSIG)
+inputMdstList('MC9', filelistSIG)
 
 # use standard final state particle lists
 #

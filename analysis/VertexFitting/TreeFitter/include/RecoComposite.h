@@ -13,21 +13,21 @@
 
 namespace TreeFitter {
 
-  /**  */
+  /** A class for composite particles */
   class RecoComposite : public ParticleBase {
 
   public:
-    /**  */
+    /** constructor */
     RecoComposite(Belle2::Particle* bc, const ParticleBase* mother) ;
 
-    /**  */
+    /** destructor */
     virtual ~RecoComposite() {};
 
     /** init particle in case it has a mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams);
 
     /** init particle in case it has no mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** update chaed params */
     void updateParams();
@@ -80,7 +80,7 @@ namespace TreeFitter {
     /** only lower triangle filled! */
     Eigen::Matrix < double, -1, -1, 0, 7, 7 >  m_covariance;
 
-    /** flag  */
+    /** flag */
     bool m_hasEnergy;
   };
 }

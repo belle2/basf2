@@ -205,14 +205,18 @@ if __name__ == "__main__":
         # "background_only",
 
         "ee",
+        "ee_large_angle",
         "eemumu",
+        "eemumu_preselected",
         "eeee",
+        "eeee_preselected",
 
         "tau",
 
         "mumu",
 
         "gg",
+        "gg_large_angle",
 
         "continuum_ccbar",
         "continuum_uubar",

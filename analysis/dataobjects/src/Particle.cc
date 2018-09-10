@@ -32,6 +32,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdexcept>
+#include <queue>
 
 using namespace Belle2;
 
@@ -544,8 +545,23 @@ const ECLCluster* Particle::getECLCluster() const
     StoreArray<ECLCluster> eclClusters;
     return eclClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
+    // a track may be matched to several clusters under different hypotheses
+    // take the most energetic of the c_nPhotons hypothesis as "the" cluster
     StoreArray<Track> tracks;
-    return tracks[m_mdstIndex]->getRelated<ECLCluster>();
+    const ECLCluster* bestTrackMatchedCluster = nullptr;
+    double highestEnergy = -1.0;
+    // loop over all clusters matched to this track
+    for (const ECLCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<ECLCluster>()) {
+      // ignore everything except the nPhotons hypothesis
+      if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        continue;
+      // check if we're most energetic thus far
+      if (cluster.getEnergy() > highestEnergy) {
+        highestEnergy = cluster.getEnergy();
+        bestTrackMatchedCluster = &cluster;
+      }
+    }
+    return bestTrackMatchedCluster;
   } else {
     return nullptr;
   }
@@ -868,4 +884,28 @@ void Particle::addExtraInfo(const std::string& name, float value)
     m_extraInfo[0] = mapID; //update map
     m_extraInfo.push_back(value); //add value
   }
+}
+
+bool Particle::forEachDaughter(std::function<bool(const Particle*)> function,
+                               bool recursive, bool includeSelf) const
+{
+  std::queue<const Particle*> qq;
+  // If we include ourselves add only this, otherwise directly all children
+  if (includeSelf) {
+    qq.push(this);
+  } else {
+    for (size_t i = 0; i < getNDaughters(); ++i) qq.push(getDaughter(i));
+  }
+  // Now just repeat until done: take the child, run the functor, remove the
+  // child, add all children if needed
+  while (!qq.empty()) {
+    const Particle* p = qq.front();
+    if (function(p)) return true;
+    qq.pop();
+    // Add children if we go through all children recursively or if we look at
+    // the current particle: we always want the direct children.
+    if (recursive || p == this)
+      for (size_t i = 0; i < p->getNDaughters(); ++i) qq.push(p->getDaughter(i));
+  }
+  return false;
 }

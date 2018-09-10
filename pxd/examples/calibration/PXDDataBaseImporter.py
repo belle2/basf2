@@ -4,94 +4,140 @@
 
 ##############################################################################
 #
-# Imports PXD calibration payloads
-# Some PXD calibration constants are currently stored in numpy files
-# or binary files with pickled python objects.
-#
-# This example reads these constants, fills dbobjects and imports them
-# into the conditions db.
+# Imports a PXD mask to local data base.
 #
 ##############################################################################
+
 
 from basf2 import *
 from ROOT import Belle2
 import ROOT
-import pickle
+
+# set some random seed
+set_random_seed(10346)
 
 
-def importPXDPositionEstimator(fileName):
+def importEmptyHotPixelMask(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    hot pixel masking.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create an empty hot pixel mask
+    HotPixelMask = Belle2.PXDMaskedPixelPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDMaskedPixelPar', HotPixelMask, iov)
+
+
+def importEmptyDeadPixelMask(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    dead pixel masking.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create an empty mask
+    DeadPixelMask = Belle2.PXDDeadPixelPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDDeadPixelPar', DeadPixelMask, iov)
+
+
+def importEmptyOccupancyInfo(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    pixel masking.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create a dummy occupancy info
+    OccupancyInfo = Belle2.PXDOccupancyInfoPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDOccupancyInfoPar', OccupancyInfo, iov)
+
+
+def importEmptyClusterChargeMap(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    gain calibration.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create a dummy payload
+    ChargeMap = Belle2.PXDClusterChargeMapPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDClusterChargeMapPar', ChargeMap, iov)
+
+
+def importEmptyGainMap(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    gain calibration.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create a dummy payload
+    GainMap = Belle2.PXDGainMapPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDGainMapPar', GainMap, iov)
+
+
+def importRandomPixelMaskPhase2(HotPixelFraction=0.001, expLow=0, runLow=0, expHigh=-1, runHigh=-1):
     """
     This function imports payloads for the PXD
-    cluster position estimation.
+    pixel masking with random hot pixels
+
+    This function works for Phase 2
     """
 
-    # Load trained hit estimator
-    hit_estimator = pickle.load(open(fileName, 'rb'))
+    # Create an empty mask
+    pixelMask = Belle2.PXDMaskedPixelPar()
 
-    # Create list of unique shapes
-    unique_shapes = []
+    # Create a list of sensors
+    sensorIDList = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
 
-    # and fill it
-    for pixelkind in hit_estimator.getPixelkinds():
-        for uBin in range(1, hit_estimator.getGrid(pixelkind).getUBins() + 1):
-            for vBin in range(1, hit_estimator.getGrid(pixelkind).getVBins() + 1):
-                shape_classifier = hit_estimator.getShapeClassifier(uBin, vBin, pixelkind)
-                unique_shapes = unique_shapes + list(shape_classifier.getDigitalLabels())
+    # Mean number of hot pixels per sensor
+    AverageHotPixels = HotPixelFraction * 250 * 768
 
-    # Remove all duplicates
-    unique_shapes = list(set(unique_shapes))
-    print('number of unique shapes is ', len(unique_shapes))
+    # ... and mask some random pixels
+    for sensorID in sensorIDList:
+        # Randomized number of hot pixels
+        nHotPixels = ROOT.gRandom.Poisson(AverageHotPixels)
 
-    # Create index table
-    indexer_payload = Belle2.PXDClusterShapeIndexPar()
+        for i in range(nHotPixels):
+            uid = ROOT.gRandom.Integer(250)
+            vid = ROOT.gRandom.Integer(768)
+            print("mask pixel uid={}, vid={}, id={}".format(uid, vid, uid * 768 + vid))
+            pixelMask.maskSinglePixel(sensorID.getID(), uid * 768 + vid)
 
-    for index, shape in enumerate(unique_shapes):
-        indexer_payload.addShape(str(shape), index)
+    # Print the final mask before committing to db
+    for sensorMask in pixelMask.getMaskedPixelMap():
+        sensorID = Belle2.VxdID(sensorMask.first)
+        print("Mask for sensor {} contains {} pixels".format(sensorID, sensorMask.second.size()))
 
-    # Create position estimator
-    estimator_payload = Belle2.PXDClusterPositionEstimatorPar()
-
-    # ... and fill it
-    for pixelkind in hit_estimator.getPixelkinds():
-
-        grid = ROOT.TH2F("grid_{:d}".format(pixelkind), "grid_{:d}".format(pixelkind), 18, -90.0, +90.0, 18, -90.0, +90.0)
-        estimator_payload.addGrid(pixelkind, grid)
-
-        for uBin in range(1, grid.GetXaxis().GetNbins() + 1):
-            for vBin in range(1, grid.GetYaxis().GetNbins() + 1):
-
-                classifier = hit_estimator.getShapeClassifier(uBin, vBin, pixelkind)
-                classifier_payload = Belle2.PXDClusterShapeClassifierPar()
-
-                for shape in classifier.getDigitalLabels():
-
-                    shape_index = indexer_payload.getShapeIndex(shape)
-                    classifier_payload.addShape(shape_index)
-
-                    # Likelyhood to create shape
-                    classifier_payload.addShapeLikelyhood(shape_index, classifier.getDigitalProb(shape))
-
-                    percentiles = classifier.getPercentiles(shape)
-
-                    for eta_index, hit in classifier.getHitMap(shape).items():
-
-                        # Read hit ... and fill into offset payload
-                        pos, cov, prob = hit
-                        # FIXME: python hit estimator uses mm, but basf2 default unit is cm
-                        offset_payload = Belle2.PXDClusterOffsetPar(
-                            0.1 * pos[0], 0.1 * pos[1], 0.01 * cov[0, 0], 0.01 * cov[1, 1], 0.01 * cov[1, 0])
-                        classifier_payload.addEtaOffset(shape_index, offset_payload)
-
-                        # Fill percentile and eta likelyhood
-                        classifier_payload.addEtaPercentile(shape_index, percentiles[eta_index - 1])
-                        classifier_payload.addEtaLikelyhood(shape_index, prob)
-
-                # and fill into position estimator payload
-                estimator_payload.setShapeClassifier(classifier_payload, uBin, vBin, pixelkind)
-
-    iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
-    Belle2.Database.Instance().storeData('PXDClusterPositionEstimatorPar', estimator_payload, iov)
-    Belle2.Database.Instance().storeData('PXDClusterShapeIndexPar', indexer_payload, iov)
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDMaskedPixelPar', pixelMask, iov)
 
 
-importPXDPositionEstimator(fileName='/home/benjamin/Desktop/cluster_shape_paper/examples/estimator_headtail_phase3.out')
+if __name__ == "__main__":
+
+    importEmptyHotPixelMask()
+    importEmptyDeadPixelMask()
+    importEmptyOccupancyInfo()
+    importEmptyGainMap()
+    importEmptyClusterChargeMap()

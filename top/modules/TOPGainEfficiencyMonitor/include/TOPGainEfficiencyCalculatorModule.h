@@ -129,8 +129,6 @@ namespace Belle2 {
      */
     static double FindPeakForSmallerXThan(TH1* histo, double xmax = 0);
 
-    void MakeInterimTTree();
-
   private:
 
     TTree* m_tree = 0; /**< ntuple to store summary */
@@ -148,7 +146,10 @@ namespace Belle2 {
     std::string m_inputFile = ""; /**< input file containing timing vs charge 2D histograms (output of TOPLaserHitSelector) */
     std::string m_outputPDFFile =
       ""; /**< output PDF file to store plots of 2D histogram, timing, and charge distribution for each channel */
-    std::string m_fitoption = "L"; /**fit option chisquare: R, likelihood: default */
+
+    std::string m_fitoption =
+      "L"; /**< charge histograms fitting option. type R for chisquare fit. type L for likelihood fit(default) */
+
     short m_targetSlotId = 0; /**< slot ID */
     short m_targetPmtId = 0; /**< PMT ID */
     short m_targetPmtChId = -1; /**< PMT channel ID */

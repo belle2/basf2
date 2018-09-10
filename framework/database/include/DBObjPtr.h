@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,15 +23,19 @@ namespace Belle2 {
      * Constructor to access an object in the DBStore.
      * @param name       Name under which the object is stored in the database (and DBStore).
      */
-    explicit DBObjPtr(const std::string& name = ""):
-      DBAccessorBase(DBStore::objectName<T>(name), T::Class(), false) {m_object = reinterpret_cast<T**>(&m_entry->object);};
+    explicit DBObjPtr(const std::string& name = "", bool required = true):
+      DBAccessorBase(DBStore::objectName<T>(name), T::Class(), false, required) {}
 
-    inline T& operator *()  const {return **m_object;}  /**< Imitate pointer functionality. */
-    inline T* operator ->() const {return *m_object;}   /**< Imitate pointer functionality. */
-
-  private:
-    /** Pointer to pointer to the object in the DBStore. */
-    T** m_object;
-
+#ifndef DISABLE_CONST_DBOBJECTS
+    inline const T& operator *()  const {return *getObject<T>(); }  /**< Imitate pointer functionality. */
+    inline const T* operator ->() const {return getObject<T>(); }   /**< Imitate pointer functionality. */
+#else
+    [[deprecated("Non-Const DBObjPtr access is deprecated. Please remove `env.Append(CPPDEFINES=['DISABLE_CONST_DBOBJECTS']) "
+                 "and fix any compilation problems you might have")]]
+    inline T& operator *()  const {return *const_cast<T*>(getObject<T>()); }  /**< Imitate pointer functionality. */
+    [[deprecated("Non-Const DBObjPtr access is deprecated. Please remove `env.Append(CPPDEFINES=['DISABLE_CONST_DBOBJECTS']) "
+                 "and fix any compilation problems you might have")]]
+    inline T* operator ->() const {return const_cast<T*>(getObject<T>()); }   /**< Imitate pointer functionality. */
+#endif
   };
 }

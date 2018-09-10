@@ -1,24 +1,22 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2011 - Belle II Collaboration                             *
+ * Copyright(C) 2011-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr, Marko Staric                                *
+ * Contributors: Thomas Kuhr, Marko Staric, Martin Ritter                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
-#include <framework/database/DBEntry.h>
+#include <framework/database/DBStoreEntry.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <set>
-#include <functional>
-
 
 namespace Belle2 {
 
@@ -69,12 +67,35 @@ namespace Belle2 {
      * If the DBStore map already contains an object under the key
      * with a DIFFERENT type than the given type one, an error will be reported. <br>
      *
+     * @param payloadType Type of the payload. Usually c_Object.
      * @param name       Name under which the object is stored in the database (and in the DBStore).
      * @param objClass   The class of the object.
      * @param array      Whether it is a TClonesArray or not.
+     * @param required   If true emit errors if the object cannot be found
+     * @return           DBEntry, or nullptr if the requested type does not match the one in the DBStore
+     */
+
+    DBStoreEntry* getEntry(DBStoreEntry::EPayloadType payloadType, const std::string& name,
+                           const TClass* objClass, bool array, bool required = true);
+
+    /**
+     * Returns the entry with the requested name in the DBStore.
+     * If the DBStore entry does not exist yet it is added to the map.
+     *
+     * If the DBStore map already contains an object under the key
+     * with a DIFFERENT type than the given type one, an error will be reported. <br>
+     *
+     * @param name       Name under which the object is stored in the database (and in the DBStore).
+     * @param objClass   The class of the object.
+     * @param array      Whether it is a TClonesArray or not.
+     * @param required   If true emit errors if the object cannot be found
      * @return           DBEntry, or NULL if the requested type does not match the one in the DBStore
      */
-    DBEntry* getEntry(const std::string& name, const TClass* objClass, bool array);
+    DBStoreEntry* getEntry(const std::string& name, const TClass* objClass,
+                           bool array, bool required = true)
+    {
+      return getEntry(DBStoreEntry::c_Object, name, objClass, array, required);
+    }
 
     /**
      * Updates all objects that are outside their interval of validity.
@@ -90,8 +111,12 @@ namespace Belle2 {
 
     /**
      * Invalidate all payloads.
+     *
+     * @param keepEntries  Keep the existing entries so that future calls to
+     *    update the database will try to obtain the payloads which were
+     *    registered so far.
      */
-    void reset();
+    void reset(bool keepEntries = false);
 
     /**
      * Add constant override payload.
@@ -107,16 +132,6 @@ namespace Belle2 {
      */
     void addConstantOverride(const std::string& name, TObject* obj, bool oneRun = false);
 
-    /**
-     * Add a callback function.
-     * The given function will be called whenever there is a new database entry for the given name.
-     *
-     * @param name Name under which the object is stored in the database (and in the DBStore).
-     * @param callback The callback function.
-     * @param id unique identifier of this callback function
-     */
-    void addCallback(const std::string& name, DBCallback callback, DBCallbackId id);
-
   private:
     /** Hidden constructor, as it is a singleton.*/
     explicit DBStore() {};
@@ -124,38 +139,11 @@ namespace Belle2 {
     /** same for copy constructor */
     DBStore(const DBStore&);
 
-    /**
-     * Check whether the given entry and the requested class match.
-     *
-     * @param dbEntry    The existing DBStore entry.
-     * @param objClass   The class of the object.
-     * @param array      Whether it is a TClonesArray or not.
-     * @return           True if both types match.
-     */
-    bool checkType(const DBEntry& dbEntry, const TClass* objClass, bool array) const;
-
-    /**
-     * Check whether the given entry and the type of the object match.
-     *
-     * @param dbEntry    The existing DBStore entry.
-     * @param object     The object whose type is to be checked.
-     * @return           True if both types match.
-     */
-    bool checkType(const DBEntry& dbEntry, const TObject* object) const;
-
-    /**
-     * Assign a new object and IoV to a given DBEntry and delete the old object.
-     *
-     * @param dbEntry    The existing DBStore entry.
-     * @param objectIov  A pair of the new object and new IoV.
-     */
-    void updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOfValidity>& objectIov);
-
     /** Map names to DBEntry objects. */
-    std::map<std::string, DBEntry> m_dbEntries;
+    std::unordered_map<std::string, DBStoreEntry> m_dbEntries;
 
     /** List of intra-run dependent conditions. */
-    std::set<DBEntry*> m_intraRunDependencies;
+    std::set<DBStoreEntry*> m_intraRunDependencies;
 
     /**
      * StoreObjPtr for the EventMetaData to get the current experiment and run

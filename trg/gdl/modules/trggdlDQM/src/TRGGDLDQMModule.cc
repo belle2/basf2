@@ -21,6 +21,9 @@
 
 #include <TDirectory.h>
 #include <TRandom3.h>
+#include <TPostScript.h>
+#include <TCanvas.h>
+#include <TStyle.h>
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
@@ -61,6 +64,15 @@ TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
   addParam("vcdNumberOfEvents", m_vcdNumberOfEvents,
            "Number of events to dump vcd file",
            unsigned(10));
+  addParam("bitNameOnBinLabel", m_bitNameOnBinLabel,
+           "Put bitname on BinLabel",
+           false);
+  addParam("generatePostscript", m_generatePostscript,
+           "Genarete postscript file or not",
+           false);
+  addParam("postScriptName", m_postScriptName,
+           "postscript file name",
+           string("gdldqm.ps"));
   B2DEBUG(20, "eventByEventTimingFlag(" << m_eventByEventTimingHistRecord
           << "), m_dumpVcdFile(" << m_dumpVcdFile
           << "), m_bitConditionToDumpVcd(" << m_bitConditionToDumpVcd
@@ -103,9 +115,47 @@ void TRGGDLDQMModule::defineHisto()
   h_ns_cdcToecl = new TH1D("hGDL_ns_cdcToecl", "ecl_timing - cdc_timing [ns]", 2000, 0, 4000);
   h_ns_cdcToecl->GetXaxis()->SetTitle("ns");
   h_ns_cdcToecl->GetYaxis()->SetTitle("evt / 2ns");
-  h_itd = new TH1I("hGDL_itd", "itd", 161, -1, 160);
-  h_ftd = new TH1I("hGDL_ftd", "ftd", 97, -1, 96);
-  h_psn = new TH1I("hGDL_psn", "psn", 97, -1, 96);
+  TrgBit tb;
+  h_itd = new TH1I("hGDL_itd", "itd", tb.getNumOfInputs() + 1, -1, tb.getNumOfInputs());
+  h_ftd = new TH1I("hGDL_ftd", "ftd", tb.getNumOfOutputs() + 1, -1, tb.getNumOfOutputs());
+  h_psn = new TH1I("hGDL_psn", "psn", tb.getNumOfOutputs() + 1, -1, tb.getNumOfOutputs());
+  // output extra
+  h_psn_extra = new TH1I("hGDL_psn_extra", "psn extra", n_output_extra, 0, n_output_extra);
+  for (unsigned i = 0; i < n_output_extra; i++) {
+    h_psn_extra->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
+  }
+  // rise/fall
+  for (unsigned i = 0; i < tb.getNumOfInputs(); i++) {
+    h_itd_rise[i] = new TH1I(Form("hGDL_itd_%s_rise", tb.getInputBitName(i)),
+                             Form("itd%d(%s) rising", i, tb.getInputBitName(i)), 48, 0, 48);
+    h_itd_rise[i]->SetLineColor(kRed);
+    h_itd_fall[i] = new TH1I(Form("hGDL_itd_%s_fall", tb.getInputBitName(i)),
+                             Form("itd%d(%s) falling", i, tb.getInputBitName(i)), 48, 0, 48);
+    h_itd_fall[i]->SetLineColor(kGreen);
+    if (m_bitNameOnBinLabel) {
+      h_itd->GetXaxis()->SetBinLabel(h_itd->GetXaxis()->FindBin(i + 0.5), tb.getInputBitName(i));
+    }
+  }
+  for (unsigned i = 0; i < tb.getNumOfOutputs(); i++) {
+    h_ftd->GetXaxis()->SetBinLabel(h_ftd->GetXaxis()->FindBin(i + 0.5), tb.getOutputBitName(i));
+    h_ftd_rise[i] = new TH1I(Form("hGDL_ftd_%s_rise", tb.getOutputBitName(i)),
+                             Form("ftd%d(%s) rising", i, tb.getOutputBitName(i)), 48, 0, 48);
+    h_ftd_rise[i]->SetLineColor(kRed);
+    h_ftd_fall[i] = new TH1I(Form("hGDL_ftd_%s_fall", tb.getOutputBitName(i)),
+                             Form("ftd%d(%s) falling", i, tb.getOutputBitName(i)), 48, 0, 48);
+    h_ftd_fall[i]->SetLineColor(kGreen);
+    h_psn->GetXaxis()->SetBinLabel(h_psn->GetXaxis()->FindBin(i + 0.5), tb.getOutputBitName(i));
+    h_psn_rise[i] = new TH1I(Form("hGDL_psn_%s_rise", tb.getOutputBitName(i)),
+                             Form("psn%d(%s) rising", i, tb.getOutputBitName(i)), 48, 0, 48);
+    h_psn_rise[i]->SetLineColor(kRed);
+    h_psn_fall[i] = new TH1I(Form("hGDL_psn_%s_fall", tb.getOutputBitName(i)),
+                             Form("psn%d(%s) falling", i, tb.getOutputBitName(i)), 48, 0, 48);
+    h_psn_fall[i]->SetLineColor(kGreen);
+    if (m_bitNameOnBinLabel) {
+      h_ftd->GetXaxis()->SetBinLabel(h_ftd->GetXaxis()->FindBin(i + 0.5), tb.getOutputBitName(i));
+      h_psn->GetXaxis()->SetBinLabel(h_psn->GetXaxis()->FindBin(i + 0.5), tb.getOutputBitName(i));
+    }
+  }
   h_timtype = new TH1I("hGDL_timtype", "timtype", 7, 0, 7);
 
   oldDir->cd();
@@ -113,10 +163,6 @@ void TRGGDLDQMModule::defineHisto()
 
 void TRGGDLDQMModule::beginRun()
 {
-
-  TrgBit tb;
-  // tb.printPreScaleValues();
-  tb.printConf();
 
   dirDQM->cd();
 
@@ -142,9 +188,78 @@ void TRGGDLDQMModule::beginRun()
 void TRGGDLDQMModule::initialize()
 {
 
+  StoreObjPtr<EventMetaData> bevt;
+  _exp = bevt->getExperiment();
+  _run = bevt->getRun();
   REG_HISTOGRAM
   defineHisto();
 
+}
+
+void TRGGDLDQMModule::endRun()
+{
+  if (m_generatePostscript) {
+    TPostScript* ps = new TPostScript(m_postScriptName.c_str(), 112);
+    TrgBit tb;
+    gStyle->SetOptStat(0);
+    TCanvas c1("c1", "", 0, 0, 500, 300);
+    c1.cd();
+    for (unsigned i = 0; i < tb.getNumOfInputs(); i++) {
+      h_itd_rise[i]->SetTitle(Form("itd%d(%s) rising(red), falling(green)",
+                                   i, tb.getInputBitName(i)));
+      h_itd_rise[i]->Draw();
+      h_itd_fall[i]->Draw("same");
+      c1.Update();
+    }
+    h_itd->GetXaxis()->SetRange(h_itd->GetXaxis()->FindBin(0.5),
+                                h_itd->GetXaxis()->FindBin(tb.getNumOfInputs() - 0.5));
+    h_itd->Draw();
+    c1.Update();
+    h_ftd->GetXaxis()->SetRange(h_ftd->GetXaxis()->FindBin(0.5),
+                                h_ftd->GetXaxis()->FindBin(tb.getNumOfOutputs() - 0.5));
+    h_ftd->Draw();
+    c1.Update();
+    h_psn->GetXaxis()->SetRange(h_psn->GetXaxis()->FindBin(0.5),
+                                h_psn->GetXaxis()->FindBin(tb.getNumOfOutputs() - 0.5));
+    h_psn->Draw();
+    c1.Update();
+    h_ftd->SetTitle("ftd(green), psnm(red)");
+    h_ftd->SetFillColor(kGreen);
+    h_ftd->SetBarWidth(0.4);
+    h_ftd->Draw("bar");
+    h_psn->SetFillColor(kRed);
+    h_psn->SetBarWidth(0.4);
+    h_psn->SetBarOffset(0.5);
+    h_psn->Draw("bar,same");
+
+    c1.Update();
+    h_timtype->Draw();
+    c1.Update();
+    h_c8_gdlL1TocomL1->Draw();
+    c1.Update();
+    h_c8_eclTogdlL1->Draw();
+    c1.Update();
+    h_c8_ecl8mToGDL->Draw();
+    c1.Update();
+    h_c8_eclToGDL->Draw();
+    c1.Update();
+    h_c2_cdcTocomL1->Draw();
+    c1.Update();
+    h_ns_cdcTocomL1->Draw();
+    c1.Update();
+    h_ns_cdcTogdlL1->Draw();
+    c1.Update();
+    h_ns_topToecl->Draw();
+    c1.Update();
+    h_ns_topTocdc->Draw();
+    c1.Update();
+    h_c2_cdcToecl->Draw();
+    c1.Update();
+    h_ns_cdcToecl->Draw();
+    c1.Update();
+
+    ps->Close();
+  }
 }
 
 void TRGGDLDQMModule::event()
@@ -152,6 +267,8 @@ void TRGGDLDQMModule::event()
 
   TrgBit tb;
   static unsigned nvcd = 0;
+  static bool begin_run = true;
+
   int n_leafs = 0;
   int n_leafsExtra = 0;
   int ee_psn[10] = {0};
@@ -250,9 +367,9 @@ void TRGGDLDQMModule::event()
   evtno = entAry[0]->m_evt;
   h_0 = new TH2I(Form("hgdl%08d", evtno), "", n_clocks, 0, n_clocks, n_leafs + n_leafsExtra, 0,
                  n_leafs + n_leafsExtra);
-  h_p = new TH2I(Form("hpsn%08d", evtno), "", n_clocks, 0, n_clocks, 96, 0, 96);
-  h_f = new TH2I(Form("hftd%08d", evtno), "", n_clocks, 0, n_clocks, 96, 0, 96);
-  h_i = new TH2I(Form("hitd%08d", evtno), "", n_clocks, 0, n_clocks, 160, 0, 160);
+  h_p = new TH2I(Form("hpsn%08d", evtno), "", n_clocks, 0, n_clocks, tb.getNumOfOutputs(), 0, tb.getNumOfOutputs());
+  h_f = new TH2I(Form("hftd%08d", evtno), "", n_clocks, 0, n_clocks, tb.getNumOfOutputs(), 0, tb.getNumOfOutputs());
+  h_i = new TH2I(Form("hitd%08d", evtno), "", n_clocks, 0, n_clocks, tb.getNumOfInputs(), 0, tb.getNumOfInputs());
   for (unsigned i = 0; i < tb.getNumOfInputs(); i++) {
     h_i->GetYaxis()->SetBinLabel(i + 1, tb.getInputBitName(i));
   }
@@ -338,6 +455,16 @@ void TRGGDLDQMModule::event()
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF0::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_toptiming);
   }
+
+  if (begin_run) {
+    B2DEBUG(20, "nconf(" << nconf
+            << "), n_clocks(" << n_clocks
+            << "), n_leafs(" << n_leafs
+            << "), n_leafsExtra(" << n_leafsExtra
+            << ")");
+    begin_run = false;
+  }
+
   int psn[3] = {0};
   int ftd[3] = {0};
   int itd[5] = {0};
@@ -348,6 +475,8 @@ void TRGGDLDQMModule::event()
   int c2_top_timing = c1_top_timing >> 1;
 
   int gdll1_rvc = h_0->GetBinContent(h_0->GetXaxis()->FindBin(n_clocks - 0.5), 1 + _e_gdll1rvc);
+
+  // fill event by event timing histogram and get time integrated bit info
   for (unsigned clk = 1; clk <= n_clocks; clk++) {
     int psn_tmp[3] = {0};
     int ftd_tmp[3] = {0};
@@ -393,8 +522,13 @@ void TRGGDLDQMModule::event()
 
   } // clk
 
-  h_timtype->Fill(timtype);
+  // fill rising and falling edges
+  fillRiseFallTimings();
+  // fill Output_extra for efficiency study
+  fillOutputExtra();
 
+  // fill summary histograms
+  h_timtype->Fill(timtype);
   h_itd->Fill(-0.5);
   h_ftd->Fill(-0.5);
   h_psn->Fill(-0.5);
@@ -408,6 +542,7 @@ void TRGGDLDQMModule::event()
     }
   }
 
+  // fill timestamp values stored in header
   int gdlL1TocomL1 = gdll1_rvc < coml1rvc ? coml1rvc - gdll1_rvc : (coml1rvc + 1280) - gdll1_rvc;
   h_c8_gdlL1TocomL1->Fill(gdlL1TocomL1);
 
@@ -450,6 +585,7 @@ void TRGGDLDQMModule::event()
                          c2_cdc_timing - c2_top_timing + (1280 << 2);
   h_ns_topTocdc->Fill(c2_diff_topTocdc *  clkTo2ns);
 
+  // vcd dump
   if (m_dumpVcdFile) {
     if (anaBitCondition()) {
       nvcd++;
@@ -460,6 +596,7 @@ void TRGGDLDQMModule::event()
     }
   }
 
+  // discard event by event histograms
   if (! m_eventByEventTimingHistRecord) {
     h_0->Delete();
     h_p->Delete();
@@ -580,9 +717,6 @@ void TRGGDLDQMModule::genVcd(void)
   int prev_f[400] = {0};
   int prev_p[400] = {0};
 //int prev_g[400]={0};
-  StoreObjPtr<EventMetaData> bevt;
-  int _exp = bevt->getExperiment();
-  int _run = bevt->getRun();
   ofstream outf(Form("vcd/e%02dr%08de%08d.vcd", _exp, _run, evtno));
   outf << "$date" << endl;
   outf << "   Aug 20, 2018 17:53:52" << endl;
@@ -678,6 +812,8 @@ TRGGDLDQMModule::isFired(std::string bitname)
   }
   boost::algorithm::to_lower(bitname);
   int bn = tb.getBitNum(bitname.c_str());
+  // bn = inputBitNumber if bn>=0
+  // bn = -outputBitNumber-1 if bn<0
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn < 0) {
       if (isPsnm) {
@@ -694,3 +830,114 @@ TRGGDLDQMModule::isFired(std::string bitname)
   }
   return false;
 }
+
+void
+TRGGDLDQMModule::fillRiseFallTimings(void)
+{
+  TrgBit tb;
+
+  for (unsigned i = 0; i < tb.getNumOfInputs(); i++) {
+    if (n_clocks == 32) {
+      h_itd_rise[i]->GetXaxis()->SetTitle("clk32ns");
+      h_itd_fall[i]->GetXaxis()->SetTitle("clk32ns");
+      h_itd_rise[i]->GetXaxis()->SetRange(1, 32);
+      h_itd_fall[i]->GetXaxis()->SetRange(1, 32);
+    } else {
+      h_itd_rise[i]->GetXaxis()->SetTitle("clk8ns");
+      h_itd_fall[i]->GetXaxis()->SetTitle("clk8ns");
+    }
+    bool rising_done = false;
+    bool falling_done = false;
+    for (unsigned clk = 0; clk < n_clocks; clk++) {
+      if (h_i->GetBinContent(clk + 1, i + 1) > 0) {
+        if (! rising_done) {
+          h_itd_rise[i]->Fill(clk + 0.5);
+          rising_done = true;
+        } else if (rising_done && !falling_done && clk == n_clocks - 1) {
+          h_itd_fall[i]->Fill(clk + 0.5);
+        }
+      } else if (h_i->GetBinContent(clk + 1, i + 1) == 0) {
+        if (rising_done && ! falling_done) {
+          h_itd_fall[i]->Fill(clk + 0.5);
+          falling_done = true;
+        }
+      }
+    }
+  }
+  for (unsigned i = 0; i < tb.getNumOfOutputs(); i++) {
+    if (n_clocks == 32) {
+      h_ftd_rise[i]->GetXaxis()->SetTitle("clk32ns");
+      h_psn_rise[i]->GetXaxis()->SetTitle("clk32ns");
+      h_ftd_fall[i]->GetXaxis()->SetTitle("clk32ns");
+      h_psn_fall[i]->GetXaxis()->SetTitle("clk32ns");
+      h_ftd_rise[i]->GetXaxis()->SetRange(1, 32);
+      h_psn_rise[i]->GetXaxis()->SetRange(1, 32);
+      h_ftd_fall[i]->GetXaxis()->SetRange(1, 32);
+      h_psn_fall[i]->GetXaxis()->SetRange(1, 32);
+    } else {
+      h_ftd_rise[i]->GetXaxis()->SetTitle("clk8ns");
+      h_psn_rise[i]->GetXaxis()->SetTitle("clk8ns");
+      h_ftd_fall[i]->GetXaxis()->SetTitle("clk8ns");
+      h_psn_fall[i]->GetXaxis()->SetTitle("clk8ns");
+    }
+    bool rising_done = false;
+    bool falling_done = false;
+    for (unsigned clk = 0; clk < n_clocks; clk++) {
+      if (h_f->GetBinContent(clk + 1, i + 1) > 0) {
+        if (! rising_done) {
+          h_ftd_rise[i]->Fill(clk + 0.5);
+          rising_done = true;
+        } else if (rising_done && !falling_done && clk == n_clocks - 1) {
+          h_ftd_fall[i]->Fill(clk + 0.5);
+        }
+      } else if (h_f->GetBinContent(clk + 1, i + 1) == 0) {
+        if (rising_done && ! falling_done) {
+          h_ftd_fall[i]->Fill(clk + 0.5);
+          falling_done = true;
+        }
+      }
+    }
+    rising_done = false;
+    falling_done = false;
+    for (unsigned clk = 0; clk < n_clocks; clk++) {
+      if (h_p->GetBinContent(clk + 1, i + 1) > 0) {
+        if (! rising_done) {
+          h_psn_rise[i]->Fill(clk + 0.5);
+          rising_done = true;
+        } else if (rising_done && !falling_done && clk == n_clocks - 1) {
+          h_psn_fall[i]->Fill(clk + 0.5);
+        }
+      } else if (h_p->GetBinContent(clk + 1, i + 1) == 0) {
+        if (rising_done && ! falling_done) {
+          h_psn_fall[i]->Fill(clk + 0.5);
+          falling_done = true;
+        }
+      }
+    }
+  }
+}
+
+void
+TRGGDLDQMModule::fillOutputExtra(void)
+{
+  bool c4_fired = isFired("C4");
+  bool hie_fired = isFired("HIE");
+  bool fff_fired = isFired("FFF");
+  if (fff_fired && (c4_fired || hie_fired)) {
+    h_psn_extra->Fill(0.5);
+  }
+  if (c4_fired || hie_fired) {
+    h_psn_extra->Fill(1.5);
+  }
+  if (fff_fired && hie_fired) {
+    h_psn_extra->Fill(2.5);
+  }
+  if (fff_fired && c4_fired) {
+    h_psn_extra->Fill(3.5);
+  }
+}
+
+const int TRGGDLDQMModule::n_output_extra = 4;
+const char* TRGGDLDQMModule::output_extra[4] = {
+  "fff&(c4|hie)", "c4|hie", "fff&hie", "fff&c4"
+};

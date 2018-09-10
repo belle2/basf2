@@ -26,12 +26,10 @@ set_log_level(LogLevel.DEBUG)
 main = create_path()
 
 if f_in_root[-6:] == ".sroot":
-    rootfiletype = "sroot"
     input = register_module('SeqRootInput')
     matchobj = re.search("([^\/]+)\.sroot", f_in_root)
     basename = re.sub('\.sroot$', '', matchobj.group())
 if f_in_root[-5:] == ".root":
-    rootfiletype = "root"
     input = register_module('RootInput')
     matchobj = re.search("([^\/]+)\.root", f_in_root)
     basename = re.sub('\.root$', '', matchobj.group())
@@ -48,9 +46,17 @@ main.add_module(trggdlUnpacker)
 main.add_module(histo)
 
 # DQM
+# trggdldqm = register_module('TRGGDLDQM', logLevel=LogLevel.DEBUG, debugLevel=20)
 trggdldqm = register_module('TRGGDLDQM')
-trggdldqm.param('eventByEventTimingHistRecord', False)
 # event by event bit-vs-clock TH2I hist for itd, ftdl, psnm in ROOT file.
+trggdldqm.param('eventByEventTimingHistRecord', False)
+# bit name on BinLabel for hGDL_itd,ftd,psn.
+trggdldqm.param('bitNameOnBinLabel', True)
+# generate postscript file
+trggdldqm.param('generatePostscript', False)
+# postscript file name
+psname = "dqm.%s.ps" % basename
+trggdldqm.param('postScriptName', psname)
 
 # dump vcd file
 dumpVcdFileTrue = False
@@ -58,14 +64,14 @@ trggdldqm.param('dumpVcdFile', dumpVcdFileTrue)
 if dumpVcdFileTrue:
     if not os.path.isdir('vcd'):
         os.mkdir('vcd')
-    trggdldqm.param('bitConditionToDumpVcd', 'fff + !fffo')
+    trggdldqm.param('bitConditionToDumpVcd', 'FFfo !FFF')
     # '+' means logical OR. '!' is logical NOT.
     # Bit names is delimited by space. No space after '!'.
     # Parenthesis, A (B+!C) not allowed. Must be expanded to 'A B+A !C'.
     # If one of characters is capital, the bit is regarded as psnm bit,
     # otherwise ftdl bit: 'hie' is ftdl hie bit. 'hIE' is psnm hie bit.
-    trggdldqm.param('vcdEventStart', 10)
-    trggdldqm.param('vcdNumberOfEvents', 5)
+    trggdldqm.param('vcdEventStart', 0)
+    trggdldqm.param('vcdNumberOfEvents', 100)
 
 main.add_module(trggdldqm)
 

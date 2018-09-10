@@ -1897,30 +1897,12 @@ namespace Belle2 {
       if (particle->getParticleType() == Particle::c_Composite) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
         for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isInThisRestOfEvent(fspDaug[i], roe) == 0)
+          if (isInThisRestOfEvent(fspDaug[i], roe, maskName) == 0)
             return 0;
         }
         return 1.0;
-      } else {
-        // Check for Tracks
-        const auto& tracks = roe->getTracks(maskName);
-        if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
-          return 1.0;
-        }
-
-        // Check for KLMClusters
-        const auto& klm = roe->getKLMClusters();
-        if (std::find(klm.begin(), klm.end(), particle->getKLMCluster()) != klm.end()) {
-          return 1.0;
-        }
-
-        // Check for ECLClusters
-        const auto& ecl = roe->getECLClusters(maskName);
-        if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
-          return 1.0;
-        }
       }
-      return 0;
+      return roe->hasParticle(particle, maskName);
     }
 
 

@@ -29,6 +29,7 @@
 #include <analysis/utility/PCmsLabTransform.h>
 
 // root
+#include <TH1F.h>
 #include <TH2F.h>
 
 
@@ -82,6 +83,8 @@ namespace Belle2 {
     addParam("stepPosition", m_stepPosition, "step size for translations", 1.0);
     addParam("stepAngle", m_stepAngle, "step size for rotations", 0.01);
     addParam("stepTime", m_stepTime, "step size for t0", 0.05);
+    addParam("stepRefind", m_stepRefind,
+             "step size for scaling of refractive index (dn/n)", 0.001);
     addParam("gridSize", m_gridSize,
              "size of a 2D grid for time-of-propagation averaging in analytic PDF: "
              "[number of emission points along track, number of Cerenkov angles]. "
@@ -118,9 +121,10 @@ namespace Belle2 {
     }
     if (m_sample == "bhabha") m_chargedStable = Const::electron;
 
-    // create alignment object for a given target module
+    // set alignment object
 
-    m_align = TOPalign(m_targetMid, m_stepPosition, m_stepAngle, m_stepTime);
+    m_align.setModuleID(m_targetMid);
+    m_align.setSteps(m_stepPosition, m_stepAngle, m_stepTime, m_stepRefind);
     if (m_gridSize.size() == 2) {
       m_align.setGrid(m_gridSize[0], m_gridSize[1]);
       B2INFO("TOPAligner: grid for time-of-propagation averaging is set");
@@ -144,7 +148,7 @@ namespace Belle2 {
 
     m_countFails = 0;
 
-    // output file
+    // open output file
 
     m_file = new TFile(m_outFileName.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
@@ -152,9 +156,11 @@ namespace Belle2 {
       return;
     }
 
-    m_alignTree = new TTree("alignTree", "TOP alignment results");
+    // create output tree
 
+    m_alignTree = new TTree("alignTree", "TOP alignment results");
     m_alignTree->Branch("ModuleId", &m_targetMid);
+    m_alignTree->Branch("iter", &m_iter);
     m_alignTree->Branch("ntrk", &m_ntrk);
     m_alignTree->Branch("errorCode", &m_errorCode);
     m_alignTree->Branch("iterPars", &m_vAlignPars);
@@ -209,6 +215,7 @@ namespace Belle2 {
 
       // do an iteration
       int err = m_align.iterate(trk, m_chargedStable);
+      m_iter++;
 
       // check number of consecutive failures, and in case reset
       if (err == 0) {
@@ -263,8 +270,18 @@ namespace Belle2 {
     m_alignTree->Write();
 
     int npar = m_align.getParameters().size();
-    const auto& errMatrix = m_align.getErrorMatrix();
+
+    TH1F h0("results", "alignment parameters", npar, 0, npar);
+    const auto& par = m_align.getParameters();
+    const auto& err = m_align.getErrors();
+    for (int i = 0; i < npar; i++) {
+      h0.SetBinContent(i + 1, par[i]);
+      h0.SetBinError(i + 1, err[i]);
+    }
+    h0.Write();
+
     TH2F h1("errMatrix", "error matrix", npar, 0, npar, npar, 0, npar);
+    const auto& errMatrix = m_align.getErrorMatrix();
     for (int i = 0; i < npar; i++) {
       for (int k = 0; k < npar; k++) {
         h1.SetBinContent(i + 1, k + 1, errMatrix[i + npar * k]);

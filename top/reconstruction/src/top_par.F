@@ -53,3 +53,50 @@
       END
 
 
+      SUBROUTINE SET_REFIND_PAR(BETA)
+
+      IMPLICIT NONE
+      REAL BETA                 ! particle beta
+      
+#include "TOP_PAR.fi"
+      
+      REAL PHASE_INDEX, GROUP_INDEX, GET_MEAN_E
+
+      E_MEAN=GET_MEAN_E(BETA)
+      REF_IND=PHASE_INDEX(E_MEAN)
+      GRU_IND=GROUP_INDEX(E_MEAN)
+      REF_IND1=PHASE_INDEX(E_MEAN+D_E)
+      GRU_IND1=GROUP_INDEX(E_MEAN+D_E)
+      REL_DNDE=(REF_IND1-REF_IND)/D_E/REF_IND
+      REL_DNGDE=(GRU_IND1-GRU_IND)/D_E/GRU_IND
+
+      END
+
+
+      REAL FUNCTION GET_MEAN_E(BETA)
+
+      IMPLICIT NONE
+      REAL BETA                 ! particle beta
+#include "TOP_PAR.fi"
+#include "TOP_QEFF.fi"
+      REAL E, P, S, EM
+      INTEGER I
+      REAL PHASE_INDEX
+
+      S=0
+      EM=0
+      DO I=1,MAX_NT
+         E=QE_E(I)
+         P=MAX(QE(I)*(1-(1/BETA/PHASE_INDEX(E))**2),0.)
+         S=S+P
+         EM=EM+P*E
+      ENDDO
+      IF(S.GT.0) THEN
+         EM=EM/S
+      ELSE
+         EM=E_MEAN
+      ENDIF
+      GET_MEAN_E=EM
+      
+      END
+      

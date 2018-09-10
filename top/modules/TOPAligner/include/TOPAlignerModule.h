@@ -96,6 +96,7 @@ namespace Belle2 {
     double m_stepPosition; /**< step size for translations */
     double m_stepAngle; /**< step size for rotations */
     double m_stepTime; /**< step size for t0 */
+    double m_stepRefind; /**< step size for scaling of refractive index (dn/n) */
     std::vector<int> m_gridSize; /**< grid size */
     std::vector<double> m_parInit; /**< initial parameter values */
     std::vector<std::string> m_parFixed; /**< names of parameters to be fixed */
@@ -109,7 +110,8 @@ namespace Belle2 {
     TFile* m_file = 0;                 /**< TFile */
     TTree* m_alignTree = 0;            /**< TTree containing alignment parameters */
     // tree variables
-    int m_ntrk = 0;                      /**< track number of the iterative procedure */
+    int m_iter = 0;  /**< iteration counter */
+    int m_ntrk = 0;                      /**< number of tracks used */
     int m_errorCode = 0;                 /**< error code of the alignment procedure */
     std::vector<float> m_vAlignPars;     /**< alignment parameters */
     std::vector<float> m_vAlignParsErr;  /**< error on alignment parameters */

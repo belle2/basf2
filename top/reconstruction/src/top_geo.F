@@ -698,12 +698,28 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
       REAL E                    ! photon energy (eV)
 
       REAL LAM, PHIND_LAMBDA
-
+      REAL RIND_SF
+      COMMON /TOP_RIND/ RIND_SF
+      
       LAM=1240./E
-      PHASE_INDEX=PHIND_LAMBDA(LAM)
-
+      PHASE_INDEX=PHIND_LAMBDA(LAM)*RIND_SF
+      
       END
 
+      
+      SUBROUTINE SET_REFIND_SF(SCALEF)
+
+      IMPLICIT NONE
+      REAL SCALEF               ! scale factor for refractive index
+
+      REAL RIND_SF
+      COMMON /TOP_RIND/ RIND_SF
+      DATA RIND_SF /1.0/
+      
+      RIND_SF=SCALEF
+
+      END
+      
 
       REAL FUNCTION GROUP_INDEX(E)
 

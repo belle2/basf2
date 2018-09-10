@@ -85,12 +85,18 @@ c--   returns log likelihood for given alignment parameters
       RY=PAR(5)
       RZ=PAR(6)
       T0=PAR(7)
-
+      IF(NPAR.EQ.8) THEN
+         CALL SET_REFIND_SF(1.0+PAR(8))
+      ENDIF
+      
       CALL SET_ALIGNMENT(MDN,DX,DY,DZ,RX,RY,RZ)
       CALL TOP_RECO
       TOP_LOGL=GET_LOGL(T0,T_MIN,T_MAX,0.0)
       OK=RTRA_FLAG(1).EQ.1
       DGEO_FLAG(MDN)=.FALSE.    ! turn off alignment
+      IF(NPAR.EQ.8) THEN
+         CALL SET_REFIND_SF(1.0)
+      ENDIF
       
       END
       

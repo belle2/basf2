@@ -30,10 +30,7 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    TOPalign::TOPalign(int moduleID,
-                       double stepPosition,
-                       double stepAngle,
-                       double stepTime): m_moduleID(moduleID)
+    TOPalign::TOPalign()
     {
       m_parNames.push_back("x");
       m_parNames.push_back("y");
@@ -42,16 +39,33 @@ namespace Belle2 {
       m_parNames.push_back("beta");
       m_parNames.push_back("gamma");
       m_parNames.push_back("t0");
+      m_parNames.push_back("dn/n");
       unsigned numPar = m_parNames.size();
       m_parInit.resize(numPar, 0);
       m_par = m_parInit;
-      m_step.resize(3, stepPosition);
-      m_step.resize(6, stepAngle);
-      m_step.resize(numPar, stepTime);
+      m_step.resize(numPar, 0);
       m_fixed.resize(numPar, false);
       m_COV.resize(numPar * numPar, 0);
       m_U.resize(numPar * numPar, 0);
+      m_maxDpar.resize(3, 1.0);
+      m_maxDpar.resize(6, 0.01);
+      m_maxDpar.resize(7, 0.05);
+      m_maxDpar.resize(8, 0.005);
     }
+
+
+    void TOPalign::setSteps(double position, double angle, double time, double refind)
+    {
+      m_step[0] = position;
+      m_step[1] = position;
+      m_step[2] = position;
+      m_step[3] = angle;
+      m_step[4] = angle;
+      m_step[5] = angle;
+      m_step[6] = time;
+      m_step[7] = refind;
+    }
+
 
     void TOPalign::clearData()
     {
@@ -136,7 +150,7 @@ namespace Belle2 {
       if (ier != 0) return ier;
 
       for (size_t i = 0; i < dpar.size(); i++) {
-        if (fabs(dpar[i]) > m_step[i]) return ier;
+        if (fabs(dpar[i]) > m_maxDpar[i]) return ier;
       }
       for (size_t i = 0; i < dpar.size(); i++) {
         m_par[i] += dpar[i];

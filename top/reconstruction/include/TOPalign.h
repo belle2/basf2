@@ -28,15 +28,8 @@ namespace Belle2 {
 
       /**
        * Constructor
-       * @param moduleID module ID
-       * @param stepPosition step size for translations
-       * @param stepAngle step size for rotations
-       * @param stepTime step size for T0
        */
-      TOPalign(int moduleID = 0,
-               double stepPosition = 1.0,
-               double stepAngle = 0.01,
-               double stepTime = 0.05);
+      TOPalign();
 
       /**
        * Clear data list
@@ -49,7 +42,7 @@ namespace Belle2 {
        * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param time TBC and local T0 corrected time in [ns]
        * @param timeError time uncertainty in [ns]
-       * @return data size (or 0 on error)
+       * @return data size (or 0/negative on error)
        */
       static int addData(int moduleID, int pixelID, double time, double timeError);
 
@@ -59,6 +52,21 @@ namespace Belle2 {
        * @param scaleN0 scale factor for figure-of-merit N0
        */
       static void setPhotonYields(double bkgPerModule, double scaleN0 = 1);
+
+      /**
+       * Sets module ID
+       * @param moduleID module ID
+       */
+      void setModuleID(int moduleID) {m_moduleID = moduleID;}
+
+      /**
+       * Sets steps for numerical calculation of derivatives
+       * @param position step size for translations [cm]
+       * @param angle step size for rotations [radians]
+       * @param time step size for T0 [ns]
+       * @param refind step size for refractive index scale factor
+       */
+      void setSteps(double position, double angle, double time, double refind);
 
       /**
        * Sets grid for averaging of time-of-propagation in analytic PDF
@@ -72,8 +80,8 @@ namespace Belle2 {
       }
 
       /**
-       * Sets initial values of parameters (overwrites the parameters!)
-       * Order is: translations in x, y, z, rotation angles around x, y, z, time zero
+       * Sets initial values of parameters (overwrites current parameters!)
+       * Order is: translations in x, y, z, rotation angles around x, y, z, t0, dn/n
        * @param parInit initial values
        */
       void setParameters(const std::vector<double>& parInit)
@@ -143,7 +151,7 @@ namespace Belle2 {
 
       /**
        * Returns alignment parameters.
-       * Order is: translations in x, y, z, rotation angles around x, y, z, time zero
+       * Order is: translations in x, y, z, rotation angles around x, y, z, t0, dn/n
        * @return parameters
        */
       const std::vector<float>& getParameters() const {return m_par;}
@@ -156,14 +164,14 @@ namespace Belle2 {
 
       /**
        * Returns errors on alignment parameters.
-       * Order is: translations in x, y, z, rotation angles around x, y, z, time zero
+       * Order is: translations in x, y, z, rotation angles around x, y, z, t0, dn/n
        * @return errors
        */
       std::vector<float> getErrors() const;
 
       /**
        * Returns error matrix of alignment parameters
-       * @return error matrix (7 x 7 symmetric matrix as a std::vector of 49 components)
+       * @return error matrix (N x N symmetric matrix as a std::vector of N*N components)
        */
       const std::vector<float>& getErrorMatrix() const {return m_COV;}
 
@@ -187,9 +195,10 @@ namespace Belle2 {
       int m_NC = 0;  /**< grid for averaging: number of Cerenkov angles */
 
       std::vector<std::string> m_parNames; /**< parameter names */
-      std::vector<float> m_par;  /**< current parameter values */
       std::vector<float> m_parInit;  /**< initial parameter values */
+      std::vector<float> m_par;  /**< current parameter values */
       std::vector<float> m_step; /**< step sizes */
+      std::vector<float> m_maxDpar; /**< maximal parameter changes in one iteration */
       std::vector<bool> m_fixed; /**< true if parameter is fixed */
       std::vector<float> m_COV;  /**< covariance matrix */
       int m_numTracks = 0;  /**< number of tracks used */

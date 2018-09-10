@@ -28,6 +28,8 @@ REG_MODULE(DQMHistAnalysisPXDEff)
 
 DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule()
 {
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
 
   //Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
@@ -37,7 +39,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("pxdeff"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
-
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff"));
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -100,6 +102,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
 
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -256,13 +263,12 @@ void DQMHistAnalysisPXDEffModule::event()
   m_cEffAll->Modified();
   m_cEffAll->Update();
 
+#ifdef _BELLE2_EPICS
+  double data = 0;
+  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
-
-void DQMHistAnalysisPXDEffModule::endRun()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDEff : endRun called");
-}
-
 
 void DQMHistAnalysisPXDEffModule::terminate()
 {

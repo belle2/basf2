@@ -7,8 +7,12 @@
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
-
 #pragma once
+
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
 
 #include <framework/core/Module.h>
 
@@ -20,8 +24,8 @@
 #include <TH2.h>
 #include <TCanvas.h>
 
-
 namespace Belle2 {
+  /*! DQM Histogram Analysis for PXD Efficiency */
 
   class DQMHistAnalysisPXDEffModule : public DQMHistAnalysisModule {
 
@@ -33,18 +37,18 @@ namespace Belle2 {
   private:
 
     //! Module functions to be called from main process
-    void initialize() override final;
+    void initialize(void) override final;
 
     //! Module functions to be called from event process
-    void beginRun() override final;
-    void event() override final;
-    void endRun() override final;
-    void terminate() override final;
+    void beginRun(void) override final;
+    void event(void) override final;
+    void terminate(void) override final;
 
     // Data members
     int m_u_bins;
     int m_v_bins;
     std::string m_histogramDirectoryName;
+    std::string m_pvPrefix;
     bool m_singleHists;
 
     //IDs of all PXD Modules to iterate over
@@ -64,5 +68,9 @@ namespace Belle2 {
 
     TH1* GetHisto(TString a);
 
+#ifdef _BELLE2_EPICS
+    chid  mychid;
+#endif
   };
 } // end namespace Belle2
+

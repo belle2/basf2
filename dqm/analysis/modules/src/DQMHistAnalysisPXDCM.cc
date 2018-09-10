@@ -41,8 +41,6 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 
 void DQMHistAnalysisPXDCMModule::initialize()
 {
-  B2DEBUG(1, "DQMHistAnalysisPXDCM: initialized.");
-
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
@@ -89,8 +87,8 @@ void DQMHistAnalysisPXDCMModule::initialize()
   SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
+  B2DEBUG(1, "DQMHistAnalysisPXDCM: initialized.");
 }
-
 
 void DQMHistAnalysisPXDCMModule::beginRun()
 {

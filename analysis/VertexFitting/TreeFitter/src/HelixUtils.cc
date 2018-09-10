@@ -23,6 +23,12 @@
 //#define OLDHELIX
 
 namespace TreeFitter {
+  /** there is no std::sign() */
+  template <typename T> int inline sgn(T val)
+  {
+    return (T(0) < val) - (val < T(0));
+  }
+
 
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
@@ -450,6 +456,161 @@ namespace TreeFitter {
 //      }
 //    }
 //  }
+  void HelixUtils::getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,
+                                                        const double x,
+                                                        const double y,
+                                                        const double z,
+                                                        const double px,
+                                                        const double py,
+                                                        const double pz,
+                                                        const double bfield,
+                                                        const double charge
+                                                       )
 
+  {
+    const double alpha = 1.0 / (bfield * Belle2::Const::speedOfLight) * 1E4;
+    const double aq = charge / alpha;
+
+
+    const double phi = std::atan2(py, px);
+    const double pt = std::hypot(px, py);
+    const double pt2 = pt * pt;
+    const double pt3 = pt2 * pt;
+    const double pt5 = pt2 * pt3;
+    const double pt7 = pt3 * pt5;
+    const double tanLambda = pz / pt;
+    const double aq2 = aq * aq;
+
+    const double cosPhi = std::cos(phi);
+    const double sinPhi = std::sin(phi);
+
+    const double para = -x * cosPhi - y * sinPhi; //delta parallel
+    const double para2 = para * para;
+    const double ortho = -y * cosPhi + x * sinPhi; //delta orthogonal
+
+    // pt * ( 1+ qa*ortho/pt ) term in Dz0/Dx
+    const double a = pt + aq * ortho;
+    const double a2 = a * a;
+
+
+    const double x2 = x * x;
+    const double y2 = y * y;
+    const double x3 = x2 * x;
+    const double y3 = y2 * y;
+    const double px2 = px * px;
+    const double px3 = px2 * px;
+    const double px4 = px3 * px;
+    const double py2 = py * py;
+    const double py3 = py2 * py;
+    const double py4 = py3 * py;
+
+    const double r = x2 + y2;
+    const double po = std::sqrt(1 + py2 / px2);
+
+    // first term for 00
+    const double t00_lead = (po * pt * px * py + aq * px2 * x + aq * py2 * x);
+    const double sqrt001 = std::sqrt((pt * (py2 + aq2 * r) + 2 * aq * po * px * py * x + px2 * (pt - 2 * aq * po * y)) /
+                                     pt3); // correct! as t03 is correct
+    const double t001 = (-2 * px4 - py2 * (2 * py2 + aq2 * r) - px2 * (4 * py2 + aq2 * r) - 2 * aq * po * pt * px * py * x + 2 * aq * po
+                         * pt * px2 * y - 2 * px2 * sqrt001 - 4 * px2 * py2 * sqrt001 - 2 * py4 * sqrt001);
+    const double t00num = t00_lead * t001;
+
+    const double denum00 = pt7 * sqrt001 * (1 + sqrt001) * (1 + sqrt001);
+
+    const double t00 = -t00num / denum00;
+
+    const double abspx = std::abs(px);
+    const double sqrtabspx = std::sqrt(abspx);
+    const double sqrtabspx3 = sqrtabspx * sqrtabspx * sqrtabspx;
+    const double a_03 = (2 * aq * px * (py * x - px * y) + abspx * (pt2 + aq2 * r));
+    const double sqrt03denum = std::sqrt(abspx) + std::sqrt(a_03 / pt2);
+    const double denum03 = pt2 * pt2 * std::sqrt(a_03) + sqrt03denum * sqrt03denum;
+
+    const double num03 = (-(pt2 * px * (2 * px * py * x + (2 * py2 + aq2 * r) * y) * sqrtabspx)
+                          - aq * pt2 * (2 * py * x * y + px * (x - y) * (x + y)) * sqrtabspx3
+                          - 2 * px * py * (px * x + py * y) * std::sqrt(pt2 * (2 * aq * px * (py * x - px * y) + (pt2 + aq2 * r) * abspx))
+                          - aq * px * r * abspx * std::sqrt(pt2 * (2 * aq * px * (py * x - px * y) + (pt2 + aq2 * r) * abspx)));
+
+    const double num04 = (pt2 * px * (2 * px2 * x + aq2 * r * x + 2 * px * py * y) * sqrtabspx
+                          - aq * pt2 * (2 * px * x * y + py * (-(x * x) + y * y)) * sqrtabspx3
+                          + 2 * px2 * (px * x + py * y) * std::sqrt(pt2 * (2 * aq * px * (py * x - px * y) + (pt2 + aq2 * r) * abspx))
+                          - aq * py * r * abspx * std::sqrt(pt2 * (2 * aq * px * (py * x - px * y) + (pt2 + aq2 * r) * abspx)));
+
+    const double numerator10 = aq * (aq * py2 * y + px2 * (-pt * po + aq * y));
+    const double denominator10 = px4 + 2 * aq * px * py * pt * po * x + py4 + py2 * aq2 * r + px2 * (2 * py2 + aq *
+                                 (-2 * pt * po * y + aq * r));
+    const double numerator11 = aq * (px * py * pt * po + aq * px2 * x + aq * py2 * x);
+
+    const double numerator33 = (pz * (-px4 * x + py4 * x - 2 * px3 * py * y + px * (-2 * py3 * y + aq * py * pt * po *
+                                      r))); //correct to 1e6
+    const double denominator33 = px * pt * po * (px4 + 2 * aq * px * py * pt * po * x + py2 * (py2 + aq2 * r) + px2 * (2 * py2 + aq *
+                                                 (-2 * pt * po * y + r * aq)));
+    const double numerator34 = (pz * (2 * px3 * py * x + 2 * px * py3 * x - px4 * y + py4 * y + aq * px2 * pt * po * r));
+
+    const double signPhiByP = 0 > px ? 1 : -1;
+    const double px0 = px + signPhiByP * aq * y;
+    const double px02 = px0 * px0;
+    const double py0 = py - signPhiByP * aq * x;
+    const double py02 = py0 * py0;
+
+    double phi13 = 0;
+    double phi14 = 0;
+    if (px < 0) { phi13 = (-2 * py) / pt2 + (py - aq * x) / ((py - aq * x) * (py - aq * x) + (px + aq * y) * (px + aq * y)) ;}
+    else { phi13 = (-2 * py) / pt2 + (py + aq * x) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) ;}
+
+    if (px < 0) { phi14 = (2 * px) / pt2 - (px + aq * y) / ((py - aq * x) * (py - aq * x) + (px + aq * y) * (px + aq * y)) ;}
+    else { phi14 = (2 * px) / pt2 + (-px + aq * y) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) ;}
+
+
+    double sqrt13 = std::sqrt(((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) / pt2);
+
+    // D d0 / Dx_i
+    jacobian(0, 0) = (px * py + aq * x * std::abs(px)) / std::sqrt(px * (px * (pt2 + aq2 * r) + 2 * aq * (py * x - px * y) * std::abs(
+                       px)));
+    jacobian(0, 1) = (aq * y - std::abs(px)) / sqrt(pt2 + aq2 * r + 2 * aq * (py * x - px * y) * sgn(px));
+    jacobian(0, 2) = 0; //done
+    jacobian(0, 3) = (-(y * (aq2 * r + 2 * aq * py * x + 2 * py2 * (1 + sqrt13))) - px * (2 * py * x * (1 + sqrt13) + aq * (y2 *
+                      (-1 + sqrt13) + x2 * (1 + sqrt13)))) / (pt2 * std::sqrt((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) *
+                                                              (1 + sqrt13) * (1 + sqrt13)); // done no mismatch
+    jacobian(0, 4) = (2 * px2 * x * (1 + sqrt13) + 2 * px * y * (py - aq * x + py * sqrt13) + aq * (aq * r * x - py * (x2 *
+                      (-1 + sqrt13) + y2 * (1 + sqrt13)))) / (pt2 * std::sqrt((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) *
+                                                              (1 + sqrt13) * (1 + sqrt13));
+    jacobian(0, 5) = 0; //done
+
+    // D phi0 / Dx_i0;
+    jacobian(1, 0) = -numerator10 / denominator10; //done
+    jacobian(1, 1) = numerator11 / denominator10; //done
+    jacobian(1, 2) = 0; //done
+
+
+    jacobian(1, 3) = -(2 * py / pt2) + (py + aq * x) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y));
+    jacobian(1, 4) = (2 * px) / pt2 + (-px + aq * y) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)); //
+    jacobian(1, 5) = 0;//done
+
+    // D omega / Dx_i
+    jacobian(2, 0) = 0; //done
+    jacobian(2, 1) = 0; //done
+    jacobian(2, 2) = 0; //done
+    jacobian(2, 3) = - aq * px / pt3; //done
+    jacobian(2, 4) = - aq * py / pt3; //done
+    jacobian(2, 5) = 0; //done
+
+    // D z0 / Dx_i
+    jacobian(3, 0) = pz * (-1 * aq2 * sinPhi * para / a2 - aq * cosPhi / a) / (aq * (1 + aq2 * para2 / a2)); //done
+    jacobian(3, 1) = pz * (aq2 * cosPhi * para / a2 - aq * sinPhi / a) / (aq * (1 + aq2 * para2 / a2));   //done
+    jacobian(3, 2) = 1; //done
+    jacobian(3, 3) = - (numerator33 / denominator33); //done
+    jacobian(3, 4) = numerator34 / denominator33;    //done
+    jacobian(3, 5) = 1. / aq * std::atan(aq * (px * x + py * y) / (-px * pt * po - aq * py * x + aq * px *
+                                         y)); //done TODO is atan save here?
+
+    // D tan lambda / Dx_i
+    jacobian(4, 0) = 0;//done
+    jacobian(4, 1) = 0;//done
+    jacobian(4, 2) = 0;//done
+    jacobian(4, 3) = - pz * px / pt3; //done
+    jacobian(4, 4) = - pz * py / pt3; //done
+    jacobian(4, 5) = 1. / pt; //done
+  }
 
 }

@@ -37,6 +37,19 @@ namespace TreeFitter {
                                          double& flt,
                                          Eigen::Matrix<double, 5, 6>& jacobian);
 
+    /**  */
+    static void getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,
+                                                     const double x,
+                                                     const double y,
+                                                     const double z,
+                                                     const double px,
+                                                     const double py,
+                                                     const double pz,
+                                                     const double bfield,
+                                                     const double charge
+                                                    );
+
+
     /** get helix and jacobian from a vertex */
     static void getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                        int charge, double Bz,

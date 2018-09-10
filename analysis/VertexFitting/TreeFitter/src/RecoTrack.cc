@@ -126,6 +126,17 @@ namespace TreeFitter {
 #else
     HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-6);
 #endif
+    HelixUtils::getJacobianToCartesianFrameworkHelix(jacobian,
+                                                     positionAndMom(0),
+                                                     positionAndMom(1),
+                                                     positionAndMom(2),
+                                                     positionAndMom(3),
+                                                     positionAndMom(4),
+                                                     positionAndMom(5),
+                                                     m_bfield,
+                                                     charge()
+                                                    );
+
 
     // get the measured track parameters at the poca to the mother
     if (!m_cached) {

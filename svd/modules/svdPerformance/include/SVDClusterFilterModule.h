@@ -59,9 +59,10 @@ namespace Belle2 {
     int m_layerNum;  /** the layer number from which the clusters should be excluded  m_sensorID*/
     int m_xShell;  /** X shell identificator: +1(+X), -1 (-X), 0(both)*/
     int m_yShell;  /** Y shell identificator: +1(+Y), -1 (-Y), 0(both)*/
+    float m_minClSNR; /** minimum cluster SNR */
 
-    std::set<VxdID> m_goodVxdID;
-    void create_goodVxdID_set(); /**creates the set containing the VxdID of the DUT sensors */
+    std::set<VxdID> m_outVxdID;
+    void create_outVxdID_set(); /**creates the set containing the VxdID of the DUT sensors */
 
     SelectSubset<SVDCluster> m_selectedClusters; /** all clusters NOT on the layer with m_layerNum */
     SelectSubset<SVDCluster> m_notSelectedClusters; /** all clusters on the layer with m_layerNum */

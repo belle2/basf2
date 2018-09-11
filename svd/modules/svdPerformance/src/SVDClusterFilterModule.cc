@@ -39,7 +39,7 @@ SVDClusterFilterModule::SVDClusterFilterModule() : Module()
   addParam("layerNum", m_layerNum, "layer number", int(999));
   addParam("XShell", m_xShell, "X-Shell ID (+1 -> +X, -1 -> -X, 0 -> both)", int(0));
   addParam("YShell", m_yShell, "Y-Shell ID (+1 -> +Y, -1 -> -Y, 0 -> both)", int(0));
-
+  addParam("minSNR", m_minClSNR, "minimum cluster SNR", float(0));
 
 }
 
@@ -52,16 +52,13 @@ SVDClusterFilterModule::~SVDClusterFilterModule()
 void SVDClusterFilterModule::initialize()
 {
 
-  B2INFO("inputArrayName: " << m_inputArrayName);
-  B2INFO("outputINArrayName: " <<  m_outputINArrayName);
-  B2INFO("outputOUTArrayName: " <<  m_outputOUTArrayName);
-  B2INFO("layerNum: " << m_layerNum);
-  B2INFO("X-Shell: " << m_xShell);
-  B2INFO("Y-Shell: " << m_yShell);
-
-  B2DEBUG(1, "Initialize");
-
-  B2DEBUG(1, "input array name " << m_inputArrayName);
+  B2DEBUG(10, "inputArrayName: " << m_inputArrayName);
+  B2DEBUG(1, "outputINArrayName: " <<  m_outputINArrayName);
+  B2DEBUG(1, "outputOUTArrayName: " <<  m_outputOUTArrayName);
+  B2DEBUG(1, "layerNum: " << m_layerNum);
+  B2DEBUG(1, "X-Shell: " << m_xShell);
+  B2DEBUG(1, "Y-Shell: " << m_yShell);
+  B2DEBUG(1, "minSNR: " << m_minClSNR);
 
 
   StoreArray<SVDCluster> inputArray(m_inputArrayName);
@@ -73,7 +70,7 @@ void SVDClusterFilterModule::initialize()
     m_notSelectedClusters.registerSubset(inputArray, m_outputOUTArrayName);
     m_notSelectedClusters.inheritAllRelations();
   }
-  create_goodVxdID_set();
+  create_outVxdID_set();
 }
 
 
@@ -88,30 +85,49 @@ void SVDClusterFilterModule::event()
 
   StoreArray<SVDCluster> inputClusterArray(m_inputArrayName);
 
-  std::set<VxdID> goodVxdID = m_goodVxdID;
+  m_selectedClusters.select([this](const SVDCluster * aCluster) {
 
-  m_selectedClusters.select([& goodVxdID](const SVDCluster * aCluster) {
 
-    if (goodVxdID.find(aCluster->getSensorID()) == goodVxdID.end())
+    bool inVxdID = (this->m_outVxdID).find(aCluster->getSensorID()) == (this->m_outVxdID).end();
+    bool aboveSNR = aCluster->getSNR() > this->m_minClSNR;
+
+    if (!inVxdID)
+      B2DEBUG(10, "not selected VxdID (OUT): " << aCluster->getSensorID().getLayerNumber() << "." <<
+              aCluster->getSensorID().getLadderNumber());
+
+    if (!aboveSNR)
+      B2DEBUG(10, "below SNR (OUT):" << aCluster->getSNR());
+
+    if (aboveSNR && inVxdID)
       B2DEBUG(10, "keeping " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
 
-    return (goodVxdID.find(aCluster->getSensorID()) == goodVxdID.end());
+    return (inVxdID && aboveSNR);
 
   });
 
   if (m_outputOUTArrayName != "") {
-    m_notSelectedClusters.select([& goodVxdID](const SVDCluster * aCluster) {
+    m_notSelectedClusters.select([this](const SVDCluster * aCluster) {
 
-      if (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end())
+      bool inVxdID = (this->m_outVxdID).find(aCluster->getSensorID()) == (this->m_outVxdID).end();
+      bool aboveSNR = aCluster->getSNR() > this->m_minClSNR;
+
+      if (inVxdID)
+        B2DEBUG(10, "selected VxdID (IN): " << aCluster->getSensorID().getLayerNumber() << "." <<
+                aCluster->getSensorID().getLadderNumber());
+
+      if (aboveSNR)
+        B2DEBUG(10, "above SNR (IN):" << aCluster->getSNR());
+
+      if (!(aboveSNR && inVxdID))
         B2DEBUG(10, "rejecting " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
 
-      return (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end());
+      return (!(inVxdID && aboveSNR));
 
     });
   }
 }
 
-void SVDClusterFilterModule::create_goodVxdID_set()
+void SVDClusterFilterModule::create_outVxdID_set()
 {
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
@@ -119,26 +135,33 @@ void SVDClusterFilterModule::create_goodVxdID_set()
   for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
     int currentLayer = layer.getLayerNumber();
 
-    if (currentLayer != m_layerNum)
-      continue;
+    bool layer_IN = true;
+
+    if ((m_layerNum != 0) && (currentLayer != m_layerNum))
+      layer_IN = false;
 
     for (auto ladder : geoCache.getLadders(layer))
       for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
+
+        bool xShell_IN = true;
+        bool yShell_IN = true;
+
         const VXD::SensorInfoBase& theSensorInfo = geoCache.getSensorInfo(sensor);
         const TVector3 globPos = theSensorInfo.pointToGlobal(TVector3(0, 0, 0));
         if (globPos.X()*m_xShell < 0)
-          continue;
+          xShell_IN = false;
 
         if (globPos.Y()*m_yShell < 0)
-          continue;
+          xShell_IN = false;
 
-        m_goodVxdID.insert(sensor);
+        if (!(layer_IN && xShell_IN && yShell_IN))
+          m_outVxdID.insert(sensor);
 
       }
   }
 
-  B2DEBUG(10, "list of DUTs:");
-  for (auto it = m_goodVxdID.begin(); it != m_goodVxdID.end(); it++)
+  B2DEBUG(10, "list of VxdID OUT:");
+  for (auto it = m_outVxdID.begin(); it != m_outVxdID.end(); it++)
     B2DEBUG(10, it->getLayerNumber() << "." << it->getLadderNumber() << "." << it->getSensorNumber());
 
 }

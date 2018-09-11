@@ -2244,7 +2244,7 @@ def tagCurlTracks(particleLists,
                   path=analysis_main):
     """
     Warning:
-        This module is not yet calibrated with Belle II data and should not be used without extensive study.
+        The cut selector is not calibrated with Belle II data and should not be used without extensive study.
 
     Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
     For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
@@ -2256,7 +2256,9 @@ def tagCurlTracks(particleLists,
     @param mcTruth:       bool flag to output some truth based information
     @param pVal:          float pVal cut for whether two tracks are identified as curls of each other.
                           Note 'cut' selector is binary 0/1
-    @param selectorType:  string name of selector to use. Only 'cut' selection based on BN1079 is currently available
+    @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
+                          It is strongly recommended to used the 'mva' selection. The 'cut' selection
+                          is based on BN1079 and is only calibrated for Belle data.
     @param ptCut:         pre-selection cut on transverse momentum.
     @param train:         flag to set training mode if selector has a training mode (mva)
     @param path:          module is added to this path

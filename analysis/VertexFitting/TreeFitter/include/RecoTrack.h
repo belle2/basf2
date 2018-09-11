@@ -65,9 +65,6 @@ namespace TreeFitter {
     /** setter for the flight length */
     void setFlightLength(double flt) { m_flt = flt ; }
 
-    /**  */
-    void updateMeasCov(const FitParams& fitpar) const;
-
   private:
 
     /**  B field along z   */
@@ -86,8 +83,6 @@ namespace TreeFitter {
     Eigen::Matrix<double, 1, 5> m_params;
 
     /** only lower triangle filled! */
-    mutable Eigen::Matrix<double, 5, 5>m_covariance;
-    /** helix of the track fit */
-    Belle2::Helix m_helix;
+    Eigen::Matrix<double, 5, 5>m_covariance;
   };
 }

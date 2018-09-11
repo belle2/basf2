@@ -64,7 +64,7 @@ TreeFitterModule::TreeFitterModule() : Module()
   addParam("expertRemoveConstraintList", m_removeConstraintList,
            "Type::[string]. List of constraints that you do not want to be used in the fit.", {});
   addParam("expertUseReferencing", m_useReferencing,
-           "Different implementation of the Kalman Filter.", false);
+           "Different implementation of the Kalman Filter.", true);
 }
 
 void TreeFitterModule::initialize()

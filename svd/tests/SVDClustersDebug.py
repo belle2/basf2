@@ -4,6 +4,9 @@
 import os
 import basf2
 from basf2 import *
+from generators import add_evtgen_generator
+from modularAnalysis import setupEventInfo
+from simulation import add_simulation
 from svd import *
 import ROOT
 from ROOT import Belle2, TH1F, TH2F, TFile
@@ -121,19 +124,25 @@ class SVDClustersDebug(basf2.Module):
 # Create paths
 main = create_path()
 
-main.add_module('RootInput')
+# if run on real data
+# main.add_module('RootInput')
 
-main.add_module("Gearbox")
-main.add_module('Geometry', useDB=True)
+# generation and simulation
+setupEventInfo(100, main)
+add_evtgen_generator(main, 'charged')
+add_simulation(main, components=['SVD'])
 
-# SVD unpacking
-main.add_module('SVDUnpacker', svdShaperDigitListName='SVDShaperDigitsToFilter')
+
+# if run on real data
+# main.add_module("Gearbox")
+# main.add_module('Geometry', useDB=True)
+# main.add_module('SVDUnpacker', svdShaperDigitListName='SVDShaperDigitsToFilter')
 
 # ZS 3
 zs3 = register_module('SVDZeroSuppressionEmulator')
 zs3.set_name("SVDZeroSuppressionEmulator_ZS3")
 zs3.param('SNthreshold', 3)
-zs3.param('ShaperDigits', 'SVDShaperDigitsToFilter')
+zs3.param('ShaperDigits', 'SVDShaperDigits')  # ToFilter
 zs3.param('ShaperDigitsIN', shaper3)
 zs3.param('FADCmode', True)
 # zs3.param('FADCmode',False)
@@ -159,7 +168,7 @@ main.add_module(clusterizerZS3)
 zs5 = register_module('SVDZeroSuppressionEmulator')
 zs5.set_name("SVDZeroSuppressionEmulator_ZS5")
 zs5.param('SNthreshold', 5)
-zs5.param('ShaperDigits', 'SVDShaperDigitsToFilter')
+zs5.param('ShaperDigits', 'SVDShaperDigits')  # ToFilter
 zs5.param('ShaperDigitsIN', shaper5)
 zs5.param('FADCmode', True)
 # zs5.param('FADCmode',False)

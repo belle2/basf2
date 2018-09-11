@@ -17,9 +17,7 @@
 
 #include <TFile.h>
 #include <TDirectory.h>
-#include <TList.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <TNtuple.h>
 
 
 namespace Belle2 {
@@ -64,31 +62,9 @@ namespace Belle2 {
     static double m_min_pT; /**< miminum value of the transverse momentum*/
     static double m_min_Pval;  /**< miminum P-value of the track fit*/
 
-    static bool m_saveControlHistos; /**< if true produces a rootfile with control histograms*/
+    static bool m_saveControlNtuples; /**< if true produces a rootfile with control ntupled*/
     std::string m_rootFileName;   /**< root file name */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
-
-    TList* m_histoList_selected; /**<TList of TH1 for selected tracks*/
-    TList* m_histoList_excluded; /**<TList of TH1 for excluded tracks*/
-
-    static TH1F* m_d0_sel; /**< TH1F of d0 for selected tracks*/
-    static TH1F* m_d0_exc; /**< TH1F of d0 for excluded tracks*/
-    static TH1F* m_z0_sel; /**< TH1F of z0 for selected tracks*/
-    static TH1F* m_z0_exc; /**< TH1F of z0 for excluded tracks*/
-    static TH2F* m_d0z0_sel; /**< TH2F of do VS z0 for selected tracks*/
-    static TH2F* m_d0z0_exc; /**< TH2F of do VS z0 for excluded tracks*/
-    static TH1F* m_nPXD_sel; /**< TH1F of # PXD hits for selected tracks*/
-    static TH1F* m_nPXD_exc; /**< TH1F of # PXD hits for excluded tracks*/
-    static TH1F* m_nSVD_sel; /**< TH1F of # SVD hits for selected tracks*/
-    static TH1F* m_nSVD_exc; /**< TH1F of # SVD hits for excluded tracks*/
-    static TH1F* m_nCDC_sel; /**< TH1F of # CDC Hits for selected tracks*/
-    static TH1F* m_nCDC_exc; /**< TH1F of # CDC hits for excluded tracks*/
-    static TH1F* m_pval_sel; /**< TH1F of pValue for selected tracks*/
-    static TH1F* m_pval_exc; /**< TH1F of pValue for excluded tracks*/
-    static TH1F* m_pCM_sel; /**< TH1F of center of mass momentum of selected tracks*/
-    static TH1F* m_pCM_exc; /**< TH1F of center of mass momentum of excluded tracks*/
-    static TH1F* m_pT_sel; /**< TH1F of transverse momentum of selected tracks*/
-    static TH1F* m_pT_exc; /**< TH1F of transverse momentum of excluded tracks*/
+    TFile* m_rootFilePtr; /**< pointer at root file used for storing ntuples */
 
   private:
 
@@ -101,8 +77,11 @@ namespace Belle2 {
 
     static bool isSelected(const Track* track); /**< determine if the track satisfies the selection criteria */
 
-    static void fillControlHistograms(const Track* track,
-                                      bool isSelected); /**< determine if the track does not satisfies the selection criteria */
+    static void fillControlNtuples(const Track* track,
+                                   bool isSelected); /**< determine if the track does not satisfies the selection criteria */
+
+    static TNtuple* m_selectedNtpl;
+    static TNtuple* m_rejectedNtpl;
   };
 }
 

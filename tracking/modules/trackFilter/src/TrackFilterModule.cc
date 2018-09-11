@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 #include <tracking/modules/trackFilter/TrackFilterModule.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
@@ -28,27 +27,10 @@ double TrackFilterModule::m_min_pCM = 0;
 double TrackFilterModule::m_min_pT = 0;
 double TrackFilterModule::m_min_Pval = 0;
 
-TH1F* TrackFilterModule::m_d0_sel = NULL;
-TH1F* TrackFilterModule::m_d0_exc = NULL;
-TH1F* TrackFilterModule::m_z0_sel = NULL;
-TH1F* TrackFilterModule::m_z0_exc = NULL;
-TH2F* TrackFilterModule::m_d0z0_sel = NULL;
-TH2F* TrackFilterModule::m_d0z0_exc = NULL;
-TH1F* TrackFilterModule::m_nPXD_sel = NULL;
-TH1F* TrackFilterModule::m_nPXD_exc = NULL;
-TH1F* TrackFilterModule::m_nSVD_sel = NULL;
-TH1F* TrackFilterModule::m_nSVD_exc = NULL;
-TH1F* TrackFilterModule::m_nCDC_sel = NULL;
-TH1F* TrackFilterModule::m_nCDC_exc = NULL;
-TH1F* TrackFilterModule::m_pT_sel = NULL;
-TH1F* TrackFilterModule::m_pT_exc = NULL;
-TH1F* TrackFilterModule::m_pCM_sel = NULL;
-TH1F* TrackFilterModule::m_pCM_exc = NULL;
-TH1F* TrackFilterModule::m_pval_sel = NULL;
-TH1F* TrackFilterModule::m_pval_exc = NULL;
+bool TrackFilterModule::m_saveControlNtuples = true;
 
-bool TrackFilterModule::m_saveControlHistos = true;
-
+TNtuple* TrackFilterModule::m_selectedNtpl = NULL;
+TNtuple* TrackFilterModule::m_rejectedNtpl = NULL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -81,9 +63,9 @@ TrackFilterModule::TrackFilterModule() : Module()
   addParam("min_NumHitSVD", m_min_NumHitsSVD, "minimum number of SVD hits associated to the trcak", int(0));
   addParam("min_NumHitCDC", m_min_NumHitsCDC, "minimum number of CDC hits associated to the trcak", int(0));
 
-  addParam("saveControlHistograms", m_saveControlHistos, "if true, generate a rootfile containing histograms ", bool(true));
+  addParam("saveControNtuples", m_saveControlNtuples, "if true, generate a rootfile containing histograms ", bool(true));
   addParam("outputFileName", m_rootFileName, "Name of output root file.",
-           std::string("TrackFilterControlHistograms.root"));
+           std::string("TrackFilterControlNtuples.root"));
 
 }
 
@@ -109,80 +91,11 @@ void TrackFilterModule::initialize()
   m_notSelectedTracks.registerSubset(inputArray, m_outputOUTArrayName);
   m_notSelectedTracks.inheritAllRelations();
 
-  if (m_saveControlHistos) {
+  if (m_saveControlNtuples) {
     //set the ROOT File
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
-    //create list of histograms to be saved in the rootfile
-    m_histoList_selected = new TList;
-    m_histoList_excluded = new TList;
-
-    //D0
-    m_d0_sel = new TH1F("d0Sel", "Transverse Impact Parameter (selected tracks)", 200, -5, 5);
-    m_d0_sel->GetXaxis()->SetTitle("d0 (cm)");
-    m_histoList_selected->Add(m_d0_sel);
-    m_d0_exc = new TH1F("d0Exc", "Transverse Impact Parameter (excluded tracks)", 200, -5, 5);
-    m_d0_exc->GetXaxis()->SetTitle("d0 (cm)");
-    m_histoList_excluded->Add(m_d0_exc);
-    //Z0
-    m_z0_sel = new TH1F("z0Sel", "Longitudinal Parameter (selected tracks)", 200, -5, 5);
-    m_z0_sel->GetXaxis()->SetTitle("z0 (cm)");
-    m_histoList_selected->Add(m_z0_sel);
-    m_z0_exc = new TH1F("z0Exc", "Longitudinal Impact Parameter (excluded tracks)", 200, -5, 5);
-    m_z0_exc->GetXaxis()->SetTitle("z0 (cm)");
-    m_histoList_excluded->Add(m_z0_exc);
-    //D0 VS Z0
-    m_d0z0_sel = new TH2F("d0z0Sel", "Transverse VS Longitudinal Parameter (selected tracks)", 200, -5, 5, 200, -5, 5);
-    m_d0z0_sel->GetXaxis()->SetTitle("z0 (cm)");
-    m_d0z0_sel->GetYaxis()->SetTitle("d0 (cm)");
-    m_histoList_selected->Add(m_d0z0_sel);
-    m_d0z0_exc = new TH2F("d0z0Exc", "Transverse VS Longitudinal Parameter (excluded tracks)", 200, -5, 5, 200, -5, 5);
-    m_d0z0_exc->GetXaxis()->SetTitle("z0 (cm)");
-    m_d0z0_exc->GetYaxis()->SetTitle("d0 (cm)");
-    m_histoList_excluded->Add(m_d0z0_exc);
-
-    //PXD HITS
-    m_nPXD_sel = new TH1F("PXDhitsSel", "Number Of PXD Hits (selected tracks)", 10, 0, 10);
-    m_nPXD_sel->GetXaxis()->SetTitle("# PXD hits");
-    m_histoList_selected->Add(m_nPXD_sel);
-    m_nPXD_exc = new TH1F("PXDhitsExc", "Number Of PXD Hits (excluded tracks)", 10, 0, 10);
-    m_nPXD_exc->GetXaxis()->SetTitle("# PXD hits");
-    m_histoList_excluded->Add(m_nPXD_exc);
-    //SVD HITS
-    m_nSVD_sel = new TH1F("SVDhitsSel", "Number Of SVD Hits (selected tracks)", 20, 0, 20);
-    m_nSVD_sel->GetXaxis()->SetTitle("# SVD hits");
-    m_histoList_selected->Add(m_nSVD_sel);
-    m_nSVD_exc = new TH1F("SVDhitsExc", "Number Of SVD Hits (excluded tracks)", 20, 0, 20);
-    m_nSVD_exc->GetXaxis()->SetTitle("# SVD hits");
-    m_histoList_excluded->Add(m_nSVD_exc);
-    //CDC HITS
-    m_nCDC_sel = new TH1F("CDChitsSel", "Number Of CDC Hits (selected tracks)", 150, 0, 150);
-    m_nCDC_sel->GetXaxis()->SetTitle("# CDC hits");
-    m_histoList_selected->Add(m_nCDC_sel);
-    m_nCDC_exc = new TH1F("CDChitsExc", "Number Of CDC Hits (excluded tracks)", 150, 0, 150);
-    m_nCDC_exc->GetXaxis()->SetTitle("# CDC hits");
-    m_histoList_excluded->Add(m_nCDC_exc);
-    //P-Value
-    m_pval_sel = new TH1F("pValSel", "Track Fit P-value (selected tracks)", 1000, 0, 1);
-    m_pval_sel->GetXaxis()->SetTitle("track P-value");
-    m_histoList_selected->Add(m_pval_sel);
-    m_pval_exc = new TH1F("pValExc", "Track Fit P-value (excted tracks)", 1000, 0, 1);
-    m_pval_exc->GetXaxis()->SetTitle("track P-value");
-    m_histoList_excluded->Add(m_pval_exc);
-    //P-CMS
-    m_pCM_sel = new TH1F("pCMSel", "Center of Mass Momentum (selected tracks)", 100, 0, 6);
-    m_pCM_sel->GetXaxis()->SetTitle("p* (GeV/c)");
-    m_histoList_selected->Add(m_pCM_sel);
-    m_pCM_exc = new TH1F("pCMExc", "Center of Mass Momentum (excluded tracks)", 100, 0, 6);
-    m_pCM_exc->GetXaxis()->SetTitle("p* (GeV/c)");
-    m_histoList_excluded->Add(m_pCM_exc);
-    //P-CMS
-    m_pT_sel = new TH1F("ptSel", "Transverse Momentum (selected tracks)", 100, 0, 5.5);
-    m_pT_sel->GetXaxis()->SetTitle("pT (GeV/c)");
-    m_histoList_selected->Add(m_pT_sel);
-    m_pT_exc = new TH1F("ptExc", "Transverse  Momentum (excluded tracks)", 100, 0, 5.5);
-    m_pT_exc->GetXaxis()->SetTitle("pT (GeV/c)");
-    m_histoList_excluded->Add(m_pT_exc);
-
+    m_selectedNtpl = new TNtuple("selected", "Selected Tracks", "d0:z0:phi:tanDip:omega:pT:pCM:nPXD:nSVD:nCDC:pVal");
+    m_rejectedNtpl = new TNtuple("rejected", "Rejected Tracks", "d0:z0:phi:tanDip:omega:pT:pCM:nPXD:nSVD:nCDC:pVal");
   }
 
 
@@ -214,20 +127,8 @@ void TrackFilterModule::terminate()
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
 
-    TDirectory* oldDir = gDirectory;
-
-    TDirectory* dir_selected = oldDir->mkdir("selected");
-    dir_selected->cd();
-    TIter nextH_selected(m_histoList_selected);
-    TObject* obj;
-    while ((obj = nextH_selected()))
-      obj->Write();
-
-    TDirectory* dir_excluded = oldDir->mkdir("excluded");
-    dir_excluded->cd();
-    TIter nextH_excluded(m_histoList_excluded);
-    while ((obj = nextH_excluded()))
-      obj->Write();
+    m_selectedNtpl->Write();
+    m_rejectedNtpl->Write();
 
     m_rootFilePtr->Close();
 
@@ -261,14 +162,15 @@ bool TrackFilterModule::isSelected(const Track* track)
   if (hitPatternCDC.getNHits() < m_min_NumHitsCDC)
     isExcluded = true;
 
-  if (m_saveControlHistos)
-    fillControlHistograms(track, !isExcluded);
+  if (m_saveControlNtuples)
+    fillControlNtuples(track, !isExcluded);
+
 
   return !isExcluded;
 
 }
 
-void TrackFilterModule::fillControlHistograms(const Track* track , bool isSelected)
+void TrackFilterModule::fillControlNtuples(const Track* track , bool isSelected)
 {
 
   int pionCode = 211;
@@ -278,6 +180,10 @@ void TrackFilterModule::fillControlHistograms(const Track* track , bool isSelect
 
   double d0 = tfr->getD0();
   double z0 = tfr->getZ0();
+  float phi = tfr->getPhi();
+  float tanDip = tfr->getTanLambda();
+  float omega = tfr->getOmega();
+
   double pt = tfr->getMomentum().Pt();
   TLorentzVector pStar = tfr->get4Momentum();
   pStar.Boost(0, 0, 3. / 11);
@@ -287,26 +193,14 @@ void TrackFilterModule::fillControlHistograms(const Track* track , bool isSelect
   int nSVDhits = hitPatternVXD.getNSVDHits();
   int nCDChits = hitPatternCDC.getNHits();
 
-  if (isSelected) {
-    m_d0_sel->Fill(d0);
-    m_z0_sel->Fill(z0);
-    m_d0z0_sel->Fill(z0, d0);
-    m_nPXD_sel->Fill(nPXDhits);
-    m_nSVD_sel->Fill(nSVDhits);
-    m_nCDC_sel->Fill(nCDChits);
-    m_pval_sel->Fill(pVal);
-    m_pCM_sel->Fill(pCM);
-    m_pT_sel->Fill(pt);
-  } else {
-    m_d0_exc->Fill(d0);
-    m_z0_exc->Fill(z0);
-    m_d0z0_exc->Fill(z0, d0);
-    m_nPXD_exc->Fill(nPXDhits);
-    m_nSVD_exc->Fill(nSVDhits);
-    m_nCDC_exc->Fill(nCDChits);
-    m_pval_exc->Fill(pVal);
-    m_pCM_exc->Fill(pCM);
-    m_pT_exc->Fill(pt);
-  }
+  float nPXD = nPXDhits;
+  float nSVD = nSVDhits;
+  float nCDC = nCDChits;
+
+  if (isSelected)
+    m_selectedNtpl->Fill(d0, z0, phi, tanDip, omega, pt, pCM, nPXD, nSVD, nCDC, pVal);
+  else
+    m_rejectedNtpl->Fill(d0, z0, phi, tanDip, omega, pt, pCM, nPXD, nSVD, nCDC, pVal);
+
 
 }

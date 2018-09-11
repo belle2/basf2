@@ -148,15 +148,12 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
         return 0.0;
-      std::vector<const Track*> roeTracks = roe->getTracks(maskName);
       int n_roe_tracks = roe->getNTracks(maskName);
       int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
-        int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212) {
-          if (std::find(roeTracks.begin(), roeTracks.end(), daughter->getTrack()) != roeTracks.end())
-            n_par_tracks++;
+        if (daughter->getParticleType() == Particle::EParticleType::c_Track && roe->hasParticle(daughter, maskName)) {
+          n_par_tracks++;
         }
       }
       return n_roe_tracks - n_par_tracks;
@@ -203,7 +200,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -216,7 +213,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -229,7 +226,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -242,7 +239,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -255,7 +252,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -268,7 +265,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -544,13 +541,12 @@ namespace Belle2 {
         }
 
         // Get tracks in ROE
-        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
+        auto roeParticles = roe->getParticles(maskName);
         int roeCharge = 0;
 
-        for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
+        for (auto* roeParticle : roeParticles)
         {
-          auto closestMassTrackFitResult = roeTracks[iTrack]->getTrackFitResultWithClosestMass(Const::pion);
-          roeCharge += closestMassTrackFitResult->getChargeSign();
+          roeCharge += roeParticle->getCharge();
         }
 
         return roeCharge;

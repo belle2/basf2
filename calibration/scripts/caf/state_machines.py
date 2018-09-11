@@ -546,7 +546,7 @@ class CalibrationMachine(Machine):
                     collection.files_to_iovs = files_to_iovs
                 else:
                     B2INFO(("Using File to IoV mapping from 'files_to_iovs' attribute for Calibration '{}' "
-                            "and Collection '{}'".format(self.calibration.name, name)))
+                            "and Collection '{}'".format(self.calibration.name, coll_name)))
         else:
             B2INFO("No File to IoV mapping required.")
 

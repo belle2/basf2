@@ -23,13 +23,6 @@
 //#define OLDHELIX
 
 namespace TreeFitter {
-  /** there is no std::sign() */
-  template <typename T> int inline sgn(T val)
-  {
-    return (T(0) < val) - (val < T(0));
-  }
-
-
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
                                    double L, double Bz,
@@ -471,13 +464,11 @@ namespace TreeFitter {
     const double alpha = 1.0 / (bfield * Belle2::Const::speedOfLight) * 1E4;
     const double aq = charge / alpha;
 
-    const double phi = std::atan2(py, px);
     const double pt = std::hypot(px, py);
     const double pt2 = pt * pt;
     const double pt3 = pt2 * pt;
     const double aq2 = aq * aq;
 
-    const double abspx = std::abs(px);
     const double x2 = x * x;
     const double y2 = y * y;
     const double r  = x2 + y2;

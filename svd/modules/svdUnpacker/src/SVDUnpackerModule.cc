@@ -135,7 +135,7 @@ void SVDUnpackerModule::event()
             << "remember to use SVDShaperDigitSorter in your path and \n"
             << "set the silentlyAppend parameter of SVDUnpacker to true.");
 
-  vector<SVDDAQDiagnostic*> diagnosticVector;
+  //vector<SVDDAQDiagnostic*> diagnosticVector;
   SVDDAQDiagnostic* currentDAQDiagnostic;
   map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
   // Store encountered pipeline addresses with APVs in which they were observed
@@ -213,7 +213,7 @@ void SVDUnpackerModule::event()
 
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header
-            diagnosticVector.clear(); // new set of objects for the current FTB
+            //diagnosticVector.clear(); // new set of objects for the current FTB
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
 
@@ -226,6 +226,25 @@ void SVDUnpackerModule::event()
             m_data32 = *data32_it; //put the second 32-bit frame to union
 
             ftbError = m_FTBHeader.errorsField;
+
+            if (ftbError != 240) {
+              switch (ftbError - 240) {
+                case 3:
+                  B2WARNING("FADC Event Number is different from (FTB & TTD) Event Numbers");
+                  break;
+                case 5:
+                  B2WARNING("TTD Event Number is different from (FTB & FADC) Event Numbers");
+                  break;
+                case 6:
+                  B2WARNING("FTB Event Number is different from (TTD & FADC) Event Numbers");
+                  break;
+                case 7:
+                  B2WARNING("(FTB, TTD & FADC) Event Numbers are different from each other");
+                  break;
+                default:
+                  B2WARNING("Problem with errorsField variable in FTB Header - abnormal value = " << ftbError);
+              }
+            }
 
             if (m_FTBHeader.eventNumber !=
                 (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) {
@@ -302,7 +321,7 @@ void SVDUnpackerModule::event()
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
             currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, fadc,
                                                             apv);
-            diagnosticVector.push_back(currentDAQDiagnostic);
+            //diagnosticVector.push_back(currentDAQDiagnostic);
             apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
           }
 
@@ -385,17 +404,25 @@ void SVDUnpackerModule::event()
             seenAPVHeaders.clear();
 
             ftbFlags = m_FADCTrailer.FTBFlags;
-            if (ftbFlags != 0)
-              B2WARNING(" Something is wrong with FTB Flags: " << ftbFlags << " on FADC number " << fadc);
+            if (ftbFlags != 0) {
+              B2WARNING(" FTB Flags variable has an active error bit(s) on FADC number " << fadc);
+
+              if (ftbFlags & 16) B2WARNING("----> CRC error has been detected. Data might be corrupted!");
+              if (ftbFlags & 8) B2WARNING("----> Bad Event indication has been detected. Data might be corrupted!");
+              if (ftbFlags & 4) B2WARNING("----> Double Header has been detected. Data might be corrupted!");
+              if (ftbFlags & 2) B2WARNING("----> Time Out has been detected. Data might be corrupted!");
+              if (ftbFlags & 1) B2WARNING("----> Event Too Long! Data might be corrupted!");
+            }
 
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
-            for (auto* finalDAQDiagnostic : diagnosticVector) {
+            for (auto& p : diagnosticMap) {
+              //for (auto* finalDAQDiagnostic : diagnosticVector)
               // adding remaining info to Diagnostic object
-              finalDAQDiagnostic->setFTBFlags(ftbFlags);
-              finalDAQDiagnostic->setEmuPipelineAddress(emuPipAddr);
-              finalDAQDiagnostic->setApvErrorOR(apvErrorsOR);
-              finalDAQDiagnostic->setAPVMatch(nAPVmatch);
+              p.second->setFTBFlags(ftbFlags);
+              p.second->setEmuPipelineAddress(emuPipAddr);
+              p.second->setApvErrorOR(apvErrorsOR);
+              p.second->setAPVMatch(nAPVmatch);
             }
 
           }// FADC trailer
@@ -472,7 +499,8 @@ void SVDUnpackerModule::event()
   // Here we can delete digits coming from upset APVs. We detect them by comparing
   // actual and emulated pipeline address fields in DAQDiagnostics.
   for (auto& p : diagnosticMap) {
-    if (m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress())
+    if ((m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress()) || p.second->getFTBError() != 240
+        || p.second->getFTBFlags())
       continue;
     shaperDigits.appendNew(p.first)->addRelationTo(p.second);
   }

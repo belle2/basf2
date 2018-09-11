@@ -18,6 +18,7 @@
 #include <TMath.h>
 
 #define NUMERICAL_JACOBIAN
+#undef NUMERICAL_JACOBIAN
 
 namespace TreeFitter {
 
@@ -32,6 +33,8 @@ namespace TreeFitter {
   {
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
+    m_helix = m_trackfit->getHelix();
+
   }
 
   ErrCode RecoTrack::initParticleWithMother(FitParams& fitparams)
@@ -67,6 +70,7 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
+
   ErrCode RecoTrack::updFltToMother(const FitParams& fitparams)
   {
     const int posindexmother = mother()->posIndex();
@@ -94,11 +98,31 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
+  void RecoTrack::updateMeasCov(const FitParams& fitpar) const
+  {
+    /** transport the measurement helix covariance to the new vertex */
+    const int posindexmother = mother()->posIndex();
+    const double deltax = m_trackfit->getPosition().X() - fitpar.getStateVector()(posindexmother);
+    const double deltay = m_trackfit->getPosition().Y() - fitpar.getStateVector()(posindexmother + 1);
+    TMatrixD J(5, 5);
+
+    m_helix.calcPassiveMoveByJacobian(-deltax, -deltay, J);
+    TMatrixDSym cov = m_trackfit->getCovariance5().Similarity(J);
+    for (int row = 0; row < 5; ++row) {
+      for (int col = 0; col <= row; ++col) {
+        m_covariance(row, col) = cov[row][col];
+      }
+    }
+  }
+
   ErrCode RecoTrack::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
   {
     ErrCode status;
     const int posindexmother = mother()->posIndex();
     const int momindex = momIndex();
+
+    //updateMeasCov(fitparams);
+
     //
     Eigen::Matrix<double, 1, 6> positionAndMom = Eigen::Matrix<double, 1, 6>::Zero(1, 6);
     positionAndMom.segment(0, 3) = fitparams.getStateVector().segment(posindexmother, 3);
@@ -115,17 +139,10 @@ namespace TreeFitter {
                               positionAndMom(4),
                               positionAndMom(5)),
                             charge(),
-                            Belle2::BFieldManager::getField(TVector3(0,
-                                                            0,
-                                                            0)).Z() / Belle2::Unit::T
+                            m_bfield
                           );
 
 #ifndef NUMERICAL_JACOBIAN
-    double flt;
-    HelixUtils::helixFromVertex(position, momentum, charge(), m_bfield, helix, flt, jacobian);
-#else
-    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-6);
-#endif
     HelixUtils::getJacobianToCartesianFrameworkHelix(jacobian,
                                                      positionAndMom(0),
                                                      positionAndMom(1),
@@ -136,7 +153,9 @@ namespace TreeFitter {
                                                      m_bfield,
                                                      charge()
                                                     );
-
+#else
+    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-6);
+#endif
 
     // get the measured track parameters at the poca to the mother
     if (!m_cached) {

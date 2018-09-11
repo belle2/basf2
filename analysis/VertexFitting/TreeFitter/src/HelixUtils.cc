@@ -477,6 +477,7 @@ namespace TreeFitter {
     const double pt3 = pt2 * pt;
     const double aq2 = aq * aq;
 
+    const double abspx = std::abs(px);
     const double x2 = x * x;
     const double y2 = y * y;
     const double r  = x2 + y2;
@@ -486,34 +487,36 @@ namespace TreeFitter {
 
     const double px0 = px - aq * y;
     const double py0 = py + aq * x;
-    double sqrt13 = std::sqrt(((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) / pt2);
+
+    const double pt02 = px0 * px0 + py0 * py0;
+    const double pt0 = std::sqrt(pt02);
+    //double sqrt13 = std::sqrt((pt02) / pt2);
+    double sqrt13 = pt0 / pt;
 
     /** _____________________________________________________________________________________________________________ */
     // D d0 / Dx_i
-    jacobian(0, 0) = (px * py + aq * x * std::abs(px)) / std::sqrt(px * (px * (pt2 + aq2 * r) + 2 * aq * (py * x - px * y) * std::abs(
-                       px)));
+    jacobian(0, 0) = py0 / pt0;
 
-    jacobian(0, 1) = (aq * y - std::abs(px)) / sqrt(pt2 + aq2 * r + 2 * aq * (py * x - px * y) * sgn(px));
+    jacobian(0, 1) = (-px + aq * y) / pt0;
 
     jacobian(0, 2) = 0;
 
     jacobian(0, 3) = (-(y * (aq2 * r + 2 * aq * py * x + 2 * py2 * (1 + sqrt13))) - px * (2 * py * x * (1 + sqrt13) + aq * (y2 *
                       (-1 + sqrt13) + x2 * (1 + sqrt13)))) /
-                     (pt2 * std::sqrt((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) * (1 + sqrt13) * (1 + sqrt13));
+                     (pt2 * pt0 * (1 + sqrt13) * (1 + sqrt13));
 
     jacobian(0, 4) = (2 * px2 * x * (1 + sqrt13) + 2 * px * y * (py - aq * x + py * sqrt13) + aq * (aq * r * x - py * (x2 *
                       (-1 + sqrt13) + y2 * (1 + sqrt13)))) /
-                     (pt2 * std::sqrt((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)) * (1 + sqrt13) * (1 + sqrt13));
+                     (pt2 * pt0 * (1 + sqrt13) * (1 + sqrt13));
 
     jacobian(0, 5) = 0;
     /** _____________________________________________________________________________________________________________ */
     // D phi0 / Dx_i0;
-    jacobian(1, 0) = -(aq * (-px + aq * y)) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y));
-    jacobian(1, 1) = ((aq * (py + aq * x)) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)));
+    jacobian(1, 0) = aq * px0 / pt02;
+    jacobian(1, 1) = aq * py0 / pt02;
     jacobian(1, 2) = 0;
-
-    jacobian(1, 3) = -(2 * py / pt2) + (py + aq * x) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y));
-    jacobian(1, 4) = (2 * px) / pt2 + (-px + aq * y) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)); //
+    jacobian(1, 3) = -py0 / pt02;
+    jacobian(1, 4) = px0 / pt02;
     jacobian(1, 5) = 0;
 
     /** _____________________________________________________________________________________________________________ */
@@ -527,14 +530,12 @@ namespace TreeFitter {
 
     /** _____________________________________________________________________________________________________________ */
     // D z0 / Dx_i
-    jacobian(3, 0) = (-(px * pz) + aq * pz * y) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y));
-    jacobian(3, 1) = -((pz * (py + aq * x)) / ((py + aq * x) * (py + aq * x) + (px - aq * y) * (px - aq * y)));
+    jacobian(3, 0) = (-px * pz + aq * pz * y) / pt02;
+    jacobian(3, 1) = -pz * py0 / pt02;
     jacobian(3, 2) = 1; //done
-    jacobian(3, 3) = (pz * (px2 * x - py * (aq * r + py * x) + 2 * px * py * y)) / (pt2 * ((py + aq * x) * (py + aq * x) +
-                     (px - aq * y) * (px - aq * y)));
-    jacobian(3, 4) = (pz * (px * (aq * r + 2 * py * x) - px2 * y + py2 * y)) / (pt2 * ((py + aq * x) * (py + aq * x) + (px - aq * y) *
-                     (px - aq * y)));
-    jacobian(3, 5) = std::atan2(-(aq * (px * x + py * y)), px2 + py * (py + aq * x) - aq * px * y) / aq;
+    jacobian(3, 3) = (pz * (px2 * x - py * (aq * r + py * x) + 2 * px * py * y)) / (pt2 * pt02);  //off by 1e6
+    jacobian(3, 4) = (pz * (px * (aq * r + 2 * py * x) - px2 * y + py2 * y)) / (pt2 * pt02);     //off by 1e6
+    jacobian(3, 5) = std::atan2(-(aq * (px * x + py * y)), px2 + py * py0 - aq * px * y) / aq;
 
     /** _____________________________________________________________________________________________________________ */
     // D tan lambda / Dx_i

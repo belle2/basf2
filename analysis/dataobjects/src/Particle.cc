@@ -576,17 +576,17 @@ const KLMCluster* Particle::getKLMCluster() const
     // a track may be matched to several clusters under different hypotheses
     // take the cluster with largest number of layers as "the" cluster
     StoreArray<Track> tracks;
-    const KLMCluster* bestTrackMatchedCluster = nullptr;
-    int nLayers = -1;
+    const KLMCluster* longestTrackMatchedCluster = nullptr;
+    int numberOfLayers = -1;
     // loop over all clusters matched to this track
     for (const KLMCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<KLMCluster>()) {
       // check if we're the longest cluster thus far
-      if (cluster.getLayers() > nLayers) {
-        nLayers = cluster.getLayers();
-        bestTrackMatchedCluster = &cluster;
+      if (cluster.getLayers() > numberOfLayers) {
+        numberOfLayers = cluster.getLayers();
+        longestTrackMatchedCluster = &cluster;
       }
     }
-    return bestTrackMatchedCluster;
+    return longestTrackMatchedCluster;
   } else {
     return nullptr;
   }

@@ -17,6 +17,7 @@ SVDClusterEvaluationModule::SVDClusterEvaluationModule(): Module()
   , m_interSigma(NULL)
   , m_clsCoor(NULL)
   , m_clsResid(NULL)
+  , m_clsMinResid(NULL)
   , m_clsResid2D(NULL)
 {
 
@@ -116,9 +117,8 @@ void SVDClusterEvaluationModule::beginRun()
 
 void SVDClusterEvaluationModule::event()
 {
-  int nEvent = m_eventMetaData->getEvent();
-  B2DEBUG(10, "nEvent = " << nEvent << ": n intercepts = " << m_svdIntercepts.getEntries() << "n clusters DUT = " <<
-          m_svdClusters.getEntries());
+  //  int nEvent = m_eventMetaData->getEvent();
+  //  B2DEBUG(10, "nEvent = " << nEvent << ": n intercepts = " << m_svdIntercepts.getEntries() << "n clusters DUT = " << m_svdClusters.getEntries());
   bool isU = true;
 
   //intercepts
@@ -143,6 +143,11 @@ void SVDClusterEvaluationModule::event()
       m_interSigma->fill(theVxdID, isU, sigmaU);
       m_interSigma->fill(theVxdID, !isU, sigmaV);
 
+      double minresidU = 999;
+      bool minfoundU = false;
+      double minresidV = 999;
+      bool minfoundV = false;
+
       //loop on clusters
       for (int cls = 0 ; cls < m_svdClusters.getEntries(); cls++) {
 
@@ -159,7 +164,24 @@ void SVDClusterEvaluationModule::event()
         double resid = interCoor - m_svdClusters[cls]->getPosition();
         m_clsResid->fill(theVxdID, m_svdClusters[cls]->isUCluster(), resid);
         m_clsResid2D->fill(theVxdID, m_svdClusters[cls]->isUCluster(), m_svdClusters[cls]->getPosition(), resid);
+
+        //looking for the minimal residual
+        if (m_svdClusters[cls]->isUCluster()) {
+          if (fabs(resid) < fabs(minresidU)) {
+            minfoundU = true;
+            minresidU = resid;
+          }
+        } else {
+          if (fabs(resid) < fabs(minresidV)) {
+            minfoundV = true;
+            minresidV = resid;
+          }
+        }
       }
+      if (minfoundU)
+        m_clsMinResid->fill(theVxdID, true, minresidU);
+      if (minfoundV)
+        m_clsMinResid->fill(theVxdID, false, minresidV);
     }
   }
 
@@ -254,6 +276,17 @@ void SVDClusterEvaluationModule::terminate()
     h_misV->GetYaxis()->SetTitle("V misalignment (#mum)");
 
 
+    TH1F* h_effU = new TH1F("hEffU", Form("U-Side Summary, %.1f#sigma", m_nSigma), 1, 0, 1);
+    h_effU->SetCanExtend(TH1::kAllAxes);
+    h_effU->SetStats(0);
+    h_effU->GetXaxis()->SetTitle("sensor");
+    h_effU->GetYaxis()->SetTitle("U efficiency");
+    TH1F* h_effV = new TH1F("hEffV", Form("V-Side Summary, %.1f#sigma", m_nSigma), 1, 0, 1);
+    h_effV->SetCanExtend(TH1::kAllAxes);
+    h_effV->SetStats(0);
+    h_effV->GetXaxis()->SetTitle("sensor");
+    h_effV->GetYaxis()->SetTitle("V efficiency");
+
     TDirectory* oldDir = gDirectory;
 
     int s = 0; //sensor counter;
@@ -284,7 +317,7 @@ void SVDClusterEvaluationModule::terminate()
             (m_interSigma->getHistogram(sensor, view))->Write();
 
             dir_resid->cd();
-            TH1F* res = m_clsResid->getHistogram(sensor, view);
+            TH1F* res = m_clsMinResid->getHistogram(sensor, view);
             if (! fitResiduals(res)) {
               if (view == SVDHistograms<TH1F>::UIndex)
                 B2DEBUG(10, "Fit to the Residuals of U-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
@@ -295,8 +328,10 @@ void SVDClusterEvaluationModule::terminate()
               continue;
             }
             TF1* func = res->GetFunction("function");
+            if (func == NULL) func = res->GetFunction("functionG1");
             if (func != NULL) {
               if (view == SVDHistograms<TH1F>::UIndex) {
+                sensorU[s] = Form("%d.%d.%dU", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 B2DEBUG(10, "U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
                 residU[s] = func->GetParameter("sigma1");
                 misU[s] = func->GetParameter("mean1");
@@ -309,6 +344,8 @@ void SVDClusterEvaluationModule::terminate()
                   num = num + res->GetBinContent(bin);
                 if (den > 0) {
                   effU[s] = 1.*num / den;
+                  //filling efficiency histogram
+                  h_effU->Fill(sensorU[s], effU[s]);
                   if (effU[s] > 1)
                     B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
                   effUErr[s] = sqrt(effU[s] * (1 - effU[s]) / den);
@@ -319,7 +356,6 @@ void SVDClusterEvaluationModule::terminate()
                          effU[s] << " ± " << effUErr[s]);
 
                 //filling summary Histograms for the U side
-                sensorU[s] = Form("%d.%d.%dU", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 h_statU->Fill(sensorU[s], stat);
 
                 residU[s] *= m_cmTomicron;
@@ -328,6 +364,7 @@ void SVDClusterEvaluationModule::terminate()
                 misU[s] *= m_cmTomicron;
                 h_misU->Fill(sensorU[s], misU[s]);
               } else {
+                sensorV[s] = Form("%d.%d.%dV", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 B2DEBUG(10, "V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
                 residV[s] = func->GetParameter("sigma1");
                 misV[s] = func->GetParameter("mean1");
@@ -340,18 +377,18 @@ void SVDClusterEvaluationModule::terminate()
                   num = num + res->GetBinContent(bin);
                 if (den > 0) {
                   effV[s] = 1.*num / den;
+                  //filling efficiency histogram
+                  h_effV->Fill(sensorV[s], effV[s]);
                   if (effV[s] > 1)
                     B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
                   effVErr[s] = sqrt(effV[s] * (1 - effV[s]) / den);
                 }
-                sensorV[s] = Form("%d.%d.%dV", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 B2DEBUG(10, "num = " << num);
                 B2DEBUG(10, "den = " << den);
                 B2RESULT("V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber() << " = " <<
                          effV[s] << " ± " << effVErr[s]);
 
                 //filing summay histograms for the V side
-                sensorV[s] = Form("%d.%d.%dV", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
                 h_statV->Fill(sensorV[s], stat);
 
                 residV[s] *= m_cmTomicron;
@@ -360,9 +397,12 @@ void SVDClusterEvaluationModule::terminate()
                 h_misV->Fill(sensorV[s], misV[s]);
               }
             }
-
+            B2INFO("writing out resid histograms for " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." <<
+                   sensor.getSensorNumber() << "." << view);
+            (m_clsResid->getHistogram(sensor, view))->Write();
             (res)->Write();
             (m_clsResid2D->getHistogram(sensor, view))->Write();
+
 
           }
           s++;
@@ -397,8 +437,12 @@ void SVDClusterEvaluationModule::terminate()
     for (int bin = 0; bin < h_misV->GetNbinsX(); bin++)
       h_misV->SetBinError(bin, 0.);
     h_misV->Write();
-    g_effU->Write();
-    g_effV->Write();
+    for (int bin = 0; bin < h_effU->GetNbinsX(); bin++)
+      h_effU->SetBinError(bin, 0.);
+    h_effU->Write();
+    for (int bin = 0; bin < h_effV->GetNbinsX(); bin++)
+      h_effV->SetBinError(bin, 0.);
+    h_effV->Write();
 
     TCanvas* c_summaryU = new TCanvas("summaryU", "U-side Summary");
     h_residU->Draw("P");
@@ -437,16 +481,16 @@ void SVDClusterEvaluationModule::terminate()
     c_summaryV->Write();
 
     TCanvas* c_effU = new TCanvas("effU", "U-side Cluster Efficiency");
-    g_effU->Draw("AP");
-    g_effU->SetLineColor(kRed);
-    g_effU->SetMarkerColor(kRed);
-    g_effU->SetMarkerStyle(20);
+    h_effU->Draw("P");
+    h_effU->SetLineColor(kRed);
+    h_effU->SetMarkerColor(kRed);
+    h_effU->SetMarkerStyle(20);
     c_effU->Write();
     TCanvas* c_effV = new TCanvas("effV", "V-side Cluster Efficiency");
-    g_effV->Draw("AP");
-    g_effV->SetLineColor(kRed);
-    g_effV->SetMarkerColor(kRed);
-    g_effV->SetMarkerStyle(20);
+    h_effV->Draw("P");
+    h_effV->SetLineColor(kRed);
+    h_effV->SetMarkerColor(kRed);
+    h_effV->SetMarkerStyle(20);
     c_effV->Write();
   }
 
@@ -476,7 +520,7 @@ bool SVDClusterEvaluationModule::fitResiduals(TH1F* res)
 
   float range = 0.4;
 
-  B2DEBUG(10, "fitting " << res->GetName());
+  B2DEBUG(10, "fitting N1G1+N2G2 " << res->GetName());
   TF1* function = new TF1("function", "gaus(0)+gaus(3)", -range, range);
   function->SetParNames("N1", "mean1", "sigma1", "N2", "mean2", "sigma2");
   function->SetParameter(0, 10);
@@ -491,6 +535,19 @@ bool SVDClusterEvaluationModule::fitResiduals(TH1F* res)
   function->SetParLimits(5, 0, 10);
 
   int fitStatus =  res->Fit(function, "R");
+
+  if (fitStatus != 0) {
+    B2DEBUG(10, "previous fit failed, now trying with N1G1 " << res->GetName());
+    TF1* function1 = new TF1("functionG1", "gaus(0)", -range, range);
+    function1->SetParNames("N1", "mean1", "sigma1");
+    function1->SetParameter(0, 10);
+    function1->SetParLimits(0, 0, 1000000);
+    function1->SetParameter(1, 0);
+    function1->SetParameter(2, 0.01);
+    function1->SetParLimits(2, 0, 0.1);
+
+    fitStatus =  res->Fit(function1, "R");
+  }
   if (fitStatus == 0)
     return true;
   else
@@ -501,14 +558,14 @@ bool SVDClusterEvaluationModule::fitResiduals(TH1F* res)
 void SVDClusterEvaluationModule::create_SVDHistograms_interCoor()
 {
 
-  TH2F h_coorUV_LargeSensor("interCoor_Large_L@layerL@ladderS@sensor@view",
+  TH2F h_coorUV_LargeSensor("interCoor_Large_L@layerL@ladderS@sensor",
                             "Intercept 2D Coordinate (layer @layer, ladder @ladder, sensor @sensor)",
                             m_nBins_LargeS_U, -m_abs_LargeS_U, m_abs_LargeS_U,
                             m_nBins_LargeS_V, -m_abs_LargeS_V, m_abs_LargeS_V);
   h_coorUV_LargeSensor.GetXaxis()->SetTitle("Intercept U coordinate (cm)");
   h_coorUV_LargeSensor.GetYaxis()->SetTitle("Intercept V coordinate (cm)");
 
-  TH2F h_coorUV_SmallSensor("interCoor_Small_L@layerL@ladderS@sensor@view",
+  TH2F h_coorUV_SmallSensor("interCoor_Small_L@layerL@ladderS@sensor",
                             "Intercept 2D Coordinate (layer @layer, ladder @ladder, sensor @sensor)",
                             m_nBins_SmallS_U, -m_abs_SmallS_U, m_abs_SmallS_U,
                             m_nBins_SmallS_V, -m_abs_SmallS_V, m_abs_SmallS_V);
@@ -634,4 +691,37 @@ void SVDClusterEvaluationModule::create_SVDHistograms_clsResid()
 
   m_clsResid2D = new SVDHistograms<TH2F>(h2_clresidU_SmallSensor, h2_clresidV_SmallSensor, h2_clresidU_LargeSensor,
                                          h2_clresidV_LargeSensor);
+
+  //CLUSTER MINIMUM RESIDUAL
+  //CLUSTER RESIDUALS
+  TH1F h_clminresidU_LargeSensor("clsMinResidU_LS_L@layerL@ladderS@sensor@view",
+                                 "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //                             m_nBins_LargeS_U, -m_abs_LargeS_U, m_abs_LargeS_U);
+                                 NbinsU, -range, range);
+  h_clminresidU_LargeSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clminresidV_LargeSensor("clsMinResidV_LS_L@layerL@ladderS@sensor@view",
+                                 "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //            m_nBins_LargeS_V, -m_abs_LargeS_V, m_abs_LargeS_V);
+                                 NbinsV, -range, range);
+  h_clminresidV_LargeSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clminresidU_SmallSensor("clsMinResidU_SS_L@layerL@ladderS@sensor@view",
+                                 "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //                             m_nBins_SmallS_U, -m_abs_SmallS_U, m_abs_SmallS_U);
+                                 NbinsU, -range, range);
+  h_clminresidU_SmallSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clminresidV_SmallSensor("clsMinResidV_SS_L@layerL@ladderS@sensor@view",
+                                 "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //                             m_nBins_SmallS_V, -m_abs_SmallS_V, m_abs_SmallS_V);
+                                 NbinsU, -range, range);
+  h_clminresidV_SmallSensor.GetXaxis()->SetTitle("residual (cm)");
+
+
+
+  m_clsMinResid = new SVDHistograms<TH1F>(h_clminresidU_SmallSensor, h_clminresidV_SmallSensor, h_clminresidU_LargeSensor,
+                                          h_clminresidV_LargeSensor);
+
+
 }

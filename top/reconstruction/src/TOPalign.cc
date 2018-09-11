@@ -43,7 +43,7 @@ namespace Belle2 {
       unsigned numPar = m_parNames.size();
       m_parInit.resize(numPar, 0);
       m_par = m_parInit;
-      m_step.resize(numPar, 0);
+      m_steps.resize(numPar, 0);
       m_fixed.resize(numPar, false);
       m_COV.resize(numPar * numPar, 0);
       m_U.resize(numPar * numPar, 0);
@@ -56,14 +56,14 @@ namespace Belle2 {
 
     void TOPalign::setSteps(double position, double angle, double time, double refind)
     {
-      m_step[0] = position;
-      m_step[1] = position;
-      m_step[2] = position;
-      m_step[3] = angle;
-      m_step[4] = angle;
-      m_step[5] = angle;
-      m_step[6] = time;
-      m_step[7] = refind;
+      m_steps[0] = position;
+      m_steps[1] = position;
+      m_steps[2] = position;
+      m_steps[3] = angle;
+      m_steps[4] = angle;
+      m_steps[5] = angle;
+      m_steps[6] = time;
+      m_steps[7] = refind;
     }
 
 
@@ -138,11 +138,15 @@ namespace Belle2 {
       int ier = 0;
       int np = m_par.size();
       std::vector<float> dpar(np, 0);
-      auto step = m_step;
-      for (size_t i = 0; i < step.size(); i++) {
-        if (m_fixed[i]) step[i] = 0;
+      auto steps = m_steps;
+      for (size_t i = 0; i < steps.size(); i++) {
+        if (m_fixed[i]) steps[i] = 0;
       }
-      top_alignment_(&np, m_par.data(), step.data(), m_U.data(),
+      if (m_valid) {
+        double sf = sqrt(static_cast<double>(m_numTracks / 100 + 1));
+        for (auto& step : steps) step /= sf;
+      }
+      top_alignment_(&np, m_par.data(), steps.data(), m_U.data(),
                      dpar.data(), m_COV.data(), &ier);
       if (ier < 0) return ier;
 

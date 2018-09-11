@@ -197,7 +197,7 @@ namespace Belle2 {
       std::vector<std::string> m_parNames; /**< parameter names */
       std::vector<float> m_parInit;  /**< initial parameter values */
       std::vector<float> m_par;  /**< current parameter values */
-      std::vector<float> m_step; /**< step sizes */
+      std::vector<float> m_steps; /**< step sizes */
       std::vector<float> m_maxDpar; /**< maximal parameter changes in one iteration */
       std::vector<bool> m_fixed; /**< true if parameter is fixed */
       std::vector<float> m_COV;  /**< covariance matrix */

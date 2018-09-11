@@ -84,7 +84,7 @@ namespace Belle2 {
     addParam("stepAngle", m_stepAngle, "step size for rotations", 0.01);
     addParam("stepTime", m_stepTime, "step size for t0", 0.05);
     addParam("stepRefind", m_stepRefind,
-             "step size for scaling of refractive index (dn/n)", 0.001);
+             "step size for scaling of refractive index (dn/n)", 0.005);
     addParam("gridSize", m_gridSize,
              "size of a 2D grid for time-of-propagation averaging in analytic PDF: "
              "[number of emission points along track, number of Cerenkov angles]. "
@@ -96,8 +96,10 @@ namespace Belle2 {
     addParam("parInit", m_parInit,
              "initial parameter values in the order [" + names + "]. "
              "If list is too short, the missing ones are set to 0.", m_parInit);
+    auto parFixed = m_parFixed;
+    parFixed.push_back("dn/n");
     addParam("parFixed", m_parFixed, "list of names of parameters to be fixed. "
-             "Valid names are: " + names, m_parFixed);
+             "Valid names are: " + names, parFixed);
 
   }
 

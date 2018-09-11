@@ -63,7 +63,10 @@ def from_metadata_of_files(file_path_patterns):
         """
         from multiprocessing.pool import ThreadPool
         tp = ThreadPool(processes=max_processes)
-        mapping = make_file_to_iov_dictionary(file_path_patterns, polling_time=20, pool=tp, filterfalse=filter_filepath)
+        if regex:
+            mapping = make_file_to_iov_dictionary(file_path_patterns, polling_time=20, pool=tp, filterfalse=filter_filepath)
+        else:
+            mapping = make_file_to_iov_dictionary(file_path_patterns, polling_time=20, pool=tp)
         tp.close()
         tp.join()
         return mapping

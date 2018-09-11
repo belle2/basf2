@@ -29,11 +29,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getMuonPDFValue();
         }
@@ -47,11 +47,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getOutcome();
         }
@@ -65,11 +65,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getBarrelExtLayer();
         }
@@ -81,11 +81,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getExtLayer();
         }
@@ -97,11 +97,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getBarrelHitLayer();
         }
@@ -113,11 +113,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getHitLayer();
         }
@@ -129,11 +129,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getExtLayerPattern();
         }
@@ -145,11 +145,11 @@ namespace Belle2 {
     {
       const Track* track = particle->getTrack();
       if (!track)
-        return -99.0;
+        return NAN;
       else {
         Muid* muid = track->getRelatedTo<Muid>();
         if (!muid)
-          return -99.0;
+          return NAN;
         else {
           return muid->getHitLayerPattern();
         }

@@ -10,11 +10,13 @@
 
 // Own include
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/EventVariables.h>
+#include <analysis/VariableManager/VertexVariables.h>
+#include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
@@ -39,6 +41,7 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/Conversion.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/InputController.h>
 
@@ -46,6 +49,8 @@
 #include <TRandom.h>
 #include <TVectorF.h>
 #include <TVector3.h>
+
+#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -360,11 +365,18 @@ namespace Belle2 {
       return std::cos((part->getVertex() - T.getBeamParams().getVertex()).Angle(part->getMomentum()));
     }
 
-    double cosThetaBetweenParticleAndTrueB(const Particle* part)
+    double cosThetaBetweenParticleAndNominalB(const Particle* part)
     {
+
+      int particlePDG = abs(part->getPDGCode());
+      if (particlePDG != 511 and particlePDG != 521)
+        B2FATAL("The Variables cosThetaBetweenParticleAndNominalB is only meant to be used on B mesons!");
+
       PCmsLabTransform T;
-      double e_Beam = T.getCMSEnergy() / 2;
+      // Hardcoded value, how to bypass this?
+      double e_Beam = 1.0579400E+1 / 2.0; // GeV
       double m_B = part->getPDGMass();
+
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
       TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
@@ -372,9 +384,48 @@ namespace Belle2 {
       double m_d = p.M();
       double p_d = p.Rho();
 
-      double theta_Bd = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
+      double theta_BY = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
-      return theta_Bd;
+      return theta_BY;
+    }
+
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
+    {
+      int idau = 0;
+      if (arguments.size() == 1) {
+        try {
+          idau = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2FATAL("The argument of cosHelicityAngleWrtCMSFrame must be an integer!");
+          return nullptr;
+        }
+      } else {
+        B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheMother");
+      }
+      auto func = [idau](const Particle * mother) -> double {
+        const Particle* part = mother->getDaughter(idau);
+        if (!part)
+        {
+          B2FATAL("Couldn't find the " << idau << "th daughter");
+          return -999.0;
+        }
+
+        TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
+        TLorentzVector part4Vector = part->get4Vector();
+        TLorentzVector mother4Vector = mother->get4Vector();
+
+        TVector3 motherBoost = -(mother4Vector.BoostVector());
+
+        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame;
+        beam4Vector_motherFrame = beam4Vector;
+        part4Vector_motherFrame = part4Vector;
+
+        beam4Vector_motherFrame.Boost(motherBoost);
+        part4Vector_motherFrame.Boost(motherBoost);
+
+        return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
+      };
+      return func;
     }
 
     double cosHelicityAngle(const Particle* part)
@@ -1044,6 +1095,39 @@ namespace Belle2 {
       }
     }
 
+    double goodBelleKshort(const Particle* KS)
+    {
+      // check input
+      if (KS->getNDaughters() != 2) {
+        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
+        return 0.0;
+      }
+      const Particle* d0 = KS->getDaughter(0);
+      const Particle* d1 = KS->getDaughter(1);
+      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
+        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
+        return 0.0;
+      }
+      if (abs(KS->getPDGCode()) != 310)
+        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
+
+      // Belle selection
+      double p = particleP(KS);
+      double fl = particleDRho(KS);
+      double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
+                           KS) + particlePy(KS) * particlePy(KS))));
+      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double zdist = v0DaughterZ0Diff(KS);
+
+      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
+      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
+      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
+
+      if (low || mid || high) {
+        return 1.0;
+      } else
+        return 0.0;
+    }
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
@@ -1084,9 +1168,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
                       cosAngleBetweenMomentumAndVertexVector,
                       "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
-    REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
-                      cosThetaBetweenParticleAndTrueB,
-                      "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosThetaBetweenParticleAndNominalB",
+                      cosThetaBetweenParticleAndNominalB,
+                      "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheMother", cosHelicityAngleIfCMSIsTheMother,
+                      "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
+                      "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
+                      "automatically loaded by the function, given the accelerators conditions.");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"
@@ -1191,8 +1279,10 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
-
-
+    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
+                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
+                      "a momentum-binned selection including requirements on impact parameter of, and"
+                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
     VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,

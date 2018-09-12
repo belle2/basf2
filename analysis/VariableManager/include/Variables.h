@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
@@ -126,10 +127,17 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
     /**
-     * cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1
-     * if only a massless particle like a neutrino is missing in the reconstruction.
+     * cosine of the angle in CMS between momentum the reconstructed particle and a nominal B particle. It is somewhere between -1 and 1
+     * if only a single massless particle like a neutrino is missing in the reconstruction.
      */
-    double cosThetaBetweenParticleAndTrueB(const Particle* part);
+    double cosThetaBetweenParticleAndNominalB(const Particle* part);
+
+    /**
+     * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided"
+     * assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are
+     * automatically loaded by the function, given the accelerators conditions.
+     */
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
 
     /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
@@ -509,6 +517,12 @@ namespace Belle2 {
      * returns the phi angle (lab) that is back-to-back (cms) to the particle
      */
     double b2bPhi(const Particle* particle);
+
+    /**
+     * return Kshort using Belle goodKS algorithm
+     */
+    double goodBelleKshort(const Particle* KS);
+
 
   }
 } // Belle2 namespace

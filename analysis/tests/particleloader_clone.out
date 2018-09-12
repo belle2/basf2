@@ -1,4 +1,4 @@
-[INFO] Steering file: analysis/tests/particleloader_clone.py
+[INFO] Steering file: particleloader_clone.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:
@@ -23,11 +23,11 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
-[INFO]    -> MDST source: V0 (-> TFR(pi) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
-[INFO]    -> MDST source: V0 (-> TFR(p) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
@@ -111,11 +111,11 @@ Total Number of Particles created in the DataStore: 10364716
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
-[INFO]    -> MDST source: V0 (-> TFR(pi) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
-[INFO]    -> MDST source: V0 (-> TFR(p) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)

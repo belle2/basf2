@@ -47,7 +47,7 @@ Here is a list of variables related to ECL cluster:
    :group: ECL Cluster related
 
 Acceptance
-~~~~~~~~
+~~~~~~~~~~
 
 Here is a list of variables for acceptance cuts:
 
@@ -143,6 +143,11 @@ Rest of Event
 .. b2-variables::
    :group: Rest Of Event
 
+Continuum Suppression
+~~~~~~~~~~~~~~~~~~~~~
+
+.. b2-variables::
+    :group: Continuum Suppression
 
 Miscellaneous
 ~~~~~~~~~~~~~

@@ -60,9 +60,24 @@ namespace Belle2 {
     double trackD0(const Particle* part);
 
     /**
+     * returns the track's tranverse momentum angle
+     */
+    double trackPhi0(const Particle* part);
+
+    /**
+     * returns the track's curvature
+     */
+    double trackOmega(const Particle* part);
+
+    /**
      * returns the track's Z0 impact parameter
      */
     double trackZ0(const Particle* part);
+
+    /**
+     * returns the track's slope
+     */
+    double trackTanLambda(const Particle* part);
 
     /**
      * returns the track's D0 impact parameter error
@@ -70,9 +85,24 @@ namespace Belle2 {
     double trackD0Error(const Particle* part);
 
     /**
+     * returns the track's tranverse momentum angle error
+     */
+    double trackPhi0Error(const Particle* part);
+
+    /**
+     * returns the track's curvature error
+     */
+    double trackOmegaError(const Particle* part);
+
+    /**
      * returns the track's Z0 impact parameter error
      */
     double trackZ0Error(const Particle* part);
+
+    /**
+     * returns the track's slope error
+     */
+    double trackTanLambdaError(const Particle* part);
 
     /**
      * returns the pValue of the track's fit

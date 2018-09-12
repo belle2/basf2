@@ -757,7 +757,11 @@ endloop:
             double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
             if (fabs(diff) > M_PI)
             {
-              diff = 2 * M_PI - copysign(diff, diff);
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
             }
             return diff;
           }
@@ -1483,9 +1487,9 @@ endloop:
                       "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame,
                       "Returns the value of the variable using the lab frame as current reference frame.\n"
-                      "The lab frame is the default reference frame, usually you don't need to use this meta-variable.\n"
-                      "E.g. useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
-                      "     useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.");
+                      "The lab frame is the default reference frame, usually you don't need to use this meta-variable. E.g.\n"
+                      "  - useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
+                      "  - useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.\n\n");
     REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
                       "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
                       "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
@@ -1512,9 +1516,9 @@ endloop:
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
-                      "Returns value of variable for the i-th daughter."
-                      "E.g. daughter(0, p) returns the total momentum of the first daughter.\n"
-                      "     daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n"
+                      "Returns value of variable for the i-th daughter. E.g.\n"
+                      "  - daughter(0, p) returns the total momentum of the first daughter.\n"
+                      "  - daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n\n"
                       "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
                       "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
@@ -1545,10 +1549,12 @@ endloop:
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
                       "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
+                      "(That means that it returns p_j - p_i)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
                       "Returns the difference in phi between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
                       "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"

@@ -376,17 +376,18 @@ def generateContinuum(
 ):
     """
     Warning:
-        This functions is deprecated. Please call ``setupEventInfo`` then
-        ``add_continuum_generator`` from the `generators`` package.
+        This functions is deprecated. Please call :func:`setupEventInfo` then
+        :func:`add_continuum_generator` from the :doc:`generators` package.
 
     ::
+
         from modularAnalysis import setupEventInfo
         from generators import add_continuum_generator, add_inclusive_continuum_generator
         setupEventInfo(noEvents, path)
         add_continuum_generator(path=analysis_main, finalstate='ccbar')
 
     Parameters:
-        noEvents (int): number of events to be generated
+        noEvents (int):  number of events to be generated
         inclusiveP (str): each event will contain this particle
         decayTable (str): file name of the decay table to be used
         inclusiveT (int) whether (2) or not (1) charge conjugated inclusive Particles should be included
@@ -649,36 +650,60 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main,
                       enforceFitHypothesis=False):
     """
-    Creates Particles of the desired types from the corresponding MDST dataobjects,
+    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
-    via list tuples (decayString, cut), like for example
-    kaons = ('K+:std', 'kaonID>0.1')
-    pions = ('pi+:std', 'pionID>0.1')
-    fillParticleLists([kaons, pions])
+    via list tuples (decayString, cut), for example
+
+    .. code-block:: python
+
+        kaons = ('K+:mykaons', 'kaonID>0.1')
+        pions = ('pi+:mypions','pionID>0.1')
+        fillParticleLists([kaons, pions])
+
+    If you are unsure what selection you want, you might like to see the
+    :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the MDST dataobject that is used as an input is determined from the type of
+    The type of the `mdst` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    - charged final state particles (input MDST type = Tracks)
-       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
+    * charged final state particles (input `mdst` type = Tracks)
+        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    - neutral final state particles
-       - gamma         (input MDST type = ECLCluster)
-       - K_S0, Lambda0 (input MDST type = V0)
-       - K_L0          (input MDST type = KLMCluster)
+    * neutral final state particles
+        - "gamma"           (input `mdst` type = ECLCluster)
+        - "K_S0", "Lambda0" (input `mdst` type = V0)
+        - "K_L0"            (input `mdst` type = KLMCluster)
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
-    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
-                                using a mass hypothesis of the exact type passed to fillParticleLists().
-                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
-                                in terms of mass difference will be used if the fit using exact particle
-                                type is not available.
+    Note:
+        For "K_S0" and "Lambda0" you must specify the daughter ordering.
+
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0s:
+
+    .. code-block:: python
+
+        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
+        fillParticleLists([kaons, pions, v0lambdas])
+
+    Parameters:
+        decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
+                                     The decay string determines the type of Particle
+                                     and determines the of the ParticleList.
+                                     If the input MDST type is V0 the whole
+                                     decay chain needs to be specified, so that
+                                     the user decides and controls the daughters
+                                     ' order (e.g. ``K_S0 -> pi+ pi-``)
+                                     The cut is the selection criteria
+                                     to be added to the ParticleList. It can be an empty string.
+        writeOut (bool):             whether RootOutput module should save the created ParticleList
+        path (basf2.Path):           modules are added to this path
+        enforceFitHypothesis (bool): If true, Particles will be created only for the tracks which have been fitted
+                                     using a mass hypothesis of the exact type passed to fillParticleLists().
+                                     If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                     in terms of mass difference will be used if the fit using exact particle
+                                     type is not available.
     """
 
     pload = register_module('ParticleLoader')
@@ -697,32 +722,46 @@ def fillParticleList(
     enforceFitHypothesis=False
 ):
     """
-    Creates Particles of the desired type from the corresponding MDST dataobjects,
+    Creates Particles of the desired type from the corresponding `mdst` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
+    See also:
+        the :doc:`StandardParticles` functions.
+
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the MDST dataobject that is used as an input is determined from the type of
+    The type of the `mdst` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    - charged final state particles (input MDST type = Tracks)
-       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
+    * charged final state particles (input `mdst` type = Tracks)
+        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    - neutral final state particles
-       - gamma         (input MDST type = ECLCluster)
-       - K_S0, Lambda0 (input MDST type = V0)
-       - K_L0          (input MDST type = KLMCluster)
+    * neutral final state particles
+        - "gamma"           (input `mdst` type = ECLCluster)
+        - "K_S0", "Lambda0" (input `mdst` type = V0)
+        - "K_L0"            (input `mdst` type = KLMCluster)
 
-    Use 'fillConvertedPhotonsList' function to load converted photons from the V0 StoreArray.
+    Note:
+        For "K_S0" and "Lambda0" you must specify the daughter ordering.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
-    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
-                                using a mass hypothesis of the exact type passed to fillParticleLists().
-                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
-                                in terms of mass difference will be used if the fit using exact particle
-                                type is not available.
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0ss:
+
+    .. code-block:: python
+
+        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
+        fillParticleLists([kaons, pions, v0lambdas])
+
+    Parameters:
+        decayString (str):           Type of Particle and determines the name of the ParticleList.
+                                     If the input MDST type is V0 the whole decay chain needs to be specified, so that
+                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``)
+        cut (str):                   Particles need to pass these selection criteria to be added to the ParticleList
+        writeOut (bool):             whether RootOutput module should save the created ParticleList
+        path (basf2.Path):           modules are added to this path
+        enforceFitHypothesis (bool): If true, Particles will be created only for the tracks which have been fitted
+                                     using a mass hypothesis of the exact type passed to fillParticleLists().
+                                     If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                     in terms of mass difference will be used if the fit using exact particle
+                                     type is not available.
     """
 
     pload = register_module('ParticleLoader')
@@ -774,10 +813,20 @@ def fillConvertedPhotonsList(
     """
     Creates photon Particle object for each e+e- combination in the V0 StoreArray.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    Note:
+        You must specify the daughter ordering.
+
+    .. code-block:: python
+
+        fillConvertedPhotonsList('gamma:converted -> e+ e-', '')
+
+    Parameters:
+        decayString (str): Must be gamma to an e+e- pair. You muse specify the daughter ordering.
+                           Will also determine the name of the particleList.
+        cut (str):         Particles need to pass these selection criteria to be added to the ParticleList
+        writeOut (bool):   whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
+
     """
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
@@ -1154,15 +1203,26 @@ def rankByLowest(
     path.add_module(bcs)
 
 
-def printDataStore(path=analysis_main):
+def printDataStore(eventNumber=-1, path=analysis_main):
     """
-    Prints the contents of DataStore in each event,
-    listing all objects and arrays (including size).
+    Prints the contents of DataStore in the first event (or a specific event number or all events).
+    Will list all objects and arrays (including size).
 
-    @param path   modules are added to this path
+    See also:
+        The command line tool: ``b2file-size``.
+
+    Parameters:
+        eventNumber (int): Print the datastore only for this event. The default
+            (-1) prints only the first event, 0 means print for all events (can produce large output)
+        path (basf2.Path): the PrintCollections module is added to this path
+
+    Warning:
+        This will print a lot of output if you print it for all events and process many events.
+
     """
 
     printDS = register_module('PrintCollections')
+    printDS.param('printForEvent', eventNumber)
     path.add_module(printDS)
 
 
@@ -1961,7 +2021,7 @@ def selectDaughters(particle_list_name, decay_string, path=analysis_main):
     Redefine the Daughters of a particle: select from decayString
 
     @param particle_list_name input particle list
-    @para decay_string  for selecting the Daughters to be preserved
+    @param decay_string  for selecting the Daughters to be preserved
     """
     seld = register_module('SelectDaughters')
     seld.set_name('SelectDaughters_' + particle_list_name)
@@ -2183,3 +2243,46 @@ def labelTauPairMC(path=analysis_main):
     tauDecayMarker.set_name('TauDecayMarker_')
 
     path.add_module(tauDecayMarker)
+
+
+def tagCurlTracks(particleLists,
+                  belle=False,
+                  mcTruth=False,
+                  pVal=0.5,
+                  selectorType='cut',
+                  ptCut=0.4,
+                  train=False,
+                  path=analysis_main):
+    """
+    Warning:
+        The cut selector is not calibrated with Belle II data and should not be used without extensive study.
+
+    Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
+    For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
+
+      .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
+
+    @param particleLists: list of particle lists to check for curls
+    @param belle:         bool flag for belle or belle2 data/mc
+    @param mcTruth:       bool flag to output some truth based information
+    @param pVal:          float pVal cut for whether two tracks are identified as curls of each other.
+                          Note 'cut' selector is binary 0/1
+    @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
+                          It is strongly recommended to used the 'mva' selection. The 'cut' selection
+                          is based on BN1079 and is only calibrated for Belle data.
+    @param ptCut:         pre-selection cut on transverse momentum.
+    @param train:         flag to set training mode if selector has a training mode (mva)
+    @param path:          module is added to this path
+    """
+
+    curlTagger = register_module('CurlTagger')
+    curlTagger.set_name('CurlTagger_')
+    curlTagger.param('particleLists', particleLists)
+    curlTagger.param('belle', belle)
+    curlTagger.param('mcTruth', mcTruth)
+    curlTagger.param('pVal', pVal)
+    curlTagger.param('selectorType', selectorType)
+    curlTagger.param('ptCut', ptCut)
+    curlTagger.param('train', train)
+
+    path.add_module(curlTagger)

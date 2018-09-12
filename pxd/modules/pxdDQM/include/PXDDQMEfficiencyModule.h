@@ -91,6 +91,8 @@ namespace Belle2 {
     //if true alignment will be used!
     bool m_useAlignment;
 
+    bool m_maskDeadPixels;
+
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
 
@@ -110,6 +112,7 @@ namespace Belle2 {
 
     double m_distcut; //distance cut in cm!
     double m_pcut; //pValue-Cut for tracks
+    double m_momCut;
     unsigned int m_minSVDHits;
 
     //Histograms to later determine efficiency

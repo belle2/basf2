@@ -12,7 +12,7 @@ from basf2 import set_random_seed, create_path, process, LogLevel
 
 set_random_seed("1337")
 testinput = [Belle2.FileSystem.findFile('analysis/tests/mdst.root')]
-fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0', 'Lambda0', 'K_L0', 'gamma']
+fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
 
 ###############################################################################
 # a new ParticleLoader for each fsp
@@ -20,6 +20,10 @@ testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput, logLevel=LogLevel.ERROR)
 for fsp in fsps:
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
+# manipulate the string to remove the daughters in case of v0
+for i in range(len(fsps)):
+    if " -> " in fsps[i]:
+        fsps[i] = fsps[i].split(' ->', 1)[0]
 testpath.add_module('ParticleStats', particleLists=fsps)
 process(testpath)
 

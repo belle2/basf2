@@ -9,6 +9,17 @@ from modularAnalysis import *
 
 
 def loadStdD0(path=analysis_main):
+    """
+    Create a list of 'D0:all' list, with an invariant mass cut :math:`1.82 < M < 1.92 GeV`, from the following particles lists:
+
+      - 'K-:loose pi+:loose'
+      - 'K-:loose pi+:loose pi+:loose pi-:loose'
+      - 'K-:loose pi+:loose pi0:loose'
+      - 'K_S0:all pi0:loose'
+      - 'K_S0:all pi+:loose pi-:loose'
+
+    @param path     modules are added to this path
+    """
     # stdCharged()
     # stdPi0()
     # stdKS()
@@ -29,6 +40,16 @@ def loadStdD0(path=analysis_main):
 
 
 def loadStdDplus(path=analysis_main):
+    """
+    Create a list of 'D+:all' list, with an invariant mass cut :math:`1.82 < M < 1.92 GeV`, from the following particles lists:
+
+      - 'K-:loose pi+:loose pi+:loose'
+      - 'K_S0:all pi+:loose'
+      - 'K_S0:all pi+:loose pi0:loose'
+      - 'K_S0:all pi+:loose pi+:loose pi-:loose'
+
+    @param path     modules are added to this path
+    """
     # stdCharged()
     # stdPi0()
     # stdKS()
@@ -48,6 +69,14 @@ def loadStdDplus(path=analysis_main):
 
 
 def loadStdDstar0(path=analysis_main):
+    """
+    Create a list of 'D*0:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
+
+      - 'D0:all pi0:loose'
+      - 'D0:all gamma:loose'
+
+    @param path     modules are added to this path
+    """
     # stdCharged()
     # stdPi0()
     # stdKS()
@@ -64,6 +93,13 @@ def loadStdDstar0(path=analysis_main):
 
 
 def loadStdDstarPlus(path=analysis_main):
+    """
+    Create a list of 'D*++:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
+      - 'D0:all pi+:all'
+      - 'D+:all pi0:loose'
+
+    @param path     modules are added to this path
+    """
     # stdCharged()
     # stdPi0()
     # stdKS()

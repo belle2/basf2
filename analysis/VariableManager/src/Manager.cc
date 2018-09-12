@@ -63,7 +63,9 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   assertValidName(alias);
 
   if (m_alias.find(alias) != m_alias.end()) {
-    B2WARNING("Another alias with the name'" << alias << "' is already set! I overwrite it!");
+    if (variable == m_alias[alias]) { return true; }
+    B2WARNING("An alias with the name'" << alias << "' exists and is set to '" << m_alias[alias] << "', setting it to '" << variable <<
+              "'. Be aware: only the last alias defined before processing the events will be used!");
     m_alias[alias] = variable;
     return true;
   }
@@ -189,7 +191,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
 
-  B2WARNING("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
+  B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
   return false;
 }
 

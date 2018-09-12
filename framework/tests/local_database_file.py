@@ -51,7 +51,7 @@ with clean_working_directory():
             f.write(entry)
         reset_database()
         logging.log_level = LogLevel.DEBUG
-        logging.debug_level = 100
+        logging.debug_level = 200
         use_local_database(filename)
         entries = parse_database_file(filename, check_existing=False)
         if entries:

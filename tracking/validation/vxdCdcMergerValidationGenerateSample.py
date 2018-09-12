@@ -14,7 +14,6 @@ import basf2
 from ROOT import Belle2
 from simulation import add_simulation
 from tracking import add_tracking_reconstruction
-from modularAnalysis import generateY4S
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
 from tracking.validation import tracking_efficiency_helpers

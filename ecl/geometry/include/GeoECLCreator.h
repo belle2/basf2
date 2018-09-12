@@ -88,7 +88,7 @@ namespace Belle2 {
       double get_pa_box_height() const {return 2;}
 
       /** pointer to a storage with crystal shapes and positions */
-      ECLCrystalsShapeAndPosition* m_sap;
+      const ECLCrystalsShapeAndPosition* m_sap;
 
       /** Sensitive detector */
       Simulation::SensitiveDetectorBase* m_sensitive;

@@ -34,7 +34,7 @@ namespace Belle2 {
        * Constructor.
        * @param[in]  nPoints Number of points in amplitude arrays.
        */
-      FPGAFitter(int nPoints);
+      explicit FPGAFitter(int nPoints);
 
       /**
        * Destructor.

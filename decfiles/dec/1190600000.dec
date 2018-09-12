@@ -1,0 +1,26 @@
+# EventType: 1190600000
+# Descriptor: [B0 -> Xsd tau+ tau-]cc
+# NickName: Bd_Xstautau
+# Documentation: Rare b->s l+ l- process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20170821
+#
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.      Xsd  tau+   tau-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+Enddecay
+#
+Decay anti-B0sig
+1.     anti-Xsd  tau+   tau-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+Enddecay
+#
+End

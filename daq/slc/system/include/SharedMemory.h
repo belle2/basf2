@@ -12,10 +12,10 @@ namespace Belle2 {
 
     // constructors and destructor
   public:
-    SharedMemory() throw();
+    SharedMemory();
     SharedMemory(const std::string& path, size_t size);
-    SharedMemory(const SharedMemory&) throw();
-    ~SharedMemory() throw();
+    SharedMemory(const SharedMemory&);
+    ~SharedMemory();
 
     // member functions;
   public:
@@ -27,15 +27,15 @@ namespace Belle2 {
     bool seekBy(size_t);
     void* map(size_t, size_t);
     void* map();
-    bool isOpened() throw();
-    const std::string& getPath() const throw() { return m_path; }
-    size_t size() const throw() { return m_size; }
-    int getfd() const throw() { return m_fd; }
-    bool truncate(size_t size) throw();
+    bool isOpened();
+    const std::string& getPath() const { return m_path; }
+    size_t size() const { return m_size; }
+    int getfd() const { return m_fd; }
+    bool truncate(size_t size);
 
     // operators
   public:
-    const SharedMemory& operator=(const SharedMemory&) throw();
+    const SharedMemory& operator=(const SharedMemory&);
 
     // data members;
   private:

@@ -14,21 +14,8 @@
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
-
-#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
-#include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
-#include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
-#include <reconstruction/dbobjects/CDCDedx2DCor.h>
-#include <reconstruction/dbobjects/CDCDedx1DCleanup.h>
-#include <reconstruction/dbobjects/CDCDedxCurvePars.h>
-#include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
-#include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 
 #include <vector>
 
@@ -59,27 +46,12 @@ namespace Belle2 {
 
   private:
 
+    bool m_cuts; /**< Boolean to apply cuts during collection */
+
     // required input
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array for Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
-    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Event metadata */
-
-    bool m_cuts; /**< Whether to apply cleanup cuts */
-    bool m_momCor; /**< Whether to apply momentum correction */
-    bool m_useDBMomCor; /**< Whether to use momentum correction in DB */
-    bool m_scaleCor; /**< Whether to apply scale correction */
-    bool m_cosineCor; /**< Whether to apply cosine correction */
-
-    // parameters: calibration constants
-    DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
-    DBObjPtr<CDCDedxMomentumCor> m_DBMomentumCor; /**< Momentum correction for cosmics */
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
-    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
-    DBObjPtr<CDCDedx2DCor> m_DB2DCor; /**< 2D correction DB object */
-    DBObjPtr<CDCDedx1DCleanup> m_DB1DCleanup; /**< 1D correction DB object */
-    DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
     // module params
     int m_maxNumHits; /**< maximum number of hits allowed */

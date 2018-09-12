@@ -44,7 +44,7 @@ from stdCharged import *
 # Consider using -n flag in command line to limit number of events, e.g.:
 # > basf2 B2A410-TagVertex.py -n 1000
 filelistSIG = \
-    ['/ghi/fs01/belle2/bdata/users/morda/JpsimumuK0S/mc9_bg1/sub00/mdst_000001_prod00002439_task00000001.root'
+    ['/group/belle2/tutorial/release_01-00-00/mdst_000001_prod00002439_task00000001.root'
      ]
 
 inputMdstList('default', filelistSIG)
@@ -56,7 +56,7 @@ stdLooseMu()
 
 # create Ks -> pi+ pi- list from V0
 # keep only candidates with 0.4 < M(pipi) < 0.6 GeV
-fillParticleList('K_S0:pipi', '0.4 < M < 0.6')
+fillParticleList('K_S0:pipi -> pi+ pi-', '0.4 < M < 0.6')
 
 # reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with 3.0 < M(mumu) < 3.2 GeV

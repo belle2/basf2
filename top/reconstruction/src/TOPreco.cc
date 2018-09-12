@@ -34,7 +34,7 @@ namespace Belle2 {
       float b = (float) BkgPerModule; float s = (float) ScaleN0;
       set_top_par_(&b, &s);
       setPDFoption(c_Optimal); // default option
-      setTmax(0); // use default (TDC range)
+      setTimeWindow(0.0, 0.0); // use default (TDC range)
       setBeta(0); // use default: beta from momentum and mass
     }
 

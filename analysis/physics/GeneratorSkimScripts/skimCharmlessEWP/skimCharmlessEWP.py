@@ -24,6 +24,7 @@
 # analysis_main is the default path created in the modularAnalysis.py
 from basf2 import *
 from modularAnalysis import *
+from generators import add_evtgen_generator
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
@@ -50,8 +51,9 @@ if not outputDir.endswith('/'):
 # GENERATION
 # ---------------------------------------------------
 
-# Generate Y(4S) events. The Function is defined in analysis/scripts/modularAnalysis.py
-generateY4S(nEvents)
+# Generate Y(4S) events.
+setupEventInfo(nEvents)
+add_evtgen_generator(analysis_main, 'signal')
 
 # Load geometry
 loadGearbox()

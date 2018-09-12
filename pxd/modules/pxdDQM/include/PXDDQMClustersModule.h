@@ -16,6 +16,8 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
@@ -30,8 +32,6 @@ namespace Belle2 {
 
     /** Constructor */
     PXDDQMClustersModule();
-    /* Destructor */
-    virtual ~PXDDQMClustersModule();
 
   private:
     /** Module functions */
@@ -48,9 +48,12 @@ namespace Belle2 {
   private:
 
     /** cut for accepting to hitmap histogram, using pixels only, default = 0 */
-    float m_CutPXDCharge = 0.0;
+    int m_CutPXDCharge = 0;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+
+    /** Input array for DAQ Status. */
+    StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
     /** PXDDigits StoreArray name */
     std::string m_storePXDDigitsName;
@@ -58,8 +61,7 @@ namespace Belle2 {
     std::string m_storePXDClustersName;
     /** PXDClustersToPXDDigits RelationArray name */
     std::string m_relPXDClusterDigitName;
-    /** Frames StoreArray name */
-    std::string m_storeFramesName;
+
 
     /** Hitmaps of Digits */
     TH1I* m_hitMapCounts;

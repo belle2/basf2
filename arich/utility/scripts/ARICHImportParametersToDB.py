@@ -10,10 +10,10 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-# set local database folder (afterwards use the same line in the begining of your simulation/reconstruction steering script!)
-# for example cosmicTest database folder (crated by "downloadCosmicTest.py")
-use_local_database("arich/database/cosmicTest_payloads/cosmicTest_database.txt",
-                   "arich/database/cosmicTest_payloads", 0, LogLevel.INFO)
+# set local database folder
+use_local_database("localdb/database.txt",
+                   "localdb", 0, LogLevel.INFO)
+
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox

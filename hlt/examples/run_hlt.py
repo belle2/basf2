@@ -29,7 +29,11 @@ components = DEFAULT_HLT_COMPONENTS
 
 main_path = basf2.create_path()
 
-main_path.add_module("SeqRootInput")
+main_path.add_module("SeqRootInput", inputFileName="hlt_rawdata_simulation.sroot")
+
+# adding the HistoManager is important because the add_softwaretrigger_reconstruction call
+# adds DQM modules which will crash, if the HistoManager is not registered
+main_path.add_module("HistoManager")
 
 add_unpackers(main_path, components=components)
 add_softwaretrigger_reconstruction(main_path, store_array_debug_prescale=1, components=components)

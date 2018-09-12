@@ -94,6 +94,11 @@ class ModuleListDirective(Directive):
 
     def show_module(self, module, library):
         description = module.description().splitlines()
+        # pretend to be the autodoc extension to let other events process
+        # the doc string. Enables Google/Numpy docstrings as well as a bit
+        # of doxygen docstring conversion we have
+        env = self.state.document.settings.env
+        env.app.emit('autodoc-process-docstring', "b2:module", module.name(), module, None, description)
         description += ["", "",
                         ":Package: %s" % module.package(),
                         ":Library: %s" % os.path.basename(library),

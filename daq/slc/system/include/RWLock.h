@@ -8,23 +8,23 @@ namespace Belle2 {
   class RWLock {
 
   public:
-    static size_t size() throw()
+    static size_t size()
     {
       return sizeof(pthread_rwlock_t);
     }
 
     // constructors and destructor
   public:
-    RWLock() throw();
-    ~RWLock() throw();
+    RWLock();
+    ~RWLock();
 
     // member functions;
   public:
-    bool init() throw();
-    bool rdlock() throw();
-    bool wrlock() throw();
-    bool unlock() throw();
-    bool destroy() throw();
+    bool init();
+    bool rdlock();
+    bool wrlock();
+    bool unlock();
+    bool destroy();
 
     // data members;
   private:

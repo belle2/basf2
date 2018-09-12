@@ -26,7 +26,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDHardwareCluster():
-      m_nrPixel(0), m_pixelU(0), m_pixelV(0), m_pixelQ(0), m_seedCharge(0), m_seedU(0), m_seedV(0), m_clusterCharge(0), m_vxdID(),
+      m_nrPixel(0), m_pixelU(0), m_pixelV(0), m_pixelQ(0), m_seedCharge(0), m_seedU(0), m_seedV(0), m_clusterCharge(0), m_vxdID(0),
       m_chipID(0) {};
 
     /**
@@ -141,7 +141,7 @@ namespace Belle2 {
     unsigned short m_seedU;
     unsigned short m_seedV;
     unsigned int m_clusterCharge;
-    VxdID m_vxdID;
+    unsigned short m_vxdID;
     unsigned int m_chipID;
     // ~PXDHardwareCluster();
 

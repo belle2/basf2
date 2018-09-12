@@ -61,8 +61,10 @@ namespace Belle2 {
     // Add parameters
     addParam("numBins", m_numBins, "number of bins", 200);
     addParam("timeRange", m_timeRange, "time range in which to search [ns]", 1.0);
+    addParam("minTime", m_minTime,
+             "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use full TDC range)", 51.2);
+             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("numEvents", m_numEvents, "number of events to merge", 100);
 
   }
@@ -101,7 +103,6 @@ namespace Belle2 {
     // Configure TOP detector
 
     TOPconfigure config;
-    if (m_maxTime <= 0) m_maxTime = config.getTDCTimeRange();
 
 
   }
@@ -119,7 +120,12 @@ namespace Belle2 {
     double mass = Const::muon.getMass();
     TOPreco reco(Nhyp, &mass);
     reco.setPDFoption(TOPreco::c_Rough);
-    reco.setTmax(m_maxTime + m_timeRange / 2);
+
+    // set time window if given, otherwise use the default one from TOPNominalTDC
+
+    if (m_maxTime > m_minTime) {
+      reco.setTimeWindow(m_minTime, m_maxTime);
+    }
 
     // add photon hits to reconstruction object
 
@@ -146,7 +152,7 @@ namespace Belle2 {
       if (reco.getFlag() != 1) return;
 
       for (int i = 0; i < m_numBins; i++) {
-        m_logLikelihood[i] += reco.getLogL(m_t0[i], m_maxTime);
+        m_logLikelihood[i] += reco.getLogL(m_t0[i], m_minTime, m_maxTime);
       }
     }
     m_iEvent++;

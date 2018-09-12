@@ -1,8 +1,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/vxdCaTracking/ThreeHitFilters.h>
-// #include <TMatrixF.h>
-// #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
 namespace Belle2 {
@@ -44,7 +42,6 @@ namespace Belle2 {
   }
 
 
-
   /** the correctness of the magneticField-values (important for pT-related calculations) */
   TEST_F(ThreeHitFiltersTest, TestMagneticField)
   {
@@ -59,7 +56,6 @@ namespace Belle2 {
 
     EXPECT_DOUBLE_EQ(26.5650511770779893515721937204532946712042, aFilter.fullAngle3D());   //angle in degrees
   }
-
 
 
   /** the correctness of the angle calculators */
@@ -84,7 +80,6 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(0.4636476090008061162142562314612144020285, aFilter.fullAngle2D(outer_center, cent_inner));  //angle in radians
     EXPECT_DOUBLE_EQ(0.89442719099991586, aFilter.calcAngle2D(outer_center, cent_inner));
   }
-
 
 
   /** test sign, helixFit and calcDeltaSlopeRZ filters */
@@ -116,7 +111,6 @@ namespace Belle2 {
   }
 
 
-
   /** test DeltaSOverZ */
   TEST_F(ThreeHitFiltersTest, TestDeltaSOverZ)
   {
@@ -133,7 +127,6 @@ namespace Belle2 {
 
     EXPECT_FLOAT_EQ(0.31823963, aFilter.calcDeltaSlopeZOverS());
   }
-
 
 
   /** test cramer method in calcPt */
@@ -164,5 +157,4 @@ namespace Belle2 {
     aFilter.resetValues(outerHit, outerHit, innerHit);
     EXPECT_ANY_THROW(aFilter.calcPt());
   }
-
 }  // namespace

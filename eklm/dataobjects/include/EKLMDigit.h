@@ -39,7 +39,7 @@ namespace Belle2 {
      * Constructor from the EKLMSim2Hit.
      * @param[in] Hit EKLMSim2Hit.
      */
-    EKLMDigit(const EKLMSimHit* Hit);
+    explicit EKLMDigit(const EKLMSimHit* Hit);
 
     /**
      * Destructor.
@@ -81,16 +81,40 @@ namespace Belle2 {
     void setCTime(uint16_t ctime);
 
     /**
+     * Get TDC.
+     * @return TDC.
+     */
+    uint16_t getTDC() const;
+
+    /**
+     * Set TDC.
+     * @param[in] tdc TDC.
+     */
+    void setTDC(uint16_t tdc);
+
+    /**
+     * Get trigger CTIME.
+     * @return Trigger CTIME.
+     */
+    uint16_t getTriggerCTime() const;
+
+    /**
+     * Set trigger CTIME.
+     * @param[in] ctime Trigger CTime
+     */
+    void setTriggerCTime(uint16_t ctime);
+
+    /**
+     * Get relative CTIME (event - trigger).
+     * @return Relative CTIME.
+     */
+    int getRelativeCTime() const;
+
+    /**
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
     float getNPE() const;
-
-    /**
-     * Set the number of photoelectrons (fit result).
-     * @param[in] npe Number of photoelectrons.
-     */
-    void setNPE(float npe);
 
     /**
      * Get generated number of photoelectrons.
@@ -175,6 +199,12 @@ namespace Belle2 {
     /** CTIME (time provided by B2TT). */
     uint16_t m_CTime;
 
+    /** TDC (time provided by ASIC). */
+    uint16_t m_TDC;
+
+    /** Trigger CTIME. */
+    uint16_t m_TriggerCTime;
+
     /** Generated number of photoelectrons (MC only). */
     int m_generatedNPE;
 
@@ -185,7 +215,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 8);
+    ClassDef(Belle2::EKLMDigit, 10);
 
   };
 

@@ -12,6 +12,7 @@
 
 #include <TTree.h>
 #include "arich/dataobjects/ARICHPhoton.h"
+#include "arich/dataobjects/ARICHInfo.h"
 
 namespace Belle2 {
   namespace ARICH {
@@ -102,11 +103,14 @@ namespace Belle2 {
       ParticlesArray expPhot;      /**< number of expected photons (signal + bkg) */
       ParticlesArray logL;   /**< log likelihoods */
 
+
       TrackHit recHit;  /**< extrapolated Track hit */
       TrackHit mcHit;  /**< related MC particle hit */
       Int_t nRec; /**< number of reconstructed photons */
       std::vector<Belle2::ARICHPhoton>  photons; /** vector of reconstructed photons */
       Float_t winHit[2];                         /** track hit on hapd window (x,y coordinates) */
+      Int_t trgtype; /**< event trigger type */
+
 
 
       /**
@@ -126,6 +130,7 @@ namespace Belle2 {
       {
         evt = 0;
         run = 0;
+        trgtype = 0;
 
         pValue = 0;
         z0 = 0;

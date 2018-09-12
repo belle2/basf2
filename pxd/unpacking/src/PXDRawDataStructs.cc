@@ -90,7 +90,7 @@ namespace Belle2 {
               << " DHEID $" << std::hex << getDHEId()
               << " DHPMASK $" << std::hex << getActiveDHPMask()
               << " SFNR $" << std::hex << getStartFrameNr()
-              << " OFF $" << std::hex << getTriggerOffsetRow()
+              << " OFF $" << std::hex << getTriggerGate()
               << " CRC " << std::hex << crc32);
     };
 

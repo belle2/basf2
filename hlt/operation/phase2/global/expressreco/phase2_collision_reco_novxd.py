@@ -12,7 +12,7 @@ reco_components = DEFAULT_EXPRESSRECO_COMPONENTS
 reco_components.remove("PXD")
 reco_components.remove("SVD")
 
-add_expressreco_processing(path, run_type="collison", do_reconstruction=True, reco_components=reco_components)
+add_expressreco_processing(path, run_type="collision", do_reconstruction=True, reco_components=reco_components)
 
 finalize_hlt_path(path, args)
 basf2.print_path(path)

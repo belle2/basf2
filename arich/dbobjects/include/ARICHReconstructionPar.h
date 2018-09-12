@@ -69,7 +69,7 @@ namespace Belle2 {
     * Get vector of additional cherenkov angle PDF parameters
     * @return vector of parameters
     */
-    const std::vector<float>& getParameters()
+    const std::vector<float>& getParameters() const
     {
       return m_pars;
     }
@@ -78,7 +78,7 @@ namespace Belle2 {
      * Get background PDF function
      * @return background PDF function
      */
-    TF1* getBackgroundPDF()
+    const TF1* getBackgroundPDF() const
     {
       return m_bkgPDF;
     }
@@ -88,7 +88,7 @@ namespace Belle2 {
     * @param momentum track momentum
     * @return cherenkov angle resolution
     */
-    double getThcResolution(double momentum)
+    double getThcResolution(double momentum) const
     {
       return  m_thcResolution->Eval(momentum);
     }
@@ -98,7 +98,7 @@ namespace Belle2 {
      * @param iLayer aerogel layer
      * @return aerogel cherenkov photon yield
      */
-    double getAerogelFOM(unsigned iLayer)
+    double getAerogelFOM(unsigned iLayer) const
     {
       return m_aerogelFOM.at(iLayer);
     }
@@ -109,7 +109,7 @@ namespace Belle2 {
     * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
     * @return expected number of backgrond hits on pad
     */
-    double getBackgroundPerPad(double th_cer, std::vector<double>& pars);
+    double getBackgroundPerPad(double th_cer, std::vector<double>& pars) const;
 
     /**
      * Get number of expected background hits in ring (0.1<theta<0.5rad by default)
@@ -118,7 +118,7 @@ namespace Belle2 {
      * @param maxThc outter theta angle of ring
      * @return expected number of backgrond hits in ring
      */
-    double getExpectedBackgroundHits(std::vector<double>& pars, double minThc = 0.1, double maxThc = 0.5);
+    double getExpectedBackgroundHits(std::vector<double>& pars, double minThc = 0.1, double maxThc = 0.5) const;
 
     /**
      * Get average number of pads in ring
@@ -127,16 +127,16 @@ namespace Belle2 {
      * @param trackTh theta angle of track (global coordinates, z axis theta = 0)
      * @return average number of pads in ring
      */
-    double getNPadsInRing(double maxThc, double minThc = 0.0, double trackTh = 0.45);
+    double getNPadsInRing(double maxThc, double minThc = 0.0, double trackTh = 0.45) const;
 
     /**
      * Print parameters values
      */
-    void print();
+    void print() const;
 
   private:
 
-    TF1* m_bkgPDF = NULL; /**< background PDF function (function of theta) */
+    mutable TF1* m_bkgPDF = NULL; /**< background PDF function (function of theta) */
     TF1* m_thcResolution = NULL; /**< cherenkov angle resolution (function of track momentum)*/
     std::vector<float> m_pars; /**< vector of other pdf parameters */
     std::vector<float> m_aerogelFOM; /**< aerogel figure of merit (for photon yield) */

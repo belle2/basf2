@@ -7,28 +7,27 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef EVTBSEMITAUONICSCALARMESONAMPLITUDE_HH
-#define EVTBSEMITAUONICSCALARMESONAMPLITUDE_HH
+#pragma once
 
 #include "generators/evtgen/models/EvtBSemiTauonicAmplitude.h"
 
-/** The class calculates the spin dependent amplitudes of B->Dtaunu decays for the BSemiTauonic model based on [M. Tanaka and R. Watanabe PRD87,034028(2013)].
-*/
-class EvtBSemiTauonicScalarMesonAmplitude : public EvtBSemiTauonicAmplitude {
+namespace Belle2 {
+  /** The class calculates the spin dependent amplitudes of B->Dtaunu decays for the BSemiTauonic model based on [M. Tanaka and R. Watanabe PRD87,034028(2013)].
+  */
+  class EvtBSemiTauonicScalarMesonAmplitude : public EvtBSemiTauonicAmplitude {
 
-public:
+  public:
 
-  /** The function calculates the spin dependent amplitude.
-   *
-   * @param parent a pointer to the parent particle.
-   * @param amp a pointer to fill the calculated spin dependent amplitude.
-   * @param CalcHelAmp a pointer to the calculator of the helicity dependent amplitude.
-   * The function calculate the spin dependent amplitude of the semi-tauonic decay to a scalar meson (D meson).
-   */
-  void CalcAmp(EvtParticle* parent, EvtAmp& amp,
-               EvtBSemiTauonicHelicityAmplitudeCalculator* HelicityAmplitudeCalculator);
+    /** The function calculates the spin dependent amplitude.
+     *
+     * @param parent a pointer to the parent particle.
+     * @param amp a pointer to fill the calculated spin dependent amplitude.
+     * @param CalcHelAmp a pointer to the calculator of the helicity dependent amplitude.
+     * The function calculate the spin dependent amplitude of the semi-tauonic decay to a scalar meson (D meson).
+     */
+    void CalcAmp(EvtParticle* parent, EvtAmp& amp,
+                 EvtBSemiTauonicHelicityAmplitudeCalculator* HelicityAmplitudeCalculator);
 
-};
+  };
 
-#endif
+} // Belle 2 Namespace

@@ -27,12 +27,11 @@ babayaganlo.param('SearchMax', 10000)
 babayaganlo.param('VPUncertainty', True)
 main.add_module(babayaganlo)
 
-# generateY4S(10, "mixed.dec", main)
 
 add_simulation(main)
 
 # add trigger
-add_tsim(main)
+add_tsim(main, component=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 # output
 rootoutput = register_module('RootOutput')

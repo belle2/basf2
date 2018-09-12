@@ -39,6 +39,9 @@ namespace Belle2 {
       m_TimeResolution = 0; /**< Calibrated Time Resolution */
       m_Energy         = 0; /**< Calibrated Energy */
       m_Status         = 0; /**< Calibration Status */
+      m_TwoComponentTotalEnergy = 0; /**< Offline Two Component Total Energy*/
+      m_TwoComponentHadronEnergy = 0; /**< Offline Two Component Hadron Energy*/
+      m_TwoComponentChi2 = 0; /**< Offline Two Component chi2*/
     }
 
     /*! Set  Cell ID
@@ -48,6 +51,18 @@ namespace Belle2 {
     /*! Set Calibrated Energy
      */
     void setEnergy(double Energy) { m_Energy = Energy; }
+
+    /*! Set two component total energy
+     */
+    void setTwoComponentTotalEnergy(double Energy) { m_TwoComponentTotalEnergy = Energy; }
+
+    /*! Set two component hadron energy
+     */
+    void setTwoComponentHadronEnergy(double Energy) { m_TwoComponentHadronEnergy = Energy; }
+
+    /*! Set two component chi2
+     */
+    void setTwoComponentChi2(double chi) { m_TwoComponentChi2 = chi; }
 
     /*! Set Calibrated Time
      */
@@ -78,6 +93,22 @@ namespace Belle2 {
      * @return Calibrated Energy
      */
     double getEnergy() const { return m_Energy; }
+
+    /*! Get Two Component calibrated Total Energy
+     * @return Two Component calibrated Total Energy
+     */
+    double getTwoComponentTotalEnergy() const { return m_TwoComponentTotalEnergy; }
+
+    /*! Get Two Component calibrated hadron component Energy
+     * @return Two Component calibrated hadron component Energy
+     */
+    double getTwoComponentHadronEnergy() const { return m_TwoComponentHadronEnergy; }
+
+    /*! Get two componnent chi2
+     * @return two componnent chi2
+     */
+    double getTwoComponentChi2() const { return m_TwoComponentChi2; }
+
 
     /*! Get Calibrated Time
      * @return Calibrated Time
@@ -126,11 +157,15 @@ namespace Belle2 {
     double m_TimeResolution;   /**< Calibrated Time resolution*/
     double m_Energy; /**< Calibrated Energy */
     unsigned short int m_Status;   /**< Calibration and Fit Status */
+    double m_TwoComponentTotalEnergy;  /**< Calibrated Two Component Total Energy */
+    double m_TwoComponentHadronEnergy; /**< Calibrated Hadron Component Energy */
+    double m_TwoComponentChi2; /**< Two Component chi2*/
 
     // 1: first version (TF)
     // 2: added m_TimeResolution (TF)
     // 3: added status bits for failed fits (TF)
-    ClassDef(ECLCalDigit, 3); /**< ClassDef */
+    // 4: added offline fit variables (SL)
+    ClassDef(ECLCalDigit, 4); /**< ClassDef */
 
   };
 

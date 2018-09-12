@@ -11,6 +11,7 @@
 
 #include <tracking/ckf/general/findlets/LayerToggledApplier.dcl.h>
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {
 

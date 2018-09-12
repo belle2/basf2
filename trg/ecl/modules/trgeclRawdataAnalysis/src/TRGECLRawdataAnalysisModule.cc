@@ -150,7 +150,7 @@ namespace Belle2 {
       int HitTiming    = TCHit ->getTCTime();
       int HitEnergy =  TCHit -> getTCEnergy();
       HitRevoFAM = TCHit -> getRevoFAM();
-      HitFineTime = TCHit -> getFineTime();
+      HitFineTime = TCHit -> getTCTime();
 
       if (iTCID == -1 && HitTiming == 0 && HitEnergy == 0) {continue;}
 
@@ -178,7 +178,7 @@ namespace Belle2 {
 
     int Timing = ((HitFineTime >> 3) & 0xF) + ((HitRevoFAM & 0x7F) << 4);
 
-    int m_hitNum = 0;
+    m_hitNum = 0;
     StoreArray<TRGECLTiming> TimingArray;
     TimingArray.appendNew();
     m_hitNum = TimingArray.getEntries() - 1;

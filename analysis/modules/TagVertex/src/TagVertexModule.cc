@@ -957,8 +957,13 @@ namespace Belle2 {
       }
     }
 
-    int isGoodFit = rFit.fit("avf");
-    if (isGoodFit < 1) return false;
+    try {
+      int isGoodFit = rFit.fit("avf");
+      if (isGoodFit < 1) return false;
+    } catch (rave::CheckedFloatException) {
+      B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
+      return false;
+    }
 
     m_tagV = rFit.getPos(0);
     m_tagVErrMatrix.ResizeTo(rFit.getCov(0));

@@ -19,14 +19,14 @@ namespace Belle2 {
 
   namespace Monopoles {
 
+    class G4Monopole;
+
     /**
      * Monopole physics class to register on the physics list.
      *
      * Entry point from FullSim to the monopole package. Consists of monopole
      * definition, transportation and ionisation processes.
      */
-    class G4Monopole;
-
     class G4MonopolePhysics : public G4VPhysicsConstructor {
     public:
 

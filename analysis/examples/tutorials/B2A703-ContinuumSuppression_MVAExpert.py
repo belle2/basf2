@@ -29,7 +29,7 @@ if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
 
 step = str(sys.argv[1])
 
-path = '/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC5_2015/Bd_KsPi0/mdst/'
+path = '/group/belle2/tutorial/release_01-00-00/Bd_KsPi0/mdst/'
 input = ''
 
 if step == 'signal':
@@ -113,7 +113,7 @@ main.add_module('MVAExpert', listNames=['B0'], extraInfoName='FastBDT', identifi
 expertVars = ['extraInfo(FastBDT)', 'transformedNetworkOutput(FastBDT,0.1,1.0)']
 
 # Create output file with all sets of variables.
-variablesToNTuple('B0', trainVars + targetVar + expertVars, treename='tree', filename=outfile, path=main)
+variablesToNtuple('B0', trainVars + targetVar + expertVars, treename='tree', filename=outfile, path=main)
 
 process(main)
 print(statistics)

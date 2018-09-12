@@ -23,6 +23,8 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 
+#include <pxd/reconstruction/PXDClusterPositionEstimator.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
@@ -64,8 +66,6 @@ PXDClusterizerModule::PXDClusterizerModule() :
   addParam("MCParticles", m_storeMCParticlesName, "MCParticles collection name",
            string(""));
 
-  addParam("notUseClusterShape", m_notUseClusterShape,
-           "Do not apply recognition of cluster shape and set it as ID", false);
 }
 
 void PXDClusterizerModule::initialize()
@@ -128,7 +128,6 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  B2INFO(" -->  NotUseClusterShape: " << m_notUseClusterShape);
 
 
   m_noiseMap.setNoiseLevel(m_elNoise);
@@ -336,17 +335,40 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     projV.setPos(projV.getPos() - lorentzShift.Y());
     B2DEBUG(100, "Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
 
-    short clsShapeID = (short)pxdClusterShapeType::no_shape_set;
-    PXDClusterShape cs;
-    if (!m_notUseClusterShape) {
-      clsShapeID = (short)cs.setClsShape(cls, sensorID);
-    }
+    // Pre classification of cluster looking at pitch type of pixels and if they touch sensor edges
+    int clusterkind = PXDClusterPositionEstimator::getInstance().getClusterkind(cls.pixels(), sensorID);
+
+    // Compute sorted set of pixel
+    // FIXME: I am not 100% sure if cls.pixels() are sorted => ask PeterQ or Martin Ritter
+    set<Pixel> pixelSet(cls.pixels().begin(), cls.pixels().end());
+
+    // Compute classifier variables needed for later retrival of position correction in PXD CKF
+    vector<float> sectorEtaValues = {0, 0, 0, 0};
+    sectorEtaValues[0] = PXDClusterPositionEstimator::getInstance().computeEta(pixelSet, projV.getMinCell(), projV.getSize(), +1.0,
+                         +1.0);
+    sectorEtaValues[1] = PXDClusterPositionEstimator::getInstance().computeEta(pixelSet, projV.getMinCell(), projV.getSize(), -1.0,
+                         +1.0);
+    sectorEtaValues[2] = PXDClusterPositionEstimator::getInstance().computeEta(pixelSet, projV.getMinCell(), projV.getSize(), -1.0,
+                         -1.0);
+    sectorEtaValues[3] = PXDClusterPositionEstimator::getInstance().computeEta(pixelSet, projV.getMinCell(), projV.getSize(), +1.0,
+                         -1.0);
+
+    vector<int> sectorShapeIndices = { -1, -1, -1, -1};
+    sectorShapeIndices[0] = PXDClusterPositionEstimator::getInstance().computeShapeIndex(pixelSet, projU.getMinCell(),
+                            projV.getMinCell(), projV.getSize(), +1.0, +1.0);
+    sectorShapeIndices[1] = PXDClusterPositionEstimator::getInstance().computeShapeIndex(pixelSet, projU.getMinCell(),
+                            projV.getMinCell(), projV.getSize(), -1.0, +1.0);
+    sectorShapeIndices[2] = PXDClusterPositionEstimator::getInstance().computeShapeIndex(pixelSet, projU.getMinCell(),
+                            projV.getMinCell(), projV.getSize(), -1.0, -1.0);
+    sectorShapeIndices[3] = PXDClusterPositionEstimator::getInstance().computeShapeIndex(pixelSet, projU.getMinCell(),
+                            projV.getMinCell(), projV.getSize(), +1.0, -1.0);
 
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(sensorID, projU.getPos(), projV.getPos(), projU.getError(), projV.getError(),
                             rho, cls.getCharge(), seed.getCharge(),
-                            cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell(), clsShapeID
+                            cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell(), clusterkind,
+                            sectorEtaValues, sectorShapeIndices
                            );
 
     //Create Relations to this Digit

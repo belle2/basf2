@@ -161,6 +161,13 @@ namespace Belle2 {
       unsigned short getNumberOfPXDVSideChips(unsigned short = 0) const
       { return c_nPXDChipsV; }
 
+      /** Get number of PXD readout gates
+       * @param (unused) Layer of the sensor
+       * @return number of v-side PXD readout gates
+       */
+      unsigned short getNumberOfPXDReadoutGates(unsigned short = 0) const
+      { return c_nPXDReadoutGates; }
+
       /** Get total number of chips in SVD
        * @return total number of chips in SVD
        */
@@ -471,6 +478,8 @@ namespace Belle2 {
       const unsigned short c_nPXDChipsU = 4;
       /** Number of PXD chips per sensor in v (Switchers) (=6) on Belle II */
       const unsigned short c_nPXDChipsV = 6;
+      /** Number of PXD readout gates (or total number of Switcher channels) on Belle II */
+      const unsigned short c_nPXDReadoutGates = 192;
       /** Number of SVD chips per sensor in u,v in layer 3 (=6) on Belle II */
       const unsigned short c_nSVDChipsL3 = 6;
       /** Number of SVD chips per sensor in u in layers 4,5,6 (=6) on Belle II */

@@ -19,6 +19,9 @@
 
 namespace Belle2 {
 
+
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
   /**
    * The PXD DAQ Status class
    *
@@ -28,8 +31,6 @@ namespace Belle2 {
    * stored. This preserves information which would normally get lost
    * during unpacking
    */
-  using Belle2::PXD::PXDError::PXDErrorFlags;
-
   class PXDDAQStatus : public TObject {
   public:
 
@@ -39,7 +40,14 @@ namespace Belle2 {
     /** constructor setting the error mask.
      * @param mask Error mask
      */
-    PXDDAQStatus(PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false), m_unfiltered(false) {}
+    explicit PXDDAQStatus(PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false),
+      m_unfiltered(false) {}
+
+    /** Return pointer to PXDDAQDHEStatus for the DHE connected to sensor with VxdID id
+     *  If id not found, it returns nullptr!
+     * @param id VxdID for required DHE
+     */
+    const PXDDAQDHEStatus* findDHE(const VxdID& id) const;
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -71,6 +79,12 @@ namespace Belle2 {
      * @param m Bit Mask to set
      */
     void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
+
+    /** Add (OR) Error bit mask
+     * This should be the OR of error masks of all sub-objects (DHC, DHE)
+     * @param m Bit Mask to add (or)
+     */
+    void addErrorMask(PXDErrorFlags m) { m_errorMask |= m; }
 
     /** Return Error bit mask
      * This is the OR of error masks of all sub-objects (DHC, DHE)
@@ -116,7 +130,13 @@ namespace Belle2 {
     /** iterator-based iteration for packets */
     std::vector<PXDDAQPacketStatus>::iterator end() { return m_pxdPacket.end(); };
 
+    /** const iterator-based iteration for packets */
+    std::vector<PXDDAQPacketStatus>::const_iterator cbegin() const { return m_pxdPacket.cbegin(); };
+    /** const iterator-based iteration for packets */
+    std::vector<PXDDAQPacketStatus>::const_iterator cend() const { return m_pxdPacket.cend(); };
+    /** Returns PXDDAQPacketStatus for last packet in this event  */
     PXDDAQPacketStatus& pkt_back() { return m_pxdPacket.back(); };
+    /** Returns number of packets in this event  */
     size_t pkt_size() const { return m_pxdPacket.size(); };
 
   private:
@@ -130,7 +150,7 @@ namespace Belle2 {
     /** Vector of packet informations beloning to this event */
     std::vector <PXDDAQPacketStatus> m_pxdPacket;
 
-    ClassDef(PXDDAQStatus, 1)
+    ClassDef(PXDDAQStatus, 2)
 
   }; // class PXDDAQStatus
 

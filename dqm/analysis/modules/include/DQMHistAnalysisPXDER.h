@@ -49,7 +49,7 @@ namespace Belle2 {
   private:
 
     /** Basic Directory in output file */
-    TDirectory* m_oldDir;
+    //TDirectory* m_oldDir;
 
     /** Flags of Hitmaps of Digits */
 //     TH1I* m_fHitMapCountsFlag;
@@ -126,7 +126,7 @@ namespace Belle2 {
     std::vector <std::string> m_ref_clusterSizeUV;
 
     /** Number of pixels on PXD v direction */
-    int m_nPixels;
+    //int m_nPixels;
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
     /** Number of PXD layers on Belle II */

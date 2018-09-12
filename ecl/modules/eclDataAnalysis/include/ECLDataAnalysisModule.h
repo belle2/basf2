@@ -9,41 +9,35 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/core/Module.h>
 #include <string>
 
-// ECL
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 // FRAMEWORK
-#include <framework/gearbox/Unit.h>
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-// GEOMETRY
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
 class TFile;
 class TTree;
 
 namespace Belle2 {
+
+  //MDST
+  class MCParticle;
+  class ECLCluster;
   class Track;
   class TrackFitResult;
+  class EventLevelClusteringInfo;
+  class EventMetaData;
+
+  //ECL
+  class ECLShower;
   class ECLPidLikelihood;
-
-
-
-
+  class ECLLocalMaximum;
+  class ECLConnectedRegion;
+  class ECLCalDigit;
+  class ECLDigit;
+  class ECLHit;
+  class ECLSimHit;
 
   /** The ECL Data Analysis Module
    *
@@ -69,11 +63,11 @@ namespace Belle2 {
      *Initializes the Module.
      */
     virtual void initialize();
-
+    /** beginRun */
     virtual void beginRun();
-
+    /** event */
     virtual void event();
-
+    /** endRun */
     virtual void endRun();
 
     /**
@@ -95,25 +89,16 @@ namespace Belle2 {
     StoreArray<Track> m_tracks;  /**< Tracks storeArray */
     StoreArray<TrackFitResult> m_trackFitResults;  /**< TrackFitResult storeArray */
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods; /**< ECLPidLikelihood storeArray */
-
-    /** Store array: ECLSimHit. */
-    StoreArray<ECLSimHit> m_eclSimHits;
-    /** Store array: ECLHit. */
-    StoreArray<ECLHit> m_eclHits;
-    /** Store array: ECLDigit. */
-    StoreArray<ECLDigit> m_eclDigits;
-    /** Store array: ECLCalDigit. */
-    StoreArray<ECLCalDigit> m_eclCalDigits;
-    /** Store array: ECLConnectedRegion. */
-    StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
-    /** Store array: ECLShower. */
-    StoreArray<ECLShower> m_eclShowers;
-    /** Store array: ECLCluster. */
-    StoreArray<ECLCluster> m_eclClusters;
-    /** Store array: ECLLocalMaximum. */
-    StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    StoreArray<ECLSimHit> m_eclSimHits; /**< Store array: ECLSimHit. */
+    StoreArray<ECLHit> m_eclHits; /**< Store array: ECLHit. */
+    StoreArray<ECLDigit> m_eclDigits; /**< Store array: ECLDigit. */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< Store array: ECLCalDigit. */
+    StoreArray<ECLConnectedRegion> m_eclConnectedRegions; /**< Store array: ECLConnectedRegion. */
+    StoreArray<ECLShower> m_eclShowers; /**< Store array: ECLShower. */
+    StoreArray<ECLCluster> m_eclClusters; /**< Store array: ECLCluster. */
+    StoreArray<ECLLocalMaximum> m_eclLocalMaximums; /**< Store array: ECLLocalMaximum. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventMetaData> m_eventmetadata; /**< Store object pointer: EventMetaData. */
 
     /** Default name ECLCalDigits array*/
     virtual const char* eclSimHitArrayName() const
@@ -181,6 +166,20 @@ namespace Belle2 {
     int m_iExperiment; /**< Experiment number */
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
+
+    //EventLevelClusteringInfo
+    /** Number of out of time, energetic ECLCalDigits, FWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeFWD {0};
+    /** Number of out of time, energetic ECLCalDigits, Barrel. */
+    uint16_t m_nECLCalDigitsOutOfTimeBarrel {0};
+    /** Number of out of time, energetic ECLCalDigits, BWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeBWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), FWD. */
+    uint8_t m_nECLShowersRejectedFWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), Barrel. */
+    uint8_t m_nECLShowersRejectedBarrel {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), BWD. */
+    uint8_t m_nECLShowersRejectedBWD {0};
 
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */

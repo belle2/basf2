@@ -60,8 +60,6 @@ SeqRootInputModule::~SeqRootInputModule()
 
 void SeqRootInputModule::initialize()
 {
-  RootIOUtilities::loadDictionaries();
-
   // Specify input file(list)
   if (!m_inputFileName.empty() && !m_filelist.empty()) {
     B2FATAL("Cannot specify both 'inputFileName' and 'inputFileNames'");

@@ -14,34 +14,30 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLLOCALMAXIMUMFINDERMODULE_H_
-#define ECLLOCALMAXIMUMFINDERMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/geometry/B2Vector3.h> // faster than TVector3
 
-// ECL (most of this is needed for MVA training and the MC finder)
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-
-// MDST
-#include <mdst/dataobjects/MCParticle.h>
-
-// ROOT
-#include "TFile.h"
-#include "TH1D.h"
-#include "TTree.h"
+class TTree;
+class TFile;
 
 namespace Belle2 {
+
+  class MCParticle;
+  class ECLHit;
+  class ECLDigit;
+  class ECLCalDigit;
+  class ECLLocalMaximum;
+  class ECLConnectedRegion;
+
+  namespace ECL {
+    class ECLNeighbours;
+    class ECLGeometryPar;
+  }
 
   /** Class to find connected regions */
   class ECLLocalMaximumFinderModule : public Module {
@@ -218,5 +214,3 @@ namespace Belle2 {
   }; // end of ECLLocalMaximumFinderPureCsIModule
 
 } // end of Belle2 namespace
-
-#endif // ECLLOCALMAXIMUMFINDERMODULE_H_

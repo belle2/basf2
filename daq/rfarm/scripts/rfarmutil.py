@@ -48,7 +48,8 @@ def run_nsmd(nsmdir, port, nsmhost):
     # Check directory for loggin
     if not os.path.exists(nsmdir + '/' + nsmhost):
         os.mkdir(nsmdir + '/' + nsmhost)
-    nsmd = str(os.environ.get('BELLE2_EXTERNALS_BIN')) + '/nsmd2 -f -p ' \
+#    nsmd = str(os.environ.get('BELLE2_EXTERNALS_BIN')) + '/nsmd2 -f -p ' \
+    nsmd = 'nsmd2 -f -p ' \
         + port + ' -s ' + port + ' -h '
     cmd = 'ssh ' + nsmhost + ' "cd ' + nsmdir + '/' + nsmhost \
         + '; setenv NSMLOGDIR ' + nsmdir + '/' + nsmhost + ';' + nsmd \

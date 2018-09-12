@@ -10,11 +10,8 @@
 
 #include <beast/microtpc/modules/TpcDigitizerModule.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
-#include <beast/microtpc/dataobjects/MicrotpcHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -65,7 +62,7 @@ TpcDigitizerModule::~TpcDigitizerModule()
 void TpcDigitizerModule::initialize()
 {
   B2INFO("TpcDigitizer: Initializing");
-  StoreArray<MicrotpcHit>::registerPersistent();
+  m_microtpcHit.registerInDataStore();
 
   //get xml data
   getXMLData();

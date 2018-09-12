@@ -55,75 +55,112 @@ def render_to_latex(df, eff_name, filename):
         subprocess.check_call(["pdflatex", tex_filename])
 
 
-def extract_efficiencies(channels, storage_location):
+def extract_efficiencies(channels, storage_location, shifts, filename_used_shift):
     """
     Compute the software trigger efficiencies from channels
     """
-    efficiency_list = []
 
-    for channel in channels:
-        result_list = []
-        channel_path = os.path.join(storage_location, channel)
-        analysed_path = os.path.join(channel_path, "analysed")
+    for shift in shifts:
+        for shift_parameter, shift_values in shift.items():
+            for value in shift_values:
 
-        for filename in glob(os.path.join(analysed_path, "*_hlt_results.pkl")):
-            result_list += pd.read_pickle(filename)
+                efficiency_list = []
 
-        if len(result_list) == 0:
-            continue
+                for channel in channels:
+                    result_list = []
+                    channel_path = os.path.join(storage_location, channel)
+                    analysed_path = os.path.join(channel_path, "analysed")
+                    for filename in glob(os.path.join(analysed_path, "*_hlt_results.pkl")):
+                        # get the original filename from the generation
+                        generation_filename = os.path.split(filename)[1]
+                        generation_filename = generation_filename.replace("analysed_", "generated_")
+                        generation_filename = generation_filename.replace("_hlt_results.pkl", ".root")
+                        shift_information = filename_used_shift[generation_filename]
 
-        results = pd.DataFrame(result_list)
+                        if shift_information == (shift_parameter, value):
+                            result_list += pd.read_pickle(filename)
 
-        efficiencies = (results[["final_decision", "software_trigger_cut&calib&total_result",
-                                 "software_trigger_cut&fast_reco&total_result",
-                                 "software_trigger_cut&hlt&total_result"]] == 1).mean()
-        efficiencies.index = ["final decision", "calibration", "fast reco", "hlt"]
-        efficiencies = pd.concat(
-            [efficiencies, (results[[col for col in results.columns if "software_trigger" in col]] == 1).mean()])
-        efficiencies.name = channel
-        efficiency_list.append(efficiencies)
+                    if len(result_list) == 0:
+                        continue
 
-    all_efficiencies = pd.DataFrame(efficiency_list)
-    all_efficiencies.to_pickle("all_efficiencies.pkl")
+                    results = pd.DataFrame(result_list)
 
-    print("\n### Final Efficiencies per channel ###\n")
-    print(all_efficiencies)
+                    efficiencies = (results[["final_decision", "software_trigger_cut&calib&total_result",
+                                             "software_trigger_cut&fast_reco&total_result",
+                                             "software_trigger_cut&hlt&total_result"]] == 1).mean()
+                    efficiencies.index = ["final decision", "calibration", "fast reco", "hlt"]
+                    efficiencies = pd.concat(
+                        [efficiencies, (results[[col for col in results.columns if "software_trigger" in col]] == 1).mean()])
+                    efficiencies.name = channel
+                    efficiency_list.append(efficiencies)
 
-    render_to_latex(all_efficiencies, "All Efficiencies", "all_efficiencies")
+                efficiencies_path = "efficiencies"
+                if not os.path.exists(efficiencies_path):
+                    os.makedirs(efficiencies_path)
+
+                all_efficiencies = pd.DataFrame(efficiency_list)
+                all_efficiencies.to_pickle(
+                    os.path.join(
+                        efficiencies_path,
+                        "all_efficiencies_{}_{}.pkl".format(
+                            shift_parameter,
+                            value)))
+
+                print("\n### Final Efficiencies per channel ###\n")
+                print(all_efficiencies)
+
+                render_to_latex(all_efficiencies, "All Efficiencies",
+                                os.path.join(efficiencies_path, "all_efficiencies_{}_{}".format(shift_parameter, str(value))))
 
     return all_efficiencies
 
 
-def extract_l1_efficiencies(channels, storage_location):
+def extract_l1_efficiencies(channels, storage_location, shifts, filename_used_shift):
     """
     Compute the level1 efficiencies from channels
     """
-    efficiency_list = []
+    for shift in shifts:
+        for shift_parameter, shift_values in shift.items():
+            for value in shift_values:
 
-    for channel in channels:
-        result_list = []
-        channel_path = os.path.join(storage_location, channel)
-        analysed_path = os.path.join(channel_path, "analysed")
+                efficiency_list = []
 
-        for filename in glob(os.path.join(analysed_path, "*_l1_results.pkl")):
-            result_list += pd.read_pickle(filename)
+                for channel in channels:
+                    result_list = []
+                    channel_path = os.path.join(storage_location, channel)
+                    analysed_path = os.path.join(channel_path, "analysed")
 
-        if len(result_list) == 0:
-            continue
+                    for filename in glob(os.path.join(analysed_path, "*_l1_results.pkl")):
+                        # get the original filename from the generation
+                        generation_filename = os.path.split(filename)[1]
+                        generation_filename = generation_filename.replace("analysed_", "generated_")
+                        generation_filename = generation_filename.replace("_l1_results.pkl", ".root")
+                        shift_information = filename_used_shift[generation_filename]
 
-        results = pd.DataFrame(result_list)
+                        if shift_information == (shift_parameter, value):
+                            result_list += pd.read_pickle(filename)
 
-        efficiencies = (results == 1).mean()
-        efficiencies.name = channel
-        efficiency_list.append(efficiencies)
+                    if len(result_list) == 0:
+                        continue
 
-    all_efficiencies = pd.DataFrame(efficiency_list)
-    all_efficiencies.to_pickle("all_l1_efficiencies.pkl")
+                    results = pd.DataFrame(result_list)
 
-    print("\n### Final L1 Efficiencies per channel ###\n")
-    print(all_efficiencies)
+                    efficiencies = (results == 1).mean()
+                    efficiencies.name = channel
+                    efficiency_list.append(efficiencies)
 
-    render_to_latex(all_efficiencies, "L1 Efficiencies", "l1_efficiencies")
+                efficiencies_path = "efficiencies"
+                if not os.path.exists(efficiencies_path):
+                    os.makedirs(efficiencies_path)
+
+                all_efficiencies = pd.DataFrame(efficiency_list)
+                all_efficiencies.to_pickle(os.path.join(efficiencies_path, "all_l1_efficiencies.pkl"))
+
+                print("\n### Final L1 Efficiencies per channel ###\n")
+                print(all_efficiencies)
+
+                render_to_latex(all_efficiencies, "L1 Efficiencies",
+                                os.path.join(efficiencies_path, "l1_efficiencies_{}_{}".format(shift_parameter, str(value))))
 
     return all_efficiencies
 

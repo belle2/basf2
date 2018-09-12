@@ -10,29 +10,29 @@ namespace Belle2 {
   class Reader {
 
   public:
-    virtual ~Reader() throw() {}
+    virtual ~Reader() {}
 
   public:
-    virtual size_t read(void*, size_t) throw(IOException) = 0;
-    virtual bool available() throw(IOException) = 0;
+    virtual size_t read(void*, size_t) = 0;
+    virtual bool available() = 0;
 
   protected:
-    void reverse(void* buf, size_t len) throw();
+    void reverse(void* buf, size_t len);
 
   public:
-    virtual bool readBool() throw(IOException);
-    virtual char readChar() throw(IOException);
-    virtual short readShort() throw(IOException);
-    virtual int readInt() throw(IOException);
-    virtual long long readLong() throw(IOException);
-    virtual unsigned char readUChar() throw(IOException);
-    virtual unsigned short readUShort() throw(IOException);
-    virtual unsigned int readUInt() throw(IOException);
-    virtual unsigned long long readULong() throw(IOException);
-    virtual float readFloat() throw(IOException);
-    virtual double readDouble() throw(IOException);
-    virtual const std::string readString() throw(IOException);
-    virtual void readObject(Serializable&) throw(IOException);
+    virtual bool readBool();
+    virtual char readChar();
+    virtual short readShort();
+    virtual int readInt();
+    virtual long long readLong();
+    virtual unsigned char readUChar();
+    virtual unsigned short readUShort();
+    virtual unsigned int readUInt();
+    virtual unsigned long long readULong();
+    virtual float readFloat();
+    virtual double readDouble();
+    virtual const std::string readString();
+    virtual void readObject(Serializable&);
 
   };
 

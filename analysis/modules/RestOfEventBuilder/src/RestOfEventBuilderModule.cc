@@ -133,9 +133,8 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* cluster = eclClusters[i];
 
-    // allow only N1 (5) and T1 (1) cluster hypotheses enter ROE
-    if (cluster->getHypothesisId() != 5  &&
-        cluster->getHypothesisId() != 1)
+    // allow only N1 (n photons) cluster hypotheses to enter the ROE
+    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
       continue;
 
     bool remainingCluster = true;
@@ -257,18 +256,24 @@ void RestOfEventBuilderModule::printParticle(const Particle* particle)
   std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
   B2INFO("[RestOfEventBuilderModule] tracks  : ");
+
+  std::string printout;
   for (unsigned i = 0; i < trackFSPs.size(); i++)
-    std::cout << trackFSPs[i] << " ";
-  std::cout << std::endl;
+    printout += std::to_string(trackFSPs[i]) + " ";
+  B2INFO(printout);
+
+  printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] eclFSPs : ");
   for (unsigned i = 0; i < eclFSPs.size(); i++)
-    std::cout << eclFSPs[i] << " ";
-  std::cout << std::endl;
+    printout += std::to_string(eclFSPs[i]) + " ";
+  B2INFO(printout);
+
+  printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
   for (unsigned i = 0; i < klmFSPs.size(); i++)
-    std::cout << klmFSPs[i] << " ";
-  std::cout << std::endl;
+    printout += std::to_string(klmFSPs[i]) + " ";
+  B2INFO(printout);
 
 }

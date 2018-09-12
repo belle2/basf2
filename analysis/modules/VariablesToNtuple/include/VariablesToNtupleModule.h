@@ -1,20 +1,24 @@
-#pragma once
-/**************************************************************************
+/*************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013 - Belle II Collaboration                             *
+* Copyright(C) 2013-2018 Belle II Collaboration                          *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Pulvermacher                                   *
+*               Thomas Keck                                              *
+*               Simon Wehle                                              *
+*               Sam Cunliffe                                             *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 
-#include <TNtuple.h>
+#include <TTree.h>
 #include <TFile.h>
 
 #include <string>
@@ -22,9 +26,9 @@
 namespace Belle2 {
 
   /** Module to calculate variables specified by the user for a given ParticleList
-   *  and save them into an Ntuple.
-   *  The Ntuple is candidate-based, meaning the variables of each candidate are saved in a separate
-   *  row of the Ntuple
+   *  and save them into a ROOT TTree.
+   *  The ntuple is candidate-based, meaning the variables of each candidate are saved in a separate
+   *  row of the ntuple
    */
   class VariablesToNtupleModule : public Module {
   public:
@@ -57,9 +61,11 @@ namespace Belle2 {
     std::string m_treeName;
 
     /** ROOT file for output. */
-    TFile* m_file;
+    std::shared_ptr<TFile> m_file;
     /** The ROOT TNtuple for output. */
-    StoreObjPtr<RootMergeable<TNtuple>> m_tree;
+    StoreObjPtr<RootMergeable<TTree>> m_tree;
+    /** Branch addresses */
+    std::vector<double> m_branchAddresses;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
 

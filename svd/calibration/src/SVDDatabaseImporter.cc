@@ -32,7 +32,10 @@
 
 // wrapper objects
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
+#include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
@@ -135,12 +138,118 @@ void SVDDatabaseImporter::importSVDTimeShiftCorrections()
 
   B2RESULT("SVDTimeShiftCorrections imported to database.");
 }
+//only for Phase2 Geometry!
+void SVDDatabaseImporter::importSVDHotStripsCalibrations()
+{
+  DBImportObjPtr<SVDHotStripsCalibrations::t_payload > svdHotStripsCal(SVDHotStripsCalibrations::name);
+
+  svdHotStripsCal.construct(25);
+
+  m_firstExperiment = 1;
+  m_firstRun = 0;
+  m_lastExperiment = 5;
+  m_lastRun = -1;
+
+  B2INFO("importing default values: all strips unmasked");
+  Bool_t isHot = false;
+
+  /********************Loop for filling default values*********/
+
+
+  //  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 2, 2, 2, 2 };
+  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+
+        B2INFO("layer: " << layer << ", ladder: " << ladder << " sensor: " << sensor);
+        Bool_t side = 1;
+
+        for (int strip = 0; strip < 768; strip++)
+          svdHotStripsCal->set(layer, ladder, sensor, side, strip, isHot);
+
+
+        side = 0;
+        int maxStripNumber = 512;
+        if (layer == 3) maxStripNumber = 768;
+
+        for (int strip = 0; strip < maxStripNumber; strip++)
+          svdHotStripsCal->set(layer, ladder, sensor, side, strip, isHot);
+
+      }
+    }
+  }
+
+  /*****************end of the Loop*****************/
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdHotStripsCal.import(iov);
+  B2RESULT("SVDHotStripsCalibrations imported to database.");
+
+
+}
+
+void SVDDatabaseImporter::importSVDFADCMaskedStrips()
+{
+  DBImportObjPtr<SVDFADCMaskedStrips::t_payload > svdFADCMasked(SVDFADCMaskedStrips::name);
+
+  svdFADCMasked.construct(25);
+
+  m_firstExperiment = 1;
+  m_firstRun = 0;
+  m_lastExperiment = 5;
+  m_lastRun = -1;
+
+  B2INFO("importing default values: all strips unmasked");
+  Bool_t isMasked = false;
+
+  /********************Loop for filling default values*********/
+
+
+  //  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 2, 2, 2, 2 };
+  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+
+        B2INFO("layer: " << layer << ", ladder: " << ladder << " sensor: " << sensor);
+        Bool_t side = 1;
+
+        for (int strip = 0; strip < 768; strip++)
+          svdFADCMasked->set(layer, ladder, sensor, side, strip, isMasked);
+
+
+        side = 0;
+        int maxStripNumber = 512;
+        if (layer == 3) maxStripNumber = 768;
+
+        for (int strip = 0; strip < maxStripNumber; strip++)
+          svdFADCMasked->set(layer, ladder, sensor, side, strip, isMasked);
+
+      }
+    }
+  }
+
+  /*****************end of the Loop*****************/
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdFADCMasked.import(iov);
+  B2RESULT("SVDFADCMaskedStrips imported to database.");
+
+
+}
 
 
 void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 {
 
-  DBImportObjPtr<SVDPulseShapeCalibrations::t_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::name);
+  DBImportObjPtr<SVDPulseShapeCalibrations::t_calAmp_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::calAmp_name);
 
   /*
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
@@ -289,6 +398,29 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
       -1.0, errorTollerant);
 }
 
+void SVDDatabaseImporter::importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDPedestalCalibrations::t_payload  >(SVDPedestalCalibrations::name,
+      xmlFileName, "pedestals",
+      -1.0, errorTollerant);
+}
+
+void SVDDatabaseImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
+      xmlFileName, "hot_strips",
+      -1.0, errorTollerant);
+}
+
+void SVDDatabaseImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
+      xmlFileName, "FADCMasked_strips",
+      -1.0, errorTollerant);
+}
+
+
+
 
 template< class SVDcalibration >
 void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDbname,
@@ -406,7 +538,7 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDb
 void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
 
-  DBImportObjPtr< typename SVDPulseShapeCalibrations::t_payload > pulseShapes(SVDPulseShapeCalibrations::name);
+  DBImportObjPtr< typename SVDPulseShapeCalibrations::t_calAmp_payload > pulseShapes(SVDPulseShapeCalibrations::calAmp_name);
 
   DBObjPtr<PayloadFile> OnlineToOfflineMapFileName("SVDChannelMapping.xml");
 
@@ -476,8 +608,8 @@ void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& 
 
                 short strip = map->getStripNumber(apvChannel, info);
                 int side = info.m_uSide ?
-                           SVDPulseShapeCalibrations::t_payload::Uindex :
-                           SVDPulseShapeCalibrations::t_payload::Vindex;
+                           SVDPulseShapeCalibrations::t_calAmp_payload::Uindex :
+                           SVDPulseShapeCalibrations::t_calAmp_payload::Vindex;
 
                 int layer = info.m_sensorID.getLayerNumber();
                 int ladder = info.m_sensorID.getLadderNumber();

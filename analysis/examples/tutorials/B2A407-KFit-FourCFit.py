@@ -16,7 +16,7 @@
 # all final states, and the total four momentum is set at that of cms
 #
 # Contributors: Yu Hu (March 2017)
-# huyu@ihep.ac.cn
+# yu.hu@desy.de
 #
 ####################################################################
 
@@ -30,7 +30,9 @@ from modularAnalysis import *
 from stdPhotons import *
 
 # load input ROOT file
-inputMdst('default', sys.argv[1])
+filelistSIG = '/group/belle2/tutorial/release_01-00-00/mdst-Y4setaY.root'
+
+inputMdst('default', filelistSIG)
 
 # Creates a list of good pions and kaons with some PID and IP cut
 stdPhotons('loose')
@@ -46,11 +48,11 @@ reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")
 
 # Perform four momentum constraint fit using KFit
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+# keep candidates only passing C.L. value of the fit prob > 0.0 (no cut)
 fourCKFit("Upsilon(4S)", 0.0)
 
 # Perform four momentum constraint fit using KFit and update the Daughters
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+# keep candidates only passing C.L. value of the fit prob > 0.0 (no cut)
 # fourCKFitDaughtersUpdate("Upsilon(4S)", 0.0)
 
 # Associates the MC truth to the reconstructed D0
@@ -63,6 +65,8 @@ toolsD0 += ['Kinematics', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> 
 toolsD0 += ['PID', 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]']
 toolsD0 += ['MCTruth', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
 toolsD0 += ['MCHierarchy', '^Upsilon(4S) -> ^eta ^Upsilon']
+toolsD0 += ['CustomFloats[extraInfo(FourCFitProb)]', '^Upsilon(4S)']
+toolsD0 += ['CustomFloats[extraInfo(FourCFitChi2)]', '^Upsilon(4S)']
 
 # ntupleFile('B2A407-KFit-FourCFit_updateDaughters.root')
 ntupleFile('B2A407-KFit-FourCFit.root')

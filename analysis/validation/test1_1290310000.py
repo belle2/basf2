@@ -249,11 +249,11 @@ appendROEMasks('Upsilon(4S):BslBtaunu', [ROEclusters, ROETracks])
 
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
-variables.addAlias('ROE_mcMissFlagsSel', 'ROE_mcMissFlags(ROEclusters)')
+variables.addAlias('ROE_mcMissFlagsSel', 'ROE_MC_MissFlags(ROEclusters)')
 variables.addAlias('ROE_chargeSel', 'ROE_charge(ROEclusters)')
 variables.addAlias('ROE_ESel', 'ROE_E(ROEclusters)')
 variables.addAlias('ROE_PSel', 'ROE_P(ROEclusters)')
-variables.addAlias('nAllROETracks', 'nROETracks(ROETracks)')
+variables.addAlias('nAllROETracks', 'nROE_Tracks(ROETracks)')
 variables.addAlias('nROEECLClustersSel', 'nROEECLClusters(ROEclusters)')
 variables.addAlias('nROENeutralECLClustersSel', 'nROENeutralECLClusters(ROEclusters)')
 
@@ -284,9 +284,10 @@ matchMCTruth('B-:taunu')
 tools4StauHad = ['EventMetaData', '^Upsilon(4S)']
 tools4StauHad += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S)']
 tools4StauHad += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S)']
-tools4StauHad += ['CustomFloats[missPx(ROEclusters,0):missPy(ROEclusters,0)]', '^Upsilon(4S)']
-tools4StauHad += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S)']
-tools4StauHad += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]', '^Upsilon(4S)']
+tools4StauHad += ['CustomFloats[WE_MissPx(ROEclusters,0):WE_MissPy(ROEclusters,0)]', '^Upsilon(4S)']
+tools4StauHad += ['CustomFloats[WE_MissPz(ROEclusters,0):WE_MissP(ROEclusters,0)]', '^Upsilon(4S)']
+tools4StauHad += ['CustomFloats[WE_MissPTheta(ROEclusters,0):WE_MissE(ROEclusters,0):m2RecoilSignalSide:WE_MissM2(ROEclusters,0)]',
+                  '^Upsilon(4S)']
 tools4StauHad += ['CustomFloats[R2:cosTBTO:cosTBz]', 'Upsilon(4S) -> ^B+:genericRank B-:taunu']
 tools4StauHad += ['CustomFloats[sigProb:rank]', 'Upsilon(4S) -> ^B+:genericRank B-:taunu']
 tools4StauHad += ['CustomFloats[extraInfo(rankY4SlnuSl):extraInfo(rankY4SlnuHad):daughter(1,rhodM)]', '^Upsilon(4S)']
@@ -318,9 +319,10 @@ tools4StauHad += ['CustomFloats[tau_pi0_gamma1_clusterTheta:tau_pi0_gamma2_clust
 tools4StauSL = ['EventMetaData', '^Upsilon(4S)']
 tools4StauSL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S)']
 tools4StauSL += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S)']
-tools4StauSL += ['CustomFloats[missPx(ROEclusters,0):missPy(ROEclusters,0)]', '^Upsilon(4S)']
-tools4StauSL += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S)']
-tools4StauSL += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]', '^Upsilon(4S)']
+tools4StauSL += ['CustomFloats[WE_MissPx(ROEclusters,0):WE_MissPy(ROEclusters,0)]', '^Upsilon(4S)']
+tools4StauSL += ['CustomFloats[WE_MissPz(ROEclusters,0):WE_MissP(ROEclusters,0)]', '^Upsilon(4S)']
+tools4StauSL += ['CustomFloats[WE_MissPTheta(ROEclusters,0):WE_MissE(ROEclusters,0):m2RecoilSignalSide:WE_MissM2(ROEclusters,0)]',
+                 '^Upsilon(4S)']
 tools4StauSL += ['CustomFloats[R2:cosTBTO:cosTBz]', 'Upsilon(4S) -> ^B+:semileptonicRank B-:taunu']
 tools4StauSL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S) -> ^B+:semileptonicRank B-:taunu']
 tools4StauSL += ['CustomFloats[extraInfo(rankY4SlnuSl):extraInfo(rankY4SlnuSL):daughter(1,rhodM)]', '^Upsilon(4S)']

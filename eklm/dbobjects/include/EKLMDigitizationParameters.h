@@ -44,12 +44,22 @@ namespace Belle2 {
     void setADCRange(int range);
 
     /**
-     * Get ADC sampling time.
+     * Get ADC sampling frequency in GHz.
+     */
+    float getADCSamplingFrequency() const;
+
+    /**
+     * Set ADC sampling frequency in GHz.
+     */
+    void setADCSamplingFrequency(float frequency);
+
+    /**
+     * Get ADC sampling time in ns.
      */
     float getADCSamplingTime() const;
 
     /**
-     * Set ADC sampling time.
+     * Set ADC sampling time in ns.
      */
     void setADCSamplingTime(float time);
 
@@ -62,26 +72,6 @@ namespace Belle2 {
      * Set number of digitizations (points) in one sample.
      */
     void setNDigitizations(int digitizations);
-
-    /**
-     * Get ADC pedestal.
-     */
-    float getADCPedestal() const;
-
-    /**
-     * Set ADC pedestal.
-     */
-    void setADCPedestal(float pedestal);
-
-    /**
-     * Get ADC photoelectron amplitude.
-     */
-    float getADCPEAmplitude() const;
-
-    /**
-     * Set ADC photoelectron amplitude.
-     */
-    void setADCPEAmplitude(float amplitude);
 
     /**
      * Get ADC readout corresponding to saturation.

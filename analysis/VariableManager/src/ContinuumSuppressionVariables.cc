@@ -48,10 +48,14 @@ namespace Belle2 {
 
       StoreArray<Track> tracks;
       for (int i = 0; i < tracks.getEntries(); ++i) {
-        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        // deal with multiple possible track hypotheses in the track fit: try to
+        // retrieve the most likely from PID, maybe this fit failed so then
+        // create a particle with whatever is closest with a TrackFitResult
+        Const::ParticleType mostLikely = tracks[i]->getRelated<PIDLikelihood>()->getMostLikely();
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(mostLikely);
         if (iTrack == nullptr) continue;
         if (iTrack->getChargeSign() != 0) {
-          Particle particle(tracks[i], Const::pion);
+          Particle particle(tracks[i], iTrack->getParticleType());
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           p3_all.push_back(p_cms.Vect());
@@ -60,10 +64,8 @@ namespace Belle2 {
 
       StoreArray<ECLCluster> eclClusters;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of T1 (1) and N1 (5) ECLClusters
-        // other clusters are duplicates
-        if (eclClusters[i]->getHypothesisId() != 1 &&
-            eclClusters[i]->getHypothesisId() != 5)
+        // sum only momentum of N1 (n photons) ECLClusters
+        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
           continue;
 
         ClusterUtils C;

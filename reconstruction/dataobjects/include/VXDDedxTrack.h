@@ -36,11 +36,11 @@ namespace Belle2 {
       m_eventID(0), m_trackID(0),
       m_p(0), m_cosTheta(0), m_charge(0),
       m_length(0.0), m_nHits(0), m_nHitsUsed(0),
-      m_pdg(0), m_mother_pdg(0), m_p_true(0)
+      m_pdg(0), m_motherPDG(0), m_pTrue(0)
     {
       // set default values for all detectors
       for (int i = 0; i <= Dedx::c_SVD; i++)
-        m_dedx_avg[i] = m_dedx_avg_truncated[i] = m_dedx_avg_truncated_err[i] = 0.0;
+        m_dedxAvg[i] = m_dedxAvgTruncated[i] = m_dedxAvgTruncatedErr[i] = 0.0;
 
       // set default values for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++)
@@ -66,31 +66,31 @@ namespace Belle2 {
       m_length += distance;
     }
 
-    /** Get the dE/dx mean for given detector */
+    /** Get dE/dx truncated mean for given detector */
     double getDedx(Const::EDetector detector) const
     {
       int iDet = (int)(detector - Const::PXD);
       if (iDet < 0 or iDet > Dedx::c_SVD)
         return 0.0;
-      return m_dedx_avg[iDet];
-    }
-
-    /** Get dE/dx truncated mean for given detector */
-    double getDedxTruncated(Const::EDetector detector) const
-    {
-      int iDet = (int)(detector - Const::PXD);
-      if (iDet < 0 or iDet > Dedx::c_SVD)
-        return 0.0;
-      return m_dedx_avg_truncated[iDet];
+      return m_dedxAvgTruncated[iDet];
     }
 
     /** Get the error on the dE/dx truncated mean for given detector */
-    double getDedxTruncatedErr(Const::EDetector detector) const
+    double getDedxError(Const::EDetector detector) const
     {
       int iDet = (int)(detector - Const::PXD);
       if (iDet < 0 or iDet > Dedx::c_SVD)
         return 0.0;
-      return m_dedx_avg_truncated_err[iDet];
+      return m_dedxAvgTruncatedErr[iDet];
+    }
+
+    /** Get the dE/dx mean for given detector */
+    double getDedxMean(Const::EDetector detector) const
+    {
+      int iDet = (int)(detector - Const::PXD);
+      if (iDet < 0 or iDet > Dedx::c_SVD)
+        return 0.0;
+      return m_dedxAvg[iDet];
     }
 
     /** Return the event ID */
@@ -148,16 +148,16 @@ namespace Belle2 {
     short m_nHitsUsed; /**< number of hits on this track used in the truncated mean */
 
     double m_pdg;        /**< MC PID */
-    double m_mother_pdg; /**< MC PID of mother particle */
-    double m_p_true;     /**< MC true momentum */
+    double m_motherPDG; /**< MC PID of mother particle */
+    double m_pTrue;     /**< MC true momentum */
 
-    double m_dedx_avg[2];               /**< dE/dx mean value per track */
-    double m_dedx_avg_truncated[2];     /**< dE/dx truncated mean per track */
-    double m_dedx_avg_truncated_err[2]; /**< standard deviation of m_dedx_avg_truncated */
+    double m_dedxAvg[2];               /**< dE/dx mean value per track */
+    double m_dedxAvgTruncated[2];     /**< dE/dx truncated mean per track */
+    double m_dedxAvgTruncatedErr[2]; /**< standard deviation of m_dedxAvgTruncated */
 
     double m_vxdLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(VXDDedxTrack, 1); /**< Debug output for VXDDedxPID module. */
+    ClassDef(VXDDedxTrack, 2); /**< Debug output for VXDDedxPID module. */
   };
 }
 #endif

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TimeConversion>
+  <TDCFrequency desc="GHz">1.017728000</TDCFrequency>
+  <TimeOffset desc="ns">0</TimeOffset>
+</TimeConversion>

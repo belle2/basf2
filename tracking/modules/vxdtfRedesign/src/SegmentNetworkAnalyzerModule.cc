@@ -8,14 +8,12 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/modules/vxdtfRedesign/SegmentNetworkAnalyzerModule.h>
+#include <vector>
 
-// #include <tracking/trackFindingVXD/segmentNetwork/Segment.h>
+#include <tracking/modules/vxdtfRedesign/SegmentNetworkAnalyzerModule.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/PurityCalculatorTools.h>
-// #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 
-#include <vector>
 
 using namespace Belle2;
 using namespace std;

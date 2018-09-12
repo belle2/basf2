@@ -65,8 +65,7 @@ add_mdst_output(
         'ECLCalDigits',
         'ECLConnectedRegions',
         'ECLShowers',
-        'ECLLocalMaximums',
-        'ECLEventInformation'])
+        'ECLLocalMaximums'])
 
 # Show progress of processing
 progress = register_module('ProgressBar')

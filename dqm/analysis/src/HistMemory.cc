@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-void HistMemory::open(const char* path, unsigned int size, const char* mode) throw(IOException)
+void HistMemory::open(const char* path, unsigned int size, const char* mode)
 {
   m_path = path;
   m_size = size;
@@ -50,7 +50,7 @@ void HistMemory::open(const char* path, unsigned int size, const char* mode) thr
   if (recreate) init();
 }
 
-void HistMemory::init() throw(IOException)
+void HistMemory::init()
 {
   if (m_body == NULL) {
     throw (IOException("%s is not opened", m_path.c_str()));

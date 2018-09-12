@@ -9,6 +9,8 @@
 		<SensitiveDetector>
 			<HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>
 		</SensitiveDetector>
+		<!-- Time conversion. -->
+		<xi:include href="TimeConversion.xml"/>
 		<!-- Geometry. -->
 		<Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
 		<!-- Numbers of elements. -->

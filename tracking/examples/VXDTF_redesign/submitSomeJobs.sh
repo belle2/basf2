@@ -10,7 +10,7 @@ rndseeds=(321 66718 12345 54321 312455 7897 90549 21352   119992 98662 15521 887
 # the name of the output directory where the root files will be stored
 outdir=./datadir/
 # number of events generated per random seed (at around 56000 events the cpu limit is reached)
-nevt=45000
+nevt=25000
 # the name of the queue at KEK
 queue=s
 

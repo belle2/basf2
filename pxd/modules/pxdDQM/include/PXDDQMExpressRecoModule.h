@@ -16,6 +16,11 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
@@ -56,10 +61,11 @@ namespace Belle2 {
     std::string m_storePXDDigitsName;
     /** PXDClusters StoreArray name */
     std::string m_storePXDClustersName;
-    /** PXDClustersToPXDDigits RelationArray name */
-    std::string m_relPXDClusterDigitName;
-    /** Frames StoreArray name */
-    std::string m_storeFramesName;
+
+    /** Storearray for Digits  */
+    StoreArray<PXDDigit> m_storePXDDigits;
+    /** Storearray for Cluster   */
+    StoreArray<PXDCluster> m_storePXDClusters;
 
     /** Hitmaps of Digits */
     TH1I* m_hitMapCounts;
@@ -73,12 +79,13 @@ namespace Belle2 {
     TH1F** m_fired;
     /** Clusters per event */
     TH1F** m_clusters;
+    // FIXME: Startrow related histos are expert debugging, not for shifter (-> remove this)
     /** Start row distribution */
-    TH1F** m_startRow;
+    //TH1F** m_startRow;
     /** Cluster seed charge by distance from the start row */
-    TH1F** m_chargStartRow;
+    //TH1F** m_chargStartRow;
     /** counter for Cluster seed charge by distance from the start row */
-    TH1F** m_startRowCount;
+    //TH1F** m_startRowCount;
     /** Charge of clusters */
     TH1F** m_clusterCharge;
     /** Charge of pixels */

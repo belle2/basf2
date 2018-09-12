@@ -85,6 +85,16 @@ namespace Belle2 {
     double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters);
 
     /**
+     * return cosine of the angle between i-th daughter momentum vector and vector connecting production and decay vertex of i-th daughter
+     */
+    double pointingAngle(const Particle* particle, const std::vector<double> daughters);
+
+    /**
+     * return azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane
+     */
+    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double> daughters);
+
+    /**
      * return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track
      */
     double v0DaughterD0(const Particle* particle, const std::vector<double>& daughterID);

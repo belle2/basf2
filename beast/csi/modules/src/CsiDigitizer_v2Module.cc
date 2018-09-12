@@ -10,11 +10,8 @@
 
 #include <beast/csi/modules/CsiDigitizer_v2Module.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
-#include <beast/csi/dataobjects/CsiHit_v2.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -70,7 +67,7 @@ CsiDigitizer_v2Module::~CsiDigitizer_v2Module()
 void CsiDigitizer_v2Module::initialize()
 {
   B2INFO("CsiDigitizer_v2: Initializing");
-  StoreArray<CsiHit_v2>::registerPersistent();
+  m_csiHit_v2.registerInDataStore();
 
   //get xml data
   getXMLData();

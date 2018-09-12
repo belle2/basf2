@@ -8,14 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_POLAR
-#define ECL_CANVAS_POLAR
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH2.h>
-#include <TCrown.h>
-#include <TText.h>
-#include <TAxis.h>
+
+class TH2F;
+class TCrown;
+class TText;
 
 namespace Belle2 {
   /**
@@ -80,5 +80,3 @@ namespace Belle2 {
     virtual void Draw();
   };
 }
-
-#endif // ECL_CANVAS_POLAR

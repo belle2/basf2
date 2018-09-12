@@ -31,6 +31,7 @@ bool ARICHChannelMapping::getXYFromAsic(unsigned asicChn, int& xChn, int& yChn) 
     return false;
   }
   int chId = (int)m_asic2xy[asicChn];
+  if (chId == -1) return false;
   xChn = chId % N_XCHANNELS;
   yChn = chId / N_XCHANNELS;
   return true;
@@ -52,7 +53,7 @@ void ARICHChannelMapping::mapXY2Asic(unsigned xChn, unsigned yChn, unsigned asic
   m_asic2xy.at(asicChn) = chId;
 }
 
-void ARICHChannelMapping::print()
+void ARICHChannelMapping::print() const
 {
   std::cout << std::endl;
   std::cout << "HAPD X,Y channel mapping to asic channels" << std::endl << std::endl;

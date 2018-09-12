@@ -215,20 +215,20 @@ namespace Belle2 {
       /** Calculate Lorentz shift along a given coordinate in a magnetic field at a given position.
         * This method can only be used for a completely reconstructed 2D cluster.
         * For 1D clusters, use the following method.
-        * @param u u coordinate where the shift is required
-        * @param v v coordinate where the shift is required
+        * @param uCoord u coordinate where the shift is required
+        * @param vCoord v coordinate where the shift is required
         * @return TVector with Lorentz shift along u and v at the given position.
         */
-      const TVector3& getLorentzShift(double u, double v) const;
+      const TVector3& getLorentzShift(double uCoord, double vCoord) const;
 
       /** Calculate mean Lorentz shift along a given coordinate, with B-field averaged
        * along the corresponding strip.
        * Use this for 1D clusters, where only one coordinate is known.
-       * @param uCoordinate True if u, false if v.
+       * @param isUCoordinate True if u, false if v.
        * @param position The position of the strip.
        * @return Mean Lorentz shift along a given coordinate.
        */
-      double getLorentzShift(bool uCoordinate, double position) const;
+      double getLorentzShift(bool isUCoordinate, double position) const;
 
     protected:
       /** Sensor temperature */

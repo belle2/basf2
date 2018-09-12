@@ -7,21 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <ecl/geometry/ECLGeometryPar.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 
 namespace Belle2 {
+  class Track;
+  class ECLCalDigit;
+  class ECLEnergyCloseToTrack;
 
+  namespace ECL {
+    class ECLGeometryPar;
+  }
   /**
    * Module to find the closest ECLCalDigits to an extrapolated track
    */
@@ -67,4 +65,3 @@ namespace Belle2 {
     StoreArray<ECLEnergyCloseToTrack> m_anaEnergyCloseToTrack; /**< Analysis level information attached to a track*/
   };
 }
-

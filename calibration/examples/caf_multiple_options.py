@@ -4,6 +4,8 @@
 # or just make your own any change the input data below.
 
 from basf2 import *
+# set_log_level(LogLevel.DEBUG)
+# set_debug_level(29)
 set_log_level(LogLevel.INFO)
 
 import os
@@ -20,7 +22,7 @@ def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 caf_multiple_options.py <data directory>")
+        print("Usage: python3 caf_multiple_options.py <data directory>")
         sys.exit(1)
 
     ###################################################

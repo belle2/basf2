@@ -82,6 +82,8 @@ namespace Belle2 {
       c_singleClustersSPs = 1024, /**< bit 10: SPTC contains single Cluster SpacePoints. */
       c_isActive =  2048,         /**< bit 11: SPTC is active (i.e. if false, some module rejected it for further use. */
       c_isReserved = 4096,        /**< bit 12: SPTC is reserved (i.e. should not be altered and should be treated with high priority). */
+      c_hasFittedRecoTrack = 1 << 13,  /**< bit 13: SPTC is related to a RecoTrack which has a successful fit.
+        NOTE: this check is performed on the original SPTC, if the current one is a copy of that the relation may be lost*/
       c_initialState = 0 + c_isActive, /**< This is the initialState, which will always be set in the beginning and at reset. */
     };
 
@@ -206,7 +208,7 @@ namespace Belle2 {
     /**
     * returns the current status of the estimated quality of this track candidate.
     * */
-    double getQualityIndex() const { return m_qualityIndex; }
+    double getQualityIndicator() const { return m_qualityIndicator; }
 
     /**
      * Check if the SpacePointTrackCand contains consecutive SpacePoints that are on the same sensor
@@ -305,7 +307,7 @@ namespace Belle2 {
     * if value < 0, the track candidate is invalid and one should not use it anymore.
     * 0.5 is the standard value if not been set otherwise
     * */
-    void setQualityIndex(double newIndex) { m_qualityIndex = newIndex; }
+    void setQualityIndicator(double newIndicator) { m_qualityIndicator = newIndicator; }
 
     /**
      * add a new SpacePoint and its according sorting parameter to the track candidate
@@ -344,7 +346,7 @@ namespace Belle2 {
 
     /** Overloading the less operator to compare SPTCs based on their quality index. This is used in
      *  in SPTCSelectorXBestPerFamily for instance. */
-    bool operator <(const SpacePointTrackCand& rhs) const { return m_qualityIndex < rhs.m_qualityIndex; }
+    bool operator <(const SpacePointTrackCand& rhs) const { return m_qualityIndicator < rhs.m_qualityIndicator; }
 
   protected:
     /**
@@ -413,9 +415,9 @@ namespace Belle2 {
      * Normally defined between 0-1 to describe the propability that this track is real(istic).
      * The quality of the track has to be determined by another function or module.
      * */
-    double m_qualityIndex = 0.5;
+    double m_qualityIndicator = 0.5;
 
-    // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
-    ClassDef(SpacePointTrackCand, 9)
+    // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndicator
+    ClassDef(SpacePointTrackCand, 10)
   };
 }

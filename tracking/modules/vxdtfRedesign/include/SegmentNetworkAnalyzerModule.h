@@ -32,16 +32,15 @@ namespace Belle2 {
 
     /** keep all the variables for rootoutput in one struct */
     struct RootVariables {
-      std::vector<double> phi{}; /** phi of the innermost hit (that is not the virtual IP) */
-      std::vector<double> theta{}; /** theta of the innermost hit (that is not the virtual IP) */
-      std::vector<double> pT{}; /** pT of the related MCParticle */
-      std::vector<int> signal{}; /** was segment combination signal */
-      std::vector<int> passed{}; /** did segment combination pass the three hit filters */
-      std::vector<int> pdg{}; /** pdg of the related MCParticle */
-      std::vector<int> virtualIP{}; /** did the segment contain the virtual IP */
-      unsigned networkSize{}; /** segmentNetwork size */
-      unsigned networkConnections{}; /** number of connections in network */
-      // std::vector<unsigned long> sectorComb;
+      std::vector<double> phi{}; /**< phi of the innermost hit (that is not the virtual IP) */
+      std::vector<double> theta{}; /**< theta of the innermost hit (that is not the virtual IP) */
+      std::vector<double> pT{}; /**< pT of the related MCParticle */
+      std::vector<int> signal{}; /**< was segment combination signal */
+      std::vector<int> passed{}; /**< did segment combination pass the three hit filters */
+      std::vector<int> pdg{}; /**< pdg of the related MCParticle */
+      std::vector<int> virtualIP{}; /**< did the segment contain the virtual IP */
+      unsigned networkSize{}; /**< segmentNetwork size */
+      unsigned networkConnections{}; /**< number of connections in network */
     };
 
     /** constructor */

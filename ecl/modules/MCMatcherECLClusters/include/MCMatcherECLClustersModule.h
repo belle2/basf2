@@ -9,22 +9,20 @@
  **************************************************************************/
 
 
-#ifndef MCMATCHERECLCLUSTERSMODULE_H_
-#define MCMATCHERECLCLUSTERSMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 namespace Belle2 {
+  class MCParticle;
+  class ECLHit;
+  class ECLCalDigit;
+  class ECLDigit;
+  class ECLSimHit;
+  class ECLCluster;
+  class ECLShower;
 
   /** Class to represent the hit of one cell */
   class MCMatcherECLClustersModule : public Module {
@@ -109,5 +107,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // MCMATCHERECLCLUSTERSMODULE_H_

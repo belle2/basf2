@@ -85,6 +85,12 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Check if segments intersect. Normally should be true, but it may be
+     * necessary to turn this check off for debugging.
+     */
+    bool m_CheckSegmentIntersection;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
@@ -101,7 +107,7 @@ namespace Belle2 {
     DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;
 
     /** Time calibration data for individual strips. */
-    EKLMTimeCalibrationData** m_TimeCalibrationData;
+    const EKLMTimeCalibrationData** m_TimeCalibrationData;
 
     /** Default time calibration data. */
     EKLMTimeCalibrationData m_DefaultTimeCalibrationData;

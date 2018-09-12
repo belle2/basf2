@@ -8,6 +8,7 @@ env['LIBS'] = [
     'bklm_dataobjects',
     'eklm_dataobjects',
     'mdst_dataobjects',
+    'vxd_dataobjects', 'vxd',
     'genfit2',
     '$ROOT_LIBS',
     'EG',

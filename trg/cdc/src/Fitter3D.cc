@@ -962,8 +962,8 @@ namespace Belle2 {
   }
 
 
-  void TRGCDCFitter3D::getMCValues(const TRGCDC& m_cdc, TRGCDCTrack* aTrack, std::map<std::string, double>& m_mConstD,
-                                   std::map<std::string, double>& m_mDouble, std::map<std::string, std::vector<double> >& m_mVector)
+  void TRGCDCFitter3D::getMCValues(const TRGCDC& m_cdc_in, TRGCDCTrack* aTrack, std::map<std::string, double>& m_mConstD_in,
+                                   std::map<std::string, double>& m_mDouble_in, std::map<std::string, std::vector<double> >& m_mVector_in)
   {
     // Access to track's MC particle.
     const TCRelation& trackRelation = aTrack->relation();
@@ -975,28 +975,28 @@ namespace Belle2 {
     TLorentzVector vector4 = trackMCParticle.get4Vector();
     TVector2 helixCenter;
     TVector3 impactPosition;
-    Fitter3DUtility::findImpactPosition(&vertex, &vector4, int(m_mDouble["mcCharge"]), helixCenter, impactPosition);
-    m_mVector["mcVertex"] = vector<double> ({vertex.X(), vertex.Y(), vertex.Z()});
-    m_mVector["mcMomentum"] = vector<double> ({vector4.Px(), vector4.Py(), vector4.Pz()});
-    m_mVector["helixCenter"] = vector<double> ({helixCenter.X(), helixCenter.Y()});
-    m_mVector["impactPosition"] = vector<double> ({impactPosition.X(), impactPosition.Y(), impactPosition.Z()});
+    Fitter3DUtility::findImpactPosition(&vertex, &vector4, int(m_mDouble_in["mcCharge"]), helixCenter, impactPosition);
+    m_mVector_in["mcVertex"] = vector<double> ({vertex.X(), vertex.Y(), vertex.Z()});
+    m_mVector_in["mcMomentum"] = vector<double> ({vector4.Px(), vector4.Py(), vector4.Pz()});
+    m_mVector_in["helixCenter"] = vector<double> ({helixCenter.X(), helixCenter.Y()});
+    m_mVector_in["impactPosition"] = vector<double> ({impactPosition.X(), impactPosition.Y(), impactPosition.Z()});
 
     // Access track's particle parameters
-    m_mDouble["mcPt"] = trackMCParticle.getMomentum().Pt();
-    m_mDouble["mcPhi0"] = 0;
-    if (trackMCParticle.getCharge() > 0) m_mDouble["mcPhi0"] = trackMCParticle.getMomentum().Phi() - m_mConstD["Trg_PI"] / 2;
-    if (trackMCParticle.getCharge() < 0) m_mDouble["mcPhi0"] = trackMCParticle.getMomentum().Phi() + m_mConstD["Trg_PI"] / 2;
+    m_mDouble_in["mcPt"] = trackMCParticle.getMomentum().Pt();
+    m_mDouble_in["mcPhi0"] = 0;
+    if (trackMCParticle.getCharge() > 0) m_mDouble_in["mcPhi0"] = trackMCParticle.getMomentum().Phi() - m_mConstD_in["Trg_PI"] / 2;
+    if (trackMCParticle.getCharge() < 0) m_mDouble_in["mcPhi0"] = trackMCParticle.getMomentum().Phi() + m_mConstD_in["Trg_PI"] / 2;
     // Change range to [0,2pi]
-    if (m_mDouble["mcPhi0"] < 0) m_mDouble["mcPhi0"] += 2 * m_mConstD["Trg_PI"];
+    if (m_mDouble_in["mcPhi0"] < 0) m_mDouble_in["mcPhi0"] += 2 * m_mConstD_in["Trg_PI"];
     //m_mDouble["mcZ0"] = trackMCParticle.getVertex().Z();
-    m_mDouble["mcZ0"] = impactPosition.Z();
-    m_mDouble["mcCot"] = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
-    m_mDouble["mcCharge"] = trackMCParticle.getCharge();
+    m_mDouble_in["mcZ0"] = impactPosition.Z();
+    m_mDouble_in["mcCot"] = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
+    m_mDouble_in["mcCharge"] = trackMCParticle.getCharge();
 
     // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
     TVectorD mcStatus(3);
-    m_mDouble["mcStatus"] = trackMCParticle.getStatus();
-    m_mDouble["pdgId"] = trackMCParticle.getPDG();
+    m_mDouble_in["mcStatus"] = trackMCParticle.getStatus();
+    m_mDouble_in["pdgId"] = trackMCParticle.getPDG();
 
     // Find position of track for each super layer
     //...G4 trackID...
@@ -1004,7 +1004,7 @@ namespace Belle2 {
     vector<const TCSHit*> mcAllTSList[9];
     vector<const TCSHit*> mcTSList(9);
     //...Segment loop...
-    const vector<const TCSHit*> hits = m_cdc.segmentHits();
+    const vector<const TCSHit*> hits = m_cdc_in.segmentHits();
     for (unsigned i = 0; i < hits.size(); i++) {
       const TCSHit& ts = * hits[i];
       if (! ts.signal().active()) continue;
@@ -1036,22 +1036,22 @@ namespace Belle2 {
 
 
     // Get mc track positions. Unit is cm.
-    m_mVector["mcPosX"] = vector<double> ({9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999});
-    m_mVector["mcPosY"] = vector<double> ({9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999});
-    m_mVector["mcPosZ"] = vector<double> ({9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999});
+    m_mVector_in["mcPosX"] = vector<double> ({9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999});
+    m_mVector_in["mcPosY"] = vector<double> ({9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999});
+    m_mVector_in["mcPosZ"] = vector<double> ({9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999});
     for (unsigned iSL = 0; iSL < 9; iSL++) {
       if (mcTSList[iSL] != 0) {
         TVector3 posTrack = mcTSList[iSL]->simHit()->getPosTrack();
-        m_mVector["mcPosX"][iSL] = posTrack.X();
-        m_mVector["mcPosY"][iSL] = posTrack.Y();
-        m_mVector["mcPosZ"][iSL] = posTrack.Z();
+        m_mVector_in["mcPosX"][iSL] = posTrack.X();
+        m_mVector_in["mcPosY"][iSL] = posTrack.Y();
+        m_mVector_in["mcPosZ"][iSL] = posTrack.Z();
       }
     }
     // Get mc LR
-    m_mVector["simMcLR"] = vector<double> (9);
+    m_mVector_in["simMcLR"] = vector<double> (9);
     for (unsigned iSL = 0; iSL < 9; iSL++) {
       if (mcTSList[iSL] != 0) {
-        m_mVector["simMcLR"][iSL] = mcTSList[iSL]->simHit()->getPosFlag();
+        m_mVector_in["simMcLR"][iSL] = mcTSList[iSL]->simHit()->getPosFlag();
       }
     }
 
@@ -1258,198 +1258,216 @@ namespace Belle2 {
     } // End superlayer loop
   }
 
-  int TRGCDCFitter3D::do2DFit(TRGCDCTrack& aTrack, std::map<std::string, bool>& m_mBool, std::map<std::string, double>& m_mConstD,
-                              std::map<std::string, std::vector<double> >& m_mConstV, std::map<std::string, double>& m_mDouble,
-                              std::map<std::string, std::vector<double> >& m_mVector)
+  int TRGCDCFitter3D::do2DFit(TRGCDCTrack& aTrack, std::map<std::string, bool>& m_mBool_in,
+                              std::map<std::string, double>& m_mConstD_in,
+                              std::map<std::string, std::vector<double> >& m_mConstV_in, std::map<std::string, double>& m_mDouble_in,
+                              std::map<std::string, std::vector<double> >& m_mVector_in)
   {
-    m_mVector["useAxSl"] = vector<double> (5);
-    //findHitAxialSuperlayers(aTrack, useAxSl, m_mBool["fIsPrintError"]);
+    m_mVector_in["useAxSl"] = vector<double> (5);
+    //findHitAxialSuperlayers(aTrack, useAxSl, m_mBool_in["fIsPrintError"]);
 
     // Find best TS between links for each SL.
     vector<int> bestTSIndex(5);
     selectAxialTSs(aTrack, bestTSIndex);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
-      if (bestTSIndex[iAx] != -1) m_mVector["useAxSl"][iAx] = 1;
+      if (bestTSIndex[iAx] != -1) m_mVector_in["useAxSl"][iAx] = 1;
       //cout<<"useAxSl["<<iAx<<"]:"<<useAxSl[iAx]<<endl;
     }
 
     // Check if number of axial super layer hits is smaller or equal to 1.
-    m_mDouble["nHitAx"] = m_mVector["useAxSl"][0] + m_mVector["useAxSl"][1] + m_mVector["useAxSl"][2] + m_mVector["useAxSl"][3] +
-                          m_mVector["useAxSl"][4];
-    if (m_mDouble["nHitAx"] <= 1) {
-      if (m_mBool["fVerbose"] == 1) cout << "[2DFit] Exiting because nHitAx is " << m_mDouble["nHitAx"] << endl;
+    m_mDouble_in["nHitAx"] = m_mVector_in["useAxSl"][0] + m_mVector_in["useAxSl"][1] + m_mVector_in["useAxSl"][2] +
+                             m_mVector_in["useAxSl"][3] +
+                             m_mVector_in["useAxSl"][4];
+    if (m_mDouble_in["nHitAx"] <= 1) {
+      if (m_mBool_in["fVerbose"] == 1) cout << "[2DFit] Exiting because nHitAx is " << m_mDouble_in["nHitAx"] << endl;
       aTrack.setFitted(0);
       return 1;
     }
 
     // Fill information for axial layers
-    m_mVector["tsId"] = vector<double> (9);
-    m_mVector["tsId2D"] = vector<double> (5);
-    m_mVector["wirePhi"] = vector<double> (9);
-    m_mVector["lutLR"] = vector<double> (9);
-    m_mVector["LR"] = vector<double> (9);
-    m_mVector["driftLength"] = vector<double> (9);
-    m_mVector["tdc"] = vector<double> (9);
-    if (m_mVector.find("mcLR") == m_mVector.end()) m_mVector["mcLR"] = vector<double> (9);
+    m_mVector_in["tsId"] = vector<double> (9);
+    m_mVector_in["tsId2D"] = vector<double> (5);
+    m_mVector_in["wirePhi"] = vector<double> (9);
+    m_mVector_in["lutLR"] = vector<double> (9);
+    m_mVector_in["LR"] = vector<double> (9);
+    m_mVector_in["driftLength"] = vector<double> (9);
+    m_mVector_in["tdc"] = vector<double> (9);
+    if (m_mVector_in.find("mcLR") == m_mVector_in.end()) m_mVector_in["mcLR"] = vector<double> (9);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
-      if (m_mVector["useAxSl"][iAx] == 1) {
+      if (m_mVector_in["useAxSl"][iAx] == 1) {
         const vector<TCLink*>& links = aTrack.links(iAx * 2);
         //const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
         const TCSegment* t_segment = dynamic_cast<const TCSegment*>(& links[bestTSIndex[iAx]]->hit()->cell());
-        m_mVector["tsId"][iAx * 2] = t_segment->localId();
-        m_mVector["tsId2D"][iAx] = m_mVector["tsId"][iAx * 2];
-        m_mVector["wirePhi"][iAx * 2] = (double) t_segment->localId() / m_mConstV["nWires"][iAx * 2] * 4 * m_mConstD["Trg_PI"];
-        m_mVector["lutLR"][iAx * 2] = t_segment->LUT()->getValue(t_segment->lutPattern());
+        m_mVector_in["tsId"][iAx * 2] = t_segment->localId();
+        m_mVector_in["tsId2D"][iAx] = m_mVector_in["tsId"][iAx * 2];
+        m_mVector_in["wirePhi"][iAx * 2] = (double) t_segment->localId() / m_mConstV_in["nWires"][iAx * 2] * 4 * m_mConstD_in["Trg_PI"];
+        m_mVector_in["lutLR"][iAx * 2] = t_segment->LUT()->getValue(t_segment->lutPattern());
         // mcLR should be removed.
-        if (m_mBool["fMc"]) m_mVector["mcLR"][iAx * 2] = t_segment->hit()->mcLR() + 1;
-        m_mVector["driftLength"][iAx * 2] = t_segment->hit()->drift();
-        m_mVector["tdc"][iAx * 2] = t_segment->priorityTime();
-        if (m_mBool["fmcLR"] == 1) m_mVector["LR"][iAx * 2] = m_mVector["mcLR"][iAx * 2];
-        else if (m_mBool["fLRLUT"] == 1) m_mVector["LR"][iAx * 2] = m_mVector["lutLR"][iAx * 2];
-        else m_mVector["LR"][iAx * 2] = 3;
+        if (m_mBool_in["fMc"]) m_mVector_in["mcLR"][iAx * 2] = t_segment->hit()->mcLR() + 1;
+        m_mVector_in["driftLength"][iAx * 2] = t_segment->hit()->drift();
+        m_mVector_in["tdc"][iAx * 2] = t_segment->priorityTime();
+        if (m_mBool_in["fmcLR"] == 1) m_mVector_in["LR"][iAx * 2] = m_mVector_in["mcLR"][iAx * 2];
+        else if (m_mBool_in["fLRLUT"] == 1) m_mVector_in["LR"][iAx * 2] = m_mVector_in["lutLR"][iAx * 2];
+        else m_mVector_in["LR"][iAx * 2] = 3;
       } else {
-        m_mVector["tsId"][iAx * 2] = 9999;
-        m_mVector["wirePhi"][iAx * 2] = 9999;
-        m_mVector["lutLR"][iAx * 2] = 0;
+        m_mVector_in["tsId"][iAx * 2] = 9999;
+        m_mVector_in["wirePhi"][iAx * 2] = 9999;
+        m_mVector_in["lutLR"][iAx * 2] = 0;
         // mcLR should be removed.
-        if (m_mBool["fMc"]) m_mVector["mcLR"][iAx * 2] = 9999;
-        m_mVector["driftLength"][iAx * 2] = 9999;
-        m_mVector["tdc"][iAx * 2] = 9999;
-        if (m_mBool["fmcLR"] == 1) m_mVector["LR"][iAx * 2] = 9999;
-        else if (m_mBool["fLRLUT"] == 1) m_mVector["LR"][iAx * 2] = 9999;
-        else m_mVector["LR"][iAx * 2] = 9999;
+        if (m_mBool_in["fMc"]) m_mVector_in["mcLR"][iAx * 2] = 9999;
+        m_mVector_in["driftLength"][iAx * 2] = 9999;
+        m_mVector_in["tdc"][iAx * 2] = 9999;
+        if (m_mBool_in["fmcLR"] == 1) m_mVector_in["LR"][iAx * 2] = 9999;
+        else if (m_mBool_in["fLRLUT"] == 1) m_mVector_in["LR"][iAx * 2] = 9999;
+        else m_mVector_in["LR"][iAx * 2] = 9999;
       }
     } // End superlayer loop
     //// Test method to find event time using hit TS's tdc.
     //int minTSTdc = 9999;
     //for(unsigned iAx=0; iAx<9; iAx++){
-    //  if (minTSTdc > m_mVector["tdc"][2*iAx]) minTSTdc = m_mVector["tdc"][2*iAx];
+    //  if (minTSTdc > m_mVector_in["tdc"][2*iAx]) minTSTdc = m_mVector_in["tdc"][2*iAx];
     //}
-    //m_mDouble["eventTime"] = minTSTdc;
+    //m_mDouble_in["eventTime"] = minTSTdc;
 
     ////////////////////
     // Get 2D fit values
     // Get 2D fit values from IW 2D fitter
-    m_mDouble["phi02D"] = aTrack.helix().phi0();
-    m_mDouble["pt2D"] = aTrack.pt();
+    m_mDouble_in["phi02D"] = aTrack.helix().phi0();
+    m_mDouble_in["pt2D"] = aTrack.pt();
     if (aTrack.charge() < 0) {
-      m_mDouble["phi02D"] -= m_mConstD["Trg_PI"];
-      if (m_mDouble["phi02D"] < 0) m_mDouble["phi02D"] += 2 * m_mConstD["Trg_PI"];
+      m_mDouble_in["phi02D"] -= m_mConstD_in["Trg_PI"];
+      if (m_mDouble_in["phi02D"] < 0) m_mDouble_in["phi02D"] += 2 * m_mConstD_in["Trg_PI"];
     }
-    m_mDouble["dr2D"] = aTrack.helix().dr() * 0.01;
+    m_mDouble_in["dr2D"] = aTrack.helix().dr() * 0.01;
     // Get 2D fit values from JB 2D fitter
     // Currently using JB fitter for 3D fitting
-    m_mDouble["charge"] = double(aTrack.charge());
+    m_mDouble_in["charge"] = double(aTrack.charge());
     // Set phi2DError for 2D fit
-    m_mVector["phi2DError"] = vector<double> (5);
+    m_mVector_in["phi2DError"] = vector<double> (5);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
-      if (m_mVector["useAxSl"][iAx] == 1) {
+      if (m_mVector_in["useAxSl"][iAx] == 1) {
         // Check LR.
-        if (m_mVector["LR"][2 * iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
-        else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
+        if (m_mVector_in["LR"][2 * iAx] != 3) m_mVector_in["phi2DError"][iAx] = m_mConstV_in["driftPhi2DError"][iAx];
+        else m_mVector_in["phi2DError"][iAx] = m_mConstV_in["wirePhi2DError"][iAx];
         // Check event time.
-        if (m_mDouble["eventTime"] == 9999) m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
+        if (m_mDouble_in["eventTime"] == 9999) m_mVector_in["phi2DError"][iAx] = m_mConstV_in["wirePhi2DError"][iAx];
       } else {
-        m_mVector["phi2DError"][iAx] = 9999;
+        m_mVector_in["phi2DError"][iAx] = 9999;
       }
     }
     // Set invPhi2DError for 2D fit
-    m_mVector["phi2DInvError"] = vector<double> (5);
+    m_mVector_in["phi2DInvError"] = vector<double> (5);
     for (unsigned iAx = 0; iAx < 5; iAx++) {
-      if (m_mVector["useAxSl"][iAx] == 1) {
-        m_mVector["phi2DInvError"][iAx] = 1 / m_mVector["phi2DError"][iAx];
+      if (m_mVector_in["useAxSl"][iAx] == 1) {
+        m_mVector_in["phi2DInvError"][iAx] = 1 / m_mVector_in["phi2DError"][iAx];
       } else {
-        m_mVector["phi2DInvError"][iAx] = 0;
+        m_mVector_in["phi2DInvError"][iAx] = 0;
       }
     }
     // Calculate phi2D.
-    m_mVector["phi2D"] = vector<double> (5);
-    if (m_mBool["f2DFitDrift"] == 0 || m_mDouble["eventTime"] == 9999) {
+    m_mVector_in["phi2D"] = vector<double> (5);
+    if (m_mBool_in["f2DFitDrift"] == 0 || m_mDouble_in["eventTime"] == 9999) {
       for (unsigned iAx = 0; iAx < 5; iAx++) {
-        m_mVector["phi2D"][iAx] = m_mVector["wirePhi"][iAx * 2];
+        m_mVector_in["phi2D"][iAx] = m_mVector_in["wirePhi"][iAx * 2];
       }
     } else {
       for (unsigned iAx = 0; iAx < 5; iAx++) {
-        if (m_mVector["useAxSl"][iAx] == 1) {
+        if (m_mVector_in["useAxSl"][iAx] == 1) {
           // Get drift length from table.
           string tableName = "driftLengthTableSL" + to_string(iAx * 2);
-          double t_driftTime = m_mVector["tdc"][iAx * 2] - m_mDouble["eventTime"];
+          double t_driftTime = m_mVector_in["tdc"][iAx * 2] - m_mDouble_in["eventTime"];
           if (t_driftTime < 0) t_driftTime = 0;
           if (t_driftTime > 511) t_driftTime = 511;
-          double t_driftLength = m_mConstV[tableName][(unsigned)t_driftTime];
-          m_mVector["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector["wirePhi"][iAx * 2], t_driftLength, m_mConstV["rr"][iAx * 2],
-                                                            m_mVector["LR"][iAx * 2]);
+          double t_driftLength = m_mConstV_in[tableName][(unsigned)t_driftTime];
+          m_mVector_in["phi2D"][iAx] = Fitter3DUtility::calPhi(m_mVector_in["wirePhi"][iAx * 2], t_driftLength, m_mConstV_in["rr"][iAx * 2],
+                                                               m_mVector_in["LR"][iAx * 2]);
         } else {
-          m_mVector["phi2D"][iAx] = 9999;
+          m_mVector_in["phi2D"][iAx] = 9999;
         }
       }
     }
     // Fit2D
-    if (m_mBool["f2DFit"] == 0) {
-      m_mDouble["rho"] = m_mDouble["pt2D"] / 0.01 / 1.5 / 0.299792458;
-      m_mDouble["pt"] = 0.299792458 * 1.5 * m_mDouble["rho"] / 100;
-      m_mDouble["phi0"] = m_mDouble["phi02D"];
-      m_mDouble["fit2DChi2"] = 9999;
+    if (m_mBool_in["f2DFit"] == 0) {
+      m_mDouble_in["rho"] = m_mDouble_in["pt2D"] / 0.01 / 1.5 / 0.299792458;
+      m_mDouble_in["pt"] = 0.299792458 * 1.5 * m_mDouble_in["rho"] / 100;
+      m_mDouble_in["phi0"] = m_mDouble_in["phi02D"];
+      m_mDouble_in["fit2DChi2"] = 9999;
     } else {
-      m_mDouble["rho"] = 0;
-      m_mDouble["phi0"] = 0;
-      m_mDouble["fit2DChi2"] = 0;
-      Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0], &m_mVector["phi2D"][0], &m_mVector["phi2DInvError"][0], m_mDouble["rho"],
-                                  m_mDouble["phi0"], m_mDouble["fit2DChi2"]);
-      m_mDouble["pt"] = 0.3 * 1.5 * m_mDouble["rho"] / 100;
+      m_mDouble_in["rho"] = 0;
+      m_mDouble_in["phi0"] = 0;
+      m_mDouble_in["fit2DChi2"] = 0;
+      Fitter3DUtility::rPhiFitter(&m_mConstV_in["rr2D"][0], &m_mVector_in["phi2D"][0], &m_mVector_in["phi2DInvError"][0],
+                                  m_mDouble_in["rho"],
+                                  m_mDouble_in["phi0"], m_mDouble_in["fit2DChi2"]);
+      m_mDouble_in["pt"] = 0.3 * 1.5 * m_mDouble_in["rho"] / 100;
     }
 
     // Find charge of particle.
-    Fitter3DUtility::chargeFinder(&m_mConstV["nTSs2D"][0], &m_mVector["tsId2D"][0], &m_mVector["useAxSl"][0], m_mDouble["phi0"],
-                                  m_mDouble["charge"], m_mDouble["charge2D"]);
+    Fitter3DUtility::chargeFinder(&m_mConstV_in["nTSs2D"][0], &m_mVector_in["tsId2D"][0], &m_mVector_in["useAxSl"][0],
+                                  m_mDouble_in["phi0"],
+                                  m_mDouble_in["charge"], m_mDouble_in["charge2D"]);
 
-    if (m_mBool["fVerbose"]) {
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]f2DFit:        " << m_mBool["f2DFit"] <<
+    if (m_mBool_in["fVerbose"]) {
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]f2DFit:        " <<
+           m_mBool_in["f2DFit"] <<
            endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]evtTime:       " << m_mDouble["eventTime"]
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]evtTime:       " <<
+           m_mDouble_in["eventTime"]
            << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]wirePhi:       " << m_mVector["wirePhi"][0]
-           << " " << m_mVector["wirePhi"][1] << " " << m_mVector["wirePhi"][2] << " " << m_mVector["wirePhi"][3] << " " <<
-           m_mVector["wirePhi"][4] << " " << m_mVector["wirePhi"][5] << " " << m_mVector["wirePhi"][6] << " " << m_mVector["wirePhi"][7] << " "
-           << m_mVector["wirePhi"][8] << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]LR:            " << int(
-             m_mVector["LR"][0]) << " " << int(m_mVector["LR"][1]) << " " << int(m_mVector["LR"][2]) << " " << int(
-             m_mVector["LR"][3]) << " " << int(m_mVector["LR"][4]) << " " << int(m_mVector["LR"][5]) << " " << int(
-             m_mVector["LR"][6]) << " " << int(m_mVector["LR"][7]) << " " << int(m_mVector["LR"][8]) << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]drift:         " <<
-           m_mVector["driftLength"][0] << " " << m_mVector["driftLength"][1] << " " << m_mVector["driftLength"][2] << " " <<
-           m_mVector["driftLength"][3] << " " << m_mVector["driftLength"][4] << " " << m_mVector["driftLength"][5] << " " <<
-           m_mVector["driftLength"][6] << " " << m_mVector["driftLength"][7] << " " << m_mVector["driftLength"][8] << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]tdc:           " << m_mVector["tdc"][0] <<
-           " " << m_mVector["tdc"][1] << " " << m_mVector["tdc"][2] << " " << m_mVector["tdc"][3] << " " << m_mVector["tdc"][4] << " " <<
-           m_mVector["tdc"][5] << " " << m_mVector["tdc"][6] << " " << m_mVector["tdc"][7] << " " << m_mVector["tdc"][8] << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]rr2D:          " << m_mConstV["rr2D"][0] <<
-           " " << m_mConstV["rr2D"][1] << " " << m_mConstV["rr2D"][2] << " " << m_mConstV["rr2D"][3] << " " << m_mConstV["rr2D"][4] << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]Phi2D:         " << m_mVector["phi2D"][0]
-           << " " << m_mVector["phi2D"][1] << " " << m_mVector["phi2D"][2] << " " << m_mVector["phi2D"][3] << " " << m_mVector["phi2D"][4] <<
-           endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]Phi2DInvError: " <<
-           m_mVector["phi2DInvError"][0] << " " << m_mVector["phi2DInvError"][1] << " " << m_mVector["phi2DInvError"][2] << " " <<
-           m_mVector["phi2DInvError"][3] << " " << m_mVector["phi2DInvError"][4] << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]charge:        " << int(
-             m_mDouble["charge"]) << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]charge2D:        " << int(
-             m_mDouble["charge2D"]) << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]pt:            " << m_mDouble["pt"] <<
-           endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]rho:           " << m_mDouble["rho"] <<
-           endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]phi0:          " << m_mDouble["phi0"] <<
-           " " << m_mDouble["phi0"] / m_mConstD["Trg_PI"] * 180 << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]fit2DChi2:     " << m_mDouble["fit2DChi2"]
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]wirePhi:       " <<
+           m_mVector_in["wirePhi"][0]
+           << " " << m_mVector_in["wirePhi"][1] << " " << m_mVector_in["wirePhi"][2] << " " << m_mVector_in["wirePhi"][3] << " " <<
+           m_mVector_in["wirePhi"][4] << " " << m_mVector_in["wirePhi"][5] << " " << m_mVector_in["wirePhi"][6] << " " <<
+           m_mVector_in["wirePhi"][7] << " "
+           << m_mVector_in["wirePhi"][8] << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]LR:            " << int(
+             m_mVector_in["LR"][0]) << " " << int(m_mVector_in["LR"][1]) << " " << int(m_mVector_in["LR"][2]) << " " << int(
+             m_mVector_in["LR"][3]) << " " << int(m_mVector_in["LR"][4]) << " " << int(m_mVector_in["LR"][5]) << " " << int(
+             m_mVector_in["LR"][6]) << " " << int(m_mVector_in["LR"][7]) << " " << int(m_mVector_in["LR"][8]) << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]drift:         " <<
+           m_mVector_in["driftLength"][0] << " " << m_mVector_in["driftLength"][1] << " " << m_mVector_in["driftLength"][2] << " " <<
+           m_mVector_in["driftLength"][3] << " " << m_mVector_in["driftLength"][4] << " " << m_mVector_in["driftLength"][5] << " " <<
+           m_mVector_in["driftLength"][6] << " " << m_mVector_in["driftLength"][7] << " " << m_mVector_in["driftLength"][8] << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]tdc:           " <<
+           m_mVector_in["tdc"][0] <<
+           " " << m_mVector_in["tdc"][1] << " " << m_mVector_in["tdc"][2] << " " << m_mVector_in["tdc"][3] << " " << m_mVector_in["tdc"][4] <<
+           " " <<
+           m_mVector_in["tdc"][5] << " " << m_mVector_in["tdc"][6] << " " << m_mVector_in["tdc"][7] << " " << m_mVector_in["tdc"][8] << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]rr2D:          " <<
+           m_mConstV_in["rr2D"][0] <<
+           " " << m_mConstV_in["rr2D"][1] << " " << m_mConstV_in["rr2D"][2] << " " << m_mConstV_in["rr2D"][3] << " " << m_mConstV_in["rr2D"][4]
            << endl;
-      cout << "[E" << int(m_mDouble["eventNumber"]) << "][T" << int(m_mDouble["trackId"]) << "]useAxSl:      " << int(
-             m_mVector["useAxSl"][0]) << " " << int(m_mVector["useAxSl"][1]) << " " << int(m_mVector["useAxSl"][2]) << " " << int(
-             m_mVector["useAxSl"][3]) << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]Phi2D:         " <<
+           m_mVector_in["phi2D"][0]
+           << " " << m_mVector_in["phi2D"][1] << " " << m_mVector_in["phi2D"][2] << " " << m_mVector_in["phi2D"][3] << " " <<
+           m_mVector_in["phi2D"][4] <<
+           endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]Phi2DInvError: " <<
+           m_mVector_in["phi2DInvError"][0] << " " << m_mVector_in["phi2DInvError"][1] << " " << m_mVector_in["phi2DInvError"][2] << " " <<
+           m_mVector_in["phi2DInvError"][3] << " " << m_mVector_in["phi2DInvError"][4] << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]charge:        " << int(
+             m_mDouble_in["charge"]) << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]charge2D:        " << int(
+             m_mDouble_in["charge2D"]) << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]pt:            " <<
+           m_mDouble_in["pt"] <<
+           endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]rho:           " <<
+           m_mDouble_in["rho"] <<
+           endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]phi0:          " <<
+           m_mDouble_in["phi0"] <<
+           " " << m_mDouble_in["phi0"] / m_mConstD_in["Trg_PI"] * 180 << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]fit2DChi2:     " <<
+           m_mDouble_in["fit2DChi2"]
+           << endl;
+      cout << "[E" << int(m_mDouble_in["eventNumber"]) << "][T" << int(m_mDouble_in["trackId"]) << "]useAxSl:      " << int(
+             m_mVector_in["useAxSl"][0]) << " " << int(m_mVector_in["useAxSl"][1]) << " " << int(m_mVector_in["useAxSl"][2]) << " " << int(
+             m_mVector_in["useAxSl"][3]) << endl;
     }
 
-    if (std::isnan(m_mDouble["rho"]) || std::isnan(m_mDouble["phi0"])) {
-      if (m_mBool["fVerbose"] == 1) cout << "[2Dfit] Exiting because rho or phi0 is nan." << endl;
+    if (std::isnan(m_mDouble_in["rho"]) || std::isnan(m_mDouble_in["phi0"])) {
+      if (m_mBool_in["fVerbose"] == 1) cout << "[2Dfit] Exiting because rho or phi0 is nan." << endl;
       return 2;
     }
     return 0;

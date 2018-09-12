@@ -7,10 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclPainter.h>
 
+//Root
+#include <TString.h>
+
+//ECL
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/modules/eclDisplay/MultilineWidget.h>
+
 using namespace Belle2;
+using namespace ECL;
 
 int EclPainter::m_obj_counter = 0;
 

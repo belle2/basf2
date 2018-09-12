@@ -109,14 +109,15 @@ def add_simulation(
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
-        simulateT0jitter=False):
+        simulateT0jitter=False,
+        usePXDGatedMode=False):
     """
     This function adds the standard simulation modules to a path.
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
 
     # background mixing or overlay input before process forking
-    if bkgfiles:
+    if bkgfiles is not None:
         if bkgOverlay:
             bkginput = register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
@@ -127,6 +128,14 @@ def add_simulation(
             if components:
                 bkgmixer.param('components', components)
             path.add_module(bkgmixer)
+            if usePXDGatedMode:
+                if components is None or 'PXD' in components:
+                    # PXD is sensitive to hits in intervall -20us to +20us
+                    bkgmixer.param('minTimePXD', -20000.0)
+                    bkgmixer.param('maxTimePXD', 20000.0)
+                    # Emulate injection vetos for PXD
+                    pxd_veto_emulator = register_module('PXDInjectionVetoEmulator')
+                    path.add_module(pxd_veto_emulator)
 
     # geometry parameter database
     if 'Gearbox' not in path:
@@ -188,7 +197,7 @@ def add_simulation(
     # ECL digitization
     if components is None or 'ECL' in components:
         ecl_digitizer = register_module('ECLDigitizer')
-        if bkgfiles:
+        if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
@@ -203,7 +212,7 @@ def add_simulation(
         path.add_module(eklm_digitizer)
 
     # background overlay executor - after all digitizers
-    if bkgfiles and bkgOverlay:
+    if bkgfiles is not None and bkgOverlay:
         path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
         if components is None or 'PXD' in components:
             path.add_module("PXDDigitSorter", digits=pxd_digits_name)

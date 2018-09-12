@@ -68,12 +68,12 @@ namespace Belle2 {
     TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
     TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
     TH1F* m_nCutHit; /**< histogram for number of cutted hist per track */
-    bool m_isCutted;
-    double m_pMag;
-    double m_pt;
-    double m_pdgID;
-    int m_Ncuts;
-    TTree* m_noKickTree;
+    bool m_isCutted; /**< Indicator if cut is applied */
+    double m_pMag; /**< momentum magnitut */
+    double m_pt; /**< transverse momentum */
+    double m_pdgID; /**< pdg Code */
+    int m_Ncuts; /**< number of times the cut is applied on a particle */
+    TTree* m_noKickTree; /**< TTree to which the information is written */
 
     /** Constructor with input file for use specific cuts file and allows validation */
     NoKickRTSel(std::string fileName, bool outputHisto) :
@@ -166,8 +166,7 @@ namespace Belle2 {
     */
     void produceHistoNoKick();
 
-
+    /// Making this class a ROOT class
     ClassDef(NoKickRTSel, 1);
   };
-
 } /** end namespace Belle2 */

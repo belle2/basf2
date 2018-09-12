@@ -91,7 +91,7 @@ void TrackCreatorModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
   if (recoTracks.getEntries() == 0) {
-    B2WARNING("RecoTrack StoreArray does not contain any RecoTracks.");
+    B2DEBUG(20, "RecoTrack StoreArray does not contain any RecoTracks.");
   }
 
   TrackFitter trackFitter;

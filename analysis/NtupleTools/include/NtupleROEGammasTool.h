@@ -19,17 +19,16 @@
 #include <string>
 #include <utility>
 
-// #include <TLorentzVector.h>
-
 namespace Belle2 {
 
   /**
-   * NtupleTool to write the kinematics of photons that belong to the RestOfEvent for given reconstructed Particle to a flat ntuple.
+   * NtupleTool to write the kinematics of all photon candidates that belong to
+   * the RestOfEvent for given reconstructed Particle to a flat ntuple.
    */
   class NtupleROEGammasTool : public NtupleFlatTool {
 
   private:
-    int* m_nROEGoodGammas; /**< Number of good ECL clusters in ROE. */
+    int* m_nROEGammas; /**< Number of photon hypothesis ECL clusters in ROE. */
     float m_fP[100];        /**< Total momentum. */
     float m_fP4[100][4];    /**< Momentum in lab system (px py pz e). */
     /** Create branches in m_tree - this function should be called by the constructor only. */

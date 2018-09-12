@@ -8,11 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_PAYLOAD_ASSEMBLER_H_
-#define ROI_PAYLOAD_ASSEMBLER_H_
+#pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/dataobjects/ROIrawID.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/ROIpayload.h>
 #include <string>
 
 namespace Belle2 {
@@ -32,16 +35,18 @@ namespace Belle2 {
      */
     ROIPayloadAssemblerModule();
 
+  private:
+
     /**
      *Initializes the Module.
      */
-    void initialize() override;
+    void initialize() override final;
 
-    void event() override;
+    void event() override final;
 
-  protected:
-
-    ROIrawID m_roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
+    StoreArray<ROIid> m_ROIList;
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+    StoreObjPtr<ROIpayload> m_roiPayloads;
 
     std::string m_ROIListName; /**< name of the ROI list */
     std::string m_ROIpayloadName; /**< name of the payload to be sent to ONSEN */
@@ -53,4 +58,3 @@ namespace Belle2 {
 
   };
 }
-#endif

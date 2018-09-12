@@ -51,7 +51,7 @@ namespace Belle2 {
      * Get time calibration data.
      * @param[in] strip Strip number.
      */
-    EKLMTimeCalibrationData* getTimeCalibrationData(uint16_t strip);
+    const EKLMTimeCalibrationData* getTimeCalibrationData(uint16_t strip) const;
 
     /**
      * Clean time calibration data.

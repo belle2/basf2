@@ -17,11 +17,9 @@
 // ROOT
 #include "TMath.h"
 
-// FRAMEWORK
-#include <framework/datastore/StoreArray.h>
-
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
@@ -40,7 +38,7 @@ REG_MODULE(ECLCovarianceMatrixPureCsI)
 //-----------------------------------------------------------------
 ECLCovarianceMatrixModule::ECLCovarianceMatrixModule() : Module(),
   m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
   // Set description
   setDescription("ECLCovarianceMatrix: Sets the ECL photon shower covariance matrix.");
@@ -56,7 +54,7 @@ void ECLCovarianceMatrixModule::initialize()
 {
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 }
 
 void ECLCovarianceMatrixModule::beginRun()
@@ -69,7 +67,7 @@ void ECLCovarianceMatrixModule::event()
 {
 
   // Get the event background level
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double background = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     background = static_cast<double>(bkgdcount) / m_fullBkgdCount;

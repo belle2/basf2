@@ -75,7 +75,7 @@ print(bkgFiles)
 path = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 
 progress = register_module('Progress')
@@ -107,7 +107,8 @@ if particleGun:
     path.add_module('EventInfoSetter')
     path.add_module(particleGunModule)
 else:
-    generateY4S(100, None, path)
+    setupEventInfo(100, path)
+    add_evtgen_generator(path, 'signal', None)
 
 path.add_module(progress)
 

@@ -63,7 +63,7 @@ namespace Belle2 {
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
 
-      bool m_generateShaperDigits;
+      bool m_generateOldDigits;
       std::string m_svdShaperDigitListName;
       std::string m_svdDAQDiagnosticsListName;
 
@@ -184,6 +184,20 @@ namespace Belle2 {
        * right in the unpacker.
        */
       bool m_killUpsetDigits = false;
+
+      /** Silently append new SVDDigits to a pre-existing non-empty
+       * SVDDigits/SVDShaperDigits storeArray.
+       * If false, a pre-exsiting non-empty output StoreArray will cause
+       * a FATAL error to remind the users that they may be mixing data
+       * inadvertently, and that they need to plug in a digit sorter in
+       * the module path.
+       */
+      bool m_silentAppend = false;
+
+      /** Optionally we can stop the unpacking if there is a missing
+       *  APV/FADC combination in the mapping -> wrong payload is identified
+       */
+      bool m_badMappingFatal = false;
 
       /** Map to store a list of missing APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;

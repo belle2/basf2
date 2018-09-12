@@ -188,6 +188,13 @@ namespace Belle2 {
     /** Getter for the quality of this SpacePoint.*/
     float getQualityEstimation() const { return m_qualityIndicator; }
 
+    /** Setter for the spacePoint quality index error */
+    void setQualityEstimationError(double qualityIndicatorError) {m_qualityIndicatorError = qualityIndicatorError;}
+
+    /** Getter for the spacePoint quality index error*/
+    float getQualityEstimationError() const {return m_qualityIndicatorError;}
+
+
 //---------------------------------------------------------------------------------------------------------------------
 //TODO: Some clarification, if the following conversions and especially the staticness of the functions below is needed
 //in the version 2 of the VXDTF.
@@ -318,7 +325,8 @@ namespace Belle2 {
                             uSigma * uSigma,
                             vSigma * vSigma,
                             0
-                          )
+                          ),
+                          true // use alignment in transformation
                         );
       m_positionError.Sqrt();
     }
@@ -375,6 +383,13 @@ namespace Belle2 {
      */
     float m_qualityIndicator {0.5};
 
+
+    /** Stores the error on the quality indicator.
+     *
+     * The value comes from the binning error on the pdfs from which the QI is derived.
+     */
+    float m_qualityIndicatorError {0.5};
+
     /** Stores whether this SpacePoint is connected to a track.
      *
      *  We assume, that const for SpacePoint means, things like position et cetera remain constant.
@@ -383,6 +398,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 12)
+    ClassDefOverride(SpacePoint, 13)
   };
 }

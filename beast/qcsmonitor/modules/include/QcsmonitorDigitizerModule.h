@@ -12,6 +12,9 @@
 #define QCSMONITORDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/qcsmonitor/dataobjects/QcsmonitorHit.h>
 #include <string>
 #include <vector>
 
@@ -61,6 +64,7 @@ namespace Belle2 {
 
 
     private:
+      StoreArray<QcsmonitorHit> m_qcsmonitorHit; /** Array for QcsmonitorHit */
 
       /** reads data from QCSMONITOR.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

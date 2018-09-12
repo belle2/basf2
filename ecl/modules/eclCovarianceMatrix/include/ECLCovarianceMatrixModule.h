@@ -11,20 +11,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCOVARIANCEMATRIXMODULE_H_
-#define ECLCOVARIANCEMATRIXMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
-
 namespace Belle2 {
+
+  class EventLevelClusteringInfo;
+  class ECLShower;
 
   /** Class to perform the shower correction */
   class ECLCovarianceMatrixModule : public Module {
@@ -58,17 +55,17 @@ namespace Belle2 {
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
   public:
     /** Default name ECLShowers */
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
   }; // end of ECLCovarianceMatrixModule
 
 
@@ -79,11 +76,9 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
   }; // end of ECLCovarianceMatrixPureCsIModule
 
 } // end of Belle2 namespace
-
-#endif

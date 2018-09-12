@@ -22,9 +22,17 @@ parser = argparse.ArgumentParser(description="SVD Database Importer")
 parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
+parser.add_argument('--hot_xml', metavar='hotStrFile', dest='hot', type=str, nargs=1, help='Hot Strips xml file')
+parser.add_argument(
+    '--FADCMasked_xml',
+    metavar='FADCMaskedStrFile',
+    dest='FADCMasked',
+    type=str,
+    nargs=1,
+    help='FADC Masked Strips xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 
-
+'''
 if(len(sys.argv) != 7):
     print('')
     print('ERROR: wrong number of arguments passed, check below the correct usage of this script.')
@@ -33,7 +41,7 @@ if(len(sys.argv) != 7):
     print(sys.argv)
     parser.print_help()
     exit()
-
+'''
 print('')
 
 args = parser.parse_args()
@@ -48,12 +56,27 @@ if args.mapp is not None:
     mappingfile = args.mapp[0]
 else:
     mappingfile = args.mapp
+if args.hot is not None:
+    hotfile = args.hot[0]
+else:
+    hotfile = args.hot
+
+if args.FADCMasked is not None:
+    FADCMaskedfile = args.FADCMasked[0]
+else:
+    FADCMaskedfile = args.FADCMasked
 
 print('experiment number = ' + str(experiment))
 print('       run number = ' + str(run))
 print('  calibration xml = ' + str(calibfile))
+print('   hot strips xml = ' + str(hotfile))
+print('   FADC Masked strips xml = ' + str(FADCMaskedfile))
 print('      mapping xml = ' + str(mappingfile))
 
+reset_database()
+use_database_chain()
+# central DB needed for the channel mapping DB object
+use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
 use_local_database("localDB/database.txt", "localDB")
 
 main = create_path()
@@ -65,7 +88,7 @@ eventinfosetter.param({'evtNumList': [1], 'expList': experiment, 'runList': run}
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
-main.add_module("Gearbox", fileName="/geometry/Beast2_phase2.xml")
+main.add_module("Gearbox")
 
 # the calibrations are good from the NEXT run
 run = int(int(run) + 1)
@@ -81,13 +104,26 @@ class dbImporterModule(Module):
             # import the noises
             dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
             print("Noise Imported")
+            # import the pedestals
+            dbImporter.importSVDPedestalCalibrationsFromXML(calibfile)
+            print("Pedestal Imported")
             # import pulse shape calibrations
             dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
             print("Pulse Shape Calibrations Imported")
         if args.mapp is not None:
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
-            # print("Channel Mapping Imported")
+            print("Channel Mapping Imported")
+        if args.hot is not None:
+            # import hot strips
+            dbImporter.importSVDHotStripsCalibrationsFromXML(hotfile)
+            print("Hot Strips List Imported")
+            # dbImporter.importSVDHotStripsCalibrations()
+        if args.FADCMasked is not None:
+            # import FADCMasked strips
+            dbImporter.importSVDFADCMaskedStripsFromXML(FADCMaskedfile)
+            # print("FADC Masked Strips List Imported")
+            # dbImporter.importSVDFADCMaskedStrips()
 
 
 main.add_module(dbImporterModule())

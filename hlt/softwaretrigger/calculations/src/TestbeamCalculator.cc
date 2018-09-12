@@ -21,7 +21,7 @@ namespace Belle2 {
       m_svdTracks.isRequired();
     };
 
-    void TestbeamCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
+    void TestbeamCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     {
       // output the number of SVD Clusters
       calculationResult["nSVDClusters"] = m_svdClusters.getEntries();

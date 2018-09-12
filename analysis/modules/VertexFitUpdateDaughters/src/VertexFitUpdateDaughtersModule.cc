@@ -84,7 +84,7 @@ void VertexFitUpdateDaughtersModule::beginRun()
 
 void VertexFitUpdateDaughtersModule::event()
 {
-  //cout<<"DECAY STRING = "<<m_decayString<<endl;
+  //B2DEBUG(19,"DECAY STRING = "<<m_decayString);
 
   StoreObjPtr<ParticleList> plist(m_listName);
   if (!plist) {

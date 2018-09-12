@@ -40,14 +40,20 @@ namespace Belle2 {
     //! The Timing of TRG Timing
     int m_caltime;
 
-    //! The Fine Timing of TRG Timing
-    int m_finetime;
+    //! The EVT Timing of TRG Timing
+    int m_evttime;
 
     //! The revo clk of FAM
     int m_revo_fam;
 
-    //! The revo clk of TRG
-    int m_revo_trg;
+    //! The revo clk of gdl
+    int m_revo_gdl;
+
+    //! The window of hit
+    int m_hit_win;
+
+    //! The checksum flag
+    int m_check_sum;
 
     //! The method to set event id
     void setEventId(int eventId) { m_eventId = eventId;}
@@ -67,14 +73,20 @@ namespace Belle2 {
     //! The method to set cal timing
     void setTCCALTime(int TCCALT) { m_caltime = TCCALT;}
 
-    //! The method to set fine timing
-    void setFineTime(int FINETIME) { m_finetime = FINETIME;}
+    //! The method to set evt timing
+    void setEVTTime(int EVTTIME) { m_evttime = EVTTIME;}
 
     //! The method to set revo clock of FAM
     void setRevoFAM(int RevoFAM) { m_revo_fam = RevoFAM;}
 
-    //! The method to set revo clock of TRG
-    void setRevoTRG(int RevoTRG) { m_revo_trg = RevoTRG;}
+    //! The method to set revo clock of GDL
+    void setRevoGDL(int RevoGDL) { m_revo_gdl = RevoGDL;}
+
+    //! The method to set checksum flag
+    void setChecksum(int Checksum) { m_check_sum = Checksum;}
+
+    //! The method to set Hit window
+    void setHitWin(int HitWin) { m_hit_win = HitWin;}
 
     //! The method to get event id
     int getEventId() const { return m_eventId;}
@@ -94,14 +106,21 @@ namespace Belle2 {
     //! The method to get cal timing
     int getTCCALTime() const {return m_caltime;}
 
-    //! The method to get fine timing
-    int getFineTime() const {return m_finetime;}
+    //! The method to get evt timing
+    int getEVTTime() const {return m_evttime;}
 
     //! The method to get revo clock of FAM
     int getRevoFAM() const {return m_revo_fam;}
 
-    //! The method to get revo clock of TRG
-    int getRevoTRG() const {return m_revo_trg;}
+    //! The method to get revo clock of GDL
+    int getRevoGDL() const {return m_revo_gdl;}
+
+    //! The method to get checksum flag
+    int getChecksum() const {return m_check_sum;}
+
+    //! The method to get Hit Win
+    int getHitWin() const {return m_hit_win;}
+
 
     // Empty constructor
     // Recommended for ROOT IO
@@ -113,9 +132,11 @@ namespace Belle2 {
       m_energy     = 0;
       m_timing     = 0;
       m_caltime    = 0;
-      m_finetime   = 0;
+      m_evttime    = 0;
       m_revo_fam   = 0;
-      m_revo_trg   = 0;
+      m_revo_gdl   = 0;
+      m_check_sum  = 0;
+      m_hit_win    = 0;
     }
 
     //! Useful Constructor
@@ -126,9 +147,11 @@ namespace Belle2 {
       int TCE,
       int TCT,
       int TCCALT,
-      int FINETIME,
+      int EVTTIME,
       int RevoFAM,
-      int RevoTRG
+      int RevoGDL,
+      int Checksum,
+      int HitWin
     )
     {
       m_eventId    = eventId;
@@ -137,9 +160,11 @@ namespace Belle2 {
       m_energy     = TCE;
       m_timing     = TCT;
       m_caltime    = TCCALT;
-      m_finetime   = FINETIME;
+      m_evttime    = EVTTIME;
       m_revo_fam   = RevoFAM;
-      m_revo_trg   = RevoTRG;
+      m_revo_gdl   = RevoGDL;
+      m_check_sum  = Checksum;
+      m_hit_win    = HitWin;
     }
     /** the class title */
     ClassDef(TRGECLUnpackerStore, 1);

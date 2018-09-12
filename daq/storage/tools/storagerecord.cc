@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/SeqFile.h>
 
 #include <daq/storage/BinData.h>
@@ -168,12 +169,12 @@ public:
 
   int write(char* evtbuf, int nbyte, bool isstreamer = false)
   {
+    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     int ret = ::write(m_file, evtbuf, nbyte);
     m_filesize += nbyte;
     if (!isstreamer) {
       m_nevents++;
     }
-    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     return ret;
   }
 
@@ -222,6 +223,7 @@ int main(int argc, char** argv)
   const int ibufsize = atoi(argv[2]);
   const char* hostname = argv[3];
   const char* runtype = argv[4];
+  const bool not_record = std::string(runtype) == "null";
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];
@@ -237,7 +239,7 @@ int main(int argc, char** argv)
     info.open(nodename, nodeid);
   }
   SharedEventBuffer ibuf[10];
-  for (unsigned int ib; ib < ninput; ib++) {
+  for (unsigned int ib = 0; ib < ninput; ib++) {
     ibuf[ib].open(StringUtil::form("%s_%d", ibufname, ib), ibufsize * 1000000);//, true);
   }
   signal(SIGINT, signalHandler);
@@ -269,6 +271,7 @@ int main(int argc, char** argv)
     unsigned int expno;
     unsigned int runno;
   } hd;
+  g_streamersize = 0;
   while (true) {
     if (use_info) info.reportRunning();
     for (unsigned int ib = 0; ib < ninput; ib++) {
@@ -279,6 +282,16 @@ int main(int argc, char** argv)
       int nbyte = evtbuf[0];
       int nword = (nbyte - 1) / 4 + 1;
       bool isnew = false;
+      //      if (not_record) continue;
+      if (hd.type == MSG_STREAMERINFO) {
+        memcpy(g_streamerinfo, evtbuf, nbyte);
+        g_streamersize = nbyte;
+      }
+      if (expno > hd.expno || runno > hd.runno) {
+        B2WARNING("Old run was detected => discard event exp = " << hd.expno << " (" << expno << "), runno" << hd.runno << "(" << runno <<
+                  ")");
+        continue;
+      }
       if (!newrun || expno < hd.expno || runno < hd.runno) {
         newrun = true;
         isnew = true;
@@ -301,19 +314,22 @@ int main(int argc, char** argv)
         oheader->expno = expno;
         oheader->runno = runno;
         obuf.unlock();
-        if (file) {
-          file.close();
+        if (!not_record) {
+          if (file) {
+            file.close();
+          }
+          file.open(path, ndisks, expno, runno, fileid);
+          nbyte_out += nbyte;
+          fileid++;
         }
-        memcpy(g_streamerinfo, evtbuf, nbyte);
-        g_streamersize = nbyte;
-        file.open(path, ndisks, expno, runno, fileid);
-        nbyte_out += nbyte;
-        fileid++;
         continue;
       }
       if (use_info) {
         info.addInputCount(1);
         info.addInputNBytes(nbyte);
+      }
+      if (hd.type == MSG_STREAMERINFO) {
+        continue;
       }
       if (file) {
         if (nbyte_out > MAX_FILE_SIZE) {
@@ -324,10 +340,6 @@ int main(int argc, char** argv)
         }
         file.write((char*)evtbuf, nbyte);
         nbyte_out += nbyte;
-        if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
-          obuf.write(evtbuf, nword, true);
-        }
-        count_out++;
         if (use_info) {
           info.addOutputCount(1);
           info.addOutputNBytes(nbyte);
@@ -341,6 +353,11 @@ int main(int argc, char** argv)
         }
         ecount = 1;
       }
+      // Dump data into output buffer
+      if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
+        obuf.write(evtbuf, nword, true);
+      }
+      count_out++;
     }
   }
   return 0;

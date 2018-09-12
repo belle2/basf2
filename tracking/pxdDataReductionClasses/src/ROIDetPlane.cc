@@ -31,9 +31,9 @@ ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo)
   TVector3 vVector(0, 1, 0);
 
   const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(m_sensorInfo);
-  TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
-  TVector3 globaluVector = aSensorInfo.vectorToGlobal(uVector);
-  TVector3 globalvVector = aSensorInfo.vectorToGlobal(vVector);
+  TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
+  TVector3 globaluVector = aSensorInfo.vectorToGlobal(uVector, true);
+  TVector3 globalvVector = aSensorInfo.vectorToGlobal(vVector, true);
 
   setO(globalSensorPos);
 
@@ -53,9 +53,9 @@ ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo, double toleranceZ, double tole
   TVector3 vVector(0, 1, 0);
 
   const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(m_sensorInfo);
-  TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
-  TVector3 globaluVector = aSensorInfo.vectorToGlobal(uVector);
-  TVector3 globalvVector = aSensorInfo.vectorToGlobal(vVector);
+  TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
+  TVector3 globaluVector = aSensorInfo.vectorToGlobal(uVector, true);
+  TVector3 globalvVector = aSensorInfo.vectorToGlobal(vVector, true);
 
   setO(globalSensorPos);
 
@@ -67,15 +67,15 @@ ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo, double toleranceZ, double tole
   TVector3 maxVecV(0, aSensorInfo.getVSize() / 2.0, 0);
   TVector3 maxVecU(aSensorInfo.getUSize() / 2.0, 0, 0);
 
-  m_sensorPhiMin = std::atan2(aSensorInfo.pointToGlobal(minVecU).Y(),
-                              aSensorInfo.pointToGlobal(minVecU).X()) - tolerancePhi;
-  m_sensorPhiMax = std::atan2(aSensorInfo.pointToGlobal(maxVecU).Y(),
-                              aSensorInfo.pointToGlobal(maxVecU).X()) + tolerancePhi;
+  m_sensorPhiMin = std::atan2(aSensorInfo.pointToGlobal(minVecU, true).Y(),
+                              aSensorInfo.pointToGlobal(minVecU, true).X()) - tolerancePhi;
+  m_sensorPhiMax = std::atan2(aSensorInfo.pointToGlobal(maxVecU, true).Y(),
+                              aSensorInfo.pointToGlobal(maxVecU, true).X()) + tolerancePhi;
   if (m_sensorPhiMin < -M_PI) m_sensorPhiMin = m_sensorPhiMin + 2.0 * M_PI; // correct 'underflows' of definition
   if (m_sensorPhiMax > M_PI) m_sensorPhiMax = m_sensorPhiMax - 2.0 * M_PI; // correct 'overflows' of definition
 
-  m_sensorZMin = aSensorInfo.pointToGlobal(minVecV).Z() - toleranceZ;
-  m_sensorZMax = aSensorInfo.pointToGlobal(maxVecV).Z() + toleranceZ;
+  m_sensorZMin = aSensorInfo.pointToGlobal(minVecV, true).Z() - toleranceZ;
+  m_sensorZMax = aSensorInfo.pointToGlobal(maxVecV, true).Z() + toleranceZ;
 
   m_layer = (aSensorInfo.getID()).getLayerNumber();
 

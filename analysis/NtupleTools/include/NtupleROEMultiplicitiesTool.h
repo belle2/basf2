@@ -32,7 +32,6 @@ namespace Belle2 {
 
     int* m_nTracks;     /**< Number of remaining tracks. */
     int* m_nECLClusters; /**< Number of remaining ECL clusters. */
-    int* m_nGoodECLClusters; /**< Number of remaining good ECL clusters. */
     int* m_nKLMClusters; /**< Number of remaining KLM clusters. */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */

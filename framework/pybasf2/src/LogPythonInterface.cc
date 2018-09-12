@@ -361,7 +361,7 @@ Parameters:
       "create a `FATAL <basf2.LogLevel.FATAL>` error message and abort processing");
 
   // methods which take a variable list
-  def("B2DEBUG", &LogPythonInterface::logDebugVariables, args("debuglevel", "message"),
+  def("B2DEBUG", &LogPythonInterface::logDebugVariables, args("debuglevel", "message", "variables"),
       "create a `DEBUG <basf2.LogLevel.DEBUG>` message with the given debug level");
   def("B2INFO", &LogPythonInterface::logInfoVariables, args("message", "variables"),
       "create an `INFO <basf2.LogLevel.INFO>` message");

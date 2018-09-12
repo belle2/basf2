@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Jo-Frederik Krohn, Francesco Tenchini                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,7 +17,6 @@
 namespace TreeFitter {
 
   /**  utility for helix<->x,p conversions
-   * FIXME we still use the numerical jacobian
    * */
   class HelixUtils {
 
@@ -37,7 +36,9 @@ namespace TreeFitter {
                                          double& flt,
                                          Eigen::Matrix<double, 5, 6>& jacobian);
 
-    /**  */
+    /** get the jacobian dh={helix pars}/dx={x,y,z,px,py,pz} for the implementation of the framework helix.
+     * WARNING only valid right after initialisation!
+     * */
     static void getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,
                                                      const double x,
                                                      const double y,
@@ -48,7 +49,6 @@ namespace TreeFitter {
                                                      const double bfield,
                                                      const double charge
                                                     );
-
 
     /** get helix and jacobian from a vertex */
     static void getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
@@ -99,9 +99,6 @@ namespace TreeFitter {
 
     /** the domain of phi */
     static double phidomain(const double phi) ;
-
-    ///**  */
-    //static void helixTest();
 
   } ;
 

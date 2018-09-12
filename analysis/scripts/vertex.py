@@ -412,18 +412,28 @@ def vertexTree(
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
-    @param list_name    name of the input ParticleList
-    @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
-    @param massConstraint list of PDG ids which are mass-constrained
-    @param ipConstraint constrain head production vertex to IP (x-y-z) constraint, default: False)
-    @param customOriginConstraint use a costum origin vertex as the production vertex of your particle." + \
-        "This is usefull when fitting D*/D without wanting to fit a B but constraining the process to be B-decay like + \
-        "(think of semileptonic modes and stuff with a neutrino in the B decay). Default: False"
+    @param list_name    name of the input ParticleList for example 'B0:mySignal'
+    @param conf_level   minimum value of the confidence level to accept the fit." +\
+    "Typical values -1: accept all candidates regardless of the fit outcome." + \ "
+    0: only keep fit survivors. 0.001: standard cut, 0.1 (too) tight cut. "+\
+        "Optimise this param for the figure of merit of your analysis. For example S/sqrt{S+B}
+    @param massConstraint list of PDG codes of the particles you want to be mass constraint."+\
+    "Note that 'M': particles fitted mass and 'InvM': calculated from the 4-momenta of "\+
+    "the daughters will look different (especially if you don't update the daughters!).
+    @param ipConstraint constrain the PRODUCTION vertex of your particle "+\
+    "(head of tree) to the IP (x-y-z) as specified in the database, default: False)
+    @param customOriginConstraint use a custom origin vertex as the PRODUCTION vertex of your particle."+\
+    "Like a more loose beam constraint." + \
+    "This is usefull when fitting D*/D without wanting to fit a B but constraining the process to be B-decay like + \
+    "(think of semileptonic modes and stuff with a neutrino in the B decay). Default: False"
     @param customOriginVertex 3d vector of the vertex coordinates you want to use as custom origin."+\
         "Default numbers are taken for B-mesons
     @param customOriginCovariance 3x3 covariance matrix for the custom vertex (type: vector)." +\
         " Default numbers extracted from generator distribtuion width of B-mesons.
-    @param updateAllDaughters if true the entire tree will be updated with the fitted values. Otherwise only the head.
+    @param updateAllDaughters if true the entire tree will be updated with the fitted values "+\
+    "for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated, "+\
+    "however for all daughters we also update the vertex position with the fit results as this would "+\
+    "otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
     @param path         modules are added to this path
     """
 

@@ -239,8 +239,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
 
 
   short version = 1;
-  TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 900);
-  ctmp->Divide(4, 3);
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 1500, 900);
+  ctmp->Divide(5, 3);
   std::stringstream psname; psname << "dedx_2dcell.pdf[";
   TLine* tl = new TLine();
   tl->SetLineColor(kRed);
@@ -305,12 +305,12 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
         tempTwoD.SetBinContent(idoca, iea, truncMean); //binning starts at 1
 
         if (IsMakePlots) {
-          ctmp->cd(((idoca - 1) % 12) + 1);
+          ctmp->cd(((idoca - 1) % 15) + 1);
           htemp->DrawClone(); //clone is nessesory for pointer survival
           tl->SetX1(truncMean); tl->SetX2(truncMean);
           tl->SetY1(0); tl->SetY2(htemp->GetMaximum());
           tl->DrawClone("same");
-          if (idoca % 12 == 0)ctmp->Print(psname.str().c_str());
+          if (idoca % 15 == 0)ctmp->Print(psname.str().c_str());
         }
         htemp->Reset();
       }

@@ -271,9 +271,21 @@ namespace Belle2 {
     m_file->cd();
     m_alignTree->Write();
 
-    int npar = m_align.getParameters().size();
+    TH1F valid("valid", "status valid", 16, 0.5, 16.5);
+    valid.SetXTitle("slot ID");
+    valid.SetBinContent(m_targetMid, m_valid);
+    valid.Write();
 
-    TH1F h0("results", "alignment parameters", npar, 0, npar);
+    TH1F ntrk("ntrk", "number of tracks", 16, 0.5, 16.5);
+    ntrk.SetXTitle("slot ID");
+    ntrk.SetBinContent(m_targetMid, m_ntrk);
+    ntrk.Write();
+
+    std::string name, title;
+    name = "results_slot" + to_string(m_targetMid);
+    title = "alignment parameters, slot " + to_string(m_targetMid);
+    int npar = m_align.getParameters().size();
+    TH1F h0(name.c_str(), title.c_str(), npar, 0, npar);
     const auto& par = m_align.getParameters();
     const auto& err = m_align.getErrors();
     for (int i = 0; i < npar; i++) {
@@ -282,7 +294,9 @@ namespace Belle2 {
     }
     h0.Write();
 
-    TH2F h1("errMatrix", "error matrix", npar, 0, npar, npar, 0, npar);
+    name = "errMatrix_slot" + to_string(m_targetMid);
+    title = "error matrix, slot " + to_string(m_targetMid);
+    TH2F h1(name.c_str(), title.c_str(), npar, 0, npar, npar, 0, npar);
     const auto& errMatrix = m_align.getErrorMatrix();
     for (int i = 0; i < npar; i++) {
       for (int k = 0; k < npar; k++) {
@@ -291,7 +305,9 @@ namespace Belle2 {
     }
     h1.Write();
 
-    TH2F h2("corMatrix", "correlation matrix", npar, 0, npar, npar, 0, npar);
+    name = "corMatrix_slot" + to_string(m_targetMid);
+    title = "correlation matrix, slot " + to_string(m_targetMid);
+    TH2F h2(name.c_str(), title.c_str(), npar, 0, npar, npar, 0, npar);
     std::vector<double> diag;
     for (int i = 0; i < npar; i++) {
       double d = errMatrix[i * (1 + npar)];

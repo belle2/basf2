@@ -47,10 +47,7 @@ namespace Belle2 {
       m_fixed.resize(numPar, false);
       m_COV.resize(numPar * numPar, 0);
       m_U.resize(numPar * numPar, 0);
-      m_maxDpar.resize(3, 1.0);
-      m_maxDpar.resize(6, 0.01);
-      m_maxDpar.resize(7, 0.05);
-      m_maxDpar.resize(8, 0.005);
+      m_maxDpar.resize(numPar, 0);
     }
 
 
@@ -64,6 +61,7 @@ namespace Belle2 {
       m_steps[5] = angle;
       m_steps[6] = time;
       m_steps[7] = refind;
+      m_maxDpar = m_steps;
     }
 
 
@@ -141,10 +139,6 @@ namespace Belle2 {
       auto steps = m_steps;
       for (size_t i = 0; i < steps.size(); i++) {
         if (m_fixed[i]) steps[i] = 0;
-      }
-      if (m_valid) {
-        double sf = sqrt(static_cast<double>(m_numTracks / 100 + 1));
-        for (auto& step : steps) step /= sf;
       }
       top_alignment_(&np, m_par.data(), steps.data(), m_U.data(),
                      dpar.data(), m_COV.data(), &ier);

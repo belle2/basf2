@@ -94,7 +94,6 @@ namespace TreeFitter {
     //
     jacobian = jacobianToHelixParameters * jacobianRot;
 
-#endif
   }
 
   std::string HelixUtils::helixParName(int i)

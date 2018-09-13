@@ -75,7 +75,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
   }
 
   ret = b2_timed_blocking_io(sd, NETWORK_IO_TIMEOUT /* secs */);
-  if (sd == -1) {
+  if (ret == -1) {
     ERROR(b2_timed_blocking_io);
     return -1;
   }

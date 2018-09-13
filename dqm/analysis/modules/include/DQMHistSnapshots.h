@@ -1,8 +1,8 @@
 //+
-// File : DQMHistComparitor.h
+// File : DQMHistSnapshots.h
 // Description :
 //
-// Author : Bjoern Spruck, Uni Mainz
+// Author : Boqun Wang, U. of Cincinnati
 // Date : yesterday
 //-
 
@@ -21,31 +21,24 @@
 #include <TH1.h>
 #include <TCanvas.h>
 #include <TFile.h>
+#include <time.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistComparitorModule : public DQMHistAnalysisModule {
+  class DQMHistSnapshotsModule : public DQMHistAnalysisModule {
 
     typedef struct {
-#ifdef _BELLE2_EPICS
-      chid    mychid;
-#endif
-      bool epicsflag;
-      TString histo1;
-      TString histo2;
+      TH1* histo;
       TCanvas* canvas;
-      float warning;
-      float error;
-      int min_entries;
-    } CMPNODE;
+    } SSNODE;
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    DQMHistComparitorModule();
-    virtual ~DQMHistComparitorModule();
+    DQMHistSnapshotsModule();
+    virtual ~DQMHistSnapshotsModule();
 
     //! Module functions to be called from main process
     virtual void initialize();
@@ -55,18 +48,15 @@ namespace Belle2 {
     virtual void event();
     virtual void endRun();
     virtual void terminate();
-    CMPNODE* find_pnode(TString a);
+    SSNODE* find_snapshot(TString a);
+    TCanvas* find_canvas(TString s);
 
     // Data members
   private:
-    /** Parameter list for histograms */
-    std::vector< std::vector<std::string>> m_histlist;
-    /** Struct for extracted parameters + EPICS PV */
-    std::vector<CMPNODE*> m_pnode;
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-    /** The pointer to the reference file */
-    TFile* m_refFile;
+    /** Struct for extracted parameters */
+    std::vector<SSNODE*> m_ssnode;
+    int m_check_interval;
+    time_t m_last_check;
 
     TH1* GetHisto(TString histoname);
 

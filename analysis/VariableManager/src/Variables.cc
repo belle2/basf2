@@ -365,11 +365,18 @@ namespace Belle2 {
       return std::cos((part->getVertex() - T.getBeamParams().getVertex()).Angle(part->getMomentum()));
     }
 
-    double cosThetaBetweenParticleAndTrueB(const Particle* part)
+    double cosThetaBetweenParticleAndNominalB(const Particle* part)
     {
+
+      int particlePDG = abs(part->getPDGCode());
+      if (particlePDG != 511 and particlePDG != 521)
+        B2FATAL("The Variables cosThetaBetweenParticleAndNominalB is only meant to be used on B mesons!");
+
       PCmsLabTransform T;
-      double e_Beam = T.getCMSEnergy() / 2;
+      // Hardcoded value, how to bypass this?
+      double e_Beam = 1.0579400E+1 / 2.0; // GeV
       double m_B = part->getPDGMass();
+
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
       TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
@@ -377,9 +384,9 @@ namespace Belle2 {
       double m_d = p.M();
       double p_d = p.Rho();
 
-      double theta_Bd = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
+      double theta_BY = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
-      return theta_Bd;
+      return theta_BY;
     }
 
     Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
@@ -1161,9 +1168,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
                       cosAngleBetweenMomentumAndVertexVector,
                       "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
-    REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
-                      cosThetaBetweenParticleAndTrueB,
-                      "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosThetaBetweenParticleAndNominalB",
+                      cosThetaBetweenParticleAndNominalB,
+                      "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheMother", cosHelicityAngleIfCMSIsTheMother,
                       "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
                       "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"

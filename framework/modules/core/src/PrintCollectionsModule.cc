@@ -32,11 +32,10 @@ REG_MODULE(PrintCollections)
 
 PrintCollectionsModule::PrintCollectionsModule()
 {
-  setDescription("Prints the contents of the DataStore in each event, listing all objects and arrays (including size).");
+  setDescription("Prints the contents of the DataStore in an event, listing all objects and arrays (including size).");
 
   addParam("printForEvent", m_printForEvent,
-           "Print the collections only for a specific event number. "
-           "If set to 0, the collections of all events will be printed, which might be a lot of output.",
+           "Print the collections only for a specific event number.  If set to -1 (default) only the collections of the first event will be printed, if set to 0, the collections of all events will be printed, which might be a lot of output.",
            m_printForEvent);
 }
 
@@ -54,8 +53,15 @@ void PrintCollectionsModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
-  // check if printing for a specific event was selected.
-  if ((m_printForEvent != eventMetaDataPtr->getEvent()) and (m_printForEvent > 0))
+  // check if printing only for the first event
+  if (m_printForEvent < 0) {
+    if (m_firstEvent)
+      m_firstEvent = false;
+    else
+      return;
+  }
+  // or for a specific event
+  else if ((m_printForEvent > 0) && ((unsigned int)m_printForEvent != eventMetaDataPtr->getEvent()))
     return;
 
   B2INFO("============================================================================");

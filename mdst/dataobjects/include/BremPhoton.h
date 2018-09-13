@@ -14,7 +14,11 @@
 
 namespace Belle2 {
   /**
-   * Class to save found bremsstrahlung photons
+   * Class to make information about bremsstrahlung photons found by the ECLTrackBremFinder available
+   * on mdst level.
+   * In general this class is used to relate the track (i.e. electron) with an ECLCluster (bremsstrahlung photon) using
+   * the detour of the BremPhoton to distinguish the relation from the default track cluster relation used track-cluster matching.
+   * Track <-> BremPhoton <-> ECLCluster
    */
   class BremPhoton : public RelationsObject {
   public:
@@ -23,6 +27,10 @@ namespace Belle2 {
      */
     BremPhoton() = default;
 
+    /**
+     * Constructor which handles the relation between the bremsstrahlung cluster and the track to which the cluster was found.
+     *
+     */
     BremPhoton(const Track* track, const ECLCluster* bremCluster, double accFactor)
     {
       addRelationTo(track, accFactor);

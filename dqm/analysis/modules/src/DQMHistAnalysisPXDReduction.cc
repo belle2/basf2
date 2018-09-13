@@ -99,42 +99,6 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
   m_cReduction->Clear();
 }
 
-
-TH1* DQMHistAnalysisPXDReductionModule::findHistLocal(TString& a)
-{
-  B2INFO("Histo " << a << " not in memfile");
-  // the following code sux ... is there no root function for that?
-  TDirectory* d = gROOT;
-  TString myl = a;
-  TString tok;
-  Ssiz_t from = 0;
-  while (myl.Tokenize(tok, from, "/")) {
-    TString dummy;
-    Ssiz_t f;
-    f = from;
-    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-      auto e = d->GetDirectory(tok);
-      if (e) {
-        B2INFO("Cd Dir " << tok);
-        d = e;
-      }
-      d->cd();
-    } else {
-      break;
-    }
-  }
-  TObject* obj = d->FindObject(tok);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      B2INFO("Histo " << a << " found in mem");
-      return (TH1*)obj;
-    }
-  } else {
-    B2INFO("Histo " << a << " NOT found in mem");
-  }
-  return NULL;
-}
-
 void DQMHistAnalysisPXDReductionModule::event()
 {
 //   double data = 0.0;
@@ -144,28 +108,15 @@ void DQMHistAnalysisPXDReductionModule::event()
   bool enough = false;
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    VxdID& aModule = m_PXDModules[i ];
+    std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
+    // std::replace( name.begin(), name.end(), '.', '_');
 
-    TString buff = (std::string)aModule;
-//     buff.ReplaceAll(".", "_");
-
-    TH1* hh1 = NULL;
-
-    TString a = "PXDDAQDHEDataReduction_" + buff;
-    hh1 = findHist(a.Data());
+    TH1* hh1 = findHist(name);
     if (hh1 == NULL) {
-      hh1 = findHistLocal(a);
-    }
-    if (hh1 == NULL) {
-      a = m_histogramDirectoryName + "/PXDDAQDHEDataReduction_" + buff;
-      hh1 = findHist(a.Data());
-    }
-    if (hh1 == NULL) {
-      a = m_histogramDirectoryName + "/PXDDAQDHEDataReduction_" + buff;
-      hh1 = findHistLocal(a);
+      hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-      B2INFO("Histo " << a << " found in mem");
+      B2INFO("Histo " << name << " found in mem");
       m_hReduction->Fill(i, hh1->GetMean());
       if (hh1->GetEntries() > 100) enough = true;
     }

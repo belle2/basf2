@@ -60,8 +60,6 @@ namespace Belle2 {
     TCanvas* m_cCharge;
 //     TLine* m_line1, *m_line2, *m_line3;
 
-    TH1* findHistLocal(TString& a);
-
 #ifdef _BELLE2_EPICS
     chid  mychid[2];// two PVs, Mean and maximum deviation
 #endif

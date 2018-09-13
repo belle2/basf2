@@ -219,7 +219,6 @@ namespace Belle2 {
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile;
-    //TH1* findHistLocal(TString& a);
     TH1* GetHisto(TString histoname);
 
   };

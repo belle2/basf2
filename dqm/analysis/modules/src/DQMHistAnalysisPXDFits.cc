@@ -30,6 +30,8 @@ DQMHistAnalysisPXDFitsModule::DQMHistAnalysisPXDFitsModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
+           std::string("pxdraw"));
 //  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   for (auto i = 0, j = 0; i < 64; i++) {
     auto layer = (((i >> 5) & 0x1) + 1);
@@ -44,9 +46,6 @@ DQMHistAnalysisPXDFitsModule::DQMHistAnalysisPXDFitsModule()
   }
   B2DEBUG(1, "DQMHistAnalysisPXDFits: Constructor done.");
 }
-
-
-DQMHistAnalysisPXDFitsModule::~DQMHistAnalysisPXDFitsModule() { }
 
 void DQMHistAnalysisPXDFitsModule::initialize()
 {
@@ -157,42 +156,6 @@ void DQMHistAnalysisPXDFitsModule::beginRun()
   }
 }
 
-
-TH1* DQMHistAnalysisPXDFitsModule::findHistLocal(TString& a)
-{
-  // B2INFO("Histo " << a << " not in memfile");
-  // the following code sux ... is there no root function for that?
-  TDirectory* d = gROOT;
-  TString myl = a;
-  TString tok;
-  Ssiz_t from = 0;
-  while (myl.Tokenize(tok, from, "/")) {
-    TString dummy;
-    Ssiz_t f;
-    f = from;
-    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-      auto e = d->GetDirectory(tok);
-      if (e) {
-        // B2INFO("Cd Dir " << tok);
-        d = e;
-      }
-      d->cd();
-    } else {
-      break;
-    }
-  }
-  TObject* obj = d->FindObject(tok);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      // B2INFO("Histo " << a << " found in mem");
-      return (TH1*)obj;
-    }
-  } else {
-    // B2INFO("Histo " << a << " NOT found in mem");
-  }
-  return NULL;
-}
-
 void DQMHistAnalysisPXDFitsModule::event()
 {
 //  bool flag = false;
@@ -217,20 +180,10 @@ void DQMHistAnalysisPXDFitsModule::event()
         TH1* hh1 = NULL;
         string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
 
-        TString a;
-
-        a = "hrawPxdHitsCharge" + s2;
-        hh1 = findHist(a.Data());
+        std::string name = "hrawPxdHitsCharge" + s2;
+        hh1 = findHist(name);
         if (hh1 == NULL) {
-          hh1 = findHistLocal(a);
-        }
-        if (hh1 == NULL) {
-          a = "pxdraw/hrawPxdHitsCharge" + s2;
-          hh1 = findHist(a.Data());
-        }
-        if (hh1 == NULL) {
-          a = "pxdraw/hrawPxdHitsCharge" + s2;
-          hh1 = findHistLocal(a);
+          hh1 = findHist(m_histogramDirectoryName, name);
         }
 
         if (hh1 != NULL) {
@@ -244,21 +197,13 @@ void DQMHistAnalysisPXDFitsModule::event()
           m_hSignal[i]->Fill(j, k, hh1->GetMean());
           m_hSignalAll->Fill(i, hh1->GetMean());
         } else {
-          B2INFO("Histo " << a << " not found");
+          B2INFO("Histo " << name << " not found");
         }
 
-        a = "hrawPxdHitsCommonMode" + s2;
-        hh1 = findHist(a.Data());
+        name = "hrawPxdHitsCommonMode" + s2;
+        hh1 = findHist(name);
         if (hh1 == NULL) {
-          hh1 = findHistLocal(a);
-        }
-        if (hh1 == NULL) {
-          a = "pxdraw/hrawPxdHitsCommonMode" + s2;
-          hh1 = findHist(a.Data());
-        }
-        if (hh1 == NULL) {
-          a = "pxdraw/hrawPxdHitsCommonMode" + s2;
-          hh1 = findHistLocal(a);
+          hh1 = findHist(m_histogramDirectoryName, name);
         }
 
         if (hh1 != NULL) {
@@ -272,21 +217,13 @@ void DQMHistAnalysisPXDFitsModule::event()
           m_hCommon[i]->Fill(j, k, hh1->GetMean());
           m_hCommonAll->Fill(i, hh1->GetMean());
         } else {
-          B2INFO("Histo " << a << " not found");
+          B2INFO("Histo " << name << " not found");
         }
 
-        a = "hrawPxdCount" + s2;
-        hh1 = findHist(a.Data());
+        name = "hrawPxdCount" + s2;
+        hh1 = findHist(name);
         if (hh1 == NULL) {
-          hh1 = findHistLocal(a);
-        }
-        if (hh1 == NULL) {
-          a = "pxdraw/hrawPxdCount" + s2;
-          hh1 = findHist(a.Data());
-        }
-        if (hh1 == NULL) {
-          a = "pxdraw/hrawPxdCount" + s2;
-          hh1 = findHistLocal(a);
+          hh1 = findHist(m_histogramDirectoryName, name);
         }
 
         if (hh1 != NULL) {
@@ -301,7 +238,7 @@ void DQMHistAnalysisPXDFitsModule::event()
           m_hCountsAll->Fill(i, hh1->GetMean());
           m_hOccupancyAll->Fill(i, hh1->GetMean() / (250 * 768 / 24)); // Occupancy in percent
         } else {
-          B2INFO("Histo " << a << " not found");
+          B2INFO("Histo " << name << " not found");
         }
       }
     }

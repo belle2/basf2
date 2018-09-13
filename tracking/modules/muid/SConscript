@@ -4,6 +4,9 @@ env['LIBS'] = [
     'CLHEP',
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
+    'analysis_dataobjects',
+    'tracking_dataobjects',
+    'analysis',
     'tracking',
     'framework'
     ]

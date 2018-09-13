@@ -18,39 +18,63 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * return KLM cluster's timing
+     * returns KLMCluster's timing
      */
     double klmClusterTiming(const Particle* particle);
 
     /**
-     * return KLM cluster's x position
+     * returns KLMCluster's x position
      */
     double klmClusterPositionX(const Particle* particle);
 
     /**
-     * return KLM cluster's y position
+     * returns KLMCluster's y position
      */
     double klmClusterPositionY(const Particle* particle);
 
     /**
-     * return KLM cluster's z position
+     * returns KLMCluster's z position
      */
     double klmClusterPositionZ(const Particle* particle);
 
     /**
-     * return KLM cluster's number of the innermost layer with hits
+     * returns KLMCluster's number of the innermost layer with hits
      */
     double klmClusterInnermostLayer(const Particle* particle);
 
     /**
-     * return KLM cluster's number of layers with hits
+     * returns KLMCluster's number of layers with hits
      */
     double klmClusterLayers(const Particle* particle);
 
     /**
-     * return the maximum angle of a KLM cluster to this particle in the CMS frame
+     * returns KLMCluster's energy (assuming the K_L0 hypothesis). N.B.: if the cluster is built
+     * only with RPC hits, the energy is proportional to klmClusterLayers
+     */
+    double klmClusterEnergy(const Particle* particle);
+
+    /**
+     * returns KLMCluster's momentum magnitude. N.B.: if the cluster is built only with RPC hits,
+     * the momentum is proportional to klmClusterLayers
+     */
+    double klmClusterMomentum(const Particle* particle);
+
+    /**
+     * returns the maximum angle of a KLMCluster to this Particle in the CMS frame
      */
     double maximumKLMAngleCMS(const Particle* particle);
+
+    /**
+     * returns the number of Tracks matched to the KLMCluster associated to this Particle
+     * (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).
+     */
+    double nKLMClusterTrackMatches(const Particle* particle);
+
+    /**
+     * returns the number of KLMClusters matched to the Track associated to this Particle.
+     * This variable returns NaN for K_L0 (they have no Tracks associated). It can return >1
+     */
+    double nMatchedKLMClusters(const Particle* particle);
 
   }
 } // Belle2 namespace

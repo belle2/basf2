@@ -2235,6 +2235,238 @@ namespace {
     EXPECT_FLOAT_EQ(totalNeutralClusterE + totalTrackClusterE, eclEnergy);
   }
 
+  class KLMVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle and KLMCluster arrays. */
+    virtual void SetUp()
+    {
+      // setup the DataStore
+      DataStore::Instance().setInitializeActive(true);
+
+      // particles (to be filled)
+      StoreArray<Particle> particles;
+      particles.registerInDataStore();
+
+      // mock up mdst objects
+      StoreArray<Track> tracks;
+      tracks.registerInDataStore();
+      StoreArray<TrackFitResult> trackFits;
+      trackFits.registerInDataStore();
+      StoreArray<KLMCluster> klmClusters;
+      klmClusters.registerInDataStore();
+
+      // tracks can be matched to clusters
+      tracks.registerRelationTo(klmClusters);
+
+      // we're done setting up the datastore
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(KLMVariableTest, WholeEventClosure)
+  {
+    // we need the Particles, Tracks, TrackFitResults and KLMClusters StoreArrays
+    StoreArray<Particle> particles;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> trackFits;
+    StoreArray<KLMCluster> klmClusters;
+
+    // create a KLong (clusters) and muon (tracks) lists
+    StoreObjPtr<ParticleList> kLongList("K0_L:testKLong");
+    StoreObjPtr<ParticleList> muonsList("mu-:testMuons");
+    StoreObjPtr<ParticleList> amuonsList("mu+:testMuons");
+
+    // register the lists in the datastore
+    DataStore::Instance().setInitializeActive(true);
+    kLongList.registerInDataStore(DataStore::c_DontWriteOut);
+    muonsList.registerInDataStore(DataStore::c_DontWriteOut);
+    amuonsList.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    kLongList.create();
+    kLongList->initialize(130, kLongList.getName());
+    muonsList.create();
+    muonsList->initialize(13, muonsList.getName());
+    amuonsList.create();
+    amuonsList->initialize(-13, amuonsList.getName());
+    amuonsList->bindAntiParticleList(*(muonsList));
+
+    // add some tracks
+    const Track* t1 = tracks.appendNew(Track());
+    const Track* t2 = tracks.appendNew(Track());
+    const Track* t3 = tracks.appendNew(Track());
+    tracks.appendNew(Track());
+    tracks.appendNew(Track());
+
+    // mock up some TrackFits for them (all muons)
+    TRandom3 generator;
+    TMatrixDSym cov6(6);
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      int charge = (i % 2 == 0) ? +1 : -1;
+      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215);
+      tracks[i]->setTrackFitResultIndex(Const::muon, i);
+    }
+
+    // add some clusters
+    KLMCluster* klm1 = klmClusters.appendNew(KLMCluster());
+    klm1->setTime(1.1);
+    klm1->setClusterPosition(1.1, 1.1, 1.0);
+    klm1->setLayers(1);
+    klm1->setInnermostLayer(1);
+    klm1->setMomentumMag(1.0);
+    KLMCluster* klm2 = klmClusters.appendNew(KLMCluster());
+    klm2->setTime(1.2);
+    klm2->setClusterPosition(1.2, 1.2, 2.0);
+    klm2->setLayers(2);
+    klm2->setInnermostLayer(2);
+    klm2->setMomentumMag(1.0);
+    KLMCluster* klm3 = klmClusters.appendNew(KLMCluster());
+    klm3->setTime(1.3);
+    klm3->setClusterPosition(1.3, 1.3, 3.0);
+    klm3->setLayers(3);
+    klm3->setInnermostLayer(3);
+    klm3->setMomentumMag(1.0);
+
+    // and add clusters related to the tracks
+    // case 1: 1 track --> 1 cluster
+    KLMCluster* klm4 = klmClusters.appendNew(KLMCluster());
+    klm4->setTime(1.4);
+    klm4->setClusterPosition(-1.4, -1.4, 1.0);
+    klm4->setLayers(4);
+    klm4->setInnermostLayer(4);
+    klm4->setMomentumMag(1.0);
+    t1->addRelationTo(klm4);
+
+    // case 2: 2 tracks --> 1 cluster
+    KLMCluster* klm5 = klmClusters.appendNew(KLMCluster());
+    klm5->setTime(1.5);
+    klm5->setClusterPosition(-1.5, -1.5, 1.0);
+    klm5->setLayers(5);
+    klm5->setInnermostLayer(5);
+    klm5->setMomentumMag(1.0);
+    t2->addRelationTo(klm5);
+    t3->addRelationTo(klm5);
+
+    // case 3: 1 track --> 2 clusters
+    // possible case, but not covered
+
+    // make the KLong from clusters (and sum up the total KLM momentum magnitude)
+    double klmMomentum = 0.0;
+    for (int i = 0; i < klmClusters.getEntries(); ++i) {
+      klmMomentum += klmClusters[i]->getMomentumMag();
+      if (!klmClusters[i]->getAssociatedTrackFlag()) {
+        const Particle* p = particles.appendNew(Particle(klmClusters[i]));
+        kLongList->addParticle(p);
+      }
+    }
+
+    // make the muons from tracks
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      const Particle* p = particles.appendNew(Particle(tracks[i], Const::muon));
+      muonsList->addParticle(p);
+    }
+
+    // grab variables
+    const Manager::Var* vClusterP = Manager::Instance().getVariable("klmClusterMomentum");
+    const Manager::Var* vClNTrack = Manager::Instance().getVariable("nKLMClusterTrackMatches");
+
+    // calculate the total KLM momentum from the KLong list --> VM
+    double totalKLongMomentum = 0.0;
+    for (size_t i = 0; i < kLongList->getListSize(); ++i)
+      totalKLongMomentum += vClusterP->function(kLongList->getParticle(i));
+
+    // calculate the total KLM momentum from muon-matched list --> VM
+    double totalMuonMomentum = 0.0;
+    for (size_t i = 0; i < muonsList->getListSize(); ++i) { // includes antiparticles
+      double muonMomentum = vClusterP->function(muonsList->getParticle(i));
+      double nOtherCl = vClNTrack->function(muonsList->getParticle(i));
+      if (nOtherCl > 0)
+        totalMuonMomentum += muonMomentum / nOtherCl;
+    }
+
+    EXPECT_FLOAT_EQ(5.0, klmMomentum);
+    EXPECT_FLOAT_EQ(totalKLongMomentum + totalMuonMomentum, klmMomentum);
+  }
+
+  TEST_F(KLMVariableTest, MoreClustersToOneTrack)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> trackFits;
+    StoreArray<KLMCluster> klmClusters;
+
+    // add a TrackFitResult
+    TRandom3 generator;
+
+    const float pValue = 0.5;
+    const float bField = 1.5;
+    const int charge = 1;
+    TMatrixDSym cov6(6);
+
+    TVector3 position(1.0, 0, 0);
+    TVector3 momentum(0, 1.0, 0);
+
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+
+    trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
+
+    // add one Track
+    Track myTrack;
+    myTrack.setTrackFitResultIndex(Const::muon, 0);
+    Track* muonTrack = tracks.appendNew(myTrack);
+
+    // add two KLMClusters
+    KLMCluster* klm1 = klmClusters.appendNew(KLMCluster());
+    klm1->setTime(1.1);
+    klm1->setClusterPosition(1.1, 1.1, 1.0);
+    klm1->setLayers(5);
+    klm1->setInnermostLayer(1);
+    klm1->setMomentumMag(1.0);
+    KLMCluster* klm2 = klmClusters.appendNew(KLMCluster());
+    klm2->setTime(1.2);
+    klm2->setClusterPosition(1.2, 1.2, 2.0);
+    klm2->setLayers(10);
+    klm2->setInnermostLayer(2);
+    klm2->setMomentumMag(1.0);
+
+    // and add a relationship between the track and both clusters
+    muonTrack->addRelationTo(klm1);
+    muonTrack->addRelationTo(klm2);
+
+    // add a Particle
+    const Particle* muon = particles.appendNew(Particle(muonTrack, Const::muon));
+
+    // grab variables
+    const Manager::Var* vTrNClusters = Manager::Instance().getVariable("nMatchedKLMClusters");
+    const Manager::Var* vClusterInnermostLayer = Manager::Instance().getVariable("klmClusterInnermostLayer");
+
+    EXPECT_POSITIVE(vTrNClusters->function(muon));
+    EXPECT_FLOAT_EQ(2.0, vClusterInnermostLayer->function(muon));
+
+    // add a Pion - no clusters matched here
+    trackFits.appendNew(position, momentum, cov6, charge, Const::pion, pValue, bField, CDCValue, 16777215);
+    Track mySecondTrack;
+    mySecondTrack.setTrackFitResultIndex(Const::pion, 0);
+    Track* pionTrack = tracks.appendNew(mySecondTrack);
+    const Particle* pion = particles.appendNew(Particle(pionTrack, Const::pion));
+
+    EXPECT_FLOAT_EQ(0.0, vTrNClusters->function(pion));
+
+  }
 
   class FlightInfoTest : public ::testing::Test {
   protected:

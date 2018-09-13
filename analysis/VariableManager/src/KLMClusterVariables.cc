@@ -18,6 +18,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/Track.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -103,6 +104,28 @@ namespace Belle2 {
       return result;
     }
 
+    double klmClusterEnergy(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (cluster) {
+        result = cluster->getEnergy();
+      }
+      return result;
+    }
+
+    double klmClusterMomentum(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (cluster) {
+        result = cluster->getMomentumMag();
+      }
+      return result;
+    }
+
     double maximumKLMAngleCMS(const Particle* part)
     {
       PCmsLabTransform T;
@@ -122,6 +145,24 @@ namespace Belle2 {
       return maxangle;
     }
 
+    double nKLMClusterTrackMatches(const Particle* particle)
+    {
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (!cluster)
+        return std::numeric_limits<double>::quiet_NaN();
+      size_t out = cluster->getRelationsFrom<Track>().size();
+      return double(out);
+    }
+
+    double nMatchedKLMClusters(const Particle* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track)
+        return std::numeric_limits<double>::quiet_NaN();
+      size_t out = track->getRelationsTo<KLMCluster>().size();
+      return double(out);
+    }
+
     VARIABLE_GROUP("KLM Cluster");
 
     REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, "Returns KLMCluster's timing info.");
@@ -131,8 +172,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("klmClusterInnermostLayer", klmClusterInnermostLayer,
                       "Returns KLM cluster's number of the innermost layer with hits.");
     REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers, "Returns KLM cluster's number of layers with hits.");
+    REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, "Returns KLMCluster's energy (assuming K_L0 hypothesis).");
+    REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, "Returns KLMCluster's momentum magnitude.")
     REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
                       "Returns the maximum angle in the CMS between the Particle and all KLM clusters in the event.");
+    REGISTER_VARIABLE("nKLMClusterTrackMatches", nKLMClusterTrackMatches,
+                      "Returns the number of Tracks matched to the KLMCluster associated to this Particle (0 for K_L0, >0 for matched Tracks, NaN for not-matched Tracks).");
+    REGISTER_VARIABLE("nMatchedKLMClusters", nMatchedKLMClusters,
+                      "Returns the number of KLMClusters matched to the Track associated to this Particle. This variable returns NaN for K_L0 (they have no Tracks associated). It can return >1");
 
   }
 }

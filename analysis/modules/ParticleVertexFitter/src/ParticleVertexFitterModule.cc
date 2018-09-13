@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc Yu Hu           *
+ * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc, Yu Hu           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -545,7 +545,7 @@ namespace Belle2 {
       }
     }
 
-    // apply mass constraint
+    // apply four momentum constraint
     kf.setFourMomentum(m_beamParams->getHER() + m_beamParams->getLER());
 
     int err = kf.doFit();
@@ -879,6 +879,8 @@ namespace Belle2 {
     double chi2 = kf.getCHIsq();
     int ndf = kf.getNDF();
     double prob = TMath::Prob(chi2, ndf);
+    mother->addExtraInfo("FourCFitProb", prob);
+    mother->addExtraInfo("FourCFitChi2", chi2);
 
     mother->updateMomentum(mom, pos, errMatrix, prob);
 
@@ -890,13 +892,19 @@ namespace Belle2 {
 
       const unsigned nd = daughters.size();
       unsigned l = 0;
-      std::vector<std::vector<unsigned>> u(nd);
+      std::vector<std::vector<unsigned>> pars;
+      std::vector<Particle*> allparticles;
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
+        std::vector<unsigned> pard;
         if (daughter->getNDaughters() > 0) {
-          updateMapofTrackandDaughter(u[ichild], l, daughter);
+          updateMapOfTrackAndDaughter(l, pars, pard, allparticles, daughter);
+          pars.push_back(pard);
+          allparticles.push_back(daughters[ichild]);
         } else {
-          u[ichild].push_back(l);
+          pard.push_back(l);
+          pars.push_back(pard);
+          allparticles.push_back(daughters[ichild]);
           l++;
         }
       }
@@ -905,23 +913,23 @@ namespace Belle2 {
       if (l != track_count)
         return false;
 
-      for (unsigned iDaug = 0; iDaug < nd; iDaug++) {
+      for (unsigned iDaug = 0; iDaug < allparticles.size(); iDaug++) {
         TLorentzVector childMoms;
         TVector3 childPoss;
         TMatrixFSym childErrMatrixs(7);
-        for (unsigned iChild = 0; iChild < u[iDaug].size(); iChild++) {
-          TLorentzVector childMom(kf.getTrackMomentum(u[iDaug][iChild]).px(),
-                                  kf.getTrackMomentum(u[iDaug][iChild]).py(),
-                                  kf.getTrackMomentum(u[iDaug][iChild]).pz(),
-                                  kf.getTrackMomentum(u[iDaug][iChild]).e());
+        for (unsigned iChild = 0; iChild < pars[iDaug].size(); iChild++) {
+          TLorentzVector childMom(kf.getTrackMomentum(pars[iDaug][iChild]).px(),
+                                  kf.getTrackMomentum(pars[iDaug][iChild]).py(),
+                                  kf.getTrackMomentum(pars[iDaug][iChild]).pz(),
+                                  kf.getTrackMomentum(pars[iDaug][iChild]).e());
           childMoms = childMoms + childMom;
 
-          TVector3 childPos(kf.getTrackPosition(u[iDaug][iChild]).x(),
-                            kf.getTrackPosition(u[iDaug][iChild]).y(),
-                            kf.getTrackPosition(u[iDaug][iChild]).z());
+          TVector3 childPos(kf.getTrackPosition(pars[iDaug][iChild]).x(),
+                            kf.getTrackPosition(pars[iDaug][iChild]).y(),
+                            kf.getTrackPosition(pars[iDaug][iChild]).z());
           childPoss = childPoss + childPos;
 
-          CLHEP::HepSymMatrix childCovMatrix = kf.getTrackError(u[iDaug][iChild]);
+          CLHEP::HepSymMatrix childCovMatrix = kf.getTrackError(pars[iDaug][iChild]);
 
           TMatrixFSym childErrMatrix(7);
           for (int i = 0; i < 7; i++) {
@@ -931,22 +939,34 @@ namespace Belle2 {
           }
           childErrMatrixs = childErrMatrixs + childErrMatrix;
         }
-        daughters[iDaug]->set4Vector(childMoms);
-        daughters[iDaug]->setVertex(childPoss);
-        daughters[iDaug]->setMomentumVertexErrorMatrix(childErrMatrixs);
+        allparticles[iDaug]->set4Vector(childMoms);
+        allparticles[iDaug]->setVertex(childPoss);
+        allparticles[iDaug]->setMomentumVertexErrorMatrix(childErrMatrixs);
       }
     }
 
     return true;
   }
 
-  void ParticleVertexFitterModule::updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter)
+  void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
+      std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
   {
+    std::vector <Belle2::Particle*> childs = daughter->getDaughters();
     for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
       const Particle* child = daughter->getDaughter(ichild);
-      if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
-      else  ui.push_back(l);
-      l++;
+      std::vector<unsigned> pard;
+      if (child->getNDaughters() > 0) {
+        updateMapOfTrackAndDaughter(l, pars, pard, allparticles, child);
+        parm.insert(parm.end(), pard.begin(), pard.end());
+        pars.push_back(pard);
+        allparticles.push_back(childs[ichild]);
+      } else  {
+        pard.push_back(l);
+        parm.push_back(l);
+        pars.push_back(pard);
+        allparticles.push_back(childs[ichild]);
+        l++;
+      }
     }
   }
 

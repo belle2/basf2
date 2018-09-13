@@ -56,7 +56,8 @@ trgeclfam.param('ShapingFunction', 1)  # Choose shaping function (0: Original fu
 
 
 trgecl = register_module("TRGECL")
-trgecl.param('Clustering', 0)  # Output Clustering method(0 : Use only ICN , 1 : ICN + Max TC )
+trgecl.param('Clustering', 1)  # Output Clustering method(0 : Use only ICN , 1 : ICN + Max TC )
+# trgecl.param('ClusterLimit', 6)  # The limit # of cluster
 trgecl.param('EventTiming', 1)  # Output EventTiming method(0 : Belle  , 1 : Most energetic TC timing , 2 : Energy weighted Timing)
 trgecl.param('Bhabha', 0)  # Bhabha tagging method(0 : Belle 1: Belle II(but not supported yet))
 trgecl.param('EventSelect', 1)  # TRGECL Event Seclection(0: no selection 1: select 1 high energy bin in 1 events( 64 bins /event))
@@ -89,7 +90,7 @@ main.add_module(trgeclfam)
 main.add_module(trgecl)
 # main.add_module(trgeclMC)
 
-main.add_module(rootoutput)
+main.add_module(rootoutput, branchNames=["TRGECLTrgs", "TRGECLHits", "TRGECLClusters"])
 
 
 # main

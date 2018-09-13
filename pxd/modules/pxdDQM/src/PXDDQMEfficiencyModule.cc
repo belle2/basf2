@@ -11,6 +11,8 @@
 #include <pxd/modules/pxdDQM/PXDDQMEfficiencyModule.h>
 #include <tracking/dataobjects/ROIid.h>
 
+#include <pxd/reconstruction/PXDPixelMasker.h>
+
 #include "TDirectory.h"
 #include "TMatrixDSym.h"
 using namespace Belle2;
@@ -49,8 +51,14 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
 
-  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
+  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
 
+  addParam("maskDeadPixels", m_maskDeadPixels, "Do not consider tracks going through known dead or hot pixels for the efficiency",
+           bool(false));
+
+  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
+
+  addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
 }
 
 
@@ -64,9 +72,10 @@ void PXDDQMEfficiencyModule::initialize()
   REG_HISTOGRAM;
 
   //register the required arrays
-  m_pxdclusters.isRequired(m_pxdClustersName);
-  m_tracks.isRequired(m_tracksName);
-  m_ROIs.isRequired(m_ROIsName);
+  //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
+  m_pxdclusters.isOptional(m_pxdClustersName);
+  m_tracks.isOptional(m_tracksName);
+  m_ROIs.isOptional(m_ROIsName);
 }
 
 
@@ -79,14 +88,34 @@ void PXDDQMEfficiencyModule::beginRun()
 
 void PXDDQMEfficiencyModule::event()
 {
+  if (!m_pxdclusters.isValid()) {
+    B2INFO("PXDClusters array is missing, no efficiencies");
+    return;
+  }
+  if (!m_tracks.isValid()) {
+    B2INFO("RecoTrack array is missing, no efficiencies");
+    return;
+  }
+  if (!m_ROIs.isValid() && m_requireROIs) {
+    B2INFO("ROI array is missing but required hits in ROIs, aborting");
+    return;
+  }
+
+
   for (auto& a_track : m_tracks) {
 
     //If fit failed assume position pointed to is useless anyway
     if (!a_track.wasFitSuccessful()) continue;
 
+    if (a_track.getNumberOfSVDHits() < m_minSVDHits) continue;
+
     const genfit::FitStatus* fitstatus = NULL;
     fitstatus = a_track.getTrackFitStatus();
     if (fitstatus->getPVal() < m_pcut) continue;
+
+    genfit::MeasuredStateOnPlane trackstate;
+    trackstate = a_track.getMeasuredStateOnPlaneFromFirstHit();
+    if (trackstate.getMom().Mag() < m_momCut) continue;
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -113,6 +142,12 @@ void PXDDQMEfficiencyModule::event()
         int ucell_fit = info.getUCellID(intersec_buff.X());
         int vcell_fit = info.getVCellID(intersec_buff.Y());
 
+        if (m_maskDeadPixels) {
+          if (PXD::PXDPixelMasker::getInstance().pixelDead(aVxdID, ucell_fit, vcell_fit)
+              || !PXD::PXDPixelMasker::getInstance().pixelOK(aVxdID, ucell_fit, vcell_fit)) {
+            continue;
+          }
+        }
 
         if (m_requireROIs) {
           //Check if the intersection is inside a ROI
@@ -262,12 +297,10 @@ PXDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
     //Do not consider as different if only segment differs!
     //As of this writing segment is never filled for clusters, but just to be sure
     VxdID clusterID = m_pxdclusters[iclus]->getSensorID();
-    if (avxdid.getLayerNumber() != clusterID.getLayerNumber()) {
-      if (avxdid.getLadderNumber() != clusterID.getLadderNumber()) {
-        if (avxdid.getSensorNumber() != clusterID.getSensorNumber()) {
-          continue;
-        }
-      }
+    if (avxdid.getLayerNumber() != clusterID.getLayerNumber() ||
+        avxdid.getLadderNumber() != clusterID.getLadderNumber() ||
+        avxdid.getSensorNumber() != clusterID.getSensorNumber()) {
+      continue;
     }
     //only cluster on the correct sensor and direction should survive
 

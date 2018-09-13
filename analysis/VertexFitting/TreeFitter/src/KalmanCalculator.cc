@@ -34,13 +34,12 @@ namespace TreeFitter {
   ErrCode KalmanCalculator::calculateGainMatrix(
     const Eigen::Matrix < double, -1, 1, 0, 5, 1 > & residuals,
     const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & G,
-    const FitParams* fitparams,
+    const FitParams& fitparams,
     const Eigen::Matrix < double, -1, -1, 0, 5, 5 > * V,
     double weight)
   {
     m_res = residuals;
     m_G = G;
-
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C =
       Eigen::Matrix < double, -1, -1, 0 , MAX_MATRIX_SIZE, MAX_MATRIX_SIZE >
       ::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
@@ -49,9 +48,8 @@ namespace TreeFitter {
       Eigen::Matrix < double, -1, -1, 0, 5, 5 >
       ::Zero(m_constrDim, m_constrDim).triangularView<Eigen::Lower>();
 
-    C  = fitparams->getCovariance().triangularView<Eigen::Lower>();
+    C  = fitparams.getCovariance().triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
-
     Rtemp = G * m_CGt;
     if (V && (weight) && ((*V).diagonal().array() != 0).all()) {
 
@@ -59,6 +57,7 @@ namespace TreeFitter {
         weight * (*V).selfadjointView<Eigen::Lower>();
 
       m_R = Rtemp + weightedV;
+
     } else {
       m_R = Rtemp.triangularView<Eigen::Lower>();
     }
@@ -66,27 +65,32 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, 5, 5 > RInvtemp;
     RInvtemp = m_R.selfadjointView<Eigen::Lower>();
     m_Rinverse = RInvtemp.inverse();
-
     if (!m_Rinverse.allFinite()) { return ErrCode(ErrCode::Status::inversionerror); }
 
     m_K = m_CGt * m_Rinverse.selfadjointView<Eigen::Lower>();
-
     return ErrCode(ErrCode::Status::success);
   }
 
-  void KalmanCalculator::updateState(FitParams* fitparams)
+  void KalmanCalculator::updateState(FitParams& fitparams)
   {
-    fitparams->getStateVector() -= m_K * m_res;
+    fitparams.getStateVector() -= m_K * m_res;
     m_chisq = m_res.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_res;
+  }
+
+  void KalmanCalculator::updateState(FitParams& fitparams, FitParams& oldState)
+  {
+    Eigen::Matrix < double, -1, 1, 0, 5, 1 > res_prime =
+      m_res + m_G * (oldState.getStateVector() - fitparams.getStateVector());
+    fitparams.getStateVector() = oldState.getStateVector() -  m_K * res_prime;
+    m_chisq = res_prime.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * res_prime;
   }
 
   TREEFITTER_NO_STACK_WARNING
 
-  void KalmanCalculator::updateCovariance(FitParams* fitparams)
+  void KalmanCalculator::updateCovariance(FitParams& fitparams)
   {
-
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > fitCov  =
-      fitparams->getCovariance().triangularView<Eigen::Lower>();
+      fitparams.getCovariance().triangularView<Eigen::Lower>();
 
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > GRinvGt =
       m_G.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_G;
@@ -98,12 +102,12 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > delta =
       fitCov - deltaCov;
 
-    fitparams->getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
+    fitparams.getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
 
     for (int col = 0; col < m_constrDim; ++col) {
       for (int k = 0; k < m_stateDim; ++k) {
         if (m_G(col, k) != 0) {
-          ++(fitparams->incrementNConstraintsVec(k));
+          ++(fitparams.incrementNConstraintsVec(k));
         }
       }
     }//end for block

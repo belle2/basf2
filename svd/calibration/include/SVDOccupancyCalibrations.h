@@ -41,8 +41,11 @@ namespace Belle2 {
     /** Constructor, no input argument is required */
     SVDOccupancyCalibrations()
       : m_aDBObjPtr(name)
-      , m_threshold_aDBObjPtr(threshold_name)
-    {}
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDOccupancyCalibrations: from now one we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
 
     /** This is the method for getting the occupancy, or the deviation from the average, still to be decided.
@@ -63,22 +66,6 @@ namespace Belle2 {
     }
 
 
-    /** This method provides the threshold on the occupancy deviation per strip which is set to apply the offline masking.
-    * Input:
-    * @param sensor ID: identitiy of the sensor for which the
-    * calibration is required
-    * @param isU: sensor side, true for p (u) side, false for n (v) side
-    * @param strip: strip number
-    *
-    * Output: float corresponding to the set threshold applied fo r masking.
-    */
-    inline float getOccupancyThreshold(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
-    {
-      return m_threshold_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                                        sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                                        strip);
-    }
-
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
 
@@ -87,7 +74,6 @@ namespace Belle2 {
 
   private:
     DBObjPtr< t_payload > m_aDBObjPtr;
-    DBObjPtr< t_threshold_payload > m_threshold_aDBObjPtr;
 
 
   };

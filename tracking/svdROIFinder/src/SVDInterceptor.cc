@@ -119,6 +119,21 @@ SVDInterceptor::appendIntercepts(StoreArray<SVDIntercept>* interceptList, std::l
       tmpSVDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
       tmpSVDIntercept.setLambda(lambda);
       tmpSVDIntercept.setVxdID(itPlanes->getSensorInfo());
+      tmpSVDIntercept.setUprime(predictedIntersect[1]);
+      tmpSVDIntercept.setVprime(predictedIntersect[2]);
+
+      B2DEBUG(10, "coordinates with getPos = " << state.getPos().X()
+              << ", " << state.getPos().Y()
+              << ", " << state.getPos().Z());
+      B2DEBUG(10, "coordinates with predInter = " << predictedIntersect[3]
+              << ", " << predictedIntersect[4]);
+      B2DEBUG(10, "momentum with getMom = " << state.getMom().X()
+              << ", " << state.getMom().Y()
+              << ", " << state.getMom().Z());
+      B2DEBUG(10, "U/V prime momentum with getMom = " << state.getMom().Z() / state.getMom().X()
+              << ", " << state.getMom().Z() / state.getMom().Y());
+      B2DEBUG(10, "U/V prime momentum with predInter = " << predictedIntersect[1]
+              << ", " << predictedIntersect[2]);
 
       interceptList->appendNew(tmpSVDIntercept);
 

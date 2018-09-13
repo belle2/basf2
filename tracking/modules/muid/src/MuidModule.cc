@@ -95,6 +95,10 @@ MuidModule::MuidModule() :
            0.0);
   addParam("deltaChordInMagneticField", m_DeltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
+  addParam("addHitsToRecoTrack", m_addHitsToRecoTrack,
+           "Parameter to add the found hits also to the reco tracks or not. Is turned off by default. "
+           "Make sure to refit the track afterwards.",
+           m_addHitsToRecoTrack);
   vector<string> defaultCommands;
   addParam("UICommands", m_UICommands, "A list of Geant4 UI commands that should be applied at the start of the job.",
            defaultCommands);
@@ -161,7 +165,7 @@ void MuidModule::initialize()
   m_Extrapolator->setECLClustersColName(m_ECLClustersColName);
   m_Extrapolator->setTrackClusterSeparationsColName(m_TrackClusterSeparationsColName);
   m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxKLMTrackClusterDistance,
-                             m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_Hypotheses);
+                             m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_addHitsToRecoTrack, m_Hypotheses);
 
   return;
 

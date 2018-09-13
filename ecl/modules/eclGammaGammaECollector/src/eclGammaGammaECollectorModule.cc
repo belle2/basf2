@@ -119,6 +119,7 @@ void eclGammaGammaECollectorModule::prepare()
   thetaLabMax = m_thetaLabMaxDeg / TMath::RadToDeg();
   B2INFO("minPairMass: " << m_minPairMass);
   B2INFO("mindPhi: " << m_mindPhi);
+  B2INFO("maxTime: " << m_maxTime);
   B2INFO("measureTrueEnergy: " << m_measureTrueEnergy);
   B2INFO("requireL1: " << m_requireL1);
 

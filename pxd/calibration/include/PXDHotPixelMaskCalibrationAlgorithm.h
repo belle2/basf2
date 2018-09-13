@@ -36,17 +36,11 @@ namespace Belle2 {
     /// Mask hot drain lines with too high average occupancy after single pixel masking
     bool maskDrains;
 
-    /// Minimum median number of hits per drain line needed for dead drain masking
-    int minHitsDrain;
-
     /// The occupancy threshold for masking hot drains is the median occupancy x drainMultiplier
     float drainMultiplier;
 
     /// Mask hot rows with too high average occupancy after single pixel masking
     bool maskRows;
-
-    /// Minimum median number of hits per row needed for dead row masking
-    int minHitsRow;
 
     /// The occupancy threshold for masking hot rows is the median occupancy x rowMultiplier
     float rowMultiplier;

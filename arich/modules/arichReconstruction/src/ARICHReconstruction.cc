@@ -46,7 +46,7 @@ namespace Belle2 {
     m_nAerogelLayers(0),
     m_storePhot(storePhot)
   {
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {p_mass[i] = 0;}
+    for (unsigned i = 0; i < c_noOfHypotheses; i++) {p_mass[i] = 0;}
     for (unsigned i = 0; i < c_noOfAerogels; i++) {
       m_refractiveInd[i] = 0;
       m_zaero[i] = 0;
@@ -102,6 +102,12 @@ namespace Belle2 {
     diff = diff.Rotate(-phi);
     const double size = m_arichgp->getHAPDGeometry().getAPDSizeX();
     if (fabs(diff.X()) < size / 2. && fabs(diff.Y()) < size / 2.) {
+      int chX, chY;
+      m_arichgp->getHAPDGeometry().getXYChannel(diff.X(), diff.Y(), chX, chY);
+      if (chX < 0 || chY < 0) return 0;
+      int asicChannel = m_chnMap->getAsicFromXY(chX, chY);
+      // eliminate un-active channels
+      if (asicChannel < 0 || !m_chnMask->isActive(copyno, asicChannel)) return 0;
       return 1;
     }
     return 0;
@@ -598,7 +604,7 @@ namespace Belle2 {
     //*********************************************
     // add constant term to the LIKELIHOOD function
     //*********************************************
-    double exppho[6] = {0.0};
+    double exppho[c_noOfHypotheses] = {0.0};
     for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
       exppho[iHyp] = nSig_w_acc[iHyp][m_nAerogelLayers] * (1 - wideGaussFract) + wideGaussFract * 0.7 *
                      nSig_wo_accInt[iHyp][m_nAerogelLayers] + nBgr[iHyp];

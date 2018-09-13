@@ -39,6 +39,11 @@ namespace Belle2 {
                       double r2, double phi2, G4double halfZlen);
 
     /**
+     * Copy constructor (disabled).
+     */
+    G4TriangularPrism(const G4TriangularPrism&) = delete;
+
+    /**
      * Destructor.
      * @details
      * The resulting solid m_is (access by getSolid()) is not deleted here.

@@ -54,16 +54,13 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
   const EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
-  double digitizationInitialTime, bool debug)
+  double digitizationInitialTime, bool debug) :
+  m_DigPar(digPar), m_fitter(fitter),
+  m_DigitizationInitialTime(digitizationInitialTime), m_Debug(debug),
+  m_FPGAStat(c_FPGANoSignal), m_npe(0), m_ChannelData(nullptr)
 {
   int i;
   double time, attenuationTime;
-  m_DigPar = digPar;
-  m_fitter = fitter;
-  m_DigitizationInitialTime = digitizationInitialTime;
-  m_Debug = debug;
-  m_npe = 0;
-  m_ChannelData = NULL;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *

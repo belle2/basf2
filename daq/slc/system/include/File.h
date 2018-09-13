@@ -10,22 +10,21 @@ namespace Belle2 {
   class File : public FileDescriptor {
 
   public:
-    static bool exist(const std::string& filename) throw();
+    static bool exist(const std::string& filename);
 
   public:
-    File() throw() {}
-    File(int fd) throw() : FileDescriptor(fd) {}
+    File() {}
+    File(int fd) : FileDescriptor(fd) {}
     File(const std::string& path,
-         const std::string& mode = "r") throw(IOException)
-    { open(path, mode); }
-    virtual ~File() throw() {}
+         const std::string& mode = "r") { open(path, mode); }
+    virtual ~File() {}
 
   public:
     void open(const std::string& path,
-              const std::string& mode = "r") throw(IOException);
-    void unlink(const std::string& path) throw(IOException);
-    virtual size_t write(const void* v, size_t count) throw(IOException);
-    virtual size_t read(void* v, size_t count) throw(IOException);
+              const std::string& mode = "r");
+    void unlink(const std::string& path);
+    virtual size_t write(const void* v, size_t count);
+    virtual size_t read(void* v, size_t count);
 
   };
 

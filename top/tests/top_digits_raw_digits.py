@@ -88,6 +88,8 @@ add_simulation(main, components=['TOP'])
 
 converter = register_module('TOPRawDigitConverter')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
+converter.param('minPulseWidth', 0.0)
+converter.param('maxPulseWidth', 1000.0)
 main.add_module(converter)
 
 main.add_module(DigitTest())

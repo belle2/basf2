@@ -48,6 +48,11 @@ namespace Belle2 {
                           bool debug);
 
       /**
+       * Copy constructor (disabled).
+       */
+      FiberAndElectronics(const FiberAndElectronics&) = delete;
+
+      /**
        * Destructor.
        */
       ~FiberAndElectronics();

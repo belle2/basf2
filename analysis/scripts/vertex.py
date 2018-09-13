@@ -412,6 +412,15 @@ def vertexTree(
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
+    :Example:
+        An example of usage for decay chain :math:`B\\to\pi^+\pi^-\pi^0` is the following:
+
+    ::
+
+      reconstructDecay('pi0:A -> gamma:pi0 gamma:pi0', '0.130 < InvM < 0.14')
+      reconstructDecay('B0:treefit -> pi+:my pi-:my pi0:A ', '')
+      vertexTree('B0:treefit', ipConstraint=True)
+
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
     @param massConstraint list of PDG ids which are mass-constrained

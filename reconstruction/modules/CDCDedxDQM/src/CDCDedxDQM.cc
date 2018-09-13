@@ -36,7 +36,6 @@ CDCDedxDQMModule::~CDCDedxDQMModule() { }
 void CDCDedxDQMModule::defineHisto()
 {
 
-
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("CDCDedx")->cd();
 
@@ -61,6 +60,10 @@ void CDCDedxDQMModule::defineHisto()
 void CDCDedxDQMModule::initialize()
 {
 
+  if (!m_cdcDedxTracks.isOptional()) {
+    B2WARNING("Missing CDCDedxTracks array, CDCDedxDQM is skipped.");
+    return;
+  }
   //hPerRunHisto = kFALSE;
   nBinsdedx = 200; nBinsdedxLE = 0.; nBinsdedxUE = 4.;
   nBinsP = 500; nBinsPLE = 0.; nBinsPUE = 10.;
@@ -83,6 +86,11 @@ void CDCDedxDQMModule::initialize()
 void CDCDedxDQMModule::beginRun()
 {
 
+  if (!m_cdcDedxTracks.isOptional()) {
+    B2WARNING("Missing CDCDedxTracks array, CDCDedxDQM is skipped.");
+    return;
+  }
+
   temp1D->Reset();
   temp2D->Reset();
 
@@ -92,6 +100,11 @@ void CDCDedxDQMModule::beginRun()
 //---------------------------------
 void CDCDedxDQMModule::event()
 {
+
+  if (!m_cdcDedxTracks.isOptional()) {
+    B2WARNING("Missing CDCDedxTracks array, CDCDedxDQM is skipped.");
+    return;
+  }
 
   for (Int_t idedx = 0; idedx < m_cdcDedxTracks.getEntries(); idedx++) {
 

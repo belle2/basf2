@@ -96,8 +96,8 @@ if __name__ == '__main__':
     # Load the data
     print("Load data")
 
-    df_sig = read_root(data_sig, args.treename, args.columns, flatten=True, where=cut_sig)
-    df_bkg = read_root(data_bkg, args.treename, args.columns, flatten=True, where=cut_bkg)
+    df_sig = read_root(data_sig, args.treename, args.columns, where=cut_sig)
+    df_bkg = read_root(data_bkg, args.treename, args.columns, where=cut_bkg)
 
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)

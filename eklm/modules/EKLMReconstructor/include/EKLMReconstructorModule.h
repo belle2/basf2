@@ -85,6 +85,12 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Check if segments intersect. Normally should be true, but it may be
+     * necessary to turn this check off for debugging.
+     */
+    bool m_CheckSegmentIntersection;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 

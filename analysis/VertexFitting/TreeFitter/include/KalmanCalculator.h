@@ -32,10 +32,13 @@ namespace TreeFitter {
     );
 
     /** update statevector */
-    void updateState(FitParams* fitparams);
+    void updateState(FitParams& fitparams);
+
+    /** update statevector */
+    void updateState(FitParams& fitparams, FitParams& oldState);
 
     /** update the statevectors covariance */
-    void updateCovariance(FitParams* fitparams);
+    void updateCovariance(FitParams& fitparams);
 
     /** get chi2 of this iteration */
     double getChiSquare() { return m_chisq;}
@@ -44,7 +47,7 @@ namespace TreeFitter {
     ErrCode calculateGainMatrix(
       const Eigen::Matrix < double, -1, 1, 0, 5, 1 > & residuals,
       const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & G,
-      const FitParams* fitparams,
+      const FitParams& fitparams,
       const Eigen::Matrix < double, -1, -1, 0, 5, 5 > * V = 0,
       double weight = 1);
 
@@ -72,7 +75,7 @@ namespace TreeFitter {
      *
      *  Eigen::Matrix < double, col, row, ColMajor, maxCol, maxRow>
      *  -1 = Eigen::Dynamic
-     *   0 = Eigen::ColMajor (dont touch)
+     *   0 = Eigen::ColMajor (don't touch)
      * */
 
     /** vector holding the residuals */

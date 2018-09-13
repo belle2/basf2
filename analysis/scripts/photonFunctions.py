@@ -6,6 +6,7 @@ Functions that work on photon lists.
 
 Contributor(s): Torben Ferber
                 Sam Cunliffe
+                Michael De Nuccio
 """
 
 from basf2 import *
@@ -22,7 +23,7 @@ def getRandomId(size=6, chars=string.ascii_uppercase + string.digits):
 
 def writeClosestPhotonExtraInfo(
     photonList,
-    photonSelection='',
+    photonSelection='True',
     path=analysis_main
 ):
     """
@@ -34,7 +35,7 @@ def writeClosestPhotonExtraInfo(
     """
 
     # build rest of event
-    buildRestOfEvent(photonList, path=analysis_main)
+    buildRestOfEvent(photonList, path=path)
 
     # create new path for ROE
     roe_path = create_path()
@@ -54,7 +55,7 @@ def writeClosestPhotonExtraInfo(
 
     # add new variables to the signal side particle
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterAngleInBetween(0, 1))': 'openingAngle'}, path=roe_path)
-    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, Theta))': 'deltaTheta'}, path=roe_path)
-    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, phi))': 'deltaPhi'}, path=roe_path)
+    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, theta))': 'deltaTheta'}, path=roe_path)
+    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfPhi(0, 1))': 'deltaPhi'}, path=roe_path)
 
-    analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

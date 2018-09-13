@@ -2,75 +2,75 @@
 [INFO] The random number seed is set to "something important"
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.1" 200 -
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=1 HTTP/1.1" 200 -
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=1.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2 HTTP/1.1" 404 -
- ... message repeated 1 times
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.0" 200 -
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=1 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=1 HTTP/1.0" 200 -
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=1.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2 HTTP/1.0" 404 -
- ... message repeated 1 times
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=0 HTTP/1.1" 200 -
 [WARNING] Cannot parse database payload information: No such node (payload)
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=1, run=0.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=1 HTTP/1.1" 200 -
 [WARNING] Cannot parse database payload information: No such node (payload)
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=1, run=1.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=1, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=0 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=0 HTTP/1.0" 200 -
 [WARNING] Cannot parse database payload information: No such node (payload)
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=1, run=0.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=1 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=1 HTTP/1.0" 200 -
 [WARNING] Cannot parse database payload information: No such node (payload)
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=1, run=1.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=2 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=2 HTTP/1.0" 404 -
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=1, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=0 HTTP/1.1" 200 -
 [WARNING] Cannot parse database payload information: <unspecified file>(1): unterminated string
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=2, run=0.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=1 HTTP/1.1" 200 -
 [WARNING] Cannot parse database payload information: <unspecified file>(1): unterminated string
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=2, run=1.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=2, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=0 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=0 HTTP/1.0" 200 -
 [WARNING] Cannot parse database payload information: <unspecified file>(1): unterminated string
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=2, run=0.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=1 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=1 HTTP/1.0" 200 -
 [WARNING] Cannot parse database payload information: <unspecified file>(1): unterminated string
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=2, run=1.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=2 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=2 HTTP/1.0" 404 -
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=2, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.1" 200 -
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
@@ -86,7 +86,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=1
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=3, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.0" 200 -
@@ -105,7 +105,7 @@ Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 HTTP/1.0" 404 -
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=3, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=4&runNumber=0 HTTP/1.1" 200 -
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
@@ -159,7 +159,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=1
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=6, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0 HTTP/1.0" 200 -
@@ -178,36 +178,36 @@ Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 HTTP/1.0" 404 -
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=6, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0 HTTP/1.1" 404 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=7, run=0.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=1 HTTP/1.1" 404 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=1": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=7, run=1.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=7, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0 HTTP/1.0" 404 -
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=7, run=0.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=1 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=1 HTTP/1.0" 404 -
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=1": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=7, run=1.
 Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2 HTTP/1.1" 308 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2 HTTP/1.0" 404 -
 [WARNING] Could not get "http://localhost:12702/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2": The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=7, run=2.
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0": The requested URL returned error: 503 Service Unavailable
@@ -222,28 +222,28 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0": The requested URL returned error: 503 Service Unavailable
 [WARNING] Failed 4 times, giving up
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=503, run=0.
 [INFO] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [WARNING] Could not get "http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0": The requested URL returned error: 503 Service Unavailable
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=503, run=0.
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get "http://localhost:0/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0": Failed to connect to localhost port 0: Connection refused
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get "http://nosuchurl/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0": Couldn't resolve host 'nosuchurl'
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get "nosuchproto://nosuchurl/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0": Protocol "nosuchproto" not supported or disabled in libcurl
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get "h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0": Couldn't resolve host 'h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ'
 [WARNING] Could not get list of payloads from database
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.
 [INFO] Setting Conditions Database servers from Environment:
 [INFO]   1. http://localhost:0
 [INFO]   2. h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢
@@ -254,9 +254,9 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber
 [WARNING] Could not get "h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0": Couldn't resolve host 'h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢'
 [WARNING] Failed to obtain payload information from h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢, trying next server
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.1" 200 -
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get "http://localhost:0/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0": Failed to connect to localhost port 0: Connection refused
 [WARNING] Failed to obtain payload information from http://localhost:0, trying next server
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.1" 200 -
-[WARNING] No entry "BeamParameters" found for this run in the conditions database for global tag "localtest".
+[WARNING] No entry "BeamParameters" found in the conditions database for global tag "localtest", exp=0, run=0.

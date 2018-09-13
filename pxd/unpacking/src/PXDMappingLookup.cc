@@ -108,7 +108,8 @@ void PXDMappingLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int& 
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID,
+                                          __attribute__((unused)) unsigned int& dhp_id,
                                           const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
@@ -179,7 +180,8 @@ void PXDMappingLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& 
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID,
+                                          __attribute__((unused)) unsigned int& dhp_id,
                                           const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");

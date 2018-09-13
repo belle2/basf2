@@ -13,7 +13,6 @@
 using namespace Belle2;
 
 void File::open(const std::string& path, const std::string& mode_s)
-throw(IOException)
 {
   int mode = O_RDONLY;
   if (mode_s.find("w") != std::string::npos) {
@@ -30,7 +29,7 @@ throw(IOException)
   }
 }
 
-void File::unlink(const std::string& path) throw(IOException)
+void File::unlink(const std::string& path)
 {
   if ((::unlink(path.c_str())) < 0) {
     perror("unlink");
@@ -38,7 +37,7 @@ void File::unlink(const std::string& path) throw(IOException)
   close();
 }
 
-size_t File::write(const void* buf, size_t count) throw(IOException)
+size_t File::write(const void* buf, size_t count)
 {
   size_t c = 0;
   int ret;
@@ -62,7 +61,7 @@ size_t File::write(const void* buf, size_t count) throw(IOException)
   return c;
 }
 
-size_t File::read(void* buf, size_t count) throw(IOException)
+size_t File::read(void* buf, size_t count)
 {
   size_t c = 0;
   int ret;
@@ -82,7 +81,7 @@ size_t File::read(void* buf, size_t count) throw(IOException)
   return c;
 }
 
-bool File::exist(const std::string& filename) throw()
+bool File::exist(const std::string& filename)
 {
   struct stat st;
   if (stat(filename.c_str(), &st) != 0) {

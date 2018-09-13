@@ -194,6 +194,7 @@ namespace Belle2 {
        */
       TLorentzVector getTLorentzVectorConstraints();
 
+
       /**
        * Resets all objects associated with the OrcaKinFit fitter.
        * @param fitter reference to OrcaKinFit fitter object
@@ -229,8 +230,8 @@ namespace Belle2 {
         * @param l represent the tracks ID
         * @param p pointer to particle
         */
-      void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
-
+      void updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                       std::vector<Particle*>&  allparticles, const Particle* daughter);
 
       /**
        * store fit object information as ExtraInfo

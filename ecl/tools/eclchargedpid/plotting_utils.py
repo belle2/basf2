@@ -57,7 +57,7 @@ def draw_plots(**kwargs):
     t.SetTextColor(ROOT.kBlack)
     t.SetTextFont(43)
     t.SetTextSize(35)
-    t.DrawLatex(0.15, 0.8, "#frac{{#chi^{{2}}}}{{{0}}} = {1:.2f}".format(kwargs["ndf"], chi2))
+    t.DrawLatex(0.15, 0.8, "#frac{{#chi^{{2}}}}{{ndf}} = #frac{{{0:.1f}}}{{{1}}}".format(chi2 * kwargs["ndf"], kwargs["ndf"]))
 
     frame2 = kwargs["frame2"]
 

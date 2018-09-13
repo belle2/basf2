@@ -21,14 +21,16 @@ def fit_electron_eop(**kwargs):
     # Set the PDF parameter ranges ((start), min, max).
     eop_range = (0.0, 1.2)
     gaus_mu_range = (0.8, 0.5, 1.5)
-    gaus_sigma_range = (0.01, 0.001, 0.1)
+    gaus_sigma_range = (0.01, 0.02, 0.1)
     gaus_frac_range = (0.0, 1.0)
     cb_mu_range = (1.0, 0.5, 1.5)
     cb_sigma_range = (0.1, 0.0001, 0.5)
     cb_alpha_range = (0.9, 0.2, 4.5)
     cb_nn_range = (1.35, 0.5, 10)
+    if (kwargs["pmin"] < 5.5e3):
+        gaus_sigma_range = (0.01, 0.005, 0.05)
     if (kwargs["pmin"] < 4e3 or kwargs["charge"] > 0):
-        gaus_sigma_range = (0.01, 0.001, 0.05)
+        gaus_sigma_range = (0.01, 0.01, 0.05)
     if kwargs["pmin"] == 4.5e3:
         gaus_frac_range = (0.5, 1.0)  # Impose Gaussian fraction to be larger than CB fraction.
     if (kwargs["pmin"] < 0.5e3):

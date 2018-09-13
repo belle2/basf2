@@ -55,8 +55,10 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     }
   }
 
+  B2RESULT("Found total of " << nevents << " events in collected data.");
+
   // Get the total number of PXD hits and sensors
-  int nPXDHits = 0;
+  unsigned long long int nPXDHits = 0;
   int nPXDSensors = 0;
   for (auto sensBin = 1; sensBin <= collector_pxdhitcounts->GetXaxis()->GetNbins(); sensBin++) {
     // The bin label is assumed to be a string representation of VxdID
@@ -65,14 +67,15 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     //Increment number of sensors
     nPXDSensors += 1;
     // Increment number of  of collected hits
-    int nSensorHits = collector_pxdhitcounts->GetBinContent(sensBin);
+    unsigned long long int nSensorHits = collector_pxdhitcounts->GetBinContent(sensBin);
     nPXDHits += nSensorHits;
 
     B2RESULT("Raw occupancy sensor=" << id << " is " << (float)nSensorHits / nevents / c_nVCells / c_nUCells);
   }
 
   // We should have enough hits in the PXD before we decide a single sensor is dead
-  if (nPXDHits < minHits * nPXDSensors * c_nUCells * c_nVCells) {
+  unsigned long long int minPXDHits =  minHits * nPXDSensors * c_nUCells * c_nVCells;
+  if (nPXDHits < minPXDHits) {
     if (not forceContinueMasking) {
       B2INFO("Not enough data: Only " << nPXDHits << " raw hits were collected!");
       return c_NotEnoughData;
@@ -80,6 +83,8 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       B2WARNING("Not enough data: Only " << nPXDHits << " raw hits were collected! The masking continous but the mask may be empty.");
     }
   }
+
+  B2RESULT("Found total of " << nPXDHits  << " raw hits in collected data.");
 
   // Check that the median number of hits is large enough
   map<VxdID, double> medianOfHitsMap;

@@ -1467,7 +1467,7 @@ namespace Belle2 {
       double bmass = particle->getPDGMass();
 
       // B theta angle
-      double cos_cone_angle = Variable::cosThetaBetweenParticleAndTrueB(particle);
+      double cos_cone_angle = Variable::cosThetaBetweenParticleAndNominalB(particle);
 
       if (abs(cos_cone_angle) > 1) {
         //makes no sense in this case, return simple value

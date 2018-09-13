@@ -47,7 +47,7 @@ Here is a list of variables related to ECL cluster:
    :group: ECL Cluster related
 
 Acceptance
-~~~~~~~~
+~~~~~~~~~~
 
 Here is a list of variables for acceptance cuts:
 

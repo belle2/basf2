@@ -92,6 +92,9 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
     }
   }
 
+  // This code assumes that the histograms address does NOT change between initialization and any later event
+  // This assumption seems to be reasonable for TFiles and in-memory objects
+  // BUT this means => Analysis moules MUST NEVER create a histogram with already existing name NOR delete any histogram
   TH1* found_hist = findHist(d, tok);
   if (found_hist) {
     g_hist[histname] = found_hist;//Can't use addHist as we want to overwrite invalid entries

@@ -30,7 +30,7 @@ FILE* HRP_debug_fp;
 
 
 /* connect */
-static const int
+static int
 HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
 {
   int ret, sd;
@@ -89,7 +89,7 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
 }
 
 
-static const mqd_t
+static mqd_t
 HRP_init_mqueue(char* name)
 {
   mqd_t ret;
@@ -123,7 +123,7 @@ HRP_init_mqueue(char* name)
 }
 
 
-static const ssize_t
+static ssize_t
 HRP_build_header(struct h2m_header_t* h, const unsigned char* roi, const size_t n_bytes_roi)
 {
   size_t n_bytes_total = sizeof(struct h2m_header_t) + n_bytes_roi + sizeof(struct h2m_footer_t);
@@ -141,7 +141,7 @@ HRP_build_header(struct h2m_header_t* h, const unsigned char* roi, const size_t 
 }
 
 
-static const size_t
+static size_t
 HRP_build_footer(struct h2m_footer_t* f, const unsigned char* roi, const size_t n_bytes_roi)
 {
   f->f_reserved[0]       = 0x02701144;
@@ -188,14 +188,14 @@ HRP_roi_get(const mqd_t mqd, void* buf, const int timeout /* secs */)
 }
 
 
-static const int
+static int
 HRP_term_connect_to_merger_meger(const int sd)
 {
   return close(sd);
 }
 
 
-static const int
+static int
 HRP_term_mqueue(const mqd_t mqd)
 {
   mq_close(mqd);

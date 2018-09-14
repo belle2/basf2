@@ -25,7 +25,7 @@ using namespace std;
 #define ERR_FPRINTF (fprintf)
 
 
-static const int
+static int
 MM_init_connect_to_onsen(const char* host, const unsigned int port)
 {
   int sd, ret;
@@ -85,10 +85,10 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
 }
 
 
-static const int
+static int
 MM_init_accept_from_hltout2merger(const unsigned int port)
 {
-  int sd, nd;
+  int sd;
   int one = 1, ret;
   // struct pollfd fds;
 
@@ -199,7 +199,7 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
     ERR_FPRINTF(stderr, "merger_merge: recv(): Packet receive timed out\n");
     return -1;
   }
-  if (ret != n_bytes_from_hltout) {
+  if (size_t(ret) != n_bytes_from_hltout) {
     ERR_FPRINTF(stderr, "merger_merge: b2_recv(): Unexpected return value (%d)\n", ret);
     return -1;
   }
@@ -209,21 +209,21 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
 }
 
 
-static const int
+static int
 MM_term_connect_to_onsen(const int sd)
 {
   return close(sd);
 }
 
 
-static const int
-MM_term_accept_from_hltout2merger(const int sd)
-{
-  close(sd);
-}
+// static int
+// MM_term_accept_from_hltout2merger(const int sd)
+// {
+//   close(sd);
+// }
 
 
-const size_t
+size_t
 perl_split_uint16t(char d, const char* string, unsigned short ret[])
 {
   char* buf, *p, delim[2];
@@ -242,7 +242,7 @@ perl_split_uint16t(char d, const char* string, unsigned short ret[])
   if (!p) return 0;
   ret[count++] = atoi(p);
 
-  while (p = strtok(NULL, delim)) ret[count++] = atoi(p);
+  while ((p = strtok(NULL, delim))) ret[count++] = atoi(p);
 
   free(buf);
 
@@ -255,7 +255,7 @@ perl_split_uint16t(char d, const char* string, unsigned short ret[])
 int
 main(int argc, char* argv[])
 {
-  int n_hltout = 0;
+  // int n_hltout = 0;
   int sd_acc = -1;
   int sd_con = -1;
   int need_reconnection_to_onsen = 1;
@@ -284,7 +284,6 @@ main(int argc, char* argv[])
 
   /* argv copy */
   char* p;
-  size_t n_ports;
 
   p = argv[1];
   strcpy(shmname, p);

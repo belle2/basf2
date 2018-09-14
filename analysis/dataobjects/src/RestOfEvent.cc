@@ -25,10 +25,6 @@
 
 using namespace Belle2;
 // New methods:
-void RestOfEvent::addParticle(const Particle* particle)
-{
-  m_particleIndices.insert(particle->getArrayIndex());
-}
 void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAdd)
 {
   StoreArray<Particle> allParticles;

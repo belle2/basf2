@@ -473,10 +473,11 @@ namespace {
     // Create ROE object, append tracks, clusters, add relation to particle
     //TODO: make particles
     RestOfEvent roe;
-    roe.addParticle(roeTrackParticle);
-    roe.addParticle(roeECLParticle);
-    roe.addParticle(roeKLMParticle);
-
+    vector<const Particle*> roeParticlesToAdd;
+    roeParticlesToAdd.push_back(roeTrackParticle);
+    roeParticlesToAdd.push_back(roeECLParticle);
+    roeParticlesToAdd.push_back(roeKLMParticle);
+    roe.addParticles(roeParticlesToAdd);
     RestOfEvent* savedROE = myROEs.appendNew(roe);
     /*
     std::map<std::string, std::map<unsigned int, bool>> tMasks;

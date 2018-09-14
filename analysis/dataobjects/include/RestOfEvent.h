@@ -208,13 +208,7 @@ namespace Belle2 {
 
     // setters
     /**
-     * Add StoreArray index of given Particle to the list of unused tracks in the event.
-     *
-     * @param Pointer to the unused Particle
-     */
-    void addParticle(const Particle* particle);
-    /**
-     * Add StoreArray index of given Particle to the list of unused tracks in the event.
+     * Add StoreArray indices of given Particle to the list of unused particles in the event.
      *
      * @param Pointer to the unused Particle
      */

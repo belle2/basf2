@@ -128,7 +128,7 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
       }
     }
   }
-  if (fsdaughters.size() != nExcludedParticles) {
+  if (fsdaughters.size() > nExcludedParticles) {
     B2WARNING("Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete");
   }
   roe->addParticles(particlesToAdd);

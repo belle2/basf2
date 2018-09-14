@@ -85,6 +85,10 @@ namespace Belle2 {
 
     int findClosestCluster(VxdID& vxdid, TVector3 intersection);
 
+    bool isCloseToBorder(int u, int v, int checkDistance);
+
+    bool isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID);
+
     //Require tracks going through ROIs
     bool m_requireROIs;
 

@@ -43,11 +43,11 @@ def SinglePhotonDarkList():
 
     # all remaining single photon events (== candidates) with region
     # dependent minimum energy in GeV
-    region_dependent = ' [clusterReg ==  2 and E > 1.0] or '  # barrel
-    region_dependent += '[clusterReg ==  1 and E > 2.0] or '  # fwd
-    region_dependent += '[clusterReg ==  3 and E > 2.0] or '  # bwd
-    region_dependent += '[clusterReg == 11 and E > 2.0] or '  # between fwd and barrel
-    region_dependent += '[clusterReg == 13 and E > 2.0] '     # between bwd and barrel
+    region_dependent = ' [clusterReg ==  2 and useCMSFrame(E) > 1.0] or '  # barrel
+    region_dependent += '[clusterReg ==  1 and useCMSFrame(E) > 2.0] or '  # fwd
+    region_dependent += '[clusterReg ==  3 and useCMSFrame(E) > 2.0] or '  # bwd
+    region_dependent += '[clusterReg == 11 and useCMSFrame(E) > 2.0] or '  # between fwd and barrel
+    region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
     cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent)
     return ['gamma:singlePhoton']
 

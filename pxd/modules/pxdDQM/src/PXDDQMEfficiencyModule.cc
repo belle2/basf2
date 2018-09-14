@@ -59,6 +59,10 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 
   addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
+
+  addParam("cutBorders", m_cutBorders, "Do not use tracks near the borders of the sensor", bool(true));
+
+  addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
 }
 
 
@@ -142,11 +146,12 @@ void PXDDQMEfficiencyModule::event()
         int ucell_fit = info.getUCellID(intersec_buff.X());
         int vcell_fit = info.getVCellID(intersec_buff.Y());
 
-        if (m_maskDeadPixels) {
-          if (PXD::PXDPixelMasker::getInstance().pixelDead(aVxdID, ucell_fit, vcell_fit)
-              || !PXD::PXDPixelMasker::getInstance().pixelOK(aVxdID, ucell_fit, vcell_fit)) {
-            continue;
-          }
+        if (m_cutBorders && isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
+          continue;
+        }
+
+        if (m_maskDeadPixels && isDeadPixelClose(ucell_fit, vcell_fit, m_maskedDistance, aVxdID)) {
+          continue;
         }
 
         if (m_requireROIs) {
@@ -320,4 +325,27 @@ PXDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
 
 }
 
+bool PXDDQMEfficiencyModule::isCloseToBorder(int u, int v, int checkDistance)
+{
 
+  if (u - checkDistance < 0 || u + checkDistance >= 250 ||
+      v - checkDistance < 0 || v + checkDistance >= 768) {
+    return true;
+  }
+  return false;
+}
+
+bool PXDDQMEfficiencyModule::isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID)
+{
+
+  //Iterate over square around the intersection to see if any close pixel is dead
+  for (int u_iter = u - checkDistance; u_iter <= u + checkDistance ; ++u_iter) {
+    for (int v_iter = v - checkDistance; v_iter <= v + checkDistance ; ++v_iter) {
+      if (PXD::PXDPixelMasker::getInstance().pixelDead(moduleID, u_iter, v_iter)
+          || !PXD::PXDPixelMasker::getInstance().pixelOK(moduleID, u_iter, v_iter)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

@@ -208,14 +208,15 @@ b2_send(const int sd, const void* buf, const size_t size)
 
     n_bytes_send      = ret;
     ptr              += n_bytes_send;
-    n_bytes_remained -= n_bytes_send;
 
-    if (n_bytes_remained < 0)
+    if (n_bytes_remained < size_t(n_bytes_send))
       /* overrun: internal error */
     {
       fprintf(stderr, "%s:%d: send(): Internal error\n", __FILE__, __LINE__);
       return -1;
     }
+    n_bytes_remained -= n_bytes_send;
+
     if (n_bytes_remained == 0)
       /* fully sendout */
     {
@@ -254,14 +255,14 @@ b2_recv(const int sd,       void* buf, const size_t size)
 
     n_bytes_recv      = ret;
     ptr              += n_bytes_recv;
-    n_bytes_remained -= n_bytes_recv;
-
-    if (n_bytes_remained < 0)
+    if (n_bytes_remained < size_t(n_bytes_recv))
       /* overrun: internal error */
     {
       fprintf(stderr, "%s:%d: recv(): Internal error\n", __FILE__, __LINE__);
       return -1;
     }
+    n_bytes_remained -= n_bytes_recv;
+
     if (n_bytes_remained == 0)
       /* fully readout */
     {

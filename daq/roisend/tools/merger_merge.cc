@@ -278,7 +278,7 @@ main(int argc, char* argv[])
   LOG_FPRINTF(stderr, "merger_merge: Process invoked [ver(%s %s)]\n", __DATE__, __TIME__);
 
   if (argc < 4) {
-    ERR_FPRINTF(stderr, "merger_merge: Usage: merger_merge onsen-host onsen-port client-port#1[:client-port#2[:...]]\n");
+    ERR_FPRINTF(stderr, "[ERROR] merger_merge: Usage: merger_merge onsen-host onsen-port client-port#1[:client-port#2[:...]]\n");
     exit(1);
   }
 
@@ -391,7 +391,7 @@ main(int argc, char* argv[])
       getsockname(sd_acc, (struct sockaddr*)&isa, &i);
       if ((t =::accept(sd_acc, (struct sockaddr*)&isa, &i)) < 0) {
         //      m_errno = errno;
-        ERR_FPRINTF(stderr, "Error on accepting new connection\n");
+        ERR_FPRINTF(stderr, "[ERROR] Error on accepting new connection\n");
         ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
         return (-1);
       }
@@ -411,7 +411,7 @@ main(int argc, char* argv[])
           ret = MM_get_packet(fd, buf);
           if (ret == -1) {
             ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", fd, strerror(errno));
-            ERR_FPRINTF(stderr, "Connection from HLT was closed on HLT side (hltout2merge)\n");
+            ERR_FPRINTF(stderr, "[ERROR] Connection from HLT was closed on HLT side (hltout2merge)\n");
             /* connection from HLT is lost */
             ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
             exit(1);
@@ -439,7 +439,7 @@ main(int argc, char* argv[])
             ERROR(b2_send);
             need_reconnection_to_onsen = 1;
             event_count = 0;
-            ERR_FPRINTF(stderr, "merger_merge: error to send to ONSEN : %s\n", strerror(errno));
+            ERR_FPRINTF(stderr, "[ERROR] merger_merge: error to send to ONSEN : %s\n", strerror(errno));
             free(buf);
             ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
             exit(1);
@@ -449,7 +449,7 @@ main(int argc, char* argv[])
             need_reconnection_to_onsen = 1;
             event_count = 0;
             free(buf);
-            ERR_FPRINTF(stderr, "Connection to ONSEN was closed on ONSEN side\n");
+            ERR_FPRINTF(stderr, "[ERROR] Connection to ONSEN was closed on ONSEN side\n");
             ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
             exit(1);
           }

@@ -219,7 +219,7 @@ main(int argc, char* argv[])
 
 
   if (argc < 3) {
-    printf("hltout2merger : mergerhost mergerport\n");
+    printf("[ERROR] hltout2merger : mergerhost mergerport\n");
     exit(-1);
   }
 

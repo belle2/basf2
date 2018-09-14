@@ -18,6 +18,21 @@ namespace Belle2 {
   namespace Variable {
 
     /**
+     * returns the KlId associated to the KLMCluster
+     */
+    double klmClusterKlId(const Particle* particle);
+
+    /**
+     * returns the Belle-style Track flag
+     */
+    int klmClusterBelleTrackFlag(const Particle* particle);
+
+    /**
+     * returns the Belle-style ECL flag
+     */
+    int klmClusterBelleECLFlag(const Particle* particle);
+
+    /**
      * returns KLMCluster's timing
      */
     double klmClusterTiming(const Particle* particle);
@@ -58,6 +73,36 @@ namespace Belle2 {
      * the momentum is proportional to klmClusterLayers
      */
     double klmClusterMomentum(const Particle* particle);
+
+    /**
+     * returns 1 if the associated KLMCluster is in BKLM
+     */
+    double klmClusterIsBKLM(const Particle* particle);
+
+    /**
+     * returns 1 if the associated KLMCluster is in EKLM
+     */
+    double klmClusterIsEKLM(const Particle* particle);
+
+    /**
+     * returns 1 if the associated KLMCluster is in forward EKLM
+     */
+    double klmClusterIsForwardEKLM(const Particle* particle);
+
+    /**
+     * returns 1 if the associated KLMCluster is in backward EKLM
+     */
+    double klmClusterIsBackwardEKLM(const Particle* particle);
+
+    /**
+     * returns KLMCluster's theta
+     */
+    double klmClusterTheta(const Particle* particle);
+
+    /**
+     * returns KLMCluster's phi
+     */
+    double klmClusterPhi(const Particle* particle);
 
     /**
      * returns the maximum angle of a KLMCluster to this Particle in the CMS frame

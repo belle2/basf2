@@ -11,6 +11,7 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <framework/utilities/HTML.h>
+#include <framework/logging/Logger.h>
 
 #include <stdexcept>
 
@@ -53,4 +54,13 @@ std::string EventExtraInfo::getInfoHTML() const
     s += HTML::escape(pair.first) + " = " + std::to_string(pair.second) + "<br />";
   }
   return s;
+}
+
+void EventExtraInfo::print() const
+{
+  std::string s;
+  for (auto pair : eventExtraInfo)
+    s += pair.first + " ";
+  B2INFO("EventExtraInfo contains:" << s);
+  return;
 }

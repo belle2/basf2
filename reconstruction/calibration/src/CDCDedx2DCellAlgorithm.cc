@@ -168,13 +168,13 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       }
 
       if (layer->at(j) < 8) {
-        hILDocaEntaG->Fill(ieaHit, idocaHit);
-        if (IsLocalBin)hILDocaEntaL->Fill(ieaHit, idocaHit);
+        hILDocaEntaG->Fill(idocaHit, ieaHit);
+        if (IsLocalBin)hILDocaEntaL->Fill(idocaHit, ieaHit);
         hILdEdx_all->Fill(dedxhit->at(j));
         hILdEdxhitInEntaDocaBin[ibinEA][ibinDOCA]->Fill(dedxhit->at(j));
       } else {
-        hOLDocaEntaG->Fill(ieaHit, idocaHit);
-        if (IsLocalBin)hOLDocaEntaL->Fill(ieaHit, idocaHit);
+        hOLDocaEntaG->Fill(idocaHit, ieaHit);
+        if (IsLocalBin)hOLDocaEntaL->Fill(idocaHit, ieaHit);
         hOLdEdx_all->Fill(dedxhit->at(j));
         hOLdEdxhitInEntaDocaBin[ibinEA][ibinDOCA]->Fill(dedxhit->at(j));
       }

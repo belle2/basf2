@@ -17,8 +17,6 @@
 #include <framework/gearbox/Const.h>
 #include <TMath.h>
 
-#define NUMERICAL_JACOBIAN
-
 namespace TreeFitter {
 
   RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
@@ -36,7 +34,6 @@ namespace TreeFitter {
 
   ErrCode RecoTrack::initParticleWithMother(FitParams& fitparams)
   {
-
     //initPar2
     if (m_flt == 0) {
       const_cast<RecoTrack*>(this)->updFltToMother(fitparams);
@@ -66,6 +63,7 @@ namespace TreeFitter {
 
     return ErrCode(ErrCode::Status::success);
   }
+
 
   ErrCode RecoTrack::updFltToMother(const FitParams& fitparams)
   {
@@ -99,7 +97,7 @@ namespace TreeFitter {
     ErrCode status;
     const int posindexmother = mother()->posIndex();
     const int momindex = momIndex();
-    //
+
     Eigen::Matrix<double, 1, 6> positionAndMom = Eigen::Matrix<double, 1, 6>::Zero(1, 6);
     positionAndMom.segment(0, 3) = fitparams.getStateVector().segment(posindexmother, 3);
     positionAndMom.segment(3, 3) = fitparams.getStateVector().segment(momindex, 3);
@@ -115,19 +113,19 @@ namespace TreeFitter {
                               positionAndMom(4),
                               positionAndMom(5)),
                             charge(),
-                            Belle2::BFieldManager::getField(TVector3(0,
-                                                            0,
-                                                            0)).Z() / Belle2::Unit::T
+                            m_bfield
                           );
 
-#ifndef NUMERICAL_JACOBIAN
-    double flt;
-    HelixUtils::helixFromVertex(position, momentum, charge(), m_bfield, helix, flt, jacobian);
-#else
-    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-6);
-#endif
-
-    // get the measured track parameters at the poca to the mother
+    HelixUtils::getJacobianToCartesianFrameworkHelix(jacobian,
+                                                     positionAndMom(0),
+                                                     positionAndMom(1),
+                                                     positionAndMom(2),
+                                                     positionAndMom(3),
+                                                     positionAndMom(4),
+                                                     positionAndMom(5),
+                                                     m_bfield,
+                                                     charge()
+                                                    );
     if (!m_cached) {
       RecoTrack* nonconst =  const_cast<RecoTrack*>(this);
       if (m_flt == 0) { nonconst->updFltToMother(fitparams); }
@@ -143,23 +141,11 @@ namespace TreeFitter {
 
     p.getResiduals().segment(0, 5) = m_params - helixpars;
 
-    p.getResiduals()(1) = HelixUtils::phidomain(p.getResiduals()(1));
+    p.getV().triangularView<Eigen::Lower>() =  m_covariance.triangularView<Eigen::Lower>();
 
-    Eigen::Matrix<double, 5, 5> writtenCov = m_covariance.block<5, 5>(0, 0);
+    p.getH().block<5, 3>(0, posindexmother) = -1.0 * jacobian.block<5, 3>(0, 0);
+    p.getH().block<5, 3>(0, momindex) = -1.0 * jacobian.block<5, 3>(0, 3);
 
-    p.getV().triangularView<Eigen::Lower>() =  writtenCov.triangularView<Eigen::Lower>();
-
-    //dr/dx
-    for (int row = 0; row < 5; ++row) {
-      // the position
-      for (int col = 0; col < 3; ++col) {
-        p.getH()(row, posindexmother + col) = -1.0 * jacobian(row, col);
-      }
-      // the momentum
-      for (int col = 0; col < 3; ++col) {
-        p.getH()(row, momindex + col) = -1.0 * jacobian(row , col + 3);
-      }
-    }
     return status;
   }
 

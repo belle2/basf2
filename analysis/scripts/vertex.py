@@ -432,7 +432,10 @@ def vertexTree(
         "Default numbers are taken for B-mesons
     @param customOriginCovariance 3x3 covariance matrix for the custom vertex (type: vector)." +\
         " Default numbers extracted from generator distribtuion width of B-mesons.
-    @param updateAllDaughters if true the entire tree will be updated with the fitted values. Otherwise only the head.
+    @param updateAllDaughters if true the entire tree will be updated with the fitted values "+\
+    "for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated, "+\
+    "however for all daughters we also update the vertex position with the fit results as this would "+\
+    "otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
     @param path         modules are added to this path
     """
 

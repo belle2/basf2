@@ -153,6 +153,7 @@ namespace Belle2 {
       for (size_t i = 0; i < dpar.size(); i++) {
         m_par[i] += dpar[i];
       }
+      m_numUsedTracks = m_numTracks;
       m_valid = true;
 
       return ier;
@@ -164,6 +165,7 @@ namespace Belle2 {
       for (auto& x : m_COV) x = 0;
       for (auto& x : m_U) x = 0;
       m_numTracks = 0;
+      m_numUsedTracks = 0;
       m_valid = false;
     }
 

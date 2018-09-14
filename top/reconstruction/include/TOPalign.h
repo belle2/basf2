@@ -176,10 +176,16 @@ namespace Belle2 {
       const std::vector<float>& getErrorMatrix() const {return m_COV;}
 
       /**
-       * Returns number of tracks used
+       * Returns track counter
        * @return number of tracks
        */
       int getNumTracks() const {return m_numTracks;}
+
+      /**
+       * Returns number of tracks used in current result
+       * @return number of tracks
+       */
+      int getNumUsedTracks() const {return m_numUsedTracks;}
 
       /**
        * Checks if the results are valid
@@ -201,7 +207,8 @@ namespace Belle2 {
       std::vector<float> m_maxDpar; /**< maximal parameter changes in one iteration */
       std::vector<bool> m_fixed; /**< true if parameter is fixed */
       std::vector<float> m_COV;  /**< covariance matrix */
-      int m_numTracks = 0;  /**< number of tracks used */
+      int m_numTracks = 0;  /**< track counter */
+      int m_numUsedTracks = 0;  /**< number of tracks used */
       bool m_valid = false; /**< validity of results */
 
       std::vector<double> m_U;   /**< matrix (neg. sum of second derivatives) */

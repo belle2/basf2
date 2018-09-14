@@ -71,8 +71,8 @@ namespace Belle2 {
              "minimal track momentum if sample is cosmics", 1.0);
     addParam("deltaEcms", m_deltaEcms,
              "c.m.s energy window (half size) if sample is dimuon or bhabha", 0.1);
-    addParam("dr", m_dr, "cut on POCA in r", 1.0);
-    addParam("dz", m_dz, "cut on POCA in z", 5.0);
+    addParam("dr", m_dr, "cut on POCA in r", 2.0);
+    addParam("dz", m_dz, "cut on POCA in abs(z)", 4.0);
     addParam("minZ", m_minZ,
              "minimal local z of extrapolated hit", -130.0);
     addParam("maxZ", m_maxZ,
@@ -97,7 +97,6 @@ namespace Belle2 {
              "initial parameter values in the order [" + names + "]. "
              "If list is too short, the missing ones are set to 0.", m_parInit);
     auto parFixed = m_parFixed;
-    parFixed.push_back("dn/n");
     addParam("parFixed", m_parFixed, "list of names of parameters to be fixed. "
              "Valid names are: " + names, parFixed);
 
@@ -234,7 +233,7 @@ namespace Belle2 {
       // get new parameter values and estimated errors
       m_vAlignPars = m_align.getParameters();
       m_vAlignParsErr = m_align.getErrors();
-      m_ntrk = m_align.getNumTracks();
+      m_ntrk = m_align.getNumUsedTracks();
       m_errorCode = err;
       m_valid = m_align.isValid();
 

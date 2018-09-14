@@ -182,7 +182,7 @@ analysis_main.add_module(skimALL)
 # apply some very loose cuts to reduce the number
 # of Btag candidates
 applyCuts('B+:generic', 'Mbc>5.22 and abs(deltaE)<0.200 and sigProb>0.001')
-applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
+applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
 
 # rank Btag canidates according to their SignalProbability
 # 'sigProb' is alias for 'extraInfo(SignalProbability)'

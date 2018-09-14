@@ -216,7 +216,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   int sumofbc = 1;
 
   TH1F* htemp = 0x0;
-  std::vector<std::vector<double>> onedcors(2, std::vector<double>()); // prev->std::vector<std::vector<double>> ones;
+  std::vector<std::vector<double>> onedcors; // prev->std::vector<std::vector<double>> ones;
   std::vector<double> onedcorIorOL, onedcorIorOLtemp;
 
   TH1F* hILEntaConst = new TH1F("hILEntaConst", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);

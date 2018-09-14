@@ -10,7 +10,7 @@
 
 #include <analysis/NtupleTools/NtupleKlongIDTool.h>
 #include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/KlongIDVariables.h>
+#include <analysis/VariableManager/KLMClusterVariables.h>
 #include <framework/gearbox/Const.h>
 #include <TBranch.h>
 
@@ -21,7 +21,7 @@ void NtupleKlongIDTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
-  m_klongID      = new float[nDecayProducts];
+  m_klongID   = new float[nDecayProducts];
   m_isFEKLM   = new float[nDecayProducts];
   m_isBEKLM   = new float[nDecayProducts];
   m_isBKLM    = new float[nDecayProducts];
@@ -59,15 +59,15 @@ void NtupleKlongIDTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_klongID[iProduct]      = Variable::particleKLMKlongID(selparticles[iProduct]);
-    m_isFEKLM[iProduct]   = Variable::particleKLMisForwardEKLM(selparticles[iProduct]);
-    m_isBEKLM[iProduct]   = Variable::particleKLMisBackwardEKLM(selparticles[iProduct]);
-    m_isBKLM[iProduct]    = Variable::particleKLMisBKLM(selparticles[iProduct]);
-    m_Time[iProduct]      = Variable::particleKLMgetTime(selparticles[iProduct]);
-    m_innerMost[iProduct] = Variable::particleKLMgetInnermostLayer(selparticles[iProduct]);
-    m_NLayer[iProduct]    = Variable::particleKLMgetNLayers(selparticles[iProduct]);
-    m_trackFlag[iProduct] = Variable::particleKLMBelleTrackFlag(selparticles[iProduct]);
-    m_ECLFlag[iProduct]   = Variable::particleKLMBelleECLFlag(selparticles[iProduct]);
-    m_Energy[iProduct]    = Variable::particleKLMgetEnergy(selparticles[iProduct]);
+    m_klongID[iProduct]      = Variable::klmClusterKlId(selparticles[iProduct]);
+    m_isFEKLM[iProduct]   = Variable::klmClusterIsForwardEKLM(selparticles[iProduct]);
+    m_isBEKLM[iProduct]   = Variable::klmClusterIsBackwardEKLM(selparticles[iProduct]);
+    m_isBKLM[iProduct]    = Variable::klmClusterIsBKLM(selparticles[iProduct]);
+    m_Time[iProduct]      = Variable::klmClusterTiming(selparticles[iProduct]);
+    m_innerMost[iProduct] = Variable::klmClusterInnermostLayer(selparticles[iProduct]);
+    m_NLayer[iProduct]    = Variable::klmClusterLayers(selparticles[iProduct]);
+    m_trackFlag[iProduct] = Variable::klmClusterBelleTrackFlag(selparticles[iProduct]);
+    m_ECLFlag[iProduct]   = Variable::klmClusterBelleECLFlag(selparticles[iProduct]);
+    m_Energy[iProduct]    = Variable::klmClusterEnergy(selparticles[iProduct]);
   }
 }

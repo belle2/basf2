@@ -358,6 +358,7 @@ main(int argc, char* argv[])
   // Preparation for select()
 
   printf("Starting select() loop\n") ;
+  fflush(stderr);
   fflush(stdout);
 
   fd_set allset;
@@ -391,6 +392,8 @@ main(int argc, char* argv[])
       getsockname(sd_acc, (struct sockaddr*)&isa, &i);
       if ((t =::accept(sd_acc, (struct sockaddr*)&isa, &i)) < 0) {
         //      m_errno = errno;
+        ERR_FPRINTF(stderr, "Error on accepting new connection\n");
+        ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
         return (-1);
       }
       printf("New socket connection t=%d\n", t);
@@ -409,60 +412,66 @@ main(int argc, char* argv[])
           ret = MM_get_packet(fd, buf);
           if (ret == -1) {
             ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", fd, strerror(errno));
-            /* connection from HLT is lost */
-            exit(1);
-          }
-          n_bytes_from_hltout = ret;
+            ERR_FPRINTF(stderr, "Connection from HLT was closed on HLT side (hltout2merge)\n);
+                        /* connection from HLT is lost */
+                        ERR_FPRINTF(stderr, " % s terminated\n",argv[0]);
+                        exit(1);
+                      }
+                        n_bytes_from_hltout = ret;
 
-//    printf ( "RoI received : Event count = %d\n", event_count );
+                        //    printf ( "RoI received : Event count = % d\n", event_count );
 
-          if (event_count < 40 || event_count % 10000 == 0) {
-            LOG_FPRINTF(stderr, "merger_merge: ---- [%d] received event from ROI transmitter\n", event_count);
-            LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned %ld\n", n_bytes_from_hltout);
-            dump_binary(stderr, buf, n_bytes_from_hltout);
-          }
-        }
+                                                                     if (event_count < 40 || event_count % 10000 == 0) {
+                                                                     LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] received event from ROI transmitter\n", event_count);
+                                                                     LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned % ld\n", n_bytes_from_hltout);
+                                                                     dump_binary(stderr, buf, n_bytes_from_hltout);
+                                                                   }
+                                                                   }
 
-        /* send packet */
-        if (n_bytes_from_hltout > 0) {
-          int ret;
-          unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
+                                                                     /* send packet */
+                                                                     if (n_bytes_from_hltout > 0) {
+                                                                     int ret;
+                                                                     unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
 
-          n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
-          ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
+                                                                     n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
+                                                                     ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
 
-          if (ret == -1) {
-            ERROR(b2_send);
-            need_reconnection_to_onsen = 1;
-            event_count = 0;
-            ERR_FPRINTF(stderr, "merger_merge: error to send to ONSEN : %s\n", strerror(errno));
-            free(buf);
-            exit(1);
-          }
-          if (ret == 0) {
-            ERR_FPRINTF(stderr, "merger_merge: b2_send(): Connection closed\n");
-            need_reconnection_to_onsen = 1;
-            event_count = 0;
-            free(buf);
-            exit(1);
-          }
+                                                                     if (ret == -1) {
+                                                                     ERROR(b2_send);
+                                                                     need_reconnection_to_onsen = 1;
+                                                                     event_count = 0;
+                                                                     ERR_FPRINTF(stderr, "merger_merge: error to send to ONSEN : % s\n", strerror(errno));
+                                                                     free(buf);
+                                                                     ERR_FPRINTF(stderr, " % s terminated\n",argv[0]);
+                                                                     exit(1);
+                                                                   }
+                                                                     if (ret == 0) {
+                                                                     ERR_FPRINTF(stderr, "merger_merge: b2_send(): Connection closed\n");
+                                                                     need_reconnection_to_onsen = 1;
+                                                                     event_count = 0;
+                                                                     free(buf);
+                                                                     ERR_FPRINTF(stderr, "Connection to ONSEN was closed on ONSEN side\n");
+                                                                     ERR_FPRINTF(stderr, " % s terminated\n",argv[0]);
+                                                                     exit(1);
+                                                                   }
 
-          flstat->log(n_bytes_to_onsen);
+                                                                     flstat->log(n_bytes_to_onsen);
 
-          if (event_count < 40 || event_count % 10000 == 0) {
-            LOG_FPRINTF(stderr, "merger_merge: ---- [%d] sent event to ONSEN\n", event_count);
-            dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
-          }
-        }
-      }
-      event_count++;
-    }
-  }
+                                                                     if (event_count < 40 || event_count % 10000 == 0) {
+                                                                     LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] sent event to ONSEN\n", event_count);
+                                                                     dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
+                                                                   }
+                                                                   }
+                                                                   }
+                                                                     event_count++;
+                                                                   }
+                                                                   }
 
 
-  /* termination: never reached */
-  MM_term_connect_to_onsen(sd_con);
+                                                                     /* termination: never reached */
+                                                                     MM_term_connect_to_onsen(sd_con);
 
-  return 0;
-}
+                                                                     ERR_FPRINTF(stderr, " % s terminated\n",argv[0]);
+                                                                     return 0;
+                                                                   }
 

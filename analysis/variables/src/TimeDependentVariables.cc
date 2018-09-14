@@ -9,9 +9,8 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/TimeDependentVariables.h>
+#include <analysis/variables/TimeDependentVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
-//#include <analysis/utility/ReferenceFrame.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -19,19 +18,9 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-//#include <analysis/dataobjects/RestOfEvent.h>
-//#include <analysis/dataobjects/EventExtraInfo.h>
-//#include <analysis/dataobjects/ParticleList.h>
-//#include <analysis/dataobjects/FlavorTaggerInfo.h>
-//#include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-//#include <mdst/dataobjects/Track.h>
-//#include <mdst/dataobjects/ECLCluster.h>
-//#include <mdst/dataobjects/KLMCluster.h>
-//#include <mdst/dataobjects/PIDLikelihood.h>
-
 
 // framework aux
 #include <framework/gearbox/Unit.h>

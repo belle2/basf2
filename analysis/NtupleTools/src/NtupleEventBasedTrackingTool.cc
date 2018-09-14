@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleEventBasedTrackingTool.h>
-#include <analysis/VariableManager/TrackVariables.h>
+#include <analysis/variables/TrackVariables.h>
 #include <TBranch.h>
 
 using namespace Belle2;

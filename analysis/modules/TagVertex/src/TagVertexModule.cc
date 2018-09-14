@@ -29,7 +29,7 @@
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/VariableManager/TrackVariables.h>
+#include <analysis/variables/TrackVariables.h>
 
 // msdt dataobject
 #include <mdst/dataobjects/MCParticle.h>

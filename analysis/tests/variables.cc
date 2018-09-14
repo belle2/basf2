@@ -1,12 +1,15 @@
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/EventVariables.h>
-#include <analysis/VariableManager/FlightInfoVariables.h>
-#include <analysis/VariableManager/VertexVariables.h>
-#include <analysis/VariableManager/PIDVariables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-#include <analysis/VariableManager/ROEVariables.h>
+
+#include <analysis/variables/Variables.h>
+#include <analysis/variables/EventVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
+#include <analysis/variables/VertexVariables.h>
+#include <analysis/variables/PIDVariables.h>
+#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/ROEVariables.h>
+
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>

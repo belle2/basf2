@@ -9,8 +9,8 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleKlongIDTool.h>
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/KlongIDVariables.h>
+#include <analysis/variables/Variables.h>
+#include <analysis/variables/KlongIDVariables.h>
 #include <framework/gearbox/Const.h>
 #include <TBranch.h>
 

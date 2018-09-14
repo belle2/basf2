@@ -9,11 +9,11 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/ParticleDaughterVariables.h>
+#include <analysis/variables/ParticleDaughterVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/MCTruthVariables.h>
+#include <analysis/variables/Variables.h>
+#include <analysis/variables/MCTruthVariables.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>

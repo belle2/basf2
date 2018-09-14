@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/KLMClusterVariables.h>
+#include <analysis/variables/KLMClusterVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/PCmsLabTransform.h>
 

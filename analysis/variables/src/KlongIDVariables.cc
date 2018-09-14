@@ -10,7 +10,7 @@
 
 // Own include
 
-#include <analysis/VariableManager/KlongIDVariables.h>
+#include <analysis/variables/KlongIDVariables.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore

@@ -9,11 +9,11 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/EventVariables.h>
-#include <analysis/VariableManager/VertexVariables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-#include <analysis/VariableManager/ParameterVariables.h>
+#include <analysis/variables/Variables.h>
+#include <analysis/variables/EventVariables.h>
+#include <analysis/variables/VertexVariables.h>
+#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 

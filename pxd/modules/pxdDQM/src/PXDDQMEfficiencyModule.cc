@@ -328,8 +328,8 @@ PXDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
 bool PXDDQMEfficiencyModule::isCloseToBorder(int u, int v, int checkDistance)
 {
 
-  if (u - checkDistance < 0 || u + checkDistance > 249 ||
-      v - checkDistance < 0 || v + checkDistance > 767) {
+  if (u - checkDistance < 0 || u + checkDistance >= 250 ||
+      v - checkDistance < 0 || v + checkDistance >= 768) {
     return true;
   }
   return false;
@@ -339,8 +339,8 @@ bool PXDDQMEfficiencyModule::isDeadPixelClose(int u, int v, int checkDistance, V
 {
 
   //Iterate over square around the intersection to see if any close pixel is dead
-  for (int u_iter = u - checkDistance; u_iter < u + checkDistance + 1 ; ++u_iter) {
-    for (int v_iter = v - checkDistance; v_iter < v + checkDistance + 1 ; ++v_iter) {
+  for (int u_iter = u - checkDistance; u_iter <= u + checkDistance ; ++u_iter) {
+    for (int v_iter = v - checkDistance; v_iter <= v + checkDistance ; ++v_iter) {
       if (PXD::PXDPixelMasker::getInstance().pixelDead(moduleID, u_iter, v_iter)
           || !PXD::PXDPixelMasker::getInstance().pixelOK(moduleID, u_iter, v_iter)) {
         return true;

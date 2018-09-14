@@ -149,7 +149,7 @@ namespace Belle2 {
       return double(out);
     }
 
-    VARIABLE_GROUP("KLM Cluster and KlongID");
+    VARIABLE_GROUP("KLM Cluster");
 
     REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, "Returns KLMCluster's timing info.");
     REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, "Returns KLMCluster's x position.");

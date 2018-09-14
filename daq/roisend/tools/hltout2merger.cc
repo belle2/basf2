@@ -267,6 +267,7 @@ main(int argc, char* argv[])
     sd = HRP_init_connect_to_merger_merger(merger_host, merger_port);
     if (sd == -1) {
       ERROR(HRP_init_connect_to_merger_merger);
+      ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
       exit(1);
     }
     printf("%s:%d: main(): Connected to MERGER_MERGE\n", __FILE__, __LINE__);
@@ -275,6 +276,7 @@ main(int argc, char* argv[])
       mqd[i] = HRP_init_mqueue(qname[i]);
       if (mqd[i] == (mqd_t) - 1) {
         ERROR(HRP_init_mqueue);
+        ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
         exit(1);
       }
     }

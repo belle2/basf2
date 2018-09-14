@@ -52,11 +52,11 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
       return -1;
 
     case  0:
-      fprintf(stderr, "%s:%d: connect(): Connection timed out (%d secs)\n", NETWORK_ESTABLISH_TIMEOUT);
+      fprintf(stderr, "%s:%d: connect(): Connection timed out (%d secs)\n", __FILE__, __LINE__, NETWORK_ESTABLISH_TIMEOUT);
       return -1;
 
     case  1: {
-      int ret, connection_error;
+      int connection_error;
       socklen_t optlen;
 
       optlen = sizeof(connection_error);
@@ -208,7 +208,6 @@ HRP_term_mqueue(const mqd_t mqd)
 int
 main(int argc, char* argv[])
 {
-  int i;
   int sd;
   mqd_t mqd[10];
   const size_t n_bytes_header  = sizeof(struct h2m_header_t);
@@ -284,7 +283,7 @@ main(int argc, char* argv[])
 
   /* forever (mq_receive -> send) */
   int curqid = 0;
-  for (i = 0;; i++) {
+  while (true) {
     unsigned char* ptr_packet;
     size_t n_bytes_packet;
     unsigned char* buf;

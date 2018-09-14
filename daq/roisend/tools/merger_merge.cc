@@ -52,7 +52,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
       return -1;
 
     case  1: {
-      int ret, connection_error;
+      int connection_error;
       socklen_t optlen;
 
       optlen = sizeof(connection_error);
@@ -90,7 +90,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
 {
   int sd, nd;
   int one = 1, ret;
-  struct pollfd fds;
+  // struct pollfd fds;
 
 
   LOG_FPRINTF(stderr, "hltout2merger: Waiting for connection on %d\n", port);
@@ -255,7 +255,6 @@ perl_split_uint16t(char d, const char* string, unsigned short ret[])
 int
 main(int argc, char* argv[])
 {
-  int j;
   int n_hltout = 0;
   int sd_acc = -1;
   int sd_con = -1;
@@ -318,7 +317,6 @@ main(int argc, char* argv[])
   const size_t n_bytes_footer  = sizeof(struct h2m_footer_t);
   size_t n_bytes_from_hltout;
   size_t n_bytes_to_onsen;
-  unsigned char* ptr_head_to_onsen;
 
   unsigned char* buf = (unsigned char*)valloc(n_bytes_header + ROI_MAX_PACKET_SIZE + n_bytes_footer);
   if (!buf) {
@@ -367,16 +365,16 @@ main(int argc, char* argv[])
   FD_SET(sd_acc, &allset);
   int maxfd = sd_acc;
   int minfd = sd_acc;
-  fd_set rset, wset;
+  fd_set rset;//, wset;
 
   // Handle Obtain ROI and send it to ONSEN
   for (;;) {
     memcpy(&rset, &allset, sizeof(rset));
-    memcpy(&wset, &allset, sizeof(wset));
+    // memcpy(&wset, &allset, sizeof(wset));
 
-    struct timeval timeout;
-    timeout.tv_sec = 0; // 1sec
-    timeout.tv_usec = 1000; // 1msec (in microsec)
+    // struct timeval timeout;
+    // timeout.tv_sec = 0; // 1sec
+    // timeout.tv_usec = 1000; // 1msec (in microsec)
     //    printf ( "Select(): maxfd = %d, start select...; rset=%x, wset=%x\n", maxfd, rset, wset);
     int rc = select(maxfd + 1, &rset, NULL, NULL, NULL);
     //    printf ( "Select(): returned with %d,  rset = %8.8x\n", rc, rset );
@@ -396,6 +394,7 @@ main(int argc, char* argv[])
         return (-1);
       }
       printf("New socket connection t=%d\n", t);
+      fflush(stdout);
       FD_SET(t, &allset);
       if (minfd == sd_acc) minfd = t;
       if (t > maxfd) maxfd = t;
@@ -409,7 +408,7 @@ main(int argc, char* argv[])
           int ret;
           ret = MM_get_packet(fd, buf);
           if (ret == -1) {
-            ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", j, strerror(errno));
+            ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", fd, strerror(errno));
             /* connection from HLT is lost */
             exit(1);
           }
@@ -419,7 +418,7 @@ main(int argc, char* argv[])
 
           if (event_count < 40 || event_count % 10000 == 0) {
             LOG_FPRINTF(stderr, "merger_merge: ---- [%d] received event from ROI transmitter\n", event_count);
-            LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned %d\n", n_bytes_from_hltout);
+            LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned %ld\n", n_bytes_from_hltout);
             dump_binary(stderr, buf, n_bytes_from_hltout);
           }
         }
@@ -462,7 +461,6 @@ main(int argc, char* argv[])
 
 
   /* termination: never reached */
-  int i;
   MM_term_connect_to_onsen(sd_con);
 
   return 0;

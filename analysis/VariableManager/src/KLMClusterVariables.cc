@@ -35,114 +35,100 @@ namespace Belle2 {
 
     double klmClusterTiming(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getTime();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getTime();
     }
 
 
     double klmClusterPositionX(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getClusterPosition().x();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getClusterPosition().x();
     }
 
 
     double klmClusterPositionY(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getClusterPosition().y();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getClusterPosition().y();
     }
 
 
     double klmClusterPositionZ(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getClusterPosition().z();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getClusterPosition().z();
     }
 
 
     double klmClusterInnermostLayer(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getInnermostLayer();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getInnermostLayer();
     }
 
 
     double klmClusterLayers(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getLayers();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getLayers();
     }
 
     double klmClusterEnergy(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getEnergy();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getEnergy();
     }
 
     double klmClusterMomentum(const Particle* particle)
     {
-      double result = 0.0;
-
       const KLMCluster* cluster = particle->getKLMCluster();
-      if (cluster) {
-        result = cluster->getMomentumMag();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
-      return result;
+      return cluster->getMomentumMag();
     }
 
-    double maximumKLMAngleCMS(const Particle* part)
+    double maximumKLMAngleCMS(const Particle* particle)
     {
-      PCmsLabTransform T;
-      const TVector3 pcms = (T.rotateLabToCms() * part->get4Vector()).Vect();
-      double maxangle = -999.0;
-
-      StoreArray<KLMCluster> klmClusters;
-      for (int iKLM = 0; iKLM < klmClusters.getEntries(); iKLM++) {
-        const TVector3 klmmomcms = (T.rotateLabToCms() * klmClusters[iKLM]->getMomentum()).Vect();
-        double angle = pcms.Angle(klmmomcms);
-
-        if (angle > maxangle) {
-          maxangle = angle;
-        }
+      StoreArray<KLMCluster> clusters;
+      if (clusters.getEntries() == 0) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
-      return maxangle;
+      PCmsLabTransform T;
+      const TVector3 pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
+
+      double maxAngle = 0.0;
+      for (int iKLM = 0; iKLM < clusters.getEntries(); iKLM++) {
+        const TVector3 clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
+        double angle = pCms.Angle(clusterMomentumCms);
+        if (angle > maxAngle) {
+          maxAngle = angle;
+        }
+      }
+      return maxAngle;
     }
 
     double nKLMClusterTrackMatches(const Particle* particle)
@@ -163,7 +149,7 @@ namespace Belle2 {
       return double(out);
     }
 
-    VARIABLE_GROUP("KLM Cluster");
+    VARIABLE_GROUP("KLM Cluster and KlongID");
 
     REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, "Returns KLMCluster's timing info.");
     REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, "Returns KLMCluster's x position.");

@@ -131,7 +131,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     binweights = 0.0;
     sumofbc = 0;
 
-    if (htempPerWire->Integral() < 10) {
+    if (htempPerWire->Integral() < 100) {
       truncMean  = 1.0;
       //iWireTruncMean[jwire] =  truncMean;
     } else {
@@ -145,7 +145,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       }
 
       for (int ibin = startfrom; ibin <= endat; ibin++) {
-        if (htempPerWire->GetBinContent(ibin) >= 0) {
+        if (htempPerWire->GetBinContent(ibin) > 0) {
           binweights += (htempPerWire->GetBinContent(ibin) * htempPerWire->GetBinCenter(ibin));
           sumofbc += htempPerWire->GetBinContent(ibin);
         }

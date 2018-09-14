@@ -155,10 +155,10 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     if (IsLocalBin) {
       ctmpde->SetCanvasSize(800, 400);
       ctmpde->Divide(2, 1);
-      ctmpde->cd(1); hILEntaG->Draw(""); hOLEntaG->SetMarkerColor(kBlue); hOLEntaG->Draw("same");
-      ctmpde->cd(2); hILEntaL->Draw(""); hOLEntaL->SetMarkerColor(kBlue); hOLEntaL->Draw("same");
+      ctmpde->cd(1); hOLEntaG->SetMarkerColor(kBlue); hOLEntaG->Draw(""); hILEntaG->Draw("same");
+      ctmpde->cd(2); hOLEntaL->SetMarkerColor(kBlue); hOLEntaL->Draw(""); hILEntaL->Draw("same");
     } else {
-      hILEntaG->Draw(""); hOLEntaG->Draw("same");
+      hOLEntaG->Draw(""); hILEntaG->Draw("same");
     }
     ctmpde->SaveAs("hEntaDistributions.pdf");
 
@@ -240,8 +240,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     for (int iea = 1; iea <= fnEntaBinL; iea++) {
 
       Int_t ieaprime = 1; //rotation symmtery for 1<->3 and 4<->2
-      if (iea < int(0.25 * fnEntaBinL))ieaprime = iea + (0.50 * fnEntaBinL);
-      else if (iea >= int(0.75 * fnEntaBinL))ieaprime = iea - (0.50 * fnEntaBinL);
+      if (iea <= int(0.25 * fnEntaBinL))ieaprime = iea + (0.50 * fnEntaBinL);
+      else if (iea > int(0.75 * fnEntaBinL))ieaprime = iea - (0.50 * fnEntaBinL);
       else ieaprime = iea;
 
       if (iIOLayer == 0)htemp = (TH1F*)hILdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
@@ -249,11 +249,11 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       else continue;
 
       truncMean  = 1.0; binweights = 0.0; sumofbc = 0;
-      if (htemp->Integral() < 10) truncMean  = 1.0; //low stats
+      if (htemp->Integral() < 100) truncMean  = 1.0; //low stats
       else {
         for (int ibin = startfrom; ibin <= endat; ibin++) {
           //std::cout << " dedxhit bin = " << ibin << ", Entries =" << htemp->GetBinContent(ibin) << std::endl;
-          if (htemp->GetBinContent(ibin) >= 0) {
+          if (htemp->GetBinContent(ibin) > 0) {
             binweights += (htemp->GetBinContent(ibin) * htemp->GetBinCenter(ibin));
             sumofbc += htemp->GetBinContent(ibin);
           }

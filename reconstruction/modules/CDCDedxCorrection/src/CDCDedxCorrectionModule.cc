@@ -128,12 +128,15 @@ void CDCDedxCorrectionModule::event()
       else correction = GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDoca(i), dedxTrack.getEnta(i), costh);
 
       // combine hits accross layers
-      newLayerDe += dedxTrack.getADCCount(i) / correction;
-      newLayerDx += dedxTrack.getPath(i);
+      if (correction != 0) {
+        newLayerDe += dedxTrack.getADCCount(i) / correction;
+        newLayerDx += dedxTrack.getPath(i);
+      }
+
       if (i + 1 < nhits && dedxTrack.getHitLayer(i + 1) == dedxTrack.getHitLayer(i))
         continue;
       else {
-        newLayerHits.push_back(newLayerDe / newLayerDx * std::sqrt(1 - costh * costh));
+        if (newLayerDx != 0)newLayerHits.push_back(newLayerDe / newLayerDx * std::sqrt(1 - costh * costh));
         newLayerDe = 0;
         newLayerDx = 0;
       }

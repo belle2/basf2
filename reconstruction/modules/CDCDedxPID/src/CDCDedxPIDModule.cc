@@ -382,9 +382,12 @@ void CDCDedxPIDModule::event()
         // The vector from the wire to the track.
         B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
 
-        // the sign of the doca is defined here to be positive in the +x dir
+        // the sign of the doca is defined here to be positive in the +x dir in the cell
         double doca = B2WireDoca.Perp();
-        if (B2WireDoca.X() < 0) doca = -1.0 * doca; // FIX ME! x changes versus phi!!! We want to know which side of the wire we are on...
+        double phidiff = fittedPoca.Phi() - pocaOnWire.Phi();
+        // be careful about "wrap around" cases when the poca and wire are close, but
+        // the difference in phi is largy
+        if (phidiff > -3.1416 && (phidiff < 0 || phidiff > 3.1416)) doca *= -1;
 
         // The opening angle of the track momentum direction
         const double px = pocaMom.x();

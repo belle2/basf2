@@ -107,7 +107,7 @@ namespace {
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterChargeCollector"),
-  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(true)
+  minClusters(3000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"

@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = "R. Cheaib & S. Hollitt"
+"""FEI Semi-leptonic B0 tag skim standalone for generic analysis in the
+    (Semi-)Leptonic and Missing Energy Working Group
+    Skim LFN code: 11180300
+    """
+
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
 
 import sys
 import glob
@@ -44,7 +49,7 @@ analysis_main.add_path(feistate.path)
 # and we're back in analysis_main pathB
 
 # SL B0 skim
-from feiSLB0WithOneLep_List import *
+from skim.fei import B0SLWithOneLep
 BtagList = B0SLWithOneLep()
 skimOutputUdst(skimCode, BtagList)
 summaryOfLists(BtagList)

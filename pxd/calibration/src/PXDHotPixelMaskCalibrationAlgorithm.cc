@@ -70,7 +70,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     unsigned long long int nSensorHits = collector_pxdhitcounts->GetBinContent(sensBin);
     nPXDHits += nSensorHits;
 
-    B2RESULT("Raw occupancy sensor=" << id << " is " << (float)nSensorHits / nevents / c_nVCells / c_nUCells);
+    B2RESULT("Number of hits for sensor sensor=" << id << " is " << nSensorHits);
   }
 
   // We should have enough hits in the PXD before we decide a single sensor is dead

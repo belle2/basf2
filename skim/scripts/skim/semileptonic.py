@@ -36,6 +36,12 @@ def SemileptonicList():
 
     Note: Uses D:all lists
 
+    Cuts applied:
+    *lepton momentum > 0.35 GeV
+    *5.24 < B_Mbc < 5.29
+    *| deltaE | < 0.5
+    *nTracks > 4
+
     """
     cutAndCopyList('e-:SLB', 'e-:all', 'p>0.35', True)
     cutAndCopyList('mu-:SLB', 'mu-:all', 'p>0.35', True)

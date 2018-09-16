@@ -44,7 +44,7 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # SL Skim
-from LeptonicUntagged_List import *
+from skim.leptonic import LeptonicList
 
 lepList = LeptonicList()
 skimOutputUdst(skimCode, lepList)

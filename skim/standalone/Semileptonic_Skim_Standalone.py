@@ -41,7 +41,7 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # SL Skim
-from SLUntagged_List import *
+from skim.semileptonic import SemileptonicList
 SLList = SemileptonicList()
 skimCode1 = encodeSkimName('SLUntagged')
 print(skimCode1)
@@ -49,7 +49,7 @@ skimOutputUdst(skimCode1, SLList)
 summaryOfLists(SLList)
 
 
-from LeptonicUntagged_List import *
+from skim.leptonic import LeptonicList
 lepList = LeptonicList()
 skimCode2 = encodeSkimName('LeptonicUntagged')
 print(skimCode2)
@@ -57,7 +57,7 @@ skimOutputUdst(skimCode2, lepList)
 summaryOfLists(lepList)
 
 
-from PRsemileptonicUntagged_List import *
+from skim.semileptonic import PRList
 PRList = PRList()
 skimCode3 = encodeSkimName('PRsemileptonicUntagged')
 skimOutputUdst(skimCode3, PRList)

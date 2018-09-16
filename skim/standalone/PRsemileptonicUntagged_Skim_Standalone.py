@@ -37,7 +37,7 @@ fileList = [
 inputMdstList('MC9', fileList)
 loadStdCharged()
 # PR Skim
-from PRsemileptonicUntagged_List import *
+from skim.semileptonic import PRList
 PRList = PRList()
 skimOutputUdst(skimCode, PRList)
 

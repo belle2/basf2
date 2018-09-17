@@ -24,28 +24,38 @@ def getRandomId(size=6, chars=string.ascii_uppercase + string.digits):
 def writeClosestPhotonExtraInfo(
     photonList,
     photonSelection='True',
-    path=analysis_main
+    roe_path=None,
+    deadend_path=None,
+    path=None
 ):
     """
     Add various variables to the first photon that are related to their angular separation and kinematics.
 
     @param photonList Photon list with photon candidates that will have the extra information in the end
     @param photonSelection Selection for the other photon
+    @param roe_path a path for the rest of event to be executed
+    @param deadend_path a path for skipping irrelevant RestOfEvent objects that may exist (if this was called twice, for instance)
     @param path modules are added to this path
     """
 
+    if not roe_path:
+        roe_path = create_path()
+
+    if not deadend_path:
+        deadend_path = create_path()
+
     # build rest of event
     buildRestOfEvent(photonList, path=path)
-
-    # create new path for ROE
-    roe_path = create_path()
 
     # get random listnames (in case we run this function multiple times)
     pListPair = 'vpho:writeClosestPhotonExtraInfo' + getRandomId()
     pList0 = 'gamma:writeClosestPhotonExtraInfo' + getRandomId()
     pList1 = 'gamma:writeClosestPhotonExtraInfo' + getRandomId()
 
+    signalSideParticleFilter(photonList, '', roe_path, deadend_path)
+
     fillSignalSideParticleList(pList0, '^' + photonList, path=roe_path)
+
     fillParticleList(pList1, 'isInRestOfEvent == 1 and ' + photonSelection, path=roe_path)
 
     reconstructDecay(pListPair + ' -> ' + pList0 + ' ' + pList1, '', path=roe_path)

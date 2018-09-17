@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own includes
-#include <analysis/VariableManager/TrackVariables.h>
+#include <analysis/variables/TrackVariables.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore

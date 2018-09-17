@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <analysis/NtupleTools/NtupleEventShapeTool.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 #include <analysis/dataobjects/EventShape.h>
 
 #include <TBranch.h>

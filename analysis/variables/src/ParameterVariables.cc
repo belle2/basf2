@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/VariableManager/ParameterVariables.h>
+#include <analysis/variables/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>

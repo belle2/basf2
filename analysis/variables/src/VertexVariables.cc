@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/VariableManager/VertexVariables.h>
+#include <analysis/variables/VertexVariables.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/logging/Logger.h>

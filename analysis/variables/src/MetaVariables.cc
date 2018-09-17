@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <analysis/VariableManager/MetaVariables.h>
+#include <analysis/variables/MetaVariables.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>

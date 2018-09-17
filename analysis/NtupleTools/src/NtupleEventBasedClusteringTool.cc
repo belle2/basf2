@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleEventBasedClusteringTool.h>
-#include <analysis/VariableManager/ECLVariables.h>
+#include <analysis/variables/ECLVariables.h>
 #include <framework/logging/Logger.h>
 #include <TBranch.h>
 

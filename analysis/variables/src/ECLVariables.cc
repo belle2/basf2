@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/ECLVariables.h>
+#include <analysis/variables/ECLVariables.h>
 
 //framework
 #include <framework/logging/Logger.h>

@@ -10,9 +10,9 @@
 
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 
-#include <analysis/VariableManager/VertexVariables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/VertexVariables.h>
+#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/Variables.h>
 
 //Root includes
 #include "TLorentzVector.h"

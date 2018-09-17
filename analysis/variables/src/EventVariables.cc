@@ -10,7 +10,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/EventVariables.h>
+#include <analysis/variables/EventVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
 

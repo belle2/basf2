@@ -21,17 +21,17 @@ testpath.add_module('RootInput', inputFileNames=testinput, logLevel=LogLevel.ERR
 for fsp in fsps:
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
 
-# also test filling from mc truth
-mcps = ['D0', 'K_S0', 'B0']
-for mcp in mcps:
-    testpath.add_module('ParticleLoader',
-                        decayStringsWithCuts=[(mcp + ':frommc', '')],
-                        useMCParticles=True)
-
 # manipulate the string to remove the daughters in case of v0
 for i in range(len(fsps)):
     if " -> " in fsps[i]:
         fsps[i] = fsps[i].split(' ->', 1)[0]
+
+# also load MC particles
+mcps = [particle + ':frommc' for particle in fsps + ['B0', 'D0']]
+for mcp in mcps:
+    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(mcp, '')],
+                        useMCParticles=True)
+
 testpath.add_module('ParticleStats', particleLists=fsps)
 testpath.add_module('ParticleStats', particleLists=mcps)
 process(testpath)

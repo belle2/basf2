@@ -32,7 +32,15 @@ for fsp in fsps:
 for i in range(len(fsps)):
     if " -> " in fsps[i]:
         fsps[i] = fsps[i].split(' ->', 1)[0]
+
+# also load MC particles
+mcps = [particle + ':frommc' for particle in fsps + ['B0', 'D0']]
+for mcp in mcps:
+    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(mcp, '')],
+                        useMCParticles=True)
+
 testpath.add_module('ParticleStats', particleLists=fsps)
+testpath.add_module('ParticleStats', particleLists=mcps)
 process(testpath)
 
 # process the first event (again) with the verbose ParticlePrinter

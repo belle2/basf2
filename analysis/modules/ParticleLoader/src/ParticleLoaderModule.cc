@@ -130,9 +130,11 @@ namespace Belle2 {
         if (not isValidPDGCode(pdgCode) and m_useMCParticles == false)
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
+        // if we're not loading MCParticles and we are loading K0S, Lambdas, or photons --> ee then this decaystring is a V0
         bool mdstSourceIsV0 = false;
-        if (abs(pdgCode) == abs(Const::Kshort.getPDGCode()) || abs(pdgCode) == abs(Const::Lambda.getPDGCode())
-            || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true))
+        if (!m_useMCParticles &&
+            (abs(pdgCode) == abs(Const::Kshort.getPDGCode()) || abs(pdgCode) == abs(Const::Lambda.getPDGCode())
+             || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
           mdstSourceIsV0 = true;
 
         int nProducts = m_decaydescriptor.getNDaughters();

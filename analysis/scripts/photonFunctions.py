@@ -33,8 +33,16 @@ def writeClosestPhotonExtraInfo(
 
     @param photonList Photon list with photon candidates that will have the extra information in the end
     @param photonSelection Selection for the other photon
+    @param roe_path a path for the rest of event to be executed
+    @param deadend_path a path for skipping irrelevant RestOfEvent objects that may exist (if this was called twice, for instance)
     @param path modules are added to this path
     """
+
+    if not roe_path:
+        roe_path = create_path()
+
+    if not deadend_path:
+        deadend_path = create_path()
 
     # build rest of event
     buildRestOfEvent(photonList, path=path)

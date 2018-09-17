@@ -31,7 +31,6 @@ void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAd
   for (auto* particleToAdd : particlesToAdd) {
     bool toAdd = true;
     for (auto& myIndex : m_particleIndices) {
-      //if(particleToAdd->isCopyOf(allParticles[myIndex])) {
       if (compareParticles(allParticles[myIndex], particleToAdd)) {
         toAdd = false;
         break;
@@ -204,7 +203,7 @@ void RestOfEvent::updateMaskWithV0(std::string name, const Particle* particleV0)
   for (auto* maskParticle : allROEParticles) {
     bool toKeep = true;
     for (auto* daughterV0 : daughtersV0) {
-      if (daughterV0->isCopyOf(maskParticle)) {
+      if (compareParticles(daughterV0, maskParticle)) {
         toKeep = false;
       }
     }
@@ -469,7 +468,7 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(std::string maskName) c
 bool RestOfEvent::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const
 {
   for (auto* listParticle : particlesToUpdate) {
-    if (roeParticle->isCopyOf(listParticle)) {
+    if (compareParticles(roeParticle, listParticle)) {
       return true;
     }
   }

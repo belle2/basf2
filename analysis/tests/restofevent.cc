@@ -49,7 +49,10 @@ namespace Belle2 {
       for (auto& name : strNames) {
         B2INFO("Creation of particle: " << name);
       }
-      return createParticle(decaydescriptor, momentum, vertex);
+      // Recursive function
+      auto* result = createParticle(decaydescriptor, momentum, vertex);
+      delete decaydescriptor;
+      return result;
     };
 
     Particle::EParticleType getType(const DecayDescriptorParticle* particleDescription)
@@ -75,6 +78,7 @@ namespace Belle2 {
         return createPhoton(momentum);
       }
       StoreArray<Particle> myParticles;
+      //Create composite particle:
       auto* motherDescriptor = particleDescriptor->getMother();
       B2INFO("Mother PDG: " << motherDescriptor->getPDGCode() << " selected: " << motherDescriptor->isSelected() << " name: " <<
              motherDescriptor->getNameSimple());
@@ -102,6 +106,7 @@ namespace Belle2 {
       myECL.setConnectedRegionId(m_photonIndex++);
       myECL.setEnergy(eclREC);
       myECL.setHypothesisId(5);
+      //This is necessary to avoid isCopyOf == true for ECLClusters:
       myECL.setClusterId(m_photonIndex++);
       ECLCluster* savedECL = myECLClusters.appendNew(myECL);
 
@@ -169,6 +174,9 @@ namespace {
       TVector3 ipposition(0, 0, 0);
       TLorentzVector ksmomentum(1, 0, 0, 3);
       TVector3 ksposition(1.0, 0, 0);
+      //Creation of test particles:
+      //All daughters and mother particles have the same momenta within a decay
+      //In principle, this concept can be better developed if needed
       auto* ksParticle = factory.produceParticle(string("^K_S0 -> ^pi+ ^pi-"), ksmomentum, ksposition);
       TLorentzVector d0momentum(-2, 0, 0, 4);
       auto* d0Particle = factory.produceParticle(string("^D0 -> ^K+ ^pi-"), d0momentum, ipposition);
@@ -199,6 +207,7 @@ namespace {
       roe.excludeParticlesFromMask("keepMask", excludeParticles, Particle::EParticleType::c_Track, false);
       roe.initializeMask("V0Mask", "TestModule");
       roe.updateMaskWithCuts("V0Mask"); // No selection
+      //Add V0 to ROE mask:
       roe.updateMaskWithV0("V0Mask", ksParticle);
       myROEs.appendNew(roe);
       roe.print();
@@ -280,7 +289,9 @@ namespace {
     EXPECT_TRUE(roe->hasParticle(myParticles[4], "V0Mask")); // D0_pi
     EXPECT_TRUE(roe->hasParticle(myParticles[6], "V0Mask")); // pi0_gamma0
     EXPECT_TRUE(roe->hasParticle(myParticles[7], "V0Mask")); // pi0_gamma1
+    //Get all particles, including the K_S0 in the mask:
     auto v0maskParticles = roe->getParticles("V0Mask", false);
+    //Get all particles, but substitute K_S0 FS daughters:
     auto v0maskParticlesUnpacked = roe->getParticles("V0Mask", true);
     B2INFO("packed size is " << v0maskParticles.size());
     for (auto* particle : v0maskParticles) {

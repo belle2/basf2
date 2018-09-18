@@ -36,7 +36,8 @@ void CDCTrackingEventLevelMdstInfoFillerFindlet::initialize()
 }
 
 // Actual work
-void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWireHit>& inputWireHits)
+void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWireHit>& inputWireHits,
+                                                       const std::vector<CDCSegment2D>& inputWireHitSegments)
 {
   if (!m_eventLevelTrackingInfo.isValid()) {
     m_eventLevelTrackingInfo.create();
@@ -49,6 +50,11 @@ void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWire
     AutomatonCell const& a_cell = hit.getAutomatonCell();
     if (a_cell.hasTakenFlag()) nTaken += 1;
     if (a_cell.hasBackgroundFlag()) nBg += 1;
+
+    if (! a_cell.hasTakenFlag()) {
+      // not signal and not background,
+      m_eventLevelTrackingInfo->setCDCLayer(hit.getWireID().getICLayer());
+    }
   }
   int nSignal = nTaken - nBg;
 
@@ -63,4 +69,16 @@ void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWire
 
   B2DEBUG(10, "Total " << nhitTotal << " taken " << nTaken << " background " << nBg  << " signal " << nTaken - nBg  <<
           " Not assigned " << nRestCleaned);
+
+  // Count 2D segments too:
+  nTaken = 0;
+  nBg = 0;
+  for (CDCSegment2D const& seg : inputWireHitSegments) {
+    AutomatonCell const& a_cell = seg.getAutomatonCell();
+    if (a_cell.hasTakenFlag()) nTaken += 1;
+    if (a_cell.hasBackgroundFlag()) nBg += 1;
+  }
+
+  m_eventLevelTrackingInfo->setNCDCSegments(inputWireHitSegments.size() - nTaken);
+  B2DEBUG(10, "Total number of segments =" << inputWireHitSegments.size() << " Taken " << nTaken << " BG " << nBg);
 }

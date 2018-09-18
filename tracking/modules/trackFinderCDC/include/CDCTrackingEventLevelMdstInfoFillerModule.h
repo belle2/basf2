@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -27,10 +27,10 @@ namespace Belle2 {
      *  Findlet description.
      *  This may go to another header file.
      */
-    class CDCTrackingEventLevelMdstInfoFillerFindlet : public Findlet<const CDCWireHit> {
+    class CDCTrackingEventLevelMdstInfoFillerFindlet : public Findlet<const CDCWireHit, const CDCSegment2D> {
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit>;
+      using Super = Findlet<const CDCWireHit, const CDCSegment2D>;
 
     public:
       /// Constructor
@@ -47,7 +47,7 @@ namespace Belle2 {
 
     public:
       /// Main method to make the heavy lifting
-      void apply(const std::vector<CDCWireHit>& inputWireHits) final;
+      void apply(const std::vector<CDCWireHit>& inputWireHits, const std::vector<CDCSegment2D>& inputWireHitSegments) final;
 
     private:
       /** Acccess to the CDCTrackingEventLevelTrackingInfo object in the datastore. */
@@ -61,7 +61,7 @@ namespace Belle2 {
     public:
       /// Constructor setting up the default store array names
       CDCTrackingEventLevelMdstInfoFillerModule()
-        : FindletModule<CDCTrackingEventLevelMdstInfoFillerFindlet>( {"CDCWireHitVector" })
+        : FindletModule<CDCTrackingEventLevelMdstInfoFillerFindlet>( {"CDCWireHitVector", "CDCSegment2DVector"})
       {
       }
     };

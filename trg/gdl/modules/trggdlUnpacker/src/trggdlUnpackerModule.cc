@@ -94,6 +94,7 @@ void TRGGDLUnpackerModule::fillTreeGDL0(int* buf, int evt)
   int n_leafsExtra = GDLCONF0::nLeafsExtra;
 
   StoreArray<TRGGDLUnpackerStore> storeAry;
+  if (storeAry.isValid()) storeAry.clear();
   for (int clk = 0; clk < n_clocks; clk++) {
 
     storeAry.appendNew();
@@ -141,6 +142,7 @@ void TRGGDLUnpackerModule::fillTreeGDL1(int* buf, int evt)
   int n_leafsExtra = GDLCONF1::nLeafsExtra;
 
   StoreArray<TRGGDLUnpackerStore> storeAry;
+  if (storeAry.isValid()) storeAry.clear();
   for (int clk = 0; clk < n_clocks; clk++) {
 
     storeAry.appendNew();
@@ -189,6 +191,7 @@ void TRGGDLUnpackerModule::fillTreeGDL2(int* buf, int evt)
   int n_leafsExtra = GDLCONF2::nLeafsExtra;
 
   StoreArray<TRGGDLUnpackerStore> storeAry;
+  if (storeAry.isValid()) storeAry.clear();
   for (int clk = 0; clk < n_clocks; clk++) {
 
     storeAry.appendNew();
@@ -240,6 +243,7 @@ void TRGGDLUnpackerModule::fillTreeGDL3(int* buf, int evt)
   int n_leafsExtra = GDLCONF3::nLeafsExtra;
 
   StoreArray<TRGGDLUnpackerStore> storeAry;
+  if (storeAry.isValid()) storeAry.clear();
   for (int clk = 0; clk < n_clocks; clk++) {
 
     storeAry.appendNew();
@@ -289,6 +293,7 @@ void TRGGDLUnpackerModule::fillTreeGDL4(int* buf, int evt)
   int n_leafsExtra = GDLCONF4::nLeafsExtra;
 
   StoreArray<TRGGDLUnpackerStore> storeAry;
+  if (storeAry.isValid()) storeAry.clear();
   for (int clk = 0; clk < n_clocks; clk++) {
 
     storeAry.appendNew();
@@ -340,6 +345,7 @@ void TRGGDLUnpackerModule::fillTreeGDL5(int* buf, int evt)
   int n_leafsExtra = GDLCONF5::nLeafsExtra;
 
   StoreArray<TRGGDLUnpackerStore> storeAry;
+  if (storeAry.isValid()) storeAry.clear();
   for (int clk = 0; clk < n_clocks; clk++) {
 
     storeAry.appendNew();

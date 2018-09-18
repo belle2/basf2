@@ -15,28 +15,31 @@ import re
 import os.path
 argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
-if argc != 2:
-    sys.exit("trggdlDQM.py> # of arg is strange. Exit.")
-if argc == 2:
-    f_in_root = argvs[1]
-
 
 set_log_level(LogLevel.DEBUG)
 
 main = create_path()
 
-if f_in_root[-6:] == ".sroot":
+if argc == 2 and argvs[1][-6:0] == ".sroot":
+    f_in_root = argvs[1]
     input = register_module('SeqRootInput')
     matchobj = re.search("([^\/]+)\.sroot", f_in_root)
     basename = re.sub('\.sroot$', '', matchobj.group())
-if f_in_root[-5:] == ".root":
+    input.param('inputFileName', f_in_root)
+elif argc == 2 and argvs[1][-5:] == ".root":
+    f_in_root = argvs[1]
     input = register_module('RootInput')
     matchobj = re.search("([^\/]+)\.root", f_in_root)
     basename = re.sub('\.root$', '', matchobj.group())
+    input.param('inputFileName', f_in_root)
+elif argc == 1:
+    input = register_module('RootInput')
+    input.param('inputFileName', '/home/belle/nkzw/e3.4S/r034*/all/raw/sub00/raw.physics.hlt_hadron.0003.*.root')
+    basename = "e3.4S.r034"
+else:
+    sys.exit("trggdlDQM.py> # of arg is strange. Exit.")
 
-input.param('inputFileName', f_in_root)
 main.add_module(input)
-
 histo = register_module('HistoManager')
 histo.param("histoFileName", "dqm.%s.root" % basename)
 
@@ -59,12 +62,12 @@ psname = "dqm.%s.ps" % basename
 trggdldqm.param('postScriptName', psname)
 
 # dump vcd file
-dumpVcdFileTrue = False
+dumpVcdFileTrue = True
 trggdldqm.param('dumpVcdFile', dumpVcdFileTrue)
 if dumpVcdFileTrue:
     if not os.path.isdir('vcd'):
         os.mkdir('vcd')
-    trggdldqm.param('bitConditionToDumpVcd', 'FFfo !FFF')
+    trggdldqm.param('bitConditionToDumpVcd', 'HIE ECL_BHA')
     # '+' means logical OR. '!' is logical NOT.
     # Bit names is delimited by space. No space after '!'.
     # Parenthesis, A (B+!C) not allowed. Must be expanded to 'A B+A !C'.

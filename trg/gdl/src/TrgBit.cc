@@ -142,6 +142,7 @@ TrgBit::getTimingSource(void) const
 unsigned
 TrgBit::preScaleValue(output a) const
 {
+  if (_outputMap[nconf_ftdl][a] == 999) return 0;
   return _psnmValues[nconf_psnm][_outputMap[nconf_ftdl][a]];
 }
 

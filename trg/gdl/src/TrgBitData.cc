@@ -12,7 +12,7 @@ TrgBit::_inputBitNames[N_BITS_RESERVED] = {
   "t3_0", "t3_1", "t3_2", "t2_0", "t2_1", "t2_2", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5",
   "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3",
   "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13",
-  "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "eactive", "ecl_tim_fwd", "ecl_tim_brl",
+  "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "ecl_active", "ecl_tim_fwd", "ecl_tim_brl",
   "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1",
   "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand",
   "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n2_0", "n2_1", "n2_2",

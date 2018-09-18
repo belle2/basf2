@@ -29,7 +29,7 @@ namespace Belle2 {
       ~SelectorCut();
 
       /** Probability that this pair of particles come from the same mc/actual particle */
-      virtual float getProbability(Particle* iPart, Particle* jPart);
+      virtual float getResponse(Particle* iPart, Particle* jPart);
 
       /** returns vector of variables used by this selector. Not really useful here but included to be consistent with eventual MVA method. */
       virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart);

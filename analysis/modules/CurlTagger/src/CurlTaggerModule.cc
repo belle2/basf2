@@ -58,8 +58,10 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   addParam("selectorType", m_SelectorType,
            "gives the name of the selector to use, available : 'cut', 'mva'", std::string("cut"));
   addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);
-  addParam("pVal", m_PVal, "min allowed pVal for a match", 0.5);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
+
+  addParam("responseCut", m_PVal, "min allowed selector response for a match", 0.5);
+  addParam("largeBundleMultiple", m_LargeBundleMultiple, "multiple for larger bundles", 1.0);
 }
 
 CurlTaggerModule::~CurlTaggerModule()
@@ -134,25 +136,28 @@ void CurlTaggerModule::event()
 
         for (CurlTagger::Bundle bundle : bundles) {
           unsigned int bundleSize = bundle.size();
-          float averageProb = 0;
+          float averageResponse = 0;
 
           for (unsigned int b = 0; b < bundleSize; b++) {
             Particle* bPart = bundle.getParticle(b);
-            averageProb += m_Selector -> getProbability(iPart, bPart);
+            averageResponse += m_Selector -> getResponse(iPart, bPart);
           }
 
-          averageProb /= bundleSize;
-          bundlesProb.push_back(averageProb);
-
-          if (bundlesProb.size() > 0) {
-            auto maxElement = std::max_element(bundlesProb.begin(), bundlesProb.end());
-            if (*maxElement > m_PVal) {
-              int maxPosition = std::distance(std::begin(bundlesProb), maxElement);
-              bundles[maxPosition].addParticle(iPart);
-              addedParticleToBundle = true;
-            }
-          }
+          averageResponse /= bundleSize;
+          averageResponse *= TMath::Power(m_LargeBundleMultiple,
+                                          Int_t(bundleSize - 1)); // multiply response for larger bundles to increase performance
+          bundlesProb.push_back(averageResponse);
         } //bundles
+
+        if (bundlesProb.size() > 0) {
+          auto maxElement = std::max_element(bundlesProb.begin(), bundlesProb.end());
+          if (*maxElement > m_PVal) {
+            int maxPosition = std::distance(std::begin(bundlesProb), maxElement);
+            bundles[maxPosition].addParticle(iPart);
+            addedParticleToBundle = true;
+          }
+        }
+
         if (!addedParticleToBundle) {
           CurlTagger::Bundle tempBundle = CurlTagger::Bundle(false);
           tempBundle.addParticle(iPart);

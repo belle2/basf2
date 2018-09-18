@@ -27,7 +27,7 @@ namespace Belle2 {
       ~Selector() {};
 
       /** returns prob that two particles are actual from same mc/data particle */
-      virtual float getProbability(Particle*, Particle*) = 0;
+      virtual float getResponse(Particle*, Particle*) = 0;
 
       /** returns vector of variables used by the selector */
       virtual std::vector<float> getVariables(Particle*, Particle*) = 0;

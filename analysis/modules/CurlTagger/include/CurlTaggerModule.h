@@ -71,6 +71,9 @@ namespace Belle2 {
     /** min allowed PVal for a match - cut based selection is binary so this doesnt do much here*/
     double m_PVal;
 
+    /** increase probability for larger bundles by *x^(n-1) to try and better capture larger bundles*/
+    double m_LargeBundleMultiple;
+
     /** name of selector function to use*/
     std::string m_SelectorType;
 

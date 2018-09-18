@@ -405,6 +405,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     # run fast t0 estimation from CDC hits only
     path.add_module("CDCHitBasedT0Extraction")
 
+    # prepare mdst event level info
+    path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+
 
 def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True,
                              use_second_cdc_hits=False):

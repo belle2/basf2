@@ -60,8 +60,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
 
-  addParam("responseCut", m_PVal, "min allowed selector response for a match", 0.5);
-  addParam("largeBundleMultiple", m_LargeBundleMultiple, "multiple for larger bundles", 1.0);
+  addParam("responseCut", m_ResponseCut, "min allowed selector response for a match", 0.5);
 }
 
 CurlTaggerModule::~CurlTaggerModule()
@@ -144,14 +143,12 @@ void CurlTaggerModule::event()
           }
 
           averageResponse /= bundleSize;
-          averageResponse *= TMath::Power(m_LargeBundleMultiple,
-                                          Int_t(bundleSize - 1)); // multiply response for larger bundles to increase performance
           bundlesProb.push_back(averageResponse);
         } //bundles
 
         if (bundlesProb.size() > 0) {
           auto maxElement = std::max_element(bundlesProb.begin(), bundlesProb.end());
-          if (*maxElement > m_PVal) {
+          if (*maxElement > m_ResponseCut) {
             int maxPosition = std::distance(std::begin(bundlesProb), maxElement);
             bundles[maxPosition].addParticle(iPart);
             addedParticleToBundle = true;

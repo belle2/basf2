@@ -78,13 +78,15 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName, boo
     // if no mask provided work with internal source
     source = m_particleIndices;
   } else {
+    bool maskFound = false;
     for (auto& mask : m_masks) {
       if (mask.getName() == maskName) {
+        maskFound = true;
         source = mask.getParticles();
         break;
       }
     }
-    if (source.size() == 0) {
+    if (!maskFound) {
       B2FATAL("No " << maskName << " mask defined in current ROE!");
     }
   }
@@ -262,7 +264,7 @@ TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
   TLorentzVector roe4Vector;
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
-    // TODO: Why it was excluded in ROE 1.0? It should be allowed
+    // KLMClusters are discarded, because KLM energy estimation is based on hit numbers, therefore it is unreliable
     if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
       continue;
     }

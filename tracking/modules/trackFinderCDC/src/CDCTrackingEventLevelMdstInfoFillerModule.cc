@@ -15,18 +15,10 @@ using namespace TrackFindingCDC;
 // Register the CDCTrackingEventLevelMdstInfoFillerModule to the framework
 REG_MODULE(CDCTrackingEventLevelMdstInfoFiller);
 
-CDCTrackingEventLevelMdstInfoFillerFindlet::CDCTrackingEventLevelMdstInfoFillerFindlet()
-{
-}
 
 std::string CDCTrackingEventLevelMdstInfoFillerFindlet::getDescription()
 {
   return "This module adds additional global event level information about CDC track finding results to the MDST object CDCTrackingEventLevelTrackingInfo";
-}
-
-void CDCTrackingEventLevelMdstInfoFillerFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  Super::exposeParameters(moduleParamList, prefix);
 }
 
 void CDCTrackingEventLevelMdstInfoFillerFindlet::initialize()
@@ -58,7 +50,7 @@ void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWire
   }
   int nSignal = nTaken - nBg;
 
-  B2ASSERT("More taken than background hits", nSignal >= 0);
+  B2ASSERT("More background than taken CDC Wire hits", nSignal >= 0);
 
   int nRest = nhitTotal - nSignal;
 

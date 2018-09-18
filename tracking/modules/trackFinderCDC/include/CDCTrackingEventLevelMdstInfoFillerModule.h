@@ -33,14 +33,8 @@ namespace Belle2 {
       using Super = Findlet<const CDCWireHit, const CDCSegment2D>;
 
     public:
-      /// Constructor
-      CDCTrackingEventLevelMdstInfoFillerFindlet();
-
       /// Getter for the module description
       std::string getDescription() final;
-
-      /// Adds the parameters of this findlet to the module parameter list
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signal the begining of the event processing
       void initialize() final;

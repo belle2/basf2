@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/PIDVariables.h>
+#include <analysis/variables/PIDVariables.h>
 #include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>

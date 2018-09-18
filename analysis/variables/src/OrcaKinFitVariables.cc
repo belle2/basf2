@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/VariableManager/OrcaKinFitVariables.h>
+#include <analysis/variables/OrcaKinFitVariables.h>
 #include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>

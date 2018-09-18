@@ -9,7 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/VariableManager/TriggerVariables.h>
+#include <analysis/variables/TriggerVariables.h>
 #include <analysis/dataobjects/Particle.h>
 
 // trigger dataobjects

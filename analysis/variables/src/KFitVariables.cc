@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/KFitVariables.h>
+#include <analysis/variables/KFitVariables.h>
 #include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>

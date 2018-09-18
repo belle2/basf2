@@ -670,8 +670,8 @@ cc            PRINT*,'construct PDF for Mass=',MASS
       DATA G_NP /0/, G_NC /0/
 
       PDF_OPT=OPT
-      G_NP=NP
-      G_NC=NC
+      G_NP=MIN(NP,G_SIZE)
+      G_NC=MIN(NC,G_SIZE)
       
       END
 

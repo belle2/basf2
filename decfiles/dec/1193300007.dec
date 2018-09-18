@@ -16,11 +16,10 @@ Decay Upsilon(4S)
 Enddecay
 #
 
-#central values from HFAG average
-
+# updated to the values from main DECAY_BELLE2.DEC
 Decay B0sig
-0.01230   D*-    tau+ nu_tau        PHOTOS        HQET3 0.920 1.205 1.21 1.404 0.854;
-0.00639   D-    tau+ nu_tau         PHOTOS       HQET3 1.0541 1.128 1.0;
+0.0125416   D*-    tau+ nu_tau        PHOTOS       HQET3 0.912 1.205 1.15 1.404 0.854; 
+0.0063687   D-     tau+ nu_tau        PHOTOS       HQET3 1.0541 1.128 1.0;
 Enddecay
 CDecay anti-B0sig
 #

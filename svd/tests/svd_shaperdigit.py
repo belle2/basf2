@@ -65,7 +65,7 @@ class SvdShaperDigitTestModule(Module):
 
         if not len(svdDigits_sorted) == len(svdShaperDigits_sorted) * 6:
             print("#SVDShaperDigits = ", len(svdShaperDigits_sorted), "\n#SVDDigits / 6 = ", len(svdDigits_sorted) / 6)
-            B2FATAL("Numbers of SVDDigits and SVDShaperDigits objects dont't match !!!")
+            B2WARNING("Numbers of SVDDigits and SVDShaperDigits objects dont't match !!!")
 
         # check all quantities between the SVDDigits & svdShaperDigits
         for i in range(len(svdShaperDigits_sorted)):
@@ -104,7 +104,7 @@ class SvdShaperDigitTestModule(Module):
                     print(ind, sensor, isu, strip, chg)
 
                 assert (strip == stripS and sensor == sensorS and isu == isuS and chg ==
-                        chgS[j]), B2FATAL("SVDDigits and SVDShaperDigits objects don't match !!!")
+                        chgS[j]), B2WARNING("SVDDigits and SVDShaperDigits objects don't match !!!")
 
 
 # to run the framework the used modules need to be registered

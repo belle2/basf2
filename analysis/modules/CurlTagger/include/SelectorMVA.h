@@ -36,7 +36,7 @@ namespace Belle2 {
       /** Destructor */
       ~SelectorMVA();
 
-      /** Probability that this pair of particles come from the same mc/actual particle */
+      /** Selector response that this pair of particles come from the same mc/actual particle */
       virtual float getResponse(Particle* iPart, Particle* jPart);
 
       /** returns vector of variables used by this selector. */

@@ -131,7 +131,7 @@ void CurlTaggerModule::event()
         if (!passesPreSelection(iPart)) {continue;}
 
         bool addedParticleToBundle = false;
-        std::vector<float> bundlesProb;
+        std::vector<float> bundlesResponse;
 
         for (CurlTagger::Bundle bundle : bundles) {
           unsigned int bundleSize = bundle.size();
@@ -143,13 +143,13 @@ void CurlTaggerModule::event()
           }
 
           averageResponse /= bundleSize;
-          bundlesProb.push_back(averageResponse);
+          bundlesResponse.push_back(averageResponse);
         } //bundles
 
-        if (bundlesProb.size() > 0) {
-          auto maxElement = std::max_element(bundlesProb.begin(), bundlesProb.end());
+        if (bundlesResponse.size() > 0) {
+          auto maxElement = std::max_element(bundlesResponse.begin(), bundlesResponse.end());
           if (*maxElement > m_ResponseCut) {
-            int maxPosition = std::distance(std::begin(bundlesProb), maxElement);
+            int maxPosition = std::distance(std::begin(bundlesResponse), maxElement);
             bundles[maxPosition].addParticle(iPart);
             addedParticleToBundle = true;
           }

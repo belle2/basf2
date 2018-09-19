@@ -11,7 +11,9 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from stdV0s import stdKshorts
+from stdLightMesons import *
+from stdPi0s import *
+from stdV0s import *
 
 
 def SetTauGenericSkimVariables():

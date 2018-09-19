@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/FlavorTaggingVariables.h>
+#include <analysis/variables/FlavorTaggingVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 

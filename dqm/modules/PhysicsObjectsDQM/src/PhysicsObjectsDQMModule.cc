@@ -7,7 +7,7 @@
 //-
 
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
-#include <analysis/VariableManager/ContinuumSuppressionVariables.h>
+#include <analysis/variables/ContinuumSuppressionVariables.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TLorentzVector.h>
 #include <TDirectory.h>

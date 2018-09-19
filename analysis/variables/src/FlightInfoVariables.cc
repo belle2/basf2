@@ -9,10 +9,7 @@
  * This software is provided "as is" without any warranty.                     *
  ******************************************************************************/
 
-
-
-
-#include <analysis/VariableManager/FlightInfoVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/utilities/Conversion.h>

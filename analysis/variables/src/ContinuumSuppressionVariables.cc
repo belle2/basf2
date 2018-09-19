@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/VariableManager/ContinuumSuppressionVariables.h>
-#include <analysis/VariableManager/ParameterVariables.h>
-#include <analysis/VariableManager/ROEVariables.h>
+#include <analysis/variables/ContinuumSuppressionVariables.h>
+#include <analysis/variables/ParameterVariables.h>
+#include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>

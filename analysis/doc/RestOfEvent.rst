@@ -154,7 +154,7 @@ ROE variables
 
 A cleaned up ROE has an effect on variables which depend on ROE. Such variables
 can be found at
-``analysis/VariableManager/src/ROEVariables.cc``.
+``analysis/variables/src/ROEVariables.cc``.
 Most of them are ROE dependant and accept the name of the ROE mask as a
 parameter. Others are more complicated, but the documentations should provide
 the needed information. An example on how to save a ROE dependant variable is

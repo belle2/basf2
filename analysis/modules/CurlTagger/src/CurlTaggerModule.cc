@@ -16,9 +16,9 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
-#include <analysis/VariableManager/VertexVariables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/VertexVariables.h>
+#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/Variables.h>
 
 #include <iostream>
 #include <vector>

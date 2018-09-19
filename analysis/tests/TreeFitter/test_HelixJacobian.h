@@ -14,7 +14,7 @@ namespace Belle2 {
 
   };
 
-
+  /** Ensure our helix definition is consistent with the framework */
   TEST_F(TreeFitterHelixJacobianTest, Helix)
   {
     const double eps = 1E-6;
@@ -60,6 +60,7 @@ namespace Belle2 {
     }
   }
 
+  /** Ensure our jacobian definition is correct by comparing it to a numerical approach */
   TEST_F(TreeFitterHelixJacobianTest, Parameters)
   {
     const double delta = 1e-6;
@@ -80,8 +81,6 @@ namespace Belle2 {
     const double z = 5.678;
 
     const Eigen::Matrix<double, 1, 6> positionAndMom_ = (Eigen::Matrix<double, 1, 6>() << x, y, z, px, py, pz).finished();
-    const double pt = std::hypot(px, py);
-    const double pt3 = pt * pt * pt;
     const int charge = -1;
     const double bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T;
 

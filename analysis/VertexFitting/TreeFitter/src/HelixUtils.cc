@@ -381,7 +381,7 @@ namespace TreeFitter {
   void HelixUtils::getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,
                                                         const double x,
                                                         const double y,
-                                                        const double z,
+                                                        const double z __attribute__((unused)),
                                                         const double px,
                                                         const double py,
                                                         const double pz,

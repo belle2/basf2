@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/AcceptanceVariables.h>
+#include <analysis/variables/AcceptanceVariables.h>
 
 using namespace std;
 

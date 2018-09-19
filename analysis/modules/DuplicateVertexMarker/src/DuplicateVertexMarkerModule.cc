@@ -16,7 +16,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>

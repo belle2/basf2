@@ -10,8 +10,8 @@
 
 #include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/ROEVariables.h>
+#include <analysis/variables/Variables.h>
+#include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 

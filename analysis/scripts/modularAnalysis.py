@@ -2248,7 +2248,7 @@ def labelTauPairMC(path=analysis_main):
 def tagCurlTracks(particleLists,
                   belle=False,
                   mcTruth=False,
-                  responseCut=0.342,
+                  responseCut=0.303,
                   selectorType='cut',
                   ptCut=0.6,
                   train=False,

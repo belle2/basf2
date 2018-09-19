@@ -60,7 +60,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
 
-  addParam("responseCut", m_ResponseCut, "min allowed selector response for a match", 0.342);
+  addParam("responseCut", m_ResponseCut, "min allowed selector response for a match", 0.303);
 }
 
 CurlTaggerModule::~CurlTaggerModule()

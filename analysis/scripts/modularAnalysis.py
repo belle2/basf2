@@ -2248,7 +2248,7 @@ def labelTauPairMC(path=analysis_main):
 def tagCurlTracks(particleLists,
                   belle=False,
                   mcTruth=False,
-                  responseCut=0.5,
+                  responseCut=0.342,
                   selectorType='cut',
                   ptCut=0.4,
                   train=False,
@@ -2274,6 +2274,9 @@ def tagCurlTracks(particleLists,
     @param train:         flag to set training mode if selector has a training mode (mva)
     @param path:          module is added to this path
     """
+
+    if (not isinstance(particleLists, list)):
+        particleLists = [particleLists]  # in case user inputs a particle list as string
 
     curlTagger = register_module('CurlTagger')
     curlTagger.set_name('CurlTagger_')

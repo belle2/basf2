@@ -8,8 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Own includes
-#include <analysis/VariableManager/DedxVariables.h>
+// needed to build variables here
+#include <reconstruction/variables/DedxVariables.h>
+#include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
@@ -31,27 +32,24 @@
 #include <algorithm>
 #include <cmath>
 
-namespace {
+namespace Belle2 {
 
-  Belle2::CDCDedxTrack const* getDedxFromParticle(Belle2::Particle const* particle)
+  CDCDedxTrack const* getDedxFromParticle(Particle const* particle)
   {
-    const Belle2::Track* track = particle->getTrack();
+    const Track* track = particle->getTrack();
     if (!track) {
       return nullptr;
     }
 
-    const Belle2::CDCDedxTrack* dedxTrack = track->getRelatedTo<Belle2::CDCDedxTrack>();
+    const CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
     if (!dedxTrack) {
       return nullptr;
     }
 
     return dedxTrack;
   }
-}
 
-namespace Belle2 {
   namespace Variable {
-
 
     double dedx(const Particle* part)
     {
@@ -88,4 +86,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("dedxnosat", dedxnosat, "dE/dx truncated mean without saturation correction");
     REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
   }
+
+  // Create an empty module which allows basf2 to easily find the library and load it from the steering file
+  class EnableDedxVariablesModule: public Module {}; // Register this module to create a .map lookup file.
+  REG_MODULE(EnableDedxVariables);
 }

@@ -4,7 +4,6 @@ env['LIBS'] = [
     'framework',
     'analysis_dataobjects',
     'mdst_dataobjects',
-    'reconstruction_dataobjects',
     '$ROOT_LIBS',
     'EG',
     'CLHEP',

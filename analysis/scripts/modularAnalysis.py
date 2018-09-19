@@ -2250,7 +2250,7 @@ def tagCurlTracks(particleLists,
                   mcTruth=False,
                   responseCut=0.342,
                   selectorType='cut',
-                  ptCut=0.4,
+                  ptCut=0.6,
                   train=False,
                   path=analysis_main):
     """

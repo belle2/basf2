@@ -54,7 +54,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("belle", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", false);
-  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.4);
+  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.6);
   addParam("selectorType", m_SelectorType,
            "gives the name of the selector to use, available : 'cut', 'mva'", std::string("cut"));
   addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);

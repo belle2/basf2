@@ -437,6 +437,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
     # todo: refactor this information extracion -> json inside a specific class / method after the
     # plots have been created
     json_objects.dump(comparison_json_file, json_objects.Comparison(comparison_revs, comparison_packages))
+    # i guess here it is
 
 
 def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):

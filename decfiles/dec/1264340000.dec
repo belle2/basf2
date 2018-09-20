@@ -42,8 +42,8 @@ Enddecay
 CDecay mytau+
 
 Decay myJpsi
-0.500 e+      e-                                      PHOTOS   VLL; 
-0.500 mu+     mu-                                     PHOTOS   VLL; 
+0.05940 e+      e-                                      PHOTOS   VLL; 
+0.05930 mu+     mu-                                     PHOTOS   VLL; 
 Enddecay
 
 

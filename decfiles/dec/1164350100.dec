@@ -33,8 +33,8 @@ Enddecay
 
 # 18.09.2018: updated to values used in main DECAY_BELLE2.DEC
 Decay B0sig
-0.0134976     D*-   mytau+ nu_tau        PHOTOS       HQET3 0.912 1.205 1.15 1.404 0.854; 
-0.0068527     D-    mytau+ nu_tau        PHOTOS       HQET3 1.0541 1.128 1.0;
+0.0125416     D*-   mytau+ nu_tau        PHOTOS       HQET3 0.912 1.205 1.15 1.404 0.854; 
+0.0063687     D-    mytau+ nu_tau        PHOTOS       HQET3 1.0541 1.128 1.0;
 Enddecay
 CDecay anti-B0sig
 #
@@ -46,8 +46,8 @@ Enddecay
 CDecay mytau+
 
 Decay myJpsi
-0.500 e+      e-                                      PHOTOS   VLL; 
-0.500 mu+     mu-                                     PHOTOS   VLL; 
+0.05940 e+      e-                                      PHOTOS   VLL; 
+0.05930 mu+     mu-                                     PHOTOS   VLL; 
 Enddecay
 
 Decay myK_S0

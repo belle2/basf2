@@ -16,7 +16,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 
-# updated to the values from main DECAY_BELLE2.DEC
+# 18.09.2018: updated to the values from main DECAY_BELLE2.DEC
 Decay B0sig
 0.0125416   D*-    tau+ nu_tau        PHOTOS       HQET3 0.912 1.205 1.15 1.404 0.854; 
 0.0063687   D-     tau+ nu_tau        PHOTOS       HQET3 1.0541 1.128 1.0;

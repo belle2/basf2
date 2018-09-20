@@ -51,6 +51,13 @@ namespace Belle2 {
       return *this;
     }
 
+    void setWireGain(int wire, double gain)
+    {
+      if (wire < 0 || (unsigned)wire >= m_wiregains.size())
+        B2WARNING("Asking for a CDC Wire that is not found!");
+      else m_wiregains[wire] = gain;
+    }
+
     /** Return wire gain
      * @param wire number
      */

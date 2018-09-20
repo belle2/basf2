@@ -2248,9 +2248,9 @@ def labelTauPairMC(path=analysis_main):
 def tagCurlTracks(particleLists,
                   belle=False,
                   mcTruth=False,
-                  pVal=0.5,
+                  responseCut=0.303,
                   selectorType='cut',
-                  ptCut=0.4,
+                  ptCut=0.6,
                   train=False,
                   path=analysis_main):
     """
@@ -2265,7 +2265,7 @@ def tagCurlTracks(particleLists,
     @param particleLists: list of particle lists to check for curls
     @param belle:         bool flag for belle or belle2 data/mc
     @param mcTruth:       bool flag to output some truth based information
-    @param pVal:          float pVal cut for whether two tracks are identified as curls of each other.
+    @param responseCut:   float min classifier response that considers two tracks to come from the same particle.
                           Note 'cut' selector is binary 0/1
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
@@ -2275,12 +2275,15 @@ def tagCurlTracks(particleLists,
     @param path:          module is added to this path
     """
 
+    if (not isinstance(particleLists, list)):
+        particleLists = [particleLists]  # in case user inputs a particle list as string
+
     curlTagger = register_module('CurlTagger')
     curlTagger.set_name('CurlTagger_')
     curlTagger.param('particleLists', particleLists)
     curlTagger.param('belle', belle)
     curlTagger.param('mcTruth', mcTruth)
-    curlTagger.param('pVal', pVal)
+    curlTagger.param('responseCut', responseCut)
     curlTagger.param('selectorType', selectorType)
     curlTagger.param('ptCut', ptCut)
     curlTagger.param('train', train)

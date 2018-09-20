@@ -40,25 +40,25 @@ SelectorCut::~SelectorCut()
 
 std::vector<float> SelectorCut::getVariables(Particle* iPart, Particle* jPart)
 {
-  float chargeMult = iPart -> getCharge() * jPart -> getCharge();
+  float chargeProduct = iPart -> getCharge() * jPart -> getCharge();
   float magDiffP = (iPart->getMomentum() - jPart->getMomentum()).Mag();
   float phi = iPart->getMomentum().Angle(jPart->getMomentum());
-  return {chargeMult, magDiffP, phi};
+  return {chargeProduct, magDiffP, phi};
 }
 
-float SelectorCut::getProbability(Particle* iPart, Particle* jPart)
+float SelectorCut::getResponse(Particle* iPart, Particle* jPart)
 {
   //Selection from BN1079
   std::vector<float> variables = getVariables(iPart, jPart);
-  float chargeMult = variables[0];
+  float chargeProduct = variables[0];
   float magDiffP = variables[1];
   float phi = variables[2];
 
   if (magDiffP > m_magDiffPCut) {return 0.;}
-  if (chargeMult > 0) {
+  if (chargeProduct > 0) {
     if (phi < m_sameChargePhiCut * TMath::Pi() / 180) {return 1.;}
   }
-  if (chargeMult < 0) {
+  if (chargeProduct < 0) {
     if (phi > m_oppositeChargePhiCut * TMath::Pi() / 180) {return 1.;}
   }
 

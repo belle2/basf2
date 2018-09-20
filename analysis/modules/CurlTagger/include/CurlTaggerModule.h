@@ -68,8 +68,8 @@ namespace Belle2 {
     /** preselection pt cut */
     double m_PtCut;
 
-    /** min allowed PVal for a match - cut based selection is binary so this doesnt do much here*/
-    double m_PVal;
+    /** min classifier response to consider a match*/
+    double m_ResponseCut;
 
     /** name of selector function to use*/
     std::string m_SelectorType;

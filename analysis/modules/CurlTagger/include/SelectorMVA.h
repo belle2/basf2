@@ -36,8 +36,8 @@ namespace Belle2 {
       /** Destructor */
       ~SelectorMVA();
 
-      /** Probability that this pair of particles come from the same mc/actual particle */
-      virtual float getProbability(Particle* iPart, Particle* jPart);
+      /** Selector response that this pair of particles come from the same mc/actual particle */
+      virtual float getResponse(Particle* iPart, Particle* jPart);
 
       /** returns vector of variables used by this selector. */
       virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart);
@@ -94,7 +94,7 @@ namespace Belle2 {
       Float_t m_PPhi;
 
       /** charge(p1) * charge(p2) */
-      Float_t m_ChargeMult;
+      Float_t m_ChargeProduct;
 
       /** error weighted particle Pt difference */
       Float_t m_PtDiffEW;

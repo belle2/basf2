@@ -3,6 +3,9 @@
 
 import re
 import json
+# martin's mail utils
+import utils
+import getpass
 
 
 def create_mail_log(comparison):
@@ -58,11 +61,34 @@ def compose_message(plotlist):
 
     body = "There were problem(s) with the validation of the following plots:\n\n"
     for plot in plotlist:
-        body += "Package: "+plot["package"]+"\n"
-        body += "Title: "+plot["title"]+"\n"
-        body += "Rootfile: "+plot["rootfile"]+".root\n"
-        body += "Description: "+plot["description"]+"\n"
-        body += "Comparison: "+plot["comparison_text"]+"\n\n"
+        body += "<b>Package:</b> "+plot["package"]+"<br>"
+        body += "<b>Title:</b> "+plot["title"]+"<br>"
+        body += "<b>Rootfile:</b> "+plot["rootfile"]+".root<br>"
+        body += "<b>Description:</b> "+plot["description"]+"<br>"
+        body += "<b>Comparison:</b> "+plot["comparison_text"]+"\n\n"
     body += "You can take a look on the plots in more detail at <link to validation thing>."
 
     return body
+
+
+def send_all_mails(mail_data):
+    """
+    send mails to all contacts in mail_data
+    """
+
+    # only for testing
+    pw = getpass.getpass("passwort: ")
+    for contact in mail_data:
+        body = compose_message(mail_data[contact])
+        print("    send mail to "+contact)
+        utils.send_mail(contact, "david.koch@physik.uni-muenchen.de", "Validation failure", body, pw)
+    del pw
+
+
+def mail_log(comparison):
+    """
+    takes the comparison json and sends mails to contact of failed comparisons
+    """
+
+    data = create_mail_log(comparison)
+    send_all_mails(data)

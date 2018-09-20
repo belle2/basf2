@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+0;95;0c * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -47,7 +47,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   auto ttree = getObjectPtr<TTree>("tree");
 
   double dedx;
-  int run = 9999, runtemp = 9999;
+  int run = 0, runtemp = 0;
   ttree->SetBranchAddress("dedx", &dedx);
   ttree->SetBranchAddress("run", &run);
 

@@ -184,9 +184,9 @@ namespace Belle2 {
     /** Return the entrance angle in the CDC cell for this hit */
     double getEnta(int i) const { return m_hEnta[i]; }
 
-    /** Return the distance of closest approach to the sense wire for this hit */
+    /** Return rescaled doca value for cell height=width assumption */
     double getDocaRS(int i) const { return m_hDocaRS[i]; }
-    /** Return the entrance angle in the CDC cell for this hit */
+    /** Return rescaled enta value for cell height=width assumption */
     double getEntaRS(int i) const { return m_hEntaRS[i]; }
 
     /** Return the drift time for this hit */

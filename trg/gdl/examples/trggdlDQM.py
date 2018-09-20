@@ -55,14 +55,14 @@ trggdldqm = register_module('TRGGDLDQM')
 trggdldqm.param('eventByEventTimingHistRecord', False)
 # bit name on BinLabel for hGDL_itd,ftd,psn.
 trggdldqm.param('bitNameOnBinLabel', True)
-# generate postscript file
+# generate postscript file that includes rising and falling edge distribution
 trggdldqm.param('generatePostscript', False)
 # postscript file name
 psname = "dqm.%s.ps" % basename
 trggdldqm.param('postScriptName', psname)
 
 # dump vcd file
-dumpVcdFileTrue = True
+dumpVcdFileTrue = False
 trggdldqm.param('dumpVcdFile', dumpVcdFileTrue)
 if dumpVcdFileTrue:
     if not os.path.isdir('vcd'):
@@ -74,7 +74,7 @@ if dumpVcdFileTrue:
     # If one of characters is capital, the bit is regarded as psnm bit,
     # otherwise ftdl bit: 'hie' is ftdl hie bit. 'hIE' is psnm hie bit.
     trggdldqm.param('vcdEventStart', 0)
-    trggdldqm.param('vcdNumberOfEvents', 100)
+    trggdldqm.param('vcdNumberOfEvents', 10)
 
 main.add_module(trggdldqm)
 

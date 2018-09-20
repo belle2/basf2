@@ -35,6 +35,11 @@ input.param('inputFileName', f_in_root)
 
 # unpacker
 unpacker = register_module('TRGGDLUnpacker')
+# No unpacking. Just print info of trigger readout board
+# included in the data.
+trgReadoutBoardSearch = False
+unpacker.param('trgReadoutBoardSearch', trgReadoutBoardSearch)
+
 # output
 output = register_module('RootOutput')
 
@@ -50,5 +55,7 @@ output.param("outputFileName", "gdltrg_test.root")
 
 main.add_module(output, branchNames=["TRGGDLUnpackerStores"])
 
-# Process all events
-process(main)
+if trgReadoutBoardSearch:
+    process(main, max_event=100)
+else:
+    process(main)

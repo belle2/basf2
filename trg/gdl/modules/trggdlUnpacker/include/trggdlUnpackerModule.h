@@ -1251,6 +1251,9 @@ namespace Belle2 {
 
     private:
 
+      /** flag to select board search mode **/
+      bool m_trgReadoutBoardSearch;
+
       StoreArray<TRGGDLUnpackerStore> store;
 
     };

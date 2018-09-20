@@ -31,6 +31,9 @@ TRGGDLUnpackerModule::TRGGDLUnpackerModule()
   string desc = "TRGGDLUnpackerModule(" + version() + ")";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("trgReadoutBoardSearch", m_trgReadoutBoardSearch,
+           "Print trigger readout board included in the data.",
+           false);
   B2INFO("trggdlunpacker: Constructor done.");
 }
 
@@ -44,39 +47,53 @@ void TRGGDLUnpackerModule::event()
   StoreArray<RawTRG> raw_trgarray;
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == 0x15000001) {
-        int nword = raw_trgarray[i]->GetDetectorNwords(j, 0);
-        if (nword > 0) {
-          int _exp = raw_trgarray[i]->GetExpNo(j);
-          int _run = raw_trgarray[i]->GetRunNo(j);
-          int exprun = _exp * 1000000 + _run;
-          if (exprun >= 3005314) {
-            fillTreeGDL6(raw_trgarray[i]->GetDetectorBuffer(j, 0),
-                         raw_trgarray[i]->GetEveNo(j));
-          } else if (exprun >= 3004876) {
-            fillTreeGDL5(raw_trgarray[i]->GetDetectorBuffer(j, 0),
-                         raw_trgarray[i]->GetEveNo(j));
-          } else if (exprun >= 3001866) {
-            fillTreeGDL4(raw_trgarray[i]->GetDetectorBuffer(j, 0),
-                         raw_trgarray[i]->GetEveNo(j));
-          } else if (exprun >= 3001117) {
-            if ((3001162 >= exprun and exprun >= 3001158) ||
-                (3000972 >= exprun and exprun >= 3000932)) {
-              fillTreeGDL2(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+      if (! m_trgReadoutBoardSearch) {
+        if (raw_trgarray[i]->GetNodeID(j) == 0x15000001) {
+          int nword = raw_trgarray[i]->GetDetectorNwords(j, 0);
+          if (nword > 0) {
+            int _exp = raw_trgarray[i]->GetExpNo(j);
+            int _run = raw_trgarray[i]->GetRunNo(j);
+            int exprun = _exp * 1000000 + _run;
+            if (exprun >= 3005314) {
+              fillTreeGDL6(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                            raw_trgarray[i]->GetEveNo(j));
-            } else {
+            } else if (exprun >= 3004791) {
+              fillTreeGDL5(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+                           raw_trgarray[i]->GetEveNo(j));
+            } else if (exprun >= 3001866) {
+              fillTreeGDL4(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+                           raw_trgarray[i]->GetEveNo(j));
+            } else if (exprun >= 3001315) {
               fillTreeGDL3(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                            raw_trgarray[i]->GetEveNo(j));
+            } else if (exprun >= 3000677) {
+              fillTreeGDL2(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+                           raw_trgarray[i]->GetEveNo(j));
+            } else if (exprun >= 3000529) {
+              fillTreeGDL1(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+                           raw_trgarray[i]->GetEveNo(j));
+            } else {
+              fillTreeGDL0(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+                           raw_trgarray[i]->GetEveNo(j));
             }
-          } else if (exprun >= 3000677) {
-            fillTreeGDL2(raw_trgarray[i]->GetDetectorBuffer(j, 0),
-                         raw_trgarray[i]->GetEveNo(j));
-          } else if (exprun >= 3000529) {
-            fillTreeGDL1(raw_trgarray[i]->GetDetectorBuffer(j, 0),
-                         raw_trgarray[i]->GetEveNo(j));
-          } else {
-            fillTreeGDL0(raw_trgarray[i]->GetDetectorBuffer(j, 0),
-                         raw_trgarray[i]->GetEveNo(j));
+          }
+        }
+      } else {
+        unsigned cprid = raw_trgarray[i]->GetNodeID(j);
+        if ((0x15000001 <= cprid && cprid <= 0x15000002) ||
+            (0x11000001 <= cprid && cprid <= 0x11000010)) {
+          int _exp = raw_trgarray[i]->GetExpNo(j);
+          int _run = raw_trgarray[i]->GetRunNo(j);
+          for (int hslb = 0; hslb < 2; hslb++) {
+            int nword = raw_trgarray[i]->GetDetectorNwords(j, hslb);
+            int* buf  = raw_trgarray[i]->GetDetectorBuffer(j, hslb);
+            printf("0x%x%c exp(%d), run(%d), nword(%d)",
+                   cprid, 'a' + hslb, _exp, _run, nword);
+            if (nword > 2) {
+              printf(", 0x%x 0x%x 0x%x",
+                     buf[0], buf[1], buf[2]);
+            }
+            printf("\n");
           }
         }
       }
@@ -181,7 +198,9 @@ void TRGGDLUnpackerModule::fillTreeGDL1(int* buf, int evt)
   }
 }
 
-// GDLCONF2. r677 - r816. gdl0065j (recorded as 65i). < r932.
+// GDLCONF2.
+// r677 - r816. gdl0065j (recorded as 65i). < r932.
+// 969,70,71,72, 1158,62.  gdl0065k.
 void TRGGDLUnpackerModule::fillTreeGDL2(int* buf, int evt)
 {
 
@@ -232,7 +251,7 @@ void TRGGDLUnpackerModule::fillTreeGDL2(int* buf, int evt)
   }
 }
 
-// GDLCONF3. r932 - r1828. gdl0066a, 66b, 66c, 66e.
+// GDLCONF3. r1315 - r1828. gdl0066a, 66b, 66c, 66e.
 // < r1866.
 void TRGGDLUnpackerModule::fillTreeGDL3(int* buf, int evt)
 {

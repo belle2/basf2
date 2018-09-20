@@ -51,7 +51,7 @@ TrgBit::_inputMap[N_INPUT_ARRAY][N_BITS_RESERVED] = {
 
   // "0"
   // 80 bits. gdl0065c-gdl0065j.
-  // e3r100 <= run < e3r932
+  // e3r100 <= run < e3r1315
   {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -77,7 +77,7 @@ TrgBit::_inputMap[N_INPUT_ARRAY][N_BITS_RESERVED] = {
 
   // "1"
   // 87 bits. gdl0065k-gdl0066e.
-  // e3r932 <= run < e3r1866
+  // e3r1315 <= run < e3r1866
   {
     0, 1, 2, 4, 5, 6, 8, 9, 10, 11,
     12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
@@ -427,7 +427,8 @@ TrgBit::_psnmValues[N_PSNM_ARRAY][N_BITS_RESERVED] = {
   },
 
   // 3
-  // psn_0057 r1512- ecltiming=1
+  // psn_0058 r1512-r1615 ecltiming=1
+  // Not used for good data
   {
     0, 0, 1, 1, 0, 0, 1, 1, 1, 0,
     1, 150, 0, 1, 0, 1, 1, 1, 1, 20,
@@ -577,8 +578,8 @@ TrgBit::_psnmValues[N_PSNM_ARRAY][N_BITS_RESERVED] = {
   },
 
   // 9
-  // psn_0064=65. e5351- eed,fed,fp,bha3d
-  // Can be earlier than 5351 but
+  // psn_0064=65. e5341- eed,fed,fp,bha3d
+  // Can be earlier than 5341 but
   // runsum files lost.
   {
     0, 0, 1, 1, 0, 0, 1, 1, 1, 0,
@@ -612,36 +613,29 @@ TrgBit::mapNumber(unsigned exp, unsigned run)
   const unsigned ern = exp * 1000000 + run;
 
   // psnm
-  if (ern >= 3006059) nconf_psnm = 9; // 67 poi=1
-  else if (ern >= 3005559) nconf_psnm = 8; // 65
-  else if (ern >= 3005351) nconf_psnm = 7; // 64
-  else if (ern >= 3003504) nconf_psnm = 6; // 63
-  else if (ern >= 3002314) nconf_psnm = 5; // 60
-  else if (ern >= 3002001) nconf_psnm = 4; // 59
-  else if (ern >= 3001995) nconf_psnm = 3; // 57
-  else if (ern >= 3001811) nconf_psnm = 3; // 57
-  else if (ern >= 3001512) nconf_psnm = 3; // 57
-  else if (ern >= 3000296) nconf_psnm = 2; // 56b
+  if (ern >= 3005341) nconf_psnm = 9; // 64=65
+  else if (ern >= 3003504) nconf_psnm = 8; // 63
+  else if (ern >= 3002314) nconf_psnm = 7; // 60
+  else if (ern >= 3002001) nconf_psnm = 6; // 59
+  else if (ern >= 3001995) nconf_psnm = 5; // 59 No good data.
+  else if (ern >= 3001811) nconf_psnm = 4; // 57
+  else if (ern >= 3001512) nconf_psnm = 3; // 58 No good data.
+  else if (ern >= 3000296) nconf_psnm = 2; // 57
   else if (ern >= 3000108) nconf_psnm = 1; // 56
   else { nconf_psnm = 0; } // 55
 
   // ftdl
   if (ern >= 3005314) nconf_ftdl = 4;
   else if (ern >= 3001512) nconf_ftdl = 3;
-  else if (ern >= 3001117) {
-    if (3001158 <= ern && ern <= 3001162) {
-      nconf_ftdl = 1;
-    } else {
-      nconf_ftdl = 2;
-    }
-  } else if (ern >= 3000292) nconf_ftdl = 1;
+  else if (ern >= 3001315) nconf_ftdl = 2;
+  else if (ern >= 3000292) nconf_ftdl = 1;
   else { nconf_ftdl = 0; }
 
   // input
   if (ern >= 3005594) nconf_input = 4;
   else if (ern >= 3005314) nconf_input = 3;
   else if (ern >= 3001866) nconf_input = 2;
-  else if (ern >= 3000932) nconf_input = 1;
+  else if (ern >= 3001315) nconf_input = 1;
   else { nconf_input = 0; }
 
   // Find number of using bits

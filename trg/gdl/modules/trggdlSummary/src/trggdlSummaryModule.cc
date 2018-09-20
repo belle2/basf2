@@ -45,10 +45,6 @@ void TRGGDLSummaryModule::initialize()
 void TRGGDLSummaryModule::event()
 {
 
-  StoreObjPtr<EventMetaData> bevt;
-  int _exp = bevt->getExperiment();
-  int _run = bevt->getRun();
-  int exprun = _exp * 1000000 + _run;
   int n_clocks = 0;
   int n_leafs = 0;
   int n_leafsExtra = 0;
@@ -204,8 +200,10 @@ void TRGGDLSummaryModule::event()
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
-  } else if (gtt == GDL::e_tt_ecl) {
+  } else if (gtt == GDL::e_tt_top) {
     tt = TRGSummary::TTYP_PID0;
+  } else if (gtt == GDL::e_tt_ecl) {
+    tt = TRGSummary::TTYP_ECL;
   } else if (gtt == GDL::e_tt_dphy) {
     tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {

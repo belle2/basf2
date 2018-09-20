@@ -86,8 +86,4 @@ namespace Belle2 {
     REGISTER_VARIABLE("dedxnosat", dedxnosat, "dE/dx truncated mean without saturation correction");
     REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
   }
-
-  // Create an empty module which allows basf2 to easily find the library and load it from the steering file
-  class EnableDedxVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableDedxVariables);
 }

@@ -99,7 +99,7 @@ def appendVariables(maskIterator_i, array):
 # define ntuple tool
 recInfo = ['EventMetaData', '^B0']
 recInfo += ['CustomFloats[decayTypeRecoil]', '^B0']
-recInfo += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B0']
+recInfo += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B0']
 recInfo += ['CustomFloats[isSignalAcceptMissingNeutrino]', '^B0']
 
 # append ROE variables to ntuple tool

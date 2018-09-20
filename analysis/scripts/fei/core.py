@@ -501,7 +501,7 @@ class PostReconstruction(object):
                                      filename=config.removeJPsiSlash(filename), path=path)
 
                 variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                             'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                             'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 filename = 'Monitor_Final_{}.root'.format(particle.identifier)
                 variablesToNtuple(particle.identifier, variables, treename='variables',
                                   filename=config.removeJPsiSlash(filename), path=path)

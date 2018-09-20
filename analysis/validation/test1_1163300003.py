@@ -164,7 +164,7 @@ analysis_main.add_module(skimALL)
 
 applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 
-applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
+applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
 
 # rank Btag canidates according to their SignalProbability
 # 'sigProb' is alias for 'extraInfo(SignalProbability)'
@@ -278,7 +278,7 @@ toolsB0 += ['MCTruth', '^B0:genericRank']
 
 
 toolsB0SL = ['EventMetaData', '^B0:semileptonicRank']
-toolsB0SL += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B0:semileptonicRank']
+toolsB0SL += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B0:semileptonicRank']
 toolsB0SL += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B0:semileptonicRank']
 toolsB0SL += ['CustomFloats[d0_dmID]', '^B0:semileptonicRank']
 toolsB0SL += ['CustomFloats[isSignalAcceptMissingNeutrino]', '^B0:semileptonicRank']
@@ -320,7 +320,7 @@ tools4SB0Had += ['CustomFloats[d0_d0_d1_kaonID:d0_d0_d1_pionID:d0_d0_d1_muonID:d
 tools4SB0SL = ['EventMetaData', '^Upsilon(4S):BslBsig0']
 tools4SB0SL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S):BslBsig0']
 tools4SB0SL += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S):BslBsig0']
-tools4SB0SL += ['CustomFloats[cosThetaBetweenParticleAndTrueB:R2EventLevel:R2:cosTBTO:cosTBz]',
+tools4SB0SL += ['CustomFloats[cosThetaBetweenParticleAndNominalB:R2EventLevel:R2:cosTBTO:cosTBz]',
                 'Upsilon(4S):BslBsig0 -> ^B0:semileptonicRank anti-B0:all']
 tools4SB0SL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BslBsig0 -> ^B0:semileptonicRank anti-B0:all']
 

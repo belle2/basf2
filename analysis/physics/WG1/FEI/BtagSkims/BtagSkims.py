@@ -111,8 +111,8 @@ analysis_main.add_module(skimALL)
 cutAndCopyList('B0:HadTagGood', 'B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 cutAndCopyList('B+:HadTagGood', 'B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 
-cutAndCopyList('B0:SLTagGood', 'B0:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
-cutAndCopyList('B+:SLTagGood', 'B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
+cutAndCopyList('B0:SLTagGood', 'B0:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
+cutAndCopyList('B+:SLTagGood', 'B+:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
 
 # this interface will change in the future
 buildRestOfEvent('B0:generic')

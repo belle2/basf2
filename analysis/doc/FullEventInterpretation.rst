@@ -464,10 +464,10 @@ Generic FEI
    path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
     
    variablesToNTuple('B+:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_charged_hadronic.root', path=path)
-   variablesToNTuple('B+:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndTrueB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_charged_semileptonic.root', path=path)
+   variablesToNTuple('B+:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_charged_semileptonic.root', path=path)
     
    variablesToNTuple('B0:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_mixed_hadronic.root', path=path)
-   variablesToNTuple('B0:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndTrueB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_mixed_semileptonic.root', path=path)
+   variablesToNTuple('B0:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_mixed_semileptonic.root', path=path)
     
    print(path)
    process(path)
@@ -596,10 +596,10 @@ Converted FEI
    path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
     
    variablesToNTuple('B+:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_charged_hadronic.root', path=path)
-   variablesToNTuple('B+:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndTrueB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_charged_semileptonic.root', path=path)
+   variablesToNTuple('B+:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_charged_semileptonic.root', path=path)
     
    variablesToNTuple('B0:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_mixed_hadronic.root', path=path)
-   variablesToNTuple('B0:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndTrueB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_mixed_semileptonic.root', path=path)
+   variablesToNTuple('B0:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_mixed_semileptonic.root', path=path)
     
    process(path)
 

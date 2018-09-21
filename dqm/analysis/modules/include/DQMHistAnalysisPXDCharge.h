@@ -14,15 +14,12 @@
 #endif
 
 #include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
-#include <TLine.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
@@ -55,7 +52,7 @@ namespace Belle2 {
     //! fit range hi edge for landau
     double m_rangeHigh;
 
-    //IDs of all PXD Modules to iterate over
+    //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
     //! only one fit function for all Landaus
@@ -68,7 +65,7 @@ namespace Belle2 {
     TCanvas* m_cCharge;
 
 #ifdef _BELLE2_EPICS
-    // Place for two EPICS PVs, Mean and maximum deviation
+    //! Place for two EPICS PVs, Mean and maximum deviation
     chid  mychid[2];
 #endif
   };

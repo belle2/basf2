@@ -14,9 +14,7 @@
 #endif
 
 #include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TF1.h>
@@ -50,7 +48,7 @@ namespace Belle2 {
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
-    //IDs of all PXD Modules to iterate over
+    //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
@@ -61,6 +59,7 @@ namespace Belle2 {
     TLine* m_line1, *m_line2, *m_line3;
 
 #ifdef _BELLE2_EPICS
+    //! one epics PV
     chid  mychid;
 #endif
   };

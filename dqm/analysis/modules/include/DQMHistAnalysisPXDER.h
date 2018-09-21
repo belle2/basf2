@@ -26,8 +26,8 @@
 #include "TH2F.h"
 
 namespace Belle2 {
+  /*! PXD DQM AnalysisModule */
 
-  /** PXD DQM AnalysisModule */
   class DQMHistAnalysisPXDERModule : public DQMHistAnalysisModule {
 
   public:

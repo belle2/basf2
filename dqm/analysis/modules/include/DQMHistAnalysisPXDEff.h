@@ -15,9 +15,7 @@
 #endif
 
 #include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TH1.h>
@@ -70,6 +68,7 @@ namespace Belle2 {
     TCanvas* m_cEffAll;
 
 #ifdef _BELLE2_EPICS
+    //! one EPICS PV
     chid  mychid;
 #endif
   };

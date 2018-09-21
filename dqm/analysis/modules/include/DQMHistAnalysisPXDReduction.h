@@ -14,15 +14,12 @@
 #endif
 
 #include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
-#include <TLine.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Reduction */
@@ -32,7 +29,7 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisPXDReductionModule();
   private:
 
@@ -45,17 +42,21 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data members
+    //! name of histogram directory
     std::string m_histogramDirectoryName;
+    //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
-    //IDs of all PXD Modules to iterate over
+    //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
+    //! Histogram covering all modules
     TH1F* m_hReduction;
+    //! Final Canvas
     TCanvas* m_cReduction;
-//     TLine* m_line1, *m_line2, *m_line3;
 
 #ifdef _BELLE2_EPICS
+    //! one EPICS PV
     chid  mychid;
 #endif
   };

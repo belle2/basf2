@@ -61,14 +61,23 @@ def compose_message(plots):
     takes a dict (like in create_mail_log) and composes a mail body
     """
 
+    # link to validation page
+    url = "https://b2-master.belle2.org/validation/static/validation.html"
+    # url = "http://localhost:8000/static/validation.html"
+
     body = "There were problem(s) with the validation of the following plots:\n\n"
     for plot in plots:
         body += "<b>" + plot + "</b><br>"
         body += "<b>Package:</b> " + plots[plot]["package"] + "<br>"
         body += "<b>Rootfile:</b> " + plots[plot]["rootfile"] + ".root<br>"
         body += "<b>Description:</b> " + plots[plot]["description"] + "<br>"
-        body += "<b>Comparison:</b> " + plots[plot]["comparison_text"] + "\n\n"
-    body += "You can take a look on the plots in more detail at link to validation thing."
+        body += "<b>Comparison:</b> " + plots[plot]["comparison_text"] + "<br>"
+        body += "<b>Error type:</b> " + \
+            ("comparison unequal<br>" if plots[plot]["comparison_result"] == "error" else "comparison failed<br>")
+        body += "<a href=\"" + url + "#" + plots[plot]["package"] + "-" + \
+            plots[plot]["rootfile"] + "\">Click me for details</a>\n\n"
+
+    body += "You can take a look on the plots in more detail at the links provided for each failed plot."
 
     return body
 

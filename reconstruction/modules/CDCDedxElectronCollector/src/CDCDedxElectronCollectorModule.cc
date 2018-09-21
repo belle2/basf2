@@ -157,7 +157,7 @@ void CDCDedxElectronCollectorModule::collect()
       if (Islayer) m_layer.push_back(dedxTrack->getHitLayer(i));
       if (Isdoca)m_doca.push_back(dedxTrack->getDoca(i));
       if (Isenta)m_enta.push_back(dedxTrack->getEnta(i));
-      if (IsdocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i));
+      if (IsdocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
       if (IsentaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
       if (Isdedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
     }

@@ -427,8 +427,10 @@ void CDCDedxPIDModule::event()
           // get the wire gain constant
           double wiregain = (m_DBWireGains && m_usePrediction && numMCParticles == 0) ? m_DBWireGains->getWireGain(iwire) : 1.0;
 
-          // get the 2D correction
-          double twodcor = (m_DB2DCell && m_usePrediction && numMCParticles == 0) ? m_DB2DCell->getMean(currentLayer, docaRS, entAngRS) : 1.0;
+          //normalization of rescaled doca wrt cell size for layer dependent 2D corrections
+          double normDocaRS = docaRS / cellHalfWidth;
+          double twodcor = (m_DB2DCell && m_usePrediction
+                            && numMCParticles == 0) ? m_DB2DCell->getMean(currentLayer, normDocaRS, entAngRS) : 1.0;
 
           // get the 1D cleanup correction
           double onedcor = (m_DB1DCell && m_usePrediction && numMCParticles == 0) ? m_DB1DCell->getMean(currentLayer, entAngRS) : 1.0;

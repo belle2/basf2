@@ -87,7 +87,7 @@ def send_all_mails(mail_data, mail_data_old=None):
             if check_if_same(mail_data[contact], mail_data_old[contact]):
                 # don't send mail
                 continue
-        body = compose_message(mail_data[contact])
+
         # set the mood of the b2bot
         if len(mail_data[contact]) < 4:
             mood = "meh"
@@ -97,7 +97,23 @@ def send_all_mails(mail_data, mail_data_old=None):
             mood = "livid"
         else:
             mood = "dead"
-        utils.send_mail(contact, "david.koch@physik.uni-muenchen.de", "Validation failure", body, pw, mood=mood)
+
+        body = compose_message(mail_data[contact])
+        utils.send_mail(contact.split('@')[0], "david.koch@physik.uni-muenchen.de", "Validation failure", body, pw, mood=mood)
+
+    # send a happy mail to folks whose failed plots work now
+    if mail_data_old:
+        for contact in mail_data_old:
+            if contact not in mail_data:
+                body = "Your validation plots work fine now!"
+                utils.send_mail(
+                    contact.split('@')[0],
+                    "david.koch@physik.uni-muenchen.de",
+                    "Validation confirmation",
+                    body,
+                    pw,
+                    mood="happy")
+
     del pw
 
 

@@ -230,6 +230,9 @@ def get_argument_parser(modes=["local"]):
                         "that produces plots based on the output of its "
                         "dependencies.",
                         type=str, nargs='*')
+    parser.add_argument("--send-mails", help="Send email to the contact persons"
+                        "who have failed comparison plots.",
+                        action='store_true')
     parser.add_argument("-q", "--quiet", help="Suppress the progress bar",
                         action='store_true')
     parser.add_argument("-t", "--tag", help="The name that will be used for "

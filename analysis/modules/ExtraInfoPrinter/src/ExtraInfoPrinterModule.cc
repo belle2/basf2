@@ -43,7 +43,10 @@ void ExtraInfoPrinterModule::event()
   // print the EventExtraInfo names
   if (m_listName == "") {
     if (m_eee.isValid()) {
-      m_eee->print();
+      std::ostringstream stream;
+      stream << "EventExtraInfo for this event: ";
+      for (auto const& name : m_eee->getNames()) stream << name << " ";
+      B2INFO(stream.str());
       m_hasPrinted = true;
     }
     return;
@@ -56,15 +59,9 @@ void ExtraInfoPrinterModule::event()
 
   for (unsigned i = 0; i < n; i++) {
     const Particle* p = m_list->getParticle(i);
-    int mapID = p->getExtraInfoMap();
-    if (mapID < 0) {
-      B2WARNING("No ParticleExtraInfo set");
-      continue;
-    }
     std::ostringstream stream;
     stream << "ExtraInfo for this particle: ";
-    const ParticleExtraInfoMap::IndexMap& map = m_peem->getMap(mapID) ;
-    for (auto const& ee : map) stream << ee.first << " ";
+    for (auto const& name : p->getExtraInfoNames()) stream << name << " ";
     B2INFO(stream.str());
     m_hasPrinted = true;
   }

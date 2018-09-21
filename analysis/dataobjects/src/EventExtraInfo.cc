@@ -56,11 +56,10 @@ std::string EventExtraInfo::getInfoHTML() const
   return s;
 }
 
-void EventExtraInfo::print() const
+std::vector<std::string> EventExtraInfo::getNames() const
 {
-  std::string s;
+  std::vector<std::string> out;
   for (auto pair : eventExtraInfo)
-    s += pair.first + " ";
-  B2INFO("EventExtraInfo contains:" << s);
-  return;
+    out.push_back(pair.first);
+  return out;
 }

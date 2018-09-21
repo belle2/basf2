@@ -40,28 +40,45 @@ namespace Belle2 {
      */
     virtual ~CDCDedx2DCellAlgorithm() {}
 
-    /**<Local vs Global bin map settings for doca*/
+    /**
+    * Local vs Global bin map settings for doca
+    */
     void GlobalToLocalDocaBinMap(Bool_t seeMap);
 
-    /**<Local vs Global bin map settings for enta*/
+    /**
+    *
+    Local vs Global bin map settings for enta
+    */
     void GlobalToLocalEntaBinMap(Bool_t seeMap);
 
-    /**<Set etna angle bins, Global */
+    /**
+    *Set etna angle bins, Global
+    */
     void setGlobalEntaBins(int value) {fnEntaBinG = value;}
 
-    /**<Set doca angle bins, Global */
+    /**
+    *Set doca angle bins, Global
+    */
     void setGlobalDocaBins(int value) {fnDocaBinG = value;}
 
-    /**<Set etna angle bins, locally */
+    /**
+    *Set etna angle bins, locally
+    */
     void setLocalEntaBins(int value) {fnEntaBinL = value;}
 
-    /**<Set doca angle bins, locally */
+    /**
+    *Set doca angle bins, locally
+    */
     void setLocalDocaBins(int value) {fnDocaBinL = value;}
 
-    /**<Set asym bins flag to on or off */
+    /**
+    *Set asym bins flag to on or off
+    */
     void setAsymmetricBins(bool value) {IsLocalBin = value;}
 
-    /*** funtion to set flag active for plotting*/
+    /**
+    funtion to set flag active for plotting
+    */
     void setMonitoringPlots(bool value = false) {IsMakePlots = value;}
 
   protected:

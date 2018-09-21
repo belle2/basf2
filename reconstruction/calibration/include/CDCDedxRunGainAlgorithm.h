@@ -36,7 +36,9 @@ namespace Belle2 {
      */
     virtual ~CDCDedxRunGainAlgorithm() {}
 
-    /*** reading input file and storing values in vectors*/
+    /**
+    * reading input file and storing values in vectors
+    */
     void setBadRunsdatafile(const std::string& fPath, const std::string& fName)
     {
 
@@ -66,13 +68,19 @@ namespace Belle2 {
       inputfile.close();
     }
 
-    /*** get path of input bad run file */
+    /**
+    * get path of input bad run file
+    */
     std::string getBadRunFilePath() const {return m_badRunFPath;}
 
-    /** * get name of input bad run file */
+    /**
+    * get name of input bad run file
+    */
     std::string getBadRunFileName() const {return m_badRunFName;}
 
-    /** * Check if run is listed as bad */
+    /**
+    * Check if run is listed as bad
+    */
     void CheckRunStatus(Int_t irun, bool& status, double& rmean)
     {
       for (unsigned int j = 0; j < listofbadruns.size(); ++j) {
@@ -85,7 +93,9 @@ namespace Belle2 {
       }
     }
 
-    /** * function to make flag active for plotting */
+    /**
+    * function to make flag active for plotting
+    */
     void setMonitoringPlots(bool value = false) {isMakePlots = value;}
 
 

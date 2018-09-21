@@ -42,7 +42,9 @@ namespace Belle2 {
      */
     virtual ~CDCDedxWireGainAlgorithm() {}
 
-    /*** reading input file and storing bad wire values in vectors*/
+    /**
+    * reading input file and storing bad wire values in vectors
+    */
     void setBadWiresdatafile(const std::string& fPath, const std::string& fName)
     {
 
@@ -72,7 +74,9 @@ namespace Belle2 {
       inputfile.close();
     }
 
-    /*** funtion to set flag active for plotting*/
+    /**
+    * funtion to set flag active for plotting
+    */
     void setMonitoringPlots(bool value = false) {isMakePlots = value;}
 
 

@@ -16,7 +16,7 @@ TrgBit::_inputBitNames[N_BITS_RESERVED] = {
   "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1",
   "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand",
   "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n2_0", "n2_1", "n2_2",
-  "d_0", "d_1", "d_2", "cdcklm_0", "cdcklm_1", "cdcklm_2", "nim0", "nim1", "nim2", "nim3",
+  "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcklm_0", "cdcklm_1", "cdcklm_2", "nim0", "nim1", "nim2", "nim3",
   "t3_3", "t2_3", "n1_3", "n2_3", "cdcecl_3", "cdcklm_3", "u2_0", "u2_1", "u2_2", "ecl_oflo",
   "ecl_3dbha", "lml_0", "lml_1", "lml_2", "lml_3", "lml_4", "lml_5", "lml_6", "lml_7", "lml_8", // 100
   "lml_9", "lml_10", "samhem", "opohem", "d_b2b3", "d_b2b5", "d_b2b7", "d_b2b9", "p_b2b3", "p_b2b5",
@@ -42,7 +42,7 @@ TrgBit::_inputMap[N_INPUT_ARRAY][N_BITS_RESERVED] = {
     // 40 ecl_tim_bwd, ecl_phys, top_0, top_1, top_2, top_bb, top_active, klm_hit, klm_0, klm_1,
     // 50 klm_2, klm_3, klmb2b_0, klmb2b_1, klmb2b_2, revo, her_kick, ler_kick, bha_delay, pseud_rand,
     // 60 plsin, poiin, periodin, veto, n1_0, n1_1, n1_2, n2_0, n2_1, n2_2,
-    // 70 d_0, d_1, d_2, cdcklm_0, cdcklm_1, cdcklm_2, nim0, nim1, nim2, nim3, --80
+    // 70 cdcecl_0, cdcecl_1, cdcecl_2, cdcklm_0, cdcklm_1, cdcklm_2, nim0, nim1, nim2, nim3, --80
     // 80 t3_3, t2_3, n1_3, n2_3, cdcecl_3, cdcklm_3, u2_0, u2_1, u2_2, ecl_oflo,
     // 90 ecl_3dbha, lml_0, lml_1, lml_2, lml_3, lml_4, lml_5, lml_6, lml_7, lml_8,
     //100 lml_9, lml_10, samhem, opohem, d_b2b3, d_b2b5, d_b2b7, d_b2b9, p_b2b3, p_b2b5,

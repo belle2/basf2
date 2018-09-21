@@ -32,7 +32,7 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisPXDCMModule();
   private:
 
@@ -45,14 +45,19 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data members
+    //! name of histogram directory
     std::string m_histogramDirectoryName;
+    //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
+    //! histogram covering all modules
     TH2F* m_hCommonMode;
+    //! Final Canvas
     TCanvas* m_cCommonMode;
+    //! Lines in the Canvas to guide the eye
     TLine* m_line1, *m_line2, *m_line3;
 
 #ifdef _BELLE2_EPICS

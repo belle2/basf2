@@ -115,10 +115,6 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: beginRun called.");
 
-  for (auto merge_cmap : m_cEffMerge) {
-    merge_cmap.second->Clear();
-  }
-
   m_cEffAll->Clear();
 
   for (auto single_cmap : m_cEffModules) {
@@ -136,11 +132,6 @@ void DQMHistAnalysisPXDEffModule::event()
 
   //Count how many of each type of histogram there are for the averaging
   std::map<std::string, int> typeCounter;
-
-  //Reset the histograms for new averaging
-  for (auto mergers : m_hEffMerge) {
-    mergers.second->Reset();
-  }
 
   for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
     VxdID& aPXDModule = m_PXDModules[i - 1];
@@ -181,17 +172,6 @@ void DQMHistAnalysisPXDEffModule::event()
       m_cEffModules[aPXDModule]->Update();
     }
   }//One-Module histos finished
-
-  //Plotting the average sensor type histograms
-  for (auto mergers : m_hEffMerge) {
-    m_cEffMerge[mergers.first]->cd();
-    mergers.second->Scale(1. / typeCounter[mergers.first]);
-    mergers.second->Draw("colz");
-    m_cEffMerge[mergers.first]->Modified();
-    m_cEffMerge[mergers.first]->Update();
-
-  }
-
 
   //Fill both of the summary histograms
   m_hEffAll->Reset();

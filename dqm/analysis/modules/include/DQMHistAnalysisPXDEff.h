@@ -32,7 +32,7 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisPXDEffModule();
   private:
 
@@ -45,28 +45,29 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data members
-    int m_u_bins;
-    int m_v_bins;
+    //! name of histogram directory
     std::string m_histogramDirectoryName;
+    //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    //! Flag to trigger creation of additional histograms
     bool m_singleHists;
+    //! u binning for 2d plots
+    int m_u_bins;
+    //! v binning for 2d plots
+    int m_v_bins;
 
-    //IDs of all PXD Modules to iterate over
+    //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    //Individual efficiency for each module
+    //! Individual efficiency for each module, 2d histogram
     std::map<VxdID, TH2D*> m_hEffModules;
+    //! Individual efficiency for each module, canvas
     std::map<VxdID, TCanvas*> m_cEffModules;
 
-    //Make four summary plots for each module type
-    std::map<std::string, TH2D*> m_hEffMerge;
-    std::map<std::string, TCanvas*> m_cEffMerge;
-
-    //One bin for each module in the geometry, one histogram for each layer
+    //! One bin for each module in the geometry
     TH1D* m_hEffAll;
+    //! Final Canvas
     TCanvas* m_cEffAll;
-
-    TH1* GetHisto(TString a);
 
 #ifdef _BELLE2_EPICS
     chid  mychid;

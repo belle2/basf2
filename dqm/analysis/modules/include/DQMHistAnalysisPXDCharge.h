@@ -32,7 +32,7 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisPXDChargeModule();
   private:
 
@@ -46,22 +46,30 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data members
+    //! name of histogram directory
     std::string m_histogramDirectoryName;
+    //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    //! fit range lo edge for landau
     double m_rangeLow;
+    //! fit range hi edge for landau
     double m_rangeHigh;
 
     //IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    TF1* m_fLandau;// only one fit function for all Landaus
-    TF1* m_fMean;// Fit the Mean for all modules
+    //! only one fit function for all Landaus
+    TF1* m_fLandau;
+    //! Fit the Mean for all modules
+    TF1* m_fMean;
+    //! Histogram covering all modules
     TH1F* m_hCharge;
+    //! Final Canvas
     TCanvas* m_cCharge;
-//     TLine* m_line1, *m_line2, *m_line3;
 
 #ifdef _BELLE2_EPICS
-    chid  mychid[2];// two PVs, Mean and maximum deviation
+    // Place for two EPICS PVs, Mean and maximum deviation
+    chid  mychid[2];
 #endif
   };
 } // end namespace Belle2

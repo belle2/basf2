@@ -435,13 +435,22 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
         comparison_revs.append(json_objects.ComparisonRevision(label=r,
                                                                color=line_color))
 
+    # if present, save old comparison to compare it to the new one when sending
+    # error emails. If the error status remained the same, no new mail is sent
+    try:
+        with open(comparison_json_file) as f:
+            comparison_old = json.load(f)
+    except FileNotFoundError:
+        comparison_old = None
+
     # todo: refactor this information extracion -> json inside a specific class / method after the
     # plots have been created
     json_objects.dump(comparison_json_file, json_objects.Comparison(comparison_revs, comparison_packages))
 
     # send mails to everyone with failed validation plots
     print("Sending mails ...")
-    mail_log.mail_log(json_objects.dump_rec(json_objects.Comparison(comparison_revs, comparison_packages)))
+    mail_log.mail_log(json_objects.dump_rec(json_objects.Comparison(comparison_revs, comparison_packages)),
+                      comparison_old)
 
 
 def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):

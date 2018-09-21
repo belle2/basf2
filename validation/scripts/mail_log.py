@@ -88,7 +88,16 @@ def send_all_mails(mail_data, mail_data_old=None):
                 # don't send mail
                 continue
         body = compose_message(mail_data[contact])
-        utils.send_mail(contact, "david.koch@physik.uni-muenchen.de", "Validation failure", body, pw)
+        # set the mood of the b2bot
+        if len(mail_data[contact]) < 4:
+            mood = "meh"
+        elif len(mail_data[contact]) < 7:
+            mood = "angry"
+        elif len(mail_data[contact]) < 10:
+            mood = "livid"
+        else:
+            mood = "dead"
+        utils.send_mail(contact, "david.koch@physik.uni-muenchen.de", "Validation failure", body, pw, mood=mood)
     del pw
 
 

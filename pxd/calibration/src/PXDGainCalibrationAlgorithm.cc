@@ -107,7 +107,7 @@ namespace {
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterChargeCollector"),
-  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(true)
+  minClusters(3000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -153,6 +153,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
   // This is the PXD gain correction payload for conditions DB
   PXDGainMapPar* gainMapPar = new PXDGainMapPar(nBinsU, nBinsV);
+  set<VxdID> pxdSensors;
 
   // Loop over all bins of input histo
   for (auto histoBin = 1; histoBin <= cluster_counter->GetXaxis()->GetNbins(); histoBin++) {
@@ -185,8 +186,47 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     } else {
       B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfHits << " < " << minClusters <<
                 "). Use default gain.");
+      gainMapPar->setContent(sensorID.getID(), uBin, vBin, 1.0);
+    }
+    pxdSensors.insert(sensorID);
+  }
+
+  // Post processing of gain map. It is possible that the gain
+  // computation failed on some parts. Here, we replace default
+  // values by local averages of neighboring sensor parts.
+  for (const auto& sensorID : pxdSensors) {
+    for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
+      float meanGain = 0;
+      unsigned short nGood = 0;
+      unsigned short nBad = 0;
+      for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+        auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+        // Filter default gains
+        if (gain != 1.0) {
+          nGood += 1;
+          meanGain += gain;
+        } else {
+          nBad += 1;
+        }
+      }
+      B2RESULT("Gain calibration on sensor=" << sensorID << " and vBin=" << vBin << " was successful on " << nGood << "/" << nBinsU <<
+               " uBins.");
+
+      // Check if we can repair bad calibrations with a local avarage
+      if (nGood > 0 && nBad > 0) {
+        meanGain /= nGood;
+        for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+          auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+          if (gain == 1.0) {
+            gainMapPar->setContent(sensorID.getID(), uBin, vBin, meanGain);
+            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin << ": Replace default gain wih average "
+                     << meanGain);
+          }
+        }
+      }
     }
   }
+
 
   // Save the gain map to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.

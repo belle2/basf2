@@ -5,11 +5,13 @@
 #
 # At first, you can extract the hotpixel calibration payloads from a localdb/centraldb using the tool
 #
-# b2conditionsdb-extract --exp 3 --runs 126-6522 --tag Calibration_Offline_Development --output hot_payloads.root PXDMaskedPixelPar
+# b2conditionsdb-extract --exp 3 --runs 0-5614 --tag Calibration_Offline_Development --output hot_payloads.root PXDMaskedPixelPar
 #
 # Secondly, execute the script as
 #
-# basf2 hotpixel_plot.py
+# basf2 plotHotPixelMasks.py
+#
+# basf2 plotHotPixelMasks.py -- --maps
 #
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
@@ -19,6 +21,12 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 from array import array
+
+import argparse
+parser = argparse.ArgumentParser(description="Plot hotpixel maps")
+parser.add_argument('--maps', dest='maps', action="store_true", help='Create maps from payloads. This can be slow!')
+args = parser.parse_args()
+
 
 sensor_list = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
 
@@ -46,33 +54,35 @@ for condition in conditions:
             nUCells = 250
             nVCells = 768
 
+            hotpixelmap = condition.PXDMaskedPixelPar.getMaskedPixelMap()
+
             layer = sensorID.getLayerNumber()
             ladder = sensorID.getLadderNumber()
             sensor = sensorID.getSensorNumber()
 
-            name = "MaskedPixels_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
-            title = "Masked Pixels Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
-            hot_map = ROOT.TH2F(name, title, nUCells, 0, nUCells, nVCells, 0, nVCells)
-            hot_map.GetXaxis().SetTitle("uCell")
-            hot_map.GetYaxis().SetTitle("vCell")
-            hot_map.GetZaxis().SetTitle("isMasked")
-            hot_map.SetStats(0)
+            counter = len(hotpixelmap[sensorID.getID()])
 
-            counter = 0.0
+            if args.maps:
+                name = "MaskedPixels_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
+                title = "Masked Pixels Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
+                hot_map = ROOT.TH2F(name, title, nUCells, 0, nUCells, nVCells, 0, nVCells)
+                hot_map.GetXaxis().SetTitle("uCell")
+                hot_map.GetYaxis().SetTitle("vCell")
+                hot_map.GetZaxis().SetTitle("isMasked")
+                hot_map.SetStats(0)
 
-            for uCell in range(nUCells):
-                for vCell in range(nVCells):
-                    pixID = uCell * nVCells + vCell
-                    isMasked = not condition.PXDMaskedPixelPar.pixelOK(sensorID.getID(), pixID)
-                    if isMasked:
-                        counter += 1.0
-                    hot_map.SetBinContent(int(uCell + 1), int(vCell + 1), isMasked)
+                for uCell in range(nUCells):
+                    for vCell in range(nVCells):
+                        pixID = uCell * nVCells + vCell
+                        isMasked = not condition.PXDMaskedPixelPar.pixelOK(sensorID.getID(), pixID)
+                        hot_map.SetBinContent(int(uCell + 1), int(vCell + 1), isMasked)
+
+                histofile.cd("maps")
+                hot_map.Write()
 
             hotfraction = counter / (nUCells * nVCells)
             hotpixel_table[sensorID.getID()].append(hotfraction)
 
-            histofile.cd("maps")
-            hot_map.Write()
 
 histofile.cd()
 c = ROOT.TCanvas('hotpixels_vs_runno', 'Hotpixel evolution vs. run number', 200, 10, 700, 500)

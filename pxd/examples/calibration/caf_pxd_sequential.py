@@ -3,33 +3,34 @@
 
 
 # This steering file computes PXD calibrations for hot pixels, dead pixels, hit occupancy and
-# energy loss (gain). The script uses the CAF framework. This script version uses by default
-# SimpleRunByRun strategy and is designed to compute run-by-run gain corrections
-# on for a large set of runs.
+# energy loss (gain). The script uses the CAF framework. This script uses by default the
+# SequentialRunByRun strategy and is designed to try to compute new calibration constants
+# regularly to follow temporal changes of the PXD.
 #
-# Note that there may be gaps in the IoV range due to missing or very short runs where default
-# values are used. Note that dead pixel and gain calibration require a certain number of hits
-# which typically cannot be acquired during a comsic run. A proper mechanism to forward extend
-# the the IoV range of the last successfull calibration to cover those gaps is missing.
+# The script allows you to create a list of runs that will be ignored in the calibration.
+# Use this list for known bad runs.
 #
 # Before calibration, you have to put a file to IoV mapping called 'file_iov_map.pkl' in your
-# working directory. The mapping file should map beam all run files (real data) from phase 2
-# that you want to calibrate. You can create such a file by using:
+# working directory. The mapping file should map file locations to IoV ranges and allows to
+# logically address data by experiment and run numbers.  You can create such a map file by using
+# the tool b2caf-filemap. See also the option --help.
 #
-# basf2 create_file_to_iov_map.py
+# b2caf-filemap -m raw  -p "/hsm/belle2/bdata/Data/Raw/e0003/r*/**/*.root"
 #
 # The next step is to prepare mc runs containing PXDSimHits. That setup for the simulation
 # should mimik the situation of beam data as closely as possible.
 #
 # basf2 submit_create_mcruns.py -- --backend='local' --outputdir='pxd_mc_phase2' --runLow=4000 --runHigh=6522 --expNo=3
 #
-# The scribts submits the creation of mc runs to a CAF.backend (here local) for all for given run range. Runs in the
+# The scripts submits the creation of mc runs to a CAF.backend (here local) for all for given run range. Runs in the
 # specified runs but not found in 'file_iov_map.pkl' will be skipped. The simulated runs will be collected in the folder
-# outputdir.
+# outputdir. It is best to create another mapping file for the mc data.
+#
+# b2caf-filemap -m metadata  -p --output-file "dummy_mc_file_iov_map.pkl" "pxd_mc_phase2/*.root"
 #
 # Finally, a CAF script for the calibration needs to be started:
 #
-# basf2 gains_caf_runbyrun.py -- --runLow=4000 --runHigh=6522 --expNo=3 --mc_input_files='pxd_mc_phase2'
+# basf2 caf_pxd_sequential.py -- --runLow=4000 --runHigh=6522 --expNo=3
 #
 # The results will be collected in a folder 'pxd_calibration_results_range_XY'. In order to complete the
 # process, the check and uploads the outputdbs to a global tag (GT).
@@ -38,7 +39,7 @@
 #
 # The option --help provides extensive help for the b2conditionsdb tool.
 #
-# author: benjamin.schwenker@phys.uni-goettingen.de
+# author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
@@ -52,7 +53,7 @@ from ROOT.Belle2 import PXDMedianChargeCalibrationAlgorithm
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
-from caf.utils import IoV
+from caf.utils import ExpRun, IoV
 from caf.utils import get_iov_from_file
 from caf.utils import find_absolute_file_paths
 from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
@@ -63,10 +64,12 @@ parser = argparse.ArgumentParser(description="Compute gain correction maps for P
 parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--mc_input_files', default='pxd_mc_phase2', type=str,
-                    help='Lets take some file patterns. We could have put wildcards in more places but this is enough for testing.')
 parser.add_argument('--maxSubRuns', default=20, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
+
+
+# Ignoring runs
+pxd_ignore_run_list = [ExpRun(3, 484), ExpRun(3, 485), ExpRun(3, 486), ExpRun(3, 524)]
 
 # Set the IoV range for this calibration
 iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
@@ -86,8 +89,12 @@ for file_iov in input_file_iov_set:
 
 print('Number selected input files:  {}'.format(len(input_files)))
 
-# Get list of input files (MC)
-mc_input_files = find_absolute_file_paths(glob.glob(args.mc_input_files + '/*.root'))
+# Access files_to_iovs for MC runs
+with open("mc_file_iov_map.pkl", 'br') as map_file:
+    mc_files_to_iovs = pickle.load(map_file)
+
+
+mc_input_files = list(mc_files_to_iovs.keys())
 
 print('Number selected mc input files:  {}'.format(len(mc_input_files)))
 
@@ -105,14 +112,14 @@ pre_hotpixel_collector_path.add_module('PXDUnpacker')
 hotpixel_algo = PXDHotPixelMaskCalibrationAlgorithm()
 
 # We can play around with hotpixelkiller parameters
-hotpixel_algo.forceContinueMasking = True   # Continue masking even when few/no events were collected
+hotpixel_algo.forceContinueMasking = False  # Continue masking even when few/no events were collected
 hotpixel_algo.minEvents = 30000             # Minimum number of collected events for masking
 hotpixel_algo.minHits = 15                  # Only consider dead pixel masking when median number of hits per pixel is higher
-hotpixel_algo.pixelMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
+hotpixel_algo.pixelMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
 hotpixel_algo.maskDrains = True             # Set True to allow masking of hot drain lines
-hotpixel_algo.drainMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
+hotpixel_algo.drainMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
 hotpixel_algo.maskRows = True               # Set True to allow masking of hot rows
-hotpixel_algo.rowMultiplier = 5             # Occupancy threshold is median occupancy x multiplier
+hotpixel_algo.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
 
 # We want to use a specific collector collecting from raw hits
 hotpixel_algo.setPrefix("PXDRawHotPixelMaskCollector")
@@ -129,10 +136,13 @@ hotpixel_cal.pre_collector_path = pre_hotpixel_collector_path
 hotpixel_cal.files_to_iovs = files_to_iovs
 
 # Here we set the AlgorithmStrategy
-hotpixel_cal.strategies = SimpleRunByRun
+hotpixel_cal.strategies = SequentialRunByRun
 hotpixel_cal.max_files_per_collector_job = 1
-
 hotpixel_cal.use_central_database("Calibration_Offline_Development")
+
+hotpixel_cal.ignored_runs = pxd_ignore_run_list
+hotpixel_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
+
 
 # Create and configure the collector on beam data and its pre collector path
 charge_collector = register_module("PXDClusterChargeCollector")
@@ -157,9 +167,9 @@ pre_charge_collector_path.add_module("PXDClusterizer")
 charge_algo = PXDMedianChargeCalibrationAlgorithm()
 
 # We can play around with algo parameters
-charge_algo.minClusters = 500      # Minimum number of collected clusters for estimating gains
+charge_algo.minClusters = 5000      # Minimum number of collected clusters for estimating gains
 charge_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
-charge_algo.forceContinue = True    # Force continue algorithm instead of c_notEnoughData
+charge_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
 
 # We want to use a specific collector
 charge_algo.setPrefix("PXDClusterChargeCollector")
@@ -176,8 +186,11 @@ charge_cal.pre_collector_path = pre_charge_collector_path
 charge_cal.files_to_iovs = files_to_iovs
 
 # Here we set the AlgorithmStrategy
-charge_cal.strategies = SimpleRunByRun
+charge_cal.strategies = SequentialRunByRun
 charge_cal.max_files_per_collector_job = 1
+
+charge_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
+charge_cal.ignored_runs = pxd_ignore_run_list
 
 charge_cal.use_central_database("Calibration_Offline_Development")
 
@@ -202,9 +215,9 @@ pre_gain_collector_path.add_module("PXDClusterizer")
 gain_algo = PXDGainCalibrationAlgorithm()
 
 # We can play around with algo parameters
-gain_algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
+gain_algo.minClusters = 3000      # Minimum number of collected clusters for estimating gains
 gain_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
-gain_algo.forceContinue = True    # Force continue algorithm instead of c_notEnoughData
+gain_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
 
 # We want to use a specific collector
 gain_algo.setPrefix("PXDClusterChargeCollector")
@@ -218,11 +231,14 @@ gain_cal = Calibration(
 gain_cal.pre_collector_path = pre_gain_collector_path
 
 # Apply the map to this calibration, now the CAF doesn't have to do it
-# gain_cal.files_to_iovs = mc_files_to_iovs
+gain_cal.files_to_iovs = mc_files_to_iovs
 
 # Here we set the AlgorithmStrategy
-gain_cal.strategies = SimpleRunByRun
+gain_cal.strategies = SequentialRunByRun
 gain_cal.max_files_per_collector_job = 1
+
+gain_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
+gain_cal.ignored_runs = pxd_ignore_run_list
 
 gain_cal.use_central_database("Calibration_Offline_Development")
 

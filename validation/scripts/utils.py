@@ -9,6 +9,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.charset import add_charset, QP
 
+import validationpath
+
 
 def get_greeting(name):
     """Get a random greeting and closing statement"""
@@ -78,7 +80,11 @@ def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="
     # create multipart mime mail
     msg.attach(MIMEText("{greeting},\n\n{text}{plain_link}\n\n{closing}"
                         "\n\tThe Belle 2 Software Bot (B2Bot)".format(**data), "plain"))
-    template = Template(open(os.path.join(os.path.dirname(__file__), "template_mail.html")).read())
+    template = Template(
+        open(
+            os.path.join(
+                validationpath.get_basepath()["local"],
+                "validation/html_static/templates/template_mail.html")).read())
     msg.attach(MIMEText(template.substitute(**data), "html"))
 
     if os.environ.get("bamboo_DRYRUN", False):

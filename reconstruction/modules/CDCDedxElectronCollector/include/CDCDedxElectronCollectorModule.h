@@ -103,6 +103,6 @@ namespace Belle2 {
     bool IsentaRS;/**< flag to write rescaled enta in tree */
     bool Isdedxhit;    /**< flag to write dedxhits in tree */
     bool IsBadPhiRej;/**< flag to remove bad phi region */
-
+    bool IsRadbhabha; /**< flag to dedx cut on partner track */
   };
 }

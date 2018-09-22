@@ -47,6 +47,7 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   addParam("IsentaRS", IsentaRS, "true for adding enta tree branch. ", false);
   addParam("Isdedxhit", Isdedxhit, "true for adding dedxhit tree branch. ", false);
   addParam("IsBadPhiRej", IsBadPhiRej, "true for removing bad phi tracks and hits ", false);
+  addParam("IsRadbhabha", IsRadbhabha, "true for cutting dedx of other track", false);
 
 
 }
@@ -100,9 +101,14 @@ void CDCDedxElectronCollectorModule::collect()
   if (Isrun)m_run = run;
   //printf("this run is = %d", run);
 
+  Int_t nTracks = m_dedxTracks.getEntries();
+
   for (int idedx = 0; idedx < m_dedxTracks.getEntries(); idedx++) {
+
     CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
+
     const Track* track = dedxTrack->getRelatedFrom<Track>();
+
     const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
@@ -116,6 +122,7 @@ void CDCDedxElectronCollectorModule::collect()
 
     // apply cleanup cuts
     if (m_cuts && dedxTrack->getNLayerHits() <= 20) continue;
+
     if (m_cuts && (fabs(fitResult->getD0()) >= 1 || fabs(fitResult->getZ0()) >= 3)) continue;
 
     ////NEW
@@ -124,6 +131,39 @@ void CDCDedxElectronCollectorModule::collect()
       double TrkEoverP = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
       if (abs(TrkEoverP - 1) >= fSetEoverP)continue;
       //printf("TrkEoverP = %0.03f\n", TrkEoverP);
+    }
+
+    if (IsRadbhabha) {
+      if (nTracks == 2) {
+
+        Int_t iOtherdedx = abs(idedx - 1);
+        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[iOtherdedx];
+        if (!dedxOtherTrack)  continue;
+
+        const Track* Othertrack = dedxOtherTrack->getRelatedFrom<Track>();
+        if (!Othertrack)continue;
+
+        const TrackFitResult* mOtherTrack = 0x0;
+        mOtherTrack = Othertrack->getTrackFitResultWithClosestMass(Const::electron);
+        if (!mOtherTrack)continue;
+
+        double TrkEoverPOther = -2.0;
+        const ECLCluster* eclClusterOther = Othertrack->getRelated<ECLCluster>();
+        if (!eclClusterOther)continue;
+
+        TrkEoverPOther = (eclClusterOther->getEnergy()) / (mOtherTrack->getMomentum().Mag());
+
+        //cutting on EoverP of other track
+        if (abs(TrkEoverPOther - 1.0) >= fSetEoverP) {
+          //printf("Cut1: TrkEoverPOther = %0.03f\n", TrkEoverPOther);
+          continue;
+        }
+        //cutting on dedx of other track
+        if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) >= 0.2) {
+          //printf("Cut2: TrkdEdxOther = %0.03f\n", dedxOtherTrack->getDedxNoSat());
+          continue;
+        }
+      }
     }
 
     if (IsBadPhiRej) {

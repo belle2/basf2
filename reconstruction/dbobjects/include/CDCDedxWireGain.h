@@ -51,6 +51,9 @@ namespace Belle2 {
       return *this;
     }
 
+    /**
+     * Set wire gain
+     **/
     void setWireGain(int wire, double gain)
     {
       if (wire < 0 || (unsigned)wire >= m_wiregains.size())

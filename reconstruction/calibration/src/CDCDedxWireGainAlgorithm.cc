@@ -117,8 +117,6 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   //------------------------> Calculations part
   TH1F* htempPerWire = new TH1F("htempPerWire", "", 250, 0, 5);
-  double truncMean = 1.0, binweights = 1.0;
-  int sumofbc = 1;
 
   for (unsigned int jwire = 0; jwire < 14336; ++jwire) {
 
@@ -127,19 +125,17 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       htempPerWire->Fill(ihit);
     }
 
-    truncMean  = 1.0;
-    binweights = 0.0;
-    sumofbc = 0;
+    double truncMean = 1.0, binweights = 1.0;
+    int sumofbc = 1;
 
     if (htempPerWire->Integral() < 100) {
       truncMean  = 1.0;
-      //iWireTruncMean[jwire] =  truncMean;
     } else {
       int startfrom = 1, endat = 1;
       if (jwire < 160 * 8) {
         startfrom = lBinInLayer;
         endat = hBinInLayer;
-      } else if (jwire >= 160 * 8) {
+      } else {
         startfrom = lBinOutLayer;
         endat = hBinOutLayer;
       }

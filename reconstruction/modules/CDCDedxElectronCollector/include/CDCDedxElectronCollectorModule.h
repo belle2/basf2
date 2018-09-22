@@ -46,35 +46,42 @@ namespace Belle2 {
      */
     virtual void collect();
 
-    /*** if bad phi region removal is demanded */
+    /**
+    * if bad phi region removal is demanded
+    */
     void setBadPhiRejection(bool value) {IsBadPhiRej = value;}
 
-    /*** if bad phi region removal is demanded */
+    /**
+    * if bad phi region removal is demanded
+    */
     void setEoverPCutValue(double value) {fSetEoverP = value;}
 
 
   private:
 
+    /**
+    * Electron collector variables
+    */
     bool m_cuts; /**< Boolean to apply cuts during collection */
 
-    // required input
+    /// required input
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array for Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
 
-    // module params
+    /// module params
     int m_maxNumHits; /**< maximum number of hits allowed */
-    double fSetEoverP;
-    // track level information
+    double fSetEoverP; /**< Cut of E over P value */
+    /// track level information
     double m_dedx = -1;  /**< dE/dx truncated mean */
     double m_costh = -1; /**< track cos(theta) */
     double m_p = -1; /**< track momentum */
     int m_charge = 0; /**< track momentum */
-    int m_run = 1;/**run number */
+    int m_run = 1;/**<run number */
     int m_nhits = -1;    /**< number of dE/dx hits on the track */
 
-    // hit level information
+    /// hit level information
     std::vector<int> m_wire;       /**< wire number for the hit */
     std::vector<int> m_layer;      /**< continuous layer number for the hit */
     std::vector<double> m_doca;    /**< distance of closest approach for the hit */

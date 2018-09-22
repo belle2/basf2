@@ -5,7 +5,6 @@ import re
 import json
 # martin's mail utils
 import utils
-import getpass
 
 
 def create_mail_log(comparison):
@@ -88,8 +87,6 @@ def send_all_mails(mail_data, mail_data_old=None):
     if mail_data_old is given, a mail is only sent if there are new failed plots
     """
 
-    # only for testing
-    pw = getpass.getpass("passwort: ")
     for contact in mail_data:
         # if the errors are the same as yesterday, don't send a new mail
         if mail_data_old and contact in mail_data_old:
@@ -108,7 +105,7 @@ def send_all_mails(mail_data, mail_data_old=None):
             mood = "dead"
 
         body = compose_message(mail_data[contact])
-        utils.send_mail(contact.split('@')[0], "david.koch@physik.uni-muenchen.de", "Validation failure", body, pw, mood=mood)
+        utils.send_mail(contact.split('@')[0], contact, "Validation failure", body, mood=mood)
 
     # send a happy mail to folks whose failed plots work now
     if mail_data_old:
@@ -117,13 +114,10 @@ def send_all_mails(mail_data, mail_data_old=None):
                 body = "Your validation plots work fine now!"
                 utils.send_mail(
                     contact.split('@')[0],
-                    "david.koch@physik.uni-muenchen.de",
+                    contact,
                     "Validation confirmation",
                     body,
-                    pw,
                     mood="happy")
-
-    del pw
 
 
 def check_if_same(new, old):

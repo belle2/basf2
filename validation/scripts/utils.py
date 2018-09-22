@@ -9,23 +9,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.charset import add_charset, QP
 
-# for testing only
-import smtplib
-import sys
-
-
-def send_mail_without_sendmail(sender, passwort, address, msg, host="smtp.web.de", port=587):
-    try:
-        s = None
-        s = smtplib.SMTP(host=host, port=port)
-        s.starttls()
-        s.login(sender, passwort)
-        s.sendmail(sender, address, msg.as_bytes())
-    except smtplib.SMTPAuthenticationError:
-        print("login fail")
-    except BaseException:
-        print(sys.exc_info()[0])
-
 
 def get_greeting(name):
     """Get a random greeting and closing statement"""
@@ -48,10 +31,8 @@ def markdown_to_plaintext(text):
     text = replace_autolink.sub(r"\1", text)
     return text
 
-#                          only for testing ---v remove later!!!
 
-
-def send_mail(name, recipient, subject, text, pw, link=None, link_title=None, mood="normal"):
+def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="normal"):
     """
     Send an email to `name` at mail address `recipient` with the given subject and text.
 
@@ -68,8 +49,7 @@ def send_mail(name, recipient, subject, text, pw, link=None, link_title=None, mo
     add_charset("utf-8", QP, QP, "utf-8")
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
-    # msg['From'] = "B2Bot <b2soft@mail.desy.de>"
-    msg['From'] = "Dave <dave-koch@web.de>"
+    msg['From'] = "B2Bot <b2soft@mail.desy.de>"
     msg['Reply-To'] = "Martin Ritter <martin.ritter@belle2.org>"
     if "bamboo_email_override" in os.environ and os.environ["bamboo_email_override"].find("@") > 0:
         msg["To"] = os.environ["bamboo_email_override"]
@@ -105,6 +85,4 @@ def send_mail(name, recipient, subject, text, pw, link=None, link_title=None, mo
         print("Send Mail: ", msg.as_bytes().decode(), file=sys.stderr)
         # open("test.html", "w").write(template.substitute(**data))
     else:
-        # just be sure to not accidentally send mails during development
-        # subprocess.run(["/usr/sbin/sendmail", "-t", "-oi"], input=msg.as_bytes())
-        send_mail_without_sendmail("dave-koch@web.de", pw, recipient, msg)
+        subprocess.run(["/usr/sbin/sendmail", "-t", "-oi"], input=msg.as_bytes())

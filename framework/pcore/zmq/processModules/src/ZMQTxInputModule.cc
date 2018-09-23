@@ -149,7 +149,7 @@ void ZMQTxInputModule::checkWorkerProcTimeout()
     return;
   }
 
-  const std::chrono::milliseconds workerProcTimeout(6000);
+  const std::chrono::milliseconds workerProcTimeout(60000);
   int workerID = m_procEvtBackupList.checkForTimeout(workerProcTimeout);
   if (workerID > -1) {
     B2WARNING("Worker process timeout, workerID: " << workerID);

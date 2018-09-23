@@ -33,6 +33,8 @@ from basf2 import *
 from flavorTagger import *
 from stdPi0s import *
 from stdCharged import *
+import variableCollections as vc
+from modularAnalysis import variablesToNtuple
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
@@ -165,18 +167,15 @@ rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 fshars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
 jpsiandk0svars = vc.mc_truth
 bvars = vc.event_meta_data + vc.reco_stats + vc.deltae_mbc + vc.ckm_kinematics + vc.mc_truth + \
-    vc.roe_multiplicities + flavor_tagging + vc.tag_vertex + mc_vc.tag_vertex + \
+    vc.roe_multiplicities + vc.flavor_tagging + vc.tag_vertex + mc_vc.tag_vertex + \
     vc.convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
     vc.convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A801-FlavorTagger.root'
 variablesToNtuple('B0:jspiks', bvars,
                   filename=output_file, treename='B0tree')

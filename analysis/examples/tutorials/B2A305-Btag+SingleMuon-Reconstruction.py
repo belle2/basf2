@@ -46,10 +46,11 @@ from modularAnalysis import copyLists
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import buildRestOfEvent
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
-from stdCharged import *
+from modularAnalysis import variablesToNtuple
+import variableCollections as vc
+from stdCharged import stdLoosePi, stdLooseK, stdLooseMu
 from stdPi0s import stdPi0s
+
 
 # load data
 inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx1.root')
@@ -90,7 +91,6 @@ matchMCTruth('Upsilon(4S)')
 buildRestOfEvent('Upsilon(4S)')
 
 # 6. Select variables that we want to store to ntuple
-import variableCollections as vc
 
 dvars = vc.mc_truth + vc.kinematics + vc.inv_mass
 bvars = vc.mc_truth + vc.deltae_mbc + \
@@ -106,7 +106,6 @@ u4svars = vc.mc_truth + vc.roe_multiplicities + vc.recoil_kinematics + vc.extra_
 
 
 # 7. Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 rootOutputFile = 'B2A305-Btag+SingleMuon-Reconstruction.root'
 variablesToNtuple('B-:tag', bvars,
                   filename=rootOutputFile, treename='btag')

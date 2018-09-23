@@ -32,8 +32,9 @@ from modularAnalysis import reconstructDecay
 from modularAnalysis import copyLists
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
+from modularAnalysis import variablesToNtuple
+import variableCollections as vc
+
 
 # check if the required input file exists (from B2A101 example)
 import os.path
@@ -72,7 +73,6 @@ reconstructDecay('B+:D0pi -> anti-D0:all pi+', '5.24 < Mbc < 5.29 and abs(deltaE
 matchMCTruth('B+:D0pi')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
 
 dtools = vc.inv_mass + vc.kinematics
 pitools = vc.kinematics
@@ -82,7 +82,6 @@ btools = vc.event_meta_data + vc.deltae_mbc + vc.mc_truth + \
     vc.wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "")
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A303-MultipleDecays-Reconstruction.root'
 variablesToNtuple('B+:D0pi', btools,
                   filename=output_file, treename='bp')

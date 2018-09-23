@@ -23,10 +23,10 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
 from stdPhotons import stdPhotons
 from stdCharged import stdLoosePi
+from modularAnalysis import variablesToNtuple
+import variableCollections as vc
 
 # Run this tutorial either over signal MC or background MC (K*gamma)
 # Add 10 signal MC files (each containing 1000 generated events)
@@ -63,7 +63,6 @@ reconstructDecay('B0 -> rho0 gamma:tight', '5.2 < Mbc < 5.29 and abs(deltaE) < 2
 matchMCTruth('B0')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
 
 gammatools = vc.cluster + vc.mc_truth + vc.kinematics
 rhotools = vc.cluster + vc.mc_truth + vc.kinematics + vc.inv_mass
@@ -77,7 +76,6 @@ btools = vc.event_meta_data + vc.kinematics + vc.deltae_mbc + vc.mc_truth + \
                                     'B0 -> [rho0 -> ^pi+ ^pi-] gamma')
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 variablesToNtuple('B0', btools,
                   filename=rootOutputFile, treename='b0')
 

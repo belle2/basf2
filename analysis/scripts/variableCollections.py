@@ -3,8 +3,6 @@
 
 """
 Adds default collections to the VariableManager
-Details can be found on https://confluence.desy.de/display/BI/Physics+VariableManager
-
 """
 
 # from variables import variables
@@ -224,6 +222,11 @@ def add_collection(variables_list, collection_name):
     variables.addCollection(collection_name, v.std_vector(tuple(variables_list)))
     return collection_name
 
+# Placehoder for FT variables collection
+# BII-3853
+flavor_tagging = [
+    "qrOutput(FBDT)"]
+
 
 # Replacement for DeltaEMbc
 deltae_mbc = [
@@ -278,6 +281,7 @@ track_hits = [
 
 # Replacement for MCTruth tool
 mc_truth = [
+    'isSignal',
     'mcErrors',
     'mcPDG']
 
@@ -328,7 +332,8 @@ pid = [
     'pionID',
     'protonID',
     'muonID',
-    'electronID']
+    'electronID',
+    'deuteronID']
 
 # Replacement for ROEMultiplicities tool
 roe_multiplicities = [

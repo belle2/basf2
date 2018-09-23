@@ -22,10 +22,10 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
+from modularAnalysis import variablesToNtuple
 from stdCharged import *
 from beamparameters import add_beamparameters
+import variableCollections as vc
 
 beamparameters = add_beamparameters(analysis_main, "Y4S")
 
@@ -58,8 +58,6 @@ reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < useCMSFrame
 matchMCTruth('D*+')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
 fs_hadron_vars = vc.convert_to_all_selected_vars(
@@ -72,7 +70,6 @@ d0_vars = vc.convert_to_one_selected_vars(
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A301-Dstar2D0Pi-Reconstruction.root'
 variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
                   filename=output_file, treename='dsttree')

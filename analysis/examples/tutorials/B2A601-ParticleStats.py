@@ -42,7 +42,7 @@ from modularAnalysis import copyLists
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import summaryOfLists
-from stdCharged import *
+from stdCharged import stdLoosePi, stdLooseK
 from stdPi0s import stdPi0s
 
 filelistMIX = ['/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002166\

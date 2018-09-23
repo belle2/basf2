@@ -36,9 +36,7 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
 from modularAnalysis import fillParticleList
-from modularAnalysis import ntupleTree
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import rankByLowest
 from modularAnalysis import variableToSignalSideExtraInfo
@@ -47,6 +45,8 @@ from modularAnalysis import signalSideParticleFilter
 from modularAnalysis import fillSignalSideParticleList
 from modularAnalysis import printVariableValues
 from modularAnalysis import writePi0EtaVeto
+from modularAnalysis import variablesToNtuple
+import variableCollections as vc
 
 filelist = [
     '/group/belle2/tutorial/release_01-00-00/\
@@ -171,7 +171,6 @@ analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 # range the extraInfo(pi0veto) does not exist. In these cases
 # -999 will be written to the extraInfo(pi0veto) branch
 # Select variables that we want to store to ntuple
-import variableCollections as vc
 
 gammatools = vc.cluster + vc.mc_truth + vc.kinematics + vc.mc_hierarchy
 rhotools = vc.cluster + vc.mc_truth + vc.kinematics + vc.inv_mass
@@ -187,7 +186,6 @@ btools = vc.event_meta_data + vc.kinematics + vc.deltae_mbc + vc.mc_truth + \
     ['isSignal']
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 variablesToNtuple('B0', btools,
                   filename=rootOutputFile, treename='b0')
 

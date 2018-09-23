@@ -32,10 +32,10 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
 from modularAnalysis import vertexKFit
-from stdCharged import *
+from stdCharged import stdPi, stdLoosePi, stdLooseK
+from modularAnalysis import variablesToNtuple
+import variableCollections as vc
 
 # Add MC9 signal samples
 filelistSIG = [('/group/belle2/tutorial/release_01-00-00/\
@@ -74,7 +74,6 @@ vertexKFit('D*+', 0.0)
 matchMCTruth('D*+')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
 
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
@@ -88,7 +87,6 @@ d0_vars = vc.convert_to_one_selected_vars(
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A403-KFit-VertexFit.root'
 variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
                   filename=output_file, treename='dsttree')

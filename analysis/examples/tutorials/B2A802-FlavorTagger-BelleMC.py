@@ -41,6 +41,8 @@ from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
 from reconstruction import add_mdst_output
+import variableCollections as vc
+from modularAnalysis import variablesToNtuple
 
 if len(sys.argv) != 4:
     sys.exit('Must provide two input parameters: [mc|data] [input_Belle_MDST_file] [output_BelleII_ROOT_file].\n'
@@ -181,19 +183,16 @@ applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
 rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 fshars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
 jpsiandk0svars = vc.mc_truth
 bvars = vc.event_meta_data + vc.reco_stats + vc.deltae_mbc + vc.ckm_kinematics + vc.mc_truth + \
-    vc.roe_multiplicities + flavor_tagging + vc.tag_vertex + mc_vc.tag_vertex + \
+    vc.roe_multiplicities + vc.flavor_tagging + vc.tag_vertex + mc_vc.tag_vertex + \
     ['extraInfo(mdstIndex_rank)'] + \
     vc.convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
     vc.convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 variablesToNtuple('B0:jspiks', bvars,
                   filename=outputBelle2ROOTFile, treename='B0tree')
 

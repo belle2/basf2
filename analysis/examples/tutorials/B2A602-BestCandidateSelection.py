@@ -25,8 +25,17 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import *
-from stdCharged import *
+from modularAnalysis import inputMdstList
+from modularAnalysis import rankByLowest
+from modularAnalysis import reconstructDecay
+from modularAnalysis import vertexKFit
+from modularAnalysis import rankByLowest
+from modularAnalysis import rankByHighest
+from modularAnalysis import matchMCTruth
+from stdCharged import stdPi, stdLooseK
+from modularAnalysis import variablesToNtuple
+import variableCollections as vc
+
 
 # Add MC9 signal samples
 filelistSIG = [('/group/belle2/tutorial/release_01-00-00/\
@@ -85,8 +94,6 @@ matchMCTruth('D0')
 
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 fs_hadron_vars = vc.convert_to_all_selected_vars(vc.mc_truth, 'D0 -> ^K- ^pi+')
 
 d0_vars = vc.event_meta_data + vc.ckm_kinematics + vc.vertex + vc.mc_vertex + vc.mc_truth + \
@@ -94,7 +101,6 @@ d0_vars = vc.event_meta_data + vc.ckm_kinematics + vc.vertex + vc.mc_vertex + vc
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A602-BestCandidateSelection.root'
 variablesToNtuple('D0', d0_vars, filename=output_file, treename='D0')
 

@@ -24,9 +24,9 @@ from modularAnalysis import inputMdst
 from modularAnalysis import printDataStore
 from modularAnalysis import printList
 from modularAnalysis import fillParticleList
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
+from modularAnalysis import variablesToNtuple
 from modularAnalysis import analysis_main
+import variableCollections as vc
 
 from stdV0s import stdKshorts
 from stdPi0s import *
@@ -91,7 +91,6 @@ printList('pi0:looseFit', False)
 
 # Select variables that we want to store to ntuple
 # You can either use preselected variable groups from variableCollections:
-import variableCollections as vc
 # Or use your own lists. Both options are shown here.
 
 charged_particle_variables = vc.reco_stats + \
@@ -127,7 +126,6 @@ pi0_variables = vc.mc_truth + \
     vc.mc_hierarchy
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A202-LoadReconstructedParticles.root'
 variablesToNtuple('pi+:all', charged_particle_variables, treename='pion', filename=output_file)
 variablesToNtuple('K+:all', charged_particle_variables, treename='kaon', filename=output_file)

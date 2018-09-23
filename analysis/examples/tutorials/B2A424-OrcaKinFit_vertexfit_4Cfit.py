@@ -22,13 +22,19 @@
 #
 # Import and mdst loading
 #
-
 from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
+from modularAnalysis import add_beamparameters
+from modularAnalysis import inputMdst
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import matchMCTruth
+from modularAnalysis import fitKinematic4C
+from modularAnalysis import variablesToNtuple
 import sys
+import pdg
 from beamparameters import add_beamparameters
-
+import variableCollections as vc
+from stdPhotons import *
 
 # load input ROOT file
 inputMdst('default', '/gpfs/group/belle2/tutorial/orcakinfit/mdst_1.root')
@@ -37,7 +43,6 @@ inputMdst('default', '/gpfs/group/belle2/tutorial/orcakinfit/mdst_1.root')
 # Creates a list of good photon and muons
 fillParticleList("gamma:sel", 'E > 0.1 and abs(formula(clusterTiming/clusterErrorTiming)) < 1.0')
 fillParticleList("mu-:sel", 'electronID < 0.01 and chiProb > 0.001 and abs(dz) < 3 and dr < 0.1')
-import pdg
 pdg.add_particle('A', 9000008, 999., 999., 0, 0)  # name, PDG, mass, width, charge, spin
 reconstructDecay("A:sel -> mu-:sel mu+:sel", "")
 reconstructDecay("A:selvertex -> mu-:sel mu+:sel", "")
@@ -59,8 +64,6 @@ matchMCTruth('beam:selv')
 matchMCTruth('beam:selv4c')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.pid + vc.momentum_uncertainty
 gammavars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
 avars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
@@ -79,7 +82,6 @@ uvars4c = uvars + vc.wrap_list(['OrcaKinFitProb',
                   'VertexFitProb'], 'daughter(1,extraInfo(variable))', "A")
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A424-OrcaKinFit_vc.vertexfit_4Cfit.root'
 variablesToNtuple('beam:selv4c', uvars4c,
                   filename=output_file, treename='beamselv4c')

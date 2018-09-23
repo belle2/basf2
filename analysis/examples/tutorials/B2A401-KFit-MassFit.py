@@ -28,10 +28,10 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
 from modularAnalysis import massKFit
+from modularAnalysis import variablesToNtuple
 from stdPi0s import stdPi0s
+import variableCollections as vc
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst-B0D0pi0.root']
@@ -60,7 +60,6 @@ reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(
 matchMCTruth('B0:all')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
 B0_vars = vc.event_meta_data + vc.inv_mass + vc.mc_truth + \
     vc.convert_to_all_selected_vars(
         vc.inv_mass + vc.mc_truth,
@@ -75,7 +74,6 @@ pi0_vars = vc.mc_truth + vc.kinematics + vc.mass_before_fit + vc.event_meta_data
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A401-KFit-MassFit.root'
 variablesToNtuple('B0:all', B0_vars,
                   filename=output_file, treename='b0')

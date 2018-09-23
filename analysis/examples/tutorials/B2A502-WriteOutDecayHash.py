@@ -22,7 +22,11 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import inputMdstList
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import analysis_main
+from modularAnalysis import variablesToNtuple
 from decayHash import DecayHashMap
 from beamparameters import add_beamparameters
 

@@ -30,11 +30,11 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
 from modularAnalysis import vertexRave
 from modularAnalysis import massVertexRave
-from stdCharged import *
+from stdCharged import stdPi, stdLoosePi, stdLooseK
+from modularAnalysis import variablesToNtuple
+import variableCollections as vc
 
 # Add MC9 signal samples
 filelistSIG = [('/group/belle2/tutorial/release_01-00-00/\
@@ -86,8 +86,6 @@ matchMCTruth('D*+:1')
 matchMCTruth('D*+:2')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth + \
     vc.mc_flight_info + vc.flight_info
 
@@ -101,7 +99,6 @@ d0_vars = vc.convert_to_one_selected_vars(
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A405-Rave-MassVertexFit.root'
 variablesToNtuple('D*+:1', dstar_vars + d0_vars + fs_hadron_vars,
                   filename=output_file, treename='dsttree1')

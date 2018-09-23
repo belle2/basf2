@@ -16,9 +16,16 @@
 #############################################################
 
 from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import add_beamparameters
+from modularAnalysis import inputMdst
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import matchMCTruth
+from modularAnalysis import fitKinematic4C
+from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
+import variableCollections as vc
 
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
     sys.exit('Required input file (B2A424-SimulateMuonPairs.root) does not exist. '
@@ -49,8 +56,6 @@ matchMCTruth('Z0:mm_kinfit')
 fitKinematic4C('Z0:mm_kinfit')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
 z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
     vc.convert_to_all_selected_vars(muvars, 'Z0 -> ^mu+ ^mu-')
@@ -60,7 +65,6 @@ z0uvars = z0vars + \
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A420-OrcaKinFit.root'
 variablesToNtuple('Z0:mm_rec', z0vars,
                   filename=output_file, treename='Z0_mm_rec')

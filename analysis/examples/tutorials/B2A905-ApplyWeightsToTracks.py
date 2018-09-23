@@ -17,9 +17,9 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
 from modularAnalysis import vertexKFit
+from modularAnalysis import variablesToNtuple
+from variables import variables
 from stdCharged import *
 
 # check if the required input file exists (from B2A101 example)
@@ -57,7 +57,6 @@ analysis_main.add_module(reweighter)
 pivars = ['p', 'pz', 'Weight', 'StatErr', 'SystErr', 'binID']
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A905-ApplyWeightsToTracks.root'
 variablesToNtuple('pi+:gen', pivars, treename='pion', filename=output_file)
 

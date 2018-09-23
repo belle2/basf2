@@ -23,10 +23,17 @@
 #
 
 from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
+from modularAnalysis import add_beamparameters
+from modularAnalysis import inputMdst
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import matchMCTruth
+from modularAnalysis import fitKinematic4C
+from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
+import variableCollections as vc
+from stdPhotons import *
 
 beamparameters = add_beamparameters(analysis_main, "Y4S")
 
@@ -56,8 +63,6 @@ matchMCTruth('Upsilon(4S):4c')
 
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 muvars = vc.mc_truth + vc.pid + vc.kinematics
 gvars = vc.kinematics + vc.mc_truth + vc.inv_mass
 etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
@@ -76,7 +81,6 @@ u4svars_def = u4svars + vc.wrap_list(['chiProb'], 'extraInfo(variable)', "")
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A423-Orcakinfit_4CFit.root'
 variablesToNtuple('Upsilon(4S)', u4svars_def,
                   filename=output_file, treename='Upsilon4s')

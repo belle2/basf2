@@ -28,7 +28,14 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import inputMdstList
+from modularAnalysis import fillParticleList
+from modularAnalysis import correctFSR
+from modularAnalysis import looseMCTruth
+from modularAnalysis import reconstructDecay
+from modularAnalysis import looseMCTruth
+from modularAnalysis import fillParticleListFromMC
+from modularAnalysis import variablesToNtuple
 from beamparameters import add_beamparameters
 
 # set the log level

@@ -16,9 +16,16 @@
 #############################################################
 
 from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import add_beamparameters
+from modularAnalysis import inputMdst
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import matchMCTruth
+from modularAnalysis import fitKinematic4C
+from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
+import variableCollections as vc
 from stdPhotons import *
 
 set_log_level(LogLevel.WARNING)

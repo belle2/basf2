@@ -15,10 +15,16 @@
 ############################################################
 
 from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import add_beamparameters
+from modularAnalysis import inputMdst
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import matchMCTruth
+from modularAnalysis import fitKinematic4C
+from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
-
+import variableCollections as vc
 
 set_log_level(LogLevel.WARNING)
 # set_log_level(LogLevel.DEBUG)
@@ -47,7 +53,6 @@ matchMCTruth('Z0:mm_kinfit')
 UnmeasuredfitKinematic1C('Z0:mm_kinfit')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
 
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
 z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
@@ -62,7 +67,6 @@ z0uvars = z0vars + \
                   'OrcaKinFitUnmeasuredE'], 'extraInfo(variable)', "")
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A421-Orcakinfit_1CFit.root'
 variablesToNtuple('Z0:mm_rec', z0vars,
                   filename=output_file, treename='Z0_mm_rec')

@@ -31,13 +31,13 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
 from vertex import vertexRave
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import fillParticleList
 from vertex import TagV
-from stdCharged import *
+from stdCharged import stdLooseMu
+import variableCollections as vc
+from modularAnalysis import variablesToNtuple
 
 # Add signal MC files for release 9.
 # 150000 events!
@@ -81,7 +81,6 @@ matchMCTruth('B0:jspiks')
 TagV('B0:jspiks', 'breco')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
 
 fshars = vc.pid + vc.track + vc.mc_truth
 jpsiandk0svars = vc.inv_mass + vc.vertex + vc.mc_vertex + vc.mc_truth
@@ -93,7 +92,6 @@ bvars = vc.event_meta_data + vc.inv_mass + deltae_mbs + vc.ckm_kinematics + \
 
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A410-TagVertex.root'
 variablesToNtuple('B0:jspiks', bvars,
                   filename=output_file, treename='B0tree')

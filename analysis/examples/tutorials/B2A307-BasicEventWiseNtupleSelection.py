@@ -44,10 +44,10 @@ from modularAnalysis import copyLists
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import buildRestOfEvent
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
-from stdCharged import *
+from modularAnalysis import variablesToNtuple
+from stdCharged import stdLoosePi, stdLooseK, stdLooseMu
 from stdPi0s import stdPi0s
+import variableCollections as vc
 
 # load data
 # Signal file from A104 reconstructed with background
@@ -103,7 +103,6 @@ matchMCTruth('Upsilon(4S)')
 buildRestOfEvent('Upsilon(4S)')
 
 # 6. Dump info to ntuple
-import variableCollections as vc
 
 dvars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['R2EventLevel']
 muvars = vc.mc_truth
@@ -121,7 +120,6 @@ u4svars = vc.mc_truth + vc.roe_multiplicities + vc.recoil_kinematics + vc.extra_
 
 
 # 7. Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 rootOutputFile = 'B2A307-BasicEventWiseNtupleSelection.root'
 variablesToNtuple('B-:tag', bvars,
                   filename=rootOutputFile, treename='btag')

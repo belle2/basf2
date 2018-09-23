@@ -26,8 +26,15 @@
 #
 
 from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
+from modularAnalysis import inputMdst
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import fourCKFit
+from modularAnalysis import matchMCTruth
+from modularAnalysis import variablesToNtuple
+from stdPhotons import stdPhotons
+import variableCollections as vc
+
 
 # load input ROOT file
 filelistSIG = '/group/belle2/tutorial/release_01-00-00/mdst-Y4setaY.root'
@@ -59,8 +66,6 @@ fourCKFit("Upsilon(4S)", 0.0)
 matchMCTruth('Upsilon(4S)')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
-
 muvars = vc.mc_truth + vc.pid + vc.kinematics
 gvars = vc.kinematics + vc.mc_truth
 etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
@@ -72,7 +77,6 @@ u4svars = vc.event_meta_data + vc.inv_mass + vc.kinematics + \
     vc.convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
 # Saving variables to ntuple
-from modularAnalysis import variablesToNtuple
 output_file = 'B2A407-KFit-FourCFit.root'
 variablesToNtuple('Upsilon(4S)', u4svars,
                   filename=output_file, treename='Upsilon4s')

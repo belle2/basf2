@@ -100,7 +100,7 @@ def main(argv):
     #
     # To explicitly prevent certain runs from within this IoV being used, you should use the ignored_runs
     # attribute of the Calibration. Or make sure that the input data files do not contain data from those runs at all.
-    cal_fw.run(iov=IoV(0, 3, 0, 9))
+    cal_fw.run(iov=IoV(0, 3, 0, 11))
     print("End of CAF processing.")
 
 

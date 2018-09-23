@@ -28,5 +28,5 @@ basf2 generate_test_data.py $EXAMPLE_DIR 0 3 3 500
 basf2 generate_test_data.py $EXAMPLE_DIR 0 4 4 500
 basf2 generate_test_data.py $EXAMPLE_DIR 0 5 6 500
 basf2 generate_test_data.py $EXAMPLE_DIR 0 7 8 500
-basf2 generate_test_data.py $EXAMPLE_DIR 0 9 9 500
 basf2 generate_test_data.py $EXAMPLE_DIR 0 10 10 500
+basf2 generate_test_data.py $EXAMPLE_DIR 0 11 11 500

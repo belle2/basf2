@@ -624,9 +624,8 @@ namespace {
   /** Test database access via DBObjPtr */
   TEST_F(DataBaseNoDataStoreTest, DBObjPtr)
   {
-    // Note that we're passing in a pointer to an event when creating the object because there's no DataStore object.
-    // The accessors take pointers and require you to explicitly set the other optional arguments before the event
-    DBObjPtr<TNamed> named("TNamed", true, &m_event);
+    DBStore::Instance().update(m_event); // The DBStore takes a reference to an EventMetaData object
+    DBObjPtr<TNamed> named;
     m_event.setExperiment(1);
     DBStore::Instance().update(m_event); // The DBStore takes a reference to an EventMetaData object
     EXPECT_TRUE(named);
@@ -643,8 +642,9 @@ namespace {
   /** Test database access via DBArray */
   TEST_F(DataBaseNoDataStoreTest, DBArray)
   {
-    DBArray<TObject> objects("TObjects", true, &m_event);
-    DBArray<TObject> missing("notexisting", true, &m_event);
+    DBStore::Instance().update(m_event);
+    DBArray<TObject> objects;
+    DBArray<TObject> missing("notexisting");
     // check iteration on fresh object
     {
       int i = 0;
@@ -702,7 +702,7 @@ namespace {
   /** Test range checks of DBArray */
   TEST_F(DataBaseNoDataStoreTest, DBArrayRange)
   {
-    DBArray<TObject> objects("TObjects", true, &m_event);
+    DBArray<TObject> objects;
 
     m_event.setExperiment(3);
     DBStore::Instance().update(m_event);
@@ -713,31 +713,31 @@ namespace {
   /** Test type check of DBObjPtr and DBArray */
   TEST_F(DataBaseNoDataStoreTest, TypeCheck)
   {
-    DBObjPtr<TNamed> named("TNamed", true, &m_event);
-    EXPECT_B2FATAL(DBObjPtr<EventMetaData> wrongType("TNamed", true, &m_event));
+    DBObjPtr<TNamed> named;
+    EXPECT_B2FATAL(DBObjPtr<EventMetaData> wrongType("TNamed"));
 
-    DBArray<TObject> objects("TObjects", true, &m_event);
-    EXPECT_B2FATAL(DBArray<EventMetaData> wrongType("TObjects", true, &m_event));
+    DBArray<TObject> objects;
+    EXPECT_B2FATAL(DBArray<EventMetaData> wrongType("TObjects"));
   }
 
   /** Test intra-run dependency */
   TEST_F(DataBaseNoDataStoreTest, IntraRun)
   {
-    DBObjPtr<TNamed> intraRun("IntraRun", true, &m_event);
+    DBObjPtr<TNamed> intraRun("IntraRun");
 
     m_event.setExperiment(1);
     m_event.setRun(1);
     m_event.setEvent(9);
     DBStore::Instance().update(m_event);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(strcmp(intraRun->GetName(), "A") == 0);
 
     m_event.setEvent(10);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
 
     m_event.setEvent(49);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
 
     //let's run an update in between and make sure intra run continues to work
@@ -745,7 +745,7 @@ namespace {
     EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
 
     m_event.setEvent(50);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(strcmp(intraRun->GetName(), "C") == 0);
 
     m_event.setRun(2);
@@ -759,7 +759,7 @@ namespace {
     m_event.setExperiment(0);
     DBStore::Instance().update(m_event);
 
-    DBObjPtr<TNamed> named("TNamed", true, &m_event);
+    DBObjPtr<TNamed> named;
     EXPECT_FALSE(named.hasChanged());
 
     m_event.setExperiment(1);
@@ -783,34 +783,34 @@ namespace {
     m_event.setExperiment(1);
     m_event.setRun(1);
     m_event.setEvent(1);
-    DBObjPtr<TNamed> intraRun("IntraRun", true, &m_event);
+    DBObjPtr<TNamed> intraRun("IntraRun");
     DBStore::Instance().update(m_event);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(intraRun.hasChanged());
 
     m_event.setEvent(2);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_FALSE(intraRun.hasChanged());
 
     m_event.setEvent(10);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(intraRun.hasChanged());
 
     m_event.setEvent(1000);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(intraRun.hasChanged());
 
     m_event.setRun(4);
     DBStore::Instance().update(m_event);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_TRUE(intraRun.hasChanged());
   }
 
   /** Test database access to payload files */
   TEST_F(DataBaseNoDataStoreTest, PayloadFile)
   {
-    DBObjPtr<PayloadFile> payload("file.xml", true, &m_event);
-
+    DBStore::Instance().update(m_event);
+    DBObjPtr<PayloadFile> payload("file.xml");
     m_event.setExperiment(1);
     DBStore::Instance().update(m_event);
     EXPECT_EQ(payload->getContent(), "Experiment 1\n") << payload->getFileName();
@@ -830,7 +830,7 @@ namespace {
     m_event.setEvent(1);
     callbackCounter = 0;
 
-    DBObjPtr<TNamed> named("TNamed", true, &m_event);
+    DBObjPtr<TNamed> named;
     named.addCallback(&callback);
     EXPECT_EQ(callbackCounter, 0);
 
@@ -860,24 +860,24 @@ namespace {
     // callbacks will now be called once for each payload so there is an extra call
     EXPECT_EQ(callbackCounter, 5);
 
-    DBObjPtr<TNamed> intraRun("IntraRun", true, &m_event);
+    DBObjPtr<TNamed> intraRun("IntraRun");
     intraRun.addCallback(&callbackObject, &Callback::callback);
 
     //There won't be any callback here because the correct object is already set on creation
     m_event.setEvent(1);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_EQ(callbackCounter, 5);
 
     m_event.setEvent(2);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_EQ(callbackCounter, 5);
 
     m_event.setEvent(10);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_EQ(callbackCounter, 6);
 
     m_event.setEvent(1);
-    DBStore::Instance().updateEvent(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
     EXPECT_EQ(callbackCounter, 7);
   }
 
@@ -887,7 +887,7 @@ namespace {
     m_event.setExperiment(1);
     DBStore::Instance().update(m_event);
 
-    DBArray<TObject> objects("TObjects", true, &m_event);
+    DBArray<TObject> objects;
     EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID(), 1);
     EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2), nullptr);
     EXPECT_EQ(objects.getByKey(&TObject::IsFolder, false)->GetUniqueID(), 1);
@@ -900,46 +900,19 @@ namespace {
     EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2)->GetUniqueID(), 2);
   }
 
-// TODO: Update DBPointer to work something like this as well and then test it. Though at the moment no-one uses it.
-//  TEST_F(DataBaseNoDataStoreTest, DBPointer)
-//  {
-//    m_event.setExperiment(2);
-//    DBStore::Instance().update(m_event);
-//
-//    DBPointer<TObject, unsigned int, &TObject::GetUniqueID> ptr(1);
-//    EXPECT_EQ(ptr.key(), 1);
-//    EXPECT_TRUE(ptr.isValid());
-//    EXPECT_EQ(ptr->GetUniqueID(), 1);
-//    ptr = 2;
-//    EXPECT_EQ(ptr->GetUniqueID(), 2);
-//    ptr = 3;
-//    EXPECT_FALSE(ptr.isValid());
-//  }
-//
-// TODO: Should we have reconnection functionality when updating events and getting DBObjects manually?
-//       Seems unnecessary and probably requires changes to DBAccessorBase e.g. isValid() -> isValid(event)
-//  TEST_F(DataBaseNoDataStoreTest, CleanupReattachDeathtest)
-//  {
-//    m_event.setExperiment(2);
-//    DBStore::Instance().update(m_event);
-//
-//    DBObjPtr<TNamed> named("TNamed", true, &m_event);
-//    EXPECT_TRUE(named.isValid());
-//    double Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
-//    EXPECT_EQ(Bz, 1.5);
-//    DBStore::Instance().reset();
-//    //Ok, on next access the DBObjPtr should try to reconnect
-//    EXPECT_TRUE(named.isValid());
-//    //Which means the magnetic field should die a horrible death: It's not
-//    //found in the database during testing, just a override.
-//    EXPECT_B2FATAL(BFieldManager::getFieldInTesla({0, 0, 0}));
-//    //Unless we add a new one
-//    Belle2::MagneticField* field = new Belle2::MagneticField();
-//    field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
-//    Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
-//    //So now it should work again
-//    Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
-//    EXPECT_EQ(Bz, 1.5);
-//  }
+  TEST_F(DataBaseNoDataStoreTest, DBPointer)
+  {
+    m_event.setExperiment(2);
+    DBStore::Instance().update(m_event);
+
+    DBPointer<TObject, unsigned int, &TObject::GetUniqueID> ptr(1);
+    EXPECT_EQ(ptr.key(), 1);
+    EXPECT_TRUE(ptr.isValid());
+    EXPECT_EQ(ptr->GetUniqueID(), 1);
+    ptr = 2;
+    EXPECT_EQ(ptr->GetUniqueID(), 2);
+    ptr = 3;
+    EXPECT_FALSE(ptr.isValid());
+  }
 
 }  // namespace

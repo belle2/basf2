@@ -130,8 +130,7 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
   B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
   updateDBObjPtrs(1, exprun.second, exprun.first);
   B2INFO("Creating CDCGeometryPar object");
-  const EventMetaData event(1, exprun.second, exprun.first);
-  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo), &event);
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   prepare();
   createHisto();

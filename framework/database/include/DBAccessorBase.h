@@ -31,10 +31,9 @@ namespace Belle2 {
      * @param isArray    Flag that indicates whether this is a single object or a TClonesArray.
      * @param isRequired If true emit errors if the object cannot be found in the Database
      */
-    DBAccessorBase(const std::string& name, const TClass* objClass, bool isArray, bool isRequired,
-                   const EventMetaData* event = nullptr) :
+    DBAccessorBase(const std::string& name, const TClass* objClass, bool isArray, bool isRequired) :
       m_type(DBStoreEntry::c_Object), m_name(name), m_objClass(objClass), m_isArray(isArray), m_isRequired(isRequired),
-      m_entry{DBStore::Instance().getEntry(name, objClass, isArray, isRequired, event)}, m_changed{isValid()}
+      m_entry{DBStore::Instance().getEntry(name, objClass, isArray, isRequired)}, m_changed{isValid()}
     {
       if (m_entry) m_entry->registerAccessor(this);
     }
@@ -46,10 +45,9 @@ namespace Belle2 {
      * @param isArray    Flag that indicates whether this is a single object or a TClonesArray.
      * @param isRequired If true emit errors if the object cannot be found in the Database
      */
-    DBAccessorBase(DBStoreEntry::EPayloadType type, const std::string& name, bool isRequired,
-                   const EventMetaData* event = nullptr):
+    DBAccessorBase(DBStoreEntry::EPayloadType type, const std::string& name, bool isRequired):
       m_type(type), m_name(name), m_objClass(nullptr), m_isArray(false), m_isRequired(isRequired),
-      m_entry{DBStore::Instance().getEntry(type, name, nullptr, false, isRequired, event)}, m_changed{isValid()}
+      m_entry{DBStore::Instance().getEntry(type, name, nullptr, false, isRequired)}, m_changed{isValid()}
     {
       if (m_entry) m_entry->registerAccessor(this);
     }

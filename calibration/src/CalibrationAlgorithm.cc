@@ -365,9 +365,9 @@ void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event = 1, const i
   // Construct an EventMetaData object but NOT in the Datastore
   EventMetaData emd(event, run, experiment);
   // Explicitly update while avoiding registering a Datastore object
-  // Since people rarely use intra-run objects it should be ok to d this at the same time every update
   DBStore::Instance().update(emd);
-  DBStore::Instance().updateEvent(emd);
+  // Also update the intra-run objects to the event at the same time (maybe unnessary...)
+  DBStore::Instance().updateEvent(event);
 }
 
 // Have to put the explicit template specialization in the enclosing namespace

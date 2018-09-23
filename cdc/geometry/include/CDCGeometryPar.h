@@ -81,7 +81,7 @@ namespace Belle2 {
       /*!
       \return A reference to an instance of this class.
       */
-      static CDCGeometryPar& Instance(const CDCGeometry* = nullptr, const EventMetaData* event = nullptr);
+      static CDCGeometryPar& Instance(const CDCGeometry* = nullptr);
 
       //! Clears
       void clear();
@@ -950,7 +950,7 @@ namespace Belle2 {
 
     private:
       /** Singleton class */
-      CDCGeometryPar(const CDCGeometry* = nullptr, const EventMetaData* event = nullptr);
+      CDCGeometryPar(const CDCGeometry* = nullptr);
       /** Singleton class */
       CDCGeometryPar(const CDCGeometryPar&);
       /** Singleton class */

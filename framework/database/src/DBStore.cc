@@ -32,8 +32,8 @@ namespace Belle2 {
     return instance;
   }
 
-  DBStoreEntry* DBStore::getEntry(DBStoreEntry::EPayloadType type, const std::string& name, const TClass* objClass, bool array,
-                                  bool required, const EventMetaData* event)
+  DBStoreEntry* DBStore::getEntry(DBStoreEntry::EPayloadType type, const std::string& name,
+                                  const TClass* objClass, bool array, bool required)
   {
     // Check whether the map entry already exists
     const auto& entry = m_dbEntries.find(name);
@@ -56,28 +56,26 @@ namespace Belle2 {
     DBStoreEntry& dbEntry = iter.first->second;
     B2DEBUG(34, "DBEntry " << name << " was created (" << (required ? "required" : "optional") << ")");
 
-    // If an actual EventMetaData pointer was passed in, we are manually grabbing objects and should get it
-    // regardless of whether m_event exists or not. We also don't want to override this dbentry with
-    // m_event's payloads so only one of the two situations can occur
-    if (event) {
-      Database::DBQuery query(name, required);
-      if (Database::Instance().getData(*event, query)) {
-        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *event);
-      }
-      if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
-    }
-    // But if 'event'==nullptr (as normal), and if no object was obtained from the database yet, but it should be available, get it
-    else if (m_event.isValid()) {
-      Database::DBQuery query(name, required);
-      if (Database::Instance().getData(*m_event, query)) {
-        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *m_event);
-      }
-      if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
-    }
+    // If no object was obtained from the database yet, but it should be available, get it
 
+    // Check if we have a non-DataStore event to use
+    if (m_manualEvent) {
+      Database::DBQuery query(name, required);
+      if (Database::Instance().getData(*m_manualEvent, query)) {
+        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *m_manualEvent);
+      }
+      if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
+    }
+    // Otherwise use the DataStore if it is valid
+    else if (m_storeEvent.isValid()) {
+      Database::DBQuery query(name, required);
+      if (Database::Instance().getData(*m_storeEvent, query)) {
+        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *m_storeEvent);
+      }
+      if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
+    }
     return &dbEntry;
   }
-
 
   void DBStore::update()
   {
@@ -87,15 +85,17 @@ namespace Belle2 {
     // disconnected if the DataStore is reset.
     // TODO: This can be removed once BII-1262 is fixed.
     StoreObjPtr<EventMetaData> event;
-    m_event = event;
-    performUpdate(*m_event);
+    m_storeEvent = event;
+    // Clear the m_manualEvent to indicate that we now want to use the DataStore event numbers
+    m_manualEvent = boost::none;
+    performUpdate(*m_storeEvent);
   }
-
 
   void DBStore::update(const EventMetaData& event)
   {
     if (m_dbEntries.empty()) return;
-    performUpdate(event);
+    m_manualEvent = event;
+    performUpdate(*m_manualEvent);
   }
 
   void DBStore::performUpdate(const EventMetaData& event)
@@ -128,21 +128,40 @@ namespace Belle2 {
     }
   }
 
-
   void DBStore::updateEvent()
   {
-    updateEvent(*m_event);
+    if (!m_manualEvent) {
+      performUpdateEvent(*m_storeEvent);
+    } else {
+      B2WARNING("The m_manualEvent variable has been initialized but you are asking for the DataStore's EventMetaData to be used "
+                "in updateEvent(). Update could not proceed. "
+                "Did you forget to call DBStore::Instance().update() before calling this function?");
+    }
   }
 
+  void DBStore::updateEvent(const unsigned int eventNumber)
+  {
+    // As m_manualEvent doesn't use the DataStore, it isn't automatically updated and we must manually update the event
+    // number prior to updating the intra-run objects.
+    // This also updates it ready for getData if a DBObject gets constructed later.
+    if (m_manualEvent) {
+      m_manualEvent->setEvent(eventNumber);
+      performUpdateEvent(*m_manualEvent);
+    } else {
+      B2WARNING("The m_manualEvent variable has not been initialized and the DBStore is not currently expecting to use it."
+                "The updateEvent(eventNumber) could not proceed. "
+                "Did you forget to call DBStore::Instance().update(event) or accidentally call DBStore::Instance().update() "
+                "prior to to this?");
+    }
+  }
 
-  void DBStore::updateEvent(const EventMetaData& event)
+  void DBStore::performUpdateEvent(const EventMetaData& event)
   {
     // loop over intra-run dependent conditions and update the objects if needed
     for (auto& dbEntry : m_intraRunDependencies) {
       dbEntry->updateObject(event);
     }
   }
-
 
   void DBStore::reset(bool keepEntries)
   {
@@ -159,15 +178,22 @@ namespace Belle2 {
     // Make sure our EventMetaData pointer is reconnected on next access ...
     // because probably this is after resetting the DataStore (BII-1262)
     StoreObjPtr<EventMetaData> event;
-    m_event = event;
+    m_storeEvent = event;
+    m_manualEvent = boost::none;
   }
 
   void DBStore::addConstantOverride(const std::string& name, TObject* obj, bool oneRun)
   {
     IntervalOfValidity iov = IntervalOfValidity::always();
     if (oneRun) {
-      const int exp = m_event->getExperiment();
-      const int run = m_event->getRun();
+      int exp, run;
+      if (m_manualEvent) {
+        exp = m_manualEvent->getExperiment();
+        run = m_manualEvent->getRun();
+      } else {
+        exp = m_storeEvent->getExperiment();
+        run = m_storeEvent->getRun();
+      }
       iov = IntervalOfValidity(exp, run, exp, run);
     }
     // Add the DBStore entry

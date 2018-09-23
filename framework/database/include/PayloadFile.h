@@ -52,8 +52,8 @@ namespace Belle2 {
   template<> class DBObjPtr<PayloadFile>: public DBAccessorBase {
   public:
     /** Constructor of a DBObjPtr object */
-    explicit DBObjPtr(const std::string& name = "", bool required = true, const EventMetaData* event = nullptr):
-      DBAccessorBase(DBStoreEntry::c_RawFile, name, required, event), m_payloadFile(isValid() ? m_entry->getFilename() : "")
+    explicit DBObjPtr(const std::string& name = "", bool required = true):
+      DBAccessorBase(DBStoreEntry::c_RawFile, name, required), m_payloadFile(isValid() ? m_entry->getFilename() : "")
     {
       // if the payload changes also change the filename
       addCallback([this](const std::string&) {m_payloadFile = PayloadFile(isValid() ? m_entry->getFilename() : "");});

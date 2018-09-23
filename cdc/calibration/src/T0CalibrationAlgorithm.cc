@@ -118,8 +118,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   // an EventMetaData object to be used when constructing the DB objects.
 
   B2INFO("Creating CDCGeometryPar object");
-  const EventMetaData event(1, exprun.second, exprun.first);
-  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo), &event);
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   createHisto();
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);

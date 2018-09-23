@@ -23,8 +23,8 @@ namespace Belle2 {
      * Constructor to access an object in the DBStore.
      * @param name       Name under which the object is stored in the database (and DBStore).
      */
-    explicit DBObjPtr(const std::string& name = "", bool required = true, const EventMetaData* event = nullptr):
-      DBAccessorBase(DBStore::objectName<T>(name), T::Class(), false, required, event) {}
+    explicit DBObjPtr(const std::string& name = "", bool required = true):
+      DBAccessorBase(DBStore::objectName<T>(name), T::Class(), false, required) {}
 
 #ifndef DISABLE_CONST_DBOBJECTS
     inline const T& operator *()  const {return *getObject<T>(); }  /**< Imitate pointer functionality. */

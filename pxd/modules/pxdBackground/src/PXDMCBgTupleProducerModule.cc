@@ -236,7 +236,7 @@ void PXDMCBgTupleProducerModule::terminate()
 
     double currentComponentTime = m_componentTime;
     B2RESULT("Total real time is " << currentComponentTime / Unit::us << " microseconds.");
-    B2RESULT("This is equivalent to  " << m_integrationTime / currentComponentTime << " random triggered events.");
+    B2RESULT("This is equivalent to  " << currentComponentTime / m_integrationTime << " random triggered events.");
 
     for (auto&   pair : m_sensorData) {
       auto& sensorID = pair.first;

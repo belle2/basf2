@@ -28,6 +28,8 @@ REG_MODULE(DQMHistAnalysisPXDEff)
 
 DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule()
 {
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
 
   //Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
@@ -37,11 +39,9 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("pxdeff"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
-
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff"));
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
-
-DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule() { }
 
 void DQMHistAnalysisPXDEffModule::initialize()
 {
@@ -53,19 +53,10 @@ void DQMHistAnalysisPXDEffModule::initialize()
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
-    m_PXDModules.push_back(aVxdID);
-
-    if (aVxdID.getLayerNumber() == 1) {
-      m_PXDLayer1.push_back(aVxdID);
-    } else if (aVxdID.getLayerNumber() == 2) {
-      m_PXDLayer2.push_back(aVxdID);
-    } else {
-      B2ERROR("Layer number " << aVxdID.getLayerNumber() << " given for a PXD Module!");
-      continue;
-    }
-
+    m_PXDModules.push_back(aVxdID); // reorder, sort would be better
 
   }
+  std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
@@ -96,49 +87,26 @@ void DQMHistAnalysisPXDEffModule::initialize()
     m_hEffModules[aPXDModule]->SetStats(false);
   }
 
-  m_hEffMerge["IF"] = new TH2D("HitEff_IF", "Average Hit Efficiency of IF Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-  m_hEffMerge["IB"] = new TH2D("HitEff_IB", "Average Hit Efficiency of IB Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-  m_hEffMerge["OF"] = new TH2D("HitEff_OF", "Average Hit Efficiency of OF Modules;Pixel in U;Pixel in V",
-                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-  m_hEffMerge["OB"] = new TH2D("HitEff_OB", "Average Hit Efficiency of OB Modules;Pixels in U;Pixels in V",
-                               m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-  m_cEffMerge["IF"] = new TCanvas("c_EffIF");
-  m_cEffMerge["IB"] = new TCanvas("c_EffIB");
-  m_cEffMerge["OF"] = new TCanvas("c_EffOF");
-  m_cEffMerge["OB"] = new TCanvas("c_EffOB");
-
-  m_hEffMerge["IF"]->SetStats(false);
-  m_hEffMerge["IB"]->SetStats(false);
-  m_hEffMerge["OF"]->SetStats(false);
-  m_hEffMerge["OB"]->SetStats(false);
-
-
   //One bin for each module in the geometry, one histogram for each layer
-  m_cEffAll1 = new TCanvas("c_EffAll1");
-  m_cEffAll2 = new TCanvas("c_EffAll2");
+  m_cEffAll = new TCanvas("c_EffAll");
 
-  m_hEffAll1 = new TH1D("HitEffAll1", "Integrated Efficiency of each layer 1 module;PXD Module;",
-                        m_PXDLayer1.size(), 0, m_PXDLayer1.size());
-  m_hEffAll2 = new TH1D("HitEffAll2", "Integrated Efficiency of each layer 2 module;PXD Module;",
-                        m_PXDLayer2.size(), 0, m_PXDLayer2.size());
+  m_hEffAll = new TH1D("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
+                       m_PXDModules.size(), 0, m_PXDModules.size());
 
-  m_hEffAll1->SetStats(false);
-  m_hEffAll2->SetStats(false);
-  m_hEffAll1->GetYaxis()->SetRangeUser(0, 1);
-  m_hEffAll2->GetYaxis()->SetRangeUser(0, 1);
+  m_hEffAll->SetStats(false);
+  m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
 
-  for (unsigned int i = 1; i <= m_PXDLayer1.size(); i++) {
-    TString ModuleName = (std::string)m_PXDLayer1[i - 1];
-    m_hEffAll1->GetXaxis()->SetBinLabel(i, ModuleName);
-  }
-  for (unsigned int i = 1; i <= m_PXDLayer2.size(); i++) {
-    TString ModuleName = (std::string)m_PXDLayer2[i - 1];
-    m_hEffAll2->GetXaxis()->SetBinLabel(i, ModuleName);
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    TString ModuleName = (std::string)m_PXDModules[i];
+    m_hEffAll->GetXaxis()->SetBinLabel(i + 1, ModuleName);
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
 
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -147,14 +115,9 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: beginRun called.");
 
-  for (auto merge_cmap : m_cEffMerge) {
-    merge_cmap.second->Clear();
-  }
+  m_cEffAll->Clear();
 
-  m_cEffAll1->Clear();
-  m_cEffAll2->Clear();
-
-  for (auto  single_cmap : m_cEffModules) {
+  for (auto single_cmap : m_cEffModules) {
     single_cmap.second->Clear();
   }
 }
@@ -169,11 +132,6 @@ void DQMHistAnalysisPXDEffModule::event()
 
   //Count how many of each type of histogram there are for the averaging
   std::map<std::string, int> typeCounter;
-
-  //Reset the histograms for new averaging
-  for (auto mergers : m_hEffMerge) {
-    mergers.second->Reset();
-  }
 
   for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
     VxdID& aPXDModule = m_PXDModules[i - 1];
@@ -205,27 +163,6 @@ void DQMHistAnalysisPXDEffModule::event()
       mapHits[aPXDModule] = Hits;
       mapMatches[aPXDModule] = Matches;
       m_hEffModules[aPXDModule]->Divide(Matches, Hits);
-      if (aPXDModule.getLayerNumber() == 1) {
-        if (aPXDModule.getSensorNumber() == 1) {
-          m_hEffMerge["IF"]->Add(m_hEffModules[aPXDModule]);
-          typeCounter["IF"]++;
-        } else if (aPXDModule.getSensorNumber() == 2) {
-          m_hEffMerge["IB"]->Add(m_hEffModules[aPXDModule]);
-          typeCounter["IB"]++;
-        } else {
-          B2ERROR("Module " << aPXDModule << " currently not supported for averaged histograms, will be skipped.");
-        }
-      } else if (aPXDModule.getLayerNumber() == 2) {
-        if (aPXDModule.getSensorNumber() == 1) {
-          m_hEffMerge["OF"]->Add(m_hEffModules[aPXDModule]);
-          typeCounter["OF"]++;
-        } else if (aPXDModule.getSensorNumber() == 2) {
-          m_hEffMerge["OB"]->Add(m_hEffModules[aPXDModule]);
-          typeCounter["OB"]++;
-        } else {
-          B2ERROR("Module " << aPXDModule << " currently not supported for averaged histograms, will be skipped.");
-        }
-      }
     }
 
     if (m_cEffModules[aPXDModule]) {
@@ -236,65 +173,41 @@ void DQMHistAnalysisPXDEffModule::event()
     }
   }//One-Module histos finished
 
-  //Plotting the average sensor type histograms
-  for (auto mergers : m_hEffMerge) {
-    m_cEffMerge[mergers.first]->cd();
-    mergers.second->Scale(1. / typeCounter[mergers.first]);
-    mergers.second->Draw("colz");
-    m_cEffMerge[mergers.first]->Modified();
-    m_cEffMerge[mergers.first]->Update();
-
-  }
-
-
   //Fill both of the summary histograms
-  m_hEffAll1->Reset();
-  for (unsigned int i = 1; i <= m_PXDLayer1.size(); i++) {
-    VxdID& aL1Module = m_PXDLayer1[i - 1];
+  m_hEffAll->Reset();
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    VxdID& aModule = m_PXDModules[i ];
+    int j = i + 1;
 
-    if (mapHits[aL1Module] == nullptr || mapMatches[aL1Module] == nullptr) {
-      m_hEffAll1->SetBinContent(i, 0);
+    if (mapHits[aModule] == nullptr || mapMatches[aModule] == nullptr) {
+      m_hEffAll->SetBinContent(j, 0);
     } else {
-      double moduleAverage = 0;
-      if (mapHits[aL1Module]->Integral() != 0) {
-        moduleAverage = mapMatches[aL1Module]->Integral() / mapHits[aL1Module]->Integral();
+      double moduleAverage = 0, moduleAverageErr = 0;
+      if (mapHits[aModule]->Integral() != 0) {
+        double i1, i2, di1, di2;
+        i1 = mapMatches[aModule]->Integral();
+        i2 = mapHits[aModule]->Integral();
+        di1 = TMath::Sqrt(i1);
+        di2 = TMath::Sqrt(i2);
+        moduleAverage = i1 / i2;
+        moduleAverageErr = (i2 * di1 + i1 * di2) / (i2 * i2);
       }
-      m_hEffAll1->SetBinContent(i, moduleAverage);
+      m_hEffAll->SetBinContent(j, moduleAverage);
+      m_hEffAll->SetBinError(j, moduleAverageErr);
     }
-
-    m_cEffAll1->cd();
-    m_hEffAll1->Draw();
-    m_cEffAll1->Modified();
-    m_cEffAll1->Update();
   }
 
-  //This code duplication is rather ugly, there should be a better way
-  m_hEffAll2->Reset();
-  for (unsigned int i = 1; i <= m_PXDLayer2.size(); i++) {
-    VxdID& aL2Module = m_PXDLayer2[i - 1];
+  m_cEffAll->cd();
+  m_hEffAll->Draw("E");
+  m_cEffAll->Modified();
+  m_cEffAll->Update();
 
-    if (mapHits[aL2Module] == nullptr || mapMatches[aL2Module] == nullptr) {
-      m_hEffAll2->SetBinContent(i, 0);
-    } else {
-      double moduleAverage = 0;
-      if (mapHits[aL2Module]->Integral() != 0) {
-        moduleAverage = mapMatches[aL2Module]->Integral() / mapHits[aL2Module]->Integral();
-      }
-      m_hEffAll2->SetBinContent(i, moduleAverage);
-    }
-    m_cEffAll2->cd();
-    m_hEffAll2->Draw();
-    m_cEffAll2->Modified();
-    m_cEffAll2->Update();
-  }
-
+#ifdef _BELLE2_EPICS
+  double data = 0;
+  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
-
-void DQMHistAnalysisPXDEffModule::endRun()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDEff : endRun called");
-}
-
 
 void DQMHistAnalysisPXDEffModule::terminate()
 {

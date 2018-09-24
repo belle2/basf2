@@ -1,10 +1,9 @@
 //+
-// File : DQMHistAnalysisPXDEff.h
-// Description : DQM module, which gives histograms showing the efficiency of PXD sensors
+// File : DQMHistAnalysisPXDReduction.h
+// Description : DAQM Analysis for PXD Data Reduction
 //
-// Modified to efficiency by Uwe Gebauer
-// Based on work from: Tomoyuki Konno, Tokyo Metroplitan Univerisity
-// Date : 25  - Dec - 2015 ; first commit
+// Author : Bjoern Spruck, University Mainz
+// Date : 2018
 //-
 
 #pragma once
@@ -18,20 +17,20 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <TH1.h>
-#include <TH2.h>
+#include <TF1.h>
+#include <TH2F.h>
 #include <TCanvas.h>
 
 namespace Belle2 {
-  /*! DQM Histogram Analysis for PXD Efficiency */
+  /*! DQM Histogram Analysis for PXD Reduction */
 
-  class DQMHistAnalysisPXDEffModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDReductionModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
     //! Constructor
-    DQMHistAnalysisPXDEffModule();
+    DQMHistAnalysisPXDReductionModule();
   private:
 
     //! Module functions to be called from main process
@@ -47,25 +46,14 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
-    //! Flag to trigger creation of additional histograms
-    bool m_singleHists;
-    //! u binning for 2d plots
-    int m_u_bins;
-    //! v binning for 2d plots
-    int m_v_bins;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    //! Individual efficiency for each module, 2d histogram
-    std::map<VxdID, TH2D*> m_hEffModules;
-    //! Individual efficiency for each module, canvas
-    std::map<VxdID, TCanvas*> m_cEffModules;
-
-    //! One bin for each module in the geometry
-    TH1D* m_hEffAll;
+    //! Histogram covering all modules
+    TH1F* m_hReduction;
     //! Final Canvas
-    TCanvas* m_cEffAll;
+    TCanvas* m_cReduction;
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

@@ -119,13 +119,15 @@ void CDCDedxCorrectionModule::event()
                             i) * dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i);
       double newhitdedx = (m_relative) ? dedxTrack.getADCCount(i) * std::sqrt(1 - costh * costh) / dedxTrack.getPath(i) / correction :
                           dedxTrack.getADCCount(i) * std::sqrt(1 - costh * costh) / dedxTrack.getPath(i);
-      StandardCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDocaRS(i), dedxTrack.getEntaRS(i),
+
+      double normDocaRS = dedxTrack.getDocaRS(i) / dedxTrack.getCellHalfWidth(i);
+      StandardCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), normDocaRS, dedxTrack.getEntaRS(i),
                          costh, newhitdedx);
       dedxTrack.setDedx(i, newhitdedx);
 
-      if (m_relative) correction *= GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDocaRS(i),
+      if (m_relative) correction *= GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), normDocaRS,
                                                     dedxTrack.getEntaRS(i), costh);
-      else correction = GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDocaRS(i), dedxTrack.getEntaRS(i),
+      else correction = GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), normDocaRS, dedxTrack.getEntaRS(i),
                                         costh);
 
       // combine hits accross layers

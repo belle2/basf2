@@ -2,9 +2,56 @@
 # -*- coding: utf-8 -*-
 
 import re
+import os
 import json
+
+import validation
 # martin's mail utils
 import utils
+
+
+def create_mail_log_failed_scripts():
+    """
+    looks up all scripts that failed and collects information about them
+    """
+
+    validator = validation.Validation()
+    # get all the steering files
+    validator.collect_steering_files(validation.IntervalSelector(['nightly']))
+
+    # get failed scripts
+    with open(os.path.join(validator.get_log_folder(), "list_of_failed_scripts.log")) as f:
+        list_of_failed_scripts = f.read().splitlines()
+
+    # collect information about failed scripts
+    mail_log = {}
+    for failed_script in list_of_failed_scripts:
+
+        # get_script_by_name works with _ only ...
+        failed_script = failed_script.replace(".py", "_py").replace(".C", "_C")
+        if validator.get_script_by_name(failed_script):
+            script = validator.get_script_by_name(failed_script)
+        else:
+            # cant do anything if script is not found
+            continue
+
+        script.load_header()
+
+        failed_script = {}
+        # give failed_script the same format as error_data in method create_mail_log
+        failed_script["package"] = script.package
+        failed_script["rootfile"] = script.header["input"]
+        failed_script["comparison_text"] = " -- "
+        failed_script["description"] = script.header["description"]
+        # this is called comparison_result but it is handled as error type when composing mail
+        failed_script["comparison_result"] = "script failed to execute"
+        # add contact of failed script to mail_log
+        for contact in parse_mail_address(script.header["contact"]):
+            if contact not in mail_log:
+                mail_log[contact] = {}
+            mail_log[contact][script.name] = failed_script
+
+    return mail_log
 
 
 def create_mail_log(comparison):
@@ -25,6 +72,7 @@ def create_mail_log(comparison):
     """
 
     mail_log = {}
+    # search for plots where comparison resulted in an error
     for package in comparison["packages"]:
         if package["comparison_error"] > 0:
             for plotfile in package["plotfiles"]:
@@ -45,6 +93,18 @@ def create_mail_log(comparison):
                                     # create new key for this contact
                                     mail_log[contact] = {}
                                 mail_log[contact][plot["title"]] = error_data
+
+    # now get failed scripts and merge information into mail_log
+    failed_scripts = create_mail_log_failed_scripts()
+    for contact in failed_scripts:
+        # if this user is not yet represented in mail_log, create new key
+        if contact not in mail_log:
+            mail_log[contact] = failed_scripts[contact]
+        # if user already is in mail_log, add the failed scripts
+        else:
+            for script in contact:
+                mail_log[contact][script] = failed_script[contact][script]
+
     return mail_log
 
 

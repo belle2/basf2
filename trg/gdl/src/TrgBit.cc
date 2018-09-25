@@ -114,15 +114,39 @@ TrgBit::isFiredInput(unsigned ith_bit) const
 }
 
 bool
+TrgBit::isFiredInput(const char* bitname) const
+{
+  unsigned bit = getInputBitNum(bitname);
+  if (bit == 999) return false;
+  return _input.isFired(bit);
+}
+
+bool
 TrgBit::isFiredFtdl(unsigned ith_bit) const
 {
   return _ftdl.isFired(ith_bit);
 }
 
 bool
+TrgBit::isFiredFtdl(const char* bitname) const
+{
+  unsigned bit = getOutputBitNum(bitname);
+  if (bit == 999) return false;
+  return _ftdl.isFired(bit);
+}
+
+bool
 TrgBit::isFiredPsnm(output a) const
 {
   unsigned bit = _outputMap[nconf_ftdl][a];
+  if (bit == 999) return false;
+  return _psnm.isFired(bit);
+}
+
+bool
+TrgBit::isFiredPsnm(const char* bitname) const
+{
+  unsigned bit = getOutputBitNum(bitname);
   if (bit == 999) return false;
   return _psnm.isFired(bit);
 }

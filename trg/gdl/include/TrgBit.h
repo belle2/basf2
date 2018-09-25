@@ -132,10 +132,13 @@ namespace Belle2 {
     bool isFired(input bitname) const;
     bool isFiredInput(unsigned ith_bit) const;
     bool isFiredInput(input bitname) const;
+    bool isFiredInput(const char* bitname) const;
     bool isFiredFtdl(unsigned ith_bit) const;
     bool isFiredFtdl(output bitname) const;
+    bool isFiredFtdl(const char* bitname) const;
     bool isFiredPsnm(unsigned ith_bit) const;
     bool isFiredPsnm(output bitname) const;
+    bool isFiredPsnm(const char* bitname) const;
 
     /// return number of used bits
     unsigned getNumOfInputs(void) {return n_input;}

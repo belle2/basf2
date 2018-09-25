@@ -15,7 +15,7 @@ from stdPi0s import *
 from stdV0s import *
 from stdCharm import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 import sys
 import os

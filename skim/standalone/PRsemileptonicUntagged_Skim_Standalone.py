@@ -24,7 +24,7 @@ import sys
 import os
 import glob
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 skimCode = encodeSkimName('PRsemileptonicUntagged')
 

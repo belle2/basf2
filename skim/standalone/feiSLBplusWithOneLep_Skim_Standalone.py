@@ -4,6 +4,7 @@
 """FEI Semi-leptonic B0 tag skim standalone for generic analysis in th
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180400
+    fei training: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
  """
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
@@ -19,7 +20,7 @@ from beamparameters import add_beamparameters
 from stdCharged import *
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 skimCode = encodeSkimName('feiSLBplusWithOneLep')
 
 

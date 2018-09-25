@@ -167,7 +167,7 @@ def B0SLWithOneLep():
         nTracks > 4
 
         Tag side B:
-        -5 < cosThetaBetweenParticleAndTrueB) < 3
+        -5 < cosThetaBetweenParticleAndNominalB < 3
         extraInfo(decayModeID) < 8 to remove semileptonic D channels
         sigProb > 0.005 to give < 10% retention
 
@@ -177,7 +177,7 @@ def B0SLWithOneLep():
 """
     # Reconstruct tag side
     # Apply cuts
-    applyCuts('B0:semileptonic', '-5<cosThetaBetweenParticleAndTrueB<3 and sigProb>0.005 and extraInfo(decayModeID)<8')
+    applyCuts('B0:semileptonic', '-5<cosThetaBetweenParticleAndNominalB<3 and sigProb>0.005 and extraInfo(decayModeID)<8')
 
     # Reconstruct signal side to lepton
     stdE('95eff')
@@ -229,7 +229,7 @@ def BplusSLWithOneLep():
     nTracks > 4
 
     Tag side B:
-    -5 < cosThetaBetweenParticleAndTrueB) < 3
+    -5 < cosThetaBetweenParticleAndNominalB < 3
     extraInfo(decayModeID) < 8 to remove semileptonic D channels
     sigProb > 0.009 to give < 10% retention
 
@@ -240,7 +240,7 @@ def BplusSLWithOneLep():
 
     # Reconstruct tag side
     # Apply cuts
-    applyCuts('B+:semileptonic', '-5<cosThetaBetweenParticleAndTrueB<3 and sigProb>0.009 and extraInfo(decayModeID)<8')
+    applyCuts('B+:semileptonic', '-5<cosThetaBetweenParticleAndNominalB<3 and sigProb>0.009 and extraInfo(decayModeID)<8')
 
     # Reconstruct signal side to lepton
     stdE('95eff')

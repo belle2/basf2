@@ -129,22 +129,19 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     peak_prev[0] = peak_prev[1] = 0;
 
     for (iter = 0; iter < maxIterations; iter++) {
-      double left, right;
-      double peak_min, peak_max;
-
+      // If stuck between two iterations, set peak to average between the two previous values
       if (abs(peak - peak_prev[1]) < 1e-3) {
-        // "Stuck between two iterations, setting peak to average between the two\n"
         peak = 0.5 * (peak_prev[1] + peak_prev[0]);
         gaus->SetParameter(1, peak);
       }
 
       // Setting ranges to interval where f(x) >= norm * 0.2
-      left  = std::max(peak - sigma * 1.27, hist_tmin);
-      right = std::min(peak + sigma * 1.27, hist_tmax);
+      const double left  = std::max(peak - sigma * 1.27, hist_tmin);
+      const double right = std::min(peak + sigma * 1.27, hist_tmax);
 
       // Peak should stay within central 40% of fit area.
-      peak_min = left  + 0.3 * (right - left);
-      peak_max = right - 0.3 * (right - left);
+      const double peak_min = left  + 0.3 * (right - left);
+      const double peak_max = right - 0.3 * (right - left);
       gaus->SetParLimits(1, peak_min, peak_max);
 
       h_time->Fit(gaus, "LIRBQ", "", left, right);

@@ -64,64 +64,56 @@ void EKLMDigitizerModule::initialize()
   }
 }
 
-void EKLMDigitizerModule::beginRun()
+void EKLMDigitizerModule::checkChannelParameters()
 {
   int endcap, layer, sector, plane, strip, stripGlobal;
   int nEndcaps, nLayers[2], nSectors, nPlanes, nStrips;
   const EKLMChannelData* channel;
-  char str[128];
-  bool correctParameters;
-  std::string errorMessage = "";
+  nEndcaps = m_ElementNumbers->getMaximalEndcapNumber();
+  nLayers[0] = m_ElementNumbers->getMaximalDetectorLayerNumber(1);
+  nLayers[1] = m_ElementNumbers->getMaximalDetectorLayerNumber(2);
+  nSectors = m_ElementNumbers->getMaximalSectorNumber();
+  nPlanes = m_ElementNumbers->getMaximalPlaneNumber();
+  nStrips = m_ElementNumbers->getMaximalStripNumber();
+  for (endcap = 1; endcap <= nEndcaps; endcap++) {
+    for (layer = 1; layer <= nLayers[endcap - 1]; layer++) {
+      for (sector = 1; sector <= nSectors; sector++) {
+        for (plane = 1; plane <= nPlanes; plane++) {
+          for (strip = 1; strip <= nStrips; strip++) {
+            stripGlobal = m_ElementNumbers->stripNumber(endcap, layer, sector,
+                                                        plane, strip);
+            channel = m_Channels->getChannelData(stripGlobal);
+            if (channel == NULL)
+              B2FATAL("Incomplete channel data.");
+            if (channel->getPhotoelectronAmplitude() <= 0) {
+              B2ERROR("Non-positive photoelectron amplitude (" <<
+                      channel->getPhotoelectronAmplitude() <<
+                      ") for channel with endcap = " << endcap <<
+                      ", layer = " << layer << ", sector = " << sector <<
+                      ", plane = " << plane << ", strip = " << strip <<
+                      ". The requested channel-specific simulation is "
+                      "impossible. EKLMDigitizer is switched to the generic "
+                      "mode.");
+              m_ChannelSpecificSimulation = false;
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void EKLMDigitizerModule::beginRun()
+{
   if (!m_DigPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
   if (!m_TimeConversion.isValid())
     B2FATAL("EKLM time conversion parameters are not available.");
   if (!m_Channels.isValid())
     B2FATAL("EKLM channel data are not available.");
-  /* Check channel parameters. */
-  if (m_ChannelSpecificSimulation) {
-    nEndcaps = m_ElementNumbers->getMaximalEndcapNumber();
-    nLayers[0] = m_ElementNumbers->getMaximalDetectorLayerNumber(1);
-    nLayers[1] = m_ElementNumbers->getMaximalDetectorLayerNumber(2);
-    nSectors = m_ElementNumbers->getMaximalSectorNumber();
-    nPlanes = m_ElementNumbers->getMaximalPlaneNumber();
-    nStrips = m_ElementNumbers->getMaximalStripNumber();
-    correctParameters = true;
-    for (endcap = 1; endcap <= nEndcaps; endcap++) {
-      for (layer = 1; layer <= nLayers[endcap - 1]; layer++) {
-        for (sector = 1; sector <= nSectors; sector++) {
-          for (plane = 1; plane <= nPlanes; plane++) {
-            for (strip = 1; strip <= nStrips; strip++) {
-              stripGlobal = m_ElementNumbers->stripNumber(endcap, layer, sector,
-                                                          plane, strip);
-              channel = m_Channels->getChannelData(stripGlobal);
-              if (channel == NULL)
-                B2FATAL("Incomplete channel data.");
-              if (channel->getPhotoelectronAmplitude() <= 0) {
-                snprintf(str, 256, "Non-positive photoelectron amplitude (%f)",
-                         channel->getPhotoelectronAmplitude());
-                errorMessage = str;
-                correctParameters = false;
-                goto parameter_check_end;
-              }
-            }
-          }
-        }
-      }
-    }
-parameter_check_end:
-    if (!correctParameters) {
-      snprintf(str, 128, " for channel with endcap = %d, layer = %d, "
-               "sector = %d, plane = %d, strip = %d. ",
-               endcap, layer, sector, plane, strip);
-      errorMessage += str;
-      errorMessage += "The requested channel-specific simulation is "
-                      "impossible. EKLMDigitizer is switched to the generic "
-                      "mode.";
-      B2ERROR(errorMessage);
-      m_ChannelSpecificSimulation = false;
-    }
-  }
+  if (m_ChannelSpecificSimulation)
+    checkChannelParameters();
 }
 
 void EKLMDigitizerModule::readAndSortSimHits()

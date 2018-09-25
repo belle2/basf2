@@ -20,9 +20,7 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   cellIDHi(8736),
   maxIterations(15),
   debugOutput(true),
-  debugFilename("eclBhabhaTAlgorithm.root"),
-  // Private members
-  m_run_count(0)
+  debugFilename("eclBhabhaTAlgorithm.root")
 {
   setDescription(
     "Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference."
@@ -88,7 +86,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     gaus->ReleaseParameter(1);
     gaus->ReleaseParameter(2);
 
-    double peak_min, peak_max;
     double sig_min(0.5), sig_max(15);
 
     double hist_max = h_time->GetMaximum();
@@ -119,7 +116,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     h_time->Fit(gaus, "LIRBQ", "", peak - stddev, peak + stddev);
 
     //=== Perform several additional iterations
-    double left, right;
 
     gaus->ReleaseParameter(0);
     double norm_min(0.85 * hist_max), norm_max(1.35 * hist_max);
@@ -133,6 +129,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     peak_prev[0] = peak_prev[1] = 0;
 
     for (iter = 0; iter < maxIterations; iter++) {
+      double left, right;
+      double peak_min, peak_max;
+
       if (abs(peak - peak_prev[1]) < 1e-3) {
         // "Stuck between two iterations, setting peak to average between the two\n"
         peak = 0.5 * (peak_prev[1] + peak_prev[0]);

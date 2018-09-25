@@ -11,7 +11,7 @@
 #include <reconstruction/calibration/CDCDedxCosineAlgorithm.h>
 
 #include <TF1.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TLine.h>
 #include <TCanvas.h>
 #include <framework/core/HistoModule.h>
@@ -56,11 +56,11 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, but for now just make uniform bins
   const int nbins = 100;
-  TH1F* hdEdx_elCosbin[nbins], *hdEdx_poCosbin[nbins], *hdEdx_epCosbin[nbins];
+  TH1D* hdEdx_elCosbin[nbins], *hdEdx_poCosbin[nbins], *hdEdx_epCosbin[nbins];
   for (unsigned int i = 0; i < nbins; ++i) {
-    hdEdx_elCosbin[i] = new TH1F(Form("hdEdx_elCosbin%d", i), "dE/dx (e-) in bins of cosine", 100, 0, 2);
-    hdEdx_poCosbin[i] = new TH1F(Form("hdEdx_poCosbin%d", i), "dE/dx (e+) in bins of cosine", 100, 0, 2);
-    hdEdx_epCosbin[i] = new TH1F(Form("hdEdx_epCosbin%d", i), "dE/dx (e- and e+) in bins of cosine", 100, 0, 2);
+    hdEdx_elCosbin[i] = new TH1D(Form("hdEdx_elCosbin%d", i), "dE/dx (e-) in bins of cosine", 100, 0, 2);
+    hdEdx_poCosbin[i] = new TH1D(Form("hdEdx_poCosbin%d", i), "dE/dx (e+) in bins of cosine", 100, 0, 2);
+    hdEdx_epCosbin[i] = new TH1D(Form("hdEdx_epCosbin%d", i), "dE/dx (e- and e+) in bins of cosine", 100, 0, 2);
   }
 
   // fill histograms, bin size may be arbitrary

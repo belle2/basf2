@@ -12,7 +12,7 @@
 #include <iostream>
 
 #include <TCanvas.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TLine.h>
 #include <TTree.h>
 #include <TMath.h>
@@ -65,8 +65,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   else fnEntaBinL =  fnEntaBinG;
 
   //enta dedx distributions for inner and outer layer
-  TH1F* hILdEdxhitInEntaBin[fnEntaBinL];
-  TH1F* hOLdEdxhitInEntaBin[fnEntaBinL];
+  TH1D* hILdEdxhitInEntaBin[fnEntaBinL];
+  TH1D* hOLdEdxhitInEntaBin[fnEntaBinL];
 
   Double_t ifeaLE = 0, ifeaUE = 0;
 
@@ -80,39 +80,39 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       ifeaUE = ifeaLE + feaBS;
     }
 
-    hILdEdxhitInEntaBin[iea] = new TH1F(Form("hILdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
+    hILdEdxhitInEntaBin[iea] = new TH1D(Form("hILdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
     hILdEdxhitInEntaBin[iea]->SetTitle(Form("IL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
     hILdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Inner Layer");
     hILdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
 
-    hOLdEdxhitInEntaBin[iea] = new TH1F(Form("hOLdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
+    hOLdEdxhitInEntaBin[iea] = new TH1D(Form("hOLdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
     hOLdEdxhitInEntaBin[iea]->SetTitle(Form("OL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
     hOLdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Outer Layer");
     hOLdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
   }
 
   // Enta stats
-  TH1F* hILEntaG = new TH1F("hILEntaG", "EntA: Inner Layer", fnEntaBinG, feaLE, feaUE);
+  TH1D* hILEntaG = new TH1D("hILEntaG", "EntA: Inner Layer", fnEntaBinG, feaLE, feaUE);
   hILEntaG->GetXaxis()->SetTitle("Entrance angle (#theta)");
   hILEntaG->GetYaxis()->SetTitle("Entries");
 
-  TH1F* hOLEntaG = new TH1F("hOLEntaG", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
+  TH1D* hOLEntaG = new TH1D("hOLEntaG", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
   hOLEntaG->GetXaxis()->SetTitle("Entrance angle (#theta)");
   hOLEntaG->GetYaxis()->SetTitle("Entries");
 
   //rebinned histogram
   Double_t* RmapEntaValue = &fEntaBinValues[0];
 
-  TH1F* hILEntaL = new TH1F("hILEntaL", "EntA: Inner Layer (rebin)", fnEntaBinL, RmapEntaValue);
+  TH1D* hILEntaL = new TH1D("hILEntaL", "EntA: Inner Layer (rebin)", fnEntaBinL, RmapEntaValue);
   hILEntaL->GetXaxis()->SetTitle("Entrance angle (#theta)");
   hILEntaL->GetYaxis()->SetTitle("Entries");
 
-  TH1F* hOLEntaL = new TH1F("hOLEntaL", "EntA: Outer Layer (rebin)", fnEntaBinL, RmapEntaValue);
+  TH1D* hOLEntaL = new TH1D("hOLEntaL", "EntA: Outer Layer (rebin)", fnEntaBinL, RmapEntaValue);
   hOLEntaL->GetYaxis()->SetTitle("Entries");
   hOLEntaL->GetXaxis()->SetTitle("Entrance angle (#theta)");
 
-  TH1F* hILdEdx_all = new TH1F("hILdEdx_all", "", 250, 0, 5);
-  TH1F* hOLdEdx_all = new TH1F("hOLdEdx_all", "", 250, 0, 5);
+  TH1D* hILdEdx_all = new TH1D("hILdEdx_all", "", 250, 0, 5);
+  TH1D* hOLdEdx_all = new TH1D("hOLdEdx_all", "", 250, 0, 5);
 
 
   Int_t ibinEA = 0;
@@ -215,15 +215,15 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   double truncMean = 1.0, binweights = 1.0;
   int sumofbc = 1;
 
-  TH1F* htemp = 0x0;
+  TH1D* htemp = 0x0;
   std::vector<std::vector<double>> onedcors; // prev->std::vector<std::vector<double>> ones;
   std::vector<double> onedcorIorOL, onedcorIorOLtemp;
 
-  TH1F* hILEntaConst = new TH1F("hILEntaConst", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
+  TH1D* hILEntaConst = new TH1D("hILEntaConst", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
   hILEntaConst->GetXaxis()->SetTitle("Entrance angle (#theta)");
   hILEntaConst->GetYaxis()->SetTitle("Constant");
 
-  TH1F* hOLEntaConst = new TH1F("hOLEntaConst", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
+  TH1D* hOLEntaConst = new TH1D("hOLEntaConst", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
   hOLEntaConst->GetXaxis()->SetTitle("Entrance angle (#theta)");
   hOLEntaConst->GetYaxis()->SetTitle("Constant");
 
@@ -244,8 +244,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       else if (iea > int(0.75 * fnEntaBinL))ieaprime = iea - (0.50 * fnEntaBinL);
       else ieaprime = iea;
 
-      if (iIOLayer == 0)htemp = (TH1F*)hILdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
-      else if (iIOLayer == 1)htemp = (TH1F*)hOLdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
+      if (iIOLayer == 0)htemp = (TH1D*)hILdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
+      else if (iIOLayer == 1)htemp = (TH1D*)hOLdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
       else continue;
 
       truncMean  = 1.0; binweights = 0.0; sumofbc = 0;
@@ -386,7 +386,7 @@ void CDCDedx1DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
                     ++it)std::cout << "1DCell-EntA: GlobalBin = " << it << ", LocalBin = " << fEntaBinNums.at(it) << std::endl;
 
 
-  TH1F* tempEnta = new TH1F("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
+  TH1D* tempEnta = new TH1D("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
   fEntaBinValues.push_back(tempEnta->GetBinLowEdge(1)); //first and last manual
   for (unsigned int i = 0; i < fEntaBinNums.size() - 1; ++i) {
     if (fEntaBinNums.at(i) < fEntaBinNums.at(i + 1)) {

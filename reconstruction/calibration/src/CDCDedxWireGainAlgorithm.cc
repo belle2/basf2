@@ -52,8 +52,8 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
   }
 
-  TH1F* hInnerLayer = new TH1F("hInnerLayer", "", 250, 0, 5);
-  TH1F* hOuterLayer = new TH1F("hOuterLayer", "", 250, 0, 5);
+  TH1D* hInnerLayer = new TH1D("hInnerLayer", "", 250, 0, 5);
+  TH1D* hOuterLayer = new TH1D("hOuterLayer", "", 250, 0, 5);
 
   for (unsigned int jwire = 0; jwire < 14336; ++jwire) {
     for (unsigned int jdedxhit = 0; jdedxhit < wirededx[jwire].size(); ++jdedxhit) {
@@ -116,7 +116,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   for (Int_t jwire = 0; jwire < 14336; jwire++) iWireTruncMean[jwire] = 1.0;
 
   //------------------------> Calculations part
-  TH1F* htempPerWire = new TH1F("htempPerWire", "", 250, 0, 5);
+  TH1D* htempPerWire = new TH1D("htempPerWire", "", 250, 0, 5);
 
   for (unsigned int jwire = 0; jwire < 14336; ++jwire) {
 
@@ -125,8 +125,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       htempPerWire->Fill(ihit);
     }
 
-    double truncMean = 1.0, binweights = 1.0;
-    int sumofbc = 1;
+    double truncMean = 1.0;
 
     if (htempPerWire->Integral() < 100) {
       truncMean  = 1.0;
@@ -140,6 +139,8 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
         endat = hBinOutLayer;
       }
 
+      double binweights = 1.0;
+      int sumofbc = 1;
       for (int ibin = startfrom; ibin <= endat; ibin++) {
         if (htempPerWire->GetBinContent(ibin) > 0) {
           binweights += (htempPerWire->GetBinContent(ibin) * htempPerWire->GetBinCenter(ibin));

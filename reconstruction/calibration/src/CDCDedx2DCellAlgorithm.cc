@@ -71,8 +71,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
 
 
   //Doca vs enta dedx distributions for inner and outer layer
-  TH1F* hILdEdxhitInEntaDocaBin[fnEntaBinL][fnDocaBinL];
-  TH1F* hOLdEdxhitInEntaDocaBin[fnEntaBinL][fnDocaBinL];
+  TH1D* hILdEdxhitInEntaDocaBin[fnEntaBinL][fnDocaBinL];
+  TH1D* hOLdEdxhitInEntaDocaBin[fnEntaBinL][fnDocaBinL];
 
   Double_t ifeaLE = 0, ifeaUE = 0, ifdocaLE = 0, ifdocaUE = 0;
 
@@ -96,13 +96,13 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
         ifdocaUE = ifdocaLE + fdocaBS;
       }
 
-      hILdEdxhitInEntaDocaBin[iea][idoca] = new TH1F(Form("hILdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 250, 0, 5);
+      hILdEdxhitInEntaDocaBin[iea][idoca] = new TH1D(Form("hILdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 250, 0, 5);
       hILdEdxhitInEntaDocaBin[iea][idoca]->SetTitle(Form("IL: dedxhit in EntA = (%0.03f to %0.03f) and Doca = (%0.03f to %0.03f)", ifeaLE,
                                                          ifeaUE, ifdocaLE, ifdocaUE));
       hILdEdxhitInEntaDocaBin[iea][idoca]->GetXaxis()->SetTitle("dedxhits in Inner Layer");
       hILdEdxhitInEntaDocaBin[iea][idoca]->GetYaxis()->SetTitle("Entries");
 
-      hOLdEdxhitInEntaDocaBin[iea][idoca] = new TH1F(Form("hOLdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 250, 0, 5);
+      hOLdEdxhitInEntaDocaBin[iea][idoca] = new TH1D(Form("hOLdEdxhitInEntaBin%dDocaBin%d", iea, idoca), "bla-bla", 250, 0, 5);
       hOLdEdxhitInEntaDocaBin[iea][idoca]->SetTitle(Form("OL: dedxhit in EntA = (%0.03f to %0.03f) and Doca = (%0.03f to %0.03f)", ifeaLE,
                                                          ifeaUE, ifdocaLE, ifdocaUE));
       hOLdEdxhitInEntaDocaBin[iea][idoca]->GetXaxis()->SetTitle("dedxhits in Outer Layer");
@@ -111,29 +111,29 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   }
 
   // //Doca vs Enta stats
-  TH2F* hILDocaEntaG = new TH2F("hILDocaEntaG", "Doca vs EntA: Inner Layer", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG, feaLE, feaUE);
+  TH2D* hILDocaEntaG = new TH2D("hILDocaEntaG", "Doca vs EntA: Inner Layer", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG, feaLE, feaUE);
   hILDocaEntaG->GetXaxis()->SetTitle("Doca");
   hILDocaEntaG->GetYaxis()->SetTitle("Entrance angle (#theta)");
 
-  TH2F* hOLDocaEntaG = new TH2F("hOLDocaEntaG", "Doca vs EntA: Outer Layer", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG, feaLE, feaUE);
+  TH2D* hOLDocaEntaG = new TH2D("hOLDocaEntaG", "Doca vs EntA: Outer Layer", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG, feaLE, feaUE);
   hOLDocaEntaG->GetXaxis()->SetTitle("Doca");
   hOLDocaEntaG->GetYaxis()->SetTitle("Entrance angle (#theta)");
 
   Double_t* RmapDocaValue = &fDocaBinValues[0];
   Double_t* RmapEntaValue = &fEntaBinValues[0];
 
-  TH2F* hILDocaEntaL = new TH2F("hILDocaEntaL", "Doca vs EntA: Inner Layer (rebin)", fnDocaBinL, RmapDocaValue, fnEntaBinL,
+  TH2D* hILDocaEntaL = new TH2D("hILDocaEntaL", "Doca vs EntA: Inner Layer (rebin)", fnDocaBinL, RmapDocaValue, fnEntaBinL,
                                 RmapEntaValue);
   hILDocaEntaL->GetXaxis()->SetTitle("Doca");
   hILDocaEntaL->GetYaxis()->SetTitle("Entrance angle (#theta)");
 
-  TH2F* hOLDocaEntaL = new TH2F("hOLDocaEntaL", "Doca vs EntA: Outer Layer (rebin)", fnDocaBinL, RmapDocaValue, fnEntaBinL,
+  TH2D* hOLDocaEntaL = new TH2D("hOLDocaEntaL", "Doca vs EntA: Outer Layer (rebin)", fnDocaBinL, RmapDocaValue, fnEntaBinL,
                                 RmapEntaValue);
   hOLDocaEntaL->GetXaxis()->SetTitle("Doca");
   hOLDocaEntaL->GetYaxis()->SetTitle("Entrance angle (#theta)");
 
-  TH1F* hILdEdx_all = new TH1F("hILdEdx_all", "", 250, 0, 5);
-  TH1F* hOLdEdx_all = new TH1F("hOLdEdx_all", "", 250, 0, 5);
+  TH1D* hILdEdx_all = new TH1D("hILdEdx_all", "", 250, 0, 5);
+  TH1D* hOLdEdx_all = new TH1D("hOLdEdx_all", "", 250, 0, 5);
 
 
   Int_t ibinEA = 0, ibinDOCA = 0;
@@ -253,7 +253,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   double truncMean = 1.0, binweights = 1.0;
   int sumofbc = 1;
 
-  TH1F* htemp = 0x0;
+  TH1D* htemp = 0x0;
   std::vector<TH2F> twodcors;
 
   TH2F tempTwoD = TH2F("tempTwoD", "dE/dx in bins of DOCA/Enta;DOCA;Entrance Angle", fnDocaBinG, fdocaLE, fdocaUE, fnEntaBinG, feaLE,
@@ -281,9 +281,9 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       //std::cout << "iea(prime) bin = " << iea << "(" << ieaprime << ")" << std::endl;
       for (int idoca = 1; idoca <= fnDocaBinL; idoca++) {
 
-        if (iIOLayer == 0)htemp = (TH1F*)hILdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer, iea,
+        if (iIOLayer == 0)htemp = (TH1D*)hILdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer, iea,
                                     idoca));
-        else if (iIOLayer == 1)htemp = (TH1F*)hOLdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer,
+        else if (iIOLayer == 1)htemp = (TH1D*)hOLdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer,
                                          iea, idoca));
         else continue;
 
@@ -420,7 +420,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalDocaBinMap(Bool_t seeMap)
   if (seeMap)for (unsigned int it = 0; it < fDocaBinNums.size();
                     ++it)std::cout << "2DCell-Doca: GlobalBin = " << it << ", LocalBin = " << fDocaBinNums.at(it) << std::endl;
 
-  TH1F* tempDoca = new TH1F("tempDoca", "tempDoca", fnDocaBinG, fdocaLE, fdocaUE);
+  TH1D* tempDoca = new TH1D("tempDoca", "tempDoca", fnDocaBinG, fdocaLE, fdocaUE);
   fDocaBinValues.push_back(tempDoca->GetBinLowEdge(1));
   for (unsigned int i = 0; i < fDocaBinNums.size() - 1; ++i) {
     if (fDocaBinNums.at(i) < fDocaBinNums.at(i + 1)) {
@@ -502,7 +502,7 @@ void CDCDedx2DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
                     ++it)std::cout << "2DCell-EntA: GlobalBin = " << it << ", LocalBin = " << fEntaBinNums.at(it) << std::endl;
 
 
-  TH1F* tempEnta = new TH1F("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
+  TH1D* tempEnta = new TH1D("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
   fEntaBinValues.push_back(tempEnta->GetBinLowEdge(1)); //first and last manual
   for (unsigned int i = 0; i < fEntaBinNums.size() - 1; ++i) {
     if (fEntaBinNums.at(i) < fEntaBinNums.at(i + 1)) {

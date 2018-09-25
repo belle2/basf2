@@ -16,7 +16,8 @@
 #include <TF1.h>
 #include <TLine.h>
 #include <TMath.h>
-#include <TH1F.h>
+#include <TH1D.h>
+#include <TH2D.h>
 #include <TH2F.h>
 #include <TString.h>
 #include <TCanvas.h>

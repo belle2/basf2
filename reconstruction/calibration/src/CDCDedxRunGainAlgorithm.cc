@@ -11,7 +11,7 @@
 #include <reconstruction/calibration/CDCDedxRunGainAlgorithm.h>
 
 #include <TF1.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TPaveText.h>
@@ -51,7 +51,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   ttree->SetBranchAddress("dedx", &dedx);
   ttree->SetBranchAddress("run", &run);
 
-  TH1F* hDedx = new TH1F("hDedx", "hDedx", 100, 0, 2);
+  TH1D* hDedx = new TH1D("hDedx", "hDedx", 100, 0, 2);
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     if (dedx == 0) continue;

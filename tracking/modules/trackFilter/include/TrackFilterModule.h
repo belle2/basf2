@@ -33,17 +33,9 @@ namespace Belle2 {
      */
     TrackFilterModule();
 
-    /** if required */
-    virtual ~TrackFilterModule();
-
-    /** initializes the module */
-    virtual void beginRun();
 
     /** processes the event */
     virtual void event();
-
-    /** end the run */
-    virtual void endRun();
 
     /** terminates the module */
     virtual void terminate();

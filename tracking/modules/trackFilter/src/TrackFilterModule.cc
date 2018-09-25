@@ -69,10 +69,6 @@ TrackFilterModule::TrackFilterModule() : Module()
 
 }
 
-TrackFilterModule::~TrackFilterModule()
-{
-}
-
 
 void TrackFilterModule::initialize()
 {
@@ -102,9 +98,6 @@ void TrackFilterModule::initialize()
 }
 
 
-void TrackFilterModule::beginRun()
-{
-}
 
 void TrackFilterModule::event()
 {
@@ -116,10 +109,6 @@ void TrackFilterModule::event()
   }
                             );
 
-}
-
-void TrackFilterModule::endRun()
-{
 }
 
 void TrackFilterModule::terminate()

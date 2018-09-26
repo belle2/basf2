@@ -22,7 +22,7 @@ namespace Belle2 {
    * This connection can be used to prevent printing of the same message again
    * and again. Messages are suppressed if they match with the one previously sent.
    */
-  class LogConnectionFilter : public LogConnectionBase {
+  class LogConnectionFilter final : public LogConnectionBase {
 
   public:
 
@@ -44,14 +44,14 @@ namespace Belle2 {
      * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    virtual bool sendMessage(const LogMessage& message);
+    bool sendMessage(const LogMessage& message) override;
 
     /**
      * Returns true if the log connection could be established.
      *
      * @return True if the log connection could be established.
      */
-    virtual bool isConnected();
+    bool isConnected() override;
 
   protected:
 

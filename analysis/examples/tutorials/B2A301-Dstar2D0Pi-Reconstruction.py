@@ -17,65 +17,69 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import variablesToNtuple
-from stdCharged import *
-from beamparameters import add_beamparameters
+import basf2 as b2
+import modularAnalysis as ma
 import variableCollections as vc
+import variableCollectionsTools as vct
+import stdCharged as stdc
+from stdV0s import stdKshorts
+from stdPi0s import stdPi0s
 
-beamparameters = add_beamparameters(analysis_main, "Y4S")
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/group/belle2/tutorial/release_01-00-00/mdst-dstars.root'
-     ]
+# check if the required input file exists
+import os
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/Dst2D0pi.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
-inputMdstList('MC9', filelistSIG)
+# create path
+my_path = ma.analysis_main
+
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename='$BELLE2_EXAMPLES_DATA/Dst2D0pi.root',
+             path=my_path)
+
 
 # use standard final state particle lists
 #
 # creates "pi+:all" ParticleList (and c.c.)
-stdPi('all')
+stdc.stdPi(listtype='all', path=my_path)
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdc.stdLoosePi(path=my_path)
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdc.stdLooseK(path=my_path)
 
 # reconstruct D0 -> K- pi+ decay
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
-reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
+ma.reconstructDecay(decayString='D0:kpi -> K-:loose pi+:loose', cut='1.8 < M < 1.9', path=my_path)
 
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
 # and D* CMS momentum > 2.5 GeV
-reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5')
+ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('D*+')
+ma.matchMCTruth(list_name='D*+', path=my_path)
 
 # Select variables that we want to store to ntuple
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
-fs_hadron_vars = vc.convert_to_all_selected_vars(
+fs_hadron_vars = vct.convert_to_all_selected_vars(
     vc.pid + vc.track + vc.mc_truth,
     'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-d0_vars = vc.convert_to_one_selected_vars(
+d0_vars = vct.convert_to_one_selected_vars(
     vc.inv_mass + vc.mc_truth,
     'D*+ -> ^D0 pi+', 'D0')
 
 
 # Saving variables to ntuple
 output_file = 'B2A301-Dstar2D0Pi-Reconstruction.root'
-variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
-                  filename=output_file, treename='dsttree')
+ma.variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
+                     filename=output_file, treename='dsttree', path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

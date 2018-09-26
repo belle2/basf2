@@ -4,7 +4,7 @@ Analysis
 
 The analysis package collects modules and tools for high-level analysis of Belle II data.
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
-With these particle decay candidates, you can use high level tools such as `TreeFitter`, `FlavorTagger`, and the `FullEventInterpretation` (FEI).
+With these particle decay candidates, you can use high level tools such as :b2:mod:`TreeFitter`, :b2:mod:`FlavorTagger`, and the `FullEventInterpretation` (FEI).
 
 The core data objects of the ``basf2`` analysis package, are the `Particle`_ class, and the `ParticleList`_ class.
 Almost all analysis modules are concerned with the manipulation of `ParticleList`_ s.
@@ -68,11 +68,15 @@ New users are encouraged to start with this.
 
 .. toctree:: VariableManagerOutput
 
-We also support `NtupleMaker` tools which were developed first.
+We also support :doc:`NtupleMaker` tools which were developed first.
 However we expect to deprecate this method in the next release, and eventually remove.
 The documentation is included here for backward compatibility.
 
 .. toctree:: NtupleMaker
+
+.. toctree:: VariableCollections
+
+.. toctree:: VariableCollectionsTools
 
 Event-based analysis
 ====================

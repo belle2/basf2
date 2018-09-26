@@ -40,16 +40,26 @@ def create_mail_log_failed_scripts():
         failed_script = {}
         # give failed_script the same format as error_data in method create_mail_log
         failed_script["package"] = script.package
-        failed_script["rootfile"] = script.header["input"]
+        try:
+            failed_script["rootfile"] = ", ".join(script.header["input"])
+        except (KeyError, TypeError) as e:  # TypeError occurs if script.header is None
+            failed_script["rootfile"] = " -- "
         failed_script["comparison_text"] = " -- "
-        failed_script["description"] = script.header["description"]
+        try:
+            failed_script["description"] = script.header["description"]
+        except (KeyError, TypeError) as e:
+            failed_script["description"] = " -- "
         # this is called comparison_result but it is handled as error type when composing mail
         failed_script["comparison_result"] = "script failed to execute"
         # add contact of failed script to mail_log
-        for contact in parse_mail_address(script.header["contact"]):
-            if contact not in mail_log:
-                mail_log[contact] = {}
-            mail_log[contact][script.name] = failed_script
+        try:
+            for contact in parse_mail_address(script.header["contact"]):
+                if contact not in mail_log:
+                    mail_log[contact] = {}
+                mail_log[contact][script.name] = failed_script
+        except (KeyError, TypeError) as e:
+            # this means no contact is given
+            continue
 
     return mail_log
 
@@ -108,11 +118,16 @@ def create_mail_log(comparison):
     return mail_log
 
 
-def parse_mail_address(string):
+def parse_mail_address(obj):
     """
-    take a string and return list of email addresses that appear in it
+    take a string or list and return list of email addresses that appear in it
     """
-    return re.findall(r'[\w\.-]+@[\w\.-]+', string)
+    if isinstance(obj, str):
+        return re.findall(r'[\w\.-]+@[\w\.-]+', obj)
+    elif isinstance(obj, list):
+        return [re.match(r'[\w\.-]+@[\w\.-]+', c).group() for c in obj if re.match(r'[\w\.-]+@[\w\.-]+', c) is not None]
+    else:
+        raise TypeError("must be string or list of strings")
 
 
 def compose_message(plots):

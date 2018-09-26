@@ -486,7 +486,10 @@ void MillepedeCollectorModule::collect()
       auto mother = list->getParticle(iParticle);
 
       auto track12 = getParticlesTracks(mother->getDaughters());
-      if (track12.size() != 2) B2FATAL("Did not get 2 tracks");
+      if (track12.size() != 2) {
+        B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
+        continue;
+      }
 
       auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, beam->getMass());
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
@@ -598,6 +601,8 @@ void MillepedeCollectorModule::collect()
         daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);
 
       gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, extPrec);
+      combined.printTrajectory(1000);
+      combined.printPoints(1000);
 
       combined.fit(chi2, ndf, lostWeight);
       getObjectPtr<TH1I>("ndf")->Fill(ndf);

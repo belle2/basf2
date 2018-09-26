@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleMCDeltaTTool.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 #include <analysis/dataobjects/Vertex.h>
 #include <cmath>
 #include <TBranch.h>

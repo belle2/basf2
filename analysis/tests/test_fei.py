@@ -206,10 +206,10 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0 -> pi+ pi-', ''),
+                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP -> p+ pi-', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0', '')], addDaughters=True, writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
 
@@ -220,10 +220,10 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0 -> pi+ pi-', ''),
+                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP -> p+ pi-', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0', '')], addDaughters=True, writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
@@ -738,7 +738,7 @@ class TestPostReconstruction(unittest.TestCase):
                         fileName='Monitor_PostReconstruction_AfterRanking_pi+:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_pi+:generic.root', treeName='variables',
                         variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
-                                   'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                                   'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='pi+:generic')
 
         path.add_module('MVAExpert', identifier='UNITTEST_K+:generic ==> K+:FSP', extraInfoName='SignalProbability',
@@ -792,7 +792,7 @@ class TestPostReconstruction(unittest.TestCase):
                         fileName='Monitor_PostReconstruction_AfterRanking_K+:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_K+:generic.root', treeName='variables',
                         variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
-                                   'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                                   'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='K+:generic')
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> K-:generic pi+:generic',
@@ -865,7 +865,7 @@ class TestPostReconstruction(unittest.TestCase):
                         fileName='Monitor_PostReconstruction_AfterRanking_D0:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_D0:generic.root', treeName='variables',
                         variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isSignal',
-                                   'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                                   'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='D0:generic')
 
         print_path(path, x.reconstruct())

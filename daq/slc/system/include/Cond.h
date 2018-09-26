@@ -10,16 +10,16 @@ namespace Belle2 {
   public:
     Cond();
     Cond(const Cond& cond);
-    ~Cond() throw() {};
+    ~Cond() {};
 
   public:
-    bool init() throw();
-    bool signal() throw();
-    bool broadcast() throw();
-    bool wait(Mutex& mutex) throw();
+    bool init();
+    bool signal();
+    bool broadcast();
+    bool wait(Mutex& mutex);
     bool wait(Mutex& mutex, const unsigned int sec,
-              const unsigned int msec = 0) throw();
-    bool destroy() throw();
+              const unsigned int msec = 0);
+    bool destroy();
 
   private:
     pthread_cond_t m_cond_t;

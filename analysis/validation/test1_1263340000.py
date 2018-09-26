@@ -37,6 +37,7 @@ from variables import variables
 
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
+variables.addAlias('ROE_neextra', 'ROE_neextra(simple)')
 variables.addAlias('ROE_mcMissFlagsSel', 'ROE_mcMissFlags(ROEclusters)')
 variables.addAlias('ROE_chargeSel', 'ROE_charge(ROEclusters)')
 variables.addAlias('ROE_ESel', 'ROE_E(ROEclusters)')
@@ -169,19 +170,19 @@ inputMdstList('default', fileList)
 # now the FEI reconstruction is done
 stdPi('95eff')
 stdK('85eff')
-stdE('90eff')
-stdMu('90eff')
+stdE('95eff')
+stdMu('95eff')
 
 # Calling standard particle lists
-applyCuts('pi+:95eff', 'pt>0.05')
-applyCuts('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
-applyCuts('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
-applyCuts('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('pi+:95effptcut', 'pi+:95eff', 'pt>0.05')
+cutAndCopyList('K+:85effCleanTracks', 'K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('e+:95effCleanTracks', 'e+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('mu+:95effCleanTracks', 'mu+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 
 stdPi0s('eff40')
-cutAndCopyList('pi+:sig', 'pi+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('pi+:sig', 'pi+:95effptcut', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 cutAndCopyList('pi0:lowp', 'pi0:eff40', '0.06<useCMSFrame(p)<0.25')
-cutAndCopyList('pi+:lowp', 'pi+:95eff', '0.06<useCMSFrame(p)<0.25')
+cutAndCopyList('pi+:lowp', 'pi+:95effptcut', '0.06<useCMSFrame(p)<0.25')
 
 
 # pi0
@@ -192,35 +193,36 @@ cutAndCopyList('K_S0:sig', 'K_S0:all', 'distance>0.5 and significanceOfDistance>
 # Photons
 stdPhotons('tight')
 stdPhotons('pi0highE')
-applyCuts('gamma:pi0highE', 'E>0.150 and clusterE9E25>0.8 and abs(clusterTiming)<clusterErrorTiming')
-applyCuts('gamma:tight', 'E>0.04 and abs(clusterTiming)<clusterErrorTiming')
+cutAndCopyList('gamma:pi0highECleanClusters', 'gamma:pi0highE',
+               'E>0.150 and clusterE9E25>0.8 and abs(clusterTiming)<clusterErrorTiming')
+cutAndCopyList('gamma:tightCleanClusters', 'gamma:tight', 'E>0.04 and abs(clusterTiming)<clusterErrorTiming')
 
 # Reconstructing pi0
-reconstructDecay('pi0:allsig -> gamma:tight gamma:tight', '0.05<InvM<0.35')
-reconstructDecay('pi0:sig -> gamma:tight gamma:tight', '0.124<InvM<0.140')
+reconstructDecay('pi0:allsig -> gamma:tightCleanClusters gamma:tightCleanClusters', '0.05<InvM<0.35')
+reconstructDecay('pi0:sig -> gamma:tightCleanClusters gamma:tightCleanClusters', '0.124<InvM<0.140')
 
-reconstructDecay('D0:tag -> K-:85eff pi+:95eff', '1.8<InvM<1.9')
-reconstructDecay('B-:tag -> D0:tag pi-:95eff', 'Mbc>5.27 and abs(deltaE)<0.200 ')
+reconstructDecay('D0:tag -> K-:85effCleanTracks pi+:95effptcut', '1.8<InvM<1.9')
+reconstructDecay('B-:tag -> D0:tag pi-:95effptcut', 'Mbc>5.27 and abs(deltaE)<0.200 ')
 
 # Truth Matching
-matchMCTruth('mu+:90eff')
-matchMCTruth('e+:90eff')
+matchMCTruth('mu+:95effCleanTracks')
+matchMCTruth('e+:95effCleanTracks')
 
 
 # D0
 
 
-reconstructDecay('D0:sig1 -> K-:85eff pi+:sig', '1.7<InvM<2.1', 1)
+reconstructDecay('D0:sig1 -> K-:85effCleanTracks pi+:sig', '1.7<InvM<2.1', 1)
 reconstructDecay('D0:sig2 -> K_S0:sig pi0:sig', '1.7<InvM<2.1', 2)
-reconstructDecay('D0:sig3 -> K-:85eff pi+:sig pi0:sig', '1.7<InvM<2.1', 3)
-reconstructDecay('D0:sig4 -> K-:85eff pi+:sig pi-:sig pi+:sig', '1.7<InvM<2.1', 4)
+reconstructDecay('D0:sig3 -> K-:85effCleanTracks pi+:sig pi0:sig', '1.7<InvM<2.1', 3)
+reconstructDecay('D0:sig4 -> K-:85effCleanTracks pi+:sig pi-:sig pi+:sig', '1.7<InvM<2.1', 4)
 reconstructDecay('D0:sig5 -> K_S0:sig pi+:sig pi-:sig', '1.7<InvM<2.1', 5)
 reconstructDecay('D0:sig6 -> K_S0:sig pi+:sig pi-:sig pi0:sig', '1.7<InvM<2.1', 6)
 copyLists('D0:sigD', ['D0:sig1', 'D0:sig2', 'D0:sig3', 'D0:sig4', 'D0:sig5', 'D0:sig6'])
 
 rankByLowest('D0:sigD', 'abs_dM')
 reconstructDecay('D*0:sigDstar1 -> D0:sigD pi0:lowp', '0.139<massDifference(0)<0.16', 1)
-reconstructDecay('D*0:sigDstar2 ->D0:sigD gamma:tight', '0.139<massDifference(0)<0.16', 2)
+reconstructDecay('D*0:sigDstar2 ->D0:sigD gamma:tightCleanClusters', '0.139<massDifference(0)<0.16', 2)
 
 copyLists('D*0:sigDstar', ['D*0:sigDstar1', 'D*0:sigDstar2'])
 
@@ -230,8 +232,8 @@ rankByLowest('D*0:sigDstar', 'massDifference(0)')
 rankByLowest('D*0:sigDstar', 'abs_dM')
 
 # tau
-reconstructDecay('tau-:ch1 -> e-:90eff', '')
-reconstructDecay('tau-:ch2 -> mu-:90eff', '')
+reconstructDecay('tau-:ch1 -> e-:95effCleanTracks', '')
+reconstructDecay('tau-:ch2 -> mu-:95effCleanTracks', '')
 copyLists('tau-:mytau', ['tau-:ch1', 'tau-:ch2'])
 
 # B+:sig
@@ -244,6 +246,7 @@ reconstructDecay('Upsilon(4S) -> B+:sig  B-:tag', '')
 
 # Rest of EVent
 buildRestOfEvent('Upsilon(4S)')
+buildRestOfEvent('B-:sig')
 
 ROETracks = ('ROETracks', '', '')
 ROEclusters = ('ROEclusters', '', 'abs(clusterTiming)<clusterErrorTiming and E>0.05')
@@ -251,6 +254,11 @@ ROEclusters = ('ROEclusters', '', 'abs(clusterTiming)<clusterErrorTiming and E>0
 
 appendROEMasks('Upsilon(4S)', [ROEclusters, ROETracks])
 
+appendROEMask('Upsilon(4S)', 'simple', 'pt>0.05 and -2< dr < 2 and -4.0<dz < 4.0',
+              'abs(clusterTiming)<clusterErrorTiming and E>0.075')
+appendROEMask('B-:sig', 'simpleB', 'pt>0.05 and -2< dr < 2 and -4.0<dz < 4.0', 'abs(clusterTiming)<clusterErrorTiming and E>0.075')
+
+buildContinuumSuppression('B-:sig', 'simpleB')
 
 # perform MC matching
 
@@ -269,11 +277,11 @@ Bsig_BpDstar_tool += ['InvMass', '^B+:sig -> ^D*0:sigDstar ^tau+:mytau ']
 Bsig_BpDstar_tool += ['EventMetaData', '^B+:sig']
 Bsig_BpDstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]', '^B+:sig ->^D*0:sigDstar tau+:mytau']
 Bsig_BpDstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndNominalB:pRecoil:daughterAngleInBetween(0,1)]',
     '^B+:sig ->D*0:sigDstar tau+:mytau']
 
 Y4S_BpDstar_tool = ['MCTruth', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar ^tau-:mytau] ^B+:tag']
-Y4S_BpDstar_tool += ['ExtraEnergy', '^Upsilon(4S)']
+Y4S_BpDstar_tool += ['CustomFloats[ROE_neextra]', '^Upsilon(4S)']
 Y4S_BpDstar_tool += ['MCKinematics', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar tau-:mytau] ^B+:tag']
 Y4S_BpDstar_tool += ['Kinematics', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar  tau-:mytau ] ^B+:tag']
 Y4S_BpDstar_tool += ['InvMass', 'Upsilon(4S) -> [B-:sig -> ^D*0:sigDstar  tau-:mytau] B+:tag']
@@ -284,7 +292,7 @@ Y4S_BpDstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]',
                      'Upsilon(4S) -> [^B-:sig ->^D*0:sigDstar ^tau-:mytau] ^B+:tag']
 Y4S_BpDstar_tool += ['CustomFloats[m2Recoil:decayAngle(0,1)]', 'Upsilon(4S) -> ^B-:sig B+:tag']
 Y4S_BpDstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndNominalB:pRecoil:daughterAngleInBetween(0,1)]',
     'Upsilon(4S) -> ^B-:sig B+:tag']
 Y4S_BpDstar_tool += ['CustomFloats[daughter(0,dr):daughter(0,dz):daughter(0,pt):daughter(0,p)]',
                      'Upsilon(4S) -> [B-:sig -> D*0:sigDstar ^tau-:mytau ] B+:tag']
@@ -313,7 +321,8 @@ Y4S_BpDstar_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(
                      'Upsilon(4S) -> [ B-:sig -> ^D*0:sigDstar ^tau-:mytau] B+:tag ']
 
 Y4S_BpDstar_tool += ['DeltaEMbc', 'Upsilon(4S) ->B-:sig ^B+:tag']
-Y4S_BpDstar_tool += ['CustomFloats[R2EventLevel:cosTBTO]', '^Upsilon(4S) ->B-:sig B+:tag']
+Y4S_BpDstar_tool += ['CustomFloats[R2EventLevel]', '^Upsilon(4S) ->B-:sig B+:tag']
+Y4S_BpDstar_tool += ['CustomFloats[cosTBTO]', 'Upsilon(4S) -> ^B-:sig B+:tag']
 Dstar_sig_tool = ['MCTruth', '^D*0:myD*']
 Dstar_sig_tool += ['MCHierarchy', '^D*0:myD*']
 Dstar_sig_tool += ['InvMass', '^D*0:myD*']

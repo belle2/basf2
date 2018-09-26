@@ -109,6 +109,16 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
 # Used in skimming code
 def loadStdSkimPhoton(path=analysis_main):
+    """
+    Function to prepare the skim photon lists.
+
+    Warning:
+        Should only be used by skims.
+
+    Parameters:
+        path (basf2.Path): modules are added to this path
+
+    """
     stdPhotons('loose', path)
     cutAndCopyList(
         'gamma:skim',
@@ -121,6 +131,13 @@ def loadStdSkimPhoton(path=analysis_main):
 
 
 def loadStdGoodBellePhoton(path=analysis_main):
+    """
+    Load the Belle goodBelle list. Creates a ParticleList named
+    'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'
+
+    Parameters:
+        path (basf2.Path): the path to load the modules
+    """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)
 
@@ -128,10 +145,18 @@ def loadStdGoodBellePhoton(path=analysis_main):
 
 
 def loadStdPhotonE12(path=analysis_main):
+    """
+    Warning:
+        This function is deprecated.
+    """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:E12', 'gamma:all', '1.2 < E < 100', True, path)
 
 
 def loadStdPhotonE15(path=analysis_main):
+    """
+    Warning:
+        This function is deprecated.
+    """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:E15', 'gamma:all', '1.5 < E < 100', True, path)

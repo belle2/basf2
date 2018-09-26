@@ -392,3 +392,16 @@ Additional Features
   ``:issue:`BII-XXXX```, for example ``:issue:`BII-8``` (:issue:`BII-8`)
 
 
+How to test locally
+-------------------
+
+You can test locally your changes in the Sphinx documentation by compiling your
+code with the following command:
+
+::
+
+    scons --sphinx html
+
+The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
+navigate it with your favorite browser to check if the output is what you
+expect.

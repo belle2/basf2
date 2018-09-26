@@ -56,7 +56,7 @@ stdLooseMu()
 
 # create Ks -> pi+ pi- list from V0
 # keep only candidates with 0.4 < M(pipi) < 0.6 GeV
-fillParticleList('K_S0:pipi', '0.4 < M < 0.6')
+fillParticleList('K_S0:pipi -> pi+ pi-', '0.4 < M < 0.6')
 
 # reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with 3.0 < M(mumu) < 3.2 GeV

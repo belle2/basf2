@@ -169,6 +169,7 @@ namespace Belle2 {
     double h_dedx[kMaxHits];   /**< charge per path length */
     double h_adcraw[kMaxHits]; /**< charge per hit */
     double h_doca[kMaxHits];   /**< distance of closest approach */
+    double h_ndoca[kMaxHits];  /**< normalized distance of closest approach */
     double h_enta[kMaxHits];   /**< entrance angle */
     double h_driftT[kMaxHits];   /**< drift time */
     double h_wireGain[kMaxHits];   /**< calibration hit gain */

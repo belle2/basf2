@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleXpTool.h>
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/EventVariables.h>
+#include <analysis/variables/Variables.h>
+#include <analysis/variables/EventVariables.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <TBranch.h>

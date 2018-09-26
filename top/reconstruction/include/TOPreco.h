@@ -19,7 +19,7 @@ extern "C" {
   void set_beta_rq_(float*);
   void set_time_window_(float*, float*);
   void get_time_window_(float*, float*);
-  void set_pdf_opt_(int*);
+  void set_pdf_opt_(int*, int*, int*);
   float get_logl_(float*, float*, float*, float*);
   int data_getnum_();
   void set_channel_mask_(int*, int*, int*);
@@ -116,11 +116,13 @@ namespace Belle2 {
       /**
        * Set PDF option
        * @param opt option - see definition of PDFoption
+       * @param NP number of emission positions along track segment (equidistant)
+       * @param NC number of Cerenkov angles (equdistant in photon energies)
        */
-      void setPDFoption(PDFoption opt)
+      void setPDFoption(PDFoption opt, int NP = 0, int NC = 0)
       {
         int iopt = opt;
-        set_pdf_opt_(&iopt);
+        set_pdf_opt_(&iopt, &NP, &NC);
       }
 
       /**

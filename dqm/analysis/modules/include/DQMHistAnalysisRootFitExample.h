@@ -36,19 +36,18 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistAnalysisRooFitExampleModule();
-    virtual ~DQMHistAnalysisRooFitExampleModule();
+  private:
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize(void) override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun(void) override final;
+    void event(void) override final;
+    void endRun(void) override final;
+    void terminate(void) override final;
 
-    // Data members
-  private:
+    // Data member
     RooWorkspace* w;
     RooRealVar* x;
     RooDataHist* data;

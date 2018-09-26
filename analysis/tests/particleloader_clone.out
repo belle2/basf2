@@ -23,11 +23,11 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
-[INFO]    -> MDST source: V0 (-> TFR(pi) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
-[INFO]    -> MDST source: V0 (-> TFR(p) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
@@ -37,7 +37,91 @@
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
 [INFO]    -> MDST source: ECLClusters
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:frommc (pi-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K+:frommc (K-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: p+:frommc (anti-p-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: mu+:frommc (mu-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:frommc (K_S0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:frommc (anti-Lambda0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_L0:frommc (K_L0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:frommc (gamma:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: B0:frommc (anti-B0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
+[INFO] Number of ParticleLists studied 11 
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
+			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8|	    9|	   10| Unique 
+     e+:frommc( 0)	|	0.9994	1.0000	0.9995	0.8537	0.5402	0.9933	0.5357	0.1185	0.4713	1.0000	0.0000	0.9652	0.0000
+    pi+:frommc( 1)	|	0.9995	0.9994	1.0000	0.8535	0.5404	0.9932	0.5359	0.1185	0.4714	1.0000	0.0000	0.9652	0.0000
+     K+:frommc( 2)	|	0.8535	0.9996	0.9994	1.0000	0.5396	0.9947	0.5012	0.1151	0.4420	1.0000	0.0000	0.9689	0.0000
+     p+:frommc( 3)	|	0.5402	0.9993	0.9999	0.8526	1.0000	0.9942	0.5276	0.1912	0.4919	1.0000	0.0000	0.9538	0.0000
+    mu+:frommc( 4)	|	0.9931	0.9995	0.9995	0.8549	0.5408	1.0000	0.5360	0.1187	0.4713	1.0000	0.0000	0.9652	0.0000
+   K_S0:frommc( 5)	|	0.5357	0.9994	0.9998	0.7986	0.5320	0.9937	1.0000	0.0999	0.4407	1.0000	0.0000	0.9668	0.0000
+Lambda0:frommc( 6)	|	0.1184	0.9995	0.9998	0.8292	0.8722	0.9950	0.4518	1.0000	0.5199	1.0000	0.0000	0.9190	0.0000
+   K_L0:frommc( 7)	|	0.4713	0.9995	0.9997	0.8005	0.5638	0.9933	0.5010	0.1307	1.0000	1.0000	0.0000	0.9632	0.0000
+  gamma:frommc( 8)	|	1.0000	0.9994	0.9995	0.8535	0.5402	0.9931	0.5357	0.1184	0.4713	1.0000	0.0000	0.9652	0.0000
+     B0:frommc( 9)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000
+     D0:frommc(10)	|	0.9652	0.9994	0.9994	0.8568	0.5338	0.9931	0.5366	0.1128	0.4703	1.0000	0.0000	1.0000	0.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+     e+:frommc( 0)	|	  7.8386	  7.8435	  4.4100	  4.4128	  3.4286	  3.4308	  0.0000	  0.0000
+    pi+:frommc( 1)	|	  9.6471	  9.6524	  4.7999	  4.8025	  4.8472	  4.8498	  0.0000	  0.0000
+     K+:frommc( 2)	|	  1.6794	  1.9676	  0.8402	  0.9844	  0.8392	  0.9832	  0.0000	  0.0000
+     p+:frommc( 3)	|	  0.9344	  1.7297	  0.8035	  1.4875	  0.1308	  0.2422	  0.0000	  0.0000
+    mu+:frommc( 4)	|	  4.5894	  4.6211	  3.6483	  3.6734	  0.9411	  0.9476	  0.0000	  0.0000
+   K_S0:frommc( 5)	|	  0.7356	  1.3732	  0.0000	  0.0000	  0.0000	  0.0000	  0.7356	  1.3732
+Lambda0:frommc( 6)	|	  0.1321	  1.1154	  0.0965	  0.8151	  0.0356	  0.3003	  0.0000	  0.0000
+   K_L0:frommc( 7)	|	  0.6232	  1.3224	  0.0000	  0.0000	  0.0000	  0.0000	  0.6232	  1.3224
+  gamma:frommc( 8)	|	 16.6387	 16.6392	  0.0000	  0.0000	  0.0000	  0.0000	 16.6387	 16.6392
+     B0:frommc( 9)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+     D0:frommc(10)	|	  1.7581	  1.8215	  0.8772	  0.9089	  0.8808	  0.9126	  0.0000	  0.0000
+
+[INFO] 
+=======================================================
+Total Retention: 1.0000
+Total Number of Particles created in the DataStore: 14376603
+=======================================================
+
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
@@ -70,7 +154,7 @@
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 10364716
+Total Number of Particles created in the DataStore: 14376603
 =======================================================
 
 [WARNING] There were 1440 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
@@ -111,11 +195,11 @@ Total Number of Particles created in the DataStore: 10364716
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
-[INFO]    -> MDST source: V0 (-> TFR(pi) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
-[INFO]    -> MDST source: V0 (-> TFR(p) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
@@ -125,7 +209,52 @@ Total Number of Particles created in the DataStore: 10364716
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
 [INFO]    -> MDST source: ECLClusters
 [INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:frommc (pi-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K+:frommc (K-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: p+:frommc (anti-p-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: mu+:frommc (mu-:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:frommc (K_S0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:frommc (anti-Lambda0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_L0:frommc (K_L0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:frommc (gamma:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: B0:frommc (anti-B0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: D0:frommc (anti-D0:frommc)
+[INFO]    -> MDST source: MCParticles
+[INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 9 
+[INFO] Number of ParticleLists studied 11 
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (4+0) + e- (6+0)
 [INFO] collection=Particles
@@ -1887,6 +2016,45 @@ Total Number of Particles created in the DataStore: 10364716
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
+			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8|	    9|	   10| Unique 
+     e+:frommc( 0)	|	1.0000	1.0000	1.0000	0.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000	1.0000	0.0000
+    pi+:frommc( 1)	|	1.0000	1.0000	1.0000	0.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000	1.0000	0.0000
+     K+:frommc( 2)	|	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000
+     p+:frommc( 3)	|	1.0000	1.0000	1.0000	0.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000	1.0000	0.0000
+    mu+:frommc( 4)	|	1.0000	1.0000	1.0000	0.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000	1.0000	0.0000
+   K_S0:frommc( 5)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000
+Lambda0:frommc( 6)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000	0.0000
+   K_L0:frommc( 7)	|	1.0000	1.0000	1.0000	0.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000	1.0000	0.0000
+  gamma:frommc( 8)	|	1.0000	1.0000	1.0000	0.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000	1.0000	0.0000
+     B0:frommc( 9)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000
+     D0:frommc(10)	|	1.0000	1.0000	1.0000	0.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000	1.0000	0.0000
+
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+			| All Particles 		| Particles     		| AntiParticles 		
+			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
+     e+:frommc( 0)	|	  6.0000	  6.0000	  2.0000	  2.0000	  4.0000	  4.0000	  0.0000	  0.0000
+    pi+:frommc( 1)	|	  6.0000	  6.0000	  3.0000	  3.0000	  3.0000	  3.0000	  0.0000	  0.0000
+     K+:frommc( 2)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+     p+:frommc( 3)	|	  2.0000	  2.0000	  1.0000	  1.0000	  1.0000	  1.0000	  0.0000	  0.0000
+    mu+:frommc( 4)	|	  1.0000	  1.0000	  1.0000	  1.0000	  0.0000	  0.0000	  0.0000	  0.0000
+   K_S0:frommc( 5)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+Lambda0:frommc( 6)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+   K_L0:frommc( 7)	|	  2.0000	  2.0000	  0.0000	  0.0000	  0.0000	  0.0000	  2.0000	  2.0000
+  gamma:frommc( 8)	|	 14.0000	 14.0000	  0.0000	  0.0000	  0.0000	  0.0000	 14.0000	 14.0000
+     B0:frommc( 9)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
+     D0:frommc(10)	|	  2.0000	  2.0000	  1.0000	  1.0000	  1.0000	  1.0000	  0.0000	  0.0000
+
+[INFO] 
+=======================================================
+Total Retention: 1.0000
+Total Number of Particles created in the DataStore: 128
+=======================================================
+
+[INFO] ParticleStats Summary: 
+
+[INFO] =======================================================================
 			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8| Unique 
             e+( 0)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	0.0000
            pi+( 1)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	0.0000
@@ -1916,6 +2084,6 @@ Total Number of Particles created in the DataStore: 10364716
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 95
+Total Number of Particles created in the DataStore: 128
 =======================================================
 

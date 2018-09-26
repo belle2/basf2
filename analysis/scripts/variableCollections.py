@@ -30,6 +30,8 @@ kinematics = ['px',
               'p',
               'E']
 
+vct.add_collection(kinematics, 'Kinematics')
+
 #: Kinematic variables in CMS
 ckm_kinematics = vct.wrap_list(kinematics,
                                "useCMSFrame(variable)",
@@ -64,6 +66,8 @@ mc_truth = [
     'isSignal',
     'mcErrors',
     'mcPDG']
+
+vct.add_collection(mc_truth, 'MCTruth')
 
 #: Replacement for MCKinematics tool
 mc_kinematics = [
@@ -204,3 +208,19 @@ mass_before_fit = [
     'ErrM',
     'InvM'
 ]
+
+#: Event level tracking variables
+event_level_tracking = ["nExtraCDCHits",
+                        "nExtraCDCHitsPostCleaning",
+                        "hasExtraCDCHitsInLayer(0)",
+                        "hasExtraCDCHitsInLayer(1)",
+                        "hasExtraCDCHitsInLayer(2)",
+                        "hasExtraCDCHitsInLayer(3)",
+                        "hasExtraCDCHitsInLayer(4)",
+                        "hasExtraCDCHitsInLayer(5)",
+                        "hasExtraCDCHitsInLayer(6)",
+                        "hasExtraCDCHitsInLayer(7)",
+                        "nExtraCDCSegments",
+                        "trackFindingFailureFlag"]
+
+vct.add_collection(event_level_tracking, 'EventLevelTracking')

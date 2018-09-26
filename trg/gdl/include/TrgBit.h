@@ -1,13 +1,14 @@
 #ifndef TRGBIT_h
 #define TRGBIT_h
-#define N_INPUT_ARRAY 5
-#define N_OUTPUT_ARRAY 5
-#define N_PSNM_ARRAY 10
-#define N_BITS_RESERVED 200
 
 #include <string>
 #include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/TRGSummary.h>
+
+const int N_INPUT_ARRAY = 5;
+const int N_OUTPUT_ARRAY = 5;
+const int N_PSNM_ARRAY = 10;
+const int N_BITS_RESERVED = 200;
 
 namespace Belle2 {
 
@@ -24,7 +25,8 @@ namespace Belle2 {
 
   public:
 
-#include <trg/gdl/TrgBitEnum.h>
+#include <trg/gdl/TrgBitInput.h>
+#include <trg/gdl/TrgBitOutput.h>
 
   public:
     /// Input bit pattern class.

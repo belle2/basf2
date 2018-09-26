@@ -14,7 +14,6 @@
 #include <string>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
 
 namespace Belle2 {
@@ -221,7 +220,7 @@ namespace Belle2 {
     /** DetectorSet for the sub-detector used */
     Const::DetectorSet m_Belle2Detector;
 
-    ClassDefOverride(RunInfo, 2); /**< ClassDef */
+    ClassDefOverride(RunInfo, 1); /**< ClassDef */
   };
 
 } // end namespace Belle2

@@ -4,14 +4,13 @@
 #include <framework/core/HistoModule.h>
 #include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
+#include <trg/gdl/TrgBit.h>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
 
 #include <TH2I.h>
 #include <TH1I.h>
-
-#define N_BITS_RESERVED 200
 
 namespace Belle2 {
 

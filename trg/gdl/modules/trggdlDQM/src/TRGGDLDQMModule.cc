@@ -15,7 +15,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <trg/gdl/TrgBit.h>
 #include <framework/dbobjects/RunInfo.h>
 #include <framework/datastore/DataStore.h>
 
@@ -716,7 +715,7 @@ void TRGGDLDQMModule::genVcd(void)
   int prev_i[400] = {0};
   int prev_f[400] = {0};
   int prev_p[400] = {0};
-//int prev_g[400]={0};
+  //int prev_g[400]={0}; // Future Plan
   ofstream outf(Form("vcd/e%02dr%08de%08d.vcd", _exp, _run, evtno));
   outf << "$date" << endl;
   outf << "   Aug 20, 2018 17:53:52" << endl;
@@ -745,11 +744,7 @@ void TRGGDLDQMModule::genVcd(void)
   for (unsigned j = 0; j < tb.getNumOfOutputs(); j++) {
     outf << "$var wire  1  n" << seqnum++ << " psn." << tb.getOutputBitName(j) << " $end" << endl;
   }
-  /*
-  for(unsigned j=0; j<n_gdlbits; j++){
-    outf << "$var wire  " << EBitWidth[j] << "  n" << seqnum++ << " " << CGNAME[j] << " $end" << endl;
-  }
-  */
+
   outf << "$upscope $end" << endl;
   outf << "$enddefinitions $end" << endl << endl;
 
@@ -777,7 +772,7 @@ void TRGGDLDQMModule::genVcd(void)
       }
       seqnum++;
     }
-    /*
+    /* Future Plan
     for(unsigned k=1; k<=n_gdlbits; k++){
       if(clk == 1 || prev_g[k-1] != hg->GetBinContent(clk, k)){
     prev_g[k-1] = hg->GetBinContent(clk, k);
@@ -812,8 +807,6 @@ TRGGDLDQMModule::isFired(std::string bitname)
   }
   boost::algorithm::to_lower(bitname);
   int bn = tb.getBitNum(bitname.c_str());
-  // bn = inputBitNumber if bn>=0
-  // bn = -outputBitNumber-1 if bn<0
   for (unsigned clk = 0; clk < n_clocks; clk++) {
     if (bn < 0) {
       if (isPsnm) {

@@ -26,9 +26,9 @@ namespace {
     /** remember where to put the messages */
     explicit LogInterceptor(std::vector<LogMessage>& messages): m_messages(messages) {}
     /** always connected */
-    bool isConnected() { return true; }
+    bool isConnected() override { return true; }
     /** and always sucessful in storing into buffer */
-    bool sendMessage(const LogMessage& message) { m_messages.emplace_back(message); return true; }
+    bool sendMessage(LogMessage const& message) override {/* m_messages.emplace_back(std::move(message));*/ return true; }
   };
 
   /** params for testing */

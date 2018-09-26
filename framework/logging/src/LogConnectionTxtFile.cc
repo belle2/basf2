@@ -38,7 +38,8 @@ bool LogConnectionTxtFile::isConnected()
 bool LogConnectionTxtFile::sendMessage(const LogMessage& message)
 {
   if (isConnected()) {
-    (*m_fileStream) << message;
+    // todo
+    //(*m_fileStream) << message;
     return true;
   } else return false;
 }

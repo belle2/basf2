@@ -63,7 +63,7 @@ namespace Belle2 {
     void printRepetitions();
 
     LogConnectionBase* m_logConnection; /**< The actual log connection.*/
-    LogMessage m_previousMessage;       /**< The previous log message. */
+    //LogMessage m_previousMessage;       /**< The previous log message. */
     int m_repeatCounter;                /**< Counter for repeated messages. */
 
   };

@@ -218,6 +218,7 @@ void LogSystem::printErrorSummary()
 
 
   // start with 100 entries in hash map
+  /* redo, wont work any more now
   std::function<size_t (const LogMessage&)> hashFunction = &hash;
   std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
 
@@ -234,7 +235,8 @@ void LogSystem::printErrorSummary()
   m_errorLog.clear(); // only do this once (e.g. not again when used through python)
 
   for (const LogMessage& msg : uniqueLog) {
-    sendMessage(msg);
+    // todo
+    //sendMessage(msg);
 
     int count = errorCount[msg];
     if (count != 1) {
@@ -245,7 +247,7 @@ void LogSystem::printErrorSummary()
   if (numLines == c_errorSummaryMaxLines) {
     B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
   }
-
+  */
   // restore old configuration
   m_logConfig = oldConfig;
   std::swap(m_moduleLogConfig, oldModuleConfig);

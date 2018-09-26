@@ -64,9 +64,7 @@ bool LogConnectionFileDescriptor::sendMessage(const LogMessage& message)
     write(m_fd, c.data(), c.size());
   }
   // format message
-  std::stringstream stream;
-  stream << message;
-  const std::string out = stream.str();
+  const std::string out; // todo = message.str();
   // and write to given file descriptor
   write(m_fd, out.data(), out.size());
   if (m_color) {

@@ -74,7 +74,7 @@ namespace Belle2 {
       return s_NULL;
     }
 
-    /** Restores state of the decay string singleton */
+    /** Restores state of the DecayDescriptor instance */
     bool drop();
 
     /** Dereference operator. */

@@ -7,12 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/track/CurlerCloneTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/BestMatchedTruthVarSet.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCCurlerCloneLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCCloneLookUp.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -22,26 +22,26 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void CurlerCloneTruthVarSet::initialize()
+void BestMatchedTruthVarSet::initialize()
 {
   CDCMCManager::getInstance().requireTruthInformation();
   Super::initialize();
 }
 
-void CurlerCloneTruthVarSet::beginEvent()
+void BestMatchedTruthVarSet::beginEvent()
 {
   CDCMCManager::getInstance().fill();
   Super::beginEvent();
 }
 
-bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
+bool BestMatchedTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
 {
   if (not ptrCDCTrack) return false;
 
   /// Find the MC track with the highest number of hits in the segment
   const CDCMCTrackLookUp& mcTrackLookUp = CDCMCTrackLookUp::getInstance();
   const CDCMCHitLookUp& hitLookUp = CDCMCHitLookUp::getInstance();
-  CDCMCCurlerCloneLookUp& curlerCloneLookUp = CDCMCCurlerCloneLookUp::getInstance();
+  CDCMCCloneLookUp& cloneLookUp = CDCMCCloneLookUp::getInstance();
 
   ITrackType trackMCMatch = mcTrackLookUp.getMCTrackId(ptrCDCTrack);
   bool trackIsFake = false;
@@ -68,7 +68,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
     }
   }
 
-  bool trackIsClone = curlerCloneLookUp.isTrackCurlerClone(*ptrCDCTrack);
+  bool trackIsClone = cloneLookUp.isTrackClone(*ptrCDCTrack);
 
   bool matchedNotClone = (not trackIsClone) and (not trackIsFake);
 
@@ -76,7 +76,7 @@ bool CurlerCloneTruthVarSet::extract(const CDCTrack* ptrCDCTrack)
   var<named("truth_track_is_fake")>() = trackIsFake;
   var<named("truth_track_is_matched")>() = not trackIsFake;
   var<named("truth_matched_hits")>() = numberOfCorrectHits;
-  var<named("truth_track_is_curler_clone")>() = trackIsClone;
+  var<named("truth_track_is_clone")>() = trackIsClone;
   var<named("truth")>() = matchedNotClone; //not trackIsClone;
   var<named("truth_first_nloops")>() = mcTrackLookUp.getFirstNLoops(ptrCDCTrack);
   var<named("truth_event_id")>() = m_eventMetaData->getEvent();

@@ -9,24 +9,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/combined/CurlerCloneRejecter.h>
+#include <tracking/trackFindingCDC/findlets/combined/TrackQualityRejecter.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-     * Module implementation using the MCTrackCurlerCloneRejecter findlet
+     * Module implementation using the MCTrackTrackQualityRejecter findlet
      */
-    class TFCDC_CurlerCloneRejecterModule : public FindletModule<CurlerCloneRejecter> {
+    class TFCDC_TrackQualityRejecterModule : public FindletModule<TrackQualityRejecter> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<CurlerCloneRejecter>;
+      using Super = FindletModule<TrackQualityRejecter>;
 
     public:
       /// Constructor setting the default store vector names
-      TFCDC_CurlerCloneRejecterModule();
+      TFCDC_TrackQualityRejecterModule();
     };
   }
 }

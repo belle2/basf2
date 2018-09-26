@@ -1,4 +1,4 @@
-#include <tracking/trackFindingCDC/mclookup/CDCMCCurlerCloneLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCCloneLookUp.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
@@ -9,13 +9,13 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCMCCurlerCloneLookUp& CDCMCCurlerCloneLookUp::getInstance()
+CDCMCCloneLookUp& CDCMCCloneLookUp::getInstance()
 {
-  static CDCMCCurlerCloneLookUp cloneInfo;
+  static CDCMCCloneLookUp cloneInfo;
   return cloneInfo;
 }
 
-std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCurlerCloneLookUp::getMatchedCDCTracksByMCID(
+std::map<const ITrackType, std::vector<CDCTrack*>> CDCMCCloneLookUp::getMatchedCDCTracksByMCID(
                                                   std::vector<CDCTrack>& cdcTracks)
 {
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
@@ -51,7 +51,7 @@ unsigned int CompareCurlerTracks::getNumberOfCorrectHits(const CDCTrack* ptrCDCT
   return std::count_if(begin(*ptrCDCTrack), end(*ptrCDCTrack), hitIsCorrect);
 }
 
-/// Functor definition of comparison function for findNonCurlerCloneTrack
+/// Functor definition of comparison function for findBestMatchedTrack
 bool CompareCurlerTracks::operator()(const CDCTrack* ptrCDCTrack1,
                                      const CDCTrack* ptrCDCTrack2) const
 {
@@ -75,30 +75,30 @@ bool CompareCurlerTracks::operator()(const CDCTrack* ptrCDCTrack1,
   return isTrack1Better;
 }
 
-CDCTrack* CDCMCCurlerCloneLookUp::findNonCurlerCloneTrack(std::vector<CDCTrack*> matchedTrackPtrs)
+CDCTrack* CDCMCCloneLookUp::findBestMatchedTrack(std::vector<CDCTrack*> matchedTrackPtrs)
 {
   const CDCMCTrackLookUp& cdcMCTrackLookUp = CDCMCTrackLookUp::getInstance();
   const CDCMCHitLookUp& cdcMCHitLookUp = CDCMCHitLookUp::getInstance();
 
   const CompareCurlerTracks compareCurlerTracks(cdcMCTrackLookUp, cdcMCHitLookUp);
-  CDCTrack* ptrNonCurlerCloneTrack =
+  CDCTrack* ptrNonCloneTrack =
     *(std::min_element(begin(matchedTrackPtrs), end(matchedTrackPtrs), compareCurlerTracks));
 
-  return ptrNonCurlerCloneTrack;
+  return ptrNonCloneTrack;
 }
 
-void CDCMCCurlerCloneLookUp::clear()
+void CDCMCCloneLookUp::clear()
 {
-  m_cdcTrackIsCurlerCloneMap.clear();
+  m_cdcTrackIsCloneMap.clear();
 }
 
 /// Fill LookUp Table which stores information, which tracks are clones from curlers
-void CDCMCCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
+void CDCMCCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
 {
   /// per default, set all tracks to "not clone"
   for (const CDCTrack& cdcTrack : cdcTracks) {
     const CDCTrack* ptrCDCTrack = &cdcTrack;
-    m_cdcTrackIsCurlerCloneMap[ptrCDCTrack] = false; // not clone
+    m_cdcTrackIsCloneMap[ptrCDCTrack] = false; // not clone
   }
 
   /// get lookup table of MC track IDs to vectors of CDC track pointers
@@ -110,19 +110,19 @@ void CDCMCCurlerCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
     std::vector<CDCTrack*>& matchedTrackPtrs = mcIDAndCDCTracks.second;
 
     if (matchedTrackPtrs.size() == 1) { // only one matching track
-      m_cdcTrackIsCurlerCloneMap[matchedTrackPtrs.at(0)] = false; // not clone
+      m_cdcTrackIsCloneMap[matchedTrackPtrs.at(0)] = false; // not clone
 
     } else { // multiple matching tracks
       for (const CDCTrack* ptrCDCTrack : matchedTrackPtrs) {
-        m_cdcTrackIsCurlerCloneMap[ptrCDCTrack] = true; // default that all are clones
+        m_cdcTrackIsCloneMap[ptrCDCTrack] = true; // default that all are clones
       }
-      const CDCTrack* ptrNonCurlerCloneTrack = findNonCurlerCloneTrack(matchedTrackPtrs);
-      m_cdcTrackIsCurlerCloneMap[ptrNonCurlerCloneTrack] = false; // not clone
+      const CDCTrack* ptrNonCloneTrack = findBestMatchedTrack(matchedTrackPtrs);
+      m_cdcTrackIsCloneMap[ptrNonCloneTrack] = false; // not clone
     }
   }
 }
 
-bool CDCMCCurlerCloneLookUp::isTrackCurlerClone(const CDCTrack& cdcTrack)
+bool CDCMCCloneLookUp::isTrackClone(const CDCTrack& cdcTrack)
 {
   const CDCTrack* ptrCDCTrack = &cdcTrack;
 
@@ -130,6 +130,6 @@ bool CDCMCCurlerCloneLookUp::isTrackCurlerClone(const CDCTrack& cdcTrack)
   if (cdcMCTrackLookUp.getMCTrackId(ptrCDCTrack) == INVALID_ITRACK) {
     return false; // track is not matched
   } else {
-    return m_cdcTrackIsCurlerCloneMap.at(ptrCDCTrack);
+    return m_cdcTrackIsCloneMap.at(ptrCDCTrack);
   }
 }

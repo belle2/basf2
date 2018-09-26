@@ -13,14 +13,14 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCMCCurlerCloneLookUp {
+    class CDCMCCloneLookUp {
 
     public:
       /// Getter for the singletone instance
-      static CDCMCCurlerCloneLookUp& getInstance();
+      static CDCMCCloneLookUp& getInstance();
       /// Singleton: Delete copy constructor and assignment operator
-      CDCMCCurlerCloneLookUp(CDCMCCurlerCloneLookUp&) = delete;
-      CDCMCCurlerCloneLookUp& operator=(const CDCMCCurlerCloneLookUp&) = delete;
+      CDCMCCloneLookUp(CDCMCCloneLookUp&) = delete;
+      CDCMCCloneLookUp& operator=(const CDCMCCloneLookUp&) = delete;
 
       /// fill with all cdcTracks in an event
       void fill(std::vector<CDCTrack>& cdcTracks);
@@ -28,13 +28,13 @@ namespace Belle2 {
       /// Clear eventwise lookup tables
       void clear();
 
-      /// getter for information from m_cdcTrackIsCurlerCloneMap
-      bool isTrackCurlerClone(const CDCTrack& cdcTrack);
+      /// getter for information from m_cdcTrackIsCloneMap
+      bool isTrackClone(const CDCTrack& cdcTrack);
 
     private:
       /// Singleton: Default ctor only available to getInstance method
       /// TODO: Manage singleton by MCManager? Then, ctor needs to be public.
-      CDCMCCurlerCloneLookUp() = default;
+      CDCMCCloneLookUp() = default;
 
       /// Helper function which returns a map of MCTrackIDs to vectors of CDTrack pointers.
       /// Need that to find clone candidates: tracks with same MCTrackID
@@ -43,11 +43,11 @@ namespace Belle2 {
 
       /// Helper function which takes a vector of pointers to CDCTracks which are matched to the
       /// same MC particle.
-      /// Returns track ptr which is assumed to be not a clone from a curler.
-      CDCTrack* findNonCurlerCloneTrack(std::vector<CDCTrack*> matchedTrackPtrs);
+      /// Returns track ptr which is assumed to be not a clone.
+      CDCTrack* findBestMatchedTrack(std::vector<CDCTrack*> matchedTrackPtrs);
 
       /// Map of track pointers to isClone indicator from MCTruth-based assumption
-      std::map<const CDCTrack*, bool> m_cdcTrackIsCurlerCloneMap;
+      std::map<const CDCTrack*, bool> m_cdcTrackIsCloneMap;
     };
 
     // Compare Functor which which decides from two tracks to declare non-clone

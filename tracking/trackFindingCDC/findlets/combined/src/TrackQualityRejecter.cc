@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/combined/CurlerCloneRejecter.h>
+#include <tracking/trackFindingCDC/findlets/combined/TrackQualityRejecter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -21,37 +21,37 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::ChooseableFilter<CurlerCloneFilterFactory>;
+template class TrackFindingCDC::ChooseableFilter<TrackQualityFilterFactory>;
 
-CurlerCloneRejecter::CurlerCloneRejecter(const std::string& defaultFilterName)
-  : m_curlerCloneFilter(defaultFilterName)
+TrackQualityRejecter::TrackQualityRejecter(const std::string& defaultFilterName)
+  : m_trackQualityFilter(defaultFilterName)
 {
-  this->addProcessingSignalListener(&m_mcTrackCurlerCloneLookUpFiller);
-  this->addProcessingSignalListener(&m_curlerCloneFilter);
+  this->addProcessingSignalListener(&m_mcCloneLookUpFiller);
+  this->addProcessingSignalListener(&m_trackQualityFilter);
 }
 
-std::string CurlerCloneRejecter::getDescription()
+std::string TrackQualityRejecter::getDescription()
 {
-  return "Classify CDC tracks which are expected to be clones from curler arms, as they are for example found by the Cellular Automaton (CA) track finding";
+  return "Set the quality indicator for CDC tracks and, if desired, delete tracks with a too low quality value.";
 }
 
-void CurlerCloneRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackQualityRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_curlerCloneFilter.exposeParameters(moduleParamList, prefix);
-  m_mcTrackCurlerCloneLookUpFiller.exposeParameters(moduleParamList, prefix);
+  m_trackQualityFilter.exposeParameters(moduleParamList, prefix);
+  m_mcCloneLookUpFiller.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(prefixed(prefix, "deleteCurlerClones"),
-                                m_param_deleteCurlerClones,
+  moduleParamList->addParameter(prefixed(prefix, "deleteTracks"),
+                                m_param_deleteTracks,
                                 "Delete the tracks instead of marking them as background.",
-                                m_param_deleteCurlerClones);
+                                m_param_deleteTracks);
 }
 
-void CurlerCloneRejecter::apply(std::vector<CDCTrack>& tracks)
+void TrackQualityRejecter::apply(std::vector<CDCTrack>& tracks)
 {
-  m_mcTrackCurlerCloneLookUpFiller.apply(tracks);
+  m_mcCloneLookUpFiller.apply(tracks);
 
   auto reject = [this](CDCTrack & track) {
-    double filterWeight = m_curlerCloneFilter(track);
+    double filterWeight = m_trackQualityFilter(track);
     track->setCellWeight(filterWeight);
     if (std::isnan(filterWeight)) {
       track->setBackgroundFlag();
@@ -63,7 +63,7 @@ void CurlerCloneRejecter::apply(std::vector<CDCTrack>& tracks)
     }
   };
 
-  if (m_param_deleteCurlerClones) {
+  if (m_param_deleteTracks) {
     erase_remove_if(tracks, reject);
   } else {
     std::for_each(begin(tracks), end(tracks), reject);

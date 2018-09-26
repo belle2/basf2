@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/track/CurlerCloneTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/TrackQualityVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
@@ -25,7 +25,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool CurlerCloneTrackVarSet::extract(const CDCTrack* track)
+bool TrackQualityVarSet::extract(const CDCTrack* track)
 /// TODO: extraction function copied from `BasicTrackVarSet`, reuse code instead
 /// TODO: use STL algorithms for extraction of min/max/sum
 /// TODO: add eventwise features

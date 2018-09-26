@@ -7,15 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/CurlerCloneRejecter/CurlerCloneRejecterModule.h>
+#include <tracking/modules/TrackQualityRejecter/TrackQualityRejecterModule.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(TFCDC_CurlerCloneRejecter);
+REG_MODULE(TFCDC_TrackQualityRejecter);
 
-TFCDC_CurlerCloneRejecterModule::TFCDC_CurlerCloneRejecterModule()
+TFCDC_TrackQualityRejecterModule::TFCDC_TrackQualityRejecteModule()
   : Super( {"CDCTrackVector"})
 {
 }

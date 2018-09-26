@@ -23,7 +23,7 @@ namespace Belle2 {
     /// Names of the variables to be generated
     /// Mostly copied from `BasicTrackVarSet`
     constexpr
-    static char const* const curlerCloneTrackVarNames[] = {
+    static char const* const trackQualityVarNames[] = {
       "size",
       "pt",
       "sz_slope",
@@ -54,15 +54,15 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct CurlerCloneTrackVarSetNames : public VarNames<CDCTrack> {
+    struct TrackQualityVarSetNames : public VarNames<CDCTrack> {
 
       /// Number of variables to be generated
-      static const size_t nVars = size(curlerCloneTrackVarNames);
+      static const size_t nVars = size(trackQualityVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
       {
-        return curlerCloneTrackVarNames[iName];
+        return trackQualityVarNames[iName];
       }
     };
 
@@ -71,7 +71,7 @@ namespace Belle2 {
      *  Class to compute floating point variables from a track
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class CurlerCloneTrackVarSet : public VarSet<CurlerCloneTrackVarSetNames> {
+    class TrackQualityVarSet : public VarSet<TrackQualityVarSetNames> {
 
     public:
       /// Generate and assign the contained variables

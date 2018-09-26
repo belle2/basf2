@@ -390,11 +390,11 @@ def add_ckf_based_track_finding(path,
 def add_cdc_track_finding(path, reco_tracks="RecoTracks",
                           with_ca=True, with_single_segment_tracks=True,
                           track_rejecter_after_ca=False,  # run fake rejecter also on full tracks from CA
-                          with_curler_clone_rejection=True,
-                          curler_clone_rejection_filter="truth",
+                          with_clone_rejection=True,
+                          clone_rejection_filter="truth",
                           clone_rejection_filter_parameters={
-                              "rootFileName": "CurlerCloneFilter.root", },
-                          mark_curler_clones_as_background=False, delete_curler_clones=False,
+                              "rootFileName": "TrackQualityFilter.root", },
+                          mark_clones_as_background=False, delete_clones=False,
                           use_second_hits=False):
     """
     Convenience function for adding all cdc track finder modules
@@ -468,12 +468,12 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks",
                             filter="mva",
                             filterParameters={"cut": 0.1})
 
-    if with_curler_clone_rejection:
-        path.add_module("TFCDC_CurlerCloneRejecter",
-                        filter=curler_clone_rejection_filter,
+    if with_clone_rejection:
+        path.add_module("TFCDC_TrackQualityRejecter",
+                        filter=clone_rejection_filter,
                         filterParameters=clone_rejection_filter_parameters,
-                        markAsBackground=mark_curler_clones_as_background,
-                        deleteCurlerClones=delete_curler_clones)
+                        markAsBackground=mark_clones_as_background,
+                        deleteClones=delete_clones)
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",

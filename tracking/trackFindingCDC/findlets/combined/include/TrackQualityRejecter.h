@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/minimal/MCCurlerCloneLookUpFiller.h>
+#include <tracking/trackFindingCDC/findlets/minimal/MCCloneLookUpFiller.h>
 
-#include <tracking/trackFindingCDC/filters/track/CurlerCloneFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/track/TrackQualityFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 #include <vector>
@@ -23,7 +23,7 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Deletes fake tracks that have been rejected by a filter
-    class CurlerCloneRejecter : public Findlet<CDCTrack&> {
+    class TrackQualityRejecter : public Findlet<CDCTrack&> {
 
     private:
       /// Type of the base class
@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      CurlerCloneRejecter(const std::string& defaultFilterName = "recording");
+      TrackQualityRejecter(const std::string& defaultFilterName = "recording");
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -44,13 +44,13 @@ namespace Belle2 {
 
     private:
       // Findlet to fill CDCTracks into lookup table (singleton) with clone information
-      MCCurlerCloneLookUpFiller m_mcTrackCurlerCloneLookUpFiller;
+      MCCloneLookUpFiller m_mcCloneLookUpFiller;
 
-      /// Parameter : Switch on to delete the curler clones, otherwise just mark them as background.
-      bool m_param_deleteCurlerClones = true;
+      /// Parameter : Switch on to delete the clones, otherwise just mark them as background.
+      bool m_param_deleteTracks = true;
 
       /// Reference to the filter to be used to filter
-      ChooseableFilter<CurlerCloneFilterFactory> m_curlerCloneFilter;
+      ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;
     };
   }
 }

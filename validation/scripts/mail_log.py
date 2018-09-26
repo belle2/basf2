@@ -10,7 +10,7 @@ import validation
 import utils
 
 
-def create_mail_log_failed_scripts():
+def create_mail_log_failed_scripts(work_folder):
     """
     looks up all scripts that failed and collects information about them
     """
@@ -20,7 +20,7 @@ def create_mail_log_failed_scripts():
     validator.collect_steering_files(validation.IntervalSelector(['nightly']))
 
     # get failed scripts
-    with open(os.path.join(validator.get_log_folder(), "list_of_failed_scripts.log")) as f:
+    with open(os.path.join(work_folder, "results", "current", "list_of_failed_scripts.log")) as f:
         list_of_failed_scripts = f.read().splitlines()
 
     # collect information about failed scripts
@@ -64,7 +64,7 @@ def create_mail_log_failed_scripts():
     return mail_log
 
 
-def create_mail_log(comparison):
+def create_mail_log(comparison, work_folder):
     """
     takes the entire comparison json file, finds all the plots where comparison failed
     and saves them the following format:
@@ -105,7 +105,7 @@ def create_mail_log(comparison):
                                 mail_log[contact][plot["title"]] = error_data
 
     # now get failed scripts and merge information into mail_log
-    failed_scripts = create_mail_log_failed_scripts()
+    failed_scripts = create_mail_log_failed_scripts(work_folder)
     for contact in failed_scripts:
         # if this user is not yet represented in mail_log, create new key
         if contact not in mail_log:
@@ -216,15 +216,15 @@ def check_if_same(new, old):
     return True
 
 
-def mail_log(comparison, comparison_old=None):
+def mail_log(comparison, comparison_old=None, work_folder=None):
     """
     takes the comparison json and sends mails to contact of failed comparisons
     comparison_old: yesterday's comparison json
     """
 
-    data = create_mail_log(comparison)
+    data = create_mail_log(comparison, work_folder)
     if comparison_old:
-        data_old = create_mail_log(comparison_old)
+        data_old = create_mail_log(comparison_old, work_folder)
     else:
         data_old = None
     send_all_mails(data, data_old)

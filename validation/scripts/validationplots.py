@@ -455,7 +455,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
         # send mails to everyone with failed validation plots
         print("sending mails ...")
         mail_log.mail_log(json_objects.dump_rec(json_objects.Comparison(comparison_revs, comparison_packages)),
-                          comparison_old)
+                          comparison_old, work_folder)
 
 
 def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):

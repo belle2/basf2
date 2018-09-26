@@ -20,7 +20,7 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Findlet to exports CDCTracks as RecoTracks
-    class MCCloneLookUpFiller : public Findlet<CDCTrack&> {
+    class CDCMCCloneLookUpFiller : public Findlet<CDCTrack&> {
 
     private:
       /// Type of the base class

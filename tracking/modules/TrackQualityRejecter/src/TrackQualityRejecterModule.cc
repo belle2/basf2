@@ -15,7 +15,7 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(TFCDC_TrackQualityRejecter);
 
-TFCDC_TrackQualityRejecterModule::TFCDC_TrackQualityRejecteModule()
+TFCDC_TrackQualityRejecterModule::TFCDC_TrackQualityRejecterModule()
   : Super( {"CDCTrackVector"})
 {
 }

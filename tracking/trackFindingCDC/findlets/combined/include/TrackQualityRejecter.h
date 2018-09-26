@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/minimal/MCCloneLookUpFiller.h>
+#include <tracking/trackFindingCDC/findlets/minimal/CDCMCCloneLookUpFiller.h>
 
 #include <tracking/trackFindingCDC/filters/track/TrackQualityFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
@@ -44,7 +44,7 @@ namespace Belle2 {
 
     private:
       // Findlet to fill CDCTracks into lookup table (singleton) with clone information
-      MCCloneLookUpFiller m_mcCloneLookUpFiller;
+      CDCMCCloneLookUpFiller m_mcCloneLookUpFiller;
 
       /// Parameter : Switch on to delete the clones, otherwise just mark them as background.
       bool m_param_deleteTracks = true;

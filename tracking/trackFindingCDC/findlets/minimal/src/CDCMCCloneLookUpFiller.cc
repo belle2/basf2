@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/minimal/MCCloneLookUpFiller.h>
+#include <tracking/trackFindingCDC/findlets/minimal/CDCMCCloneLookUpFiller.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCCloneLookUp.h>
 
@@ -19,18 +19,18 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-std::string MCCloneLookUpFiller::getDescription()
+std::string CDCMCCloneLookUpFiller::getDescription()
 {
   return "Fill CDCTracks into CDCMCCloneLookUp singleton, which stores lookup table if track is clone from curler loops";
 }
 
 /// Signal the beginning of a new event
-void MCCloneLookUpFiller::beginEvent()
+void CDCMCCloneLookUpFiller::beginEvent()
 {
   CDCMCCloneLookUp::getInstance().clear();
 }
 
-void MCCloneLookUpFiller::apply(std::vector<CDCTrack>& cdcTracks)
+void CDCMCCloneLookUpFiller::apply(std::vector<CDCTrack>& cdcTracks)
 {
   CDCMCCloneLookUp::getInstance().fill(cdcTracks);
 }

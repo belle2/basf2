@@ -60,7 +60,7 @@ bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const
 }
 
 
-bool LogSystem::sendMessage(LogMessage message)
+bool LogSystem::sendMessage(LogMessage&& message)
 {
   LogConfig::ELogLevel logLevel = message.getLogLevel();
   map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
@@ -85,7 +85,7 @@ bool LogSystem::sendMessage(LogMessage message)
     incMessageCounter(logLevel);
   }
   if (m_printErrorSummary && logLevel >= LogConfig::c_Warning && m_errorLog.size() < c_errorSummaryMaxLines) {
-    m_errorLog.push_back(message);
+    m_errorLog.emplace_back(std::move(message));
   }
 
   if (logLevel >= m_logConfig.getAbortLevel()) {

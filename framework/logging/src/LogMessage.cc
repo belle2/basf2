@@ -34,10 +34,10 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
 {
 }
 
-LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const LogVariableStream& messageStream, const char* package,
+LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
                        const std::string& function, const std::string& file, unsigned int line, int debugLevel) :
   m_logLevel(logLevel),
-  m_message(messageStream.str()),
+  m_message(std::move(messageStream)),
   m_module(""),
   m_package(package ? package : ""),
   m_function(function),
@@ -51,13 +51,13 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const LogVariableStream& m
 
 bool LogMessage::operator==(const LogMessage& message) const
 {
-  return (m_logLevel == message.m_logLevel) &&
-         (m_line == message.m_line) &&
-         (m_message == message.m_message) &&
-         (m_module == message.m_module) &&
-         (m_package == message.m_package) &&
-         (m_function == message.m_function) &&
-         (m_file == message.m_file);
+  return ((m_logLevel == message.m_logLevel) &&
+          (m_line == message.m_line) &&
+          (m_message == message.m_message) &&
+          (m_module == message.m_module) &&
+          (m_package == message.m_package) &&
+          (m_function == message.m_function) &&
+          (m_file == message.m_file));
 }
 
 

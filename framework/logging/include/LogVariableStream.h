@@ -102,6 +102,11 @@ public:
   /** Default constructor with empty text and no variables */
   LogVariableStream() = default;
 
+  LogVariableStream(LogVariableStream&&) = default;
+
+  LogVariableStream(LogVariableStream const&) = delete;
+  LogVariableStream& operator=(LogVariableStream const&) = delete;
+
   /** Constructor which sets an initial text for this stream
    * @param text Initial text
    * */
@@ -111,15 +116,6 @@ public:
     for (auto const& kv : variables) {
       m_variables.emplace_back(LogVar(kv.first, kv.second));
     }
-  }
-
-  /**
-   * Implement custom copy-constructor, because stringstream's one is deleted.
-   */
-  LogVariableStream(const LogVariableStream& other) :  m_variables(other.m_variables)
-  {
-    // copy manually because stringstream has no copy-constructor
-    m_stringStream << other.m_stringStream.rdbuf();
   }
 
   /**
@@ -163,17 +159,6 @@ public:
   }
 
   /**
-   * Custom assignment-operator, thanks to stringsream's incompetence ...
-   */
-  LogVariableStream&  operator=(const LogVariableStream& lvs)
-  {
-    this->m_stringStream = std::stringstream();
-    this->m_stringStream << lvs.m_stringStream.rdbuf();
-    this->m_variables = lvs.m_variables;
-    return *this;
-  }
-
-  /**
    * Return the content of the stream as string. First the stringstream part
    * and then a list of the variables
    */
@@ -181,8 +166,9 @@ public:
   {
     // little optimization, so we don't need to copy the whole string
     // in the cases where there are no variables ...
-    if (m_variables.size() == 0)
+    if (m_variables.size() == 0) {
       return m_stringStream.str();
+    }
 
     std::stringstream s;
     // put the string first

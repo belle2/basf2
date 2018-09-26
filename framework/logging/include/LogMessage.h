@@ -50,8 +50,10 @@ namespace Belle2 {
      * @param file The file name where the message was sent from.
      * @param line The line number in the source code where the message was sent from.
      */
-    LogMessage(LogConfig::ELogLevel logLevel, const LogVariableStream& messageStream, const char* package,
+    LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
                const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
+
+    LogMessage(LogMessage&&) = default;
 
     /**
      * Compares two messages.

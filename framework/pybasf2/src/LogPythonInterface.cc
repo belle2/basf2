@@ -386,7 +386,7 @@ Parameters:
   object inspectDict = import("inspect").attr("__dict__"); \
   auto cppDict = PyObjConvUtils::convertPythonObject(variables, std::map<std::string,std::string>()); \
   LogVariableStream lvs(text, cppDict); \
-  _B2LOGMESSAGE_VARSTREAM(loglevel, debuglevel, lvs, "steering", \
+  _B2LOGMESSAGE_VARSTREAM(loglevel, debuglevel, std::move(lvs), "steering", \
                           extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
                           extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
                           extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
@@ -395,7 +395,7 @@ Parameters:
   object inspectDict = import("inspect").attr("__dict__"); \
   auto cppDict = PyObjConvUtils::convertPythonObject(variables, std::map<std::string,std::string>()); \
   LogVariableStream lvs(text, cppDict); \
-  _B2LOGMESSAGE_VARSTREAM_IFENABLED(loglevel, debuglevel, lvs, "steering", \
+  _B2LOGMESSAGE_VARSTREAM_IFENABLED(loglevel, debuglevel, std::move(lvs), "steering", \
                                     extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
                                     extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
                                     extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))

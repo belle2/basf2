@@ -9,10 +9,7 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/EventExtraInfo.h>
-
 #include <framework/utilities/HTML.h>
-#include <framework/logging/Logger.h>
-
 #include <stdexcept>
 
 using namespace Belle2;

@@ -28,7 +28,7 @@ namespace {
     /** always connected */
     bool isConnected() override { return true; }
     /** and always sucessful in storing into buffer */
-    bool sendMessage(LogMessage const& message) override {/* m_messages.emplace_back(std::move(message));*/ return true; }
+    bool sendMessage(LogMessage const& message) override {m_messages.push_back(message); return true; }
   };
 
   /** params for testing */

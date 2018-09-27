@@ -218,36 +218,39 @@ void LogSystem::printErrorSummary()
 
 
   // start with 100 entries in hash map
-  /* redo, wont work any more now
   std::function<size_t (const LogMessage&)> hashFunction = &hash;
   std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
 
   // log in chronological order, with repetitions removed
-  std::vector<LogMessage> uniqueLog;
-  uniqueLog.reserve(100);
+  // additional scope to ensure uniqueLog will not be used
+  // later, as its items are undefinde after the call to sendMessage
+  {
+    std::vector<LogMessage> uniqueLog;
+    uniqueLog.reserve(100);
 
-  for (const LogMessage& msg : m_errorLog) {
-    int count = errorCount[msg]++;
+    for (const LogMessage& msg : m_errorLog) {
+      int count = errorCount[msg]++;
 
-    if (count == 0) // this is the first time we see this message
-      uniqueLog.push_back(msg);
-  }
-  m_errorLog.clear(); // only do this once (e.g. not again when used through python)
+      if (count == 0) // this is the first time we see this message
+        uniqueLog.push_back(msg);
+    }
+    m_errorLog.clear(); // only do this once (e.g. not again when used through python)
 
-  for (const LogMessage& msg : uniqueLog) {
-    // todo
-    //sendMessage(msg);
-
-    int count = errorCount[msg];
-    if (count != 1) {
-      B2INFO(" (last message occurred " << count << " times in total)");
+    for (LogMessage& msg : uniqueLog) {
+      int count = errorCount[msg];
+      // move the message out to the sendMessage command, but leave the vector intact
+      // it will be cleared at the end of this loop
+      sendMessage(std::move(msg));
+      if (count != 1) {
+        B2INFO(" (last message occurred " << count << " times in total)");
+      }
     }
   }
   B2INFO("================================================================================\n");
   if (numLines == c_errorSummaryMaxLines) {
     B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
   }
-  */
+
   // restore old configuration
   m_logConfig = oldConfig;
   std::swap(m_moduleLogConfig, oldModuleConfig);

@@ -22,73 +22,107 @@
 # final state particles.
 #
 # Contributors: A. Zupanc (June 2014)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import fillParticleListsFromMC
-from modularAnalysis import reconstructDecay
-from modularAnalysis import copyLists
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import variablesToNtuple
+import basf2 as b2
+import modularAnalysis as ma
 import variableCollections as vc
+import variableCollectionsTools as vct
+from stdV0s import stdKshorts
+from stdV0s import stdLambdas
 
+# check if the required input file exists
+import os
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
-# check if the required input file exists (from B2A101 example)
-import os.path
-import sys
-if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. '
-             'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
+# create path
+my_path = ma.analysis_main
 
 # load input ROOT file
-inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
+ma.inputMdst(environmentType='default',
+             filename='$BELLE2_EXAMPLES_DATA/B2pi0D_D2hh_D2hhh_B2munu.root',
+             path=my_path)
 
 # create and fill final state ParticleLists
 kaons = ('K-', '')
 pions = ('pi-', '')
 photons = ('gamma', '')
-fillParticleListsFromMC([kaons, pions, photons])
+ma.fillParticleListsFromMC(decayStringsWithCuts=[kaons, pions, photons],
+                           path=my_path)
 
 # 1. reconstruct pi0 -> gamma gamma decay
 # InvM is the sum of daughter momenta whereas M is the initialised PDG mass ...
-reconstructDecay('pi0 -> gamma gamma', '0.1 < InvM < 0.15')
+ma.reconstructDecay(decayString='pi0 -> gamma gamma',
+                    cut='0.1 < InvM < 0.15',
+                    path=my_path)
 
 # 2. reconstruct D0 in multiple decay modes
-reconstructDecay('D0:ch1 -> K- pi+', '1.8 < M < 1.9', 1)
-reconstructDecay('D0:ch2 -> K- pi+ pi0', '1.8 < M < 1.9', 2)
-reconstructDecay('D0:ch3 -> K- pi+ pi+ pi-', '1.8 < M < 1.9', 3)
-reconstructDecay('D0:ch4 -> K- K+', '1.8 < M < 1.9', 4)
-reconstructDecay('D0:ch5 -> pi+ pi-', '1.8 < M < 1.9', 5)
+ma.reconstructDecay(decayString='D0:ch1 -> K- pi+',
+                    cut='1.8 < M < 1.9',
+                    dmID=1,
+                    path=my_path)
+ma.reconstructDecay(decayString='D0:ch2 -> K- pi+ pi0',
+                    cut='1.8 < M < 1.9',
+                    dmID=2,
+                    path=my_path)
+ma.reconstructDecay(decayString='D0:ch3 -> K- pi+ pi+ pi-',
+                    cut='1.8 < M < 1.9',
+                    dmID=3,
+                    path=my_path)
+ma.reconstructDecay(decayString='D0:ch4 -> K- K+',
+                    cut='1.8 < M < 1.9',
+                    dmID=4,
+                    path=my_path)
+ma.reconstructDecay(decayString='D0:ch5 -> pi+ pi-',
+                    cut='1.8 < M < 1.9',
+                    dmID=5,
+                    path=my_path)
 
 # merge the D0 lists together into one single list
-copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'])
+ma.copyLists(outputListName='D0:all',
+             inputListNames=['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'],
+             path=my_path)
 
 # 3. reconstruct B+ -> anti-D0 pi+ decay
-reconstructDecay('B+:D0pi -> anti-D0:all pi+', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0', 1)
+ma.reconstructDecay(decayString='B+:D0pi -> anti-D0:all pi+',
+                    cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
+                    dmID=1,
+                    path=my_path)
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('B+:D0pi')
+ma.matchMCTruth(list_name='B+:D0pi',
+                path=my_path)
 
 # Select variables that we want to store to ntuple
-
-dtools = vc.inv_mass + vc.kinematics
-pitools = vc.kinematics
-btools = vc.event_meta_data + vc.deltae_mbc + vc.mc_truth + \
-    vc.convert_to_one_selected_vars(dtools, 'B+ -> ^anti-D0 pi+', 'D0') + \
-    vc.convert_to_one_selected_vars(pitools, 'B+ -> anti-D0 ^pi+', 'pi') + \
-    vc.wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "")
+d_vars = vc.inv_mass + vc.kinematics
+pi_vars = vc.kinematics
+b_vars = vc.event_meta_data + \
+    vc.deltae_mbc + \
+    vc.mc_truth + \
+    vct.convert_to_one_selected_vars(variables_list=d_vars,
+                                     decay_string='B+ -> ^anti-D0 pi+',
+                                     alias_prefix='D0') + \
+    vct.convert_to_one_selected_vars(variables_list=pi_vars,
+                                     decay_string='B+ -> anti-D0 ^pi+',
+                                     alias_prefix='pi') + \
+    vct.wrap_list(variables_list=['decayModeID'],
+                  wrapper='daughter(0,extraInfo(variable))',
+                  alias_prefix="")
 
 # Saving variables to ntuple
 output_file = 'B2A303-MultipleDecays-Reconstruction.root'
-variablesToNtuple('B+:D0pi', btools,
-                  filename=output_file, treename='bp')
+ma.variablesToNtuple(decay_string='B+:D0pi',
+                     variables=b_vars,
+                     filename=output_file,
+                     treename='bp',
+                     path=my_path)
 
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

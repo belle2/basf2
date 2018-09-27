@@ -15,72 +15,79 @@
 #
 # Contributors: A. Zupanc (June 2014)
 #               I. Komarov (Demeber 2017)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from stdPhotons import stdPhotons
-from stdCharged import stdLoosePi
-from modularAnalysis import variablesToNtuple
+import basf2 as b2
+import modularAnalysis as ma
 import variableCollections as vc
+import variableCollectionsTools as vct
+from stdPhotons import stdPhotons
+import stdCharged as stdc
 
-# Run this tutorial either over signal MC or background MC (K*gamma)
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistBKG = ['/group/belle2/tutorial/release_01-00-00/Bd_Kstgamma_GENSIMRECtoDST.dst.root']
-filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst_000001_prod00002326_task00000001.root']
+# check if the required input file exists
+import os
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2rhogamma_rho2pipi.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
-# Run B0 -> rho gamma reconstruction over B0 -> rho gamma MC
-rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-SIGMC.root'
-inputMdstList('default', filelistSIG)
+# create path
+my_path = ma.analysis_main
 
-# Run B0 -> rho gamma reconstruction over B0 -> K* gamma MC
-# (uncomment next two lines and comment above two to run over BKG MC)
-# rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-BKGMC.root'
-# inputMdstList('default',filelistBKG)
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename='$BELLE2_EXAMPLES_DATA/B2rhogamma_rho2pipi.root',
+             path=my_path)
 
-# use standard final state particle lists
 #
 # creates "gamma:tight" ParticleList
-stdPhotons('tight')
+stdPhotons(listtype='tight', path=my_path)
 
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdc.stdLoosePi(path=my_path)
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV
-reconstructDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.0')
+ma.reconstructDecay(decayString='rho0 -> pi+:loose pi-:loose',
+                    cut='0.6 < M < 1.0',
+                    path=my_path)
 
 # reconstruct B0 -> rho0 gamma decay
 # keep only candidates with Mbc > 5.2 GeV
 # and -2 < Delta E < 2 GeV
-reconstructDecay('B0 -> rho0 gamma:tight', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
+ma.reconstructDecay(decayString='B0 -> rho0 gamma:tight',
+                    cut='5.2 < Mbc < 5.29 and abs(deltaE) < 2.0',
+                    path=my_path)
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('B0')
+ma.matchMCTruth(list_name='B0', path=my_path)
 
 # Select variables that we want to store to ntuple
 
-gammatools = vc.cluster + vc.mc_truth + vc.kinematics
-rhotools = vc.cluster + vc.mc_truth + vc.kinematics + vc.inv_mass
-pitools = vc.pid + vc.track
-btools = vc.event_meta_data + vc.kinematics + vc.deltae_mbc + vc.mc_truth + \
-    vc.convert_to_all_selected_vars(gammatools,
-                                    'B0 -> rho0 ^gamma') + \
-    vc.convert_to_all_selected_vars(rhotools,
-                                    'B0 -> ^rho0 gamma') + \
-    vc.convert_to_all_selected_vars(rhotools,
-                                    'B0 -> [rho0 -> ^pi+ ^pi-] gamma')
+gamma_vars = vc.cluster + vc.mc_truth + vc.kinematics
+rho_vars = vc.cluster + vc.mc_truth + vc.kinematics + vc.inv_mass
+pi_vars = vc.pid + vc.track
+b_vars = vc.event_meta_data + \
+    vc.kinematics + \
+    vc.deltae_mbc + \
+    vc.mc_truth + \
+    vct.convert_to_all_selected_vars(variables=gamma_vars,
+                                     decay_string='B0 -> rho0 ^gamma') + \
+    vct.convert_to_all_selected_vars(variables=rho_vars,
+                                     decay_string='B0 -> ^rho0 gamma') + \
+    vct.convert_to_all_selected_vars(variables=rho_vars,
+                                     decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma')
 
 # Saving variables to ntuple
-variablesToNtuple('B0', btools,
-                  filename=rootOutputFile, treename='b0')
+rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'
+ma.variablesToNtuple(decayString='B0',
+                     variables=b_vars,
+                     filename=rootOutputFile,
+                     treename='b0',
+                     path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

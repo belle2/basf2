@@ -21,113 +21,152 @@
 # The original example has been modified to apply the
 # event based selection, and the ntuples are filled
 # also with the R2EventLevel variable.
-# It is possible to run the example with the signal from
-# A101, with the charged background or with the ccbar BG;
-# while signal/charged samples have R2 distributins below
+# While signal/charged samples have R2 distributins below
 # 0.3, ccbar sample has a larger distribution and the
 # initial selection reduces the processing time.
-#
-# Since the example needs files from MC8 as background,
-# it can only run at KEK for such cases.
 #
 # Contributors: A. Zupanc (June 2014)
 #               S. Spataro (October 2017)
 #               I. Komarov (December 2017)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import fillParticleList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import copyLists
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import buildRestOfEvent
-from modularAnalysis import variablesToNtuple
-from stdCharged import stdLoosePi, stdLooseK, stdLooseMu
-from stdPi0s import stdPi0s
+import basf2 as b2
+import modularAnalysis as ma
 import variableCollections as vc
+import variableCollectionsTools as vct
+import stdCharged as stdc
+from stdPi0s import stdPi0s
 
-# load data
-# Signal file from A104 reconstructed with background
-inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx1.root')
+# check if the required input file exists
+import os
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/ccbar_background.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
-# Background file from MC9 generic sample - charged
-# inputMdst('default',
-# 	'/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002167/e0000/4S/r00000/charged/sub00/mdst_000001_prod00002167_task00000001.root')
+# create path
+my_path = ma.analysis_main
 
-# Background file from MC9 generic sample - ccbar
-# inputMdst('default',
-# 	'/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002171/e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00002171_task00000001.root')
+# load input ROOT file
+ma.inputMdstList(environmentType='default',
+                 filelist=['$BELLE2_EXAMPLES_DATA/B2pi0D_D2hh_D2hhh_B2munu.root',
+                           '$BELLE2_EXAMPLES_DATA/ccbar_background.root'],
+                 path=my_path)
 
 # Apply a selection at the event level, to avoid
 # processing useless events
-applyEventCuts('R2EventLevel < 0.3')
+ma.applyEventCuts(cut='R2EventLevel < 0.3', path=my_path)
 
 # The following lines cut&pasted from A304
 
 # create and fill final state ParticleLists
 # use standard lists
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdc.stdLoosePi(path=my_path)
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdc.stdLooseK(path=my_path)
 # creates "mu+:loose" ParticleList (and c.c.)
-stdLooseMu()
+stdc.stdLooseMu(path=my_path)
 
 # creates "pi0:looseFit" ParticleList
-stdPi0s('looseFit')
+stdPi0s(listtype='looseFit', path=my_path)
 
 # 1. reconstruct D0 in multiple decay modes
-reconstructDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9', 1)
-reconstructDecay('D0:ch2 -> K-:loose pi+:loose pi0:looseFit', '1.8 < M < 1.9', 2)
-reconstructDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9', 3)
-reconstructDecay('D0:ch4 -> K-:loose K+:loose', '1.8 < M < 1.9', 4)
-reconstructDecay('D0:ch5 -> pi-:loose pi+:loose', '1.8 < M < 1.9', 5)
+ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
+                    cut='1.8 < M < 1.9',
+                    dmID=1,
+                    path=my_path)
 
-# merge the D0 lists together into one single list
-copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'])
+ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:looseFit',
+                    cut='1.8 < M < 1.9',
+                    dmID=2,
+                    path=my_path)
 
-# 2. reconstruct Btag+ -> anti-D0 pi+
-reconstructDecay('B+:tag -> anti-D0:all pi+:loose', '5.2 < Mbc < 5.29 and abs(deltaE) < 1.0', 1)
-matchMCTruth('B+:tag')
+ma.reconstructDecay(decayString='D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose',
+                    cut='1.8 < M < 1.9',
+                    dmID=3,
+                    path=my_path)
 
-# 3. reconstruct Upsilon(4S) -> Btag+ Bsig- -> Btag+ mu-
-reconstructDecay('Upsilon(4S) -> B-:tag mu+:loose', "")
+ma.reconstructDecay(decayString='D0:ch4 -> K-:loose K+:loose',
+                    cut='1.8 < M < 1.9',
+                    dmID=4,
+                    path=my_path)
+
+ma.reconstructDecay(decayString='D0:ch5 -> pi-:loose pi+:loose',
+                    cut='1.8 < M < 1.9',
+                    dmID=5,
+                    path=my_path)
+
+# 2. merge the D0 lists together into one single list
+ma.copyLists(outputListName='D0:all',
+             inputListNames=['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'],
+             path=my_path)
+
+
+# 3. reconstruct B+ -> anti-D0 pi+ decay
+ma.reconstructDecay(decayString='B+:tag -> anti-D0:all pi+',
+                    cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
+                    dmID=1,
+                    path=my_path)
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('Upsilon(4S)')
+ma.matchMCTruth(list_name='B+:tag',
+                path=my_path)
+
+
+# 3. reconstruct Upsilon(4S) -> Btag+ Bsig- -> Btag+ mu-
+ma.reconstructDecay(decayString='Upsilon(4S) -> B-:tag mu+:loose',
+                    cut="",
+                    path=my_path)
+
+# perform MC matching (MC truth asociation)
+ma.matchMCTruth(list_name='Upsilon(4S)', path=my_path)
 
 # 5. build rest of the event
-buildRestOfEvent('Upsilon(4S)')
+ma.buildRestOfEvent(list_name='Upsilon(4S)', path=my_path)
 
-# 6. Dump info to ntuple
+d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['R2EventLevel']
+mu_vars = vc.mc_truth
 
-dvars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['R2EventLevel']
-muvars = vc.mc_truth
-
-bvars = vc.mc_truth + vc.deltae_mbc + \
-    vc.convert_to_all_selected_vars(dvars,
-                                    'B- -> ^D0 pi-') + \
-    vc.wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "D") + \
+b_vars = vc.mc_truth + \
+    vc.deltae_mbc + \
+    vct.convert_to_all_selected_vars(variables_list=dvars,
+                                     decay_string='B- -> ^D0 pi-') + \
+    vct.wrap_list(variables_list=['decayModeID'],
+                  wrapper='daughter(0,extraInfo(variable))',
+                  alias_prefix="D") + \
     ['R2EventLevel']
 
-u4svars = vc.mc_truth + vc.roe_multiplicities + vc.recoil_kinematics + vc.extra_energy + vc.kinematics + \
-    vc.convert_to_all_selected_vars(bvars, 'Upsilon(4S) -> ^B- mu+') + \
-    vc.convert_to_all_selected_vars(dvars, 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
-    vc.convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> B- ^mu+')
+u4s_vars = vc.mc_truth + \
+    vc.roe_multiplicities + \
+    vc.recoil_kinematics + \
+    vc.extra_energy + \
+    vc.kinematics + \
+    vct.convert_to_all_selected_vars(variables_list=b_vars,
+                                     decay_string='Upsilon(4S) -> ^B- mu+') + \
+    vct.convert_to_all_selected_vars(variables_list=d_vars,
+                                     decay_string='Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
+    vct.convert_to_all_selected_vars(variables_list=mu_vars,
+                                     decay_string='Upsilon(4S) -> B- ^mu+')
 
 
 # 7. Saving variables to ntuple
 rootOutputFile = 'B2A307-BasicEventWiseNtupleSelection.root'
-variablesToNtuple('B-:tag', bvars,
-                  filename=rootOutputFile, treename='btag')
-variablesToNtuple('Upsilon(4S)', u4svars,
-                  filename=rootOutputFile, treename='btagbsig')
+ma.variablesToNtuple(decayString='B-:tag',
+                     variables=bvars,
+                     filename=rootOutputFile,
+                     treename='btag',
+                     path=my_path)
+ma.variablesToNtuple(decayString='Upsilon(4S)',
+                     variables=u4svars,
+                     filename=rootOutputFile,
+                     treename='btagbsig',
+                     path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

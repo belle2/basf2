@@ -65,12 +65,12 @@ ma.matchMCTruth(list_name='D*+', path=my_path)
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
 fs_hadron_vars = vct.convert_to_all_selected_vars(
-    vc.pid + vc.track + vc.mc_truth,
-    'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
+    variables_list=vc.pid + vc.track + vc.mc_truth,
+    decay_string='D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
 d0_vars = vct.convert_to_one_selected_vars(
-    vc.inv_mass + vc.mc_truth,
-    'D*+ -> ^D0 pi+', 'D0')
+    variables_list=vc.inv_mass + vc.mc_truth,
+    decay_string='D*+ -> ^D0 pi+', 'D0')
 
 
 # Saving variables to ntuple

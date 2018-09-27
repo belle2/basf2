@@ -9,59 +9,64 @@
 # LooKUpTable from the database
 #
 # Contributors: I. Komarov (April 2018)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import vertexKFit
-from modularAnalysis import variablesToNtuple
-from variables import variables
-from stdCharged import *
+import basf2 as b2
+import modularAnalysis as ma
+import variableCollections as vc
+import variableCollectionsTools as vct
+import stdCharged as stdc
+import variables as va
 
-# check if the required input file exists (from B2A101 example)
-import os.path
-import sys
-if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. '
-             'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
+# check if the required input file exists
+import os
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+
+# create path
+my_path = ma.analysis_main
 
 # load input ROOT file
-inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
+ma.inputMdst(environmentType='default',
+             filename='$BELLE2_EXAMPLES_DATA/B2pi0D_D2hh_D2hhh_B2munu.root',
+             path=my_path)
 
 # use standard final state particle lists
 # creates "pi+:all" ParticleList (and c.c.)
-fillParticleListFromMC('pi+:gen', '')
+ma.fillParticleListFromMC(decayString='pi+:gen', cut='', path=my_path)
 
 # ID of weight table is taked from B2A904
 weight_table_id = "ParticleReweighting:TestMomentum"
 
 # We know what weight info will be added (see B2A904),
 # so we add aliases and add it ot tools
-variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
-variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
-variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')
-variables.addAlias('binID', 'extraInfo(' + weight_table_id + '_binID)')
+va.variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
+va.variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
+va.variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')
+va.variables.addAlias('binID', 'extraInfo(' + weight_table_id + '_binID)')
 
 
 # We configure weighing module
 reweighter = register_module('ParticleWeighting')
 reweighter.param('tableName', weight_table_id)
 reweighter.param('particleList', 'pi+:gen')
-analysis_main.add_module(reweighter)
+my_path.add_module(reweighter)
 
 
 pivars = ['p', 'pz', 'Weight', 'StatErr', 'SystErr', 'binID']
 
 # Saving variables to ntuple
 output_file = 'B2A905-ApplyWeightsToTracks.root'
-variablesToNtuple('pi+:gen', pivars, treename='pion', filename=output_file)
+ma.variablesToNtuple(decayString='pi+:gen',
+                     variables=pivars,
+                     treename='pion',
+                     filename=output_file,
+                     path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

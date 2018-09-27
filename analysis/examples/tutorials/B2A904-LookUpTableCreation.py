@@ -9,12 +9,13 @@
 # upload it to the database
 #
 # Contributors: I. Komarov (April 2018)
+#               I. Komarov (September 2018)
 #
 ######################################################
 
 import sys
-from basf2 import *
-from modularAnalysis import analysis_main
+import basf2 as b2
+import modularAnalysis as ma
 import random
 
 # Add some bin constructors
@@ -122,13 +123,14 @@ addtable2.param('runHigh', 1000)
 addtable2.param('runLow', 0)
 addtable2.param('tableName', "ParticleReweighting:TestMomentum2")
 
-analysis_main.add_module(addtable)
-analysis_main.add_module(addtable2)
-
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('expList', [0])
-analysis_main.add_module(eventinfosetter)
 
-process(analysis_main)
+my_path = ma.analysis_main
+my_path.add_module(addtable)
+my_path.add_module(addtable2)
+my_path.add_module(eventinfosetter)
+
+process(my_path)

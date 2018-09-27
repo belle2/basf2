@@ -18,35 +18,43 @@
 #  1) No guarantee for collisions!
 #
 # Contributors: Moritz Gelb (June 2017)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import fillParticleList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import analysis_main
-from modularAnalysis import variablesToNtuple
-from decayHash import DecayHashMap
-from beamparameters import add_beamparameters
+import basf2 as b2
+import modularAnalysis as ma
+import variableCollections as vc
+import variableCollectionsTools as vct
 
-# set the log level
-set_log_level(LogLevel.WARNING)
-beamparameters = add_beamparameters(analysis_main, "Y4S")
+# check if the required input file exists
+import os
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/JPsi2ee_e2egamma.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
-# Bd_JpsiKL_ee Signal MC file
-# Generated for release-01-00-00
-inputFile = "/group/belle2/tutorial/release_01-00-00/1111540100.dst.root"
-inputMdstList('MC9', inputFile)
+# create path
+my_path = ma.analysis_main
 
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename='$BELLE2_EXAMPLES_DATA/JPsi2ee_e2egamma.root',
+             path=my_path)
 
 # reconstruct the decay
-fillParticleList('e+', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4', False)
-fillParticleList('gamma', '', False)
-reconstructDecay('J/psi -> e+ e-', '')
+ma.fillParticleList(decayString='e+',
+                    cut='electronID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    writeOut=False,
+                    path=my_path)
+ma.fillParticleList(decayString='gamma',
+                    cut='',
+                    writeOut=False,
+                    path=my_path)
+ma.reconstructDecay(decayString='J/psi -> e+ e-',
+                    cut='',
+                    path=my_path)
 
 # generate the decay string
-analysis_main.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi.root')
+my_path.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi.root')
 
 
 # write out ntuples
@@ -58,10 +66,13 @@ var = ['M',
        'extraInfo(DecayHashExtended)',
        ]
 
-variablesToNtuple('J/psi', var, filename='Jpsi.root')
+ma.variablesToNtuple(decayString='J/psi',
+                     variables=var,
+                     filename='Jpsi.root',
+                     path=my_path)
 
 # process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

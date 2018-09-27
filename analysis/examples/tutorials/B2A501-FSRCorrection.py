@@ -32,8 +32,6 @@ import basf2 as b2
 import modularAnalysis as ma
 import variableCollections as vc
 import variableCollectionsTools as vct
-from stdV0s import stdKshorts
-from stdV0s import stdLambdas
 
 # check if the required input file exists
 import os

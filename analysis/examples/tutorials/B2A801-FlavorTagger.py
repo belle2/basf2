@@ -19,70 +19,84 @@
 # flavor*dilution factor of the not reconstructed B0,
 # is saved as extraInfo to the reconstructed B0.
 #
-#
-# Note: The weight files for the trained TMVA methods
-# were produced using the signal MC sample created in
-# MC campaign 5.
-#
 # Contributors: F. Abudinen & Moritz Gelb (February 2015)
+#               I. Komarov (September 2018)
 #
 ######################################################
 
-from basf2 import *
-# The FlavorTagger already imports  modularAnalysis
-from flavorTagger import *
-from stdPi0s import *
-from stdCharged import *
+import basf2 as b2
+import modularAnalysis as ma
+import flavorTagger as ft
+import vertex as vx
 import variableCollections as vc
-from modularAnalysis import variablesToNtuple
+import variableCollectionsTools as vct
+import stdCharged as stdc
+from stdPi0s import stdPi0s
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    [
-        '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000103/s00/e0000/4S/' +
-        'r00000/1111440100/sub00/mdst_00000*_prod00000103_task0000000*.root'
-    ]
+# check if the required input file exists
+import os
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2JPsiKs_JPsi2mumu.root'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
-inputMdstList('MC5', filelistSIG)
+# create path
+my_path = ma.analysis_main
+
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename='$BELLE2_EXAMPLES_DATA/B2JPsiKs_JPsi2mumu.root',
+             path=my_path)
 
 # use standard final state particle lists
 #
 # creates "highPID" ParticleLists (and c.c.)
-fillParticleList('pi+:highPID', 'pionID > 0.5 and d0 < 5 and abs(z0) < 10')
-fillParticleList('mu+:highPID', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4')
+ma.fillParticleList(decayString='pi+:highPID',
+                    cut='pionID > 0.5 and d0 < 5 and abs(z0) < 10',
+                    path=my_path)
+ma.fillParticleList(decayString='mu+:highPID',
+                    cut='muonID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    path=my_path)
 
 
 # reconstruct Ks -> pi+ pi- decay
 # keep only candidates with dM<0.25
-reconstructDecay('K_S0:pipi -> pi+:highPID pi-:highPID', 'dM<0.25')
-# fit K_S0 Vertex
-fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False)
+ma.reconstructDecay(decayString='K_S0:pipi -> pi+:highPID pi-:highPID',
+                    cut='dM<0.25',
+                    path=my_path)
 
-# reconstruct J/psi -> mu+ mu- decay and fit vertex
+# reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with dM<0.11
-reconstructDecay('J/psi:mumu -> mu+:highPID mu-:highPID', 'dM<0.11')
-applyCuts('J/psi:mumu', '3.07 < M < 3.11')
-massVertexRave('J/psi:mumu', 0., '')
+ma.reconstructDecay(decayString='J/psi:mumu -> mu+:highPID mu-:highPID',
+                    cut='dM<0.11 and 3.07 < M < 3.11',
+                    path=my_path)
 
 # reconstruct B0 -> J/psi Ks decay
 # keep only candidates with Mbc > 5.1 and abs(deltaE)<0.15
-reconstructDecay('B0:jspiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.1 and abs(deltaE)<0.15')
+ma.reconstructDecay(decayString='B0:jspiks -> J/psi:mumu K_S0:pipi',
+                    cut='Mbc > 5.1 and abs(deltaE)<0.15',
+                    path=my_path)
 
-# Fit the B0 Vertex
-vertexRave('B0:jspiks', 0., 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '')
+vx.vertexTree(list_name='B0:jspiks',
+              conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
+              ipConstraint=True,
+              # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
+              updateAllDaughters=True,  # update momenta off ALL particles
+              path=my_path
+              )
 
 # perform MC matching (MC truth asociation). Always before TagV
-matchMCTruth('B0:jspiks')
+ma.matchMCTruth(list_name='B0:jspiks', path=my_path)
 
 # build the rest of the event associated to the B0
-buildRestOfEvent('B0:jspiks')
+ma.buildRestOfEvent(list_name='B0:jspiks')
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
 # You just have to use a special global tag of the conditions database. Check in
 # https://confluence.desy.de/display/BI/Physics+FlavorTagger
 # E.g. for release-00-09-01
-use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
+
+# use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
+
 # The default working directory is '.'
 # If you have an own analysis package it is recomended to use
 # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'.
@@ -92,9 +106,17 @@ use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
-flavorTagger(
+ft.flavorTagger(
     particleLists=['B0:jspiks'],
-    weightFiles='B2JpsiKs_muBGx1')
+    weightFiles='B2JpsiKs_muBGx1',
+    path=my_path)
+
+# NOTE: for Belle data, (i.e. b2bii users) should use modified line:
+# ft.flavorTagger(
+#     particleLists=['B0:jspiks'],
+#     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
+#     belleOrBelle2='Belle')
+
 #
 # BGx0 stays for MC generated without machine Background.
 # Please use B2JpsiKs_muBGx1 if you use MC generated with machine background.
@@ -158,36 +180,59 @@ flavorTagger(
 
 # You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
 # provide flavor information using the tag side
-applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
+ma.applyCuts(list_name='B0:jspiks',
+             cut='qrOutput(FBDT) > -2',
+             path=my_path)
 
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
-rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
+ma.rankByHighest(particleList='B0:jspiks',
+                 variable='abs(qrOutput(FBDT))',
+                 numBest=0,
+                 outputVariable='Dilution_rank',
+                 path=my_path)
 
 # Fit Vertex of the B0 on the tag side
-TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
+vx.TagV(list_name='B0:jspiks',
+        MCassociation='breco',
+        confidenceLevel=0.001,
+        useFitAlgorithm='standard_PXD',
+        path=my_path)
 
 # Select variables that we want to store to ntuple
-fshars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
-jpsiandk0svars = vc.mc_truth
-bvars = vc.event_meta_data + vc.reco_stats + vc.deltae_mbc + vc.ckm_kinematics + vc.mc_truth + \
-    vc.roe_multiplicities + vc.flavor_tagging + vc.tag_vertex + mc_vc.tag_vertex + \
-    vc.convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
-    vc.convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
+fs_vars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
+jpsiandk0s_vars = vc.mc_truth
+bvars = vc.event_meta_data + \
+    vc.reco_stats + \
+    vc.deltae_mbc + \
+    vc.ckm_kinematics + \
+    vc.mc_truth + \
+    vc.roe_multiplicities + \
+    vc.flavor_tagging + \
+    vc.tag_vertex + \
+    vc.mc_tag_vertex + \
+    vct.convert_to_all_selected_vars(variables_list=fs_vars,
+                                     decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    vct.convert_to_all_selected_vars(variables_list=jpsiandk0s_vars,
+                                     decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 
 
 # Saving variables to ntuple
 output_file = 'B2A801-FlavorTagger.root'
-variablesToNtuple('B0:jspiks', bvars,
-                  filename=output_file, treename='B0tree')
+ma.variablesToNtuple(decay_string='B0:jspiks',
+                     variables=bvars,
+                     filename=output_file,
+                     treename='B0tree',
+                     path=my_path)
 
 # Summary of created Lists
-summaryOfLists(['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'])
+ma.summaryOfLists(particleLists=['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'],
+                  path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)
 
 # If you want to calculate the efficiency of the FlavorTagger on your own
 # File use the script analysis/examples/FlavorTaggerEfficiency.py giving

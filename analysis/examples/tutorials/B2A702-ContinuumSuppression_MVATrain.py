@@ -14,6 +14,7 @@
 #   basf2 B2A702-ContinuumSuppression_MVATrain.py
 #
 # Contributors: P. Goldenzweig (October 2016)
+#               I. Komarov (September 2018)
 #
 ################################################################################
 
@@ -25,14 +26,17 @@ if __name__ == "__main__":
     # Note that the target variable 'isNotContinuum' needs to be
     # saved in your train.root and test.root files, along with the
     # trainingVars, listed again here (see B2A701).
+    import os
+    if not os.getenv('BELLE2_EXAMPLES_DATA'):
+        b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
     # Use this path to run over Bd_KsPi0 reconstructed signal and qqbar skims.
-    path = '/group/belle2/tutorial/release_01-00-00/inputForCSTutorial/'
+    path = 'BELLE2_EXAMPLES_DATA/'
 
-    train_data = path + 'train.root'
-    test_data = path + 'test.root'
-    apply_signal_data = path + 'apply_signal.root'
-    apply_qqbar_data = path + 'apply_qqbar.root'
+    train_data = path + 'mva_train.root'
+    test_data = path + 'mva_test.root'
+    apply_signal_data = path + 'mva_apply_signal.root'
+    apply_qqbar_data = path + 'mva_apply_qqbar.root'
 
     # Define the variables for training.
     #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework

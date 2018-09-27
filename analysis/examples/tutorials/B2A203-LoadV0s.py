@@ -28,8 +28,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import variableCollections as vc
 import variableCollectionsTools as vct
-from stdV0s import stdKshorts
-from stdV0s import stdLambdas
+import stdV0s as stdv
 
 # check if the required input file exists
 import os
@@ -77,8 +76,8 @@ ma.vertexKFit(list_name='Lambda0:RD', conf_level=0.0, path=my_path)
 # e.g. stdKshorts():
 # - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
 #   a cut on the candidates mass is applied, too
-stdKshorts(path=my_path)
-stdLambdas(path=my_path)
+stdv.stdKshorts(path=my_path)
+stdv.stdLambdas(path=my_path)
 
 # print contents of the DataStore after loading Particles
 ma.printDataStore(path=my_path)

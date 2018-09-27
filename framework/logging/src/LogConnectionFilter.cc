@@ -56,7 +56,6 @@ void LogConnectionFilter::printRepetitions()
 {
   if (m_repeatCounter > 0) {
     const std::string message{" ... message repeated " + std::to_string(m_repeatCounter) + " times"};
-
     LogMessage repeatMessage(m_previousMessage.getLogLevel(), message, "", "", "", 0);
     repeatMessage.setLogInfo(LogConfig::c_Message);
     m_logConnection->sendMessage(repeatMessage);

@@ -15,7 +15,7 @@ def wrap_list(variables_list, wrapper, alias_prefix):
 
     Parameters:
         variables_list (list(str)): list of variable names
-        wrapper (str): metafunction taking variables from variables_list as a parameter
+        wrapper (str): metafunction taking variables from variables_list as a parameter \
         (``<metafunction>(<some configs>, {variable} ,<some otehr configs>)``
         alias_prefix (str): alias prefix used for wrapped variables.
 

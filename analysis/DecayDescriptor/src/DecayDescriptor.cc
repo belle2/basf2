@@ -25,21 +25,6 @@ using namespace std;
 
 const DecayDescriptor& DecayDescriptor::s_NULL = DecayDescriptor();
 
-bool DecayDescriptor::drop()
-{
-  DecayDescriptorParticle p_nullptr;
-  m_mother = p_nullptr;
-  m_iDaughter_p = -1;
-  std::vector<DecayDescriptor> nd_nullptr;
-  m_daughters = nd_nullptr;
-  m_isIgnorePhotons = false;
-  m_isIgnoreIntermediate = false;
-  m_isInclusive = false;
-  m_isNULL = false;
-  std::vector<std::vector<std::pair<int, std::string>>> h_nullptr;
-  m_hierarchy = h_nullptr;
-  return true;
-}
 DecayDescriptor::DecayDescriptor() :
   m_mother(),
   m_iDaughter_p(-1),

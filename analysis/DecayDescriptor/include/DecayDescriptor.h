@@ -68,15 +68,6 @@ namespace Belle2 {
     /** Singleton object representing NULL. */
     const static DecayDescriptor& s_NULL;
 
-    /** get singleton instance to use in python */
-    const static DecayDescriptor& Instance()
-    {
-      return s_NULL;
-    }
-
-    /** Restores state of the DecayDescriptor instance */
-    bool drop();
-
     /** Dereference operator. */
     operator DecayDescriptor* ()
     {

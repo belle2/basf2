@@ -7,30 +7,27 @@ def wrap_list(variables_list, wrapper, alias_prefix):
     The function wraps every variable from variables list with given wrapper
     and add alias using given alias prefix
 
+    >>> variables_list = ['M','p']
+    >>> wrapper = 'daughter(1,{variable})'
+    >>> alias_prefix = 'pref'
+    >>> print(wrap_list(variables_list, wrapper, alias_prefix))
+    ['pref_M', 'pref_p']
+
     Parameters:
         variables_list (list(str)): list of variable names
-        wrapper (str): wrapper in format ``<wrapper_name>(<some configs>,variable,<some configs)``
+        wrapper (str): metafunction taking variables from variables_list as a parameter
+        (``<metafunction>(<some configs>, {variable} ,<some otehr configs>)``
         alias_prefix (str): alias prefix used for wrapped variables.
 
     Returns:
         list(str): new variables list
     """
-    wrapped_list = []
     from variables import variables
+    aliases = [f"{alias_prefix}_{e}" for e in variables_list]
+    for var, alias in zip(variables_list, aliases):
+        variables.addAlias(alias, wrapper.format(variable=var))
 
-    import re
-    count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape('varieble'), wrapper))
-    if count != 0:
-        B2FATAL("Can't parse wrapper : " + wrapper +
-                " Please make sure it has format `<wrapper_name>(<some configs>,variable,<some configs>)`")
-
-    left_side_of_wrapper = wrapper.split("variable")[0]
-    right_side_of_wrapper = wrapper.split("variable")[1]
-    for v in variables_list:
-        alias = alias_prefix + "_" + v
-        variables.addAlias(alias, left_side_of_wrapper + v + right_side_of_wrapper)
-        wrapped_list.append(alias)
-    return wrapped_list
+    return aliases
 
 
 def get_hierarchy_of_decay(decay_string):
@@ -40,14 +37,21 @@ def get_hierarchy_of_decay(decay_string):
     For instance, in decay
     ``B+ -> [ D+ -> ^K+ pi0 ] pi0``
     decay path of K+ is
-    ``[(0, B), (0, D), (0 K)]``
+    ``[(0, D), (0 K)]``:
+
+    >>> print(get_hierarchy_of_decay('B+ -> [ D+ -> ^K+ pi0 ] pi0'))
+    [[(0, 'D'), (0, 'K')]]
+
     Every selected partcile has its own hierarchy path and
     they are stored as a vector in this variable:
     For the decayString
     ``B+ -> [ D+ -> ^K+ pi0 ] ^pi0``
     m_hierarchy, once filled, is
     ``[[(0, D), (0, K)],
-    [(1, pi0)]]``
+    [(1, pi0)]]``:
+
+    >>> print(get_hierarchy_of_decay('B+ -> [ D+ -> ^K+ pi0 ] ^pi0'))
+    [[(0, 'D'), (0, 'K')], [(1, 'pi0')]]
 
     Note: here C++ object are converted to python ones (vector of pairs becomes list of tuples)
 
@@ -61,14 +65,12 @@ def get_hierarchy_of_decay(decay_string):
         list(list(tuple(int,str))): list of hierarchies of selected particles.
     """
     from ROOT import Belle2
-    d = Belle2.DecayDescriptor.Instance()
+    d = Belle2.DecayDescriptor()
     d.init(decay_string)
     selected_particles = []
     for _ in d.getHierarchyOfSelected():
         if len(_) > 1:
             selected_particles.append(list([tuple(__) for __ in _])[1:])
-    print(selected_particles)
-    d.drop()
     return selected_particles
 
 
@@ -79,7 +81,12 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     Aliases of variables are assigned automaticaly in the following manner:
     If namings are unambiguous, it's semi-laconic :doc:`DecayString` style:
 
-    * pi variabels selected as ``B0 -> [D0 -> ^pi+ K-] pi0`` will have ``D0_pi_`` prefix in ntuple.
+    * pi variabels selected as ``B0 -> [D0 -> ^pi+ K-] pi0`` will have ``D0_pi_`` prefix in ntuple.:
+
+    >>> variables_list = ['M','p']
+    >>> decay_string = 'B0 -> [D0 -> ^pi+ K-] pi0'
+    >>> print(convert_to_all_selected_vars(variables_list, decay_string))
+    ['D0_pi_M', 'D0_pi_p']
 
     If namings are ambiguous, prefix will contain hierarchy path indexes:
 
@@ -95,8 +102,21 @@ def convert_to_all_selected_vars(variables_list, decay_string):
 
       4. ``pi0_``
 
+    >>> variables_list = ['M','p']
+    >>> decay_string = 'B0 -> [D0 -> ^pi+ ^pi- ^pi0] ^pi0'
+    >>> print(convert_to_all_selected_vars(variables_list, decay_string))
+    ['D0_pi_0_0_M', 'D0_pi_0_0_p', 'D0_pi_0_1_M', 'D0_pi_0_1_p',
+     'D0_pi0_M', 'D0_pi0_p', 'pi0_M', 'pi0_p']
+
     If you feel that such naming is clumsy, you always can add individual aliases
-    for particles with `convert_to_all_selected_vars()` function.
+    for particles with `convert_to_one_selected_vars()` function:
+    >>> variables_list = ['M','p']
+    >>> decay_string = 'B0 -> [D0 -> pi+ ^pi- pi0] pi0'
+    >>> aliases = convert_to_one_selected_vars(variables_list, decay_string, 'pim')
+    >>> decay_string = 'B0 -> [D0 -> ^pi+ pi- pi0] pi0'
+    >>> aliases += convert_to_one_selected_vars(variables_list, decay_string, 'pip')
+    >>> print(aliases)
+    ['pim_M', 'pim_p', 'pip_M', 'pip_p']
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -128,7 +148,7 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     for p in prefixes.keys():
         var_list += convert_to_nd_vars(variables_list, prefixes[p], p)
 
-    return var_list
+    return var_list, prefixes
 
 
 def convert_to_one_selected_vars(variables_list, decay_string, alias_prefix):
@@ -140,6 +160,11 @@ def convert_to_one_selected_vars(variables_list, decay_string, alias_prefix):
     If you want to apply variables for several particles, either use
     this function without specifyng alias prefix or call the function
     for each child particle independently.
+
+    >>> variables_list = ['M','p']
+    >>> decay_string = 'B0 -> [D0 -> pi+ ^pi- pi0] pi0'
+    >>> print(convert_to_one_selected_vars(variables_list, decay_string, 'pim'))
+    ['pim_M', 'pim_p']
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -157,20 +182,29 @@ def convert_to_one_selected_vars(variables_list, decay_string, alias_prefix):
 
 def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
     """
-    The function transforms list of variables to that relative for the particle's n-th daughter.
-    Daughter numbering starts from 0, daughters are ordered by mass.
-    Daughters with the same mass are ordred by charge.
+    The function transforms list of variables to that relative for the one of the particle's daughter.
+    This is helper function used by other functions in this package since it requires
+    quite peculiar input, namely ``hierarchy_path``, that is sequence od number of daughters
+    ending with the number of selected particle. For instance, ``hierarchy_path`` of
+    ``pi-`` in ``B0 -> [D0 -> pi+ ^pi- pi0] pi0`` is ``[0, 1]`` and of
+    ``pi0`` in ``B0 -> [D0 -> pi+ pi- pi0] ^pi0`` is ``[1]``
+
+    >>> variables_list = ['M','p']
+    >>> # Users don't use the finction, so let's define hierarcy path
+    >>> # for decay 'B0 -> [D0 -> pi+ ^pi- pi0] pi0' by hands:
+    >>> hierarcy_path = [0, 1]
+    >>> print(convert_to_nd_vars(variables_list, hierarcy_path, 'pim'))
+    ['pim_M', 'pim_p']
 
     Parameters:
         variables_list (list(str)): list of variable names
-        hierarchy_path (list(int)): hierarchy path (sequence of numbers of daughters that brings to the paericle)
+        hierarchy_path (list(int)): hierarchy path (sequence of numbers of daughters that brings to the particle)
         alias_prefix (str): User-defined alias prefix for trannsformed list
-
 
     Returns:
         list(str): new variables list
     """
-    wrapper = "variable"
+    wrapper = '{{variable}}'
     for h in reversed(hierarchy_path):
         wrapper = "daughter(" + str(h) + "," + wrapper + ")"
     return wrap_list(variables_list, wrapper, alias_prefix)
@@ -179,8 +213,12 @@ def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
 def convert_to_daughter_vars(variables_list, daughter_number):
     """
     The function transforms list of variables to that for the n-th daughter.
-    Daughter numbering starts from 0, daughters are ordered by mass.
-    Daughters with the same mass are ordred by charge.
+
+    >>> variables_list = ['M','p']
+    >>> daughter_number = 1
+    >>> print(convert_to_daughter_vars(variables_list, daughter_number))
+    ['d1_M', 'd1_p']
+
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -197,8 +235,12 @@ def convert_to_daughter_vars(variables_list, daughter_number):
 def convert_to_gd_vars(variables_list, daughter_number, granddaughter_number):
     """
     The function transforms list of variables to that relative for the particle's granddaughter.
-    Daughter numbering starts from 0, daughters are ordered by mass.
-    Daughters with the same mass are ordred by charge.
+
+    >>> variables_list = ['M','p']
+    >>> daughter_number = 1
+    >>> granddaughter_number = 2
+    >>> print(convert_to_gd_vars(variables_list, daughter_number, granddaughter_number))
+    ['d1_d2_M', 'd1_d2_p']
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -209,30 +251,32 @@ def convert_to_gd_vars(variables_list, daughter_number, granddaughter_number):
         list(str): new variables list
     """
     return wrap_list(variables_list,
-                     'daughter(' + str(daughter_number) + ',daughter(' + str(granddaughter_number) + ',variable))',
-                     'd' + str(daughter_number) + '_d' + str(granddaughter_number))
+                     f"daughter({daughter_number}, daughter({granddaughter_number}, variable))",
+                     f"d{daughter_number}_d{granddaughter_number}")
 
 
 def make_mc(variables_list):
     """
     The function wraps variables from the list with 'matchedMC()'.
 
+    >>> variables_list = ['M','p']
+    >>> print(make_mc(variables_list))
+    ['mmc_M', 'mmc_p']
+
     Parameters:
         variables_list (list(str)): list of variable names
-
 
     Returns:
         list(str): new variables list
     """
     return wrap_list(variables_list,
-                     'matchedMC(variable)',
+                     'matchedMC({{variable}})',
                      'mmc')
 
 
 def add_collection(variables_list, collection_name):
     """
     The function creates variable collection from tne list of variables
-
 
     Note: This is kept for compatibility.
 

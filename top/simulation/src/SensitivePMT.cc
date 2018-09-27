@@ -63,6 +63,18 @@ namespace Belle2 {
       // check if the track is an optical photon
       if (photon.GetDefinition()->GetParticleName() != "opticalphoton") return false;
 
+      // photon energy in [eV]
+      double energy = photon.GetKineticEnergy() * Unit::MeV / Unit::eV;
+
+      // pmt and module ID
+      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(m_pmtReplicaDepth);
+      int moduleID = photon.GetTouchableHandle()->GetReplicaNumber(m_moduleReplicaDepth);
+
+      // hit position in local frame, converted to Basf units
+      G4ThreeVector localPosition = photon.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(photon.GetPosition());
+      double xLocal = localPosition.x() * Unit::mm;
+      double yLocal = localPosition.y() * Unit::mm;
+
       // apply quantum efficiency if not yet done
       bool applyQE = true;
       double fraction = 1;
@@ -72,18 +84,12 @@ namespace Belle2 {
         fraction = info->getFraction();
       }
       if (applyQE) {
-        double energy = photon.GetKineticEnergy() * Unit::MeV / Unit::eV;
-        const auto* geo = m_topgp->getGeometry();
-        double qeffi = geo->getNominalQE().getEfficiency(energy);
-        if (gRandom->Uniform() * fraction > qeffi) {
+        double qeffi = m_topgp->getPMTEfficiency(energy, moduleID, pmtID, xLocal, yLocal);
+        if (qeffi == 0 or gRandom->Uniform() * fraction > qeffi) {
           photon.SetTrackStatus(fStopAndKill);
           return false;
         }
       }
-
-      // pmt and module ID
-      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(m_pmtReplicaDepth);
-      int moduleID = photon.GetTouchableHandle()->GetReplicaNumber(m_moduleReplicaDepth);
 
       // photon at detection
       const G4ThreeVector& g_detPoint = photon.GetPosition();
@@ -91,7 +97,6 @@ namespace Belle2 {
       TVector3 detPoint(g_detPoint.x(), g_detPoint.y(), g_detPoint.z());
       TVector3 detMomDir(g_detMomDir.x(), g_detMomDir.y(), g_detMomDir.z());
       double detTime = photon.GetGlobalTime();
-      double energy = photon.GetKineticEnergy();
       double length = photon.GetTrackLength();
 
       // photon at emission
@@ -101,16 +106,10 @@ namespace Belle2 {
       TVector3 emiMomDir(g_emiMomDir.x(), g_emiMomDir.y(), g_emiMomDir.z());
       double emiTime = photon.GetGlobalTime() - photon.GetLocalTime();
 
-      // convert to Basf units (photon energy in [eV]!)
+      // convert to Basf2 units
       emiPoint = emiPoint * Unit::mm;
       detPoint = detPoint * Unit::mm;
-      energy = energy * Unit::MeV / Unit::eV;
       length = length * Unit::mm;
-
-      // hit position in local frame, converted to Basf units
-      G4ThreeVector localPosition = photon.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(g_detPoint);
-      double xLocal = localPosition.x() * Unit::mm;
-      double yLocal = localPosition.y() * Unit::mm;
 
       // write to store arrays; add relations
 

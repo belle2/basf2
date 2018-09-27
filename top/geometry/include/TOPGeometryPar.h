@@ -87,6 +87,25 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * Returns PMT efficiency envelope, e.g. at given photon energy the maximum
+       * over all PMT's of a product of quantum and collection efficiency.
+       * @param energy photon energy in [eV]
+       * @return the maximal efficiency
+       */
+      double getPMTEfficiencyEnvelope(double energy) const;
+
+      /**
+       * Returns PMT pixel efficiency, a product of quantum and collection efficiency.
+       * @param energy photon energy in [eV]
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @param x photon detection position x in local PMT frame
+       * @param y photon detection position y in local PMT frame
+       * @return the efficiency
+       */
+      double getPMTEfficiency(double energy,
+                              int moduleID, int pmtID, double x, double y) const;
 
     private:
 

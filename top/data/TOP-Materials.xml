@@ -431,7 +431,6 @@
     <!-- composition not known, density not known -->
     <!-- refractive index similar to borosilicate glass -->
     <!-- using data for borosilicate glass -->
-    <!-- absorption coefficient to be added - WITH CARE: now included in QE! -->
     <state>Solid</state>
     <density unit="g/cm3">2.23</density>
     <Components>   
@@ -441,6 +440,58 @@
       <Element fraction="0.0123">B</Element>     
       <Element fraction="0.0108">Al</Element>     
     </Components>  
+    <Property name="ABSLENGTH" unit="eV" desc="bulk absorption length in mm"> 
+      <!-- absorption length calculated from bulk transmission of 2.5 mm thick filter -->
+      <!-- bulk transmission data points obtained from Okuto-san, September 2018 -->
+      <value energy="1.40000">50.0</value>
+      <value energy="1.50000">80.0</value>
+      <value energy="1.63158">94.8984</value>
+      <value energy="1.65333">98.7447</value>
+      <value energy="1.67568">102.912</value>
+      <value energy="1.69863">107.441</value>
+      <value energy="1.72222">112.382</value>
+      <value energy="1.74648">123.746</value>
+      <value energy="1.77143">123.746</value>
+      <value energy="1.79710">137.635</value>
+      <value energy="1.82353">145.805</value>
+      <value energy="1.85075">154.997</value>
+      <value energy="1.87879">165.414</value>
+      <value energy="1.90769">177.318</value>
+      <value energy="1.93750">191.055</value>
+      <value energy="1.96825">191.055</value>
+      <value energy="2.00000">207.081</value>
+      <value energy="2.03279">207.081</value>
+      <value energy="2.06667">207.081</value>
+      <value energy="2.10169">226.02</value>
+      <value energy="2.13793">226.02</value>
+      <value energy="2.17544">248.748</value>
+      <value energy="2.21429">248.748</value>
+      <value energy="2.25455">276.526</value>
+      <value energy="2.29630">276.526</value>
+      <value energy="2.33962">311.248</value>
+      <value energy="2.38462">311.248</value>
+      <value energy="2.43137">311.248</value>
+      <value energy="2.48000">355.891</value>
+      <value energy="2.53061">355.891</value>
+      <value energy="2.58333">355.891</value>
+      <value energy="2.63830">311.248</value>
+      <value energy="2.69565">311.248</value>
+      <value energy="2.75556">311.248</value>
+      <value energy="2.81818">311.248</value>
+      <value energy="2.88372">276.526</value>
+      <value energy="2.95238">248.748</value>
+      <value energy="3.02439">276.526</value>
+      <value energy="3.10000">248.748</value>
+      <value energy="3.17949">191.055</value>
+      <value energy="3.26316">123.746</value>
+      <value energy="3.35135">61.2415</value>
+      <value energy="3.44444">28.1433</value>
+      <value energy="3.54286">11.4597</value>
+      <value energy="3.64706">4.28525</value>
+      <value energy="3.75758">1.55334</value>
+      <value energy="3.87500">0.604571</value>
+      <value energy="4.00000">0</value>
+    </Property> 
     <Property name="RINDEX" unit="eV"> 
       <value energy="1.4">1.50923</value>
       <value energy="1.5">1.51026</value>

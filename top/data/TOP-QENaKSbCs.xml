@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<QE>
+<QE descr="nominal quantum efficiency of NaKSbCs photocathode">
   <ColEffi>0.55</ColEffi>
   <LambdaFirst unit="nm">200</LambdaFirst>
   <LambdaStep unit="nm">10</LambdaStep>
@@ -11,19 +11,19 @@
   <Qeffi>0.000</Qeffi>
   <Qeffi>0.000</Qeffi>
   <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.002</Qeffi>
-  <Qeffi>0.036</Qeffi>
-  <Qeffi>0.130</Qeffi>
-  <Qeffi>0.217</Qeffi>
+  <Qeffi>0.135</Qeffi>
+  <Qeffi>0.166</Qeffi>
+  <Qeffi>0.197</Qeffi>
+  <Qeffi>0.210</Qeffi>
+  <Qeffi>0.223</Qeffi>
+  <Qeffi>0.239</Qeffi>
   <Qeffi>0.255</Qeffi>
+  <Qeffi>0.278</Qeffi>
+  <Qeffi>0.280</Qeffi>
+  <Qeffi>0.279</Qeffi>
+  <Qeffi>0.277</Qeffi>
   <Qeffi>0.268</Qeffi>
-  <Qeffi>0.271</Qeffi>
-  <Qeffi>0.265</Qeffi>
-  <Qeffi>0.256</Qeffi>
+  <Qeffi>0.259</Qeffi>
   <Qeffi>0.242</Qeffi>
   <Qeffi>0.225</Qeffi>
   <Qeffi>0.207</Qeffi>

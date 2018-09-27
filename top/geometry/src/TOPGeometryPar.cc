@@ -17,6 +17,8 @@
 #include <framework/logging/LogSystem.h>
 #include <geometry/Materials.h>
 #include <iostream>
+#include <TSpline.h>
+
 
 using namespace std;
 
@@ -528,6 +530,47 @@ namespace Belle2 {
         geo->setCalPulseShape(shape);
       }
 
+      // wavelength filter bulk transmission
+
+      std::string materialNode = "Materials/Material[@name='TOPWavelengthFilterIHU340']";
+      GearDir filterMaterial(content, materialNode);
+      if (!filterMaterial) {
+        B2FATAL("TOPGeometry: " << materialNode << " not found");
+      }
+      GearDir property(filterMaterial, "Property[@name='ABSLENGTH']");
+      if (!property) {
+        B2FATAL("TOPGeometry: " << materialNode << ", Property ABSLENGTH not found");
+      }
+      int numNodes = property.getNumberNodes("value");
+      if (numNodes > 1) {
+        double conversion = Unit::convertValue(1, property.getString("@unit", "GeV"));
+        std::vector<double> energies;
+        std::vector<double> absLengths;
+        for (int i = 0; i < numNodes; i++) {
+          GearDir value(property, "value", i + 1);
+          energies.push_back(value.getDouble("@energy") * conversion / Unit::eV);// [eV]
+          absLengths.push_back(value.getDouble() * Unit::mm); // [cm]
+        }
+        TSpline3 spline("absLen", energies.data(), absLengths.data(), energies.size());
+        double lambdaFirst = 1240 / energies.back();
+        double lambdaLast = 1240 / energies[0];
+        double lambdaStep = 5; // [nm]
+        int numSteps = (lambdaLast - lambdaFirst) / lambdaStep + 1;
+        const double filterThickness = prism.getFilterThickness();
+        std::vector<float> bulkTransmissions;
+        for (int i = 0; i < numSteps; i++) {
+          double wavelength = lambdaFirst + lambdaStep * i;
+          double energy = 1240 / wavelength;
+          double absLen = spline.Eval(energy);
+          bulkTransmissions.push_back(exp(-filterThickness / absLen));
+        }
+        TOPWavelengthFilter filter(lambdaFirst, lambdaStep, bulkTransmissions);
+        geo->setWavelengthFilter(filter);
+      } else {
+        B2FATAL("TOPGeometry: " << materialNode
+                << ", Property ABSLENGTH has less than 2 nodes");
+      }
+
       return geo;
     }
 
@@ -544,6 +587,26 @@ namespace Belle2 {
       ss >> out;
       return out;
     }
+
+
+    double TOPGeometryPar::getPMTEfficiencyEnvelope(double energy) const
+    {
+      // provisional only!
+      const auto* geo = getGeometry();
+      double qeffi = geo->getNominalQE().getEfficiency(energy);
+      return qeffi;
+    }
+
+    double TOPGeometryPar::getPMTEfficiency(double energy,
+                                            int moduleID, int pmtID,
+                                            double x, double y) const
+    {
+      // provisional only!
+      const auto* geo = getGeometry();
+      double qeffi = geo->getNominalQE().getEfficiency(energy);
+      return qeffi;
+    }
+
 
   } // End namespace TOP
 } // End namespace Belle2

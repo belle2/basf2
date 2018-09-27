@@ -31,7 +31,8 @@ namespace Belle2 {
      * The LogMessage constructor.
      *
      * @param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
-     * @param message The message string which should be send.
+     * @param message The message string which should be send. This will be internally converted
+     *                to a LogVariableStream with the text message and 0 variables.
      * @param package The package name where the message was sent from (can be NULL)
      * @param function The function name where the message was sent from.
      * @param file The file name where the message was sent from.
@@ -53,7 +54,15 @@ namespace Belle2 {
     LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
                const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
 
+    /**
+     * Provide move constructor
+     */
     LogMessage(LogMessage&&) = default;
+
+    /**
+     * Provide copy-constructor
+     */
+    LogMessage(LogMessage const& lm) = default;
 
     /**
      * Compares two messages.
@@ -64,6 +73,11 @@ namespace Belle2 {
 
     /** Check for inequality. */
     bool operator!=(const LogMessage& message) const { return !(*this == message); }
+
+    /**
+     * Custom assignment-operator, thanks to stringsream's incompetence ...
+     */
+    LogMessage& operator=(const LogMessage& lvs) = default;
 
     /**
      * Returns the log level of the message.

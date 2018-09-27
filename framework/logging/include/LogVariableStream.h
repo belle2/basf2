@@ -102,10 +102,19 @@ public:
   /** Default constructor with empty text and no variables */
   LogVariableStream() = default;
 
+  /**
+   * Provide default move constructor
+   */
   LogVariableStream(LogVariableStream&&) = default;
 
-  LogVariableStream(LogVariableStream const&) = delete;
-  LogVariableStream& operator=(LogVariableStream const&) = delete;
+  /**
+   * Implement custom copy-constructor, because stringstream's one is deleted.
+   */
+  LogVariableStream(const LogVariableStream& other) :  m_variables(other.m_variables)
+  {
+    // copy manually because stringstream has no copy-constructor
+    m_stringStream << other.m_stringStream.rdbuf();
+  }
 
   /** Constructor which sets an initial text for this stream
    * @param text Initial text
@@ -156,6 +165,17 @@ public:
   bool operator==(const LogVariableStream& lvs) const
   {
     return (lvs.m_variables == this->m_variables) && (lvs.m_stringStream.str() == this->m_stringStream.str());
+  }
+
+  /**
+   * Custom assignment-operator, thanks to stringsream's non-copy policy
+   */
+  LogVariableStream&  operator=(const LogVariableStream& lvs)
+  {
+    this->m_stringStream = std::stringstream();
+    this->m_stringStream << lvs.m_stringStream.rdbuf();
+    this->m_variables = lvs.m_variables;
+    return *this;
   }
 
   /**

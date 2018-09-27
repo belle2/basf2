@@ -228,7 +228,7 @@ def convert_to_daughter_vars(variables_list, daughter_number):
         list(str): new variables list
     """
     return wrap_list(variables_list,
-                     "daughter(" + str(daughter_number) + ",variable)",
+                     "daughter(" + str(daughter_number) + ",{{variable}})",
                      "d" + str(daughter_number))
 
 
@@ -251,7 +251,7 @@ def convert_to_gd_vars(variables_list, daughter_number, granddaughter_number):
         list(str): new variables list
     """
     return wrap_list(variables_list,
-                     f"daughter({daughter_number}, daughter({granddaughter_number}, variable))",
+                     f"daughter({daughter_number}, daughter({granddaughter_number}, {{variable}}))",
                      f"d{daughter_number}_d{granddaughter_number}")
 
 

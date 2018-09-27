@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Thomas Hauth                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,7 @@
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogMessage.h>
 
+#include <memory>
 
 namespace Belle2 {
 
@@ -62,8 +63,8 @@ namespace Belle2 {
      */
     void printRepetitions();
 
-    LogConnectionBase* m_logConnection; /**< The actual log connection.*/
-    //LogMessage m_previousMessage;       /**< The previous log message. */
+    std::unique_ptr<LogConnectionBase> m_logConnection; /**< The actual log connection.*/
+    LogMessage m_previousMessage;       /**< The previous log message. */
     int m_repeatCounter;                /**< Counter for repeated messages. */
 
   };

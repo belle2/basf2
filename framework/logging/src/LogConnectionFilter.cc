@@ -26,7 +26,6 @@ LogConnectionFilter::LogConnectionFilter(LogConnectionBase* logConnection) :
 LogConnectionFilter::~LogConnectionFilter()
 {
   printRepetitions();
-  delete m_logConnection;
 }
 
 

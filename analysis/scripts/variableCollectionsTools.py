@@ -91,7 +91,7 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     If namings are ambiguous, prefix will contain hierarchy path indexes:
 
     * pi variabels selected as
-      ``B0 -> [D0 -> ^pi+`` (1) `` ^pi-`` (2) `` ^pi0`` (3) `` ] ^pi0`` (4)
+      ``B0 -> [D0 -> ^pi+`` (1) ``^pi-`` (2) ``^pi0`` (3) ``] ^pi0`` (4)
       will have the following prefixes:
 
       1. ``D0_pi_00_``
@@ -110,6 +110,7 @@ def convert_to_all_selected_vars(variables_list, decay_string):
 
     If you feel that such naming is clumsy, you always can add individual aliases
     for particles with `convert_to_one_selected_vars()` function:
+
     >>> variables_list = ['M','p']
     >>> decay_string = 'B0 -> [D0 -> pi+ ^pi- pi0] pi0'
     >>> aliases = convert_to_one_selected_vars(variables_list, decay_string, 'pim')

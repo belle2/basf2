@@ -25,6 +25,7 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
+#include <pxd/reconstruction/PXDGainCalibrator.h>
 
 #include <boost/format.hpp>
 
@@ -140,6 +141,7 @@ void PXDDQMClustersModule::defineHisto()
   m_chargStartRow = new TH1F*[nPXDSensors];
   m_startRowCount = new TH1F*[nPXDSensors];
   m_clusterCharge = new TH1F*[nPXDSensors];
+  m_clusterEnergy = new TH1F*[nPXDSensors];
   m_pixelSignal = new TH1F*[nPXDSensors];
   m_clusterSizeU = new TH1F*[nPXDSensors];
   m_clusterSizeV = new TH1F*[nPXDSensors];
@@ -210,6 +212,14 @@ void PXDDQMClustersModule::defineHisto()
     m_clusterCharge[i] = new TH1F(name.c_str(), title.c_str(), 256, 0, 256);
     m_clusterCharge[i]->GetXaxis()->SetTitle("charge of clusters [ADU]");
     m_clusterCharge[i]->GetYaxis()->SetTitle("counts");
+    //----------------------------------------------------------------
+    // Cluster Energy
+    //----------------------------------------------------------------
+    name = str(format("DQM_PXD_%1%_ClusterEnergy") % sensorDescr);
+    title = str(format("DQM PXD Sensor %1% Cluster Energy") % sensorDescr);
+    m_clusterEnergy[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 60000);
+    m_clusterEnergy[i]->GetXaxis()->SetTitle("energy of clusters [eV]");
+    m_clusterEnergy[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Pixel Signal
     //----------------------------------------------------------------
@@ -350,6 +360,7 @@ void PXDDQMClustersModule::beginRun()
     if (m_chargStartRow[i] != NULL) m_chargStartRow[i]->Reset();
     if (m_startRowCount[i] != NULL) m_startRowCount[i]->Reset();
     if (m_clusterCharge[i] != NULL) m_clusterCharge[i]->Reset();
+    if (m_clusterEnergy[i] != NULL) m_clusterEnergy[i]->Reset();
     if (m_pixelSignal[i] != NULL) m_pixelSignal[i]->Reset();
     if (m_clusterSizeU[i] != NULL) m_clusterSizeU[i]->Reset();
     if (m_clusterSizeV[i] != NULL) m_clusterSizeV[i]->Reset();
@@ -432,6 +443,13 @@ void PXDDQMClustersModule::event()
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
     if (m_hitMapClCounts != NULL) m_hitMapClCounts->Fill(index);
     if (m_clusterCharge[index] != NULL) m_clusterCharge[index]->Fill(cluster.getCharge());
+    // FIXME: The cluster charge is stored in ADU. We have to extract the
+    // area dependent conversion factor ADU->eV. Assume this is the same for all pixels of the
+    // cluster.
+    auto cluster_uID = SensorInfo.getUCellID(cluster.getU());
+    auto cluster_vID = SensorInfo.getVCellID(cluster.getV());
+    auto ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, cluster_uID, cluster_vID);
+    if (m_clusterEnergy[index] != NULL) m_clusterEnergy[index]->Fill(cluster.getCharge()* ADUToEnergy);
     if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getUSize());
     if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getVSize());
     if (m_clusterSizeUV[index] != NULL) m_clusterSizeUV[index]->Fill(cluster.getSize());

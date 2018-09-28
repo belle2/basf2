@@ -96,6 +96,9 @@ namespace Belle2 {
     /** distance of the track to the IP along the beam axis */
     double m_z0;
 
+    /** number of last CDC layer used for track fit */
+    int m_lastCDCLayer;
+
     /** detector region of cluster matched to track */
     int m_detectorRegion;
 

@@ -176,6 +176,8 @@ void ECLTrackClusterMatchingPerformanceModule::event()
         m_trackProperties.nSVDhits = fitResult->getHitPatternVXD().getNSVDHits();
         m_trackProperties.nCDChits = fitResult->getHitPatternCDC().getNHits();
 
+        m_lastCDCLayer = fitResult->getHitPatternCDC().getLastLayer();
+
         double shower_energy = 0., highest_track_related_shower_energy = 0.;
         const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
         for (const auto& eclCluster : b2Track->getRelationsTo<ECLCluster>(m_trackClusterRelationName)) {
@@ -293,6 +295,8 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits, m_dataTree);
   addVariableToTree("nSVDhits", m_trackProperties.nSVDhits, m_dataTree);
   addVariableToTree("nCDChits", m_trackProperties.nCDChits, m_dataTree);
+
+  addVariableToTree("lastCDCLayer", m_lastCDCLayer, m_dataTree);
 
   addVariableToTree("ECLMatch", m_matchedToECLCluster, m_dataTree);
   addVariableToTree("ShowerMatch", m_sameclusters, m_dataTree);

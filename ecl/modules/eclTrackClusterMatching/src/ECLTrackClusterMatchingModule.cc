@@ -162,8 +162,8 @@ void ECLTrackClusterMatchingModule::event()
     // never match tracks pointing towards gaps or adjacent part of barrel using angular distance
     if (trackTowardsGap(theta)) continue;
     int trackDetectorRegion = getDetectorRegion(theta);
-    // for low-pt tracks pointing towards the barrel never match based on the angular distance
-    if (pt < 0.3 && trackDetectorRegion == 2) continue;
+    // for low-pt tracks matching based on the angular distance is only applied if track points towards the FWD
+    if (pt < 0.3 && trackDetectorRegion != 1) continue;
     // Find extrapolated track hits in the ECL, considering only hit points
     // that either are on the sphere, closest to, or on radial direction of an
     // ECLCluster.
@@ -486,12 +486,8 @@ void ECLTrackClusterMatchingModule::optimizedPTMatchingConsistency(double theta,
       else m_matchingConsistency = 1e-18;
     }
   } else if (getDetectorRegion(theta) == 3 || getDetectorRegion(theta) == 13) {
-    if (pt < 0.2) m_matchingConsistency = 0.2;
-    else if (pt < 0.3) m_matchingConsistency = 0.1;
-    else if (pt < 0.333) m_matchingConsistency = 1e-2;
-    else if (pt < 0.366) m_matchingConsistency = 1e-3;
-    else if (pt < 0.45) m_matchingConsistency = 1e-4;
-    else if (pt < 0.7) m_matchingConsistency = 1e-5;
-    else m_matchingConsistency = 1e-6;
+    if (pt < 0.4) m_matchingConsistency = 1e-3;
+    else if (pt < 0.7) m_matchingConsistency = 1e-4;
+    else m_matchingConsistency = 1e-5;
   }
 }

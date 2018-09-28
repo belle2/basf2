@@ -64,7 +64,7 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
 
   if (m_alias.find(alias) != m_alias.end()) {
     if (variable == m_alias[alias]) { return true; }
-    B2WARNING("An alias with the name'" << alias << "' exists and is set to '" << m_alias[alias] << "', setting it to '" << variable <<
+    B2WARNING("An alias with the name '" << alias << "' exists and is set to '" << m_alias[alias] << "', setting it to '" << variable <<
               "'. Be aware: only the last alias defined before processing the events will be used!");
     m_alias[alias] = variable;
     return true;
@@ -77,6 +77,17 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
 
   m_alias.insert(std::make_pair(alias, variable));
   return true;
+}
+
+
+void Variable::Manager::printAliases()
+{
+  B2INFO("=========================");
+  B2INFO("Following aliases exists:");
+  for (auto a : m_alias) {
+    B2INFO("'" << a.first << "' --> '" << a.second << "'");
+  }
+  B2INFO("=========================");
 }
 
 bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)

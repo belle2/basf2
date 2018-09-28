@@ -12,6 +12,13 @@ def wrap_list(variables_list, wrapper, alias_prefix):
     >>> alias_prefix = 'pref'
     >>> print(wrap_list(variables_list, wrapper, alias_prefix))
     ['pref_M', 'pref_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'pref_M' --> 'daughter(1,M)'
+    [INFO] 'pref_p' --> 'daughter(1,p)'
+    [INFO] =========================
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -87,6 +94,14 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     >>> decay_string = 'B0 -> [D0 -> ^pi+ K-] pi0'
     >>> print(convert_to_all_selected_vars(variables_list, decay_string))
     ['D0_pi_M', 'D0_pi_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'D0_pi_M' --> 'daughter(0,daughter(0,M))'
+    [INFO] 'D0_pi_p' --> 'daughter(0,daughter(0,p))'
+    [INFO] =========================
+
 
     If namings are ambiguous, prefix will contain hierarchy path indexes:
 
@@ -107,6 +122,22 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     >>> print(convert_to_all_selected_vars(variables_list, decay_string))
     ['D0_pi_0_0_M', 'D0_pi_0_0_p', 'D0_pi_0_1_M', 'D0_pi_0_1_p',
      'D0_pi0_M', 'D0_pi0_p', 'pi0_M', 'pi0_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'D0_pi0_M' --> 'daughter(0,daughter(2,M))'
+    [INFO] 'D0_pi0_p' --> 'daughter(0,daughter(2,p))'
+    [INFO] 'D0_pi_0_0_M' --> 'daughter(0,daughter(0,M))'
+    [INFO] 'D0_pi_0_0_p' --> 'daughter(0,daughter(0,p))'
+    [INFO] 'D0_pi_0_1_M' --> 'daughter(0,daughter(1,M))'
+    [INFO] 'D0_pi_0_1_p' --> 'daughter(0,daughter(1,p))'
+    [INFO] 'D0_pi_M' --> 'daughter(0,daughter(0,M))'
+    [INFO] 'D0_pi_p' --> 'daughter(0,daughter(0,p))'
+    [INFO] 'pi0_M' --> 'daughter(1,M)'
+    [INFO] 'pi0_p' --> 'daughter(1,p)'
+    [INFO] =========================
+
 
     If you feel that such naming is clumsy, you always can add individual aliases
     for particles with `convert_to_one_selected_vars()` function:
@@ -118,6 +149,15 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     >>> aliases += convert_to_one_selected_vars(variables_list, decay_string, 'pip')
     >>> print(aliases)
     ['pim_M', 'pim_p', 'pip_M', 'pip_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'pim_M' --> 'daughter(0,daughter(1,M))'
+    [INFO] 'pim_p' --> 'daughter(0,daughter(1,p))'
+    [INFO] 'pip_M' --> 'daughter(0,daughter(0,M))'
+    [INFO] 'pip_p' --> 'daughter(0,daughter(0,p))'
+    [INFO] =========================
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -149,7 +189,7 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     for p in prefixes.keys():
         var_list += convert_to_nd_vars(variables_list, prefixes[p], p)
 
-    return var_list, prefixes
+    return var_list
 
 
 def convert_to_one_selected_vars(variables_list, decay_string, alias_prefix):
@@ -166,6 +206,14 @@ def convert_to_one_selected_vars(variables_list, decay_string, alias_prefix):
     >>> decay_string = 'B0 -> [D0 -> pi+ ^pi- pi0] pi0'
     >>> print(convert_to_one_selected_vars(variables_list, decay_string, 'pim'))
     ['pim_M', 'pim_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'pim_M' --> 'daughter(0,daughter(1,M))'
+    [INFO] 'pim_p' --> 'daughter(0,daughter(1,p))'
+    [INFO] =========================
+
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -196,6 +244,13 @@ def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
     >>> hierarcy_path = [0, 1]
     >>> print(convert_to_nd_vars(variables_list, hierarcy_path, 'pim'))
     ['pim_M', 'pim_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'pim_M' --> 'daughter(0,daughter(1,M))'
+    [INFO] 'pim_p' --> 'daughter(0,daughter(1,p))'
+    [INFO] =========================
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -205,7 +260,7 @@ def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
     Returns:
         list(str): new variables list
     """
-    wrapper = '{{variable}}'
+    wrapper = '{variable}'
     for h in reversed(hierarchy_path):
         wrapper = "daughter(" + str(h) + "," + wrapper + ")"
     return wrap_list(variables_list, wrapper, alias_prefix)
@@ -219,6 +274,13 @@ def convert_to_daughter_vars(variables_list, daughter_number):
     >>> daughter_number = 1
     >>> print(convert_to_daughter_vars(variables_list, daughter_number))
     ['d1_M', 'd1_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'd1_M' --> 'daughter(1,M)'
+    [INFO] 'd1_p' --> 'daughter(1,p)'
+    [INFO] =========================
 
 
     Parameters:
@@ -229,7 +291,7 @@ def convert_to_daughter_vars(variables_list, daughter_number):
         list(str): new variables list
     """
     return wrap_list(variables_list,
-                     "daughter(" + str(daughter_number) + ",{{variable}})",
+                     "daughter(" + str(daughter_number) + ",{variable})",
                      "d" + str(daughter_number))
 
 
@@ -242,6 +304,13 @@ def convert_to_gd_vars(variables_list, daughter_number, granddaughter_number):
     >>> granddaughter_number = 2
     >>> print(convert_to_gd_vars(variables_list, daughter_number, granddaughter_number))
     ['d1_d2_M', 'd1_d2_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'd1_d2_M' --> 'daughter(1, daughter(2, M))
+    [INFO] 'd1_d2_p' --> 'daughter(1, daughter(2, p))
+    [INFO] =========================
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -263,6 +332,14 @@ def make_mc(variables_list):
     >>> variables_list = ['M','p']
     >>> print(make_mc(variables_list))
     ['mmc_M', 'mmc_p']
+    >>> from variables import variables
+    >>> variables.printAliases()
+    [INFO] =========================
+    [INFO] Following aliases exists:
+    [INFO] 'mmc_M' --> 'matchedMC(M)'
+    [INFO] 'mmc_p' --> 'matchedMC(p)'
+    [INFO] =========================
+
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -271,7 +348,7 @@ def make_mc(variables_list):
         list(str): new variables list
     """
     return wrap_list(variables_list,
-                     'matchedMC({{variable}})',
+                     'matchedMC({variable})',
                      'mmc')
 
 

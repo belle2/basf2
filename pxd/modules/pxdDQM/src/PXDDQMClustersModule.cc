@@ -13,7 +13,7 @@
 #include "pxd/modules/pxdDQM/PXDDQMClustersModule.h"
 
 #include <framework/core/HistoModule.h>
-
+#include <framework/gearbox/Unit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -449,7 +449,7 @@ void PXDDQMClustersModule::event()
     auto cluster_uID = SensorInfo.getUCellID(cluster.getU());
     auto cluster_vID = SensorInfo.getVCellID(cluster.getV());
     auto ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, cluster_uID, cluster_vID);
-    if (m_clusterEnergy[index] != NULL) m_clusterEnergy[index]->Fill(cluster.getCharge()* ADUToEnergy);
+    if (m_clusterEnergy[index] != NULL) m_clusterEnergy[index]->Fill(cluster.getCharge()* ADUToEnergy / Unit::eV);
     if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getUSize());
     if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getVSize());
     if (m_clusterSizeUV[index] != NULL) m_clusterSizeUV[index]->Fill(cluster.getSize());

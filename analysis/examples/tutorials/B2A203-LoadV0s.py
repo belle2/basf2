@@ -96,7 +96,7 @@ ma.printList(list_name='Lambda0:all', full=False, path=my_path)
 pi0_vars = vc.kinematics + \
     vc.pid +  \
     vc.track + \
-    vc.track_hist + \
+    vc.track_hits + \
     vc.mc_truth
 
 v0_vars = vc.event_meta_data + \

@@ -37,7 +37,7 @@ from stdPi0s import stdPi0s
 
 # check if the required input file exists
 import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B02D0pi_D02pi0pi0.root'):
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B02D0pi0_D02pi0pi0.root'):
     b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
 # create path
@@ -45,7 +45,7 @@ my_path = ma.analysis_main
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename='$BELLE2_EXAMPLES_DATA/B02D0pi_D02pi0pi0.root',
+             filename='$BELLE2_EXAMPLES_DATA/B02D0pi0_D02pi0pi0.root',
              path=my_path)
 
 
@@ -93,11 +93,12 @@ variables = [
 ]
 
 # safe the output
+output_name = "B2A400-TreeFit.root"
 my_path.add_module('VariablesToNtuple',
                    treeName='B0',
                    particleList='B0:all',
                    variables=variables,
-                   fileName=out_put_name)
+                   fileName=output_name)
 
 # Process the events
 b2.process(my_path)

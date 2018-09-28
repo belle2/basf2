@@ -136,12 +136,9 @@ mu_vars = vc.mc_truth
 u4s_vars = vc.mc_truth + \
     vc.roe_multiplicities + \
     vc.recoil_kinematics + \
-    vc.extra_energy + \
     vc.kinematics + \
     vct.convert_to_all_selected_vars(variables_list=b_vars,
                                      decay_string='Upsilon(4S) -> ^B- mu+') + \
-    vct.convert_to_all_selected_vars(variables_list=d_vars,
-                                     decay_string='Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
     vct.convert_to_all_selected_vars(variables_list=mu_vars,
                                      decay_string='Upsilon(4S) -> B- ^mu+')
 

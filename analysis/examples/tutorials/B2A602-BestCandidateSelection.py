@@ -54,7 +54,7 @@ stdc.stdPi('all', path=my_path)
 # rank all pions of the event by momentum magnitude
 # variable stored to extraInfo as pi_p_rank
 ma.rankByLowest(particleList='pi+:all',
-                variables='p',
+                variable='p',
                 outputVariable='pi_p_rank',
                 path=my_path)
 
@@ -136,11 +136,11 @@ d0_vars = vc.event_meta_data + \
 
 # Saving variables to ntuple
 output_file = 'B2A602-BestCandidateSelection.root'
-variablesToNtuple(decayString='D0',
-                  variables=d0_vars,
-                  filename=output_file,
-                  treename='D0',
-                  path=my_path)
+ma.variablesToNtuple(decayString='D0',
+                     variables=d0_vars,
+                     filename=output_file,
+                     treename='D0',
+                     path=my_path)
 
 
 # Process the events

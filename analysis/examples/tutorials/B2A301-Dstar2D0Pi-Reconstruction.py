@@ -70,7 +70,8 @@ fs_hadron_vars = vct.convert_to_all_selected_vars(
 
 d0_vars = vct.convert_to_one_selected_vars(
     variables_list=vc.inv_mass + vc.mc_truth,
-    decay_string='D*+ -> ^D0 pi+', 'D0')
+    decay_string='D*+ -> ^D0 pi+',
+    alias_prefix='D0')
 
 
 # Saving variables to ntuple

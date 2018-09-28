@@ -34,7 +34,7 @@ vct.add_collection(kinematics, 'Kinematics')
 
 #: Kinematic variables in CMS
 ckm_kinematics = vct.wrap_list(kinematics,
-                               "useCMSFrame(variable)",
+                               "useCMSFrame({variable})",
                                "CMS")
 
 #: Cluster-related variables
@@ -121,7 +121,8 @@ pid = [
 
 #: Replacement for ROEMultiplicities tool
 roe_multiplicities = [
-    'nROEKLMClusters']
+    'nROE_KLMClusters',
+]
 
 #: Recoil kinematics relaed variables
 recoil_kinematics = [
@@ -132,11 +133,14 @@ recoil_kinematics = [
     'pyRecoil',
     'pzRecoil']
 
-#: see BII-3874
-flight_info = []
+#: Flight info variables
+flight_info = ['flightTime',
+               'flightDistance',
+               'flightTimeErr',
+               'flightDistanceErr']
 
-#: see BII-3874
-mc_flight_info = []
+#: MC true flight info variables
+mc_flight_info = vct.make_mc(flight_info)
 
 #: Replacement for Vertex tuple tool
 #: see BII-3876
@@ -204,6 +208,12 @@ inv_mass = [
 ]
 
 #: Replacement for MassBeforeFit tool
+mass_before_fit = [
+    'ErrM',
+    'InvM'
+]
+
+#: Extra energy variables
 mass_before_fit = [
     'ErrM',
     'InvM'

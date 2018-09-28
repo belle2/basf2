@@ -30,7 +30,7 @@ from stdPi0s import stdPi0s
 
 # check if the required input file exists
 import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B02D0pi_D02pi0pi0.root'):
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B02D0pi0_D02pi0pi0.root'):
     b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
 # create path
@@ -38,7 +38,7 @@ my_path = ma.analysis_main
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename='$BELLE2_EXAMPLES_DATA/B02D0pi_D02pi0pi0.root',
+             filename='$BELLE2_EXAMPLES_DATA/B02D0pi0_D02pi0pi0.root',
              path=my_path)
 
 
@@ -71,10 +71,10 @@ B0_vars = vc.event_meta_data + \
     vc.inv_mass + \
     vc.mc_truth + \
     vct.convert_to_all_selected_vars(
-        variable_list=vc.inv_mass + vc.mc_truth,
+        variables_list=vc.inv_mass + vc.mc_truth,
         decay_string='B0 -> ^D0 ^pi0') + \
     vct.convert_to_all_selected_vars(
-        variable_list=vc.cluster,
+        variables_list=vc.cluster,
         decay_string='B0 -> D0 [pi0 -> ^gamma ^gamma]')
 
 pi0_vars = vc.mc_truth + \
@@ -83,7 +83,7 @@ pi0_vars = vc.mc_truth + \
     vc.event_meta_data + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vct.convert_to_all_selected_vars(
-        variable_list=vc.cluster + vc.kinematics,
+        variables_list=vc.cluster + vc.kinematics,
         decay_string='pi0 -> ^gamma ^gamma')
 
 

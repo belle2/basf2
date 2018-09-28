@@ -366,6 +366,6 @@ def add_collection(variables_list, collection_name):
     Returns:
         str: name of the variable collection
     """
-    from variables import variables
-    variables.addCollection(collection_name, v.std_vector(tuple(variables_list)))
+    import variables as v
+    v.variables.addCollection(collection_name, v.std_vector(*tuple(variables_list)))
     return collection_name

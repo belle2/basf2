@@ -56,7 +56,7 @@ ma.fillParticleList(decayString='gamma:highE',
                     path=my_path)
 ma.fillParticleList(decayString='pi+:loose',
                     cut='abs(d0) < 0.5 and abs(z0) < 0.5 and pionID > 0.002',
-                    patth=my_path)
+                    path=my_path)
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV
@@ -175,7 +175,7 @@ ma.rankByLowest(particleList='pi0:veto',
 
 # write the invariant mass of the best pi0 candidate to the current B0
 # candidate as the 'pi0veto' extraInfo
-variableToSignalSideExtraInfo(particleList='pi0:veto', varToExtraInfo={'M': 'pi0veto'}, path=roe_path)
+ma.variableToSignalSideExtraInfo(particleList='pi0:veto', varToExtraInfo={'M': 'pi0veto'}, path=roe_path)
 
 # execute roe_path for each RestOfEvent in the event
 my_path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

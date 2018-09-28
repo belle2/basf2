@@ -26,7 +26,7 @@ import modularAnalysis as ma
 
 # check if the required input file exists
 import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/for_B2A102.root'):
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu_evtgen.root'):
     b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
 
 # create path
@@ -34,7 +34,7 @@ my_path = ma.analysis_main
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename='$BELLE2_EXAMPLES_DATA/B2A102.root',
+             filename='$BELLE2_EXAMPLES_DATA/B2pi0D_D2hh_D2hhh_B2munu_evtgen.root',
              path=my_path)
 
 # In case of conflict with geometry, you may use this line instead:
@@ -49,7 +49,7 @@ re.add_reconstruction(path=my_path)
 # dump in MDST format
 mdst.add_mdst_output(path=my_path,
                      mc=True,
-                     filename='from_B2A102.root')
+                     filename='B2pi0D_D2hh_D2hhh_B2munu.root')
 
 # Show progress of processing
 progress = b2.register_module('ProgressBar')

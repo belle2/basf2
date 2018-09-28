@@ -71,11 +71,11 @@ b_vars = vc.event_meta_data + \
     vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
-    vct.convert_to_all_selected_vars(variables=gamma_vars,
+    vct.convert_to_all_selected_vars(variables_list=gamma_vars,
                                      decay_string='B0 -> rho0 ^gamma') + \
-    vct.convert_to_all_selected_vars(variables=rho_vars,
+    vct.convert_to_all_selected_vars(variables_list=rho_vars,
                                      decay_string='B0 -> ^rho0 gamma') + \
-    vct.convert_to_all_selected_vars(variables=rho_vars,
+    vct.convert_to_all_selected_vars(variables_list=rho_vars,
                                      decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma')
 
 # Saving variables to ntuple

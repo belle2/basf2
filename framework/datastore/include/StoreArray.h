@@ -187,7 +187,7 @@ namespace Belle2 {
      * @param namedRelation Additional name for the relation, or "" for the default naming
      */
     template <class TO> bool registerRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event,
-                                                DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut, std::string namedRelation = "") const
+                                                DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut, const std::string& namedRelation = "") const
     {
       return DataStore::Instance().registerRelation(*this, toArray, durability, storeFlags, namedRelation);
     }
@@ -203,7 +203,7 @@ namespace Belle2 {
      */
     template <class TO> bool requireRelationTo(const StoreArray<TO>& toArray,
                                                DataStore::EDurability durability = DataStore::c_Event,
-                                               std::string const& namedRelation = "") const
+                                               const std::string& namedRelation = "") const
     {
       return DataStore::Instance().requireRelation(*this, toArray, durability, namedRelation);
     }
@@ -220,7 +220,7 @@ namespace Belle2 {
      */
     template <class TO> bool optionalRelationTo(const StoreArray<TO>& toArray,
                                                 DataStore::EDurability durability = DataStore::c_Event,
-                                                std::string const& namedRelation = "") const
+                                                const std::string& namedRelation = "") const
     {
       return DataStore::Instance().optionalRelation(*this, toArray, durability, namedRelation);
     }

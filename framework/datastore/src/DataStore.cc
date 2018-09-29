@@ -242,7 +242,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
 }
 
 bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
-                                 EStoreFlags storeFlags, std::string namedRelation)
+                                 EStoreFlags storeFlags, const std::string& namedRelation)
 {
   if (!fromArray.isArray())
     B2FATAL(fromArray.readableName() << " is not an array!");
@@ -468,7 +468,7 @@ const std::vector<std::string>& DataStore::getArrayNames(const std::string& name
 }
 
 void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject,
-                            StoreEntry*& toEntry, int& toIndex, float weight, std::string namedRelation)
+                            StoreEntry*& toEntry, int& toIndex, float weight, const std::string& namedRelation)
 {
   if (!fromObject or !toObject)
     return;
@@ -521,7 +521,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 }
 
 RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry,
-                                               int& index, const TClass* withClass, const std::string& withName, std::string namedRelation)
+                                               int& index, const TClass* withClass, const std::string& withName, const std::string& namedRelation)
 {
   if (searchSide == c_BothSides) {
     auto result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName, namedRelation);

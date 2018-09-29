@@ -176,7 +176,7 @@ namespace Belle2 {
 
     /** Return storage name for a relation between two arrays of the given names. */
     static std::string relationName(const std::string& fromName, const std::string& toName,
-                                    std::string namedRelation = "")
+                                    std::string const& namedRelation = "")
     {
       std::string s;
       s.reserve(fromName.length() + toName.length() + 2);
@@ -222,7 +222,7 @@ namespace Belle2 {
      *  @sa DependencyMap
      */
     bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
-                          EStoreFlags storeFlags, std::string namedRelation);
+                          EStoreFlags storeFlags, const std::string& namedRelation);
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
@@ -317,7 +317,7 @@ namespace Belle2 {
      *  @param namedRelation  Additional name for the relation, or "" for the default naming
      */
     void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry,
-                     int& toIndex, float weight, std::string namedRelation);
+                     int& toIndex, float weight, const std::string& namedRelation);
 
 
     /** Get the relations between an object and other objects in a store array.
@@ -335,7 +335,7 @@ namespace Belle2 {
      *  @return               Vector of relation entry objects (not type-safe).
      */
     RelationVectorBase getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
-                                        const TClass* withClass, const std::string& withName, std::string namedRelation);
+                                        const TClass* withClass, const std::string& withName, const std::string& namedRelation);
 
     /** Get the first relation between an object and another object in a store array.
      *
@@ -365,7 +365,7 @@ namespace Belle2 {
      *  @param namedRelation  Additional name for the relation, or "" for the default naming
      */
     static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, float weight = 1.0,
-                                  std::string namedRelation = "")
+                                  const std::string& namedRelation = "")
     {
       DataStore::StoreEntry* fromEntry = nullptr;
       int fromIndex = -1;
@@ -390,7 +390,7 @@ namespace Belle2 {
      *  @return               Vector of relation entry objects.
      */
     template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, const std::string& name = "",
-        std::string namedRelation = "")
+        const std::string& namedRelation = "")
     {
       StoreEntry* storeEntry = nullptr;
       int index = -1;
@@ -409,7 +409,7 @@ namespace Belle2 {
      *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return        The related object or a null pointer.
      */
-    template <class T> static T* getRelated(const TObject* object, const std::string& name = "", std::string namedRelation = "")
+    template <class T> static T* getRelated(const TObject* object, const std::string& name = "", const std::string& namedRelation = "")
     {
       if (!object) return nullptr;
       StoreEntry* storeEntry = nullptr;

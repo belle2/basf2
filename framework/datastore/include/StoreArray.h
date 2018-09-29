@@ -198,12 +198,14 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this StoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Additional name for the relation, or "" for the default naming
      * @return            True if the relations exists.
      */
     template <class TO> bool requireRelationTo(const StoreArray<TO>& toArray,
-                                               DataStore::EDurability durability = DataStore::c_Event) const
+                                               DataStore::EDurability durability = DataStore::c_Event,
+                                               std::string const& namedRelation = "") const
     {
-      return DataStore::Instance().requireRelation(*this, toArray, durability);
+      return DataStore::Instance().requireRelation(*this, toArray, durability, namedRelation);
     }
 
     /** Tell the data store about a relation that we could make use of. (aka. optional input)
@@ -213,12 +215,14 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this StoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Additional name for the relation, or "" for the default naming
      * @return            True if the relations exists.
      */
     template <class TO> bool optionalRelationTo(const StoreArray<TO>& toArray,
-                                                DataStore::EDurability durability = DataStore::c_Event) const
+                                                DataStore::EDurability durability = DataStore::c_Event,
+                                                std::string const& namedRelation = "") const
     {
-      return DataStore::Instance().optionalRelation(*this, toArray, durability);
+      return DataStore::Instance().optionalRelation(*this, toArray, durability, namedRelation);
     }
 
     /** Delete all entries in this array.

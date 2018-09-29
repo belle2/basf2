@@ -201,6 +201,13 @@ namespace {
   }
 
   /** Test using named relations */
+  TEST_F(RelationsObjectTest, NamedRelationsWithInvalidName)
+  {
+    const std::string relationName = "ExtraRelation WithSpaceInName";
+    EXPECT_B2FATAL(relObjData.registerRelationTo(profileData, DataStore::c_Event, DataStore::c_WriteOut, relationName));
+  }
+
+  /** Test using named relations */
   TEST_F(RelationsObjectTest, NamedRelations)
   {
     const std::string relationName = "ExtraRelation";
@@ -230,6 +237,12 @@ namespace {
     EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[1]->getRelatedToWithWeight<ProfileInfo>("", relationName));
     EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[0]->getRelatedFromWithWeight<ProfileInfo>("", relationName));
     EXPECT_TRUE(std::make_pair(profileData[0], -42.0f) == relObjData[0]->getRelatedWithWeight<ProfileInfo>("", relationName));
+
+    // Check if the "ALL" parameter also works
+    StoreEntry* storeEntry = nullptr;
+    int index = -1;
+    auto allRelations = DataStore::Instance().getRelationsWith(DataStore::c_FromSide, (relObjData)[0], storeEntry, index,
+                                                               TObject::Class(), "ALL", "");
 
     //adding relations to NULL is safe and doesn't do anything
     (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr), 1.0, relationName);

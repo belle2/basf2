@@ -242,14 +242,14 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
 }
 
 bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
-                                 EStoreFlags storeFlags)
+                                 EStoreFlags storeFlags, std::string namedRelation)
 {
   if (!fromArray.isArray())
     B2FATAL(fromArray.readableName() << " is not an array!");
   if (!toArray.isArray())
     B2FATAL(toArray.readableName() << " is not an array!");
 
-  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName(), namedRelation);
   /*
   if ((fromArray.notWrittenOut() or toArray.notWrittenOut()) and !(storeFlags & c_DontWriteOut)) {
     B2WARNING("You're trying to register a persistent relation " << relName << " from/to an array which is not written out (DataStore::c_DontWriteOut flag)! Relation will also not be saved!");
@@ -464,7 +464,7 @@ const std::vector<std::string>& DataStore::getArrayNames(const std::string& name
 }
 
 void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject,
-                            StoreEntry*& toEntry, int& toIndex, float weight)
+                            StoreEntry*& toEntry, int& toIndex, float weight, std::string namedRelation)
 {
   if (!fromObject or !toObject)
     return;
@@ -482,7 +482,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   }
 
   // get the relations from -> to
-  const string& relationsName = relationName(fromEntry->name, toEntry->name);
+  const string& relationsName = relationName(fromEntry->name, toEntry->name, namedRelation);
   const StoreEntryIter& it = m_storeEntryMap[c_Event].find(relationsName);
   if (it == m_storeEntryMap[c_Event].end()) {
     B2FATAL("No relation '" << relationsName <<
@@ -517,7 +517,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 }
 
 RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry,
-                                               int& index, const TClass* withClass, const std::string& withName)
+                                               int& index, const TClass* withClass, const std::string& withName, std::string namedRelation)
 {
   if (searchSide == c_BothSides) {
     auto result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName);
@@ -538,7 +538,8 @@ RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TOb
   // loop over found store arrays
   for (const std::string& name : names) {
     // get the relations from -> to
-    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name, namedRelation) : relationName(name,
+                                  entry->name, namedRelation);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
@@ -568,12 +569,12 @@ RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TOb
 }
 
 RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry, int& index,
-                                         const TClass* withClass, const std::string& withName)
+                                         const TClass* withClass, const std::string& withName, const std::string& namedRelation)
 {
   if (searchSide == c_BothSides) {
-    RelationEntry result = getRelationWith(c_ToSide, object, entry, index, withClass, withName);
+    RelationEntry result = getRelationWith(c_ToSide, object, entry, index, withClass, withName, namedRelation);
     if (!result.object) {
-      result = getRelationWith(c_FromSide, object, entry, index, withClass, withName);
+      result = getRelationWith(c_FromSide, object, entry, index, withClass, withName, namedRelation);
     }
     return result;
   }
@@ -587,7 +588,8 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   // loop over found store arrays
   for (const std::string& name : names) {
     // get the relations from -> to
-    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name, namedRelation) : relationName(name,
+                                  entry->name, namedRelation);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;

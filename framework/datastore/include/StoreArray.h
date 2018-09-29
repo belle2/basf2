@@ -184,11 +184,12 @@ namespace Belle2 {
      * @param toArray    Array the relation should point to (from this StoreArray)
      * @param durability Durability of the relation.
      * @param storeFlags ORed combination of DataStore::EStoreFlags
+     * @param namedRelation Additional name for the relation, or "" for the default naming
      */
     template <class TO> bool registerRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event,
-                                                DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) const
+                                                DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut, std::string namedRelation = "") const
     {
-      return DataStore::Instance().registerRelation(*this, toArray, durability, storeFlags);
+      return DataStore::Instance().registerRelation(*this, toArray, durability, storeFlags, namedRelation);
     }
 
     /** Produce error if no relation from this array to 'toArray' has been registered.

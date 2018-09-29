@@ -249,6 +249,10 @@ bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const Store
   if (!toArray.isArray())
     B2FATAL(toArray.readableName() << " is not an array!");
 
+  // check the the namedRelation only contains regular characters
+  if (!std::regex_match(namedRelation, m_regexNamedRelationCheck))
+    B2FATAL("Named Relations can only contain alphabetic characters, given was: " << namedRelation);
+
   const std::string& relName = relationName(fromArray.getName(), toArray.getName(), namedRelation);
   /*
   if ((fromArray.notWrittenOut() or toArray.notWrittenOut()) and !(storeFlags & c_DontWriteOut)) {
@@ -520,8 +524,8 @@ RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TOb
                                                int& index, const TClass* withClass, const std::string& withName, std::string namedRelation)
 {
   if (searchSide == c_BothSides) {
-    auto result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName);
-    const auto& fromResult = getRelationsWith(c_FromSide, object, entry, index, withClass, withName);
+    auto result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName, namedRelation);
+    const auto& fromResult = getRelationsWith(c_FromSide, object, entry, index, withClass, withName, namedRelation);
     result.add(fromResult);
     return result;
   }
@@ -693,7 +697,8 @@ bool DataStore::optionalInput(const StoreAccessorBase& accessor)
   return (getEntry(accessor) != nullptr);
 }
 
-bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability)
+bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                                std::string const& namedRelation)
 {
   if (!m_initializeActive) {
     B2FATAL("Attempt to require relation " << fromArray.readableName() << " -> " << toArray.readableName() <<
@@ -705,18 +710,19 @@ bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreA
   if (!toArray.isArray())
     B2FATAL(toArray.readableName() << " is not an array!");
 
-  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName(), namedRelation);
   return DataStore::Instance().requireInput(StoreAccessorBase(relName, durability, RelationContainer::Class(), false));
 }
 
-bool DataStore::optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability)
+bool DataStore::optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                                 std::string const& namedRelation)
 {
   if (!fromArray.isArray())
     B2FATAL(fromArray.readableName() << " is not an array!");
   if (!toArray.isArray())
     B2FATAL(toArray.readableName() << " is not an array!");
 
-  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName(), namedRelation);
   return DataStore::Instance().optionalInput(StoreAccessorBase(relName, durability, RelationContainer::Class(), false));
 }
 

@@ -18,6 +18,7 @@
 #include <framework/datastore/RelationEntry.h>
 #endif
 
+#include <regex>
 #include <array>
 #include <vector>
 #include <string>
@@ -182,6 +183,12 @@ namespace Belle2 {
       s += fromName;
       s += "To";
       s += toName;
+      if (namedRelation.length() > 0) {
+        s += "Named";
+        // Characters are not escaped here, because in registerRelation, the namedRelation
+        // given is checked to contain no special characters or white spaces
+        s += namedRelation;
+      }
       return s;
     }
 
@@ -232,13 +239,15 @@ namespace Belle2 {
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
-    bool requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
+    bool requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                         std::string const& namedRelation);
 
     /** Register the given object/array as an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *
      *  @param accessor   Encapsulates name, durability, and type
+     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
@@ -247,11 +256,12 @@ namespace Belle2 {
     /** Register the given relation as an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
-     *
+     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
-    bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
+    bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                          std::string const& namedRelation);
 
     /** Check whether an entry with the correct type is registered in the DataStore map and return it.
      *
@@ -578,6 +588,12 @@ namespace Belle2 {
      * Creating new map slots is only allowed in a Module's initialize() function.
      */
     bool m_initializeActive;
+
+    /**
+     * Regular expression to check that no special characters and no
+     * white spaces are in the string given for namedRelations.
+     */
+    const std::regex m_regexNamedRelationCheck = std::regex("^[a-zA-Z]*$");
 
     /** Collect information about the dependencies between modules. */
     DependencyMap* m_dependencyMap;

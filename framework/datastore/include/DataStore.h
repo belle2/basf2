@@ -320,7 +320,8 @@ namespace Belle2 {
      *  @param withName        The name of the store array to or from which the relations point.
      *                        If empty the default store array name for withClass will be used.
      *                        If the special name "ALL" is given all store arrays containing object of type withClass are considered.
-     *  @param namedRelation  Additional name for the relation, or "" for the default naming
+     *  @param namedRelation  Additional name for the relation, or "" for the default naming. If withName is "ALL", the
+     *                        namedRelation parameter is ignored and all related objects are returned.
      *  @return               Vector of relation entry objects (not type-safe).
      */
     RelationVectorBase getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
@@ -336,7 +337,8 @@ namespace Belle2 {
      *  @param withName       The name of the store array to or from which the relation points.
      *                        If empty the default store array name for withClass will be used.
      *                        If the special name "ALL" is given all store arrays containing object of type withClass are considered.
-     *  @param namedRelation Additional name for the relation, or "" for the default naming
+     *  @param namedRelation Additional name for the relation, or "" for the default naming. If withName is "ALL", the
+     *                        namedRelation parameter is ignored and all related objects are returned.
      *  @return               The entry of the first related object.
      */
     Belle2::RelationEntry getRelationWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,

@@ -217,7 +217,7 @@ void PXDDQMClustersModule::defineHisto()
     //----------------------------------------------------------------
     name = str(format("DQM_PXD_%1%_ClusterEnergy") % sensorDescr);
     title = str(format("DQM PXD Sensor %1% Cluster Energy") % sensorDescr);
-    m_clusterEnergy[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 60000);
+    m_clusterEnergy[i] = new TH1F(name.c_str(), title.c_str(), 100, 0, 60000);
     m_clusterEnergy[i]->GetXaxis()->SetTitle("energy of clusters [eV]");
     m_clusterEnergy[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------

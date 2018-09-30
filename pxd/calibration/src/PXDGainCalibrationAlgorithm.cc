@@ -262,14 +262,22 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
 
   auto dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
   auto mcMedian = CalculateMedian(mc_signals);
-
   double gain =  dataMedian / mcMedian;
   if (gain <= 0) {
     B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
               ". Set gain to default value (=1.0) as well.");
     gain = 1.0;
   }
-  return gain;
+
+  auto gainFromDB = GetCurrentGainFromDB(sensorID, uBin, vBin);
+  B2INFO("Gain from db used in PXDDigitizer is " << gainFromDB);
+  B2INFO("New gain correction derived is " << gain);
+  B2INFO("The total gain we should return is " << gain * gainFromDB);
+
+  // FIXME: if gain is close to 1.0, the calibration has converged and
+  // we no further iteration. otherwise, we should iterate.
+
+  return gain * gainFromDB;
 }
 
 double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin)
@@ -282,7 +290,7 @@ double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsign
   dbtree->SetBranchAddress("exp", &m_exp);
   dbtree->SetBranchAddress("chargeMap", &chargeMapPtr);
 
-  // Compute running average of valiie d
+  // Compute running average of charge medians from db
   double sum = 0;
   int counter = 0;
 
@@ -295,6 +303,31 @@ double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsign
   }
   return sum / counter;
 }
+
+double PXDGainCalibrationAlgorithm::GetCurrentGainFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+{
+  // Read back db payloads
+  PXDGainMapPar* gainMapPtr = &m_gainMap;
+
+  auto dbtree = getObjectPtr<TTree>("dbtree");
+  dbtree->SetBranchAddress("run", &m_run);
+  dbtree->SetBranchAddress("exp", &m_exp);
+  dbtree->SetBranchAddress("gainMap", &gainMapPtr);
+
+  // Compute running average of gains from db
+  double sum = 0;
+  int counter = 0;
+
+  // Loop over dbtree
+  const auto nEntries = dbtree->GetEntries();
+  for (int i = 0; i < nEntries; ++i) {
+    dbtree->GetEntry(i);
+    sum += m_gainMap.getContent(sensorID.getID(), uBin, vBin);
+    counter += 1;
+  }
+  return sum / counter;
+}
+
 
 double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 {

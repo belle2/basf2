@@ -41,6 +41,18 @@ namespace Belle2 {
       m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_CE(CE), m_QE(qe)
     {}
 
+    void set(float lambdaFirst, float lambdaStep, float CE,
+             const std::vector<float>& qe,
+             const std::string& name)
+    {
+
+      m_lambdaFirst = lambdaFirst;
+      m_lambdaStep = lambdaStep;
+      m_CE = CE;
+      m_QE = qe;
+      setName(name);
+    }
+
     /**
      * Returns quantum efficiency data points
      * @return quantum efficiency data points

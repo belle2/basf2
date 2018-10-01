@@ -18,7 +18,7 @@
 #include <geometry/Materials.h>
 #include <iostream>
 #include <TSpline.h>
-
+#include <algorithm>
 
 using namespace std;
 
@@ -76,11 +76,7 @@ namespace Belle2 {
         return;
       }
 
-      // print geometry if the debug level for 'top' is set 10000
-      const auto& logSystem = LogSystem::Instance();
-      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
-        m_geo->print();
-      }
+      finalizeInitialization();
 
       m_valid = true;
     }
@@ -117,15 +113,24 @@ namespace Belle2 {
         return;
       }
 
-      // print geometry if the debug level for 'top' is set 10000
-      const auto& logSystem = LogSystem::Instance();
-      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
-        m_geo->print();
-      }
+      finalizeInitialization();
 
       m_valid = true;
     }
 
+    void TOPGeometryPar::finalizeInitialization()
+    {
+      // update and add call backs for PMT data
+      setEnvelopeQE();
+      m_pmtQEData.addCallback(this, &TOPGeometryPar::setEnvelopeQE);
+
+      // print geometry if the debug level for 'top' is set 10000
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
+        m_geo->print();
+        m_envelopeQE.print("Envelope QE");
+      }
+    }
 
     const TOPGeometry* TOPGeometryPar::getGeometry() const
     {
@@ -591,10 +596,7 @@ namespace Belle2 {
 
     double TOPGeometryPar::getPMTEfficiencyEnvelope(double energy) const
     {
-      // provisional only!
-      const auto* geo = getGeometry();
-      double qeffi = geo->getNominalQE().getEfficiency(energy);
-      return qeffi;
+      return m_envelopeQE.getEfficiency(energy);
     }
 
     double TOPGeometryPar::getPMTEfficiency(double energy,
@@ -605,6 +607,73 @@ namespace Belle2 {
       const auto* geo = getGeometry();
       double qeffi = geo->getNominalQE().getEfficiency(energy);
       return qeffi;
+    }
+
+    void TOPGeometryPar::setEnvelopeQE()
+    {
+      if (m_pmtQEData.getEntries() == 0) {
+        B2ERROR("DBArray TOPPmtQEs is empty");
+        return;
+      }
+
+      double lambdaFirst = 0;
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaFirst() > 0) {
+          lambdaFirst = pmt.getLambdaFirst();
+          break;
+        }
+      }
+      if (lambdaFirst == 0) {
+        B2ERROR("DBArray TOPPmtQEs: lambdaFirst of all PMT found to be less or equal 0");
+        return;
+      }
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaFirst() > 0) {
+          lambdaFirst = std::min(lambdaFirst, pmt.getLambdaFirst());
+        }
+      }
+
+      double lambdaStep = 0;
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaStep() > 0) {
+          lambdaStep = pmt.getLambdaStep();
+          break;
+        }
+      }
+      if (lambdaStep == 0) {
+        B2ERROR("DBArray TOPPmtQEs: lambdaStep of all PMT found to be less or equal 0");
+        return;
+      }
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaStep() > 0) {
+          lambdaStep = std::min(lambdaStep, pmt.getLambdaStep());
+        }
+      }
+
+      std::vector<float> envelopeQE;
+      for (const auto& pmt : m_pmtQEData) {
+        float ce = std::max(pmt.getCE0(), pmt.getCE());
+        if (pmt.getLambdaFirst() == lambdaFirst and pmt.getLambdaStep() == lambdaStep) {
+          const auto& envelope = pmt.getEnvelopeQE();
+          if (envelopeQE.size() < envelope.size()) {
+            envelopeQE.resize(envelope.size() - envelopeQE.size(), 0);
+          }
+          for (size_t i = 0; i < std::min(envelopeQE.size(), envelope.size()); i++) {
+            envelopeQE[i] = std::max(envelopeQE[i], envelope[i] * ce);
+          }
+        } else {
+          double lambdaLast = pmt.getLambdaLast();
+          int nExtra = (lambdaLast - lambdaFirst) / lambdaStep + 1 - envelopeQE.size();
+          if (nExtra > 0) envelopeQE.resize(nExtra, 0);
+          for (size_t i = 0; i < envelopeQE.size(); i++) {
+            float qe = pmt.getEnvelopeQE(lambdaFirst + lambdaStep * i);
+            envelopeQE[i] = std::max(envelopeQE[i], qe * ce);
+          }
+        }
+      }
+
+      m_envelopeQE.set(lambdaFirst, lambdaStep, 1.0, envelopeQE, "EnvelopeQE");
+
     }
 
 

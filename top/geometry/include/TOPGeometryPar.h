@@ -15,6 +15,10 @@
 #include <top/geometry/FrontEndMapper.h>
 #include <top/geometry/ChannelMapper.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+#include <top/dbobjects/TOPPmtInstallation.h>
+#include <top/dbobjects/TOPPmtQE.h>
+#include <top/dbobjects/TOPNominalQE.h>
 #include <string>
 
 namespace Belle2 {
@@ -116,6 +120,11 @@ namespace Belle2 {
       {}
 
       /**
+       * finalize initialization
+       */
+      void finalizeInitialization();
+
+      /**
        * Create a parameter object from gearbox
        * @param content XML data directory
        */
@@ -129,6 +138,11 @@ namespace Belle2 {
        */
       std::string addNumber(const std::string& str, unsigned number);
 
+      /**
+       * Constructs envelope of quantum efficiency from PMT data
+       */
+      void setEnvelopeQE();
+
       // Geometry
 
       TOPGeometry* m_geo = 0;             /**< geometry parameters from Gearbox */
@@ -141,6 +155,11 @@ namespace Belle2 {
       FrontEndMapper m_frontEndMapper; /**< front end electronics mapper */
       ChannelMapper m_channelMapperIRS3B; /**< channel-pixel mapper */
       ChannelMapper m_channelMapperIRSX;  /**< channel-pixel mapper */
+
+      // PMT data
+      DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
+      DBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
+      mutable TOPNominalQE m_envelopeQE;  /**< envelope quantum efficiency */
 
       // Other
 

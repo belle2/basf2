@@ -80,7 +80,7 @@ namespace Belle2 {
       double fraction = 1;
       auto* info = dynamic_cast<Simulation::TrackInfo*>(photon.GetUserInformation());
       if (info) {
-        applyQE = info->getStatus() < 2;
+        applyQE = info->getStatus() < 3;
         fraction = info->getFraction();
       }
       if (applyQE) {
@@ -89,6 +89,8 @@ namespace Belle2 {
           photon.SetTrackStatus(fStopAndKill);
           return false;
         }
+        info->setStatus(3);
+        info->setFraction(qeffi);
       }
 
       // photon at detection

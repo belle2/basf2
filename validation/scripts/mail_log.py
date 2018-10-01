@@ -139,19 +139,26 @@ def compose_message(plots):
     url = "https://b2-master.belle2.org/validation/static/validation.html"
     # url = "http://localhost:8000/static/validation.html"
 
-    body = "There were problem(s) with the validation of the following plots:\n\n"
+    body = "There were problem(s) with the validation of the following plots/scripts:\n\n"
     for plot in plots:
         body += "<b>" + plot + "</b><br>"
         body += "<b>Package:</b> " + plots[plot]["package"] + "<br>"
         body += "<b>Rootfile:</b> " + plots[plot]["rootfile"] + ".root<br>"
         body += "<b>Description:</b> " + plots[plot]["description"] + "<br>"
         body += "<b>Comparison:</b> " + plots[plot]["comparison_text"] + "<br>"
-        body += "<b>Error type:</b> " + \
-            ("comparison unequal<br>" if plots[plot]["comparison_result"] == "error" else "comparison failed<br>")
+        body += "<b>Error type:</b> "  # + plots[plot]["comparison_result"] + "<br>"
+        # compose descriptive error message
+        if plots[plot]["comparison_result"] == "error":
+            errormsg = "comparison unequal"
+        elif plots[plot]["comparison_result"] == "not_compared":
+            errormsg = "not compared"
+        else:
+            errormsg = plots[plot]["comparison_result"]
+        body += errormsg + "<br>"
         body += "<a href=\"" + url + "#" + plots[plot]["package"] + "-" + \
             plots[plot]["rootfile"] + "\">Click me for details</a>\n\n"
 
-    body += "You can take a look on the plots in more detail at the links provided for each failed plot."
+    body += "You can take a look on the plots/scripts in more detail at the links provided for each failed plot/script."
 
     return body
 

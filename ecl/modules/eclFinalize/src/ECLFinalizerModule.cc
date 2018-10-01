@@ -143,7 +143,7 @@ void ECLFinalizerModule::event()
       eclCluster->setTheta(eclShower.getTheta());
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
-      eclCluster->setClusterHadronIntensity(eclShower.getShowerHadronIntensity());
+      eclCluster->setPulseShapeDiscriminationMVA(eclShower.getPulseShapeDiscriminationMVA());
       eclCluster->setNumberOfHadronDigits(eclShower.getNumberOfHadronDigits());
 
       // set relation to ECLShower

@@ -233,9 +233,9 @@ double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
   }
 
   //compute mva from input variables
-  const double BDTout = m_expert->apply(*m_dataset)[0];
+  const double MVAout = m_expert->apply(*m_dataset)[0];
 
-  return BDTout;
+  return MVAout;
 }
 
 
@@ -280,12 +280,11 @@ void ECLClusterPSDModule::event()
       }
     }
 
+    shower.setPulseShapeDiscriminationMVA(mvaout);
     if (nWaveforminCluster > 0) {
-      shower.setShowerHadronIntensity(0);
       shower.setNumberOfHadronDigits(numberofHadronDigits);
       shower.addStatus(ECLShower::c_hasPulseShapeDiscrimination);
     } else {
-      shower.setShowerHadronIntensity(0);
       shower.setNumberOfHadronDigits(0);
     }
   }

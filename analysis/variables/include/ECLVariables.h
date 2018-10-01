@@ -20,7 +20,7 @@ namespace Belle2 {
      * return hadron scintillation component intensity of cluster computed from digits with offline waveforms saved.
      * Variable is used to separate hadronic showers from electromagnetic showers
      */
-    double eclClusterHadronIntensity(const Particle* particle);
+    double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component

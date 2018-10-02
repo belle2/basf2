@@ -229,6 +229,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
         add_pid_module(path, components)
         # add_ecl_track_cluster_modules(path, components)
+        add_ecl_cluster_properties_modules(path, components)
 
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
@@ -529,12 +530,19 @@ def add_ecl_track_cluster_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
-        # track cluster matching
-        ecl_track_cluster = register_module('ECLTrackClusterMatching')
-        path.add_module(ecl_track_cluster)
+        path.add_module('ECLTrackClusterMatching')
 
-        ecl_cluster_properties = register_module('ECLClusterProperties')
-        path.add_module(ecl_cluster_properties)
+
+def add_ecl_cluster_properties_modules(path, components=None):
+    """
+    Add the ECL cluster properties module to the path.
+
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    if components is None or 'ECL' in components:
+        path.add_module('ECLClusterProperties')
 
 
 def add_ecl_track_brem_finder(path, components=None):

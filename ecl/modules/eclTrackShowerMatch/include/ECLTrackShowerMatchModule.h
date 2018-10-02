@@ -63,12 +63,6 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-    /** Minimal distance between track and shower. */
-    double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
-
-    /** Compute depth. */
-    void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
-
     //DataStore variabels
     StoreArray<Track> m_tracks; /**< Track dataStore variables*/
     StoreArray<ECLShower> m_eclShowers; /**< ECLShower dataStore variables*/

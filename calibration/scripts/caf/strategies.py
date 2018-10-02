@@ -299,7 +299,7 @@ class SequentialRunByRun(AlgorithmStrategy):
             if iov_coverage and i_exp == 1:
                 lowest_exprun = ExpRun(iov_coverage.exp_low, iov_coverage.run_low)
             else:
-                lowest_exprun = runs_list[0]
+                lowest_exprun = run_list[0]
 
             if iov_coverage and i_exp == number_of_experiments:
                 highest_exprun = ExpRun(iov_coverage.exp_high, iov_coverage.run_high)
@@ -352,7 +352,8 @@ class SequentialRunByRun(AlgorithmStrategy):
                     apply_iov = IoV(*current_runs[0], *highest_exprun)
                 # Othewise, it's just a normal IoV in the middle.
                 else:
-                    apply_iov = IoV(*current_runs[0], *current_runs[-1])
+                    B2INFO("Detected that there are more runs to execute in this experiment after this next execution.")
+                    apply_iov = IoV(*current_runs[0], remaining_runs[0].exp, remaining_runs[0].run - 1)
 
             B2INFO("Executing and applying {} to the payloads".format(apply_iov))
             self.machine.execute_runs(runs=current_runs, iteration=iteration, apply_iov=apply_iov)

@@ -135,6 +135,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
         """Runs the AlgorithmStrategy sends back the results"""
         strategy.run(iov, iteration)
         # Get the return codes of the algorithm for the IoVs found by the Process
+        B2INFO("Finished Strategy for {}, sending back results.".format(strategy.algorithm.name))
         conn.send(strategy.results)
 
 

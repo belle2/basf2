@@ -77,7 +77,7 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclCalDigits;  /** ECLCalDigit's */
     StoreArray<ECLShower> m_eclShowers;  /** ECLShower's */
 
-    const unsigned int m_numMVAvariables = 140; /**< number of variables expected in the MVA weightfile */
+    const unsigned int m_numMVAvariables = 160; /**< number of variables expected in the MVA weightfile */
     std::string m_MVAidentifier; /**< MVA - weight-file */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
                                                                m_weightfile_representation; /**< Database pointer to the Database representation of the MVA weightfile */

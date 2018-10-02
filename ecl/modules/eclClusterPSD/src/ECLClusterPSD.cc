@@ -57,7 +57,7 @@ ECLClusterPSDModule::ECLClusterPSDModule()
            "Hadron component energy threshold to identify as hadron digit.(GeV)", 0.003);
   addParam("CrystalHadronIntensityThreshold", m_CrystalHadronIntensityThreshold,
            "Hadron component intensity threshold to identify as hadron digit.", 0.005);
-  addParam("MVAidentifier", m_MVAidentifier, "MVA database identifier.", std::string{"myMVA_s2_BDT_D20XYREonEoffNhFT"});
+  addParam("MVAidentifier", m_MVAidentifier, "MVA database identifier.", std::string{"DigitMVA_s3_BDT_D20XYRWEonEoffNhFT"});
 }
 
 // destructor
@@ -181,6 +181,7 @@ double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
   std::vector<double>  Phi(maxdigits); //cos phi of vector pointing to from cluster centre to crystal centre
   std::vector<double>  Nh(maxdigits); //hadron component intensity from offline two component fit
   std::vector<double>  Ft(maxdigits); //offline fit type
+  std::vector<double>  Weight(maxdigits); //digit weight from clustering
 
   for (unsigned int i = 0; i < maxdigits; i++) {
 
@@ -192,6 +193,7 @@ double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
     Phi[i] = 0;
     Nh[i] = 0;
     Ft[i] = -1;
+    Weight[i] = 0;
 
     if (i < EnergyToSort.size()) {
 
@@ -202,6 +204,7 @@ double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
         const double digitEnergy = caldigit->getTwoComponentTotalEnergy();
         const double digitHadronEnergy = caldigit->getTwoComponentHadronEnergy();
         const double digitOnlineEnergy = caldigit->getEnergy();
+        const double digitWeight = relatedDigits.weight(next);
         ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
         const int digitFitType = digitFitType1;
         const int cellId = caldigit->getCellId();
@@ -217,19 +220,21 @@ double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
         Phi[i] = phiVal;
         Nh[i] = (digitHadronEnergy / digitEnergy);
         Ft[i] = digitFitType;
+        Weight[i] = digitWeight;
       }
     }
   }
 
-  //use vectors filled above to input data into mva dataset.  20 digits x 7 variables = 140 inputs.
+  //use vectors filled above to input data into mva dataset.  20 digits x 8 variables = 160 inputs.
   for (int i = 0; i < maxdigits; i++) {
-    m_dataset->m_input[(i * 7) + 0] = The[i];
-    m_dataset->m_input[(i * 7) + 1] = Phi[i];
-    m_dataset->m_input[(i * 7) + 2] = Rdist[i];
-    m_dataset->m_input[(i * 7) + 3] = Eon[i];
-    m_dataset->m_input[(i * 7) + 4] = Eoff[i];
-    m_dataset->m_input[(i * 7) + 5] = Nh[i];
-    m_dataset->m_input[(i * 7) + 6] = Ft[i];
+    m_dataset->m_input[(i * 8) + 0] = The[i];
+    m_dataset->m_input[(i * 8) + 1] = Phi[i];
+    m_dataset->m_input[(i * 8) + 2] = Rdist[i];
+    m_dataset->m_input[(i * 8) + 3] = Eon[i];
+    m_dataset->m_input[(i * 8) + 4] = Eoff[i];
+    m_dataset->m_input[(i * 8) + 5] = Nh[i];
+    m_dataset->m_input[(i * 8) + 6] = Ft[i];
+    m_dataset->m_input[(i * 8) + 7] = Weight[i];
   }
 
   //compute mva from input variables

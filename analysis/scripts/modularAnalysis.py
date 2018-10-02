@@ -1971,19 +1971,6 @@ def buildContinuumSuppression(list_name, roe_mask, path=analysis_main):
     path.add_module(qqBuilder)
 
 
-def calibratePhotonEnergy(list_name, energy_bias=0.030, path=analysis_main):
-    """
-    Performs energy calibration for photons given in the input ParticleList.
-    @param list_name name of the input photon ParticleList
-    @param energy_bias energy bias in GeV
-    @param path      modules are added to this path
-    """
-
-    B2ERROR('The photon energy calibration should not be done by the user any more.'
-            'The module was removed and this function performs nothing!'
-            'Remove calibratePhotonEnergy(...) from your script')
-
-
 def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
     """
     Removes all Particles that are not in a given list of ParticleLists (or daughters of those).

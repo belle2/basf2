@@ -180,7 +180,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
 
         double shower_energy = 0., highest_track_related_shower_energy = 0.;
         const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
-        for (const auto& eclCluster : b2Track->getRelationsTo<ECLCluster>(m_trackClusterRelationName)) {
+        for (const auto& eclCluster : b2Track->getRelationsTo<ECLCluster>("", m_trackClusterRelationName)) {
           if (eclCluster.getHypothesisId() != 5) continue;
           if (!(eclCluster.isTrack())) continue;
           const ECLShower* eclShower = eclCluster.getRelatedTo<ECLShower>();

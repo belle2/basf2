@@ -84,7 +84,6 @@ namespace Belle2 {
     StoreArray<ECLShower> m_eclShowers; /**< Required input array of ECLShowers */
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits */
 
-    RelationArray m_tracksToECLClustersRelationArray; /**< new relation array between tracks and ECL clusters */
     /** members of ECLTrackClusterMatching Module */
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */

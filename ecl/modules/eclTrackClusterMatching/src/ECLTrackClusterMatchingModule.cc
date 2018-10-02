@@ -16,8 +16,7 @@ using namespace Belle2;
 
 REG_MODULE(ECLTrackClusterMatching)
 
-ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
-  m_tracksToECLClustersRelationArray(m_tracks, m_eclClusters, "newTracksToECLClusters")
+ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module()
 {
   setDescription("Match Tracks to ECLCluster");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -43,9 +42,8 @@ void ECLTrackClusterMatchingModule::initialize()
   m_extHits.isRequired();
   m_trackFitResults.isRequired();
 
-  m_tracks.registerRelationTo(m_eclShowers);
-  m_tracksToECLClustersRelationArray.registerInDataStore("newTracksToECLClusters");
-  m_tracks.registerRelationTo(m_eclClusters);
+  m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
+  m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
 }
 
 void ECLTrackClusterMatchingModule::event()
@@ -122,14 +120,14 @@ void ECLTrackClusterMatchingModule::event()
         if (arrayindex > -1) {
           auto shower = m_eclShowers[arrayindex];
           shower->setIsTrack(true);
-          track.addRelationTo(shower);
+          track.addRelationTo(shower, 1.0, "AngularDistance");
           B2DEBUG(29, shower->getArrayIndex() << " "  << shower->getIsTrack());
 
           // there is a 1:1 relation, just set the relation for the corresponding cluster as well
           ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
           if (cluster != nullptr) {
             cluster->setIsTrack(true);
-            track.addRelationTo(cluster);
+            track.addRelationTo(cluster, 1.0, "AngularDistance");
           }
         }
       }
@@ -210,16 +208,13 @@ void ECLTrackClusterMatchingModule::event()
       if (m_useOptimizedMatchingConsistency) optimizedPTMatchingConsistency(theta, pt);
       if (cluster_best_cross != nullptr && quality_best_cross > m_matchingConsistency) {
         cluster_best_cross->setIsTrack(true);
-        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best_cross->getArrayIndex());
-        track.addRelationTo(cluster_best_cross);
+        track.addRelationTo(cluster_best_cross, 1.0, "AngularDistance");
       } else if (cluster_best_dl != nullptr && quality_best_dl > m_matchingConsistency) {
         cluster_best_dl->setIsTrack(true);
-        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best_dl->getArrayIndex());
-        track.addRelationTo(cluster_best_dl);
+        track.addRelationTo(cluster_best_dl, 1.0, "AngularDistance");
       } else if (cluster_best_near != nullptr && quality_best_near > m_matchingConsistency) {
         cluster_best_near->setIsTrack(true);
-        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best_near->getArrayIndex());
-        track.addRelationTo(cluster_best_near);
+        track.addRelationTo(cluster_best_near, 1.0, "AngularDistance");
       }
     }
   } // end loop on Tracks

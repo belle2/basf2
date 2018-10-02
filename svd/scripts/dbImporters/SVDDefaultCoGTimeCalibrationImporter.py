@@ -3,6 +3,7 @@
 
 """
 SVD Default CoG Time Calibration importer.
+alfa = 1 and beta = 0 for all sensors and sides
 Script to Import Calibrations into a local DB
 """
 import basf2
@@ -26,8 +27,8 @@ class defaultCoGTimeCalibrationImporter(basf2.Module):
         payload = Belle2.SVDCoGTimeCalibrations.t_payload()
 
         timeCal = SVDCoGCalibrationFunction()
-        timeCal.set_bias(8., 0., 0., 0.)
-        timeCal.set_scale(42., 1., 1., 1.)
+        timeCal.set_bias(0., 0., 0., 0.)
+        timeCal.set_scale(1., 1., 1., 1.)
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -38,13 +39,20 @@ class defaultCoGTimeCalibrationImporter(basf2.Module):
                 for sensor in geoCache.getSensors(ladder):
                     sensorNumber = sensor.getSensorNumber()
                     for side in (0, 1):
-                        print("setting CoG calibration for " + str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
+                        print(
+                            "setting CoG calibration for " +
+                            str(layerNumber) +
+                            "." +
+                            str(ladderNumber) +
+                            "." +
+                            str(sensorNumber) +
+                            " to alfa = 1, beta = 0")
                         payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, timeCal)
 
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
 
-use_local_database("localDB/database.txt", "localDB")
+use_local_database("localDB_noCoGcalibration/database.txt", "localDB_noCoGcalibration")
 
 main = create_path()
 
@@ -53,8 +61,8 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox", fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])  # , useDB = True)
+main.add_module("Gearbox")
+main.add_module("Geometry", components=['SVD'], useDB=True)
 
 main.add_module(defaultCoGTimeCalibrationImporter())
 

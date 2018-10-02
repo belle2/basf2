@@ -1688,6 +1688,170 @@ namespace {
     EXPECT_B2FATAL(vnonsense->function(nullptr));
     EXPECT_FLOAT_EQ(vsensible->function(nullptr), 4.3);
   }
+  TEST_F(MetaVariableTest, totalPxOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPxOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPxOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 2.2);
+  }
+  TEST_F(MetaVariableTest, totalPyOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPyOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPyOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 1.5);
+  }
+  TEST_F(MetaVariableTest, totalPzOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPzOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPzOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 3.1);
+  }
+  TEST_F(MetaVariableTest, maxPtInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "maxPtInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "maxPtInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), sqrt(0.5 * 0.5 + 0.4 * 0.4));
+  }
 
 
   TEST_F(MetaVariableTest, numberOfNonOverlappingParticles)

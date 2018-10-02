@@ -1545,7 +1545,6 @@ endloop:
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
           if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxPtInList");
-          double totalPz = 0;
           int nParticles = listOfParticles->getListSize();
           const auto& frame = ReferenceFrame::GetCurrent();
           double maxPt = 0;
@@ -1736,16 +1735,16 @@ endloop:
     REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
                       "Returns the total energy of particles in the given particle List.");
     REGISTER_VARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
-                      "Returns the total Px of particles in the given particle List.");
+                      "Returns the total momentum Px of particles in the given particle List.");
     REGISTER_VARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
-                      "Returns the total Py of particles in the given particle List.");
+                      "Returns the total momentum Py of particles in the given particle List.");
     REGISTER_VARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
-                      "Returns the total Pz of particles in the given particle List.");
+                      "Returns the total momentum Pz of particles in the given particle List.");
     REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
                       "Returns the invariant mass of the combination of particles in the given particle lists.");
     REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
                       "Returns the total ECL energy of particles in the given particle List.");
     REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
-                      "Returns maximum Pt in the given particle List.");
+                      "Returns maximum transverse momentum Pt in the given particle List.");
   }
 }

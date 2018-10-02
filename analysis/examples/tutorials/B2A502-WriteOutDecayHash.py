@@ -30,7 +30,7 @@ import variableCollectionsTools as vct
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/JPsi2ee_e2egamma.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main

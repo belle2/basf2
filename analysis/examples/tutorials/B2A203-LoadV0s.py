@@ -33,7 +33,7 @@ import stdV0s as stdv
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main
@@ -106,8 +106,8 @@ v0_vars = vc.event_meta_data + \
     vc.mc_truth + \
     vc.mc_hierarchy +\
     ['chiProb'] +\
-    vct.convert_to_daughter_vars(pi0_vars, 0) +\
-    vct.convert_to_daughter_vars(pi0_vars, 1)
+    vct.create_daughter_aliases(pi0_vars, 0) +\
+    vct.create_daughter_aliases(pi0_vars, 1)
 
 
 # saving variables to ntuple

@@ -36,7 +36,7 @@ from stdV0s import stdLambdas
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main
@@ -102,15 +102,15 @@ pi_vars = vc.kinematics
 b_vars = vc.event_meta_data + \
     vc.deltae_mbc + \
     vc.mc_truth + \
-    vct.convert_to_one_selected_vars(variables_list=d_vars,
-                                     decay_string='B+ -> ^anti-D0 pi+',
-                                     alias_prefix='D0') + \
-    vct.convert_to_one_selected_vars(variables_list=pi_vars,
-                                     decay_string='B+ -> anti-D0 ^pi+',
-                                     alias_prefix='pi') + \
-    vct.wrap_list(variables_list=['decayModeID'],
-                  wrapper='daughter(0,extraInfo(variable))',
-                  alias_prefix="")
+    vct.create_aliases_for_selected(list_of_variables=d_vars,
+                                    decay_string='B+ -> ^anti-D0 pi+',
+                                    prefix='D0') + \
+    vct.create_aliases_for_selected(list_of_variables=pi_vars,
+                                    decay_string='B+ -> anti-D0 ^pi+',
+                                    prefix='pi') + \
+    vct.create_aliases(list_of_variables=['decayModeID'],
+                       wrapper='daughter(0,extraInfo(variable))',
+                       prefix="")
 
 # Saving variables to ntuple
 output_file = 'B2A303-MultipleDecays-Reconstruction.root'

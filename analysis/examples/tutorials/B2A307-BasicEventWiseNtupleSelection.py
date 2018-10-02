@@ -42,9 +42,9 @@ from stdPi0s import stdPi0s
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/ccbar_background.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main
@@ -132,11 +132,11 @@ mu_vars = vc.mc_truth
 
 b_vars = vc.mc_truth + \
     vc.deltae_mbc + \
-    vct.convert_to_all_selected_vars(variables_list=dvars,
-                                     decay_string='B- -> ^D0 pi-') + \
-    vct.wrap_list(variables_list=['decayModeID'],
-                  wrapper='daughter(0,extraInfo(variable))',
-                  alias_prefix="D") + \
+    vct.create_aliases_for_selected(list_of_variables=dvars,
+                                    decay_string='B- -> ^D0 pi-') + \
+    vct.create_aliases(list_of_variables=['decayModeID'],
+                       wrapper='daughter(0,extraInfo(variable))',
+                       prefix="D") + \
     ['R2EventLevel']
 
 u4s_vars = vc.mc_truth + \
@@ -144,12 +144,12 @@ u4s_vars = vc.mc_truth + \
     vc.recoil_kinematics + \
     vc.extra_energy + \
     vc.kinematics + \
-    vct.convert_to_all_selected_vars(variables_list=b_vars,
-                                     decay_string='Upsilon(4S) -> ^B- mu+') + \
-    vct.convert_to_all_selected_vars(variables_list=d_vars,
-                                     decay_string='Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
-    vct.convert_to_all_selected_vars(variables_list=mu_vars,
-                                     decay_string='Upsilon(4S) -> B- ^mu+')
+    vct.create_aliases_for_selected(list_of_variables=b_vars,
+                                    decay_string='Upsilon(4S) -> ^B- mu+') + \
+    vct.create_aliases_for_selected(list_of_variables=d_vars,
+                                    decay_string='Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
+    vct.create_aliases_for_selected(list_of_variables=mu_vars,
+                                    decay_string='Upsilon(4S) -> B- ^mu+')
 
 
 # 7. Saving variables to ntuple

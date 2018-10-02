@@ -68,16 +68,16 @@ gvars = vc.kinematics + vc.mc_truth + vc.inv_mass
 etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
 u4svars = vc.event_meta_data + vc.inv_mass + vc.kinematics + \
     vc.mc_truth + vc.mc_hierarchy + \
-    vc.wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
-    vc.convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
-    vc.convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
-    vc.convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
+    vc.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vc.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    vc.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    vc.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
-u4svars_4c = u4svars + vc.wrap_list(['OrcaKinFitProb',
-                                     'OrcaKinFitChi2',
-                                     'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
+u4svars_4c = u4svars + vc.create_aliases(['OrcaKinFitProb',
+                                          'OrcaKinFitChi2',
+                                          'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
 
-u4svars_def = u4svars + vc.wrap_list(['chiProb'], 'extraInfo(variable)', "")
+u4svars_def = u4svars + vc.create_aliases(['chiProb'], 'extraInfo(variable)', "")
 
 
 # Saving variables to ntuple

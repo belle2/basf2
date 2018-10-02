@@ -62,12 +62,12 @@ import variableCollections as vc
 
 mugvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
 z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
-    vc.convert_to_all_selected_vars(mugvars, 'Z0 -> ^gamma ^mu+ ^mu-')
+    vc.create_aliases_for_selected(mugvars, 'Z0 -> ^gamma ^mu+ ^mu-')
 
 z0uvars = z0vars + \
-    vc.wrap_list(['OrcaKinFitProb',
-                  'OrcaKinFitChi2',
-                  'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
+    vc.create_aliases(['OrcaKinFitProb',
+                       'OrcaKinFitChi2',
+                       'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
 
 # Saving variables to ntuple
 from modularAnalysis import variablesToNtuple

@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from functools import reduce
+import collections as co
 
 
-def wrap_list(variables_list, wrapper, alias_prefix):
+def create_aliases(list_of_variables, wrapper, prefix):
     """
-    The function wraps every variable from variables list with given wrapper
-    and add alias using given alias prefix
+    The function creates aliases for variables from the variables list with given wrapper
+    and returns list of the aliases.
 
-    >>> variables_list = ['M','p']
+    >>> list_of_variables = ['M','p']
     >>> wrapper = 'daughter(1,{variable})'
-    >>> alias_prefix = 'pref'
-    >>> print(wrap_list(variables_list, wrapper, alias_prefix))
+    >>> prefix = 'pref'
+    >>> print(create_aliases(list_of_variables, wrapper, prefix))
     ['pref_M', 'pref_p']
     >>> from variables import variables
     >>> variables.printAliases()
@@ -21,17 +23,17 @@ def wrap_list(variables_list, wrapper, alias_prefix):
     [INFO] =========================
 
     Parameters:
-        variables_list (list(str)): list of variable names
-        wrapper (str): metafunction taking variables from variables_list as a parameter \
+        list_of_variables (list(str)): list of variable names
+        wrapper (str): metafunction taking variables from list_of_variables as a parameter \
         (``<metafunction>(<some configs>, {variable} ,<some otehr configs>)``
-        alias_prefix (str): alias prefix used for wrapped variables.
+        prefix (str): alias prefix used for wrapped variables.
 
     Returns:
         list(str): new variables list
     """
     from variables import variables
-    aliases = [f"{alias_prefix}_{e}" for e in variables_list]
-    for var, alias in zip(variables_list, aliases):
+    aliases = [f"{prefix}_{e}" for e in list_of_variables]
+    for var, alias in zip(list_of_variables, aliases):
         variables.addAlias(alias, wrapper.format(variable=var))
 
     return aliases
@@ -81,18 +83,81 @@ def get_hierarchy_of_decay(decay_string):
     return selected_particles
 
 
-def convert_to_all_selected_vars(variables_list, decay_string):
+def create_daughter_aliases(list_of_variables, indices, prefix="", include_indices=True):
+    """Create Aliases for all variables for a given daughter hierachy
+
+    Arguments:
+        list_of_variables (list(str)): list of variables to create aliases for
+        indices (int): index of the daughter, grand-daughter, grand-grand-daughter,
+            and so forth
+        prefix (str): optional prefix to prepend to the aliases
+        include_indices(bool): if set to True (default) the aliases will contain
+            the daughter indices as dX_dY_dZ...
+
+    * create aliases for the second daughter as "d1_E", "d1_M" (daughters start at 0)
+
+      >>> create_daughter_aliases(["E", "m"], 1)
+      ['d1_E', 'd1_m']
+      >>> from variables import variables
+      >>> variables.printAliases()
+      [INFO] =========================
+      [INFO] Following aliases exists:
+      [INFO] 'd1_E' --> 'daughter(1,E)'
+      [INFO] 'd1_m' --> 'daughter(1,m)'
+      [INFO] =========================
+
+
+    * create aliases for the first grand daughter of the second daughter,
+      starting with "my" and without including the indices, resulting in "my_E", "my_m"
+
+      >>> create_daughter_aliases(["E", "m"], [1, 0], prefix="my", include_indices=False)
+      ['my_E', 'my_m']
+      >>> from variables import variables
+      >>> variables.printAliases()
+      [INFO] =========================
+      [INFO] Following aliases exists:
+      [INFO] 'd1_E' --> 'daughter(1,daughter(0,E))'
+      [INFO] 'd1_m' --> 'daughter(1,daughter(0,m))'
+      [INFO] =========================
+
+    * create aliases for the second grand grand daughter of the third grand
+      daughter of the fifth daugther, starting with my and including the
+      indices, resulting in "my_d4_d2_d1_E", "my_d4_d2_d1_m"
+
+      >>> create_daughter_aliases(["E", "m"], [4, 2, 1], prefix="my")
+      ['my_d4_d2_d1_E', 'my_d4_d2_d1_m']
+      >>> from variables import variables
+      >>> variables.printAliases()
+      [INFO] =========================
+      [INFO] Following aliases exists:
+      [INFO] 'd1_E' --> 'daughter(4,daughter(2,daughter(1,E))'
+      [INFO] 'd1_m' --> 'daughter(4,daughter(2,daughter(1,m))'
+      [INFO] =========================
+
     """
-    The function transforms list of variables to that for
+
+    if not isinstance(indices, co.Iterable):
+        indices = [indices]
+
+    if include_indices:
+        prefix = reduce(lambda x, y: f"{x}_d{y}", indices, prefix).lstrip("_")
+
+    template = reduce(lambda x, y: f"daughter({y},{x})", reversed(indices), "{variable}")
+    return create_aliases(list_of_variables, template, prefix)
+
+
+def create_aliases_for_selected(list_of_variables, decay_string, prefix=""):
+    """
+    The function creates list of aliases for given variables so that they are calculated for
     particles selected in decay strigng.
     Aliases of variables are assigned automaticaly in the following manner:
     If namings are unambiguous, it's semi-laconic :doc:`DecayString` style:
 
     * pi variabels selected as ``B0 -> [D0 -> ^pi+ K-] pi0`` will have ``D0_pi_`` prefix in ntuple.:
 
-    >>> variables_list = ['M','p']
+    >>> list_of_variables = ['M','p']
     >>> decay_string = 'B0 -> [D0 -> ^pi+ K-] pi0'
-    >>> print(convert_to_all_selected_vars(variables_list, decay_string))
+    >>> print(create_aliases_for_selected(list_of_variables, decay_string))
     ['D0_pi_M', 'D0_pi_p']
     >>> from variables import variables
     >>> variables.printAliases()
@@ -117,9 +182,9 @@ def convert_to_all_selected_vars(variables_list, decay_string):
 
       4. ``pi0_``
 
-    >>> variables_list = ['M','p']
+    >>> list_of_variables = ['M','p']
     >>> decay_string = 'B0 -> [D0 -> ^pi+ ^pi- ^pi0] ^pi0'
-    >>> print(convert_to_all_selected_vars(variables_list, decay_string))
+    >>> print(create_aliases_for_selected(list_of_variables, decay_string))
     ['D0_pi_0_0_M', 'D0_pi_0_0_p', 'D0_pi_0_1_M', 'D0_pi_0_1_p',
      'D0_pi0_M', 'D0_pi0_p', 'pi0_M', 'pi0_p']
     >>> from variables import variables
@@ -139,14 +204,14 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     [INFO] =========================
 
 
-    If you feel that such naming is clumsy, you always can add individual aliases
-    for particles with `convert_to_one_selected_vars()` function:
+    If you feel that such naming is clumsy, you call this function for each selected
+    particle and add individual aliases for them:
 
-    >>> variables_list = ['M','p']
+    >>> list_of_variables = ['M','p']
     >>> decay_string = 'B0 -> [D0 -> pi+ ^pi- pi0] pi0'
-    >>> aliases = convert_to_one_selected_vars(variables_list, decay_string, 'pim')
+    >>> aliases = create_aliases_for_selected(list_of_variables, decay_string, 'pim')
     >>> decay_string = 'B0 -> [D0 -> ^pi+ pi- pi0] pi0'
-    >>> aliases += convert_to_one_selected_vars(variables_list, decay_string, 'pip')
+    >>> aliases += create_aliases_for_selected(list_of_variables, decay_string, 'pip')
     >>> print(aliases)
     ['pim_M', 'pim_p', 'pip_M', 'pip_p']
     >>> from variables import variables
@@ -160,12 +225,16 @@ def convert_to_all_selected_vars(variables_list, decay_string):
     [INFO] =========================
 
     Parameters:
-        variables_list (list(str)): list of variable names
+        list_of_variables (list(str)): list of variable names
         decay_string (str): Decay strinng with selected particles
 
     Returns:
         list(str): new variables list
     """
+    if decay_string.count("^") == 1:
+        selected_particles = [x[0] for x in get_hierarchy_of_decay(decay_string)[0]]
+        return create_daughter_aliases(list_of_variables, selected_particles, prefix)
+
     selected_particles = get_hierarchy_of_decay(decay_string)
     prefixes = {}
     unique_namings = []
@@ -187,150 +256,17 @@ def convert_to_all_selected_vars(variables_list, decay_string):
             prefixes[name_prefix] = hierarchy_path
     var_list = []
     for p in prefixes.keys():
-        var_list += convert_to_nd_vars(variables_list, prefixes[p], p)
+        var_list += create_daughter_aliases(list_of_variables, prefixes[p], prefix + p)
 
     return var_list
 
 
-def convert_to_one_selected_vars(variables_list, decay_string, alias_prefix):
-    """
-    The function transforms list of variables to that for the
-    particle selected in decay string.
-
-    Note 1: Only one particle can be selected in the DcayString.
-    If you want to apply variables for several particles, either use
-    this function without specifyng alias prefix or call the function
-    for each child particle independently.
-
-    >>> variables_list = ['M','p']
-    >>> decay_string = 'B0 -> [D0 -> pi+ ^pi- pi0] pi0'
-    >>> print(convert_to_one_selected_vars(variables_list, decay_string, 'pim'))
-    ['pim_M', 'pim_p']
-    >>> from variables import variables
-    >>> variables.printAliases()
-    [INFO] =========================
-    [INFO] Following aliases exists:
-    [INFO] 'pim_M' --> 'daughter(0,daughter(1,M))'
-    [INFO] 'pim_p' --> 'daughter(0,daughter(1,p))'
-    [INFO] =========================
-
-
-    Parameters:
-        variables_list (list(str)): list of variable names
-        decay_string (str): Decay strinng with selected particle
-        alias_prefix (str): User-defined alias prefix for trannsformed list
-
-    Returns:
-        list(str): new variables list
-    """
-    if decay_string.count("^") != 1:
-        B2FATAL("Please use only one '^' per call of the function")
-    selected_particles = [x[0] for x in get_hierarchy_of_decay(decay_string)[0]]
-    return convert_to_nd_vars(variables_list, selected_particles, alias_prefix)
-
-
-def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
-    """
-    The function transforms list of variables to that relative for the one of the particle's daughter.
-    This is helper function used by other functions in this package since it requires
-    quite peculiar input, namely ``hierarchy_path``, that is sequence od number of daughters
-    ending with the number of selected particle. For instance, ``hierarchy_path`` of
-    ``pi-`` in ``B0 -> [D0 -> pi+ ^pi- pi0] pi0`` is ``[0, 1]`` and of
-    ``pi0`` in ``B0 -> [D0 -> pi+ pi- pi0] ^pi0`` is ``[1]``
-
-    >>> variables_list = ['M','p']
-    >>> # Users don't use the finction, so let's define hierarcy path
-    >>> # for decay 'B0 -> [D0 -> pi+ ^pi- pi0] pi0' by hands:
-    >>> hierarcy_path = [0, 1]
-    >>> print(convert_to_nd_vars(variables_list, hierarcy_path, 'pim'))
-    ['pim_M', 'pim_p']
-    >>> from variables import variables
-    >>> variables.printAliases()
-    [INFO] =========================
-    [INFO] Following aliases exists:
-    [INFO] 'pim_M' --> 'daughter(0,daughter(1,M))'
-    [INFO] 'pim_p' --> 'daughter(0,daughter(1,p))'
-    [INFO] =========================
-
-    Parameters:
-        variables_list (list(str)): list of variable names
-        hierarchy_path (list(int)): hierarchy path (sequence of numbers of daughters that brings to the particle)
-        alias_prefix (str): User-defined alias prefix for trannsformed list
-
-    Returns:
-        list(str): new variables list
-    """
-    wrapper = '{variable}'
-    for h in reversed(hierarchy_path):
-        wrapper = "daughter(" + str(h) + "," + wrapper + ")"
-    return wrap_list(variables_list, wrapper, alias_prefix)
-
-
-def convert_to_daughter_vars(variables_list, daughter_number):
-    """
-    The function transforms list of variables to that for the n-th daughter.
-
-    >>> variables_list = ['M','p']
-    >>> daughter_number = 1
-    >>> print(convert_to_daughter_vars(variables_list, daughter_number))
-    ['d1_M', 'd1_p']
-    >>> from variables import variables
-    >>> variables.printAliases()
-    [INFO] =========================
-    [INFO] Following aliases exists:
-    [INFO] 'd1_M' --> 'daughter(1,M)'
-    [INFO] 'd1_p' --> 'daughter(1,p)'
-    [INFO] =========================
-
-
-    Parameters:
-        variables_list (list(str)): list of variable names
-        daugther_numer (int): serial number of a daughter (starting from 0)
-
-    Returns:
-        list(str): new variables list
-    """
-    return wrap_list(variables_list,
-                     "daughter(" + str(daughter_number) + ",{variable})",
-                     "d" + str(daughter_number))
-
-
-def convert_to_gd_vars(variables_list, daughter_number, granddaughter_number):
-    """
-    The function transforms list of variables to that relative for the particle's granddaughter.
-
-    >>> variables_list = ['M','p']
-    >>> daughter_number = 1
-    >>> granddaughter_number = 2
-    >>> print(convert_to_gd_vars(variables_list, daughter_number, granddaughter_number))
-    ['d1_d2_M', 'd1_d2_p']
-    >>> from variables import variables
-    >>> variables.printAliases()
-    [INFO] =========================
-    [INFO] Following aliases exists:
-    [INFO] 'd1_d2_M' --> 'daughter(1, daughter(2, M))
-    [INFO] 'd1_d2_p' --> 'daughter(1, daughter(2, p))
-    [INFO] =========================
-
-    Parameters:
-        variables_list (list(str)): list of variable names
-        daugther_numer (int): serial number of a daughter (starting from 0)
-        granddaughter_number (int): serial number of a daughter's daughter (starting from 0)
-
-    Returns:
-        list(str): new variables list
-    """
-    return wrap_list(variables_list,
-                     f"daughter({daughter_number}, daughter({granddaughter_number}, {{variable}}))",
-                     f"d{daughter_number}_d{granddaughter_number}")
-
-
-def make_mc(variables_list):
+def make_mc(list_of_variables):
     """
     The function wraps variables from the list with 'matchedMC()'.
 
-    >>> variables_list = ['M','p']
-    >>> print(make_mc(variables_list))
+    >>> list_of_variables = ['M','p']
+    >>> print(make_mc(list_of_variables))
     ['mmc_M', 'mmc_p']
     >>> from variables import variables
     >>> variables.printAliases()
@@ -342,24 +278,24 @@ def make_mc(variables_list):
 
 
     Parameters:
-        variables_list (list(str)): list of variable names
+        list_of_variables (list(str)): list of variable names
 
     Returns:
         list(str): new variables list
     """
-    return wrap_list(variables_list,
-                     'matchedMC({variable})',
-                     'mmc')
+    return create_aliases(list_of_variables,
+                          'matchedMC({variable})',
+                          'mmc')
 
 
-def add_collection(variables_list, collection_name):
+def add_collection(list_of_variables, collection_name):
     """
     The function creates variable collection from tne list of variables
 
     Note: This is kept for compatibility.
 
     Parameters:
-        variables_list (list(str)): list of variable names
+        list_of_variables (list(str)): list of variable names
         collection_name (str): name of the collection
 
 
@@ -367,5 +303,5 @@ def add_collection(variables_list, collection_name):
         str: name of the variable collection
     """
     import variables as v
-    v.variables.addCollection(collection_name, v.std_vector(*tuple(variables_list)))
+    v.variables.addCollection(collection_name, v.std_vector(*tuple(list_of_variables)))
     return collection_name

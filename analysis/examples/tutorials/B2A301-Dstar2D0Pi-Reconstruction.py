@@ -29,7 +29,7 @@ from stdPi0s import stdPi0s
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/Dst2D0pi.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main
@@ -64,14 +64,14 @@ ma.matchMCTruth(list_name='D*+', path=my_path)
 # Select variables that we want to store to ntuple
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
-fs_hadron_vars = vct.convert_to_all_selected_vars(
-    variables_list=vc.pid + vc.track + vc.mc_truth,
+fs_hadron_vars = vct.create_aliases_for_selected(
+    list_of_variables=vc.pid + vc.track + vc.mc_truth,
     decay_string='D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-d0_vars = vct.convert_to_one_selected_vars(
-    variables_list=vc.inv_mass + vc.mc_truth,
+d0_vars = vct.create_aliases_for_selected(
+    list_of_variables=vc.inv_mass + vc.mc_truth,
     decay_string='D*+ -> ^D0 pi+',
-    alias_prefix='D0')
+    prefix='D0')
 
 
 # Saving variables to ntuple

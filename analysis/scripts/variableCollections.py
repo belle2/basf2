@@ -33,9 +33,9 @@ kinematics = ['px',
 vct.add_collection(kinematics, 'Kinematics')
 
 #: Kinematic variables in CMS
-ckm_kinematics = vct.wrap_list(kinematics,
-                               "useCMSFrame({variable})",
-                               "CMS")
+ckm_kinematics = vct.create_aliases(kinematics,
+                                    "useCMSFrame({variable})",
+                                    "CMS")
 
 #: Cluster-related variables
 #: BII-3896

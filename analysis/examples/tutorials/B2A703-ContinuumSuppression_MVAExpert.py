@@ -30,7 +30,7 @@ if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
 
 import os
 if not os.getenv('BELLE2_EXAMPLES_DATA'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 step = str(sys.argv[1])
 

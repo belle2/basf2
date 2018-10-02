@@ -105,20 +105,20 @@ matchMCTruth('D*+:3')
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth + \
     vc.mc_flight_info + vc.flight_info + vc.vertex
 
-fs_hadron_vars = vc.convert_to_all_selected_vars(
+fs_hadron_vars = vc.create_aliases_for_selected(
     vc.pid + vc.track + vc.mc_truth,
     'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-d0_vars = vc.convert_to_one_selected_vars(
+d0_vars = vc.create_aliases_for_selected(
     vc.inv_mass + vc.mc_truth + vc.vertex,
     'D*+ -> ^D0 pi+', 'D0')
 
 dstt = vc.event_meta_data + vc.kinematics + vc.vertex + vc.mc_vertex + vc.flight_info + \
-    vc.convert_to_all_selected_vars(
+    vc.create_aliases_for_selected(
         vc.kinematics,
         '^D0 -> ^K- ^pi+')
 
-dstu = vc.kinematics + vc.convert_to_all_selected_vars(
+dstu = vc.kinematics + vc.create_aliases_for_selected(
     vc.kinematics,
     '^D0 -> ^K- ^pi+')
 

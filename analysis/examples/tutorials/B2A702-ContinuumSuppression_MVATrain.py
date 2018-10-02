@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # trainingVars, listed again here (see B2A701).
     import os
     if not os.getenv('BELLE2_EXAMPLES_DATA'):
-        b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+        b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
     # Use this path to run over Bd_KsPi0 reconstructed signal and qqbar skims.
     path = 'BELLE2_EXAMPLES_DATA/'

@@ -68,18 +68,18 @@ muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.pid + vc.momentum_u
 gammavars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
 avars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
 uvars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + \
-    vc.convert_to_all_selected_vars(muvars, 'beam -> [A -> ^mu+ ^mu-] gamma') + \
-    vc.convert_to_all_selected_vars(gammavars, 'beam -> A ^gamma') + \
-    vc.convert_to_all_selected_vars(avars, 'beam -> ^A gamma')
+    vc.create_aliases_for_selected(muvars, 'beam -> [A -> ^mu+ ^mu-] gamma') + \
+    vc.create_aliases_for_selected(gammavars, 'beam -> A ^gamma') + \
+    vc.create_aliases_for_selected(avars, 'beam -> ^A gamma')
 
 uvarsv = uvars + ['chiProb']
 
-uvars4c = uvars + vc.wrap_list(['OrcaKinFitProb',
-                                'OrcaKinFitProb',
-                                'OrcaKinFitChi2',
-                                'OrcaKinFitErrorCode'], 'extraInfo(variable)', "") + \
-    vc.wrap_list(['VertexFitChi2',
-                  'VertexFitProb'], 'daughter(1,extraInfo(variable))', "A")
+uvars4c = uvars + vc.create_aliases(['OrcaKinFitProb',
+                                     'OrcaKinFitProb',
+                                     'OrcaKinFitChi2',
+                                     'OrcaKinFitErrorCode'], 'extraInfo(variable)', "") + \
+    vc.create_aliases(['VertexFitChi2',
+                       'VertexFitProb'], 'daughter(1,extraInfo(variable))', "A")
 
 # Saving variables to ntuple
 output_file = 'B2A424-OrcaKinFit_vc.vertexfit_4Cfit.root'

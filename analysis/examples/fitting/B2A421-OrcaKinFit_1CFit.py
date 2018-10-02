@@ -56,15 +56,15 @@ UnmeasuredfitKinematic1C('Z0:mm_kinfit')
 
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
 z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
-    vc.convert_to_all_selected_vars(muvars, 'Z0 -> ^mu+ ^mu-')
+    vc.create_aliases_for_selected(muvars, 'Z0 -> ^mu+ ^mu-')
 
 z0uvars = z0vars + \
-    vc.wrap_list(['OrcaKinFitProb',
-                  'OrcaKinFitChi2',
-                  'OrcaKinFitErrorCode',
-                  'OrcaKinFitUnmeasuredTheta',
-                  'OrcaKinFitUnmeasuredPhi',
-                  'OrcaKinFitUnmeasuredE'], 'extraInfo(variable)', "")
+    vc.create_aliases(['OrcaKinFitProb',
+                       'OrcaKinFitChi2',
+                       'OrcaKinFitErrorCode',
+                       'OrcaKinFitUnmeasuredTheta',
+                       'OrcaKinFitUnmeasuredPhi',
+                       'OrcaKinFitUnmeasuredE'], 'extraInfo(variable)', "")
 
 # Saving variables to ntuple
 output_file = 'B2A421-Orcakinfit_1CFit.root'

@@ -41,7 +41,7 @@ import stdCharged as stdc
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2rhogamma_rho2pipi.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main
@@ -208,15 +208,15 @@ b_vars = vc.event_meta_data + \
     vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
-    vct.convert_to_all_selected_vars(variables_list=gamma_vars,
-                                     decay_string='B0 -> rho0 ^gamma') + \
-    vct.convert_to_all_selected_vars(variables_list=rho_vars,
-                                     decay_string='B0 -> ^rho0 gamma') + \
-    vct.convert_to_all_selected_vars(variables_list=rho_vars,
-                                     decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
-    vct.wrap_list(variables_list=['Pi0_Prob', 'Eta_Prob', 'pi0veto'],
-                  wrapper='extraInfo(variable)',
-                  alias_prefix="B")
+    vct.create_aliases_for_selected(list_of_variables=gamma_vars,
+                                    decay_string='B0 -> rho0 ^gamma') + \
+    vct.create_aliases_for_selected(list_of_variables=rho_vars,
+                                    decay_string='B0 -> ^rho0 gamma') + \
+    vct.create_aliases_for_selected(list_of_variables=rho_vars,
+                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
+    vct.create_aliases(list_of_variables=['Pi0_Prob', 'Eta_Prob', 'pi0veto'],
+                       wrapper='extraInfo(variable)',
+                       prefix="B")
 
 # Saving variables to ntuple
 rootOutputFile = "B2A306-B02RhoGamma-withPi0EtaVeto.root"

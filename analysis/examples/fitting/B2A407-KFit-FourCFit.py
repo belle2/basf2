@@ -71,10 +71,10 @@ gvars = vc.kinematics + vc.mc_truth
 etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
 u4svars = vc.event_meta_data + vc.inv_mass + vc.kinematics + \
     vc.mc_truth + vc.mc_hierarchy + \
-    vc.wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
-    vc.convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
-    vc.convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
-    vc.convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
+    vc.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vc.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    vc.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    vc.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
 # Saving variables to ntuple
 output_file = 'B2A407-KFit-FourCFit.root'

@@ -77,11 +77,11 @@ matchMCTruth('D*+')
 
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
-fs_hadron_vars = vc.convert_to_all_selected_vars(
+fs_hadron_vars = vc.create_aliases_for_selected(
     vc.pid + vc.track + vc.mc_truth,
     'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-d0_vars = vc.convert_to_one_selected_vars(
+d0_vars = vc.create_aliases_for_selected(
     vc.inv_mass + vc.mc_truth,
     'D*+ -> ^D0 pi+', 'D0')
 

@@ -30,7 +30,7 @@ from stdPi0s import stdPi0s
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main
@@ -157,7 +157,7 @@ ma.variablesToNtuple(decayString='gamma:all',
 # we convert names of te variables from the gamma list in the way that they will
 # correspond to given gammas.
 ma.variablesToNtuple(decayString='pi0:looseFit',
-                     variables=pi0_variables + vct.convert_to_all_selected_vars(gamma_variables, 'pi0 -> ^gamma ^gamma'),
+                     variables=pi0_variables + vct.create_aliases_for_selected(gamma_variables, 'pi0 -> ^gamma ^gamma'),
                      filename=output_file,
                      treename='pi0',
                      path=my_path)
@@ -166,8 +166,8 @@ ma.variablesToNtuple(decayString='pi0:looseFit',
 # (see ntuples to see the difference)
 ma.variablesToNtuple(decayString='K_S0:all',
                      variables=K0s_variables +
-                     vct.convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
-                     vct.convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),
+                     vct.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
+                     vct.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),
                      filename=output_file,
                      treename='kshort',
                      path=my_path)

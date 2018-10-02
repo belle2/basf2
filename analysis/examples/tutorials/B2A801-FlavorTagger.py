@@ -36,7 +36,7 @@ from stdPi0s import stdPi0s
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2JPsiKs_JPsi2mumu.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-example-data` in terminal for it.")
+    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
 my_path = ma.analysis_main
@@ -210,10 +210,10 @@ bvars = vc.event_meta_data + \
     vc.flavor_tagging + \
     vc.tag_vertex + \
     vc.mc_tag_vertex + \
-    vct.convert_to_all_selected_vars(variables_list=fs_vars,
-                                     decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
-    vct.convert_to_all_selected_vars(variables_list=jpsiandk0s_vars,
-                                     decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
+    vct.create_aliases_for_selected(list_of_variables=fs_vars,
+                                    decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    vct.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
+                                    decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 
 
 # Saving variables to ntuple

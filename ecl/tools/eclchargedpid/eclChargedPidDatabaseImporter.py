@@ -49,6 +49,10 @@ import ROOT
 
 # Silence ROOT!
 ROOT.gROOT.SetBatch(True)
+ROOT.gErrorIgnoreLevel = ROOT.kWarning
+# Silence RooFit!
+ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
+ROOT.RooMsgService.instance().setSilentMode(True)
 
 from electrons_pdf import fit_electron_eop
 from muons_pdf import fit_muon_eop
@@ -75,7 +79,7 @@ if __name__ == "__main__":
     arr_p = array.array("d", pmin_vals + [5500.0])
     arr_theta = array.array("d", thetamin_vals + [180.0])
 
-    histgrid = ROOT.TH2F("binsgrid", "bins grid;#theta;P [MeV]", len(thetamin_vals), arr_theta, len(pmin_vals), arr_p)
+    histgrid = ROOT.TH2F("binsgrid", "bins grid;#theta_{lab};p_{lab} [MeV/c]", len(thetamin_vals), arr_theta, len(pmin_vals), arr_p)
     # Fill w/ random stuff gaussianly-distributed. Just cosmetics.
     xyg = ROOT.TF2("xyg", "xygaus", thetamin_vals[0], 180.0, pmin_vals[0], 5500.0)
     xyg.SetParameters(10000, 75.0, 65.0, 2500.0, 2000.0)
@@ -99,16 +103,33 @@ if __name__ == "__main__":
 
         for ip, pmin in enumerate(pmin_vals, 1):
 
+            # TEMP
+            # if not ip==5: continue
+
+            pmax = pmin_vals[ip] if ip <= pmin_vals.index(pmin_vals[-1]) else arr_p[-1]
+
             for jth, thetamin in enumerate(thetamin_vals, 1):
+
+                # TEMP
+                # if not jth==5: continue
+
+                thetamax = thetamin_vals[jth] if jth <= thetamin_vals.index(thetamin_vals[-1]) else arr_theta[-1]
 
                 params = {"inputpath": args.inputpath,
                           "pmin": pmin,
+                          "pmax": pmax,
                           "idx_p": ip,
+                          "thetamin": thetamin,
+                          "thetamax": thetamax,
                           "idx_theta": jth,
                           "hypo": hypo,
                           "charge": hypo / abs(hypo),  # The fit functions need to know whether we are looking at +/- particles.
                           "outputplots": args.outputplots
                           }
+
+                print(
+                    "Hypothesis: {0},\t{1:.2f} < p < {2:.2f},\t{3:.2f} < theta < {4:.2f}".format(
+                        hypo, pmin, pmax, thetamin, thetamax))
 
                 if abs(hypo) == 11:
                     pdf = fit_electron_eop(**params)

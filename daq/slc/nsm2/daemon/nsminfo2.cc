@@ -10,7 +10,14 @@
 // 20140117  color version
 // 20140117  xcolor version
 // 20140124  anonymous, one less column
+// 20180327  nsminfo_hoststr update
+// 20180404  no resolv by default
+// 20180404  cache was forgotten
+// 20180412  xnumeric=0 as default for nsminfo2
+// 20180523  nsminfo2 vresion
 // ----------------------------------------------------------------------
+
+#define NSMINFO2_VERSION   1973
 
 // -- include files -----------------------------------------------------
 // ----------------------------------------------------------------------
@@ -25,13 +32,19 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <unistd.h>
 #include <signal.h>
 
 #include "nsm2.h"
 #include "nsmsys2.h"
 
+static int xnumeric = 1;
+static int xfqdn = 0;
 static int xcolor = 0;
+
+#define lengthof(a) (sizeof(a)/sizeof((a)[0]))
+
 #define BLACK()   if (xcolor) printf("\033[m")
 #define BOLD()    if (xcolor) printf("\033[0;1m")
 #define RED()     if (xcolor) printf("\033[40;31;1m")
@@ -106,22 +119,63 @@ extern "C" int nsmlib_hash(NSMsys* sysp, int32* hashtable, int hashmax,
 static const char*
 nsminfo_hoststr(int ip, int iponly = 0) // ip: network byte order
 {
-  static char host[16][256];
-  static int ihost = 0;
-  int iph = ntohl(ip);
-
-  memset(host[ihost], 0, sizeof(host[ihost]));
-  char* hostp = host[ihost];
-  ihost = (ihost + 1) % 16;
-
-  iponly = 1;
+  if (xnumeric) iponly = 1;
 
   if (iponly) {
-    S(hostp, "%d.%d.%d.%d",
-      (iph >> 24) & 255, (iph >> 16) & 255, (iph >> 8) & 255, (iph >> 0) & 255);
-  }
+    static char host[16][256];
+    static int ihost = 0;
 
-  return hostp;
+    ihost = (ihost + 1) % (lengthof(host));
+    memset(host[ihost], 0, sizeof(host[ihost]));
+    int iph = ntohl(ip);
+
+    S(host[ihost], "%d.%d.%d.%d",
+      (iph >> 24) & 255, (iph >> 16) & 255, (iph >> 8) & 255, (iph >> 0) & 255);
+
+    return host[ihost];
+
+  } else {
+    static char host[64][256];
+    static int cache[64];
+    static int ihost = -1;
+    static char* databuf = 0;
+    static int datalen = 256;
+
+    for (int i = 0; i < 64; i++) {
+      if (cache[i] == ip) return host[i];
+    }
+
+    ihost = (ihost + 1) % (lengthof(host));
+    memset(host[ihost], 0, sizeof(host[ihost]));
+
+    struct hostent hostentbuf;
+    struct hostent* hostentptr;
+    int ret;
+    int err;
+    memset((char*)&hostentbuf, 0, sizeof(hostentbuf));
+    if (! databuf) databuf = (char*)malloc(datalen);
+    if (! databuf) { perror("malloc"); exit(1); }
+    // from https://stackoverflow.com/questions/6517478/how-to-use-gethostbyname-r-in-linux
+    while ((ret = gethostbyaddr_r((char*)&ip, 4, AF_INET,
+                                  &hostentbuf, databuf, datalen,
+                                  &hostentptr, &err)) == ERANGE) {
+      datalen *= 2;
+      char* tmp = (char*)realloc(databuf, datalen);
+      if (! tmp) { perror("realloc"); free(databuf); exit(1); }
+      databuf = tmp;
+    }
+    if (! hostentptr || ! hostentptr->h_name) {
+      strcpy(host[ihost], nsminfo_hoststr(ip, 1));
+    } else {
+      snprintf(host[ihost], sizeof(host[0]), "%s", hostentptr->h_name);
+      if (! xfqdn) {
+        char* p = strchr(host[ihost], '.');
+        if (p) *p = 0;
+      }
+    }
+    cache[ihost] = ip;
+    return host[ihost];
+  }
 }
 // -- timestr -----------------------------------------------------------
 static const char*
@@ -539,6 +593,8 @@ main(int argc, char** argv)
   int shmkey = -1;
   int interval = -1;
 
+  xnumeric = 0;
+
   // option loop
   while (argc > 1 && argv[1][0] == '-') {
     char opt = argv[1][1];
@@ -569,11 +625,25 @@ main(int argc, char** argv)
       case 'A': showalist = 1; break;
       case 'D': showdisid = 1; break;
       case 'X': showconid = 1; break;
+      case 'n': xnumeric  = 1; break;
+      case 'h': xnumeric  = 0; break;
+      case 'q': xfqdn     = 1; break;
       default:
+        printf("nsminfo2 version %d.%d.%d\n",
+               NSMINFO2_VERSION / 1000,
+               (NSMINFO2_VERSION / 100) % 10,
+               NSMINFO2_VERSION % 100);
         printf("usage: nsminfo2 [options]\n");
         printf(" -p <port>   set port number.\n");
         printf(" -s <shmkey> set shmkey number.\n");
-        printf(" -i[<n>] repeat every n(default=2) seconds\n");
+        printf(" -i[<n>]     repeat every n(default=2) seconds\n");
+        printf(" -n          show numeric IP address\n");
+        printf(" -h          show resolved hostname [default]\n");
+        printf(" -c          color option\n");
+        printf(" -C          black and white [default]\n");
+        printf(" -A          show <alist> info (for experts only)\n");
+        printf(" -D          show <disid> info (for experts only)\n");
+        printf(" -X          show <conid> info (for experts only)\n");
         exit(1);
     }
     argc--, argv++;

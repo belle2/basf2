@@ -41,7 +41,7 @@ using namespace Belle2;
 //
 //
 TrgEclMaster::TrgEclMaster():
-  TimeWindow(375.0), OverlapWindow(0.0), _Clustering(0), _Bhabha(0), _EventTiming(1), _NofTopTC(3)
+  TimeWindow(375.0), OverlapWindow(0.0), _Clustering(0), _Bhabha(0), _EventTiming(1), _NofTopTC(3), _ClusterLimit(6)
 {
 
   TCEnergy.clear();
@@ -260,8 +260,10 @@ TrgEclMaster::simulate01(int m_nEvent)
     //
     // TrgEclCluster obj_cluster;
     obj_cluster->setClusteringMethod(_Clustering);
+    obj_cluster->setClusterLimit(_ClusterLimit);
     obj_cluster->setEventId(m_nEvent);
-    obj_cluster->setICN(HitTCId, TCHitEnergy, TCHitTiming);
+    obj_cluster->setICN(HitTCId, TCHitEnergy, TCHitTiming);// Clustering
+    obj_cluster->setICN(HitTCId); // Belle Cluster Counting
 
     int icn = obj_cluster->getICNFwBr();
     int icnfwd  = obj_cluster->getICNSub(0);
@@ -603,8 +605,11 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   //
   // TrgEclCluster obj_cluster;
   obj_cluster->setClusteringMethod(_Clustering);
+  obj_cluster->setClusterLimit(_ClusterLimit);
   obj_cluster->setEventId(m_nEvent);
-  obj_cluster->setICN(HitTCId, TCHitEnergy, TCHitTiming);
+  obj_cluster->setICN(HitTCId, TCHitEnergy, TCHitTiming);// Clustering
+  obj_cluster->setICN(HitTCId); // Belle Cluster Counting
+
 
   int icn = obj_cluster->getICNFwBr();
   int icnfwd  = obj_cluster->getICNSub(0);

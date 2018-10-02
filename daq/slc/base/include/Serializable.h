@@ -11,11 +11,11 @@ namespace Belle2 {
   class Serializable {
 
   public:
-    virtual ~Serializable() throw() {}
+    virtual ~Serializable() {}
 
   public:
-    virtual void readObject(Reader&) throw(IOException) = 0;
-    virtual void writeObject(Writer&) const throw(IOException) = 0;
+    virtual void readObject(Reader&) = 0;
+    virtual void writeObject(Writer&) const = 0;
 
   };
 

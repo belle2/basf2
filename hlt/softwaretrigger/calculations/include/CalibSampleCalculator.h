@@ -30,7 +30,7 @@ namespace Belle2 {
       CalibSampleCalculator(): m_particlelist(), m_extrainfoname() {};
 
       /// Set the default names for the store object particle lists.
-      CalibSampleCalculator(std::vector<std::string> prt, std::vector<std::string>ext) { m_particlelist = prt; m_extrainfoname = ext;};
+      CalibSampleCalculator(const std::vector<std::string>& prt, const std::vector<std::string>& ext) { m_particlelist = prt; m_extrainfoname = ext;};
 
       /// Require the particle list. We do not need more here.
       void requireStoreArrays() override;

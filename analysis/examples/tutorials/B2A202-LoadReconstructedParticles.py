@@ -65,6 +65,7 @@ fillParticleList('p+:good', 'protonID > 0.1')
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
 # - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
+# (-> for more details about V0s have a look at B2A203-LoadV0s.py)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts()
 stdPi0s('looseFit')

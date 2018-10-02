@@ -13,3 +13,27 @@ import variables as v
 
 v.variables.addCollection("Kinematics", v.std_vector("M", "p", "px", "py", "pz", "E"))
 v.variables.addCollection("MCTruth", v.std_vector("isSignal", "mcErrors"))
+
+v.variables.addCollection("EventLevelTracking",
+                          v.std_vector(
+                              "nExtraCDCHits",
+                              "nExtraCDCHitsPostCleaning",
+                              "hasExtraCDCHitsInLayer(0)",
+                              "hasExtraCDCHitsInLayer(1)",
+                              "hasExtraCDCHitsInLayer(2)",
+                              "hasExtraCDCHitsInLayer(3)",
+                              "hasExtraCDCHitsInLayer(4)",
+                              "hasExtraCDCHitsInLayer(5)",
+                              "hasExtraCDCHitsInLayer(6)",
+                              "hasExtraCDCHitsInLayer(7)",
+                              "nExtraCDCSegments",
+                              # "nExtraVXDHits",
+                              # "nExtraVXDHitsInLayer(1)",
+                              # "nExtraVXDHitsInLayer(2)",
+                              # "nExtraVXDHitsInLayer(3)",
+                              # "nExtraVXDHitsInLayer(4)",
+                              # "nExtraVXDHitsInLayer(5)",
+                              # "nExtraVXDHitsInLayer(6)",
+                              # "svdFirstSampleTime",
+                              "trackFindingFailureFlag"
+                          ))

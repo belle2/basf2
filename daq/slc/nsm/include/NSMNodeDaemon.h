@@ -18,13 +18,13 @@ namespace Belle2 {
       add(callback1, host1, port1);
       add(callback2, host2, port2);
     }
-    virtual ~NSMNodeDaemon() throw() {}
+    virtual ~NSMNodeDaemon() {}
 
   public:
     void add(NSMCallback* callback, const std::string& host, int port);
 
   public:
-    void run() throw();
+    void run();
 
   private:
     int m_timeout;

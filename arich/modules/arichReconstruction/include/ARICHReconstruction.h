@@ -13,6 +13,8 @@
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHReconstructionPar.h>
+#include <arich/dbobjects/ARICHChannelMask.h>
+#include <arich/dbobjects/ARICHChannelMapping.h>
 #include "framework/datastore/StoreArray.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
@@ -76,6 +78,8 @@ namespace Belle2 {
 
     DBObjPtr<ARICHGeometryConfig> m_arichgp; /**< geometry configuration parameters from the DB */
     DBObjPtr<ARICHReconstructionPar> m_recPars; /**< reconstruction parameters from the DB */
+    DBObjPtr<ARICHChannelMask> m_chnMask; /**< map of masked channels from the DB */
+    DBObjPtr<ARICHChannelMapping> m_chnMap; /**< map x,y channels to asic channels from the DB */
 
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */

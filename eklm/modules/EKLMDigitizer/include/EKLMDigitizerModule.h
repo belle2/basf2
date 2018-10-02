@@ -73,6 +73,11 @@ namespace Belle2 {
   private:
 
     /**
+     * Check channel parameters for channel-specific simulation.
+     */
+    void checkChannelParameters();
+
+    /**
      * Read hits from the store, sort sim hits and fill m_HitStripMap.
      */
     void readAndSortSimHits();
@@ -98,6 +103,12 @@ namespace Belle2 {
 
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+
+    /** Simulation mode. */
+    std::string m_SimulationMode;
+
+    /** Whether the simulation is channel-specific. */
+    bool m_ChannelSpecificSimulation;
 
     /** Initial digitization time. */
     double m_DigitizationInitialTime;

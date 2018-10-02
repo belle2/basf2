@@ -50,7 +50,7 @@ add_simulation(main)
 add_reconstruction(main)
 
 # Finally add mdst output
-output_filename = "TauGeneric.dst.root"
+output_filename = "../TauGeneric.dst.root"
 add_mdst_output(main, filename=output_filename)
 
 # process events and print call statistics

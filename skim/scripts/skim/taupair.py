@@ -18,7 +18,19 @@ from stdV0s import *
 
 def SetTauGenericSkimVariables():
     """
-    Set variables for TauGeneric skim
+    Set particle lists and variables for TauGeneric skim
+
+    * output particle lists: pi+:S1/S2, gamma:S1/S2
+
+    * nGoodTracks: number of good tracks in an event
+    * netCharge: total net charge of good tracks
+    * nTracksS1/nTracksS2: number of good tracks in each hemisphere S1/S2 divided by thrust axis
+    * MinvS1/MinvS2: invariant mass of particles in each hemisphere
+    * E_S1/E_S2: total energy of particles in each hemisphere in CMS
+    * Etot: visibleEnergyOfEventCMS + missingMomentumOfEventCMS (sum of energy of particles and missing momentum in CMS)
+    * E_ECL: total ECL energy of particles
+
+
     """
     __author__ = "Kenji Inami"
 
@@ -113,7 +125,9 @@ def TauLFVList(flag=1):
 
     Returns:
         list name of the TauLFV skim candidates
-        * If called as TauLFVList(0), not execute skim (reconstructDecay) and only return list of names
+        * If called as TauLFVList(0), not execute skim (reconstructDecay) and
+        only return list of names
+        (such as tau+:LFV_lgamma0, tau+:LFV_lgamma1, tau+:LFV_lll0, ...)
     """
     __author__ = "P. Urquijo, K. Inami"
 

@@ -33,7 +33,7 @@ inputMdstList('MC9', fileList)
 
 # Tau Skim
 from skim.taupair import *
-tauList = TauLFVList()
+tauList = TauLFVList(1)
 
 skimOutputUdst(skimCode, tauList)
 summaryOfLists(tauList)

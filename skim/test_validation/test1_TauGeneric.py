@@ -11,9 +11,9 @@ from basf2 import *
 from modularAnalysis import *
 from skimExpertFunctions import *
 
-fileList = ['TauGeneric.dst.root']
+fileList = ['../TauGeneric.dst.root']
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 # Hadronic B0 skim
 from skim.taupair import *

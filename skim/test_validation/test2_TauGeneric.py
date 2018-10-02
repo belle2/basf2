@@ -5,7 +5,7 @@ from basf2 import *
 from modularAnalysis import *
 from variables import variables
 
-inputMdst('default', 'TauGeneric.udst.root')
+inputMdst('MC9', 'TauGeneric.udst.root')
 
 # set variables
 from skim.taupair import *

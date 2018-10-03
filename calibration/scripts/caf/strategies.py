@@ -57,13 +57,14 @@ class AlgorithmStrategy(ABC):
     #: Granularity of collector that can be run by this algorithm properly
     allowed_granularities = ["run", "all"]
 
+    #: Signal value that is put into the Queue when there are no more results left
+    FINISHED_RESULTS = "DONE"
+
     def __init__(self, algorithm):
         """
         """
         #: Algorithm() class that we're running
         self.algorithm = algorithm
-        #: The results dictionary that should be filled as the algorithm gets run
-        self.results = []
         #: Collector output files, will contain all files retured by the output patterns
         self.input_files = []
         #: The algorithm output directory which is mostly used to store the stdout file
@@ -77,9 +78,13 @@ class AlgorithmStrategy(ABC):
         #: Runs that will not be included in ANY execution of the algorithm. Usually set by Calibration.ignored_runs.
         #: The different strategies may handle the resulting run gaps differently.
         self.ignored_runs = []
+        #: The list of results objects which will be sent out before the end
+        self.results = []
+        #: The multiprocessing Queue we use to pass back results one at a time
+        self.queue = None
 
     @abstractmethod
-    def run(self, iov, iteration):
+    def run(self, iov, iteration, queue):
         """
         Abstract method that needs to be implemented. It will be called to actually execute the
         algorithm.
@@ -153,12 +158,14 @@ class SingleIOV(AlgorithmStrategy):
         #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
 
-    def run(self, iov, iteration):
+    def run(self, iov, iteration, queue):
         """
         Runs the algorithm machine over the collected data and fills the results.
         """
         if not self.is_valid():
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
+        self.queue = queue
+
         B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
@@ -194,9 +201,7 @@ class SingleIOV(AlgorithmStrategy):
         self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
         B2INFO("Finished execution with result code {}".format(self.machine.result.result))
 
-        # Save the result
-        self.results.append(self.machine.result)
-        if (self.results[0].result == AlgResult.ok.value) or (self.results[0].result == AlgResult.iterate.value):
+        if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
             # Valid exit codes mean we can complete properly
             self.machine.complete()
             # Commit all the payloads and send out the results
@@ -204,6 +209,11 @@ class SingleIOV(AlgorithmStrategy):
         else:
             # Either there wasn't enough data or the algorithm failed
             self.machine.fail()
+        # No real reason for this, just so we have it in case of code changes later
+        self.results.append(self.machine.result)
+        # Send out the result
+        self.queue.put(self.machine.result)
+        self.queue.put(self.FINISHED_RESULTS)
 
 
 class SequentialRunByRun(AlgorithmStrategy):
@@ -242,12 +252,13 @@ class SequentialRunByRun(AlgorithmStrategy):
             self.algorithm.params["step_size"] = 1
         self.first_execution = True
 
-    def run(self, iov, iteration):
+    def run(self, iov, iteration, queue):
         """
         Runs the algorithm machine over the collected data and fills the results.
         """
         if not self.is_valid():
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
+        self.queue = queue
         B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
@@ -373,6 +384,7 @@ class SequentialRunByRun(AlgorithmStrategy):
                            " Will now commit payloads from the previous success for {}.".format(last_successful_result.iov))
                     self.machine.algorithm.algorithm.commit(last_successful_payloads)
                     self.results.append(last_successful_result)
+                    self.queue.put(last_successful_result)
                     # If there are remaining runs we need to have the current payloads ready to commit after the next execution
                     if remaining_runs:
                         last_successful_payloads = new_successful_payloads
@@ -383,6 +395,7 @@ class SequentialRunByRun(AlgorithmStrategy):
                                "Will now commit the most recent payloads for {}".format(new_successful_result.iov))
                         self.machine.algorithm.algorithm.commit(new_successful_payloads)
                         self.results.append(new_successful_result)
+                        self.queue.put(new_successful_result)
                         break
                 # if there's no previous success this must be the first run executed
                 else:
@@ -398,6 +411,7 @@ class SequentialRunByRun(AlgorithmStrategy):
                                " No runs left to be processed, so we are committing results of this execution.")
                         self.machine.algorithm.algorithm.commit()
                         self.results.append(self.machine.result)
+                        self.queue.put(self.machine.result)
                         break
 
                 previous_runs = current_runs[:]
@@ -412,7 +426,8 @@ class SequentialRunByRun(AlgorithmStrategy):
                 elif not remaining_runs and not last_successful_result:
                     B2ERROR("There aren't any more runs remaining to merge with, and we never had a previous success."
                             " There wasn't enough data in the full input data requested.")
-                    self.results.append(self.machine.result)
+                    self.results.appemd(self.machine.result)
+                    self.queue.put(self.machine.result)
                     self.machine.fail()
                     break
                 elif not remaining_runs and last_successful_result:
@@ -425,6 +440,7 @@ class SequentialRunByRun(AlgorithmStrategy):
             elif self.machine.result.result == AlgResult.failure.value:
                 B2ERROR("{} returned failure exit code.".format(self.algorithm.name))
                 self.results.append(self.machine.result)
+                self.queue.put(self.machine.result)
                 self.machine.fail()
                 break
         else:
@@ -444,11 +460,14 @@ class SequentialRunByRun(AlgorithmStrategy):
                     self.machine.algorithm.algorithm.commit()
                     # Save the result
                     self.results.append(self.machine.result)
+                    self.queue.put(self.machine.result)
                 else:
                     # Save the result
                     self.results.append(self.machine.result)
+                    self.queue.put(self.machine.result)
                     # But failed
                     self.machine.fail()
+        self.queue.put(self.FINISHED_RESULTS)
 
 
 class SimpleRunByRun(AlgorithmStrategy):
@@ -486,12 +505,13 @@ class SimpleRunByRun(AlgorithmStrategy):
         #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
 
-    def run(self, iov, iteration):
+    def run(self, iov, iteration, queue):
         """
         Runs the algorithm machine over the collected data and fills the results.
         """
         if not self.is_valid():
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
+        self.queue = queue
         B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
@@ -532,16 +552,20 @@ class SimpleRunByRun(AlgorithmStrategy):
                 B2INFO("Committing payloads for {}.".format(iov_from_runs([current_runs])))
                 self.machine.algorithm.algorithm.commit()
                 self.results.append(self.machine.result)
+                self.queue.put(self.machine.result)
                 self.machine.complete()
             # If it wasn't successful, was it due to lack of data in the runs?
             elif (self.machine.result.result == AlgResult.not_enough_data.value):
                 B2INFO("There wasn't enough data in the IoV {}".format(iov_from_runs([current_runs])))
                 self.results.append(self.machine.result)
+                self.queue.put(self.machine.result)
                 self.machine.fail()
             elif self.machine.result.result == AlgResult.failure.value:
                 B2ERROR("Failure exit code in the IoV {}".format(iov_from_runs([current_runs])))
                 self.results.append(self.machine.result)
+                self.queue.put(self.machine.result)
                 self.machine.fail()
+        self.queue.put(self.FINISHED_RESULTS)
 
         # Print any knowable gaps between result IoVs
         self.find_iov_gaps()

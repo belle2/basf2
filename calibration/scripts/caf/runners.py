@@ -3,6 +3,7 @@
 
 from abc import ABC, abstractmethod
 from threading import Thread
+import time
 import ROOT
 from .utils import decode_json_string
 from .utils import IoV_Result
@@ -112,31 +113,43 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
             strategy.setup_from_dict(strategy_params)
             strategies.append(strategy)
 
-        parent_conn, child_conn = multiprocessing.Pipe()
         # We then fork off a copy of this python process so that we don't affect the original with logging changes
         ctx = multiprocessing.get_context("fork")
         for strategy in strategies:
+            queue = multiprocessing.SimpleQueue()
             child = ctx.Process(target=SeqAlgorithmsRunner._run_strategy,
-                                args=(strategy, iov, iteration, child_conn))
+                                args=(strategy, iov, iteration, queue))
 
+            self.results[strategy.algorithm.name] = []
             B2DEBUG(29, "Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
             child.start()
+            update_interval = 60
+            previous_update_time = time.time()
+            while True:
+                if (time.time() - previous_update_time) > update_interval:
+                    B2INFO("Still waiting for AlgorithStrategy to finish for {}".format(strategy.algorithm.name))
+                    previous_update_time = time.time()
+                else:
+                    result = queue.get()
+                    if result == strategy.FINISHED_RESULTS:
+                        break
+                    else:
+                        self.results[strategy.algorithm.name].append(result)
             child.join()
-            B2DEBUG(29, "Finished subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
             # Check the exitcode for failed Process()
             if child.exitcode == 0:
-                self.results[strategy.algorithm.name] = parent_conn.recv()
+                B2INFO("AlgorithStrategy subprocess for {} exited correctly.".format(strategy.algorithm.name))
             else:
                 raise RunnerError("Error during subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2DEBUG(29, "Finished subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
         B2INFO("SequentialAlgorithmsRunner finished for Calibration {}".format(self.name))
 
     @staticmethod
-    def _run_strategy(strategy, iov, iteration, conn):
+    def _run_strategy(strategy, iov, iteration, queue):
         """Runs the AlgorithmStrategy sends back the results"""
-        strategy.run(iov, iteration)
+        strategy.run(iov, iteration, queue)
         # Get the return codes of the algorithm for the IoVs found by the Process
-        B2INFO("Finished Strategy for {}, sending back results.".format(strategy.algorithm.name))
-        conn.send(strategy.results)
+        B2INFO("Finished Strategy for {}".format(strategy.algorithm.name))
 
 
 class RunnerError(Exception):

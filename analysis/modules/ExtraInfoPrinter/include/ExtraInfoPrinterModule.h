@@ -22,7 +22,6 @@ namespace Belle2 {
   */
   class ExtraInfoPrinterModule : public Module {
   private:
-    bool m_printEEE = false;          /**< are we printing the EventExtraInfo? */
     bool m_printOnce = true;          /**< print for he first event or for all events? */
     bool m_hasPrinted = false;        /**< internal check if I've already printed */
     std::string m_listName;           /**< name of the ParticleList */

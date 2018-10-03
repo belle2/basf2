@@ -17,8 +17,7 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * return hadron scintillation component intensity of cluster computed from digits with offline waveforms saved.
-     * Variable is used to separate hadronic showers from electromagnetic showers
+     * return digit level MVA that uses pulse shape discrimination to identify hadronic vs electromagnetic showers.
      */
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
 

@@ -182,9 +182,10 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
 
   // Sort the found stereo hits by same CDCHit and smaller distance to the node
   // FIXME there should be a way to call the right function depending on the templated class
-  // i.e. .getLowerZ0() and .getLowerTanLambda() or .getLowerZ1() and .getLowerZ2()
-  const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or Z1
-  const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Z2
+  // i.e. .getLowerZ0() and .getLowerTanLambda() for z(s)=z0 + tanLambda * s
+  // or .getLowerP() and .getLowerQ() for z(s)=(p + 4q) * s - q^2 / 25 * s^2
+  const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or P
+  const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Q
   auto sortByHitAndNodeCenterDistance = [xMean, yMean](const CDCRecoHitWithRLPointer & lhs,
   const CDCRecoHitWithRLPointer & rhs) {
 
@@ -209,8 +210,6 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       double rhsZDistance;
 
       if (AQuadTree::m_lookingForQuadraticTracks) {
-//         lhsZDistance = lhsS * xMean + lhsS * lhsS * yMean - lhsZ;
-//         rhsZDistance = rhsS * xMean + rhsS * rhsS * yMean - rhsZ;
         lhsZDistance = (xMean + 4 * yMean) * lhsS - yMean / 25 * lhsS * lhsS - lhsZ;
         rhsZDistance = (xMean + 4 * yMean) * rhsS - yMean / 25 * rhsS * rhsS - rhsZ;
       } else {

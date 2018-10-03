@@ -27,35 +27,13 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits)
-        : m_allAxialWireHits(std::move(allAxialWireHits))
-      {
-      }
+      BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits);
       /// Destructor
-      virtual ~BaseCandidateReceiver()
-      {
-      }
+      virtual ~BaseCandidateReceiver();
       /// Main entry point for the post processing call from the QuadTreeProcessor
-      virtual void operator()(const std::vector<const CDCWireHit*>& inputWireHits, void* qt __attribute__((unused)))
-      {
-        // Unset the taken flag
-        // NOTE after QuadTreeProcessor finds a leaf, it marks all items as "taken"
-        for (const CDCWireHit* wireHit : inputWireHits) {
-          (*wireHit)->setTakenFlag(false);
-        }
-        LowHitsAxialTrackUtil::addCandidateFromHits(inputWireHits,
-                                                    m_allAxialWireHits,
-                                                    m_tracks,
-                                                    true, // fromOrigin
-                                                    false, // straight
-                                                    false); // withPostprocessing
-      }
-
+      virtual void operator()(const std::vector<const CDCWireHit*>& inputWireHits, void* qt);
       /// Get the collected tracks
-      const std::vector<CDCTrack>& getTracks() const
-      {
-        return m_tracks;
-      }
+      const std::vector<CDCTrack>& getTracks() const;
 
     protected:
       /// Pool of all axial hits from which the road search may select additional hits

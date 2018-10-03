@@ -81,7 +81,8 @@ namespace Belle2 {
       }
 
       FoxWolfram FW(p3_all);
-      return FW.R(2);
+      FW.calculateBasicMoments();
+      return FW.getR(2);
     }
 
     double R2(const Particle* particle)

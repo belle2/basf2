@@ -171,7 +171,8 @@ namespace Belle2 {
 
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
       FoxWolfram FW(p3_cms_all);
-      R2 = FW.R(2);
+      FW.calculateBasicMoments();
+      R2 = FW.getR(2);
 
       // KSFW moments
       TLorentzVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();

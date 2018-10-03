@@ -28,7 +28,7 @@ using namespace TrackFindingCDC;
 
 OffOriginExtension::OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits,
                                        double levelPrecision)
-  : BaseCandidateReceiver(allAxialWireHits)
+  : BaseCandidateReceiver(std::move(allAxialWireHits))
   , m_levelPrecision(levelPrecision)
 {
 }

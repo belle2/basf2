@@ -4,7 +4,8 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
- *       for the EventShape variables: Ami Rostomyan,  Michel Villanueva  *
+ *       for the EventKinematics variables: Ami Rostomyan,                *
+ *                                          Michel Villanueva             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

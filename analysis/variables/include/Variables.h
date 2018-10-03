@@ -205,10 +205,6 @@ namespace Belle2 {
      */
     double particleInvariantMassBeforeFitSignificance(const Particle* part);
 
-    /**
-     * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
-     */
-    double cosToThrustOfEvent(const Particle* part);
 
     /**
      * return released energy in decay

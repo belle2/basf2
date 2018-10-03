@@ -30,7 +30,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
-#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -641,19 +640,6 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
-    double cosToThrustOfEvent(const Particle* part)
-    {
-      StoreObjPtr<EventShape> evtShape;
-      if (!evtShape) {
-        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-      PCmsLabTransform T;
-      TVector3 th = evtShape->getThrustAxis();
-      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
-      return std::cos(th.Angle(particleMomentum));
-    }
-
     double b2bTheta(const Particle* part)
     {
       PCmsLabTransform T;
@@ -1211,9 +1197,6 @@ namespace Belle2 {
                       "signed deviation of particle's invariant mass from its nominal mass");
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass(determined from particle's daughter 4-momentum vectors) from its nominal mass");
-
-    REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
-                      "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
                       "component x of 3-momentum recoiling against given Particle");

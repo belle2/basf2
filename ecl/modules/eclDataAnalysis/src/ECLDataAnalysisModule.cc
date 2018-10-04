@@ -8,21 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <list>
-#include <iostream>
+//This module
+#include <ecl/modules/eclDataAnalysis/ECLDataAnalysisModule.h>
 
 #include <TTree.h>
 #include <TFile.h>
 
 // FRAMEWORK
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 
 // MDST
 #include <mdst/dataobjects/MCParticle.h>
@@ -40,11 +35,9 @@
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/modules/eclDataAnalysis/ECLDataAnalysisModule.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -1226,11 +1219,11 @@ void ECLDataAnalysisModule::event()
     m_eclLogLikePi->clear();
   }
 
-  StoreObjPtr<EventMetaData> eventmetadata;
-  if (eventmetadata) {
-    m_iExperiment = eventmetadata->getExperiment();
-    m_iRun = eventmetadata->getRun();
-    m_iEvent = eventmetadata->getEvent();
+
+  if (m_eventmetadata) {
+    m_iExperiment = m_eventmetadata->getExperiment();
+    m_iRun = m_eventmetadata->getRun();
+    m_iEvent = m_eventmetadata->getEvent();
   } else {
     m_iExperiment = -1;
     m_iRun = -1;

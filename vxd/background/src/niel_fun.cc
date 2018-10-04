@@ -34,7 +34,7 @@
 using namespace std;
 using namespace Belle2;
 
-TNiel::TNiel(const string FileName)
+TNiel::TNiel(const string& FileName)
 {
   string fullName = FileSystem::findFile(FileName);
   if (fullName == "") {

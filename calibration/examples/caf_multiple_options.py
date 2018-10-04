@@ -4,6 +4,8 @@
 # or just make your own any change the input data below.
 
 from basf2 import *
+# set_log_level(LogLevel.DEBUG)
+# set_debug_level(29)
 set_log_level(LogLevel.INFO)
 
 import os

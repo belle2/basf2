@@ -25,7 +25,7 @@
 namespace Belle2 {
   namespace SoftwareTrigger {
     /// Module defining the STM histograms
-    class SoftwareTriggerHLTDQMModule : public HistoModule {
+    class SoftwareTriggerHLTDQMModule final : public HistoModule {
     public:
       //! Constructor / Destructor
       SoftwareTriggerHLTDQMModule();
@@ -38,6 +38,9 @@ namespace Belle2 {
 
       //! Histogram definition
       void defineHisto() override;
+
+      //! Reset all histogram entries for a new run
+      void beginRun() override;
 
     private:
       // Parameters
@@ -52,10 +55,10 @@ namespace Belle2 {
 
       // Histograms
       /// histograms for the final sw trigger decisions for each base identifier
-      std::map<std::string, TH1F> m_cutResultHistograms;
+      std::map<std::string, TH1F*> m_cutResultHistograms;
 
       /// histograms for the software trigger variables in all calculators (although maybe not filled)
-      std::map<std::string, TH1F> m_triggerVariablesHistograms;
+      std::map<std::string, TH1F*> m_triggerVariablesHistograms;
 
       // Datastore members
       /// STM cut results

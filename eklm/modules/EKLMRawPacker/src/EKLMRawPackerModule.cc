@@ -21,8 +21,8 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
   setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = NULL;
   m_NEvents = 0;
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 EKLMRawPackerModule::~EKLMRawPackerModule()
@@ -33,7 +33,6 @@ void EKLMRawPackerModule::initialize()
 {
   m_Digits.isRequired();
   m_RawKLMs.registerInDataStore();
-  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 void EKLMRawPackerModule::beginRun()
@@ -68,13 +67,14 @@ void EKLMRawPackerModule::event()
     endcap = eklmDigit->getEndcap();
     layer = eklmDigit->getLayer();
     sector = eklmDigit->getSector();
-    sectorGlobal = m_GeoDat->sectorNumber(endcap, layer, sector);
+    sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
     if (lane == NULL)
       B2FATAL("Incomplete EKLM electronics map.");
     formatData(lane, eklmDigit->getPlane(),
                eklmDigit->getStrip(), eklmDigit->getCharge(),
-               eklmDigit->getTime(), bword1, bword2, bword3, bword4);
+               eklmDigit->getCTime(), eklmDigit->getTDC(),
+               bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
@@ -91,9 +91,9 @@ void EKLMRawPackerModule::event()
     packerInfo.run_subrun_num = 2;
     packerInfo.eve_num = m_NEvents;
     packerInfo.node_id = EKLM_ID + 1 + i;
-    packerInfo.tt_ctime = 0x7123456;
-    packerInfo.tt_utime = 0xF1234567;  //Triger info may be required
-    packerInfo.b2l_ctime = 0x7654321;
+    packerInfo.tt_ctime = 0;
+    packerInfo.tt_utime = 0;
+    packerInfo.b2l_ctime = 0;
     rawKlm = m_RawKLMs.appendNew();
     for (j = 0; j < 4; j++) {
       nWords[j] = dataWords[i][j].size();
@@ -120,27 +120,28 @@ void EKLMRawPackerModule::event()
  *         Bit  7 - plane number.
  *         Bit  8-12 - lane in the data concentrator.
  *         Bit  13-15 - data type: RPC=0x010 scintillator=0x100
- * Word 2: 15 bits of ctime, !!!!!!!!!!!!!!! NOT FILLED YET !!!!!!!!!!!!!
+ * Word 2: 15 bits of ctime.
  * Word 3: TDC in 10 bits.
- * Word 4: 12 bits of charge. We use 15 yet since EDep from mc does not fit
- *         12 bits, e.g. after packing/unpacking variable changes 4829 -> 733
+ * Word 4: 12 bits of charge.
  */
 void EKLMRawPackerModule::formatData(
   const EKLMDataConcentratorLane* lane, int plane, int strip,
-  int charge, float time,
+  int charge, uint16_t ctime, uint16_t tdc,
   uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4)
 {
+  int stripFirmware;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
   bword4 = 0;
-  bword1 |= (strip & 0x7F);
+  stripFirmware = m_ElementNumbers->getStripFirmwareBySoftware(strip);
+  bword1 |= (stripFirmware & 0x7F);
   bword1 |= (((plane - 1) & 1) << 7);
   bword1 |= ((lane->getLane() & 0x1F) << 8);
   bword1 |= (4 << 13);
-  //bword2 |= (ctime & 0x7FFF); //Do we need CTIME ?
-  bword3 |= (((int)time) & 0x3FF);
-  bword4 |= (charge & 0xFFFF);  //SHOULD BE 12 BITS!!!
+  bword2 |= (ctime & 0xFFFF);
+  bword3 |= (tdc & 0x3FF);
+  bword4 |= (charge & 0xFFF);
 }
 
 void EKLMRawPackerModule::endRun()

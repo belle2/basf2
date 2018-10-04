@@ -16,6 +16,8 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 
+#include <algorithm>
+
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
@@ -66,8 +68,8 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     const unsigned int numberOfBins = 50;
     const double lowerX = 0;
     const double upperX = 50;
-    m_triggerVariablesHistograms.emplace(variable, TH1F(variable.c_str(), variable.c_str(), numberOfBins, lowerX, upperX));
-    m_triggerVariablesHistograms[variable].SetXTitle(("SoftwareTriggerVariable " + variable).c_str());
+    m_triggerVariablesHistograms.emplace(variable, new TH1F(variable.c_str(), variable.c_str(), numberOfBins, lowerX, upperX));
+    m_triggerVariablesHistograms[variable]->SetXTitle(("SoftwareTriggerVariable " + variable).c_str());
   }
 
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
@@ -78,8 +80,11 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     const double lowerX = 0;
     const double upperX = numberOfBins;
     m_cutResultHistograms.emplace(baseIdentifier,
-                                  TH1F(baseIdentifier.c_str(), baseIdentifier.c_str(), numberOfBins, lowerX, upperX));
-    m_cutResultHistograms[baseIdentifier].SetXTitle(("Cut Result for " + baseIdentifier).c_str());
+                                  new TH1F(baseIdentifier.c_str(), baseIdentifier.c_str(), numberOfBins, lowerX, upperX));
+    m_cutResultHistograms[baseIdentifier]->SetXTitle(("Cut Result for " + baseIdentifier).c_str());
+    m_cutResultHistograms[baseIdentifier]->SetOption("bar");
+    m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
+    m_cutResultHistograms[baseIdentifier]->SetStats(false);
   }
 
   // We add one for the total result
@@ -87,8 +92,11 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   const double lowerX = 0;
   const double upperX = numberOfBins;
   m_cutResultHistograms.emplace("total_result",
-                                TH1F("total_result", "total_result", numberOfBins, lowerX, upperX));
-  m_cutResultHistograms["total_result"].SetXTitle("Total Cut Result");
+                                new TH1F("total_result", "total_result", numberOfBins, lowerX, upperX));
+  m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
+  m_cutResultHistograms["total_result"]->SetOption("bar");
+  m_cutResultHistograms["total_result"]->SetFillStyle(0);
+  m_cutResultHistograms["total_result"]->SetStats(false);
 
   if (oldDirectory) {
     oldDirectory->cd();
@@ -109,14 +117,14 @@ void SoftwareTriggerHLTDQMModule::event()
   if (m_variables.isValid()) {
     for (auto& variableNameAndTH1F : m_triggerVariablesHistograms) {
       const std::string& variable = variableNameAndTH1F.first;
-      TH1F& histogram = variableNameAndTH1F.second;
+      TH1F* histogram = variableNameAndTH1F.second;
 
       // try to load this variable from the computed trigger variables
       if (!m_variables->has(variable)) {
         B2FATAL("Variable " << variable << " configured for SoftwareTriggerDQM plotting is not available");
       } else {
         const double value = m_variables->getVariable(variable);
-        histogram.Fill(value);
+        histogram->Fill(value);
       }
     }
   }
@@ -128,18 +136,32 @@ void SoftwareTriggerHLTDQMModule::event()
 
       for (const std::string& cutName : cuts) {
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
-        const int cutResult = static_cast<int>(m_triggerResult->getResult(fullCutIdentifier));
 
-        m_cutResultHistograms[baseIdentifier].Fill(cutName.c_str(), cutResult);
+        // check if the cutResult is in the list, be graceful when not available
+        auto const cutEntry = m_triggerResult->getResults().find(fullCutIdentifier);
+
+        if (cutEntry != m_triggerResult->getResults().end()) {
+          const int cutResult = cutEntry->second;
+          m_cutResultHistograms[baseIdentifier]->Fill(cutName.c_str(), cutResult);
+        }
       }
 
       const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(baseIdentifier);
       const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-      m_cutResultHistograms["total_result"].Fill(totalCutIdentifier.c_str(), cutResult);
+      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult);
     }
 
     const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
-    m_cutResultHistograms["total_result"].Fill("total_result", totalResult);
+    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult);
   }
 }
+
+void SoftwareTriggerHLTDQMModule::beginRun()
+{
+  std::for_each(m_cutResultHistograms.begin(), m_cutResultHistograms.end(),
+  [](auto & it) {it.second->Reset();});
+  std::for_each(m_triggerVariablesHistograms.begin(), m_triggerVariablesHistograms.end(),
+  [](auto & it) {it.second->Reset();});
+}
+

@@ -52,7 +52,7 @@ namespace Belle2 {
      * Get sector alignment data.
      * @param[in] sector Sector number.
      */
-    EKLMAlignmentData* getSectorAlignment(uint16_t sector);
+    const EKLMAlignmentData* getSectorAlignment(uint16_t sector) const;
 
     /**
      * Set segment alignment data.
@@ -65,25 +65,7 @@ namespace Belle2 {
      * Get segment alignment data.
      * @param[in] segment Segment number.
      */
-    EKLMAlignmentData* getSegmentAlignment(uint16_t segment);
-
-    /**
-     * Add correction.
-     * @param[in] element    Element identifier.
-     * @param[in] parameter  Parameter number.
-     * @param[in] correction Correction.
-     * @param[in] invertSign Whether to invert the correction sign.
-     */
-    void add(EKLMElementID element, int parameter, double correction,
-             bool invertSign);
-
-    /**
-     * Set parameter value.
-     * @param[in] element    Element identifier.
-     * @param[in] parameter  Parameter number.
-     * @param[in] value      Value.
-     */
-    void set(EKLMElementID element, int parameter, double value);
+    const EKLMAlignmentData* getSegmentAlignment(uint16_t segment) const;
 
     /* Interface to global Millepede calibration. */
 
@@ -97,7 +79,7 @@ namespace Belle2 {
      * Get global parameter.
      * @return Global parameter value.
      */
-    double getGlobalParam(unsigned short element, unsigned short param);
+    double getGlobalParam(unsigned short element, unsigned short param) const;
 
     /**
      * Set global parameter.

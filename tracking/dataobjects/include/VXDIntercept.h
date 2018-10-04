@@ -27,6 +27,29 @@ namespace Belle2 {
     VXDIntercept(): m_coorU(0), m_coorV(0), m_sigmaU(0), m_sigmaV(0),
       m_sigmaUprime(0), m_sigmaVprime(0), m_lambda(0), m_sensorID() {}
 
+    /** Explicit constructor providing coordinates and sensorID */
+    VXDIntercept(double coorU, double coorV, VxdID sensorid) :
+      m_coorU(coorU),
+      m_coorV(coorV),
+      m_sigmaU(0),
+      m_sigmaV(0),
+      m_sigmaUprime(0),
+      m_sigmaVprime(0),
+      m_lambda(0),
+      m_sensorID(sensorid) {}
+
+    /** Explicit constructor providing all values */
+    VXDIntercept(double coorU, double coorV, double sigmaU, double sigmaV,
+                 double sigmaUprime, double sigmaVprime, double lambda, VxdID sensorid) :
+      m_coorU(coorU),
+      m_coorV(coorV),
+      m_sigmaU(sigmaU),
+      m_sigmaV(sigmaV),
+      m_sigmaUprime(sigmaUprime),
+      m_sigmaVprime(sigmaVprime),
+      m_lambda(lambda),
+      m_sensorID(sensorid) {}
+
     /** Destructor.
      */
     ~VXDIntercept() {}

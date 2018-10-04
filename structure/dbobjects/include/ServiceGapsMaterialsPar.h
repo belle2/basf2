@@ -146,12 +146,12 @@ namespace Belle2 {
 
 
   private:
-    /**< Rmin list of the mother volume. */
+    /** Rmin list of the mother volume. */
     std::vector<double> m_rmin; /**< Rmin list of the mother volume. */
-    /**< Rmax list of the mother volume. */
+    /** Rmax list of the mother volume. */
     std::vector<double> m_rmax; /**< Rmax list of the mother volume. */
-    /**< Z-cordinates list of the mother volume. */
-    std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
+    /** Z-cordinates list of the mother volume. */
+    std::vector<double> m_z;
 
     ClassDef(ServiceGapsMomVolPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
@@ -162,14 +162,14 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    ThicknessDensityPar(double IRCDCB = 0, double IPhiCDCB = 0, double IRCDCF = 0, double IPhiCDCF = 0,
-                        double IRECLB = 0, double IPhiECLB = 0, double IRECLF = 0, double IPhiECLF = 0,
-                        double IRARICHF = 0, double IPhiARICHF = 0,  double IPhiTOPF = 0,
+    ThicknessDensityPar(int IRCDCB = 0, int IPhiCDCB = 0, int IRCDCF = 0, int IPhiCDCF = 0,
+                        int IRECLB = 0, int IPhiECLB = 0, int IRECLF = 0, int IPhiECLF = 0,
+                        int IRARICHF = 0, int IPhiARICHF = 0,  int IPhiTOPB = 0, int IPhiTOPF = 0,
                         std::vector<double> thicknisses = std::vector<double>(),
                         std::vector<double> density = std::vector<double>()):
       m_IRCDCB(IRCDCB), m_IPhiCDCB(IPhiCDCB), m_IRCDCF(IRCDCF), m_IPhiCDCF(IPhiCDCF), m_IRECLB(IRECLB),
       m_IPhiECLB(IPhiECLB), m_IRECLF(IRECLF), m_IPhiECLF(IPhiECLF), m_IRARICHF(IRARICHF),
-      m_IPhiARICHF(IPhiARICHF), m_IPhiTOPF(IPhiTOPF), m_thick(thicknisses), m_density(density) {}
+      m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF), m_thick(thicknisses), m_density(density) {}
 
     /** Destructor */
     ~ThicknessDensityPar() {}
@@ -202,6 +202,8 @@ namespace Belle2 {
     int getIRARICHF() const { return m_IRARICHF;}
     /** Get the segmentation in Phi of ARICH gap forward */
     int getIPhiARICHF() const { return m_IPhiARICHF;}
+    /** Get the segmentation in Phi of TOP gap backward */
+    int getIPhiTOPB() const { return m_IPhiTOPB;}
     /** Get the segmentation in Phi of TOP gap forward */
     int getIPhiTOPF() const { return m_IPhiTOPF;}
     /** Get the list of the thicknesses */
@@ -211,31 +213,33 @@ namespace Belle2 {
 
 
   private:
-    /**< segmentation in R of CDC backward     */
-    double m_IRCDCB;
-    /**< segmentation in Phi of CDC backward   */
-    double m_IPhiCDCB;
-    /**< segmentation in R of CDC forward      */
-    double m_IRCDCF;
-    /**< segmentation in Phi of CDC forward    */
-    double m_IPhiCDCF;
-    /**< segmentation in R of ECL backward     */
-    double m_IRECLB;
-    /**< segmentation in Phi of ECL backward   */
-    double m_IPhiECLB;
-    /**< segmentation in R of ECL forward      */
-    double m_IRECLF;
-    /**< segmentation in Phi of ECL forward    */
-    double m_IPhiECLF;
-    /**< segmentation in R of ARICH forward    */
-    double m_IRARICHF;
-    /**< segmentation in Phi of ARICH forward  */
-    double m_IPhiARICHF;
-    /**< segmentation in Phi of TOP forward    */
-    double m_IPhiTOPF;
-    /**< Thickness list of CDC gap element cell. */
+    /** segmentation in R of CDC backward     */
+    int m_IRCDCB;
+    /** segmentation in Phi of CDC backward   */
+    int m_IPhiCDCB;
+    /** segmentation in R of CDC forward      */
+    int m_IRCDCF;
+    /** segmentation in Phi of CDC forward    */
+    int m_IPhiCDCF;
+    /** segmentation in R of ECL backward     */
+    int m_IRECLB;
+    /** segmentation in Phi of ECL backward   */
+    int m_IPhiECLB;
+    /** segmentation in R of ECL forward      */
+    int m_IRECLF;
+    /** segmentation in Phi of ECL forward    */
+    int m_IPhiECLF;
+    /** segmentation in R of ARICH forward    */
+    int m_IRARICHF;
+    /** segmentation in Phi of ARICH forward  */
+    int m_IPhiARICHF;
+    /** segmentation in Phi of TOP backward    */
+    int m_IPhiTOPB;
+    /** segmentation in Phi of TOP forward    */
+    int m_IPhiTOPF;
+    /** Thickness list of CDC gap element cell. */
     std::vector<double> m_thick;
-    /**< Densities list of ECL, ARICH and top gap element cell. */
+    /** Densities list of ECL, ARICH and top gap element cell. */
     std::vector<double> m_density;
 
     ClassDef(ThicknessDensityPar, 1); /**< ClassDef, must be the last term before the closing {} */
@@ -271,6 +275,10 @@ namespace Belle2 {
     std::vector<double> getRmax() const { return m_rmax;}
     /** Get the list of the z corrdinates */
     std::vector<double> getZ() const { return m_z;}
+    /** Get Backward Top Gap MomVolume */
+    const ServiceGapsMomVolPar& getMomVolTopBack(void) const { return m_momvoltopback; }
+    /** Get Backward Top Gap MomVolume */
+    ServiceGapsMomVolPar& getMomVolTopBack(void)  { return m_momvoltopback; }
     /** Get Backward Gap MomVolume */
     const ServiceGapsMomVolPar& getMomVolBack(void) const { return m_momvolback; }
     /** Get Backward Gap MomVolume */
@@ -296,21 +304,23 @@ namespace Belle2 {
   private:
     /** Record background */
     bool m_recordBackground;
-    /**< Rmin list of the mother volume. */
+    /** Rmin list of the mother volume. */
     std::vector<double> m_rmin;
-    /**< Rmax list of the mother volume. */
+    /** Rmax list of the mother volume. */
     std::vector<double> m_rmax;
-    /**< Z-cordinates list of the mother volume. */
+    /** Z-cordinates list of the mother volume. */
     std::vector<double> m_z;
-    /**< Vector with Service Materials between CDC and ECL. */
+    /** Vector with Service Materials between CDC and ECL. */
     std::vector<ServiceGapsMaterialsCdcArichTopPar> m_ServiceGapsMaterials;
-    /**< Vector with Service Materials between barrel and end cap of ECL. */
+    /** Vector with Service Materials between barrel and end cap of ECL. */
     std::vector<ServiceGapsMaterialsEclPar>  m_ServiceGapsEclMaterials;
-    /**< Backward mother volume for Service Materials. */
+    /** Backward Top mother volume for Service Materials. */
+    ServiceGapsMomVolPar m_momvoltopback;
+    /** Backward mother volume for Service Materials. */
     ServiceGapsMomVolPar m_momvolback;
-    /**< Backward mother volume for Service Materials. */
+    /** Backward mother volume for Service Materials. */
     ServiceGapsMomVolPar m_momvolfor;
-    /**< Gap element cell Thickness and density for Service Materials. */
+    /** Gap element cell Thickness and density for Service Materials. */
     ThicknessDensityPar m_thick;
 
     ClassDef(ServiceGapsMaterialsPar, 1); /**< ClassDef, must be the last term before the closing {} */

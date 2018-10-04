@@ -103,18 +103,12 @@ void SVDPackerModule::beginRun()
 void SVDPackerModule::event()
 {
 
-  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
-  StoreArray<SVDShaperDigit> svdShaperDigits(m_svdShaperDigitListName);
-
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData.");
     return;
   }
 
-
-
-  rawSVDList.clear();
-
+  m_rawSVD.clear();
 
   if (! m_map) {
     B2ERROR("xml map not loaded, going to the next module");
@@ -132,7 +126,7 @@ void SVDPackerModule::event()
   rawcprpacker_info.b2l_ctime = 0x7654321;
 
 
-  unsigned int nEntries_SVDShaperDigits = svdShaperDigits.getEntries();
+  unsigned int nEntries_SVDShaperDigits = m_svdShaperDigit.getEntries();
 
   // DataInfo contains info on 6 samples and strip number
   vector<DataInfo> (*fadc_apv_matrix)[48] = new
@@ -140,7 +134,7 @@ void SVDPackerModule::event()
 
   for (unsigned int i = 0; i < nEntries_SVDShaperDigits; i++) {
 
-    const SVDShaperDigit* hit = svdShaperDigits[i];
+    const SVDShaperDigit* hit = m_svdShaperDigit[i];
 
     short int cellID = hit->getCellID();
     VxdID sensID = hit->getSensorID();
@@ -155,6 +149,9 @@ void SVDPackerModule::event()
     unsigned short fadc = CHIP_info.fadc;
     unsigned short apv = CHIP_info.apv;
     unsigned short apvChannel = CHIP_info.apvChannel;
+
+    //do not create data words for APV missing in the hardware mapping
+    if (fadc == 0) continue;
 
     // return 0-47 for given FADC number
     auto fadcIter = FADCnumberMap.find(fadc);
@@ -178,7 +175,6 @@ void SVDPackerModule::event()
 
   for (unsigned int iFADC = 0; iFADC < nFADCboards; iFADC++) {
 
-    iCRC = 0;
     sim3sample = false;
 
     //get original FADC number
@@ -189,7 +185,7 @@ void SVDPackerModule::event()
 
 
     //new RawSVD entry --> moved inside FADC loop
-    RawSVD* raw_svd = rawSVDList.appendNew();
+    RawSVD* raw_svd = m_rawSVD.appendNew();
     data_words.clear();
 
 
@@ -198,7 +194,7 @@ void SVDPackerModule::event()
     // here goes FTB header
     data32 = 0xffaa0000;
 
-    //adds data32 to data vector and to crc16Input for further crc16 calculation
+    //adds data32 to data vector
     addData32(data32);
 
     m_FTBHeader.errorsField = 0xf0;
@@ -289,14 +285,15 @@ void SVDPackerModule::event()
 
     // crc16 calculation
     //first swap all 32-bits word -> big endian
-    uint32_t tmpBuffer[iCRC];
+    unsigned short nCRC = data_words.size();
+    uint32_t tmpBuffer[nCRC];
 
-    for (unsigned short i = 0; i < iCRC; i++)
-      tmpBuffer[i] = htonl(crc16Input[i]);
+    for (unsigned short i = 0; i < nCRC; i++)
+      tmpBuffer[i] = htonl(data_words[i]);
 
     //compute crc16
     boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
-    bcrc.process_block(tmpBuffer, tmpBuffer + iCRC);
+    bcrc.process_block(tmpBuffer, tmpBuffer + nCRC);
     unsigned int crc = bcrc.checksum();
 
 
@@ -304,7 +301,7 @@ void SVDPackerModule::event()
     m_FTBTrailer.crc16 = crc;
     m_FTBTrailer.controlWord = 0xff55;
 
-    data_words.push_back(data32);
+    addData32(data32);
 
 
     // ******* modified and moved inside FADC loop **********

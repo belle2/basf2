@@ -15,11 +15,11 @@
 //THIS MODULE
 #include <ecl/modules/eclDQM/eclDQM.h>
 
+//Boost
+#include <boost/format.hpp>
+
 //FRAMEWORK
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -32,12 +32,9 @@
 #include <ecl/utility/ECLChannelMapper.h>
 
 //ROOT
-#include "TH1F.h"
-#include "TH2F.h"
+#include <TH1F.h>
+#include <TH2F.h>
 #include <TDirectory.h>
-
-#include <iostream>
-#include <boost/format.hpp>
 
 //NAMESPACE(S)
 using namespace Belle2;
@@ -190,17 +187,13 @@ void ECLDQMModule::initialize()
 {
   REG_HISTOGRAM;   // required to register histograms to HistoManager.
 
-  StoreArray<ECLDigit> ECLDigits;
-  ECLDigits.isRequired();
+  m_ECLDigits.isRequired();
 
-  StoreArray<ECLCalDigit> ECLCalDigits;
-  ECLCalDigits.isOptional();
+  m_ECLCalDigits.isOptional();
 
-  StoreArray<ECLTrig> ECLTrigs;
-  ECLTrigs.isOptional();
+  m_ECLTrigs.isOptional();
 
-  StoreArray<ECLDsp> ECLDsps;
-  ECLDsps.isOptional();
+  m_ECLDsps.isOptional();
 }
 
 void ECLDQMModule::beginRun()
@@ -230,25 +223,20 @@ void ECLDQMModule::beginRun()
 
 void ECLDQMModule::event()
 {
-  StoreArray<ECLDigit> ECLDigits;
-  StoreArray<ECLCalDigit> ECLCalDigits;
-  StoreArray<ECLTrig> ECLTrigs;
-  StoreArray<ECLDsp> ECLDsps;
-
-  int NHitsEvent = ECLCalDigits.getEntries();
+  int NHitsEvent = m_ECLCalDigits.getEntries();
   int trigtag1 = 0;
   int flagtag = 1;
   double ecletot = 0.;
   int NHitsEventThr10MeV = 0;
   double adc_flag_bin[3] = {0., 0., 0.};
 
-  StoreObjPtr<EventMetaData> eventmetadata;
-  if (eventmetadata) m_iEvent = eventmetadata->getEvent();
+
+  if (m_eventmetadata) m_iEvent = m_eventmetadata->getEvent();
   else m_iEvent = -1;
 
-  for (auto& aECLDigit : ECLDigits) h_quality->Fill(aECLDigit.getQuality());  //Fit quality histogram filling.
+  for (auto& aECLDigit : m_ECLDigits) h_quality->Fill(aECLDigit.getQuality());  //Fit quality histogram filling.
 
-  for (auto& aECLTrig : ECLTrigs) {
+  for (auto& aECLTrig : m_ECLTrigs) {
     double itrg = aECLTrig.getTimeTrig();
     //trigger time conversion to acceptable units in range (0, ..., 142).
     //one trigger time clock corresponds to 0.567/144*1000 = 3.93 ns
@@ -258,13 +246,13 @@ void ECLDQMModule::event()
     h_trigtag2_trigid->Fill(aECLTrig.getTrigId(), aECLTrig.getTrigTagQualityFlag()); //Trigger tag flag #2 histogram filling.
   }
 
-  if (ECLTrigs.getEntries() > 0) trigtag1 /= ECLTrigs.getEntries();
+  if (m_ECLTrigs.getEntries() > 0) trigtag1 /= m_ECLTrigs.getEntries();
 
   int compar = (65535 & m_iEvent);
   if (compar == trigtag1) flagtag = 0;
   h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.
 
-  for (auto& aECLCalDigit : ECLCalDigits) {
+  for (auto& aECLCalDigit : m_ECLCalDigits) {
     int cid        = aECLCalDigit.getCellId();
     double energy  = aECLCalDigit.getEnergy(); //get calibrated energy.
     double timing  = aECLCalDigit.getTime();   //get calibrated time.
@@ -299,7 +287,7 @@ void ECLDQMModule::event()
   h_ncev->Fill(NHitsEvent); //Multiplicity histogram filling.
   h_ncev_Thr10MeV->Fill(NHitsEventThr10MeV); //Multiplicity histogram filling.
 
-  for (auto& aECLDsp : ECLDsps)  {
+  for (auto& aECLDsp : m_ECLDsps)  {
     int i = aECLDsp.getCellId() - 1; //get number of Cell ID in m_DspArray.
     aECLDsp.getDspA(m_DspArray[i]);
     m_PedestalMean[i] = 0;
@@ -312,14 +300,14 @@ void ECLDQMModule::event()
     h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal Rms error histogram filling.
   }
   h_adc_flag->Fill(0); //ADC flag histogram filling.
-  if (ECLDsps.getEntries() == ECL_TOTAL_CHANNELS) h_adc_flag->Fill(1); //ADC flag histogram filling.
-  if (ECLDsps.getEntries() > 0 && ECLDsps.getEntries() < ECL_TOTAL_CHANNELS) h_adc_flag->Fill(2); //ADC flag histogram filling.
+  if (m_ECLDsps.getEntries() == ECL_TOTAL_CHANNELS) h_adc_flag->Fill(1); //ADC flag histogram filling.
+  if (m_ECLDsps.getEntries() > 0 && m_ECLDsps.getEntries() < ECL_TOTAL_CHANNELS) h_adc_flag->Fill(2); //ADC flag histogram filling.
   for (int i = 0; i < 3; i++) adc_flag_bin[i] = h_adc_flag->GetBinContent(i + 1);
   string adc_flag_title = str(format("Flag of ADC samples (%1%, %2%)") % (adc_flag_bin[1] / adc_flag_bin[0]) %
                               (adc_flag_bin[2] / adc_flag_bin[0]));
   h_adc_flag->SetTitle(adc_flag_title.c_str());
-  if (ECLDsps.getEntries() > 0 && ECLDsps.getEntries() < ECL_TOTAL_CHANNELS && ECLDigits.getEntries() > 0)
-    h_adc_hits->Fill((double)ECLDsps.getEntries() / (double)ECLDigits.getEntries()); //ADC hits histogram filling.
+  if (m_ECLDsps.getEntries() > 0 && m_ECLDsps.getEntries() < ECL_TOTAL_CHANNELS && m_ECLDigits.getEntries() > 0)
+    h_adc_hits->Fill((double)m_ECLDsps.getEntries() / (double)m_ECLDigits.getEntries()); //ADC hits histogram filling.
 }
 
 void ECLDQMModule::endRun()

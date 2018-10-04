@@ -53,17 +53,18 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
 }
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
-  double digitizationInitialTime, bool debug)
+  const EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
+  double digitizationInitialTime, bool debug) :
+  m_DigPar(digPar), m_fitter(fitter),
+  m_DigitizationInitialTime(digitizationInitialTime), m_Debug(debug),
+  m_FPGAStat(c_FPGANoSignal), m_npe(0)
 {
   int i;
   double time, attenuationTime;
-  m_DigPar = digPar;
-  m_fitter = fitter;
-  m_DigitizationInitialTime = digitizationInitialTime;
-  m_Debug = debug;
-  m_npe = 0;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
+  m_Pedestal = m_DigPar->getADCPedestal();
+  m_PhotoelectronAmplitude = m_DigPar->getADCPEAmplitude();
+  m_Threshold = m_DigPar->getADCThreshold();
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
                                      sizeof(float));
@@ -126,14 +127,17 @@ void EKLM::FiberAndElectronics::setHitRange(
   m_stripName = "strip_" + std::to_string(it->first);
 }
 
-void EKLM::FiberAndElectronics::setThreshold(double threshold)
+void EKLM::FiberAndElectronics::setChannelData(
+  const EKLMChannelData* channelData)
 {
-  m_Threshold = threshold;
+  m_Pedestal = channelData->getPedestal();
+  m_PhotoelectronAmplitude = channelData->getPedestal();
+  m_Threshold = channelData->getThreshold();
 }
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-  int i, threshold;
+  int i;
   double l, d, t;
   double nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
@@ -178,24 +182,9 @@ void EKLM::FiberAndElectronics::processEntry()
   if (m_DigPar->getMeanSiPMNoise() > 0)
     addRandomSiPMNoise();
   simulateADC();
-  /*
-   * Fit. Threshold is 7 photoelectron signal, it has average simulated maximal
-   * amplitude about 3 maximal amplitudes of 1 photoelectron signal.
-   */
-  threshold = m_DigPar->getADCPedestal() +
-              m_DigPar->getADCPEAmplitude() * m_Threshold;
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_Threshold, &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
-  /**
-   * TODO: Change units.
-   * FPGA fitter now uses units:
-   * time = ADC conversion time,
-   * amplitude = amplitude * 0.5 * m_DigPar->ADCRange.
-   */
-  m_FPGAFit.setStartTime(m_FPGAFit.getStartTime() *
-                         m_DigPar->getADCSamplingTime() +
-                         m_DigitizationInitialTime);
   if (m_Debug)
     if (m_npe >= 10)
       debugOutput();
@@ -409,12 +398,13 @@ void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
   double amp;
+  if (m_Pedestal == 0 || m_PhotoelectronAmplitude == 0)
+    B2FATAL("Incorrect EKLM ADC simulation parameters.");
   for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
-    amp = m_DigPar->getADCPedestal() +
-          m_DigPar->getADCPEAmplitude() * m_amplitude[i];
-    if (amp > m_DigPar->getADCSaturation())
+    amp = m_Pedestal - m_PhotoelectronAmplitude * m_amplitude[i];
+    if (amp < m_DigPar->getADCSaturation())
       amp = m_DigPar->getADCSaturation();
-    m_ADCAmplitude[i] = amp;
+    m_ADCAmplitude[i] = floor(amp);
   }
 }
 
@@ -433,7 +423,7 @@ double EKLM::FiberAndElectronics::getNPE()
   double intg;
   intg = m_FPGAFit.getAmplitude();
   return intg * m_DigPar->getPEAttenuationFrequency() /
-         m_DigPar->getADCPEAmplitude();
+         m_PhotoelectronAmplitude;
 }
 
 int EKLM::FiberAndElectronics::getGeneratedNPE()

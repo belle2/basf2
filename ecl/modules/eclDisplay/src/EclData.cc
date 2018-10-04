@@ -7,8 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclData.h>
+
+//ROOT
+#include <TLeaf.h>
+#include <TFile.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 using namespace Belle2;
 
@@ -310,7 +320,8 @@ void EclData::loadRootFile(const char* path)
   m_time_max = 0;
 
   TFile* file = new TFile(path, "READ");
-  TTree* tree = (TTree*)file->Get("tree");
+  TTree* tree = 0;
+  file->GetObject("tree", tree);
   long nentries = tree->GetEntries();
 
   tree->SetBranchAddress("ECLCalDigits.m_CellId", &m_branch_ch);
@@ -320,7 +331,6 @@ void EclData::loadRootFile(const char* path)
   TLeaf* leafCellId;
   TLeaf* leafEnergy;
   TLeaf* leafTimeFit;
-  int len;
 
   leafCellId  = tree->GetLeaf("ECLCalDigits.m_CellId");
   leafEnergy  = tree->GetLeaf("ECLCalDigits.m_Energy");
@@ -329,7 +339,7 @@ void EclData::loadRootFile(const char* path)
   for (long i = 0; i < nentries; i++) {
     tree->GetEntry(i);
 
-    len = leafCellId->GetLen();
+    const int len = leafCellId->GetLen();
 
     if (len > 0) {
       m_last_event_id++;

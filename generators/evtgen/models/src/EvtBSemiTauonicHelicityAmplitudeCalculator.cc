@@ -18,7 +18,8 @@
 namespace Belle2 {
 
 
-  EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalculator()
+  EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalculator():
+    m_CV1(0), m_CV2(0), m_CS1(0), m_CS2(0), m_CT(0)
   {
     m_mB =   5.279; // value used in PRD87,034028
     m_mD =   1.866; // value used in PRD87,034028
@@ -35,8 +36,6 @@ namespace Belle2 {
 
     m_mBottom = 4.20;  // PRD77,113016
     m_mCharm =  0.901; // PRD77,113016 running mass at m_b scale
-
-    m_CV1 = m_CV2 = m_CS1 = m_CS2 = m_CT = 0;
 
     B2INFO("EvtBSemiTauonicHelicityAmplitudeCalculator initialized with the default values.");
     B2INFO("rho_1^2 : " << m_rho12);
@@ -61,7 +60,8 @@ namespace Belle2 {
       const double ffR11, const double ffR21, const double aS1, const double aR3,
       const double bottomMass, const double charmMass,
       const EvtComplex& CV1, const EvtComplex& CV2, const EvtComplex& CS1, const EvtComplex& CS2, const EvtComplex& CT,
-      const double parentMass, const double DMass, const double DstarMass)
+      const double parentMass, const double DMass, const double DstarMass):
+    m_CV1(CV1), m_CV2(CV2), m_CS1(CS1), m_CS2(CS2), m_CT(CT)
   {
     m_mB = parentMass;
     m_mD = DMass;
@@ -77,12 +77,6 @@ namespace Belle2 {
 
     m_aS1 = aS1;
     m_aR3 = aR3;
-
-    m_CV1 = CV1;
-    m_CV2 = CV2;
-    m_CS1 = CS1;
-    m_CS2 = CS2;
-    m_CT = CT;
 
     B2INFO("EvtBSemiTauonicHelicityAmplitudeCalculator initialized.");
     B2INFO("rho_1^2 : " << rho12);

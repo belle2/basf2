@@ -15,8 +15,10 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <eklm/geometry/GeometryData.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
@@ -71,6 +73,11 @@ namespace Belle2 {
   private:
 
     /**
+     * Check channel parameters for channel-specific simulation.
+     */
+    void checkChannelParameters();
+
+    /**
      * Read hits from the store, sort sim hits and fill m_HitStripMap.
      */
     void readAndSortSimHits();
@@ -85,11 +92,23 @@ namespace Belle2 {
      */
     void mergeSimHitsToStripHits();
 
-    /** Strip hits with npe lower this value will be marked as bad. */
-    double m_DiscriminatorThreshold;
-
     /** Digitization parameters. */
     DBObjPtr<EKLMDigitizationParameters> m_DigPar;
+
+    /** Time conversion. */
+    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+
+    /** Channel data. */
+    DBObjPtr<EKLMChannels> m_Channels;
+
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+
+    /** Simulation mode. */
+    std::string m_SimulationMode;
+
+    /** Whether the simulation is channel-specific. */
+    bool m_ChannelSpecificSimulation;
 
     /** Initial digitization time. */
     double m_DigitizationInitialTime;
@@ -102,9 +121,6 @@ namespace Belle2 {
 
     /** Create EKLMSim2Hits? */
     bool m_CreateSim2Hits;
-
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
 
     /** Map for EKLMSimHit sorting according sensitive volumes. */
     std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;

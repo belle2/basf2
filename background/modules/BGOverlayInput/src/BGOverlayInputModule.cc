@@ -216,7 +216,7 @@ namespace Belle2 {
         DataStore::StoreEntry& entry = (map.find(name))->second;
         m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
         m_storeEntries.push_back(&entry);
-      } else if (objName == "Belle2::ECLWaveforms") {
+      } else if (objName == "Belle2::ECLWaveforms" or objName == "Belle2::PXDInjectionBGTiming") {
         std::string name = branchName;// + m_extensionName;
         bool ok = DataStore::Instance().registerEntry(name, durability, objectPtr->IsA(),
                                                       false, storeFlags);

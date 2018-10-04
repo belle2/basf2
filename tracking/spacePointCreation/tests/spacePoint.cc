@@ -80,13 +80,14 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(aVxdID, testPoint.getVxdID());
 
     // needing globalized position and error:
-    TVector3 aPosition = sensorInfoBase.pointToGlobal(TVector3(aCluster.getU(), aCluster.getV(), 0));
+    TVector3 aPosition = sensorInfoBase.pointToGlobal(TVector3(aCluster.getU(), aCluster.getV(), 0), true);
     TVector3 globalizedVariances = sensorInfoBase.vectorToGlobal(
                                      TVector3(
                                        aCluster.getUSigma() * aCluster.getUSigma(),
                                        aCluster.getVSigma() * aCluster.getVSigma(),
                                        0
-                                     )
+                                     ),
+                                     true
                                    );
 
     TVector3 globalError;
@@ -151,13 +152,14 @@ namespace Belle2 {
 
 
     // check results for full 2D cluster-combi:
-    TVector3 aPositionFor2D = sensorInfoBase.pointToGlobal(TVector3(clusterU1.getPosition(), clusterV1.getPosition(), 0));
+    TVector3 aPositionFor2D = sensorInfoBase.pointToGlobal(TVector3(clusterU1.getPosition(), clusterV1.getPosition(), 0), true);
     TVector3 globalizedVariancesFor2D = sensorInfoBase.vectorToGlobal(
                                           TVector3(
                                             clusterU1.getPositionSigma() * clusterU1.getPositionSigma(),
                                             clusterV1.getPositionSigma() * clusterV1.getPositionSigma(),
                                             0
-                                          )
+                                          ),
+                                          true
                                         );
     TVector3 globalErrorFor2D;
     for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
@@ -178,13 +180,14 @@ namespace Belle2 {
 
 
     // check results for single-cluster-only-case:
-    TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0));
+    TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0), true);
     TVector3 globalizedVariancesFor1D = anotherSensorInfoBase.vectorToGlobal(
                                           TVector3(
                                             clusterU3.getPositionSigma() * clusterU3.getPositionSigma(),
                                             anotherSensorInfoBase.getVSize() * anotherSensorInfoBase.getVSize() / 12.,
                                             0
-                                          )
+                                          ),
+                                          true
                                         );
     TVector3 globalErrorFor1D;
     for (int i = 0; i < 3; i++) { globalErrorFor1D[i] = sqrt(abs(globalizedVariancesFor1D[i])); }

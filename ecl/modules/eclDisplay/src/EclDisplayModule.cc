@@ -8,8 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+//This module
 #include <ecl/modules/eclDisplay/EclDisplayModule.h>
+
+//Root
+#include <TApplication.h>
+#include <TSystem.h>
+
+//Framework
 #include <framework/utilities/FileSystem.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/modules/eclDisplay/EclFrame.h>
+#include <ecl/modules/eclDisplay/EclData.h>
+#include <ecl/modules/eclDisplay/geometry.h>
 
 using namespace Belle2;
 using namespace ECLDisplayUtility;
@@ -47,7 +60,7 @@ EclDisplayModule::~EclDisplayModule()
 
 void EclDisplayModule::initialize()
 {
-  eclarray.isRequired();
+  m_eclarray.isRequired();
 
   // Loading code from ECLUnpacker
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -92,8 +105,8 @@ void EclDisplayModule::event()
 
   int added_entries = 0;
 
-  for (int i = 0; i < eclarray.getEntries(); i++) {
-    ECLCalDigit* record = eclarray[i];
+  for (int i = 0; i < m_eclarray.getEntries(); i++) {
+    ECLCalDigit* record = m_eclarray[i];
     if (record->getEnergy() >= 1e-4) { //TODO: Move to constant ENERGY_THRESHOLD.
       if (m_data->addEvent(record, m_evtNum) == 0) {
         added_entries++;
@@ -130,4 +143,3 @@ void EclDisplayModule::terminate()
   delete m_frame;
   delete m_data;
 }
-

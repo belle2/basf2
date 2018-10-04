@@ -254,12 +254,12 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
               //** Peak point is the Energy */
               TCFitEnergy[iTCIdm].push_back(TCDigiE[iTCIdm][maxId[noutput]] - NoiseLevel);
               if (!(maxId[noutput] - 1)) {
-                for (int iSampling = 1; iSampling < maxId[noutput] + 3; iSampling++) {
-                  TCDigiE[iTCIdm][iSampling] -= NoiseLevel;
+                for (int jSampling = 1; jSampling < maxId[noutput] + 3; jSampling++) {
+                  TCDigiE[iTCIdm][jSampling] -= NoiseLevel;
                 }
               } else {
-                for (int iSampling = maxId[noutput] - 1; iSampling < maxId[noutput] + 3; iSampling++) {
-                  TCDigiE[iTCIdm][iSampling] -= NoiseLevel;
+                for (int jSampling = maxId[noutput] - 1; jSampling < maxId[noutput] + 3; jSampling++) {
+                  TCDigiE[iTCIdm][jSampling] -= NoiseLevel;
                 }
               }
               //@ Search T_a ID

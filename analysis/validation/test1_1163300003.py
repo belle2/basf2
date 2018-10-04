@@ -164,7 +164,7 @@ analysis_main.add_module(skimALL)
 
 applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 
-applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
+applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
 
 # rank Btag canidates according to their SignalProbability
 # 'sigProb' is alias for 'extraInfo(SignalProbability)'
@@ -278,7 +278,7 @@ toolsB0 += ['MCTruth', '^B0:genericRank']
 
 
 toolsB0SL = ['EventMetaData', '^B0:semileptonicRank']
-toolsB0SL += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B0:semileptonicRank']
+toolsB0SL += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B0:semileptonicRank']
 toolsB0SL += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B0:semileptonicRank']
 toolsB0SL += ['CustomFloats[d0_dmID]', '^B0:semileptonicRank']
 toolsB0SL += ['CustomFloats[isSignalAcceptMissingNeutrino]', '^B0:semileptonicRank']
@@ -295,7 +295,7 @@ tools4SB0Had += ['CustomFloats[d0_E:d0_eCMS:d1_E:d1_eCMS:d1_d0_E:d1_d0_eCMS:d0_d
 
 tools4SB0Had += ['CustomFloats[missPx(ROEclusters,0):missPy(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
 tools4SB0Had += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
-tools4SB0Had += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]',
+tools4SB0Had += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
                  '^Upsilon(4S):BhadBsig0']
 tools4SB0Had += ['CustomFloats[d0_M:d1_M:d0_d0_M:d0_d1_M:d1_d0_M]', 'Upsilon(4S):BhadBsig0 ->  B0:genericRank ^anti-B0:all']
 tools4SB0Had += ['CustomFloats[d0_p:d0_pCMS:d1_p:d1_pCMS:d0_d0_p:d0_d0_pCMS:d0_d1_p:d0_d1_pCMS:d1_d0_pCMS:d1_d0_p]',
@@ -320,13 +320,13 @@ tools4SB0Had += ['CustomFloats[d0_d0_d1_kaonID:d0_d0_d1_pionID:d0_d0_d1_muonID:d
 tools4SB0SL = ['EventMetaData', '^Upsilon(4S):BslBsig0']
 tools4SB0SL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S):BslBsig0']
 tools4SB0SL += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S):BslBsig0']
-tools4SB0SL += ['CustomFloats[cosThetaBetweenParticleAndTrueB:R2EventLevel:R2:cosTBTO:cosTBz]',
+tools4SB0SL += ['CustomFloats[cosThetaBetweenParticleAndNominalB:R2EventLevel:R2:cosTBTO:cosTBz]',
                 'Upsilon(4S):BslBsig0 -> ^B0:semileptonicRank anti-B0:all']
 tools4SB0SL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BslBsig0 -> ^B0:semileptonicRank anti-B0:all']
 
 
 tools4SB0SL += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S):BslBsig0']
-tools4SB0SL += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):missingMass:missM2(ROEclusters,0)]',
+tools4SB0SL += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
                 '^Upsilon(4S):BslBsig0']
 tools4SB0SL += ['CustomFloats[d0_E:d0_eCMS:d1_E:d1_eCMS:d1_d0_E:d1_d0_eCMS:d0_d0_E:d0_d0_eCMS:d0_d1_E:d0_d1_eCMS]',
                 'Upsilon(4S):BslBsig0 ->  B0:semileptonicRank ^anti-B0:all']

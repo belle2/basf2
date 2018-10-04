@@ -37,6 +37,14 @@ Hough3DFinder::Hough3DFinder(void) :
   m_mode = 2;
   m_Trg_PI = 3.141592653589793;
   m_outputLutDirname = m_outputVhdlDirname + "/" + "LutData";
+  // Make driftMap
+  m_driftMap = new int* [4];
+  for (int iSt = 0; iSt < 4; iSt++) {
+    m_driftMap[iSt] = new int[m_nWires[iSt] / 2];
+    for (int iTS = 0; iTS < m_nWires[iSt] / 2; iTS++) {
+      m_driftMap[iSt][iTS] = 0;
+    }
+  }
 }
 
 Hough3DFinder::~Hough3DFinder(void)

@@ -29,6 +29,7 @@ namespace TreeFitter {
     enum Type { unknown = 0,
                 beamenergy,
                 beamspot,
+                origin,
                 lifetime,
                 resonance,
                 composite,
@@ -37,9 +38,9 @@ namespace TreeFitter {
                 klong,
                 conversion,
                 kinematic,
-                massEnergy,
                 geometric,
                 mass,
+                massEnergy,
                 merged,
                 ntypes
               };
@@ -96,7 +97,10 @@ namespace TreeFitter {
     virtual ErrCode project(const FitParams& fitpar, Projection& p) const;
 
     /** filter this constraint */
-    virtual ErrCode filter(FitParams* fitpar);
+    virtual ErrCode filter(FitParams& fitpar);
+
+    /** filter this constraint */
+    virtual ErrCode filterWithReference(FitParams& fitpar, const FitParams& oldState);
 
     /** get name of constraint  */
     std::string name() const;

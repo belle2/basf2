@@ -7,11 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclPainterPolar.h>
+
+//Root
 #include <TMath.h>
 #include <TColor.h>
+#include <TH2.h>
+#include <TCrown.h>
+#include <TText.h>
+
+//ECL
 #include <ecl/modules/eclDisplay/geometry.h>
+
 
 using namespace Belle2;
 using namespace ECLDisplayUtility;

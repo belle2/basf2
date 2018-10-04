@@ -25,7 +25,8 @@
 
 from basf2 import process, statistics
 from modularAnalysis import *
-from stdFSParticles import *
+from stdPhotons import *
+from stdCharged import *
 from variables import variables
 
 # load input ROOT file
@@ -37,11 +38,11 @@ inputMdst('default', '../1110021010.dst.root')
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-stdPi('99eff')
+stdPi('95eff')
 stdPhotons('loose')
 
 # reconstruct rho0:pipi
-reconstructDecay('rho0:pipi -> pi+:99eff pi-:99eff', '0.35 < M < 1.2')
+reconstructDecay('rho0:pipi -> pi+:95eff pi-:95eff', '0.35 < M < 1.2')
 matchMCTruth('rho0:pipi')
 
 # reconstruct B0:sig
@@ -55,11 +56,11 @@ matchMCTruth('B0:sig')
 # information to be saved to file
 tools = ['EventMetaData', '^B0:sig']
 tools += ['RecoStats', '^B0:sig']
-tools += ['Kinematics', '^B0:sig -> [^rho0:pipi -> ^pi+:99eff ^pi-:99eff] ^gamma:loose']
-tools += ['InvMass', '^B0:sig -> [^rho0:pipi -> pi+:99eff pi-:99eff] gamma:loose']
-tools += ['DeltaEMbc', '^B0:sig -> [rho0:pipi -> pi+:99eff pi-:99eff] gamma:loose']
+tools += ['Kinematics', '^B0:sig -> [^rho0:pipi -> ^pi+:95eff ^pi-:95eff] ^gamma:loose']
+tools += ['InvMass', '^B0:sig -> [^rho0:pipi -> pi+:95eff pi-:95eff] gamma:loose']
+tools += ['DeltaEMbc', '^B0:sig -> [rho0:pipi -> pi+:95eff pi-:95eff] gamma:loose']
 variables.addAlias("Egamma", "useRestFrame(daughter(1,E))")
-tools += ['CustomFloats[Egamma]', '^B0:sig -> [rho0:pipi -> pi+:99eff pi-:99eff] gamma:loose']
+tools += ['CustomFloats[Egamma]', '^B0:sig -> [rho0:pipi -> pi+:95eff pi-:95eff] gamma:loose']
 
 # write out the flat ntuple
 ntupleFile('../1110021010.ntup.root')

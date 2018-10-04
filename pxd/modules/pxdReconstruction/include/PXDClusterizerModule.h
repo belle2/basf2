@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDClusterizerModule_H
-#define PXDClusterizerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -17,15 +16,13 @@
 #include <pxd/reconstruction/ClusterCache.h>
 #include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
-#include <pxd/reconstruction/PXDClusterShape.h>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
   class RelationArray;
   class RelationElement;
-  class PXDClusterShape;
-  class PXDClusterShapeType;
+
 
   namespace PXD {
 
@@ -121,9 +118,6 @@ namespace Belle2 {
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;
 
-      /** Do not aply recognition of cluster shape and set its ID */
-      bool m_notUseClusterShape;
-
       /** Size of cluster Cache (0 = default) */
       int m_clusterCacheSize;
       /** cache of the last seen clusters to speed up clustering */
@@ -142,4 +136,3 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDClusterizerModule_H

@@ -19,7 +19,7 @@ namespace Belle2 {
   /**
    * Calibration Collector Module for PXD hot pixel masking from PXDRawHits
    *
-   *    *
+   *
    */
   class PXDRawHotPixelMaskCollectorModule : public CalibrationCollectorModule {
 

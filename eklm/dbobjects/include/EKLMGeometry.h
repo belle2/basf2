@@ -1297,11 +1297,6 @@ namespace Belle2 {
     int getNSegmentSupportElementsSector() const;
 
     /**
-     * Get number of strips in a segment.
-     */
-    int getNStripsSegment() const;
-
-    /**
      * Get number of strips.
      */
     int getNStrips() const;
@@ -1436,9 +1431,6 @@ namespace Belle2 {
     /** Number of segment support elements in one sector. */
     int m_NSegmentSupportElementsSector;
 
-    /** Number of strips in one segment. */
-    int m_NStripsSegment;
-
     /** Number of strips in one plane. */
     int m_NStrips;
 
@@ -1488,7 +1480,7 @@ namespace Belle2 {
     ShieldGeometry m_ShieldGeometry;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMGeometry, 2);
+    ClassDef(Belle2::EKLMGeometry, 3);
 
   };
 

@@ -59,8 +59,6 @@ namespace Belle2 {
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
 
-    int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
-
     double m_toleranceZ;
     double m_tolerancePhi;
 

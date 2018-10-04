@@ -11,6 +11,8 @@
 #pragma once
 
 #include <top/reconstruction/TOPf77fun.h>
+#include <framework/database/DBObjPtr.h>
+#include <top/dbobjects/TOPCalModuleAlignment.h>
 
 extern "C" {void top_geo_dump_();}
 
@@ -42,6 +44,12 @@ namespace Belle2 {
        * Constructor (which does the stuff if reconstruction geometry not configured yet)
        */
       TOPconfigure();
+
+      /**
+       * Passes alignment constants to FORTRAN code
+       * function is used in call-back
+       */
+      static void setAlignmentConstants();
 
       /**
        * Defines TOP counter volume (must be called first)
@@ -386,6 +394,7 @@ namespace Belle2 {
 
     private:
       static bool m_configured; /**< set to true when done */
+      static DBObjPtr<TOPCalModuleAlignment> m_alignment; /**< alignment constants */
       double m_R1 = 0;   /**< inner radius */
       double m_R2 = 0;   /**< outer radius */
       double m_Z1 = 0;   /**< backward z */

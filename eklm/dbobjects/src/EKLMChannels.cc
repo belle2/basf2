@@ -33,9 +33,9 @@ void EKLMChannels::setChannelData(uint16_t strip, EKLMChannelData* dat)
     it->second = *dat;
 }
 
-EKLMChannelData* EKLMChannels::getChannelData(uint16_t strip)
+const EKLMChannelData* EKLMChannels::getChannelData(uint16_t strip) const
 {
-  std::map<uint16_t, EKLMChannelData>::iterator it;
+  std::map<uint16_t, EKLMChannelData>::const_iterator it;
   it = m_Channels.find(strip);
   if (it == m_Channels.end())
     return NULL;

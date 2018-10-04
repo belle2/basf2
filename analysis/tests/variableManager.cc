@@ -79,7 +79,8 @@ namespace {
     const Manager::Var* aliasDoesExists = Manager::Instance().getVariable("myAlias");
     EXPECT_TRUE(aliasDoesExists != nullptr);
 
-    EXPECT_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
+    EXPECT_NO_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
+    EXPECT_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(0, extraInfo(signalProbability)))"));
     EXPECT_B2ERROR(Manager::Instance().addAlias("M", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
 
     //re-registration not allowed

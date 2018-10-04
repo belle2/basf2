@@ -6,7 +6,7 @@
 <header>
   <input>../1111440100.dst.root</input>
   <output>../PIDMuons.ntup.root</output>
-  <contact>Jan Strube jan.strube@desy.de</contact>
+  <contact>Jan Strube jan.strube@desy.de, Dmitrii Neverov dmitrii.neverov@desy.de</contact>
 </header>
 """
 
@@ -23,7 +23,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdFSParticles import *
+from stdCharged import *
 from variables import variables
 from ROOT import Belle2
 from glob import glob
@@ -50,8 +50,9 @@ reconstructDecay('J/psi -> mu-:all mu+:all', '2.8 < M < 3.3')
 vertexRave('J/psi', 0.0, "J/psi -> ^mu-:all ^mu+:all")
 matchMCTruth('J/psi')
 
-fillParticleList('K_S0', '0.3 < M < 0.7')
-vertexRave('K_S0', 0.0, "K_S0 -> ^pi+:all ^pi-:all")
+# load V0 Kshorts
+fillParticleList('K_S0 -> pi+ pi-', '0.3 < M < 0.7')
+vertexRave('K_S0', 0.0, "K_S0 -> ^pi+ ^pi-")
 matchMCTruth('K_S0')
 
 # Prepare the B candidates
@@ -65,7 +66,8 @@ tools += ['InvMass', '^B0 -> [^J/psi -> mu+:all mu-:all] [^K_S0 -> pi+ pi-]']
 
 # PID VARIABLES AND TRACK RECONSTRUCTION
 tools += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+tools += ['Kinematics', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
+tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL:cosTheta]',
           "B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]"]
 
 ntupleFile('../PIDMuons.ntup.root')

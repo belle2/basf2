@@ -12,23 +12,13 @@
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
-#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
-#include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
-#include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
-#include <reconstruction/dbobjects/CDCDedx2DCor.h>
-#include <reconstruction/dbobjects/CDCDedx1DCleanup.h>
-#include <reconstruction/dbobjects/CDCDedxCurvePars.h>
-#include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
-#include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 
 #include <vector>
 
@@ -56,45 +46,63 @@ namespace Belle2 {
      */
     virtual void collect();
 
+    /**
+    * if bad phi region removal is demanded
+    */
+    void setBadPhiRejection(bool value) {IsBadPhiRej = value;}
+
+    /**
+    * if bad phi region removal is demanded
+    */
+    void setEoverPCutValue(double value) {fSetEoverP = value;}
+
 
   private:
 
-    // required input
+    /**
+    * Electron collector variables
+    */
+    bool m_cuts; /**< Boolean to apply cuts during collection */
+
+    /// required input
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array for Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
-    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Event metadata */
-
-    bool m_cuts; /**< Whether to apply cleanup cuts */
-    bool m_momCor; /**< Whether to apply momentum correction */
-    bool m_useDBMomCor; /**< Whether to use momentum correction in DB */
-    bool m_scaleCor; /**< Whether to apply scale correction */
-    bool m_cosineCor; /**< Whether to apply cosine correction */
-
-    // parameters: calibration constants
-    DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
-    DBObjPtr<CDCDedxMomentumCor> m_DBMomentumCor; /**< Momentum correction for cosmics */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
-    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
-    DBObjPtr<CDCDedx2DCor> m_DB2DCor; /**< 2D correction DB object */
-    DBObjPtr<CDCDedx1DCleanup> m_DB1DCleanup; /**< 1D correction DB object */
-    DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
-    // module params
+    /// module params
     int m_maxNumHits; /**< maximum number of hits allowed */
-
-    // track level information
+    double fSetEoverP; /**< Cut of E over P value */
+    /// track level information
     double m_dedx = -1;  /**< dE/dx truncated mean */
     double m_costh = -1; /**< track cos(theta) */
     double m_p = -1; /**< track momentum */
+    int m_charge = 0; /**< track momentum */
+    int m_run = 1;/**<run number */
     int m_nhits = -1;    /**< number of dE/dx hits on the track */
 
-    // hit level information
+    /// hit level information
     std::vector<int> m_wire;       /**< wire number for the hit */
     std::vector<int> m_layer;      /**< continuous layer number for the hit */
     std::vector<double> m_doca;    /**< distance of closest approach for the hit */
     std::vector<double> m_enta;    /**< entrance angle for the hit */
+    std::vector<double> m_docaRS;    /**< rescaled distance of closest approach for the hit */
+    std::vector<double> m_entaRS;    /**< rescaled entrance angle for the hit */
     std::vector<double> m_dedxhit; /**< dE/dx for the hit */
+
+
+    bool Iscosth; /**< flag to write costh in tree  */
+    bool Isp;/**< flag to write momentum in treet */
+    bool Ischarge;/**< flag to write charge in treet */
+    bool Isrun;/**< flag to write run number in tree */
+    bool Iswire;/**< flag to write wire number in tree */
+    bool Islayer;/**< flag to write layer number in tree */
+    bool Isdoca;/**< flag to write doca in tree */
+    bool Isenta;/**< flag to write enta in tree */
+    bool IsdocaRS;/**< flag to write rescaled doca in tree */
+    bool IsentaRS;/**< flag to write rescaled enta in tree */
+    bool Isdedxhit;    /**< flag to write dedxhits in tree */
+    bool IsBadPhiRej;/**< flag to remove bad phi region */
+    bool IsRadbhabha; /**< flag to dedx cut on partner track */
   };
 }

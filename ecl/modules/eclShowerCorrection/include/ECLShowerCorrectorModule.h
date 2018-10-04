@@ -15,26 +15,23 @@
 
 #pragma once
 
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
-#include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
+// STL
+#include <vector>
+
+//ROOT
+#include <TGraph2D.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
-#include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// OTHER
-#include <string>
-#include <vector>
-#include <TGraph2D.h>
-
-
 namespace Belle2 {
   class EventLevelClusteringInfo;
+  class ECLShower;
+  class ECLShowerCorrectorLeakageCorrection;
+  class ECLShowerEnergyCorrectionTemporary;
 
   /** Class to perform the shower correction */
   class ECLShowerCorrectorModule : public Module {

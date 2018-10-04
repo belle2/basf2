@@ -72,8 +72,21 @@ namespace Belle2 {
   TEST_F(EventLevelTrackingInfoTest, settersNGettersFlagBlock)
   {
     EventLevelTrackingInfo eventLevelTrackingInfo;
-    EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), false);
-    eventLevelTrackingInfo.setHintForTrackFindingFailure();
-    EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), true);
+    EXPECT_EQ(eventLevelTrackingInfo.hasUnspecifiedTrackFindingFailure(), false);
+    EXPECT_EQ(eventLevelTrackingInfo.hasAnErrorFlag(), false);
+    EXPECT_EQ(eventLevelTrackingInfo.hasVXDTF2AbortionFlag(), false);
+    eventLevelTrackingInfo.setUnspecifiedTrackFindingFailure();
+    EXPECT_EQ(eventLevelTrackingInfo.hasUnspecifiedTrackFindingFailure(), true);
+    EXPECT_EQ(eventLevelTrackingInfo.hasAnErrorFlag(), true);
+    EXPECT_EQ(eventLevelTrackingInfo.hasVXDTF2AbortionFlag(), false);
+
+    EventLevelTrackingInfo eventLevelTrackingInfo2;
+    EXPECT_EQ(eventLevelTrackingInfo2.hasVXDTF2AbortionFlag(), false);
+    EXPECT_EQ(eventLevelTrackingInfo2.hasAnErrorFlag(), false);
+    EXPECT_EQ(eventLevelTrackingInfo2.hasUnspecifiedTrackFindingFailure(), false);
+    eventLevelTrackingInfo2.setVXDTF2AbortionFlag();
+    EXPECT_EQ(eventLevelTrackingInfo2.hasVXDTF2AbortionFlag(), true);
+    EXPECT_EQ(eventLevelTrackingInfo2.hasAnErrorFlag(), true);
+    EXPECT_EQ(eventLevelTrackingInfo2.hasUnspecifiedTrackFindingFailure(), false);
   }
 } // namespace Belle2

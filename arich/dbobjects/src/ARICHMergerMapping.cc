@@ -72,7 +72,7 @@ void ARICHMergerMapping::addMapping(unsigned moduleID, unsigned mergerID, unsign
   m_mergerID.insert(std::pair<unsigned, unsigned>(mergerID, mergerSN));
 }
 
-void ARICHMergerMapping::print()
+void ARICHMergerMapping::print() const
 {
 
   std::cout << std::endl;

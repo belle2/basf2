@@ -61,9 +61,9 @@ const TVector3& SensorInfo::getBField(const TVector3& point) const
   static TVector3 oldField(0, 0, 0);
   static double bRadius = 0.5 * Unit::cm;
   if (TVector3(point - oldPoint).Mag() > bRadius) { // renew if far point
-    TVector3 pointGlobal = pointToGlobal(point);
+    TVector3 pointGlobal = pointToGlobal(point, true);
     TVector3 bGlobal = BFieldManager::getField(pointGlobal);
-    TVector3 bLocal = vectorToLocal(bGlobal);
+    TVector3 bLocal = vectorToLocal(bGlobal, true);
     oldPoint = point;
     oldField = bLocal;
   }

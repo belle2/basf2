@@ -14,6 +14,7 @@
 #pragma link C++ class Belle2::PXDRawAdc+;
 #pragma link C++ class Belle2::PXDRawCluster+;
 #pragma link C++ class Belle2::PXDHardwareCluster+;
+#pragma link C++ class Belle2::PXDInjectionBGTiming+;
 
 #pragma link C++ class Belle2::PXDDAQDHPStatus;
 #pragma link C++ class Belle2::PXDDAQDHEStatus;
@@ -21,12 +22,11 @@
 #pragma link C++ class Belle2::PXDDAQPacketStatus;
 #pragma link C++ class Belle2::PXDDAQStatus+;
 
+#pragma link C++ class Belle2::PXDGatedModeInfo+;
+
 #pragma link C++ class Belle2::PXDEnergyDepositionEvent+;
 #pragma link C++ class Belle2::PXDNeutronFluxEvent+;
 #pragma link C++ class Belle2::PXDOccupancyEvent+;
 
-#pragma link C++ class Belle2::PXDCalibrationMap+;
-#pragma link C++ struct Belle2::PXDCalibrationMap::key_hash+;
-#pragma link C++ struct Belle2::PXDCalibrationMap::key_equal+;
 
 #endif

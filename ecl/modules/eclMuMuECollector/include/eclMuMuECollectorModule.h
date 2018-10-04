@@ -10,15 +10,25 @@
 
 #pragma once
 
+//Calibration
 #include <calibration/CalibrationCollectorModule.h>
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+//ECL
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLDigit.h>
 
 namespace Belle2 {
+
+  class ECLDigit;
+  class ECLCalDigit;
+  class Track;
+  class ECLCrystalCalib;
+  class EventMetaData;
+  class TRGSummary;
+
+  namespace ECL {
+    class ECLNeighbours;
+  }
 
   /** Calibration collector module that uses muon pairs to do ECL single crystal energy calibration */
   class eclMuMuECollectorModule : public CalibrationCollectorModule {
@@ -52,9 +62,11 @@ namespace Belle2 {
     ECL::ECLNeighbours* myNeighbours8; /**< class to return 8 nearest neighbours to crystal */
 
     /** Required arrays */
-    StoreArray<Track> TrackArray; /**< Required input array of tracks */
-    StoreArray<ECLDigit> eclDigitArray; /**< Required input array of eclDigits */
-
+    StoreArray<Track> m_trackArray; /**< Required input array of tracks */
+    StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of eclDigits */
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< DataStore EventMetaData */
+    StoreObjPtr<TRGSummary> m_TRGResults; /**< DataStore TRGSummary */
+    StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< DataStore TRGSummary */
 
     /** Some other useful quantities */
     double cotThetaLabMin;  /**< m_thetaLabMinDeg converted to cotangent */
@@ -76,4 +88,3 @@ namespace Belle2 {
 
   };
 }
-

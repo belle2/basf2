@@ -19,14 +19,16 @@
 
 // ECL
 #include <ecl/utility/Position.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLShower.h>
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
 
 // OTHER
 #include <string>
-#include <utility>      // std::pair
-#include <algorithm>    // std::find
 
 // NAMESPACES
 using namespace Belle2;

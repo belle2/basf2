@@ -8,12 +8,10 @@ path, tempfolder = create_test_path(runtype="collision", expNum=1002)
 reco_components = DEFAULT_HLT_COMPONENTS
 reco_components.remove("SVD")
 
-# no reconstruction or software trigger added at all
 add_hlt_processing(
     path,
     run_type="collision",
     softwaretrigger_mode="monitoring",
-    reco_components=reco_components,
-    clean_wrapped_path=True)
+    reco_components=reco_components)
 
 finalize_test_path(path, tempfolder)

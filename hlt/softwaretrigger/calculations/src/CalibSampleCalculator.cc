@@ -20,6 +20,7 @@ namespace Belle2 {
       }
       m_particleList.isRequired("pi+:calib");
       m_particleList.isRequired("gamma:calib");
+      m_recoTracksMpl.isRequired("RecoTracksMpl");
 
     };
 
@@ -41,6 +42,7 @@ namespace Belle2 {
 
       calculationResult["ntracks"] = pionlist->getListSize();
       calculationResult["ngamma"] = gammalist->getListSize();
+      calculationResult["nMplTracks"] = m_recoTracksMpl.getEntries();
 
       // total Charge
       int totalCharge = 0;

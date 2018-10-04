@@ -4,10 +4,11 @@ env['SUBLIB'] = True
 env['LIBS'] = ['framework', 
                'analysis_dataobjects',
                'mdst_dataobjects', 
+	       'RaveBase',
                '$ROOT_LIBS', 
                'CLHEP', 
                'EG',
-	             'analysis_ClusterUtility', 
+	       'analysis_ClusterUtility', 
 ]
 
 Return('env')

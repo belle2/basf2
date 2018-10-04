@@ -13,6 +13,8 @@
 #include <framework/logging/Logger.h>
 #include <TObject.h>
 
+#include <boost/optional.hpp>
+
 #include <vector>
 #include <utility>
 #include <cmath>
@@ -34,36 +36,58 @@ namespace Belle2 {
       EventT0Component() = default;
 
       /// Convenience constructor.
-      EventT0Component(double eventT0_, double eventT0Uncertainty_, Const::EDetector detector_) :
-        eventT0(eventT0_), eventT0Uncertainty(eventT0Uncertainty_), detector(detector_) {}
+      EventT0Component(double eventT0_, double eventT0Uncertainty_, const Const::DetectorSet& detectorSet_,
+                       const std::string& algorithm_ = "", double quality_ = NAN) :
+        eventT0(eventT0_), eventT0Uncertainty(eventT0Uncertainty_), detectorSet(detectorSet_),
+        algorithm(algorithm_), quality(quality_) {}
 
       /// Storage of the T0 estimation.
       double eventT0 = NAN;
       /// Storage of the uncertainty of the T0 estimation.
       double eventT0Uncertainty = NAN;
-      /// Storage of the detector, who has determined the event T0.
-      Const::EDetector detector = Const::EDetector::invalidDetector;
+      /**
+       * Storage of the detector, who has determined the event T0.
+       * Can be multiple detectors, if the value was computed using information
+       * from multiple detectors.
+      */
+      Const::DetectorSet detectorSet;
+      /// Storage for which algorithm created the event t0
+      std::string algorithm = "";
+      /// Storage for the internal quality estimation for a single algorithm. Only comparable for all temporaries with the same algorithm and detector.
+      double quality = NAN;
+
+      ClassDef(EventT0Component, 3) /**< Storage element for the EventT0Component */
     };
 
-    // Final event t0
     /// Check if a final event t0 is set
     bool hasEventT0() const;
 
     /// Return the final event t0, if one is set. Else, return NAN.
     double getEventT0() const;
 
+    /// Return the final event t0, if one is set. Else, return an empty optional.
+    boost::optional<EventT0Component> getEventT0Component() const;
+
     /// Return the final event t0 uncertainty, if one is set. Else, return NAN.
     double getEventT0Uncertainty() const;
 
     /// Replace/set the final double T0 estimation
-    void setEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector);
+    void setEventT0(double eventT0, double eventT0Uncertainty, const Const::DetectorSet& detector, const std::string& algorithm = "");
 
-    // Temporary event t0
-    /// Check if one of the detectors in the given set has a temporary t0 estimation.
-    bool hasTemporaryEventT0(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
+    /// Replace/set the final double T0 estimation
+    void setEventT0(const EventT0Component& eventT0);
+
+    /// Add another temporary double T0 estimation
+    void addTemporaryEventT0(const EventT0Component& eventT0);
 
     /// Return the list of all temporary event t0 estimations.
     const std::vector<EventT0Component>& getTemporaryEventT0s() const;
+
+    /// Return the list of all temporary event t0 estimations for a specific detector
+    const std::vector<EventT0Component> getTemporaryEventT0s(Const::EDetector detector) const;
+
+    /// Check if one of the detectors in the given set has a temporary t0 estimation.
+    bool hasTemporaryEventT0(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
     /// Get the detectors that have determined temporary event T0s.
     Const::DetectorSet getTemporaryDetectors() const;
@@ -71,11 +95,15 @@ namespace Belle2 {
     /// Return the number of stored event T0s
     unsigned long getNumberOfTemporaryEventT0s() const;
 
-    /// Add another temporary double T0 estimation, replacing the final event t0 or not
-    void addTemporaryEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector);
-
     /// Clear the list of temporary event T0 estimations
     void clearTemporaries();
+
+    /**
+     * Clear the final EventT0, this is neded in case some algorithm has
+     * set one for an itertive t0 finding procedure and none was set in
+     * the beginning
+    */
+    void clearEventT0();
 
   private:
     /// Internal storage of the temporary event t0 list.

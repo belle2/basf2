@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+#pragma once
 
 /** @file ecl/modules/eclDisplay/geometry.h
  * This file was meant to contain several (relatively) short auxillary functions
@@ -32,5 +31,3 @@ namespace Belle2 {
     int GetMode();
   }
 }
-
-#endif // GEOMETRY_H

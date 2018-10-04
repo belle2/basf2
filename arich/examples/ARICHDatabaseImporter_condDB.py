@@ -10,7 +10,6 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-
 parser = OptionParser()
 parser.add_option('-c', '--class', dest='whatclass', default='none', help='')
 parser.add_option('-x', '--i-e', dest='importexport', default='export', help='')
@@ -24,10 +23,16 @@ aopRootF = options.aopRootF
 
 home = os.environ['BELLE2_LOCAL_DIR']
 
-# use_local_database()
-use_local_database("test_database.txt", "test_payloads")
+# More information about use_local_database please find here:
+# https://b2-master.belle2.org/software/development/sphinx/framework/doc/index-03-framework.html?highlight=use_local_database#basf2.use_local_database
+use_local_database()
+# use_local_database("./ARICHdata/centraldb/database.txt", "./ARICHdata/centraldb/", False, LogLevel.ERROR, False)
+# use_local_database("./ARICH_db_Test/centraldb/database.txt", "", False, LogLevel.ERROR, False)
+# use_local_database("test_database.txt", "test_payloads")
+# use_local_database("test_database.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
 # use_central_database("ARICHdata", LogLevel.ERROR)
+# use_central_database("ARICH_db_Test", LogLevel.ERROR)
 # use_central_database("development", LogLevel.ERROR)
 #
 
@@ -94,7 +99,30 @@ if(ie == "import"):
                 rootFilesFebTest.push_back(os.path.join(path, name))
     mypath = '%s/moduleTest/modules/' % (os.getcwd())
 
+if(ie == 'importAerogelInfoOnly'):
+    paramloader = register_module('Gearbox')
+    pathname = '/home/b-lab050/KEK/xmlarichdata/data/aerogel_xml_ver3_R/'
+    paramloader.param('backends', [pathname])
+    paramloader.param('fileName', 'AerogelData.xml')
+    paramloader.initialize()
+
+if(ie == 'importAerogelRayleighScatteringFit'):
+    paramloader = register_module('Gearbox')
+    pathname = '/home/b-lab050/KEK/xmlarichdata/xmlData/aerogel_xml_ver3_L/'
+    paramloader.param('backends', [pathname])
+    paramloader.param('fileName', 'aerogel_xml_ver3_L_fit.xml')
+    paramloader.initialize()
+
 process(main)
+
+if(ie == 'importAerogelInfoOnly'):
+    dbImporter = ARICHDatabaseImporter()
+    dbImporter.importAerogelInfo("Right")
+
+if(ie == 'importAerogelRayleighScatteringFit'):
+    dbImporter = ARICHDatabaseImporter()
+    dbImporter.importAeroRayleighScatteringFit("Left")
+
 
 # and run the importer
 if(ie == 'import'):
@@ -131,6 +159,10 @@ if(ie == 'import'):
     if(ieClass == 'sensorMap'):
         dbImporter.importSensorModuleMap()
 
+if(ie == 'importAerogelTilesInfo'):
+    dbImporter = ARICHDatabaseImporter()
+    if(ieClass == 'aerogelTilesInfo'):
+        dbImporter.importAeroTilesInfo()
 
 if(ie == 'export'):
     dbImporter = ARICHDatabaseImporter()

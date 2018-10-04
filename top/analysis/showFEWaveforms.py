@@ -141,10 +141,14 @@ class WFDisplay(Module):
             wf = waveform.getWaveform()
             self.hist[k].Reset()
             numSamples = waveform.getSize()
-            self.hist[k].SetBins(numSamples, 0.0, float(numSamples))
+            startSample = waveform.getStartSample()
+            self.hist[k].SetBins(numSamples, float(startSample), float(startSample + numSamples))
             title = 'S' + str(slot) + ' chan ' + str(chan) + ' win'
-            for window in waveform.getStorageWindows():
-                title += ' ' + str(window)
+            if waveform.getStorageWindows().empty():
+                title += ' ' + str(waveform.getStorageWindow())
+            else:
+                for window in waveform.getStorageWindows():
+                    title += ' ' + str(window)
             self.hist[k].SetTitle(title)
             self.hist[k].SetStats(False)
             self.hist[k].SetLineColor(8)

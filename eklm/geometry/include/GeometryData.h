@@ -53,7 +53,7 @@ namespace Belle2 {
        * @param[in] dataSource Data source.
        */
       static const GeometryData& Instance(enum DataSource dataSource =
-                                            c_Gearbox);
+                                            c_Database);
 
       /**
        * Save geometry data to database.

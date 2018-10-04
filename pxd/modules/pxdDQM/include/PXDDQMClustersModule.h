@@ -32,8 +32,6 @@ namespace Belle2 {
 
     /** Constructor */
     PXDDQMClustersModule();
-    /* Destructor */
-    virtual ~PXDDQMClustersModule();
 
   private:
     /** Module functions */
@@ -50,7 +48,7 @@ namespace Belle2 {
   private:
 
     /** cut for accepting to hitmap histogram, using pixels only, default = 0 */
-    float m_CutPXDCharge = 0.0;
+    int m_CutPXDCharge = 0;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 

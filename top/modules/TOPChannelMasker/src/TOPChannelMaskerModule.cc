@@ -1,11 +1,11 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:                                                          *
  *    Jan Strube (jan.strube@pnnl.gov)                                    *
- *    Sam Cunliffe (samuel.cunliffe@pnnl.gov)                             *
+ *    Sam Cunliffe (sam.cunliffe@desy.de)                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

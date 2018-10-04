@@ -510,6 +510,18 @@ namespace Belle2 {
      */
     const Particle* getDaughter(unsigned i) const;
 
+    /** Apply a function to all daughters of this particle
+     *
+     * @param function function object to run on each daugther. If this
+     *    function returns true the processing will be stopped immeddiately.
+     * @param recursive if true go through all daughters of daughters as well
+     * @param includeSelf if true also apply the function to this particle
+     * @return true if the function returned true for any of the particles it
+     *    was applied to
+     */
+    bool forEachDaughter(std::function<bool(const Particle*)> function,
+                         bool recursive = true, bool includeSelf = true) const;
+
     /**
      * Returns a vector of pointers to daughter particles
      * @return vector of pointers to daughter particles
@@ -585,7 +597,8 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * NULL pointer is returned, if the Particle was not made from KLMCluster.
+     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */
     const KLMCluster* getKLMCluster() const;
@@ -607,6 +620,9 @@ namespace Belle2 {
      * Prints the contents of a Particle object to standard output.
      */
     void print() const;
+
+    /** get a list of the extra info names */
+    std::vector<std::string> getExtraInfoNames() const;
 
     /**
      * Remove all stored extra info fields

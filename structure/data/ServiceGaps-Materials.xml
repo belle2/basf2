@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Materials>
   <!--Can switch the material of the gap beteewn ARICH and tOP, TOP and ECL, barrel and endcap of ECL.-->
-  <Material name="Arich_TopGapback">
+  <Material name="Arich_TopGapfor">
     <Components>
       <Material>Air</Material>
     </Components>
   </Material>
   <Material name="Top_ECLGapback">
+    <Components>
+      <Material>Air</Material>
+    </Components>
+  </Material>
+  <Material name="Top_ECLGapfor">
     <Components>
       <Material>Air</Material>
     </Components>

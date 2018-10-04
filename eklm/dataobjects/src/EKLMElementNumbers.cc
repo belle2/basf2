@@ -17,7 +17,7 @@ using namespace Belle2;
 EKLMElementNumbers::EKLMElementNumbers() : m_MaximalEndcapNumber(2),
   m_MaximalLayerNumber(14), m_MaximalDetectorLayerNumber{12, 14},
   m_MaximalSectorNumber(4), m_MaximalPlaneNumber(2),
-  m_MaximalSegmentNumber(5), m_MaximalStripNumber(75)
+  m_MaximalSegmentNumber(5), m_MaximalStripNumber(75), m_NStripsSegment(15)
 {
 }
 
@@ -224,6 +224,28 @@ int EKLMElementNumbers::stripLocalNumber(int strip) const
   return (strip - 1) % m_MaximalStripNumber + 1;
 }
 
+int EKLMElementNumbers::getStripSoftwareByFirmware(int stripFirmware) const
+{
+  int segment, strip;
+  segment = (stripFirmware - 1) / m_NStripsSegment;
+  /* Order of segment readout boards in the firmware is opposite. */
+  segment = 4 - segment;
+  strip = segment * m_NStripsSegment +
+          (stripFirmware - 1) % m_NStripsSegment + 1;
+  return strip;
+}
+
+int EKLMElementNumbers::getStripFirmwareBySoftware(int stripSoftware) const
+{
+  int segment, strip;
+  segment = (stripSoftware - 1) / m_NStripsSegment;
+  /* Order of segment readout boards in the firmware is opposite. */
+  segment = 4 - segment;
+  strip = segment * m_NStripsSegment +
+          (stripSoftware - 1) % m_NStripsSegment + 1;
+  return strip;
+}
+
 int EKLMElementNumbers::getMaximalEndcapNumber() const
 {
   return m_MaximalEndcapNumber;
@@ -295,5 +317,10 @@ int EKLMElementNumbers::getMaximalStripGlobalNumber() const
                      m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
                      m_MaximalSectorNumber, m_MaximalPlaneNumber,
                      m_MaximalStripNumber);
+}
+
+int EKLMElementNumbers::getNStripsSegment() const
+{
+  return m_NStripsSegment;
 }
 

@@ -556,8 +556,9 @@ namespace Belle2 {
       if (i)
         tsType = 1;
 
-      const unsigned nLayers = _superLayers[i]->size();
-      if (nLayers < 5) {
+//      const unsigned nLayers = _superLayers[i]->size(); //'nLayers' shadows a previous local
+//      if (nLayers < 5) {
+      if (_superLayers[i]->size() < 5) {
         cout << "TRGCDC !!! can not create TS because "
              << "#layers is less than 5 in super layer " << i
              << endl;
@@ -1149,8 +1150,8 @@ namespace Belle2 {
             h.dump("detail", TRGDebug::tab(4));
           }
         } else {
-          unsigned n = 10;
-          if (n > _hits.size()) n = _hits.size();
+          unsigned nh = 10;
+          if (nh > _hits.size()) nh = _hits.size();
           cout << TRGDebug::tab() << "Dump of the first " << n
                << " hits of a wire" << endl;
           for (unsigned i = 0; i < n; i++) {

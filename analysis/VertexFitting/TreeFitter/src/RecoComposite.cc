@@ -22,19 +22,19 @@ namespace TreeFitter {
     updateParams();
   }
 
-  ErrCode RecoComposite::initParticleWithMother(FitParams* fitparams)
+  ErrCode RecoComposite::initParticleWithMother(FitParams& fitparams)
   {
     return initTau(fitparams);
   }
 
-  ErrCode RecoComposite::initMotherlessParticle(FitParams* fitparams)
+  ErrCode RecoComposite::initMotherlessParticle(FitParams& fitparams)
   {
     const int posindex = posIndex();
     const int momindex = momIndex();
 
-    fitparams->getStateVector().segment(posindex, 3) = m_params.segment(0, 3);
+    fitparams.getStateVector().segment(posindex, 3) = m_params.segment(0, 3);
 
-    fitparams->getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
+    fitparams.getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
 
     return ErrCode(ErrCode::Status::success) ;
   }
@@ -56,7 +56,7 @@ namespace TreeFitter {
     m_params(6) = energy;
 
     m_covariance = Eigen::Matrix < double, -1, -1, 0, 7, 7 >::Zero(7, 7);
-    const TMatrixFSym cov7in = getBasf2Particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
+    const TMatrixFSym cov7in = particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
 
     for (int row = 0; row < 4; ++row) { //first the p,E block
       for (int col = 0; col <= row; ++col) {

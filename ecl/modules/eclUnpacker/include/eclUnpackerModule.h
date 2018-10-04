@@ -25,10 +25,15 @@ namespace Belle2 {
     ECLUnpackerModule();
     virtual ~ECLUnpackerModule();
 
+    /** initialize */
     virtual void initialize();
+    /** beginRun */
     virtual void beginRun();
+    /** event */
     virtual void event();
+    /** endRun */
     virtual void endRun();
+    /** terminate */
     virtual void terminate();
 
     /** exeption should be thrown when the unexpected      */
@@ -84,6 +89,9 @@ namespace Belle2 {
     StoreArray<ECLDsp>   m_eclDsps;
     /** store array for RawECL**/
     StoreArray<RawECL>   m_rawEcl;
+
+    /** Cached debug level from LogSystem */
+    int m_debugLevel;
 
     /** read nex word from COPPER data, check if the end of data is reached  */
     unsigned int readNextCollectorWord();

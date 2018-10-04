@@ -1,0 +1,25 @@
+# EventType: 1110422000
+# Descriptor: [B0 -> pi0 mu+ mu-] cc
+# NickName: Bd_pi0mumu
+# Documentation: Rare b->dll process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sam Cunliffe
+# Email: sam.cunliffe@desy.de
+# Cuts: None
+# Date: 20180221
+#
+#
+Decay Upsilon(4S)
+1.000 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+#
+#
+Decay B0sig
+1.000   pi0     mu+     mu-   BTOSLLBALL  6;
+Enddecay
+CDecay anti-B0sig
+#
+End
+#
+

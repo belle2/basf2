@@ -9,10 +9,12 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <TTree.h>
 #include <TH1F.h>
 
 using namespace Belle2;
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -30,12 +32,24 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 
   // Parameter definitions
   addParam("cleanupCuts", m_cuts, "Boolean to apply cleanup cuts", true);
-  addParam("momentumCor", m_momCor, "Boolean to apply momentum correction", false);
-  addParam("momentumCorFromDB", m_useDBMomCor, "Boolean to apply DB momentum correction", false);
-  addParam("scaleCor", m_scaleCor, "Boolean to apply scale correction", false);
-  addParam("cosineCor", m_cosineCor, "Boolean to apply cosine correction", false);
   addParam("maxNumHits", m_maxNumHits,
            "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
+  addParam("fSetEoverP", fSetEoverP, "Set E over p Cut values. ", double(0.2));
+  addParam("Iscosth", Iscosth, "true for adding costh tree branch. ", false);
+  addParam("Isp", Isp, "true for adding momentum tree branch. ", true);
+  addParam("Ischarge", Ischarge, "true for charge dedx tree branch. ", false);
+  addParam("Isrun", Isrun, "true for adding run number tree branch. ", false);
+  addParam("Iswire", Iswire, "true for adding wires tree branch. ", false);
+  addParam("Islayer", Islayer, "true for adding layers tree branch. ", false);
+  addParam("Isdoca", Isdoca, "true for adding doca tree branch. ", false);
+  addParam("Isenta", Isenta, "true for adding enta tree branch. ", false);
+  addParam("IsdocaRS", IsdocaRS, "true for adding doca tree branch. ", false);
+  addParam("IsentaRS", IsentaRS, "true for adding enta tree branch. ", false);
+  addParam("Isdedxhit", Isdedxhit, "true for adding dedxhit tree branch. ", false);
+  addParam("IsBadPhiRej", IsBadPhiRej, "true for removing bad phi tracks and hits ", false);
+  addParam("IsRadbhabha", IsRadbhabha, "true for cutting dedx of other track", false);
+
+
 }
 
 //-----------------------------------------------------------------
@@ -44,26 +58,27 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 
 void CDCDedxElectronCollectorModule::prepare()
 {
-  // required input
   m_dedxTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
-
-  m_eventMetaData.isRequired();
 
   // Data object creation
   auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
   auto ttree = new TTree("tree", "Tree with dE/dx information");
 
   ttree->Branch<double>("dedx", &m_dedx);
-  ttree->Branch<double>("costh", &m_costh);
-  ttree->Branch<double>("p", &m_p);
+  if (Iscosth)ttree->Branch<double>("costh", &m_costh);
+  if (Isp)ttree->Branch<double>("p", &m_p);
+  if (Ischarge)ttree->Branch<int>("charge", &m_charge);
+  if (Isrun)ttree->Branch<int>("run", &m_run);
 
-  ttree->Branch("wire", &m_wire);
-  ttree->Branch("layer", &m_layer);
-  ttree->Branch("doca", &m_doca);
-  ttree->Branch("enta", &m_enta);
-  ttree->Branch("dedxhit", &m_dedxhit);
+  if (Iswire)ttree->Branch("wire", &m_wire);
+  if (Islayer)ttree->Branch("layer", &m_layer);
+  if (Isdoca)ttree->Branch("doca", &m_doca);
+  if (Isenta)ttree->Branch("enta", &m_enta);
+  if (IsdocaRS)ttree->Branch("docaRS", &m_docaRS);
+  if (IsentaRS)ttree->Branch("entaRS", &m_entaRS);
+  if (Isdedxhit)ttree->Branch("dedxhit", &m_dedxhit);
 
   // Collector object registration
   registerObject<TH1F>("means", means);
@@ -76,108 +91,115 @@ void CDCDedxElectronCollectorModule::prepare()
 
 void CDCDedxElectronCollectorModule::collect()
 {
-  int run = m_eventMetaData->getRun();
-
-  //low run #
-  const float momcorrlo[50] = {
-    0.936667, 0.791667, 0.763456, 0.755219, 0.758876,
-    0.762439, 0.769009, 0.776787, 0.783874, 0.791462,
-    0.796567, 0.80445,  0.809177, 0.815605, 0.817414,
-    0.822127, 0.828355, 0.83215,  0.832959, 0.833546,
-    0.840324, 0.844323, 0.847539, 0.849506, 0.850848,
-    0.852272, 0.854783, 0.853612, 0.861432, 0.859428,
-    0.859533, 0.862021, 0.865721, 0.868412, 0.868954,
-    0.872075, 0.872732, 0.872475, 0.872152, 0.876957,
-    0.87419,  0.875742, 0.874523, 0.878218, 0.873543,
-    0.881054, 0.874919, 0.877849, 0.886954, 0.882283
-  };
-
-  //high run #
-  const float momcorrhi[50] = {
-    1.14045,  0.73178,  0.709983, 0.711266, 0.716683,
-    0.727419, 0.735754, 0.74534,  0.754149, 0.761252,
-    0.768799, 0.77552,  0.780306, 0.786253, 0.79139,
-    0.797053, 0.800905, 0.804441, 0.807102, 0.809439,
-    0.815215, 0.818581, 0.821492, 0.823083, 0.824502,
-    0.828764, 0.830907, 0.831392, 0.832376, 0.833232,
-    0.836063, 0.839065, 0.841527, 0.84118,  0.842779,
-    0.840801, 0.844476, 0.846664, 0.848733, 0.844318,
-    0.84837,  0.850549, 0.852183, 0.851242, 0.856488,
-    0.852705, 0.851871, 0.852278, 0.856854, 0.856848
-  };
-
-  // momentum correction
-  float momcor[50];
-  for (int i = 0; i < 50; ++i) {
-    if (run <  3500) momcor[i] = momcorrlo[i];
-    if (run >= 3500) momcor[i] = momcorrhi[i];
-  }
 
   // Collector object access
   auto means = getObjectPtr<TH1F>("means");
   auto tree = getObjectPtr<TTree>("tree");
 
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  int run = eventMetaDataPtr->getRun();
+  if (Isrun)m_run = run;
+  //printf("this run is = %d", run);
+
+  Int_t nTracks = m_dedxTracks.getEntries();
+
   for (int idedx = 0; idedx < m_dedxTracks.getEntries(); idedx++) {
+
     CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
+
     const Track* track = dedxTrack->getRelatedFrom<Track>();
-    if (!track) {
-      B2WARNING("No related track...");
-      continue;
-    }
+
     const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
       continue;
     }
 
-    m_p = dedxTrack->getMomentum();
-    TVector3 trackMom = fitResult->getMomentum();
-
-    // apply Roy's cuts
-    if (m_cuts && (fabs(m_p) >= 10.0 || fabs(m_p) <= 1.0)) continue;
-    if (m_cuts && (dedxTrack->getNLayerHits() <= 42 || dedxTrack->getNLayerHits() >= 65)) continue;
-    if (m_cuts && (trackMom.Phi() >= 0 || fitResult->getD0() >= 5 || fabs(fitResult->getZ0() - 35) >= 50)) continue;
-
-    // determine the correction factor, if any
-    double correction = 1.0;
-
-    // determine Roy's corrections
-    int mombin = 5.0 * fabs(m_p);
-    if (m_momCor) {
-      if (m_useDBMomCor) correction *= m_DBMomentumCor->getMean(fabs(m_p));
-      else correction *= momcor[mombin];
+    if (Isp) {
+      m_p = dedxTrack->getMomentum();
+      TVector3 trackMom = fitResult->getMomentum();
     }
 
-    // apply the scale factor
-    if (m_scaleCor) correction *= m_DBScaleFactor->getScaleFactor();
+    // apply cleanup cuts
+    if (m_cuts && dedxTrack->getNLayerHits() <= 20) continue;
 
-    // apply the cosine corection
-    double costh = dedxTrack->getCosTheta();
-    if (m_cosineCor) {
-      B2INFO("APPLYING COSING CORRECTION");
-      correction *= m_DBCosineCor->getMean(costh);
+    if (m_cuts && (fabs(fitResult->getD0()) >= 1 || fabs(fitResult->getZ0()) >= 3)) continue;
+
+    ////NEW
+    const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
+    if (eclCluster) {
+      double TrkEoverP = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+      if (abs(TrkEoverP - 1) >= fSetEoverP)continue;
+      //printf("TrkEoverP = %0.03f\n", TrkEoverP);
+    }
+
+    if (IsRadbhabha) {
+      if (nTracks == 2) {
+
+        Int_t iOtherdedx = abs(idedx - 1);
+        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[iOtherdedx];
+        if (!dedxOtherTrack)  continue;
+
+        const Track* Othertrack = dedxOtherTrack->getRelatedFrom<Track>();
+        if (!Othertrack)continue;
+
+        const TrackFitResult* mOtherTrack = 0x0;
+        mOtherTrack = Othertrack->getTrackFitResultWithClosestMass(Const::electron);
+        if (!mOtherTrack)continue;
+
+        double TrkEoverPOther = -2.0;
+        const ECLCluster* eclClusterOther = Othertrack->getRelated<ECLCluster>();
+        if (!eclClusterOther)continue;
+
+        TrkEoverPOther = (eclClusterOther->getEnergy()) / (mOtherTrack->getMomentum().Mag());
+
+        //cutting on EoverP of other track
+        if (abs(TrkEoverPOther - 1.0) >= fSetEoverP) {
+          //printf("Cut1: TrkEoverPOther = %0.03f\n", TrkEoverPOther);
+          continue;
+        }
+        //cutting on dedx of other track
+        if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) >= 0.2) {
+          //printf("Cut2: TrkdEdxOther = %0.03f\n", dedxOtherTrack->getDedxNoSat());
+          continue;
+        }
+      }
+    }
+
+    if (IsBadPhiRej) {
+      double TrkPhi = fitResult->getPhi();
+      if (abs(TrkPhi - 1.3) < 0.35)continue;
     }
 
     // Make sure to remove all the data in vectors from the previous track
-    m_wire.clear();
-    m_layer.clear();
-    m_doca.clear();
-    m_enta.clear();
-    m_dedxhit.clear();
+    if (Iswire)m_wire.clear();
+    if (Islayer)m_layer.clear();
+    if (Isdoca)m_doca.clear();
+    if (Isenta)m_enta.clear();
+    if (IsdocaRS)m_docaRS.clear();
+    if (IsentaRS)m_entaRS.clear();
+    if (Isdedxhit)m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    if (correction == 0) continue;
-    m_dedx = dedxTrack->getTruncatedMean() / correction;
-    m_costh = costh;
+    // make sure to use the truncated mean without the hadron saturation correction
     m_nhits = dedxTrack->size();
-
     if (m_nhits > m_maxNumHits) continue;
+
+    m_dedx = dedxTrack->getDedxNoSat();
+    if (Iscosth)m_costh = dedxTrack->getCosTheta();
+    if (Ischarge)m_charge = fitResult->getChargeSign();
+
     for (int i = 0; i < m_nhits; ++i) {
-      m_wire.push_back(dedxTrack->getWire(i));
-      m_layer.push_back(dedxTrack->getHitLayer(i));
-      m_doca.push_back(dedxTrack->getDoca(i));
-      m_enta.push_back(dedxTrack->getEnta(i));
-      m_dedxhit.push_back(dedxTrack->getDedx(i) / correction);
+
+      if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue; //Jake added
+      if (dedxTrack->getPath(i) <= 0.5)continue; //JK
+      if (Iswire)m_wire.push_back(dedxTrack->getWire(i));
+      if (Islayer) m_layer.push_back(dedxTrack->getHitLayer(i));
+      if (Isdoca)m_doca.push_back(dedxTrack->getDoca(i));
+      if (Isenta)m_enta.push_back(dedxTrack->getEnta(i));
+      if (IsdocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
+      if (IsentaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
+      if (Isdedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
     }
 
     // Track information filled

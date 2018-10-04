@@ -112,9 +112,9 @@ namespace Belle2 {
       }
 
       //...Ignore lines not starting with a digit...
-      string ignore;
+      string ignores;
       while (!isdigit(infile.peek())) {
-        getline(infile, ignore);
+        getline(infile, ignores);
       }
 
       //...Read Hough plane cell number and limits...
@@ -690,12 +690,12 @@ namespace Belle2 {
       vector<vector<unsigned>> tsf;
 
       //...Ignore lines not starting with a digit...
-      string ignore;
+      string ignores;
       while (!isdigit(infile.peek())) {
-        getline(infile, ignore);
+        getline(infile, ignores);
       }
       //...Skip the first line (read in constructor)...
-      getline(infile, ignore);
+      getline(infile, ignores);
 
       //...Read map file...
       string car;

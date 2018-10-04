@@ -23,10 +23,9 @@
 ######################################################
 
 from basf2 import *
-from generatoprs import add_evtgen_generator
+from generators import add_evtgen_generator
 from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
-from reconstruction import add_mdst_output
 from modularAnalysis import analysis_main
 from ROOT import Belle2
 
@@ -43,10 +42,9 @@ add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile(
 # then the Gearbox needs to be loaded with the loadGearbox() function.
 loadGearbox()
 
-# dump generated events in MDST format to the output ROOT file
+# dump generated events in DST format to the output ROOT file
 #
-# add_mdst_output function is defined in reconstruction/scripts/reconstruction.py
-add_mdst_output(analysis_main, True, 'B2A101-Y4SEventGeneration-evtgen.root')
+analysis_main.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtgen.root')
 
 # process all modules added to the analysis_main path
 # (note: analysis_main is the default path created in the modularAnapys.py)

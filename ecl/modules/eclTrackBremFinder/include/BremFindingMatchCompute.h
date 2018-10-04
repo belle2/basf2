@@ -7,16 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef BREMFINDING_H
-#define BREMFINDING_H
-
-#include <mdst/dataobjects/ECLCluster.h>
-#include <genfit/MeasuredStateOnPlane.h>
-
-#include <TMath.h>
+namespace genfit {
+  class MeasuredStateOnPlane;
+}
 
 namespace Belle2 {
+
+  class ECLCluster;
+  class MeasuredStateOnPlane;
 
   /**
    * Module to compute if an extrapolation to the ECL matches the position of an secondary ECLCLuster
@@ -68,4 +68,3 @@ namespace Belle2 {
   };
 
 } //Belle2
-#endif

@@ -18,6 +18,8 @@
 #include <string>
 #include <fstream>
 
+#include <TF1.h>
+#include <TRandom.h>
 #include <TLorentzRotation.h>
 
 namespace Belle2 {
@@ -86,7 +88,9 @@ namespace Belle2 {
     int m_nInitial;        /**< The number of particles in each event with a set Initial flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
-
+    double m_meanDecayLength;        /**< Mean lifetime*c of displaced particle. */
+    double Rmin, Rmax;           /**< Minimum and maximum of vertex distance to IP.*/
+    int pdg_displaced;           /**< PDG code of the displaced particle being studied*/
 
   protected:
     /** Just a typedef for simple use of the boost::tokenizer to split the lines */
@@ -120,6 +124,7 @@ namespace Belle2 {
      * @param particle Reference to the particle which will be filled with the information from the LHE file.
      */
     int readParticle(MCParticleGraph::GraphParticle& particle);
+
   };
 
 }

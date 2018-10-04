@@ -43,7 +43,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import summaryOfLists
 from stdCharged import *
-from stdFSParticles import stdPi0s
+from stdPi0s import stdPi0s
 
 filelistMIX = ['/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002166\
 /e0000/4S/r00000/mixed/sub00/mdst_000001_prod00002166_task00000001.root']

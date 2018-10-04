@@ -25,6 +25,7 @@ class CompareTransformationsModule(basf2.Module):
     def __init__(self):
         """ constructor """
         super().__init__()
+        #: Shift of a sensor
         self.test_shift_z = 10.
 
     def initialize(self):
@@ -66,6 +67,7 @@ class CompareTransformationsModule(basf2.Module):
         # expect that sensor moved with the ladder
         print("Now testing that moving a ladder moves a sensor correspondingly...")
         assert(abs(new_global_sensor_z - original_global_sensor_z - self.test_shift_z) < 1.e-14)
+
 
 main = create_path()
 # No params for EventInfoSetter means exp=0, run=0 --> Monte Carlo, no alignment corrections

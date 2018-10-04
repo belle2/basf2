@@ -50,6 +50,8 @@ namespace VXDTFfourHitFilterTest {
     TGeoCombiTrans c1(t1, r1);
     TGeoHMatrix transform = c1;
     sensorInfoBase.setTransformation(transform);
+    // also need to set the reco-transform
+    sensorInfoBase.setTransformation(transform, true);
 
     return sensorInfoBase;
   }

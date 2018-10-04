@@ -652,7 +652,7 @@ void PXDROIFinderAnalysisModule::event()
       m_coorVmc = aSensorInfo.getVCellPosition(m_Vidmc);   //pxdDigits_MCParticle[iPXDDigit]->getVCellPosition();
 
       TVector3 local(m_coorUmc, m_coorVmc, 0);
-      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
+      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
 
 
       if (m_pTmc > 1) npxdDigit[5]++;

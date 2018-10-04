@@ -115,6 +115,68 @@ namespace {
     EXPECT_B2FATAL(Particle p2 = Particle(momentum, 411, Particle::c_Unflavored, daughterIndices));
   }
 
+  /** Functor to count children of a particle */
+  struct ParticleChildrenCounter {
+    int count{0}; /**< number of calls to this object */
+    /** increase counter ... duh */
+    bool operator()(const Particle*) { ++count; return false; }
+  };
+
+  TEST_F(ParticleTest, ForEachDaughters)
+  {
+    // setup a particle with some daughters and grand daughters
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    int nGrandDaughters = 0;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      if (i % 2 == 0) {
+        Particle* grandDaughter = particles.appendNew(d);
+        newDaughters->appendDaughter(grandDaughter);
+        ++nGrandDaughters;
+      }
+    }
+    const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
+
+    // Check if we get called the correct amount of times
+    int count{0};
+    auto counterFct = [&count](const Particle*) { ++count; return false; };
+    EXPECT_FALSE(p.forEachDaughter(counterFct, false, false));
+    EXPECT_EQ(count, nDaughters);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, true, false));
+    EXPECT_EQ(count, nDaughters + nGrandDaughters);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, false, true));
+    EXPECT_EQ(count, nDaughters + 1);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, true, true));
+    EXPECT_EQ(count, nDaughters + nGrandDaughters + 1);
+
+    // Functors passed by value don't return the state
+    ParticleChildrenCounter counterStruct;
+    EXPECT_FALSE(p.forEachDaughter(counterStruct));
+    EXPECT_EQ(counterStruct.count, 0);
+    // But if reference_wrapped it should work fine
+    EXPECT_FALSE(p.forEachDaughter(std::reference_wrapper<ParticleChildrenCounter>(counterStruct)));
+    EXPECT_EQ(counterStruct.count, nDaughters + nGrandDaughters + 1);
+
+    // Test return value: if we return true the processing should be stopped so
+    // count should not be increased anymore
+    int maxchildren{1}, total{nDaughters + nGrandDaughters + 1};
+    auto returnFctTester = [&count, &maxchildren](const Particle*) {++count; return count >= maxchildren; };
+    for (; maxchildren < 2 * total; ++maxchildren) {
+      count = 0;
+      EXPECT_EQ(p.forEachDaughter(returnFctTester), maxchildren <= total);
+      EXPECT_EQ(count, std::min(maxchildren, total));
+    }
+  }
+
   /** test some basics for extra information. */
   TEST_F(ParticleTest, ExtraInfo)
   {

@@ -138,6 +138,6 @@ namespace Belle2 {
      */
     float const m_qualityIndicator;
 
-    ClassDef(Track, 4); /**< Class that bundles various TrackFitResults. */
+    ClassDefOverride(Track, 4); /**< Class that bundles various TrackFitResults. */
   };
 }

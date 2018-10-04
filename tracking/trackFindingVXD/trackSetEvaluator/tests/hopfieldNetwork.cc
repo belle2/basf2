@@ -59,15 +59,15 @@ protected:
 
     //Make the actual OverlapResolverNodeInfos
     for (unsigned int ii = 0; ii < myNTrackCands; ii++) {
-      float qualityIndex = 0;
+      float qualityIndicator = 0;
       if (ii < myTrueTracks) {
-        qualityIndex = static_cast<float>(rand() % 100) / 100.;
-        B2INFO("Track Index" << ii << ", TrueQI: " << qualityIndex);
+        qualityIndicator = static_cast<float>(rand() % 100) / 100.;
+        B2INFO("Track Index" << ii << ", TrueQI: " << qualityIndicator);
       } else {
-        qualityIndex = 1 / (static_cast<float>(rand() % 100) + 1.2);
-        B2INFO("Track Index" << ii << ", FakeQI: " << qualityIndex);
+        qualityIndicator = 1 / (static_cast<float>(rand() % 100) + 1.2);
+        B2INFO("Track Index" << ii << ", FakeQI: " << qualityIndicator);
       }
-      trackCandidateInfos.emplace_back(qualityIndex, ii, competitorIDMatrix[ii], 0.8);
+      trackCandidateInfos.emplace_back(qualityIndicator, ii, competitorIDMatrix[ii], 0.8);
     }
     return trackCandidateInfos;
   }

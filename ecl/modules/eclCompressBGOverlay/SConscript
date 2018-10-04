@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['ecl', 'framework', 'ecl_dataobjects']
+
+Return('env')

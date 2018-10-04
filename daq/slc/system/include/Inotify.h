@@ -14,16 +14,16 @@ namespace Belle2 {
   public:
     InotifyEvent()
       : m_wd(-1), m_mask(-1), m_name() {}
-    ~InotifyEvent() throw() {}
+    ~InotifyEvent() {}
 
   private:
     InotifyEvent(int wd, unsigned long mask, const std::string& name)
       : m_wd(wd), m_mask(mask), m_name(name) {}
 
   public:
-    int get_wd() const throw() { return m_wd;}
-    unsigned long getMask() const throw() { return m_mask; }
-    const std::string& getName() const throw() { return m_name; }
+    int get_wd() const { return m_wd;}
+    unsigned long getMask() const { return m_mask; }
+    const std::string& getName() const { return m_name; }
 
   private:
     int m_wd;
@@ -47,14 +47,14 @@ namespace Belle2 {
     static const unsigned long FILE_ATTRIB;
 
   public:
-    Inotify() throw() {}
-    virtual ~Inotify() throw() {}
+    Inotify() {}
+    virtual ~Inotify() {}
 
   public:
-    void open() throw(IOException);
-    int add(const std::string& path, unsigned long mask) throw(IOException);
-    void remove(int wd) throw(IOException);
-    InotifyEventList wait(int sec) throw(IOException);
+    void open();
+    int add(const std::string& path, unsigned long mask);
+    void remove(int wd);
+    InotifyEventList wait(int sec);
 
   };
 

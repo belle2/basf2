@@ -64,7 +64,7 @@ namespace Belle2 {
     StoreArray<RawARICH> rawdata;
     rawdata.isRequired();
     StoreArray<ARICHRawDigit> rawdigit;
-    rawdigit.registerPersistent();
+    rawdigit.registerInDataStore();
   }
 
   void ARICHRawUnpackerModule::beginRun()

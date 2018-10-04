@@ -379,7 +379,7 @@ void MCTrackCandClassifierModule::event()
             nBarrel++;
         }
 
-        TVector3 globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+        TVector3 globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
         double hitRadius = theDistance(center, globalHit);
 
         bool accepted1 = true;

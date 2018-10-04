@@ -13,6 +13,7 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 #include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>
@@ -28,6 +29,7 @@ namespace TreeFitter {
 
     /** particle types  */
     enum TFParticleType {kInteractionPoint,
+                         kOrigin,
                          kRecoComposite,
                          kRecoResonance,
                          kInternalParticle,
@@ -37,7 +39,6 @@ namespace TreeFitter {
                          kRecoKlong,
                          kMissingParticle
                         };
-
 
     /** default constructor  */
     ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) ;
@@ -59,22 +60,22 @@ namespace TreeFitter {
                                         const ParticleBase* mother,
                                         bool forceFitAll = false);
 
-    /** return an Interaction Point particle */
-    static ParticleBase* createInteractionPoint(Belle2::Particle* daughter,
-                                                bool forceFitAll,
-                                                int dimension);
+    /** create a custom origin particle or a beamspot*/
+    static ParticleBase* createOrigin(Belle2::Particle* daughter,
+                                      bool forceFitAll,
+                                      const std::vector<double> customOriginVertex,
+                                      const std::vector<double> customOriginCovariance,
+                                      const bool isBeamSpot
+                                     );
 
     /** init particle that does not need a mother vertex  */
-    virtual ErrCode initMotherlessParticle(FitParams*) = 0;
+    virtual ErrCode initMotherlessParticle(FitParams&) = 0;
 
     /** init particle that does need a mother vertex  */
-    virtual ErrCode initParticleWithMother(FitParams*) = 0;
+    virtual ErrCode initParticleWithMother(FitParams&) = 0;
 
     /** init covariance matrix */
-    virtual ErrCode initCovariance(FitParams*) const;
-
-    /**  get basf2 particle  */
-    Belle2::Particle* getBasf2Particle() const { return m_particle ; }
+    virtual ErrCode initCovariance(FitParams&) const;
 
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
@@ -103,8 +104,15 @@ namespace TreeFitter {
     /**  project geometrical constraint */
     virtual ErrCode projectGeoConstraint(const FitParams&, Projection&) const ;
 
-    /** project mass constraint  */
+    /** project mass constraint using the particles parameters */
+    virtual ErrCode projectMassConstraintParticle(const FitParams&, Projection&) const ;
+
+    /** project mass constraint using the parameters of the daughters */
+    virtual ErrCode projectMassConstraintDaughters(const FitParams&, Projection&) const ;
+
+    /** project mass constraint abstract */
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
+
 
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
@@ -135,7 +143,7 @@ namespace TreeFitter {
     int eneIndex() const { return hasEnergy() ? momIndex() + 3 : -1 ; }
 
     /**  get chi2 */
-    virtual double chiSquare(const FitParams*) const;
+    virtual double chiSquare(const FitParams&) const;
 
     /** get pdg mass  */
     double pdgMass() const { return m_pdgMass ; }
@@ -170,7 +178,7 @@ namespace TreeFitter {
     /** get vertex daughters */
     void collectVertexDaughters(std::vector<ParticleBase*>& particles, int posindex) ;
 
-    /**  */
+    /** number of charged candidates */
     virtual int nFinalChargedCandidates() const;
 
     /** set the relation to basf2 particle type */
@@ -194,7 +202,7 @@ namespace TreeFitter {
     static double bFieldOverC();
 
     /** initialises tau as a length  */
-    ErrCode initTau(FitParams* par) const ;
+    ErrCode initTau(FitParams& par) const ;
 
     /** set Index (in statevector) */
     void setIndex(int i) { m_index = i ; }

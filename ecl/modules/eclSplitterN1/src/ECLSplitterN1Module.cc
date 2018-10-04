@@ -20,6 +20,16 @@
 // THIS MODULE
 #include <ecl/modules/eclSplitterN1/ECLSplitterN1Module.h>
 
+//STL
+#include <string>
+#include <utility>      // std::pair
+#include <algorithm>    // std::find
+
+//Root
+#include "TFile.h"
+#include "TGraph2D.h"
+#include "TH1D.h"
+
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
@@ -28,15 +38,16 @@
 
 // ECL
 #include <ecl/utility/Position.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
-// OTHER
-#include <string>
-#include <utility>      // std::pair
-#include <algorithm>    // std::find
 
 // NAMESPACES
 using namespace Belle2;

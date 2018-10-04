@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPRecBunch.h>
 
@@ -95,6 +96,7 @@ namespace Belle2 {
 
     // collections
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
+    StoreArray<TOPRawDigit> m_topRawDigits; /**< collection of TOP raw digits */
     StoreArray<Track> m_tracks; /**< collection of tracks */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
 

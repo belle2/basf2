@@ -402,18 +402,40 @@ def vertexTree(
     list_name,
     conf_level=0.001,
     massConstraint=[],
-    ipConstraintDim=0,
+    ipConstraint=False,
     updateAllDaughters=False,
+    customOriginConstraint=False,
+    customOriginVertex=[0.001, 0, 0.0116],
+    customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
     path=analysis_main,
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
+    :Example:
+        An example of usage for decay chain :math:`B\\to\pi^+\pi^-\pi^0` is the following:
+
+    ::
+
+      reconstructDecay('pi0:A -> gamma:pi0 gamma:pi0', '0.130 < InvM < 0.14')
+      reconstructDecay('B0:treefit -> pi+:my pi-:my pi0:A ', '')
+      vertexTree('B0:treefit', ipConstraint=True)
+
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
     @param massConstraint list of PDG ids which are mass-constrained
-    @param ipConstraintDim constrain head production vertex to IP (2 = (x-y) constraint, 3 = 3D (x-y-z) constraint, 0 = none)
-    @param updateAllDaughters if true the entire tree will be updated with the fitted values. Otherwise only the head.
+    @param ipConstraint constrain head production vertex to IP (x-y-z) constraint, default: False)
+    @param customOriginConstraint use a costum origin vertex as the production vertex of your particle." + \
+        "This is usefull when fitting D*/D without wanting to fit a B but constraining the process to be B-decay like + \
+        "(think of semileptonic modes and stuff with a neutrino in the B decay). Default: False"
+    @param customOriginVertex 3d vector of the vertex coordinates you want to use as custom origin."+\
+        "Default numbers are taken for B-mesons
+    @param customOriginCovariance 3x3 covariance matrix for the custom vertex (type: vector)." +\
+        " Default numbers extracted from generator distribtuion width of B-mesons.
+    @param updateAllDaughters if true the entire tree will be updated with the fitted values "+\
+    "for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated, "+\
+    "however for all daughters we also update the vertex position with the fit results as this would "+\
+    "otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
     @param path         modules are added to this path
     """
 
@@ -422,8 +444,12 @@ def vertexTree(
     treeFitter.param('particleList', list_name)
     treeFitter.param('confidenceLevel', conf_level)
     treeFitter.param('massConstraintList', massConstraint)
-    treeFitter.param('ipConstraintDimension', ipConstraintDim)
+    treeFitter.param('ipConstraint', ipConstraint)
     treeFitter.param('updateAllDaughters', updateAllDaughters)
+    treeFitter.param('customOriginConstraint', customOriginConstraint)
+    treeFitter.param('customOriginVertex', customOriginVertex)
+    treeFitter.param('customOriginCovariance', customOriginCovariance)
+
     path.add_module(treeFitter)
 
 

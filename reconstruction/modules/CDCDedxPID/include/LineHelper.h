@@ -8,8 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LINEHELPER_H
-#define LINEHELPER_H
+#pragma once
+
+#include <framework/core/Module.h>
+#include <framework/gearbox/Const.h>
 
 #include <cmath>
 #include <iostream>
@@ -60,8 +62,8 @@ namespace Belle2 {
       // vertical line
       else if (m_x == p.getX()) return std::abs(m_y - p.getY());
       // else use Pythagorean Theorem
-      else return sqrt((m_x - p.getX()) * (m_x - p.getX()) +
-                         (m_y - p.getY()) * (m_y - p.getY()));
+      else return std::sqrt((m_x - p.getX()) * (m_x - p.getX()) +
+                              (m_y - p.getY()) * (m_y - p.getY()));
     }
 
     /** Check whether this point lies within the endpoints of a line */
@@ -76,9 +78,7 @@ namespace Belle2 {
     double m_y; /**< the y-coordinate of the DedxPoint */
     bool m_valid; /**< used to check if the point lies inside a boundary */
 
-
   };
-
 
   /** A class to hold the endpoints and slope of a line.
    *
@@ -183,7 +183,6 @@ namespace Belle2 {
 
   };
 
-
   /** A class to hold the geometry of a cell
    *
    * This class is used to actually calculate the path length of a track
@@ -213,7 +212,7 @@ namespace Belle2 {
 
       // The DedxPoint Of Closest Approach (poca) is useful for a reference point
       // to construct a line that represents the track.
-      DedxLine track = DedxLine(poca, tan(PI_2 - entAng));
+      DedxLine track = DedxLine(poca, std::tan(PI_2 - entAng));
 
       // Find the points of intersection with each cell boundary
       DedxPoint intLeft = m_Left.intersection(track);
@@ -221,26 +220,22 @@ namespace Belle2 {
       DedxPoint intRight = m_Right.intersection(track);
       DedxPoint intBot = m_Bot.intersection(track);
 
-      // Make sure we only get two intersections! The function isValid() returns
-      // false if the intersection occurs outside the cell.
-      int index = 0;
-      std::vector< DedxPoint > endpoints;
-      if (intLeft.isValid()) {
-        endpoints.push_back(intLeft); index++;
-      }
-      if (intTop.isValid()) {
-        endpoints.push_back(intTop); index++;
-      }
-      if (intRight.isValid()) {
-        endpoints.push_back(intRight); index++;
-      }
-      if (intBot.isValid()) {
-        endpoints.push_back(intBot); index++;
-      }
+      std::vector<DedxPoint> endpoints;
+      if (intLeft.isValid())
+        endpoints.push_back(intLeft);
+      if (intTop.isValid())
+        endpoints.push_back(intTop);
+      if (intRight.isValid())
+        endpoints.push_back(intRight);
+      if (intBot.isValid())
+        endpoints.push_back(intBot);
 
-      Dx = endpoints[0].length(endpoints[1]);
-
-      if (index != 2 || Dx == 0)
+      // Make sure we only get two intersections!
+      if (endpoints.size() == 2) {
+        Dx = endpoints[0].length(endpoints[1]);
+        if (Dx == 0)
+          m_isValid = false;
+      } else
         m_isValid = false;
 
       return Dx;
@@ -255,8 +250,8 @@ namespace Belle2 {
 
       // The DedxPoint Of Closest Approach (poca) is useful for a reference point
       // to construct a line that represents the track.
-      const DedxPoint poca = DedxPoint(doca * TMath::Abs(cos(entAng)), -1.0 * doca * sin(entAng));
-      DedxLine track = DedxLine(poca, tan(PI_2 - entAng));
+      const DedxPoint poca = DedxPoint(doca * std::abs(std::cos(entAng)), -1.0 * doca * std::sin(entAng));
+      DedxLine track = DedxLine(poca, std::tan(PI_2 - entAng));
 
       // Find the points of intersection with each cell boundary
       DedxPoint intLeft = m_Left.intersection(track);
@@ -264,29 +259,22 @@ namespace Belle2 {
       DedxPoint intRight = m_Right.intersection(track);
       DedxPoint intBot = m_Bot.intersection(track);
 
-      // Make sure we only get two intersections! The function isValid() returns
-      // false if the intersection occurs outside the cell.
-      int index = 0;
       std::vector< DedxPoint > endpoints;
-      if (intLeft.isValid()) {
-        endpoints.push_back(intLeft); index++;
-      }
-      if (intTop.isValid()) {
-        endpoints.push_back(intTop); index++;
-      }
-      if (intRight.isValid()) {
-        endpoints.push_back(intRight); index++;
-      }
-      if (intBot.isValid()) {
-        endpoints.push_back(intBot); index++;
-      }
+      if (intLeft.isValid())
+        endpoints.push_back(intLeft);
+      if (intTop.isValid())
+        endpoints.push_back(intTop);
+      if (intRight.isValid())
+        endpoints.push_back(intRight);
+      if (intBot.isValid())
+        endpoints.push_back(intBot);
 
-      if (index != 2)
-        m_isValid = false;
-      else
+      // Make sure we only get two intersections!
+      if (endpoints.size() == 2) {
         Dx = endpoints[0].length(endpoints[1]);
-
-      if (Dx == 0)
+        if (Dx == 0)
+          m_isValid = false;
+      } else
         m_isValid = false;
 
       return Dx;
@@ -299,7 +287,5 @@ namespace Belle2 {
     DedxLine m_Right;   /**< the left boundary of the cell */
     DedxLine m_Bot;     /**< the left boundary of the cell */
     bool m_isValid; /**< does the hit land in this cell */
-
   };
-}
-#endif
+} // Belle2 namespace

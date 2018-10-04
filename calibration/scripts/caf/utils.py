@@ -589,3 +589,38 @@ def parse_raw_data_iov(file_path):
         return IoV(path_exp, path_run, path_exp, path_run)
     else:
         raise ValueError("Filename and directory gave different IoV after parsing for: {}".format(file_path))
+
+
+def create_directories(path, overwrite=True):
+    """
+    Creates a new directory path. If it already exists it will either leave it as is (including any contents),
+    or delete it and re-create it fresh. It will only delete the end point, not any intermediate directories created
+    """
+    # Delete if overwriting and it exists
+    if (path.exists() and overwrite):
+        shutil.rmtree(path)
+    # If it never existed or we just deleted it, make it now
+    if not path.exists():
+        os.makedirs(path)
+
+
+def find_int_dirs(dir_path):
+    """
+    If you previously ran a Calibration and are now re-running after failure, you may have iteration directories
+    from iterations above your current one. This function will find directories that match an integer.
+
+    Parameters:
+        dir_path(`pathlib.Path`): The dircetory to search inside.
+
+    Returns:
+        list[`pathlib.Path`]: The matching Path objects to the directories that are valid ints
+    """
+    paths = []
+    all_dirs = [sub_dir for sub_dir in dir_path.glob("*") if sub_dir.is_dir()]
+    for directory in all_dirs:
+        try:
+            int(directory.name)
+            paths.append(directory)
+        except ValueError as err:
+            pass
+    return paths

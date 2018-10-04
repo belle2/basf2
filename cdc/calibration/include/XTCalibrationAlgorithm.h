@@ -107,7 +107,6 @@ namespace Belle2 {
       TH2D* m_hist2d[56][2][20][10];         /**< 2D histo of xt*/
       TH2D* m_hist2dDraw[56][20][10];       /**< 2d histo for draw*/
       TH1D* m_hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit */
-
       TF1* m_xtFunc[56][2][20][10];         /**< XTFunction */
 
       double m_xtPost[56][2][18][7][8];     /**< paremeters of XT before calibration */

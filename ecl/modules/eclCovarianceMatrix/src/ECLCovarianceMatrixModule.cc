@@ -17,9 +17,6 @@
 // ROOT
 #include "TMath.h"
 
-// FRAMEWORK
-#include <framework/datastore/StoreArray.h>
-
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>

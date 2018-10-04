@@ -62,8 +62,6 @@ namespace Belle2 {
     StoreArray<Track> m_tracks;/**< reco track store array */
     StoreArray<SVDIntercept> m_SVDIntercepts; /**< svd intercept store array */
 
-    bool m_isSimulation; /**< true if the module is run on simulated events*/
-
     float m_edgeU; /**<fiducial region, edge along U*/
     float m_edgeV; /**<fiducial region, edge along U*/
     float m_minPVal; /**<fiducial region, minimum P value of the tracks*/
@@ -80,12 +78,6 @@ namespace Belle2 {
     int m_rootEvent;   /**<  event number*/
 
     //graphs & histos - results
-    Double_t pt[6]  = {0.05, 0.15, 0.25, 0.4, 0.75, 1.5}; /**< bin edges (in pt = transverse momentum)*/
-    Double_t ptErr[6] = { 0.05, 0.05, 0.05, 0.1, 0.25, 0.5}; /**< bin widths (transverse momentum) */
-
-
-    TH1F* m_h1digiIn; /**< digits contained in ROI histogram*/
-    TH1F* m_h1digiOut; /**< digits contained in ROI histogram*/
 
     TH1F* m_h1Track; /**< denominator track  */
     TH1F* m_h1Track_pt; /**< denominator track pT*/
@@ -130,15 +122,6 @@ namespace Belle2 {
     TH1F* m_h1SigmaV; /**< distribution of sigmaV for SVDShaperDigits contained in a ROI*/
     TH1F* m_h1GlobalTime; /**< distribution of global time for PDXDigits contained in a ROI*/
 
-    //fill digits outside2 ROIs
-    TH2F* m_h2sigmaUphi_out; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
-    TH2F* m_h2sigmaVphi_out; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
-    TH1F* m_h1ResidU_out; /**< distribution of U resid for SVDShaperDigits not contained in a ROI*/
-    TH1F* m_h1ResidV_out; /**< distribution of V resid for SVDShaperDigits not contained in a ROI*/
-    TH1F* m_h1SigmaU_out; /**< distribution of sigmaU for SVDShaperDigits not contained in a ROI*/
-    TH1F* m_h1SigmaV_out; /**< distribution of sigmaV for SVDShaperDigits not contained in a ROI*/
-    TH1F* m_h1GlobalTime_out; /**< distribution of global time for PDXDigits not contained in a ROI*/
-
     //ROI stuff
     TH2F* m_h2ROIuMinMax;
     TH2F* m_h2ROIvMinMax;
@@ -149,17 +132,6 @@ namespace Belle2 {
     TH1F* m_h1goodROIs; /**< distribution of number of ROIs containin a SVDShaperDigit, DATA*/
     TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a SVDShaperDigit*/
     TH1F* m_h1effROIs; /**< distribution of number of ROIs containin a SVDShaperDigit, DATA*/
-    TH1F* m_h1totUstrips; /**< distribution of #u strips of all ROIs*/
-    TH1F* m_h1totVstrips; /**< distribution of #u strips of all ROIs*/
-
-    //variables
-    double m_globalTime; /**< global hit time */
-    double m_coorU; /**< intercept U coordinate*/
-    double m_coorV; /**< intercept V coordinate*/
-    double m_sigmaU; /**< intercept U stat error*/
-    double m_sigmaV; /**< intercept V stat error*/
-    int m_vxdID; /**< VXD ID*/
-
 
     unsigned int n_rois;
     unsigned int m_nGoodROIs;

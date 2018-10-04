@@ -19,11 +19,8 @@
 
 #pragma once
 
-// ECL
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLShower.h>
+//STL
+#include <vector>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -31,22 +28,21 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// GEOMETRY
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-
-// ROOT
-#include "TH1F.h"
-#include "TH1D.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TGraph2D.h"
-
-#include <vector>    // std::vector
+class TGraph2D;
+class TFile;
+class TH1D;
 
 namespace Belle2 {
-
+  class ECLCalDigit;
+  class ECLConnectedRegion;
+  class ECLShower;
+  class ECLLocalMaximum;
   class EventLevelClusteringInfo;
+
+  namespace ECL {
+    class ECLNeighbours;
+    class ECLGeometryPar;
+  }
 
   /** Class to perform the shower correction */
   class ECLSplitterN1Module : public Module {

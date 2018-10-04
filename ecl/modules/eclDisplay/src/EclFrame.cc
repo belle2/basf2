@@ -7,12 +7,33 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclFrame.h>
 
-// #define DEFAULT_PAINTER PAINTER_CHANNEL_2D
+//ROOT
+#include <TFile.h>
+#include <TCanvas.h>
+#include <TSystem.h>
+#include <TRootEmbeddedCanvas.h>
+#include <TGDoubleSlider.h>
+#include <TGNumberEntry.h>
+#include <TGListTree.h>
+#include <TGFileDialog.h>
+#include <TStyle.h>
+#include <TGLabel.h>
+#include <TGComboBox.h>
+#include <TGeoVolume.h>
+#include <TGMenu.h>
+
+//ECL
+#include <ecl/modules/eclDisplay/geometry.h>
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/modules/eclDisplay/MultilineWidget.h>
+#include <ecl/modules/eclDisplay/EclPainter.h>
+#include <ecl/modules/eclDisplay/EclPainter1D.h>
 
 using namespace Belle2;
+using namespace ECL;
 using namespace ECLDisplayUtility;
 
 const char* EclFrame::filetypes[] = {

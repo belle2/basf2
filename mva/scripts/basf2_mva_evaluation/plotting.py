@@ -606,26 +606,42 @@ class Distribution(Plotter):
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin = numpy.nanmin([hist.min(), self.ymin])
-        self.ymax = numpy.nanmax([(hist + hist_error).max(), self.ymax, self.ymin])
+        self.ymax = numpy.nanmax([(hist + hist_error).max(), self.ymax])
 
         p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
         self.plots.append(p)
         self.x_axis_label = column
+
+        appendix = ''
+        if self.ymax <= self.ymin or self.xmax <= self.xmin:
+            appendix = ' No data to plot!'
+
         if label is None:
-            self.labels.append(column)
+            self.labels.append(column + appendix)
         else:
-            self.labels.append(label)
+            self.labels.append(label + appendix)
         return self
 
     def finish(self):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.scale_limits()
-        self.axis.set_xlim((self.xmin, self.xmax))
-        self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Distribution Plot")
         self.axis.get_xaxis().set_label_text(self.x_axis_label)
+
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+
+        if self.ymax <= self.ymin or self.xmax <= self.xmin:
+            self.axis.set_xlim((0., 1.))
+            self.axis.set_ylim((0., 1.))
+            self.axis.text(0.36, 0.5, 'No data to plot', fontsize=60, color='black')
+            return self
+
+        self.scale_limits()
+
+        self.axis.set_xlim((self.xmin, self.xmax))
+        self.axis.set_ylim((self.ymin, self.ymax))
+
         if self.normed_to_all_entries and self.normed_to_bin_width:
             self.axis.get_yaxis().set_label_text('# Entries per Bin / (# Entries * Bin Width)')
         elif self.normed_to_all_entries:
@@ -634,7 +650,7 @@ class Distribution(Plotter):
             self.axis.get_yaxis().set_label_text('# Entries per Bin / Bin Width')
         else:
             self.axis.get_yaxis().set_label_text('# Entries per Bin')
-        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+
         return self
 
 

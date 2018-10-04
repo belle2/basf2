@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 namespace Belle2 {
@@ -17,7 +18,23 @@ namespace Belle2 {
   public:
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {
-      // TODO
+      const auto pathComparison = [](const CDCCKFPath & lhs, const CDCCKFPath & rhs) {
+        const auto& lhsLastState = lhs.back();
+        const auto& rhsLastState = rhs.back();
+
+        const auto lhsArcLength = lhsLastState.getArcLength();
+        const auto rhsArcLength = rhsLastState.getArcLength();
+
+        // TODO: arc length of everything!
+        return lhs.size() / lhsArcLength > rhs.size() / rhsArcLength;
+      };
+
+      std::sort(newPaths.begin(), newPaths.end(), pathComparison);
+
+      TrackFindingCDC::only_best_N(newPaths, m_maximalCandidatesInFlight);
     }
+
+  private:
+    size_t m_maximalCandidatesInFlight = 10;
   };
 }

@@ -12,6 +12,8 @@
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
@@ -39,14 +41,13 @@ void CKFToCDCFindlet::beginEvent()
   Super::beginEvent();
 
   m_vxdRecoTrackVector.clear();
-  m_hitRelations.clear();
 }
 
 void CKFToCDCFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wireHits)
 {
   m_trackHandler.apply(m_vxdRecoTrackVector);
 
-  // TODO: Create relations among wireHits
+  const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
 
   // Do the tree search
   for (const RecoTrack* recoTrack : m_vxdRecoTrackVector) {
@@ -54,7 +55,7 @@ void CKFToCDCFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wire
 
     CDCCKFState seedState(recoTrack, recoTrack->getMeasuredStateOnPlaneFromLastHit());
     paths.push_back({seedState});
-    m_treeSearcher.apply(paths, m_hitRelations);
+    m_treeSearcher.apply(paths, wireHitPtrs);
 
     // TODO: do something with the paths
   }

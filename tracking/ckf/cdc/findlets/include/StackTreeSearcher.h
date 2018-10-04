@@ -16,14 +16,13 @@
 #include <tracking/ckf/cdc/findlets/CDCCKFPathMerger.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFPathSelector.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 
 namespace Belle2 {
   class StackTreeSearcher : public
-    TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::WeightedRelation<TrackFindingCDC::CDCWireHit>> {
+    TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const> {
   public:
     StackTreeSearcher()
     {
@@ -34,7 +33,7 @@ namespace Belle2 {
     }
 
     void apply(std::vector<CDCCKFPath>& paths,
-               const std::vector<TrackFindingCDC::WeightedRelation<TrackFindingCDC::CDCWireHit>>& relations)
+               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
     {
 
       std::vector<CDCCKFPath> newPaths;
@@ -42,7 +41,7 @@ namespace Belle2 {
 
       for (CDCCKFPath& path : paths) {
         nextStates.clear();
-        m_stateCreator.apply(nextStates, path, relations);
+        m_stateCreator.apply(nextStates, path, wireHits);
         m_stateFilter.apply(path, nextStates);
 
         for (const auto& nextState : nextStates) {
@@ -60,7 +59,7 @@ namespace Belle2 {
       }
 
       paths.swap(newPaths);
-      apply(paths, relations);
+      apply(paths, wireHits);
     }
 
   private:

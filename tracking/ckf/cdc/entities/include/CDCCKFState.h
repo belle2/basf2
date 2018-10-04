@@ -11,6 +11,8 @@
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <boost/optional.hpp>
@@ -51,9 +53,52 @@ namespace Belle2 {
       m_trackState = trackState;
     }
 
+    void setArcLength(double arcLength)
+    {
+      m_arcLength = arcLength;
+    }
+
+    double getArcLength() const
+    {
+      return m_arcLength;
+    }
+
+    void setHitDistance(double hitDistance)
+    {
+      m_hitDistance = hitDistance;
+    }
+
+    double getHitDistance() const
+    {
+      return m_hitDistance;
+    }
+
+    void setWeight(double weight)
+    {
+      m_weight = weight;
+    }
+
+    double getWeight() const
+    {
+      return m_weight;
+    }
+
+    TrackFindingCDC::CDCTrajectory3D getTrajectory() const
+    {
+      const auto& trackState = getTrackState();
+      const TrackFindingCDC::Vector3D trackPosition(trackState.getPos());
+      const TrackFindingCDC::Vector3D trackMomentum(trackState.getMom());
+      return TrackFindingCDC::CDCTrajectory3D(trackPosition, trackState.getTime(),
+                                              trackMomentum, trackState.getCharge());
+    }
+
   private:
     boost::optional<const RecoTrack*> m_seed;
     boost::optional<const TrackFindingCDC::CDCWireHit*> m_cdcWireHit;
     boost::optional<genfit::MeasuredStateOnPlane> m_trackState;
+
+    double m_arcLength = 0;
+    double m_hitDistance = 0;
+    double m_weight = 0;
   };
 }

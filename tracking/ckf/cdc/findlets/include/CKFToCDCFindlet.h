@@ -54,7 +54,5 @@ namespace Belle2 {
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector
     std::vector<RecoTrack*> m_vxdRecoTrackVector;
-    /// Relations among cdc wire hits
-    std::vector<TrackFindingCDC::WeightedRelation<TrackFindingCDC::CDCWireHit>> m_hitRelations;
   };
 }

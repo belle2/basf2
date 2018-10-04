@@ -60,18 +60,35 @@ void SphericityEigenvalues::calculateEigenvalues()
   }
 
   auto eigenVals = sphericityTensor.eigenvalues();
-  for (short i = 0; i < 3; i++) {
-    m_lambda[i] = eigenVals[i].real();
-  }
-
   Eigen::ComplexEigenSolver<Eigen::MatrixXcf> ces(sphericityTensor);
 
+  // unfortunately Eigen does not provide the eigenvalues in
+  // any specific order, so we have to sort them and keep also the correct eigenvector-eigenvalue
+  // associations...
+
+  short order[3] = {0, 1, 2};
+
+  std::vector<float> tmpLambda;
   for (short i = 0; i < 3; i++) {
-    auto eigenVector =  ces.eigenvectors().col(i);
+    tmpLambda.push_back(eigenVals[i].real());
+  }
+
+  // position of the largest Eigenvalue
+  order[0] =  std::distance(tmpLambda.begin(), std::max_element(tmpLambda.begin(), tmpLambda.end()));
+  // position of the smallest Eigenvalue
+  order[2] =  std::distance(tmpLambda.begin(), std::min_element(tmpLambda.begin(), tmpLambda.end()));
+  // position of the middle eigenvalue
+  order[1] = (short)(3.1 - (order[0] + order[2]));
+
+  for (short i = 0; i < 3; i++) {
+    short n = order[i];
+    m_lambda[i] = eigenVals[n].real();
+    auto eigenVector =  ces.eigenvectors().col(n);
     m_eVector[i].SetX(eigenVector[0].real());
     m_eVector[i].SetY(eigenVector[1].real());
     m_eVector[i].SetZ(eigenVector[2].real());
   }
+
   return;
 }
 

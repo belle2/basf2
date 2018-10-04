@@ -140,6 +140,12 @@ namespace Belle2 {
     Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the cosine of the angle between the particle and the thrust axis
+     * of the event, as calculate by the EventShapeCalculator module.
+     */
+    double cosToThrustOfEvent(const Particle* part);
+
+    /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
      * of the two daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
      * If the given particle has three daughters: cosine of the angle between the normal vector of the plane

@@ -29,6 +29,7 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
+#include <analysis/dataobjects/EventShapeContainer.h>
 #include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -426,6 +427,21 @@ namespace Belle2 {
       };
       return func;
     }
+
+
+    double cosToThrustOfEvent(const Particle* part)
+    {
+      StoreObjPtr<EventShapeContainer> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to load the event shape calculation?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      PCmsLabTransform T;
+      TVector3 th = evtShape->getThrustAxis();
+      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      return std::cos(th.Angle(particleMomentum));
+    }
+
 
     double cosHelicityAngle(const Particle* part)
     {
@@ -1161,6 +1177,10 @@ namespace Belle2 {
                       "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
                       "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
                       "automatically loaded by the function, given the accelerators conditions.");
+
+    REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
+                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable")
+
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"

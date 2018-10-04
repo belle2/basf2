@@ -115,12 +115,12 @@ namespace Belle2 {
     };
 
     /**
-     * Sets the thrustness of the event
-     * @param float The thrustness  value
+     * Sets the thrust of the event
+     * @param float The thrust  value
      */
-    void setThrustness(float thrustness)
+    void setThrust(float thrust)
     {
-      m_thrustness = thrustness;
+      m_thrust = thrust;
     };
 
     /**
@@ -136,7 +136,7 @@ namespace Belle2 {
 
     /**
      * Sets the spherocity axis, normalizing it
-     * @param TVector3 sperocity axis. Must have magnitude equal to the thrustness value.
+     * @param TVector3 sperocity axis. Must have magnitude equal to the thrust value.
      */
     void setSpherocityAxis(TVector3 spherocityAxis)
     {
@@ -222,12 +222,12 @@ namespace Belle2 {
 
 
     /**
-     * Returns the thrustness
+     * Returns the thrust
      * @return TVector3 the thrust axis, normalized
      */
-    float getThrustness()
+    float getThrust()
     {
-      return m_thrustness;
+      return m_thrust;
     };
 
     /**
@@ -383,7 +383,7 @@ namespace Belle2 {
     float m_foxWolframMoments[10] = {0.}; /**< Fox Wolfram moments up to order 9. */
 
     // Axis-dependent quantities
-    float m_thrustness = 0; /**< Thrustness value */
+    float m_thrust = 0; /**< Thrust value */
     float m_multipoleMomentsThrust[10] = {0.}; /**< Multipole moments up to order 9, calculated respect to the thrust axis */
     float m_cleoConesThrust[10] = {0.}; /**< Cleo cones up to order 9, calculated respect to the thrust axis. */
     float m_multipoleMomentsCollision[10] = {0.}; /**< Multipole moments up to order 9, calculated respect to the collision axis. */

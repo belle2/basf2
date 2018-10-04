@@ -14,4 +14,14 @@
 
 namespace Belle2 {
   using CDCCKFPath = std::vector<CDCCKFState>;
+
+  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path)
+  {
+    output << "[";
+    for (const auto& state : path) {
+      output << state << ", ";
+    }
+    output << "]";
+    return output;
+  }
 }

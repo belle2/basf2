@@ -46,6 +46,9 @@ namespace Belle2 {
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitCandidates"),
                                     m_maximalHitCandidates, "Maximal hit candidates to test",
                                     m_maximalHitCandidates);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitDistance"),
+                                    m_maximalHitDistance, "Maximal hit distance to allow",
+                                    m_maximalHitDistance);
 
       m_extrapolator.exposeParameters(moduleParamList, prefix);
     }
@@ -60,8 +63,8 @@ namespace Belle2 {
         nextState.setWeight(0);
 
         // Do a reconstruction based on the helix extrapolation from the last hit
-        reconstruct(nextState, trajectory, lastState);
-        if (not roughHitSelection(nextState, trajectory)) {
+        reconstruct(nextState, trajectory, lastState.getArcLength());
+        if (not roughHitSelection(nextState, lastState)) {
           nextState.setWeight(NAN);
           continue;
         }
@@ -75,7 +78,7 @@ namespace Belle2 {
 
         // Do a final hit selection based on the new state
         const TrackFindingCDC::CDCTrajectory3D& thisTrajectory = nextState.getTrajectory();
-        reconstruct(nextState, thisTrajectory, lastState);
+        reconstruct(nextState, thisTrajectory, nextState.getArcLength());
 
         // TODO: set a weight somehow with an MVA
         nextState.setWeight(1 / std::abs(nextState.getHitDistance()));
@@ -94,11 +97,13 @@ namespace Belle2 {
     }
 
   private:
-    size_t m_maximalHitCandidates = 10;
+    size_t m_maximalHitCandidates = 4;
+    double m_maximalHitDistance = 2;
+
     KalmanStepper<1> m_updater;
     Advancer m_extrapolator;
 
-    void reconstruct(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory, const CDCCKFState& lastState) const
+    void reconstruct(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory, const double lastArcLength) const
     {
       // TODO: actually we do not need to do any trajectory creation here. We could save some computing time!
       const TrackFindingCDC::CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
@@ -128,7 +133,7 @@ namespace Belle2 {
       const double arcLength = trajectory2D.calcArcLength2D(recoPos2D);
       const double distanceToHit = trajectory2D.getDist2D(recoPos2D);
 
-      state.setArcLength(lastState.getArcLength() + arcLength);
+      state.setArcLength(lastArcLength + arcLength);
       state.setHitDistance(distanceToHit);
     }
 
@@ -151,9 +156,9 @@ namespace Belle2 {
         const auto rightLeft = static_cast<TrackFindingCDC::ERightLeft>(TrackFindingCDC::sign(
                                  state.getHitDistance()));
         if (rightLeft == TrackFindingCDC::ERightLeft::c_Right) {
-          m_updater.kalmanStep(mSoP, *(measurements[1]));
+          B2INFO(m_updater.kalmanStep(mSoP, *(measurements[1])));
         } else {
-          m_updater.kalmanStep(mSoP, *(measurements[0]));
+          B2INFO(m_updater.kalmanStep(mSoP, *(measurements[0])));
         }
 
         delete measurements[0];
@@ -166,9 +171,9 @@ namespace Belle2 {
       }
     }
 
-    bool roughHitSelection(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory) const
+    bool roughHitSelection(CDCCKFState& state, const CDCCKFState& lastState) const
     {
-      const double& arcLength = state.getArcLength();
+      const double& arcLength = state.getArcLength() - lastState.getArcLength();
       // TODO: magic number
       if (arcLength <= 0 or arcLength > 20) {
         return false;
@@ -176,7 +181,7 @@ namespace Belle2 {
 
       const double& hitDistance = state.getHitDistance();
       // TODO: magic number
-      if (std::abs(hitDistance) > 2) {
+      if (std::abs(hitDistance) > m_maximalHitDistance) {
         return false;
       }
 

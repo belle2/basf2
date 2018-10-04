@@ -30,14 +30,17 @@ namespace Belle2 {
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {
       const auto pathComparison = [](const CDCCKFPath & lhs, const CDCCKFPath & rhs) {
-        /*const auto &lhsLastState = lhs.back();
-        const auto &rhsLastState = rhs.back();
+        const auto& lhsLastState = lhs.back();
+        const auto& rhsLastState = rhs.back();
 
         const auto lhsArcLength = lhsLastState.getArcLength();
-        const auto rhsArcLength = rhsLastState.getArcLength();*/
+        const auto rhsArcLength = rhsLastState.getArcLength();
 
-        // TODO: arc length of everything!
-        return lhs.size() > rhs.size();
+        if (lhs.size() != rhs.size()) {
+          return lhs.size() > rhs.size();
+        }
+
+        return lhsArcLength < rhsArcLength;
       };
 
       std::sort(newPaths.begin(), newPaths.end(), pathComparison);
@@ -46,6 +49,6 @@ namespace Belle2 {
     }
 
   private:
-    size_t m_maximalCandidatesInFlight = 5;
+    size_t m_maximalCandidatesInFlight = 3;
   };
 }

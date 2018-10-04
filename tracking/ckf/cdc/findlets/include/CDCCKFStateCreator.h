@@ -58,7 +58,6 @@ namespace Belle2 {
           }
         }
 
-        // TODO: test if there is the same hit twice
         nextStates.emplace_back(wireHit);
       }
     }

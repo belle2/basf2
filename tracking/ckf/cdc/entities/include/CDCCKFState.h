@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <boost/optional.hpp>
 
@@ -101,4 +102,17 @@ namespace Belle2 {
     double m_hitDistance = 0;
     double m_weight = 0;
   };
+
+
+  std::ostream& operator<<(std::ostream& output, const CDCCKFState& state)
+  {
+    if (state.isSeed()) {
+      output << "seed";
+    } else {
+      const auto* wireHit = state.getWireHit();
+      const auto& wire = wireHit->getWire();
+      output << wire.getICLayer() << " " << wire.getIWire();
+    }
+    return output;
+  }
 }

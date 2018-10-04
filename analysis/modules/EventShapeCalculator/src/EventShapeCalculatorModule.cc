@@ -124,10 +124,10 @@ void EventShapeCalculatorModule::event()
   // --------------------
   if (m_enableThrust) {
     TVector3 thrust = Thrust::calculateThrust(m_p3List);
-    float thrustness = thrust.Mag();
-    thrust = (1. / thrustness) * thrust;
+    float thrustVal = thrust.Mag();
+    thrust = (1. / thrustVal) * thrust;
     eventShapeContainer->setThrustAxis(thrust);
-    eventShapeContainer->setThrustness(thrustness);
+    eventShapeContainer->setThrust(thrustVal);
 
     // --- If required, calculates the MultipoleMoments ---
     if (m_enableMultipoleMoments) {

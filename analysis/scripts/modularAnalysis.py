@@ -2218,6 +2218,74 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_
     path.add_module(eventKinematicsModule)
 
 
+def buildEventShape(inputListNames=[],
+                    default_cleanup=True,
+                    allMoments=False,
+                    cleoCones=True,
+                    collisionAxis=True,
+                    foxWolfram=True,
+                    multipoleMoments=True,
+                    jets=True,
+                    sphericity=True,
+                    thrust=True,
+                    path=analysis_main):
+    """
+    Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
+    particles in the lists provided by the user.
+    The results of the calculation are then store in the EventShapeContainer dataobject, and are accessible
+    byt the variabels of the EventShape group.
+
+    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
+                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
+    @param default_cleanup  if True,  applyes some very standard cuts on pt and costTheta when defines the interanl lists.
+    @param path             modules are added to this path
+    @param allMoments  Enables the calculation of FW and multipole moments from 5 to 8
+    @param cleoCones  Enables the calculation of the CLEO cones.
+    @param collisionAxis  Enables the calculation of the  quantities related to the collision axis.
+    @param foxWolfram    Enables the calculation of the Fox-Wolfram moments.
+    @param jets   Enables the calculation of jet-related quantities.
+    @param multipoleMoments   Enables the calculation of the Multipole moments.
+    @param sphericity  Enables the calculation of the sphericity-related quantities.
+    @param thrust  Enables the calculation of thust-related quantities.
+
+    """
+    if not inputListNames:
+        B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
+        fillParticleList('pi+:evtshape', '')
+        fillParticleList('gamma:evtshape', '')
+        particleLists = ['pi+:evtshape', 'gamma:evtshape']
+
+        if default_cleanup:
+            B2INFO("Using the default lists for the EventShape module.")
+            trackCuts = 'pt > 0.1'
+            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
+            trackCuts += ' and -3.0 < dz < 3.0'
+            trackCuts += ' and -0.5 < dr < 0.5'
+            applyCuts('pi+:evtshape', trackCuts)
+
+            gammaCuts = 'E > 0.05'
+            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            applyCuts('gamma:evtshape', gammaCuts)
+        else:
+            B2WARNIG("Creating the default lists with no cleanup. This can be potentially dangerous")
+    else:
+        particleLists = inputListNames
+
+    eventShapeModule = register_module('EventShapeCalculator')
+    eventShapeModule.set_name('EventShape')
+    eventShapeModule.param('particleListNames', particleLists)
+    eventShapeModule.param('enableAllMoments', allMoments)
+    eventShapeModule.param('enableCleoCones', cleoCones)
+    eventShapeModule.param('enableCollisionAxis', collisionAxis)
+    eventShapeModule.param('enableFoxWolfram', foxWolfram)
+    eventShapeModule.param('enableJets', jets)
+    eventShapeModule.param('enableMultipoleMoments', multipoleMoments)
+    eventShapeModule.param('enableSphericity', sphericity)
+    eventShapeModule.param('enableThrust', thrust)
+
+    path.add_module(eventShapeModule)
+
+
 def labelTauPairMC(path=analysis_main):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,

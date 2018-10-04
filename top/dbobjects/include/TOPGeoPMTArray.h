@@ -211,6 +211,14 @@ namespace Belle2 {
     int getPixelID(double x, double y, unsigned pmtID) const;
 
     /**
+     * Returns pixel ID (1-based)
+     * @param pmtID PMT ID (1-based)
+     * @param pmtPixelID PMT pixel ID (1-based)
+     * @return pixel ID or 0 for invalid input ID's
+     */
+    int getPixelID(unsigned pmtID, unsigned pmtPixelID) const;
+
+    /**
      * Returns air gap
      * @return gap thickness
      */

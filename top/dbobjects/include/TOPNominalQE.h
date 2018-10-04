@@ -60,19 +60,19 @@ namespace Belle2 {
     const std::vector<float>& getQE() const {return m_QE;}
 
     /**
-     * Returns quantum efficiency at given photon energy using linear interpolation
-     * @param energy photon energy in [eV]
+     * Returns quantum efficiency at given photon wavelength using linear interpolation
+     * @param lambda photon wavelength in [nm]
      * @return quantum efficiency
      */
-    double getQE(double energy) const;
+    double getQE(double lambda) const;
 
     /**
-     * Returns quantum times collection efficiency at given photon energy
+     * Returns quantum times collection efficiency at given photon wavelength
      * using linear interpolation
-     * @param energy photon energy in [eV]
+     * @param lambda photon wavelength in [nm]
      * @return quantum efficiency
      */
-    double getEfficiency(double energy) const {return getQE(energy) * m_CE;}
+    double getEfficiency(double lambda) const {return getQE(lambda) * m_CE;}
 
     /**
      * Returns wavelenght of the first data point

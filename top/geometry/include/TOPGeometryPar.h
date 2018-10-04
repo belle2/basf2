@@ -19,7 +19,9 @@
 #include <top/dbobjects/TOPPmtInstallation.h>
 #include <top/dbobjects/TOPPmtQE.h>
 #include <top/dbobjects/TOPNominalQE.h>
+#include <top/dbobjects/TOPCalChannelRQE.h>
 #include <string>
+#include <map>
 
 namespace Belle2 {
   namespace TOP {
@@ -111,6 +113,8 @@ namespace Belle2 {
       double getPMTEfficiency(double energy,
                               int moduleID, int pmtID, double x, double y) const;
 
+      static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
+
     private:
 
       /**
@@ -139,9 +143,36 @@ namespace Belle2 {
       std::string addNumber(const std::string& str, unsigned number);
 
       /**
+       * Prepares caches for PMT dependent QE data
+       */
+      void preparePmtQEdata() const
+      {
+        setEnvelopeQE();
+        mapPmtQEToPositions();
+      }
+
+      /**
+       * Clears caches for PMT dependent QE data - function is used in call backs
+       */
+      void clearPmtQEdata();
+
+      /**
        * Constructs envelope of quantum efficiency from PMT data
        */
-      void setEnvelopeQE();
+      void setEnvelopeQE() const;
+
+      /**
+       * Maps PMT QE data to positions within the detector
+       */
+      void mapPmtQEToPositions() const;
+
+      /**
+       * Returns unique PMT ID within the detector
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @return unique ID
+       */
+      int getUniquePmtID(int moduleID, int pmtID) const {return (moduleID << 16) + pmtID;}
 
       // Geometry
 
@@ -149,6 +180,8 @@ namespace Belle2 {
       DBObjPtr<TOPGeometry>* m_geoDB = 0; /**< geometry parameters from database */
       bool m_fromDB = false;              /**< parameters from database or Gearbox */
       bool m_valid = false;               /**< true if geometry is available */
+      bool m_oldPayload = false;          /**< true if old payload found in DB */
+      bool m_BfieldOn =  true;            /**< true if B field is on */
 
       // Mappings
 
@@ -156,10 +189,15 @@ namespace Belle2 {
       ChannelMapper m_channelMapperIRS3B; /**< channel-pixel mapper */
       ChannelMapper m_channelMapperIRSX;  /**< channel-pixel mapper */
 
-      // PMT data
+      // PMT database
+
       DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
       DBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
+      DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
+
+      // caches
       mutable TOPNominalQE m_envelopeQE;  /**< envelope quantum efficiency */
+      mutable std::map<int, const TOPPmtQE*> m_pmts; /**< QE data mapped to positions */
 
       // Other
 

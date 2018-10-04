@@ -93,6 +93,16 @@ namespace Belle2 {
     double getEnvelopeQE(double lambda) const;
 
     /**
+     * Returns quantum times collection efficiency for a given pixel and wavelength,
+     * using linear interpolation.
+     * @param pmtPixel pmtPixel number (1-based)
+     * @param lambda wavelength in [nm]
+     * @param BfieldOn true for magnetic field being ON
+     * @return quantum efficiency
+     */
+    double getEfficiency(unsigned pmtPixel, double lambda, bool BfieldOn) const;
+
+    /**
      * Returns wavelenght of the first data point
      * @return wavelength in [nm]
      */
@@ -118,16 +128,11 @@ namespace Belle2 {
     double getLambdaStep() const {return m_lambdaStep;}
 
     /**
-     * Returns collection efficiency (for no B field)
+     * Returns collection efficiency
+     * @param BfieldOn true for magnetic field being ON
      * @return collection efficiency
      */
-    double getCE0() const {return m_CE_noB;}
-
-    /**
-     * Returns collection efficiency (for B field = 1.5T)
-     * @return collection efficiency
-     */
-    double getCE() const {return m_CE_withB;}
+    double getCE(bool BfieldOn) const;
 
 
   private:

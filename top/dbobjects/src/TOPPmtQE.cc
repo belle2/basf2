@@ -45,6 +45,24 @@ namespace Belle2 {
     return interpolate(lambda, m_envelopeQE);
   }
 
+  double TOPPmtQE::getEfficiency(unsigned pmtPixel, double lambda, bool BfieldOn) const
+  {
+    if (BfieldOn) {
+      return getQE(pmtPixel, lambda) * m_CE_withB;
+    } else {
+      return getQE(pmtPixel, lambda) * m_CE_noB;
+    }
+  }
+
+  double TOPPmtQE::getCE(bool BfieldOn) const
+  {
+    if (BfieldOn) {
+      return m_CE_withB;
+    } else {
+      return m_CE_noB;
+    }
+  }
+
   double TOPPmtQE::getLambdaLast() const
   {
     size_t size = 0;
@@ -85,9 +103,9 @@ namespace Belle2 {
   double TOPPmtQE::interpolate(double lambda, const std::vector<float>& QE) const
   {
     double dlam = lambda - m_lambdaFirst;
-    if (dlam < 0 or dlam >= (QE.size() - 1) * m_lambdaStep) return 0;
+    if (dlam < 0 or dlam > (QE.size() - 1) * m_lambdaStep) return 0;
     unsigned i = int(dlam / m_lambdaStep);
-    if (i > QE.size() - 2) return 0;
+    if (i > QE.size() - 2) return QE.back();
     return QE[i] + (QE[i + 1] - QE[i]) / m_lambdaStep * (dlam - i * m_lambdaStep);
   }
 

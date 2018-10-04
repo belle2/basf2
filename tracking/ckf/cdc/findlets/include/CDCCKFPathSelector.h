@@ -3,16 +3,21 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors:  Nils Braun                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-using namespace Belle2;
-
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
-REG_MODULE(ToCDCCKF)
+namespace Belle2 {
+  class CDCCKFPathSelector : public TrackFindingCDC::Findlet<CDCCKFPath>  {
+  public:
+    void apply(std::vector<CDCCKFPath>& newPaths) override
+    {
+      // TODO
+    }
+  };
+}

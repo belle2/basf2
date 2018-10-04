@@ -28,12 +28,26 @@
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.h>
+
 namespace Belle2 {
   class CDCCKFStateFilter : public TrackFindingCDC::Findlet<const CDCCKFState, CDCCKFState> {
   public:
     CDCCKFStateFilter()
     {
       addProcessingSignalListener(&m_extrapolator);
+    }
+
+
+    /// Expose the parameters of the sub findlets.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+    {
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitCandidates"),
+                                    m_maximalHitCandidates, "Maximal hit candidates to test",
+                                    m_maximalHitCandidates);
+
+      m_extrapolator.exposeParameters(moduleParamList, prefix);
     }
 
     void apply(const CDCCKFPath& path, std::vector<CDCCKFState>& nextStates) override
@@ -46,6 +60,7 @@ namespace Belle2 {
         nextState.setWeight(0);
 
         // Do a reconstruction based on the helix extrapolation from the last hit
+        reconstruct(nextState, trajectory, lastState);
         if (not roughHitSelection(nextState, trajectory)) {
           nextState.setWeight(NAN);
           continue;
@@ -60,28 +75,30 @@ namespace Belle2 {
 
         // Do a final hit selection based on the new state
         const TrackFindingCDC::CDCTrajectory3D& thisTrajectory = nextState.getTrajectory();
-        if (not roughHitSelection(nextState, thisTrajectory)) {
-          nextState.setWeight(NAN);
-          continue;
-        }
+        reconstruct(nextState, thisTrajectory, lastState);
 
         // TODO: set a weight somehow with an MVA
         nextState.setWeight(1 / std::abs(nextState.getHitDistance()));
       }
 
+      B2DEBUG(100, "Starting with " << nextStates.size() << " possible hits");
+
       TrackFindingCDC::erase_remove_if(nextStates,
                                        TrackFindingCDC::Composition<TrackFindingCDC::IsNaN, TrackFindingCDC::GetWeight>());
+
+      B2DEBUG(100, "Now have " << nextStates.size());
+
       std::sort(nextStates.begin(), nextStates.end(), TrackFindingCDC::GreaterWeight());
 
       TrackFindingCDC::only_best_N(nextStates, m_maximalHitCandidates);
     }
 
   private:
-    size_t m_maximalHitCandidates = 5;
+    size_t m_maximalHitCandidates = 10;
     KalmanStepper<1> m_updater;
     Advancer m_extrapolator;
 
-    void reconstruct(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory) const
+    void reconstruct(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory, const CDCCKFState& lastState) const
     {
       // TODO: actually we do not need to do any trajectory creation here. We could save some computing time!
       const TrackFindingCDC::CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
@@ -89,27 +106,30 @@ namespace Belle2 {
 
       const TrackFindingCDC::CDCWireHit* wireHit = state.getWireHit();
 
-      // First step: get the position on the drift circle closest to the trajectory
+      TrackFindingCDC::Vector2D recoPos2D;
       if (wireHit->isAxial()) {
-        // Mostly a copy from CDCRLWireHit
-        const TrackFindingCDC::Vector2D& refPos2D = wireHit->getRefPos2D();
-        const TrackFindingCDC::Vector2D recoPos2D = trajectory2D.getClosest(refPos2D);
-
-        // Fix the displacement to lie on the drift circle.
-        const double driftLength = wireHit->getRefDriftLength();
-        TrackFindingCDC::Vector2D disp2D = recoPos2D - refPos2D;
-        // Fix the displacement to lie on the drift circle.
-        disp2D.normalizeTo(driftLength);
-        const TrackFindingCDC::Vector2D recoPos2DOnCircle = refPos2D + disp2D;
-
-        const double distanceToHit = trajectory2D.getDist2D(recoPos2DOnCircle);
-        const double arcLength = trajectory2D.calcArcLength2D(recoPos2D);
-
-        state.setArcLength(arcLength);
-        state.setHitDistance(distanceToHit);
+        recoPos2D = wireHit->reconstruct2D(trajectory2D);
       } else {
-        // TODO
+        const TrackFindingCDC::CDCWire& wire = wireHit->getWire();
+        const TrackFindingCDC::Vector2D& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
+
+        const double arcLength = trajectory2D.calcArcLength2D(posOnXYPlane);
+        const double z = trajectorySZ.mapSToZ(arcLength);
+
+        const TrackFindingCDC::Vector2D& wirePos2DAtZ = wire.getWirePos2DAtZ(z);
+
+        const TrackFindingCDC::Vector2D& recoPosOnTrajectory = trajectory2D.getClosest(wirePos2DAtZ);
+        const double driftLength = wireHit->getRefDriftLength();
+        TrackFindingCDC::Vector2D disp2D = recoPosOnTrajectory - wirePos2DAtZ;
+        disp2D.normalizeTo(driftLength);
+        recoPos2D = wirePos2DAtZ + disp2D;
       }
+
+      const double arcLength = trajectory2D.calcArcLength2D(recoPos2D);
+      const double distanceToHit = trajectory2D.getDist2D(recoPos2D);
+
+      state.setArcLength(lastState.getArcLength() + arcLength);
+      state.setHitDistance(distanceToHit);
     }
 
     bool extrapolateAndUpdate(CDCCKFState& state, const genfit::MeasuredStateOnPlane& lastMSoP) const
@@ -119,32 +139,35 @@ namespace Belle2 {
       const TrackFindingCDC::CDCWireHit* wireHit = state.getWireHit();
       CDCRecoHit recoHit(wireHit->getHit(), nullptr);
 
-      const auto& plane = recoHit.constructPlane(lastMSoP);
-      if (std::isnan(m_extrapolator.extrapolateToPlane(mSoP, plane))) {
+      try {
+        const auto& plane = recoHit.constructPlane(lastMSoP);
+        if (std::isnan(m_extrapolator.extrapolateToPlane(mSoP, plane))) {
+          return false;
+        }
+
+        const auto& measurements = recoHit.constructMeasurementsOnPlane(mSoP);
+        B2ASSERT("Should be exactly two measurements", measurements.size() == 2);
+
+        const auto rightLeft = static_cast<TrackFindingCDC::ERightLeft>(TrackFindingCDC::sign(
+                                 state.getHitDistance()));
+        if (rightLeft == TrackFindingCDC::ERightLeft::c_Right) {
+          m_updater.kalmanStep(mSoP, *(measurements[1]));
+        } else {
+          m_updater.kalmanStep(mSoP, *(measurements[0]));
+        }
+
+        delete measurements[0];
+        delete measurements[1];
+
+        state.setTrackState(mSoP);
+        return true;
+      } catch (genfit::Exception) {
         return false;
       }
-
-      const auto& measurements = recoHit.constructMeasurementsOnPlane(mSoP);
-      B2ASSERT("Should be exactly two measurements", measurements.size() == 2);
-
-      const auto rightLeft = static_cast<TrackFindingCDC::ERightLeft>(TrackFindingCDC::sign(state.getHitDistance()));
-      if (rightLeft == TrackFindingCDC::ERightLeft::c_Right) {
-        m_updater.kalmanStep(mSoP, *(measurements[1]));
-      } else {
-        m_updater.kalmanStep(mSoP, *(measurements[0]));
-      }
-
-      delete measurements[0];
-      delete measurements[1];
-
-      state.setTrackState(mSoP);
-      return true;
     }
 
     bool roughHitSelection(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory) const
     {
-      reconstruct(state, trajectory);
-
       const double& arcLength = state.getArcLength();
       // TODO: magic number
       if (arcLength <= 0 or arcLength > 20) {

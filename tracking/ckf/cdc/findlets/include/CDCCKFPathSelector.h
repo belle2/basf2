@@ -13,20 +13,31 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.h>
+
 namespace Belle2 {
-  class CDCCKFPathSelector : public TrackFindingCDC::Findlet<CDCCKFPath>  {
+  class CDCCKFPathSelector : public TrackFindingCDC::Findlet<CDCCKFPath> {
   public:
+    /// Expose the parameters of the sub findlets.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+    {
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalCandidatesInFlight"),
+                                    m_maximalCandidatesInFlight,
+                                    "Maximal candidates in flight", m_maximalCandidatesInFlight);
+    }
+
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {
       const auto pathComparison = [](const CDCCKFPath & lhs, const CDCCKFPath & rhs) {
-        const auto& lhsLastState = lhs.back();
-        const auto& rhsLastState = rhs.back();
+        /*const auto &lhsLastState = lhs.back();
+        const auto &rhsLastState = rhs.back();
 
         const auto lhsArcLength = lhsLastState.getArcLength();
-        const auto rhsArcLength = rhsLastState.getArcLength();
+        const auto rhsArcLength = rhsLastState.getArcLength();*/
 
         // TODO: arc length of everything!
-        return lhs.size() / lhsArcLength > rhs.size() / rhsArcLength;
+        return lhs.size() > rhs.size();
       };
 
       std::sort(newPaths.begin(), newPaths.end(), pathComparison);
@@ -35,6 +46,6 @@ namespace Belle2 {
     }
 
   private:
-    size_t m_maximalCandidatesInFlight = 10;
+    size_t m_maximalCandidatesInFlight = 5;
   };
 }

@@ -17,6 +17,7 @@
 #include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -34,6 +35,9 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   Super::exposeParameters(moduleParamList, prefix);
 
   m_trackHandler.exposeParameters(moduleParamList, prefix);
+  m_treeSearcher.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->getParameter<std::string>("direction").setDefaultValue("forward");
 }
 
 void CKFToCDCFindlet::beginEvent()
@@ -43,14 +47,27 @@ void CKFToCDCFindlet::beginEvent()
   m_vxdRecoTrackVector.clear();
 }
 
+void CKFToCDCFindlet::initialize()
+{
+  Super::initialize();
+
+  StoreArray<RecoTrack> outputRecoTracks("CDCCKFRecoTracks");
+  outputRecoTracks.registerInDataStore();
+
+  RecoTrack::registerRequiredRelations(outputRecoTracks);
+}
+
 void CKFToCDCFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wireHits)
 {
+  StoreArray<RecoTrack> outputRecoTracks("CDCCKFRecoTracks");
+
   m_trackHandler.apply(m_vxdRecoTrackVector);
 
   const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
 
   // Do the tree search
   for (const RecoTrack* recoTrack : m_vxdRecoTrackVector) {
+    B2DEBUG(100, "Starting new seed");
     std::vector<CDCCKFPath> paths;
 
     CDCCKFState seedState(recoTrack, recoTrack->getMeasuredStateOnPlaneFromLastHit());
@@ -58,7 +75,34 @@ void CKFToCDCFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wire
     m_treeSearcher.apply(paths, wireHitPtrs);
 
     // TODO: do something with the paths
+    for (const CDCCKFPath& path : paths) {
+      const auto& result = path.back().getTrackState();
+      const TVector3& trackPosition = result.getPos();
+      const TVector3& trackMomentum = result.getMom();
+      const double trackCharge = result.getCharge();
+
+      RecoTrack* newRecoTrack = outputRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);
+
+      unsigned int sortingParameter = 0;
+      for (const CDCCKFState& state : path) {
+        if (state.isSeed()) {
+          continue;
+        }
+
+        // TODO: RL info + track finder info
+        const TrackFindingCDC::CDCWireHit* wireHit = state.getWireHit();
+        newRecoTrack->addCDCHit(wireHit->getHit(), sortingParameter);
+
+        sortingParameter++;
+      }
+
+      /*const RecoTrack* seed = path.front().getSeed();
+      if (not seed) {
+        continue;
+      }
+      //seed->addRelationTo(newRecoTrack);*/
+    }
   }
 
-  // TODO: write out the path candidates
+  // TODO: write out the path candidates correctly
 }

@@ -44,6 +44,9 @@ namespace Belle2 {
     /// Clear the object pools
     void beginEvent() override;
 
+    /// Init the store arrays
+    void initialize() override;
+
   private:
     // Findlets
     /// Findlet for retrieving the vxd tracks and writing the result out

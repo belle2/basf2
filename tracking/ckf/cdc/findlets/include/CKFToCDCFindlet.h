@@ -10,18 +10,23 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-
-#include <tracking/ckf/cdc/findlets/StackTreeSearcher.h>
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/ckf/general/findlets/TrackLoader.h>
+#include <tracking/ckf/cdc/findlets/CDCCKFSeedCreator.h>
+#include <tracking/ckf/cdc/findlets/StackTreeSearcher.h>
+#include <tracking/ckf/cdc/findlets/CDCCKFResultFinalizer.h>
+#include <tracking/ckf/cdc/findlets/CDCCKFResultStorer.h>
+
+#include <tracking/ckf/cdc/entities/CDCCKFState.h>
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <vector>
 
 namespace Belle2 {
   class RecoTrack;
+
   class ModuleParamList;
 
   class CKFToCDCFindlet : public TrackFindingCDC::Findlet<const TrackFindingCDC::CDCWireHit> {
@@ -44,18 +49,27 @@ namespace Belle2 {
     /// Clear the object pools
     void beginEvent() override;
 
-    /// Init the store arrays
-    void initialize() override;
-
   private:
     // Findlets
     /// Findlet for retrieving the vxd tracks and writing the result out
     TrackLoader m_trackHandler;
+    /// Seed Creator
+    CDCCKFSeedCreator m_seedCreator;
     /// Tree Searcher
     StackTreeSearcher m_treeSearcher;
+    /// Result Finalizer
+    CDCCKFResultFinalizer m_resultFinalizer;
+    /// Result Storer
+    CDCCKFResultStorer m_resultStorer;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector
     std::vector<RecoTrack*> m_vxdRecoTrackVector;
+    /// Current list of paths
+    std::vector<CDCCKFPath> m_paths;
+    /// Current list of seeds
+    std::vector<CDCCKFPath> m_seeds;
+    /// Current list of results
+    std::vector<CDCCKFPath> m_results;
   };
 }

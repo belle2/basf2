@@ -6,7 +6,7 @@ import tempfile
 import subprocess
 import json
 import basf2 as b2
-from basf2_version import version
+from basf2.version import version
 
 b2.set_random_seed("something important")
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2.core import basf2label, basf2copyright, get_default_global_tags, list_module_search_paths
+from basf2.core import basf2label, basf2copyright, get_default_global_tags, list_module_search_paths, \
+    LogPythonInterface
 from basf2.version import version, release
 
 import os
@@ -41,10 +42,16 @@ logo = """\
 
 """
 
-CSI = "\x1B["
-reset = CSI + 'm'
+if LogPythonInterface.terminal_supports_colors():
+    CSI = "\x1B["
+    color = CSI + '93;44m'
+    reset = CSI + '0m'
+else:
+    color = ""
+    reset = ""
+
 for line in logo.splitlines():
-    print(CSI + '93;44m' + line.ljust(48) + CSI + '0m')
+    print(color + line.ljust(48) + reset)
 
 print('')
 print(basf2label.center(48))

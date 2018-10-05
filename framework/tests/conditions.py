@@ -18,7 +18,8 @@ getting the payload information and payloads and then we run through different s
 """
 
 import sys
-from basf2 import *
+import os
+import basf2 as b2
 from ROOT import Belle2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
@@ -176,25 +177,25 @@ def dbprocess(host, path, lastChangeCallback=lambda: None):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
     # reset the database so that there is no chain
-    reset_database()
+    b2.reset_database()
     # now run the path in a child process inside of a clean working directory
-    with clean_working_directory() as tempdir:
-        use_central_database("localtest", host, host, "", LogLevel.WARNING)
+    with clean_working_directory():
+        b2.use_central_database("localtest", host, host, "", b2.LogLevel.WARNING)
         lastChangeCallback()
         safe_process(path)
 
 
 # keep timeouts short for testing
-set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
+b2.set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
 
 # set the random seed to something fixed
-set_random_seed("something important")
+b2.set_random_seed("something important")
 # simplify logging output to just the type and the message
-for level in LogLevel.values.values():
-    logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
+for level in b2.LogLevel.values.values():
+    b2.logging.set_info(level, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 # disable error summary, we don't need it for these short tests and it basically
 # doubles the output
-logging.enable_summary(False)
+b2.logging.enable_summary(False)
 # and create a pipe so we can send the port we listen on from child to parent
 conn = multiprocessing.Pipe(False)
 # now start the mock conditions database as daemon so it gets killed at the end
@@ -222,7 +223,7 @@ redir_host = f"http://localhost:{redir_port}/"
 
 # create a simple processing path with just event info setter an a module which
 # prints the beamparameters from the database
-main = create_path()
+main = b2.Path()
 evtinfo = main.add_module("EventInfoSetter")
 main.add_module("PrintBeamParameters")
 
@@ -238,7 +239,7 @@ for exp in range(len(SimpleConditionsDB.payloads) + 1):
 evtinfo.param({"expList": [503], "runList": [0], "evtNumList": [1]})
 dbprocess(mock_host, main)
 # check again with different amount of retries
-set_central_database_networkparams(max_retries=0)
+b2.set_central_database_networkparams(max_retries=0)
 dbprocess(mock_host, main)
 
 # the following ones fail, no need for 3 times
@@ -264,7 +265,7 @@ dbprocess("", main)
 # ok, try again with the steering file settings instead of environment variable
 del os.environ["BELLE2_CONDB_SERVERLIST"]
 del serverlist[1]
-dbprocess("", main, lastChangeCallback=lambda: set_central_serverlist(serverlist))
+dbprocess("", main, lastChangeCallback=lambda: b2.set_central_serverlist(serverlist))
 
 if "ssl" in sys.argv:
     # ok, test SSL connectivity ... for now we just want to accept anything. This

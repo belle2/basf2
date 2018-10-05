@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
       pythonFile = "modules.py";
     } else if (varMap.count("module-io")) {
       runModuleIOVisualization = varMap["module-io"].as<string>();
-      pythonFile = "basf2.py"; //make module maps available, visualization will happen later
+      pythonFile = "basf2/core.py"; //make module maps available, visualization will happen later
     } else if (varMap.count("execute-path")) {
       Environment::Instance().setPicklePath(varMap["execute-path"].as<string>());
       pythonFile = "execute_pickled_path.py";

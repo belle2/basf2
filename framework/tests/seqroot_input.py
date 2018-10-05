@@ -4,21 +4,22 @@
 # Test SeqRootInputModule. Input data is the same as used by chain_input.py
 # (both files)
 
-from basf2 import *
+import os
+import basf2 as b2
 from ROOT import Belle2
 import gzip
 import glob
 import struct
 from b2test_utils import clean_working_directory, safe_process
 
-set_random_seed("something important")
+b2.set_random_seed("something important")
 # simplify logging output to just the type and the message
-logging.enable_summary(False)
-for level in LogLevel.values.values():
-    logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
+b2.logging.enable_summary(False)
+for level in b2.LogLevel.values.values():
+    b2.logging.set_info(level, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
 
 
-class TestModule(Module):
+class TestModule(b2.Module):
 
     """Test to read relations in the input files."""
 
@@ -42,8 +43,8 @@ class TestModule(Module):
 
 filename = Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot')
 
-main = create_path()
-seqinput = main.add_module("SeqRootInput", logLevel=LogLevel.WARNING)
+main = b2.Path()
+seqinput = main.add_module("SeqRootInput", logLevel=b2.LogLevel.WARNING)
 main.add_module("EventInfoPrinter")
 main.add_module("PrintCollections", printForEvent=0)
 main.add_module(TestModule())

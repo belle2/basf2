@@ -69,7 +69,7 @@ except:
 print('ROOT version:'.ljust(25), rootver)
 print('')
 print('basf2 module directories:'.ljust(25))
-for dirname in fw.list_module_search_paths():
+for dirname in list_module_search_paths():
     print(' ', dirname)
 
 print('-' * 48)

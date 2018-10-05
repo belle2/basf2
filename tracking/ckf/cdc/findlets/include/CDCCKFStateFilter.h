@@ -19,14 +19,12 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/numerics/WeightComperator.h>
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
-#include <cdc/dataobjects/CDCRecoHit.h>
-
-#include <tracking/ckf/general/utilities/KalmanStepper.h>
-#include <tracking/ckf/general/utilities/Advancer.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
+#include <tracking/ckf/cdc/filters/states/CDCStateFilterFactory.h>
+
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
@@ -34,9 +32,13 @@
 namespace Belle2 {
   class CDCCKFStateFilter : public TrackFindingCDC::Findlet<const CDCCKFState, CDCCKFState> {
   public:
+    /// Add all sub findlets
     CDCCKFStateFilter()
     {
-      addProcessingSignalListener(&m_extrapolator);
+      addProcessingSignalListener(&m_preFilter);
+      addProcessingSignalListener(&m_basicFilter);
+      addProcessingSignalListener(&m_extrapolationFilter);
+      addProcessingSignalListener(&m_finalSelection);
     }
 
 
@@ -46,33 +48,40 @@ namespace Belle2 {
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitCandidates"),
                                     m_maximalHitCandidates, "Maximal hit candidates to test",
                                     m_maximalHitCandidates);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitDistance"),
-                                    m_maximalHitDistance, "Maximal hit distance to allow",
-                                    m_maximalHitDistance);
-
-      m_extrapolator.exposeParameters(moduleParamList, prefix);
+      m_preFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "pre"));
+      m_basicFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "basic"));
+      m_extrapolationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "extrapolation"));
+      m_finalSelection.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "final"));
     }
 
+    /// Apply the findlet and do the state selection
     void apply(const CDCCKFPath& path, std::vector<CDCCKFState>& nextStates) override
     {
       const CDCCKFState& lastState = path.back();
       const TrackFindingCDC::CDCTrajectory3D& trajectory = lastState.getTrajectory();
 
+      TrackFindingCDC::Weight weight;
+
       for (CDCCKFState& nextState : nextStates) {
-        // Erase all previous weight information
-        nextState.setWeight(0);
+        weight = m_preFilter({&path, &nextState});
+        nextState.setWeight(weight);
+        if (std::isnan(weight)) {
+          continue;
+        }
 
         // Do a reconstruction based on the helix extrapolation from the last hit
         reconstruct(nextState, trajectory, lastState.getArcLength());
-        if (not roughHitSelection(nextState, lastState)) {
-          nextState.setWeight(NAN);
+
+        weight = m_basicFilter({&path, &nextState});
+        nextState.setWeight(weight);
+        if (std::isnan(weight)) {
           continue;
         }
 
         // Extrapolate and update
-        const genfit::MeasuredStateOnPlane& lastMSoP = lastState.getTrackState();
-        if (not extrapolateAndUpdate(nextState, lastMSoP)) {
-          nextState.setWeight(NAN);
+        weight = m_extrapolationFilter({&path, &nextState});
+        nextState.setWeight(weight);
+        if (std::isnan(weight)) {
           continue;
         }
 
@@ -80,8 +89,11 @@ namespace Belle2 {
         const TrackFindingCDC::CDCTrajectory3D& thisTrajectory = nextState.getTrajectory();
         reconstruct(nextState, thisTrajectory, nextState.getArcLength());
 
-        // TODO: set a weight somehow with an MVA
-        nextState.setWeight(1 / std::abs(nextState.getHitDistance()));
+        weight = m_finalSelection({&path, &nextState});
+        nextState.setWeight(weight);
+        if (std::isnan(weight)) {
+          continue;
+        }
       }
 
       B2DEBUG(100, "Starting with " << nextStates.size() << " possible hits");
@@ -97,12 +109,18 @@ namespace Belle2 {
     }
 
   private:
+    /// Parameter: max number of candidates
     size_t m_maximalHitCandidates = 4;
-    double m_maximalHitDistance = 2;
+    /// Pre Filter
+    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_preFilter;
+    /// Basic Filter
+    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_basicFilter;
+    /// Extrapolation Filter
+    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_extrapolationFilter;
+    /// Final Selection Filter
+    TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_finalSelection;
 
-    KalmanStepper<1> m_updater;
-    Advancer m_extrapolator;
-
+    /// Helper function to reconstruct the arc length and the hit distance of a state according to the trajectory
     void reconstruct(CDCCKFState& state, const TrackFindingCDC::CDCTrajectory3D& trajectory, const double lastArcLength) const
     {
       // TODO: actually we do not need to do any trajectory creation here. We could save some computing time!
@@ -136,56 +154,5 @@ namespace Belle2 {
       state.setArcLength(lastArcLength + arcLength);
       state.setHitDistance(distanceToHit);
     }
-
-    bool extrapolateAndUpdate(CDCCKFState& state, const genfit::MeasuredStateOnPlane& lastMSoP) const
-    {
-      genfit::MeasuredStateOnPlane mSoP = lastMSoP;
-
-      const TrackFindingCDC::CDCWireHit* wireHit = state.getWireHit();
-      CDCRecoHit recoHit(wireHit->getHit(), nullptr);
-
-      try {
-        const auto& plane = recoHit.constructPlane(lastMSoP);
-        if (std::isnan(m_extrapolator.extrapolateToPlane(mSoP, plane))) {
-          return false;
-        }
-
-        const auto& measurements = recoHit.constructMeasurementsOnPlane(mSoP);
-        B2ASSERT("Should be exactly two measurements", measurements.size() == 2);
-
-        const auto rightLeft = static_cast<TrackFindingCDC::ERightLeft>(TrackFindingCDC::sign(
-                                 state.getHitDistance()));
-        if (rightLeft == TrackFindingCDC::ERightLeft::c_Right) {
-          B2INFO(m_updater.kalmanStep(mSoP, *(measurements[1])));
-        } else {
-          B2INFO(m_updater.kalmanStep(mSoP, *(measurements[0])));
-        }
-
-        delete measurements[0];
-        delete measurements[1];
-
-        state.setTrackState(mSoP);
-        return true;
-      } catch (genfit::Exception) {
-        return false;
-      }
-    }
-
-    bool roughHitSelection(CDCCKFState& state, const CDCCKFState& lastState) const
-    {
-      const double& arcLength = state.getArcLength() - lastState.getArcLength();
-      // TODO: magic number
-      if (arcLength <= 0 or arcLength > 20) {
-        return false;
-      }
-
-      const double& hitDistance = state.getHitDistance();
-      // TODO: magic number
-      if (std::abs(hitDistance) > m_maximalHitDistance) {
-        return false;
-      }
-
-      return true;
-    };
   };
 }

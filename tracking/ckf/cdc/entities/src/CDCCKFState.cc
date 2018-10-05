@@ -7,13 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <vector>
 
 namespace Belle2 {
-  using CDCCKFPath = std::vector<CDCCKFState>;
-
-  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path);
+  std::ostream& operator<<(std::ostream& output, const CDCCKFState& state)
+  {
+    if (state.isSeed()) {
+      output << "seed";
+    } else {
+      const auto* wireHit = state.getWireHit();
+      const auto& wire = wireHit->getWire();
+      output << wire.getICLayer() << " " << wire.getIWire();
+    }
+    return output;
+  }
 }

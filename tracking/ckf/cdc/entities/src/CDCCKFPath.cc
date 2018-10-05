@@ -7,13 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
-#include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <vector>
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 namespace Belle2 {
-  using CDCCKFPath = std::vector<CDCCKFState>;
-
-  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path);
+  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path)
+  {
+    output << "[";
+    for (const auto& state : path) {
+      output << state << ", ";
+    }
+    output << "]";
+    return output;
+  }
 }

@@ -1,19 +1,20 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun                                              *
+ * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <vector>
 
 namespace Belle2 {
-  using CDCCKFPath = std::vector<CDCCKFState>;
-
-  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path);
+  /// Base filter for CKF CDC states
+  using BaseCDCStateFilter =
+    TrackFindingCDC::Filter<std::pair<const CDCCKFPath*, CDCCKFState*>>;
 }

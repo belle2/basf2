@@ -37,7 +37,10 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   m_trackHandler.exposeParameters(moduleParamList, prefix);
   m_treeSearcher.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->getParameter<std::string>("direction").setDefaultValue("forward");
+  moduleParamList->getParameter<std::string>("preFilter").setDefaultValue("all");
+  moduleParamList->getParameter<std::string>("basicFilter").setDefaultValue("rough");
+  moduleParamList->getParameter<std::string>("extrapolationFilter").setDefaultValue("extrapolate_and_update");
+  moduleParamList->getParameter<std::string>("finalFilter").setDefaultValue("distance");
 }
 
 void CKFToCDCFindlet::beginEvent()

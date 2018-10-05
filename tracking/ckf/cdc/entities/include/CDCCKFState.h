@@ -84,6 +84,16 @@ namespace Belle2 {
       return m_weight;
     }
 
+    void setChi2(double chi2)
+    {
+      m_chi2 = chi2;
+    }
+
+    double getChi2() const
+    {
+      return m_chi2;
+    }
+
     TrackFindingCDC::CDCTrajectory3D getTrajectory() const
     {
       const auto& trackState = getTrackState();
@@ -101,18 +111,9 @@ namespace Belle2 {
     double m_arcLength = 0;
     double m_hitDistance = 0;
     double m_weight = 0;
+    double m_chi2 = 0;
   };
 
 
-  std::ostream& operator<<(std::ostream& output, const CDCCKFState& state)
-  {
-    if (state.isSeed()) {
-      output << "seed";
-    } else {
-      const auto* wireHit = state.getWireHit();
-      const auto& wire = wireHit->getWire();
-      output << wire.getICLayer() << " " << wire.getIWire();
-    }
-    return output;
-  }
+  std::ostream& operator<<(std::ostream& output, const CDCCKFState& state);
 }

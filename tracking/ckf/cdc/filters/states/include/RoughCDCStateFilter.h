@@ -3,17 +3,30 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun                                              *
+ * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
+#include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <vector>
+
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <string>
 
 namespace Belle2 {
-  using CDCCKFPath = std::vector<CDCCKFState>;
+  class ModuleParamList;
 
-  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path);
+  /// A very rough filter for all CDC states.
+  class RoughCDCStateFilter : public BaseCDCStateFilter {
+  public:
+    TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
+
+    /// Expose the parameters of the sub findlets.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
+  private:
+    double m_maximalHitDistance = 2;
+  };
 }

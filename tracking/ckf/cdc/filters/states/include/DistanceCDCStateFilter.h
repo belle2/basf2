@@ -3,17 +3,21 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun                                              *
+ * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
+#include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <vector>
+
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
-  using CDCCKFPath = std::vector<CDCCKFState>;
-
-  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path);
+  /// Give a weight based on the distance
+  class DistanceCDCStateFilter : public BaseCDCStateFilter {
+  public:
+    TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
+  };
 }

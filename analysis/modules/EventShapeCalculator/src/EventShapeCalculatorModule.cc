@@ -26,7 +26,7 @@
 #include <iostream>
 
 #include <analysis/ContinuumSuppression/Thrust.h>
-#include <analysis/ContinuumSuppression/MultipoleMoments.h>
+#include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 
@@ -57,11 +57,11 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
   addParam("enableCollisionAxis", m_enableCollisionAxis, "Enables the calculation of the  quantities related to the collision axis.",
            true);
   addParam("enableFoxWolfram", m_enableFW, "Enables the calculation of the Fox-Wolfram moments.", true);
-  addParam("enableMultipoleMoments", m_enableMultipoleMoments, "Enables the calculation of the Multipole moments.", true);
+  addParam("enableHarmonicMoments", m_enableHarmonicMoments, "Enables the calculation of the Harmonic moments.", true);
   addParam("enableJets", m_enableJets, "Enables the calculation of jet-related quantities.", true);
   addParam("enableSphericity", m_enableSphericity, "Enables the calculation of the sphericity-related quantities.", true);
   addParam("enableCleoCones", m_enableCleoCones, "Enables the calculation of the CLEO cones.", true);
-  addParam("enableAllMoments", m_enableAllMoments, "Enables the calculation of FW and multipole moments from 5 to 8", false);
+  addParam("enableAllMoments", m_enableAllMoments, "Enables the calculation of FW and harmonic moments from 5 to 8", false);
   addParam("checkForDuplicates", m_checkForDuplicates,
            "Enables the check for duplicates in the input list. If a duplicate entry is found, the first one is kept.", false);
 }
@@ -131,20 +131,20 @@ void EventShapeCalculatorModule::event()
     eventShapeContainer->setThrustAxis(thrust);
     eventShapeContainer->setThrust(thrustVal);
 
-    // --- If required, calculates the MultipoleMoments ---
-    if (m_enableMultipoleMoments) {
-      MultipoleMoments MM(m_p3List, thrust);
+    // --- If required, calculates the HarmonicMoments ---
+    if (m_enableHarmonicMoments) {
+      HarmonicMoments MM(m_p3List, thrust);
       if (m_enableAllMoments) {
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setMultipoleMomentThrust(i, moment);
+          eventShapeContainer->setHarmonicMomentThrust(i, moment);
         }
       } else {
         MM.calculateBasicMoments();
         for (short i = 0; i < 5; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setMultipoleMomentThrust(i, moment);
+          eventShapeContainer->setHarmonicMomentThrust(i, moment);
         }
       }
     }
@@ -200,23 +200,23 @@ void EventShapeCalculatorModule::event()
       }
     }
 
-    // --- If required, calculates the MultipoleMoments ---
-    if (m_enableMultipoleMoments) {
-      MultipoleMoments MM(m_p3List, collisionAxis);
+    // --- If required, calculates the HarmonicMoments ---
+    if (m_enableHarmonicMoments) {
+      HarmonicMoments MM(m_p3List, collisionAxis);
       if (m_enableAllMoments) {
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setMultipoleMomentCollision(i, moment);
+          eventShapeContainer->setHarmonicMomentCollision(i, moment);
         }
       } else {
         MM.calculateBasicMoments();
         for (short i = 0; i < 5; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setMultipoleMomentCollision(i, moment);
+          eventShapeContainer->setHarmonicMomentCollision(i, moment);
         }
       }
-    } // end of m_enableMultipoleMoments
+    } // end of m_enableHarmonicMoments
   } // end of m_enableCollisionAxis
 } // end of event()
 

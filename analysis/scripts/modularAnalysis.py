@@ -2224,7 +2224,7 @@ def buildEventShape(inputListNames=[],
                     cleoCones=True,
                     collisionAxis=True,
                     foxWolfram=True,
-                    multipoleMoments=True,
+                    harmonicMoments=True,
                     jets=True,
                     sphericity=True,
                     thrust=True,
@@ -2240,12 +2240,12 @@ def buildEventShape(inputListNames=[],
                             If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
     @param default_cleanup  if True,  applyes some very standard cuts on pt and costTheta when defines the interanl lists.
     @param path             modules are added to this path
-    @param allMoments  Enables the calculation of FW and multipole moments from 5 to 8
+    @param allMoments  Enables the calculation of FW and harmonic moments from 5 to 8
     @param cleoCones  Enables the calculation of the CLEO cones.
     @param collisionAxis  Enables the calculation of the  quantities related to the collision axis.
     @param foxWolfram    Enables the calculation of the Fox-Wolfram moments.
     @param jets   Enables the calculation of jet-related quantities.
-    @param multipoleMoments   Enables the calculation of the Multipole moments.
+    @param harmonicMoments   Enables the calculation of the Harmonic moments.
     @param sphericity  Enables the calculation of the sphericity-related quantities.
     @param thrust  Enables the calculation of thust-related quantities.
 
@@ -2280,7 +2280,7 @@ def buildEventShape(inputListNames=[],
     eventShapeModule.param('enableCollisionAxis', collisionAxis)
     eventShapeModule.param('enableFoxWolfram', foxWolfram)
     eventShapeModule.param('enableJets', jets)
-    eventShapeModule.param('enableMultipoleMoments', multipoleMoments)
+    eventShapeModule.param('enableHarmonicMoments', harmonicMoments)
     eventShapeModule.param('enableSphericity', sphericity)
     eventShapeModule.param('enableThrust', thrust)
     eventShapeModule.param('checkForDuplicates', checkForDuplicates)

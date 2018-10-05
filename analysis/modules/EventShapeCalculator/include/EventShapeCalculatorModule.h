@@ -28,7 +28,7 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
-#include <analysis/ContinuumSuppression/MultipoleMoments.h>
+#include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
 
@@ -84,7 +84,7 @@ namespace Belle2 {
     bool m_enableThrust = true; /**< Enables the calculation of thust-related quantities.  */
     bool m_enableCollisionAxis = true; /**< Enables the calculation of the quantities related to the collision axis.  */
     bool m_enableFW = true; /**< Enables the calculation of the FW moments. */
-    bool m_enableMultipoleMoments = true; /**< Enables the calculation of the Multipole moments. */
+    bool m_enableHarmonicMoments = true; /**< Enables the calculation of the Harmonic moments. */
     bool m_enableJets = true; /**< Enables the calculation of the Jet-related quantities. */
     bool m_enableSphericity = true; /**< Enables the calculation of the Sphericity matrix. */
     bool m_enableCleoCones = true; /**< Enables the calculation of the Cleo Cones. */

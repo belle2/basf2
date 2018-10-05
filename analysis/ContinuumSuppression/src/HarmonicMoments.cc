@@ -8,14 +8,14 @@
  **************************************************************************/
 
 
-#include <analysis/ContinuumSuppression/MultipoleMoments.h>
+#include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include "TVector3.h"
 
 using namespace Belle2;
 
 
 
-void MultipoleMoments::calculateBasicMoments()
+void HarmonicMoments::calculateBasicMoments()
 {
   // Loop over the particles' momenta
   for (auto& p : m_momenta) {
@@ -41,7 +41,7 @@ void MultipoleMoments::calculateBasicMoments()
 }
 
 
-void MultipoleMoments::calculateAllMoments()
+void HarmonicMoments::calculateAllMoments()
 {
   // Loop over the particles' momenta
   for (auto& p : m_momenta) {

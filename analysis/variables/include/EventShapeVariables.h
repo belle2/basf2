@@ -58,6 +58,79 @@ namespace Belle2 {
 
 
     /**
+     * Returns 0th order harmonic moment, calculated w/ respect to the thrust axis
+     */
+    double harmonicMomentThrust0(const Particle* particle);
+
+    /**
+     * Returns 1st order harmonic moment, calculated w/ respect to the thrust axis
+     */
+    double harmonicMomentThrust1(const Particle* particle);
+
+    /**
+     * Returns 2nd order harmonic moment, calculated w/ respect to the thrust axis
+     */
+    double harmonicMomentThrust2(const Particle* particle);
+
+    /**
+     * Returns 3rd order harmonic moment, calculated w/ respect to the thrust axis
+     */
+    double harmonicMomentThrust3(const Particle* particle);
+
+    /**
+     * Returns 4th order harmonic moment, calculated w/ respect to the thrust axis
+     */
+    double harmonicMomentThrust4(const Particle* particle);
+
+
+    /**
+     * Returns the 0-th order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust0(const Particle* particle);
+
+    /**
+     * Returns the 1-st order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust1(const Particle* particle);
+
+    /**
+     * Returns the 2-nd order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust2(const Particle* particle);
+
+    /**
+     * Returns the 3-rd order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust3(const Particle* particle);
+
+    /**
+     * Returns the 4-th order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust4(const Particle* particle);
+
+    /**
+     * Returns the 5-th order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust5(const Particle* particle);
+
+    /**
+     * Returns the 6-th order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust6(const Particle* particle);
+
+    /**
+     * Returns the 7-th order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust7(const Particle* particle);
+
+    /**
+     * Returns the 8-th order cleo cone, calculated w/ respect to the thrust axis
+     */
+    double cleoConeThrust8(const Particle* particle);
+
+
+
+    /**
      * Returns the sphericity value
      */
     double sphericity(const Particle* particle);
@@ -71,6 +144,7 @@ namespace Belle2 {
      * Returns the thrust value
      */
     double thrust(const Particle* particle);
+
 
     /**
      * Returns the X component of the thrust axis

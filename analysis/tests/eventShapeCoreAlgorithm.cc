@@ -5,7 +5,7 @@
 #include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
-#include <analysis/ContinuumSuppression/MultipoleMoments.h>
+#include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
 
@@ -169,8 +169,8 @@ namespace Belle2 {
 
 
 
-  /** Test the calculation of the Multipole moments */
-  TEST_F(eventShapeCoreAlgorithmTest, MultipoleMoments)
+  /** Test the calculation of the Harmonic moments */
+  TEST_F(eventShapeCoreAlgorithmTest, HarmonicMoments)
   {
 
     float dummySqrtS = 10.;
@@ -197,7 +197,7 @@ namespace Belle2 {
         moment[i] += pMag * boost::math::legendre_p(i, cTheta) / dummySqrtS;
     }
 
-    MultipoleMoments MM(partMom, axis);
+    HarmonicMoments MM(partMom, axis);
     MM.calculateAllMoments();
 
     for (short i = 0; i < 9; i++)

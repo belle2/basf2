@@ -16,20 +16,20 @@
 namespace Belle2 {
 
   /**
-   * Class to calculate the Multipole moments up to order 8 with respect to a given axis.
+   * Class to calculate the Harmonic moments up to order 8 with respect to a given axis.
    * Since the most common user case is the calculation of the moments up to order 4, and the
-   * calculation of the momenta 5-8 takes much longer, two methods have been implemented. MultipoleMoments::calculateBasicMoments
-   * will calculate the moments up to 4, while MultipoleMoments::calculateAllMoments will perform the calculation
+   * calculation of the momenta 5-8 takes much longer, two methods have been implemented. HarmonicMoments::calculateBasicMoments
+   * will calculate the moments up to 4, while HarmonicMoments::calculateAllMoments will perform the calculation
    * up to order 8. The two options have been implemented in two separate methods instead of using an if condition simply
    * to minimize the computing time.
    */
-  class MultipoleMoments {
+  class HarmonicMoments {
   public:
 
     /**
      * Default constructor.
      */
-    MultipoleMoments()
+    HarmonicMoments()
     {
       m_axis.SetXYZ(0., 0., 0.);
     };
@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param momenta An std::vector<TVector3> containing the 3-momenta to be used to the moments' calculation
      * @param axis The reference axis
      */
-    MultipoleMoments(std::vector<TVector3> momenta,  TVector3 axis)
+    HarmonicMoments(std::vector<TVector3> momenta,  TVector3 axis)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -49,7 +49,7 @@ namespace Belle2 {
     /**
      * Default destructor.
      */
-    ~MultipoleMoments() {};
+    ~HarmonicMoments() {};
 
     /**
      * Sets the list of momenta, overwriting whatever list has been set before.
@@ -87,7 +87,7 @@ namespace Belle2 {
      * Returns the moment of order i
      * @param i the order (0-8)
      * @param sqrts the center of mass energy
-     * @returns the multipole moment, not normalized to sqrt(s)
+     * @returns the harmonic moment, not normalized to sqrt(s)
      */
     double getMoment(short i, double sqrts) const
     {
@@ -98,7 +98,7 @@ namespace Belle2 {
     }
 
   private:
-    double m_moment[9] = {0.}; /**< The multipole moments */
+    double m_moment[9] = {0.}; /**< The harmonic moments */
     std::vector<TVector3> m_momenta; /**< The list of particles */
     TVector3 m_axis; /** < The reference axis */
   };

@@ -42,7 +42,7 @@ namespace Belle2 {
    * - Fow-Wolfram moments from 0 to 9
    *
    * The axis-dependent quantities currently implemented are:
-   * - Multipole moments from 0 to 9
+   * - Harmonic moments from 0 to 9
    * - Thrust
    * - Cleo cones
    * All these quantities are can be stored in two versions:
@@ -146,29 +146,29 @@ namespace Belle2 {
     };
 
     /**
-     * Sets the multipole moment of order n, calculated using the thrust axis.
+     * Sets the harmonic moment of order n, calculated using the thrust axis.
      * @param short The order (0 to 9)
-     * @param float The multipole moment value
+     * @param float The harmonic moment value
      */
-    void setMultipoleMomentThrust(short order, float moment)
+    void setHarmonicMomentThrust(short order, float moment)
     {
       if (order < 0 || order > 9)
-        B2ERROR("Invalid multipole moment order. It  must be in the [0,9] range.");
+        B2ERROR("Invalid harmonic moment order. It  must be in the [0,9] range.");
       else
-        m_multipoleMomentsThrust[order] = moment;
+        m_harmonicMomentsThrust[order] = moment;
     };
 
     /**
-     * Sets the multipole moment of order n, calculated using the collision axis.
+     * Sets the harmonic moment of order n, calculated using the collision axis.
      * @param short The order (0 to 9)
-     * @param float The multipole moment value
+     * @param float The harmonic moment value
      */
-    void setMultipoleMomentCollision(short order, float moment)
+    void setHarmonicMomentCollision(short order, float moment)
     {
       if (order < 0 || order > 9)
-        B2ERROR("Invalid multipole moment order. It  must be in the [0,9] range.");
+        B2ERROR("Invalid harmonic moment order. It  must be in the [0,9] range.");
       else
-        m_multipoleMomentsCollision[order] = moment;
+        m_harmonicMomentsCollision[order] = moment;
     };
 
     /**
@@ -295,37 +295,37 @@ namespace Belle2 {
     };
 
     /**
-     * Returns the multipole moment of a given order, calculated respect to the beam axis
-     * @param short Order of the multipole moment
-     * @return float multipole moment
+     * Returns the harmonic moment of a given order, calculated respect to the beam axis
+     * @param short Order of the harmonic moment
+     * @return float harmonic moment
      */
-    float getMultipoleMomentCollision(short order)
+    float getHarmonicMomentCollision(short order)
     {
       if (order < 0 || order > 9) {
-        B2ERROR("Invalid multipole moment order. It  must be in the [0,9] range.");
+        B2ERROR("Invalid harmonic moment order. It  must be in the [0,9] range.");
         return std::numeric_limits<float>::quiet_NaN();
       } else
-        return m_multipoleMomentsCollision[order];
+        return m_harmonicMomentsCollision[order];
     };
 
     /**
-     * Returns the multipole moment of a given order, calculated respect to the thrust axis
-     * @param short Order of the multipole moment
-     * @return float multipole moment
+     * Returns the harmonic moment of a given order, calculated respect to the thrust axis
+     * @param short Order of the harmonic moment
+     * @return float harmonic moment
      */
-    float getMultipoleMomentThrust(short order)
+    float getHarmonicMomentThrust(short order)
     {
       if (order < 0 || order > 9) {
-        B2ERROR("Invalid multipole moment order. The order must be in the [0,9] range.");
+        B2ERROR("Invalid harmonic moment order. The order must be in the [0,9] range.");
         return std::numeric_limits<float>::quiet_NaN();
       } else
-        return m_multipoleMomentsThrust[order];
+        return m_harmonicMomentsThrust[order];
     };
 
 
     /**
      * Returns the Cleo cone of a given order, calculated respect to the beam axis
-     * @param short Order of the multipole moment
+     * @param short Order of the harmonic moment
      * @return float Cleo cone
      */
     float getCleoConeCollision(short order)
@@ -339,7 +339,7 @@ namespace Belle2 {
 
     /**
      * Returns the Cleo cone of a given order, calculated respect to the thrust axis
-     * @param short Order of the multipole moment
+     * @param short Order of the harmonic moment
      * @return float Cleo cone
      */
     float getCleoConeThrust(short order)
@@ -384,9 +384,9 @@ namespace Belle2 {
 
     // Axis-dependent quantities
     float m_thrust = 0; /**< Thrust value */
-    float m_multipoleMomentsThrust[10] = {0.}; /**< Multipole moments up to order 9, calculated respect to the thrust axis */
+    float m_harmonicMomentsThrust[10] = {0.}; /**< Harmonic moments up to order 9, calculated respect to the thrust axis */
     float m_cleoConesThrust[10] = {0.}; /**< Cleo cones up to order 9, calculated respect to the thrust axis. */
-    float m_multipoleMomentsCollision[10] = {0.}; /**< Multipole moments up to order 9, calculated respect to the collision axis. */
+    float m_harmonicMomentsCollision[10] = {0.}; /**< Harmonic moments up to order 9, calculated respect to the collision axis. */
     float m_cleoConesCollision[10] = {0.}; /**< Cleo cones up to order 9, calculated respect to the collision axis. */
 
     // Hemisphere related quantities

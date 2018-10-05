@@ -2228,6 +2228,7 @@ def buildEventShape(inputListNames=[],
                     jets=True,
                     sphericity=True,
                     thrust=True,
+                    checkForDuplicates=False,
                     path=analysis_main):
     """
     Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
@@ -2282,6 +2283,7 @@ def buildEventShape(inputListNames=[],
     eventShapeModule.param('enableMultipoleMoments', multipoleMoments)
     eventShapeModule.param('enableSphericity', sphericity)
     eventShapeModule.param('enableThrust', thrust)
+    eventShapeModule.param('checkForDuplicates', checkForDuplicates)
 
     path.add_module(eventShapeModule)
 

@@ -30,10 +30,6 @@
 #include <analysis/ContinuumSuppression/CleoCones.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 
-#include <TMatrixD.h>
-#include <TMatrixDSym.h>
-#include <TMatrixDSymEigen.h>
-#include <TVectorD.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 
@@ -66,6 +62,8 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
   addParam("enableSphericity", m_enableSphericity, "Enables the calculation of the sphericity-related quantities.", true);
   addParam("enableCleoCones", m_enableCleoCones, "Enables the calculation of the CLEO cones.", true);
   addParam("enableAllMoments", m_enableAllMoments, "Enables the calculation of FW and multipole moments from 5 to 8", false);
+  addParam("checkForDuplicates", m_checkForDuplicates,
+           "Enables the check for duplicates in the input list. If a duplicate entry is found, the first one is kept.", false);
 }
 
 
@@ -112,6 +110,10 @@ void EventShapeCalculatorModule::event()
   if (m_enableSphericity) {
     SphericityEigenvalues Sph(m_p3List);
     Sph.calculateEigenvalues();
+    if (Sph.getEigenvalue(0) < Sph.getEigenvalue(1) || Sph.getEigenvalue(0) < Sph.getEigenvalue(2)
+        || Sph.getEigenvalue(1) < Sph.getEigenvalue(2))
+      B2WARNING("Eigenvalues not ordered!!!!!!!!!!");
+
     for (short i = 0; i < 3; i++) {
       eventShapeContainer->setSphericityEigenvalue(i, Sph.getEigenvalue(i));
       eventShapeContainer->setSphericityEigenvector(i, Sph.getEigenvector(i));
@@ -226,10 +228,17 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
   PCmsLabTransform T;
   m_p4List.clear();
+  m_p3List.clear();
 
   unsigned short nParticleLists = particleListNames.size();
   if (nParticleLists == 0)
     B2ERROR("No particle lists found. EventShape calculation not performed.");
+
+  // This vector temporary stores the particle objects
+  // that have been processed so far (not only the momenta)
+  // in order to check for duplicates before pushing the 3- and 4- vectors
+  // in the corresponding lists
+  std::vector<Particle> tmpParticles;
 
   // Loops over the number of particle lists
   for (unsigned short iList = 0; iList < nParticleLists; iList++) {
@@ -239,12 +248,30 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
     // Loops over the number of particles in the list
     for (unsigned int iPart = 0; iPart < particleList->getListSize(); iPart++) {
       const Particle* part = particleList->getParticle(iPart);
-      TLorentzVector p4CMS = T.rotateLabToCms() * part->get4Vector();
 
-      // it need to fill an std::vector of TVector3 to use the current FW rutines.
-      // It will hopefully change in release 3
-      m_p4List.push_back(p4CMS);
-      m_p3List.push_back(p4CMS.Vect());
+      // Flag to check for duplicates across the lists.
+      // It can be true only if m_checkForDuplicates is enabled
+      bool isDuplicate = false;
+
+      if (m_checkForDuplicates) {
+        // loops over all the particles loaded so far
+        for (auto testPart : tmpParticles) {
+          if (testPart.isCopyOf(part)) {
+            B2WARNING("Duplicate particle found. The new one won't be used for the calculation of the event shape variables. Please, double check your input lists and try to make them mutually exclusive.");
+            isDuplicate = true;
+            break;
+          }
+        }
+        tmpParticles.push_back(*part);
+      }
+
+      if (!isDuplicate) {
+        TLorentzVector p4CMS = T.rotateLabToCms() * part->get4Vector();
+        // it need to fill an std::vector of TVector3 to use the current FW rutines.
+        // It will hopefully change in release 3
+        m_p4List.push_back(p4CMS);
+        m_p3List.push_back(p4CMS.Vect());
+      }
     }
   }
   return nPart;

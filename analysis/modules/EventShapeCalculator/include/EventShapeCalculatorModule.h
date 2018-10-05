@@ -89,6 +89,8 @@ namespace Belle2 {
     bool m_enableSphericity = true; /**< Enables the calculation of the Sphericity matrix. */
     bool m_enableCleoCones = true; /**< Enables the calculation of the Cleo Cones. */
     bool m_enableAllMoments = false; /**< Enables the calculation of the FW moments from 5 to 8. */
+    bool m_checkForDuplicates = false; /**< Enables the check for the duplicates in the input list. */
+
   };
 }
 

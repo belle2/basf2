@@ -61,8 +61,8 @@ namespace Belle2 {
     {
       m_thrustAxis.SetXYZ(0., 0., 0.);
       m_spherocityAxis.SetXYZ(0., 0., 0.);
-      m_forwardEmisphere4Momentum.SetXYZT(0., 0., 0., 0.);
-      m_backwardEmisphere4Momentum.SetXYZT(0., 0., 0., 0.);
+      m_forwardHemisphere4Momentum.SetXYZT(0., 0., 0., 0.);
+      m_backwardHemisphere4Momentum.SetXYZT(0., 0., 0., 0.);
 
       m_thrustAxis.SetXYZ(0., 0., 0.);
       for (int i = 0; i < 3; i++)
@@ -198,21 +198,21 @@ namespace Belle2 {
     };
 
     /**
-     * Sets the 4-momentum of the forward emisphere, as defined by the thrust axis.
-     * @param TLorentzVector 4-momentum of the particles in the emisphere
+     * Sets the 4-momentum of the forward hemisphere, as defined by the thrust axis.
+     * @param TLorentzVector 4-momentum of the particles in the hemisphere
      */
-    void setForwardEmisphere4Momentum(TLorentzVector mom)
+    void setForwardHemisphere4Momentum(TLorentzVector mom)
     {
-      m_forwardEmisphere4Momentum = mom;
+      m_forwardHemisphere4Momentum = mom;
     };
 
     /**
-     * Sets the 4-momentum of the backward emisphere, as defined by the thrust axis.
-     * @param TLorentzVector 4-momentum of the particles in the emisphere
+     * Sets the 4-momentum of the backward hemisphere, as defined by the thrust axis.
+     * @param TLorentzVector 4-momentum of the particles in the hemisphere
      */
-    void setBackwardEmisphere4Momentum(TLorentzVector mom)
+    void setBackwardHemisphere4Momentum(TLorentzVector mom)
     {
-      m_backwardEmisphere4Momentum = mom;
+      m_backwardHemisphere4Momentum = mom;
     };
 
 
@@ -353,21 +353,21 @@ namespace Belle2 {
 
 
     /**
-     * Returns the 4-momentum of the forward emisphere, as defined by the thrust axis.
-     * @return TLorentzVector 4-momentum of the particles in the emisphere
+     * Returns the 4-momentum of the forward hemisphere, as defined by the thrust axis.
+     * @return TLorentzVector 4-momentum of the particles in the hemisphere
      */
-    TLorentzVector getForwardEmisphere4Momentum()
+    TLorentzVector getForwardHemisphere4Momentum()
     {
-      return m_forwardEmisphere4Momentum;
+      return m_forwardHemisphere4Momentum;
     };
 
     /**
-     * Return the 4-momentum of the backward emisphere, as defined by the thrust axis.
-     * @return TLorentzVector 4-momentum of the particles in the emisphere
+     * Return the 4-momentum of the backward hemisphere, as defined by the thrust axis.
+     * @return TLorentzVector 4-momentum of the particles in the hemisphere
      */
-    TLorentzVector getBackwardEmisphere4Momentum()
+    TLorentzVector getBackwardHemisphere4Momentum()
     {
-      return m_backwardEmisphere4Momentum;
+      return m_backwardHemisphere4Momentum;
     };
 
 
@@ -389,9 +389,9 @@ namespace Belle2 {
     float m_multipoleMomentsCollision[10] = {0.}; /**< Multipole moments up to order 9, calculated respect to the collision axis. */
     float m_cleoConesCollision[10] = {0.}; /**< Cleo cones up to order 9, calculated respect to the collision axis. */
 
-    // Emisphere related quantities
-    TLorentzVector m_forwardEmisphere4Momentum; /**< Total 4-momentum of the particles in the forward emisphere */
-    TLorentzVector m_backwardEmisphere4Momentum; /**< Total 4-momentum of the particles in the backward emisphere */
+    // Hemisphere related quantities
+    TLorentzVector m_forwardHemisphere4Momentum; /**< Total 4-momentum of the particles in the forward hemisphere */
+    TLorentzVector m_backwardHemisphere4Momentum; /**< Total 4-momentum of the particles in the backward hemisphere */
 
     ClassDef(EventShapeContainer, 1) /**< class definition */
 

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Umberto Tamponi (tamponi@to.infn.it)                     *
@@ -94,56 +94,66 @@ namespace Belle2 {
 
 
     /**
-     * Returns the invariant mass of the forward emisphere, as defined by the thrust axis
+     * Returns the invariant mass of the forward hemisphere, as defined by the thrust axis
      */
-    double forwardEmisphereMass(const Particle* particle);
+    double forwardHemisphereMass(const Particle* particle);
 
     /**
-     * Returns the X component of the momentum of the forward emisphere, as defined by the thrust axis
+     * Returns the X component of the momentum of the forward hemisphere, as defined by the thrust axis
      */
-    double forwardEmisphereX(const Particle* particle);
+    double forwardHemisphereX(const Particle* particle);
 
     /**
-     * Returns the Y component of the momentum of the forward emisphere, as defined by the thrust axis
+     * Returns the Y component of the momentum of the forward hemisphere, as defined by the thrust axis
      */
-    double forwardEmisphereY(const Particle* particle);
+    double forwardHemisphereY(const Particle* particle);
 
     /**
-     * Returns the Z component of the momentum of the forward emisphere, as defined by the thrust axis
+     * Returns the Z component of the momentum of the forward hemisphere, as defined by the thrust axis
      */
-    double forwardEmisphereZ(const Particle* particle);
+    double forwardHemisphereZ(const Particle* particle);
 
     /**
-     * Returns  the momentum of the forward emisphere, as defined by the thrust axis
+     * Returns  the momentum of the forward hemisphere, as defined by the thrust axis
      */
-    double forwardEmisphereMomentum(const Particle* particle);
+    double forwardHemisphereMomentum(const Particle* particle);
+
+    /**
+     * Returns  the energy of the forward hemisphere, as defined by the thrust axis
+     */
+    double forwardHemisphereEnergy(const Particle* particle);
 
 
 
     /**
-     * Returns the invariant mass of the backward emisphere, as defined by the thrust axis
+     * Returns the invariant mass of the backward hemisphere, as defined by the thrust axis
      */
-    double backwardEmisphereMass(const Particle* particle);
+    double backwardHemisphereMass(const Particle* particle);
 
     /**
-     * Returns the X component of the momentum of the backward emisphere, as defined by the thrust axis
+     * Returns the X component of the momentum of the backward hemisphere, as defined by the thrust axis
      */
-    double backwardEmisphereX(const Particle* particle);
+    double backwardHemisphereX(const Particle* particle);
 
     /**
-     * Returns the Y component of the momentum of the backward emisphere, as defined by the thrust axis
+     * Returns the Y component of the momentum of the backward hemisphere, as defined by the thrust axis
      */
-    double backwardEmisphereY(const Particle* particle);
+    double backwardHemisphereY(const Particle* particle);
 
     /**
-     * Returns the Z component of the momentum of the backward emisphere, as defined by the thrust axis
+     * Returns the Z component of the momentum of the backward hemisphere, as defined by the thrust axis
      */
-    double backwardEmisphereZ(const Particle* particle);
+    double backwardHemisphereZ(const Particle* particle);
 
     /**
-     * Returns  the momentum of the backward emisphere, as defined by the thrust axis
+     * Returns  the momentum of the backward hemisphere, as defined by the thrust axis
      */
-    double backwardEmisphereMomentum(const Particle* particle);
+    double backwardHemisphereMomentum(const Particle* particle);
+
+    /**
+     * Returns  the energy of the backward hemisphere, as defined by the thrust axis
+     */
+    double backwardHemisphereEnergy(const Particle* particle);
 
 
     /**

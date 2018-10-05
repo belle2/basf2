@@ -176,8 +176,8 @@ void EventShapeCalculatorModule::event()
         else
           p4BKW += p4;
       }
-      eventShapeContainer->setForwardEmisphere4Momentum(p4FWD);
-      eventShapeContainer->setBackwardEmisphere4Momentum(p4BKW);
+      eventShapeContainer->setForwardHemisphere4Momentum(p4FWD);
+      eventShapeContainer->setBackwardHemisphere4Momentum(p4BKW);
     } // end of if m_enableJets
   }// end of if m_enableThrust
 

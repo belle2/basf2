@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Pablo Goldenzweig, Dennis Weyland                        *
+ * Contributors: Umberto Tamponi (tamponi@to.infn.it)                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -255,109 +255,129 @@ namespace Belle2 {
       return 1.5 * evtShapeCont->getSphericityEigenvalue(2);
     }
 
-    double forwardEmisphereMass(const Particle*)
+    double forwardHemisphereMass(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardEmisphere4Momentum().Mag();
+      return evtShapeCont->getForwardHemisphere4Momentum().Mag();
     }
 
-    double forwardEmisphereX(const Particle*)
+    double forwardHemisphereX(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardEmisphere4Momentum().Vect().X();
+      return evtShapeCont->getForwardHemisphere4Momentum().Vect().X();
     }
 
-    double forwardEmisphereY(const Particle*)
+    double forwardHemisphereY(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardEmisphere4Momentum().Vect().Y();
+      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Y();
     }
 
-    double forwardEmisphereZ(const Particle*)
+    double forwardHemisphereZ(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardEmisphere4Momentum().Vect().Z();
+      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Z();
     }
 
-    double forwardEmisphereMomentum(const Particle*)
+    double forwardHemisphereMomentum(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardEmisphere4Momentum().Vect().Mag();
+      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Mag();
     }
 
-
-
-    double backwardEmisphereMass(const Particle*)
+    double forwardHemisphereEnergy(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardEmisphere4Momentum().Mag();
+      return evtShapeCont->getForwardHemisphere4Momentum().E();
     }
 
 
-    double backwardEmisphereX(const Particle*)
+
+
+    double backwardHemisphereMass(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardEmisphere4Momentum().Vect().X();
+      return evtShapeCont->getBackwardHemisphere4Momentum().Mag();
     }
 
-    double backwardEmisphereY(const Particle*)
+
+    double backwardHemisphereX(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardEmisphere4Momentum().Vect().Y();
+      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().X();
     }
 
-    double backwardEmisphereZ(const Particle*)
+    double backwardHemisphereY(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardEmisphere4Momentum().Vect().Z();
+      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Y();
     }
 
-    double backwardEmisphereMomentum(const Particle*)
+    double backwardHemisphereZ(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardEmisphere4Momentum().Vect().Mag();
+      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Z();
     }
 
+    double backwardHemisphereMomentum(const Particle*)
+    {
+      StoreObjPtr<EventShapeContainer> evtShapeCont;
+      if (!evtShapeCont) {
+        B2ERROR("No EventShapeContainer object has been found in the datastore");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Mag();
+    }
+
+    double backwardHemisphereEnergy(const Particle*)
+    {
+      StoreObjPtr<EventShapeContainer> evtShapeCont;
+      if (!evtShapeCont) {
+        B2ERROR("No EventShapeContainer object has been found in the datastore");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return evtShapeCont->getBackwardHemisphere4Momentum().E();
+    }
 
 
 
@@ -483,34 +503,30 @@ namespace Belle2 {
     REGISTER_VARIABLE("thrustAxisZ", thrustAxisZ, "[Eventbased] Z component of the thrust axis.");
     REGISTER_VARIABLE("thrustAxisCosTheta", thrustAxisCosTheta, "[Eventbased] Cosine of the polar angle component of the thrust axis.");
 
-    REGISTER_VARIABLE("forwardEmisphereMass", forwardEmisphereMass,
+    REGISTER_VARIABLE("forwardHemisphereMass", forwardHemisphereMass,
                       "[Eventbased] Invariant mass of the particles flying in the same direction of the thrust axis.");
-    REGISTER_VARIABLE("forwardEmisphereX", forwardEmisphereX,
+    REGISTER_VARIABLE("forwardHemisphereX", forwardHemisphereX,
                       "[Eventbased] X component of the total momentum of the particles flying in the same direction of the thrust axis");
-    REGISTER_VARIABLE("forwardEmisphereY", forwardEmisphereY,
+    REGISTER_VARIABLE("forwardHemisphereY", forwardHemisphereY,
                       "[Eventbased] Y component of the total momentum of the particles flying in the same direction of the thrust axis");
-    REGISTER_VARIABLE("forwardEmisphereZ", forwardEmisphereZ,
+    REGISTER_VARIABLE("forwardHemisphereZ", forwardHemisphereZ,
                       "[Eventbased] Z component of the total momentum of the particles flying in the same  direction of the thrust axis");
-    REGISTER_VARIABLE("forwardEmisphereMomentum", forwardEmisphereMomentum,
+    REGISTER_VARIABLE("forwardHemisphereMomentum", forwardHemisphereMomentum,
                       "[Eventbased] Total momentum the particles flying in the same direction of the thrust axis.");
+    REGISTER_VARIABLE("forwardHemisphereEnergy", forwardHemisphereEnergy,
+                      "[Eventbased] Total energy the particles flying in the same direction of the thrust axis.");
 
-    REGISTER_VARIABLE("backwardEmisphereMass", backwardEmisphereMass,
+    REGISTER_VARIABLE("backwardHemisphereMass", backwardHemisphereMass,
                       "[Eventbased] Invariant mass of the particles flying in the direction opposite to the thrust axis.");
-    REGISTER_VARIABLE("backwardEmisphereX", backwardEmisphereX,
+    REGISTER_VARIABLE("backwardHemisphereX", backwardHemisphereX,
                       "[Eventbased] X component of the total momentum of the particles flying in the direciton opposite to the thrust axis");
-    REGISTER_VARIABLE("backwardEmisphereY", backwardEmisphereY,
+    REGISTER_VARIABLE("backwardHemisphereY", backwardHemisphereY,
                       "[Eventbased] Y component of the total momentum of the particles flying in the direction opposite to the thrust axis");
-    REGISTER_VARIABLE("backwardEmisphereZ", backwardEmisphereZ,
+    REGISTER_VARIABLE("backwardHemisphereZ", backwardHemisphereZ,
                       "[Eventbased] Z component of the total momentum of the particles flying in the direction opposite to the thrust axis");
-    REGISTER_VARIABLE("backwardEmisphereMomentum", forwardEmisphereMomentum,
+    REGISTER_VARIABLE("backwardHemisphereMomentum", backwardHemisphereMomentum,
                       "[Eventbased] Total momentum the particles flying in the  direction opposite to the thrust axis.");
-
-
-
-
-
-
-
-
+    REGISTER_VARIABLE("backwardHemisphereEnergy", backwardHemisphereEnergy,
+                      "[Eventbased] Total energy the particles flying in the direction opposite to the thrust axis.");
   }
 }

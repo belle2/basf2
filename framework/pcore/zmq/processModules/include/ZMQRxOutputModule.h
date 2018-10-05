@@ -39,6 +39,9 @@ namespace Belle2 {
     /// Set to false if the objects are initialized
     bool m_firstEvent = true;
 
+    /// Maximal time to wait until aborting in ms
+    unsigned int m_param_maximalWaitingTime = 100 * 1000;
+
     /// Parameter: name of the data socket
     std::string m_param_socketName;
     /// Parameter: name of the pub multicast socket

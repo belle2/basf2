@@ -15,6 +15,8 @@ ZMQRxOutputModule::ZMQRxOutputModule() : Module()
   addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
   addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
   addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
+  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message",
+           m_param_maximalWaitingTime);
   setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
   B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
@@ -81,7 +83,7 @@ void ZMQRxOutputModule::event()
 
 
     B2DEBUG(100, "Start polling");
-    const int pollReply = m_zmqClient.poll(100 * 1000, multicastAnswer, socketAnswer);
+    const int pollReply = m_zmqClient.poll(m_param_maximalWaitingTime, multicastAnswer, socketAnswer);
     B2ASSERT("Output process did not receive any message in some time. Aborting.", pollReply);
 
     B2DEBUG(100, "finished reading in an event.");

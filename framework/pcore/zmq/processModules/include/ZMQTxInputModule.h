@@ -34,6 +34,11 @@ namespace Belle2 {
     /// The backup list
     ProcessedEventsBackupList m_procEvtBackupList;
 
+    /// Maximal time to wait for any message from the workers in ms
+    unsigned int m_param_maximalWaitingTime = 60 * 1000;
+    /// Maximal time a worker is allowed to spent in ms
+    unsigned int m_param_workerProcessTimeout = 60 * 1000;
+
     /// Flag to use the event backup or not.
     bool m_param_useEventBackup = true;
 

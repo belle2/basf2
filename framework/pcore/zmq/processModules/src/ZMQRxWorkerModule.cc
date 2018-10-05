@@ -26,6 +26,11 @@ ZMQRxWorkerModule::ZMQRxWorkerModule() : Module()
   addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
   addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
   addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
+  addParam("eventBufferSize", m_param_bufferSize, "Maximal number of events to store in the internal buffer",
+           m_param_bufferSize);
+  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message",
+           m_param_maximalWaitingTime);
+
   setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
   B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
@@ -74,7 +79,7 @@ void ZMQRxWorkerModule::event()
       }
 
       // send ready msg x buffer size
-      for (unsigned int bufferIndex = 0; bufferIndex < m_bufferSize; bufferIndex++) {
+      for (unsigned int bufferIndex = 0; bufferIndex < m_param_bufferSize; bufferIndex++) {
         auto readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
         m_zmqClient.send(std::move(readyMessage));
       }
@@ -110,7 +115,7 @@ void ZMQRxWorkerModule::event()
       return true;
     };
 
-    const int pollReply = m_zmqClient.poll(60 * 1000, multicastAnswer, socketAnswer);
+    const int pollReply = m_zmqClient.poll(m_param_maximalWaitingTime, multicastAnswer, socketAnswer);
     B2ASSERT("The input process did not send any event in some time!", pollReply);
 
     B2DEBUG(10, "Finished with event");

@@ -19,6 +19,11 @@ ZMQTxInputModule::ZMQTxInputModule() : Module()
   addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
   addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
   addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
+  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message",
+           m_param_maximalWaitingTime);
+  addParam("workerProcessTimeout", m_param_workerProcessTimeout, "Maximal time a worker is allowed to spent per event",
+           m_param_workerProcessTimeout);
+
   setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
   B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
@@ -55,7 +60,7 @@ void ZMQTxInputModule::event()
       return;
     }
 
-    int timeout = 60 * 1000;
+    int timeout = m_param_maximalWaitingTime;
     if (not m_nextWorker.empty()) {
       // if next worker are available do not waste time
       timeout = 0;
@@ -149,7 +154,7 @@ void ZMQTxInputModule::checkWorkerProcTimeout()
     return;
   }
 
-  const std::chrono::milliseconds workerProcTimeout(60000);
+  const std::chrono::milliseconds workerProcTimeout(m_param_workerProcessTimeout);
   int workerID = m_procEvtBackupList.checkForTimeout(workerProcTimeout);
   if (workerID > -1) {
     B2WARNING("Worker process timeout, workerID: " << workerID);

@@ -41,17 +41,42 @@ namespace Belle2 {
       m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_CE(CE), m_QE(qe)
     {}
 
+    /**
+     * Sets the object
+     * @param lambdaFirst wavelenght of the first data point [nm]
+     * @param lambdaStep wavelength step [nm]
+     * @param CE collection efficiency
+     * @param qe quantum efficiency data points
+     * @param name object name
+     */
     void set(float lambdaFirst, float lambdaStep, float CE,
              const std::vector<float>& qe,
              const std::string& name)
     {
-
       m_lambdaFirst = lambdaFirst;
       m_lambdaStep = lambdaStep;
       m_CE = CE;
       m_QE = qe;
       setName(name);
     }
+
+    /**
+     * Clears the object
+     */
+    void clear()
+    {
+      m_lambdaFirst = 0;
+      m_lambdaStep = 0;
+      m_CE = 0;
+      m_QE.clear();
+      setName("");
+    }
+
+    /**
+     * Checks the status
+     * @return true if QE data points are empty
+     */
+    bool isEmpty() const {return m_QE.empty();}
 
     /**
      * Returns quantum efficiency data points
@@ -79,6 +104,15 @@ namespace Belle2 {
      * @return wavelength in [nm]
      */
     double getLambdaFirst() const {return m_lambdaFirst;}
+
+    /**
+     * Returns wavelenght of the last data point
+     * @return wavelength in [nm]
+     */
+    double getLambdaLast() const
+    {
+      return m_lambdaFirst + (m_QE.size() - 1) * m_lambdaStep;
+    }
 
     /**
      * Returns wavelenght step

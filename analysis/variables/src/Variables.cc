@@ -777,39 +777,6 @@ namespace Belle2 {
       return 0.0;
     }
 
-    double mcParticleSecondaryPhysicsProcess(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        return mcp->getSecondaryPhysicsProcess();
-      } else {
-        return -1;
-      }
-    }
-
-    double mcParticleStatus(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        return mcp->getStatus();
-      } else {
-        return -1;
-      }
-    }
-
-    double particleMCPrimaryParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_PrimaryParticle;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
 
     double particleMCMomentumTransfer2(const Particle* part)
     {
@@ -1266,13 +1233,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
-    REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
-                      "Returns the secondary physics process flag.");
-    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
-                      "Returns status bits of related MCParticle or - 1 if MCParticle relation is not set.");
-    REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
-                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle,"
-                      "-1 if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
                       "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.");
     REGISTER_VARIABLE("False", False,

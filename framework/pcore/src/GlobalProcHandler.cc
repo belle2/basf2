@@ -146,7 +146,7 @@ bool GlobalProcHandler::startInputProcess()
 
 bool GlobalProcHandler::startWorkerProcesses(unsigned int numProcesses)
 {
-  for (int i = 0; i < numProcesses; i++) {
+  for (unsigned int i = 0; i < numProcesses; i++) {
     if (startProc(ProcType::c_Worker, 0)) {
       return true;
     }

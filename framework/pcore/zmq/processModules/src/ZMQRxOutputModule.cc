@@ -52,6 +52,8 @@ void ZMQRxOutputModule::event()
         B2DEBUG(100, "Having received an event backup. Will go in with this.");
         // TODO: We would set a flag here, as we have received this message from the input process
         m_streamer.read(std::move(message));
+        StoreObjPtr<EventMetaData> eventMetaData;
+        eventMetaData->addErrorFlag(EventMetaData::EventErrorFlag::c_HLTCrash);
         return false;
       } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
         B2DEBUG(100, "Having received an end message. Will not go on.");

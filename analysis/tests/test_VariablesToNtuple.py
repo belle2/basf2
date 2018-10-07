@@ -44,6 +44,13 @@ path.add_module('VariablesToNtuple',
                 fileName='eventNtuple.root',
                 treeName='eventTree')
 
+# try to write out candidate counters even though they're already there
+path.add_module('VariablesToNtuple',
+                particleList='',
+                variables=['expNum', 'runNum', 'evtNum'],
+                fileName='countersNtuple.root',
+                treeName='countersTree')
+
 
 with tempfile.TemporaryDirectory() as tempdir:
     os.chdir(tempdir)
@@ -61,10 +68,20 @@ with tempfile.TemporaryDirectory() as tempdir:
     assert t1.GetListOfBranches().Contains('electronID'), "electronID branch is missing from electronListTree"
     assert t1.GetListOfBranches().Contains('p'), "p branch is missing from electronListTree"
     assert t1.GetListOfBranches().Contains('__weight__'), "weight branch is missing from electronListTree"
+    assert t1.GetListOfBranches().Contains('__event__'), "event number branch is missing from electronList tree"
+    assert t1.GetListOfBranches().Contains('__run__'), "run number branch is missing from electronList tree"
+    assert t1.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing from electronList tree"
+    assert t1.GetListOfBranches().Contains('__candidate__'), "candidate number branch is missing from electronList tree"
+    assert t1.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is missing from electronList tree"
 
     assert t2.GetListOfBranches().Contains('clusterE'), "clusterEnergy branch is missing from photonListTree"
     assert t2.GetListOfBranches().Contains('p'), "p branch is missing from photonListTree"
     assert t2.GetListOfBranches().Contains('__weight__'), "weight branch is missing from photonListTree"
+    assert t2.GetListOfBranches().Contains('__event__'), "event number branch is missing from photonList tree"
+    assert t2.GetListOfBranches().Contains('__run__'), "run number branch is missing from photonList tree"
+    assert t2.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing from photonList tree"
+    assert t2.GetListOfBranches().Contains('__candidate__'), "candidate number branch is missing from photonList tree"
+    assert t2.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is missing from photonList tree"
 
     nSignal = 0
     nBckgrd = 0
@@ -87,6 +104,16 @@ with tempfile.TemporaryDirectory() as tempdir:
     assert t.GetListOfBranches().Contains('nTracks'), "nTracks branch is missing"
     assert t.GetListOfBranches().Contains('nECLClusters'), "nECLClusters branch is missing"
     assert t.GetListOfBranches().Contains('__weight__'), "weight branch is missing"
+    assert t.GetListOfBranches().Contains('__event__'), "event number branch is missing"
+    assert t.GetListOfBranches().Contains('__run__'), "run number branch is missing"
+    assert t.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing"
+    assert not t.GetListOfBranches().Contains('__candidate__'), "candidate number branch is present in eventwise tree"
+    assert not t.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is present in eventwise tree"
+
+    t.GetEntry(0)
+    assert t.__run__ == 0, "run number not as expected"
+    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__event__ == 281340001, "event number not as expected"
 
     nTracks_12 = 0
     nTracks_11 = 0
@@ -99,3 +126,16 @@ with tempfile.TemporaryDirectory() as tempdir:
             if event.nTracks == 11:
                 nTracks_11 += 1
     assert nTracks_12 * 5 < nTracks_11, "Expected much less events with 12 tracks than with 11, due to the large sampling rate"
+
+    assert os.path.isfile('countersNtuple.root'), "eventNtuple.root wasn't created"
+    f = ROOT.TFile('countersNtuple.root')
+    t = f.Get('countersTree')
+    assert bool(t), "countersTree isn't contained in file"
+    assert t.GetListOfBranches().Contains('__event__'), "event number branch is missing"
+    assert t.GetListOfBranches().Contains('__run__'), "run number branch is missing"
+    assert t.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing"
+
+    t.GetEntry(0)
+    assert t.__run__ == 0, "run number not as expected"
+    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__event__ == 281340001, "event number not as expected"

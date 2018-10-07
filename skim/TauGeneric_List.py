@@ -21,7 +21,7 @@ def TauList():
     applyCuts('gamma:all', gammaCuts)
 
     # Get EventShape variables
-    buildEventShape(['pi+:all', 'gamma:all'] foxWolfram=False, cleoCones=False,
+    buildEventShape(['pi+:all', 'gamma:all'], foxWolfram=False, cleoCones=False,
                     jets=False, multipoleMoments=False, allMoments=False,
                     collisionAxis=False, sphericity=False, thrust=True)
     buildEventKinematics(['pi+:all', 'gamma:all'])

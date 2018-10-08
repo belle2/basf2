@@ -164,7 +164,7 @@ namespace Belle2 {
     {
       double lambda = c_hc / energy;
 
-      if (m_oldPayload) { // filter transmission is included in nominal QE -> return it!
+      if (m_oldPayload) { // filter transmission is included in nominal QE, return it!
         return getGeometry()->getNominalQE().getEfficiency(lambda);
       }
 
@@ -181,7 +181,7 @@ namespace Belle2 {
 
       double lambda = c_hc / energy;
 
-      if (m_oldPayload) { // filter transmission is included in nominal QE -> return it!
+      if (m_oldPayload) { // filter transmission is included in nominal QE, return it!
         return geo->getNominalQE().getEfficiency(lambda);
       }
 
@@ -198,8 +198,11 @@ namespace Belle2 {
       auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
       auto channel = getChannelMapper().getChannel(pixelID);
 
-      return pmtQE->getEfficiency(pmtPixel, lambda, m_BfieldOn) *
-             m_channelRQE->getRQE(moduleID, channel);
+      double RQE = 1.0;
+      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+
+      return pmtQE->getEfficiency(pmtPixel, lambda, m_BfieldOn) * RQE;
+
     }
 
 
@@ -207,8 +210,12 @@ namespace Belle2 {
     {
 
       auto channel = getChannelMapper().getChannel(pixelID);
-      double RQE = m_channelRQE->getRQE(moduleID, channel);
-      double thrEffi = m_thresholdEff->getThrEff(moduleID, channel);
+
+      double RQE = 1.0;
+      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+
+      double thrEffi = 1.0;
+      if (m_thresholdEff.isValid()) thrEffi = m_thresholdEff->getThrEff(moduleID, channel);
 
       if (m_oldPayload) { // nominal QE is used
         return RQE * thrEffi;

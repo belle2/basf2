@@ -82,7 +82,6 @@ main.add_module(cdcDigitizer)
 
 # TOP digitization
 topdigi = register_module('TOPDigitizer')
-topdigi.param('trigT0Sigma', 2.0)  # simulate trigger ucertainy in finding correct T0
 main.add_module(topdigi)
 
 # tracking
@@ -94,6 +93,9 @@ add_dedx_modules(main)
 # Track extrapolation
 ext = register_module('Ext')
 main.add_module(ext)
+
+# Channel masker
+main.add_module('TOPChannelMasker')
 
 # Bunch finder
 finder = register_module('TOPBunchFinder')

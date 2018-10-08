@@ -90,6 +90,9 @@ add_tracking_reconstruction(main)
 ext = register_module('Ext')
 main.add_module(ext)
 
+# Channel masker
+main.add_module('TOPChannelMasker')
+
 # TOP reconstruction
 topreco = register_module('TOPReconstructor')
 topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout

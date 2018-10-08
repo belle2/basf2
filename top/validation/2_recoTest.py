@@ -66,6 +66,9 @@ main.add_module(topdigi)
 trackmaker = register_module('TOPMCTrackMaker')
 main.add_module(trackmaker)
 
+# Channel masker
+main.add_module('TOPChannelMasker')
+
 # TOP reconstruction
 topreco = register_module('TOPReconstructor')
 main.add_module(topreco)

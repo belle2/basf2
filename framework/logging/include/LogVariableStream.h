@@ -113,7 +113,7 @@ public:
   LogVariableStream(const LogVariableStream& other) :  m_variables(other.m_variables)
   {
     // copy manually because stringstream has no copy-constructor
-    m_stringStream << other.m_stringStream.rdbuf();
+    m_stringStream << other.m_stringStream.str();
   }
 
   /** Constructor which sets an initial text for this stream
@@ -170,10 +170,10 @@ public:
   /**
    * Custom assignment-operator, thanks to stringsream's non-copy policy
    */
-  LogVariableStream&  operator=(const LogVariableStream& lvs)
+  LogVariableStream& operator=(const LogVariableStream& lvs)
   {
     this->m_stringStream = std::stringstream();
-    this->m_stringStream << lvs.m_stringStream.rdbuf();
+    this->m_stringStream << lvs.m_stringStream.str();
     this->m_variables = lvs.m_variables;
     return *this;
   }

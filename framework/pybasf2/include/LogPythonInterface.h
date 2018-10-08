@@ -157,24 +157,9 @@ namespace Belle2 {
      *
      * @param level The debug level
      * @param msg The debug message text
-     */
-    static void logDebug(int level, const std::string& msg);
-
-    /**
-     * Produce debug message
-     *
-     * @param level The debug level
-     * @param msg The debug message text
      * @param variables dictionary of variables that should be printed together with the message
      */
-    static void logDebugVariables(int level, const std::string& msg, boost::python::dict variables);
-
-    /**
-     * Produce info message
-     *
-     * @param msg The info message text
-     */
-    static void logInfo(const std::string& msg);
+    static void logDebug(int level, const std::string& msg, boost::python::dict variables);
 
     /**
      * Produce info message
@@ -182,14 +167,7 @@ namespace Belle2 {
      * @param msg The info message text
      * @param variables dictionary of variables that should be printed together with the message
      */
-    static void logInfoVariables(const std::string& msg, boost::python::dict variables);
-
-    /**
-     * Produce result message
-     *
-     * @param msg The result message text
-     */
-    static void logResult(const std::string& msg);
+    static void logInfo(const std::string& msg, boost::python::dict variables);
 
     /**
      * Produce result message
@@ -197,14 +175,7 @@ namespace Belle2 {
      * @param msg The result message text
      * @param variables dictionary of variables that should be printed together with the message
      */
-    static void logResultVariables(const std::string& msg, boost::python::dict variables);
-
-    /**
-     * Produce warning message
-     *
-     * @param msg The warning message
-     */
-    static void logWarning(const std::string& msg);
+    static void logResult(const std::string& msg, boost::python::dict variables);
 
     /**
      * Produce warning message
@@ -212,14 +183,7 @@ namespace Belle2 {
      * @param msg The warning message
      * @param variables dictionary of variables that should be printed together with the message
      */
-    static void logWarningVariables(const std::string& msg, boost::python::dict variables);
-
-    /**
-     * Produce error message
-     *
-     * @param msg The error message text
-     */
-    static void logError(const std::string& msg);
+    static void logWarning(const std::string& msg, boost::python::dict variables);
 
     /**
      * Produce error message
@@ -227,14 +191,7 @@ namespace Belle2 {
      * @param msg The error message text
      * @param variables dictionary of variables that should be printed together with the message
      */
-    static void logErrorVariables(const std::string& msg, boost::python::dict variables);
-
-    /**
-     * Produce fatal message
-     *
-     * @param msg The fatal message text
-     */
-    static void logFatal(const std::string& msg);
+    static void logError(const std::string& msg, boost::python::dict variables);
 
     /**
      * Produce fatal message
@@ -242,8 +199,7 @@ namespace Belle2 {
      * @param msg The fatal message text
      * @param variables dictionary of variables that should be printed together with the message
      */
-    static void logFatalVariables(const std::string& msg, boost::python::dict variables);
-
+    static void logFatal(const std::string& msg, boost::python::dict variables);
 
     /** return dict with log statistics */
     boost::python::dict getLogStatistics();

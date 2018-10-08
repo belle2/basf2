@@ -343,35 +343,24 @@ Parameters:
        "Expects one argument whether or not the summary should be shown")
   ;
 
-  // methods which only take a text string
-  // unfortunately, default C++ parameters cannot be used and this is the way to do it
-  // according to boost.python documentation:
-  // https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/tutorial/tutorial/functions.html#tutorial.functions.default_arguments
-  def("B2DEBUG", &LogPythonInterface::logDebug, args("debuglevel", "message"),
-      "create a `DEBUG <basf2.LogLevel.DEBUG>` message with the given debug level");
-  def("B2INFO", &LogPythonInterface::logInfo, args("message"),
-      "create an `INFO <basf2.LogLevel.INFO>` message");
-  def("B2RESULT", &LogPythonInterface::logResult, args("message"),
-      "create an `RESULT <basf2.LogLevel.RESULT>` message");
-  def("B2WARNING", &LogPythonInterface::logWarning, args("message"),
-      "create a `WARNING <basf2.LogLevel.WARNING>` message");
-  def("B2ERROR", &LogPythonInterface::logError, args("message"),
-      "create an `ERROR <basf2.LogLevel.ERROR>` message");
-  def("B2FATAL", &LogPythonInterface::logFatal, args("message"),
-      "create a `FATAL <basf2.LogLevel.FATAL>` error message and abort processing");
-
   // methods which take a variable list
-  def("B2DEBUG", &LogPythonInterface::logDebugVariables, args("debuglevel", "message", "variables"),
+  def("B2DEBUG", &LogPythonInterface::logDebug,
+      (bp::arg("debuglevel"), bp::arg("message"), bp::arg("variables") = bp::dict()),
       "create a `DEBUG <basf2.LogLevel.DEBUG>` message with the given debug level");
-  def("B2INFO", &LogPythonInterface::logInfoVariables, args("message", "variables"),
+  def("B2INFO", &LogPythonInterface::logInfo,
+      (bp::arg("message"), bp::arg("variables") = bp::dict()),
       "create an `INFO <basf2.LogLevel.INFO>` message");
-  def("B2RESULT", &LogPythonInterface::logResultVariables, args("message", "variables"),
+  def("B2RESULT", &LogPythonInterface::logResult,
+      (bp::arg("message"), bp::arg("variables") = bp::dict()),
       "create an `RESULT <basf2.LogLevel.RESULT>` message");
-  def("B2WARNING", &LogPythonInterface::logWarningVariables, args("message", "variables"),
+  def("B2WARNING", &LogPythonInterface::logWarning,
+      (bp::arg("message"), bp::arg("variables") = bp::dict()),
       "create a `WARNING <basf2.LogLevel.WARNING>` message");
-  def("B2ERROR", &LogPythonInterface::logErrorVariables, args("message", "variables"),
+  def("B2ERROR", &LogPythonInterface::logError,
+      (bp::arg("message"), bp::arg("variables") = bp::dict()),
       "create an `ERROR <basf2.LogLevel.ERROR>` message");
-  def("B2FATAL", &LogPythonInterface::logFatalVariables, args("message", "variables"),
+  def("B2FATAL", &LogPythonInterface::logFatal,
+      (bp::arg("message"), bp::arg("variables") = bp::dict()),
       "create a `FATAL <basf2.LogLevel.FATAL>` error message and abort processing");
 }
 
@@ -401,78 +390,40 @@ Parameters:
                                     extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
 
 
-void LogPythonInterface::logDebug(int level, const std::string& msg)
-{
-#ifndef LOG_NO_B2DEBUG
-  PYTHON_LOG_IFENABLED(LogConfig::c_Debug, level, msg, boost::python::dict());
-#endif
-}
-
-void LogPythonInterface::logInfo(const std::string& msg)
-{
-#ifndef LOG_NO_B2INFO
-  PYTHON_LOG_IFENABLED(LogConfig::c_Info, 0, msg, boost::python::dict());
-#endif
-}
-
-void LogPythonInterface::logResult(const std::string& msg)
-{
-#ifndef LOG_NO_B2RESULT
-  PYTHON_LOG_IFENABLED(LogConfig::c_Result, 0, msg, boost::python::dict());
-#endif
-}
-
-void LogPythonInterface::logWarning(const std::string& msg)
-{
-#ifndef LOG_NO_B2WARNING
-  PYTHON_LOG_IFENABLED(LogConfig::c_Warning, 0, msg, boost::python::dict());
-#endif
-}
-
-void LogPythonInterface::logError(const std::string& msg)
-{
-  PYTHON_LOG(LogConfig::c_Error, 0, msg, boost::python::dict());
-}
-
-void LogPythonInterface::logFatal(const std::string& msg)
-{
-  PYTHON_LOG(LogConfig::c_Fatal, 0, msg, boost::python::dict());
-}
-
-void LogPythonInterface::logDebugVariables(int level, const std::string& msg, dict d)
+void LogPythonInterface::logDebug(int level, const std::string& msg, dict d)
 {
 #ifndef LOG_NO_B2DEBUG
   PYTHON_LOG_IFENABLED(LogConfig::c_Debug, level, msg, d);
 #endif
 }
 
-void LogPythonInterface::logInfoVariables(const std::string& msg, dict d)
+void LogPythonInterface::logInfo(const std::string& msg, dict d)
 {
 #ifndef LOG_NO_B2INFO
   PYTHON_LOG_IFENABLED(LogConfig::c_Info, 0, msg, d);
 #endif
 }
 
-void LogPythonInterface::logResultVariables(const std::string& msg, dict d)
+void LogPythonInterface::logResult(const std::string& msg, dict d)
 {
 #ifndef LOG_NO_B2RESULT
   PYTHON_LOG_IFENABLED(LogConfig::c_Result, 0, msg, d);
 #endif
 }
 
-void LogPythonInterface::logWarningVariables(const std::string& msg, dict d)
+void LogPythonInterface::logWarning(const std::string& msg, dict d)
 {
 #ifndef LOG_NO_B2WARNING
   PYTHON_LOG_IFENABLED(LogConfig::c_Warning, 0, msg, d);
 #endif
 }
 
-void LogPythonInterface::logErrorVariables(const std::string& msg, dict d)
+void LogPythonInterface::logError(const std::string& msg, dict d)
 {
   PYTHON_LOG(LogConfig::c_Error, 0, msg, d);
 }
 
-void LogPythonInterface::logFatalVariables(const std::string& msg, dict d)
+void LogPythonInterface::logFatal(const std::string& msg, dict d)
 {
   PYTHON_LOG(LogConfig::c_Fatal, 0, msg, d);
 }

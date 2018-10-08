@@ -36,7 +36,7 @@ SVDClusterFilterModule::SVDClusterFilterModule() : Module()
   addParam("inputArrayName", m_inputArrayName, "StoreArray with the input clusters", std::string("SVDClusters"));
   addParam("outputINArrayName", m_outputINArrayName, "StoreArray with the output clusters", std::string(""));
   addParam("outputOUTArrayName", m_outputOUTArrayName, "StoreArray with the output clusters", std::string(""));
-  addParam("layerNum", m_layerNum, "layer number", int(999));
+  addParam("layerNum", m_layerNum, "layer number (0 -> no selection)", int(0));
   addParam("XShell", m_xShell, "X-Shell ID (+1 -> +X, -1 -> -X, 0 -> both)", int(0));
   addParam("YShell", m_yShell, "Y-Shell ID (+1 -> +Y, -1 -> -Y, 0 -> both)", int(0));
   addParam("minSNR", m_minClSNR, "minimum cluster SNR", float(0));

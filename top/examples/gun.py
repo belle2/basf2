@@ -34,14 +34,6 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('components', [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-])
 main.add_module(geometry)
 
 # Particle gun: generate multiple tracks

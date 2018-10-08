@@ -77,10 +77,10 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         return;
       }
+      m_valid = true;
 
       finalizeInitialization();
 
-      m_valid = true;
     }
 
 
@@ -118,10 +118,10 @@ namespace Belle2 {
         B2ERROR("TOPChannelMaps: no payload found in database");
         return;
       }
+      m_valid = true;
 
       finalizeInitialization();
 
-      m_valid = true;
     }
 
     void TOPGeometryPar::finalizeInitialization()
@@ -136,7 +136,7 @@ namespace Belle2 {
       // print geometry if the debug level for 'top' is set 10000
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
-        m_geo->print();
+        getGeometry()->print();
         m_envelopeQE.print("Envelope QE");
       }
     }

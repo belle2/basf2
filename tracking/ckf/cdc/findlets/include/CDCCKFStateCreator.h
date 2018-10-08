@@ -38,13 +38,7 @@ namespace Belle2 {
 
       const auto& lastState = path.back();
       for (const TrackFindingCDC::CDCWireHit* wireHit : wireHits) {
-        const auto sameWireHit = [wireHit](const auto & state) {
-          return not state.isSeed() and state.getWireHit() == wireHit;
-        };
-        if (TrackFindingCDC::any(path, sameWireHit)) {
-          continue;
-        }
-
+        // Do faster selection first
         const auto iCLayer = wireHit->getWire().getICLayer();
         if (lastState.isSeed()) {
           if (iCLayer >= m_maximalLayerJump) {
@@ -56,6 +50,13 @@ namespace Belle2 {
           if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
             continue;
           }
+        }
+
+        const auto sameWireHit = [wireHit](const auto & state) {
+          return not state.isSeed() and state.getWireHit() == wireHit;
+        };
+        if (TrackFindingCDC::any(path, sameWireHit)) {
+          continue;
         }
 
         nextStates.emplace_back(wireHit);

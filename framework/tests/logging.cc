@@ -49,6 +49,14 @@ namespace {
     lv << "Some Text" << endl << "which is constant" << LogVar("intVar", 23) << LogVar("floatVar", 3.14) << LogVar("strVar",
         "someString");
     EXPECT_EQ("Some Text\nwhich is constant\n\tintVar = 23\n\tfloatVar = 3.1400000000000001\n\tstrVar = someString", lv.str());
+
+    // test if copy and assignment works as expected
+    LogVariableStream lv_copyconst(lv);
+    LogVariableStream lv_assign;
+    lv_assign = lv;
+    EXPECT_EQ("Some Text\nwhich is constant\n\tintVar = 23\n\tfloatVar = 3.1400000000000001\n\tstrVar = someString", lv_assign.str());
+    EXPECT_EQ("Some Text\nwhich is constant\n\tintVar = 23\n\tfloatVar = 3.1400000000000001\n\tstrVar = someString",
+              lv_copyconst.str());
   }
 
 }  // namespace

@@ -206,9 +206,9 @@ void SVDChargeSharingAnalysisModule::event()
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
     RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
     RelationVector<VXDDedxTrack> VXDdedxTr = DataStore::getRelationsWithObj<VXDDedxTrack>(&track);
-    if (theRC.size() == 0 || svdClustersTrack.size() == 0 || VXDdedxTr.size() == 0) continue;
+    // if (theRC.size() == 0 || svdClustersTrack.size() == 0 || VXDdedxTr.size() == 0) continue;
 
-    double trkMom = VXDdedxTr[0]->getMomentum();
+    // double trkMom = VXDdedxTr[0]->getMomentum();
 
     for (int cl = 0; cl < static_cast<int>(svdClustersTrack.size()); cl++) {
       VxdID cl_VxdID = svdClustersTrack[cl]->getSensorID();
@@ -222,9 +222,9 @@ void SVDChargeSharingAnalysisModule::event()
       unsigned short clSizeIndex;
       unsigned short sensTypeIndex;
       VXD::SensorInfoBase info = VXD::GeoCache::get(cl_VxdID);
-      double sensThickness = info.getThickness();
-      double pathLength = VXDdedxTr[0]->getDx(cl); // path length in the silicon, for a given sensor
-      double incAngle = 180. / M_PI * acos(sensThickness / pathLength);
+      // double sensThickness = info.getThickness();
+      // double pathLength = VXDdedxTr[0]->getDx(cl); // path length in the silicon, for a given sensor
+      // double incAngle = 180. / M_PI * acos(sensThickness / pathLength);
 
       // clSizeIndex = 0,1 for clSize 1,2 respectively and =2 for clSize >=3
       clSizeIndex = clSize >= 3 ? 2 : clSize - 1;
@@ -241,20 +241,20 @@ void SVDChargeSharingAnalysisModule::event()
 
       // cl charge histograms
       h_clCharge[sensTypeIndex][side][clSizeIndex]->Fill(clCharge);
-      h_clChargeVsMomentum[sensTypeIndex][side][clSizeIndex]->Fill(trkMom, clCharge);
-      h_clChargeVsIncidentAngle[sensTypeIndex][side][clSizeIndex]->Fill(incAngle, clCharge);
+      // h_clChargeVsMomentum[sensTypeIndex][side][clSizeIndex]->Fill(trkMom, clCharge);
+      // h_clChargeVsIncidentAngle[sensTypeIndex][side][clSizeIndex]->Fill(incAngle, clCharge);
       h_clChargeVsSNR[sensTypeIndex][side][clSizeIndex]->Fill(clSNR, clCharge);
 
       //cl size
       h_clSize[sensTypeIndex][side]->Fill(clSize);
-      h_clSizeVsMomentum[sensTypeIndex][side]->Fill(trkMom, clSize);
-      h_clSizeVsIncidentAngle[sensTypeIndex][side]->Fill(incAngle, clSize);
+      // h_clSizeVsMomentum[sensTypeIndex][side]->Fill(trkMom, clSize);
+      // h_clSizeVsIncidentAngle[sensTypeIndex][side]->Fill(incAngle, clSize);
       h_clSizeVsSNR[sensTypeIndex][side]->Fill(clSNR, clSize);
 
       //cl SNR
       h_clSNR[sensTypeIndex][side][clSizeIndex]->Fill(clSNR);
-      h_clSNRVsMomentum[sensTypeIndex][side][clSizeIndex]->Fill(trkMom, clSize);
-      h_clSNRVsIncidentAngle[sensTypeIndex][side][clSizeIndex]->Fill(incAngle, clSize);
+      // h_clSNRVsMomentum[sensTypeIndex][side][clSizeIndex]->Fill(trkMom, clSize);
+      // h_clSNRVsIncidentAngle[sensTypeIndex][side][clSizeIndex]->Fill(incAngle, clSize);
 
     } //clusters
   } //tracks
@@ -405,4 +405,4 @@ TCanvas* SVDChargeSharingAnalysisModule::comparisonPlot(TH1F* h1, TH1F* h2, TH1F
   legend->Draw();
 
   return c;
-} e
+}

@@ -26,7 +26,7 @@ geometry = register_module('Geometry', components=['SVD'])
 main.add_module(geometry, useDB=False)
 
 main.add_module('SVDChargeSharingAnalysis', outputDirName=str(dirOUT), outputRootFileName='test.root',
-                useTrackInfo=True, useVXDDedx=True, is2017TBanalysis=False)
+                useTrackInfo=True, is2017TBanalysis=False)
 main.add_module('Progress')
 print_path(main)
 process(main)

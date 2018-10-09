@@ -78,7 +78,7 @@ namespace Belle2 {
       m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
       m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
-      m_PulseShapeDiscriminationMVA = 0.0;        /**< Digit level MVA classifier that uses pulse shape discrimination.*/
+      m_PulseShapeDiscriminationMVA = 0.5;        /**< Digit level MVA classifier that uses pulse shape discrimination.*/
       m_NumberOfHadronDigits = 0.0;         /**< Shower Number of hadron digits*/
 
     }

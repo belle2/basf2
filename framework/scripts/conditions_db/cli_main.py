@@ -32,7 +32,8 @@ from urllib.parse import urljoin
 import shutil
 import pprint
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
-    pretty_print_table, LogPythonInterface
+    LogPythonInterface
+from basf2.utils import pretty_print_table
 from pager import Pager
 from dateutil.parser import parse as parse_date
 from . import ConditionsDB, enable_debugging, encode_name

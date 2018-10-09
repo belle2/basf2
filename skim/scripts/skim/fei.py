@@ -63,7 +63,7 @@ def B0hadronic():
     Cuts applied are::
         Event precuts:
         R2EventLevel < 0.4
-        nTracks > 4 
+        nTracks > 4
 
         Tag side B:
         Mbc > 5.24
@@ -122,7 +122,7 @@ def BplusHadronic():
     Cuts applied are::
         Event precuts:
         R2EventLevel < 0.4
-        nTracks > 4 
+        nTracks > 4
 
         Tag side B:
         Mbc > 5.24

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTSHAPEMODULE_H
-#define EVENTSHAPEMODULE_H
+#ifndef EVENTKINEMATICSMODULE_H
+#define EVENTKINEMATICSMODULE_H
 
 #include <cstdlib>
 #include <ctime>
@@ -20,32 +20,29 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventShape.h>
+#include <analysis/dataobjects/EventKinematics.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/ContinuumSuppression/Thrust.h>
 
 
 namespace Belle2 {
   /**
-   * Module to compute event shape variables such as thrust, missing energy and mass2, visible energy, etc.
-   *
-   *    *
+   * Module to compute global quantities related to the event kinematics, like total missing energy and mass2, visible energy, etc.
    */
-  class EventShapeModule : public Module {
+  class EventKinematicsModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    EventShapeModule();
+    EventKinematicsModule();
 
     /** free memory */
-    virtual ~EventShapeModule();
+    virtual ~EventKinematicsModule();
 
     /** Define the physical parameters. look for them in database. */
     virtual void initialize();
@@ -76,8 +73,6 @@ namespace Belle2 {
     /** Fill the lists of particles' momenta */
     void getParticleMomentumLists(std::vector<std::string> particleLists);
 
-    /** Calculate the thrust for this event */
-    TVector3 getThrustOfEvent();
     /** Calculate the missing momentum in the lab system for this event */
     TVector3 getMissingMomentum();
     /** Calculate the missing momentum in the CMS for this event */

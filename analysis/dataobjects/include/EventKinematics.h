@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTSHAPE_H
-#define EVENTSHAPE_H
+#ifndef EVENTKINEMATICS_H
+#define EVENTKINEMATICS_H
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -21,12 +21,12 @@ namespace Belle2 {
 
 
   /**
-   * Class for collecting variables related to the event shape.
+   * Class for collecting variables related to the global kinematics of the event
    *
-   * Mainly used to compute the thrust, missing momentum/energy/mass of qqbar continuum and tau-taubar events.
+   * Mainly used to compute the  missing momentum/energy/mass of qqbar continuum and tau-taubar events.
    */
 
-  class EventShape : public RelationsObject {
+  class EventKinematics : public RelationsObject {
 
   public:
 
@@ -34,16 +34,10 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    EventShape() : m_thrustAxis(0.0, 0.0, 0.0), m_missingMomentum(0.0, 0.0, 0.0), m_missingMomentumCMS(0.0, 0.0, 0.0),
+    EventKinematics() :  m_missingMomentum(0.0, 0.0, 0.0), m_missingMomentumCMS(0.0, 0.0, 0.0),
       m_missingEnergyCMS(0.0), m_missingMass2(0.0), m_visibleEnergyCMS(0.0), m_photonsEnergy(0.0) {};
 
     // setters
-    /**
-     * Add thrust axis.
-     *
-     * @param TVector3 thrust axis
-     */
-    void addThrustAxis(TVector3 thrustAxis);
 
     /**
      * Add the missing momentum vector in lab.
@@ -89,15 +83,6 @@ namespace Belle2 {
 
 
     // getters
-    /**
-     * Get thrust axis.
-     *
-     * @return TVector3 thrust axis
-     */
-    TVector3 getThrustAxis(void) const
-    {
-      return m_thrustAxis;
-    }
 
     /**
      * Get missing momentum vector in lab.
@@ -164,8 +149,6 @@ namespace Belle2 {
   private:
 
     // persistent data members
-    TVector3 m_thrustAxis; /**< Thrust axis */
-
     TVector3 m_missingMomentum; /**< Missing momentum of the event in lab*/
     TVector3 m_missingMomentumCMS; /**< Missing momentum of the event in CMS*/
 
@@ -176,7 +159,7 @@ namespace Belle2 {
 
     float m_photonsEnergy; /**< Total energy of photons in lab */
 
-    ClassDef(EventShape, 1) /**< class definition */
+    ClassDef(EventKinematics, 1) /**< class definition */
 
   };
 

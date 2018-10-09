@@ -11,11 +11,11 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-#include <analysis/modules/EventShape/EventShapeModule.h>
+#include <analysis/modules/EventKinematics/EventKinematicsModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventShape.h>
+#include <analysis/dataobjects/EventKinematics.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -30,74 +30,71 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EventShape)
+REG_MODULE(EventKinematics)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-EventShapeModule::EventShapeModule() : Module()
+EventKinematicsModule::EventKinematicsModule() : Module()
 {
   // Set module properties
-  setDescription("Module to compute event shape attributes like Thrust of event, missing momentum and energy.");
+  setDescription("Module to compute global event kinematic attributes like missing momentum and energy.");
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());
 
 }
 
-EventShapeModule::~EventShapeModule()
+EventKinematicsModule::~EventKinematicsModule()
 {
 }
 
-void EventShapeModule::initialize()
+void EventKinematicsModule::initialize()
 {
-  StoreObjPtr<EventShape> evtShape;
-  evtShape.registerInDataStore();
+  StoreObjPtr<EventKinematics> evtKinematics;
+  evtKinematics.registerInDataStore();
 
 }
 
-void EventShapeModule::beginRun()
+void EventKinematicsModule::beginRun()
 {
 }
 
-void EventShapeModule::event()
+void EventKinematicsModule::event()
 {
-  StoreObjPtr<EventShape> eventShape;
-  if (!eventShape) eventShape.create();
-  EventShapeModule::getParticleMomentumLists(m_particleLists);
+  StoreObjPtr<EventKinematics> eventKinematics;
+  if (!eventKinematics) eventKinematics.create();
+  EventKinematicsModule::getParticleMomentumLists(m_particleLists);
 
-  TVector3 thrustAxis = EventShapeModule::getThrustOfEvent();
-  eventShape->addThrustAxis(thrustAxis);
+  TVector3 missingMomentum = EventKinematicsModule::getMissingMomentum();
+  eventKinematics->addMissingMomentum(missingMomentum);
 
-  TVector3 missingMomentum = EventShapeModule::getMissingMomentum();
-  eventShape->addMissingMomentum(missingMomentum);
+  TVector3 missingMomentumCMS = EventKinematicsModule::getMissingMomentumCMS();
+  eventKinematics->addMissingMomentumCMS(missingMomentumCMS);
 
-  TVector3 missingMomentumCMS = EventShapeModule::getMissingMomentumCMS();
-  eventShape->addMissingMomentumCMS(missingMomentumCMS);
-
-  float missingEnergyCMS = EventShapeModule::getMissingEnergyCMS();
-  eventShape->addMissingEnergyCMS(missingEnergyCMS);
+  float missingEnergyCMS = EventKinematicsModule::getMissingEnergyCMS();
+  eventKinematics->addMissingEnergyCMS(missingEnergyCMS);
 
   float missingMass2 = missingEnergyCMS * missingEnergyCMS - missingMomentumCMS.Mag() * missingMomentumCMS.Mag();
-  eventShape->addMissingMass2(missingMass2);
+  eventKinematics->addMissingMass2(missingMass2);
 
-  float visibleEnergyCMS = EventShapeModule::getVisibleEnergyCMS();
-  eventShape->addVisibleEnergyCMS(visibleEnergyCMS);
+  float visibleEnergyCMS = EventKinematicsModule::getVisibleEnergyCMS();
+  eventKinematics->addVisibleEnergyCMS(visibleEnergyCMS);
 
-  float totalPhotonsEnergy = EventShapeModule::getTotalPhotonsEnergy();
-  eventShape->addTotalPhotonsEnergy(totalPhotonsEnergy);
+  float totalPhotonsEnergy = EventKinematicsModule::getTotalPhotonsEnergy();
+  eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
 }
 
-void EventShapeModule::endRun()
+void EventKinematicsModule::endRun()
 {
 }
 
-void EventShapeModule::terminate()
+void EventKinematicsModule::terminate()
 {
 }
 
-void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
+void EventKinematicsModule::getParticleMomentumLists(vector<string> particleLists)
 {
   PCmsLabTransform T;
 
@@ -106,7 +103,7 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
   m_particleMomentumListCMS.clear();
 
   int nParticleLists = particleLists.size();
-  B2DEBUG(10, "Number of ParticleLists to calculate Event Shape variables: " << nParticleLists);
+  B2DEBUG(10, "Number of ParticleLists to calculate Event Kinematics variables: " << nParticleLists);
 
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
     string particleListName = particleLists[i_pl];
@@ -129,19 +126,8 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
   return;
 }
 
-TVector3 EventShapeModule::getThrustOfEvent()
-{
-  std::vector<TVector3> forThrust;
-  forThrust.clear();
-  int nParticles = m_particleMomentumListCMS.size();
-  for (int i = 0; i < nParticles; ++i) {
-    forThrust.push_back(m_particleMomentumListCMS.at(i).Vect());
-  }
-  TVector3 th = Thrust::calculateThrust(forThrust);
-  return th;
-}
 
-TVector3 EventShapeModule::getMissingMomentum()
+TVector3 EventKinematicsModule::getMissingMomentum()
 {
   PCmsLabTransform T;
   TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
@@ -153,7 +139,7 @@ TVector3 EventShapeModule::getMissingMomentum()
   return p;
 }
 
-TVector3 EventShapeModule::getMissingMomentumCMS()
+TVector3 EventKinematicsModule::getMissingMomentumCMS()
 {
   TVector3 p(0., 0., 0.);
   int nParticles = m_particleMomentumListCMS.size();
@@ -163,7 +149,7 @@ TVector3 EventShapeModule::getMissingMomentumCMS()
   return p;
 }
 
-float EventShapeModule::getMissingEnergyCMS()
+float EventKinematicsModule::getMissingEnergyCMS()
 {
   PCmsLabTransform T;
   float ECMS = T.getCMSEnergy();
@@ -174,7 +160,7 @@ float EventShapeModule::getMissingEnergyCMS()
   return ECMS;
 }
 
-float EventShapeModule::getVisibleEnergyCMS()
+float EventKinematicsModule::getVisibleEnergyCMS()
 {
   float visibleE = 0.0;
   int nParticles = m_particleMomentumListCMS.size();
@@ -184,7 +170,7 @@ float EventShapeModule::getVisibleEnergyCMS()
   return visibleE;
 }
 
-float EventShapeModule::getTotalPhotonsEnergy()
+float EventKinematicsModule::getTotalPhotonsEnergy()
 {
   float photonsEnergy = 0.0;
   int nParticles = m_photonsMomentumList.size();
@@ -192,5 +178,6 @@ float EventShapeModule::getTotalPhotonsEnergy()
     photonsEnergy += m_photonsMomentumList.at(i).E();
   }
   return photonsEnergy;
-
 }
+
+

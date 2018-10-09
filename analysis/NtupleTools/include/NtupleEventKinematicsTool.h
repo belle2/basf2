@@ -8,8 +8,8 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEEVENTSHAPETOOL_H
-#define NTUPLEEVENTSHAPETOOL_H
+#ifndef NTUPLEEVENTKINEMATICSTOOL_H
+#define NTUPLEEVENTKINEMATICSTOOL_H
 
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
@@ -23,15 +23,11 @@
 namespace Belle2 {
 
   /**
-   * NtupleTool to write out the thrust axis, the cosine angle between the particle and the thrust axis and the missing
-   * momentum.
+   * NtupleTool to write out the event kinematic variables
    */
-  class NtupleEventShapeTool : public NtupleFlatTool {
+  class NtupleEventKinematicsTool : public NtupleFlatTool {
 
   private:
-    float m_fThrustValue;            /**< The thrust value of the event */
-    float m_fThrustVector[3];        /**< The thrust vector. */
-    float* m_fCosToThrust;           /**< Cosine of the angle between the thrust axis and the particle's momentum */
     float m_fMissingMomentum[3];     /**< The missing momentum of the event in the lab system */
     float m_fMissingMomentumCMS[3];  /**< The missing momentum of the event in the CMS  */
     float m_fMissingEnergyCMS;       /**< The missing energy of the event in the CMS  */
@@ -45,9 +41,9 @@ namespace Belle2 {
     void deallocateMemory();
   public:
     /** Constuctor. */
-    NtupleEventShapeTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    NtupleEventKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Destructor. */
-    ~NtupleEventShapeTool() {deallocateMemory();}
+    ~NtupleEventKinematicsTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

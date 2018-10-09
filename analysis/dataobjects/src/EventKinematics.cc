@@ -8,44 +8,39 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/dataobjects/EventShape.h>
+#include <analysis/dataobjects/EventKinematics.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
 
 using namespace Belle2;
 
-void EventShape::addThrustAxis(TVector3 thrustAxis)
-{
-  m_thrustAxis = thrustAxis;
-}
-
-void EventShape::addMissingMomentum(TVector3 missingMomentum)
+void EventKinematics::addMissingMomentum(TVector3 missingMomentum)
 {
   m_missingMomentum = missingMomentum;
 }
 
-void EventShape::addMissingMomentumCMS(TVector3 missingMomentumCMS)
+void EventKinematics::addMissingMomentumCMS(TVector3 missingMomentumCMS)
 {
   m_missingMomentumCMS = missingMomentumCMS;
 }
 
-void EventShape::addMissingEnergyCMS(float missingEnergyCMS)
+void EventKinematics::addMissingEnergyCMS(float missingEnergyCMS)
 {
   m_missingEnergyCMS = missingEnergyCMS;
 }
 
-void EventShape::addMissingMass2(float missingMass2)
+void EventKinematics::addMissingMass2(float missingMass2)
 {
   m_missingMass2 = missingMass2;
 }
 
-void EventShape::addVisibleEnergyCMS(float visibleEnergyCMS)
+void EventKinematics::addVisibleEnergyCMS(float visibleEnergyCMS)
 {
   m_visibleEnergyCMS = visibleEnergyCMS;
 }
 
-void EventShape::addTotalPhotonsEnergy(float totalPhotonsEnergy)
+void EventKinematics::addTotalPhotonsEnergy(float totalPhotonsEnergy)
 {
   m_photonsEnergy = totalPhotonsEnergy;
 }

@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""""
-basf2 Utilities
+"""
+basf2.utils - Helper functions for printing basf2 objects
+---------------------------------------------------------
 
 This modules contains some utility functions used by basf2, mainly for printing
-things
+things.
 """
 
 import pybasf2
+import inspect as _inspect
 
 
 def get_terminal_width():
@@ -348,3 +350,46 @@ def print_path(path, defaults=False, description=False, indentation=0, title=Tru
             print(out)
             print_path(condition.get_path(), defaults=defaults, description=description, indentation=indentation + 6,
                        title=False)
+
+
+def is_mod_function(mod, func):
+    """Return true if ``func`` is a function and defined in the module ``mod``"""
+    return _inspect.isfunction(func) and _inspect.getmodule(func) == mod
+
+
+def list_functions(mod):
+    """
+    Returns list of function names defined in the given Python module.
+    """
+    return [func.__name__ for func in mod.__dict__.values() if is_mod_function(mod, func)]
+
+
+def pretty_print_module(module, module_name, replacements={}):
+    """Pretty print the contents of a python module.
+    It will print all the functions defined in the given module to the console
+
+    Arguments:
+        module: instance of the module or name with which it can be found in
+            `sys.modules`
+        module_name: readable module name
+        replacements (dict): dictionary containing text replacements: Every
+            occurence of any key in the function signature will be replaced by
+            its value
+    """
+    from pager import Pager
+    desc_list = []
+
+    # allow mod to be just the name of the module
+    if isinstance(module, str):
+        import sys
+        module = sys.modules[module]
+
+    for function_name in sorted(list_functions(module), key=lambda x: x.lower()):
+        function = getattr(module, function_name)
+        signature = _inspect.formatargspec(*_inspect.getfullargspec(function))
+        for key, value in replacements.items():
+            signature = signature.replace(key, value)
+        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
+
+    with Pager('List of available functions in ' + module_name, True):
+        pretty_print_description_list(desc_list)

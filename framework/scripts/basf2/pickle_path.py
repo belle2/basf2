@@ -2,14 +2,19 @@
 # -*- coding: utf-8 -*-
 
 """
-Functions necessary to pickle and unpickle a Path and all Modules on it
+basf2.pickle_path - Functions necessary to pickle and unpickle a Path
+=====================================================================
+
+This module contains all the functiones necessary to serialize and deserialize
+a full path with all modules, parameters, sub paths, conditions and so on. This
+can be used in conjunction with ``basf2 --dump-path`` and ``basf2
+--execute-path`` to save a full configuration to file and execute it later.
 """
 
 import pybasf2
-import pickle
-import inspect
-import os
-import sys
+import pickle as _pickle
+import os as _os
+import sys as _sys
 
 
 def serialize_value(module, parameter):
@@ -86,30 +91,36 @@ def deserialize_path(path_state):
 
 
 def get_path_from_file(path_filename):
+    """Read a path from a given pickle file"""
     with open(path_filename, 'br') as f:
-        return deserialize_path(pickle.load(f))
+        return deserialize_path(_pickle.load(f))
 
 
 def write_path_to_file(path, filename):
+    """Write a path to a given pickle file"""
     with open(filename, 'bw') as f:
-        pickle.dump(serialize_path(path), f)
+        _pickle.dump(serialize_path(path), f)
 
 
 def check_pickle_path(path):
+    """Check if the path to be executed should be pickled or unpickled.
+    This function is used by basf2.process to handle the ``--dump-path`` and
+    ``--execute-path`` arguments to ``basf2``
+    """
     # If a pickle path is set via  --dump-path or --execute-path we do something special
     pickle_filename = pybasf2.get_pickle_path()
     if pickle_filename == '':
         return path
 
     # If the given path is None and the picklePath is valid we load a path from the pickle file
-    if os.path.isfile(pickle_filename) and path is None:
+    if _os.path.isfile(pickle_filename) and path is None:
         path = get_path_from_file(pickle_filename)
         with open(pickle_filename, "br") as f:
-            loaded = pickle.load(f)
+            loaded = _pickle.load(f)
         if 'state' in loaded:
             pybasf2.B2INFO("Pickled path contains a state object. Activating pickled state.")
             for name, args, kwargs in loaded['state']:
-                getattr(sys.modules[__name__], name)(*args, **kwargs)
+                getattr(_sys.modules[__name__], name)(*args, **kwargs)
         return path
 
     # Otherwise we dump the given path into the pickle file and exit
@@ -118,17 +129,6 @@ def check_pickle_path(path):
         return None
     else:
         pybasf2.B2FATAL("Couldn't open path-file '" + pickle_filename + "' and no steering file provided.")
-
-
-def is_mod_function(mod, func):
-    return inspect.isfunction(func) and inspect.getmodule(func) == mod
-
-
-def list_functions(mod):
-    """
-    Returns list of function names defined in the given Python module.
-    """
-    return [func.__name__ for func in mod.__dict__.values() if is_mod_function(mod, func)]
 
 
 def make_code_pickable(code):

@@ -10,10 +10,6 @@
 # Date: 20180331
 #
 
-Alias myK0  K0
-Alias anti-myK0 anti-K0
-ChargeConj myK0 anti-myK0
-
 # Need to define B0 mass eigenstates for VSS_BMIX model
 Define dm 0.510e12
 
@@ -24,16 +20,10 @@ Enddecay
 
 # Set the signal side B decay, need the other side to decay generically for tagging
 Decay B0sig
-1.0 myK0 nu_e anti-nu_e PHOTOS PHSP;
+1.0 K_S0 nu_e anti-nu_e PHOTOS PHSP;
 Enddecay
 CDecay anti-B0sig
 #
 #
-Decay myK0
-1.0000 K_S0         PHOTOS PHSP ;
-Enddecay
-CDecay anti-myK0
-
-
 # Signal EOF
 End

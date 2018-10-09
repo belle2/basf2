@@ -257,7 +257,7 @@ class ConditionsDB:
         Check for the existence of payloads in the database.
 
         Arguments:
-            payloads list((str,str)): A list of payloads to check for. Each
+            payloads (list((str,str))): A list of payloads to check for. Each
                payload needs to be a tuple of the name of the payload and the
                md5 checksum of the payload file.
 

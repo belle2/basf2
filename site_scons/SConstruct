@@ -133,7 +133,9 @@ if option == 'debug':
 elif option == 'opt':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
     global_env.Append(FORTRANFLAGS='-O3')
-    global_env.Append(LINKFLAGS='-flto')
+    # FIXME: This is more efficient during the development cycle, but less efficient in full builds.
+    #        In addition, the number of jobs should not be hardcoded, but rather taken from SCons.
+    global_env.Append(LINKFLAGS='-flto=8')
     # When using LTO, GCC-provided ar and ranlib wrappers must be used in order
     # to preserve the GCC intermediate representation
     global_env['AR'] = 'gcc-ar'

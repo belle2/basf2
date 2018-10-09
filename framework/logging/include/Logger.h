@@ -50,21 +50,10 @@
     Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, std::move(varStream), package, function, file, line, debuglevel)); \
   }
 
-/** Send generic log message which uses the LogVariableStream */
-#define _B2LOGMESSAGE_VARSTREAM(loglevel, debuglevel, logVariableStream, package, function, file, line) { \
-    Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, logVariableStream, package, function, file, line, debuglevel)); \
-  }
-
 /** send generic log message via the << operator if the log level is enabled. */
 #define _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, logTextAndVariables, package, function, file, line) do { \
     if (Belle2::LogSystem::Instance().isLevelEnabled(loglevel, debuglevel, package)) { \
       _B2LOGMESSAGE(loglevel, debuglevel, logTextAndVariables, package, function, file, line); \
-    } } while(false)
-
-/** send generic log message via variable stream if the log level is enabled. */
-#define _B2LOGMESSAGE_VARSTREAM_IFENABLED(loglevel, debuglevel, logVariableStream, package, function, file, line) do { \
-    if (Belle2::LogSystem::Instance().isLevelEnabled(loglevel, debuglevel, package)) { \
-      _B2LOGMESSAGE_VARSTREAM(loglevel, debuglevel, logVariableStream, package, function, file, line); \
     } } while(false)
 
 /** send generic log message if the log level is enabled. */

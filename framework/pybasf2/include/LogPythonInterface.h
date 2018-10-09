@@ -155,51 +155,47 @@ namespace Belle2 {
     /**
      * Produce debug message
      *
-     * @param level The debug level
-     * @param msg The debug message text
-     * @param variables dictionary of variables that should be printed together with the message
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logDebug(int level, const std::string& msg, boost::python::dict variables);
-
+    static boost::python::object logDebug(boost::python::tuple args, boost::python::dict kwargs);
     /**
      * Produce info message
      *
-     * @param msg The info message text
-     * @param variables dictionary of variables that should be printed together with the message
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logInfo(const std::string& msg, boost::python::dict variables);
+    static boost::python::object logInfo(boost::python::tuple args, boost::python::dict kwargs);
 
     /**
      * Produce result message
      *
-     * @param msg The result message text
-     * @param variables dictionary of variables that should be printed together with the message
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logResult(const std::string& msg, boost::python::dict variables);
-
+    static boost::python::object logResult(boost::python::tuple args, boost::python::dict kwargs);
     /**
      * Produce warning message
      *
-     * @param msg The warning message
-     * @param variables dictionary of variables that should be printed together with the message
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logWarning(const std::string& msg, boost::python::dict variables);
-
+    static boost::python::object logWarning(boost::python::tuple args, boost::python::dict kwargs);
     /**
      * Produce error message
      *
-     * @param msg The error message text
-     * @param variables dictionary of variables that should be printed together with the message
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logError(const std::string& msg, boost::python::dict variables);
+    static boost::python::object logError(boost::python::tuple args, boost::python::dict kwargs);
 
     /**
      * Produce fatal message
      *
-     * @param msg The fatal message text
-     * @param variables dictionary of variables that should be printed together with the message
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logFatal(const std::string& msg, boost::python::dict variables);
+    static boost::python::object logFatal(boost::python::tuple args, boost::python::dict kwargs);
 
     /** return dict with log statistics */
     boost::python::dict getLogStatistics();

@@ -33,7 +33,7 @@ from sphinx.util.nodes import nested_parse_with_titles
 from docutils.parsers.rst import directives, Directive, roles
 from docutils.statemachine import StringList
 from basf2domain import Basf2Domain
-from basf2 import fw, register_module
+from basf2 import list_available_modules, register_module
 from sphinx.domains.std import StandardDomain
 
 
@@ -88,6 +88,7 @@ class ModuleListDirective(Directive):
         "modules": directives.unchanged,
         "package": directives.unchanged,
         "no-parameters": directives.flag,
+        "noindex": directives.flag,
         "regex-filter": directives.unchanged,
         "io-plots": directives.flag,
     }
@@ -124,12 +125,12 @@ class ModuleListDirective(Directive):
             if os.path.exists(image):
                 description += [":IO diagram:", "    ", "    .. image:: /%s" % image]
 
-        content = [".. b2:module:: {module}".format(module=module.name()), "    "]
+        content = [".. b2:module:: {module}".format(module=module.name())] + self.noindex + ["    "]
         content += ["    " + e for e in description]
         return parse_with_titles(self.state, content)
 
     def run(self):
-        all_modules = fw.list_available_modules().items()
+        all_modules = list_available_modules().items()
         # check if we have a list of modules to show if so filter the list of
         # all modules
         if "modules" in self.options:
@@ -146,6 +147,9 @@ class ModuleListDirective(Directive):
         if "library" in self.options:
             lib = self.options["library"].strip()
             all_modules = [e for e in all_modules if os.path.basenam(e[1]) == lib]
+
+        # see if we have to forward noindex
+        self.noindex = ["    :noindex:"] if "noindex" in self.options else []
 
         # list of all docutil nodes we create to be returned
         all_nodes = []
@@ -170,11 +174,13 @@ class VariableListDirective(Directive):
         "variables": directives.unchanged,
         "regex-filter": directives.unchanged,
         "description-regex-filter": directives.unchanged,
+        "noindex": directives.flag,
     }
 
     def run(self):
         from ROOT import Belle2
         manager = Belle2.Variable.Manager.Instance()
+        self.noindex = ["    :noindex:"] if "noindex" in self.options else []
         all_variables = []
         explicit_list = None
         regex_filter = None
@@ -206,7 +212,7 @@ class VariableListDirective(Directive):
             # of doxygen docstring conversion we have
             env.app.emit('autodoc-process-docstring', "b2:variable", var.name, var, None, docstring)
 
-            description = [f".. b2:variable:: {var.name}", ""]
+            description = [f".. b2:variable:: {var.name}"] + self.noindex + [""]
             description += ["    " + e for e in docstring]
             if "group" not in self.options:
                 description += ["", f"    :Group: {var.group}"]

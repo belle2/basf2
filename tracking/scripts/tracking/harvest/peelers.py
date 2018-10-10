@@ -119,7 +119,7 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
         n_cdc_hits = reco_track.getNumberOfCDCHits()
         n_svd_hits = reco_track.getNumberOfSVDHits()
         n_pxd_hits = reco_track.getNumberOfPXDHits()
-        ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
+        ndf = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
 
         pxd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getPXDHitList()]
         if pxd_hits:

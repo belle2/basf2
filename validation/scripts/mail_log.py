@@ -6,6 +6,8 @@ import os
 import json
 
 import validation
+import validationpath
+from validationfunctions import available_revisions
 # martin's mail utils
 import utils
 
@@ -53,8 +55,10 @@ class Mails:
         self.validator = validation
 
         # read contents from comparison.json
-        # TODO: get those paths straight
-        with open(os.path.join("/home/davidkoch/Documents/development/html/plots/current_reference", "comparison.json")) as f:
+        work_folder = self.validator.work_folder
+        list_of_revisions = ['reference'] + available_revisions(work_folder)
+        comparison_json_file = validationpath.get_html_plots_tag_comparison_json(work_folder, list_of_revisions)
+        with open(comparison_json_file) as f:
             self.comparison_json = json.load(f)
 
         # current mail data

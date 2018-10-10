@@ -33,8 +33,7 @@ import validationcomparison
 import validationpath
 from validationplotuple import Plotuple
 import metaoptions
-from validationfunctions import strip_ext, index_from_revision, get_style, available_revisions, parse_cmd_line_arguments
-import mail_log
+from validationfunctions import strip_ext, index_from_revision, get_style, available_revisions
 
 try:
     import simplejson as json
@@ -434,28 +433,10 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
         # todo the creation date and git_hash of the original revision should be transferred here
         comparison_revs.append(json_objects.ComparisonRevision(label=r,
                                                                color=line_color))
-    # get the command line arguments
-    args = parse_cmd_line_arguments()
-
-    # if --send-mails option is set
-    if args.send_mails:
-        # if present, save old comparison to compare it to the new one when sending
-        # error emails. If the error status remained the same, no new mail is sent
-        try:
-            with open(comparison_json_file) as f:
-                comparison_old = json.load(f)
-        except FileNotFoundError:
-            comparison_old = None
 
     # todo: refactor this information extracion -> json inside a specific class / method after the
     # plots have been created
     json_objects.dump(comparison_json_file, json_objects.Comparison(comparison_revs, comparison_packages))
-
-    if args.send_mails:
-        # send mails to everyone with failed validation plots
-        print("sending mails ...")
-        mail_log.mail_log(json_objects.dump_rec(json_objects.Comparison(comparison_revs, comparison_packages)),
-                          comparison_old, work_folder)
 
 
 def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):

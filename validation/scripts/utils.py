@@ -88,7 +88,7 @@ def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="
     msg.attach(MIMEText(template.substitute(**data), "html"))
 
     if os.environ.get("bamboo_DRYRUN", False):
-        print("Send Mail: ", msg.as_bytes().decode(), file=sys.stderr)
-        open(msg["To"]+".html", "w").write(template.substitute(**data))
+        # print("Send Mail: ", msg.as_bytes().decode(), file=sys.stderr)
+        open(msg["To"] + ".html", "w").write(template.substitute(**data))
     else:
         subprocess.run(["/usr/sbin/sendmail", "-t", "-oi"], input=msg.as_bytes())

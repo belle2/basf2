@@ -21,6 +21,7 @@ import datetime
 import localcontrol
 
 import json_objects
+import mail_log
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
 import pprint
@@ -1205,6 +1206,16 @@ def execute(tag=None, isTest=None):
             validation.log.note('Plots have been created...')
         else:
             validation.log.note('Skipping plot creation (dry run)...')
+
+        # send mails
+        if cmd_arguments.send_mails:
+            mails = mail_log.Mails(validation)
+            validation.log.note('Send mails...')
+            # send mails to all users with failed scripts/comparison
+            mails.send_all_mails()
+            validation.log.note('Save mail data to {}'.format(validation.get_log_folder()))
+            # save json with data about outgoing mails
+            mails.write_log()
 
         # Log that everything is finished
         validation.log.note('Validation finished! Total runtime: {0}s'

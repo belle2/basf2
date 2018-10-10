@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Thomas Kuhr                               *
+ * Contributors: Martin Ritter, Thomas Kuhr, Thomas Hauth                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,10 +16,13 @@
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogVariableStream.h>
 
 #include <framework/core/Environment.h>
 
 #include <iostream>
+#include <string>
+#include <map>
 
 using namespace std;
 using namespace Belle2;
@@ -339,76 +342,167 @@ Parameters:
        "Expects one argument whether or not the summary should be shown")
   ;
 
-  def("B2DEBUG", &LogPythonInterface::logDebug, args("debuglevel", "message"),
-      "create a `DEBUG <basf2.LogLevel.DEBUG>` message with the given debug level");
-  def("B2INFO", &LogPythonInterface::logInfo, args("message"),
-      "create an `INFO <basf2.LogLevel.INFO>` message");
-  def("B2RESULT", &LogPythonInterface::logResult, args("message"),
-      "create an `RESULT <basf2.LogLevel.RESULT>` message");
-  def("B2WARNING", &LogPythonInterface::logWarning, args("message"),
-      "create a `WARNING <basf2.LogLevel.WARNING>` message");
-  def("B2ERROR", &LogPythonInterface::logError, args("message"),
-      "create an `ERROR <basf2.LogLevel.ERROR>` message");
-  def("B2FATAL", &LogPythonInterface::logFatal, args("message"),
-      "create a `FATAL <basf2.LogLevel.FATAL>` error message and abort processing");
+  //Add all the logging functions. To handle arbitrary keyword arguments we add
+  //them as raw functions. However it seems setting the docstring needs to be
+  //done manually in this case. So create function objects, add to namespace,
+  //set docstring ...
+
+  const std::string common_doc = R"DOCSTRING(
+All additional positional arguments are concatenated to the message and all
+keyword arguments are added to the function as log variables.)DOCSTRING";
+
+  auto logDebug = raw_function(&LogPythonInterface::logDebug);
+  def("B2DEBUG", logDebug);
+  setattr(logDebug, "__doc__", "B2DEBUG(debugLevel, message, *args, **kwargs)\n\n"
+          "Print a `DEBUG <basf2.LogLevel.DEBUG>` message. "
+          "The first argument is the debug Level" + common_doc);
+
+  auto logInfo = raw_function(&LogPythonInterface::logInfo);
+  def("B2INFO", logInfo);
+  setattr(logInfo, "__doc__", "B2INFO(message, *args, **kwargs)\n\n"
+          "Print a `INFO <basf2.LogLevel.INFO>` message" + common_doc);
+
+  auto logResult = raw_function(&LogPythonInterface::logResult);
+  def("B2RESULT", logResult);
+  setattr(logResult, "__doc__", "B2RESULT(message, *args, **kwargs)\n\n"
+          "Print a `RESULT <basf2.LogLevel.RESULT>` message" + common_doc);
+
+  auto logWarning = raw_function(&LogPythonInterface::logWarning);
+  def("B2WARNING", logWarning);
+  setattr(logWarning, "__doc__", "B2WARNING(message, *args, **kwargs)\n\n"
+          "Print a `WARNING <basf2.LogLevel.WARNING>` message" + common_doc);
+
+  auto logError = raw_function(&LogPythonInterface::logError);
+  def("B2ERROR", logError);
+  setattr(logError, "__doc__", "B2ERROR(message, *args, **kwargs)\n\n"
+          "Print a `ERROR <basf2.LogLevel.ERROR>` message" + common_doc);
+
+  auto logFatal = raw_function(&LogPythonInterface::logFatal);
+  def("B2FATAL", logFatal);
+  setattr(logFatal, "__doc__", "B2FATAL(message, *args, **kwargs)\n\n"
+          "Print a `FATAL <basf2.LogLevel.FATAL>` message. "
+          "This also exits the programm with an error" + common_doc);
 }
 
-//
-//This macro is a wrapper around the generic _B2LOGMESSAGE macro to supply most
-//of the arguments using information from the python interpreter. It is only
-//used by the log* Messages of the LogPythonInterface to show meaningful log
-//message information for messages sent from the steering file
-//
-//inspect is needed to get line numbers etc. when using B2INFO() and friends in Python
-#define PYTHON_LOG(loglevel, debuglevel, text) \
-  object inspectDict = import("inspect").attr("__dict__"); \
-  _B2LOGMESSAGE(loglevel, debuglevel, text, "steering", \
-                extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
-                extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
-                extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
+namespace {
+  /** small helper function to convert any python object to a string representation */
+  std::string pythonObjectToString(const boost::python::object& obj)
+  {
+    return boost::python::extract<std::string>(obj.attr("__str__")());
+  }
 
-#define PYTHON_LOG_IFENABLED(loglevel, debuglevel, text) \
-  object inspectDict = import("inspect").attr("__dict__"); \
-  _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, text, "steering", \
-                          extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
-                          extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
-                          extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
+  /** small helper function to convert a python dict containing arbitrary
+   * objects to a std::map<string,string> by using the `str()` operator in
+   * python.
+   */
+  auto pythonDictToMap(dict d)
+  {
+    std::map<std::string, std::string> result;
+    if (d.is_none()) return result;
+    const auto items = d.items();
+    const int size = len(d);
+    for (int i = 0; i < size; ++i) {
+      const auto key = pythonObjectToString(items[i][0]);
+      const auto val = pythonObjectToString(items[i][1]);
+      result.emplace(std::make_pair(key, val));
+    }
+    return result;
+  }
 
+  /** Dispatch a log message from a generic raw python function call:
+   * Concatenate all the positional arguments and add the keyword arguments as
+   * log stream variables. In case of debug messages the first argument is
+   * treated as the debug level.
+   */
+  boost::python::object dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, boost::python::dict kwargs)
+  {
+    int debugLevel = 0;
+    const int firstArg = logLevel == LogConfig::c_Debug ? 1 : 0;
+    const int argSize = len(args);
+    if (argSize - firstArg <= 0) {
+      PyErr_SetString(PyExc_TypeError, ("At least " + std::to_string(firstArg + 1) + " positional arguments required").c_str());
+      boost::python::throw_error_already_set();
+    }
+    if (logLevel == LogConfig::c_Debug) {
+      boost::python::extract<int> proxy(args[0]);
+      if (!proxy.check()) {
+        PyErr_SetString(PyExc_TypeError, "First argument `debugLevel` must be an integer");
+        boost::python::throw_error_already_set();
+      }
+      debugLevel = proxy;
+    }
+    if (logLevel >= LogConfig::c_Error || Belle2::LogSystem::Instance().isLevelEnabled(logLevel, debugLevel, "steering")) {
+      //Finally we know we actually will send the message: concatenate all
+      //positional arguments and convert the keyword arguments to a python dict
+      stringstream message;
+      int size = len(args);
+      for (int i = firstArg; i < size; ++i) {
+        message << pythonObjectToString(args[i]);
+      }
+      const auto cppKwArgs = pythonDictToMap(kwargs);
+      LogVariableStream lvs(message.str(), cppKwArgs);
 
-void LogPythonInterface::logDebug(int level, const std::string& msg)
+      // Now we also need to find out where the message came from: use the
+      // inspect module to get the filename/linenumbers
+      object inspect = import("inspect");
+      auto frame = inspect.attr("currentframe")();
+      const std::string function = extract<std::string>(frame.attr("f_code").attr("co_name"));
+      const std::string file = extract<std::string>(frame.attr("f_code").attr("co_filename"));
+      int line = extract<int>(frame.attr("f_lineno"));
+
+      // Everything done, send it away
+      Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(logLevel, std::move(lvs), "steering",
+                                                function, file, line, debugLevel));
+    }
+    // return None
+    return boost::python::object();
+  }
+}
+
+boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2DEBUG
-  PYTHON_LOG_IFENABLED(LogConfig::c_Debug, level, msg);
+  return dispatchMessage(LogConfig::c_Debug, args, kwargs);
+#elif
+  return boost::python::object();
 #endif
 }
 
-void LogPythonInterface::logInfo(const std::string& msg)
+boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2INFO
-  PYTHON_LOG_IFENABLED(LogConfig::c_Info, 0, msg);
+  return dispatchMessage(LogConfig::c_Info, args, kwargs);
+#elif
+  return boost::python::object();
 #endif
 }
 
-void LogPythonInterface::logResult(const std::string& msg)
+boost::python::object LogPythonInterface::logResult(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2RESULT
-  PYTHON_LOG_IFENABLED(LogConfig::c_Result, 0, msg);
+  return dispatchMessage(LogConfig::c_Result, args, kwargs);
+#elif
+  return boost::python::object();
 #endif
 }
 
-void LogPythonInterface::logWarning(const std::string& msg)
+boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2WARNING
-  PYTHON_LOG_IFENABLED(LogConfig::c_Warning, 0, msg);
+  return dispatchMessage(LogConfig::c_Warning, args, kwargs);
+#elif
+  return boost::python::object();
 #endif
 }
 
-void LogPythonInterface::logError(const std::string& msg)
+boost::python::object LogPythonInterface::logError(boost::python::tuple args, boost::python::dict kwargs)
 {
-  PYTHON_LOG(LogConfig::c_Error, 0, msg);
+  return dispatchMessage(LogConfig::c_Error, args, kwargs);
 }
 
-void LogPythonInterface::logFatal(const std::string& msg)
+boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, boost::python::dict kwargs)
 {
-  PYTHON_LOG(LogConfig::c_Fatal, 0, msg);
+  dispatchMessage(LogConfig::c_Fatal, args, kwargs);
+  std::exit(1);
+  return boost::python::object();
 }

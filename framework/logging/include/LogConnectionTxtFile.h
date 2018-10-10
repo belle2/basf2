@@ -22,7 +22,7 @@ namespace Belle2 {
    *
    * Inherits from the abstract base class LogConnectionBase.
   */
-  class LogConnectionTxtFile : public LogConnectionBase {
+  class LogConnectionTxtFile final: public LogConnectionBase {
 
   public:
 
@@ -44,14 +44,14 @@ namespace Belle2 {
      * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    virtual bool sendMessage(const LogMessage& message);
+    bool sendMessage(const LogMessage& message) override;
 
     /**
      * Returns true if the connection to the text file could be established.
      *
      * @return True if the connection to the text file could be established.
      */
-    virtual bool isConnected();
+    bool isConnected() override;
 
   protected:
 

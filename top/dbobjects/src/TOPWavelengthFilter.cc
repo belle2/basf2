@@ -18,15 +18,16 @@ using namespace std;
 
 namespace Belle2 {
 
-  float TOPWavelengthFilter::getBulkTransmission(double lambda) const
+  float TOPWavelengthFilter::getBulkTransmittance(double lambda) const
   {
-    if (m_transmissions.empty()) return 1; // old payload from DB (filter included in QE)
+    if (m_transmittances.empty()) return 1; // old payload from DB (filter included in QE)
 
     double dlam = lambda - m_lambdaFirst;
-    if (dlam < 0 or dlam >= (m_transmissions.size() - 1) * m_lambdaStep) return 0;
+    if (dlam < 0) return 0;
+    if (dlam > (m_transmittances.size() - 1) * m_lambdaStep) return m_transmittances.back();
     unsigned i = int(dlam / m_lambdaStep);
-    if (i > m_transmissions.size() - 2) return 0;
-    return m_transmissions[i] + (m_transmissions[i + 1] - m_transmissions[i]) / m_lambdaStep * (dlam - i * m_lambdaStep);
+    if (i > m_transmittances.size() - 2) return m_transmittances.back();
+    return m_transmittances[i] + (m_transmittances[i + 1] - m_transmittances[i]) / m_lambdaStep * (dlam - i * m_lambdaStep);
   }
 
 
@@ -36,7 +37,7 @@ namespace Belle2 {
 
     if (m_lambdaFirst <= 0) return false;
     if (m_lambdaStep <= 0) return false;
-    if (m_transmissions.empty()) return false;
+    if (m_transmittances.empty()) return false;
     return true;
   }
 
@@ -46,11 +47,11 @@ namespace Belle2 {
     TOPGeoBase::printUnderlined(title);
     cout << " first point: " << getLambdaFirst() << " nm";
     cout << ", step: " << getLambdaStep() << " nm" << endl;
-    cout << " bulk transmissions: [";
-    for (const auto& trE : m_transmissions) cout << setprecision(3) << trE << ", ";
+    cout << " bulk transmittances: [";
+    for (const auto& trE : m_transmittances) cout << setprecision(3) << trE << ", ";
     cout << "]" << endl;
     if (getName().empty()) {
-      cout << "(Old geometry payload, filter transmission is included in QE)" << endl;
+      cout << "(Old geometry payload, filter transmittance is included in QE)" << endl;
     }
 
   }

@@ -98,7 +98,7 @@ namespace Belle2 {
       }
       if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
-        B2INFO("TOPGeometry: using old payload (filter transmission included in QE)");
+        B2WARNING("TOPGeometry: old payload found, pixel dependent PDE will not be used");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -164,7 +164,7 @@ namespace Belle2 {
     {
       double lambda = c_hc / energy;
 
-      if (m_oldPayload) { // filter transmission is included in nominal QE, return it!
+      if (m_oldPayload) { // filter transmittance is included in nominal QE, return it!
         return getGeometry()->getNominalQE().getEfficiency(lambda);
       }
 
@@ -181,7 +181,7 @@ namespace Belle2 {
 
       double lambda = c_hc / energy;
 
-      if (m_oldPayload) { // filter transmission is included in nominal QE, return it!
+      if (m_oldPayload) { // filter transmittance is included in nominal QE, return it!
         return geo->getNominalQE().getEfficiency(lambda);
       }
 
@@ -759,7 +759,7 @@ namespace Belle2 {
         geo->setCalPulseShape(shape);
       }
 
-      // wavelength filter bulk transmission
+      // wavelength filter bulk transmittance
 
       std::string materialNode = "Materials/Material[@name='TOPWavelengthFilterIHU340']";
       GearDir filterMaterial(content, materialNode);
@@ -786,14 +786,14 @@ namespace Belle2 {
         double lambdaStep = 5; // [nm]
         int numSteps = (lambdaLast - lambdaFirst) / lambdaStep + 1;
         const double filterThickness = prism.getFilterThickness();
-        std::vector<float> bulkTransmissions;
+        std::vector<float> bulkTransmittances;
         for (int i = 0; i < numSteps; i++) {
           double wavelength = lambdaFirst + lambdaStep * i;
           double energy = c_hc / wavelength;
           double absLen = spline.Eval(energy);
-          bulkTransmissions.push_back(exp(-filterThickness / absLen));
+          bulkTransmittances.push_back(exp(-filterThickness / absLen));
         }
-        TOPWavelengthFilter filter(lambdaFirst, lambdaStep, bulkTransmissions);
+        TOPWavelengthFilter filter(lambdaFirst, lambdaStep, bulkTransmittances);
         geo->setWavelengthFilter(filter);
       } else {
         B2FATAL("TOPGeometry: " << materialNode

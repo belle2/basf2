@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QE descr="nominal quantum efficiency of NaKSbCs photocathode">
   <!-- average of Nagoya measurements, for the procedure see top/analysis/averageQE.py -->
-  <ColEffi descr="average over all PMTs">0.5677</ColEffi>
+  <ColEffi descr="average over all PMTs for 1.5 T">0.5677</ColEffi>
   <LambdaFirst unit="nm">280.0</LambdaFirst>
   <LambdaStep unit="nm">20.0</LambdaStep>
   <Qeffi>0.211</Qeffi>

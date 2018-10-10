@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /**
-   * Bulk transmission of wavelength filter
+   * Bulk transmittance of wavelength filter
    */
   class TOPWavelengthFilter : public TOPGeoBase {
   public:
@@ -32,27 +32,27 @@ namespace Belle2 {
      * Full constructor
      * @param lambdaFirst wavelength of the first data point [nm]
      * @param lambdaStep wavelength step [nm]
-     * @param trEffi bulk transmission data points
+     * @param trEffi bulk transmittance data points
      * @param name object name
      */
     TOPWavelengthFilter(float lambdaFirst, float lambdaStep,
                         const std::vector<float>& trEffi,
                         const std::string& name = "TOPWavelengthFilter"): TOPGeoBase(name),
-      m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_transmissions(trEffi)
+      m_lambdaFirst(lambdaFirst), m_lambdaStep(lambdaStep), m_transmittances(trEffi)
     {}
 
     /**
-     * Returns bulk transmission data points
-     * @return bulk transmission data points
+     * Returns bulk transmittance data points
+     * @return bulk transmittance data points
      */
-    const std::vector<float>& getBulkTransmissions() const {return m_transmissions;}
+    const std::vector<float>& getBulkTransmittances() const {return m_transmittances;}
 
     /**
-     * Returns bulk transmission at given wavelength using linear interpolation
+     * Returns bulk transmittance at given wavelength using linear interpolation
      * @param lambda photon wavelength in [nm]
-     * @return bulk transmission
+     * @return bulk transmittance
      */
-    float getBulkTransmission(double lambda) const;
+    float getBulkTransmittance(double lambda) const;
 
     /**
      * Returns wavelength of the first data point
@@ -76,14 +76,14 @@ namespace Belle2 {
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Wavelength filter bulk transmission") const;
+    void print(const std::string& title = "Wavelength filter bulk transmittance") const;
 
 
   private:
 
     float m_lambdaFirst = 0; /**< wavelength of the first data point [nm] */
     float m_lambdaStep = 0;  /**< wavelength step [nm] */
-    std::vector<float> m_transmissions; /**< bulk transmission data points */
+    std::vector<float> m_transmittances; /**< bulk transmittance data points */
 
     ClassDef(TOPWavelengthFilter, 1); /**< ClassDef */
 

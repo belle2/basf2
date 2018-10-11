@@ -12,7 +12,7 @@
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionFilter.h>
-#include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
@@ -175,7 +175,7 @@ void LogSystem::resetLogging()
 
   resetMessageCounter();
   resetLogConnections();
-  addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+  addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 
   m_errorLog.clear();
   m_errorLog.reserve(100);

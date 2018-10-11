@@ -153,6 +153,16 @@ namespace Belle2 {
     void enableErrorSummary(bool on);
 
     /**
+     * Set flag if logging should be done via python `sys.stdout`
+     */
+    void setPythonLoggingEnabled(bool enabled) const;
+
+    /**
+     * Get flag if logging should be done via python `sys.stdout`
+     */
+    bool getPythonLoggingEnabled() const;
+
+    /**
      * Produce debug message
      *
      * @param level The debug level
@@ -194,7 +204,6 @@ namespace Belle2 {
      * @param msg The fatal message text
      */
     static void logFatal(const std::string& msg);
-
 
     /** return dict with log statistics */
     boost::python::dict getLogStatistics();

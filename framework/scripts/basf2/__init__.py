@@ -60,3 +60,12 @@ fw = ScopeDeprecationWarning("The Framework object `fw` is deprecated and will b
                              "   Please use the same functionality directly from the basf2 module.\n"
                              "   So instead of `basf2.fw.{key}` just use `basf2.{key}`",
                              _sys.modules[__name__])
+
+# check for jupyter notebook
+_is_ipython = hasattr(__builtins__, '__IPYTHON__') or 'IPython' in _sys.modules
+if _is_ipython:
+    from IPython import get_ipython as _get_ipython
+    _ip = _get_ipython()
+    if hasattr(_ip, "kernel"):
+        # we're in a notebook, reset log system to print to python sys.stdout
+        logging.enable_python_logging = True

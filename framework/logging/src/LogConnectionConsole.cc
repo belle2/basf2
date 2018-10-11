@@ -8,38 +8,40 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogMessage.h>
+#include <boost/python.hpp>
 #include <sstream>
 #include <cstring> // strerror()
 #include <unistd.h> // isatty(), dup()
 #include <cstdlib> // getenv()
 
 using namespace Belle2;
-using namespace std;
 
-LogConnectionFileDescriptor::LogConnectionFileDescriptor(int outputFD, bool color):
+bool LogConnectionConsole::s_pythonLoggingEnabled{false};
+
+LogConnectionConsole::LogConnectionConsole(int outputFD, bool color):
   m_fd(dup(outputFD)), m_color(color)
 {
   // check fd
   if (m_fd < 0) throw std::runtime_error(std::string("Error duplicating file descriptor: ") + std::strerror(errno));
 }
 
-LogConnectionFileDescriptor::~LogConnectionFileDescriptor()
+LogConnectionConsole::~LogConnectionConsole()
 {
-  if (isConnected()) close(m_fd);
+  if (m_fd > 0) close(m_fd);
 }
 
-bool LogConnectionFileDescriptor::isConnected()
+bool LogConnectionConsole::isConnected()
 {
-  return m_fd >= 0;
+  return s_pythonLoggingEnabled || m_fd >= 0;
 }
 
-bool LogConnectionFileDescriptor::terminalSupportsColors(int fileDescriptor)
+bool LogConnectionConsole::terminalSupportsColors(int fileDescriptor)
 {
   //enable color for TTYs with color support (list taken from gtest)
   const bool isTTY = isatty(fileDescriptor);
-  const string termName = getenv("TERM") ? getenv("TERM") : "";
+  const std::string termName = getenv("TERM") ? getenv("TERM") : "";
   const bool useColor = isTTY and
                         (termName == "xterm" or termName == "xterm-color" or termName == "xterm-256color" or
                          termName == "sceen" or termName == "screen-256color" or termName == "tmux" or
@@ -48,9 +50,11 @@ bool LogConnectionFileDescriptor::terminalSupportsColors(int fileDescriptor)
   return useColor;
 }
 
-bool LogConnectionFileDescriptor::sendMessage(const LogMessage& message)
+bool LogConnectionConsole::sendMessage(const LogMessage& message)
 {
   if (!isConnected()) return false;
+  // format message
+  std::stringstream stream;
   if (m_color) {
     const std::string color_str[] = {
       "\x1b[32m",        // Debug  : green
@@ -61,17 +65,19 @@ bool LogConnectionFileDescriptor::sendMessage(const LogMessage& message)
       "\x1b[07m\x1b[31m" // Fatal  : red reversed
     };
     const std::string& c{color_str[message.getLogLevel()]};
-    write(m_fd, c.data(), c.size());
+    stream << c;
   }
-  // format message
-  std::stringstream stream;
   stream << message;
-  const std::string out = stream.str();
-  // and write to given file descriptor
-  write(m_fd, out.data(), out.size());
   if (m_color) {
-    const std::string c = "\x1b[m";
-    write(m_fd, c.data(), c.size());
+    stream << "\x1b[m";
+  }
+  const std::string out = stream.str();
+  if (s_pythonLoggingEnabled) {
+    auto pyout = boost::python::import("sys").attr("stdout");
+    pyout.attr("write")(out);
+    pyout.attr("flush")();
+  } else {
+    write(m_fd, out.data(), out.size());
   }
   return true;
 }

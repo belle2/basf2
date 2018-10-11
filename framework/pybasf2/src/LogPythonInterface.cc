@@ -15,7 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
-#include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogConnectionConsole.h>
 
 #include <framework/core/Environment.h>
 
@@ -86,12 +86,12 @@ void LogPythonInterface::addLogFile(const std::string& filename, bool append)
 
 void LogPythonInterface::addLogConsole()
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 }
 
 void LogPythonInterface::addLogConsole(bool color)
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO, color)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO, color)));
 }
 
 void LogPythonInterface::reset()
@@ -107,6 +107,16 @@ void LogPythonInterface::zeroCounters()
 void LogPythonInterface::enableErrorSummary(bool on)
 {
   LogSystem::Instance().enableErrorSummary(on);
+}
+
+void LogPythonInterface::setPythonLoggingEnabled(bool enabled) const
+{
+  LogConnectionConsole::setPythonLoggingEnabled(enabled);
+}
+
+bool LogPythonInterface::getPythonLoggingEnabled() const
+{
+  return LogConnectionConsole::getPythonLoggingEnabled();
 }
 
 /** Return dict containing message counters */
@@ -136,7 +146,7 @@ namespace {
 
   bool terminalSupportsColors()
   {
-    return LogConnectionFileDescriptor::terminalSupportsColors(STDOUT_FILENO);
+    return LogConnectionConsole::terminalSupportsColors(STDOUT_FILENO);
   }
 }
 
@@ -337,6 +347,13 @@ Parameters:
   .def("enable_summary", &LogPythonInterface::enableErrorSummary, args("on"),
        "Enable or disable the error summary printed at the end of processing. "
        "Expects one argument whether or not the summary should be shown")
+  .add_property("enable_python_logging",  &LogPythonInterface::getPythonLoggingEnabled,
+                &LogPythonInterface::setPythonLoggingEnabled, R"DOCSTRING(
+Enable or disable logging via python. If this is set to true than log messages
+will be sent via `sys.stdout`. This is probably slightly slower but is useful
+when running in jupyter notebooks or when trying to redirect stdout in python
+to a buffer. This setting affects all log connections to the
+console.)DOCSTRING")
   ;
 
   def("B2DEBUG", &LogPythonInterface::logDebug, args("debuglevel", "message"),

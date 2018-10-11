@@ -119,14 +119,13 @@ class ReadOrGenerateEventsRun(MinimalRun):
 
         # Gearbox & Geometry must always be registered
         path.add_module("Gearbox")
-        path.add_module("Geometry")
+        path.add_module("Geometry", useDB=True)
         if self.detector_setup:
             detector_setup = self.detector_setup
             detector_setup_function = detector_setups_by_short_name[detector_setup]
             components = detector_setup_function(path)
 
         if self.components:
-            adjustments.adjust_module(path, "Geometry", components=self.components)
             components = self.components
 
         # Only generate events if no input file has been provided

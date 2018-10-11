@@ -3,7 +3,6 @@ from ROOT import Belle2
 import ROOT
 from tracking import add_cdc_cr_track_finding
 from tracking import add_cdc_track_finding
-from time_extraction_helper_modules import *
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
@@ -216,11 +215,11 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
 
     if eventTimingExtraction is True:
         # Extract the time
-        path.add_module("FullGridTrackTimeExtraction",
+        path.add_module("FullGridChi2TrackTimeExtractor",
                         RecoTracksStoreArrayName="RecoTracks",
-                        maximalT0Shift=40,
-                        minimalT0Shift=-40,
-                        numberOfGrids=6
+                        GridMaximalT0Value=40,
+                        GridMinimalT0Value=-40,
+                        GridGridSteps=6
                         )
 
         # Track fitting
@@ -270,11 +269,11 @@ def add_cdc_reconstruction(path, eventTimingExtraction=True,
 
     if eventTimingExtraction is True:
         # Extract the time
-        path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName="RecoTracks",
-                        maximalT0Shift=40,
-                        minimalT0Shift=-40,
-                        numberOfGrids=6
+        path.add_module("FullGridChi2TrackTimeExtractor",
+                        RecoTracksStoreArrayName="RecoTracks",
+                        GridMaximalT0Value=40,
+                        GridMinimalT0Value=-40,
+                        GridGridSteps=6
                         )
 
         # Track fitting

@@ -179,6 +179,22 @@ void SVDPerformanceModule::initialize()
         TitleOfHisto = "cluster time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_cltrkTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", m_histoList_clTRK[i]);
 
+        NameOfHisto = "clTRK_timeTB1_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time - TB = 1 (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkTime_TB1[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", m_histoList_clTRK[i]);
+
+        NameOfHisto = "clTRK_timeTB2_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time - TB = 2 (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkTime_TB2[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", m_histoList_clTRK[i]);
+
+        NameOfHisto = "clTRK_timeTB3_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time - TB = 3 (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkTime_TB3[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", m_histoList_clTRK[i]);
+
+        NameOfHisto = "clTRK_timeTB4_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time - TB = 4 (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkTime_TB4[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", m_histoList_clTRK[i]);
+
         if (m_isSimulation) {
           NameOfHisto = "clTRK_timeVStrueTime_L" + nameLayer + "S" + nameSensor + "" + nameSide;
           TitleOfHisto = "cluster time VS true hit time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
@@ -257,7 +273,8 @@ void SVDPerformanceModule::initialize()
 
         if (k == 1) {
           NameOfHisto = "clNOtrk_energyVScoorU_L" + nameLayer + "S" + nameSensor + "" + nameSide;
-          TitleOfHisto = "cluster Energy vs coor U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
+          TitleOfHisto = "cluster Energy vs coor U, TB=3,4,5 NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide
+                         +
                          " side)";
           h_clEnergyVSCoorU[i][j][1] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 200, -3, 3, "coor U (cm)",
                                                          m_histoList_cluster[i]);
@@ -286,7 +303,8 @@ void SVDPerformanceModule::initialize()
 
         } else {
           NameOfHisto = "clNOtrk_energyVScoorV_L" + nameLayer + "S" + nameSensor + "" + nameSide;
-          TitleOfHisto = "cluster Energy vs coor V, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
+          TitleOfHisto = "cluster Energy vs coor V, TB=3,4,5 NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide
+                         +
                          " side)";
           h_clEnergyVSCoorV[i][j][0] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 200, -6.5, 6.5,
                                                          "coor V (cm)", m_histoList_cluster[i]);
@@ -346,6 +364,11 @@ void SVDPerformanceModule::initialize()
         }
 
       }
+      NameOfHisto = "clNOtrk_nUVSnV_L" + nameLayer + "S" + nameSensor;
+      TitleOfHisto = "Number of U clusters VS number of V cluster, TB=3,4,5 (L" + nameLayer + ", sensor" + nameSensor + ")";
+      h_clNuVSNv[i][j] = createHistogram2D(NameOfHisto, TitleOfHisto, 50, 0, 50, "# V cluster", 50, 0, 50, "# U clusters",
+                                           m_histoList_cluster[i]);
+
       NameOfHisto = "clNOtrk_coorUVScoorV_L" + nameLayer + "S" + nameSensor;
       TitleOfHisto = "cluster coor U VS cluster coor V, TB=3,4,5 (L" + nameLayer + ", sensor" + nameSensor + ")";
       h_clCoorUVSCoorV[i][j] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -6.5, 6.5, "coor V", 200, -3, 3, "coor U",
@@ -418,6 +441,7 @@ void SVDPerformanceModule::event()
 
   // SVD clusters
   int nCl[m_nLayers][m_nSensors][m_nSides];
+  int nCl345[m_nLayers][m_nSensors][m_nSides];
   int nCltrk[m_nLayers][m_nSensors][m_nSides];
 
   for (int i = 0; i < m_nLayers; i ++) //loop on Layers
@@ -426,6 +450,7 @@ void SVDPerformanceModule::event()
         nShaperDigi[i][j][k] = 0;
         nRecoDigi[i][j][k] = 0;
         nCl[i][j][k] = 0;
+        nCl345[i][j][k] = 0;
         nCltrk[i][j][k] = 0;
       }
 
@@ -474,6 +499,13 @@ void SVDPerformanceModule::event()
       h_cltrkSize[layer][sensor][side]->Fill(clSize);
       h_cltrkSN[layer][sensor][side]->Fill(clSN);
       h_cltrkTime[layer][sensor][side]->Fill(clTime);
+
+      RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svdClustersTrack[cl]);
+      SVDModeByte::baseType tb = (theRecoDigits[0]->getModeByte()).getTriggerBin();
+      if ((int) tb == 0) h_cltrkTime_TB1[layer][sensor][side]->Fill(clTime);
+      if ((int) tb == 1) h_cltrkTime_TB2[layer][sensor][side]->Fill(clTime);
+      if ((int) tb == 2) h_cltrkTime_TB3[layer][sensor][side]->Fill(clTime);
+      if ((int) tb == 3) h_cltrkTime_TB4[layer][sensor][side]->Fill(clTime);
 
       h_cltrkChargeVSSize[layer][sensor][side]->Fill(clCharge, clSize);
       h_cltrkSNVSSize[layer][sensor][side]->Fill(clSN, clSize);
@@ -717,10 +749,6 @@ void SVDPerformanceModule::event()
 
     nCl[layer][sensor][side]++;
 
-    if (m_svdClusters[cl]->isUCluster())
-      h_clEnergyVSCoorU[layer][sensor][side]->Fill(clEnergy, clCoor);
-    else
-      h_clEnergyVSCoorV[layer][sensor][side]->Fill(clEnergy, clCoor);
 
     h_clCharge[layer][sensor][side]->Fill(clCharge);
     h_clEnergy[layer][sensor][side]->Fill(clEnergy);
@@ -730,8 +758,14 @@ void SVDPerformanceModule::event()
       h_clEnergyVSSize_mb12[layer][sensor][side]->Fill(clEnergy, clSize);
     else if (seed_maxbin == 5)
       h_clEnergyVSSize_mb6[layer][sensor][side]->Fill(clEnergy, clSize);
-    else
+    else {
       h_clEnergyVSSize_mb345[layer][sensor][side]->Fill(clEnergy, clSize);
+      nCl345[layer][sensor][side]++;
+      if (m_svdClusters[cl]->isUCluster())
+        h_clEnergyVSCoorU[layer][sensor][side]->Fill(clEnergy, clCoor);
+      else
+        h_clEnergyVSCoorV[layer][sensor][side]->Fill(clEnergy, clCoor);
+    }
     h_clSize[layer][sensor][side]->Fill(clSize);
     h_clSN[layer][sensor][side]->Fill(clSN);
     h_clTime[layer][sensor][side]->Fill(clTime);
@@ -754,6 +788,7 @@ void SVDPerformanceModule::event()
         h_nShaper[i][j][k]->Fill(nShaperDigi[i][j][k]);
         h_nReco[i][j][k]->Fill(nRecoDigi[i][j][k]);
         h_nCl[i][j][k]->Fill(nCl[i][j][k]);
+        h_clNuVSNv[i][j]->Fill(nCl345[i][j][0], nCl345[i][j][1]);
         h_nCltrk[i][j][k]->Fill(nCltrk[i][j][k]);
       }
 }

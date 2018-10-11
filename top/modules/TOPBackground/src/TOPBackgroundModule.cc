@@ -199,6 +199,7 @@ namespace Belle2 {
       peflux->AddBinContent(barID * 2, 1. / m_TimeOfSimulation / 32.0);
 
       const TOPSimHit* simHit = DataStore::getRelated<TOPSimHit>(aDigit);
+      if (!simHit) continue;
       int PMTID = simHit->getPmtID();
 
       module_occupancy->SetPoint(count_occ, PMTID , barID);

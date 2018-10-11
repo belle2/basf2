@@ -27,18 +27,9 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <ecl/chargedPID/ECLAbsPdf.h>
-#include <ecl/chargedPID/ECLElectronPdf.h>
-#include <ecl/chargedPID/ECLMuonPdf.h>
-#include <ecl/chargedPID/ECLPionPdf.h>
-#include <ecl/chargedPID/ECLKaonPdf.h>
-#include <ecl/chargedPID/ECLProtonPdf.h>
+#include <ecl/dbobjects/ECLChargedPidPDFs.h>
 
 namespace Belle2 {
-
-  namespace ECL {
-    class ECLAbsPdf;
-  }
 
   /** The module implements a first version of charged particle identification
       using E/p as discriminating variable.
@@ -46,6 +37,7 @@ namespace Belle2 {
       hypothesis are calculated and stored in an ECLPidLikelihood object.
    */
   class ECLChargedPIDModule : public Module {
+
   public:
 
     /** Constructor, for setting module description and parameters.
@@ -55,6 +47,10 @@ namespace Belle2 {
     /** Use to clean up anything you created in the constructor.
      */
     virtual ~ECLChargedPIDModule();
+
+    /** Check the PDFs for consistency everytime they change in the database.
+     */
+    void checkDB();
 
     /** Use this to initialize resources or memory your module needs.
      *
@@ -95,19 +91,18 @@ namespace Belle2 {
      */
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods;
 
-    /** Array of ECLAbsPdfs
-    PDFs are stored for both +/- charge hypotheses, hence the double array structure.
+    /** Interface to get the DB payload for ECL charged PID PDFs.
      */
-    Belle2::ECL::ECLAbsPdf* m_pdf[2][Const::ChargedStable::c_SetSize];
+    DBObjPtr<ECLChargedPidPDFs> m_pdfs;
 
-    /** Max value of Log Likelihood for a particle hypothesis.
+    /** Minimum value of Log Likelihood for a particle hypothesis.
     Used when the pdf value is not positive or subnormal.
     */
     static constexpr double m_minLogLike = -700;
 
-    /** Use PDF hypotheses for particles regardless of the sign of charge.
+    /** Apply cluster timing selection.
      */
-    bool m_useUnsignedParticleHypo;
+    bool m_applyClusterTimingSel;
 
   };
 

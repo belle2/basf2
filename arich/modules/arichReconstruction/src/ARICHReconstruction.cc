@@ -102,6 +102,12 @@ namespace Belle2 {
     diff = diff.Rotate(-phi);
     const double size = m_arichgp->getHAPDGeometry().getAPDSizeX();
     if (fabs(diff.X()) < size / 2. && fabs(diff.Y()) < size / 2.) {
+      int chX, chY;
+      m_arichgp->getHAPDGeometry().getXYChannel(diff.X(), diff.Y(), chX, chY);
+      if (chX < 0 || chY < 0) return 0;
+      int asicChannel = m_chnMap->getAsicFromXY(chX, chY);
+      // eliminate un-active channels
+      if (asicChannel < 0 || !m_chnMask->isActive(copyno, asicChannel)) return 0;
       return 1;
     }
     return 0;

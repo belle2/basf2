@@ -1,0 +1,28 @@
+# Descriptor:  B0 -> D- pi+
+# NickName: Bd_Dpi
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Racha Cheaib
+# Email: rcheaib@olemiss.edu
+# Cuts: None
+
+
+Alias myD+ D+
+Alias myD- D-
+ChargeConj myD- myD+
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+
+Decay B0
+1.00 myD- pi+                    PHSP;
+Enddecay
+CDecay anti-B0
+
+Decay myD-
+1.00 K- pi+ pi-    PHSP;
+Enddecay
+CDecay myD+
+
+End

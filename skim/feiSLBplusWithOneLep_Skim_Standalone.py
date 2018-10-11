@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-######################################################
-#
-# This script demonstrates how to reconstruct  semileptonic Btag using
-# generically trained FEI with Bsig to at least one lepton.
-#
-# Racha Cheaib (2017)
-#####################################################
+__author__ = "R. Cheaib & S. Hollitt"
+
 import sys
 import glob
 import os.path
@@ -20,8 +15,6 @@ from stdCharged import *
 from skimExpertFunctions import *
 
 gb2_setuprel = 'release-02-00-00'
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
-
 skimCode = encodeSkimName('feiSLBplusWithOneLep')
 
 
@@ -33,26 +26,30 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
-applyEventCuts('R2EventLevel<0.4 and nTracks>4')
+applyEventCuts('R2EventLevel<0.4 and nTracks>=4')
 
+# Run FEI
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
 import fei
-particles = fei.get_MC9_channels(chargedB=True, neutralB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
+particles = fei.get_default_channels(chargedB=True, neutralB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
 # now the FEI reconstruction is done
 # and we're back in analysis_main pathB
 
+# SL Bplus skim
 from feiSLBplusWithOneLep_List import *
 BtagList = BplusSLWithOneLep()
 
 skimOutputUdst(skimCode, BtagList)
 summaryOfLists(BtagList)
 
+# Suppress noisy modules, and then process
 setSkimLogging()
 process(analysis_main)
 

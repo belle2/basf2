@@ -457,6 +457,57 @@ namespace Belle2 {
   }
 
 
+  void TOPDatabaseImporter::importChannelMask(std::string fileName,
+                                              int expNo, int firstRun, int lastRun)
+  {
+    // declare db object to be imported -- and construct it
+    DBImportObjPtr<TOPCalChannelMask> channelMask;
+    channelMask.construct();
+
+    // open the root file
+    TFile* file = new TFile(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // loop over slots and set channel mask
+    int nModules = TOPGeometryPar::Instance()->getGeometry()->getNumModules();
+    int active = 0, dead = 0, noisy = 0;
+    for (int moduleID = 1; moduleID <= nModules; moduleID++) {
+      std::string name = "slot_" + std::to_string(moduleID);
+      auto* h = (TH1F*) file->Get(name.c_str());
+      if (!h) {
+        B2ERROR("Histogram with name '" + name + "' not found");
+        continue;
+      }
+      for (int channel = 0; channel < h->GetNbinsX(); channel++) {
+        int value = h->GetBinContent(channel + 1);
+        if (value == 0) {
+          channelMask->setActive(moduleID, channel);
+          active++;
+        } else if (value == 1) {
+          channelMask->setDead(moduleID, channel);
+          dead++;
+        } else {
+          channelMask->setNoisy(moduleID, channel);
+          noisy++;
+        }
+      }
+    }
+
+    // import to database
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    channelMask.import(iov);
+
+    B2INFO("Channel mask for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Active channels: " << active << ", dead: " << dead
+           << ", noisy: " << noisy);
+
+  }
+
+
   void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fractionHot, int firstExp = 0, int firstRun = 0,
                                                     int lastExp = -1, int lastRun = -1)
   {
@@ -795,16 +846,18 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto", int firstExp = 0, int firstRun = 0,
+  void TOPDatabaseImporter::importPmtTTSHisto(string fileName,
+                                              string treeName = "ttsPmtHisto",
+                                              int firstExp = 0, int firstRun = 0,
                                               int lastExp = -1, int lastRun = -1)
   {
 
-    // define data array
-    TClonesArray pmtTtsHistos("Belle2::TOPPmtTTSHisto");
+    // declare db objects to be imported
+    DBImportArray<TOPPmtTTSHisto> pmtTtsHistos;
 
     static const int nChann = 16;
     std::string* serialNum = 0;
-    float hv(-9.);
+    float hv = 0;
     TH1F* histo[nChann] = {0};
 
     // open root file and get tree
@@ -819,7 +872,6 @@ namespace Belle2 {
       tTtsHisto->SetBranchAddress(hString, &histo[ic]);
     }
 
-
     // loop on input tree entries and construct the pmt tts histo objects
     int countHists = 0;
 
@@ -832,11 +884,7 @@ namespace Belle2 {
 
       B2INFO("Saving TTS histograms for PMT " << *serialNum << ", HV = " << hv);
 
-      new(pmtTtsHistos[ient]) TOPPmtTTSHisto();
-      auto* pmtTtsHisto = static_cast<TOPPmtTTSHisto*>(pmtTtsHistos[ient]);
-
-      pmtTtsHisto->setSerialNumber(*serialNum);
-      pmtTtsHisto->setHV(hv);
+      auto* pmtTtsHisto = pmtTtsHistos.appendNew(*serialNum, hv);
       for (int ic = 0; ic < nChann; ic++) {
         pmtTtsHisto->setHistogram(ic + 1, histo[ic]);
       }
@@ -844,7 +892,7 @@ namespace Belle2 {
     }
 
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
-    Database::Instance().storeData("TOPPmtTTSHistos", &pmtTtsHistos, iov);
+    pmtTtsHistos.import(iov);
 
     B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
 
@@ -934,9 +982,6 @@ namespace Belle2 {
 
     // this is just an example on how to retrieve TTS histograms
     DBArray<TOPPmtTTSHisto> elements("TOPPmtTTSHistos");
-    elements.getEntries();
-
-    static const int nChann = 16;
 
     TFile file(outFileName.c_str(), "recreate");
 
@@ -944,10 +989,9 @@ namespace Belle2 {
     for (const auto& element : elements) {
 
       B2INFO("serialNum = " << element.getSerialNumber() << ", HV = " << element.getHV());
-      TH1F* ttsHisto[nChann];
-      for (int ic = 0; ic < nChann; ic++) {
-        ttsHisto[ic] = element.getTTSHisto(ic + 1);
-        ttsHisto[ic]->Write();
+      for (int ic = 0; ic < element.getNumOfPixels(); ic++) {
+        const auto* ttsHisto = element.getHistogram(ic + 1);
+        if (ttsHisto) ttsHisto->Write();
       }
     }
 

@@ -54,16 +54,10 @@ def create_test_path(runtype="collision", location="hlt", expNum=0):
     if runtype == "collision":
         generators.add_continuum_generator(path, finalstate="uubar")
     elif runtype == "cosmics":
-        # add gearbox and geometry here, otherwise the Gearbox will be added with some custom xml geometry
-        global_box_size = [100, 100, 100]
-        override = [("/Global/length", str(global_box_size[0]), "m"),
-                    ("/Global/width", str(global_box_size[1]), "m"),
-                    ("/Global/height", str(global_box_size[2]), "m")]
-
-        path.add_module('Gearbox', override=override)
-        path.add_module("Geometry")
-
-        generators.add_cosmics_generator(path)
+        # add something which looks a tiny bit like a cosmic generator. We
+        # cannot use the normal cosmic generator as that needs a bigger
+        # simulation top volume than the default geometry from the database.
+        path.add_module("ParticleGun", pdgCodes=[-13, 13], momentumParams=[10, 200])
 
     add_simulation(path, usePXDDataReduction=False)
 

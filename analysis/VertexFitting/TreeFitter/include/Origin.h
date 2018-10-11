@@ -39,10 +39,10 @@ namespace TreeFitter {
     virtual ~Origin() {};
 
     /** init particle, used if it has a mother */
-    virtual  ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual  ErrCode initParticleWithMother(FitParams& fitparams);
 
     /** init particle, used if it has no mother */
-    virtual  ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual  ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** init the origin "particle"  */
     ErrCode initOrigin();
@@ -51,7 +51,7 @@ namespace TreeFitter {
     virtual int dim() const { return m_constraintDimension; }
 
     /** init covariance matrix of the constraint  */
-    virtual ErrCode initCovariance(FitParams* fitpar) const;
+    virtual ErrCode initCovariance(FitParams& fitpar) const;
 
     /* particle type */
     virtual int type() const { return kOrigin; }

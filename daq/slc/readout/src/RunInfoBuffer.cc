@@ -7,7 +7,7 @@
 
 using namespace Belle2;
 
-size_t RunInfoBuffer::size() throw()
+size_t RunInfoBuffer::size()
 {
   return m_mutex.size() + m_cond.size() +
          sizeof(ronode_info);
@@ -69,31 +69,31 @@ bool RunInfoBuffer::unlink()
   return true;
 }
 
-bool RunInfoBuffer::lock() throw()
+bool RunInfoBuffer::lock()
 {
   if (m_info == NULL) return false;
   return m_mutex.lock();
 }
 
-bool RunInfoBuffer::unlock() throw()
+bool RunInfoBuffer::unlock()
 {
   if (m_info == NULL) return false;
   return m_mutex.unlock();
 }
 
-bool RunInfoBuffer::wait() throw()
+bool RunInfoBuffer::wait()
 {
   if (m_info == NULL) return false;
   return m_cond.wait(m_mutex);
 }
 
-bool RunInfoBuffer::wait(int time) throw()
+bool RunInfoBuffer::wait(int time)
 {
   if (m_info == NULL) return false;
   return m_cond.wait(m_mutex, time, 0);
 }
 
-bool RunInfoBuffer::notify() throw()
+bool RunInfoBuffer::notify()
 {
   if (m_info == NULL) return false;
   return m_cond.broadcast();

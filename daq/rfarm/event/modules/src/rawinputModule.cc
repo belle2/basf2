@@ -119,13 +119,15 @@ void RawInputModule::registerRawCOPPERs()
 
   B2INFO("RawInput: got an event from a file, size=" << recsize <<
          " (proc= " << (int)getpid() << ")");
+  //  printf ( "%8.8x %8.8x %8.8x %8.8x ", *evtbuf, *(evtbuf+1), *(evtbuf+2), *(evtbuf+3) );
+  //  printf ( "%8.8x %8.8x %8.8x %8.8x\n", *(evtbuf+4), *(evtbuf+5), *(evtbuf+6), *(evtbuf+7) );
 
   // Unpack SendHeader
   SendHeader sndhdr;
   sndhdr.SetBuffer((int*)evtbuf);
   int npackedevts = sndhdr.GetNumEventsinPacket();
   if (npackedevts != 1) {
-    B2FATAL("Raw2DsModule::number of events in packet is not 1");
+    B2FATAL("Raw2DsModule::number of events in packet is not 1 " << npackedevts);
   }
   int ncprs = sndhdr.GetNumNodesinPacket();
   int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;

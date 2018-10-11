@@ -49,7 +49,7 @@ from modularAnalysis import buildRestOfEvent
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from stdCharged import *
-from stdFSParticles import stdPi0s
+from stdPi0s import stdPi0s
 
 # load data
 inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx1.root')

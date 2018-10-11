@@ -7,8 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  *                                                                        *
- * Read payloads ECLRefAmpl and ECLRefTime and use them to derive         *
- * payloads ECLCrystalElectronics or ECLCrystalElectronicsTime            *
+ * Standard usage is to read payloads ECLRefAmpl, ECLRefAmplNom,          *
+ * ECLRefTime and ECLRefTimeNom and use them to derive payloads           *
+ * ECLCrystalElectronics or ECLCrystalElectronicsTime                     *
+ *                                                                        *
+ * Alternatively, find new payloads ECLRefAmplNom or ECLRefTimeNom  to    *
+ * keep ECLCrystalElectronics or ECLCrystalElectronicsTime constant       *
  *                                                                        *
  * Also performs a comparison of new and existing calibration values and  *
  * writes these to a root file.                                           *
@@ -19,7 +23,9 @@
  *                                                                        *
  * Usage:                                                                 *
  * eclElectronicsPayloads payloadName exp run [writeToDB]                 *
- * where payloadName = ECLCrystalElectronics or ECLCrystalElectronicsName *
+ * where payloadName = ECLCrystalElectronics, ECLCrystalElectronicsName,  *
+ * ECLRefAmplNom, or ECLRefTimeNom                                        *
+ *                                                                        *
  * exp and run specify the start of the iov, and are used to read         *
  * the reference amplitudes and times                                     *
  * Option argument writeToDB = 0 to not write output to database          *
@@ -71,13 +77,10 @@ int main(int argc, char** argv)
     return -1;
   }
   std::string payloadName = argv[1];
-  bool findAmpl = false;
-  if (payloadName == "ECLCrystalElectronics") {
-    findAmpl = true;
-  } else if (payloadName == "ECLCrystalElectronicsTime") {
-    findAmpl = false;
-  } else {
-    std::cout << "First argument must be ECLCrystalElectronics or ECLCrystalElectronicsTime" << std::endl;
+  if (payloadName != "ECLCrystalElectronics" and payloadName != "ECLCrystalElectronicsTime" and payloadName != "ECLRefAmplNom"
+      and payloadName != "ECLRefTimeNom") {
+    std::cout << "First argument must be ECLCrystalElectronics, ECLCrystalElectronicsTime, ECLRefAmplNom, or ECLRefTimeNom" <<
+              std::endl;
     return -1;
   }
   int experiment = std::stoi(argv[2]);
@@ -109,47 +112,64 @@ int main(int argc, char** argv)
   //..Read input and existing output payloads from database
   DBObjPtr<Belle2::ECLCrystalCalib> existingObject(payloadName);
   DBObjPtr<Belle2::ECLCrystalCalib> InputAmpl("ECLRefAmpl");
+  DBObjPtr<Belle2::ECLCrystalCalib> InputAmplNom("ECLRefAmplNom");
   DBObjPtr<Belle2::ECLCrystalCalib> InputTime("ECLRefTime");
+  DBObjPtr<Belle2::ECLCrystalCalib> InputTimeNom("ECLRefTimeNom");
+  DBObjPtr<Belle2::ECLCrystalCalib> CurrentElec("ECLCrystalElectronics");
+  DBObjPtr<Belle2::ECLCrystalCalib> CurrentTime("ECLCrystalElectronicsTime");
 
   //..Print out some information about the existing payload
-  std::cout << "Reading ECLRefAmpl, ECLRefTime, and " << payloadName << std::endl;
+  std::cout << "Reading ECLRefAmpl, ECLRefAmplNom, ECLRefTime, ECLRefTimeNom, ECLCrystalElectronics, and ECLCrystalElectronicsTime" <<
+            std::endl;
+  std::cout << "Dumping " << payloadName << std::endl;
   existingObject->Dump();
 
   //..Get vectors of values from the payloads
-  std::vector<float> currentValues;
-  std::vector<float> currentUnc;
-  currentValues = existingObject->getCalibVector();
-  currentUnc = existingObject->getCalibUncVector();
+  std::vector<float> currentValues = existingObject->getCalibVector();
+  std::vector<float> currentUnc = existingObject->getCalibUncVector();
 
-  std::vector<float> refAmpl;
-  std::vector<float> refAmplUnc;
-  refAmpl = InputAmpl->getCalibVector();
-  refAmplUnc = InputAmpl->getCalibUncVector();
+  std::vector<float> refAmpl = InputAmpl->getCalibVector();
+  std::vector<float> refAmplUnc = InputAmpl->getCalibUncVector();
 
-  std::vector<float> refTime;
-  std::vector<float> refTimeUnc;
-  refTime = InputTime->getCalibVector();
-  refTimeUnc = InputTime->getCalibUncVector();
+  std::vector<float> refAmplNom = InputAmplNom->getCalibVector();
+
+  std::vector<float> refTime = InputTime->getCalibVector();
+  std::vector<float> refTimeUnc = InputTime->getCalibUncVector();
+
+  std::vector<float> refTimeNom = InputTimeNom->getCalibVector();
+
+  std::vector<float> crysElec = CurrentElec->getCalibVector();
+
+  std::vector<float> crysTime = CurrentTime->getCalibVector();
+
 
   //..Print out a few values for quality control
   std::cout << std::endl << "Reference amplitudes and times read from database " << std::endl;
   for (int ic = 0; ic < 9000; ic += 1000) {
-    std::cout << "cellID " << ic + 1 << " ref amplitude = " << refAmpl[ic] << " +/- " << refAmplUnc[ic] << " ref time = " << refTime[ic]
-              << " +/- " << refTimeUnc[ic] << std::endl;
+    std::cout << "cellID " << ic + 1 << " ref amplitude = " << refAmpl[ic] << " +/- " << refAmplUnc[ic] << " nom = " << refAmplNom[ic]
+              << " ref time = " << refTime[ic]
+              << " +/- " << refTimeUnc[ic] << " nom = " << refTimeNom[ic] << std::endl;
   }
 
   //------------------------------------------------------------------------
-  //..Calculate the new values for ECLCrystalElectronics or ECLCrystalElectronicsTime
+  //..Calculate the new values for requested payload
   std::vector<float> newValues;
   std::vector<float> newUnc;
   for (int ic = 0; ic < 8736; ic++) {
-    if (findAmpl) {
-      newValues.push_back(17750. / refAmpl[ic]);
+    if (payloadName == "ECLCrystalElectronics") {
+      newValues.push_back(refAmplNom[ic] / refAmpl[ic]);
       newUnc.push_back(newValues[ic]*refAmplUnc[ic] / refAmpl[ic]);
-    } else {
-      newValues.push_back(refTime[ic]);
+    } else if (payloadName == "ECLCrystalElectronicsTime") {
+      newValues.push_back(refTime[ic] - refTimeNom[ic]);
       newUnc.push_back(refTimeUnc[ic]);
+    } else if (payloadName == "ECLRefAmplNom") {
+      newValues.push_back(crysElec[ic]*refAmpl[ic]);
+      newUnc.push_back(0.);
+    } else if (payloadName == "ECLRefTimeNom") {
+      newValues.push_back(refTime[ic] - crysTime[ic]);
+      newUnc.push_back(0.);
     }
+
   }
 
   //------------------------------------------------------------------------

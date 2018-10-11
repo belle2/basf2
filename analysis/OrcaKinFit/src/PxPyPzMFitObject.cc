@@ -249,7 +249,7 @@ namespace Belle2 {
       double px2 = px * px;
       double py2 = py * py;
       double pz2 = pz * pz;
-      double p  = px + py + pz;
+      double p  = std::sqrt(px2 + py2 + pz2);
       assert(p != 0);
 
       double mass2 = mass * mass;

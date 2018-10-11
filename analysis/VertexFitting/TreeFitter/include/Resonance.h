@@ -26,10 +26,10 @@ namespace TreeFitter {
     virtual ~Resonance() ;
 
     /** initialise a motherless particle */
-    ErrCode initMotherlessParticle(FitParams* fitparams);
+    ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** initialise a particle with a mother */
-    ErrCode initParticleWithMother(FitParams* fitparams);
+    ErrCode initParticleWithMother(FitParams& fitparams);
 
     /** dimension (4) */
     virtual int dim() const { return 4; }

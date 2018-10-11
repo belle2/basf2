@@ -29,14 +29,14 @@ inputMdst('default', '../1120240010.dst.root')
 
 stdPi('95eff')
 stdK('95eff')
-stdE('99eff')
+stdE('95eff')
 
 # reconstruct K*0:Kpi
 reconstructDecay('K*0:Kpi -> K+:95eff pi-:95eff', '0.795 < M < 0.995')
 matchMCTruth('K*0:Kpi')
 
 # reconstruct B0:sig
-reconstructDecay('B0:sig -> K*0:Kpi e+:99eff e-:99eff', 'Mbc > 5.2 and abs(deltaE) < 0.2')
+reconstructDecay('B0:sig -> K*0:Kpi e+:95eff e-:95eff', 'Mbc > 5.2 and abs(deltaE) < 0.2')
 matchMCTruth('B0:sig')
 
 # --------------------------------------------------

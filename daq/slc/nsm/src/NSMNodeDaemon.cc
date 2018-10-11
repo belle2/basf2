@@ -40,7 +40,7 @@ void NSMNodeDaemon::add(NSMCallback* callback,
   }
 }
 
-void NSMNodeDaemon::run() throw()
+void NSMNodeDaemon::run()
 {
   NSMCommunicatorList& com_v(NSMCommunicator::get());
   try {

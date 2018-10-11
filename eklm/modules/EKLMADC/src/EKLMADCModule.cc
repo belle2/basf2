@@ -23,7 +23,8 @@ REG_MODULE(EKLMADC)
 
 static const char MemErr[] = "Memory allocation error.";
 
-EKLMADCModule::EKLMADCModule() : Module()
+EKLMADCModule::EKLMADCModule() : Module(),
+  m_fout(nullptr), m_DigPar(nullptr), m_hDir(nullptr), m_hRef(nullptr)
 {
   setDescription("Standalone generation and studies of ADC output.");
   setPropertyFlags(c_ParallelProcessingCertified);

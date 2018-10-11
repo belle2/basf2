@@ -3,12 +3,12 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Cate MacQueen              *
+ * Contributors: Cate MacQueen                                            *
  * Contact: cmq.centaurus@gmail.com                                       *
- * Last Updated: May 2018             *
+ * Last Updated: June 2018                                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+ *************************************************************************/
 
 #pragma once
 

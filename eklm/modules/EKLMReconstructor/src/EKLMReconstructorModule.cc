@@ -52,13 +52,13 @@ static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
 }
 
 EKLMReconstructorModule::EKLMReconstructorModule() : Module(),
-  m_DefaultTimeCalibrationData(0)
+  m_GeoDat(nullptr), m_nStrip(0), m_TransformData(nullptr),
+  m_TimeCalibrationData(nullptr)
 {
   setDescription("EKLM reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_TransformData = NULL;
-  m_GeoDat = NULL;
-  m_TimeCalibrationData = NULL;
+  addParam("CheckSegmentIntersection", m_CheckSegmentIntersection,
+           "Check if segments intersect.", true);
 }
 
 EKLMReconstructorModule::~EKLMReconstructorModule()
@@ -212,7 +212,8 @@ void EKLMReconstructorModule::event()
          */
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
         if (!m_TransformData->intersection(*it4, *it6, &crossPoint,
-                                           &d1, &d2, &sd)) {
+                                           &d1, &d2, &sd,
+                                           m_CheckSegmentIntersection)) {
           it6 = it7;
           continue;
         }

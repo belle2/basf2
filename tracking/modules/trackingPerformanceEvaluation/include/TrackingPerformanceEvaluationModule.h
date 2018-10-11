@@ -141,9 +141,13 @@ namespace Belle2 {
 
     TH2F* m_h2_OmegaerrOmegaVSpt;  /**< error */
 
+    TH2F* m_h2_z0errVSpt_wtpxd;  /**< error */
+    TH2F* m_h2_z0errVSpt_wfpxd;  /**< error */
     TH2F* m_h2_z0errVSpt_wpxd;  /**< error */
     TH2F* m_h2_z0errVSpt_wopxd; /**< error */
     TH2F* m_h2_z0errVSpt; /**< error */
+    TH2F* m_h2_d0errVSpt_wtpxd; /**< error */
+    TH2F* m_h2_d0errVSpt_wfpxd; /**< error */
     TH2F* m_h2_d0errVSpt_wpxd; /**< error */
     TH2F* m_h2_d0errVSpt_wopxd; /**< error */
     TH2F* m_h2_d0errVSpt; /**< error */

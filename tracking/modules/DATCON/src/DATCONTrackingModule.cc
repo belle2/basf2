@@ -162,7 +162,7 @@ DATCONTrackingModule::event()
   }
 
 
-  TVector2 v1_s, v2_s, v3_s, v4_s;
+  TVector2 v1_s, v2_s, v4_s;
 
   /* Hough transformation */
   houghTrafo2d(uClusters, true);     // with conformal transformation in r-phi
@@ -174,13 +174,12 @@ DATCONTrackingModule::event()
   /* Set start values */
   v1_s.Set(-M_PI,  m_rectSizeU);
   v2_s.Set(M_PI,   m_rectSizeU);
-  v3_s.Set(M_PI,  -m_rectSizeU);
   v4_s.Set(-M_PI, -m_rectSizeU);
   /* Run intercept finder */
   if (m_independentSectors) {
     slowInterceptFinder2d(uHough, true);
   } else {
-    fastInterceptFinder2d(uHough, true, v1_s, v2_s, v3_s, v4_s, 0, m_maxIterationsU);
+    fastInterceptFinder2d(uHough, true, v1_s, v2_s, v4_s, 0, m_maxIterationsU);
   }
 
   /*
@@ -189,13 +188,12 @@ DATCONTrackingModule::event()
   /* Set start values */
   v1_s.Set(-M_PI,  m_rectSizeV);
   v2_s.Set(0.,     m_rectSizeV);
-  v3_s.Set(0.,    -m_rectSizeV);
   v4_s.Set(-M_PI, -m_rectSizeV);
   /* Run intercept finder */
   if (m_independentSectors) {
     slowInterceptFinder2d(vHough, false);
   } else {
-    fastInterceptFinder2d(vHough, false, v1_s, v2_s, v3_s, v4_s, 0, m_maxIterationsV);
+    fastInterceptFinder2d(vHough, false, v1_s, v2_s, v4_s, 0, m_maxIterationsV);
   }
 
   if (m_useHoughSpaceClustering) {

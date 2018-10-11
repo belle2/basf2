@@ -24,30 +24,30 @@ namespace Belle2 {
     static const RCState BOOTING_RS;
 
   public:
-    RCState() throw() : NSMState(Enum::UNKNOWN) {}
-    RCState(const Enum& e) throw() : NSMState(e) {}
-    RCState(const NSMState& num) throw() : NSMState(num) {}
-    RCState(const RCState& st) throw() : NSMState(st) {}
-    RCState(const char* st) throw() { *this = st; }
-    RCState(const std::string& st) throw() { *this = st; }
-    RCState(int id) throw() { *this = id; }
-    ~RCState()  throw() {}
+    RCState() : NSMState(Enum::UNKNOWN) {}
+    RCState(const Enum& e) : NSMState(e) {}
+    RCState(const NSMState& num) : NSMState(num) {}
+    RCState(const RCState& st) : NSMState(st) {}
+    RCState(const char* st) { *this = st; }
+    RCState(const std::string& st) { *this = st; }
+    RCState(int id) { *this = id; }
+    ~RCState()  {}
 
   protected:
     RCState(int id, const char* label)
-    throw() : NSMState(id, label) {}
+      : NSMState(id, label) {}
 
   public:
-    bool isStable() const throw() { return getId() > 1 && getId() <= 5; }
-    bool isTransition() const throw() { return getId() > 5 && getId() <= 9; }
-    bool isError() const throw() { return getId() > 9 && getId() <= 11; }
-    bool isRecovering() const throw() { return getId() > 11 && getId() <= 14; }
-    RCState next() const throw();
+    bool isStable() const { return getId() > 1 && getId() <= 5; }
+    bool isTransition() const { return getId() > 5 && getId() <= 9; }
+    bool isError() const { return getId() > 9 && getId() <= 11; }
+    bool isRecovering() const { return getId() > 11 && getId() <= 14; }
+    RCState next() const;
 
   public:
-    const RCState& operator=(const std::string& msg) throw();
-    const RCState& operator=(const char* msg) throw();
-    const RCState& operator=(int id) throw();
+    const RCState& operator=(const std::string& msg);
+    const RCState& operator=(const char* msg);
+    const RCState& operator=(int id);
 
   };
 

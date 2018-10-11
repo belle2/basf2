@@ -12,34 +12,34 @@ namespace Belle2 {
   class DBRecord {
 
   public:
-    DBRecord() throw() {};
-    ~DBRecord() throw() {};
+    DBRecord() {};
+    ~DBRecord() {};
 
   public:
-    std::vector<std::string>& getFieldNames() throw() { return m_name_v; }
-    DBFieldList& getFieldValues() throw() { return m_value_m; }
-    bool hasField(const std::string& name) throw()
+    std::vector<std::string>& getFieldNames() { return m_name_v; }
+    DBFieldList& getFieldValues() { return m_value_m; }
+    bool hasField(const std::string& name)
     {
       return m_value_m.find(name) != m_value_m.end();
     }
-    size_t getNFields() const throw() { return m_name_v.size(); }
-    const std::string get(const std::string& name) const throw();
-    const std::string get(int i) const throw();
-    int getInt(const std::string& name) const throw();
-    int getInt(int i) const throw();
-    bool getBool(const std::string& name) const throw();
-    bool getBool(int i) const throw();
-    float getFloat(const std::string& name) const throw();
-    float getFloat(int i) const throw();
-    std::vector<std::string> getArray(const std::string& name) const throw();
-    std::vector<std::string> getArray(int i) const throw();
-    std::vector<int> getIntArray(const std::string& name) const throw();
-    std::vector<int> getIntArray(int i) const throw();
-    std::vector<float> getFloatArray(const std::string& name) const throw();
-    std::vector<float> getFloatArray(int i) const throw();
-    const std::string getFieldName(int i) const throw();
+    size_t getNFields() const { return m_name_v.size(); }
+    const std::string get(const std::string& name) const;
+    const std::string get(int i) const;
+    int getInt(const std::string& name) const;
+    int getInt(int i) const;
+    bool getBool(const std::string& name) const;
+    bool getBool(int i) const;
+    float getFloat(const std::string& name) const;
+    float getFloat(int i) const;
+    std::vector<std::string> getArray(const std::string& name) const;
+    std::vector<std::string> getArray(int i) const;
+    std::vector<int> getIntArray(const std::string& name) const;
+    std::vector<int> getIntArray(int i) const;
+    std::vector<float> getFloatArray(const std::string& name) const;
+    std::vector<float> getFloatArray(int i) const;
+    const std::string getFieldName(int i) const;
     void reset();
-    void add(std::string name, std::string value) throw();
+    void add(std::string name, std::string value);
 
   private:
     std::vector<std::string> m_name_v;

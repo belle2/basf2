@@ -26,6 +26,22 @@ class TMinuit;
 
 namespace Belle2 {
 
+  /** Struct to keep upper triangle of the covariance matrix. Since the
+  *  matrix is already inverted we do not need extra precision, so
+  *  keep matrix elements in float type to save space.
+  *  sigma is the average noise.
+  */
+  struct CovariancePacked {
+    /** packed matrix*/
+    float m_covMatPacked[31 * (31 + 1) / 2];
+    /** sigma noise*/
+    float sigma;
+    /** lvalue access by index */
+    float& operator[](int i) { return m_covMatPacked[i];}
+    /** rvalue access by index */
+    const float& operator[](int i) const { return m_covMatPacked[i];}
+  };
+
   /** Struct to return signal function information
    * f0 is the function value
    * f1 is the first derivative
@@ -129,13 +145,20 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigits;   /** StoreArray ECLDigit*/
 
     double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
+    double m_chi2Threshold;  /*chi2 threshold to classify offline fit as good fit*/
     double m_TriggerThreshold;  /**energy threshold for waveform trigger.*/
     bool m_TemplatesLoaded;  /**Flag to indicate if waveform templates are loaded from database.*/
     void loadTemplateParameterArray(bool IsDataFlag);  /** loads waveform templates from database.*/
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
 
     TMinuit* m_Minit2h;   /** minuit minimizer for optimized fit*/
+    TMinuit* m_Minit2h2;   /** minuit minimizer for optimized fit with background photon*/
     void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /** Optimized fit using hadron component model*/
+    void Fit2hExtraPhoton(double& b, double& a0, double& t0, double& a1, double& A2, double& T2,
+                          double& chi2);  /** Optimized fit using hadron component model plus out of time background photon*/
     SignalInterpolation2 m_si[8736][3];  /**ShaperDSP signal shapes.*/
+
+    CovariancePacked m_c[8736];  /** Packed covariance matrices */
+    bool m_CovarianceMatrix;  /**Option to use crystal dependent covariance matrices.*/
   };
 } // end Belle2 namespace

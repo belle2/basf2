@@ -68,13 +68,14 @@ namespace Belle2 {
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
     addParam("recoilParticleType", m_recoilParticleType,
              "If not equal 0, the mother Particle is reconstructed in the recoil against the daughter particles.\n"
-             "In the case of the following decay chain M -> D1 D2 ... Dn and\n"
-             " a) recoilParticleType = 1: \n"
-             "   - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
-             "   - D1, D2, ..., DN are attached as daughters of M\n"
-             " b) recoilParticleType = 2: \n"
-             "   - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
-             "   - D1, D2, ..., DN are attached as daughters of M\n" , 0);
+             "In the case of the following decay chain M -> D1 D2 ... Dn and\n\n"
+             ""
+             "  a) recoilParticleType = 1: \n\n"
+             "    - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
+             "    - D1, D2, ..., DN are attached as daughters of M\n\n"
+             "  b) recoilParticleType = 2: \n\n"
+             "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
+             "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;

@@ -81,6 +81,16 @@ namespace Belle2 {
     void printSampleTimeCalibration();
 
     /**
+     * Import channel mask from a root file (given as 1D histograms, one per slot).
+     * @param fileName root file name
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importChannelMask(std::string fileName,
+                           int expNo, int firstRun, int lastRun);
+
+    /**
      * Generate and import a (random, fake) channel mask for testing
      * @param fractionDead the fraction of dead PMs to randomly assign
      * @param fractionHot the fraction of noisy PMs to randomly assign

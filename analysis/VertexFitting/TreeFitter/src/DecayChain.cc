@@ -63,59 +63,74 @@ namespace TreeFitter {
   {
     m_constraintlist.clear();
     m_headOfChain->addToConstraintList(m_constraintlist, 0);
+    removeConstraintFromList();
     std::sort(m_constraintlist.begin(), m_constraintlist.end());
   }
 
-  ErrCode DecayChain::initialize(FitParams* par)
+  void DecayChain::removeConstraintFromList()
+  {
+    for (auto removeConstraint : removeConstraintList) {
+      m_constraintlist.erase(std::remove_if(m_constraintlist.begin(), m_constraintlist.end(),
+      [&](Constraint constraint) { return constraint.name() == removeConstraint ;}),
+      m_constraintlist.end());
+    }
+  }
+
+  ErrCode DecayChain::initialize(FitParams& par)
   {
     ErrCode status;
-    par->resetStateVector();
+    par.resetStateVector();
     status |= m_headOfChain->initMotherlessParticle(par);
-    par->resetCovariance();
+    par.resetCovariance();
     status |= m_headOfChain->initCovariance(par);
     initConstraintList();
     return status;
   }
 
-  ErrCode DecayChain::filter(FitParams& par, bool firstpass)
+  ErrCode DecayChain::filter(FitParams& par)
   {
     ErrCode status;
     par.resetCovariance();
-    if (firstpass || !par.testCovariance()) {
-      status |= m_headOfChain->initCovariance(&par);
-    }
-
-    m_chi2SumConstraints = 0;
+    status |= m_headOfChain->initCovariance(par);
     par.resetChiSquare();
     for (auto constraint : m_constraintlist) {
-
-      status |= constraint.filter(&par);
-
-      m_chi2SumConstraints += constraint.getChi2();
+      status |= constraint.filter(par);
     }
     return status;
   }
 
-  double DecayChain::chiSquare(const FitParams* par) const
+  ErrCode DecayChain::filterWithReference(FitParams& par, const FitParams& ref)
+  {
+    ErrCode status;
+    par.resetCovariance();
+    status |= m_headOfChain->initCovariance(par);
+    par.resetChiSquare();
+    for (auto constraint : m_constraintlist) {
+      status |= constraint.filterWithReference(par, ref);
+    }
+    return status;
+  }
+
+
+  double DecayChain::chiSquare(const FitParams& par) const
   {
     return m_headOfChain->chiSquare(par);
   }
 
   const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const
   {
-    //FIXME this can be done easier
     const ParticleBase* rc(0);
     const auto mapRow = m_particleMap.find(particle) ;
 
     if (mapRow == m_particleMap.end()) {
-      //JFK: take head of chain and recursively find particle in it 2017-11-15
+      //take head of chain and recursively find particle in it
       rc = m_headOfChain->locate(particle);
 
       if (rc && rc->particle()) {
         const_cast<DecayChain*>(this)->m_particleMap[rc->particle()] = rc;
       }
     } else {
-      //JFK: only used for "head of tree" 2017-11-15
+      //only used for "head of tree"
       rc = mapRow->second;// (B2::Particle, Particlebase)
     }
     return rc;

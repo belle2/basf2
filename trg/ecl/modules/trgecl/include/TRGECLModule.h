@@ -97,6 +97,8 @@ namespace Belle2 {
     int _Bhabha;
     //! Clustering option
     int _Clustering;
+    //! Cluster Limit
+    int _ClusterLimit;
     //! Eventtiming option
     int _EventTiming;
     //! Trigger decision time window

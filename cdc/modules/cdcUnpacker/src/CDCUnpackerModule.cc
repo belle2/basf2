@@ -221,8 +221,10 @@ void CDCUnpackerModule::event()
 
 
         if (dataLength != (nWord - c_headearWords)) {
-          B2ERROR("Inconsistent data size between COPPER and CDC FEE.");
-          B2ERROR("data length " << dataLength << " nWord " << nWord);
+          B2ERROR("Inconsistent data size between COPPER and CDC FEE."
+                  << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+                  << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
+
           continue;
         }
         if (m_enablePrintOut == true) {
@@ -365,8 +367,9 @@ void CDCUnpackerModule::event()
             if (!((length == 4) || (length == 5))) {
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
               B2ERROR("CDCUnpacker : length " << length << " words.");
+              B2ERROR("board= " << board << " ch= " << ch);
               it += length;
-              continue;
+              break;
             }
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
@@ -419,7 +422,12 @@ void CDCUnpackerModule::event()
 
                 if (m_enableStoreCDCRawHit == true) {
                   // Store to the CDCRawHit object.
-                  cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
+                  CDCRawHit* rawHit = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                                           trgTime, fadcSum, tdc1, tdc2, tot);
+                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(rawHit);
+                  if (m_enable2ndHit == true) {
+                    cdcHits[cdcHits.getEntries() - 2]->addRelationTo(rawHit);
+                  }
                 }
 
               } else {
@@ -470,6 +478,7 @@ void CDCUnpackerModule::terminate()
   }
 
   if (m_channelMapFromDB) delete m_channelMapFromDB;
+  if (m_adcPedestalFromDB) delete m_adcPedestalFromDB;
 }
 
 

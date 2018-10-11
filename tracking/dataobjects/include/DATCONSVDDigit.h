@@ -42,12 +42,14 @@ namespace Belle2 {
     /** Number of APV samples stored */
     static const std::size_t c_nAPVSamples = 6;
 
-    /** Types for array of samples received from DAQ. */
+    /** Type of samples received from DAQ. */
     typedef uint8_t APVRawSampleType;
+    /** Type for array of samples received from DAQ. */
     typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
 
-    /** Types for array of samples for processing. */
+    /** Types of samples for processing. */
     typedef float APVFloatSampleType;
+    /** Types for array of samples for processing. */
     typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples;
 
     /** Constructor using c-array of samples.
@@ -89,7 +91,7 @@ namespace Belle2 {
       m_totalCharge = 0;
       m_maxSampleIndex = 0;
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
-                     [this](typename T::value_type x)->APVRawSampleType
+                     [](typename T::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
                     );
     }

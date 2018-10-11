@@ -12,8 +12,10 @@ from fnmatch import fnmatch
 home = os.environ['BELLE2_LOCAL_DIR']
 
 # change if you use different local DB folder (see arich/examples/database... examples of database usage)
-use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
-                   home + "/arich/database/cosmicTest_payloads")
+# use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
+#                    home + "/arich/database/cosmicTest_payloads")
+use_local_database(home + "/arich/database/newGeo/database.txt",
+                   home + "/arich/database/newGeo")
 
 gearbox = register_module('Gearbox')
 

@@ -22,36 +22,40 @@ namespace Belle2 {
 
   class DQMHistAnalysisPXDFitsModule : public DQMHistAnalysisModule {
 
+    enum { NUM_MODULES = 40}; // we want that from geometry
     // Public functions
   public:
 
     //! Constructor / Destructor
     DQMHistAnalysisPXDFitsModule();
-    virtual ~DQMHistAnalysisPXDFitsModule();
+
+  private:
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     // Data members
-  private:
-//     std::string m_histoname;
+    std::string m_histogramDirectoryName;
+    std::map <int, int> m_id_to_inx;
+    std::map <int, int> m_inx_to_id;
 
-    TH2F* m_hSignal[64];
-    TH2F* m_hCommon[64];
-    TH2F* m_hCounts[64];
-    TCanvas* m_cSignal[64];
-    TCanvas* m_cCommon[64];
-    TCanvas* m_cCounts[64];
+    TH1F* m_hSignalAll, *m_hCommonAll, *m_hCountsAll, *m_hOccupancyAll;
+    TCanvas* m_cSignalAll, *m_cCommonAll, *m_cCountsAll, *m_cOccupancyAll;
+
+    TH2F* m_hSignal[NUM_MODULES];
+    TH2F* m_hCommon[NUM_MODULES];
+    TH2F* m_hCounts[NUM_MODULES];
+    TCanvas* m_cSignal[NUM_MODULES];
+    TCanvas* m_cCommon[NUM_MODULES];
+    TCanvas* m_cCounts[NUM_MODULES];
     TF1* m_fLandau;// only one fit function
     TF1* m_fGaus;// only one fit function
-
-    TH1* findHistLocal(TString& a);
 
   };
 } // end namespace Belle2

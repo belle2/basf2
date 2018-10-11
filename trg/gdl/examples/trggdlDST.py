@@ -24,7 +24,13 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 # input
-input = register_module('SeqRootInput')
+if f_in_root[-6:] == ".sroot":
+    rootfiletype = "sroot"
+    input = register_module('SeqRootInput')
+if f_in_root[-5:] == ".root":
+    rootfiletype = "root"
+    input = register_module('RootInput')
+
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 

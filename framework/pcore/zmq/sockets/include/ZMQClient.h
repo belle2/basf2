@@ -135,7 +135,6 @@ namespace Belle2 {
     return pollResult;
   }
 
-  // TODO: Attention: repeat meaning changed
   template <class ASocketAnswer>
   int ZMQClient::pollSocket(unsigned int timeout, ASocketAnswer socketAnswer) const
   {

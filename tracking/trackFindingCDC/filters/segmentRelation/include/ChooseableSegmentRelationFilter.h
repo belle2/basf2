@@ -11,12 +11,10 @@
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    // Guard to prevent repeated instantiations
-    extern template class ChooseableFilter<SegmentRelationFilterFactory>;
     using ChooseableSegmentRelationFilter = ChooseableFilter<SegmentRelationFilterFactory>;
   }
 }

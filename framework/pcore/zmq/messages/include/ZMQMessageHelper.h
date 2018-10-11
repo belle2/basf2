@@ -3,6 +3,7 @@
 #include <framework/logging/LogMethod.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
+#include <framework/pcore/zmq/utils/EventMetaDataSerialization.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <zmq.hpp>
@@ -33,12 +34,10 @@ namespace Belle2 {
       return createZMQMessage(std::to_string(i));
     }
 
-    /// Create a message out of an event meta data by serialization. TODO
+    /// Create a message out of an event meta data by serialization.
     static zmq::message_t createZMQMessage(const StoreObjPtr<EventMetaData>& evtMetaData)
     {
-      std::string message = std::to_string(evtMetaData->getEvent()) + ":" +
-                            std::to_string(evtMetaData->getRun()) + ":" +
-                            std::to_string(evtMetaData->getExperiment());
+      const auto& message = EventMetaDataSerialization::serialize(*evtMetaData);
       return zmq::message_t(message.c_str(), message.length());
     }
 

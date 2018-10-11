@@ -111,6 +111,7 @@ void ZMQClient::send(zmq::message_t& message) const
   m_socket->send(message);
 }
 
+#pragma GCC diagnostic ignored "-Wstack-usage="
 int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, int timeout)
 {
   auto start = std::chrono::system_clock::now();

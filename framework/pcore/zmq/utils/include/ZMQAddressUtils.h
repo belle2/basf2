@@ -21,6 +21,7 @@ namespace Belle2 {
     c_control /// Multicast control socket
   };
 
+  /// Summary of some address helpers
   class ZMQAddressUtils {
   public:
     /// Generate a random socket name in the form tcp://hostname:port

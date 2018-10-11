@@ -32,6 +32,7 @@ namespace Belle2 {
   private:
     /// The data store streamer to use
     std::unique_ptr<DataStoreStreamer> m_streamer;
+    /// The random generator object in the data store that we need to transport also
     StoreObjPtr<RandomGenerator> m_randomGenerator;
   };
 }

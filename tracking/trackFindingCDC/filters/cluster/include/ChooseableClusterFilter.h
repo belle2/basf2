@@ -11,12 +11,10 @@
 
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    // Guard to prevent repeated instantiations
-    extern template class ChooseableFilter<ClusterFilterFactory>;
     using ChooseableClusterFilter = ChooseableFilter<ClusterFilterFactory>;
   }
 }

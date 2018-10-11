@@ -2,7 +2,6 @@ import os
 import re
 
 import hep_ipython_tools.ipython_handler_basf2.viewer
-from hep_ipython_tools import viewer
 from hep_ipython_tools.information import EnvironmentInformation
 
 

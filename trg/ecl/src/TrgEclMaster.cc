@@ -7,6 +7,41 @@
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
 // Description : A class to represent TRG ECL
+//---------------------------------------------------------------------------------
+//
+//   ECL trigger bit
+// ---------------------------------------------------------------------------------
+// Variable(in Tsim) | N(bit) |   Address     | Parameter
+// -------------------------------------- ------------------------------------------
+//                   |      1 |         0     | TRG(Hit or not)
+//                   |      7 |   7 downto 1  | Timing (LSB = 1 ns )
+//    _Triggerbit[0] |      7 |  14 downto 8  | Revoclk from FAM (LSB  = 125 ns)
+//    (upto 12th     |      3 |  17 downto 15 | ECL-TRG Timing Source
+//    bhabha bit)    |      1 |            18 | Physics TRG
+//      (32bit)      |      1 |            19 | Belle type Bhabha
+// ------------------|     14 |  33 downto 20 | Bhabha Type
+//                   |     13 |  46 downto 34 | Total Energy
+//                   |      1 |            47 | E low (Etot >0.5 GeV)
+//                   |      1 |            48 | E High (Etot > 1.0 GeV)
+//    _Triggerbit[1] |      1 |            49 | E lom (Etot > 3.0 GeV)
+//                   |      7 |  56 dwonto 50 | ICN
+//                   |      3 |  59 downto 57 | BG veto
+//                   |      1 |            60 | Cluster Overflow
+//                   |      1 |            61 | 3D Bhabha Trigger
+//                   |      1 |         62    | N Cluster  >= 3, at least one Cluster >300 MeV (LAB), not 3D ECL Bhabha
+// _________________ |      1 |         63    | one Cluster >= 2GeV(CM) with Theta Id = 4~14
+//                   |      1 |         64    | one Cluster >= 2GeV(CM) with Theta Id = 2,3,15 or 16 and not a 3D ECL Bhabha
+//                   |      1 |         65    | one Cluster >= 2GeV(CM) with Theta Id = 2, 3, 15 or 16 and not a 3D ECL Bhabha
+//                   |      1 |         66    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and not a 3D ECL Bhabha
+//                   |      1 |         67    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and a 3D ECL Bhabha
+//    _Triggerbit[2] |      1 |         68    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300  MeV (LAB ), in Theta Id 4~15(Barrel)
+//                   |      1 |         69    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300 MeV (LAB), in Theta Id 2, 3 or 16
+//                   |      1 |         70    | 170 < delta phi(CM) < 190 degree, both Clusters > 250 MeV (LAB), and no 2GeV (CM) Cluster
+//                   |      1 |         71    | 170 < delta phi(CM) < 190 degree, one Cluster < 250 MeV (LAB), the other Cluster > 250 MeV(LAB), and no 2GeV (CM) Cluster
+//                   |      1 |         72    | 160 < delta phi(CM) < 200 degree, 160 < Sum Theta (CM)< 200 degree, no 2 GeV(CM) cluster
+//                   |      1 |         73    | No 2GeV (CM) Cluster
+// ---------------------------------------------------------------------------------
+//
 //---------------------------------------------------------------
 // $Log$
 // 2017-02-23 version 1.0
@@ -41,7 +76,7 @@ using namespace Belle2;
 //
 //
 TrgEclMaster::TrgEclMaster():
-  TimeWindow(375.0), OverlapWindow(0.0), _Clustering(0), _Bhabha(0), _EventTiming(1), _NofTopTC(3), _ClusterLimit(6)
+  TimeWindow(375.0), OverlapWindow(0.0), _Clustering(0), _Bhabha(0), _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Lowmultibit(0)
 {
 
   TCEnergy.clear();
@@ -57,8 +92,10 @@ TrgEclMaster::TrgEclMaster():
   TCTiming.resize(576);
   TCBeamBkgTag.resize(576);
 
-
-
+  _Triggerbit[0] = 0;
+  _Triggerbit[1] = 0;
+  _Triggerbit[2] = 0;
+  _Triggerbit[3] = 0;
 
 
   //ThetaRingSum.resize(3,std::vector<double>(36,0));
@@ -70,6 +107,7 @@ TrgEclMaster::TrgEclMaster():
   obj_bhabha = new TrgEclBhabha();
   obj_timing = new TrgEclTiming();
   obj_map = new TrgEclMapping();
+  obj_database = new TrgEclDataBase();
 
 
 }
@@ -838,6 +876,342 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
 
   }
 
+}
+
+
+void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource, int etot, int bhabha2D, int physics,
+                                  std::vector<int> bhabhatype, int ICN, int BGVeto, int ClusterOverflow, int bhabha3D, int lowmultibit)
+{
+
+
+  _Triggerbit[0] = 0;
+  _Triggerbit[1] = 0;
+  _Triggerbit[2] = 0;
+  _Triggerbit[3] = 0;
+
+  //---------------------------------------------------------------------------------
+  // ECL trigger
+  //---------------------------------------------------------------------------------
+  //Variable(in Tsim) | N(bit) |   Address     | Parameter
+  //-------------------------------------- ------------------------------------------
+  //                  |      1 |         0     | TRG(Hit or not)
+  //                  |      7 |   7 downto 1  | Timing (LSB = 1 ns )
+  //   _Triggerbit[0] |      7 |  14 downto 8  | Revoclk from FAM (LSB  = 125 ns)
+  //   (upto 12th     |      3 |  17 downto 15 | ECL-TRG Timing Source
+  //   bhabha bit)    |      1 |            18 | Physics TRG
+  //     (32bit)      |      1 |            19 | Belle type Bhabha
+  //------------------|     14 |  33 downto 20 | Bhabha Type
+  //                  |     13 |  46 downto 34 | Total Energy
+  //                  |      1 |            47 | E low (Etot >0.5 GeV)
+  //                  |      1 |            48 | E High (Etot > 1.0 GeV)
+  //   _Triggerbit[1] |      1 |            49 | E lom (Etot > 3.0 GeV)
+  //                  |      7 |  56 dwonto 50 | ICN
+  //                  |      3 |  59 downto 57 | BG veto
+  //                  |      1 |            60 | Cluster Overflow
+  //                  |      1 |            61 | 3D Bhabha Trigger
+  //                  |      1 |         62    | N Cluster  >= 3, at least one Cluster >300 MeV (LAB), not 3D ECL Bhabha
+  //_________________ |      1 |         63    | one Cluster >= 2GeV(CM) with Theta Id = 4~14
+  //                  |      1 |         64    | one Cluster >= 2GeV(CM) with Theta Id = 2,3,15 or 16 and not a 3D ECL Bhabha
+  //                  |      1 |         65    | one Cluster >= 2GeV(CM) with Theta Id = 2, 3, 15 or 16 and not a 3D ECL Bhabha
+  //                  |      1 |         66    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and not a 3D ECL Bhabha
+  //                  |      1 |         67    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and a 3D ECL Bhabha
+  //   _Triggerbit[2] |      1 |         68    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300  MeV (LAB ), in Theta Id 4~15(Barrel)
+  //                  |      1 |         69    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300 MeV (LAB), in Theta Id 2, 3 or 16
+  //                  |      1 |         70    | 170 < delta phi(CM) < 190 degree, both Clusters > 250 MeV (LAB), and no 2GeV (CM) Cluster
+  //                  |      1 |         71    | 170 < delta phi(CM) < 190 degree, one Cluster < 250 MeV (LAB), the other Cluster > 250 MeV(LAB), and no 2GeV (CM) Cluster
+  //                  |      1 |         72    | 160 < delta phi(CM) < 200 degree, 160 < Sum Theta (CM)< 200 degree, no 2 GeV(CM) cluster
+  //                  |      1 |         73    | No 2GeV (CM) Cluster
+  //---------------------------------------------------------------------------------
+  //
+  //
+  //
+  //
+  //  int physics = 0;
+  int elow = 0;
+  int ehigh = 0;
+  int elum = 0;
+  int bhabhaveto = 0;
+  int Bhabhatype = 0;
+  if (bhabha2D == 0 && ICN < 4) {
+    bhabhaveto = 1;
+  }
+
+  if (etot > 0.5) {
+    elow = 0x01;
+  }
+  if (etot > 1.0) {
+    ehigh = 0x01;
+  }
+  if (etot > 3.0) {
+    elum = 0x01;
+  }
+
+  if (bhabhatype.size() > 14) {
+    for (int ibhabha = 0; ibhabha < 13; ibhabha++) {
+      int type = 0x00;
+      if (bhabhatype[ibhabha] == 1) {type = 0x01;}
+
+      Bhabhatype |= type;
+      Bhabhatype <<= 1;
+
+    }
+  }
+
+
+
+  int bit_hit = hit && 0x01;
+  int bit_Timing = (Timing && 0x7F) ;
+  int bit_RevoFAM = (RevoFAM && 0x7F) ;
+  int bit_TimingSource  = (TimingSource && 0x07) ;
+  int bit_physics = (physics &&  0x01) ;
+  int bit_2Dbhabha = (bhabhaveto && 0x01) ;
+  int bit_bhabhatype = (Bhabhatype && 0x3FFF);
+  int bit_etot = (((int)etot) && 0x1FFF) ;
+  int bit_elow = (elow && 0x01);
+  int bit_ehigh = (ehigh && 0x01) ;
+  int bit_elum = (elum && 0x01) ;
+  int bit_ICN = (ICN && 0x7F) ;
+  int bit_BGVeto = (BGVeto && 0x07) ;
+  int bit_ClusterOverflow = (ClusterOverflow && 0x01);
+  int bit_3Dbhabha = (bhabha3D && 0x01);
+  int bit_lowmulti = lowmultibit && 0x0FFF;
+
+
+
+  _Triggerbit[2] |= ((bit_lowmulti) >> 2) && 0x3FF;
+  _Triggerbit[1] |= (bit_lowmulti & 0x03);
+  _Triggerbit[1] <<= 2;
+  _Triggerbit[1] |= bit_3Dbhabha;
+  _Triggerbit[1] <<= 1;
+  _Triggerbit[1] |= bit_ClusterOverflow;
+  _Triggerbit[1] <<= 3;
+  _Triggerbit[1] |= bit_BGVeto;
+  _Triggerbit[1] <<= 7;
+  _Triggerbit[1] |= bit_ICN;
+  _Triggerbit[1] <<= 1;
+  _Triggerbit[1] |= bit_elum;
+  _Triggerbit[1] <<= 1;
+  _Triggerbit[1] |= bit_ehigh;
+  _Triggerbit[1] <<= 1;
+  _Triggerbit[1] |= bit_elow;
+  _Triggerbit[1] <<= 13;
+  _Triggerbit[1] |= bit_etot;
+  _Triggerbit[1] <<= 2;
+  _Triggerbit[1] |= ((bit_bhabhatype >> 12) & 0x03);
+
+
+  _Triggerbit[0] |= (bit_bhabhatype & 0x0FFF);
+  _Triggerbit[0] <<= 12;
+  _Triggerbit[0] |= bit_2Dbhabha;
+  _Triggerbit[0] <<= 1;
+  _Triggerbit[0] |= bit_physics;
+  _Triggerbit[0] <<= 3;
+  _Triggerbit[0] |= bit_TimingSource;
+  _Triggerbit[0] <<= 7;
+  _Triggerbit[0] |= bit_RevoFAM;
+  _Triggerbit[0] <<= 7;
+  _Triggerbit[0] |= bit_Timing;
+  _Triggerbit[0] <<= 1;
+  _Triggerbit[0] |= bit_hit;
+
+
+
+
+
+
+
+}
+
+
+void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vector<double> clusterenergy)
+{
+
+  //---------------------------------------------------------------------------------
+  // ECL trigger
+  //---------------------------------------------------------------------------------
+  //Variable(in Tsim) | N(bit) |   Address     | Parameter
+  //-------------------------------------- ------------------------------------------
+  //                  |      1 |         62    |  N Cluster  >= 3, at least one Cluster >300 MeV (LAB), not 3D ECL Bhabha
+  //                  |      1 |         63    | one Cluster >= 2GeV(CM) with Theta Id = 4~14
+  //  _Lowmultibit    |      1 |         64    | one Cluster >= 2GeV(CM) with Theta Id = 2,3,15 or 16 and not a 3D ECL Bhabha
+  //                  |      1 |         65    | one Cluster >= 2GeV(CM) with Theta Id = 2, 3, 15 or 16 and not a 3D ECL Bhabha
+  //                  |      1 |         66    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and not a 3D ECL Bhabha
+  //                  |      1 |         67    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and a 3D ECL Bhabha
+  //                  |      1 |         68    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300  MeV (LAB ), in Theta Id 4~15(Barrel)
+  //                  |      1 |         69    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300 MeV (LAB), in Theta Id 2, 3 or 16
+  //                  |      1 |         70    | 170 < delta phi(CM) < 190 degree, both Clusters > 250 MeV (LAB), and no 2GeV (CM) Cluster
+  //                  |      1 |         71    | 170 < delta phi(CM) < 190 degree, one Cluster < 250 MeV (LAB), the other Cluster > 250 MeV(LAB), and no 2GeV (CM) Cluster
+  //                  |      1 |         72    | 160 < delta phi(CM) < 200 degree, 160 < Sum Theta (CM)< 200 degree, no 2 GeV(CM) cluster
+  //                  |      1 |         73    | No 2GeV (CM) Cluster
+  //---------------------------------------------------------------------------------
+  _Lowmultibit = 0;
+  int _nClust = CenterTCId.size();
+  int _n300MeV = 0;
+  int _n2GeV = 0;
+  int _n2GeV414 = 0;
+  int _n2GeV231516 = 0;
+  int _n2GeV117 = 0;
+  int _n1GeV415 = 0;
+  int _n1GeV2316 = 0;
+  int _n1GeV117 = 0;
+
+  for (int ic = 0; ic < _nClust; ic++) {
+    if (clusterenergy[ic] > 0.3) {_n300MeV++;}
+    int thetaid = obj_map->getTCThetaIdFromTCId(CenterTCId[ic]);
+    int lut = obj_database->Get3DBhabhaLUT(CenterTCId[ic]);
+    int thresh = 15 & lut;
+    if (clusterenergy[ic] * 100 > (thresh * 20)) {
+      _n2GeV++;
+      if (thetaid >= 4 && thetaid <= 14) {_n2GeV414++;}
+      if (thetaid == 2 || thetaid == 3 || thetaid == 15 || thetaid == 16) {_n2GeV231516++;}
+      if (thetaid == 1 || thetaid == 17) {_n2GeV117++;}
+    }
+    if (clusterenergy[ic] * 100 > thresh * 10) {
+      if (thetaid >= 4 && thetaid <= 15) {_n1GeV415++;}
+      if (thetaid == 2 || thetaid == 3 || thetaid == 16) {_n1GeV2316++;}
+      if (thetaid == 1 || thetaid == 17) {_n1GeV117++;}
+    }
+  }
+  //---------------------------------------------------------------------
+  //..Trigger objects using back-to-back ECL clusters, plus Bhabha vetoes
+  //  nPhiPairHigh nPhiPairLow n3DPair nECLBhabha nTrkBhabha
+
+  int _nPhiPairHigh = 0;
+  int _nPhiPairLow = 0;
+  int _n3DPair = 0;
+  int _nECLBhabha = 0;
+  for (int i0 = 0; i0 < _nClust - 1; i0++) {
+    for (int i1 = i0 + 1; i1 < _nClust; i1++) {
+      int lut1 = obj_database->Get3DBhabhaLUT(CenterTCId[i0]);
+      int lut2 = obj_database->Get3DBhabhaLUT(CenterTCId[i1]);
+
+      int energy1 = 15 & lut1;
+      int energy2 = 15 & lut2;
+      lut1 >>= 4;
+      lut2 >>= 4;
+      int phi1 = 511 & lut1;
+      int phi2 = 511 & lut2;
+      lut1 >>= 9;
+      lut2 >>= 9;
+      int theta1 = lut1;
+      int theta2 = lut2;
+
+      //..back to back in phi
+      int dphi = abs(phi1 - phi2);
+      if (dphi > 180) {dphi = 360 - dphi;}
+      int thetaSum = theta1 + theta2;
+
+      // cout << dphi << " "  << thetaSum << endl;
+      // cout << clusterenergy[i0] << " " << clusterenergy[i1] << endl;
+      //  if (dphi > 180.) {dphi = 360 - dphi;}
+      if (dphi > 170. && clusterenergy[i0] > 0.25 && clusterenergy[i1] > 0.25) {_nPhiPairHigh++;}
+      if (dphi > 170. && (clusterenergy[i0] < 0.25 || clusterenergy[i1] < 0.25)) {_nPhiPairLow++;}
+      //..3D
+      if (dphi > 160. && thetaSum > 160. && thetaSum < 200) {_n3DPair++;}
+      //..ecl Bhabha
+      if (dphi > 160 && thetaSum > 165 && thetaSum < 190 && clusterenergy[i0] * 100 > 30 * energy1
+          && clusterenergy[i1] * 100 > 30 * energy2
+          && (clusterenergy[i0] * 100 > 45 * energy1 ||  clusterenergy[i1] * 100 > 45 * energy2)) {
+        _nECLBhabha++;
+
+      }
+    }
+  }
+  int bit0 = 0;
+  int bit1 = 0;
+  int bit2 = 0;
+  int bit3 = 0;
+  int bit4 = 0;
+  int bit5 = 0;
+  int bit6 = 0;
+  int bit7 = 0;
+  int bit8 = 0;
+  int bit9 = 0;
+  int bit10 = 0;
+  int bit11 = 0;
+  int bit12 = 0;
+
+  if (_nECLBhabha > 0) {
+    bit0 = 1;
+  }
+  if (_n2GeV == 0) {
+    bit1 = 0x01; //4
+  }
+  if (_nClust >= 3 && _n300MeV && _nECLBhabha == 0) {
+    bit2 = 0x01; //6
+  }
+  if (_n2GeV414 > 0) {
+    bit3 = 0x01; //7
+  }
+  if (_n2GeV231516 && _nECLBhabha == 0) {
+    bit4 = 0x01; //9
+  }
+  if (_n2GeV231516 && _nECLBhabha != 0) {
+    bit5 = 0x01; //10
+  }
+  if (_n2GeV117 && _nECLBhabha == 0) {
+    bit6 = 0x01; //11
+  }
+  if (_n2GeV117 && _nECLBhabha != 0) {
+    bit7 = 0x01; //12
+  }
+  if (_n1GeV415 == 1 && _n300MeV == 1) {
+    bit8 = 0x01; //13
+  }
+  if (_n1GeV2316 == 1 && _n300MeV == 1) {
+    bit9 = 0x01; //14
+  }
+  if (_nPhiPairHigh > 0 && _n2GeV == 0) {
+    bit10 = 0x01; //15
+  }
+  if (_nPhiPairLow > 0 && _n2GeV == 0) {
+    bit11 = 0x01; //16
+  }
+  if (_n3DPair > 0 && _n2GeV == 0) {
+    bit12 = 0x01; //17;
+  }
+
+  int  total_bit = 0;
+  total_bit |= bit12;
+  total_bit <<= 1;
+  total_bit |= bit11;
+  total_bit <<= 1;
+  total_bit |= bit10;
+  total_bit <<= 1;
+  total_bit |= bit9;
+  total_bit <<= 1;
+  total_bit |= bit8;
+  total_bit <<= 1;
+  total_bit |= bit7;
+  total_bit <<= 1;
+  total_bit |= bit6;
+  total_bit <<= 1;
+  total_bit |= bit5;
+  total_bit <<= 1;
+  total_bit |= bit4;
+  total_bit <<= 1;
+  total_bit |= bit3;
+  total_bit <<= 1;
+  total_bit |= bit2;
+  total_bit <<= 1;
+  total_bit |= bit1;
+  total_bit <<= 1;
+  total_bit |= bit0;
+
+  _Lowmultibit =  total_bit ;
+
+}
+//
+//
+//
+double TrgEclMaster::setTotalEnergy(std::vector<double> phisum)
+{
+
+  double E_phys = 0;
+  for (int iii = 0; iii <= 16; iii++) {
+    if (iii > 1 && iii < 15) {E_phys += phisum[iii];}
+  }
+  return E_phys;
 }
 
 //

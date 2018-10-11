@@ -25,15 +25,15 @@ namespace Belle2 {
   class ECLDspData: public TObject {
   private:
     /** ShaperDSP board number, 0..11 */
-    const int m_boardNumber;
+    unsigned char m_boardNumber;
     /** Number of bits for FG31, FG41 */
-    short int m_ka;
+    unsigned char m_ka;
     /** Number of bits for FG32 */
-    short int m_kb;
+    unsigned char m_kb;
     /** Number of bits for FG33, FG43 */
-    short int m_kc;
+    unsigned char m_kc;
     /** start point for pedestal calculation */
-    short int m_y0Startr;
+    unsigned char m_y0Startr;
     /**
      * chi2 threshold for quality bit
      *
@@ -41,9 +41,9 @@ namespace Belle2 {
      */
     short int m_chiThresh;
     /** multipliers power of 2 for f, f1 */
-    short int m_k1Chi;
+    unsigned char m_k1Chi;
     /** multipliers power of 2 for chi2 calculation */
-    short int m_k2Chi;
+    unsigned char m_k2Chi;
     /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
     short int m_hitThresh;
     /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
@@ -70,7 +70,7 @@ namespace Belle2 {
      * @brief Initialize DSP coefficients class from binary file.
      * @param board_number Id of specific shaperDSP, 0..11
      */
-    ECLDspData(int board_number = 0) :
+    ECLDspData(unsigned char board_number = 0) :
       m_boardNumber(board_number),
       m_ka(0),
       m_kb(0),
@@ -146,20 +146,20 @@ namespace Belle2 {
     /** chi2 threshold for fit quality flag */
     short int getchiThresh() const { return m_chiThresh; }
     /** multipliers power of 2 for f, f1 */
-    short int getk1() const { return m_k1Chi; }
+    unsigned char getk1() const { return m_k1Chi; }
     /** multipliers power of 2 for chi2 calculation */
-    short int getk2() const { return m_k2Chi; }
+    unsigned char getk2() const { return m_k2Chi; }
     /** Number of bits for FG31, FG41 */
-    short int getka() const { return m_ka; }
+    unsigned char getka() const { return m_ka; }
     /** Number of bits for FG32 */
-    short int getkb() const { return m_kb; }
+    unsigned char getkb() const { return m_kb; }
     /** Number of bits for FG33, FG43 */
-    short int getkc() const { return m_kc; }
+    unsigned char getkc() const { return m_kc; }
     /** start point for pedestal calculation */
-    short int gety0Startr() const { return m_y0Startr; }
+    unsigned char gety0Startr() const { return m_y0Startr; }
 
     /** Return ShaperDSP board number, 0..11 */
-    int getBoardNumber() const { return m_boardNumber; }
+    unsigned char getBoardNumber() const { return m_boardNumber; }
 
     /*************/
     /** SETTERS **/
@@ -180,17 +180,17 @@ namespace Belle2 {
     /** Set chi2 threshold for fit quality flag */
     void setchiThresh(short int val) { m_chiThresh = val; }
     /** Set multipliers power of 2 for f, f1 */
-    void setk1(short int val) { m_k1Chi = val; }
+    void setk1(unsigned char val) { m_k1Chi = val; }
     /** Set multipliers power of 2 for chi2 calculation */
-    void setk2(short int val) { m_k2Chi = val; }
+    void setk2(unsigned char val) { m_k2Chi = val; }
     /** Set number of bits for FG31, FG41 */
-    void setka(short int val) { m_ka = val; }
+    void setka(unsigned char val) { m_ka = val; }
     /** Set number of bits for FG32 */
-    void setkb(short int val) { m_kb = val; }
+    void setkb(unsigned char val) { m_kb = val; }
     /** Set number of bits for FG33, FG43 */
-    void setkc(short int val) { m_kc = val; }
+    void setkc(unsigned char val) { m_kc = val; }
     /** Set start point for pedestal calculation */
-    void sety0Startr(short int val) { m_y0Startr = val; }
+    void sety0Startr(unsigned char val) { m_y0Startr = val; }
 
     ClassDef(ECLDspData, 1);
   };

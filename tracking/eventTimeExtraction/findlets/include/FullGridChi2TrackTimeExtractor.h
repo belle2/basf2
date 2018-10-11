@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.dcl.h>
-#include <tracking/eventTimeExtraction/findlets/GridEventTimeExtractor.dcl.h>
+#include <tracking/eventTimeExtraction/findlets/GridEventTimeExtractor.icc.h>
 #include <tracking/eventTimeExtraction/findlets/Chi2BasedEventTimeExtractor.h>
 #include <tracking/eventTimeExtraction/findlets/IterativeChi2BasedEventTimeExtractor.h>
 

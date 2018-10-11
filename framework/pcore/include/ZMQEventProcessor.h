@@ -25,7 +25,7 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    ZMQEventProcessor(const std::string& socketAddress);
+    ZMQEventProcessor();
 
     /** Destructor */
     virtual ~ZMQEventProcessor();
@@ -52,15 +52,11 @@ namespace Belle2 {
 
     void runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally, long maxEvent);
     void runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent);
-    void runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent,
-                   const std::string& pubSocketAddress, const std::string& subSocketAddress);
+    void runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent);
     void runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
                    long maxEvent);
     void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);
 
     ProcessMonitor m_processMonitor;
-
-    bool m_param_restartFailedWorkers = true;
-    bool m_param_failOnFailedWorkers = false;
   };
 }

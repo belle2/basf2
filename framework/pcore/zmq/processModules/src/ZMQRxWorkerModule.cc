@@ -26,10 +26,8 @@ ZMQRxWorkerModule::ZMQRxWorkerModule() : Module()
   addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
   addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
   addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
-  addParam("eventBufferSize", m_param_bufferSize, "Maximal number of events to store in the internal buffer",
-           m_param_bufferSize);
-  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message",
-           m_param_maximalWaitingTime);
+  addParam("eventBufferSize", m_param_bufferSize, "Maximal number of events to store in the internal buffer");
+  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message");
 
   setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 

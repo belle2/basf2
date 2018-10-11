@@ -40,7 +40,7 @@ namespace Belle2 {
     bool m_firstEvent = true;
 
     /// Maximal time to wait until aborting in ms
-    unsigned int m_param_maximalWaitingTime = 100 * 1000;
+    unsigned int m_param_maximalWaitingTime;
 
     /// Parameter: name of the data socket
     std::string m_param_socketName;

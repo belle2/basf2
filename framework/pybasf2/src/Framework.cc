@@ -123,14 +123,20 @@ void Framework::process(PathPtr startPath, long maxEvent)
     DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
 
+    auto& environment = Environment::Instance();
+
     already_executed = true;
-    if (Environment::Instance().getNumberProcesses() == 0) {
+    if (environment.getNumberProcesses() == 0) {
       EventProcessor processor;
-      processor.setProfileModuleName(Environment::Instance().getProfileModuleName());
+      processor.setProfileModuleName(environment.getProfileModuleName());
       processor.process(startPath, maxEvent);
     } else {
-      if (Environment::Instance().getUseZMQ()) {
-        ZMQEventProcessor processor(ZMQAddressUtils::randomSocketName());
+      if (environment.getUseZMQ()) {
+        // If the user has not given any socket address, use a random one.
+        if (environment.getZMQSocketAddress().empty()) {
+          environment.setZMQSocketAddress(ZMQAddressUtils::randomSocketName());
+        }
+        ZMQEventProcessor processor;
         processor.process(startPath, maxEvent);
       } else {
         pEventProcessor processor;

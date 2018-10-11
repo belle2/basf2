@@ -36,9 +36,9 @@ namespace Belle2 {
 
   private:
     /// How many events do we want to have in the buffer
-    unsigned int m_param_bufferSize = 2;
+    unsigned int m_param_bufferSize;
     /// Maximal time to wait in polling
-    unsigned int m_param_maximalWaitingTime = 60 * 1000;
+    unsigned int m_param_maximalWaitingTime;
 
     /// Set to false if the objects are initialized
     bool m_firstEvent = true;

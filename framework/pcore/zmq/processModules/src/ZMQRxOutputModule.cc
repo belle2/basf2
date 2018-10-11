@@ -15,8 +15,7 @@ ZMQRxOutputModule::ZMQRxOutputModule() : Module()
   addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
   addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
   addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
-  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message",
-           m_param_maximalWaitingTime);
+  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message");
   setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
   B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
@@ -50,7 +49,6 @@ void ZMQRxOutputModule::event()
       auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
         B2DEBUG(100, "Having received an event backup. Will go in with this.");
-        // TODO: We would set a flag here, as we have received this message from the input process
         m_streamer.read(std::move(message));
         StoreObjPtr<EventMetaData> eventMetaData;
         eventMetaData->addErrorFlag(EventMetaData::EventErrorFlag::c_HLTCrash);

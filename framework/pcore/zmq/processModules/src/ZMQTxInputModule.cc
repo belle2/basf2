@@ -19,10 +19,9 @@ ZMQTxInputModule::ZMQTxInputModule() : Module()
   addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
   addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
   addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
-  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message",
-           m_param_maximalWaitingTime);
-  addParam("workerProcessTimeout", m_param_workerProcessTimeout, "Maximal time a worker is allowed to spent per event",
-           m_param_workerProcessTimeout);
+  addParam("maximalWaitingTime", m_param_maximalWaitingTime, "Maximal time to wait for any message");
+  addParam("workerProcessTimeout", m_param_workerProcessTimeout, "Maximal time a worker is allowed to spent per event");
+  addParam("useEventBackup", m_param_useEventBackup, "Turn on the event backup");
 
   setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
@@ -150,7 +149,7 @@ void ZMQTxInputModule::event()
 //TODO: wait for confirmation before deleting when sending backup messages to output
 void ZMQTxInputModule::checkWorkerProcTimeout()
 {
-  if (not m_param_useEventBackup) {
+  if (not m_param_useEventBackup or m_param_workerProcessTimeout == 0) {
     return;
   }
 

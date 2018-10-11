@@ -9,6 +9,7 @@
 #include <framework/pcore/PathUtils.h>
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 #include <framework/core/ModuleManager.h>
+#include <framework/core/Environment.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/logging/LogMethod.h>
 #include <set>
@@ -103,18 +104,25 @@ ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, 
 
   return histoManagerModule;
 }
-ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath,
-                                      const std::string& socketAddress)
+ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath)
 {
   B2ASSERT("The main part is empty. This is a bug in the framework.",
            mainPath and not mainPath->isEmpty());
 
   ModuleManager& moduleManager = ModuleManager::Instance();
 
+  const auto& environment = Environment::Instance();
+
+  const auto& socketAddress = environment.getZMQSocketAddress();
   const auto inputSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_input));
   const auto outputSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_output));
   const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_pub));
   const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_sub));
+
+  unsigned int maximalWaitingTime = environment.getZMQMaximalWaitingTime();
+  unsigned int eventBufferSize = environment.getZMQEventBufferSize();
+  unsigned int workerTimeout = environment.getZMQWorkerTimeout();
+  bool useEventBackup = environment.getZMQUseEventBackup();
 
   if (inputPath) {
     // Add TXInput after input path
@@ -122,6 +130,9 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     zmqTxInputModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
     zmqTxInputModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
     zmqTxInputModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
+    zmqTxInputModule->getParam<unsigned int>("workerProcessTimeout").setValue(workerTimeout);
+    zmqTxInputModule->getParam<bool>("useEventBackup").setValue(useEventBackup);
+    zmqTxInputModule->getParam<unsigned int>("maximalWaitingTime").setValue(maximalWaitingTime);
     appendModule(inputPath, zmqTxInputModule);
 
     // Add RXWorker before main path
@@ -129,6 +140,8 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     zmqRxWorkerModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
     zmqRxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
     zmqRxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
+    zmqRxWorkerModule->getParam<unsigned int>("maximalWaitingTime").setValue(maximalWaitingTime);
+    zmqRxWorkerModule->getParam<unsigned int>("eventBufferSize").setValue(eventBufferSize);
     prependModule(mainPath, zmqRxWorkerModule);
   }
 
@@ -145,6 +158,7 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     zmqRxOutputModule->getParam<std::string>("socketName").setValue(outputSocketAddress);
     zmqRxOutputModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
     zmqRxOutputModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
+    zmqRxOutputModule->getParam<unsigned int>("maximalWaitingTime").setValue(maximalWaitingTime);
     prependModule(outputPath, zmqRxOutputModule);
   }
 

@@ -22,8 +22,7 @@ namespace Belle2 {
     static std::tuple<PathPtr, PathPtr, PathPtr> splitPath(const PathPtr& path);
 
     /** Adds internal zmq modules to the paths. */
-    static ModulePtrList preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath,
-                                      const std::string& socketAddress);
+    static ModulePtrList preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath);
 
     /** Find the histogram manager in the paths and return it. */
     static ModulePtr getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath);

@@ -77,6 +77,7 @@ namespace {
     }
   }
 
+  /// The socket address currently in use
   std::string g_socketAddress = "";
 
   void deleteSocketFiles()
@@ -104,14 +105,14 @@ namespace {
   }
 } // namespace
 
-ZMQEventProcessor::ZMQEventProcessor(const std::string& socketAddress)
+ZMQEventProcessor::ZMQEventProcessor()
 {
   B2ASSERT("You are having two instances of the ZMQEventProcessor running! This is not possible",
            not g_eventProcessorForSignalHandling);
-  g_socketAddress = socketAddress;
   g_eventProcessorForSignalHandling = this;
 
   // Make sure to remove the sockets
+  g_socketAddress = Environment::Instance().getZMQSocketAddress();
   std::atexit(deleteSocketFiles);
 }
 
@@ -150,7 +151,7 @@ void ZMQEventProcessor::process(PathPtr path, long maxEvent)
   }
 
   // inserts Rx/Tx modules into path (sets up IPC structures)
-  const ModulePtrList& moduleList = PathUtils::preparePaths(inputPath, mainPath, outputPath, g_socketAddress);
+  const ModulePtrList& moduleList = PathUtils::preparePaths(inputPath, mainPath, outputPath);
 
   B2DEBUG(10, "Initialisation phase");
   // Run the initialization of the modules and the histogram manager
@@ -244,9 +245,12 @@ void ZMQEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& 
   exit(0);
 }
 
-void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent,
-                                  const std::string& pubSocketAddress, const std::string& subSocketAddress)
+void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent)
 {
+  const auto& socketAddress = Environment::Instance().getZMQSocketAddress();
+  const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_pub));
+  const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_sub));
+
   if (not outputPath or outputPath->isEmpty()) {
     return;
   }
@@ -282,8 +286,7 @@ void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList
   exit(0);
 }
 void ZMQEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath,
-                                  const ModulePtrList& terminateGlobally,
-                                  long maxEvent)
+                                  const ModulePtrList& terminateGlobally, long maxEvent)
 {
   if (numProcesses == 0) {
     return;
@@ -331,8 +334,10 @@ void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& m
     return;
   }
 
+  const auto& environment = Environment::Instance();
+
   B2DEBUG(10, "Will now start process monitor...");
-  const int numProcesses = Environment::Instance().getNumberProcesses();
+  const int numProcesses = environment.getNumberProcesses();
   m_processMonitor.initialize(numProcesses);
 
   // Make sure the input process is running until we go on
@@ -351,6 +356,9 @@ void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& m
   // at least start the number of workers requested
   runWorker(m_processMonitor.needMoreWorkers(), inputPath, mainPath, terminateGlobally, maxEvent);
 
+  const auto& restartFailedWorkers = environment.getZMQRestartFailedWorkers();
+  const auto& failOnFailedWorkers = environment.getZMQFailOnFailedWorkers();
+
   B2DEBUG(10, "Will now start main loop...");
   while (true) {
     // check multicast for messages and kill workers if requested
@@ -368,9 +376,9 @@ void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& m
     // Test if we need more workers
     const unsigned int neededWorkers = m_processMonitor.needMoreWorkers();
     if (neededWorkers > 0) {
-      if (m_param_restartFailedWorkers) {
+      if (restartFailedWorkers) {
         runWorker(neededWorkers, inputPath, mainPath, terminateGlobally, maxEvent);
-      } else if (m_param_failOnFailedWorkers) {
+      } else if (failOnFailedWorkers) {
         B2ERROR("A worker failed. Will try to end the process smoothly now.");
         break;
       } else if (not m_processMonitor.hasWorkers()) {
@@ -389,9 +397,11 @@ void ZMQEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, cons
   const int numProcesses = Environment::Instance().getNumberProcesses();
   GlobalProcHandler::initialize(numProcesses);
 
-  const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(g_socketAddress, ZMQAddressType::c_pub));
-  const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(g_socketAddress, ZMQAddressType::c_sub));
-  const auto controlSocketAddress(ZMQAddressUtils::getSocketAddress(g_socketAddress, ZMQAddressType::c_control));
+  const auto& socketAddress = Environment::Instance().getZMQSocketAddress();
+
+  const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_pub));
+  const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_sub));
+  const auto controlSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_control));
 
   // We catch all signals and store them into a variable. This is used during the main loop then.
   // From now on, we have to make sure to clean up behind us
@@ -401,7 +411,7 @@ void ZMQEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, cons
   B2DEBUG(10, "Starting input process...");
   runInput(inputPath, terminateGlobally, maxEvent);
   B2DEBUG(10, "Starting output process...");
-  runOutput(outputPath, terminateGlobally, maxEvent, pubSocketAddress, subSocketAddress);
+  runOutput(outputPath, terminateGlobally, maxEvent);
 
   B2DEBUG(10, "Starting monitoring process...");
   runMonitoring(inputPath, mainPath, terminateGlobally, maxEvent);

@@ -25,7 +25,7 @@
 
 namespace Belle2 {
   class StackTreeSearcher : public
-    TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const, const CDCCKFWireHitCache> {
+    TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const> {
   public:
     StackTreeSearcher()
     {
@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
     void apply(std::vector<CDCCKFPath>& paths,
-               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits, const std::vector<CDCCKFWireHitCache>& wireHitCache) override
+               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
     {
 
       if (paths.empty()) {
@@ -57,7 +57,7 @@ namespace Belle2 {
 
       for (CDCCKFPath& path : paths) {
         B2DEBUG(100, "Testing one path from " << path.back());
-        m_stateCreator.apply(nextStates, path, wireHits, wireHitCache);
+        m_stateCreator.apply(nextStates, path, wireHits);
         m_stateFilter.apply(path, nextStates);
 
         // TODO: Attention: if there is no hit anymore, the path will not be added to the final set!
@@ -96,7 +96,7 @@ namespace Belle2 {
       paths.swap(newPaths);
       newPaths.clear();
 
-      apply(paths, wireHits, wireHitCache);
+      apply(paths, wireHits);
     }
 
   private:

@@ -63,21 +63,11 @@ void CKFToCDCFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wire
 
   const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
 
-  // buffer wire-hit based infoL
-  const size_t nHits = wireHitPtrs.size();
-  std::vector<CDCCKFWireHitCache> wireCache(nHits);
-
-  for (size_t iHit = 0; iHit < nHits; iHit++) {
-    wireCache[iHit].phi      = wireHits[iHit].getRefPos2D().phi();
-    wireCache[iHit].icLayer  = wireHits[iHit].getWire().getICLayer();
-  }
-
-
   for (const auto& seed : m_seeds) {
     B2DEBUG(100, "Starting new seed");
     m_paths.clear();
     m_paths.push_back(seed);
-    m_treeSearcher.apply(m_paths, wireHitPtrs,  wireCache);
+    m_treeSearcher.apply(m_paths, wireHitPtrs);
     m_resultFinalizer.apply(m_paths, m_results);
   }
 

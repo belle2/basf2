@@ -18,19 +18,25 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
+#include <boost/container/flat_set.hpp>
 
 namespace Belle2 {
-
-  /// Store basic wire info for faster access
-  struct CDCCKFWireHitCache {
-    int     icLayer;
-    double  phi;
-  };
 
 
   class CDCCKFStateCreator
     : public TrackFindingCDC::Findlet<CDCCKFState, const CDCCKFState,
-      const TrackFindingCDC::CDCWireHit* const, const CDCCKFWireHitCache > {
+      const TrackFindingCDC::CDCWireHit* const > {
+
+    /// Parent class
+    using Super = TrackFindingCDC::Findlet<CDCCKFState, const CDCCKFState, const TrackFindingCDC::CDCWireHit* const>;
+
+    /// Store basic wire info for faster access
+    struct CDCCKFWireHitCache {
+      int     icLayer;
+      double  phi;
+    };
+
+
   public:
 
     /// Expose the parameters of the sub findlets.
@@ -42,39 +48,58 @@ namespace Belle2 {
                                     m_maximalDeltaPhi, "Maximal distance in phi between wires for Z=0 plane", m_maximalDeltaPhi);
     }
 
-    void apply(std::vector<CDCCKFState>& nextStates, const CDCCKFPath& path,
-               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits, const std::vector<CDCCKFWireHitCache>& wireHitCache) override
+    /// Clear the wire cache
+    void beginEvent() override
     {
+      Super::beginEvent();
+      m_wireHitCache.clear();
+    }
 
-      // Cache last hit layer
+
+    void apply(std::vector<CDCCKFState>& nextStates, const CDCCKFPath& path,
+               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
+    {
+      // Create cache over wirehits, if empty:
+      if (m_wireHitCache.empty()) {
+        const size_t nHits = wireHits.size();
+        m_wireHitCache.reserve(nHits);
+        for (auto  hitPtr : wireHits) {
+          m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().phi()});
+        }
+      }
+
+      // Cache last-on-the-path state info too:
       const auto& lastState = path.back();
       int lastICLayer =  lastState.isSeed() ? 0 : lastState.getWireHit()->getWire().getICLayer();
       double lastPhi  =  lastState.isSeed() ? 0 : lastState.getWireHit()->getRefPos2D().phi();
 
-      // Cache all wireHits for the current path
-      std::set<const TrackFindingCDC::CDCWireHit*> wireHitsOnPath;
+      // Get sorted vector of wireHits on the path for faster search
+      std::vector<const TrackFindingCDC::CDCWireHit*> wireHitsOnPath;
       for (auto const& state : path) {
         if (! state.isSeed()) {
-          wireHitsOnPath.insert(state.getWireHit());
+          wireHitsOnPath.push_back(state.getWireHit());
         }
       }
+      std::sort(wireHitsOnPath.begin(), wireHitsOnPath.end());
+
 
       for (size_t i = 0; i < wireHits.size(); i++) {
 
         const TrackFindingCDC::CDCWireHit* wireHit = wireHits[i];
 
-        const auto iCLayer =  wireHitCache[i].icLayer; // wireHit->getWire().getICLayer();
+        const auto iCLayer =  m_wireHitCache[i].icLayer; // wireHit->getWire().getICLayer();
         if (std::abs(lastICLayer - iCLayer) > m_maximalLayerJump) {
           continue;
         }
 
-        if (wireHitsOnPath.find(wireHit) != wireHitsOnPath.end()) {
+        if (std::binary_search(wireHitsOnPath.begin(), wireHitsOnPath.end(), wireHit)) {
           continue;
         }
 
+
         if (! lastState.isSeed()) {
           //    if ( fabs(fmod(lastPhi - wireHit->getRefPos2D().phi(), TMath::Pi() ))  > m_maximalDeltaPhi)  {
-          if (fabs(fmod(lastPhi - wireHitCache[i].phi, TMath::Pi()))  > m_maximalDeltaPhi)  {
+          if (fabs(fmod(lastPhi - m_wireHitCache[i].phi, TMath::Pi()))  > m_maximalDeltaPhi)  {
             continue;
           }
         }
@@ -86,5 +111,6 @@ namespace Belle2 {
   private:
     int m_maximalLayerJump = 2;
     double m_maximalDeltaPhi =  TMath::Pi() / 8;
+    std::vector<CDCCKFWireHitCache> m_wireHitCache = {};
   };
 }

@@ -62,8 +62,13 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   addParam("requestedNumberOfCDCHits", m_requestedNumberOfCDCHits, "Minimal/Maximal number of CDC hits, the track has to possess "
            "to be considered for bremsstrahlung finding",
            m_requestedNumberOfCDCHits);
+
   addParam("electronProbabilityCut", m_electronProbabilityCut, "Cut on the electron probability (from pid) of track",
            m_electronProbabilityCut);
+
+  addParam("clusterDistanceCut", m_clusterDistanceCut,
+           "Cut on the distance between the cluster position angle and the extrapolation angle",
+           m_clusterDistanceCut);
 }
 
 void ECLTrackBremFinderModule::initialize()
@@ -291,13 +296,15 @@ void ECLTrackBremFinderModule::event()
 
         double effAcceptanceFactor = std::get<3>(matchClustermSoP);
         ECLCluster* bremCluster = std::get<0>(matchClustermSoP);
+        double clusterDistance = std::get<2>(matchClustermSoP);
 
-        if (fitted_pos.Perp() <= 16) { // should always be true, but this is not the case
+        if (fitted_pos.Perp() <= 16 && clusterDistance <= m_clusterDistanceCut) {
           m_bremHits.appendNew(recoTrack, bremCluster,
                                fitted_pos, bremCluster->getEnergy(),
-                               std::get<2>(matchClustermSoP), effAcceptanceFactor);
+                               clusterDistance, effAcceptanceFactor);
 
-          // generate a mdst object bremphoton to tranfer the information to the analysis
+          // generate a mdst object bremphoton to transfer the information to the analysis
+          // todo: remove this in favor of named relations
           m_bremPhotons.appendNew(&track, bremCluster, effAcceptanceFactor);
 
           if (primaryClusterOfTrack) {

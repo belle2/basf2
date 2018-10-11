@@ -90,6 +90,11 @@ namespace Belle2 {
     float m_electronProbabilityCut = 0;
 
     /**
+     * Cut on the distance between the cluster position angle and the extrapolation angle
+     */
+    float m_clusterDistanceCut = 0.05;
+
+    /**
      * StoreArray name of the ECLClusters for brem matching
      */
     std::string m_param_eclClustersStoreArrayName = "";

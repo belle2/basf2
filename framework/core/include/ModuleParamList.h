@@ -222,4 +222,12 @@ namespace Belle2 {
     /// Stores the module parameters together with a string name as key.
     std::map<std::string, ModuleParamPtr> m_paramMap;
   };
+
+  // These frequent template instantiations are provided by the library and do not require including the details header
+  extern template void ModuleParamList::addParameter(const std::string&, bool&, const std::string&, const bool&);
+  extern template void ModuleParamList::addParameter(const std::string&, double&, const std::string&, const double&);
+  extern template void ModuleParamList::addParameter(const std::string&, float&, const std::string&, const float&);
+  extern template void ModuleParamList::addParameter(const std::string&, int&, const std::string&, const int&);
+  extern template void ModuleParamList::addParameter(const std::string&, std::string&, const std::string&, const std::string&);
+
 } //end of Belle2 namespace

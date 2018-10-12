@@ -15,48 +15,52 @@
 #include <framework/pcore/ProcessMonitor.h>
 
 namespace Belle2 {
-
-  class ProcHandler;
-
   /**
-    This class provides the core event processing loop for parallel processing.
+    This class provides the core event processing loop for parallel processing with ZMQ.
   */
   class ZMQEventProcessor : public EventProcessor {
   public:
 
-    /** Constructor */
+    /// Init the socket cleaning at exit
     ZMQEventProcessor();
 
-    /** Destructor */
+    /// Make sure we remove all sockets cleanly
     virtual ~ZMQEventProcessor();
 
-    /** Processes the full module chain using parallel processing, starting with the first module in the given path. */
-    /**
-        Processes all events for the given run number and for events from 0 to maxEvent.
-        \param spath The processing starts with the first module of this path.
-        \param maxEvent The maximum number of events that will be processed.
-            If the number is smaller or equal 0, all events will be processed.
-    */
+    /// Processes the full module chain using parallel processing, starting with the first module in the given path.
     void process(PathPtr spath, long maxEvent);
 
-    /** clean up IPC resources (should only be called in one process). */
+    /// clean up IPC resources (should only be called in one process).
     void cleanup();
 
   private:
+    /// First step in the process: init the module in the list
     void initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager);
 
+    /// Second step in the process: fork out the processes we need to have and call the event loop
     void forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
                     const ModulePtrList& terminateGlobally);
 
+    /// Last step in the process: run the termination and cleanup (kill all remaining processes)
     void terminateAndCleanup(const ModulePtr& histogramManager);
 
+    /// Start the monitoring (without forking)
     void runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally, long maxEvent);
+
+    /// Fork out the input process
     void runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent);
+
+    /// Fork out the output process
     void runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent);
+
+    /// Fork out the N worker process
     void runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
                    long maxEvent);
+
+    /// Basic function run in every process: process the event loop of the given path
     void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);
 
+    /// Instance of the process monitor
     ProcessMonitor m_processMonitor;
   };
 }

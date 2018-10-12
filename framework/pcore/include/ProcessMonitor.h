@@ -34,8 +34,13 @@ namespace Belle2 {
     /// Ask all processes to terminate. If not, kill them after timeout seconds.
     void killProcesses(unsigned int timeout);
 
+    /// Init the processing with that many workers
     void initialize(unsigned int requestedNumberOfWorkers);
+
+    /// Terminate the processing
     void terminate();
+
+    /// Reset the internal state
     void reset();
 
     /// check multicast for messages and kill workers if requested
@@ -55,19 +60,26 @@ namespace Belle2 {
     bool hasWorkers() const;
 
   private:
+    /// The client used for message processing
     ZMQClient m_client;
 
+    /// How many workers we should request to start
     unsigned int m_requestedNumberOfWorkers = 0;
+    /// The current list of pid -> process types (to be compared to the proc handler)
     std::map<int, ProcType> m_processList;
+    /// Someone requested us to end the processing
     bool m_hasEnded = false;
 
     /// The data store streamer
     StreamHelper m_streamer;
 
+    /// Did we already receive the statistics?
     bool m_receivedStatistics = false;
 
+    /// Cound the number of processes with a certain type
     unsigned int processesWithType(const ProcType& procType) const;
 
+    /// Process a message from the multicast
     template <class ASocket>
     void processMulticast(const ASocket& socket);
   };

@@ -74,7 +74,7 @@ namespace Belle2 {
     /// How many processes are handled in this GlobalProcHandler
     static int s_numEventProcesses;
 
-    // global list of PIDs managed by GlobalProcHandler.
+    /// global list of PIDs managed by GlobalProcHandler.
     static std::vector<int> s_pidVector;
     /// Which PIDs were started with which types
     static std::map<int, ProcType> s_startedPIDs;

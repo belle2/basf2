@@ -55,6 +55,8 @@ namespace Belle2 {
     /** Set whether console logging via pyhthon is enabled */
     static void setPythonLoggingEnabled(bool enabled) { s_pythonLoggingEnabled = enabled; }
 
+    /** Register a std::atexit handler to allow python to flush the remaining output */
+    static void registerAtExitHandling();
   private:
     int m_fd;  /**< The output stream used for sending the log message.*/
     bool m_color; /**< Flag for color output.*/

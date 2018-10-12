@@ -23,6 +23,7 @@ bool LogConnectionConsole::s_pythonLoggingEnabled{false};
 LogConnectionConsole::LogConnectionConsole(int outputFD, bool color):
   m_fd(dup(outputFD)), m_color(color)
 {
+  registerAtExitHandling();
   // check fd
   if (m_fd < 0) throw std::runtime_error(std::string("Error duplicating file descriptor: ") + std::strerror(errno));
 }
@@ -84,4 +85,19 @@ bool LogConnectionConsole::sendMessage(const LogMessage& message)
   }
   write(stream.str());
   return true;
+}
+
+void LogConnectionConsole::registerAtExitHandling()
+{
+  static bool done{false};
+  if (!done) {
+    // If python logging is enabled we need to give jupyter some time to flush
+    // the output as this happens only in the output thread. Seems flushing again is fine :D
+    std::atexit([]() {
+      if (LogConnectionConsole::getPythonLoggingEnabled()) {
+        boost::python::import("sys").attr("exit").attr("flush")();
+      }
+    });
+    done = true;
+  }
 }

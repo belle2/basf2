@@ -199,6 +199,18 @@ public:
     return s.str();
   }
 
+  /** Return the constant message part without the variables */
+  std::string getMessage() const
+  {
+    return m_stringStream.str();
+  }
+
+  /** Return the list of all defined variables */
+  const std::vector<LogVar>& getVariables() const
+  {
+    return m_variables;
+  }
+
 private:
 
   /** All non-LogVar items are directly forwarded to this stringstream */

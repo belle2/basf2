@@ -14,6 +14,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/pcore/ProcHandler.h>
 
+#include <boost/property_tree/json_parser.hpp>
 #include <ostream>
 
 using namespace std;
@@ -60,6 +61,49 @@ bool LogMessage::operator==(const LogMessage& message) const
           (m_file == message.m_file));
 }
 
+std::string LogMessage::toJSON(bool complete) const
+{
+  using namespace boost::property_tree::json_parser;
+  std::stringstream buffer;
+  static const double startClock = Utils::getClock();
+  double time = (Utils::getClock() - startClock) / Unit::s;
+  int logInfo = (m_logInfo and not complete) ? m_logInfo :
+                (LogConfig::c_Timestamp | LogConfig::c_Level | LogConfig::c_Message | LogConfig::c_Module |
+                 LogConfig::c_Package | LogConfig::c_Function | LogConfig::c_File | LogConfig::c_Line);
+  // in JSON we always output level, independent of what the log info says, otherwise it is hard to parse
+  buffer << "{\"level\":\"" << LogConfig::logLevelToString(m_logLevel) << '"';
+  if (logInfo & LogConfig::c_Message) {
+    buffer << ",\"message\":\"" << create_escapes(m_message.getMessage()) << '"';
+    const auto& vars = m_message.getVariables();
+    if (vars.size() > 0 or complete) {
+      buffer << ",\"variables\":{";
+      bool first{true};
+      for (const auto& v : vars) {
+        if (!first) buffer << ",";
+        buffer << '"' << create_escapes(v.getName()) << "\":\"" << create_escapes(v.getValue()) << '"';
+        first = false;
+      }
+      buffer << '}';
+    }
+  }
+  if (logInfo & LogConfig::c_Module)
+    buffer << ",\"module\":\"" << create_escapes(m_module) << '"';
+  if (logInfo & LogConfig::c_Package)
+    buffer << ",\"package\":\"" << create_escapes(m_package) << '"';
+  if (logInfo & LogConfig::c_Function)
+    buffer << ",\"function\":\"" << create_escapes(m_function) << '"';
+  if (logInfo & LogConfig::c_File)
+    buffer << ",\"file\":\"" << create_escapes(m_file) << '"';
+  if (logInfo & LogConfig::c_Line)
+    buffer << ",\"line\":" << m_line;
+  if (logInfo & LogConfig::c_Timestamp)
+    buffer << ",\"timestamp\":" << std::fixed << std::setprecision(3) << time;
+  if (ProcHandler::EvtProcID() != -1 or complete)
+    buffer << ",\"proc\":" << ProcHandler::EvtProcID();
+  //variables ...
+  buffer << "}\n";
+  return buffer.str();
+}
 
 std::ostream& LogMessage::print(std::ostream& out) const
 {

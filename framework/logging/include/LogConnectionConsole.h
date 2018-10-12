@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/logging/LogConnectionBase.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -42,6 +43,9 @@ namespace Belle2 {
      * @return true if the message could be send.
      */
     bool sendMessage(const LogMessage& message) override;
+
+    /** Send a preformatted string message to the connected output */
+    void write(const std::string& message);
 
     /** Returns true if the connection to the io stream could be established. */
     bool isConnected() override;

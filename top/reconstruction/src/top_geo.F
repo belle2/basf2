@@ -696,10 +696,10 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
 
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
-
+#include "TOP_CONS.fi"
       REAL LAM, PHIND_LAMBDA
       
-      LAM=1240./E
+      LAM=C_HC/E
       PHASE_INDEX=PHIND_LAMBDA(LAM)
       
       END
@@ -724,6 +724,7 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
 
+#include "TOP_CONS.fi"
       REAL RIND_SF
       COMMON /TOP_RIND/ RIND_SF
 
@@ -731,7 +732,7 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
       DATA DL /1./              ! (nm)
       SAVE DL
 
-      LAM=1240./E
+      LAM=C_HC/E
       PHIND=PHIND_LAMBDA(LAM)
       DNDL=(PHIND_LAMBDA(LAM+DL/2)-PHIND_LAMBDA(LAM-DL/2))/DL
 
@@ -744,10 +745,10 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
 
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
-
+#include "TOP_CONS.fi"
       REAL LAM
 
-      LAM=1240/E
+      LAM=C_HC/E
 cc      ABSPT_LENG=50000.*(LAM/442)**4 ! J. Va'vra (7-jul-2004)
       ABSPT_LENG=15100.*(LAM/405)**4 ! Alan, 2013
 

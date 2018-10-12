@@ -71,9 +71,6 @@ if _is_ipython:
         logging.enable_python_logging = True
 
         # convenience wrap the process() function to use a calculation object
-        from hep_ipython_tools.ipython_handler_basf2 import handler as _handler
-        _handler.style()
-
         def process(path, max_event=0):
             """
             Start processing events using the modules in the given `basf2.Path` object.
@@ -93,6 +90,7 @@ if _is_ipython:
                 a `hep_ipython_tools.calculation.Calculation` object
             """
 
+            from hep_ipython_tools.ipython_handler_basf2 import handler as _handler
             calculation = _handler.process(path, max_event=max_event)
             calculation.start()
             calculation.wait_for_end()

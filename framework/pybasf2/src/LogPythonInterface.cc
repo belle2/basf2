@@ -283,8 +283,8 @@ These fields can be used as a bitmask to configure the appearance of log message
   void (LogPythonInterface::*addLogConsole)(bool) = &LogPythonInterface::addLogConsole;
 
   //Interface the Interface class :)
-  class_<LogPythonInterface, boost::noncopyable>("LogPythonInterface",
-                                                 R"(Logging configuration (for messages generated from C++ or Python), available as a global `basf2.logging` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
+  class_<LogPythonInterface, std::shared_ptr<LogPythonInterface>, boost::noncopyable>("LogPythonInterface", R"(
+Logging configuration (for messages generated from C++ or Python), available as a global `basf2.logging` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
 
 This class exposes a object called `logging` to the python interface. With
 this object it is possible to set all properties of the logging system
@@ -358,6 +358,10 @@ when running in jupyter notebooks or when trying to redirect stdout in python
 to a buffer. This setting affects all log connections to the
 console.)DOCSTRING")
   ;
+
+  //Expose Logging object
+  std::shared_ptr<LogPythonInterface> initguard{new LogPythonInterface()};
+  scope().attr("logging") = initguard;
 
   //Add all the logging functions. To handle arbitrary keyword arguments we add
   //them as raw functions. However it seems setting the docstring needs to be

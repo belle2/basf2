@@ -38,9 +38,6 @@ basf2copyright = 'Copyright(C) 2010-2018  Belle II Collaboration'
 # This will again be replaced once process() is called.
 _signal.signal(_signal.SIGINT, _signal.SIG_DFL)
 
-# Create default framework, also initialises environment
-logging = pybasf2.LogPythonInterface()
-
 
 def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLevel=None, **kwargs):
     """

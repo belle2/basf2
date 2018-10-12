@@ -8,8 +8,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLDATABASEIMPORTER_H
-#define ECLDATABASEIMPORTER_H
+#pragma once
 
 //framework
 #include <framework/logging/Logger.h>
@@ -69,6 +68,16 @@ namespace Belle2 {
     */
     void importShowerEnergyCorrectionTemporary();
 
+    /**
+     * Import threshold values for track ECL cluster matching to the database
+     */
+    void importTrackClusterMatchingThresholds();
+
+    /**
+     * Import parameterizations for the RMS between tracks and ECL clusters to the database
+     */
+    void importTrackClusterMatchingParameterizations();
+
   private:
 
     std::vector<std::string> m_inputFileNames; /**< Input file name */
@@ -122,9 +131,9 @@ namespace Belle2 {
      * 3: Added Second moment importer.
      * 4: Added shower leakage corrections importer.
      * 5: Added ECLShowerEnergyCorrectionTemporary importer.
+     * 6: Added importer for TrackClusterMatchingThresholds and TrackClusterMatchingParameterizations.
      */
-    ClassDef(ECLDatabaseImporter, 5);
+    ClassDef(ECLDatabaseImporter, 6);
   };
 
 } // Belle2 namespace
-#endif

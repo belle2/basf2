@@ -25,6 +25,8 @@
 #include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 #include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 #include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
+#include <ecl/dbobjects/ECLTrackClusterMatchingParameterizations.h>
+#include <ecl/dbobjects/ECLTrackClusterMatchingThresholds.h>
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -436,4 +438,108 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
   }
 
 
+}
+
+void ECLDatabaseImporter::importTrackClusterMatchingThresholds()
+{
+  if (m_inputFileNames.size() > 1)
+    B2FATAL("Sorry, you must only import one file at a time for now!");
+
+  //Expect a txt file
+  boost::filesystem::path path(m_inputFileNames[0]);
+  if (path.extension() != ".txt")
+    B2FATAL("Expecting a .txt file. Aborting");
+
+  vector<pair<double, double>> m_matchingThresholdPairsFWD;
+  vector<pair<double, double>> m_matchingThresholdPairsBWD;
+  vector<pair<double, pair<double, double>>> m_matchingThresholdPairsBRL;
+  pair<double, double> m_matchingThresholdPair;
+  pair<double, pair<double, double>> m_thetaMatchingThresholdPair;
+  double pt, threshold, thetalimit;
+  string eclregion;
+
+  ifstream infile(m_inputFileNames[0]);
+  string line;
+  while (getline(infile, line)) {
+    istringstream iss(line);
+    iss >> eclregion;
+    if (eclregion == "FWD" || eclregion == "BWD") {
+      iss >> pt >> threshold;
+      m_matchingThresholdPair = make_pair(pt, threshold);
+      if (eclregion == "FWD") m_matchingThresholdPairsFWD.push_back(m_matchingThresholdPair);
+      else m_matchingThresholdPairsBWD.push_back(m_matchingThresholdPair);
+    } else if (eclregion == "BRL") {
+      iss >> thetalimit >> pt >> threshold;
+      m_matchingThresholdPair = make_pair(pt, threshold);
+      m_thetaMatchingThresholdPair = make_pair(thetalimit, m_matchingThresholdPair);
+      m_matchingThresholdPairsBRL.push_back(m_thetaMatchingThresholdPair);
+    }
+  }
+
+  DBImportObjPtr<ECLTrackClusterMatchingThresholds> dbPtr("ECLTrackClusterMatchingThresholds");
+  dbPtr.construct(m_matchingThresholdPairsFWD, m_matchingThresholdPairsBWD, m_matchingThresholdPairsBRL);
+
+  IntervalOfValidity iov(0, 0, -1, -1);
+
+  //Import into local db
+  dbPtr.import(iov);
+}
+
+void ECLDatabaseImporter::importTrackClusterMatchingParameterizations()
+{
+  if (m_inputFileNames.size() > 1)
+    B2FATAL("Sorry, you must only import one file at a time for now!");
+
+  // Open file
+  TFile* inputFile = new TFile(m_inputFileNames[0].data(), "READ");
+
+  if (!inputFile || inputFile->IsZombie())
+    B2FATAL("Could not open file " << m_inputFileNames[0]);
+
+  TF1* f_RMSParameterizationThetaFWDCROSS = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaFWDCROSS");
+  TF1* f_RMSParameterizationThetaFWDDL    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaFWDDL");
+  TF1* f_RMSParameterizationThetaFWDNEAR  = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaFWDNEAR");
+  TF1* f_RMSParameterizationThetaBRLCROSS = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBRLCROSS");
+  TF1* f_RMSParameterizationThetaBRLDL    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBRLDL");
+  TF1* f_RMSParameterizationThetaBRLNEAR  = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBRLNEAR");
+  TF1* f_RMSParameterizationThetaBWDCROSS = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBWDCROSS");
+  TF1* f_RMSParameterizationThetaBWDDL    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBWDDL");
+  TF1* f_RMSParameterizationThetaBWDNEAR  = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBWDNEAR");
+  TF1* f_RMSParameterizationPhiFWDCROSS   = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiFWDCROSS");
+  TF1* f_RMSParameterizationPhiFWDDL      = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiFWDDL");
+  TF1* f_RMSParameterizationPhiFWDNEAR    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiFWDNEAR");
+  TF1* f_RMSParameterizationPhiBRLCROSS   = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBRLCROSS");
+  TF1* f_RMSParameterizationPhiBRLDL      = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBRLDL");
+  TF1* f_RMSParameterizationPhiBRLNEAR    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBRLNEAR");
+  TF1* f_RMSParameterizationPhiBWDCROSS   = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBWDCROSS");
+  TF1* f_RMSParameterizationPhiBWDDL      = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBWDDL");
+  TF1* f_RMSParameterizationPhiBWDNEAR    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBWDNEAR");
+
+  DBImportObjPtr<ECLTrackClusterMatchingParameterizations> dbPtr("ECLTrackClusterMatchingParameterizations");
+  dbPtr.construct(*f_RMSParameterizationThetaFWDCROSS,
+                  *f_RMSParameterizationThetaFWDDL,
+                  *f_RMSParameterizationThetaFWDNEAR,
+                  *f_RMSParameterizationThetaBRLCROSS,
+                  *f_RMSParameterizationThetaBRLDL,
+                  *f_RMSParameterizationThetaBRLNEAR,
+                  *f_RMSParameterizationThetaBWDCROSS,
+                  *f_RMSParameterizationThetaBWDDL,
+                  *f_RMSParameterizationThetaBWDNEAR,
+                  *f_RMSParameterizationPhiFWDCROSS,
+                  *f_RMSParameterizationPhiFWDDL,
+                  *f_RMSParameterizationPhiFWDNEAR,
+                  *f_RMSParameterizationPhiBRLCROSS,
+                  *f_RMSParameterizationPhiBRLDL,
+                  *f_RMSParameterizationPhiBRLNEAR,
+                  *f_RMSParameterizationPhiBWDCROSS,
+                  *f_RMSParameterizationPhiBWDDL,
+                  *f_RMSParameterizationPhiBWDNEAR
+                 );
+
+  IntervalOfValidity iov(0, 0, -1, -1);
+
+  //Import into local db
+  dbPtr.import(iov);
+
+  delete inputFile;
 }

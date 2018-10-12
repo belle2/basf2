@@ -9,9 +9,12 @@
  **************************************************************************/
 #pragma once
 
+#include <TF1.h>
+
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -20,6 +23,8 @@
 #include <tracking/dataobjects/ExtHit.h>
 
 namespace Belle2 {
+  class ECLTrackClusterMatchingParameterizations;
+  class ECLTrackClusterMatchingThresholds;
 
   /** The module creates and saves a Relation between Tracks and ECLCluster in
    *  the DataStore. It uses the existing Relation between Tracks and ExtHit as well
@@ -83,6 +88,33 @@ namespace Belle2 {
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
     StoreArray<ECLShower> m_eclShowers; /**< Required input array of ECLShowers */
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits */
+
+    DBObjPtr<ECLTrackClusterMatchingParameterizations> m_matchingParameterizations; /**< Parameterizations of RMS */
+
+    TF1 f_phiRMSFWDCROSS; /**< function to describe phi RMS for FWD CROSS */
+    TF1 f_phiRMSFWDDL; /**< function to describe phi RMS for FWD DL */
+    TF1 f_phiRMSFWDNEAR; /**< function to describe phi RMS for FWD NEAR */
+    TF1 f_phiRMSBRLCROSS; /**< function to describe phi RMS for BRL CROSS */
+    TF1 f_phiRMSBRLDL; /**< function to describe phi RMS for BRL DL */
+    TF1 f_phiRMSBRLNEAR; /**< function to describe phi RMS for BRL NEAR */
+    TF1 f_phiRMSBWDCROSS; /**< function to describe phi RMS for BWD CROSS */
+    TF1 f_phiRMSBWDDL; /**< function to describe phi RMS for BWD DL */
+    TF1 f_phiRMSBWDNEAR; /**< function to describe phi RMS for BWD NEAR */
+    TF1 f_thetaRMSFWDCROSS; /**< function to describe theta RMS for FWD CROSS */
+    TF1 f_thetaRMSFWDDL; /**< function to describe theta RMS for FWD DL */
+    TF1 f_thetaRMSFWDNEAR; /**< function to describe theta RMS for FWD NEAR */
+    TF1 f_thetaRMSBRLCROSS; /**< function to describe theta RMS for BRL CROSS */
+    TF1 f_thetaRMSBRLDL; /**< function to describe theta RMS for BRL DL */
+    TF1 f_thetaRMSBRLNEAR; /**< function to describe theta RMS for BRL NEAR */
+    TF1 f_thetaRMSBWDCROSS; /**< function to describe theta RMS for BWD CROSS */
+    TF1 f_thetaRMSBWDDL; /**< function to describe theta RMS for BWD DL */
+    TF1 f_thetaRMSBWDNEAR; /**< function to describe theta RMS for BWD NEAR */
+
+    DBObjPtr<ECLTrackClusterMatchingThresholds> m_matchingThresholds; /**< Optimized matching thresholds */
+
+    std::vector<std::pair<double, double>> m_matchingThresholdValuesFWD; /**< Matching threshold values for FWD */
+    std::vector<std::pair<double, std::pair<double, double>>> m_matchingThresholdValuesBRL; /**< Matching threshold values for BRL */
+    std::vector<std::pair<double, double>> m_matchingThresholdValuesBWD; /**< Matching threshold values for BWD */
 
     /** members of ECLTrackClusterMatching Module */
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */

@@ -42,10 +42,14 @@ namespace Belle2 {
         thisModuleID = h.getCopyID(); // could be positive or negative
         break;
       }
+      if (thisModuleID == 77) {
+        return -1;
+      }
+
       StoreArray<TOPDigit> topDigits;
       int count = 0;
       for (auto t : topDigits) {
-        if (t.getModuleID() == thisModuleID) {
+        if (abs(t.getModuleID()) == abs(thisModuleID)) { // catch the case where one of the module IDs is negative
           count += 1;
         }
       }

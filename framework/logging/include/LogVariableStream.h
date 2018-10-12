@@ -160,6 +160,117 @@ public:
   }
 
   /**
+   * Provide by-val operator for int, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(int i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for unsigned int, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(unsigned int i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for char, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(char i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for unsigned char, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(unsigned char i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for short, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(short i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for unsigned short, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(unsigned short i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for long, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(long i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for unsigned long, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(unsigned long i)
+  {
+    m_stringStream << i;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for double, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(double f)
+  {
+    m_stringStream << f;
+    return *this;
+  }
+
+  /**
+   * Provide by-val operator for float, because they might
+   * occur as static int const in class defs and break linking
+   * if used by reference.
+   */
+  LogVariableStream& operator<<(float f)
+  {
+    m_stringStream << f;
+    return *this;
+  }
+
+
+  /**
    * Custom comparison operator
    */
   bool operator==(const LogVariableStream& lvs) const

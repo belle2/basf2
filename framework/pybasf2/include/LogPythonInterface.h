@@ -132,6 +132,8 @@ namespace Belle2 {
      */
     void addLogConsole();
 
+    void addLogJSON(bool complete);
+
     /**
      * Add the console as output connection
      *

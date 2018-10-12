@@ -3,11 +3,14 @@
 import basf2
 import unittest
 from b2test_utils import run_in_subprocess, clean_working_directory
+from contextlib import redirect_stdout
+import io
+import json
 
 # @cond internal_test
 
 
-class DBInterface(unittest.TestCase):
+class PythonLogInterface(unittest.TestCase):
     def assertDeath(self, function, *args, **kwargs):
         """Run function in child process and check if it died. Only way to check for B2FATAL"""
         exitcode = run_in_subprocess(target=function, *args, **kwargs)
@@ -109,7 +112,94 @@ class DBInterface(unittest.TestCase):
         # and print a message
         basf2.B2INFO("show current frame info", why="because we can")
         self.check_logs("[INFO] show current frame info\n"
-                        "\twhy = because we can  { package: steering function: test_inspect @%s:110 }\n" % filename)
+                        "\twhy = because we can  { package: steering function: test_inspect @%s:113 }\n" % filename)
+
+
+class PythonLogJSON(unittest.TestCase):
+    def setUp(self):
+        # disable error summary
+        basf2.logging.enable_summary(False)
+        # but use sys.stdout for logging
+        basf2.logging.enable_python_logging = True
+        # log to a file. We assume this is run in a temporary directory so
+        # fixed filename is fine
+        basf2.reset_log()
+        basf2.logging.add_json()
+        # Reset log level
+        basf2.logging.log_level = basf2.LogLevel.INFO
+        basf2.logging.debug_level = 100
+        # modify logging to remove the useless information
+        for level in basf2.LogLevel.values.values():
+            basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+
+    def getLogMessage(self, message, **argk):
+        out = io.StringIO()
+        with redirect_stdout(out):
+            basf2.B2INFO(message, **argk)
+        raw = out.getvalue()
+        # make sure string ends in new line
+        self.assertEqual(raw[-1], "\n")
+        # make sure there are no newlines in the raw string
+        self.assertTrue(raw[:-1].find("\n") < 0)
+        # make sure we can parse json
+        logobject = json.loads(raw)
+        return logobject
+
+    def assertLogMessage(self, message, **argk):
+        # and that the message and level are there
+        logobject = self.getLogMessage(message, **argk)
+        if len(argk):
+            stringified = {str(key): str(val) for key, val in argk.items()}
+            self.assertDictEqual(logobject, {"level": "INFO", "message": message, "variables": stringified})
+        else:
+            self.assertDictEqual(logobject, {"level": "INFO", "message": message})
+
+    def test_info(self):
+        self.assertLogMessage("message")
+
+    def test_multiline(self):
+        self.assertLogMessage("message\ncontaining\nnewlines")
+
+    def test_vars(self):
+        self.assertLogMessage("message", var1="foo", var2="bar", int=3)
+
+    def test_vars_newline(self):
+        self.assertLogMessage("message", var1="foo\nbar", var2="bar\nboo")
+
+    def test_utf8(self):
+        zalgo = "h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ"
+        self.assertLogMessage(zalgo, **{zalgo: zalgo})
+
+    def test_loginfo(self):
+        """Make sure all loginfo settings are honored in json output"""
+        cum_info = 0
+        # level is always added
+        cum_keys = {"level"}
+        # go through all loginfo values and check if the correct field is in
+        # the json, once separately and also cumulative
+        for val, key in basf2.LogInfo.values.items():
+            cum_info |= val
+            key = key.name.lower()
+            cum_keys.add(key)
+            for info, keys in (val, {"level", key}), (cum_info, cum_keys):
+                basf2.logging.set_info(basf2.LogLevel.INFO, info)
+                logobject = self.getLogMessage("simple")
+                self.assertEqual(set(logobject.keys()), keys)
+                varkeys = keys.copy()
+                # variables are parts of messages ... but they only show up if
+                # message is shown
+                if "message" in keys:
+                    varkeys.add("variables")
+                logobject = self.getLogMessage("with var", var="val")
+                self.assertEqual(set(logobject.keys()), varkeys)
+
+    def test_complete(self):
+        """Test that we always get all fields when setting output to complete"""
+        basf2.reset_log()
+        basf2.logging.add_json(True)
+        logobject = self.getLogMessage("message")
+        self.assertSetEqual(set(logobject.keys()), {"level", "message", "variables", "module", "package",
+                                                    "function", "file", "line", "timestamp", "proc"})
 
 
 if __name__ == "__main__":

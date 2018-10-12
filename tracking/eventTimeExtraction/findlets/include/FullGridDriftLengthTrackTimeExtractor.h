@@ -10,12 +10,15 @@
 #pragma once
 
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.dcl.h>
-#include <tracking/eventTimeExtraction/findlets/GridEventTimeExtractor.icc.h>
+#include <tracking/eventTimeExtraction/findlets/GridEventTimeExtractor.dcl.h>
 #include <tracking/eventTimeExtraction/findlets/DriftLengthBasedEventTimeExtractor.h>
 #include <tracking/eventTimeExtraction/findlets/IterativeChi2BasedEventTimeExtractor.h>
 
 namespace Belle2 {
   class RecoTrack;
+
+  // Guard to prevent repeated instantiations
+  extern template class GridEventTimeExtractor<DriftLengthBasedEventTimeExtractor>;
 
   class FullGridDriftLengthTrackTimeExtractor final : public BaseEventTimeExtractor<RecoTrack*> {
   private:

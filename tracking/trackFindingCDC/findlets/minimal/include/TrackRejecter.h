@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
@@ -22,6 +23,10 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
     class CDCTrack;
+
+    // Guard to prevent repeated instantiations
+    extern template class Chooseable<BaseTrackFilter>;
+    extern template class ChooseableFilter<TrackFilterFactory>;
 
     /// Deletes fake tracks that have been rejected by a filter
     class TrackRejecter : public Findlet<CDCTrack&> {

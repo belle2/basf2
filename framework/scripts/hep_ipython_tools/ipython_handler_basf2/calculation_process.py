@@ -1,4 +1,7 @@
 import basf2.core as _basf2
+import sys
+import os
+import ctypes
 
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.ipython_handler_basf2.entities import Basf2CalculationQueueStatistics
@@ -28,28 +31,35 @@ class Basf2CalculationProcess(CalculationProcess):
         A function to prepare a path with the modules given in path.
         """
         if self.path:
-            # Append the needed ToFileLogger module
-            created_path = _basf2.create_path()
-            file_logger_module = _basf2.register_module("ToFileLogger")
-            file_logger_module.param("fileName", self.log_file_name)
-            created_path.add_module(file_logger_module)
-
-            # Copy the modules from the path
-            for module in self.path.modules():
-                created_path.add_module(module)
-
             # import late due to side effects with importing ROOT
             from hep_ipython_tools.ipython_handler_basf2 import python_modules
             # Add the progress python module
-            created_path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
+            self.path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
             # Add the print collections python module
-            created_path.add_module(python_modules.PrintCollections(self.result_queue))
-
-            self.path = created_path
-
+            self.path.add_module(python_modules.PrintCollections(self.result_queue))
         else:
             #: Set is_valid to false to not show this process in any listings.
             self.is_valid = False
+
+    def initialize_output(self):
+        """
+        Make sure all output by python and or C is written to the same output file
+        """
+        # reset stdout/stderr (notebooks forward them over zmq)
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
+        # open filename
+        logfile = open(self.log_file_name, "wb", 0)
+
+        # redirect stdout/stderr to logfile
+        os.dup2(logfile.fileno(), sys.stdout.fileno())
+        os.dup2(logfile.fileno(), sys.stderr.fileno())
+
+        # reset logging to use the new file descriptors
+        _basf2.reset_log()
+        _basf2.logging.zero_counters()
+        _basf2.logging.add_json()
 
     def start_process(self):
         """
@@ -66,9 +76,10 @@ class Basf2CalculationProcess(CalculationProcess):
             if self.random_seed is not None:
                 _basf2.set_random_seed(self.random_seed)
 
-            _basf2.reset_log()
-            _basf2.logging.zero_counters()
-            _basf2.log_to_file(self.log_file_name)
+            # setup output capture
+            self.initialize_output()
+
+            # and start processing
             _basf2.process(self.path, self.max_event)
 
             self.result_queue.put("ipython.statistics", Basf2CalculationQueueStatistics(_basf2.statistics))

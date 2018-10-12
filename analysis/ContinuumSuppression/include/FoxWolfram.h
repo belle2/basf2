@@ -40,7 +40,7 @@ namespace Belle2 {
     /**
      * Constructor with an array ot 3-momenta.
      */
-    FoxWolfram(const std::vector<TVector3> momenta)
+    explicit FoxWolfram(const std::vector<TVector3>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;

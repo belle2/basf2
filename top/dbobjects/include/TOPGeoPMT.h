@@ -255,6 +255,14 @@ namespace Belle2 {
     unsigned getPixelRow(double y) const;
 
     /**
+     * Converts x and y coordinates to PMT pixel ID (1-based)
+     * @param x coordinate
+     * @param y coordinate
+     * @return pixel ID or 0 if x or y outside sensitive area
+     */
+    unsigned getPixelID(double x, double y) const;
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */

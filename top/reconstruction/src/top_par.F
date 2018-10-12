@@ -13,6 +13,7 @@
 #include "TOP_CONS.fi"
       DATA C0 /29.9792458/      ! speed of light (cm/ns)
       DATA PI /3.14159274/
+      DATA C_HC /1239.84193/    ! Planck constant times speed of light (eV*nm)
 #include "TOP_PAR.fi"
       DATA PAR_INI /.FALSE./
       DATA D_E /0.1/            ! step for differentiation (eV)

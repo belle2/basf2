@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param momenta An std::vector<TVector3> containing the 3-momenta to be used to the moments' calculation
      * @param axis The reference axis
      */
-    HarmonicMoments(std::vector<TVector3> momenta,  TVector3 axis)
+    HarmonicMoments(const std::vector<TVector3>& momenta, const TVector3& axis)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -55,7 +55,7 @@ namespace Belle2 {
      * Sets the list of momenta, overwriting whatever list has been set before.
      * @param momenta An std::vector<TVector3> containing the 3-momenta to be used to the moments' calculation
      */
-    void setMomenta(std::vector<TVector3> momenta)
+    void setMomenta(const std::vector<TVector3>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -100,7 +100,7 @@ namespace Belle2 {
   private:
     double m_moment[9] = {0.}; /**< The harmonic moments */
     std::vector<TVector3> m_momenta; /**< The list of particles */
-    TVector3 m_axis; /** < The reference axis */
+    TVector3 m_axis; /**< The reference axis */
   };
 
 } // Belle2 namespace

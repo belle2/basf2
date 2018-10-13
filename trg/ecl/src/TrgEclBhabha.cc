@@ -289,8 +289,8 @@ bool TrgEclBhabha::GetBhabha01()
       int energy2 = 15 & lut2;
       lut1 >>= 4;
       lut2 >>= 4;
-      int phi1 = 255 & lut1;
-      int phi2 = 255 & lut2;
+      int phi1 = 511 & lut1;
+      int phi2 = 511 & lut2;
       lut1 >>= 9;
       lut2 >>= 9;
       int theta1 = lut1;
@@ -301,28 +301,28 @@ bool TrgEclBhabha::GetBhabha01()
       if (dphi > 180) {dphi = 360 - dphi;}
       int thetaSum = theta1 + theta2;
 
+
       if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
 
       if ((ClusterEnergy[icluster] * 100.) > 30 * energy1 && (ClusterEnergy[jcluster] * 100.) > 30 * (energy2)
           && ((ClusterEnergy[icluster] * 100.) > 45 * energy1 || (ClusterEnergy[jcluster] * 100.) > 45 * (energy2))) {
         if (BtoBFlag) {BhabhaFlag = true;}
       }
-
-      if (BhabhaFlag && icluster == 0 && jcluster == 1) {BhabhaComb[0] = 1;}
-      else if (BhabhaFlag && icluster == 0 && jcluster == 2) {BhabhaComb[1] = 1;}
-      else if (BhabhaFlag && icluster == 0 && jcluster == 3) {BhabhaComb[2] = 1;}
-      else if (BhabhaFlag && icluster == 0 && jcluster == 4) {BhabhaComb[3] = 1;}
-      else if (BhabhaFlag && icluster == 0 && jcluster == 5) {BhabhaComb[4] = 1;}
-      else if (BhabhaFlag && icluster == 1 && jcluster == 2) {BhabhaComb[5] = 1;}
-      else if (BhabhaFlag && icluster == 1 && jcluster == 3) {BhabhaComb[6] = 1;}
-      else if (BhabhaFlag && icluster == 1 && jcluster == 4) {BhabhaComb[7] = 1;}
-      else if (BhabhaFlag && icluster == 1 && jcluster == 5) {BhabhaComb[8] = 1;}
-      else if (BhabhaFlag && icluster == 2 && jcluster == 3) {BhabhaComb[9] = 1;}
-      else if (BhabhaFlag && icluster == 2 && jcluster == 4) {BhabhaComb[10] = 1;}
-      else if (BhabhaFlag && icluster == 2 && jcluster == 5) {BhabhaComb[11] = 1;}
-      else if (BhabhaFlag && icluster == 3 && jcluster == 4) {BhabhaComb[12] = 1;}
-      else if (BhabhaFlag && icluster == 3 && jcluster == 5) {BhabhaComb[13] = 1;}
-      else if (BhabhaFlag && icluster == 4 && jcluster == 5) {BhabhaComb[14] = 1;}
+      // if (BhabhaFlag && icluster == 0 && jcluster == 1) {BhabhaComb[0] = 1;}
+      // else if (BhabhaFlag && icluster == 0 && jcluster == 2) {BhabhaComb[1] = 1;}
+      // else if (BhabhaFlag && icluster == 0 && jcluster == 3) {BhabhaComb[2] = 1;}
+      // else if (BhabhaFlag && icluster == 0 && jcluster == 4) {BhabhaComb[3] = 1;}
+      // else if (BhabhaFlag && icluster == 0 && jcluster == 5) {BhabhaComb[4] = 1;}
+      // else if (BhabhaFlag && icluster == 1 && jcluster == 2) {BhabhaComb[5] = 1;}
+      // else if (BhabhaFlag && icluster == 1 && jcluster == 3) {BhabhaComb[6] = 1;}
+      // else if (BhabhaFlag && icluster == 1 && jcluster == 4) {BhabhaComb[7] = 1;}
+      // else if (BhabhaFlag && icluster == 1 && jcluster == 5) {BhabhaComb[8] = 1;}
+      // else if (BhabhaFlag && icluster == 2 && jcluster == 3) {BhabhaComb[9] = 1;}
+      // else if (BhabhaFlag && icluster == 2 && jcluster == 4) {BhabhaComb[10] = 1;}
+      // else if (BhabhaFlag && icluster == 2 && jcluster == 5) {BhabhaComb[11] = 1;}
+      // else if (BhabhaFlag && icluster == 3 && jcluster == 4) {BhabhaComb[12] = 1;}
+      // else if (BhabhaFlag && icluster == 3 && jcluster == 5) {BhabhaComb[13] = 1;}
+      // else if (BhabhaFlag && icluster == 4 && jcluster == 5) {BhabhaComb[14] = 1;}
 
 
     }
@@ -332,24 +332,6 @@ bool TrgEclBhabha::GetBhabha01()
 
 
   }
-  if (BhabhaComb[0] == 1 ||
-      BhabhaComb[1] == 1 ||
-      BhabhaComb[2] == 1 ||
-      BhabhaComb[3] == 1 ||
-      BhabhaComb[4] == 1 ||
-      BhabhaComb[5] == 1 ||
-      BhabhaComb[6] == 1 ||
-      BhabhaComb[7] == 1 ||
-      BhabhaComb[8] == 1 ||
-      BhabhaComb[9] == 1 ||
-      BhabhaComb[10] == 1 ||
-      BhabhaComb[11] == 1 ||
-      BhabhaComb[12] == 1 ||
-      BhabhaComb[13] == 1 ||
-      BhabhaComb[14] == 1) {
-    BhabhaFlag = true;
-  }
-
 
 
 

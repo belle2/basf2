@@ -112,7 +112,7 @@ namespace Belle2 {
     //! Backward endcap ICN
     int m_icn_bw;
     //! bit output to GDL
-    int m_bitECLtoGDL;
+    int m_bitECLtoGDL[4];
     //! time bin
     int m_itimebin;
     //! beambkf veto
@@ -129,6 +129,30 @@ namespace Belle2 {
     int m_FwdNofTCHit;
     //! The number of TC Hit in Backward
     int m_BwdNofTCHit;
+    //! TC Hit or not
+    int m_hit ;
+    //! Revo clk
+    int m_Revoclk;
+    //! Timing source
+    int m_TimingSource;
+    //! Physics trigger
+    int m_physics ;
+    //! 2D Bhabha
+    int m_2DBhabha;
+    //! 3D Bhabha
+    int m_3DBhabha;
+    //! E low
+    int m_ELow;
+    //! E high
+    int m_EHigh;
+    //! E lom
+    int m_ELum;
+    //! Cluster overflow
+    int m_ClusterOverflow;
+    //! Low multi bit
+    int m_LowMultiBit;
+
+
 
     //! Set event id
     void setEventId(int eventId) { m_eventId = eventId; }
@@ -212,10 +236,14 @@ namespace Belle2 {
     void setICNBr(int icn_br) { m_icn_br = icn_br; }
     //! Set ICN in backward Endcap
     void setICNBw(int icn_bw) { m_icn_bw = icn_bw; }
-    //!
 
     //! Set bit for GDL
-    void setECLtoGDL(int bitECLtoGDL) { m_bitECLtoGDL = bitECLtoGDL; }
+    void setECLtoGDL(int bitECLtoGDL, int i)
+    {
+
+      m_bitECLtoGDL[i] = bitECLtoGDL;
+
+    }
     //! set bin #
     void setitimebin(int itimebin) { m_itimebin = itimebin; }
     //! Set beam background veto
@@ -233,6 +261,28 @@ namespace Belle2 {
     void setFwdNofTCHit(double FwdNofTCHit) { m_FwdNofTCHit = FwdNofTCHit; }
     //! Set No of TC Hit
     void setBwdNofTCHit(double BwdNofTCHit) { m_BwdNofTCHit = BwdNofTCHit; }
+    //! Set hit
+    void setHit(int hit) { m_hit = hit; }
+    //! Set Revoclk
+    void setRevoclk(int Revoclk) { m_Revoclk = Revoclk; }
+    //! Set TimingSource
+    void setTimingSource(int TimingSource) { m_TimingSource = TimingSource; }
+    //! Set physics
+    void setPhysics(int physics) { m_physics = physics; }
+    //! Set 2DBhabha
+    void set2DBhabha(int v2DBhabha) { m_2DBhabha = v2DBhabha; }
+    //! Set 3DBhabha
+    void set3DBhabha(int v3DBhabha) { m_3DBhabha = v3DBhabha; }
+    //! Set ELow
+    void setELow(int ELow) { m_ELow = ELow; }
+    //! Set EHihg
+    void setEHihg(int EHigh) { m_EHigh = EHigh; }
+    //! Set ELum
+    void setELum(int ELum) { m_ELum = ELum; }
+    //! Set ClusterOverflow
+    void setClusterOverflow(int ClusterOverflow) { m_ClusterOverflow = ClusterOverflow; }
+    //! Set LowMultiBit
+    void setLowMultiBit(int LowMultiBit) { m_LowMultiBit = LowMultiBit; }
 
     //! Get No of TC Hit
     double getNofTCHit() { return m_NofTCHit; }
@@ -294,7 +344,24 @@ namespace Belle2 {
       m_icn_fw = 0;
       m_icn_bw = 0;
       //!
-      m_bitECLtoGDL = 0;
+      m_bitECLtoGDL[0] = 0;
+      m_bitECLtoGDL[1] = 0;
+      m_bitECLtoGDL[2] = 0;
+      m_bitECLtoGDL[3] = 0;
+      m_hit = 0;
+      m_Revoclk = 0;
+      m_TimingSource = 0;
+      m_physics = 0;
+      m_2DBhabha = 0;
+      m_3DBhabha = 0;
+      m_ELow = 0;
+      m_EHigh = 0;
+      m_ELum = 0;
+      m_ClusterOverflow = 0;
+      m_LowMultiBit = 0;
+
+
+
       m_BeamBkgVeto = 0;
       m_BhabhaVeto = 0;
       m_eventtiming = 0;
@@ -353,7 +420,11 @@ namespace Belle2 {
       int icn_fw,
       int icn_bw,
       //!
-      int bitECLtoGDL,
+      int bitECLtoGDL1,
+      int bitECLtoGDL2,
+      int bitECLtoGDL3,
+      int bitECLtoGDL4,
+
       int BeamBkgVeto,
       int BhabhaVeto,
       int itimebin,
@@ -404,6 +475,11 @@ namespace Belle2 {
       m_bhabha16 = bhabha16;
       m_bhabha17 = bhabha17;
       m_bhabha18 = bhabha18;
+      //
+      m_bitECLtoGDL[0] =  bitECLtoGDL1;
+      m_bitECLtoGDL[1] =  bitECLtoGDL2;
+      m_bitECLtoGDL[2] =  bitECLtoGDL3;
+      m_bitECLtoGDL[3] =  bitECLtoGDL4;
 
       //!
       m_icn = icn;
@@ -411,7 +487,7 @@ namespace Belle2 {
       m_icn_fw = icn_fw;
       m_icn_bw = icn_bw;
       //!
-      m_bitECLtoGDL = bitECLtoGDL;
+      //      m_bitECLtoGDL = bitECLtoGDL;
       m_BhabhaVeto =  BhabhaVeto;
       m_BeamBkgVeto = BeamBkgVeto;
       m_eventtiming = eventtiming;
@@ -423,7 +499,7 @@ namespace Belle2 {
 
     }
     //! the class title
-    ClassDef(TRGECLTrg, 1);
+    ClassDef(TRGECLTrg, 2);
 
   };
 

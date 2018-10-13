@@ -122,9 +122,9 @@ namespace Belle2 {
     std::vector<std::vector<std::vector<double>>> ThetaRingSum;
 
     /** Hit TC Energy in time window */
-    std::vector<double> ClusterEnergy;
+    //   std::vector<double> ClusterEnergy;
     /** Hit TC Timing in time window*/
-    std::vector<double>  ClusterTiming;
+    //    std::vector<double>  ClusterTiming;
 
 
 

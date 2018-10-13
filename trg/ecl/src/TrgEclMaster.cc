@@ -165,7 +165,7 @@ TrgEclMaster::getTrgEclMaster(void)
 
 }
 void
-TrgEclMaster::simulate01(int m_nEvent)
+TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns )
 {
   //  TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
   //   obj_trgeclfam->setup(m_nEvent, 1);
@@ -261,7 +261,7 @@ TrgEclMaster::simulate01(int m_nEvent)
     obj_timing -> Setup(HitTCId, TCHitEnergy, TCHitTiming);
     obj_timing -> SetNofTopTC(_NofTopTC);
     eventtiming = obj_timing -> GetEventTiming(_EventTiming);
-
+    int timingsource = obj_timing -> GetTimingSource();
     //--------------------------------------------------
     // Ring sum and Total Energy Sum
     //-------------------------------------------------
@@ -289,6 +289,18 @@ TrgEclMaster::simulate01(int m_nEvent)
       E_total += phiringsum[iii];
     }
     if (E_total == 0) {continue;}
+    int ELow, EHigh, ELum;
+
+    if (E_phys > 0.5) {
+      ELow = 0x01;
+    }
+    if (E_phys > 1.0) {
+      EHigh = 0x01;
+    }
+    if (E_phys > 3.0) {
+      ELum = 0x01;
+    }
+
 
 
 
@@ -309,26 +321,60 @@ TrgEclMaster::simulate01(int m_nEvent)
     int icnbwd = obj_cluster->getICNSub(2);
 
     //    int NofCluster =  obj_cluster->getNofCluster();
+    //--------------
+    // Low Multiplicity bit
+    //--------------
+    //
+    //
+    std::vector<double> ClusterTiming;
+    std::vector<double> ClusterEnergy;
+    std::vector<int> MaxTCId;
+    ClusterTiming.clear();
+    ClusterEnergy.clear();
+    MaxTCId.clear();
+    StoreArray<TRGECLCluster> trgeclClusterArray;
+    for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+      TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+      int maxTCId    = aTRGECLCluster ->getMaxTCId();
+      double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+      double clustertiming  =  aTRGECLCluster -> getTimeAve();
+      TVector3 clusterposition(aTRGECLCluster ->getPositionX(), aTRGECLCluster ->getPositionY(), aTRGECLCluster ->getPositionZ());
+      ClusterTiming.push_back(clustertiming);
+      ClusterEnergy.push_back(clusterenergy);
+      MaxTCId.push_back(maxTCId);
+    }
+    //    const int ncluster = ClusterEnergy.size();
+
+    makeLowMultiTriggerBit(MaxTCId, ClusterEnergy);
 
     //--------------
     // Bhabha veto
     //--------------
     //
     //    obj_bhabha -> setup()
+    // std::vector<double> vct_bhabha;
+    // vct_bhabha.clear();
+    // bool boolBtoBTag  = false;
+    // if (_Bhabha == 0) { //belle I
+    //   boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
+    //   vct_bhabha = obj_bhabha -> GetBhabhaComb();
+    // } else if (_Bhabha == 1) {
+    //   vct_bhabha.resize(18, 0);
+    //   boolBtoBTag  =  obj_bhabha -> GetBhabha01();
+    // }
+    // int BtoBTag = 0;
+    // if (boolBtoBTag && icn < 4) {
+    //   BtoBTag = 1;
+    // }
     std::vector<double> vct_bhabha;
     vct_bhabha.clear();
-    bool boolBtoBTag  = false;
-    if (_Bhabha == 0) { //belle I
-      boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
-      vct_bhabha = obj_bhabha -> GetBhabhaComb();
-    } else if (_Bhabha == 1) {
-      vct_bhabha.resize(18, 0);
-      boolBtoBTag  =  obj_bhabha -> GetBhabha01();
-    }
-    int BtoBTag = 0;
-    if (boolBtoBTag && icn < 4) {
-      BtoBTag = 1;
-    }
+    int bhabha2D = 0 ;
+    int bhabha3D = 0 ;
+    bool b_2Dbhabha = obj_bhabha -> GetBhabha00(phiringsum);
+    vct_bhabha = obj_bhabha -> GetBhabhaComb();
+    if (b_2Dbhabha && (icn < 3)) {bhabha2D = 1;}
+    bool b_3Dbhabha =  obj_bhabha -> GetBhabha01();
+    if (b_3Dbhabha) {bhabha3D = 1;}
     //------------------------
     // Beam Background veto (Old cosmic veto)
     //------------------------
@@ -336,6 +382,34 @@ TrgEclMaster::simulate01(int m_nEvent)
     int beambkgtag = 0;
     boolBeamBkgTag =   obj_beambkg -> GetBeamBkg(thetaringsum);
     if (boolBeamBkgTag) {beambkgtag = 1;}
+
+
+    //-------------
+    // Make ECL  Trigger Bit
+    //-------------
+    int hit = 1; // hit or not
+    int Timing = (int)(eventtiming + 0.5);
+    int RevoFAM = 0;
+    int TimingSource = obj_timing->GetTimingSource(); //  FWD(0), Barrel(0), Backward(0);
+    int etot = (int)(E_phys * 1000 + 0.5); // total Energy in theta ID [2~15]
+    //int bhabha2D = BtoBTag ;
+    int physics = 0;
+    if ((etot > 1000 || icn > 3) && !(bhabha2D == 1)) {physics = 1;}
+    std::vector<int> bhabhabit;
+    bhabhabit.clear();
+    int bhabhabitsize = vct_bhabha.size();
+    for (int ibhabha = 0; ibhabha < bhabhabitsize; ibhabha++) {
+      bhabhabit.push_back((int)vct_bhabha[ibhabha]);
+    }
+    int ClusterOverflow = obj_cluster->getNofExceedCluster();
+    int flagoverflow = 0;
+    if (ClusterOverflow > 0) {
+      flagoverflow = 1;
+    }
+
+    makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
+                   bhabha3D, _Lowmultibit);
+
     //
     //
     //--------------
@@ -364,42 +438,42 @@ TrgEclMaster::simulate01(int m_nEvent)
     // 10 0001000000000   512   200   BeamBkgVeto
     // 11 0010000000000  1024   400   Timing
     //------------------------------
-    int bitEtot1       = 0x0001;
-    int bitEtot2       = 0x0002;
-    int bitEtot3       = 0x0004;
-    int bitBhabha      = 0x0008;
-    int bitPreBhabha   = 0x0010;
-    int bitForwardICN  = 0x0100;
-    int bitBeamBkgVeto = 0x0200;
-    int bitTiming      = 0x0400;
+    // int bitEtot1       = 0x0001;
+    // int bitEtot2       = 0x0002;
+    // int bitEtot3       = 0x0004;
+    // int bitBhabha      = 0x0008;
+    // int bitPreBhabha   = 0x0010;
+    // int bitForwardICN  = 0x0100;
+    // int bitBeamBkgVeto = 0x0200;
+    // int bitTiming      = 0x0400;
 
-    bool boolEtot[3] = {false};
-    if (E_phys > 1.0) boolEtot[1] = true;
-    bool boolBhabha = (boolBtoBTag && icn > 4);
-    bool boolPreBhabha = false;
-    bool boolForwardICN = icnfwd;
-    bool boolBeamBkgVeto = boolBeamBkgTag;
-    int bit = 0;
-    //
-    // bit 5-7
-    bit = (icn >= 7) ? 0x0007 : icn;
-    bit <<= 5;
-    // bit 0
-    bit |= boolEtot[0] ? bitEtot1 : 0;
-    // bit 1
-    bit |= boolEtot[1] ? bitEtot2 : 0;
-    // bit 2
-    bit |= boolEtot[2] ? bitEtot3 : 0;
-    // bit 3
-    bit |= boolBhabha  ? bitBhabha : 0;
-    // bit 4
-    bit |= boolPreBhabha   ? bitPreBhabha : 0;
-    // bit 8
-    bit |= boolForwardICN  ? bitForwardICN : 0;
-    // bit 9
-    bit |= boolBeamBkgVeto ? bitBeamBkgVeto : 0;
-    // bit 10
-    bit |= bitTiming;
+    // bool boolEtot[3] = {false};
+    // if (E_phys > 1.0) boolEtot[1] = true;
+    // bool boolBhabha = (boolBtoBTag && icn > 4);
+    // bool boolPreBhabha = false;
+    // bool boolForwardICN = icnfwd;
+    // bool boolBeamBkgVeto = boolBeamBkgTag;
+    //    int bit = 0;
+    // //
+    // // bit 5-7
+    // bit = (icn >= 7) ? 0x0007 : icn;
+    // bit <<= 5;
+    // // bit 0
+    // bit |= boolEtot[0] ? bitEtot1 : 0;
+    // // bit 1
+    // bit |= boolEtot[1] ? bitEtot2 : 0;
+    // // bit 2
+    // bit |= boolEtot[2] ? bitEtot3 : 0;
+    // // bit 3
+    // bit |= boolBhabha  ? bitBhabha : 0;
+    // // bit 4
+    // bit |= boolPreBhabha   ? bitPreBhabha : 0;
+    // // bit 8
+    // bit |= boolForwardICN  ? bitForwardICN : 0;
+    // // bit 9
+    // bit |= boolBeamBkgVeto ? bitBeamBkgVeto : 0;
+    // // bit 10
+    // bit |= bitTiming;
     //
     //  printf("bit = %i \n", bit);
     //----------------------
@@ -476,10 +550,26 @@ TrgEclMaster::simulate01(int m_nEvent)
     trgEcltrgArray[m_hitEneNum]->setICNBr(icnbr);
     trgEcltrgArray[m_hitEneNum]->setICNBw(icnbwd);
     //
-    trgEcltrgArray[m_hitEneNum]->setECLtoGDL(bit);
-    trgEcltrgArray[m_hitEneNum]->setBhabhaVeto(BtoBTag);
+    trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[0], 0);
+    trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[1], 1);
+    trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[2], 2);
+    trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[3], 3);
+
+    trgEcltrgArray[m_hitEneNum]->setBhabhaVeto(bhabha2D);
     trgEcltrgArray[m_hitEneNum]->setBeamBkgVeto(beambkgtag);
     trgEcltrgArray[m_hitEneNum]->setEventTiming(eventtiming);
+
+    trgEcltrgArray[m_hitEneNum]->setHit(hit);
+    trgEcltrgArray[m_hitEneNum]->setRevoclk(RevoFAM);
+    trgEcltrgArray[m_hitEneNum]->setTimingSource(TimingSource);
+    trgEcltrgArray[m_hitEneNum]->setPhysics(physics) ;
+    trgEcltrgArray[m_hitEneNum]->set2DBhabha(bhabha2D);
+    trgEcltrgArray[m_hitEneNum]->set3DBhabha(bhabha3D);
+    trgEcltrgArray[m_hitEneNum]->setELow(ELow)  ;
+    trgEcltrgArray[m_hitEneNum]->setEHihg(EHigh);
+    trgEcltrgArray[m_hitEneNum]->setELum(ELum)  ;
+    trgEcltrgArray[m_hitEneNum]->setClusterOverflow(ClusterOverflow) ;
+    trgEcltrgArray[m_hitEneNum]->setLowMultiBit(_Lowmultibit);
 
 
   }
@@ -604,6 +694,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   obj_timing -> Setup(HitTCId, TCHitEnergy, TCHitTiming);
   obj_timing -> SetNofTopTC(_NofTopTC);
   eventtiming = obj_timing -> GetEventTiming(_EventTiming);
+  int timingsource = obj_timing -> GetTimingSource();
 
 
 
@@ -634,6 +725,17 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     E_total += phiringsum[iii];
   }
   if (E_total == 0) {return;}
+  int ELow, EHigh, ELum;
+
+  if (E_phys > 0.5) {
+    ELow = 0x01;
+  }
+  if (E_phys > 1.0) {
+    EHigh = 0x01;
+  }
+  if (E_phys > 3.0) {
+    ELum = 0x01;
+  }
 
 
 
@@ -655,27 +757,59 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int icnbwd = obj_cluster->getICNSub(2);
 
   //    int NofCluster =  obj_cluster->getNofCluster();
+  //--------------
+  // Low Multiplicity bit
+  //--------------
+  //
+  //
+  std::vector<double> ClusterTiming;
+  std::vector<double> ClusterEnergy;
+  std::vector<int> MaxTCId;
+  ClusterTiming.clear();
+  ClusterEnergy.clear();
+  MaxTCId.clear();
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    int maxTCId    = aTRGECLCluster ->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster -> getTimeAve();
+    TVector3 clusterposition(aTRGECLCluster ->getPositionX(), aTRGECLCluster ->getPositionY(), aTRGECLCluster ->getPositionZ());
+    ClusterTiming.push_back(clustertiming);
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+  }
+  //    int NofCluster =  obj_cluster->getNofCluster();
+  makeLowMultiTriggerBit(MaxTCId, ClusterEnergy);
 
   //--------------
   // Bhabha veto
   //--------------
   //
   //    obj_bhabha -> setup()
+  // std::vector<double> vct_bhabha;
+  // vct_bhabha.clear();
+  // bool boolBtoBTag  = false;
+  // if (_Bhabha == 0) { //belle I
+  //   boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
+  //   vct_bhabha = obj_bhabha -> GetBhabhaComb();
+  // } else if (_Bhabha == 1) {
+  //   vct_bhabha.resize(18);
+  //   boolBtoBTag  =  obj_bhabha -> GetBhabha01();
+  // }
+  // int BtoBTag = 0;
+  // if (boolBtoBTag && icn < 4) {
+  //   BtoBTag = 1;
+  // }
   std::vector<double> vct_bhabha;
   vct_bhabha.clear();
-  bool boolBtoBTag  = false;
-  if (_Bhabha == 0) { //belle I
-    boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
-    vct_bhabha = obj_bhabha -> GetBhabhaComb();
-  } else if (_Bhabha == 1) {
-    vct_bhabha.resize(18);
-    boolBtoBTag  =  obj_bhabha -> GetBhabha01();
-
-  }
-  int BtoBTag = 0;
-  if (boolBtoBTag && icn < 4) {
-    BtoBTag = 1;
-  }
+  int bhabha2D = 0 ;
+  int bhabha3D = 0 ;
+  bool b_2Dbhabha = obj_bhabha -> GetBhabha00(phiringsum);
+  vct_bhabha = obj_bhabha -> GetBhabhaComb();
+  if (b_2Dbhabha && (icn < 3)) {bhabha2D = 1;}
+  bool b_3Dbhabha =  obj_bhabha -> GetBhabha01();
+  if (b_3Dbhabha) {bhabha3D = 1;}
   //------------------------
   // Beam Background veto (Old cosmic veto)
   //------------------------
@@ -683,6 +817,32 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int beambkgtag = 0;
   boolBeamBkgTag =   obj_beambkg -> GetBeamBkg(thetaringsum);
   if (boolBeamBkgTag) {beambkgtag = 1;}
+  //-------------
+  // Make ECL  Trigger Bit
+  //-------------
+  int hit = 1; // hit or not
+  int Timing = (int)(eventtiming + 0.5);
+  int RevoFAM = 0;
+  int TimingSource = obj_timing->GetTimingSource(); //  FWD(0), Barrel(0), Backward(0);
+  int etot = (int)(E_phys * 1000 + 0.5); // total Energy in theta ID [2~15]
+  //int bhabha2D = BtoBTag ;
+  int physics = 0;
+  if ((etot > 1000 || icn > 3) && !(bhabha2D == 1)) {physics = 1;}
+  std::vector<int> bhabhabit;
+  bhabhabit.clear();
+  int bhabhabitsize = vct_bhabha.size();
+  for (int ibhabha = 0; ibhabha < bhabhabitsize; ibhabha++) {
+    bhabhabit.push_back((int)vct_bhabha[ibhabha]);
+  }
+  int ClusterOverflow = obj_cluster->getNofExceedCluster();
+  int flagoverflow = 0;
+  if (ClusterOverflow > 0) {
+    flagoverflow = 1;
+  }
+
+  makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
+                 bhabha3D, _Lowmultibit);
+
   //
   //
   //--------------
@@ -711,42 +871,42 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   // 10 0001000000000   512   200   BeamBkgVeto
   // 11 0010000000000  1024   400   Timing
   //------------------------------
-  int bitEtot1       = 0x0001;
-  int bitEtot2       = 0x0002;
-  int bitEtot3       = 0x0004;
-  int bitBhabha      = 0x0008;
-  int bitPreBhabha   = 0x0010;
-  int bitForwardICN  = 0x0100;
-  int bitBeamBkgVeto = 0x0200;
-  int bitTiming      = 0x0400;
+  // int bitEtot1       = 0x0001;
+  // int bitEtot2       = 0x0002;
+  // int bitEtot3       = 0x0004;
+  // int bitBhabha      = 0x0008;
+  // int bitPreBhabha   = 0x0010;
+  // int bitForwardICN  = 0x0100;
+  // int bitBeamBkgVeto = 0x0200;
+  // int bitTiming      = 0x0400;
 
-  bool boolEtot[3] = {false};
-  if (E_phys > 1.0) boolEtot[1] = true;
-  bool boolBhabha = (boolBtoBTag && icn > 4);
-  bool boolPreBhabha = false;
-  bool boolForwardICN = icnfwd;
-  bool boolBeamBkgVeto = boolBeamBkgTag;
-  int bit = 0;
-  //
-  // bit 5-7
-  bit = (icn >= 7) ? 0x0007 : icn;
-  bit <<= 5;
-  // bit 0
-  bit |= boolEtot[0] ? bitEtot1 : 0;
-  // bit 1
-  bit |= boolEtot[1] ? bitEtot2 : 0;
-  // bit 2
-  bit |= boolEtot[2] ? bitEtot3 : 0;
-  // bit 3
-  bit |= boolBhabha  ? bitBhabha : 0;
-  // bit 4
-  bit |= boolPreBhabha   ? bitPreBhabha : 0;
-  // bit 8
-  bit |= boolForwardICN  ? bitForwardICN : 0;
-  // bit 9
-  bit |= boolBeamBkgVeto ? bitBeamBkgVeto : 0;
-  // bit 10
-  bit |= bitTiming;
+  // bool boolEtot[3] = {false};
+  // if (E_phys > 1.0) boolEtot[1] = true;
+  // bool boolBhabha = (boolBtoBTag && icn > 4);
+  // bool boolPreBhabha = false;
+  // bool boolForwardICN = icnfwd;
+  // bool boolBeamBkgVeto = boolBeamBkgTag;
+  // int bit = 0;
+  // //
+  // // bit 5-7
+  // bit = (icn >= 7) ? 0x0007 : icn;
+  // bit <<= 5;
+  // // bit 0
+  // bit |= boolEtot[0] ? bitEtot1 : 0;
+  // // bit 1
+  // bit |= boolEtot[1] ? bitEtot2 : 0;
+  // // bit 2
+  // bit |= boolEtot[2] ? bitEtot3 : 0;
+  // // bit 3
+  // bit |= boolBhabha  ? bitBhabha : 0;
+  // // bit 4
+  // bit |= boolPreBhabha   ? bitPreBhabha : 0;
+  // // bit 8
+  // bit |= boolForwardICN  ? bitForwardICN : 0;
+  // // bit 9
+  // bit |= boolBeamBkgVeto ? bitBeamBkgVeto : 0;
+  // // bit 10
+  // bit |= bitTiming;
   //
   //  printf("bit = %i \n", bit);
   //----------------------
@@ -823,10 +983,26 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   trgEcltrgArray[m_hitEneNum]->setICNBr(icnbr);
   trgEcltrgArray[m_hitEneNum]->setICNBw(icnbwd);
   //
-  trgEcltrgArray[m_hitEneNum]->setECLtoGDL(bit);
-  trgEcltrgArray[m_hitEneNum]->setBhabhaVeto(BtoBTag);
+  trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[0], 0);
+  trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[1], 1);
+  trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[2], 2);
+  trgEcltrgArray[m_hitEneNum]->setECLtoGDL(_Triggerbit[3], 3);
+
+  trgEcltrgArray[m_hitEneNum]->setBhabhaVeto(bhabha2D);
   trgEcltrgArray[m_hitEneNum]->setBeamBkgVeto(beambkgtag);
   trgEcltrgArray[m_hitEneNum]->setEventTiming(eventtiming);
+
+  trgEcltrgArray[m_hitEneNum]->setHit(hit);
+  trgEcltrgArray[m_hitEneNum]->setRevoclk(RevoFAM);
+  trgEcltrgArray[m_hitEneNum]->setTimingSource(TimingSource);
+  trgEcltrgArray[m_hitEneNum]->setPhysics(physics) ;
+  trgEcltrgArray[m_hitEneNum]->set2DBhabha(bhabha2D);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabha(bhabha3D);
+  trgEcltrgArray[m_hitEneNum]->setELow(ELow)  ;
+  trgEcltrgArray[m_hitEneNum]->setEHihg(EHigh);
+  trgEcltrgArray[m_hitEneNum]->setELum(ELum)  ;
+  trgEcltrgArray[m_hitEneNum]->setClusterOverflow(ClusterOverflow) ;
+  trgEcltrgArray[m_hitEneNum]->setLowMultiBit(_Lowmultibit);
 
 
 
@@ -931,10 +1107,7 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   int ehigh = 0;
   int elum = 0;
   int bhabhaveto = 0;
-  int Bhabhatype = 0;
-  if (bhabha2D == 0 && ICN < 4) {
-    bhabhaveto = 1;
-  }
+  int Bhabhatype = bhabha2D;
 
   if (etot > 0.5) {
     elow = 0x01;
@@ -979,6 +1152,7 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
 
 
   _Triggerbit[2] |= ((bit_lowmulti) >> 2) && 0x3FF;
+
   _Triggerbit[1] |= (bit_lowmulti & 0x03);
   _Triggerbit[1] <<= 2;
   _Triggerbit[1] |= bit_3Dbhabha;

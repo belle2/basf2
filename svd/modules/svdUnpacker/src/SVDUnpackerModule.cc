@@ -135,7 +135,6 @@ void SVDUnpackerModule::event()
             << "remember to use SVDShaperDigitSorter in your path and \n"
             << "set the silentlyAppend parameter of SVDUnpacker to true.");
 
-  //vector<SVDDAQDiagnostic*> diagnosticVector;
   SVDDAQDiagnostic* currentDAQDiagnostic;
   map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
   // Store encountered pipeline addresses with APVs in which they were observed
@@ -213,7 +212,6 @@ void SVDUnpackerModule::event()
 
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header
-            //diagnosticVector.clear(); // new set of objects for the current FTB
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
 
@@ -303,7 +301,6 @@ void SVDUnpackerModule::event()
             }
 
             // create SVDModeByte object from MainHeader vars
-            //B2INFO("Filling SVDModeByte object");
             m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
           }
 
@@ -321,7 +318,6 @@ void SVDUnpackerModule::event()
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
             currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, fadc,
                                                             apv);
-            //diagnosticVector.push_back(currentDAQDiagnostic);
             apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
           }
 
@@ -417,7 +413,6 @@ void SVDUnpackerModule::event()
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
             for (auto& p : diagnosticMap) {
-              //for (auto* finalDAQDiagnostic : diagnosticVector)
               // adding remaining info to Diagnostic object
               p.second->setFTBFlags(ftbFlags);
               p.second->setEmuPipelineAddress(emuPipAddr);
@@ -432,7 +427,6 @@ void SVDUnpackerModule::event()
             //check CRC16
             crc16vec.pop_back();
             unsigned short iCRC = crc16vec.size();
-            //uint32_t *crc16input = new uint32_t[iCRC];
             uint32_t crc16input[iCRC];
 
             for (unsigned short icrc = 0; icrc < iCRC; icrc++)

@@ -19,7 +19,7 @@ def parse_mail_address(obj):
     if isinstance(obj, str):
         return re.findall(r'[\w\.-]+@[\w\.-]+', obj)
     elif isinstance(obj, list):
-        return [re.match(r'[\w\.-]+@[\w\.-]+', c).group() for c in obj if re.match(r'[\w\.-]+@[\w\.-]+', c) is not None]
+        return [re.search(r'[\w\.-]+@[\w\.-]+', c).group() for c in obj if re.search(r'[\w\.-]+@[\w\.-]+', c) is not None]
     else:
         raise TypeError("must be string or list of strings")
 

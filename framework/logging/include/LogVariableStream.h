@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <type_traits>
 #include <boost/lexical_cast.hpp>
 
 /**
@@ -149,126 +150,27 @@ public:
   }
 
   /**
-   * Catch-all operator which will forward all other
-   * input types to the internal stringstream object
+   * Templated operator which will be used for all non-fundamental types. This types can be accepted via
+   * const& and need no copy.
    */
   template<class TText>
-  LogVariableStream& operator<<(TText const& text)
+  typename std::enable_if<not std::is_fundamental<TText>::value, LogVariableStream&>::type operator<<(TText const& text)
   {
-    m_stringStream << text;
+    this->m_stringStream << text;
     return *this;
   }
 
   /**
-   * Provide by-val operator for int, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
+   * Templated operator which will be used for POD types (especially integers) and uses by-value. For cases where constants are
+   * declared "static const int Name = 23;" in header files but the .cc file contains no definition. In these cases, by-ref
+   * cannot be used because no memory location exists to get the reference.
    */
-  LogVariableStream& operator<<(int i)
+  template<class PODTYPE>
+  typename std::enable_if<std::is_fundamental<PODTYPE>::value, LogVariableStream&>::type operator<<(PODTYPE pod)
   {
-    m_stringStream << i;
+    this->m_stringStream << pod;
     return *this;
   }
-
-  /**
-   * Provide by-val operator for unsigned int, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(unsigned int i)
-  {
-    m_stringStream << i;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for char, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(char i)
-  {
-    m_stringStream << i;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for unsigned char, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(unsigned char i)
-  {
-    m_stringStream << i;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for short, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(short i)
-  {
-    m_stringStream << i;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for unsigned short, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(unsigned short i)
-  {
-    m_stringStream << i;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for long, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(long i)
-  {
-    m_stringStream << i;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for unsigned long, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(unsigned long i)
-  {
-    m_stringStream << i;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for double, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(double f)
-  {
-    m_stringStream << f;
-    return *this;
-  }
-
-  /**
-   * Provide by-val operator for float, because they might
-   * occur as static int const in class defs and break linking
-   * if used by reference.
-   */
-  LogVariableStream& operator<<(float f)
-  {
-    m_stringStream << f;
-    return *this;
-  }
-
 
   /**
    * Custom comparison operator

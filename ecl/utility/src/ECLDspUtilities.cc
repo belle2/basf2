@@ -42,20 +42,32 @@ namespace Belle2 {
       data->setchiThresh(id[15]);
       data->setk2(id[16] >> 8);
       data->setk1(id[16] - 256 * data->getk2());
+
+      std::vector<short int> f(49152), f1(49152), f31(49152),
+          f32(49152), f33(49152), f41(6144), f43(6144);
+
       for (int i = 0; i < 16; ++i) {
         nsiz1 = 384;
-        size = fread(&(*(data->getF41().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fread(&(*(f41.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 3072;
-        size = fread(&(*(data->getF31().begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fread(&(*(data->getF32().begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fread(&(*(data->getF33().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fread(&(*(f31.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fread(&(*(f32.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fread(&(*(f33.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 384;
-        size = fread(&(*(data->getF43().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fread(&(*(f43.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 3072;
-        size = fread(&(*(data->getF().begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fread(&(*(data->getF1().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fread(&(*(f.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fread(&(*(f1.begin() + i * nsiz1)), nsiz, nsiz1, fl);
       }
       fclose(fl);
+
+      data->setF41(f41);
+      data->setF31(f31);
+      data->setF32(f32);
+      data->setF33(f33);
+      data->setF43(f43);
+      data->setF(f);
+      data->setF1(f1);
 
       return data;
     }
@@ -107,7 +119,7 @@ namespace Belle2 {
       // Size of fragment to write (in words)
       int nsiz1 = 256;
       // modification of DEFAULT_HEADER
-      short header[256];
+      unsigned short header[256];
 
       for (int i = 0; i < 256; i++) {
         switch (i) {
@@ -136,18 +148,28 @@ namespace Belle2 {
         B2FATAL("Error writing header of DSP file " << filename);
       }
 
+      std::vector<short int> f(49152), f1(49152), f31(49152),
+          f32(49152), f33(49152), f41(6144), f43(6144);
+      data->getF41(f41);
+      data->getF31(f31);
+      data->getF32(f32);
+      data->getF33(f33);
+      data->getF43(f43);
+      data->getF(f);
+      data->getF1(f1);
+
       for (int i = 0; i < 16; ++i) {
         nsiz1 = 384;
-        size = fwrite(&(*(data->getF41().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fwrite(&(*(f41.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 3072;
-        size = fwrite(&(*(data->getF31().begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fwrite(&(*(data->getF32().begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fwrite(&(*(data->getF33().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fwrite(&(*(f31.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fwrite(&(*(f32.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fwrite(&(*(f33.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 384;
-        size = fwrite(&(*(data->getF43().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fwrite(&(*(f43.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 3072;
-        size = fwrite(&(*(data->getF().begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fwrite(&(*(data->getF1().begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fwrite(&(*(f.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        size = fwrite(&(*(f1.begin() + i * nsiz1)), nsiz, nsiz1, fl);
       }
       fclose(fl);
     }

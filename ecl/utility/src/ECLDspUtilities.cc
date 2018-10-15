@@ -26,6 +26,16 @@ namespace Belle2 {
 
       ECLDspData* data = new ECLDspData(boardNumber);
 
+      //== Do not fill data for non-existent shapers
+      std::string crate_id_str = std::string(filename - 12 + strlen(filename)).substr(0, 2);
+      int crate_id = std::stoi(crate_id_str);
+      if (boardNumber > 7) {
+        if (crate_id >= 45 && crate_id <= 52) return data;
+        if (boardNumber > 9) {
+          if (crate_id >= 37 && crate_id <= 44) return data;
+        }
+      }
+
       // Word size
       const int nsiz = 2;
       // Size of fragment to read (in words)

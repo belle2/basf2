@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <type_traits>
 #include <boost/lexical_cast.hpp>
 
 /**
@@ -149,13 +150,25 @@ public:
   }
 
   /**
-   * Catch-all operator which will forward all other
-   * input types to the internal stringstream object
+   * Templated operator which will be used for all non-fundamental types. This types can be accepted via
+   * const& and need no copy.
    */
   template<class TText>
-  LogVariableStream& operator<<(TText const& text)
+  typename std::enable_if<not std::is_fundamental<TText>::value, LogVariableStream&>::type operator<<(TText const& text)
   {
-    m_stringStream << text;
+    this->m_stringStream << text;
+    return *this;
+  }
+
+  /**
+   * Templated operator which will be used for POD types (especially integers) and uses by-value. For cases where constants are
+   * declared "static const int Name = 23;" in header files but the .cc file contains no definition. In these cases, by-ref
+   * cannot be used because no memory location exists to get the reference.
+   */
+  template<class PODTYPE>
+  typename std::enable_if<std::is_fundamental<PODTYPE>::value, LogVariableStream&>::type operator<<(PODTYPE pod)
+  {
+    this->m_stringStream << pod;
     return *this;
   }
 

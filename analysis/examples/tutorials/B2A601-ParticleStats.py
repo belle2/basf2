@@ -44,7 +44,7 @@ from stdPi0s import stdPi0s
 
 # check if the required input file exists
 import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/udsc_background.root'):
+if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
     b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
@@ -52,7 +52,7 @@ my_path = ma.analysis_main
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename='$BELLE2_EXAMPLES_DATA/udsc_background.root',
+             filename='$BELLE2_EXAMPLES_DATA/B2pi0D_D2hh_D2hhh_B2munu.root',
              path=my_path)
 
 # create and fill final state ParticleLists
@@ -67,15 +67,15 @@ stdPi0s(listtype='looseFit', path=my_path)
 # 1. reconstruct D0 in multiple decay modes
 ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
                     cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
-                    dmID=1.,
+                    dmID=1,
                     path=my_path)
 ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:looseFit',
                     cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
-                    dmID=2.,
+                    dmID=2,
                     path=my_path)
 ma.reconstructDecay(decayString='D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose',
                     cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
-                    dmID=3.,
+                    dmID=3,
                     path=my_path)
 
 # merge the D0 lists together into one single list

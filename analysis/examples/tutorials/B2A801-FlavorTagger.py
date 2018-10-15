@@ -33,6 +33,10 @@ import variableCollectionsTools as vct
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 
+b2.B2FATAL("Input files for this tuttorial do not exist. \
+    We are working on producing them.\
+    Pleae feel free to use code snippets in a meanwhile.")
+
 # check if the required input file exists
 import os
 if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2JPsiKs_JPsi2mumu.root'):

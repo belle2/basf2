@@ -114,7 +114,7 @@ b_vars = vc.event_meta_data + \
 
 # Saving variables to ntuple
 output_file = 'B2A303-MultipleDecays-Reconstruction.root'
-ma.variablesToNtuple(decay_string='B+:D0pi',
+ma.variablesToNtuple(decayString='B+:D0pi',
                      variables=b_vars,
                      filename=output_file,
                      treename='bp',

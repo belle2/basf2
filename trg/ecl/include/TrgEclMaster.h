@@ -95,7 +95,8 @@ namespace Belle2 {
     void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int);
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
-
+    int getTriggerbit(int i) {return _Triggerbit[i];}
+    int getLowmultibit() {return _Lowmultibit;}
 
 
   private:

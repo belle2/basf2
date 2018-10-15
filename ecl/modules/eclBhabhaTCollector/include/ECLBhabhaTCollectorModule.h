@@ -106,8 +106,6 @@ namespace Belle2 {
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evtn;    /**< Event number for debug TTree output*/
-    int m_tree_exp;     /**< Experiment number for debug TTree output */
-    int m_tree_run;     /**< Run number for debug TTree output */
     int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
     int m_tree_amp;     /**< Fitting amplitude from ECL for debug TTree output */
     double m_tree_en;     /**< ECL hit energy, GeV for debug TTree output */

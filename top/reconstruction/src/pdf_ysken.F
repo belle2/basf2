@@ -3,6 +3,7 @@
 ! M. Staric, nov-2008, jun-2009, feb-2010, dec-2013, apr-2014, avg-2017
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
+! oct-2018: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE PDF_YSKEN(I0,K0,K1,K2,K3,XD,DXCH,ZB,ZD,IX,IPMTX,LR,TYP)

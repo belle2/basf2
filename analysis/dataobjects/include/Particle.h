@@ -621,6 +621,9 @@ namespace Belle2 {
      */
     void print() const;
 
+    /** get a list of the extra info names */
+    std::vector<std::string> getExtraInfoNames() const;
+
     /**
      * Remove all stored extra info fields
      */

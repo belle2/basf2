@@ -121,6 +121,7 @@ namespace Belle2 {
     if (!m_nominalQE.isConsistent()) return false;
     if (!m_nominalTTS.isConsistent()) return false;
     if (!m_nominalTDC.isConsistent()) return false;
+    if (!m_wavelengthFilter.isConsistent()) return false;
     return true;
   }
 
@@ -146,6 +147,8 @@ namespace Belle2 {
     m_nominalTTS.print();
     cout << endl;
     m_nominalTDC.print();
+    cout << endl;
+    m_wavelengthFilter.print();
     cout << endl;
 
   }

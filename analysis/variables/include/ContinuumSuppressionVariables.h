@@ -58,7 +58,7 @@ namespace Belle2 {
     /**
      * Returns the i-th Cleo Cone.
      */
-    Manager::FunctionPtr CleoCones(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr CleoConesCS(const std::vector<std::string>& arguments);
 
     /**
      * Returns a function which gives the transformed network output C->C' via: C'=log((C-low)/(high-C)).
@@ -70,7 +70,7 @@ namespace Belle2 {
     /**
      * Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.
      */
-    Manager::FunctionPtr useThrustFrame(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr useBThrustFrame(const std::vector<std::string>& arguments);
 
   }
 }

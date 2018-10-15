@@ -77,6 +77,11 @@ namespace Belle2 {
         wavelength.push_back(wl);
       }
       auto QE = nominalQE.getQE();
+      // multiply QE with filter transmittance
+      const auto& wavelengthFilter = geo->getWavelengthFilter();
+      for (unsigned i = 0; i < QE.size(); i++) {
+        QE[i] *= wavelengthFilter.getBulkTransmittance(wavelength[i]);
+      }
       setQE(wavelength.data(), QE.data(), QE.size(),
             nominalQE.getCE() * tdc.getEfficiency());
 
@@ -109,10 +114,10 @@ namespace Belle2 {
         addExpansionVolume(id, c_Left, c_Prism, prismLength - prismFlat,
                            B / 2, B / 2 - prismExit, 0, 0, prismWidth);
 
-        double filter = prism.getFilterThickness();
+        double filterThickness = prism.getFilterThickness();
         const auto& pmtArray = module.getPMTArray();
         double pmtWindow = pmtArray.getPMT().getWinThickness();
-        setBBoxWindow(id, prismFlat + filter + pmtWindow);
+        setBBoxWindow(id, prismFlat + filterThickness + pmtWindow);
 
         double x0 = module.getPMTArrayDisplacement().getX();
         double y0 = module.getPMTArrayDisplacement().getY();

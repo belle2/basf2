@@ -1,20 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#!/bin/bash
 
-"""\
-This command set up location of tutorial files depending on the server where code is running.
-So far only kekcc is supported.
-"""
+# This command set up location of tutorial files depending on the server where code is running.
+# So far only kekcc is supported.
 
-import socket
-import os    
-
-if __name__ == 'main':
-    hostname = socket.gethostname()
-    if hostname.endswith("cc.kek.jp"):
-        os.environ['BELLE2_EXAMPLES_DATA'] = '/sw/belle2/examples-data/'
-    else:
-        print("You are trying to setup location of tutorial files on the server that did not have DESY cloud configured by the time of release.\
-              Please contact your system administrator to mount DESY cloud somewhere at your server and set up environemnt variable\
-              $BELLE2_EXAMPLES_DATA pointing to examples-data directory from DESY cloud.\
-              ")
+case $HOSTNAME in
+  (*cc.kek.jp) BELLE2_EXAMPLES_DATA='/sw/belle2/examples-data'; 
+               echo '$BELLE2_EXAMPLES_DATA is set to '$BELLE2_EXAMPLES_DATA;;
+  (*)   printf "You are trying to setup location of tutorial files on the server that did not have DESY cloud configured by the time of release.
+Please contact your system administrator to mount DESY cloud somewhere at your server and set up environemnt variable
+$BELLE2_EXAMPLES_DATA pointing to examples-data directory from DESY cloud.
+";;
+esac

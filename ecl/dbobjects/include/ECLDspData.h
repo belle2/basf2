@@ -100,37 +100,37 @@ namespace Belle2 {
     /**
      * Array with tabulated signal waveform.
      */
-    std::vector<short int>& getF() { return m_f; }
+    void getF(std::vector<short int>& dst) { unpackCoefVector(m_f, dst); }
     /**
      * Array with tabulated derivative of signal waveform
      */
-    std::vector<short int>& getF1() { return m_f1; }
+    void getF1(std::vector<short int>& dst) { unpackCoefVector(m_f1, dst); }
     /**
      * Array FG31, used to estimate signal amplitude.
      * Calculated from F and covariance matrix.
      */
-    std::vector<short int>& getF31() { return m_fg31; }
+    void getF31(std::vector<short int>& dst) { unpackCoefVector(m_fg31, dst); }
     /**
      * Array FG32, used to estimate A * delta_t.
      * (A -- amplitude, delta_t -- time shift for linearization)
      *
      * Calculated from F and covariance matrix.
      */
-    std::vector<short int>& getF32() { return m_fg32; }
+    void getF32(std::vector<short int>& dst) { unpackCoefVector(m_fg32, dst); }
     /**
      * Array FG33, used to estimate pedestal height in signal.
      *
      * Calculated from F and covariance matrix.
      */
-    std::vector<short int>& getF33() { return m_fg33; }
+    void getF33(std::vector<short int>& dst) { unpackCoefVector(m_fg33, dst); }
     /**
      * Alternative for FG31 for signals with small amplitude.
      */
-    std::vector<short int>& getF41() { return m_fg41; }
+    void getF41(std::vector<short int>& dst) { unpackCoefVector(m_fg41, dst); }
     /**
      * Alternative for FG33 for signals with small amplitude.
      */
-    std::vector<short int>& getF43() { return m_fg43; }
+    void getF43(std::vector<short int>& dst) { unpackCoefVector(m_fg43, dst); }
     /**
      * @return Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
@@ -166,6 +166,41 @@ namespace Belle2 {
     /*************/
 
     /**
+     * Array with tabulated signal waveform.
+     */
+    void setF(std::vector<short int>& src) { packCoefVector(src, m_f); }
+    /**
+     * Array with tabulated derivative of signal waveform
+     */
+    void setF1(std::vector<short int>& src) { packCoefVector(src, m_f1); }
+    /**
+     * Array FG31, used to estimate signal amplitude.
+     * Calculated from F and covariance matrix.
+     */
+    void setF31(std::vector<short int>& src) { packCoefVector(src, m_fg31); }
+    /**
+     * Array FG32, used to estimate A * delta_t.
+     * (A -- amplitude, delta_t -- time shift for linearization)
+     *
+     * Calculated from F and covariance matrix.
+     */
+    void setF32(std::vector<short int>& src) { packCoefVector(src, m_fg32); }
+    /**
+     * Array FG33, used to estimate pedestal height in signal.
+     *
+     * Calculated from F and covariance matrix.
+     */
+    void setF33(std::vector<short int>& src) { packCoefVector(src, m_fg33); }
+    /**
+     * Alternative for FG31 for signals with small amplitude.
+     */
+    void setF41(std::vector<short int>& src) { packCoefVector(src, m_fg41); }
+    /**
+     * Alternative for FG33 for signals with small amplitude.
+     */
+    void setF43(std::vector<short int>& src) { packCoefVector(src, m_fg43); }
+
+    /**
      * Set Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
     void setlAT(short int val) { m_lowAmpThresh = val; }
@@ -191,6 +226,23 @@ namespace Belle2 {
     void setkc(unsigned char val) { m_kc = val; }
     /** Set start point for pedestal calculation */
     void sety0Startr(unsigned char val) { m_y0Startr = val; }
+
+  private:
+    /**
+     * @brief Convert vector of DSP coefficients (src) to ECLDspData
+     *        internal format (dst).
+     * The internal format of coefficient vectors stored in this object is
+     * different from their real values: this improves data compression by ~200%.
+     * Thus, any accessor methods to m_f* vectors utilize packCoefVector and
+     * unpackCoefVector.
+     */
+    void packCoefVector(const std::vector<short int>& src, std::vector<short int>& dst);
+    /**
+     * @brief Convert vector of DSP coefficients (src) to ECLDspData
+     *        internal format (dst).
+     * See documentation for packCoefVector on why this was necessary.
+     */
+    void unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst);
 
     ClassDef(ECLDspData, 1);
   };

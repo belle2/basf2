@@ -31,7 +31,7 @@ cppcheck in parallel:
 However in this case a directory to check has to be provided
 EOT
     exit 1;
-  fi
+fi
 
 cppcheck -q --enable=all --template=gcc --suppress=unusedFunction --inline-suppr --force --relative-paths=${BELLE2_LOCAL_DIR} \
          -D_PACKAGE_=PACKAGE -ULOG_NO_B2DEBUG -ULOG_NO_B2METHOD -ULOG_NO_B2INFO -ULOG_NO_B2WARNING -ULOG_NO_B2ASSERT -ULOG_NO_B2RESULT \

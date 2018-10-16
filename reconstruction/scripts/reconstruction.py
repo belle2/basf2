@@ -233,9 +233,6 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_cluster_expert_modules(path, components)
 
     if trigger_mode in ["hlt", "all"]:
-        path.add_module("EventT0Combiner")
-
-    if trigger_mode in ["hlt", "all"]:
         add_ecl_track_brem_finder(path, components)
 
         # Prune tracks as soon as the post-tracking steps are complete

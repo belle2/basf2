@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Thomas Hauth                               *
+ * Contributors: Hideyuki Nakazawa, Thomas Hauth                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,11 +12,6 @@
 #define TRGSUMMARY_H
 
 #include <framework/datastore/RelationsObject.h>
-
-#include <TROOT.h>
-#include <TColor.h>
-
-#include <sstream>
 
 namespace Belle2 {
 
@@ -31,7 +26,7 @@ namespace Belle2 {
    *   timType
    *     types of trigger timing source defined in b2tt firmware
    */
-  class TRGSummary : public RelationsObject {
+  class TRGSummary final : public RelationsObject {
 
   public:
 
@@ -78,29 +73,15 @@ namespace Belle2 {
     };
 
     /*! default constructor: xxx */
-    TRGSummary() {;}
+    TRGSummary() = default;
 
     /*! constructor: xxx */
     TRGSummary(unsigned int inputBits[10],
                unsigned int ftdlBits[10],
                unsigned int psnmBits[10],
-               ETimingType timType)
-    {
-      for (int i = 0; i < 10; i++) {
-        m_inputBits[i] = inputBits[i];
-        m_ftdlBits[i] = ftdlBits[i];
-        m_psnmBits[i] = psnmBits[i];
-      }
-      m_timType = timType;
-    }
+               ETimingType timType);
 
-    /** Destructor.
-     */
-    ~TRGSummary() {}
-
-    /*! setter
-     * @param xxx explanation
-     */
+    /**set the Final Trigger Decision Logic bit*/
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
 
     /**set the prescale factor of each bit*/
@@ -116,10 +97,10 @@ namespace Belle2 {
     void setPsnmBits(int i, int word) {m_psnmBits[i] = word;}
 
     /** get the trigger result, each word has 32 bits*/
-    unsigned int getTRGSummary(int i) {return m_ftdlBits[i];}
+    unsigned int getTRGSummary(int i) const {return m_ftdlBits[i];}
 
     /** get the prescale factor which the bit is corresponding*/
-    unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
+    unsigned int getPreScale(int i, int bit) const {return m_prescaleBits[i][bit];}
 
     /**set the timType */
     void setTimType(ETimingType timType) {m_timType = timType;}
@@ -160,53 +141,12 @@ namespace Belle2 {
     }
 
     /** Return a short summary of this object's contents in HTML format. */
-    std::string getInfoHTML() const override
-    {
-      std::stringstream htmlOutput;
-
-      htmlOutput << "<table>";
-      htmlOutput << "<tr><td></td><td bgcolor='#cccccc'>GDL Input</td><td bgcolor='#cccccc' colspan='2'>GDL Output</td></tr>";
-      htmlOutput << "<tr><td>Bit</td><td>Input Bits</td><td>Final Trg DL</td><td>Prescaled Trg and Mask</td></tr>";
-
-      for (unsigned int currentBit = 0; currentBit < (c_ntrgWords * c_trgWordSize);
-           currentBit++) {
-        htmlOutput << "<tr>";
-
-        const auto currentWord = currentBit / c_trgWordSize;
-        const auto currentBitInWord = currentBit % c_trgWordSize;
-
-        const auto ftdlBit = (getFtdlBits(currentWord)
-                              & (1 << currentBitInWord)) > 0;
-        const auto psnmBit = (getPsnmBits(currentWord)
-                              & (1 << currentBitInWord)) > 0;
-        const auto inputBit = (getInputBits(currentWord)
-                               & (1 << currentBitInWord)) > 0;
-
-        htmlOutput << "<td>" << currentBit << "(word " << currentWord
-                   << " bit " << currentBitInWord << ")</td>";
-        htmlOutput << outputBitWithColor(inputBit);
-        htmlOutput << outputBitWithColor(ftdlBit);
-        htmlOutput << outputBitWithColor(psnmBit);
-        htmlOutput << "</tr>";
-      }
-      htmlOutput << "</table>";
-
-      return htmlOutput.str();
-    }
+    std::string getInfoHTML() const override;
 
   private:
 
     /** return the td part of an HTML table with green of the bit is > 0 */
-    std::string outputBitWithColor(bool bit) const
-    {
-      const std::string colorNeutral = gROOT->GetColor(kWhite)->AsHexString();
-      const std::string colorAccept = gROOT->GetColor(kGreen)->AsHexString();
-
-      std::string color = bit > 0 ? colorAccept : colorNeutral;
-      std::stringstream outStream;
-      outStream << "<td bgcolor=\"" << color << "\">" << bit << "</td>";
-      return outStream.str();
-    }
+    std::string outputBitWithColor(bool bit) const;
 
     /**
      * version of this code

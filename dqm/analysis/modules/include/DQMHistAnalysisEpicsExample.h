@@ -8,8 +8,10 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
 // EPICS
-//#include "cadef.h"
+#include "cadef.h"
+#endif
 
 #include <framework/core/Module.h>
 
@@ -45,13 +47,15 @@ namespace Belle2 {
     std::string m_histoname;
     std::string m_function;
     Int_t m_parameters;
-    std::string  m_pvname;
+    std::string  m_pvPrefix;
 
     TF1* m_f1;
     TCanvas* m_c1;
     TLine* m_line, * m_line_lo, * m_line_hi;
 
-//    chid mychid[10];// hard limit max 10 parameters
+#ifdef _BELLE2_EPICS
+    chid mychid[10];// hard limit max 10 parameters
+#endif
   };
 } // end namespace Belle2
 

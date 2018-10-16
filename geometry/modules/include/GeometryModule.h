@@ -45,7 +45,7 @@ namespace Belle2 {
      * it's not clear if it's already present in another path */
     bool m_ignoreIfPresent{false};
     /** Whether or not to build the geometry from the database */
-    bool m_useDB{false};
+    bool m_useDB{true};
     /** Payload iov when creating a geometry configuration */
     std::vector<int> m_payloadIov{0, 0, -1, -1};
     /** If true we need to create a payload */

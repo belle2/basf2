@@ -64,11 +64,6 @@ class InjectSimHits(basf2.Module):
 
 if __name__ == "__main__":
 
-    # Load ROOT libs before we change directory
-    dummy_simhit = Belle2.SVDSimHit()
-    dummy_digit = Belle2.SVDShaperDigit()
-    dummy_bdata = Belle2.BackgroundMetaData()
-
     with b2test_utils.clean_working_directory():
 
         basf2.B2INFO('Creating background data...')

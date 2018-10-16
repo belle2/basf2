@@ -28,6 +28,7 @@ def add_mdst_output(
         'Tracks',
         'V0s',
         'TrackFitResults',
+        'EventLevelTrackingInfo',
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
         'ECLClusters',

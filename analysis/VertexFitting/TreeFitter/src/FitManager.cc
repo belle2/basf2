@@ -191,13 +191,13 @@ namespace TreeFitter {
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
       // very important! Belle2 uses p,E,x! Change order here!
       for (int row = 0; row < 4; ++row) {
-        for (int col = 0; col <= row; ++col) {
+        for (int col = 0; col < 4; ++col) {
           returncov(row, col) = cov(momindex + row, momindex + col);
         }
       }
 
       for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col <= row; ++col) {
+        for (int col = 0; col < 3; ++col) {
           returncov(row + 4, col + 4) = cov(posindex + row, posindex + col);
         }
       }
@@ -207,7 +207,7 @@ namespace TreeFitter {
         Eigen::Matrix<double, 6, 6>::Zero(6, 6);
 
       for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col <= row; ++col) {
+        for (int col = 0; col < 3; ++col) {
           cov6(row, col) = cov(momindex + row, momindex + col);
           cov6(row + 3, col + 3) = cov(posindex + row, posindex + col);
         }
@@ -235,7 +235,7 @@ namespace TreeFitter {
       cov7 = jacobian * cov6.selfadjointView<Eigen::Lower>() * jacobian.transpose();
 
       for (int row = 0; row < 7; ++row) {
-        for (int col = 0; col <= row; ++col) {
+        for (int col = 0; col < 7; ++col) {
           returncov(row, col) = cov7(row, col);
         }
       }

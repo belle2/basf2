@@ -32,13 +32,16 @@ REG_MODULE(TreeFitter)
 
 TreeFitterModule::TreeFitterModule() : Module()
 {
-  setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain.");
-  addParam("particleList", m_particleList, "Input mother of the decay tree to fit");
+  setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain. Can also be used to just fit a single vertex.");
+  addParam("particleList", m_particleList, "Input mother of the decay tree to fit. For example 'B0:myB0particleList'.");
   addParam("confidenceLevel", m_confidenceLevel,
-           "Confidence level to accept fitted decay tree. -1.0 for failed fits. Candidates with < confidenceLevel will be removed from the particle list! ",
+           "Confidence level to accept fitted decay tree. Candidates with < confidenceLevel will be removed from the particle list! Typical Values: -1: keep all particle candidates, 0: remove all that fail the fit, 0.001: standard cut, 0.1: (too) tight cut. Optimise using a figure of merit (for example S/(sqrt{S+B}) ) for your analysis.",
            0.0);
-  addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
-  addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
+  addParam("convergencePrecision", m_precision,
+           "Upper limit for chi2 fluctuations to accept result. Larger value = less signal rejection but also less background rejection. Optimized for FOM on different topologies - don't touch unless you REALLY want this.",
+           1.);
+  addParam("massConstraintList", m_massConstraintList,
+           "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).");
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
@@ -50,21 +53,23 @@ TreeFitterModule::TreeFitterModule() : Module()
   }
           );
   addParam("customOriginConstraint", m_customOrigin,
-           "Use a custom vertex as the production point of the highest hierachy particle (register this as the mother of the list you specify).",
+           "Use a custom vertex as the production point of the highest hierachy particle (register this as the mother of the list you specify). Like the beam constraint but you can specify the position its covariance yourself. ",
            false);
   addParam("ipConstraint", m_ipConstraint,
-           "use the IP as the origin of the tree. This register an internal IP particle as the mother of the list you give.",
+           "use the IP as the origin of the tree. This registers an internal IP particle as the mother of the list you give. Or in other words forces the PRODUCTION vertex of your particle to be the IP and its covariance as specified in the database.",
            false);
   addParam("updateAllDaughters", m_updateDaughters,
-           "Update all daughters in the tree. If not set only the head of the tree will be updated.", false);
+           "Update all daughters (vertex position and momenta) in the tree. If not set only the 4-momenta for the head of the tree will be updated. We also update the vertex position of the daughters regardless of what you put here, because otherwise the default when the particle list is created is {0,0,0}.",
+           false);
   //
   addParam("expertMassConstraintType", m_massConstraintType,
-           "Type::[int]. False(0): use particles parameters in mass constraint; True: use sum of daughter parameters for mass constraint. The difference is subtle don't use this unless you really want this.",
+           "Type::[int]. False(0): use particles parameters in mass constraint; True: use sum of daughter parameters for mass constraint. WAARNING not even guranteed that it works.",
            0);
   addParam("expertRemoveConstraintList", m_removeConstraintList,
-           "Type::[string]. List of constraints that you do not want to be used in the fit.", {});
+           "Type::[string]. List of constraints that you do not want to be used in the fit. WARNING don't use if you don't know exactly what it does.", {});
   addParam("expertUseReferencing", m_useReferencing,
-           "Different implementation of the Kalman Filter.", false);
+           "Use the Extended Kalman Fitler. This implementation linearises around the previous state vector which gives smoother convergence.",
+           true);
 }
 
 void TreeFitterModule::initialize()
@@ -140,7 +145,7 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
       m_useReferencing
     )
   );
-
+  /** TODO this is a bit of a hack. Make a config struct or so. */
   TreeFitter::massConstraintListPDG = m_massConstraintList;
   TreeFitter::massConstraintType = m_massConstraintType;
   TreeFitter::removeConstraintList = m_removeConstraintList;

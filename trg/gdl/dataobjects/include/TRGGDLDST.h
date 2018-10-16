@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
 
     /**! The Class title*/
-    ClassDef(TRGGDLDST, 1); /*< the class title */
+    ClassDef(TRGGDLDST, 2); /*< the class title */
 
     TRGGDLDST() {}
 

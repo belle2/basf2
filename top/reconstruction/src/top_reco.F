@@ -4,6 +4,7 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
 ! dec-2017: change in some commons
+! oct-2018: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_RECO
@@ -70,7 +71,8 @@
 #include "TOP_GEO.fi"     
 #include "TOP_TRACK.fi"     
 #include "TOP_CONS.fi"     
-      REAL T1, T2, T, FI
+#include "TOP_GRID.fi"     
+      REAL T1, T2, T, FI, DT
       REAL HLX_LOC(10), R(3), DIR(3)
       LOGICAL INSIDE_QBAR
       INTEGER I, K
@@ -106,6 +108,22 @@
             T_R(K,I)=R(K)
          ENDDO
          IF(I.EQ.0) T_DIR=DIR
+      ENDDO
+
+      IF(G_NP.EQ.0) RETURN
+      DT=(T2-T1)/G_NP
+      DO I=1,G_NP
+         T=T1+DT*(I-0.5)
+         CALL GET_HLX_RDIR(HLX_LOC,T,R,DIR) ! get in nominal frame
+         CALL NOMINAL_TO_LOCAL(R,DIR,MODUL) ! transform to local (bar) frame
+         DO K=1,3
+            G_R0(K,I)=R(K)
+         ENDDO
+         G_CTH(I)=DIR(3)
+         G_STH(I)=SQRT(1-DIR(3)**2)
+         FI=ATAN2(DIR(2),DIR(1))
+         G_CFI(I)=COS(FI)
+         G_SFI(I)=SIN(FI)
       ENDDO
       
       END
@@ -644,14 +662,18 @@ cc            PRINT*,'construct PDF for Mass=',MASS
       END
 
 
-      SUBROUTINE SET_PDF_OPT(OPT)
+      SUBROUTINE SET_PDF_OPT(OPT,NP,NC)
 
       IMPLICIT NONE
-      INTEGER OPT
+      INTEGER OPT, NP, NC
 #include "TOP_PIK.fi"
+#include "TOP_GRID.fi"
+      DATA G_NP /0/, G_NC /0/
 
       PDF_OPT=OPT
-
+      G_NP=MIN(NP,G_SIZE)
+      G_NC=MIN(NC,G_SIZE)
+      
       END
 
 

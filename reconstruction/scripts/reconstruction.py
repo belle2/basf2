@@ -209,6 +209,12 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_ecl_modules(path, components)
 
     if trigger_mode in ["hlt", "all"]:
+        path.add_module("EventT0Combiner")
+
+    if trigger_mode in ["fast_reco", "all"]:
+        add_ecl_finalizer_module(path, components)
+
+    if trigger_mode in ["hlt", "all"]:
         add_ecl_track_matcher_module(path, components)
         add_ecl_eip_module(path, components)
 
@@ -292,8 +298,8 @@ def add_cdst_output(
         'TOPRecBunch',
         'ECLDigits',
         'ECLCalDigits',
-        'ECLEventInformation',
         'TRGECLClusters',
+        'TRGECLUnpackerStores',
         'BKLMHit2ds',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
@@ -487,6 +493,18 @@ def add_ecl_modules(path, components=None):
         ecl_covariance = register_module('ECLCovarianceMatrix')
         path.add_module(ecl_covariance)
 
+        # ECL finalize -> must run after eventT0Combiner
+
+
+def add_ecl_finalizer_module(path, components=None):
+    """
+        Add the ECL finalizer module to the path.
+
+        :param path: The path to add the modules to.
+        :param components: The components to use or None to use all standard components.
+        """
+
+    if components is None or 'ECL' in components:
         # ECL finalize
         ecl_finalize = register_module('ECLFinalizer')
         path.add_module(ecl_finalize)

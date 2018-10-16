@@ -77,8 +77,11 @@ def linkdef_emitter(target, source, env):
         if not os.path.isfile(header_file):
             if not namespace:
                 # no //implicit for suppression found...
-                print "%s contains '%s' where we couldn't find a header file. If dictionary compilation fails, this might be the reason. For classes residing in other directories and already included via other link requests, add '// implicit' at the end to suppress this message." \
-                    % (str(source[0]), str(line))
+                print("%s contains '%s' where we couldn't find a header file. "
+                      "If dictionary compilation fails, this might be the reason. "
+                      "For classes residing in other directories and already "
+                      "included via other link requests, add '// implicit' at "
+                      "the end to suppress this message." % (str(source[0]), str(line)))
                 continue
 
             # remove trailing '::', add '.h'

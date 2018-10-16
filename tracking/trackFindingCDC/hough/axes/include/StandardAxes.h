@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost, Nils Braun                                 *
+ * Contributors: Oliver Frost, Nils Braun, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -96,6 +96,24 @@ namespace Belle2 {
 
     /// Type for discrete phi0 values
     using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
+
+    /// Phantom type tag for the discrete p representation
+    class PTag;
+
+    /// Type for discrete p values
+    using DiscreteP = DiscreteValue<float, PTag>;
+
+    /// Type to have continuous p values
+    using ContinuousP = ContinuousValue<double, PTag>;
+
+    /// Phantom type tag for the discrete q representation
+    class QTag;
+
+    /// Type for discrete q values
+    using DiscreteQ = DiscreteValue<float, QTag>;
+
+    /// Type to have continuous q values
+    using ContinuousQ = ContinuousValue<double, QTag>;
 
   }
 }

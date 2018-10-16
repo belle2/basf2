@@ -20,10 +20,14 @@ using namespace Belle2;
 
 REG_MODULE(EKLMDigitizer)
 
-EKLMDigitizerModule::EKLMDigitizerModule() : Module()
+EKLMDigitizerModule::EKLMDigitizerModule() : Module(),
+  m_ChannelSpecificSimulation(false)
 {
   setDescription("EKLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("SimulationMode", m_SimulationMode,
+           "Simulation mode (\"Generic\" or \"ChannelSpecific\")",
+           std::string("Generic"));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(-40.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
@@ -51,6 +55,53 @@ void EKLMDigitizerModule::initialize()
     m_Digits.registerRelationTo(m_FPGAFits);
   }
   m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
+  if (m_SimulationMode == "Generic") {
+    /* Nothing to do. */
+  } else if (m_SimulationMode == "ChannelSpecific") {
+    m_ChannelSpecificSimulation = true;
+  } else {
+    B2FATAL("Unknown simulation mode: " << m_SimulationMode);
+  }
+}
+
+void EKLMDigitizerModule::checkChannelParameters()
+{
+  int endcap, layer, sector, plane, strip, stripGlobal;
+  int nEndcaps, nLayers[2], nSectors, nPlanes, nStrips;
+  const EKLMChannelData* channel;
+  nEndcaps = m_ElementNumbers->getMaximalEndcapNumber();
+  nLayers[0] = m_ElementNumbers->getMaximalDetectorLayerNumber(1);
+  nLayers[1] = m_ElementNumbers->getMaximalDetectorLayerNumber(2);
+  nSectors = m_ElementNumbers->getMaximalSectorNumber();
+  nPlanes = m_ElementNumbers->getMaximalPlaneNumber();
+  nStrips = m_ElementNumbers->getMaximalStripNumber();
+  for (endcap = 1; endcap <= nEndcaps; endcap++) {
+    for (layer = 1; layer <= nLayers[endcap - 1]; layer++) {
+      for (sector = 1; sector <= nSectors; sector++) {
+        for (plane = 1; plane <= nPlanes; plane++) {
+          for (strip = 1; strip <= nStrips; strip++) {
+            stripGlobal = m_ElementNumbers->stripNumber(endcap, layer, sector,
+                                                        plane, strip);
+            channel = m_Channels->getChannelData(stripGlobal);
+            if (channel == NULL)
+              B2FATAL("Incomplete channel data.");
+            if (channel->getPhotoelectronAmplitude() <= 0) {
+              B2ERROR("Non-positive photoelectron amplitude (" <<
+                      channel->getPhotoelectronAmplitude() <<
+                      ") for channel with endcap = " << endcap <<
+                      ", layer = " << layer << ", sector = " << sector <<
+                      ", plane = " << plane << ", strip = " << strip <<
+                      ". The requested channel-specific simulation is "
+                      "impossible. EKLMDigitizer is switched to the generic "
+                      "mode.");
+              m_ChannelSpecificSimulation = false;
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 void EKLMDigitizerModule::beginRun()
@@ -61,6 +112,8 @@ void EKLMDigitizerModule::beginRun()
     B2FATAL("EKLM time conversion parameters are not available.");
   if (!m_Channels.isValid())
     B2FATAL("EKLM channel data are not available.");
+  if (m_ChannelSpecificSimulation)
+    checkChannelParameters();
 }
 
 void EKLMDigitizerModule::readAndSortSimHits()
@@ -213,13 +266,15 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     ub = m_SimHitVolumeMap.upper_bound(it->first);
     /* Set hits. */
     fes.setHitRange(it, ub);
-    strip = m_ElementNumbers->stripNumber(
-              simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
-              simHit->getPlane(), simHit->getStrip());
-    channelData = m_Channels->getChannelData(strip);
-    if (channelData == NULL)
-      B2FATAL("Incomplete EKLM channel data.");
-    fes.setChannelData(channelData);
+    if (m_ChannelSpecificSimulation) {
+      strip = m_ElementNumbers->stripNumber(
+                simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
+                simHit->getPlane(), simHit->getStrip());
+      channelData = m_Channels->getChannelData(strip);
+      if (channelData == NULL)
+        B2FATAL("Incomplete EKLM channel data.");
+      fes.setChannelData(channelData);
+    }
     /* Simulation for a strip. */
     fes.processEntry();
     if (fes.getGeneratedNPE() == 0)

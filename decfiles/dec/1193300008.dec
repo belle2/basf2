@@ -16,13 +16,12 @@ Decay Upsilon(4S)
 Enddecay
 #
 
-#central values from HFAG average
-
+# updated to values used in main DECAY_BELLE2.DEC
 Decay B0sig
-0.00039   D_1-   tau+ nu_tau      PHOTOS          LLSW 0.71 -1.6 -0.5 2.9;
-0.00031   D_0*-   tau+ nu_tau     PHOTOS           LLSW 0.68 -0.2 0.3;
-0.00011   D'_1-   tau+ nu_tau       PHOTOS         LLSW 0.68 -0.2 0.3;
-0.00011   D_2*-   tau+ nu_tau       PHOTOS         LLSW 0.71 -1.6 -0.5 2.9;
+0.0013    D_1-    tau+ nu_tau       PHOTOS           LLSW 0.71 -1.6 -0.5 2.9;
+0.0013    D_0*-   tau+ nu_tau       PHOTOS           LLSW 0.68 -0.2 0.3;
+0.0020    D'_1-   tau+ nu_tau       PHOTOS           LLSW 0.68 -0.2 0.3;
+0.0020    D_2*-   tau+ nu_tau       PHOTOS           LLSW 0.71 -1.6 -0.5 2.9;
 Enddecay
 CDecay anti-B0sig
 #

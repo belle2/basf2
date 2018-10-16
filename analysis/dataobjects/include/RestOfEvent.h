@@ -40,7 +40,7 @@ namespace Belle2 {
   /**
    * This is a general purpose class for collecting reconstructed MDST data objects
    * that are not used in reconstruction of given Particle -- referred also as
-   * Rest Of the Event. From remaining charged tracks, energy deposits in the ECL, etc.,
+   * Rest Of the Event. From remaining photons, K_L0 and charged particles, etc.,
    * we infer for example the decay vertex and flavor of the tagging B meson, which are
    * needed in measurements of t-dependent CP violation, or we determine whether or not
    * the rest of the event is consistent with some B decay that involves neutrinos after
@@ -52,9 +52,8 @@ namespace Belle2 {
    * The RestOfEvent object is created for given existing Particle object by the RestOfEventBuilder
    * module and are related between each other with the BASF2 relation.
    *
-   * Internally, the RestOfEvent class holds only StoreArray indices of all unused MDST dataobjects:
-   * Tracks, ECLCluster, MDSTVee and KLMCluster. Indices are stored in std::set
-   * and not std::vector, since the former ensures uniqueness of all its elements.
+   * Internally, the RestOfEvent class holds only StoreArray indices of all unused MDST particles.
+   * Indices are stored in std::set and not std::vector, since the former ensures uniqueness of all its elements.
    */
 
   class RestOfEvent : public RelationsObject {
@@ -72,7 +71,6 @@ namespace Belle2 {
       /**
        * Default constructor.
        * All private members are set to 0 (all vectors are empty).
-       * TODO: Get rid of the default name,
        * @param name of mask
        * @param origin of mask, for debug
        */
@@ -208,9 +206,9 @@ namespace Belle2 {
 
     // setters
     /**
-     * Add StoreArray indices of given Particle to the list of unused particles in the event.
+     * Add StoreArray indices of given Particles to the list of unused particles in the event.
      *
-     * @param Pointer to the unused Particle
+     * @param Reference to a vector of unused Particles
      */
     void addParticles(const std::vector<const Particle*>& particle);
     /**

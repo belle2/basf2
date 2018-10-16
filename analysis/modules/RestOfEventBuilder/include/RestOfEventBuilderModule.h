@@ -19,9 +19,13 @@
 namespace Belle2 {
 
   /**
-   * Creates for each Particle in given ParticleList an RestOfEvent dataobject and makes BASF2 relation between them.
-   *
-   *    *
+   * Creates for each Particle in given ParticleList an RestOfEvent (ROE) dataobject and makes BASF2 relation between them.
+   * Takes as frst input parameter the name of target particle list, around which the RestOfEvent will be constructed.
+   * The ROE particles are taken from dafault particle lists 'gamma:myroe', 'pi+:myroe' and 'K_L0:myroe', which defines
+   * the default particle type hypotheses: gammas, pions and K-longs.
+   * Second input parameter is an array of final-state particle list names, which are preselected by PID, for example:
+   * if the module is launched with particleListsInput=['K+:good','e+:good'], it will create ROE object filled with these
+   * particle track hypotheses first and all other particles with default particle hypotheses.
    */
   class RestOfEventBuilderModule : public Module {
 

@@ -179,9 +179,8 @@ elif option == 'clang':
     # now let's look what gcc uses as includes. Let's call the g++ to give us
     # the search path. But we have to make sure that gcc is set to english so
     # that the search path works
-    gcc_search_path = subprocess.Popen(["g++", "-v", "-x", "c++", "--syntax-only", "/dev/null"],
-                                       env=dict(os.environ, LC_ALL="C"), stderr=subprocess.STDOUT,
-                                       stdout=subprocess.PIPE).communicate()[0]
+    gcc_search_path = subprocess.check_output(["g++", "-v", "-x", "c++", "--syntax-only", "/dev/null"],
+                                              stderr=subprocess.STDOUT, env=dict(os.environ, LC_ALL="C"), encoding="utf8")
     is_search_path = False
     for line in gcc_search_path.splitlines():
         if line.startswith("End of search list"):

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCLUSTERPROPERTIESMODULE_H
-#define ECLCLUSTERPROPERTIESMODULE_H
+#pragma once
 
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
@@ -65,5 +64,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* ECLCLUSTERPROPERTIESMODULE_H */

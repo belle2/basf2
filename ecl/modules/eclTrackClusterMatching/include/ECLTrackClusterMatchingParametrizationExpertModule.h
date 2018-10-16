@@ -19,8 +19,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 
-#include "TFile.h"
-#include "TTree.h"
+class TFile;
+class TTree;
 
 namespace Belle2 {
 

@@ -13,6 +13,8 @@
 #include <set>
 #include <vector>
 #include <cmath>
+#include "TFile.h"
+#include "TTree.h"
 
 using namespace std;
 using namespace Belle2;

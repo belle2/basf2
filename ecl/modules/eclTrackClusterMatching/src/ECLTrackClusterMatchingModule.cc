@@ -10,6 +10,7 @@
 
 #include <ecl/dbobjects/ECLTrackClusterMatchingParameterizations.h>
 #include <ecl/dbobjects/ECLTrackClusterMatchingThresholds.h>
+#include <ecl/utility/utilityFunctions.h>
 
 #include <framework/datastore/RelationVector.h>
 #include <framework/gearbox/Const.h>
@@ -32,6 +33,10 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
            "the 2D consistency of Delta theta and Delta phi has to exceed this value for a track to be matched to an ECL cluster", 1e-6);
   addParam("rerunOldMatching", m_rerunOldMatching,
            "run old track cluster matching (again)", bool(true));
+  addParam("oldMatchingPTThreshold", m_oldMatchingPTThreshold,
+           "tracks with pt greater than this value will exclusively be matched based on angular distance", 0.3);
+  addParam("brlEdgeTheta", m_brlEdgeTheta,
+           "distance of polar angle from gaps where old matching should be applied (in rad)", 0.1);
 }
 
 ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()
@@ -88,7 +93,7 @@ void ECLTrackClusterMatchingModule::event()
 
       const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(hypothesis);
       double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
-      if (fitResult->getTransverseMomentum() > 0.3 && !trackTowardsGap(theta)) continue;
+      if (fitResult->getTransverseMomentum() > m_oldMatchingPTThreshold && !trackTowardsGap(theta)) continue;
 
       // Unique shower ids related to this track
       set<int> uniqueShowerIds;
@@ -145,7 +150,7 @@ void ECLTrackClusterMatchingModule::event()
           }
         }
 
-        // if we find a shower, take that one by directly acessing the store array
+        // if we find a shower, take that one by directly accessing the store array
         if (arrayindex > -1) {
           auto shower = m_eclShowers[arrayindex];
           shower->setIsTrack(true);
@@ -168,7 +173,8 @@ void ECLTrackClusterMatchingModule::event()
       for (unsigned int index = 0; index < relatedTracks.size() && matchedWithHighPTTrack; ++index) {
         const Track* relatedTrack = relatedTracks.object(index);
         const TrackFitResult* fitResult = relatedTrack->getTrackFitResultWithClosestMass(Const::pion);
-        if (fitResult->getTransverseMomentum() < 0.3 && getDetectorRegion(TMath::ACos(fitResult->getMomentum().CosTheta())) == 2) {
+        if (fitResult->getTransverseMomentum() < m_oldMatchingPTThreshold
+            && ECL::getDetectorRegion(TMath::ACos(fitResult->getMomentum().CosTheta())) == ECL::DetectorRegion::BRL) {
           matchedWithHighPTTrack = false;
         }
       }
@@ -188,9 +194,9 @@ void ECLTrackClusterMatchingModule::event()
     double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
     // never match tracks pointing towards gaps or adjacent part of barrel using angular distance
     if (trackTowardsGap(theta)) continue;
-    int trackDetectorRegion = getDetectorRegion(theta);
+    ECL::DetectorRegion trackDetectorRegion = ECL::getDetectorRegion(theta);
     // for low-pt tracks matching based on the angular distance is only applied if track points towards the FWD
-    if (pt < 0.3 && trackDetectorRegion != 1) continue;
+    if (pt < m_oldMatchingPTThreshold && trackDetectorRegion != ECL::DetectorRegion::FWD) continue;
     // Find extrapolated track hits in the ECL, considering only hit points
     // that either are on the sphere, closest to, or on radial direction of an
     // ECLCluster.
@@ -198,12 +204,12 @@ void ECLTrackClusterMatchingModule::event()
       if (!isECLHit(extHit)) continue;
       ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
       if (eclCluster != nullptr) {
-        if (eclCluster->getHypothesisId() != 5) continue;
+        if (eclCluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
         int eclDetectorRegion = eclCluster->getDetectorRegion();
         // accept only cluster from region matching track direction, exception for gaps
         if (abs(eclDetectorRegion - trackDetectorRegion) == 1) continue;
         // never match low-pt tracks with clusters in the barrel
-        if (pt < 0.3 && eclDetectorRegion == 2) continue;
+        if (pt < m_oldMatchingPTThreshold && eclDetectorRegion == ECL::DetectorRegion::BRL) continue;
         double phiHit = extHit.getPosition().Phi();
         double phiCluster = eclCluster->getPhi();
         double deltaPhi = phiHit - phiCluster;
@@ -280,26 +286,26 @@ double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double del
 double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double pt, int eclDetectorRegion, int hitStatus) const
 {
   double phi_RMS;
-  if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
-    if (hitStatus == 4) {
+  if (eclDetectorRegion == ECL::DetectorRegion::FWD || eclDetectorRegion == ECL::DetectorRegion::FWDGap) {
+    if (hitStatus == EXT_ECLCROSS) {
       phi_RMS = f_phiRMSFWDCROSS.Eval(pt);
-    } else if (hitStatus == 5) {
+    } else if (hitStatus == EXT_ECLDL) {
       phi_RMS = f_phiRMSFWDDL.Eval(pt);
     } else {
       phi_RMS = f_phiRMSFWDNEAR.Eval(pt);
     }
-  } else if (eclDetectorRegion == 2) { /* RMS for barrel */
-    if (hitStatus == 4) {
+  } else if (eclDetectorRegion == ECL::DetectorRegion::BRL) {
+    if (hitStatus == EXT_ECLCROSS) {
       phi_RMS = f_phiRMSBRLCROSS.Eval(pt);
-    } else if (hitStatus == 5) {
+    } else if (hitStatus == EXT_ECLDL) {
       phi_RMS = f_phiRMSBRLDL.Eval(pt);
     } else {
       phi_RMS = f_phiRMSBRLNEAR.Eval(pt);
     }
-  } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
-    if (hitStatus == 4) {
+  } else if (eclDetectorRegion == ECL::DetectorRegion::BWD || eclDetectorRegion == ECL::DetectorRegion::BWDGap) {
+    if (hitStatus == EXT_ECLCROSS) {
       phi_RMS = f_phiRMSBWDCROSS.Eval(pt);
-    } else if (hitStatus == 5) {
+    } else if (hitStatus == EXT_ECLDL) {
       phi_RMS = f_phiRMSBWDDL.Eval(pt);
     } else {
       phi_RMS = f_phiRMSBWDNEAR.Eval(pt);
@@ -313,26 +319,26 @@ double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double pt,
 double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const
 {
   double theta_RMS;
-  if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
-    if (hitStatus == 4) {
+  if (eclDetectorRegion == ECL::DetectorRegion::FWD || eclDetectorRegion == ECL::DetectorRegion::FWDGap) {
+    if (hitStatus == EXT_ECLCROSS) {
       theta_RMS = f_thetaRMSFWDCROSS.Eval(pt);
-    } else if (hitStatus == 5) {
+    } else if (hitStatus == EXT_ECLDL) {
       theta_RMS = f_thetaRMSFWDDL.Eval(pt);
     } else {
       theta_RMS = f_thetaRMSFWDNEAR.Eval(pt);
     }
-  } else if (eclDetectorRegion == 2) { /* RMS for barrel */
-    if (hitStatus == 4) {
+  } else if (eclDetectorRegion == ECL::DetectorRegion::BRL) {
+    if (hitStatus == EXT_ECLCROSS) {
       theta_RMS = f_thetaRMSBRLCROSS.Eval(pt);
-    } else if (hitStatus == 5) {
+    } else if (hitStatus == EXT_ECLDL) {
       theta_RMS = f_thetaRMSBRLDL.Eval(pt);
     } else {
       theta_RMS = f_thetaRMSBRLNEAR.Eval(pt);
     }
-  } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
-    if (hitStatus == 4) {
+  } else if (eclDetectorRegion == ECL::DetectorRegion::BWD || eclDetectorRegion == ECL::DetectorRegion::BWDGap) {
+    if (hitStatus == EXT_ECLCROSS) {
       theta_RMS = f_thetaRMSBWDCROSS.Eval(pt);
-    } else if (hitStatus == 5) {
+    } else if (hitStatus == EXT_ECLDL) {
       theta_RMS = f_thetaRMSBWDDL.Eval(pt);
     } else {
       theta_RMS = f_thetaRMSBWDNEAR.Eval(pt);
@@ -343,41 +349,33 @@ double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double
   return erfc(abs(deltaTheta) / theta_RMS);
 }
 
-int ECLTrackClusterMatchingModule::getDetectorRegion(double theta) const
-{
-  if (theta < 0.2164208) return 0;   // < 12.4 deg
-  if (theta < 0.5480334) return 1;   // < 31.4 deg
-  if (theta < 0.561996) return 11;   // < 32.2 deg
-  if (theta < 2.2462387) return 2;   // < 128.7 deg
-  if (theta < 2.2811453) return 13;   // < 130.7 deg
-  if (theta < 2.7070057) return 3;   // < 155.1 deg
-  else return 0;
-}
-
 bool ECLTrackClusterMatchingModule::trackTowardsGap(double theta) const
 {
-  if (theta > 0.55 && theta < 0.65) return true;
-  else if (theta > 2.15 && theta < 2.25) return true;
-  else return false;
+  if (ECL::getDetectorRegion(theta) == ECL::DetectorRegion::BRL) {
+    if (ECL::getDetectorRegion(theta - m_brlEdgeTheta) != ECL::DetectorRegion::BRL) return true;
+    else if (ECL::getDetectorRegion(theta + m_brlEdgeTheta) != ECL::DetectorRegion::BRL) return true;
+    else return false;
+  } else return false;
 }
 
 void ECLTrackClusterMatchingModule::optimizedPTMatchingConsistency(double theta, double pt)
 {
-  if (getDetectorRegion(theta) == 1 || getDetectorRegion(theta) == 11) {
+  if (ECL::getDetectorRegion(theta) == ECL::DetectorRegion::FWD || ECL::getDetectorRegion(theta) == ECL::DetectorRegion::FWDGap) {
     for (const auto& matchingThresholdPair : m_matchingThresholdValuesFWD) {
       if (pt < matchingThresholdPair.first) {
         m_matchingConsistency = matchingThresholdPair.second;
         break;
       }
     }
-  } else if (getDetectorRegion(theta) == 2) {
+  } else if (ECL::getDetectorRegion(theta) == ECL::DetectorRegion::BRL) {
     for (const auto& matchingThresholdPair : m_matchingThresholdValuesBRL) {
       if (theta < matchingThresholdPair.first && pt < matchingThresholdPair.second.first) {
         m_matchingConsistency = matchingThresholdPair.second.second;
         break;
       }
     }
-  } else if (getDetectorRegion(theta) == 3 || getDetectorRegion(theta) == 13) {
+  } else if (ECL::getDetectorRegion(theta) == ECL::DetectorRegion::BWD
+             || ECL::getDetectorRegion(theta) == ECL::DetectorRegion::BWDGap) {
     for (const auto& matchingThresholdPair : m_matchingThresholdValuesBWD) {
       if (pt < matchingThresholdPair.first) {
         m_matchingConsistency = matchingThresholdPair.second;

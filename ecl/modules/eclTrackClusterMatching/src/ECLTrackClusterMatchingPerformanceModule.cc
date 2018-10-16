@@ -181,7 +181,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
         double shower_energy = 0., highest_track_related_shower_energy = 0.;
         const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
         for (const auto& eclCluster : b2Track->getRelationsTo<ECLCluster>("", m_trackClusterRelationName)) {
-          if (eclCluster.getHypothesisId() != 5) continue;
+          if (eclCluster.getHypothesisId() != ECLCluster::c_nPhotons) continue;
           if (!(eclCluster.isTrack())) continue;
           const ECLShower* eclShower = eclCluster.getRelatedTo<ECLShower>();
           shower_energy = eclShower->getEnergy();
@@ -203,7 +203,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
         const auto& relatedECLClusters = mcParticle.getRelationsFrom<ECLCluster>();
         for (unsigned int index = 0; index < relatedECLClusters.size(); ++index) {
           const ECLCluster* relatedECLCluster = relatedECLClusters.object(index);
-          if (relatedECLCluster->getHypothesisId() != 5) continue;
+          if (relatedECLCluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
           const double weight = relatedECLClusters.weight(index);
           if (weight > maximumWeight) {
             eclCluster_matchedBestToMCParticle = relatedECLCluster;

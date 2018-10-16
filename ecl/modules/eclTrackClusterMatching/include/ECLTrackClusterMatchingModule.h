@@ -76,8 +76,6 @@ namespace Belle2 {
      */
     double thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;
 
-    int getDetectorRegion(double theta) const; /**< return detector region based on polar angle */
-
     bool trackTowardsGap(double theta) const; /**< return if track points towards gap or adjacent part of barrel */
 
     void optimizedPTMatchingConsistency(double theta, double pt); /**< choose criterion depending on track's pt */
@@ -120,5 +118,7 @@ namespace Belle2 {
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */
     bool m_rerunOldMatching; /**< if true old track cluster matching is run at beginning of module (possibly for the 2nd time) */
+    double m_oldMatchingPTThreshold; /**< pt limit between old and and new angular-distance-based matching algorithm */
+    double m_brlEdgeTheta; /**< distance of polar angle from gaps where old matching should be applied (in rad) */
   };
 } //Belle2

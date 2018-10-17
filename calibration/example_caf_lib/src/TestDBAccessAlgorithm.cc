@@ -72,7 +72,7 @@ void TestDBAccessAlgorithm::reduceDistancesAndSave()
            << mean);
 
     TestCalibMean* dbMean = new TestCalibMean(mean, meanError);
-    saveCalibration(dbMean, IntervalOfValidity(expRun.first, expRun.second, expRun.first, expRun.second));
+    saveCalibration(dbMean);
   }
 }
 
@@ -91,7 +91,7 @@ void TestDBAccessAlgorithm::saveSameMeans()
     float meanError = m_dbMean->getMeanError();
 
     TestCalibMean* dbMean = new TestCalibMean(mean, meanError);
-    saveCalibration(dbMean, IntervalOfValidity(expRun.first, expRun.second, expRun.first, expRun.second));
+    saveCalibration(dbMean);
   }
 }
 

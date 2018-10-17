@@ -78,7 +78,7 @@ namespace Belle2 {
     * Saves the usemode of the FlavorTagger
     * @param mode "Teacher" or "Expert"
     */
-    void setUseModeFlavorTagger(std::string mode);
+    void setUseModeFlavorTagger(const std::string& mode);
 
     /**
     * Saves the method and the correspondig FlavorTaggerMap

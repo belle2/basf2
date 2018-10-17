@@ -27,6 +27,7 @@ namespace Belle2 {
     /** Charge. */
     int* m_iQ;
 
+    /** set up the tree */
     void setupTree() override;
   public:
     /** Constuctor. */

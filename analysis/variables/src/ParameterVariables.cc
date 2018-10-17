@@ -386,7 +386,7 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
-    double pointingAngle(const Particle* particle, const std::vector<double> daughters)
+    double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
         return -999;
@@ -409,7 +409,7 @@ namespace Belle2 {
       return cos(daughterMomentumVector.Angle(vertexDiffVector));
     }
 
-    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double> daughters)
+    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
         return -999;
@@ -549,9 +549,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
                       "cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
     REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "cosine of the angle between i-th and j-th daughters");
-    REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
-                      cosine of the angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
-                      This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
+    REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, "");
+    /**R"DOC(
+                          cosine of the angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
+                          This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
+                          */
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(
                       Azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane.
 

@@ -214,7 +214,7 @@ namespace Belle2 {
      * @param Pointer to the Particle
      * @param Name of the mask to work with
      */
-    bool hasParticle(const Particle* particle, std::string maskName = "") const;
+    bool hasParticle(const Particle* particle, const std::string& maskName = "") const;
     /**
      * Initialize new mask
      * @param Name of the mask to work with
@@ -229,7 +229,7 @@ namespace Belle2 {
      * @param Cut on KLM particles
      * @param Update existing mask if true or not if false
      */
-    void updateMaskWithCuts(std::string name, std::shared_ptr<Variable::Cut> trackCut = nullptr,
+    void updateMaskWithCuts(const std::string& name, std::shared_ptr<Variable::Cut> trackCut = nullptr,
                             std::shared_ptr<Variable::Cut> eclCut = nullptr, std::shared_ptr<Variable::Cut> klmCut = nullptr, bool updateExisting = false);
     /**
      * Update mask by keeping or excluding particles
@@ -277,14 +277,14 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused Particles
      */
-    std::vector<const Particle*> getParticles(std::string maskName = "", bool unpackComposite = true) const;
+    std::vector<const Particle*> getParticles(const std::string& maskName = "", bool unpackComposite = true) const;
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
      * @param name of mask
      * @return vector of pointers to unused Tracks
      */
-    std::vector<const Track*> getTracks(std::string maskName = "") const;
+    std::vector<const Track*> getTracks(const std::string& maskName = "") const;
 
     /**
      * Get vector of all (no mask) or a subset (use mask) of all ECLClusters in ROE.
@@ -292,7 +292,7 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused ECLClusters
      */
-    std::vector<const ECLCluster*> getECLClusters(std::string maskName = "") const;
+    std::vector<const ECLCluster*> getECLClusters(const std::string& maskName = "") const;
 
     /**
      * Get vector of all unused KLMClusters.
@@ -300,7 +300,7 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused KLMClusters
      */
-    std::vector<const KLMCluster*> getKLMClusters(std::string maskName = "") const;
+    std::vector<const KLMCluster*> getKLMClusters(const std::string& maskName = "") const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.
@@ -308,7 +308,7 @@ namespace Belle2 {
      * @param name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector get4Vector(std::string maskName = "") const;
+    TLorentzVector get4Vector(const std::string& maskName = "") const;
 
     /**
      * OBSOLETE:
@@ -317,7 +317,7 @@ namespace Belle2 {
      * @param name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector get4VectorTracks(std::string maskName = "") const;
+    TLorentzVector get4VectorTracks(const std::string& maskName = "") const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all ECLClusters in ROE.
@@ -325,7 +325,7 @@ namespace Belle2 {
      * @param name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector get4VectorNeutralECLClusters(std::string maskName = "") const;
+    TLorentzVector get4VectorNeutralECLClusters(const std::string& maskName = "") const;
 
     /**
      * Get number of all (no mask) or a subset (use mask) of all Tracks in ROE.
@@ -333,7 +333,7 @@ namespace Belle2 {
      * @param name of mask
      * @return number of all remaining tracks
      */
-    int getNTracks(std::string maskName = "") const;
+    int getNTracks(const std::string& maskName = "") const;
 
     /**
      * Get number of all (no mask) or a subset (use mask) of all ECLclusters in ROE.
@@ -341,7 +341,7 @@ namespace Belle2 {
      * @param name of mask
      * @return number of all remaining ECL clusters
      */
-    int getNECLClusters(std::string maskName = "") const;
+    int getNECLClusters(const std::string& maskName = "") const;
 
     /**
      * Get number of all remaining KLM clusters.
@@ -349,7 +349,7 @@ namespace Belle2 {
      * @param name of mask
      * @return number of all remaining KLM clusters
      */
-    int getNKLMClusters(std::string maskName = "") const;
+    int getNKLMClusters(const std::string& maskName = "") const;
 
     /**
      * Get vector of all mask names of the ROE object

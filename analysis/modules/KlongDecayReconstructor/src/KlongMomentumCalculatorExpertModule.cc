@@ -40,7 +40,6 @@ namespace Belle2 {
 
   KlongMomentumCalculatorExpertModule::KlongMomentumCalculatorExpertModule() :
     Module()
-
   {
     // set module description (e.g. insert text)
     setDescription("This module is used to reconstruct B momentum for two body decays in a K_L0 and something else. The K_L0 momentum is reconstructed by taking reconstructed direction (ECL or KLM) and kinematic constraints.");
@@ -59,16 +58,6 @@ namespace Belle2 {
     addParam("recoList", m_recoList,
              "Suffix attached to the output K_L list, if not defined it is set to '_reco' \n", std::string("_reco"));
 
-  }
-
-  void KlongMomentumCalculatorExpertModule::initialize()
-  {
-    // clear everything, initialize private members
-    m_pdgCode = 0;
-    m_listName = "";
-    m_isSelfConjugatedParticle = 0;
-    m_generator = 0;
-
     // obtain the input and output particle lists from the decay string
     bool valid = m_decaydescriptor.init(m_decayString);
     if (!valid)
@@ -84,7 +73,6 @@ namespace Belle2 {
     m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
     m_klistName = m_recoList;
-    m_kpdgCode = Const::Klong.getPDGCode();
 
     // Daughters
     bool k_check = 0;
@@ -104,6 +92,11 @@ namespace Belle2 {
 
     m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));
 
+  }
+
+  void KlongMomentumCalculatorExpertModule::initialize()
+  {
+
     StoreObjPtr<ParticleList> KparticleList(m_klistName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
     KparticleList.registerInDataStore(flags);
@@ -118,7 +111,7 @@ namespace Belle2 {
 
     StoreObjPtr<ParticleList> koutputList(m_klistName);
     koutputList.create();
-    koutputList->initialize(m_kpdgCode, m_klistName);
+    koutputList->initialize(Const::Klong.getPDGCode(), m_klistName);
 
     m_generator->init();
 

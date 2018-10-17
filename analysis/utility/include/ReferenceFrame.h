@@ -339,7 +339,7 @@ namespace Belle2 {
   public:
     /** Constructor which applies the reference frame  */
     template<class ...Args>
-    UseReferenceFrame(Args&& ... params) : m_frame(std::forward<Args>(params)...)
+    explicit UseReferenceFrame(Args&& ... params) : m_frame(std::forward<Args>(params)...)
     {
       ReferenceFrame::Push(&m_frame);
     }

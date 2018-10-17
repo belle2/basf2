@@ -53,7 +53,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_MCdeltaT(0)
+    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");
@@ -796,9 +796,8 @@ namespace Belle2 {
 
     // Here the program keeps track of the tracks that are repeated inside the FlavorTaggerInfo
     int nonRepeated = 1;
-    bool repeatedTrack = false;
     for (unsigned i = 0; i < listTracks.size(); i++) {
-      repeatedTrack = false;
+      bool repeatedTrack = false;
       for (int j = i - 1; j >= 0; j--) {
         if (originalTracks[i] == originalTracks[j]) {
           repeatedTrack = true;

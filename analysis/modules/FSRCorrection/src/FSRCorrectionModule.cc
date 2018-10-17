@@ -62,6 +62,7 @@ namespace Belle2 {
 
     // initializing the rest of private members
     m_pdgCode   = 0;
+    m_maxAngle = cos(m_angleThres * M_PI / 180.0);
   }
 
   void FSRCorrectionModule::initialize()
@@ -97,7 +98,6 @@ namespace Belle2 {
     particleList.registerInDataStore(flags);
     StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
     antiParticleList.registerInDataStore(flags);
-    m_maxAngle = cos(m_angleThres * M_PI / 180.0);
   }
 
 

@@ -65,7 +65,7 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
   return true;
 }
 
-std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName, bool unpackComposite) const
+std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskName, bool unpackComposite) const
 {
   std::vector<const Particle*> result;
   StoreArray<Particle> allParticles;
@@ -103,7 +103,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName, boo
   return result;
 }
 
-bool RestOfEvent::hasParticle(const Particle* particle, std::string maskName) const
+bool RestOfEvent::hasParticle(const Particle* particle, const std::string& maskName) const
 {
   if (maskName != "" && !hasMask(maskName)) {
     B2FATAL("No " << maskName << " mask defined in current ROE!");
@@ -250,7 +250,7 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(std::string name, const Particle
   return true;
 }
 
-bool RestOfEvent::hasMask(std::string name) const
+bool RestOfEvent::hasMask(const std::string& name) const
 {
   for (auto& mask : m_masks) {
     if (mask.getName() == name) {
@@ -284,7 +284,7 @@ RestOfEvent::Mask* RestOfEvent::findMask(std::string& name)
   return nullptr;
 
 }
-std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
+std::vector<const Track*> RestOfEvent::getTracks(const std::string& maskName) const
 {
   std::vector<const Track*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
@@ -295,7 +295,7 @@ std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
   }
   return result;
 }
-std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
+std::vector<const ECLCluster*> RestOfEvent::getECLClusters(const std::string& maskName) const
 {
   std::vector<const ECLCluster*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
@@ -307,7 +307,7 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName)
   }
   return result;
 }
-std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(std::string maskName) const
+std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(const std::string& maskName) const
 {
   std::vector<const KLMCluster*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);

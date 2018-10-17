@@ -958,7 +958,7 @@ endloop:
             for (auto& index : daughterIndices)
             {
               if (index >= int(particle->getNDaughters())) {
-                return -999; break;
+                return -999;
               } else pSum += frame.getMomentum(particle->getDaughter(index));
             }
 

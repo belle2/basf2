@@ -1,5 +1,4 @@
 /**************************************************************************
- *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
@@ -318,7 +317,6 @@ namespace TreeFitter {
 
   std::tuple<double, double> FitManager::getLifeTime(Belle2::Particle& cand) const
   {
-    std::tuple<double, double> rc;
     const ParticleBase* pb = m_decaychain->locate(&cand);
 
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {

@@ -54,17 +54,26 @@ TrackFindingCDC::Weight ExtrapolateAndUpdateCDCStateFilter::operator()(const Bas
 
     const auto rightLeft = static_cast<TrackFindingCDC::ERightLeft>(TrackFindingCDC::sign(
                              state.getHitDistance()));
+
+    state.setRLinfo(rightLeft);
+    //double residual = 0;
+
     if (rightLeft == TrackFindingCDC::ERightLeft::c_Right) {
       state.setChi2(m_updater.kalmanStep(mSoP, *(measurements[1])));
+      //      residual = m_updater.calculateResidual(mSoP, *(measurements[1])) ;
     } else {
       state.setChi2(m_updater.kalmanStep(mSoP, *(measurements[0])));
+      // residual = m_updater.calculateResidual(mSoP, *(measurements[0])) ;
     }
+
+    //std::cout << " Residual = " << residual <<"\n";
 
     delete measurements[0];
     delete measurements[1];
 
     state.setTrackState(mSoP);
-    return state.getChi2();
+
+    return 1. / state.getChi2();
   } catch (genfit::Exception) {
     return NAN;
   }

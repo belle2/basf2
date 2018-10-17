@@ -299,6 +299,7 @@ class Calibration(CalibrationBase):
             #: in :py:mod:`caf.strategies`.
             self.strategies = strategies.SingleIOV
 
+        #: The list of central or local databases to be applied to the collector/algorithm processes.
         self.database_chain = []
         self.use_central_database(get_default_global_tags())
         #: The class that runs all the algorithms in this Calibration using their assigned

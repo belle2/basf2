@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
 #include <boost/optional.hpp>
 
@@ -38,6 +39,7 @@ namespace Belle2 {
       return *m_seed;
     }
 
+
     bool isSeed() const
     {
       return static_cast<bool>(m_seed);
@@ -52,6 +54,17 @@ namespace Belle2 {
     void setTrackState(const genfit::MeasuredStateOnPlane& trackState)
     {
       m_trackState = trackState;
+    }
+
+    void setRLinfo(const  TrackFindingCDC::ERightLeft rl)
+    {
+      m_rl = rl;
+    }
+
+    TrackFindingCDC::ERightLeft getRLinfo() const
+    {
+      B2ASSERT("LR info is not present yet", m_rl != TrackFindingCDC::ERightLeft::c_Unknown);
+      return m_rl;
     }
 
     void setArcLength(double arcLength)
@@ -112,6 +125,8 @@ namespace Belle2 {
     double m_hitDistance = 0;
     double m_weight = 0;
     double m_chi2 = 0;
+    /// Store if the track is on the right or left side of the hit
+    TrackFindingCDC::ERightLeft m_rl = TrackFindingCDC::ERightLeft::c_Unknown;
   };
 
 

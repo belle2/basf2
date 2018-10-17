@@ -189,8 +189,6 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   // Set module properties
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("TriggerThreshold", m_TriggerThreshold,
-           "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.02);
   addParam("Chi2Threshold", m_chi2Threshold, "chi2 threshold to classify offline fit as good fit.", 60.0);
   addParam("CovarianceMatrix", m_CovarianceMatrix,
@@ -340,17 +338,6 @@ void ECLWaveformFitModule::event()
 
     //Filling array with ADC values.
     for (int j = 0; j < ec.m_nsmp; j++) fitA[j] = aECLDsp.getDspA()[j];
-
-    //Trigger check to remove noise pulses in random trigger events.
-    //In random trigger events all eclDSP saved but only eclDigits above online threshold are saved.
-    //Set 10 MeV threshold for now.
-    //Trigger amplitude is computed with algorithm described in slide 5 of:
-    //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
-    //note the trigger check is a temporary workaround to ensure all eclDsp's have a corresponding eclDigit.
-    double baselineADC = 0.25 * (fitA[12] + fitA[13] + fitA[14] + fitA[15]),
-           maxADC = 0.5 * (fitA[20] + fitA[21]),
-           triggerAmp = (maxADC - baselineADC) * m_ADCtoEnergy[id];
-    if (triggerAmp < m_TriggerThreshold) continue;
 
     //setting relation of eclDSP to aECLDigit
     const ECLDigit* d = NULL;

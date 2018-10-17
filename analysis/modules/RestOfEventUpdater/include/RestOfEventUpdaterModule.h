@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RESTOFEVENTUPDATERMODULE_H
-#define RESTOFEVENTUPDATERMODULE_H
-
+#pragma once
 #include <framework/core/Module.h>
 
 #include <analysis/VariableManager/Utility.h>
@@ -86,4 +84,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* RESTOFEVENTUPDATERMODULE_H_H */

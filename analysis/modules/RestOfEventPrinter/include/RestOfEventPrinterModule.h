@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RESTOFEVENTPRINTERMODULE_H
-#define RESTOFEVENTPRINTERMODULE_H
-
+#pragma once
 #include <framework/core/Module.h>
 #include <string>
 #include <map>
@@ -60,4 +58,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RESTOFEVENTBUILDERMODULE_H
-#define RESTOFEVENTBUILDERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -67,4 +66,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* RESTOFEVENTBUILDERMODULE_H */

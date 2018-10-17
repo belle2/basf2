@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RESTOFEVENT_H
-#define RESTOFEVENT_H
-
+#pragma once
 #include <analysis/VariableManager/Utility.h>
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -399,4 +397,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RESTOFEVENTINTERPRETERMODULE_H
-#define RESTOFEVENTINTERPRETERMODULE_H
-
+#pragma once
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -73,4 +71,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* RESTOFEVENTINTERPRETERMODULE_H_H */

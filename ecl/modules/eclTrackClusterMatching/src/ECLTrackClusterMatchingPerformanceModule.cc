@@ -105,6 +105,8 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       m_clusterErrorTiming = eclCluster.getDeltaTime99();
       m_clusterE1E9 = eclCluster.getE1oE9();
       m_clusterDetectorRegion = eclCluster.getDetectorRegion();
+      m_clusterMinTrkDistance = eclCluster.getMinTrkDistance();
+      m_clusterDeltaL = eclCluster.getDeltaL();
       m_clusterTree->Fill();
     }
   }
@@ -196,6 +198,8 @@ void ECLTrackClusterMatchingPerformanceModule::event()
           m_detectorRegion = eclCluster_WithHighestEnergy_track_related->getDetectorRegion();
           m_matchedClusterTheta = eclCluster_WithHighestEnergy_track_related->getTheta();
           m_matchedClusterPhi = eclCluster_WithHighestEnergy_track_related->getPhi();
+          m_matchedClusterMinTrkDistance = eclCluster_WithHighestEnergy_track_related->getMinTrkDistance();
+          m_matchedClusterDeltaL = eclCluster_WithHighestEnergy_track_related->getDeltaL();
         }
         // find ECLCluster in which the particle has deposited the majority of its energy
         maximumWeight = -2.;
@@ -306,6 +310,8 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster, m_dataTree);
   addVariableToTree("ClusterTheta", m_matchedClusterTheta, m_dataTree);
   addVariableToTree("ClusterPhi", m_matchedClusterPhi, m_dataTree);
+  addVariableToTree("MinTrkDistance", m_matchedClusterMinTrkDistance, m_dataTree);
+  addVariableToTree("DeltaL", m_matchedClusterDeltaL, m_dataTree);
 
   addVariableToTree("MCClusterEnergy", m_mcparticle_cluster_energy, m_dataTree);
   addVariableToTree("MCClusterDetectorRegion", m_mcparticle_cluster_detectorregion, m_dataTree);
@@ -325,6 +331,8 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
   addVariableToTree("ClusterE1E9", m_clusterE1E9, m_clusterTree);
   addVariableToTree("ClusterErrorTiming", m_clusterErrorTiming, m_clusterTree);
   addVariableToTree("ClusterDetectorRegion", m_clusterDetectorRegion, m_clusterTree);
+  addVariableToTree("ClusterMinTrkDistance", m_clusterMinTrkDistance, m_clusterTree);
+  addVariableToTree("ClusterDeltaL", m_clusterDeltaL, m_clusterTree);
 
   addVariableToTree("TrackCluster", m_clusterIsTrack, m_clusterTree);
   addVariableToTree("PhotonCluster", m_clusterIsPhoton, m_clusterTree);
@@ -375,6 +383,10 @@ void ECLTrackClusterMatchingPerformanceModule::setVariablesToDefaultValue()
 
   m_matchedClusterPhi = -999;
 
+  m_matchedClusterDeltaL = -999;
+
+  m_matchedClusterMinTrkDistance = -999;
+
   m_mcparticle_cluster_energy = 0.0;
 
   m_mcparticle_cluster_detectorregion = 0;
@@ -407,6 +419,10 @@ void ECLTrackClusterMatchingPerformanceModule::setClusterVariablesToDefaultValue
   m_clusterErrorTiming = -999;
 
   m_clusterDetectorRegion = -999;
+
+  m_clusterMinTrkDistance = -999;
+
+  m_clusterDeltaL = -999;
 }
 
 void ECLTrackClusterMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)

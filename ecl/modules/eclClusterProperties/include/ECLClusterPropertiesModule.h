@@ -62,5 +62,7 @@ namespace Belle2 {
     StoreArray<ECLShower> m_eclShowers; /** Required input array of ECLShowers */
     StoreArray<ECLCalDigit> m_eclCalDigits; /** Required input array of ECLCalDigits */
 
+    std::string m_trackClusterRelationName; /**< name of relation array between tracks and ECL clusters */
+
   };
 }

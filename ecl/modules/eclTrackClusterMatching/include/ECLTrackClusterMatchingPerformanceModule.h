@@ -108,6 +108,12 @@ namespace Belle2 {
     /** phi of cluster matched to track */
     double m_matchedClusterPhi;
 
+    /** minimal distance between cluster and track (not necessarily the matched one) */
+    double m_matchedClusterMinTrkDistance;
+
+    /** delta l */
+    double m_matchedClusterDeltaL;
+
     /** detector region of cluster matched to MCParticle */
     int m_mcparticle_cluster_detectorregion;
 
@@ -164,6 +170,12 @@ namespace Belle2 {
 
     /** cluster's timing uncertainty containing 99% of true photons */
     double m_clusterErrorTiming;
+
+    /** distance to closest track */
+    double m_clusterMinTrkDistance;
+
+    /** delta l */
+    double m_clusterDeltaL;
 
     /** Sets all variables to the default value, here -999. */
     void setVariablesToDefaultValue();

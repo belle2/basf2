@@ -115,10 +115,15 @@ namespace Belle2 {
     std::vector<std::pair<double, double>> m_matchingThresholdValuesBWD; /**< Matching threshold values for BWD */
 
     /** members of ECLTrackClusterMatching Module */
+    /** Track cluster matching method
+     *
+     *  true: track cluster matching based on angular distance between track at specific points and cluster centers
+     *  false: track cluster matching based on tracks entering crystals belonging to cluster
+     */
+    bool m_angularDistanceMatching;
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */
-    bool m_rerunOldMatching; /**< if true old track cluster matching is run at beginning of module (possibly for the 2nd time) */
-    double m_oldMatchingPTThreshold; /**< pt limit between old and and new angular-distance-based matching algorithm */
-    double m_brlEdgeTheta; /**< distance of polar angle from gaps where old matching should be applied (in rad) */
+    double m_matchingPTThreshold; /**< pt limit between angular-distance based and crystal-entering based matching algorithm */
+    double m_brlEdgeTheta; /**< distance of polar angle from gaps where crystal-entering based matching is applied (in rad) */
   };
 } //Belle2

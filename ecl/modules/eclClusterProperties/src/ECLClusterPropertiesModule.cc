@@ -29,7 +29,8 @@ ECLClusterPropertiesModule::ECLClusterPropertiesModule() : Module()
   setDescription("This module calculates some properties of ECL clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
-
+  addParam("trackClusterRelationName", m_trackClusterRelationName, "Name of relation array between tracks and ECL clusters",
+           std::string("AngularDistance"));
 }
 
 ECLClusterPropertiesModule::~ECLClusterPropertiesModule()
@@ -117,7 +118,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   if (cluster == nullptr) return;
   const Track* selectedTrk = nullptr;
   double p = 0;
-  for (const auto& track : cluster->getRelationsFrom<Track>()) {
+  for (const auto& track : cluster->getRelationsFrom<Track>("", m_trackClusterRelationName)) {
     const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
     if (fit != 0) cp = fit->getMomentum().Mag();
@@ -128,10 +129,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   }
   if (selectedTrk == nullptr) return;
   bool found(false);
-  Const::ChargedStable hypothesis = Const::pion;
-  int pdgCode = abs(hypothesis.getPDGCode());
   for (const auto& extHit : selectedTrk->getRelationsTo<ExtHit>()) {
-    if (abs(extHit.getPdgCode()) != pdgCode) continue;
     if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
     if (extHit.getStatus() != EXT_ENTER) continue;
     if (extHit.getCopyID() == -1) continue;

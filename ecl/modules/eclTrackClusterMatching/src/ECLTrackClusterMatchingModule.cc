@@ -27,16 +27,16 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
 {
   setDescription("Match Tracks to ECLCluster");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("useAngularDistanceMatching", m_angularDistanceMatching,
+           "if true use track cluster matching based on angular distance, if false use matching based on entered crystals", bool(true));
   addParam("useOptimizedMatchingConsistency", m_useOptimizedMatchingConsistency,
            "set false if you want to set the matching criterion on your own", bool(true));
   addParam("matchingConsistency", m_matchingConsistency,
            "the 2D consistency of Delta theta and Delta phi has to exceed this value for a track to be matched to an ECL cluster", 1e-6);
-  addParam("rerunOldMatching", m_rerunOldMatching,
-           "run old track cluster matching (again)", bool(true));
-  addParam("oldMatchingPTThreshold", m_oldMatchingPTThreshold,
+  addParam("matchingPTThreshold", m_matchingPTThreshold,
            "tracks with pt greater than this value will exclusively be matched based on angular distance", 0.3);
   addParam("brlEdgeTheta", m_brlEdgeTheta,
-           "distance of polar angle from gaps where old matching should be applied (in rad)", 0.1);
+           "distance of polar angle from gaps where crystal-entering based matching is applied (in rad)", 0.1);
 }
 
 ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()
@@ -53,47 +53,49 @@ void ECLTrackClusterMatchingModule::initialize()
   m_extHits.isRequired();
   m_trackFitResults.isRequired();
 
-  m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
-  m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
+  if (m_angularDistanceMatching) {
+    m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
+    m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
 
-  f_phiRMSFWDCROSS = m_matchingParameterizations->getPhiFWDCROSSRMSParameterization();
-  f_phiRMSFWDDL = m_matchingParameterizations->getPhiFWDDLRMSParameterization();
-  f_phiRMSFWDNEAR = m_matchingParameterizations->getPhiFWDNEARRMSParameterization();
-  f_phiRMSBRLCROSS = m_matchingParameterizations->getPhiBRLCROSSRMSParameterization();
-  f_phiRMSBRLDL = m_matchingParameterizations->getPhiBRLDLRMSParameterization();
-  f_phiRMSBRLNEAR = m_matchingParameterizations->getPhiBRLNEARRMSParameterization();
-  f_phiRMSBWDCROSS = m_matchingParameterizations->getPhiBWDCROSSRMSParameterization();
-  f_phiRMSBWDDL = m_matchingParameterizations->getPhiBWDDLRMSParameterization();
-  f_phiRMSBWDNEAR = m_matchingParameterizations->getPhiBWDNEARRMSParameterization();
-  f_thetaRMSFWDCROSS = m_matchingParameterizations->getThetaFWDCROSSRMSParameterization();
-  f_thetaRMSFWDDL = m_matchingParameterizations->getThetaFWDDLRMSParameterization();
-  f_thetaRMSFWDNEAR = m_matchingParameterizations->getThetaFWDNEARRMSParameterization();
-  f_thetaRMSBRLCROSS = m_matchingParameterizations->getThetaBRLCROSSRMSParameterization();
-  f_thetaRMSBRLDL = m_matchingParameterizations->getThetaBRLDLRMSParameterization();
-  f_thetaRMSBRLNEAR = m_matchingParameterizations->getThetaBRLNEARRMSParameterization();
-  f_thetaRMSBWDCROSS = m_matchingParameterizations->getThetaBWDCROSSRMSParameterization();
-  f_thetaRMSBWDDL = m_matchingParameterizations->getThetaBWDDLRMSParameterization();
-  f_thetaRMSBWDNEAR = m_matchingParameterizations->getThetaBWDNEARRMSParameterization();
+    f_phiRMSFWDCROSS = m_matchingParameterizations->getPhiFWDCROSSRMSParameterization();
+    f_phiRMSFWDDL = m_matchingParameterizations->getPhiFWDDLRMSParameterization();
+    f_phiRMSFWDNEAR = m_matchingParameterizations->getPhiFWDNEARRMSParameterization();
+    f_phiRMSBRLCROSS = m_matchingParameterizations->getPhiBRLCROSSRMSParameterization();
+    f_phiRMSBRLDL = m_matchingParameterizations->getPhiBRLDLRMSParameterization();
+    f_phiRMSBRLNEAR = m_matchingParameterizations->getPhiBRLNEARRMSParameterization();
+    f_phiRMSBWDCROSS = m_matchingParameterizations->getPhiBWDCROSSRMSParameterization();
+    f_phiRMSBWDDL = m_matchingParameterizations->getPhiBWDDLRMSParameterization();
+    f_phiRMSBWDNEAR = m_matchingParameterizations->getPhiBWDNEARRMSParameterization();
+    f_thetaRMSFWDCROSS = m_matchingParameterizations->getThetaFWDCROSSRMSParameterization();
+    f_thetaRMSFWDDL = m_matchingParameterizations->getThetaFWDDLRMSParameterization();
+    f_thetaRMSFWDNEAR = m_matchingParameterizations->getThetaFWDNEARRMSParameterization();
+    f_thetaRMSBRLCROSS = m_matchingParameterizations->getThetaBRLCROSSRMSParameterization();
+    f_thetaRMSBRLDL = m_matchingParameterizations->getThetaBRLDLRMSParameterization();
+    f_thetaRMSBRLNEAR = m_matchingParameterizations->getThetaBRLNEARRMSParameterization();
+    f_thetaRMSBWDCROSS = m_matchingParameterizations->getThetaBWDCROSSRMSParameterization();
+    f_thetaRMSBWDDL = m_matchingParameterizations->getThetaBWDDLRMSParameterization();
+    f_thetaRMSBWDNEAR = m_matchingParameterizations->getThetaBWDNEARRMSParameterization();
 
-  m_matchingThresholdValuesFWD = m_matchingThresholds->getFWDMatchingThresholdValues();
-  m_matchingThresholdValuesBRL = m_matchingThresholds->getBRLMatchingThresholdValues();
-  m_matchingThresholdValuesBWD = m_matchingThresholds->getBWDMatchingThresholdValues();
+    m_matchingThresholdValuesFWD = m_matchingThresholds->getFWDMatchingThresholdValues();
+    m_matchingThresholdValuesBRL = m_matchingThresholds->getBRLMatchingThresholdValues();
+    m_matchingThresholdValuesBWD = m_matchingThresholds->getBWDMatchingThresholdValues();
+  } else {
+    m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "EnterCrystal");
+    m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "EnterCrystal");
+  }
 }
 
 void ECLTrackClusterMatchingModule::event()
 {
-  if (m_rerunOldMatching) {
-    for (auto& eclCluster : m_eclClusters) {
-      eclCluster.setIsTrack(false);
-    }
-    Const::ChargedStable hypothesis = Const::pion;
-    int pdgCode = abs(hypothesis.getPDGCode());
-
-    for (const Track& track : m_tracks) {
-
-      const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(hypothesis);
-      double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
-      if (fitResult->getTransverseMomentum() > m_oldMatchingPTThreshold && !trackTowardsGap(theta)) continue;
+  for (auto& eclCluster : m_eclClusters) {
+    eclCluster.setIsTrack(false);
+  }
+  for (const Track& track : m_tracks) {
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
+    double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
+    double pt = fitResult->getTransverseMomentum();
+    // if (pt > m_matchingPTThreshold && !trackTowardsGap(theta) && m_angularDistanceMatching) continue;
+    if (!m_angularDistanceMatching || pt < m_matchingPTThreshold || trackTowardsGap(theta)) {
 
       // Unique shower ids related to this track
       set<int> uniqueShowerIds;
@@ -109,7 +111,6 @@ void ECLTrackClusterMatchingModule::event()
       // note that more than one crystal belonging to more than one shower
       // can be found
       for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
-        if (abs(extHit.getPdgCode()) != pdgCode) continue;
         if (!isECLEnterHit(extHit)) continue;
         const int cell = extHit.getCopyID() + 1;
 
@@ -154,102 +155,105 @@ void ECLTrackClusterMatchingModule::event()
         if (arrayindex > -1) {
           auto shower = m_eclShowers[arrayindex];
           shower->setIsTrack(true);
-          track.addRelationTo(shower, 1.0, "AngularDistance");
+          if (m_angularDistanceMatching) {
+            track.addRelationTo(shower, 1.0, "AngularDistance");
+          } else {
+            track.addRelationTo(shower, 1.0, "EnterCrystal");
+          }
           B2DEBUG(29, shower->getArrayIndex() << " "  << shower->getIsTrack());
 
           // there is a 1:1 relation, just set the relation for the corresponding cluster as well
           ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
           if (cluster != nullptr) {
             cluster->setIsTrack(true);
-            track.addRelationTo(cluster, 1.0, "AngularDistance");
+            if (m_angularDistanceMatching) {
+              track.addRelationTo(cluster, 1.0, "AngularDistance");
+            } else {
+              track.addRelationTo(cluster, 1.0, "EnterCrystal");
+            }
           }
         }
-      }
-    } // end loop on Tracks
-  } else {
-    for (auto& eclCluster : m_eclClusters) {
-      bool matchedWithHighPTTrack = true;
-      const auto& relatedTracks = eclCluster.getRelationsFrom<Track>();
-      for (unsigned int index = 0; index < relatedTracks.size() && matchedWithHighPTTrack; ++index) {
-        const Track* relatedTrack = relatedTracks.object(index);
-        const TrackFitResult* fitResult = relatedTrack->getTrackFitResultWithClosestMass(Const::pion);
-        if (fitResult->getTransverseMomentum() < m_oldMatchingPTThreshold
-            && ECL::getDetectorRegion(TMath::ACos(fitResult->getMomentum().CosTheta())) == ECL::DetectorRegion::BRL) {
-          matchedWithHighPTTrack = false;
-        }
-      }
-      if (matchedWithHighPTTrack) {
-        eclCluster.setIsTrack(false);
-      }
+      } // end loop on hypothesis IDs
     }
-  }
-
-  for (const Track& track : m_tracks) {
-    ECLCluster* cluster_best_cross = nullptr;
-    ECLCluster* cluster_best_dl = nullptr;
-    ECLCluster* cluster_best_near = nullptr;
-    double quality_best_cross = 0, quality_best_dl = 0, quality_best_near = 0;
-    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
-    double pt = fitResult->getTransverseMomentum();
-    double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
-    // never match tracks pointing towards gaps or adjacent part of barrel using angular distance
-    if (trackTowardsGap(theta)) continue;
-    ECL::DetectorRegion trackDetectorRegion = ECL::getDetectorRegion(theta);
-    // for low-pt tracks matching based on the angular distance is only applied if track points towards the FWD
-    if (pt < m_oldMatchingPTThreshold && trackDetectorRegion != ECL::DetectorRegion::FWD) continue;
-    // Find extrapolated track hits in the ECL, considering only hit points
-    // that either are on the sphere, closest to, or on radial direction of an
-    // ECLCluster.
-    for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
-      if (!isECLHit(extHit)) continue;
-      ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
-      if (eclCluster != nullptr) {
-        if (eclCluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
-        int eclDetectorRegion = eclCluster->getDetectorRegion();
-        // accept only cluster from region matching track direction, exception for gaps
-        if (abs(eclDetectorRegion - trackDetectorRegion) == 1) continue;
-        // never match low-pt tracks with clusters in the barrel
-        if (pt < m_oldMatchingPTThreshold && eclDetectorRegion == ECL::DetectorRegion::BRL) continue;
-        double phiHit = extHit.getPosition().Phi();
-        double phiCluster = eclCluster->getPhi();
-        double deltaPhi = phiHit - phiCluster;
-        if (deltaPhi > M_PI) {
-          deltaPhi = deltaPhi - 2 * M_PI;
-        } else if (deltaPhi < -M_PI) {
-          deltaPhi = deltaPhi + 2 * M_PI;
-        }
-        double thetaHit = extHit.getPosition().Theta();
-        double thetaCluster = eclCluster->getTheta();
-        double deltaTheta = thetaHit - thetaCluster;
-        ExtHitStatus extHitStatus = extHit.getStatus();
-        double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion, extHitStatus);
-        if (extHitStatus == EXT_ECLCROSS) {
-          if (quality > quality_best_cross) {
-            quality_best_cross = quality;
-            cluster_best_cross = eclCluster;
+    if (m_angularDistanceMatching) {
+      // never match tracks pointing towards gaps or adjacent part of barrel using angular distance
+      if (trackTowardsGap(theta)) continue;
+      ECL::DetectorRegion trackDetectorRegion = ECL::getDetectorRegion(theta);
+      // for low-pt tracks matching based on the angular distance is only applied if track points towards the FWD
+      if (pt < m_matchingPTThreshold && trackDetectorRegion != ECL::DetectorRegion::FWD) continue;
+      ECLCluster* cluster_best_cross = nullptr;
+      ECLCluster* cluster_best_dl = nullptr;
+      ECLCluster* cluster_best_near = nullptr;
+      double quality_best_cross = 0, quality_best_dl = 0, quality_best_near = 0;
+      // Find extrapolated track hits in the ECL, considering only hit points
+      // that either are on the sphere, closest to, or on radial direction of an
+      // ECLCluster.
+      for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
+        if (!isECLHit(extHit)) continue;
+        ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
+        if (eclCluster != nullptr) {
+          if (eclCluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
+          int eclDetectorRegion = eclCluster->getDetectorRegion();
+          // accept only cluster from region matching track direction, exception for gaps
+          if (abs(eclDetectorRegion - trackDetectorRegion) == 1) continue;
+          // never match low-pt tracks with clusters in the barrel
+          if (pt < m_matchingPTThreshold && eclDetectorRegion == ECL::DetectorRegion::BRL) continue;
+          double phiHit = extHit.getPosition().Phi();
+          double phiCluster = eclCluster->getPhi();
+          double deltaPhi = phiHit - phiCluster;
+          if (deltaPhi > M_PI) {
+            deltaPhi = deltaPhi - 2 * M_PI;
+          } else if (deltaPhi < -M_PI) {
+            deltaPhi = deltaPhi + 2 * M_PI;
           }
-        } else if (extHitStatus == EXT_ECLDL) {
-          if (quality > quality_best_dl) {
-            quality_best_dl = quality;
-            cluster_best_dl = eclCluster;
+          double thetaHit = extHit.getPosition().Theta();
+          double thetaCluster = eclCluster->getTheta();
+          double deltaTheta = thetaHit - thetaCluster;
+          ExtHitStatus extHitStatus = extHit.getStatus();
+          double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion, extHitStatus);
+          if (extHitStatus == EXT_ECLCROSS) {
+            if (quality > quality_best_cross) {
+              quality_best_cross = quality;
+              cluster_best_cross = eclCluster;
+            }
+          } else if (extHitStatus == EXT_ECLDL) {
+            if (quality > quality_best_dl) {
+              quality_best_dl = quality;
+              cluster_best_dl = eclCluster;
+            }
+          } else if (quality > quality_best_near) {
+            quality_best_near = quality;
+            cluster_best_near = eclCluster;
           }
-        } else if (quality > quality_best_near) {
-          quality_best_near = quality;
-          cluster_best_near = eclCluster;
         }
-      }
-    } // end loop on ExtHits related to Track
-    if (cluster_best_cross != nullptr || cluster_best_dl != nullptr || cluster_best_near != nullptr) {
-      if (m_useOptimizedMatchingConsistency) optimizedPTMatchingConsistency(theta, pt);
-      if (cluster_best_cross != nullptr && quality_best_cross > m_matchingConsistency) {
-        cluster_best_cross->setIsTrack(true);
-        track.addRelationTo(cluster_best_cross, 1.0, "AngularDistance");
-      } else if (cluster_best_dl != nullptr && quality_best_dl > m_matchingConsistency) {
-        cluster_best_dl->setIsTrack(true);
-        track.addRelationTo(cluster_best_dl, 1.0, "AngularDistance");
-      } else if (cluster_best_near != nullptr && quality_best_near > m_matchingConsistency) {
-        cluster_best_near->setIsTrack(true);
-        track.addRelationTo(cluster_best_near, 1.0, "AngularDistance");
+      } // end loop on ExtHits related to Track
+      if (cluster_best_cross != nullptr || cluster_best_dl != nullptr || cluster_best_near != nullptr) {
+        if (m_useOptimizedMatchingConsistency) optimizedPTMatchingConsistency(theta, pt);
+        if (cluster_best_cross != nullptr && quality_best_cross > m_matchingConsistency) {
+          cluster_best_cross->setIsTrack(true);
+          track.addRelationTo(cluster_best_cross, 1.0, "AngularDistance");
+          ECLShower* shower_cross = cluster_best_cross->getRelatedFrom<ECLShower>();
+          if (shower_cross != nullptr) {
+            shower_cross->setIsTrack(true);
+            track.addRelationTo(shower_cross, 1.0, "AngularDistance");
+          }
+        } else if (cluster_best_dl != nullptr && quality_best_dl > m_matchingConsistency) {
+          cluster_best_dl->setIsTrack(true);
+          track.addRelationTo(cluster_best_dl, 1.0, "AngularDistance");
+          ECLShower* shower_dl = cluster_best_dl->getRelatedFrom<ECLShower>();
+          if (shower_dl != nullptr) {
+            shower_dl->setIsTrack(true);
+            track.addRelationTo(shower_dl, 1.0, "AngularDistance");
+          }
+        } else if (cluster_best_near != nullptr && quality_best_near > m_matchingConsistency) {
+          cluster_best_near->setIsTrack(true);
+          track.addRelationTo(cluster_best_near, 1.0, "AngularDistance");
+          ECLShower* shower_near = cluster_best_near->getRelatedFrom<ECLShower>();
+          if (shower_near != nullptr) {
+            shower_near->setIsTrack(true);
+            track.addRelationTo(shower_near, 1.0, "AngularDistance");
+          }
+        }
       }
     }
   } // end loop on Tracks

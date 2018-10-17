@@ -3,7 +3,8 @@
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Viktor Trusov, Thomas Hauth, Nils Braun                  *
+* Contributors: Viktor Trusov, Thomas Hauth, Nils Braun,                 *
+*               Dmitrii Neverov                                          *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -309,7 +310,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   return crossesRight or crossesLeft;
 }
 
-void AxialHitQuadTreeProcessor::drawNode()
+void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, unsigned int color) const
 {
   static int nevent(0);
 
@@ -322,24 +323,41 @@ void AxialHitQuadTreeProcessor::drawNode()
   dummyGraph->GetXaxis()->SetTitle("#theta");
   dummyGraph->GetYaxis()->SetTitle("#rho");
   dummyGraph->GetXaxis()->SetRangeUser(-3.1415, 3.1415);
-  dummyGraph->GetYaxis()->SetRangeUser(0, 0.15);
+  dummyGraph->GetYaxis()->SetRangeUser(-0.02, 0.15);
 
-  for (Item* item : m_quadTree->getItems()) {
-    const CDCWireHit* wireHit = item->getPointer();
+  for (const CDCWireHit* wireHit : hits) {
     const double& l = wireHit->getRefDriftLength();
     const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
-
-    TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
-    funct1->SetLineWidth(1);
-    double r2 = pos2D.normSquared() - l * l;
     double x = pos2D.x();
+    double y = pos2D.y();
+    double r2 = pos2D.normSquared() - l * l;
 
-    funct1->SetParameters(x, r2);
-    funct1->Draw("CSAME");
+    TF1* concaveHitLegendre = new TF1("concaveHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) + 2*([2]/[3])", -3.1415, 3.1415);
+    TF1* convexHitLegendre = new TF1("convexHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) - 2*([2]/[3])", -3.1415, 3.1415);
+    concaveHitLegendre->SetLineWidth(1);
+    convexHitLegendre->SetLineWidth(1);
+    concaveHitLegendre->SetLineColor(color);
+    convexHitLegendre->SetLineColor(color);
+
+    concaveHitLegendre->SetParameters(x, y, l, r2);
+    convexHitLegendre->SetParameters(x, y, l, r2);
+    concaveHitLegendre->Draw("CSAME");
+    convexHitLegendre->Draw("CSAME");
   }
-  canv->Print(Form("legendreHits_%i.root", nevent));
-  canv->Print(Form("legendreHits_%i.eps", nevent));
+//   canv->Print(Form("legendreHits_%i.root", nevent));
+//   canv->Print(Form("legendreHits_%i.eps", nevent));
   canv->Print(Form("legendreHits_%i.png", nevent));
+  delete canv;
 
   nevent++;
+}
+
+void AxialHitQuadTreeProcessor::drawNode(QuadTree* node) const
+{
+  std::vector<const CDCWireHit*> hits;
+  for (Item* item : node->getItems()) {
+    const CDCWireHit* wireHit = item->getPointer();
+    hits.push_back(wireHit);
+  }
+  drawHits(hits);
 }

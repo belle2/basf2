@@ -1393,6 +1393,78 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr totalPxOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalPxOfParticlesInList");
+          double totalPx = 0;
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalPx += frame.getMomentum(part).Px();
+          }
+          return totalPx;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalPxOfParticlesInList");
+      }
+    }
+
+    Manager::FunctionPtr totalPyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalPyOfParticlesInList");
+          double totalPy = 0;
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalPy += frame.getMomentum(part).Py();
+          }
+          return totalPy;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalPyOfParticlesInList");
+      }
+    }
+
+    Manager::FunctionPtr totalPzOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalPzOfParticlesInList");
+          double totalPz = 0;
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalPz += frame.getMomentum(part).Pz();
+          }
+          return totalPz;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalPzOfParticlesInList");
+      }
+    }
+
     Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 0) {
@@ -1465,6 +1537,30 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxPtInList");
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          double maxPt = 0;
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            const double Pt = frame.getMomentum(part).Pt();
+            if (Pt > maxPt) maxPt = Pt;
+          }
+          return maxPt;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function maxPtInList");
+      }
+    }
 
 
     VARIABLE_GROUP("MetaFunctions");
@@ -1638,9 +1734,17 @@ endloop:
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
     REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
                       "Returns the total energy of particles in the given particle List.");
+    REGISTER_VARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
+                      "Returns the total momentum Px of particles in the given particle List.");
+    REGISTER_VARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
+                      "Returns the total momentum Py of particles in the given particle List.");
+    REGISTER_VARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
+                      "Returns the total momentum Pz of particles in the given particle List.");
     REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
                       "Returns the invariant mass of the combination of particles in the given particle lists.");
     REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
                       "Returns the total ECL energy of particles in the given particle List.");
+    REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
+                      "Returns maximum transverse momentum Pt in the given particle List.");
   }
 }

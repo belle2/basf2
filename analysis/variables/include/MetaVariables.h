@@ -234,6 +234,21 @@ namespace Belle2 {
     Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
     /**
+    * Returns function which returns the x-component of total momentum Px of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPxOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the y-component of total momentum Py of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPyOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the z-component of total momentum Pz of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPzOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
     * Returns function which returns the invariant mass of the combination of particles in the given particle Lists.
     */
     Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments);
@@ -243,5 +258,9 @@ namespace Belle2 {
     */
     Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
+    /**
+    * Returns function which returns maximum transverse momentum Pt in the given particle Lists.
+    */
+    Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
   }
 }

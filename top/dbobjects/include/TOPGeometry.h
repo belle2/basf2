@@ -18,6 +18,7 @@
 #include <top/dbobjects/TOPNominalTTS.h>
 #include <top/dbobjects/TOPNominalTDC.h>
 #include <top/dbobjects/TOPSignalShape.h>
+#include <top/dbobjects/TOPWavelengthFilter.h>
 #include <framework/gearbox/Unit.h>
 #include <vector>
 
@@ -107,6 +108,12 @@ namespace Belle2 {
     void setCalPulseShape(const TOPSignalShape& shape) {m_calPulseShape = shape;}
 
     /**
+     * Sets wavelength filter transmittance
+     * @param filter wavelength filter transmittance
+     */
+    void setWavelengthFilter(const TOPWavelengthFilter& filter) {m_wavelengthFilter = filter;}
+
+    /**
      * Returns number of modules
      * @return number of modules
      */
@@ -181,6 +188,12 @@ namespace Belle2 {
     const TOPSignalShape& getCalPulseShape() const {return m_calPulseShape;}
 
     /**
+     * Returns transmittance of wavelength filter
+     * @return transmittance of wavelength filter
+     */
+    const TOPWavelengthFilter& getWavelengthFilter() const {return m_wavelengthFilter;}
+
+    /**
      * Returns inner radius of the volume devoted to TOP counter
      * @return inner radius
      */
@@ -234,8 +247,9 @@ namespace Belle2 {
     TOPNominalTDC m_nominalTDC; /**< nominal time-to-digit conversion parameters */
     TOPSignalShape m_signalShape; /**< shape of single photon signal */
     TOPSignalShape m_calPulseShape; /**< shape of the calibration pulse */
+    TOPWavelengthFilter m_wavelengthFilter; /**< transmittance of wavelength filter */
 
-    ClassDef(TOPGeometry, 5); /**< ClassDef */
+    ClassDef(TOPGeometry, 6); /**< ClassDef */
 
   };
 

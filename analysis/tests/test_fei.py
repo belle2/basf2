@@ -206,8 +206,12 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0 -> pi+ pi-', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP -> p+ pi-', '')],
+                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
+                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         print_path(path, x.reconstruct())
@@ -220,8 +224,12 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0 -> pi+ pi-', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP -> p+ pi-', '')],
+                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
+                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)

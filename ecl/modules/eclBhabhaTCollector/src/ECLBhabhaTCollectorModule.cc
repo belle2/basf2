@@ -212,7 +212,6 @@ void ECLBhabhaTCollectorModule::collect()
     double pt = fit_result->getTransverseMomentum();
     double z0 = fit_result->getZ0();
     double d0 = fit_result->getD0();
-    double pValue = fit_result->getPValue();
     int nCDChits = fit_result->getHitPatternCDC().getNHits();
 
     if (pt < 0.15) continue;

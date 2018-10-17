@@ -18,7 +18,7 @@ namespace Belle2 {
    *
    * Inherits from the abstract base class LogConnectionBase.
    */
-  class LogConnectionFileDescriptor : public LogConnectionBase {
+  class LogConnectionFileDescriptor final : public LogConnectionBase {
 
   public:
 
@@ -44,10 +44,10 @@ namespace Belle2 {
      * @param message The log message object.
      * @return true if the message could be send.
      */
-    virtual bool sendMessage(const LogMessage& message);
+    bool sendMessage(const LogMessage& message) override;
 
     /** Returns true if the connection to the io stream could be established. */
-    virtual bool isConnected();
+    bool isConnected() override;
 
   private:
     int m_fd;  /**< The output stream used for sending the log message.*/

@@ -70,6 +70,6 @@ namespace Belle2 {
     /// Current list of seeds
     std::vector<CDCCKFPath> m_seeds;
     /// Current list of results
-    std::vector<CDCCKFPath> m_results;
+    std::vector<CDCCKFResult> m_results;
   };
 }

@@ -18,7 +18,8 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
-#include <boost/container/flat_set.hpp>
+#include <tracking/trackFindingCDC/numerics/Angle.h>
+
 
 namespace Belle2 {
 
@@ -98,8 +99,8 @@ namespace Belle2 {
 
 
         if (! lastState.isSeed()) {
-          //    if ( fabs(fmod(lastPhi - wireHit->getRefPos2D().phi(), TMath::Pi() ))  > m_maximalDeltaPhi)  {
-          if (fabs(fmod(lastPhi - m_wireHitCache[i].phi, TMath::Pi()))  > m_maximalDeltaPhi)  {
+          double deltaPhi = TrackFindingCDC::AngleUtil::normalised(lastPhi - m_wireHitCache[i].phi);
+          if (fabs(deltaPhi)  > m_maximalDeltaPhi)  {
             continue;
           }
         }

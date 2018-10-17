@@ -117,6 +117,9 @@ namespace Belle2 {
       m_intraRunDependencies.erase(&entry.second);
     }
 
+    // nothing to update
+    if (entries.empty()) return;
+
     // Request new objects and IoVs from database
     Database::Instance().getData(event, entries);
 
@@ -133,8 +136,8 @@ namespace Belle2 {
     if (!m_manualEvent) {
       performUpdateEvent(*m_storeEvent);
     } else {
-      B2WARNING("The m_manualEvent variable has been initialized but you are asking for the DataStore's EventMetaData to be used "
-                "in updateEvent(). Update could not proceed. "
+      B2WARNING("DBStore is currently using manual event information. But you are asking for the DataStore's EventMetaData "
+                "to be used to update the Intra-run dependencies. Update could not proceed. "
                 "Did you forget to call DBStore::Instance().update() before calling this function?");
     }
   }
@@ -148,9 +151,9 @@ namespace Belle2 {
       m_manualEvent->setEvent(eventNumber);
       performUpdateEvent(*m_manualEvent);
     } else {
-      B2WARNING("The m_manualEvent variable has not been initialized and the DBStore is not currently expecting to use it."
-                "The updateEvent(eventNumber) could not proceed. "
-                "Did you forget to call DBStore::Instance().update(event) or accidentally call DBStore::Instance().update() "
+      B2WARNING("DBStore is not currently using manual event information. But you are asking for the event number to be set "
+                " to a custom value. Update of the Intra-run dependencies could not proceed. "
+                "Did you forget to call DBStore::Instance().update(event), or accidentally call DBStore::Instance().update() "
                 "prior to to this?");
     }
   }

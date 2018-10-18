@@ -13,6 +13,7 @@
 
 #include <tracking/ckf/cdc/filters/pathPairs/DistanceBasedCDCPathPairFilter.h>
 #include <tracking/ckf/cdc/filters/pathPairs/ArcLengthBasedCDCPathPairFilter.h>
+#include <tracking/ckf/cdc/filters/pathPairs/MCTruthCDCPathPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
@@ -48,7 +49,7 @@ std::map<std::string, std::string> CDCPathPairFilterFactory::getValidFilterNames
     {"none", "no track combination is valid"},
     {"distance", "ordering based on distance"},
     {"arc_length", "ordering based on arc_length"},
-    //{"mc_truth", "Extrapolation and update"},
+    {"mc_truth", "ordering based on mc truth information"},
   };
 }
 
@@ -63,8 +64,8 @@ CDCPathPairFilterFactory::create(const std::string& filterName) const
     return std::make_unique<DistanceBasedCDCPathPairFilter>();
   } else if (filterName == "arc_length") {
     return std::make_unique<ArcLengthBasedCDCPathPairFilter>();
-    //} else if (filterName == "mc_truth") {
-    //  return std::make_unique<MCTruthCDCPathPairFilter>();
+  } else if (filterName == "mc_truth") {
+    return std::make_unique<MCTruthCDCPathPairFilter>();
   } else {
     return Super::create(filterName);
   }

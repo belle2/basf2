@@ -39,6 +39,12 @@ namespace Belle2 {
       return *m_seed;
     }
 
+    const RecoTrack* getMCRecoTrack(const std::string& mcRecoTrackStoreArrayName = "MCRecoTracks") const
+    {
+      const RecoTrack* seed = getSeed();
+      return seed->getRelated<RecoTrack>(mcRecoTrackStoreArrayName);
+    }
+
 
     bool isSeed() const
     {

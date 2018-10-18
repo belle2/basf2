@@ -60,6 +60,9 @@ namespace Belle2 {
     void apply(std::vector<CDCCKFState>& nextStates, const CDCCKFPath& path,
                const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
     {
+      // TODO: as we do not need any information on the current state (track state) of the path, we could in principle
+      // TODO: precalculate everything in here
+
       // Create cache over wirehits, if empty:
       if (m_wireHitCache.empty()) {
         const size_t nHits = wireHits.size();

@@ -21,6 +21,7 @@ namespace Belle2 {
   public:
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {
+      /// TODO: Merging does not work properly, as the tracks we compare must not have the same number of hits (and must not be at the same stage)
       std::unordered_map<size_t, CDCCKFPath> hashToPathList;
       for (const CDCCKFPath& path : newPaths) {
         const auto hash = lastThreeHitHash(path);

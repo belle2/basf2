@@ -107,6 +107,16 @@ namespace Belle2 {
       return m_chi2;
     }
 
+    void setReconstructedZ(double reconstructedZ)
+    {
+      m_reconstructedZ = reconstructedZ;
+    }
+
+    double getReconstructedZ() const
+    {
+      return m_reconstructedZ;
+    }
+
     TrackFindingCDC::CDCTrajectory3D getTrajectory() const
     {
       const auto& trackState = getTrackState();
@@ -125,6 +135,7 @@ namespace Belle2 {
     double m_hitDistance = 0;
     double m_weight = 0;
     double m_chi2 = 0;
+    double m_reconstructedZ = 0;
     /// Store if the track is on the right or left side of the hit
     TrackFindingCDC::ERightLeft m_rl = TrackFindingCDC::ERightLeft::c_Unknown;
   };

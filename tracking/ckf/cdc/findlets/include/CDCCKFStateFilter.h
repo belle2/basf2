@@ -149,10 +149,12 @@ namespace Belle2 {
       }
 
       const double arcLength = trajectory2D.calcArcLength2D(recoPos2D);
+      const double z = trajectorySZ.mapSToZ(arcLength);
       const double distanceToHit = trajectory2D.getDist2D(recoPos2D);
 
       state.setArcLength(lastArcLength + arcLength);
       state.setHitDistance(distanceToHit);
+      state.setReconstructedZ(z);
     }
   };
 }

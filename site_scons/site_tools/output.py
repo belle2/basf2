@@ -8,6 +8,7 @@ from SCons.Script import GetOption
 # compile: blue
 # link   : green
 # install: purple
+# copy   : purple
 # map    : cyan
 # dict   : yellow
 # cleanup: black/white
@@ -18,6 +19,7 @@ color_map_none = {
     'compile': '',
     'link': '',
     'install': '',
+    'copy': '',
     'map': '',
     'dict': '',
     'cleanup': '',
@@ -28,6 +30,7 @@ color_map_light = {
     'compile': '\033[94m',
     'link': '\033[92m',
     'install': '\033[95m',
+    'copy': '\033[95m',
     'map': '\033[96m',
     'dict': '\033[93m',
     'cleanup': '\033[37m',
@@ -38,6 +41,7 @@ color_map_dark = {
     'compile': '\033[2m\033[34m',
     'link': '\033[2m\033[32m',
     'install': '\033[2m\033[35m',
+    'copy': '\033[2m\033[35m',
     'map': '\033[2m\033[36m',
     'dict': '\033[2m\033[33m',
     'cleanup': '\033[30m',
@@ -67,6 +71,7 @@ def generate(env):
             SHLINKCOMSTR='${LINKCOMSTR}',
             LINKCOMSTR=color_map['link'] + '*** linking    : ${TARGET}' + color_map['end'],
             INSTALLSTR=color_map['install'] + '*** ' + install_text + ' : ${TARGET}' + color_map['end'],
+            COPYCOMSTR=color_map['copy'] + '*** copying    : ${TARGET}' + color_map['end'],
             MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}' + color_map['end'],
             ROOTCINTCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}' + color_map['end'],
             STRIPCOMSTR=color_map['strip'] + '*** stripping  : ${TARGET}' + color_map['end'],

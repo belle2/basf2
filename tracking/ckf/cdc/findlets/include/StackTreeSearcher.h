@@ -39,9 +39,9 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
       m_stateCreator.exposeParameters(moduleParamList, prefix);
-      m_stateFilter.exposeParameters(moduleParamList, prefix);
+      m_stateFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("state", prefix));
       m_pathMerger.exposeParameters(moduleParamList, prefix);
-      m_pathSelector.exposeParameters(moduleParamList, prefix);
+      m_pathSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("path", prefix));
     }
 
     void apply(std::vector<CDCCKFPath>& paths,

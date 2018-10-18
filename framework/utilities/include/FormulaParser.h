@@ -45,12 +45,12 @@ namespace Belle2 {
       c_Empty,        /**< Empty string */
       c_Sign,         /**< Leading sign */
       c_Int,          /**< [leading sign] + digits */
-      c_Dot,          /**< [leading sign] + [digits] + dot */
-      c_LeadingDot,   /**< leading dot */
+      c_Dot,          /**< [leading sign] + digits + dot */
+      c_LeadingDot,   /**< leading dot without preceding digits */
       c_Float,        /**< [leading sign] + [digits] + dot + digits */
-      c_Exponent,     /**< [float] + E or e*/
-      c_ExponentSign, /**< exponent followed by plus or minus*/
-      c_Scientific    /**< eponent followed by sign and digits */
+      c_Exponent,     /**< [float] + E or e */
+      c_ExponentSign, /**< exponent followed by plus or minus */
+      c_Scientific    /**< exponent followed by sign and digits */
     };
 
     /** Input token type: an input tokein is either a string or a float variable */
@@ -75,6 +75,12 @@ namespace Belle2 {
     virtual void executeOperator(EOperator op) = 0;
     /** Add a variable token to the current state */
     virtual void addVariable(const InputToken& token) = 0;
+    /** Process the given formula and store the final state */
+    void processString(const std::string& formula);
+    /** Format the given runtime_error with context information and rethrow a
+     * new one */
+    [[noreturn]] void raiseError(const std::runtime_error& e);
+  private:
     /** Add an operator to the internal state, convert them to reverse polish
      * notation using the shunting yard algorithm and execute them as they
      * become available */
@@ -86,12 +92,6 @@ namespace Belle2 {
     void flushPendingOperators();
     /** Check if the next character is a operator */
     EOperator checkForOperator(char next);
-    /** Process the given formula and store the final state */
-    void processString(const std::string& formula);
-    /** Format the given runtime_error with context information and rethrow a
-     * new one */
-    [[noreturn]] void raiseError(const std::runtime_error& e);
-  private:
     /** Bool to check whether there were consecutive operators or variables */
     bool m_lastTokenWasOperator;
     /** Buffer for the formula */
@@ -163,10 +163,14 @@ namespace Belle2 {
     void executeOperator(EOperator op) override
     {
       assertOperatorUsable(m_outputStack.size());
+      // so far all a binary operators
       OutputToken op2 = m_outputStack.top(); m_outputStack.pop();
       OutputToken op1 = m_outputStack.top(); m_outputStack.pop();
+      // and apply ...
       m_outputStack.push(std::visit(Utils::VisitOverload{
+        // eagerly apply operations if both operands are numbers
         [op](double a, double b) -> OutputToken { return applyOperator(op, a, b); },
+        // otherwise defer to variable constructor
         [op](auto a, auto b) -> OutputToken { return VariableConstructor()(op, a, b); },
       }, op1, op2));
     }
@@ -175,7 +179,9 @@ namespace Belle2 {
     void addVariable(const InputToken& var) override
     {
       m_outputStack.push(std::visit(Utils::VisitOverload{
+        // if the variable is a string its an identifier and we have to construct a variable from it
         [](const std::string & s) -> OutputToken { return VariableConstructor()(s); },
+        // otherwise keep as is
         [](auto s) -> OutputToken { return s; }
       }, var));
     }

@@ -48,8 +48,8 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   double empty_s_sum = 0;
   double empty_s_sum_squared = 0;
   double empty_s_variance = 0;
-  double empty_s_max = 0;
-  double empty_s_min = 0;
+  double empty_s_max = -1000;
+  double empty_s_min = 1000;
 
   double last_perp_s = NAN;
 

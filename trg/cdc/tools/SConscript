@@ -13,7 +13,7 @@ env['TOOLS_LIBS']['TRGCDCHoughMapConverter'] = ['trg_cdc','trg_trg', 'framework'
 env['TOOLS_LIBS']['TRGCDCTSStreamReader'].insert(0, ['Core'])
 env['TOOLS_LIBS']['TRGCDCDisplay'].insert(0, ['Core'])
 env['TOOLS_LIBS']['TRGCDCTrackSegmentSimulator'].insert(0, ['Core'])
-if 'TRGCDC_DISPLAY' in env['CPPDEFINES'].keys():
+if 'TRGCDC_DISPLAY' in env['CPPDEFINES']:
     env['TOOLS_LIBS']['TRGCDCTSStreamReader'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4'])
     env['TOOLS_LIBS']['TRGCDCDisplay'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4'])
     env['TOOLS_LIBS']['TRGCDCTrackSegmentSimulator'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4'])

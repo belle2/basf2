@@ -299,11 +299,11 @@ namespace TreeFitter {
     return rc;
   }
 
-  void ParticleBase::retrieveIndexMap(indexmap& indexmap) const
+  void ParticleBase::retrieveIndexMap(indexmap& map) const
   {
-    indexmap.push_back(std::pair<const ParticleBase*, int>(this, index()));
+    map.push_back(std::pair<const ParticleBase*, int>(this, index()));
     for (auto* daughter : m_daughters) {
-      daughter->retrieveIndexMap(indexmap);
+      daughter->retrieveIndexMap(map);
     }
   }
 

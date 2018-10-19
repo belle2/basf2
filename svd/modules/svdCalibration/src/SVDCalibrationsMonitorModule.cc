@@ -47,6 +47,7 @@ void SVDCalibrationsMonitorModule::initialize()
   m_histoList_pulseWidth = new TList;
   m_histoList_timeshift = new TList;
   m_histoList_triggerbin = new TList;
+  m_histoList_cluster = new TList;
   //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -159,6 +160,15 @@ void SVDCalibrationsMonitorModule::initialize()
                                                       "CoG_ShiftMeanToZeroTBDep (ns)",
                                                       m_histoList_triggerbin);
 
+          //CLUSTER SNR
+          NameOfHisto = "cls_ClusterSNR" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Minimum SNR (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_clsSNR[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, -0.5, 99.5,
+                                                                    "cls min SNR",
+                                                                    m_histoList_cluster);
+
+
         }
         //histogram created
         ++itSvdSensors;
@@ -219,9 +229,13 @@ void SVDCalibrationsMonitorModule::event()
         Belle2::VxdID theVxdID(layer, ladder, sensor);
         const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
 
+        float clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, 1);
+        h_clsSNR[layer][ladder][sensor][1]->Fill(clsSNR);
+        clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, 0);
+        h_clsSNR[layer][ladder][sensor][0]->Fill(clsSNR);
+
         for (int Ustrip = 0; Ustrip < currentSensorInfo->getUCells(); Ustrip++) {
           //fill your histogram for U side
-
 
 
           float ADCnoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
@@ -235,6 +249,8 @@ void SVDCalibrationsMonitorModule::event()
 
           float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 1, Ustrip,
                                    0); /*reading by default the trigger bin #0*/
+
+
 
           h_noise[layer][ladder][sensor][1]->Fill(ADCnoise);
           h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
@@ -263,7 +279,6 @@ void SVDCalibrationsMonitorModule::event()
           float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 0, Vstrip,
                                    0); /*reading by default the trigger bin #0*/
 
-
           h_noise[layer][ladder][sensor][0]->Fill(ADCnoise);
           h_noiseInElectrons[layer][ladder][sensor][0]->Fill(noiseInElectrons);
           h_gainInElectrons[layer][ladder][sensor][0]->Fill(ELECgain);
@@ -271,7 +286,6 @@ void SVDCalibrationsMonitorModule::event()
           h_pulseWidth[layer][ladder][sensor][0]->Fill(width);
           h_timeshift[layer][ladder][sensor][0]->Fill(time_shift);
           h_triggerbin[layer][ladder][sensor][0]->Fill(triggerbin_shift);
-
         } //histogram filled for V side
 
         m_layer = layer;
@@ -298,6 +312,8 @@ void SVDCalibrationsMonitorModule::event()
     ++itSvdLayers;
   }
 
+  //  B2INFO("iscluster in time if t0 = 0? "<< );
+
 }
 
 void SVDCalibrationsMonitorModule::endRun()
@@ -307,6 +323,7 @@ void SVDCalibrationsMonitorModule::endRun()
   B2RESULT("");
   B2RESULT("   - SVDNoiseCalibrations:" << m_NoiseCal.getUniqueID());
   B2RESULT("   - SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
+  B2RESULT("   - SVDClusterCalibrations:" << m_ClusterCal.getUniqueID());
 }
 
 void SVDCalibrationsMonitorModule::terminate()
@@ -375,6 +392,13 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_triggerbin()))
       obj->Write();
 
+
+    //writing the histogram list for the clusters
+    m_rootFilePtr->mkdir("cluster");
+    m_rootFilePtr->cd("cluster");
+    TIter nextH_clusters(m_histoList_cluster);
+    while ((obj = nextH_clusters()))
+      obj->Write();
 
 
     m_rootFilePtr->Close();

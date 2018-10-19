@@ -30,7 +30,7 @@ namespace Belle2 {
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
     void saveNewT0ForEachRunFromTTree(std::shared_ptr<TTree> ttree, StoreObjPtr<EventMetaData>& evtPtr);

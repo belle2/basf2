@@ -76,6 +76,21 @@ class PythonLogInterface(unittest.TestCase):
 
         self.check_logs("[FATAL] exit\n")
 
+    def test_fatal_pythonlogging(self):
+        # but use sys.stdout for logging
+        basf2.logging.enable_python_logging = True
+
+        # check that fatal actually kills the process
+        def checkfatal():
+            try:
+                basf2.B2FATAL("exit")
+            except Exception as e:
+                basf2.B2ERROR("raised exception: ", e)
+            basf2.B2ERROR("should not show")
+        self.assertDeath(checkfatal)
+
+        self.check_logs("[FATAL] exit\n")
+
     def test_others(self):
         # check argument handling
         for i, f in enumerate([basf2.B2INFO, basf2.B2WARNING, basf2.B2ERROR]):
@@ -111,8 +126,10 @@ class PythonLogInterface(unittest.TestCase):
         basf2.logging.set_info(basf2.LogLevel.INFO, li.MESSAGE | li.LEVEL | li.PACKAGE | li.FUNCTION | li.FILE | li.LINE)
         # and print a message
         basf2.B2INFO("show current frame info", why="because we can")
-        self.check_logs("[INFO] show current frame info\n"
-                        "\twhy = because we can  { package: steering function: test_inspect @%s:113 }\n" % filename)
+        self.check_logs(
+            "[INFO] show current frame info\n"
+            "\twhy = because we can  { package: steering function: test_inspect @%s:%d }\n" %
+            (filename, inspect.currentframe().f_lineno - 2))
 
 
 class PythonLogJSON(unittest.TestCase):

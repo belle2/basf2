@@ -91,6 +91,6 @@ void LogConnectionConsole::finalizeOnAbort()
   // If python logging is enabled we need to give jupyter some time to flush
   // the output as this happens only in the output thread. Seems flushing again is fine :D
   if (LogConnectionConsole::getPythonLoggingEnabled()) {
-    boost::python::import("sys").attr("exit").attr("flush")();
+    boost::python::import("sys").attr("stdout").attr("flush")();
   }
 }

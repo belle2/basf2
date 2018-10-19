@@ -14,6 +14,7 @@
 
 #include <string>
 #include <iosfwd>
+#include <memory>
 
 namespace Belle2 {
 
@@ -53,11 +54,11 @@ namespace Belle2 {
      */
     bool isConnected() override;
 
-  protected:
+    /** Make sure the file is closed on abort */
+    void finalizeOnAbort() override;
 
   private:
-
-    std::ofstream* m_fileStream; /**< The file output stream used for sending the log message.*/
+    std::unique_ptr<std::ofstream> m_fileStream; /**< The file output stream used for sending the log message.*/
 
   };
 

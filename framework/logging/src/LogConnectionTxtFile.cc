@@ -17,23 +17,17 @@ using namespace std;
 
 LogConnectionTxtFile::LogConnectionTxtFile(const string& filename, bool append)
 {
-  if (append) {
-    m_fileStream = new ofstream(filename.c_str(), ios::app);
-  } else m_fileStream = new ofstream(filename.c_str(), ios::out);
+  m_fileStream = std::make_unique<ofstream>(filename.c_str(), append ? ios::app : ios::out);
 }
-
 
 LogConnectionTxtFile::~LogConnectionTxtFile()
 {
-  delete m_fileStream;
 }
-
 
 bool LogConnectionTxtFile::isConnected()
 {
-  return (m_fileStream != NULL);
+  return (bool)m_fileStream;
 }
-
 
 bool LogConnectionTxtFile::sendMessage(const LogMessage& message)
 {
@@ -41,4 +35,9 @@ bool LogConnectionTxtFile::sendMessage(const LogMessage& message)
     (*m_fileStream) << message;
     return true;
   } else return false;
+}
+
+void LogConnectionTxtFile::finalizeOnAbort()
+{
+  m_fileStream.reset(nullptr);
 }

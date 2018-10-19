@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr, Thomas Hauth                                *
+ * Contributors: Thomas Kuhr, Thomas Hauth, Martin Ritter                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -54,19 +54,22 @@ namespace Belle2 {
      */
     bool isConnected() override;
 
-  protected:
+    /** Finalize on Abort: make sure last repetition is printed if there is any
+     * and that connected connection is also finalized
+     */
+    void finalizeOnAbort() override
+    {
+      printRepetitions();
+      m_logConnection->finalizeOnAbort();
+    }
 
   private:
-
-    /**
-     * If there are repeated messages print the number of repetitions.
-     */
+    /** If there are repeated messages print the number of repetitions.  */
     void printRepetitions();
 
     std::unique_ptr<LogConnectionBase> m_logConnection; /**< The actual log connection.*/
     LogMessage m_previousMessage;       /**< The previous log message. */
     int m_repeatCounter;                /**< Counter for repeated messages. */
-
   };
 
 } // end namespace Belle2

@@ -50,6 +50,12 @@ namespace Belle2 {
      */
     bool isConnected() override { return m_console.isConnected(); }
 
+    /** Finalize on Abort: make sure that connected connection is finalized */
+    void finalizeOnAbort() override
+    {
+      m_console.finalizeOnAbort();
+    }
+
   private:
     /** LogConnection to the console we use to dispatch the json objects */
     LogConnectionConsole m_console;

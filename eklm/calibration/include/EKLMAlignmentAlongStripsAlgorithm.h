@@ -55,7 +55,7 @@ namespace Belle2 {
     /**
      * Calibration.
      */
-    CalibrationAlgorithm::EResult calibrate();
+    CalibrationAlgorithm::EResult calibrate() override;
 
     /**
      * Set output file name.

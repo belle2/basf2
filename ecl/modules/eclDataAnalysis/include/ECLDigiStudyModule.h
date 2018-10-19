@@ -41,13 +41,13 @@ namespace Belle2 {
     virtual ~ECLDigiStudyModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** output root file name (given as Module parameter) */

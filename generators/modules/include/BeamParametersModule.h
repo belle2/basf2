@@ -31,7 +31,7 @@ namespace Belle2 {
     BeamParametersModule();
 
     /** Create the Beamparameters*/
-    virtual void initialize();
+    virtual void initialize() override;
 
   private:
     BeamParameters m_beamParams; /**< Copy of the beamparameters created from the parameters */

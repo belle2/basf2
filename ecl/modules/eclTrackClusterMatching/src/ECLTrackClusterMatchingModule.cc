@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  * Contributors: Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -25,7 +25,7 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
   m_matchingParameterizations("ECLTrackClusterMatchingParameterizations"),
   m_matchingThresholds("ECLTrackClusterMatchingThresholds")
 {
-  setDescription("Match Tracks to ECLCluster");
+  setDescription("Creates and saves a Relation between Tracks and ECLCluster in the DataStore. It uses the existing Relation between Tracks and ExtHit as well as the Relation between ECLCluster and ExtHit.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("useAngularDistanceMatching", m_angularDistanceMatching,
            "if true use track cluster matching based on angular distance, if false use matching based on entered crystals", bool(true));
@@ -94,7 +94,6 @@ void ECLTrackClusterMatchingModule::event()
     const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
     double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
     double pt = fitResult->getTransverseMomentum();
-    // if (pt > m_matchingPTThreshold && !trackTowardsGap(theta) && m_angularDistanceMatching) continue;
     if (!m_angularDistanceMatching || pt < m_matchingPTThreshold || trackTowardsGap(theta)) {
 
       // Unique shower ids related to this track

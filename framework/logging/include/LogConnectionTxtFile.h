@@ -13,8 +13,7 @@
 #include <framework/logging/LogConnectionBase.h>
 
 #include <string>
-#include <iosfwd>
-#include <memory>
+#include <fstream>
 
 namespace Belle2 {
 
@@ -58,7 +57,7 @@ namespace Belle2 {
     void finalizeOnAbort() override;
 
   private:
-    std::unique_ptr<std::ofstream> m_fileStream; /**< The file output stream used for sending the log message.*/
+    std::ofstream m_fileStream; /**< The file output stream used for sending the log message.*/
 
   };
 

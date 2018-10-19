@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Thomas Kuhr, Thomas Hauth                 *
@@ -132,6 +132,12 @@ namespace Belle2 {
      */
     void addLogConsole();
 
+    /**
+     * Add the console as output connection but print the log messages as json
+     * objects so that they can be parsed easily
+     * @param complete if true ignore the log info configuration and print all
+     *                 parts of the log message.
+     */
     void addLogJSON(bool complete);
 
     /**

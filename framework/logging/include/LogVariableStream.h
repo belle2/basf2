@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Martin Ritter                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

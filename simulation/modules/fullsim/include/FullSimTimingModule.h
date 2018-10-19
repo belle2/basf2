@@ -41,13 +41,13 @@ namespace Belle2 {
     FullSimTimingModule();
 
     /** Setup the timing structure */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Save the simulation time for each region in a profile */
-    virtual void event();
+    virtual void event() override;
 
     /** Save the output */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /** store the time it took a Geant4 track for one step inside a volume */

@@ -46,7 +46,8 @@ def SetTauGenericSkimVariables():
     applyCuts('gamma:all', gammaCuts)
 
     # Get EventShape variables
-    buildEventShape(['pi+:all', 'gamma:all'])
+    buildEventShape(['pi+:all', 'gamma:all'], allMoments=False, foxWolfram=False, cleoCones=False, sphericity=False, jets=False)
+    buildEventKinematics(['pi+:all', 'gamma:all'])
 
     # Split in signal and tag
     cutAndCopyList('pi+:S1', 'pi+:all', 'cosToEvtThrust > 0')

@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>TauGeneric.dst.root, kkmc_tautau.txt</output>
+  <output>../TauGeneric.dst.root, kkmc_tautau.txt</output>
   <contact>kenji@hepl.phys.nagoya-u.ac.jp</contact>
 </header>
 """

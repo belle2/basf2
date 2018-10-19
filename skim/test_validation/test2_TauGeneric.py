@@ -5,7 +5,15 @@ from basf2 import *
 from modularAnalysis import *
 from variables import variables
 
-inputMdst('MC9', 'TauGeneric.udst.root')
+"""
+<header>
+  <input>../TauGeneric.udst.root</input>
+  <output>../TauGeneric_Validation.root</output>
+  <contact>kenji@hepl.phys.nagoya-u.ac.jp</contact>
+</header>
+"""
+
+inputMdst('MC9', '../TauGeneric.udst.root')
 
 # set variables
 from skim.taupair import *
@@ -18,7 +26,7 @@ variables.addAlias('M2miss', 'missingMass2OfEvent')
 
 # the variables that are printed out are:
 variablesToHistogram(
-    filename='TauGeneric_Validation.root',
+    filename='../TauGeneric_Validation.root',
     decayString='',
     variables=[('nGoodTracks', 7, 1, 8),
                ('nGoodGammas', 15, 0, 15),

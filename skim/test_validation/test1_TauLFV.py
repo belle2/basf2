@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <input>../TauLFV.dst.root</input>
+  <output>../TauLFV.udst.root</output>
+  <contact>kenji@hepl.phys.nagoya-u.ac.jp</contact>
+</header>
+"""
+
 __author__ = "Kenji Inami"
 
 import sys
@@ -18,7 +26,7 @@ inputMdstList('MC9', fileList)
 # Hadronic B0 skim
 from skim.taupair import *
 tauList = TauLFVList(1)
-skimOutputUdst('TauLFV.udst.root', tauList)
+skimOutputUdst('../TauLFV.udst.root', tauList)
 summaryOfLists(tauList)
 
 # Suppress noisy modules, and then process

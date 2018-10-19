@@ -115,7 +115,8 @@ namespace Belle2 {
       int dbin = std::floor((doca - m_twodgains[mylayer].GetXaxis()->GetBinLowEdge(1)) / dbinsize) + 1;
 
       double ebinsize = m_twodgains[mylayer].GetYaxis()->GetBinCenter(2) - m_twodgains[mylayer].GetYaxis()->GetBinCenter(1);
-      int ebin = std::floor((std::sin(enta) - m_twodgains[mylayer].GetYaxis()->GetBinLowEdge(1)) / ebinsize) + 1;
+      // int ebin = std::floor((std::sin(enta) - m_twodgains[mylayer].GetYaxis()->GetBinLowEdge(1)) / ebinsize) + 1;
+      int ebin = std::floor((enta - m_twodgains[mylayer].GetYaxis()->GetBinLowEdge(1)) / ebinsize) + 1;
 
       double mean = 1.0;
       if (dbin > 0 && dbin <= m_twodgains[mylayer].GetNbinsX() && ebin > 0 && ebin <= m_twodgains[mylayer].GetNbinsY())
@@ -123,7 +124,8 @@ namespace Belle2 {
       else if (dbin > m_twodgains[mylayer].GetNbinsX() && ebin > 0 && ebin <= m_twodgains[mylayer].GetNbinsY())
         mean = m_twodgains[mylayer].GetBinContent(m_twodgains[mylayer].GetNbinsX(), ebin);
       else
-        B2WARNING("Problem with 2D CDC dE/dx calibration! " << doca << "\t" << dbin << "\t" << std::sin(enta) << "\t" << ebin);
+        // B2WARNING("Problem with 2D CDC dE/dx calibration! " << doca << "\t" << dbin << "\t" << std::sin(enta) << "\t" << ebin);
+        B2WARNING("Problem with 2D CDC dE/dx calibration! " << doca << "\t" << dbin << "\t" << enta << "\t" << ebin);
 
       return mean;
     };

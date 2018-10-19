@@ -14,7 +14,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 
 using namespace Belle2;
 using namespace std;

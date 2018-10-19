@@ -53,22 +53,25 @@ namespace Belle2 {
     bool passesPreSelection(Particle* particle);
 
     //params
-    /**< input particle lists */
+    /** input particle lists */
     std::vector<std::string> m_ParticleLists;
 
-    /**< flags if data/mc comes from belle or belle II */
+    /** flags if data/mc comes from belle or belle II */
     bool m_BelleFlag;
 
-    /**< if true also does some truth based matching and tags the particles with truthCurl info */
+    /** if true also does some truth based matching and tags the particles with truthCurl info */
     bool m_McStatsFlag;
 
-    /**< preselection pt cut */
+    /** switch between training and classifying */
+    bool m_TrainFlag;
+
+    /** preselection pt cut */
     double m_PtCut;
 
-    /**< min allowed PVal for a match - cut based selection is binary so this doesnt do much here*/
-    double m_PVal;
+    /** min classifier response to consider a match*/
+    double m_ResponseCut;
 
-    /**< name of selector function to use*/
+    /** name of selector function to use*/
     std::string m_SelectorType;
 
     //member objects

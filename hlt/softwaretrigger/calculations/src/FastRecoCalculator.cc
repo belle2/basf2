@@ -37,7 +37,6 @@ namespace Belle2 {
       }
 
       // We only want to access the photon ECL clusters. We use references to not need to copy always.
-      m_eclClustersWithPhotonHypothesis.clear();
       for (const ECLCluster& eclCluster : m_eclClusters) {
         if (eclCluster.getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons) {
           m_eclClustersWithPhotonHypothesis.emplace_back(eclCluster);
@@ -191,6 +190,9 @@ namespace Belle2 {
           }
         }
       }
+
+      // Clear the ECL clusters
+      m_eclClustersWithPhotonHypothesis.clear();
     }
   }
 }

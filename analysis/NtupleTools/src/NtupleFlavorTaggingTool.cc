@@ -9,8 +9,8 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
-#include <analysis/VariableManager/FlavorTaggingVariables.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/Variables.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 

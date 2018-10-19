@@ -21,7 +21,7 @@ void NtupleHelicityTool::setupTree()
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
 
-  m_tree->Branch((strNames[0] + strNames[1] + "_hel").c_str(), &m_helA, (strNames[0] + strNames[1] + "_hel/F").c_str());
+  m_tree->Branch((strNames[1] + strNames[2] + "_hel").c_str(), &m_helA, (strNames[1] + strNames[2] + "_hel/F").c_str());
 
 }
 
@@ -35,28 +35,22 @@ void NtupleHelicityTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  if (selparticles.size() != 2) {
-    B2ERROR("NtupleHelicityTool::eval - ERROR, you must select exactly 2 particles in the decay A->1+2!\n");
+  if (selparticles.size() != 3) {
+    B2ERROR("NtupleHelicityTool::eval - ERROR, you must select exactly 3 particles: mother and two daughters of a given particle.\n");
     return;
   }
 
-  //get daughter1
-  const Particle*  daughter1 = selparticles[0];
-
-  //get daughter2
-  const Particle*  daughter2 = selparticles[1];
-
-  TLorentzVector daughter1Momentum = daughter1->get4Vector();
-  TLorentzVector daughter2Momentum = daughter2->get4Vector();
-
-  TLorentzVector motherAMomentum = (daughter1Momentum + daughter2Momentum);
-  TVector3       motherABoost    = -(motherAMomentum.BoostVector());
-
-  TLorentzVector daughter1MomentumBoostedA = (daughter1->get4Vector());
-  daughter1MomentumBoostedA.Boost(motherABoost);
-
-  m_helA =  cos(daughter1MomentumBoostedA.Angle(motherAMomentum.Vect()));
-
-
+  const Particle* mother = selparticles[0];
+  const Particle* daughter1 = selparticles[1];
+  const Particle* daughter2 = selparticles[2];
+  TLorentzVector daughterP4 = daughter1->get4Vector();
+  TLorentzVector thisP4 = daughterP4 + daughter2->get4Vector();
+  TLorentzVector motherP4 = mother->get4Vector();
+  TVector3 boost = -(thisP4.BoostVector());
+  daughterP4.Boost(boost);
+  motherP4.Boost(boost);
+  TVector3 daughterP3 = daughterP4.Vect();
+  TVector3 motherP3 = motherP4.Vect();
+  m_helA = - daughterP3.Dot(motherP3) / daughterP3.Mag() / motherP3.Mag();
 }
 

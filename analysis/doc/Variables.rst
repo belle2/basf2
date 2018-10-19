@@ -41,13 +41,14 @@ Here is a list of particle identification variables:
 ECL Cluster
 ~~~~~~~~~~~
 
-Here is a list of variables related to ECL cluster:
+Here is a list of variables related to ECL cluster.
+There is further detailed documentation available `here<https://confluence.desy.de/x/I3I0Aw>`_.
 
 .. b2-variables::
    :group: ECL Cluster related
 
 Acceptance
-~~~~~~~~
+~~~~~~~~~~
 
 Here is a list of variables for acceptance cuts:
 

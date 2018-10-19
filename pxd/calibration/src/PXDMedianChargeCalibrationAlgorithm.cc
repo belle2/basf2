@@ -97,7 +97,7 @@ namespace {
 
 PXDMedianChargeCalibrationAlgorithm::PXDMedianChargeCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterChargeCollector"),
-  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(true)
+  minClusters(5000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false)
 {
   setDescription(
     " -------------------------- PXDMedianChargeCalibrationAlgorithm -------------------------------\n"

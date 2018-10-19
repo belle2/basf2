@@ -29,7 +29,7 @@
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/VariableManager/TrackVariables.h>
+#include <analysis/variables/TrackVariables.h>
 
 // msdt dataobject
 #include <mdst/dataobjects/MCParticle.h>
@@ -952,7 +952,7 @@ namespace Belle2 {
       }
       try {
         if (!isKsDau) rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
-      } catch (rave::CheckedFloatException) {
+      } catch (const rave::CheckedFloatException&) {
         B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       }
     }
@@ -960,7 +960,7 @@ namespace Belle2 {
     try {
       int isGoodFit = rFit.fit("avf");
       if (isGoodFit < 1) return false;
-    } catch (rave::CheckedFloatException) {
+    } catch (const rave::CheckedFloatException&) {
       B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       return false;
     }

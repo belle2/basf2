@@ -84,10 +84,15 @@ void ECLClusterPSDModule::event()
 
       if (digit2CChi2 < 0)  continue; //only digits with waveforms
 
+      ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
+
+      if (digitFitType != ECLDsp::photonHadron)  continue; //only standard fits
+
       if (digit2CChi2 < m_Chi2Threshold) { //must be a good fit
 
         const double digit2CTotalEnergy = caldigit->getTwoComponentTotalEnergy();
         const double digit2CHadronComponentEnergy = caldigit->getTwoComponentHadronEnergy();
+
         cluster2CTotalEnergy += digit2CTotalEnergy;
         cluster2CHadronEnergy += digit2CHadronComponentEnergy;
         if (digit2CTotalEnergy < 0.6) {

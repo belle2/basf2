@@ -39,10 +39,10 @@ namespace Belle2 {
     FixECLClustersModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Event function */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

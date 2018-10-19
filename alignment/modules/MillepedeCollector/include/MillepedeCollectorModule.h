@@ -37,16 +37,16 @@ namespace Belle2 {
     MillepedeCollectorModule();
 
     /** Prepration */
-    virtual void prepare();
+    virtual void prepare() override;
 
     /** Data collection */
-    virtual void collect();
+    virtual void collect() override;
 
     /** Only for closing mille binaries after each run */
-    virtual void closeRun();
+    virtual void closeRun() override;
 
     /** Register mille binaries in file catalog */
-    virtual void finish();
+    virtual void finish() override;
 
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();

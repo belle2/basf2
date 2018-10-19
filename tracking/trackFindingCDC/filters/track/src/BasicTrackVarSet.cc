@@ -37,19 +37,19 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   double drift_length_sum = 0;
   double drift_length_sum_squared = 0;
   double drift_length_variance = 0;
-  double drift_length_max = -1000;
-  double drift_length_min = 1000;
+  double drift_length_max = -1e9;
+  double drift_length_min = 1e9;
   double adc_sum = 0;
   double adc_sum_squared = 0;
   double adc_variance = 0;
-  double adc_max = -1000;
-  double adc_min = 1000;
+  double adc_max = -1e9;
+  double adc_min = 1e9;
   double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
   double empty_s_sum = 0;
   double empty_s_sum_squared = 0;
   double empty_s_variance = 0;
-  double empty_s_max = -1000;
-  double empty_s_min = 1000;
+  double empty_s_max = -1e9;
+  double empty_s_min = 1e9;
 
   double last_perp_s = NAN;
 

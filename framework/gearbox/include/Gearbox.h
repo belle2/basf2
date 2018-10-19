@@ -107,7 +107,7 @@ namespace Belle2 {
      * Return the number of nodes a given path will expand to
      * @return number of nodes, 0 if path does not exist
      */
-    virtual int getNumberNodes(const std::string& path = "") const
+    virtual int getNumberNodes(const std::string& path = "") const override
     {
       return getPathValue(path).numNodes;
     }
@@ -118,7 +118,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string& path = "") const noexcept(false)
+    virtual std::string getString(const std::string& path = "") const noexcept(false) override
     {
       PathValue p = getPathValue(path);
       if (p.numNodes == 0) throw gearbox::PathEmptyError() << path;
@@ -149,7 +149,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const noexcept(false)
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const noexcept(false) override
     {
       PathValue p = getPathValue(path);
       if (!p.numNodes) throw gearbox::PathEmptyError() << path;
@@ -165,7 +165,7 @@ namespace Belle2 {
      *         be deleted once it is no longer valid (e.g. after the current
      *         run if it belongs to this run)
      */
-    virtual const TObject* getTObject(const std::string& path) const noexcept(false);
+    virtual const TObject* getTObject(const std::string& path) const noexcept(false) override;
 
     /**
      * Return GearDir representing a given DetectorComponent

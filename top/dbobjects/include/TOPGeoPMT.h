@@ -266,13 +266,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "MCP-PMT geometry parameters") const;
+    void print(const std::string& title = "MCP-PMT geometry parameters") const override;
 
   private:
 
@@ -300,7 +300,7 @@ namespace Belle2 {
     float m_reflEdgeThickness = 0; /**< reflective edge thickness */
     GeoOpticalSurface m_reflEdgeSurface; /**< reflective edge optical surface */
 
-    ClassDef(TOPGeoPMT, 1); /**< ClassDef */
+    ClassDefOverride(TOPGeoPMT, 1); /**< ClassDef */
 
   };
 

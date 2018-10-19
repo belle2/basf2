@@ -42,13 +42,13 @@ namespace Belle2 {
     /**
      * initialize method: registers datastore objects (the TOP hits)
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * event method: removes channels from the reconstruction pdf, flags hits
      * from noisy channels as junk
      */
-    virtual void event();
+    virtual void event() override;
 
   private:
 

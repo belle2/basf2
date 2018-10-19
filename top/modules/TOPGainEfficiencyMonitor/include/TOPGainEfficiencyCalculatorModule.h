@@ -64,36 +64,36 @@ namespace Belle2 {
      * Load time vs charge 2D histogram from a given input file (paramter "inputFile")
      * and prepare hit timing and pulse charge distribution for each channel.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * The main processes, fitting charge distribution and calculating gain/efficiency,
      * are done in this function.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * This will be empty as the all the processes are done in beginRun() function
      * thus input file can be a dummy file.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Draw plots to show fitting results for each channel and save them into a given PDF file (outputPDFFile).
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * Define TTree branches to store fit results for each channel
      * This TTree is saved in an output file given by "histoFileName" parameter of "HistoManager" module.
      */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /**
      * Load 2D histograms from a given input file (output of TOPLaserHitSelector)

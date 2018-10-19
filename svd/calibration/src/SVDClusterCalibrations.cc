@@ -1,4 +1,4 @@
 #include <svd/calibration/SVDClusterCalibrations.h>
 
-std::string Belle2::SVDClusterCalibration::name = std::string("SVDClusterCalibration");
-std::string Belle2::SVDClusterCalibration::time_name = std::string("SVDHitTimeSelection");
+std::string Belle2::SVDClusterCalibrations::name = std::string("SVDClusterCut");
+std::string Belle2::SVDClusterCalibrations::time_name = std::string("SVDHitTimeSelectionFunction");

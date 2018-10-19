@@ -38,6 +38,10 @@ namespace Belle2 {
      */
     float scaleError_clSize3;
 
+    void set_minClusterSNR(float a)
+    {
+      minClusterSNR = a;
+    }
     float getCorrectedValue(float raw_error, int size)
     {
 

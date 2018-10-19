@@ -25,7 +25,7 @@ namespace Belle2 {
    * calibration of the cluster reconstruction
    *
    */
-  class SVDClusterCalibration {
+  class SVDClusterCalibrations {
   public:
     static std::string name;
     static std::string time_name;
@@ -33,10 +33,14 @@ namespace Belle2 {
     typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDHitTimeSelectionFunction> > t_time_payload;
 
     /** Constructor, no input argument is required */
-    SVDClusterCalibration()
+    SVDClusterCalibrations()
       : m_aDBObjPtr(name)
       , m_time_aDBObjPtr(time_name)
-    {}
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDClusterCalibrations: from now one we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
     /** Return the corrected cluster position error
      *
@@ -59,7 +63,7 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              sensorID.getSensorNumber(),
+                              0,
                               m_aDBObjPtr->sideIndex(isU)).getCorrectedValue(raw_error, size);
 
     }
@@ -82,7 +86,7 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              sensorID.getSensorNumber(),
+                              0,
                               m_aDBObjPtr->sideIndex(isU)).minSeedSNR;
 
     }
@@ -105,7 +109,7 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              sensorID.getSensorNumber(),
+                              0,
                               m_aDBObjPtr->sideIndex(isU)).minAdjSNR;
 
     }
@@ -128,7 +132,7 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              sensorID.getSensorNumber(),
+                              0,
                               m_aDBObjPtr->sideIndex(isU)).minClusterSNR;
 
     }
@@ -154,7 +158,7 @@ namespace Belle2 {
       return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
                                    sensorID.getLadderNumber(),
                                    sensorID.getSensorNumber(),
-                                   sensorID.getSensorNumber(),
+                                   0,
                                    m_aDBObjPtr->sideIndex(isU)).isOnTime(svdTime, svdTimeError, t0, t0Error);
 
     }

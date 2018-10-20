@@ -73,7 +73,7 @@ namespace Belle2 {
           c_maxLaserFibers = 9
          };
 
-    TH1F* m_histo[c_NumChannels]; /**< profile histograms */
+    TH1F* m_histo[c_NumChannels] = {0}; /**< profile histograms */
 
     std::vector<double> m_fitRange; /**< fit range [nbins, xmin, xmax] */
     std::string m_outputFile; /**< output root file name */

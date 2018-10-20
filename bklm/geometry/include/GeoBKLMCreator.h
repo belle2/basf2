@@ -47,6 +47,9 @@ namespace Belle2 {
       //! Constructor of the GeoBKLMCreator class
       GeoBKLMCreator();
 
+      //! Copy constructor
+      GeoBKLMCreator(GeoBKLMCreator&) = delete;
+
       //! Destructor of the GeoBKLMCreator class
       virtual ~GeoBKLMCreator();
 

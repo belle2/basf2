@@ -42,7 +42,30 @@ REG_MODULE(BKLMAna)
 //                 Implementation
 //-----------------------------------------------------------------
 
-BKLMAnaModule::BKLMAnaModule() : Module()
+BKLMAnaModule::BKLMAnaModule() : Module(),
+  m_file(NULL),
+  m_extTree(NULL),
+  m_run(0),
+  m_nExtHit(0),
+  m_extx(NULL),
+  m_exty(NULL),
+  m_extz(NULL),
+  m_hdistance(NULL),
+  m_totalMom(NULL),
+  m_passMom(NULL),
+  m_effiMom(NULL),
+  m_totalThephi(NULL),
+  m_passThephi(NULL),
+  m_effiThephi(NULL),
+  m_totalTrkThephi(NULL),
+  m_passTrkThephi(NULL),
+  m_effiTrkThephi(NULL),
+  m_totalYX(NULL),
+  m_passYX(NULL),
+  m_effiYX(NULL),
+  m_totalYZ(NULL),
+  m_passYZ(NULL),
+  m_effiYZ(NULL)
 {
   setDescription("analyze bklm efficiency associated to CDC, check performance of bklm et al.");
   addParam("filename", m_filename, "Output root filename", string("bklmana.root"));
@@ -185,7 +208,7 @@ void BKLMAnaModule::event()
       ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
       int copyid = exthit->getCopyID();
-      int isForward = (copyid & BKLM_END_MASK) >> BKLM_END_BIT;
+      bool isForward = ((copyid & BKLM_END_MASK) >> BKLM_END_BIT) != 0;
       int sector = ((copyid & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
       int layer = ((copyid & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
       //int plane = (copyid & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;//only for sci

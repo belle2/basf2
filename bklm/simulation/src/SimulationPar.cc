@@ -30,9 +30,12 @@ namespace Belle2 {
       return m_Instance;
     }
 
-    SimulationPar::SimulationPar()
+    SimulationPar::SimulationPar() :
+      m_HitTimeMax(0.0),
+      m_PhiMultiplicityCDF(NULL),
+      m_ZMultiplicityCDF(NULL),
+      m_IsValid(false)
     {
-      m_IsValid = false;
     }
 
     SimulationPar::~SimulationPar()

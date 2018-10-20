@@ -50,13 +50,29 @@ REG_MODULE(BKLMDQM)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-BKLMDQMModule::BKLMDQMModule() : HistoModule()
+BKLMDQMModule::BKLMDQMModule() : HistoModule(),
+  h_layerHits(NULL),
+  h_ctime(NULL),
+  h_simtime(NULL),
+  h_time(NULL),
+  h_simEDep(NULL),
+  h_eDep(NULL),
+  h_simNPixel(NULL),
+  h_nPixel(NULL),
+  h_moduleID(NULL),
+  h_zStrips(NULL),
+  h_phiStrip(NULL),
+  h_sector(NULL),
+  h_layer(NULL),
+  h_rBKLMHit2ds(NULL),
+  h_zBKLMHit2ds(NULL),
+  h_yvsxBKLMHit2ds(NULL),
+  h_xvxzBKLMHit2ds(NULL)
 {
   // set module description (e.g. insert text)
   setDescription("BKLM DQM histogrammer");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
-
 }
 
 BKLMDQMModule::~BKLMDQMModule()

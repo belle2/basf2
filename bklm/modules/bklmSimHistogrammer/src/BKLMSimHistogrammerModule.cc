@@ -40,23 +40,23 @@ REG_MODULE(BKLMSimHistogrammer)
 //-----------------------------------------------------------------
 
 BKLMSimHistogrammerModule::BKLMSimHistogrammerModule() : Module(),
-  m_hSimHitPerChannelLayer(NULL),
-  m_hEvt(NULL),
-  m_hSimHitPhiRPC(NULL),
-  m_bgSourcePerLayer(NULL),
-  m_bgSourcePerLayer2D(NULL),
-  m_bgSourceVsPhi(NULL),
-  m_bgSourceVsTheta(NULL),
-  m_bgSource(NULL),
-  m_bgSource2D(NULL),
-  m_hSimHitPhiScinti(NULL),
-  m_SimHitThetaRPC(NULL),
-  m_hSimHitThetaScinti(NULL),
-  m_hSimHit_layer(NULL),
-  m_hSimHit_layer2D(NULL),
-  m_SimHitThetaPhiRPC(NULL),
-  m_SimHitThetaPhiScinti(NULL),
-  m_file(NULL)
+  m_hSimHitPerChannelLayer(nullptr),
+  m_hEvt(nullptr),
+  m_hSimHitPhiRPC(nullptr),
+  m_bgSourcePerLayer(nullptr),
+  m_bgSourcePerLayer2D(nullptr),
+  m_bgSourceVsPhi(nullptr),
+  m_bgSourceVsTheta(nullptr),
+  m_bgSource(nullptr),
+  m_bgSource2D(nullptr),
+  m_hSimHitPhiScinti(nullptr),
+  m_hSimHitThetaRPC(nullptr),
+  m_hSimHitThetaScinti(nullptr),
+  m_hSimHit_layer(nullptr),
+  m_hSimHit_layer2D(nullptr),
+  m_hSimHitThetaPhiRPC(nullptr),
+  m_hSimHitThetaPhiScinti(nullptr),
+  m_file(nullptr)
 {
 
   setDescription("Analyzes bg");

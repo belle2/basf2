@@ -22,16 +22,21 @@ using namespace CLHEP;
 REG_MODULE(BKLMTracking)
 
 BKLMTrackingModule::BKLMTrackingModule() : Module(),
-  m_total(NULL),
-  m_pass(NULL),
-  m_effiVsLayer(NULL),
-  m_effiYX(NULL),
-  m_effiYZ(NULL),
-  m_passYX(NULL),
-  m_totalYX(NULL),
-  m_passYZ(NULL),
-  m_totalYZ(NULL)
+  m_effiYX(nullptr),
+  m_effiYZ(nullptr),
+  m_passYX(nullptr),
+  m_totalYX(nullptr),
+  m_passYZ(nullptr),
+  m_totalYZ(nullptr)
 {
+  for (int i = 0; i < 8; ++i) {
+    m_total[0][i] = nullptr;
+    m_total[1][i] = nullptr;
+    m_pass[0][i] = nullptr;
+    m_pass[1][i] = nullptr;
+    m_effiVsLayer[0][i] = nullptr;
+    m_effiVsLayer[1][i] = nullptr;
+  }
   setDescription("perform standard-alone straight line tracking for BKLM");
   addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,

@@ -51,23 +51,23 @@ REG_MODULE(BKLMDQM)
 //                 Implementation
 //-----------------------------------------------------------------
 BKLMDQMModule::BKLMDQMModule() : HistoModule(),
-  h_layerHits(NULL),
-  h_ctime(NULL),
-  h_simtime(NULL),
-  h_time(NULL),
-  h_simEDep(NULL),
-  h_eDep(NULL),
-  h_simNPixel(NULL),
-  h_nPixel(NULL),
-  h_moduleID(NULL),
-  h_zStrips(NULL),
-  h_phiStrip(NULL),
-  h_sector(NULL),
-  h_layer(NULL),
-  h_rBKLMHit2ds(NULL),
-  h_zBKLMHit2ds(NULL),
-  h_yvsxBKLMHit2ds(NULL),
-  h_xvxzBKLMHit2ds(NULL)
+  h_layerHits(nullptr),
+  h_ctime(nullptr),
+  h_simtime(nullptr),
+  h_time(nullptr),
+  h_simEDep(nullptr),
+  h_eDep(nullptr),
+  h_simNPixel(nullptr),
+  h_nPixel(nullptr),
+  h_moduleID(nullptr),
+  h_zStrips(nullptr),
+  h_phiStrip(nullptr),
+  h_sector(nullptr),
+  h_layer(nullptr),
+  h_rBKLMHit2ds(nullptr),
+  h_zBKLMHit2ds(nullptr),
+  h_yvsxBKLMHit2ds(nullptr),
+  h_xvszBKLMHit2ds(nullptr)
 {
   // set module description (e.g. insert text)
   setDescription("BKLM DQM histogrammer");

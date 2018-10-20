@@ -43,30 +43,34 @@ REG_MODULE(BKLMAna)
 //-----------------------------------------------------------------
 
 BKLMAnaModule::BKLMAnaModule() : Module(),
-  m_file(NULL),
-  m_extTree(NULL),
+  m_file(nullptr),
+  m_extTree(nullptr),
   m_run(0),
   m_nExtHit(0),
-  m_extx(NULL),
-  m_exty(NULL),
-  m_extz(NULL),
-  m_hdistance(NULL),
-  m_totalMom(NULL),
-  m_passMom(NULL),
-  m_effiMom(NULL),
-  m_totalThephi(NULL),
-  m_passThephi(NULL),
-  m_effiThephi(NULL),
-  m_totalTrkThephi(NULL),
-  m_passTrkThephi(NULL),
-  m_effiTrkThephi(NULL),
-  m_totalYX(NULL),
-  m_passYX(NULL),
-  m_effiYX(NULL),
-  m_totalYZ(NULL),
-  m_passYZ(NULL),
-  m_effiYZ(NULL)
+  m_hdistance(nullptr),
+  m_totalMom(nullptr),
+  m_passMom(nullptr),
+  m_effiMom(nullptr),
+  m_totalYX(nullptr),
+  m_passYX(nullptr),
+  m_effiYX(nullptr),
+  m_totalYZ(nullptr),
+  m_passYZ(nullptr),
+  m_effiYZ(nullptr)
 {
+  for (int i = 0; i < 200; ++i) {
+    m_extx[i] = 0.0;
+    m_exty[i] = 0.0;
+    m_extz[i] = 0.0;
+  }
+  for (int i = 0; i < 15; ++i) {
+    m_totalThephi[i] = nullptr;
+    m_passThephi[i] = nullptr;
+    m_effiThephi[i] = nullptr;
+    m_totalTrkThephi[i] = nullptr;
+    m_passTrkThephi[i] = nullptr;
+    m_effiTrkThephi[i] = nullptr;
+  }
   setDescription("analyze bklm efficiency associated to CDC, check performance of bklm et al.");
   addParam("filename", m_filename, "Output root filename", string("bklmana.root"));
 }

@@ -32,10 +32,14 @@ namespace Belle2 {
 
     SimulationPar::SimulationPar() :
       m_HitTimeMax(0.0),
-      m_PhiMultiplicityCDF(NULL),
-      m_ZMultiplicityCDF(NULL),
       m_IsValid(false)
     {
+      for (int i = 0; i <= c_NDIV; ++i) {
+        for (int j = 0; j < c_MAX_NHIT; ++j) {
+          m_PhiMultiplicityCDF[i][j] = 0.0;
+          m_ZMultiplicityCDF[i][j] = 0.0;
+        }
+      }
     }
 
     SimulationPar::~SimulationPar()

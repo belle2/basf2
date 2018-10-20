@@ -35,7 +35,7 @@ namespace Belle2 {
        * @param aStep Current Geant4 step in the sensitive medium.
        * @return true when particle that is not an optical photon enters the bar
        */
-      bool step(G4Step* aStep, G4TouchableHistory*);
+      bool step(G4Step* aStep, G4TouchableHistory*) override;
 
       /**
        * Sets replica depth of module volume

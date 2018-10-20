@@ -227,13 +227,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "TOP geometry parameters") const;
+    void print(const std::string& title = "TOP geometry parameters") const override;
 
 
   private:
@@ -249,7 +249,7 @@ namespace Belle2 {
     TOPSignalShape m_calPulseShape; /**< shape of the calibration pulse */
     TOPWavelengthFilter m_wavelengthFilter; /**< transmittance of wavelength filter */
 
-    ClassDef(TOPGeometry, 6); /**< ClassDef */
+    ClassDefOverride(TOPGeometry, 6); /**< ClassDef */
 
   };
 

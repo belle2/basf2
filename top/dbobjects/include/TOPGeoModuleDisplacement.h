@@ -105,13 +105,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const {return true;}
+    bool isConsistent() const override {return true;}
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Module displacement parameters") const;
+    void print(const std::string& title = "Module displacement parameters") const override;
 
   private:
 
@@ -122,7 +122,7 @@ namespace Belle2 {
     float m_beta = 0;  /**< rotation angle around y */
     float m_gamma = 0; /**< rotation angle around z */
 
-    ClassDef(TOPGeoModuleDisplacement, 1); /**< ClassDef */
+    ClassDefOverride(TOPGeoModuleDisplacement, 1); /**< ClassDef */
 
   };
 

@@ -29,13 +29,13 @@ namespace Belle2 {
     virtual ~DelayDQMModule();
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */

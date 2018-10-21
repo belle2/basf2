@@ -67,7 +67,8 @@ BKLMDQMModule::BKLMDQMModule() : HistoModule(),
   h_rBKLMHit2ds(nullptr),
   h_zBKLMHit2ds(nullptr),
   h_yvsxBKLMHit2ds(nullptr),
-  h_xvszBKLMHit2ds(nullptr)
+  h_xvszBKLMHit2ds(nullptr),
+  h_yvszBKLMHit2ds(nullptr)
 {
   // set module description (e.g. insert text)
   setDescription("BKLM DQM histogrammer");

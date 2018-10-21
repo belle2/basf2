@@ -56,7 +56,8 @@ BKLMSimHistogrammerModule::BKLMSimHistogrammerModule() : Module(),
   m_hSimHit_layer2D(nullptr),
   m_hSimHitThetaPhiRPC(nullptr),
   m_hSimHitThetaPhiScinti(nullptr),
-  m_file(nullptr)
+  m_file(nullptr),
+  m_weight(0.0)
 {
 
   setDescription("Analyzes bg");

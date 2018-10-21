@@ -37,7 +37,7 @@ namespace Belle2 {
       bool step(G4Step*, G4TouchableHistory*) override;
 
       //! Tidy up at the end of each event
-      void EndOfEvent(G4HCofThisEvent*) {}
+      void EndOfEvent(G4HCofThisEvent*) override {}
 
     private:
 

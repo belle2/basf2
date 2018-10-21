@@ -6,7 +6,7 @@
 # This script reconstructs hadronic Btags using
 # generically trained FEI.
 #
-# FEIv4_2018_MC9_release_02_00_00
+# FEIv4_2018_MC9_release_02_00_01
 #
 #####################################################
 import sys
@@ -36,7 +36,7 @@ use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_da
 
 import fei
 particles = fei.get_default_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=False, KLong=False)
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 

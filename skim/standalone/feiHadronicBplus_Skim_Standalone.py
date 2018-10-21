@@ -5,7 +5,7 @@
     FEI Hadronic B+ tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180200
-    fei training: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
+    fei training: MC9 based, release-02-00-01 'FEIv4_2018_MC9_release_02_00_01'
     """
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
@@ -39,7 +39,7 @@ use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_da
 
 import fei
 particles = fei.get_default_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 

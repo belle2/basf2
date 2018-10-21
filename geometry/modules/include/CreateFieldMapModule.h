@@ -36,10 +36,10 @@ namespace Belle2 {
     CreateFieldMapModule();
 
     /** Check input parameters */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Create the fieldmap */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
   private:
     /** output filename for the fieldmap */

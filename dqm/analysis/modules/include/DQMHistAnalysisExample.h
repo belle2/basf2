@@ -28,13 +28,13 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisExampleModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     //! Parameters accesible from basf2 scripts
   protected:

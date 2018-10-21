@@ -39,7 +39,24 @@ REG_MODULE(BKLMSimHistogrammer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-BKLMSimHistogrammerModule::BKLMSimHistogrammerModule() : Module()
+BKLMSimHistogrammerModule::BKLMSimHistogrammerModule() : Module(),
+  m_hSimHitPerChannelLayer(nullptr),
+  m_hEvt(nullptr),
+  m_hSimHitPhiRPC(nullptr),
+  m_bgSourcePerLayer(nullptr),
+  m_bgSourcePerLayer2D(nullptr),
+  m_bgSourceVsPhi(nullptr),
+  m_bgSourceVsTheta(nullptr),
+  m_bgSource(nullptr),
+  m_bgSource2D(nullptr),
+  m_hSimHitPhiScinti(nullptr),
+  m_hSimHitThetaRPC(nullptr),
+  m_hSimHitThetaScinti(nullptr),
+  m_hSimHit_layer(nullptr),
+  m_hSimHit_layer2D(nullptr),
+  m_hSimHitThetaPhiRPC(nullptr),
+  m_hSimHitThetaPhiScinti(nullptr),
+  m_file(nullptr)
 {
 
   setDescription("Analyzes bg");

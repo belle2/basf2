@@ -45,7 +45,7 @@ namespace Belle2 {
      * Initializes the magnetic field component.
      * This method opens the magnetic field map file.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Calculates the magnetic field vector at the specified space point.
@@ -54,13 +54,13 @@ namespace Belle2 {
      * @return The magnetic field vector at the given space point in [T].
      *         Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const;
+    virtual B2Vector3D calculate(const B2Vector3D& point) const override;
 
     /**
      * Terminates the magnetic field component.
      * This method closes the magnetic field map file.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * Sets the filename of the magnetic field map.

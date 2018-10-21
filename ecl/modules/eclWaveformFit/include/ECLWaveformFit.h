@@ -146,7 +146,6 @@ namespace Belle2 {
 
     double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
     double m_chi2Threshold;  /*chi2 threshold to classify offline fit as good fit*/
-    double m_TriggerThreshold;  /**energy threshold for waveform trigger.*/
     bool m_TemplatesLoaded;  /**Flag to indicate if waveform templates are loaded from database.*/
     void loadTemplateParameterArray(bool IsDataFlag);  /** loads waveform templates from database.*/
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/

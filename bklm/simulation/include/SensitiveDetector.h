@@ -34,7 +34,7 @@ namespace Belle2 {
       explicit SensitiveDetector(const G4String& name);
 
       //! Process each step in the BKLM
-      bool step(G4Step*, G4TouchableHistory*);
+      bool step(G4Step*, G4TouchableHistory*) override;
 
       //! Tidy up at the end of each event
       void EndOfEvent(G4HCofThisEvent*) {}

@@ -88,7 +88,7 @@ def build_library(name, dirs, extra_libs=[]):
     # see if it found source files, since this is a list of lists, we have to
     # flatten it
     if len(Flatten(source_files)) == 0:
-        print "No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory."
+        print("No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory.")
         Exit(1)
 
     dict_files = create_dictionaries(dirs)
@@ -102,9 +102,9 @@ build_library("libgenfit2.so", dirs)
 if env.get('HAS_TEVE', False):
     build_library("libgenfit2_eventDisplay.so", ["eventDisplay"], env["TEVE_LIBS"] + ["genfit2"])
 else:
-    print "Genfit's eventDisplay disabled, please recompile root with opengl "\
+    print("Genfit's eventDisplay disabled, please recompile root with opengl "\
         "support (on Debian/Ubuntu you'll probably only need to install "\
-        "libglu1-mesa-dev and rebuild)"
+        "libglu1-mesa-dev and rebuild)")
 
 
 env['CONTINUE'] = False

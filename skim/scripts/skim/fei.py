@@ -64,7 +64,7 @@ def B0hadronic():
         Event precuts:
         R2EventLevel < 0.4
         nTracks >= 4 
-
+=======
         Tag side B:
         Mbc > 5.24
         abs(deltaE) < 0.200
@@ -123,7 +123,7 @@ def BplusHadronic():
         Event precuts:
         R2EventLevel < 0.4
         nTracks >= 4 
-
+=======
         Tag side B:
         Mbc > 5.24
         abs(deltaE) < 0.200

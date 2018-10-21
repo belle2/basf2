@@ -144,7 +144,8 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
         use_database_chain()
-        use_central_database("Legacy_MagneticField_MC8_MC9_MC10")
+        use_central_database("Legacy_MagneticField_MC8_MC9_MC10", "", "", "centraldb",
+                             loglevel=LogLevel.INFO, invertLogging=True)
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -2175,47 +2176,116 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventShape(inputListNames=[], default_cleanup=True, path=analysis_main):
+def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_main):
     """
-    Calculates the Thrust of the event and the missing information using ParticleLists provided. If no ParticleList is
-    provided, default ParticleLists are used(all track and all hits in ECL without associated track).
+    Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
+    using ParticleLists provided. If no ParticleList is provided, default ParticleLists are used
+    (all track and all hits in ECL without associated track).
 
-    The Thrust and missing values are
-    stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
-    and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
-    particle and the Thrust of the event in the CM system, are also created.
+    The visible energy missing values are
+    stored in a EventKinematics dataobject.
 
-    @param inputListNames   list of ParticleLists used to calculate the Thrust. If the list is empty,
-                            default ParticleLists pi+:thrust and gamma:thrust are filled.
+    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
+                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
     @param default_cleanup  if True, apply default clean up cuts to default
-                            ParticleLists pi+:thrust and gamma:thrust.
+                            ParticleLists pi+:evtkin and gamma:evtkin.
     @param path             modules are added to this path
     """
     if not inputListNames:
-        B2INFO("Creating particle lists pi+:thrust and gamma:thrust to get the Thrust of Event.")
-        fillParticleList('pi+:thrust', '')
-        fillParticleList('gamma:thrust', '')
-        particleLists = ['pi+:thrust', 'gamma:thrust']
+        B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
+        fillParticleList('pi+:evtkin', '')
+        fillParticleList('gamma:evtkin', '')
+        particleLists = ['pi+:evtkin', 'gamma:evtkin']
 
         if default_cleanup:
-            B2INFO("Using default cleanup in Thrust of Event module.")
+            B2INFO("Using default cleanup in EventKinematics module.")
             trackCuts = 'pt > 0.1'
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:thrust', trackCuts)
+            applyCuts('pi+:evtkin', trackCuts)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:thrust', gammaCuts)
+            applyCuts('gamma:evtkin', gammaCuts)
         else:
-            B2INFO("No cleanup in Thrust of Event module.")
+            B2INFO("No cleanup in EventKinematics module.")
     else:
         particleLists = inputListNames
 
-    eventShapeModule = register_module('EventShape')
-    eventShapeModule.set_name('EventShape_')
-    eventShapeModule.param('particleLists', particleLists)
+    eventKinematicsModule = register_module('EventKinematics')
+    eventKinematicsModule.set_name('EventKinematics_')
+    eventKinematicsModule.param('particleLists', particleLists)
+    path.add_module(eventKinematicsModule)
+
+
+def buildEventShape(inputListNames=[],
+                    default_cleanup=True,
+                    allMoments=False,
+                    cleoCones=True,
+                    collisionAxis=True,
+                    foxWolfram=True,
+                    harmonicMoments=True,
+                    jets=True,
+                    sphericity=True,
+                    thrust=True,
+                    checkForDuplicates=False,
+                    path=analysis_main):
+    """
+    Calculates the event shape quantities (thrust, sphericity, Fox-Wolfram moments...) using the
+    particles in the lists provided by the user.
+    The results of the calculation are then store in the EventShapeContainer dataobject, and are accessible
+    byt the variabels of the EventShape group.
+
+    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
+                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
+    @param default_cleanup  if True,  applyes some very standard cuts on pt and costTheta when defines the interanl lists.
+    @param path             modules are added to this path
+    @param allMoments  Enables the calculation of FW and harmonic moments from 5 to 8
+    @param cleoCones  Enables the calculation of the CLEO cones.
+    @param collisionAxis  Enables the calculation of the  quantities related to the collision axis.
+    @param foxWolfram    Enables the calculation of the Fox-Wolfram moments.
+    @param jets   Enables the calculation of jet-related quantities.
+    @param harmonicMoments   Enables the calculation of the Harmonic moments.
+    @param sphericity  Enables the calculation of the sphericity-related quantities.
+    @param thrust  Enables the calculation of thust-related quantities.
+
+    """
+    if not inputListNames:
+        B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
+        fillParticleList('pi+:evtshape', '')
+        fillParticleList('gamma:evtshape', '')
+        particleLists = ['pi+:evtshape', 'gamma:evtshape']
+
+        if default_cleanup:
+            B2INFO("Using the default lists for the EventShape module.")
+            trackCuts = 'pt > 0.1'
+            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
+            trackCuts += ' and -3.0 < dz < 3.0'
+            trackCuts += ' and -0.5 < dr < 0.5'
+            applyCuts('pi+:evtshape', trackCuts)
+
+            gammaCuts = 'E > 0.05'
+            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            applyCuts('gamma:evtshape', gammaCuts)
+        else:
+            B2WARNIG("Creating the default lists with no cleanup. This can be potentially dangerous")
+    else:
+        particleLists = inputListNames
+
+    eventShapeModule = register_module('EventShapeCalculator')
+    eventShapeModule.set_name('EventShape')
+    eventShapeModule.param('particleListNames', particleLists)
+    eventShapeModule.param('enableAllMoments', allMoments)
+    eventShapeModule.param('enableCleoCones', cleoCones)
+    eventShapeModule.param('enableCollisionAxis', collisionAxis)
+    eventShapeModule.param('enableFoxWolfram', foxWolfram)
+    eventShapeModule.param('enableJets', jets)
+    eventShapeModule.param('enableHarmonicMoments', harmonicMoments)
+    eventShapeModule.param('enableSphericity', sphericity)
+    eventShapeModule.param('enableThrust', thrust)
+    eventShapeModule.param('checkForDuplicates', checkForDuplicates)
+
     path.add_module(eventShapeModule)
 
 

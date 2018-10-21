@@ -105,10 +105,12 @@ namespace Belle2 {
      * Sends a log message using the log connection object.
      * This method should _only_ be called by the logger macros.
      *
-     * @param message The log message object.
+     * @param message The log message object. The message might
+     *                be moved into internal storage and is not valid
+     *                any more after the method call.
      * @return Returns true if the message could be send.
      */
-    bool sendMessage(LogMessage message);
+    bool sendMessage(LogMessage&& message);
 
     /** Resets the message counter and error log by setting all message counts to 0. */
     void resetMessageCounter();

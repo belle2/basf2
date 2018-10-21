@@ -27,13 +27,13 @@ namespace Belle2 {
     float* m_MCGenTheta;   /**< theta in the laboratory frame */
     float* m_MCGenPhi;     /**< phi in the laboratory frame */
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
   public:
     /** Constructor. */
     NtupleMCGenKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
           decaydescriptor, strOptions) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 } // namepspace Belle2
 

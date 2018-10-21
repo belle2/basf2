@@ -716,11 +716,15 @@ def _make_tobject_const(obj):
     # nothing to do if already const wrapped or None
     if obj is None or isinstance(obj, _TObjectConstWrapper):
         return obj
-
+    # ROOT 6.14/04 issues a runtime warning for GetListOfAllPublicMethods() but
+    # the code still seems to work fine (ROOT-9699)
+    import warnings
     try:
-        #: list of all non-const, public methods
-        non_const = [m.GetName() for m in obj.Class().GetListOfAllPublicMethods()
-                     if not (m.Property() & (_ROOT_kIsConstMethod | _ROOT_kIsStatic))]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            #: list of all non-const, public methods
+            non_const = [m.GetName() for m in obj.Class().GetListOfAllPublicMethods()
+                         if not (m.Property() & (_ROOT_kIsConstMethod | _ROOT_kIsStatic))]
     except AttributeError:
         raise ValueError("Object does not have a valid dictionary: %r" % obj)
 

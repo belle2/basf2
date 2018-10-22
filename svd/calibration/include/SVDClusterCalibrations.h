@@ -50,7 +50,7 @@ namespace Belle2 {
      * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
      * @param size: cluster size
-     * @param raw_error : error provided byt algorithm in the SVDSimpleClusterizer
+     * @param raw_error : error provided by the algorithm in the SVDSimpleClusterizer
      *
      * Output: double corresponding to the corrected cluster position error [cm]
      */
@@ -138,15 +138,19 @@ namespace Belle2 {
     }
 
 
-    /** Return whther the cluster is estimated to be in time with the event or off-time
+    /** Return whether the cluster is estimated to be in time with the event or off-time
      *
      * Input:
      * @param sensor ID: identity of the sensor for which the
      * calibration is required
      * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
+     * @param svdTime: cluster time
+     * @param svdTimeError: cluster time error
+     * @param t0: event t0
+     * @param t0Error: event t0 error
      *
-     * Output: double corresponding to the minimum SNR for the cluster
+     * Output: bool true if the svd hit time is compatible with t0
      */
     inline bool isClusterInTime(
       const Belle2::VxdID& sensorID,
@@ -160,6 +164,30 @@ namespace Belle2 {
                                    sensorID.getSensorNumber(),
                                    0,
                                    m_aDBObjPtr->sideIndex(isU)).isOnTime(svdTime, svdTimeError, t0, t0Error);
+
+    }
+
+    /** Return the min value of the cluster time to use it for reconstruction.
+     * this function is used in the calibration monitoring
+     *
+     * Input:
+     * @param sensor ID: identity of the sensor for which the
+     * calibration is required
+     * @param strip: NOT USED
+     * @param isU: sensor side, true for p side, false for n side
+     *
+     * Output:
+     */
+    inline float getMinClusterTime(
+      const Belle2::VxdID& sensorID,
+      const bool& isU
+    ) const
+    {
+      return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
+                                   sensorID.getLadderNumber(),
+                                   sensorID.getSensorNumber(),
+                                   0,
+                                   m_aDBObjPtr->sideIndex(isU)).getMinTime();
 
     }
 

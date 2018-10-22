@@ -23,15 +23,16 @@ namespace Belle2 {
 
     typedef bool (SVDHitTimeSelectionFunction::*selFunction)(double, double, double, double) const;
 
-    /** returns the  value of raw_time, depending on the trigger bin*/
+    /** returns whether the hit came on time or not */
     bool isOnTime(double svdTime, double svdTimeError = 0, double t0 = 0 , double t0Error = 0)
     {
       selFunction f = m_implementations[m_current];
       return (this->*f)(svdTime, svdTimeError, t0, t0Error) ;
     }
 
+
     /** constructor */
-    SVDHitTimeSelectionFunction(double tMin)
+    SVDHitTimeSelectionFunction(double tMin = -999.)
     {
       m_tMin = tMin;
 
@@ -47,26 +48,34 @@ namespace Belle2 {
 
     };
 
+    /** copy constructor */
+    SVDHitTimeSelectionFunction(const Belle2::SVDHitTimeSelectionFunction& a);
 
-    void set_tMin(double tMin)
+    //implementation firstVersion, setters and getters
+    /** set the minimum cluster time */
+    void setMinTime(double tMin)
     {
       m_tMin = tMin;
     }
-    /** copy constructor */
-    SVDHitTimeSelectionFunction(const Belle2::SVDHitTimeSelectionFunction& a);
+    /** returns the  minimum cluster time */
+    float getMinTime()
+    {
+      return m_tMin;
+    };
+
 
 
   private:
 
     /** function parameters & implementations*/
 
-    /** FIRST VERSION: correctedValue = t * scale[tb] + bias[tb] */
-    double m_tMin; /**< trigger-bin dependent bias*/
-    /** first version implementation*/
+    /** FIRST VERSION: isOnTime if t > m_tMin */
+    double m_tMin; /**< minimum cluster time*/
     bool firstVersion(double svdTime, double /* svdTimeError */, double /* t0 */, double /* t0Error */) const
     {
       return svdTime > m_tMin;
     };
+
 
     /** current function ID */
     int m_current;

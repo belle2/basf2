@@ -26,22 +26,19 @@ namespace Belle2 {
      */
     float minClusterSNR;
 
-    /** scale factor for cluster size = 1
+    /** position error scale factor for cluster size = 1
      */
     float scaleError_clSize1;
 
-    /** scale factor for cluster size = 2
+    /** position error scale factor for cluster size = 2
      */
     float scaleError_clSize2;
 
-    /** scale factor for cluster size > 2
+    /** position error scale factor for cluster size > 2
      */
     float scaleError_clSize3;
 
-    void set_minClusterSNR(float a)
-    {
-      minClusterSNR = a;
-    }
+    /** returns the corrected cluster position error */
     float getCorrectedValue(float raw_error, int size)
     {
 

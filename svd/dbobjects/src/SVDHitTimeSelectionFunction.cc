@@ -8,7 +8,9 @@ SVDHitTimeSelectionFunction::m_implementations;
 
 SVDHitTimeSelectionFunction::SVDHitTimeSelectionFunction(const SVDHitTimeSelectionFunction& a)
 {
+  //first version:
   m_tMin = a.m_tMin;
+
   m_current = a.m_current;
 }
 

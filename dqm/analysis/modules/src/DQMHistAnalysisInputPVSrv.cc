@@ -95,8 +95,6 @@ DQMHistAnalysisInputPVSrvModule::~DQMHistAnalysisInputPVSrvModule() { }
 
 void DQMHistAnalysisInputPVSrvModule::initialize()
 {
-  m_expno = m_runno = 0;
-  m_count = 0;
   m_eventMetaDataPtr.registerInDataStore();
   //if (m_server) m_serv = new THttpServer("http:8082");
 

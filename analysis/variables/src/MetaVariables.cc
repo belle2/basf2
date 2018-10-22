@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2010 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Thomas Keck                                              *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 
 #include <analysis/variables/MetaVariables.h>
@@ -769,6 +769,47 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
+    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            if (std::isnan(var->function(particle->getDaughter(jDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
+              return std::numeric_limits<float>::quiet_NaN();
+
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfClusterPhi");
       }
     }
 

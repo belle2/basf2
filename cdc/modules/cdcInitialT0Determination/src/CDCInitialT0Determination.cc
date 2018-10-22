@@ -122,8 +122,8 @@ void CDCInitialT0DeterminationModule::terminate()
         B2DEBUG(99, "Warning: low statistic channel: " << m_hTDC[il][w]->GetEntries());
         if (bflag[bid] != 0) {
           m_t0[il][w] = m_t0b[bid];
-          m_flag[il][w] = 1;
-        } else {m_flag[il][w] = 0;}
+          m_flag[il][w] = true;
+        } else {m_flag[il][w] = false;}
       } else {
         double p3 = m_hTDC[il][w]->GetXaxis()->GetBinCenter(m_hTDC[il][w]->GetMaximumBin());
         f1->SetParameters(0, m_hTDC[il][w]->GetMaximum(), -0.001, p3, m_initT0, 2.5);
@@ -133,12 +133,12 @@ void CDCInitialT0DeterminationModule::terminate()
             || (f1->GetParameter(5) > 20)) {
           if (bflag[bid] != 0) {
             m_t0[il][w] = m_t0b[bid];
-            m_flag[il][w] = 1;
-          } else {m_flag[il][w] = 0;}
+            m_flag[il][w] = true;
+          } else {m_flag[il][w] = false;}
         } else {
           m_t0[il][w] = f1->GetParameter(4) * tdcBinWidth;
           hs->Fill(f1->GetParameter(5));
-          m_flag[il][w] = 1;
+          m_flag[il][w] = true;
         }
       }
       B2DEBUG(99, "P4 = " << m_t0[il][w]);
@@ -158,7 +158,7 @@ void CDCInitialT0DeterminationModule::terminate()
   ofstream ofs(m_outputFileName.c_str());
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
-      if (m_flag[il][w] != 1) {
+      if (m_flag[il][w] != true) {
         m_t0[il][w] = m_hT0All->GetMean();
       }
       ofs << il << "\t" << w << "\t" << m_t0[il][w] << endl;
@@ -175,7 +175,7 @@ void CDCInitialT0DeterminationModule::terminate()
       Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
       Direct[il]->cd();
       for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
-        if (m_flag[il][w] == 1) {
+        if (m_flag[il][w] == true) {
           m_hTDC[il][w]->Write();
         }
       }

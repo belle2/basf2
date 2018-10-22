@@ -53,12 +53,12 @@ namespace Belle2 {
     void terminate() override;
 
   private:
-    TH1D* m_hTDC[56][400]; /**< TDC distribution histo. */
-    TH1D* m_hTDCBoard[300];     /**< T0 distribution of each board. */
-    TH1D* m_hT0All;        /**< T0 distribution of all channel. */
-    double m_t0b[300];    /**< T0 for each board*/
-    double m_t0[56][400]; /**< T0 of each channel*/
-    double m_flag[56][400]; /**< flag =1 for good, =0 for low statistic or bad fit */
+    TH1D* m_hTDC[56][400] = {{nullptr}}; /**< TDC distribution histo. */
+    TH1D* m_hTDCBoard[300] = {nullptr}; /**< T0 distribution of each board. */
+    TH1D* m_hT0All = nullptr;   /**< T0 distribution of all channel. */
+    double m_t0b[300] = {0};    /**< T0 for each board*/
+    double m_t0[56][400] = {{0}}; /**< T0 of each channel*/
+    bool m_flag[56][400] = {{false}} ; /**< flag =1 for good, =0 for low statistic or bad fit */
     unsigned short m_tdcMin = 0; /**< Lower boundary TDC histogram. */
     unsigned short m_tdcMax = 8400; /**< Upper boundary TDC histogram. */
     unsigned short m_adcMin = 0;    /**< ADC cut to reject noise. */

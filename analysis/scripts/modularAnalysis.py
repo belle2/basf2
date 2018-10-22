@@ -1542,8 +1542,8 @@ def looseMCTruth(list_name, path=analysis_main):
 def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
-    dataobject and makes BASF2 relation between them.
-    TODO: Make sure that there is no collision in particle lists!
+    dataobject and makes BASF2 relation between them. User can provide additional
+    particle lists with a different particle hypotheses like ['K+:good, e+:good'], etc.
 
     @param target_list_name name of the input ParticleList
     @param inputParticlelists list of input particle list names, which serve
@@ -1552,10 +1552,10 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     @param path      modules are added to this path
     """
     # if (len(inputParticlelists) < 3):
-    fillParticleList('pi+:myroe', '')
-    fillParticleList('gamma:myroe', '')
-    fillParticleList('K_L0:myroe', '')
-    inputParticlelists += ['pi+:myroe', 'gamma:myroe', 'K_L0:myroe']
+    fillParticleList('pi+:roe_default', '', path=path)
+    fillParticleList('gamma:roe_default', '', path=path)
+    fillParticleList('K_L0:roe_default', '', path=path)
+    inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)

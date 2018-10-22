@@ -132,6 +132,7 @@ namespace Belle2 {
     TH1F* h_peakTime[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // peakTime in ns
     TH1F* h_pulseWidth[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // pulse width in ns
 
+    //CoG OLD Corrections (Michael)
     //CoG TIME SHIFT
     TH1F* h_timeshift[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // time shift in ns
 
@@ -139,9 +140,29 @@ namespace Belle2 {
     TH1F* h_triggerbin[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
                                                           1][m_maxSides]; // thime shift due to the trigger bin correction in ns
 
+
+    //Clusters
     //CLUSTER SNR
     TH1F* h_clsSNR[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
                                                       1][m_maxSides]; // clusterSNR
+
+    //CLUSTER Seed SNR
+    TH1F* h_clsSeedSNR[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                          1][m_maxSides]; // cluster seed SNR
+    //CLUSTER Adj SNR
+    TH1F* h_clsAdjSNR[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                         1][m_maxSides]; // cluster adj SNR
+    //CLUSTER Position Error Scale Factor Size 1
+    TH1F* h_clsScaleErr1[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                            1][m_maxSides]; // scale err size 1
+    //CLUSTER Position Error Scale Factor Size 2
+    TH1F* h_clsScaleErr2[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                            1][m_maxSides]; // scale err size 2
+    //CLUSTER Position Error Scale Factor Size >2
+    TH1F* h_clsScaleErr3[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                            1][m_maxSides]; // scale err size >2
+
+
     //CLUSTER TIME
     TH1F* h_clsTime[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
                                                        1][m_maxSides]; // clusterTime

@@ -27,14 +27,14 @@ namespace Belle2 {
     virtual ~cdcDQM7Module();
 
     //! Module functions
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override;
+    void beginRun() override;
+    void event() override;
+    void endRun() override;
+    void terminate() override;
 
     //! function to define histograms
-    virtual void defineHisto();
+    void defineHisto() override;
 
   private:
     TH1D* h_nhits_L[56];/**<histogram hit in each layer*/

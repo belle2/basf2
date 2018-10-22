@@ -36,7 +36,7 @@ namespace Belle2 {
     {
       try {
         return getString(path);
-      } catch (PathEmptyError) {
+      } catch (PathEmptyError&) {
         return defaultValue;
       }
     }
@@ -46,7 +46,7 @@ namespace Belle2 {
       std::string value = getString(path);
       try {
         return boost::lexical_cast<double>(value);
-      } catch (boost::bad_lexical_cast) {
+      } catch (boost::bad_lexical_cast&) {
         throw ConversionError() << path << value;
       }
     }
@@ -55,7 +55,7 @@ namespace Belle2 {
     {
       try {
         return getDouble(path);
-      } catch (PathEmptyError) {
+      } catch (PathEmptyError&) {
         return defaultValue;
       }
     }
@@ -66,7 +66,7 @@ namespace Belle2 {
       try {
         //hide spurious warning in boost
         return boost::lexical_cast<int>(value);
-      } catch (boost::bad_lexical_cast) {
+      } catch (boost::bad_lexical_cast&) {
         throw ConversionError() << path << value;
       }
     }
@@ -75,7 +75,7 @@ namespace Belle2 {
     {
       try {
         return getInt(path);
-      } catch (PathEmptyError) {
+      } catch (PathEmptyError&) {
         return defaultValue;
       }
     }
@@ -92,7 +92,7 @@ namespace Belle2 {
     {
       try {
         return getBool(path);
-      } catch (PathEmptyError) {
+      } catch (PathEmptyError&) {
         return defaultValue;
       }
     }
@@ -103,7 +103,7 @@ namespace Belle2 {
       double numValue(0);
       try {
         numValue = boost::lexical_cast<double>(value.first);
-      } catch (boost::bad_lexical_cast) {
+      } catch (boost::bad_lexical_cast&) {
         throw ConversionError() << path << value.first;
       }
       if (value.second.empty()) {
@@ -118,7 +118,7 @@ namespace Belle2 {
     {
       try {
         return getWithUnit(path);
-      } catch (PathEmptyError) {
+      } catch (PathEmptyError&) {
         return defaultValue;
       }
     }
@@ -150,7 +150,7 @@ namespace Belle2 {
     {
       try {
         return getArray(path);
-      } catch (PathEmptyError) {
+      } catch (PathEmptyError&) {
         return defaultValue;
       }
     }

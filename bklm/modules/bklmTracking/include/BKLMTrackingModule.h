@@ -38,19 +38,19 @@ namespace Belle2 {
     virtual ~BKLMTrackingModule();
 
     //! Initialize at start of job
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! begin run stuff
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     //! Unpack one event and create digits
-    virtual void event();
+    virtual void event() override;
 
     //! end run stuff
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! Terminate at the end of job
-    virtual void terminate();
+    virtual void terminate() override;
 
     //! Judge if two hits come from the same sector
     bool sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2);

@@ -53,7 +53,7 @@ namespace Belle2 {
      * Return the number of nodes a given path will expand to
      * @return number of nodes, 0 if path does not exist
      */
-    virtual int getNumberNodes(const std::string& path = "") const
+    virtual int getNumberNodes(const std::string& path = "") const override
     {
       return Gearbox::getInstance().getNumberNodes(ensurePath(m_path) + path);
     }
@@ -64,7 +64,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string& path = "") const noexcept(false)
+    virtual std::string getString(const std::string& path = "") const noexcept(false) override
     {
       return Gearbox::getInstance().getString(ensurePath(m_path) + path);
     }
@@ -93,7 +93,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const noexcept(false)
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const noexcept(false) override
     {
       return Gearbox::getInstance().getStringWithUnit(ensurePath(m_path) + path);
     }
@@ -107,7 +107,7 @@ namespace Belle2 {
      *         be deleted once it is no longer valid (e.g. after the current
      *         run if it belongs to this run)
      */
-    virtual const TObject* getTObject(const std::string& path) const noexcept(false)
+    virtual const TObject* getTObject(const std::string& path) const noexcept(false) override
     {
       return Gearbox::getInstance().getTObject(ensurePath(m_path) + path);
     }

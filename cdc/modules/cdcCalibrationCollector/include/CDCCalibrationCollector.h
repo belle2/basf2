@@ -43,19 +43,19 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void prepare();
+      void prepare() override;
 
 
       /**
        * Event action, collect information for calibration.
        */
 
-      virtual void collect();
+      void collect() override;
 
       /**
        * Termination action.
        */
-      virtual void finish();
+      void finish() override;
 
     private:
 

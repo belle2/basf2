@@ -54,6 +54,21 @@ namespace Belle2 {
     return row * m_numColumns * m_pmt.getNumColumns() + col + 1;
   }
 
+  int TOPGeoPMTArray::getPixelID(unsigned pmtID, unsigned pmtPixelID) const
+  {
+    pmtID--;
+    if (pmtID >= getSize()) return 0;
+
+    pmtPixelID--;
+    if (pmtPixelID >= m_pmt.getNumPixels()) return 0;
+
+    unsigned col = pmtPixelID % m_pmt.getNumColumns();
+    unsigned row = pmtPixelID / m_pmt.getNumColumns();
+
+    col += (pmtID % m_numColumns) * m_pmt.getNumColumns();
+    row += (pmtID / m_numColumns) * m_pmt.getNumRows();
+    return row * m_numColumns * m_pmt.getNumColumns() + col + 1;
+  }
 
   void TOPGeoPMTArray::generateDecoupledPMTs(double fraction)
   {

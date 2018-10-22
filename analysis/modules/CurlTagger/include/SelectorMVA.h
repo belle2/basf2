@@ -37,19 +37,19 @@ namespace Belle2 {
       ~SelectorMVA();
 
       /** Selector response that this pair of particles come from the same mc/actual particle */
-      virtual float getResponse(Particle* iPart, Particle* jPart);
+      virtual float getResponse(Particle* iPart, Particle* jPart) override;
 
       /** returns vector of variables used by this selector. */
-      virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart);
+      virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) override;
 
       /** initialize whatever needs to be initalized (root file etc)  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** collect training data and save to a root file*/
-      virtual void collectTrainingInfo(Particle* iPart, Particle* jPart);
+      virtual void collectTrainingInfo(Particle* iPart, Particle* jPart) override;
 
       /** finalize whatever needs to be finalized (train the MVA) */
-      virtual void finalize();
+      virtual void finalize() override;
 
     private:
 

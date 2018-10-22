@@ -28,7 +28,7 @@ namespace Belle2 {
     /** xp */
     float* m_fxp;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
     /** delete all 'new's */
     void deallocateMemory();
 
@@ -39,7 +39,7 @@ namespace Belle2 {
     /** Destructor */
     ~NtupleXpTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namespace Belle2

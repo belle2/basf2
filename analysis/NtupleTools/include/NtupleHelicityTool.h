@@ -29,7 +29,7 @@ namespace Belle2 {
     float m_helA;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
 
   public:
 
@@ -41,7 +41,7 @@ namespace Belle2 {
     }
 
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
 
   };
 

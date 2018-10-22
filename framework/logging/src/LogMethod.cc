@@ -33,7 +33,8 @@ LogMethod::~LogMethod()
 {
   //Check for uncaught exceptions
   string uncaughtExc;
-  if (std::uncaught_exception()) uncaughtExc = "(uncaught exceptions pending)";
+  if (std::uncaught_exceptions() > 0) uncaughtExc = "(" + std::to_string(std::uncaught_exceptions()) +
+                                                      " uncaught exceptions pending)";
 
   //Send message for leaving the method
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) {

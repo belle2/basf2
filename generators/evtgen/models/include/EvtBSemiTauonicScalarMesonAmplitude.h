@@ -26,7 +26,7 @@ namespace Belle2 {
      * The function calculate the spin dependent amplitude of the semi-tauonic decay to a scalar meson (D meson).
      */
     void CalcAmp(EvtParticle* parent, EvtAmp& amp,
-                 EvtBSemiTauonicHelicityAmplitudeCalculator* HelicityAmplitudeCalculator);
+                 EvtBSemiTauonicHelicityAmplitudeCalculator* HelicityAmplitudeCalculator) override;
 
   };
 

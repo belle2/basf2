@@ -27,9 +27,7 @@ namespace Belle2 {
       "size",
       "pt",
       "sz_slope",
-      //"fit_prob_3d",
-      //"fit_prob_2d",
-      //"fit_prob_sz",
+
       "drift_length_mean",
       "drift_length_variance",
       "drift_length_max",
@@ -45,13 +43,11 @@ namespace Belle2 {
       "empty_s_mean",
       "empty_s_variance",
       "empty_s_max",
-      "empty_s_min", // is only != 0 for CA tracks
+      "empty_s_min", // is only non-zero for CA tracks (why?)
       "empty_s_sum",
-
-      // "has_matching_segment", // is always 0 after SegmentTrackCombiner
-
-      "s_range",
+      "s_range"
     };
+
 
     /// Vehicle class to transport the variable names
     struct TrackQualityVarSetNames : public VarNames<CDCTrack> {

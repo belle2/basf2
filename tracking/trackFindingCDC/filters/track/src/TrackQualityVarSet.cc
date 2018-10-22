@@ -19,116 +19,125 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <numeric>
 
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool TrackQualityVarSet::extract(const CDCTrack* track)
-/// TODO: extraction function copied from `BasicTrackVarSet`, reuse code instead
-/// TODO: use STL algorithms for extraction of min/max/sum
 /// TODO: add eventwise features
-
+/// TODO: add class for feature extraction, to reduce redundancy
+bool TrackQualityVarSet::extract(const CDCTrack* track)
 {
-  if (not track) return false;
-
-  if (track->empty()) {
+  if ((not track) or track->empty()) {
     return false;
   }
 
   unsigned int size = track->size();
-  double drift_length_sum = 0;
-  double drift_length_sum_squared = 0;
-  double drift_length_variance = 0;
-  double drift_length_max = -1000;
-  double drift_length_min = 1000;
-  double adc_sum = 0;
-  double adc_sum_squared = 0;
-  double adc_variance = 0;
-  double adc_max = -1000;
-  double adc_min = 1000;
+
+  std::vector<double> drift_lengths;
+  std::transform(std::begin(*track),
+                 std::end(*track),
+                 std::back_inserter(drift_lengths),
+  [](const CDCRecoHit3D & recoHit) {
+    return recoHit.getWireHit().getRefDriftLength();
+  });
+  double drift_length_sum = std::accumulate(std::begin(drift_lengths), std::end(drift_lengths), 0.);
+  double drift_length_mean = drift_length_sum / size;
+  double drift_length_min = *std::min_element(std::begin(drift_lengths), std::end(drift_lengths));
+  double drift_length_max = *std::max_element(std::begin(drift_lengths), std::end(drift_lengths));
+
+  std::vector<double> adc_counts;
+  std::transform(std::begin(*track),
+                 std::end(*track),
+                 std::back_inserter(adc_counts),
+  [](const CDCRecoHit3D & recoHit) {
+    return static_cast<double>(recoHit.getWireHit().getHit()->getADCCount());
+  });
+
+  double adc_sum = std::accumulate(std::begin(adc_counts), std::end(adc_counts), 0.);
+  double adc_mean = adc_sum / size;
+  double adc_min = *std::min_element(std::begin(adc_counts), std::end(adc_counts));
+  double adc_max = *std::max_element(std::begin(adc_counts), std::end(adc_counts));
+
   double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
-  double empty_s_sum = 0;
-  double empty_s_sum_squared = 0;
-  double empty_s_variance = 0;
-  double empty_s_max = 0;
-  double empty_s_min = 0;
 
-  double last_perp_s = NAN;
+  // variables of variances and hit gaps (empty_s) require at least 2 hits in the tracks
+  // if only one hit available and they are thus not defined, initialize them to -1 (or better 0?)
+  double empty_s_sum = -1;
+  double empty_s_mean = -1;
+  double empty_s_min = -1;
+  double empty_s_max = -1;
 
-  for (const CDCRecoHit3D& recoHit : *track) {
-    // Drift circle information
-    double driftLength = recoHit.getWireHit().getRefDriftLength();
-    drift_length_sum += driftLength;
-    drift_length_sum_squared += driftLength * driftLength;
-
-    if (driftLength < drift_length_min) {
-      drift_length_min = driftLength;
-    }
-
-    if (driftLength > drift_length_max) {
-      drift_length_max = driftLength;
-    }
-
-    // ADC information
-    double adc = static_cast<double>(recoHit.getWireHit().getHit()->getADCCount());
-    adc_sum += adc;
-    adc_sum_squared += adc * adc;
-
-    if (adc < adc_min) {
-      adc_min = adc;
-    }
-
-    if (adc > adc_max) {
-      adc_max = adc;
-    }
-
-    // perpS Information
-    double currentPerpS = recoHit.getArcLength2D();
-    if (not std::isnan(last_perp_s)) {
-      double perp_s_difference = currentPerpS - last_perp_s;
-      empty_s_sum += perp_s_difference;
-      empty_s_sum_squared += perp_s_difference * perp_s_difference;
-
-      if (perp_s_difference < empty_s_min) {
-        empty_s_min = perp_s_difference;
-      }
-
-      if (perp_s_difference > empty_s_max) {
-        empty_s_max = perp_s_difference;
-      }
-    }
-    last_perp_s = currentPerpS;
-  }
+  double adc_std = -1;
+  double empty_s_std = -1;
+  double drift_length_std = -1;
 
   if (size > 1) {
-    double driftLengthVarianceSquared = (drift_length_sum_squared - drift_length_sum * drift_length_sum / size)  / (size - 1.0) ;
-    double adcVarianceSquared = (adc_sum_squared - adc_sum * adc_sum / size)  / (size - 1.0) ;
-    double emptySVarianceSquared = (empty_s_sum_squared - empty_s_sum * empty_s_sum / size)  / (size - 1.0) ;
+    std::vector<double> arc_lengths;
+    std::transform(std::begin(*track),
+                   std::end(*track),
+                   std::back_inserter(arc_lengths),
+    [](const CDCRecoHit3D & recoHit) { return recoHit.getArcLength2D(); });
+    // vector of gaps in arc length s between adjacent hits
+    std::vector<double> empty_s_gaps;
+    // calculate difference between subsequent arc lengths, accept first element, which stays the same
+    std::adjacent_difference(std::begin(arc_lengths),
+                             std::end(arc_lengths),
+                             std::back_inserter(empty_s_gaps));
+    // remove first element from empty s gaps, which is not a difference
+    std::vector<double>(std::next(std::begin(empty_s_gaps)), std::end(empty_s_gaps))
+    .swap(empty_s_gaps);
 
-    if (driftLengthVarianceSquared > 0) {
-      drift_length_variance = std::sqrt(driftLengthVarianceSquared);
-    } else {
-      drift_length_variance = 0;
+    double empty_s_size = empty_s_gaps.size();
+
+    empty_s_sum = std::accumulate(std::begin(empty_s_gaps), std::end(empty_s_gaps), 0.);
+    empty_s_mean = empty_s_sum / empty_s_size;
+    empty_s_min = *std::min_element(std::begin(empty_s_gaps), std::end(empty_s_gaps));
+    empty_s_max = *std::max_element(std::begin(empty_s_gaps), std::end(empty_s_gaps));
+
+    std::vector<double> drift_residuals;
+    std::transform(std::begin(drift_lengths),
+                   std::end(drift_lengths),
+                   std::back_inserter(drift_residuals),
+    [&](double x) { return x - drift_length_mean; });
+
+    double drift_length_variance_squared = std::inner_product(drift_residuals.begin(),
+                                                              drift_residuals.end(),
+                                                              drift_residuals.begin(),
+                                                              0.0)
+                                           / (size - 1);
+    drift_length_std = std::sqrt(drift_length_variance_squared);
+
+    std::vector<double> adc_residuals;
+    std::transform(std::begin(adc_counts),
+                   std::end(adc_counts),
+                   std::back_inserter(adc_residuals),
+    [&](double x) { return x - adc_mean; });
+
+    double adc_variance_squared =
+      std::inner_product(adc_residuals.begin(), adc_residuals.end(), adc_residuals.begin(), 0.0)
+      / (size - 1);
+    adc_std = std::sqrt(adc_variance_squared);
+
+    // equivalent to size > 2, need at least two gaps between hits to calculate their variance
+    if (empty_s_size > 1) {
+      std::vector<double> empty_s_residuals;
+      std::transform(std::begin(empty_s_gaps),
+                     std::end(empty_s_gaps),
+                     std::back_inserter(empty_s_residuals),
+      [&](double x) { return x - empty_s_mean; });
+
+      double empty_s_variance_squared = std::inner_product(empty_s_residuals.begin(),
+                                                           empty_s_residuals.end(),
+                                                           empty_s_residuals.begin(),
+                                                           0.0)
+                                        / (empty_s_size - 1);
+
+      empty_s_std = std::sqrt(empty_s_variance_squared);
     }
-
-    if (adcVarianceSquared > 0) {
-      adc_variance = std::sqrt(adcVarianceSquared);
-    } else {
-      adc_variance = 0;
-    }
-
-    if (emptySVarianceSquared > 0) {
-      empty_s_variance = std::sqrt(emptySVarianceSquared);
-    } else {
-      empty_s_variance = 0;
-    }
-
-  } else {
-    drift_length_variance = -1;
-    adc_variance = -1;
-    empty_s_variance = -1;
   }
 
   const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
@@ -137,28 +146,23 @@ bool TrackQualityVarSet::extract(const CDCTrack* track)
 
   var<named("size")>() = size;
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
-  //var<named("fit_prob_3d")>() = trajectory3D.getPValue();
-  //var<named("fit_prob_2d")>() = trajectory2D.getPValue();
-  //var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
-  var<named("drift_length_mean")>() = toFinite(drift_length_sum / size, 0);
-  var<named("drift_length_variance")>() = toFinite(drift_length_variance, 0);
+  var<named("drift_length_mean")>() = toFinite(drift_length_mean, 0);
+  var<named("drift_length_variance")>() = toFinite(drift_length_std, 0);
   var<named("drift_length_max")>() = toFinite(drift_length_max, 0);
   var<named("drift_length_min")>() = toFinite(drift_length_min, 0);
   var<named("drift_length_sum")>() = toFinite(drift_length_sum, 0);
 
   var<named("adc_mean")>() = toFinite(adc_sum / size, 0);
-  var<named("adc_variance")>() = toFinite(adc_variance, 0);
+  var<named("adc_variance")>() = toFinite(adc_std, 0);
   var<named("adc_max")>() = toFinite(adc_max, 0);
   var<named("adc_min")>() = toFinite(adc_min, 0);
   var<named("adc_sum")>() = toFinite(adc_sum, 0);
 
-  // var<named("has_matching_segment")>() = track->getHasMatchingSegment();
-
-  var<named("empty_s_mean")>() = toFinite(empty_s_sum / size, 0);
+  var<named("empty_s_mean")>() = toFinite(empty_s_mean, 0);
   var<named("empty_s_sum")>() = toFinite(empty_s_sum, 0);
-  var<named("empty_s_variance")>() = toFinite(empty_s_variance, 0);
+  var<named("empty_s_variance")>() = toFinite(empty_s_std, 0);
   var<named("empty_s_max")>() = toFinite(empty_s_max, 0);
   var<named("empty_s_min")>() = toFinite(empty_s_min, 0);
   var<named("s_range")>() = toFinite(s_range, 0);

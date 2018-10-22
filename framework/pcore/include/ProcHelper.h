@@ -1,13 +1,14 @@
 #pragma once
 
 namespace Belle2 {
+  /// Type of the process used for storing and mapping the child processes in the process handler
   enum class ProcType {
-    c_Input = 'i',
-    c_Worker = 'w',
-    c_Output = 'o',
-    c_Proxy = 'p',
-    c_Monitor = 'm',
-    c_Init = '0',
-    c_Stopped = 's'
+    c_Input = 'i', /**< Input Process */
+    c_Worker = 'w', /**< Worker/Reconstruction Process */
+    c_Output = 'o', /**< Output Process */
+    c_Proxy = 'p', /**< Multicast Proxy Process */
+    c_Monitor = 'm', /**< Monitoring Process */
+    c_Init = '0', /**< Before the forks, the process is in init state */
+    c_Stopped = 's' /**< The process is stopped/killed */
   };
 }

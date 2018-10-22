@@ -39,18 +39,18 @@ namespace Belle2 {
     /**
      * Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
     /**
      * Event action (main routine).
      */
 
-    virtual void event();
+    void event() override;
 
     /**
      * Termination action, fit t0 and store histograms.
      */
-    virtual void terminate();
+    void terminate() override;
 
   private:
     TH1D* m_hTDC[56][400]; /**< TDC distribution histo. */

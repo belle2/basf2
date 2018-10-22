@@ -15,6 +15,15 @@ from ROOT.Belle2 import SVDHitTimeSelectionFunction
 
 import os
 
+# default values
+clsMinTime = -20
+clsSeedSNR = 5
+clsAdjSNR = 3
+clsMinSNR = 0
+clsScaleErrSize1 = 1
+clsScaleErrSize2 = 1
+clsScaleErrSize3 = 1
+
 
 class defaultSVDClusterCalibrationImporter(basf2.Module):
 
@@ -25,15 +34,18 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         cls_payload = Belle2.SVDClusterCalibrations.t_payload()
         time_payload = Belle2.SVDClusterCalibrations.t_time_payload()
 
+        # cluster time
         hitTimeSelection = SVDHitTimeSelectionFunction()
+        hitTimeSelection.setMinTime(clsMinTime)
 
+        # cluster reconstruction & position error
         clsParam = SVDClusterCuts()
-        clsParam.set_minClusterSNR(10)
-        clsParam.minAdjSNR = 3
-#        clsParam.minClusterSNR = 10
-        clsParam.scaleError_clSize1 = 1
-        clsParam.scaleError_clSize2 = 1
-        clsParam.scaleError_clSize3 = 1
+        clsParam.minSeedSNR = clsSeedSNR
+        clsParam.minAdjSNR = clsAdjSNR
+        clsParam.minClusterSNR = clsMinSNR
+        clsParam.scaleError_clSize1 = clsScaleErrSize1
+        clsParam.scaleError_clSize2 = clsScaleErrSize2
+        clsParam.scaleError_clSize3 = clsScaleErrSize3
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -53,7 +65,8 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDClusterCalibrations.time_name, time_payload, iov)
 
 
-use_local_database("localDB/database.txt", "localDB")
+use_database_chain()
+use_local_database("localDB/database.txt", "localDB", invertLogging=True)
 
 main = create_path()
 
@@ -62,8 +75,8 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])  # , useDB = True)
+main.add_module("Gearbox")  # fileName="/geometry/Beast2_phase2.xml")
+main.add_module("Geometry", components=['SVD'])  # , useDB = False)
 
 main.add_module(defaultSVDClusterCalibrationImporter())
 

@@ -20,6 +20,7 @@
 
 #include <genfit/MeasurementFactory.h>
 #include <string>
+#include <map>
 
 
 namespace genfit {
@@ -182,7 +183,8 @@ namespace Belle2 {
     /// Helper: Go through all measurement creators in the given list and create the measurement with a given hit.
     template <class HitType, Const::EDetector detector>
     void addMeasurementsFromHitToRecoTrack(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation, HitType* hit,
-                                           const std::vector<std::shared_ptr<BaseMeasurementCreatorFromHit<HitType, detector>>>& measurementCreators) const
+                                           const std::vector<std::shared_ptr<BaseMeasurementCreatorFromHit<HitType, detector>>>& measurementCreators,
+                                           std::map<genfit::TrackPoint*, RecoHitInformation*>& trackPointHitMapping) const
     {
       if (not recoHitInformation.useInFit()) {
         return;
@@ -193,14 +195,9 @@ namespace Belle2 {
       for (const auto& measurementCreator : measurementCreators) {
         const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(hit, recoTrack,
                                                               recoHitInformation);
-
-        if (trackPoints.size() >= 1) {
-          int trackPointCounter = genfitTrack.getNumPoints();
-          recoHitInformation.setCreatedTrackPointID(trackPointCounter);
-        }
-
         for (genfit::TrackPoint* trackPoint : trackPoints) {
           genfitTrack.insertPoint(trackPoint);
+          trackPointHitMapping[trackPoint] = &recoHitInformation;
         }
       }
     }

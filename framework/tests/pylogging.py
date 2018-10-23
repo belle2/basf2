@@ -117,19 +117,21 @@ class PythonLogInterface(unittest.TestCase):
                         "[ERROR] But here\n")
 
     def test_inspect(self):
-        # sometimes the path to the file is absolute so make sure the filename
-        # is the same as reported for this frame
-        import inspect
-        filename = inspect.currentframe().f_code.co_filename
         # no change log info to show everything except time
         li = basf2.LogInfo
         basf2.logging.set_info(basf2.LogLevel.INFO, li.MESSAGE | li.LEVEL | li.PACKAGE | li.FUNCTION | li.FILE | li.LINE)
+        # sometimes the path to the file is absolute so make sure the filename
+        # is the same as reported for this frame. Also the line number changes
+        # every time we touch this file so determine it automatically
+        import inspect
+        filename = inspect.currentframe().f_code.co_filename
+        lineno = inspect.currentframe().f_lineno + 2
         # and print a message
         basf2.B2INFO("show current frame info", why="because we can")
         self.check_logs(
             "[INFO] show current frame info\n"
             "\twhy = because we can  { package: steering function: test_inspect @%s:%d }\n" %
-            (filename, inspect.currentframe().f_lineno - 2))
+            (filename, lineno))
 
 
 class PythonLogJSON(unittest.TestCase):

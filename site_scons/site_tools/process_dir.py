@@ -260,15 +260,12 @@ def process_dir(
             # install corresponding pcm file in lib (for cling)
             pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
             pcm_name = os.path.basename(pcm_path)
-            pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
-                                       pcm_path)
+            pcm_target = env.Copy(os.path.join(env['LIBDIR'], pcm_name), pcm_path)
             # install corresponding rootmap files to support auto-loading of libraries
             # once used via ROOT
             rootmap_path = str(dict_file[0])[:-3] + '.rootmap'
             rootmap_name = os.path.basename(rootmap_path)
-
-            rootmap_target = env.InstallAs(os.path.join(env['LIBDIR'], rootmap_name),
-                                           rootmap_path)
+            rootmap_target = env.Copy(os.path.join(env['LIBDIR'], rootmap_name), rootmap_path)
 
             # Ensure InstallAs() comes after the dictionary build
             env.Depends(rootmap_path, dict_file)

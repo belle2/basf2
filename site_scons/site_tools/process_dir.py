@@ -294,8 +294,9 @@ def process_dir(
             # create library and map for modules
             lib = env.SharedLibrary(os.path.join(lib_dir_name, lib_name),
                                     [env['SRC_FILES'], dict_files])
+            debug = env.StripDebug(lib)
 
-            lib_files = [lib] + aux_dict_targets
+            lib_files = [lib, debug] + aux_dict_targets
             if is_module_dir:
                 map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.b2modmap')
                 # Adding lib_files is important to ensure we load local module
@@ -358,10 +359,11 @@ def process_dir(
         tool = bin_env.Program(os.path.join(bin_env['BINDIR'], bin_filename),
                                os.path.join(bin_env['BUILDDIR'],
                                             str(bin_file)))
-        env.Alias(os.path.join(dir_name, 'tools', bin_filename), tool)
-        env.Alias(os.path.join(dir_name, 'tools'), tool)
-        env.Alias(os.path.join(dir_name, bin_filename), tool)
-        define_aliases(env, tool, dir_name, 'bin')
+        debug = bin_env.StripDebug(tool)
+        env.Alias(os.path.join(dir_name, 'tools', bin_filename), [tool, debug])
+        env.Alias(os.path.join(dir_name, 'tools'), [tool, debug])
+        env.Alias(os.path.join(dir_name, bin_filename), [tool, debug])
+        define_aliases(env, [tool, debug], dir_name, 'bin')
 
     # restore original environment
     env = save_env

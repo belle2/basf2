@@ -87,7 +87,7 @@ EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
     const int algorithm = m_complevel / 100;
     const int level = m_complevel % 100;
     int irep{0}, nin{(int)m_buf.size()}, nout{nin};
-    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data(), &irep, algorithm);
+    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data(), &irep, (ROOT::ECompressionAlgorithm) algorithm);
     // it returns the number of bytes of the output in irep. If that is zero or
     // to big compression failed and we transmit uncompressed.
     if (irep > 0 && irep <= nin) {

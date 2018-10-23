@@ -272,7 +272,7 @@ These fields can be used as a bitmask to configure the appearance of log message
                     R"(Defines logging settings (log levels and items included in each message) for a certain context, e.g. a module or package.
 
 .. seealso:: `logging.package(str) <basf2.LogPythonInterface.package>`)")
-  .def(init<optional<LogConfig::ELogLevel, int> >())
+  .def(init<bp::optional<LogConfig::ELogLevel, int> >())
   .add_property("log_level",  &LogConfig::getLogLevel,  &LogConfig::setLogLevel, "set or get the current log level")
   .add_property("debug_level", &LogConfig::getDebugLevel, &LogConfig::setDebugLevel, "set or get the current debug level")
   .add_property("abort_level", &LogConfig::getAbortLevel, &LogConfig::setAbortLevel,

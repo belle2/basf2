@@ -417,7 +417,7 @@ int main(int argc, char* argv[])
     if (Environment::Instance().getDryRun()) {
       Environment::Instance().printJobInformation();
     }
-  } catch (error_already_set) {
+  } catch (error_already_set&) {
     //Apparently an exception occured which wasn't handled. So print the traceback
     PyErr_Print();
     //And in rare cases, i.e. when redirecting output, the buffers are not

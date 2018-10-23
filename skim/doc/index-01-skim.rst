@@ -92,3 +92,9 @@ Time-dependent CP-violation (TDCPV) analysis skims
 
 .. automodule:: skim.tdcpv
     :members:
+
+Tau-pair skims
+~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.taupair
+    :members:

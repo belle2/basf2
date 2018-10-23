@@ -180,3 +180,5 @@ They have a *[Calibration]* pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
+.. b2-variables::
+   :group: KLM Calibration | PID

@@ -197,6 +197,10 @@ namespace Belle2 {
                                                               recoHitInformation);
         for (genfit::TrackPoint* trackPoint : trackPoints) {
           genfitTrack.insertPoint(trackPoint);
+          // FIXME: hotfix: to get a correct mapping between reco hit information and the track point.
+          // We are not able to store the TrackPoint in the RecoHitInformation directly because of problems in streaming
+          // the genfit::TrackPoint. So what we do is store the index of the track points in the vector of the genfit::Track.
+          // As this vector is sorted after this function, we can not set it here directly.
           trackPointHitMapping[trackPoint] = &recoHitInformation;
         }
       }

@@ -237,6 +237,11 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
 
   genfitTrack.sort();
 
+  // FIXME: hotfix:
+  // after we have a mapping between created track points and reco track information, we can use this mapping to
+  // write it back to the reco hit information. Please note, that we only store a single index for each
+  // reco hit information (although there could be multiple track points).
+  // We also assume that the track point vector is never changed again!
   int counter = 0;
   for (genfit::TrackPoint* trackPoint : genfitTrack.getPoints()) {
     trackPointHitMapping[trackPoint]->setCreatedTrackPointID(counter);

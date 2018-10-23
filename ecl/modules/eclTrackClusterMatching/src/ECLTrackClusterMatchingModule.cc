@@ -57,24 +57,26 @@ void ECLTrackClusterMatchingModule::initialize()
     m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
     m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
 
-    f_phiRMSFWDCROSS = m_matchingParameterizations->getPhiFWDCROSSRMSParameterization();
-    f_phiRMSFWDDL = m_matchingParameterizations->getPhiFWDDLRMSParameterization();
-    f_phiRMSFWDNEAR = m_matchingParameterizations->getPhiFWDNEARRMSParameterization();
-    f_phiRMSBRLCROSS = m_matchingParameterizations->getPhiBRLCROSSRMSParameterization();
-    f_phiRMSBRLDL = m_matchingParameterizations->getPhiBRLDLRMSParameterization();
-    f_phiRMSBRLNEAR = m_matchingParameterizations->getPhiBRLNEARRMSParameterization();
-    f_phiRMSBWDCROSS = m_matchingParameterizations->getPhiBWDCROSSRMSParameterization();
-    f_phiRMSBWDDL = m_matchingParameterizations->getPhiBWDDLRMSParameterization();
-    f_phiRMSBWDNEAR = m_matchingParameterizations->getPhiBWDNEARRMSParameterization();
-    f_thetaRMSFWDCROSS = m_matchingParameterizations->getThetaFWDCROSSRMSParameterization();
-    f_thetaRMSFWDDL = m_matchingParameterizations->getThetaFWDDLRMSParameterization();
-    f_thetaRMSFWDNEAR = m_matchingParameterizations->getThetaFWDNEARRMSParameterization();
-    f_thetaRMSBRLCROSS = m_matchingParameterizations->getThetaBRLCROSSRMSParameterization();
-    f_thetaRMSBRLDL = m_matchingParameterizations->getThetaBRLDLRMSParameterization();
-    f_thetaRMSBRLNEAR = m_matchingParameterizations->getThetaBRLNEARRMSParameterization();
-    f_thetaRMSBWDCROSS = m_matchingParameterizations->getThetaBWDCROSSRMSParameterization();
-    f_thetaRMSBWDDL = m_matchingParameterizations->getThetaBWDDLRMSParameterization();
-    f_thetaRMSBWDNEAR = m_matchingParameterizations->getThetaBWDNEARRMSParameterization();
+    m_parametrizationFunctions = m_matchingParameterizations->getRMSParameterizations();
+
+    f_phiRMSFWDCROSS = m_parametrizationFunctions["PhiFWDCROSS"];
+    f_phiRMSFWDDL = m_parametrizationFunctions["PhiFWDDL"];
+    f_phiRMSFWDNEAR = m_parametrizationFunctions["PhiFWDNEAR"];
+    f_phiRMSBRLCROSS = m_parametrizationFunctions["PhiBRLCROSS"];
+    f_phiRMSBRLDL = m_parametrizationFunctions["PhiBRLDL"];
+    f_phiRMSBRLNEAR = m_parametrizationFunctions["PhiBRLNEAR"];
+    f_phiRMSBWDCROSS = m_parametrizationFunctions["PhiBWDCROSS"];
+    f_phiRMSBWDDL = m_parametrizationFunctions["PhiBWDDL"];
+    f_phiRMSBWDNEAR = m_parametrizationFunctions["PhiBWDNEAR"];
+    f_thetaRMSFWDCROSS = m_parametrizationFunctions["ThetaFWDCROSS"];
+    f_thetaRMSFWDDL = m_parametrizationFunctions["ThetaFWDDL"];
+    f_thetaRMSFWDNEAR = m_parametrizationFunctions["ThetaFWDNEAR"];
+    f_thetaRMSBRLCROSS = m_parametrizationFunctions["ThetaBRLCROSS"];
+    f_thetaRMSBRLDL = m_parametrizationFunctions["ThetaBRLDL"];
+    f_thetaRMSBRLNEAR = m_parametrizationFunctions["ThetaBRLNEAR"];
+    f_thetaRMSBWDCROSS = m_parametrizationFunctions["ThetaBWDCROSS"];
+    f_thetaRMSBWDDL = m_parametrizationFunctions["ThetaBWDDL"];
+    f_thetaRMSBWDNEAR = m_parametrizationFunctions["ThetaBWDNEAR"];
 
     m_matchingThresholdValuesFWD = m_matchingThresholds->getFWDMatchingThresholdValues();
     m_matchingThresholdValuesBRL = m_matchingThresholds->getBRLMatchingThresholdValues();

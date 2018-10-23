@@ -89,6 +89,8 @@ namespace Belle2 {
 
     DBObjPtr<ECLTrackClusterMatchingParameterizations> m_matchingParameterizations; /**< Parameterizations of RMS */
 
+    std::map<std::string, TF1> m_parametrizationFunctions; /**< map containing all RMS parametrization functions */
+
     TF1 f_phiRMSFWDCROSS; /**< function to describe phi RMS for FWD CROSS */
     TF1 f_phiRMSFWDDL; /**< function to describe phi RMS for FWD DL */
     TF1 f_phiRMSFWDNEAR; /**< function to describe phi RMS for FWD NEAR */

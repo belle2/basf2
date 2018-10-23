@@ -496,45 +496,22 @@ void ECLDatabaseImporter::importTrackClusterMatchingParameterizations()
   if (!inputFile || inputFile->IsZombie())
     B2FATAL("Could not open file " << m_inputFileNames[0]);
 
-  TF1* f_RMSParameterizationThetaFWDCROSS = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaFWDCROSS");
-  TF1* f_RMSParameterizationThetaFWDDL    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaFWDDL");
-  TF1* f_RMSParameterizationThetaFWDNEAR  = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaFWDNEAR");
-  TF1* f_RMSParameterizationThetaBRLCROSS = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBRLCROSS");
-  TF1* f_RMSParameterizationThetaBRLDL    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBRLDL");
-  TF1* f_RMSParameterizationThetaBRLNEAR  = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBRLNEAR");
-  TF1* f_RMSParameterizationThetaBWDCROSS = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBWDCROSS");
-  TF1* f_RMSParameterizationThetaBWDDL    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBWDDL");
-  TF1* f_RMSParameterizationThetaBWDNEAR  = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationThetaBWDNEAR");
-  TF1* f_RMSParameterizationPhiFWDCROSS   = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiFWDCROSS");
-  TF1* f_RMSParameterizationPhiFWDDL      = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiFWDDL");
-  TF1* f_RMSParameterizationPhiFWDNEAR    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiFWDNEAR");
-  TF1* f_RMSParameterizationPhiBRLCROSS   = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBRLCROSS");
-  TF1* f_RMSParameterizationPhiBRLDL      = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBRLDL");
-  TF1* f_RMSParameterizationPhiBRLNEAR    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBRLNEAR");
-  TF1* f_RMSParameterizationPhiBWDCROSS   = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBWDCROSS");
-  TF1* f_RMSParameterizationPhiBWDDL      = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBWDDL");
-  TF1* f_RMSParameterizationPhiBWDNEAR    = getRootObjectFromFile<TF1*>(inputFile, "RMSParameterizationPhiBWDNEAR");
+  map<string, TF1> m_parametrizationFunctions;
+  vector<string> angles = {"Theta", "Phi"};
+  vector<string> regions = {"BRL", "BWD", "FWD"};
+  vector<string> hittypes = {"CROSS", "DL", "NEAR"};
+
+  for (const auto& angle : angles) {
+    for (const auto& region : regions) {
+      for (const auto& hittype : hittypes) {
+        m_parametrizationFunctions.insert(pair<string, TF1>(angle + region + hittype, *(getRootObjectFromFile<TF1*>(inputFile,
+                                                            "RMSParameterization" + angle + region + hittype))));
+      }
+    }
+  }
 
   DBImportObjPtr<ECLTrackClusterMatchingParameterizations> dbPtr("ECLTrackClusterMatchingParameterizations");
-  dbPtr.construct(*f_RMSParameterizationThetaFWDCROSS,
-                  *f_RMSParameterizationThetaFWDDL,
-                  *f_RMSParameterizationThetaFWDNEAR,
-                  *f_RMSParameterizationThetaBRLCROSS,
-                  *f_RMSParameterizationThetaBRLDL,
-                  *f_RMSParameterizationThetaBRLNEAR,
-                  *f_RMSParameterizationThetaBWDCROSS,
-                  *f_RMSParameterizationThetaBWDDL,
-                  *f_RMSParameterizationThetaBWDNEAR,
-                  *f_RMSParameterizationPhiFWDCROSS,
-                  *f_RMSParameterizationPhiFWDDL,
-                  *f_RMSParameterizationPhiFWDNEAR,
-                  *f_RMSParameterizationPhiBRLCROSS,
-                  *f_RMSParameterizationPhiBRLDL,
-                  *f_RMSParameterizationPhiBRLNEAR,
-                  *f_RMSParameterizationPhiBWDCROSS,
-                  *f_RMSParameterizationPhiBWDDL,
-                  *f_RMSParameterizationPhiBWDNEAR
-                 );
+  dbPtr.construct(m_parametrizationFunctions);
 
   IntervalOfValidity iov(0, 0, -1, -1);
 

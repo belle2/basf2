@@ -28,7 +28,9 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 /// TODO: add eventwise features
-/// TODO: add class for feature extraction, to reduce redundancy
+/// IDEA: add class for feature extraction (mean, variance, etc.), to reduce redundancy in
+/// calculation of different feature sets
+
 bool TrackQualityVarSet::extract(const CDCTrack* track)
 {
   if ((not track) or track->empty()) {
@@ -102,7 +104,7 @@ bool TrackQualityVarSet::extract(const CDCTrack* track)
     std::transform(std::begin(drift_lengths),
                    std::end(drift_lengths),
                    std::back_inserter(drift_residuals),
-    [&](double x) { return x - drift_length_mean; });
+    [drift_length_mean](double x) { return x - drift_length_mean; });
 
     double drift_length_variance_squared = std::inner_product(drift_residuals.begin(),
                                                               drift_residuals.end(),
@@ -115,7 +117,7 @@ bool TrackQualityVarSet::extract(const CDCTrack* track)
     std::transform(std::begin(adc_counts),
                    std::end(adc_counts),
                    std::back_inserter(adc_residuals),
-    [&](double x) { return x - adc_mean; });
+    [adc_mean](double x) { return x - adc_mean; });
 
     double adc_variance_squared =
       std::inner_product(adc_residuals.begin(), adc_residuals.end(), adc_residuals.begin(), 0.0)
@@ -128,7 +130,7 @@ bool TrackQualityVarSet::extract(const CDCTrack* track)
       std::transform(std::begin(empty_s_gaps),
                      std::end(empty_s_gaps),
                      std::back_inserter(empty_s_residuals),
-      [&](double x) { return x - empty_s_mean; });
+      [empty_s_mean](double x) { return x - empty_s_mean; });
 
       double empty_s_variance_squared = std::inner_product(empty_s_residuals.begin(),
                                                            empty_s_residuals.end(),

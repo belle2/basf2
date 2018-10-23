@@ -106,21 +106,13 @@ Here is a list of variables getting info from particle's daughters:
 .. b2-variables::
    :group: DirectDaughterInfo
 
-KLM Cluster
+KLM Cluster and :math:`K_{L}^0` Identification
 ~~~~~~~~~~~
 
-Here is a list of KLM cluster variables:
+Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 
 .. b2-variables::
-   :group: KLM Cluster
-
-:math:`K_{L}^0` Identification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Here is a list of :math:`K_{L}^{0}` identification variables:
-
-.. b2-variables::
-   :group: klong-ID
+   :group: KLM Cluster and KlongID
 
 Time Dependent CPV Analysis Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,3 +180,5 @@ They have a *[Calibration]* pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
+.. b2-variables::
+   :group: KLM Calibration | PID

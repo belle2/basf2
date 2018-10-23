@@ -24,6 +24,7 @@
 
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
 
 namespace Belle2 {
 
@@ -82,18 +83,21 @@ namespace Belle2 {
 
 
       // 2. Clustering
-      /** Seed cut in units of noise. */
+      /** Seed cut in units of noise. DEPRECATED */
       double m_cutSeed;
-      /** Adjacent cut in units of noise. */
+      /** Adjacent cut in units of noise. DEPRECATED */
       double m_cutAdjacent;
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;
       // Cluster cut in units of m_elNoise, not included (yet?)
-      //  double m_cutCluster;
+      double m_cutCluster;
+      //use DB
+      bool m_useDB; //if false, use the module parameters
 
       //calibration objects
       SVDPulseShapeCalibrations m_PulseShapeCal;
       SVDNoiseCalibrations m_NoiseCal;
+      SVDClusterCalibrations m_ClusterCal;
 
       void writeClusters(SimpleClusterCandidate clusterCand);
     };//end class declaration

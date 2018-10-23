@@ -19,12 +19,14 @@ namespace Belle2 {
 
   namespace SVD {
 
-    SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent)
+    SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent,
+                                                   double cutCluster)
       : m_vxdID(vxdID)
       , m_isUside(isUside)
       , m_sizeHeadTail(sizeHeadTail)
       , m_cutSeed(cutSeed)
       , m_cutAdjacent(cutAdjacent)
+      , m_cutCluster(cutCluster)
       , m_charge(0)
       , m_chargeError(0)
       , m_seedCharge(0)
@@ -164,7 +166,7 @@ namespace Belle2 {
         return false;
       }
 
-      if (m_seedCharge > 0 && m_seedSNR >= m_cutSeed)
+      if (m_seedCharge > 0 && m_seedSNR >= m_cutSeed && m_SNR >= m_cutCluster)
         isGood = true;
 
       return isGood;

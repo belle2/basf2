@@ -49,7 +49,7 @@ analysis_main.add_module('MCMatcherParticles', listName='B0:generic', looseMCMat
 # Hadronic B0 skim
 # Importing the reconstructed events from the feiHadronicB0_List file
 from skim.fei import B0hadronic
-B0hadronicList = B0hadronic()
+B0hadronicList = B0hadronic(analysis_main)
 skimOutputUdst(skimCode, B0hadronicList)
 summaryOfLists(B0hadronicList)
 

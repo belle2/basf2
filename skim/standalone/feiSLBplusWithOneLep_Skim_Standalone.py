@@ -50,7 +50,7 @@ analysis_main.add_path(feistate.path)
 
 # SL Bplus skim
 from skim.fei import BplusSLWithOneLep
-BtagList = BplusSLWithOneLep()
+BtagList = BplusSLWithOneLep(analysis_main)
 
 skimOutputUdst(skimCode, BtagList)
 summaryOfLists(BtagList)

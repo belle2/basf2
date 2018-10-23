@@ -48,7 +48,7 @@ analysis_main.add_module('MCMatcherParticles', listName='B+:generic', looseMCMat
 # Hadronic Bplus skim
 from feiHadronicBplus_List import*
 from skim.fei import BplusHadronic
-BplushadronicList = BplusHadronic()
+BplushadronicList = BplusHadronic(analysis_main)
 
 skimOutputUdst(skimCode, BplushadronicList)
 summaryOfLists(BplushadronicList)

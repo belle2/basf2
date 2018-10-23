@@ -32,7 +32,7 @@ applyEventCuts('R2EventLevel<0.4 and nTracks>=4')
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
-# Weightfiles for FEIv4_2018_MC9_release_02_00_00 in this database
+# Weightfiles for FEIv4_2018_MC9_release_02_00_01 in this database
 
 import fei
 particles = fei.get_default_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=False, KLong=False)

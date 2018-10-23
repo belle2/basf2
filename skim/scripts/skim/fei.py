@@ -229,7 +229,7 @@ def B0SLWithOneLep(path):
     # Reconstruct signal side to lepton
     stdE('95eff', path=path)
     stdMu('95eff', path=path)
-    reconstructDecay('B0:sig1 -> e+:95eff', 'Mbc>0', 1path=path)
+    reconstructDecay('B0:sig1 -> e+:95eff', 'Mbc>0', 1, path=path)
     reconstructDecay('B0:sig2 -> mu+:95eff', 'Mbc>0', 2, path=path)
     reconstructDecay('B0:sig3 -> e-:95eff', 'Mbc>0', 3, path=path)
     reconstructDecay('B0:sig4 -> mu-:95eff', 'Mbc>0', 4, path=path)

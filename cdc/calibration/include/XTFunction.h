@@ -111,6 +111,11 @@ namespace Belle2 {
       }
 
       /**
+       * Copy constructor.
+       */
+      XTFunction(const XTFunction& x) = default;
+
+      /**
        * Set Parameter 6 for polynomia fit.
        */
       void  setP6(double p6)

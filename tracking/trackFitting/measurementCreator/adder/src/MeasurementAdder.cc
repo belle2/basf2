@@ -201,37 +201,47 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
   RecoTrackGenfitAccess::getGenfitTrack(recoTrack).deleteTrackPointsAndFitStatus();
   recoTrack.setDirtyFlag();
 
+  std::map<genfit::TrackPoint*, RecoHitInformation*> trackPointHitMapping;
+
   // Add the measurements created by the CDC, SVD and PXD measurement creators.
   recoTrack.mapOnHits<RecoHitInformation::UsedPXDHit>(m_param_storeArrayNameOfPXDHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedPXDHit * pxdHit) {
     addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedPXDHit, Const::PXD>(recoTrack, recoHitInformation, pxdHit,
-        m_pxdMeasurementCreators);
+        m_pxdMeasurementCreators, trackPointHitMapping);
   });
   recoTrack.mapOnHits<RecoHitInformation::UsedSVDHit>(m_param_storeArrayNameOfSVDHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedSVDHit * svdHit) {
     addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedSVDHit, Const::SVD>(recoTrack, recoHitInformation, svdHit,
-        m_svdMeasurementCreators);
+        m_svdMeasurementCreators, trackPointHitMapping);
   });
   recoTrack.mapOnHits<RecoHitInformation::UsedCDCHit>(m_param_storeArrayNameOfCDCHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedCDCHit * cdcHit) {
     addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedCDCHit, Const::CDC>(recoTrack, recoHitInformation, cdcHit,
-        m_cdcMeasurementCreators);
+        m_cdcMeasurementCreators, trackPointHitMapping);
   });
   recoTrack.mapOnHits<RecoHitInformation::UsedBKLMHit>(m_param_storeArrayNameOfBKLMHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedBKLMHit * bklmHit) {
     addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedBKLMHit, Const::BKLM>(recoTrack, recoHitInformation, bklmHit,
-        m_bklmMeasurementCreators);
+        m_bklmMeasurementCreators, trackPointHitMapping);
   });
   recoTrack.mapOnHits<RecoHitInformation::UsedEKLMHit>(m_param_storeArrayNameOfEKLMHits, [&](RecoHitInformation & recoHitInformation,
   RecoHitInformation::UsedEKLMHit * EKLMHit) {
     addMeasurementsFromHitToRecoTrack<RecoHitInformation::UsedEKLMHit, Const::EKLM>(recoTrack, recoHitInformation, EKLMHit,
-        m_eklmMeasurementCreators);
+        m_eklmMeasurementCreators, trackPointHitMapping);
   });
 
   // Special case is with the additional measurement creator factories. They do not need any hits:
   addMeasurementsToRecoTrack(recoTrack, m_additionalMeasurementCreators);
 
-  RecoTrackGenfitAccess::getGenfitTrack(recoTrack).sort();
+  auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
+
+  genfitTrack.sort();
+
+  int counter = 0;
+  for (genfit::TrackPoint* trackPoint : genfitTrack.getPoints()) {
+    trackPointHitMapping[trackPoint]->setCreatedTrackPointID(counter);
+    counter += 1;
+  }
 
   return true;
 }

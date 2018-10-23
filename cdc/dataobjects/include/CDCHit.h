@@ -280,7 +280,7 @@ namespace Belle2 {
 
   private:
     /** ROOT Macro.*/
-    ClassDef(CDCHit, 7);
+    ClassDefOverride(CDCHit, 7);
   };
 } // end namespace Belle2
 

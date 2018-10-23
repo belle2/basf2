@@ -932,7 +932,6 @@ namespace Belle2 {
         const int offset = rib3.getOffset();
         const int ndiv = rib3.getNDiv();
 
-        const string solidName = "solidRib3" + to_string(id);
         const string logicalName = "logicalRib3" + to_string(id);
         G4VSolid* boxShape = new G4Box("Block",
                                        0.5 * length * CLHEP::cm,
@@ -999,7 +998,6 @@ namespace Belle2 {
         const int offset = rib4.getOffset();
         const int ndiv = rib4.getNDiv();
 
-        const string solidName = "solidRib4" + to_string(id);
         const string logicalName = "logicalRib4" + to_string(id);
         G4VSolid* baseShape = new G4Box("Base",
                                         0.5 * length * CLHEP::cm,

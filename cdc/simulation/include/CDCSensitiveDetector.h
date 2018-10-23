@@ -41,7 +41,7 @@ namespace Belle2 {
       ~CDCSensitiveDetector() {}
 
       //! Register CDC hits collection into G4HCofThisEvent
-      void Initialize(G4HCofThisEvent*);
+      void Initialize(G4HCofThisEvent*) override;
 
       //! Process each step and calculate variables defined in CDCB4VHit
       bool step(G4Step* aStep, G4TouchableHistory* history) override;
@@ -50,7 +50,7 @@ namespace Belle2 {
       //      void BeginOfEvent(G4HCofThisEvent*);
 
       //!  Do what you want to do at the end of each event
-      void EndOfEvent(G4HCofThisEvent*);
+      void EndOfEvent(G4HCofThisEvent*) override;
 
       //! Save CDCSimHit into datastore
       void saveSimHit(const G4int layerId,

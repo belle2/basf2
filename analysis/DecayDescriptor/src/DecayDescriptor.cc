@@ -336,6 +336,9 @@ vector<string> DecayDescriptor::getSelectionNames()
     }
     strNames.insert(strNames.end(), strDaughterNames.begin(), strDaughterNames.end());
   }
+
+  // search for multiple occurrence of the same name and then distinguish by attaching a number
+
   for (vector<string>::iterator itName = strNames.begin(); itName != strNames.end(); ++itName) {
     if (count(itName, strNames.end(), *itName) == 1) continue;
     // multiple occurrence found!

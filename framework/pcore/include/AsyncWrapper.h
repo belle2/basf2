@@ -63,9 +63,6 @@ namespace Belle2 {
     /** The wrapped module. */
     ModulePtr m_wrappedModule;
 
-    /** process manager. */
-    ProcHandler* m_procHandler;
-
     /** shared memory buffer */
     RingBuffer* m_ringBuffer;
 

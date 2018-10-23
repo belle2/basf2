@@ -6,6 +6,7 @@
 // Date : 13 - Aug - 2010
 //-
 
+#include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/TxModule.h>
 
 #include <framework/pcore/EvtMessage.h>

@@ -57,7 +57,7 @@ ECLClusterPSDModule::ECLClusterPSDModule()
            "Hadron component energy threshold to identify as hadron digit.(GeV)", 0.003);
   addParam("CrystalHadronIntensityThreshold", m_CrystalHadronIntensityThreshold,
            "Hadron component intensity threshold to identify as hadron digit.", 0.005);
-  addParam("MVAidentifier", m_MVAidentifier, "MVA database identifier.", std::string{"DigitMVA_s3_BDT_D20XYRWEonEoffNhFT"});
+  addParam("MVAidentifier", m_MVAidentifier, "MVA database identifier.", std::string{"eclClusterPSD_MVA_s3_BDT_D20XYRWEonEoffNhFT"});
 }
 
 // destructor

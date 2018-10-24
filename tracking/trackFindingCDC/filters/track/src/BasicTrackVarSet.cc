@@ -36,22 +36,24 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   unsigned int size = track->size();
   double drift_length_sum = 0;
   double drift_length_sum_squared = 0;
-  double drift_length_variance = 0;
+  double drift_length_variance = -1;
   double drift_length_max = -1e9;
   double drift_length_min = 1e9;
   double adc_sum = 0;
   double adc_sum_squared = 0;
-  double adc_variance = 0;
+  double adc_variance = -1;
   double adc_max = -1e9;
   double adc_min = 1e9;
   double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
   double empty_s_sum = 0;
   double empty_s_sum_squared = 0;
-  double empty_s_variance = 0;
+  double empty_s_variance = -1;
   double empty_s_max = -1e9;
   double empty_s_min = 1e9;
 
   double last_perp_s = NAN;
+  double empty_s_size = size - 1; // number of empty_s gaps is number of hits -1
+  double empty_s_mean = -1;
 
   for (const CDCRecoHit3D& recoHit : *track) {
     // Drift circle information
@@ -101,7 +103,6 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   if (size > 1) {
     double driftLengthVarianceSquared = (drift_length_sum_squared - drift_length_sum * drift_length_sum / size)  / (size - 1.0) ;
     double adcVarianceSquared = (adc_sum_squared - adc_sum * adc_sum / size)  / (size - 1.0) ;
-    double emptySVarianceSquared = (empty_s_sum_squared - empty_s_sum * empty_s_sum / size)  / (size - 1.0) ;
 
     if (driftLengthVarianceSquared > 0) {
       drift_length_variance = std::sqrt(driftLengthVarianceSquared);
@@ -115,16 +116,24 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
       adc_variance = 0;
     }
 
-    if (emptySVarianceSquared > 0) {
-      empty_s_variance = std::sqrt(emptySVarianceSquared);
-    } else {
-      empty_s_variance = 0;
-    }
+    empty_s_mean = empty_s_sum / empty_s_size;
 
-  } else {
-    drift_length_variance = -1;
-    adc_variance = -1;
-    empty_s_variance = -1;
+    // Equivalent to `empty_s_size > 1`. Need at least two hit gaps (-> 3 hits) to calculate variance.
+    if (size > 2) {
+      double emptySVarianceSquared =
+        (empty_s_sum_squared - empty_s_sum * empty_s_sum / empty_s_size) / (empty_s_size - 1.0);
+
+      if (emptySVarianceSquared > 0) {
+        empty_s_variance = std::sqrt(emptySVarianceSquared);
+      } else {
+        empty_s_variance = 0;
+      }
+    }
+  } else { // only one hit or less, no hit gaps in arc length s
+    // empty_s_mean and variances have initial values of -1 and thus don't need to be set here
+    empty_s_sum = -1;
+    empty_s_max = -1;
+    empty_s_min = -1;
   }
 
   const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
@@ -152,7 +161,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   var<named("has_matching_segment")>() = track->getHasMatchingSegment();
 
-  var<named("empty_s_mean")>() = toFinite(empty_s_sum / size, 0);
+  var<named("empty_s_mean")>() = toFinite(empty_s_mean, 0);
   var<named("empty_s_sum")>() = toFinite(empty_s_sum, 0);
   var<named("empty_s_variance")>() = toFinite(empty_s_variance, 0);
   var<named("empty_s_max")>() = toFinite(empty_s_max, 0);

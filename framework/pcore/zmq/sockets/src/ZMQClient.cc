@@ -111,7 +111,10 @@ void ZMQClient::send(zmq::message_t& message) const
   m_socket->send(message);
 }
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, int timeout)
 {
   auto start = std::chrono::system_clock::now();
@@ -135,7 +138,7 @@ int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, i
         }
       }
       return return_bitmask;
-    } catch (zmq::error_t error) {
+    } catch (zmq::error_t& error) {
       if (error.num() == EINTR) {
         auto now = std::chrono::system_clock::now();
         timeout -= std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
@@ -146,6 +149,9 @@ int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, i
   }
   return 0;
 }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 template void Belle2::ZMQClient::initialize<ZMQ_PUSH>(const std::string& pubSocketAddress, const std::string& subSocketAddress,
                                                       const std::string& socketAddress, bool bind);

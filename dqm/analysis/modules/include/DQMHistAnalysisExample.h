@@ -43,8 +43,8 @@ namespace Belle2 {
 
     //! Data members
   private:
-    TF1* m_f;
-    TCanvas* m_c;
+    TF1* m_f = nullptr;
+    TCanvas* m_c = nullptr;
 
   };
 } // end namespace Belle2

@@ -48,15 +48,15 @@ namespace Belle2 {
     void terminate(void) override final;
 
     // Data member
-    RooWorkspace* w;
-    RooRealVar* x;
-    RooDataHist* data;
-    RooPlot* plot;
-    RooFitResult* r;
-    RooAbsPdf* model;
+    RooWorkspace* w = nullptr;
+    RooRealVar* x = nullptr;
+    RooDataHist* data = nullptr;
+    RooPlot* plot = nullptr;
+    RooFitResult* r = nullptr;
+    RooAbsPdf* model = nullptr;
 
 
-    TCanvas* m_c0;
+    TCanvas* m_c0 = nullptr;
 
 #ifdef _BELLE2_EPICS
     chid  mychid;

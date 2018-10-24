@@ -56,9 +56,7 @@ namespace Belle2 {
     /** Struct for extracted parameters */
     std::vector<SSNODE*> m_ssnode;
     int m_check_interval;
-    time_t m_last_check;
-
-    TH1* GetHisto(TString histoname);
+    time_t m_last_check = 0;
 
   };
 } // end namespace Belle2

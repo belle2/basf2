@@ -63,7 +63,7 @@ bool LocalDatabase::readDatabase()
   // read and parse the database content
   std::ifstream file(m_absFileName.c_str());
   if (!file.is_open()) {
-    B2ERROR("Opening of database file " << m_fileName << " failed.");
+    B2ERROR("Opening of database file " << m_fileName << " failed: " << strerror(errno));
     return false;
   }
   int lineno{0};

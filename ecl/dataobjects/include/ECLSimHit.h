@@ -128,7 +128,7 @@ namespace Belle2 {
     /** Shift the SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) { m_FlightTime += delta; }
+    void shiftInTime(float delta) override { m_FlightTime += delta; }
 
 
   private:
@@ -142,7 +142,7 @@ namespace Belle2 {
     double m_HadronEdep;      /**< Hadron Energy Deposit */
 
 
-    ClassDef(ECLSimHit, 6);/**< the class title */
+    ClassDefOverride(ECLSimHit, 6);/**< the class title */
 
   };
 } // end namespace Belle2

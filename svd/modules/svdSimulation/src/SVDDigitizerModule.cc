@@ -90,7 +90,7 @@ SVDDigitizerModule::SVDDigitizerModule() :
   addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
            bool(false));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
-           "Zero suppression cut in sigmas of strip noise", double(3.0));
+           "Zero suppression cut in sigmas of strip noise", double(5.0));
   addParam("Use3SampleFilter", m_3sampleFilter,
            "A digit must have at least 3 consecutive samples over threshold",
            bool(true));
@@ -802,7 +802,13 @@ void SVDDigitizerModule::saveDigits()
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentU);
       });
+      // Check if there is a sample over threshold
+      // This will approximately not interfere with the 3-sample filter, if used.
+      const auto rawThreshold = static_cast<SVDShaperDigit::APVRawSampleType>(charge_thresholdU);
+      auto rawMax = *(std::max_element(rawSamples.begin(), rawSamples.end()));
+      if (rawMax < rawThreshold) continue;
       // Save as a new digit
+
       int digIndex = storeShaperDigits.getEntries();
       storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
                                                  bunchXingsSinceAPVstart >> 1)));
@@ -909,6 +915,11 @@ void SVDDigitizerModule::saveDigits()
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentV);
       });
+      // Check if there is a sample over threshold
+      // This will approximately not interfere with the 3-sample filter, if used.
+      const auto rawThreshold = static_cast<SVDShaperDigit::APVRawSampleType>(charge_thresholdV);
+      auto rawMax = *(std::max_element(rawSamples.begin(), rawSamples.end()));
+      if (rawMax < rawThreshold) continue;
       // Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
       storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
@@ -921,7 +932,6 @@ void SVDDigitizerModule::saveDigits()
       if (truehits.size() > 0) {
         relShaperDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
       }
-      //      relShaperDigitDigits.add(digIndex, digit_weights.begin(), digit_weights.end());
     } // for stripSignals
   } // FOREACH sensor
 }

@@ -471,7 +471,7 @@ void CDCDedxPIDModule::event()
             nhitscombined++;
           }
         }
-      } catch (genfit::Exception) {
+      } catch (genfit::Exception&) {
         B2WARNING("Track: " << mtrack << ": genfit::MeasuredStateOnPlane exception...");
         continue;
       }

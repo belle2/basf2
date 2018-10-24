@@ -300,11 +300,6 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-    double eclClusterMergedPi0(const Particle* particle)
-    {
-      return std::numeric_limits<float>::quiet_NaN();;
-    }
-
     double eclClusterNHits(const Particle* particle)
     {
 
@@ -1074,8 +1069,6 @@ namespace Belle2 {
                       "Returns second moment.");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT,
                       "Returns lateral energy distribution (shower variable).");
-    REGISTER_VARIABLE("clusterMergedPi0", eclClusterMergedPi0,
-                      "Returns high momentum pi0 likelihood (not available yet).");
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits,
                       "Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster. for non-overlapping clusters this is equal to the number of crystals in the cluster.");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,

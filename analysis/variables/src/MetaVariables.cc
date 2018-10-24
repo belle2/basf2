@@ -781,7 +781,7 @@ endloop:
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
+          B2WARNING("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
           return nullptr;
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
@@ -1692,6 +1692,12 @@ endloop:
                       "Returns the difference in phi between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
+                      "Returns the difference in phi between the ECLClusters of two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
                       "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"

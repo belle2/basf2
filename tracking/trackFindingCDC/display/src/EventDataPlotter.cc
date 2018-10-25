@@ -770,7 +770,7 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
         }
         const genfit::MeasuredStateOnPlane& state = fittedResult->getFittedState();
         state.getPosMomCov(pos, mom, cov);
-      } catch (genfit::Exception&) {
+      } catch (const genfit::Exception&) {
         B2WARNING("Skipping state with strange pos, mom or cov");
         continue;
       }

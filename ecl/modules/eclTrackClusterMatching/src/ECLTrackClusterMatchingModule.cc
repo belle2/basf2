@@ -54,6 +54,8 @@ void ECLTrackClusterMatchingModule::initialize()
   m_trackFitResults.isRequired();
 
   if (m_angularDistanceMatching) {
+    m_tracks.registerRelationTo(m_eclShowers);
+    m_tracks.registerRelationTo(m_eclClusters);
     m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
     m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
 
@@ -157,6 +159,7 @@ void ECLTrackClusterMatchingModule::event()
           auto shower = m_eclShowers[arrayindex];
           shower->setIsTrack(true);
           if (m_angularDistanceMatching) {
+            track.addRelationTo(shower);
             track.addRelationTo(shower, 1.0, "AngularDistance");
           } else {
             track.addRelationTo(shower, 1.0, "EnterCrystal");
@@ -168,6 +171,7 @@ void ECLTrackClusterMatchingModule::event()
           if (cluster != nullptr) {
             cluster->setIsTrack(true);
             if (m_angularDistanceMatching) {
+              track.addRelationTo(cluster);
               track.addRelationTo(cluster, 1.0, "AngularDistance");
             } else {
               track.addRelationTo(cluster, 1.0, "EnterCrystal");
@@ -177,15 +181,19 @@ void ECLTrackClusterMatchingModule::event()
       } // end loop on hypothesis IDs
     }
     if (m_angularDistanceMatching) {
+      // tracks should never be matched to more than one cluster
+      if (track.getRelationsTo<ECLCluster>("", "AngularDistance").size() > 0) continue;
       // never match tracks pointing towards gaps or adjacent part of barrel using angular distance
       if (trackTowardsGap(theta)) continue;
-      ECL::DetectorRegion trackDetectorRegion = ECL::getDetectorRegion(theta);
       // for low-pt tracks matching based on the angular distance is only applied if track points towards the FWD
+      ECL::DetectorRegion trackDetectorRegion = ECL::getDetectorRegion(theta);
       if (pt < m_matchingPTThreshold && trackDetectorRegion != ECL::DetectorRegion::FWD) continue;
-      ECLCluster* cluster_best_cross = nullptr;
-      ECLCluster* cluster_best_dl = nullptr;
-      ECLCluster* cluster_best_near = nullptr;
-      double quality_best_cross = 0, quality_best_dl = 0, quality_best_near = 0;
+
+      map<int, pair<double, int>> hypothesisIdBestQualityCROSSArrayIndexMap;
+      map<int, pair<double, int>> hypothesisIdBestQualityDLArrayIndexMap;
+      map<int, pair<double, int>> hypothesisIdBestQualityNEARArrayIndexMap;
+      set<int> uniqueHypothesisIds;
+
       // Find extrapolated track hits in the ECL, considering only hit points
       // that either are on the sphere, closest to, or on radial direction of an
       // ECLCluster.
@@ -193,9 +201,8 @@ void ECLTrackClusterMatchingModule::event()
         if (!isECLHit(extHit)) continue;
         ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
         if (eclCluster != nullptr) {
-          if (eclCluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
-          int eclDetectorRegion = eclCluster->getDetectorRegion();
           // accept only cluster from region matching track direction, exception for gaps
+          int eclDetectorRegion = eclCluster->getDetectorRegion();
           if (abs(eclDetectorRegion - trackDetectorRegion) == 1) continue;
           // never match low-pt tracks with clusters in the barrel
           if (pt < m_matchingPTThreshold && eclDetectorRegion == ECL::DetectorRegion::BRL) continue;
@@ -212,47 +219,49 @@ void ECLTrackClusterMatchingModule::event()
           double deltaTheta = thetaHit - thetaCluster;
           ExtHitStatus extHitStatus = extHit.getStatus();
           double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion, extHitStatus);
+          int hypothesisId = eclCluster->getHypothesisId();
+          bool inserted = (uniqueHypothesisIds.insert(hypothesisId)).second;
+          if (inserted) {
+            hypothesisIdBestQualityCROSSArrayIndexMap.insert(make_pair(hypothesisId, make_pair(0, -1)));
+            hypothesisIdBestQualityDLArrayIndexMap.insert(make_pair(hypothesisId, make_pair(0, -1)));
+            hypothesisIdBestQualityNEARArrayIndexMap.insert(make_pair(hypothesisId, make_pair(0, -1)));
+          }
           if (extHitStatus == EXT_ECLCROSS) {
-            if (quality > quality_best_cross) {
-              quality_best_cross = quality;
-              cluster_best_cross = eclCluster;
+            if (quality > hypothesisIdBestQualityCROSSArrayIndexMap.at(hypothesisId).first) {
+              hypothesisIdBestQualityCROSSArrayIndexMap[hypothesisId] = make_pair(quality, eclCluster->getArrayIndex());
             }
           } else if (extHitStatus == EXT_ECLDL) {
-            if (quality > quality_best_dl) {
-              quality_best_dl = quality;
-              cluster_best_dl = eclCluster;
+            if (quality > hypothesisIdBestQualityDLArrayIndexMap.at(hypothesisId).first) {
+              hypothesisIdBestQualityDLArrayIndexMap[hypothesisId] = make_pair(quality, eclCluster->getArrayIndex());
             }
-          } else if (quality > quality_best_near) {
-            quality_best_near = quality;
-            cluster_best_near = eclCluster;
+          } else {
+            if (quality > hypothesisIdBestQualityNEARArrayIndexMap.at(hypothesisId).first) {
+              hypothesisIdBestQualityNEARArrayIndexMap[hypothesisId] = make_pair(quality, eclCluster->getArrayIndex());
+            }
           }
         }
       } // end loop on ExtHits related to Track
-      if (cluster_best_cross != nullptr || cluster_best_dl != nullptr || cluster_best_near != nullptr) {
-        if (m_useOptimizedMatchingConsistency) optimizedPTMatchingConsistency(theta, pt);
-        if (cluster_best_cross != nullptr && quality_best_cross > m_matchingConsistency) {
-          cluster_best_cross->setIsTrack(true);
-          track.addRelationTo(cluster_best_cross, 1.0, "AngularDistance");
-          ECLShower* shower_cross = cluster_best_cross->getRelatedFrom<ECLShower>();
-          if (shower_cross != nullptr) {
-            shower_cross->setIsTrack(true);
-            track.addRelationTo(shower_cross, 1.0, "AngularDistance");
-          }
-        } else if (cluster_best_dl != nullptr && quality_best_dl > m_matchingConsistency) {
-          cluster_best_dl->setIsTrack(true);
-          track.addRelationTo(cluster_best_dl, 1.0, "AngularDistance");
-          ECLShower* shower_dl = cluster_best_dl->getRelatedFrom<ECLShower>();
-          if (shower_dl != nullptr) {
-            shower_dl->setIsTrack(true);
-            track.addRelationTo(shower_dl, 1.0, "AngularDistance");
-          }
-        } else if (cluster_best_near != nullptr && quality_best_near > m_matchingConsistency) {
-          cluster_best_near->setIsTrack(true);
-          track.addRelationTo(cluster_best_near, 1.0, "AngularDistance");
-          ECLShower* shower_near = cluster_best_near->getRelatedFrom<ECLShower>();
-          if (shower_near != nullptr) {
-            shower_near->setIsTrack(true);
-            track.addRelationTo(shower_near, 1.0, "AngularDistance");
+
+      vector<map<int, pair<double, int>>> hypothesisIdBestQualityArrayIndexMaps;
+      hypothesisIdBestQualityArrayIndexMaps.push_back(hypothesisIdBestQualityCROSSArrayIndexMap);
+      hypothesisIdBestQualityArrayIndexMaps.push_back(hypothesisIdBestQualityDLArrayIndexMap);
+      hypothesisIdBestQualityArrayIndexMaps.push_back(hypothesisIdBestQualityNEARArrayIndexMap);
+      if (m_useOptimizedMatchingConsistency) optimizedPTMatchingConsistency(theta, pt);
+      for (const auto& uniqueHypothesisId : uniqueHypothesisIds) {
+        for (const auto& hypothesisIdBestQualityArrayIndexMap : hypothesisIdBestQualityArrayIndexMaps) {
+          if (hypothesisIdBestQualityArrayIndexMap.at(uniqueHypothesisId).first > m_matchingConsistency
+              && hypothesisIdBestQualityArrayIndexMap.at(uniqueHypothesisId).second > -1) {
+            auto cluster = m_eclClusters[hypothesisIdBestQualityArrayIndexMap.at(uniqueHypothesisId).second];
+            cluster->setIsTrack(true);
+            track.addRelationTo(cluster);
+            track.addRelationTo(cluster, 1.0, "AngularDistance");
+            ECLShower* shower = cluster->getRelatedFrom<ECLShower>();
+            if (shower != nullptr) {
+              shower->setIsTrack(true);
+              track.addRelationTo(shower);
+              track.addRelationTo(shower, 1.0, "AngularDistance");
+            }
+            break;
           }
         }
       }

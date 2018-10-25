@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Michael Eliachevitch                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,10 +20,21 @@
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
+// use BOOST for  accumulators
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/count.hpp>
+#include <boost/accumulators/statistics/min.hpp>
+#include <boost/accumulators/statistics/max.hpp>
+#include <boost/accumulators/statistics/sum.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
+
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace bacc = boost::accumulators;
 
 bool BasicTrackVarSet::extract(const CDCTrack* track)
 {
@@ -33,107 +44,66 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
     return false;
   }
 
-  unsigned int size = track->size();
-  double drift_length_sum = 0;
-  double drift_length_sum_squared = 0;
-  double drift_length_variance = -1;
-  double drift_length_max = -1e9;
-  double drift_length_min = 1e9;
-  double adc_sum = 0;
-  double adc_sum_squared = 0;
-  double adc_variance = -1;
-  double adc_max = -1e9;
-  double adc_min = 1e9;
   double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
-  double empty_s_sum = 0;
-  double empty_s_sum_squared = 0;
-  double empty_s_variance = -1;
-  double empty_s_max = -1e9;
-  double empty_s_min = 1e9;
-
   double last_perp_s = NAN;
-  double empty_s_size = size - 1; // number of empty_s gaps is number of hits -1
-  double empty_s_mean = -1;
+
+  // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
+  // data that they accumulate (i.e. are "filled" with).
+  // TODO Maybe wrap the accumulators code in an interface and put them in some utilityfile
+  using features_set = bacc::features<bacc::tag::count,
+        bacc::tag::sum,
+        bacc::tag::min,
+        bacc::tag::max,
+        bacc::tag::mean,
+        bacc::tag::lazy_variance>;
+  using feature_accumulator = bacc::accumulator_set<double, features_set>;
+
+  feature_accumulator drift_length_acc;
+  feature_accumulator adc_acc;
+  feature_accumulator empty_s_acc;
 
   for (const CDCRecoHit3D& recoHit : *track) {
     // Drift circle information
     double driftLength = recoHit.getWireHit().getRefDriftLength();
-    drift_length_sum += driftLength;
-    drift_length_sum_squared += driftLength * driftLength;
-
-    if (driftLength < drift_length_min) {
-      drift_length_min = driftLength;
-    }
-
-    if (driftLength > drift_length_max) {
-      drift_length_max = driftLength;
-    }
+    drift_length_acc(driftLength);
 
     // ADC information
     double adc = static_cast<double>(recoHit.getWireHit().getHit()->getADCCount());
-    adc_sum += adc;
-    adc_sum_squared += adc * adc;
-
-    if (adc < adc_min) {
-      adc_min = adc;
-    }
-
-    if (adc > adc_max) {
-      adc_max = adc;
-    }
+    adc_acc(adc);
 
     // perpS Information
     double currentPerpS = recoHit.getArcLength2D();
     if (not std::isnan(last_perp_s)) {
       double perp_s_difference = currentPerpS - last_perp_s;
-      empty_s_sum += perp_s_difference;
-      empty_s_sum_squared += perp_s_difference * perp_s_difference;
-
-      if (perp_s_difference < empty_s_min) {
-        empty_s_min = perp_s_difference;
-      }
-
-      if (perp_s_difference > empty_s_max) {
-        empty_s_max = perp_s_difference;
-      }
+      empty_s_acc(perp_s_difference);
     }
     last_perp_s = currentPerpS;
   }
 
+  // if track has insufficient hits (size) for some variables to be computable, set them to -1
+  // variance calculations and empty_s (hit gaps) information need at least 2 hits (1 hit gap)
+  unsigned int size = track->size();
+  unsigned int empty_s_size = bacc::count(empty_s_acc); // == size - 1
+
+  double drift_length_variance = -1;
+  double adc_variance = -1;
+  double empty_s_variance = -1;
+  double empty_s_sum = -1;
+  double empty_s_min = -1;
+  double empty_s_max = -1;
+  double empty_s_mean = -1;
+
   if (size > 1) {
-    double driftLengthVarianceSquared = (drift_length_sum_squared - drift_length_sum * drift_length_sum / size)  / (size - 1.0) ;
-    double adcVarianceSquared = (adc_sum_squared - adc_sum * adc_sum / size)  / (size - 1.0) ;
-
-    if (driftLengthVarianceSquared > 0) {
-      drift_length_variance = std::sqrt(driftLengthVarianceSquared);
-    } else {
-      drift_length_variance = 0;
+    drift_length_variance = std::sqrt(bacc::lazy_variance(drift_length_acc) * size / (size - 1));
+    adc_variance = std::sqrt(bacc::lazy_variance(adc_acc) * size / (size - 1));
+    empty_s_sum = bacc::sum(empty_s_acc);
+    empty_s_min = bacc::min(empty_s_acc);
+    empty_s_max = bacc::max(empty_s_acc);
+    empty_s_mean = bacc::mean(empty_s_acc);
+    if (size > 2) { // equivalent to empty_s_size > 1
+      empty_s_variance =
+        std::sqrt(bacc::lazy_variance(empty_s_acc) * empty_s_size / (empty_s_size - 1));
     }
-
-    if (adcVarianceSquared > 0) {
-      adc_variance = std::sqrt(adcVarianceSquared);
-    } else {
-      adc_variance = 0;
-    }
-
-    empty_s_mean = empty_s_sum / empty_s_size;
-
-    // Equivalent to `empty_s_size > 1`. Need at least two hit gaps (-> 3 hits) to calculate variance.
-    if (size > 2) {
-      double emptySVarianceSquared =
-        (empty_s_sum_squared - empty_s_sum * empty_s_sum / empty_s_size) / (empty_s_size - 1.0);
-
-      if (emptySVarianceSquared > 0) {
-        empty_s_variance = std::sqrt(emptySVarianceSquared);
-      } else {
-        empty_s_variance = 0;
-      }
-    }
-  } else { // only one hit or less, no hit gaps in arc length s
-    // empty_s_mean and variances have initial values of -1 and thus don't need to be set here
-    empty_s_sum = -1;
-    empty_s_max = -1;
-    empty_s_min = -1;
   }
 
   const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
@@ -147,17 +117,17 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   //var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
-  var<named("drift_length_mean")>() = toFinite(drift_length_sum / size, 0);
+  var<named("drift_length_mean")>() = toFinite(bacc::mean(drift_length_acc), 0);
   var<named("drift_length_variance")>() = toFinite(drift_length_variance, 0);
-  var<named("drift_length_max")>() = toFinite(drift_length_max, 0);
-  var<named("drift_length_min")>() = toFinite(drift_length_min, 0);
-  var<named("drift_length_sum")>() = toFinite(drift_length_sum, 0);
+  var<named("drift_length_max")>() = toFinite(bacc::max(drift_length_acc), 0);
+  var<named("drift_length_min")>() = toFinite(bacc::min(drift_length_acc), 0);
+  var<named("drift_length_sum")>() = toFinite(bacc::sum(drift_length_acc), 0);
 
-  var<named("adc_mean")>() = toFinite(adc_sum / size, 0);
+  var<named("adc_mean")>() = toFinite(bacc::mean(adc_acc), 0);
   var<named("adc_variance")>() = toFinite(adc_variance, 0);
-  var<named("adc_max")>() = toFinite(adc_max, 0);
-  var<named("adc_min")>() = toFinite(adc_min, 0);
-  var<named("adc_sum")>() = toFinite(adc_sum, 0);
+  var<named("adc_max")>() = toFinite(bacc::max(adc_acc), 0);
+  var<named("adc_min")>() = toFinite(bacc::min(adc_acc), 0);
+  var<named("adc_sum")>() = toFinite(bacc::sum(adc_acc), 0);
 
   var<named("has_matching_segment")>() = track->getHasMatchingSegment();
 

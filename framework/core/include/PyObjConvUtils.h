@@ -443,7 +443,6 @@ namespace Belle2 {
      * Reads a scalar type (int, double, string, bool) from a python object.
      *
      * @param pyObject Python object which stores the scalar type.
-     * @param dummy allows the compiler to infer the correct template.
      * @return Scalar type, which holds the value from the python object
      */
     template<typename Scalar>
@@ -467,7 +466,6 @@ namespace Belle2 {
      * If the python object isn't a list, a std::vector with the given object as single entry is returned.
      *
      * @param pyObject Python object which stores the vector.
-     * @param dummy allows the compiler to infer the correct template.
      * @return Vector, which holds the vector from the python object
      */
     template<typename Value>
@@ -493,7 +491,6 @@ namespace Belle2 {
      * Reads std::map from a python object.
      *
      * @param pyObject Python object which stores the map.
-     * @param dummy allows the compiler to infer the correct template.
      * @return Map, which holds the map from the python object
      */
     template<typename Key, typename Value>
@@ -547,7 +544,6 @@ namespace Belle2 {
      * Reads std::tuple from a python object.
      *
      * @param pyObject Python object which stores the map.
-     * @param dummy allows the compiler to infer the correct template.
      * @return std::tuple<Types...>, which holds the map from the python object
      */
     template<typename... Types>
@@ -596,7 +592,6 @@ namespace Belle2 {
      * Reads boost::variant from a python object.
      *
      * @param pyObject Python object which stores the value.
-     * @param dummy allows the compiler to infer the correct template.
      * @return boost::variant<Types...>, which holds the value from the python object
      */
     template<typename... Types>

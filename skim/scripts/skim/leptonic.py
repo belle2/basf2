@@ -20,19 +20,23 @@ def LeptonicList():
         "Phillip Urquijo"
     ]
 
-    """(Semi-)Leptonic Working Group Skim list building functions for leptonic analyses.
-    To be used initially for B leptonic decays (B to l v) (l=electron, muon)
-    Skim code: 11130300
+    """
+    Note:
+        * (Semi-)Leptonic Working Group Skim list building functions for leptonic analyses.
+        * To be used initially for B leptonic decays (B to l v) (l=electron, muon)
+        * Skim code: 11130300
 
-    Modes Reconstructed:
-    *B- -> e-
-    *B- -> mu-
+    **Decay Modes**:
 
-    Cuts applied:
-    *lepton momentum in CMS Frame > 2 GeV
-    *electronID > 0.5
-    *muonID > 0.5
-    *nTracks > 4
+    * B- -> e-
+    * B- -> mu-
+
+    **Cuts applied**:
+
+    * lepton momentum in CMS Frame > 2 GeV
+    * electronID > 0.5
+    * muonID > 0.5
+    * nTracks > 4
     """
 
     cutAndCopyList('e-:highP', 'e-:all', 'useCMSFrame(p) > 2.0 and electronID > 0.5', True)

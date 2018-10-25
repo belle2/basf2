@@ -21,11 +21,15 @@ from stdCharged import *
 
 
 def B0hadronic():
-    """FEI Hadronic B0 tag skim list for generic analysis in the
-    (Semi-)Leptonic and Missing Energy Working Group
-    Skim LFN code: 11180100
-    Physics channels: (All available FEI B0 Hadronic tags are
-    reconstructed)
+    """
+    Note:
+        * FEI Hadronic B0 tag skim list
+        * For generic analysis in the (Semi-)Leptonic and Missing Energy Working Group
+        * Skim LFN code: 11180100
+        * Physics channels: (All available FEI B0 Hadronic tags are reconstructed)
+
+    **Decay Modes**:
+
     * B0 -> D- pi+
     * B0 -> D- pi+ pi0
     * B0 -> D- pi+ pi0 pi0
@@ -60,16 +64,19 @@ def B0hadronic():
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are**:
+
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks > 4
+
+        * R2EventLevel < 0.4
+        * nTracks > 4
 
         Tag side B:
-        Mbc > 5.24
-        abs(deltaE) < 0.200
-        sigProb > 0.001
-"""
+
+        * Mbc > 5.24
+        * abs(deltaE) < 0.200
+        * sigProb > 0.001
+    """
     # Reconstruct tag side
     # Apply cuts
     applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
@@ -79,55 +86,60 @@ def B0hadronic():
 
 
 def BplusHadronic():
-    """FEI Hadronic B+ tag skim list for generic analysis in the
-    (Semi-)Leptonic and Missing Energy Working Group
-    Skim LFN code: 11180200
-    Physics channels: (All available FEI B+ Hadronic tags are
-    reconstructed)
-    *B+ -> anti-D0 pi+
-    *B+ -> anti-D0 pi+ pi0
-    *B+ -> anti-D0 pi+ pi0 pi0
-    *B+ -> anti-D0 pi+ pi+ pi-
-    *B+ -> anti-D0 pi+ pi+ pi- pi0
-    *B+ -> anti-D0 D+
-    *B+ -> anti-D0 D+ KS0
-    *B+ -> anti-D0* D+ KS0
-    *B+ -> anti-D0 D+* KS0
-    *B+ -> anti-D0* D+* KS0
-    *B+ -> anti-D0 D0 K+
-    *B+ -> anti-D0* D0 K+
-    *B+ -> anti-D0 D*(2010)0 K+
-    *B+ -> anti-D0* D*(2010)0 K+
-    *B+ -> Ds+ anti-D0
-    *B+ -> anti-D0* pi+
-    *B+ -> anti-D0* pi+ pi0
-    *B+ -> anti-D0* pi+ pi0 pi0
-    *B+ -> anti-D0* pi+ pi+ pi-
-    *B+ -> anti-D0* pi+ pi+ pi- pi0
-    *B+ -> Ds+* anti-D0
-    *B+ -> Ds+ anti-D0*
-    *B+ -> anti-D0 K+
-    *B+ -> D- pi+ pi+
-    *B+ -> D- pi+ pi+ pi0
-    *B+ -> J/Psi K+
-    *B+ -> J/Psi K+ pi+ pi-
-    *B+ -> J/Psi K+ pi0
-    *B+ -> J/Psi KS0 pi+
+    """
+    Note:
+        * FEI Hadronic B+ tag skim list
+        * For generic analysis in the (Semi-)Leptonic and Missing Energy Working Group
+        * Skim LFN code: 11180200
+        * Physics channels: (All available FEI B+ Hadronic tags are reconstructed)
+
+    **Decay Modes**:
+
+        * B+ -> anti-D0 pi+
+        * B+ -> anti-D0 pi+ pi0
+        * B+ -> anti-D0 pi+ pi0 pi0
+        * B+ -> anti-D0 pi+ pi+ pi-
+        * B+ -> anti-D0 pi+ pi+ pi- pi0
+        * B+ -> anti-D0 D+
+        * B+ -> anti-D0 D+ KS0
+        * B+ -> anti-D0* D+ KS0
+        * B+ -> anti-D0 D+* KS0
+        * B+ -> anti-D0* D+* KS0
+        * B+ -> anti-D0 D0 K+
+        * B+ -> anti-D0* D0 K+
+        * B+ -> anti-D0 D*(2010)0 K+
+        * B+ -> anti-D0* D*(2010)0 K+
+        * B+ -> Ds+ anti-D0
+        * B+ -> anti-D0* pi+
+        * B+ -> anti-D0* pi+ pi0
+        * B+ -> anti-D0* pi+ pi0 pi0
+        * B+ -> anti-D0* pi+ pi+ pi-
+        * B+ -> anti-D0* pi+ pi+ pi- pi0
+        * B+ -> Ds+* anti-D0
+        * B+ -> Ds+ anti-D0*
+        * B+ -> anti-D0 K+
+        * B+ -> D- pi+ pi+
+        * B+ -> D- pi+ pi+ pi0
+        * B+ -> J/Psi K+
+        * B+ -> J/Psi K+ pi+ pi-
+        * B+ -> J/Psi K+ pi0
+        * B+ -> J/Psi KS0 pi+
 
     Skimming script reconstructs hadronic Btag using generically trained
     FEI.
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are:
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks > 4
+        * R2EventLevel < 0.4
+        * nTracks > 4
 
         Tag side B:
-        Mbc > 5.24
-        abs(deltaE) < 0.200
-        sigProb > 0.001"""
+        * Mbc > 5.24
+        * abs(deltaE) < 0.200
+        * sigProb > 0.001
+    """
     # Reconstruct tag side
     # Apply cuts
     applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
@@ -137,21 +149,24 @@ def BplusHadronic():
 
 
 def B0SLWithOneLep():
-    """FEI Semi-Leptonic B0 tag (with Bsig with at least one lepton) skim list
-    FEI semi-leptonic (SL) B0 tag with one lepton
-    skim list for generic analysis in the (Semi-)Leptonic and
-    Missing Energy Working Group
-    Skim LFN code: 11180300
-    Physics channels: (All available FEI B0 SL tags are reconstructed)
+    """
+    Note:
+        * FEI semi-leptonic (SL) B0 tag (Bsig with at least one lepton) skim list
+        * For generic analysis in the (Semi-)Leptonic and Missing Energy Working Group.
+        * Skim LFN code: 11180300
+        * Physics channels: (All available FEI B0 SL tags are reconstructed)
 
-    *B0 -> D- e+ nu
-    *B0 -> D- mu+ nu
-    *B0 -> D+* e+ nu
-    *B0 -> D+* mu+ nu
-    *B0 -> anti-D0 pi- e+ nu
-    *B0 -> anti-D0 pi- mu+ nu
-    *B0 -> anti-D0* pi- e+ nu
-    *B0 -> anti-D0* pi- mu+ nu
+    **Decay Modes**:
+
+    * B0 -> D- e+ nu
+    * B0 -> D- mu+ nu
+    * B0 -> D+* e+ nu
+    * B0 -> D+* mu+ nu
+    * B0 -> anti-D0 pi- e+ nu
+    * B0 -> anti-D0 pi- mu+ nu
+    * B0 -> anti-D0* pi- e+ nu
+    * B0 -> anti-D0* pi- mu+ nu
+
     In addition, all hadronic channels (listed in FEI hadronic skim are
     used, where one of the hadronic D mesons is replaced by a SL D meson.
 
@@ -161,19 +176,22 @@ def B0SLWithOneLep():
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are**:
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks > 4
+
+        * R2EventLevel < 0.4
+        * nTracks > 4
 
         Tag side B:
-        -5 < cosThetaBetweenParticleAndNominalB < 3
-        extraInfo(decayModeID) < 8 to remove semileptonic D channels
-        sigProb > 0.005 to give < 10% retention
+
+        * -5 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
+        * sigProb > 0.005 to give < 10% retention
 
         Signal side:
-        electron or muon from list 95eff
-        B Mbc > 0
+
+        * electron or muon from list 95eff
+        * B Mbc > 0
 """
     # Reconstruct tag side
     # Apply cuts
@@ -198,21 +216,24 @@ def B0SLWithOneLep():
 
 
 def BplusSLWithOneLep():
-    """ FEI semi-leptonic (SL) Bplus tag with one lepton skim
-    list for generic analysis in the (Semi-)Leptonic and
-    Missing Energy Working Group
+    """
+    Note:
+        * FEI semi-leptonic B+ tag with one lepton skim list
+        * For generic analysis in the (Semi-)Leptonic and Missing Energy Working Group
+        * Skim LFN code: 11180400
+        * Physics channels: (All available FEI Bplus SL tags are reconstructed)
 
-    Skim LFN code: 11180400
-    Physics channels: (All available FEI Bplus SL tags are reconstructed)
+    **Decay Modes**:
 
-    *B+ -> anti-D0 e+ nu
-    *B+ -> anti-D0 mu+ nu
-    *B+ -> anti-D0* e+ nu
-    *B+ -> anti-D0* mu+ nu
-    *B+ -> D- pi+ e+ nu
-    *B+ -> D- pi+ mu+ nu
-    *B+ -> D+* pi+ e+ nu
-    *B+ -> D+* pi+ mu+ nu
+    * B+ -> anti-D0 e+ nu
+    * B+ -> anti-D0 mu+ nu
+    * B+ -> anti-D0* e+ nu
+    * B+ -> anti-D0* mu+ nu
+    * B+ -> D- pi+ e+ nu
+    * B+ -> D- pi+ mu+ nu
+    * B+ -> D+* pi+ e+ nu
+    * B+ -> D+* pi+ mu+ nu
+
     In addition, all hadronic channels (listed in FEI
     Bplus hadronic skim are used, where one of the hadronic
     D mesons is replaced by a SL D meson.
@@ -223,19 +244,22 @@ def BplusSLWithOneLep():
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
-    Event precuts:
-    R2EventLevel < 0.4
-    nTracks > 4
+    **Cuts applied are**:
 
-    Tag side B:
-    -5 < cosThetaBetweenParticleAndNominalB < 3
-    extraInfo(decayModeID) < 8 to remove semileptonic D channels
-    sigProb > 0.009 to give < 10% retention
+        Event precuts:
 
-    Signal side:
-    electron or muon from list 95eff
-    B Mbc > 0
+        * R2EventLevel < 0.4
+        * nTracks > 4
+
+        Tag side B:
+
+        * -5 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
+        * sigProb > 0.009 to give < 10% retention
+
+        Signal side:
+        * electron or muon from list 95eff
+        * B Mbc > 0
     """
 
     # Reconstruct tag side

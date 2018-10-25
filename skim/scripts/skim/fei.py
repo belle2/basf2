@@ -130,12 +130,15 @@ def BplusHadronic():
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    **Cuts applied are:
+    **Cuts applied are**:
+
         Event precuts:
+
         * R2EventLevel < 0.4
         * nTracks > 4
 
         Tag side B:
+
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
@@ -177,6 +180,7 @@ def B0SLWithOneLep():
     Skim Liasons: S. Hollitt & H. Wakeling
 
     **Cuts applied are**:
+
         Event precuts:
 
         * R2EventLevel < 0.4

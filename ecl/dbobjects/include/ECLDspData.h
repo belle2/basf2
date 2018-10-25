@@ -18,9 +18,6 @@ namespace Belle2 {
    * For detailed overview of ECLDSP file structure see Confluence,
    * https://confluence.desy.de/display/BI/ECL+Technical+Notes
    * Attached file ECL-TN-2013-02 (digi.pdf)
-   *
-   * Note: Some things in that PDF are outdated, please verify with
-   * Alexander Kuzmin or Vladimir Zhulanov
    */
   class ECLDspData: public TObject {
   private:

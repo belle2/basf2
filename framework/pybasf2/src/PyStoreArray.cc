@@ -84,28 +84,34 @@ bool PyStoreArray::isOptional(const std::string& name)
 
 bool PyStoreArray::registerRelationTo(const PyStoreArray& toArray,
                                       DataStore::EDurability durability,
-                                      DataStore::EStoreFlags storeFlags) const
+                                      DataStore::EStoreFlags storeFlags,
+                                      std::string const& namedRelation) const
 {
   return DataStore::Instance().registerRelation(this->m_storeAccessor,
                                                 toArray.m_storeAccessor,
                                                 durability,
-                                                storeFlags);
+                                                storeFlags,
+                                                namedRelation);
 }
 
 bool PyStoreArray::requireRelationTo(const PyStoreArray& toArray,
-                                     DataStore::EDurability durability) const
+                                     DataStore::EDurability durability,
+                                     std::string const& namedRelation) const
 {
   return DataStore::Instance().requireRelation(this->m_storeAccessor,
                                                toArray.m_storeAccessor,
-                                               durability);
+                                               durability,
+                                               namedRelation);
 }
 
 bool PyStoreArray::optionalRelationTo(const PyStoreArray& toArray,
-                                      DataStore::EDurability durability) const
+                                      DataStore::EDurability durability,
+                                      std::string const& namedRelation) const
 {
   return DataStore::Instance().requireRelation(this->m_storeAccessor,
                                                toArray.m_storeAccessor,
-                                               durability);
+                                               durability,
+                                               namedRelation);
 }
 
 bool PyStoreArray::hasValidClass() const

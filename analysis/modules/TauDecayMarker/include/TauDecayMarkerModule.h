@@ -42,10 +42,10 @@ namespace Belle2 {
     TauDecayMarkerModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   private:
 

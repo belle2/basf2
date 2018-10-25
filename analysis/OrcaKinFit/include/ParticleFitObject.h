@@ -91,7 +91,7 @@ namespace Belle2 {
 
       /// Assign from anther object, if of same type
       virtual ParticleFitObject& assign(const BaseFitObject& source    ///< The source object
-                                       );
+                                       ) override;
 
       /// Set mass of particle; return=success
       virtual bool setMass(double mass_);
@@ -135,7 +135,7 @@ namespace Belle2 {
       virtual double getDE(int ilocal                ///< Local parameter number
                           ) const = 0;
 
-      virtual void getDerivatives(double der[], int idim) const;
+      virtual void getDerivatives(double der[], int idim) const override;
 
       /// Add  numerically determined derivatives of chi squared to global covariance matrix
       virtual void addToGlobalChi2DerMatrixNum(double* M,    ///< Global covariance matrix
@@ -151,7 +151,7 @@ namespace Belle2 {
 
       /// print object to ostream
       virtual std::ostream& print(std::ostream& os     ///< The output stream
-                                 ) const;
+                                 ) const override;
 
       void test1stDerivatives();
       void test2ndDerivatives();
@@ -168,7 +168,7 @@ namespace Belle2 {
                               double eps2  ///< variation of 2nd local parameter
                              );
 
-      virtual double getChi2() const;
+      virtual double getChi2() const override;
 
     protected:
       /// mass of particle

@@ -49,7 +49,7 @@ namespace Belle2 {
 
     protected:
       /// Run algo on data
-      EResult calibrate();
+      EResult calibrate() override;
       ///create histo for each channel
       void createHisto();
       /// write outut or store db

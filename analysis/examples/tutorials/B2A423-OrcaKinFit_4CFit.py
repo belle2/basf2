@@ -3,7 +3,7 @@
 
 ###################################################################
 # This tutorial demonstrates how to perform four momentum constraint
-# fit with the KFit. In this example the following decay chain:
+# fit with the OrcaKinFit. In this example the following decay chain:
 #
 # Upsilon(4S) -> eta               Upsilon
 #                 |                  |
@@ -13,7 +13,7 @@
 # all final states, and the total four momentum is set at that of cms
 #
 # Contributors: Yu Hu (March 2017)
-# huyu@ihep.ac.cn
+# yu.hu@desy.de
 #
 ####################################################################
 
@@ -28,8 +28,10 @@ from stdPhotons import *
 import sys
 from beamparameters import add_beamparameters
 
+beamparameters = add_beamparameters(analysis_main, "Y4S")
+
 # load input ROOT file
-inputMdst('default', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
+inputMdst('MC9', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
 
 # Creates a list of good photon and mu
 stdPhotons('loose')
@@ -48,7 +50,7 @@ reconstructDecay("Upsilon(4S):4c -> eta:gg Upsilon:uu", "")
 # Perform four momentum constraint fit using OrcaKinFit
 fitKinematic4C("Upsilon(4S):4c")
 
-# Associates the MC truth to the reconstructed D0
+# Associates the MC truth to the reconstructed Upsilon(4S)
 matchMCTruth('Upsilon(4S)')
 matchMCTruth('Upsilon(4S):4c')
 

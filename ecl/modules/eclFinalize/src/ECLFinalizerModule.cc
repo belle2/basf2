@@ -158,21 +158,24 @@ void ECLFinalizerModule::event()
         eclCluster->addRelationTo(calDigit, weight);
       }
 
-    } else { // Count number of showers that aren't converted into clusters
+    } else { // Count number of c_nPhotons showers that aren't converted into clusters for monitoring
 
       // Get detector region
-      const auto detectorRegion = eclShower.getDetectorRegion();
+      if (eclShower.getHypothesisId() == Belle2::ECLCluster::c_nPhotons) {
 
-      B2DEBUG(39, "ECLFinalizerModule::event: Rejected shower with energy " << showerEnergy << ", time = " << showerTime << ", theta = "
-              << eclShower.getTheta()
-              << ", region " << detectorRegion);
-      // Increment counters
-      if (detectorRegion == static_cast<int>(ECL::DetectorRegion::FWD)) {
-        ++rejectedShowersFwd;
-      } else if (detectorRegion == ECL::DetectorRegion::BRL) {
-        ++rejectedShowersBrl;
-      } else if (detectorRegion == ECL::DetectorRegion::BWD) {
-        ++rejectedShowersBwd;
+        const auto detectorRegion = eclShower.getDetectorRegion();
+
+        B2DEBUG(39, "ECLFinalizerModule::event: Rejected shower with energy " << showerEnergy << ", time = " << showerTime << ", theta = "
+                << eclShower.getTheta()
+                << ", region " << detectorRegion);
+        // Increment counters
+        if (detectorRegion == static_cast<int>(ECL::DetectorRegion::FWD)) {
+          ++rejectedShowersFwd;
+        } else if (detectorRegion == ECL::DetectorRegion::BRL) {
+          ++rejectedShowersBrl;
+        } else if (detectorRegion == ECL::DetectorRegion::BWD) {
+          ++rejectedShowersBwd;
+        }
       }
     }
   }

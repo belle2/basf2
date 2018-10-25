@@ -31,12 +31,12 @@ namespace Belle2 {
     virtual ~TxModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     /** Whether to block until we can insert data into the ring buffer in event().
      *

@@ -31,13 +31,13 @@ namespace Belle2 {
       virtual ~CosmicRayHLTDQMModule();
 
       //! Module functions to be called from main process
-      virtual void initialize();
+      virtual void initialize() override;
 
       //! Module functions to be called from event process
-      virtual void event();
+      virtual void event() override;
 
       //! Histogram definition
-      virtual void defineHisto();
+      virtual void defineHisto() override;
 
 
     private:

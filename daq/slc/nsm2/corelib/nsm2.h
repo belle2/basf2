@@ -11,7 +11,7 @@ extern "C" {
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1944 /* protocol version */
-#define NSM_PACKAGE_VERSION  1958 /* package  version */
+#define NSM_PACKAGE_VERSION  1974 /* package  version */
 
 /*
   20120723 1900 file created
@@ -60,17 +60,22 @@ extern "C" {
   20150808 1945 updates for PNNL summer school tutorial
   20160420 1946 suppress debug output of nsmd2 and b2lib
   20170613 1947 nsmd2 update for USRCPYMEM protection
-  20170927 1948 nsmd2 touchsys pos fix, log cleanup for send/recv
-  20170929 1949 nsmd2 ackdaemon fix
-  20170102 1950 nsmd2 ackdaemon more fix
-  20171002 1951 nsmd2 destroyconn/ackdaemon fix
-  20171002 1952 nsmd2 recv buffer to global
-  20180111 1953 debug orphan node
-  20180118 1954 nsmlib fix on select timeout, conid fix, message cleanup
-  20180118 1955 put more priority to less frequent messages
-  20180120 1956 b2nsm_wait to accept usec precision time
-  20180121 1957 b2nsm_nodename added
-  20180124 1958 smarter nsmd2 debug messages
+  20180326 1959 based on 1947, just change the handling of -o option
+  20180327 1960 delconn/touchsys fix, better log, nsminfo2 hostname
+  20180328 1961 limit syscpymem.pos in uint16 range
+  20180329 1962 nsmlib.h fix for nsmlib_parsefile type
+  20180404 1963 nsminfo2 no hostname resolving by default
+  20180412 1964 one more nsminfo2 update on hostname cache
+  20180417 1965 suppress "bad" in usrcpymem if not ready
+  20180423 1966 destroyconn when write error at tcpwriteq
+  20180430 1967 src/dest at command and lastmsg at delconn for debug
+  20180502 1968 fix nsmd_dbg of 1967 printing all DBG messages
+  20180504 1969 b2nsm_nodename restored from 1957
+  20180515 1970 int16_t fix for owner in usrcpymem
+  20180519 1971 tcprecv static buffer shift upon delcon
+  20180521 1972 further debug of 1971
+  20180523 1973 nsminfo2 usage print
+  20180709 1974 nsmlib memory leak fix, etc, nsmd2 is rolled back to 1970
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

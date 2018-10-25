@@ -40,7 +40,7 @@ bool NSMDataStore::open(unsigned short max)
   return true;
 }
 
-void NSMDataStore::init() throw()
+void NSMDataStore::init()
 {
   if (m_header == NULL) return;
   int max = m_header->maxentries;
@@ -127,7 +127,7 @@ NSMDataStore::Entry* NSMDataStore::get(unsigned int addr,
   return NULL;
 }
 
-void NSMDataStore::unlink() throw()
+void NSMDataStore::unlink()
 {
   const unsigned int n = m_header->nentries;
   for (unsigned int i = 0; i < n; i++) {

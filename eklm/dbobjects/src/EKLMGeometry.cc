@@ -948,7 +948,6 @@ EKLMGeometry::EKLMGeometry()
   m_NPlanes = 0;
   m_NSegments = 0;
   m_NSegmentSupportElementsSector = 0;
-  m_NStripsSegment = 0;
   m_NStrips = 0;
   m_SolenoidZ = 0;
   m_LayerShiftZ = 0;
@@ -981,7 +980,6 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_NPlanes = geometry.getNPlanes();
   m_NSegments = geometry.getNSegments();
   m_NSegmentSupportElementsSector = geometry.getNSegmentSupportElementsSector();
-  m_NStripsSegment = geometry.getNStripsSegment();
   m_NStrips = geometry.getNStrips();
   m_SolenoidZ = geometry.getSolenoidZ();
   m_LayerShiftZ = geometry.getLayerShiftZ();
@@ -1025,7 +1023,6 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   m_NPlanes = geometry.getNPlanes();
   m_NSegments = geometry.getNSegments();
   m_NSegmentSupportElementsSector = geometry.getNSegmentSupportElementsSector();
-  m_NStripsSegment = geometry.getNStripsSegment();
   m_NStrips = geometry.getNStrips();
   m_SolenoidZ = geometry.getSolenoidZ();
   m_EndcapStructureGeometry = *geometry.getEndcapStructureGeometry();
@@ -1094,11 +1091,6 @@ int EKLMGeometry::getNSegments() const
 int EKLMGeometry::getNSegmentSupportElementsSector() const
 {
   return m_NSegmentSupportElementsSector;
-}
-
-int EKLMGeometry::getNStripsSegment() const
-{
-  return m_NStripsSegment;
 }
 
 int EKLMGeometry::getNStrips() const

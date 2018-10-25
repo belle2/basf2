@@ -36,7 +36,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EKLMSensitiveDetector(G4String name);
+      explicit EKLMSensitiveDetector(G4String name);
 
       /**
        * Destructor.
@@ -47,7 +47,7 @@ namespace Belle2 {
        * Process each step and calculate variables for EKLMSimHit
        * store EKLMSimHit.
        */
-      bool step(G4Step* aStep, G4TouchableHistory* history);
+      bool step(G4Step* aStep, G4TouchableHistory* history) override;
 
     private:
 

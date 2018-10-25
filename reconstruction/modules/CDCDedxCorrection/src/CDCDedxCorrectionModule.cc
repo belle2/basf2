@@ -119,21 +119,27 @@ void CDCDedxCorrectionModule::event()
                             i) * dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i);
       double newhitdedx = (m_relative) ? dedxTrack.getADCCount(i) * std::sqrt(1 - costh * costh) / dedxTrack.getPath(i) / correction :
                           dedxTrack.getADCCount(i) * std::sqrt(1 - costh * costh) / dedxTrack.getPath(i);
-      StandardCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDoca(i), dedxTrack.getEnta(i),
+
+      double normDocaRS = dedxTrack.getDocaRS(i) / dedxTrack.getCellHalfWidth(i);
+      StandardCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), normDocaRS, dedxTrack.getEntaRS(i),
                          costh, newhitdedx);
       dedxTrack.setDedx(i, newhitdedx);
 
-      if (m_relative) correction *= GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDoca(i),
-                                                    dedxTrack.getEnta(i), costh);
-      else correction = GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDoca(i), dedxTrack.getEnta(i), costh);
+      if (m_relative) correction *= GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), normDocaRS,
+                                                    dedxTrack.getEntaRS(i), costh);
+      else correction = GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), normDocaRS, dedxTrack.getEntaRS(i),
+                                        costh);
 
       // combine hits accross layers
-      newLayerDe += dedxTrack.getADCCount(i) / correction;
-      newLayerDx += dedxTrack.getPath(i);
+      if (correction != 0) {
+        newLayerDe += dedxTrack.getADCCount(i) / correction;
+        newLayerDx += dedxTrack.getPath(i);
+      }
+
       if (i + 1 < nhits && dedxTrack.getHitLayer(i + 1) == dedxTrack.getHitLayer(i))
         continue;
       else {
-        newLayerHits.push_back(newLayerDe / newLayerDx * std::sqrt(1 - costh * costh));
+        if (newLayerDx != 0)newLayerHits.push_back(newLayerDe / newLayerDx * std::sqrt(1 - costh * costh));
         newLayerDe = 0;
         newLayerDx = 0;
       }

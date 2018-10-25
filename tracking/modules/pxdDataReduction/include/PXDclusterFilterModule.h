@@ -35,10 +35,10 @@ namespace Belle2 {
   private:
 
     /**  */
-    void initialize();
+    void initialize() override;
 
     /**  */
-    void event();
+    void event() override;
 
     bool m_CreateOutside; /**< if set, create list of outside pixels, too */
     std::string m_PXDClustersName;  /**< The name of the StoreArray of PXDClusters to be filtered */

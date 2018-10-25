@@ -26,9 +26,9 @@ namespace Belle2 {
     ToFileLoggerModule();
 
     /** Init the module. */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Don't break the terminal. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
     /** Filename to log into. */

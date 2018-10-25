@@ -319,3 +319,8 @@ int EKLMElementNumbers::getMaximalStripGlobalNumber() const
                      m_MaximalStripNumber);
 }
 
+int EKLMElementNumbers::getNStripsSegment() const
+{
+  return m_NStripsSegment;
+}
+

@@ -35,21 +35,21 @@ namespace Belle2 {
     virtual ~MCMatcherECLClustersModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Nothing so far.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Actual digitization of all hits in the ECL.
      *
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Nothing so far. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Stopping of CPU clock.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

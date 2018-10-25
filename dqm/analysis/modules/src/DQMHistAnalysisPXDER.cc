@@ -351,8 +351,8 @@ void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, in
   }
 }
 
-int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double ratio, std::string name_hist,
-                                        std::string name_refhist, TH1I* flaghist)
+int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist,
+                                        const std::string& name_refhist, TH1I* flaghist)
 {
   int iret = 0;
   float WarningLevel = 6.0;

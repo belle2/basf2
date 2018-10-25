@@ -290,6 +290,11 @@ namespace Belle2 {
      */
     int getMaximalStripGlobalNumber() const;
 
+    /**
+     * Get number of strips in a segment.
+     */
+    int getNStripsSegment() const;
+
   protected:
 
     /** Maximal endcap number. */

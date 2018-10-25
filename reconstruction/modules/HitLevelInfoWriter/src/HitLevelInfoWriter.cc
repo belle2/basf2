@@ -120,7 +120,7 @@ void HitLevelInfoWriterModule::event()
     // make sure the list exists and is not empty
     StoreObjPtr<ParticleList> particlelist(m_strParticleList[iList]);
     if (!particlelist or particlelist->getListSize(true) == 0) {
-      B2WARNING("ParticleList " << m_strParticleList[iList] << " not found or empty, skipping");
+      //B2WARNING("ParticleList " << m_strParticleList[iList] << " not found or empty, skipping");
       continue;
     }
 
@@ -290,6 +290,7 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
     h_dedx[ihit] = dedxTrack->getDedx(ihit);
     h_adcraw[ihit] = dedxTrack->getADCCount(ihit);
     h_doca[ihit] = dedxTrack->getDoca(ihit);
+    h_ndoca[ihit] = h_doca[ihit] / dedxTrack->getCellHalfWidth(ihit);
     h_enta[ihit] = dedxTrack->getEnta(ihit);
     h_driftT[ihit] = dedxTrack->getDriftT(ihit);
 
@@ -319,6 +320,7 @@ HitLevelInfoWriterModule::clearEntries()
     h_dedx[ihit] = 0;
     h_adcraw[ihit] = 0;
     h_doca[ihit] = 0;
+    h_ndoca[ihit] = 0;
     h_enta[ihit] = 0;
     h_driftT[ihit] = 0;
     h_wireGain[ihit] = 0;
@@ -401,6 +403,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("hDedx", h_dedx, "hDedx[hNHits]/D");
   m_tree[i]->Branch("hADCRaw", h_adcraw, "hADCRaw[hNHits]/D");
   m_tree[i]->Branch("hDoca", h_doca, "hDoca[hNHits]/D");
+  m_tree[i]->Branch("hNDoca", h_ndoca, "hNDoca[hNHits]/D");
   m_tree[i]->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
   m_tree[i]->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
   m_tree[i]->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");

@@ -27,12 +27,12 @@ namespace Belle2 {
     /** PDGCode. */
     int* m_iQ;
 
-    void setupTree();
+    void setupTree() override;
   public:
     /** Constuctor. */
     NtuplePDGCodeTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2

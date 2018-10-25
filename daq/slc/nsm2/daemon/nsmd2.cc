@@ -11,49 +11,51 @@
 //   - destroyconn   (to -1, when master disappeared)
 // ----------------------------------------------------------------------
 // revisions
-//  20130303  1910 hinamatsuri alpha version
-//  20131025  ---- work resuming
-//  20131028  ---- suppress recv message
-//  20131028  1911 assert no conid case (*1)
-//  20131217  1912 more fix about -1 (and major signal fix in corelib)
-//  20131217  1913 dtpos fix (don't use ntohs!)
-//  20131218  1914 new protocol version, merged with Konno branch
-//  20131219  1915 uid/gid for MEM shm
-//  20131222  1916 printlog infinite loop fix
-//  20131230  1918 argv[0] changed to lower case
-//  20140104  1919 disid fix, stdint
-//  20140105  1920 nsminfo2
-//  20140106  1921 destroyconn fix
-//  20140107  1922 fix when master/daemon killed together
-//  20140107  1923 priority fix in do_ready
-//  20140117  1924 check error before going background, many crucial bug
-//                 fixes on nsmd master/deputy switching
-//  20140124  1925 fix for anonymous client
-//  20140304  1926 nested dtfmt
-//  20140305  1927 freeq comparison and timing fix
-//  20140305  1928 more freeq checks, longused=1 for debug
-//  20140305  1929 longused=0 again
-//  20140516  1930 destroycon / delcli fix
-//  20140902  1934 static bsizbuf pollution fix, broken tcprecv debug
-//  20140902  1935 memset fix
-//  20140903  1936 debug message fix
-//  20140917  1938 newclient error return fix / shm cleanup fix
-//  20140921  1940 flushmem, less DBG messages
-//  20140922  1942 nodtim fix
-//  20150520  1943 destroyconn fix [for anonymous and for sys.ready]
-//  20150521  1944 new protocol version, master recoonect fix
-//  20160420  1946 suppress debug output
-//  20170613  1947 protect against bad USRCPYMEM from misconnected nodes
-//  20170927  1948 touchsys pos fix, log cleanup for send/recv
-//  20170929  1949 ackdaemon fix to avoid reconnecting to same M/D
-//  20171002  1950 ackdaemon fix to avoid connection to multiple D
-//  20171002  1951 destroyconn to non M/D allowed, avoid duplicate free M/D
-//  20171002  1952 shortbufp/longbufp/bsizbuf to be modified when ncon changes
-//  20180111  1953 debug orphan node
-//  20180118  1954 conid fix for master's client, suppress WARN(no conid)
-//  20180124  1958 logfp fix for -b, smarter recv message
+//  20130303 1910 hinamatsuri alpha version
+//  20131025 ---- work resuming
+//  20131028 ---- suppress recv message
+//  20131028 1911 assert no conid case (*1)
+//  20131217 1912 more fix about -1 (and major signal fix in corelib)
+//  20131217 1913 dtpos fix (don't use ntohs!)
+//  20131218 1914 new protocol version, merged with Konno branch
+//  20131219 1915 uid/gid for MEM shm
+//  20131222 1916 printlog infinite loop fix
+//  20131230 1918 argv[0] changed to lower case
+//  20140104 1919 disid fix, stdint
+//  20140105 1920 nsminfo2
+//  20140106 1921 destroyconn fix
+//  20140107 1922 fix when master/daemon killed together
+//  20140107 1923 priority fix in do_ready
+//  20140117 1924 check error before going background, many crucial bug
+//                fixes on nsmd master/deputy switching
+//  20140124 1925 fix for anonymous client
+//  20140304 1926 nested dtfmt
+//  20140305 1927 freeq comparison and timing fix
+//  20140305 1928 more freeq checks, longused=1 for debug
+//  20140305 1929 longused=0 again
+//  20140516 1930 destroycon / delcli fix
+//  20140902 1934 static bsizbuf pollution fix, broken tcprecv debug
+//  20140902 1935 memset fix
+//  20140903 1936 debug message fix
+//  20140917 1938 newclient error return fix / shm cleanup fix
+//  20140921 1940 flushmem, less DBG messages
+//  20140922 1942 nodtim fix
+//  20150520 1943 destroyconn fix [for anonymous and for sys.ready]
+//  20150521 1944 new protocol version, master recoonect fix
+//  20160420 1946 suppress debug output
+//  20170613 1947 protect against bad USRCPYMEM from misconnected nodes
+//  20180326 1959 based on 1947, just change the handling of -o option
+//  20180327 1960 delconn(conid) and touchsys(qpos) fix and better log
+//  20180328 1961 limit syscpymem.pos in uint16 range
+//  20180404 1963 nsminfo2 no hostname resolving
+//  20180412 1964 restore xnumeric=0 only for nsminfo2
+//  20180417 1965 suppress "bad" in usrcpymem if not ready
+//  20180423 1966 destroyconn when write error at tcpwriteq
+//  20180430 1967 src/dest at command and lastmsg at delconn for debug
+//  20180502 1968 fix nsmd_dbg of 1967 printing all DBG messages
+//  20180515 1970 int16_t fix for owner in usrcpymem
 
-#define NSM_DAEMON_VERSION   1958
+#define NSM_DAEMON_VERSION   1970
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -138,8 +140,8 @@ SOCKAD_IN   nsmd_sockad;
 char        nsmd_host[1024];
 const char* nsmd_logdir = ".";
 FILE*       nsmd_logfp = stdout;
-#define NSMD_DBGAFTER 4
-#define NSMD_DBGBEFORE 8
+#define NSMD_DBGAFTER 8
+#define NSMD_DBGBEFORE 16
 char        nsmd_dbgbuf[NSMD_DBGBEFORE][256];
 int         nsmd_dbgcnt = 0;
 int         nsmd_shmsysid = -1;
@@ -150,6 +152,13 @@ NSMsys*     nsmd_sysp = 0;
 NSMmem*     nsmd_memp = 0;
 
 static int nsmd_init_count = NSMD_INITCOUNT_FIRST;
+
+struct NSMDlastmsg {
+  char rcvd[256];
+  char sent[256];
+};
+
+NSMDlastmsg nsmd_lastmsg[NSMSYS_MAX_CON];
 
 /*
   Default is to store twice the largest packet, but:
@@ -168,12 +177,6 @@ int nsmd_tcpsocksiz = NSM_TCPMSGSIZ * 2;
 static NSMDtcpq* nsmd_tcpqfirst = 0;
 static NSMDtcpq* nsmd_tcpqlast = 0;
 
-// buffer to store partially received data
-const int MAX_CONI = NSMSYS_MAX_CON - NSMCON_OUT;
-const int NO_CONI = -1;
-static char* recv_shortbufp[MAX_CONI];
-static char* recv_longbufp[MAX_CONI];
-static int32_t recv_bsizbuf[MAX_CONI];
 
 // -- command list ------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -327,7 +330,7 @@ static NSMcmdtbl_t nsmd_cmdtbl[] = {
 
 // -- forward declarations ----------------------------------------------
 // ----------------------------------------------------------------------
-void nsmd_dbg(const char* fmt, ...);
+const char* nsmd_dbg(const char* fmt, ...);
 void nsmd_log(const char* fmt, ...);
 void nsmd_warn(const char* fmt, ...);
 void nsmd_error(const char* fmt, ...);
@@ -566,6 +569,30 @@ nsmd_nodestr(int nodeid)
     sprintf(nodestrp, "[node=%d]", nodeid);
   }
   return nodestrp;
+}
+// -- nsmd_datatoprint --------------------------------------------------
+void
+nsmd_datatoprint(const char* datap, int len, char databuf[], int siz)
+{
+  if (datap) {
+    int i;
+    for (i = 0; i < siz - 1 && i < len; i++) {
+      if (i && datap[i] == 0) {
+        databuf[i] = ' ';
+      } else if (isprint(datap[i])) {
+        databuf[i] = datap[i];
+      } else {
+        break;
+      }
+    }
+    databuf[i] = 0;
+    for (i-- ; i > 0; i--) {
+      if (! datap[i]) databuf[i] = 0;
+      if (datap[i]) break;
+    }
+  } else {
+    strcpy(databuf, "(null)");
+  }
 }
 // -- nsmd_destroy_clients ----------------------------------------------
 //    called from nsmd_destroy and also when orphan shm is found
@@ -845,30 +872,40 @@ nsmd_assert(const char* fmt, ...)
 // -- nsmd_dbg ----------------------------------------------------------
 //    debug message in printf style (only during debug, not to be kept)
 // ----------------------------------------------------------------------
-void
+const char*
 nsmd_dbg(const char* fmt, ...)
 {
   char buf[4096];
   va_list ap;
   VSNPRINTF(buf, ap, fmt);
+
+  // print first NSMD_DBGAFTER times messages now
   if (nsmd_dbgcnt < NSMD_DBGAFTER) {
     nsmd_printlog("DBG: ", buf, /* isdbg */ 1);
-  } else {
-    int i = (nsmd_dbgcnt - NSMD_DBGAFTER) % NSMD_DBGBEFORE;
-    char* p = nsmd_dbgbuf[i];
-    int siz = sizeof(nsmd_dbgbuf[0]);
-    // strlen(p) = 13 ("%02d:%02d:%02d.%03d ")
-    nsmd_logtime(p);
-    if (nsmd_dbgcnt == 0) {    // maybe changed by nsmd_logtime()
-      nsmd_printlog("DBG: ", buf, /* isdbg */ 1);
-      return;
-    }
-    strcpy(p + 13, "DBG: ");
-    strncpy(p + 18, buf, siz - 18);
-    p[siz - 1] = 0;                  // null-terminate if longer than siz
-    if (p = strchr(p, '\n')) * p = 0; // no multiple lines
+    nsmd_dbgcnt++;
+    return 0;
   }
+
+  int i = (nsmd_dbgcnt - NSMD_DBGAFTER) % NSMD_DBGBEFORE;
+  char* p = nsmd_dbgbuf[i];
+  int siz = sizeof(nsmd_dbgbuf[0]);
+  // strlen(p) = 13 ("%02d:%02d:%02d.%03d ")
+  nsmd_logtime(p);
+
+  // at the beginning of the day, nsmd_logtime() reset it to zero
+  // and should be printed in a new logfile now
+  if (nsmd_dbgcnt == 0) {
+    nsmd_printlog("DBG: ", buf, /* isdbg */ 1);
+    return 0;
+  }
+
+  // otherwise keep it in the buffer, and
+  strcpy(p + 13, "DBG: ");
+  strncpy(p + 18, buf, siz - 18);
+  p[siz - 1] = 0;                  // null-terminate if longer than siz
+  if (p = strchr(p, '\n')) * p = 0; // no multiple lines
   nsmd_dbgcnt++;
+  return nsmd_dbgbuf[i];
 }
 // -- nsmd_log ----------------------------------------------------------
 //    usual log message in printf style
@@ -1055,6 +1092,8 @@ nsmd_shmclean()
   }
   for (NSMcon* conp = sys.con; conp < sys.con + NSMSYS_MAX_CON; conp++) {
     conp->sock = -1;
+    conp->nid  = -1;
+    conp->pid  = -1;
   }
   sys.afirst = htons(-1);
   sys.ready = -1;
@@ -1638,11 +1677,17 @@ nsmd_tcpwriteq()
   while (1) { // just for EINTR and EAGAIN
     if ((ret = write(con.sock, writep, writelen)) >= 0) break;
     if (errno == EINTR || errno == EAGAIN) continue;
-    // 20170927 this is not unexpected
-    WARN("tcpwriteq(%d,%d) write %d bytes failed: %s",
-         con.sock, q->conid, writelen, strerror(errno));
-    nsmd_destroyconn(con, 1, "tcpwriteq");
-    return 1;
+
+    WARN("tcpwriteq(%d,%d) write %d bytes: %s",
+         con.sock, q->conid, writelen, strerror(errno)); // unexpected
+
+    if ((IamMaster() && ! ConIsLocal(con)) ||
+        (IamDeputy() && ConIsMaster(con))) {
+      nsmd_destroyconn(con, 1, "tcpwriteq");
+    } else {
+      nsmd_destroyconn(con, 0, "tcpwriteq");
+    }
+    return 1; // call me again
   }
 
   {
@@ -1660,17 +1705,22 @@ nsmd_tcpwriteq()
       default: sprintf(parbuf, "n=%d p=[%d,%d]",
                          npar, ntohl(p[0]), ntohl(p[1])); break;
     }
-    DBG("tcpwriteq(%d,%d) req=%x len=%d %s buf=%x wp=%x(%d/%d)",
-        con.sock, q->conid,
-        req, len, parbuf, q->buf, writep, ret, writelen);
 
+    char databuf[80];
+    nsmd_datatoprint(q->buf, len, databuf, sizeof(databuf));
+
+    const char* dbgp;
+    dbgp = DBG("tcpwriteq(%d,%d) req=%x len=%d %s%s%s wp=%x(%d/%d)",
+               con.sock, q->conid, req, len, parbuf,
+               *databuf ? " " : "", databuf, writep, ret, writelen);
+    if (dbgp) {
+      strcpy(nsmd_lastmsg[q->conid].sent, dbgp);
+    } else {
+      nsmd_lastmsg[q->conid].sent[0] = 0;
+    }
   }
 
-  if (ret == 0) {
-    WARN("tcpwriteq: write returns 0 for con=%d", q->conid);
-    nsmd_destroyconn(con, 1, "tcpwriteq");
-    return 1;
-  }
+  if (ret == 0) ASRT("tcpwriteq: write returns 0 for con=%d", q->conid);
 
   // for a large datap, keep the queue to be called again
   if (ret == writelen && wtyp == WHEAD) {
@@ -1733,7 +1783,9 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
        req == NSMCMD_PING || req == NSMCMD_PONG) && !DBGBIT(6)) dispflag = 0;
   if (DBGBIT(1) || (reqstr[0] == '[' && ! DBGBIT(10))) dispflag = 0;
   if (dispflag) {
-    LOG("send %s(%d)=>%s", reqstr, dmsg.seq, ADDR_STR(con.sockad));
+    LOG("send %s(%d,%d,%d)=>%s(%d)",
+        reqstr, dmsg.seq, dmsg.npar, dmsg.len,
+        ADDR_STR(con.sockad), conid);
   }
 
   // skip sending to removed or temporarily unavailable destination
@@ -1778,6 +1830,11 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
       if (ret >= 0) break;
       if (errno == EINTR || errno == EAGAIN) continue;
       if (errno == ESRCH) { // remove client if process is gone
+        if (! dispflag) {
+          LOG("send %s(%d,%d,%d)=>%s(%d)",
+              reqstr, dmsg.seq, dmsg.npar, dmsg.len,
+              ADDR_STR(con.sockad), conid);
+        }
         LOG("DESTROY non-existing process pid=%d", con.pid);
         nsmd_destroyconn(con, 1, "tcpsend");
         return;
@@ -1825,12 +1882,10 @@ nsmd_tcpsend(NSMcon& con, NSMdmsg& dmsg, NSMDtcpq* qptr, int beforeafter)
     if (qptr == nsmd_tcpqlast) nsmd_tcpqlast = q;
     qptr->nextp = q;
   }
-  /* 20170927 commented out
   DBG("tcpsend(%d,%d) f=%08x(%08x) l=%08x q=%08x %d",
       con.sock, CON_ID(con),
-      nsmd_tcpqfirst, nsmd_tcpqfirst?nsmd_tcpqfirst->prevp:0, nsmd_tcpqlast,
+      nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast,
       q, beforeafter);
-  */
 
   // setup the queue entries
   q->conid = CON_ID(con);
@@ -1964,9 +2019,7 @@ nsmd_tcpconnect(SOCKAD_IN& sockad, const char* contype)
 // - TCP connection is made only to master/deputy and
 //   called from do_ackdaemon and do_newmaster
 // - conid = sys.ncon in do_newmaster to create a new connection,
-//   and sys.ncon++ for a successful connection, right after this call
-//   in nsmd_do_ackdaemon or nsmd_do_newmaster
-//
+//   and sys.ncon++ for a successful connection
 // ----------------------------------------------------------------------
 int
 nsmd_newconn(int conid, int32_t ip, const char* contype)
@@ -1991,11 +2044,6 @@ nsmd_newconn(int conid, int32_t ip, const char* contype)
   con.ready  = sys.ready <= 0 ? 0 : sys.ready;
   con.timevent = time(0);
   sys.sock_updated  = 1;
-
-  // clear recvbuf
-  int coni  = CON_ID(con) - NSMCON_OUT; // instead of conid
-  recv_bsizbuf[coni] = 0;
-
   return sock;
 }
 // -- nsmd_delconn ------------------------------------------------------
@@ -2006,6 +2054,12 @@ nsmd_delconn(NSMcon& con)
 {
   NSMsys& sys = *nsmd_sysp;
   const int conid = CON_ID(con);
+
+  LOG("delconn sock %d conid %d", con.sock, conid);
+  if (nsmd_lastmsg[conid].rcvd[0])
+    LOG("last recv %s", nsmd_lastmsg[conid].rcvd);
+  if (nsmd_lastmsg[conid].sent[0])
+    LOG("last sent %s", nsmd_lastmsg[conid].sent);
 
   shutdown(con.sock, 2);
   close(con.sock);
@@ -2025,9 +2079,17 @@ nsmd_delconn(NSMcon& con)
   sys.ncon--;
   // bug! conid should not be modified as it is used to manipulate
   // tcpq -- for (; conid < sys.ncon; conid++) sys.con[conid] = sys.con[conid + 1];
-  for (int i = conid; i < sys.ncon; i++) sys.con[i] = sys.con[i + 1];
+  for (int i = conid; i < sys.ncon; i++) {
+    sys.con[i] = sys.con[i + 1];
+    memcpy(&nsmd_lastmsg[i], &nsmd_lastmsg[i + 1], sizeof(nsmd_lastmsg[0]));
+  }
+  for (int i = 0; i < NSMSYS_MAX_NOD; i++) {
+    if (sys.conid[i] == conid) sys.conid[i] = 0;
+    if (sys.conid[i] >  conid) sys.conid[i]--;
+  }
   memset(&sys.con[sys.ncon], 0, sizeof(NSMcon));
   memset(&sys.con[sys.ncon].sockad.sin_addr, -1, sizeof(SOCKAD_IN));
+  memset(&nsmd_lastmsg[sys.ncon], 0, sizeof(nsmd_lastmsg[0]));
   sys.con[sys.ncon].sock = -1;
 
   // clear and shift tcpq
@@ -2042,21 +2104,6 @@ nsmd_delconn(NSMcon& con)
       q = q->nextp;
     }
   }
-
-  // clear and shift recvbuf
-  int coni = conid - NSMCON_OUT; // instead of conid
-  if (recv_shortbufp[coni]) nsmd_free("delconn", recv_shortbufp[coni]);
-  if (recv_longbufp[coni])  nsmd_free("delconn", recv_longbufp[coni]);
-  for (int i = conid; i < sys.ncon; i++) {
-    coni = i - NSMCON_OUT;
-    recv_shortbufp[coni] = recv_shortbufp[coni + 1];
-    recv_longbufp[coni]  = recv_longbufp[coni + 1];
-    recv_bsizbuf[coni]   = recv_bsizbuf[coni + 1];
-  }
-  coni = sys.ncon - NSMCON_OUT;
-  recv_shortbufp[coni] = recv_shortbufp[coni + 1];
-  recv_longbufp[coni]  = recv_longbufp[coni + 1];
-  recv_bsizbuf[coni] = 0;
 
   // and make it dirty to update select fdset
   sys.sock_updated = 1;
@@ -2091,7 +2138,6 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
       memset(&dmsg, 0, sizeof(dmsg));
       dmsg.req = NSMCMD_DELCLIENT;
       dmsg.src = con.nid;
-      dmsg.dest = -1;
       nsmd_do_delclient(con, dmsg);
     } else if (sys.ready <= 0) {
       LOG("nsmd is not ready yet");
@@ -2126,7 +2172,7 @@ nsmd_destroyconn(NSMcon& con, int delcli, const char* bywhom)
     } else if (ConIsDeputy(con)) {
       sys.deputy = NSMCON_NON;
     } else if (!IamMaster() && !IamDeputy()) {
-      WARN("destroyconn: disappeared con=%d is not a MASTER/DEPUTY",
+      ASRT("destroyconn: disappeared con=%d is not a MASTER/DEPUTY",
            &con - sys.con);
     }
   }
@@ -3015,7 +3061,7 @@ void
 nsmd_do_newreq(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
-  // DBG("do_newreq");
+  DBG("do_newreq");
 
   // dmsg should have at most one pars
   if (dmsg.npar != 0 && dmsg.npar != 1 || dmsg.len <= 1)
@@ -3212,10 +3258,7 @@ nsmd_do_newclient(NSMcon& con, NSMdmsg& dmsg)
 
     // reuse dmsg packet
     dmsg.pars[0] = nodeid;
-    if (ConIsLocal(con) && nodeid >= 0) {
-      con.nid = nodeid;
-      sys.conid[nodeid] = &con - sys.con;
-    }
+    if (ConIsLocal(con) && nodeid >= 0) con.nid = nodeid;
     DBG("do_newclient immaster nodeid=%d", nodeid);
     nsmd_tcpsend(con, dmsg);
     return;
@@ -3269,9 +3312,7 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
   DBG("do_delclient");
 
   // free distribution list
-  if (dmsg.src != (uint16_t) - 1 &&
-      dmsg.dest == (uint16_t) - 1 &&
-      ConIsLocal(con)) {
+  if (dmsg.src != (uint16_t) - 1 && ConIsLocal(con)) {
     nsmd_delete_dis(dmsg.src);
   }
 
@@ -3301,29 +3342,13 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
     return;
   }
 
-  // 1953 debug code
-  if (dmsg.src != (uint16_t) - 1 && dmsg.dest != (uint16_t) - 1) {
-    // send delclient to dest, not to src
-    uint16_t tmp = dmsg.src;
-    dmsg.src  = dmsg.dest;
-    dmsg.dest = tmp;
-  }
-
   // for an NSM client
   if (dmsg.src != (uint16_t) - 1) {
     if (dmsg.src == NSMSYS_MAX_NOD) return;
     if (dmsg.src >  NSMSYS_MAX_NOD) ASRT("do_delclient dmsg.src=%d", dmsg.src);
     NSMnod& nod = sys.nod[dmsg.src];
-
-    /* 1953 debug -- this condition may need to be differently handled */
-    if (nod.ipaddr == 0) {
-      LOG("do_delclient: nod is already removed");
-      return;
-    }
-    if (nod.ipaddr != ADDR_IP(con.sockad)) {
-      LOG("do_delclient bad ip=%s", ADDR_STR(con.sockad));
-      return;
-    }
+    if (nod.ipaddr != ADDR_IP(con.sockad))
+      ASRT("do_delclient bad ip=%s", ADDR_STR(con.sockad));
 
     /*
       IP address check was there in nsm1
@@ -3447,14 +3472,16 @@ nsmd_do_usrcpymem(NSMcon& con, NSMdmsg& dmsg)
   int badcpymem = 0;
   int nodip = 0;
 
-  if (datid >= 0) {
+  if (datid >= 0 && datid < NSMSYS_MAX_DAT) {
     NSMdat& dat = sys.dat[datid];
-    owner = (int32_t)ntohs(dat.owner);
+    owner = (int16_t)ntohs(dat.owner);
     dtpos = (int32_t)ntohl(dat.dtpos);
-    dtsiz = (int32_t)ntohs(dat.dtsiz);
+    dtsiz = (uint16_t)ntohs(dat.dtsiz);
   }
 
-  if (owner == -1 || dtpos == -1 || dtsiz < dmsg.len + offset) {
+  if (owner < 0 || owner >= NSMSYS_MAX_NOD ||
+      dtpos < 0 || offset < 0 ||
+      dtsiz < dmsg.len + offset) {
     badcpymem = 1;
   } else {
     NSMnod& nod = sys.nod[owner];
@@ -3470,9 +3497,10 @@ nsmd_do_usrcpymem(NSMcon& con, NSMdmsg& dmsg)
         ;
       if (i == nbadip) {
         badip[nbadip++] = fromip;
-        LOG("bad USRCPYMEM(dat=%d len=%d off=%d) from ip=%s (dbg owner=%d dtpos=%d dtsiz=%d fromip=%08x nodip=%08x)\n",
+        LOG("%s USRCPYMEM(dat=%d len=%d off=%d) from ip=%s (dbg owner=%d dtpos=%d dtsiz=%d fromip=%08x nodip=%08x inicnt=%d)\n",
+            nsmd_init_count < 0 ? "bad" : "ignored",
             datid, dmsg.len, offset, ADDR_STR(fromip),
-            owner, dtpos, dtsiz, fromip, nodip
+            owner, dtpos, dtsiz, fromip, nodip, nsmd_init_count
            );
       }
     }
@@ -3494,6 +3522,7 @@ void
 nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
+  DBG("do_ackdaemon");
 
   if (dmsg.npar != 9) ASRT("do_ackdaemon: dmsg.npar(%d) != 9", dmsg.npar);
 
@@ -3508,20 +3537,10 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   int32_t oldm = sys.master ? AddrMaster() : -1;
   int32_t oldd = sys.deputy ? AddrDeputy() : -1;
   int32_t newgen = dmsg.pars[8];
-  int32_t fromip = ADDR_IP(con.sockad);
-
-  DBG("ACKDAEMON from %s m:%s=>%s d:%s=>%s g:%d=>%d",
-      ADDR_STR(fromip),
-      ADDR_STR(oldm),
-      ADDR_STR(newm),
-      ADDR_STR(oldd),
-      ADDR_STR(newd),
-      sys.generation,
-      newgen);
-
   if (newm && newm == oldm && newd == oldd && newgen == sys.generation) return;
 
   // check the message source
+  int32_t fromip = ADDR_IP(con.sockad);
   if (fromip != newm && fromip != newd) {
     WARN("ackdaemon from a non-master/deputy host %s", ADDR_STR(fromip));
     return;
@@ -3533,8 +3552,6 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   // connect to master
   if (newm == nsmd_myip) {
     sys.master = NSMCON_TCP;
-  } else if (newm == oldm) {
-    // do nothing
   } else if (nsmd_newconn(sys.ncon, newm, "master") < 0) {
     // if it cannot connect, it may be because the master have
     // disappeared just now
@@ -3546,7 +3563,7 @@ nsmd_do_ackdaemon(NSMcon& con, NSMdmsg& dmsg)
   }
 
   // connect to deputy if any
-  if (! NoMaster() && newd != -1 && newd != nsmd_myip && oldd == -1) {
+  if (! NoMaster() && newd != -1 && newd != nsmd_myip) {
     if (nsmd_newconn(sys.ncon, newd, "deputy") < 0) {
       sys.deputy = NSMCON_NON;
       WARN("Cannot connect to deputy at %s", ADDR_STR(newd));
@@ -3612,15 +3629,14 @@ nsmd_do_syscpymem(NSMcon& con, NSMdmsg& dmsg)
 {
   NSMsys& sys = *nsmd_sysp;
   int pos = dmsg.pars[0];
-  int siz = dmsg.pars[1];
+  int siz = dmsg.pars[1] & 0xffff;
   int opt = dmsg.opt;
   static int seq = 0;
   const int tcpdatmax = NSM_TCPDATSIZ - 4 * sizeof(int32_t); // 64k - 16byte
   static int datid = -1;
 
-  DBG("syscpymem opt=%d pos=%d siz=%d seq=%d<=%s",
-      opt, pos, siz, dmsg.seq, ADDR_STR(con.sockad));
-  /* ConIsMaster(con) ? " master" : ""); */
+  DBG("syscpymem opt=%d pos=%d siz=%d%s", opt, pos, siz,
+      ConIsMaster(con) ? " master" : "");
 
   if (! ConIsMaster(con) && !(ConIsDeputy(con) && IamMaster())) return;
 
@@ -3736,15 +3752,15 @@ nsmd_do_reqcpymem(NSMcon& con, NSMdmsg& dmsg)
   // parameters
   int opt = dmsg.npar == 2 ? 1 : 2; // npar=2 for sys, npar=1/siz=0 for mem
   int pos = dmsg.pars[0];
-  int siz = dmsg.pars[1];
+  int siz = (dmsg.pars[1] & 0xffff);
   const int tcpdatmax = NSM_TCPDATSIZ - 4 * sizeof(int32_t); // 64k - 16byte
   const char* typ = (opt == 2) ? "mem" : "sys";
   char*       ptr = (opt == 2) ? (char*)nsmd_memp : (char*)nsmd_sysp;
 
   if (opt == 2) {
     datid = pos;
-    siz = (int16_t)ntohs(sys.dat[datid].dtsiz); // 0 if removed, but don't care
-    pos = (int32_t)ntohl(sys.dat[datid].dtpos);
+    siz = (uint16_t)ntohs(sys.dat[datid].dtsiz); // 0 if removed, but don't care
+    pos = (uint32_t)ntohl(sys.dat[datid].dtpos);
   }
 
   memset(&dmsg, 0, sizeof(dmsg));
@@ -3753,8 +3769,8 @@ nsmd_do_reqcpymem(NSMcon& con, NSMdmsg& dmsg)
   dmsg.opt = opt;
   dmsg.npar = 2;
   dmsg.pars[0] = pos;
-  dmsg.pars[1] = siz;
-  dmsg.len = siz;
+  dmsg.pars[1] = siz & 0xffff;
+  dmsg.len = siz & 0xffff;
   dmsg.datap = pos >= 0 ? ptr + pos : 0;
 
   if (pos == -1 && siz == 0) {
@@ -3950,13 +3966,11 @@ nsmd_do_newmaster(NSMcon& con, NSMdmsg& dmsg)
         nsmd_delconn(sys.con[sys.master]);
         sys.master = NSMCON_NON;
       }
-      if (newgen != oldgen && ConIsMaster(con) && oldd != -1 &&
-          sys.deputy != NSMCON_NON) {
+      if (newgen != oldgen && ConIsMaster(con) && oldd != -1) {
         nsmd_delconn(sys.con[sys.deputy]);
         sys.deputy = NSMCON_NON;
       }
-      if (newgen != oldgen && ConIsDeputy(con) && oldm != -1 &&
-          sys.master != NSMCON_NON) {
+      if (newgen != oldgen && ConIsDeputy(con) && oldm != -1) {
         nsmd_delconn(sys.con[sys.master]);
         sys.master = NSMCON_NON;
       }
@@ -4208,24 +4222,16 @@ nsmd_sendreq(NSMdmsg& dmsg)
   }
 
   char databuf[80];
-  if (dmsg.datap) {
-    int i = 0;
-    while (isprint(dmsg.datap[i]) && i < sizeof(databuf) - 1) {
-      databuf[i] = dmsg.datap[i];
-      i++;
-    }
-    databuf[i] = 0;
-  } else {
-    strcpy(databuf, "(null)");
-  }
+  nsmd_datatoprint(dmsg.datap, dmsg.len, databuf, sizeof(databuf));
 
   if (conid != 0) {
-    DBG("command: req = %04x len = %d npar = %d datap = %s con = %d",
+    DBG("command: %d=>%d req=%04x len=%d npar=%d datap=%s con=%d",
+        dmsg.src, dmsg.dest,
         dmsg.req, dmsg.len, dmsg.npar, databuf, conid);
     nsmd_tcpsend(sys.con[conid], dmsg);
   } else {
-    DBG("ignored: req = %04x len = %d npar = %d datap = %s",
-        dmsg.req, dmsg.len, dmsg.npar, databuf);
+    DBG("ignored: %d=>%d req=%04x len=%d npar=%d datap=%s",
+        dmsg.src, dmsg.dest, dmsg.req, dmsg.len, dmsg.npar, databuf);
   }
   return;
 }
@@ -4772,7 +4778,6 @@ nsmd_tcpaccept()
     if (fromaddr == ADDR_IP(tcp.sockad)) {
       extrastr = " (local)";
     }
-    recv_bsizbuf[sys.ncon - NSMCON_OUT] = 0;
     sys.ncon++;
   }
   LOG("ACCEPT connection from %s sock=%d conn=%d%s",
@@ -4845,29 +4850,34 @@ nsmd_tcpaccept()
 // - Allocated long buffer is fixed to the message, and will not be reused
 //   in tcprecv, and will be freed elsewhere.
 // ----------------------------------------------------------------------
-int xignore_recvlen0 = 0;
 void
 nsmd_tcprecv(NSMcon& con)
 {
   NSMsys& sys = *nsmd_sysp;
+  int coni  = CON_ID(con) - NSMCON_OUT; // instead of conid
+
+  const int MAX_CONI = NSMSYS_MAX_CON - NSMCON_OUT;
+  const int NO_CONI = -1;
+  static char* shortbufp[MAX_CONI];
+  static char* longbufp[MAX_CONI];
+  static int32_t bsizbuf[MAX_CONI];
   int recvlen;
   int recvsiz;
   char* recvp;
   char* datap = 0;
-  int coni  = CON_ID(con) - NSMCON_OUT; // instead of conid
 
   if (coni < 0 || coni >= MAX_CONI)
     ASRT("tcprecv conid=%d", coni + NSMCON_OUT);
 
-  if (! recv_shortbufp[coni]) {
-    recv_shortbufp[coni] = (char*)nsmd_malloc("tcprecv", NSM_TCPTHRESHOLD);
+  if (! shortbufp[coni]) {
+    shortbufp[coni] = (char*)nsmd_malloc("tcprecv", NSM_TCPTHRESHOLD);
   }
 
   // headlen is valid only after receiving the NSMtcphead part
-  NSMtcphead& head = *(NSMtcphead*)recv_shortbufp[coni];
+  NSMtcphead& head = *(NSMtcphead*)shortbufp[coni];
   int datlen = head.npar * sizeof(int32_t) + ntohs(head.len);
   int msglen = sizeof(NSMtcphead) + datlen;
-  int& bsiz = recv_bsizbuf[coni];
+  int& bsiz = bsizbuf[coni];
 
   if (con.icnt == 0) bsiz = 0;
   con.icnt++;
@@ -4884,8 +4894,8 @@ nsmd_tcprecv(NSMcon& con)
     recvp = (char*)&head + bsiz;
   } else if (msglen <= NSM_TCPTHRESHOLD) { // short buffer is fine
     recvsiz = msglen - bsiz;
-    recvp   = recv_shortbufp[coni] + bsiz;
-    datap   = recv_shortbufp[coni] + sizeof(NSMtcphead);
+    recvp   = shortbufp[coni] + bsiz;
+    datap   = shortbufp[coni] + sizeof(NSMtcphead);
   } else { // need a long buffer
     if (bsiz == sizeof(NSMtcphead)) {
       /* datap may not be freed after nsmd_command, and new message
@@ -4896,9 +4906,9 @@ nsmd_tcprecv(NSMcon& con)
       } else {
         datap = (char*)nsmd_malloc("tcprecv", datlen);
       }
-      recv_longbufp[coni] = datap;
+      longbufp[coni] = datap;
     } else {
-      datap = recv_longbufp[coni];
+      datap = longbufp[coni];
     }
     recvsiz = msglen - bsiz;
     recvp   = datap + (bsiz - sizeof(NSMtcphead));
@@ -4923,7 +4933,6 @@ nsmd_tcprecv(NSMcon& con)
     } else {
       LOG("tcprecv connection closed while reading %d bytes", recvsiz);
     }
-    if (xignore_recvlen0) return;
     goto disconnect_return;
   }
 
@@ -5004,6 +5013,19 @@ nsmd_tcprecv(NSMcon& con)
     dmsg.pars[i]   = ntohl(par);
   }
   dmsg.datap = dmsg.len ? datap + dmsg.npar * sizeof(int32_t) : 0;
+
+  {
+    int conid = CON_ID(con);
+    char* buf = nsmd_lastmsg[conid].rcvd;
+    char databuf[80];
+
+    nsmd_logtime(buf);
+    nsmd_datatoprint(dmsg.datap, dmsg.len, databuf, sizeof(databuf));
+    snprintf(buf + strlen(buf), sizeof(nsmd_lastmsg[conid].rcvd) - strlen(buf),
+             "(%d,%d) req=%x %d=>%d p(%d)=[%d,%d] len=%d %s",
+             con.sock, conid, dmsg.req, dmsg.src, dmsg.dest, dmsg.npar,
+             dmsg.pars[0], dmsg.pars[1], dmsg.len, databuf);
+  }
 
   nsmd_command(con, dmsg);
 
@@ -5105,8 +5127,6 @@ nsmd_loop()
 {
   int busy = 0;
   uint64_t tinfo_in10ms = time10ms() + 30 * 100; /* 30s after the start */
-  fd_set fdset_skip;
-  FD_ZERO(&fdset_skip);
 
   while (1) {
 
@@ -5126,27 +5146,18 @@ nsmd_loop()
     int nfd = nsmd_select(fdset, 1); // 10msec
     if (nfd > 0) {
       NSMcon& conlast = sys.con[sys.ncon];
-      int action = 0;
       for (int conid = 0; nfd > 0 && conid < sys.ncon; conid++) {
         int sock = sys.con[conid].sock;
         if (sock < 0 || ! FD_ISSET(sock, &fdset)) continue;
-        if (FD_ISSET(sock, &fdset_skip)) continue;
         nfd--;
         if (conid == NSMCON_UDP) {
           nsmd_udprecv();
-          FD_SET(sock, &fdset_skip);
-          action++;
         } else if (conid == NSMCON_TCP) {
           nsmd_tcpaccept();
-          FD_SET(sock, &fdset_skip);
-          action++;
         } else {
           nsmd_tcprecv(sys.con[conid]);
-          FD_SET(sock, &fdset_skip);
-          action++;
         }
       }
-      if (! action) FD_ZERO(&fdset_skip);
       busy = 1;
     }
 
@@ -5190,9 +5201,9 @@ nsmd_loop()
       LOG("nsminfo");
       nsminfo2();
       tinfo_in10ms = (uint64_t)mktime(&tbuf) * 100;
-      LOG("tinfo: now %lld.%02d next %lld.%02d",
-          now_in10ms / 100, (int)now_in10ms % 100,
-          tinfo_in10ms / 100, (int)tinfo_in10ms % 100);
+      LOG("tinfo: now %lld.%02lld next %lld.%02lld",
+          now_in10ms / 100, now_in10ms % 100,
+          tinfo_in10ms / 100, tinfo_in10ms % 100);
     }
   }
 }
@@ -5261,9 +5272,10 @@ main(int argc, char** argv)
     }
 
     switch (opt) {
-      case 'b': nofork = 0; nsmd_logfp = stdout; break; // default
-      case 'f': nofork = 1; nsmd_logfp = 0;      break;
-      case 'o': nofork = 1; nsmd_logfp = stdout; break;
+      case 'b': nofork = 0; nsmd_logfp = 0; break;
+      case 'f': nofork = 1; nsmd_logfp = 0; break;
+      case 'o': nofork = 1; nsmd_logfp = 0; break;
+      case 'O': nofork = 1; nsmd_logfp = stdout; break;
       case 'd': debug  = nsmd_atoi(ap, 255); break;
       case 'm': prio   = nsmd_atoi(ap, 10); break;
       case 'p': port   = nsmd_atoi(ap, -1); break;
@@ -5273,23 +5285,30 @@ main(int argc, char** argv)
       case 'g': if (ap && *ap) nsmgrp = ap; break;
       case 'h': if (ap && *ap) host   = ap; break;
       case 'l': if (ap && *ap) logdir = ap; break;
-      default:
-        printf("usage: nsmd2 [options]\n");
-        printf(" -f         run as foreground, message into a log file.\n");
-        printf(" -o         run as foreground, message into stdout.\n");
-        printf(" -b         run as a background process (default).\n");
-        printf(" -p <port>  set port number.\n");
-        printf(" -h <host>  set host name.\n");
-        printf(" -s <key>   set shmkey number.\n");
-        printf(" -l <log>   set log file directory/prefix.\n");
-        printf(" -t <size>  set TCP buffer size.\n");
-        printf(" -u <user>  shm uid when run as root (default=nsm).\n");
-        printf(" -g <group> shm gid when run as root (default=nsm).\n");
-        printf(" -d<num>    set debug level (0-255, default=0).\n");
-        printf(" -d         set debug level to 255.\n");
-        printf(" -m<pri>    set mastership priority (0-100, default=1).\n");
-        printf(" -m         set mastership priority to=10.\n");
-        exit(1);
+      default: {
+        int dver = NSM_DAEMON_VERSION;
+        int pver = NSM_PROTOCOL_VERSION;
+        printf("%s version %d.%d.%02d protocol %d.%d.%02d\n",
+               "NSMD2 - network shared memory daemon",
+               dver / 1000, (dver / 100) % 10, dver % 100,
+               pver / 1000, (pver / 100) % 10, pver % 100);
+      }
+      printf("usage: nsmd2 [options]\n");
+      printf(" -f         run as foreground, message into a log file.\n");
+      printf(" -O         run as foreground, message into stdout.\n");
+      printf(" -b         run as a background process (default).\n");
+      printf(" -p <port>  set port number.\n");
+      printf(" -h <host>  set host name.\n");
+      printf(" -s <key>   set shmkey number.\n");
+      printf(" -l <log>   set log file directory/prefix.\n");
+      printf(" -t <size>  set TCP buffer size.\n");
+      printf(" -u <user>  shm uid when run as root (default=nsm).\n");
+      printf(" -g <group> shm gid when run as root (default=nsm).\n");
+      printf(" -d<num>    set debug level (0-255, default=0).\n");
+      printf(" -d         set debug level to 255.\n");
+      printf(" -m<pri>    set mastership priority (0-100, default=1).\n");
+      printf(" -m         set mastership priority to=10.\n");
+      exit(1);
     }
     av[ac++] = argv[1];
     argc--, argv++;

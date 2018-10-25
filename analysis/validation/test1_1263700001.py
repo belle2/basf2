@@ -149,7 +149,7 @@ analysis_main.add_module(skimALL)
 # apply some very loose cuts to reduce the number
 # of Btag candidates
 applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
-applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
+applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
 
 # rank Btag canidates according to their SignalProbability
 # 'sigProb' is alias for 'extraInfo(SignalProbability)'
@@ -253,7 +253,7 @@ toolsBP += ['CustomFloats[looseMCWrongDaughterBiB:looseMCWrongDaughterPDG]', '^B
 toolsBP += ['MCTruth', '^B+:genericRank']
 
 toolsBPSL = ['EventMetaData', '^B+:semileptonicRank']
-toolsBPSL += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B+:semileptonicRank']
+toolsBPSL += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B+:semileptonicRank']
 toolsBPSL += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B+:semileptonicRank']
 toolsBPSL += ['CustomFloats[d0_dmID]', '^B+:semileptonicRank']
 toolsBPSL += ['MCTruth', '^B+:semileptonicRank']
@@ -294,7 +294,7 @@ tools4SBplusHad += ['CustomFloats[d0_d0_d1_electronID:d0_d0_d1_muonID:d0_d0_d1_p
 tools4SBplusSL = ['EventMetaData', '^Upsilon(4S):BslBsigp']
 tools4SBplusSL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S):BslBsigp']
 tools4SBplusSL += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S):BslBsigp']
-tools4SBplusSL += ['CustomFloats[cosThetaBetweenParticleAndTrueB:R2EventLevel:R2:cosTBTO:cosTBz]',
+tools4SBplusSL += ['CustomFloats[cosThetaBetweenParticleAndNominalB:R2EventLevel:R2:cosTBTO:cosTBz]',
                    'Upsilon(4S):BslBsigp -> ^B+:semileptonicRank B-:all']
 tools4SBplusSL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BslBsigp -> ^B+:semileptonicRank B-:all']
 

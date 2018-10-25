@@ -29,7 +29,7 @@ stdPhotons('all')
 loadStdCharged()
 
 # dark photon skim
-from SinglePhotonDark_List import *
+from skim.dark import SinglePhotonDarkList
 darklist = SinglePhotonDarkList()
 skimCode = encodeSkimName('SinglePhotonDark')
 print("Single photon dark skim:", skimCode)

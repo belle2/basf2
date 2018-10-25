@@ -5,6 +5,7 @@
 <header>
   <input>../3110021000.dst.root</input>
   <output>../3110021000.ntup.root</output>
+  <contact>Maeda Yosuke (maeday@hepl.phys.nagoya-u.ac.jp)</contact>
 </header>
 """
 

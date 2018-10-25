@@ -44,14 +44,11 @@
 #include <analysis/NtupleTools/NtupleSLTool.h>
 #include <analysis/NtupleTools/NtupleErrMatrixTool.h>
 #include <analysis/NtupleTools/NtupleEventWeightsTool.h>
-#include <analysis/NtupleTools/NtupleLECDCTool.h>
-#include <analysis/NtupleTools/NtupleLEECLTool.h>
-#include <analysis/NtupleTools/NtupleLEKLMTool.h>
 #include <analysis/NtupleTools/NtupleMCGenKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleMCGenCMSKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleKlongIDTool.h>
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
-#include <analysis/NtupleTools/NtupleEventShapeTool.h>
+#include <analysis/NtupleTools/NtupleEventKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleXpTool.h>
 
 using namespace Belle2;
@@ -134,14 +131,11 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "SL") return new NtupleSLTool(tree, d);
   else if (strToolName == "ErrMatrix") return new NtupleErrMatrixTool(tree, d);
   else if (strToolName == "EventWeights") return new NtupleEventWeightsTool(tree, d);
-  else if (strToolName == "LECDC")  return new NtupleLECDCTool(tree, d);
-  else if (strToolName == "LEECL")  return new NtupleLEECLTool(tree, d);
-  else if (strToolName == "LEKLM")  return new NtupleLEKLMTool(tree, d);
   else if (strToolName == "MCGenKinematics") return new NtupleMCGenKinematicsTool(tree, d, strOption);
   else if (strToolName == "MCGenCMSKinematics") return new NtupleMCGenCMSKinematicsTool(tree, d, strOption);
   else if (strToolName == "KlongID") return new NtupleKlongIDTool(tree, d);
   else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
-  else if (strToolName == "EventShape") return new NtupleEventShapeTool(tree, d);
+  else if (strToolName == "EventKinematics") return new NtupleEventKinematicsTool(tree, d);
   else if (strToolName == "Xp") return new NtupleXpTool(tree, d);
 
   B2ERROR("NtupleTool \"" << strToolName << "\" is not available: no tool with that name could be found!");

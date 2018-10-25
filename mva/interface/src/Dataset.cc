@@ -576,12 +576,16 @@ namespace Belle2 {
 
     void ROOTDataset::setRootInputType()
     {
+      std::string control_variable;
       for (auto& variable : m_general_options.m_variables) {
-        if (checkForBranch(m_tree, variable)) {
-          TBranch* branch = m_tree->GetBranch(variable.c_str());
-          TLeaf* leaf = branch->GetLeaf(variable.c_str());
+        if (checkForBranch(m_tree, variable))
+          control_variable = variable;
+        else if (checkForBranch(m_tree, Belle2::makeROOTCompatible(variable)))
+          control_variable = Belle2::makeROOTCompatible(variable);
+        if (not control_variable.empty()) {
+          TBranch* branch = m_tree->GetBranch(control_variable.c_str());
+          TLeaf* leaf = branch->GetLeaf(control_variable.c_str());
           std::string type_name = leaf->GetTypeName();
-
           if (type_name == "Double_t")
             m_isDoubleInputType = true;
           else if (type_name == "Float_t")

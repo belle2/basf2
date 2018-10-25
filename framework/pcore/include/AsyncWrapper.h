@@ -46,11 +46,11 @@ namespace Belle2 {
      *
      * This function will fork() to create the wrapping environment, everything done previously will be available in the wrapped module.
      */
-    void initialize();
+    void initialize() override;
     /** Call this from event().  */
-    void event();
+    void event() override;
     /** Call this from terminate().  */
-    void terminate();
+    void terminate() override;
 
     /** returns true if the current process is on the receiving (async) side of an AsyncWrapper. */
     static bool isAsync() { return s_isAsync; }
@@ -62,9 +62,6 @@ namespace Belle2 {
   private:
     /** The wrapped module. */
     ModulePtr m_wrappedModule;
-
-    /** process manager. */
-    ProcHandler* m_procHandler;
 
     /** shared memory buffer */
     RingBuffer* m_ringBuffer;

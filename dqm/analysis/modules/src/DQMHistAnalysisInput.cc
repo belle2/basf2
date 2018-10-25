@@ -32,6 +32,7 @@ DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
   addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
   addParam("AutoCanvasFolders", m_acfolders, "List of folders for which to automatically create canvases, empty for all",
            std::vector<std::string>());
+  addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
 }
 
@@ -40,8 +41,7 @@ DQMHistAnalysisInputModule::~DQMHistAnalysisInputModule() { }
 
 void DQMHistAnalysisInputModule::initialize()
 {
-  m_expno = m_runno = 0;
-  m_count = 0;
+  if (m_memory != nullptr) delete m_memory;
   m_memory = new DqmMemFile(m_mempath.c_str());
   m_eventMetaDataPtr.registerInDataStore();
   B2INFO("DQMHistAnalysisInput: initialized.");
@@ -64,6 +64,7 @@ void DQMHistAnalysisInputModule::event()
   while ((key = (TKey*)next())) {
     TH1* h = (TH1*)key->ReadObj();
     if (h == NULL) continue; // would be strange, but better check
+    if (m_remove_empty && h->GetEntries() == 0) continue;
     // Remove ":" from folder name, workaround!
     TString a = h->GetName();
     a.ReplaceAll(":", "");

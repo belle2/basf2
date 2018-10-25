@@ -8,8 +8,10 @@
 
 #pragma once
 
+#ifdef _BELLE2_EPICS
 // EPICS
-//#include "cadef.h"
+#include "cadef.h"
+#endif
 
 #include <framework/core/Module.h>
 
@@ -32,26 +34,28 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisEpicsExampleModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
     std::string m_histoname;
     std::string m_function;
     Int_t m_parameters;
-    std::string  m_pvname;
+    std::string  m_pvPrefix;
 
-    TF1* m_f1;
-    TCanvas* m_c1;
-    TLine* m_line, * m_line_lo, * m_line_hi;
+    TF1* m_f1 = nullptr;
+    TCanvas* m_c1 = nullptr;
+    TLine* m_line = nullptr, * m_line_lo = nullptr, * m_line_hi = nullptr;
 
-//    chid mychid[10];// hard limit max 10 parameters
+#ifdef _BELLE2_EPICS
+    chid mychid[10];// hard limit max 10 parameters
+#endif
   };
 } // end namespace Belle2
 

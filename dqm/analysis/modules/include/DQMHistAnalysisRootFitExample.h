@@ -36,28 +36,27 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistAnalysisRooFitExampleModule();
-    virtual ~DQMHistAnalysisRooFitExampleModule();
+  private:
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize(void) override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun(void) override final;
+    void event(void) override final;
+    void endRun(void) override final;
+    void terminate(void) override final;
 
-    // Data members
-  private:
-    RooWorkspace* w;
-    RooRealVar* x;
-    RooDataHist* data;
-    RooPlot* plot;
-    RooFitResult* r;
-    RooAbsPdf* model;
+    // Data member
+    RooWorkspace* w = nullptr;
+    RooRealVar* x = nullptr;
+    RooDataHist* data = nullptr;
+    RooPlot* plot = nullptr;
+    RooFitResult* r = nullptr;
+    RooAbsPdf* model = nullptr;
 
 
-    TCanvas* m_c0;
+    TCanvas* m_c0 = nullptr;
 
 #ifdef _BELLE2_EPICS
     chid  mychid;

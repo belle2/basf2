@@ -19,7 +19,7 @@
 
 #include <string>
 
-
+#include <TFile.h>
 
 namespace Belle2 {
   /**
@@ -41,15 +41,15 @@ namespace Belle2 {
     *
     * prepares all store- and relationArrays.
     */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
     /** eventWise jobs (e.g. storing spacepoints */
-    virtual void event();
+    virtual void event() override;
 
 
     /** final output with mini-feedback */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
     /** initialize variables in constructor to avoid nondeterministic behavior */
@@ -78,7 +78,13 @@ namespace Belle2 {
 
     bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
 
+    std::string m_inputPDF; /**< File path of root file containing pdf histograms */
 
+    TFile* m_calibrationFile; /** Pointer to root TFile containing PDF histograms */
+
+    bool m_useLegacyNaming; /**< Choice between PDF naming conventions */
+
+    bool m_useQualityEstimator; /** Standard is true. Can be turned off in case accessing pdf root file is causing errors */
     //counters for testing
     unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */
 

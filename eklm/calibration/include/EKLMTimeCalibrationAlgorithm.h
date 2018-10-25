@@ -46,7 +46,7 @@ namespace Belle2 {
     /**
      * Calibration.
      */
-    CalibrationAlgorithm::EResult calibrate();
+    CalibrationAlgorithm::EResult calibrate() override;
 
     /**
      * Turn on debug mode (prints histograms).

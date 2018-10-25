@@ -53,30 +53,30 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void initialize();
+      void initialize() override;
 
       /**
        * Begin run action.
        */
 
-      virtual void beginRun();
+      void beginRun() override;
 
       /**
        * Event action (main routine).
        *
        */
 
-      virtual void event();
+      void event() override;
 
       /**
        * End run action.
        */
-      virtual void endRun();
+      void endRun() override;
 
       /**
        * Termination action.
        */
-      virtual void terminate();
+      void terminate() override;
 
       /**
        * Set CDC Packet header

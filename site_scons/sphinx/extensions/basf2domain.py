@@ -92,6 +92,7 @@ class Basf2VariableIndex(Index):
     def generate(self, docnames=None):
         content = {}
         modules = self.domain.data["variables"].items()
+        modules = sorted(modules, key=lambda x: x[0].lower())
         for modname, (docname, target) in modules:
             letter = modname[0].upper()
             content.setdefault(letter, [])

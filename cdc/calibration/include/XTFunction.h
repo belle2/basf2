@@ -113,7 +113,51 @@ namespace Belle2 {
       /**
        * Copy constructor.
        */
-      XTFunction(const XTFunction& x) = default;
+      XTFunction(const XTFunction& x) :
+        m_h1(x.m_h1),
+        m_fitFunc(x.m_fitFunc),
+        m_mode(x.m_mode),
+        m_debug(x.m_debug),
+        m_draw(x.m_draw),
+        m_bField(x.m_bField),
+        m_minRequiredEntry(x.m_minRequiredEntry),
+        m_fitflag(x.m_fitflag),
+        m_Prob(x.m_Prob),
+        m_tmin(x.m_tmin),
+        m_tmax(x.m_tmax)
+      {
+        for (int i = 0; i < 8; ++i) {
+          m_XTParam[i] = x.m_XTParam[i];
+          m_FittedXTParams[i] = x.m_XTParam[i];
+        }
+      }
+
+      /**
+       *  Assignment operator.
+       */
+      XTFunction& operator=(const XTFunction& x)
+      {
+        if (this != &x) {
+          m_h1 = x.m_h1;
+          m_fitFunc = x.m_fitFunc;
+          m_mode = x.m_mode;
+          m_debug = x.m_debug;
+          m_draw = x.m_draw;
+          m_bField = x.m_bField;
+          m_minRequiredEntry = x.m_minRequiredEntry;
+          m_fitflag = x.m_fitflag;
+          m_Prob = x.m_Prob;
+          m_tmin = x.m_tmin;
+          m_tmax = x.m_tmax;
+
+          for (int i = 0; i < 8; ++i) {
+            m_XTParam[i] = x.m_XTParam[i];
+            m_FittedXTParams[i] = x.m_XTParam[i];
+          }
+        }
+        return *this;
+      }
+
 
       /**
        * Set Parameter 6 for polynomia fit.

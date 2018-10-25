@@ -49,7 +49,7 @@ namespace Belle2 {
     int m_fileptr{0};
 
     //! Total nr. of events in the file
-    int m_nevt{0};
+    int m_nevt{ -1};
 
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer{nullptr};

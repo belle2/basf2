@@ -44,7 +44,6 @@ RingBuffer::RingBuffer(int size)
 // Constructor of Global Ringbuffer with name
 RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
 {
-  m_procIsBusy = false;
   // 0. Determine shared memory type
   if (name != "private") { // Global
     m_file = true;

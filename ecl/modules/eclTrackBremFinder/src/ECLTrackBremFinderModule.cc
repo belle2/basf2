@@ -298,6 +298,10 @@ void ECLTrackBremFinderModule::event()
                                fitted_pos, bremCluster->getEnergy(),
                                clusterDistance, effAcceptanceFactor);
 
+          // add a relation between the bremsstrahlung cluster and the track to transfer the information to the analysis
+          // set the acceptance factor as weight
+          bremCluster->addRelationTo(&track, effAcceptanceFactor, "Bremsstrahlung");
+
           if (primaryClusterOfTrack) {
             primaryClusterOfTrack->addRelationTo(bremCluster, effAcceptanceFactor);
           }

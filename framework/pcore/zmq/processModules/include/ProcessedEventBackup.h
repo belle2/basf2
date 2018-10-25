@@ -21,6 +21,7 @@
 namespace Belle2 {
   /// Storage item for the event backup storing the event message, the time stamp and the event meta data
   class ProcessedEventBackup {
+    /// Short for the class of the time stamp (it is a system clock time stamp)
     using TimeStamp = std::chrono::time_point<std::chrono::system_clock>;
   public:
     /// Constructor setting the informations. Takes ownership of the evtMsg.

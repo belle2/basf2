@@ -130,7 +130,7 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
     genfit::TrackCandHit* trackCandHit = trackCand.getHit(hitIndex);
     const int detID = trackCandHit->getDetId();
     const int hitID = trackCandHit->getHitId();
-    const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<unsigned int>
+    const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<const unsigned int>
                                           (trackCandHit->getSortingParameter());
     if (detID == Const::CDC) {
       UsedCDCHit* cdcHit = cdcHits[hitID];

@@ -78,34 +78,34 @@ namespace Belle2 {
     HepPolyhedron* getBooleanSolidPolyhedron(G4VSolid*);
 
     //! Once-only flag to write VRML only on the first event
-    bool m_First;
+    bool m_First{true};
 
     //! User-specified output filename
-    std::string m_Filename;
+    std::string m_Filename{"belle2.wrl"};
 
     //! Output file
     std::ofstream m_File;
 
     //! Modified (legal-character and unique) physical-volume name
-    std::vector<std::string>* m_PVName;
+    std::vector<std::string>* m_PVName{nullptr};
 
     //! Modified (legal-character and unique) logical-volume name
-    std::vector<std::string>* m_LVName;
+    std::vector<std::string>* m_LVName{nullptr};
 
     //! Modified (legal-character and unique) solid name
-    std::vector<std::string>* m_SolidName;
+    std::vector<std::string>* m_SolidName{nullptr};
 
     //! Flag to indicate that a solid can be rendered as a VMRL cylinder
-    std::vector<bool>* m_IsCylinder;
+    std::vector<bool>* m_IsCylinder{nullptr};
 
     //! Indices (in G4PhysicalVolumeStore) of the logical volume's physical-volume daughters
-    std::vector<std::vector<int> >* m_PVIndex;
+    std::vector<std::vector<int> >* m_PVIndex{nullptr};
 
     //! Flag to indicate that the logical volume has already been written
-    std::vector<bool>* m_LVWritten;
+    std::vector<bool>* m_LVWritten{nullptr};
 
     //! Flag to indicate that the physical volume has already been written
-    std::vector<bool>* m_PVWritten;
+    std::vector<bool>* m_PVWritten{nullptr};
 
   };
 

@@ -1,20 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# generic BBbar events using EvtGen
-# Example steering file
-
+##################################################################################
+# Simulating BBbar events with geometry created from xml file
+# usage: basf2_phase2_simulate.py fileOUT
+##################################################################################
+import os
 from basf2 import *
+from generators import *
+
+print('***')
+print('*** Used steering script:')
+with open(sys.argv[0], 'r') as fin:
+    print(fin.read(), end="")
+print('*** end of the script.')
+print('***')
+
+fileOUT = sys.argv[1]
+
+dec_file = None
+final_state = 'mixed'
 
 # main path
 main = create_path()
+
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=10000)
+main.add_module("EventInfoSetter", expList=1002, runList=0, evtNumList=100)
 
-# EvtGen
-evtgen = register_module('EvtGenInput')
-# evtgen.set_log_level(LogLevel.INFO)
-
+# create geometry from xml file
 gearbox = register_module('Gearbox')
 geomfile = '/geometry/Beast2_phase2.xml'
 if geomfile != 'None':
@@ -22,33 +35,21 @@ if geomfile != 'None':
 
 main.add_module(gearbox)
 geometry = register_module('Geometry')
-geometry.param('components', ['SVD', 'CDC', 'PXD'])
+geometry.param('useDB', False)
+geometry.param('components', ['SVD'])
 main.add_module(geometry)
 
-main.add_module(evtgen)
+# EvtGen
+add_evtgen_generator(path=main, finalstate=final_state, signaldecfile=dec_file)
 
+# Simulation
 main.add_module('FullSim', StoreAllSecondaries=True)
 
-main.add_module('PXDDigitizer')
+# Digitizer
 main.add_module('SVDDigitizer')
-main.add_module('CDCDigitizer')
 
 main.add_module("Progress")
-main.add_module(
-    'RootOutput',
-    outputFileName=str(
-        sys.argv[1]),
-    branchNames=[
-        "MCParticles",
-        "CDCHits",
-        "MCParticlesToCDCHits",
-        "MCParticlesToSVDTrueHits",
-        "SVDShaperDigits",
-        "SVDShaperDigitsToMCParticles",
-        "SVDShaperDigitsToSVDTrueHits",
-        "SVDSimHits",
-        "SVDTrueHits",
-        "SVDTrueHitsToSVDSimHits"])
+main.add_module('RootOutput', outputFileName=fileOUT)
 
 # generate events
 process(main)

@@ -2,19 +2,26 @@
 # -*- coding: utf-8 -*-
 
 ##################################################################################
-# Simulating BBbar events
-# usage: basf2_phase2_simulate_localDB.py fileOUT localDB_dirs
+# Simulating BBbar events, geometry created from DB chain
+# usage: basf2_phase2_simulate_localDB.py fileOUT localDB_dir
 ##################################################################################
 import os
 from basf2 import *
 from generators import *
 
-fileOUT = str(sys.argv[1])
-localdb_dir = str(sys.argv[2])
+print('***')
+print('*** Used steering script:')
+with open(sys.argv[0], 'r') as fin:
+    print(fin.read(), end="")
+print('*** end of the script.')
+print('***')
 
-# use_database_chain()
-# use_central_database("development")
-# use_local_database(localdb_dir+"database.txt", localdb_dir)
+fileOUT = sys.argv[1]
+localdb_dir = sys.argv[2]
+
+use_database_chain()
+use_central_database("development")
+use_local_database(localdb_dir+"database.txt", localdb_dir)
 
 dec_file = None
 final_state = 'mixed'

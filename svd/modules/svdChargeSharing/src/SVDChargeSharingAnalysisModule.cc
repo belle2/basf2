@@ -26,7 +26,6 @@
 #include <TLegend.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TPaveStats.h>
 #include <TLatex.h>
 #include <TGaxis.h>
 #include <TPaveLabel.h>

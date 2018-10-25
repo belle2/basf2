@@ -379,10 +379,20 @@ namespace Belle2 {
     public:
       /** Emtpy constructor. */
       ParticleSet() = default;
-      /** Copy constructor */
-      ParticleSet(const ParticleSet&) = default;
+
+      /** Copy constructor to make sure particles belong to correct set. */
+      ParticleSet(const ParticleSet& other)
+      {
+        for (const ParticleType& pdgIter : other) add(pdgIter);
+      }
+
       /** Assignment operator */
-      ParticleSet& operator=(const ParticleSet&) = default;
+      ParticleSet& operator=(const ParticleSet& other)
+      {
+        m_particles.clear();
+        for (const ParticleType& pdgIter : other) add(pdgIter);
+        return *this;
+      }
 
       /** Add a copy of the given ParticleType to this set.
        *

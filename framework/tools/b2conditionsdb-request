@@ -180,7 +180,7 @@ if __name__ == "__main__":
         data['mc'] = upload_global_tag('mc')
     elif input('- analysis for analysis tools conditions (y/n) [n]? ').lower() == 'y':
         data['analysis'] = upload_global_tag('analysis')
-    else:
+    elif 'master' not in data.keys() and 'online' not in data.keys():
         print('\nNo global tag selected -> Exiting')
         print('\nIf you want to add already uploaded payloads to a new global tag, send the request including the list of payload names, the source, and the destination global tag to mgt-global-tag@belle2.org.')
         sys.exit(1)
@@ -211,7 +211,14 @@ Affected global tags: """ % (localdb, data['reason'], data['release'], data['req
     print('')
     if input('- Is the above information correct (y/n) [n]? ').lower() != 'y':
        sys.exit(0)
-    password = getpass.getpass("\nPlease give your DESY password to authenticate the request: ")
+
+    while True:
+        password = getpass.getpass("\nPlease give your DESY password to authenticate the request: ")
+        response = requests.get('https://b2-master.belle2.org', auth=(data['user'], password))
+        if response.status_code == 401:
+            print('Authorization failed. Please try again.')
+        else:
+            break
 
     # create jira issues and upload to staging global tags
     for task in tasks:

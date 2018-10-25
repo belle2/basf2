@@ -137,20 +137,4 @@ ModuleParamPtr ModuleParamList::getParameterPtr(const std::string& name) const
   } else throw (ModuleParameterNotFoundError() << name);
 }
 
-std::string ModuleParamList::getParamTypeString(const std::string& name) const
-{
-  //Check if a parameter with the given name exists
-  std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
-  mapIter = m_paramMap.find(name);
-
-  if (mapIter != m_paramMap.end()) {
-    return mapIter->second.get()->getTypeInfo();
-  } else {
-    B2FATAL("Module parameter '" + name + "' does not exist!");
-  }
-  return std::string();
-}
-
-
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

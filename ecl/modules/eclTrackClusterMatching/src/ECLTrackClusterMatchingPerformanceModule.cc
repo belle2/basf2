@@ -180,26 +180,27 @@ void ECLTrackClusterMatchingPerformanceModule::event()
 
         m_lastCDCLayer = fitResult->getHitPatternCDC().getLastLayer();
 
-        double shower_energy = 0., highest_track_related_shower_energy = 0.;
-        const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
+        const ECLCluster* eclCluster_PhotonHypothesis_track_related = nullptr;
+        const ECLCluster* eclCluster_HadronHypothesis_track_related = nullptr;
         for (const auto& eclCluster : b2Track->getRelationsTo<ECLCluster>("", m_trackClusterRelationName)) {
-          if (eclCluster.getHypothesisId() != ECLCluster::c_nPhotons) continue;
           if (!(eclCluster.isTrack())) continue;
-          const ECLShower* eclShower = eclCluster.getRelatedTo<ECLShower>();
-          shower_energy = eclShower->getEnergy();
-          if (shower_energy > highest_track_related_shower_energy) {
-            highest_track_related_shower_energy = shower_energy;
-            eclCluster_WithHighestEnergy_track_related = &eclCluster;
+          if (eclCluster.getHypothesisId() == ECLCluster::c_nPhotons) {
+            m_matchedToPhotonHypothesisECLCluster = 1;
+            m_matchedPhotonHypothesisClusterDetectorRegion = eclCluster.getDetectorRegion();
+            m_matchedPhotonHypothesisClusterTheta = eclCluster.getTheta();
+            m_matchedPhotonHypothesisClusterPhi = eclCluster.getPhi();
+            m_matchedPhotonHypothesisClusterMinTrkDistance = eclCluster.getMinTrkDistance();
+            m_matchedPhotonHypothesisClusterDeltaL = eclCluster.getDeltaL();
+            eclCluster_PhotonHypothesis_track_related = &eclCluster;
+          } else if (eclCluster.getHypothesisId() == ECLCluster::c_neutralHadron) {
+            m_matchedToHadronHypothesisECLCluster = 1;
+            m_matchedHadronHypothesisClusterDetectorRegion = eclCluster.getDetectorRegion();
+            m_matchedHadronHypothesisClusterTheta = eclCluster.getTheta();
+            m_matchedHadronHypothesisClusterPhi = eclCluster.getPhi();
+            m_matchedHadronHypothesisClusterMinTrkDistance = eclCluster.getMinTrkDistance();
+            m_matchedHadronHypothesisClusterDeltaL = eclCluster.getDeltaL();
+            eclCluster_HadronHypothesis_track_related = &eclCluster;
           }
-        }
-        if (eclCluster_WithHighestEnergy_track_related != nullptr) {
-          m_matchedToECLCluster = 1;
-          m_hypothesisOfMatchedECLCluster = eclCluster_WithHighestEnergy_track_related->getHypothesisId();
-          m_detectorRegion = eclCluster_WithHighestEnergy_track_related->getDetectorRegion();
-          m_matchedClusterTheta = eclCluster_WithHighestEnergy_track_related->getTheta();
-          m_matchedClusterPhi = eclCluster_WithHighestEnergy_track_related->getPhi();
-          m_matchedClusterMinTrkDistance = eclCluster_WithHighestEnergy_track_related->getMinTrkDistance();
-          m_matchedClusterDeltaL = eclCluster_WithHighestEnergy_track_related->getDeltaL();
         }
         // find ECLCluster in which the particle has deposited the majority of its energy
         maximumWeight = -2.;
@@ -220,12 +221,14 @@ void ECLTrackClusterMatchingPerformanceModule::event()
           m_mcparticle_cluster_theta = eclCluster_matchedBestToMCParticle->getTheta();
           m_mcparticle_cluster_phi = eclCluster_matchedBestToMCParticle->getPhi();
           m_mcparticle_cluster_detectorregion = eclCluster_matchedBestToMCParticle->getDetectorRegion();
-          if (eclCluster_WithHighestEnergy_track_related == eclCluster_matchedBestToMCParticle) {
+          if ((eclCluster_PhotonHypothesis_track_related == eclCluster_matchedBestToMCParticle
+               && eclCluster_matchedBestToMCParticle->getHypothesisId() == ECLCluster::c_nPhotons)
+              || (eclCluster_HadronHypothesis_track_related == eclCluster_matchedBestToMCParticle
+                  && eclCluster_matchedBestToMCParticle->getHypothesisId() == ECLCluster::c_neutralHadron)) {
             m_sameclusters = 1;
           }
         }
       }
-
       m_dataTree->Fill(); // write data to tree
     }
   }
@@ -302,16 +305,23 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
 
   addVariableToTree("lastCDCLayer", m_lastCDCLayer, m_dataTree);
 
-  addVariableToTree("ECLMatch", m_matchedToECLCluster, m_dataTree);
-  addVariableToTree("ShowerMatch", m_sameclusters, m_dataTree);
+  addVariableToTree("ECLMatchPhotonHypothesis", m_matchedToPhotonHypothesisECLCluster, m_dataTree);
+  addVariableToTree("ECLMatchHadronHypothesis", m_matchedToHadronHypothesisECLCluster, m_dataTree);
   addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match, m_dataTree);
 
-  addVariableToTree("DetectorRegion", m_detectorRegion, m_dataTree);
-  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster, m_dataTree);
-  addVariableToTree("ClusterTheta", m_matchedClusterTheta, m_dataTree);
-  addVariableToTree("ClusterPhi", m_matchedClusterPhi, m_dataTree);
-  addVariableToTree("MinTrkDistance", m_matchedClusterMinTrkDistance, m_dataTree);
-  addVariableToTree("DeltaL", m_matchedClusterDeltaL, m_dataTree);
+  addVariableToTree("SameMatch", m_sameclusters, m_dataTree);
+
+  addVariableToTree("PhotonHypothesisDetectorRegion", m_matchedPhotonHypothesisClusterDetectorRegion, m_dataTree);
+  addVariableToTree("PhotonHypothesisClusterTheta", m_matchedPhotonHypothesisClusterTheta, m_dataTree);
+  addVariableToTree("PhotonHypothesisClusterPhi", m_matchedPhotonHypothesisClusterPhi, m_dataTree);
+  addVariableToTree("PhotonHypothesisMinTrkDistance", m_matchedPhotonHypothesisClusterMinTrkDistance, m_dataTree);
+  addVariableToTree("PhotonHypothesisDeltaL", m_matchedPhotonHypothesisClusterDeltaL, m_dataTree);
+
+  addVariableToTree("HadronHypothesisDetectorRegion", m_matchedHadronHypothesisClusterDetectorRegion, m_dataTree);
+  addVariableToTree("HadronHypothesisClusterTheta", m_matchedHadronHypothesisClusterTheta, m_dataTree);
+  addVariableToTree("HadronHypothesisClusterPhi", m_matchedHadronHypothesisClusterPhi, m_dataTree);
+  addVariableToTree("HadronHypothesisMinTrkDistance", m_matchedHadronHypothesisClusterMinTrkDistance, m_dataTree);
+  addVariableToTree("HadronHypothesisDeltaL", m_matchedHadronHypothesisClusterDeltaL, m_dataTree);
 
   addVariableToTree("MCClusterEnergy", m_mcparticle_cluster_energy, m_dataTree);
   addVariableToTree("MCClusterDetectorRegion", m_mcparticle_cluster_detectorregion, m_dataTree);
@@ -371,21 +381,31 @@ void ECLTrackClusterMatchingPerformanceModule::setVariablesToDefaultValue()
 
   m_mcparticle_cluster_match = 0;
 
-  m_matchedToECLCluster = 0;
+  m_matchedToPhotonHypothesisECLCluster = 0;
+
+  m_matchedToHadronHypothesisECLCluster = 0;
 
   m_sameclusters = 0;
 
-  m_detectorRegion = 0;
+  m_matchedPhotonHypothesisClusterDetectorRegion = 0;
 
-  m_hypothesisOfMatchedECLCluster = 0;
+  m_matchedPhotonHypothesisClusterTheta = -999;
 
-  m_matchedClusterTheta = -999;
+  m_matchedPhotonHypothesisClusterPhi = -999;
 
-  m_matchedClusterPhi = -999;
+  m_matchedPhotonHypothesisClusterDeltaL = -999;
 
-  m_matchedClusterDeltaL = -999;
+  m_matchedPhotonHypothesisClusterMinTrkDistance = -999;
 
-  m_matchedClusterMinTrkDistance = -999;
+  m_matchedHadronHypothesisClusterDetectorRegion = 0;
+
+  m_matchedHadronHypothesisClusterTheta = -999;
+
+  m_matchedHadronHypothesisClusterPhi = -999;
+
+  m_matchedHadronHypothesisClusterDeltaL = -999;
+
+  m_matchedHadronHypothesisClusterMinTrkDistance = -999;
 
   m_mcparticle_cluster_energy = 0.0;
 

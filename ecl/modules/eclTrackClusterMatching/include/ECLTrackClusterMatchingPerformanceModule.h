@@ -99,20 +99,35 @@ namespace Belle2 {
     /** number of last CDC layer used for track fit */
     int m_lastCDCLayer;
 
-    /** detector region of cluster matched to track */
-    int m_detectorRegion;
+    /** detector region of cluster with photon hypothesis matched to track */
+    int m_matchedPhotonHypothesisClusterDetectorRegion;
 
-    /** theta of cluster matched to track */
-    double m_matchedClusterTheta;
+    /** theta of cluster with photon hypothesis matched to track */
+    double m_matchedPhotonHypothesisClusterTheta;
 
-    /** phi of cluster matched to track */
-    double m_matchedClusterPhi;
+    /** phi of cluster with photon hypothesis matched to track */
+    double m_matchedPhotonHypothesisClusterPhi;
 
-    /** minimal distance between cluster and track (not necessarily the matched one) */
-    double m_matchedClusterMinTrkDistance;
+    /** minimal distance between cluster with photon hypothesis and track (not necessarily the matched one) */
+    double m_matchedPhotonHypothesisClusterMinTrkDistance;
 
-    /** delta l */
-    double m_matchedClusterDeltaL;
+    /** delta l of cluster with photon hypothesis*/
+    double m_matchedPhotonHypothesisClusterDeltaL;
+
+    /** detector region of cluster with hadron hypothesis matched to track */
+    int m_matchedHadronHypothesisClusterDetectorRegion;
+
+    /** theta of cluster with hadron hypothesis matched to track */
+    double m_matchedHadronHypothesisClusterTheta;
+
+    /** phi of cluster with hadron hypothesis matched to track */
+    double m_matchedHadronHypothesisClusterPhi;
+
+    /** minimal distance between cluster with hadron hypothesis and track (not necessarily the matched one) */
+    double m_matchedHadronHypothesisClusterMinTrkDistance;
+
+    /** delta l of cluster with hadron hypothesis*/
+    double m_matchedHadronHypothesisClusterDeltaL;
 
     /** detector region of cluster matched to MCParticle */
     int m_mcparticle_cluster_detectorregion;
@@ -129,11 +144,11 @@ namespace Belle2 {
     /** boolean for match between MCParticle and ECL cluster */
     int m_mcparticle_cluster_match;
 
-    /** boolean for match between track and ECL cluster */
-    int m_matchedToECLCluster;
+    /** boolean for match between track and ECL cluster with photon hypothesis */
+    int m_matchedToPhotonHypothesisECLCluster;
 
-    /** hypothesis of matched ECL cluster */
-    int m_hypothesisOfMatchedECLCluster;
+    /** boolean for match between track and ECL cluster with hadron hypothesis */
+    int m_matchedToHadronHypothesisECLCluster;
 
     /** boolean whether matched to ECL cluster with highest weight */
     int m_sameclusters;

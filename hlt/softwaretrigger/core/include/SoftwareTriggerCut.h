@@ -119,7 +119,7 @@ namespace Belle2 {
       * Make constructor private. You should only download a SoftwareCut from the database or compile a new one from a string.
       */
       SoftwareTriggerCut(std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>>&& cut,
-                         const std::vector<unsigned int> prescaleFactor,
+                         const std::vector<unsigned int>& prescaleFactor,
                          const bool rejectCut) : SoftwareTriggerCutBase(prescaleFactor, rejectCut),
         m_cut(std::move(cut))
       {

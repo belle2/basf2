@@ -254,7 +254,7 @@ void PXDMCBgTupleProducerModule::terminate()
       m_sensorData[sensorID].m_meanOccupancy = bgdata.m_meanOccupancy * (m_integrationTime / currentComponentTime);
 
       if (currentSensorArea > 0) {
-        m_sensorData[sensorID].m_dose *= (1.0 / currentComponentTime) * (1000 / currentSensorMass);
+        m_sensorData[sensorID].m_dose *= (1.0 / (currentComponentTime / Unit::s)) * (1000 / currentSensorMass);
         m_sensorData[sensorID].m_expo *= (1.0 / currentSensorArea) * (1.0  / (currentComponentTime / Unit::s));
         m_sensorData[sensorID].m_softPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
         m_sensorData[sensorID].m_hardPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));

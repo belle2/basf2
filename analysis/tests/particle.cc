@@ -435,10 +435,6 @@ namespace {
     T3Kaon->addRelationTo(MC3);
     Particle* ROEPion    = particles.appendNew(Particle(TLorentzVector(3.5, 3.5, 3.5, 3.5),  211, Particle::c_Flavored,
                                                         Particle::c_Track, 4));
-    //MCParticle* MCROE      = mcparticles. appendNew(MCParticle());
-    //MCROE->setPDG(1);
-    //ROEPion->addExtraInfo("test_var", 4.0);
-    //ROEPion->addRelationTo(MCROE);
 
     // Construct composite particles
     Particle* D0KK = particles.appendNew(Particle(TLorentzVector(4, 4, 4, 4), 421));
@@ -514,7 +510,6 @@ namespace {
     EXPECT_TRUE(mc2orig->getPDG() == mc2copy->getPDG());
     EXPECT_TRUE(mc3orig->getPDG() == mc3copy->getPDG());
 
-    //EXPECT_TRUE(roeorig->getNTracks() == roecopy->getNTracks());
     EXPECT_TRUE(roeorig->hasParticle(ROEPion) && roecopy->hasParticle(ROEPion));
 
     // modify original and check the copy

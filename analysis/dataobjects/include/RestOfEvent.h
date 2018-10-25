@@ -311,6 +311,7 @@ namespace Belle2 {
     TLorentzVector get4Vector(std::string maskName = "") const;
 
     /**
+     * OBSOLETE:
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
      * @param name of mask
@@ -357,6 +358,7 @@ namespace Belle2 {
     std::vector<std::string> getMaskNames() const;
 
     /**
+     * OBSOLETE:
      * Added helper function so creation of temporary particles and setting pid relations is not needed
      */
     double atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const;

@@ -59,6 +59,7 @@ PXDMCBgTupleProducerModule::PXDMCBgTupleProducerModule() : Module()
   addParam("maskDeadPixels", m_maskDeadPixels, "Correct bg rates by known dead pixels", bool(true));
   addParam("nBinsU", m_nBinsU, "Number of regions per sensor along u side", int(1));
   addParam("nBinsV", m_nBinsV, "Number of regions per sensor along v side", int(6));
+  addParam("overrideComponentTime", m_overrideComponentTime, "User specified component time in micro seconds", double(0.0));
 }
 
 
@@ -76,6 +77,8 @@ void PXDMCBgTupleProducerModule::initialize()
 
   // PXD integration time
   m_integrationTime *= Unit::us;
+
+  m_overrideComponentTime *= Unit::us;
 
   // So far, we did not see PXD data
   m_hasPXDData = false;
@@ -235,6 +238,8 @@ void PXDMCBgTupleProducerModule::terminate()
     TTree* treeBEAST = new TTree("tout", "BEAST data tree");
 
     double currentComponentTime = m_componentTime;
+    if (m_overrideComponentTime > 0.0) currentComponentTime = m_overrideComponentTime;
+
     B2RESULT("Total real time is " << currentComponentTime / Unit::us << " microseconds.");
     B2RESULT("This is equivalent to  " << currentComponentTime / m_integrationTime << " random triggered events.");
 

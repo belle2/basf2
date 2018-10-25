@@ -112,6 +112,7 @@ namespace Belle2 {
       std::map<std::pair<VxdID, int>, double> m_regionSensitiveAreaMap; /**< Struct to hold region-wise sensitive area */
       bool m_hasPXDData; /**< Flag to indicate there was at least one PXDDigit in the run */
       double m_componentTime; /**< Time of current component. */
+      double m_overrideComponentTime; /**< Time of current component given by user. */
     };
 
     inline int PXDMCBgTupleProducerModule::getRegionID(int uBin, int vBin) const

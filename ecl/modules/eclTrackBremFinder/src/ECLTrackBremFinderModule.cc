@@ -18,7 +18,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/BremPhoton.h>
 
 //Tracking
 #include <tracking/dataobjects/RecoTrack.h>
@@ -85,10 +84,6 @@ void ECLTrackBremFinderModule::initialize()
   m_bremHits.registerInDataStore();
   m_bremHits.registerRelationTo(m_eclClusters);
   m_bremHits.registerRelationTo(m_recoTracks);
-
-  m_bremPhotons.registerInDataStore();
-  m_bremPhotons.registerRelationTo(m_eclClusters);
-  m_bremPhotons.registerRelationTo(m_tracks);
 }
 
 void ECLTrackBremFinderModule::event()
@@ -302,10 +297,6 @@ void ECLTrackBremFinderModule::event()
           m_bremHits.appendNew(recoTrack, bremCluster,
                                fitted_pos, bremCluster->getEnergy(),
                                clusterDistance, effAcceptanceFactor);
-
-          // generate a mdst object bremphoton to transfer the information to the analysis
-          // todo: remove this in favor of named relations
-          m_bremPhotons.appendNew(&track, bremCluster, effAcceptanceFactor);
 
           if (primaryClusterOfTrack) {
             primaryClusterOfTrack->addRelationTo(bremCluster, effAcceptanceFactor);

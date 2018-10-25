@@ -22,7 +22,6 @@ namespace Belle2 {
   class EventMetaData;
   class RecoTrack;
   class BremHit;
-  class BremPhoton;
 
   /**
    * Module to assign ECL Clusters resulting from Bremsstrahlung to the
@@ -58,8 +57,6 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks;
     /** StoreArray BremHits */
     StoreArray<BremHit> m_bremHits;
-    /** StoreArray BremPhotons */
-    StoreArray<BremPhoton> m_bremPhotons;
     /** StoreObjPtr EventMetaData */
     StoreObjPtr<EventMetaData> m_evtPtr;
     /**

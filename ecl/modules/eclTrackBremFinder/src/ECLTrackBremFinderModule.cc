@@ -12,6 +12,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/datastore/StoreArray.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -77,7 +78,8 @@ void ECLTrackBremFinderModule::initialize()
 
   m_tracks.isRequired(m_param_tracksStoreArrayName);
 
-  m_eclClusters.registerRelationTo(m_tracks);
+  const std::string relationName = "Bremsstrahlung";
+  m_eclClusters.registerRelationTo(m_tracks, DataStore::c_Event, DataStore::c_WriteOut, relationName);
 
   m_recoTracks.isRequired();
 

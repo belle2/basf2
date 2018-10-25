@@ -205,6 +205,103 @@ namespace Belle2 {
     /** Get list of streaming objects */
     const std::vector<std::string>& getStreamingObjects() const { return m_streamingObjects; }
 
+    // ZMQ Options
+    /// Flag if ZMQ should be used instead of the RingBuffer multiprocesing implementation
+    bool getUseZMQ() const
+    {
+      return m_useZMQ;
+    }
+
+    /// Set the flag if ZMQ should be used instead of the RingBuffer multiprocessing implementation
+    void setUseZMQ(bool useZMQ)
+    {
+      m_useZMQ = useZMQ;
+    }
+
+    /**< Socket address to use in ZMQ. */
+    const std::string& getZMQSocketAddress() const
+    {
+      return m_zmqSocketAddress;
+    }
+
+    /**< Socket address to use in ZMQ. */
+    void setZMQSocketAddress(const std::string& zmqSocketAddress)
+    {
+      m_zmqSocketAddress = zmqSocketAddress;
+    }
+
+    /**< Maximal waiting time of any ZMQ module for any communication in ms */
+    unsigned int getZMQMaximalWaitingTime() const
+    {
+      return m_zmqMaximalWaitingTime;
+    }
+
+    /**< Maximal waiting time of any ZMQ module for any communication in ms */
+    void setZMQMaximalWaitingTime(unsigned int zmqMaximalWaitingTime)
+    {
+      m_zmqMaximalWaitingTime = zmqMaximalWaitingTime;
+    }
+
+    /**< Number of events to keep in flight for every worker */
+    unsigned int getZMQEventBufferSize() const
+    {
+      return m_zmqEventBufferSize;
+    }
+
+    /**< Number of events to keep in flight for every worker */
+    void setZMQEventBufferSize(unsigned int zmqEventBufferSize)
+    {
+      m_zmqEventBufferSize = zmqEventBufferSize;
+    }
+
+    /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
+    unsigned int getZMQWorkerTimeout() const
+    {
+      return m_zmqWorkerTimeout;
+    }
+
+    /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
+    void setZMQWorkerTimeout(unsigned int zmqWorkerTimeout)
+    {
+      m_zmqWorkerTimeout = zmqWorkerTimeout;
+    }
+
+    /**< If a worker dies, store its events in a backup. */
+    bool getZMQUseEventBackup() const
+    {
+      return m_zmqUseEventBackup;
+    }
+
+    /**< If a worker dies, store its events in a backup. */
+    void setZMQUseEventBackup(bool zmqUseEventBackup)
+    {
+      m_zmqUseEventBackup = zmqUseEventBackup;
+    }
+
+    /**< If a worker dies, restart it. */
+    bool getZMQRestartFailedWorkers() const
+    {
+      return m_zmqRestartFailedWorkers;
+    }
+
+    /**< If a worker dies, restart it. */
+    void setZMQRestartFailedWorkers(bool zmqRestartFailedWorkers)
+    {
+      m_zmqRestartFailedWorkers = zmqRestartFailedWorkers;
+    }
+
+    /**< If a worker dies, fail also. */
+    bool getZMQFailOnFailedWorkers() const
+    {
+      return m_zmqFailOnFailedWorkers;
+    }
+
+    /**< If a worker dies, fail also. */
+    void setZMQFailOnFailedWorkers(bool zmqFailOnFailedWorkers)
+    {
+      m_zmqFailOnFailedWorkers = zmqFailOnFailedWorkers;
+    }
+
   private:
 
     std::string m_externalsPath;  /**< The path in which the externals are located. */
@@ -229,6 +326,17 @@ namespace Belle2 {
     int m_run; /**< override run for EventInfoSetter. */
     int m_experiment; /**< override experiment for EventInfoSetter. */
     unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
+
+    // ZMQ specific settings
+    bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */
+    std::string m_zmqSocketAddress = ""; /**< Socket address to use in ZMQ. If not set, uses a random IPC connection. */
+    unsigned int m_zmqMaximalWaitingTime = 100 * 1000; /**< Maximal waiting time of any ZMQ module for any communication in ms */
+    unsigned int m_zmqEventBufferSize = 2; /**< Number of events to keep in flight for every worker */
+    unsigned int m_zmqWorkerTimeout =
+      0; /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
+    bool m_zmqUseEventBackup = false; /**< If a worker dies, store its events in a backup. */
+    bool m_zmqRestartFailedWorkers = false; /**< If a worker dies, restart it. */
+    bool m_zmqFailOnFailedWorkers = true; /**< If a worker dies, fail also. Will not be used if restartFailedWorkers is true. */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

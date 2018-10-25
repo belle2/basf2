@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Scale Momentum algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
 

@@ -219,7 +219,7 @@ void ECLTrackBremFinderModule::event()
                                                            bremFinder.getEffAcceptanceFactor());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
-          } catch (NoTrackFitResult) {
+          } catch (NoTrackFitResult&) {
             B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
           } catch (genfit::Exception e) {
             B2WARNING("Exception" << e.what());
@@ -242,14 +242,14 @@ void ECLTrackBremFinderModule::event()
                 if (distance < 3) {
                   nearestHitContainer.add(hit, distance);
                 }
-              } catch (NoTrackFitResult) {
+              } catch (NoTrackFitResult&) {
                 B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
               }
             }
-          }
-          if (nearestHitContainer.hasMatch()) {
-            auto nearestHit = nearestHitContainer.getBestMatch();
-            extrapolationParams.push_back({virtualHitRadius, nearestHit});
+            if (nearestHitContainer.hasMatch()) {
+              auto nearestHit = nearestHitContainer.getBestMatch();
+              extrapolationParams.push_back({virtualHitRadius, nearestHit});
+            }
           }
         }
 

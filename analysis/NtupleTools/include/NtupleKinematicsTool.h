@@ -30,7 +30,7 @@ namespace Belle2 {
     /** Momentum in lab system (px py pz e). */
     float** m_fP4;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
     /** delete all 'new's */
     void deallocateMemory();
   public:
@@ -39,7 +39,7 @@ namespace Belle2 {
     /** Destructor */
     ~NtupleKinematicsTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2

@@ -24,9 +24,9 @@ namespace Belle2 {
     /** Destructor */
     ~GeometryModule() {};
     /** Create geometry */
-    void initialize();
+    void initialize() override;
     /** Clean up the geometry */
-    void terminate();
+    void terminate() override;
   protected:
     /** Path for the geometry in the parameter space */
     std::string m_geometryPath;

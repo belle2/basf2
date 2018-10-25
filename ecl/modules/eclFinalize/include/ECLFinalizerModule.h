@@ -35,19 +35,19 @@ namespace Belle2 {
     ~ECLFinalizerModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */

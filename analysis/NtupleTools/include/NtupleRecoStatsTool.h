@@ -37,12 +37,12 @@ namespace Belle2 {
     /** N Particles*/
     int m_iParticles;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
   public:
     /** Constructor. */
     NtupleRecoStatsTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 } // namepspace Belle2
 

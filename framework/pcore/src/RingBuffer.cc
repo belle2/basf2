@@ -37,15 +37,7 @@ using namespace Belle2;
 // Constructor of Private Ringbuffer
 RingBuffer::RingBuffer(int size)
 {
-  m_file = false;
-  m_new = true;
-  m_procIsBusy = false;
-  m_pathname = "";
-  m_shmkey = IPC_PRIVATE;
-  m_semkey = IPC_PRIVATE;
-
   openSHM(size);
-
   B2DEBUG(32, "RingBuffer initialization done");
 }
 
@@ -70,10 +62,6 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
     m_shmkey = ftok(m_pathname.c_str(), 1);
     m_semkey = ftok(m_pathname.c_str(), 2);
   } else { // Private
-    m_file = false;
-    m_new = true;
-    m_shmkey = IPC_PRIVATE;
-    m_semkey = IPC_PRIVATE;
     B2DEBUG(32, "[RingBuffer] Opening private ring buffer");
   }
 

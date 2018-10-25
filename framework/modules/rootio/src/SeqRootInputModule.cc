@@ -31,14 +31,11 @@ REG_MODULE(SeqRootInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size(0), m_size2(0)
+SeqRootInputModule::SeqRootInputModule() : Module()
 {
   //Set module properties
   setDescription("Read .sroot files produced by SeqRootOutput.");
   setPropertyFlags(c_Input);
-
-  m_file = 0;
-  m_nevt = -1;
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName,

@@ -24,7 +24,7 @@ namespace Belle2 {
      */
     SwitchDataStoreModule();
     /** setter for Path. */
-    void init(std::string to, bool doCopy, std::vector<std::string> mergeBack);
+    void init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack);
 
     ~SwitchDataStoreModule();
 

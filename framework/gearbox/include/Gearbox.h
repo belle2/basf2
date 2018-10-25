@@ -191,7 +191,9 @@ namespace Belle2 {
     /** Singleton: private constructor */
     Gearbox();
     /** Singleton: private copy constructor */
-    Gearbox(const Gearbox& other) = delete;
+    Gearbox(const Gearbox&) = delete;
+    /** Also no assignment operator */
+    Gearbox& operator=(const Gearbox&) = delete;
 
     /** Function to be called when libxml requests a new input uri to be opened */
     gearbox::InputContext* openXmlUri(const std::string& uri) const;

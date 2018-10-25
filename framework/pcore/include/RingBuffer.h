@@ -6,6 +6,7 @@
 #pragma once
 
 #include <sys/types.h>
+#include <sys/ipc.h>
 #include <string>
 
 namespace Belle2 {
@@ -100,14 +101,14 @@ namespace Belle2 {
     void dumpInfo() const;
 
   private:
-    bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
-    bool m_file; /**< True if m_pathfd needs to be closed. */
-    std::string m_pathname; /**< Path for identifying shared memory if named ring buffer is created. */
-    int  m_pathfd; /**< Associated file descriptor. */
-    key_t m_shmkey; /**< SHM key, see shmget(2). */
-    key_t m_semkey; /**< Semaphore key, see semget(2). */
+    bool m_new{true}; /**< True if we created the ring buffer ourselves (and need to clean it). */
+    bool m_file{false}; /**< True if m_pathfd needs to be closed. */
+    std::string m_pathname{""}; /**< Path for identifying shared memory if named ring buffer is created. */
+    int  m_pathfd{ -1}; /**< Associated file descriptor. */
+    key_t m_shmkey{IPC_PRIVATE}; /**< SHM key, see shmget(2). */
+    key_t m_semkey{IPC_PRIVATE}; /**< Semaphore key, see semget(2). */
     /** file path containing ids of shm and sema for private shared mem, used for easier cleanup if we fail to do things properly */
-    std::string m_semshmFileName;
+    std::string m_semshmFileName{""};
 
     /** Is this process currently processing events from this RingBuffer?
      *

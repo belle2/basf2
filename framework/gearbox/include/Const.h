@@ -61,16 +61,12 @@ namespace Belle2 {
     class DetectorSet {
     public:
 
-      /**
-       * Default constructor.
-       */
-      DetectorSet(): m_bits(0) {};
-
-      /**
-       * Copy constructor.
-       * @param set  The copied set of detector IDs.
-       */
-      DetectorSet(const DetectorSet& set): m_bits(set.m_bits) {}
+      /** Default constructor */
+      DetectorSet(): m_bits(0) {}
+      /** Copy constructor */
+      DetectorSet(const DetectorSet&) = default;
+      /** Assignment operator */
+      DetectorSet& operator=(const DetectorSet&) = default;
 
       /**
        * Constructor for a set containig one detector ID.
@@ -284,14 +280,13 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set),
-        m_index(index)  {};
+      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1):
+        m_pdgCode(pdgCode), m_set(set), m_index(index)  {}
 
-      /** Copy constructor.
-       *
-       *  The created object will be part of the same set.
-       */
-      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_set(other.m_set), m_index(other.m_index) { };
+      /** Copy constructor  */
+      ParticleType(const ParticleType&) = default;
+      /** Assignment Operator */
+      ParticleType& operator=(const ParticleType&) = default;
 
       /**
        * Comparison operator to be usable in sets.
@@ -349,7 +344,6 @@ namespace Belle2 {
        */
       double getMass() const;
 
-
     private:
       int m_pdgCode;  /**< PDG code of the particle **/
       const ParticleSet* m_set; /**< set this particle belongs to, or NULL if stand-alone. */
@@ -384,15 +378,11 @@ namespace Belle2 {
     class ParticleSet {
     public:
       /** Emtpy constructor. */
-      ParticleSet() { };
-
-      /** Copy constructor to make sure particles belong to correct set. */
-      ParticleSet(const ParticleSet& other)
-      {
-        for (ParticleType pdgIter : other) {
-          add(pdgIter);
-        }
-      }
+      ParticleSet() = default;
+      /** Copy constructor */
+      ParticleSet(const ParticleSet&) = default;
+      /** Assignment operator */
+      ParticleSet& operator=(const ParticleSet&) = default;
 
       /** Add a copy of the given ParticleType to this set.
        *
@@ -563,10 +553,10 @@ namespace Belle2 {
      * @{
      * no Const instances allowed.
      */
-    Const() { };
-    Const(const Const&) { };
-    Const& operator=(const Const&) { return *this; };
-    ~Const() {};
+    Const() = delete;
+    Const(const Const&) = delete;
+    Const& operator=(const Const&) = delete;
+    ~Const() = delete;
     /** @} */
 
   };

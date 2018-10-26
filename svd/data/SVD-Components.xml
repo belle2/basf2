@@ -102,15 +102,15 @@
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
                         <BackplaneCapacitanceU unit="pF/cm">0.12</BackplaneCapacitanceU>
-			<InterstripCapacitanceU unit="pF/cm">0.75</InterstripCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">0.40</InterstripCapacitanceU>
 			<CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
                         <BackplaneCapacitanceV unit="pF/cm">0.39</BackplaneCapacitanceV>
-			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
+			<InterstripCapacitanceV unit="pF/cm">0.58</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <!-- All except backward sensors are on Origami -->
-                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
+                        <ADUEquivalentU unit="e">410</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">395</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">1080</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
                         <ADUEquivalentSbwU unit="e">375</ADUEquivalentSbwU>
                         <ADUEquivalentSbwV unit="e">375</ADUEquivalentSbwV>
@@ -141,15 +141,15 @@
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
 			<BackplaneCapacitanceU unit="pF/cm">0.08</BackplaneCapacitanceU>
-			<InterstripCapacitanceU unit="pF/cm">0.92</InterstripCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">1.04</InterstripCapacitanceU>
 			<CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
 			<BackplaneCapacitanceV unit="pF/cm">0.26</BackplaneCapacitanceV>
-	        	<InterstripCapacitanceV unit="pF/cm">0.75</InterstripCapacitanceV>
+	        	<InterstripCapacitanceV unit="pF/cm">0.41</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
-                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">800</ElectronicNoiseV>
+                        <ADUEquivalentU unit="e">425</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">440</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">940</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">

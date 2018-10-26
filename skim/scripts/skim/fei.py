@@ -3,6 +3,7 @@
 
 """
 (Semi-)Leptonic Working Group Skims for missing energy modes that use the `FullEventInterpretation` (FEI) algorithm.
+ The fei training is: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
 """
 
 __authors__ = [

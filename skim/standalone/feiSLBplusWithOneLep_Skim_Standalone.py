@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""FEI Semi-leptonic B0 tag skim standalone for generic analysis in th
-    (Semi-)Leptonic and Missing Energy Working Group
-    Skim LFN code: 11180400
-    fei training: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
- """
-
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
 
 import sys

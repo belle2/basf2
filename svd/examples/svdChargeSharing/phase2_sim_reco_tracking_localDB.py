@@ -28,8 +28,8 @@ fileOUT = sys.argv[2]
 localdb_dir = sys.argv[3]
 
 use_database_chain()
-use_central_database("development")
-use_local_database(localdb_dir + "database.txt", localdb_dir)
+# use_central_database("development")
+use_local_database(localdb_dir + "/database.txt", localdb_dir)
 
 main = create_path()
 main.add_module('RootInput', inputFileName=fileIN)

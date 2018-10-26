@@ -24,10 +24,8 @@
 
 namespace Belle2 {
 
-  /** This class defines the dbobject and the method to access SVD
-   * calibrations from the noise local runs. It provides the strip noise
-   * in ADC units.
-   *
+  /** This class defines the wrapper to retrieve the the list
+   *  of the hot strips flgged offline.
    *
    */
   class SVDHotStripsCalibrations {
@@ -39,7 +37,7 @@ namespace Belle2 {
     SVDHotStripsCalibrations(): m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDHotStripsCalibrations: from now one we are using " <<
+        B2INFO("SVDHotStripsCalibrations: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
 

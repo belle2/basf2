@@ -42,20 +42,6 @@ DQMHistSnapshotsModule::DQMHistSnapshotsModule()
 
 DQMHistSnapshotsModule::~DQMHistSnapshotsModule() { }
 
-
-TH1* DQMHistSnapshotsModule::GetHisto(TString histoname)
-{
-  TH1* hh1;
-  gROOT->cd();
-  hh1 = findHist(histoname.Data());
-
-  if (hh1 == NULL) {
-    B2DEBUG(20, "Histo " << histoname << " not found");
-  }
-
-  return hh1;
-}
-
 void DQMHistSnapshotsModule::initialize()
 {
   gROOT->cd();
@@ -101,7 +87,7 @@ void DQMHistSnapshotsModule::event()
 
   const HistList& hlist = getHistList();
 
-  for (HistList::const_iterator it = hlist.begin(); it != hlist.end(); it++) {
+  for (HistList::const_iterator it = hlist.begin(); it != hlist.end(); ++it) {
     TString a = it->first;
 
     SSNODE* n = find_snapshot(a);

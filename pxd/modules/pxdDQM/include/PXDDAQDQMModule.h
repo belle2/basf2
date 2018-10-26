@@ -63,6 +63,7 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hDAQDHETriggerGate;/** DHE Trigger Gate ("start Row")  */
       std::map<VxdID, TH1F*> hDAQDHEReduction;/** DHE data reduction  */
       std::map<VxdID, TH2F*> hDAQCM;/** Common Mode per DHE to gate and DHP level */
+      std::map<VxdID, TH1F*> hDAQCM2;/** Common Mode per DHE to gate and DHP level */
       std::map<int, TH1F*> hDAQDHCReduction;/** DHC data reduction  */
 
       virtual void defineHisto();

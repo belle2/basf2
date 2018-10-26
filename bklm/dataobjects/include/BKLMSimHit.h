@@ -90,7 +90,7 @@ namespace Belle2 {
 
     //! Get the hit time (implementation of base class function
     //! @return the hit time (ns) since start of the event
-    float getGlobalTime() const { return m_Time; }
+    float getGlobalTime() const override { return m_Time; }
 
     //! Get the hit time
     //! @return the hit time (ns) since start of the event
@@ -106,7 +106,7 @@ namespace Belle2 {
 
     //! Adjust time (for background-overlay hit)
     //! @param delta time shift (ns)
-    void shiftInTime(float delta) { m_Time += delta; }
+    void shiftInTime(float delta) override { m_Time += delta; }
 
   private:
 

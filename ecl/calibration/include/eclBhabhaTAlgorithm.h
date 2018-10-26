@@ -42,11 +42,7 @@ namespace Belle2 {
     protected:
 
       /**..Run algorithm on events */
-      virtual EResult calibrate();
-
-    private:
-      /** Number of processed runs */
-      unsigned int m_run_count;
+      virtual EResult calibrate() override;
     };
   }
 } // namespace Belle2

@@ -30,10 +30,10 @@ namespace Belle2 {
     virtual ~PrintCollectionsModule();
 
     /** initialization. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Prints information for each collection in the DataStore. */
-    virtual void event();
+    virtual void event() override;
 
 
   protected:

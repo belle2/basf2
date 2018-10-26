@@ -36,11 +36,11 @@ namespace Belle2 {
     SVDClusterQualityEstimatorModule();
 
     /** Init the module.*/
-    virtual void initialize();
+    virtual void initialize() override;
     /** Event. */
-    virtual void event();
+    virtual void event() override;
     /** Final output.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:

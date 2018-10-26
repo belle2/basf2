@@ -47,10 +47,10 @@ namespace Belle2 {
     SignalSideParticleListCreatorModule();
 
     /**  initialize method */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  event method */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

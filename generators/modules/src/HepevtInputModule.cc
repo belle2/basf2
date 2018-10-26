@@ -127,7 +127,7 @@ void HepevtInputModule::event()
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-  } catch (HepevtReader::HepEvtEmptyEventError) {
+  } catch (HepevtReader::HepEvtEmptyEventError&) {
     B2DEBUG(100, "Reached end of HepEvt file.");
     m_hepevt.closeCurrentInputFile();
     m_iFile++;

@@ -368,8 +368,8 @@ int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int pl
   //we flip channel to match raw data
   int MaxiChannel = 0;
   if (!isForward && sector == 3 && plane == 0) {
-    if (plane == 0 && layer < 3) MaxiChannel = 38;
-    if (plane == 0 && layer > 2) MaxiChannel = 34;
+    if (layer < 3) MaxiChannel = 38;
+    if (layer > 2) MaxiChannel = 34;
   } else {
     if (layer == 1 && plane == 1) MaxiChannel = 37;
     if (layer == 2 && plane == 1) MaxiChannel = 42;

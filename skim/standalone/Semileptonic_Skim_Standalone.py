@@ -15,7 +15,7 @@ from stdPi0s import *
 from stdV0s import *
 from stdCharm import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 import sys
 import os
@@ -41,7 +41,7 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # SL Skim
-from SLUntagged_List import *
+from skim.semileptonic import SemileptonicList
 SLList = SemileptonicList()
 skimCode1 = encodeSkimName('SLUntagged')
 print(skimCode1)
@@ -49,7 +49,7 @@ skimOutputUdst(skimCode1, SLList)
 summaryOfLists(SLList)
 
 
-from LeptonicUntagged_List import *
+from skim.leptonic import LeptonicList
 lepList = LeptonicList()
 skimCode2 = encodeSkimName('LeptonicUntagged')
 print(skimCode2)
@@ -57,7 +57,7 @@ skimOutputUdst(skimCode2, lepList)
 summaryOfLists(lepList)
 
 
-from PRsemileptonicUntagged_List import *
+from skim.semileptonic import PRList
 PRList = PRList()
 skimCode3 = encodeSkimName('PRsemileptonicUntagged')
 skimOutputUdst(skimCode3, PRList)

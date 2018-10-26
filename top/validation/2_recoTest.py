@@ -34,6 +34,7 @@ main.add_module(gearbox)
 
 # Geometry (only TOP and B-field)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['MagneticField', 'TOP'])
 main.add_module(geometry)
 
@@ -65,6 +66,9 @@ main.add_module(topdigi)
 # Dedicated track maker using MC information only
 trackmaker = register_module('TOPMCTrackMaker')
 main.add_module(trackmaker)
+
+# Channel masker
+main.add_module('TOPChannelMasker')
 
 # TOP reconstruction
 topreco = register_module('TOPReconstructor')

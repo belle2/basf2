@@ -356,12 +356,51 @@ namespace {
 
   }
 
-  TEST(ROEVariablesTest, Variable)
-  {
+  class ROEVariablesTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
 
+      StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
+      DataStore::Instance().setInitializeActive(true);
+      pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
+      StoreArray<ECLCluster> myECLClusters;
+      StoreArray<KLMCluster> myKLMClusters;
+      StoreArray<TrackFitResult> myTFRs;
+      StoreArray<Track> myTracks;
+      StoreArray<Particle> myParticles;
+      StoreArray<RestOfEvent> myROEs;
+      StoreArray<PIDLikelihood> myPIDLikelihoods;
+      myECLClusters.registerInDataStore();
+      myKLMClusters.registerInDataStore();
+      myTFRs.registerInDataStore();
+      myTracks.registerInDataStore();
+      myParticles.registerInDataStore();
+      myROEs.registerInDataStore();
+      myPIDLikelihoods.registerInDataStore();
+      myParticles.registerRelationTo(myROEs);
+      myTracks.registerRelationTo(myPIDLikelihoods);
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+//
+// TODO: redo all ROE variable tests
+//
+
+  TEST_F(ROEVariablesTest, Variable)
+  {
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
     StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
-    DataStore::Instance().setInitializeActive(true);
-    pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
     StoreArray<TrackFitResult> myTFRs;
@@ -369,16 +408,6 @@ namespace {
     StoreArray<Particle> myParticles;
     StoreArray<RestOfEvent> myROEs;
     StoreArray<PIDLikelihood> myPIDLikelihoods;
-    myECLClusters.registerInDataStore();
-    myKLMClusters.registerInDataStore();
-    myTFRs.registerInDataStore();
-    myTracks.registerInDataStore();
-    myParticles.registerInDataStore();
-    myROEs.registerInDataStore();
-    myPIDLikelihoods.registerInDataStore();
-    myParticles.registerRelationTo(myROEs);
-    myTracks.registerRelationTo(myPIDLikelihoods);
-    DataStore::Instance().setInitializeActive(false);
 
     pi0ParticleList.create();
     pi0ParticleList->initialize(111, "pi0:vartest");
@@ -402,14 +431,14 @@ namespace {
     myROEECL.setEnergy(eclROE);
     myROEECL.setHypothesisId(5);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
-
+    Particle* roeECLParticle = myParticles.appendNew(savedROEECL);
     // Create KLMCluster on ROE side
     KLMCluster myROEKLM;
     KLMCluster* savedROEKLM = myKLMClusters.appendNew(myROEKLM);
+    Particle* roeKLMParticle = myParticles.appendNew(savedROEKLM);
 
     // Create Track on ROE side
     // - create TFR
-    TRandom3 generator;
 
     const float pValue = 0.5;
     const float bField = 1.5;
@@ -425,27 +454,35 @@ namespace {
 
     // - create Track
     Track myROETrack;
-    myROETrack.setTrackFitResultIndex(Const::muon, 1);
+    myROETrack.setTrackFitResultIndex(Const::muon, 0);
     Track* savedROETrack = myTracks.appendNew(myROETrack);
-
     // - create PID information, add relation
     PIDLikelihood myPID;
-    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.5);
-    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.52);
-    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.54);
-    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.56);
-    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.15);
+    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.152);
+    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.154);
+    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.156);
+    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.158);
+    myPID.setLogLikelihood(Const::TOP, Const::pion, 0.5);
+    myPID.setLogLikelihood(Const::ARICH, Const::pion, 0.52);
+    myPID.setLogLikelihood(Const::ECL, Const::pion, 0.54);
+    myPID.setLogLikelihood(Const::CDC, Const::pion, 0.56);
+    myPID.setLogLikelihood(Const::SVD, Const::pion, 0.58);
     PIDLikelihood* savedPID = myPIDLikelihoods.appendNew(myPID);
 
     savedROETrack->addRelationTo(savedPID);
+    Particle* roeTrackParticle = myParticles.appendNew(savedROETrack, Const::muon);
 
     // Create ROE object, append tracks, clusters, add relation to particle
+    //TODO: make particles
     RestOfEvent roe;
-    roe.addTrack(savedROETrack);
-    roe.addECLCluster(savedROEECL);
-    roe.addKLMCluster(savedROEKLM);
+    vector<const Particle*> roeParticlesToAdd;
+    roeParticlesToAdd.push_back(roeTrackParticle);
+    roeParticlesToAdd.push_back(roeECLParticle);
+    roeParticlesToAdd.push_back(roeKLMParticle);
+    roe.addParticles(roeParticlesToAdd);
     RestOfEvent* savedROE = myROEs.appendNew(roe);
-
+    /*
     std::map<std::string, std::map<unsigned int, bool>> tMasks;
     std::map<std::string, std::map<unsigned int, bool>> cMasks;
     std::map<std::string, std::vector<double>> fracs;
@@ -475,14 +512,22 @@ namespace {
     savedROE->appendTrackMasks(tMasks);
     savedROE->appendECLClusterMasks(cMasks);
     savedROE->appendChargedStableFractionsSet(fracs);
-
+    */
+    savedROE->initializeMask("mask1", "test");
+    std::shared_ptr<Variable::Cut> trackSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    std::shared_ptr<Variable::Cut> eclSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    savedROE->updateMaskWithCuts("mask1");
+    savedROE->initializeMask("mask2", "test");
+    savedROE->updateMaskWithCuts("mask2",  trackSelection,  eclSelection);
     part->addRelationTo(savedROE);
 
     // ROE variables
     PCmsLabTransform T;
     float E0 = T.getCMSEnergy() / 2;
-
-    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::pion.getMass()*Const::pion.getMass() + 1.0 /*momentum.Mag2()*/));
+    B2INFO("E0 is " << E0);
+    //*/
+    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + 1.0 /*momentum.Mag2()*/));
+    pTrack_ROE_Lab = roeTrackParticle->get4Vector();
     TLorentzVector pECL_ROE_Lab(0, 0, eclROE, eclROE);
     TLorentzVector pECL_REC_Lab(0, 0, eclREC, eclREC);
 
@@ -521,14 +566,18 @@ namespace {
     neutrino4vecCMS.SetE(neutrino4vecCMS.Vect().Mag());
 
     TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
-
+    B2INFO("roe4vecCMS.E() = " << roe4vecCMS.E());
     // TESTS FOR ROE STRUCTURE
-    EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
-    EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
-    double fArray[6];
-    EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
+    //double fArray[6];
+    //EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithCuts("noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithV0("noSuchMask", part));
+    EXPECT_B2FATAL(savedROE->hasParticle(part, "noSuchMask"));
 
     // TESTS FOR ROE VARIABLES
+
     const Manager::Var* var = Manager::Instance().getVariable("nROE_Tracks(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
@@ -612,6 +661,7 @@ namespace {
     var = Manager::Instance().getVariable("WE_MissM2(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
+
   }
 
 
@@ -1690,6 +1740,170 @@ namespace {
     // -
     EXPECT_B2FATAL(vnonsense->function(nullptr));
     EXPECT_FLOAT_EQ(vsensible->function(nullptr), 4.3);
+  }
+  TEST_F(MetaVariableTest, totalPxOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPxOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPxOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 2.2);
+  }
+  TEST_F(MetaVariableTest, totalPyOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPyOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPyOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 1.5);
+  }
+  TEST_F(MetaVariableTest, totalPzOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPzOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPzOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 3.1);
+  }
+  TEST_F(MetaVariableTest, maxPtInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "maxPtInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "maxPtInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), sqrt(0.5 * 0.5 + 0.4 * 0.4));
   }
 
 

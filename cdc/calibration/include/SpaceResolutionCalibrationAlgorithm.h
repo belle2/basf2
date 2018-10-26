@@ -64,7 +64,7 @@ namespace Belle2 {
 
     protected:
       /// Run algo on data
-      virtual EResult calibrate();
+      EResult calibrate() override;
       /// create histogram
       virtual void createHisto();
       /// store histogram

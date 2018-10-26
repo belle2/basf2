@@ -140,7 +140,7 @@ void ECLTrackBremFinderModule::event()
               ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
-          } catch (NoTrackFitResult) {
+          } catch (NoTrackFitResult&) {
             B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
           }
         }
@@ -157,7 +157,7 @@ void ECLTrackBremFinderModule::event()
               float hitRadius = measState.getPos().Perp();
               float distance = abs(hitRadius - virtualHitRadius);
               nearestHitContainer.add(hit, distance);
-            } catch (NoTrackFitResult) {
+            } catch (NoTrackFitResult&) {
               B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
             }
           }

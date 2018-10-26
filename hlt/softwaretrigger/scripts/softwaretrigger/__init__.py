@@ -4,6 +4,8 @@ import basf2
 
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "development"
 
+from tracking.path_utils import add_cdc_monopole_track_finding
+
 
 def add_fast_reco_software_trigger(path, store_array_debug_prescale=0):
     """
@@ -143,6 +145,10 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'dqm_Jpsimumu_M'}, path=path)
     calib_particle_list.append('J/psi:dqm_mumu')
     calib_extraInfo_list.append('dqm_Jpsimumu_M')
+
+    # monopoles
+    add_cdc_monopole_track_finding(path)
+
     calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib",
                                              preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
                                              calibParticleListName=calib_particle_list,

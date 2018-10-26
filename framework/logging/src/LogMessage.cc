@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                *
+ * Contributors: Andreas Moll, Thomas Kuhr, Thomas Hauth                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -34,16 +34,30 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
 {
 }
 
+LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
+                       const std::string& function, const std::string& file, unsigned int line, int debugLevel) :
+  m_logLevel(logLevel),
+  m_message(std::move(messageStream)),
+  m_module(""),
+  m_package(package ? package : ""),
+  m_function(function),
+  m_file(file),
+  m_line(line),
+  m_debugLevel(debugLevel),
+  m_logInfo(0)
+{
+}
+
 
 bool LogMessage::operator==(const LogMessage& message) const
 {
-  return (m_logLevel == message.m_logLevel) &&
-         (m_line == message.m_line) &&
-         (m_message == message.m_message) &&
-         (m_module == message.m_module) &&
-         (m_package == message.m_package) &&
-         (m_function == message.m_function) &&
-         (m_file == message.m_file);
+  return ((m_logLevel == message.m_logLevel) &&
+          (m_line == message.m_line) &&
+          (m_message == message.m_message) &&
+          (m_module == message.m_module) &&
+          (m_package == message.m_package) &&
+          (m_function == message.m_function) &&
+          (m_file == message.m_file));
 }
 
 
@@ -69,7 +83,7 @@ std::ostream& LogMessage::print(std::ostream& out) const
     out << "(" << ProcHandler::EvtProcID() << ") ";
   }
   if (logInfo & LogConfig::c_Message) {
-    out << m_message;
+    out << m_message.str();
   }
   // if there is no module or package or similar there's no need to print them
   if (m_module.empty()) logInfo &= ~LogConfig::c_Module;
@@ -115,7 +129,7 @@ namespace Belle2 {
   size_t hash(const LogMessage& msg)
   {
     return (
-             std::hash<std::string>()(msg.m_message)
+             std::hash<std::string>()(msg.m_message.str())
              ^ std::hash<std::string>()(msg.m_module)
              ^ std::hash<std::string>()(msg.m_package)
              ^ std::hash<std::string>()(msg.m_function)

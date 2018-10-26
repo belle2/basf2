@@ -32,7 +32,7 @@ namespace Belle2 {
     /** Mass. */
     float* m_fTruthM;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
     /** delete all 'new's */
     void deallocateMemory();
   public:
@@ -41,7 +41,7 @@ namespace Belle2 {
     /** Destructor */
     ~NtupleMCKinematicsTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2

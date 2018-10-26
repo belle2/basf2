@@ -31,7 +31,7 @@ namespace Belle2 {
     /** number of PXD hits associated to the track */
     int* m_iNPXDHits;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
     /** Delete 'new's */
     void deallocateMemory();
   public:
@@ -40,7 +40,7 @@ namespace Belle2 {
     /** Destructor. */
     ~NtupleTrackHitsTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2

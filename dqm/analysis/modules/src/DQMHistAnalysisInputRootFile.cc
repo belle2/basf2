@@ -35,8 +35,7 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
 
 void DQMHistAnalysisInputRootFileModule::initialize()
 {
-  m_expno = m_runno = 0;
-  m_count = 0;
+  if (m_file != nullptr) delete m_file;
   m_file = new TFile(m_input_name.c_str());
   m_eventMetaDataPtr.registerInDataStore();
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");

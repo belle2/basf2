@@ -72,7 +72,7 @@ namespace Belle2 {
        * @param name of mask
        * @param origin of mask, for debug
        */
-      Mask(std::string name = "", std::string origin = "unknown"): m_name(name),
+      Mask(const std::string& name = "", const std::string& origin = "unknown"): m_name(name),
         m_origin(origin)
       {
         B2DEBUG(10, "Mask " << name << " is being initialized by " << origin);
@@ -220,7 +220,7 @@ namespace Belle2 {
      * @param Name of the mask to work with
      * @param Name of the creator module
      */
-    void initializeMask(std::string name, std::string origin = "unknown");
+    void initializeMask(const std::string& name, const std::string& origin = "unknown");
     /**
      * Update mask with cuts
      * @param Name of the mask to work with
@@ -238,30 +238,31 @@ namespace Belle2 {
      * @param ParticleType of the collection
      * @param Update the ROE mask by passing or discarding particles in the provided particle list
      */
-    void excludeParticlesFromMask(std::string maskName, std::vector<const Particle*>& particles, Particle::EParticleType listType,
+    void excludeParticlesFromMask(const std::string& maskName, std::vector<const Particle*>& particles,
+                                  Particle::EParticleType listType,
                                   bool discard);
     /**
      * True if this ROE object has mask
      * @param Name of the mask to work with
      */
-    bool hasMask(std::string name) const;
+    bool hasMask(const std::string& name) const;
     /**
      * Update mask with composite particle
      * @param Name of the mask to work with
      * @param Pointer to composite particle
      */
-    void updateMaskWithV0(std::string name, const Particle* particleV0);
+    void updateMaskWithV0(const std::string& name, const Particle* particleV0);
     /**
      * Check if V0 can be added, maybe should be moved to private
      */
-    bool checkCompatibilityOfMaskAndV0(std::string name, const Particle* particleV0);
+    bool checkCompatibilityOfMaskAndV0(const std::string& name, const Particle* particleV0);
     /**
      * Get charged stable fractions with a specific mask name
      *
      * @param name of mask
      * @return fractions
      */
-    std::vector<double> getChargedStableFractions(std::string maskName) const;
+    std::vector<double> getChargedStableFractions(const std::string& maskName) const;
 
     /**
      * Update or add a priori ChargedStable fractions for a specific mask name in the ROE object.
@@ -269,7 +270,7 @@ namespace Belle2 {
      * @param name of mask
      * @param a priori fractions
      */
-    void updateChargedStableFractions(std::string maskName, std::vector<double>& fractions);
+    void updateChargedStableFractions(const std::string& maskName, std::vector<double>& fractions);
     // getters
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Particles in ROE.
@@ -387,7 +388,7 @@ namespace Belle2 {
     /**
      *  Helper method to find ROE mask
      */
-    Mask* findMask(std::string& name);
+    Mask* findMask(const std::string& name);
     /**
      * Prints indices in the given set in a single line
      */

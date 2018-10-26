@@ -54,14 +54,13 @@ namespace Belle2 {
     * @param pointer to the RestOfEvent to be filled with remaining tracks
     */
     void addRemainingParticles(const Particle* particle, RestOfEvent* roe);
-    /**
-      * for debugging purposes
-      */
+
+    // cppcheck-suppress unusedPrivateFunction
+    /** for debugging purposes */
     void printEvent();
 
-    /**
-     * for debugging purposes
-     */
+    // cppcheck-suppress unusedPrivateFunction
+    /** for debugging purposes */
     void printParticle(const Particle* particle);
   };
 }

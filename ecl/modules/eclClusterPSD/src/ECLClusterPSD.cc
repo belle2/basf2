@@ -147,7 +147,7 @@ double ECLClusterPSDModule::evaluatemva(const ECLShower* cluster)
 
     const double digitChi2 = caldigit->getTwoComponentChi2();
 
-    if (digitChi2 == 0 || digitChi2 >= m_Chi2Threshold) continue;
+    if (digitChi2 < 0 || digitChi2 >= m_Chi2Threshold) continue;
     EnergyToSort.emplace_back(caldigit->getTwoComponentTotalEnergy(), iRel);
 
   }

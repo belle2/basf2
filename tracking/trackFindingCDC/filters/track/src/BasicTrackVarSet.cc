@@ -72,18 +72,18 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
     adc_acc(adc);
 
     // perpS Information
-    double currentPerpS = recoHit.getArcLength2D();
-    if (not std::isnan(last_perp_s)) {
-      double perp_s_difference = currentPerpS - last_perp_s;
+    double current_perp_s = recoHit.getArcLength2D();
+    if (not(std::isnan(last_perp_s) or std::isnan(current_perp_s))) {
+      double perp_s_difference = current_perp_s - last_perp_s;
       empty_s_acc(perp_s_difference);
     }
-    last_perp_s = currentPerpS;
+    if (not std::isnan(current_perp_s)) { last_perp_s = current_perp_s; }
   }
 
   // if track has insufficient hits (size) for some variables to be computable, set them to -1
   // variance calculations and empty_s (hit gaps) information need at least 2 hits (1 hit gap)
   unsigned int size = track->size();
-  unsigned int empty_s_size = bacc::count(empty_s_acc); // == size - 1
+  unsigned int empty_s_size = bacc::count(empty_s_acc); // smaller than `size`, usually by 1
 
   double drift_length_variance = -1;
   double adc_variance = -1;
@@ -94,15 +94,17 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   double empty_s_mean = -1;
 
   if (size > 1) {
-    drift_length_variance = std::sqrt(bacc::lazy_variance(drift_length_acc) * size / (size - 1));
-    adc_variance = std::sqrt(bacc::lazy_variance(adc_acc) * size / (size - 1));
+    drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * size / (size - 1));
+    adc_variance = std::sqrt(bacc::variance(adc_acc) * size / (size - 1));
+  }
+
+  if (empty_s_size > 0) {
     empty_s_sum = bacc::sum(empty_s_acc);
     empty_s_min = bacc::min(empty_s_acc);
     empty_s_max = bacc::max(empty_s_acc);
     empty_s_mean = bacc::mean(empty_s_acc);
-    if (size > 2) { // equivalent to empty_s_size > 1
-      empty_s_variance =
-        std::sqrt(bacc::lazy_variance(empty_s_acc) * empty_s_size / (empty_s_size - 1));
+    if (empty_s_size > 1) {
+      empty_s_variance = std::sqrt(bacc::variance(empty_s_acc) * empty_s_size / (empty_s_size - 1));
     }
   }
 
@@ -112,9 +114,9 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   var<named("size")>() = size;
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
-  //var<named("fit_prob_3d")>() = trajectory3D.getPValue();
-  //var<named("fit_prob_2d")>() = trajectory2D.getPValue();
-  //var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
+  // var<named("fit_prob_3d")>() = trajectory3D.getPValue();
+  // var<named("fit_prob_2d")>() = trajectory2D.getPValue();
+  // var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
   var<named("drift_length_mean")>() = toFinite(bacc::mean(drift_length_acc), 0);

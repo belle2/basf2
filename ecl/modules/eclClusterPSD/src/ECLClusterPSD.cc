@@ -36,7 +36,6 @@
 #include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Modules
@@ -127,17 +126,20 @@ void ECLClusterPSDModule::beginRun()
   initializeMVA(m_MVAidentifier, m_weightfile_representation, m_expert);
 }
 
-// evaluates PSD mva
-double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
+// evaluates mva
+double ECLClusterPSDModule::evaluatemva(const ECLShower* cluster)
 {
 
+  //mva can include up to 20 input digits. Note input digits must have offline waveform.
+  const int maxdigits = 20;
+
   //geometry for cell id position
-  ECLGeometryPar* geometry = ECLGeometryPar::Instance();
+  ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
 
   auto relatedDigits = cluster->getRelationsTo<ECLCalDigit>();
 
   //EnergyToSort vector is used for sorting digits by offline two component energy
-  std::vector< std::vector<double> > EnergyToSort;
+  std::vector<std::tuple<double, unsigned int>> EnergyToSort;
 
   for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
@@ -145,17 +147,8 @@ double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
 
     const double digitChi2 = caldigit->getTwoComponentChi2();
 
-    std::vector<double> temp(2);
-    temp[0] = 0;
-    temp[1] = (double)iRel;
-
-    //only digits with offline waveform and offline fit chi2 was good (chi2<m_Chi2Threshold)
-    if (digitChi2 > 0 && digitChi2 < m_Chi2Threshold) {
-      const double digitEnergy = caldigit->getTwoComponentTotalEnergy();
-      temp[0] = digitEnergy;
-    }
-
-    EnergyToSort.push_back(temp);
+    if (digitChi2 == 0 || digitChi2 >= m_Chi2Threshold) continue;
+    EnergyToSort.emplace_back(caldigit->getTwoComponentTotalEnergy(), iRel);
 
   }
 
@@ -170,71 +163,46 @@ double ECLClusterPSDModule::evaluatePSDmva(const ECLShower* cluster)
   B2Vector3D showerPosition;
   showerPosition.SetMagThetaPhi(showerR, showerTheta, showerPhi);
 
-  //mva can include up to 20 input digits. Note input digits must have offline waveform.
-  const int maxdigits = 20;
+  size_t input_index{0};
+  auto& input = m_dataset->m_input;
 
-  //vectors below are used to organize the digit quantities to be used as inputs for the mva.  Sorted by offline energy.
-  std::vector<double>  Eon(maxdigits); //One photon template fit energy
-  std::vector<double>  Eoff(maxdigits); //Offline two component fit energy
-  std::vector<double>  Rdist(maxdigits); //Distance from cluster centre to crystal centre
-  std::vector<double>  The(maxdigits); //cos theta of vector pointing to from cluster centre to crystal centre
-  std::vector<double>  Phi(maxdigits); //cos phi of vector pointing to from cluster centre to crystal centre
-  std::vector<double>  Nh(maxdigits); //hadron component intensity from offline two component fit
-  std::vector<double>  Ft(maxdigits); //offline fit type
-  std::vector<double>  Weight(maxdigits); //digit weight from clustering
+  for (unsigned int digit = 0; digit < maxdigits; ++digit) {
 
-  for (unsigned int i = 0; i < maxdigits; i++) {
+    if (digit >= EnergyToSort.size()) break;
 
-    //initalizing entries. Extra digits are set to 0
-    Eon[i] = 0;
-    Eoff[i] = 0;
-    Rdist[i] = 0;
-    The[i] = 0;
-    Phi[i] = 0;
-    Nh[i] = 0;
-    Ft[i] = -1;
-    Weight[i] = 0;
+    const auto [digitEnergy, next] = EnergyToSort[digit];
 
-    if (i < EnergyToSort.size()) {
+    const auto caldigit = relatedDigits.object(next);
+    const double digitHadronEnergy = caldigit->getTwoComponentHadronEnergy();
+    const double digitOnlineEnergy = caldigit->getEnergy();
+    const double digitWeight = relatedDigits.weight(next);
+    ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
+    const int digitFitType = digitFitType1;
+    const int cellId = caldigit->getCellId();
+    B2Vector3D calDigitPosition = geometry->GetCrystalPos(cellId - 1);
+    TVector3 tempP = showerPosition - calDigitPosition;
+    const double Rval = tempP.Mag();
+    const double theVal = tempP.CosTheta();
+    const double phiVal = cos(tempP.Phi());
 
-      if (EnergyToSort[i][0] > 0) {
+    input[input_index++] = theVal;
+    input[input_index++] = phiVal;
+    input[input_index++] = Rval;
+    input[input_index++] = digitOnlineEnergy;
+    input[input_index++] = digitEnergy;
+    input[input_index++] = (digitHadronEnergy / digitEnergy);
+    input[input_index++] = digitFitType;
+    input[input_index++] = digitWeight;
 
-        const unsigned int next = EnergyToSort[i][1]; //index of next highest energy digit
-        const auto caldigit = relatedDigits.object(next);
-        const double digitEnergy = caldigit->getTwoComponentTotalEnergy();
-        const double digitHadronEnergy = caldigit->getTwoComponentHadronEnergy();
-        const double digitOnlineEnergy = caldigit->getEnergy();
-        const double digitWeight = relatedDigits.weight(next);
-        ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
-        const int digitFitType = digitFitType1;
-        const int cellId = caldigit->getCellId();
-        B2Vector3D calDigitPosition = geometry->GetCrystalPos(cellId - 1);
-        TVector3 tempP = showerPosition - calDigitPosition;
-        const double Rval = tempP.Mag();
-        const double theVal = tempP.CosTheta();
-        const double phiVal = cos(tempP.Phi());
-        Eon[i] = digitOnlineEnergy;
-        Eoff[i] = digitEnergy;
-        Rdist[i] = Rval;
-        The[i] = theVal;
-        Phi[i] = phiVal;
-        Nh[i] = (digitHadronEnergy / digitEnergy);
-        Ft[i] = digitFitType;
-        Weight[i] = digitWeight;
-      }
-    }
   }
 
-  //use vectors filled above to input data into mva dataset.  20 digits x 8 variables = 160 inputs.
-  for (int i = 0; i < maxdigits; i++) {
-    m_dataset->m_input[(i * 8) + 0] = The[i];
-    m_dataset->m_input[(i * 8) + 1] = Phi[i];
-    m_dataset->m_input[(i * 8) + 2] = Rdist[i];
-    m_dataset->m_input[(i * 8) + 3] = Eon[i];
-    m_dataset->m_input[(i * 8) + 4] = Eoff[i];
-    m_dataset->m_input[(i * 8) + 5] = Nh[i];
-    m_dataset->m_input[(i * 8) + 6] = Ft[i];
-    m_dataset->m_input[(i * 8) + 7] = Weight[i];
+  //fill remainder with defaults
+  while (input_index < input.size()) {
+    if (((input_index - 6) % 8) != 0) {
+      input[input_index++] = 0.0;
+    } else {
+      input[input_index++] = -1.0;  //Fit Type
+    }
   }
 
   //compute mva from input variables
@@ -250,7 +218,7 @@ void ECLClusterPSDModule::event()
   for (auto& shower : m_eclShowers) {
 
     //evaluates mva classifier
-    const double mvaout = evaluatePSDmva(&shower);
+    const double mvaout = evaluatemva(&shower);
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
 

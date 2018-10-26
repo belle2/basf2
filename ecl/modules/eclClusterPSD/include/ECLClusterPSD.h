@@ -92,7 +92,7 @@ namespace Belle2 {
     void initializeMVA(const std::string& identifier,
                        std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert);
 
-    double evaluatePSDmva(const ECLShower* cluster);/** Evalaute mva. */
+    double evaluatemva(const ECLShower* cluster); /**< Evaluates mva. */
 
   };
 

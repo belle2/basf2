@@ -36,7 +36,7 @@ BKLMTrackFitter::BKLMTrackFitter():
   m_Chi2(0.0),
   m_NumHit(0),
   m_globalFit(false),
-  m_GeoPar(NULL)
+  m_GeoPar(nullptr)
 {
   HepVector     iniPar(4, 0);
   HepSymMatrix  iniErr(4, 0);

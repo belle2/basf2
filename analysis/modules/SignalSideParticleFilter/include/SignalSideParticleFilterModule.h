@@ -39,10 +39,10 @@ namespace Belle2 {
     SignalSideParticleFilterModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

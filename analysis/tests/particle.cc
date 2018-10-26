@@ -433,6 +433,8 @@ namespace {
     MC3->setPDG(3);
     T3Kaon->addExtraInfo("test_var", 3.0);
     T3Kaon->addRelationTo(MC3);
+    Particle* ROEPion    = particles.appendNew(Particle(TLorentzVector(3.5, 3.5, 3.5, 3.5),  211, Particle::c_Flavored,
+                                                        Particle::c_Track, 4));
 
     // Construct composite particles
     Particle* D0KK = particles.appendNew(Particle(TLorentzVector(4, 4, 4, 4), 421));
@@ -444,21 +446,21 @@ namespace {
     B0->appendDaughter(T1Pion);
 
     RestOfEvent* roe = roes.appendNew(RestOfEvent());
-    std::vector<int> roeTracks = {4, 5, 6, 7};
-    roe->addTracks(roeTracks);
+
+    roe->addParticles({ROEPion});
     B0->addRelationTo(roe);
 
     // Perform tests
     // First sanity check
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 5/3/1
-    EXPECT_EQ(particles.getEntries(), 5);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 6/3/1
+    EXPECT_EQ(particles.getEntries(), 6);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
     // now make a copy of B0
     Particle* B0_copy = copyParticle(B0);
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 10/3/1
-    EXPECT_EQ(particles.getEntries(), 10);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 11/3/1
+    EXPECT_EQ(particles.getEntries(), 11);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
@@ -508,7 +510,7 @@ namespace {
     EXPECT_TRUE(mc2orig->getPDG() == mc2copy->getPDG());
     EXPECT_TRUE(mc3orig->getPDG() == mc3copy->getPDG());
 
-    EXPECT_TRUE(roeorig->getNTracks() == roecopy->getNTracks());
+    EXPECT_TRUE(roeorig->hasParticle(ROEPion) && roecopy->hasParticle(ROEPion));
 
     // modify original and check the copy
     MCParticle* MC4      = mcparticles. appendNew(MCParticle());

@@ -56,13 +56,13 @@ namespace Belle2 {
 
     //! Get unique channel identifier.
     //!@return unique channel id
-    unsigned int getUniqueChannelID() const;
+    unsigned int getUniqueChannelID() const override;
 
 
 
     //! The pile-up method.
     //! @return if the bg digit should be appended
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override;
 
 
     //! Determine whether hit is in RPC or scintillator

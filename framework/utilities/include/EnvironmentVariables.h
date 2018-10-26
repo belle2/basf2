@@ -21,7 +21,7 @@ namespace Belle2 {
     static bool isSet(const std::string& name);
 
     /** Get the value of an environment variable or the given fallback value if the variable is not set */
-    static std::string get(const std::string& name, const std::string fallback = "");
+    static std::string get(const std::string& name, const std::string& fallback = "");
 
     /** Get a list of values from an environment variable or the given fallback
      * list if the variable is not set.

@@ -20,7 +20,7 @@ namespace Belle2 {
     return envValue != nullptr;
   }
 
-  std::string EnvironmentVariables::get(const std::string& name, const std::string fallback)
+  std::string EnvironmentVariables::get(const std::string& name, const std::string& fallback)
   {
     char* envValue = std::getenv(name.c_str());
     if (envValue != nullptr) {

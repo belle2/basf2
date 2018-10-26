@@ -58,15 +58,15 @@ def configure_belle2(conf):
 
     # Belle II environment setup
     if not conf.CheckEnvVar('BELLE2_TOOLS', 'Belle II environment setup'):
-        print 'Belle II software environment is not set up.'
-        print '-> Source "setup_belle2" from the tools/ directory.'
+        print('Belle II software environment is not set up.')
+        print('-> Source "setup_belle2" from the tools/ directory.')
         return False
 
     # local Belle II release setup
     if not conf.CheckEnvVar('BELLE2_ANALYSIS_DIR', 'analysis setup') \
             and not conf.CheckEnvVar('BELLE2_LOCAL_DIR', 'local release setup'):
-        print 'analysis or local release is not set up.'
-        print '-> Execute "setupana" or "setuprel" in your local analysis or release directory, respectively.'
+        print('analysis or local release is not set up.')
+        print('-> Execute "setupana" or "setuprel" in your local analysis or release directory, respectively.')
         return False
 
     return True
@@ -123,8 +123,8 @@ def configure_externals(conf):
         sys.path[:0] = [os.environ['BELLE2_TOOLS'], extdir]
         from externals import config_externals
         return config_externals(conf)
-    except Exception, e:
-        print 'Configuration of externals failed:', e
+    except Exception as e:
+        print('Configuration of externals failed:', e)
         return False
 
     return True

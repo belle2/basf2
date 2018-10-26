@@ -112,6 +112,7 @@
       REAL LAM(*), QEF(*)       ! QE datapoints: lambda [nm], QE
       INTEGER NT                ! number of datapoints
       REAL CE                   ! collection efficiency
+#include "TOP_CONS.fi"
 #include "TOP_QEFF.fi"      
       REAL X, S, LIN_INTERP
       INTEGER I
@@ -122,13 +123,13 @@
          IF(QEF(I).GT.0) EXIT
       ENDDO
       I=MAX(I-1,1)
-      EMA=1240./LAM(I)
+      EMA=C_HC/LAM(I)
 
       DO I=NT,1,-1
          IF(QEF(I).GT.0) EXIT
       ENDDO
       I=MIN(I+1,NT)
-      EMI=1240./LAM(I)
+      EMI=C_HC/LAM(I)
 
       IF(EMA.LE.EMI) RETURN
       E_STEP=(EMA-EMI)/(MAX_NT-1)
@@ -136,7 +137,7 @@
       S=0.
       QEMAX=0.
       DO I=1,MAX_NT
-         QE(I)=MAX(LIN_INTERP(LAM,QEF,NT,1240./X),0.)*CE
+         QE(I)=MAX(LIN_INTERP(LAM,QEF,NT,C_HC/X),0.)*CE
          QEMAX=MAX(QEMAX,QE(I))
          S=S+QE(I)
          QE_E(I)=X

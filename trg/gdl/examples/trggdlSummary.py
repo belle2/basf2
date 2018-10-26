@@ -11,6 +11,8 @@
 from basf2 import *
 ################
 import sys  # get argv
+import re
+import os.path
 argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 if argc != 2:
@@ -24,12 +26,26 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 # input
-input = register_module('SeqRootInput')
+if f_in_root[-6:] == ".sroot":
+    rootfiletype = "sroot"
+    input = register_module('SeqRootInput')
+    matchobj = re.search("([^\/]+)\.sroot", f_in_root)
+    basename = re.sub('\.sroot$', '', matchobj.group())
+if f_in_root[-5:] == ".root":
+    rootfiletype = "root"
+    input = register_module('RootInput')
+    matchobj = re.search("([^\/]+)\.root", f_in_root)
+    basename = re.sub('\.root$', '', matchobj.group())
+
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 
+
 # output
 output = register_module('RootOutput')
+output.param("outputFileName", "trgsum/trgsum.%s.root" % basename)
+if not os.path.isdir('trgsum'):
+    os.mkdir('trgsum')
 
 # Unpacker
 trggdlUnpacker = register_module("TRGGDLUnpacker")

@@ -73,7 +73,7 @@ namespace Belle2 {
     /** Creating a deep copy of this hit.
      * Overrides the method inherited from GFRecoHit.
      */
-    genfit::AbsMeasurement* clone() const;
+    genfit::AbsMeasurement* clone() const override;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -101,10 +101,10 @@ namespace Belle2 {
 
     /** Methods that actually interface to Genfit.  */
     //virtual genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane&) const;
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
     // TODO: use HMatrixPhi for wedge sensors instead of rotating the plane!
-    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { if (m_isU) return new genfit::HMatrixU(); else return new genfit::HMatrixV(); }
+    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { if (m_isU) return new genfit::HMatrixU(); else return new genfit::HMatrixV(); }
 
   private:
 
@@ -123,7 +123,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit, 7)
+    ClassDefOverride(SVDRecoHit, 7)
   };
 
 } // namespace Belle2

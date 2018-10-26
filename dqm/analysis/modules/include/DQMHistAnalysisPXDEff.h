@@ -7,66 +7,70 @@
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
-
 #pragma once
 
+#ifdef _BELLE2_EPICS
+// EPICS
+#include "cadef.h"
+#endif
+
 #include <framework/core/Module.h>
-
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TH1.h>
 #include <TH2.h>
 #include <TCanvas.h>
 
-
 namespace Belle2 {
+  /*! DQM Histogram Analysis for PXD Efficiency */
 
   class DQMHistAnalysisPXDEffModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     DQMHistAnalysisPXDEffModule();
   private:
-    ~DQMHistAnalysisPXDEffModule() override final;
 
     //! Module functions to be called from main process
-    void initialize() override final;
+    void initialize(void) override final;
 
     //! Module functions to be called from event process
-    void beginRun() override final;
-    void event() override final;
-    void endRun() override final;
-    void terminate() override final;
+    void beginRun(void) override final;
+    void event(void) override final;
+    void terminate(void) override final;
 
     // Data members
-    int m_u_bins;
-    int m_v_bins;
+    //! name of histogram directory
     std::string m_histogramDirectoryName;
+    //! prefix for EPICS PVs
+    std::string m_pvPrefix;
+    //! Flag to trigger creation of additional histograms
     bool m_singleHists;
+    //! u binning for 2d plots
+    int m_u_bins;
+    //! v binning for 2d plots
+    int m_v_bins;
 
-    //IDs of all PXD Modules to iterate over
+    //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
-    //IDs of only the sensors of layer 1/2, to iterate the summary histograms
-    std::vector<VxdID> m_PXDLayer1;
-    std::vector<VxdID> m_PXDLayer2;
-
-    //Individual efficiency for each module
+    //! Individual efficiency for each module, 2d histogram
     std::map<VxdID, TH2D*> m_hEffModules;
+    //! Individual efficiency for each module, canvas
     std::map<VxdID, TCanvas*> m_cEffModules;
 
-    //Make four summary plots for each module type
-    std::map<std::string, TH2D*> m_hEffMerge;
-    std::map<std::string, TCanvas*> m_cEffMerge;
+    //! One bin for each module in the geometry
+    TH1D* m_hEffAll = nullptr;
+    //! Final Canvas
+    TCanvas* m_cEffAll = nullptr;
 
-    //One bin for each module in the geometry, one histogram for each layer
-    TH1D* m_hEffAll1;
-    TCanvas* m_cEffAll1;
-    TH1D* m_hEffAll2;
-    TCanvas* m_cEffAll2;
+#ifdef _BELLE2_EPICS
+    //! one EPICS PV
+    chid  mychid;
+#endif
   };
 } // end namespace Belle2
+

@@ -26,8 +26,8 @@ namespace Belle2 {
       /** Destructor */
       ~Selector() {};
 
-      /** returns prob that two particles are actual from same mc/data particle */
-      virtual float getProbability(Particle*, Particle*) = 0;
+      /** returns selector response that two particles are actual from same mc/data particle */
+      virtual float getResponse(Particle*, Particle*) = 0;
 
       /** returns vector of variables used by the selector */
       virtual std::vector<float> getVariables(Particle*, Particle*) = 0;

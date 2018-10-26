@@ -27,7 +27,7 @@ namespace Belle2 {
   class PyModule : public Module {
   public:
     /** constructor */
-    PyModule(PyObject* p):
+    explicit PyModule(PyObject* p):
       Module(),
       m_self(p)
     {

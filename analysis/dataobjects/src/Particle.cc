@@ -747,6 +747,19 @@ void Particle::print() const
   B2INFO(getInfo());
 }
 
+std::vector<std::string> Particle::getExtraInfoNames() const
+{
+  std::vector<std::string> out;
+  if (!m_extraInfo.empty()) {
+    StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+    if (!extraInfoMap)
+      B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
+    const ParticleExtraInfoMap::IndexMap& map = extraInfoMap->getMap(m_extraInfo[0]);
+    for (auto const& ee : map) out.push_back(ee.first);
+  }
+  return out;
+}
+
 std::string Particle::getInfoHTML() const
 {
   std::stringstream stream;

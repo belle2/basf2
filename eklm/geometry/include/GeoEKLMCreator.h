@@ -233,7 +233,7 @@ namespace Belle2 {
        * @param[in] type      Geometry type.
        */
       void create(const GearDir& content, G4LogicalVolume& topVolume,
-                  geometry::GeometryTypes type);
+                  geometry::GeometryTypes type) override;
 
       /**
        * Creation of the detector geometry from database.
@@ -242,7 +242,7 @@ namespace Belle2 {
        * @param[in] type      Geometry type.
        */
       void createFromDB(const std::string& name, G4LogicalVolume& topVolume,
-                        geometry::GeometryTypes type);
+                        geometry::GeometryTypes type) override;
 
       /**
        * Creation of payloads.
@@ -250,7 +250,7 @@ namespace Belle2 {
        * @param iov     Interval of validity.
        */
       void createPayloads(const GearDir& content,
-                          const IntervalOfValidity& iov);
+                          const IntervalOfValidity& iov) override;
 
     private:
 

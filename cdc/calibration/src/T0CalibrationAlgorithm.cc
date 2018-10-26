@@ -142,9 +142,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   B2INFO("Gaus fitting for whole channel");
   double par[3];
-  double mean = 0.;
   m_hTotal->SetDirectory(0);
-  mean = m_hTotal->GetMean();
+  double mean = m_hTotal->GetMean();
   m_hTotal->Fit("g1", "Q", "", mean - 15, mean + 15);
   g1->GetParameters(par);
 

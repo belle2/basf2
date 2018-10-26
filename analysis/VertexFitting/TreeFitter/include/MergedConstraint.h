@@ -38,7 +38,7 @@ namespace TreeFitter {
 
 
     /** project the constraints */
-    virtual ErrCode project(const FitParams& fitpar, Projection& p) const ;
+    virtual ErrCode project(const FitParams& fitpar, Projection& p) const override ;
 
     /** push back a new constrint */
     void push_back(Constraint* c)

@@ -11,9 +11,6 @@
  **************************************************************************/
 
 #include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
-
-#include <top/dataobjects/TOPDigit.h>       // data Cherenkov hits
-#include <framework/datastore/StoreArray.h> // data store framework
 #include <top/reconstruction/TOPreco.h>     // reconstruction wrapper
 
 using namespace std;
@@ -43,14 +40,24 @@ namespace Belle2 {
   void TOPChannelMaskerModule::initialize()
   {
     // register data objects
-    StoreArray<TOPDigit> digits;
-    digits.isRequired();
-    return;
+    m_digits.isRequired();
+
   }
 
   void TOPChannelMaskerModule::event()
   {
-    // are masks are available?
+    // if changed then pass pixel relative efficiencies to the FORTRAN reconstructon code
+    if (m_pmtInstalled.hasChanged() or m_pmtQEData.hasChanged() or
+        m_channelRQE.hasChanged() or m_thresholdEff.hasChanged()) {
+      TOPreco::setChannelEffi();
+      // reset others to prevent passing the same effi. again in the next couple of events
+      m_pmtInstalled.hasChanged();
+      m_pmtQEData.hasChanged();
+      m_channelRQE.hasChanged();
+      m_thresholdEff.hasChanged();
+    }
+
+    // are masks available?
     if (!m_channelMask.isValid()) {
       B2ERROR("channel mask not available, not masking any channels");
       return;
@@ -63,13 +70,12 @@ namespace Belle2 {
     }
 
     // now flag actual data Cherenkov hits as coming from bad channels
-    StoreArray<TOPDigit> digits;
-    for (auto& digit : digits) {
+    for (auto& digit : m_digits) {
       if (!m_channelMask->isActive(digit.getModuleID(), digit.getChannel())) {
         digit.setHitQuality(TOPDigit::c_Junk);
       }
     }
-    return;
+
   }
 
 } // end Belle2 namespace

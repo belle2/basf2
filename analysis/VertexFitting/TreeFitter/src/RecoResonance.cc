@@ -28,17 +28,17 @@ namespace TreeFitter {
     const int momindex = momIndex();
 
     //quick map for parameters
-    int indexmap[7];
+    int quickindexmap[7];
     for (int i = 0; i < 3; ++i) {
-      indexmap[i]   = posindex + i;
+      quickindexmap[i]   = posindex + i;
     }
     for (int i = 0; i < 4; ++i) {
-      indexmap[i + 3] = momindex + i;
+      quickindexmap[i + 3] = momindex + i;
     }
 
     // copy the 'measurement' -> this overwrites mother position !
     for (int row = 0; row < dimM(); ++row) {
-      fitparams.getStateVector()(indexmap[row]) = m_params[row];
+      fitparams.getStateVector()(quickindexmap[row]) = m_params[row];
     }
     return ErrCode(ErrCode::Status::success);
   }

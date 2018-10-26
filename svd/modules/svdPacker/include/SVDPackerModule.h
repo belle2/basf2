@@ -44,12 +44,12 @@ namespace Belle2 {
 
       virtual ~SVDPackerModule();
 
-      virtual void initialize();
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
+      virtual void initialize() override;
+      virtual void beginRun() override;
+      virtual void event() override;
+      virtual void endRun() override;
 
-      virtual void terminate();
+      virtual void terminate() override;
 
 
       std::string m_rawSVDListName;

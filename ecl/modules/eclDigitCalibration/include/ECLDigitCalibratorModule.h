@@ -55,20 +55,20 @@ namespace Belle2 {
     ~ECLDigitCalibratorModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** begin run.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** event per event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** end run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Name of the ECLDigit.*/
     virtual const char* eclDigitArrayName() const

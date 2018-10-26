@@ -75,7 +75,7 @@ namespace Belle2 {
     class StoppedBySignalException : public std::runtime_error {
     public:
       /** Constructor. */
-      StoppedBySignalException(int signal);
+      explicit StoppedBySignalException(int signal);
       int signal; /**< see 'man 7 signal'. */
     };
 
@@ -144,6 +144,11 @@ namespace Belle2 {
      * the endRun() loop will also be called.
      */
     void processEndRun();
+
+    /**
+     * Calculate the maximum event number out of the argument from command line and the environment.
+     */
+    long getMaximumEventNumber(long maxEvent) const;
 
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
     ModulePtrList m_moduleList; /**< List of all modules in order initialized. */

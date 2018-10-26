@@ -405,6 +405,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     # run fast t0 estimation from CDC hits only
     path.add_module("CDCHitBasedT0Extraction")
 
+    # prepare mdst event level info
+    path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+
 
 def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True,
                              use_second_cdc_hits=False):
@@ -504,6 +507,25 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
 
     # run fast t0 estimation from CDC hits only
     path.add_module("CDCHitBasedT0Extraction")
+
+
+def add_cdc_monopole_track_finding(path, output_reco_tracks="RecoTracksMpl"):
+    """
+    Convenience function for adding all cdc monopole track finding modules
+    NOTE that these have to be run after ecl modules and normal tracking modules.
+
+    :param path: basf2 path
+    :param output_reco_tracks: Name of the output RecoTracks, Defaults to RecoTracksMpl.
+    """
+
+    path.add_module("TFCDC_AxialStraightTrackFinder")
+    # path.add_module("TFCDC_MonopoleAxialTrackFinderLegendre")
+
+    path.add_module("TFCDC_MonopoleStereoHitFinder")
+
+    path.add_module("TFCDC_TrackExporter",
+                    inputTracks="CDCMonopoleTrackVector",
+                    RecoTracksStoreArrayName=output_reco_tracks)
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",

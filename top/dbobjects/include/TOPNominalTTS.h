@@ -73,13 +73,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Nominal TTS distribution") const;
+    void print(const std::string& title = "Nominal TTS distribution") const override;
 
 
   private:
@@ -87,7 +87,7 @@ namespace Belle2 {
     std::vector<Gauss> m_tts; /**< TTS distribution composed of a sum of Gaussians */
     bool m_normalized = false; /**< normalization flag */
 
-    ClassDef(TOPNominalTTS, 1); /**< ClassDef */
+    ClassDefOverride(TOPNominalTTS, 1); /**< ClassDef */
 
   };
 

@@ -41,9 +41,9 @@ namespace Belle2 {
     virtual ~PrintMCParticlesModule() {}
 
     /** init. */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
 

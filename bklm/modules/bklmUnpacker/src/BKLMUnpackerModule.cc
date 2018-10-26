@@ -371,7 +371,7 @@ int BKLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, 
   stripId =  flipChannel(isForward, sector, layer, plane, stripId, outOfRange);
   //attention: moduleId counts are zero based
   int moduleId = (isForward ? BKLM_END_MASK : 0)
-                 | ((sector - 1) << BKLM_SECTOR_BIT)
+                 | (uint(sector - 1) << BKLM_SECTOR_BIT)
                  | ((layer - 1) << BKLM_LAYER_BIT)
                  | ((plane) << BKLM_PLANE_BIT)
                  | ((stripId - 1) << BKLM_STRIP_BIT);
@@ -452,8 +452,8 @@ unsigned short BKLMUnpackerModule::flipChannel(int isForward, int sector, int la
   int MaxiChannel = 0;
 
   if (!isForward && sector == 3 && plane == 0) {
-    if (plane == 0 && layer < 3) MaxiChannel = 38;
-    if (plane == 0 && layer > 2) MaxiChannel = 34;
+    if (layer < 3) MaxiChannel = 38;
+    if (layer > 2) MaxiChannel = 34;
   } else {
     if (layer == 1 && plane == 1) MaxiChannel = 37;
     if (layer == 2 && plane == 1) MaxiChannel = 42;

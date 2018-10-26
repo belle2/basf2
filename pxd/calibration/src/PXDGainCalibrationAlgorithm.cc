@@ -38,15 +38,10 @@ namespace {
 
   /** Signal in ADU of collected clusters */
   int m_signal;
-
   /** Run number to be stored in dbtree */
   int m_run;
   /** Experiment number to be stored in dbtree */
   int m_exp;
-  /** ChargeMap to be stored in dbtree */
-  PXDClusterChargeMapPar m_chargeMap;
-  /** GainMap to be stored in dbtree */
-  PXDGainMapPar m_gainMap;
 
   /** Helper function to extract number of bins along u side and v side from counter histogram labels. */
   void getNumberOfBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
@@ -98,7 +93,6 @@ namespace {
       VxdID sensorID(token);
       sensorSet.insert(sensorID.getID());
     }
-
     return sensorSet.size();
   }
 
@@ -107,7 +101,7 @@ namespace {
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterChargeCollector"),
-  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(true)
+  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -153,6 +147,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
   // This is the PXD gain correction payload for conditions DB
   PXDGainMapPar* gainMapPar = new PXDGainMapPar(nBinsU, nBinsV);
+  set<VxdID> pxdSensors;
 
   // Loop over all bins of input histo
   for (auto histoBin = 1; histoBin <= cluster_counter->GetXaxis()->GetNbins(); histoBin++) {
@@ -185,8 +180,47 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     } else {
       B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfHits << " < " << minClusters <<
                 "). Use default gain.");
+      gainMapPar->setContent(sensorID.getID(), uBin, vBin, 1.0);
+    }
+    pxdSensors.insert(sensorID);
+  }
+
+  // Post processing of gain map. It is possible that the gain
+  // computation failed on some parts. Here, we replace default
+  // values by local averages of neighboring sensor parts.
+  for (const auto& sensorID : pxdSensors) {
+    for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
+      float meanGain = 0;
+      unsigned short nGood = 0;
+      unsigned short nBad = 0;
+      for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+        auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+        // Filter default gains
+        if (gain != 1.0) {
+          nGood += 1;
+          meanGain += gain;
+        } else {
+          nBad += 1;
+        }
+      }
+      B2RESULT("Gain calibration on sensor=" << sensorID << " and vBin=" << vBin << " was successful on " << nGood << "/" << nBinsU <<
+               " uBins.");
+
+      // Check if we can repair bad calibrations with a local avarage
+      if (nGood > 0 && nBad > 0) {
+        meanGain /= nGood;
+        for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
+          auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
+          if (gain == 1.0) {
+            gainMapPar->setContent(sensorID.getID(), uBin, vBin, meanGain);
+            B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin << ": Replace default gain wih average "
+                     << meanGain);
+          }
+        }
+      }
     }
   }
+
 
   // Save the gain map to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
@@ -220,8 +254,8 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
     mc_signals.push_back(m_signal + noise);
   }
 
-  auto dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
-  auto mcMedian = CalculateMedian(mc_signals);
+  double dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
+  double mcMedian = CalculateMedian(mc_signals);
 
   double gain =  dataMedian / mcMedian;
   if (gain <= 0) {
@@ -229,20 +263,28 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
               ". Set gain to default value (=1.0) as well.");
     gain = 1.0;
   }
-  return gain;
+
+  double gainFromDB = GetCurrentGainFromDB(sensorID, uBin, vBin);
+  B2DEBUG(10, "Gain from db used in PXDDigitizer is " << gainFromDB);
+  B2DEBUG(10, "New gain correction derived is " << gain);
+  B2DEBUG(10, "The total gain we should return is " << gain * gainFromDB);
+
+  return gain * gainFromDB;
 }
 
 double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin)
 {
   // Read back db payloads
-  PXDClusterChargeMapPar* chargeMapPtr = &m_chargeMap;
+  PXDClusterChargeMapPar* chargeMapPtr = 0;
+  PXDGainMapPar* gainMapPtr = 0;
 
   auto dbtree = getObjectPtr<TTree>("dbtree");
   dbtree->SetBranchAddress("run", &m_run);
   dbtree->SetBranchAddress("exp", &m_exp);
   dbtree->SetBranchAddress("chargeMap", &chargeMapPtr);
+  dbtree->SetBranchAddress("gainMap", &gainMapPtr);
 
-  // Compute running average of valiie d
+  // Compute running average of charge medians from db
   double sum = 0;
   int counter = 0;
 
@@ -250,11 +292,48 @@ double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsign
   const auto nEntries = dbtree->GetEntries();
   for (int i = 0; i < nEntries; ++i) {
     dbtree->GetEntry(i);
-    sum += m_chargeMap.getContent(sensorID.getID(), uBin, vBin);
+    sum += chargeMapPtr->getContent(sensorID.getID(), uBin, vBin);
     counter += 1;
   }
+  delete chargeMapPtr;
+  chargeMapPtr = 0;
+  delete gainMapPtr;
+  gainMapPtr = 0;
+
   return sum / counter;
 }
+
+double PXDGainCalibrationAlgorithm::GetCurrentGainFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+{
+  // Read back db payloads
+  PXDClusterChargeMapPar* chargeMapPtr = 0;
+  PXDGainMapPar* gainMapPtr = 0;
+
+  auto dbtree = getObjectPtr<TTree>("dbtree");
+  dbtree->SetBranchAddress("run", &m_run);
+  dbtree->SetBranchAddress("exp", &m_exp);
+  dbtree->SetBranchAddress("chargeMap", &chargeMapPtr);
+  dbtree->SetBranchAddress("gainMap", &gainMapPtr);
+
+  // Compute running average of gains from db
+  double sum = 0;
+  int counter = 0;
+
+  // Loop over dbtree
+  const auto nEntries = dbtree->GetEntries();
+  for (int i = 0; i < nEntries; ++i) {
+    dbtree->GetEntry(i);
+    sum += gainMapPtr->getContent(sensorID.getID(), uBin, vBin);
+    counter += 1;
+  }
+  delete chargeMapPtr;
+  chargeMapPtr = 0;
+  delete gainMapPtr;
+  gainMapPtr = 0;
+
+  return sum / counter;
+}
+
 
 double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 {

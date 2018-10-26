@@ -47,23 +47,23 @@ namespace Belle2 {
      *
      *  Opens a file and creates TTree(s)
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Write data in c_Event DataStore maps.
      *
      *  Loops over all objects in event maps (in the first call of the function) and writes them to event-TTree.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Write data in the c_Persistent DataStore maps.
      *
      *  Loops over all objects in persistent maps and writes them to persistent-TTree.
      *  Finally the TTree(s) is/are written out.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Set the used output file, taking into account -o argument to basf2. */
-    virtual std::vector<std::string> getFileNames(bool outputFiles = true)
+    virtual std::vector<std::string> getFileNames(bool outputFiles = true) override
     {
       B2ASSERT("RootOutput is not an input module", outputFiles);
       if (!m_ignoreCommandLineOverride) {

@@ -18,9 +18,9 @@ namespace Belle2 {
   class IPTrackTimeEstimatorModule : public BaseTrackTimeEstimatorModule {
   private:
     /// Extrapolate the first measurement to the center of the IP.
-    double estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane) const;
+    double estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane) const override;
 
     /// Calculate the flight length from the origin or the perigee to the start position of the track.
-    double estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const;
+    double estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const override;
   };
 }

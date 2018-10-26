@@ -10,6 +10,7 @@
 
 #include <top/reconstruction/TOPalign.h>
 #include <framework/logging/Logger.h>
+#include <iostream>
 
 extern "C" {
   void data_clear_();
@@ -20,6 +21,7 @@ extern "C" {
   void rtra_set_hypid_(int*, int*);
   void rtra_put_(float*, float*, float*, float*, float*, float*, float*,
                  int*, int*, int*, int*);
+  void set_pdf_opt_(int*, int*, int*);
   void top_alignment_(int*, float*, float*, double*, float*, float*, int*);
 }
 
@@ -28,18 +30,40 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    TOPalign::TOPalign(int moduleID,
-                       double stepPosition,
-                       double stepAngle,
-                       double stepTime): m_moduleID(moduleID)
+    TOPalign::TOPalign()
     {
-      m_par.resize(c_numPar, 0);
-      m_step.resize(3, stepPosition);
-      m_step.resize(6, stepAngle);
-      m_step.resize(c_numPar, stepTime);
-      m_COV.resize(c_numPar * c_numPar, 0);
-      m_U.resize(c_numPar * c_numPar, 0);
+      m_parNames.push_back("x");
+      m_parNames.push_back("y");
+      m_parNames.push_back("z");
+      m_parNames.push_back("alpha");
+      m_parNames.push_back("beta");
+      m_parNames.push_back("gamma");
+      m_parNames.push_back("t0");
+      m_parNames.push_back("dn/n");
+      unsigned numPar = m_parNames.size();
+      m_parInit.resize(numPar, 0);
+      m_par = m_parInit;
+      m_steps.resize(numPar, 0);
+      m_fixed.resize(numPar, false);
+      m_COV.resize(numPar * numPar, 0);
+      m_U.resize(numPar * numPar, 0);
+      m_maxDpar.resize(numPar, 0);
     }
+
+
+    void TOPalign::setSteps(double position, double angle, double time, double refind)
+    {
+      m_steps[0] = position;
+      m_steps[1] = position;
+      m_steps[2] = position;
+      m_steps[3] = angle;
+      m_steps[4] = angle;
+      m_steps[5] = angle;
+      m_steps[6] = time;
+      m_steps[7] = refind;
+      m_maxDpar = m_steps;
+    }
+
 
     void TOPalign::clearData()
     {
@@ -105,29 +129,57 @@ namespace Belle2 {
       rtra_set_hypo_(&Num, &mass);
       rtra_set_hypid_(&Num, &HYP);
 
+      // set PDF option
+      set_pdf_opt_(&m_opt, &m_NP, &m_NC);
+
       // run single iteration
       int ier = 0;
-      std::vector<float> dpar(c_numPar, 0);
-      int np = c_numPar;
-      top_alignment_(&np, m_par.data(), m_step.data(), m_U.data(),
+      int np = m_par.size();
+      std::vector<float> dpar(np, 0);
+      auto steps = m_steps;
+      for (size_t i = 0; i < steps.size(); i++) {
+        if (m_fixed[i]) steps[i] = 0;
+      }
+      top_alignment_(&np, m_par.data(), steps.data(), m_U.data(),
                      dpar.data(), m_COV.data(), &ier);
       if (ier < 0) return ier;
 
       m_numTracks++;
       if (ier != 0) return ier;
 
-      for (unsigned i = 0; i < c_numPar; i++) {
-        if (fabs(dpar[i]) > m_step[i]) return ier;
+      for (size_t i = 0; i < dpar.size(); i++) {
+        if (fabs(dpar[i]) > m_maxDpar[i]) return ier;
       }
-      for (unsigned i = 0; i < c_numPar; i++) {
+      for (size_t i = 0; i < dpar.size(); i++) {
         m_par[i] += dpar[i];
       }
+      m_numUsedTracks = m_numTracks;
       m_valid = true;
 
       return ier;
     }
 
+    void TOPalign::reset()
+    {
+      m_par = m_parInit;
+      for (auto& x : m_COV) x = 0;
+      for (auto& x : m_U) x = 0;
+      m_numTracks = 0;
+      m_numUsedTracks = 0;
+      m_valid = false;
+    }
 
-  }
-}
+    std::vector<float> TOPalign::getErrors() const
+    {
+      std::vector<float> errors;
+      int numPar = m_par.size();
+      for (int i = 0; i < numPar; i++) {
+        errors.push_back(sqrt(m_COV[i * (numPar + 1)]));
+      }
+      return errors;
+    }
+
+
+  } // namespace TOP
+} // namespace Belle2
 

@@ -359,7 +359,7 @@ toolsBP += ['CustomFloats[isSignal:isExtendedSignal]', '^B+']
 toolsBP += ['MCTruth', '^B+']
 
 toolsBPSL = ['EventMetaData', '^B+']
-toolsBPSL += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B+']
+toolsBPSL += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B+']
 toolsBPSL += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B+']
 toolsBPSL += ['CustomFloats[d0_dmID:d1_dmID:d0_d0_dmID:d1_d0_dmID:d0_d1_dmID]', '^B+']
 toolsBPSL += ['CustomFloats[d0_M:d0_d0_M:d0_d1_M]', '^B+']

@@ -12,6 +12,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -90,5 +91,6 @@ namespace Belle2 {
 
     unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
 
+    SVDClusterCalibrations m_ClusterCal;
   };
 } // end namespace Belle2

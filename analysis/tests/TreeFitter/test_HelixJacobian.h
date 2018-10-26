@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
@@ -6,8 +8,8 @@
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Unit.h>
-namespace Belle2 {
 
+namespace {
 
   /** Test fixture. */
   class TreeFitterHelixJacobianTest : public ::testing::Test {

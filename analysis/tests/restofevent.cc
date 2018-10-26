@@ -30,7 +30,7 @@ using namespace Belle2;
 using namespace Belle2::Variable;
 
 
-namespace Belle2 {
+namespace {
   class TestParticleFactory {
   public:
     TestParticleFactory(): m_photonIndex(0) {};

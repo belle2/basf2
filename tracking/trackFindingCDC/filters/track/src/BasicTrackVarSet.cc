@@ -20,7 +20,9 @@
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
-// use BOOST for  accumulators
+// BOOST
+#include <boost/bind.hpp>
+#include <boost/ref.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/count.hpp>
 #include <boost/accumulators/statistics/min.hpp>
@@ -28,6 +30,9 @@
 #include <boost/accumulators/statistics/sum.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
+
+#include<algorithm>
+#include<numeric>
 
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -44,46 +49,59 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
     return false;
   }
 
-  double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
-  double last_perp_s = NAN;
-
   // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
   // data that they accumulate (i.e. are "filled" with).
-  // TODO Maybe wrap the accumulators code in an interface and put them in some utilityfile
-  using features_set = bacc::features<bacc::tag::count,
+  // TODO Maybe wrap the accumulators code in an interface and put them in some utility file
+  using statistics_set = bacc::features<bacc::tag::count,
         bacc::tag::sum,
         bacc::tag::min,
         bacc::tag::max,
         bacc::tag::mean,
         bacc::tag::lazy_variance>;
-  using feature_accumulator = bacc::accumulator_set<double, features_set>;
+  using statistics_accumulator = bacc::accumulator_set<double, statistics_set>;
 
-  feature_accumulator drift_length_acc;
-  feature_accumulator adc_acc;
-  feature_accumulator empty_s_acc;
+  statistics_accumulator drift_length_acc;
+  statistics_accumulator adc_acc;
+  statistics_accumulator empty_s_acc;
 
+  unsigned int size = track->size();
+
+  // Fill accumulators with ADC and drift circle information
   for (const CDCRecoHit3D& recoHit : *track) {
-    // Drift circle information
-    double driftLength = recoHit.getWireHit().getRefDriftLength();
-    drift_length_acc(driftLength);
-
-    // ADC information
-    double adc = static_cast<double>(recoHit.getWireHit().getHit()->getADCCount());
-    adc_acc(adc);
-
-    // perpS Information
-    double current_perp_s = recoHit.getArcLength2D();
-    if (not(std::isnan(last_perp_s) or std::isnan(current_perp_s))) {
-      double perp_s_difference = current_perp_s - last_perp_s;
-      empty_s_acc(perp_s_difference);
-    }
-    if (not std::isnan(current_perp_s)) { last_perp_s = current_perp_s; }
+    drift_length_acc(recoHit.getWireHit().getRefDriftLength());
+    adc_acc(recoHit.getWireHit().getHit()->getADCCount());
   }
 
-  // if track has insufficient hits (size) for some variables to be computable, set them to -1
-  // variance calculations and empty_s (hit gaps) information need at least 2 hits (1 hit gap)
-  unsigned int size = track->size();
-  unsigned int empty_s_size = bacc::count(empty_s_acc); // smaller than `size`, usually by 1
+  // Extract empty_s (ArcLength2D gap) information
+  double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
+
+  // fill vector with all 2D arc lengths
+  std::vector<double> arc_lengths;
+  std::transform(std::begin(*track),
+                 std::end(*track),
+                 std::back_inserter(arc_lengths),
+  [](const CDCRecoHit3D & recoHit) { return recoHit.getArcLength2D(); });
+  // Remove all NAN elements. For some reason, last hit in track is sometimes NAN
+  arc_lengths.erase(std::remove_if(std::begin(arc_lengths),
+                                   std::end(arc_lengths),
+  [](double x) { return std::isnan(x); }),
+  std::end(arc_lengths));
+
+  // calculate gaps in arc length s between adjacent hits
+  // beware: first element not a difference but mapped onto itself, empty_s_gaps[0] = arc_lengths[0]
+  if (arc_lengths.size() > 1) {
+    std::vector<double> empty_s_gaps;
+    std::adjacent_difference(std::begin(arc_lengths),
+                             std::end(arc_lengths),
+                             std::back_inserter(empty_s_gaps));
+
+    // start filling accumulator with hit gaps, but skip first which is not a difference
+    std::for_each(std::next(std::begin(empty_s_gaps)),
+                  std::end(empty_s_gaps),
+    [&empty_s_acc](double empty_s) { empty_s_acc(empty_s); });
+  }
+
+  unsigned int empty_s_size = bacc::count(empty_s_acc);
 
   double drift_length_variance = -1;
   double adc_variance = -1;

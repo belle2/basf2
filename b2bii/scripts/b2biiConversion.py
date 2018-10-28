@@ -62,7 +62,9 @@ def setupB2BIIDatabase(isMC=False):
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
-                                  useBelleDBServer=None, path=analysis_main, entrySequences=None):
+                                  useBelleDBServer=None,
+                                  generatorLevelMCMatching=False,
+                                  path=analysis_main, entrySequences=None):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -104,6 +106,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
 
     # Convert MDST Module
     convert = register_module('B2BIIConvertMdst')
+    if (generatorLevelMCMatching):
+        convert.param('mcMatchingMode', 'GeneratorLevel')
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

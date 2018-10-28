@@ -80,6 +80,19 @@ namespace Belle2 {
 
   class B2BIIConvertMdstModule : public Module {
 
+    /**
+     * MC matching mode.
+     */
+    enum MCMatchingMode {
+
+      /** Direct matching. */
+      c_Direct,
+
+      /** Match to generator-level particles. */
+      c_GeneratorLevel,
+
+    };
+
     // Public functions
   public:
 
@@ -113,6 +126,12 @@ namespace Belle2 {
     // true = use 6x6 (position, momentum) covariance matrix
     // false = use 5x5 (helix parameters) covaraince matrix
     bool m_use6x6CovarianceMatrix4Tracks;
+
+    //! MC matching mode.
+    std::string m_mcMatchingModeString;
+
+    //! C matching mode.
+    MCMatchingMode m_mcMatchingMode;
 
     //! variable to tell us which IPProfile bin was active last time we looked
     int m_lastIPProfileBin{ -1};

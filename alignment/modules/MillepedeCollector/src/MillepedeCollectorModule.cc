@@ -94,6 +94,12 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            "Name of particle list of (mother) particles with daughters for calibration using vertex + mass constraint",
            vector<string>());
   addParam("primaryTwoBodyDecays", m_primaryTwoBodyDecays,
+           "Name of particle list of (mother) particles with daughters for calibration using vertex + IP profile + kinematics constraint",
+           vector<string>());
+  addParam("primaryMassTwoBodyDecays", m_primaryMassTwoBodyDecays,
+           "Name of particle list of (mother) particles with daughters for calibration using vertex + mass constraint",
+           vector<string>());
+  addParam("primaryMassVertexTwoBodyDecays", m_primaryMassVertexTwoBodyDecays,
            "Name of particle list of (mother) particles with daughters for calibration using vertex + IP profile + mass constraint",
            vector<string>());
 
@@ -144,7 +150,14 @@ void MillepedeCollectorModule::prepare()
   StoreObjPtr<EventMetaData> emd;
   emd.isRequired();
 
-  if (m_tracks.empty() && m_particles.empty() && m_vertices.empty() && m_primaryVertices.empty())
+  if (m_tracks.empty() &&
+      m_particles.empty() &&
+      m_vertices.empty() &&
+      m_primaryVertices.empty() &&
+      m_twoBodyDecays.empty() &&
+      m_primaryTwoBodyDecays.empty() &&
+      m_primaryMassTwoBodyDecays.empty() &&
+      m_primaryMassVertexTwoBodyDecays.empty())
     B2ERROR("You have to specify either arrays of single tracks or particle lists of single single particles or mothers with vertex constrained daughters.");
 
   if (!m_tracks.empty()) {
@@ -442,7 +455,10 @@ void MillepedeCollectorModule::collect()
 
       auto mother = list->getParticle(iParticle);
       auto track12 = getParticlesTracks(mother->getDaughters());
-      if (track12.size() != 2) B2FATAL("Did not get 2 tracks");
+      if (track12.size() != 2) {
+        B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
+        continue;
+      }
 
       auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, mother->getPDGMass());
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
@@ -451,9 +467,63 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
       auto pdgdb = EvtGenDatabasePDG::Instance();
-      const double motherWidth = pdgdb->GetParticle(mother->getPDGCode())->Width();
+      double motherWidth = pdgdb->GetParticle(mother->getPDGCode())->Width();
+      //TODO: what to take as width for "real" particles? -> make a param for default detector mass resolution??
+      if (motherWidth == 0.) {
+        motherWidth = 10. * Unit::MeV;
+        B2WARNING("Using artificial width for " << pdgdb->GetParticle(mother->getPDGCode())->GetName() << " : " << motherWidth << " GeV");
+      }
+
+
       TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth;
-      TVectorD massResidual(0); massResidual = - (mother->getMass() - mother->getPDGMass());
+      TVectorD massResidual(1); massResidual = - (mother->getMass() - mother->getPDGMass());
+
+      TVectorD extMeasurements(1);
+      extMeasurements[0] = massResidual[0];
+
+      TMatrixD extDeriv(1, 9);
+      extDeriv.Zero();
+      extDeriv(0, 8) = 1.;
+
+      gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, massPrec);
+
+      combined.fit(chi2, ndf, lostWeight);
+      //combined.printTrajectory(1000);
+      //combined.printPoints(1000);
+      getObjectPtr<TH1I>("ndf")->Fill(ndf);
+      getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+      getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+
+      B2RESULT("Mass(PDG) + vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+
+      if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
+    }
+  }
+
+  for (auto listName : m_primaryMassTwoBodyDecays) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
+      continue;
+
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
+
+      auto mother = list->getParticle(iParticle);
+      auto track12 = getParticlesTracks(mother->getDaughters());
+      if (track12.size() != 2) {
+        B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
+        continue;
+      }
+
+      DBObjPtr<BeamParameters> beam;
+      auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, beam->getMass());
+      std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
+
+      daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
+      daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
+
+      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovHER())(0, 0);
+      TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
 
       TVectorD extMeasurements(1);
       extMeasurements[0] = massResidual[0];
@@ -469,7 +539,67 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
 
+      B2RESULT("Mass constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+
       if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
+    }
+  }
+
+  for (auto listName : m_primaryMassVertexTwoBodyDecays) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
+      continue;
+
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
+
+      auto mother = list->getParticle(iParticle);
+      auto track12 = getParticlesTracks(mother->getDaughters());
+      if (track12.size() != 2) {
+        B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
+        continue;
+      }
+
+      DBObjPtr<BeamParameters> beam;
+      auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, beam->getMass());
+      std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
+
+      daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
+      daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
+
+      TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
+      TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
+
+      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / (beam->getCovHER() + beam->getCovHER())(0, 0);
+      TVectorD massResidual(1); massResidual = - (mother->getMass() - beam->getMass());
+
+      TMatrixDSym extPrec(4); extPrec.Zero();
+      extPrec.SetSub(0, 0, vertexPrec);
+      extPrec(3, 3) = massPrec(0, 0);
+
+      TVectorD extMeasurements(4);
+      extMeasurements[0] = vertexResidual[0];
+      extMeasurements[1] = vertexResidual[1];
+      extMeasurements[2] = vertexResidual[2];
+      extMeasurements[3] = massResidual[0];
+
+      TMatrixD extDeriv(4, 9);
+      extDeriv.Zero();
+      extDeriv(0, 0) = 1.;
+      extDeriv(1, 1) = 1.;
+      extDeriv(2, 2) = 1.;
+      extDeriv(3, 8) = 1.;
+
+      gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, extPrec);
+
+      combined.fit(chi2, ndf, lostWeight);
+      getObjectPtr<TH1I>("ndf")->Fill(ndf);
+      getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+      getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+
+      if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
+      B2RESULT("Mass + vertex constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
 
     }
   }
@@ -517,6 +647,8 @@ void MillepedeCollectorModule::collect()
       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
       extMeasurements[6] = - (mother->getMass() - beam->getMass());
 
+      B2ERROR("mother mass = " << mother->getMass() << "  and beam mass = " << beam->getMass());
+
       TMatrixD extDeriv(7, 9);
       extDeriv.Zero();
       // beam vertex constraint
@@ -528,94 +660,304 @@ void MillepedeCollectorModule::collect()
       extDeriv(4, 4) = 1.;
       extDeriv(5, 5) = 1.;
       // beam inv. mass constraint
-      extDeriv(6, 8) = 1.;
+      extDeriv(6, 8) = 1;
 
-      TMatrixD derivatives(9, 11); // up to d(x,y,z,px,py,pz,theta,phi,M)/d(vx,vy,vz,pxH,pyH,pzH,EH,pxL,pyL,pzL,EL)
-      std::vector<int> labels;
-      derivatives.Zero();
-      if (m_calibrateVertex) {
-        derivatives(0, 0) = 1.;
-        derivatives(1, 1) = 1.;
-        derivatives(2, 2) = 1.;
-        GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
-        labels.push_back(label.setParameterId(1));
-        labels.push_back(label.setParameterId(2));
-        labels.push_back(label.setParameterId(3));
+      if (m_calibrateVertex || m_calibrateKinematics) {
+        B2WARNING("Primary vertex+kinematics calibration not (yet?) fully implemented!");
+
+        TMatrixD derivatives(9, 6); // up to d(x,y,z,px,py,pz,theta,phi,M)/d(vx,vy,vz,theta_x,theta_y,E)
+        std::vector<int> labels;
+        derivatives.Zero();
+        if (m_calibrateVertex) {
+          derivatives(0, 0) = 1.;
+          derivatives(1, 1) = 1.;
+          derivatives(2, 2) = 1.;
+          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          labels.push_back(label.setParameterId(1));
+          labels.push_back(label.setParameterId(2));
+          labels.push_back(label.setParameterId(3));
+        } else {
+          labels.push_back(0);
+          labels.push_back(0);
+          labels.push_back(0);
+        }
+
+        if (m_calibrateKinematics) {
+          derivatives(3, 3) = mother->getMomentumMagnitude();
+          derivatives(4, 4) = mother->getMomentumMagnitude();
+          derivatives(8, 5) = (beam->getLER().E() + beam->getHER().E()) / beam->getMass();
+
+          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          labels.push_back(label.setParameterId(4)); //theta_x
+          labels.push_back(label.setParameterId(5)); //theta_y
+          labels.push_back(label.setParameterId(6)); //E
+
+        } else {
+          labels.push_back(0);
+          labels.push_back(0);
+          labels.push_back(0);
+        }
+        // Allow to disable BeamParameters externally
+        alignment::GlobalDerivatives globals(labels, derivatives);
+
+        // Add derivatives for vertex calibration to first point of first trajectory
+        // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
+        // the derivatives to not pass those with zero labels (usefull to get rid of some params)
+        std::vector<int> lab(globals); TMatrixD der(globals);
+
+        // I want: dlocal/dext = dlocal/dtwobody * dtwobody/dext = dfdextPlusMinus * extDeriv^(-1)
+        TMatrixD dTwoBody_dExt(9, 7);
+        dTwoBody_dExt.Zero();
+        // beam vertex constraint
+        dTwoBody_dExt(0, 0) = 1.;
+        dTwoBody_dExt(1, 1) = 1.;
+        dTwoBody_dExt(2, 2) = 1.;
+        // beam kinematics constraint
+        dTwoBody_dExt(3, 3) = 1.;
+        dTwoBody_dExt(4, 4) = 1.;
+        dTwoBody_dExt(5, 5) = 1.;
+        // beam inv. mass constraint
+        dTwoBody_dExt(8, 6) = 1.;
+
+        TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
+        TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
+        TVectorD locRes = dLocal_dExt * extMeasurements;
+        TMatrixD locPrec =  dLocal_dExt * extPrec * dLocal_dExt_T;
+
+        TMatrixDSym prec(5); prec.Zero();
+        for (int i = 0; i < 5; ++i)
+          for (int j = 0; j < 5; ++j)
+            prec(i, j) = locPrec(i, j);
+
+        daughters[0].first[0].addMeasurement(locRes, prec);
+
+        // particle 2
+        TMatrixD dLocal_dExt2 = dfdextPlusMinus.second * dTwoBody_dExt;
+        TMatrixD dLocal_dExt2_T = dLocal_dExt2; dLocal_dExt2_T.T();
+        TVectorD locRes2 = dLocal_dExt2 * extMeasurements;
+        TMatrixD locPrec2 =  dLocal_dExt2 * extPrec * dLocal_dExt2_T;
+
+        TMatrixDSym prec2(5); prec2.Zero();
+        for (int i = 0; i < 5; ++i)
+          for (int j = 0; j < 5; ++j)
+            prec2(i, j) = locPrec2(i, j);
+
+        //daughters[1].first[0].addMeasurement(locRes2, prec2);
+
+        if (!lab.empty())
+          daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);
+
+        //if (!lab.empty())
+        //  daughters[1].first[0].addGlobals(lab, dfdextPlusMinus.second * der);
+
+        gbl::GblTrajectory combined(daughters);//, extDeriv, extMeasurements, extPrec);
+        //combined.printTrajectory(1000);
+        //combined.printPoints(1000);
+
+        combined.fit(chi2, ndf, lostWeight);
+        getObjectPtr<TH1I>("ndf")->Fill(ndf);
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+
+        B2RESULT("Full kinematic-constrained fit (calibration version) results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+
+        if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+
       } else {
-        labels.push_back(0);
-        labels.push_back(0);
-        labels.push_back(0);
+
+        gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, extPrec);
+        //combined.printTrajectory(1000);
+        //combined.printPoints(1000);
+
+        combined.fit(chi2, ndf, lostWeight);
+        getObjectPtr<TH1I>("ndf")->Fill(ndf);
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+
+        B2RESULT("Full kinematic-constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+
+        if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
       }
-
-      if (m_calibrateKinematics) {
-        derivatives(3, 3) = 1.;
-        derivatives(3, 7) = 1.;
-
-        derivatives(4, 4) = 1.;
-        derivatives(4, 8) = 1.;
-
-        derivatives(5, 5) = 1.;
-        derivatives(5, 9) = 1.;
-
-        derivatives(8, 3) = - beam->getLER()[0] / beam->getMass();
-        derivatives(8, 4) = - beam->getLER()[1] / beam->getMass();
-        derivatives(8, 5) = - beam->getLER()[2] / beam->getMass();
-
-        derivatives(8, 6) = beam->getLER().E() / beam->getMass();
-
-        derivatives(8, 7) = - beam->getHER()[0] / beam->getMass();
-        derivatives(8, 8) = - beam->getHER()[1] / beam->getMass();
-        derivatives(8, 9) = - beam->getHER()[2] / beam->getMass();
-
-        derivatives(8, 10) = beam->getHER().E() / beam->getMass();
-
-        GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
-        labels.push_back(label.setParameterId(4)); //px LER
-        labels.push_back(label.setParameterId(5)); //py LER
-        labels.push_back(label.setParameterId(6)); //pz LER
-        labels.push_back(label.setParameterId(7)); //E LER
-        labels.push_back(label.setParameterId(8)); //px HER
-        labels.push_back(label.setParameterId(9)); //py HER
-        labels.push_back(label.setParameterId(10)); //pz HER
-        labels.push_back(label.setParameterId(11)); //E HER
-
-      } else {
-        labels.push_back(0);
-        labels.push_back(0);
-        labels.push_back(0);
-        labels.push_back(0);
-        labels.push_back(0);
-        labels.push_back(0);
-        labels.push_back(0);
-        labels.push_back(0);
-      }
-      // Allow to disable BeamParameters externally
-      alignment::GlobalDerivatives globals(labels, derivatives);
-
-      // Add derivatives for vertex calibration to first point of first trajectory
-      // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
-      // the derivatives to not pass those with zero labels (usefull to get rid of some params)
-      std::vector<int> lab(globals); TMatrixD der(globals);
-
-      if (!lab.empty())
-        daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);
-
-      gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, extPrec);
-      combined.printTrajectory(1000);
-      combined.printPoints(1000);
-
-      combined.fit(chi2, ndf, lostWeight);
-      getObjectPtr<TH1I>("ndf")->Fill(ndf);
-      getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
-      getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-
-      B2RESULT("Full kinematic-constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
-
-      if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
-
     }
   }
 
+
+
+//   for (auto listName : m_primaryTwoBodyDecays) {
+//     StoreObjPtr<ParticleList> list(listName);
+//     if (!list.isValid())
+//       continue;
+//
+//     DBObjPtr<BeamParameters> beam;
+//
+//     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
+//
+//       auto mother = list->getParticle(iParticle);
+//
+//       auto track12 = getParticlesTracks(mother->getDaughters());
+//       if (track12.size() != 2) {
+//         B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
+//         continue;
+//       }
+//
+//       auto dfdextPlusMinus = getLocalToCommonTwoBodyExtParametersTransform(*mother, beam->getMass());
+//       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
+//
+//       daughters.push_back({gbl->collectGblPoints(track12[0], track12[0]->getCardinalRep()), dfdextPlusMinus.first});
+//       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
+//
+//       TMatrixDSym extPrec(7); extPrec.Zero();
+//       extPrec.SetSub(0, 0, beam->getCovVertex().Invert());
+//       //TODO:
+//       //I cannot get all 3 entries non-zero using Y4S setting for add_beamparameters
+//       //extPrec.SetSub(3, 3, (beam->getCovLER() + beam->getCovHER()).Invert());
+//       extPrec(3, 3) = 1. / (beam->getCovLER() + beam->getCovHER())(0, 0);
+//       extPrec(4, 4) = 1. / (beam->getCovLER() + beam->getCovHER())(0, 0);
+//       extPrec(5, 5) = 1. / (beam->getCovLER() + beam->getCovHER())(0, 0);
+//       //
+//       extPrec(6, 6) = 1. / (beam->getCovLER()(0, 0) + beam->getCovHER()(0, 0));
+//
+//       TVectorD extMeasurements(7);
+//       extMeasurements[0] = - (mother->getVertex() - beam->getVertex())[0];
+//       extMeasurements[1] = - (mother->getVertex() - beam->getVertex())[1];
+//       extMeasurements[2] = - (mother->getVertex() - beam->getVertex())[2];
+//       extMeasurements[3] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[0];
+//       extMeasurements[4] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
+//       extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
+//       extMeasurements[6] = - (mother->getMass() - beam->getMass());
+//
+//       TMatrixD extDeriv(7, 9);
+//       extDeriv.Zero();
+//       // beam vertex constraint
+//       extDeriv(0, 0) = 1.;
+//       extDeriv(1, 1) = 1.;
+//       extDeriv(2, 2) = 1.;
+//       // beam kinematics constraint
+//       extDeriv(3, 3) = 1.;
+//       extDeriv(4, 4) = 1.;
+//       extDeriv(5, 5) = 1.;
+//       // beam inv. mass constraint
+//       extDeriv(6, 8) = 1;
+//
+//       if (m_calibrateVertex || m_calibrateKinematics) {
+//         B2WARNING("Primary vertex+kinematics calibration not (yet?) fully implemented!");
+//
+//         TMatrixD derivatives(9, 6); // up to d(x,y,z,px,py,pz,theta,phi,M)/d(vx,vy,vz,theta_x,theta_y,E)
+//         std::vector<int> labels;
+//         derivatives.Zero();
+//         if (m_calibrateVertex) {
+//           derivatives(0, 0) = 1.;
+//           derivatives(1, 1) = 1.;
+//           derivatives(2, 2) = 1.;
+//           GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+//           labels.push_back(label.setParameterId(1));
+//           labels.push_back(label.setParameterId(2));
+//           labels.push_back(label.setParameterId(3));
+//         } else {
+//           labels.push_back(0);
+//           labels.push_back(0);
+//           labels.push_back(0);
+//         }
+//
+//         if (m_calibrateKinematics) {
+//           derivatives(3, 3) = mother->getMomentumMagnitude();
+//           derivatives(4, 4) = mother->getMomentumMagnitude();
+//           derivatives(8, 5) = (beam->getLER().E() + beam->getHER().E()) / beam->getMass();
+//
+//           GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+//           labels.push_back(label.setParameterId(4)); //theta_x
+//           labels.push_back(label.setParameterId(5)); //theta_y
+//           labels.push_back(label.setParameterId(6)); //E
+//
+//         } else {
+//           labels.push_back(0);
+//           labels.push_back(0);
+//           labels.push_back(0);
+//         }
+//         // Allow to disable BeamParameters externally
+//         alignment::GlobalDerivatives globals(labels, derivatives);
+//
+//         // Add derivatives for vertex calibration to first point of first trajectory
+//         // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
+//         // the derivatives to not pass those with zero labels (usefull to get rid of some params)
+//         std::vector<int> lab(globals); TMatrixD der(globals);
+//
+//         // I want: dlocal/dext = dlocal/dtwobody * dtwobody/dext = dfdextPlusMinus * extDeriv^(-1)
+//         TMatrixD dTwoBody_dExt(9, 7);
+//         dTwoBody_dExt.Zero();
+//         // beam vertex constraint
+//         dTwoBody_dExt(0, 0) = 1.;
+//         dTwoBody_dExt(1, 1) = 1.;
+//         dTwoBody_dExt(2, 2) = 1.;
+//         // beam kinematics constraint
+//         dTwoBody_dExt(3, 3) = 1.;
+//         dTwoBody_dExt(4, 4) = 1.;
+//         dTwoBody_dExt(5, 5) = 1.;
+//         // beam inv. mass constraint
+//         dTwoBody_dExt(8, 6) = 1.;
+//
+//         TMatrixD dLocal_dExt = dfdextPlusMinus.first * dTwoBody_dExt;
+//         TMatrixD dLocal_dExt_T = dLocal_dExt; dLocal_dExt_T.T();
+//         TVectorD locRes = dLocal_dExt * extMeasurements;
+//         TMatrixD locPrec =  dLocal_dExt * extPrec * dLocal_dExt_T;
+//
+//         TMatrixDSym prec(5); prec.Zero();
+//         for (int i = 0; i < 5; ++i)
+//           for (int j = 0; j < 5; ++j)
+//             prec(i, j) = locPrec(i, j);
+//
+//         daughters[0].first[0].addMeasurement(locRes, prec);
+//
+//         // particle 2
+//         TMatrixD dLocal_dExt2 = dfdextPlusMinus.second * dTwoBody_dExt;
+//         TMatrixD dLocal_dExt2_T = dLocal_dExt2; dLocal_dExt2_T.T();
+//         TVectorD locRes2 = dLocal_dExt2 * extMeasurements;
+//         TMatrixD locPrec2 =  dLocal_dExt2 * extPrec * dLocal_dExt2_T;
+//
+//         TMatrixDSym prec2(5); prec2.Zero();
+//         for (int i = 0; i < 5; ++i)
+//           for (int j = 0; j < 5; ++j)
+//             prec2(i, j) = locPrec2(i, j);
+//
+//         daughters[1].first[0].addMeasurement(locRes2, prec2);
+//
+//         if (!lab.empty())
+//           daughters[0].first[0].addGlobals(lab, dfdextPlusMinus.first * der);
+//
+//         if (!lab.empty())
+//           daughters[1].first[0].addGlobals(lab, dfdextPlusMinus.second * der);
+//
+//         gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, extPrec);
+//         //combined.printTrajectory(1000);
+//         //combined.printPoints(1000);
+//
+//         combined.fit(chi2, ndf, lostWeight);
+//         getObjectPtr<TH1I>("ndf")->Fill(ndf);
+//         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+//         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+//
+//         B2RESULT("Full kinematic-constrained fit (calibration version) results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+//
+//         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+//
+//       } else {
+//
+//         gbl::GblTrajectory combined(daughters, extDeriv, extMeasurements, extPrec);
+//         //combined.printTrajectory(1000);
+//         //combined.printPoints(1000);
+//
+//         combined.fit(chi2, ndf, lostWeight);
+//         getObjectPtr<TH1I>("ndf")->Fill(ndf);
+//         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+//         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+//
+//         B2RESULT("Full kinematic-constrained fit results NDF = " << ndf << " Chi2/NDF = " << chi2 / double(ndf));
+//
+//         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
+//       }
+//     }
+//   }
+//
 
 
 }
@@ -942,7 +1284,6 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getLocalToCommonTwoBodyE
   double pt = sqrt(px * px + py * py);
   double p  = mother.getMomentumMagnitude();
   double M  = motherMass;
-  M = 10.57;
   double m  = mother.getDaughter(0)->getPDGMass();
 
   if (mother.getNDaughters() != 2

@@ -93,6 +93,10 @@ namespace Belle2 {
     std::vector<std::string> m_twoBodyDecays;
     /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
     std::vector<std::string> m_primaryTwoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
+    std::vector<std::string> m_primaryMassTwoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
+    std::vector<std::string> m_primaryMassVertexTwoBodyDecays;
     /** Use double (instead of single/float) precision for binary files */
     bool m_doublePrecision;
     /** Add derivatives for beam spot vertex calibration for primary vertices */

@@ -137,6 +137,11 @@ namespace Belle2 {
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
         getGeometry()->print();
+        if (m_oldPayload) {
+          cout << "Envelope QE same as nominal quantum efficiency" << endl << endl;
+          return;
+        }
+        if (m_envelopeQE.isEmpty()) setEnvelopeQE();
         m_envelopeQE.print("Envelope QE");
       }
     }
@@ -146,6 +151,7 @@ namespace Belle2 {
       m_envelopeQE.clear();
       m_pmts.clear();
       m_relEfficiencies.clear();
+      m_pmtTypes.clear();
     }
 
     const TOPGeometry* TOPGeometryPar::getGeometry() const
@@ -225,6 +231,18 @@ namespace Belle2 {
 
       int id = getUniquePixelID(moduleID, pixelID);
       return m_relEfficiencies[id] * RQE * thrEffi;
+    }
+
+
+    const TOPNominalTTS& TOPGeometryPar::getTTS(int moduleID, int pmtID) const
+    {
+
+      if (m_pmtTypes.empty()) mapPmtTypeToPositions();
+
+      int id = getUniquePmtID(moduleID, pmtID);
+      auto pmtType = m_pmtTypes[id];
+
+      return getGeometry()->getTTS(pmtType);
     }
 
 
@@ -312,6 +330,17 @@ namespace Belle2 {
       }
 
       B2INFO("TOPGeometryPar: QE of PMT's mapped to positions, size = " << m_pmts.size());
+    }
+
+
+    void TOPGeometryPar::mapPmtTypeToPositions() const
+    {
+      for (const auto& pmt : m_pmtInstalled) {
+        int id = getUniquePmtID(pmt.getSlotNumber(), pmt.getPosition());
+        m_pmtTypes[id] = pmt.getType();
+      }
+
+      B2INFO("TOPGeometryPar: PMT types mapped to positions, size = " << m_pmtTypes.size());
     }
 
 

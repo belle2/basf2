@@ -21,6 +21,7 @@
 #include <top/dbobjects/TOPWavelengthFilter.h>
 #include <framework/gearbox/Unit.h>
 #include <vector>
+#include <map>
 
 
 namespace Belle2 {
@@ -88,6 +89,12 @@ namespace Belle2 {
      * @param nominalTTS nominal TTS
      */
     void setNominalTTS(const TOPNominalTTS& nominalTTS) {m_nominalTTS = nominalTTS;}
+
+    /**
+     * Appends time transition spread of a particular PMT type
+     * @param tts TTS of a particular PMT type
+     */
+    void appendTTS(const TOPNominalTTS& tts) {m_tts[tts.getPMTType()] = tts;}
 
     /**
      * Sets nominal time-to-digit conversion parameters
@@ -170,6 +177,13 @@ namespace Belle2 {
     const TOPNominalTTS& getNominalTTS() const {return m_nominalTTS;}
 
     /**
+     * Returns time transition spread of a given PMT type
+     * @param type PMT type
+     * @return TTS of a given PMT type if found, otherwise nominal TTS
+     */
+    const TOPNominalTTS& getTTS(unsigned type) const;
+
+    /**
      * Returns nominal time-to-digit conversion parameters
      * @return nominal TDC parameters
      */
@@ -248,8 +262,9 @@ namespace Belle2 {
     TOPSignalShape m_signalShape; /**< shape of single photon signal */
     TOPSignalShape m_calPulseShape; /**< shape of the calibration pulse */
     TOPWavelengthFilter m_wavelengthFilter; /**< transmittance of wavelength filter */
+    std::map<unsigned, TOPNominalTTS> m_tts; /**< TTS of PMT types */
 
-    ClassDefOverride(TOPGeometry, 6); /**< ClassDef */
+    ClassDefOverride(TOPGeometry, 7); /**< ClassDef */
 
   };
 

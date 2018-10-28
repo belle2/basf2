@@ -46,6 +46,12 @@ namespace Belle2 {
     B2FATAL("TOPGeometry::getModule: invalid module ID " << moduleID);
   }
 
+  const TOPNominalTTS& TOPGeometry::getTTS(unsigned type) const
+  {
+    std::map<unsigned, TOPNominalTTS>::const_iterator it = m_tts.find(type);
+    if (it == m_tts.end()) return m_nominalTTS;
+    return it->second;
+  }
 
   double TOPGeometry::getInnerRadius() const
   {

@@ -79,14 +79,12 @@ void EKLMDigitizerModule::checkChannelParameters()
             if (channel == NULL)
               B2FATAL("Incomplete channel data.");
             if (channel->getPhotoelectronAmplitude() <= 0) {
-              B2ERROR("Non-positive photoelectron amplitude (" <<
-                      channel->getPhotoelectronAmplitude() <<
-                      ") for channel with endcap = " << endcap <<
-                      ", layer = " << layer << ", sector = " << sector <<
-                      ", plane = " << plane << ", strip = " << strip <<
-                      ". The requested channel-specific simulation is "
-                      "impossible. EKLMDigitizer is switched to the generic "
-                      "mode.");
+              B2ERROR("Non-positive photoelectron amplitude. The requested "
+                      "channel-specific simulation is impossible. "
+                      "EKLMDigitizer is switched to the generic mode."
+                      << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                      << LogVar("Sector", sector) << LogVar("Plane", plane)
+                      << LogVar("Strip", strip));
               m_ChannelSpecificSimulation = false;
               return;
             }

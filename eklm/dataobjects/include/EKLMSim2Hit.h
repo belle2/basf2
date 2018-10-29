@@ -93,7 +93,7 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** Needed to make root object storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMSim2Hit, 1);
 
   };

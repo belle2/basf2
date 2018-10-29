@@ -92,7 +92,7 @@ namespace Belle2 {
     /** Amplitude dependence time constant. */
     float m_AmplitudeTimeConstant;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMTimeCalibration, 2);
 
   };

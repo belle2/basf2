@@ -214,7 +214,7 @@ namespace Belle2 {
     /** MC time at SiPM. */
     float m_sMCTime;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDefOverride(Belle2::EKLMDigit, 10);
 
   };

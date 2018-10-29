@@ -14,7 +14,7 @@ import subprocess
 from fnmatch import fnmatch
 
 # set local database folder
-use_central_database("Calibration_Offline_Development")
+use_local_database("localdb/database.txt", "localdb")
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox
@@ -91,3 +91,8 @@ dbImporter = ARICHDatabaseImporter()
 # Parameters are read from arich/data/ARICH-CosmicTest.xml
 
 # dbImporter.importCosmicTestGeometry()
+
+# Import global alignment parameters
+# Parameters are read from arich/data/ARICH-GlobalAlignment.xml
+
+# dbImporter.importGlobalAlignment()

@@ -24,6 +24,7 @@
 #include <arich/dbobjects/ARICHGeoMirrors.h>
 #include <arich/dbobjects/ARICHGeoMasterVolume.h>
 #include <arich/dbobjects/ARICHGeoSupport.h>
+#include <arich/dbobjects/ARICHGeoGlobalDisplacement.h>
 
 #define MAX_N_ALAYERS 5
 #define MAXPTS_QE 100
@@ -136,6 +137,12 @@ namespace Belle2 {
     const ARICHGeoCooling& getCoolingGeometry() const { return m_cooling; }
 
     /**
+     * Get global displacement parameters
+     * @return global displacement parameters
+     */
+    const ARICHGeoGlobalDisplacement& getGlobalDisplacement() const { return m_globalDispl; }
+
+    /**
     * Set geometry configuration of aerogel plane
     * @param aerogelPlane aerogel plane geometry parameters
     */
@@ -180,6 +187,16 @@ namespace Belle2 {
       m_supportStructure = supportStructure;
     }
 
+    /**
+     * Set global displacement parameters
+     * @param displ global displacement parameters
+     */
+    void setGlobalDisplacement(ARICHGeoGlobalDisplacement& displ)
+    {
+      m_globalDispl = displ;
+    }
+
+
 
   private:
 
@@ -192,13 +209,14 @@ namespace Belle2 {
     ARICHGeoMerger m_merger;                 /**< Merger PCB geometry configuration */
     ARICHGeoCablesEnvelope m_cablesenvelope; /**< ARICH cables envelop geometry configuration */
     ARICHGeoCooling m_cooling;               /**< ARICH cooling system geometry configuration */
+    ARICHGeoGlobalDisplacement m_globalDispl;  /**< global displacement parameters */
 
     int m_bbstudy = 0; /**< is beam background study */
 
     //! initializes the positions of HAPD modules, with the parameters from xml.
     void modulesPosition(const GearDir& content);
 
-    ClassDef(ARICHGeometryConfig, 2);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHGeometryConfig, 3);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 

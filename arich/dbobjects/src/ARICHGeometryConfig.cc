@@ -42,6 +42,14 @@ void ARICHGeometryConfig::read(const GearDir& content)
                               envParams.getLength("zPosition") + envParams.getLength("length") / 2., envParams.getAngle("xRotation"),
                               envParams.getAngle("yRotation"), envParams.getAngle("zRotation"));
 
+  GearDir displParams(content, "GlobalDisplacement");
+  m_globalDispl.setX(displParams.getLength("x"));
+  m_globalDispl.setY(displParams.getLength("y"));
+  m_globalDispl.setZ(displParams.getLength("z"));
+  m_globalDispl.setAlpha(displParams.getAngle("alpha"));
+  m_globalDispl.setBeta(displParams.getAngle("beta"));
+  m_globalDispl.setGamma(displParams.getAngle("gamma"));
+
   auto& materials = geometry::Materials::getInstance();
 
   GearDir detParams(content, "Detector/Module");

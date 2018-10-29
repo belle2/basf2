@@ -67,7 +67,7 @@ namespace Belle2 {
              "Resolution of track direction angle on aerogel plane (for additional smearing of MC tracks)", 2.0 * Unit::mrad);
     addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0), from AeroHits - MC info (1)", 0);
     addParam("storePhotons", m_storePhot, "Set to 1 to store reconstructed photon information (Ch. angle,...)", 0);
-    addParam("useAlignment", m_align, "Use ARICH position alignment constatns", false);
+    addParam("useAlignment", m_align, "Use ARICH position alignment constatns", true);
   }
 
   ARICHReconstructorModule::~ARICHReconstructorModule()

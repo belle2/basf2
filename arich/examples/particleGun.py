@@ -24,6 +24,8 @@ parser.add_option('-f', '--file', dest='filename',
 
 home = os.environ['BELLE2_LOCAL_DIR']
 
+# use_local_database("local_db/database.txt","localdb")
+
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 

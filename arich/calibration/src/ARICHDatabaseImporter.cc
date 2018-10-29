@@ -40,6 +40,8 @@
 #include <arich/dbobjects/ARICHReconstructionPar.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHAeroTilesInfo.h>
+#include <arich/dbobjects/ARICHGlobalAlignment.h>
+#include <arich/dbobjects/ARICHAlignmentElement.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
@@ -189,6 +191,22 @@ void ARICHDatabaseImporter::importModulesInfo()
   importObj.construct(modInfo);
   importObj.import(iov);
 
+}
+
+void ARICHDatabaseImporter::importGlobalAlignment()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir alignPars(content, "GlobalAlignment");
+  ARICHGlobalAlignment arichAlign;
+  ARICHAlignmentElement alignel(alignPars.getLength("x"), alignPars.getLength("y"), alignPars.getLength("z"),
+                                alignPars.getAngle("alpha"), alignPars.getAngle("beta"), alignPars.getAngle("gamma"));
+  arichAlign.setAlignmentElement(alignel);
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHGlobalAlignment> importObj;
+  importObj.construct(arichAlign);
+  importObj.import(iov);
 }
 
 void ARICHDatabaseImporter::importChannelMask()

@@ -497,7 +497,7 @@ namespace Belle2 {
         double fi_cer_1st = 0;
         int proc = 0;
 
-        // loop over all arogel layers
+        // loop over all aerogel layers
         for (unsigned int iAerogel = 0; iAerogel < m_nAerogelLayers; iAerogel++) {
 
           TVector3 initialrf = getTrackPositionAtZ(arichTrack, m_zaero[iAerogel]);
@@ -660,17 +660,18 @@ namespace Belle2 {
     return pos + dir * path;
   }
 
-  void ARICHReconstruction::transformTrackToLocal(ARICHTrack& arichTrack, bool)
+  void ARICHReconstruction::transformTrackToLocal(ARICHTrack& arichTrack, bool align)
   {
-    // tranform track from BelleII to local ARICH frame
+    // tranform track from Belle II to local ARICH frame
     TVector3 locPos = m_arichgp->getMasterVolume().pointToLocal(arichTrack.getPosition());
     TVector3 locDir = m_arichgp->getMasterVolume().momentumToLocal(arichTrack.getDirection());
 
-    /*if(align && m_alignp.isValid()){
+    // apply the alignment correction
+    if (align && m_alignp.isValid()) {
       // apply global alignment correction
-      //   locPos = m_alignp->pointToLocal(locPos);
-      //locDir = m_alignp->momentumToLocal(locDir);
-    } */
+      locPos = m_alignp->pointToLocal(locPos);
+      locDir = m_alignp->momentumToLocal(locDir);
+    }
 
     // set parameters and return
     // is it needed to extrapolate to z of aerogel in local frame?? tabun

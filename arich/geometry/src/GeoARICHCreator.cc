@@ -109,13 +109,22 @@ namespace Belle2 {
       setVisibility(*masterLV, false);
 
       G4RotationMatrix rotMaster;
-      rotMaster.rotateX(m_config.getMasterVolume().getRotationX());
+      rotMaster.rotateX(m_config.getMasterVolume().getRotationX() + m_config.getGlobalDisplacement().getAlpha());
+      rotMaster.rotateY(m_config.getMasterVolume().getRotationY() + m_config.getGlobalDisplacement().getBeta());
+      rotMaster.rotateZ(m_config.getMasterVolume().getRotationZ() + m_config.getGlobalDisplacement().getGamma());
+
+      G4ThreeVector transMaster(m_config.getMasterVolume().getPosition().X() + m_config.getGlobalDisplacement().getX(),
+                                m_config.getMasterVolume().getPosition().Y() + m_config.getGlobalDisplacement().getY(),
+                                m_config.getMasterVolume().getPosition().Z() + m_config.getGlobalDisplacement().getZ());
+
+
+      /*rotMaster.rotateX(m_config.getMasterVolume().getRotationX());
       rotMaster.rotateY(m_config.getMasterVolume().getRotationY());
       rotMaster.rotateZ(m_config.getMasterVolume().getRotationZ());
 
       G4ThreeVector transMaster(m_config.getMasterVolume().getPosition().X(), m_config.getMasterVolume().getPosition().Y(),
                                 m_config.getMasterVolume().getPosition().Z());
-
+      */
       new G4PVPlacement(G4Transform3D(rotMaster, transMaster), masterLV, "ARICH.MasterVolume", &topVolume, false, 1);
 
       m_isBeamBkgStudy = m_config.doBeamBackgroundStudy();

@@ -115,7 +115,6 @@ namespace Belle2 {
        */
       XTFunction(const XTFunction& x) :
         m_h1(x.m_h1),
-        m_fitFunc(x.m_fitFunc),
         m_mode(x.m_mode),
         m_debug(x.m_debug),
         m_draw(x.m_draw),
@@ -126,6 +125,7 @@ namespace Belle2 {
         m_tmin(x.m_tmin),
         m_tmax(x.m_tmax)
       {
+        m_fitFunc = (TF1*) x.m_fitFunc->Clone();
         for (int i = 0; i < 8; ++i) {
           m_XTParam[i] = x.m_XTParam[i];
           m_FittedXTParams[i] = x.m_XTParam[i];

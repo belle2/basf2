@@ -26,6 +26,11 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/gdl/dbobjects/TRGGDLDBPrescales.h>
+#include <trg/gdl/dbobjects/TRGGDLDBFTDLBits.h>
+#include <trg/gdl/dbobjects/TRGGDLDBInputBits.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 
 namespace Belle2 {
 
@@ -44,6 +49,8 @@ namespace Belle2 {
 
     /** num of b2l bits **/
     const int nBits = 640;
+
+
 
     namespace GDLCONF0 {
 
@@ -1249,12 +1256,19 @@ namespace Belle2 {
       /** Unpacker main function.*/
       virtual void fillTreeGDL6(int* buf, int evt);
 
+      virtual void fillTreeGDLDB(int* buf, int evt);
+
     private:
 
       /** flag to select board search mode **/
       bool m_trgReadoutBoardSearch;
 
       StoreArray<TRGGDLUnpackerStore> store;
+
+      DBObjPtr<TRGGDLDBPrescales> m_prescales;
+      DBObjPtr<TRGGDLDBFTDLBits> m_ftdlbits;
+      DBObjPtr<TRGGDLDBInputBits>m_inputbits;
+      DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
 
     };
   }

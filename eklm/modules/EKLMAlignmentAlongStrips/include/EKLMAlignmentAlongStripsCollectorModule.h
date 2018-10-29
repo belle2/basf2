@@ -48,6 +48,12 @@ namespace Belle2 {
       const EKLMAlignmentAlongStripsCollectorModule&) = delete;
 
     /**
+     * Operator = (disabled).
+     */
+    EKLMAlignmentAlongStripsCollectorModule& operator=(
+      const EKLMAlignmentAlongStripsCollectorModule&) = delete;
+
+    /**
      * Destructor.
      */
     ~EKLMAlignmentAlongStripsCollectorModule();

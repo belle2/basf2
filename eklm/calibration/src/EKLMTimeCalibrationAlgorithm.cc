@@ -168,8 +168,9 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
                         (k[0][2] * k[1][1] - k[1][2] * k[0][1]);
   tau = (k[0][0] * k[1][2] - k[1][0] * k[0][2]) /
         (k[0][0] * k[1][1] - k[1][0] * k[0][1]);
-  B2INFO("Effective light speed = " << effectiveLightSpeed << " cm / ns");
-  B2INFO("Amplitude time constant = " << tau << " ns");
+  B2INFO("EKLM time calibration results:"
+         << LogVar("Effective light speed, cm / ns", effectiveLightSpeed)
+         << LogVar("Amplitude time constant, ns", tau));
   calibration->setEffectiveLightSpeed(effectiveLightSpeed);
   calibration->setAmplitudeTimeConstant(tau);
   for (i = 0; i < m_maxStrip; i++) {

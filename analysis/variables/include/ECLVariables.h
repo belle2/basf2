@@ -157,11 +157,6 @@ namespace Belle2 {
     double eclClusterLAT(const Particle* particle);
 
     /**
-     * return high momentum pi0 likelihood.
-     */
-    double eclClusterMergedPi0(const Particle* particle);
-
-    /**
      *
      * return number of hits associated to this cluster
      */

@@ -1,11 +1,13 @@
-#include "analysis/VertexFitting/TreeFitter/FitParams.h"
-#include "analysis/VertexFitting/TreeFitter/KalmanCalculator.h"
-#include <Eigen/Core>
+#pragma once
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
+#include "analysis/VertexFitting/TreeFitter/FitParams.h"
+#include "analysis/VertexFitting/TreeFitter/KalmanCalculator.h"
 
-namespace Belle2 {
+namespace {
+
   /** Test fixture. */
   class TreeFitterKalmanCalculatorTest : public ::testing::Test {
   protected:

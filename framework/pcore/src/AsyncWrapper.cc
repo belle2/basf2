@@ -52,9 +52,10 @@ int AsyncWrapper::numAvailableEvents()
   return s_currentRingBuffer->numq();
 }
 
-AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_ringBuffer(0), m_rx(0), m_tx(0)
+AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(),
+  m_wrappedModule(ModuleManager::Instance().registerModule(moduleType)),
+  m_ringBuffer(0), m_rx(0), m_tx(0)
 {
-  m_wrappedModule = ModuleManager::Instance().registerModule(moduleType);
   setParamList(m_wrappedModule->getParamList()); //inherit parameters from wrapped module
 
   addParam("discardOldEvents", m_discardOldEvents,

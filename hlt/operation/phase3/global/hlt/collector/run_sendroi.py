@@ -24,7 +24,8 @@ def cleanup(num, frame):
     os.kill(procrb2mrb.pid, signal.SIGINT)
     os.kill(procmrb2rb.pid, signal.SIGINT)
     for i in range(0, ncol):
-        os.kill(procbasf2[i].pid, signal.SIGKILL)
+        #        os.kill(procbasf2[i].pid, signal.SIGKILL)
+        os.killpg(procbasf2[i].pid, signal.SIGINT)
         subprocess.call(["removerb", inrblist[i]])
         subprocess.call(["removerb", outrblist[i]])
     exit()

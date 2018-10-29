@@ -83,6 +83,8 @@ namespace Belle2 {
     TH1F** m_startRowCount;
     /** Charge of clusters */
     TH1F** m_clusterCharge;
+    /** Deposited energy of clusters */
+    TH1F** m_clusterEnergy;
     /** Charge of pixels */
     TH1F** m_pixelSignal;
     /** u cluster size */

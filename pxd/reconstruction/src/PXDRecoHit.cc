@@ -13,6 +13,7 @@
 #include <framework/gearbox/Const.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
+#include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -76,7 +77,10 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float 
   rawHitCov_(1, 0) = covUV;
   rawHitCov_(1, 1) = sigmaV * sigmaV;
   // Set physical parameters
-  m_energyDep = hit->getCharge() * Const::ehEnergy;
+  const PXD::SensorInfo& SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  auto ADUToEnergy = PXD::PXDGainCalibrator::getInstance().getADUToEnergy(m_sensorID, SensorInfo.getUCellID(hit->getU()),
+                     SensorInfo.getVCellID(hit->getV()));
+  m_energyDep = hit->getCharge() * ADUToEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();
@@ -98,7 +102,10 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit*):
   rawHitCov_(1, 0) = hit->getRho() * hit->getUSigma() * hit->getVSigma();
   rawHitCov_(1, 1) = hit->getVSigma() * hit->getVSigma();
   // Set physical parameters
-  m_energyDep = hit->getCharge() * Const::ehEnergy;
+  const PXD::SensorInfo& SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+  auto ADUToEnergy = PXD::PXDGainCalibrator::getInstance().getADUToEnergy(m_sensorID, SensorInfo.getUCellID(hit->getU()),
+                     SensorInfo.getVCellID(hit->getV()));
+  m_energyDep = hit->getCharge() * ADUToEnergy;
   //m_energyDepError = 0;
   // Setup geometry information
   setDetectorPlane();

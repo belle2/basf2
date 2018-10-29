@@ -87,10 +87,17 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
-     * * Returns function which returns the difference of the angular variable phi between the two given daughters
-     * * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     * */
+     * Returns function which returns the difference of the angular variable phi between the two given daughters
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters
+     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the normalized difference of the given variable between the two given daughters

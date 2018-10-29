@@ -218,85 +218,85 @@ namespace Belle2 {
       m_useZMQ = useZMQ;
     }
 
-    /**< Socket address to use in ZMQ. */
+    /// Socket address to use in ZMQ.
     const std::string& getZMQSocketAddress() const
     {
       return m_zmqSocketAddress;
     }
 
-    /**< Socket address to use in ZMQ. */
+    /// Socket address to use in ZMQ.
     void setZMQSocketAddress(const std::string& zmqSocketAddress)
     {
       m_zmqSocketAddress = zmqSocketAddress;
     }
 
-    /**< Maximal waiting time of any ZMQ module for any communication in ms */
+    /// Maximal waiting time of any ZMQ module for any communication in ms
     unsigned int getZMQMaximalWaitingTime() const
     {
       return m_zmqMaximalWaitingTime;
     }
 
-    /**< Maximal waiting time of any ZMQ module for any communication in ms */
+    /// Maximal waiting time of any ZMQ module for any communication in ms
     void setZMQMaximalWaitingTime(unsigned int zmqMaximalWaitingTime)
     {
       m_zmqMaximalWaitingTime = zmqMaximalWaitingTime;
     }
 
-    /**< Number of events to keep in flight for every worker */
+    /// Number of events to keep in flight for every worker
     unsigned int getZMQEventBufferSize() const
     {
       return m_zmqEventBufferSize;
     }
 
-    /**< Number of events to keep in flight for every worker */
+    /// Number of events to keep in flight for every worker
     void setZMQEventBufferSize(unsigned int zmqEventBufferSize)
     {
       m_zmqEventBufferSize = zmqEventBufferSize;
     }
 
-    /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
+    /// How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check.
     unsigned int getZMQWorkerTimeout() const
     {
       return m_zmqWorkerTimeout;
     }
 
-    /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
+    /// How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check.
     void setZMQWorkerTimeout(unsigned int zmqWorkerTimeout)
     {
       m_zmqWorkerTimeout = zmqWorkerTimeout;
     }
 
-    /**< If a worker dies, store its events in a backup. */
+    /// If a worker dies, store its events in a backup.
     bool getZMQUseEventBackup() const
     {
       return m_zmqUseEventBackup;
     }
 
-    /**< If a worker dies, store its events in a backup. */
+    /// If a worker dies, store its events in a backup.
     void setZMQUseEventBackup(bool zmqUseEventBackup)
     {
       m_zmqUseEventBackup = zmqUseEventBackup;
     }
 
-    /**< If a worker dies, restart it. */
+    /// If a worker dies, restart it.
     bool getZMQRestartFailedWorkers() const
     {
       return m_zmqRestartFailedWorkers;
     }
 
-    /**< If a worker dies, restart it. */
+    /// If a worker dies, restart it.
     void setZMQRestartFailedWorkers(bool zmqRestartFailedWorkers)
     {
       m_zmqRestartFailedWorkers = zmqRestartFailedWorkers;
     }
 
-    /**< If a worker dies, fail also. */
+    /// If a worker dies, fail also.
     bool getZMQFailOnFailedWorkers() const
     {
       return m_zmqFailOnFailedWorkers;
     }
 
-    /**< If a worker dies, fail also. */
+    /// If a worker dies, fail also.
     void setZMQFailOnFailedWorkers(bool zmqFailOnFailedWorkers)
     {
       m_zmqFailOnFailedWorkers = zmqFailOnFailedWorkers;

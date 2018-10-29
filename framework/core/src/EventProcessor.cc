@@ -98,7 +98,7 @@ namespace {
    * after process() is complete (RAII) */
   struct NumberEventsOverrideGuard {
     /** Remember the old value */
-    NumberEventsOverrideGuard(unsigned int newValue)
+    explicit NumberEventsOverrideGuard(unsigned int newValue)
     {
       m_maxEvent = Environment::Instance().getNumberEventsOverride();
       Environment::Instance().setNumberEventsOverride(newValue);

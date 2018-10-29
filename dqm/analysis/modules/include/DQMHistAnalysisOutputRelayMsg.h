@@ -36,7 +36,7 @@ namespace Belle2 {
 
     // Data members
   private:
-    TSocket* m_sock;
+    TSocket* m_sock = nullptr;
     int m_port;
     std::string m_hostname;
 

@@ -185,37 +185,37 @@ namespace Belle2 {
 
   private:
     /** Experiment Number */
-    unsigned int m_exp;
+    unsigned int m_exp{0};
 
     /** Run Number */
-    unsigned int m_run;
+    unsigned int m_run{0};
 
     /** Run type  */
-    std::string m_runType;
+    std::string m_runType{""};
 
     /** Run start time  (Epoch time) */
-    unsigned long long int m_startTime;
+    unsigned long long int m_startTime{0};
 
     /** Run stop time  (Epoch time) */
-    unsigned long long int m_stopTime;
+    unsigned long long int m_stopTime{0};
 
     /** No. of events HLT processed   */
-    unsigned int m_receivedNevent;
+    unsigned int m_receivedNevent{0};
 
     /** Get No. of events triggered  */
-    unsigned int m_acceptedNevent;
+    unsigned int m_acceptedNevent{0};
 
     /** No. of events recorded  */
-    unsigned int m_sentNevent;
+    unsigned int m_sentNevent{0};
 
     /** Trigger rate (in Hz) */
-    double m_triggerRate;
+    double m_triggerRate{0};
 
     /** Run length  (in sec) by DAQ. Start and Stop time are when shifter starts the run but in reality there is some difference as DAQ doesn't start immediately or can be paused during the run.*/
-    unsigned int m_runLength;
+    unsigned int m_runLength{0};
 
     /** Bad run tag  (=0 means good run)*/
-    unsigned int m_badRun;
+    unsigned int m_badRun{0};
 
     /** DetectorSet for the sub-detector used */
     Const::DetectorSet m_Belle2Detector;

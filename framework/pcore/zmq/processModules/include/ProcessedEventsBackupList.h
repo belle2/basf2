@@ -20,6 +20,7 @@
 namespace Belle2 {
   /// List-like structure for storing and retaining event backups
   class ProcessedEventsBackupList {
+    /// Short for the class of a duration (always measured in milliseconds)
     using Duration = std::chrono::milliseconds;
 
   public:

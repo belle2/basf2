@@ -66,7 +66,7 @@ namespace Belle2 {
     /** Reference Histogram Root file name */
     std::string m_refFileName;
     /** The pointer to the reference file */
-    TFile* m_refFile;
+    TFile* m_refFile = nullptr;
 
     TH1* GetHisto(TString histoname);
 

@@ -49,9 +49,9 @@ namespace Belle2 {
     Int_t m_parameters;
     std::string  m_pvPrefix;
 
-    TF1* m_f1;
-    TCanvas* m_c1;
-    TLine* m_line, * m_line_lo, * m_line_hi;
+    TF1* m_f1 = nullptr;
+    TCanvas* m_c1 = nullptr;
+    TLine* m_line = nullptr, * m_line_lo = nullptr, * m_line_hi = nullptr;
 
 #ifdef _BELLE2_EPICS
     chid mychid[10];// hard limit max 10 parameters

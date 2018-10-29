@@ -6,6 +6,7 @@
 #pragma once
 
 #include <sys/types.h>
+#include <sys/ipc.h>
 #include <string>
 
 namespace Belle2 {
@@ -100,30 +101,30 @@ namespace Belle2 {
     void dumpInfo() const;
 
   private:
-    bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
-    bool m_file; /**< True if m_pathfd needs to be closed. */
-    std::string m_pathname; /**< Path for identifying shared memory if named ring buffer is created. */
-    int  m_pathfd; /**< Associated file descriptor. */
-    key_t m_shmkey; /**< SHM key, see shmget(2). */
-    key_t m_semkey; /**< Semaphore key, see semget(2). */
+    bool m_new{true}; /**< True if we created the ring buffer ourselves (and need to clean it). */
+    bool m_file{false}; /**< True if m_pathfd needs to be closed. */
+    std::string m_pathname{""}; /**< Path for identifying shared memory if named ring buffer is created. */
+    int  m_pathfd{ -1}; /**< Associated file descriptor. */
+    key_t m_shmkey{IPC_PRIVATE}; /**< SHM key, see shmget(2). */
+    key_t m_semkey{IPC_PRIVATE}; /**< Semaphore key, see semget(2). */
     /** file path containing ids of shm and sema for private shared mem, used for easier cleanup if we fail to do things properly */
-    std::string m_semshmFileName;
+    std::string m_semshmFileName{""};
 
     /** Is this process currently processing events from this RingBuffer?
      *
      * set during remq() with value depending on wether data was returned.
      * Always false for a process that is only using insq().
      */
-    bool m_procIsBusy;
+    bool m_procIsBusy{false};
 
-    int  m_shmid; /**< ID of shared memory segment. (See shmget(2)) */
-    int* m_shmadr; /**< Address of attached shared memory segment. (See shmat(2)) */
-    int  m_shmsize; /**< Size of shared memory segment, in bytes. */
-    struct RingBufInfo* m_bufinfo; /**< structure to manage ring buffer. Placed on top of the shared memory. */
-    int* m_buftop; /**< Points to memory after the end of m_bufinfo. */
-    int  m_semid; /**< Semaphore ID. */
-    int  m_remq_counter; /**< count remq() calls. */
-    int  m_insq_counter; /**< count insq() calls. */
+    int  m_shmid{ -1}; /**< ID of shared memory segment. (See shmget(2)) */
+    int* m_shmadr{nullptr}; /**< Address of attached shared memory segment. (See shmat(2)) */
+    int  m_shmsize{ -1}; /**< Size of shared memory segment, in bytes. */
+    struct RingBufInfo* m_bufinfo {nullptr}; /**< structure to manage ring buffer. Placed on top of the shared memory. */
+    int* m_buftop{nullptr}; /**< Points to memory after the end of m_bufinfo. */
+    int  m_semid{ -1}; /**< Semaphore ID. */
+    int  m_remq_counter{0}; /**< count remq() calls. */
+    int  m_insq_counter{0}; /**< count insq() calls. */
   };
 
 }

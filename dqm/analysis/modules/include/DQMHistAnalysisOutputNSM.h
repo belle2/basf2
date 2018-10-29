@@ -37,7 +37,7 @@ namespace Belle2 {
   private:
     std::string m_nodename;
     std::string m_rcnodename;
-    NSMCallback* m_callback;
+    NSMCallback* m_callback = nullptr;
 
   };
 } // end namespace Belle2

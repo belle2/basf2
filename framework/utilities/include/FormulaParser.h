@@ -30,8 +30,8 @@ namespace Belle2 {
       c_noop               = 0x00, /**< No operation */
       c_roundBracketOpen   = 0x01, /**< Open round bracket */
       c_roundBracketClose  = 0x02, /**< Close round bracket */
-      c_squareBracketOpen  = 0x03, /**< Open round bracket */
-      c_squareBracketClose = 0x04, /**< Close round bracket */
+      c_squareBracketOpen  = 0x03, /**< Open square bracket */
+      c_squareBracketClose = 0x04, /**< Close square bracket */
       c_plus               = 0x11, /**< Addition */
       c_minus              = 0x12, /**< Subtraction */
       c_multiply           = 0x21, /**< Multiply */

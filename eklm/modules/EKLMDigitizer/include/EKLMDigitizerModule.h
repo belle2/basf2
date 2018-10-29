@@ -14,7 +14,6 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
@@ -83,11 +82,6 @@ namespace Belle2 {
     void readAndSortSimHits();
 
     /**
-     * Create EKLMSim2Hits from EKLMSimHits using boost:graph mechanism.
-     */
-    void makeSim2Hits();
-
-    /**
      * Merge hits from the same strip. Create EKLMDigits.
      */
     void mergeSimHitsToStripHits();
@@ -119,9 +113,6 @@ namespace Belle2 {
     /** Use debug mode in EKLM::FiberAndElectronics or not. */
     bool m_Debug;
 
-    /** Create EKLMSim2Hits? */
-    bool m_CreateSim2Hits;
-
     /** Map for EKLMSimHit sorting according sensitive volumes. */
     std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;
 
@@ -130,9 +121,6 @@ namespace Belle2 {
 
     /** Simulation hits. */
     StoreArray<EKLMSimHit> m_SimHits;
-
-    /** Partly merged simulation hits (not created by default). */
-    StoreArray<EKLMSim2Hit> m_Sim2Hits;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;

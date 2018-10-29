@@ -153,7 +153,7 @@ namespace Belle2 {
        * Constructor.
        * @param[in] dataSource Data source.
        */
-      GeometryData(enum DataSource dataSource);
+      explicit GeometryData(enum DataSource dataSource);
 
       /**
        * Destructor.

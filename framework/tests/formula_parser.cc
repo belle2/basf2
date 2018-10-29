@@ -12,6 +12,7 @@ namespace {
   };
 
 #define EXPECT_FORMULA_OK(a, b) EXPECT_NO_THROW({EXPECT_EQ(parse(a), b);})
+#define EXPECT_FORMULA_FLOAT_EQ(a, b) EXPECT_NO_THROW({EXPECT_FLOAT_EQ(std::stof(parse(a)), b);})
 #define EXPECT_FORMULA_FAIL(a) EXPECT_THROW(parse(a), std::runtime_error)
 
   TEST_F(FormulaParserTest, Simple)
@@ -44,6 +45,7 @@ namespace {
   }
   TEST_F(FormulaParserTest, Numbers)
   {
+    EXPECT_FORMULA_OK("0", "0.000000");
     EXPECT_FORMULA_OK("1", "1.000000");
     EXPECT_FORMULA_OK("2.", "2.000000");
     EXPECT_FORMULA_OK(".3", "0.300000");
@@ -52,6 +54,10 @@ namespace {
     EXPECT_FORMULA_OK("+6e0", "6.000000");
     EXPECT_FORMULA_OK("-7e0", "-7.000000");
     EXPECT_FORMULA_OK("8.e-1", "0.800000");
+    EXPECT_FORMULA_FAIL("/9.0");
+    EXPECT_FORMULA_FAIL("*10.0");
+    EXPECT_FORMULA_OK("11**2", "121.000000");
+    EXPECT_FORMULA_OK("12^2", "144.000000");
   }
 
   TEST_F(FormulaParserTest, OperatorPrecedence)
@@ -59,6 +65,24 @@ namespace {
     EXPECT_FORMULA_OK("a+b+c", "(('a'+'b')+'c')");
     EXPECT_FORMULA_OK("a+b*c", "('a'+('b'*'c'))");
     EXPECT_FORMULA_OK("a^b*c", "(('a'^'b')*'c')");
+
+    EXPECT_FORMULA_OK("10.58-2+4", "12.580000"); // c/o. Racha
+    EXPECT_FORMULA_OK("10.58-(2+4)", "4.580000");
+    EXPECT_FORMULA_OK("10.58-[2+4]", "4.580000");
+  }
+
+  TEST_F(FormulaParserTest, MiscMaths)
+  {
+    EXPECT_FORMULA_OK("2^(1/2)", "1.414214");
+    EXPECT_FORMULA_OK("2**(1/2)", "1.414214");
+  }
+
+  TEST_F(FormulaParserTest, OrdersOfMagnitude)
+  {
+    EXPECT_FORMULA_OK("1e10", "10000000000.000000");
+    EXPECT_FORMULA_OK("1E10", "10000000000.000000");
+    EXPECT_FORMULA_OK("1*10**10", "10000000000.000000");
+    EXPECT_FORMULA_OK("1*10^10", "10000000000.000000");
+    EXPECT_FORMULA_FLOAT_EQ("((-3+5) * 10 ^ 2 / 3e-12)", 66666666666666.66);
   }
 }
-

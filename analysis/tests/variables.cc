@@ -977,6 +977,11 @@ namespace {
 
   TEST_F(MetaVariableTest, formula)
   {
+    // see also unit tests in framework/formula_parser.cc
+    //
+    // keep particle-based tests here, and operator precidence tests (etc) in
+    // framework with the parser itself
+
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
 
     const Manager::Var* var = Manager::Instance().getVariable("formula(px + py)");
@@ -1006,6 +1011,47 @@ namespace {
     var = Manager::Instance().getVariable("formula(pz + px * py)");
     ASSERT_NE(var, nullptr);
     EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
+
+    var = Manager::Instance().getVariable("formula(pt)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.41231057);
+    double pt = var->function(&p);
+
+    var = Manager::Instance().getVariable("formula((px**2 + py**2)**(1/2))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), pt);
+
+    var = Manager::Instance().getVariable("formula(charge)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -1.0);
+
+    var = Manager::Instance().getVariable("formula(charge**2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    var = Manager::Instance().getVariable("formula(charge^2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    var = Manager::Instance().getVariable("formula(PDG * charge)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -11.0);
+
+    var = Manager::Instance().getVariable("formula(PDG**2 * charge)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -121.0);
+
+    var = Manager::Instance().getVariable("formula(10.58 - (px + py + pz - E)**2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 8.33);
+
+    var = Manager::Instance().getVariable("formula(-10.58 + (px + py + pz - E)**2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -8.33);
+
+    var = Manager::Instance().getVariable("formula(-1.0 * PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -11);
   }
 
   TEST_F(MetaVariableTest, passesCut)

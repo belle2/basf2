@@ -113,8 +113,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   for (i = 0; i < m_maxStrip; i++) {
     n = stripEvents[i].size();
     if (n < 2) {
-      B2WARNING("Not enough calibration data collected for strip "
-                << i + 1 << ".");
+      B2WARNING("Not enough calibration data collected."
+                << LogVar("Strip", i + 1));
       delete fcn;
       delete[] stripEvents;
       delete[] averageDist;

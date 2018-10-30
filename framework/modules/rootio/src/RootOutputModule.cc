@@ -11,9 +11,6 @@
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
@@ -112,8 +109,9 @@ void RootOutputModule::initialize()
   TTree::SetMaxTreeSize(1000 * 1000 * 100000000000LL);
 
   //create a file level metadata object in the data store
-  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
-  fileMetaData.registerInDataStore();
+  m_fileMetaData.registerInDataStore();
+  //and make sure we have event meta data
+  m_eventMetaData.isRequired();
 
   getFileNames();
   TDirectory* dir = gDirectory;
@@ -209,27 +207,25 @@ void RootOutputModule::initialize()
 void RootOutputModule::event()
 {
 
-  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
   if (!m_keepParents) {
-    if (fileMetaDataPtr) {
-      const StoreObjPtr<EventMetaData> eventMetaData;
-      eventMetaData->setParentLfn(fileMetaDataPtr->getLfn());
+    if (m_fileMetaData) {
+      m_eventMetaData->setParentLfn(m_fileMetaData->getLfn());
     }
   }
 
   //fill Event data
   fillTree(DataStore::c_Event);
 
-  if (fileMetaDataPtr) {
+  if (m_fileMetaData) {
     if (m_keepParents) {
-      for (int iparent = 0; iparent < fileMetaDataPtr->getNParents(); iparent++) {
-        string lfn = fileMetaDataPtr->getParent(iparent);
+      for (int iparent = 0; iparent < m_fileMetaData->getNParents(); iparent++) {
+        string lfn = m_fileMetaData->getParent(iparent);
         if (!lfn.empty() && (m_parentLfns.empty() || (m_parentLfns.back() != lfn))) {
           m_parentLfns.push_back(lfn);
         }
       }
     } else {
-      string lfn = fileMetaDataPtr->getLfn();
+      string lfn = m_fileMetaData->getLfn();
       if (!lfn.empty() && (m_parentLfns.empty() || (m_parentLfns.back() != lfn))) {
         m_parentLfns.push_back(lfn);
       }
@@ -237,10 +233,9 @@ void RootOutputModule::event()
   }
 
   // keep track of file level metadata
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  unsigned long experiment =  eventMetaDataPtr->getExperiment();
-  unsigned long run =  eventMetaDataPtr->getRun();
-  unsigned long event = eventMetaDataPtr->getEvent();
+  unsigned long experiment =  m_eventMetaData->getExperiment();
+  unsigned long run =  m_eventMetaData->getRun();
+  unsigned long event = m_eventMetaData->getEvent();
   if (m_experimentLow > m_experimentHigh) { //starting condition
     m_experimentLow = m_experimentHigh = experiment;
     m_runLow = m_runHigh = run;
@@ -259,13 +254,18 @@ void RootOutputModule::event()
       m_eventHigh = event;
     }
   }
+
+  // check if we need to split the file
+  if (m_outputSplitSize and m_file->GetEND() > *m_outputSplitSize * 1024 * 1024) {
+    // close file and open new one
+    B2INFO("Output size limit reached, closing file ...");
+    closeFile();
+  }
 }
 
 void RootOutputModule::fillFileMetaData()
 {
-  //get pointer to file level metadata
-  StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
-  fileMetaDataPtr.create(true);
+  m_fileMetaData.create(true);
 
   if (m_tree[DataStore::c_Event]) {
     //create an index for the event tree

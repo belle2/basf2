@@ -13,6 +13,9 @@
 #include <framework/core/Module.h>
 #include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/FileMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -192,5 +195,10 @@ namespace Belle2 {
 
     /** Whether to keep parents same as that of input file */
     bool m_keepParents{false};
+
+    /** Pointer to the event meta data */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+    /** Pointer to the file meta data */
+    StoreObjPtr<FileMetaData> m_fileMetaData{"", DataStore::c_Persistent};
   };
 } // end namespace Belle2

@@ -33,13 +33,11 @@ from simulation import add_simulation
 
 import os
 import sys
+import random
 
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 
-# If later the use of bg is wanted, you can as well import setup_bg
-from setup_modules import setup_sim
-from setup_modules import setup_Geometry
 
 # ---------------------------------------------------------------------------------------
 
@@ -56,6 +54,7 @@ if(len(sys.argv) > 2):
 
 set_random_seed(rndseed)
 
+
 # Set log level. Can be overridden with the "-l LEVEL" flag for basf2.
 set_log_level(LogLevel.ERROR)
 
@@ -63,6 +62,12 @@ set_log_level(LogLevel.ERROR)
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
+# default phase3 geometry:
+exp_number = 0
+# if environment variable is set then phase2 (aka Beast2) geometry will be taken
+if os.environ.get('USE_BEAST2_GEOMETRY'):
+    exp_number = 1002
+eventinfosetter.param("expList", [exp_number])
 main.add_module(eventinfosetter)
 
 eventinfoprinter = register_module('EventInfoPrinter')
@@ -74,6 +79,23 @@ main.add_module(progress)
 # ---------------------------------------------------------------------------------------
 # Simulation Settings:
 
+
+# randomize the vertex position (flatly distributed) to make the sectormap more robust wrt. changing beam position
+# minima and maxima of the beam position given in cm
+random.seed(rndseed)
+vertex_x_min = -0.1
+vertex_x_max = 0.1
+vertex_y_min = -0.1
+vertex_y_max = 0.1
+vertex_z_min = -0.5
+vertex_z_max = 0.5
+
+vertex_x = random.uniform(vertex_x_min, vertex_x_max)
+vertex_y = random.uniform(vertex_y_min, vertex_y_max)
+vertex_z = random.uniform(vertex_z_min, vertex_z_max)
+
+print("WARNING: setting non-default beam vertex at x= " + str(vertex_x) + " y= " + str(vertex_y) + " z= " + str(vertex_z))
+
 # Particle Gun:
 # One can add more particle gun modules if wanted.
 particlegun = register_module('ParticleGun')
@@ -82,21 +104,12 @@ param_pGun = {
     'pdgCodes': [13, -13],   # 13 = muon --> negatively charged!
     'nTracks': 1,
     'momentumGeneration': 'uniform',
-    'momentumParams': [0.1, 4]
+    'momentumParams': [0.1, 4],
+    'vertexGeneration': 'fixed',
+    'xVertexParams': [vertex_x, 0.0],            # in cm...
+    'yVertexParams': [vertex_y, 0.0],
+    'zVertexParams': [vertex_z, 0.0],
 }
-"""
-              'momentumGeneration': 'fixed',
-              'momentumParams': [2, 2],           # 2 values: [min, max] in GeV
-              'thetaGeneration': 'fixed',
-              'thetaParams': [90., 90.],               # 2 values: [min, max] in degree
-              'phiGeneration': 'uniform',
-              'phiParams': [0., 90.],                  # [min, max] in degree
-              'vertexGeneration': 'uniform',
-              'xVertexParams': [-0.1, 0.1],            # in cm...
-              'yVertexParams': [-0.1, 0.1],
-              'zVertexParams': [-0.5, 0.5],
-             }
-"""
 
 particlegun.param(param_pGun)
 main.add_module(particlegun)
@@ -105,6 +118,9 @@ main.add_module(particlegun)
 # TODO: There are newer convenience functions for this task -> Include them!
 # Beam parameters
 beamparameters = add_beamparameters(main, "Y4S")
+beamparameters.param("vertex", [vertex_x, vertex_y, vertex_z])
+# print_params(beamparameters)
+
 evtgenInput = register_module('EvtGenInput')
 evtgenInput.logging.log_level = LogLevel.WARNING
 main.add_module(evtgenInput)
@@ -113,15 +129,13 @@ main.add_module(evtgenInput)
 # ---------------------------------------------------------------------------------------
 
 
-# setup the geometry (the Geometry and the Gearbox will be ignore in add_simulation if they are already in the path)
-setup_Geometry(path=main)
-main.add_module('SetupGenfitExtrapolation')
-
 # Detector Simulation:
-# dont use specific components because else not the whole geometry will be loaded!
 add_simulation(path=main,
                usePXDDataReduction=False,  # for training one does not want the data reduction
-               components=None)
+               components=None)  # dont specify components because else not the whole geometry will be loaded!
+
+# needed for fitting
+main.add_module('SetupGenfitExtrapolation')
 
 # this adds the clusters for PXD and SVD (was done by the usePXDDataReduction previously) which are needed in the next steps
 add_pxd_reconstruction(path=main)
@@ -168,9 +182,35 @@ outputFileName += '_' + str(rndseed) + '.root'
 # Root output. Default filename can be overriden with '-o' basf2 option.
 rootOutput = register_module('RootOutput')
 rootOutput.param('outputFileName', outputFileName)
+# to save some space exclude everything except stuff needed for tracking
+rootOutput.param('excludeBranchNames', ["ARICHAeroHits",
+                                        "ARICHDigits",
+                                        "ARICHSimHits",
+                                        "BKLMDigits",
+                                        "BKLMSimHitPositions",
+                                        "BKLMSimHits",
+                                        "CDCHits",
+                                        "CDCHits4Trg",
+                                        "CDCSimHits",
+                                        "CDCSimHitsToCDCHits4Trg",
+                                        "ECLDigits",
+                                        "ECLDsps",
+                                        "ECLHits",
+                                        "ECLSimHits",
+                                        "ECLTrigs",
+                                        "ECLDiodeHits",
+                                        "EKLMDigits",
+                                        "EKLMSimHits",
+                                        "TOPBarHits",
+                                        "TOPDigits",
+                                        "TOPRawDigits",
+                                        "TOPSimHits"
+                                        ])
 main.add_module(rootOutput)
 
 log_to_file('createSim.log', append=False)
+
+print_path(main)
 
 process(main)
 print(statistics)

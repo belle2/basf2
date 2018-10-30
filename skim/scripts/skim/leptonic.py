@@ -15,11 +15,6 @@ from modularAnalysis import *
 
 
 def LeptonicList():
-
-    __authors__ = [
-        "Phillip Urquijo"
-    ]
-
     """
     Note:
         * (Semi-)Leptonic Working Group Skim list building functions for leptonic analyses.
@@ -38,6 +33,9 @@ def LeptonicList():
     * muonID > 0.5
     * nTracks > 4
     """
+    __authors__ = [
+        "Phillip Urquijo"
+    ]
 
     cutAndCopyList('e-:highP', 'e-:all', 'useCMSFrame(p) > 2.0 and electronID > 0.5', True)
     cutAndCopyList('mu-:highP', 'mu-:all', 'useCMSFrame(p) > 2.0 and muonID > 0.5', True)

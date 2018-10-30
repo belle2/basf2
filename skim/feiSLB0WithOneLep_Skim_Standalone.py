@@ -14,7 +14,7 @@ from beamparameters import add_beamparameters
 from stdCharged import *
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 skimCode = encodeSkimName('feiSLB0WithOneLep')
 
 

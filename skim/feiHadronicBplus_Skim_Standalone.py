@@ -61,7 +61,7 @@ from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import sys
 import os

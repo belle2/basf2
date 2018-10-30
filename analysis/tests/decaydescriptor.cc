@@ -40,15 +40,21 @@ namespace {
     ASSERT_NE(dd.getMother(), nullptr);
     EXPECT_EQ(dd.getMother()->getName(), "B0");
     EXPECT_EQ(dd.getMother()->getLabel(), "cand");
+    EXPECT_EQ(dd.getMother()->getPDGCode(), 511);
+    EXPECT_EQ(dd.getMother()->getFullName(), "B0:cand");
     EXPECT_EQ(dd.getNDaughters(), 2);
 
     EXPECT_EQ(dd.getDaughter(0)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getName(), "K+");
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getLabel(), "loose");
+    EXPECT_EQ(dd.getDaughter(0)->getMother()->getPDGCode(), 321);
+    EXPECT_EQ(dd.getDaughter(0)->getMother()->getFullName(), "K+:loose");
 
     EXPECT_EQ(dd.getDaughter(1)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getName(), "pi-");
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getLabel(), "loose");
+    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), -211);
+    EXPECT_EQ(dd.getDaughter(1)->getMother()->getFullName(), "pi-:loose");
 
     ASSERT_EQ(dd.getDaughter(2), nullptr);
   }
@@ -65,6 +71,7 @@ namespace {
 
     // D0 -> K pi
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getName(), "D0");
+    EXPECT_EQ(dd.getDaughter(0)->getMother()->getPDGCode(), 421);
     EXPECT_EQ(dd.getDaughter(0)->getNDaughters(), 2);
     EXPECT_EQ(dd.getDaughter(0)->getDaughter(0)->getMother()->getName(), "K+");
     EXPECT_EQ(dd.getDaughter(0)->getDaughter(0)->getNDaughters(), 0);
@@ -74,15 +81,20 @@ namespace {
 
     // pi0 -> gamma gamma; gamma -> ee
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getName(), "pi0");
+    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), 111);
     EXPECT_EQ(dd.getDaughter(1)->getNDaughters(), 2);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getName(), "gamma");
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getLabel(), "grandau");
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), 22);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getName(), "gamma");
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getLabel(), "converted");
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), 22);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getNDaughters(), 2);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getName(), "e+");
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), -11);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getName(), "e-");
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), 11);
     ASSERT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(2), nullptr);
     ASSERT_EQ(dd.getDaughter(1)->getDaughter(2), nullptr);
 

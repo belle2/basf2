@@ -139,7 +139,7 @@ void RootOutputModule::openFile()
     if (boost::filesystem::create_directories(dirpath)) {
       B2WARNING("Created missing directory " << dirpath << ".");
       //try again
-      m_file = new TFile(out.c_str(), "RECREATE", "basf2 Event File");
+      m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
     }
 
     if (m_file->IsZombie())

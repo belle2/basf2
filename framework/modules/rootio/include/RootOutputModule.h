@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-
+#include <boost/optional.hpp>
 
 namespace Belle2 {
   /** Write objects from DataStore into a ROOT file.
@@ -80,6 +80,12 @@ namespace Belle2 {
     }
 
   private:
+
+    /** Finalize the output file */
+    void closeFile();
+
+    /** Open the next output file */
+    void openFile();
 
     /** Fill TTree.
      *
@@ -148,8 +154,14 @@ namespace Belle2 {
      */
     bool m_ignoreCommandLineOverride;
 
+    /** Maximum output file size in MB. If not set we don't split. Otherwise we split
+     * if the event tree in output file has reached the given size in MB */
+    boost::optional<int> m_outputSplitSize{boost::none};
 
     //then those for purely internal use:
+
+    /** Keep track of the file index: if we split files than we add '.f{fileIndex:05d}' in front of the ROOT extension */
+    int m_fileIndex{0};
 
     /** TFile for output. */
     TFile* m_file;

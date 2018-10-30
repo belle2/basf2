@@ -97,6 +97,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam("buildIndex", m_buildIndex, "Build Event Index for faster finding of events by exp/run/event number", m_buildIndex);
   addParam("keepParents", m_keepParents, "Keep parents files of input files, input files will not be added as output file's parents",
            m_keepParents);
+  addParam("outputSplitSize", m_outputSplitSize, "If given split the output file once the file has reached the given "
+           "size in MB. If set the filename will end in ``.f{index:05d}.root``", m_outputSplitSize);
 }
 
 
@@ -113,18 +115,31 @@ void RootOutputModule::initialize()
   //and make sure we have event meta data
   m_eventMetaData.isRequired();
 
+  //check outputSplitSize
+  if (m_outputSplitSize and * m_outputSplitSize <= 0)
+    B2ERROR("outputSplitSize must be a positive value");
+
   getFileNames();
+  openFile();
+}
+
+void RootOutputModule::openFile()
+{
   TDirectory* dir = gDirectory;
-  m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
+  boost::filesystem::path out{m_outputFileName};
+  if (m_outputSplitSize) {
+    // mangle path: replace extension with fNNNNN
+    out.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
+  }
+  m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
     //try creating necessary directories
-    boost::filesystem::path dirpath(m_outputFileName);
-    dirpath.remove_filename();
+    auto dirpath = out.parent_path();
 
     if (boost::filesystem::create_directories(dirpath)) {
       B2WARNING("Created missing directory " << dirpath << ".");
       //try again
-      m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
+      m_file = new TFile(out.c_str(), "RECREATE", "basf2 Event File");
     }
 
     if (m_file->IsZombie())
@@ -171,8 +186,9 @@ void RootOutputModule::initialize()
       //using it instead of GetClassInfo() avoids  having to parse header files (and
       //the associated memory cost)
       if (!entryClass->HasDictionary()) {
-        B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
-                  "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
+        if (m_fileIndex == 0)
+          B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
+                    "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
         continue;
       }
 
@@ -195,17 +211,22 @@ void RootOutputModule::initialize()
       B2DEBUG(150, "The branch " << branchName << " was created.");
 
       //Tell DataStore that we are using this entry
-      DataStore::Instance().optionalInput(StoreAccessorBase(branchName, (DataStore::EDurability)durability, entryClass,
-                                                            iter->second.isArray));
+      if (m_fileIndex == 0)
+        DataStore::Instance().optionalInput(StoreAccessorBase(branchName, (DataStore::EDurability)durability, entryClass,
+                                                              iter->second.isArray));
     }
   }
 
   dir->cd();
+  if (m_outputSplitSize)
+    B2INFO("RootOutput: Opened " << (m_fileIndex > 0 ? "new " : "") << "file for writing" << LogVar("filename", out));
 }
 
 
 void RootOutputModule::event()
 {
+  // if we closed after last event ... make a new one
+  if (!m_file) openFile();
 
   if (!m_keepParents) {
     if (m_fileMetaData) {
@@ -281,40 +302,55 @@ void RootOutputModule::fillFileMetaData()
       }
     }
 
-    fileMetaDataPtr->setNEvents(numEntries);
+    m_fileMetaData->setNEvents(numEntries);
     if (m_experimentLow > m_experimentHigh) {
       //starting condition so apparently no events at all
-      fileMetaDataPtr->setLow(-1, -1, 0);
-      fileMetaDataPtr->setHigh(-1, -1, 0);
+      m_fileMetaData->setLow(-1, -1, 0);
+      m_fileMetaData->setHigh(-1, -1, 0);
     } else {
-      fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
-      fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+      m_fileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
+      m_fileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
     }
   }
 
   //fill more file level metadata
-  fileMetaDataPtr->setParents(m_parentLfns);
-  RootIOUtilities::setCreationData(*fileMetaDataPtr);
-  fileMetaDataPtr->setRandomSeed(RandomNumbers::getSeed());
-  fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
-  fileMetaDataPtr->setMcEvents(Environment::Instance().getNumberOfMCEvents());
-  fileMetaDataPtr->setDatabaseGlobalTag(Database::getGlobalTag());
+  m_fileMetaData->setParents(m_parentLfns);
+  RootIOUtilities::setCreationData(*m_fileMetaData);
+  m_fileMetaData->setRandomSeed(RandomNumbers::getSeed());
+  m_fileMetaData->setSteering(Environment::Instance().getSteering());
+  m_fileMetaData->setMcEvents(Environment::Instance().getNumberOfMCEvents());
+  m_fileMetaData->setDatabaseGlobalTag(Database::getGlobalTag());
   for (const auto& item : m_additionalDataDescription) {
-    fileMetaDataPtr->setDataDescription(item.first, item.second);
+    m_fileMetaData->setDataDescription(item.first, item.second);
   }
   //register the file in the catalog
   if (m_updateFileCatalog) {
-    FileCatalog::Instance().registerFile(m_outputFileName, *fileMetaDataPtr);
+    FileCatalog::Instance().registerFile(m_outputFileName, *m_fileMetaData);
   }
+
 }
 
 
 void RootOutputModule::terminate()
 {
+  closeFile();
+  B2DEBUG(200, "terminate() finished");
+}
+
+void RootOutputModule::closeFile()
+{
+  //get pointer to file level metadata
+  std::unique_ptr<FileMetaData> old;
+  if (m_fileMetaData) old.reset(new FileMetaData(*m_fileMetaData));
+
   fillFileMetaData();
 
   //fill Persistent data
   fillTree(DataStore::c_Persistent);
+
+  // restore old file meta data if it existed
+  if (old) *m_fileMetaData = *old;
+  old.reset();
 
   //write the trees
   TDirectory* dir = gDirectory;
@@ -323,18 +359,29 @@ void RootOutputModule::terminate()
     if (m_tree[durability]) {
       B2INFO("Write TTree " << c_treeNames[durability]);
       m_tree[durability]->Write(c_treeNames[durability].c_str(), TObject::kWriteDelete);
+      delete m_tree[durability];
     }
+    m_tree[durability] = nullptr;
   }
   dir->cd();
 
   delete m_file;
+  m_file = nullptr;
 
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_entries[jj].clear();
   }
   m_parentLfns.clear();
 
-  B2DEBUG(200, "terminate() finished");
+  // reset some variables
+  m_experimentLow = 1;
+  m_experimentHigh = 0;
+  m_runLow = 0;
+  m_runHigh = 0;
+  m_eventLow = 0;
+  m_eventHigh = 0;
+  // and increase index of next file
+  ++m_fileIndex;
 }
 
 

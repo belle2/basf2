@@ -117,8 +117,11 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
+    /** TFile compression algorithm.  */
+    int m_compressionAlgorithm{0};
+
     /** TFile compression level.  */
-    int m_compressionLevel;
+    int m_compressionLevel{1};
 
     /** Branch split level.
      *

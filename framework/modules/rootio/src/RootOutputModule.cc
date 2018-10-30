@@ -60,7 +60,9 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
            "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
   addParam("compressionLevel", m_compressionLevel,
            "0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by >50%, higher levels have no noticeable effect. On typical hard disks, disabling compression reduces write time by 10-20 %, but almost doubles read time, so you probably should leave this turned on.",
-           1);
+           m_compressionLevel);
+  addParam("compressionAlgorithm", m_compressionAlgorithm,
+           "Set the Compression algorithm. Recommended values are 0 for default, 1 for zlib and 4 for lz4", m_compressionAlgorithm);
   addParam("splitLevel", m_splitLevel,
            "Branch split level: determines up to which depth object members will be saved in separate sub-branches in the tree. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used. The default (99) usually gives the highest read performance with RootInput.",
            99);
@@ -130,6 +132,7 @@ void RootOutputModule::initialize()
     if (m_file->IsZombie())
       B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
   }
+  m_file->SetCompressionAlgorithm(m_compressionAlgorithm);
   m_file->SetCompressionLevel(m_compressionLevel);
 
   for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {

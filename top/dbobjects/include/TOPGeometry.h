@@ -184,6 +184,12 @@ namespace Belle2 {
     const TOPNominalTTS& getTTS(unsigned type) const;
 
     /**
+     * Returns PMT dependent time transition spreads
+     * @return a map of PMT dependent time transition spreads
+     */
+    const std::map<unsigned, TOPNominalTTS>& getTTSes() const {return m_tts;}
+
+    /**
      * Returns nominal time-to-digit conversion parameters
      * @return nominal TDC parameters
      */

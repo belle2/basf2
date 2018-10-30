@@ -121,6 +121,14 @@ namespace Belle2 {
       double getRelativePixelEfficiency(int moduleID, int pixelID) const;
 
       /**
+       * Returns PMT type at a given position
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @return PMT type
+       */
+      unsigned getPMTType(int moduleID, int pmtID) const;
+
+      /**
        * Returns TTS of a PMT at given position
        * @param moduleID slot ID
        * @param pmtID PMT ID

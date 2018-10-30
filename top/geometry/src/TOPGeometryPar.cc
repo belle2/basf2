@@ -20,6 +20,7 @@
 #include <iostream>
 #include <TSpline.h>
 #include <algorithm>
+#include <set>
 
 using namespace std;
 
@@ -99,6 +100,9 @@ namespace Belle2 {
       if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
         B2WARNING("TOPGeometry: old payload found, pixel dependent PDE will not be used");
+      }
+      if ((*m_geoDB)->getTTSes().empty()) {
+        B2WARNING("TOPGeometry: old payload found, nominal TTS will be used");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -234,14 +238,18 @@ namespace Belle2 {
     }
 
 
-    const TOPNominalTTS& TOPGeometryPar::getTTS(int moduleID, int pmtID) const
+    unsigned TOPGeometryPar::getPMTType(int moduleID, int pmtID) const
     {
-
       if (m_pmtTypes.empty()) mapPmtTypeToPositions();
 
       int id = getUniquePmtID(moduleID, pmtID);
-      auto pmtType = m_pmtTypes[id];
+      return m_pmtTypes[id];
+    }
 
+
+    const TOPNominalTTS& TOPGeometryPar::getTTS(int moduleID, int pmtID) const
+    {
+      auto pmtType = getPMTType(moduleID, pmtID);
       return getGeometry()->getTTS(pmtType);
     }
 
@@ -340,7 +348,22 @@ namespace Belle2 {
         m_pmtTypes[id] = pmt.getType();
       }
 
-      B2INFO("TOPGeometryPar: PMT types mapped to positions, size = " << m_pmtTypes.size());
+      B2INFO("TOPGeometryPar: PMT types mapped to positions, size = "
+             << m_pmtTypes.size());
+
+
+      std::set<unsigned> types;
+      for (const auto& pmt : m_pmtInstalled) {
+        types.insert(pmt.getType());
+      }
+      const auto* geo = getGeometry();
+      for (const auto& type : types) {
+        if (geo->getTTS(type).getPMTType() != type) {
+          B2WARNING("No TTS found for an installed PMT type. Nominal one will be used."
+                    << LogVar("PMT type", type));
+        }
+      }
+
     }
 
 

@@ -143,7 +143,7 @@ void RootOutputModule::openFile()
     }
 
     if (m_file->IsZombie())
-      B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
+      B2FATAL("Couldn't open file '" << m_file->GetName() << "' for writing!");
   }
   m_file->SetCompressionAlgorithm(m_compressionAlgorithm);
   m_file->SetCompressionLevel(m_compressionLevel);
@@ -325,7 +325,7 @@ void RootOutputModule::fillFileMetaData()
   }
   //register the file in the catalog
   if (m_updateFileCatalog) {
-    FileCatalog::Instance().registerFile(m_outputFileName, *m_fileMetaData);
+    FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);
   }
 
 }
@@ -404,6 +404,6 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
   if (writeError) {
     //m_file deleted first so we have a chance of closing it (though that will probably fail)
     delete m_file;
-    B2FATAL("A write error occured while saving '" << m_outputFileName  << "', please check if enough disk space is available.");
+    B2FATAL("A write error occured while saving '" << m_file->GetName()  << "', please check if enough disk space is available.");
   }
 }

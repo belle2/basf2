@@ -118,13 +118,10 @@ setup_Geometry(path=main)
 main.add_module('SetupGenfitExtrapolation')
 
 # Detector Simulation:
+# dont use specific components because else not the whole geometry will be loaded!
 add_simulation(path=main,
                usePXDDataReduction=False,  # for training one does not want the data reduction
-               components=['BeamPipe',
-                           'MagneticFieldConstant4LimitedRSVD',
-                           'PXD',
-                           'SVD',
-                           'CDC'])
+               components=None)
 
 # this adds the clusters for PXD and SVD (was done by the usePXDDataReduction previously) which are needed in the next steps
 add_pxd_reconstruction(path=main)

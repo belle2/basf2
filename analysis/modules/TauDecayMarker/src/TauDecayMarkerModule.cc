@@ -33,7 +33,8 @@ REG_MODULE(TauDecayMarker)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TauDecayMarkerModule::TauDecayMarkerModule() : Module()
+TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tau_pair(false), no_of_tau_plus(0), no_of_tau_minus(0), id_of_tau_plus(-1),
+  id_of_tau_minus(-1), m_pmode(-2), m_mmode(-2)
 {
   // Set module properties
   setDescription("Module to identify and label generated tau decays channels, using MCParticle information..");

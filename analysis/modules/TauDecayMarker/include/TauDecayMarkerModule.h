@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef TAUDECAYMARKERMODULE_H
-#define TAUDECAYMARKERMODULE_H
+#pragma once
 
 #include <TMath.h>
 #include <string>
@@ -76,5 +74,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif // TAUDECAYMARKERMODULE_H

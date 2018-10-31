@@ -77,7 +77,8 @@ path.add_module("PrintCollections", printForEvent=1)
 # puts the geometry and gearbox in the path
 gearbox = register_module('Gearbox')
 path.add_module(gearbox)
-# the geometry is loaded from the DB by default now!
+# the geometry is loaded from the DB by default now! The correct geometry
+# should be pickked according to exp number for the generated events.
 geometry = register_module('Geometry')
 path.add_module(geometry)
 

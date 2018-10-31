@@ -133,11 +133,12 @@ if option == 'debug':
 elif option == 'opt':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
     global_env.Append(FORTRANFLAGS='-O3')
-    # FIXME: This avoids sequential bottlenecks when large libraries get linked, but
-    #        causes oversubscription when small libraries get linked.
+    # Parallel LTO avoids sequential bottlenecks when large libraries are
+    # linked, but causes oversubscription when linking libraries concurrently.
+    # Performance and RAM usage measurements suggest that between these two
+    # evils, oversubscription is the better choice.
     global_env.Append(LINKFLAGS='-flto=' + str(GetOption('num_jobs')))
-    # When using LTO, GCC-provided ar and ranlib wrappers must be used in order
-    # to preserve the GCC intermediate representation
+    # LTO requires some binutils wrappers that preserve the GCC IR
     global_env['AR'] = 'gcc-ar'
     global_env['RANLIB'] = 'gcc-ranlib'
 elif option == 'intel':

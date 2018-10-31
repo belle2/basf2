@@ -316,8 +316,8 @@ void SVDUnpackerModule::event()
             pipAddr = m_APVHeader.pipelineAddr;
 
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
-            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, fadc,
-                                                            apv);
+            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, nAPVmatch,
+                                                            fadc, apv);
             apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
           }
 
@@ -412,12 +412,13 @@ void SVDUnpackerModule::event()
 
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
-            for (auto& p : diagnosticMap) {
+            for (auto& p : DAQDiagnostics) {
+              if (p.getFADCNumber() != fadc) continue;
               // adding remaining info to Diagnostic object
-              p.second->setFTBFlags(ftbFlags);
-              p.second->setEmuPipelineAddress(emuPipAddr);
-              p.second->setApvErrorOR(apvErrorsOR);
-              p.second->setAPVMatch(nAPVmatch);
+              p.setFTBFlags(ftbFlags);
+              p.setEmuPipelineAddress(emuPipAddr);
+              p.setApvErrorOR(apvErrorsOR);
+              p.setAPVMatch(nAPVmatch);
             }
 
           }// FADC trailer
@@ -452,7 +453,7 @@ void SVDUnpackerModule::event()
 
     } // end event loop
 
-  }
+  }// end loop over RawSVD objects
 
   // Detect upset APVs and report/treat
   auto major_apv = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
@@ -484,6 +485,10 @@ void SVDUnpackerModule::event()
                                make_pair(fadcApv.first, fadcApv.second),
                                make_pair(eventNo, eventNo)
                              ));
+          for (auto& pp : DAQDiagnostics) {
+            if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
+              pp.setUpsetAPV(true);
+          }
           B2WARNING(" Event number " << eventNo << ": upset APV: " <<
                     int(fadcApv.second) << " on FADC " << int(fadcApv.first));
         }
@@ -494,8 +499,7 @@ void SVDUnpackerModule::event()
   // actual and emulated pipeline address fields in DAQDiagnostics.
   for (auto& p : diagnosticMap) {
     if ((m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress()) || p.second->getFTBError() != 240
-        || p.second->getFTBFlags())
-      continue;
+        || p.second->getFTBFlags()) continue;
     shaperDigits.appendNew(p.first)->addRelationTo(p.second);
   }
 

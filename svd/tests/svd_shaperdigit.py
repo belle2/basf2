@@ -51,7 +51,6 @@ class SvdShaperDigitTestModule(Module):
         B2INFO("SVDDigits <-> SVDShaperDigits comparison: SUCCESS !!!")
 
     def event(self):
-
         # load SVDDigit from the packer and unpacker
         svdDigits = Belle2.PyStoreArray(svd_digits_pack_unpack_collection)
         # load SVDShaperDigit from the packer and unpacker
@@ -103,8 +102,8 @@ class SvdShaperDigitTestModule(Module):
                 if printouts:
                     print(ind, sensor, isu, strip, chg)
 
-                assert (strip == stripS and sensor == sensorS and isu == isuS and chg ==
-                        chgS[j]), B2WARNING("SVDDigits and SVDShaperDigits objects don't match !!!")
+                if (strip != stripS or sensor != sensorS or isu != isuS or chg != chgS[j]):
+                    B2WARNING("SVDDigits and SVDShaperDigits objects don't match !!!")
 
 
 # to run the framework the used modules need to be registered
@@ -146,6 +145,11 @@ unPacker.param('svdShaperDigitListName', svd_shaperdigits_pack_unpack_collection
 unPacker.param('svdDAQDiagnosticsListName', 'myDAQDiagnostics')
 unPacker.param('badMappingFatal', False)
 main.add_module(unPacker)
+
+# ------ DQM Monitor test
+# unPackerDQM = register_module('SVDUnpackerDQM')
+# unPackerDQM.param('DiagnosticsName', 'myDAQDiagnostics')
+# main.add_module(unPackerDQM)
 
 main.add_module(SvdShaperDigitTestModule())
 

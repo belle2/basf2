@@ -23,7 +23,7 @@ ProcessingSignalListener::ProcessingSignalListener() = default;
 ProcessingSignalListener::~ProcessingSignalListener()
 {
   if (m_initialized) {
-    B2DEBUG(20, "Processing signal listener " << m_initializedAs << " was not terminated after initialization";
+    B2DEBUG(20, "Processing signal listener " << m_initializedAs << " was not terminated after initialization");
   }
 }
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REFERENCEFRAME_H
-#define REFERENCEFRAME_H
+#pragma once
 
 #include <TLorentzRotation.h>
 #include <TRotation.h>
@@ -355,4 +354,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

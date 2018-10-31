@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYDESCRIPTOR_H
-#define DECAYDESCRIPTOR_H
+#pragma once
 
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
@@ -136,4 +135,3 @@ namespace Belle2 {
 
 }
 
-#endif // DECAYDESCRIPTOR_H

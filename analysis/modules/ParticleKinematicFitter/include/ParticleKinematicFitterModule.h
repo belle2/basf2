@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEKINEMATICFITTERMODULE_H
-#define PARTICLEKINEMATICFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -300,4 +299,3 @@ namespace Belle2 {
   }// end OrcaKinFit namespace
 } // Belle2 namespace
 
-#endif

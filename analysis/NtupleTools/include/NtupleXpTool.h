@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef NTUPLEXPTOOL_H
-#define NTUPLEXPTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -44,4 +43,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif // NTUPLEXPTOOL_H

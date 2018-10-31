@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYDESCRIPTORPARTICLE_H
-#define DECAYDESCRIPTORPARTICLE_H
+#pragma once
 
 #include <string>
 
@@ -73,5 +72,4 @@ namespace Belle2 {
   };
 }
 
-#endif // DECAYDESCRIPTORPARTICLE_H
 

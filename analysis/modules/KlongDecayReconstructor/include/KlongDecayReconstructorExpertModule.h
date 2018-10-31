@@ -79,4 +79,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-//#endif

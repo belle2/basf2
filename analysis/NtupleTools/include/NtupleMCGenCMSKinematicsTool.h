@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEMCGENCMSKINEMATICSTOOL_H
-#define NTUPLEMCGENCMSKINEMATICSTOOL_H
+#pragma once
 #include <boost/function.hpp>
 #include <analysis/dataobjects/Particle.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -43,4 +42,3 @@ namespace Belle2 {
   };
 } // namepspace Belle2
 
-#endif // NTUPLEMCGENCMSKINEMATICSTOOL_H

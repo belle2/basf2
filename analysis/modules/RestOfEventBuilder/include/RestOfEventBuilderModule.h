@@ -41,7 +41,6 @@ namespace Belle2 {
     /** Overriden event method */
     virtual void event() override;
 
-
   private:
 
     std::string m_particleList;  /**< Name of the ParticleList */
@@ -64,4 +63,3 @@ namespace Belle2 {
     void printParticle(const Particle* particle);
   };
 }
-

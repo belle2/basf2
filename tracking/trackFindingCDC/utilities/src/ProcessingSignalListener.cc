@@ -23,14 +23,14 @@ ProcessingSignalListener::ProcessingSignalListener() = default;
 ProcessingSignalListener::~ProcessingSignalListener()
 {
   if (m_initialized) {
-    B2DEBUG(100, "Processing signal listener " << m_initializedAs << " was not terminated after initialization");
+    B2DEBUG(20, "Processing signal listener " << m_initializedAs << " was not terminated after initialization";
   }
 }
 
 void ProcessingSignalListener::initialize()
 {
   if (m_initialized) {
-    B2DEBUG(100, typeid(*this).name() << " has been initialized before");
+    B2DEBUG(20, typeid(*this).name() << " has been initialized before");
     printBacktrace(LogConfig::c_Debug, 10);
   }
   m_initializedAs = typeid(*this).name();
@@ -40,34 +40,34 @@ void ProcessingSignalListener::initialize()
 void ProcessingSignalListener::beginRun()
 {
   if (not m_initialized) {
-    B2DEBUG(100, typeid(*this).name() << " was not initialized");
+    B2DEBUG(20, typeid(*this).name() << " was not initialized");
   }
 }
 
 void ProcessingSignalListener::beginEvent()
 {
   if (not m_initialized) {
-    B2DEBUG(100, typeid(*this).name() << " was not initialized");
+    B2DEBUG(20, typeid(*this).name() << " was not initialized");
   }
 }
 
 void ProcessingSignalListener::endRun()
 {
   if (not m_initialized) {
-    B2DEBUG(100, typeid(*this).name() << " was not initialized");
+    B2DEBUG(20, typeid(*this).name() << " was not initialized");
   }
 }
 
 void ProcessingSignalListener::terminate()
 {
   if (m_terminated) {
-    B2DEBUG(100, typeid(*this).name() << " has been terminated before");
+    B2DEBUG(20, typeid(*this).name() << " has been terminated before");
     printBacktrace(LogConfig::c_Debug, 10);
   }
   m_terminated = true;
 
   if (not m_initialized) {
-    B2DEBUG(100, typeid(*this).name() << " was not initialized before termination");
+    B2DEBUG(20, typeid(*this).name() << " was not initialized before termination");
     printBacktrace(LogConfig::c_Debug, 10);
   }
   m_initialized = false;

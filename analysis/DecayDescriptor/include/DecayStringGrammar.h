@@ -36,7 +36,7 @@ namespace Belle2 {
     using boost::spirit::repeat;
 
     // Reserved characters for steering - cppcheck doesn't understand the
-    // boost::sprint syntax so we suppress warnings
+    // boost::spirit syntax so we suppress warnings
     // cppcheck-suppress knownConditionTrueFalse
     reserved = space || '^' || '[' || ']' || '>' || ':';
 

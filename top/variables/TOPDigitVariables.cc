@@ -144,10 +144,10 @@ namespace Belle2 {
     VARIABLE_GROUP("TOP Calibration");
     REGISTER_VARIABLE("topModuleDigitCount", getTOPModuleDigitCount,
                       "[calibration] Returns the number of TOPDigits in the module to which the track was extrapolated");
-    // REGISTER_VARIABLE("topModuleTrackCount", getTOPModuleTrackCount,
-    //                   "[calibration] Returns the number of particles (including this particle) that hit the same module");
-    // REGISTER_VARIABLE("topModuleT0", getTOPModuleT0,
-    //                   "[calibration] Returns the T0 for the module to which the particle was extrapolated");
+    REGISTER_VARIABLE("reflectedTOPModuleDigitCount", getNReflectedTOPModuleDigits,
+                      "[calibration] Returns the number of reflected photons in the same module");
+    REGISTER_VARIABLE("getTOPModuleDigitGapSize", getTOPModuleDigitGapSize,
+                      "[calibration] Returns the largest time difference between two consecutive hits in the same module");
     // REGISTER_VARIABLE("topModuleExtHit_x", getTOPModuleExtHit_x,
     //                   "[calibration] Returns the x component of the ExtHit");
     // REGISTER_VARIABLE("topModuleExtHit_y", getTOPModuleExtHit_y,

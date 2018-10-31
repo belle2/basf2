@@ -28,8 +28,8 @@ namespace Belle2 {
   namespace TOPDigitVariables {
   }
   namespace Variable {
-    double getTOPModuleDigitCount(const Particle*);
-    double getTOPModuleDigitGapSize(const Particle*);
-    double getNReflectedTOPModuleDigits(const Particle*);
+    double getTOPModuleDigitCount(const Particle*); /**< Number of digits in the module hit by the particle */
+    double getTOPModuleDigitGapSize(const Particle*); /**< Largest time difference between two consecutive hits in the module */
+    double getNReflectedTOPModuleDigits(const Particle*); /**< Number of reflected photons in the module */
   }
 }

@@ -112,7 +112,7 @@ Note:
   additional information has to be written at the end of the file. If necessary
   please account for this. Also, using `buildIndex=False` might be beneficial
   to reduce the overshoot.
-)DOC");
+)DOC", m_outputSplitSize);
 }
 
 

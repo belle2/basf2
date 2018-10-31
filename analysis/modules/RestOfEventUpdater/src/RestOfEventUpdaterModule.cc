@@ -128,7 +128,7 @@ namespace Belle2 {
       }
       if (!roe->hasMask(maskToUpdate)) {
         // Change name to get all ROE particles in case of new mask
-        maskNameToGetParticles = "";
+        maskNameToGetParticles = ""; // FIXME: should this be passed to excludeParticlesFromMask down below??
         roe->initializeMask(maskToUpdate, "ROEUpdaterModule");
       }
       roe->excludeParticlesFromMask(maskToUpdate, particlesToUpdate, listType, m_discard);

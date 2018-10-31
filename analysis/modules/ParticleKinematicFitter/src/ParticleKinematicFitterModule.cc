@@ -185,7 +185,7 @@ namespace Belle2 {
 
       }
       // invalid fitter
-      else if (m_kinematicFitter != "OrcaKinFit") {
+      else {
         B2FATAL("ParticleKinematicFitter: " << m_kinematicFitter << " is an invalid kinematic fitter!");
       }
 
@@ -231,6 +231,7 @@ namespace Belle2 {
       } else {
         B2FATAL("ParticleKinematicFitterModule:  " << m_orcaFitterEngine << " is an invalid OrcaKinFit fitter engine!");
       }
+
       BaseFitter& fitter = *pfitter;
 
       // reset fitter
@@ -293,7 +294,7 @@ namespace Belle2 {
           BaseFitObject* fo = fitObjectContainer->at(iChild);
           const std::string name = fo->getName();
           if (name == "unmeasured") {
-            ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+            ParticleFitObject* fitobject = static_cast<ParticleFitObject*>(fo);
             TLorentzVector tlv = getTLorentzVector(fitobject);
             mother->addExtraInfo("OrcaKinFitUnmeasuredTheta", tlv.Theta());
             mother->addExtraInfo("OrcaKinFitUnmeasuredPhi", tlv.Phi());
@@ -670,7 +671,7 @@ namespace Belle2 {
             if (pars[iDaug].size() > 0) {
               for (unsigned iChild = 0; iChild < pars[iDaug].size(); iChild++) {
                 BaseFitObject* fo = fitObjectContainer->at(pars[iDaug][iChild]);
-                ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+                ParticleFitObject* fitobject = static_cast<ParticleFitObject*>(fo);
                 TLorentzVector tlv_sub = getTLorentzVector(fitobject);
                 TMatrixFSym errMatrixU_sub = getCovMat7(fitobject);
                 tlv = tlv + tlv_sub;
@@ -742,7 +743,7 @@ namespace Belle2 {
       std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
       for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++) {
         BaseFitObject* fo = fitObjectContainer->at(iChild);
-        ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+        ParticleFitObject* fitobject = static_cast<ParticleFitObject*>(fo);
         TLorentzVector tlv = getTLorentzVector(fitobject);
         momnew += tlv;
       }
@@ -762,7 +763,7 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++) {
         BaseFitObject* fo = fitObjectContainer->at(iChild);
-        ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+        ParticleFitObject* fitobject = static_cast<ParticleFitObject*>(fo);
         TLorentzVector tlv = getTLorentzVector(fitobject);
 
         // name of extra variables
@@ -792,7 +793,7 @@ namespace Belle2 {
     float ParticleKinematicFitterModule::getFitObjectError(ParticleFitObject* fitobject, int ilocal)
     {
       //check if it is a PxPyPzMFitObject
-      PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+      PxPyPzMFitObject* pxpypzmfitobject = static_cast<PxPyPzMFitObject*>(fitobject);
       if (pxpypzmfitobject) {
         return fitobject->getError(ilocal);
       } else {
@@ -805,7 +806,7 @@ namespace Belle2 {
     {
 
       //check if it is a PxPyPzMFitObject
-      PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+      PxPyPzMFitObject* pxpypzmfitobject = static_cast<PxPyPzMFitObject*>(fitobject);
       if (pxpypzmfitobject) {
 
         TMatrixFSym errMatrix(3);
@@ -831,7 +832,7 @@ namespace Belle2 {
 
       if (strcmp(fitobject->getParamName(0), "E") == 0) {
         //check if it is a JetFitObject
-        JetFitObject* jetfitObject = (JetFitObject*) fitobject;
+        JetFitObject* jetfitObject = static_cast<JetFitObject*>(fitobject);
         if (jetfitObject) {
 
           fitCovMatrix = getFitObjectCovMat(fitobject);
@@ -869,7 +870,7 @@ namespace Belle2 {
         }
       } else {
         //check if it is a PxPyPzMFitObject
-        PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+        PxPyPzMFitObject* pxpypzmfitobject = static_cast<PxPyPzMFitObject*>(fitobject);
         if (pxpypzmfitobject) {
 
           fitCovMatrix = getFitObjectCovMat(fitobject);

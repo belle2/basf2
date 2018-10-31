@@ -26,7 +26,7 @@ using namespace Belle2;
 // Register module in the framework
 REG_MODULE(MCDecayFinder)
 
-MCDecayFinderModule::MCDecayFinderModule() : Module()
+MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticle(false)
 {
   //Set module properties
   setDescription("Find decays in MCParticle list matching a given DecayString and create Particles from them.");
@@ -35,17 +35,16 @@ MCDecayFinderModule::MCDecayFinderModule() : Module()
   addParam("listName", m_listName, "Name of the output particle list");
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
-
-  m_decaydescriptor.init(m_strDecay);
-
-  m_antiListName = ParticleListName::antiParticleListName(m_listName);
-  m_isSelfConjugatedParticle = (m_listName == m_antiListName);
-
 }
 
 void MCDecayFinderModule::initialize()
 {
   B2WARNING("MCDecayFinder is not yet configured to deal with matches that require intermediate resonances to be ignored.");
+
+  m_decaydescriptor.init(m_strDecay);
+
+  m_antiListName = ParticleListName::antiParticleListName(m_listName);
+  m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
   B2DEBUG(10, "particle list name: " << m_listName);
   B2DEBUG(10, "antiparticle list name: " << m_antiListName);

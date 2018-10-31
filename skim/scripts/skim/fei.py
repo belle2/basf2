@@ -25,7 +25,7 @@ def B0hadronic(path):
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180100
     Physics channels: (All available FEI B0 Hadronic tags are
-    reconstructed)
+    used)
     * B0 -> D- pi+
     * B0 -> D- pi+ pi0
     * B0 -> D- pi+ pi0 pi0
@@ -53,8 +53,10 @@ def B0hadronic(path):
     * B0 -> J/Psi K+ pi-
     * B0 -> J/Psi KS0 pi+ pi-
 
-    Skimming script reconstructs hadronic Btag using generically trained
-    FEI. From Thomas Keck's thesis, 'the channel B0 -> anti-D0 pi0 was
+    This function applies cuts to the FEI-reconstructed tag side B, and
+    the pre-cuts and FEI must be applied separately.
+
+    From Thomas Keck's thesis, 'the channel B0 -> anti-D0 pi0 was
     used by the FR, but is not yet used in the FEI due to unexpected
     technical restrictions in the KFitter algorithm'.
 
@@ -70,35 +72,12 @@ def B0hadronic(path):
         abs(deltaE) < 0.200
         sigProb > 0.001
 """
-    # Reconstruct tag side
+    # B0:generic list from FEI must already exist in path
     # Apply cuts
     applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
 
     B0hadronicList = ['B0:generic']
     return B0hadronicList
-
-
-def B0HadronicWithFEI(path):
-    """Generates FEI Hadronic B0 skim including FEI weights and pre-selection cuts. Uses B0Hadronic()
-"""
-    # Pre-selection cuts
-    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
-
-    # Run FEI
-    from fei import backward_compatibility_layer
-    backward_compatibility_layer.pid_renaming_oktober_2017()
-    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
-
-    import fei
-    particles = fei.get_default_channels(neutralB=True, chargedB=False, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
-    feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
-
-    path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
-
-    # Return B0Hadronic list
-    return B0Hadronic(path)
 
 
 def BplusHadronic(path):
@@ -137,8 +116,8 @@ def BplusHadronic(path):
     *B+ -> J/Psi K+ pi0
     *B+ -> J/Psi KS0 pi+
 
-    Skimming script reconstructs hadronic Btag using generically trained
-    FEI.
+    This function applies cuts to the FEI-reconstructed tag side B, and
+    the pre-cuts and FEI must be applied separately.
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
@@ -151,7 +130,8 @@ def BplusHadronic(path):
         Mbc > 5.24
         abs(deltaE) < 0.200
         sigProb > 0.001"""
-    # Reconstruct tag side
+
+    # B+:generic list from FEI must already exist in path
     # Apply cuts
     applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
 
@@ -159,9 +139,126 @@ def BplusHadronic(path):
     return BplushadronicList
 
 
-def BplusHadronicWithFEI(path):
-    """Generates FEI Hadronic B+ skim including FEI weights and pre-selection cuts. Uses BplusHadronic()
+def runFEIforB0Hadronic(path):
+    """Generates FEI B0:generic list, including applying FEI weights and skim
+    pre-selection cuts. Use B0hadronic(path) for skim cuts on FEI output list.
+
+    (Semi-)Leptonic and Missing Energy Working Group
+    Skim LFN code: 11180100
+    Physics channels: (All available FEI B0 Hadronic tags are
+    reconstructed)
+    * B0 -> D- pi+
+    * B0 -> D- pi+ pi0
+    * B0 -> D- pi+ pi0 pi0
+    * B0 -> D- pi+ pi+ pi-
+    * B0 -> D- pi+ pi+ pi- pi0
+    * B0 -> anti-D0 pi+ pi0
+    * B0 -> D- D0 K+
+    * B0 -> D- D*(2010)0 K+
+    * B0 -> D+* D0 K+
+    * B0 -> D+* D*(2010)0 K+
+    * B0 -> D- D+ KS0
+    * B0 -> D+* D+ KS0
+    * B0 -> D- D+* KS0
+    * B0 -> D+* D+* KS0
+    * B0 -> Ds+ D-
+    * B0 -> D+* pi+
+    * B0 -> D+* pi+ pi0
+    * B0 -> D+* pi+ pi0 pi0
+    * B0 -> D+* pi+ pi+ pi-
+    * B0 -> D+* pi+ pi+ pi- pi0
+    * B0 -> Ds+* D-
+    * B0 -> Ds+ D+*
+    * B0 -> Ds+* D+*
+    * B0 -> J/Psi KS0
+    * B0 -> J/Psi K+ pi-
+    * B0 -> J/Psi KS0 pi+ pi-
+
+    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+
+    From Thomas Keck's thesis, 'the channel B0 -> anti-D0 pi0 was
+    used by the FR, but is not yet used in the FEI due to unexpected
+    technical restrictions in the KFitter algorithm'.
+
+    Skim Liasons: S. Hollitt & H. Wakeling
+
+    Cuts applied are::
+        Event precuts:
+        R2EventLevel < 0.4
+        nTracks >= 4
+=======
+        Tag side B:
+        Mbc > 5.24
+        abs(deltaE) < 0.200
+        sigProb > 0.001
 """
+    # Pre-selection cuts
+    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+
+    # Run FEI
+    from fei import backward_compatibility_layer
+    backward_compatibility_layer.pid_renaming_oktober_2017()
+    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+
+    import fei
+    particles = fei.get_default_channels(neutralB=True, chargedB=False, hadronic=True, semileptonic=False, KLong=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    feistate = fei.get_path(particles, configuration)
+    path.add_path(feistate.path)
+
+
+def runFEIforBplusHadronic(path):
+    """Generates FEI B+:generic list, including applying FEI weights and skim
+    pre-selection cuts. Use BplusHadronic(path) for skim cuts on FEI output list
+
+    (Semi-)Leptonic and Missing Energy Working Group
+    Skim LFN code: 11180200
+    Physics channels: (All available FEI B+ Hadronic tags are
+    reconstructed)
+    *B+ -> anti-D0 pi+
+    *B+ -> anti-D0 pi+ pi0
+    *B+ -> anti-D0 pi+ pi0 pi0
+    *B+ -> anti-D0 pi+ pi+ pi-
+    *B+ -> anti-D0 pi+ pi+ pi- pi0
+    *B+ -> anti-D0 D+
+    *B+ -> anti-D0 D+ KS0
+    *B+ -> anti-D0* D+ KS0
+    *B+ -> anti-D0 D+* KS0
+    *B+ -> anti-D0* D+* KS0
+    *B+ -> anti-D0 D0 K+
+    *B+ -> anti-D0* D0 K+
+    *B+ -> anti-D0 D*(2010)0 K+
+    *B+ -> anti-D0* D*(2010)0 K+
+    *B+ -> Ds+ anti-D0
+    *B+ -> anti-D0* pi+
+    *B+ -> anti-D0* pi+ pi0
+    *B+ -> anti-D0* pi+ pi0 pi0
+    *B+ -> anti-D0* pi+ pi+ pi-
+    *B+ -> anti-D0* pi+ pi+ pi- pi0
+    *B+ -> Ds+* anti-D0
+    *B+ -> Ds+ anti-D0*
+    *B+ -> anti-D0 K+
+    *B+ -> D- pi+ pi+
+    *B+ -> D- pi+ pi+ pi0
+    *B+ -> J/Psi K+
+    *B+ -> J/Psi K+ pi+ pi-
+    *B+ -> J/Psi K+ pi0
+    *B+ -> J/Psi KS0 pi+
+
+    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+
+    Skim Liasons: S. Hollitt & H. Wakeling
+
+    Cuts applied are::
+        Event precuts:
+        R2EventLevel < 0.4
+        nTracks >= 4
+=======
+        Tag side B:
+        Mbc > 5.24
+        abs(deltaE) < 0.200
+        sigProb > 0.001"""
+
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
@@ -176,10 +273,38 @@ def BplusHadronicWithFEI(path):
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
-    path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
 
-    # Return BplusHadronic list
-    return BplusHadronic(path)
+def runFEIforHadronicCombined(path):
+    """Generates FEI B+:generic and B0:generic list for FEI Hadronic skims, including
+    applying FEI weights and skim pre-selection cuts.
+    Use BplusHadronic(path) and B0Hadronic(path) for skim cuts on FEI output lists
+
+    (Semi-)Leptonic and Missing Energy Working Group
+    Skim LFN code: 11180100, 11180200
+    Physics channels: (All available FEI B0 and B+ Hadronic tags are
+    reconstructed)
+    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+
+    Skim Liasons: S. Hollitt & H. Wakeling
+
+    Cuts applied are::
+        Event precuts:
+        R2EventLevel < 0.4
+        nTracks >= 4"""
+
+    # Pre-selection cuts
+    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+
+    # Run FEI
+    from fei import backward_compatibility_layer
+    backward_compatibility_layer.pid_renaming_oktober_2017()
+    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+
+    import fei
+    particles = fei.get_default_channels(neutralB=True, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    feistate = fei.get_path(particles, configuration)
+    path.add_path(feistate.path)
 
 
 def B0SLWithOneLep(path):

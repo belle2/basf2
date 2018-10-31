@@ -147,6 +147,9 @@ if __name__ == "__main__":
 
     data['content'] = content
     data['user'] = os.environ['BELLE2_USER']
+    username = input('\nConfirm or enter your DESY user name [%s]: ' % data['user'])
+    if username  != '':
+        data['user'] = username
     data['reason'] = input('\nPlease describe the reason for the request: ')
     data['release'] = input('\nThe new payloads require at least the following software release: ')
 

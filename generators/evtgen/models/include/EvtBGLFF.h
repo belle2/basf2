@@ -65,23 +65,30 @@ private:
 
    **/
 
-  /** z expansion coeffieients for vector form factor: f_+  */
-
+  /** 0th-order z expansion coeffieient for vector form factor: f_+  */
   double ap_0{0};
 
+  /** 1st-order z expansion coeffieient for vector form factor: f_+  */
   double ap_1{0};
 
+  /** 2nd-order z expansion coeffieient for vector form factor: f_+  */
   double ap_2{0};
 
+  /** 3rd-order z expansion coeffieient for vector form factor: f_+  */
   double ap_3{0};
 
-  /** z expansion coeffieients for scalar form factor f_0   */
+
+
+  /** 0th-order z expansion coeffieient for scalar form factor f_0   */
   double a0_0{0};
 
+  /** 1st-order z expansion coeffieient for scalar form factor f_0   */
   double a0_1{0};
 
+  /** 2nd-order z expansion coeffieient for scalar form factor f_0   */
   double a0_2{0};
 
+  /** 3rd-order z expansion coeffieient for scalar form factor f_0   */
   double a0_3{0};
 
 };

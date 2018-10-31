@@ -9,12 +9,14 @@
  **************************************************************************/
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/dataobjects/Particle.h>
 
-#include <framework/logging/Logger.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
 #include <string>
+#include <vector>
 
 using namespace Belle2;
 
@@ -28,6 +30,8 @@ namespace {
     ASSERT_NE(dd.getMother(), nullptr);
     EXPECT_EQ(dd.getMother()->getName(), "K+");
     EXPECT_EQ(dd.getMother()->getLabel(), "");
+    EXPECT_EQ(dd.getMother()->getFullName(), "K+");
+    EXPECT_EQ(dd.getMother()->getPDGCode(), 321);
     EXPECT_EQ(dd.getNDaughters(), 0);
   }
 
@@ -199,5 +203,47 @@ namespace {
     EXPECT_EQ(initok, false);
   }
 
-  // TODO add tests of Particle* selector API
+  TEST(DecayDescriptorTest, B2ParticleInterface)
+  {
+    // need datastore for the particles StoreArray
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+
+    // mock up a composite Belle2::Particle
+    TLorentzVector zeroes(0, 0, 0, 0);
+    Particle* Kp = particles.appendNew(Particle(zeroes, 321));    // 0
+    Particle* pim1 = particles.appendNew(Particle(zeroes, -211)); // 1
+    Particle* pim2 = particles.appendNew(Particle(zeroes, -211)); // 2
+    Particle* pip = particles.appendNew(Particle(zeroes, 211));   // 3
+    Particle* D0 = particles.appendNew(Particle(zeroes, 421));    // 4
+    D0->appendDaughter(0);
+    D0->appendDaughter(1);
+    Particle* B0 = particles.appendNew(Particle(zeroes, 511));    // 5
+    B0->appendDaughter(4);
+    B0->appendDaughter(3);
+    B0->appendDaughter(2);
+
+    // ---
+    DecayDescriptor dd;
+    bool initok = dd.init("B0:B2Dzpipi -> [D0 -> K+:loose ^pi-:loose] ^pi+:loose pi-:loose");
+    ASSERT_EQ(initok, true);
+
+    std::vector<const Particle*> selectionparticles = dd.getSelectionParticles(B0);
+    EXPECT_EQ(selectionparticles.size(), 2);
+    EXPECT_EQ(selectionparticles[0], pim1);
+    EXPECT_EQ(selectionparticles[1], pip);
+
+    EXPECT_B2ERROR(dd.getSelectionParticles(D0));
+
+    EXPECT_B2WARNING(dd.getSelectionParticles(pip));
+    EXPECT_B2WARNING(dd.getSelectionParticles(Kp));
+    EXPECT_B2WARNING(dd.getSelectionParticles(pim1));
+    EXPECT_B2WARNING(dd.getSelectionParticles(pim2));
+
+    EXPECT_EQ(dd.getSelectionParticles(D0).size(), 0);
+
+    DataStore::Instance().reset();
+  }
 }

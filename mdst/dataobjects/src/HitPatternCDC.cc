@@ -70,7 +70,7 @@ void HitPatternCDC::setNHits(unsigned short nHits)
 
 ULong64_t HitPatternCDC::getInteger() const
 {
-  if (sizeof(unsigned long) >= 8) {
+  if constexpr(sizeof(unsigned long) >= 8) {
     return m_pattern.to_ulong();
   } else {
     return m_pattern.to_ullong();

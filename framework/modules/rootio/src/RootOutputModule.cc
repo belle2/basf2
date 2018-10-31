@@ -97,8 +97,22 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam("buildIndex", m_buildIndex, "Build Event Index for faster finding of events by exp/run/event number", m_buildIndex);
   addParam("keepParents", m_keepParents, "Keep parents files of input files, input files will not be added as output file's parents",
            m_keepParents);
-  addParam("outputSplitSize", m_outputSplitSize, "If given split the output file once the file has reached the given "
-           "size in MB. If set the filename will end in ``.f{index:05d}.root``", m_outputSplitSize);
+  addParam("outputSplitSize", m_outputSplitSize, R"DOC(
+If given split the output file once the file has reached the given size in MB.
+If set the filename will end in ``.f{index:05d}.root``. So if ``outputFileName="RootOutput.root"``
+then the files will be named ``RootOutput.f00000.root, RootOutput.f00001.root,
+RootOutput.f00002.root, ...``.
+
+All created output files are complete and independent files and can
+subsequently processed completely independent.
+
+Note:
+  The output files will be approximately of the size given by
+  ``outputSplitSize`` but they will be slightly larger since
+  additional information has to be written at the end of the file. If necessary
+  please account for this. Also, using `buildIndex=False` might be beneficial
+  to reduce the overshoot.
+)DOC");
 }
 
 
@@ -116,8 +130,13 @@ void RootOutputModule::initialize()
   m_eventMetaData.isRequired();
 
   //check outputSplitSize
-  if (m_outputSplitSize and * m_outputSplitSize <= 0)
-    B2ERROR("outputSplitSize must be a positive value");
+  if (m_outputSplitSize) {
+    if (*m_outputSplitSize == 0) B2ERROR("outputSplitSize must be set to a positive value");
+    // Warn is splitsize is >= 1TB ... because this seems weirdly like size was given in bytes
+    if (*m_outputSplitSize >= 1024*1024) B2WARNING("outputSplitSize set to " << *m_outputSplitSize << " MB, please make sure the units are correct");
+    // convert to bytes
+    *m_outputSplitSize *= 1024 * 1024;
+  }
 
   getFileNames();
   openFile();
@@ -137,13 +156,14 @@ void RootOutputModule::openFile()
     auto dirpath = out.parent_path();
 
     if (boost::filesystem::create_directories(dirpath)) {
-      B2WARNING("Created missing directory " << dirpath << ".");
+      B2INFO("Created missing directory " << dirpath << ".");
       //try again
       m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
     }
 
-    if (m_file->IsZombie())
+    if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_file->GetName() << "' for writing!");
+    }
   }
   m_file->SetCompressionAlgorithm(m_compressionAlgorithm);
   m_file->SetCompressionLevel(m_compressionLevel);
@@ -172,8 +192,9 @@ void RootOutputModule::openFile()
       if (branchList.count(branchName) == 0) {
         //make sure FileMetaData and EventMetaData are always included in the output
         if (((branchName != "FileMetaData") || (durability == DataStore::c_Event)) &&
-            ((branchName != "EventMetaData") || (durability == DataStore::c_Persistent)))
+            ((branchName != "EventMetaData") || (durability == DataStore::c_Persistent))) {
           continue;
+        }
       }
 
       TClass* entryClass = iter->second.objClass;
@@ -186,18 +207,20 @@ void RootOutputModule::openFile()
       //using it instead of GetClassInfo() avoids  having to parse header files (and
       //the associated memory cost)
       if (!entryClass->HasDictionary()) {
-        if (m_fileIndex == 0)
+        if (m_fileIndex == 0) {
           B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
                     "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
+        }
         continue;
       }
 
-      if (!hasStreamer(entryClass))
+      if (!hasStreamer(entryClass)) {
         B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
+      }
 
       int splitLevel = m_splitLevel;
       if (hasCustomStreamer(entryClass)) {
-        B2DEBUG(100, entryClass->GetName() << " has custom streamer, setting split level -1 for this branch.");
+        B2DEBUG(38, entryClass->GetName() << " has custom streamer, setting split level -1 for this branch.");
 
         splitLevel = -1;
         if (iter->second.isArray) {
@@ -208,18 +231,20 @@ void RootOutputModule::openFile()
       m_tree[durability]->Branch(branchName.c_str(), &iter->second.object, m_basketsize, splitLevel);
       m_tree[durability]->SetBranchAddress(branchName.c_str(), &iter->second.object);
       m_entries[durability].push_back(&iter->second);
-      B2DEBUG(150, "The branch " << branchName << " was created.");
+      B2DEBUG(39, "The branch " << branchName << " was created.");
 
       //Tell DataStore that we are using this entry
-      if (m_fileIndex == 0)
+      if (m_fileIndex == 0) {
         DataStore::Instance().optionalInput(StoreAccessorBase(branchName, (DataStore::EDurability)durability, entryClass,
                                                               iter->second.isArray));
+      }
     }
   }
 
   dir->cd();
-  if (m_outputSplitSize)
-    B2INFO("RootOutput: Opened " << (m_fileIndex > 0 ? "new " : "") << "file for writing" << LogVar("filename", out));
+  if (m_outputSplitSize) {
+    B2INFO(getName() << ": Opened " << (m_fileIndex > 0 ? "new " : "") << "file for writing" << LogVar("filename", out));
+  }
 }
 
 
@@ -277,9 +302,9 @@ void RootOutputModule::event()
   }
 
   // check if we need to split the file
-  if (m_outputSplitSize and m_file->GetEND() > *m_outputSplitSize * 1024 * 1024) {
+  if (m_outputSplitSize and (uint64_t)m_file->GetEND() > *m_outputSplitSize) {
     // close file and open new one
-    B2INFO("Output size limit reached, closing file ...");
+    B2INFO(getName() << ": Output size limit reached, closing file ...");
     closeFile();
   }
 }
@@ -334,7 +359,6 @@ void RootOutputModule::fillFileMetaData()
 void RootOutputModule::terminate()
 {
   closeFile();
-  B2DEBUG(200, "terminate() finished");
 }
 
 void RootOutputModule::closeFile()
@@ -357,7 +381,7 @@ void RootOutputModule::closeFile()
   m_file->cd();
   for (int durability = 0; durability < DataStore::c_NDurabilityTypes; ++durability) {
     if (m_tree[durability]) {
-      B2INFO("Write TTree " << c_treeNames[durability]);
+      B2DEBUG(30, "Write TTree " << c_treeNames[durability]);
       m_tree[durability]->Write(c_treeNames[durability].c_str(), TObject::kWriteDelete);
       delete m_tree[durability];
     }

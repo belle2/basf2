@@ -156,7 +156,7 @@ namespace Belle2 {
 
     /** Maximum output file size in MB. If not set we don't split. Otherwise we split
      * if the event tree in output file has reached the given size in MB */
-    boost::optional<int> m_outputSplitSize{boost::none};
+    boost::optional<uint64_t> m_outputSplitSize{boost::none};
 
     //then those for purely internal use:
 

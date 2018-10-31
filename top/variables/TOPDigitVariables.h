@@ -29,5 +29,7 @@ namespace Belle2 {
   }
   namespace Variable {
     double getTOPModuleDigitCount(const Particle*);
+    double getTOPModuleDigitGapSize(const Particle*);
+    double getNReflectedTOPModuleDigits(const Particle*);
   }
 }

@@ -23,6 +23,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <top/dataobjects/TOPDigit.h>
 
+#include <algorithm> // for sort
 using namespace std;
 
 namespace Belle2 {
@@ -58,6 +59,75 @@ namespace Belle2 {
       // auto tr0_p = tr_p3.X(), tr_p3.Y(), tr_p3.Z();
     }
 
+    double getTOPModuleDigitGapSize(const Particle* particle)
+    {
+      auto trk = particle->getTrack();
+      // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
+      auto extHits = trk->getRelationsWith<ExtHit>();
+      int thisModuleID = 77; // default to sentinel value
+      for (auto h : extHits) {
+        if (h.getDetectorID() != 4) continue; // 4 == iTOP, see Const::EDetectors
+        if (h.getStatus() != 0) continue; // 0 == EXT_ENTER
+        // now find the module of this hit.
+        thisModuleID = h.getCopyID(); // could be positive or negative
+        break;
+      }
+      if (thisModuleID == 77) {
+        return -1;
+      }
+
+      StoreArray<TOPDigit> topDigits;
+      double maxGap = 0; // the largest time difference between two consecutive hits
+      vector<double> digitTimes; // all digits in the module that the track entered
+      for (auto t : topDigits) {
+        if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
+        digitTimes.push_back(t.getTime());
+      }
+      sort(digitTimes.begin(), digitTimes.end());
+      for (size_t i = 0; i < digitTimes.size() - 1; ++i) {
+        double gap = digitTimes[i + 1] - digitTimes[i];
+        if (gap > maxGap) {
+          maxGap = gap;
+        }
+      }
+      return maxGap;
+    }
+
+    double getNReflectedTOPModuleDigits(const Particle* particle)
+    {
+      auto trk = particle->getTrack();
+      // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
+      auto extHits = trk->getRelationsWith<ExtHit>();
+      int thisModuleID = 77; // default to sentinel value
+      for (auto h : extHits) {
+        if (h.getDetectorID() != 4) continue; // 4 == iTOP, see Const::EDetectors
+        if (h.getStatus() != 0) continue; // 0 == EXT_ENTER
+        // now find the module of this hit.
+        thisModuleID = h.getCopyID(); // could be positive or negative
+        break;
+      }
+      if (thisModuleID == 77) {
+        return -1;
+      }
+
+      StoreArray<TOPDigit> topDigits;
+      double maxGap = 0; // the largest time difference between two consecutive hits
+      size_t maxGapIndex = 0; // the index of the first hit *after* the gap
+      vector<double> digitTimes; // all digits in the module that the track entered
+      for (auto t : topDigits) {
+        if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
+        digitTimes.push_back(t.getTime());
+      }
+      sort(digitTimes.begin(), digitTimes.end());
+      for (size_t i = 0; i < digitTimes.size() - 1; ++i) {
+        double gap = digitTimes[i + 1] - digitTimes[i];
+        if (gap > maxGap) {
+          maxGap = gap;
+          maxGapIndex = i + 1;
+        }
+      }
+      return digitTimes.size() - maxGapIndex;
+    }
 
     //     def extHitInfo(extHitList):
     // for h in extHitList:

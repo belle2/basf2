@@ -77,7 +77,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     drldrg(1, i) = vdir[i];
     drldrg(2, i) = ndir[i];
   }
-  // d local residual / global rigid body param
+  // d local residual / d global rigid body param
   auto drldg = drldrg * (drdm * dmdg);
 
   // wire ends

@@ -755,7 +755,7 @@ namespace Belle2 {
     }
 
 
-    bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(std::string prefix, BaseFitter& fitter,
+    bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter,
         std::vector<Particle*>& particleChildren, Particle* mother)
     {
       bool updated = false;

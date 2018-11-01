@@ -648,7 +648,7 @@ void RootInputModule::addEventListForIndexFile(const std::string& parentLfn)
   }
 }
 
-void RootInputModule::entryNotFound(std::string entryOrigin, std::string name, bool fileChanged)
+void RootInputModule::entryNotFound(const std::string& entryOrigin, const std::string& name, bool fileChanged)
 {
   if (name == "ProcessStatistics" or DataStore::Instance().getDependencyMap().isUsedAs(name, DependencyMap::c_Input)) {
     B2FATAL(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain required object " << name << ", aborting.");

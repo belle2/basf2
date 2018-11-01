@@ -36,11 +36,11 @@ namespace Belle2 {
     /** ised by Path::doWhile() to actually set parameters */
     void initSubLoop(std::shared_ptr<Path> path, const std::string& condition, unsigned int maxIterations);
 
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void endRun();
-    virtual void event();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void endRun() override;
+    virtual void event() override;
+    virtual void terminate() override;
 
   private:
     /** Set properties for this module based on the modules found in m_path */

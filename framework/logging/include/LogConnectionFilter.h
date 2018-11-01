@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Thomas Hauth                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,7 @@
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogMessage.h>
 
+#include <memory>
 
 namespace Belle2 {
 
@@ -22,7 +23,7 @@ namespace Belle2 {
    * This connection can be used to prevent printing of the same message again
    * and again. Messages are suppressed if they match with the one previously sent.
    */
-  class LogConnectionFilter : public LogConnectionBase {
+  class LogConnectionFilter final : public LogConnectionBase {
 
   public:
 
@@ -44,14 +45,14 @@ namespace Belle2 {
      * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    virtual bool sendMessage(const LogMessage& message);
+    bool sendMessage(const LogMessage& message) override;
 
     /**
      * Returns true if the log connection could be established.
      *
      * @return True if the log connection could be established.
      */
-    virtual bool isConnected();
+    bool isConnected() override;
 
   protected:
 
@@ -62,7 +63,7 @@ namespace Belle2 {
      */
     void printRepetitions();
 
-    LogConnectionBase* m_logConnection; /**< The actual log connection.*/
+    std::unique_ptr<LogConnectionBase> m_logConnection; /**< The actual log connection.*/
     LogMessage m_previousMessage;       /**< The previous log message. */
     int m_repeatCounter;                /**< Counter for repeated messages. */
 

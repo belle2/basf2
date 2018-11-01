@@ -207,6 +207,7 @@ gain_collector.param("nBinsV", 6)
 pre_gain_collector_path = create_path()
 pre_gain_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_gain_collector_path.add_module("Geometry")
+pre_gain_collector_path.add_module("ActivatePXDGainCalibrator")
 pre_gain_collector_path.add_module("PXDDigitizer")
 pre_gain_collector_path.add_module("PXDClusterizer")
 
@@ -215,7 +216,7 @@ pre_gain_collector_path.add_module("PXDClusterizer")
 gain_algo = PXDGainCalibrationAlgorithm()
 
 # We can play around with algo parameters
-gain_algo.minClusters = 3000      # Minimum number of collected clusters for estimating gains
+gain_algo.minClusters = 2000      # Minimum number of collected clusters for estimating gains
 gain_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
 gain_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
 
@@ -238,6 +239,7 @@ gain_cal.strategies = SequentialRunByRun
 gain_cal.max_files_per_collector_job = 1
 
 gain_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
+gain_cal.max_iterations = 2
 gain_cal.ignored_runs = pxd_ignore_run_list
 
 gain_cal.use_central_database("Calibration_Offline_Development")

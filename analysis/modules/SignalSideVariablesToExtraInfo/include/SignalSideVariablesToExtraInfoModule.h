@@ -39,10 +39,10 @@ namespace Belle2 {
     SignalSideVariablesToExtraInfoModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

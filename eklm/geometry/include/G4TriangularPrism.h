@@ -44,6 +44,11 @@ namespace Belle2 {
     G4TriangularPrism(const G4TriangularPrism&) = delete;
 
     /**
+     * Operator =  (disabled).
+     */
+    G4TriangularPrism& operator=(const G4TriangularPrism&) = delete;
+
+    /**
      * Destructor.
      * @details
      * The resulting solid m_is (access by getSolid()) is not deleted here.

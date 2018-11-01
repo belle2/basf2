@@ -46,9 +46,9 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDChannelMappingModule();
 
-    void initialize();
-    void event();
-    void terminate();
+    void initialize() override;
+    void event() override;
+    void terminate() override;
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
     std::string m_SVDClustersName; /**< reco digit list name*/

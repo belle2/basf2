@@ -44,6 +44,7 @@ DQMHistAnalysisOutputRelayMsgModule::~DQMHistAnalysisOutputRelayMsgModule() { }
 
 void DQMHistAnalysisOutputRelayMsgModule::initialize()
 {
+  if (m_sock != nullptr) delete m_sock;
   m_sock = new TSocket(m_hostname.c_str(), m_port);
   B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: initialized.");
 }

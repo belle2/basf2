@@ -50,19 +50,19 @@ namespace Belle2 {
      *
      * Creates the ProfileInfo objects in the data store and starts the profiling.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Event profiling.
      *
      * Records the event profiling information.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Terminate the Module.
      *
      * Records the final profiling information.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

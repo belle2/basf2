@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Cosine algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
 

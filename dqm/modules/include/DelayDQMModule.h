@@ -29,21 +29,21 @@ namespace Belle2 {
     virtual ~DelayDQMModule();
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
     std::string m_title; /**< Prefix for title (NOT histo name) */
 
-    TH1D* m_DelayS;          /**< Delay between trigger and end of processing in s */
-    TH1D* m_DelayMs;          /**< Delay between trigger and end of processing in ms*/
-    TH1D* m_DelayLog;          /**< Delay between trigger and end of processing log scale */
+    TH1D* m_DelayS = nullptr;        /**< Delay between trigger and end of processing in s */
+    TH1D* m_DelayMs = nullptr;        /**< Delay between trigger and end of processing in ms*/
+    TH1D* m_DelayLog = nullptr;        /**< Delay between trigger and end of processing log scale */
 
     void BinLogX(TH1* h);
   };

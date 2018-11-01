@@ -1,76 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<QE>
-  <ColEffi>0.55</ColEffi>
-  <LambdaFirst unit="nm">200</LambdaFirst>
-  <LambdaStep unit="nm">10</LambdaStep>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.002</Qeffi>
-  <Qeffi>0.036</Qeffi>
-  <Qeffi>0.130</Qeffi>
-  <Qeffi>0.217</Qeffi>
-  <Qeffi>0.255</Qeffi>
-  <Qeffi>0.268</Qeffi>
+<QE descr="nominal quantum efficiency of NaKSbCs photocathode">
+  <!-- average of Nagoya measurements, for the procedure see top/analysis/averageQE.py -->
+  <ColEffi descr="average over all PMTs for 1.5 T">0.5677</ColEffi>
+  <LambdaFirst unit="nm">280.0</LambdaFirst>
+  <LambdaStep unit="nm">20.0</LambdaStep>
+  <Qeffi>0.211</Qeffi>
+  <Qeffi>0.228</Qeffi>
+  <Qeffi>0.248</Qeffi>
   <Qeffi>0.271</Qeffi>
-  <Qeffi>0.265</Qeffi>
-  <Qeffi>0.256</Qeffi>
-  <Qeffi>0.242</Qeffi>
-  <Qeffi>0.225</Qeffi>
-  <Qeffi>0.207</Qeffi>
-  <Qeffi>0.189</Qeffi>
-  <Qeffi>0.171</Qeffi>
-  <Qeffi>0.154</Qeffi>
-  <Qeffi>0.140</Qeffi>
-  <Qeffi>0.126</Qeffi>
-  <Qeffi>0.115</Qeffi>
-  <Qeffi>0.104</Qeffi>
-  <Qeffi>0.095</Qeffi>
-  <Qeffi>0.086</Qeffi>
-  <Qeffi>0.078</Qeffi>
-  <Qeffi>0.071</Qeffi>
-  <Qeffi>0.065</Qeffi>
-  <Qeffi>0.059</Qeffi>
-  <Qeffi>0.054</Qeffi>
-  <Qeffi>0.049</Qeffi>
-  <Qeffi>0.045</Qeffi>
-  <Qeffi>0.041</Qeffi>
-  <Qeffi>0.038</Qeffi>
-  <Qeffi>0.034</Qeffi>
-  <Qeffi>0.031</Qeffi>
+  <Qeffi>0.292</Qeffi>
+  <Qeffi>0.285</Qeffi>
+  <Qeffi>0.271</Qeffi>
+  <Qeffi>0.241</Qeffi>
+  <Qeffi>0.206</Qeffi>
+  <Qeffi>0.173</Qeffi>
+  <Qeffi>0.145</Qeffi>
+  <Qeffi>0.122</Qeffi>
+  <Qeffi>0.103</Qeffi>
+  <Qeffi>0.087</Qeffi>
+  <Qeffi>0.073</Qeffi>
+  <Qeffi>0.061</Qeffi>
+  <Qeffi>0.051</Qeffi>
+  <Qeffi>0.043</Qeffi>
+  <Qeffi>0.035</Qeffi>
   <Qeffi>0.028</Qeffi>
-  <Qeffi>0.025</Qeffi>
-  <Qeffi>0.023</Qeffi>
-  <Qeffi>0.011</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
-  <Qeffi>0.000</Qeffi>
+  <Qeffi>0.022</Qeffi>
+  <Qeffi>0.017</Qeffi>
+  <Qeffi>0.012</Qeffi>
+  <Qeffi>0.009</Qeffi>
+  <Qeffi>0.006</Qeffi>
 </QE>

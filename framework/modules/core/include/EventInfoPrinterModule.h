@@ -35,7 +35,7 @@ namespace Belle2 {
     virtual ~EventInfoPrinterModule();
 
     /** initialization. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Prints a header for each new run.
@@ -43,10 +43,10 @@ namespace Belle2 {
      * A header is printed which provides the information that a new
      * run was started and which run number we are currently running on.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Prints the full information about the event, run and experiment number. */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Prints a footer for each run which ended.
@@ -54,7 +54,7 @@ namespace Belle2 {
      * A footer is printed which provides the information that a run
      * was ended and which run number we were running on.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
   private:
     std::string formatDateTime(unsigned long long int); /**< Format date & time for output */

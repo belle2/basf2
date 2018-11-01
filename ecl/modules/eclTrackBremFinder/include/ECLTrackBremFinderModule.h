@@ -13,11 +13,15 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/ModuleParam.templateDetails.h>
+#include <utility>
 
 namespace Belle2 {
   class ECLCluster;
   class Track;
   class EventMetaData;
+  class RecoTrack;
+  class BremHit;
 
   /**
    * Module to assign ECL Clusters resulting from Bremsstrahlung to the
@@ -36,19 +40,23 @@ namespace Belle2 {
      *  Also register any outputs of your module (StoreArrays, RelationArrays,
      *  StoreObjPtrs) here, see the respective class documentation for details.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called once for each event.
      *
      * This is most likely where your module will actually do anything.
      */
-    virtual void event();
+    virtual void event() override;
 
   private:
     /** StoreArray ECLCluster */
     StoreArray<ECLCluster> m_eclClusters;
     /** StoreArray Track */
     StoreArray<Track> m_tracks;
+    /** StoreArray RecoTrack */
+    StoreArray<RecoTrack> m_recoTracks;
+    /** StoreArray BremHits */
+    StoreArray<BremHit> m_bremHits;
     /** StoreObjPtr EventMetaData */
     StoreObjPtr<EventMetaData> m_evtPtr;
     /**
@@ -61,7 +69,27 @@ namespace Belle2 {
      * The default values are taken from bremsstrahlung studies
      * They represent the edge of the beampipe, the outer SVD wall and the inner CDC wall
      */
-    std::vector<float> m_virtualHitRadii = {1.05, 15.0, 16.0};
+    std::vector<float> m_virtualHitRadii = {1.05, 16.0};
+
+    /**
+     * Fraction of the tracks energy the ECL cluster has to possess to be considered for bremsstrahlung finding
+     */
+    double m_relativeClusterEnergy = 0.02f;
+
+    /**
+     * Minimal/Maximal number of CDC hits, the track has to possess to be considered for bremsstrahlung finding
+     */
+    std::tuple<unsigned int, unsigned int> m_requestedNumberOfCDCHits = {1, 100};
+
+    /**
+     * Cut on the electron probability (from pid) of track
+     */
+    float m_electronProbabilityCut = 0;
+
+    /**
+     * Cut on the distance between the cluster position angle and the extrapolation angle
+     */
+    float m_clusterDistanceCut = 0.05;
 
     /**
      * StoreArray name of the ECLClusters for brem matching

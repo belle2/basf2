@@ -110,13 +110,13 @@ namespace Belle2 {
      * Get hit time (implementation of base class function)
      * @return hit time
      */
-    float getGlobalTime() const { return getTime(); }
+    float getGlobalTime() const override { return getTime(); }
 
     /**
      * Shift SimHit in time (implementation of base class function)
      * @param delta time shift.
      */
-    void shiftInTime(float delta) { setTime(getTime() + delta); }
+    void shiftInTime(float delta) override { setTime(getTime() + delta); }
 
 
   private:
@@ -136,8 +136,8 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** The class title. */
-    ClassDef(Belle2::EKLMSimHit, 2);
+    /** Class version. */
+    ClassDefOverride(Belle2::EKLMSimHit, 2);
 
   };
 

@@ -1,10 +1,12 @@
-#include "analysis/VertexFitting/TreeFitter/FitParams.h"
-#include <Eigen/Core>
+#pragma once
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
+#include "analysis/VertexFitting/TreeFitter/FitParams.h"
 
-namespace Belle2 {
+namespace {
+
   /** Test fixture. */
   class TreeFitterFitparTest : public ::testing::Test {
   protected:

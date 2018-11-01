@@ -52,11 +52,11 @@ namespace Belle2 {
     SVDPerformanceModule();
 
     virtual ~SVDPerformanceModule();
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     std::string m_ShaperDigitName; /**< */
     std::string m_RecoDigitName; /**< */

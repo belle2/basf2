@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = "R. Cheaib & S. Hollitt"
+"""FEI Semi-leptonic B0 tag skim standalone for generic analysis in th
+    (Semi-)Leptonic and Missing Energy Working Group
+    Skim LFN code: 11180400
+    fei training: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
+ """
+
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
 
 import sys
 import glob
@@ -14,7 +20,7 @@ from beamparameters import add_beamparameters
 from stdCharged import *
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 skimCode = encodeSkimName('feiSLBplusWithOneLep')
 
 
@@ -43,7 +49,7 @@ analysis_main.add_path(feistate.path)
 # and we're back in analysis_main pathB
 
 # SL Bplus skim
-from feiSLBplusWithOneLep_List import *
+from skim.fei import BplusSLWithOneLep
 BtagList = BplusSLWithOneLep()
 
 skimOutputUdst(skimCode, BtagList)

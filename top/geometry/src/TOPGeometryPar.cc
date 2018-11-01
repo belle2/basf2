@@ -15,8 +15,11 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
+#include <framework/geometry/BFieldManager.h>
 #include <geometry/Materials.h>
 #include <iostream>
+#include <TSpline.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -25,6 +28,7 @@ namespace Belle2 {
   namespace TOP {
 
     TOPGeometryPar* TOPGeometryPar::s_instance = 0;
+    const double TOPGeometryPar::c_hc = 1239.84193; // [eV*nm]
 
     TOPGeometryPar::~TOPGeometryPar()
     {
@@ -73,14 +77,10 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         return;
       }
-
-      // print geometry if the debug level for 'top' is set 10000
-      const auto& logSystem = LogSystem::Instance();
-      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
-        m_geo->print();
-      }
-
       m_valid = true;
+
+      finalizeInitialization();
+
     }
 
 
@@ -95,6 +95,10 @@ namespace Belle2 {
       if (!m_geoDB->isValid()) {
         B2ERROR("TOPGeometry: no payload found in database");
         return;
+      }
+      if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
+        m_oldPayload = true;
+        B2WARNING("TOPGeometry: old payload found, pixel dependent PDE will not be used");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -114,16 +118,35 @@ namespace Belle2 {
         B2ERROR("TOPChannelMaps: no payload found in database");
         return;
       }
+      m_valid = true;
+
+      finalizeInitialization();
+
+    }
+
+    void TOPGeometryPar::finalizeInitialization()
+    {
+      // set B field flag
+      m_BfieldOn = (BFieldManager::getField(0, 0, 0).Mag() / Unit::T) > 0.1;
+
+      // add call backs for PMT data
+      m_pmtInstalled.addCallback(this, &TOPGeometryPar::clearCache);
+      m_pmtQEData.addCallback(this, &TOPGeometryPar::clearCache);
 
       // print geometry if the debug level for 'top' is set 10000
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
-        m_geo->print();
+        getGeometry()->print();
+        m_envelopeQE.print("Envelope QE");
       }
-
-      m_valid = true;
     }
 
+    void TOPGeometryPar::clearCache()
+    {
+      m_envelopeQE.clear();
+      m_pmts.clear();
+      m_relEfficiencies.clear();
+    }
 
     const TOPGeometry* TOPGeometryPar::getGeometry() const
     {
@@ -135,6 +158,214 @@ namespace Belle2 {
       } else {
         return m_geo;
       }
+    }
+
+    double TOPGeometryPar::getPMTEfficiencyEnvelope(double energy) const
+    {
+      double lambda = c_hc / energy;
+
+      if (m_oldPayload) { // filter transmittance is included in nominal QE, return it!
+        return getGeometry()->getNominalQE().getEfficiency(lambda);
+      }
+
+      if (m_envelopeQE.isEmpty()) setEnvelopeQE();
+      return m_envelopeQE.getEfficiency(lambda);
+    }
+
+    double TOPGeometryPar::getPMTEfficiency(double energy,
+                                            int moduleID, int pmtID,
+                                            double x, double y) const
+    {
+      const auto* geo = getGeometry();
+      if (!geo->isModuleIDValid(moduleID)) return 0;
+
+      double lambda = c_hc / energy;
+
+      if (m_oldPayload) { // filter transmittance is included in nominal QE, return it!
+        return geo->getNominalQE().getEfficiency(lambda);
+      }
+
+      if (m_pmts.empty()) mapPmtQEToPositions();
+
+      int id = getUniquePmtID(moduleID, pmtID);
+      const auto* pmtQE = m_pmts[id];
+      if (!pmtQE) return 0;
+
+      const auto& pmtArray = geo->getModule(moduleID).getPMTArray();
+      auto pmtPixel = pmtArray.getPMT().getPixelID(x, y);
+      if (pmtPixel == 0) return 0;
+
+      auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
+      auto channel = getChannelMapper().getChannel(pixelID);
+
+      double RQE = 1.0;
+      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+
+      return pmtQE->getEfficiency(pmtPixel, lambda, m_BfieldOn) * RQE;
+
+    }
+
+
+    double TOPGeometryPar::getRelativePixelEfficiency(int moduleID, int pixelID) const
+    {
+
+      auto channel = getChannelMapper().getChannel(pixelID);
+
+      double RQE = 1.0;
+      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+
+      double thrEffi = 1.0;
+      if (m_thresholdEff.isValid()) thrEffi = m_thresholdEff->getThrEff(moduleID, channel);
+
+      if (m_oldPayload) { // nominal QE is used
+        return RQE * thrEffi;
+      }
+
+      if (m_relEfficiencies.empty()) prepareRelEfficiencies();
+
+      int id = getUniquePixelID(moduleID, pixelID);
+      return m_relEfficiencies[id] * RQE * thrEffi;
+    }
+
+
+    void TOPGeometryPar::setEnvelopeQE() const
+    {
+      if (m_pmtQEData.getEntries() == 0) {
+        B2ERROR("DBArray TOPPmtQEs is empty");
+        return;
+      }
+
+      double lambdaFirst = 0;
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaFirst() > 0) {
+          lambdaFirst = pmt.getLambdaFirst();
+          break;
+        }
+      }
+      if (lambdaFirst == 0) {
+        B2ERROR("DBArray TOPPmtQEs: lambdaFirst of all PMT found to be less or equal 0");
+        return;
+      }
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaFirst() > 0) {
+          lambdaFirst = std::min(lambdaFirst, pmt.getLambdaFirst());
+        }
+      }
+
+      double lambdaStep = 0;
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaStep() > 0) {
+          lambdaStep = pmt.getLambdaStep();
+          break;
+        }
+      }
+      if (lambdaStep == 0) {
+        B2ERROR("DBArray TOPPmtQEs: lambdaStep of all PMT found to be less or equal 0");
+        return;
+      }
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaStep() > 0) {
+          lambdaStep = std::min(lambdaStep, pmt.getLambdaStep());
+        }
+      }
+
+      std::vector<float> envelopeQE;
+      for (const auto& pmt : m_pmtQEData) {
+        float ce = pmt.getCE(m_BfieldOn);
+        if (pmt.getLambdaFirst() == lambdaFirst and pmt.getLambdaStep() == lambdaStep) {
+          const auto& envelope = pmt.getEnvelopeQE();
+          if (envelopeQE.size() < envelope.size()) {
+            envelopeQE.resize(envelope.size() - envelopeQE.size(), 0);
+          }
+          for (size_t i = 0; i < std::min(envelopeQE.size(), envelope.size()); i++) {
+            envelopeQE[i] = std::max(envelopeQE[i], envelope[i] * ce);
+          }
+        } else {
+          double lambdaLast = pmt.getLambdaLast();
+          int nExtra = (lambdaLast - lambdaFirst) / lambdaStep + 1 - envelopeQE.size();
+          if (nExtra > 0) envelopeQE.resize(nExtra, 0);
+          for (size_t i = 0; i < envelopeQE.size(); i++) {
+            float qe = pmt.getEnvelopeQE(lambdaFirst + lambdaStep * i);
+            envelopeQE[i] = std::max(envelopeQE[i], qe * ce);
+          }
+        }
+      }
+
+      m_envelopeQE.set(lambdaFirst, lambdaStep, 1.0, envelopeQE, "EnvelopeQE");
+
+      B2INFO("TOPGeometryPar: envelope of PMT dependent QE has been set");
+
+    }
+
+
+    void TOPGeometryPar::mapPmtQEToPositions() const
+    {
+      m_pmts.clear();
+
+      std::map<std::string, const TOPPmtQE*> map;
+      for (const auto& pmt : m_pmtQEData) {
+        map[pmt.getSerialNumber()] = &pmt;
+      }
+      for (const auto& pmt : m_pmtInstalled) {
+        int id = getUniquePmtID(pmt.getSlotNumber(), pmt.getPosition());
+        m_pmts[id] = map[pmt.getSerialNumber()];
+      }
+
+      B2INFO("TOPGeometryPar: QE of PMT's mapped to positions, size = " << m_pmts.size());
+    }
+
+
+    void TOPGeometryPar::prepareRelEfficiencies() const
+    {
+      m_relEfficiencies.clear();
+      if (m_pmts.empty()) mapPmtQEToPositions();
+
+      const auto* geo = getGeometry();
+
+      const auto& nominalQE = geo->getNominalQE();
+      double s0 = integralOfQE(nominalQE.getQE(), nominalQE.getCE(),
+                               nominalQE.getLambdaFirst(), nominalQE.getLambdaStep());
+
+      for (const auto& module : geo->getModules()) {
+        auto moduleID = module.getModuleID();
+        const auto& pmtArray = module.getPMTArray();
+        int numPMTs = pmtArray.getSize();
+        int numPMTPixels = pmtArray.getPMT().getNumPixels();
+        for (int pmtID = 1; pmtID <= numPMTs; pmtID++) {
+          const auto* pmtQE = m_pmts[getUniquePmtID(moduleID, pmtID)];
+          for (int pmtPixel = 1; pmtPixel <= numPMTPixels; pmtPixel++) {
+            double s = 0;
+            if (pmtQE) {
+              s = integralOfQE(pmtQE->getQE(pmtPixel), pmtQE->getCE(m_BfieldOn),
+                               pmtQE->getLambdaFirst(), pmtQE->getLambdaStep());
+            }
+            auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
+            auto id = getUniquePixelID(moduleID, pixelID);
+            m_relEfficiencies[id] = s / s0;
+          }
+        }
+      }
+
+      B2INFO("TOPGeometryPar: pixel relative quantum efficiencies have been set, size = "
+             << m_relEfficiencies.size());
+    }
+
+
+    double TOPGeometryPar::integralOfQE(const std::vector<float>& qe, double ce,
+                                        double lambdaFirst, double lambdaStep) const
+    {
+      if (qe.empty()) return 0;
+
+      double s = 0;
+      double lambda = lambdaFirst;
+      double f1 = qe[0] / (lambda * lambda);
+      for (size_t i = 1; i < qe.size(); i++) {
+        lambda += lambdaStep;
+        double f2 = qe[i] / (lambda * lambda);
+        s += (f1 + f2) / 2;
+        f1 = f2;
+      }
+      return s * c_hc * lambdaStep * ce;
     }
 
 
@@ -528,6 +759,47 @@ namespace Belle2 {
         geo->setCalPulseShape(shape);
       }
 
+      // wavelength filter bulk transmittance
+
+      std::string materialNode = "Materials/Material[@name='TOPWavelengthFilterIHU340']";
+      GearDir filterMaterial(content, materialNode);
+      if (!filterMaterial) {
+        B2FATAL("TOPGeometry: " << materialNode << " not found");
+      }
+      GearDir property(filterMaterial, "Property[@name='ABSLENGTH']");
+      if (!property) {
+        B2FATAL("TOPGeometry: " << materialNode << ", Property ABSLENGTH not found");
+      }
+      int numNodes = property.getNumberNodes("value");
+      if (numNodes > 1) {
+        double conversion = Unit::convertValue(1, property.getString("@unit", "GeV"));
+        std::vector<double> energies;
+        std::vector<double> absLengths;
+        for (int i = 0; i < numNodes; i++) {
+          GearDir value(property, "value", i + 1);
+          energies.push_back(value.getDouble("@energy") * conversion / Unit::eV);// [eV]
+          absLengths.push_back(value.getDouble() * Unit::mm); // [cm]
+        }
+        TSpline3 spline("absLen", energies.data(), absLengths.data(), energies.size());
+        double lambdaFirst = c_hc / energies.back();
+        double lambdaLast = c_hc / energies[0];
+        double lambdaStep = 5; // [nm]
+        int numSteps = (lambdaLast - lambdaFirst) / lambdaStep + 1;
+        const double filterThickness = prism.getFilterThickness();
+        std::vector<float> bulkTransmittances;
+        for (int i = 0; i < numSteps; i++) {
+          double wavelength = lambdaFirst + lambdaStep * i;
+          double energy = c_hc / wavelength;
+          double absLen = spline.Eval(energy);
+          bulkTransmittances.push_back(exp(-filterThickness / absLen));
+        }
+        TOPWavelengthFilter filter(lambdaFirst, lambdaStep, bulkTransmittances);
+        geo->setWavelengthFilter(filter);
+      } else {
+        B2FATAL("TOPGeometry: " << materialNode
+                << ", Property ABSLENGTH has less than 2 nodes");
+      }
+
       return geo;
     }
 
@@ -544,6 +816,8 @@ namespace Belle2 {
       ss >> out;
       return out;
     }
+
+
 
   } // End namespace TOP
 } // End namespace Belle2

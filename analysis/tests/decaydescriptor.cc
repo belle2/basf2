@@ -41,6 +41,12 @@ namespace {
     bool initok = dd.init("B0:cand -> K+:loose pi-:loose");
 
     EXPECT_EQ(initok, true);
+
+    // standard arrow, not an inclusive decay
+    EXPECT_EQ(dd.isIgnorePhotons(), false);
+    EXPECT_EQ(dd.isIgnoreIntermediate(), false);
+    EXPECT_EQ(dd.isInclusive(), false);
+
     ASSERT_NE(dd.getMother(), nullptr);
     EXPECT_EQ(dd.getMother()->getName(), "B0");
     EXPECT_EQ(dd.getMother()->getLabel(), "cand");
@@ -103,6 +109,44 @@ namespace {
     ASSERT_EQ(dd.getDaughter(1)->getDaughter(2), nullptr);
 
     ASSERT_EQ(dd.getDaughter(2), nullptr);
+  }
+
+  TEST(DecayDescriptorTest, ArrowsAndInclusiveDecaysGrammar)
+  {
+    // --> means ignore intermediate resonances
+    DecayDescriptor dd1;
+    bool initok = dd1.init("B0:candidates --> K+:loose pi-:loose gamma:clean");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd1.isIgnorePhotons(), false);
+    EXPECT_EQ(dd1.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd1.isInclusive(), false);
+
+    // => means ignore photons
+    initok = false;
+    DecayDescriptor dd2;
+    initok = dd2.init("B0:candidates => K+:loose pi-:loose gamma:clean");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd2.isIgnorePhotons(), true);
+    EXPECT_EQ(dd2.isIgnoreIntermediate(), false);
+    EXPECT_EQ(dd2.isInclusive(), false);
+
+    // ==> means ignore intermediate resonances *and* photons
+    initok = false;
+    DecayDescriptor dd3;
+    initok = dd3.init("B0:candidates ==> K+:loose pi-:loose gamma:clean");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd3.isIgnorePhotons(), true);
+    EXPECT_EQ(dd3.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd3.isInclusive(), false);
+
+    // ... means inclusive, for example B -> Xs gamma
+    initok = false;
+    DecayDescriptor dd4;
+    initok = dd4.init("B0:candidates -> K+:loose gamma:clean ...");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd4.isIgnorePhotons(), false);
+    EXPECT_EQ(dd4.isIgnoreIntermediate(), false);
+    EXPECT_EQ(dd4.isInclusive(), true);
   }
 
   TEST(DecayDescriptorTest, SelectionParticles)

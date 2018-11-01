@@ -185,9 +185,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
       if (eclCluster != nullptr) {
         if (eclCluster->getHypothesisId() != 5) continue;
         double errorPhi = extHit.getErrorPhi();
-        // if (errorPhi > 2 * M_PI) continue;
         double errorTheta = extHit.getErrorTheta();
-        // if (errorTheta > M_PI) continue;
         double phiHit = extHit.getPosition().Phi();
         double phiCluster = eclCluster->getPhi();
         double deltaPhi = phiHit - phiCluster;
@@ -199,14 +197,6 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
         double thetaHit = extHit.getPosition().Theta();
         double thetaCluster = eclCluster->getTheta();
         double deltaTheta = thetaHit - thetaCluster;
-        // if (phiHit > 0 && phiCluster < 0) deltaTheta = thetaHit + thetaCluster;
-        // else if (phiHit < 0 && phiCluster > 0) deltaTheta = -thetaHit - thetaCluster;
-        // else if (phiHit < 0 && phiCluster < 0) deltaTheta = -thetaHit + thetaCluster;
-        // if (deltaTheta > M_PI) {
-        //   deltaTheta = deltaTheta - 2 * M_PI;
-        // } else if (deltaTheta < -M_PI) {
-        //   deltaTheta = deltaTheta + 2 * M_PI;
-        // }
         ExtHitStatus hitStatus = extHit.getStatus();
         const auto& relatedMCParticles = eclCluster->getRelationsTo<MCParticle>();
         bool found_match = false;

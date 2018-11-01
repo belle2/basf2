@@ -112,7 +112,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
     double energy = weight * aECLCalDigit->getEnergy();
     int cellid = aECLCalDigit->getCellId();
     TVector3 cvec = geometry->GetCrystalVec(cellid - 1);
-    avgDir += weight * energy * cvec; // CHECK: energy already contains weight, needed here again?
+    avgDir += energy * cvec;
   }
   const ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
   if (cluster == nullptr) return;
@@ -140,7 +140,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   }
   if (!found) return;
   TVector3 w0 = showerCenter - trkpos;
-  double costh = avgDir * trkdir; // CHECK: how/where is avgDir being normalized?
+  double costh = avgDir.Unit() * trkdir;
   double sin2th = 1 - costh * costh;
   lShower = costh * (w0 * trkdir) - w0 * avgDir;
   lShower /= sin2th;

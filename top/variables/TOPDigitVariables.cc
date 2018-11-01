@@ -28,15 +28,18 @@ namespace Belle2 {
   namespace TOPDigitVariables {
   }
   namespace Variable {
+    //! @returns the number of digits in the same module as the particle
     double TOPModuleDigitCount(const Particle* particle)
     {
       auto trk = particle->getTrack();
-      // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
+      if (not trk) {
+        return -1.0;
+      }
       auto extHits = trk->getRelationsWith<ExtHit>();
       int thisModuleID = 77; // default to sentinel value
       for (auto h : extHits) {
-        if (h.getDetectorID() != 4) continue; // 4 == iTOP, see Const::EDetectors
-        if (h.getStatus() != 0) continue; // 0 == EXT_ENTER
+        if (h.getDetectorID() != Const::EDetector::TOP) continue;
+        if (h.getStatus() != EXT_ENTER) continue;
         // now find the module of this hit.
         thisModuleID = h.getCopyID(); // could be positive or negative
         break;
@@ -53,14 +56,15 @@ namespace Belle2 {
         }
       }
       return count;
-      // auto tr0_loglInfo = loglInfo(t.getRelationsWith("TOPLikelihoods"));
-      // auto tr0_p = tr_p3.X(), tr_p3.Y(), tr_p3.Z();
     }
 
+    //! @returns the largest time between to subsequent digits in the same module as the particle
     double TOPModuleDigitGapSize(const Particle* particle)
     {
       auto trk = particle->getTrack();
-      // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
+      if (not trk) {
+        return -1.0;
+      }
       auto extHits = trk->getRelationsWith<ExtHit>();
       int thisModuleID = 77; // default to sentinel value
       for (auto h : extHits) {
@@ -71,7 +75,7 @@ namespace Belle2 {
         break;
       }
       if (thisModuleID == 77) {
-        return -1;
+        return -1.0;
       }
 
       StoreArray<TOPDigit> topDigits;
@@ -91,10 +95,14 @@ namespace Belle2 {
       return maxGap;
     }
 
+    // The number of reflected digits is defined as the number of digits after the gap
+    //! @returns the number of reflected digits in the same module as the particle
     double TOPModuleReflectedDigitCount(const Particle* particle)
     {
       auto trk = particle->getTrack();
-      // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
+      if (not trk) {
+        return -1.0;
+      }
       auto extHits = trk->getRelationsWith<ExtHit>();
       int thisModuleID = 77; // default to sentinel value
       for (auto h : extHits) {
@@ -105,7 +113,7 @@ namespace Belle2 {
         break;
       }
       if (thisModuleID == 77) {
-        return -1;
+        return -1.0;
       }
 
       StoreArray<TOPDigit> topDigits;
@@ -126,18 +134,6 @@ namespace Belle2 {
       }
       return digitTimes.size() - maxGapIndex;
     }
-
-    //     def extHitInfo(extHitList):
-    // for h in extHitList:
-    //     if h.getDetectorID() != 4: # 4 == iTOP, see Const::EDetectors
-    //         continue
-    //     if h.getStatus() != 0: # 0 == EXT_ENTER
-    //         continue
-    //     # now find the module of this hit.
-    //     thisModuleID = h.getCopyID()
-    //     pos = h.getPosition()
-    //     return thisModuleID, pos.X(), pos.Y(), pos.Z(), h.getTOF()
-    // return (0, 0, 0, 0, 0)
 
     VARIABLE_GROUP("TOP Calibration");
     REGISTER_VARIABLE("topModuleDigitCount", TOPModuleDigitCount,

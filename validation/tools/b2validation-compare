@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import os
+from glob import glob
+
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
+import argparse
+from subprocess import check_call
+
+from git import Repo
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(usage="""Quickly compare multiple git revisions with the validation framework.
+
+    For each git-hash given as revision, the script will:
+
+        1. Checkout the git hash
+           Attention if you have a dirty git repository. The script will not try to help you with that!
+
+        2. Compile the software with the current settings.
+           You can control the scons call with the --compile-options flag.
+
+        3. Run the validation.
+           You can control the b2validation call with the --validateion-options flag.
+           While running the validation, all files which match the regex EvtGen*.root will be reused
+           from the first call to save some computing time.
+
+        In the end it will show the results of the validation in your browser.
+    """)
+
+    parser.add_argument("revision", nargs="+", help="Which revisions to compare. Give the git hashes here.")
+    parser.add_argument("--compile-options", help="Options passed to scons when compiling",
+                        default="")
+    parser.add_argument("--validation-options", help="Options passed to b2validation when running",
+                        default="--use-cache")
+
+    args = parser.parse_args()
+    revisions = args.revision
+    compile_options = args.compile_options
+    validation_options = args.validation_options
+
+    git_repository = os.getenv("BELLE2_LOCAL_DIR")
+
+    if not git_repository:
+        raise ValueError("You need to setup basf2 first")
+
+    repo = Repo(git_repository)
+    assert not repo.bare
+
+    if repo.is_dirty():
+        print("Your git repo is dirty! I can not guarantee for valid results...")
+
+    try:
+        os.mkdir("results")
+    except FileExistsError:
+        pass
+
+    for revision in revisions:
+        # Step 1 Checkout git commit
+        repo.git.checkout(revision)
+
+        # Step 2: compile
+        check_call(["scons"] + compile_options.split(" "))
+
+        # Step 3: Copy input files
+        try:
+            os.mkdir(os.path.join("results", revision))
+        except FileExistsError:
+            pass
+
+        first_revision = revisions[0]
+        for input_file in glob(os.path.join("results", first_revision, "EvtGen*.root")):
+            link_file = os.path.join("results", revision, os.path.basename(input_file))
+            try:
+                os.link(input_file, link_file)
+            except FileExistsError:
+                pass
+
+        # Step 4: run validation with tag
+        check_call(["b2validation", "--tag", revision] + validation_options.split(" "))
+
+    # Show results
+    check_call(["b2validation-server", "--view"])

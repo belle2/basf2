@@ -6,8 +6,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <top/variables/TOPDigitVariables.h>
-
 // analysis
 #include <analysis/VariableManager/Manager.h>
 
@@ -142,11 +140,11 @@ namespace Belle2 {
     // return (0, 0, 0, 0, 0)
 
     VARIABLE_GROUP("TOP Calibration");
-    REGISTER_VARIABLE("TOPModuleDigitCount", TOPModuleDigitCount,
+    REGISTER_VARIABLE("topModuleDigitCount", TOPModuleDigitCount,
                       "[calibration] Returns the number of TOPDigits in the module to which the track was extrapolated");
-    REGISTER_VARIABLE("TOPModuleReflectedDigitCount", TOPModuleReflectedDigitCount,
+    REGISTER_VARIABLE("topModuleReflectedDigitCount", TOPModuleReflectedDigitCount,
                       "[calibration] Returns the number of reflected photons in the same module");
-    REGISTER_VARIABLE("TOPModuleDigitGapSize", TOPModuleDigitGapSize,
+    REGISTER_VARIABLE("topModuleDigitGapSize", TOPModuleDigitGapSize,
                       "[calibration] Returns the largest time difference between two consecutive hits in the same module");
   }
 // Create an empty module which allows basf2 to easily find the library and load it from the steering file

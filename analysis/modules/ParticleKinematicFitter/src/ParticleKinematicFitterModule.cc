@@ -69,7 +69,7 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_eventextrainfo("", DataStore::c_Event)
+    ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_eventextrainfo("", DataStore::c_Event), m_textTracer(0)
     {
       setDescription("Kinematic fitter for modular analysis");
       setPropertyFlags(c_ParallelProcessingCertified);

@@ -207,17 +207,6 @@ namespace Belle2 {
      */
     ModuleParamPtr getParameterPtr(const std::string& name) const;
 
-    /**
-     * Returns the type identifier of the parameter as string.
-     *
-     * The type identifier is used to discriminate between problematic parameter types (e.g. double and int)
-     *
-     * @param name The unique name of the parameter.
-     * @return The type identifier as string. Returns an empty string if a parameter with the given name could not be found.
-     */
-    std::string getParamTypeString(const std::string& name) const;
-
-
   private:
     /// Stores the module parameters together with a string name as key.
     std::map<std::string, ModuleParamPtr> m_paramMap;

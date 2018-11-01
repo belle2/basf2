@@ -33,10 +33,10 @@ namespace Belle2 {
     ECLTrackCalDigitMatchModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** event */
-    virtual void event();
+    virtual void event() override;
 
   private:
 

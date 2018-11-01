@@ -33,13 +33,13 @@ namespace Belle2 {
     GeneratorPreselectionModule();
 
     /** Initialize the parameters */
-    void initialize();
+    void initialize() override;
 
     /** Event processor. */
-    void event();
+    void event() override;
 
     /** Print the results of the cuts. */
-    void terminate();
+    void terminate() override;
 
   protected:
     /** called for each particle, checks for cuts. */

@@ -183,6 +183,46 @@ namespace Belle2 {
     {
     }
 
+    // Assignment operator
+    Module& Module::operator=(const Module& m)
+    {
+      if (this != &m) {
+        m_HasRPCs = m.m_HasRPCs;
+        m_IsFlipped = m.m_IsFlipped;
+        m_PhiStripWidth = m.m_PhiStripWidth;
+        m_PhiStripMin = m.m_PhiStripMin;
+        m_PhiStripMax = m.m_PhiStripMax;
+        m_PhiPositionBase = m.m_PhiPositionBase;
+        m_ZStripWidth = m.m_ZStripWidth;
+        m_ZStripMin = m.m_ZStripMin;
+        m_ZStripMax = m.m_ZStripMax;
+        m_ZPositionBase = m.m_ZPositionBase;
+        m_PhiSensorSide = m.m_PhiSensorSide;
+        m_SignalSpeed = m.m_SignalSpeed;
+        m_GlobalOrigin = m.m_GlobalOrigin;
+        m_LocalReconstructionShift = m.m_LocalReconstructionShift;
+        m_Rotation = m.m_Rotation;
+        m_RotationInverse = m.m_RotationInverse;
+        m_Alignment = m.m_Alignment;
+        m_AlignmentRotation = m.m_AlignmentRotation;
+        m_AlignmentTranslation = m.m_AlignmentTranslation;
+        m_AlignmentInverse = m.m_AlignmentInverse;
+        m_AlignmentRotationInverse = m.m_AlignmentRotationInverse;
+        m_DisplacedGeo = m.m_DisplacedGeo;
+        m_DisplacedGeoRotation = m.m_DisplacedGeoRotation;
+        m_DisplacedGeoTranslation = m.m_DisplacedGeoTranslation;
+        m_DisplacedGeoInverse = m.m_DisplacedGeoInverse;
+        m_DisplacedGeoRotationInverse = m.m_DisplacedGeoRotationInverse;
+        m_PhiScintLengths = m.m_PhiScintLengths;
+        m_PhiScintPositions = m.m_PhiScintPositions;
+        m_PhiScintOffsets = m.m_PhiScintOffsets;
+        m_ZScintLengths = m.m_ZScintLengths;
+        m_ZScintPositions = m.m_ZScintPositions;
+        m_ZScintOffsets = m.m_ZScintOffsets;
+      }
+      return *this;
+    }
+
     Module::~Module()
     {
     }

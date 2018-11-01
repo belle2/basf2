@@ -134,41 +134,46 @@ checkSectorAlignment(int endcap, int layer, int sector,
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_LineCorner1)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", corner 1.");
+          B2ERROR("Segment support overlaps with corner 1."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_ArcOuter)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", outer arc.");
+          B2ERROR("Segment support overlaps with outer arc."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_Line23)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", line 2-3.");
+          B2ERROR("Segment support overlaps with line 2-3."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_ArcInner)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", inner arc.");
+          B2ERROR("Segment support overlaps with inner arc."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_Line41)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", line 4-1.");
+          B2ERROR("Segment support overlaps with line 4-1."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
     }
@@ -236,46 +241,58 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
     Polygon2D stripPolygon(stripRectangle, 4);
     if (stripPolygon.hasIntersection(*m_LineCorner1)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", corner 1.");
+        B2ERROR("Strip overlaps with corner 1."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
       return false;
     }
     if (stripPolygon.hasIntersection(*m_ArcOuter)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", outer arc.");
+        B2ERROR("Strip overlaps with outer arc."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
+      B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
+              ", sector " << sector << ", plane " << plane <<
+              "): strip " << iStrip << ", outer arc.");
       return false;
     }
     if (stripPolygon.hasIntersection(*m_Line23)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", line 2-3.");
+        B2ERROR("Strip overlaps with line 2-3."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
       return false;
     }
     if (stripPolygon.hasIntersection(*m_ArcInner)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", inner arc.");
+        B2ERROR("Strip overlaps with inner arc."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
+      B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
+              ", sector " << sector << ", plane " << plane <<
+              "): strip " << iStrip << ", inner arc.");
       return false;
     }
     if (stripPolygon.hasIntersection(*m_Line41)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", line 4-1.");
+        B2ERROR("Strip overlaps with line 4-1."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
       return false;
     }
     for (j = 0; j <= m_GeoDat->getNSegments(); j++) {
       if (stripPolygon.hasIntersection(*m_SegmentSupport[plane - 1][j])) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << ", plane " << plane <<
-                  "): strip " << iStrip <<
-                  ", segment support" << j + 1 << ".");
+          B2ERROR("Strip overlaps with segment support."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector) << LogVar("Plane", plane)
+                  << LogVar("Strip", iStrip)
+                  << LogVar("Segment support", j + 1));
         return false;
       }
     }

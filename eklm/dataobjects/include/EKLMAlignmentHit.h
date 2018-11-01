@@ -58,7 +58,7 @@ namespace Belle2 {
      */
     int m_DigitIdentifier;
 
-    /** Needed to make object storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMAlignmentHit, 1);
 
   };

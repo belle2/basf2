@@ -39,15 +39,15 @@ namespace Belle2 {
     *
     * prepares histograms.
     */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
     /** eventWise jobs */
-    virtual void event();
+    virtual void event() override;
 
 
     /** final output  */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
 

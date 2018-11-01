@@ -512,6 +512,8 @@ namespace Belle2 {
     explicit DataStore();
     /** no copy constructor */
     DataStore(const DataStore&) = delete;
+    /** no assignment operator */
+    DataStore& operator=(const DataStore&) = delete;
     /** Destructor. */
     ~DataStore();
 

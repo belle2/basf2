@@ -43,12 +43,12 @@ namespace Belle2 {
     /**
      * Initializes the module
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * Method is called for each event
      */
-    void event();
+    void event() override;
 
   protected:
 

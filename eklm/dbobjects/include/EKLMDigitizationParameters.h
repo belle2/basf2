@@ -74,14 +74,44 @@ namespace Belle2 {
     void setNDigitizations(int digitizations);
 
     /**
+     * Get ADC pedestal.
+     */
+    float getADCPedestal() const;
+
+    /**
+     * Set ADC pedestal.
+     */
+    void setADCPedestal(float pedestal);
+
+    /**
+     * Get ADC photoelectron amplitude.
+     */
+    float getADCPEAmplitude() const;
+
+    /**
+     * Set ADC photoelectron amplitude.
+     */
+    void setADCPEAmplitude(float amplitude);
+
+    /**
      * Get ADC readout corresponding to saturation.
      */
-    float getADCSaturation() const;
+    int getADCThreshold() const;
 
     /**
      * Set ADC readout corresponding to saturation.
      */
-    void setADCSaturation(float saturation);
+    void setADCThreshold(int threshold);
+
+    /**
+     * Get ADC readout corresponding to saturation.
+     */
+    int getADCSaturation() const;
+
+    /**
+     * Set ADC readout corresponding to saturation.
+     */
+    void setADCSaturation(int saturation);
 
     /**
      * Get number of photoelectrons / 1 MeV.
@@ -200,8 +230,11 @@ namespace Belle2 {
     /** ADC photoelectron amplitude. */
     float m_ADCPEAmplitude;
 
+    /** ADC threshold. */
+    float m_ADCThreshold;
+
     /** ADC readout corresponding to saturation. */
-    float m_ADCSaturation;
+    int m_ADCSaturation;
 
     /** Number of photoelectrons / 1 MeV. */
     float m_NPEperMeV;
@@ -235,8 +268,8 @@ namespace Belle2 {
     /** Enable background in fitting. */
     bool m_EnableConstBkg;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigitizationParameters, 2);
+    /** Class version. */
+    ClassDef(Belle2::EKLMDigitizationParameters, 3);
 
   };
 

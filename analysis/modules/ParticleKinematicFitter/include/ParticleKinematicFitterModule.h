@@ -238,7 +238,8 @@ namespace Belle2 {
        * @param particleChildren list of all particle childen
        * @param mother mother particle
        */
-      bool storeOrcaKinFitParticles(std::string prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren, Particle* mother);
+      bool storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
+                                    Particle* mother);
 
 
       /**

@@ -77,6 +77,7 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclCalDigits;  /** ECLCalDigit's */
     StoreArray<ECLShower> m_eclShowers;  /** ECLShower's */
 
+    const unsigned int maxdigits = 20; /**< Max number of digits mva can include.  Note input digits must have offline waveform. */
     const unsigned int m_numMVAvariables = 160; /**< number of variables expected in the MVA weightfile */
     std::string m_MVAidentifier; /**< MVA - weight-file */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
@@ -92,7 +93,7 @@ namespace Belle2 {
     void initializeMVA(const std::string& identifier,
                        std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert);
 
-    double evaluatemva(const ECLShower* cluster); /**< Evaluates mva. */
+    double evaluateMVA(const ECLShower* cluster); /**< Evaluates mva. */
 
   };
 

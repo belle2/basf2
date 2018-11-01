@@ -127,11 +127,8 @@ void ECLClusterPSDModule::beginRun()
 }
 
 // evaluates mva
-double ECLClusterPSDModule::evaluatemva(const ECLShower* cluster)
+double ECLClusterPSDModule::evaluateMVA(const ECLShower* cluster)
 {
-
-  //mva can include up to 20 input digits. Note input digits must have offline waveform.
-  const int maxdigits = 20;
 
   //geometry for cell id position
   ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
@@ -218,7 +215,7 @@ void ECLClusterPSDModule::event()
   for (auto& shower : m_eclShowers) {
 
     //evaluates mva classifier
-    const double mvaout = evaluatemva(&shower);
+    const double mvaout = evaluateMVA(&shower);
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
 
@@ -233,10 +230,6 @@ void ECLClusterPSDModule::event()
       const double digit2CChi2 = caldigit->getTwoComponentChi2();
 
       if (digit2CChi2 < 0)  continue; //only digits with waveforms
-
-      //ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
-
-      //if (digitFitType != ECLDsp::photonHadron)  continue; //only standard fits
 
       if (digit2CChi2 < m_Chi2Threshold) { //must be a good fit
 

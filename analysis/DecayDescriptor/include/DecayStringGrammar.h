@@ -35,8 +35,10 @@ namespace Belle2 {
     using boost::spirit::qi::lexeme;
     using boost::spirit::repeat;
 
-    // Reserved characters for steering
-    reserved = space || '^' || '[' || ']' || '>' || ':';
+    // Reserved characters for steering - cppcheck doesn't understand the
+    // boost::spirit syntax so we suppress warnings
+    // cppcheck-suppress knownConditionTrueFalse
+    reserved = space || '^' || '[' || ']' || '>' || ':' || '.';
 
     // particle composed of selector, particle name, and user label: "^D_s+:label"
     particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;

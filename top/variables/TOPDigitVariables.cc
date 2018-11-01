@@ -30,7 +30,7 @@ namespace Belle2 {
   namespace TOPDigitVariables {
   }
   namespace Variable {
-    double getTOPModuleDigitCount(const Particle* particle)
+    double TOPModuleDigitCount(const Particle* particle)
     {
       auto trk = particle->getTrack();
       // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
@@ -59,7 +59,7 @@ namespace Belle2 {
       // auto tr0_p = tr_p3.X(), tr_p3.Y(), tr_p3.Z();
     }
 
-    double getTOPModuleDigitGapSize(const Particle* particle)
+    double TOPModuleDigitGapSize(const Particle* particle)
     {
       auto trk = particle->getTrack();
       // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
@@ -93,7 +93,7 @@ namespace Belle2 {
       return maxGap;
     }
 
-    double getNReflectedTOPModuleDigits(const Particle* particle)
+    double TOPModuleReflectedDigitCount(const Particle* particle)
     {
       auto trk = particle->getTrack();
       // auto tr = trk->getTrackFitResult(Const::ChargedStable(particle->getPDGCode()));
@@ -142,18 +142,12 @@ namespace Belle2 {
     // return (0, 0, 0, 0, 0)
 
     VARIABLE_GROUP("TOP Calibration");
-    REGISTER_VARIABLE("topModuleDigitCount", getTOPModuleDigitCount,
+    REGISTER_VARIABLE("TOPModuleDigitCount", TOPModuleDigitCount,
                       "[calibration] Returns the number of TOPDigits in the module to which the track was extrapolated");
-    REGISTER_VARIABLE("reflectedTOPModuleDigitCount", getNReflectedTOPModuleDigits,
+    REGISTER_VARIABLE("TOPModuleReflectedDigitCount", TOPModuleReflectedDigitCount,
                       "[calibration] Returns the number of reflected photons in the same module");
-    REGISTER_VARIABLE("getTOPModuleDigitGapSize", getTOPModuleDigitGapSize,
+    REGISTER_VARIABLE("TOPModuleDigitGapSize", TOPModuleDigitGapSize,
                       "[calibration] Returns the largest time difference between two consecutive hits in the same module");
-    // REGISTER_VARIABLE("topModuleExtHit_x", getTOPModuleExtHit_x,
-    //                   "[calibration] Returns the x component of the ExtHit");
-    // REGISTER_VARIABLE("topModuleExtHit_y", getTOPModuleExtHit_y,
-    //                   "[calibration] Returns the y component of the ExtHit");
-    // REGISTER_VARIABLE("topModuleExtHit_z", getTOPModuleExtHit_z,
-    //                   "[calibration] Returns the z component of the ExtHit");
   }
 // Create an empty module which allows basf2 to easily find the library and load it from the steering file
   class EnableTOPDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.

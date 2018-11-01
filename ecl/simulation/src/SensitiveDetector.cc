@@ -24,7 +24,8 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double UNUSED(thresholdEne
                                      G4double UNUSED(thresholdKineticEnergy)):
   Simulation::SensitiveDetectorBase(name, Const::ECL),
   m_eclSimHitRel(m_mcParticles, m_eclSimHits),
-  m_eclHitRel(m_mcParticles, m_eclHits)//,
+  m_eclHitRel(m_mcParticles, m_eclHits),
+  m_ECLHadronComponentEmissionFunction("eclHadronComponentEmissionFunction")
   // m_thresholdEnergyDeposit(thresholdEnergyDeposit),
   // m_thresholdKineticEnergy(thresholdKineticEnergy)
 {
@@ -42,14 +43,7 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double UNUSED(thresholdEne
   m_mcParticles.registerRelationTo(m_eclSimHits);
   m_mcParticles.registerRelationTo(m_eclHits);
 
-  const std::string& hadronEmissionFile = FileSystem::findFile("/data/ecl/HadronScintEmissionFunction.root");
-  TFile* inFile = new TFile(hadronEmissionFile.c_str(), "READ");
-  if (!inFile or inFile->IsZombie()) {
-    B2FATAL("Could not open file " << "HadronScintEmissionFunction.root");
-  }
-  m_HadronEmissionFunction = (TGraph*)inFile->Get("HadronEmissionFunction");
-  inFile->Close();
-  delete inFile;
+  m_HadronEmissionFunction = m_ECLHadronComponentEmissionFunction->getHadronComponentEmissionFunction();
 }
 
 SensitiveDetector::~SensitiveDetector()

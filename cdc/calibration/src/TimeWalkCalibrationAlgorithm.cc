@@ -24,9 +24,9 @@
 #include "iostream"
 #include "string"
 #include <framework/utilities/FileSystem.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -44,7 +44,8 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 {
   B2INFO("Creating and filling histograms");
 
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
   double halfCSize[56];
   for (int i = 0; i < 56; ++i) {
     double R = cdcgeo.senseWireR(i);
@@ -100,46 +101,33 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   B2INFO("Start calibration");
   gROOT->SetBatch(1);
 
-  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
-  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
-  StoreObjPtr<EventMetaData> evtPtr;
-  if (!evtPtr.isValid()) {
-    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
-    DataStore::Instance().setInitializeActive(true);
-    B2INFO("Registering EventMetaData object in DataStore");
-    evtPtr.registerInDataStore();
-    DataStore::Instance().setInitializeActive(false);
-    B2INFO("Creating EventMetaData object");
-    const auto exprun = getRunList()[0];
-    evtPtr.construct(1,  exprun.second, exprun.first);
-
-    //    evtPtr.create();
-  } else {
-    B2INFO("A valid EventMetaData object already exists.");
-  }
-  DBObjPtr<CDCGeometry> cdcGeometry;
-  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
-  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+  const auto exprun = getRunList()[0];
+  B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
+  updateDBObjPtrs(1, exprun.second, exprun.first);
+  B2INFO("Creating CDCGeometryPar object");
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   prepare();
   createHisto();
 
-  TF1* fold;
-  if (m_twParamMode_old == 0)
+  TF1* fold = nullptr;
+  if (m_twParamMode == 0)
     fold = new TF1("fold", "[0]/sqrt(x)", 0, 500);
-  else if (m_twParamMode_old == 1)
+  else if (m_twParamMode == 1)
     fold = new TF1("fold", "[0]*exp(-1*[1]*x)", 0, 500);
-  else
-    B2FATAL("Mode " << m_twParamMode_old << " haven't implemented yet.");
 
-  B2INFO("Old time walk formular: ");
-  fold->Print();
-  B2INFO("New time walk mode : " << m_twParamMode_new << " with " << m_nTwParams_new << " parameters");
+  if (fold == nullptr) {
+    B2FATAL("Old fitting function is not defined.");
+  }
 
-  m_tw_new[0].resize(m_nTwParams_new, 0.0); //for board 0, no available
+
+  B2INFO("time walk formular: ");
+  [](TF1 * f) { auto title = f->GetTitle(); B2INFO("Expression : " << title);}(fold);
+  //  B2INFO("New time walk mode : " << m_twParamMode_new << " with " << m_nTwParams_new << " parameters");
+
   for (int ib = 1; ib < 300; ++ib) {
     m_flag[ib] = 1;
-    B2DEBUG(199, "Board ID:" << ib);
+    B2DEBUG(21, "Board ID:" << ib);
     m_h2[ib]->SetDirectory(0);
 
     // Ignore if histogram has low stat. (<500 entries)
@@ -160,69 +148,97 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
     }
 
     // Add previous correction to this
-    for (int p = 0; p < m_nTwParams_old; ++p) {
+    for (int p = 0; p < m_nTwParams; ++p) {
       fold->SetParameter(p, m_tw_old[ib][p]);
     }
+
     m_h1[ib]->Add(fold);
-    if (m_twParamMode_new == 0) {
+    if (m_twParamMode == 0) {
       TF1* func = new TF1("func", "[0]+[1]/sqrt(x)", 0, 500);
       func->SetParameters(-4, 28);
       m_h1[ib]->Fit("func", "MQ", "", 20, 150);
-    } else if (m_twParamMode_new == 1) {
+    } else if (m_twParamMode == 1) {
       fitToExponentialFunc(m_h1[ib]);
     } else {
-      B2FATAL("Mode " << m_twParamMode_new << " is not available, please check again");
+      B2FATAL("Mode " << m_twParamMode << " is not available, please check again");
     }
 
     // Read fitted parameters
     TF1* f1 = m_h1[ib]->GetFunction("func");
     if (!f1) { m_flag[ib] = 0; continue;}
     m_constTerm[ib] = f1->GetParameter(0);
-    m_tw_new[ib].resize(m_nTwParams_new, 0.0);
-    for (int i = 1; i <= m_nTwParams_new; ++i) {
+    for (int i = 1; i <= m_nTwParams; ++i) {
       m_tw_new[ib][i - 1] = f1->GetParameter(i);
     }
 
-    B2DEBUG(199, "Prob of fitting:" << f1->GetProb());
-    B2DEBUG(199, "Fitting Param 0-1:" << f1->GetParameter(0) << " - " << f1->GetParameter(1));
+    B2DEBUG(21, "Prob of fitting:" << f1->GetProb());
+    B2DEBUG(21, "Fitting Param 0-1:" << f1->GetParameter(0) << " - " << f1->GetParameter(1));
 
   }
 
   //Write histogram to file
   if (m_storeHisto) {
-    B2INFO("Storing histogram");
-
-    B2DEBUG(199, "Store 1D histogram");
-    TFile* fhist = new TFile("histTw.root", "recreate");
-    TDirectory* old = gDirectory;
-    TDirectory* h1D = old->mkdir("h1D");
-    TDirectory* h2D = old->mkdir("h2D");
-    h1D->cd();
-    for (int ib = 1; ib < 300; ++ib) {
-      if (!m_h1[ib] || m_flag[ib] != 1) continue;
-      if (m_h1[ib]->GetEntries() < 5) continue;
-      m_h1[ib]->SetMinimum(-5);
-      m_h1[ib]->SetMaximum(15);
-      m_h1[ib]->Write();
-    }
-
-    B2DEBUG(199, "Store 2D histogram");
-    h2D->cd();
-    for (int ib = 1; ib < 300; ++ib) {
-      if (m_h2[ib] == nullptr) continue;
-      if (m_h2[ib]->GetEntries() < 5) continue;
-      m_h2[ib]->Write();
-
-    }
-
-    fhist->Close();
-    B2INFO("Hitograms were stored");
+    storeHist();
   }
 
   write();
   updateT0();
-  return c_OK;
+
+  return checkConvergence();
 }
+
+void TimeWalkCalibrationAlgorithm::storeHist()
+{
+  B2INFO("Storing histogram");
+  B2DEBUG(21, "Store 1D histogram");
+  TFile*  fhist = new TFile(m_histName.c_str(), "RECREATE");
+  TDirectory* old = gDirectory;
+  TDirectory* h1D = old->mkdir("h1D");
+  TDirectory* h2D = old->mkdir("h2D");
+  h1D->cd();
+  for (int ib = 1; ib < 300; ++ib) {
+    if (!m_h1[ib] || m_flag[ib] != 1) continue;
+    if (m_h1[ib]->GetEntries() < 5) continue;
+    m_h1[ib]->SetMinimum(-5);
+    m_h1[ib]->SetMaximum(15);
+    m_h1[ib]->Write();
+  }
+
+  B2DEBUG(21, "Store 2D histogram");
+  h2D->cd();
+  for (int ib = 1; ib < 300; ++ib) {
+    if (m_h2[ib] == nullptr) continue;
+    if (m_h2[ib]->GetEntries() < 5) continue;
+    m_h2[ib]->Write();
+
+  }
+
+  fhist->Close();
+  B2INFO("Hitograms were stored");
+}
+
+CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::checkConvergence()
+{
+  TH1F* hDtw = new TH1F("hDtw", "", 100, -1, 1);
+  float dtw;
+  for (int ib = 0; ib < 300; ++ib) {
+    dtw = (m_tw_new[ib][0] - m_tw_old[ib][0]) / m_tw_old[ib][0];
+    if (std::isnan(dtw) == 0) {
+      //      std::cout << dtw << " " << m_tw_new[ib][0] << " " << m_tw_old[ib][0] << std::endl;
+      hDtw->Fill(dtw);
+    }
+  }
+
+  B2INFO(hDtw->GetRMS());
+
+  if (hDtw->GetRMS() < 0.02) {
+    return c_OK;
+  } else {
+    return c_Iterate;
+  }
+  delete hDtw;
+}
+
 void TimeWalkCalibrationAlgorithm::write()
 {
   B2INFO("Save to the local DB");
@@ -231,18 +247,12 @@ void TimeWalkCalibrationAlgorithm::write()
   for (int ib = 0; ib < 300; ++ib) {
     if (m_flag[ib] != 1) {
       nfailure += 1;
-      if (m_twParamMode_old == m_twParamMode_new) {
-        dbTw->setTimeWalkParams(ib, m_tw_old[ib]);
-      } else {
-        //and even calibrated fail but mode is different from previous.
-        //in this case, param is zero
-        m_tw_new[ib].resize(m_nTwParams_new, 0.0);
-        dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
-      }
-    } else {
-      //Use new param if board is successfuly calibrated
-      dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
     }
+    const int num = static_cast<int>(m_tw_old[ib].size());
+    for (int i = 0; i < num; ++i) {
+      m_tw_new[ib][i] += m_tw_old[ib][i];
+    }
+    dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
   }
 
   if (m_textOutput == true) {
@@ -253,28 +263,31 @@ void TimeWalkCalibrationAlgorithm::write()
   saveCalibration(dbTw, "CDCTimeWalks");
   B2RESULT("Failure to calibrate time-walk for " << nfailure << " board");
 
-
 }
 
 void TimeWalkCalibrationAlgorithm::prepare()
 {
   B2INFO("Prepare calibration");
 
-  const auto exprun =  getRunList();
-
   DBObjPtr<CDCTimeWalks> dbTw;
-  //sw/  DBStore::Instance().update();
-  m_twParamMode_old = dbTw->getTwParamMode();
-  B2INFO("old tw param mode " << m_twParamMode_old);
+  m_twParamMode = dbTw->getTwParamMode();
+
+  if (!(m_twParamMode == 0 || m_twParamMode == 1)) {
+    B2FATAL("Mode " << m_twParamMode << " haven't implemented yet.");
+  }
+
+  B2INFO("tw param mode " << m_twParamMode);
   const int nEntries = dbTw->getEntries();
   for (int ib = 0; ib < nEntries; ++ib) {
     m_tw_old[ib] = dbTw->getTimeWalkParams(ib);
+    m_tw_new[ib].resize(m_nTwParams, 0.0);
   }
 }
+
 void TimeWalkCalibrationAlgorithm::updateT0()
 {
   B2INFO("Add constant term into T0 database");
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   for (int ilay = 0; ilay < 56; ++ilay) {
@@ -299,7 +312,7 @@ void TimeWalkCalibrationAlgorithm::fitToExponentialFunc(TH1D* h1)
   int max = h1->GetMaximumBin();
   double maxX = h1->GetBinCenter(max);
   double maxY = h1->GetBinContent(max);
-  B2DEBUG(199, "Max: id - x - y : " << max << "  " << maxX << "  " << maxY);
+  B2DEBUG(21, "Max: id - x - y : " << max << "  " << maxX << "  " << maxY);
 
   //search for p0
   double p0 = -1;

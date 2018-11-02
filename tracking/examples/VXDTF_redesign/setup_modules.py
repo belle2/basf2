@@ -28,26 +28,7 @@ def setup_Geometry(path=None):
 
     """
 
-    # If the environmental variable USE_BEAST2_GEOMETRY is set the Beast2 geometry will be used, else the default Belle2 geometry
-    fileName = 'geometry/Belle2.xml'
-    if os.environ.get('USE_BEAST2_GEOMETRY'):
-        print('WARNING: will use the Beast2 geometry: geometry/Beast2_phase2.xml')
-        fileName = 'geometry/Beast2_phase2.xml'
-    print('The used geometry is ' + fileName)
-
-    # Gearbox
-    gearbox = register_module('Gearbox')
-    gearbox.param('fileName', fileName)
-    path.add_module(gearbox)
-
-    # Geometry
-    geometry = register_module('Geometry')
-    geometry.param('components', ['BeamPipe',
-                                  'MagneticFieldConstant4LimitedRSVD',
-                                  'PXD',
-                                  'SVD',
-                                  'CDC'])
-    path.add_module(geometry)
+    print("WARNING: this function is deprecated and should not be used anymore! The geometry should now be loaded from the DB")
 
 
 def setup_VXDTF2(path=None,

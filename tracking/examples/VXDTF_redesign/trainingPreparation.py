@@ -18,7 +18,6 @@
 
 from basf2 import *
 from setup_modules import setup_RTCtoSPTCConverters
-from setup_modules import setup_Geometry
 import argparse
 import os
 

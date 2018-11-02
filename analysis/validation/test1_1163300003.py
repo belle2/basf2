@@ -27,13 +27,6 @@ from stdPi0s import *
 from stdV0s import *
 gb2_setuprel = "build-2017-09-08"
 
-# reset_database()
-use_local_database('/cvmfs/belle.cern.ch/conditions/GT_gen_ana_004.40_AAT-parameters.txt', readonly=True)
-
-
-# from fei import backward_compatibility_layer
-# backward_compatibility_layer.pid_renaming_oktober_2017()
-
 # their names in the ntuple are human readable
 from variables import variables
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
@@ -91,13 +84,6 @@ variables.addAlias('d1_d0_M', 'daughter(1,daughter(0,InvM))')
 variables.addAlias('d0_M', 'daughter(0,InvM)')
 variables.addAlias('d1_M', 'daughter(1,InvM)')
 
-variables.addAlias('d0_d0_costheta', 'daughter(0,daughter(0,cosTheta))')
-variables.addAlias('d0_costheta', 'daughter(0,cosTheta)')
-variables.addAlias('d0_costhetaCMS', 'daughter(0,useCMSFrame(cosTheta))')
-variables.addAlias('d0_d0_costhetaCMS', 'daughter(0,daughter(0,useCMSFrame(cosTheta)))')
-variables.addAlias('d0_d1_costhetaCMS', 'daughter(0,daughter(1,useCMSFrame(cosTheta)))')
-variables.addAlias('d1_costheta', 'daughter(1,cosTheta)')
-
 variables.addAlias('d0_d0_E', 'daughter(0,daughter(0,E))')
 variables.addAlias('d0_d1_E', 'daughter(0,daughter(1,E))')
 variables.addAlias('d0_E', 'daughter(0,E)')
@@ -117,42 +103,21 @@ variables.addAlias('d1_deltaE', 'daughter(1,deltaE)')
 variables.addAlias('d1_Mbc', 'daughter(1,Mbc)')
 
 
-# PDG ID
-variables.addAlias('d0_PDG', 'daughter(0,PDG)')
-variables.addAlias('d1_PDG', 'daughter(1,PDG)')
-variables.addAlias('d2_PDG', 'daughter(2,PDG)')
-variables.addAlias('d3_PDG', 'daughter(3,PDG)')
-variables.addAlias('d0_d0_PDG', 'daughter(0,daughter(0,PDG))')
-variables.addAlias('d0_d1_PDG', 'daughter(0,daughter(1,PDG))')
-variables.addAlias('d0_d2_PDG', 'daughter(0,daughter(2,PDG))')
-variables.addAlias('d0_d3_PDG', 'daughter(0,daughter(3,PDG))')
-variables.addAlias('d0_d1_d0_PDG', 'daughter(0,daughter(1,daughter(0,PDG)))')
-variables.addAlias('d0_d1_d1_PDG', 'daughter(0,daughter(1,daughter(1,PDG)))')
-variables.addAlias('d0_d0_d2_PDG', 'daughter(0,daughter(0,daughter(2,PDG)))')
-variables.addAlias('d0_d0_d3_PDG', 'daughter(0,daughter(0,daughter(3,PDG)))')
-
-
-variables.addAlias('d0_mcPDG', 'daughter(0,mcPDG)')
-variables.addAlias('d1_mcPDG', 'daughter(1,mcPDG)')
-variables.addAlias('d1_d0_mcPDG', 'daughter(1,daughter(0,mcPDG))')
-variables.addAlias('d0_d0_mcPDG', 'daughter(0,daughter(0,mcPDG))')
-variables.addAlias('d0_d1_mcPDG', 'daughter(0,daughter(1,mcPDG))')
-
-
 outputRootFile = '../1163300003.ntup.root'
 
 
 path = create_path()
 
-import fei
-particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
-feistate = fei.get_path(particles, configuration)
-path.add_path(feistate.path)
-
 
 fileList = ['../1163300003.dst.root']
 inputMdstList('default', fileList)
+
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+import fei
+particles = fei.get_default_channels()
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+feistate = fei.get_path(particles, configuration)
+analysis_main.add_path(feistate.path)
 
 # execute path and return back to the analysis_main
 # the skim condition is TRUE for all events

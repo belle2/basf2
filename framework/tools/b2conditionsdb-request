@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
     data['content'] = content
     data['user'] = os.environ['BELLE2_USER']
-    username = input('\nConfirm or enter your DESY user name [%s]: ' % data['user'])
+    username = input('\nConfirm your DESY user name by pressing enter or type the correct one [%s]: ' % data['user'])
     if username  != '':
         data['user'] = username
     data['reason'] = input('\nPlease describe the reason for the request: ')

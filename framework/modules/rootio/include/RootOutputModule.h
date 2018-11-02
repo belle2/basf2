@@ -208,6 +208,9 @@ namespace Belle2 {
     /** Whether to keep parents same as that of input file */
     bool m_keepParents{false};
 
+    /** Whether this is a regular, local file where we can actually create directories */
+    bool m_regularFile{true};
+
     /** Pointer to the event meta data */
     StoreObjPtr<EventMetaData> m_eventMetaData;
     /** Pointer to the file meta data */

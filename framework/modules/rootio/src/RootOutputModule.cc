@@ -23,6 +23,7 @@
 #include <TClonesArray.h>
 
 #include <ctime>
+#include <regex>
 
 
 using namespace std;
@@ -139,6 +140,18 @@ void RootOutputModule::initialize()
   }
 
   getFileNames();
+
+  // Now check if the file has a protocol like file:// or http:// in front
+  std::regex protocol("^([A-Za-z]*)://");
+  if(std::smatch m; std::regex_search(m_outputFileName, m, protocol)) {
+    if(m[1] == "file") {
+      // file protocol: treat as local and just remove it from the filename
+      m_outputFileName = std::regex_replace(m_outputFileName, protocol, "");
+    } else {
+      // any other protocol: not local, don't create directories
+      m_regularFile = false;
+    }
+  }
   openFile();
 }
 
@@ -147,12 +160,21 @@ void RootOutputModule::openFile()
   TDirectory* dir = gDirectory;
   boost::filesystem::path out{m_outputFileName};
   if (m_outputSplitSize) {
-    // mangle path: replace extension with fNNNNN
-    out.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
+    // Mangle the filename to add the fNNNNN part. However we need to be
+    // careful since the file name could be non-local and have some options or
+    // anchor information attached (like
+    // http://mydomain.org/filename.root?foo=bar#baz). So use "TUrl" *sigh* to
+    // do the parsing and only replace the extension of the file part.
+    TUrl fileUrl(m_outputFileName.c_str());
+    boost::filesystem::path file{fileUrl.GetFile()};
+    file.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
+    fileUrl.SetFile(file.c_str());
+    // In case of regular files we don't want the protocol or anything, just the file
+    out = m_regularFile? fileUrl.GetFileAndOptions() : fileUrl.GetUrl();
   }
   m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
-  if (m_file->IsZombie()) {
-    //try creating necessary directories
+  if ((!m_file || m_file->IsZombie()) && m_regularFile) {
+    //try creating necessary directories since this is a local file
     auto dirpath = out.parent_path();
 
     if (boost::filesystem::create_directories(dirpath)) {
@@ -161,9 +183,9 @@ void RootOutputModule::openFile()
       m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");
     }
 
-    if (m_file->IsZombie()) {
-      B2FATAL("Couldn't open file '" << m_file->GetName() << "' for writing!");
-    }
+  }
+  if (!m_file || m_file->IsZombie()) {
+    B2FATAL("Couldn't open file " << out << " for writing!");
   }
   m_file->SetCompressionAlgorithm(m_compressionAlgorithm);
   m_file->SetCompressionLevel(m_compressionLevel);

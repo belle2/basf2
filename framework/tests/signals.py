@@ -14,10 +14,10 @@ import os
 import signal
 import tempfile
 import shutil
-import basf2 as b2
+import basf2
 
 
-class TestModule(b2.Module):
+class TestModule(basf2.Module):
     """test"""
 
     def __init__(self, init_signal, event_signal):
@@ -33,19 +33,19 @@ class TestModule(b2.Module):
 
         if self.init_signal:
             pid = os.getpid()
-            b2.B2INFO("Killing %s in init (sig %d)" % (pid, self.init_signal))
+            basf2.B2INFO("Killing %s in init (sig %d)" % (pid, self.init_signal))
             os.kill(pid, self.init_signal)
-        b2.B2INFO("initialize()")
+        basf2.B2INFO("initialize()")
 
     def event(self):
         """If init_signal is true raise error, if event_signal is true kill process, otherwise print info"""
         if self.init_signal:
-            b2.B2FATAL("Processing should have been stopped in init!")
+            basf2.B2FATAL("Processing should have been stopped in init!")
         if self.event_signal:
             pid = os.getpid()
-            b2.B2INFO("Killing %s in event (sig %d)" % (pid, self.event_signal))
+            basf2.B2INFO("Killing %s in event (sig %d)" % (pid, self.event_signal))
             os.kill(pid, self.event_signal)
-        b2.B2INFO("event()")
+        basf2.B2INFO("event()")
 
 
 # Tests running in Bamboo have SIGQUIT blocked via sigmask(3),
@@ -58,7 +58,7 @@ os.system('clear_basf2_ipc')
 
 tmpdir = tempfile.mkdtemp(prefix='b2signal_test')
 
-b2.set_random_seed("something important")
+basf2.set_random_seed("something important")
 
 
 def run_test(init_signal, event_signal, abort, test_in_process):
@@ -97,7 +97,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
         if fileExists and (not abort or event_signal == signal.SIGINT):
             # is ROOT file ok?
             file_ok_ret = os.system('showmetadata ' + testFile.name)
-            b2.B2WARNING("file_ok_ret: " + str(file_ok_ret))
+            basf2.B2WARNING("file_ok_ret: " + str(file_ok_ret))
             if file_ok_ret != 0:
                 raise RuntimeError("Root file not properly closed!")
 
@@ -106,7 +106,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
         if ret != 0:
             raise RuntimeError("Some IPC structures were not cleaned up")
 
-        b2.B2WARNING("test ok.")
+        basf2.B2WARNING("test ok.")
         return
 
     # actual test
@@ -115,30 +115,30 @@ def run_test(init_signal, event_signal, abort, test_in_process):
         num_events = int(1e8)  # larger number to test we abort early.
 
     # Create paths
-    main = b2.Path()
+    main = basf2.Path()
     main.add_module('EventInfoSetter', evtNumList=[num_events])
     if test_in_process == 0:
         testmod = main.add_module(TestModule(init_signal, event_signal))
-        main.add_module('ProgressBar').set_property_flags(b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+        main.add_module('ProgressBar').set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     elif test_in_process == 1:
         testmod = main.add_module(TestModule(init_signal, event_signal))
-        testmod.set_property_flags(b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+        testmod.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     elif test_in_process == 2:
-        main.add_module('ProgressBar').set_property_flags(b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+        main.add_module('ProgressBar').set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
         testmod = main.add_module(TestModule(init_signal, event_signal))
     main.add_module('RootOutput', outputFileName=testFile.name, updateFileCatalog=False)
 
-    b2.B2WARNING("Running with PID " + str(os.getpid()))
-    b2.process(main)
+    basf2.B2WARNING("Running with PID " + str(os.getpid()))
+    basf2.process(main)
     sys.exit(0)
 
 
 for nproc in [0, 3]:
-    b2.set_nprocesses(nproc)
+    basf2.set_nprocesses(nproc)
     for in_proc in [0, 1, 2]:
         if nproc == 0 and in_proc != 0:
             break  # running more tests in single process mode doesn't make sense
-        b2.B2WARNING("== starting tests with nproc=%d, test_in_process=%d" % (nproc, in_proc))
+        basf2.B2WARNING("== starting tests with nproc=%d, test_in_process=%d" % (nproc, in_proc))
 
         try:
             run_test(None, None, abort=False, test_in_process=in_proc)
@@ -157,7 +157,7 @@ for nproc in [0, 3]:
             # SIGPIPE would be nice, too. just stops immediately now
         except Exception as e:
             # Note: Without specifying exception type, we might get those from forked processes, too
-            b2.B2WARNING("Exception occured for nproc=%d, test_in_process=%d" % (nproc, in_proc))
+            basf2.B2WARNING("Exception occured for nproc=%d, test_in_process=%d" % (nproc, in_proc))
             raise
 
 print("\n")

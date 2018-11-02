@@ -254,8 +254,8 @@ def jira_issue_role(role, rawtext, text, lineno, inliner, options={}, content=[]
 
 
 def setup(app):
-    import basf2 as b2
-    b2.logging.log_level = b2.LogLevel.WARNING
+    import basf2
+    basf2.logging.log_level = basf2.LogLevel.WARNING
 
     app.add_config_value("basf2_repository", "", True)
     app.add_config_value("basf2_commitid", "", True)

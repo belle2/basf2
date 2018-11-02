@@ -5,21 +5,21 @@
 # (both files)
 
 import os
-import basf2 as b2
+import basf2
 from ROOT import Belle2
 import gzip
 import glob
 import struct
 from b2test_utils import clean_working_directory, safe_process
 
-b2.set_random_seed("something important")
+basf2.set_random_seed("something important")
 # simplify logging output to just the type and the message
-b2.logging.enable_summary(False)
-for level in b2.LogLevel.values.values():
-    b2.logging.set_info(level, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
+basf2.logging.enable_summary(False)
+for level in basf2.LogLevel.values.values():
+    basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 
 
-class TestModule(b2.Module):
+class TestModule(basf2.Module):
 
     """Test to read relations in the input files."""
 
@@ -43,8 +43,8 @@ class TestModule(b2.Module):
 
 filename = Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot')
 
-main = b2.Path()
-seqinput = main.add_module("SeqRootInput", logLevel=b2.LogLevel.WARNING)
+main = basf2.Path()
+seqinput = main.add_module("SeqRootInput", logLevel=basf2.LogLevel.WARNING)
 main.add_module("EventInfoPrinter")
 main.add_module("PrintCollections", printForEvent=0)
 main.add_module(TestModule())

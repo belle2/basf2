@@ -3,6 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
+ * Contributor: Jan Strube (jan.strube@desy.de)                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,11 +26,11 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace TOPDigitVariables {
+  namespace topDigitVariables {
   }
   namespace Variable {
     //! @returns the number of digits in the same module as the particle
-    double TOPModuleDigitCount(const Particle* particle)
+    double topDigitCount(const Particle* particle)
     {
       auto trk = particle->getTrack();
       if (not trk) {
@@ -59,7 +60,7 @@ namespace Belle2 {
     }
 
     //! @returns the largest time between to subsequent digits in the same module as the particle
-    double TOPModuleDigitGapSize(const Particle* particle)
+    double topDigitGapSize(const Particle* particle)
     {
       auto trk = particle->getTrack();
       if (not trk) {
@@ -85,6 +86,9 @@ namespace Belle2 {
         if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
         digitTimes.push_back(t.getTime());
       }
+      if (digitTimes.size() == 0) {
+        return -1.0;
+      }
       sort(digitTimes.begin(), digitTimes.end());
       for (size_t i = 0; i < digitTimes.size() - 1; ++i) {
         double gap = digitTimes[i + 1] - digitTimes[i];
@@ -97,7 +101,7 @@ namespace Belle2 {
 
     // The number of reflected digits is defined as the number of digits after the gap
     //! @returns the number of reflected digits in the same module as the particle
-    double TOPModuleReflectedDigitCount(const Particle* particle)
+    double topReflectedDigitCount(const Particle* particle)
     {
       auto trk = particle->getTrack();
       if (not trk) {
@@ -124,6 +128,9 @@ namespace Belle2 {
         if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
         digitTimes.push_back(t.getTime());
       }
+      if (digitTimes.size() == 0) {
+        return -1.0;
+      }
       sort(digitTimes.begin(), digitTimes.end());
       for (size_t i = 0; i < digitTimes.size() - 1; ++i) {
         double gap = digitTimes[i + 1] - digitTimes[i];
@@ -136,11 +143,11 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("TOP Calibration");
-    REGISTER_VARIABLE("topModuleDigitCount", TOPModuleDigitCount,
+    REGISTER_VARIABLE("topDigitCount", topDigitCount,
                       "[calibration] Returns the number of TOPDigits in the module to which the track was extrapolated");
-    REGISTER_VARIABLE("topModuleReflectedDigitCount", TOPModuleReflectedDigitCount,
+    REGISTER_VARIABLE("topReflectedDigitCount", topReflectedDigitCount,
                       "[calibration] Returns the number of reflected photons in the same module");
-    REGISTER_VARIABLE("topModuleDigitGapSize", TOPModuleDigitGapSize,
+    REGISTER_VARIABLE("topDigitGapSize", topDigitGapSize,
                       "[calibration] Returns the largest time difference between two consecutive hits in the same module");
   }
 // Create an empty module which allows basf2 to easily find the library and load it from the steering file

@@ -122,7 +122,6 @@ namespace {
     EXPECT_EQ(dd1.isInclusive(), false);
 
     // => means ignore photons
-    initok = false;
     DecayDescriptor dd2;
     initok = dd2.init("B0:candidates => K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
@@ -131,7 +130,6 @@ namespace {
     EXPECT_EQ(dd2.isInclusive(), false);
 
     // ==> means ignore intermediate resonances *and* photons
-    initok = false;
     DecayDescriptor dd3;
     initok = dd3.init("B0:candidates ==> K+:loose pi-:loose gamma:clean");
     EXPECT_EQ(initok, true);
@@ -140,7 +138,6 @@ namespace {
     EXPECT_EQ(dd3.isInclusive(), false);
 
     // ... means inclusive, for example B -> Xs gamma
-    initok = false;
     DecayDescriptor dd4;
     initok = dd4.init("B0:candidates -> K+:loose gamma:clean ...");
     EXPECT_EQ(initok, true);
@@ -160,7 +157,6 @@ namespace {
 
     // add another selection particle to an already existing decay descriptor
     // not sure exactly who is using this feature, but might as well test it.
-    initok = false;
     initok = dd1.init("B0:B2Dzpipi -> [D0 -> K+:loose ^pi-:loose] pi+:loose pi-:loose");
     EXPECT_EQ(initok, true);
     names = dd1.getSelectionNames();
@@ -169,7 +165,6 @@ namespace {
     EXPECT_EQ(names[1], "B0_D0_pi");
 
     // more complex decay string with multiple particles of the same type
-    initok = false;
     DecayDescriptor dd2;
     initok = dd2.init("vpho:complex -> [D0 -> ^K+:loose pi-:loose] ^e+:loose ^e-:loose ^gamma:loose");
     EXPECT_EQ(initok, true);
@@ -191,28 +186,24 @@ namespace {
     EXPECT_EQ(dd1.getMother()->getName(), "");
     EXPECT_EQ(dd1.getMother()->getLabel(), "");
 
-    initok = true;
     DecayDescriptor dd2;
     initok = dd2.init("B0:lab^el -> K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd2.getMother()->getName(), "");
     EXPECT_EQ(dd2.getMother()->getLabel(), "");
 
-    initok = true;
     DecayDescriptor dd3;
     initok = dd3.init("B0:lab]el -> K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd3.getMother()->getName(), "");
     EXPECT_EQ(dd3.getMother()->getLabel(), "");
 
-    initok = true;
     DecayDescriptor dd4;
     initok = dd4.init("B0:lab>el -> K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd4.getMother()->getName(), "");
     EXPECT_EQ(dd4.getMother()->getLabel(), "");
 
-    initok = true;
     DecayDescriptor dd5;
     initok = dd5.init("B0:lab:el -> K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
@@ -226,22 +217,18 @@ namespace {
     bool initok = dd1.init("B0:label ---> K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
 
-    initok = true;
     DecayDescriptor dd2;
     initok = dd2.init("B0:label > K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
 
-    initok = true;
     DecayDescriptor dd3;
     initok = dd3.init("B0:label -> K+::loose pi-:loose");
     EXPECT_EQ(initok, false);
 
-    initok = true;
     DecayDescriptor dd4;
     initok = dd4.init("B0:label K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
 
-    initok = true;
     DecayDescriptor dd5;
     initok = dd5.init("B0:label <- K+:loose pi-:loose");
     EXPECT_EQ(initok, false);

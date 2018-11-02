@@ -345,6 +345,7 @@ void KLMClusterEfficiencyModule::terminate()
     rec1Cluster = rec1Cluster + m_ReconstructedKL01Cluster[i];
   for (i = 0; i < 6; i++)
     rec2Clusters = rec2Clusters + m_ReconstructedKL02Clusters[i];
+  /* Always printed once, not necessary to use LogVar. */
   B2INFO("Total number of KLM clusters: " << m_KL0Clusters +
          m_PartlyKL0Clusters + m_OtherClusters);
   B2INFO("K_L0 clusters: " << m_KL0Clusters);

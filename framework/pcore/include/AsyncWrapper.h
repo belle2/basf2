@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * Wrap am module of given type.
      */
-    AsyncWrapper(const std::string& moduleType);
+    explicit AsyncWrapper(const std::string& moduleType);
 
     ~AsyncWrapper();
 

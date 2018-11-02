@@ -48,7 +48,7 @@ namespace Belle2 {
     /** Maximal hit time. */
     float m_HitTimeThreshold;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMSimulationParameters, 1);
 
   };

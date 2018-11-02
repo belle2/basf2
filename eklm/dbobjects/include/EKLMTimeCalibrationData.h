@@ -54,7 +54,7 @@ namespace Belle2 {
     /** Additional rotation of the segment. */
     float m_TimeShift;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMTimeCalibrationData, 2);
 
   };

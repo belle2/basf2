@@ -10,22 +10,24 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
+#include <calibration/dbobjects/TestCalibMean.h>
 
 namespace Belle2 {
   /**
-   * Test class implementing calibration algorithm which accesses the Database Instance manually
-   * It provides a few member functions that show examples of how you *could* decide to update the
-   * Database instance and use the constants to construct your new ones. This is not the only way,
-   * or necessarily a good idea, just some examples.
+   * Test class implementing calibration algorithm
    */
-  class DBAccessCalibrationAlgorithm : public CalibrationAlgorithm {
+  class TestDBAccessAlgorithm : public CalibrationAlgorithm {
   public:
 
     /// Constructor set the prefix to TestCalibration
-    DBAccessCalibrationAlgorithm();
+    TestDBAccessAlgorithm();
 
     /// Destructor
-    virtual ~DBAccessCalibrationAlgorithm() {}
+    virtual ~TestDBAccessAlgorithm() {}
+    void setGeneratePayloads(const bool& value) {m_generatePayloads = value;}
+    bool getGeneratePayloads() const {return m_generatePayloads;}
+    void saveSameMeans();
 
   protected:
 
@@ -33,9 +35,10 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
-    void saveNewT0ForEachRunFromTTree(std::shared_ptr<TTree> ttree, StoreObjPtr<EventMetaData>& evtPtr);
-    void saveNewT0ForEachRunFromRunRange(StoreObjPtr<EventMetaData>& evtPtr);
-    void saveNewT0FromAverageT0(StoreObjPtr<EventMetaData>& evtPtr);
-
+    float getAverageDistanceFromAnswer();
+    void generateNewPayloads();
+    void reduceDistancesAndSave();
+    bool m_generatePayloads = true;
+    DBObjPtr<TestCalibMean> m_dbMean;
   };
 } // namespace Belle2

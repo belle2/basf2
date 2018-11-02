@@ -143,7 +143,8 @@ int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, i
         auto now = std::chrono::system_clock::now();
         timeout -= std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
       } else {
-        throw error;
+        // cannot handle, rethrow exception
+        throw;
       }
     }
   }

@@ -792,7 +792,7 @@ endloop:
             return -999;
           else
           {
-            if (std::isnan(var->function(particle->getDaughter(jDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
+            if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
               return std::numeric_limits<float>::quiet_NaN();
 
             double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
@@ -958,7 +958,7 @@ endloop:
             for (auto& index : daughterIndices)
             {
               if (index >= int(particle->getNDaughters())) {
-                return -999; break;
+                return -999;
               } else pSum += frame.getMomentum(particle->getDaughter(index));
             }
 

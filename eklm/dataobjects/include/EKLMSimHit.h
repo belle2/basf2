@@ -136,7 +136,7 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** The class title. */
+    /** Class version. */
     ClassDefOverride(Belle2::EKLMSimHit, 2);
 
   };

@@ -75,19 +75,19 @@ namespace Belle2 {
     Scalar convertPythonObject(const boost::python::object& pyObject, Scalar);
     /** Convert from Python to given type. */
     template<typename Key, typename Value>
-    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, std::map<Key, Value>);
+    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, const std::map<Key, Value>&);
     /** Convert from Python to given type. */
     template<typename Value>
-    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, std::vector<Value>);
+    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, const std::vector<Value>&);
     /** Convert from Python to given type. */
     template<typename... Types>
-    std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, std::tuple<Types...>);
+    std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, const std::tuple<Types...>&);
     /** Convert from Python to given type. */
     template<typename... Types>
-    boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject, boost::variant<Types...>);
+    boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject, const boost::variant<Types...>&);
     /** Convert from Python to the given boost::optional type */
     template<typename Type>
-    boost::optional<Type> convertPythonObject(const boost::python::object& pyObject, boost::optional<Type>);
+    boost::optional<Type> convertPythonObject(const boost::python::object& pyObject, const boost::optional<Type>&);
 
     template<typename Scalar>
     boost::python::object convertToPythonObject(const Scalar& value);
@@ -443,11 +443,10 @@ namespace Belle2 {
      * Reads a scalar type (int, double, string, bool) from a python object.
      *
      * @param pyObject Python object which stores the scalar type.
-     * @param dummy allows the compiler to infer the correct template.
      * @return Scalar type, which holds the value from the python object
      */
     template<typename Scalar>
-    Scalar convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) Scalar dummy)
+    Scalar convertPythonObject(const boost::python::object& pyObject, const Scalar)
     {
 
       Scalar tmpValue;
@@ -467,11 +466,10 @@ namespace Belle2 {
      * If the python object isn't a list, a std::vector with the given object as single entry is returned.
      *
      * @param pyObject Python object which stores the vector.
-     * @param dummy allows the compiler to infer the correct template.
      * @return Vector, which holds the vector from the python object
      */
     template<typename Value>
-    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) std::vector<Value> dummy)
+    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, const std::vector<Value>&)
     {
 
       std::vector<Value> tmpVector;
@@ -493,11 +491,10 @@ namespace Belle2 {
      * Reads std::map from a python object.
      *
      * @param pyObject Python object which stores the map.
-     * @param dummy allows the compiler to infer the correct template.
      * @return Map, which holds the map from the python object
      */
     template<typename Key, typename Value>
-    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) std::map<Key, Value> dummy)
+    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, const std::map<Key, Value>&)
     {
       std::map<Key, Value> tmpMap;
       const boost::python::dict& pyDict = static_cast<const boost::python::dict&>(pyObject);
@@ -547,11 +544,10 @@ namespace Belle2 {
      * Reads std::tuple from a python object.
      *
      * @param pyObject Python object which stores the map.
-     * @param dummy allows the compiler to infer the correct template.
      * @return std::tuple<Types...>, which holds the map from the python object
      */
     template<typename... Types>
-    std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) std::tuple<Types...> dummy)
+    std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, const std::tuple<Types...>&)
     {
       std::tuple<Types...> tmpTuple;
       const boost::python::tuple& pyTuple = static_cast<const boost::python::tuple&>(pyObject);
@@ -596,12 +592,10 @@ namespace Belle2 {
      * Reads boost::variant from a python object.
      *
      * @param pyObject Python object which stores the value.
-     * @param dummy allows the compiler to infer the correct template.
      * @return boost::variant<Types...>, which holds the value from the python object
      */
     template<typename... Types>
-    boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject,
-                                                 __attribute((unused)) boost::variant<Types...> dummy)
+    boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject, const boost::variant<Types...>&)
     {
       boost::variant<Types...> tmpVariant;
       SetVariant(tmpVariant, pyObject, SizeT<sizeof...(Types)>());
@@ -615,7 +609,7 @@ namespace Belle2 {
      *         it will be converted to the type of the boost optional
      */
     template<typename Type>
-    boost::optional<Type> convertPythonObject(const boost::python::object& pyObject, boost::optional<Type>)
+    boost::optional<Type> convertPythonObject(const boost::python::object& pyObject, const boost::optional<Type>&)
     {
       boost::optional<Type> tmpOptional = boost::none;
       if (!pyObject.is_none()) {

@@ -111,6 +111,8 @@ void ZMQTxInputModule::event()
     };
 
     m_zmqClient.poll(timeout, multicastAnswer, socketAnswer);
+    // false positive due to lambda capture ...
+    // cppcheck-suppress knownConditionTrueFalse
     if (terminate) {
       m_zmqClient.terminate();
       return;

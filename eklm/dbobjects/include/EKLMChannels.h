@@ -58,7 +58,7 @@ namespace Belle2 {
     /** Channel data. */
     std::map<uint16_t, EKLMChannelData> m_Channels;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMChannels, 1);
 
   };

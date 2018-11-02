@@ -664,11 +664,10 @@ namespace Belle2 {
       }
     }
 
-    double mean = 0.0;
     double chi2 = -1.0;
 
     if (m_good > 10) {
-      mean = sum1 / m_good;
+      double mean = sum1 / m_good;
       chi2 = (sum2 - m_good * mean * mean) / m_good / m_sigm2_exp;
     }
     return chi2;

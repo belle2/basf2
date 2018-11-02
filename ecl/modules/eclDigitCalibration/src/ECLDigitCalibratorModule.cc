@@ -260,6 +260,9 @@ void ECLDigitCalibratorModule::event()
     //Calibrating offline fit results
     ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
     aECLCalDigit->setTwoComponentChi2(-1);
+    aECLCalDigit->setTwoComponentSavedChi2(0, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(1, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(2, -1);
     aECLCalDigit->setTwoComponentTotalEnergy(-1);
     aECLCalDigit->setTwoComponentHadronEnergy(-1);
     aECLCalDigit->setTwoComponentDiodeEnergy(-1);
@@ -282,6 +285,7 @@ void ECLDigitCalibratorModule::event()
         aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
         aECLCalDigit->setTwoComponentDiodeEnergy(calibratedTwoComponentDiodeEnergy);
         aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
+        for (unsigned int a = 0; a < 3; a++)  aECLCalDigit->setTwoComponentSavedChi2(a, aECLDsp->getTwoComponentSavedChi2(a));
         aECLCalDigit->setTwoComponentFitType(twoComponentFitType);
 
       }

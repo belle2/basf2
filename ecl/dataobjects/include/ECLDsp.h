@@ -42,6 +42,9 @@ namespace Belle2 {
       m_TwoComponentTotalAmp = -1;  /**< Offline two component total amplitude */
       m_TwoComponentHadronAmp = -1; /**< Offline two component hadron amplitude */
       m_TwoComponentChi2 = -1;  /**< Offline two component chi2*/
+      m_TwoComponentSavedChi2[0] = -1;  /**< Offline two component chi2 FT=0*/
+      m_TwoComponentSavedChi2[1] = -1;  /**< Offline two component chi2 FT=1*/
+      m_TwoComponentSavedChi2[2] = -1;  /**< Offline two component chi2 FT=2*/
       m_TwoComponentTime = 1;  /**< Offline two component time */
       m_TwoComponentBaseline = 1;  /**< Offline two component baseline */
       m_IsData = false;  /**< Data = true MC = false */
@@ -100,6 +103,10 @@ namespace Belle2 {
     /*! Set two comp chi2
      */
     void setTwoComponentChi2(double input) {      m_TwoComponentChi2 = input; }
+
+    /*! Set two comp chi2 for a fit type
+     */
+    void setTwoComponentSavedChi2(unsigned int index, double input) {      m_TwoComponentSavedChi2[index] = input; }
 
     /*! Set two comp time
      */
@@ -161,6 +168,11 @@ namespace Belle2 {
      */
     double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
+    /*! get two comp chi2 for a fit type
+     * @return two comp chi2 for fit type
+     */
+    double getTwoComponentSavedChi2(unsigned int index) const { return m_TwoComponentSavedChi2[index]; }
+
     /*! get two comp time
      * @return two comp time
      */
@@ -210,6 +222,7 @@ namespace Belle2 {
     double m_TwoComponentHadronAmp;   /**< Two comp hadron amp */
     double m_TwoComponentDiodeAmp;   /**< Two comp diode amp */
     double m_TwoComponentChi2; /**< Two comp chi2 */
+    double m_TwoComponentSavedChi2[3]; /**< Two comp chi2 for each fit tried in reconstruction */
     double m_TwoComponentTime; /**< Two comp time*/
     double m_TwoComponentBaseline; /**< Two comp baseline*/
     double m_backgroundPhotonEnergy;  /**< Pile-up photon energy*/
@@ -220,7 +233,8 @@ namespace Belle2 {
     /*2 dspa array with variable length*/
     /*3 Add two component variables*/
     /*4 Add diode and pile-up photon offline fit hypothesis*/
-    ClassDef(ECLDsp, 4);
+    /*5 Added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried */
+    ClassDef(ECLDsp, 5);
 
   };
 } // end namespace Belle2

@@ -44,7 +44,10 @@ namespace Belle2 {
       m_TwoComponentTotalEnergy = 0; /**< Offline Two Component Total Energy*/
       m_TwoComponentHadronEnergy = 0; /**< Offline Two Component Hadron Energy*/
       m_TwoComponentDiodeEnergy = 0; /**< Offline Two Component Diode Energy*/
-      m_TwoComponentChi2 = 0; /**< Offline Two Component chi2*/
+      m_TwoComponentChi2 = -1; /**< Offline Two Component chi2*/
+      m_TwoComponentSavedChi2[0] = -1;  /**< Offline two component chi2 FT=0*/
+      m_TwoComponentSavedChi2[1] = -1;  /**< Offline two component chi2 FT=1*/
+      m_TwoComponentSavedChi2[2] = -1;  /**< Offline two component chi2 FT=2*/
       m_TwoComponentFitType = ECLDsp::poorChi2; /**< Offline Two Component fit type*/
     }
 
@@ -71,6 +74,10 @@ namespace Belle2 {
     /*! Set two component chi2
      */
     void setTwoComponentChi2(double chi) { m_TwoComponentChi2 = chi; }
+
+    /*! Set two comp chi2 for a fit type
+     */
+    void setTwoComponentSavedChi2(unsigned int index, double input) { m_TwoComponentSavedChi2[index] = input; }
 
     /*! Set two component fit type
      */
@@ -125,6 +132,11 @@ namespace Belle2 {
      * @return two componnent chi2
      */
     double getTwoComponentChi2() const { return m_TwoComponentChi2; }
+
+    /*! get two comp chi2 for a fit type
+     * @return two comp chi2 for fit type
+     */
+    double getTwoComponentSavedChi2(unsigned int index) const { return m_TwoComponentSavedChi2[index]; }
 
     /*! Get two componnent fit type
      * @return two componnent fit type
@@ -182,6 +194,7 @@ namespace Belle2 {
     double m_TwoComponentHadronEnergy; /**< Calibrated Hadron Component Energy */
     double m_TwoComponentDiodeEnergy; /**< Calibrated Diode Component Energy */
     double m_TwoComponentChi2; /**< Two Component chi2*/
+    double m_TwoComponentSavedChi2[3]; /**< Two comp chi2 for each fit tried in reconstruction */
     ECLDsp::TwoComponentFitType m_TwoComponentFitType;  /**< offline fit hypothesis.*/
 
     // 1: first version (TF)
@@ -189,7 +202,8 @@ namespace Belle2 {
     // 3: added status bits for failed fits (TF)
     // 4: added offline fit variables (SL)
     // 5: added diode and pile-up photon offline fit hypothesis (SL)
-    ClassDef(ECLCalDigit, 5); /**< ClassDef */
+    // 6: added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried (SL)
+    ClassDef(ECLCalDigit, 6); /**< ClassDef */
 
   };
 

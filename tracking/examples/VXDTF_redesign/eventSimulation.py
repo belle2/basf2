@@ -106,9 +106,9 @@ param_pGun = {
     'momentumGeneration': 'uniform',
     'momentumParams': [0.1, 4],
     'vertexGeneration': 'fixed',
-    'xVertexParams': [vertex_x, 0.0],            # in cm...
-    'yVertexParams': [vertex_y, 0.0],
-    'zVertexParams': [vertex_z, 0.0],
+    'xVertexParams': [vertex_x],            # in cm...
+    'yVertexParams': [vertex_y],
+    'zVertexParams': [vertex_z]
 }
 
 particlegun.param(param_pGun)

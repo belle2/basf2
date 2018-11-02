@@ -9,7 +9,11 @@ PyConfig.IgnoreCommandLineOptions = True
 import argparse
 from subprocess import check_call
 
-from git import Repo
+try:
+    from git import Repo
+except ImportError:
+    print("This script requires GitPython, please install it via `pip3 install --user GitPython")
+    sys.exit(1)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(usage="""Quickly compare multiple git revisions with the validation framework.

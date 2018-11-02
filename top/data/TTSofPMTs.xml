@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<TTSofPMTs descr="parameterized time transition spreads of different PMT types">
+
+  <TTSpar name="conventional">
+    <type>1</type>
+    <Gauss>
+      <fraction>0.7380</fraction> 
+      <mean unit="ps">0</mean>
+      <sigma unit="ps">35.38</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.2620</fraction> 
+      <mean unit="ps">127.3</mean>
+      <sigma unit="ps">147.4</sigma>
+    </Gauss>
+  </TTSpar>
+
+  <TTSpar name="ALD">
+    <type>2</type>
+    <Gauss>
+      <fraction>0.5465</fraction> 
+      <mean unit="ps">0</mean>
+      <sigma unit="ps">33.40</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.4535</fraction> 
+      <mean unit="ps">147.7</mean>
+      <sigma unit="ps">129.6</sigma>
+    </Gauss>
+  </TTSpar>
+
+  <TTSpar name="life extended ALD">
+    <type>3</type>
+    <Gauss>
+      <fraction>0.5551</fraction> 
+      <mean unit="ps">0</mean>
+      <sigma unit="ps">37.78</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.4449</fraction> 
+      <mean unit="ps">168.3</mean>
+      <sigma unit="ps">148.4</sigma>
+    </Gauss>
+  </TTSpar>
+
+</TTSofPMTs>

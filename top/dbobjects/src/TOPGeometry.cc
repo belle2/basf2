@@ -152,6 +152,10 @@ namespace Belle2 {
     cout << endl;
     m_nominalTTS.print();
     cout << endl;
+    for (const auto& tts : m_tts) {
+      tts.second.print("TTS distribution");
+      cout << endl;
+    }
     m_nominalTDC.print();
     cout << endl;
     m_wavelengthFilter.print();

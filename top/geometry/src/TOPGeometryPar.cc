@@ -758,6 +758,22 @@ namespace Belle2 {
       nominalTTS.normalize();
       geo->setNominalTTS(nominalTTS);
 
+      // PMT type dependent TTS
+
+      GearDir pmtTTSParams(content, "TTSofPMTs");
+      for (const GearDir& ttsPar : pmtTTSParams.getNodes("TTSpar")) {
+        int type = ttsPar.getInt("type");
+        TOPNominalTTS tts("TTS of " + ttsPar.getString("@name") + " PMT");
+        tts.setPMTType(type);
+        for (const GearDir& Gauss : ttsPar.getNodes("Gauss")) {
+          tts.appendGaussian(Gauss.getDouble("fraction"),
+                             Gauss.getTime("mean"),
+                             Gauss.getTime("sigma"));
+        }
+        tts.normalize();
+        geo->appendTTS(tts);
+      }
+
       // nominal TDC
 
       GearDir tdcParams(content, "TDC");

@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef KFITERROR_H
-#define KFITERROR_H
+#pragma once
 
 #include <stdio.h>
 
@@ -65,7 +64,8 @@ namespace Belle2 {
        * @param func function name in the file
        * @param code error code
        */
-      static void displayError(const char* file, const int line, const char* func, const enum ECode code) {
+      static void displayError(const char* file, const int line, const char* func, const enum ECode code)
+      {
         const char* str_error =
           code == kNoError                ? "No error" :
           code == kNotFittedYet           ? "Not fitted yet" :
@@ -89,5 +89,4 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif  /* KFITERROR_H */
 

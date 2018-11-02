@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLE4BODYTOOL_H
-#define NTUPLE4BODYTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TTree.h>
@@ -52,4 +51,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLE4BODYTOOL_H

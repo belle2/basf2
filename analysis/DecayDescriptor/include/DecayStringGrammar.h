@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYSTRINGGRAMMAR_H
-#define DECAYSTRINGGRAMMAR_H
+#pragma once
 #include <boost/spirit/include/qi.hpp>
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <analysis/DecayDescriptor/DecayStringDecay.h>
@@ -85,4 +84,3 @@ namespace Belle2 {
   boost::spirit::qi::rule<Iterator, DecayString(), boost::spirit::ascii::space_type> start;
   };
 }
-#endif // DECAYSTRINGGRAMMAR_H

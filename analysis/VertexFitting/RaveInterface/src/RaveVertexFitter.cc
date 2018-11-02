@@ -265,7 +265,6 @@ void RaveVertexFitter::updateDaughters()
   }
 
   std::vector < rave::Track > rTracks = m_raveVertices[0].tracks(); //< the original tracks
-  std::vector < rave::Track > rfTracks = m_raveVertices[0].refittedTracks(); //< the refitted tracks
 
   for (unsigned int i = 0; i < rTracks.size(); i++) {
     rave::Track rtrk =  m_raveVertices[0].refittedTrack(rTracks[i]);

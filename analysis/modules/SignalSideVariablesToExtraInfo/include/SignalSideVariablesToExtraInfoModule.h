@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIGNALSIDEVARIABLESTOEXTRAINFOMODULE_H
-#define SIGNALSIDEVARIABLESTOEXTRAINFOMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -62,4 +61,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* SIGNALSIDEVARIABLESTOEXTRAINFOMODULE_H */

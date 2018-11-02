@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEHELICITYTOOL_H
-#define NTUPLEHELICITYTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TTree.h>
@@ -47,4 +46,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLEHELICITYTOOL_H

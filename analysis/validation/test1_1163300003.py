@@ -25,7 +25,6 @@ from beamparameters import add_beamparameters
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-gb2_setuprel = "build-2017-09-08"
 
 # their names in the ntuple are human readable
 from variables import variables

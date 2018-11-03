@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
     FEI Hadronic B+ tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group

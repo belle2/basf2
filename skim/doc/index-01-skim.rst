@@ -61,14 +61,15 @@ Full event interpretation skims
 
 .. automodule:: skim.fei
     :members:
-
+    :undoc-members:
 
 Leptonic skims
 ~~~~~~~~~~~~~~
 
 .. automodule:: skim.leptonic
     :members:
-
+    :undoc-members:
+    
 Quarkonium skims
 ~~~~~~~~~~~~~~~~
 
@@ -86,6 +87,7 @@ Semileptonic skims
 
 .. automodule:: skim.semileptonic
     :members:
+    :undoc-members:
 
 Time-dependent CP-violation (TDCPV) analysis skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

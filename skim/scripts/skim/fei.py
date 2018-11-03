@@ -3,6 +3,7 @@
 
 """
 (Semi-)Leptonic Working Group Skims for missing energy modes that use the `FullEventInterpretation` (FEI) algorithm.
+ The fei training is: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
 """
 
 __authors__ = [
@@ -62,18 +63,19 @@ def B0hadronic(path):
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are**:
+
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks >= 4
-=======
+
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+
         Tag side B:
-        Mbc > 5.24
-        abs(deltaE) < 0.200
-        sigProb > 0.001
-"""
-    # B0:generic list from FEI must already exist in path
-    # Apply cuts
+
+        * Mbc > 5.24
+        * abs(deltaE) < 0.200
+        * sigProb > 0.001
+    """
     applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
 
     B0hadronicList = ['B0:generic']
@@ -86,50 +88,51 @@ def BplusHadronic(path):
     Skim LFN code: 11180200
     Physics channels: (All available FEI B+ Hadronic tags are
     reconstructed)
-    *B+ -> anti-D0 pi+
-    *B+ -> anti-D0 pi+ pi0
-    *B+ -> anti-D0 pi+ pi0 pi0
-    *B+ -> anti-D0 pi+ pi+ pi-
-    *B+ -> anti-D0 pi+ pi+ pi- pi0
-    *B+ -> anti-D0 D+
-    *B+ -> anti-D0 D+ KS0
-    *B+ -> anti-D0* D+ KS0
-    *B+ -> anti-D0 D+* KS0
-    *B+ -> anti-D0* D+* KS0
-    *B+ -> anti-D0 D0 K+
-    *B+ -> anti-D0* D0 K+
-    *B+ -> anti-D0 D*(2010)0 K+
-    *B+ -> anti-D0* D*(2010)0 K+
-    *B+ -> Ds+ anti-D0
-    *B+ -> anti-D0* pi+
-    *B+ -> anti-D0* pi+ pi0
-    *B+ -> anti-D0* pi+ pi0 pi0
-    *B+ -> anti-D0* pi+ pi+ pi-
-    *B+ -> anti-D0* pi+ pi+ pi- pi0
-    *B+ -> Ds+* anti-D0
-    *B+ -> Ds+ anti-D0*
-    *B+ -> anti-D0 K+
-    *B+ -> D- pi+ pi+
-    *B+ -> D- pi+ pi+ pi0
-    *B+ -> J/Psi K+
-    *B+ -> J/Psi K+ pi+ pi-
-    *B+ -> J/Psi K+ pi0
-    *B+ -> J/Psi KS0 pi+
+    * B+ -> anti-D0 pi+
+    * B+ -> anti-D0 pi+ pi0
+    * B+ -> anti-D0 pi+ pi0 pi0
+    * B+ -> anti-D0 pi+ pi+ pi-
+    * B+ -> anti-D0 pi+ pi+ pi- pi0
+    * B+ -> anti-D0 D+
+    * B+ -> anti-D0 D+ KS0
+    * B+ -> anti-D0* D+ KS0
+    * B+ -> anti-D0 D+* KS0
+    * B+ -> anti-D0* D+* KS0
+    * B+ -> anti-D0 D0 K+
+    * B+ -> anti-D0* D0 K+
+    * B+ -> anti-D0 D*(2010)0 K+
+    * B+ -> anti-D0* D*(2010)0 K+
+    * B+ -> Ds+ anti-D0
+    * B+ -> anti-D0* pi+
+    * B+ -> anti-D0* pi+ pi0
+    * B+ -> anti-D0* pi+ pi0 pi0
+    * B+ -> anti-D0* pi+ pi+ pi-
+    * B+ -> anti-D0* pi+ pi+ pi- pi0
+    * B+ -> Ds+* anti-D0
+    * B+ -> Ds+ anti-D0*
+    * B+ -> anti-D0 K+
+    * B+ -> D- pi+ pi+
+    * B+ -> D- pi+ pi+ pi0
+    * B+ -> J/Psi K+
+    * B+ -> J/Psi K+ pi+ pi-
+    * B+ -> J/Psi K+ pi0
+    * B+ -> J/Psi KS0 pi+
 
     This function applies cuts to the FEI-reconstructed tag side B, and
     the pre-cuts and FEI must be applied separately.
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are**:
+
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks >= 4
-=======
-        Tag side B:
-        Mbc > 5.24
-        abs(deltaE) < 0.200
-        sigProb > 0.001"""
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+        * Tag side B:
+        * Mbc > 5.24
+        * abs(deltaE) < 0.200
+        * sigProb > 0.001
+    """
 
     # B+:generic list from FEI must already exist in path
     # Apply cuts
@@ -183,15 +186,14 @@ def runFEIforB0Hadronic(path):
     Skim Liasons: S. Hollitt & H. Wakeling
 
     Cuts applied are::
-        Event precuts:
-        R2EventLevel < 0.4
-        nTracks >= 4
-=======
-        Tag side B:
-        Mbc > 5.24
-        abs(deltaE) < 0.200
-        sigProb > 0.001
-"""
+        * Event precuts:
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+        * Tag side B:
+        * Mbc > 5.24
+        * abs(deltaE) < 0.200
+        * sigProb > 0.001
+ """
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 
@@ -215,35 +217,35 @@ def runFEIforBplusHadronic(path):
     Skim LFN code: 11180200
     Physics channels: (All available FEI B+ Hadronic tags are
     reconstructed)
-    *B+ -> anti-D0 pi+
-    *B+ -> anti-D0 pi+ pi0
-    *B+ -> anti-D0 pi+ pi0 pi0
-    *B+ -> anti-D0 pi+ pi+ pi-
-    *B+ -> anti-D0 pi+ pi+ pi- pi0
-    *B+ -> anti-D0 D+
-    *B+ -> anti-D0 D+ KS0
-    *B+ -> anti-D0* D+ KS0
-    *B+ -> anti-D0 D+* KS0
-    *B+ -> anti-D0* D+* KS0
-    *B+ -> anti-D0 D0 K+
-    *B+ -> anti-D0* D0 K+
-    *B+ -> anti-D0 D*(2010)0 K+
-    *B+ -> anti-D0* D*(2010)0 K+
-    *B+ -> Ds+ anti-D0
-    *B+ -> anti-D0* pi+
-    *B+ -> anti-D0* pi+ pi0
-    *B+ -> anti-D0* pi+ pi0 pi0
-    *B+ -> anti-D0* pi+ pi+ pi-
-    *B+ -> anti-D0* pi+ pi+ pi- pi0
-    *B+ -> Ds+* anti-D0
-    *B+ -> Ds+ anti-D0*
-    *B+ -> anti-D0 K+
-    *B+ -> D- pi+ pi+
-    *B+ -> D- pi+ pi+ pi0
-    *B+ -> J/Psi K+
-    *B+ -> J/Psi K+ pi+ pi-
-    *B+ -> J/Psi K+ pi0
-    *B+ -> J/Psi KS0 pi+
+    * B+ -> anti-D0 pi+
+    * B+ -> anti-D0 pi+ pi0
+    * B+ -> anti-D0 pi+ pi0 pi0
+    * B+ -> anti-D0 pi+ pi+ pi-
+    * B+ -> anti-D0 pi+ pi+ pi- pi0
+    * B+ -> anti-D0 D+
+    * B+ -> anti-D0 D+ KS0
+    * B+ -> anti-D0* D+ KS0
+    * B+ -> anti-D0 D+* KS0
+    * B+ -> anti-D0* D+* KS0
+    * B+ -> anti-D0 D0 K+
+    * B+ -> anti-D0* D0 K+
+    * B+ -> anti-D0 D*(2010)0 K+
+    * B+ -> anti-D0* D*(2010)0 K+
+    * B+ -> Ds+ anti-D0
+    * B+ -> anti-D0* pi+
+    * B+ -> anti-D0* pi+ pi0
+    * B+ -> anti-D0* pi+ pi0 pi0
+    * B+ -> anti-D0* pi+ pi+ pi-
+    * B+ -> anti-D0* pi+ pi+ pi- pi0
+    * B+ -> Ds+* anti-D0
+    * B+ -> Ds+ anti-D0*
+    * B+ -> anti-D0 K+
+    * B+ -> D- pi+ pi+
+    * B+ -> D- pi+ pi+ pi0
+    * B+ -> J/Psi K+
+    * B+ -> J/Psi K+ pi+ pi-
+    * B+ -> J/Psi K+ pi0
+    * B+ -> J/Psi KS0 pi+
 
     FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
 
@@ -251,13 +253,13 @@ def runFEIforBplusHadronic(path):
 
     Cuts applied are::
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks >= 4
-=======
-        Tag side B:
-        Mbc > 5.24
-        abs(deltaE) < 0.200
-        sigProb > 0.001"""
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+        * Tag side B:
+        * Mbc > 5.24
+        * abs(deltaE) < 0.200
+        * sigProb > 0.001
+    """
 
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
@@ -315,14 +317,14 @@ def B0SLWithOneLep(path):
     Skim LFN code: 11180300
     Physics channels: (All available FEI B0 SL tags are reconstructed)
 
-    *B0 -> D- e+ nu
-    *B0 -> D- mu+ nu
-    *B0 -> D+* e+ nu
-    *B0 -> D+* mu+ nu
-    *B0 -> anti-D0 pi- e+ nu
-    *B0 -> anti-D0 pi- mu+ nu
-    *B0 -> anti-D0* pi- e+ nu
-    *B0 -> anti-D0* pi- mu+ nu
+    * B0 -> D- e+ nu
+    * B0 -> D- mu+ nu
+    * B0 -> D+* e+ nu
+    * B0 -> D+* mu+ nu
+    * B0 -> anti-D0 pi- e+ nu
+    * B0 -> anti-D0 pi- mu+ nu
+    * B0 -> anti-D0* pi- e+ nu
+    * B0 -> anti-D0* pi- mu+ nu
     In addition, all hadronic channels (listed in FEI hadronic skim are
     used, where one of the hadronic D mesons is replaced by a SL D meson.
 
@@ -332,19 +334,23 @@ def B0SLWithOneLep(path):
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are**:
+
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks >= 4
+
+        * R2EventLevel < 0.4
+        * nTracks >= 4
 
         Tag side B:
-        -5 < cosThetaBetweenParticleAndNominalB < 3
-        extraInfo(decayModeID) < 8 to remove semileptonic D channels
-        sigProb > 0.005 to give < 10% retention
+
+        * -5 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
+        * sigProb > 0.005 to give < 10% retention
 
         Signal side:
-        electron or muon from list 95eff
-        B Mbc > 0
+
+        * electron or muon from list 95eff
+        * B Mbc > 0
 """
     # Reconstruct tag side
     # Apply cuts
@@ -377,14 +383,14 @@ def BplusSLWithOneLep(path):
     Skim LFN code: 11180400
     Physics channels: (All available FEI Bplus SL tags are reconstructed)
 
-    *B+ -> anti-D0 e+ nu
-    *B+ -> anti-D0 mu+ nu
-    *B+ -> anti-D0* e+ nu
-    *B+ -> anti-D0* mu+ nu
-    *B+ -> D- pi+ e+ nu
-    *B+ -> D- pi+ mu+ nu
-    *B+ -> D+* pi+ e+ nu
-    *B+ -> D+* pi+ mu+ nu
+    * B+ -> anti-D0 e+ nu
+    * B+ -> anti-D0 mu+ nu
+    * B+ -> anti-D0* e+ nu
+    * B+ -> anti-D0* mu+ nu
+    * B+ -> D- pi+ e+ nu
+    * B+ -> D- pi+ mu+ nu
+    * B+ -> D+* pi+ e+ nu
+    * B+ -> D+* pi+ mu+ nu
     In addition, all hadronic channels (listed in FEI
     Bplus hadronic skim are used, where one of the hadronic
     D mesons is replaced by a SL D meson.
@@ -395,19 +401,20 @@ def BplusSLWithOneLep(path):
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
-    Event precuts:
-    R2EventLevel < 0.4
-    nTracks >= 4
+        Event precuts:
 
-    Tag side B:
-    -5 < cosThetaBetweenParticleAndNominalB < 3
-    extraInfo(decayModeID) < 8 to remove semileptonic D channels
-    sigProb > 0.009 to give < 10% retention
+        * R2EventLevel < 0.4
+        * nTracks > 4
 
-    Signal side:
-    electron or muon from list 95eff
-    B Mbc > 0
+        Tag side B:
+
+        * -5 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
+        * sigProb > 0.009 to give < 10% retention
+
+        Signal side:
+        * electron or muon from list 95eff
+        * B Mbc > 0
     """
 
     # Reconstruct tag side

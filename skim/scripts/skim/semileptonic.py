@@ -20,27 +20,31 @@ def SemileptonicList():
         "Racha Cheaib"
     ]
 
-    """(Semi-)Leptonic Working Group skim for semi-leptonic analysis.
-    To be used initially for for B semileptonic decays (B to D l v) (l= electron, muon)
-    Skim code: 11160200
+    """
+    Note:
+        * (Semi-)Leptonic Working Group skim for semi-leptonic analysis.
+        * To be used initially for for B semileptonic decays (B to D l v) (l= electron, muon)
+        * Skim code: 11160200
 
-    Modes Reconstructed:
-    *B+ -> D0 e+
-    *B+ -> D0 mu+
-    *B+ -> D*0 e+
-    *B+ -> D*0 mu+
-    *B0 ->  D+ e-
-    *B0 ->  D+ mu-
-    *B0 ->  D*+ e-
-    *B0 ->  D*+ mu-
+    **Decay Modes**:
+        *B+ -> D0 e+
+        *B+ -> D0 mu+
+        *B+ -> D*0 e+
+        *B+ -> D*0 mu+
+        *B0 ->  D+ e-
+        *B0 ->  D+ mu-
+        *B0 ->  D*+ e-
+        *B0 ->  D*+ mu-
 
-    Note: Uses D:all lists
+    Note:
+    Uses D:all lists
 
-    Cuts applied:
-    *lepton momentum > 0.35 GeV
-    *5.24 < B_Mbc < 5.29
-    *| deltaE | < 0.5
-    *nTracks > 4
+    **Cuts applied**:
+
+    * lepton momentum > 0.35 GeV
+    * 5.24 < B_Mbc < 5.29
+    * | deltaE | < 0.5
+    * nTracks > 4
 
     """
     cutAndCopyList('e-:SLB', 'e-:all', 'p>0.35', True)
@@ -76,20 +80,24 @@ def SemileptonicList():
 
 
 def PRList():
-    """ (Semi-)Leptonic Working Group skim for partial reconstruction analysis.
-    To be used initially for measuring B to D* l v using partial reconstruction.
-    Skim code: 11110100
+    """
+    Note:
+        * (Semi-)Leptonic Working Group skim for partial reconstruction analysis.
+        * To be used initially for measuring B to D* l v using partial reconstruction.
+        * Skim code: 11110100
 
-    Modes reconstructed:
-    *B0:L1 ->  pi-:PR1 e+:PR1
-    *B0:L2 ->  pi-:PR1 mu+:PR1
+    **Decay Modes**:
 
-    Cuts applied:
-    *electronID>0.5
-    *muonID>0.5
-    *lepton Momentum>1.5
-    *R2EventLevel<0.5
-    *nTracks>4
+    * B0:L1 ->  pi-:PR1 e+:PR1
+    * B0:L2 ->  pi-:PR1 mu+:PR1
+
+    **Cuts applied**:
+
+    * electronID>0.5
+    * muonID>0.5
+    * lepton Momentum>1.5
+    * R2EventLevel<0.5
+    * nTracks>4
     """
 
     __authors__ = [

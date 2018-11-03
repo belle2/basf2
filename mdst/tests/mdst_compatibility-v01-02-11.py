@@ -66,21 +66,8 @@ const_stable = [Belle2.Const.electron, Belle2.Const.muon, Belle2.Const.pion,
 mdst_dataobjects = [
     DataStorePrinter("EventMetaData", [
         "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
-        "getTime", "getParentLfn", "getGeneratedWeight",
+        "getProduction", "getTime", "getGeneratedWeight",  # getParentLfn: not printed in release-01-00-04
     ], array=False),
-    DataStorePrinter("TRGSummary", ["getTimTypeBits"], {
-        "getInputBits": range(10),
-        "getFtdlBits": range(10),
-        "getPsnmBits": range(10),
-    }, array=False),
-    DataStorePrinter("MCParticle", [
-        "getPDG", "getStatus", "getMass", "getCharge", "getEnergy", "hasValidVertex",
-        "getProductionTime", "getDecayTime", "getLifetime", "getVertex",
-        "getProductionVertex", "getMomentum", "get4Vector", "getDecayVertex",
-        "getFirstDaughter", "getLastDaughter", "getNDaughters", "getMother",
-        "getSecondaryPhysicsProcess", "getSeenInDetector",
-        "isVirtual", "isInitial"
-    ]),
     DataStorePrinter("Track", ["getNumberOfFittedHypotheses"], {
         "getTrackFitResult": const_stable,
         "getTrackFitResultWithClosestMass": const_stable,
@@ -91,33 +78,59 @@ mdst_dataobjects = [
     }),
     DataStorePrinter("TrackFitResult", [
         "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
-        "getCovariance6", "getChargeSign", "getPValue", "getD0", "getPhi0",
+        "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
         "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
-        "getTau", "getCov", "getCovariance5"
+        "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD"
     ]),
     DataStorePrinter("PIDLikelihood", ["getMostLikely"], {
-        "getLogL": const_stable,
         "isAvailable": PIDDetector_sets,
+        "getLogL": const_stable,
+        "getProbability": const_stable,
     }),
     DataStorePrinter("ECLCluster", [
-        "getEnergy", "getTheta", "getPhi", "getR", "getUncertaintyEnergy",
-        "getUncertaintyTheta", "getUncertaintyPhi", "getEnergyRaw", "getTime",
-        "getDeltaTime99", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
-        "getNumberOfCrystals", "getStatus", "getClusterPosition",
-        "getCovarianceMatrix3x3", "isTrack", "isNeutral", "getDeltaL",
-        "getE1oE9", "getAbsZernike40", "getAbsZernike51", "getZernikeMVA",
-        "getSecondMoment"
+        "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
+        "getHypothesisId", "getClusterId", "getMinTrkDistance", "getDeltaL",
+        "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
+        "getE9oE21",
+        "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
+        "getDeltaTime99", "getPhi", "getTheta", "getR", "getEnergy",
+        "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",
+        "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
+        "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",
     ], {
         "getRelationsWith": ["MCParticles"],
     }),
+    DataStorePrinter("EventLevelClusteringInfo", [
+        "getNECLCalDigitsOutOfTimeFWD", "getNECLCalDigitsOutOfTimeBarrel",
+        "getNECLCalDigitsOutOfTimeBWD", "getNECLCalDigitsOutOfTime",
+        "getNECLShowersRejectedFWD", "getNECLShowersRejectedBarrel",
+        "getNECLShowersRejectedBWD", "getNECLShowersRejected"
+    ], array=False),
     DataStorePrinter("KLMCluster", [
-        "getTime", "getLayers", "getInnermostLayer",  # "getGlobalPosition", skipped because of strange return class
-        "getClusterPosition", "getPosition", "getAssociatedEclClusterFlag",
-        "getAssociatedTrackFlag",
-        # incompatibilities: "getMomentum", "getErrorMatrix"
+        "getTime", "getLayers", "getInnermostLayer",
+        "getClusterPosition", "getPosition", "getMomentumMag", "getEnergy",
+        "getMomentum", "getError4x4", "getError7x7",
+        "getAssociatedEclClusterFlag", "getAssociatedTrackFlag",
     ], {
-        "getRelationsWith": ["ECLClusters"],
+        "getRelationsWith": ["MCParticles"],
     }),
+    DataStorePrinter("TRGSummary", ["getTimType"], {
+        "getTRGSummary": range(10),
+        "getPreScale": [[int(i / 32), i % 32] for i in list(range(320))],
+        "getInputBits": range(10),
+        "getFtdlBits": range(10),
+        "getPsnmBits": range(10),
+    }, array=False),
+    DataStorePrinter("SoftwareTriggerResult", ["getResults"], array=False),
+    DataStorePrinter("MCParticle", [
+        "getPDG", "getStatus", "getMass", "getCharge", "getEnergy", "hasValidVertex",
+        "getProductionTime", "getDecayTime", "getLifetime", "getVertex",
+        "getProductionVertex", "getMomentum", "get4Vector", "getDecayVertex",
+        "getIndex", "getArrayIndex",
+        "getFirstDaughter", "getLastDaughter", "getDaughters", "getNDaughters", "getMother",
+        "getSecondaryPhysicsProcess", "getSeenInDetector",
+        "isVirtual", "isInitial", "isPrimaryParticle"
+    ]),
 ]
 
 
@@ -130,7 +143,7 @@ def print_file(filename):
     main.add_module("RootInput", inputFileName=mdst_file, logLevel=LogLevel.WARNING)
     main.add_module("EventInfoPrinter")
     main.add_module(PrintObjectsModule(mdst_dataobjects))
-    process(main, 6)
+    process(main, 4)
 
 
 if __name__ == "__main__":
@@ -144,4 +157,4 @@ if __name__ == "__main__":
     Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     set_log_level(LogLevel.INFO)
     # now run the test
-    print_file("mdst/tests/mdst-v00-05-02.root")
+    print_file("mdst/tests/mdst-v01-02-11.root")

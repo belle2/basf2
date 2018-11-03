@@ -50,7 +50,7 @@ namespace Belle2 {
       void outputT0FileName(std::string t0_out_name) {m_outputT0FileName.assign(t0_out_name);}
 
       /// Set name for histogram output
-      void setHistFileName(std::string name) {m_histName = "histTW_" + name + ".root";}
+      void setHistFileName(const std::string& name) {m_histName = "histTW_" + name + ".root";}
 
       /// Set time walk mode
       void setMode(unsigned short mode)
@@ -111,7 +111,7 @@ namespace Belle2 {
       bool m_textOutput = false;                     /**< output text file if true */
       unsigned short m_twParamMode = 1;              /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
       unsigned short m_nTwParams = 2;                /**< No. of tw parameters. for new database*/
-      DBObjPtr<CDCGeometry> m_cdcGeo;                /** Geometry of CDC */
+      DBObjPtr<CDCGeometry> m_cdcGeo;                /**< Geometry of CDC */
     };
   }
 }

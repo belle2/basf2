@@ -220,9 +220,8 @@ void TimeWalkCalibrationAlgorithm::storeHist()
 CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::checkConvergence()
 {
   TH1F* hDtw = new TH1F("hDtw", "", 100, -1, 1);
-  float dtw;
   for (int ib = 0; ib < 300; ++ib) {
-    dtw = (m_tw_new[ib][0] - m_tw_old[ib][0]) / m_tw_old[ib][0];
+    float dtw = (m_tw_new[ib][0] - m_tw_old[ib][0]) / m_tw_old[ib][0];
     if (std::isnan(dtw) == 0) {
       //      std::cout << dtw << " " << m_tw_new[ib][0] << " " << m_tw_old[ib][0] << std::endl;
       hDtw->Fill(dtw);

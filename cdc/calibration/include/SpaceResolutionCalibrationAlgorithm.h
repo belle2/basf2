@@ -63,7 +63,7 @@ namespace Belle2 {
       void setOutputFileName(std::string outputname) {m_outputFileName.assign(outputname);}
 
       /// Set name for histogram output
-      void setHistFileName(std::string name) {m_histName = "histSigma_" + name + ".root";}
+      void setHistFileName(const std::string& name) {m_histName = "histSigma_" + name + ".root";}
 
 
     protected:
@@ -116,7 +116,7 @@ namespace Belle2 {
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputFileName = "sigma_new.dat"; /**< Output sigma filename*/
       std::string m_histName = "histSigma.root"; /**< root file name */
-      DBObjPtr<CDCGeometry> m_cdcGeo; /** Geometry of CDC */
+      DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
     };
   }
 }

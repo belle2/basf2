@@ -45,7 +45,7 @@ namespace Belle2 {
       void setOutputFileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
 
       /// Set name for histogram output
-      void setHistFileName(std::string name) {m_histName = "histT0_" + name + ".root";}
+      void setHistFileName(const std::string& name) {m_histName = "histT0_" + name + ".root";}
 
     protected:
       /// Run algo on data
@@ -74,7 +74,7 @@ namespace Belle2 {
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
       std::string m_histName = "histT0.root"; /**< root file name */
-      DBObjPtr<CDCGeometry> m_cdcGeo; /** Geometry of CDC */
+      DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
     };
   }// name space CDC
 } // namespace Belle2

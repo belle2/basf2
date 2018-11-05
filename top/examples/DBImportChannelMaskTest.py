@@ -10,9 +10,10 @@ from basf2 import *
 import ROOT
 from ROOT.Belle2 import TOPDatabaseImporter
 
-# use_local_database()
+# define local database with write access
 use_local_database("localDB/localDB.txt", "localDB", False)
 
+# create path
 main = create_path()
 
 # Event info setter - execute single event
@@ -24,7 +25,9 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
+# Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
@@ -33,5 +36,5 @@ process(main)
 
 # and then run the importer (note: input file is not there - must change the path!)
 dbImporter = TOPDatabaseImporter()
-dbImporter.generateFakeChannelMask(0.0, 0.0)
+dbImporter.generateFakeChannelMask(0.0, 0.0, 0, 0, 0, -1)
 # dbImporter.generateFakeChannelMask(0.1, 0.2) # change these vaulus to increase the fractions of dead/noisy channels

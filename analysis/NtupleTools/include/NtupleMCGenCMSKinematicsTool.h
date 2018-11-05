@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEMCGENCMSKINEMATICSTOOL_H
-#define NTUPLEMCGENCMSKINEMATICSTOOL_H
+#pragma once
 #include <boost/function.hpp>
 #include <analysis/dataobjects/Particle.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -33,14 +32,13 @@ namespace Belle2 {
     /** Phi (center of mass frame) */
     float* m_MCGenCMSPhi;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
   public:
     /** Constructor. */
     NtupleMCGenCMSKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
           decaydescriptor, strOptions) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 } // namepspace Belle2
 
-#endif // NTUPLEMCGENCMSKINEMATICSTOOL_H

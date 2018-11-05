@@ -43,10 +43,10 @@ namespace Belle2 {
     VRMLWriterModule();
 
     //! Initialize at the start of a job
-    void initialize();
+    void initialize() override;
 
     //! Called for each event: this runs the VRML writer only for the first event
-    void event();
+    void event() override;
 
   private:
 

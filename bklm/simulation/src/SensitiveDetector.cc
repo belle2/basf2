@@ -111,7 +111,9 @@ namespace Belle2 {
         const G4VTouchable* hist = preStep->GetTouchable();
         int depth = hist->GetHistoryDepth();
         if (depth < DEPTH_PLANE) {
-          B2WARNING("Touchable History depth = " << depth << " should be at least " << DEPTH_PLANE);
+          B2WARNING("BKLM SensitiveDetector::step(): "
+                    << LogVar("Touchable HistoryDepth", depth)
+                    << LogVar(" should be at least", DEPTH_PLANE));
           return false;
         }
         int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);

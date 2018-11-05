@@ -25,31 +25,31 @@ namespace TreeFitter {
     virtual ~RecoParticle() {};
 
     /** init particle without mother */
-    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** dimension of the constraint */
     virtual int dimM() const = 0;
 
     /** name */
-    virtual std::string parname(int index) const;
+    virtual std::string parname(int index) const override;
 
     /** this here sets the size in the state vector
      * we are only interested in the momenta of photons and tracks
      * as the postion were the track ends or the cluster is, is
      * not relevant for physics  */
-    virtual int dim() const { return 3; }
+    virtual int dim() const override { return 3; }
 
     /** get momentum index */
-    virtual int momIndex() const { return index(); }
+    virtual int momIndex() const override { return index(); }
 
     /** has an energy in the statevector? */
-    virtual bool hasEnergy() const { return false; }
+    virtual bool hasEnergy() const override { return false; }
 
     /** abstract projection */
     virtual ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const = 0;
 
     /** abstract abstract projection */
-    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
+    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const override;
 
   };
 

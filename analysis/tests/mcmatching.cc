@@ -122,12 +122,12 @@ namespace {
 
     /** Helper for constructing Particles. */
     struct ReconstructedDecay {
-      ReconstructedDecay(int pdg, std::vector<ReconstructedDecay> daughters = std::vector<ReconstructedDecay>(),
+      ReconstructedDecay(int pdg, const std::vector<ReconstructedDecay>& daughters = std::vector<ReconstructedDecay>(),
                          EBehavior behavior = c_Default):
         m_pdg(pdg), m_daughterDecays(daughters), m_behavior(behavior), m_optMcPart(nullptr), m_optDecay(nullptr) { }
-      ReconstructedDecay(int pdg, std::vector<ReconstructedDecay> daughters, EBehavior behavior, MCParticle* optMcPart):
+      ReconstructedDecay(int pdg, const std::vector<ReconstructedDecay>& daughters, EBehavior behavior, MCParticle* optMcPart):
         m_pdg(pdg), m_daughterDecays(daughters), m_behavior(behavior), m_optMcPart(optMcPart), m_optDecay(nullptr) { }
-      ReconstructedDecay(int pdg, std::vector<ReconstructedDecay> daughters, EBehavior behavior, Decay* optDecay):
+      ReconstructedDecay(int pdg, const std::vector<ReconstructedDecay>& daughters, EBehavior behavior, Decay* optDecay):
         m_pdg(pdg), m_daughterDecays(daughters), m_behavior(behavior), m_optMcPart(nullptr), m_optDecay(optDecay) { }
       int m_pdg; /**< PDG code of this particle. */
       vector<ReconstructedDecay> m_daughterDecays; /**< decay products. */

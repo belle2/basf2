@@ -50,19 +50,19 @@ namespace Belle2 {
     virtual ~ECLLocalMaximumFinderModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate (close ROOT files here if you have opened any). */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Store array: MCParticle. */
     StoreArray<MCParticle> m_mcParticles;

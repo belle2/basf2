@@ -240,13 +240,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "PMT array geometry parameters") const;
+    void print(const std::string& title = "PMT array geometry parameters") const override;
 
   private:
 
@@ -261,7 +261,7 @@ namespace Belle2 {
     float m_airGap = 0; /**< air gap thickness for decoupled PMT's */
     std::vector<unsigned> m_decoupledPMTs; /**< ID's of decoupled PMT's */
 
-    ClassDef(TOPGeoPMTArray, 2); /**< ClassDef */
+    ClassDefOverride(TOPGeoPMTArray, 2); /**< ClassDef */
 
   };
 

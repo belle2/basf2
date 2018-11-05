@@ -16,6 +16,7 @@
 
 #include <TClass.h>
 #include <TList.h>
+#include <TVirtualStreamerInfo.h>
 
 using namespace std;
 using namespace Belle2;
@@ -169,7 +170,7 @@ void SeqRootOutputModule::getStreamerInfos()
       TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
       B2INFO("Recording StreamerInfo : durability " << durability << " : Class Name " << entryClass->GetName());
       if (!minilist) minilist  =  new TList();
-      minilist->Add((TObject*)vinfo);
+      minilist->Add(vinfo);
     }
   }
 

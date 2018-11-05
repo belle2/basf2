@@ -82,8 +82,9 @@ void EKLMUnpackerModule::event()
     printf("  w1   w2   w3   w4 e la s p st\n");
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
     if (m_RawKLMs[i]->GetNumEvents() != 1) {
-      B2ERROR("RawKLM with index " << i << " has " <<
-              m_RawKLMs[i]->GetNumEvents() << " entries (should be 1). ");
+      B2ERROR("RawKLM a wrong number of entries (should be 1)."
+              << LogVar("RawKLM index", i)
+              << LogVar("Number of entries", m_RawKLMs[i]->GetNumEvents()));
       continue;
     }
     /*
@@ -104,7 +105,8 @@ void EKLMUnpackerModule::event()
         int numHits = numDetNwords / hitLength;
         lane.setDataConcentrator(finesse_num);
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
-          B2ERROR("Incorrect number of data words: " << numDetNwords);
+          B2ERROR("Incorrect number of data words."
+                  << LogVar("Number of data words", numDetNwords));
           continue;
         }
         if (m_CheckCalibration) {
@@ -112,8 +114,8 @@ void EKLMUnpackerModule::event()
           std::map<int, int>::iterator it;
           uint16_t blockData[15];
           if (numHits % 75 != 0) {
-            B2ERROR("The number of hits in the calibration mode (" <<
-                    numHits << ") is not a multiple of 75.");
+            B2ERROR("The number of hits in the calibration mode is not a "
+                    "multiple of 75." << LogVar("Number of hits", numHits));
           } else {
             nBlocks = numHits / 15;
             for (i1 = 0; i1 < nBlocks; i1++) {
@@ -130,22 +132,21 @@ void EKLMUnpackerModule::event()
               }
               if (blockLanes.size() != 1) {
                 char buf[1024];
-                std::string errorMessage;
-                errorMessage = "Corrupted data block found. Lane numbers:\n";
+                std::string errorMessage1, errorMessage2;
                 for (it = blockLanes.begin(); it != blockLanes.end(); ++it) {
-                  errorMessage += (std::string("Lane ") +
-                                   std::to_string(it->first) + ": " +
-                                   std::to_string(it->second) + " time(s).\n");
+                  errorMessage1 += (std::string("Lane ") +
+                                    std::to_string(it->first) + ": " +
+                                    std::to_string(it->second) + " time(s).\n");
                 }
-                errorMessage += "All first data words:\n";
                 for (i2 = 0; i2 < 15; i2++) {
                   snprintf(buf, 1024, "%04x", blockData[i2]);
-                  errorMessage += buf;
-                  if (i2 < 15)
-                    errorMessage += " ";
+                  errorMessage2 += buf;
+                  if (i2 < 14)
+                    errorMessage2 += " ";
                 }
-                errorMessage += "\n";
-                B2ERROR(errorMessage);
+                B2ERROR("Corrupted data block found."
+                        << LogVar("Lane numbers", errorMessage1)
+                        << LogVar("All first data words", errorMessage2));
               }
             }
           }
@@ -164,8 +165,11 @@ void EKLMUnpackerModule::event()
            */
           correctHit = m_ElementNumbers->checkStrip(stripFirmware, false);
           if (!correctHit) {
-            if (!(m_IgnoreWrongHits || (stripFirmware == 0 && m_IgnoreStrip0)))
-              B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+            if (!(m_IgnoreWrongHits ||
+                  (stripFirmware == 0 && m_IgnoreStrip0))) {
+              B2ERROR("Incorrect strip number in raw data."
+                      << LogVar("Strip number", strip));
+            }
             if (!m_WriteWrongHits)
               continue;
             strip = stripFirmware;
@@ -185,11 +189,12 @@ void EKLMUnpackerModule::event()
           uint16_t charge = dataWords[3] & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
           if (sectorGlobal == NULL) {
-            if (!m_IgnoreWrongHits)
-              B2ERROR("Lane with copper = " << lane.getCopper() <<
-                      ", data concentrator = " << lane.getDataConcentrator() <<
-                      ", lane = " << lane.getLane() << " does not exist in the "
-                      "EKLM electronics map.");
+            if (!m_IgnoreWrongHits) {
+              B2ERROR("Lane does not exist in the EKLM electronics map."
+                      << LogVar("Copper", lane.getCopper())
+                      << LogVar("Data concentrator", lane.getDataConcentrator())
+                      << LogVar("Lane", lane.getLane()));
+            }
             if (!m_WriteWrongHits)
               continue;
             endcap = 0;

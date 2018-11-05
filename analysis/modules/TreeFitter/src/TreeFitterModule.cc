@@ -30,7 +30,7 @@ using namespace Belle2;
 
 REG_MODULE(TreeFitter)
 
-TreeFitterModule::TreeFitterModule() : Module()
+TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_nCandidatesAfter(-1)
 {
   setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain. Can also be used to just fit a single vertex.");
   addParam("particleList", m_particleList, "Input mother of the decay tree to fit. For example 'B0:myB0particleList'.");

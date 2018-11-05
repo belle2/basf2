@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEEVENTKINEMATICSTOOL_H
-#define NTUPLEEVENTKINEMATICSTOOL_H
+#pragma once
 
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
@@ -36,7 +35,7 @@ namespace Belle2 {
     float m_fTotalPhotonsEnergy;     /**< Total energy of the photons in the event in lab system  */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
     /** delete 'new's */
     void deallocateMemory();
   public:
@@ -45,9 +44,8 @@ namespace Belle2 {
     /** Destructor. */
     ~NtupleEventKinematicsTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLETHRUSTANDCO_H

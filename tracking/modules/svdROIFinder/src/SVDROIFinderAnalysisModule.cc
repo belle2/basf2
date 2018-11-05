@@ -44,9 +44,6 @@ SVDROIFinderAnalysisModule::SVDROIFinderAnalysisModule() : Module()
   , m_rootFileName("")
   , m_writeToRoot(false)
   , m_rootEvent(-1)
-  //svd sensors
-  , m_nSensorsL3(0)
-  , m_nSensorsL4(0)
   //efficiency graphs
   , m_gEff2(NULL)
   , m_gEff(NULL)
@@ -372,37 +369,6 @@ void SVDROIFinderAnalysisModule::initialize()
 void SVDROIFinderAnalysisModule::beginRun()
 {
   m_rootEvent = 0;
-
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-
-  std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
-  std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
-
-  while ((itSvdLayers != svdLayers.end()) && (itSvdLayers->getLayerNumber() != 7)) {
-
-    std::set<Belle2::VxdID> svdLadders = aGeometry.getLadders(*itSvdLayers);
-    std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();
-
-    while (itSvdLadders != svdLadders.end()) {
-
-      std::set<Belle2::VxdID> svdSensors = aGeometry.getSensors(*itSvdLadders);
-      std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
-
-      while (itSvdSensors != svdSensors.end()) {
-
-        if (itSvdLadders->getLayerNumber() == 3)
-          m_nSensorsL3++;
-        if (itSvdLadders->getLayerNumber() == 4)
-          m_nSensorsL4++;
-
-        ++itSvdSensors;
-      }
-      ++itSvdLadders;
-    }
-    ++itSvdLayers;
-  }
-
-
 }
 
 

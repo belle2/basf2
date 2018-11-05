@@ -30,11 +30,11 @@ namespace Belle2 {
     virtual ~svdDumpModule();
 
     //! module functions
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void endRun();
-    virtual void event();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void endRun() override;
+    virtual void event() override;
+    virtual void terminate() override;
 
   private:
     StoreArray<RawSVD> m_rawSVD; /**< Array for RawSVD */

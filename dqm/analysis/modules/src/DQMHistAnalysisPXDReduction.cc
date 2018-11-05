@@ -123,8 +123,6 @@ void DQMHistAnalysisPXDReductionModule::event()
   }
   m_cReduction->cd();
 
-  double data = 0; // what do we want to return?
-
   // not enough Entries
   if (!enough) {
     m_cReduction->Pad()->SetFillColor(6);// Magenta
@@ -149,6 +147,8 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
+  double data = 0; // what do we want to return?
+
   SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif

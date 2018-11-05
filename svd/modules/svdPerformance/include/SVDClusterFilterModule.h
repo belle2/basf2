@@ -37,19 +37,19 @@ namespace Belle2 {
     virtual ~SVDClusterFilterModule();
 
     /** initializes the module */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** processes the event */
-    virtual void event();
+    virtual void event() override;
 
     /** end the run */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminates the module */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** init the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
   private:
 

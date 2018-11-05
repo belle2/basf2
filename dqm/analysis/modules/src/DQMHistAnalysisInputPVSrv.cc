@@ -27,50 +27,48 @@ REG_MODULE(DQMHistAnalysisInputPVSrv)
 //-----------------------------------------------------------------
 
 #ifdef _BELLE2_EPICS
-static void printChidInfo(chid chid, char* message)
+static void printChidInfo(chid ichid, const char* message)
 {
-  printf("\n%s\n", message);
-  printf("pv: %s  type(%d) nelements(%ld) host(%s)",
-         ca_name(chid), ca_field_type(chid), ca_element_count(chid),
-         ca_host_name(chid));
-  printf(" read(%d) write(%d) state(%d)\n",
-         ca_read_access(chid), ca_write_access(chid), ca_state(chid));
+  B2DEBUG(20, message);
+  B2DEBUG(20, "pv: " << ca_name(ichid) << " type(" << ca_field_type(ichid) << ") nelements(" << ca_element_count(
+            ichid) << ") host(" << ca_host_name(ichid)
+          << ") read(" << ca_read_access(ichid) << ") write(" << ca_write_access(ichid) << ") state(" << ca_state(ichid) << ")");
 }
 
 static void exceptionCallback(struct exception_handler_args args)
 {
-  chid  chid = args.chid;
+  chid  ichid = args.chid;
   long  stat = args.stat; /* Channel access status code*/
   const char*  channel;
-  static char* noname = "unknown";
+  const char* noname = "unknown";
 
-  channel = (chid ? ca_name(chid) : noname);
+  channel = (ichid ? ca_name(ichid) : noname);
 
 
-  if (chid) printChidInfo(chid, "exceptionCallback");
+  if (ichid) printChidInfo(ichid, "exceptionCallback");
   printf("exceptionCallback stat %s channel %s\n", ca_message(stat), channel);
 }
 
 static void connectionCallback(struct connection_handler_args args)
 {
-  chid  chid = args.chid;
+  chid  ichid = args.chid;
 
-//     printChidInfo(chid,"connectionCallback");
+  printChidInfo(ichid, "connectionCallback");
 }
 
 static void accessRightsCallback(struct access_rights_handler_args args)
 {
-  chid  chid = args.chid;
+  chid  ichid = args.chid;
 
-//     printChidInfo(chid,"accessRightsCallback");
+  printChidInfo(ichid, "accessRightsCallback");
 }
 static void eventCallback(struct event_handler_args eha)
 {
-  chid  chid = eha.chid;
+  chid  ichid = eha.chid;
   MYNODE* n = (MYNODE*)eha.usr;
 
   if (eha.status != ECA_NORMAL) {
-//       printChidInfo(chid,"eventCallback");
+    printChidInfo(ichid, "eventCallback");
   } else {
 //       char *pdata = (char *)eha.dbr;
 //       printf("Event Callback: %s = %s (%d,%d)\n",ca_name(eha.chid),pdata,(int)eha.type,(int)eha.count);
@@ -97,8 +95,6 @@ DQMHistAnalysisInputPVSrvModule::~DQMHistAnalysisInputPVSrvModule() { }
 
 void DQMHistAnalysisInputPVSrvModule::initialize()
 {
-  m_expno = m_runno = 0;
-  m_count = 0;
   m_eventMetaDataPtr.registerInDataStore();
   //if (m_server) m_serv = new THttpServer("http:8082");
 
@@ -144,7 +140,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
 
       Int_t x;
       Double_t xmin, xmax;
-      strncpy(n->name, it.at(0).c_str(), MAX_PV_NAME_LEN);
+      strncpy(n->name, it.at(0).c_str(), MAX_PV_NAME_LEN - 1);
       istringstream is(it.at(3));
       is >> x;
       is >> xmin;
@@ -157,10 +153,10 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
       } else {
         Int_t y;
         Double_t ymin, ymax;
-        istringstream is(it.at(4));
-        is >> y;
-        is >> ymin;
-        is >> ymax;
+        istringstream iss(it.at(4));
+        iss >> y;
+        iss >> ymin;
+        iss >> ymax;
         n->histo = (TH1*)new TH2F(tok, it.at(2).c_str(), x, xmin, xmax, y, ymin, ymax);
         n->binx = x;
         n->biny = y;

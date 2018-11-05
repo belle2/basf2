@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEMOMENTUMUNCERTAINTYTOOL_H
-#define NTUPLEMOMENTUMUNCERTAINTYTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -26,14 +25,13 @@ namespace Belle2 {
     /** Uncertainty of the momentum in the lab system (sigma_px sigma_py sigma_pz sigma_e). */
     float** m_fErrP4;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
   public:
     /** Constuctor. */
     NtupleMomentumUncertaintyTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLEMOMENTUMUNCERTAINTYTOOL_H

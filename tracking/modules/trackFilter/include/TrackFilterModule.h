@@ -35,13 +35,13 @@ namespace Belle2 {
 
 
     /** processes the event */
-    virtual void event();
+    virtual void event() override;
 
     /** terminates the module */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** init the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     static double m_min_d0; /**< d0 miminum value*/
     static double m_max_d0; /**< d0 maximum value*/

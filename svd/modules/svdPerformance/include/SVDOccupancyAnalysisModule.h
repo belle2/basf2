@@ -49,11 +49,11 @@ namespace Belle2 {
     SVDOccupancyAnalysisModule();
 
     virtual ~SVDOccupancyAnalysisModule();
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */

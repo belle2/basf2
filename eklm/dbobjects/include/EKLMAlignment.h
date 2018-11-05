@@ -99,7 +99,7 @@ namespace Belle2 {
     /** Segment alignment. */
     std::map<uint16_t, EKLMAlignmentData> m_SegmentAlignment;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMAlignment, 2);
 
   };

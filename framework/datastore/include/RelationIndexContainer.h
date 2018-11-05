@@ -130,7 +130,7 @@ namespace Belle2 {
     void rebuild(bool force = false);
 
     /** Clear the index (at the end of an event) */
-    virtual void clear() { m_index.clear(); }
+    virtual void clear() override { m_index.clear(); }
 
     /** Instance of the index. */
     ElementIndex m_index;

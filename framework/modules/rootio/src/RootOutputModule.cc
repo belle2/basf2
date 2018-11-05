@@ -219,6 +219,12 @@ void RootOutputModule::openFile()
         }
       }
 
+      // Warn for anything other than FileMetaData and ProcessStatistics ...
+      if(durability == DataStore::c_Persistent and m_outputSplitSize and m_fileIndex==0 and
+         (branchName != "FileMetaData" and branchName != "ProcessStatistics")) {
+        B2WARNING("Persistent branches might not be stored as expected when splitting the output by size" << LogVar("branch", branchName));
+      }
+
       TClass* entryClass = iter->second.objClass;
 
       //I want to do this in the input module, but I apparently I cannot disable reading those branches.

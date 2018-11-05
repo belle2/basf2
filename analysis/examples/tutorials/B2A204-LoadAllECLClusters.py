@@ -12,7 +12,7 @@
 #
 ################################################################################
 
-from basf2 import *
+import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import analysis_main
@@ -23,7 +23,7 @@ from modularAnalysis import variablesToNtuple
 from variables import variables
 
 # create path
-mypath = create_path()
+mypath = b2.create_path()
 
 # load input ROOT file (overwrite using -i)
 inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx0.root', path=mypath)
@@ -70,7 +70,7 @@ vars = ['combinationID',
 variablesToNtuple('vpho:bhabha', vars, filename='bhabha.root', path=mypath)
 
 # Process the events
-process(mypath)
+b2.process(mypath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

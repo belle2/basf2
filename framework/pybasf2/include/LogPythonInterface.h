@@ -153,6 +153,16 @@ namespace Belle2 {
     void enableErrorSummary(bool on);
 
     /**
+     * Set flag if logging should be done via python `sys.stdout`
+     */
+    void setPythonLoggingEnabled(bool enabled) const;
+
+    /**
+     * Get flag if logging should be done via python `sys.stdout`
+     */
+    bool getPythonLoggingEnabled() const;
+
+    /**
      * Produce debug message
      *
      * @param args positional arguments, concatenated to form message

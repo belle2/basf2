@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import ROOT
 from ROOT import Belle2
 from basf2 import Module
 
 
 class DataStorePrinter(object):
     """
-    Class to print contents of a StroeObjPtr or StoreArray.
+    Class to print contents of a StoreObjPtr or StoreArray.
 
     This class is inteded to print the contents of dataobjects to the standard
     output to monitor changes to the contents among versions.
@@ -80,6 +79,7 @@ class DataStorePrinter(object):
             display (str or None): display string to use when printing member call
                 info instead of function name and arguments
         """
+        import bisect
         bisect.insort(self.object_members, (name, arguments, callback, display))
         # return self for method chaining
         return self
@@ -122,7 +122,7 @@ class DataStorePrinter(object):
                 print("  %s(%s): " % (name, ",".join(map(str, args))), end="")
             # if a callback is set the callback is used to print the result
             if callback is not None:
-                sys.stdout.flush()
+                print("", end="", flush=True)
                 callback(name, args, result)
             # otherwise use default function
             else:

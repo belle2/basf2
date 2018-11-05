@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2017 Belle II Collaboration                          *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -18,27 +18,24 @@ namespace Belle2 {
    *
    * Inherits from the abstract base class LogConnectionBase.
    */
-  class LogConnectionFileDescriptor final : public LogConnectionBase {
-
+  class LogConnectionConsole final: public LogConnectionBase {
   public:
-
-
     /** Constructor
      * @param outputFD The output file descriptor to write to
      * @param color whether color should be used for output
      */
-    LogConnectionFileDescriptor(int outputFD, bool color);
+    LogConnectionConsole(int outputFD, bool color);
 
     /** Constructor which automatically enables color if the file descriptor is a terminal and supports colors
      * @param outputFD The output file descriptor to write to.
      */
-    explicit LogConnectionFileDescriptor(int outputFD): LogConnectionFileDescriptor(outputFD, terminalSupportsColors(outputFD)) {}
+    explicit LogConnectionConsole(int outputFD): LogConnectionConsole(outputFD, terminalSupportsColors(outputFD)) {}
 
     /** Returns true if the given file descriptor is a tty and supports colors. */
     static bool terminalSupportsColors(int fileDescriptor);
 
     /** Destructor */
-    virtual ~LogConnectionFileDescriptor();
+    ~LogConnectionConsole() override;
 
     /** Sends a log message.
      * @param message The log message object.
@@ -49,9 +46,15 @@ namespace Belle2 {
     /** Returns true if the connection to the io stream could be established. */
     bool isConnected() override;
 
+    /** Check whether console logging via python is enabled */
+    static bool getPythonLoggingEnabled() { return s_pythonLoggingEnabled; }
+    /** Set whether console logging via pyhthon is enabled */
+    static void setPythonLoggingEnabled(bool enabled) { s_pythonLoggingEnabled = enabled; }
+
   private:
     int m_fd;  /**< The output stream used for sending the log message.*/
     bool m_color; /**< Flag for color output.*/
+    static bool s_pythonLoggingEnabled; /**< Flag to indicate whether log messages should be sent to python sys.stdout */
   };
 
 } // end namespace Belle2

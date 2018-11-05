@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import basf2_version
+from basf2.core import basf2label, basf2copyright, get_default_global_tags, list_module_search_paths, \
+    LogPythonInterface
+from basf2.version import version, release
 
 import os
 import sys
@@ -41,15 +42,22 @@ logo = """\
 
 """
 
-CSI = "\x1B["
-reset = CSI + 'm'
+if LogPythonInterface.terminal_supports_colors():
+    CSI = "\x1B["
+    color = CSI + '93;44m'
+    reset = CSI + '0m'
+else:
+    color = ""
+    reset = ""
+
 for line in logo.splitlines():
-    print(CSI + '93;44m' + line.ljust(48) + CSI + '0m')
+    print(color + line.ljust(48) + reset)
 
 print('')
 print(basf2label.center(48))
 print(basf2copyright.center(48))
-print(('Version ' + basf2_version.version).center(48))
+print(('Release ' + release).center(48))
+print(('Version ' + version).center(48))
 print('')
 print('-' * 48)
 for var in ["RELEASE", "RELEASE_DIR", "LOCAL_DIR", "SUBDIR", "EXTERNALS_VERSION", "ARCH"]:
@@ -64,12 +72,12 @@ try:
     from ROOT import gROOT
     gROOT.SetBatch()
     rootver = gROOT.GetVersion()
-except:
+except ImportError:
     rootver = 'PyROOT broken, cannot get version!'
 print('ROOT version:'.ljust(25), rootver)
 print('')
 print('basf2 module directories:'.ljust(25))
-for dirname in fw.list_module_search_paths():
+for dirname in list_module_search_paths():
     print(' ', dirname)
 
 print('-' * 48)

@@ -13,7 +13,7 @@ from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 import pdg
 import pager
-from basf2 import pretty_print_table
+from basf2.utils import pretty_print_table
 
 
 def _align_dots(data, index, ensure_dot=False):

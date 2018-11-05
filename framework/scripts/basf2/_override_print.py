@@ -11,7 +11,7 @@ garbled
 
 It overrides the function in the builtins module so this will propagate to
 everywhere. We do this in a extra module to be able to check the python version
-in basf2.py.
+on `import basf2`.
 """
 
 import builtins
@@ -21,6 +21,7 @@ def flush_print(*args, **argk):
     """print function which flushes by default"""
     argk.setdefault("flush", True)
     builtins._print(*args, **argk)
+
 
 # remember original print function
 builtins._print = print

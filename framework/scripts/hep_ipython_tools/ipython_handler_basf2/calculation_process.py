@@ -1,9 +1,7 @@
-import basf2
+import basf2.core as _basf2
 
-from hep_ipython_tools.ipython_handler_basf2 import python_modules
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.ipython_handler_basf2.entities import Basf2CalculationQueueStatistics
-from ROOT import Belle2
 import json
 
 
@@ -31,8 +29,8 @@ class Basf2CalculationProcess(CalculationProcess):
         """
         if self.path:
             # Append the needed ToFileLogger module
-            created_path = basf2.create_path()
-            file_logger_module = basf2.register_module("ToFileLogger")
+            created_path = _basf2.create_path()
+            file_logger_module = _basf2.register_module("ToFileLogger")
             file_logger_module.param("fileName", self.log_file_name)
             created_path.add_module(file_logger_module)
 
@@ -40,9 +38,10 @@ class Basf2CalculationProcess(CalculationProcess):
             for module in self.path.modules():
                 created_path.add_module(module)
 
+            # import late due to side effects with importing ROOT
+            from hep_ipython_tools.ipython_handler_basf2 import python_modules
             # Add the progress python module
             created_path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
-
             # Add the print collections python module
             created_path.add_module(python_modules.PrintCollections(self.result_queue))
 
@@ -65,15 +64,17 @@ class Basf2CalculationProcess(CalculationProcess):
 
         try:
             if self.random_seed is not None:
-                basf2.set_random_seed(self.random_seed)
+                _basf2.set_random_seed(self.random_seed)
 
-            basf2.reset_log()
-            basf2.logging.zero_counters()
-            basf2.log_to_file(self.log_file_name)
-            basf2.process(self.path, self.max_event)
+            _basf2.reset_log()
+            _basf2.logging.zero_counters()
+            _basf2.log_to_file(self.log_file_name)
+            _basf2.process(self.path, self.max_event)
 
-            self.result_queue.put("ipython.statistics", Basf2CalculationQueueStatistics(basf2.statistics))
+            self.result_queue.put("ipython.statistics", Basf2CalculationQueueStatistics(_basf2.statistics))
 
+            # import ROOT late due to all the side effects
+            from ROOT import Belle2
             store_arrays = list(Belle2.PyStoreArray.list())
             all_arrays = list(dict(Belle2.DataStore.Instance().getStoreEntryMap(Belle2.DataStore.c_Event)).keys())
 
@@ -92,8 +93,6 @@ class Basf2CalculationProcess(CalculationProcess):
             nodes_json = json.dumps(nodes)
             self.result_queue.put("ipython.dependencies", nodes_json)
 
-        except:
-            raise
         finally:
             self.result_queue.queue.close()
 

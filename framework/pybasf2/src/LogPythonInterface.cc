@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Thomas Kuhr, Thomas Hauth                 *
+ * Contributors: Martin Ritter, Thomas Kuhr                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,7 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
-#include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogVariableStream.h>
 
 #include <framework/core/Environment.h>
@@ -89,12 +89,12 @@ void LogPythonInterface::addLogFile(const std::string& filename, bool append)
 
 void LogPythonInterface::addLogConsole()
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 }
 
 void LogPythonInterface::addLogConsole(bool color)
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO, color)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO, color)));
 }
 
 void LogPythonInterface::reset()
@@ -110,6 +110,16 @@ void LogPythonInterface::zeroCounters()
 void LogPythonInterface::enableErrorSummary(bool on)
 {
   LogSystem::Instance().enableErrorSummary(on);
+}
+
+void LogPythonInterface::setPythonLoggingEnabled(bool enabled) const
+{
+  LogConnectionConsole::setPythonLoggingEnabled(enabled);
+}
+
+bool LogPythonInterface::getPythonLoggingEnabled() const
+{
+  return LogConnectionConsole::getPythonLoggingEnabled();
 }
 
 /** Return dict containing message counters */
@@ -139,7 +149,7 @@ namespace {
 
   bool terminalSupportsColors()
   {
-    return LogConnectionFileDescriptor::terminalSupportsColors(STDOUT_FILENO);
+    return LogConnectionConsole::terminalSupportsColors(STDOUT_FILENO);
   }
 }
 
@@ -273,8 +283,8 @@ These fields can be used as a bitmask to configure the appearance of log message
   void (LogPythonInterface::*addLogConsole)(bool) = &LogPythonInterface::addLogConsole;
 
   //Interface the Interface class :)
-  class_<LogPythonInterface, boost::noncopyable>("LogPythonInterface",
-                                                 R"(Logging configuration (for messages generated from C++ or Python), available as a global `basf2.logging` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
+  class_<LogPythonInterface, std::shared_ptr<LogPythonInterface>, boost::noncopyable>("LogPythonInterface", R"(
+Logging configuration (for messages generated from C++ or Python), available as a global `basf2.logging` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
 
 This class exposes a object called `logging` to the python interface. With
 this object it is possible to set all properties of the logging system
@@ -340,7 +350,18 @@ Parameters:
   .def("enable_summary", &LogPythonInterface::enableErrorSummary, args("on"),
        "Enable or disable the error summary printed at the end of processing. "
        "Expects one argument whether or not the summary should be shown")
+  .add_property("enable_python_logging",  &LogPythonInterface::getPythonLoggingEnabled,
+                &LogPythonInterface::setPythonLoggingEnabled, R"DOCSTRING(
+Enable or disable logging via python. If this is set to true than log messages
+will be sent via `sys.stdout`. This is probably slightly slower but is useful
+when running in jupyter notebooks or when trying to redirect stdout in python
+to a buffer. This setting affects all log connections to the
+console.)DOCSTRING")
   ;
+
+  //Expose Logging object
+  std::shared_ptr<LogPythonInterface> initguard{new LogPythonInterface()};
+  scope().attr("logging") = initguard;
 
   //Add all the logging functions. To handle arbitrary keyword arguments we add
   //them as raw functions. However it seems setting the docstring needs to be

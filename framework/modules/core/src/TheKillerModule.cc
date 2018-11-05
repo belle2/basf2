@@ -81,8 +81,9 @@ void TheKillerModule::event()
       if (raise(m_parameter) != 0) B2FATAL("Invalid signal number" << LogVar("signal", m_parameter));
       break;
     case EMethod::c_segfault:
-      int* foo{nullptr};
+      volatile int* foo {nullptr};
       *foo = 5;
+      B2FATAL("This should never be called ...");
       break;
   }
 }

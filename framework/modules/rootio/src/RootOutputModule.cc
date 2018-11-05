@@ -236,19 +236,19 @@ void RootOutputModule::openFile()
       //the associated memory cost)
       if (!entryClass->HasDictionary()) {
         if (m_fileIndex == 0) {
-          B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
-                    "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
+          B2WARNING("No dictionary found, object will not be saved  (This is probably an obsolete class that is still present in the input file.)"
+                    << LogVar("class", entryClass->GetName()) << LogVar("branch", branchName));
         }
         continue;
       }
 
       if (!hasStreamer(entryClass)) {
-        B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
+        B2ERROR("The version number in the ClassDef() macro must be at least 1 to enable I/O!" << LogVar("class", entryClass->GetName()));
       }
 
       int splitLevel = m_splitLevel;
       if (hasCustomStreamer(entryClass)) {
-        B2DEBUG(38, entryClass->GetName() << " has custom streamer, setting split level -1 for this branch.");
+        B2DEBUG(38, "Class has custom streamer, setting split level -1 for this branch." << LogVar("class", entryClass->GetName()));
 
         splitLevel = -1;
         if (iter->second.isArray) {
@@ -391,6 +391,7 @@ void RootOutputModule::terminate()
 
 void RootOutputModule::closeFile()
 {
+  if(!m_file) return;
   //get pointer to file level metadata
   std::unique_ptr<FileMetaData> old;
   if (m_fileMetaData) old.reset(new FileMetaData(*m_fileMetaData));
@@ -417,15 +418,17 @@ void RootOutputModule::closeFile()
   }
   dir->cd();
 
+  if (m_outputSplitSize) {
+    B2INFO(getName() << ": Finished writing file." << LogVar("filename", m_file->GetName()));
+  }
   delete m_file;
   m_file = nullptr;
 
+  // reset some variables
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_entries[jj].clear();
   }
   m_parentLfns.clear();
-
-  // reset some variables
   m_experimentLow = 1;
   m_experimentHigh = 0;
   m_runLow = 0;

@@ -98,6 +98,10 @@ print("WARNING: setting non-default beam vertex at x= " + str(vertex_x) + " y= "
 
 # Particle Gun:
 # One can add more particle gun modules if wanted.
+
+# additional flatly smear the muon vertex between +/- this value
+vertex_delta = 0.005  # in cm
+
 particlegun = register_module('ParticleGun')
 particlegun.logging.log_level = LogLevel.WARNING
 param_pGun = {
@@ -105,10 +109,10 @@ param_pGun = {
     'nTracks': 1,
     'momentumGeneration': 'uniform',
     'momentumParams': [0.1, 4],
-    'vertexGeneration': 'fixed',
-    'xVertexParams': [vertex_x],            # in cm...
-    'yVertexParams': [vertex_y],
-    'zVertexParams': [vertex_z]
+    'vertexGeneration': 'uniform',
+    'xVertexParams': [vertex_x - vertex_delta, vertex_x + vertex_delta],            # in cm...
+    'yVertexParams': [vertex_y - vertex_delta, vertex_y + vertex_delta],
+    'zVertexParams': [vertex_z - vertex_delta, vertex_z + vertex_delta]
 }
 
 particlegun.param(param_pGun)

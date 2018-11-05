@@ -371,7 +371,12 @@ void RootOutputModule::fillFileMetaData()
   RootIOUtilities::setCreationData(*m_fileMetaData);
   m_fileMetaData->setRandomSeed(RandomNumbers::getSeed());
   m_fileMetaData->setSteering(Environment::Instance().getSteering());
-  m_fileMetaData->setMcEvents(Environment::Instance().getNumberOfMCEvents());
+  auto mcEvents = Environment::Instance().getNumberOfMCEvents();
+  if(m_outputSplitSize and mcEvents > 0) {
+    if(m_fileIndex == 0) B2WARNING("Number of MC Events cannot be saved when splitting output files by size, setting to 0");
+    mcEvents = 0;
+  }
+  m_fileMetaData->setMcEvents(mcEvents);
   m_fileMetaData->setDatabaseGlobalTag(Database::getGlobalTag());
   for (const auto& item : m_additionalDataDescription) {
     m_fileMetaData->setDataDescription(item.first, item.second);

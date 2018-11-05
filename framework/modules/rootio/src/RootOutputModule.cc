@@ -165,7 +165,7 @@ void RootOutputModule::openFile()
     // anchor information attached (like
     // http://mydomain.org/filename.root?foo=bar#baz). So use "TUrl" *sigh* to
     // do the parsing and only replace the extension of the file part.
-    TUrl fileUrl(m_outputFileName.c_str());
+    TUrl fileUrl(m_outputFileName.c_str(), m_regularFile);
     boost::filesystem::path file{fileUrl.GetFile()};
     file.replace_extension((boost::format("f%05d.root") % m_fileIndex).str());
     fileUrl.SetFile(file.c_str());

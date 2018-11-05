@@ -1,0 +1,13 @@
+[INFO] Steering file: framework/tests/root_output_split.py
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] RootOutput: Opened file for writing
+	filename = "test_noext.f00000.root"
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] RootOutput: Opened file for writing
+	filename = "test_otherext.f00000.root"
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] RootOutput: Opened file for writing
+	filename = "test_param.f00000.root?foo=bar"
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] RootOutput: Opened file for writing
+	filename = "test_anchor.f00000.root#foo"

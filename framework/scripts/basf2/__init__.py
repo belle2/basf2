@@ -79,7 +79,7 @@ if _is_ipython:
             modules need to perform proper cleanup & reinitialisation, if Geometry is
             involved this might be difficult to achieve.)
 
-            This is a conenience wrapper which will automatically call the
+            This is a convenience wrapper which will automatically call the
             `process()` function in a separate process using `hep_ipython_tools`
 
             Parameters:

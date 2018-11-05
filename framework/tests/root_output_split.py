@@ -13,10 +13,11 @@ import os
 
 class CreateDummyData(basf2.Module):
     """Create some random data to have event size not be too small"""
-    def __init__(self, size):
+    def __init__(self, size, persistent=False):
         super().__init__()
         self.size = size // 8
-        self.chunk_data = Belle2.PyStoreObj(Belle2.TestChunkData.Class())
+        durability = Belle2.DataStore.c_Persistent if persistent else Belle2.DataStore.c_Event
+        self.chunk_data = Belle2.PyStoreObj(Belle2.TestChunkData.Class(), durability)
 
     def initialize(self):
         self.chunk_data.registerInDataStore()
@@ -35,7 +36,8 @@ def get_metadata(filename):
 
 
 if __name__ == "__main__":
-    basf2.logging.log_level = basf2.LogLevel.WARNING
+    basf2.logging.log_level = basf2.LogLevel.ERROR
+    basf2.logging.enable_summary(False)
     basf2.set_random_seed("something important")
     with clean_working_directory():
         # create 2 files around 3 MB
@@ -75,6 +77,7 @@ if __name__ == "__main__":
             assert m["eventLow"] == last + 1, "eventLow is not correct"
             last = m["eventHigh"]
             assert m["eventLow"] + m["nEvents"] - 1 == m["eventHigh"], "event high is inconsistent"
+            assert m["mcEvents"] == 0, "MC events cannot be saved"
 
         assert sum(e["nEvents"] for e in meta) == 550, "number of events must be correct"
 
@@ -94,6 +97,7 @@ if __name__ == "__main__":
         with clean_working_directory():
             path = basf2.Path()
             path.add_module("EventInfoSetter")
+            path.add_module(CreateDummyData(10, True))  # 10 byte persistent dummy data
             path.add_module("RootOutput", outputFileName=name, outputSplitSize=1, updateFileCatalog=False)
             safe_process(path)
             assert os.listdir() == [result], "wrong output file name"

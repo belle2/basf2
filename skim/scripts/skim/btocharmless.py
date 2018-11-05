@@ -13,6 +13,20 @@ from basf2 import *
 from modularAnalysis import *
 
 
+def BtoPi0Pi0List():
+    Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
+
+    B0_Channels = ['pi0:skim pi0:skim']
+
+    B0List = []
+    for chID, channel in enumerate(B0_Channels):
+        reconstructDecay('B0:Pi0Pi0' + ' -> ' + channel, Bcuts, chID)
+        B0List.append('B0:Pi0Pi0')
+
+    Lists = B0List
+    return Lists
+
+
 def CharmlessHad2BodyB0List():
     """
     Skim list definitions for all neutral B to charmless 2 body modes.

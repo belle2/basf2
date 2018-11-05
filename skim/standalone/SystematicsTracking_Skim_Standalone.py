@@ -16,7 +16,7 @@ from stdPi0s import *
 from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
-gb_setuprel = 'release-02-00-00'
+gb_setuprel = 'release-02-00-01'
 
 import sys
 import os
@@ -39,7 +39,7 @@ loadStdCharged()
 
 skimCode = encodeSkimName('SystematicsTracking')
 
-from SystematicsTracking_List import *
+from skim.systematics import SystematicsTrackingList
 SysList = SystematicsTrackingList()
 if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)

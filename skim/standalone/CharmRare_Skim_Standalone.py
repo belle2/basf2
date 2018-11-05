@@ -15,7 +15,7 @@ from stdCharged import *
 from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 import os
 import sys
@@ -32,7 +32,7 @@ loadStdSkimPi0()
 loadStdSkimPhoton()
 stdLooseMu()
 stdLooseE()
-from CharmRare_List import *
+from skim.charm import CharmRareList
 CharmRareList = CharmRareList()
 skimOutputUdst(skimCode, CharmRareList)
 summaryOfLists(CharmRareList)

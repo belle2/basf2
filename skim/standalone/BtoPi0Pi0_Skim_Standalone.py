@@ -17,7 +17,7 @@ from stdPi0s import *
 from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = "release-02-00-00"
+gb2_setuprel = "release-02-00-01"
 
 import os
 import sys
@@ -37,7 +37,7 @@ inputMdstList('MC9', fileList)
 loadStdSkimPi0()
 
 # Had Skim
-from BtoPi0Pi0_List import *
+from skim.btocharmless import BtoPi0Pi0List
 Pi0Pi0List = BtoPi0Pi0List()
 skimOutputUdst(skimCode, Pi0Pi0List)
 

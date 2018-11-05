@@ -5,7 +5,7 @@
 #
 # Charmonium skims
 # Sen Jia, 11/Jun/2018
-# ISRpipicc_List skim
+# ISRpipicc skim
 #
 ######################################################
 
@@ -14,7 +14,7 @@ from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 
 import os
@@ -33,8 +33,7 @@ inputMdstList('MC9', fileList)
 loadStdCharged()
 stdPhotons('tight')
 
-# importing the reconstructed events from the ISRpipicc_List file
-from ISRpipicc_List import *
+from skim.charmonium import ISRpipiccList
 ISRpipicc = ISRpipiccList()
 
 # output to Udst file

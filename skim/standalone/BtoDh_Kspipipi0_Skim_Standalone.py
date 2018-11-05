@@ -16,7 +16,7 @@ from stdV0s import *
 from stdCharm import *
 from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import os
 import sys
@@ -37,7 +37,7 @@ loadStdKS()
 loadStdSkimPi0()
 
 # B- to D(->Kspipipi0)h- Skim
-from BtoDh_Kspipipi0_List import *
+from skim.btocharm import loadDkspipipi0, BsigToDhToKspipipi0List
 loadDkspipipi0()
 BtoDhList = BsigToDhToKspipipi0List()
 skimOutputUdst(skimCode, BtoDhList)

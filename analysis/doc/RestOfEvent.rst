@@ -38,11 +38,11 @@ The ROE is formed by calling :func:`modularAnalysis.buildRestOfEvent` command:
 
   import basf2 as b2
   import modularAnalysis as ma
-  analysis_main = b2.create_path()
+  mainPath = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = analysis_main)
+  ma.fillParticleList('B0:rec', path = mainPath)
   # Build the ROE object:
-  ma.buildRestOfEvent('B0:rec', path = analysis_main)
+  ma.buildRestOfEvent('B0:rec', path = mainPath)
    
 This code simply adds ``RestOfEvent`` objects, which are related to each ``B0:rec`` candidate.
 Now, it is possible to calculate simple ROE-based variables using target particle candidate,
@@ -70,11 +70,11 @@ This can be changed by passing additional particle lists to the builder method:
   stdCharged.stdK('good')
   stdCharged.stdMu('good')
   stdCharged.stdPr('good')
-  analysis_main = b2.create_path()
+  mainPath = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = analysis_main)
+  ma.fillParticleList('B0:rec', path = mainPath)
   # Build the ROE object:
-  ma.buildRestOfEvent('B0:rec',['K+:good', 'p+:good','e+:good','mu+:good'], path = analysis_main)
+  ma.buildRestOfEvent('B0:rec',['K+:good', 'p+:good','e+:good','mu+:good'], path = mainPath)
  
 Particles from these lists will be added to the ROE first, and then the ROE object will be completed 
 by adding the default particle types, pions, photons and :math:`K_L^0`'s. 
@@ -96,17 +96,17 @@ In basf2 this is realized by ``path.for_each`` functionality:
 
   import basf2 as b2
   import modularAnalysis as ma
-  analysis_main = b2.create_path()
+  mainPath = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = analysis_main)
+  ma.fillParticleList('B0:rec', path = mainPath)
   # build the ROE object
-  ma.buildRestOfEvent('B0:rec', path = analysis_main)
+  ma.buildRestOfEvent('B0:rec', path = mainPath)
   # Create a path for ROE logic
   roe_path = b2.create_path()
   # Associate a module to be executed for each ROE candidate:
   ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1', path = roe_path)
   # Execute loop for each ROE:
-  analysis_main.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
+  mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 In this example we create another path ``roe_path``, which is used to loop over the created ROE objects.
 By calling ``modularAnalysis`` methods with ``path = roe_path`` we create basf2 modules, which will be executed for each ROE candidate.
@@ -128,15 +128,15 @@ which have passed a selection criteria:
 
   import basf2 as b2
   import modularAnalysis as ma
-  analysis_main = b2.create_path()
+  mainPath = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = analysis_main)
+  ma.fillParticleList('B0:rec', path = mainPath)
   # Build the ROE object:
-  ma.buildRestOfEvent('B0:rec', path = analysis_main)
+  ma.buildRestOfEvent('B0:rec', path = mainPath)
   # Create a mask tuple:
   cleanMask = ('cleanMask', 'abs(d0) < 10.0 and abs(z0) < 20.0', 'E > 0.06 and abs(clusterTiming) < 20')
   # append masks to existing ROE object
-  appendROEMasks('D0:tag', [cleanMask], path = analysis_main)
+  appendROEMasks('D0:tag', [cleanMask], path = mainPath)
   
 The mask tuples should contain a mask name and cuts for charged particles, for photons and for :math:`K_L^0` or hadrons.
 In the example above a cut is not set, therefore, all hadrons will pass the mask.
@@ -160,15 +160,15 @@ These methods should be executed inside the ROE loop:
   import basf2 as b2
   import modularAnalysis as ma
   import vertex as vtx
-  analysis_main = b2.create_path()
+  mainPath = b2.create_path()
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
-  ma.fillParticleList('B0:rec', path = analysis_main)
+  ma.fillParticleList('B0:rec', path = mainPath)
   # build the ROE object
-  ma.buildRestOfEvent('B0:rec', path = analysis_main)
+  ma.buildRestOfEvent('B0:rec', path = mainPath)
   # Create a mask tuple:
   cleanMask = ('cleanMask', 'abs(d0) < 10.0 and abs(z0) < 20.0', 'E > 0.06 and abs(clusterTiming) < 20')
   # append masks to the existing ROE object
-  appendROEMasks('D0:tag', [cleanMask], path = analysis_main)
+  appendROEMasks('D0:tag', [cleanMask], path = mainPath)
   
   # Create a path for ROE logic
   roe_path = b2.create_path()
@@ -188,7 +188,7 @@ These methods should be executed inside the ROE loop:
   # Insert a K_S0 candidate into the ROE mask:
   ma.optimizeROEWithV0('K_S0:roe',['cleanMask'],'', path=roe_path)
   # Execute loop for each ROE:
-  analysis_main.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
+  mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 These advanced ROE methods can be used for further clean up from beam-induced pollution and for applications of MVA training.
 
@@ -234,7 +234,7 @@ keep or discard the objects used by the particles.
   keepInROEMasks('pi+:roe', 'advanced', 'sigProb > 0.5', path=roe_main)
    
   # execute roe_main
-  analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_main)
+  mainPath.for_each('RestOfEvent', 'RestOfEvents', roe_main)
    
   ######################
   # exit for_each path #

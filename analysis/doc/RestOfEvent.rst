@@ -19,7 +19,7 @@ are in **tagged** and **untagged** analyses of :math:`Y(4S)` decays:
     should be empty in a perfect situation. However, it often contains particles
     from either the collision event or the background. Cleaning up
     the ROE in this case can help improve variables such as :math:`E_{extra}`, which
-    should peak at 0.
+    should be close to 0.
   - In untagged analyses one reconstruct only the signal *B* meson, everything
     else in the event is considered to come from the companion *B* meson. In
     addition to tracks and clusters from the companion *B* meson, the ROE contains
@@ -49,14 +49,17 @@ Now, it is possible to calculate simple ROE-based variables using target particl
 like the ROE momentum ``ROE_P``, the ROE mass ``ROE_M`` or others. The full list of the ROE variables can be found
 by using command ``basf2 variables.py`` under the **Rest of Event** section.
 
-Note: 
+.. warning :: 
   Names or behavior of the ROE variables may vary from release to release. 
+  Please recheck list of variables ``basf2 variables.py`` when switching between the releases.
+
+After reconstructing the ROE, one can use ROE-dependent modules, like `FlavorTagger`, `ContinuumSuppression`, `FullEventInterpretation` and other algorithms.
 
 ROE particle type hypothesis
 ----------------------------
 
 By default, the ROE object is filled by pions, photons and :math:`K_L^0`'s.
-This can be changed by passing additional particle lists:
+This can be changed by passing additional particle lists to the builder method:
 
 ::
 
@@ -116,7 +119,7 @@ however, it is **important** to use a proper ROE path when calling any basf2 fun
 ROE masks
 ---------
 
-The ROE object contain *every* particle in the event, which has not been associated to the targed candidate. 
+The ROE object contains **every** particle in the event, which has not been associated to the targed particle candidate. 
 Therefore, a clean up procedure is **necessary** to filter out beam-induced energy depositions from the ROE.
 In basf2 framework it is done using a concept of ROE mask. The ROE mask is a simple container of particles, 
 which have passed a selection criteria:

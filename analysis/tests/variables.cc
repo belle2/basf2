@@ -2316,7 +2316,8 @@ namespace {
       // we're done setting up the datastore
       DataStore::Instance().setInitializeActive(false);
 
-      // add some tracks
+      // add some tracks the zeroth one is not going to be matched
+      tracks.appendNew(Track());
       const Track* t1 = tracks.appendNew(Track());
       const Track* t2 = tracks.appendNew(Track());
       const Track* t3 = tracks.appendNew(Track());
@@ -2345,12 +2346,19 @@ namespace {
       e1->setEnergy(0.3);
       e1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e1->setClusterId(1);
+      // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
       e2->setEnergy(0.6);
+      e2->setTheta(1.0); // somewhere in the barrel
+      e2->setPhi(2.0);
+      e2->setR(148.5);
       e2->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e2->setClusterId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
+      e3->setTheta(0.2); // somewhere in the fwd encap
+      e3->setPhi(1.5);
+      e3->setR(200.0);
       e3->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e3->setClusterId(3);
 
@@ -2387,6 +2395,58 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+
+  TEST_F(ECLVariableTest, b2bKinematicsTest)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // connect gearbox for CMS boosting etc
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // get the zeroth track in the array (is not associated to a cluster)
+    const Particle* sometrack = particles.appendNew(Particle(tracks[0], Const::pion));
+
+    // grab ze variables for testing
+    const Manager::Var* b2bClusterTheta = Manager::Instance().getVariable("b2bClusterTheta");
+    const Manager::Var* b2bClusterPhi = Manager::Instance().getVariable("b2bClusterPhi");
+
+    EXPECT_EQ(gammalist->getListSize(), 3);
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)), 3.0276606);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)), 0.0);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(1)), 1.6036042);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(1)), -1.0607308);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(2)), 2.7840068);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(2)), -1.3155469);
+
+    // track (or anything without a cluster) should be nan
+    ASSERT_TRUE(std::isnan(b2bClusterTheta->function(sometrack)));
+    ASSERT_TRUE(std::isnan(b2bClusterPhi->function(sometrack)));
+  }
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {

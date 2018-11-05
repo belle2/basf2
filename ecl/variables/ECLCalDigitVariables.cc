@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//#include <ecl/variables/ECLCalDigitVariables.h>
-
 // analysis
 #include <analysis/VariableManager/Manager.h>
 

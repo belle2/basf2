@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2017 Belle II Collaboration                          *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Martin Ritter                              *
@@ -50,6 +50,17 @@ bool LogConnectionConsole::terminalSupportsColors(int fileDescriptor)
   return useColor;
 }
 
+void LogConnectionConsole::write(const std::string& message)
+{
+  if (s_pythonLoggingEnabled) {
+    auto pymessage = boost::python::import("sys").attr("stdout");
+    pymessage.attr("write")(message);
+    pymessage.attr("flush")();
+  } else {
+    ::write(m_fd, message.data(), message.size());
+  }
+}
+
 bool LogConnectionConsole::sendMessage(const LogMessage& message)
 {
   if (!isConnected()) return false;
@@ -71,13 +82,15 @@ bool LogConnectionConsole::sendMessage(const LogMessage& message)
   if (m_color) {
     stream << "\x1b[m";
   }
-  const std::string out = stream.str();
-  if (s_pythonLoggingEnabled) {
-    auto pyout = boost::python::import("sys").attr("stdout");
-    pyout.attr("write")(out);
-    pyout.attr("flush")();
-  } else {
-    write(m_fd, out.data(), out.size());
-  }
+  write(stream.str());
   return true;
+}
+
+void LogConnectionConsole::finalizeOnAbort()
+{
+  // If python logging is enabled we need to give jupyter some time to flush
+  // the output as this happens only in the output thread. Seems flushing again is fine :D
+  if (LogConnectionConsole::getPythonLoggingEnabled()) {
+    boost::python::import("sys").attr("stdout").attr("flush")();
+  }
 }

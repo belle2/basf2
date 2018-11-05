@@ -69,6 +69,8 @@ if _is_ipython:
     if hasattr(_ip, "kernel"):
         # we're in a notebook, reset log system to print to python sys.stdout
         logging.enable_python_logging = True
+        # also in this case we really don't need a log summary
+        logging.enable_summary(False)
 
         # convenience wrap the process() function to use a calculation object
         def process(path, max_event=0):

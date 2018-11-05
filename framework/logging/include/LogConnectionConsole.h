@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/logging/LogConnectionBase.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -43,6 +44,9 @@ namespace Belle2 {
      */
     bool sendMessage(const LogMessage& message) override;
 
+    /** Send a preformatted string message to the connected output */
+    void write(const std::string& message);
+
     /** Returns true if the connection to the io stream could be established. */
     bool isConnected() override;
 
@@ -50,7 +54,8 @@ namespace Belle2 {
     static bool getPythonLoggingEnabled() { return s_pythonLoggingEnabled; }
     /** Set whether console logging via pyhthon is enabled */
     static void setPythonLoggingEnabled(bool enabled) { s_pythonLoggingEnabled = enabled; }
-
+    /** Make sure output is flushed on abort */
+    void finalizeOnAbort() override;
   private:
     int m_fd;  /**< The output stream used for sending the log message.*/
     bool m_color; /**< Flag for color output.*/

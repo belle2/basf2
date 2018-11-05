@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Thomas Kuhr                               *
@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
+#include <framework/logging/LogConnectionJSON.h>
 #include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogVariableStream.h>
 
@@ -80,6 +81,11 @@ int LogPythonInterface::getLogInfo(LogConfig::ELogLevel level)
 LogConfig& LogPythonInterface::getPackageLogConfig(const std::string& package)
 {
   return LogSystem::Instance().getPackageLogConfig(package);
+}
+
+void LogPythonInterface::addLogJSON(bool complete)
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionJSON(complete));
 }
 
 void LogPythonInterface::addLogFile(const std::string& filename, bool append)
@@ -340,6 +346,17 @@ Parameters:
   .def("add_console", addLogConsole,
        addLogConsole_overloads(args("enable_color"), "Write log output to console. (In addition to existing outputs). "
                                "If ``enable_color`` is not specified color will be enabled if supported"))
+  .def("add_json", &LogPythonInterface::addLogJSON, (bp::arg("complete_info") = false), R"DOCSTRING(
+Write log output to console, but format log messages as json objects for
+simplified parsing by other tools.  Each log message will be printed as a one
+line JSON object.
+
+Parameters:
+   complete_info (bool): If this is set to True the complete log information is printed regardless of the `LogInfo` setting.
+
+See Also:
+   `add_console()`, `set_info()`
+)DOCSTRING")
   .def("terminal_supports_colors", &terminalSupportsColors, "Returns true if the terminal supports colored output")
   .staticmethod("terminal_supports_colors")
   .def("reset", &LogPythonInterface::reset, "Remove all configured logging outputs. "

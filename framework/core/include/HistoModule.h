@@ -31,15 +31,15 @@ namespace Belle2 {
 
     // Member functions (for event processing)
     /** Function for dynamic initialization of module */
-    virtual void initialize() {};
+    virtual void initialize() override {};
     /** Function to process begin_run record */
-    virtual void beginRun() {};
+    virtual void beginRun() override {};
     /** Function to process event record */
-    virtual void event() {};
+    virtual void event() override {};
     /** Function to process end_run record */
-    virtual void endRun() {};
+    virtual void endRun() override {};
     /** Function to terminate module */
-    virtual void terminate() {};
+    virtual void terminate() override {};
 
     /** Function to define histograms */
     /**

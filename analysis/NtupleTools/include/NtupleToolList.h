@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLETOOLLIST_H
-#define NTUPLETOOLLIST_H
+#pragma once
 
 #include<string>
 #include "TTree.h"
@@ -32,4 +31,3 @@ namespace Belle2 {
   };
 } // namespace Belle2
 
-#endif // NTUPLETOOLLIST_H

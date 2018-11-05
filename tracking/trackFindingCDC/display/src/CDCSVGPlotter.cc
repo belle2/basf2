@@ -106,9 +106,8 @@ const AttributeMap c_defaultSVGAttributes({
   {"transform", "translate(0, 1120) scale(1,-1)"}
 });
 
-CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade)
-  : m_animate(animate)
-  , m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
+CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade) :
+  m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
 {
   int top = -112;
   int left = -112;

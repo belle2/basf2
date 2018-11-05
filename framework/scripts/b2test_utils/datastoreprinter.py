@@ -183,9 +183,15 @@ class DataStorePrinter(object):
                 if weight_getter is not None:
                     weight = weight_getter(i)
                 self._printResult(e, depth + 1, weight=weight)
+        # or, is it a HitPattern?
+        elif hasattr(result, "getInteger"):
+            print(bin(result.getInteger()), weight, sep="")
         # print floats with 6 valid digits
         elif isinstance(result, float):
             print("%.6g%s" % (result, weight))
+        # print char as int
+        elif isinstance(result, str) and len(result) == 1:
+            print(ord(result), weight, sep="")
         # ok, in any case we can just print it
         else:
             print(result, weight, sep="")

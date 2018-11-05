@@ -82,7 +82,7 @@ namespace Belle2 {
     /** Lane number. */
     int m_Lane;
 
-    /** Needed to make objects storable, */
+    /** Class version, */
     ClassDef(EKLMDataConcentratorLane, 1);
 
   };

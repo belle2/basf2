@@ -53,6 +53,11 @@ namespace Belle2 {
       FiberAndElectronics(const FiberAndElectronics&) = delete;
 
       /**
+       * Operator = (disabled).
+       */
+      FiberAndElectronics& operator=(const FiberAndElectronics&) = delete;
+
+      /**
        * Destructor.
        */
       ~FiberAndElectronics();

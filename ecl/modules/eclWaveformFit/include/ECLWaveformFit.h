@@ -116,20 +116,20 @@ namespace Belle2 {
     ~ECLWaveformFitModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** begin run.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** event per event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** end run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** ECLDigits Array Name.*/
     virtual const char* eclDigitArrayName() const
@@ -146,7 +146,6 @@ namespace Belle2 {
 
     double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
     double m_chi2Threshold;  /*chi2 threshold to classify offline fit as good fit*/
-    double m_TriggerThreshold;  /**energy threshold for waveform trigger.*/
     bool m_TemplatesLoaded;  /**Flag to indicate if waveform templates are loaded from database.*/
     void loadTemplateParameterArray(bool IsDataFlag);  /** loads waveform templates from database.*/
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/

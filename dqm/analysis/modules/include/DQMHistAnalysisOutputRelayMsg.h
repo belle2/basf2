@@ -26,17 +26,17 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisOutputRelayMsgModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
-    TSocket* m_sock;
+    TSocket* m_sock = nullptr;
     int m_port;
     std::string m_hostname;
 

@@ -177,7 +177,7 @@ namespace Belle2 {
     }
   protected:
     /** Create a ray with the current parameter values according to a spherical distribution */
-    void getRay(G4ThreeVector& origin, G4ThreeVector& direction);
+    void getRay(G4ThreeVector& origin, G4ThreeVector& direction) override;
 
     /** Origin for the spherical scan */
     G4ThreeVector m_origin;
@@ -210,7 +210,7 @@ namespace Belle2 {
     }
   protected:
     /** Create a ray with the current parameter values according to a planar distribution */
-    void getRay(G4ThreeVector& origin, G4ThreeVector& direction);
+    void getRay(G4ThreeVector& origin, G4ThreeVector& direction) override;
   protected:
     /** Origin of the scan plane */
     G4ThreeVector m_origin;
@@ -311,13 +311,13 @@ namespace Belle2 {
     MaterialScanModule();
 
     /** Initialize the output file and check the parameters. */
-    void initialize();
+    void initialize() override;
 
     /** Do the actual scanning */
-    void beginRun();
+    void beginRun() override;
 
     /** Save the output */
-    void terminate();
+    void terminate() override;
   private:
     /** Return a vector along the axis with the given name
      * @param name Name of the axis */

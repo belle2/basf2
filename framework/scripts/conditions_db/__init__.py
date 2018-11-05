@@ -59,10 +59,10 @@ class ConditionsDB:
         base_url_list = ConditionsDB.BASE_URLS[:]
         base_url_env = os.environ.get("BELLE2_CONDB_SERVERLIST", None)
         if given_url is not None:
-            base_url_list = [base_url]
+            base_url_list = [given_url]
         elif base_url_env is not None:
             base_url_list = base_url_env.split()
-            B2INFO("Setting Conditions Database servers from Environment:")
+            B2INFO("Getting Conditions Database servers from Environment:")
             for i, url in enumerate(base_url_list, 1):
                 B2INFO(f"  {i}. {url}")
         return base_url_list

@@ -43,11 +43,11 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDROIDQMModule();
 
-    void initialize(); /**< register histograms*/
+    void initialize() override; /**< register histograms*/
 
-    void event();/**< fill per-event histograms*/
+    void event() override;/**< fill per-event histograms*/
 
-    void endRun(); /**< fill per-run histograms*/
+    void endRun() override; /**< fill per-run histograms*/
 
   private:
 
@@ -102,7 +102,7 @@ namespace Belle2 {
     TH1F* hCellV; /**< V cells */
     int n_events; /**< number of events*/
 
-    void defineHisto(); /**< define histograms*/
+    void defineHisto() override; /**< define histograms*/
 
   };//end class declaration
 

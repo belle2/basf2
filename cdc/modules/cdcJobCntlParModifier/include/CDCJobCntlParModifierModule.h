@@ -32,10 +32,10 @@ namespace Belle2 {
     CDCJobCntlParModifierModule();
 
     /** Initialize */
-    void initialize();
+    void initialize() override;
 
     /** Actual digitization of all hits in the CDC. */
-    void event();
+    void event() override;
 
   private:
 

@@ -139,7 +139,7 @@ namespace Belle2 {
     /** Lookback window width (unit is 32 TDC counts). */
     int m_LookbackWindowWidth;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMChannelData, 4);
 
   };

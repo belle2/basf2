@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -78,7 +78,7 @@ bool MaterialScanBase::checkStep(const G4Step* step)
 }
 
 
-MaterialScan2D::MaterialScan2D(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params):
+MaterialScan2D::MaterialScan2D(TFile* rootFile, const std::string& name, const std::string& axisLabel, const ScanParams& params):
   MaterialScanBase(rootFile, name, axisLabel), m_params(params), m_curDepth(0)
 {
   //Sort the parameters accordingly
@@ -127,15 +127,15 @@ bool MaterialScan2D::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
 
 TH2D* MaterialScan2D::getHistogram(const std::string& name)
 {
-  TH2D*& hist = m_regions[name];
+  std::unique_ptr<TH2D>& hist = m_regions[name];
   if (!hist) {
     //Create new histogram
     m_rootFile->cd(m_name.c_str());
-    hist = new TH2D(name.c_str(), (name + ";" + m_axisLabel).c_str(),
-                    m_params.nU, m_params.minU, m_params.maxU,
-                    m_params.nV, m_params.minV, m_params.maxV);
+    hist.reset(new TH2D(name.c_str(), (name + ";" + m_axisLabel).c_str(),
+                        m_params.nU, m_params.minU, m_params.maxU,
+                        m_params.nV, m_params.minV, m_params.maxV));
   }
-  return hist;
+  return hist.get();
 }
 
 void MaterialScan2D::fillValue(const std::string& name, double value)
@@ -256,14 +256,14 @@ bool MaterialScanRay::createNext(G4ThreeVector& origin, G4ThreeVector& direction
 
 TH1D* MaterialScanRay::getHistogram(const std::string& name)
 {
-  TH1D*& hist = m_regions[name];
+  std::unique_ptr<TH1D>& hist = m_regions[name];
   if (!hist) {
     //Create new histogram
     m_rootFile->cd(m_name.c_str());
     int bins = std::ceil(m_maxDepth / m_sampleDepth);
-    hist = new TH1D(name.c_str(), (name + ";" + m_axisLabel).c_str(), bins, 0, m_maxDepth * Unit::mm);
+    hist.reset(new TH1D(name.c_str(), (name + ";" + m_axisLabel).c_str(), bins, 0, m_maxDepth * Unit::mm));
   }
-  return hist;
+  return hist.get();
 }
 
 void MaterialScanRay::fillValue(const std::string& name, double value, double steplength)
@@ -441,7 +441,11 @@ MaterialScanModule::MaterialScanModule(): m_rootFile(0), m_sphericalOrigin(3, 0)
 
 void MaterialScanModule::initialize()
 {
-  m_rootFile = new TFile(m_filename.c_str(), "RECREATE");
+  m_rootFile = TFile::Open(m_filename.c_str(), "RECREATE");
+  if (!m_rootFile || m_rootFile->IsZombie()) {
+    B2ERROR("Cannot open rootfile for writing" << LogVar("rootfile", m_filename));
+    return;
+  }
 
   boost::to_lower(m_planeName);
   boost::trim(m_planeName);
@@ -471,14 +475,6 @@ void MaterialScanModule::initialize()
       return;
     }
     for (double& value : *m_rayDirection) value /= Unit::mm;
-  }
-}
-
-void MaterialScanModule::terminate()
-{
-  if (m_rootFile) {
-    m_rootFile->Write();
-    m_rootFile->Close();
   }
 }
 
@@ -564,10 +560,16 @@ void MaterialScanModule::beginRun()
         lastPercent = donePercent;
       }
     }
-    //Free the scan object
+  }
+  m_rootFile->Write();
+  // free the scan objects which also deletes the histograms ...
+  for (MaterialScanBase* scan : scans) {
     delete scan;
   }
-
+  // and delete the file, which we could not do before because that would also delete the histograms ...
+  m_rootFile->Close();
+  delete m_rootFile;
+  m_rootFile = nullptr;
   //And now we reset the user actions
   eventManager->SetUserAction(vanillaEventAction);
   eventManager->SetUserAction(vanillaStackingAction);

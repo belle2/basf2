@@ -41,7 +41,11 @@ namespace Belle2 {
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getPulseShapeDiscriminationMVA();
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          return cluster->getPulseShapeDiscriminationMVA();
+        } else {
+          return -1.0;
+        }
       }
       return std::numeric_limits<float>::quiet_NaN();
     }

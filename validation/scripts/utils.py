@@ -13,7 +13,9 @@ import validationpath
 
 
 def get_greeting(name):
-    """Get a random greeting and closing statement"""
+    """
+    Get a random greeting and closing statement using name
+    """
     greetings = ["Dear", "Dearest", "Hi", "Salutations", "Hello", "Exalted", "Yo",
                  "Honorable", "To the esteemed", "Magnificent", "Glorious", "Howdy"]
     closing = ["Bye", "Cheers", "Best Regards", "Best Wishes", "Yours sincerely",
@@ -22,6 +24,9 @@ def get_greeting(name):
 
 
 def markdown_to_plaintext(text):
+    """
+    removes markdown specific formatting elements from text
+    """
     # replace all links of the form [text](url) by just the url.
     replace_links = re.compile(r"\[.*?]\(([^)]*)\)")
     text = replace_links.sub(r"\1", text)

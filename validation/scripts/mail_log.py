@@ -51,6 +51,15 @@ class Mails:
     """
 
     def __init__(self, validation):
+        """
+        initialize Mails instance
+        takes an instance of validation.Validation
+        this method assumes that a comparison json file exists, reads it and parses
+        it to extract information about failed plots. This information, together
+        with information about failed scripts, gets stored in self.mail_data_new.
+        If there is mail_data.json inside the log folder, its contents get stored
+        in self.mail_data_old for later comparison
+        """
 
         self.validator = validation
 

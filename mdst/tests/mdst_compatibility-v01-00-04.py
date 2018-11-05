@@ -15,7 +15,7 @@ objects.
 """
 
 from basf2 import create_path, process,  LogLevel, set_log_level, set_random_seed
-from datastoreprinter import DataStorePrinter, PrintObjectsModule
+from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 import ROOT
 from ROOT import Belle2
 

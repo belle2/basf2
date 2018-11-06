@@ -58,6 +58,11 @@ namespace Belle2 {
       TransformData(const TransformData&) = delete;
 
       /**
+       * Operator = (disabled).
+       */
+      TransformData& operator=(const TransformData&) = delete;
+
+      /**
        * Destructor.
        */
       ~TransformData();

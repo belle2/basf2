@@ -19,7 +19,6 @@ import re
 import glob
 import shutil
 import subprocess
-import basf2_version
 
 sys.path.insert(0, os.path.abspath("extensions"))
 

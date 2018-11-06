@@ -156,10 +156,6 @@ namespace Belle2 {
      **/
     bool assign(TObject* object, bool replace = false);
 
-  private:
-    /** Ensure that contained TObject has been created on the DataStore. */
-    void ensureCreated();
-
   public:
     /** Create default constructed object in the DataStore.
      *

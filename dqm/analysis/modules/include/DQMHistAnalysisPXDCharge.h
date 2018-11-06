@@ -56,13 +56,13 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! only one fit function for all Landaus
-    TF1* m_fLandau;
+    TF1* m_fLandau = nullptr;
     //! Fit the Mean for all modules
-    TF1* m_fMean;
+    TF1* m_fMean = nullptr;
     //! Histogram covering all modules
-    TH1F* m_hCharge;
+    TH1F* m_hCharge = nullptr;
     //! Final Canvas
-    TCanvas* m_cCharge;
+    TCanvas* m_cCharge = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! Place for two EPICS PVs, Mean and maximum deviation

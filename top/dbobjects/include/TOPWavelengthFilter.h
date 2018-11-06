@@ -70,13 +70,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Wavelength filter bulk transmittance") const;
+    void print(const std::string& title = "Wavelength filter bulk transmittance") const override;
 
 
   private:
@@ -85,7 +85,7 @@ namespace Belle2 {
     float m_lambdaStep = 0;  /**< wavelength step [nm] */
     std::vector<float> m_transmittances; /**< bulk transmittance data points */
 
-    ClassDef(TOPWavelengthFilter, 1); /**< ClassDef */
+    ClassDefOverride(TOPWavelengthFilter, 1); /**< ClassDef */
 
   };
 

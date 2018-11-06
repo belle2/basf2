@@ -10,6 +10,8 @@
 #include <pxd/modules/pxdSimulation/PXDDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/GeoTools.h>
+#include <pxd/reconstruction/PXDGainCalibrator.h>
+#include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -550,8 +552,11 @@ void PXDDigitizerModule::saveDigits()
       // Draw a pedestal value
       double pedestal = std::max(gRandom->Gaus(m_pedestalMean, m_pedestalRMS), 0.0);
 
+      // Get gain correction
+      double gain = PXDGainCalibrator::getInstance().getGainCorrection(sensorID, d.u(), d.v());
+
       // Add pedestal to charge
-      charge = round(charge / m_eToADU + pedestal);
+      charge = round(charge * gain / m_eToADU + pedestal);
 
       // Clipping of ADC codes at 255
       charge = std::min(charge, 255.0);
@@ -570,6 +575,12 @@ void PXDDigitizerModule::saveDigits()
           row  = 767 - row;
         int gate = row / 4;
         if (checkIfGated(gate)) continue;
+      }
+
+      // Check if the readout digit is coming from a masked or dead area
+      if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, d.u(), d.v())
+          || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, d.u(), d.v())) {
+        continue;
       }
 
       //Add the digit to datastore

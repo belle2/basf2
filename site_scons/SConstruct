@@ -66,7 +66,7 @@ if GetOption("check_externals"):
 global_env = Environment(
     ENV=os.environ,
     tools=['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir',
-           'check_libraries'],
+           'check_libraries', 'strip_debug'],
     BUILDERS={},
     BUILDDIR=os.path.join('#build', subdir),
     INCDIR='#include',

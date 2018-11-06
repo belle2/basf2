@@ -12,7 +12,7 @@ import sys
 import inspect
 from vertex import *
 from kinfit import *
-from analysisPath import *
+from analysisPath import analysis_main
 from variables import variables
 import basf2_mva
 
@@ -1600,18 +1600,27 @@ def looseMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(list_name, path=analysis_main):
+def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
-    dataobject and makes BASF2 relation between them.
+    dataobject and makes BASF2 relation between them. User can provide additional
+    particle lists with a different particle hypotheses like ['K+:good, e+:good'], etc.
 
-    @param list_name name of the input ParticleList
+    @param target_list_name name of the input ParticleList
+    @param inputParticlelists list of input particle list names, which serve
+                              as a source of particles to build ROE, the FSP particles from
+                              target_list_name are excluded from ROE object
     @param path      modules are added to this path
     """
-
+    # if (len(inputParticlelists) < 3):
+    fillParticleList('pi+:roe_default', '', path=path)
+    fillParticleList('gamma:roe_default', '', path=path)
+    fillParticleList('K_L0:roe_default', '', path=path)
+    inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
     roeBuilder = register_module('RestOfEventBuilder')
-    roeBuilder.set_name('ROEBuilder_' + list_name)
-    roeBuilder.param('particleList', list_name)
+    roeBuilder.set_name('ROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('particleListsInput', inputParticlelists)
     path.add_module(roeBuilder)
 
 
@@ -2018,19 +2027,6 @@ def selectDaughters(particle_list_name, decay_string, path=analysis_main):
     path.add_module(seld)
 
 
-if __name__ == '__main__':
-    desc_list = []
-    for function_name in sorted(list_functions(sys.modules[__name__])):
-        function = globals()[function_name]
-        signature = inspect.formatargspec(*inspect.getfullargspec(function))
-        signature = signature.replace(repr(analysis_main), 'analysis_main')
-        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
-
-    from pager import Pager
-    with Pager('List of available functions in modularAnalysis'):
-        pretty_print_description_list(desc_list)
-
-
 def markDuplicate(particleList, prioritiseV0, path=analysis_main):
     """
     Call DuplicateVertexMarker to find duplicate particles in a list and
@@ -2346,3 +2342,10 @@ def tagCurlTracks(particleLists,
     curlTagger.param('train', train)
 
     path.add_module(curlTagger)
+
+
+if __name__ == '__main__':
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "modularAnalysis", {
+        repr(analysis_main): "analysis_main",
+    })

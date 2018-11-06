@@ -1024,5 +1024,6 @@ if __name__ == '__main__':
     desc_list.append((function.__name__, signature + '\n' + function.__doc__))
 
     from pager import Pager
+    from basf2.utils import pretty_print_description_list
     with Pager('Flavor Tagger function accepts the following arguments:'):
         pretty_print_description_list(desc_list)

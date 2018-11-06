@@ -165,6 +165,8 @@ int main(int argc, char* argv[])
      "Read steering file, but do not actually start any event processing. The module path the steering file would execute is instead pickled (serialized) into the given file.")
     ("execute-path", prog::value<string>(),
      "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
+    ("zmq",
+     "Use ZMQ for multiprocessing instead of a RingBuffer. This has many implications and should only be used by experts.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -189,9 +191,9 @@ int main(int argc, char* argv[])
       cout << cmdlineOptions << endl;
       return 0;
     } else if (varMap.count("version")) {
-      pythonFile = "basf2_version.py";
+      pythonFile = "basf2/version.py";
     } else if (varMap.count("info")) {
-      pythonFile = "info.py";
+      pythonFile = "basf2_cli/print_info.py";
     } else if (varMap.count("modules")) {
       string modArgs = varMap["modules"].as<string>();
       if (!modArgs.empty()) {
@@ -199,17 +201,17 @@ int main(int argc, char* argv[])
       }
       // recent boost program_options will not consume extra tokens for
       // implicit options. In this case the module/package name gets consumed
-      // in tyhe steering file so we just use that.
+      // in the steering file so we just use that.
       if (varMap.count("steering")) {
         arguments.insert(arguments.begin(), varMap["steering"].as<string>());
       }
-      pythonFile = "modules.py";
+      pythonFile = "basf2_cli/modules.py";
     } else if (varMap.count("module-io")) {
       runModuleIOVisualization = varMap["module-io"].as<string>();
-      pythonFile = "basf2.py"; //make module maps available, visualization will happen later
+      pythonFile = "basf2/core.py"; //make module maps available, visualization will happen later
     } else if (varMap.count("execute-path")) {
       Environment::Instance().setPicklePath(varMap["execute-path"].as<string>());
-      pythonFile = "execute_pickled_path.py";
+      pythonFile = "basf2_cli/execute_pickled_path.py";
     } else if (varMap.count("steering")) {
       // steering file not misused as module name, so print it's name :D
       pythonFile = varMap["steering"].as<string>();
@@ -226,6 +228,12 @@ int main(int argc, char* argv[])
       }
       Environment::Instance().setNumberProcessesOverride(nprocesses);
     }
+
+    // --zmq
+    if (varMap.count("zmq")) {
+      Environment::Instance().setUseZMQ(true);
+    }
+
 
 #ifdef HAS_CALLGRIND
     if (varMap.count("profile")) {

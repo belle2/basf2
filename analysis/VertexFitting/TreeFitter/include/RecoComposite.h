@@ -24,10 +24,10 @@ namespace TreeFitter {
     virtual ~RecoComposite() {};
 
     /** init particle in case it has a mother */
-    virtual ErrCode initParticleWithMother(FitParams& fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init particle in case it has no mother */
-    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** update chaed params */
     void updateParams();
@@ -39,34 +39,34 @@ namespace TreeFitter {
     int dimMeas() const        { return m_hasEnergy ? 7 : 6 ; }
 
     /** get dimension of cosntraint */
-    virtual int dim() const { return m_hasEnergy ? 8 : 7 ; }// (x,y,z,t,px,py,pz,(E))
+    virtual int dim() const override { return m_hasEnergy ? 8 : 7 ; }// (x,y,z,t,px,py,pz,(E))
 
     /** get dimension  of measurement*/
     int dimM() const        { return m_hasEnergy ? 7 : 6 ; }
 
     /** project this constraint */
-    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const ;
+    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const override ;
 
     /** get ype */
-    virtual int type() const { return kRecoComposite ; }
+    virtual int type() const override { return kRecoComposite ; }
 
     /** get position index in statevectof x,y,z,tau,px,py,pz */
-    virtual int posIndex() const { return index()   ; }
+    virtual int posIndex() const override { return index()   ; }
 
     /** get tau (lifetime) index in statevector */
-    virtual int tauIndex() const { return index() + 3 ; }
+    virtual int tauIndex() const override { return index() + 3 ; }
 
     /** get momentum index in statevector */
-    virtual int momIndex() const { return index() + 4 ; }
+    virtual int momIndex() const override { return index() + 4 ; }
 
     /** return of this constraint/particle has an energy component */
-    virtual bool hasEnergy() const { return m_hasEnergy ; }
+    virtual bool hasEnergy() const override { return m_hasEnergy ; }
 
     /** return true FIXME */
-    virtual bool hasPosition() const { return true ; }
+    virtual bool hasPosition() const override { return true ; }
 
     /** add this to list */
-    virtual void addToConstraintList(constraintlist& alist, int depth) const
+    virtual void addToConstraintList(constraintlist& alist, int depth) const override
     {
       alist.push_back(Constraint(this, Constraint::composite, depth, dimM())) ;
       alist.push_back(Constraint(this, Constraint::geometric, depth, 3)) ;

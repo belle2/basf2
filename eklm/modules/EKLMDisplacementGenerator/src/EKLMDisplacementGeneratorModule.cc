@@ -430,10 +430,14 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
         param = 1;
         value = alignmentData->getDx();
         t_sector->Fill();
+        /* cppcheck-suppress redundantAssignment */
         param = 2;
+        /* cppcheck-suppress redundantAssignment */
         value = alignmentData->getDy();
         t_sector->Fill();
+        /* cppcheck-suppress redundantAssignment */
         param = 3;
+        /* cppcheck-suppress redundantAssignment */
         value = alignmentData->getDalpha();
         t_sector->Fill();
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
@@ -445,7 +449,9 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
             param = 1;
             value = alignmentData->getDy();
             t_segment->Fill();
+            /* cppcheck-suppress redundantAssignment */
             param = 2;
+            /* cppcheck-suppress redundantAssignment */
             value = alignmentData->getDalpha();
             t_segment->Fill();
           }

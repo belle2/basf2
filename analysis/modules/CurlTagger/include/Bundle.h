@@ -24,7 +24,7 @@ namespace Belle2 {
 
     public:
       /** Constructor */
-      Bundle(bool isTruthBundle);
+      explicit Bundle(bool isTruthBundle);
 
       /** Destructor */
       ~Bundle();

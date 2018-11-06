@@ -3,13 +3,12 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CLUSTERUTILS_H
-#define CLUSTERUTILS_H
+#pragma once
 
 // BEAMPARAMETERS AND DATABASE
 #include <framework/dbobjects/BeamParameters.h>
@@ -95,8 +94,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif
-
-
-

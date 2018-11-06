@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ANALYSISCONFIGURATIONMODULE_H
-#define ANALYSISCONFIGURATIONMODULE_H
+#pragma once
 #include <string>
 #include <set>
 #include <framework/core/Module.h>
@@ -56,7 +55,6 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif
 
 
 

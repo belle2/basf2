@@ -30,7 +30,7 @@ ParticleList::~ParticleList()
   delete m_antiList;
 }
 
-void ParticleList::initialize(int pdg, std::string name, std::string particleStoreName)
+void ParticleList::initialize(int pdg, const std::string& name, const std::string& particleStoreName)
 {
   m_pdg    = pdg;
   m_pdgbar = pdg;

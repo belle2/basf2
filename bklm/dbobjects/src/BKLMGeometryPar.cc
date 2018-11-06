@@ -37,16 +37,18 @@ void BKLMGeometryPar::read(const GearDir& content)
   m_Phi = content.getLength("Phi");
   m_NSector = content.getNumberNodes("Sectors/Forward/Sector");
   if (m_NSector > NSECTOR) { // array-bounds check
-    B2FATAL("BKLMGeometryPar::read(): # of sectors (" <<
-            m_NSector << ") exceeds array size NSECTOR (" << NSECTOR << ")");
+    B2FATAL("BKLMGeometryPar::read(): sectors array size exceeded:"
+            << LogVar("# of sectors", m_NSector)
+            << LogVar("array size", NSECTOR));
   }
   m_SolenoidOuterRadius = content.getLength("SolenoidOuterRadius");
   m_OuterRadius = content.getLength("OuterRadius");
   m_HalfLength = content.getLength("HalfLength");
   m_NLayer = content.getNumberNodes("Layers/Layer");
   if (m_NLayer > NLAYER) { // array-bounds check
-    B2FATAL("BKLMGeometryPar::read(): # of layers (" <<
-            m_NLayer << ") exceeds array size NLAYER (" << NLAYER << ")");
+    B2FATAL("BKLMGeometryPar::read(): layer array size exceeded:"
+            << LogVar("# of layers", m_NLayer)
+            << LogVar("array size", NLAYER));
   }
 
   m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");
@@ -64,12 +66,14 @@ void BKLMGeometryPar::read(const GearDir& content)
   m_NZScintsChimney = content.getInt("Layers/NZScintillatorsChimney");
   m_NZScintsChimney = content.getInt("Layers/NZScintillatorsChimney");
   if (m_NZScints > NZSCINT) { // array-bounds check
-    B2FATAL("BKLMGeometryPar::read(): # of z scintillators (" <<
-            m_NZScints << ") exceeds array size NZSCINT (" << NZSCINT << ")");
+    B2FATAL("BKLMGeometryPar::read(): z-scint array size exceeded:"
+            << LogVar("# of z scintillators", m_NZScints)
+            << LogVar("array size", NZSCINT));
   }
   if (m_NZScintsChimney > NZSCINT) { // array-bounds check
-    B2FATAL("BKLMGeometryPar::read(): # of z scintillators in chimney sector (" <<
-            m_NZScintsChimney << ") exceeds array size NZSCINT (" << NZSCINT << ")");
+    B2FATAL("BKLMGeometryPar::read(): chimney sector z-scint array size exceeded:"
+            << LogVar("# of z scintillators", m_NZScintsChimney)
+            << LogVar("array size", NZSCINT));
   }
 
   m_ModuleLength = content.getLength("Module/Length");
@@ -123,8 +127,9 @@ void BKLMGeometryPar::read(const GearDir& content)
 
   m_NReadoutStation = content.getNumberNodes("Readout/Stations/Station");
   if (m_NReadoutStation > NSTATION) { // array-bounds check
-    B2FATAL("BKLMGeometryPar::read(): # of readout stations (" <<
-            m_NReadoutStation << ") exceeds array size NSTATION (" << NSTATION << ")");
+    B2FATAL("BKLMGeometryPar::read(): readout stations array size exceeded:"
+            << LogVar("# of readout stations", m_NReadoutStation)
+            << LogVar("array size", NSTATION));
   }
   for (int station = 1; station <= m_NReadoutStation; ++station) {
     sprintf(name, "/Readout/Stations/Station[@station=\"%d\"]", station);
@@ -166,8 +171,10 @@ void BKLMGeometryPar::read(const GearDir& content)
       m_ScintEnvelopeOffsetSign[layer - 1] = layerContent.getInt("ScintEnvelopeOffsetSign");
       m_NPhiScints[layer - 1] = layerContent.getInt("PhiScintillators/NScints", 0);
       if (m_NPhiScints[layer - 1] > NPHISCINT) { // array-bounds check
-        B2FATAL("BKLMGeometryPar::read(): # of phi scintillators (" <<
-                m_NPhiScints[layer - 1] << ") exceeds array size NPHISCINT (" << NPHISCINT << ")");
+        B2FATAL("BKLMGeometryPar::read(): phi-scint array size exceeded:"
+                << LogVar("in zero-based layer", layer - 1)
+                << LogVar("# of phi scintillators", m_NPhiScints[layer - 1])
+                << LogVar("array size", NPHISCINT));
       }
       for (int scint = 1; scint <= m_NZScints; ++scint) {
         sprintf(name, "/ZScintillators/Scint[@scint=\"%d\"]", scint);

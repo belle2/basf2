@@ -55,45 +55,46 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * create timing-height 2D histograms for all 8192 pixels
      */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
 
     TH2F* m_TimeHeightHistogramForFit[c_NPixelPerModule *
-                                      c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
+                                      c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
     TH2F* m_TimeHeightHistogramForHitRate[c_NPixelPerModule *
-                                          c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
+                                          c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
     TH2F* m_TimeIntegralHistogramForFit[c_NPixelPerModule *
-                                        c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
-    TH1F* m_nCalPulseHistogram; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
+                                        c_NModule] = {0}; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
+    TH1F* m_nCalPulseHistogram =
+      0; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
          the x-axis means global asic ID, defined as (slotNum-1)*64+(pixelID-1) */
 
     std::vector<int>

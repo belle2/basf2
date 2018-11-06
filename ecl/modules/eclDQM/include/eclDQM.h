@@ -52,18 +52,18 @@ namespace Belle2 {
     virtual ~ECLDQMModule();
 
     /** Initialize the module. */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Call when a run begins. */
-    virtual void beginRun();
+    virtual void beginRun() override;
     /** Event processor. */
-    virtual void event();
+    virtual void event() override;
     /** Call when a run ends. */
-    virtual void endRun();
+    virtual void endRun() override;
     /** Terminate. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Function to define histograms. */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
     /** StoreArray ECLDigit */

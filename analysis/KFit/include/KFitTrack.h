@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef KFITTRACK_H
-#define KFITTRACK_H
-
+#pragma once
 
 #include <iostream>
 
@@ -164,7 +161,8 @@ namespace Belle2 {
       /** Check if the flag is one of KFitConst::kBeforeFit or KFitConst::kAfterFit.  If check fails, abort the program.
        * @param flag
        */
-      inline void checkFlag(const int flag) const {
+      inline void checkFlag(const int flag) const
+      {
         if (flag != KFitConst::kBeforeFit && flag != KFitConst::kAfterFit) B2FATAL("checkFlag");
       }
 
@@ -172,7 +170,8 @@ namespace Belle2 {
        * @param m matrix to be tested
        * @param dim size of the matrix
        */
-      inline void checkMatrixDimension(const CLHEP::HepSymMatrix& m, const int dim) const {
+      inline void checkMatrixDimension(const CLHEP::HepSymMatrix& m, const int dim) const
+      {
         if (m.num_row() != dim) B2FATAL("checkMatrixDimension");
       }
 
@@ -197,6 +196,3 @@ namespace Belle2 {
 
   } // namespace analysis
 } // namespace Belle2
-
-#endif /* KFITTRACK_H */
-

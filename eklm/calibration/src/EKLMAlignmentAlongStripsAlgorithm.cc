@@ -25,9 +25,9 @@ static bool compareSegmentSignificance(
 }
 
 EKLMAlignmentAlongStripsAlgorithm::EKLMAlignmentAlongStripsAlgorithm() :
-  CalibrationAlgorithm("EKLMAlignmentAlongStripsCollector")
+  CalibrationAlgorithm("EKLMAlignmentAlongStripsCollector"),
+  m_OutputFile("")
 {
-  m_OutputFile = "";
 }
 
 EKLMAlignmentAlongStripsAlgorithm::~EKLMAlignmentAlongStripsAlgorithm()

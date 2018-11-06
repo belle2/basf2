@@ -19,7 +19,7 @@ conditions.root file in root::
 
 """
 
-import basf2 as b2
+import basf2
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
@@ -54,7 +54,7 @@ class Condition:
                 pass
         else:
             # nothing found, cannot continue
-            b2.B2FATAL(f"Cannot determine find object type '{className}'")
+            basf2.B2FATAL(f"Cannot determine find object type '{className}'")
 
         #: flag indicating whether or not the condition is present for this run
         self.valid = array('i', [0])
@@ -76,7 +76,7 @@ class Condition:
             self.valid[0] = False
 
 
-class ConditionsTreeModule(b2.Module):
+class ConditionsTreeModule(basf2.Module):
     """This module writes conditions to a TTree."""
 
     def __init__(self, exp, filename, conditions):
@@ -99,7 +99,7 @@ class ConditionsTreeModule(b2.Module):
         #: ROOT File to contain the output
         self.tfile = ROOT.TFile.Open(self.filename, "RECREATE")
         if not self.tfile.IsOpen():
-            b2.B2FATAL(f"Cannot create output root file '{self.filename}'")
+            basf2.B2FATAL(f"Cannot create output root file '{self.filename}'")
         #: Tree with the conditions data
         self.tree = ROOT.TTree('conditions', f'Conditions data for experiment {self.exp[0]}')
         #: Add the experiment and run numbers
@@ -116,7 +116,7 @@ class ConditionsTreeModule(b2.Module):
         # Update run/exp number
         self.exp[0] = self.eventMetaData.getExperiment()
         self.run[0] = self.eventMetaData.getRun()
-        b2.B2INFO(f"Processing exp {self.exp[0]}, run {self.run[0]}")
+        basf2.B2INFO(f"Processing exp {self.exp[0]}, run {self.run[0]}")
 
         # update all condition objects
         for condition in self.conditions:
@@ -150,19 +150,19 @@ def get_argument_parser():
 if __name__ == "__main__":
     args = get_argument_parser().parse_args()
     # no need for log summary
-    b2.logging.enable_summary(False)
+    basf2.logging.enable_summary(False)
 
     # setup database if a tag is given
     if args.tag:
-        b2.reset_database()
+        basf2.reset_database()
         tags = args.tag.split(':')
-        b2.use_database_chain(False, b2.LogLevel.DEBUG)
+        basf2.use_database_chain(False, basf2.LogLevel.DEBUG)
 
         for tag in tags:
             if tag.endswith('.txt'):
-                b2.use_local_database(tag, readonly=True, loglevel=b2.LogLevel.DEBUG)
+                basf2.use_local_database(tag, readonly=True, loglevel=basf2.LogLevel.DEBUG)
             else:
-                b2.use_central_database(tag, b2.LogLevel.DEBUG)
+                basf2.use_central_database(tag, basf2.LogLevel.DEBUG)
 
     # parse runs argument
     runs = []
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     runs = list(sorted(set(runs)))
 
     # run over the given run ranges and write the conditions to the TTree
-    main = b2.create_path()
+    main = basf2.create_path()
     main.add_module('EventInfoSetter', expList=[args.exp] * len(runs), runList=runs, evtNumList=[1] * len(runs))
     main.add_module(ConditionsTreeModule(args.exp, args.output, args.condition))
-    b2.process(main)
+    basf2.process(main)

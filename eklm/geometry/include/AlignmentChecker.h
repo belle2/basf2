@@ -50,6 +50,11 @@ namespace Belle2 {
       AlignmentChecker(const AlignmentChecker&) = delete;
 
       /**
+       * Operator = (disabled).
+       */
+      AlignmentChecker& operator=(const AlignmentChecker&) = delete;
+
+      /**
        * Destructor.
        */
       ~AlignmentChecker();

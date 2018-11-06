@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef MAKEMOTHERKFIT_H
-#define MAKEMOTHERKFIT_H
-
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -188,6 +185,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MAKEMOTHERKFIT_H */
-

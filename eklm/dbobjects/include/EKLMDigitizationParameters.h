@@ -268,7 +268,7 @@ namespace Belle2 {
     /** Enable background in fitting. */
     bool m_EnableConstBkg;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMDigitizationParameters, 3);
 
   };

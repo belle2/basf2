@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef KFITBASE_H
-#define KFITBASE_H
-
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -29,16 +26,12 @@
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitTrack.h>
 
-
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
 
-
 namespace Belle2 {
-
   namespace analysis {
-
     /**
      * KFitBase is a base class for kinematical fitters.
      */
@@ -337,5 +330,4 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif /* B2KFIT_BASE_H */
 

@@ -1,9 +1,9 @@
 /**************************************************************************
- * Copyright(C) 2016 - Yu Hu                                              *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
- * Author: Yu Hu                                                          *
- * Contributor: J. Tanaka and                                             *
- *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Yu Hu                                                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

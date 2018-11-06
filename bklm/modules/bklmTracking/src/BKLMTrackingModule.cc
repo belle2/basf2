@@ -21,8 +21,22 @@ using namespace CLHEP;
 
 REG_MODULE(BKLMTracking)
 
-BKLMTrackingModule::BKLMTrackingModule() : Module()
+BKLMTrackingModule::BKLMTrackingModule() : Module(),
+  m_effiYX(nullptr),
+  m_effiYZ(nullptr),
+  m_passYX(nullptr),
+  m_totalYX(nullptr),
+  m_passYZ(nullptr),
+  m_totalYZ(nullptr)
 {
+  for (int i = 0; i < 8; ++i) {
+    m_total[0][i] = nullptr;
+    m_total[1][i] = nullptr;
+    m_pass[0][i] = nullptr;
+    m_pass[1][i] = nullptr;
+    m_effiVsLayer[0][i] = nullptr;
+    m_effiVsLayer[1][i] = nullptr;
+  }
   setDescription("perform standard-alone straight line tracking for BKLM");
   addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,
@@ -465,13 +479,13 @@ bool BKLMTrackingModule::sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2)
 
 bool BKLMTrackingModule::isLayerUnderStudy(int isForward, int iSector, int iLayer, BKLMHit2d* hit)
 {
-  if (hit->isForward() == isForward && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
+  if (hit->isForward() == (isForward != 0) && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1) return true;
   else return false;
 }
 
 bool BKLMTrackingModule::isSectorUnderStudy(int isForward, int iSector, BKLMHit2d* hit)
 {
-  if (hit->isForward() == isForward && hit->getSector() == iSector + 1) return true;
+  if (hit->isForward() == (isForward != 0) && hit->getSector() == iSector + 1) return true;
   else return false;
 }
 

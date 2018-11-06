@@ -40,8 +40,8 @@ namespace TreeFitter {
                bool ipConstraint = false,
                bool customOrigin = false,
                bool updateDaughters = false,
-               const std::vector<double> customOriginVertex = {0, 0, 0},
-               const std::vector<double> customOriginCovariance = {0, 0, 0},
+               const std::vector<double>& customOriginVertex = {0, 0, 0},
+               const std::vector<double>& customOriginCovariance = {0, 0, 0},
                const bool useReferencing = false
               );
 
@@ -52,7 +52,7 @@ namespace TreeFitter {
     bool fit();
 
     /** add extrainfo to particle */
-    void setExtraInfo(Belle2::Particle* part, const std::string name, const double value) const;
+    void setExtraInfo(Belle2::Particle* part, const std::string& name, const double value) const;
 
     /** update particles parameters with the fit results */
     bool updateCand(Belle2::Particle& particle, const bool isTreeHead) const;

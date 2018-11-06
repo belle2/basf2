@@ -227,6 +227,7 @@ namespace Belle2 {
 
       if (!treeCal) {
         B2ERROR("openFile: no tree named chT0 found in " << fileName);
+        file->Close();
         continue;
       }
 
@@ -296,6 +297,7 @@ namespace Belle2 {
 
     if (!treeCal) {
       B2ERROR("openFile: no tree named tree found in " << fileName);
+      file->Close();
       return;
     }
 
@@ -500,6 +502,7 @@ namespace Belle2 {
         }
       }
     }
+    file->Close();
 
     // import to database
     IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
@@ -579,7 +582,16 @@ namespace Belle2 {
 
     // open root file and get tree
     TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tQeData = (TTree*)file->Get(treeName.c_str());
+    if (!tQeData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tQeData->SetBranchAddress("serialNum", &serialNum);
     tQeData->SetBranchAddress("lambdaFirst", &lambdaFirst);
@@ -615,6 +627,7 @@ namespace Belle2 {
 
       countPMTs++;
     }
+    file->Close();
 
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtQEs.import(iov);
@@ -640,7 +653,16 @@ namespace Belle2 {
 
     // open root file and get tree
     TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tGainData = (TTree*)file->Get(treeName.c_str());
+    if (!tGainData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tGainData->SetBranchAddress("serialNum", &serialNum);
     tGainData->SetBranchAddress("gain_const", &gain_const);
@@ -664,6 +686,7 @@ namespace Belle2 {
       }
       countPMTs++;
     }
+    file->Close();
 
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtGains.import(iov);
@@ -688,7 +711,16 @@ namespace Belle2 {
 
     // open root file and get tree
     TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tInstData = (TTree*)file->Get(treeName.c_str());
+    if (!tInstData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tInstData->SetBranchAddress("serialNum", &serialNum);
     tInstData->SetBranchAddress("moduleCNum", &moduleCNum);
@@ -705,13 +737,13 @@ namespace Belle2 {
       pmtInst.appendNew(*serialNum, moduleCNum, slotNum, arrayNum, PMTposition, type);
       countPMTs++;
     }
+    file->Close();
 
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtInst.import(iov);
 
     B2RESULT("PMT installation data imported to database for " << countPMTs << " PMT's.");
 
-    return;
   }
 
 
@@ -730,7 +762,16 @@ namespace Belle2 {
 
     // open root file and get tree
     TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tObsData = (TTree*)file->Get(treeName.c_str());
+    if (!tObsData) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tObsData->SetBranchAddress("serialNum", &serialNum);
     tObsData->SetBranchAddress("cathode", &cathode);
@@ -787,7 +828,16 @@ namespace Belle2 {
 
     // open root file and get tree
     TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tTtsPar = (TTree*)file->Get(treeName.c_str());
+    if (!tTtsPar) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tTtsPar->SetBranchAddress("serialNum", &serialNum);
     for (int ic = 0; ic < nChann; ic++) {
@@ -847,6 +897,7 @@ namespace Belle2 {
       }
       countPMTs++;
     }
+    file->Close();
 
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtTtsPars.import(iov);
@@ -873,7 +924,16 @@ namespace Belle2 {
 
     // open root file and get tree
     TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("Cannot open the file " << fileName);
+      return;
+    }
     TTree* tTtsHisto = (TTree*)file->Get(treeName.c_str());
+    if (!tTtsHisto) {
+      B2ERROR("No TTree with name " << treeName << " in file " << fileName);
+      file->Close();
+      return;
+    }
 
     tTtsHisto->SetBranchAddress("serialNum", &serialNum);
     tTtsHisto->SetBranchAddress("hv", &hv);
@@ -901,6 +961,7 @@ namespace Belle2 {
       }
       countHists++;
     }
+    file->Close();
 
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtTtsHistos.import(iov);
@@ -926,6 +987,11 @@ namespace Belle2 {
       return;
     }
     TTree* tr = (TTree*)file->Get("tree");   // defined in TOPGainEfficiencyCalculatorModule
+    if (!tr) {
+      B2ERROR("No TTree with name tree found in " << fileName);
+      file->Close();
+      return;
+    }
 
     short slotId = 0;
     short pixelId = 0;
@@ -949,6 +1015,7 @@ namespace Belle2 {
     const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
     if (!channelMapper.isValid()) {
       B2ERROR("No valid channel mapper found");
+      file->Close();
       return;
     }
 
@@ -981,6 +1048,7 @@ namespace Belle2 {
         }
       }
     }
+    file->Close();
 
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     calChannelPulseHeight.import(iov);

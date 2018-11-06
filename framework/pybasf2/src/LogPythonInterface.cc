@@ -393,33 +393,33 @@ keyword arguments are added to the function as log variables.)DOCSTRING";
   def("B2DEBUG", logDebug);
   setattr(logDebug, "__doc__", "B2DEBUG(debugLevel, message, *args, **kwargs)\n\n"
           "Print a `DEBUG <basf2.LogLevel.DEBUG>` message. "
-          "The first argument is the debug Level" + common_doc);
+          "The first argument is the debug Level. " + common_doc);
 
   auto logInfo = raw_function(&LogPythonInterface::logInfo);
   def("B2INFO", logInfo);
   setattr(logInfo, "__doc__", "B2INFO(message, *args, **kwargs)\n\n"
-          "Print a `INFO <basf2.LogLevel.INFO>` message" + common_doc);
+          "Print a `INFO <basf2.LogLevel.INFO>` message. " + common_doc);
 
   auto logResult = raw_function(&LogPythonInterface::logResult);
   def("B2RESULT", logResult);
   setattr(logResult, "__doc__", "B2RESULT(message, *args, **kwargs)\n\n"
-          "Print a `RESULT <basf2.LogLevel.RESULT>` message" + common_doc);
+          "Print a `RESULT <basf2.LogLevel.RESULT>` message. " + common_doc);
 
   auto logWarning = raw_function(&LogPythonInterface::logWarning);
   def("B2WARNING", logWarning);
   setattr(logWarning, "__doc__", "B2WARNING(message, *args, **kwargs)\n\n"
-          "Print a `WARNING <basf2.LogLevel.WARNING>` message" + common_doc);
+          "Print a `WARNING <basf2.LogLevel.WARNING>` message. " + common_doc);
 
   auto logError = raw_function(&LogPythonInterface::logError);
   def("B2ERROR", logError);
   setattr(logError, "__doc__", "B2ERROR(message, *args, **kwargs)\n\n"
-          "Print a `ERROR <basf2.LogLevel.ERROR>` message" + common_doc);
+          "Print a `ERROR <basf2.LogLevel.ERROR>` message. " + common_doc);
 
   auto logFatal = raw_function(&LogPythonInterface::logFatal);
   def("B2FATAL", logFatal);
   setattr(logFatal, "__doc__", "B2FATAL(message, *args, **kwargs)\n\n"
           "Print a `FATAL <basf2.LogLevel.FATAL>` message. "
-          "This also exits the programm with an error" + common_doc);
+          "This also exits the programm with an error. " + common_doc);
 }
 
 namespace {
@@ -452,7 +452,7 @@ namespace {
    * log stream variables. In case of debug messages the first argument is
    * treated as the debug level.
    */
-  boost::python::object dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, boost::python::dict kwargs)
+  void dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, boost::python::dict kwargs)
   {
     int debugLevel = 0;
     const int firstArg = logLevel == LogConfig::c_Debug ? 1 : 0;
@@ -492,50 +492,45 @@ namespace {
       Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(logLevel, std::move(lvs), "steering",
                                                 function, file, line, debugLevel));
     }
-    // return None
-    return boost::python::object();
   }
 }
 
 boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2DEBUG
-  return dispatchMessage(LogConfig::c_Debug, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Debug, args, kwargs);
 #endif
+  return boost::python::object();
 }
 
 boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2INFO
-  return dispatchMessage(LogConfig::c_Info, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Info, args, kwargs);
 #endif
+  return boost::python::object();
 }
 
 boost::python::object LogPythonInterface::logResult(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2RESULT
-  return dispatchMessage(LogConfig::c_Result, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Result, args, kwargs);
 #endif
+  return boost::python::object();
 }
 
 boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, boost::python::dict kwargs)
 {
 #ifndef LOG_NO_B2WARNING
-  return dispatchMessage(LogConfig::c_Warning, args, kwargs);
-#elif
-  return boost::python::object();
+  dispatchMessage(LogConfig::c_Warning, args, kwargs);
 #endif
+  return boost::python::object();
 }
 
 boost::python::object LogPythonInterface::logError(boost::python::tuple args, boost::python::dict kwargs)
 {
-  return dispatchMessage(LogConfig::c_Error, args, kwargs);
+  dispatchMessage(LogConfig::c_Error, args, kwargs);
+  return boost::python::object();
 }
 
 boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, boost::python::dict kwargs)

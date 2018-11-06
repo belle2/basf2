@@ -2428,9 +2428,9 @@ namespace {
     }
 
     // get the zeroth track in the array (is not associated to a cluster)
-    const Particle* sometrack = particles.appendNew(Particle(tracks[0], Const::pion));
+    const Particle* noclustertrack = particles.appendNew(Particle(tracks[0], Const::pion));
 
-    // grab ze variables for testing
+    // grab variables for testing
     const Manager::Var* b2bClusterTheta = Manager::Instance().getVariable("b2bClusterTheta");
     const Manager::Var* b2bClusterPhi = Manager::Instance().getVariable("b2bClusterPhi");
 
@@ -2444,8 +2444,18 @@ namespace {
     EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(2)), -1.3155469);
 
     // track (or anything without a cluster) should be nan
-    ASSERT_TRUE(std::isnan(b2bClusterTheta->function(sometrack)));
-    ASSERT_TRUE(std::isnan(b2bClusterPhi->function(sometrack)));
+    ASSERT_TRUE(std::isnan(b2bClusterTheta->function(noclustertrack)));
+    ASSERT_TRUE(std::isnan(b2bClusterPhi->function(noclustertrack)));
+
+    // the "normal" (not cluster based) variables should be the same for photons
+    // (who have no track information)
+    const Manager::Var* b2bTheta = Manager::Instance().getVariable("b2bTheta");
+    const Manager::Var* b2bPhi = Manager::Instance().getVariable("b2bPhi");
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)),
+                    b2bTheta->function(gammalist->getParticle(0)));
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)),
+                    b2bPhi->function(gammalist->getParticle(0)));
   }
 
   TEST_F(ECLVariableTest, WholeEventClosure)

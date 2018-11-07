@@ -52,8 +52,8 @@ namespace Belle2 {
       /*
        * TMatrixFSym is stored as a full matrix, thus all elements must be set.
        */
-      for (int i = 0; i <= n; ++i) {
-        for (int j = 0; j <= n; j++)
+      for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j)
           m(i, j) = matrix(i, j);
       }
       return m;

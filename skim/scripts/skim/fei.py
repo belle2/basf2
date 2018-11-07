@@ -3,7 +3,6 @@
 
 """
 (Semi-)Leptonic Working Group Skims for missing energy modes that use the `FullEventInterpretation` (FEI) algorithm.
- The fei training is: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
 """
 
 __authors__ = [
@@ -126,9 +125,12 @@ def BplusHadronic(path):
     **Cuts applied are**:
 
         Event precuts:
+
         * R2EventLevel < 0.4
         * nTracks >= 4
-        * Tag side B:
+
+        Tag side B:
+
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
@@ -185,11 +187,15 @@ def runFEIforB0Hadronic(path):
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
-        * Event precuts:
+   ** Cuts applied are**:
+
+        Event precuts:
+
         * R2EventLevel < 0.4
         * nTracks >= 4
-        * Tag side B:
+
+        Tag side B:
+
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
@@ -251,11 +257,15 @@ def runFEIforBplusHadronic(path):
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are**:
+
         Event precuts:
+
         * R2EventLevel < 0.4
         * nTracks >= 4
-        * Tag side B:
+
+        Tag side B:
+
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
@@ -289,10 +299,12 @@ def runFEIforHadronicCombined(path):
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
-    Cuts applied are::
+    **Cuts applied are**:
+
         Event precuts:
-        R2EventLevel < 0.4
-        nTracks >= 4"""
+
+        * R2EventLevel < 0.4
+        * nTracks >= 4"""
 
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)

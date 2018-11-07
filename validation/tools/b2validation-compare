@@ -3,17 +3,26 @@
 import os
 from glob import glob
 
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
-
 import argparse
 from subprocess import check_call
 
-try:
-    from git import Repo
-except ImportError:
-    print("This script requires GitPython, please install it via `pip3 install --user GitPython")
-    sys.exit(1)
+from validation_tools import helpers
+helpers.fix_root_command_line()
+
+
+def copy_input_files(revision, first_revision):
+    try:
+        os.mkdir(os.path.join("results", revision))
+    except FileExistsError:
+        pass
+
+    for input_file in glob(os.path.join("results", first_revision, "EvtGen*.root")):
+        link_file = os.path.join("results", revision, os.path.basename(input_file))
+        try:
+            os.link(input_file, link_file)
+        except FileExistsError:
+            pass
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(usage="""Quickly compare multiple git revisions with the validation framework.
@@ -42,19 +51,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     revisions = args.revision
-    compile_options = args.compile_options
-    validation_options = args.validation_options
+    compile_options = args.compile_options.split(" ")
+    validation_options = args.validation_options.split(" ")
 
-    git_repository = os.getenv("BELLE2_LOCAL_DIR")
-
-    if not git_repository:
-        raise ValueError("You need to setup basf2 first")
-
-    repo = Repo(git_repository)
-    assert not repo.bare
-
-    if repo.is_dirty():
-        print("Your git repo is dirty! I can not guarantee for valid results...")
+    repo = helpers.get_basf2_repo(non_dirty_check=True)
 
     try:
         os.mkdir("results")
@@ -63,27 +63,17 @@ if __name__ == '__main__':
 
     for revision in revisions:
         # Step 1 Checkout git commit
-        repo.git.checkout(revision)
+        helpers.checkout_git_revision(revision, repo)
 
         # Step 2: compile
-        check_call(["scons"] + compile_options.split(" "))
+        helpers.compile_basf2(compile_options)
 
         # Step 3: Copy input files
-        try:
-            os.mkdir(os.path.join("results", revision))
-        except FileExistsError:
-            pass
-
         first_revision = revisions[0]
-        for input_file in glob(os.path.join("results", first_revision, "EvtGen*.root")):
-            link_file = os.path.join("results", revision, os.path.basename(input_file))
-            try:
-                os.link(input_file, link_file)
-            except FileExistsError:
-                pass
+        copy_input_files(revision, first_revision)
 
         # Step 4: run validation with tag
-        check_call(["b2validation", "--tag", revision] + validation_options.split(" "))
+        helpers.run_basf2_validation(["--tag", revision] + validation_options)
 
     # Show results
     check_call(["b2validation-server", "--view"])

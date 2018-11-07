@@ -24,6 +24,7 @@
 #include <framework/gearbox/Const.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/dataobjects/TOPLikelihood.h>
+#include <top/dataobjects/TOPRecBunch.h>
 
 #include <algorithm> // for sort
 using namespace std;
@@ -278,7 +279,7 @@ namespace Belle2 {
     }
 
     //! @returns the number of TOP photons in the given time interval
-    int countTOPHitsInInterval(const Particle* particle, const vector<double>& vars)
+    double countTOPHitsInInterval(const Particle* particle, const vector<double>& vars)
     {
       if (vars.size() != 2) {
         B2FATAL("Need exactly two parameters (tmin, tmax)");
@@ -287,9 +288,54 @@ namespace Belle2 {
     }
 
     //! @returns the number of TOP photons in the first 20 ns
-    int countTOPHitsInFirst20ns(const Particle* particle)
+    double countTOPHitsInFirst20ns(const Particle* particle)
     {
       return topDigitVariables::countHits(particle, -1.0, 20.0);
+    }
+
+    //---------------- TOPRecBunch related --------------------
+
+    //! @returns whether the rec bunch is reconstructed
+    double isTOPRecBunchReconstructed(const Particle* particle)
+    {
+      StoreObjPtr<TOPRecBunch> recBunch;
+      // Attention! 0.0 is false, everything else is true
+      // returning -1, like for the others will most likely lead to bugs
+      // if the caller is not careful about return values.
+      if (not recBunch.isValid()) return 0.0;
+      return recBunch->isReconstructed();
+    }
+
+    //! returns the bunch number. Use -9999 to indicate error
+    double TOPRecBunchNumber(const Particle* particle)
+    {
+      StoreObjPtr<TOPRecBunch> recBunch;
+      if (not recBunch.isValid()) return -9999.0;
+      return recBunch->getBunchNo();
+    }
+
+    //! returns the current offset
+    double TOPRecBunchCurrentOffset(const Particle* particle)
+    {
+      StoreObjPtr<TOPRecBunch> recBunch;
+      if (not recBunch.isValid()) return -9999.0;
+      return recBunch->getCurrentOffset();
+    }
+
+    //! returns the number of tracks in the TOP acceptance
+    double TOPRecBunchTrackCount(const Particle* particle)
+    {
+      StoreObjPtr<TOPRecBunch> recBunch;
+      if (not recBunch.isValid()) return -9999.0;
+      return recBunch->getNumTracks();
+    }
+
+    //! returns the number of tracks used in the bunch reconstruction
+    double TOPRecBunchUsedTrackCount(const Particle* particle)
+    {
+      StoreObjPtr<TOPRecBunch> recBunch;
+      if (not recBunch.isValid()) return -9999.0;
+      return recBunch->getUsedTracks();
     }
 
     VARIABLE_GROUP("TOP Calibration");
@@ -319,6 +365,16 @@ namespace Belle2 {
                       "[calibration] The number of photons in the given interval");
     REGISTER_VARIABLE("countTOPHitsInFirst20ns", countTOPHitsInFirst20ns,
                       "[calibration] The number of photons in the first 20 ns after the first photon");
+    REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPRecBunchUsedTrackCount,
+                      "[calibration] The number of tracks used in the bunch reconstruction");
+    REGISTER_VARIABLE("topRecBunchTrackCount", TOPRecBunchTrackCount,
+                      "[calibration] The number of tracks in the TOP acceptance");
+    REGISTER_VARIABLE("topRecBunchCurrentOffset", TOPRecBunchCurrentOffset,
+                      "[calibration] The current offset");
+    REGISTER_VARIABLE("topRecBunchNumber", TOPRecBunchNumber,
+                      "[calibration] The number of the bunch relative to the interaction");
+    REGISTER_VARIABLE("isTopRecBunchReconstructed", isTOPRecBunchReconstructed,
+                      "[calibration] Flag to indicate whether the bunch was reconstructed");
   }
 // Create an empty module which allows basf2 to easily find the library and load it from the steering file
   class EnableTOPDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.

@@ -10,9 +10,9 @@
 
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 
-#include <analysis/VariableManager/VertexVariables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/VertexVariables.h>
+#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/Variables.h>
 
 //Root includes
 #include "TLorentzVector.h"
@@ -43,7 +43,7 @@ void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
   if (m_TrainFlag) {
     m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? 1 : 0);
   }
-  m_ChargeMult = iPart->getCharge() * jPart->getCharge();
+  m_ChargeProduct = iPart->getCharge() * jPart->getCharge();
   m_PPhi  = iPart->getMomentum().Angle(jPart->getMomentum());
   m_PtDiffEW = abs(Variable::particlePt(iPart) - Variable::particlePt(jPart)) / (Variable::particlePtErr(
                  iPart) + Variable::particlePtErr(jPart));
@@ -64,7 +64,7 @@ void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
 std::vector<float> SelectorMVA::getVariables(Particle* iPart, Particle* jPart)
 {
   updateVariables(iPart, jPart);
-  return {m_PPhi, m_ChargeMult, m_PtDiffEW, m_PzDiffEW, m_TrackD0DiffEW, m_TrackZ0DiffEW, m_TrackTanLambdaDiffEW, m_TrackPhi0DiffEW, m_TrackOmegaDiffEW};
+  return {m_PPhi, m_ChargeProduct, m_PtDiffEW, m_PzDiffEW, m_TrackD0DiffEW, m_TrackZ0DiffEW, m_TrackTanLambdaDiffEW, m_TrackPhi0DiffEW, m_TrackOmegaDiffEW};
 }
 
 void SelectorMVA::collectTrainingInfo(Particle* iPart, Particle* jPart)
@@ -80,7 +80,7 @@ void SelectorMVA::initialize()
     m_TTree = new TTree("ntuple", "Training Data for the Curl Tagger MVA");
 
     m_TTree -> Branch("PPhi"  , &m_PPhi, "PPhi/F");
-    m_TTree -> Branch("ChargeMult", &m_ChargeMult, "ChargeMult/F");
+    m_TTree -> Branch("ChargeProduct", &m_ChargeProduct, "ChargeProduct/F");
     m_TTree -> Branch("PtDiffEW", &m_PtDiffEW, "PtDiffEW/F");
     m_TTree -> Branch("PzDiffEW", &m_PzDiffEW, "PzDiffEW/F");
     m_TTree -> Branch("TrackD0DiffEW", &m_TrackD0DiffEW, "TrackD0DiffEW/F");
@@ -92,7 +92,7 @@ void SelectorMVA::initialize()
     m_TTree -> Branch("IsCurl", &m_IsCurl, "IsCurl/F");
 
     m_target_variable = "IsCurl";
-    m_variables = {"PPhi", "ChargeMult", "PtDiffEW", "PzDiffEW", "TrackD0DiffEW", "TrackZ0DiffEW", "TrackTanLambdaDiffEW", "TrackPhi0DiffEW", "TrackOmegaDiffEW"};
+    m_variables = {"PPhi", "ChargeProduct", "PtDiffEW", "PzDiffEW", "TrackD0DiffEW", "TrackZ0DiffEW", "TrackTanLambdaDiffEW", "TrackPhi0DiffEW", "TrackOmegaDiffEW"};
 
   } else { // normal application
     //load MVA
@@ -134,7 +134,7 @@ void SelectorMVA::finalize()
   }
 }
 
-float SelectorMVA::getProbability(Particle* iPart, Particle* jPart)
+float SelectorMVA::getResponse(Particle* iPart, Particle* jPart)
 {
   MVA::SingleDataset dataset(m_generalOptions, getVariables(iPart, jPart));
   return m_expert.apply(dataset)[0];

@@ -44,18 +44,18 @@ namespace Belle2 {
     virtual ~BKLMAnaModule();
 
     //! Initialize at start of job
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Do any needed actions at the start of a simulation run
-    virtual void beginRun();
+    virtual void beginRun() override;
 
-    virtual void event();
+    virtual void event() override;
 
     //! Do any needed actions at the end of a simulation run
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! Terminate at the end of job
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 

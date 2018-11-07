@@ -42,16 +42,16 @@ namespace Belle2 {
     virtual ~KKGenInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Method is called at the end of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:

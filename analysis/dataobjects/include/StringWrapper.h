@@ -9,11 +9,8 @@
  **************************************************************************/
 
 #pragma once
-
 #include <framework/datastore/RelationsObject.h>
-
 #include <string>
-
 
 namespace Belle2 {
 
@@ -21,8 +18,6 @@ namespace Belle2 {
    * This class is a wrapper for strings, such as MCDecayStrings, to allow them to be associated
    * with particles via a relation.
    */
-
-
   class StringWrapper : public RelationsObject {
 
     // Note: Currently all functions are simple enough to be defined in this file,
@@ -41,9 +36,9 @@ namespace Belle2 {
      *
      * @param the new string.
      */
-    void setString(std::string string)
+    void setString(const std::string& inputstring)
     {
-      m_string = string;
+      m_string = inputstring;
     }
 
     /**
@@ -58,11 +53,6 @@ namespace Belle2 {
 
   private:
     std::string m_string; /**< the contained string */
-
-
     ClassDef(StringWrapper, 1) /**< class definition */
-
-
   };
-
 } //end namespace Belle2

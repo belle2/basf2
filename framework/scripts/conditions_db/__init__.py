@@ -36,11 +36,36 @@ class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URLS = ["http://belle2db.sdcc.bnl.gov/b2s/rest/", "http://belle2db.hep.pnnl.gov/b2s/rest/"]
+    BASE_URLS = ["http://belle2db.sdcc.bnl.gov/b2s/rest/"]
 
     class RequestError(RuntimeError):
         """Class to be thrown by request() if there is any error"""
         pass
+
+    @staticmethod
+    def get_base_urls(given_url):
+        """Resolve the list of server urls. If a url is given just return it.
+        Otherwise return servers listed in BELLE2_CONDB_SERVERLIST or the
+        builtin defaults
+
+        Arguments:
+            given_url (str): Explicit base_url. If this is not None it will be
+               returned as is in a list of length 1
+
+        Returns:
+            a list of urls to try for database connectivity
+        """
+
+        base_url_list = ConditionsDB.BASE_URLS[:]
+        base_url_env = os.environ.get("BELLE2_CONDB_SERVERLIST", None)
+        if given_url is not None:
+            base_url_list = [given_url]
+        elif base_url_env is not None:
+            base_url_list = base_url_env.split()
+            B2INFO("Getting Conditions Database servers from Environment:")
+            for i, url in enumerate(base_url_list, 1):
+                B2INFO(f"  {i}. {url}")
+        return base_url_list
 
     def __init__(self, base_url=None, max_connections=10, retries=3):
         """
@@ -68,15 +93,7 @@ class ConditionsDB:
                 "https": os.environ.get("BELLE2_CONDB_PROXY"),
             }
         # test the given url or try the known defaults
-        base_url_list = self.BASE_URLS
-        base_url_env = os.environ.get("BELLE2_CONDB_SERVERLIST", None)
-        if base_url is not None:
-            base_url_list = [base_url]
-        elif base_url_env is not None:
-            base_url_list = base_url_env.split()
-            B2INFO("Setting list of database servers from environment")
-            for i, url in enumerate(base_url_list, 1):
-                B2INFO(f"   {i}. {url}")
+        base_url_list = ConditionsDB.get_base_urls(base_url)
 
         for url in base_url_list:
             #: base url to be prepended to all requests
@@ -240,7 +257,7 @@ class ConditionsDB:
         Check for the existence of payloads in the database.
 
         Arguments:
-            payloads list((str,str)): A list of payloads to check for. Each
+            payloads (list((str,str))): A list of payloads to check for. Each
                payload needs to be a tuple of the name of the payload and the
                md5 checksum of the payload file.
 
@@ -374,13 +391,19 @@ def require_database_for_test(timeout=60, base_url=None):
     will signal test_basf2 that the test should be skipped and exit
     """
     import sys
-    try:
-        if os.environ.get("BELLE2_CONDB_GLOBALTAG", None) == "":
-            raise Exception("Access to the Database is disabled")
-        req = requests.request("HEAD", base_url + "globalTags", timeout=timeout)
-        req.raise_for_status()
-    except Exception as e:
-        print("TEST SKIPPED: Database problem: %s" % e, file=sys.stderr)
+    if os.environ.get("BELLE2_CONDB_GLOBALTAG", None) == "":
+        raise Exception("Access to the Database is disabled")
+    base_url_list = ConditionsDB.get_base_urls(base_url)
+    for url in base_url_list:
+        try:
+            req = requests.request("HEAD", url.rstrip('/') + "/v2/globalTags")
+            req.raise_for_status()
+        except requests.RequestException as e:
+            B2WARNING(f"Problem connecting to {url}:\n     {e}\n Trying next server ...")
+        else:
+            break
+    else:
+        print("TEST SKIPPED: No working database servers configured, giving up", file=sys.stderr)
         sys.exit(1)
 
 

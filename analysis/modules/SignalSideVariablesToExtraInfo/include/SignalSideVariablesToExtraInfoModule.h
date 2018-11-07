@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIGNALSIDEVARIABLESTOEXTRAINFOMODULE_H
-#define SIGNALSIDEVARIABLESTOEXTRAINFOMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -39,10 +38,10 @@ namespace Belle2 {
     SignalSideVariablesToExtraInfoModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void event();
+    virtual void event() override;
 
 
   private:
@@ -62,4 +61,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* SIGNALSIDEVARIABLESTOEXTRAINFOMODULE_H */

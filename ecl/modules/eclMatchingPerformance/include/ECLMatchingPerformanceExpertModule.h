@@ -46,13 +46,13 @@ namespace Belle2 {
     ECLMatchingPerformanceExpertModule();
 
     /** Register the needed StoreArrays and open the output TFile. */
-    void initialize();
+    void initialize() override;
 
     /** Fill the tree with the event data. */
-    void event();
+    void event() override;
 
     /** Write the tree into the opened root file. */
-    void terminate();
+    void terminate() override;
 
   private:
     std::string m_outputFileName; /**< name of output root file */

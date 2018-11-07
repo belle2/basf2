@@ -29,7 +29,7 @@
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/VariableManager/TrackVariables.h>
+#include <analysis/variables/TrackVariables.h>
 
 // msdt dataobject
 #include <mdst/dataobjects/MCParticle.h>
@@ -53,7 +53,8 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_MCdeltaT(0)
+    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0), m_tagVl(0),
+    m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");
@@ -796,9 +797,8 @@ namespace Belle2 {
 
     // Here the program keeps track of the tracks that are repeated inside the FlavorTaggerInfo
     int nonRepeated = 1;
-    bool repeatedTrack = false;
     for (unsigned i = 0; i < listTracks.size(); i++) {
-      repeatedTrack = false;
+      bool repeatedTrack = false;
       for (int j = i - 1; j >= 0; j--) {
         if (originalTracks[i] == originalTracks[j]) {
           repeatedTrack = true;
@@ -952,7 +952,7 @@ namespace Belle2 {
       }
       try {
         if (!isKsDau) rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
-      } catch (rave::CheckedFloatException) {
+      } catch (const rave::CheckedFloatException&) {
         B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       }
     }
@@ -960,7 +960,7 @@ namespace Belle2 {
     try {
       int isGoodFit = rFit.fit("avf");
       if (isGoodFit < 1) return false;
-    } catch (rave::CheckedFloatException) {
+    } catch (const rave::CheckedFloatException&) {
       B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
       return false;
     }

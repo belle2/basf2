@@ -85,7 +85,7 @@ namespace Belle2 {
 
   private:
 
-    /** Needed to make objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMHitGlobalCoord, 1);
 
   };

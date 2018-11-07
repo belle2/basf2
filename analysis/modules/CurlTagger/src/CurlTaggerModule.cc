@@ -16,9 +16,9 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
-#include <analysis/VariableManager/VertexVariables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/VertexVariables.h>
+#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/Variables.h>
 
 #include <iostream>
 #include <vector>
@@ -54,12 +54,13 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("belle", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", false);
-  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.4);
+  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.6);
   addParam("selectorType", m_SelectorType,
            "gives the name of the selector to use, available : 'cut', 'mva'", std::string("cut"));
   addParam("mcTruth", m_McStatsFlag, "outputs extra stats based on MC truth", false);
-  addParam("pVal", m_PVal, "min allowed pVal for a match", 0.5);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
+
+  addParam("responseCut", m_ResponseCut, "min allowed selector response for a match", 0.303);
 }
 
 CurlTaggerModule::~CurlTaggerModule()
@@ -130,29 +131,30 @@ void CurlTaggerModule::event()
         if (!passesPreSelection(iPart)) {continue;}
 
         bool addedParticleToBundle = false;
-        std::vector<float> bundlesProb;
+        std::vector<float> bundlesResponse;
 
         for (CurlTagger::Bundle bundle : bundles) {
           unsigned int bundleSize = bundle.size();
-          float averageProb = 0;
+          float averageResponse = 0;
 
           for (unsigned int b = 0; b < bundleSize; b++) {
             Particle* bPart = bundle.getParticle(b);
-            averageProb += m_Selector -> getProbability(iPart, bPart);
+            averageResponse += m_Selector -> getResponse(iPart, bPart);
           }
 
-          averageProb /= bundleSize;
-          bundlesProb.push_back(averageProb);
-
-          if (bundlesProb.size() > 0) {
-            auto maxElement = std::max_element(bundlesProb.begin(), bundlesProb.end());
-            if (*maxElement > m_PVal) {
-              int maxPosition = std::distance(std::begin(bundlesProb), maxElement);
-              bundles[maxPosition].addParticle(iPart);
-              addedParticleToBundle = true;
-            }
-          }
+          averageResponse /= bundleSize;
+          bundlesResponse.push_back(averageResponse);
         } //bundles
+
+        if (bundlesResponse.size() > 0) {
+          auto maxElement = std::max_element(bundlesResponse.begin(), bundlesResponse.end());
+          if (*maxElement > m_ResponseCut) {
+            int maxPosition = std::distance(std::begin(bundlesResponse), maxElement);
+            bundles[maxPosition].addParticle(iPart);
+            addedParticleToBundle = true;
+          }
+        }
+
         if (!addedParticleToBundle) {
           CurlTagger::Bundle tempBundle = CurlTagger::Bundle(false);
           tempBundle.addParticle(iPart);

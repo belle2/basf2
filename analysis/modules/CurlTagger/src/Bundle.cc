@@ -10,7 +10,7 @@
 #include <analysis/modules/CurlTagger/Bundle.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
-#include <analysis/VariableManager/VertexVariables.h>
+#include <analysis/variables/VertexVariables.h>
 
 using namespace Belle2;
 using namespace CurlTagger;

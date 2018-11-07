@@ -74,7 +74,7 @@ namespace Belle2 {
       /** The number of sides (=8 : octagonal). */
       int m_NSides;
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(EndcapStructureGeometry, 1);
 
     };
@@ -177,7 +177,7 @@ namespace Belle2 {
       /** Z coordinate. */
       double m_Z;
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(ElementPosition, 1);
 
     };
@@ -632,7 +632,7 @@ namespace Belle2 {
       /** Coordinates of the corner of corner 4 prism. */
       HepGeom::Point3D<double> m_Corner4Prism;  //!
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(SectorSupportGeometry, 1);
 
     };
@@ -679,7 +679,7 @@ namespace Belle2 {
       /** Distance from edge of last strip to edge of plastic sheet. */
       double m_DeltaL;
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(PlasticSheetGeometry, 1);
 
     };
@@ -754,7 +754,7 @@ namespace Belle2 {
       /** Middle box thickness. */
       double m_MiddleThickness;
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(SegmentSupportGeometry, 1);
 
     };
@@ -857,7 +857,7 @@ namespace Belle2 {
       /** Z coordinate. */
       double m_Z;
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(SegmentSupportPosition, 1);
 
     };
@@ -960,7 +960,7 @@ namespace Belle2 {
       /** Radiation study SiPM size. */
       double m_RSSSize;
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(StripGeometry, 1);
 
     };
@@ -1007,7 +1007,7 @@ namespace Belle2 {
       /** Y coordinate. */
       double m_Y;
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(Point, 1);
 
     };
@@ -1099,7 +1099,7 @@ namespace Belle2 {
       /** Points. */
       Point* m_Points; //[m_NPoints]
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(ShieldDetailGeometry, 1);
 
     };
@@ -1235,7 +1235,7 @@ namespace Belle2 {
       /** Detail C center. */
       Point m_DetailCCenter; //!
 
-      /** Makes objects storable. */
+      /** Class version. */
       ClassDef(ShieldGeometry, 1);
 
     };
@@ -1479,7 +1479,7 @@ namespace Belle2 {
     /** Shield layer details geometry data. */
     ShieldGeometry m_ShieldGeometry;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMGeometry, 3);
 
   };

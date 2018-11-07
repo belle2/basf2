@@ -36,7 +36,7 @@ REG_MODULE(BKLMReconstructor)
 //                 Implementation
 //-----------------------------------------------------------------
 
-BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
+BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(nullptr)
 {
   setDescription("BKLM reconstruction module of 1D and 2D hits");
   setPropertyFlags(c_ParallelProcessingCertified);

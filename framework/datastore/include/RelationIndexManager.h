@@ -82,10 +82,14 @@ namespace Belle2 {
     }
 
   protected:
-    /** Constructor hidden. */
-    RelationIndexManager() { }
-    /** Same for copy-constructor. */
-    RelationIndexManager(const RelationIndexManager&) { }
+    /** No Constructor hidden. */
+    RelationIndexManager() = default;
+    /** No copy-constructor. */
+    RelationIndexManager(const RelationIndexManager&) = delete;
+    /** No move constructor */
+    RelationIndexManager(RelationIndexManager&&) = delete;
+    /** Also no assignment */
+    RelationIndexManager& operator=(const RelationIndexManager&) = delete;
 
     /** if the index exists in the cache, it is returned; otherwise NULL.
      *

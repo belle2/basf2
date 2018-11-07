@@ -467,7 +467,7 @@ void SVDROIDQMModule::createHistosDictionaries()
                                   (Belle2::VxdID)*itSvdSensors,
                                   InterHistoAndFill(
                                     tmp2D,
-        [this, itSvdSensors](TH1 * hPtr, const SVDIntercept * inter) {
+        [this](TH1 * hPtr, const SVDIntercept * inter) {
           StoreArray<SVDShaperDigit> SVDShaperDigits(this->m_SVDShaperDigitsName);
 
           for (auto& it : SVDShaperDigits) {

@@ -20,6 +20,8 @@
 
 extern "C" {
   void set_alignment_(int*, float*, float*, float*, float*, float*, float*);
+  int set_tts_type_(int*, int*, float*, float*, float*);
+  int set_pmt_type_(int*, int*, int*);
 }
 
 using namespace std;
@@ -29,6 +31,7 @@ namespace Belle2 {
 
     bool TOPconfigure::m_configured(false);
     DBObjPtr<TOPCalModuleAlignment> TOPconfigure::m_alignment;
+    DBArray<TOPPmtInstallation> TOPconfigure::m_pmtInstalled;
 
     TOPconfigure::TOPconfigure()
     {
@@ -59,7 +62,7 @@ namespace Belle2 {
              pmt.getSensSizeX(), pmt.getSensSizeY(),
              pmt.getNumColumns(), pmt.getNumRows());
 
-      // TTS parameterization
+      // Nominal TTS parameterization
       const auto& tts = geo->getNominalTTS().getTTS();
       std::vector<float> frac, mean, sigma;
       for (const auto& gauss : tts) {
@@ -69,6 +72,13 @@ namespace Belle2 {
       }
       setTTS(tts.size(), frac.data(), mean.data(), sigma.data());
 
+      // PMT dependent TTS-es
+      setPMTDependentTTSes();
+
+      // pixel table of PMT types
+      setPMTTypes();
+      m_pmtInstalled.addCallback(&setPMTTypes);
+
       // quantum efficiency
       const auto& nominalQE = geo->getNominalQE();
       std::vector<float> wavelength;
@@ -77,6 +87,11 @@ namespace Belle2 {
         wavelength.push_back(wl);
       }
       auto QE = nominalQE.getQE();
+      // multiply QE with filter transmittance
+      const auto& wavelengthFilter = geo->getWavelengthFilter();
+      for (unsigned i = 0; i < QE.size(); i++) {
+        QE[i] *= wavelengthFilter.getBulkTransmittance(wavelength[i]);
+      }
       setQE(wavelength.data(), QE.data(), QE.size(),
             nominalQE.getCE() * tdc.getEfficiency());
 
@@ -109,10 +124,10 @@ namespace Belle2 {
         addExpansionVolume(id, c_Left, c_Prism, prismLength - prismFlat,
                            B / 2, B / 2 - prismExit, 0, 0, prismWidth);
 
-        double filter = prism.getFilterThickness();
+        double filterThickness = prism.getFilterThickness();
         const auto& pmtArray = module.getPMTArray();
         double pmtWindow = pmtArray.getPMT().getWinThickness();
-        setBBoxWindow(id, prismFlat + filter + pmtWindow);
+        setBBoxWindow(id, prismFlat + filterThickness + pmtWindow);
 
         double x0 = module.getPMTArrayDisplacement().getX();
         double y0 = module.getPMTArrayDisplacement().getY();
@@ -151,6 +166,62 @@ namespace Belle2 {
       }
 
       B2INFO("TOPconfigure: Alignment constants are set in reconstruction");
+
+    }
+
+    void TOPconfigure::setPMTDependentTTSes()
+    {
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& ttses = geo->getTTSes();
+      for (const auto& tts : ttses) {
+        int type = tts.second.getPMTType();
+        std::vector<float> frac, mean, sigma;
+        for (const auto& gauss : tts.second.getTTS()) {
+          frac.push_back(gauss.fraction);
+          mean.push_back(gauss.position);
+          sigma.push_back(gauss.sigma);
+        }
+        int size = frac.size();
+        int err = set_tts_type_(&type, &size, frac.data(), mean.data(), sigma.data());
+        if (err == 1) {
+          B2ERROR("TOPconfigure: sum of TTS fractions is zero."
+                  << LogVar("TTS type", type));
+        } else if (err == 2) {
+          B2ERROR("TOPconfigure: TTS type is out of range."
+                  << LogVar("TTS type", type));
+        }
+      }
+    }
+
+
+    void TOPconfigure::setPMTTypes()
+    {
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+
+      for (const auto& module : geo->getModules()) {
+        auto moduleID = module.getModuleID();
+        const auto& pmtArray = module.getPMTArray();
+        const auto& pmt = pmtArray.getPMT();
+        for (unsigned pmtID = 1; pmtID <= pmtArray.getSize(); pmtID++) {
+          int pmtType = TOPGeometryPar::Instance()->getPMTType(moduleID, pmtID);
+          for (unsigned pmtPixel = 1; pmtPixel <= pmt.getNumPixels(); pmtPixel++) {
+            auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
+            int ich = pixelID - 1;
+            int mdn = moduleID - 1;
+            int err = set_pmt_type_(&mdn, &ich, &pmtType);
+            if (err == 1) {
+              B2ERROR("TOPconfigure: PMT type is out of range."
+                      << LogVar("PMT type", pmtType));
+            } else if (err == 2) {
+              B2ERROR("TOPconfigure: invalid slot ID or pixel ID."
+                      << LogVar("slot ID", moduleID)
+                      << LogVar("pixel ID", pixelID));
+            }
+          }
+        }
+      }
+
+      B2INFO("TOPconfigure: new map of PMT types has been passed to reconstruction");
 
     }
 

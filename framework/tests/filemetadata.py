@@ -5,18 +5,18 @@ import os
 import tempfile
 import subprocess
 import json
-from basf2 import *
-from basf2_version import version
+import basf2
+from basf2.version import version
 
-set_random_seed("something important")
+basf2.set_random_seed("something important")
 
 testFile = tempfile.NamedTemporaryFile(prefix='b2filemetadata_')
 
 # Generate a small test file
-main = create_path()
+main = basf2.Path()
 main.add_module('EventInfoSetter', evtNumList=[9, 1], runList=[1, 15], expList=[7, 7])
 main.add_module('RootOutput', outputFileName=testFile.name, updateFileCatalog=False)
-process(main)
+basf2.process(main)
 
 # Check the file meta data (via DataStore)
 from ROOT import Belle2

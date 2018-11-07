@@ -38,10 +38,10 @@ namespace Belle2 {
     ECLEventT0Module();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Event */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

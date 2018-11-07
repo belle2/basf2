@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleInvMassTool.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 #include <framework/logging/Logger.h>
 #include <TBranch.h>
 

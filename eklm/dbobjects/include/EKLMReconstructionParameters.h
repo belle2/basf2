@@ -48,7 +48,7 @@ namespace Belle2 {
     /** Time resolution. */
     float m_TimeResolution;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMReconstructionParameters, 1);
 
   };

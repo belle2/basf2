@@ -3,9 +3,9 @@ Import('env')
 import os
 
 testbeam = False
-if 'BELLE2_RELEASE_DIR' in os.environ.keys():
+if 'BELLE2_RELEASE_DIR' in os.environ:
     testbeam = os.path.isdir(os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'testbeam'))
-if not testbeam and 'BELLE2_LOCAL_DIR' in os.environ.keys():
+if not testbeam and 'BELLE2_LOCAL_DIR' in os.environ:
     testbeam = os.path.isdir(os.path.join(os.environ['BELLE2_LOCAL_DIR'], 'testbeam'))
 
 if testbeam:

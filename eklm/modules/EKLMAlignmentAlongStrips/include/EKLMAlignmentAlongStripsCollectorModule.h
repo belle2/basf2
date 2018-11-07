@@ -48,6 +48,12 @@ namespace Belle2 {
       const EKLMAlignmentAlongStripsCollectorModule&) = delete;
 
     /**
+     * Operator = (disabled).
+     */
+    EKLMAlignmentAlongStripsCollectorModule& operator=(
+      const EKLMAlignmentAlongStripsCollectorModule&) = delete;
+
+    /**
      * Destructor.
      */
     ~EKLMAlignmentAlongStripsCollectorModule();
@@ -55,17 +61,17 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void prepare();
+    void prepare() override;
 
     /**
      * This method is called for each event.
      */
-    void collect();
+    void collect() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void finish();
+    void finish() override;
 
   private:
 

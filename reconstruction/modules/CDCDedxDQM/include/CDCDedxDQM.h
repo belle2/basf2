@@ -46,23 +46,23 @@ namespace Belle2 {
     virtual ~CDCDedxDQMModule();
 
     /** Defination of histograms */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each run */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** This method is called at the end of each run */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
 

@@ -4,6 +4,7 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
 ! dec-2017: change in some commons
+! oct-2018: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_RECO
@@ -70,7 +71,8 @@
 #include "TOP_GEO.fi"     
 #include "TOP_TRACK.fi"     
 #include "TOP_CONS.fi"     
-      REAL T1, T2, T, FI
+#include "TOP_GRID.fi"     
+      REAL T1, T2, T, FI, DT
       REAL HLX_LOC(10), R(3), DIR(3)
       LOGICAL INSIDE_QBAR
       INTEGER I, K
@@ -106,6 +108,22 @@
             T_R(K,I)=R(K)
          ENDDO
          IF(I.EQ.0) T_DIR=DIR
+      ENDDO
+
+      IF(G_NP.EQ.0) RETURN
+      DT=(T2-T1)/G_NP
+      DO I=1,G_NP
+         T=T1+DT*(I-0.5)
+         CALL GET_HLX_RDIR(HLX_LOC,T,R,DIR) ! get in nominal frame
+         CALL NOMINAL_TO_LOCAL(R,DIR,MODUL) ! transform to local (bar) frame
+         DO K=1,3
+            G_R0(K,I)=R(K)
+         ENDDO
+         G_CTH(I)=DIR(3)
+         G_STH(I)=SQRT(1-DIR(3)**2)
+         FI=ATAN2(DIR(2),DIR(1))
+         G_CFI(I)=COS(FI)
+         G_SFI(I)=SIN(FI)
       ENDDO
       
       END
@@ -257,7 +275,10 @@
 #include "TOP_TRACK.fi"
 #include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
-      INTEGER I, ICH, M, NUMCH
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+     
+      INTEGER I, ICH, M, NUMCH, TYP
       REAL P, T, TERR, F
       REAL TOP_SIGNAL, TOP_BGR, POIS_LOG
 
@@ -277,9 +298,10 @@
             TERR=DATA_TERR(I)
             IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
             NFOT=NFOT+1
-            F=P*TOP_SIGNAL(T,TERR,ICH)+(1-P)*TOP_BGR(T,ICH)
+            TYP=PMT_TYPE(ICH,M)
+            F=P*TOP_SIGNAL(T,TERR,ICH,TYP)+(1-P)*TOP_BGR(T,ICH)
             PLKH=PLKH+LOG(F)
-            IF(FLAG) CALL STORE_PULLS(T,TERR,ICH)
+            IF(FLAG) CALL STORE_PULLS(T,TERR,ICH,TYP)
          ENDIF
       ENDDO
       PLKH=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
@@ -299,7 +321,9 @@
 #include "TOP_TRACK.fi"
 #include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
-      INTEGER I, ICH, M, NUMCH, NFOT
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      INTEGER I, ICH, M, NUMCH, NFOT, TYP
       REAL P, T, TERR, F, SFOT, PLKH, PS, PB
       REAL TOP_SIGNAL1, TOP_BGR, POIS_LOG
 
@@ -329,7 +353,8 @@
             TERR=DATA_TERR(I)
             IF(T.LT.TMIN.OR.T.GT.TMAX) CYCLE
             NFOT=NFOT+1
-            F=P*TOP_SIGNAL1(T-T0,TERR,ICH,SIGT) +
+            TYP=PMT_TYPE(ICH,M)
+            F=P*TOP_SIGNAL1(T-T0,TERR,ICH,TYP,SIGT) +
      &           (1-P)*TOP_BGR(T-T0,ICH)
             PLKH=PLKH+LOG(F)
          ENDIF
@@ -366,11 +391,12 @@
       END
 
 
-      REAL FUNCTION TOP_SIGNAL(T,TERR,ICH)
+      REAL FUNCTION TOP_SIGNAL(T,TERR,ICH,TYP)
 
       IMPLICIT NONE
-      REAL T, TERR
-      INTEGER ICH
+      REAL T, TERR              ! photon time and uncertainty
+      INTEGER ICH               ! channel (e.g pixel-1)
+      INTEGER TYP               ! PMT type
 #include "TOP_PIK.fi"
 #include "TOP_PMT.fi"
       INTEGER K, I
@@ -380,12 +406,12 @@
 
       TOP_SIGNAL=0.
       DO K=1,NUM_PIK(ICH)
-         DO I=1,TTS_NG
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+TERR**2
-            X=(T-PIK_POZ(K,ICH)-TTS_T0(I))**2/SIG
+         DO I=1,TTS_NG(TYP)
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I,TYP)**2+TERR**2
+            X=(T-PIK_POZ(K,ICH)-TTS_T0(I,TYP))**2/SIG
             IF(X.GT.10) CYCLE
             SIG=SQRT(SIG)
-            F=PIK_NPH(K,ICH)*TTS_FRAC(I)/SQPI/SIG*EXP(-X/2)
+            F=PIK_NPH(K,ICH)*TTS_FRAC(I,TYP)/SQPI/SIG*EXP(-X/2)
             TOP_SIGNAL=TOP_SIGNAL+F
          ENDDO
       ENDDO
@@ -393,12 +419,13 @@
       END
      
 
-      REAL FUNCTION TOP_SIGNAL1(T,TERR,ICH,SIGT)
+      REAL FUNCTION TOP_SIGNAL1(T,TERR,ICH,TYP,SIGT)
 
       IMPLICIT NONE
-      REAL T, TERR
-      INTEGER ICH
-      REAL SIGT
+      REAL T, TERR              ! photon time and uncertainty
+      INTEGER ICH               ! channel (e.g pixel-1)
+      INTEGER TYP               ! PMT type
+      REAL SIGT                 ! additional time smearing
 #include "TOP_PIK.fi"
 #include "TOP_PMT.fi"
       INTEGER K, I
@@ -408,12 +435,12 @@
 
       TOP_SIGNAL1=0.
       DO K=1,NUM_PIK(ICH)
-         DO I=1,TTS_NG
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+TERR**2+SIGT**2
-            X=(T-PIK_POZ(K,ICH)-TTS_T0(I))**2/SIG
+         DO I=1,TTS_NG(TYP)
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I,TYP)**2+TERR**2+SIGT**2
+            X=(T-PIK_POZ(K,ICH)-TTS_T0(I,TYP))**2/SIG
             IF(X.GT.10) CYCLE
             SIG=SQRT(SIG)
-            F=PIK_NPH(K,ICH)*TTS_FRAC(I)/SQPI/SIG*EXP(-X/2)
+            F=PIK_NPH(K,ICH)*TTS_FRAC(I,TYP)/SQPI/SIG*EXP(-X/2)
             TOP_SIGNAL1=TOP_SIGNAL1+F
          ENDDO
       ENDDO
@@ -497,11 +524,13 @@
       END
 
 
-      SUBROUTINE STORE_PULLS(T,TERR,ICH)
+      SUBROUTINE STORE_PULLS(T,TERR,ICH,TYP)
 
       IMPLICIT NONE
-      REAL T, TERR
-      INTEGER ICH
+      REAL T, TERR              ! photon time and uncertainty
+      INTEGER ICH               ! channel (e.g pixel-1)
+      INTEGER TYP               ! PMT type
+
       INTEGER N, KK
       REAL TOP, T_0, WIDTH, PHIC, UT
       INTEGER ICHID
@@ -530,14 +559,14 @@
 
       S=0.
       DO K=1,NUM_PIK(ICH)
-         DO I=1,TTS_NG
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+TERR**2
-            XX=(T-PIK_POZ(K,ICH)-TTS_T0(I))**2/SIG
+         DO I=1,TTS_NG(TYP)
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I,TYP)**2+TERR**2
+            XX=(T-PIK_POZ(K,ICH)-TTS_T0(I,TYP))**2/SIG
             W(I,K)=0
             IF(XX.GT.100) CYCLE
             SIG=SQRT(SIG)
             SIGMA(I,K)=SIG
-            W(I,K)=P*PIK_NPH(K,ICH)*TTS_FRAC(I)/SQPI/SIG*EXP(-XX/2)
+            W(I,K)=P*PIK_NPH(K,ICH)*TTS_FRAC(I,TYP)/SQPI/SIG*EXP(-XX/2)
             S=S+W(I,K)
          ENDDO
       ENDDO
@@ -548,12 +577,12 @@
       T0_MIN=T_MAX
       DO K=1,NUM_PIK(ICH)
          T0_MIN=MIN(T0_MIN,PIK_POZ(K,ICH))
-         DO I=1,TTS_NG
+         DO I=1,TTS_NG(TYP)
             IF(W(I,K).EQ.0) CYCLE
             IF(NT.GE.NB) RETURN
             NT=NT+1
             TIME(NT)=T
-            T0(NT)=PIK_POZ(K,ICH)+TTS_T0(I)
+            T0(NT)=PIK_POZ(K,ICH)+TTS_T0(I,TYP)
             WID(NT)=SIGMA(I,K)
             FIC(NT)=PIK_FIC(K,ICH)-PI
             WT(NT)=W(I,K)/S
@@ -603,7 +632,10 @@
 #include "TOP_RTRA.fi"     
 #include "TOP_PIK.fi"
 #include "TOP_PHTIM.fi"
-      INTEGER NUMCH
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      
+      INTEGER NUMCH, TYP
       REAL SFOT, P
       REAL TOP_SIGNAL, TOP_BGR
 
@@ -615,20 +647,19 @@
 
       IF(BETA_RQ.GT.0) THEN
          IF(BETA_RQ.NE.BETA.OR..NOT.FORCE_SCAN) THEN
-cc            PRINT*,'construct PDF for Beta=',BETA_RQ
             CALL SET_PHTIMES(.TRUE.)
             CALL TOP_SET_PDF(MASS,RTRA_T0(1))
          ENDIF
       ELSE
          IF(MASS.NE.MASS_HYP.OR..NOT.FORCE_SCAN) THEN
-cc            PRINT*,'construct PDF for Mass=',MASS
             CALL SET_PHTIMES(.TRUE.)
             CALL TOP_SET_PDF(MASS,RTRA_T0(1))
          ENDIF
       ENDIF
       SFOT=STFS+STFB
       P=STFS/SFOT
-      GET_PDF=P*TOP_SIGNAL(T,TERR,ICH)+(1-P)*TOP_BGR(T,ICH)
+      TYP=PMT_TYPE(ICH,RTRA_MOD(1))
+      GET_PDF=P*TOP_SIGNAL(T,TERR,ICH,TYP)+(1-P)*TOP_BGR(T,ICH)
 
       END
 
@@ -644,14 +675,18 @@ cc            PRINT*,'construct PDF for Mass=',MASS
       END
 
 
-      SUBROUTINE SET_PDF_OPT(OPT)
+      SUBROUTINE SET_PDF_OPT(OPT,NP,NC)
 
       IMPLICIT NONE
-      INTEGER OPT
+      INTEGER OPT, NP, NC
 #include "TOP_PIK.fi"
+#include "TOP_GRID.fi"
+      DATA G_NP /0/, G_NC /0/
 
       PDF_OPT=OPT
-
+      G_NP=MIN(NP,G_SIZE)
+      G_NC=MIN(NC,G_SIZE)
+      
       END
 
 

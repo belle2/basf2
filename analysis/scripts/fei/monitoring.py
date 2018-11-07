@@ -322,7 +322,7 @@ def MonitorCosBDLPlot(particle, filename):
     if not particle.final_ntuple.valid:
         return
     df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
-                                  ['extraInfo__bouniqueSignal__bc', 'cosThetaBetweenParticleAndTrueB',
+                                  ['extraInfo__bouniqueSignal__bc', 'cosThetaBetweenParticleAndNominalB',
                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
                                   ['unique', 'cosThetaBDl', 'probability', 'signal'])
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):

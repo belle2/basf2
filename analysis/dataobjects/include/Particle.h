@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -597,7 +596,8 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * NULL pointer is returned, if the Particle was not made from KLMCluster.
+     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */
     const KLMCluster* getKLMCluster() const;
@@ -619,6 +619,9 @@ namespace Belle2 {
      * Prints the contents of a Particle object to standard output.
      */
     void print() const;
+
+    /** get a list of the extra info names */
+    std::vector<std::string> getExtraInfoNames() const;
 
     /**
      * Remove all stored extra info fields
@@ -788,5 +791,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

@@ -1,12 +1,15 @@
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/EventVariables.h>
-#include <analysis/VariableManager/FlightInfoVariables.h>
-#include <analysis/VariableManager/VertexVariables.h>
-#include <analysis/VariableManager/PIDVariables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-#include <analysis/VariableManager/ROEVariables.h>
+
+#include <analysis/variables/Variables.h>
+#include <analysis/variables/EventVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
+#include <analysis/variables/VertexVariables.h>
+#include <analysis/variables/PIDVariables.h>
+#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/ROEVariables.h>
+
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -353,12 +356,51 @@ namespace {
 
   }
 
-  TEST(ROEVariablesTest, Variable)
-  {
+  class ROEVariablesTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
 
+      StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
+      DataStore::Instance().setInitializeActive(true);
+      pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
+      StoreArray<ECLCluster> myECLClusters;
+      StoreArray<KLMCluster> myKLMClusters;
+      StoreArray<TrackFitResult> myTFRs;
+      StoreArray<Track> myTracks;
+      StoreArray<Particle> myParticles;
+      StoreArray<RestOfEvent> myROEs;
+      StoreArray<PIDLikelihood> myPIDLikelihoods;
+      myECLClusters.registerInDataStore();
+      myKLMClusters.registerInDataStore();
+      myTFRs.registerInDataStore();
+      myTracks.registerInDataStore();
+      myParticles.registerInDataStore();
+      myROEs.registerInDataStore();
+      myPIDLikelihoods.registerInDataStore();
+      myParticles.registerRelationTo(myROEs);
+      myTracks.registerRelationTo(myPIDLikelihoods);
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+//
+// TODO: redo all ROE variable tests
+//
+
+  TEST_F(ROEVariablesTest, Variable)
+  {
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
     StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
-    DataStore::Instance().setInitializeActive(true);
-    pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
     StoreArray<TrackFitResult> myTFRs;
@@ -366,16 +408,6 @@ namespace {
     StoreArray<Particle> myParticles;
     StoreArray<RestOfEvent> myROEs;
     StoreArray<PIDLikelihood> myPIDLikelihoods;
-    myECLClusters.registerInDataStore();
-    myKLMClusters.registerInDataStore();
-    myTFRs.registerInDataStore();
-    myTracks.registerInDataStore();
-    myParticles.registerInDataStore();
-    myROEs.registerInDataStore();
-    myPIDLikelihoods.registerInDataStore();
-    myParticles.registerRelationTo(myROEs);
-    myTracks.registerRelationTo(myPIDLikelihoods);
-    DataStore::Instance().setInitializeActive(false);
 
     pi0ParticleList.create();
     pi0ParticleList->initialize(111, "pi0:vartest");
@@ -399,14 +431,14 @@ namespace {
     myROEECL.setEnergy(eclROE);
     myROEECL.setHypothesisId(5);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
-
+    Particle* roeECLParticle = myParticles.appendNew(savedROEECL);
     // Create KLMCluster on ROE side
     KLMCluster myROEKLM;
     KLMCluster* savedROEKLM = myKLMClusters.appendNew(myROEKLM);
+    Particle* roeKLMParticle = myParticles.appendNew(savedROEKLM);
 
     // Create Track on ROE side
     // - create TFR
-    TRandom3 generator;
 
     const float pValue = 0.5;
     const float bField = 1.5;
@@ -422,27 +454,35 @@ namespace {
 
     // - create Track
     Track myROETrack;
-    myROETrack.setTrackFitResultIndex(Const::muon, 1);
+    myROETrack.setTrackFitResultIndex(Const::muon, 0);
     Track* savedROETrack = myTracks.appendNew(myROETrack);
-
     // - create PID information, add relation
     PIDLikelihood myPID;
-    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.5);
-    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.52);
-    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.54);
-    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.56);
-    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.15);
+    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.152);
+    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.154);
+    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.156);
+    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.158);
+    myPID.setLogLikelihood(Const::TOP, Const::pion, 0.5);
+    myPID.setLogLikelihood(Const::ARICH, Const::pion, 0.52);
+    myPID.setLogLikelihood(Const::ECL, Const::pion, 0.54);
+    myPID.setLogLikelihood(Const::CDC, Const::pion, 0.56);
+    myPID.setLogLikelihood(Const::SVD, Const::pion, 0.58);
     PIDLikelihood* savedPID = myPIDLikelihoods.appendNew(myPID);
 
     savedROETrack->addRelationTo(savedPID);
+    Particle* roeTrackParticle = myParticles.appendNew(savedROETrack, Const::muon);
 
     // Create ROE object, append tracks, clusters, add relation to particle
+    //TODO: make particles
     RestOfEvent roe;
-    roe.addTrack(savedROETrack);
-    roe.addECLCluster(savedROEECL);
-    roe.addKLMCluster(savedROEKLM);
+    vector<const Particle*> roeParticlesToAdd;
+    roeParticlesToAdd.push_back(roeTrackParticle);
+    roeParticlesToAdd.push_back(roeECLParticle);
+    roeParticlesToAdd.push_back(roeKLMParticle);
+    roe.addParticles(roeParticlesToAdd);
     RestOfEvent* savedROE = myROEs.appendNew(roe);
-
+    /*
     std::map<std::string, std::map<unsigned int, bool>> tMasks;
     std::map<std::string, std::map<unsigned int, bool>> cMasks;
     std::map<std::string, std::vector<double>> fracs;
@@ -472,14 +512,22 @@ namespace {
     savedROE->appendTrackMasks(tMasks);
     savedROE->appendECLClusterMasks(cMasks);
     savedROE->appendChargedStableFractionsSet(fracs);
-
+    */
+    savedROE->initializeMask("mask1", "test");
+    std::shared_ptr<Variable::Cut> trackSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    std::shared_ptr<Variable::Cut> eclSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    savedROE->updateMaskWithCuts("mask1");
+    savedROE->initializeMask("mask2", "test");
+    savedROE->updateMaskWithCuts("mask2",  trackSelection,  eclSelection);
     part->addRelationTo(savedROE);
 
     // ROE variables
     PCmsLabTransform T;
     float E0 = T.getCMSEnergy() / 2;
-
-    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::pion.getMass()*Const::pion.getMass() + 1.0 /*momentum.Mag2()*/));
+    B2INFO("E0 is " << E0);
+    //*/
+    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + 1.0 /*momentum.Mag2()*/));
+    pTrack_ROE_Lab = roeTrackParticle->get4Vector();
     TLorentzVector pECL_ROE_Lab(0, 0, eclROE, eclROE);
     TLorentzVector pECL_REC_Lab(0, 0, eclREC, eclREC);
 
@@ -518,14 +566,18 @@ namespace {
     neutrino4vecCMS.SetE(neutrino4vecCMS.Vect().Mag());
 
     TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
-
+    B2INFO("roe4vecCMS.E() = " << roe4vecCMS.E());
     // TESTS FOR ROE STRUCTURE
-    EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
-    EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
-    double fArray[6];
-    EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
+    //double fArray[6];
+    //EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithCuts("noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithV0("noSuchMask", part));
+    EXPECT_B2FATAL(savedROE->hasParticle(part, "noSuchMask"));
 
     // TESTS FOR ROE VARIABLES
+
     const Manager::Var* var = Manager::Instance().getVariable("nROE_Tracks(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
@@ -609,6 +661,7 @@ namespace {
     var = Manager::Instance().getVariable("WE_MissM2(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
+
   }
 
 
@@ -1688,6 +1741,170 @@ namespace {
     EXPECT_B2FATAL(vnonsense->function(nullptr));
     EXPECT_FLOAT_EQ(vsensible->function(nullptr), 4.3);
   }
+  TEST_F(MetaVariableTest, totalPxOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPxOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPxOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 2.2);
+  }
+  TEST_F(MetaVariableTest, totalPyOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPyOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPyOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 1.5);
+  }
+  TEST_F(MetaVariableTest, totalPzOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalPzOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalPzOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 3.1);
+  }
+  TEST_F(MetaVariableTest, maxPtInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "maxPtInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "maxPtInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), sqrt(0.5 * 0.5 + 0.4 * 0.4));
+  }
 
 
   TEST_F(MetaVariableTest, numberOfNonOverlappingParticles)
@@ -2099,7 +2316,8 @@ namespace {
       // we're done setting up the datastore
       DataStore::Instance().setInitializeActive(false);
 
-      // add some tracks
+      // add some tracks the zeroth one is not going to be matched
+      tracks.appendNew(Track());
       const Track* t1 = tracks.appendNew(Track());
       const Track* t2 = tracks.appendNew(Track());
       const Track* t3 = tracks.appendNew(Track());
@@ -2128,12 +2346,19 @@ namespace {
       e1->setEnergy(0.3);
       e1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e1->setClusterId(1);
+      // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
       e2->setEnergy(0.6);
+      e2->setTheta(1.0); // somewhere in the barrel
+      e2->setPhi(2.0);
+      e2->setR(148.5);
       e2->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e2->setClusterId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
+      e3->setTheta(0.2); // somewhere in the fwd encap
+      e3->setPhi(1.5);
+      e3->setR(200.0);
       e3->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e3->setClusterId(3);
 
@@ -2170,6 +2395,68 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+
+  TEST_F(ECLVariableTest, b2bKinematicsTest)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // connect gearbox for CMS boosting etc
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // get the zeroth track in the array (is not associated to a cluster)
+    const Particle* noclustertrack = particles.appendNew(Particle(tracks[0], Const::pion));
+
+    // grab variables for testing
+    const Manager::Var* b2bClusterTheta = Manager::Instance().getVariable("b2bClusterTheta");
+    const Manager::Var* b2bClusterPhi = Manager::Instance().getVariable("b2bClusterPhi");
+
+    EXPECT_EQ(gammalist->getListSize(), 3);
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)), 3.0276606);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)), 0.0);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(1)), 1.6036042);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(1)), -1.0607308);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(2)), 2.7840068);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(2)), -1.3155469);
+
+    // track (or anything without a cluster) should be nan
+    ASSERT_TRUE(std::isnan(b2bClusterTheta->function(noclustertrack)));
+    ASSERT_TRUE(std::isnan(b2bClusterPhi->function(noclustertrack)));
+
+    // the "normal" (not cluster based) variables should be the same for photons
+    // (who have no track information)
+    const Manager::Var* b2bTheta = Manager::Instance().getVariable("b2bTheta");
+    const Manager::Var* b2bPhi = Manager::Instance().getVariable("b2bPhi");
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)),
+                    b2bTheta->function(gammalist->getParticle(0)));
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)),
+                    b2bPhi->function(gammalist->getParticle(0)));
+  }
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
@@ -2235,6 +2522,238 @@ namespace {
     EXPECT_FLOAT_EQ(totalNeutralClusterE + totalTrackClusterE, eclEnergy);
   }
 
+  class KLMVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle and KLMCluster arrays. */
+    virtual void SetUp()
+    {
+      // setup the DataStore
+      DataStore::Instance().setInitializeActive(true);
+
+      // particles (to be filled)
+      StoreArray<Particle> particles;
+      particles.registerInDataStore();
+
+      // mock up mdst objects
+      StoreArray<Track> tracks;
+      tracks.registerInDataStore();
+      StoreArray<TrackFitResult> trackFits;
+      trackFits.registerInDataStore();
+      StoreArray<KLMCluster> klmClusters;
+      klmClusters.registerInDataStore();
+
+      // tracks can be matched to clusters
+      tracks.registerRelationTo(klmClusters);
+
+      // we're done setting up the datastore
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(KLMVariableTest, WholeEventClosure)
+  {
+    // we need the Particles, Tracks, TrackFitResults and KLMClusters StoreArrays
+    StoreArray<Particle> particles;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> trackFits;
+    StoreArray<KLMCluster> klmClusters;
+
+    // create a KLong (clusters) and muon (tracks) lists
+    StoreObjPtr<ParticleList> kLongList("K0_L:testKLong");
+    StoreObjPtr<ParticleList> muonsList("mu-:testMuons");
+    StoreObjPtr<ParticleList> amuonsList("mu+:testMuons");
+
+    // register the lists in the datastore
+    DataStore::Instance().setInitializeActive(true);
+    kLongList.registerInDataStore(DataStore::c_DontWriteOut);
+    muonsList.registerInDataStore(DataStore::c_DontWriteOut);
+    amuonsList.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    kLongList.create();
+    kLongList->initialize(130, kLongList.getName());
+    muonsList.create();
+    muonsList->initialize(13, muonsList.getName());
+    amuonsList.create();
+    amuonsList->initialize(-13, amuonsList.getName());
+    amuonsList->bindAntiParticleList(*(muonsList));
+
+    // add some tracks
+    const Track* t1 = tracks.appendNew(Track());
+    const Track* t2 = tracks.appendNew(Track());
+    const Track* t3 = tracks.appendNew(Track());
+    tracks.appendNew(Track());
+    tracks.appendNew(Track());
+
+    // mock up some TrackFits for them (all muons)
+    TRandom3 generator;
+    TMatrixDSym cov6(6);
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      int charge = (i % 2 == 0) ? +1 : -1;
+      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215);
+      tracks[i]->setTrackFitResultIndex(Const::muon, i);
+    }
+
+    // add some clusters
+    KLMCluster* klm1 = klmClusters.appendNew(KLMCluster());
+    klm1->setTime(1.1);
+    klm1->setClusterPosition(1.1, 1.1, 1.0);
+    klm1->setLayers(1);
+    klm1->setInnermostLayer(1);
+    klm1->setMomentumMag(1.0);
+    KLMCluster* klm2 = klmClusters.appendNew(KLMCluster());
+    klm2->setTime(1.2);
+    klm2->setClusterPosition(1.2, 1.2, 2.0);
+    klm2->setLayers(2);
+    klm2->setInnermostLayer(2);
+    klm2->setMomentumMag(1.0);
+    KLMCluster* klm3 = klmClusters.appendNew(KLMCluster());
+    klm3->setTime(1.3);
+    klm3->setClusterPosition(1.3, 1.3, 3.0);
+    klm3->setLayers(3);
+    klm3->setInnermostLayer(3);
+    klm3->setMomentumMag(1.0);
+
+    // and add clusters related to the tracks
+    // case 1: 1 track --> 1 cluster
+    KLMCluster* klm4 = klmClusters.appendNew(KLMCluster());
+    klm4->setTime(1.4);
+    klm4->setClusterPosition(-1.4, -1.4, 1.0);
+    klm4->setLayers(4);
+    klm4->setInnermostLayer(4);
+    klm4->setMomentumMag(1.0);
+    t1->addRelationTo(klm4);
+
+    // case 2: 2 tracks --> 1 cluster
+    KLMCluster* klm5 = klmClusters.appendNew(KLMCluster());
+    klm5->setTime(1.5);
+    klm5->setClusterPosition(-1.5, -1.5, 1.0);
+    klm5->setLayers(5);
+    klm5->setInnermostLayer(5);
+    klm5->setMomentumMag(1.0);
+    t2->addRelationTo(klm5);
+    t3->addRelationTo(klm5);
+
+    // case 3: 1 track --> 2 clusters
+    // possible case, but not covered
+
+    // make the KLong from clusters (and sum up the total KLM momentum magnitude)
+    double klmMomentum = 0.0;
+    for (int i = 0; i < klmClusters.getEntries(); ++i) {
+      klmMomentum += klmClusters[i]->getMomentumMag();
+      if (!klmClusters[i]->getAssociatedTrackFlag()) {
+        const Particle* p = particles.appendNew(Particle(klmClusters[i]));
+        kLongList->addParticle(p);
+      }
+    }
+
+    // make the muons from tracks
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      const Particle* p = particles.appendNew(Particle(tracks[i], Const::muon));
+      muonsList->addParticle(p);
+    }
+
+    // grab variables
+    const Manager::Var* vClusterP = Manager::Instance().getVariable("klmClusterMomentum");
+    const Manager::Var* vClNTrack = Manager::Instance().getVariable("nKLMClusterTrackMatches");
+
+    // calculate the total KLM momentum from the KLong list --> VM
+    double totalKLongMomentum = 0.0;
+    for (size_t i = 0; i < kLongList->getListSize(); ++i)
+      totalKLongMomentum += vClusterP->function(kLongList->getParticle(i));
+
+    // calculate the total KLM momentum from muon-matched list --> VM
+    double totalMuonMomentum = 0.0;
+    for (size_t i = 0; i < muonsList->getListSize(); ++i) { // includes antiparticles
+      double muonMomentum = vClusterP->function(muonsList->getParticle(i));
+      double nOtherCl = vClNTrack->function(muonsList->getParticle(i));
+      if (nOtherCl > 0)
+        totalMuonMomentum += muonMomentum / nOtherCl;
+    }
+
+    EXPECT_FLOAT_EQ(5.0, klmMomentum);
+    EXPECT_FLOAT_EQ(totalKLongMomentum + totalMuonMomentum, klmMomentum);
+  }
+
+  TEST_F(KLMVariableTest, MoreClustersToOneTrack)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> trackFits;
+    StoreArray<KLMCluster> klmClusters;
+
+    // add a TrackFitResult
+    TRandom3 generator;
+
+    const float pValue = 0.5;
+    const float bField = 1.5;
+    const int charge = 1;
+    TMatrixDSym cov6(6);
+
+    TVector3 position(1.0, 0, 0);
+    TVector3 momentum(0, 1.0, 0);
+
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+
+    trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
+
+    // add one Track
+    Track myTrack;
+    myTrack.setTrackFitResultIndex(Const::muon, 0);
+    Track* muonTrack = tracks.appendNew(myTrack);
+
+    // add two KLMClusters
+    KLMCluster* klm1 = klmClusters.appendNew(KLMCluster());
+    klm1->setTime(1.1);
+    klm1->setClusterPosition(1.1, 1.1, 1.0);
+    klm1->setLayers(5);
+    klm1->setInnermostLayer(1);
+    klm1->setMomentumMag(1.0);
+    KLMCluster* klm2 = klmClusters.appendNew(KLMCluster());
+    klm2->setTime(1.2);
+    klm2->setClusterPosition(1.2, 1.2, 2.0);
+    klm2->setLayers(10);
+    klm2->setInnermostLayer(2);
+    klm2->setMomentumMag(1.0);
+
+    // and add a relationship between the track and both clusters
+    muonTrack->addRelationTo(klm1);
+    muonTrack->addRelationTo(klm2);
+
+    // add a Particle
+    const Particle* muon = particles.appendNew(Particle(muonTrack, Const::muon));
+
+    // grab variables
+    const Manager::Var* vTrNClusters = Manager::Instance().getVariable("nMatchedKLMClusters");
+    const Manager::Var* vClusterInnermostLayer = Manager::Instance().getVariable("klmClusterInnermostLayer");
+
+    EXPECT_POSITIVE(vTrNClusters->function(muon));
+    EXPECT_FLOAT_EQ(2.0, vClusterInnermostLayer->function(muon));
+
+    // add a Pion - no clusters matched here
+    trackFits.appendNew(position, momentum, cov6, charge, Const::pion, pValue, bField, CDCValue, 16777215);
+    Track mySecondTrack;
+    mySecondTrack.setTrackFitResultIndex(Const::pion, 0);
+    Track* pionTrack = tracks.appendNew(mySecondTrack);
+    const Particle* pion = particles.appendNew(Particle(pionTrack, Const::pion));
+
+    EXPECT_FLOAT_EQ(0.0, vTrNClusters->function(pion));
+
+  }
 
   class FlightInfoTest : public ::testing::Test {
   protected:

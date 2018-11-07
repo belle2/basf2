@@ -82,7 +82,7 @@ namespace Belle2 {
     /** Additional rotation of the segment. */
     float m_Dalpha;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMAlignmentData, 2);
 
   };

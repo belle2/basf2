@@ -61,7 +61,7 @@ namespace Belle2 {
     /** Time offset. */
     double m_TimeOffset;
 
-    /** Needed to make objects storable, */
+    /** Class version, */
     ClassDef(EKLMTimeConversion, 1);
 
   };

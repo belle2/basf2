@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VERTEXFITUPDATEDAUGHTERSMODULE_H
-#define VERTEXFITUPDATEDAUGHTERSMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -45,19 +44,19 @@ namespace Belle2 {
     virtual ~VertexFitUpdateDaughtersModule();
 
     /** sdf */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** sdf */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** sdf */
-    virtual void event();
+    virtual void event() override;
 
     /** sdfy */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** sdf */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -85,4 +84,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* VERTEXFITUPDATEDAUGHTERSMODULE_H */

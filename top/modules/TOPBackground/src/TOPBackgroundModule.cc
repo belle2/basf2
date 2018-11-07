@@ -104,7 +104,7 @@ namespace Belle2 {
     // CPU time start
 
     // Initializing the output root file
-    m_rootFile = new TFile(m_OutputFileName.c_str(), "RECREATE");
+    m_rootFile = TFile::Open(m_OutputFileName.c_str(), "RECREATE");
     origingamma = new TTree("origingamma", "tree");
     originpe = new TTree("originpe", "tree2");
 

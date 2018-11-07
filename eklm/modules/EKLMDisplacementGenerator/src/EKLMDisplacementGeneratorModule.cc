@@ -55,7 +55,7 @@ EKLMDisplacementGeneratorModule::EKLMDisplacementGeneratorModule() : Module()
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = NULL;
+  m_GeoDat = nullptr;
 }
 
 EKLMDisplacementGeneratorModule::~EKLMDisplacementGeneratorModule()

@@ -31,8 +31,8 @@ EKLMAlignmentAlongStripsCollectorModule() : CalibrationCollectorModule()
   setDescription("Module for EKLM alignment along strip (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
   m_Event = new EKLMAlignmentAlongStripsAlgorithm::Event;
-  m_GeoDat = NULL;
-  m_TransformData = NULL;
+  m_GeoDat = nullptr;
+  m_TransformData = nullptr;
 }
 
 EKLMAlignmentAlongStripsCollectorModule::

@@ -35,8 +35,8 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
            false);
   m_ev = {0, 0, 0};
   m_Strip = 0;
-  m_TransformData = NULL;
-  m_GeoDat = NULL;
+  m_TransformData = nullptr;
+  m_GeoDat = nullptr;
 }
 
 EKLMTimeCalibrationCollectorModule::~EKLMTimeCalibrationCollectorModule()
@@ -108,8 +108,8 @@ void EKLMTimeCalibrationCollectorModule::collect()
     if (digits[0]->getNPE() == 0 || digits[1]->getNPE() == 0)
       continue;
     for (j = 0; j < 2; j++) {
-      entryHit[j] = NULL;
-      exitHit[j] = NULL;
+      entryHit[j] = nullptr;
+      exitHit[j] = nullptr;
       vol = m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
                                   digits[j]->getSector(), digits[j]->getPlane(),
                                   digits[j]->getStrip());
@@ -119,7 +119,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
         extHit = it->second;
         switch (extHit->getStatus()) {
           case EXT_ENTER:
-            if (entryHit[j] == NULL) {
+            if (entryHit[j] == nullptr) {
               entryHit[j] = extHit;
             } else {
               if (extHit->getTOF() < entryHit[j]->getTOF())
@@ -127,7 +127,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
             }
             break;
           case EXT_EXIT:
-            if (exitHit[j] == NULL) {
+            if (exitHit[j] == nullptr) {
               exitHit[j] = extHit;
             } else {
               if (extHit->getTOF() > exitHit[j]->getTOF())
@@ -139,8 +139,8 @@ void EKLMTimeCalibrationCollectorModule::collect()
         }
       }
     }
-    if (entryHit[0] == NULL || exitHit[0] == NULL ||
-        entryHit[1] == NULL || exitHit[1] == NULL)
+    if (entryHit[0] == nullptr || exitHit[0] == nullptr ||
+        entryHit[1] == nullptr || exitHit[1] == nullptr)
       continue;
     for (j = 0; j < 2; j++) {
       hitTime = 0.5 * (entryHit[j]->getTOF() + exitHit[j]->getTOF());
@@ -169,7 +169,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
 
 void EKLMTimeCalibrationCollectorModule::finish()
 {
-  if (m_TransformData != NULL)
+  if (m_TransformData != nullptr)
     delete m_TransformData;
 }
 

@@ -46,8 +46,8 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
   m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
                                         size * sizeof(int));
   if (size != 0) {
-    if (m_Photoelectrons == NULL || m_PhotoelectronIndex == NULL ||
-        m_PhotoelectronIndex2 == NULL)
+    if (m_Photoelectrons == nullptr || m_PhotoelectronIndex == nullptr ||
+        m_PhotoelectronIndex2 == nullptr)
       B2FATAL(MemErr);
   }
 }
@@ -68,25 +68,25 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
                                      sizeof(float));
-  if (m_amplitudeDirect == NULL)
+  if (m_amplitudeDirect == nullptr)
     B2FATAL(MemErr);
   m_amplitudeReflected = (float*)malloc(m_DigPar->getNDigitizations() *
                                         sizeof(float));
-  if (m_amplitudeReflected == NULL)
+  if (m_amplitudeReflected == nullptr)
     B2FATAL(MemErr);
   m_amplitude = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
-  if (m_amplitude == NULL)
+  if (m_amplitude == nullptr)
     B2FATAL(MemErr);
   m_ADCAmplitude = (int*)malloc(m_DigPar->getNDigitizations() * sizeof(int));
-  if (m_ADCAmplitude == NULL)
+  if (m_ADCAmplitude == nullptr)
     B2FATAL(MemErr);
   m_SignalTimeDependence = (double*)malloc((m_DigPar->getNDigitizations() + 1) *
                                            sizeof(double));
-  if (m_SignalTimeDependence == NULL)
+  if (m_SignalTimeDependence == nullptr)
     B2FATAL(MemErr);
   m_SignalTimeDependenceDiff = (double*)malloc(m_DigPar->getNDigitizations() *
                                                sizeof(double));
-  if (m_SignalTimeDependenceDiff == NULL)
+  if (m_SignalTimeDependenceDiff == nullptr)
     B2FATAL(MemErr);
   attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
   for (i = 0; i <= m_DigPar->getNDigitizations(); i++) {
@@ -98,9 +98,9 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
                                           m_SignalTimeDependence[i];
     }
   }
-  m_Photoelectrons = NULL;
-  m_PhotoelectronIndex = NULL;
-  m_PhotoelectronIndex2 = NULL;
+  m_Photoelectrons = nullptr;
+  m_PhotoelectronIndex = nullptr;
+  m_PhotoelectronIndex2 = nullptr;
   reallocPhotoElectronBuffers(100);
 }
 
@@ -436,11 +436,11 @@ void EKLM::FiberAndElectronics::debugOutput()
   int i;
   std::string str;
   StoreObjPtr<EventMetaData> event;
-  TFile* hfile = NULL;
-  TH1D* histAmplitudeDirect = NULL;
-  TH1D* histAmplitudeReflected = NULL;
-  TH1D* histAmplitude = NULL;
-  TH1D* histADCAmplitude = NULL;
+  TFile* hfile = nullptr;
+  TH1D* histAmplitudeDirect = nullptr;
+  TH1D* histAmplitudeReflected = nullptr;
+  TH1D* histAmplitude = nullptr;
+  TH1D* histADCAmplitude = nullptr;
   try {
     histAmplitudeDirect =
       new TH1D("histAmplitudeDirect", m_stripName.c_str(),

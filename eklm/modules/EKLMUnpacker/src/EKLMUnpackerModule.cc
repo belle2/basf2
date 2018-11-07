@@ -188,7 +188,7 @@ void EKLMUnpackerModule::event()
           uint16_t tdc = dataWords[2] & 0x7FF;
           uint16_t charge = dataWords[3] & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
-          if (sectorGlobal == NULL) {
+          if (sectorGlobal == nullptr) {
             if (!m_IgnoreWrongHits) {
               B2ERROR("Lane does not exist in the EKLM electronics map."
                       << LogVar("Copper", lane.getCopper())
@@ -225,7 +225,7 @@ void EKLMUnpackerModule::event()
             stripGlobal = m_ElementNumbers->stripNumber(
                             endcap, layer, sector, plane, strip);
             channelData = m_Channels->getChannelData(stripGlobal);
-            if (channelData == NULL)
+            if (channelData == nullptr)
               B2FATAL("Incomplete EKLM channel data.");
             if (charge < channelData->getThreshold())
               eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);

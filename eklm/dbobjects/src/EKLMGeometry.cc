@@ -738,7 +738,7 @@ EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry()
   m_LengthX = 0;
   m_LengthY = 0;
   m_NPoints = 0;
-  m_Points = NULL;
+  m_Points = nullptr;
 }
 
 EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
@@ -753,7 +753,7 @@ EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
     for (i = 0; i < m_NPoints; i++)
       m_Points[i] = *geometry.getPoint(i);
   } else
-    m_Points = NULL;
+    m_Points = nullptr;
 }
 
 EKLMGeometry::ShieldDetailGeometry&
@@ -766,20 +766,20 @@ EKLMGeometry::ShieldDetailGeometry::operator=(
   m_LengthX = geometry.getLengthX();
   m_LengthY = geometry.getLengthY();
   m_NPoints = geometry.getNPoints();
-  if (m_Points != NULL)
+  if (m_Points != nullptr)
     delete[] m_Points;
   if (m_NPoints > 0) {
     m_Points = new Point[m_NPoints];
     for (i = 0; i < m_NPoints; i++)
       m_Points[i] = *geometry.getPoint(i);
   } else
-    m_Points = NULL;
+    m_Points = nullptr;
   return *this;
 }
 
 EKLMGeometry::ShieldDetailGeometry::~ShieldDetailGeometry()
 {
-  if (m_Points != NULL)
+  if (m_Points != nullptr)
     delete[] m_Points;
 }
 
@@ -813,12 +813,12 @@ void EKLMGeometry::ShieldDetailGeometry::setNPoints(int nPoints)
   if (nPoints < 0)
     B2FATAL("Number of points must be nonnegative.");
   m_NPoints = nPoints;
-  if (m_Points != NULL)
+  if (m_Points != nullptr)
     delete[] m_Points;
   if (m_NPoints > 0)
     m_Points = new Point[m_NPoints];
   else
-    m_Points = NULL;
+    m_Points = nullptr;
 }
 
 const EKLMGeometry::Point*
@@ -943,7 +943,7 @@ EKLMGeometry::EKLMGeometry()
 {
   m_NEndcaps = 0;
   m_NLayers = 0;
-  m_NDetectorLayers = NULL;
+  m_NDetectorLayers = nullptr;
   m_NSectors = 0;
   m_NPlanes = 0;
   m_NSegments = 0;
@@ -951,8 +951,8 @@ EKLMGeometry::EKLMGeometry()
   m_NStrips = 0;
   m_SolenoidZ = 0;
   m_LayerShiftZ = 0;
-  m_SegmentSupportPosition = NULL;
-  m_StripPosition = NULL;
+  m_SegmentSupportPosition = nullptr;
+  m_StripPosition = nullptr;
 }
 
 EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
@@ -998,11 +998,11 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
 
 EKLMGeometry::~EKLMGeometry()
 {
-  if (m_NDetectorLayers != NULL)
+  if (m_NDetectorLayers != nullptr)
     delete[] m_NDetectorLayers;
-  if (m_SegmentSupportPosition != NULL)
+  if (m_SegmentSupportPosition != nullptr)
     delete[] m_SegmentSupportPosition;
-  if (m_StripPosition != NULL)
+  if (m_StripPosition != nullptr)
     delete[] m_StripPosition;
 }
 
@@ -1013,7 +1013,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
     return *this;
   m_NEndcaps = geometry.getNEndcaps();
   m_NLayers = geometry.getNLayers();
-  if (m_NDetectorLayers != NULL)
+  if (m_NDetectorLayers != nullptr)
     delete[] m_NDetectorLayers;
   m_NDetectorLayers = new int[m_NEndcaps];
   m_NDetectorLayers[0] = geometry.getNDetectorLayers(1);
@@ -1035,7 +1035,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   m_PlanePosition = *geometry.getPlanePosition();
   m_PlasticSheetGeometry = *geometry.getPlasticSheetGeometry();
   m_SegmentSupportGeometry = *geometry.getSegmentSupportGeometry();
-  if (m_SegmentSupportPosition != NULL)
+  if (m_SegmentSupportPosition != nullptr)
     delete[] m_SegmentSupportPosition;
   m_SegmentSupportPosition =
     new SegmentSupportPosition[m_NSegmentSupportElementsSector];
@@ -1046,7 +1046,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
     }
   }
   m_StripGeometry = *geometry.getStripGeometry();
-  if (m_StripPosition != NULL)
+  if (m_StripPosition != nullptr)
     delete[] m_StripPosition;
   m_StripPosition = new ElementPosition[m_NStrips];
   for (i = 0; i < m_NStrips; i++)

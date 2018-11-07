@@ -67,7 +67,7 @@ void EKLMRawPackerModule::event()
     sector = eklmDigit->getSector();
     sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
-    if (lane == NULL)
+    if (lane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
     formatData(lane, eklmDigit->getPlane(),
                eklmDigit->getStrip(), eklmDigit->getCharge(),

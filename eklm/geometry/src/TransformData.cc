@@ -119,7 +119,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
         for (iSector = 1; iSector <= nSectors; iSector++) {
           sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
           sectorAlignment = alignment->getSectorAlignment(sector);
-          if (sectorAlignment == NULL)
+          if (sectorAlignment == nullptr)
             B2FATAL("Incomplete EKLM displacement (alignment) data.");
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
             /* First plane is rotated. */
@@ -142,7 +142,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
               segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                 iPlane, iSegment);
               segmentAlignment = alignment->getSegmentAlignment(segment);
-              if (segmentAlignment == NULL)
+              if (segmentAlignment == nullptr)
                 B2FATAL("Incomplete EKLM displacement (alignment) data.");
               m_Segment[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
               [iSegment - 1] =

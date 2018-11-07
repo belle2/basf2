@@ -68,9 +68,10 @@ void BKLMUnpackerModule::initialize()
   bklmDigits.registerInDataStore(m_outputDigitsName);
   if (m_loadMapFromDB)
     loadMapFromDB();
-  if (m_enableDebugFile)
+  if (m_enableDebugFile) {
     B2INFO("BKLMUnpackerModule:: debugging mode enabled: the additional file " << m_nameDebugFile.c_str() << " will be created");
-  bookDebugFile();
+    bookDebugFile();
+  }
 }
 
 void BKLMUnpackerModule::loadMapFromDB()
@@ -471,6 +472,9 @@ void BKLMUnpackerModule::event()
 
   } //events for cycle: should be only 1...
 
+  //
+  // Store informations for debugging root file
+  //
   if (m_enableDebugFile) {
     for (int ii = 0; ii < 2; ii++) {
       for (int jj = 0; jj < 8; jj++) {
@@ -541,6 +545,9 @@ void BKLMUnpackerModule::terminate()
     B2INFO(message.first << "(occured " << message.second << " times)");
   }
 
+  //
+  // Store informations for debugging root file
+  //
   if (m_enableDebugFile) {
     m_file->cd();
     m_hitTree->Write();

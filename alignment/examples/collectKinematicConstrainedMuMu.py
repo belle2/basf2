@@ -11,8 +11,8 @@ import beamparameters as beam
 
 main = basf2.create_path()
 
-basf2.reset_database()
-basf2.use_local_database('centraldb/dbcache.txt')
+# basf2.reset_database()
+# basf2.use_local_database('centraldb/dbcache.txt')
 # basf2.use_local_database('localdb/database.txt')
 
 

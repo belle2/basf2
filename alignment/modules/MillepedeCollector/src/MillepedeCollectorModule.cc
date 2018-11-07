@@ -20,7 +20,7 @@
 #include <genfit/GblFitter.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/include/ReferenceFrame.h>
+#include <analysis/utility/ReferenceFrame.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/database/DBObjPtr.h>

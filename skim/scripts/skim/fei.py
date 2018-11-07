@@ -337,6 +337,7 @@ def B0SLWithOneLep(path):
     * B0 -> anti-D0 pi- mu+ nu
     * B0 -> anti-D0* pi- e+ nu
     * B0 -> anti-D0* pi- mu+ nu
+
     In addition, all hadronic channels (listed in FEI hadronic skim are
     used, where one of the hadronic D mesons is replaced by a SL D meson.
 
@@ -403,6 +404,7 @@ def BplusSLWithOneLep(path):
     * B+ -> D- pi+ mu+ nu
     * B+ -> D+* pi+ e+ nu
     * B+ -> D+* pi+ mu+ nu
+
     In addition, all hadronic channels (listed in FEI
     Bplus hadronic skim are used, where one of the hadronic
     D mesons is replaced by a SL D meson.

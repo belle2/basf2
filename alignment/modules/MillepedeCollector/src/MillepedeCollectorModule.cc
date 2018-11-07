@@ -103,6 +103,9 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            "Name of particle list of (mother) particles with daughters for calibration using vertex + IP profile + mass constraint",
            vector<string>());
 
+  addParam("stableParticleWidth", m_stableParticleWidth,
+           "Width (in GeV/c/c) to use for invariant mass constraint for 'stable' particles (like K short). Temporary until proper solution is found.",
+           double(0.002));
   // Configure output
   addParam("doublePrecision", m_doublePrecision, "Use double (=true) or single/float (=false) precision for writing binary files",
            bool(false));
@@ -356,7 +359,7 @@ void MillepedeCollectorModule::collect()
       for (auto& track : getParticlesTracks(mother->getDaughters()))
         daughters.push_back({
         gbl->collectGblPoints(track, track->getCardinalRep()),
-        getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
+        getGlobalToLocalTransform(track->getFittedState()).T().GetSub(0, 4, 0, 2)
       });
 
       if (daughters.size() > 1) {
@@ -389,7 +392,7 @@ void MillepedeCollectorModule::collect()
       for (auto& track : getParticlesTracks(mother->getDaughters())) {
         if (first) {
           // For first trajectory only
-          extProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
+          extProjection = getLocalToGlobalTransform(track->getFittedState()).T().GetSub(0, 2, 0, 4);
           first = false;
         }
         daughters.push_back({
@@ -470,7 +473,7 @@ void MillepedeCollectorModule::collect()
       double motherWidth = pdgdb->GetParticle(mother->getPDGCode())->Width();
       //TODO: what to take as width for "real" particles? -> make a param for default detector mass resolution??
       if (motherWidth == 0.) {
-        motherWidth = 10. * Unit::MeV;
+        motherWidth = m_stableParticleWidth * Unit::GeV;
         B2WARNING("Using artificial width for " << pdgdb->GetParticle(mother->getPDGCode())->GetName() << " : " << motherWidth << " GeV");
       }
 

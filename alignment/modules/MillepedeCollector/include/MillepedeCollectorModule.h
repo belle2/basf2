@@ -87,16 +87,20 @@ namespace Belle2 {
     std::vector<std::string> m_particles;
     /** Name of particle list with mothers of daughters to be used with vertex constraint in calibration */
     std::vector<std::string> m_vertices;
-    /** Name of particle list with mothers of daughters to be used with vertex + IP profile constraint in calibration */
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile (+ optional calibration) constraint in calibration */
     std::vector<std::string> m_primaryVertices;
     /** Name of particle list with mothers of daughters to be used with vertex + mass constraint in calibration */
     std::vector<std::string> m_twoBodyDecays;
-    /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile (+ optional calibration) + IP kinematics (+ optional calibration) constraint in calibration */
     std::vector<std::string> m_primaryTwoBodyDecays;
     /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
     std::vector<std::string> m_primaryMassTwoBodyDecays;
     /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
     std::vector<std::string> m_primaryMassVertexTwoBodyDecays;
+
+    /** Width (in GeV/c/c) to use for invariant mass constraint for 'stable' particles (like K short). Temporary until proper solution is found */
+    double m_stableParticleWidth;
+
     /** Use double (instead of single/float) precision for binary files */
     bool m_doublePrecision;
     /** Add derivatives for beam spot vertex calibration for primary vertices */

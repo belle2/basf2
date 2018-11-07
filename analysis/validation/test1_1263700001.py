@@ -23,7 +23,6 @@ import os.path
 from basf2 import *
 from modularAnalysis import *
 from analysisPath import analysis_main
-from beamparameters import add_beamparameters
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
@@ -218,7 +217,7 @@ variables.addAlias('ROE_mcMissFlagsSel', 'ROE_mcMissFlags(ROEclusters)')
 variables.addAlias('ROE_chargeSel', 'ROE_charge(ROEclusters)')
 variables.addAlias('ROE_ESel', 'ROE_E(ROEclusters)')
 variables.addAlias('ROE_PSel', 'ROE_P(ROEclusters)')
-variables.addAlias('nAllROETracks', 'nROETracks(ROETracks)')
+variables.addAlias('nAllROETracks', 'nROE_Tracks(ROETracks)')
 variables.addAlias('nROEECLClustersSel', 'nROEECLClusters(ROEclusters)')
 variables.addAlias('nROENeutralECLClustersSel', 'nROENeutralECLClusters(ROEclusters)')
 
@@ -267,10 +266,10 @@ tools4SBplusHad += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BhadBsigp -> ^B+:
 tools4SBplusHad += ['CustomFloats[d0_costheta:d0_d0_costheta:d0_costhetaCMS:d0_d0_costhetaCMS]',
                     'Upsilon(4S):BhadBsigp ->  B+:genericRank ^B-:all']
 tools4SBplusHad += [
-    'CustomFloats[missPz(ROEclusters,0):missPy(ROEclusters,0):missPx(ROEclusters,0):missP(R0Eclusters,0)]',
+    'CustomFloats[WE_MissPz(ROEclusters,0):WE_MissPy(ROEclusters,0):WE_MissPx(ROEclusters,0):WE_MissP(R0Eclusters,0)]',
     '^Upsilon(4S):BhadBsigp ->B+:genericRank B-:all']
 tools4SBplusHad += [
-    'CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
+    'CustomFloats[WE_MissPTheta(ROEclusters,0):WE_MissE(ROEclusters,0):m2RecoilSignalSide:WE_MissM2(ROEclusters,0)]',
     '^Upsilon(4S):BhadBsigp']
 tools4SBplusHad += ['CustomFloats[d0_costheta:d0_d0_costheta:d0_costhetaCMS:d0_d0_costhetaCMS]',
                     'Upsilon(4S):BhadBsigp ->  B+:genericRank ^B-:all']
@@ -300,11 +299,12 @@ tools4SBplusSL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BslBsigp -> ^B+:se
 
 tools4SBplusSL += ['CustomFloats[d0_costheta:d0_d0_costheta:d0_costhetaCMS:d0_d0_costhetaCMS]',
                    'Upsilon(4S):BslBsigp ->  B+:semileptonicRank ^B-:all']
-tools4SBplusSL += ['CustomFloats[missPz(ROEclusters,0):missPy(ROEclusters,0):missPx(ROEclusters,0):missP(R0Eclusters,0)]',
-                   '^Upsilon(4S):BslBsigp ->B+:semileptonicRank B-:all']
+tools4SBplusSL += [
+    'CustomFloats[WE_MissPz(ROEclusters,0):WE_MissPy(ROEclusters,0):WE_MissPx(ROEclusters,0):WE_MissP(R0Eclusters,0)]',
+    '^Upsilon(4S):BslBsigp ->B+:semileptonicRank B-:all']
 
 tools4SBplusSL += [
-    'CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
+    'CustomFloats[WE_MissPTheta(ROEclusters,0):WE_MissE(ROEclusters,0):m2RecoilSignalSide:WE_MissM2(ROEclusters,0)]',
     '^Upsilon(4S):BslBsigp']
 tools4SBplusSL += ['CustomFloats[d0_costheta:d0_d0_costheta:d0_costhetaCMS:d0_d0_costhetaCMS]',
                    'Upsilon(4S):BslBsigp ->  B+:semileptonicRank ^B-:all']

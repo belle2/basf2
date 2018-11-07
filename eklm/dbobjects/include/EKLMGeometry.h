@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMGEOMETRY_H
-#define EKLMGEOMETRY_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -1485,6 +1484,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

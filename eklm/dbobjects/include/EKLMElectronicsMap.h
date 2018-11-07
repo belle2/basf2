@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMELECTRONICSMAP_H
-#define EKLMELECTRONICSMAP_H
+#pragma once
 
 /* C++ headers. */
 #include <map>
@@ -79,6 +78,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

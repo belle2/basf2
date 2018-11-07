@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_GEOEKLMCREATOR_H
-#define EKLM_GEOEKLMCREATOR_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -673,6 +672,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

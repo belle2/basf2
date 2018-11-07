@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTRANSFORMDATA_H
-#define EKLMTRANSFORMDATA_H
+#pragma once
 
 /* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
@@ -239,6 +238,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

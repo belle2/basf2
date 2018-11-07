@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KLMCLUSTEREFFICIENCYMODULE_H
-#define KLMCLUSTEREFFICIENCYMODULE_H
+#pragma once
 
 /* External headers. */
 #include <TFile.h>
@@ -155,6 +154,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

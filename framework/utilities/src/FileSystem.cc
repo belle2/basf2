@@ -121,7 +121,11 @@ std::string FileSystem::findFile(const string& path, const std::string& dataType
     dirs.push_back((fs::path(getenv("VO_BELL2_SW_DIR")) / dirName).string());
   }
   dirs.push_back(dirName);
-  return findFile(path, dirs, silent);
+  std::string result = findFile(path, dirs, true);
+  if (result.empty() && !silent)
+    B2ERROR("findFile(): Could not find data file. You may want to use the 'b2install-data' tool to get the file."
+            << LogVar("path", path) << LogVar("data type", dataType));
+  return result;
 }
 
 FileSystem::Lock::Lock(std::string fileName, bool readonly) :

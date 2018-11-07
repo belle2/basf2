@@ -478,6 +478,7 @@ namespace Belle2 {
 
       ARICHHit* h = arichHits[iPhoton];
       int modID = h->getModule();
+      int channel = h->getChannel();
       TVector3 hitpos = m_arichgp->getMasterVolume().pointToLocal(h->getPosition());
       bool bkgAdded = false;
       int nfoo = nDetPhotons;
@@ -493,8 +494,10 @@ namespace Belle2 {
         if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
 
         double sigExpArr[c_noOfHypotheses] = {0.0}; // esigi for given mirror hypothesis only
-        double th_cer_1st = 0;
-        double fi_cer_1st = 0;
+        double th_cer_all[c_noOfAerogels] = {0.0};
+        double fi_cer_all[c_noOfAerogels] = {0.0};
+        double weight[c_noOfHypotheses][c_noOfAerogels] = { {0.0} };
+        double weight_sum[c_noOfHypotheses] = {0.0};
         int proc = 0;
 
         // loop over all aerogel layers
@@ -512,13 +515,15 @@ namespace Belle2 {
           double fi_cer = dirch.Phi();
           double th_cer = dirch.Theta();
 
+
+          th_cer_all[iAerogel] = th_cer;
+          fi_cer_all[iAerogel] = fi_cer;
+
           // skip photons with irrelevantly large/small Cherenkov angle
           if ((th_cer > 0.5 || th_cer < 0.1) && iAerogel == 0) break;
 
           // count photons with 0.1<thc<0.5
           if (nfoo == nDetPhotons) nDetPhotons++;
-
-          if (iAerogel == 0) { th_cer_1st = th_cer; fi_cer_1st = fi_cer;}
 
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii = fi_cer;
@@ -558,6 +563,8 @@ namespace Belle2 {
 
             if (dr > 0.01) {
               double normalizacija = nSig_wo_acc[iHyp][iAerogel][ifi] * padSize / (0.1 * M_PI * dr);
+              weight[iHyp][iAerogel] = normalizacija;
+              weight_sum[iHyp] += weight[iHyp][iAerogel];
               double integralMain = SquareInt(padSize, pad_fi, dx, detector_sigma) / sqrt(2.);
               double integralWide = SquareInt(padSize, pad_fi, dx, wide_sigma) / sqrt(2.);
               // expected number of signal photons in each pixel
@@ -575,18 +582,39 @@ namespace Belle2 {
           if (!bkgAdded) {
             for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
               std::vector<double> pars = {momentum / sqrt(p_mass[iHyp]*p_mass[iHyp] + momentum * momentum), double(arichTrack.hitsWindow())};
-              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_1st, pars);
+              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_all[0], pars);
             }
             bkgAdded = true;
           }
-          // create ARICHPhoton if desired
-          if (m_storePhot) {
-            ARICHPhoton phot(iPhoton, th_cer_1st, fi_cer_1st, mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
-            phot.setBkgExp(ebgri); // store expected number of background hits
-            phot.setSigExp(sigExpArr); // store expected number of signal hits
-            arichTrack.addPhoton(phot);
-          }
         }
+        // create ARICHPhoton if desired
+        if (m_storePhot && th_cer_all[0] > 0) {
+          double n_cos_theta_ch[c_noOfHypotheses] = {0.0};
+          double phi_ch[c_noOfHypotheses] = {0.0};
+          for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
+            if (weight_sum[iHyp] > 0) {
+              for (unsigned int iAerogel = 0; iAerogel < m_nAerogelLayers; iAerogel++) {
+                double emission_prob = weight[iHyp][iAerogel] / weight_sum[iHyp];
+                n_cos_theta_ch[iHyp] += emission_prob * m_refractiveInd[iAerogel] * cos(th_cer_all[iAerogel]);
+                phi_ch[iHyp] += emission_prob * fi_cer_all[iAerogel];
+              }
+              //std::cout << iHyp << " " <<  n_cos_theta_ch[iHyp] << " " << phi_ch[iHyp] << std::endl;
+            } else {
+              n_cos_theta_ch[iHyp] = -99999.;
+              phi_ch[iHyp] = -99999.;
+            }
+          }
+          ARICHPhoton phot(iPhoton, th_cer_all[0], fi_cer_all[0], mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
+          phot.setBkgExp(ebgri); // store expected number of background hits
+          phot.setSigExp(sigExpArr); // store expected number of signal hits
+          phot.setNCosThetaCh(n_cos_theta_ch); // store n cos(theta_th) for all particle hypotheses
+          phot.setPhiCh(phi_ch); // store phi_ch for all particle hypotheses
+          phot.setXY(hitpos.X(), hitpos.Y()); // store x-y hit position
+          phot.setModuleID(modID); // store module id
+          phot.setChannel(channel); // store channel
+          arichTrack.addPhoton(phot);
+        }
+
 
       }// for (int mirr = 0; mirr < refl; mirr++)
 

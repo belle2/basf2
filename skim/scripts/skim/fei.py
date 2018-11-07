@@ -26,6 +26,7 @@ def B0hadronic(path):
     Skim LFN code: 11180100
     Physics channels: (All available FEI B0 Hadronic tags are
     used)
+
     * B0 -> D- pi+
     * B0 -> D- pi+ pi0
     * B0 -> D- pi+ pi0 pi0
@@ -87,6 +88,7 @@ def BplusHadronic(path):
     Skim LFN code: 11180200
     Physics channels: (All available FEI B+ Hadronic tags are
     reconstructed)
+
     * B+ -> anti-D0 pi+
     * B+ -> anti-D0 pi+ pi0
     * B+ -> anti-D0 pi+ pi0 pi0
@@ -152,6 +154,7 @@ def runFEIforB0Hadronic(path):
     Skim LFN code: 11180100
     Physics channels: (All available FEI B0 Hadronic tags are
     reconstructed)
+
     * B0 -> D- pi+
     * B0 -> D- pi+ pi0
     * B0 -> D- pi+ pi0 pi0
@@ -223,6 +226,7 @@ def runFEIforBplusHadronic(path):
     Skim LFN code: 11180200
     Physics channels: (All available FEI B+ Hadronic tags are
     reconstructed)
+
     * B+ -> anti-D0 pi+
     * B+ -> anti-D0 pi+ pi0
     * B+ -> anti-D0 pi+ pi0 pi0

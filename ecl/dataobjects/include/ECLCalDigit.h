@@ -77,7 +77,11 @@ namespace Belle2 {
 
     /*! Set two comp chi2 for a fit type
      */
-    void setTwoComponentSavedChi2(unsigned int index, double input) { m_TwoComponentSavedChi2[index] = input; }
+    void setTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn, double input)
+    {
+      unsigned int index = FitTypeIn ;
+      m_TwoComponentSavedChi2[index] = input;
+    }
 
     /*! Set two component fit type
      */
@@ -136,7 +140,11 @@ namespace Belle2 {
     /*! get two comp chi2 for a fit type
      * @return two comp chi2 for fit type
      */
-    double getTwoComponentSavedChi2(unsigned int index) const { return m_TwoComponentSavedChi2[index]; }
+    double getTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn) const
+    {
+      unsigned int index = FitTypeIn ;
+      return m_TwoComponentSavedChi2[index];
+    }
 
     /*! Get two componnent fit type
      * @return two componnent fit type

@@ -332,9 +332,9 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentHadronAmp(-1);
     aECLDsp.setTwoComponentDiodeAmp(-1);
     aECLDsp.setTwoComponentChi2(-1);
-    aECLDsp.setTwoComponentSavedChi2(0, -1);
-    aECLDsp.setTwoComponentSavedChi2(1, -1);
-    aECLDsp.setTwoComponentSavedChi2(2, -1);
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, -1);
     aECLDsp.setTwoComponentTime(-1);
     aECLDsp.setTwoComponentBaseline(-1);
     aECLDsp.setTwoComponentFitType(ECLDsp::poorChi2);
@@ -388,7 +388,7 @@ void ECLWaveformFitModule::event()
     ECLDsp::TwoComponentFitType fitType = ECLDsp::photonHadron;
     p2_chi2 = -1;
     Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
-    aECLDsp.setTwoComponentSavedChi2(0, p2_chi2);
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadron, p2_chi2);
 
     //if hadron fit failed try hadron + background photon (fit type = 1)
     if (p2_chi2 >= m_chi2Threshold) {
@@ -396,7 +396,7 @@ void ECLWaveformFitModule::event()
       fitType = ECLDsp::photonHadronBackgroundPhoton;
       p2_chi2 = -1;
       Fit2hExtraPhoton(p2_b, p2_a, p2_t, p2_a1, p_extraPhotonEnergy, p_extraPhotonTime, p2_chi2);
-      aECLDsp.setTwoComponentSavedChi2(1, p2_chi2);
+      aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, p2_chi2);
 
       //hadron + background photon fit failed try diode fit (fit type = 2)
       if (p2_chi2 >= m_chi2Threshold) {
@@ -404,7 +404,7 @@ void ECLWaveformFitModule::event()
         fitType = ECLDsp::photonDiodeCrossing;
         p2_chi2 = -1;
         Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
-        aECLDsp.setTwoComponentSavedChi2(2, p2_chi2);
+        aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, p2_chi2);
       }
 
     }

@@ -10,6 +10,7 @@
 
 #include <TMatrixFSym.h>
 
+#include <analysis/utility/ROOTToCLHEP.h>
 #include <analysis/KFit/KFitBase.h>
 
 using namespace std;
@@ -44,6 +45,7 @@ KFitBase::addTrack(const KFitTrack& p) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
+
 enum KFitError::ECode
 KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q) {
   if (e.num_row() != KFitConst::kNumber7)
@@ -56,13 +58,9 @@ KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymM
   return this->addTrack(KFitTrack(p, x, e, q));
 }
 
+
 enum KFitError::ECode KFitBase::addParticle(const Particle* particle)
 {
-  CLHEP::HepLorentzVector mom(particle->getPx(),
-                              particle->getPy(),
-                              particle->getPz(),
-                              particle->getEnergy());
-  HepPoint3D pos(particle->getX(), particle->getY(), particle->getZ());
   CLHEP::HepSymMatrix covMatrix(7);
   TMatrixFSym errMatrix = particle->getMomentumVertexErrorMatrix();
   for (int i = 0; i < 7; i++) {
@@ -70,7 +68,11 @@ enum KFitError::ECode KFitBase::addParticle(const Particle* particle)
       covMatrix[i][j] = errMatrix[i][j];
     }
   }
-  return addTrack(mom, pos, covMatrix, particle->getCharge());
+  return addTrack(
+           ROOTToCLHEP::getHepLorentzVector(particle->get4Vector()),
+           ROOTToCLHEP::getPoint3D(particle->getVertex()),
+           ROOTToCLHEP::getHepSymMatrix(particle->getMomentumVertexErrorMatrix()),
+           particle->getCharge());
 }
 
 
@@ -165,13 +167,6 @@ KFitBase::getTrackMomentum(const int id) const
   return m_Tracks[id].getMomentum();
 }
 
-const TLorentzVector KFitBase::getTrackMomentumROOT(const int id) const
-{
-  CLHEP::HepLorentzVector momentumClhep = getTrackMomentum(id);
-  return TLorentzVector(momentumClhep.x(), momentumClhep.y(),
-                        momentumClhep.z(), momentumClhep.t());
-}
-
 const HepPoint3D
 KFitBase::getTrackPosition(const int id) const
 {
@@ -179,30 +174,11 @@ KFitBase::getTrackPosition(const int id) const
   return m_Tracks[id].getPosition();
 }
 
-const TVector3 KFitBase::getTrackPositionROOT(const int id) const
-{
-  HepPoint3D positionClhep = getTrackPosition(id);
-  return TVector3(positionClhep.x(), positionClhep.y(), positionClhep.z());
-}
-
 const HepSymMatrix
 KFitBase::getTrackError(const int id) const
 {
   if (!isTrackIDInRange(id)) return HepSymMatrix(KFitConst::kNumber7, 0);
   return m_Tracks[id].getError();
-}
-
-const TMatrixFSym KFitBase::getTrackErrorROOT(const int id) const
-{
-  int i, j;
-  TMatrixFSym error;
-  CLHEP::HepSymMatrix errorClhep = getTrackError(id);
-  for (i = 0; i < KFitConst::kNumber7; i++) {
-    for (j = 0; j < KFitConst::kNumber7; j++) {
-      error[i][j] = errorClhep[i][j];
-    }
-  }
-  return error;
 }
 
 const KFitTrack

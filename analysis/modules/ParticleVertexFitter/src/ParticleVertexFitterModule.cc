@@ -26,6 +26,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // utilities
+#include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
@@ -576,27 +577,12 @@ namespace Belle2 {
         return false;
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
-        TLorentzVector childMom(kv.getTrackMomentum(iChild).px(),
-                                kv.getTrackMomentum(iChild).py(),
-                                kv.getTrackMomentum(iChild).pz(),
-                                kv.getTrackMomentum(iChild).e());
-
-        TVector3 childPos(kv.getTrackPosition(iChild).x(),
-                          kv.getTrackPosition(iChild).y(),
-                          kv.getTrackPosition(iChild).z());
-
-        CLHEP::HepSymMatrix childCovMatrix = kv.getTrackError(iChild);
-
-        TMatrixFSym childErrMatrix(7);
-        for (int i = 0; i < 7; i++) {
-          for (int j = 0; j < 7; j++) {
-            childErrMatrix[i][j] = childCovMatrix[i][j];
-          }
-        }
-
-        daughters[iChild]->set4Vector(childMom);
-        daughters[iChild]->setVertex(childPos);
-        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+        daughters[iChild]->set4Vector(
+          CLHEPToROOT::getTLorentzVector(kv.getTrackMomentum(iChild)));
+        daughters[iChild]->setVertex(
+          CLHEPToROOT::getTVector3(kv.getTrackPosition(iChild)));
+        daughters[iChild]->setMomentumVertexErrorMatrix(
+          CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
       }
     }
 
@@ -623,27 +609,12 @@ namespace Belle2 {
         return false;
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
-        TLorentzVector childMom(kmv.getTrackMomentum(iChild).px(),
-                                kmv.getTrackMomentum(iChild).py(),
-                                kmv.getTrackMomentum(iChild).pz(),
-                                kmv.getTrackMomentum(iChild).e());
-
-        TVector3 childPos(kmv.getTrackPosition(iChild).x(),
-                          kmv.getTrackPosition(iChild).y(),
-                          kmv.getTrackPosition(iChild).z());
-
-        CLHEP::HepSymMatrix childCovMatrix = kmv.getTrackError(iChild);
-
-        TMatrixFSym childErrMatrix(7);
-        for (int i = 0; i < 7; i++) {
-          for (int j = 0; j < 7; j++) {
-            childErrMatrix[i][j] = childCovMatrix[i][j];
-          }
-        }
-
-        daughters[iChild]->set4Vector(childMom);
-        daughters[iChild]->setVertex(childPos);
-        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+        daughters[iChild]->set4Vector(
+          CLHEPToROOT::getTLorentzVector(kmv.getTrackMomentum(iChild)));
+        daughters[iChild]->setVertex(
+          CLHEPToROOT::getTVector3(kmv.getTrackPosition(iChild)));
+        daughters[iChild]->setMomentumVertexErrorMatrix(
+          CLHEPToROOT::getTMatrixFSym(kmv.getTrackError(iChild)));
       }
     }
 
@@ -669,27 +640,12 @@ namespace Belle2 {
         return false;
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
-        TLorentzVector childMom(km.getTrackMomentum(iChild).px(),
-                                km.getTrackMomentum(iChild).py(),
-                                km.getTrackMomentum(iChild).pz(),
-                                km.getTrackMomentum(iChild).e());
-
-        TVector3 childPos(km.getTrackPosition(iChild).x(),
-                          km.getTrackPosition(iChild).y(),
-                          km.getTrackPosition(iChild).z());
-
-        CLHEP::HepSymMatrix childCovMatrix = km.getTrackError(iChild);
-
-        TMatrixFSym childErrMatrix(7);
-        for (int i = 0; i < 7; i++) {
-          for (int j = 0; j < 7; j++) {
-            childErrMatrix[i][j] = childCovMatrix[i][j];
-          }
-        }
-
-        daughters[iChild]->set4Vector(childMom);
-        daughters[iChild]->setVertex(childPos);
-        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+        daughters[iChild]->set4Vector(
+          CLHEPToROOT::getTLorentzVector(km.getTrackMomentum(iChild)));
+        daughters[iChild]->setVertex(
+          CLHEPToROOT::getTVector3(km.getTrackPosition(iChild)));
+        daughters[iChild]->setMomentumVertexErrorMatrix(
+          CLHEPToROOT::getTMatrixFSym(km.getTrackError(iChild)));
       }
     }
 
@@ -740,25 +696,14 @@ namespace Belle2 {
         TVector3 childPoss;
         TMatrixFSym childErrMatrixs(7);
         for (unsigned iChild = 0; iChild < pars[iDaug].size(); iChild++) {
-          TLorentzVector childMom(kf.getTrackMomentum(pars[iDaug][iChild]).px(),
-                                  kf.getTrackMomentum(pars[iDaug][iChild]).py(),
-                                  kf.getTrackMomentum(pars[iDaug][iChild]).pz(),
-                                  kf.getTrackMomentum(pars[iDaug][iChild]).e());
-          childMoms = childMoms + childMom;
-
-          TVector3 childPos(kf.getTrackPosition(pars[iDaug][iChild]).x(),
-                            kf.getTrackPosition(pars[iDaug][iChild]).y(),
-                            kf.getTrackPosition(pars[iDaug][iChild]).z());
-          childPoss = childPoss + childPos;
-
-          CLHEP::HepSymMatrix childCovMatrix = kf.getTrackError(pars[iDaug][iChild]);
-
-          TMatrixFSym childErrMatrix(7);
-          for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
-              childErrMatrix[i][j] = childCovMatrix[i][j];
-            }
-          }
+          childMoms = childMoms +
+                      CLHEPToROOT::getTLorentzVector(
+                        kf.getTrackMomentum(pars[iDaug][iChild]));
+          childPoss = childPoss +
+                      CLHEPToROOT::getTVector3(
+                        kf.getTrackPosition(pars[iDaug][iChild]));
+          TMatrixFSym childErrMatrix =
+            CLHEPToROOT::getTMatrixFSym(kf.getTrackError(pars[iDaug][iChild]));
           childErrMatrixs = childErrMatrixs + childErrMatrix;
         }
         allparticles[iDaug]->set4Vector(childMoms);

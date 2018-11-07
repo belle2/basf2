@@ -16,6 +16,7 @@
 
 #include <analysis/KFit/MakeMotherKFit.h>
 #include <analysis/KFit/VertexFitKFit.h>
+#include <analysis/utility/CLHEPToROOT.h>
 
 
 using namespace std;
@@ -924,21 +925,14 @@ enum KFitError::ECode VertexFitKFit::updateMother(Particle* mother)
   m_ErrorCode = kmm.doMake();
   if (m_ErrorCode != KFitError::kNoError)
     return m_ErrorCode;
-  CLHEP::HepLorentzVector momClhep = kmm.getMotherMomentum();
-  TLorentzVector mom(momClhep.px(), momClhep.py(), momClhep.pz(), momClhep.e());
-  CLHEP::Hep3Vector posClhep = kmm.getMotherPosition();
-  TVector3 pos(posClhep.x(), posClhep.y(), posClhep.z());
-  CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
-  TMatrixFSym errMatrix(7);
-  for (int i = 0; i < 7; i++) {
-    for (int j = 0; j < 7; j++) {
-      errMatrix[i][j] = covMatrix[i][j];
-    }
-  }
   double chi2 = getCHIsq();
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
-  mother->updateMomentum(mom, pos, errMatrix, prob);
+  mother->updateMomentum(
+    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
+    prob);
   m_ErrorCode = KFitError::kNoError;
   return m_ErrorCode;
 }

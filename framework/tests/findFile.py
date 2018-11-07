@@ -45,9 +45,9 @@ os.chdir('/')
 assert abspath == rl(Belle2.FileSystem.findFile('framework/tests/findFile.py'))
 assert abspath == rl(Belle2.FileSystem.findFile('/framework/tests/findFile.py'))
 
-# try to find EXAMPLE data file
-assert '' == Belle2.FileSystem.findFile('framework/tests/findFile.py', 'example', True)
+# try to find TEST data file
+assert '' == Belle2.FileSystem.findFile('framework/tests/findFile.py', 'test', True)
 
-# set BELLE2_EXAMPLE_DATA_DIR and try again
-os.environ['BELLE2_EXAMPLE_DATA_DIR'] = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR'))
-assert abspath == rl(Belle2.FileSystem.findFile('/framework/tests/findFile.py', 'example'))
+# set BELLe2_TEST_DATA_DIR and try again
+os.environ['BELLE2_TEST_DATA_DIR'] = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR'))
+assert abspath == rl(Belle2.FileSystem.findFile('/framework/tests/findFile.py', 'test'))

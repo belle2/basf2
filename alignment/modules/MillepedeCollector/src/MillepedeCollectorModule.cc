@@ -478,7 +478,7 @@ void MillepedeCollectorModule::collect()
       }
 
 
-      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth;
+      TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth / motherWidth;
       TVectorD massResidual(1); massResidual = - (mother->getMass() - mother->getPDGMass());
 
       TVectorD extMeasurements(1);

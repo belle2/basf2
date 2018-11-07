@@ -31,7 +31,7 @@
 #include <alignment/GlobalLabel.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/particledb/include/EvtGenDatabasePDG.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <TMath.h>
 #include <TH1F.h>

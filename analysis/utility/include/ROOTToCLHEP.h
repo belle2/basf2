@@ -15,7 +15,7 @@
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
 #include <TLorentzVector.h>
-#include <TMatrixFSymfwd.h>
+#include <TMatrixFSym.h>
 #include <TVector3.h>
 
 namespace Belle2 {

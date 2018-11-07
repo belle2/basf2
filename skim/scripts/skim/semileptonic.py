@@ -14,12 +14,6 @@ from modularAnalysis import *
 
 
 def SemileptonicList():
-
-    __authors__ = [
-        "Phillip Urquijo",
-        "Racha Cheaib"
-    ]
-
     """
     Note:
         * (Semi-)Leptonic Working Group skim for semi-leptonic analysis.
@@ -47,6 +41,12 @@ def SemileptonicList():
     * nTracks > 4
 
     """
+
+    __authors__ = [
+        "Phillip Urquijo",
+        "Racha Cheaib"
+    ]
+
     cutAndCopyList('e-:SLB', 'e-:all', 'p>0.35', True)
     cutAndCopyList('mu-:SLB', 'mu-:all', 'p>0.35', True)
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'

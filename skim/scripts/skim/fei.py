@@ -22,8 +22,10 @@ from stdCharged import *
 
 def B0hadronic(path):
     """FEI Hadronic B0 tag skim list for generic analysis in the
-    (Semi-)Leptonic and Missing Energy Working Group
+    (Semi-)Leptonic and Missing Energy Working Group.
+
     Skim LFN code: 11180100
+
     Physics channels: (All available FEI B0 Hadronic tags are
     used)
 
@@ -76,6 +78,7 @@ def B0hadronic(path):
         * abs(deltaE) < 0.200
         * sigProb > 0.001
     """
+
     applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
 
     B0hadronicList = ['B0:generic']
@@ -84,8 +87,10 @@ def B0hadronic(path):
 
 def BplusHadronic(path):
     """FEI Hadronic B+ tag skim list for generic analysis in the
-    (Semi-)Leptonic and Missing Energy Working Group
+    (Semi-)Leptonic and Missing Energy Working Group.
+
     Skim LFN code: 11180200
+
     Physics channels: (All available FEI B+ Hadronic tags are
     reconstructed)
 
@@ -150,8 +155,10 @@ def runFEIforB0Hadronic(path):
     """Generates FEI B0:generic list, including applying FEI weights and skim
     pre-selection cuts. Use B0hadronic(path) for skim cuts on FEI output list.
 
-    (Semi-)Leptonic and Missing Energy Working Group
+    (Semi-)Leptonic and Missing Energy Working Group.
+
     Skim LFN code: 11180100
+
     Physics channels: (All available FEI B0 Hadronic tags are
     reconstructed)
 
@@ -220,10 +227,12 @@ def runFEIforB0Hadronic(path):
 
 def runFEIforBplusHadronic(path):
     """Generates FEI B+:generic list, including applying FEI weights and skim
-    pre-selection cuts. Use BplusHadronic(path) for skim cuts on FEI output list
+    pre-selection cuts. Use BplusHadronic(path) for skim cuts on FEI output list.
 
-    (Semi-)Leptonic and Missing Energy Working Group
+    (Semi-)Leptonic and Missing Energy Working Group.
+
     Skim LFN code: 11180200
+
     Physics channels: (All available FEI B+ Hadronic tags are
     reconstructed)
 
@@ -295,10 +304,13 @@ def runFEIforHadronicCombined(path):
     applying FEI weights and skim pre-selection cuts.
     Use BplusHadronic(path) and B0Hadronic(path) for skim cuts on FEI output lists
 
-    (Semi-)Leptonic and Missing Energy Working Group
+    (Semi-)Leptonic and Missing Energy Working Group.
+
     Skim LFN code: 11180100, 11180200
+
     Physics channels: (All available FEI B0 and B+ Hadronic tags are
     reconstructed)
+
     FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
 
     Skim Liasons: S. Hollitt & H. Wakeling
@@ -329,8 +341,10 @@ def B0SLWithOneLep(path):
     """FEI Semi-Leptonic B0 tag (with Bsig with at least one lepton) skim list
     FEI semi-leptonic (SL) B0 tag with one lepton
     skim list for generic analysis in the (Semi-)Leptonic and
-    Missing Energy Working Group
+    Missing Energy Working Group.
+
     Skim LFN code: 11180300
+
     Physics channels: (All available FEI B0 SL tags are reconstructed)
 
     * B0 -> D- e+ nu
@@ -395,9 +409,10 @@ def B0SLWithOneLep(path):
 def BplusSLWithOneLep(path):
     """ FEI semi-leptonic (SL) Bplus tag with one lepton skim
     list for generic analysis in the (Semi-)Leptonic and
-    Missing Energy Working Group
+    Missing Energy Working Group.
 
     Skim LFN code: 11180400
+
     Physics channels: (All available FEI Bplus SL tags are reconstructed)
 
     * B+ -> anti-D0 e+ nu

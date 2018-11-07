@@ -8,8 +8,10 @@ import math
 import numpy as np
 
 import ROOT
+
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
+Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
 
 import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
@@ -71,7 +73,6 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             decay_vertex_z_truth=decay_vertex.Z(),
             number_of_daughters_truth=number_of_daughters,
             status_truth=status,
-
 
             # MC Particle information
             charge_truth=charge,
@@ -206,7 +207,7 @@ def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}")
         return dict(
             has_vxdtf2_failure_flag=False,
             has_unspecified_trackfinding_failure=False,
-             )
+        )
     return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
                 )
@@ -285,7 +286,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
         pt_estimate = mom.Perp()
 
         pt_variance = np.divide(
-            mom.X()**2 * cov6(3, 3) + mom.Y()**2 * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3, 4),
+            mom.X() ** 2 * cov6(3, 3) + mom.Y() ** 2 * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3, 4),
             mom.Perp2()
         )
 
@@ -511,3 +512,15 @@ def get_seed_track_fit_result(reco_track):
     )
 
     return track_fit_result
+
+
+def is_correct_rl_information(cdc_hit, reco_track, hit_lookup):
+    rl_info = reco_track.getRightLeftInformation("const Belle2::CDCHit")(cdc_hit)
+    truth_rl_info = hit_lookup.getRLInfo(cdc_hit)
+
+    if rl_info == Belle2.RecoHitInformation.c_right and truth_rl_info == 1:
+        return True
+    if rl_info == Belle2.RecoHitInformation.c_left and truth_rl_info == -1:
+        return True
+
+    return False

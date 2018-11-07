@@ -1,3 +1,4 @@
 [INFO] Steering file: framework/tests/findFile.py
-[ERROR] findFile(): Could not find 'framework/tests/ThisFileDoesntExist'!
+[ERROR] findFile(): Could not find file.
+	path = framework/tests/ThisFileDoesntExist
 [INFO] No more output from here...

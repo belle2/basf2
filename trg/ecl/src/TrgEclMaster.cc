@@ -372,7 +372,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     int bhabha3D = 0 ;
     bool b_2Dbhabha = obj_bhabha -> GetBhabha00(phiringsum);
     vct_bhabha = obj_bhabha -> GetBhabhaComb();
-    if (b_2Dbhabha && (icn < 3)) {bhabha2D = 1;}
+    if (b_2Dbhabha && (icn < 4)) {bhabha2D = 1;}
     bool b_3Dbhabha =  obj_bhabha -> GetBhabha01();
     if (b_3Dbhabha) {bhabha3D = 1;}
     //------------------------
@@ -807,7 +807,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int bhabha3D = 0 ;
   bool b_2Dbhabha = obj_bhabha -> GetBhabha00(phiringsum);
   vct_bhabha = obj_bhabha -> GetBhabhaComb();
-  if (b_2Dbhabha && (icn < 3)) {bhabha2D = 1;}
+  if (b_2Dbhabha && (icn < 4)) {bhabha2D = 1;}
   bool b_3Dbhabha =  obj_bhabha -> GetBhabha01();
   if (b_3Dbhabha) {bhabha3D = 1;}
   //------------------------

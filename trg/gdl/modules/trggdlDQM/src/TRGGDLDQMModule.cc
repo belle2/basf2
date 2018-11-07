@@ -120,7 +120,7 @@ void TRGGDLDQMModule::defineHisto()
   h_psn = new TH1I("hGDL_psn", "psn", tb.getNumOfOutputs() + 1, -1, tb.getNumOfOutputs());
   // output extra
   h_psn_extra = new TH1I("hGDL_psn_extra", "psn extra", n_output_extra, 0, n_output_extra);
-  for (unsigned i = 0; i < n_output_extra; i++) {
+  for (int i = 0; i < n_output_extra; i++) {
     h_psn_extra->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
   }
   // rise/fall

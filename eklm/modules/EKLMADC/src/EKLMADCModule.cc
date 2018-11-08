@@ -69,8 +69,11 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
 
 void EKLMADCModule::initialize()
 {
+  /* cppcheck-suppress variableScope */
   char str[32];
+  /* cppcheck-suppress variableScope */
   int i;
+  /* cppcheck-suppress variableScope */
   double l;
   if (!m_DigParDatabase.isValid())
     B2FATAL("EKLM digitization parameters are not available.");

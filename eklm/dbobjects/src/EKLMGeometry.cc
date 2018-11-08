@@ -744,6 +744,7 @@ EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry()
 EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
   const ShieldDetailGeometry& geometry) : TObject(geometry)
 {
+  /* cppcheck-suppress variableScope */
   int i;
   m_LengthX = geometry.getLengthX();
   m_LengthY = geometry.getLengthY();
@@ -760,6 +761,7 @@ EKLMGeometry::ShieldDetailGeometry&
 EKLMGeometry::ShieldDetailGeometry::operator=(
   const ShieldDetailGeometry& geometry)
 {
+  /* cppcheck-suppress variableScope */
   int i;
   if (&geometry == this)
     return *this;
@@ -1102,6 +1104,7 @@ int EKLMGeometry::getNStrips() const
 
 void EKLMGeometry::checkDetectorLayerNumber(int endcap, int layer) const
 {
+  /* cppcheck-suppress variableScope */
   const char* endcapName[2] = {"backward", "forward"};
   if (layer < 0 || layer > m_NLayers ||
       layer > m_MaximalDetectorLayerNumber[endcap - 1])
@@ -1112,6 +1115,7 @@ void EKLMGeometry::checkDetectorLayerNumber(int endcap, int layer) const
 
 void EKLMGeometry::checkDetectorLayer(int endcap, int layer) const
 {
+  /* cppcheck-suppress variableScope */
   const char* endcapName[2] = {"backward", "forward"};
   if (layer < 0 || layer > m_NDetectorLayers[endcap - 1])
     B2FATAL("Number of layer must be less from 1 to the number of "

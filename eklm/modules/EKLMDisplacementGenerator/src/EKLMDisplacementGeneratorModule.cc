@@ -224,6 +224,7 @@ sector:
 
 void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
 {
+  /* cppcheck-suppress variableScope */
   int i, n, iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment, param;
   float value;
   IntervalOfValidity iov(0, 0, -1, -1);

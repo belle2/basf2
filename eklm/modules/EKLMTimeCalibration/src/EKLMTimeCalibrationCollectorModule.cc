@@ -66,6 +66,7 @@ void EKLMTimeCalibrationCollectorModule::prepare()
 
 void EKLMTimeCalibrationCollectorModule::collect()
 {
+  /* cppcheck-suppress variableScope */
   int i, j, n, n2, vol;
   double l, hitTime;
   TVector3 hitPosition;

@@ -58,6 +58,7 @@ void EKLMAlignmentAlongStripsCollectorModule::prepare()
 
 void EKLMAlignmentAlongStripsCollectorModule::collect()
 {
+  /* cppcheck-suppress variableScope */
   int i, j, n, n2, vol;
   double l;
   const HepGeom::Transform3D* tr;

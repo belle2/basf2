@@ -112,6 +112,7 @@ void EKLMUnpackerModule::event()
         if (m_CheckCalibration) {
           std::map<int, int> blockLanes;
           std::map<int, int>::iterator it;
+          /* cppcheck-suppress variableScope */
           uint16_t blockData[15];
           if (numHits % 75 != 0) {
             B2ERROR("The number of hits in the calibration mode is not a "

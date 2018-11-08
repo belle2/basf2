@@ -297,6 +297,7 @@ static void getDetailDxDy(HepGeom::Point3D<double>* points, int nPoints,
 {
   int i;
   /* Variable maxt is initialized to avoid a false-positive warning. */
+  /* cppcheck-suppress variableScope */
   double a, b, c, d, t, maxt = 0, x1, y1, x2, y2, u;
   bool intersection;
   /*

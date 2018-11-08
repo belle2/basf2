@@ -110,6 +110,7 @@ void EKLMDigitizerModule::beginRun()
 void EKLMDigitizerModule::readAndSortSimHits()
 {
   EKLMSimHit* hit;
+  /* cppcheck-suppress variableScope */
   int i, strip, maxStrip;
   maxStrip = m_ElementNumbers->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();

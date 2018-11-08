@@ -60,6 +60,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_FPGAStat(c_FPGANoSignal), m_npe(0)
 {
   int i;
+  /* cppcheck-suppress variableScope */
   double time, attenuationTime;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   m_Pedestal = m_DigPar->getADCPedestal();
@@ -138,8 +139,8 @@ void EKLM::FiberAndElectronics::setChannelData(
 void EKLM::FiberAndElectronics::processEntry()
 {
   int i;
-  double l, d, t;
-  double nPhotons;
+  /* cppcheck-suppress variableScope */
+  double l, d, t, nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
   EKLMSimHit* hit;
   m_MCTime = -1;
@@ -253,6 +254,7 @@ void EKLM::FiberAndElectronics::generatePhotoelectrons(
   const double maxHitTime = m_DigPar->getNDigitizations() *
                             m_DigPar->getADCSamplingTime();
   int i;
+  /* cppcheck-suppress variableScope */
   double hitTime, deExcitationTime, cosTheta, hitDist;
   double inverseLightSpeed, inverseAttenuationLength;
   inverseLightSpeed = 1.0 / m_DigPar->getFiberLightSpeed();
@@ -347,8 +349,10 @@ void EKLM::FiberAndElectronics::generatePhotoelectrons(
 void EKLM::FiberAndElectronics::fillSiPMOutput(float* hist, bool useDirect,
                                                bool useReflected)
 {
+  /* cppcheck-suppress variableScope */
   int i, bin, maxBin;
   double attenuationTime, sig, expSum;
+  /* cppcheck-suppress variableScope */
   int ind1, ind2, ind3;
   int* indexArray;
   if (m_npe == 0)
@@ -397,6 +401,7 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(float* hist, bool useDirect,
 void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
+  /* cppcheck-suppress variableScope */
   double amp;
   if (m_Pedestal == 0 || m_PhotoelectronAmplitude == 0)
     B2FATAL("Incorrect EKLM ADC simulation parameters.");

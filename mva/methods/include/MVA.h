@@ -24,6 +24,7 @@
 #include <mva/methods/PDF.h>
 #include <mva/methods/Combination.h>
 #include <mva/methods/Reweighter.h>
+#include <mva/methods/RegressionFastBDT.h>
 #include <mva/methods/Trivial.h>
 
 #endif

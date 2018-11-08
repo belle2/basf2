@@ -8,7 +8,7 @@ Script to Import Calibrations into a local DB
 
 from basf2 import *
 import ROOT
-from ROOT.Belle2 import SVDDatabaseImporter
+from ROOT.Belle2 import SVDLocalCalibrationsImporter
 from ROOT.Belle2 import FileSystem
 import os
 import sys
@@ -18,7 +18,7 @@ import interactive
 import argparse
 from fnmatch import fnmatch
 
-parser = argparse.ArgumentParser(description="SVD Database Importer")
+parser = argparse.ArgumentParser(description="SVD Local Calibrations Importer")
 parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
@@ -99,7 +99,7 @@ run = int(int(run) + 1)
 class dbImporterModule(Module):
     def beginRun(self):
         # call the importer class
-        dbImporter = SVDDatabaseImporter(experiment, run, experiment, -1)
+        dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
         if args.calib is not None:
             # import the noises
             dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
@@ -115,7 +115,8 @@ class dbImporterModule(Module):
             dbImporter.importSVDChannelMapping(mappingfile)
             print("Channel Mapping Imported")
         if args.hot is not None:
-            # import hot strips
+            # import hot strips: ATTENTION! Do we want to import the hot strips at any
+            # local run? is these fields correctly updated in the xml?
             dbImporter.importSVDHotStripsCalibrationsFromXML(hotfile)
             print("Hot Strips List Imported")
             # dbImporter.importSVDHotStripsCalibrations()

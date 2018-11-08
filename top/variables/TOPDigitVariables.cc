@@ -75,20 +75,22 @@ namespace Belle2 {
       int slotID = extHit->getCopyID();
       const auto& momentum = extHit->getMomentum(); // TVector3
       const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-      if (not geo or not geo->isModuleIDValid(slotID)) return TVector3(0, 0, 0);
+      if ((not geo) or (not geo->isModuleIDValid(slotID))) return TVector3(0, 0, 0);
       const auto& module = geo->getModule(slotID);
       return module.momentumToLocal(momentum); // TVector3
     }
 
     // counts the number of photons in the TOP in a given time frame
     // if tmin < 0, count from the time of the first photon
-    int countHits(const Particle* particle, double tmin, double tmax)
+    int countHits(const Particle* particle, double tmin, double tmax, bool clean = true)
     {
       int slotID = getSlotID(particle);
       StoreArray<TOPDigit> digits;
       vector<double> digitTimes;
       for (const auto& digit : digits) {
-        if (abs(digit.getModuleID()) == abs(slotID)) continue;
+        if (abs(digit.getModuleID()) != abs(slotID)) continue;
+        // skip bad digits only when we want to clean
+        if (clean && digit.getHitQuality() != TOPDigit::c_Good) continue;
         digitTimes.push_back(digit.getTime());
       }
       if (digitTimes.empty()) return 0;
@@ -96,10 +98,16 @@ namespace Belle2 {
       int count = 0;
       if (tmin < 0) tmin = digitTimes[0];
       for (auto t : digitTimes) {
-        if (t > tmin) ++count;
+        if (t >= tmin) ++count;
         if (t > tmax) break;
       }
       return count;
+    }
+
+    // counts the number of photons regardless of hit quality
+    int countRawHits(const Particle* particle, double tmin, double tmax)
+    {
+      return countHits(particle, tmin, tmax, false);
     }
 
     // returns the expected number of photons for a given hypothesis
@@ -138,9 +146,94 @@ namespace Belle2 {
       StoreArray<TOPDigit> topDigits;
       int count = 0;
       for (auto t : topDigits) {
-        if (abs(t.getModuleID()) == abs(thisModuleID)) { // catch the case where one of the module IDs is negative
-          count += 1;
-        }
+        if (abs(t.getModuleID()) != abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
+        if (t.getHitQuality() != TOPDigit::c_Good) continue;
+        count += 1;
+      }
+      return count;
+    }
+
+    //! @returns the number of digits in all other module as the particle
+    double topBackgroundDigitCount(const Particle* particle)
+    {
+      auto trk = particle->getTrack();
+      if (not trk) {
+        return -1.0;
+      }
+      auto extHits = trk->getRelationsWith<ExtHit>();
+      int thisModuleID = 77; // default to sentinel value
+      for (auto h : extHits) {
+        if (h.getDetectorID() != Const::EDetector::TOP) continue;
+        if (h.getStatus() != EXT_ENTER) continue;
+        // now find the module of this hit.
+        thisModuleID = h.getCopyID(); // could be positive or negative
+        break;
+      }
+      if (thisModuleID == 77) {
+        return -1;
+      }
+      StoreArray<TOPDigit> topDigits;
+      int count = 0;
+      for (auto t : topDigits) {
+        if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
+        if (t.getHitQuality() != TOPDigit::c_Good) continue;
+        count += 1;
+      }
+      return count;
+    }
+
+    //! @returns the number of digits in all other module as the particle
+    double topBackgroundDigitCountRaw(const Particle* particle)
+    {
+      auto trk = particle->getTrack();
+      if (not trk) {
+        return -1.0;
+      }
+      auto extHits = trk->getRelationsWith<ExtHit>();
+      int thisModuleID = 77; // default to sentinel value
+      for (auto h : extHits) {
+        if (h.getDetectorID() != Const::EDetector::TOP) continue;
+        if (h.getStatus() != EXT_ENTER) continue;
+        // now find the module of this hit.
+        thisModuleID = h.getCopyID(); // could be positive or negative
+        break;
+      }
+      if (thisModuleID == 77) {
+        return -1;
+      }
+      StoreArray<TOPDigit> topDigits;
+      int count = 0;
+      for (auto t : topDigits) {
+        if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
+        count += 1;
+      }
+      return count;
+    }
+
+    //! @returns the number of all digits regardless of hit quality in the same module as the particle
+    double topRawDigitCount(const Particle* particle)
+    {
+      auto trk = particle->getTrack();
+      if (not trk) {
+        return -1.0;
+      }
+      auto extHits = trk->getRelationsWith<ExtHit>();
+      int thisModuleID = 77; // default to sentinel value
+      for (auto h : extHits) {
+        if (h.getDetectorID() != Const::EDetector::TOP) continue;
+        if (h.getStatus() != EXT_ENTER) continue;
+        // now find the module of this hit.
+        thisModuleID = h.getCopyID(); // could be positive or negative
+        break;
+      }
+      if (thisModuleID == 77) {
+        return -1;
+      }
+      StoreArray<TOPDigit> topDigits;
+      int count = 0;
+      for (auto t : topDigits) {
+        if (abs(t.getModuleID()) != abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
+        count += 1;
       }
       return count;
     }
@@ -169,6 +262,7 @@ namespace Belle2 {
       vector<double> digitTimes; // all digits in the module that the track entered
       for (auto t : topDigits) {
         if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
+        if (t.getHitQuality() != TOPDigit::c_Good) continue;
         digitTimes.push_back(t.getTime());
       }
       if (digitTimes.empty()) {
@@ -210,6 +304,7 @@ namespace Belle2 {
       vector<double> digitTimes; // all digits in the module that the track entered
       for (auto t : topDigits) {
         if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
+        if (t.getHitQuality() != TOPDigit::c_Good) continue;
         digitTimes.push_back(t.getTime());
       }
       if (digitTimes.empty()) {
@@ -293,6 +388,14 @@ namespace Belle2 {
       return topDigitVariables::countHits(particle, -1.0, 20.0);
     }
 
+    //! @returns the number of raw TOP photons in the given time interval
+    double countRawTOPHitsInInterval(const Particle* particle, const vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (tmin, tmax)");
+      }
+      return topDigitVariables::countRawHits(particle, vars[0], vars[1]);
+    }
     //---------------- TOPRecBunch related --------------------
 
     //! @returns whether the rec bunch is reconstructed
@@ -337,10 +440,44 @@ namespace Belle2 {
       if (not recBunch.isValid()) return -9999.0;
       return recBunch->getUsedTracks();
     }
+    //-------------- Event based -----------------------------------
 
+    //! returns the number of photons in a given slot without cleaning
+    double TOPRawPhotonsInSlot(const Particle* particle, const vector<double>& vars)
+    {
+      if (vars.size() != 1) { B2FATAL("Need exactly one parameter (slot id).");}
+      StoreArray<TOPDigit> topDigits;
+      int thisModuleID = static_cast<int>(vars[0]);
+      size_t count = 0;
+      for (auto t : topDigits) {
+        if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
+        count += 1;
+      }
+      return count;
+    }
+    //! returns the number of good photons in a given slot
+    double TOPGoodPhotonsInSlot(const Particle* particle, const vector<double>& vars)
+    {
+      if (vars.size() != 1) { B2FATAL("Need exactly one parameter (slot id).");}
+      StoreArray<TOPDigit> topDigits;
+      int thisModuleID = static_cast<int>(vars[0]);
+      size_t count = 0;
+      for (auto t : topDigits) {
+        if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
+        if (t.getHitQuality() != TOPDigit::c_Good) continue;
+        count += 1;
+      }
+      return count;
+    }
     VARIABLE_GROUP("TOP Calibration");
     REGISTER_VARIABLE("topDigitCount", topDigitCount,
                       "[calibration] The number of TOPDigits in the module to which the track was extrapolated");
+    REGISTER_VARIABLE("topBackgroundDigitCount", topBackgroundDigitCount,
+                      "[calibration] The number of TOPDigits in all modules except the one to which the track was extrapolated");
+    REGISTER_VARIABLE("topBackgroundDigitCountRaw", topBackgroundDigitCountRaw,
+                      "[calibration] The number of TOPDigits in all modules except the one to which the track was extrapolated");
+    REGISTER_VARIABLE("topDigitCountRaw", topDigitCount,
+                      "[calibration] The number of TOPDigits in the module to which the track was extrapolated, regardless of hit quality");
     REGISTER_VARIABLE("topReflectedDigitCount", topReflectedDigitCount,
                       "[calibration] The number of reflected photons in the same module");
     REGISTER_VARIABLE("topDigitGapSize", topDigitGapSize,
@@ -365,6 +502,8 @@ namespace Belle2 {
                       "[calibration] The number of photons in the given interval");
     REGISTER_VARIABLE("countTOPHitsInFirst20ns", countTOPHitsInFirst20ns,
                       "[calibration] The number of photons in the first 20 ns after the first photon");
+    REGISTER_VARIABLE("countRawTOPHitsInInterval(tmin, tmax)", countRawTOPHitsInInterval,
+                      "[calibration] The number of photons in the given interval");
     REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPRecBunchUsedTrackCount,
                       "[calibration] The number of tracks used in the bunch reconstruction");
     REGISTER_VARIABLE("topRecBunchTrackCount", TOPRecBunchTrackCount,
@@ -375,6 +514,10 @@ namespace Belle2 {
                       "[calibration] The number of the bunch relative to the interaction");
     REGISTER_VARIABLE("isTopRecBunchReconstructed", isTOPRecBunchReconstructed,
                       "[calibration] Flag to indicate whether the bunch was reconstructed");
+    REGISTER_VARIABLE("topRawPhotonsInSlot(id)", TOPRawPhotonsInSlot,
+                      "[calibration] The number of all photons in the given slot");
+    REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPGoodPhotonsInSlot,
+                      "[calibration] The number of good photons in the given slot");
   }
 // Create an empty module which allows basf2 to easily find the library and load it from the steering file
   class EnableTOPDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.

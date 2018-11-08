@@ -60,10 +60,10 @@ namespace {
     EXPECT_EQ(probabilities.size(), 10);
 
     for (unsigned int i = 0; i < 5; ++i) {
-      EXPECT_LE(probabilities[i], 0.5);
+      EXPECT_LE(probabilities[i], 0.8);
     }
     for (unsigned int i = 5; i < 10; ++i) {
-      EXPECT_GE(probabilities[i], 0.5);
+      EXPECT_GE(probabilities[i], 0.2);
     }
   }
 }

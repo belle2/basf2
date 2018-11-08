@@ -67,6 +67,20 @@ namespace Belle2 {
     std::vector<short int> m_f;
     /** See documentation for method 'getF1' */
     std::vector<short int> m_f1;
+    /**
+     * This vector contains all parameters that didn't exist in the initial
+     * version of ECL DSP file format.
+     *
+     * This vector allows loose coupling between ECLDspData class and
+     * ECL DSP file format.
+     *
+     * m_extraData[0] -- FORMAT_VERSION
+     * m_extraData[1] -- PACKER_VERSION
+     */
+    std::vector<short int> m_extraData;
+
+    /** Version of packer used in [un]packCoefVector by default */
+    static const short int c_packerVersion = 1;
 
   public:
     /**
@@ -100,6 +114,15 @@ namespace Belle2 {
     /*************/
     /** GETTERS **/
     /*************/
+
+    /** Return version of packer algorithm used in [un]packCoefVector */
+    static short int getPackerVersion() { return c_packerVersion; }
+
+    /**
+     * @return Vector with all parameters that haven't been
+     * included in basic ECL DSP file format
+     */
+    std::vector<short int> getExtraData() const { return m_extraData; }
 
     /**
      * Array with tabulated signal waveform.
@@ -176,6 +199,12 @@ namespace Belle2 {
     /*************/
     /** SETTERS **/
     /*************/
+
+    /**
+     * Sets vector with all parameters that haven't been
+     * included in basic ECL DSP file format
+     */
+    void setExtraData(const std::vector<short int>& newval) { m_extraData = newval; }
 
     /**
      * Array with tabulated signal waveform.

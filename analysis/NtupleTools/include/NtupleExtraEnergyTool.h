@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEEXTRAENERGYTOOL_H
-#define NTUPLEEXTRAENERGYTOOL_H
+#pragma once
 
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 
@@ -44,4 +43,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLEEXTRAENERGYTOOL_H

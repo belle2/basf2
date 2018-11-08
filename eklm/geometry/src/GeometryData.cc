@@ -222,7 +222,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
     }
   }
   m_StripLenToAll = (int*)malloc(m_nStripDifferent * sizeof(int));
-  if (m_StripLenToAll == NULL)
+  if (m_StripLenToAll == nullptr)
     B2FATAL(c_MemErr);
   i = 0;
   l = strips[0];
@@ -243,7 +243,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
     }
   }
   m_StripAllToLen = (int*)malloc(m_NStrips * sizeof(int));
-  if (m_StripAllToLen == NULL)
+  if (m_StripAllToLen == nullptr)
     B2FATAL(c_MemErr);
   for (i = 0; i < m_NStrips; i++) {
     itm = mapLengthStrip2.find(m_StripPosition[i].getLength());
@@ -597,7 +597,7 @@ void EKLM::GeometryData::initializeFromDatabase()
 
 EKLM::GeometryData::GeometryData(enum DataSource dataSource)
 {
-  m_Geometry = NULL;
+  m_Geometry = nullptr;
   switch (dataSource) {
     case c_Gearbox:
       initializeFromGearbox();
@@ -617,7 +617,7 @@ EKLM::GeometryData::GeometryData(enum DataSource dataSource)
 
 EKLM::GeometryData::~GeometryData()
 {
-  if (m_Geometry != NULL)
+  if (m_Geometry != nullptr)
     delete m_Geometry;
   free(m_StripLenToAll);
   free(m_StripAllToLen);

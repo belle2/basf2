@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYSTRINGGRAMMAR_H
-#define DECAYSTRINGGRAMMAR_H
+#pragma once
 #include <boost/spirit/include/qi.hpp>
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <analysis/DecayDescriptor/DecayStringDecay.h>
@@ -35,8 +34,10 @@ namespace Belle2 {
     using boost::spirit::qi::lexeme;
     using boost::spirit::repeat;
 
-    // Reserved characters for steering
-    reserved = space || '^' || '[' || ']' || '>' || ':';
+    // Reserved characters for steering - cppcheck doesn't understand the
+    // boost::spirit syntax so we suppress warnings
+    // cppcheck-suppress knownConditionTrueFalse
+    reserved = space || '^' || '[' || ']' || '>' || ':' || '.';
 
     // particle composed of selector, particle name, and user label: "^D_s+:label"
     particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;
@@ -83,4 +84,3 @@ namespace Belle2 {
   boost::spirit::qi::rule<Iterator, DecayString(), boost::spirit::ascii::space_type> start;
   };
 }
-#endif // DECAYSTRINGGRAMMAR_H

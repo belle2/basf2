@@ -25,9 +25,9 @@ static bool compareSegmentSignificance(
 }
 
 EKLMAlignmentAlongStripsAlgorithm::EKLMAlignmentAlongStripsAlgorithm() :
-  CalibrationAlgorithm("EKLMAlignmentAlongStripsCollector")
+  CalibrationAlgorithm("EKLMAlignmentAlongStripsCollector"),
+  m_OutputFile("")
 {
-  m_OutputFile = "";
 }
 
 EKLMAlignmentAlongStripsAlgorithm::~EKLMAlignmentAlongStripsAlgorithm()
@@ -45,7 +45,7 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   double nHitsSegment, nHitsAverage, nSigma;
   bool found;
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  struct Event* event = NULL;
+  struct Event* event = nullptr;
   TFile* f_out;
   TTree* t_out;
   std::shared_ptr<TTree> t_in = getObjectPtr<TTree>("calibration_data");

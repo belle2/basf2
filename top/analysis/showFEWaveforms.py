@@ -186,8 +186,8 @@ class WFDisplay(Module):
                 if tlpfResult:
                     tlpfgraph = TGraph(2)
                     tlpfgraph.SetMarkerStyle(25)
-                    tlpfgraph.SetPoint(0, tlpfResult.getMean(), tlpfResult.getAmplitude() + tlpfResult.getBackgroundOffset())
-                    tlpfgraph.SetPoint(1, tlpfResult.getMean(), tlpfResult.getBackgroundOffset())
+#                    tlpfgraph.SetPoint(0, tlpfResult.getMean(), tlpfResult.getAmplitude() + tlpfResult.getBackgroundOffset())
+#                    tlpfgraph.SetPoint(1, tlpfResult.getMean(), tlpfResult.getBackgroundOffset())
                     print('Template Fit Chisquare: ', tlpfResult.getChisquare())
                     self.tlpfgraphs[k].append(tlpfgraph)
 
@@ -223,6 +223,7 @@ main.add_module(gearbox)
 
 # Geometry (only TOP needed)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

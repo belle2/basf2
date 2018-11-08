@@ -159,8 +159,8 @@ void CosmicRayHLTDQMModule::event()
 
   //Monitor ECL N1 Clusters
   StoreArray<ECLCluster> eclClusters;
-  int nECLClusters = 0;
   if (eclClusters.isValid()) {
+    int nECLClusters = 0;
     for (const auto& eclCluster : eclClusters) {
       if (eclCluster.getHypothesisId() == 5) {
         h_e_eclcluster->Fill(eclCluster.getEnergy());
@@ -176,8 +176,8 @@ void CosmicRayHLTDQMModule::event()
 
   // Monitor ECL N1 Showers (without timing and energy cut)
   StoreArray<ECLShower> eclShowers;
-  int nECLShowers = 0;
   if (eclShowers.isValid()) {
+    int nECLShowers = 0;
     for (const auto& eclShower : eclShowers) {
       if (eclShower.getHypothesisId() == 5) {
         h_e_eclshower->Fill(eclShower.getEnergy());

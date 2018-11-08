@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
-#define EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -45,6 +44,12 @@ namespace Belle2 {
      * Copy constructor (disabled).
      */
     EKLMAlignmentAlongStripsCollectorModule(
+      const EKLMAlignmentAlongStripsCollectorModule&) = delete;
+
+    /**
+     * Operator = (disabled).
+     */
+    EKLMAlignmentAlongStripsCollectorModule& operator=(
       const EKLMAlignmentAlongStripsCollectorModule&) = delete;
 
     /**
@@ -87,6 +92,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

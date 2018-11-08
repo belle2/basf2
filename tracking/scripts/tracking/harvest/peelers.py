@@ -265,7 +265,7 @@ def peel_fit_status(reco_track, key="{part_name}"):
             for crop in crops.keys():
                 if crop.startswith("fit_"):
                     particle_name = crop.split("_")[1]
-                    if getattr(Belle2.Const, particle_name).getPDGCode() == pdg_code:
+                    if abs(getattr(Belle2.Const, particle_name).getPDGCode()) == abs(pdg_code):
                         crops[crop] = was_successful
 
                         if was_successful:

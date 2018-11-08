@@ -69,8 +69,6 @@ namespace Belle2 {
       CDCSimControlPar::getInstance();
       CDCGeoControlPar::getInstance();
 
-      m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)* CLHEP::eV, 10 * CLHEP::MeV);
-      m_bkgsensitive = NULL;
       logical_cdc = 0;
       physical_cdc = 0;
       m_VisAttributes.clear();
@@ -91,6 +89,9 @@ namespace Belle2 {
 
     void GeoCDCCreator::createGeometry(const CDCGeometry& geo, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
+
+      m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)* CLHEP::eV, 10 * CLHEP::MeV);
+
       //      std::cout << "createGeometry called" << std::endl;
       const G4double realTemperture = (273.15 + 23.) * CLHEP::kelvin;
       G4Material* medHelium = geometry::Materials::get("CDCHeGas");

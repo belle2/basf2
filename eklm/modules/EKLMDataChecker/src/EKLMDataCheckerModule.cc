@@ -22,7 +22,7 @@ REG_MODULE(EKLMDataChecker)
 EKLMDataCheckerModule::EKLMDataCheckerModule() : Module()
 {
   setDescription("EKLM data checker module.");
-  m_GeoDat = NULL;
+  m_GeoDat = nullptr;
 }
 
 EKLMDataCheckerModule::~EKLMDataCheckerModule()

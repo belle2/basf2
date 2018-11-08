@@ -20,6 +20,7 @@
 #include <iostream>
 #include <TSpline.h>
 #include <algorithm>
+#include <set>
 
 using namespace std;
 
@@ -100,6 +101,9 @@ namespace Belle2 {
         m_oldPayload = true;
         B2WARNING("TOPGeometry: old payload found, pixel dependent PDE will not be used");
       }
+      if ((*m_geoDB)->getTTSes().empty()) {
+        B2WARNING("TOPGeometry: old payload found, nominal TTS will be used");
+      }
 
       // Make sure that we abort as soon as the geometry changes
       m_geoDB->addCallback([]() {
@@ -137,6 +141,11 @@ namespace Belle2 {
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
         getGeometry()->print();
+        if (m_oldPayload) {
+          cout << "Envelope QE same as nominal quantum efficiency" << endl << endl;
+          return;
+        }
+        if (m_envelopeQE.isEmpty()) setEnvelopeQE();
         m_envelopeQE.print("Envelope QE");
       }
     }
@@ -146,6 +155,7 @@ namespace Belle2 {
       m_envelopeQE.clear();
       m_pmts.clear();
       m_relEfficiencies.clear();
+      m_pmtTypes.clear();
     }
 
     const TOPGeometry* TOPGeometryPar::getGeometry() const
@@ -225,6 +235,22 @@ namespace Belle2 {
 
       int id = getUniquePixelID(moduleID, pixelID);
       return m_relEfficiencies[id] * RQE * thrEffi;
+    }
+
+
+    unsigned TOPGeometryPar::getPMTType(int moduleID, int pmtID) const
+    {
+      if (m_pmtTypes.empty()) mapPmtTypeToPositions();
+
+      int id = getUniquePmtID(moduleID, pmtID);
+      return m_pmtTypes[id];
+    }
+
+
+    const TOPNominalTTS& TOPGeometryPar::getTTS(int moduleID, int pmtID) const
+    {
+      auto pmtType = getPMTType(moduleID, pmtID);
+      return getGeometry()->getTTS(pmtType);
     }
 
 
@@ -312,6 +338,32 @@ namespace Belle2 {
       }
 
       B2INFO("TOPGeometryPar: QE of PMT's mapped to positions, size = " << m_pmts.size());
+    }
+
+
+    void TOPGeometryPar::mapPmtTypeToPositions() const
+    {
+      for (const auto& pmt : m_pmtInstalled) {
+        int id = getUniquePmtID(pmt.getSlotNumber(), pmt.getPosition());
+        m_pmtTypes[id] = pmt.getType();
+      }
+
+      B2INFO("TOPGeometryPar: PMT types mapped to positions, size = "
+             << m_pmtTypes.size());
+
+
+      std::set<unsigned> types;
+      for (const auto& pmt : m_pmtInstalled) {
+        types.insert(pmt.getType());
+      }
+      const auto* geo = getGeometry();
+      for (const auto& type : types) {
+        if (geo->getTTS(type).getPMTType() != type) {
+          B2WARNING("No TTS found for an installed PMT type. Nominal one will be used."
+                    << LogVar("PMT type", type));
+        }
+      }
+
     }
 
 
@@ -705,6 +757,22 @@ namespace Belle2 {
       }
       nominalTTS.normalize();
       geo->setNominalTTS(nominalTTS);
+
+      // PMT type dependent TTS
+
+      GearDir pmtTTSParams(content, "TTSofPMTs");
+      for (const GearDir& ttsPar : pmtTTSParams.getNodes("TTSpar")) {
+        int type = ttsPar.getInt("type");
+        TOPNominalTTS tts("TTS of " + ttsPar.getString("@name") + " PMT");
+        tts.setPMTType(type);
+        for (const GearDir& Gauss : ttsPar.getNodes("Gauss")) {
+          tts.appendGaussian(Gauss.getDouble("fraction"),
+                             Gauss.getTime("mean"),
+                             Gauss.getTime("sigma"));
+        }
+        tts.normalize();
+        geo->appendTTS(tts);
+      }
 
       // nominal TDC
 

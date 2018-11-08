@@ -25,12 +25,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
 
-#include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/overloads.hpp>
-#include <boost/python/exception_translator.hpp>
+#include <boost/python.hpp>
 
 #include <set>
 
@@ -165,7 +160,7 @@ void Framework::setNumberProcesses(int numProcesses)
 }
 
 
-int Framework::getNumberProcesses() const
+int Framework::getNumberProcesses()
 {
   return Environment::Instance().getNumberProcesses();
 }
@@ -177,7 +172,7 @@ void Framework::setPicklePath(std::string path)
 }
 
 
-std::string Framework::getPicklePath() const
+std::string Framework::getPicklePath()
 {
   return Environment::Instance().getPicklePath();
 }
@@ -192,7 +187,7 @@ void Framework::setStreamingObjects(boost::python::list streamingObjects)
 //                          Python API
 //=====================================================================
 
-boost::python::list Framework::getModuleSearchPathsPython() const
+boost::python::list Framework::getModuleSearchPathsPython()
 {
   boost::python::list returnList;
 
@@ -202,7 +197,7 @@ boost::python::list Framework::getModuleSearchPathsPython() const
 }
 
 
-boost::python::dict Framework::getAvailableModulesPython() const
+boost::python::dict Framework::getAvailableModulesPython()
 {
   boost::python::dict returnDict;
   for (auto modulePair : ModuleManager::Instance().getAvailableModules())
@@ -211,7 +206,7 @@ boost::python::dict Framework::getAvailableModulesPython() const
 }
 
 
-boost::python::list Framework::getRegisteredModulesPython() const
+boost::python::list Framework::getRegisteredModulesPython()
 {
   boost::python::list returnList;
 
@@ -226,7 +221,7 @@ boost::python::list Framework::getRegisteredModulesPython() const
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(process_overloads, process, 1, 2)
+BOOST_PYTHON_FUNCTION_OVERLOADS(process_overloads, Framework::process, 1, 2)
 #if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic pop
@@ -250,23 +245,116 @@ void Framework::exposePythonAPI()
   scope().attr("ModuleNotCreatedError") = handle<>(borrowed(PyExc_ModuleNotCreatedError));
   register_exception_translator<ModuleManager::ModuleNotCreatedError>(moduleNotCreatedTranslator);
   //Overloaded methods
-  ModulePtr(Framework::*registerModule1)(const std::string&) = &Framework::registerModule;
-  ModulePtr(Framework::*registerModule2)(const std::string&, const std::string&) = &Framework::registerModule;
+  ModulePtr(*registerModule1)(const std::string&) = &Framework::registerModule;
+  ModulePtr(*registerModule2)(const std::string&, const std::string&) = &Framework::registerModule;
+
+  //don't show c++ signature in python doc to keep it simple
+  docstring_options options(true, true, false);
 
   //Expose framework class
-  class_<Framework>("Framework")
-  .def("add_module_search_path", &Framework::addModuleSearchPath)
-  .def("set_externals_path", &Framework::setExternalsPath)
-  .def("list_module_search_paths", &Framework::getModuleSearchPathsPython)
-  .def("list_available_modules", &Framework::getAvailableModulesPython)
-  .def("register_module", registerModule1)
-  .def("register_module", registerModule2)
-  .def("list_registered_modules", &Framework::getRegisteredModulesPython)
-  .def("process", &Framework::process, process_overloads())
-  .def("get_pickle_path", &Framework::getPicklePath)
-  .def("set_pickle_path", &Framework::setPicklePath)
-  .def("set_nprocesses", &Framework::setNumberProcesses)
-  .def("get_nprocesses", &Framework::getNumberProcesses)
-  .def("set_streamobjs", &Framework::setStreamingObjects)
-  ;
+  class_<Framework, std::shared_ptr<Framework>, boost::noncopyable>("Framework", "Initialize and Cleanup functions", no_init);
+  std::shared_ptr<Framework> initguard{new Framework()};
+  scope().attr("__framework") = initguard;
+
+  def("add_module_search_path", &Framework::addModuleSearchPath, R"DOCSTRING(
+Add a directory in which to search for compiled basf2 C++ `Modules <Module>`.
+
+This directory needs to contain the shared libraries containing the compiled
+modules as well as companion files ending in ``.b2modmap`` which contain a list
+of the module names contained in each library.
+
+Note:
+  The newly added path will not override existing modules
+
+Parameters:
+  path (str): directory containing the modules.
+)DOCSTRING", args("path"));
+  def("set_externals_path", &Framework::setExternalsPath, R"DOCSTRING(
+Set the path to the externals to be used.
+
+Warning:
+  This will not change the library and executable paths but will just change
+  the directory where to look for certain data files like the Evtgen particle
+  definition file. Don't use this unless you really know what you are doing.
+
+Parameters:
+  path (str): new top level directory for the externals
+)DOCSTRING", args("path"));
+  def("list_module_search_paths", &Framework::getModuleSearchPathsPython, R"DOCSTRING(
+Return a python list containing all the directories included in the module
+search Path.
+
+See:
+  `add_module_search_path`
+)DOCSTRING");
+  def("list_available_modules", &Framework::getAvailableModulesPython, R"DOCSTRING(
+Return a dictionary containing the names of all known modules
+as keys and the name of the shared library containing these modules as values.
+)DOCSTRING");
+  def("list_registered_modules", &Framework::getRegisteredModulesPython, R"DOCSTRING(
+Return a list with pointers to all previously created module instances by calling `register_module()`
+)DOCSTRING");
+  def("get_pickle_path", &Framework::getPicklePath, R"DOCSTRING(
+Return the filename where the pickled path is or should be stored
+)DOCSTRING");
+  def("set_pickle_path", &Framework::setPicklePath, R"DOCSTRING(
+Set the filename where the pickled path should be stored or retrieved from
+)DOCSTRING", args("path"));
+  def("set_nprocesses", &Framework::setNumberProcesses, R"DOCSTRING(
+Sets number of worker processes for parallel processing.
+
+Can be overridden using the ``-p`` argument to basf2.
+
+Note:
+  Setting this to 1 will have one parallel worker job which is almost always
+  slower than just running without parallel processing but is still provided to
+  allow debugging of parallel execution.
+
+Parameters:
+  nproc (int): number of worker processes. 0 to disable parallel processing.
+)DOCSTRING");
+  def("get_nprocesses", &Framework::getNumberProcesses, R"DOCSTRING(
+Gets number of worker processes for parallel processing. 0 disables parallel processing
+)DOCSTRING");
+  def("set_streamobjs", &Framework::setStreamingObjects, R"DOCSTRING(
+Set the names of all DataStore objects which should be sent between the
+parallel processes. This can be used to improve parallel processing performance
+by removing objects not required.
+)DOCSTRING");
+  {
+    // The register_module function is overloaded with different signatures which makes
+    // the boost docstring very useless so we handcraft a docstring
+    docstring_options param_options(true, false, false);
+    def("_register_module", registerModule1);
+    def("_register_module", registerModule2, R"DOCSTRING(register_module(name, library=None)
+Register a new Module.
+
+This function will try to create a new instance of a module with the given name. If no library is given it will try to find the module by itself from the module search path. Optionally one can specify the name of a shared library containing the module code then this library will be loaded
+
+See:
+  `list_module_search_paths()`, `add_module_search_path()`
+
+Parameters:
+  name (str): Type of the module to create
+  library (str): Optional, name of a shared library containing the module
+
+Returns:
+  An instance of the module if successful.
+
+Raises:
+  will raise a `ModuleNotCreatedError` if there is any problem creating the module.
+)DOCSTRING");
+    def("_process", &Framework::process, process_overloads(R"DOCSTRING(process(path, num_events=0)
+Processes up to max_events events by starting with the first module in the specified path.
+
+ This method starts processing events only if there is a module in the path
+ which is capable of specifying the end of the data flow.
+
+ Parameters:
+   path (Path): The processing starts with the first module of this path.
+   max_events (int): The maximum number of events that will be processed.
+       If the number is smaller than 1, all events will be processed (default).
+)DOCSTRING"));
+    ;
+  }
 }

@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Martin Ritter                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -200,6 +200,18 @@ public:
       s << std::endl << "\t" << v.getName() << " = " << v.getValue();
     }
     return s.str();
+  }
+
+  /** Return the constant message part without the variables */
+  std::string getMessage() const
+  {
+    return m_stringStream.str();
+  }
+
+  /** Return the list of all defined variables */
+  const std::vector<LogVar>& getVariables() const
+  {
+    return m_variables;
   }
 
 private:

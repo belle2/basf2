@@ -114,10 +114,9 @@ void InclusiveBtagReconstructionModule::event()
         const std::vector<const Particle*>& particleFinalStateDaughters = particle->getFinalStateDaughters();
 
         // check if particle shares something with bsig...
-        int mdstSource;
         bool append = true;
         for (const Particle* daughter : particleFinalStateDaughters) {
-          mdstSource = daughter->getMdstSource();
+          int mdstSource = daughter->getMdstSource();
           if (mdstSourcesOfBsigFinalStateDaughters.find(mdstSource) != mdstSourcesEnd) {
             append = false;
             break;

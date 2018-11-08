@@ -111,7 +111,6 @@ namespace Belle2 {
   }
   void RestOfEventPrinterModule::printMaskParticles(const std::vector<const Particle*>& maskParticles) const
   {
-    std::string printout = "\n - -  Particles: ";
     for (auto* particle : maskParticles) {
       particle->print();
     }

@@ -65,7 +65,7 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
   return true;
 }
 
-std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName, bool unpackComposite) const
+std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskName, bool unpackComposite) const
 {
   std::vector<const Particle*> result;
   StoreArray<Particle> allParticles;
@@ -103,7 +103,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName, boo
   return result;
 }
 
-bool RestOfEvent::hasParticle(const Particle* particle, std::string maskName) const
+bool RestOfEvent::hasParticle(const Particle* particle, const std::string& maskName) const
 {
   if (maskName != "" && !hasMask(maskName)) {
     B2FATAL("No " << maskName << " mask defined in current ROE!");
@@ -113,7 +113,7 @@ bool RestOfEvent::hasParticle(const Particle* particle, std::string maskName) co
   return isInParticleList(particle, particlesROE);
 }
 
-void RestOfEvent::initializeMask(std::string name, std::string origin)
+void RestOfEvent::initializeMask(const std::string& name, const std::string& origin)
 {
   if (name == "") {
     B2FATAL("Creation of ROE Mask with an empty name is not allowed!");
@@ -125,7 +125,7 @@ void RestOfEvent::initializeMask(std::string name, std::string origin)
   m_masks.push_back(elon);
 }
 
-void RestOfEvent::excludeParticlesFromMask(std::string maskName, std::vector<const Particle*>& particlesToUpdate,
+void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, std::vector<const Particle*>& particlesToUpdate,
                                            Particle::EParticleType listType, bool discard)
 {
   Mask* mask = findMask(maskName);
@@ -158,7 +158,7 @@ void RestOfEvent::excludeParticlesFromMask(std::string maskName, std::vector<con
   mask->addParticles(toKeepinROE);
 }
 
-void RestOfEvent::updateMaskWithCuts(std::string maskName, std::shared_ptr<Variable::Cut> trackCut,
+void RestOfEvent::updateMaskWithCuts(const std::string& maskName, std::shared_ptr<Variable::Cut> trackCut,
                                      std::shared_ptr<Variable::Cut> eclCut, std::shared_ptr<Variable::Cut> klmCut, bool updateExisting)
 {
   Mask* mask = findMask(maskName);
@@ -193,7 +193,7 @@ void RestOfEvent::updateMaskWithCuts(std::string maskName, std::shared_ptr<Varia
   mask->addParticles(maskedParticles);
 }
 
-void RestOfEvent::updateMaskWithV0(std::string name, const Particle* particleV0)
+void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* particleV0)
 {
   Mask* mask = findMask(name);
   if (!mask) {
@@ -226,7 +226,7 @@ void RestOfEvent::updateMaskWithV0(std::string name, const Particle* particleV0)
   mask->addV0(particleV0, indicesToErase);
 }
 
-bool RestOfEvent::checkCompatibilityOfMaskAndV0(std::string name, const Particle* particleV0)
+bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const Particle* particleV0)
 {
   Mask* mask = findMask(name);
   if (!mask) {
@@ -250,7 +250,7 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(std::string name, const Particle
   return true;
 }
 
-bool RestOfEvent::hasMask(std::string name) const
+bool RestOfEvent::hasMask(const std::string& name) const
 {
   for (auto& mask : m_masks) {
     if (mask.getName() == name) {
@@ -259,7 +259,7 @@ bool RestOfEvent::hasMask(std::string name) const
   }
   return false;
 }
-TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
+TLorentzVector RestOfEvent::get4Vector(const std::string& maskName) const
 {
   TLorentzVector roe4Vector;
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
@@ -274,7 +274,7 @@ TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
 }
 
 
-RestOfEvent::Mask* RestOfEvent::findMask(std::string& name)
+RestOfEvent::Mask* RestOfEvent::findMask(const std::string& name)
 {
   for (auto& mask : m_masks) {
     if (mask.getName() == name) {
@@ -284,7 +284,7 @@ RestOfEvent::Mask* RestOfEvent::findMask(std::string& name)
   return nullptr;
 
 }
-std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
+std::vector<const Track*> RestOfEvent::getTracks(const std::string& maskName) const
 {
   std::vector<const Track*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
@@ -295,7 +295,7 @@ std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
   }
   return result;
 }
-std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
+std::vector<const ECLCluster*> RestOfEvent::getECLClusters(const std::string& maskName) const
 {
   std::vector<const ECLCluster*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
@@ -307,7 +307,7 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName)
   }
   return result;
 }
-std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(std::string maskName) const
+std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(const std::string& maskName) const
 {
   std::vector<const KLMCluster*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
@@ -318,22 +318,22 @@ std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(std::string maskName)
   }
   return result;
 }
-int RestOfEvent::getNTracks(std::string maskName) const
+int RestOfEvent::getNTracks(const std::string& maskName) const
 {
   int nTracks = getTracks(maskName).size();
   return nTracks;
 }
-int RestOfEvent::getNECLClusters(std::string maskName) const
+int RestOfEvent::getNECLClusters(const std::string& maskName) const
 {
   int nROEECLClusters = getECLClusters(maskName).size();
   return nROEECLClusters;
 }
-int RestOfEvent::getNKLMClusters(std::string maskName) const
+int RestOfEvent::getNKLMClusters(const std::string& maskName) const
 {
   int nROEKLMClusters = getKLMClusters(maskName).size();
   return nROEKLMClusters;
 }
-void RestOfEvent::updateChargedStableFractions(std::string maskName, std::vector<double>& fractions)
+void RestOfEvent::updateChargedStableFractions(const std::string& maskName, std::vector<double>& fractions)
 {
   Mask* mask = findMask(maskName);
   if (!mask) {
@@ -344,7 +344,7 @@ void RestOfEvent::updateChargedStableFractions(std::string maskName, std::vector
   }
   mask->setChargedStableFractions(fractions);
 }
-std::vector<double> RestOfEvent::getChargedStableFractions(std::string maskName) const
+std::vector<double> RestOfEvent::getChargedStableFractions(const std::string& maskName) const
 {
   std::vector<double> maskFractions = {0, 0, 1, 0, 0, 0};
   for (auto& mask : m_masks) {
@@ -358,7 +358,7 @@ std::vector<double> RestOfEvent::getChargedStableFractions(std::string maskName)
 //
 // Old methods:
 //
-TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
+TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
 {
   StoreArray<Particle> particles;
   std::vector<const Track*> roeTracks = RestOfEvent::getTracks(maskName);
@@ -452,7 +452,7 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
   return roe4VectorTracks;
 }
 
-TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(std::string maskName) const
+TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
 {
   std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
   TLorentzVector roe4VectorECLClusters;

@@ -23,7 +23,7 @@ namespace Belle2 {
 
     public:
       /** Constructor */
-      SelectorCut(bool belleFlag);
+      explicit SelectorCut(bool belleFlag);
 
       /** Destructor */
       ~SelectorCut();

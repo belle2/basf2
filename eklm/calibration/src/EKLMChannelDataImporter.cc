@@ -107,7 +107,7 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -121,7 +121,7 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
                                               strip);
     channelData = const_cast<EKLMChannelData*>(
                     m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setActive(bool(active));
   }
@@ -158,7 +158,7 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -172,7 +172,7 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
                                               strip);
     channelData = const_cast<EKLMChannelData*>(
                     m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setVoltage(voltage);
   }
@@ -210,7 +210,7 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -224,7 +224,7 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
                                               strip);
     channelData = const_cast<EKLMChannelData*>(
                     m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setLookbackTime(lookbackTime);
     channelData->setLookbackWindowWidth(lookbackWindowWidth);
@@ -265,7 +265,7 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -279,7 +279,7 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
                                               strip);
     channelData = const_cast<EKLMChannelData*>(
                     m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setActive(bool(active));
     channelData->setPedestal(pedestalMin);

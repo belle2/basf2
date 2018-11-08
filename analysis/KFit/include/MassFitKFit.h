@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef MASSFITKFIT_H
-#define MASSFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -165,6 +162,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MASSFITKFIT_H */
-

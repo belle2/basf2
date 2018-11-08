@@ -41,7 +41,6 @@ void EKLMRawPackerModule::beginRun()
 
 void EKLMRawPackerModule::event()
 {
-  int n_Gdidgits = 0;
   const EKLMDataConcentratorLane* lane;
   int i, j, k, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
   vector<uint32_t> dataWords[4][4]; // Indices: copper - 1, data concentrator.
@@ -57,7 +56,6 @@ void EKLMRawPackerModule::event()
     eklmDigit = m_Digits[i];
     if (!(eklmDigit->isGood()))
       continue;
-    n_Gdidgits++;
     buf[0] = 0;
     buf[1] = 0;
     bword1 = 0;
@@ -69,7 +67,7 @@ void EKLMRawPackerModule::event()
     sector = eklmDigit->getSector();
     sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
-    if (lane == NULL)
+    if (lane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
     formatData(lane, eklmDigit->getPlane(),
                eklmDigit->getStrip(), eklmDigit->getCharge(),

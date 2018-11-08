@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FLAVORTAGGERINFOBUILDERMODULE_H
-#define FLAVORTAGGERINFOBUILDERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -43,4 +42,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* FLAVORTAGINFOBUILDERMODULE_H */

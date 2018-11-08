@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KLMK0LRECONSTRUCTORMODULE_H
-#define KLMK0LRECONSTRUCTORMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
@@ -112,6 +111,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

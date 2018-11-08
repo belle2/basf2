@@ -45,6 +45,7 @@ namespace Belle2 {
       if (size != nsiz1) {
         B2ERROR("Error reading data");
       }
+
       data->setkb(id[13] >> 8);
       data->setka(id[13] - 256 * data->getkb());
       data->sety0Startr(id[14] >> 8);
@@ -55,6 +56,7 @@ namespace Belle2 {
       data->sethT(id[64]);
       data->setlAT(id[128]);
       data->setsT(id[192]);
+      data->setaAT(id[208]);
 
       std::vector<short int> f(49152), f1(49152), f31(49152),
           f32(49152), f33(49152), f41(6144), f43(6144);
@@ -117,8 +119,8 @@ namespace Belle2 {
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
         0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD,
         0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD,
-        0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-        0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+        0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD,
+        0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD, 0xABCD,
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -149,6 +151,8 @@ namespace Belle2 {
           header[i] = data->getlAT();
         } else if (i >= 192 && i < 208) {
           header[i] = data->getsT();
+        } else if (i >= 208 && i < 224) {
+          header[i] = data->getaAT();
         } else {
           // Reverse bytes for header.
           int high = (DEFAULT_HEADER[i] & 0xFF00) >> 8;

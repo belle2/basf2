@@ -16,6 +16,9 @@
 
 namespace Belle2 {
   namespace ECL {
+    /** Version of ECL DSP file format */
+    const short ECLDSP_FORMAT_VERSION = 1;
+
     ECLDspData* readEclDsp(const char* filename, int boardNumber)
     {
       FILE* fl;
@@ -45,6 +48,11 @@ namespace Belle2 {
       if (size != nsiz1) {
         B2ERROR("Error reading data");
       }
+
+      std::vector<short int> extraData;
+      extraData.push_back(ECLDSP_FORMAT_VERSION);
+      extraData.push_back(data->getPackerVersion());
+      data->setExtraData(extraData);
 
       data->setverMaj(id[8] & 0xFF);
       data->setverMin(id[8] >> 8);
@@ -137,6 +145,11 @@ namespace Belle2 {
       int nsiz1 = 256;
       // modification of DEFAULT_HEADER
       unsigned short header[256];
+
+      int format_version = data->getExtraData()[0];
+      if (format_version > ECLDSP_FORMAT_VERSION) {
+        B2WARNING("Format version " << format_version << " is not fully supported, some data might be discarded.");
+      }
 
       for (int i = 0; i < 256; i++) {
         if (i == 8) {

@@ -115,7 +115,7 @@ namespace Belle2 {
        {
          auto numberOfEventsGuard = ScopeGuard::guardGetterSetter(
            [](){return Environment::Instance().getNumberEventsOverride();},
-           [](unsigned int v){ Environment::Instance().setNumberEventsOverride();}
+           [](unsigned int v){ Environment::Instance().setNumberEventsOverride(v);}
          );
          // when this block is finished the number of events will be reset to its
          // original value
@@ -145,7 +145,7 @@ namespace Belle2 {
        {
          auto numberOfEventsGuard = ScopeGuard::guardGetterSetter(
            [](){return Environment::Instance().getNumberEventsOverride();},
-           [](unsigned int v){ Environment::Instance().setNumberEventsOverride();}
+           [](unsigned int v){ Environment::Instance().setNumberEventsOverride(v);}
            56);
          // now the number of events is set to 56 but when this block is finished
          // the number of events will be reset to its original value
@@ -158,7 +158,7 @@ namespace Belle2 {
      *
      * @param getter a callable object to return a value
      * @param setter a callable object to set a value of the same type
-     * @param newValue a value to pass to the setter when this function is called
+     * @param newValue a new value to pass to the setter when this function is called
      */
     template<class Getter, class Setter> [[nodiscard]]
     static ScopeGuard guardGetterSetter(const Getter& getter, Setter setter,
@@ -200,6 +200,7 @@ namespace Belle2 {
      * @param functor An object which has a suitable overloaded operator() to be able to
      *                  * get a value (`const T& operator()();`)
      *                  * set a value (`void operator()(const T&);`)
+     * @param newValue a new value to pass to the functor when this function is called
      */
     template<class Functor> [[nodiscard]]
     static ScopeGuard guardFunctor(Functor functor, const typename std::result_of<Functor()>::type& newValue)

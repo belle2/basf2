@@ -139,7 +139,7 @@ namespace Belle2 {
     /**
      * @return Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
-    short int getthT() const { return m_hitThresh; }
+    short int gethT() const { return m_hitThresh; }
     /** chi2 threshold for fit quality flag */
     short int getchiThresh() const { return m_chiThresh; }
     /** multipliers power of 2 for f, f1 */
@@ -208,7 +208,7 @@ namespace Belle2 {
     /**
      * Set Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
-    void setthT(short int val) { m_hitThresh = val; }
+    void sethT(short int val) { m_hitThresh = val; }
     /** Set chi2 threshold for fit quality flag */
     void setchiThresh(short int val) { m_chiThresh = val; }
     /** Set multipliers power of 2 for f, f1 */

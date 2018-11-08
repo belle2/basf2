@@ -1,6 +1,6 @@
 #ifdef __CINT__
 
-// Remember to include your heaser in methods/include/MVA.h, otherwise cling will not find them.
+// Remember to include your headers in methods/include/MVA.h, otherwise cling will not find them.
 
 #pragma link off all globals;
 #pragma link off all classes;

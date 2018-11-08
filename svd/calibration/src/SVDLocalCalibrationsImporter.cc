@@ -34,6 +34,7 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>

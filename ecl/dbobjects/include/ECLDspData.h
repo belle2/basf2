@@ -47,6 +47,8 @@ namespace Belle2 {
     short int m_lowAmpThresh;
     /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
     short int m_skipThresh;
+    /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
+    short int m_adcAlwThresh;
     /** See documentation for method 'getF31' */
     std::vector<short int> m_fg31;
     /** See documentation for method 'getF32' */
@@ -79,6 +81,7 @@ namespace Belle2 {
       m_hitThresh(0),
       m_lowAmpThresh(0),
       m_skipThresh(0),
+      m_adcAlwThresh(0),
       m_fg31(49152),
       m_fg32(49152),
       m_fg33(49152),
@@ -128,6 +131,10 @@ namespace Belle2 {
      * Alternative for FG33 for signals with small amplitude.
      */
     void getF43(std::vector<short int>& dst) { unpackCoefVector(m_fg43, dst); }
+    /**
+     * @return ADC always threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     */
+    short int getaAT() const { return m_adcAlwThresh; }
     /**
      * @return Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
@@ -197,6 +204,10 @@ namespace Belle2 {
      */
     void setF43(std::vector<short int>& src) { packCoefVector(src, m_fg43); }
 
+    /**
+     * Set Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     */
+    void setaAT(short int val) { m_adcAlwThresh = val; }
     /**
      * Set Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */

@@ -23,6 +23,10 @@ namespace Belle2 {
   private:
     /** ShaperDSP board number, 0..11 */
     unsigned char m_boardNumber;
+    /** Major version of DSP coefficients */
+    unsigned char m_verMaj;
+    /** Minor version of DSP coefficients */
+    unsigned char m_verMin;
     /** Number of bits for FG31, FG41 */
     unsigned char m_ka;
     /** Number of bits for FG32 */
@@ -131,6 +135,10 @@ namespace Belle2 {
      * Alternative for FG33 for signals with small amplitude.
      */
     void getF43(std::vector<short int>& dst) { unpackCoefVector(m_fg43, dst); }
+    /** @return Major version of DSP coefficients */
+    unsigned char getverMaj() const { return m_verMaj; }
+    /** @return Minor version of DSP coefficients */
+    unsigned char getverMin() const { return m_verMin; }
     /**
      * @return ADC always threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
@@ -204,6 +212,10 @@ namespace Belle2 {
      */
     void setF43(std::vector<short int>& src) { packCoefVector(src, m_fg43); }
 
+    /** Sets major version of DSP coefficients */
+    void setverMaj(unsigned char val) { m_verMaj = val; }
+    /** Sets minor version of DSP coefficients */
+    void setverMin(unsigned char val) { m_verMin = val; }
     /**
      * Set Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */

@@ -46,6 +46,8 @@ namespace Belle2 {
         B2ERROR("Error reading data");
       }
 
+      data->setverMaj(id[8] & 0xFF);
+      data->setverMin(id[8] >> 8);
       data->setkb(id[13] >> 8);
       data->setka(id[13] - 256 * data->getkb());
       data->sety0Startr(id[14] >> 8);
@@ -94,7 +96,7 @@ namespace Belle2 {
       const unsigned short DEFAULT_HEADER[256] {
         // ECLDSP FILE.....
         0x4543, 0x4c44, 0x5350, 0x2046, 0x494c, 0x4500, 0x0000, 0x0000,
-        0x0102, 0xffff, 0x0000, 0x0000, 0x0000, 0xABCD, 0xABCD, 0xABCD,
+        0xABCD, 0xffff, 0x0000, 0x0000, 0x0000, 0xABCD, 0xABCD, 0xABCD,
         0xABCD, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -137,7 +139,9 @@ namespace Belle2 {
       unsigned short header[256];
 
       for (int i = 0; i < 256; i++) {
-        if (i == 13) {
+        if (i == 8) {
+          header[i] = (data->getverMin() << 8) | data->getverMaj();
+        } else if (i == 13) {
           header[i] = (data->getkb() << 8) | data->getka();
         } else if (i == 14) {
           header[i] = (data->gety0Startr() << 8) | data->getkc();

@@ -10,7 +10,6 @@
  **************************************************************************/
 
 /* C++ headers. */
-#include <cerrno>
 #include <cmath>
 #include <string>
 

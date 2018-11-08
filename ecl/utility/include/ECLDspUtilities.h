@@ -25,6 +25,7 @@ namespace Belle2 {
      * @brief Convert ECLDspData from Root object to *.dat file.
      *
      * @param[in] raw_file Path to dsp??.dat file to be created.
+     * @param[in] obj      Object to be written
      */
     void writeEclDsp(const char* raw_file, ECLDspData* obj);
   }

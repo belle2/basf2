@@ -105,11 +105,11 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
                 baseurl = "http://%s:%s" % self.server.socket.getsockname()
                 return self.reply(self.payloads[exp] % dict(exp=exp, run=run, baseurl=baseurl))
         else:
-            # check if a fallback payload file exists in the data/framework directory
+            # check if a fallback payload file exists in the conditions_testpayloads directory
             filename = os.path.basename(url.path)
             # replace rev_3 with rev_1
             filename = filename.replace("rev_3", "rev_1")
-            basedir = Belle2.FileSystem.findFile("data/framework")
+            basedir = basf2.find_file("framework/tests/conditions_testpayloads")
             path = os.path.join(basedir, filename)
             if os.path.isfile(path):
                 # ok, file exists. let's serve it

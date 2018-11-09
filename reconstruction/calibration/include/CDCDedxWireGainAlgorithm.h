@@ -85,7 +85,7 @@ namespace Belle2 {
     /**
      * Wire gain algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
 
   private:

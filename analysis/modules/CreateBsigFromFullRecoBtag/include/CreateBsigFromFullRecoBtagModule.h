@@ -8,15 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CREATEBSIGFROMFULLRECOBTAGMODULE_H
-#define CREATEBSIGFROMFULLRECOBTAGMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-//#include <vector>
-//#include <tuple>
-//#include <memory>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 
 // DataStore
@@ -48,24 +43,14 @@ namespace Belle2 {
      */
     CreateBsigFromFullRecoBtagModule();
 
-    /** sdf */
+    /** destructor */
     virtual ~CreateBsigFromFullRecoBtagModule();
 
-    /** sdf */
-    virtual void initialize();
+    /** declare data store elements */
+    virtual void initialize() override;
 
-    /** sdf */
-    virtual void beginRun();
-
-    /** sdf */
-    virtual void event();
-
-    /** sdfy */
-    virtual void endRun();
-
-    /** sdf */
-    virtual void terminate();
-
+    /** process event */
+    virtual void event() override;
 
   private:
 
@@ -88,9 +73,5 @@ namespace Belle2 {
      * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
      */
     bool doVertexFit(Particle* p);
-
-
   };
 }
-
-#endif /* CREATEBSIGFROMFULLRECOBTAGMODULE_H */

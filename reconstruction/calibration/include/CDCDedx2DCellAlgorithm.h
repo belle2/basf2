@@ -87,7 +87,7 @@ namespace Belle2 {
     /**
      * 2D Cell algorithm algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
 

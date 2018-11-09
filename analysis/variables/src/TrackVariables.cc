@@ -108,6 +108,15 @@ namespace Belle2 {
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
 
+    double trackLastCDCLayer(const Particle* part)
+    {
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
+      return trackFit->getHitPatternCDC().getLastLayer();
+    }
+
     double trackD0(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
@@ -340,6 +349,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
+    REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track");
 
     REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");
@@ -363,10 +373,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("hasExtraCDCHitsInSuperLayer(i)", hasExtraCDCHitsInSuperLayer,
                       "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC SuperLayer");
     REGISTER_VARIABLE("nExtraCDCSegments", nExtraCDCSegments, "[Eventbased] The number of CDC segments not assigned to any track");
-    REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
-                      "[Eventbased] The number VXD hits not assigned in the specified VXD layer");
-    REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
-    REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
+    // TODO: once the Tracking group fill the dataobject these can be
+    // uncommented - at the moment they are not filled, so leave out
+    //REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
+    //"[Eventbased] The number VXD hits not assigned in the specified VXD layer");
+    //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
+    //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
     REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag,
                       "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking, "
                       "or the track finding was (partly) aborted for this event.");

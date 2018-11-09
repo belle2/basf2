@@ -72,10 +72,9 @@ namespace Belle2 {
         if (!info) return false;
         if (info->getStatus() < 2) {
           double energy = aTrack->GetKineticEnergy() * Unit::MeV / Unit::eV;
-          const auto* geo = m_topgp->getGeometry();
-          double qeffi = geo->getNominalQE().getEfficiency(energy);
+          double qeffi = m_topgp->getPMTEfficiencyEnvelope(energy);
           double fraction = info->getFraction();
-          if (gRandom->Uniform() * fraction > qeffi) {
+          if (qeffi == 0 or gRandom->Uniform() * fraction > qeffi) {
             aTrack->SetTrackStatus(fStopAndKill);
             return false;
           }

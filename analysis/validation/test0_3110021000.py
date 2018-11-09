@@ -25,7 +25,7 @@ main = create_path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)

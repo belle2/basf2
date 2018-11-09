@@ -22,7 +22,7 @@ using namespace Belle2;
 
 REG_MODULE(ProgressBar)
 
-ProgressBarModule::ProgressBarModule() : Module(), m_evtNr(0), m_nTotal(0), m_startTime(0), m_lastPrint(0)
+ProgressBarModule::ProgressBarModule() : Module(), m_evtNr(0), m_nTotal(0), m_startTime(0), m_lastPrint(0), m_isTTY{false}
 {
   setDescription("Display a progress bar and an estimate of remaining time when number of events is known (e.g. reading from file, or -n switch used). "
                  "The bar uses stderr for output, so it works best when stdout is piped to a file.");
@@ -36,6 +36,7 @@ void ProgressBarModule::initialize()
   m_progress = 0;
   // Check if we run on a tty or if we are writing to a log file. In the second
   // case we don't use carriage return but just new lines and only update if the progress bar changes.
+  // Done here in case someone fiddles with the file descriptor before we process
   m_isTTY = isatty(STDERR_FILENO);
 }
 

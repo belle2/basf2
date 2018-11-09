@@ -21,16 +21,16 @@ namespace Belle2 {
     int m_nExtraCDCHits;             /**< number of CDC hits in the event not assigned to any track */
     int m_nExtraCDCHitsPostCleaning; /**< number of CDC hits in the event not assigned to any track nor very likely beam background*/
     int m_nExtraCDCSegments;         /**< number of segments that couldn't be assigned to any track */
-    int m_nExtraVXDHits;             /**< number of VXD hits not assigned to any track */
-    double m_svdFirstSampleTime;     /**< time of first SVD sample relatvie to event T0 */
+    //int m_nExtraVXDHits;             /**< number of VXD hits not assigned to any track */
+    //double m_svdFirstSampleTime;     /**< time of first SVD sample relatvie to event T0 */
     bool m_trackFindingFailureFlag;  /**< flag set by the tracking if there is reason to assume there was a missed track in the event */
-    void setupTree();                /**< declare branches */
+    void setupTree() override;                /**< declare branches */
   public:
     /** constuctor */
     NtupleEventBasedTrackingTool(TTree* tree, DecayDescriptor& decaydescriptor)
       : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
 
     /** evaluate the variables */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 } // namepspace Belle2

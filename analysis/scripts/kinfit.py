@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
-import sys
+from basf2 import register_module
 import inspect
-from analysisPath import *
+from analysisPath import analysis_main
 
 
 def fitKinematic4C(
@@ -171,10 +169,7 @@ def MassfitKinematic1C(
 
 
 if __name__ == '__main__':
-    desc_list = []
-    for function_name in sorted(list_functions(sys.modules[__name__])):
-        function = globals()[function_name]
-        signature = inspect.formatargspec(*inspect.getargspec(function))
-        signature = signature.replace(repr(analysis_main), 'analysis_main')
-        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
-    pretty_print_description_list(desc_list)
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "kinfit", {
+        repr(analysis_main): "analysis_main",
+    })

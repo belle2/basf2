@@ -77,7 +77,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph)
         }
         fields[index] = boost::lexical_cast<double>(tok);
         index++;
-      } catch (boost::bad_lexical_cast) {
+      } catch (boost::bad_lexical_cast&) {
         throw (TouschekConvertFieldError() << m_lineNum << index << tok);
       }
     }

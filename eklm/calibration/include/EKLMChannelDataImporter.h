@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMCHANNELDATAIMPORTER_H
-#define EKLMCHANNELDATAIMPORTER_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMChannels.h>
@@ -107,6 +106,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

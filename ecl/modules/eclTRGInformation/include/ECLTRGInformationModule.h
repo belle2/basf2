@@ -35,13 +35,13 @@ namespace Belle2 {
     ECLTRGInformationModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** event */
-    virtual void event();
+    virtual void event() override;
 
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

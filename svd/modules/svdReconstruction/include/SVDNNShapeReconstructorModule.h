@@ -43,10 +43,10 @@ namespace Belle2 {
       SVDNNShapeReconstructorModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     protected:
 

@@ -1,8 +1,8 @@
 Import('env')
 
-if env.has_key('HAS_TEVE'):
+if 'HAS_TEVE' in env:
   if not env['HAS_TEVE']:
-    print "Event display disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
+    print("Event display disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)")
 
   env['CONTINUE'] = env['HAS_TEVE']
   env['LIBS'] = ['$ROOT_LIBS', 'GuiHtml', 'framework', 'geometry',

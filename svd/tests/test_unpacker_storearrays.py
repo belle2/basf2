@@ -27,11 +27,6 @@ test_message = ['successful', 'FAILED']
 
 if __name__ == "__main__":
 
-    # Load ROOT libs before we change directory
-    dummy_raw = Belle2.RawSVD()
-    dummy_digit = Belle2.SVDDigit()
-    dummy_shaper = Belle2.SVDShaperDigit()
-
     with b2test_utils.clean_working_directory():
 
         basf2.B2INFO('Test 1. \nBehaviour with residual digits\n')

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TAGVERTEXMODULE_H
-#define TAGVERTEXMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -152,4 +151,3 @@ namespace Belle2 {
     void deltaT(Particle* Breco);
   };
 }
-#endif /* TAGVERTEXMODULE_H */

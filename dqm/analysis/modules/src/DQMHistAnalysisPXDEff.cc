@@ -131,7 +131,7 @@ void DQMHistAnalysisPXDEffModule::event()
   std::map<VxdID, TH2D*> mapMatches;
 
   //Count how many of each type of histogram there are for the averaging
-  std::map<std::string, int> typeCounter;
+  //std::map<std::string, int> typeCounter;
 
   for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
     VxdID& aPXDModule = m_PXDModules[i - 1];

@@ -25,7 +25,7 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double UNUSED(thresholdEne
   Simulation::SensitiveDetectorBase(name, Const::ECL),
   m_eclSimHitRel(m_mcParticles, m_eclSimHits),
   m_eclHitRel(m_mcParticles, m_eclHits),
-  m_ECLHadronComponentEmissionFunction("eclHadronComponentEmissionFunction")
+  m_ECLHadronComponentEmissionFunction()
   // m_thresholdEnergyDeposit(thresholdEnergyDeposit),
   // m_thresholdKineticEnergy(thresholdKineticEnergy)
 {

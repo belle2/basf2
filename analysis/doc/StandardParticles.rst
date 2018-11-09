@@ -35,25 +35,35 @@ These other functions are not recommended for normal use without some study of t
 If you improve these lists, please report in a physics performance meeting and make a pull request.
 
 .. automodule:: stdCharged
+   :members:
    :undoc-members:
+   :exclude-members: stdPi, stdK, stdPr, stdE, stdMu
 
 .. automodule:: stdCharm
+   :members:
    :undoc-members:
 
 .. automodule:: stdDiLeptons
+   :members:
    :undoc-members:
 
 .. automodule:: stdLightMesons
+   :members:
    :undoc-members:
 
 .. automodule:: stdPhotons
+   :members:
    :undoc-members:
+   :exclude-members: stdPhotons
 
 .. automodule:: stdPi0s
+   :members:
    :undoc-members:
+   :exclude-members: stdPi0s
 
 .. automodule:: stdV0s
    :undoc-members:
+   :exclude-members: stdKshorts, stdLambdas
 
 .. automodule:: stdKlongs
    :undoc-members:

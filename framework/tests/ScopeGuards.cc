@@ -20,9 +20,13 @@ namespace {
 
   /** Simple functor to set and get the values of an integer */
   struct IntSetterGetterFunctor {
-    IntSetterGetterFunctor(int& reference): ref(reference) {}
+    /** Constructor */
+    explicit IntSetterGetterFunctor(int& reference): ref(reference) {}
+    /** Call operator to set a new value */
     void operator()(const int& v) { ref = v; }
+    /** Call operator to get the value */
     int operator()() const { return ref; }
+    /** Reference */
     int& ref;
   };
 
@@ -49,6 +53,7 @@ namespace {
     ASSERT_EQ(old, 17);
   }
 
+  /** Check guard with getter and setter */
   TEST(ScopeGuards, IntSetterGetter)
   {
     int old{5};
@@ -73,7 +78,7 @@ namespace {
     ASSERT_EQ(old, 17);
   }
 
-
+  /** Check guard with functor */
   TEST(ScopeGuards, IntSetterGetterFunctor)
   {
     int old{5};
@@ -105,6 +110,9 @@ namespace {
     ASSERT_EQ(old, 17);
   }
 
+  /** Test guarding a string reference. This is always fun because string
+   * literals are not actually strings so it might show some problems with the
+   * template arguments */
   TEST(ScopeGuards, StringReference)
   {
     std::string value{"before"};
@@ -123,6 +131,7 @@ namespace {
     ASSERT_EQ(value, "before");
   }
 
+  /** Test guarding a stream state */
   TEST(ScopeGuards, StreamState)
   {
     std::stringstream buf;
@@ -141,6 +150,7 @@ namespace {
     ASSERT_EQ(buf.str(), "a:1.2:b:2.3000:c:---3.40000:d:4.5000e+00:e:5.4");
   }
 
+  /** Test guarding the current working directory */
   TEST(ScopeGuards, WorkingDirectory)
   {
     std::string start{boost::filesystem::current_path().c_str()};

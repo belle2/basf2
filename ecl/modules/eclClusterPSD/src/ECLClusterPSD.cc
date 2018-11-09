@@ -214,8 +214,6 @@ void ECLClusterPSDModule::event()
 
   for (auto& shower : m_eclShowers) {
 
-    //evaluates mva classifier
-    const double mvaout = evaluateMVA(&shower);
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
 
@@ -246,11 +244,17 @@ void ECLClusterPSDModule::event()
       }
     }
 
-    shower.setPulseShapeDiscriminationMVA(mvaout);
     if (nWaveforminCluster > 0) {
+
+      //evaluates mva classifier only if waveforms are available in the cluster
+      const double mvaout = evaluateMVA(&shower);
+      shower.setPulseShapeDiscriminationMVA(mvaout);
+
       shower.setNumberOfHadronDigits(numberofHadronDigits);
       shower.addStatus(ECLShower::c_hasPulseShapeDiscrimination);
+
     } else {
+      shower.setPulseShapeDiscriminationMVA(0.5);
       shower.setNumberOfHadronDigits(0);
     }
   }

@@ -520,7 +520,7 @@ def is_correct_rl_information(cdc_hit, reco_track, hit_lookup):
 
     if rl_info == Belle2.RecoHitInformation.c_right and truth_rl_info == 1:
         return True
-    if rl_info == Belle2.RecoHitInformation.c_left and truth_rl_info == -1:
+    if rl_info == Belle2.RecoHitInformation.c_left and truth_rl_info == 65535:  # -1 as short
         return True
 
     return False

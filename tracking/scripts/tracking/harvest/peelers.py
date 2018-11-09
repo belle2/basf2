@@ -116,7 +116,13 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
     last_svd_layer = nan
     first_cdc_layer = nan
     last_cdc_layer = nan
+    sum_of_weights = nan
+    last_fit_layer = nan
+
     if reco_track:
+        sum_of_weights = 0
+        last_fit_layer = 0
+
         n_cdc_hits = reco_track.getNumberOfCDCHits()
         n_svd_hits = reco_track.getNumberOfSVDHits()
         n_pxd_hits = reco_track.getNumberOfPXDHits()
@@ -134,7 +140,17 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
         if cdc_hits:
             first_cdc_layer = min(cdc_hits)
             last_cdc_layer = max(cdc_hits)
-
+        for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
+            track_point = reco_track.getCreatedTrackPoint(hit_info)
+            if track_point:
+                fitted_state = track_point.getFitterInfo()
+                if fitted_state:
+                    W = max(fitted_state.getWeights())
+                    sum_of_weights += W
+                    if W > 0.5 and hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_CDC:
+                        layer = hit_info.getRelated("CDCHits").getICLayer()
+                        if layer > last_fit_layer:
+                            last_fit_layer = layer
         return dict(
             n_pxd_hits=n_pxd_hits,
             n_svd_hits=n_svd_hits,
@@ -147,6 +163,8 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
             last_svd_layer=last_svd_layer,
             first_cdc_layer=first_cdc_layer,
             last_cdc_layer=last_cdc_layer,
+            sum_of_weights=sum_of_weights,
+            last_fit_layer=last_fit_layer
         )
     else:
         return dict(
@@ -161,6 +179,8 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
             last_svd_layer=last_svd_layer,
             first_cdc_layer=first_cdc_layer,
             last_cdc_layer=last_cdc_layer,
+            sum_of_weights=sum_of_weights,
+            last_fit_layer=last_fit_layer
         )
 
 

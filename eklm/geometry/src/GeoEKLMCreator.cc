@@ -945,7 +945,7 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
 
 G4VSolid* EKLM::GeoEKLMCreator::
 unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
-            int nSolids, std::string name)
+            int nSolids, const std::string& name)
 {
   G4UnionSolid** u;
   G4DisplacedSolid* d;

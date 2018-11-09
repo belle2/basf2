@@ -415,7 +415,7 @@ namespace Belle2 {
        * @param[in] name    First part of solid names.
        */
       G4VSolid* unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
-                            int nSolids, std::string name);
+                            int nSolids, const std::string& name);
 
       /**
        * Create plastic sheet logical volume.

@@ -76,6 +76,7 @@ namespace Belle2 {
     void setTwoComponentChi2(double chi) { m_TwoComponentChi2 = chi; }
 
     /*! Set two comp chi2 for a fit type
+     *  see enum TwoComponentFitType in ECLDsp.h for description of fit types.
      */
     void setTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn, double input)
     {
@@ -138,6 +139,7 @@ namespace Belle2 {
     double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
     /*! get two comp chi2 for a fit type
+     *  see enum TwoComponentFitType in ECLDsp.h for description of fit types.
      * @return two comp chi2 for fit type
      */
     double getTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn) const

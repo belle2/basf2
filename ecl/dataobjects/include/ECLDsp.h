@@ -27,10 +27,10 @@ namespace Belle2 {
 
     /**< Offline two component fit type */
     enum TwoComponentFitType {
-      poorChi2 = -1,
-      photonHadron = 0,
-      photonHadronBackgroundPhoton = 1,
-      photonDiodeCrossing = 2
+      poorChi2 = -1,  /**< All offline fit attempts were greater than chi2 threshold */
+      photonHadron = 0,  /**< photon + hadron template fit */
+      photonHadronBackgroundPhoton = 1,  /**< photon + hadron template + pile-up photon fit */
+      photonDiodeCrossing = 2  /**< photon + diode template fit */
     };
 
     /** default constructor for ROOT */
@@ -105,6 +105,7 @@ namespace Belle2 {
     void setTwoComponentChi2(double input) {      m_TwoComponentChi2 = input; }
 
     /*! Set two comp chi2 for a fit type
+     *   see enum TwoComponentFitType in ECLDsp.h for description of fit types.
      */
     void setTwoComponentSavedChi2(TwoComponentFitType FitTypeIn, double input)
     {
@@ -173,6 +174,7 @@ namespace Belle2 {
     double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
     /*! get two comp chi2 for a fit type
+     *  see enum TwoComponentFitType in ECLDsp.h for description of fit types.
      * @return two comp chi2 for fit type
      */
     double getTwoComponentSavedChi2(TwoComponentFitType FitTypeIn) const

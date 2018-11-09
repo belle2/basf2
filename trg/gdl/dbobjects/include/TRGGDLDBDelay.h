@@ -15,42 +15,51 @@
 
 namespace Belle2 {
 
-  /** The payload class for PXD cluster charge calibrations
+
+
+  /** The payload class for delay of GDL input bit
    *
-   *  The payload class stores the median cluster charge values
-   *  for PXD sensors on a grid nBinsU x nBinsV. The values are
-   *  stored in raw ADC units (called ADU).
-   *
-   *  The granularity of the grid is user adjustable. The default
-   *  value of a missing calibraiton is -1.0.
+   *  The payload class stores the number of input bit and their delay
+   *  value of a missing delay is "-1"
    */
+
 
   class TRGGDLDBDelay: public TObject {
   public:
 
     /** Default constructor */
-    TRGGDLDBDelay(): m_delay{0} {}
+    TRGGDLDBDelay(): m_ninbit{0}, m_delay{0} {}
     /** copy constructor */
     TRGGDLDBDelay(const TRGGDLDBDelay& b)
     {
-      for (int i = 0; i < 200; i++) {
+      m_ninbit = b.m_ninbit;
+      for (int i = 0; i < 320; i++) {
         m_delay[i] = b.m_delay[i];
       }
     }
     /** assignment operator */
     TRGGDLDBDelay& operator=(const TRGGDLDBDelay& b)
     {
-      for (int i = 0; i < 200; i++) {
+      m_ninbit = b.m_ninbit;
+      for (int i = 0; i < 320; i++) {
         m_delay[i] = b.m_delay[i];
       }
       return *this;
     }
 
+    void setninbit(int i)
+    {
+      m_ninbit = i;
+    }
     void setdelay(int i, const int j)
     {
       m_delay[i] = j;
     }
 
+    int getninbit() const
+    {
+      return m_ninbit;
+    }
     int getdelay(int i) const
     {
       return m_delay[i];
@@ -58,8 +67,11 @@ namespace Belle2 {
 
   private:
 
+    /** Number of bit */
+    int m_ninbit;
+
     /** Number of bins per sensor along u side */
-    int m_delay[200];
+    int m_delay[320];
 
     ClassDef(TRGGDLDBDelay, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };

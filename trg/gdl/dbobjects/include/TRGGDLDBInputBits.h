@@ -15,32 +15,31 @@
 
 namespace Belle2 {
 
-  /** The payload class for PXD cluster charge calibrations
+
+  /** The payload class for GDL input bit
    *
-   *  The payload class stores the median cluster charge values
-   *  for PXD sensors on a grid nBinsU x nBinsV. The values are
-   *  stored in raw ADC units (called ADU).
-   *
-   *  The granularity of the grid is user adjustable. The default
-   *  value of a missing calibraiton is -1.0.
+   *  The payload class stores the number of input bit and their names
+   *  value of a missing name is ""
    */
 
   class TRGGDLDBInputBits: public TObject {
   public:
 
     /** Default constructor */
-    TRGGDLDBInputBits(): m_inbitname{0} {}
+    TRGGDLDBInputBits(): m_ninbit{0}, m_inbitname{} {}
     /** copy constructor */
     TRGGDLDBInputBits(const TRGGDLDBInputBits& b)
     {
-      for (int i = 0; i < 200; i++) {
+      m_ninbit = b.m_ninbit;
+      for (int i = 0; i < 320; i++) {
         strcpy(m_inbitname[i], b.m_inbitname[i]);
       }
     }
     /** assignment operator */
     TRGGDLDBInputBits& operator=(const TRGGDLDBInputBits& b)
     {
-      for (int i = 0; i < 200; i++) {
+      m_ninbit = b.m_ninbit;
+      for (int i = 0; i < 320; i++) {
         strcpy(m_inbitname[i], b.m_inbitname[i]);
       }
       return *this;
@@ -50,16 +49,27 @@ namespace Belle2 {
     {
       strcpy(m_inbitname[i], c);
     }
+    void setninbit(int i)
+    {
+      m_ninbit = i;
+    }
 
     const char* getinbitname(int i) const
     {
       return m_inbitname[i];
     }
+    int getninbit() const
+    {
+      return m_ninbit;
+    }
 
   private:
 
+    /** Number of bit */
+    int m_ninbit;
+
     /** Number of bins per sensor along u side */
-    char m_inbitname[200][100];
+    char m_inbitname[320][100];
 
     ClassDef(TRGGDLDBInputBits, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };

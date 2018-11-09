@@ -15,32 +15,31 @@
 
 namespace Belle2 {
 
-  /** The payload class for PXD cluster charge calibrations
+  /** The payload class for GDL psnm
    *
-   *  The payload class stores the median cluster charge values
-   *  for PXD sensors on a grid nBinsU x nBinsV. The values are
-   *  stored in raw ADC units (called ADU).
-   *
-   *  The granularity of the grid is user adjustable. The default
-   *  value of a missing calibraiton is -1.0.
+   *  The payload class stores the number of psnm bit and their prescale values
+   *  value of a missing bit is "0"
    */
+
 
   class TRGGDLDBPrescales: public TObject {
   public:
 
     /** Default constructor */
-    TRGGDLDBPrescales(): m_prescales{0} {}
+    TRGGDLDBPrescales(): m_noutbit{0}, m_prescales{0} {}
     /** copy constructor */
     TRGGDLDBPrescales(const TRGGDLDBPrescales& b)
     {
-      for (int i = 0; i < 200; i++) {
+      m_noutbit = b.m_noutbit;
+      for (int i = 0; i < 320; i++) {
         m_prescales[i] = b.m_prescales[i];
       }
     }
     /** assignment operator */
     TRGGDLDBPrescales& operator=(const TRGGDLDBPrescales& b)
     {
-      for (int i = 0; i < 200; i++) {
+      m_noutbit = b.m_noutbit;
+      for (int i = 0; i < 320; i++) {
         m_prescales[i] = b.m_prescales[i];
       }
       return *this;
@@ -50,16 +49,27 @@ namespace Belle2 {
     {
       m_prescales[i] = j;
     }
+    void setnoutbit(int i)
+    {
+      m_noutbit = i;
+    }
 
     int getprescales(int i) const
     {
       return m_prescales[i];
     }
+    int getnoutbit() const
+    {
+      return m_noutbit;
+    }
 
   private:
 
+    /** Number of bit */
+    int m_noutbit;
+
     /** Number of bins per sensor along u side */
-    int m_prescales[200];
+    int m_prescales[320];
 
     ClassDef(TRGGDLDBPrescales, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };

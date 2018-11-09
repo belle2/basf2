@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: jvbennett                                                *
+ * Contributors: jikumar, jvbennett                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -159,7 +159,7 @@ void CDCDedxElectronCollectorModule::collect()
           continue;
         }
         //cutting on dedx of other track
-        if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) >= 0.2) {
+        if (dedxOtherTrack->getDedxNoSat() <= 0.85 || dedxOtherTrack->getDedxNoSat() >= 1.25) {
           //printf("Cut2: TrkdEdxOther = %0.03f\n", dedxOtherTrack->getDedxNoSat());
           continue;
         }
@@ -192,7 +192,7 @@ void CDCDedxElectronCollectorModule::collect()
     for (int i = 0; i < m_nhits; ++i) {
 
       if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue; //Jake added
-      if (dedxTrack->getPath(i) <= 0.5)continue; //JK
+      //if (dedxTrack->getPath(i) <= 0.5)continue; //JK
       if (Iswire)m_wire.push_back(dedxTrack->getWire(i));
       if (Islayer) m_layer.push_back(dedxTrack->getHitLayer(i));
       if (Isdoca)m_doca.push_back(dedxTrack->getDoca(i));

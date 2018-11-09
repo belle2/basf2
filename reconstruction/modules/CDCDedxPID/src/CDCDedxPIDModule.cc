@@ -474,7 +474,7 @@ void CDCDedxPIDModule::event()
                               cellHalfWidth, driftT, driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
 
         }
-      } catch (genfit::Exception) {
+      } catch (genfit::Exception&) {
         B2WARNING("Track: " << mtrack << ": genfit::MeasuredStateOnPlane exception...");
         continue;
       }

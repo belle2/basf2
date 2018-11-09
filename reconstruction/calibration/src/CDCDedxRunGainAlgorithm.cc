@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: jvbennett                                                *
+ * Contributors: jikumar, jvbennett                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -51,7 +51,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   ttree->SetBranchAddress("dedx", &dedx);
   ttree->SetBranchAddress("run", &run);
 
-  TH1D* hDedx = new TH1D("hDedx", "hDedx", 100, 0, 2);
+  TH1D* hDedx = new TH1D("hDedx", "hDedx", 200, 0, 2);
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     if (dedx == 0) continue;
@@ -63,6 +63,10 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   double rmean = 1.0;
   if (isRmBadruns)CheckRunStatus(runtemp, IsSkipRun, rmean);
 
+  TF1* fitG = new TF1("fitG", "gaus", 0.5, 1.5);
+  fitG->SetParLimits(1, 0.90, 1.10);
+  fitG->SetParLimits(2, 0.03, 0.12);
+
   double RunGainConst = 1.0;
   std::string rstatus = "";
   if (IsSkipRun) {
@@ -73,13 +77,13 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
       RunGainConst = 1.0; //try global running avg accorsing all runs: next
       rstatus = "LowStatsRun";
     } else {
-      if (isMakePlots)hDedx->Fit("gaus");
-      else if (!isMakePlots)hDedx->Fit("gaus", "Q"); //silent fitting
-      if (!hDedx->GetFunction("gaus")->IsValid()) {
+      if (isMakePlots)hDedx->Fit("fitG");
+      else if (!isMakePlots)hDedx->Fit("fitG", "QRM"); //silent fitting
+      if (!hDedx->GetFunction("fitG")->IsValid()) {
         RunGainConst = 1.0;
         rstatus = "FitFailedRun";
       } else {
-        RunGainConst = hDedx->GetFunction("gaus")->GetParameter(1);
+        RunGainConst = hDedx->GetFunction("fitG")->GetParameter(1);
         rstatus = "GoodRun";
       }
     }
@@ -96,6 +100,8 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     hDedx->SetTitle(Form("run = %d, status: %s, const: %0.04f", runtemp, rstatus.data(), RunGainConst));
     hDedx->SetFillColor(kYellow);
     hDedx->DrawCopy("hist");
+    fitG->DrawCopy("same");
+
 
     TLine* tl = new TLine();
     tl->SetLineColor(kRed);

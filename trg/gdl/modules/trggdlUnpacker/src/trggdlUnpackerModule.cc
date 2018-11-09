@@ -60,6 +60,7 @@ void TRGGDLUnpackerModule::event()
           int nword = raw_trgarray[i]->GetDetectorNwords(j, 0);
           if (nword > 0) {
             if (!m_unpacker)B2INFO("no database of gdl unpacker");
+            else if (m_badrun->getflag() == -1)B2INFO("bad run");
             else fillTreeGDLDB(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                                  raw_trgarray[i]->GetEveNo(j));
           }

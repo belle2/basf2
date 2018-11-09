@@ -20,6 +20,7 @@
 #include <trg/gdl/dbobjects/TRGGDLDBInputBits.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 #include <trg/gdl/dbobjects/TRGGDLDBDelay.h>
+#include <trg/gdl/dbobjects/TRGGDLDBBadrun.h>
 #include <iostream>
 #include <fstream>
 //#include <TFile.h>
@@ -1114,6 +1115,41 @@ void setdelay()
 
 }
 
+void setbadrun()
+{
+
+  const int N_BADRUN_ARRAY = 12;
+
+  const int run[N_BADRUN_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
+    0, 0,    3, 3526, // 1
+    3, 3527, 3, 3623, //-1
+    3, 3624, 3, 3769, // 1
+    3, 3770, 3, 3790, //-1
+    3, 3791, 3, 4877, // 1
+    3, 4878, 3, 5012, //-1
+    3, 5013, 3, 5019, // 1
+    3, 5020, 3, 5246, //-1
+    3, 5247, 3, 5313, // 1
+    3, 5314, 3, 5326, //-1
+    3, 5327, 3, 6000, // 1
+    3, 6001, 10, 0    // 0
+  };
+
+  int flag[N_BADRUN_ARRAY] = {
+    1, -1, 1, -1, 1,
+    -1, 1, -1, 1, -1,
+    1, 0
+  };
+
+  DBImportObjPtr<TRGGDLDBBadrun> badrun;
+  badrun.construct();
+  for (int i = 0; i < N_BADRUN_ARRAY; i++) {
+    IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+    badrun->setflag(flag[i]);
+    badrun.import(iov);
+  }
+}
+
 int main()
 {
 
@@ -1122,6 +1158,7 @@ int main()
   setinputbits();
   setunpacker();
   setdelay();
+  setbadrun();
 
 }
 

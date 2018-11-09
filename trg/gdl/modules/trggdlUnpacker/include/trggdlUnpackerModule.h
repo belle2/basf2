@@ -28,6 +28,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
+#include <trg/gdl/dbobjects/TRGGDLDBBadrun.h>
 
 namespace Belle2 {
 
@@ -88,6 +89,8 @@ namespace Belle2 {
       DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
       int LeafBitMap[320];
       char LeafNames[320][100];
+      //condition database for badrun
+      DBObjPtr<TRGGDLDBBadrun> m_badrun;
 
     };
   }

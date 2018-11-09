@@ -10,6 +10,7 @@
 #pragma link C++ class Belle2::TRGGDLDBInputBits+;
 #pragma link C++ class Belle2::TRGGDLDBUnpacker+;
 #pragma link C++ class Belle2::TRGGDLDBDelay+;
+#pragma link C++ class Belle2::TRGGDLDBBadrun+;
 
 
 

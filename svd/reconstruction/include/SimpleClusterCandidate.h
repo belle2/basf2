@@ -38,7 +38,7 @@ namespace Belle2 {
     public:
 
       /** Constructor to create an empty Cluster */
-      SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent);
+      SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent, double cutSNR);
 
       /**
        * Add a Strip to the current cluster.
@@ -134,6 +134,9 @@ namespace Belle2 {
 
       /** SNR above which the strip can be considered for clustering*/
       double m_cutAdjacent;
+
+      /** SNR above which the cluster is ok*/
+      double m_cutCluster;
 
       /** Charge of the cluster */
       float m_charge;

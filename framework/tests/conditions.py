@@ -20,7 +20,6 @@ getting the payload information and payloads and then we run through different s
 import sys
 import os
 import basf2
-from ROOT import Belle2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from b2test_utils import clean_working_directory, safe_process, skip_test

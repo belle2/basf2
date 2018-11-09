@@ -14,7 +14,17 @@
 
 namespace Belle2 {
 
-  /*
+  /**
+   * This object contains ECL DSP coefs -- electromagnetic calorimeter
+   * digital signal processing coefficients.
+   * Payloads with these objects are used in two use cases.
+   *
+   * 1. They are uploaded to ShaperDSP boards and then used in waveform fitting
+   *    (amplitude and time reconstruction).
+   * 2. ECL DQM uses these payloads with ShaperDSP emulator to quickly detect
+   *    ShaperDSP boards that started sending corrupted data.
+   *    (ECL expert then resets these modules)
+   *
    * For detailed overview of ECLDSP file structure see Confluence,
    * https://confluence.desy.de/display/BI/ECL+Technical+Notes
    * Attached file ECL-TN-2013-02 (digi.pdf)

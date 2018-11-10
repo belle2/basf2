@@ -12,6 +12,17 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+// BOOST accumulators
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/count.hpp>
+#include <boost/accumulators/statistics/min.hpp>
+#include <boost/accumulators/statistics/max.hpp>
+#include <boost/accumulators/statistics/sum.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
+
+namespace bacc = boost::accumulators;
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
@@ -70,6 +81,15 @@ namespace Belle2 {
     public:
       /// Generate and assign the contained variables
       bool extract(const CDCTrack* track) override;
+      // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
+      // data that they accumulate (i.e. are "filled" with).
+      using statistics_set = bacc::features<bacc::tag::count,
+            bacc::tag::sum,
+            bacc::tag::min,
+            bacc::tag::max,
+            bacc::tag::mean,
+            bacc::tag::lazy_variance>;
+      using statistics_accumulator = bacc::accumulator_set<double, statistics_set>;
     };
   }
 }

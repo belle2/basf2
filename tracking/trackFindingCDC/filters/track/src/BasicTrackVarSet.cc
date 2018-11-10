@@ -20,17 +20,6 @@
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
-// BOOST
-#include <boost/bind.hpp>
-#include <boost/ref.hpp>
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/count.hpp>
-#include <boost/accumulators/statistics/min.hpp>
-#include <boost/accumulators/statistics/max.hpp>
-#include <boost/accumulators/statistics/sum.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
-
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include<numeric>
 
@@ -38,8 +27,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-namespace bacc = boost::accumulators;
 
 bool BasicTrackVarSet::extract(const CDCTrack* track)
 {
@@ -52,14 +39,6 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
   // data that they accumulate (i.e. are "filled" with).
   // TODO Maybe wrap the accumulators code in an interface and put them in some utility file
-  using statistics_set = bacc::features<bacc::tag::count,
-        bacc::tag::sum,
-        bacc::tag::min,
-        bacc::tag::max,
-        bacc::tag::mean,
-        bacc::tag::lazy_variance>;
-  using statistics_accumulator = bacc::accumulator_set<double, statistics_set>;
-
   statistics_accumulator drift_length_acc;
   statistics_accumulator adc_acc;
   statistics_accumulator empty_s_acc;

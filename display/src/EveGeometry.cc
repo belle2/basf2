@@ -80,23 +80,6 @@ void EveGeometry::addGeometry(EType visMode)
   s_simplifiedShape->SetName("Minimal geometry extract");
   delete f;
 
-  //TOP was rotated, let's remove the wrong shapes from the extract
-  //   std::list<TEveElement*> top_bars;
-  //   TPRegexp re("Support.*");
-  //   s_simplifiedShape->FindChildren(top_bars, re);
-  //   B2ASSERT("No TOP bars found?", !top_bars.empty());
-  //   for (TEveElement* el : top_bars) {
-  //     el->Destroy();
-  //   }
-  //   //and add fixed ones instead
-  //   const std::string extractPathTop = FileSystem::findFile(s_eveGeometryExtractPathTop);
-  //   f = TFile::Open(extractPathTop.c_str(), "READ");
-  //   TEveGeoShapeExtract* gsetop = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
-  //   TEveGeoShape* top_extract = TEveGeoShape::ImportShapeExtract(gsetop, 0);
-  //   top_extract->SetRnrSelf(false);
-  //   s_simplifiedShape->AddElement(top_extract);
-  //   delete f;
-
   //I want to show full geo in unprojected view,
   //but I still need to add the extract to the geometry scene...
   gEve->AddGlobalElement(s_simplifiedShape);

@@ -33,6 +33,7 @@
 
 // utility
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 #include <TRandom.h>
 #include <TMath.h>
@@ -637,29 +638,9 @@ namespace Belle2 {
           B2ERROR("Relation between particle and ROE doesn't exist!");
           return -1;
         }
-        return roe->get4Vector(maskName).Energy();
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr ROE_Ecms(const std::vector<std::string>& arguments)
-    {
-      std::string maskName;
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
-        maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Ecms");
-      auto func = [maskName](const Particle * particle) -> double {
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-        if (!roe)
-        {
-          B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
-        }
-        PCmsLabTransform T;
-        return (T.rotateLabToCms() * roe->get4Vector(maskName)).Energy();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Energy();
       };
       return func;
     }
@@ -713,7 +694,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Mag();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Mag();
       };
       return func;
     }
@@ -740,7 +723,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().X();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().X();
       };
       return func;
     }
@@ -767,34 +752,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Y();
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr ROE_Pcms(const std::vector<std::string>& arguments)
-    {
-      std::string maskName;
-
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
-        maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Pcms");
-
-      auto func = [maskName](const Particle * particle) -> double {
-
-        // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-        if (!roe)
-        {
-          B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
-        }
-        PCmsLabTransform T;
-        return (T.rotateLabToCms() * roe->get4Vector(maskName)).Vect().Mag();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Y();
       };
       return func;
     }
@@ -822,7 +782,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Perp();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Perp();
       };
       return func;
     }
@@ -849,7 +811,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Z();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Z();
       };
       return func;
     }
@@ -876,34 +840,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Theta();
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr ROE_PThetacms(const std::vector<std::string>& arguments)
-    {
-      std::string maskName;
-
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
-        maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_PThetacms");
-
-      auto func = [maskName](const Particle * particle) -> double {
-
-        // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-        if (!roe)
-        {
-          B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
-        }
-        PCmsLabTransform T;
-        return (T.rotateLabToCms() * roe->get4Vector(maskName)).Theta();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Theta();
       };
       return func;
     }
@@ -1694,38 +1633,11 @@ namespace Belle2 {
 
         if (maskName == "")
           return 1.0;
-        //TODO: test this or replace
         if (roe->hasParticle(particle, maskName))
         {
           return 1.0;
         }
 
-        /*else {
-          if (particle->getParticleType() == Particle::c_Track)
-          {
-            const Track* track = particle->getTrack();
-
-            std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
-
-            auto it = trackMask.find(track->getArrayIndex());
-            if (it == trackMask.end())
-              B2ERROR("Something is wrong, track not found in map of ROE tracks!");
-            else
-              result = double(trackMask[track->getArrayIndex()]);
-          } else if (particle->getParticleType() == Particle::c_ECLCluster)
-          {
-            const ECLCluster* ecl = particle->getECLCluster();
-
-            std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
-
-            auto it = eclClusterMask.find(ecl->getArrayIndex());
-            if (it == eclClusterMask.end())
-              B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
-            else
-              result = double(eclClusterMask[ecl->getArrayIndex()]);
-          } else
-            B2ERROR("Particle used is not an ECLCluster or Track type particle!");
-        }*/
         return result;
       };
       return func;
@@ -1977,37 +1889,28 @@ namespace Belle2 {
                       "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle");
 
     REGISTER_VARIABLE("ROE_E(maskName)", ROE_E,
-                      "Returns energy of unused tracks and clusters in ROE");
-
-    REGISTER_VARIABLE("ROE_Ecms(maskName)", ROE_Ecms,
-                      "Returns energy of unused tracks and clusters in ROE in cms fame");
+                      "Returns energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_M(maskName)", ROE_M,
                       "Returns invariant mass of unused tracks and clusters in ROE");
 
     REGISTER_VARIABLE("ROE_P(maskName)", ROE_P,
-                      "Returns momentum of unused tracks and clusters in ROE");
-
-    REGISTER_VARIABLE("ROE_Pcms(maskName)", ROE_Pcms,
-                      "Returns momentum of unused tracks and clusters in ROE in cms");
+                      "Returns momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Pt(maskName)", ROE_Pt,
-                      "Returns transverse component of momentum of unused tracks and clusters in ROE");
+                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Px(maskName)", ROE_Px,
-                      "Returns x component of momentum of unused tracks and clusters in ROE");
+                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Py(maskName)", ROE_Py,
-                      "Returns y component of momentum of unused tracks and clusters in ROE");
+                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Pz(maskName)", ROE_Pz,
-                      "Returns z component of momentum of unused tracks and clusters in ROE");
+                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_PTheta(maskName)", ROE_PTheta,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE");
-
-    REGISTER_VARIABLE("ROE_PThetacms(maskName)", ROE_PThetacms,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE in cms");
+                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_deltae(maskName)", ROE_DeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");

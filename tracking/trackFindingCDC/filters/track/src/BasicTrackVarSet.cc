@@ -31,7 +31,7 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
-#include<algorithm>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include<numeric>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -77,28 +77,23 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   // fill vector with all 2D arc lengths
   std::vector<double> arc_lengths;
-  std::transform(std::begin(*track),
-                 std::end(*track),
-                 std::back_inserter(arc_lengths),
+  std::transform(begin(*track),
+                 end(*track),
+                 back_inserter(arc_lengths),
   [](const CDCRecoHit3D & recoHit) { return recoHit.getArcLength2D(); });
   // Remove all NAN elements. For some reason, last hit in track is sometimes NAN
-  arc_lengths.erase(std::remove_if(std::begin(arc_lengths),
-                                   std::end(arc_lengths),
-  [](double x) { return std::isnan(x); }),
-  std::end(arc_lengths));
+  erase_remove_if(arc_lengths, [](double x) { return std::isnan(x); });
 
   // calculate gaps in arc length s between adjacent hits
   // beware: first element not a difference but mapped onto itself, empty_s_gaps[0] = arc_lengths[0]
   if (arc_lengths.size() > 1) {
     std::vector<double> empty_s_gaps;
-    std::adjacent_difference(std::begin(arc_lengths),
-                             std::end(arc_lengths),
-                             std::back_inserter(empty_s_gaps));
+    std::adjacent_difference(begin(arc_lengths), end(arc_lengths), back_inserter(empty_s_gaps));
 
     // start filling accumulator with hit gaps, but skip first which is not a difference
-    std::for_each(std::next(std::begin(empty_s_gaps)),
-                  std::end(empty_s_gaps),
-    [&empty_s_acc](double empty_s) { empty_s_acc(empty_s); });
+    std::for_each(next(begin(empty_s_gaps)), end(empty_s_gaps), [&empty_s_acc](double empty_s) {
+      empty_s_acc(empty_s);
+    });
   }
 
   unsigned int empty_s_size = bacc::count(empty_s_acc);

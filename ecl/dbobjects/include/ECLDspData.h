@@ -97,8 +97,10 @@ namespace Belle2 {
      * @brief Initialize DSP coefficients class from binary file.
      * @param board_number Id of specific shaperDSP, 0..11
      */
-    ECLDspData(unsigned char board_number = 0) :
+    explicit ECLDspData(unsigned char board_number = 0) :
       m_boardNumber(board_number),
+      m_verMaj(0),
+      m_verMin(0),
       m_ka(0),
       m_kb(0),
       m_kc(0),

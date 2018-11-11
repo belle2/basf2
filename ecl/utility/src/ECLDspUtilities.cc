@@ -19,6 +19,18 @@ namespace Belle2 {
     /** Version of ECL DSP file format */
     const short ECLDSP_FORMAT_VERSION = 1;
 
+    /**
+     * @brief Read data from file to ptr.
+     * @return Number of times sucessfully read.
+     */
+    void readEclDspCoefs(FILE* fl, void* ptr, int word_size, int word_count)
+    {
+      int read_items = fread(ptr, word_size, word_count, fl);
+      if (read_items != word_count) {
+        B2ERROR("Error reading DSP coefficients");
+      }
+    }
+
     ECLDspData* readEclDsp(const char* filename, int boardNumber)
     {
       FILE* fl;
@@ -33,9 +45,15 @@ namespace Belle2 {
       std::string crate_id_str = std::string(filename - 12 + strlen(filename)).substr(0, 2);
       int crate_id = std::stoi(crate_id_str);
       if (boardNumber > 7) {
-        if (crate_id >= 45 && crate_id <= 52) return data;
+        if (crate_id >= 45 && crate_id <= 52) {
+          fclose(fl);
+          return data;
+        }
         if (boardNumber > 9) {
-          if (crate_id >= 37 && crate_id <= 44) return data;
+          if (crate_id >= 37 && crate_id <= 44) {
+            fclose(fl);
+            return data;
+          }
         }
       }
 
@@ -46,7 +64,7 @@ namespace Belle2 {
       short int id[256];
       int size = fread(id, nsiz, nsiz1, fl);
       if (size != nsiz1) {
-        B2ERROR("Error reading data");
+        B2ERROR("Error reading header of DSP file");
       }
 
       std::vector<short int> extraData;
@@ -73,16 +91,16 @@ namespace Belle2 {
 
       for (int i = 0; i < 16; ++i) {
         nsiz1 = 384;
-        size = fread(&(*(f41.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        readEclDspCoefs(fl, &(*(f41.begin() + i * nsiz1)), nsiz, nsiz1);
         nsiz1 = 3072;
-        size = fread(&(*(f31.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fread(&(*(f32.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fread(&(*(f33.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        readEclDspCoefs(fl, &(*(f31.begin() + i * nsiz1)), nsiz, nsiz1);
+        readEclDspCoefs(fl, &(*(f32.begin() + i * nsiz1)), nsiz, nsiz1);
+        readEclDspCoefs(fl, &(*(f33.begin() + i * nsiz1)), nsiz, nsiz1);
         nsiz1 = 384;
-        size = fread(&(*(f43.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        readEclDspCoefs(fl, &(*(f43.begin() + i * nsiz1)), nsiz, nsiz1);
         nsiz1 = 3072;
-        size = fread(&(*(f.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fread(&(*(f1.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        readEclDspCoefs(fl, &(*(f.begin() + i * nsiz1)), nsiz, nsiz1);
+        readEclDspCoefs(fl, &(*(f1.begin() + i * nsiz1)), nsiz, nsiz1);
       }
       fclose(fl);
 
@@ -195,16 +213,16 @@ namespace Belle2 {
 
       for (int i = 0; i < 16; ++i) {
         nsiz1 = 384;
-        size = fwrite(&(*(f41.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        fwrite(&(*(f41.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 3072;
-        size = fwrite(&(*(f31.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fwrite(&(*(f32.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fwrite(&(*(f33.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        fwrite(&(*(f31.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        fwrite(&(*(f32.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        fwrite(&(*(f33.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 384;
-        size = fwrite(&(*(f43.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        fwrite(&(*(f43.begin() + i * nsiz1)), nsiz, nsiz1, fl);
         nsiz1 = 3072;
-        size = fwrite(&(*(f.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-        size = fwrite(&(*(f1.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        fwrite(&(*(f.begin() + i * nsiz1)), nsiz, nsiz1, fl);
+        fwrite(&(*(f1.begin() + i * nsiz1)), nsiz, nsiz1, fl);
       }
       fclose(fl);
     }

@@ -188,7 +188,7 @@ These methods should be executed inside the ROE loop:
   # Insert a K_S0 candidate into the ROE mask:
   ma.optimizeROEWithV0('K_S0:roe',['cleanMask'],'', path=roe_path)
   # Execute loop for each ROE:
-  mainPath.for_each('RestOfEvent', 'RestOfEvents')
+  mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 These advanced ROE methods can be used for further clean up from beam-induced pollution and for applications of MVA training.
 
@@ -225,9 +225,9 @@ particles from host ROE object:
   # reconstructing a K_S0 inside nested ROE:
   ma.reconstructDecay('K_S0:nestedroe -> pi+:nestedroe pi-:nestedroe', 'p > 0.5', path = nestedroe_path)
   # Execute loop for each nested ROE:
-  roe_path.for_each('RestOfEvent', 'NestedRestOfEvents')
+  roe_path.for_each('RestOfEvent', 'NestedRestOfEvents', path = nestedroe_path)
   # Execute loop for each host ROE:
-  mainPath.for_each('RestOfEvent', 'RestOfEvents')
+  mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 One can execute all possible ROE-related methods using nested ROE objects or loops. 
 

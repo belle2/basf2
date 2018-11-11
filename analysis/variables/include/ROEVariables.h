@@ -134,11 +134,6 @@ namespace Belle2 {
     Manager::FunctionPtr ROE_E(const std::vector<std::string>& arguments);
 
     /**
-     * Returns energy of unused tracks and clusters in ROE in cms.
-     */
-    Manager::FunctionPtr ROE_Ecms(const std::vector<std::string>& arguments);
-
-    /**
      * Returns invariant mass of unused tracks and clusters in ROE
      */
     Manager::FunctionPtr ROE_M(const std::vector<std::string>& arguments);
@@ -164,11 +159,6 @@ namespace Belle2 {
     Manager::FunctionPtr ROE_Pz(const std::vector<std::string>& arguments);
 
     /**
-     * Returns momentum of unused tracks and clusters in ROE in cms
-     */
-    Manager::FunctionPtr ROE_Pcms(const std::vector<std::string>& arguments);
-
-    /**
      * Returns transverse momentum of unused tracks and clusters in ROE
      */
     Manager::FunctionPtr ROE_Pt(const std::vector<std::string>& arguments);
@@ -177,11 +167,6 @@ namespace Belle2 {
      * Returns theta angle of momentum of unused tracks and clusters in ROE
      */
     Manager::FunctionPtr ROE_PTheta(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns theta angle of momentum of unused tracks and clusters in ROE in cms
-     */
-    Manager::FunctionPtr ROE_PThetacms(const std::vector<std::string>& arguments);
 
     /**
      * Returns energy difference of the related RestOfEvent object with respect to E_cms/2 (CMS only)

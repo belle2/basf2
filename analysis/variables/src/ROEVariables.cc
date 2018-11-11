@@ -185,7 +185,7 @@ namespace Belle2 {
     double nROE_KLMClusters(const Particle* particle)
     {
       // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      const RestOfEvent* roe = getRelatedROEObject(particle);
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
@@ -314,7 +314,7 @@ namespace Belle2 {
           mcROE = mcDaughters[0];
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         // Load ROE Tracks
         std::vector<const Track*> roeTracks = roe->getTracks(maskName);
@@ -398,7 +398,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -425,7 +425,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -452,7 +452,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -491,7 +491,7 @@ namespace Belle2 {
       auto func = [pListName, maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -532,7 +532,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -568,7 +568,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -601,7 +601,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -631,7 +631,7 @@ namespace Belle2 {
       else
         B2FATAL("Wrong number of arguments (1 required) for meta function ROE_E");
       auto func = [maskName](const Particle * particle) -> double {
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
@@ -678,7 +678,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -705,7 +705,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -732,7 +732,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -759,7 +759,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -814,7 +814,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -841,7 +841,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -868,7 +868,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -895,7 +895,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -922,7 +922,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -951,7 +951,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1161,7 +1161,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1191,7 +1191,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1221,7 +1221,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1251,7 +1251,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1281,7 +1281,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1311,7 +1311,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1338,7 +1338,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1382,7 +1382,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1518,7 +1518,7 @@ namespace Belle2 {
       auto func = [maskName, option](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1556,7 +1556,7 @@ namespace Belle2 {
       auto func = [arguments, maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1738,7 +1738,7 @@ namespace Belle2 {
     TLorentzVector missing4Vector(const Particle* particle, std::string maskName, const std::string& opt)
     {
       // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      const RestOfEvent* roe = getRelatedROEObject(particle);
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
@@ -1900,7 +1900,16 @@ namespace Belle2 {
       }
       return roe->hasParticle(particle, maskName);
     }
+    const RestOfEvent* getRelatedROEObject(const Particle* particle, bool returnHostOnly)
+    {
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      if (!roe && !returnHostOnly) {
+        roe = particle->getRelatedTo<RestOfEvent>("NestedRestOfEvents");
 
+      }
+      return roe;
+    }
 
     VARIABLE_GROUP("Rest Of Event");
 

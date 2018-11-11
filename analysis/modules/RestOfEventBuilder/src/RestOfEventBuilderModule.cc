@@ -44,8 +44,12 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
+  std::vector<std::string> emptyList;
   addParam("particleList", m_particleList, "Name of the ParticleList");
-  addParam("particleListsInput", m_particleListsInput, "List of the particle lists, which serve as a source of particles");
+  addParam("particleListsInput", m_particleListsInput, "List of the particle lists, which serve as a source of particles", emptyList);
+  addParam("createNestedROE", m_createNestedROE, "A switch to create nested ROE", false);
+  addParam("nestedROEMask", m_nestedMask, "A switch to create nested ROE", std::string(""));
+  m_nestedROEArrayName = "NestedRestOfEvents";
 }
 
 void RestOfEventBuilderModule::initialize()
@@ -59,11 +63,76 @@ void RestOfEventBuilderModule::initialize()
   StoreArray<RestOfEvent> roeArray;
   roeArray.registerInDataStore();
   particles.registerRelationTo(roeArray);
+  if (m_createNestedROE) {
+    StoreArray<RestOfEvent> nestedROEArray(m_nestedROEArrayName);
+    nestedROEArray.registerInDataStore();
+    particles.registerRelationTo(nestedROEArray);
+    roeArray.registerRelationTo(nestedROEArray);
+  }
 }
 
 void RestOfEventBuilderModule::event()
 {
-  // input Particle
+  if (!m_createNestedROE) {
+    createROE();
+  } else {
+    createNestedROE();
+  }
+
+}
+
+
+void RestOfEventBuilderModule::createNestedROE()
+{
+  // input target Particle
+  StoreObjPtr<ParticleList> plist(m_particleList);
+  StoreArray<RestOfEvent> nestedROEArray(m_nestedROEArrayName);
+  StoreObjPtr<RestOfEvent> hostROE("RestOfEvent");
+  if (!hostROE.isValid()) {
+    B2WARNING("ROE list is not valid somehow, nested ROE is not created!");
+    return;
+  }
+  auto outerROEParticles = hostROE->getParticles(m_nestedMask);
+  unsigned int nParticles = plist->getListSize();
+  for (unsigned i = 0; i < nParticles; i++) {
+    B2INFO("Creating nested roe:");
+    B2INFO("Host ROE:");
+    hostROE->print();
+    const Particle* particle = plist->getParticle(i);
+    // check if a Particle object is already related to a RestOfEvent object
+    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    if (check_roe != nullptr) {
+      return;
+    }
+    // create nested RestOfEvent object:
+    RestOfEvent* nestedROE = nestedROEArray.appendNew(true);
+    // create relation: Particle <-> RestOfEvent
+    particle->addRelationTo(nestedROE);
+    // create relation: host ROE <-> nested ROE
+    hostROE->addRelationTo(nestedROE);
+    auto fsdaughters =  particle->getFinalStateDaughters();
+    std::vector<const Particle* > particlesToAdd;
+    for (auto* outerROEParticle : outerROEParticles) {
+      bool toAdd = true;
+      for (auto* daughter : fsdaughters) {
+        if (RestOfEvent::compareParticles(outerROEParticle, daughter)) {
+          toAdd = false;
+          break;
+        }
+      }
+      if (toAdd) {
+        particlesToAdd.push_back(outerROEParticle);
+      }
+    }
+    nestedROE->addParticles(particlesToAdd);
+    B2INFO("Nested ROE:");
+    nestedROE->print();
+  }
+}
+
+void RestOfEventBuilderModule::createROE()
+{
+  // input target Particle
   StoreObjPtr<ParticleList> plist(m_particleList);
 
   // output

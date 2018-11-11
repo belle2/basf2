@@ -334,6 +334,10 @@ namespace Belle2 {
      * temp
      */
     Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments);
+    /**
+     * returns related nested or host ROE
+     */
+    const RestOfEvent* getRelatedROEObject(const Particle* particle, bool returnHostOnly = false);
   }
 } // Belle2 namespace
 

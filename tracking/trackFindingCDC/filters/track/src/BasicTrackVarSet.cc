@@ -77,27 +77,20 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   unsigned int empty_s_size = bacc::count(empty_s_acc);
 
+  // Overwrite boost-accumulator behavior for containers with 0 or 1 elements
+  // Set variances containers with for 0/1 elements to -1 (boost default: nan/0 respectively)
   double drift_length_variance = -1;
   double adc_variance = -1;
-  double empty_s_variance = -1;
-  double empty_s_sum = -1;
-  double empty_s_min = -1;
-  double empty_s_max = -1;
-  double empty_s_mean = -1;
-
   if (size > 1) {
-    drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * size / (size - 1));
-    adc_variance = std::sqrt(bacc::variance(adc_acc) * size / (size - 1));
+    // for more than two elements, calculate variance with bessel correction
+    double bessel_corr = size / (size - 1);
+    drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * bessel_corr);
+    adc_variance = std::sqrt(bacc::variance(adc_acc) * bessel_corr);
   }
-
-  if (empty_s_size > 0) {
-    empty_s_sum = bacc::sum(empty_s_acc);
-    empty_s_min = bacc::min(empty_s_acc);
-    empty_s_max = bacc::max(empty_s_acc);
-    empty_s_mean = bacc::mean(empty_s_acc);
-    if (empty_s_size > 1) {
-      empty_s_variance = std::sqrt(bacc::variance(empty_s_acc) * empty_s_size / (empty_s_size - 1));
-    }
+  double empty_s_variance = -1;
+  if (empty_s_size > 1) {
+    double empty_s_bessel_corr = empty_s_size / (empty_s_size - 1);
+    empty_s_variance = std::sqrt(bacc::variance(empty_s_acc) * empty_s_bessel_corr);
   }
 
   const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
@@ -125,11 +118,14 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   var<named("has_matching_segment")>() = track->getHasMatchingSegment();
 
-  var<named("empty_s_mean")>() = toFinite(empty_s_mean, 0);
-  var<named("empty_s_sum")>() = toFinite(empty_s_sum, 0);
+  var<named("empty_s_mean")>() = toFinite(bacc::mean(empty_s_acc), 0);
+  var<named("empty_s_sum")>() = toFinite(bacc::sum(empty_s_acc), 0);
   var<named("empty_s_variance")>() = toFinite(empty_s_variance, 0);
-  var<named("empty_s_max")>() = toFinite(empty_s_max, 0);
-  var<named("empty_s_min")>() = toFinite(empty_s_min, 0);
+  // bacc::min/max returns max/min double for no entries which happens for empty_s
+  // toFinite only works here because of implicit conversion to float, turning max doubles to inf
+  // TODO: This is future-unsafe, write tests to ensure that this works
+  var<named("empty_s_max")>() = toFinite(bacc::max(empty_s_acc), 0);
+  var<named("empty_s_min")>() = toFinite(bacc::min(empty_s_acc), 0);
   var<named("s_range")>() = toFinite(s_range, 0);
 
   return true;

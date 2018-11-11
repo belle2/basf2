@@ -95,9 +95,6 @@ void RestOfEventBuilderModule::createNestedROE()
   auto outerROEParticles = hostROE->getParticles(m_nestedMask);
   unsigned int nParticles = plist->getListSize();
   for (unsigned i = 0; i < nParticles; i++) {
-    B2INFO("Creating nested roe:");
-    B2INFO("Host ROE:");
-    hostROE->print();
     const Particle* particle = plist->getParticle(i);
     // check if a Particle object is already related to a RestOfEvent object
     RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
@@ -125,8 +122,6 @@ void RestOfEventBuilderModule::createNestedROE()
       }
     }
     nestedROE->addParticles(particlesToAdd);
-    B2INFO("Nested ROE:");
-    nestedROE->print();
   }
 }
 

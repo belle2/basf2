@@ -66,29 +66,29 @@ namespace Belle2 {
      * Initializes Geant4, calls the geometry converter, creates the physics processes and
      * create the user actions.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when a new run is started.
      *
      * Initializes the Geant4 run manager and sets the run number in Geant4.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Performs the full Geant4 simulation.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Called when run has ended.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Terminates the module.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:

@@ -45,32 +45,32 @@ namespace Belle2 {
     /**
      * Defining the histograms
      */
-    void defineHisto();
+    void defineHisto() override;
 
     /**
      * Initialize the module
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * Called when entering a new run
      */
-    void beginRun();
+    void beginRun() override;
 
     /**
      * Event processor
      */
-    void event();
+    void event() override;
 
     /**
      * End-of-run action
      */
-    void endRun();
+    void endRun() override;
 
     /**
      * Termination action
      */
-    void terminate();
+    void terminate() override;
 
     /**
      * Flag hit quality

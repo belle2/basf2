@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleVertexTool.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>
@@ -67,14 +67,14 @@ void NtupleVertexTool::deallocateMemory()
   }
   delete [] m_fProdCov;
   delete [] m_fProdV;
-  delete m_fPvalue;
-  delete m_fDRho;
-  delete m_fDEZ;
-  delete m_fDEY;
-  delete m_fDEX;
-  delete m_fDZ;
-  delete m_fDY;
-  delete m_fDX;
+  delete [] m_fPvalue;
+  delete [] m_fDRho;
+  delete [] m_fDEZ;
+  delete [] m_fDEY;
+  delete [] m_fDEX;
+  delete [] m_fDZ;
+  delete [] m_fDY;
+  delete [] m_fDX;
 }
 
 void NtupleVertexTool::eval(const Particle* particle)

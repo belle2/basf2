@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef KFITBASE_H
-#define KFITBASE_H
-
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -28,16 +25,12 @@
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitTrack.h>
 
-
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
 
-
 namespace Belle2 {
-
   namespace analysis {
-
     /**
      * KFitBase is a base class for kinematical fitters.
      */
@@ -63,7 +56,8 @@ namespace Belle2 {
        * @param q charge of the track
        * @return error code (zero if success)
        */
-      enum KFitError::ECode               addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q);
+      enum KFitError::ECode               addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
+                                                   const double q);
       /** Set a correlation matrix.  Not intended for end user's use.
        * @param c (7x7) correlation matrix
        * @return error code (zero if success)
@@ -131,7 +125,8 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return (7x7) correlation matrix
        */
-      virtual const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
+      virtual const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2,
+                                                                const int flag = KFitConst::kAfterFit) const;
 
 
     public:
@@ -154,7 +149,8 @@ namespace Belle2 {
        * @param e (6x6) error matrix
        * @return (7x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e) const;
+      const CLHEP::HepMatrix    makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
+                                           const CLHEP::HepMatrix& e) const;
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x6) error matrix
@@ -175,7 +171,8 @@ namespace Belle2 {
        * @param is_fix_mass true to recalculate energy term from other parameters, false to do nothing
        * @return (7x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const;
+      const CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
+                                           const CLHEP::HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const;
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x7) error matrix
@@ -310,5 +307,4 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif /* B2KFIT_BASE_H */
 

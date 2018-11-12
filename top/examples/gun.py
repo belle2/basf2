@@ -34,14 +34,6 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('components', [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-])
 main.add_module(geometry)
 
 # Particle gun: generate multiple tracks
@@ -89,6 +81,9 @@ add_tracking_reconstruction(main)
 # Track extrapolation
 ext = register_module('Ext')
 main.add_module(ext)
+
+# Channel masker
+main.add_module('TOPChannelMasker')
 
 # TOP reconstruction
 topreco = register_module('TOPReconstructor')

@@ -18,7 +18,7 @@ template class TrackFindingCDC::MVA<BaseSegmentRelationFilter>;
 
 MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
   : Super(std::make_unique<VarSet>(),
-          "tracking/data/trackfindingcdc_RealisticSegmentRelationFilter.xml",
+          "trackfindingcdc_RealisticSegmentRelationFilter",
           0.805)
 {
   this->addProcessingSignalListener(&m_feasibleSegmentRelationFilter);

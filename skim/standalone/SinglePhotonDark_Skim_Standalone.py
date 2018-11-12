@@ -15,7 +15,7 @@ from stdCharged import loadStdCharged
 from stdPhotons import stdPhotons
 from skimExpertFunctions import setSkimLogging, encodeSkimName
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 
 fileList = [
@@ -23,7 +23,7 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC10', fileList)
 
 stdPhotons('all')
 loadStdCharged()

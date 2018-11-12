@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 from abc import ABC, abstractmethod
 import subprocess
 import multiprocessing as mp
@@ -643,7 +644,7 @@ class Local(Backend):
         # Create unix command to redirect stdour and stderr
         B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(name, stdout_file_path))
         with open(stdout_file_path, 'w', buffering=1) as f_out:
-            with Popen(["/bin/bash", "-l", script],
+            with Popen(["/bin/bash", script],
                        stdout=PIPE,
                        stderr=STDOUT,
                        bufsize=1,

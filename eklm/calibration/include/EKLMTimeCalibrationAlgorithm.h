@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONALGORITHM_H
-#define EKLMTIMECALIBRATIONALGORITHM_H
+#pragma once
 
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
@@ -46,7 +45,7 @@ namespace Belle2 {
     /**
      * Calibration.
      */
-    CalibrationAlgorithm::EResult calibrate();
+    CalibrationAlgorithm::EResult calibrate() override;
 
     /**
      * Turn on debug mode (prints histograms).
@@ -67,6 +66,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

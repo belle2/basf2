@@ -1,13 +1,14 @@
 /*
 <header>
-  <input>../3110021000.dst.root</input>
-  <output>../3110021000.ntup.root</output>
+  <input>../3110021000.ntup.root</input>
+  <output>3110021000_Validation.root</output>
+  <contact>Maeda Yosuke (maeday@hepl.phys.nagoya-u.ac.jp)</contact>
 </header>
 */
 
 ////////////////////////////////////////////////////////////////
 //
-// Analysis Code (make Ntuple for validation of ee->pipigamma)
+// Analysis Code (make plots for validation of ee->pipigamma)
 // contributor : Maeda Yosuke (KMI, Nagoya Univ.)
 //               maeday@hepl.phys.nagoya-u.ac.jp  (March 2018)
 //

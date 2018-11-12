@@ -116,20 +116,20 @@ namespace Belle2 {
     ~ECLWaveformFitModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** begin run.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** event per event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** end run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** ECLDigits Array Name.*/
     virtual const char* eclDigitArrayName() const
@@ -145,13 +145,16 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigits;   /** StoreArray ECLDigit*/
 
     double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
-    double m_TriggerThreshold;  /**energy threshold for waveform trigger.*/
+    double m_chi2Threshold;  /*chi2 threshold to classify offline fit as good fit*/
     bool m_TemplatesLoaded;  /**Flag to indicate if waveform templates are loaded from database.*/
     void loadTemplateParameterArray(bool IsDataFlag);  /** loads waveform templates from database.*/
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
 
     TMinuit* m_Minit2h;   /** minuit minimizer for optimized fit*/
+    TMinuit* m_Minit2h2;   /** minuit minimizer for optimized fit with background photon*/
     void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /** Optimized fit using hadron component model*/
+    void Fit2hExtraPhoton(double& b, double& a0, double& t0, double& a1, double& A2, double& T2,
+                          double& chi2);  /** Optimized fit using hadron component model plus out of time background photon*/
     SignalInterpolation2 m_si[8736][3];  /**ShaperDSP signal shapes.*/
 
     CovariancePacked m_c[8736];  /** Packed covariance matrices */

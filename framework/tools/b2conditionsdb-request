@@ -1,0 +1,250 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""Tool to request an update of a global tag.
+
+The command takes the name of a local database file as argument. It asks several
+questions and then issues a request to update one or more global tags.
+"""
+
+import sys
+import os
+import datetime
+import argparse
+import requests
+import re
+import subprocess
+import getpass
+import requests
+import json
+from versioning import upload_global_tag, jira_global_tag
+
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s localdb"
+    )
+    parser.add_argument('localdb', help='Name of the local database file')
+    return parser
+
+
+def staging_global_tag(task, data, time):
+    """
+    Get name of a staging global tag for the given task
+    """
+
+    if data[task] is not None:
+        return data[task]
+    return 'staging_%s_%s_%s' % (task, data['user'], time)
+
+
+def upload_payloads(localdb, task, data, time, iovs):
+    """
+    Upload the local database to the staging global tag for the given task and optionally adjust the IoVs
+    """
+
+    upload_localdb = localdb
+    if iovs is not None:
+        upload_localdb = '%s_%s_%s' % (localdb, task, time)
+        dbfile = open(upload_localdb, 'w')
+        payloads = []
+        for entry in open(localdb).readlines():
+            (payload, revision, current_iov) = entry.split()
+            if payload in payloads:
+                print('WARNING: Duplicate payload %s' % payload)
+            payloads.append(payload)
+            for iov in iovs:
+                dbfile.write('%s %s %s\n' % (payload, revision, iov))
+        dbfile.close()
+
+    global_tag = staging_global_tag(task, data, time)
+    if data[task] is None:
+        data[task] = global_tag
+        print('\nCreating new global tag %s' % (global_tag))
+        if subprocess.call(['b2conditionsdb', 'tag', 'create', 'DEV', global_tag, data['reason']]) != 0:
+            print('ERROR: Creation of global tag failed.')
+            sys.exit(1)
+
+    print('\nUploading local database %s to global tag %s' % (upload_localdb, global_tag))
+    if subprocess.call(['b2conditionsdb', 'upload', global_tag, upload_localdb]) != 0:
+        print('ERROR: Upload of payloads failed.')
+        sys.exit(1)
+
+    if iovs is not None:
+        os.remove(upload_localdb)
+
+
+def create_jira_issue(task, data, time, password):
+    """
+    Create a jira sub-issue for the given request
+    """
+
+    issue = jira_global_tag(task)
+    if issue is None:
+        return
+
+    global_tag = staging_global_tag(task, data, time)
+    keys = data
+    keys['task'] = task
+    keys['time'] = time
+    if "summary" in issue.keys():
+        issue["summary"] = issue["summary"].format(**keys)
+    else:
+        issue["summary"] = 'Global tag request for %s by %s at %s' % (task, data['user'], time)
+    issue["description"] = """
+Upload global tag : %s
+Request reason : %s
+Required release : %s
+Type of request : %s
+""" % (data[task], data['reason'], data['release'], data['request'])
+    if task == 'master':
+        issue["description"] += 'Branch              : %s\nPhase               : %s\n' % (data['master_branch'], data['master_phases'])
+    elif task == 'online':
+        issue["description"] += 'Software update     : %s\n' % data['online_update']
+    if 'details' in data.keys():
+        issue["description"] += 'Details :\n' + ''.join(data['details'])
+    issue["description"] += '\nPayloads/IoVs :\n' + ''.join(data['content'])
+
+    print('\nCreating jira issue for %s global tag request' % task)
+    response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password), json={'fields': issue})
+    if response.status_code in range(200, 210):
+        print('Issue successfully created: %s' % response.json()['key'])
+    else:
+        print('ERROR: The creation of the issue failed:')
+        print(response)
+        print(response.text)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    # parse arguments
+    options, args = get_argument_parser().parse_known_args()
+    localdb = options.localdb
+
+    # check whether the local database file exist
+    if not os.path.isfile(localdb):
+        sys.stderr.write('ERROR: The local database file %s does not exist.\n' % (localdb))
+        sys.exit(1)
+
+    # get local database content
+    content = open(localdb).read()
+    print('The content of the local database %s is:' % localdb)
+    print(content)
+    print('If you want to select a subset, quit now and create a new local database file with the desired subset of IoVs.')
+    if input('- Continue (y/n) [y]? ').lower() not in ['y', '']:
+        sys.exit(0)
+
+    # ask user for payload request information
+    tasks = ['master', 'online', 'data', 'mc', 'analysis']
+    data = {}
+
+    data['content'] = content
+    data['user'] = os.environ['BELLE2_USER']
+    username = input('\nConfirm your DESY user name by pressing enter or type the correct one [%s]: ' % data['user'])
+    if username  != '':
+        data['user'] = username
+    data['reason'] = input('\nPlease describe the reason for the request: ')
+    data['release'] = input('\nThe new payloads require at least the following software release: ')
+
+    print("""\nOf which type is the request?
+    - [A]ddition: New payloads are added. No changes of other payloads are required.
+    - [U]pdate: Payloads with the given names already exist and have the same type as the new ones, only the values are different. Superseded existing payloads will be removed.
+    - [C]hange: Payloads with the given names already exist, but have a different type than the new ones. All existing payloads will be removed.""")
+    while True:
+        request = input('a/u/c: ').lower()
+        if request in ['a', 'u', 'c']:
+            break
+    request_text = {'a': 'Addition', 'u': 'Update', 'c': 'Change'}
+    data['request'] = request_text[request]
+
+    print('\nWhich global tags are affected?')
+    if input('- master for software development (y/n) [n]? ').lower() == 'y':
+        data['master'] = upload_global_tag('master')
+        data['master_branch'] = input('  -> The code changes, that must be synchronized with the payload update, are in the branch: ')
+        data['master_phases'] = '2+3'
+        if (input('  -> Are the payloads for phase 2 and 3 (y/n) [y]? ').lower() == 'n'):
+            if (input('  -> Are the payloads for phase 3 (y/n) [y]? ').lower() == 'n'):
+                data['master_phases'] = '2'
+            else:
+                data['master_phases'] = '3'
+    if input('- online for HLT and express reco (y/n) [n]? ').lower() == 'y':
+        data['online'] = upload_global_tag('online')
+        data['online_update'] = input('  -> The update of the payload must be synchronized with an update of the software (y/n) [y]? ').lower() in ['y', '']
+    if input('- data for data (re)processing and MC production (y/n) [n]? ').lower() == 'y':
+        data['data'] = upload_global_tag('data')
+    elif input('- mc for payloads that differ from those in the data GT (y/n) [n]? ').lower() == 'y':
+        data['mc'] = upload_global_tag('mc')
+    elif input('- analysis for analysis tools conditions (y/n) [n]? ').lower() == 'y':
+        data['analysis'] = upload_global_tag('analysis')
+    elif 'master' not in data.keys() and 'online' not in data.keys():
+        print('\nNo global tag selected -> Exiting')
+        print('\nIf you want to add already uploaded payloads to a new global tag, send the request including the list of payload names, the source, and the destination global tag to mgt-global-tag@belle2.org.')
+        sys.exit(1)
+
+    if len(set(data.keys()) & set(['data', 'mc', 'analysis'])) > 0:
+        print('\nEnter detailed instructions about targeted global tags/releases and the update procedure and then hit CTRL-D:')
+        data['details'] = sys.stdin.readlines()
+
+    # summarize request and ask for confirmation
+    time = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
+    print("""\nSUMMARY:
+Local database      : %s
+Request reason      : %s
+Required release    : %s
+Type of request     : %s
+Affected global tags: """ % (localdb, data['reason'], data['release'], data['request']))
+    for task in tasks:
+        if task in data.keys():
+            add = ''
+            if task == 'master':
+                add = '  (branch=%s, phase=%s)' % (data['master_branch'], data['master_phases'])
+            elif task == 'online' and data['online_update']:
+                add = '  (software update required)'
+            print('  %16s -> %s%s' % (task, staging_global_tag(task, data, time), add))
+    if 'details' in data.keys():
+        print('Details :')
+        print(''.join(data['details']))
+    print('')
+    if input('- Is the above information correct (y/n) [n]? ').lower() != 'y':
+       sys.exit(0)
+
+    while True:
+        password = getpass.getpass("\nPlease give your DESY password to authenticate the request: ")
+        response = requests.get('https://b2-master.belle2.org', auth=(data['user'], password))
+        if response.status_code == 401:
+            print('Authorization failed. Please try again.')
+        else:
+            break
+
+    # create jira issues and upload to staging global tags
+    for task in tasks:
+        if task in data.keys():
+            iovs = None
+            if task == 'master':
+                iovs = []
+                if '3' in data['master_phases']:
+                    iovs.append('0,0,0,-1')
+                if '2' in data['master_phases']:
+                    iovs.append('1002,0,1002,-1')
+            elif task == 'online' and data['online_update']:
+                iovs = ['0,0,-1,-1']
+            create_jira_issue(task, data, time, password)
+            upload_payloads(localdb, task, data, time, iovs)
+
+    # send information to web service
+    user = re.search('user=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
+    password = re.search('password=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
+    response = requests.post('https://b2-master.belle2.org/cgi-bin/global_tag_request.py', auth=(user, password), data=data)
+    if response.status_code == 200:
+        print('\nRequest successfully submitted.')
+    else:
+        print('\nERROR: The request submission failed:')
+        print(response)
+        print(response.text)

@@ -45,16 +45,16 @@ namespace Belle2 {
   private:
     //int m_interval;
     std::string m_input_name;
-    TFile* m_file;
+    TFile* m_file = nullptr;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     std::map<std::string, TCanvas*> m_cs;
     std::vector<std::string> m_folders;
 
     //! Exp number, Run number
-    unsigned int m_expno;
-    unsigned int m_runno;
-    unsigned int m_count;
+    unsigned int m_expno = 0;
+    unsigned int m_runno = 0;
+    unsigned int m_count = 0;
   };
 } // end namespace Belle2
 

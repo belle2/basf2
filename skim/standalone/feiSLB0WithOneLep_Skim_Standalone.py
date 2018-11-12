@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = "R. Cheaib & S. Hollitt"
+"""FEI Semi-leptonic B0 tag skim standalone for generic analysis in the
+    (Semi-)Leptonic and Missing Energy Working Group
+    Skim LFN code: 11180300
+    fei training: MC9 based, release-02-00-01 'FEIv4_2018_MC9_release_02_00_01'
+    """
+
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
 
 import sys
 import glob
@@ -14,7 +20,7 @@ from beamparameters import add_beamparameters
 from stdCharged import *
 from skimExpertFunctions import *
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 skimCode = encodeSkimName('feiSLB0WithOneLep')
 
 
@@ -34,7 +40,7 @@ use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_da
 
 import fei
 particles = fei.get_default_channels(neutralB=True, chargedB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
@@ -44,8 +50,8 @@ analysis_main.add_path(feistate.path)
 # and we're back in analysis_main pathB
 
 # SL B0 skim
-from feiSLB0WithOneLep_List import *
-BtagList = B0SLWithOneLep()
+from skim.fei import B0SLWithOneLep
+BtagList = B0SLWithOneLep(analysis_main)
 skimOutputUdst(skimCode, BtagList)
 summaryOfLists(BtagList)
 

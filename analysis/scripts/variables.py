@@ -9,7 +9,7 @@ Details can be found on https://confluence.desy.de/display/BI/Physics+VariableMa
 You can also run ``basf2 variables.py`` to list all available variables.
 """
 
-from basf2 import *
+import basf2.utils as b2utils
 from ROOT import gSystem
 import argparse
 import pager
@@ -59,7 +59,7 @@ def printVars():
             current_group = group
             rows.append([group])
         rows.append([name, description])
-    pretty_print_description_list(rows)
+    b2utils.pretty_print_description_list(rows)
 
 
 if __name__ == "__main__":

@@ -203,6 +203,7 @@ if not skipFirst:
 
     # Geometry (only TOP needed)
     geometry = register_module('Geometry')
+    geometry.param('useDB', False)
     geometry.param('components', ['TOP'])
     first.add_module(geometry)
 

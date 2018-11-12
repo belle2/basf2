@@ -43,7 +43,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
   FSRCorrectionModule::FSRCorrectionModule() :
-    Module()
+    Module(), m_pdgCode(0), m_maxAngle(-1.0)
 
   {
     // set module description (e.g. insert text)
@@ -59,9 +59,6 @@ namespace Belle2 {
     addParam("energyThreshold", m_energyThres, "The maximum energy of the (radiative) gamma to be accepted.", 1.0);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
-
-    // initializing the rest of private members
-    m_pdgCode   = 0;
   }
 
   void FSRCorrectionModule::initialize()

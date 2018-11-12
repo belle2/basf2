@@ -46,22 +46,22 @@ namespace Belle2 {
     virtual ~ECLBackgroundModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** beginRun */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event method  */
-    virtual void event();
+    virtual void event() override;
 
     /** endRun */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Initalize the histograms*/
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
 

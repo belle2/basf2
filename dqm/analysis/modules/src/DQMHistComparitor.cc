@@ -214,7 +214,7 @@ DQMHistComparitorModule::CMPNODE* DQMHistComparitorModule::find_pnode(TString a)
 void DQMHistComparitorModule::event()
 {
   const HistList& hlist = getHistList();
-  for (HistList::const_iterator ihl = hlist.begin(); ihl != hlist.end(); ihl++) {
+  for (HistList::const_iterator ihl = hlist.begin(); ihl != hlist.end(); ++ihl) {
     TString a = ihl->first;
 
     CMPNODE* it = find_pnode(a);
@@ -253,8 +253,8 @@ void DQMHistComparitorModule::event()
     // if compare normalized ... does not work!
     // hist2->Scale(hist1->GetEntries()/hist2->GetEntries());
 
-    double data = 0.0;
-    data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
+    //double data = 0.0;
+    double data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
     //     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
     //     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
     //     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);

@@ -133,7 +133,7 @@ namespace Belle2 {
      * Returns glue thickness (no glue on -z side, instead there is a wavelength filter)
      * @return thickness
      */
-    double getGlueThickness() const {return 0;}
+    double getGlueThickness() const override {return 0;}
 
     /**
      * Returns cookie size in x (corresponding to 2x2 PMT)
@@ -180,13 +180,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Prism geometry parameters") const;
+    void print(const std::string& title = "Prism geometry parameters") const override;
 
 
   private:
@@ -200,7 +200,7 @@ namespace Belle2 {
     std::string m_peelOffMaterial; /**< material name of peel-off volume */
     std::vector<PeelOffRegion> m_peelOffRegions; /**< peel-off regions */
 
-    ClassDef(TOPGeoPrism, 2); /**< ClassDef */
+    ClassDefOverride(TOPGeoPrism, 2); /**< ClassDef */
 
   };
 

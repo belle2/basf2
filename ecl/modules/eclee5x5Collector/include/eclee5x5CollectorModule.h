@@ -65,15 +65,15 @@ namespace Belle2 {
     StoreObjPtr<TRGSummary> m_TRGResults; /**< dataStore TRGSummary */
 
     /** Some other useful quantities */
-    double m_thetaLabMin;  /**< m_thetaLabMinDeg converted to radians */
-    double m_thetaLabMax;  /**< m_thetaLabMaxDeg converted to radians */
+    double m_thetaLabMin = 0.;  /**< m_thetaLabMinDeg converted to radians */
+    double m_thetaLabMax = 0.;  /**< m_thetaLabMaxDeg converted to radians */
     std::vector<float> m_dPhiMin; /**< minimum dPhi* as a function of thetaID */
     std::vector<float> m_dPhiMax; /**< maximum dPhi* as a function of thetaID */
     bool storeCalib = true; /**< force the input calibration constants to be saved first event */
     std::vector<float> EperCrys; /**< Energy for each crystal from ECLDigit or ECLCalDigit (GeV) */
-    ECL::ECLNeighbours* m_eclNeighbours5x5; /**< Neighbour map of 25 crystals */
+    ECL::ECLNeighbours* m_eclNeighbours5x5{nullptr}; /**< Neighbour map of 25 crystals */
     PCmsLabTransform m_boostrotate; /**< boost from COM to lab and visa versa */
-    double m_sqrts; /**< sqrt s from m_boostrotate */
+    double m_sqrts = 10.58; /**< sqrt s from m_boostrotate */
     std::vector<int> m_thetaID; /**< thetaID of each crystal */
 
     /** Expected energies from database */

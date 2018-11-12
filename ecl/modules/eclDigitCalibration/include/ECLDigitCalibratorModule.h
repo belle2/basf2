@@ -145,8 +145,8 @@ namespace Belle2 {
 
     // new time calibration from Kim and Chris
     std::string m_fileBackgroundName; /**< Background filename. */
-    TFile* m_fileBackground; /**< Background file. */
-    TH1F* m_th1fBackground; /**< Background histogram. */
+    TFile* m_fileBackground{nullptr}; /**< Background file. */
+    TH1F* m_th1fBackground{nullptr}; /**< Background histogram. */
 
     const double c_pol2Var1 = 1684.0; /**< 2-order fit for p1 Var1 + Var2*bg + Var3*bg^2. */
     const double c_pol2Var2 = 3080.0; /**< 2-order fit for p1. */

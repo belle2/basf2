@@ -110,32 +110,6 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
 
   // Set parallel processing flag.
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  // initialize all pointer to null
-  m_NeighbourMap9 = nullptr;
-  m_NeighbourMap21 = nullptr;
-  m_fileBackgroundNorm = nullptr;
-  m_fileNOptimalBWD = nullptr;
-  m_fileNOptimalBarrel = nullptr;
-  m_fileNOptimalFWD = nullptr;
-  m_geom = nullptr;
-
-  for (unsigned t = 0; t < 10; ++t) {
-    for (unsigned s = 0; s < c_nSectorCellIdBWD[t]; ++s) {
-      m_tg2dNOptimalBWD[t][s] = nullptr;
-    }
-  }
-
-  m_tg2dNOptimalBarrel = nullptr;
-
-  for (unsigned t = 0; t < 13; ++t) {
-    for (unsigned s = 0; s < c_nSectorCellIdFWD[t]; ++s) {
-      m_tg2dNOptimalFWD[t][s] = nullptr;
-    }
-  }
-
-  m_th1fBackgroundNorm = nullptr;
-
 }
 
 ECLSplitterN1Module::~ECLSplitterN1Module()

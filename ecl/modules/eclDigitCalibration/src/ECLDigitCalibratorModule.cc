@@ -85,9 +85,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   m_averageBG = 0;
-  m_fileBackground = nullptr;
   m_pol2Max = 0.0;
-  m_th1fBackground = nullptr;
   m_timeInverseSlope = 0.0;
 
 }

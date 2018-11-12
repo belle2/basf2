@@ -90,14 +90,14 @@ namespace Belle2 {
     std::string m_fileNOptimalFWDName; /**< FWD number of optimal neighbours filename. */
     std::string m_fileNOptimalBarrelName; /**< Barrel number of optimal neighbours filename. */
     std::string m_fileNOptimalBWDName; /**< BWD number of optimal neighbours filename. */
-    TFile* m_fileBackgroundNorm; /**< Background normalization file. */
-    TFile* m_fileNOptimalFWD; /**< FWD number of optimal neighbours. */
-    TFile* m_fileNOptimalBarrel; /**< Barrel number of optimal neighbours. */
-    TFile* m_fileNOptimalBWD; /**< BWD number of optimal neighbours. */
-    TH1F* m_th1fBackgroundNorm; /**< Background normalization histogram. */
-    TGraph2D* m_tg2dNOptimalFWD[13][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
-    TGraph2D* m_tg2dNOptimalBWD[10][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
-    TGraph2D* m_tg2dNOptimalBarrel; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TFile* m_fileBackgroundNorm{nullptr}; /**< Background normalization file. */
+    TFile* m_fileNOptimalFWD{nullptr}; /**< FWD number of optimal neighbours. */
+    TFile* m_fileNOptimalBarrel{nullptr}; /**< Barrel number of optimal neighbours. */
+    TFile* m_fileNOptimalBWD{nullptr}; /**< BWD number of optimal neighbours. */
+    TH1F* m_th1fBackgroundNorm{nullptr}; /**< Background normalization histogram. */
+    TGraph2D* m_tg2dNOptimalFWD[13][9] {}; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TGraph2D* m_tg2dNOptimalBWD[10][9] {}; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TGraph2D* m_tg2dNOptimalBarrel{nullptr}; /**< Array of 2D graphs used for interpolation between background and energy. */
 
     // Position
     std::string m_positionMethod;  /**< Position calculation: lilo or linear */
@@ -132,8 +132,8 @@ namespace Belle2 {
     std::vector< int > m_cellIdInCR;
 
     /** Neighbour maps */
-    ECL::ECLNeighbours* m_NeighbourMap9; /**< 3x3 = 9 neighbours */
-    ECL::ECLNeighbours* m_NeighbourMap21; /**< 5x5 neighbours excluding corners = 21 */
+    ECL::ECLNeighbours* m_NeighbourMap9{nullptr}; /**< 3x3 = 9 neighbours */
+    ECL::ECLNeighbours* m_NeighbourMap21{nullptr}; /**< 5x5 neighbours excluding corners = 21 */
 
     /** Store array: ECLCalDigit. */
     StoreArray<ECLCalDigit> m_eclCalDigits;
@@ -171,7 +171,7 @@ namespace Belle2 {
     { return "EventLevelClusteringInfo" ; }
 
     /** Geometry */
-    ECL::ECLGeometryPar* m_geom;
+    ECL::ECLGeometryPar* m_geom{nullptr};
 
     /** Split connected region into showers. */
     void splitConnectedRegion(ECLConnectedRegion& aCR);

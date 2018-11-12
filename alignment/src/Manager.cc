@@ -21,7 +21,6 @@ namespace Belle2 {
       vector.addDBObj<BeamParameters>();
       vector.addDBObj<VXDAlignment>(vxdInterface);
       vector.addDBObj<CDCAlignment>(cdcInterface);
-      vector.addDBObj<CDCLayerAlignment>(cdcInterface);
       vector.addDBObj<CDCTimeZeros>(cdcInterface);
       vector.addDBObj<CDCTimeWalks>(cdcInterface);
       vector.addDBObj<CDCXtRelations>(cdcInterface);

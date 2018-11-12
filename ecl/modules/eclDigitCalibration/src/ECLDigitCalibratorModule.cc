@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 // ROOT
-#include "TH1D.h"
+#include "TH1F.h"
 #include "TFile.h"
 
 // ECL
@@ -87,7 +87,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   m_averageBG = 0;
   m_fileBackground = nullptr;
   m_pol2Max = 0.0;
-  m_th1dBackground = nullptr;
+  m_th1fBackground = nullptr;
   m_timeInverseSlope = 0.0;
 
 }
@@ -146,11 +146,11 @@ void ECLDigitCalibratorModule::initialize()
   // read the Background correction factors (for full background)
   m_fileBackground = new TFile(m_fileBackgroundName.c_str(), "READ");
   if (!m_fileBackground) B2FATAL("Could not find file: " << m_fileBackgroundName);
-  m_th1dBackground = dynamic_cast<TH1D*>(m_fileBackground->Get("background"));
-  if (!m_th1dBackground) B2FATAL("Could not find m_th1dBackground");
+  m_th1fBackground = dynamic_cast<TH1F*>(m_fileBackground->Get("background"));
+  if (!m_th1fBackground) B2FATAL("Could not find m_th1fBackground");
 
-  // average BG value from m_th1dBackground
-  m_averageBG = m_th1dBackground->Integral() / m_th1dBackground->GetEntries();
+  // average BG value from m_th1fBackground
+  m_averageBG = m_th1fBackground->Integral() / m_th1fBackground->GetEntries();
 
   // get maximum position ("x") of 2-order pol background for t99
   if (fabs(c_pol2Var3) > 1e-12) {
@@ -340,7 +340,7 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
   if (fitfailed) return c_timeResolutionForFitFailed;
 
   // Get the background level [MeV / mus]
-  const double bglevel = TMath::Min((double) bgcount / (double) c_nominalBG * m_th1dBackground->GetBinContent(cellid) / m_averageBG,
+  const double bglevel = TMath::Min((double) bgcount / (double) c_nominalBG * m_th1fBackground->GetBinContent(cellid) / m_averageBG,
                                     m_pol2Max); // c_nominalBG = 183 for actual version of digitizer, m_averageBG is about 2 MeV/ mus
 
   // Get p1 as function of background level
@@ -356,7 +356,7 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
   // for high energies we fix t99 to 3.5ns
   if (t99 < c_minT99) t99 = c_minT99;
 
-  B2DEBUG(35, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1dBackground->GetBinContent(
+  B2DEBUG(35, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1fBackground->GetBinContent(
             cellid) << ", bglevel = " << bglevel << ", cellid = " << cellid << ", t99 = " << t99 << ", energy = " << energy /
           Belle2::Unit::MeV);
 

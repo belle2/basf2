@@ -63,7 +63,10 @@ def getLocalRunFileList(path):
         spath = os.path.join(path, subdir)
         fl = getLocalRunFile(spath)
         if fl:
-            fllist.append(os.path.join(spath, fl))
+            tmpPath = os.path.join(spath, fl)
+            size = subprocess.check_output(['du', '-sh', tmpPath]).split()[0].decode('utf-8')
+            if size != '0':
+                fllist.append(tmpPath)
     return fllist
 
 

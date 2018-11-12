@@ -277,13 +277,23 @@ void fillSingleRunHistograms(
       g_ref_time_count_c->SetPoint(cellid - 1, cellid, ref_time_count);
       g_ref_time_mean_c->SetPoint(cellid - 1, cellid, ref_time_mean);
       g_ref_time_stddev_c->SetPoint(cellid - 1, cellid, ref_time_stddev);
-      g_norm_time_mean_c->SetPoint(cellid - 1, cellid, time_mean - ref_time_mean);
-      g_norm_time_stddev_c->SetPoint(cellid - 1, cellid, time_stddev / ref_time_stddev);
       g_ref_ampl_count_c->SetPoint(cellid - 1, cellid, ref_ampl_count);
       g_ref_ampl_mean_c->SetPoint(cellid - 1, cellid, ref_ampl_mean);
       g_ref_ampl_stddev_c->SetPoint(cellid - 1, cellid, ref_ampl_stddev);
-      g_norm_ampl_mean_c->SetPoint(cellid - 1, cellid, ampl_mean / ref_ampl_mean);
-      g_norm_ampl_stddev_c->SetPoint(cellid - 1, cellid, ampl_stddev / ref_ampl_stddev);
+      if (ref_time_count != 0 && time_count != 0) {
+        g_norm_time_mean_c->SetPoint(cellid - 1, cellid, time_mean - ref_time_mean);
+        g_norm_time_stddev_c->SetPoint(cellid - 1, cellid, time_stddev / ref_time_stddev);
+      } else {
+        g_norm_time_mean_c->SetPoint(cellid - 1, cellid, 0.);
+        g_norm_time_stddev_c->SetPoint(cellid - 1, cellid, 1.);
+      }
+      if (ref_ampl_count != 0 && ampl_count != 0) {
+        g_norm_ampl_mean_c->SetPoint(cellid - 1, cellid, ampl_mean / ref_ampl_mean);
+        g_norm_ampl_stddev_c->SetPoint(cellid - 1, cellid, ampl_stddev / ref_ampl_stddev);
+      } else {
+        g_norm_ampl_mean_c->SetPoint(cellid - 1, cellid, 1.);
+        g_norm_ampl_stddev_c->SetPoint(cellid - 1, cellid, 1.);
+      }
     }
   }
   if (withref) {
@@ -304,7 +314,9 @@ void fillSingleRunHistograms(
     *objs = {h_time_count, h_time_mean, h_time_stddev,
              h_ampl_count, h_ampl_mean, h_ampl_stddev,
              h_ref_time_count, h_ref_time_mean, h_ref_time_stddev,
-             h_ref_ampl_count, h_ref_ampl_mean, h_ref_ampl_stddev
+             h_ref_ampl_count, h_ref_ampl_mean, h_ref_ampl_stddev,
+             g_time_count_c, g_time_mean_c, g_time_stddev_c,
+             g_ampl_count_c, g_ampl_mean_c, g_ampl_stddev_c
             };
   }
   for (auto obj : *objs) {
@@ -537,13 +549,23 @@ void fillTrendPlots(
         g_ref_time_count_t->SetPoint(j, run_start, ref_time_count);
         g_ref_time_mean_t->SetPoint(j, run_start, ref_time_mean);
         g_ref_time_stddev_t->SetPoint(j, run_start, ref_time_stddev);
-        g_norm_time_mean_t->SetPoint(j, run_start, time_mean - ref_time_mean);
-        g_norm_time_stddev_t->SetPoint(j, run_start, time_stddev / ref_time_stddev);
         g_ref_ampl_count_t->SetPoint(j, run_start, ref_ampl_count);
         g_ref_ampl_mean_t->SetPoint(j, run_start, ref_ampl_mean);
         g_ref_ampl_stddev_t->SetPoint(j, run_start, ref_ampl_stddev);
-        g_norm_ampl_mean_t->SetPoint(j, run_start, ampl_mean / ref_ampl_mean);
-        g_norm_ampl_stddev_t->SetPoint(j, run_start, ampl_stddev / ref_ampl_stddev);
+        if (ref_time_count != 0 && time_count != 0) {
+          g_norm_time_mean_t->SetPoint(j, run_start, time_mean - ref_time_mean);
+          g_norm_time_stddev_t->SetPoint(j, run_start, time_stddev / ref_time_stddev);
+        } else {
+          g_norm_time_mean_t->SetPoint(j, run_start, 0.);
+          g_norm_time_stddev_t->SetPoint(j, run_start, 1.);
+        }
+        if (ref_ampl_count != 0 && ampl_count != 0) {
+          g_norm_ampl_mean_t->SetPoint(j, run_start, ampl_mean / ref_ampl_mean);
+          g_norm_ampl_stddev_t->SetPoint(j, run_start, ampl_stddev / ref_ampl_stddev);
+        } else {
+          g_norm_ampl_mean_t->SetPoint(j, run_start, 1.);
+          g_norm_ampl_stddev_t->SetPoint(j, run_start, 1.);
+        }
       }
       j++;
     }

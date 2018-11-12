@@ -1,7 +1,1 @@
-{
-    "dboptions" : {
-	"centraldb" : false,
-	"dbname" : "localdb-03-initial/database.txt"
-    },
-    "reference" : true
-}
+{"dboptions": {"centraldb": false, "dbname": "localrundb-0004/database.txt"}, "dir": "/hsm/belle2/bdata/group/detector/ECL", "exp": 4, "reference": true}

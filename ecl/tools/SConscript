@@ -16,4 +16,5 @@ env['TOOLS_LIBS']['eclLocalRunCalibAnalyzer'] = ['framework', 'ecl_dbobjects', '
 env['TOOLS_LIBS']['eclLocalRunCalibNotify'] = ['framework', 'ecl_dbobjects', 'ecl', '$ROOT_LIBS', 'boost_program_options']
 env['TOOLS_LIBS']['eclLocalRunCalibQualityTest'] = ['framework', 'ecl_dbobjects', 'ecl', '$ROOT_LIBS', 'boost_program_options']
 env['TOOLS_LIBS']['eclLocalRunCalibCopy'] = ['framework', 'ecl_dbobjects', 'ecl', '$ROOT_LIBS', 'boost_program_options']
+env['TOOLS_LIBS']['eclCopySingleLocalRun'] = ['framework', 'ecl_dbobjects', 'ecl', '$ROOT_LIBS', 'boost_program_options']
 Return('env')

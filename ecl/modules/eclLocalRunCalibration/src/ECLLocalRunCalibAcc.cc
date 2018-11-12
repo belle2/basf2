@@ -71,41 +71,48 @@ void ECLLocalRunCalibAcc::updateLimits(const float& mean,
 // Calculate accumulated features.
 void ECLLocalRunCalibAcc::calc()
 {
-  namespace bacc = boost::accumulators;
-  bacc::accumulator_set <
-  float,
-  bacc::features <
-  bacc::tag::count,
-  bacc::tag::median,
-  bacc::tag::variance >> acc;
-  for (const auto& value : m_data) {
-    if (isValueInRange(value)) {
-      acc(value);
+  if (m_data.size() == 0) {
+    m_nevents = 0;
+    m_count = 0;
+    m_mean = 0;
+    m_stddev = 0;
+  } else {
+    namespace bacc = boost::accumulators;
+    bacc::accumulator_set <
+    float,
+    bacc::features <
+    bacc::tag::count,
+    bacc::tag::median,
+    bacc::tag::variance >> acc;
+    for (const auto& value : m_data) {
+      if (isValueInRange(value)) {
+        acc(value);
+      }
     }
-  }
-  float tcount = bacc::count(acc);
-  float tmedian = bacc::median(acc);
-  float tvariance = bacc::variance(acc);
-  float tstddev = calcStdDev(tvariance,
-                             tcount);
-  updateLimits(tmedian, tstddev);
-  bacc::accumulator_set <
-  float,
-  bacc::features <
-  bacc::tag::count,
-  bacc::tag::mean,
-  bacc::tag::variance >> acc_final;
-  for (const auto& value : m_data) {
-    if (isValueInRange(value)) {
-      acc_final(value);
+    float tcount = bacc::count(acc);
+    float tmedian = bacc::median(acc);
+    float tvariance = bacc::variance(acc);
+    float tstddev = calcStdDev(tvariance,
+                               tcount);
+    updateLimits(tmedian, tstddev);
+    bacc::accumulator_set <
+    float,
+    bacc::features <
+    bacc::tag::count,
+    bacc::tag::mean,
+    bacc::tag::variance >> acc_final;
+    for (const auto& value : m_data) {
+      if (isValueInRange(value)) {
+        acc_final(value);
+      }
     }
+    m_nevents = static_cast<int>(m_data.size());
+    m_data.clear();
+    m_count = bacc::count(acc_final);
+    m_mean = bacc::mean(acc_final);
+    tvariance = bacc::variance(acc_final);
+    m_stddev = calcStdDev(tvariance, m_count);
   }
-  m_nevents = static_cast<int>(m_data.size());
-  m_data.clear();
-  m_count = bacc::count(acc_final);
-  m_mean = bacc::mean(acc_final);
-  tvariance = bacc::variance(acc_final);
-  m_stddev = calcStdDev(tvariance, m_count);
 }
 // Get total number of events.
 int ECLLocalRunCalibAcc::getNOfEvents() const

@@ -117,6 +117,9 @@ ECLLocalRunCalibratorModule::ECLLocalRunCalibratorModule():
            "File name used to save amplitude and time"
            "histograms for a certain cell id.",
            defaultHistoFileName);
+  // Enables full tree writing mode.
+  addParam("fulltree", m_fulltree,
+           "Fill full tree.", false);
 }
 // Destructor.
 ECLLocalRunCalibratorModule::~ECLLocalRunCalibratorModule()
@@ -149,6 +152,18 @@ void ECLLocalRunCalibratorModule::beginRun()
     m_ampl = new ECLLocalRunCalibUnit(c_ncellids,
                                       m_minAmpl, m_maxAmpl,
                                       &m_devs);
+    if (m_fulltree) {
+      m_tree = new TTree("localrun", "");
+      m_tree->Branch("cellid", &m_tree_cellid,
+                     "m_tree_cellid/I");
+      m_tree->Branch("time", &m_tree_time,
+                     "time/F");
+      m_tree->Branch("ampl", &m_tree_ampl,
+                     "ampl/F");
+      m_tree_event = 0;
+      m_tree->Branch("event", &m_tree_event,
+                     "event/I");
+    }
   }
 }
 // Event.
@@ -192,12 +207,22 @@ void ECLLocalRunCalibratorModule::event()
       // Accumulating amplitude mean
       // values and standard deviations.
       m_ampl->add(index, ampl);
+      if (m_fulltree) {
+        m_tree_cellid = cellid;
+        m_tree_time = shiftedTime;
+        m_tree_ampl = ampl;
+        m_tree->Fill();
+      }
       // Enabling negative value alarm,
       // if there are negative amplitudes.
       if (ampl < 0) {
         m_ampl->enableNegAmpl();
       }
     }
+  }
+
+  if (m_fulltree) {
+    m_tree_event++;
   }
 }
 // Write histograms to file
@@ -259,6 +284,14 @@ void ECLLocalRunCalibratorModule::endRun()
     // Saving calibration results
     // into a database.
     writeCalibResultsToDB();
+    if (m_fulltree) {
+      auto fl = TFile::Open("ecl_local_run_fulltree.root",
+                            "recreate");
+      fl->cd();
+      m_tree->Write();
+      fl->Close();
+      delete m_tree;
+    }
   }
 }
 // Read collector's time to

@@ -196,6 +196,39 @@ namespace Belle2 {
      */
     ECLLocalRunCalibUnit* m_ampl;
     /**
+     * Write full tree of times and amplitudes
+     per each cellid
+     (before calculating mean values)
+     to file "ecl_local_run_fulltree.root"
+     */
+    bool m_fulltree;
+    /**
+     * Full tree of times and amplitudes
+     per each cellid before calculating
+     mean values.
+     */
+    TTree* m_tree;
+    /**
+     * Cellid varible used
+     to fill tree.
+     */
+    int m_tree_cellid;
+    /**
+     * Time varible used
+     to fill tree.
+     */
+    float m_tree_time;
+    /**
+     * Amplitude varible used
+     to fill tree.
+     */
+    float m_tree_ampl;
+    /**
+     * Event varible used
+     to fill tree.
+     */
+    int m_tree_event;
+    /**
      * Write histograms to file in
      * the case, if the histogram
      * filling mode is enabled.

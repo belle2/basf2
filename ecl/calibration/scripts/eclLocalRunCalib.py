@@ -79,6 +79,12 @@ def parseArguments():
                         default=False,
                         help='Change interval of validity '
                         'of a previous payload.')
+    parser.add_argument('--tree',
+                        action='store_true',
+                        dest='tree',
+                        default=False,
+                        help='Write tree.'
+                        'In default case a local DB is used.')
     parser.add_argument('--addref',
                         action='store_true',
                         dest='addref',
@@ -142,6 +148,7 @@ def runCalibration():
     calibrator.param('maxAmpl', args.maxampl)
     calibrator.param('nOfStdDevs', args.nofdevs)
     calibrator.param('isLocal', (not args.centraldb))
+    calibrator.param('fulltree', args.tree)
     calibrator.param('changePrev', args.changeprev)
     calibrator.param('addRef', args.addref)
     calibrator.param('dbName', args.dbname)

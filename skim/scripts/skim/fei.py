@@ -361,7 +361,7 @@ def B0SLWithOneLep(path):
 
     Skimming script reconstructs SL Btag using generically trained FEI
     and Bsig with at least one lepton (e, mu). Signal side lepton is not
-    stored in skim output. FEI is run with SLDecay=False to deactivate
+    stored in skim output. FEI is run with removeSLD=True to deactivate
     rare but time-intensive semileptonic D channels in skim.
 
     Skim Liasons: S. Hollitt & H. Wakeling
@@ -431,7 +431,7 @@ def BplusSLWithOneLep(path):
 
     Skimming script reconstructs SL Btag using generically trained
     FEI and Bsig with at least one lepton (e, mu). Signal side lepton
-    is not stored in skim output. FEI is run with removeSLD=False to
+    is not stored in skim output. FEI is run with removeSLD=True to
     deactivate rare but time-intensive semileptonic D channels in skim.
 
     Skim Liasons: S. Hollitt & H. Wakeling

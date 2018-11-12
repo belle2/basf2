@@ -197,7 +197,7 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc
-    ClassDef(BKLMDigit, 7)
+    ClassDefOverride(BKLMDigit, 7)
 
   };
 

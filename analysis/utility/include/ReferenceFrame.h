@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REFERENCEFRAME_H
-#define REFERENCEFRAME_H
+#pragma once
 
 #include <TLorentzRotation.h>
 #include <TRotation.h>
@@ -339,7 +338,7 @@ namespace Belle2 {
   public:
     /** Constructor which applies the reference frame  */
     template<class ...Args>
-    UseReferenceFrame(Args&& ... params) : m_frame(std::forward<Args>(params)...)
+    explicit UseReferenceFrame(Args&& ... params) : m_frame(std::forward<Args>(params)...)
     {
       ReferenceFrame::Push(&m_frame);
     }
@@ -355,4 +354,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

@@ -21,4 +21,5 @@
 #pragma link C++ class Belle2::ECLAutoCovariance;
 #pragma link C++ class Belle2::ECLTrackClusterMatchingThresholds;
 #pragma link C++ class Belle2::ECLTrackClusterMatchingParameterizations;
+#pragma link C++ class Belle2::ECLHadronComponentEmissionFunction;
 #endif

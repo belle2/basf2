@@ -161,7 +161,7 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
   int sectorGlobal, segmentGlobal;
   sectorGlobal = geoDat->sectorNumber(endcap, layer, sector);
   sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);
-  if (sectorAlignment == NULL)
+  if (sectorAlignment == nullptr)
     B2FATAL("Incomplete alignment data.");
   segmentGlobal = geoDat->segmentNumber(endcap, layer, sector, plane, segment);
   if (!alignmentChecker.checkSegmentAlignment(endcap, layer, sector, plane,

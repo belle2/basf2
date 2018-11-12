@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATION_H
-#define EKLMTIMECALIBRATION_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -98,6 +97,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

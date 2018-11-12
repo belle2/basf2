@@ -76,7 +76,7 @@ namespace Belle2 {
 
     //member objects
     /** contains the selector used */
-    CurlTagger::Selector* m_Selector;
+    CurlTagger::Selector* m_Selector = 0;
 
   }; // CurlTaggerModule
 } //namespace

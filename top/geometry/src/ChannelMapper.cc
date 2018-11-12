@@ -21,15 +21,16 @@ namespace Belle2 {
 
     ChannelMapper::ChannelMapper()
     {
+      static_assert(c_numRows * c_numColumns == c_numAsics * c_numChannels,
+                    "TOP::ChannelMapper: bug in coding (enum) - "
+                    "number of channels and number of pixels disagree");
+
       for (auto& channels : m_channels) {
         for (auto& channel : channels) channel = 0;
       }
       for (auto& pixels : m_pixels) {
         for (auto& pixel : pixels) pixel = 0;
       }
-      if (c_numRows * c_numColumns != c_numAsics * c_numChannels)
-        B2FATAL("TOP::ChannelMapper: bug in coding (enum) - "
-                "number of channels and number of pixels disagree");
     }
 
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_POLYGON2D_H
-#define EKLM_POLYGON2D_H
+#pragma once
 
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
@@ -95,6 +94,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

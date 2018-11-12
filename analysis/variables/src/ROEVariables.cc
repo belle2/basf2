@@ -1711,7 +1711,7 @@ namespace Belle2 {
             if (it == trackMask.end())
               B2ERROR("Something is wrong, track not found in map of ROE tracks!");
             else
-              result = trackMask[track->getArrayIndex()];
+              result = double(trackMask[track->getArrayIndex()]);
           } else if (particle->getParticleType() == Particle::c_ECLCluster)
           {
             const ECLCluster* ecl = particle->getECLCluster();
@@ -1722,7 +1722,7 @@ namespace Belle2 {
             if (it == eclClusterMask.end())
               B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
             else
-              result = eclClusterMask[ecl->getArrayIndex()];
+              result = double(eclClusterMask[ecl->getArrayIndex()]);
           } else
             B2ERROR("Particle used is not an ECLCluster or Track type particle!");
         }*/

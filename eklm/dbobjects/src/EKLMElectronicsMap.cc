@@ -29,7 +29,7 @@ const int* EKLMElectronicsMap::getSectorByLane(
   std::map<EKLMDataConcentratorLane, int>::const_iterator it;
   it = m_MapLaneSector.find(*lane);
   if (it == m_MapLaneSector.end())
-    return NULL;
+    return nullptr;
   return &(it->second);
 }
 
@@ -39,7 +39,7 @@ const EKLMDataConcentratorLane* EKLMElectronicsMap::getLaneBySector(
   std::map<int, EKLMDataConcentratorLane>::const_iterator it;
   it = m_MapSectorLane.find(sector);
   if (it == m_MapSectorLane.end())
-    return NULL;
+    return nullptr;
   return &(it->second);
 }
 

@@ -25,6 +25,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 main.add_module(geometry)
 
 # generate BBbar events

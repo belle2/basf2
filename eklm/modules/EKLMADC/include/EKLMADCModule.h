@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMADCMODULE_H
-#define EKLMADCMODULE_H
+#pragma once
 
 /* External headers. */
 #include <TFile.h>
@@ -100,6 +99,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

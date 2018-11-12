@@ -134,6 +134,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
         clusterizer.set_name(clusterizerName)
         clusterizer.param('RecoDigits', recoDigitsName)
         clusterizer.param('Clusters', clusterName)
+        clusterizer.param('useDB', True)
         path.add_module(clusterizer)
 
     # Add SVDSpacePointCreator

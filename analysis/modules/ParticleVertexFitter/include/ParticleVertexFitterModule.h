@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEVERTEXFITTERMODULE_H
-#define PARTICLEVERTEXFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -242,4 +241,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

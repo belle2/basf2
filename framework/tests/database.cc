@@ -542,4 +542,377 @@ namespace {
     Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
     EXPECT_EQ(Bz, 1.5);
   }
+
+  /** Does the same as DatabaBaseTest but without using the DataStore to set the EventMetaData
+   *  used by the DBStore */
+  class DataBaseNoDataStoreTest : public ::testing::Test {
+  protected:
+
+    /** Type of database to be tested */
+    enum EDatabaseType {c_local, c_central, c_chain, c_default};
+
+    /** Type of database to be tested */
+    EDatabaseType m_dbType = c_local;
+
+    TestHelpers::TempDirCreator m_tempDir; /**< ensure all tests are run inside a temporary directory. */
+
+    EventMetaData m_event;
+
+    DataBaseNoDataStoreTest() : m_event(0, 0, 1) {};
+
+    /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
+    virtual void SetUp()
+    {
+      switch (m_dbType) {
+        case c_local:
+          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          break;
+        case c_central:
+          ConditionsDatabase::createDefaultInstance("default");
+          break;
+        case c_chain:
+          DatabaseChain::createInstance();
+          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          ConditionsDatabase::createDefaultInstance("default");
+          break;
+        case c_default:
+          break;
+      }
+
+      if (m_dbType != c_central) {
+        list<Database::DBImportQuery> query;
+        TClonesArray array("TObject");
+        for (int experiment = 1; experiment <= 5; experiment++) {
+          IntervalOfValidity iov(experiment, -1, experiment, -1);
+
+          TString name = "Experiment ";
+          name += experiment;
+          query.push_back(Database::DBImportQuery("TNamed", new TNamed(name, name), iov));
+
+          new(array[experiment - 1]) TObject;
+          array[experiment - 1]->SetUniqueID(experiment);
+          Database::Instance().storeData("TObjects", &array, iov);
+
+          FILE* f = fopen("file.xml", "w");
+          fprintf(f, "Experiment %d\n", experiment);
+          fclose(f);
+          Database::Instance().addPayload("file.xml", "file.xml", iov);
+        }
+        if (m_dbType != c_chain) {
+          Database::Instance().storeData(query);
+        }
+
+        EventDependency intraRunDep(new TNamed("A", "A"));
+        intraRunDep.add(10, new TNamed("B", "B"));
+        intraRunDep.add(50, new TNamed("C", "C"));
+        IntervalOfValidity iov1(1, 1, 1, 1);
+        Database::Instance().storeData("IntraRun", &intraRunDep, iov1);
+        IntervalOfValidity iov2(1, 2, 1, -1);
+        Database::Instance().storeData("IntraRun", new TNamed("X", "X"), iov2);
+      }
+    }
+
+    /** Just reset the Database, hopefully no DataStore needs resetting */
+    virtual void TearDown()
+    {
+      if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
+      Database::reset();
+    }
+
+  };
+
+  /** Test database access via DBObjPtr */
+  TEST_F(DataBaseNoDataStoreTest, DBObjPtr)
+  {
+    DBStore::Instance().update(m_event); // The DBStore takes a reference to an EventMetaData object
+    DBObjPtr<TNamed> named;
+    m_event.setExperiment(1);
+    DBStore::Instance().update(m_event); // The DBStore takes a reference to an EventMetaData object
+    EXPECT_TRUE(named);
+    EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
+    m_event.setExperiment(4);
+    EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
+    DBStore::Instance().update(m_event);
+    EXPECT_TRUE(strcmp(named->GetName(), "Experiment 4") == 0);
+    m_event.setExperiment(7);
+    DBStore::Instance().update(m_event);
+    EXPECT_FALSE(named);
+  }
+
+  /** Test database access via DBArray */
+  TEST_F(DataBaseNoDataStoreTest, DBArray)
+  {
+    DBStore::Instance().update(m_event);
+    DBArray<TObject> objects;
+    DBArray<TObject> missing("notexisting");
+    // check iteration on fresh object
+    {
+      int i = 0;
+      for (auto o : missing) {
+        (void)o;
+        ++i;
+      }
+      EXPECT_EQ(i, 0);
+    }
+
+
+    m_event.setExperiment(1);
+    DBStore::Instance().update(m_event);
+    EXPECT_TRUE(objects);
+    EXPECT_FALSE(missing);
+    EXPECT_EQ(objects.getEntries(), 1);
+    EXPECT_EQ(objects[0]->GetUniqueID(), 1);
+    m_event.setExperiment(4);
+    EXPECT_EQ(objects.getEntries(), 1);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(objects.getEntries(), 4);
+    // check iteration on existing
+    {
+      int i = 0;
+      for (auto o : objects) {
+        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
+        ++i;
+      }
+      EXPECT_EQ(i, 4);
+    }
+
+    // check iteration on missing object
+    {
+      int i = 0;
+      for (auto o : missing) {
+        (void)o;
+        ++i;
+      }
+      EXPECT_EQ(i, 0);
+    }
+    m_event.setExperiment(7);
+    DBStore::Instance().update(m_event);
+    EXPECT_FALSE(objects);
+    // check iteration over missing but previously existing
+    {
+      int i = 0;
+      for (auto o : objects) {
+        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
+        ++i;
+      }
+      EXPECT_EQ(i, 0);
+    }
+  }
+
+  /** Test range checks of DBArray */
+  TEST_F(DataBaseNoDataStoreTest, DBArrayRange)
+  {
+    DBArray<TObject> objects;
+
+    m_event.setExperiment(3);
+    DBStore::Instance().update(m_event);
+    EXPECT_THROW(objects[-1], std::out_of_range);
+    EXPECT_THROW(objects[3], std::out_of_range);
+  }
+
+  /** Test type check of DBObjPtr and DBArray */
+  TEST_F(DataBaseNoDataStoreTest, TypeCheck)
+  {
+    DBObjPtr<TNamed> named;
+    EXPECT_B2FATAL(DBObjPtr<EventMetaData> wrongType("TNamed"));
+
+    DBArray<TObject> objects;
+    EXPECT_B2FATAL(DBArray<EventMetaData> wrongType("TObjects"));
+  }
+
+  /** Test intra-run dependency */
+  TEST_F(DataBaseNoDataStoreTest, IntraRun)
+  {
+    DBObjPtr<TNamed> intraRun("IntraRun");
+
+    m_event.setExperiment(1);
+    m_event.setRun(1);
+    m_event.setEvent(9);
+    DBStore::Instance().update(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "A") == 0);
+
+    m_event.setEvent(10);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
+
+    m_event.setEvent(49);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
+
+    //let's run an update in between and make sure intra run continues to work
+    DBStore::Instance().update(m_event);
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
+
+    m_event.setEvent(50);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "C") == 0);
+
+    m_event.setRun(2);
+    DBStore::Instance().update(m_event);
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "X") == 0);
+  }
+
+  /** Test the database content change notification */
+  TEST_F(DataBaseNoDataStoreTest, HasChanged)
+  {
+    m_event.setExperiment(0);
+    DBStore::Instance().update(m_event);
+
+    DBObjPtr<TNamed> named;
+    EXPECT_FALSE(named.hasChanged());
+
+    m_event.setExperiment(1);
+    EXPECT_FALSE(named.hasChanged());
+
+    DBStore::Instance().update(m_event);
+    EXPECT_TRUE(named.hasChanged());
+
+    m_event.setRun(8);
+    DBStore::Instance().update(m_event);
+    EXPECT_FALSE(named.hasChanged());
+
+    m_event.setExperiment(5);
+    DBStore::Instance().update(m_event);
+    EXPECT_TRUE(named.hasChanged());
+
+    m_event.setExperiment(7);
+    DBStore::Instance().update(m_event);
+    EXPECT_TRUE(named.hasChanged());
+
+    m_event.setExperiment(1);
+    m_event.setRun(1);
+    m_event.setEvent(1);
+    DBObjPtr<TNamed> intraRun("IntraRun");
+    DBStore::Instance().update(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(intraRun.hasChanged());
+
+    m_event.setEvent(2);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_FALSE(intraRun.hasChanged());
+
+    m_event.setEvent(10);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(intraRun.hasChanged());
+
+    m_event.setEvent(1000);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(intraRun.hasChanged());
+
+    m_event.setRun(4);
+    DBStore::Instance().update(m_event);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_TRUE(intraRun.hasChanged());
+  }
+
+  /** Test database access to payload files */
+  TEST_F(DataBaseNoDataStoreTest, PayloadFile)
+  {
+    DBStore::Instance().update(m_event);
+    DBObjPtr<PayloadFile> payload("file.xml");
+    m_event.setExperiment(1);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(payload->getContent(), "Experiment 1\n") << payload->getFileName();
+    m_event.setExperiment(4);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(payload->getContent(), "Experiment 4\n") << payload->getFileName();
+    m_event.setExperiment(7);
+    DBStore::Instance().update(m_event);
+    EXPECT_FALSE(payload);
+  }
+
+  /** Test callbacks - We'll use the same callback object/function/counter as before */
+
+  TEST_F(DataBaseNoDataStoreTest, Callbacks)
+  {
+    m_event.setRun(1);
+    m_event.setEvent(1);
+    callbackCounter = 0;
+
+    DBObjPtr<TNamed> named;
+    named.addCallback(&callback);
+    EXPECT_EQ(callbackCounter, 0);
+
+    m_event.setExperiment(2);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(callbackCounter, 1);
+
+    m_event.setExperiment(4);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(callbackCounter, 2);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(callbackCounter, 2);
+
+    m_event.setExperiment(6);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(callbackCounter, 3);
+
+    m_event.setExperiment(7);
+    DBStore::Instance().update(m_event);
+    EXPECT_EQ(callbackCounter, 3);
+
+    DBArray<TObject> objects;
+    objects.addCallback(&callback);
+
+    m_event.setExperiment(1);
+    DBStore::Instance().update(m_event);
+    // callbacks will now be called once for each payload so there is an extra call
+    EXPECT_EQ(callbackCounter, 5);
+
+    DBObjPtr<TNamed> intraRun("IntraRun");
+    intraRun.addCallback(&callbackObject, &Callback::callback);
+
+    //There won't be any callback here because the correct object is already set on creation
+    m_event.setEvent(1);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_EQ(callbackCounter, 5);
+
+    m_event.setEvent(2);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_EQ(callbackCounter, 5);
+
+    m_event.setEvent(10);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_EQ(callbackCounter, 6);
+
+    m_event.setEvent(1);
+    DBStore::Instance().updateEvent(m_event.getEvent());
+    EXPECT_EQ(callbackCounter, 7);
+  }
+
+  /** Test the access to arrays by key */
+  TEST_F(DataBaseNoDataStoreTest, KeyAccess)
+  {
+    m_event.setExperiment(1);
+    DBStore::Instance().update(m_event);
+
+    DBArray<TObject> objects;
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID(), 1);
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2), nullptr);
+    EXPECT_EQ(objects.getByKey(&TObject::IsFolder, false)->GetUniqueID(), 1);
+    EXPECT_EQ(objects.getByKey(&TObject::IsFolder, true), nullptr);
+
+    m_event.setExperiment(2);
+    DBStore::Instance().update(m_event);
+
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 1)->GetUniqueID(), 1);
+    EXPECT_EQ(objects.getByKey<unsigned int>(&TObject::GetUniqueID, 2)->GetUniqueID(), 2);
+  }
+
+  TEST_F(DataBaseNoDataStoreTest, DBPointer)
+  {
+    m_event.setExperiment(2);
+    DBStore::Instance().update(m_event);
+
+    DBPointer<TObject, unsigned int, &TObject::GetUniqueID> ptr(1);
+    EXPECT_EQ(ptr.key(), 1);
+    EXPECT_TRUE(ptr.isValid());
+    EXPECT_EQ(ptr->GetUniqueID(), 1);
+    ptr = 2;
+    EXPECT_EQ(ptr->GetUniqueID(), 2);
+    ptr = 3;
+    EXPECT_FALSE(ptr.isValid());
+  }
+
 }  // namespace

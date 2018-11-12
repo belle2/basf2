@@ -49,11 +49,11 @@ namespace Belle2 {
     virtual unsigned nActiveCellsInPattern(unsigned layerId) const;
 
     void dump(const std::string& message = std::string(""),
-              const std::string& prefix = std::string("")) const;
+              const std::string& prefix = std::string("")) const override;
 
   public:// Modifiers
     /// Clears all entries.
-    void clear(void);
+    void clear(void) override;
 
     /// vote
     // using TRGCDCHoughPlaneBase::vote; // to be checked
@@ -68,7 +68,7 @@ namespace Belle2 {
     void merge(void);
 
     /// registers a pattern..
-    void registerPattern(unsigned id);
+    void registerPattern(unsigned id) override;
 
   private:
 //  AList<TRGCDCHoughPlane> _layers;

@@ -23,6 +23,8 @@
 #include <nsm2/nsm2.h>
 #include <nsm2/belle2nsm.h>
 
+#include "daq/rfarm/manager/RFNSM.h"
+
 namespace Belle2 {
   class RFLogManager {
   public:

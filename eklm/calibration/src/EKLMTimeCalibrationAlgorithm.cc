@@ -66,7 +66,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   TH1F* h, *h2;
   TF1* fcn;
   std::shared_ptr<TTree> t;
-  TCanvas* c1 = NULL;
+  TCanvas* c1 = nullptr;
   if (m_Debug)
     c1 = new TCanvas();
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);
@@ -113,8 +113,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   for (i = 0; i < m_maxStrip; i++) {
     n = stripEvents[i].size();
     if (n < 2) {
-      B2WARNING("Not enough calibration data collected for strip "
-                << i + 1 << ".");
+      B2WARNING("Not enough calibration data collected."
+                << LogVar("Strip", i + 1));
       delete fcn;
       delete[] stripEvents;
       delete[] averageDist;
@@ -168,8 +168,9 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
                         (k[0][2] * k[1][1] - k[1][2] * k[0][1]);
   tau = (k[0][0] * k[1][2] - k[1][0] * k[0][2]) /
         (k[0][0] * k[1][1] - k[1][0] * k[0][1]);
-  B2INFO("Effective light speed = " << effectiveLightSpeed << " cm / ns");
-  B2INFO("Amplitude time constant = " << tau << " ns");
+  B2INFO("EKLM time calibration results:"
+         << LogVar("Effective light speed, cm / ns", effectiveLightSpeed)
+         << LogVar("Amplitude time constant, ns", tau));
   calibration->setEffectiveLightSpeed(effectiveLightSpeed);
   calibration->setAmplitudeTimeConstant(tau);
   for (i = 0; i < m_maxStrip; i++) {

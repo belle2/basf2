@@ -521,6 +521,16 @@ namespace Belle2 {
     double b2bPhi(const Particle* particle);
 
     /**
+     * returns the theta angle (lab) that is back-to-back (cms) to the cluster
+     */
+    double b2bClusterTheta(const Particle* particle);
+
+    /**
+     * returns the phi angle (lab) that is back-to-back (cms) to the cluster
+     */
+    double b2bClusterPhi(const Particle* particle);
+
+    /**
      * return Kshort using Belle goodKS algorithm
      */
     double goodBelleKshort(const Particle* KS);

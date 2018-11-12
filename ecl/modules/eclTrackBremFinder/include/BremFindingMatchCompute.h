@@ -43,6 +43,11 @@ namespace Belle2 {
      * Return the difference between the angles of extrapolation and cluster position
      */
     double getDistanceHitCluster() {return m_distanceHitCluster;}
+
+    /**
+     * Return the effective acceptance factor
+     */
+    double getEffAcceptanceFactor() {return m_effAcceptanceFactor;}
   private:
     /**
      * Factor which is multiplied onto the cluster position error to check for matches
@@ -64,6 +69,10 @@ namespace Belle2 {
      */
     double m_distanceHitCluster;
 
+    /**
+     * The effective acceptance factor, needed to assign the radiation
+     */
+    double m_effAcceptanceFactor;
 
   };
 

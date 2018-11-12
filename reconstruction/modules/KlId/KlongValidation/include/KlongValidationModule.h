@@ -39,19 +39,19 @@ namespace Belle2 {
     virtual ~KlongValidationModule();
 
     /** initialize   */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  beginn run   */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** process event   */
-    virtual void event();
+    virtual void event() override;
 
     /** end run   */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate   */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 

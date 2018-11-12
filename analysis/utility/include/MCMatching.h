@@ -1,9 +1,15 @@
-#pragma once
-// ******************************************************************
-// MC Matching
-// authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
-// ******************************************************************
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ *                                                                        *
+ * Copyright(C) 2013-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Anze Zupanc, Christian Pulvermacher                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
+#pragma once
 
 #include <vector>
 #include <string>

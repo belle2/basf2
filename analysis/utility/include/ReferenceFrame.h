@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REFERENCEFRAME_H
-#define REFERENCEFRAME_H
+#pragma once
 
 #include <TLorentzRotation.h>
 #include <TRotation.h>
@@ -140,28 +139,28 @@ namespace Belle2 {
      * @param 3-vector from particle
      * @return 3-vector in rest frame System
      */
-    virtual TVector3 getVertex(const TVector3& vector) const;
+    virtual TVector3 getVertex(const TVector3& vector) const override;
 
     /**
      * Get Lorentz vector in rest frame System
      * @param Lorentz vector from particle
      * @return Lorentz vector in rest frame System
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
 
     /**
      * Get Momentum error matrix in rest frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in rest frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const override;
 
     /**
      * Get Vertex error matrix in rest frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in rest frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const override;
 
   private:
     TLorentzVector m_momentum;         /**< momentum of RF in the lab frame */
@@ -182,28 +181,28 @@ namespace Belle2 {
      * @param 3-vector from particle
      * @return 3-vector in lab frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const;
+    virtual TVector3 getVertex(const TVector3& vector) const override;
 
     /**
      * Get Lorentz vector in lab frame
      * @param Lorentz vector from particle
      * @return Lorentz vector in lab frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
 
     /**
      * Get Momentum error matrix in lab frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in lab frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const override;
 
     /**
      * Get Vertex error matrix in lab frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in lab frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const override;
 
   };
 
@@ -218,28 +217,28 @@ namespace Belle2 {
      * @param 3-vector from particle
      * @return 3-vector in cms frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const;
+    virtual TVector3 getVertex(const TVector3& vector) const override;
 
     /**
      * Get Lorentz vector in cms frame
      * @param Lorentz vector from particle
      * @return Lorentz vector in cms frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
 
     /**
      * Get Momentum error matrix in cms frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in cms frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const override;
 
     /**
      * Get Vertex error matrix in cms frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in cms frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const override;
 
   private:
     PCmsLabTransform m_transform; /**< Lab to CMS Transform */
@@ -261,28 +260,28 @@ namespace Belle2 {
      * @param 3-vector from particle
      * @return 3-vector in rotation frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const;
+    virtual TVector3 getVertex(const TVector3& vector) const override;
 
     /**
      * Get Lorentz vector in rotation frame
      * @param Lorentz vector from particle
      * @return Lorentz vector in rotation frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
 
     /**
      * Get Momentum error matrix in rotation frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in rotation frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const override;
 
     /**
      * Get Vertex error matrix in rotation frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in rotation frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const override;
 
   private:
     TRotation m_rotation; /**< Rotation */
@@ -304,28 +303,28 @@ namespace Belle2 {
      * @param 3-vector from particle
      * @return 3-vector in rotation frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const;
+    virtual TVector3 getVertex(const TVector3& vector) const override;
 
     /**
      * Get Lorentz vector in rotation frame
      * @param Lorentz vector from particle
      * @return Lorentz vector in rotation frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
 
     /**
      * Get Momentum error matrix in rotation frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in rotation frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const override;
 
     /**
      * Get Vertex error matrix in rotation frame
      * @param Covariance matrix from particle
      * @return Covariance matrix in rotation frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const override;
 
   private:
     CMSFrame cmsframe; /**< CMSFrame*/
@@ -339,7 +338,7 @@ namespace Belle2 {
   public:
     /** Constructor which applies the reference frame  */
     template<class ...Args>
-    UseReferenceFrame(Args&& ... params) : m_frame(std::forward<Args>(params)...)
+    explicit UseReferenceFrame(Args&& ... params) : m_frame(std::forward<Args>(params)...)
     {
       ReferenceFrame::Push(&m_frame);
     }
@@ -355,4 +354,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

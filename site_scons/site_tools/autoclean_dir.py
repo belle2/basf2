@@ -20,7 +20,7 @@ def autoclean_dir(env, dirname):
         for node in dirnode.all_children():
             if isinstance(node, Node.FS.Dir):
                 stack.append(node)
-            elif node.has_explicit_builder():
+            elif node.is_derived():
                 targets.add(str(node))
 
     # Now delete all files found in the directory which are not in the target set

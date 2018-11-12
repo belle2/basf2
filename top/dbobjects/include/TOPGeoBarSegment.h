@@ -184,14 +184,14 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    virtual bool isConsistent() const;
+    virtual bool isConsistent() const override;
 
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    virtual void print(const std::string& title = "Bar segment geometry parameters") const;
+    virtual void print(const std::string& title = "Bar segment geometry parameters") const override;
 
   protected:
 
@@ -220,7 +220,7 @@ namespace Belle2 {
     std::string m_vendor; /**< vendor's name */
     std::string m_serialNumber; /**< serial number */
 
-    ClassDef(TOPGeoBarSegment, 3); /**< ClassDef */
+    ClassDefOverride(TOPGeoBarSegment, 3); /**< ClassDef */
 
   };
 

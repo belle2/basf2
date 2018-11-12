@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef MAKEMOTHERKFIT_H
-#define MAKEMOTHERKFIT_H
-
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -61,7 +58,8 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q, const int flag = KFitConst::kAfterFit);
+      enum KFitError::ECode       addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
+                                           const double q, const int flag = KFitConst::kAfterFit);
       /** Change a magnetic field from the default value KFitConst::kDefaultMagneticField.
        * @param mf magnetic field to set
        * @return error code (zero if success)
@@ -188,6 +186,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MAKEMOTHERKFIT_H */
-

@@ -70,7 +70,7 @@ namespace Belle2 {
     RingBuffer* connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b);
 
     /** Dump module names in the ModulePtrList */
-    void dump_modules(const std::string, const ModulePtrList);
+    void dump_modules(const std::string&, const ModulePtrList);
 
     /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!

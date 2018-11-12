@@ -15,9 +15,11 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-# define a local database (will be created automatically, if doesn't exist)
+# define a local database with write access
+# (will be created automatically, if doesn't exist)
 use_local_database("localDB/localDB.txt", "localDB", False)
 
+# create path
 main = create_path()
 
 # Event info setter - execute single event
@@ -30,13 +32,14 @@ gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # process single event
 process(main)
 
-# and then run the importer (note: input file is not there - must change the path!)
+# and then run the importer
 dbImporter = TOPDatabaseImporter()
 
 # import constants

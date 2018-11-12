@@ -64,17 +64,17 @@ namespace Belle2 {
     virtual ~CDCDedxSkimCDSTModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Selection function to skim DataStore */
     //    void mySelectionFunction(const CDCDedxTrack* dedxTrack);
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

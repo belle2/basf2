@@ -260,6 +260,9 @@ void ECLDigitCalibratorModule::event()
     //Calibrating offline fit results
     ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
     aECLCalDigit->setTwoComponentChi2(-1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, -1);
     aECLCalDigit->setTwoComponentTotalEnergy(-1);
     aECLCalDigit->setTwoComponentHadronEnergy(-1);
     aECLCalDigit->setTwoComponentDiodeEnergy(-1);
@@ -282,6 +285,10 @@ void ECLDigitCalibratorModule::event()
         aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
         aECLCalDigit->setTwoComponentDiodeEnergy(calibratedTwoComponentDiodeEnergy);
         aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadron));
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton,
+                                               aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton));
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing));
         aECLCalDigit->setTwoComponentFitType(twoComponentFitType);
 
       }

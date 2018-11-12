@@ -66,7 +66,6 @@ void DuplicateVertexMarkerModule::event()
     return;
 
   const int size = inPList->getListSize();
-  std::set<const Particle*> foundParticles;
   for (int i = 0; i < size; i++) {
     Particle* part = inPList->getParticle(i);
     if (part->getNDaughters() != 2) { //ignore 3+ vertices

@@ -52,7 +52,6 @@ namespace {
         evtDataDifferentName.appendNew(newObj2);
 
         //fancy constructors
-        // cppcheck-suppress memleak
         newobj = evtDataDifferentDurability.appendNew(30 + i);
         ASSERT_TRUE(newobj != nullptr);
 

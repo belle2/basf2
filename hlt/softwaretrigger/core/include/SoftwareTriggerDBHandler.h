@@ -116,7 +116,7 @@ namespace Belle2 {
       static std::unique_ptr<SoftwareTriggerMenu> downloadTriggerMenu(const std::string& baseCutIdentifier);
 
       /** Use the default constructor (needed as we delete the copy constructor) */
-      SoftwareTriggerDBHandler(const std::string& baseIdentifier) :
+      explicit SoftwareTriggerDBHandler(const std::string& baseIdentifier) :
         m_baseIdentifier(baseIdentifier),
         m_softwareTriggerMenu(makeFullTriggerMenuName(baseIdentifier))
       {

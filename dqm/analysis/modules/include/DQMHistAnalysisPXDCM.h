@@ -52,11 +52,11 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
-    TH2F* m_hCommonMode;
+    TH2F* m_hCommonMode = nullptr;
     //! Final Canvas
-    TCanvas* m_cCommonMode;
+    TCanvas* m_cCommonMode = nullptr;
     //! Lines in the Canvas to guide the eye
-    TLine* m_line1, *m_line2, *m_line3;
+    TLine* m_line1 = nullptr, *m_line2 = nullptr, *m_line3 = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! one epics PV

@@ -31,18 +31,18 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisInputSrvModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
     //! Hist memory
-    DqmMemFile* m_memory;
+    DqmMemFile* m_memory = nullptr;
     std::string m_mempath;
     int m_memsize;
     int m_interval;
@@ -51,9 +51,9 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     //! Exp number, Run number
-    unsigned int m_expno;
-    unsigned int m_runno;
-    unsigned int m_count;
+    unsigned int m_expno = 0;
+    unsigned int m_runno = 0;
+    unsigned int m_count = 0;
   };
 } // end namespace Belle2
 

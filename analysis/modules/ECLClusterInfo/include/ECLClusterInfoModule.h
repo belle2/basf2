@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCLUSTERINFOMODULE_H
-#define ECLCLUSTERINFOMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -176,4 +175,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* ECLCLUSTERINFOMODULE_H */

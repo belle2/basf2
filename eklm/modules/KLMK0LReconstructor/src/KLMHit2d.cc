@@ -17,13 +17,13 @@ KLMHit2d::KLMHit2d(BKLMHit2d* bklmHit2d)
 {
   m_bklmHit = true;
   m_bklmHit2d = bklmHit2d;
-  m_eklmHit2d = NULL;
+  m_eklmHit2d = nullptr;
 }
 
 KLMHit2d::KLMHit2d(EKLMHit2d* eklmHit2d)
 {
   m_bklmHit = false;
-  m_bklmHit2d = NULL;
+  m_bklmHit2d = nullptr;
   m_eklmHit2d = eklmHit2d;
 }
 

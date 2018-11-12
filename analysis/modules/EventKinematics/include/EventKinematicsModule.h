@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTKINEMATICSMODULE_H
-#define EVENTKINEMATICSMODULE_H
+#pragma once
 
 #include <cstdlib>
 #include <ctime>
@@ -45,19 +44,19 @@ namespace Belle2 {
     virtual ~EventKinematicsModule();
 
     /** Define the physical parameters. look for them in database. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Define run parameters. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Define event parameters */
-    virtual void event();
+    virtual void event() override;
 
     /** Finish the run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** finish the execution  */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -86,4 +85,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* EVENTSHAPEMODULE_H */

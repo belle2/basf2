@@ -1,4 +1,4 @@
-Flavour Tagger
+Flavor Tagger
 ==============
 
 **Authors: F. Abudinen, M. Gelb, L. Li Gioi**

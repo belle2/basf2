@@ -624,46 +624,17 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
 // Set alignment wire positions
 void CDCGeometryPar::setWirPosAlignParams()
 {
-//   const int np = 3;
-//   double back[np], fwrd[np];
-//
-//   for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
-//     for (unsigned iC = 0; iC < m_nWires[iL]; ++iC) {
-//       //      std::cout << "iLiC= " << iL <<" "<< iC << std::endl;
-//       WireID wire(iL, iC);
-//       back[0] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireBwdX);
-//       back[1] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireBwdY);
-//       back[2] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireBwdZ);
-//
-//       fwrd[0] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireFwdX);
-//       fwrd[1] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireFwdY);
-//       fwrd[2] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireFwdZ);
-//
-//       for (int i = 0; i < np; ++i) {
-//         m_BWirPosAlign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
-//         m_FWirPosAlign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
-//       }
-//
-//       //      double baseTension = 0.;
-//       double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
-//       double tension = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireTension);
-//       //      std::cout << back[0] <<" "<< back[1] <<" "<< back[2] <<" "<< fwrd[0] <<" "<< fwrd[1] <<" "<< fwrd[2] <<" "<< tension << std::endl;
-//       m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
-//                                    m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
-//       //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
-//     } //end of  layer loop
-//   } //end of cell loop
-
-
   for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+    // wire number 511 = no wire
+    auto layerID = WireID(511);
 
-    double d_layerXbwd = (*m_layerAlignmentFromDB)->get(iL, CDCLayerAlignment::layerX);
-    double d_layerYbwd = (*m_layerAlignmentFromDB)->get(iL, CDCLayerAlignment::layerY);
-    double d_layerPhiBwd = (*m_layerAlignmentFromDB)->get(iL, CDCLayerAlignment::layerPhi);
+    double d_layerXbwd = (*m_alignmentFromDB)->get(layerID, CDCAlignment::layerX);
+    double d_layerYbwd = (*m_alignmentFromDB)->get(layerID, CDCAlignment::layerY);
+    double d_layerPhiBwd = (*m_alignmentFromDB)->get(layerID, CDCAlignment::layerPhi);
 
-    double d_layerXfwd = (*m_layerAlignmentFromDB)->get(iL, CDCLayerAlignment::layerDx) + d_layerXbwd;
-    double d_layerYfwd = (*m_layerAlignmentFromDB)->get(iL, CDCLayerAlignment::layerDy) + d_layerYbwd;
-    double d_layerPhiFwd = (*m_layerAlignmentFromDB)->get(iL, CDCLayerAlignment::layerDPhi) + d_layerPhiBwd;
+    double d_layerXfwd = (*m_alignmentFromDB)->get(layerID, CDCAlignment::layerDx) + d_layerXbwd;
+    double d_layerYfwd = (*m_alignmentFromDB)->get(layerID, CDCAlignment::layerDy) + d_layerYbwd;
+    double d_layerPhiFwd = (*m_alignmentFromDB)->get(layerID, CDCAlignment::layerDPhi) + d_layerPhiBwd;
 
     for (unsigned iC = 0; iC < m_nWires[iL]; ++iC) {
       double wireXbwd = m_BWirPos[iL][iC][0];
@@ -684,6 +655,36 @@ void CDCGeometryPar::setWirPosAlignParams()
       m_FWirPosAlign[iL][iC][2] = wireZfwd;
 
       WireID wire(iL, iC);
+      //      double baseTension = 0.;
+      double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+      double tension = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireTension);
+      //      std::cout << back[0] <<" "<< back[1] <<" "<< back[2] <<" "<< fwrd[0] <<" "<< fwrd[1] <<" "<< fwrd[2] <<" "<< tension << std::endl;
+      m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
+                                   m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+      //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
+    } //end of  layer loop
+  } //end of cell loop
+
+  const int np = 3;
+  double back[np], fwrd[np];
+
+  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+    for (unsigned iC = 0; iC < m_nWires[iL]; ++iC) {
+      //      std::cout << "iLiC= " << iL <<" "<< iC << std::endl;
+      WireID wire(iL, iC);
+      back[0] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireBwdX);
+      back[1] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireBwdY);
+      back[2] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireBwdZ);
+
+      fwrd[0] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireFwdX);
+      fwrd[1] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireFwdY);
+      fwrd[2] = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireFwdZ);
+
+      for (int i = 0; i < np; ++i) {
+        m_BWirPosAlign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
+        m_FWirPosAlign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
+      }
+
       //      double baseTension = 0.;
       double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
       double tension = (*m_alignmentFromDB)->get(wire, CDCAlignment::wireTension);

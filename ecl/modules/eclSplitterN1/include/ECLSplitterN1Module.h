@@ -30,7 +30,7 @@
 
 class TGraph2D;
 class TFile;
-class TH1D;
+class TH1F;
 
 namespace Belle2 {
   class ECLCalDigit;
@@ -94,7 +94,7 @@ namespace Belle2 {
     TFile* m_fileNOptimalFWD; /**< FWD number of optimal neighbours. */
     TFile* m_fileNOptimalBarrel; /**< Barrel number of optimal neighbours. */
     TFile* m_fileNOptimalBWD; /**< BWD number of optimal neighbours. */
-    TH1D* m_th1dBackgroundNorm; /**< Background normalization histogram. */
+    TH1F* m_th1fBackgroundNorm; /**< Background normalization histogram. */
     TGraph2D* m_tg2dNOptimalFWD[13][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
     TGraph2D* m_tg2dNOptimalBWD[10][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
     TGraph2D* m_tg2dNOptimalBarrel; /**< Array of 2D graphs used for interpolation between background and energy. */
@@ -108,6 +108,9 @@ namespace Belle2 {
 
     // Background
     int m_fullBkgdCount; /**< Number of expected background digits at full background, FIXME: move to database. */
+
+    const unsigned short c_nSectorCellIdBWD[10] = {9, 9, 6, 6, 6, 6, 6, 4, 4, 4}; /**< crystals per sector for theta rings */
+    const unsigned short c_nSectorCellIdFWD[13] = {3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9}; /**< crystals per sector for theta rings */
 
     // Crystals per Ring
     const unsigned short c_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, //FWD (13)

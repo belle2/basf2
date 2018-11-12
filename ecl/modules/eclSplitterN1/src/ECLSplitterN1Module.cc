@@ -28,7 +28,7 @@
 //Root
 #include "TFile.h"
 #include "TGraph2D.h"
-#include "TH1D.h"
+#include "TH1F.h"
 
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
@@ -110,6 +110,32 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
 
   // Set parallel processing flag.
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  // initialize all pointer to null
+  m_NeighbourMap9 = nullptr;
+  m_NeighbourMap21 = nullptr;
+  m_fileBackgroundNorm = nullptr;
+  m_fileNOptimalBWD = nullptr;
+  m_fileNOptimalBarrel = nullptr;
+  m_fileNOptimalFWD = nullptr;
+  m_geom = nullptr;
+
+  for (unsigned t = 0; t < 10; ++t) {
+    for (unsigned s = 0; s < c_nSectorCellIdBWD[t]; ++s) {
+      m_tg2dNOptimalBWD[t][s] = nullptr;
+    }
+  }
+
+  m_tg2dNOptimalBarrel = nullptr;
+
+  for (unsigned t = 0; t < 13; ++t) {
+    for (unsigned s = 0; s < c_nSectorCellIdFWD[t]; ++s) {
+      m_tg2dNOptimalFWD[t][s] = nullptr;
+    }
+  }
+
+  m_th1fBackgroundNorm = nullptr;
+
 }
 
 ECLSplitterN1Module::~ECLSplitterN1Module()
@@ -153,28 +179,31 @@ void ECLSplitterN1Module::initialize()
   // read the Background correction factors (for full background)
   m_fileBackgroundNorm = new TFile(m_fileBackgroundNormName.c_str(), "READ");
   if (!m_fileBackgroundNorm) B2FATAL("Could not find file: " << m_fileBackgroundNormName);
-  m_th1dBackgroundNorm = (TH1D*) m_fileBackgroundNorm->Get("background_norm");
+  m_th1fBackgroundNorm = dynamic_cast<TH1F*>(m_fileBackgroundNorm->Get("background_norm"));
+  if (!m_th1fBackgroundNorm) B2FATAL("Could not find m_th1fBackgroundNorm");
 
   // read the optimal neighbour maps
   m_fileNOptimalFWD = new TFile(m_fileNOptimalFWDName.c_str(), "READ");
   if (!m_fileNOptimalFWD) B2FATAL("Could not find file: " << m_fileNOptimalFWDName);
-  const unsigned c_nSectorCellIdFWD[13] = {3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9}; // crystals per sector for theta rings
   for (unsigned t = 0; t < 13; ++t) {
     for (unsigned s = 0; s < c_nSectorCellIdFWD[t]; ++s) {
-      m_tg2dNOptimalFWD[t][s] = (TGraph2D*) m_fileNOptimalFWD->Get(Form("thetaid-%i_sectorcellid-%i", t, s));
+      m_tg2dNOptimalFWD[t][s] = dynamic_cast<TGraph2D*>(m_fileNOptimalFWD->Get(Form("thetaid-%i_sectorcellid-%i", t, s)));
+      if (!m_tg2dNOptimalFWD[t][s]) B2FATAL("Could not find TGraph2D m_tg2dNOptimalFWD!");
     }
   }
 
   m_fileNOptimalBarrel = new TFile(m_fileNOptimalBarrelName.c_str(), "READ");
   if (!m_fileNOptimalBarrel) B2FATAL("Could not find file: " << m_fileNOptimalBarrelName);
-  m_tg2dNOptimalBarrel = (TGraph2D*) m_fileNOptimalBarrel->Get("thetaid-50_sectorcellid-8");
+
+  m_tg2dNOptimalBarrel = dynamic_cast<TGraph2D*>(m_fileNOptimalBarrel->Get("thetaid-50_sectorcellid-8"));
+  if (!m_tg2dNOptimalBarrel) B2FATAL("Could not find TGraph2D m_tg2dNOptimalBarrel!");
 
   m_fileNOptimalBWD = new TFile(m_fileNOptimalBWDName.c_str(), "READ");
   if (!m_fileNOptimalBWD) B2FATAL("Could not find file: " << m_fileNOptimalBWDName);
-  const unsigned c_nSectorCellIdBWD[10] = {9, 9, 6, 6, 6, 6, 6, 4, 4, 4}; // crystals per sector for theta rings
   for (unsigned t = 0; t < 10; ++t) {
     for (unsigned s = 0; s < c_nSectorCellIdBWD[t]; ++s) {
-      m_tg2dNOptimalBWD[t][s] = (TGraph2D*) m_fileNOptimalBWD->Get(Form("thetaid-%i_sectorcellid-%i", t + 59, s));
+      m_tg2dNOptimalBWD[t][s] = dynamic_cast<TGraph2D*>(m_fileNOptimalBWD->Get(Form("thetaid-%i_sectorcellid-%i", t + 59, s)));
+      if (!m_tg2dNOptimalBWD[t][s]) B2FATAL("Could not find TGraph2D m_tg2dNOptimalBWD!");
     }
   }
 
@@ -274,12 +303,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     aECLShower->addRelationTo(&aCR);
 
     // Find the highest energetic crystal in this CR or use the LM.
-    double highestEnergy = 0.0;
-    double highestEnergyTime = 0.;
-    double highestEnergyTimeResolution = 0.;
     double weightSum = 0.0;
-
-    unsigned int highestEnergyID = 0;
 
     // Add relation to the LM.
     RelationVector<ECLLocalMaximum> locmaxvector = aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName());
@@ -287,10 +311,10 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
     const int locmaxcellid = locmaxvector[0]->getCellId();
     const int pos = m_StoreArrPosition[locmaxcellid];
-    highestEnergyID             = (m_eclCalDigits[pos])->getCellId();
-    highestEnergy               = (m_eclCalDigits[pos])->getEnergy();
-    highestEnergyTime           = (m_eclCalDigits[pos])->getTime();
-    highestEnergyTimeResolution = (m_eclCalDigits[pos])->getTimeResolution();
+    double highestEnergyID             = (m_eclCalDigits[pos])->getCellId();
+    double highestEnergy               = (m_eclCalDigits[pos])->getEnergy();
+    double highestEnergyTime           = (m_eclCalDigits[pos])->getTime();
+    double highestEnergyTimeResolution = (m_eclCalDigits[pos])->getTimeResolution();
 
     // Get a first estimation of the energy using 3x3 neighbours.
     const double energyEstimation = estimateEnergy(highestEnergyID);
@@ -773,7 +797,7 @@ unsigned int ECLSplitterN1Module::getOptimalNumberOfDigits(const int cellid, con
   int nOptimalNeighbours = 21;
 
   // Get the corrected background level
-  const double bgCorrected = bg * m_th1dBackgroundNorm->GetBinContent(cellid);
+  const double bgCorrected = bg * m_th1fBackgroundNorm->GetBinContent(cellid);
 
   // For very small background levels, we always use 21 neighbours.
   if (bgCorrected > 0.025) {

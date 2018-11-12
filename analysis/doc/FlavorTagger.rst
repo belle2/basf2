@@ -60,19 +60,6 @@ Lambda:
 In the following the particles providing the flavor tag information, i.e. the
 flavor signatures, are denoted as target.
 
-Below: Simple draft (no physical magnitudes) to illustrate the different decays
-providing the signatures belonging to the different categories.
-
-
-
-
-
-
-
-
-
-
-
 Notes:
 ^^^^^^
 
@@ -94,8 +81,6 @@ developed by Belle and BaBar. It proceeds in 2 steps or levels: *EventLevel* and
 *CombinerLevel*. Each step relies on trained multivariate methods. Up to now, for
 the official Flavor Tagger, the multivariate method used is always a FastBDT
 which is embedded as Plugin in the `mva` TMVAInterface.
-
-
 
 At the starting point the available information consists only of ROE Tracks,
 ECL and KLM clusters.

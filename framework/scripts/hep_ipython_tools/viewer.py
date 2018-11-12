@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import numbers
-import random
-import string
+import json
 import time
+from io import StringIO
+from html import escape
 
 from dateutil.relativedelta import relativedelta
 
@@ -50,7 +51,7 @@ class StylingWidget(IPythonWidget):
 
     def create(self):
         """Create the styling widget."""
-        from IPython.core.display import HTML, display
+        from IPython.core.display import HTML
         html = HTML("<style>\n%s\n</style>" % self.css_string)
         return html
 
@@ -88,8 +89,6 @@ class ProgressBarViewer(IPythonWidget):
         Update the widget with a new event number
         """
 
-        from IPython.core.display import display, Javascript
-
         if isinstance(text_or_percentage, numbers.Number):
             # text_or_percentage is percentage fraction
             current_percentage = float(text_or_percentage)
@@ -117,10 +116,6 @@ class ProgressBarViewer(IPythonWidget):
 
                 self.progress_label.value = display_text
                 self.progress_bar.value = float(current_percentage)
-
-            else:
-                js = ""
-
         else:
             # text_or_percentage is status string
             self.progress_label.value = "Status: {}".format(text_or_percentage)
@@ -305,14 +300,14 @@ class LogViewer(IPythonWidget):
         self.log_content = log_content
 
         #: The log levels of the framework
-        self.log_levels = ["DEBUG", "ERROR", "FATAL", "INFO", "RESULT", "WARNING", "DEFAULT"]
+        self.log_levels = ["DEBUG", "INFO", "RESULT", "WARNING", "ERROR", "FATAL", "DEFAULT"]
 
         #: The color codes for the log messages
         self.log_color_codes = {"DEBUG": "gray", "ERROR": "red", "FATAL": "red", "INFO": "black", "RESULT": "green",
                                 "WARNING": "orange", "DEFAULT": "black"}
 
         #: A templated line in the log
-        self.log_line = """<tr style="color: {color};" class="log-line-{type_lower}"><td>{content}</td></tr>"""
+        self.log_message = """<pre class="log-line-{type_lower}" title="{info}">[{level}] {message}{var_output}</pre>"""
 
         #: The toggle button
         self.toggle_button_line = """<a onclick="$('.log-line-{type_lower}').hide();
@@ -326,14 +321,68 @@ class LogViewer(IPythonWidget):
                                         style="cursor: pointer; margin: 0px 10px; display: none;"
                                         class="log-line-{type_lower}-show-button">Show {type_upper}</a>"""
 
+    def format_logmessage(self, buf, message, indent=4, base=0):
+        """
+        Format the json object of a logmessage as key: value list with recursion and indentation
+        Funnily this is faster than json.dumps() and looks a bit better in the title attribute
+        """
+        for key, val in message.items():
+            if not val:
+                continue
+            if isinstance(val, dict):
+                buf.write(f"{key}:\n")
+                self.format_logmessage(buf, val, indent=indent, base=base + indent)
+            else:
+                buf.write(base * " ")
+                buf.write(f"{key}: {val!r}\n")
+
     def create(self):
         """
         Create the log viewer.
         """
         from ipywidgets import HTML, HBox, VBox
-        html = HTML()
 
-        html.value = """<div style="max-height: 400px; overflow-y: auto; width: 100%";>"""
+        output = StringIO()
+        output.write("<style scoped>\n")
+        for level, color in self.log_color_codes.items():
+            level = level.lower()
+            output.write(f".log-line-{level} {{margin:0; padding:0; line-height:normal; color: {color} !important;}}\n")
+
+        output.write("""</style><div style="max-height: 400px; overflow-y: auto; width: 100%";>""")
+
+        for line in self.log_content.split("\n"):
+            if line.startswith('{"level"'):
+                try:
+                    message = json.loads(line)
+                    # ok, message is parsed. Prepare some info string which
+                    # contains the info about the message in a indented
+                    # format but don't completely json or pprint because it
+                    # takes to much time
+                    buf = StringIO()
+                    self.format_logmessage(buf, message)
+                    info = escape(buf.getvalue())
+                    # add variables if necessary
+                    variables = message.get("variables", "")
+                    if variables:
+                        variables = "\n".join([""] + [f"\t{k} = {v}" for k, v in variables.items()])
+                    # and write out
+                    level = message["level"].lower()
+                    output.write(self.log_message.format(info=info, type_lower=level, var_output=variables, **message))
+                    continue
+                except json.JSONDecodeError as e:
+                    # any error: treat as default output, not a log line
+                    pass
+
+            output.write('<pre class="log-line-default">')
+            output.write(line)
+            output.write('</pre>')
+
+        output.write("</div>")
+
+        html = HTML()
+        html.value = output.getvalue()
+        html.width = "100%"
+        html.margin = "5px"
 
         buttons = []
         for type in self.log_levels:
@@ -341,28 +390,6 @@ class LogViewer(IPythonWidget):
 
         buttons_view = HBox(buttons)
         buttons_view.margin = "10px 0px"
-
-        html.value += """<table style="word-break: break-all; margin: 10px;">"""
-
-        for line in self.log_content.split("\n"):
-            found = False
-            for type in self.log_levels:
-                type_upper = type.upper()
-                type_lower = type.lower()
-                color = self.log_color_codes[type_upper]
-                if line.startswith("[{type_upper}]".format(type_upper=type_upper)):
-                    html.value += self.log_line.format(content=line, type_lower=type_lower, color=color)
-                    found = True
-                    break
-
-            if not found:
-                html.value += self.log_line.format(content=line, type_lower="default",
-                                                   color=self.log_color_codes["DEFAULT"])
-
-        html.value += "</table></div>"
-        html.width = "100%"
-        html.margin = "5px"
-
         result_vbox = VBox((buttons_view, html))
 
         return result_vbox

@@ -7,6 +7,7 @@ import tempfile
 from unittest import TestCase, main
 
 import basf2
+from basf2 import pickle_path as b2pp
 from ROOT import Belle2
 
 # @cond internal_test
@@ -47,8 +48,8 @@ class PathSerialisationTestCase(TestCase):
                 self.check_if_paths_equal(cond1.get_path(), cond2.get_path())
 
     def pickle_and_check(self, path):
-        basf2.write_path_to_file(path, self.pickle_file)
-        pickled_path = basf2.get_path_from_file(self.pickle_file)
+        b2pp.write_path_to_file(path, self.pickle_file)
+        pickled_path = b2pp.get_path_from_file(self.pickle_file)
 
         self.check_if_paths_equal(pickled_path, path)
 
@@ -91,7 +92,7 @@ class PathSerialisationTestCase(TestCase):
         path.add_module('RootOutput', outputFileName=outputFile.name)
 
         # equivalent to --dump-path
-        basf2.fw.set_pickle_path(pathFile.name)
+        basf2.set_pickle_path(pathFile.name)
         basf2.process(path)
 
         # path dumped, but not executed
@@ -100,12 +101,13 @@ class PathSerialisationTestCase(TestCase):
         self.assertEqual(0, os.stat(outputFile.name).st_size)
 
         # equivalent to --execute-path
-        self.assertEqual(basf2.fw.get_pickle_path(), pathFile.name)
+        self.assertEqual(basf2.get_pickle_path(), pathFile.name)
         basf2.process(None)
 
         # path unmodified, output file created
         self.assertEqual(pathSize, os.stat(pathFile.name).st_size)
         self.assertNotEqual(0, os.stat(outputFile.name).st_size)
+
 
 if __name__ == '__main__':
     main()

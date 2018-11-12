@@ -1,16 +1,15 @@
-/* BASF2 (Belle Analysis Framework 2)                                     *
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ *                                                                        *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- *                                                                        *
  **************************************************************************/
 
 #pragma once
-#ifndef ANALYSIS_UTILITY_INCLUDE_DECAYFOREST_H_
-#define ANALYSIS_UTILITY_INCLUDE_DECAYFOREST_H_
 
 #include <analysis/utility/DecayTree.h>
 
@@ -22,8 +21,6 @@
 
 
 namespace Belle2 {
-
-
   /**
    * Contains several DecayTree objects, which belong all to the same candidate
    */
@@ -71,9 +68,4 @@ namespace Belle2 {
     std::vector<DecayTree> forest; /**< vector of DecayTrees */
     size_t m_first_valid_original; /**< The first valid DecayTree */
   };
-
-
 }
-
-
-#endif /* ANALYSIS_UTILITY_INCLUDE_DECAYFOREST_H_ */

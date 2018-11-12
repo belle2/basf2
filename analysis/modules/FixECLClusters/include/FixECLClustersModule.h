@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FIXECLCLUSTERSMODULE_H
-#define FIXECLCLUSTERSMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -51,4 +50,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* FIXECLCLUSTERSMODULE_H */

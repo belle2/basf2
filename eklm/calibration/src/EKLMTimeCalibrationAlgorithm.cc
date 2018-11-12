@@ -66,7 +66,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   TH1F* h, *h2;
   TF1* fcn;
   std::shared_ptr<TTree> t;
-  TCanvas* c1 = NULL;
+  TCanvas* c1 = nullptr;
   if (m_Debug)
     c1 = new TCanvas();
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);

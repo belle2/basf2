@@ -17,7 +17,6 @@
 #include <mva/interface/Expert.h>
 
 #include <framework/utilities/MakeROOTCompatible.h>
-#include <framework/utilities/WorkingDirectoryManager.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/Utils.h>
 #include <framework/logging/Logger.h>

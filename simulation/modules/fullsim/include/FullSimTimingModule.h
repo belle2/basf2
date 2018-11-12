@@ -40,6 +40,12 @@ namespace Belle2 {
      */
     FullSimTimingModule();
 
+    /** No copying */
+    FullSimTimingModule(const FullSimTimingModule&) = delete;
+
+    /** No assignment */
+    FullSimTimingModule& operator=(const FullSimTimingModule&) = delete;
+
     /** Setup the timing structure */
     virtual void initialize() override;
 

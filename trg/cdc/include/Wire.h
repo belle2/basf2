@@ -81,16 +81,16 @@ namespace Belle2 {
     int localIdForMinus(void) const;
 
     /// returns name.
-    std::string name(void) const;
+    std::string name(void) const override;
 
     /// dumps debug information.
     void dump(const std::string& message = std::string(""),
-              const std::string& prefix = std::string("")) const;
+              const std::string& prefix = std::string("")) const override;
 
   public:// Modifiers
 
     /// clears information.
-    void clear(void);
+    void clear(void) override;
 
     /// returns a pointer to a TRGCDCWireHit.
     const TRGCDCWireHit* hit(const TRGCDCWireHit*);
@@ -104,7 +104,7 @@ namespace Belle2 {
   public:// TRG
 
     /// returns an input to the trigger. This is sync'ed to 1GHz clock.
-    const TRGSignal& signal(void) const;
+    const TRGSignal& signal(void) const override;
 
   private:
 

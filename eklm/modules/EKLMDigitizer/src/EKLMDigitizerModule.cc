@@ -32,7 +32,7 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module(),
            "Debug mode (generates additional output files with histograms).",
            false);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
-  m_Fitter = NULL;
+  m_Fitter = nullptr;
 }
 
 EKLMDigitizerModule::~EKLMDigitizerModule()
@@ -76,7 +76,7 @@ void EKLMDigitizerModule::checkChannelParameters()
             stripGlobal = m_ElementNumbers->stripNumber(endcap, layer, sector,
                                                         plane, strip);
             channel = m_Channels->getChannelData(stripGlobal);
-            if (channel == NULL)
+            if (channel == nullptr)
               B2FATAL("Incomplete channel data.");
             if (channel->getPhotoelectronAmplitude() <= 0) {
               B2ERROR("Non-positive photoelectron amplitude. The requested "
@@ -110,6 +110,7 @@ void EKLMDigitizerModule::beginRun()
 void EKLMDigitizerModule::readAndSortSimHits()
 {
   EKLMSimHit* hit;
+  /* cppcheck-suppress variableScope */
   int i, strip, maxStrip;
   maxStrip = m_ElementNumbers->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();
@@ -148,7 +149,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
                 simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
                 simHit->getPlane(), simHit->getStrip());
       channelData = m_Channels->getChannelData(strip);
-      if (channelData == NULL)
+      if (channelData == nullptr)
         B2FATAL("Incomplete EKLM channel data.");
       fes.setChannelData(channelData);
     }

@@ -8,11 +8,6 @@ import math
 # Example of running time base calibration using simulated double pulses
 # ----------------------------------------------------------------------------
 
-# local database with TBC constants
-reset_database()
-pathTo = '/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/'  # on KEKCC
-use_local_database(pathTo + "localDB/localDB.txt", pathTo + "localDB")
-
 # slot number to calibrate
 moduleID = 5
 
@@ -36,6 +31,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

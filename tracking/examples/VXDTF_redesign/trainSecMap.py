@@ -57,10 +57,22 @@ path = create_path()
 # Phase. Thus, this script does not run over any events at all, but over the data available
 # in the prepared training sample root file.
 eventinfosetter = register_module('EventInfoSetter')
+# default phase3 geometry:
+exp_number = 0
+# if environment variable is set then phase2 (aka Beast2) geometry will be taken
+if os.environ.get('USE_BEAST2_GEOMETRY'):
+    exp_number = 1002
+eventinfosetter.param("expList", [exp_number])
 path.add_module(eventinfosetter)
 
-# Gearbox
-setup_Geometry(path)
+# puts the geometry and gearbox in the path
+gearbox = register_module('Gearbox')
+path.add_module(gearbox)
+# the geometry is loaded from the DB by default now! The correct geometry
+# should be pickked according to exp number
+geometry = register_module('Geometry')
+path.add_module(geometry)
+
 
 # SecMapBootStrap Module is requiered, as it holds all  the sector maps and
 # for storing the trained SecMap.

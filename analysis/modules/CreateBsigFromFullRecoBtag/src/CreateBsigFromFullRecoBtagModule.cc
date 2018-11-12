@@ -58,6 +58,7 @@ CreateBsigFromFullRecoBtagModule::CreateBsigFromFullRecoBtagModule() : Module(),
   addParam("listOutput", m_listOutput, "Bsig particle list created", string(""));
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+  m_isSelfConjugatedParticle = true; // FIXME BII-4106
 }
 
 CreateBsigFromFullRecoBtagModule::~CreateBsigFromFullRecoBtagModule()
@@ -82,10 +83,6 @@ void CreateBsigFromFullRecoBtagModule::initialize()
     antiParticleList.registerInDataStore(flags);
   }
 
-}
-
-void CreateBsigFromFullRecoBtagModule::beginRun()
-{
 }
 
 void CreateBsigFromFullRecoBtagModule::event()
@@ -228,11 +225,7 @@ void CreateBsigFromFullRecoBtagModule::event()
 
 bool CreateBsigFromFullRecoBtagModule::doVertexFit(Particle* mother)
 {
-
   analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
-
-
-  std::vector<const Particle*> tracksVertex;
 
   analysis::RaveVertexFitter rsg;
   rsg.addTrack(mother);
@@ -241,19 +234,5 @@ bool CreateBsigFromFullRecoBtagModule::doVertexFit(Particle* mother)
   if (nvert == 1) {
     rsg.updateDaughters();
   } else {return false;}
-
-
   return true;
 }
-
-
-
-void CreateBsigFromFullRecoBtagModule::endRun()
-{
-}
-
-void CreateBsigFromFullRecoBtagModule::terminate()
-{
-}
-
-

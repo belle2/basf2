@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CLEOCONES_H
-#define CLEOCONES_H
+#pragma once
 
 #include <TVector3.h>
 
@@ -50,5 +49,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

@@ -3,8 +3,6 @@
 
 from basf2 import *
 
-gb2_setuprel = 'build-2014-10-22'
-
 # ---------------------------------------------------------------
 # example of using OpticalGun to simulate laser light sources
 # two sources at the left and right side of prism, outside quartz
@@ -53,6 +51,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

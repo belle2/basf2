@@ -61,7 +61,8 @@ class Basf2Object(ObjectDescription):
             # already exists, give warning
             self.env.warn(self.env.docname,
                           "Duplicate description of basf2 %s %s, " % (self.objtype, name) +
-                          "Other instance in " + self.env.doc2path(ddata[name][0]),
+                          "Other instance in " + self.env.doc2path(ddata[name][0]) +
+                          ", please add ':noindex:' to one",
                           self.lineno)
         else:
             ddata[name] = (self.env.docname, targetname)

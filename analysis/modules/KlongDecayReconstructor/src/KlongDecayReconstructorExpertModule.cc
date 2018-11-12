@@ -39,7 +39,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
   KlongDecayReconstructorExpertModule::KlongDecayReconstructorExpertModule() :
-    Module()
+    Module(), m_pdgCode(0), m_isSelfConjugatedParticle(false)
 
   {
     // set module description (e.g. insert text)
@@ -65,9 +65,7 @@ namespace Belle2 {
   void KlongDecayReconstructorExpertModule::initialize()
   {
     // clear everything, initialize private members
-    m_pdgCode = 0;
     m_listName = "";
-    m_isSelfConjugatedParticle = 0;
     m_generator = 0;
 
     // obtain the input and output particle lists from the decay string

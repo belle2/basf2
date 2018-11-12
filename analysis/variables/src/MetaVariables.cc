@@ -360,6 +360,10 @@ namespace Belle2 {
             Variable::Manager::FunctionPtr lhs = operand_stack.back();
             operand_stack.pop_back();
 
+            // 'operation' gets used but cppcheck doesn't support the lambda
+            // function syntax and throws a (wrong) unreadVariable
+
+            // cppcheck-suppress unreadVariable
             char operation = op->first.front();
 
             auto func = [lhs, operation, rhs](const Particle * particle) -> double {
@@ -709,9 +713,14 @@ endloop:
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
+          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -737,9 +746,14 @@ endloop:
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
+          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -775,9 +789,14 @@ endloop:
     Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
+          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -792,7 +811,7 @@ endloop:
             return -999;
           else
           {
-            if (std::isnan(var->function(particle->getDaughter(jDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
+            if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
               return std::numeric_limits<float>::quiet_NaN();
 
             double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
@@ -816,9 +835,14 @@ endloop:
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
+          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -958,7 +982,7 @@ endloop:
             for (auto& index : daughterIndices)
             {
               if (index >= int(particle->getNDaughters())) {
-                return -999; break;
+                return -999;
               } else pSum += frame.getMomentum(particle->getDaughter(index));
             }
 
@@ -1208,6 +1232,10 @@ endloop:
         std::string rankedVariableName = arguments[1];
         std::string returnVariableName = arguments[2];
         std::string extraInfoName = rankedVariableName + "_rank";
+        // 'rank' is correctly scoped, but cppcheck support the lambda
+        // function syntax and throws a (wrong) variableScope error
+
+        // cppcheck-suppress variableScope
         int rank = 1;
         try {
           rank = Belle2::convertString<int>(arguments[3]);

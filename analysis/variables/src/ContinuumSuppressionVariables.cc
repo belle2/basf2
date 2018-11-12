@@ -220,6 +220,10 @@ namespace Belle2 {
     Manager::FunctionPtr transformedNetworkOutput(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         double low = 0;
         double high = 0;
         try {

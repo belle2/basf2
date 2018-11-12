@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef MASSVERTEXFITKFIT_H
-#define MASSVERTEXFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -126,6 +123,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* MASSVERTEXFITKFIT_H */
-

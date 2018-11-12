@@ -106,7 +106,7 @@ In basf2 this is realized by ``path.for_each`` functionality:
   # Associate a module to be executed for each ROE candidate:
   ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1', path = roe_path)
   # Execute loop for each ROE:
-  mainPath.for_each('RestOfEvent', 'RestOfEvents', path = mainPath)
+  mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 In this example we create another path ``roe_path``, which is used to loop over the created ROE objects.
 By calling ``modularAnalysis`` methods with ``path = roe_path`` we create basf2 modules, which will be executed for each ROE candidate.
@@ -229,12 +229,12 @@ particles from host ROE object:
   # Execute loop for each host ROE:
   mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
-In this piece of code, we first reconstruct a host ROE object with a mask *cleanMask*, we create a path for it, 
-and we reconstruct a :math:`\pi_0` object inside the host ROE. 
+In this piece of code, we first reconstruct a host ROE object with a mask *cleanMask*, we create ``roe_path`` path for it, 
+and we reconstruct a :math:`\pi_0` object inside the host ROE, similarly to the previous code snippets.
 Then we create a nested ROE using :func:`modularAnalysis.buildNestedRestOfEvent`, which
 is going to be reconstructed using particles from *cleanMask* of the host ROE.
 This is needed to clean up the nested ROE from the beam-background energy depositions. 
-Then we create another path for the nested ROE modules and finally we reconstruct a K short inside the nested ROE.
+Then we create ``nestedroe_path`` path for the nested ROE modules and finally we reconstruct a :math:`K_S^0` inside the nested ROE.
 One can execute all possible ROE-related methods using nested ROE objects or loops. 
 
 

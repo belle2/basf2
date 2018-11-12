@@ -86,40 +86,43 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   // relative Z position [0..1]
   const double zRel = std::max(0., std::min(1., (pos[2] - zWireM) / (zWireP - zWireM)));
 
+  // 511 = no wire
+  layerWireID = WireID(getWireID().getICLayer(), 511);
+
   // Alignment of layer X (bwd)
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerX),
+    GlobalLabel::construct<CDCLayerAlignment>(layerWireID, CDCAlignment::layerX),
     drldg(0, 0)
   );
 
   // Alignment of layer Y (bwd)
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerY),
+    GlobalLabel::construct<CDCLayerAlignment>(layerWireID, CDCAlignment::layerY),
     drldg(0, 1)
   );
 
   // Alignment of layer rotation (gamma) (bwd)
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerPhi),
+    GlobalLabel::construct<CDCLayerAlignment>(layerWireID, CDCAlignment::layerPhi),
     drldg(0, 5)
   );
 
   // Difference between wire ends (end plates)
   // Alignment of layer dX, dX = foward - backward endplate
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerDx),
+    GlobalLabel::construct<CDCLayerAlignment>(layerWireID, CDCAlignment::layerDx),
     drldg(0, 0) * zRel
   );
 
   // Alignment of layer dY, dY = foward - backward endplate
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerDy),
+    GlobalLabel::construct<CDCLayerAlignment>(layerWireID, CDCAlignment::layerDy),
     drldg(0, 1) * zRel
   );
 
   // Alignment of layer rotation difference d(gamma or phi), dPhi = foward - backward endplate
   globals.add(
-    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerDPhi),
+    GlobalLabel::construct<CDCLayerAlignment>(layerWireID, CDCAlignment::layerDPhi),
     drldg(0, 5) * zRel
   );
 

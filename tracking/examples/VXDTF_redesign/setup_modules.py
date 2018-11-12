@@ -28,7 +28,7 @@ def setup_Geometry(path=None):
 
     """
 
-    print("WARNING: this function is deprecated and should not be used anymore! The geometry should now be loaded from the DB")
+    basf2.B2WARNING("This function is deprecated and should not be used anymore! The geometry should now be loaded from the DB")
 
 
 def setup_VXDTF2(path=None,

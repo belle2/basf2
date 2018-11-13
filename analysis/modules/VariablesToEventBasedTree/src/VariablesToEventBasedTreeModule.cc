@@ -101,7 +101,6 @@ void VariablesToEventBasedTreeModule::initialize()
     if (Variable::isCounterVariable(varStr)) {
       B2WARNING("The counter '" << varStr
                 << "' is handled automatically by VariablesToEventBasedTree, you don't need to add it.");
-      m_event_variables.erase(m_event_variables.begin() + i);
       continue;
     }
 

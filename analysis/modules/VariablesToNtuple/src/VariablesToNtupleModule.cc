@@ -119,7 +119,6 @@ void VariablesToNtupleModule::initialize()
     if (Variable::isCounterVariable(m_variables[iVar])) {
       B2WARNING("The counter '" << m_variables[iVar]
                 << "' is handled automatically by VariablesToNtuple, you don't need to add it.");
-      m_variables.erase(m_variables.begin() + iVar);
     }
 
   // declare branches and get the variable strings

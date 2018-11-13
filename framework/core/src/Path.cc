@@ -139,7 +139,7 @@ void Path::addIndependentPath(PathPtr independent_path, std::string ds_ID, boost
   addModule(switchEnd);
 }
 
-bool Path::contains(std::string moduleType) const
+bool Path::contains(const std::string& moduleType) const
 {
   const std::list<ModulePtr>& modules = getModules();
 

@@ -46,6 +46,12 @@ namespace Belle2 {
     B2FATAL("TOPGeometry::getModule: invalid module ID " << moduleID);
   }
 
+  const TOPNominalTTS& TOPGeometry::getTTS(unsigned type) const
+  {
+    std::map<unsigned, TOPNominalTTS>::const_iterator it = m_tts.find(type);
+    if (it == m_tts.end()) return m_nominalTTS;
+    return it->second;
+  }
 
   double TOPGeometry::getInnerRadius() const
   {
@@ -121,6 +127,7 @@ namespace Belle2 {
     if (!m_nominalQE.isConsistent()) return false;
     if (!m_nominalTTS.isConsistent()) return false;
     if (!m_nominalTDC.isConsistent()) return false;
+    if (!m_wavelengthFilter.isConsistent()) return false;
     return true;
   }
 
@@ -145,7 +152,13 @@ namespace Belle2 {
     cout << endl;
     m_nominalTTS.print();
     cout << endl;
+    for (const auto& tts : m_tts) {
+      tts.second.print("TTS distribution");
+      cout << endl;
+    }
     m_nominalTDC.print();
+    cout << endl;
+    m_wavelengthFilter.print();
     cout << endl;
 
   }

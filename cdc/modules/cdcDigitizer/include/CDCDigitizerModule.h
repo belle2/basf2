@@ -51,16 +51,16 @@ namespace Belle2 {
     CDCDigitizerModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    void initialize();
+    void initialize() override;
 
     /** Actual digitization of all hits in the CDC.
      *
      *  The digitized hits are written into the DataStore.
      */
-    void event();
+    void event() override;
 
     /** Terminate func. */
-    void terminate()
+    void terminate() override
     {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;

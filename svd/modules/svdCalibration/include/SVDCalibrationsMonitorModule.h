@@ -19,6 +19,7 @@
 #include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDOccupancyCalibrations.h>
 #include <svd/calibration/SVDHotStripsCalibrations.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
 
 #include <string>
 #include <TList.h>
@@ -44,19 +45,19 @@ namespace Belle2 {
     SVDCalibrationsMonitorModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** y */
-    virtual void event();
+    virtual void event() override;
 
     /**  */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**  */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
@@ -102,6 +103,7 @@ namespace Belle2 {
     //    SVDPedestalCalibrations m_PedCal;
     //    SVDOccupancyCalibrations m_OccCal;
     //    SVDHotStripsCalibrations m_HotStripsCal;
+    SVDClusterCalibrations m_ClusterCal;
 
     static const int m_maxLayers = 6; // 1,2 will not be filled
     static const int m_maxLadders = 16;
@@ -115,11 +117,11 @@ namespace Belle2 {
     TList* m_histoList_peakTime;
     TList* m_histoList_pulseWidth;
     TList* m_histoList_timeshift;
+    TList* m_histoList_cluster;
     /* the following is currently not needed because this correction is not implemented yet*/
     TList* m_histoList_triggerbin;
 
     //NOISES
-
     TH1F* h_noise[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // noise in ADC units
     TH1F* h_noiseInElectrons[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // noise in electrons
 
@@ -130,13 +132,40 @@ namespace Belle2 {
     TH1F* h_peakTime[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // peakTime in ns
     TH1F* h_pulseWidth[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // pulse width in ns
 
+    //CoG OLD Corrections (Michael)
     //CoG TIME SHIFT
     TH1F* h_timeshift[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; // time shift in ns
-
 
     //CoG TRIGGER BIN CORRECTION
     TH1F* h_triggerbin[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
                                                           1][m_maxSides]; // thime shift due to the trigger bin correction in ns
+
+
+    //Clusters
+    //CLUSTER SNR
+    TH1F* h_clsSNR[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                      1][m_maxSides]; // clusterSNR
+
+    //CLUSTER Seed SNR
+    TH1F* h_clsSeedSNR[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                          1][m_maxSides]; // cluster seed SNR
+    //CLUSTER Adj SNR
+    TH1F* h_clsAdjSNR[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                         1][m_maxSides]; // cluster adj SNR
+    //CLUSTER Position Error Scale Factor Size 1
+    TH1F* h_clsScaleErr1[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                            1][m_maxSides]; // scale err size 1
+    //CLUSTER Position Error Scale Factor Size 2
+    TH1F* h_clsScaleErr2[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                            1][m_maxSides]; // scale err size 2
+    //CLUSTER Position Error Scale Factor Size >2
+    TH1F* h_clsScaleErr3[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                            1][m_maxSides]; // scale err size >2
+
+
+    //CLUSTER TIME
+    TH1F* h_clsTime[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
+                                                       1][m_maxSides]; // clusterTime
 
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,

@@ -298,27 +298,15 @@ directly in python using the following functions:
 Additional Functions
 --------------------
 
-
-.. 
-  .. autofunction:: deserialize_conditions
-  .. autofunction:: deserialize_module
-  .. autofunction:: deserialize_path
-  .. autofunction:: deserialize_value
-  .. autofunction:: get_path_from_file
+.. autofunction:: find_file
 
 .. autofunction:: get_random_seed
-.. autofunction:: get_terminal_width
 
 ..
   .. autofunction:: is_mod_function
 
-.. autofunction:: list_functions
 .. autofunction:: log_to_console
 .. autofunction:: log_to_file
-.. autofunction:: make_code_pickable
-.. autofunction:: pretty_print_description_list
-.. autofunction:: pretty_print_table
-.. autofunction:: print_all_modules
 .. autofunction:: reset_log
 
 ..

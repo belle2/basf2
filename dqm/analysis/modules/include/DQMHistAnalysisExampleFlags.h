@@ -40,8 +40,8 @@ namespace Belle2 {
 
     // Data members
 
-    TH2F* m_hFlagtest;
-    TCanvas* m_cFlagtest;
+    TH2F* m_hFlagtest = nullptr;
+    TCanvas* m_cFlagtest = nullptr;
 
   };
 } // end namespace Belle2

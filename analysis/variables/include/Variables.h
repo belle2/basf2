@@ -140,6 +140,12 @@ namespace Belle2 {
     Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the cosine of the angle between the particle and the thrust axis
+     * of the event, as calculate by the EventShapeCalculator module.
+     */
+    double cosToThrustOfEvent(const Particle* part);
+
+    /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
      * of the two daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
      * If the given particle has three daughters: cosine of the angle between the normal vector of the plane
@@ -205,10 +211,6 @@ namespace Belle2 {
      */
     double particleInvariantMassBeforeFitSignificance(const Particle* part);
 
-    /**
-     * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
-     */
-    double cosToThrustOfEvent(const Particle* part);
 
     /**
      * return released energy in decay
@@ -366,6 +368,16 @@ namespace Belle2 {
      * returns the phi angle (lab) that is back-to-back (cms) to the particle
      */
     double b2bPhi(const Particle* particle);
+
+    /**
+     * returns the theta angle (lab) that is back-to-back (cms) to the cluster
+     */
+    double b2bClusterTheta(const Particle* particle);
+
+    /**
+     * returns the phi angle (lab) that is back-to-back (cms) to the cluster
+     */
+    double b2bClusterPhi(const Particle* particle);
 
     /**
      * return Kshort using Belle goodKS algorithm

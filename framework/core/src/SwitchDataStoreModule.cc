@@ -31,7 +31,7 @@ SwitchDataStoreModule::SwitchDataStoreModule() : Module()
 SwitchDataStoreModule::~SwitchDataStoreModule()
 {
 }
-void SwitchDataStoreModule::init(std::string to, bool doCopy, std::vector<std::string> mergeBack)
+void SwitchDataStoreModule::init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack)
 {
   m_to = to;
   m_doCopy = doCopy;

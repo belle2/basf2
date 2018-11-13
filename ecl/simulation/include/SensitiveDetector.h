@@ -15,8 +15,10 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dbobjects/ECLHadronComponentEmissionFunction.h>
 
 #include "TGraph.h"
 #include "TFile.h"
@@ -35,13 +37,13 @@ namespace Belle2 {
       ~SensitiveDetector();
 
       /** Register ECL hits collection into G4HCofThisEvent */
-      void Initialize(G4HCofThisEvent* HCTE);
+      void Initialize(G4HCofThisEvent* HCTE) override;
 
       /** Process each step and calculate variables defined in ECLHit */
-      bool step(G4Step* aStep, G4TouchableHistory* history);
+      bool step(G4Step* aStep, G4TouchableHistory* history) override;
 
       /** Do what you want to do at the end of each event */
-      void EndOfEvent(G4HCofThisEvent* eventHC);
+      void EndOfEvent(G4HCofThisEvent* eventHC) override;
 
     private:
       TGraph* m_HadronEmissionFunction = nullptr;  /**< Graph for hadron scintillation component emission function */
@@ -63,6 +65,7 @@ namespace Belle2 {
       double m_hadronenergyDeposit;     /**< energy deposited resulting in hadronic scint component */
       G4ThreeVector m_WeightedPos;  /**< average track position weighted by energy deposition */
       G4ThreeVector m_momentum;     /**< initial momentum of track before energy deposition inside sensitive volume */
+      DBObjPtr<ECLHadronComponentEmissionFunction> m_ECLHadronComponentEmissionFunction;  /**<Hadron Component Emission Function*/
 
     };
     /** Class for ECL Sensitive Detector */
@@ -75,13 +78,13 @@ namespace Belle2 {
       ~SensitiveDiode();
 
       /** Register ECL hits collection into G4HCofThisEvent */
-      void Initialize(G4HCofThisEvent* HCTE);
+      void Initialize(G4HCofThisEvent* HCTE) override;
 
       /** Process each step and calculate variables defined in ECLHit */
-      bool step(G4Step* aStep, G4TouchableHistory* history);
+      bool step(G4Step* aStep, G4TouchableHistory* history) override;
 
       /** Do what you want to do at the end of each event */
-      void EndOfEvent(G4HCofThisEvent* eventHC);
+      void EndOfEvent(G4HCofThisEvent* eventHC) override;
 
     private:
       // members of SensitiveDiode
@@ -108,7 +111,7 @@ namespace Belle2 {
       explicit BkgSensitiveDiode(const G4String&);
 
       /** Process each step and calculate variables defined in ECLHit */
-      bool step(G4Step* aStep, G4TouchableHistory* history);
+      bool step(G4Step* aStep, G4TouchableHistory* history) override;
     private:
       int m_trackID;          /**< track id */
       TVector3 m_startPos;    /**< particle position at the entrance in volume */

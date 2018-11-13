@@ -174,15 +174,12 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
   string currentLine;
 
   //Read each line of the map file and use boost regular expression to find the module name string in brackets.
-  string::const_iterator start, end;
   std::regex expression("^REG_MODULE\\((.+)\\)$");
   std::match_results<std::string::const_iterator> matchResult;
 
   int lineNr{0};
   while (getline(mapFile, currentLine)) {
     ++lineNr;
-    start = currentLine.begin();
-    end = currentLine.end();
 
     if (!std::regex_match(currentLine, matchResult, expression)) {
       B2ERROR("Problem parsing map file " << mapPath << ": Invalid entry in line " << lineNr << ", skipping remaining file");

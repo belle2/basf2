@@ -34,10 +34,10 @@ namespace Belle2 {
     eclCosmicECollectorModule();
 
     /** prepare. Define histograms to be filled and stored; ecl geometry calculations */
-    void prepare();
+    void prepare() override;
 
     /** collect. Select events and fill histograms */
-    void collect();
+    void collect() override;
 
   private:
 

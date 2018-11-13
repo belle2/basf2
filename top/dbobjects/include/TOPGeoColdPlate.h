@@ -81,13 +81,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    virtual void print(const std::string& title = "QBB cold plate geometry parameters") const;
+    virtual void print(const std::string& title = "QBB cold plate geometry parameters") const override;
 
 
 
@@ -99,7 +99,7 @@ namespace Belle2 {
     float m_coolWidth = 0;      /**< cooling plate width */
     std::string m_coolMaterial; /**< cooling plate material name */
 
-    ClassDef(TOPGeoColdPlate, 1); /**< ClassDef */
+    ClassDefOverride(TOPGeoColdPlate, 1); /**< ClassDef */
 
   };
 

@@ -125,11 +125,11 @@ SVDStateFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root");
   } else if (filterName == "mva") {
-    return std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
+    return std::make_unique<MVASVDStateFilter>("ckf_CDCSVDStateFilter_1");
   } else if (filterName == "mva_with_direction_check") {
     return std::make_unique<AndSVDStateFilter>(
              std::make_unique<NonIPCrossingSVDStateFilter>(),
-             std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml")
+             std::make_unique<MVASVDStateFilter>("ckf_CDCPXDStateFilter_1")
            );
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingSVDStateFilter>("SVDStateFilter.root");

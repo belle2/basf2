@@ -337,14 +337,7 @@ namespace Belle2 {
 
     double mcParticleSecondaryPhysicsProcess(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         return mcp->getSecondaryPhysicsProcess();
       } else {
@@ -354,14 +347,7 @@ namespace Belle2 {
 
     double mcParticleStatus(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         return mcp->getStatus();
       } else {
@@ -371,14 +357,7 @@ namespace Belle2 {
 
     double particleMCPrimaryParticle(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_PrimaryParticle;
         if (mcp->hasStatus(bitmask))
@@ -392,14 +371,7 @@ namespace Belle2 {
 
     double particleMCVirtualParticle(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsVirtual;
         if (mcp->hasStatus(bitmask))
@@ -413,14 +385,7 @@ namespace Belle2 {
 
     double particleMCInitialParticle(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_Initial;
         if (mcp->hasStatus(bitmask))
@@ -434,14 +399,7 @@ namespace Belle2 {
 
     double particleMCISRParticle(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsISRPhoton;
         if (mcp->hasStatus(bitmask))
@@ -455,14 +413,7 @@ namespace Belle2 {
 
     double particleMCFSRParticle(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsFSRPhoton;
         if (mcp->hasStatus(bitmask))
@@ -476,14 +427,7 @@ namespace Belle2 {
 
     double particleMCPhotosParticle(const Particle* p)
     {
-      const MCParticle* mcp;
-      // if this particle was created from an MCParticle or from something else
-      // then mcmatching has been run...
-      if (p->getParticleType() == Particle::EParticleType::c_MCParticle)
-        mcp = p->getMCParticle();
-      else
-        mcp = p->getRelated<MCParticle>();
-
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int bitmask = MCParticle::c_IsPHOTOSPhoton;
         if (mcp->hasStatus(bitmask))

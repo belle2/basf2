@@ -1172,9 +1172,9 @@ endloop:
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr)
+          if (particle->getRelated<MCParticle>() == nullptr) // no MC match
           {
-            if (particle->getMCParticle()) {
+            if (particle->getParticleType() == Particle::EParticleType::c_MCParticle) { // was created from MC particle
               if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
                 return -999;
               Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
@@ -1202,9 +1202,9 @@ endloop:
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr)
+          if (particle->getRelated<MCParticle>() == nullptr) // no MC match
           {
-            if (particle->getMCParticle()) {
+            if (particle->getParticleType() == Particle::EParticleType::c_MCParticle) { // was created from MC particle
               if (particle->getMCParticle()->getMother() == nullptr)
                 return -999;
               Particle tempParticle = Particle(particle->getMCParticle()->getMother());

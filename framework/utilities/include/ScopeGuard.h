@@ -37,7 +37,7 @@ namespace Belle2 {
     bool m_engaged{true};
   public:
     /** Construct a object with a callable function to be called on destruction */
-    template<class Callable> ScopeGuard(Callable&& f): m_exitfunc{std::forward<Callable>(f)} {}
+    template<class Callable> explicit ScopeGuard(Callable&& f): m_exitfunc{std::forward<Callable>(f)} {}
     /** No copies */
     ScopeGuard(const ScopeGuard&) = delete;
     /** No move construction */

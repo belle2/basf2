@@ -1,5 +1,185 @@
 Continuum suppression
 =====================
 
-Documentation about continuum suppression framework is not yet migrated from our `confluence page <https://confluence.desy.de/display/BI/Continuum+Suppression+Framework>`_. Please go there.
-If you have time to do the migration, feel free to take `agira ticket <https://agira.desy.de/browse/BII-2978>`_. In this case you might need nice guid on Sphinx documentation: :ref:`doctools` .
+This page contains instructions on how to use the continuum suppression
+framework, with a focus on recent modifications. For a detailed description of
+the variables, please refer to Chapter 9 (Background suppression for B decays)
+of `The Physics of the B Factories book <https://arxiv.org/abs/1406.6311>`_
+
+Example usage
+-------------
+
+In order to build continuum suppression variables, you need to first
+reconstruct a B on the signal side, then reconstruct the rest of event (ROE) `buildRestOfEvent`,
+and eventually build the continuum suppression variables `buildContinuumSuppression`.
+
+Since the ROE can be affected by background and noise, a mask has to be
+provided to try to get rid of part of this background `appendROEMasks`.
+The mask defines a set
+of cuts which will be applied on ROE objects, and only the ROE objects passing
+the selection mask will be used to build the continuum suppression variables.
+
+The generic interface is the following:
+
+::
+
+  # build you signal ('B0')
+
+  buildRestOfEvent('B0', path=main)
+   
+  cleanMask = ('cleanMask', '<Your selections for ROE>')
+  appendROEMasks('B0', [cleanMask], path=main)
+   
+  buildContinuumSuppression('B0', 'cleanMask', path=main)
+
+Where ``<Your selections for ROE>`` is a set of cuts on tracks and clusters of ROE
+which are in general analysis dependet. Some examples will be given below.
+
+.. autofunction:: modularAnalysis.buildContinuumSuppression
+
+Old interface
+"""""""""""""
+First a note to those who have been using the module prior to the Feb. 2017 B2GM:
+
+Up until commit ``4cd28b25fdc`` (1/3/2017), the module contained the following hard-coded
+cuts on the ROE, which were taken from the Belle software: 
+
+  * Maximum c.m. momentum of tracks & clusters in the ROE ≤ 3.2.
+  * Minimum lab momentum of clusters in the ROE ≥ 0.05.
+
+Starting with ``935cd4d6b95`` (1/3/2017), these hard-coded cuts have been removed from the
+module. They can now be applied via ROE masks in the steering file. If you are
+happy with the above momentum cuts and would like to continue your analysis
+without changing anything, you can re-apply them like this:
+
+::
+ 
+  buildRestOfEvent('B0', path=main)
+   
+  cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+  appendROEMasks('B0', [cleanMask], path=main)
+   
+  buildContinuumSuppression('B0', 'cleanMask', path=main)
+
+In this case, your ntuples will remain the same. 
+
+Clean Mask
+""""""""""
+
+While the ROE cuts can now be tuned for each analysis, it may be a good idea to
+require a minimum of 1 CDC hit in the ROE, to exclude VXD-only fake tracks. You
+can add this to the above mask as follows:
+
+::
+
+  cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+
+Another new feature is the addition of an event-level R2 variable
+(`R2EventLevel`). It has been added as a `Continuum Suppression` variable, even
+though it is event-level. This returns the event-level R2, where no cuts have
+been applied. Being event-level, it does not reconstruct a B or build a ROE, so
+no masks can be applied. This may be useful for skimming purposes, as R2 is a
+highly discriminating variable and running the continuum suppression module to
+apply such a simple cut is wasteful.
+
+On that note, the original analysis-level R2 variable still exists (`R2`). This
+remains included in the continuum suppression module, where cuts, including ROE
+masks can now be applied.
+
+ 
+
+The default `CleoConeCS` variable returns the cones calculated from all final state
+particles. It is now possible to construct CLEO Cones using only particles in
+the ROE. If you want to store the CleoCones constructed using only the ROE
+particles, you simply need to add ``ROE`` as a second argument to your variable:
+
+::
+
+  variables = ['CleoCone(1)','CleoCone(1,ROE)']
+
+Note that you can store both types of CleoClones in a single ntuple.
+
+There is also the option to calculate the KSFW moments (:b2:var:`KSFWVariables`)
+constructed from the reconstructed B-mesons final state particles.
+In Belle, this was possible, but it was not often employed as the KSFW moments
+become analysis dependent which is not good for systematics.
+For this reason, the call to the :b2:var:`KSFWVariables`
+returns the variables calculated from the B-meson primary daughters. If you
+would like to store the :b2:var:`KSFWVariables` constructed from the B final state
+particles, you need to add ``FS1`` as an additional argument (``FS1 = final_state_1``,
+from the Belle software):
+
+::
+
+  variables = ['KSFWVariables(hso00)','KSFWVariables(hso00,FS1)']
+
+Again, as shown in this example, you can store both cases in your ntuple.
+
+
+If you are using :doc:`NtupleMaker` (aka ``NtupleTools``), the way to store the
+entire set of :b2:var:`CleoConeCS` constructed from only ROE particles is by adding
+``CcROE`` as an argument.  Similarly, to store the KSFW moments calculated from
+the B final state particles, you need to add ``KsfwFS1``. To store all sets of
+CleoCones and KSFW variables, you can do the following:
+
+::
+
+  tools = ['ContinuumSuppression[KsfwFS1CcROE]', '^B0']
+  tools += ['ContinuumSuppression', '^B0']
+
+For the time-being, this also stores two identical sets of :b2:var:`thrustBm`, :b2:var:`thrustOm`,
+:b2:var:`cosTBTO`, :b2:var:`cosTBz`, and :b2:var:`R2` variables.
+This is due to the fact that the ``FS1`` and ``CcROE`` cases to not affect the
+calculation of these variables, so they are simply written out twice. This will
+be fixed in the near future. 
+
+Deep Continuum Suppression
+--------------------------
+
+The Deep Continuum Suppression (DCS) employs additional detector-level
+variables describing nearly every track (cluster) in the event to increase the
+classification performance.
+
+It is described in detail in this `MsC thesis <http://ekp-invenio.physik.uni-karlsruhe.de/record/48934>`_.
+Tutorial files are available in
+``basf2`` in ``analysis/examples/tutorials/``.
+
+There are two big differences when using the DCS instead of the Continuum Suppression:
+
+  1 Writing out of new variables, which describe single tracks and clusters instead of the whole shape of the event.
+
+  2 Using Deep Neural Networks as MVA methods to increase performance and to deal with the large number of new variables.
+
+This following section provides additional information about the DCS, which supplements the information in the tutorials.
+
+Adversarial Networks
+~~~~~~~~~~~~~~~~~~~~
+
+Due to the new variables in the DCS, correlations between the classifier output
+and quantities like ``Mbc`` and :math:`\Delta{Z}` are much more likely to occur.
+
+Using Adversarial Networks during training can reduce such correlations to a
+minimum. This is achieved by using additional networks for signal and
+background distributions of each quantity to train against the regular Neural
+network used for classification.
+
+In the DCS, the impact on these additional Adversarial Networks can be
+regularized with the parameter :math:`\lambda`.
+
+This parameter is highly dependent on the given problem and can vary in orders of magnitude.
+
+Please note that in most cases either the signal or continuum distribution of a quantity is correlated.
+
+While in the DCS tutorial there is an Adverserial Network for every signal and
+background distribution for every quantity (which is put in as a spectator),
+one should limit the number of Adversarial Networks to only those distributions
+which are correlated.
+
+
+
+
+..
+  Documentation about continuum suppression framework is not yet migrated from our `confluence page <https://confluence.desy.de/display/BI/Continuum+Suppression+Framework>`_. Please go there.
+  If you have time to do the migration, feel free to take `agira ticket <https://agira.desy.de/browse/BII-2978>`_. In this case you might need nice guid on Sphinx documentation: :ref:`doctools` .
+
+

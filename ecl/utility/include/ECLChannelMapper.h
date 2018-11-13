@@ -13,6 +13,11 @@
 #include <ecl/dbobjects/ECLChannelMap.h>
 namespace Belle2 {
   namespace ECL {
+    /**
+     * This class provides access to ECL channel map that is either
+     *  a) Loaded from the database (see ecl/dbobject/include/ECLChannelMap.h).
+     *  b) Loaded from the text file (standard location is FileSystem::findFile("ecl/data/ecl_channels_map.txt"))
+     */
     class ECLChannelMapper {
 
       /// initialization flag

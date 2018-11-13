@@ -1,11 +1,13 @@
-#include "ecl/utility/ECLChannelMapper.h"
+//
+#include <ecl/utility/ECLChannelMapper.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
+#include <framework/database/DBObjPtr.h>
+//
 #include <iostream>
-
 #include <fstream>
 #include <string>
-#include <stdio.h>
-#include <stdlib.h>
-#include <rawdata/dataobjects/RawCOPPERFormat.h>
+#include <cstdio>
+#include <cstdlib>
 
 using namespace Belle2;
 using namespace std;
@@ -28,10 +30,8 @@ ECLChannelMapper::ECLChannelMapper()
 
 }
 
-bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
+bool ECLChannelMapper::initFromFile(const char* eclMapFileName)
 {
-
-
   ifstream mapFile(eclMapFileName);
   if (mapFile.is_open()) {
 
@@ -64,23 +64,23 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
         convertArrayInv[(int)cellID - 1][2] = (int)iChannel;
       }
 
+      // Barrel
       if (iCrate >= 1 && iCrate <= 36) {
         arrayIndex = arrayCount;
-//        std::cout << arrayIndex << " " << cellID << std::endl;
         convertArrayBarrel[arrayIndex] = (int)cellID;
       }
 
+      // Forward endcap
       if (iCrate > 36 && iCrate < 45) {
         arrayIndex = arrayCount - 36 * 12 * 16;
 
-//        std::cout << arrayIndex << " " << cellID << std::endl
         if (arrayIndex >= 0 && arrayIndex < ECL_FWD_CRATES * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER)
           convertArrayFWD[arrayIndex] = (int)cellID;
       }
 
+      // Backward endcap
       if (iCrate > 44) {
         arrayIndex = arrayCount - 36 * 12 * 16 - 8 * 10 * 16;
-//        std::cout << arrayIndex << " " << cellID << std::endl;
         if (arrayIndex >= 0 && arrayIndex < ECL_BKW_CRATES * ECL_BKW_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER)
           convertArrayBKW[arrayIndex] = (int)cellID;
       }
@@ -91,25 +91,112 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
     return false;
   }
 
-//  std::cout << "ECL Channel mapper is initialized \n";
-
   isInitialized = true;
 
   return true;
-
-
 }
 
 bool ECLChannelMapper::initFromDB()
 {
-  // TODO
-  return false;
+  DBObjPtr<Belle2::ECLChannelMap> channelMap("ECLChannelMap");
+
+  const auto& mappingBAR = channelMap->getMappingVectorBAR();
+  const auto& mappingFWD = channelMap->getMappingVectorFWD();
+  const auto& mappingBWD = channelMap->getMappingVectorBWD();
+
+  int cellID;
+  // Loop variables
+  int iCrate = 1, iShaper = 1, iChannel = 1;
+  // Index in currently used array (converArrayBarrel,*FWD,*BKW)
+  int arrayIndex = 0;
+  int iMaxShapers = ECL_BARREL_SHAPERS_IN_CRATE;
+
+  while (iCrate <= ECL_CRATES) {
+    if (iCrate <= ECL_BARREL_CRATES) {
+      // Barrel
+      cellID = mappingBAR[arrayIndex];
+      convertArrayBarrel[arrayIndex] = cellID;
+    } else if (iCrate <= ECL_BARREL_CRATES + ECL_FWD_CRATES) {
+      // Forward endcap
+      cellID = mappingFWD[arrayIndex];
+      convertArrayFWD[arrayIndex] = cellID;
+    } else {
+      // Backward endcap
+      cellID = mappingBWD[arrayIndex];
+      convertArrayBKW[arrayIndex] = cellID;
+    }
+
+    if (cellID > ECL_TOTAL_CHANNELS) {
+      B2ERROR("ECLChannelMapper:: wrong cellID in the database payload");
+      return false;
+    }
+
+    if (cellID > 0) {
+      convertArrayInv[cellID - 1][0] = iCrate;
+      convertArrayInv[cellID - 1][1] = iShaper;
+      convertArrayInv[cellID - 1][2] = iChannel;
+    }
+
+    arrayIndex++;
+    // Increment all indices, accounting for hierarchical
+    // structure of channels <- shapers <- crates
+    iChannel++;
+    if (iChannel > ECL_CHANNELS_IN_SHAPER) {
+      iChannel = 1;
+      iShaper++;
+      if (iShaper > iMaxShapers) {
+        iShaper = 1;
+        if (iCrate == ECL_BARREL_CRATES) {
+          arrayIndex = 0;
+          iMaxShapers = getNShapersInCrate(iCrate);
+        } else  if (iCrate == ECL_BARREL_CRATES + ECL_FWD_CRATES) {
+          arrayIndex = 0;
+          iMaxShapers = getNShapersInCrate(iCrate);
+        }
+        iCrate++;
+      }
+    }
+  }
+
+  isInitialized = true;
+
+  return true;
 }
 
+ECLChannelMap ECLChannelMapper::getDBObject()
+{
+  ECLChannelMap map;
+
+  if (!isInitialized) {
+    B2FATAL("ECLChannelMapper:: Tried to generate dbobject before initialization");
+  }
+
+  int mappingBAR_size = ECL_BARREL_CRATES * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER;
+  int mappingFWD_size = ECL_FWD_CRATES    * ECL_FWD_SHAPERS_IN_CRATE    * ECL_CHANNELS_IN_SHAPER;
+  int mappingBWD_size = ECL_BKW_CRATES    * ECL_BKW_SHAPERS_IN_CRATE    * ECL_CHANNELS_IN_SHAPER;
+
+  std::vector<int> mappingBAR(mappingBAR_size);
+  std::vector<int> mappingFWD(mappingFWD_size);
+  std::vector<int> mappingBWD(mappingBWD_size);
+
+  for (int i = 0; i < mappingBAR_size; i++)
+    mappingBAR[i] = convertArrayBarrel[i];
+  for (int i = 0; i < mappingFWD_size; i++)
+    mappingFWD[i] = convertArrayFWD[i];
+  for (int i = 0; i < mappingBWD_size; i++)
+    mappingBWD[i] = convertArrayBKW[i];
+
+  map.setMappingVectors(mappingBAR, mappingFWD, mappingBWD);
+
+  return map;
+}
 
 int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE)
 {
   int iCrate;
+
+  // TODO: I am 99.99% sure this code returns wrong results.
+  //       Check and fix if necessary!
 
   //  B2DEBUG(50, "iCOPPERNode = %x" << iCOPPERNode);
   if (iFINESSE > ECL_FINESSES_IN_COPPER - 1) {

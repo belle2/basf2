@@ -57,7 +57,38 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
                     sensorNumber = sensor.getSensorNumber()
                     for side in (0, 1):
                         print("setting SVDCluster calibrations for " +
-                              str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
+                              str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber) + "." + str(side))
+                        if side == 0:  # V
+                            if layerNumber == 3:  # L3 V
+                                clsParam.scaleError_clSize1 = 1.57
+                                clsParam.scaleError_clSize2 = 1.32
+                                clsParam.scaleError_clSize3 = 0.70
+                            else:
+                                if sensorNumber == 1:  # FW V
+                                    clsParam.scaleError_clSize1 = 1.84
+                                    clsParam.scaleError_clSize2 = 1.53
+                                    clsParam.scaleError_clSize3 = 0.67
+                                else:  # BARREL V
+                                    clsParam.scaleError_clSize1 = 1.84
+                                    clsParam.scaleError_clSize2 = 1.40
+                                    clsParam.scaleError_clSize3 = 0.75
+                        if side == 1:  # U
+                            if layerNumber == 3:  # L3 U
+                                clsParam.scaleError_clSize1 = 1.32
+                                clsParam.scaleError_clSize2 = 1.25
+                                clsParam.scaleError_clSize3 = 0.93
+                            else:
+                                if sensorNumber == 1:  # FW U
+                                    clsParam.scaleError_clSize1 = 1.44
+                                    clsParam.scaleError_clSize2 = 1.28
+                                    clsParam.scaleError_clSize3 = 0.99
+                                else:  # BARREL U
+                                    clsParam.scaleError_clSize1 = 1.15
+                                    clsParam.scaleError_clSize2 = 1.09
+                                    clsParam.scaleError_clSize3 = 0.95
+                        print(" size 1 = " + str(clsParam.scaleError_clSize1) + ", size 2 = " +
+                              str(clsParam.scaleError_clSize2) + ", size >2 = " + str(clsParam.scaleError_clSize3))
+
                         cls_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, clsParam)
                         time_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, hitTimeSelection)
 

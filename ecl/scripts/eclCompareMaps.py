@@ -41,21 +41,29 @@ def main():
 
     # True if there are different rows in two maps
     diff = False
+    # Header for the diff table
+    header = '       | crate | shaper | channel | cell_id |'
+
+    def rowToString(row):
+        return '| %5d | %6d | %7d | %7d |' % row
 
     for partial_ch_maps in zip(*ch_maps):
         for row1, row2 in zip(*partial_ch_maps):
             if row1 != row2:
+                print()
+                if not diff:
+                    print(header)
                 diff = True
-                print('file1:', row1)
-                print('file2:', row2)
+                print('file1:', rowToString(row1))
+                print('file2:', rowToString(row2))
     if not diff:
         print()
         print('%s and %s contain identical channel maps.' % paths)
         print()
         exit(0)
     else:
-        # It should be obvious from diff output that files are different,
-        # so nothing is printed here.
+        print(header)
+        print()
         exit(1)
 
 ################################################

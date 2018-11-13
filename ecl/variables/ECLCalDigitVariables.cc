@@ -412,6 +412,21 @@ namespace Belle2 {
       return mapping->getCellIdToTheta(centercellid);
     }
 
+    //! @returns the eclcaldigit center cell crystal phi
+    double getCenterCellCrystalPhi(const Particle* particle)
+    {
+      const int centercellid = ECLCalDigitVariable::getCenterCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (centercellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToPhi(centercellid);
+    }
+
     //! @returns the eclcaldigit ext cell id
     double getExtCellId(const Particle* particle)
     {
@@ -464,6 +479,21 @@ namespace Belle2 {
 
       if (extcellid < 0) return std::numeric_limits<double>::quiet_NaN();
       return mapping->getCellIdToTheta(extcellid);
+    }
+
+    //! @returns the eclcaldigit ext cell crystal phi
+    double getExtCellCrystalPhi(const Particle* particle)
+    {
+      const int extcellid = ECLCalDigitVariable::getExtCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (extcellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToPhi(extcellid);
     }
 
     //! @returns the eclcaldigit center cell index
@@ -569,6 +599,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id");
     REGISTER_VARIABLE("eclcaldigitCenterCellCrystalTheta", getCenterCellCrystalTheta,
                       "[calibration] Returns the center cell crystal theta");
+    REGISTER_VARIABLE("eclcaldigitCenterCellCrystalPhi", getCenterCellCrystalPhi,
+                      "[calibration] Returns the center cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours)");
 
@@ -588,6 +620,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitExtCellId", getExtCellId, "[calibration] Returns the extrapolated cell id");
     REGISTER_VARIABLE("eclcaldigitExtCellThetaId", getExtCellThetaId, "[calibration] Returns the ext cell theta id");
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalTheta", getExtCellCrystalTheta, "[calibration] Returns the ext cell crystal theta");
+    REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours) for an ext track");
 

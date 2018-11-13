@@ -1,6 +1,22 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#################################################################################
+#
+# evaluates the CoG corrections, create a localDB
+# with the corrections and a root file to check
+# the corrections
+#
+# usage: basf2 SVDCoGTimeCalibratinWithErrorImporter localDB filename
+# localDB = name of the local DB folder
+# filename = single root file, or file with the list of reconstructed files
+#
+# this script can be launched with launch_calibration_cog.sh in the
+# B2SVD project, svd_CoGHitTime_calibration repository
+#
+#################################################################################
+
+
 from basf2 import *
 from svd import *
 import ROOT
@@ -22,15 +38,28 @@ import simulation
 hasCluster = True
 hasRecoDigits = True
 
-filename = sys.argv[1]
-inputFile = filename + ".root"
-outputFile = "CoGcorrectionMonitor_" + filename + ".root"
-localdb = "localDB_" + filename
+
+localdb = sys.argv[1]
+outputFile = "CoGCorrectionMonitor_" + localdb + ".root"
+trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
+nSVD = 6
+nCDC = 1
+pVal = 0.0  # 0001
+
+filename = sys.argv[2]
+inputFileList = []
+if filename.rfind(".root") != -1:
+    inputFileList.append(filename)
+else:
+    with open(filename, 'r') as f:
+        inputFileList = [line.strip() for line in f]
+
 
 svd_recoDigits = "SVDRecoDigits"
 cdc_Time0 = "EventT0"
 svd_Clusters = "SVDClusters"
 svd_Tracks = "Tracks"
+# svd_Tracks = "SelectedTracks"
 svd_RecoTracks = "RecoTracks"
 
 gROOT.SetBatch(True)
@@ -386,22 +415,37 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
 
 
 use_database_chain()
-use_local_database(localdb + "/database.txt", localdb)
+use_local_database(localdb + "/database.txt", localdb, invertLogging=True)
 
 main = create_path()
 
 rootinput = register_module('RootInput')
-rootinput.param('inputFileName', inputFile)
+rootinput.param('inputFileNames', inputFileList)
 main.add_module(rootinput)
 
 main.add_module("Gearbox")
 main.add_module("Geometry", useDB=True)
 
+# Track selection - NOT YET
+trkFlt = register_module('TrackFilter')
+trkFlt.param('outputFileName', trk_outputFile)
+trkFlt.param('outputINArrayName', 'SelectedTracks')
+trkFlt.param('outputOUTArrayName', 'ExcludedTracks')
+trkFlt.param('min_NumHitSVD', nSVD)
+trkFlt.param('min_NumHitCDC', nCDC)
+trkFlt.param('min_Pvalue', pVal)
+# trkFlt.logging.log_level = LogLevel.DEBUG
+# main.add_module(trkFlt)
+
 main.add_module(SVDCoGTimeCalibrationImporterModule())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = register_module('ProgressBar')
 main.add_module(progress)
+
+print_path(main)
 
 # Process events
 process(main)
+
+print(statistics)

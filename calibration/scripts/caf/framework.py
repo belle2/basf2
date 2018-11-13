@@ -47,10 +47,10 @@ from caf.database import CAFDB
 
 class Collection():
     """
-    Keyword Argumemts:
+    Keyword Arguments:
         collector (str, basf2.Module): The collector module  or module name for this `Collection`.
         input_files (list[str]): The input files to be used for only this `Collection`.
-        pre_collection_path (basf.path): The reconstruction `basf2.path` to be run prior to the Collector module.
+        pre_collection_path (basf2.Path): The reconstruction `basf2.Path` to be run prior to the Collector module.
         database_chain (list[CentralDatabase, LocalDatabase]): The database chain to be used initially for this `Collection`.
         output_patterns (list[str]): Output patterns of files produced by collector which will be used to pass to the
             `Algorithm.data_input` function. Setting this here, replaces the default completely.
@@ -302,7 +302,7 @@ class Calibration(CalibrationBase):
     You have the option to add in your collector/algorithm by argument here, or add them
     later by changing the properties.
 
-    If you plan to use multiple `Collections` I recommend that you only set the name here and add the Collections
+    If you plan to use multiple `Collection` objects I recommend that you only set the name here and add the Collections
     separately via `add_collection()`.
 
     Parameters:
@@ -437,7 +437,7 @@ class Calibration(CalibrationBase):
             self.database_chain = database_chain
         else:
             self.database_chain = []
-            # This database is already applied to the Collection automatically, so don't do it again
+            # This database is already applied to the `Collection` automatically, so don't do it again
             self.use_central_database(get_default_global_tags(), apply_to_default_collection=False)
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
@@ -460,8 +460,8 @@ class Calibration(CalibrationBase):
     def add_collection(self, name, collection):
         """
         Parameters:
-            name (str): Unique name of this Collection in the Calibration.
-            collection (Collection): Collection object to use.
+            name (str): Unique name of this `Collection` in the Calibration.
+            collection (`Collection`): `Collection` object to use.
 
         Adds a new `Collection` object to the `Calibration`. Any valid Collection will be used in the Calibration.
         A default Collection is automatically added but isn't valid and won't run unless you have assigned a collector

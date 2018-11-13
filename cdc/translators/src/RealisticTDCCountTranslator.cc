@@ -33,6 +33,12 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   }
 //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
 
+  if (m_realData) {
+    m_fudgeFactor = m_gcp.getFudgeFactorForSpaceResolForData();
+  } else {
+    m_fudgeFactor = m_gcp.getFudgeFactorForSpaceResolForMC();
+  }
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "RealisticTDCCountTranslator constructor" << endl;
@@ -133,7 +139,8 @@ double RealisticTDCCountTranslator::getDriftLengthResolution(double driftLength,
     double alpha, double theta)
 {
   static_cast<void>(z); //just to suppress warning of unused
-  double resol = m_cdcp.getSigma(driftLength, wireID.getICLayer(), leftRight, alpha, theta);
+  double resol = m_fudgeFactor * m_cdcp.getSigma(driftLength, wireID.getICLayer(), leftRight, alpha, theta);
+  //  cout << "fudgeFactor in transl= " << m_fudgeFactor << endl;
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

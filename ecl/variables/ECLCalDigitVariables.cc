@@ -398,7 +398,7 @@ namespace Belle2 {
     }
 
     //! @returns the eclcaldigit center cell crystal theta
-    double getCenterCellThetaCrystalTheta(const Particle* particle)
+    double getCenterCellCrystalTheta(const Particle* particle)
     {
       const int centercellid = ECLCalDigitVariable::getCenterCell(particle);
       StoreObjPtr<ECLCellIdMapping> mapping;
@@ -567,7 +567,7 @@ namespace Belle2 {
                       "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
     REGISTER_VARIABLE("eclcaldigitCenterCellId", getCenterCellId, "[calibration] Returns the center cell id");
     REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id");
-    REGISTER_VARIABLE("eclcaldigitCenterCellCrystalTheta", getCenterCellThetaCrystalTheta,
+    REGISTER_VARIABLE("eclcaldigitCenterCellCrystalTheta", getCenterCellCrystalTheta,
                       "[calibration] Returns the center cell crystal theta");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours)");

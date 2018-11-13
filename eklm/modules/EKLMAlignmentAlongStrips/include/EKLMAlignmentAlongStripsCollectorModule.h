@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
-#define EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -93,6 +92,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

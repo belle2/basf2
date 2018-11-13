@@ -83,7 +83,7 @@ TrackFilterFactory::create(const std::string& filterName) const
     recordedVarSets->push_back(std::make_unique<TrackFilterVarSet>("truth", create("truth")));
     return std::make_unique<Recording<BaseTrackFilter>>(std::move(recordedVarSets), "TrackFilter_eval.root");
   } else if (filterName == "mva") {
-    return std::make_unique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackFilter.xml", 0.10);
+    return std::make_unique<MVATrackFilter>("trackfindingcdc_TrackFilter", 0.10);
   } else {
     return Super::create(filterName);
   }

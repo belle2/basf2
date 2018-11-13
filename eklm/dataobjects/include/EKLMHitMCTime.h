@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMHITMCTIME_H
-#define EKLMHITMCTIME_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -58,6 +57,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

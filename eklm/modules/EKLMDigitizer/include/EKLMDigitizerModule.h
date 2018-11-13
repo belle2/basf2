@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGITIZERMODULE_H
-#define EKLMDIGITIZERMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
@@ -131,6 +130,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

@@ -29,7 +29,7 @@ EKLMSensitiveDetector(G4String name)
 {
   int iEndcap, iLayer, iSector, iPlane, iStrip, strip, maxStrip;
   const EKLMChannelData* channelData;
-  m_ChannelActive = NULL;
+  m_ChannelActive = nullptr;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
@@ -49,7 +49,7 @@ EKLMSensitiveDetector(G4String name)
             strip = m_GeoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
                                           iStrip);
             channelData = channels->getChannelData(strip);
-            if (channelData == NULL)
+            if (channelData == nullptr)
               B2FATAL("Incomplete EKLM channel data.");
             m_ChannelActive[strip - 1] = channelData->getActive();
           }
@@ -66,7 +66,7 @@ EKLMSensitiveDetector(G4String name)
 
 EKLM::EKLMSensitiveDetector::~EKLMSensitiveDetector()
 {
-  if (m_ChannelActive != NULL)
+  if (m_ChannelActive != nullptr)
     delete[] m_ChannelActive;
 }
 

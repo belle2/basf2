@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMUNPACKERMODULE_H
-#define EKLMUNPACKERMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -116,6 +115,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

@@ -26,7 +26,7 @@ using namespace TrackFindingCDC;
 void TrackFindingCDCTestWithTopology::SetUpTestCase()
 {
   /// Manually open the database and prepare the cdc geometry parameters.
-  CDCGeometryLoader::loadLocalDatabase();
+  CDCGeometryLoader::loadDatabase();
 
   // Prepare the wires for the cdc track finders.
   CDCWireTopology::getInstance();

@@ -298,6 +298,7 @@ directly in python using the following functions:
 Additional Functions
 --------------------
 
+.. autofunction:: find_file
 
 .. autofunction:: get_random_seed
 

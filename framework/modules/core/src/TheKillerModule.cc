@@ -81,8 +81,11 @@ void TheKillerModule::event()
       if (raise(m_parameter) != 0) B2FATAL("Invalid signal number" << LogVar("signal", m_parameter));
       break;
     case EMethod::c_segfault:
+#ifndef __clang_analyzer__
+      // this is an intentional nullptr dereference so lets hide it from clang analyzer
       volatile int* foo {nullptr};
       *foo = 5;
+#endif
       B2FATAL("This should never be called ...");
       break;
   }

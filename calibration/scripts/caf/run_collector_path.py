@@ -13,6 +13,7 @@ def run_collectors():
     Runs the CAF collector in a general way by passing serialised basf2 paths, input file
     locations, and local databases from previous calibrations.
     """
+    from basf2.pickle_path import get_path_from_file
     import glob
     import os
     import sys

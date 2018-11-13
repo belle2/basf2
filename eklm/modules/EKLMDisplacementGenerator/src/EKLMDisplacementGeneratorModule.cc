@@ -55,7 +55,7 @@ EKLMDisplacementGeneratorModule::EKLMDisplacementGeneratorModule() : Module()
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = NULL;
+  m_GeoDat = nullptr;
 }
 
 EKLMDisplacementGeneratorModule::~EKLMDisplacementGeneratorModule()
@@ -224,6 +224,7 @@ sector:
 
 void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
 {
+  /* cppcheck-suppress variableScope */
   int i, n, iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment, param;
   float value;
   IntervalOfValidity iov(0, 0, -1, -1);

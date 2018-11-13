@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# --------------------------------------------------------------------------
-# This scripts compares different versions of ECL channel maps,
-# both text files and database ecl_ch_maps
-#
-# Return code is
-#  0-identical ECL channel maps
-#  1-different ECL channel maps
-#  255-wrong arguments
-# --------------------------------------------------------------------------
+"""
+This scripts compares different versions of ECL channel maps,
+both text files and database payloads
+
+Return code is
+ 0-ECL channel maps are identical
+ 1-ECL channel maps are different
+ 255-wrong script arguments
+"""
 
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import ECLChannelMap
 import sys
+
+################################################
+# CONSTANTS
 
 ECL_CHANNELS_IN_SHAPER = 16
 ECL_BARREL_CRATES = 36

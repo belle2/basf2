@@ -198,9 +198,8 @@ namespace Belle2 {
     // simulate start time jitter
     double startTimeJitter = gRandom->Gaus(0, m_timeZeroJitter);
 
-    // get nominal TTS and electronic efficiency
+    // get electronic efficiency
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    const auto& tts = geo->getNominalTTS();
     double electronicEfficiency = geo->getNominalTDC().getEfficiency();
 
     // define pixels with time digitizers
@@ -225,7 +224,10 @@ namespace Belle2 {
 
       // add start time jitter and generated TTS to photon time
       double time = simHit.getTime() + startTimeJitter;
-      if (m_simulateTTS) time += tts.generateTTS();
+      if (m_simulateTTS) {
+        const auto& tts = TOPGeometryPar::Instance()->getTTS(moduleID, pmtID);
+        time += tts.generateTTS();
+      }
 
       // time range cut (to speed up digitization)
       if (time < m_timeMin) continue;

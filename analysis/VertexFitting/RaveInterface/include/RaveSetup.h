@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef RaveSetup_H
-#define RaveSetup_H
+#pragma once
 
 //std
 #include <string>
@@ -87,4 +85,3 @@ namespace Belle2 {
 
 }
 
-#endif

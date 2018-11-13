@@ -24,7 +24,7 @@ using namespace Belle2;
 /************************SETTERS***********************/
 
 
-void FlavorTaggerInfo::setUseModeFlavorTagger(std::string mode)
+void FlavorTaggerInfo::setUseModeFlavorTagger(const std::string& mode)
 {
   m_useModeFlavorTagger = mode;
 }

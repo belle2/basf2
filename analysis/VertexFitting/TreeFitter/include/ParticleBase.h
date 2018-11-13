@@ -63,8 +63,8 @@ namespace TreeFitter {
     /** create a custom origin particle or a beamspot*/
     static ParticleBase* createOrigin(Belle2::Particle* daughter,
                                       bool forceFitAll,
-                                      const std::vector<double> customOriginVertex,
-                                      const std::vector<double> customOriginCovariance,
+                                      const std::vector<double>& customOriginVertex,
+                                      const std::vector<double>& customOriginCovariance,
                                       const bool isBeamSpot
                                      );
 

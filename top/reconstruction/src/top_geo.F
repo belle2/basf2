@@ -470,7 +470,7 @@ c-- internal functions --------------------------------------------------
 #include "TOP_EXT.fi"
 #include "TOP_PIK.fi"
 
-      INTEGER I
+      INTEGER I, K
       LOGICAL FOCTOP
 
       FOCTOP=.FALSE.
@@ -491,10 +491,15 @@ c-- internal functions --------------------------------------------------
       PRINT*,'PMT active area [cm]:     ', PMT_AA, PMT_BB
       PRINT*,'PMT number of pads:       ', PMT_NX, PMT_NY
       PRINT*,'PMT pad size [cm]:        ', PMT_DXCH, PMT_DYCH
-      PRINT*,'TTS number of Gaussians:  ', TTS_NG
-      PRINT*,'          I  fraction [%]     mean [ps]      sigma [ps]'
-      DO I=1,TTS_NG
-         PRINT*,I,TTS_FRAC(I)*100.,TTS_T0(I)*1000.,TTS_SIG(I)*1000.
+      DO K=0,MAX_TTS
+         IF(TTS_TYP(K).NE.K) CYCLE
+         PRINT*,'TTS type: ', TTS_TYP(K)
+         PRINT*,'          I   fraction [%]     mean [ps]      ',
+     &        '  sigma [ps]'
+         DO I=1,TTS_NG(K)
+            PRINT*,I,TTS_FRAC(I,K)*100.,TTS_T0(I,K)*1000.,
+     &           TTS_SIG(I,K)*1000.
+         ENDDO
       ENDDO
       PRINT*,'TDC range [channels]:     ', TDC_RANGE
       PRINT*,'TDC channel width [ps]:   ', TDC_DT*1000.
@@ -543,6 +548,7 @@ c-- internal functions --------------------------------------------------
  101  FORMAT(I3,2I4,8F8.2)
       PRINT*
 
+c      CALL PRINT_PMT_TYPES
 c      call print_refind(1.4, 4.0, 0.01) ! xml format
 
       END
@@ -696,10 +702,10 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
 
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
-
+#include "TOP_CONS.fi"
       REAL LAM, PHIND_LAMBDA
       
-      LAM=1240./E
+      LAM=C_HC/E
       PHASE_INDEX=PHIND_LAMBDA(LAM)
       
       END
@@ -724,6 +730,7 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
 
+#include "TOP_CONS.fi"
       REAL RIND_SF
       COMMON /TOP_RIND/ RIND_SF
 
@@ -731,7 +738,7 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
       DATA DL /1./              ! (nm)
       SAVE DL
 
-      LAM=1240./E
+      LAM=C_HC/E
       PHIND=PHIND_LAMBDA(LAM)
       DNDL=(PHIND_LAMBDA(LAM+DL/2)-PHIND_LAMBDA(LAM-DL/2))/DL
 
@@ -744,10 +751,10 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
 
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
-
+#include "TOP_CONS.fi"
       REAL LAM
 
-      LAM=1240/E
+      LAM=C_HC/E
 cc      ABSPT_LENG=50000.*(LAM/442)**4 ! J. Va'vra (7-jul-2004)
       ABSPT_LENG=15100.*(LAM/405)**4 ! Alan, 2013
 

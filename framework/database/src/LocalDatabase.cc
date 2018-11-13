@@ -63,7 +63,7 @@ bool LocalDatabase::readDatabase()
   // read and parse the database content
   std::ifstream file(m_absFileName.c_str());
   if (!file.is_open()) {
-    B2ERROR("Opening of database file " << m_fileName << " failed.");
+    B2ERROR("Opening of database file " << m_fileName << " failed: " << strerror(errno));
     return false;
   }
   int lineno{0};
@@ -122,6 +122,7 @@ bool LocalDatabase::tryDefault(DBQuery& query)
   if (FileSystem::fileExists(defaultName)) {
     query.filename = defaultName;
     query.iov = IntervalOfValidity(0, -1, -1, -1);
+    query.checksum = FileSystem::calculateMD5(query.filename);
     if (m_invertLogging)
       B2LOG(m_logLevel, 35, "Obtained " << query.name << " from " << defaultName << ". IoV="
             << query.iov);
@@ -147,6 +148,10 @@ bool LocalDatabase::getData(const EventMetaData& event, DBQuery& query)
     if (entry.second.contains(event)) {
       query.revision = entry.first;
       query.filename = payloadFileName(m_payloadDir, query.name, query.revision);
+      if (!FileSystem::fileExists(query.filename)) {
+        B2ERROR("Could not find payload file." << LogVar("filename", query.filename) << LogVar("database", m_fileName));
+        return false;
+      }
       query.iov = entry.second;
       // We don't store the md5 in the file yet ... we probably should
       query.checksum = FileSystem::calculateMD5(query.filename);

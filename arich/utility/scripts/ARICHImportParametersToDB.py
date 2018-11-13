@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# use to import parmeters from the xml files to corresponding database classes
+# Author: luka.santelj@ijs.si
+
 from basf2 import *
 import ROOT
 from ROOT.Belle2 import ARICHDatabaseImporter
@@ -11,15 +14,12 @@ import subprocess
 from fnmatch import fnmatch
 
 # set local database folder
-use_local_database("localdb/database.txt",
-                   "localdb", 0, LogLevel.INFO)
-
+use_central_database("Calibration_Offline_Development")
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox
 eventinfo = register_module('EventInfoSetter')
 eventinfo.initialize()
-
 
 # load gearbox for reading parameters from xml files (by default in "arich/data")
 paramloader = register_module('Gearbox')
@@ -91,24 +91,3 @@ dbImporter = ARICHDatabaseImporter()
 # Parameters are read from arich/data/ARICH-CosmicTest.xml
 
 # dbImporter.importCosmicTestGeometry()
-
-# below few functions print the content of described classes from the database
-
-# dbImporter.printModulesInfo()
-# dbImporter.printSimulationPar()
-# dbImporter.printChannelMask()
-# dbImporter.printChannelMapping()
-# dbImporter.printFEMappings()
-
-
-# creates root file with full detector plane QE map (all HAPDs) as stored in the database
-
-# dbImporter.dumpQEMap()
-
-# creates root file with numbering of HAPD module slots (position on detector plane -> module number)
-
-# dbImporter.dumpModuleNumbering()
-
-# print geometry parameters of ARICH detector from the database
-
-# dbImporter.printGeometryConfig()

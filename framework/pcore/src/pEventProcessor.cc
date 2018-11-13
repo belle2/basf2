@@ -410,7 +410,7 @@ void pEventProcessor::preparePaths()
 }
 
 
-void pEventProcessor::dump_modules(const std::string title, const ModulePtrList modlist)
+void pEventProcessor::dump_modules(const std::string& title, const ModulePtrList modlist)
 {
   ModulePtrList::const_iterator it;
   std::ostringstream strbuf;

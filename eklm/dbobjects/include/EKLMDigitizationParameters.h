@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGITIZATIONPARAMETERS_H
-#define EKLMDIGITIZATIONPARAMETERS_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -268,12 +267,9 @@ namespace Belle2 {
     /** Enable background in fitting. */
     bool m_EnableConstBkg;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMDigitizationParameters, 3);
 
   };
 
 }
-
-#endif
-

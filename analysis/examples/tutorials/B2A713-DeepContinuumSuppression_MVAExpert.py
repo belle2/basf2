@@ -144,7 +144,7 @@ cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', '
 track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits', 'isInRestOfEvent', 'charge']
 
 for variablename in basic_variables + vertex_variables:
-    v.variables.addAlias('thrustsig' + variablename, 'useThrustFrame(' + variablename + ',Signal)')
+    v.variables.addAlias('thrustsig' + variablename, 'useBThrustFrame(' + variablename + ',Signal)')
 
 cluster_variables = cluster_specific_variables[:]
 for variablename in basic_variables:

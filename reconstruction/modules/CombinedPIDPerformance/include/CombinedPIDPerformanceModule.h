@@ -54,13 +54,13 @@ namespace Belle2 {
     virtual ~CombinedPIDPerformanceModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

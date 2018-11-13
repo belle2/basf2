@@ -30,19 +30,19 @@ namespace Belle2 {
     ~BKLMK0LReconstructorModule();
 
     //! Once-only initialization at start of job
-    void initialize();
+    void initialize() override;
 
     //! Prepare for start of each run
-    void beginRun();
+    void beginRun() override;
 
     //! Process each event
-    void event();
+    void event() override;
 
     //! Aggregate information at end of each run
-    void endRun();
+    void endRun() override;
 
     //! Once-only termination at the end of the job
-    void terminate();
+    void terminate() override;
 
   private:
 

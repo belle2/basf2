@@ -49,12 +49,32 @@ namespace Belle2 {
     TOPASICChannel(const TOPASICChannel& chan): TObject()
     {
       *this = chan;
-      for (auto& pedestals : m_pedestals) {
-        if (pedestals) pedestals = new TOPASICPedestals(*pedestals);
+    }
+
+    /**
+     * Assignment operator
+     */
+    TOPASICChannel& operator=(const TOPASICChannel& chan)
+    {
+      if (this != &chan) {
+        m_moduleID = chan.getModuleID();
+        m_channel = chan.getChannel();
+        for (auto& pedestals : m_pedestals) {
+          if (pedestals) delete pedestals;
+        }
+        m_pedestals = chan.getPedestals();
+        for (auto& pedestals : m_pedestals) {
+          if (pedestals) pedestals = new TOPASICPedestals(*pedestals);
+        }
+        for (auto& gains : m_gains) {
+          if (gains) delete gains;
+        }
+        m_gains = chan.getGains();
+        for (auto& gains : m_gains) {
+          if (gains) gains = new TOPASICGains(*gains);
+        }
       }
-      for (auto& gains : m_gains) {
-        if (gains) gains = new TOPASICGains(*gains);
-      }
+      return *this;
     }
 
     /**
@@ -144,6 +164,12 @@ namespace Belle2 {
     }
 
     /**
+     * Returns a vector of pedestals
+     * @return pedestals
+     */
+    const std::vector<TOPASICPedestals*>& getPedestals() const {return m_pedestals;}
+
+    /**
      * Return gains of an ASIC window
      * @param window ASIC window number
      * @return pointer to gains or NULL
@@ -154,6 +180,12 @@ namespace Belle2 {
       if (window < m_pedestals.size()) return &m_defaultGain;
       return NULL;
     }
+
+    /**
+     * Returns a vector of gains
+     * @return gains
+     */
+    const std::vector<TOPASICGains*>& getGains() const {return m_gains;}
 
     /**
      * Return number of good ASIC windows (e.g. those with defined pedestals)

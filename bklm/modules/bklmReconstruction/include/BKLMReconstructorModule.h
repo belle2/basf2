@@ -30,19 +30,19 @@ namespace Belle2 {
     virtual ~BKLMReconstructorModule();
 
     //! Once-only initialization at start of job
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Prepare for start of each run
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     //! Process each event
-    virtual void event();
+    virtual void event() override;
 
     //! Aggregate information at end of each run
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! Once-only termination at the end of the job
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 

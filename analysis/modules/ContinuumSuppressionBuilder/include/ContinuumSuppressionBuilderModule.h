@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CONTINUUMSUPPRESSIONBUILDERMODULE_H
-#define CONTINUUMSUPPRESSIONBUILDERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/Particle.h>
@@ -57,4 +56,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* CONTINUUMSUPPRESSIONBUILDERMODULE_H */

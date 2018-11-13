@@ -156,7 +156,7 @@ namespace Belle2 {
         SoftwareTriggerCutResult swtcr;
         try {
           swtcr = swtr->getResult(triggerIdentifier);
-        } catch (std::out_of_range)
+        } catch (const std::out_of_range&)
         {
           // then the trigger indentifier is wrong
           std::string err = "The trigger identifier \"" + triggerIdentifier;

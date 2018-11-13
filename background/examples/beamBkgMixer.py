@@ -16,11 +16,19 @@ import glob
 
 set_log_level(LogLevel.INFO)
 
+
+if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
+    B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG mixing samples')
+    sys.exit()
+
 # define background (collision) files
 #    glob.glob is the prefered way to get the list of files:
 #    (the directory must include only BG files!)
 
-bg = glob.glob('/sw/belle2/bkg/*.root')  # if you run at KEKCC
+bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
+if len(bg) == 0:
+    B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+    sys.exit()
 
 # alternative: you can specify files explicitely
 #

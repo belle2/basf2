@@ -25,15 +25,15 @@ namespace Belle2 {
     /** Initialize the module.
      * Initialize the networks and register datastore objects.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called once for each event.
      * Prepare input and target for each track and store it.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Do the training for all sectors. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** calculate and set the relevant id range for given sector
      *  based on hit counters of the track segments. */

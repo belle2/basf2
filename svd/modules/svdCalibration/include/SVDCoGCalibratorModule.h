@@ -39,19 +39,19 @@ namespace Belle2 {
     SVDCoGCalibratorModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** y */
-    virtual void event();
+    virtual void event() override;
 
     /**  */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**  */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */

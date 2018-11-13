@@ -96,7 +96,19 @@ ARICHDatabaseImporter::ARICHDatabaseImporter(const vector<string>& inputFilesHap
   for (unsigned int i = 0; i < inputFilesFebTest.size(); i++) {  m_inputFilesFebTest.push_back(inputFilesFebTest[i]); }
 }
 
+ARICHDatabaseImporter::ARICHDatabaseImporter(int experiment, int run)
+{
+  StoreObjPtr<EventMetaData> meta;
+  meta->setRun(run); meta->setExperiment(experiment);
+  B2INFO("Experiment " << experiment << ", run " << run);
+}
 
+void ARICHDatabaseImporter::setExperimentAndRun(int experiment, int run)
+{
+  StoreObjPtr<EventMetaData> meta;
+  meta->setRun(run); meta->setExperiment(experiment);
+  B2INFO("Experiment " << experiment << ", run " << run);
+}
 
 // classses for simulation/reconstruction software
 void ARICHDatabaseImporter::importModulesInfo()
@@ -835,10 +847,21 @@ void ARICHDatabaseImporter::printModulesInfo()
   modinfo->print();
 }
 
-void ARICHDatabaseImporter::printChannelMask()
+void ARICHDatabaseImporter::printChannelMask(bool makeHist)
 {
+
   DBObjPtr<ARICHChannelMask> chMask;
   chMask->print();
+
+  if (makeHist) {
+    ARICHChannelHist* hist = new ARICHChannelHist("channelMask", "Map of active channels");
+    for (int hapdID = 1; hapdID < 421; hapdID++) {
+      for (int ichn = 0; ichn < 144; ichn++) {
+        if (chMask->isActive(hapdID, ichn)) hist->setBinContent(hapdID, ichn, 1.0);
+      }
+    }
+    hist->SaveAs("channelMask.root");
+  }
 }
 
 void ARICHDatabaseImporter::dumpModuleNumbering()

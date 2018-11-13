@@ -15,7 +15,14 @@
 #include <top/geometry/FrontEndMapper.h>
 #include <top/geometry/ChannelMapper.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+#include <top/dbobjects/TOPPmtInstallation.h>
+#include <top/dbobjects/TOPPmtQE.h>
+#include <top/dbobjects/TOPNominalQE.h>
+#include <top/dbobjects/TOPCalChannelRQE.h>
+#include <top/dbobjects/TOPCalChannelThresholdEff.h>
 #include <string>
+#include <map>
 
 namespace Belle2 {
   namespace TOP {
@@ -87,6 +94,49 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * Returns PMT efficiency envelope, e.g. at given photon energy the maximum
+       * over all PMT's of a product of quantum and collection efficiency.
+       * @param energy photon energy in [eV]
+       * @return the maximal efficiency
+       */
+      double getPMTEfficiencyEnvelope(double energy) const;
+
+      /**
+       * Returns PMT pixel efficiency, a product of quantum and collection efficiency.
+       * @param energy photon energy in [eV]
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @param x photon detection position x in local PMT frame
+       * @param y photon detection position y in local PMT frame
+       * @return the efficiency
+       */
+      double getPMTEfficiency(double energy,
+                              int moduleID, int pmtID, double x, double y) const;
+
+      /**
+       * Returns relative pixel efficiency (including CE, RQE and threshold efficiency)
+       * @return pixel efficiency relative to nominal photocathode
+       */
+      double getRelativePixelEfficiency(int moduleID, int pixelID) const;
+
+      /**
+       * Returns PMT type at a given position
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @return PMT type
+       */
+      unsigned getPMTType(int moduleID, int pmtID) const;
+
+      /**
+       * Returns TTS of a PMT at given position
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @return TTS
+       */
+      const TOPNominalTTS& getTTS(int moduleID, int pmtID) const;
+
+      static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
     private:
 
@@ -95,6 +145,11 @@ namespace Belle2 {
        */
       TOPGeometryPar()
       {}
+
+      /**
+       * finalize initialization
+       */
+      void finalizeInitialization();
 
       /**
        * Create a parameter object from gearbox
@@ -110,18 +165,91 @@ namespace Belle2 {
        */
       std::string addNumber(const std::string& str, unsigned number);
 
+      /**
+       * Clears cache for PMT dependent QE data - function is used in call backs
+       */
+      void clearCache();
+
+      /**
+       * Constructs envelope of quantum efficiency from PMT data
+       */
+      void setEnvelopeQE() const;
+
+      /**
+       * Maps PMT QE data to positions within the detector
+       */
+      void mapPmtQEToPositions() const;
+
+      /**
+       * Maps PMT type to positions within the detector
+       */
+      void mapPmtTypeToPositions() const;
+
+      /**
+       * Prepares a map of relative pixel efficiencies
+       */
+      void prepareRelEfficiencies() const;
+
+      /**
+       * Returns unique PMT ID within the detector
+       * @param moduleID slot ID
+       * @param pmtID PMT ID
+       * @return unique ID
+       */
+      int getUniquePmtID(int moduleID, int pmtID) const
+      {
+        return (moduleID << 16) + pmtID;
+      }
+
+      /**
+       * Returns unique pixel ID within the detector
+       * @param moduleID slot ID
+       * @param pixelID pixel ID
+       * @return unique ID
+       */
+      int getUniquePixelID(int moduleID, int pixelID) const
+      {
+        return (moduleID << 16) + pixelID;
+      }
+
+      /**
+       * Returns integral of quantum efficiency over photon energies
+       * @param qe quantum efficiency data points
+       * @param ce collection efficiency data points
+       * @param lambdaFirst wavelenght of the first data point [nm]
+       * @param lambdaStep wavelength step [nm]
+       * @return integral [eV]
+       */
+      double integralOfQE(const std::vector<float>& qe, double ce,
+                          double lambdaFirst, double lambdaStep) const;
+
       // Geometry
 
       TOPGeometry* m_geo = 0;             /**< geometry parameters from Gearbox */
       DBObjPtr<TOPGeometry>* m_geoDB = 0; /**< geometry parameters from database */
       bool m_fromDB = false;              /**< parameters from database or Gearbox */
       bool m_valid = false;               /**< true if geometry is available */
+      bool m_oldPayload = false;          /**< true if old payload found in DB */
+      bool m_BfieldOn =  true;            /**< true if B field is on */
 
       // Mappings
 
       FrontEndMapper m_frontEndMapper; /**< front end electronics mapper */
       ChannelMapper m_channelMapperIRS3B; /**< channel-pixel mapper */
       ChannelMapper m_channelMapperIRSX;  /**< channel-pixel mapper */
+
+      // PMT database
+
+      DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
+      DBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
+      DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
+      DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
+
+      // cache
+      mutable TOPNominalQE m_envelopeQE;  /**< envelope quantum efficiency */
+      mutable std::map<int, const TOPPmtQE*> m_pmts; /**< QE data mapped to positions */
+      mutable std::map<int, double> m_relEfficiencies; /**< pixel relative QE */
+      mutable std::map<int, unsigned> m_pmtTypes; /**< PMT types mapped to positions */
 
       // Other
 

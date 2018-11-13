@@ -39,7 +39,7 @@ REG_MODULE(VariablesToNtuple)
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
   Module(),
-  m_tree("", DataStore::c_Persistent)
+  m_tree("", DataStore::c_Persistent), m_sampling_variable(nullptr)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");

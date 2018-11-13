@@ -148,10 +148,12 @@ void RFLogManager::Info(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[info]", msg);
-  int pars[2];
-  pars[0] = 2;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 2;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
 void RFLogManager::Warning(char* fmt, ...)
@@ -162,10 +164,12 @@ void RFLogManager::Warning(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[warning]", msg);
-  int pars[2];
-  pars[0] = 4;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 4;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
 void RFLogManager::Error(char* fmt, ...)
@@ -176,10 +180,12 @@ void RFLogManager::Error(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[error]", msg);
-  int pars[2];
-  pars[0] = 5;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 5;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
 void RFLogManager::Fatal(char* fmt, ...)
@@ -190,10 +196,12 @@ void RFLogManager::Fatal(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[fatal]", msg);
-  int pars[2];
-  pars[0] = 6;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 6;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
 void RFLogManager::Abort(char* fmt, ...)

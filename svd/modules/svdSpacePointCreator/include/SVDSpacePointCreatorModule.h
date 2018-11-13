@@ -12,6 +12,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -41,15 +42,15 @@ namespace Belle2 {
     *
     * prepares all store- and relationArrays.
     */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
     /** eventWise jobs (e.g. storing spacepoints */
-    virtual void event();
+    virtual void event() override;
 
 
     /** final output with mini-feedback */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
     /** initialize variables in constructor to avoid nondeterministic behavior */
@@ -90,5 +91,6 @@ namespace Belle2 {
 
     unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
 
+    SVDClusterCalibrations m_ClusterCal;
   };
 } // end namespace Belle2

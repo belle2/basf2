@@ -37,3 +37,28 @@ v.variables.addCollection("EventLevelTracking",
                               # "svdFirstSampleTime",
                               "trackFindingFailureFlag"
                           ))
+
+v.variables.addCollection("EventShape",
+                          v.std_vector("foxWolframR1",
+                                       "foxWolframR2",
+                                       "foxWolframR3",
+                                       "foxWolframR4",
+                                       "harmonicMomentThrust0",
+                                       "harmonicMomentThrust1",
+                                       "harmonicMomentThrust2",
+                                       "harmonicMomentThrust3",
+                                       "harmonicMomentThrust4",
+                                       "cleoConeThrust0",
+                                       "cleoConeThrust1",
+                                       "cleoConeThrust2",
+                                       "cleoConeThrust3",
+                                       "cleoConeThrust4",
+                                       "cleoConeThrust5",
+                                       "cleoConeThrust6",
+                                       "cleoConeThrust7",
+                                       "cleoConeThrust8",
+                                       "sphericity",
+                                       "aplanarity",
+                                       "thrust",
+                                       "thrustAxisCosTheta"
+                                       ))

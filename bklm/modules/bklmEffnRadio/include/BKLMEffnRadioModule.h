@@ -44,15 +44,15 @@ namespace Belle2 {
     //! Destructor
     virtual  ~BKLMEffnRadioModule();
     //! Initialize at start of job
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin run actions
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Process one event (fill histograms etc)
-    virtual void event();
+    virtual void event() override;
     //! end run cleanunp
-    virtual void endRun();
+    virtual void endRun() override;
     //! Terminate at the end of job
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
     //! struct to save the track parameters

@@ -1,8 +1,0 @@
-/control/verbose  0
-/run/verbose      2
-/event/verbose    0
-/tracking/verbose 0
-
-/generator/name tester
-
-/generator/tester 3 pi+ -0.5  0.5 0 360 0.2 0.0 0

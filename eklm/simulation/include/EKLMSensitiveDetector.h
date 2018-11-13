@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSENSETIVEDETECTOR_H
-#define EKLMSENSETIVEDETECTOR_H
+#pragma once
 
 /* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
@@ -36,7 +35,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EKLMSensitiveDetector(G4String name);
+      explicit EKLMSensitiveDetector(G4String name);
 
       /**
        * Destructor.
@@ -47,7 +46,7 @@ namespace Belle2 {
        * Process each step and calculate variables for EKLMSimHit
        * store EKLMSimHit.
        */
-      bool step(G4Step* aStep, G4TouchableHistory* history);
+      bool step(G4Step* aStep, G4TouchableHistory* history) override;
 
     private:
 
@@ -71,6 +70,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

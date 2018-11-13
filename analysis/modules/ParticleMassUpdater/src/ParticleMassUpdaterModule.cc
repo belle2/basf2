@@ -31,7 +31,6 @@ ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
   addParam("pdgCode", m_pdgCode, "PDG code for mass reference", 22);
-
 }
 
 void ParticleMassUpdaterModule::initialize()
@@ -49,13 +48,12 @@ void ParticleMassUpdaterModule::event()
       B2ERROR("ParticleList " << iList << " not found");
       continue;
     } else {
-      if (particlelist->getListSize() == 0)continue;
+      if (particlelist->getListSize() == 0) continue;
       for (unsigned int i = 0; i < particlelist->getListSize(); ++i) {
         Particle* iParticle = particlelist->getParticle(i);
         iParticle -> updateMass(m_pdgCode);
       }
     }
-
   }
 }
 

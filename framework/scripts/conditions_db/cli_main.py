@@ -28,10 +28,15 @@ import argparse
 import textwrap
 import json
 import difflib
+from urllib.parse import urljoin
+import shutil
+import pprint
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
-    pretty_print_table, LogPythonInterface
+    LogPythonInterface
+from basf2.utils import pretty_print_table
 from pager import Pager
 from dateutil.parser import parse as parse_date
+from getpass import getuser
 from . import ConditionsDB, enable_debugging, encode_name
 from .cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
@@ -223,7 +228,7 @@ def command_tag_create(args, db=None):
     info = {"name": args.tag, "description": args.description, "modifiedBy": args.user, "isDefault": False}
     # add user information if not given by command line
     if args.user is None:
-        info["modifiedBy"] = os.environ.get("BELLE2_USER", os.getlogin())
+        info["modifiedBy"] = os.environ.get("BELLE2_USER", getuser())
 
     typeinfo = db.get_globalTagType(args.type)
     if typeinfo is None:
@@ -533,6 +538,81 @@ def command_iov(args, db):
             table_header = ["First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "IovId", "PayloadId"]
             table.insert(0, table_header)
             pretty_print_table(table, [6, 6, 6, 6, '+', -8, 6, 9])
+
+
+def command_dump(args, db):
+    """
+    Dump the content of a given payload
+
+    This command will dump the payload contents stored in a given payload. One
+    can either specify the payloadId (from a previous output of
+    ``b2conditionsdb iov``) or the payload name and its revision.
+    """
+    if db is None:
+        group = args.add_mutually_exclusive_group(required=True)
+        group.add_argument("-i", "--id", metavar="PAYLOADID", help="payload id to dump")
+        group.add_argument("-r", "--revision", metavar=("NAME", "REVISION"), nargs=2,
+                           help="Name and revision of the payload to dump")
+        return
+
+    payload = None
+    if args.id:
+        req = db.request("GET", f"/payload/{args.id}", "Getting payload info")
+        payload = req.json()
+    elif args.revision:
+        name, rev = args.revision
+        rev = int(rev)
+        req = db.request("GET", f"/module/{name}/payloads", "Getting payload info")
+        for p in req.json():
+            if p["revision"] == rev:
+                payload = p
+                break
+        else:
+            B2ERROR(f"Cannot find payload {name} with revision {rev}")
+            return 1
+
+    name = payload["basf2Module"]["name"]
+    url = payload["payloadUrl"]
+    base = payload["baseUrl"]
+    remote_file = urljoin(base + "/", url)
+
+    # late import of ROOT because of all the side effects
+    from ROOT import TFile, TBufferJSON
+
+    # remote http opening ...
+    tfile = TFile.Open(remote_file)
+    if not tfile.IsOpen():
+        B2ERROR(f"Could not open payload file {remote_file}")
+        return 1
+
+    obj = tfile.Get(name)
+    if not obj:
+        B2ERROR(f"Could not find payload object in payload {remote_file}")
+        return 1
+
+    json_str = TBufferJSON.ConvertToJSON(obj)
+    tfile.Close()
+
+    def drop_fbits(obj):
+        """
+        Drop some members from ROOT json output.
+
+        We do not care about fBits, fUniqueID or the typename of sub classes,
+        we assume users are only interested in the data stored in the member
+        variables
+        """
+        obj.pop("fBits", None)
+        obj.pop("fUniqueID", None)
+        obj.pop("_typename", None)
+        return obj
+
+    with Pager(f"Contents of Payload {name}, revision {payload['revision']} (id {payload['payloadId']})", True):
+        B2INFO(f"Contents of Payload {name}, revision {payload['revision']} (id {payload['payloadId']})")
+        # load the json as python object dropping some things we don't want to
+        # print
+        obj = json.loads(json_str.Data(), object_hook=drop_fbits)
+        # print the object content using pretty print with a certain width
+        pprint.pprint(obj, compact=True, width=shutil.get_terminal_size((80, 20))[0])
 
 
 class FullHelpAction(argparse._HelpAction):

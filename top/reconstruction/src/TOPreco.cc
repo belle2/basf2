@@ -54,8 +54,27 @@ namespace Belle2 {
           set_channel_mask_(&mdn, &ich, &flag);
         }
       }
+      B2INFO("TOPreco: new channel masks have been passed to reconstruction");
 
       if (printMask) print_channel_mask_();
+    }
+
+
+    void TOPreco::setChannelEffi()
+    {
+      const auto* topgp = TOPGeometryPar::Instance();
+      const auto* geo = topgp->getGeometry();
+      int numModules = geo->getNumModules();
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
+        for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
+          int mdn = moduleID - 1; // 0-based used in fortran
+          int ich = pixelID - 1;  // 0-based used in fortran
+          float effi = topgp->getRelativePixelEfficiency(moduleID, pixelID);
+          set_channel_effi_(&mdn, &ich, &effi);
+        }
+      }
+      B2INFO("TOPreco: new relative pixel efficiencies have been passed to reconstruction");
     }
 
 

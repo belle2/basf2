@@ -152,7 +152,10 @@ void BKLMRawPackerModule::event()
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
     buf[1] |= ((bword3 << 16));
-    if (copperId < 1 || copperId > 4) { B2WARNING("BKLMRawPacker:: abnormal copper index: " << copperId); continue; }
+    if (copperId < 1 || copperId > 4) {
+      B2WARNING("BKLMRawPacker::event() out-of-range (1..4):" << LogVar("COPPER ID", copperId));
+      continue;
+    }
     data_words[copperId - 1][finesse].push_back(buf[0]);
     data_words[copperId - 1][finesse].push_back(buf[1]);
 
@@ -368,8 +371,8 @@ int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int pl
   //we flip channel to match raw data
   int MaxiChannel = 0;
   if (!isForward && sector == 3 && plane == 0) {
-    if (plane == 0 && layer < 3) MaxiChannel = 38;
-    if (plane == 0 && layer > 2) MaxiChannel = 34;
+    if (layer < 3) MaxiChannel = 38;
+    if (layer > 2) MaxiChannel = 34;
   } else {
     if (layer == 1 && plane == 1) MaxiChannel = 37;
     if (layer == 2 && plane == 1) MaxiChannel = 42;
@@ -390,7 +393,24 @@ int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int pl
     if (layer == 1)  channel = channel + 4;
     if (layer == 2)  channel = channel + 2;
   } else if (plane == 0) { //z strips
-    if (layer < 3 && channel > 9) channel = channel + 6;
+    if (layer < 3) { //scintillator
+      if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
+        if (layer == 1) {
+          if (channel > 0 && channel < 9) channel = 9 - channel;
+          else if (channel > 8 && channel < 24) channel = 54 - channel;
+          else if (channel > 23 && channel < 39) channel = 54 - channel;
+        } else {
+          if (channel > 0 && channel < 10) channel = 10 - channel;
+          else if (channel > 9 && channel < 24) channel = 40 - channel;
+          else if (channel > 23 && channel < 39) channel = 69 - channel;
+        }
+      } else { //all sectors except backward sector #3
+        if (channel > 0 && channel < 10) channel = 10 - channel;
+        else if (channel > 9 && channel < 25) channel = 40 - channel;
+        else if (channel > 24 && channel < 40) channel = 70 - channel;
+        else if (channel > 39 && channel < 55) channel = 100 - channel;
+      }
+    }
   }
 
   return channel;

@@ -106,6 +106,13 @@ namespace Belle2 {
      */
     void setm_MinInvMassHadrons(double MinInvMassHadrons) { m_MinInvMassHadrons = MinInvMassHadrons; }
 
+    /** Sets whether to force the minimal invariant mass squared cut.
+     *  This cut is ignored by PHOKHARA with LO = 1, NLO = 1.
+     * @param[in] forceMinInvMassHadronsCut Whether to force the cut or not.
+     */
+    void setForceMinInvMassHadronsCut(bool forceMinInvMassHadronsCut)
+    { m_ForceMinInvMassHadronsCut = forceMinInvMassHadronsCut; }
+
     /** Sets the maximal inv. mass squared of the hadrons(muons)
      * @param MaxInvMassHadrons maximal inv. mass squared of the hadrons(muons) in [GeV^2].
      */
@@ -135,6 +142,12 @@ namespace Belle2 {
      * @param finalState Final state code.
      */
     void setFinalState(int finalState) { m_finalState = finalState; }
+
+    /** Sets whether to replace muons by a virtual photon.
+     * @param replaceMuonsByVirtualPhoton If true, perform the replacement.
+     */
+    void setReplaceMuonsByVirtualPhoton(bool replaceMuonsByVirtualPhoton)
+    { m_replaceMuonsByVirtualPhoton = replaceMuonsByVirtualPhoton; }
 
     /** Sets number of trials per event.
     * @param nMaxTrials PHOKHARA is very ineffienct when using NLO corrections, adjust number of trials to >1000 per event!
@@ -173,6 +186,7 @@ namespace Belle2 {
 
     //PHOKHARA
     int m_finalState;  /**< final state, called 'pion' in Phokhara, dont get confused. */
+    bool m_replaceMuonsByVirtualPhoton; /**< Replace muons by a virtual photon. */
     int m_nMaxTrials;  /**< Events before loop is aborted. */
     int m_nSearchMax;  /**< Events used to search maximum of differential cross section. */
     double m_cmsEnergy;         /**< CMS Energy = 2*Ebeam [GeV]. */
@@ -190,9 +204,10 @@ namespace Belle2 {
 
     std::pair<double, double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::pair<double, double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
-    double m_MinInvMassHadronsGamma; /**< minimum mass of the hadron-gamma system [GeV] */
-    double m_MinInvMassHadrons; /**< minimum mass of the hadron system [GeV] */
-    double m_MaxInvMassHadrons; /**< maximum mass of the hadron system [GeV] */
+    double m_MinInvMassHadronsGamma; /**< minimum mass of the hadron-gamma system [GeV^2] */
+    double m_MinInvMassHadrons; /**< minimum mass of the hadron system [GeV^2] */
+    bool m_ForceMinInvMassHadronsCut; /**< Force application of the above cut. */
+    double m_MaxInvMassHadrons; /**< maximum mass of the hadron system [GeV^2] */
     double m_MinEnergyGamma; /**< minimum gamma energy [GeV] */
 
     /**

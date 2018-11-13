@@ -34,13 +34,13 @@ namespace Belle2 {
     ~ECLCompressBGOverlayModule();
 
     /** Initialize variables  */
-    void initialize();
+    void initialize() override;
 
     /** Compression happens here */
-    void event();
+    void event() override;
 
     /** Cleanup variables  */
-    void terminate();
+    void terminate() override;
 
   private:
     StoreArray<ECLDsp> m_eclDsps; /**< recorded waveforms */

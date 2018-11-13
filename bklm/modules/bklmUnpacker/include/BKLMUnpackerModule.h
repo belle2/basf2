@@ -39,15 +39,15 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMUnpackerModule();
     //! Initialize at start of job
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin run stuff
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Unpack one event and create digits
-    virtual void event();
+    virtual void event() override;
     //! end run stuff
-    virtual void endRun();
+    virtual void endRun() override;
     //! Terminate at the end of job
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -77,7 +77,7 @@ namespace Belle2 {
     int electCooToInt(int copper, int finesse, int lane, int axis, int channel);
 
     //! remap the channel ID for scitilators and RPCs
-    unsigned short getChannel(int layer,  int plane,  unsigned short channel);
+    unsigned short getChannel(int isForward, int sector, int layer,  int plane,  unsigned short channel);
 
     //! handle 0-->max max-->0 channel number flip between software and detector
     unsigned short flipChannel(int isForward, int sector, int layer, int plane, unsigned short channel, bool& isOutRange);

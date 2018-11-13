@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_ELEMENTNUMBERSSINGLETON_H
-#define EKLM_ELEMENTNUMBERSSINGLETON_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMElementNumbers.h>
@@ -48,6 +47,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

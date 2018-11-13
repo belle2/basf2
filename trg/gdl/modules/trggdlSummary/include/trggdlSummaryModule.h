@@ -12,7 +12,7 @@
 #include <TH2I.h>
 #include <TH1I.h>
 
-using namespace std;
+//using namespace std;
 
 namespace Belle2 {
 

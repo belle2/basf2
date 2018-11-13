@@ -42,10 +42,10 @@ namespace Belle2 {
       SVDDatabaseTestModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** Retrieve calibrations from database */
-      virtual void event();
+      virtual void event() override;
 
     private:
       //      SVDNoiseCalibrations m_obj_noise;

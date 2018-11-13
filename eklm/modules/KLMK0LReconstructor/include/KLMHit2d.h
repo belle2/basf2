@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KLMHIT2D_H
-#define KLMHIT2D_H
+#pragma once
 
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMHit2d.h>
@@ -28,13 +27,13 @@ namespace Belle2 {
      * Constructor.
      * @param[in] bklmHit2d BKLM 2d hit.
      */
-    KLMHit2d(BKLMHit2d* bklmHit2d);
+    explicit KLMHit2d(BKLMHit2d* bklmHit2d);
 
     /**
      * Constructor.
      * @param[in] eklmHit2d EKLM 2d hit.
      */
-    KLMHit2d(EKLMHit2d* eklmHit2d);
+    explicit KLMHit2d(EKLMHit2d* eklmHit2d);
 
     /**
      * Destructor.
@@ -85,6 +84,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

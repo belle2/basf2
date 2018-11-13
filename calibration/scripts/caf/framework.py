@@ -14,6 +14,8 @@ import sys
 from threading import Thread
 from time import sleep
 from pathlib import Path
+import sqlite3
+import shutil
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import get_default_global_tags
@@ -32,11 +34,15 @@ from .utils import AlgResult
 from .utils import temporary_workdir
 from .utils import IoV
 from .utils import IoV_Result
+from .utils import find_int_dirs
+from .utils import LocalDatabase
+from .utils import CentralDatabase
 
 from caf import strategies
 from caf import runners
 import caf.backends
 from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+from caf.database import CAFDB
 
 
 class CalibrationBase(ABC, Thread):
@@ -89,9 +95,6 @@ class CalibrationBase(ABC, Thread):
         self.iov = None
         #: The directory where we'll store the local database payloads from this calibration
         self.output_database_dir = ""
-        #: The current state, you can change this to anything you want. BUT if you change it to
-        #: one of the end states then the CAF will assume you are finished and move on.
-        self.state = "init"
 
     @abstractmethod
     def run(self):
@@ -139,6 +142,16 @@ class CalibrationBase(ABC, Thread):
         Checks if all of the Calibrations that this one depends on have reached a successful end state
         """
         return all(map(lambda x: x.state == x.end_state, self.dependencies))
+
+    def failed_dependencies(self):
+        """
+        Returns the list of calibrations in our dependency list that have failed.
+        """
+        failed = []
+        for calibration in self.dependencies:
+            if calibration.state == self.fail_state:
+                failed.append(calibration)
+        return failed
 
     def _apply_calibration_defaults(self, defaults):
         """
@@ -231,6 +244,8 @@ class Calibration(CalibrationBase):
     moves = ["submit_collector", "complete", "run_algorithms", "iterate", "fail_fully"]
     #: Subdirectory name for algorithm output
     alg_output_dir = "algorithm_output"
+    #: Checkpoint states which we are allowed to restart from.
+    checkpoint_states = ["init", "collector_completed", "completed"]
 
     def __init__(self,
                  name,
@@ -284,7 +299,8 @@ class Calibration(CalibrationBase):
             #: in :py:mod:`caf.strategies`.
             self.strategies = strategies.SingleIOV
 
-        self._local_database_chain = []
+        #: The list of central or local databases to be applied to the collector/algorithm processes.
+        self.database_chain = []
         self.use_central_database(get_default_global_tags())
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
@@ -300,7 +316,9 @@ class Calibration(CalibrationBase):
         self.collector_full_update_interval = 300
         self.setup_defaults()
         #: The `caf.state_machines.CalibrationMachine` that we will run to process this calibration start to finish.
-        self.machine = CalibrationMachine(self)
+        self.machine = None
+        #: Location of a SQLite database that will save the state of the calibration so that it can be restarted from failure.
+        self._db_path = None
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -328,17 +346,25 @@ class Calibration(CalibrationBase):
                 return False
         return True
 
+    def reset_database(self):
+        """
+        Remove everything in the database_chain of this Calibration, including the default central database
+        tag automatically included from `basf2.get_default_global_tags`
+        """
+        self.database_chain = []
+
     def use_central_database(self, global_tag):
         """
         Parameters:
             global_tag (str): The central database global tag to use for this calibration.
 
-        Using this allows you to set the central database for this calibration.
-        If you don't call this, the default is set from `basf2.get_default_global_tags`.
-        If this is set manually it will override the default.
-        To turn off central database completely you should set this global tag to an empty string.
+        Using this allows you to append a central database to the database chain for this calibration.
+        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
+        and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
         """
-        self._global_tag = global_tag
+        central_db = CentralDatabase(global_tag)
+        self.database_chain.append(central_db)
 
     def use_local_database(self, filename, directory=""):
         """
@@ -351,11 +377,15 @@ class Calibration(CalibrationBase):
         Append a local database to the chain for this calibration.
         You can call this function multiple times and each database will be added to the chain IN ORDER.
         The databases are applied to this calibration ONLY.
-        They are applied to the collector job and algorithm step as a database chain of the form:
+        The Local and Central databases for this Calibration are applied to the collector job and algorithm step
+        as a database chain. There are other databases applied to the processes, checked in this order:
 
-        central DB Global tag (if used) -> these local databases -> CAF created local database constants
+        1) Local Database from previous iteration of this Calibration.
+        2) Local Database chain from output of previous dependent Calibrations.
+        3) This chain of Local and Central databases where the last added is checked first.
         """
-        self._local_database_chain.append((filename, directory))
+        local_db = LocalDatabase(filename, directory)
+        self.database_chain.append(local_db)
 
     @property
     def collector(self):
@@ -489,57 +519,69 @@ class Calibration(CalibrationBase):
         Main logic of the Calibration object.
         Will be run in a new Thread by calling the start() method.
         """
-        self.machine.root_dir = os.path.join(os.getcwd(), self.name)
-        self.machine.iov_to_calibrate = self.iov
+        with CAFDB(self._db_path) as db:
+            initial_state = db.get_calibration_value(self.name, "checkpoint")
+            initial_iteration = db.get_calibration_value(self.name, "iteration")
+        B2INFO("Initial status of {} found to be state={}, iteration={}".format(self.name,
+                                                                                initial_state,
+                                                                                initial_iteration))
+        self.machine = CalibrationMachine(self,
+                                          iov_to_calibrate=self.iov,
+                                          initial_state=initial_state,
+                                          iteration=initial_iteration)
+        self.state = initial_state
+        self.machine.root_dir = Path(os.getcwd(), self.name)
         self.machine.collector_backend = self.backend
-        while self.state != self.end_state and self.state != self.fail_state:
-            try:
-                B2INFO("Attempting collector submission for calibration {}.".format(self.name))
-                self.machine.submit_collector()
-                #: State of Calibration
-                self.state = self.machine.state
-            except Except as err:
-                B2FATAL(str(err))
 
-            self._poll_collector()
+        # Before we start running, let's clean up any iteration directories from iterations above our initial one.
+        # Should prevent confusion between attempts if we fail again.
+        all_iteration_paths = find_int_dirs(self.machine.root_dir)
+        for iteration_path in all_iteration_paths:
+            if int(iteration_path.name) > initial_iteration:
+                shutil.rmtree(iteration_path)
+
+        while self.state != self.end_state and self.state != self.fail_state:
+            if self.state == "init":
+                try:
+                    B2INFO("Attempting collector submission for calibration {}.".format(self.name))
+                    self.machine.submit_collector()
+                except Exception as err:
+                    B2FATAL(str(err))
+
+                self._poll_collector()
 
             # If we failed take us to the final fail state
             if self.state == "collector_failed":
                 self.machine.fail_fully()
-                self.state = self.machine.state
                 return
 
             # It's possible that we might raise an error while attempting to run due
             # to some problems e.g. Missing collector output files
             # We catch the error and exit with failed state so the CAF will stop
             try:
+                B2INFO("Attempting to run algorithms for calibration {}".format(self.name))
                 self.machine.run_algorithms()
-                self.state = self.machine.state
             except MachineError as err:
                 B2ERROR(str(err))
-                self.state = "failed"
-                return
+                self.machine.fail()
 
             # If we failed take us to the final fail state
             if self.machine.state == "algorithms_failed":
                 self.machine.fail_fully()
-                self.state = self.machine.state
                 return
 
     def _poll_collector(self):
         """
         """
-        while self.machine.state == "running_collector":
+        while self.state == "running_collector":
             try:
                 B2INFO("Checking if collector jobs for calibration {} have finished successfully.".format(self.name))
                 self.machine.complete()
-                self.state = self.machine.state
             # ConditionError is thrown when the condtions for the transition have returned false, it's not serious.
             except ConditionError:
                 try:
                     B2DEBUG(29, "Checking if collector jobs for calibration {} have failed.".format(self.name))
                     self.machine.fail()
-                    self.state = self.machine.state
                 except ConditionError:
                     pass
             sleep(self.heartbeat)  # Sleep until we want to check again
@@ -557,6 +599,45 @@ class Calibration(CalibrationBase):
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
         #: This calibration's sleep time before rechecking to see if it can move state
         self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
+
+    @property
+    def state(self):
+        """
+        The current major state of the calibration in the database file. The machine may have a different state.
+        """
+        with CAFDB(self._db_path) as db:
+            return db.get_calibration_value(self.name, "state")
+
+    @state.setter
+    def state(self, state):
+        """
+        """
+        B2DEBUG(29, "Setting {} to state {}".format(self.name, str(state)))
+        with CAFDB(self._db_path) as db:
+            db.update_calibration_value(self.name, "state", str(state))
+            if state in self.checkpoint_states:
+                db.update_calibration_value(self.name, "checkpoint", str(state))
+        B2DEBUG(29, "{} set to {}".format(self.name, self.state))
+
+    @property
+    def iteration(self):
+        """
+        Retrieves the current iteration number in the database file
+
+        Returns:
+            int: The current iteration number
+        """
+        with CAFDB(self._db_path) as db:
+            return db.get_calibration_value(self.name, "iteration")
+
+    @iteration.setter
+    def iteration(self, iteration):
+        """
+        """
+        B2DEBUG(29, "Setting {} to {}".format(self.name, iteration))
+        with CAFDB(self._db_path) as db:
+            db.update_calibration_value(self.name, "iteration", iteration)
+        B2DEBUG(29, "{} set to {}".format(self.name, self.iteration))
 
 
 class Algorithm():
@@ -587,7 +668,7 @@ class Algorithm():
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
         #: The name of the algorithm, default is the Algorithm class name
-        self.name = algorithm.__cppname__.replace('Belle2::', '')
+        self.name = algorithm.__cppname__[algorithm.__cppname__.rfind('::')+2:]
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
         #: The list of files matching the `Calibration.output_patterns` from the collector output
         #: directories will be passed to it
@@ -640,6 +721,9 @@ class CAF():
     `CalibrationBase` instances.
     """
 
+    #: The name of the SQLite DB that gets created
+    _db_name = "caf_state.db"
+
     def __init__(self, calibration_defaults=None):
         """
         """
@@ -676,6 +760,8 @@ class CAF():
         #: Default options applied to each calibration known to the `CAF`, if the `Calibration` has these defined by the user
         #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the `CAF`.
         self.calibration_defaults = calibration_defaults
+        #: The path of the SQLite DB
+        self._db_path = None
 
     def add_calibration(self, calibration):
         """
@@ -771,8 +857,9 @@ class CAF():
 
     def run(self, iov=None):
         """
-        :param iov: The `caf.utils.IoV` to calibrate for this processing run. Only the input files necessary to calibrate
-            this IoV will be used in the collection step. An the algorithm will only run over this IoV.
+        Keyword Arguments:
+            iov(`caf.utils.IoV`): IoV to calibrate for this processing run. Only the input files necessary to calibrate
+                                  this IoV will be used in the collection step.
 
         This function runs the overall calibration job, saves the outputs to the output_dir directory,
         and creates database payloads.
@@ -794,34 +881,68 @@ class CAF():
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
 
+        # The sleep heartbeat when checking calibration statuses
         caf_heartbeat = int(self.config["CAF_DEFAULTS"]["HeartBeat"])
-        # Enter the overall output dir during processing
-        with temporary_workdir(self.output_dir):
+
+        #  Creates a SQLite DB to save the status of the various calibrations
+        self._make_database()
+
+        # Enter the overall output dir during processing and opena  connection to the DB
+        with temporary_workdir(self.output_dir), CAFDB(self._db_path) as db:
+            db_initial_calibrations = db.query("select * from calibrations").fetchall()
             for calibration in self.calibrations.values():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
                 calibration._apply_calibration_defaults(self.calibration_defaults)
+                calibration._db_path = self._db_path
                 calibration.iov = iov
                 if not calibration.backend:
                     calibration.backend = self.backend
+                # Do some checking of the db to see if we need to add an entry for this calibration
+                if calibration.name not in [db_cal[0] for db_cal in db_initial_calibrations]:
+                    db.insert_calibration(calibration.name)
+                    db.commit()
+                else:
+                    for cal_info in db_initial_calibrations:
+                        if cal_info[0] == calibration.name:
+                            cal_initial_state = cal_info[2]
+                            cal_initial_iteration = cal_info[3]
+                    B2INFO("Previous entry in database found for {}".format(calibration.name))
+                    B2INFO("Setting {} state to checkpoint state '{}'".format(calibration.name, cal_initial_state))
+                    calibration.state = cal_initial_state
+                    B2INFO("Setting {} iteration to '{}'".format(calibration.name, cal_initial_iteration))
+                    calibration.iteration = cal_initial_iteration
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
-            finished = False
-            while not finished:
-                finished = True
+
+            # Is it possible to keep going?
+            keep_running = True
+            while keep_running:
+                keep_running = False
+                # Do we have calibrations that may yet complete?
+                remaining_calibrations = []
+
                 for calibration in self.calibrations.values():
-                    # Join the thread if we've hit an end state
-                    if calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state:
-                        calibration.join()
-                    # If we're not ready yet we should go round again
+                    # Find the currently ended calibrations (may not be joined yet)
+                    if (calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state):
+                        # Search for any alive Calibrations and join them
+                        if calibration.is_alive():
+                            B2DEBUG(29, "joining {}".format(calibration.name))
+                            calibration.join()
                     else:
-                        finished = False
-
-                    if calibration.dependencies_met() and not calibration.is_alive():
-                        if calibration.state != calibration.end_state and \
-                           calibration.state != calibration.fail_state:
-                            calibration.start()
-
+                        if calibration.dependencies_met():
+                            if not calibration.is_alive():
+                                B2DEBUG(29, "Starting {}".format(calibration.name))
+                                calibration.start()
+                            remaining_calibrations.append(calibration)
+                        else:
+                            if not calibration.failed_dependencies():
+                                remaining_calibrations.append(calibration)
+                if remaining_calibrations:
+                    keep_running = True
                 sleep(caf_heartbeat)
+
+            B2INFO("Printing summary of final CAF status.")
+            print(db.output_calibration_table())
 
         # Close down our processing pools nicely
         if isinstance(self.backend, caf.backends.Local):
@@ -848,13 +969,16 @@ class CAF():
 
     def _make_output_dir(self):
         """
-        Creates the output directory. If it already exists we quit the program to prevent horrible
-        problems by either overwriting the files in this directory or moving it to a new name.
-        It returns the absolute path of the new output_dir
+        Creates the output directory. If it already exists we are now going to try and restart the program from the last state.
+
+        Returns:
+            str: The absolute path of the new output_dir
         """
         if os.path.isdir(self.output_dir):
-            B2ERROR('{0} output directory already exists.'.format(self.output_dir))
-            sys.exit(1)
+            B2INFO('{0} output directory already exists. '
+                   'We will try to restart from the previous finishing state.'.format(self.output_dir))
+            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
+            return abs_output_dir
         else:
             os.mkdir(self.output_dir)
             abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
@@ -863,3 +987,14 @@ class CAF():
             else:
                 B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
                 sys.exit(1)
+
+    def _make_database(self):
+        """
+        Creates the CAF status database. If it already exists we don't overwrite it.
+        """
+        self._db_path = Path(self.output_dir, self._db_name).absolute()
+        if self._db_path.exists():
+            B2INFO('Previous CAF database found {}'.format(self._db_path))
+        # Will create a new database + tables, or do nothing but checks we can connect to existing one
+        with CAFDB(self._db_path) as db:
+            pass

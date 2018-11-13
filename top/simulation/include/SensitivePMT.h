@@ -32,7 +32,7 @@ namespace Belle2 {
        * @param aStep Current Geant4 step in the sensitive medium.
        * @return true if optical photon detected.
        */
-      bool step(G4Step* aStep, G4TouchableHistory*);
+      bool step(G4Step* aStep, G4TouchableHistory*) override;
 
       /**
        * Sets replica depth of PMT volume

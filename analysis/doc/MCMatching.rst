@@ -98,7 +98,6 @@ MC decay finder module `MCDecayFinder`
 --------------------------------------
 
 Analysis module to search for a given decay in the list of generated particles (MCParticle).
-See more at `confluence page <https://confluence.desy.de/display/BI/Physics+MCDecayFinder>`_.
 
 The module can be used for:
 

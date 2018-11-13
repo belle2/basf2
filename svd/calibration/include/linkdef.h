@@ -9,6 +9,8 @@
 #pragma link C++ class Belle2::SVDDatabaseImporter+;
 #pragma link C++ class Belle2::SVDCoGTimeCalibrationsImporter+;
 #pragma link C++ class Belle2::SVDCoGTimeCalibrations+;
+#pragma link C++ class Belle2::SVDClusterCalibrations+;
 #pragma link C++ class Belle2::SVDCoGCalibrationsImporter;
+#pragma link C++ class Belle2::SVDNoiseCalibrations;
 
 #endif

@@ -13,6 +13,10 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
+#include <framework/database/DBObjPtr.h>
+#include <bklm/dbobjects/BKLMBadChannels.h>
+#include <eklm/dbobjects/EKLMChannels.h>
+#include <eklm/geometry/TransformDataGlobalAligned.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <bklm/geometry/GeometryPar.h>
 
@@ -203,7 +207,7 @@ namespace Belle2 {
     //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
     void initialize(double meanDt, double maxDt, double maxSeparation,
                     double maxKLMTrackClusterDistance, double maxECLTrackClusterDistance,
-                    double minPt, double minKE, std::vector<Const::ChargedStable>& hypotheses);
+                    double minPt, double minKE, bool addHitsToRecoTrack, std::vector<Const::ChargedStable>& hypotheses);
 
     //! Perform beginning-of-run actions.
     //! @param flag True if called by Muid module, false if called by Ext module.
@@ -397,9 +401,6 @@ namespace Belle2 {
     //! Pointers to BKLM geant4 sensitive (physical) volumes
     std::vector<G4VPhysicalVolume*>* m_BKLMVolumes;
 
-    //! Pointers to EKLM geant4 sensitive (physical) volumes
-    std::vector<G4VPhysicalVolume*>* m_EKLMVolumes;
-
     //! virtual "target" cylinder for EXT (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_TargetExt;
 
@@ -471,6 +472,24 @@ namespace Belle2 {
 
     //! experiment number for the current set of particle-hypothesis PDFs
     int m_ExpNo;
+
+    //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
+    bool m_addHitsToRecoTrack = false;
+
+    //! Conditions-database object for BKLM dead-channel list (updated at start of each run)
+    DBObjPtr<BKLMBadChannels> m_bklmBadChannels;
+
+    //! Flag to indicate that the BKLM dead-channel list is valid for the given run
+    bool m_bklmBadChannelsValid;
+
+    //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
+    DBObjPtr<EKLMChannels> m_eklmChannels;
+
+    //! Flag to indicate that the EKLM dead-channel list is valid for the given run
+    bool m_eklmChannelsValid;
+
+    //! EKLM transformation data.
+    const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
 
     //! probability density function for positive-muon hypothesis
     MuidPar* m_MuonPlusPar;

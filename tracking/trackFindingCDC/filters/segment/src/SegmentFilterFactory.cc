@@ -77,7 +77,7 @@ SegmentFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "bkg_recording") {
     return std::make_unique<BkgRecordingSegmentFilter>("BackgroundSegmentFilter.root");
   } else if (filterName == "bkg_mva") {
-    return std::make_unique<BkgMVASegmentFilter>("tracking/data/trackfindingcdc_BackgroundSegmentFilter.xml");
+    return std::make_unique<BkgMVASegmentFilter>("trackfindingcdc_BackgroundSegmentFilter");
   } else {
     return Super::create(filterName);
   }

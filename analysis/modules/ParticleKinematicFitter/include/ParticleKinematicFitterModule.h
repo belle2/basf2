@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEKINEMATICFITTERMODULE_H
-#define PARTICLEKINEMATICFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -230,8 +229,8 @@ namespace Belle2 {
         * @param l represent the tracks ID
         * @param p pointer to particle
         */
-      void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
-
+      void updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                       std::vector<Particle*>&  allparticles, const Particle* daughter);
 
       /**
        * store fit object information as ExtraInfo
@@ -239,7 +238,8 @@ namespace Belle2 {
        * @param particleChildren list of all particle childen
        * @param mother mother particle
        */
-      bool storeOrcaKinFitParticles(std::string prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren, Particle* mother);
+      bool storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
+                                    Particle* mother);
 
 
       /**
@@ -300,4 +300,3 @@ namespace Belle2 {
   }// end OrcaKinFit namespace
 } // Belle2 namespace
 
-#endif

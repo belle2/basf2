@@ -40,6 +40,13 @@ if len(bg) == 0:
     B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
+if phase == 2:
+    for fileName in bg:
+        if 'phase2' not in fileName:
+            B2ERROR('BG mixing samples given in BELLE2_BACKGROUND_MIXING_DIR are not for phase 2')
+            B2INFO('Try:\n export BELLE2_BACKGROUND_MIXING_DIR=/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2/set0/')
+            sys.exit()
+
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression))
 B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])

@@ -167,27 +167,19 @@ void cdcDQM7Module::event()
 
   StoreArray<CDCHit> cdcHits;
   int nent = cdcHits.getEntries();
-
-  int sL = 0;
-  int iL = 0;
-  int wid = 0;
-  int num = 0;
-  int adcsum = 0;
-  int vtdc = 0;
   int ftdc = 0;
-
   if (nent < 60 || nent > 200) return; //
 
   for (int i = 0; i < nent; i++) {
     CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
 
-    sL = cdchit->getISuperLayer();
-    iL = cdchit->getILayer();
-    wid = cdchit->getIWire();
-    adcsum = cdchit->getADCCount();
-    vtdc = cdchit->getTDCCount();
+    int sL = cdchit->getISuperLayer();
+    int iL = cdchit->getILayer();
+    int wid = cdchit->getIWire();
+    int adcsum = cdchit->getADCCount();
+    int vtdc = cdchit->getTDCCount();
 
-    num = sL * 6 + iL + 2;
+    int num = sL * 6 + iL + 2;
 
     if (adcsum > 10) {
 
@@ -220,17 +212,14 @@ void cdcDQM7Module::event()
   int r_nent = cdcRawHits.getEntries();
 
   // new
-  int board = 0;
-  int x = 0;
-  int y = 0;
 
   for (int j = 0; j < r_nent; j++) {
     CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
 
-    board = cdcrawhit->getBoardId();
+    int board = cdcrawhit->getBoardId();
 
-    x = board % 20;
-    y = (board - (board % 20)) / 20;
+    int x = board % 20;
+    int y = (board - (board % 20)) / 20;
     bmap_2->Fill(x, y);
 
   }// cdcrawhits

@@ -24,10 +24,23 @@ namespace TreeFitter {
   public:
 
     /** Constructor */
-    FitParams(int dim);
+    explicit FitParams(int dim);
 
     /** Destructor */
     ~FitParams() {};
+
+    /** copy constructor */
+    FitParams(const FitParams& toCopy)
+      : m_dim(toCopy.m_dim),
+        m_chiSquare(toCopy.m_chiSquare),
+        m_nConstraints(toCopy.m_nConstraints),
+        m_dimensionReduction(toCopy.m_dimensionReduction)
+    {
+      this->m_globalState =
+        Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > (toCopy.m_globalState);
+      this->m_globalCovariance =
+        Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance);
+    }
 
     /** getter for the states covariance */
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > & getCovariance()
@@ -74,20 +87,13 @@ namespace TreeFitter {
     /** get dimension sum of constraints */
     int getNConstraints() {return m_nConstraints;}
 
-    /** get degress of freedom */
-    int getNDOF() {return m_nConstraints - m_dim; }
-
     /** test if the covariance makes sense */
     bool testCovariance() const;
 
     /** increment nconstraints vec */
     int& incrementNConstraintsVec(int row) { return m_nConstraintsVec[row];}
 
-    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value.
-     *  FIXME this is stupid.
-     *    replace with with setter.
-     *    only used in resetCov and KalmanCalculator.cc
-     * */
+    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value. */
     int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1]; }
 
     /** get dimension od statevector */
@@ -152,6 +158,9 @@ namespace TreeFitter {
 
     /** number of conatraints */
     int m_nConstraints;
+
+    /** reduce the ndf used in the chi2 by this count */
+    int m_dimensionReduction;
 
     /** vector with the number of constraints per parameter */
     std::vector<int> m_nConstraintsVec;

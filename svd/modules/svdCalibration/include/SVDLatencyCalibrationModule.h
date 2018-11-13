@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <svd/dataobjects/SVDHistograms.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <string>
@@ -42,13 +43,16 @@ namespace Belle2 {
     SVDLatencyCalibrationModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void event();
+    virtual void beginRun() override;
 
     /**  */
-    virtual void terminate();
+    virtual void event() override;
+
+    /**  */
+    virtual void endRun() override;
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
@@ -56,31 +60,12 @@ namespace Belle2 {
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
-    TH1F* h_maxAmplitudeU; /**< histogram containing the maximum of the 6 samples of the U SVDShaperDigit*/
-    TH1F* h_maxAmplitudeV; /**< histogram containing the maximum of the 6 samples of the V SVDShaperDigit*/
-    TH1F* h_ladder;
-
-    TH1F* h_maxAmplitudeU_L3fw;
-    TH1F* h_maxAmplitudeV_L3fw;
-    TH1F* h_maxAmplitudeU_L3bw;
-    TH1F* h_maxAmplitudeV_L3bw;
-    TH1F* h_maxAmplitudeU_L4bw;
-    TH1F* h_maxAmplitudeV_L4bw;
-    TH1F* h_maxAmplitudeU_L5bw;
-    TH1F* h_maxAmplitudeV_L5bw;
-    TH1F* h_maxAmplitudeU_L6bw;
-    TH1F* h_maxAmplitudeV_L6bw;
-
-    TList* m_histoList;
-
   private:
+
+    SVDHistograms<TH1F>* m_histo_maxAmplitude;
 
     std::string m_shapersListName; /**< shapers list name */
     StoreArray<SVDShaperDigit> m_digits; /**< SVD digits*/
-
-    TH1F* createHistogram1D(const char* name, const char* title,
-                            Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList);
 
   };
 }

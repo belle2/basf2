@@ -113,8 +113,8 @@ analysis_main.add_module(skimALL)
 applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 
-applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
-applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
+applyCuts('B0:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
+applyCuts('B+:semileptonic', 'abs(cosThetaBetweenParticleAndNominalB)<10 and sigProb>0.001')
 
 # rank Btag canidates according to their SignalProbability
 # 'sigProb' is alias for 'extraInfo(SignalProbability)'
@@ -149,14 +149,14 @@ toolsBP += ['CustomFloats[looseMCWrongDaughterBiB:looseMCWrongDaughterPDG]', '^B
 toolsBP += ['MCTruth', '^B+']
 
 toolsB0SL = ['EventMetaData', '^B0']
-toolsB0SL += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B0']
+toolsB0SL += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B0']
 toolsB0SL += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B0']
 toolsB0SL += ['CustomFloats[d0_dmID]', '^B0']
 toolsB0SL += ['CustomFloats[isSignalAcceptMissingNeutrino]', '^B0']
 toolsB0SL += ['MCTruth', '^B0']
 
 toolsBPSL = ['EventMetaData', '^B+']
-toolsBPSL += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B+']
+toolsBPSL += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B+']
 toolsBPSL += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B+']
 toolsBPSL += ['CustomFloats[d0_dmID]', '^B+']
 toolsBPSL += ['CustomFloats[isSignalAcceptMissingNeutrino]', '^B+']

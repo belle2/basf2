@@ -78,6 +78,7 @@ DQMHistAnalysisOutputNSMModule::~DQMHistAnalysisOutputNSMModule() { }
 void DQMHistAnalysisOutputNSMModule::initialize()
 {
   ConfigFile config("slowcontrol");
+  if (m_callback != nullptr) delete m_callback;
   m_callback = new DQMHistAnalysisCallback(m_nodename, m_rcnodename);
   int port = config.getInt("nsm.port");
   std::string host = config.get("nsm.host");

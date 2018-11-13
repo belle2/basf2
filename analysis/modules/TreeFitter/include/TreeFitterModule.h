@@ -42,17 +42,33 @@ namespace Belle2 {
     /**   name of the particle list fed to the fitter  */
     std::string m_particleList;
 
-    /** minimum confidence level to accept fit   */
+    /** minimum confidence level to accept fit
+     * calculated as f(chiSquared, NDF)
+     * -2: accept all
+     *  0: only accept fit survivors
+     *  0.001 loose cut
+     *  0.1 (too) tight cut
+     *  */
     double m_confidenceLevel;
 
-    /** convergence precision for the newton method  */
+    /** convergence precision for the newton method
+     * When the detla chiSquared between 2 iterations is smaller than this stop the fit and call it converged
+     * optimized - don't touch
+     * */
     double m_precision;
 
-    /** unused    */
+    /** vector carrying the PDG codes of the particles to be mass constraint */
     std::vector<int> m_massConstraintList;
 
+    /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental!
+     *  WARNING not even guaranteed that it works
+     * */
+    int m_massConstraintType;
+
     /** Use x-y-z beamspot constraint.
-     * The Beamspot will be treated as the mother of the particle you feed. */
+     * The Beamspot will be treated as the mother of the particle you feed,
+     * thus pinning down the PRODUCTION vertex of the mother to the IP
+     * */
     bool  m_ipConstraint;
 
     /** this fits all particle candidates contained in the m_particleList  */
@@ -64,18 +80,28 @@ namespace Belle2 {
     /** after the fit  */
     unsigned int m_nCandidatesAfter;
 
-    /** flag if you want to update all particles in the decay tree.
-     * False means only the head of the tree will be updated */
+    /** flag if you want to update all particle momenta in the decay tree.
+     * False means only the head of the tree will be updated
+     * */
     bool m_updateDaughters;
 
-    /** use a custom vertex as the production vertex of the highest hierarchy particle */
+    /** use a custom vertex as the production vertex of the highest hierarchy particle
+     * */
     bool m_customOrigin;
+
+    /** linearise around a previous state of the Kalman Filter */
+    bool m_useReferencing;
 
     /** vertex coordinates of the custom origin  */
     std::vector<double> m_customOriginVertex;
 
     /** covariance of the custom origin */
     std::vector<double> m_customOriginCovariance;
+
+    /** list of constraints not to be applied in tree fit
+     *  WARNING only use if you know what you are doing
+     * */
+    std::vector<std::string> m_removeConstraintList;
 
   };
 }

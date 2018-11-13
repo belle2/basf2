@@ -157,6 +157,9 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module()
 
   addParam("use6x6CovarianceMatrix4Tracks", m_use6x6CovarianceMatrix4Tracks,
            "Use 6x6 (position, momentum) covariance matrix for charged tracks instead of 5x5 (helix parameters) covariance matrix", false);
+  addParam("mcMatchingMode", m_mcMatchingModeString,
+           "MC matching mode: 'Direct', or 'GeneratorLevel'",
+           std::string("Direct"));
 
   m_realData = false;
 
@@ -172,7 +175,12 @@ void B2BIIConvertMdstModule::initialize()
 {
   // Initialize Belle II DataStore
   initializeDataStore();
-
+  if (m_mcMatchingModeString == "Direct")
+    m_mcMatchingMode = c_Direct;
+  else if (m_mcMatchingModeString == "GeneratorLevel")
+    m_mcMatchingMode = c_GeneratorLevel;
+  else
+    B2FATAL("Unknown MC matching mode: " << m_mcMatchingModeString);
   B2INFO("B2BIIConvertMdst: initialized.");
 }
 
@@ -423,20 +431,29 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
 
     // create Track -> MCParticle relation
     // step 1: MDSTCharged -> Gen_hepevt
-    const Belle::Gen_hepevt& hep(gen_level(get_hepevt(belleTrack)));
-    if (hep) {
-      // step 2: Gen_hepevt -> MCParticle
-      if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
-        int matchedMCParticle = genHepevtToMCParticle[hep.get_ID()];
+    const Belle::Gen_hepevt& hep0 = get_hepevt(belleTrack);
+    if (hep0 == 0)
+      continue;
+    const Belle::Gen_hepevt* hep = nullptr;
+    switch (m_mcMatchingMode) {
+      case c_Direct:
+        hep = &hep0;
+        break;
+      case c_GeneratorLevel:
+        hep = &gen_level(hep0);
+        break;
+    }
+    // step 2: Gen_hepevt -> MCParticle
+    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+      int matchedMCParticle = genHepevtToMCParticle[hep->get_ID()];
 
-        // step 3: set the relation
-        tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
+      // step 3: set the relation
+      tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
 
-        testMCRelation(hep, mcParticles[matchedMCParticle], "Track");
-      } else {
-        B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
-        B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
-      }
+      testMCRelation(*hep, mcParticles[matchedMCParticle], "Track");
+    } else {
+      B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+      B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
     }
   }
 }
@@ -695,27 +712,19 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
     TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
+    Particle* newV0 = nullptr;
     if (belleV0.kind() == 1) { // K0s -> pi+ pi-
       Particle KS(v0Momentum, 310);
       KS.appendDaughter(newDaugP);
       KS.appendDaughter(newDaugM);
       KS.setVertex(v0Vertex);
-      Particle* newKS = particles.appendNew(KS);
-      ksPList->addParticle(newKS);
+      newV0 = particles.appendNew(KS);
+      ksPList->addParticle(newV0);
 
       // append extra info: goodKs flag
       Belle::FindKs belleKSFinder;
       belleKSFinder.candidates(belleV0, Belle::IpProfile::position(1));
-      newKS->addExtraInfo("goodKs", belleKSFinder.goodKs());
-
-      // append extra info: nisKsFinder quality indicators
-      Belle::nisKsFinder ksnb;
-      double protIDP = atcPID(pidP, 2, 4);
-      double protIDM = atcPID(pidM, 2, 4);
-      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
-      newKS->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
-      newKS->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
-      newKS->addExtraInfo("ksnbStandard", ksnb.standard());
+      newV0->addExtraInfo("goodKs", belleKSFinder.goodKs());
 
       /*
       std::cout << " ---- B1 Ks ---- " << std::endl;
@@ -756,22 +765,35 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.appendDaughter(newDaugP);
       Lambda0.appendDaughter(newDaugM);
       Lambda0.setVertex(v0Vertex);
-      Particle* newLambda0 = particles.appendNew(Lambda0);
-      lambda0PList->addParticle(newLambda0);
+      newV0 = particles.appendNew(Lambda0);
+      lambda0PList->addParticle(newV0);
     } else if (belleV0.kind() == 3) { // anti-Lambda -> pi+ anti-p
       Particle antiLambda0(v0Momentum, -3122);
       antiLambda0.appendDaughter(newDaugM);
       antiLambda0.appendDaughter(newDaugP);
       antiLambda0.setVertex(v0Vertex);
-      Particle* newAntiLambda0 = particles.appendNew(antiLambda0);
-      antiLambda0PList->addParticle(newAntiLambda0);
+      newV0 = particles.appendNew(antiLambda0);
+      antiLambda0PList->addParticle(newV0);
     } else if (belleV0.kind() == 4) { // gamma -> e+ e-
       Particle gamma(v0Momentum, 22);
       gamma.appendDaughter(newDaugP);
       gamma.appendDaughter(newDaugM);
       gamma.setVertex(v0Vertex);
-      Particle* newGamma = particles.appendNew(gamma);
-      convGammaPList->addParticle(newGamma);
+      newV0 = particles.appendNew(gamma);
+      convGammaPList->addParticle(newV0);
+    }
+    // append extra info: nisKsFinder quality indicators
+    if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
+      Belle::nisKsFinder ksnb;
+      double protIDP = atcPID(pidP, 2, 4);
+      double protIDM = atcPID(pidM, 2, 4);
+      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
+      // K_S0 and Lambda (inverse cut on ksnbNoLam for Lambda selection).
+      newV0->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
+      newV0->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
+      // K_S0 only
+      if (belleV0.kind() == 1)
+        newV0->addExtraInfo("ksnbStandard", ksnb.standard());
     }
   }
 
@@ -927,17 +949,28 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
     // Create ECLCluster -> MCParticle relation
     // Step 1: MDST_ECL -> Gen_hepevt
-    const Belle::Gen_hepevt hep(gen_level(get_hepevt(mdstEcl)));
-    if (hep && hep.idhep() != 911) {
+    const Belle::Gen_hepevt& hep0 = get_hepevt(mdstEcl);
+    if (hep0 == 0)
+      continue;
+    const Belle::Gen_hepevt* hep = nullptr;
+    switch (m_mcMatchingMode) {
+      case c_Direct:
+        hep = &hep0;
+        break;
+      case c_GeneratorLevel:
+        hep = &gen_level(hep0);
+        break;
+    }
+    if (hep->idhep() != 911) {
       // Step 2: Gen_hepevt -> MCParticle
-      if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
-        int matchedMCParticleID = genHepevtToMCParticle[hep.get_ID()];
+      if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+        int matchedMCParticleID = genHepevtToMCParticle[hep->get_ID()];
         // Step 3: set the relation
         eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticleID);
-        testMCRelation(hep, mcParticles[matchedMCParticleID], "ECLCluster");
+        testMCRelation(*hep, mcParticles[matchedMCParticleID], "ECLCluster");
       } else {
-        B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
-        B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
+        B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+        B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
       }
     }
   }
@@ -1763,10 +1796,6 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
 
         if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
           // found the correct  mdst_charged
-          // if this is a connected region cluster we set the track id as connected region id
-          if (mECLTRK.type() == 2) {
-            eclClusters[mdstEcl.get_ID() - 1]->setConnectedRegionId(mTRK.get_ID());
-          }
           eclClustersToTracks.add(mdstEcl.get_ID() - 1, mChar.get_ID() - 1, 1.0);
           break;
         }

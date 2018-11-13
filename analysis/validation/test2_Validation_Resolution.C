@@ -203,12 +203,14 @@ void pi_plots(bool runOffline) {
     h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction, reconstructed vs truth transverse momentum of truth-matched pion tracks with a pi hypothesis. A Generic BBbar sample is used."));
     h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
     h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+    h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
     list_web->Add(h_Resolution_2D);
 
     TH1F *h_Resolution = new TH1F("h_Resolution", ";p_{T} (#pi) GeV;#sigma(p_{T})/p_{T}", NBINSP, MINP, MAXP);
     h_Resolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction PT resolution of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
     h_Resolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
     h_Resolution->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+    h_Resolution->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
     h_Resolution->SetFillColor(kBlue);  h_Resolution->SetMarkerColor(kBlue);
     h_Resolution->SetMinimum(0.00);     h_Resolution->SetMaximum(0.03);
     for( int bin=0; bin<NBINSP; bin++ ){
@@ -227,6 +229,7 @@ void pi_plots(bool runOffline) {
     h_Bias->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction pT bias of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
     h_Bias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low pT tracks < 100 MeV exhibit larger relative bias."));
     h_Bias->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+    h_Bias->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
     h_Bias->SetFillColor(kBlue);    h_Bias->SetMarkerColor(kBlue);
     h_Bias->SetMinimum(-0.002);     h_Bias->SetMaximum(0.002);
     for( int bin=0; bin<NBINSP; bin++ ){
@@ -256,6 +259,7 @@ void pi_plots(bool runOffline) {
     h_ZResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction dz of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
     h_ZResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
     h_ZResolution->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+    h_ZResolution->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
     list->Add(h_ZResolution);
     h_ZResolution->SetFillColor(kBlue); h_ZResolution->SetMarkerColor(kBlue);
     h_ZResolution->SetMinimum(0.00);    h_ZResolution->SetMaximum(250);
@@ -310,6 +314,7 @@ void photon_plots(bool runOffline) {
         h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Photon reconstruction, reconstructed vs truth energy of truth-matched photons. A Generic BBbar sample is used. ECL %s",names[i]) ) );
         h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0."));
         h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+        h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
         list->Add( h_Resolution_2D[i] );
         if(i==0)    list_web->Add( h_Resolution_2D[i] );
     }
@@ -423,6 +428,7 @@ void photon_plots(bool runOffline) {
         h_Resolution->GetListOfFunctions()->Add(new TNamed("Description", Form( "Single photon reconstruction resolution of truth-matched photons in bins of true energy. Sigma is determined from getRMS. A Generic BBbar sample is used. ECL %s", names[i]) ) );
         h_Resolution->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0"));
         h_Resolution->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+        h_Resolution->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
         h_Resolution->SetFillColor(kBlue);  h_Resolution->SetMarkerColor(kBlue);
         h_Resolution->SetMinimum(0.);       h_Resolution->SetMaximum(0.4);
         for( int bin=0; bin<NBINSP; bin++ ){
@@ -442,6 +448,7 @@ void photon_plots(bool runOffline) {
         h_Bias->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction Energy bias of truth-matched photons in bins of true energy. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used. ECL %s", names[i])));
         h_Bias->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0"));
         h_Bias->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+        h_Bias->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
         list->Add(h_Bias);
         h_Bias->SetFillColor(kBlue);  h_Bias->SetMarkerColor(kBlue);
         h_Bias->SetMinimum(-0.5);     h_Bias->SetMaximum(0.1);
@@ -473,10 +480,11 @@ void test2_Validation_Resolution(bool runOffline=false) {
     TFile* output = new TFile(Form("test2_Validation_Resolution_output.root"), "recreate");
     output->Close();
 
-    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf["));
+    //canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf["));
     pi_plots(runOffline);
     photon_plots(runOffline);
-    canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf]"));
+    //canvasResolution->Print(Form("test2_Validation_Resolution_plots.pdf]"));
+
 }
 
 

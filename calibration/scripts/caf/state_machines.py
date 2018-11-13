@@ -10,11 +10,15 @@ import multiprocessing
 import glob
 import shutil
 import time
+import pathlib
 
 from basf2 import *
+from basf2.pickle_path import serialize_path
+import os
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
 
+from .utils import create_directories
 from .utils import method_dispatch
 from .utils import merge_local_databases
 from .utils import decode_json_string
@@ -382,15 +386,24 @@ class CalibrationMachine(Machine):
         set the initial state
         """
         #: States that are defaults to the `CalibrationMachine` (could override later)
-        self.default_states = [State("init"),
-                               State("running_collector", enter=self._log_new_state),
-                               State("collector_failed", enter=self._log_new_state),
-                               State("collector_completed", enter=self._log_new_state),
-                               State("running_algorithms", enter=self._log_new_state),
-                               State("algorithms_failed", enter=self._log_new_state),
-                               State("algorithms_completed", enter=self._log_new_state),
-                               State("completed", enter=self._log_new_state),
-                               State("failed", enter=self._log_new_state)
+        self.default_states = [State("init", enter=[self._update_cal_state,
+                                                    self._log_new_state]),
+                               State("running_collector", enter=[self._update_cal_state,
+                                                                 self._log_new_state]),
+                               State("collector_failed", enter=[self._update_cal_state,
+                                                                self._log_new_state]),
+                               State("collector_completed", enter=[self._update_cal_state,
+                                                                   self._log_new_state]),
+                               State("running_algorithms", enter=[self._update_cal_state,
+                                                                  self._log_new_state]),
+                               State("algorithms_failed", enter=[self._update_cal_state,
+                                                                 self._log_new_state]),
+                               State("algorithms_completed", enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("completed", enter=[self._update_cal_state,
+                                                         self._log_new_state]),
+                               State("failed", enter=[self._update_cal_state,
+                                                      self._log_new_state])
                                ]
 
         super().__init__(self.default_states, initial_state)
@@ -410,12 +423,15 @@ class CalibrationMachine(Machine):
         #: IoV to be executed, currently will loop over all runs in IoV
         self.iov_to_calibrate = iov_to_calibrate
         #: root directory for this Calibration
-        self.root_dir = os.path.join(os.getcwd(), calibration.name)
+        self.root_dir = pathlib.Path(os.getcwd(), calibration.name)
 
         #: Times of various useful updates to the collector job e.g. start, elapsed, last update
         #: Used to periodically call update_status on the collector job
         #: and find out an overall number of jobs remaining + estimated remaining time
         self._collector_timing = {}
+
+        #: The collector job used for submission
+        self._collector_job = None
 
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
@@ -429,7 +445,8 @@ class CalibrationMachine(Machine):
         self.add_transition("complete", "running_collector", "collector_completed",
                             conditions=[self._collector_ready,
                                         self._collector_job_completed],
-                            before=self._post_process_collector)
+                            before=self._post_process_collector,
+                            after=self._dump_job_config)
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
                             before=self._check_valid_collector_output,
                             after=[self._run_algorithms,
@@ -449,6 +466,9 @@ class CalibrationMachine(Machine):
         self.add_transition("fail_fully", "algorithms_failed", "failed")
         self.add_transition("fail_fully", "collector_failed", "failed")
 
+    def _update_cal_state(self, **kwargs):
+        self.calibration.state = str(kwargs["new_state"])
+
     def files_containing_iov(self, iov):
         """
         Lookup function that takes an IoV and returns all files from the input_files that
@@ -461,6 +481,21 @@ class CalibrationMachine(Machine):
             if file_iov.overlaps(iov) and (file_path in self.calibration.input_files):
                 overlapping_files.append(file_path)
         return overlapping_files
+
+    def _dump_job_config(self):
+        """
+        Dumps the `Job` object for the collector to a JSON file so that it's configuration can be recovered
+        later in case of failure.
+        """
+        output_file = self.root_dir.joinpath(str(self.iteration), 'collector_input', 'collector_job.json')
+        self._collector_job.dump_to_json(output_file)
+
+    def _recover_collector_job(self):
+        """
+        Recovers the `Job` object for the collector from a JSON file in the event that we are starting from a reset.
+        """
+        output_file = self.root_dir.joinpath(str(self.iteration), 'collector_input', 'collector_job.json')
+        self._collector_job = Job.from_json(output_file)
 
     def _iov_requested(self):
         """
@@ -509,6 +544,7 @@ class CalibrationMachine(Machine):
         """
         """
         self.iteration += 1
+        self.calibration.iteration = self.iteration
 
     def _collector_job_completed(self):
         B2DEBUG(29, "Checking for failed collector job")
@@ -631,7 +667,7 @@ class CalibrationMachine(Machine):
     def _log_new_state(self, **kwargs):
         """
         """
-        B2INFO("Calibration {0} moved to state {1}".format(self.calibration.name, kwargs["new_state"].name))
+        B2INFO("Calibration Machine {0} moved to state {1}".format(self.calibration.name, kwargs["new_state"].name))
 
     def dependencies_completed(self):
         """
@@ -639,7 +675,7 @@ class CalibrationMachine(Machine):
         Technically only need to check explicit dependencies.
         """
         for calibration in self.calibration.dependencies:
-            if not calibration.machine.state == "completed":
+            if not calibration.state == calibration.end_state:
                 return False
         else:
             return True
@@ -664,41 +700,40 @@ class CalibrationMachine(Machine):
 
     def _make_output_dir(self):
         """
+        Creates the overall root directory of the Calibration. Wil not overwrite if it already exists.
         """
-        try:
-            os.mkdir(self.root_dir)
-        except FileExistsError:
-            pass
+        create_directories(self.root_dir, overwrite=False)
 
     def _make_collector_path(self):
         """
         Creates a basf2 path for the correct collector and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
-        path_output_dir = os.path.join(self.root_dir, str(self.iteration), 'paths')
-        # Should work fine as we previously make the other directories
-        os.makedirs(path_output_dir)
+        path_output_dir = self.root_dir.joinpath(str(self.iteration), 'paths')
+        # Should work fine and we automatically overwrite any previous attempt
+        create_directories(path_output_dir)
+
+        path_file_name = self.calibration.collector.name() + '.path'
+        path_file_name = path_output_dir / path_file_name
         # Create empty path and add collector to it
         path = create_path()
         path.add_module(self.calibration.collector)
         # Dump the basf2 path to file
-        path_file_name = self.calibration.collector.name() + '.path'
-        path_file_name = os.path.join(path_output_dir, path_file_name)
         with open(path_file_name, 'bw') as serialized_path_file:
             pickle.dump(serialize_path(path), serialized_path_file)
         # Return the pickle file path for addition to the input sandbox
-        return path_file_name
+        return str(path_file_name.absolute())
 
     def _make_pre_collector_path(self):
         """
         Creates a basf2 path for the collectors setup path (Calibration.pre_collector_path) and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
-        path_output_dir = os.path.join(self.root_dir, str(self.iteration), 'paths')
+        path_output_dir = self.root_dir.joinpath(str(self.iteration), 'paths')
         path = self.calibration.pre_collector_path
-        # Dump the basf2 path to file
         path_file_name = 'pre_collector.path'
         path_file_name = os.path.join(path_output_dir, path_file_name)
+        # Dump the basf2 path to file
         with open(path_file_name, 'bw') as serialized_path_file:
             pickle.dump(serialize_path(path), serialized_path_file)
         # Return the pickle file path for addition to the input sandbox
@@ -709,10 +744,16 @@ class CalibrationMachine(Machine):
         Creates a Job object for the collector for this iteration, ready for submission
         to backend
         """
-        iteration_dir = os.path.join(self.root_dir, str(self.iteration))
+        iteration_dir = self.root_dir.joinpath(str(self.iteration))
         job = Job('_'.join([self.calibration.name, 'Collector', 'Iteration', str(self.iteration)]))
-        job.output_dir = os.path.join(iteration_dir, 'collector_output')
-        job.working_dir = os.path.join(iteration_dir, 'collector_output')
+        job.output_dir = iteration_dir.joinpath('collector_output')
+        job.working_dir = iteration_dir.joinpath('collector_output')
+        # Remove previous failed attempt to avoid problems
+        if job.output_dir.exists():
+            B2INFO("Previous output directory for {} collector exists. "
+                   "Deleting {} before re-submitting.".format(self.calibration.name,
+                                                              str(job.output_dir)))
+            shutil.rmtree(job.output_dir)
         job.cmd = ['basf2', 'run_collector_path.py']
         job.input_sandbox_files.append(self.default_collector_steering_file_path)
         collector_path_file = self._make_collector_path()
@@ -733,29 +774,34 @@ class CalibrationMachine(Machine):
 
         # Add previous iteration databases from this calibration
         if self.iteration > 0:
-            previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
+            previous_iteration_dir = self.root_dir.joinpath(str(self.iteration - 1))
             database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
             B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
 
         # Let's make a directory to store some files later to the collector jobs
-        input_data_directory = os.path.join(self.root_dir, str(self.iteration), 'collector_input')
-        os.mkdir(input_data_directory)
+        input_data_directory = self.root_dir.joinpath(str(self.iteration), 'collector_input')
+        create_directories(pathlib.Path(input_data_directory))
 
         # Need to pass setup info to collector which would be tricky as arguments
         # We make a dictionary and pass it in as json
         job_config = {}
-        # Pass in the central database global tag
-        job_config['global_tag'] = self.calibration._global_tag
-        # Add chain of local databases to be used
-        job_config['local_database_chain'] = []
-        # User defined ones
-        job_config['local_database_chain'].extend(self.calibration._local_database_chain)
-        # CAF created ones for dependent calibrations and previous iteratioons of this calibration
-        job_config['local_database_chain'].extend(list_dependent_databases)
+        # Apply the user-set Calibration database chain to the base of the overall chain.
+        json_db_chain = []
+        for database in self.calibration.database_chain:
+            if database.db_type == 'local':
+                json_db_chain.append(('local', (database.filepath.as_posix(), database.payload_dir.as_posix())))
+            elif database.db_type == 'central':
+                json_db_chain.append(('central', database.global_tag))
+            else:
+                raise ValueError("Unknown database type {}".format(database.db_type))
+        # CAF created ones for dependent calibrations and previous iterations of this calibration
+        for database in list_dependent_databases:
+            json_db_chain.append(('local', database))
+        job_config['database_chain'] = json_db_chain
 
         import json
-        job_config_file_path = os.path.join(input_data_directory, 'collector_config.json')
+        job_config_file_path = str(input_data_directory.joinpath('collector_config.json').absolute())
         with open(job_config_file_path, 'w') as job_config_file:
             json.dump(job_config, job_config_file)
         job.input_sandbox_files.append(job_config_file_path)
@@ -794,6 +840,10 @@ class CalibrationMachine(Machine):
     def _check_valid_collector_output(self):
         B2INFO("Checking that Collector output exists for all colector jobs "
                "using {}.output_patterns.".format(self.calibration.name))
+        if not self._collector_job:
+            B2INFO("We're restarting so we'll recreate the collector Job object.")
+            self._recover_collector_job()
+
         if not self._collector_job.subjobs:
             output_files = []
             for pattern in self._collector_job.output_patterns:
@@ -818,10 +868,17 @@ class CalibrationMachine(Machine):
         # Get an instance of the Runner for these algorithms and run it
         algs_runner = self.calibration.algorithms_runner(name=self.calibration.name)
         algs_runner.algorithms = self.calibration.algorithms
-        output_database_dir = os.path.join(self.root_dir, str(self.iteration), self.calibration.alg_output_dir, "outputdb")
+        algorithm_output_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir)
+        output_database_dir = algorithm_output_dir.joinpath("outputdb")
+        # Remove it, if we failed previously, to start clean
+        if algorithm_output_dir.exists():
+            B2INFO("Output directory for {} already exists from a previous CAF attempt. "
+                   "Deleting and recreating {}".format(self.calibration.name,
+                                                       algorithm_output_dir))
+        create_directories(algorithm_output_dir)
         B2INFO("Output local database for {} will be stored at {}".format(self.calibration.name, output_database_dir))
         algs_runner.output_database_dir = output_database_dir
-        algs_runner.output_dir = os.path.join(self.root_dir, str(self.iteration), self.calibration.alg_output_dir)
+        algs_runner.output_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir)
         input_files = []
 
         if self._collector_job.subjobs:
@@ -833,10 +890,8 @@ class CalibrationMachine(Machine):
                 input_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
         algs_runner.input_files = input_files
 
-        # Add any user defined local database chain for this calibration
-        for filename, directory in self.calibration._local_database_chain:
-            B2INFO("Adding local database {0} for calibration algorithms of {1}".format(filename, self.calibration.name))
-            algs_runner.local_database_chain.append((filename, directory))
+        # Add any user defined database chain for this calibration
+        algs_runner.database_chain = self.calibration.database_chain
 
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
@@ -848,13 +903,12 @@ class CalibrationMachine(Machine):
 
         # Add previous iteration databases from this calibration
         if self.iteration > 0:
-            previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
+            previous_iteration_dir = self.root_dir.joinpath(str(self.iteration - 1))
             database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
             B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
         algs_runner.dependent_databases = list_dependent_databases
-        B2DEBUG(20, "Setting Algortihm Runner {} to use global tag {}".format(algs_runner.name, self.calibration._global_tag))
-        algs_runner.global_tag = self.calibration._global_tag
+
         try:
             algs_runner.run(self.iov_to_calibrate, self.iteration)
         except Exception as err:
@@ -868,11 +922,13 @@ class CalibrationMachine(Machine):
         """
         Take the last iteration's outputdb and copy it to a more easily findable place.
         """
-        database_location = os.path.join(self.root_dir,
-                                         str(self.iteration),
-                                         self.calibration.alg_output_dir,
-                                         'outputdb')
-        final_database_location = os.path.join(self.root_dir, 'outputdb')
+        database_location = self.root_dir.joinpath(str(self.iteration),
+                                                   self.calibration.alg_output_dir,
+                                                   'outputdb')
+        final_database_location = self.root_dir.joinpath('outputdb')
+        if final_database_location.exists():
+            B2INFO("Removing previous final output database for {} before copying new one.".format(self.calibration.name))
+            shutil.rmtree(final_database_location)
         shutil.copytree(database_location, final_database_location)
 
 
@@ -930,9 +986,8 @@ class AlgorithmMachine(Machine):
         self.result = None
 
         self.add_transition("setup_algorithm", "init", "ready",
-                            before=[self._create_output_dir,
+                            before=[self._setup_logging,
                                     self._setup_database_chain,
-                                    self._setup_logging,
                                     self._set_input_data,
                                     self._pre_algorithm])
         self.add_transition("execute_runs", "ready", "running_algorithm",
@@ -970,10 +1025,9 @@ class AlgorithmMachine(Machine):
 
     def _create_output_dir(self, **kwargs):
         """
-        Create working/output directory of algorithm
+        Create working/output directory of algorithm. Any old directory is overwritten.
         """
-        if not os.path.exists(self.output_dir):
-            os.mkdir(self.output_dir)
+        create_directories(pathlib.Path(self.output_dir), overwrite=True)
 
     def _setup_database_chain(self, **kwargs):
         """
@@ -981,15 +1035,18 @@ class AlgorithmMachine(Machine):
         """
         # Clean everything out just in case
         reset_database()
-        # Fall back to previous databases if no payloads are found
-        use_database_chain(True)
-        # Use the central database with global tag if requested
-        if self.global_tag:
-            use_central_database(self.global_tag)
-        # Add any user defined local database chain for this calibration
-        for filename, directory in self.local_database_chain:
-            B2INFO("Using local database {} for {}".format(directory, self.algorithm.name))
-            use_local_database(filename, directory)
+        use_database_chain()
+        # Apply all the databases in order, starting with the user-set chain for this Calibration
+        for database in self.database_chain:
+            if database.db_type == 'local':
+                B2INFO("Using local database {} for {}".format((database.filepath.as_posix(), database.payload_dir.as_posix()),
+                                                               self.algorithm.name))
+                use_local_database(database.filepath.as_posix(), database.payload_dir.as_posix())
+            elif database.db_type == 'central':
+                B2INFO("Using Central database tag {} for {}".format(database.global_tag, self.algorithm.name))
+                use_central_database(database.global_tag)
+            else:
+                raise ValueError("Unknown database type {}".format(database.db_type))
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
@@ -998,22 +1055,28 @@ class AlgorithmMachine(Machine):
             use_local_database(filename, directory)
 
         # Create a directory to store the payloads of this algorithm
-        if not os.path.exists(self.output_database_dir):
-            os.mkdir(self.output_database_dir)
+        create_directories(pathlib.Path(self.output_database_dir), overwrite=False)
+
         # add local database to save payloads
         B2INFO("Output local database for {} stored at {}".format(
                self.algorithm.name,
                self.output_database_dir))
-        use_local_database(os.path.join(self.output_database_dir, "database.txt"), self.output_database_dir, False, LogLevel.INFO)
+        use_local_database(str(self.output_database_dir.joinpath("database.txt")),
+                           str(self.output_database_dir),
+                           False,
+                           LogLevel.INFO)
 
     def _setup_logging(self, **kwargs):
         """
         """
-        logging.reset()
-        set_log_level(LogLevel.INFO)
-
         # add logfile for output
-        logging.add_file(os.path.join(self.output_dir, self.algorithm.name + '_stdout'))
+        log_file = os.path.join(self.output_dir, self.algorithm.name + '_stdout')
+        B2INFO('Output log file at {}'.format(log_file))
+        reset_log()
+        set_log_level(LogLevel.INFO)
+#        set_log_level(LogLevel.DEBUG)
+#        set_debug_level(100)
+        log_to_file(log_file)
 
     def _pre_algorithm(self, **kwargs):
         """

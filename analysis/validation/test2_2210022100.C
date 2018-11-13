@@ -58,21 +58,21 @@ void plotTime(TFile* pfile, TTree* ptree, TFile *outputFile){
   TString tmCuts("(D0_isSignal == 1)");
   Double_t ax = 0.01;
  
-  h_tres_all = new TH1F("h_tres_all", "D0 flight time resolution", 30,-ax, ax);
+  TH1F* h_tres_all = new TH1F("h_tres_all", "D0 flight time resolution", 30,-ax, ax);
   ptree->Project("h_tres_all", "D0_K_S0_FT - D0_K_S0_MCFT",tmCuts);
   h_tres_all->GetXaxis()->SetTitle("t_{reco} - t_{gen} (ns)");
   h_tres_all->GetListOfFunctions()->Add(new TNamed("Description", "D0 -> KSpi0, D0 flight time resolution"));
   h_tres_all->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_tres_all->GetListOfFunctions()->Add(new TNamed("Check", "D0 time resolution about 140 fs"));
 
-  h_sigmat_all = new TH1F("h_sigmat_all", "D0 flight time error", 20,0, 0.01);
+  TH1F* h_sigmat_all = new TH1F("h_sigmat_all", "D0 flight time error", 20,0, 0.01);
   ptree->Project("h_sigmat_all", "D0_K_S0_FTE",tmCuts);
   h_sigmat_all->GetXaxis()->SetTitle("#sigma_{t} (ns)");
   h_sigmat_all->GetListOfFunctions()->Add(new TNamed("Description", "D0 -> KSpi0, D0 flight time error"));
   h_sigmat_all->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_sigmat_all->GetListOfFunctions()->Add(new TNamed("Check", "D0 flight time error is about 73 fs"));
 
-  h_sig_all = new TH1F("h_sig_all", "D0 flight time significance", 20,0, 200);
+  TH1F* h_sig_all = new TH1F("h_sig_all", "D0 flight time significance", 20,0, 200);
   ptree->Project("h_sig_all", "D0_K_S0_FT/D0_K_S0_FTE",tmCuts);
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Description", "D0 -> KSpi0,  D0 flight time significance"));
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));

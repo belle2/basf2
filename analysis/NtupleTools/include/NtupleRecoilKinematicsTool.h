@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLERECOILKINEMATICSTOOL_H
-#define NTUPLERECOILKINEMATICSTOOL_H
+#pragma once
 
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 
@@ -36,16 +35,15 @@ namespace Belle2 {
     float* m_recoilMM2; /**< invarian mass squared of the system recoiling against given Particle */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
 
   public:
     /** Constuctor. */
     NtupleRecoilKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
 
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLERECOILKINEMATICSTOOL_H

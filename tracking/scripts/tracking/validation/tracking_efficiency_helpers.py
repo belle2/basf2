@@ -156,9 +156,7 @@ def run_simulation(path, pt_value, output_filename=''):
 
     background_files = []
     if 'BELLE2_BACKGROUND_DIR' in os.environ:
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/PXD*.root')
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/SVD*.root')
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/CDC*.root')
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 
         print('Number of used background files (%d): ' % len(background_files))
 
@@ -186,8 +184,7 @@ def run_reconstruction(path, output_file_name, input_file_name=''):
         path.add_module(gearbox)
 
         geometry = register_module('Geometry')
-        if get_reconstruction_components() is not None:
-            geometry.param('components', get_reconstruction_components())
+        geometry.param("useDB", True)
         path.add_module(geometry)
 
     add_reconstruction(path, get_reconstruction_components(), pruneTracks=0)

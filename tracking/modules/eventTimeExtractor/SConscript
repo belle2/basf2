@@ -1,0 +1,4 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'tracking', 'tracking_eventTimeExtraction']
+Return('env')

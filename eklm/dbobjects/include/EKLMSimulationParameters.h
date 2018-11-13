@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSIMULATIONPARAMETERS_H
-#define EKLMSIMULATIONPARAMETERS_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -48,12 +47,9 @@ namespace Belle2 {
     /** Maximal hit time. */
     float m_HitTimeThreshold;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMSimulationParameters, 1);
 
   };
 
 }
-
-#endif
-

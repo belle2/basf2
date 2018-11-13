@@ -22,14 +22,14 @@ namespace Belle2 {
 
   public:
     RoiSenderCallback();
-    virtual ~RoiSenderCallback() throw();
+    virtual ~RoiSenderCallback();
 
   public:
-    virtual void load(const DBObject&) throw(RCHandlerException);
-    virtual void start() throw(RCHandlerException);
-    virtual void stop() throw(RCHandlerException);
-    virtual void recover(const DBObject&) throw(RCHandlerException);
-    virtual void abort() throw(RCHandlerException);
+    virtual void load(const DBObject&, const std::string&);
+    virtual void start();
+    virtual void stop();
+    virtual void recover(const DBObject&, const std::string&);
+    virtual void abort();
 
     void RoiSenderLogger();
 

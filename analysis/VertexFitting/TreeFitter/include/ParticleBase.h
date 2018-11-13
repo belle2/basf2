@@ -13,6 +13,7 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 #include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>
@@ -62,19 +63,19 @@ namespace TreeFitter {
     /** create a custom origin particle or a beamspot*/
     static ParticleBase* createOrigin(Belle2::Particle* daughter,
                                       bool forceFitAll,
-                                      const std::vector<double> customOriginVertex,
-                                      const std::vector<double> customOriginCovariance,
+                                      const std::vector<double>& customOriginVertex,
+                                      const std::vector<double>& customOriginCovariance,
                                       const bool isBeamSpot
                                      );
 
     /** init particle that does not need a mother vertex  */
-    virtual ErrCode initMotherlessParticle(FitParams*) = 0;
+    virtual ErrCode initMotherlessParticle(FitParams&) = 0;
 
     /** init particle that does need a mother vertex  */
-    virtual ErrCode initParticleWithMother(FitParams*) = 0;
+    virtual ErrCode initParticleWithMother(FitParams&) = 0;
 
     /** init covariance matrix */
-    virtual ErrCode initCovariance(FitParams*) const;
+    virtual ErrCode initCovariance(FitParams&) const;
 
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
@@ -103,8 +104,15 @@ namespace TreeFitter {
     /**  project geometrical constraint */
     virtual ErrCode projectGeoConstraint(const FitParams&, Projection&) const ;
 
-    /** project mass constraint  */
+    /** project mass constraint using the particles parameters */
+    virtual ErrCode projectMassConstraintParticle(const FitParams&, Projection&) const ;
+
+    /** project mass constraint using the parameters of the daughters */
+    virtual ErrCode projectMassConstraintDaughters(const FitParams&, Projection&) const ;
+
+    /** project mass constraint abstract */
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
+
 
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
@@ -135,7 +143,7 @@ namespace TreeFitter {
     int eneIndex() const { return hasEnergy() ? momIndex() + 3 : -1 ; }
 
     /**  get chi2 */
-    virtual double chiSquare(const FitParams*) const;
+    virtual double chiSquare(const FitParams&) const;
 
     /** get pdg mass  */
     double pdgMass() const { return m_pdgMass ; }
@@ -194,7 +202,7 @@ namespace TreeFitter {
     static double bFieldOverC();
 
     /** initialises tau as a length  */
-    ErrCode initTau(FitParams* par) const ;
+    ErrCode initTau(FitParams& par) const ;
 
     /** set Index (in statevector) */
     void setIndex(int i) { m_index = i ; }

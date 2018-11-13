@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_GEOEKLMCREATOR_H
-#define EKLM_GEOEKLMCREATOR_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -233,7 +232,7 @@ namespace Belle2 {
        * @param[in] type      Geometry type.
        */
       void create(const GearDir& content, G4LogicalVolume& topVolume,
-                  geometry::GeometryTypes type);
+                  geometry::GeometryTypes type) override;
 
       /**
        * Creation of the detector geometry from database.
@@ -242,7 +241,7 @@ namespace Belle2 {
        * @param[in] type      Geometry type.
        */
       void createFromDB(const std::string& name, G4LogicalVolume& topVolume,
-                        geometry::GeometryTypes type);
+                        geometry::GeometryTypes type) override;
 
       /**
        * Creation of payloads.
@@ -250,7 +249,7 @@ namespace Belle2 {
        * @param iov     Interval of validity.
        */
       void createPayloads(const GearDir& content,
-                          const IntervalOfValidity& iov);
+                          const IntervalOfValidity& iov) override;
 
     private:
 
@@ -500,8 +499,8 @@ namespace Belle2 {
        * @param[in] layer  Layer logical volume.
        * @return Layer logical volume.
        *
-       * If layer == NULL, then new layer logical volume is created
-       * (for detector layers). If layer != NULL, then the existing
+       * If layer == nullptr, then new layer logical volume is created
+       * (for detector layers). If layer != nullptr, then the existing
        * logical volume is used (for shield layers).
        */
       G4LogicalVolume* createLayer(G4LogicalVolume* endcap,
@@ -513,8 +512,8 @@ namespace Belle2 {
        * @param[in] sector Sector logical volume.
        * @return Sector logical volume.
        *
-       * If sector == NULL, then new sector logical volume is created
-       * (for detector layers). If sector != NULL, then the existing
+       * If sector == nullptr, then new sector logical volume is created
+       * (for detector layers). If sector != nullptr, then the existing
        * logical volume is used (for shield layers).
        */
       G4LogicalVolume* createSector(G4LogicalVolume* layer,
@@ -673,6 +672,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

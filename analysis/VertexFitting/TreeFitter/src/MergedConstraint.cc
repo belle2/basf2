@@ -9,7 +9,7 @@
  **************************************************************************/
 
 //Merge multiple constraints that we want to project simultaneously.
-//As of release-00-08-00 this causes issues when referencing, see DecayChain.cc
+//Kept for development, currently incompatible with referencing.
 
 #include <framework/logging/Logger.h>
 //
@@ -21,7 +21,6 @@ namespace TreeFitter {
 
   ErrCode MergedConstraint::project(const FitParams& fitpar, Projection& p) const
   {
-    B2DEBUG(12, "MergedConstraint:project()");
     ErrCode status ;
     for (auto element : m_list) {
       status |= element->project(fitpar, p) ;

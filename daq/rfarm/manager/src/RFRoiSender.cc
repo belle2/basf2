@@ -42,6 +42,10 @@ RFRoiSender::RFRoiSender(string conffile)
   // 5. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
 
+  // 6. Clear PID list
+  m_pid_sender = 0;
+  m_pid_merger = 0;
+
 }
 
 RFRoiSender::~RFRoiSender()

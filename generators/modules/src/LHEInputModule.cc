@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015  Belle II Collaboration                         *
+ * Copyright(C) 2015  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber      Yefan Tao                             *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -48,6 +48,11 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
+  addParam("meanDecayLength", m_meanDecayLength,
+           "Mean decay length(mean lifetime * c) between displaced vertex to IP, default to be zero, unit in cm", 0.);
+  addParam("Rmin", m_Rmin, "Minimum of distance between displaced vertex to IP", 0.);
+  addParam("Rmax", m_Rmax, "Maximum of distance between displaced vertex to IP", 1000000.);
+  addParam("pdg_displaced", m_pdg_displaced, "PDG code of the displaced particle being studied", 9000008);
 }
 
 
@@ -80,6 +85,20 @@ void LHEInputModule::initialize()
     MCInitialParticles& initial = m_initial.generate();
     TLorentzRotation boost = initial.getCMSToLab();
     m_lhe.m_labboost = boost;
+  }
+
+  //pass displaced vertex to LHEReader
+  m_lhe.m_meanDecayLength = m_meanDecayLength;
+  m_lhe.Rmin = m_Rmin;
+  m_lhe.Rmax = m_Rmax;
+  m_lhe.pdg_displaced = m_pdg_displaced;
+  //print out warning information if default R range is change
+  if (m_Rmin != 0 || m_Rmax != 1000000) {
+    TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
+    double factor;
+    factor = fr.Integral(m_Rmin, m_Rmax) / fr.Integral(0, 1000000);
+    B2WARNING("Default range of R is changed, new range is from " << m_Rmin << "cm to " << m_Rmax <<
+              " cm. This will change the cross section by a factor of " << factor);
   }
 
   //are we the master module? And do we have all infos?
@@ -125,7 +144,7 @@ void LHEInputModule::event()
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-  } catch (LHEReader::LHEEmptyEventError) {
+  } catch (LHEReader::LHEEmptyEventError&) {
     B2DEBUG(100, "Reached end of LHE file.");
     m_lhe.closeCurrentInputFile();
     m_iFile++;

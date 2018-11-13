@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENTDATA_H
-#define EKLMALIGNMENTDATA_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -82,12 +81,9 @@ namespace Belle2 {
     /** Additional rotation of the segment. */
     float m_Dalpha;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMAlignmentData, 2);
 
   };
 
 }
-
-#endif
-

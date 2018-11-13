@@ -874,13 +874,14 @@ namespace Belle2 {
           //cout<<"[TSF]: "<<ts.name()<<" was hit at ";
           unsigned nHits = ts.wires()[iWire]->signal().nSignals();
           for (unsigned iHit = 0; iHit < nHits; iHit++) {
+            if (iHit % 2 == 1) continue;
             TVectorD tempTSInformation(3);
             tempTSInformation[0] = iSuperLayer;
             tempTSInformation[1] = ts.localId();
             tempTSInformation[2] = ts.wires()[iWire]->signal().stateChanges()[iHit];
             new(tsInformation[iHitTS++]) TVectorD(tempTSInformation);
             //cout<<ts.wires()[iWire]->signal().stateChanges()[iHit]<<", ";
-            iHit++;
+            //iHit++;
           }
           //cout<<endl;
         } // If wire is hit

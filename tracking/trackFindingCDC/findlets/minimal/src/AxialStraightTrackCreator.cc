@@ -88,9 +88,6 @@ std::vector<const CDCWireHit*> AxialStraightTrackCreator::search(const std::vect
 {
   std::vector<const CDCWireHit*> foundHits;
   for (const CDCWireHit* hit : axialWireHits) {
-    AutomatonCell& automatonCell = hit->getAutomatonCell();
-    if (automatonCell.hasTakenFlag()) continue; // Ignore hits already taken by normal tracking
-
     const Vector2D point = hit->reconstruct2D(guidingTrajectory2D);
     float arc = guidingTrajectory2D.calcArcLength2D(point);
     if (arc < 0) continue; // No b2b tracks

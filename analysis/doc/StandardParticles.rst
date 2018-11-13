@@ -3,8 +3,8 @@
 Standard Particles
 ==================
 
-The standard particle lists provide recommended selection criteria for final-state particles, and some cases, for composite particles.
-The recommended selections are studied and provided by the physics performance group.
+The standard particle lists provide recommended selection criteria for final-state particles, and in some cases, for composite particles.
+The recommended selections are provided by the physics performance group.
 
 Although not available yet, it is envisaged that systematics will be provided centrally for these recommended lists.
 
@@ -62,9 +62,11 @@ If you improve these lists, please report in a physics performance meeting and m
    :exclude-members: stdPi0s
 
 .. automodule:: stdV0s
+   :members:
    :undoc-members:
    :exclude-members: stdKshorts, stdLambdas
 
 .. automodule:: stdKlongs
+   :members:
    :undoc-members:
 

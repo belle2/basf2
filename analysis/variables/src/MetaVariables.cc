@@ -1172,21 +1172,15 @@ endloop:
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr) // no MC match
+          if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            if (particle->getParticleType() == Particle::EParticleType::c_MCParticle) { // was created from MC particle
-              if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
-                return -999;
-              Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
-              return var->function(&tempParticle);
-            } else
+            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
               return -999;
-          }
-          if (daughterNumber >= int(particle->getRelated<MCParticle>()->getNDaughters()))
-            return -999;
-          else {
-            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getDaughters().at(daughterNumber));
+            }
+            Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             return var->function(&tempParticle);
+          } else {
+            return -999;
           }
         };
         return func;
@@ -1202,21 +1196,15 @@ endloop:
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr) // no MC match
+          if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            if (particle->getParticleType() == Particle::EParticleType::c_MCParticle) { // was created from MC particle
-              if (particle->getMCParticle()->getMother() == nullptr)
-                return -999;
-              Particle tempParticle = Particle(particle->getMCParticle()->getMother());
-              return var->function(&tempParticle);
-            } else
+            if (particle->getMCParticle()->getMother() == nullptr) {
               return -999;
-          }
-          if (particle->getRelated<MCParticle>()->getMother() == nullptr)
-            return -999;
-          else {
-            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getMother());
+            }
+            Particle tempParticle = Particle(particle->getMCParticle()->getMother());
             return var->function(&tempParticle);
+          } else {
+            return -999;
           }
         };
         return func;
@@ -1395,10 +1383,11 @@ endloop:
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          const MCParticle* mcp = particle->getRelated<MCParticle>();
-          if (!mcp)
+          const MCParticle* mcp = particle->getMCParticle();
+          if (!mcp)   // Has no MC match and is no MCParticle
+          {
             return -999;
-
+          }
           Particle tmpPart(mcp);
           return var->function(&tmpPart);
         };

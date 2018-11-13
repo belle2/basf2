@@ -1619,11 +1619,15 @@ namespace {
     auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
 
+    // Test if matchedMC also works for particle which already is an MCParticle.
+    auto* p4 = particles.appendNew(mcParticle);
+
     const Manager::Var* var = Manager::Instance().getVariable("matchedMC(charge)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p1), -1);
     EXPECT_FLOAT_EQ(var->function(p2), 1);
     EXPECT_FLOAT_EQ(var->function(p3), 0);
+    EXPECT_FLOAT_EQ(var->function(p4), 0);
   }
 
   TEST_F(MetaVariableTest, countInList)

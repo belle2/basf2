@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Descriptor:  Validation of CharmlessHad3Body skim using B -> K_S0 pi0
+# Descriptor:  Validation of CharmlessHad2Body skim using B -> K_S0 pi0
 
 """
 <header>
-  <output>../CharmlessHad2Body.dst.root</output>
+  <output>../CharmlessHad2BodyNeutral.dst.root</output>
   <contact>khsmith@student.unimelb.edu.au</contact>
 </header>
 """
@@ -44,7 +44,7 @@ add_reconstruction(main)
 
 
 # Finally add mdst output
-output_filename = "../CharmlessHad2Body.dst.root"
+output_filename = "../CharmlessHad2BodyNeutral.dst.root"
 add_mdst_output(main, filename=output_filename)
 
 # process events and print call statistics

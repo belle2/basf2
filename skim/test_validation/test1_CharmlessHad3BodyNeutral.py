@@ -20,7 +20,7 @@ from stdPhotons import stdPhotons
 from skimExpertFunctions import *
 
 
-fileList = ['../CharmlessHad2Body.dst.root']
+fileList = ['../CharmlessHad3BodyNeutral.dst.root']
 
 inputMdstList('MC9', fileList)
 
@@ -36,9 +36,9 @@ loadStdLightMesons()
 
 # Hadronic B0 skim
 from skim.btocharmless import *
-Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()
-skimOutputUdst('CharmlessHad2Body.udst.root', Had2BodyList)
-summaryOfLists(Had2BodyList)
+Had3BodyList = CharmlessHad3BodyB0List() + CharmlessHad3BodyBmList()
+skimOutputUdst('CharmlessHad3BodyNeutral.udst.root', Had3BodyList)
+summaryOfLists(Had3BodyList)
 
 # Suppress noisy modules, and then process
 setSkimLogging()

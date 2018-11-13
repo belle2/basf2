@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>../CharmlessHad3Body.dst.root</output>
+  <output>../CharmlessHad3BodyCharged.dst.root</output>
   <contact>khsmith@student.unimelb.edu.au</contact>
 </header>
 """
@@ -44,7 +44,7 @@ add_reconstruction(main)
 
 
 # Finally add mdst output
-output_filename = "../CharmlessHad3Body.dst.root"
+output_filename = "../CharmlessHad3BodyCharged.dst.root"
 add_mdst_output(main, filename=output_filename)
 
 # process events and print call statistics

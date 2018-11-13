@@ -19,18 +19,20 @@ namespace Belle2 {
    */
   typedef std::pair<TVector2, TVector2> coord2dPair;
 
-  /*
-  * Hough Candidates class.
-  */
+  /**
+   * Hough Candidates class.
+   */
   class DATCONHoughCand {
 
   public:
 
-    /** Constructor for hough candidates
+    /** Constructor for Hough candidates
      *
      * A HoughCand is a pair of two TVector2 containing the lower left and upper right
      * corner of a Hough Space (sub) sector as well as the list of the hits (=space points)
      * associated with this HoughCand (hits of at least three different SVD layers).
+     * @param list Vector of unsinged ints containing the ids of the hits belonging go this candidate
+     * @param coord Pair of two TVector2 pointing to the lower-left and upper-right corner of this cell of the Hough Space
      */
     DATCONHoughCand(std::vector<unsigned int>& list, coord2dPair coord): hitList(list), coordinatePair(coord)
     {

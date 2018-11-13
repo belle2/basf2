@@ -37,15 +37,18 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
 
   TVector2* CenterOfGravity = new TVector2(0, 0);
 
-  vector<int> clusterSizes;
-  vector<TVector2> CoG;
-
   int** ArrayOfActiveHoughSpaceSectors;
 
   if (m_usePhase2Simulation) {
     // ATTENTION TODO FIXME : This still has to be implemented!!!
     // So far no phase 2 specific algorithms have been implemented and tested!
     B2WARNING("This mode is not yet implemented, nothing will happen! Return...");
+
+    delete clusterCount;
+    delete clusterSize;
+    delete initialPositionX;
+    delete initialPositionY;
+
     return;
   } else {
     if (uSide) {

@@ -19,7 +19,7 @@ namespace Belle2 {
 
   DATCONSVDSimpleClusterCandidate::DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside)
     : m_vxdID(vxdID)
-    , m_isUside(isUside) {};
+    , m_isUside(isUside) { m_maxClusterSize = 0; };
 
   DATCONSVDSimpleClusterCandidate::DATCONSVDSimpleClusterCandidate(VxdID vxdID, bool isUside, unsigned short maxClusterSize)
     : m_vxdID(vxdID)

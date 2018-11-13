@@ -70,46 +70,34 @@ DATCONROICalculationModule::event()
   int uSize = m_fixedSizeUCells;
   int vSize = m_fixedSizeVCells;
   /** Reminder: 250 px in u-direction = r-phi, in total 768 (512+256) px in v-direction = z */
-  double uCoordinate, vCoordinate;
-  int uCell, vCell;
-  int uCellDownLeft, vCellDownLeft, uCellUpRight, vCellUpRight;
-  int uCellDownLeft_tmp, vCellDownLeft_tmp, uCellUpRight_tmp, vCellUpRight_tmp;
   int sensorChange = 0, ladderChange = 0;
   int uCellsRest = 0, vCellsRest = 0;
-  int uCells = 250, vCells = 768;
-  VxdID MPHSensorID, nextSensorID;
-  TVector2 localPosition;
-
-//   double qualityOfHit;
-  int sensorNumber;
-  int layerNumber;
-  int ladderNumber;
-  const PXD::SensorInfo* currentSensor;
+  VxdID nextSensorID;
 
   ROIid DATCONROIid;
 
   for (auto& datconmph : storeDATCONMPHs) {
-    MPHSensorID = datconmph.getSensorID();
-    localPosition = datconmph.getLocalCoordinate();
+    VxdID MPHSensorID = datconmph.getSensorID();
+    TVector2 localPosition = datconmph.getLocalCoordinate();
 //     qualityOfHit = datconmph.getQualityOfHit();
 
-    uCoordinate = localPosition.X();
-    vCoordinate = localPosition.Y();
+    double uCoordinate = localPosition.X();
+    double vCoordinate = localPosition.Y();
 
-    currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(MPHSensorID));
+    const PXD::SensorInfo* currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(MPHSensorID));
 
-    uCell = currentSensor->getUCellID(uCoordinate, vCoordinate, false);
-    vCell = currentSensor->getVCellID(vCoordinate, false);
-    uCells = currentSensor->getUCells();
-    vCells = currentSensor->getVCells();
+    int uCell = currentSensor->getUCellID(uCoordinate, vCoordinate, false);
+    int vCell = currentSensor->getVCellID(vCoordinate, false);
+    int uCells = currentSensor->getUCells();
+    int vCells = currentSensor->getVCells();
 
-    sensorNumber = MPHSensorID.getSensorNumber();
-    layerNumber  = MPHSensorID.getLayerNumber();
-    ladderNumber = MPHSensorID.getLadderNumber();
+    unsigned short sensorNumber = MPHSensorID.getSensorNumber();
+    unsigned short layerNumber  = MPHSensorID.getLayerNumber();
+    unsigned short ladderNumber = MPHSensorID.getLadderNumber();
 
     /** Lower left corner */
-    uCellDownLeft = uCell - uSize / 2;
-    vCellDownLeft = vCell - vSize / 2;
+    int uCellDownLeft = uCell - uSize / 2;
+    int vCellDownLeft = vCell - vSize / 2;
 
     if (sensorNumber == 1) {
       if (vCellDownLeft < 0) {
@@ -130,8 +118,8 @@ DATCONROICalculationModule::event()
     }
 
     /** Upper right corner */
-    uCellUpRight = uCell + uSize / 2;
-    vCellUpRight = vCell + vSize / 2;
+    int uCellUpRight = uCell + uSize / 2;
+    int vCellUpRight = vCell + vSize / 2;
 
     if (sensorNumber == 1) {
       if (vCellUpRight > vCells - 1) {
@@ -154,6 +142,7 @@ DATCONROICalculationModule::event()
     storeDATCONROIids.appendNew(ROIid(uCellDownLeft, uCellUpRight, vCellDownLeft, vCellUpRight, MPHSensorID));
 
     if (m_ContinueROIonNextSensor) {
+      int uCellDownLeft_tmp, vCellDownLeft_tmp, uCellUpRight_tmp, vCellUpRight_tmp;
 
       /** ROI covering several sensors / ladder */
       if (ladderChange == -1 && sensorChange == 0) {

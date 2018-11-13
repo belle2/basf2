@@ -19,10 +19,7 @@ using namespace Belle2;
 void
 DATCONTrackingModule::findandcombine3d()
 {
-  vector<unsigned int> v_idList, u_idList;
   unsigned int tracks;
-  TVector2 TrackCandV, TrackCandU;
-  double TrackRadius, TrackPhi, TrackTheta, TrackZzero;
 
   TVector3 houghMomentum;
 
@@ -34,8 +31,8 @@ DATCONTrackingModule::findandcombine3d()
 
   for (auto it = vTrackCand.begin(); it != vTrackCand.end(); ++it) {
     for (auto it_in = uTrackCand.begin(); it_in != uTrackCand.end(); ++it_in) {
-      v_idList = it->getIdList();
-      u_idList = it_in->getIdList();
+      vector<unsigned int> v_idList = it->getIdList();
+      vector<unsigned int> u_idList = it_in->getIdList();
 
       if (compareList(u_idList, v_idList)) {
 
@@ -44,12 +41,12 @@ DATCONTrackingModule::findandcombine3d()
 
         ++tracks;
 
-        TrackCandV  = it->getCoord();
-        TrackCandU  = it_in->getCoord();
-        TrackRadius = 1.0 / TrackCandU.Y();
-        TrackPhi    = TrackCandU.X();
-        TrackTheta  = TrackCandV.X();
-        TrackZzero  = TrackCandV.Y();
+        TVector2 TrackCandV  = it->getCoord();
+        TVector2 TrackCandU  = it_in->getCoord();
+        double TrackRadius = 1.0 / TrackCandU.Y();
+        double TrackPhi    = TrackCandU.X();
+        double TrackTheta  = TrackCandV.X();
+        double TrackZzero  = TrackCandV.Y();
 
         if (m_usePhase2Simulation) {
           // ATTENTION TODO FIXME : This still has to be implemented!!!
@@ -114,7 +111,6 @@ DATCONTrackingModule::findandcombine3d()
 void
 DATCONTrackingModule::saveHitsToRecoTrack(std::vector<unsigned int>& idList, TVector3 momentum)
 {
-  int spacePointIndex;
   unsigned int sortingParameter = 0;
 
   TVector3 seedPosition(0.0, 0.0, 0.0);
@@ -124,7 +120,7 @@ DATCONTrackingModule::saveHitsToRecoTrack(std::vector<unsigned int>& idList, TVe
                                                          m_storeRecoHitInformationName);
 
   for (auto it = idList.begin(); it != idList.end(); it++) {
-    spacePointIndex = (int)(*it) - (((int)(*it) / 10000) * 10000);
+    int spacePointIndex = (int)(*it) - (((int)(*it) / 10000) * 10000);
 
     DATCONSVDSpacePoint* spacepoint = storeDATCONSVDSpacePoints[spacePointIndex];
     vector<SVDCluster> DATCONSVDClusters = spacepoint->getAssignedDATCONSVDClusters();
@@ -173,24 +169,20 @@ DATCONTrackingModule::trackCandMerger()
   /* Begin of u-side trackCand merger */
   if (m_useTrackCandMerger && m_useTrackCandMergerU) {
 
-    TVector2 TrackCandU, TrackCandU_in;
-    double TrackRadius, TrackPhi;
-    double inverseTrackRadius;
-
     while (uTrackCandCopy.size() > 0) {
       auto it             = uTrackCandCopy.begin();
       idList              = it->getIdList();
-      TrackCandU          = it->getCoord();
-      TrackRadius         = 1.0 / TrackCandU.Y();
-      inverseTrackRadius  = TrackCandU.Y();
-      TrackPhi            = TrackCandU.X();
+      TVector2 TrackCandU = it->getCoord();
+      double TrackRadius  = 1.0 / TrackCandU.Y();
+      double inverseTrackRadius  = TrackCandU.Y();
+      double TrackPhi     = TrackCandU.X();
       count               = 1;
 
       bool cancelflag = false;
       while (true) {
 
         for (auto it_in = (uTrackCandCopy.begin() + 1); it_in != uTrackCandCopy.end(); ++it_in) {
-          TrackCandU_in = it_in->getCoord();
+          TVector2 TrackCandU_in = it_in->getCoord();
           cancelflag = false;
           if (fabs(TrackCandU.X() - TrackCandU_in.X()) < m_mergeThresholdU) {
             TrackPhi    += TrackCandU_in.X();
@@ -222,22 +214,19 @@ DATCONTrackingModule::trackCandMerger()
   /* Begin of v-side trackCand merger */
   if (m_useTrackCandMerger && m_useTrackCandMergerV) {
 
-    TVector2 TrackCandV, TrackCandV_in;
-    double TrackZzero, TrackTheta;
-
     while (vTrackCandCopy.size() > 0) {
       auto it     = vTrackCandCopy.begin();
       idList      = it->getIdList();
-      TrackCandV  = it->getCoord();
-      TrackZzero  = TrackCandV.Y();
-      TrackTheta  = TrackCandV.X();
+      TVector2 TrackCandV  = it->getCoord();
+      double TrackZzero  = TrackCandV.Y();
+      double TrackTheta  = TrackCandV.X();
       count       = 1;
 
       bool cancelflag = false;
       while (true) {
 
         for (auto it_in = (vTrackCandCopy.begin() + 1); it_in != vTrackCandCopy.end(); ++it_in) {
-          TrackCandV_in = it_in->getCoord();
+          TVector2 TrackCandV_in = it_in->getCoord();
           cancelflag = false;
           if (fabs(TrackCandV.X() - TrackCandV_in.X()) < m_mergeThresholdV) {
             TrackTheta += TrackCandV_in.X();
@@ -279,10 +268,6 @@ DATCONTrackingModule::trackMerger()
 
   int count = 1;
   int trackID = 1;
-  int trackCharge = 0, trackCharge_in = 0;
-  double trackPhi = 0., trackRadius = 0., trackTheta = 0., TrackZzero = 0.;
-  double trackPhi_in = 0., trackRadius_in = 0., trackTheta_in = 0., TrackZzero_in = 0.;
-  double PhiAverage = 0., RadiusAverage = 0., ThetaAverage = 0., ZzeroAverage = 0.;
 
   if (storeDATCONTracks.isValid()) {
     storeDATCONTracks.clear();
@@ -294,16 +279,16 @@ DATCONTrackingModule::trackMerger()
 
   while (TracksCopy.size() > 0) {
     auto it     = TracksCopy.begin();
-    trackPhi    = it->getTrackPhi();
-    trackRadius = it->getTrackRadius();
-    trackTheta  = it->getTrackTheta();
-    TrackZzero  = it->getTrackZzero();
-    trackCharge = it->getTrackCharge();
+    double trackPhi    = it->getTrackPhi();
+    double trackRadius = it->getTrackRadius();
+    double trackTheta  = it->getTrackTheta();
+    double TrackZzero  = it->getTrackZzero();
+    int    trackCharge = it->getTrackCharge();
 
-    PhiAverage    = trackPhi;
-    RadiusAverage = trackRadius;
-    ThetaAverage  = trackTheta;
-    ZzeroAverage  = TrackZzero;
+    double PhiAverage    = trackPhi;
+    double RadiusAverage = trackRadius;
+    double ThetaAverage  = trackTheta;
+    double ZzeroAverage  = TrackZzero;
 
     count = 1;
 
@@ -311,11 +296,11 @@ DATCONTrackingModule::trackMerger()
     while (true) {
 
       for (auto it_in = (TracksCopy.begin() + 1); it_in != TracksCopy.end(); ++it_in) {
-        trackPhi_in    = it_in->getTrackPhi();
-        trackRadius_in = it_in->getTrackRadius();
-        trackTheta_in  = it_in->getTrackTheta();
-        TrackZzero_in  = it_in->getTrackZzero();
-        trackCharge_in = it_in->getTrackCharge();
+        double trackPhi_in    = it_in->getTrackPhi();
+        double trackRadius_in = it_in->getTrackRadius();
+        double trackTheta_in  = it_in->getTrackTheta();
+        double TrackZzero_in  = it_in->getTrackZzero();
+        int    trackCharge_in = it_in->getTrackCharge();
 
         cancelflag = false;
         if (fabs(PhiAverage - trackPhi_in) < m_mergeThresholdPhi && fabs(ThetaAverage - trackTheta_in) < m_mergeThresholdTheta

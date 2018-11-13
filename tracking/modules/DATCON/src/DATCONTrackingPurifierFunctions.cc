@@ -20,8 +20,7 @@ using namespace Belle2;
 void
 DATCONTrackingModule::purifyTrackCandsList()
 {
-  coord2dPair hc, hc2;
-  vector<unsigned int> idList, merged_idList;
+  vector<unsigned int> merged_idList;
   unsigned int cand_cnt = 0;
   double x = 0, y = 0;
   double x_tolerance = 0.2;
@@ -33,8 +32,8 @@ DATCONTrackingModule::purifyTrackCandsList()
   cpyCand = vHoughCand;
   sort(cpyCand.begin(), cpyCand.end());
   for (auto it = cpyCand.begin(); it != cpyCand.end(); ++it) {
-    idList = it->getIdList();
-    hc = it->getCoord();
+    vector<unsigned int> idList = it->getIdList();
+    coord2dPair hc = it->getCoord();
     if (it == cpyCand.begin()) {
       x  = hc.first.X() + hc.second.X();
       y  = hc.first.Y() + hc.second.Y();
@@ -76,8 +75,8 @@ DATCONTrackingModule::purifyTrackCandsList()
   cpyCand = uHoughCand;
   sort(cpyCand.begin(), cpyCand.end());
   for (auto it = cpyCand.begin(); it != cpyCand.end(); ++it) {
-    idList = it->getIdList();
-    hc = it->getCoord();
+    vector<unsigned int> idList = it->getIdList();
+    coord2dPair hc = it->getCoord();
     if (it == cpyCand.begin()) {
       x = hc.first.X() + hc.second.X();
       y = hc.first.Y() + hc.second.Y();
@@ -124,15 +123,13 @@ bool
 DATCONTrackingModule::compareList(std::vector<unsigned int>& aList, std::vector<unsigned int>& bList)
 {
   unsigned int countLayer = 0;
-  int layera = 0;
-  int hitIDa = 0, hitIDb = 0;
   bool foundLayer[4] = {false};
 
   for (auto ita = aList.begin(); ita != aList.end(); ++ita) {
     for (auto itb = bList.begin(); itb != bList.end(); ++itb) {
-      hitIDa      = (int)(*ita) - (((int)(*ita) / 10000) * 10000);
-      hitIDb      = (int)(*itb) - (((int)(*itb) / 10000) * 10000);
-      layera    = (int)(*ita) / 10000000;
+      int hitIDa      = (int)(*ita) - (((int)(*ita) / 10000) * 10000);
+      int hitIDb      = (int)(*itb) - (((int)(*itb) / 10000) * 10000);
+      int layera    = (int)(*ita) / 10000000;
       if (hitIDa == hitIDb && !foundLayer[layera - 3]) {
         foundLayer[layera - 3] = true;
         ++countLayer;
@@ -155,10 +152,8 @@ DATCONTrackingModule::compareList(std::vector<unsigned int>& aList, std::vector<
 void
 DATCONTrackingModule::mergeIdList(std::vector<unsigned int>& mergedList, std::vector<unsigned int>& mergeme)
 {
-  bool found;
-
   for (auto mergemeit = mergeme.begin(); mergemeit != mergeme.end(); ++mergemeit) {
-    found = false;
+    bool found = false;
     for (auto mergedit = mergedList.begin(); mergedit != mergedList.end(); ++mergedit) {
       if (*mergedit == *mergemeit) {
         found = true;

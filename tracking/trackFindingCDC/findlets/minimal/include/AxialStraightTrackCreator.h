@@ -50,7 +50,7 @@ namespace Belle2 {
     private:
       // Search for hits compatible with given trajectory
       std::vector<const CDCWireHit*> search(const std::vector<const CDCWireHit*>& axialWireHits,
-                                            const CDCTrajectory2D& trajectory);
+                                            const CDCTrajectory2D& guidingTrajectory2D);
 
     private:
       // ECL cluster energy threshold

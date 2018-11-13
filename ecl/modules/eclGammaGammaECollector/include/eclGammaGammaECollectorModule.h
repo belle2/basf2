@@ -60,8 +60,8 @@ namespace Belle2 {
 
 
     /** Some other useful quantities */
-    double thetaLabMin;  /**< m_thetaLabMinDeg converted to radians */
-    double thetaLabMax;  /**< m_thetaLabMaxDeg converted to radians */
+    double thetaLabMin = 0.;  /**< m_thetaLabMinDeg converted to radians */
+    double thetaLabMax = 0.;  /**< m_thetaLabMaxDeg converted to radians */
     bool storeCalib = true;; /**< force the input calibration constants to be saved first event */
     std::vector<float> EperCrys; /**< ECL digit energy for each crystal */
 

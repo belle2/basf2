@@ -58,8 +58,8 @@ namespace Belle2 {
     /** Neighbours of each ECL crystal. 4 Neighbours for barrel and outer endcap; ;~8 otherwise */
     int firstcellIDN4 = 1009; /**< first cellID where we only need 4 neighbours */
     int lastcellIDN4 = 7920; /**< last cellID where we only need 4 neighbours */
-    ECL::ECLNeighbours* myNeighbours4; /**< class to return 4 nearest neighbours to crystal */
-    ECL::ECLNeighbours* myNeighbours8; /**< class to return 8 nearest neighbours to crystal */
+    ECL::ECLNeighbours* myNeighbours4{nullptr}; /**< class to return 4 nearest neighbours to crystal */
+    ECL::ECLNeighbours* myNeighbours8{nullptr}; /**< class to return 8 nearest neighbours to crystal */
 
     /** Required arrays */
     StoreArray<Track> m_trackArray; /**< Required input array of tracks */
@@ -69,8 +69,8 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< DataStore TRGSummary */
 
     /** Some other useful quantities */
-    double cotThetaLabMin;  /**< m_thetaLabMinDeg converted to cotangent */
-    double cotThetaLabMax;  /**< m_thetaLabMaxDeg converted to cotangent */
+    double cotThetaLabMin = 0.;  /**< m_thetaLabMinDeg converted to cotangent */
+    double cotThetaLabMax = 0.;  /**< m_thetaLabMaxDeg converted to cotangent */
     int iEvent = 0; /**< event counter */
     std::vector<float> EperCrys; /**< ECL digit energy for each crystal */
 

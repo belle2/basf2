@@ -21,4 +21,5 @@
 #pragma link C++ class Belle2::ECLAutoCovariance;
 #pragma link C++ class Belle2::ECLHadronComponentEmissionFunction;
 #pragma link C++ class Belle2::ECLDspData;
+#pragma link C++ class Belle2::ECLChannelMap;
 #endif

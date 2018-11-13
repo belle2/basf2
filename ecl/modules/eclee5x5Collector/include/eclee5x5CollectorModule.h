@@ -40,10 +40,10 @@ namespace Belle2 {
     eclee5x5CollectorModule();
 
     /** Define histograms and read payloads from DB */
-    void prepare();
+    void prepare() override;
 
     /** Select events and crystals and accumulate histograms */
-    void collect();
+    void collect() override;
 
   private:
     /** Parameters to control the job */

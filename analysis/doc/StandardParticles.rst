@@ -6,13 +6,14 @@ Standard Particles
 The standard particle lists provide recommended selection criteria for final-state particles, and in some cases, for composite particles.
 The recommended selections are provided by the physics performance group.
 
-Although not available yet, it is envisaged that systematics will be provided centrally for these recommended lists.
+Although not available with this release, systematics will be provided centrally for these recommended lists.
+For information about the status of this, please see `BII-4105`_.
+
+.. _BII-4105: https://agira.desy.de/browse/BII-4105
 
 There are also some skimming, development and legacy lists available.
 These are specifically for use in skims, for study, or for comparison with Belle and old simulations.
 They are not recommended for normal analysis use (unless you are working on a skim or legacy study).
-In addition, some of the light meson standard particle lists are under development.
-If you are interested in light mesons you could consider presenting your study in a physics performance meeting.
 
 Recommended final-state particle list builder functions
 -------------------------------------------------------

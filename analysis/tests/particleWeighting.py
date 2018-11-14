@@ -5,7 +5,7 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from spl.stdCharged import *
 import random
 from ROOT import Belle2, TFile, TNtuple
 

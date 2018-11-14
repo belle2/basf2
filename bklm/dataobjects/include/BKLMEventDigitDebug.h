@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * Class to store debugging information about BKLM digits (hit based).
+   * Class to store debugging informations from the unpacker (event based).
    */
   class BKLMEventDigitDebug : public RelationsObject {
 

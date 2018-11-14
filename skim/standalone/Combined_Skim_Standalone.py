@@ -65,8 +65,8 @@ from skim.btocharmless import BtoPi0Pi0List
 add_skim('BtoPi0Pi0', BtoPi0Pi0List())
 
 # Tau Skim
-from skim.taupair import TauLFVList
-add_skim('TauLFV', TauLFVList())
+from skim.tau import TauLFVList
+add_skim('Tau', TauLFVList())
 
 
 # TCPV Skim

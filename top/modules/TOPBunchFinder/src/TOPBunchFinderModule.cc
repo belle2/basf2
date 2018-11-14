@@ -105,6 +105,7 @@ namespace Belle2 {
     m_tracks.isRequired();
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
+    m_initialParticles.isOptional();
 
     if (m_useMCTruth) {
       StoreArray<MCParticle> mcParticles;
@@ -153,11 +154,23 @@ namespace Belle2 {
 
     m_processed++;
 
-    // define output for reconstructed bunch values
+    // define output for the reconstructed bunch
 
-    if (!m_recBunch.isValid()) m_recBunch.create();
+    if (!m_recBunch.isValid()) {
+      m_recBunch.create();
+    } else {
+      m_recBunch->clearReconstructed();
+    }
 
-    // set revo9 counter from the first raw digit (all should be the same)
+    // set MC truth if available
+
+    if (m_initialParticles.isValid()) {
+      double simTime = m_initialParticles->getTime();
+      int simBunchNumber = round(simTime / m_bunchTimeSep);
+      m_recBunch->setSimulated(simBunchNumber, simTime);
+    }
+
+    // set revo9 counter from the first raw digit if available (all should be the same)
 
     if (m_topRawDigits.getEntries() > 0) {
       const auto* rawDigit = m_topRawDigits[0];
@@ -376,7 +389,7 @@ namespace Belle2 {
         if (m_addOffset) {
           double err = digit.getTimeError();
           digit.setTimeError(sqrt(err * err + m_error * m_error));
-          digit.addStatus(TOPDigit::c_OffsetSubtracted);
+          digit.addStatus(TOPDigit::c_BunchOffsetSubtracted);
         }
       }
     }

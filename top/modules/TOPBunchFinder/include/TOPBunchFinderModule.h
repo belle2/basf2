@@ -20,6 +20,7 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 
 namespace Belle2 {
 
@@ -99,6 +100,7 @@ namespace Belle2 {
     StoreArray<TOPRawDigit> m_topRawDigits; /**< collection of TOP raw digits */
     StoreArray<Track> m_tracks; /**< collection of tracks */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
+    StoreObjPtr<MCInitialParticles> m_initialParticles; /**< simulated beam particles */
 
   };
 

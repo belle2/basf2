@@ -23,6 +23,7 @@ namespace Belle2 {
   class ModuleParamList;
   class RecoTrack;
 
+  /// Findlet for merging VXD and CDC tracks with MC information.
   class MCVXDCDCTrackMergerFindlet : public TrackFindingCDC::Findlet<> {
   public:
     /// Constructor, for setting module description and parameters.

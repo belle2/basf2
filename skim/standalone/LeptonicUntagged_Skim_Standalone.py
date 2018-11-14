@@ -13,7 +13,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
+from skimStdCharm import *
 from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
 import sys
@@ -34,7 +34,7 @@ inputMdstList('MC9', fileList)
 loadStdSkimPi0()
 loadStdSkimPhoton()
 loadStdCharged()
-stdPi0s('loose')  # for stdCharm.py
+stdPi0s('loose')  # for skimStdCharm.py
 stdPhotons('loose')
 loadStdKS()
 

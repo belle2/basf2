@@ -19,7 +19,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
+from skimStdCharm import *
 from stdLightMesons import *
 from stdDiLeptons import *
 set_log_level(LogLevel.INFO)

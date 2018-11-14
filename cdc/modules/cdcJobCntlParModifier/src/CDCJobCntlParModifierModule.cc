@@ -19,7 +19,8 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_maxSpaceResol(), m_mapperGeometry(), m_mapperPhiAngle(), m_debug4Geo(), m_printMaterialTable(),
+  m_minTrackLength(), m_maxSpaceResol(), m_fudgeFactorForSpaceResolForData(), m_fudgeFactorForSpaceResolForMC(),
+  m_mapperGeometry(), m_mapperPhiAngle(), m_debug4Geo(), m_printMaterialTable(),
   m_materialDefinitionMode(), m_senseWireZposMode(),
   m_displacement(),
   m_alignment(),
@@ -128,6 +129,16 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("MaxSpaceResol", m_maxSpaceResol,
            "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
            double(2.5 * 0.0130));
+
+  //fudge factor for data
+  addParam("FudgeFactorForSpaceResolForData", m_fudgeFactorForSpaceResolForData,
+           "Fudge factor for space resol for data (common to all cells).",
+           double(1.));
+
+  //fudge factor for MC
+  addParam("FudgeFactorForSpaceResolForMC", m_fudgeFactorForSpaceResolForMC,
+           "Fudge factor for space resol for MC (common to all cells).",
+           double(1.));
 
   //mapper geometry flag
   addParam("MapperGeometry", m_mapperGeometry, "Define B-field mapper geometry used in GCR in 2017 summer. Tentative option.",
@@ -311,6 +322,18 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getMaxSpaceResolution() != m_maxSpaceResol) {
     B2INFO("CDCJobCntlParModifier: maxSpaceResol modified: " << m_gcp.getMaxSpaceResolution() << " to " << m_maxSpaceResol);
     m_gcp.setMaxSpaceResolution(m_maxSpaceResol);
+  }
+
+  if (m_gcp.getFudgeFactorForSpaceResolForData() != m_fudgeFactorForSpaceResolForData) {
+    B2INFO("CDCJobCntlParModifier: fudgeFactorForSpaceResolForData modified: " << m_gcp.getFudgeFactorForSpaceResolForData() << " to "
+           << m_fudgeFactorForSpaceResolForData);
+    m_gcp.setFudgeFactorForSpaceResolForData(m_fudgeFactorForSpaceResolForData);
+  }
+
+  if (m_gcp.getFudgeFactorForSpaceResolForMC() != m_fudgeFactorForSpaceResolForMC) {
+    B2INFO("CDCJobCntlParModifier: fudgeFactorForSpaceResolForMC modified: " << m_gcp.getFudgeFactorForSpaceResolForMC() << " to " <<
+           m_fudgeFactorForSpaceResolForMC);
+    m_gcp.setFudgeFactorForSpaceResolForMC(m_fudgeFactorForSpaceResolForMC);
   }
 
   if (m_gcp.getMapperGeometry() != m_mapperGeometry) {

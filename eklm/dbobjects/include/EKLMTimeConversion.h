@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECONVERSION_H
-#define EKLMTIMECONVERSION_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -67,6 +66,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

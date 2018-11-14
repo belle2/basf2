@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGITIZATIONPARAMETERS_H
-#define EKLMDIGITIZATIONPARAMETERS_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -274,6 +273,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

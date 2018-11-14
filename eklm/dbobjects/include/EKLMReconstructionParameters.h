@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMRECONSTRUCTIONPARAMETERS_H
-#define EKLMRECONSTRUCTIONPARAMETERS_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -54,6 +53,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

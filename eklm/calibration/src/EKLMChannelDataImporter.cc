@@ -83,12 +83,13 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
 {
   int i, n;
   int copper, dataConcentrator, lane, daughterCard, channel, active;
+  /* cppcheck-suppress variableScope */
   int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMChannelData* channelData;
   EKLMDataConcentratorLane dataConcentratorLane;
   TFile* file;
   TTree* tree;
@@ -107,7 +108,7 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -119,9 +120,9 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);
-    channelData = const_cast<EKLMChannelData*>(
-                    m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
+                                     m_Channels->getChannelData(stripGlobal));
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setActive(bool(active));
   }
@@ -134,12 +135,13 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
   int i, n;
   int copper, dataConcentrator, lane, daughterCard, channel;
   float voltage;
+  /* cppcheck-suppress variableScope */
   int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMChannelData* channelData;
   EKLMDataConcentratorLane dataConcentratorLane;
   TFile* file;
   TTree* tree;
@@ -158,7 +160,7 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -170,9 +172,9 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);
-    channelData = const_cast<EKLMChannelData*>(
-                    m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
+                                     m_Channels->getChannelData(stripGlobal));
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setVoltage(voltage);
   }
@@ -185,12 +187,13 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
   int i, n;
   int copper, dataConcentrator, lane, daughterCard, channel;
   int lookbackTime, lookbackWindowWidth;
+  /* cppcheck-suppress variableScope */
   int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMChannelData* channelData;
   EKLMDataConcentratorLane dataConcentratorLane;
   TFile* file;
   TTree* tree;
@@ -210,7 +213,7 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -222,9 +225,9 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);
-    channelData = const_cast<EKLMChannelData*>(
-                    m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
+                                     m_Channels->getChannelData(stripGlobal));
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setLookbackTime(lookbackTime);
     channelData->setLookbackWindowWidth(lookbackWindowWidth);
@@ -238,12 +241,13 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   int i, n;
   int copper, dataConcentrator, lane, daughterCard, channel;
   int active, pedestalMin, threshold, adjustmentVoltage;
+  /* cppcheck-suppress variableScope */
   int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  /* cppcheck-suppress variableScope */
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMChannelData* channelData;
   EKLMDataConcentratorLane dataConcentratorLane;
   TFile* file;
   TTree* tree;
@@ -265,7 +269,7 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
     dataConcentratorLane.setDataConcentrator(dataConcentrator);
     dataConcentratorLane.setLane(lane);
     sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == NULL) {
+    if (sectorGlobal == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
@@ -277,9 +281,9 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);
-    channelData = const_cast<EKLMChannelData*>(
-                    m_Channels->getChannelData(stripGlobal));
-    if (channelData == NULL)
+    EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
+                                     m_Channels->getChannelData(stripGlobal));
+    if (channelData == nullptr)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
     channelData->setActive(bool(active));
     channelData->setPedestal(pedestalMin);

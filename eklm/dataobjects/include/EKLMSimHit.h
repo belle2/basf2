@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSIMHIT_H
-#define EKLMSIMHIT_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -141,6 +140,4 @@ namespace Belle2 {
 
   };
 
-} // end namespace Belle2
-
-#endif
+}

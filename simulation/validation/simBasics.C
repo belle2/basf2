@@ -62,7 +62,9 @@ void numberOfParticles(TTree* tree)
   for (int i = 0; i < nbins; i++) xbins[i] = PDG[i] - 0.5;
   xbins[nbins] = PDG[nbins-1] + 0.5;
 
-  TH1F* h =  new TH1F("hLepton", "No. of leptons", nbins, xbins);
+  TH1F* h =  0;
+
+  h = new TH1F("hLepton", "No. of leptons", nbins, xbins);
   for (int i = 1; i <= nbins; i++) h->GetXaxis()->SetBinLabel(i, leptonNames[i - 1]);
   h->GetXaxis()->SetLabelSize(0.05);
   h->GetXaxis()->SetNdivisions(nbins, kFALSE);
@@ -90,7 +92,7 @@ void numberOfParticles(TTree* tree)
   for (int i = 0; i < nbins2; i++) xbins2[i] = PDG2[i] - 0.5;
   xbins2[nbins2] = PDG2[nbins2-1] + 0.5;
  
-  TH1F* h =  new TH1F("hStableMeson", "No. of stable mesons", nbins2, xbins2);
+  h =  new TH1F("hStableMeson", "No. of stable mesons", nbins2, xbins2);
   for (int i = 1; i <= nbins2; i++) h->GetXaxis()->SetBinLabel(i, mesonNames[i - 1]);
   h->GetXaxis()->SetLabelSize(0.05);
   h->GetXaxis()->SetNdivisions(nbins2, kFALSE);
@@ -118,7 +120,7 @@ void numberOfParticles(TTree* tree)
   for (int i = 0; i < nbins3; i++) xbins3[i] = PDG3[i] - 0.5;
   xbins3[nbins3] = PDG3[nbins3-1] + 0.5;
  
-  TH1F* h =  new TH1F("hStableBaryon", "No. of stable baryons", nbins3, xbins3);
+  h =  new TH1F("hStableBaryon", "No. of stable baryons", nbins3, xbins3);
   for (int i = 1; i <= nbins3; i++) h->GetXaxis()->SetBinLabel(i, baryonNames[i - 1]);
   h->GetXaxis()->SetLabelSize(0.05);
   h->GetXaxis()->SetNdivisions(nbins3, kFALSE);
@@ -149,7 +151,9 @@ void createVertexHistograms(TTree* tree, const char* particle, const char* info,
 
   string title = string("MC Vertex [") + "x" + "] of " + particleDetails;
 
-  TH1F* h = new TH1F(name.c_str(), title.c_str(), 100, -400., 400.);
+  TH1F* h = 0;
+
+  h = new TH1F(name.c_str(), title.c_str(), 100, -400., 400.);
 
   title = string("x") + " [cm]";
   h->GetXaxis()->SetTitle(title.c_str());
@@ -172,7 +176,7 @@ void createVertexHistograms(TTree* tree, const char* particle, const char* info,
 
   title = string("MC Vertex [") + "y" + "] of " + particleDetails;
 
-  Th1F* h = new TH1F(name.c_str(), title.c_str(), 100, -400., 400.);
+  h = new TH1F(name.c_str(), title.c_str(), 100, -400., 400.);
 
   title = string("y") + " [cm]";
   h->GetXaxis()->SetTitle(title.c_str());
@@ -195,7 +199,7 @@ void createVertexHistograms(TTree* tree, const char* particle, const char* info,
 
   title = string("MC Vertex [") + "z" + "] of " + particleDetails;
 
-  TH1F* h = new TH1F(name.c_str(), title.c_str(), 100, -800., 800.);
+  h = new TH1F(name.c_str(), title.c_str(), 100, -800., 800.);
 
   title = string("z") + " [cm]";
   h->GetXaxis()->SetTitle(title.c_str());
@@ -237,7 +241,7 @@ void createEnergyHistogram(TTree* tree, const char* particle, const char* info, 
 
   string title = string("MC Energy of ") + particleDetails;
 
-  Th1F* h = new TH1F(name.c_str(), title.c_str(), 100, 0., xup);
+  TH1F* h = new TH1F(name.c_str(), title.c_str(), 100, 0., xup);
 
   title = string("[GeV]");
   h->GetXaxis()->SetTitle(title.c_str());

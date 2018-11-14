@@ -18,6 +18,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/utility/MCMatching.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -674,6 +675,42 @@ namespace Belle2 {
       return b2blab.Vect().Phi();
     }
 
+    double b2bClusterTheta(const Particle* part)
+    {
+      // get associated ECLCluster
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      // get 4 momentum from cluster
+      ClusterUtils clutls;
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+      // find the vector that balances this in the CMS
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Theta();
+    }
+
+    double b2bClusterPhi(const Particle* part)
+    {
+      // get associated ECLCluster
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      // get 4 momentum from cluster
+      ClusterUtils clutls;
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+      // find the vector that balances this in the CMS
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Phi();
+    }
+
 
 // released energy --------------------------------------------------
 
@@ -1245,6 +1282,10 @@ namespace Belle2 {
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
                       "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,

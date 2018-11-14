@@ -4,7 +4,8 @@
 """ Skim list building functions for quarkonium analyses: bottomonium, charmonium, resonance """
 
 __authors__ = [
-    ""
+    "Sen Jia"
+    "..."
 ]
 
 from basf2 import *
@@ -14,7 +15,6 @@ from modularAnalysis import *
 def EtabList():
     Etabcuts = 'M > 7 and M < 10'
     fillParticleList('gamma:hard', 'E>3.5')
-#    cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5') # for some unknown reason this line is crashing the code
     applyCuts('gamma:hard', 'R2EventLevel < 0.995')
 
     Etab_Channels = ['gamma:hard gamma:hard']
@@ -54,6 +54,7 @@ def UpsilonList():
 
 def ISRpipiccList():
     """
+    Skim code: 16460100
     Skim selection of the following channels:
     - e+e- -> pi+ pi- J/psi -> e+e-
     - e+e- -> pi+ pi- J/psi -> mu+mu-

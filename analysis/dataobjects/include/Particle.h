@@ -650,6 +650,11 @@ namespace Belle2 {
       return m_extraInfo.size();
     }
 
+    /**
+     * Sets the user defined extraInfo. Adds it if necessary.
+     * */
+    void writeExtraInfo(const std::string& name, const double value);
+
     /** Sets the user-defined data of given name to the given value.
      *
      * throws std::runtime_error if variable isn't set.

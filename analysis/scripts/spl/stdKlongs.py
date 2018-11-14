@@ -60,3 +60,17 @@ def stdKlongs(listtype='veryLoose', path=analysis_main):
             'klongID_KLM > 0.2',
             True,
             path)
+
+
+# Used in skimming code
+def loadStdSkimKL0(path=analysis_main):
+    stdKlongs('loose', path)
+    cutAndCopyList(
+        'K_L0:skim',
+        'K_L0:loose',
+        '',
+        True,
+        path)
+
+# Only used for Belle via b2bii
+# ?

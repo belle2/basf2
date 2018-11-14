@@ -339,13 +339,13 @@ def runFEIforHadronicCombined(path):
 
 def B0SLWithOneLep(path):
     """FEI Semi-Leptonic B0 tag (with Bsig with at least one lepton) skim list
-    FEI semi-leptonic (SL) B0 tag with one lepton
-    skim list for generic analysis in the (Semi-)Leptonic and
+    for generic analysis in the (Semi-)Leptonic and
     Missing Energy Working Group.
 
     Skim LFN code: 11180300
 
-    Physics channels: (All available FEI B0 SL tags are reconstructed)
+    Physics channels: (FEI B0 SL tags are reconstructed. Hadronic B with SL D
+    not reconstructed)
 
     * B0 -> D- e+ nu
     * B0 -> D- mu+ nu
@@ -356,12 +356,13 @@ def B0SLWithOneLep(path):
     * B0 -> anti-D0* pi- e+ nu
     * B0 -> anti-D0* pi- mu+ nu
 
-    In addition, all hadronic channels (listed in FEI hadronic skim are
-    used, where one of the hadronic D mesons is replaced by a SL D meson.
+    This function applies cuts to the FEI-reconstructed tag side B, and
+    the pre-cuts and FEI must be applied separately.
 
     Skimming script reconstructs SL Btag using generically trained FEI
     and Bsig with at least one lepton (e, mu). Signal side lepton is not
-    stored in skim output.
+    stored in skim output. FEI is run with removeSLD=True to deactivate
+    rare but time-intensive semileptonic D channels in skim.
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
@@ -396,12 +397,11 @@ def B0SLWithOneLep(path):
     reconstructDecay('B0:sig3 -> e-:95eff', 'Mbc>0', 3, path=path)
     reconstructDecay('B0:sig4 -> mu-:95eff', 'Mbc>0', 4, path=path)
 
-    copyLists('B0:all', ['B0:sig1', 'B0:sig2', 'B0:sig3', 'B0:sig4'], path=path)
+    copyLists('B0:sigall', ['B0:sig1', 'B0:sig2', 'B0:sig3', 'B0:sig4'], path=path)
 
-    reconstructDecay('Upsilon(4S):B0 -> anti-B0:semileptonic B0:all', '', path=path)
+    reconstructDecay('Upsilon(4S):B0sig -> anti-B0:semileptonic B0:sigall', '', path=path)
     # Apply cuts
-    applyCuts('B0:semileptonic', 'nParticlesInList(Upsilon(4S):B0)>0', path=path)
-
+    applyCuts('B0:semileptonic', 'nParticlesInList(Upsilon(4S):B0sig)>0', path=path)
     BtagList = ['B0:semileptonic']
     return BtagList
 
@@ -413,7 +413,8 @@ def BplusSLWithOneLep(path):
 
     Skim LFN code: 11180400
 
-    Physics channels: (All available FEI Bplus SL tags are reconstructed)
+    Physics channels: (FEI Bplus SL tags are reconstructed.
+    Hadronic Bplus with SL D meson not reconstructed)
 
     * B+ -> anti-D0 e+ nu
     * B+ -> anti-D0 mu+ nu
@@ -424,20 +425,20 @@ def BplusSLWithOneLep(path):
     * B+ -> D+* pi+ e+ nu
     * B+ -> D+* pi+ mu+ nu
 
-    In addition, all hadronic channels (listed in FEI
-    Bplus hadronic skim are used, where one of the hadronic
-    D mesons is replaced by a SL D meson.
+    This function applies cuts to the FEI-reconstructed tag side B, and
+    the pre-cuts and FEI must be applied separately.
 
     Skimming script reconstructs SL Btag using generically trained
     FEI and Bsig with at least one lepton (e, mu). Signal side lepton
-    is not stored in skim output.
+    is not stored in skim output. FEI is run with removeSLD=True to
+    deactivate rare but time-intensive semileptonic D channels in skim.
 
     Skim Liasons: S. Hollitt & H. Wakeling
 
         Event precuts:
 
         * R2EventLevel < 0.4
-        * nTracks > 4
+        * nTracks >= 4
 
         Tag side B:
 
@@ -463,11 +464,242 @@ def BplusSLWithOneLep(path):
     reconstructDecay('B+:sig3 -> e-:95eff', 'Mbc>0', 3, path=path)
     reconstructDecay('B+:sig4 -> mu-:95eff', 'Mbc>0', 4, path=path)
 
-    copyLists('B+:all', ['B+:sig1', 'B+:sig2', 'B+:sig3', 'B+:sig4'], path=path)
+    copyLists('B+:sigall', ['B+:sig1', 'B+:sig2', 'B+:sig3', 'B+:sig4'], path=path)
 
-    reconstructDecay('Upsilon(4S):Bp -> B-:semileptonic B+:all', '', path=path)
+    reconstructDecay('Upsilon(4S):Bpsig -> B-:semileptonic B+:sigall', '', path=path)
     # Apply cuts
-    applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):Bp)>0', path=path)
+    applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):Bpsig)>0', path=path)
 
     BtagList = ['B+:semileptonic']
     return BtagList
+
+
+def runFEIforB0SLWithOneLep(path):
+    """Generates FEI B0:semileptonic list with FEI removeSLD=True flag.
+    This includes applying FEI weights and skim
+    pre-selection cuts. Use B0SLWithOneLep(path) for skim cuts on FEI output list.
+
+    (Semi-)Leptonic and Missing Energy Working Group
+
+    Skim LFN code: 11180300
+
+    Physics channels: (FEI B0 SL tags are reconstructed. Hadronic B0 with SL D
+    not reconstructed)
+
+    * B0 -> D- e+ nu
+    * B0 -> D- mu+ nu
+    * B0 -> D+* e+ nu
+    * B0 -> D+* mu+ nu
+    * B0 -> anti-D0 pi- e+ nu
+    * B0 -> anti-D0 pi- mu+ nu
+    * B0 -> anti-D0* pi- e+ nu
+    * B0 -> anti-D0* pi- mu+ nu
+
+    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+
+    Skimming script reconstructs SL Btag using generically trained FEI
+    and Bsig with at least one lepton (e, mu). Signal side lepton is not
+    stored in skim output. FEI is run with removeSLD=True to deactivate
+    rare but time-intensive semileptonic D channels in skim.
+
+    Skim Liasons: S. Hollitt & H. Wakeling
+
+    **Cuts applied are**:
+
+        Event precuts:
+
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+
+        Tag side B:
+
+        * -5 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
+        * sigProb > 0.005 to give < 10% retention
+
+        Signal side:
+
+        * electron or muon from list 95eff
+        * B Mbc > 0
+ """
+    # Pre-selection cuts
+    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+
+    # Run FEI
+    from fei import backward_compatibility_layer
+    backward_compatibility_layer.pid_renaming_oktober_2017()
+    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+
+    import fei
+    particles = fei.get_default_channels(
+        neutralB=True,
+        chargedB=False,
+        hadronic=False,
+        semileptonic=True,
+        KLong=False,
+        removeSLD=True)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    feistate = fei.get_path(particles, configuration)
+    path.add_path(feistate.path)
+
+
+def runFEIforBplusSLWithOneLep(path):
+    """Generates FEI B+:semileptonic list with FEI removeSLD=True flag.
+    This includes applying FEI weights and skim
+    pre-selection cuts. Use BplusSLWithOneLep(path) for skim cuts on FEI output list.
+
+    (Semi-)Leptonic and Missing Energy Working Group
+
+    Skim LFN code: 11180400
+
+    Physics channels: (FEI Bplus SL tags are reconstructed.
+    Hadronic Bplus with SL D meson not reconstructed)
+
+    * B+ -> anti-D0 e+ nu
+    * B+ -> anti-D0 mu+ nu
+    * B+ -> anti-D0* e+ nu
+    * B+ -> anti-D0* mu+ nu
+    * B+ -> D- pi+ e+ nu
+    * B+ -> D- pi+ mu+ nu
+    * B+ -> D+* pi+ e+ nu
+    * B+ -> D+* pi+ mu+ nu
+
+    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+
+    Skimming script reconstructs SL Btag using generically trained FEI
+    and Bsig with at least one lepton (e, mu). Signal side lepton is not
+    stored in skim output. FEI is run with removeSLD=True to deactivate
+    rare but time-intensive semileptonic D channels in skim.
+
+    Skim Liasons: S. Hollitt & H. Wakeling
+
+    **Cuts applied are**:
+
+        Event precuts:
+
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+
+        Tag side B:
+
+        * -5 < cosThetaBetweenParticleAndNominalB < 3
+        * extraInfo(decayModeID) < 8 to remove semileptonic D channels
+        * sigProb > 0.009 to give < 10% retention
+
+        Signal side:
+
+        * electron or muon from list 95eff
+        * B Mbc > 0
+ """
+    # Pre-selection cuts
+    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+
+    # Run FEI
+    from fei import backward_compatibility_layer
+    backward_compatibility_layer.pid_renaming_oktober_2017()
+    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+
+    import fei
+    particles = fei.get_default_channels(
+        neutralB=False,
+        chargedB=True,
+        hadronic=False,
+        semileptonic=True,
+        KLong=False,
+        removeSLD=True)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    feistate = fei.get_path(particles, configuration)
+    path.add_path(feistate.path)
+
+
+def runFEIforSLWithOneLepCombined(path):
+    """Generates FEI B+:semileptonic and B0:semileptonic lists
+    (without semileptonic D candidates) for FEI Semileptonic+lepton skims, including
+    applying FEI weights and skim pre-selection cuts.
+    Use BplusSLWithOneLep(path) and B0SLWithOneLep(path) for skim cuts on FEI output lists
+
+    (Semi-)Leptonic and Missing Energy Working Group.
+
+    Skim LFN code: 11180300, 11180400
+
+    Physics channels: (FEI B0 and B+ semileptonic tags are
+    reconstructed. The Hadronic B with semileptonic D tags are
+    not reconstructed)
+
+    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+
+    Skim Liasons: S. Hollitt & H. Wakeling
+
+    **Cuts applied are**:
+
+        Event precuts:
+
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+    """
+    # Pre-selection cuts
+    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+
+    # Run FEI
+    from fei import backward_compatibility_layer
+    backward_compatibility_layer.pid_renaming_oktober_2017()
+    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+
+    import fei
+    particles = fei.get_default_channels(
+        neutralB=True,
+        chargedB=True,
+        hadronic=False,
+        semileptonic=True,
+        KLong=False,
+        removeSLD=True)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    feistate = fei.get_path(particles, configuration)
+    path.add_path(feistate.path)
+
+
+def runFEIforSkimCombined(path):
+    """Generates FEI B0:generic, B+:generic, B+:semileptonic and B0:semileptonic lists
+    (without semileptonic D candidates) for all FEI skims, including
+    applying FEI weights and skim pre-selection cuts.
+    Use B0Hadronic(path), BplusHadronic(path), BplusSLWithOneLep(path)
+    and B0SLWithOneLep(path) for skim cuts on FEI output lists
+
+    (Semi-)Leptonic and Missing Energy Working Group.
+
+    Skim LFN code: 11180100, 11180200, 11180300, 11180400
+
+    Physics channels: (FEI B0 and B+ hadronic and semileptonic tags are
+    reconstructed. The Hadronic B with semileptonic D tags from the semileptonic
+    FEI are not reconstructed)
+
+    FEI weightfiles: FEIv4_2018_MC9_release_02_00_01
+
+    Skim Liasons: S. Hollitt & H. Wakeling
+
+    **Cuts applied are**:
+
+        Event precuts:
+
+        * R2EventLevel < 0.4
+        * nTracks >= 4
+    """
+    # Pre-selection cuts
+    applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
+
+    # Run FEI
+    from fei import backward_compatibility_layer
+    backward_compatibility_layer.pid_renaming_oktober_2017()
+    use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+
+    import fei
+    particles = fei.get_default_channels(
+        neutralB=True,
+        chargedB=True,
+        hadronic=True,
+        semileptonic=True,
+        KLong=False,
+        removeSLD=True)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+    feistate = fei.get_path(particles, configuration)
+    path.add_path(feistate.path)

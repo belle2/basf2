@@ -19,6 +19,7 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -1052,6 +1053,61 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2 || arguments.size() == 3) {
+        std::vector<int> daughterIndices;
+        try {
+          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The arguments of daughterClusterAngleInBetween meta function must be integers!");
+          return nullptr;
+        }
+        auto func = [daughterIndices](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterIndices.size() == 2)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
+              return -999;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              ClusterUtils clusutilsi, clusutilsj;
+              TLorentzVector p4iCluster = clusutilsi.Get4MomentumFromCluster(clusteri);
+              TLorentzVector p4jCluster = clusutilsj.Get4MomentumFromCluster(clusterj);
+              TVector3 pi = p4iCluster.Vect();
+              TVector3 pj = p4jCluster.Vect();
+              return pi.Angle(pj);
+            }
+          } else if (daughterIndices.size() == 3)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
+                || daughterIndices[2] >= int(particle->getNDaughters())) return -999;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
+              ClusterUtils clusutilsi, clusutilsj, clusutilsk;
+              TLorentzVector p4iCluster = clusutilsi.Get4MomentumFromCluster(clusteri);
+              TLorentzVector p4jCluster = clusutilsj.Get4MomentumFromCluster(clusterj);
+              TLorentzVector p4kCluster = clusutilsk.Get4MomentumFromCluster(clusterk);
+              TVector3 pi = p4iCluster.Vect();
+              TVector3 pj = p4jCluster.Vect();
+              TVector3 pk = p4kCluster.Vect();
+              return pk.Angle(pi + pj);
+            }
+          } else return -999;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterClusterAngleInBetween");
+      }
+    }
+
     Manager::FunctionPtr daughterInvM(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 1) {
@@ -1831,6 +1887,11 @@ endloop:
                       "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
                       "which is the sum of the first two daughter momenta.\n"
                       "E.g. useLabFrame(daughterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
+    REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
+                      "If two indices given: Variable returns the angle between the momenta of the two given daughters, computed from the Cluster information instead that from the Track ones.\n"
+                      "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
+                      "which is the sum of the first two daughter momenta.\n"
+                      "E.g. useLabFrame(daughterClusterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
                       "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");

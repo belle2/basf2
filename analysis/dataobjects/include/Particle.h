@@ -604,7 +604,9 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the MCParticle object that was used to create this Particle (ParticleType == c_MCParticle).
-     * NULL pointer is returned, if the Particle was not made from MCParticle.
+     * Returns the best MC match for this particle (if ParticleType == c_Track or c_ECLCluster or c_KLMCluster)
+     * NULL pointer is returned, if the Particle was not made from MCParticle or not matched.
+     *
      * @return const pointer to the MCParticle
      */
     const MCParticle* getMCParticle() const;

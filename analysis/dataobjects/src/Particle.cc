@@ -598,8 +598,12 @@ const MCParticle* Particle::getMCParticle() const
   if (m_particleType == c_MCParticle) {
     StoreArray<MCParticle> mcParticles;
     return mcParticles[m_mdstIndex];
-  } else
-    return nullptr;
+  } else {
+    const MCParticle* related = this->getRelated<MCParticle>();
+    if (related)
+      return related;
+  }
+  return nullptr;
 }
 
 //--- private methods --------------------------------------------

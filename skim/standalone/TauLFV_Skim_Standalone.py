@@ -31,6 +31,14 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
+stdPi0s('loose')
+loadStdCharged()
+loadStdSkimPhoton()
+loadStdSkimPi0()
+loadStdKS()
+stdPhotons('loose')
+loadStdLightMesons()
+
 # Tau Skim
 from skim.taupair import *
 tauList = TauLFVList(1)

@@ -398,9 +398,9 @@ def B0SLWithOneLep(path):
 
     copyLists('B0:all', ['B0:sig1', 'B0:sig2', 'B0:sig3', 'B0:sig4'], path=path)
 
-    reconstructDecay('Upsilon(4S):sig -> anti-B0:semileptonic B0:all', '', path=path)
+    reconstructDecay('Upsilon(4S):B0 -> anti-B0:semileptonic B0:all', '', path=path)
     # Apply cuts
-    applyCuts('B0:semileptonic', 'nParticlesInList(Upsilon(4S):sig)>0', path=path)
+    applyCuts('B0:semileptonic', 'nParticlesInList(Upsilon(4S):B0)>0', path=path)
 
     BtagList = ['B0:semileptonic']
     return BtagList
@@ -465,9 +465,9 @@ def BplusSLWithOneLep(path):
 
     copyLists('B+:all', ['B+:sig1', 'B+:sig2', 'B+:sig3', 'B+:sig4'], path=path)
 
-    reconstructDecay('Upsilon(4S):sig -> B-:semileptonic B+:all', '', path=path)
+    reconstructDecay('Upsilon(4S):Bp -> B-:semileptonic B+:all', '', path=path)
     # Apply cuts
-    applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):sig)>0', path=path)
+    applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):Bp)>0', path=path)
 
     BtagList = ['B+:semileptonic']
     return BtagList

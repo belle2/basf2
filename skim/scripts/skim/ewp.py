@@ -14,6 +14,11 @@ from basf2 import *
 from modularAnalysis import *
 
 
+# take the loose stdPhotons SPL and require a bit of energy for eta candidates
+cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
+reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
+
+
 def Xs0Modes():
     list = [
         # ordered as in BN1480
@@ -104,9 +109,6 @@ def B2XgammaList():
     cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.50 and 0.120 < M < 0.145')
     cutAndCopyList('K_S0:ewp', 'K_S0:all', 'p > 0.50 and 0.4776 < M < 0.5176')  # 20 MeV width
     #
-    # take the loose stdPhotons SPL and require a bit of energy for eta candidates
-    cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
-    reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
     #
     # take the tight stdPhotons SPL (timing cuts dependent on regions) and add
     # a minimum lab-frame energy requirement (1.5 GeV) and cluster shape e9oe21
@@ -165,9 +167,6 @@ def B2XllList():
     cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.20 and 0.115 < M < 0.145')
     cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.40 and 0.115 < M < 0.145')
     cutAndCopyList('K_S0:ewp', 'K_S0:all', '0.4776 < M < 0.5176')  # 20 MeV width
-    #
-    cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
-    reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
 
     # invariant mass and dE windows for all modes
     btoxlldilepton = 'formula(daughter(0, E)+daughter(1, E)) > 1.5'  # dilepton energy sum in a dirty way

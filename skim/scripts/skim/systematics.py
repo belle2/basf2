@@ -183,10 +183,10 @@ def ResonanceList():
 def getDsList():
     DsCuts = '1.90 < M < 2.04'
 
-    reconstructDecay('phi:loose -> K+:loose K-:loose', '1.01 < M < 1.03')
-    reconstructDecay('K*0:loose -> K+:loose pi-:loose', '0.7 < M < 1.1')
+    reconstructDecay('phi:res -> K+:loose K-:loose', '1.01 < M < 1.03')
+    reconstructDecay('K*0:res -> K+:loose pi-:loose', '0.7 < M < 1.1')
 
-    DsChannel = ['phi:loose pi+:loose']
+    DsChannel = ['phi:res pi+:loose']
     DsList = []
     for chID, channel in enumerate(DsChannel):
         particlename = 'D_s+:Resonance%d' % (chID)
@@ -304,6 +304,14 @@ def getBZeroList():
     BZeroCuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
     BZeroChannel = ['D-:resonance0 pi+:loose']
     BZeroList = []
+
+    for chID, channel in enumerate(BZeroChannel):
+        resonanceName = 'B0:resonance' + str(chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, BZeroCuts, chID)
+        BZeroList.append(resonanceName)
+        matchMCTruth(resonanceName)
+
+    return BZeroList
 
 
 def SystematicsLambdaList():
@@ -471,3 +479,28 @@ def BtoDStarPiList():
         matchMCTruth(resonanceName)
 
     return B0List
+
+
+def XiList():
+    LambdaCuts = '1.10 < M < 1.13'
+    XiCuts = '1.3 < M < 1.34'
+
+    LambdaChannel = ['p+:all pi-:all'
+                     ]
+
+    LambdaList = []
+    for chID, channel in enumerate(LambdaChannel):
+        reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID)
+        massVertexRave('Lambda0:syst' + str(chID), 0.001)
+        LambdaList.append('Lambda0:syst' + str(chID))
+
+    XiChannel = []
+    for channel in LambdaList:
+        XiChannel.append(channel + ' pi-:all')
+
+    XiList = []
+    for chID, channel in enumerate(XiChannel):
+        reconstructDecay('Xi-:syst' + str(chID) + ' -> ' + channel, XiCuts, chID)
+        XiList.append('Xi-:syst' + str(chID))
+
+    return XiList

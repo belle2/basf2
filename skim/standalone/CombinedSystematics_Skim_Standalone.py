@@ -70,7 +70,7 @@ add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
 
 # Systematics Rad mu mu
 from skim.systematics import *
-add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
+add_skim('SystematicsRadEE', SystematicsRadEEList())
 
 process(analysis_main)
 

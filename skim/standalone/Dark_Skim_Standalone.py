@@ -56,24 +56,16 @@ def add_skim(label, lists):
     summaryOfLists(lists)
 
 
-# ISR cc skim
-from skim.quarkonium import ISRpipiccList
-add_skim('ISRpipicc', ISRpipiccList())
-
-# BtoPi0Pi0 Skim
-from skim.btocharmless import BtoPi0Pi0List
-add_skim('BtoPi0Pi0', BtoPi0Pi0List())
-
-# Tau Skim
-from skim.taupair import TauLFVList
-add_skim('TauLFV', TauLFVList())
+from skim.dark import SinglePhotonDarkList
+darklist = SinglePhotonDarkList()
+add_skim('SinglePhotonDark', darklist)
 
 
-# TCPV Skim
-from skim.tcpv import TCPVList
-add_skim('TCPV', TCPVList())
+from skim.dark import LFVZpInvisibleList
+add_skim('LFVZpInvisible', LFVZpInvisibleList())
 
-
+from skim.dark import LFVZpVisibleList
+add_skim('LFVZpVisible', LFVZpVisibleList())
 setSkimLogging()
 process(analysis_main)
 

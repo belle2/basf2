@@ -90,10 +90,12 @@ SVDDigitizerModule::SVDDigitizerModule() :
   addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
            bool(false));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
-           "Zero suppression cut in sigmas of strip noise", double(5.0));
-  addParam("Use3SampleFilter", m_3sampleFilter,
-           "A digit must have at least 3 consecutive samples over threshold",
-           bool(true));
+           "Zero suppression cut in sigmas of strip noise", double(3.0));
+  addParam("FADCmode", m_roundZS,
+           "FADC mode: if true, ZS cut is rounded to nearest ADU ", bool(false));
+  addParam("numberOfSamples", m_nSamplesOverZS,
+           "Keep digit if numberOfSamples or more samples are over ZS threshold",
+           decltype(m_nSamplesOverZS)(1));
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
@@ -200,7 +202,8 @@ void SVDDigitizerModule::initialize()
   B2DEBUG(1, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
   B2DEBUG(1, " -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
   B2DEBUG(1, " -->  Zero suppression cut" << m_SNAdjacent);
-  B2DEBUG(1, " -->  3-sample filter:    " << (m_3sampleFilter ? "on" : "off"));
+  B2DEBUG(1, " -->  Round ZS cut:       " << (m_roundZS ? "true" : "false"));
+  B2DEBUG(1, " -->  Samples over ZS cut:" << m_nSamplesOverZS);
   B2DEBUG(1, " -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
   B2DEBUG(1, " TIMING: ");
   B2DEBUG(1, " -->  APV25 shaping time: " << m_shapingTime);
@@ -750,14 +753,6 @@ void SVDDigitizerModule::saveDigits()
           t += m_samplingTime;
         }
       }
-      // Check that at least three consecutive samples are over threshold
-      if (m_3sampleFilter) {
-        auto it = search_n(
-                    samples.begin(), samples.end(), 3, charge_thresholdU,
-        [](double x, double y) { return x > y; }
-                  );
-        if (it == samples.end()) continue;
-      }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -797,18 +792,21 @@ void SVDDigitizerModule::saveDigits()
       } // Save SVDDigits if required
 
       // Save SVDShaperDigits
+      // 1. Convert to ADU
       SVDShaperDigit::APVRawSamples rawSamples;
       std::transform(samples.begin(), samples.end(), rawSamples.begin(),
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentU);
       });
-      // Check if there is a sample over threshold
-      // This will approximately not interfere with the 3-sample filter, if used.
-      const auto rawThreshold = static_cast<SVDShaperDigit::APVRawSampleType>(charge_thresholdU);
-      auto rawMax = *(std::max_element(rawSamples.begin(), rawSamples.end()));
-      if (rawMax < rawThreshold) continue;
-      // Save as a new digit
+      // 2. Check if over threshold
+      auto rawThreshold = charge_thresholdU / aduEquivalentU;
+      if (m_roundZS) rawThreshold = round(rawThreshold);
+      auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
+                                  std::bind2nd(std::greater<double>(), rawThreshold)
+                                 );
+      if (n_over < m_nSamplesOverZS) continue;
 
+      // Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
       storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,
                                                  bunchXingsSinceAPVstart >> 1)));
@@ -820,7 +818,6 @@ void SVDDigitizerModule::saveDigits()
       if (truehits.size() > 0) {
         relShaperDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
       }
-      //      relShaperDigitDigits.add(digIndex, digit_weights.begin(), digit_weights.end());
       // generate SVDShaperDigits
     } // for stripSignals
 
@@ -863,14 +860,6 @@ void SVDDigitizerModule::saveDigits()
           t += m_samplingTime;
         }
       }
-      // Check that at least three samples are over threshold
-      if (m_3sampleFilter) {
-        auto it = search_n(
-                    samples.begin(), samples.end(), 3, charge_thresholdV,
-        [](double x, double y) { return x > y; }
-                  );
-        if (it == samples.end()) continue;
-      }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -910,16 +899,19 @@ void SVDDigitizerModule::saveDigits()
       } // Save SVDShaperDigits if required
 
       // Save SVDShaperDigits
+      // 1. Convert to ADU
       SVDShaperDigit::APVRawSamples rawSamples;
       std::transform(samples.begin(), samples.end(), rawSamples.begin(),
       [&](double x)->SVDShaperDigit::APVRawSampleType {
         return SVDShaperDigit::trimToSampleRange(x / aduEquivalentV);
       });
-      // Check if there is a sample over threshold
-      // This will approximately not interfere with the 3-sample filter, if used.
-      const auto rawThreshold = static_cast<SVDShaperDigit::APVRawSampleType>(charge_thresholdV);
-      auto rawMax = *(std::max_element(rawSamples.begin(), rawSamples.end()));
-      if (rawMax < rawThreshold) continue;
+      // 2. Check if over threshold
+      auto rawThreshold = charge_thresholdV / aduEquivalentV;
+      if (m_roundZS) rawThreshold = round(rawThreshold);
+      auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
+                                  std::bind2nd(std::greater<double>(), rawThreshold)
+                                 );
+      if (n_over < m_nSamplesOverZS) continue;
       // Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
       storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, daqMode,

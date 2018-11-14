@@ -136,8 +136,10 @@ namespace Belle2 {
       bool  m_applyNoise = false;
       /** Zero-suppression cut. */
       double m_SNAdjacent = 3.0;
-      /** Use 3-sample filter? */
-      bool m_3sampleFilter = true;
+      /** Round ZS cut to nearest ADU */
+      bool m_roundZS = true;
+      /** Keek digit if at least m_nSamplesOverZS are over threshold */
+      unsigned short m_nSamplesOverZS = 1;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction;
 

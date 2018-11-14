@@ -83,6 +83,7 @@ void EKLMReconstructorModule::initialize()
 
 void EKLMReconstructorModule::beginRun()
 {
+  /* cppcheck-suppress variableScope */
   int i;
   if (!m_RecPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");

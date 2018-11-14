@@ -40,6 +40,7 @@ EKLMDQMModule::~EKLMDQMModule()
 void EKLMDQMModule::defineHisto()
 {
   int i;
+  /* cppcheck-suppress variableScope */
   int endcap, layer, detectorLayer, stripMin, stripMax;
   int maxLayerGlobal, maxSector, maxPlane, maxStrip;
   std::string str, str2;

@@ -42,7 +42,7 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
 {
   int j;
   double t, s;
-  EKLM::FiberAndElectronics fe(&(*m_DigPar), nullptr, 0, false);
+  EKLM::FiberAndElectronics fe(m_DigPar, nullptr, 0, false);
   TH1F* h = nullptr;
   t = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   try {
@@ -69,8 +69,11 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
 
 void EKLMADCModule::initialize()
 {
+  /* cppcheck-suppress variableScope */
   char str[32];
+  /* cppcheck-suppress variableScope */
   int i;
+  /* cppcheck-suppress variableScope */
   double l;
   if (!m_DigParDatabase.isValid())
     B2FATAL("EKLM digitization parameters are not available.");

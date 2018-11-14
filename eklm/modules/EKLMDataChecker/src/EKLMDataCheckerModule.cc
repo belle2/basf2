@@ -42,13 +42,13 @@ void EKLMDataCheckerModule::beginRun()
 void EKLMDataCheckerModule::event()
 {
   const uint16_t c_ChargeError = 0x0FFF;
+  /* cppcheck-suppress variableScope */
   int i, n, strip;
   std::map<int, StripData>::iterator it;
   StripData data;
-  EKLMDigit* eklmDigit;
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
-    eklmDigit = m_Digits[i];
+    EKLMDigit* eklmDigit = m_Digits[i];
     strip = m_GeoDat->stripNumber(
               eklmDigit->getEndcap(), eklmDigit->getLayer(),
               eklmDigit->getSector(), eklmDigit->getPlane(),

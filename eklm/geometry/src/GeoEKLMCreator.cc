@@ -10,7 +10,6 @@
  **************************************************************************/
 
 /* C++ headers. */
-#include <cerrno>
 #include <cmath>
 #include <string>
 
@@ -946,7 +945,7 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
 
 G4VSolid* EKLM::GeoEKLMCreator::
 unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
-            int nSolids, std::string name)
+            int nSolids, const std::string& name)
 {
   G4UnionSolid** u;
   G4DisplacedSolid* d;
@@ -954,6 +953,7 @@ unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
   HepGeom::Transform3D* inverseTransf;
   HepGeom::Transform3D t;
   char str[128];
+  /* cppcheck-suppress variableScope */
   int n, nUnions, i, i1, i2, k, k1, k2, l, dl;
   if (nSolids <= 1)
     B2FATAL("Number of solids to be unified must be greater than 1.");
@@ -1023,13 +1023,13 @@ unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
 void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
 {
   int i, m, nStrip;
+  /* cppcheck-suppress variableScope */
   double ly;
   char name[128];
   G4VSolid** elements;
   HepGeom::Transform3D* t;
   const EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
     m_GeoDat->getPlasticSheetGeometry();
-  const EKLMGeometry::ElementPosition* stripPos;
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
   nStrip = m_GeoDat->getNStripsSegment();
@@ -1047,7 +1047,8 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
     if (i == 0 || i == nStrip - 1)
       ly = ly - plasticSheetGeometry->getDeltaL();
     m = nStrip * iSegment + i;
-    stripPos = m_GeoDat->getStripPosition(m + 1);
+    const EKLMGeometry::ElementPosition* stripPos =
+      m_GeoDat->getStripPosition(m + 1);
     try {
       m_Solids.plasticSheetElement[m] =
         new G4Box(name, 0.5 * stripPos->getLength(), 0.5 * ly,
@@ -1075,6 +1076,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
 
 void EKLM::GeoEKLMCreator::createStripSegmentLogicalVolume(int iSegment)
 {
+  /* cppcheck-suppress variableScope */
   int i, m, nStrip;
   char name[128];
   G4VSolid** strips;
@@ -1862,7 +1864,9 @@ bool EKLM::GeoEKLMCreator::detectorLayer(int endcap, int layer) const
 
 void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
 {
+  /* cppcheck-suppress variableScope */
   int i, j, imin, imax;
+  /* cppcheck-suppress variableScope */
   G4LogicalVolume* endcap, *layer, *sector, *plane;
   createMaterials();
   createSolids();

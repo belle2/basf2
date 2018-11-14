@@ -194,11 +194,12 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
                       const EKLMAlignmentData* segmentAlignment,
                       bool calledFromSectorCheck) const
 {
+  /* cppcheck-suppress variableScope */
   int i, j, iStrip;
+  /* cppcheck-suppress variableScope */
   double lx, ly;
   HepGeom::Point3D<double> stripRectangle[4];
   HepGeom::Transform3D t;
-  const EKLMGeometry::ElementPosition* stripPosition;
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
   if (!calledFromSectorCheck) {
@@ -208,7 +209,8 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
   ly = 0.5 * stripGeometry->getWidth();
   for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
     iStrip = m_GeoDat->getNStripsSegment() * (segment - 1) + i;
-    stripPosition = m_GeoDat->getStripPosition(iStrip);
+    const EKLMGeometry::ElementPosition* stripPosition =
+      m_GeoDat->getStripPosition(iStrip);
     lx = 0.5 * stripPosition->getLength();
     stripRectangle[0].setX(lx);
     stripRectangle[0].setY(ly);

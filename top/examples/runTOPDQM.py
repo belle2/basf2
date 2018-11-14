@@ -9,11 +9,12 @@ set_log_level(LogLevel.ERROR)
 # Create path
 main = create_path()
 
-# input
-roinput = register_module('SeqRootInput')
+# input: raw data
+roinput = register_module('RootInput')
+# roinput = register_module('SeqRootInput')
 main.add_module(roinput)
 
-# conversion from RawCOPPER or RawDataBlock to RawTOP
+# conversion from RawCOPPER or RawDataBlock to RawTOP (uncomment for pocketDAQ!)
 # converter = register_module('Convert2RawDet')
 # main.add_module(converter)
 
@@ -23,6 +24,7 @@ main.add_module(gearbox)
 
 # Geometry (only TOP needed)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

@@ -42,7 +42,7 @@ namespace Belle2 {
               const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
-    virtual int fit(TRGCDCTrackBase&) const;
+    virtual int fit(TRGCDCTrackBase&) const override;
 
   private:
     mutable double _charge;

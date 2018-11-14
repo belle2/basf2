@@ -36,7 +36,9 @@ EKLMAlignmentAlongStripsAlgorithm::~EKLMAlignmentAlongStripsAlgorithm()
 
 CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
 {
+  /* cppcheck-suppress variableScope */
   int i, n, nEndcaps, nSectors, nLayers, nDetectorLayers, nPlanes, nSegments;
+  /* cppcheck-suppress variableScope */
   int segment, segmentGlobal;
   std::vector<std::pair<int, double> > segmentSignificance;
   std::vector<std::pair<int, double> >::iterator it;
@@ -46,8 +48,6 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   bool found;
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   struct Event* event = nullptr;
-  TFile* f_out;
-  TTree* t_out;
   std::shared_ptr<TTree> t_in = getObjectPtr<TTree>("calibration_data");
   t_in->SetBranchAddress("event", &event);
   nEndcaps = geoDat->getNEndcaps();
@@ -158,8 +158,8 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   delete[] nHits;
   delete[] averageHits;
   if (m_OutputFile != "") {
-    f_out = new TFile(m_OutputFile.c_str(), "recreate");
-    t_out = new TTree("tree", "");
+    TFile* f_out = new TFile(m_OutputFile.c_str(), "recreate");
+    TTree* t_out = new TTree("tree", "");
     t_out->Branch("event", event);
     n = t_in->GetEntries();
     for (i = 0; i < n; i++) {

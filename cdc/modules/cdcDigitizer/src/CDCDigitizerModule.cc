@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
-#include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/utilities/ClosestApproach.h>
 
 #include <framework/datastore/RelationArray.h>
@@ -120,6 +119,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("useDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", false);
   addParam("useDB4EDepToADC", m_useDB4EDepToADC, "Fetch and use edep-to-ADC conversion params. from database or not", false);
 
+  addParam("AdditionalFudgeFactorForSpaceResol", m_additionalFudgeFactorForSpaceResol,
+           "Additional fudge factor for space resol. (common to all cells)",  1.);
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer constructor" << endl;
@@ -156,6 +158,11 @@ void CDCDigitizerModule::initialize()
       //      m_adcThreshold = std::round(m_adcThreshold / m_gasToGasWire);
     }
   }
+  m_gcp = &(CDCGeoControlPar::getInstance());
+  m_totalFudgeFactor  = m_gcp->getFudgeFactorForSpaceResolForMC();
+  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
+  m_totalFudgeFactor *= m_additionalFudgeFactorForSpaceResol;
+  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
   /*
       m_fraction = 1.0;
       m_resolution1 = cdcgp.getNominalSpaceResol();
@@ -607,7 +614,8 @@ float CDCDigitizerModule::smearDriftLength(const float driftLength, const float 
   // Smear drift length
   float newDL = gRandom->Gaus(driftLength + mean , resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
-  return newDL;
+  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
+  return m_totalFudgeFactor * newDL;
 }
 
 
@@ -697,8 +705,8 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
     double propLength = (m_posWire - backWirePos).Mag();
     //    if (m_cdcgp->getSenseWireZposMode() == 1) {
     //TODO: replace the following with cached reference
-    //    std::cout << CDCGeoControlPar::getInstance().getSenseWireZposMode() << std::endl;
-    if (CDCGeoControlPar::getInstance().getSenseWireZposMode() == 1) {
+    //    std::cout << m_gcp->getInstance().getSenseWireZposMode() << std::endl;
+    if (m_gcp->getSenseWireZposMode() == 1) {
       const unsigned short layer = m_wireID.getICLayer();
       propLength += m_cdcgp->getBwdDeltaZ(layer);
     }

@@ -20,13 +20,12 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <bklm/dataobjects/BKLMEventDigitDebug.h>
 
 #include <map>
 #include <string>
 #include <iostream>
-
-#include "TTree.h"
-#include "TFile.h"
 
 namespace Belle2 {
 
@@ -125,90 +124,17 @@ namespace Belle2 {
     StoreArray<RawKLM> rawKLM;
 
     //! BKLMDigit Array
-    StoreArray<BKLMDigit>bklmDigits;
+    StoreArray<BKLMDigit> bklmDigits;
 
-    //! Flag to enable the production of a debugging root file
-    bool m_enableDebugFile;
+    //! BKLMDigitDebug StoreArray
+    StoreArray<BKLMDigitOutOfRange> bklmDigitOutOfRanges;
 
-    //! Name of the of the debugging root file, if enabled
-    std::string m_nameDebugFile;
+    //! BKLMEventDigitDebug StoreArray
+    StoreArray<BKLMEventDigitDebug> bklmEventDigitDebugs;
 
-    //! Function that prepare the debugging root file, if enabled
-    void bookDebugFile();
+    //! trigger ctime of the previous event
+    unsigned int m_triggerCTimeOfPreviousEvent;
 
-  protected:
-
-    long int m_iEvent;
-    int m_cntsRPC[2][8];
-
-    TFile* m_file;
-
-    TTree* m_hitTree;
-    int m_exp;
-    int m_run;
-    int m_event;
-    int m_time;
-    int m_copperId;
-    int m_finesse;
-    int m_lane;
-    int m_isRPC;
-    int m_numRPC;
-    int m_numSci;
-    int m_layer;
-    int m_flag;
-    //int m_windowStart;
-    int m_sector;
-    int m_isForward;
-    int m_rawchannel;
-    int m_channel;
-    int m_outofrange;
-    int m_axis;
-    int m_ctime;
-    int m_tdc;
-    int m_unused_word3;
-    int m_unused_word4;
-    //int m_tdc_check;
-    float m_tdcnano;
-    //float m_ctimenano;
-    int m_charge;
-    int m_triggerctime;
-    int m_ctimeDiff;
-    int m_window_2;
-    int m_asic_2;
-    int m_window_3;
-    int m_asic_3;
-    int m_window_4;
-    int m_asic_4;
-    int m_trigger;
-    int m_format;
-    //char m_fname[50];
-
-    TTree* m_eventTree;
-    int m_triggerTime;
-    double m_interval;
-    int m_trigUTime;
-    int m_windowStart;
-    int m_nTotal;
-    int m_nLane0;//
-    int m_nSci;//
-    int m_nRPC;//
-    int m_nBF2L2;
-    //int m_nhit[2][8][15][2];
-    int m_nRPCOnSector[2][8];
-    //int m_ctimecount; //
-    int m_ctimeCount[2][8];//difference between the min ctime and max ctime on each sector
-    int m_ctimeOfRPC[2][8][1000];//ctime of rpc hit on each sector
-    int m_minctime[2][8];
-    int m_maxctime[2][8];
-    int m_firstHitCtime;
-    //int m_firstctime;
-    //int m_lastctime;
-    int zchannel_BF2L1[100];
-    int phichannel_BF2L1[100];
-    int zchannel_BF2L2[100];
-    int phichannel_BF2L2[100];
-    int m_nBF2L2_pass;
-    int m_nDigit[2][8][15];
   };
 
 }

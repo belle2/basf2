@@ -18,7 +18,6 @@
 
 from basf2 import *
 from setup_modules import setup_RTCtoSPTCConverters
-from setup_modules import setup_Geometry
 import argparse
 import os
 
@@ -41,7 +40,7 @@ parser.add_argument(
     action='store_const',
     const=False,
     default=True,
-    help="By default only RecoTracks with valid fit are taken by training. Usiing this option will disable that. ")
+    help="By default only RecoTracks with valid fit are taken for training. Using this option will disable that. ")
 
 arguments = parser.parse_args()
 use_noKick = arguments.use_NoKick
@@ -75,7 +74,12 @@ path.add_module("PrintCollections", printForEvent=1)
 
 
 # puts the geometry and gearbox in the path
-setup_Geometry(path)
+gearbox = register_module('Gearbox')
+path.add_module(gearbox)
+# the geometry is loaded from the DB by default now! The correct geometry
+# should be pickked according to exp number for the generated events.
+geometry = register_module('Geometry')
+path.add_module(geometry)
 
 # Event counter
 # eventCounter = register_module('EventCounter')

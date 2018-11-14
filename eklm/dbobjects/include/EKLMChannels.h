@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMCHANNELS_H
-#define EKLMCHANNELS_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -64,6 +63,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

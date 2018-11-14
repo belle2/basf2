@@ -52,9 +52,18 @@ variables.addAlias('clusterTheta_1', 'daughter(1, clusterTheta)')
 variables.addAlias('clusterPhi_0', 'daughter(0, clusterPhi)')
 variables.addAlias('clusterPhi_1', 'daughter(1, clusterPhi)')
 
+variables.addAlias('clusterECMS_0', 'daughter(0, useCMSFrame(clusterE))')
+variables.addAlias('clusterECMS_1', 'daughter(1, useCMSFrame(clusterE))')
+variables.addAlias('clusterThetaCMS_0', 'daughter(0, useCMSFrame(clusterTheta))')
+variables.addAlias('clusterThetaCMS_1', 'daughter(1, useCMSFrame(clusterTheta))')
+variables.addAlias('clusterPhiCMS_0', 'daughter(0, useCMSFrame(clusterPhi))')
+variables.addAlias('clusterPhiCMS_1', 'daughter(1, useCMSFrame(clusterPhi))')
+variables.addAlias('deltaPhiCMS', 'daughterDiffOfClusterPhiCMS(0, 1)')
+
 # variables to ntuple
 vars = ['combinationID',
         'deltaPhi',
+        'deltaPhiCMS',
         'deltaTheta',
         'charge_0',
         'charge_1',
@@ -63,7 +72,13 @@ vars = ['combinationID',
         'clusterTheta_0',
         'clusterTheta_1',
         'clusterPhi_0',
-        'clusterPhi_1'
+        'clusterPhi_1',
+        'clusterECMS_0',
+        'clusterECMS_1',
+        'clusterPhiCMS_0',
+        'clusterPhiCMS_1',
+        'clusterThetaCMS_0',
+        'clusterThetaCMS_1'
         ]
 
 # store variables

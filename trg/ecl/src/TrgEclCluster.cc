@@ -1779,5 +1779,18 @@ int TrgEclCluster::setBackwardICN()
 
 }
 //
+//
+//
+//
+int TrgEclCluster::getNofExceedCluster()
+{
+  int ncluster = ClusterEnergy[0].size() + ClusterEnergy[1].size() + ClusterEnergy[2].size();
+  if (ncluster > _LimitNCluster) {
+    return ncluster;
+  } else {
+    return 0;
+  }
+}
+//
 //===<END>
 //

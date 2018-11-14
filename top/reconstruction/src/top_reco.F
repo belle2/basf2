@@ -488,6 +488,7 @@
 #include "TOP_PIK.fi"
 #include "TOP_TDC.fi"
 #include "TOP_PMT.fi"
+#include "TOP_GEO.fi"
 #include "TOP_PHTIM.fi"
       DATA FORCE_SCAN /.TRUE./
 
@@ -502,7 +503,7 @@
          NUM_PHOT(ICHX)=0
       ENDDO
 
-      NUMCH=NCH(0)+NCH(1)
+      NUMCH=PMT_NX*PMT_NY*(N_PMT(0,MODUL)+N_PMT(1,MODUL))
       DO I=1,N_DATA
          M=DATA_MOD(I)
          IF(M.EQ.MODUL) THEN

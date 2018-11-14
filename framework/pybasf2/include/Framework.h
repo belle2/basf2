@@ -126,6 +126,31 @@ namespace Belle2 {
     static void setStreamingObjects(boost::python::list streamingObjects);
 
 
+    /** Find a file. This is a wrapper around FileSystem::findFile() to be able
+     * to call it nicely from python and create a `FileNotFoundError` if the
+     * file cannot be found.
+     *
+     * Known types:
+     *
+     * - empty string: exactly like `FileSystem::findFile`, look in $BELLE2_LOCAL_DIR
+     *   and then $BELLE2_RELEASE_DIR and then relative to local dir
+     * - 'examples': look for example data in $BELLE2_EXAMPLES_DATA_DIR, then
+     *   in $VO_BELLE2_SW_DIR/examples-data, then relative to the local directory
+     * - 'validation': look for validation data in $BELLE2_VALIDATION_DATA_DIR, then
+     *   in $VO_BELLE2_SW_DIR/validation-data, then relative to the local directory
+     *
+     * @param filename relative filename to look for, either in a central place
+     *        or in the current working directory
+     * @param type if set, specifies where to look if the file cannot be found
+     *        locally
+     * @param ignore_errors if true don't print any errors and silently return
+     *        None. Otherwise this function will raise a FileNotFoundError
+     *        exception if the file cannot be found.
+     * @return relative or absolute filename if found, Emprt string if not
+     *        found and ignore_errors is true
+     */
+    static std::string findFile(const std::string& filename, const std::string& type, bool ignore_errors = false);
+
     //--------------------------------------------------
     //                   Python API
     //--------------------------------------------------

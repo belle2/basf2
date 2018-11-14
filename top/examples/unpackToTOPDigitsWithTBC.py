@@ -10,10 +10,6 @@
 
 from basf2 import *
 
-# database
-reset_database()
-use_local_database("localDB/localDB.txt", "localDB")
-
 # Create path
 main = create_path()
 
@@ -32,6 +28,7 @@ main.add_module(gearbox)
 
 # Geometry (only TOP needed)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

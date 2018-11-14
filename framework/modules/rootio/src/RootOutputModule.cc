@@ -143,6 +143,7 @@ void RootOutputModule::initialize()
 
   // Now check if the file has a protocol like file:// or http:// in front
   std::regex protocol("^([A-Za-z]*)://");
+  // cppcheck-suppress syntaxError ; of course cppcheck doesn't know if with initializer yet
   if(std::smatch m; std::regex_search(m_outputFileName, m, protocol)) {
     if(m[1] == "file") {
       // file protocol: treat as local and just remove it from the filename

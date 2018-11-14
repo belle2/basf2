@@ -15,8 +15,10 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dbobjects/ECLHadronComponentEmissionFunction.h>
 
 #include "TGraph.h"
 #include "TFile.h"
@@ -63,6 +65,7 @@ namespace Belle2 {
       double m_hadronenergyDeposit;     /**< energy deposited resulting in hadronic scint component */
       G4ThreeVector m_WeightedPos;  /**< average track position weighted by energy deposition */
       G4ThreeVector m_momentum;     /**< initial momentum of track before energy deposition inside sensitive volume */
+      DBObjPtr<ECLHadronComponentEmissionFunction> m_ECLHadronComponentEmissionFunction;  /**<Hadron Component Emission Function*/
 
     };
     /** Class for ECL Sensitive Detector */

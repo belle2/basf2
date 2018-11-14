@@ -10,6 +10,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <fstream>
 
 namespace Belle2 {
@@ -35,6 +36,29 @@ namespace Belle2 {
      *         or empty string if file wasn't found.
      */
     static std::string findFile(const std::string& path, bool silent = false);
+
+    /**
+     * Search for given file or directory in the directory given by the
+     * environment variable BELLE2_<DATATYPE>_DATA_DIR or subdirectory
+     * <datatype>-data of $VO_BELLE2_SW_DIR or local/central release directory
+     * and return absolute path if found.
+     * If the file isn't found in either of these, absolute paths and paths
+     * relative to the current working directory are also accepted.
+     *
+     * It is recommended to replace any relative paths you have with the
+     * return value of this function during initialization.
+     *
+     * @param path path to file/directory, assuming it's installed locally
+     *             (e.g. /data/geometry/Belle2.xml). Leading slash is not
+     *             strictly required.
+     * @param dataType type of data, like "examples" or "validation".
+     * @param silent If true, no error message is printed when file could
+     *             not be found.
+     * @return absolute path to file in local directory, if it exists,
+     *         otherwise abs. path to file in central release directory,
+     *         or empty string if file wasn't found.
+     */
+    static std::string findFile(const std::string& path, const std::string& dataType, bool silent = false);
 
     /** Check if the file with given filename exists */
     static bool fileExists(const std::string& filename);
@@ -116,5 +140,10 @@ namespace Belle2 {
   private:
     /** no instances. */
     FileSystem() = delete;
+
+    /**
+     * Search for given file or directory in list of directories or working directory
+     */
+    static std::string findFile(const std::string& path, const std::vector<std::string>& dirs, bool silent);
   };
 }

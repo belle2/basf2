@@ -69,7 +69,7 @@ namespace Belle2 {
      */
     TItem const& getBestMatch() const
     {
-      return m_bestMatch;
+      return *m_bestMatch;
     }
 
   private:
@@ -85,7 +85,7 @@ namespace Belle2 {
     }
 
     /// Stores the best matched item
-    TItem m_bestMatch;
+    std::optional<TItem> m_bestMatch;
 
     // stores if at least match item has been set
     bool m_oneMatch = false;

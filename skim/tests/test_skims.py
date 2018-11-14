@@ -68,7 +68,7 @@ from skim.taupair import TauLFVList
 add_skim('TauLFV', TauLFVList())
 
 from skim.taupair import TauList
-add_skim('TauGeneric', TauList())
+# add_skim('TauGeneric', TauList())
 
 
 # TCPV Skim

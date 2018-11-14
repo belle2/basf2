@@ -11,7 +11,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from stdLightMesons import *
+from skimStdLightMesons import *
 from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import *

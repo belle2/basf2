@@ -42,7 +42,7 @@ from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
-from stdLightMesons import *
+from skimStdLightMesons import *
 from skimStdDiLeptons import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-00'

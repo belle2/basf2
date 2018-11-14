@@ -13,7 +13,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-from stdLightMesons import *
+from skimStdLightMesons import *
 from stdPhotons import *
 set_log_level(LogLevel.INFO)
 from skimExpertFunctions import *

@@ -20,7 +20,7 @@ from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
 from skimStdCharm import *
-from stdLightMesons import *
+from skimStdLightMesons import *
 from skimStdDiLeptons import *
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-00'

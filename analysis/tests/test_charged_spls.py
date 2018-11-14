@@ -3,7 +3,7 @@
 
 import unittest
 from basf2 import create_path
-import stdCharged
+import spl.stdCharged
 
 #: the basic std functions
 _base_functions = {

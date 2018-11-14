@@ -4,13 +4,14 @@
 #######################################################
 #
 # Bottomonium skims
-# S. Spataro, 25/Jul/2016
+# S. Spataro & Sen Jia, 14/Nov/2018
 #
 ######################################################
 
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
+from stdCharged import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-00'
 import sys
@@ -28,8 +29,9 @@ inputMdstList('MC9', fileList)
 
 
 stdPhotons('loose')
+loadStdCharged()
 # Bottomonium Etab Skim: 15420100
-from BottomoniumEtabExclusive_List import *
+from skim.quarkonium import EtabList
 EtabList = EtabList()
 skimCode1 = encodeSkimName('BottomoniumEtabExclusive')
 skimOutputUdst(skimCode1, EtabList)
@@ -37,7 +39,7 @@ summaryOfLists(EtabList)
 
 
 # Bottomonium Upsilon Skim: 15440100
-from BottomoniumUpsilon_List import *
+from skim.quarkonium import UpsilonList
 YList = UpsilonList()
 skimCode2 = encodeSkimName('BottomoniumUpsilon')
 skimOutputUdst(skimCode2, YList)

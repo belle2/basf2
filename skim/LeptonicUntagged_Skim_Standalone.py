@@ -36,7 +36,7 @@ loadStdSkimPhoton()
 loadStdCharged()
 stdPi0s('loose')  # for skimStdCharm.py
 stdPhotons('loose')
-loadStdKS()
+stdKshorts()
 
 loadStdD0()
 loadStdDplus()

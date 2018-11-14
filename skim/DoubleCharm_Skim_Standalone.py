@@ -31,7 +31,7 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 loadStdCharged()
-loadStdKS()
+stdKshorts()
 loadStdSkimPi0()
 loadStdSkimPhoton()
 stdPi0s('loose')

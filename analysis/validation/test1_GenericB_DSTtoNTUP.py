@@ -23,7 +23,7 @@ loadStdCharged()
 stdPhotons('loose')  # loose list also creates 'all' list
 loadStdPi0('all')
 loadStdLoosePi0()
-loadStdKS()
+stdKshorts()
 
 # ----> NtupleMaker module
 ntupleFile('../GenericB.ntup.root')

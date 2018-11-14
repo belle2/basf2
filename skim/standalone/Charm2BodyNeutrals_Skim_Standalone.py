@@ -32,7 +32,7 @@ inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
-loadStdKS()
+stdKshorts()
 loadStdSkimPi0()
 
 from Charm2BodyNeutrals_List import *

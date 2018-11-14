@@ -30,7 +30,7 @@ inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
-loadStdKS()
+stdKshorts()
 
 fillParticleList('pi+:all', '')
 fillParticleList('K+:all', '')

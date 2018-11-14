@@ -33,7 +33,7 @@ inputMdstList('MC9', fileList)
 loadStdSkimPhoton()
 loadStdSkimPi0()
 loadStdCharged()
-loadStdKS()
+stdKshorts()
 
 from Charm3BodyHadronic_List import *
 

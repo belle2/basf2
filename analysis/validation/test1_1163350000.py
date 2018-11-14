@@ -199,7 +199,7 @@ reconstructDecay('B0:tag ->D-:tag pi+:sig', 'Mbc>5.27 and abs(deltaE)<0.2')
 
 # pi0
 # KSs
-loadStdKS()
+stdKshorts()
 vertexKFit('K_S0:all', 0.001)
 cutAndCopyList('K_S0:sig', 'K_S0:all', 'distance>0.5 and significanceOfDistance>2')
 # Photons

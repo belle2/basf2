@@ -33,7 +33,7 @@ stdPhotons('loose')
 loadStdCharged()
 loadStdSkimPi0()
 loadStdSkimPhoton()
-loadStdKS()
+stdKshorts()
 
 loadStdD0()
 loadStdDplus()

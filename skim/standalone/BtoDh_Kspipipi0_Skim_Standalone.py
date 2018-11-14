@@ -33,7 +33,7 @@ inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
-loadStdKS()
+stdKshorts()
 loadStdSkimPi0()
 
 # B- to D(->Kspipipi0)h- Skim

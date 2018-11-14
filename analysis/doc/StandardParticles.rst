@@ -40,10 +40,6 @@ If you improve these lists, please report in a physics performance meeting and m
    :undoc-members:
    :exclude-members: stdPi, stdK, stdPr, stdE, stdMu
 
-.. automodule:: stdDiLeptons
-   :members:
-   :undoc-members:
-
 .. automodule:: stdLightMesons
    :members:
    :undoc-members:

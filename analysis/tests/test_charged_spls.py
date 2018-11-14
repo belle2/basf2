@@ -7,41 +7,41 @@ import spl.stdCharged
 
 #: the basic std functions
 _base_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK,
-    stdCharged.stdPr,
-    stdCharged.stdE,
-    stdCharged.stdMu
+    spl.stdCharged.stdPi,
+    spl.stdCharged.stdK,
+    spl.stdCharged.stdPr,
+    spl.stdCharged.stdE,
+    spl.stdCharged.stdMu
 }
 
 #: the functions with 95% lists
 _95_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK,
-    stdCharged.stdMu,
-    stdCharged.stdE
+    spl.stdCharged.stdPi,
+    spl.stdCharged.stdK,
+    spl.stdCharged.stdMu,
+    spl.stdCharged.stdE
 }
 
 #: the functions with 90% lists
 _90_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK,
-    stdCharged.stdPr
+    spl.stdCharged.stdPi,
+    spl.stdCharged.stdK,
+    spl.stdCharged.stdPr
 }
 
 #: the functions with 85% lists
 _85_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK
+    spl.stdCharged.stdPi,
+    spl.stdCharged.stdK
 }
 
 #: the stdLoose functions
 _loose_functions = {
-    stdCharged.stdLoosePi,
-    stdCharged.stdLooseK,
-    stdCharged.stdLoosePr,
-    stdCharged.stdLooseE,
-    stdCharged.stdLooseMu
+    spl.stdCharged.stdLoosePi,
+    spl.stdCharged.stdLooseK,
+    spl.stdCharged.stdLoosePr,
+    spl.stdCharged.stdLooseE,
+    spl.stdCharged.stdLooseMu
 }
 
 #: the default particle list loaded

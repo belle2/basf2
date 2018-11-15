@@ -15,7 +15,7 @@ from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunction import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 
 import os
@@ -36,7 +36,7 @@ stdKshorts()
 loadStdCharged()
 
 
-from Charm3BodyHadronicD0_List import *
+from skim.charm import D0ToHpJmPi0List
 D0ToHpJmPi0List = D0ToHpJmPi0()
 skimOutputUdst(skimCode, D0ToHpJmPi0List)
 

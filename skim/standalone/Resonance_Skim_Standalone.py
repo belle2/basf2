@@ -16,7 +16,7 @@ from skimExpertFunctions import *
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import sys
 import os
@@ -37,7 +37,7 @@ stdPi0s('looseFit')
 
 skimCode = encodeSkimName('Resonance')
 
-from Resonance_List import *
+from skim.systematics import *
 ResonanceList = ResonanceList()
 if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), ResonanceList)

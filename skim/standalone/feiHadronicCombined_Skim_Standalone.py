@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+    FEI Hadronic B0 and B+ tag skim standalone for generic analysis in the
+    (Semi-)Leptonic and Missing Energy Working Group
+    Skim LFN code: 11180100, 11180200
+    fei training: MC9 based, release-02-00-01 'FEIv4_2018_MC9_release_02_00_01'
+    """
+
+__authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
+
 ######################################################
 #
 # This script reconstructs hadronic Btags using
@@ -9,6 +18,7 @@
 # FEIv4_2018_MC9_release_02_00_01
 #
 #####################################################
+
 import sys
 import glob
 import os.path

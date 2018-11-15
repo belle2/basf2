@@ -16,7 +16,7 @@ from stdCharged import *
 
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import os
 import sys
@@ -34,11 +34,9 @@ inputMdstList('MC9', fileList)
 
 loadStdCharged()
 
-from Charm2BodyHadronicD0_List import *
-
+from skim.charm import D0ToHpJmList
 D0ToHpJmList = D0ToHpJm()
 skimOutputUdst(skimCode, D0ToHpJmList)
-
 summaryOfLists(D0ToHpJmList)
 
 

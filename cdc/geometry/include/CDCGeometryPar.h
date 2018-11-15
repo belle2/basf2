@@ -842,7 +842,7 @@ namespace Belle2 {
 
 
       /**
-       * Return the resolution of drift length (cm).
+       * Return the basic resolution of drift length (cm). N.B. A fudge factor may be multiplied at the place where this is called; be careful.
        * @param dist Drift length (cm); negative dist is treated as |dist|.
        * @param layer Layer id.
        * @param lr Left/Right.

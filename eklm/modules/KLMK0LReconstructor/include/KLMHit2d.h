@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KLMHIT2D_H
-#define KLMHIT2D_H
+#pragma once
 
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMHit2d.h>
@@ -85,6 +84,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

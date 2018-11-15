@@ -132,14 +132,6 @@ def TauLFVList(flag=1):
     """
     __author__ = "P. Urquijo, K. Inami"
 
-    stdPi0s('loose')
-    loadStdCharged()
-    loadStdSkimPhoton()
-    loadStdSkimPi0()
-    loadStdKS()
-    stdPhotons('loose')
-    loadStdLightMesons()
-
     tauLFVCuts = '1.58 < Mbc < 1.98 and abs(deltaE) < 1.0'
 
     tau_lgamma_Channels = ['e+:loose gamma:loose',

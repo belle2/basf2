@@ -31,8 +31,8 @@ EKLMAlignmentAlongStripsCollectorModule() : CalibrationCollectorModule()
   setDescription("Module for EKLM alignment along strip (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
   m_Event = new EKLMAlignmentAlongStripsAlgorithm::Event;
-  m_GeoDat = NULL;
-  m_TransformData = NULL;
+  m_GeoDat = nullptr;
+  m_TransformData = nullptr;
 }
 
 EKLMAlignmentAlongStripsCollectorModule::
@@ -58,6 +58,7 @@ void EKLMAlignmentAlongStripsCollectorModule::prepare()
 
 void EKLMAlignmentAlongStripsCollectorModule::collect()
 {
+  /* cppcheck-suppress variableScope */
   int i, j, n, n2, vol;
   double l;
   const HepGeom::Transform3D* tr;

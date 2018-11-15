@@ -98,7 +98,7 @@ namespace Belle2 {
       /**
        * Initialized with TH1D histogram and mode
        */
-      XTFunction(TH1D* h1, int mode)
+      XTFunction(TH1F* h1, int mode)
       {
         m_h1 = (TProfile*)h1->Clone();
         m_h1->SetDirectory(0);
@@ -115,7 +115,6 @@ namespace Belle2 {
        */
       XTFunction(const XTFunction& x) :
         m_h1(x.m_h1),
-        m_fitFunc(x.m_fitFunc),
         m_mode(x.m_mode),
         m_debug(x.m_debug),
         m_draw(x.m_draw),
@@ -126,6 +125,7 @@ namespace Belle2 {
         m_tmin(x.m_tmin),
         m_tmax(x.m_tmax)
       {
+        m_fitFunc = (TF1*) x.m_fitFunc->Clone();
         for (int i = 0; i < 8; ++i) {
           m_XTParam[i] = x.m_XTParam[i];
           m_FittedXTParams[i] = x.m_XTParam[i];
@@ -279,6 +279,11 @@ namespace Belle2 {
        * Fit xt histogram incase 5th order Chebeshev polynomial is used.
        */
       void FitChebyshev();
+      /**
+       * Validate the xt has proper shape.
+       * Suppose to be bad xt if |xt(0)| > 0.2.
+       */
+      bool validate();
     private:
 
       TProfile* m_h1;  /**< Histogram of xt relation. */
@@ -392,6 +397,17 @@ namespace Belle2 {
         m_fitFunc->SetLineColor(kBlack);
         m_fitFunc->DrawF1(0, 400, "same");
         c1->SaveAs(name);
+      }
+    }
+
+    bool XTFunction::validate()
+    {
+      if (fabs(m_fitFunc->Eval(0))  > 0.2) {
+        B2WARNING("Bad xt function");
+        m_fitflag = 0;
+        return false;
+      } else {
+        return true;
       }
     }
 

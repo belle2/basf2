@@ -52,6 +52,12 @@ namespace Belle2 {
     void appendGaussian(double norm, double mean, double sigma);
 
     /**
+     * Set type of PMT (see TOPPmtObsoleteData::EType for the defined types)
+     * @param type PMT type
+     */
+    void setPMTType(unsigned type) {m_type = type;}
+
+    /**
      * Normalize the distribution (fractions)
      * @return value used to normalize fractions
      */
@@ -62,6 +68,12 @@ namespace Belle2 {
      * @return TTS parametrization
      */
     const std::vector<Gauss>& getTTS() const {return m_tts;}
+
+    /**
+     * Returns PMT type (see TOPPmtObsoleteData::EType for the defined types)
+     * @return PMT type
+     */
+    unsigned getPMTType() const {return m_type;}
 
     /**
      * Generate time according to TTS distribution
@@ -86,8 +98,9 @@ namespace Belle2 {
 
     std::vector<Gauss> m_tts; /**< TTS distribution composed of a sum of Gaussians */
     bool m_normalized = false; /**< normalization flag */
+    unsigned m_type = 0; /**< PMT type (see TOPPmtObsoleteData::EType) */
 
-    ClassDefOverride(TOPNominalTTS, 1); /**< ClassDef */
+    ClassDefOverride(TOPNominalTTS, 2); /**< ClassDef */
 
   };
 

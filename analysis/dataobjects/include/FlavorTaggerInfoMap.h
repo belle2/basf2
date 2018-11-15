@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FLAVORTAGGERINFOMAP_H
-#define FLAVORTAGGERINFOMAP_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <analysis/dataobjects/Particle.h>
@@ -232,4 +231,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

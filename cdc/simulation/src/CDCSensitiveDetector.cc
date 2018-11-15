@@ -638,7 +638,6 @@ namespace Belle2 {
 
     m_hitNumber = cdcArray.getEntries();
 
-    // cppcheck-suppress memleak
     CDCSimHit* simHit =  cdcArray.appendNew();
 
     simHit->setWireID(layerId, wireId);
@@ -678,7 +677,6 @@ namespace Belle2 {
     //    if (hitWeight < 0) m_nNegHits++;
     //    std::cout <<"trackID,HitNumber,weight,driftL,edep= "<< trackID <<" "<< m_hitNumber <<" "<< hitWeight <<" "<< distance <<" "<< edep << std::endl;
     //    return (m_hitNumber);
-    // cppcheck-suppress memleak
   }
 
 

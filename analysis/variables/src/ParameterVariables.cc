@@ -386,7 +386,7 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
-    double pointingAngle(const Particle* particle, const std::vector<double> daughters)
+    double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
         return -999;
@@ -409,7 +409,7 @@ namespace Belle2 {
       return cos(daughterMomentumVector.Angle(vertexDiffVector));
     }
 
-    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double> daughters)
+    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
         return -999;

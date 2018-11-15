@@ -49,6 +49,8 @@ namespace Belle2 {
     double m_thresholdEnergyDeposit;  /*!< Energy thresh. for G4 step (GeV) */
     double m_minTrackLength;              /*!< Minimum track length for G4 step (cm) */
     double m_maxSpaceResol;   /**< Max. space resolution allowed (cm). */
+    double m_fudgeFactorForSpaceResolForData;   /**< Fudge factor for space resol. for data. */
+    double m_fudgeFactorForSpaceResolForMC;   /**< Fudge factor for space resol. for MC. */
     bool   m_mapperGeometry;  /**< Mapper geometry flag. */
     double m_mapperPhiAngle;  /**< Mapper phi-angle(deg). */
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGIT_H
-#define EKLMDIGIT_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
@@ -214,12 +213,9 @@ namespace Belle2 {
     /** MC time at SiPM. */
     float m_sMCTime;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDefOverride(Belle2::EKLMDigit, 10);
 
   };
 
 }
-
-#endif
-

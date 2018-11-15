@@ -15,7 +15,7 @@ from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 import sys
 import os
@@ -35,7 +35,7 @@ loadStdSkimPi0()
 loadStdCharged()
 loadStdKS()
 
-from Charm3BodyHadronic_List import *
+from skim.charm import DstToD0PiD0ToHpJmPi0List
 
 
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0()

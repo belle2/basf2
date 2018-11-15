@@ -28,13 +28,13 @@ namespace Belle2 {
     /** Initialize the module.
      * Load the network weights and register datastore objects.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called once for each event.
      * Run the network for all CDCTriggerTracks and store output z-vertex
      * in the same CDCTriggerTrack.
      */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Name of file where network weights etc. are stored. */

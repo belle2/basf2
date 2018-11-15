@@ -15,9 +15,10 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-# use_local_database()
-use_local_database("DBmoduleC04/DBmoduleC04.txt", "DBmoduleC04", False)
+# define local database with write access
+use_local_database("localDB/localDB.txt", "localDB", False)
 
+# create path
 main = create_path()
 
 # Event info setter - execute single event
@@ -29,9 +30,15 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
+# Geometry
+geometry = register_module('Geometry')
+geometry.param('useDB', False)
+geometry.param('components', ['TOP'])
+main.add_module(geometry)
+
 # process single event
 process(main)
 
-# and then run the importer (note: input file is not there - must change the path!)
+# and then run the importer
 dbImporter = TOPDatabaseImporter()
-dbImporter.importSampleTimeCalibration('../timeSampleCal/M03_M04_dT.dat')
+dbImporter.importDummyCalTimebase(0, 0, 0, -1)

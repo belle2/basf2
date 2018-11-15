@@ -13,6 +13,7 @@ def run_collectors():
     Runs the CAF collector in a general way by passing serialised basf2 paths, input file
     locations, and local databases from previous calibrations.
     """
+    from basf2.pickle_path import get_path_from_file
     import glob
     import os
     import sys
@@ -23,16 +24,16 @@ def run_collectors():
     with open('collector_config.json', 'r') as config_file:
         config = json.load(config_file)
 
-    # Create the database chain to use the necessary central DB global tag and local DBs if they are requested
-    # We don't check for existence of keys in the dictionary as we want it to fail if they don't exist.
+    # Create the database chain to use the necessary central DB global tags and local DBs if they are requested
     reset_database()
-    use_database_chain(True)
-    if config['global_tag']:
-        B2INFO("Using Global Tag {}".format(config['global_tag']))
-        use_central_database(config['global_tag'])
-    for filename, directory in config['local_database_chain']:
-        B2INFO("Adding Local Database {} to chain".format(filename))
-        use_local_database(filename, directory, True, LogLevel.INFO)
+    use_database_chain()
+    for db_type, database in config['database_chain']:
+        if db_type == 'local':
+            B2INFO("Adding Local Database {} to chain".format(database))
+            use_local_database(database[0], database[1], True, LogLevel.INFO)
+        else:
+            B2INFO("Using Global Tag {}".format(database))
+            use_central_database(database)
 
     # create a path with all modules needed before calibration path is run.
     collector_path = create_path()

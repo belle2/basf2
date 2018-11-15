@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <chrono>
 #include <random>
@@ -76,29 +77,56 @@ std::string FileSystem::calculateMD5(const std::string& filename)
   return md5->AsString();
 }
 
-std::string FileSystem::findFile(const string& path, bool silent)
+std::string FileSystem::findFile(const string& path, const std::vector<std::string>& dirs, bool silent)
 {
-  //environment doesn't change, so only done once
-  static const char* localdir = getenv("BELLE2_LOCAL_DIR");
-  static const char* reldir = getenv("BELLE2_RELEASE_DIR");
-
-  //check in local directory
+  // check given directories
   string fullpath;
-  if (localdir and fileExists(fullpath = (fs::path(localdir) / path).string()))
-    return fullpath;
-  //check in central release directory
-  else if (reldir and fileExists(fullpath = (fs::path(reldir) / path).string()))
-    return fullpath;
-  //check if this thing exists as normal path (absolute / relative to PWD)
-  else if (fileExists(fullpath = (fs::absolute(path).string())))
-    return fullpath;
+  for (auto dir : dirs) {
+    if (dir.empty()) continue;
+    fullpath = (fs::path(dir) / path).string();
+    if (fileExists(fullpath)) return fullpath;
+  }
 
-  //nothing found
+  // check local directory
+  fullpath = fs::absolute(path).string();
+  if (fileExists(fullpath)) return fullpath;
+
+  // nothing found
   if (!silent)
-    B2ERROR("findFile(): Could not find '" << path << "'!");
+    B2ERROR("findFile(): Could not find file." << LogVar("path", path));
   return string("");
 }
 
+std::string FileSystem::findFile(const string& path, bool silent)
+{
+  std::vector<std::string> dirs;
+  if (getenv("BELLE2_LOCAL_DIR")) {
+    dirs.push_back(getenv("BELLE2_LOCAL_DIR"));
+  }
+  if (getenv("BELLE2_RELEASE_DIR")) {
+    dirs.push_back(getenv("BELLE2_RELEASE_DIR"));
+  }
+  return findFile(path, dirs, silent);
+}
+
+std::string FileSystem::findFile(const string& path, const std::string& dataType, bool silent)
+{
+  std::vector<std::string> dirs;
+  std::string envVar = "BELLE2_" + boost::to_upper_copy(dataType) + "_DATA_DIR";
+  if (getenv(envVar.c_str())) {
+    dirs.push_back(getenv(envVar.c_str()));
+  }
+  std::string dirName = boost::to_lower_copy(dataType) + "-data";
+  if (getenv("VO_BELL2_SW_DIR")) {
+    dirs.push_back((fs::path(getenv("VO_BELL2_SW_DIR")) / dirName).string());
+  }
+  dirs.push_back(dirName);
+  std::string result = findFile(path, dirs, true);
+  if (result.empty() && !silent)
+    B2ERROR("findFile(): Could not find data file. You may want to use the 'b2install-data' tool to get the file."
+            << LogVar("path", path) << LogVar("data type", dataType));
+  return result;
+}
 
 FileSystem::Lock::Lock(std::string fileName, bool readonly) :
   m_readOnly(readonly)

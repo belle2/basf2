@@ -21,6 +21,8 @@
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 #include <analysis/dataobjects/ECLTRGInformation.h>
 #include <analysis/dataobjects/ECLTriggerCell.h>
+#include <analysis/utility/ReferenceFrame.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 //MDST
 #include <mdst/dataobjects/MCParticle.h>
@@ -143,10 +145,14 @@ namespace Belle2 {
 
     double eclClusterE(const Particle* particle)
     {
+      const auto& frame = ReferenceFrame::GetCurrent();
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getEnergy();
+        ClusterUtils clutls;
+        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+        return frame.getMomentum(p4Cluster).E();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -183,10 +189,14 @@ namespace Belle2 {
 
     double eclClusterTheta(const Particle* particle)
     {
+      const auto& frame = ReferenceFrame::GetCurrent();
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getTheta();
+        ClusterUtils clutls;
+        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+        return frame.getMomentum(p4Cluster).Theta();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -213,10 +223,14 @@ namespace Belle2 {
 
     double eclClusterPhi(const Particle* particle)
     {
+      const auto& frame = ReferenceFrame::GetCurrent();
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getPhi();
+        ClusterUtils clutls;
+        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+        return frame.getMomentum(p4Cluster).Phi();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }

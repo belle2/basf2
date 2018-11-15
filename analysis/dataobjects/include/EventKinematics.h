@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTKINEMATICS_H
-#define EVENTKINEMATICS_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -166,4 +165,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

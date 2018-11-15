@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 // ROOT
-#include "TH1D.h"
+#include "TH1F.h"
 #include "TFile.h"
 
 // ECL
@@ -84,6 +84,10 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  m_averageBG = 0;
+  m_pol2Max = 0.0;
+  m_timeInverseSlope = 0.0;
+
 }
 
 // destructor
@@ -140,10 +144,11 @@ void ECLDigitCalibratorModule::initialize()
   // read the Background correction factors (for full background)
   m_fileBackground = new TFile(m_fileBackgroundName.c_str(), "READ");
   if (!m_fileBackground) B2FATAL("Could not find file: " << m_fileBackgroundName);
-  m_th1dBackground = (TH1D*) m_fileBackground->Get("background");
+  m_th1fBackground = dynamic_cast<TH1F*>(m_fileBackground->Get("background"));
+  if (!m_th1fBackground) B2FATAL("Could not find m_th1fBackground");
 
-  // average BG value from m_th1dBackground
-  m_averageBG = m_th1dBackground->Integral() / m_th1dBackground->GetEntries();
+  // average BG value from m_th1fBackground
+  m_averageBG = m_th1fBackground->Integral() / m_th1fBackground->GetEntries();
 
   // get maximum position ("x") of 2-order pol background for t99
   if (fabs(c_pol2Var3) > 1e-12) {
@@ -151,16 +156,6 @@ void ECLDigitCalibratorModule::initialize()
   } else {
     m_pol2Max = 0.;
   }
-
-  // time resolution calibration for MC (for full background. for no background, this will be a pessimistic approximation.)
-  m_timeResolutionPointResolution[0] =   0.134 * Belle2::Unit::ns; // (CH for svn revision 26660)
-  m_timeResolutionPointResolution[1] =  12.23 * Belle2::Unit::ns; // (CH for svn revision 26660)
-  m_timeResolutionPointResolution[2] =  85.74 * Belle2::Unit::ns; // (CH for svn revision 26660)
-  m_timeResolutionPointResolution[3] = 342.9 * Belle2::Unit::ns; // (CH for svn revision 26660)
-  m_timeResolutionPointX[0] =   0.0; // (CH for svn revision 26660)
-  m_timeResolutionPointX[1] =  15.65; // (CH for svn revision 26660)
-  m_timeResolutionPointX[2] = 109.0; // (CH for svn revision 26660)
-  m_timeResolutionPointX[3] = 400.0; // (CH for svn revision 26660)
 
 }
 
@@ -260,6 +255,9 @@ void ECLDigitCalibratorModule::event()
     //Calibrating offline fit results
     ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
     aECLCalDigit->setTwoComponentChi2(-1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
+    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, -1);
     aECLCalDigit->setTwoComponentTotalEnergy(-1);
     aECLCalDigit->setTwoComponentHadronEnergy(-1);
     aECLCalDigit->setTwoComponentDiodeEnergy(-1);
@@ -282,6 +280,10 @@ void ECLDigitCalibratorModule::event()
         aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
         aECLCalDigit->setTwoComponentDiodeEnergy(calibratedTwoComponentDiodeEnergy);
         aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadron));
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton,
+                                               aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton));
+        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing));
         aECLCalDigit->setTwoComponentFitType(twoComponentFitType);
 
       }
@@ -336,7 +338,7 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
   if (fitfailed) return c_timeResolutionForFitFailed;
 
   // Get the background level [MeV / mus]
-  const double bglevel = TMath::Min((double) bgcount / (double) c_nominalBG * m_th1dBackground->GetBinContent(cellid) / m_averageBG,
+  const double bglevel = TMath::Min((double) bgcount / (double) c_nominalBG * m_th1fBackground->GetBinContent(cellid) / m_averageBG,
                                     m_pol2Max); // c_nominalBG = 183 for actual version of digitizer, m_averageBG is about 2 MeV/ mus
 
   // Get p1 as function of background level
@@ -352,18 +354,7 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
   // for high energies we fix t99 to 3.5ns
   if (t99 < c_minT99) t99 = c_minT99;
 
-//  // piecewise linear extrapolation in x with E (in GeV) = 1/x
-//  double x = 1.e12; //
-//  if (energy > 1.e-9) x = 1. / (energy / Belle2::Unit::GeV);  // avoid division by (almost) zero
-//  else return c_timeResolutionForZeroEnergy;
-//
-//  int bin = 0;
-//  if (x > m_timeResolutionPointX[2]) bin = 2;
-//  else if (x > m_timeResolutionPointX[1]) bin = 1;
-//
-//  double timeresolution = getInterpolatedTimeResolution(x, bin);
-
-  B2DEBUG(35, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1dBackground->GetBinContent(
+  B2DEBUG(35, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1fBackground->GetBinContent(
             cellid) << ", bglevel = " << bglevel << ", cellid = " << cellid << ", t99 = " << t99 << ", energy = " << energy /
           Belle2::Unit::MeV);
 

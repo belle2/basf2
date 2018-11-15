@@ -106,7 +106,7 @@ namespace Belle2 {
       double scaleFactor;      /**< scale factor for the rate */
       std::vector<std::string> fileNames;     /**< file names */
       BackgroundMetaData::EFileType fileType; /**< file type */
-      TChain* tree;            /**< tree pointer */
+      std::unique_ptr<TChain> tree; /**< tree pointer */
       unsigned numFiles;       /**< number of files connected to TChain */
       unsigned numEvents;      /**< number of events (tree entries) in the sample */
       unsigned eventCount;     /**< current event (tree entry) */
@@ -118,7 +118,7 @@ namespace Belle2 {
        */
       BkgFiles(): tag(SimHitBase::bg_none), realTime(0.0), scaleFactor(1.0),
         fileType(BackgroundMetaData::c_Usual),
-        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(0)
+        tree(nullptr), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(0)
       {}
       /**
        * usefull constructor
@@ -139,7 +139,7 @@ namespace Belle2 {
                unsigned indx = 0):
         tag(bkgTag), type(bkgType), realTime(time), scaleFactor(scaleFac),
         fileType(fileTyp),
-        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(indx)
+        tree(nullptr), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(indx)
       {
         fileNames.push_back(fileName);
       }

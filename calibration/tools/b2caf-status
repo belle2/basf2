@@ -10,17 +10,19 @@ from caf.framework import Calibration
 from pathlib import Path
 
 
-def command_show(args, db):
+def command_show(args, db_path):
     """Prints the current CAF database, showing values such as the current *state*, *checkpoint*, and *iteration*,
 for every Calibration known to the CAF process. You may call this even while the CAF is still running in
 order to check on the status."""
-    print(db.output_calibration_table())
+    with CAFDB(db_path, read_only=True) as db:
+        print(db.output_calibration_table())
     return 0
 
 
-def command_update(args, db):
-    db.update_calibration_value(args.cal_name, args.col_name, args.new_value)
-    print(db.output_calibration_table())
+def command_update(args, db_path):
+    with CAFDB(db_path, read_only=False) as db:
+        db.update_calibration_value(args.cal_name, args.col_name, args.new_value)
+        print(db.output_calibration_table())
     return 0
 
 __docstring = ("This allows you to modify (update) the value of a column in the SQLite3 CAF database.\n\n"
@@ -75,8 +77,7 @@ def main():
         print("No database at path: {}".format(db_path))
         return 1
 
-    with CAFDB(db_path) as db:
-        return args.func(args, db)
+    return args.func(args, db_path)
 
 if __name__ == "__main__":
     import sys

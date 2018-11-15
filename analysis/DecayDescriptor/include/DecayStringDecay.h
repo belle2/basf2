@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYSTRINGDECAY_H
-#define DECAYSTRINGDECAY_H
+#pragma once
 #include <string>
 #include <vector>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -45,5 +44,4 @@ BOOST_FUSION_ADAPT_STRUCT(
   (std::string, m_strInclusive)
 )
 
-#endif // DECAYSTRINGDECAY_H
 

@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLETRACKHITSTOOL_H
-#define NTUPLETRACKHITSTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -45,4 +44,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLETRACKHITSTOOL_H

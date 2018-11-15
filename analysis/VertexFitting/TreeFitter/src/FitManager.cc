@@ -1,5 +1,4 @@
 /**************************************************************************
- *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
@@ -33,8 +32,8 @@ namespace TreeFitter {
                          bool ipConstraint,
                          bool customOrigin,
                          bool updateDaughters,
-                         const std::vector<double> customOriginVertex,
-                         const std::vector<double> customOriginCovariance,
+                         const std::vector<double>& customOriginVertex,
+                         const std::vector<double>& customOriginCovariance,
                          const bool useReferencing
                         ) :
     m_particle(particle),
@@ -64,7 +63,7 @@ namespace TreeFitter {
     delete m_fitparams;
   }
 
-  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string name, const double value) const
+  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string& name, const double value) const
   {
     if (part) {
       if (part->hasExtraInfo(name)) {
@@ -93,7 +92,6 @@ namespace TreeFitter {
       m_status = VertexStatus::UnFitted;
       int ndiverging = 0;
       bool finished = false;
-      double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         if (0 == m_niter) {
           m_errCode = m_decaychain->filter(*m_fitparams);
@@ -105,7 +103,7 @@ namespace TreeFitter {
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
         double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);//protected against m_ndf<1
-        deltachisq = chisq - m_chiSquare;
+        double deltachisq = chisq - m_chiSquare;
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
@@ -308,9 +306,8 @@ namespace TreeFitter {
 
     if (updateableMother) {
       const int ndaughters = cand.getNDaughters();
-      Belle2::Particle* daughter;
       for (int i = 0; i < ndaughters; i++) {
-        daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
+        Belle2::Particle* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
         updateTree(*daughter, false);
       }
     }
@@ -318,7 +315,6 @@ namespace TreeFitter {
 
   std::tuple<double, double> FitManager::getLifeTime(Belle2::Particle& cand) const
   {
-    std::tuple<double, double> rc;
     const ParticleBase* pb = m_decaychain->locate(&cand);
 
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {

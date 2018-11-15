@@ -651,9 +651,9 @@ namespace Belle2 {
     }
 
     /**
-     * Sets the user defined extraInfo. Adds it if necessary.
+     * Sets the user defined extraInfo. Adds it if necessary, overwrites existing ones if they share the same name.
      * */
-    void writeExtraInfo(const std::string& name, const double value);
+    void writeExtraInfo(const std::string& name, const float value);
 
     /** Sets the user-defined data of given name to the given value.
      *

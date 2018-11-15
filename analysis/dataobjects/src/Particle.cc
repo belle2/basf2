@@ -874,7 +874,7 @@ float Particle::getExtraInfo(const std::string& name) const
 
 }
 
-void Particle::writeExtraInfo(const std::string& name, const double value)
+void Particle::writeExtraInfo(const std::string& name, const float value)
 {
   if (this->hasExtraInfo(name)) {
     this->setExtraInfo(name, value);

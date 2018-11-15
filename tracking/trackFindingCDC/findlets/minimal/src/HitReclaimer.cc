@@ -3,30 +3,34 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun, Oliver Frost, Dmitrii Neverov                *
+ * Contributors: Dmitrii Neverov                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/trackFinderCDC/WireHitPreparationModules.h>
+
+#include <tracking/trackFindingCDC/findlets/minimal/HitReclaimer.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(TFCDC_WireHitPreparer);
-REG_MODULE(TFCDC_WireHitCreator);
-REG_MODULE(TFCDC_HitReclaimer);
+HitReclaimer::HitReclaimer() = default;
 
-TFCDC_WireHitPreparerModule::TFCDC_WireHitPreparerModule()
-  : Super( {"CDCWireHitVector"})
+void HitReclaimer::initialize()
 {
+  Super::initialize();
 }
 
-TFCDC_WireHitCreatorModule::TFCDC_WireHitCreatorModule()
-  : Super( {"CDCWireHitVector"})
+std::string HitReclaimer::getDescription()
 {
+  return "A small findlet that removes flags from hits not accepted by conventional tracking.";
 }
 
-TFCDC_HitReclaimerModule::TFCDC_HitReclaimerModule()
-  : Super( {"CDCWireHitVector"})
+void HitReclaimer::apply(const std::vector<CDCWireHit>& wireHits)
 {
+  for (const CDCWireHit& wireHit : wireHits) {
+    if (wireHit->hasBackgroundFlag() or wireHit->hasMaskedFlag()) {
+      wireHit->unsetTakenFlag();
+    }
+  }
 }

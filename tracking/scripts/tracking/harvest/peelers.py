@@ -206,7 +206,7 @@ def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}")
         return dict(
             has_vxdtf2_failure_flag=False,
             has_unspecified_trackfinding_failure=False,
-             )
+        )
     return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
                 )
@@ -363,6 +363,13 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
     return fit_crops
 
 
+def get_reco_hit_information(reco_track, hit):
+    """Helper function for getting the correct reco hit info"""
+    for info in hit.getRelationsFrom("RecoHitInformations"):
+        if info.getRelatedFrom(reco_track.getArrayName()) == reco_track:
+            return info
+
+
 # Custom peel function to get the sub detector hit efficiencies
 @format_crop_keys
 def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"):
@@ -371,19 +378,28 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
             hit_efficiency = float("nan")
         else:
             mc_reco_hits = getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()
-            mc_reco_hit_size = mc_reco_hits.size()
-
-            if mc_reco_hit_size == 0:
+            if mc_reco_hits.size() == 0:
                 hit_efficiency = float('nan')
             else:
+                mc_reco_hit_size = 0
                 hit_efficiency = 0.
                 for mc_reco_hit in mc_reco_hits:
+                    info = get_reco_hit_information(mc_reco_track, mc_reco_hit)
+
+                    if info.getFoundByTrackFinder() == Belle2.RecoHitInformation.c_MCTrackFinderAuxiliaryHit:
+                        continue
+
+                    mc_reco_hit_size += 1
+
                     for reco_hit in getattr(reco_track, "get{}HitList".format(detector_string.upper()))():
                         if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
                             hit_efficiency += 1
                             break
 
-                hit_efficiency /= mc_reco_hit_size
+                if not mc_reco_hit_size:
+                    hit_efficiency = float('nan')
+                else:
+                    hit_efficiency /= mc_reco_hit_size
 
         return {"{}_hit_efficiency".format(detector_string.lower()): hit_efficiency}
 

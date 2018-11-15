@@ -30,7 +30,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   constexpr uint64_t defaulterrormask =
-//         c_XXXXTB_IDS | // unused
+    c_EVENT_STRUCT |
     c_FRAME_TNR_MM |
     c_META_MM |
     c_ONSEN_TRG_FIRST |
@@ -46,7 +46,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHE_CRC |
     //
     c_DHC_UNKNOWN |
-//         c_XXXMERGER_CRC | unused
+    c_HEADERTYPE_INV |
     c_PACKET_SIZE |
     c_MAGIC |
     //
@@ -102,8 +102,10 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     //
 //         c_EVT_TRG_GATE_DIFFER | // still a bug in DHE FW
 //         c_EVT_TRG_FRM_NR_DIFFER | // still a bug in DHE FW
-//         c_DHP_ROW_WO_PIX |
-    c_DHE_START_THIRD ;
+//         c_DHP_ROW_WO_PIX | // still a bug in DHE FW?
+    c_DHE_START_THIRD |
+    //
+    c_FAKE_NO_FAKE_DATA ;
 
   // other bits not used yet
 

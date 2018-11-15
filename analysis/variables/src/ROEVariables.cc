@@ -609,15 +609,15 @@ namespace Belle2 {
           B2ERROR("Relation between particle and ROE doesn't exist!");
           return -1;
         }
-
-        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
-        double extraE = 0.0;
-
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          if (roeClusters[iEcl]->isNeutral())
-            extraE += roeClusters[iEcl]->getEnergy();
-
-        return extraE;
+        auto roephotons = roe->getPhotons(maskName);
+        TLorentzVector total4vector;
+        for (auto* photon : roephotons)
+        {
+          total4vector += photon->get4Vector();
+        }
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(total4vector);
+        return frameRoe4Vector.Energy();
       };
       return func;
     }

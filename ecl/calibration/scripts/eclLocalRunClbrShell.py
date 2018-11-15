@@ -15,7 +15,8 @@ from ROOT import TFile, TGraph, TCanvas
 
 class EclLRCalibrator:
     def __init__(self):
-        self.__optPath = self.__getOptionsPath__()
+        os.chdir('/home/belle2/sgrib/localrun')
+        self.__optPath = '/home/belle2/sgrib/ecl-local-run-db/service/options_eclLocalRunClbrShell.json'
         self.__curexp = None
         self.__localDBDir = None
         self.__globalDB = None
@@ -28,13 +29,17 @@ class EclLRCalibrator:
         self.__userName = ''
         self.__userId = None
         self.__loginTime = None
-        self.__tmpLastRunFigs = '.ecl_local_run_shift_last_check.root'
+        self.__tmpLastRunFigs = '/tmp/ecl_local_run_shift_last_check.root'
         self.loadOptions()
         if not os.path.exists(self.__eclClbrLogDB):
             self.__createClbrLogDB__()
 
         self.setUser()
         self.writeOptsToLogDB()
+
+    def __recursiveChmod__(self, path, right):
+        for r, d, f in os.walk(path):
+            os.chmod(r, right)
 
     def __getTime__(self):
         return int(1.e+03 * time.time())
@@ -119,7 +124,7 @@ class EclLRCalibrator:
         conn.close()
 
     def setUser(self):
-        userName = os.environ.get('USER')
+        self.__userName = os.environ.get('USER')
         conn = sqlite3.connect(self.__eclClbrLogDB)
         cursor = conn.cursor()
         cursor.execute('PRAGMA foreign_keys = ON')
@@ -218,8 +223,9 @@ class EclLRCalibrator:
         (8, "check"),
         (9, "check_fwd"),
         (10, "check_barrel"),
-        (11, "save"),
-        (12, "comment");
+        (11, "check_bwd"),
+        (12, "save"),
+        (13, "comment");
         ''')
         cursor.execute('''
         CREATE TABLE event
@@ -251,6 +257,7 @@ class EclLRCalibrator:
         ''')
         conn.commit()
         conn.close()
+        os.chmod(self.__eclClbrLogDB, 0o777)
 
     def __clbrDBAdd__(self, runnum):
         conn = sqlite3.connect(self.__eclClbrLogDB)
@@ -291,23 +298,16 @@ class EclLRCalibrator:
     def __getLocalDBPath__(self, expnum):
         return os.path.join(
             self.__localDBDir,
-            'localdb-%(expnum)04d' % {'expnum': expnum},
+            '%(expnum)04d' % {'expnum': expnum},
             'database.txt')
-
-    def __getOptionsPath__(self):
-        dirName = os.path.dirname(sys.argv[0])
-        path = os.path.join(
-            dirName,
-            'options_eclLocalRunClbrShell.json')
-        return path
 
     def __keyPressPause__(self):
         stdscr = curses.initscr()
         curses.noecho()
         c = 0
-        stdscr.addstr(0, 0, 'Press [S] to continue:',
+        stdscr.addstr(0, 0, 'Press [s] to continue:',
                       curses.A_REVERSE)
-        while chr(c) != 'S':
+        while chr(c) != 's':
             c = stdscr.getch()
 
         curses.endwin()
@@ -613,6 +613,8 @@ The current experiment nuber is %(exp)04d.''' % {
         self.logEventLog(eventTime, 'Make dir: %(dirname)s' % {
             'dirname': dirName})
         os.mkdir(dirName)
+        os.chmod(dirName, 0o777)
+        self.__recursiveChmod__(dirName, 0o777)
         print('''The new experiment number has been created (%(expnum)04d). \
 The current experiment number has been set to %(expnum)04d.''' % {
             'expnum': self.__curexp})
@@ -641,6 +643,7 @@ The current experiment number has been set to %(expnum)04d.''' % {
             'highrun': highrun}
 
         subprocess.call(cmd, shell=True)
+        self.__recursiveChmod__(self.__getLocalDBPath__(self.__curexp), 0o777)
         self.logEventSuccess(evtime, 1)
 
         conn = sqlite3.connect(self.__eclClbrLogDB)
@@ -728,13 +731,14 @@ of experiment %(expnum)04d does not exist.''' % {
             print(msg)
             return
 
-        cmd = 'ecl/calibration/scripts/eclLocalRunCalib.py --tree'
+        cmd = 'ecl/calibration/scripts/eclLocalRunCalib.py'
         cmd += ' --dbname %s' % (self.__getLocalDBPath__(self.__curexp),)
         cmd += ' --filename %s' % (path,)
         if not isNewExp:
             cmd += ' --changeprev'
 
         subprocess.call(cmd, shell=True)
+        self.__recursiveChmod__(self.__getLocalDBPath__(self.__curexp), 0o777)
         self.logEventSuccess(eventTime, 1)
         self.logEventLog(eventTime, 'Succesfully finished.')
         self.__clbrDBAdd__(runnum)
@@ -831,17 +835,23 @@ of experiment %(expnum)04d does not exist.''' % {
                             'offset': float(res.groups()[1])})
 
         if eclPart == 1:  # FWD
-            rng = chain(range(1, 1253), range(7777, 8737))
+            rng = chain(range(1, 1153))
             time_lst = self.__updateOffsetList__(time_lst, rng)
-            rng = chain(range(1, 1253), range(7777, 8737))
+            rng = chain(range(1, 1153))
             ampl_lst = self.__updateOffsetList__(ampl_lst, rng)
             print('FWD:')
         elif eclPart == 2:  # Barrel
-            rng = chain(range(1253, 7777))
+            rng = chain(range(1153, 7777))
             time_lst = self.__updateOffsetList__(time_lst, rng)
-            rng = chain(range(1253, 7777))
+            rng = chain(range(1153, 7777))
             ampl_lst = self.__updateOffsetList__(ampl_lst, rng)
             print('Barrel:')
+        elif eclPart == 3:  # BWD
+            rng = chain(range(7777, 8737))
+            time_lst = self.__updateOffsetList__(time_lst, rng)
+            rng = chain(range(7777, 8737))
+            ampl_lst = self.__updateOffsetList__(ampl_lst, rng)
+            print('BWD:')
 
         if len(time_lst) > 0:
             print(time_line)
@@ -893,6 +903,8 @@ of experiment %(expnum)04d does not exist.''' % {
             'exp': self.__curexp,
             'run': runnum}
         subprocess.call(cmd, shell=True)
+        dirName = os.path.dirname(self.__globalDB)
+        self.__recursiveChmod__(dirName, 0o777)
         self.__saved = True
         self.logEventLog(eventTime, '''Begin updating quality \
 of the run %(runnum)05d (experiment %(expnum)04d).''' % {
@@ -944,7 +956,7 @@ Type help or ? to list commands. Type shift_readme to read shift instructions.''
         '''Comment local run.
         Usage:
         (1) comment'''
-        eventTime = self.calibrator.logEvent(12)
+        eventTime = self.calibrator.logEvent(13)
         self.calibrator.logEventArgs(eventTime, arg)
         if len(arg) == 0:
             self.__printWrogUsageMsg__()
@@ -1171,6 +1183,14 @@ procedure for the selected run.
         (3) check_barrel <run number> <max time offset> <max amplitude offset>'''
         self.__check__(2, 10, arg)
 
+    def do_check_bwd(self, arg):
+        '''Check quality of calibration runs (Barrel part only).
+        Usage:
+        (1) check_barrel
+        (2) check_barrel <run number>
+        (3) check_barrel <run number> <max time offset> <max amplitude offset>'''
+        self.__check__(3, 11, arg)
+
     def __check__(self, eclPart, cmdid, arg):
         '''Check quality of calibration runs.
         Usage:
@@ -1211,7 +1231,7 @@ that the local run has a good quality).
         Usage:
         (1) save
         (2) save <run number>'''
-        eventTime = self.calibrator.logEvent(11)
+        eventTime = self.calibrator.logEvent(12)
         self.calibrator.logEventArgs(eventTime, arg)
         if not self.__checkNumberOfArgs__(arg, (0, 1)):
             self.__printWrogUsageMsg__()
@@ -1243,7 +1263,8 @@ To check current run use command "check".''')
         if (runnum != self.calibrator.getCurRunNum()):
             self.calibrator.logEventLog(eventTime, '''Ask for saving the run %(run)05d, \
 which is not current run.''' % {'run': runnum})
-            yes = self.__ask__('Are you sure that you want to save this run?')
+            yes = self.__ask__('Are you sure that you want to save run %(run)d?' % {
+                'run': runnum})
             if not yes:
                 self.calibrator.logEventSuccess(eventTime, 0)
                 self.calibrator.logEventLog(eventTime, 'NO')

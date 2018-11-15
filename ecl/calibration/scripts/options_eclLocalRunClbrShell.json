@@ -1,1 +1,7 @@
-{"localdbdir": "/home/belle2/sgrib/ecl-local-run-db", "globaldb": "/home/belle2/sgrib/ecl-local-run-db/test-globaldb-emulator/database.txt", "eclmapdb": "/home/belle2/sgrib/ecl-local-run-db/service/ecl_map.db", "logdb": "/home/belle2/sgrib/ecl-local-run-db/service/eclclbr_log.db", "dir": "/hsm/belle2/bdata/group/detector/ECL"}
+{
+"localdbdir": "/home/belle2/sgrib/ecl-local-run-db/localdb", 
+"globaldb": "/home/belle2/sgrib/ecl-local-run-db/test-globaldb-emulator/database.txt", 
+"eclmapdb": "/home/belle2/sgrib/ecl-local-run-db/service/ecl_map.db", 
+"logdb": "/home/belle2/sgrib/ecl-local-run-db/logdb/eclclbr_log.db", 
+"dir": "/hsm/belle2/bdata/group/detector/ECL"
+}

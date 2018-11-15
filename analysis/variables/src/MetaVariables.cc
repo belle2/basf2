@@ -1074,11 +1074,9 @@ endloop:
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
-              ClusterUtils clusutilsi, clusutilsj;
-              TLorentzVector p4iCluster = clusutilsi.Get4MomentumFromCluster(clusteri);
-              TLorentzVector p4jCluster = clusutilsj.Get4MomentumFromCluster(clusterj);
-              TVector3 pi = p4iCluster.Vect();
-              TVector3 pj = p4jCluster.Vect();
+              ClusterUtils clusutils;
+              TVector3 pi = clusutils.Get4MomentumFromCluster(clusteri).Vect();
+              TVector3 pj = clusutils.Get4MomentumFromCluster(clusterj).Vect();
               return pi.Angle(pj);
             }
           } else if (daughterIndices.size() == 3)
@@ -1090,13 +1088,10 @@ endloop:
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
               const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
-              ClusterUtils clusutilsi, clusutilsj, clusutilsk;
-              TLorentzVector p4iCluster = clusutilsi.Get4MomentumFromCluster(clusteri);
-              TLorentzVector p4jCluster = clusutilsj.Get4MomentumFromCluster(clusterj);
-              TLorentzVector p4kCluster = clusutilsk.Get4MomentumFromCluster(clusterk);
-              TVector3 pi = p4iCluster.Vect();
-              TVector3 pj = p4jCluster.Vect();
-              TVector3 pk = p4kCluster.Vect();
+              ClusterUtils clusutils;
+              TVector3 pi = clusutils.Get4MomentumFromCluster(clusteri).Vect();
+              TVector3 pj = clusutils.Get4MomentumFromCluster(clusterj).Vect();
+              TVector3 pk = clusutils.Get4MomentumFromCluster(clusterk).Vect();
               return pk.Angle(pi + pj);
             }
           } else return -999;

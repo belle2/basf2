@@ -111,7 +111,7 @@ void ECLUnpackerModule::initialize()
     m_eclDigits.registerRelationTo(m_eclTrigs);
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
-  m_eclDsps.registerRelationTo(m_eclDigits);
+  m_eclDigits.registerRelationTo(m_eclDsps);
 
   // make full name of the initialization file
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -436,7 +436,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
+              ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
+              // Add relation from ECLDigit to ECLDsp
+              for (auto& newEclDigit : m_eclDigits) {
+                if (newEclDsp->getCellId() == newEclDigit.getCellId()) newEclDigit.addRelationTo(newEclDsp);
+              }
             }
 
           }

@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett, Christian Pulvermacher, Jitendra
+ * Contributors: Jake Bennett, Christian Pulvermacher
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -421,6 +421,7 @@ void CDCDedxPIDModule::event()
                                     pocaMom.Theta());
 
         // now calculate the path length for this hit
+        // std::cout << "--Jitendra0: doca = " << doca << ", docaRS = " << docaRS << ", entAng = " << entAng << ", entAngRS = " << entAngRS << std::endl;
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
           // get the wire gain constant
@@ -440,7 +441,6 @@ void CDCDedxPIDModule::event()
 
 
           double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
-          double cellDedx = 0.;
           if (correction != 0) {
             dadcCount = dadcCount / correction;
 
@@ -458,21 +458,18 @@ void CDCDedxPIDModule::event()
             // --------------------
             // save individual hits
             // --------------------
-            cellDedx = (dadcCount / celldx);
+            double cellDedx = (dadcCount / celldx);
 
             // correct for path length through the cell
             if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
             else cellDedx *= std::sin(trackMom.Theta());
 
+            if (m_enableDebugOutput)
+              dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
+                                cellHalfWidth, driftT,
+                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
             nhitscombined++;
-          } else {
-            cellDedx = 0.;
           }
-
-          if (m_enableDebugOutput)
-            dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
-                              cellHalfWidth, driftT, driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
-
         }
       } catch (genfit::Exception&) {
         B2WARNING("Track: " << mtrack << ": genfit::MeasuredStateOnPlane exception...");

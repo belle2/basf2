@@ -187,16 +187,18 @@ add_skim('feiSLB0WithOneLep', B0SLWithOneLep(path=analysis_main))
 
 
 from skim.dark import SinglePhotonDarkList
-add_skim('SinglePhotonDark', SinglePhotonDarkList())
+add_skim('SinglePhotonDark', SinglePhotonDarkList(path=analysis_main))
 
 
 from skim.dark import LFVZpInvisibleList
-add_skim('LFVZpInvisible', LFVZpInvisibleList())
+add_skim('LFVZpInvisible', LFVZpInvisibleList(path=analysis_main))
 
 
 from skim.dark import LFVZpVisibleList
-add_skim('LFVZpVisible', LFVZpVisibleList())
+add_skim('LFVZpVisible', LFVZpVisibleList(path=analysis_main))
 
+from skim.dark import ALP3GammaList
+add_skim('ALP3Gamma', ALP3GammaList(path=analysis_main))
 
 setSkimLogging()
 process(analysis_main)

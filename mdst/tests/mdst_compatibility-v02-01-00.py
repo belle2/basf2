@@ -14,7 +14,7 @@ approach also allows to check for the compatibility of getters of the mdst
 objects.
 """
 
-from basf2 import create_path, process,  LogLevel, set_log_level, set_random_seed
+from basf2 import create_path, process, LogLevel, set_log_level, set_random_seed
 from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 import ROOT
 from ROOT import Belle2
@@ -93,11 +93,12 @@ mdst_dataobjects = [
         "getLogL": const_stable,
         "getProbability": const_stable,
     }),
+    # release-02 variable getClusterHadronIntensity is replaced below by release-03 variable getPulseShapeDiscriminationMVA
     DataStorePrinter("ECLCluster", [
         "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
         "getHypothesisId", "getClusterId", "getMinTrkDistance", "getDeltaL",
         "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
-        "getE9oE21", "getClusterHadronIntensity", "getNumberOfHadronDigits",
+        "getE9oE21", "getPulseShapeDiscriminationMVA", "getNumberOfHadronDigits",
         "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
         "getDeltaTime99", "getPhi", "getTheta", "getR", "getEnergy",
         "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",

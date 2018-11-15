@@ -100,7 +100,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for svd only
-add_svd_simulation(main, createDigits=True)
+add_svd_simulation(main)
 
 main.add_module(progress)
 

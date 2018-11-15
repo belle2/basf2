@@ -43,7 +43,7 @@ if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2JPsiKs_JPsi2mumu.r
     b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
 
 # create path
-my_path = ma.analysis_main
+my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',

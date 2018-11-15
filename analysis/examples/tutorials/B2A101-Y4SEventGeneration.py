@@ -34,7 +34,7 @@ from ROOT import Belle2
 #
 
 # Defining custom path
-my_path = ma.analysis_main
+my_path = b2.create_path()
 
 # Setting up number of events to generate
 ma.setupEventInfo(noEvents=100, path=my_path)

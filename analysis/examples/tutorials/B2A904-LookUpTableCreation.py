@@ -128,7 +128,7 @@ eventinfosetter.param('evtNumList', [10])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('expList', [0])
 
-my_path = ma.analysis_main
+my_path = b2.create_path()
 my_path.add_module(addtable)
 my_path.add_module(addtable2)
 my_path.add_module(eventinfosetter)

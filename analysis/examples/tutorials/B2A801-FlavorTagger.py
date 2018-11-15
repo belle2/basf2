@@ -37,17 +37,12 @@ b2.B2FATAL("Input files for this tuttorial do not exist. \
     We are working on producing them.\
     Pleae feel free to use code snippets in a meanwhile.")
 
-# check if the required input file exists
-import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2JPsiKs_JPsi2mumu.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
-
 # create path
 my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename='$BELLE2_EXAMPLES_DATA/B2JPsiKs_JPsi2mumu.root',
+             filename=b2.find_file('B2JPsiKs_JPsi2mumu.root', 'examples', False),
              path=my_path)
 
 # use standard final state particle lists

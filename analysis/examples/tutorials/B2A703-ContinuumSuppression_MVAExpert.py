@@ -29,12 +29,12 @@ if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
     sys.exit("usage:\n\tbasf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>")
 
 import os
-if not os.getenv('BELLE2_EXAMPLES_DATA'):
-    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
+if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
 step = str(sys.argv[1])
 
-path = '$BELLE2_EXAMPLES_DATA/mva/'
+path = '$BELLE2_EXAMPLES_DATA_DIR/mva/'
 input_file = ''
 
 if step == 'signal':

@@ -39,20 +39,13 @@ import variableCollectionsTools as vct
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 
-# check if the required input file exists
-import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/B2pi0D_D2hh_D2hhh_B2munu.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/ccbar_background.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
-
 # create path
 my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdstList(environmentType='default',
-                 filelist=['$BELLE2_EXAMPLES_DATA/B2pi0D_D2hh_D2hhh_B2munu.root',
-                           '$BELLE2_EXAMPLES_DATA/ccbar_background.root'],
+                 filelist=[b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+                           b2.find_file('ccbar_background.root', 'examples', False)],
                  path=my_path)
 
 # Apply a selection at the event level, to avoid

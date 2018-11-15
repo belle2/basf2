@@ -27,17 +27,12 @@ import modularAnalysis as ma
 import variableCollections as vc
 import variableCollectionsTools as vct
 
-# check if the required input file exists
-import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/JPsi2ee_e2egamma.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
-
 # create path
 my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename='$BELLE2_EXAMPLES_DATA/JPsi2ee_e2egamma.root',
+             filename=b2.find_file('JPsi2ee_e2egamma.root', 'examples', False),
              path=my_path)
 
 # reconstruct the decay

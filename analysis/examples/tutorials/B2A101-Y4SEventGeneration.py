@@ -25,7 +25,6 @@
 import basf2 as b2
 import generators as ge
 import modularAnalysis as ma
-from ROOT import Belle2
 
 # generation of 100 events according to the specified DECAY table
 # Y(4S) -> Btag- Bsig+
@@ -42,7 +41,7 @@ ma.setupEventInfo(noEvents=100, path=my_path)
 # Adding genberator
 ge.add_evtgen_generator(path=my_path,
                         finalstate='signal',
-                        signaldecfile=Belle2.FileSystem.findFile(
+                        signaldecfile=b2.find_file(
                             'analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,

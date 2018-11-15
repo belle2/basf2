@@ -25,18 +25,12 @@ import stdCharged as stdc
 from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 
-
-# check if the required input file exists
-import os
-if not os.path.isfile(os.getenv('BELLE2_EXAMPLES_DATA') + '/Dst2D0pi.root'):
-    b2.B2FATAL("You need the example data installed. Run `b2mount-tutorial-cloud` in terminal for it.")
-
 # create path
 my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename='$BELLE2_EXAMPLES_DATA/Dst2D0pi.root',
+             filename=b2.find_file('Dst2D0pi.root', 'examples', False),
              path=my_path)
 
 

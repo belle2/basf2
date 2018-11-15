@@ -91,28 +91,28 @@ from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
 
 
 # Systematics skim
-from skim.systematics import *
-add_skim('Systematics', SystematicsList())
+from skim.systematics import SystematicsList
+add_skim('Systematics', SystematicsList(analysis_main))
 
 # Systematics Lambda Skim
-from skim.systematics import *
-add_skim('SystematicsLambda', SystematicsLambdaList())
+from skim.systematics import SystematicsLambdaList
+add_skim('SystematicsLambda', SystematicsLambdaList(analysis_main))
 
 # Systematics Tracking
-from skim.systematics import *
-add_skim('SystematicsTracking', SystematicsTrackingList())
+from skim.systematics import SystematicsTrackingList
+add_skim('SystematicsTracking', SystematicsTrackingList(analysis_main))
 
 # Resonan ce
-from skim.systematics import *
-add_skim('Resonance', ResonanceList())
+from skim.systematics import ResonanceList
+add_skim('Resonance', ResonanceList(analysis_main))
 
 # Systematics Rad mu mu
-from skim.systematics import *
-add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
-#
+from skim.systematics import SystematicsRadMuMuList
+add_skim('SystematicsRadMuMu', SystematicsRadMuMuList(analysis_main))
+
 # Systematics Rad mu mu
-from skim.systematics import *
-add_skim('SystematicsRadEE', SystematicsRadEEList())
+from skim.systematics import SystematicsRadEEList
+add_skim('SystematicsRadEE', SystematicsRadEEList(analysis_main))
 
 
 from skim.btocharm import BsigToDhTohhList, loadD0bar

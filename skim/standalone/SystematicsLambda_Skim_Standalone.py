@@ -21,17 +21,19 @@ import sys
 import os
 import glob
 
+skimpath = Path()
+
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
 
-inputMdstList('MC9', fileList)
-loadStdCharged()
+inputMdstList('MC9', fileList, path=skimpath)
+loadStdCharged(path=skimpath)
 
 from skim.systematics import *
-SysList = SystematicsLambdaList()
+SysList = SystematicsLambdaList(path=skimpath)
 
 skimCode = encodeSkimName('SystematicsLambda')
 
@@ -39,17 +41,17 @@ argc = len(sys.argv)
 argvs = sys.argv
 
 if 'Validation' in sys.argv and len(sys.argv) > 2:
-    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)
+    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList, path=skimpath)
 else:
-    skimOutputUdst(skimCode, SysList)
+    skimOutputUdst(skimCode, SysList, path=skimpath)
 
-summaryOfLists(SysList)
+summaryOfLists(SysList, path=skimpath)
 
 if 'Validation' in sys.argv:
     if argc > 2:
-        ntupleFile('Validation_%s_%s.root' % (skimCode, (argvs[argvs.index('Validation') + 1])))
+        ntupleFile('Validation_%s_%s.root' % (skimCode, (argvs[argvs.index('Validation') + 1])), path=skimpath)
     else:
-        ntupleFile('Validation_%s.root' % (skimCode))
+        ntupleFile('Validation_%s.root' % (skimCode), path=skimpath)
 
     toolsdstar = ['EventMetaData', '^Lambda0 -> p+ pi-']
     toolsdstar += ['InvMass', '^Lambda0 -> p+ pi-']
@@ -58,10 +60,10 @@ if 'Validation' in sys.argv:
     toolsdstar += ['Vertex', '^Lambda0 -> p+ pi-']
     toolsdstar += ['MCTruth', '^Lambda0 -> p+ pi-']
     toolsdstar += ['CMSKinematics', '^Lambda0 -> p+ pi-']
-    ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar)
+    ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar, path=skimpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=skimpath)
+process(skimpath)
 
 print(statistics)

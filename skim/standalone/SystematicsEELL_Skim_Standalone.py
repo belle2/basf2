@@ -23,6 +23,7 @@ import sys
 import os
 import glob
 
+skimpath = Path()
 
 fileList = [
         '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
@@ -30,16 +31,15 @@ fileList = [
     ]
 
 
-inputMdstList('MC9', fileList)
-
-loadStdCharged()
+inputMdstList('MC9', fileList, path=skimpath)
+loadStdCharged(path=skimpath)
 
 from skim.systematics import *
-SysList = EELLList()
-skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+SysList = EELLList(skimpath)
+skimOutputUdst(skimCode, SysList, path=skimpath)
+summaryOfLists(SysList, path=skimpath)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=skimpath)
+process(skimpath)
 
 print(statistics)

@@ -23,9 +23,9 @@ import os
 import glob
 
 fileList = [
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
-    ]
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
+]
 
 
 inputMdstList('MC9', fileList)

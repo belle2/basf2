@@ -68,5 +68,6 @@ use_central_database("development")
 use_local_database("localdb/database.txt")
 
 process(main)
+# process(main, max_event=10) # For quicker studies where statistics aren't as important
 
 print(statistics)

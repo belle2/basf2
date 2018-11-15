@@ -23,7 +23,7 @@ from stdCharm import *
 from stdLightMesons import *
 from stdDiLeptons import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 from skimExpertFunctions import *
 fileList = [
@@ -49,28 +49,28 @@ def add_skim(label, lists):
 
 
 # Systematics skim
-from Systematics_List import *
+from skim.systematics import *
 add_skim('Systematics', SystematicsList())
 
 # Systematics Lambda Skim
-from SystematicsLambda_List import *
+from skim.systematics import *
 add_skim('SystematicsLambda', SystematicsLambdaList())
 
 # Systematics Tracking
-from SystematicsTracking_List import *
+from skim.systematics import *
 add_skim('SystematicsTracking', SystematicsTrackingList())
 
 # Resonan ce
-from Resonance_List import *
+from skim.systematics import *
 add_skim('Resonance', ResonanceList())
 
 # Systematics Rad mu mu
-from SystematicsRadMuMu_List import *
+from skim.systematics import *
 add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
 
 # Systematics Rad mu mu
-from SystematicsRadEE_List import *
-add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
+from skim.systematics import *
+add_skim('SystematicsRadEE', SystematicsRadEEList())
 
 process(analysis_main)
 

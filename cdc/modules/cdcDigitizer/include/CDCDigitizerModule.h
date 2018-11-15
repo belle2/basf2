@@ -21,6 +21,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
@@ -51,16 +52,16 @@ namespace Belle2 {
     CDCDigitizerModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    void initialize();
+    void initialize() override;
 
     /** Actual digitization of all hits in the CDC.
      *
      *  The digitized hits are written into the DataStore.
      */
-    void event();
+    void event() override;
 
     /** Terminate func. */
-    void terminate()
+    void terminate() override
     {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
@@ -146,7 +147,8 @@ namespace Belle2 {
     //    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
     double m_trigTimeJitter;   /**< Magnitude of trigger timing jitter (ns). */
 
-    CDC::CDCGeometryPar* m_cdcgp;  /**< Pointer to CDCGeometryPar */
+    CDC::CDCGeometryPar* m_cdcgp;  /**< Cached Pointer to CDCGeometryPar */
+    CDC::CDCGeoControlPar* m_gcp;  /**< Cached pointer to CDCGeoControlPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
     WireID m_wireID;            /**< WireID of this hit */
     unsigned short m_posFlag;   /**< left or right flag of this hit */
@@ -164,6 +166,8 @@ namespace Belle2 {
     double m_driftV;            /**< Nominal drift velocity (in cm/ns)*/
     double m_driftVInv;         /**< m_driftV^-1 (in ns/cm)*/
     double m_propSpeedInv;      /**< Inv. of nominal signal propagation speed in a wire (in ns/cm)*/
+    double m_additionalFudgeFactorForSpaceResol; /**< additional fudge factor for space resol. */
+    double m_totalFudgeFactor;  /**< total fudge factor for space resol. */
 
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */

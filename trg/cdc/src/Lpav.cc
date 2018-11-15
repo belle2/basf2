@@ -570,13 +570,13 @@ namespace Belle2 {
 
   void TRGCDCLpav::add(double xi, double yi, double w, double a, double b)
   {
-//register double wi = err_dis_inv(xi, yi, w, a, b);
+//double wi = err_dis_inv(xi, yi, w, a, b);
     double wi = err_dis_inv(xi, yi, w, a, b);
     add(xi, yi, wi);
   }
 
-  void TRGCDCLpav::add_point(register double xi, register double yi,
-                             register double wi)
+  void TRGCDCLpav::add_point(double xi, double yi,
+                             double wi)
   {
     m_wsum += wi;
     m_xsum += wi * xi;
@@ -584,8 +584,8 @@ namespace Belle2 {
     m_xxsum += wi * xi * xi;
     m_yysum += wi * yi * yi;
     m_xysum += wi * xi * yi;
-//register double rri = ( xi * xi + yi * yi );
-//register double wrri = wi * rri;
+//double rri = ( xi * xi + yi * yi );
+//double wrri = wi * rri;
     double rri = (xi * xi + yi * yi);
     double wrri = wi * rri;
     m_xrrsum += wrri * xi;
@@ -596,7 +596,7 @@ namespace Belle2 {
 
   void TRGCDCLpav::add_point_frac(double xi, double yi, double w, double a)
   {
-//register double wi = w * a;
+//double wi = w * a;
     double wi = w * a;
     m_wsum += wi;
     m_xsum += wi * xi;
@@ -604,8 +604,8 @@ namespace Belle2 {
     m_xxsum += wi * xi * xi;
     m_yysum += wi * yi * yi;
     m_xysum += wi * xi * yi;
-//register double rri = ( xi * xi + yi * yi );
-//register double wrri = wi * rri;
+//double rri = ( xi * xi + yi * yi );
+//double wrri = wi * rri;
     double rri = (xi * xi + yi * yi);
     double wrri = wi * rri;
     m_xrrsum += wrri * xi;
@@ -616,7 +616,7 @@ namespace Belle2 {
 
   void TRGCDCLpav::sub(double xi, double yi, double w, double a, double b)
   {
-//register double wi = err_dis_inv(xi, yi, w, a, b);
+//double wi = err_dis_inv(xi, yi, w, a, b);
     double wi = err_dis_inv(xi, yi, w, a, b);
     m_wsum -= wi;
     m_xsum -= wi * xi;
@@ -624,8 +624,8 @@ namespace Belle2 {
     m_xxsum -= wi * xi * xi;
     m_yysum -= wi * yi * yi;
     m_xysum -= wi * xi * yi;
-//register double rri = ( xi * xi + yi * yi );
-//register double wrri = wi * rri;
+//double rri = ( xi * xi + yi * yi );
+//double wrri = wi * rri;
     double rri = (xi * xi + yi * yi);
     double wrri = wi * rri;
     m_xrrsum -= wrri * xi;

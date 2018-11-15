@@ -63,9 +63,9 @@ namespace Belle2 {
     std::map<VxdID, TCanvas*> m_cEffModules;
 
     //! One bin for each module in the geometry
-    TH1D* m_hEffAll;
+    TH1D* m_hEffAll = nullptr;
     //! Final Canvas
-    TCanvas* m_cEffAll;
+    TCanvas* m_cEffAll = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

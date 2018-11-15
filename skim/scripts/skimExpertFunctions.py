@@ -14,7 +14,7 @@ from analysisPath import *
 from modularAnalysis import *
 
 # For channels in fei skim
-from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
+# from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 
 
 _skimNameMatching = [
@@ -54,7 +54,7 @@ _skimNameMatching = [
     ('10600500', 'SystematicsRadMuMu'),
     ('10600600', 'SystematicsEELL'),
     ('10600700', 'SystematicsRadEE'),
-    ('18360100', 'Tau'),
+    ('18360100', 'TauLFV'),
     ('13160100', 'TCPV'),
     ('18020100', 'SinglePhotonDark'),
     ('18020300', 'ALP3Gamma'),
@@ -91,6 +91,20 @@ def setSkimLogging(skim_path=analysis_main, additional_modules=[]):
         if module.type() in noisy_modules:
             module.set_log_level(LogLevel.ERROR)
     return
+
+
+def ifEventPasses(cut, conditional_path, path=analysis_main):
+    """
+    If the event passes the given ``cut`` proceed to process everything in ``conditional_path``.
+    Afterwards return here and continue processing with the next module.
+
+    Arguments:
+        cut (str): selection criteria which needs to be fulfilled in order to continue with ``conditional_path``
+        conditional_path (basf2.Path): path to execute if the event fulfills the criteria ``cut``
+        path (basf2.Path): modules are added to this path
+    """
+    eselect = path.add_module("VariableToReturnValue", variable=f"passesEventCut({cut})")
+    eselect.if_value('>=1', conditional_path, AfterConditionPath.CONTINUE)
 
 
 def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,

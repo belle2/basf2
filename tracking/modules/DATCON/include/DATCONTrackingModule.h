@@ -71,11 +71,11 @@ namespace Belle2 {
     virtual ~DATCONTrackingModule() = default;
 
     /** Initialize the module and check module parameters */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Run tracking */
-    virtual void event();
+    virtual void event() override;
     /** Terminate the module */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Add module parameter, put in separate function to have the Constructor clean and readable */
     void addParameter();

@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef VERTEXFITKFIT_H
-#define VERTEXFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -78,7 +75,7 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const CLHEP::HepSymMatrix          getVertexError(void) const;
-      double                      getCHIsq(void) const;
+      double                      getCHIsq(void) const override;
       /** Get a chi-square of the fit excluding IP-constraint part.
        * @return chi-square of the fit excluding IP-constraint part.
        */
@@ -89,7 +86,7 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const CLHEP::HepMatrix             getTrackVertexError(const int id) const;
-      double                      getTrackCHIsq(const int id) const;
+      double                      getTrackCHIsq(const int id) const override;
       /** Get a sum of the chi-square associated to the input tracks.
        *  The return value should be the same as the one from getCHIsqVertex().
        * @return sum of the chi-square associated to the input tracks
@@ -124,11 +121,11 @@ namespace Belle2 {
 
 
     private:
-      enum KFitError::ECode prepareInputMatrix(void);
-      enum KFitError::ECode prepareInputSubMatrix(void);
-      enum KFitError::ECode prepareOutputMatrix(void);
-      enum KFitError::ECode makeCoreMatrix(void);
-      enum KFitError::ECode calculateNDF(void);
+      enum KFitError::ECode prepareInputMatrix(void) override;
+      enum KFitError::ECode prepareInputSubMatrix(void) override;
+      enum KFitError::ECode prepareOutputMatrix(void) override;
+      enum KFitError::ECode makeCoreMatrix(void) override;
+      enum KFitError::ECode calculateNDF(void) override;
 
 
     private:
@@ -179,6 +176,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* VERTEXFITKFIT_H */
-

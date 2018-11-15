@@ -24,10 +24,10 @@ namespace Belle2 {
     virtual ~CDCTrigger3DFitterModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Run the 3D fitter for an event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Select stereo hits.

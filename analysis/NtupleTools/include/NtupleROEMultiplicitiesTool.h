@@ -35,14 +35,14 @@ namespace Belle2 {
     int* m_nKLMClusters; /**< Number of remaining KLM clusters. */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
 
   public:
     /** Constuctor. */
     NtupleROEMultiplicitiesTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
 
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMELECTRONICSMAP_H
-#define EKLMELECTRONICSMAP_H
+#pragma once
 
 /* C++ headers. */
 #include <map>
@@ -42,14 +41,14 @@ namespace Belle2 {
     /**
      * Get global sector number by lane identifier.
      * @param[in] lane Lane identifier.
-     * @return Sector number, NULL if not found.
+     * @return Sector number, nullptr if not found.
      */
     const int* getSectorByLane(EKLMDataConcentratorLane* lane) const;
 
     /**
      * Get lane identifier by global sector number.
      * @param[in] sector Global sector number.
-     * @return Lane identifier, NULL if not found.
+     * @return Lane identifier, nullptr if not found.
      */
     const EKLMDataConcentratorLane* getLaneBySector(int sector) const;
 
@@ -73,12 +72,9 @@ namespace Belle2 {
     /** Lane - sector map. */
     std::map<EKLMDataConcentratorLane, int> m_MapLaneSector;
 
-    /** Needed to make objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMElectronicsMap, 1);
 
   };
 
 }
-
-#endif
-

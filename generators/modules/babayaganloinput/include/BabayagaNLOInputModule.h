@@ -46,13 +46,13 @@ namespace Belle2 {
     virtual ~BabayagaNLOInputModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Method is called at the end of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Static method to get a random CMS energy (used via extern C from fortran). */
     static double generateCMSEnergy()

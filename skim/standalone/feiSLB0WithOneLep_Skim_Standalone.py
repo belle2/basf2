@@ -4,7 +4,7 @@
 """FEI Semi-leptonic B0 tag skim standalone for generic analysis in the
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180300
-    fei training: MC9 based, release-02-00-00 'FEIv4_2018_MC9_release_02_00_00'
+    fei training: MC9 based, release-02-00-01 'FEIv4_2018_MC9_release_02_00_01'
     """
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling"]
@@ -29,35 +29,25 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-inputMdstList('MC9', fileList)
+path = create_path()
 
-applyEventCuts('R2EventLevel<0.4 and nTracks>=4')
+inputMdstList('MC9', fileList, path=path)
 
-# Run FEI
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+from skim.fei import *
+# run pre-selection cuts and FEI
+runFEIforB0SLWithOneLep(path)
 
-import fei
-particles = fei.get_default_channels(neutralB=True, chargedB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
-feistate = fei.get_path(particles, configuration)
-analysis_main.add_path(feistate.path)
+# Include MC matching
+path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
-# analysis_main.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
-
-# now the FEI reconstruction is done
-# and we're back in analysis_main pathB
-
-# SL B0 skim
-from skim.fei import B0SLWithOneLep
-BtagList = B0SLWithOneLep()
-skimOutputUdst(skimCode, BtagList)
-summaryOfLists(BtagList)
+# Apply final  B0 tag cuts
+BtagList = B0SLWithOneLep(path)
+skimOutputUdst(skimCode, BtagList, path=path)
+summaryOfLists(BtagList, path=path)
 
 # Suppress noisy modules, and then process
 setSkimLogging()
-process(analysis_main)
+process(path)
 
 # print out the summary
 print(statistics)

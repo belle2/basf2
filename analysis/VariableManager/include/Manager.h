@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck, Christian Pulvermacher                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #pragma once
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -105,28 +114,32 @@ namespace Belle2 {
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
         /** ctor */
-        VarBase(std::string n, std::string d, std::string g) : name(n), description(d), group(g) { }
+        VarBase(const std::string& n, const std::string& d, const std::string& g)
+          : name(n), description(d), group(g) { }
       };
 
       /** A variable returning a floating-point value for a given Particle. */
       struct Var : public VarBase {
         FunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
+        Var(const std::string& n, FunctionPtr f, const std::string& d, const std::string& g = "")
+          : VarBase(n, d, g), function(f) { }
       };
 
       /** A variable taking additional floating-point arguments to influence the behaviour. */
       struct ParameterVar : public VarBase {
         ParameterFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
+        ParameterVar(const std::string& n, ParameterFunctionPtr f, const std::string& d, const std::string& g = "")
+          : VarBase(n, d, g), function(f) { }
       };
 
       /** A variable taking string arguments returning a variable. */
       struct MetaVar : public VarBase {
         MetaFunctionPtr function; /**< Pointer to function. */
         /** ctor */
-        MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : VarBase(n, d, g), function(f) { }
+        MetaVar(const std::string& n, MetaFunctionPtr f, const std::string& d, const std::string& g = "")
+          : VarBase(n, d, g), function(f) { }
       };
 
       /** get singleton instance. */

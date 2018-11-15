@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Shebalin Vasily                                          *
+ * Contributors: Shebalin Vasily, Mikhail Remnev                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,15 +26,15 @@ namespace Belle2 {
     virtual ~ECLUnpackerModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
     /** beginRun */
-    virtual void beginRun();
+    virtual void beginRun() override;
     /** event */
-    virtual void event();
+    virtual void event() override;
     /** endRun */
-    virtual void endRun();
+    virtual void endRun() override;
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** exeption should be thrown when the unexpected      */
     BELLE2_DEFINE_EXCEPTION(Unexpected_end_of_FINESSE_buffer,

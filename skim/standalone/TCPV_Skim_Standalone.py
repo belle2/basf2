@@ -45,7 +45,7 @@ from stdV0s import *
 from stdLightMesons import *
 from stdDiLeptons import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 
 
@@ -53,6 +53,7 @@ import sys
 import os
 import glob
 skimCode = encodeSkimName('TCPV')
+
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -72,7 +73,7 @@ loadStdDiLeptons(True)
 loadStdLightMesons()
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
 # TCPV Skim
-from TCPV_List import *
+from skim.tcpv import *
 tcpvList = TCPVList()
 skimOutputUdst(skimCode, tcpvList)
 summaryOfLists(tcpvList)

@@ -16,6 +16,9 @@ namespace Belle2 {
   class EventLevelClusteringInfo : public TObject {
   public:
 
+    /** default constructor */
+    EventLevelClusteringInfo() = default;
+
     /** Getter for the number of ECLCalDigits that are out of time and above some MeV (scale ~linearly with background), FWD only. */
     uint16_t getNECLCalDigitsOutOfTimeFWD() const
     {

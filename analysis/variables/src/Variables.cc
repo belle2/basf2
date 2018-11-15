@@ -18,6 +18,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/utility/MCMatching.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -674,6 +675,42 @@ namespace Belle2 {
       return b2blab.Vect().Phi();
     }
 
+    double b2bClusterTheta(const Particle* part)
+    {
+      // get associated ECLCluster
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      // get 4 momentum from cluster
+      ClusterUtils clutls;
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+      // find the vector that balances this in the CMS
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Theta();
+    }
+
+    double b2bClusterPhi(const Particle* part)
+    {
+      // get associated ECLCluster
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      // get 4 momentum from cluster
+      ClusterUtils clutls;
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+      // find the vector that balances this in the CMS
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Phi();
+    }
+
 
 // released energy --------------------------------------------------
 
@@ -779,39 +816,6 @@ namespace Belle2 {
       return 0.0;
     }
 
-    double mcParticleSecondaryPhysicsProcess(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        return mcp->getSecondaryPhysicsProcess();
-      } else {
-        return -1;
-      }
-    }
-
-    double mcParticleStatus(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        return mcp->getStatus();
-      } else {
-        return -1;
-      }
-    }
-
-    double particleMCPrimaryParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_PrimaryParticle;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
 
     double particleMCMomentumTransfer2(const Particle* part)
     {
@@ -1245,6 +1249,10 @@ namespace Belle2 {
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
                       "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
@@ -1269,13 +1277,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
-    REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
-                      "Returns the secondary physics process flag.");
-    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
-                      "Returns status bits of related MCParticle or - 1 if MCParticle relation is not set.");
-    REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
-                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle,"
-                      "-1 if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
                       "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.");
     REGISTER_VARIABLE("False", False,

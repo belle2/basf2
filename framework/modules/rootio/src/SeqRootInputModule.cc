@@ -31,14 +31,11 @@ REG_MODULE(SeqRootInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size(0), m_size2(0)
+SeqRootInputModule::SeqRootInputModule() : Module()
 {
   //Set module properties
   setDescription("Read .sroot files produced by SeqRootOutput.");
   setPropertyFlags(c_Input);
-
-  m_file = 0;
-  m_nevt = -1;
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName,
@@ -74,8 +71,9 @@ void SeqRootInputModule::initialize()
   } else if (m_filelist.size() > 0) {
     m_nfile = m_filelist.size();
     m_inputFileName = m_filelist[0];
-  } else
+  } else {
     m_nfile = 1;
+  }
 
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer();
@@ -137,9 +135,10 @@ void SeqRootInputModule::beginRun()
 
 void SeqRootInputModule::event()
 {
-  m_nevt++;
-  // First event is already loaded
-  if (m_nevt == 0) return;
+  // on first call: first event is already loaded. This is actually called once
+  // before the first beginRun() since we are the module setting the EventInfo
+  // so don't get confused by the m_nevt=0 in beginRun()
+  if (++m_nevt == 0) return;
 
   // Get a SeqRoot record from the file
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];

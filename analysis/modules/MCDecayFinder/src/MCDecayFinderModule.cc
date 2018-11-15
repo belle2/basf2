@@ -26,7 +26,7 @@ using namespace Belle2;
 // Register module in the framework
 REG_MODULE(MCDecayFinder)
 
-MCDecayFinderModule::MCDecayFinderModule() : Module()
+MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticle(false)
 {
   //Set module properties
   setDescription("Find decays in MCParticle list matching a given DecayString and create Particles from them.");

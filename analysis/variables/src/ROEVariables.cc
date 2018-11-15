@@ -148,15 +148,12 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
         return 0.0;
-      std::vector<const Track*> roeTracks = roe->getTracks(maskName);
       int n_roe_tracks = roe->getNTracks(maskName);
       int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
-        int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212) {
-          if (std::find(roeTracks.begin(), roeTracks.end(), daughter->getTrack()) != roeTracks.end())
-            n_par_tracks++;
+        if (daughter->getParticleType() == Particle::EParticleType::c_Track && roe->hasParticle(daughter, maskName)) {
+          n_par_tracks++;
         }
       }
       return n_roe_tracks - n_par_tracks;
@@ -203,7 +200,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -216,7 +213,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -229,7 +226,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -242,7 +239,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -255,7 +252,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -268,7 +265,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -323,12 +320,13 @@ namespace Belle2 {
         std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
         // Add tracks in ROE V0 list, if they exist
-        std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
+        //TODO: replace this!
+        /*std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
         for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
         {
           roeTracks.push_back(particles[v0List[iV0]]->getDaughter(0)->getTrack());
           roeTracks.push_back(particles[v0List[iV0]]->getDaughter(1)->getTrack());
-        }
+        }*/
 
         // Load ROE ECLClusters
         std::vector<const ECLCluster*> roeECL = roe->getECLClusters(maskName);
@@ -543,13 +541,12 @@ namespace Belle2 {
         }
 
         // Get tracks in ROE
-        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
+        auto roeParticles = roe->getParticles(maskName);
         int roeCharge = 0;
 
-        for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
+        for (auto* roeParticle : roeParticles)
         {
-          auto closestMassTrackFitResult = roeTracks[iTrack]->getTrackFitResultWithClosestMass(Const::pion);
-          roeCharge += closestMassTrackFitResult->getChargeSign();
+          roeCharge += roeParticle->getCharge();
         }
 
         return roeCharge;
@@ -935,7 +932,6 @@ namespace Belle2 {
 
         PCmsLabTransform T;
         TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
-
         return vec.E() - T.getCMSEnergy() / 2;
       };
       return func;
@@ -1698,7 +1694,13 @@ namespace Belle2 {
 
         if (maskName == "")
           return 1.0;
-        else {
+        //TODO: test this or replace
+        if (roe->hasParticle(particle, maskName))
+        {
+          return 1.0;
+        }
+
+        /*else {
           if (particle->getParticleType() == Particle::c_Track)
           {
             const Track* track = particle->getTrack();
@@ -1709,7 +1711,7 @@ namespace Belle2 {
             if (it == trackMask.end())
               B2ERROR("Something is wrong, track not found in map of ROE tracks!");
             else
-              result = trackMask[track->getArrayIndex()];
+              result = double(trackMask[track->getArrayIndex()]);
           } else if (particle->getParticleType() == Particle::c_ECLCluster)
           {
             const ECLCluster* ecl = particle->getECLCluster();
@@ -1720,10 +1722,10 @@ namespace Belle2 {
             if (it == eclClusterMask.end())
               B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
             else
-              result = eclClusterMask[ecl->getArrayIndex()];
+              result = double(eclClusterMask[ecl->getArrayIndex()]);
           } else
             B2ERROR("Particle used is not an ECLCluster or Track type particle!");
-        }
+        }*/
         return result;
       };
       return func;
@@ -1891,30 +1893,12 @@ namespace Belle2 {
       if (particle->getParticleType() == Particle::c_Composite) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
         for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isInThisRestOfEvent(fspDaug[i], roe) == 0)
+          if (isInThisRestOfEvent(fspDaug[i], roe, maskName) == 0)
             return 0;
         }
         return 1.0;
-      } else {
-        // Check for Tracks
-        const auto& tracks = roe->getTracks(maskName);
-        if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
-          return 1.0;
-        }
-
-        // Check for KLMClusters
-        const auto& klm = roe->getKLMClusters();
-        if (std::find(klm.begin(), klm.end(), particle->getKLMCluster()) != klm.end()) {
-          return 1.0;
-        }
-
-        // Check for ECLClusters
-        const auto& ecl = roe->getECLClusters(maskName);
-        if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
-          return 1.0;
-        }
       }
-      return 0;
+      return roe->hasParticle(particle, maskName);
     }
 
 

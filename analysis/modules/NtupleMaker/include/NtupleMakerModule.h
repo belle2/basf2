@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEDUMPERMODULE_H
-#define NTUPLEDUMPERMODULE_H
+#pragma once
 #include <framework/core/Module.h>
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -85,4 +84,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // NTUPLEDUMPERMODULE_H

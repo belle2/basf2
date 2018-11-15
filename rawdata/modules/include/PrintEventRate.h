@@ -51,13 +51,13 @@ namespace Belle2 {
     virtual ~PrintEventRateModule();
 
     //! Module function to be called from event process
-    virtual void event();
+    virtual void event() override;
 
     //! Module function to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module function to be called after main process
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! print an event
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);

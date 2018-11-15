@@ -23,11 +23,11 @@ namespace Belle2 {
     ProgressBarModule();
 
     /** Init the module */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Show progress */
-    virtual void event();
+    virtual void event() override;
     /** Don't break the terminal */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
     /** Number of processed events. */

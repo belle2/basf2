@@ -67,7 +67,11 @@ namespace Belle2 {
       /// Getter for current iteration
       int getIteration() const {return m_iteration;}
       /// Setter for current iteration
-      void setIteration(int iteration) {m_iteration = iteration;}
+      void setIteration(int iteration)
+      {
+        B2DEBUG(29, "Setting Iteration of Algorithm to " << iteration);
+        m_iteration = iteration;
+      }
       /// Getter for current result
       EResult getResult() const {return m_result;}
       /// Setter for current iteration
@@ -253,6 +257,9 @@ namespace Belle2 {
 
     /// Store DB payload with given name and custom IOV
     void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
+
+    /// Updates any DBObjPtrs by calling update(event) for DBStore
+    void updateDBObjPtrs(const unsigned int event, const int run, const int experiment);
 
     // -----------------------------------------------
 

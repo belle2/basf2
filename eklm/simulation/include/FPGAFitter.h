@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FPGAFITTER_H
-#define FPGAFITTER_H
+#pragma once
 
 #include <eklm/dataobjects/EKLMFPGAFit.h>
 
@@ -60,6 +59,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

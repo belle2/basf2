@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Martin Ritter                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <type_traits>
 #include <boost/lexical_cast.hpp>
 
 /**
@@ -29,7 +30,7 @@ public:
    *          convert to a string.
    */
   template<class TVarType>
-  LogVar(std::string name, TVarType v) :
+  LogVar(const std::string& name, const TVarType& v) :
     m_name(name),
     m_value(boost::lexical_cast<std::string>(v))
   {
@@ -57,16 +58,6 @@ public:
   bool operator==(const LogVar& lv) const
   {
     return (lv.m_name == this->m_name) && (lv.m_value == this->m_value);
-  }
-
-  /**
-   * Custom assignment operator
-   */
-  LogVar& operator=(const LogVar& lvs)
-  {
-    this->m_name = lvs.m_name;
-    this->m_value = lvs.m_value;
-    return *this;
   }
 
 private:
@@ -149,13 +140,25 @@ public:
   }
 
   /**
-   * Catch-all operator which will forward all other
-   * input types to the internal stringstream object
+   * Templated operator which will be used for all non-fundamental types. This types can be accepted via
+   * const& and need no copy.
    */
   template<class TText>
-  LogVariableStream& operator<<(TText const& text)
+  typename std::enable_if<not std::is_fundamental<TText>::value, LogVariableStream&>::type operator<<(TText const& text)
   {
-    m_stringStream << text;
+    this->m_stringStream << text;
+    return *this;
+  }
+
+  /**
+   * Templated operator which will be used for POD types (especially integers) and uses by-value. For cases where constants are
+   * declared "static const int Name = 23;" in header files but the .cc file contains no definition. In these cases, by-ref
+   * cannot be used because no memory location exists to get the reference.
+   */
+  template<class PODTYPE>
+  typename std::enable_if<std::is_fundamental<PODTYPE>::value, LogVariableStream&>::type operator<<(PODTYPE pod)
+  {
+    this->m_stringStream << pod;
     return *this;
   }
 
@@ -197,6 +200,18 @@ public:
       s << std::endl << "\t" << v.getName() << " = " << v.getValue();
     }
     return s.str();
+  }
+
+  /** Return the constant message part without the variables */
+  std::string getMessage() const
+  {
+    return m_stringStream.str();
+  }
+
+  /** Return the list of all defined variables */
+  const std::vector<LogVar>& getVariables() const
+  {
+    return m_variables;
   }
 
 private:

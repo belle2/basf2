@@ -90,8 +90,8 @@ namespace TreeFitter {
   {
     std::vector<ParticleBase*>::iterator iter = std::find(m_daughters.begin(), m_daughters.end(), pb);
     if (iter != m_daughters.end()) {
-      m_daughters.erase(iter);
       delete *iter;
+      m_daughters.erase(iter);
     } else {
       B2ERROR("Cannot remove particle, because not found ...");
     }
@@ -109,8 +109,8 @@ namespace TreeFitter {
   ParticleBase* ParticleBase::createOrigin(
     Belle2::Particle* daughter,
     bool forceFitAll,
-    const std::vector<double> customOriginVertex,
-    const std::vector<double> customOriginCovariance,
+    const std::vector<double>& customOriginVertex,
+    const std::vector<double>& customOriginCovariance,
     const bool isBeamSpot
   )
   {
@@ -122,7 +122,7 @@ namespace TreeFitter {
     ParticleBase* rc = 0;
     const int pdgcode = particle->getPDGCode();
 
-    bool validfit  = false;
+    bool validfit  = false; // ? SC
 
     if (Belle2::Const::ParticleType(pdgcode) == Belle2::Const::pi0 && validfit) {
       B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.");
@@ -299,11 +299,11 @@ namespace TreeFitter {
     return rc;
   }
 
-  void ParticleBase::retrieveIndexMap(indexmap& indexmap) const
+  void ParticleBase::retrieveIndexMap(indexmap& map) const
   {
-    indexmap.push_back(std::pair<const ParticleBase*, int>(this, index()));
+    map.push_back(std::pair<const ParticleBase*, int>(this, index()));
     for (auto* daughter : m_daughters) {
-      daughter->retrieveIndexMap(indexmap);
+      daughter->retrieveIndexMap(map);
     }
   }
 
@@ -340,13 +340,11 @@ namespace TreeFitter {
 
     double tau = fitparams.getStateVector()(tauindex);
 
-    double posxmother = 0, posx = 0, momx = 0;
-
     // linear approximation is fine
     for (int row = 0; row < 3; ++row) {
-      posxmother = x_m(row);
-      posx       = x_vec(row);
-      momx       = p_vec(row);
+      double posxmother = x_m(row);
+      double posx       = x_vec(row);
+      double momx       = p_vec(row);
 
       /** the direction of the momentum is very well known from the kinematic constraints
        *  that is why we do not extract the distance as a vector here
@@ -374,7 +372,7 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  void inline setExtraInfo(Belle2::Particle* part, const std::string name, const double value)
+  void inline setExtraInfo(Belle2::Particle* part, const std::string& name, const double value)
   {
     if (part) {
       if (part->hasExtraInfo(name)) {

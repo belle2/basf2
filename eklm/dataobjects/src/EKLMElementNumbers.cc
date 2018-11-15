@@ -51,6 +51,7 @@ bool EKLMElementNumbers::checkLayer(int layer, bool fatalError) const
 bool EKLMElementNumbers::checkDetectorLayer(int endcap, int layer,
                                             bool fatalError) const
 {
+  /* cppcheck-suppress variableScope */
   const char* endcapName[2] = {"backward", "forward"};
   if (layer < 0 || layer > m_MaximalDetectorLayerNumber[endcap - 1]) {
     if (fatalError) {

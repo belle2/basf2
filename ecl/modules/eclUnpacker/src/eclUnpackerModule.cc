@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Shebalin Vasily, Mikhail Remnev                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 //This module
 #include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
@@ -111,7 +120,7 @@ void ECLUnpackerModule::initialize()
     m_eclDigits.registerRelationTo(m_eclTrigs);
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
-  m_eclDsps.registerRelationTo(m_eclDigits);
+  m_eclDigits.registerRelationTo(m_eclDsps);
 
   // make full name of the initialization file
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -312,8 +321,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         // check that trigger phases for all shapers in the crate are equal
         if (triggerPhase0 == -1) triggerPhase0 = triggerPhase;
         else if (triggerPhase != triggerPhase0 && !m_phasesReported) {
-          B2ERROR("Different trigger phases for crate " << iCrate << " :: " << triggerPhase << " != " << triggerPhase0
-                  << " ECL data is corrupted for whole run probably") ;
+          B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
+                  << LogVar("crate", iCrate)
+                  << LogVar("trigger phase1", triggerPhase) << LogVar("trigger phase0", triggerPhase0));
           m_phasesReported = true;
         }
 
@@ -330,8 +340,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
         else if (triggerTag != triggerTag0) {
           if (!m_tagsReported) {
-            B2ERROR("Different trigger tags for crate " << iCrate << " :: " << triggerTag << " != " << triggerTag0
-                    << " ECL data is corrupted for whole run probably") ;
+            B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
+                    << LogVar("crate", iCrate)
+                    << LogVar("trigger tag1", triggerTag) << LogVar("trigger tag0", triggerTag0));
             m_tagsReported = true;
           }
           triggerTag0 |= (1 << 16);
@@ -388,8 +399,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
 
         if (nRead != nActiveDSPChannels) {
-          B2ERROR("Number of active DSP channels and number of read channels don't match (Corrupted data?)" << " nRead = " << nRead <<
-                  " nActiveDSP = " << nActiveDSPChannels);
+          B2ERROR("Number of active DSP channels and number of read channels don't match (Corrupted data?)"
+                  << LogVar("nRead", nRead) << LogVar("nActiveDSP", nActiveDSPChannels));
           // do something (throw an exception etc.) TODO
         }
 
@@ -427,13 +438,18 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             if (eclWaveformSamples.size() != nADCSamplesPerChannel)
               B2ERROR("Wrong number of ADC samples. Actual number of read samples "
-                      << eclWaveformSamples.size() << " != number of samples in header "
-                      << nADCSamplesPerChannel);
+                      " != number of samples in header "
+                      << LogVar("Actual number of read samples", eclWaveformSamples.size())
+                      << LogVar("Number of samples in header", nADCSamplesPerChannel));
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
+              ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
+              // Add relation from ECLDigit to ECLDsp
+              for (auto& newEclDigit : m_eclDigits) {
+                if (newEclDsp->getCellId() == newEclDigit.getCellId()) newEclDigit.addRelationTo(newEclDsp);
+              }
             }
 
           }
@@ -447,8 +463,10 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         }
 
         if (nRead != nActiveChannelsWithADCData) {
-          B2ERROR("Number of channels with ADC data " << nActiveChannelsWithADCData << " and number of read channels " << nRead <<
-                  " don't match (Corrupted data?) ");
+          B2ERROR("Number of channels with ADC data and "
+                  "number of read channels don't match (Corrupted data?)"
+                  << LogVar("active channels", nActiveChannelsWithADCData)
+                  << LogVar("read channels", nRead));
           // do something (throw an exception etc.) TODO
         }
 

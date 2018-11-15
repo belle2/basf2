@@ -29,7 +29,7 @@ class EclLRCalibrator:
         self.__userName = ''
         self.__userId = None
         self.__loginTime = None
-        self.__tmpLastRunFigs = '/tmp/ecl_local_run_shift_last_check.root'
+        self.__tmpLastRunFigs = '/tmp/ecl_localrun_shift_last_check.root'
         self.loadOptions()
         if not os.path.exists(self.__eclClbrLogDB):
             self.__createClbrLogDB__()
@@ -330,6 +330,7 @@ class EclLRCalibrator:
             cmd += ' --withref'
 
         subprocess.call(cmd, shell=True)
+        os.chmod(self.__tmpLastRunFigs, 0o777)
 
     def __loadSingleRunFigs__(self, withref):
         fl = TFile.Open(self.__tmpLastRunFigs, 'read')

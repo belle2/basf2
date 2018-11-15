@@ -205,7 +205,7 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
   }
 
 
-  Frames_in_event = ((ulittle32_t*)data.data())[1];
+  Frames_in_event = ((ubig32_t*)data.data())[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
     if (!(m_suppressErrorMask & EPXDErrMask::c_FRAME_NR))
       B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
@@ -239,7 +239,7 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
   for (int j = 0; j < Frames_in_event; j++) {
     int lo;/// len of frame in bytes
 
-    lo = ((ulittle32_t*)tableptr)[j];
+    lo = ((ubig32_t*)tableptr)[j];
     if (lo <= 0) {
       if (!(m_suppressErrorMask & EPXDErrMask::c_FRAME_SIZE)) B2ERROR("size of frame invalid: " << j << "size " << lo <<
             " at byte offset in dataptr " << ll);

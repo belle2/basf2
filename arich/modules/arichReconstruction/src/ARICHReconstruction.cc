@@ -588,7 +588,7 @@ namespace Belle2 {
           }
         }
         // create ARICHPhoton if desired
-        if (m_storePhot && th_cer_all[0] > 0) {
+        if (m_storePhot && th_cer_all[0] > 0 && th_cer_all[0] < 0.6) {
           double n_cos_theta_ch[c_noOfHypotheses] = {0.0};
           double phi_ch[c_noOfHypotheses] = {0.0};
           for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {

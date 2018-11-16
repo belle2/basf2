@@ -124,9 +124,9 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      ARICHTree(): evt(0), run(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
+      ARICHTree(): evt(0), run(0), charge(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
 #ifdef ALIGNMENT_USING_BHABHA
-        charge(0), eop(0), e9e21(0), etot(0),
+        eop(0), e9e21(0), etot(0),
 #endif
         status(0), primary(0), seen(0), rhoProd(0), zProd(0), phiProd(0), rhoDec(0), zDec(0),
         phiDec(0), scatter(0), nRec(0)
@@ -146,8 +146,9 @@ namespace Belle2 {
         pValue = 0;
         z0 = 0;
         d0 = 0;
-#ifdef ALIGNMENT_USING_BHABHA
         charge = 0;
+
+#ifdef ALIGNMENT_USING_BHABHA
         eop = 0;
         e9e21 = 0;
         etot = 0;

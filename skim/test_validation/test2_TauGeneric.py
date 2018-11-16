@@ -30,7 +30,7 @@ variablesToHistogram(
     decayString='',
     variables=[('nGoodTracks', 7, 1, 8),
                ('nGoodGammas', 15, 0, 15),
-               ('thrustOfEvent', 60, 0.7, 1)],
+               ('thrust', 60, 0.7, 1)],
     variables_2d=[('Theta_miss', 30, 0, 180, 'Pmiss', 30, 0, 6),
                   ('Theta_miss', 30, 0, 180, 'M2miss', 30, -20, 100),
                   ('E_S1', 30, 0, 6, 'MinvS1', 20, 0, 2),

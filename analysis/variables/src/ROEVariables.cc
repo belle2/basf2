@@ -205,8 +205,10 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
-
-      return boostvec.Energy() - mcp->getEnergy();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+      return frameMCRoe4Vector.Energy();
     }
 
     double ROE_MC_P(const Particle* particle)
@@ -218,8 +220,10 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
-
-      return (boostvec.Vect() - mcp->getMomentum()).Mag();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+      return frameMCRoe4Vector.Vect().Mag();
     }
 
     double ROE_MC_Px(const Particle* particle)
@@ -231,8 +235,11 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return boostvec.Vect().X() - mcp->getMomentum().X();
+      return frameMCRoe4Vector.Vect().X();
     }
 
     double ROE_MC_Py(const Particle* particle)
@@ -244,8 +251,11 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return boostvec.Vect().Y() - mcp->getMomentum().Y();
+      return frameMCRoe4Vector.Vect().Y();
     }
 
     double ROE_MC_Pz(const Particle* particle)
@@ -257,9 +267,44 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return boostvec.Vect().Z() - mcp->getMomentum().Z();
+      return frameMCRoe4Vector.Vect().Z();
     }
+    double ROE_MC_Pt(const Particle* particle)
+    {
+      const MCParticle* mcp = particle->getRelated<MCParticle>();
+
+      if (!mcp)
+        return -999;
+
+      PCmsLabTransform T;
+      TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+
+      return frameMCRoe4Vector.Vect().Perp();
+    }
+    double ROE_MC_PTheta(const Particle* particle)
+    {
+      const MCParticle* mcp = particle->getRelated<MCParticle>();
+
+      if (!mcp)
+        return -999;
+
+      PCmsLabTransform T;
+      TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+
+      return frameMCRoe4Vector.Theta();
+    }
+
+
 
     double ROE_MC_M(const Particle* particle)
     {
@@ -1846,22 +1891,28 @@ namespace Belle2 {
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("ROE_MC_E", ROE_MC_E,
-                      "Returns true energy of unused tracks and clusters in ROE");
+                      "Returns true energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_M", ROE_MC_M,
                       "Returns true invariant mass of unused tracks and clusters in ROE");
 
     REGISTER_VARIABLE("ROE_MC_P", ROE_MC_P,
-                      "Returns true momentum of unused tracks and clusters in ROE");
+                      "Returns true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE");
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE");
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE");
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+
+    REGISTER_VARIABLE("ROE_MC_Pt", ROE_MC_Pt,
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+
+    REGISTER_VARIABLE("ROE_MC_PTheta", ROE_MC_PTheta,
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_MissFlags(maskName)", ROE_MC_MissingFlags,
                       "Returns flags corresponding to missing particles on ROE side.");

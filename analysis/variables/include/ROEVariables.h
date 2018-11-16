@@ -88,6 +88,16 @@ namespace Belle2 {
     double ROE_MC_Pz(const Particle* particle);
 
     /**
+     * Returns true transverse momentum of unused tracks and clusters in ROE
+     */
+    double ROE_MC_Pt(const Particle* particle);
+
+    /**
+     * Returns true polar angle of momentum of unused tracks and clusters in ROE
+     */
+    double ROE_MC_PTheta(const Particle* particle);
+
+    /**
      * Returns flags corresponding to missing particles on ROE side.
      */
     Manager::FunctionPtr ROE_MC_MissingFlags(const std::vector<std::string>& arguments);

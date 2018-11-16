@@ -26,7 +26,7 @@ namespace Belle2 {
     ECLTrackClusterMatchingParameterizations() {};
 
     /** Constructor */
-    ECLTrackClusterMatchingParameterizations(std::map<std::string, TF1> RMSParameterizationFunctions):
+    ECLTrackClusterMatchingParameterizations(std::map<std::string, TF1*> RMSParameterizationFunctions):
       m_RMSParameterizationFunctions(RMSParameterizationFunctions)
     {
     }
@@ -35,11 +35,11 @@ namespace Belle2 {
     ~ECLTrackClusterMatchingParameterizations() {};
 
     /** Get RMS parameterization */
-    std::map<std::string, TF1> getRMSParameterizations() const {return m_RMSParameterizationFunctions;};
+    const std::map<std::string, TF1*>& getRMSParameterizations() const {return m_RMSParameterizationFunctions;};
 
   private:
 
-    std::map<std::string, TF1> m_RMSParameterizationFunctions;
+    std::map<std::string, TF1*> m_RMSParameterizationFunctions;
 
     ClassDef(ECLTrackClusterMatchingParameterizations, 1); /**< ClassDef */
   };

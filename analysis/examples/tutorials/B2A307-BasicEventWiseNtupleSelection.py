@@ -99,7 +99,7 @@ ma.copyLists(outputListName='D0:all',
 
 
 # 3. reconstruct B+ -> anti-D0 pi+ decay
-ma.reconstructDecay(decayString='B+:tag -> anti-D0:all pi+',
+ma.reconstructDecay(decayString='B+:tag -> anti-D0:all pi+:loose',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     dmID=1,
                     path=my_path)
@@ -118,14 +118,14 @@ ma.reconstructDecay(decayString='Upsilon(4S) -> B-:tag mu+:loose',
 ma.matchMCTruth(list_name='Upsilon(4S)', path=my_path)
 
 # 5. build rest of the event
-ma.buildRestOfEvent(list_name='Upsilon(4S)', path=my_path)
+ma.buildRestOfEvent(target_list_name='Upsilon(4S)', path=my_path)
 
 d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['R2EventLevel']
 mu_vars = vc.mc_truth
 
 b_vars = vc.mc_truth + \
     vc.deltae_mbc + \
-    vct.create_aliases_for_selected(list_of_variables=dvars,
+    vct.create_aliases_for_selected(list_of_variables=d_vars,
                                     decay_string='B- -> ^D0 pi-') + \
     vct.create_aliases(list_of_variables=['decayModeID'],
                        wrapper='daughter(0,extraInfo(variable))',
@@ -148,12 +148,12 @@ u4s_vars = vc.mc_truth + \
 # 7. Saving variables to ntuple
 rootOutputFile = 'B2A307-BasicEventWiseNtupleSelection.root'
 ma.variablesToNtuple(decayString='B-:tag',
-                     variables=bvars,
+                     variables=b_vars,
                      filename=rootOutputFile,
                      treename='btag',
                      path=my_path)
 ma.variablesToNtuple(decayString='Upsilon(4S)',
-                     variables=u4svars,
+                     variables=u4s_vars,
                      filename=rootOutputFile,
                      treename='btagbsig',
                      path=my_path)

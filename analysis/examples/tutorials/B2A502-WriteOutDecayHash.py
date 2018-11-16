@@ -49,7 +49,7 @@ ma.reconstructDecay(decayString='J/psi -> e+ e-',
                     path=my_path)
 
 # generate the decay string
-my_path.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi.root')
+my_path.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi_from_B2A502.root')
 
 
 # write out ntuples
@@ -63,7 +63,7 @@ var = ['M',
 
 ma.variablesToNtuple(decayString='J/psi',
                      variables=var,
-                     filename='Jpsi.root',
+                     filename='Jpsi_from_B2A502.root',
                      path=my_path)
 
 # process the events

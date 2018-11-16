@@ -20,6 +20,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
+import sys
 
 # create path
 my_path = b2.create_path()

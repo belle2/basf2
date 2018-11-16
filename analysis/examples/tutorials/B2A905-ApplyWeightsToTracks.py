@@ -19,6 +19,7 @@ import variableCollections as vc
 import variableCollectionsTools as vct
 import stdCharged as stdc
 import variables as va
+import os
 
 # create path
 my_path = b2.create_path()
@@ -35,6 +36,14 @@ ma.fillParticleListFromMC(decayString='pi+:gen', cut='', path=my_path)
 # ID of weight table is taked from B2A904
 weight_table_id = "ParticleReweighting:TestMomentum"
 
+if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
+
+db_location = os.getenv('BELLE2_EXAMPLES_DATA_DIR') + '/database/'
+b2.use_local_database(db_location + 'database.txt',
+                      directory=db_location,
+                      readonly=True)
+
 # We know what weight info will be added (see B2A904),
 # so we add aliases and add it ot tools
 va.variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
@@ -44,7 +53,7 @@ va.variables.addAlias('binID', 'extraInfo(' + weight_table_id + '_binID)')
 
 
 # We configure weighing module
-reweighter = register_module('ParticleWeighting')
+reweighter = b2.register_module('ParticleWeighting')
 reweighter.param('tableName', weight_table_id)
 reweighter.param('particleList', 'pi+:gen')
 my_path.add_module(reweighter)

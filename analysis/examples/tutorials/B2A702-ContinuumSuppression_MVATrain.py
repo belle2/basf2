@@ -20,6 +20,7 @@
 
 import basf2_mva
 import subprocess
+import sys
 
 if __name__ == "__main__":
 
@@ -31,12 +32,12 @@ if __name__ == "__main__":
         b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
     # Use this path to run over Bd_KsPi0 reconstructed signal and qqbar skims.
-    path = 'BELLE2_EXAMPLES_DATA_DIR/'
+    path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/'
 
-    train_data = path + 'mva_train.root'
-    test_data = path + 'mva_test.root'
-    apply_signal_data = path + 'mva_apply_signal.root'
-    apply_qqbar_data = path + 'mva_apply_qqbar.root'
+    train_data = path + 'train.root'
+    test_data = path + 'test.root'
+    apply_signal_data = path + 'apply_signal.root'
+    apply_qqbar_data = path + 'apply_qqbar.root'
 
     # Define the variables for training.
     #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
@@ -100,5 +101,5 @@ if __name__ == "__main__":
     # comment these in to apply the trained methods on an independent sample
     # (produced in B2A701 if you ran with the `apply_signal` and `apply_qqbar` options).
     #
-    # basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_signal_data), 'tree', 'MVAExpert_signal.root')
-    # basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')
+    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_signal_data), 'tree', 'MVAExpert_signal.root')
+    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')

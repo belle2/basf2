@@ -79,7 +79,7 @@ ma.looseMCTruth(list_name='J/psi:uncorrected', path=my_path)
 ma.looseMCTruth(list_name='J/psi:corrected', path=my_path)
 
 # get all MC particles
-ma.fillParticleListFromMC(list_name='J/psi:MC', path=my_path)
+ma.fillParticleListFromMC(decayString='J/psi:MC', cut="", path=my_path)
 
 # write out ntuples
 

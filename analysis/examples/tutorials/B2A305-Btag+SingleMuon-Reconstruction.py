@@ -114,7 +114,7 @@ ma.matchMCTruth(list_name='Upsilon(4S)',
                 path=my_path)
 
 # 5. build rest of the event
-ma.buildRestOfEvent(list_name='Upsilon(4S)',
+ma.buildRestOfEvent(target_list_name='Upsilon(4S)',
                     path=my_path)
 
 # 6. Select variables that we want to store to ntuple

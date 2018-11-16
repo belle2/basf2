@@ -22,6 +22,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
+import sys
 
 
 # --I/O----------------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
 
 step = str(sys.argv[1])
 
-path = '$BELLE2_EXAMPLES_DATA_DIR/mva/'
+path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/'
 input_file = ''
 
 if step == 'signal':

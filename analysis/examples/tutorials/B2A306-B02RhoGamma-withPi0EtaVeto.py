@@ -72,7 +72,7 @@ ma.matchMCTruth(list_name='B0',
 
 # build RestOfEvent (ROE) object for each B0 candidate
 # ROE is required by the veto
-ma.buildRestOfEvent(list_name='B0',
+ma.buildRestOfEvent(target_list_name='B0',
                     path=my_path)
 
 # perform pi0/eta veto

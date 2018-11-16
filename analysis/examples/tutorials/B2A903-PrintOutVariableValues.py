@@ -37,8 +37,8 @@ ma.fillParticleListFromMC(decayString='pi-:gen', cut='', path=my_path)
 #
 # the list of all available variables can be obtained by executing
 # basf2 analysis/scripts/variables.py
-printVariableValues(list_name='K-:gen', var_names=['charge', 'E', 'p'], path=my_path)
-printVariableValues(list_name='pi-:gen', var_names=['charge', 'px', 'py', 'pz'], path=my_path)
+ma.printVariableValues(list_name='K-:gen', var_names=['charge', 'E', 'p'], path=my_path)
+ma.printVariableValues(list_name='pi-:gen', var_names=['charge', 'px', 'py', 'pz'], path=my_path)
 
 # Process the events
 b2.process(my_path)

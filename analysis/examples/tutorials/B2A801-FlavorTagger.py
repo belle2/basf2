@@ -33,34 +33,24 @@ import variableCollectionsTools as vct
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 
-b2.B2FATAL("Input files for this tuttorial do not exist. \
-    We are working on producing them.\
-    Pleae feel free to use code snippets in a meanwhile.")
-
 # create path
 my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B2JPsiKs_JPsi2mumu.root', 'examples', False),
+             filename=b2.find_file('B2JPsipi0_JPsi2mumu.root', 'examples', False),
              path=my_path)
 
 # use standard final state particle lists
 #
+# creates "pi0:looseFit" ParticleList
+# https://confluence.desy.de/display/BI/Physics+StandardParticles
+stdPi0s(listtype='looseFit', path=my_path)
 # creates "highPID" ParticleLists (and c.c.)
-ma.fillParticleList(decayString='pi+:highPID',
-                    cut='pionID > 0.5 and d0 < 5 and abs(z0) < 10',
-                    path=my_path)
 ma.fillParticleList(decayString='mu+:highPID',
                     cut='muonID > 0.2 and d0 < 2 and abs(z0) < 4',
                     path=my_path)
 
-
-# reconstruct Ks -> pi+ pi- decay
-# keep only candidates with dM<0.25
-ma.reconstructDecay(decayString='K_S0:pipi -> pi+:highPID pi-:highPID',
-                    cut='dM<0.25',
-                    path=my_path)
 
 # reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with dM<0.11
@@ -70,11 +60,11 @@ ma.reconstructDecay(decayString='J/psi:mumu -> mu+:highPID mu-:highPID',
 
 # reconstruct B0 -> J/psi Ks decay
 # keep only candidates with Mbc > 5.1 and abs(deltaE)<0.15
-ma.reconstructDecay(decayString='B0:jspiks -> J/psi:mumu K_S0:pipi',
+ma.reconstructDecay(decayString='B0:jspipi0 -> J/psi:mumu pi0:looseFit',
                     cut='Mbc > 5.1 and abs(deltaE)<0.15',
                     path=my_path)
 
-vx.vertexTree(list_name='B0:jspiks',
+vx.vertexTree(list_name='B0:jspipi0',
               conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
               ipConstraint=True,
               # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
@@ -83,10 +73,11 @@ vx.vertexTree(list_name='B0:jspiks',
               )
 
 # perform MC matching (MC truth asociation). Always before TagV
-ma.matchMCTruth(list_name='B0:jspiks', path=my_path)
+ma.matchMCTruth(list_name='B0:jspipi0', path=my_path)
 
 # build the rest of the event associated to the B0
-ma.buildRestOfEvent(list_name='B0:jspiks')
+ma.buildRestOfEvent(target_list_name='B0:jspipi0',
+                    path=my_path)
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
@@ -106,13 +97,13 @@ ma.buildRestOfEvent(list_name='B0:jspiks')
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 ft.flavorTagger(
-    particleLists=['B0:jspiks'],
+    particleLists=['B0:jspipi0'],
     weightFiles='B2JpsiKs_muBGx1',
     path=my_path)
 
 # NOTE: for Belle data, (i.e. b2bii users) should use modified line:
 # ft.flavorTagger(
-#     particleLists=['B0:jspiks'],
+#     particleLists=['B0:jspipi0'],
 #     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
 #     belleOrBelle2='Belle')
 
@@ -133,13 +124,13 @@ ft.flavorTagger(
 # If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
 # you want to use like:
 #
-# flavorTagger(particleLists=['B0:jspiks'], mode = 'Sampler', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Sampler', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.]
 # )
 #
 # After the Sampling process:
 #
-# flavorTagger(particleLists=['B0:jspiks'], mode = 'Teacher', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Teacher', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.]
 # )
 #
@@ -172,26 +163,26 @@ ft.flavorTagger(
 # It is also possible to train different combiners consecutively using the same weightFiles name.
 # You just need always to specify the desired category combination while using the expert mode as:
 #
-# flavorTagger(particleLists=['B0:jspiks'], mode = 'Expert', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Expert', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
 
 # You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
 # provide flavor information using the tag side
-ma.applyCuts(list_name='B0:jspiks',
+ma.applyCuts(list_name='B0:jspipi0',
              cut='qrOutput(FBDT) > -2',
              path=my_path)
 
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
-ma.rankByHighest(particleList='B0:jspiks',
+ma.rankByHighest(particleList='B0:jspipi0',
                  variable='abs(qrOutput(FBDT))',
                  numBest=0,
                  outputVariable='Dilution_rank',
                  path=my_path)
 
 # Fit Vertex of the B0 on the tag side
-vx.TagV(list_name='B0:jspiks',
+vx.TagV(list_name='B0:jspipi0',
         MCassociation='breco',
         confidenceLevel=0.001,
         useFitAlgorithm='standard_PXD',
@@ -210,21 +201,21 @@ bvars = vc.event_meta_data + \
     vc.tag_vertex + \
     vc.mc_tag_vertex + \
     vct.create_aliases_for_selected(list_of_variables=fs_vars,
-                                    decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+                                    decay_string='B0 -> [J/psi -> ^mu+ ^mu-] pi0') + \
     vct.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
-                                    decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
+                                    decay_string='B0 -> [^J/psi -> mu+ mu-] ^pi0')
 
 
 # Saving variables to ntuple
 output_file = 'B2A801-FlavorTagger.root'
-ma.variablesToNtuple(decay_string='B0:jspiks',
+ma.variablesToNtuple(decayString='B0:jspipi0',
                      variables=bvars,
                      filename=output_file,
                      treename='B0tree',
                      path=my_path)
 
 # Summary of created Lists
-ma.summaryOfLists(particleLists=['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'],
+ma.summaryOfLists(particleLists=['J/psi:mumu', 'pi0:looseFit', 'B0:jspipi0'],
                   path=my_path)
 
 # Process the events

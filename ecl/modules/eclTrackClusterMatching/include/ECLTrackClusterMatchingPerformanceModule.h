@@ -69,7 +69,7 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
 
     TFile* m_outputFile; /**< output root file */
-    TTree* m_dataTree; /**< MCParticle based root tree with all output data. Tree will be written to the output root file */
+    TTree* m_tracksTree; /**< MCParticle based root tree with all output data. Tree will be written to the output root file */
     TTree* m_clusterTree; /**< root tree containing information on all truth-matched photon clusters. Tree will be written to the output root file */
 
     /** properties of a reconstructed track */

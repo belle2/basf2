@@ -27,7 +27,7 @@ using namespace Belle2;
 REG_MODULE(ECLTrackClusterMatchingPerformance)
 
 ECLTrackClusterMatchingPerformanceModule::ECLTrackClusterMatchingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_clusterTree(NULL)
+  Module(), m_outputFile(NULL), m_tracksTree(NULL), m_clusterTree(NULL)
 {
   setDescription("Module to test the track cluster matching efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -55,7 +55,7 @@ void ECLTrackClusterMatchingPerformanceModule::initialize()
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
   m_outputFile->cd();
-  m_dataTree = new TTree("data", "data");
+  m_tracksTree = new TTree("tracks", "tracks");
   m_clusterTree = new TTree("cluster", "cluster");
   oldDir->cd();
 
@@ -229,7 +229,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
           }
         }
       }
-      m_dataTree->Fill(); // write data to tree
+      m_tracksTree->Fill(); // write data to tree
     }
   }
 }
@@ -253,80 +253,80 @@ bool ECLTrackClusterMatchingPerformanceModule::isChargedStable(const MCParticle&
 
 void ECLTrackClusterMatchingPerformanceModule::setupTree()
 {
-  if (m_dataTree == NULL || m_clusterTree == NULL) {
+  if (m_tracksTree == NULL || m_clusterTree == NULL) {
     B2FATAL("Data tree or event tree was not created.");
   }
-  addVariableToTree("expNo", m_iExperiment, m_dataTree);
-  addVariableToTree("runNo", m_iRun, m_dataTree);
-  addVariableToTree("evtNo", m_iEvent, m_dataTree);
+  addVariableToTree("expNo", m_iExperiment, m_tracksTree);
+  addVariableToTree("runNo", m_iRun, m_tracksTree);
+  addVariableToTree("evtNo", m_iEvent, m_tracksTree);
 
-  addVariableToTree("pdgCode", m_trackProperties.pdg_gen, m_dataTree);
+  addVariableToTree("pdgCode", m_trackProperties.pdg_gen, m_tracksTree);
 
-  addVariableToTree("cosTheta", m_trackProperties.cosTheta, m_dataTree);
-  addVariableToTree("cosTheta_gen",  m_trackProperties.cosTheta_gen, m_dataTree);
+  addVariableToTree("cosTheta", m_trackProperties.cosTheta, m_tracksTree);
+  addVariableToTree("cosTheta_gen",  m_trackProperties.cosTheta_gen, m_tracksTree);
 
-  addVariableToTree("phi", m_trackProperties.phi, m_dataTree);
-  addVariableToTree("phi_gen", m_trackProperties.phi_gen, m_dataTree);
+  addVariableToTree("phi", m_trackProperties.phi, m_tracksTree);
+  addVariableToTree("phi_gen", m_trackProperties.phi_gen, m_tracksTree);
 
-  addVariableToTree("px", m_trackProperties.px, m_dataTree);
-  addVariableToTree("px_gen", m_trackProperties.px_gen, m_dataTree);
+  addVariableToTree("px", m_trackProperties.px, m_tracksTree);
+  addVariableToTree("px_gen", m_trackProperties.px_gen, m_tracksTree);
 
-  addVariableToTree("py", m_trackProperties.py, m_dataTree);
-  addVariableToTree("py_gen", m_trackProperties.py_gen, m_dataTree);
+  addVariableToTree("py", m_trackProperties.py, m_tracksTree);
+  addVariableToTree("py_gen", m_trackProperties.py_gen, m_tracksTree);
 
-  addVariableToTree("pz", m_trackProperties.pz, m_dataTree);
-  addVariableToTree("pz_gen", m_trackProperties.pz_gen, m_dataTree);
+  addVariableToTree("pz", m_trackProperties.pz, m_tracksTree);
+  addVariableToTree("pz_gen", m_trackProperties.pz_gen, m_tracksTree);
 
-  addVariableToTree("x", m_trackProperties.x, m_dataTree);
-  addVariableToTree("x_gen", m_trackProperties.x_gen, m_dataTree);
+  addVariableToTree("x", m_trackProperties.x, m_tracksTree);
+  addVariableToTree("x_gen", m_trackProperties.x_gen, m_tracksTree);
 
-  addVariableToTree("y", m_trackProperties.y, m_dataTree);
-  addVariableToTree("y_gen", m_trackProperties.y_gen, m_dataTree);
+  addVariableToTree("y", m_trackProperties.y, m_tracksTree);
+  addVariableToTree("y_gen", m_trackProperties.y_gen, m_tracksTree);
 
-  addVariableToTree("z", m_trackProperties.z, m_dataTree);
-  addVariableToTree("z_gen", m_trackProperties.z_gen, m_dataTree);
+  addVariableToTree("z", m_trackProperties.z, m_tracksTree);
+  addVariableToTree("z_gen", m_trackProperties.z_gen, m_tracksTree);
 
-  addVariableToTree("pt", m_trackProperties.pt, m_dataTree);
-  addVariableToTree("pt_gen", m_trackProperties.pt_gen, m_dataTree);
+  addVariableToTree("pt", m_trackProperties.pt, m_tracksTree);
+  addVariableToTree("pt_gen", m_trackProperties.pt_gen, m_tracksTree);
 
-  addVariableToTree("ptot", m_trackProperties.ptot, m_dataTree);
-  addVariableToTree("ptot_gen", m_trackProperties.ptot_gen, m_dataTree);
+  addVariableToTree("ptot", m_trackProperties.ptot, m_tracksTree);
+  addVariableToTree("ptot_gen", m_trackProperties.ptot_gen, m_tracksTree);
 
-  addVariableToTree("pValue", m_pValue, m_dataTree);
+  addVariableToTree("pValue", m_pValue, m_tracksTree);
 
-  addVariableToTree("charge", m_charge, m_dataTree);
+  addVariableToTree("charge", m_charge, m_tracksTree);
 
-  addVariableToTree("d0", m_d0, m_dataTree);
-  addVariableToTree("z0", m_z0, m_dataTree);
+  addVariableToTree("d0", m_d0, m_tracksTree);
+  addVariableToTree("z0", m_z0, m_tracksTree);
 
-  addVariableToTree("nPXDhits", m_trackProperties.nPXDhits, m_dataTree);
-  addVariableToTree("nSVDhits", m_trackProperties.nSVDhits, m_dataTree);
-  addVariableToTree("nCDChits", m_trackProperties.nCDChits, m_dataTree);
+  addVariableToTree("nPXDhits", m_trackProperties.nPXDhits, m_tracksTree);
+  addVariableToTree("nSVDhits", m_trackProperties.nSVDhits, m_tracksTree);
+  addVariableToTree("nCDChits", m_trackProperties.nCDChits, m_tracksTree);
 
-  addVariableToTree("lastCDCLayer", m_lastCDCLayer, m_dataTree);
+  addVariableToTree("lastCDCLayer", m_lastCDCLayer, m_tracksTree);
 
-  addVariableToTree("ECLMatchPhotonHypothesis", m_matchedToPhotonHypothesisECLCluster, m_dataTree);
-  addVariableToTree("ECLMatchHadronHypothesis", m_matchedToHadronHypothesisECLCluster, m_dataTree);
-  addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match, m_dataTree);
+  addVariableToTree("ECLMatchPhotonHypothesis", m_matchedToPhotonHypothesisECLCluster, m_tracksTree);
+  addVariableToTree("ECLMatchHadronHypothesis", m_matchedToHadronHypothesisECLCluster, m_tracksTree);
+  addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match, m_tracksTree);
 
-  addVariableToTree("SameMatch", m_sameclusters, m_dataTree);
+  addVariableToTree("SameMatch", m_sameclusters, m_tracksTree);
 
-  addVariableToTree("PhotonHypothesisDetectorRegion", m_matchedPhotonHypothesisClusterDetectorRegion, m_dataTree);
-  addVariableToTree("PhotonHypothesisClusterTheta", m_matchedPhotonHypothesisClusterTheta, m_dataTree);
-  addVariableToTree("PhotonHypothesisClusterPhi", m_matchedPhotonHypothesisClusterPhi, m_dataTree);
-  addVariableToTree("PhotonHypothesisMinTrkDistance", m_matchedPhotonHypothesisClusterMinTrkDistance, m_dataTree);
-  addVariableToTree("PhotonHypothesisDeltaL", m_matchedPhotonHypothesisClusterDeltaL, m_dataTree);
+  addVariableToTree("PhotonHypothesisDetectorRegion", m_matchedPhotonHypothesisClusterDetectorRegion, m_tracksTree);
+  addVariableToTree("PhotonHypothesisClusterTheta", m_matchedPhotonHypothesisClusterTheta, m_tracksTree);
+  addVariableToTree("PhotonHypothesisClusterPhi", m_matchedPhotonHypothesisClusterPhi, m_tracksTree);
+  addVariableToTree("PhotonHypothesisMinTrkDistance", m_matchedPhotonHypothesisClusterMinTrkDistance, m_tracksTree);
+  addVariableToTree("PhotonHypothesisDeltaL", m_matchedPhotonHypothesisClusterDeltaL, m_tracksTree);
 
-  addVariableToTree("HadronHypothesisDetectorRegion", m_matchedHadronHypothesisClusterDetectorRegion, m_dataTree);
-  addVariableToTree("HadronHypothesisClusterTheta", m_matchedHadronHypothesisClusterTheta, m_dataTree);
-  addVariableToTree("HadronHypothesisClusterPhi", m_matchedHadronHypothesisClusterPhi, m_dataTree);
-  addVariableToTree("HadronHypothesisMinTrkDistance", m_matchedHadronHypothesisClusterMinTrkDistance, m_dataTree);
-  addVariableToTree("HadronHypothesisDeltaL", m_matchedHadronHypothesisClusterDeltaL, m_dataTree);
+  addVariableToTree("HadronHypothesisDetectorRegion", m_matchedHadronHypothesisClusterDetectorRegion, m_tracksTree);
+  addVariableToTree("HadronHypothesisClusterTheta", m_matchedHadronHypothesisClusterTheta, m_tracksTree);
+  addVariableToTree("HadronHypothesisClusterPhi", m_matchedHadronHypothesisClusterPhi, m_tracksTree);
+  addVariableToTree("HadronHypothesisMinTrkDistance", m_matchedHadronHypothesisClusterMinTrkDistance, m_tracksTree);
+  addVariableToTree("HadronHypothesisDeltaL", m_matchedHadronHypothesisClusterDeltaL, m_tracksTree);
 
-  addVariableToTree("MCClusterEnergy", m_mcparticle_cluster_energy, m_dataTree);
-  addVariableToTree("MCClusterDetectorRegion", m_mcparticle_cluster_detectorregion, m_dataTree);
-  addVariableToTree("MCClusterTheta", m_mcparticle_cluster_theta, m_dataTree);
-  addVariableToTree("MCClusterPhi", m_mcparticle_cluster_phi, m_dataTree);
+  addVariableToTree("MCClusterEnergy", m_mcparticle_cluster_energy, m_tracksTree);
+  addVariableToTree("MCClusterDetectorRegion", m_mcparticle_cluster_detectorregion, m_tracksTree);
+  addVariableToTree("MCClusterTheta", m_mcparticle_cluster_theta, m_tracksTree);
+  addVariableToTree("MCClusterPhi", m_mcparticle_cluster_phi, m_tracksTree);
 
 
   addVariableToTree("expNo", m_iExperiment, m_clusterTree);
@@ -351,12 +351,12 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
 
 void ECLTrackClusterMatchingPerformanceModule::writeData()
 {
-  if (m_dataTree != NULL && m_clusterTree != NULL) {
+  if (m_tracksTree != NULL && m_clusterTree != NULL) {
     TDirectory* oldDir = gDirectory;
     if (m_outputFile)
       m_outputFile->cd();
-    m_dataTree->Write();
-    delete m_dataTree;
+    m_tracksTree->Write();
+    delete m_tracksTree;
     m_clusterTree->Write();
     delete m_clusterTree;
     oldDir->cd();

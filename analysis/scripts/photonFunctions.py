@@ -22,8 +22,8 @@ def getRandomId(size=6, chars=string.ascii_uppercase + string.digits):
 
 
 def writeClosestParticleExtraClusterInfo(
-    particleName='gamma',
     particleList,
+    particleType='gamma',
     particleSelection='True',
     roe_path=None,
     deadend_path=None,
@@ -32,8 +32,8 @@ def writeClosestParticleExtraClusterInfo(
     """
     Add various variables to the first particle that are related to their angular separation and kinematics.
 
-    @param particleName Family of particle to which we want to add the information (pi+, gamma, ...)
-    @param particleList Particle list (of 'particleName') with particle candidates that will have the extra information in the end
+    @param particleList Particle list (of 'particleType') with particle candidates that will have the extra information in the end
+    @param particleType Family of particle to which we want to add the information (pi+, gamma, ...)
     @param particleSelection Selection for the other particle
     @param roe_path a path for the rest of event to be executed
     @param deadend_path a path for skipping irrelevant RestOfEvent objects that may exist (if this was called twice, for instance)
@@ -51,8 +51,8 @@ def writeClosestParticleExtraClusterInfo(
 
     # get random listnames (in case we run this function multiple times)
     pListPair = 'vpho:writeClosestParticleExtraClusterInfo' + getRandomId()
-    pList0 = particleName + ':writeClosestParticleExtraClusterInfo' + getRandomId()
-    pList1 = particleName + ':writeClosestParticleExtraClusterInfo' + getRandomId()
+    pList0 = particleType + ':writeClosestParticleExtraClusterInfo' + getRandomId()
+    pList1 = particleType + ':writeClosestParticleExtraClusterInfo' + getRandomId()
 
     signalSideParticleFilter(particleList, '', roe_path, deadend_path)
 

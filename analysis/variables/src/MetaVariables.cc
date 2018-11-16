@@ -1074,10 +1074,13 @@ endloop:
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
-              ClusterUtils clusutils;
-              TVector3 pi = clusutils.Get4MomentumFromCluster(clusteri).Vect();
-              TVector3 pj = clusutils.Get4MomentumFromCluster(clusterj).Vect();
-              return pi.Angle(pj);
+              if (clusteri and clusterj) {
+                ClusterUtils clusutils;
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                return pi.Angle(pj);
+              }
+              return std::numeric_limits<float>::quiet_NaN();
             }
           } else if (daughterIndices.size() == 3)
           {
@@ -1088,11 +1091,14 @@ endloop:
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
               const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
-              ClusterUtils clusutils;
-              TVector3 pi = clusutils.Get4MomentumFromCluster(clusteri).Vect();
-              TVector3 pj = clusutils.Get4MomentumFromCluster(clusterj).Vect();
-              TVector3 pk = clusutils.Get4MomentumFromCluster(clusterk).Vect();
-              return pk.Angle(pi + pj);
+              if (clusteri and clusterj and clusterk) {
+                ClusterUtils clusutils;
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk)).Vect();
+                return pk.Angle(pi + pj);
+              }
+              return std::numeric_limits<float>::quiet_NaN();
             }
           } else return -999;
 
@@ -1883,10 +1889,12 @@ endloop:
                       "which is the sum of the first two daughter momenta.\n"
                       "E.g. useLabFrame(daughterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
-                      "If two indices given: Variable returns the angle between the momenta of the two given daughters, computed from the Cluster information instead that from the Track ones.\n"
-                      "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
-                      "which is the sum of the first two daughter momenta.\n"
-                      "E.g. useLabFrame(daughterClusterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
+                      "Returns function which returns the angle between clusters associated to the two daughters."
+                      "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
+                      "If three indices given: returns the angle between the momentum of the third particle's cluster and a vector "
+                      "which is the sum of the first two daughter's cluster momenta."
+                      "Returns nan if any of the daughters specified don't have an associated cluster."
+                      "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
                       "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");

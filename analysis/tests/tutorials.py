@@ -17,6 +17,7 @@ class TutorialsTest(unittest.TestCase):
         """
         Test supported tutorials.
         """
+
         supported_tutorials = ['B2A101-Y4SEventGeneration.py',
                                'B2A102-SimulateAndReconstruct.py',
                                'B2A201-LoadMCParticles.py',
@@ -36,11 +37,11 @@ class TutorialsTest(unittest.TestCase):
                                'B2A503-ReadDecayHash.py',
                                'B2A601-ParticleStats.py',
                                'B2A602-BestCandidateSelection.py',
-                               'B2A701-ContinuumSuppression_Input.py',
-                               'B2A702-ContinuumSuppression_MVATrain.py',
-                               'B2A703-ContinuumSuppression_MVAExpert.py',
+                               # 'B2A701-ContinuumSuppression_Input.py', ## BII-4246
+                               # 'B2A702-ContinuumSuppression_MVATrain.py', ## BII-4246
+                               # 'B2A703-ContinuumSuppression_MVAExpert.py', ## BII-4246
                                'B2A704-EventShape.py',
-                               'B2A801-FlavorTagger.py',
+                               # 'B2A801-FlavorTagger.py', ## BII-4247
                                'B2A901-PrintOutDataStore.py',
                                'B2A902-PrintOutMCParticles.py',
                                'B2A903-PrintOutVariableValues.py',

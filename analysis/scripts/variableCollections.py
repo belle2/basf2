@@ -213,10 +213,7 @@ mass_before_fit = [
 ]
 
 #: Extra energy variables
-mass_before_fit = [
-    'ErrM',
-    'InvM'
-]
+extra_energy = ["ROE_eextra()"]
 
 #: Event level tracking variables
 event_level_tracking = ["nExtraCDCHits",

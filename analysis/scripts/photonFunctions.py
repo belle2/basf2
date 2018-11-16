@@ -23,7 +23,6 @@ def getRandomId(size=6, chars=string.ascii_uppercase + string.digits):
 
 def writeClosestParticleExtraClusterInfo(
     particleList,
-    particleType='gamma',
     particleSelection='True',
     roe_path=None,
     deadend_path=None,
@@ -33,12 +32,13 @@ def writeClosestParticleExtraClusterInfo(
     Add various variables to the first particle that are related to their angular separation and kinematics.
 
     @param particleList Particle list (of 'particleType') with particle candidates that will have the extra information in the end
-    @param particleType Family of particle to which we want to add the information (pi+, gamma, ...)
     @param particleSelection Selection for the other particle
     @param roe_path a path for the rest of event to be executed
     @param deadend_path a path for skipping irrelevant RestOfEvent objects that may exist (if this was called twice, for instance)
     @param path modules are added to this path
     """
+
+    particleType = particleList.split(":")[0]
 
     if not roe_path:
         roe_path = create_path()

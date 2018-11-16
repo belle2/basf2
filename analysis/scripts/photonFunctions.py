@@ -31,7 +31,7 @@ def writeClosestParticleExtraClusterInfo(
     """
     Add various variables to the first particle that are related to their angular separation and kinematics.
 
-    @param particleList Particle list (of 'particleType') with particle candidates that will have the extra information in the end
+    @param particleList Particle list with particle candidates that will have the extra information in the end
     @param particleSelection Selection for the other particle
     @param roe_path a path for the rest of event to be executed
     @param deadend_path a path for skipping irrelevant RestOfEvent objects that may exist (if this was called twice, for instance)

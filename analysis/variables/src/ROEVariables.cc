@@ -1886,7 +1886,7 @@ namespace Belle2 {
                       "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle");
 
     REGISTER_VARIABLE("ROE_neextra(maskName)", ROE_NeutralExtraEnergy,
-                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle");
+                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_E(maskName)", ROE_E,
                       "Returns energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");

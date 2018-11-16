@@ -16,6 +16,17 @@ be adapted when changing to the new release.
 Changes since release-03-00
 ===========================
 
+.. important changes should go here. Especially things that break backwards
+   compatibility 
+
+.. rubric:: Loading ECLClusters under multiple hypotheses
+
+It is now possible to load :math:`K_L^0` particles from clusters in the ECL. 
+This has several important consequences for the creation of particles and using combinations containing :math:`K_L^0` s or other neutral hadrons in the analysis package.
+This is handled correctly by the ParticleLoader and ParticleCombiner (the corresponding convenience functions are `modularAnalysis.fillParticleList` and `modularAnalysis.reconstructDecay`).
+Essentially: it is forbidden from now onwards for any other analysis modules to create particles.
+
+
 .. Now let's add the detailed changes for the analysis package first, that's
    what user will want to see
 

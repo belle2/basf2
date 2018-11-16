@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck, Anze Zupanc                                 *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -217,7 +218,7 @@ namespace Belle2 {
      * then they are from different connected regions or from the same connected region but have
      * the same hypothesis.
      *
-     * #######     * @return true if indices not found in the stack; if true indices pushed to stack
+     * @return true if indices not found in the stack; if true indices pushed to stack
      */
     bool currentCombinationIsECLCRUnique();
 

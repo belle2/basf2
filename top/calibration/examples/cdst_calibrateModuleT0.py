@@ -10,9 +10,6 @@ from ROOT import TFile, TH1F
 # Note: replace local database name/location before running or comment it out
 # ---------------------------------------------------------------------------------------
 
-# Suppress messages during processing:
-set_log_level(LogLevel.RESULT)
-
 # Database:
 # - replace the name and location of the local DB before running!
 # - one can even use several local DB's
@@ -47,6 +44,9 @@ recalibrator.param('useModuleT0Calibration', False)
 recalibrator.param('useCommonT0Calibration', True)
 recalibrator.param('subtractBunchTime', True)
 main.add_module(recalibrator)
+
+# Channel masking
+main.add_module('TOPChannelMasker')
 
 # Module T0 calibration w/ TOPAligner using bhabha's
 # - to be replaced with a dedicated module employing different method

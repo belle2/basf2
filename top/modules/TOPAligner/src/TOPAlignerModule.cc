@@ -144,6 +144,7 @@ namespace Belle2 {
     m_digits.isRequired();
     m_tracks.isRequired();
     m_extHits.isRequired();
+    m_recBunch.isOptional();
 
     // set counter for failed iterations:
 
@@ -187,6 +188,14 @@ namespace Belle2 {
 
   void TOPAlignerModule::event()
   {
+
+    // check bunch reconstruction status and run alignment:
+    // - if object exists and bunch is found (collision data w/ bunch finder in the path)
+    // - if object doesn't exist (cosmic data and other cases w/o bunch finder)
+
+    if (m_recBunch.isValid()) {
+      if (!m_recBunch->isReconstructed()) return;
+    }
 
     // add photons
 
@@ -253,7 +262,7 @@ namespace Belle2 {
         resMsg += " ";
         resMsg += par;
       }
-      B2INFO(resMsg);
+      B2DEBUG(100, resMsg);
 
     }
 
@@ -322,6 +331,14 @@ namespace Belle2 {
 
     m_file->Close();
 
+    if (m_valid) {
+      B2RESULT("TOPAligner: slot = " << m_targetMid << ", status = successful, "
+               << "iterations = " << m_iter << ", tracks used = " << m_ntrk);
+    } else {
+      B2RESULT("TOPAligner: slot = " << m_targetMid << ", status = failed, "
+               << "error code = " << m_errorCode
+               << ", iterations = " << m_iter << ", tracks used = " << m_ntrk);
+    }
   }
 
   bool TOPAlignerModule::selectTrack(const TOP::TOPtrack& trk)

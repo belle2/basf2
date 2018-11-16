@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
 #include <framework/gearbox/Const.h>
 
 #include <string>
@@ -132,6 +133,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreArray<Track> m_tracks;    /**< collection of tracks */
     StoreArray<ExtHit> m_extHits;  /**< collection of extrapolated hits */
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
 
   };
 

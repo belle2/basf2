@@ -195,10 +195,6 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE)
 {
   int iCrate;
 
-  // TODO: I am 99.99% sure this code returns wrong results.
-  //       Check and fix if necessary!
-
-  //  B2DEBUG(50, "iCOPPERNode = %x" << iCOPPERNode);
   if (iFINESSE > ECL_FINESSES_IN_COPPER - 1) {
     B2ERROR("ECLChannelMapper::ERROR:: wrong FINESSE " << iFINESSE);
     return -1;
@@ -293,8 +289,8 @@ int ECLChannelMapper::getCOPPERNode(int iCrate)
 
   if (iCrate < 1 || iCrate > ECL_CRATES) return -1;
   systemID = (iCrate <= ECL_BARREL_CRATES) * BECL_ID + (iCrate > ECL_BARREL_CRATES) * EECL_ID;
-  iNode = (iCrate <= ECL_BARREL_CRATES) ? iCrate : iCrate - ECL_BARREL_CRATES;
-  iCOPPERNode = systemID + iNode;
+  iNode = (iCrate <= ECL_BARREL_CRATES) ? (iCrate - 1) / 2 : (iCrate - ECL_BARREL_CRATES - 1) % 8;
+  iCOPPERNode = systemID + iNode + 1;
 
   return iCOPPERNode;
 }
@@ -303,9 +299,7 @@ int ECLChannelMapper::getFINESSE(int iCrate)
 {
   if (iCrate < 1 || iCrate > ECL_CRATES) return -1;
 
-  return 1;
-// not implemented yet TODO
-
+  return (iCrate <= ECL_BARREL_CRATES) ? (iCrate - 1) % 2 : (iCrate - ECL_BARREL_CRATES - 1) / 8;
 }
 
 int ECLChannelMapper::getSubSystem(int iCrate)

@@ -23,14 +23,14 @@ def SemileptonicList(path):
 
     **Decay Modes**:
 
-        *B+ -> D0 e+
-        *B+ -> D0 mu+
-        *B+ -> D*0 e+
-        *B+ -> D*0 mu+
-        *B0 ->  D+ e-
-        *B0 ->  D+ mu-
-        *B0 ->  D*+ e-
-        *B0 ->  D*+ mu-
+        * B+ -> D0 e+
+        * B+ -> D0 mu+
+        * B+ -> D*0 e+
+        * B+ -> D*0 mu+
+        * B0 ->  D+ e-
+        * B0 ->  D+ mu-
+        * B0 ->  D*+ e-
+        * B0 ->  D*+ mu-
 
     **Cuts applied**:
 

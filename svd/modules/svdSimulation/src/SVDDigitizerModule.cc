@@ -88,7 +88,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module()
   addParam("ZeroSuppressionCut", m_SNAdjacent,
            "Zero suppression cut in sigmas of strip noise", double(3.0));
   addParam("FADCmode", m_roundZS,
-           "FADC mode: if true, ZS cut is rounded to nearest ADU ", bool(false));
+           "FADC mode: if true, ZS cut is rounded to nearest ADU ", bool(true));
   addParam("numberOfSamples", m_nSamplesOverZS,
            "Keep digit if numberOfSamples or more samples are over ZS threshold",
            decltype(m_nSamplesOverZS)(1));

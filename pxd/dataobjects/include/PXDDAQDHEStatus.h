@@ -53,6 +53,10 @@ namespace Belle2 {
      */
     bool isUsable() const { return m_usable; }
 
+    /** Mark Data in DHE as Unusable
+     */
+    void markUnusable() { m_usable = false; }
+
     /** Set Error bit mask
      * @param m Bit Mask to set
      */

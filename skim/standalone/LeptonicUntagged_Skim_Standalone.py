@@ -28,32 +28,33 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
+leppath = Path()
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=leppath)
 
-loadStdSkimPi0()
-loadStdSkimPhoton()
-loadStdCharged()
-stdPi0s('loose')  # for stdCharm.py
-stdPhotons('loose')
-loadStdKS()
+loadStdSkimPi0(path=leppath)
+loadStdSkimPhoton(path=leppath)
+loadStdCharged(path=leppath)
+stdPi0s('loose', path=leppath)  # for stdCharm.py
+stdPhotons('loose', path=leppath)
+loadStdKS(path=leppath)
 
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
+loadStdD0(path=leppath)
+loadStdDplus(path=leppath)
+loadStdDstar0(path=leppath)
+loadStdDstarPlus(path=leppath)
 
 # SL Skim
 from skim.leptonic import LeptonicList
 
-lepList = LeptonicList()
-skimOutputUdst(skimCode, lepList)
+lepList = LeptonicList(path=leppath)
+skimOutputUdst(skimCode, lepList, path=leppath)
 
-summaryOfLists(lepList)
+summaryOfLists(lepList, path=leppath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=leppath)
+process(leppath)
 
 # print out the summary
 print(statistics)

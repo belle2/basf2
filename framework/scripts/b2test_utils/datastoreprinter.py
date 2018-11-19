@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ROOT import Belle2
+from ROOT import Belle2, kIsPublic, kIsStatic
 from basf2 import Module
+
+
+def get_public_members(classname):
+    """
+    Return a list of public, non-static member functions for a given classname.
+    The class must exist in the Belle2 namespace and have a ROOT dictionary
+    """
+    tclass = getattr(Belle2, classname).Class()
+    members = {e.GetName() for e in tclass.GetListOfMethods()
+               if (e.Property() & kIsPublic) and not (e.Property() & kIsStatic)}
+
+    # filter known members from ClassDef and constructor/destructor
+    # Remove some Dictionary members
+    removed = {
+        "CheckTObjectHashConsistency", "Class", "Class_Name", "Class_Version",
+        "DeclFileLine", "DeclFileName", "Dictionary", "ImplFileLine",
+        "ImplFileName", "IsA", "ShowMembers", "Streamer", "StreamerNVirtual",
+        "operator!=", "operator=", "operator==",
+        # we don't need constructor and destructor either
+        classname, f"~{classname}",
+    }
+    members -= removed
+    return list(sorted(members))
 
 
 class DataStorePrinter(object):
@@ -94,6 +117,15 @@ class DataStorePrinter(object):
             obj = Belle2.PyStoreObj(self.name)
             if obj:
                 self._printObj(obj.obj())
+
+    def print_untested(self):
+        """Print all the public member functions we will not test"""
+        members = get_public_members(self.name)
+        tested = set(e[0] for e in self.object_members)
+        for member in members:
+            if member in tested:
+                continue
+            print(f"Untested method {self.name}::{member}")
 
     def _printObj(self, obj, index=None):
         """Print all defined members for each object with given index.
@@ -203,7 +235,7 @@ class PrintObjectsModule(Module):
 
     """Call all DataStorePrinter objects in for each event"""
 
-    def __init__(self, objects_to_print):
+    def __init__(self, objects_to_print, print_untested=False):
         """
         Initialize
 
@@ -212,7 +244,16 @@ class PrintObjectsModule(Module):
         """
         #: list of object to print
         self.objects_to_print = objects_to_print
+        #: print untested members?
+        self.print_untested = print_untested
         super().__init__()
+
+    def initialize(self):
+        if not self.print_untested:
+            return
+
+        for printer in self.objects_to_print:
+            printer.print_untested()
 
     def event(self):
         """print the contents of the mdst mdst_dataobjects"""

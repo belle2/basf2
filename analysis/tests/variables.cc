@@ -1619,11 +1619,15 @@ namespace {
     auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
 
+    // Test if matchedMC also works for particle which already is an MCParticle.
+    auto* p4 = particles.appendNew(mcParticle);
+
     const Manager::Var* var = Manager::Instance().getVariable("matchedMC(charge)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p1), -1);
     EXPECT_FLOAT_EQ(var->function(p2), 1);
     EXPECT_FLOAT_EQ(var->function(p3), 0);
+    EXPECT_FLOAT_EQ(var->function(p4), 0);
   }
 
   TEST_F(MetaVariableTest, countInList)
@@ -2396,6 +2400,8 @@ namespace {
     }
   };
 
+
+
   TEST_F(ECLVariableTest, b2bKinematicsTest)
   {
     // we need the particles and ECLClusters arrays
@@ -2457,6 +2463,56 @@ namespace {
     EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)),
                     b2bPhi->function(gammalist->getParticle(0)));
   }
+
+  TEST_F(ECLVariableTest, clusterKinematicsTest)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // connect gearbox for CMS boosting etc
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // grab variables for testing
+    const Manager::Var* clusterPhi = Manager::Instance().getVariable("clusterPhi");
+    const Manager::Var* clusterPhiCMS = Manager::Instance().getVariable("useCMSFrame(clusterPhi)");
+    const Manager::Var* clusterTheta = Manager::Instance().getVariable("clusterTheta");
+    const Manager::Var* clusterThetaCMS = Manager::Instance().getVariable("useCMSFrame(clusterTheta)");
+
+    EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(1)), 2.0);
+    EXPECT_FLOAT_EQ(clusterPhiCMS->function(gammalist->getParticle(1)), 2.0442522);
+    EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(1)), 1.0);
+    EXPECT_FLOAT_EQ(clusterThetaCMS->function(gammalist->getParticle(1)), 1.2625268);
+
+    // test cluster quantities directly (lab system only)
+    EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(0)), eclclusters[0]->getPhi());
+    EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(0)), eclclusters[0]->getTheta());
+
+
+  }
+
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {

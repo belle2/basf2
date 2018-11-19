@@ -50,10 +50,10 @@ def SetTauGenericSkimVariables():
     buildEventKinematics(['pi+:all', 'gamma:all'])
 
     # Split in signal and tag
-    cutAndCopyList('pi+:S1', 'pi+:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('pi+:S2', 'pi+:all', 'cosToEvtThrust < 0')
-    cutAndCopyList('gamma:S1', 'gamma:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('gamma:S2', 'gamma:all', 'cosToEvtThrust < 0')
+    cutAndCopyList('pi+:S1', 'pi+:all', 'cosToThrustOfEvent > 0')
+    cutAndCopyList('pi+:S2', 'pi+:all', 'cosToThrustOfEvent < 0')
+    cutAndCopyList('gamma:S1', 'gamma:all', 'cosToThrustOfEvent > 0')
+    cutAndCopyList('gamma:S2', 'gamma:all', 'cosToThrustOfEvent < 0')
 
     variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:all)')
     variables.addAlias('netCharge', 'formula(countInList(pi+:all, charge == 1) - countInList(pi+:all, charge == -1))')
@@ -131,14 +131,6 @@ def TauLFVList(flag=1):
         (such as tau+:LFV_lgamma0, tau+:LFV_lgamma1, tau+:LFV_lll0, ...)
     """
     __author__ = "P. Urquijo, K. Inami"
-
-    stdPi0s('loose')
-    loadStdCharged()
-    loadStdSkimPhoton()
-    loadStdSkimPi0()
-    loadStdKS()
-    stdPhotons('loose')
-    loadStdLightMesons()
 
     tauLFVCuts = '1.58 < Mbc < 1.98 and abs(deltaE) < 1.0'
 

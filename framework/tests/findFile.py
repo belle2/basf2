@@ -50,5 +50,5 @@ assert abspath == rl(Belle2.FileSystem.findFile('framework/tests/findFile.py'))
 assert abspath == rl(Belle2.FileSystem.findFile('/framework/tests/findFile.py'))
 
 # set BELLe2_TEST_DATA_DIR and try to find data file
-os.environ['BELLE2_TEST_DATA_DIR'] = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR'))
+os.environ['BELLE2_TEST_DATA_DIR'] = os.environ.get('BELLE2_RELEASE_DIR', os.environ.get('BELLE2_LOCAL_DIR'))
 assert abspath == rl(Belle2.FileSystem.findFile('framework/tests/findFile.py', 'test'))

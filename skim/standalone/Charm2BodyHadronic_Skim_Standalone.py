@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 
 import os
@@ -32,11 +32,9 @@ inputMdstList('MC9', fileList)
 
 loadStdCharged()
 
-from Charm2BodyHadronic_List import *
-
+from skim.charm import DstToD0PiD0ToHpJmList
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm()
 skimOutputUdst(skimCode, DstToD0PiD0ToHpJmList)
-
 summaryOfLists(DstToD0PiD0ToHpJmList)
 
 

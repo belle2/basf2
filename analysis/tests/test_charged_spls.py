@@ -3,45 +3,45 @@
 
 import unittest
 from basf2 import create_path
-import spl.stdCharged
+import stdCharged
 
 #: the basic std functions
 _base_functions = {
-    spl.stdCharged.stdPi,
-    spl.stdCharged.stdK,
-    spl.stdCharged.stdPr,
-    spl.stdCharged.stdE,
-    spl.stdCharged.stdMu
+    stdCharged.stdPi,
+    stdCharged.stdK,
+    stdCharged.stdPr,
+    stdCharged.stdE,
+    stdCharged.stdMu
 }
 
 #: the functions with 95% lists
 _95_functions = {
-    spl.stdCharged.stdPi,
-    spl.stdCharged.stdK,
-    spl.stdCharged.stdMu,
-    spl.stdCharged.stdE
+    stdCharged.stdPi,
+    stdCharged.stdK,
+    stdCharged.stdMu,
+    stdCharged.stdE
 }
 
 #: the functions with 90% lists
 _90_functions = {
-    spl.stdCharged.stdPi,
-    spl.stdCharged.stdK,
-    spl.stdCharged.stdPr
+    stdCharged.stdPi,
+    stdCharged.stdK,
+    stdCharged.stdPr
 }
 
 #: the functions with 85% lists
 _85_functions = {
-    spl.stdCharged.stdPi,
-    spl.stdCharged.stdK
+    stdCharged.stdPi,
+    stdCharged.stdK
 }
 
 #: the stdLoose functions
 _loose_functions = {
-    spl.stdCharged.stdLoosePi,
-    spl.stdCharged.stdLooseK,
-    spl.stdCharged.stdLoosePr,
-    spl.stdCharged.stdLooseE,
-    spl.stdCharged.stdLooseMu
+    stdCharged.stdLoosePi,
+    stdCharged.stdLooseK,
+    stdCharged.stdLoosePr,
+    stdCharged.stdLooseE,
+    stdCharged.stdLooseMu
 }
 
 #: the default particle list loaded
@@ -58,7 +58,7 @@ class TestStdCharged(unittest.TestCase):
         """
         for param in particleloader.available_params():
             if param.name == 'decayStringsWithCuts':
-                name = param.values[0][0].split(':')[1]
+                name = param.values[0][0].t(':')[1]
                 self.assertTrue(
                     name == target,
                     "Name: \"%s\" added by function %s, expecting \"%s\""

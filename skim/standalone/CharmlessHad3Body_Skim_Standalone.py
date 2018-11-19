@@ -53,7 +53,7 @@ Had3BodyList = CharmlessHad3BodyB0List(path=charmless3skimpath) + CharmlessHad3B
 skimOutputUdst(skimCode, Had3BodyList, path=charmless3skimpath)
 summaryOfLists(Had3BodyList, path=charmless3skimpath)
 
-setSkimLogging(path=charmless3skimpath)
+setSkimLogging(skim_path=charmless3skimpath)
 process(charmless3skimpath)
 
 # Print summary statistics

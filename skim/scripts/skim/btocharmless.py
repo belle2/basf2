@@ -304,7 +304,7 @@ def CharmlessHad2BodyBmList(path):
 
     BmVSList = []
     for chID, channel in enumerate(Bm_VSChannels):
-        reconstructDecay('B-:HAD_b2VS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path, path=path)
+        reconstructDecay('B-:HAD_b2VS' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmVSList.append('B-:HAD_b2VS' + str(chID))
 
     copyLists('B-:2BodyBm', BmPPList + BmPVList + BmVVList + BmPSList + BmVSList, path=path)
@@ -388,7 +388,7 @@ def CharmlessHad3BodyB0List(path):
 
     B0PPPList = []
     for chID, channel in enumerate(B0_PPPChannels):
-        reconstructDecay('B0:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path, path=path)
+        reconstructDecay('B0:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0PPPList.append('B0:HAD_b2PPP' + str(chID))
 
     B0PPVList = []
@@ -490,7 +490,7 @@ def CharmlessHad3BodyBmList(path):
 
     BmPPPList = []
     for chID, channel in enumerate(Bm_PPPChannels):
-        reconstructDecay('B-:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path, path=path)
+        reconstructDecay('B-:HAD_b2PPP' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BmPPPList.append('B-:HAD_b2PPP' + str(chID))
 
     BmPPVList = []

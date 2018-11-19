@@ -32,7 +32,7 @@ inputMdstList('MC9', fileList)
 
 loadStdCharged()
 
-from skim.charm import DstToD0PiD0ToHpJmList
+from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm()
 skimOutputUdst(skimCode, DstToD0PiD0ToHpJmList)
 summaryOfLists(DstToD0PiD0ToHpJmList)

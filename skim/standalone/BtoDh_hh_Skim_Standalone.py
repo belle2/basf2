@@ -33,7 +33,7 @@ inputMdstList('MC9', fileList)
 loadStdCharged()
 
 # B+ to D(->h+h-)h+ Skim
-from skim.btocharm import loadD0bar, BsigToDhTohhList()
+from skim.btocharm import loadD0bar, BsigToDhTohhList
 loadD0bar()
 BtoDhList = BsigToDhTohhList()
 skimOutputUdst(skimCode, BtoDhList)

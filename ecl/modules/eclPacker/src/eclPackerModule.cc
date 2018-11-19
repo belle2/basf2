@@ -57,17 +57,11 @@ void ECLPackerModule::initialize()
   // register output container in data store
   m_eclRawCOPPERs.registerInDataStore(m_eclRawCOPPERsName);
 
-  // initialize channel mapper from file (temporary)
-  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
-  if (! FileSystem::fileExists(ini_file_name)) {
-    B2FATAL("eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
+  // initialize channel mapper from the database
+  if (! m_eclMapper->initFromDB()) {
+    B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
   }
 
-  if (! m_eclMapper->initFromFile(ini_file_name.data())) {
-    B2FATAL("Can't initialize eclChannelMapper!");
-  }
-
-  // of initialize if from DB TODO
   B2INFO("ECL Packer: eclChannelMapper initialized successfully");
   B2INFO("ECL Packer: Compress mode = " << m_compressMode);
 }

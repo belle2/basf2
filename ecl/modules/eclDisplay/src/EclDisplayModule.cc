@@ -62,13 +62,7 @@ void EclDisplayModule::initialize()
 {
   m_eclarray.isRequired();
 
-  // Loading code from ECLUnpacker
-  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
-  if (!FileSystem::fileExists(ini_file_name)) {
-    B2FATAL("ECL Display : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-  }
-  // TODO: DB initialization is necessary.
-  if (!m_mapper.initFromFile(ini_file_name.data())) {
+  if (!m_mapper.initFromDB()) {
     B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
   }
 

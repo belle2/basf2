@@ -22,6 +22,7 @@ def SemileptonicList(path):
         * Uses D:all lists
 
     **Decay Modes**:
+
         *B+ -> D0 e+
         *B+ -> D0 mu+
         *B+ -> D*0 e+
@@ -33,10 +34,10 @@ def SemileptonicList(path):
 
     **Cuts applied**:
 
-    * lepton momentum > 0.35 GeV
-    * 5.24 < B_Mbc < 5.29
-    * | deltaE | < 0.5
-    * nTracks > 4
+        * lepton momentum > 0.35 GeV
+        * 5.24 < B_Mbc < 5.29
+        * | deltaE | < 0.5
+        * nTracks > 4
     """
 
     __authors__ = [

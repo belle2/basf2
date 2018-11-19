@@ -308,8 +308,6 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         tbScale_err = [1, 1, 1, 1]
         tbCovScaleBias = [1, 1, 1, 1]
 
-        sensorNoFitted = []
-
         geoCache = Belle2.VXD.GeoCache.getInstance()
         gDirectory.mkdir("plots")
         gDirectory.cd("plots")
@@ -365,7 +363,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                             if sp.GetRMS() != 0:
                                 m = sp.GetCovariance() / pow(sp.GetRMS(1), 2)
                                 # m = sp.GetCovariance()/cog.GetRMS()
-                                m_err = 2 / pow(sp.GetRMS(), 3) * sp.GetRMSError()
+                                m_err = 2 / pow(sp.GetRMS(), 3) * sp.GetRMSError() * sp.GetCovariance()
                                 q = sp.GetMean(2) - m * sp.GetMean(1)
                                 q_err = math.sqrt(pow(sp.GetMeanError(2), 2) +
                                                   pow(m * sp.GetMeanError(1), 2) + pow(m_err * sp.GetMean(1), 2))

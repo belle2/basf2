@@ -127,7 +127,7 @@ bool ECLChannelMapper::initFromDB()
     }
 
     if (cellID > ECL_TOTAL_CHANNELS) {
-      B2ERROR("ECLChannelMapper:: wrong cellID in the database payload");
+      B2ERROR("ECLChannelMapper:: wrong cellID (" << cellID << ") in the database payload");
       return false;
     }
 
@@ -148,10 +148,10 @@ bool ECLChannelMapper::initFromDB()
         iShaper = 1;
         if (iCrate == ECL_BARREL_CRATES) {
           arrayIndex = 0;
-          iMaxShapers = getNShapersInCrate(iCrate);
+          iMaxShapers = getNShapersInCrate(iCrate + 1);
         } else  if (iCrate == ECL_BARREL_CRATES + ECL_FWD_CRATES) {
           arrayIndex = 0;
-          iMaxShapers = getNShapersInCrate(iCrate);
+          iMaxShapers = getNShapersInCrate(iCrate + 1);
         }
         iCrate++;
       }

@@ -11,7 +11,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 import sys
 import os
 import glob
@@ -29,14 +29,12 @@ inputMdstList('MC9', fileList)
 
 stdPhotons('loose')
 # Bottomonium Skim
-from BottomoniumEtabExclusive_List import *
+from skim.quarkonium import *
 EtabList = EtabList()
-
 skimOutputUdst(skimCode, EtabList)
 summaryOfLists(EtabList)
 
 
-setSkimLogging()
 setSkimLogging()
 process(analysis_main)
 

@@ -598,8 +598,12 @@ const MCParticle* Particle::getMCParticle() const
   if (m_particleType == c_MCParticle) {
     StoreArray<MCParticle> mcParticles;
     return mcParticles[m_mdstIndex];
-  } else
-    return nullptr;
+  } else {
+    const MCParticle* related = this->getRelated<MCParticle>();
+    if (related)
+      return related;
+  }
+  return nullptr;
 }
 
 //--- private methods --------------------------------------------
@@ -874,6 +878,14 @@ float Particle::getExtraInfo(const std::string& name) const
 
 }
 
+void Particle::writeExtraInfo(const std::string& name, const float value)
+{
+  if (this->hasExtraInfo(name)) {
+    this->setExtraInfo(name, value);
+  } else {
+    this->addExtraInfo(name, value);
+  }
+}
 
 void Particle::setExtraInfo(const std::string& name, float value)
 {

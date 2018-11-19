@@ -25,7 +25,7 @@ for var in release_dir_vars:
             # release dir is set, but we couldn't get a commit id -> not tracked
             # shouldn't happen for local dirs, but is OK for central (we'll use .release content)
             try:
-                head_commitid[var] = open(os.path.join(reldir, '.release')).readline().strip()
+                head_commitid[var] = open(os.path.join(reldir, '.release')).readline().strip().decode()
             except:
                 if 'BELLE2_RELEASE' in os.environ:
                    head_commitid[var] = os.environ['BELLE2_RELEASE']
@@ -42,10 +42,10 @@ for var in release_dir_vars:
 
         # get tag for current commit and use it instead of the commit ID if it's a release or build
         proc = subprocess.Popen(['git', '-C', reldir, 'describe', '--exact', '--match', 'release*'], stdout=subprocess.PIPE, stderr=devnull)
-        release_version = proc.communicate()[0].strip()
+        release_version = proc.communicate()[0].strip().decode()
         if proc.returncode != 0:  # try build tag instead
             proc = subprocess.Popen(['git', '-C', reldir, 'describe', '--exact', '--match', 'build*'], stdout=subprocess.PIPE, stderr=devnull)
-            release_version = proc.communicate()[0].strip()
+            release_version = proc.communicate()[0].strip().decode()
             if proc.returncode != 0:
                 release_version = 'HEAD'
 

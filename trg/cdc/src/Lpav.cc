@@ -568,13 +568,12 @@ namespace Belle2 {
     return l;
   }
 
-  void TRGCDCLpav::add(double xi, double yi, double w, double a, double b)
-  {
+//  void TRGCDCLpav::add(double xi, double yi, double w, double a, double b)
+//  {
 //double wi = err_dis_inv(xi, yi, w, a, b);
-    double wi = err_dis_inv(xi, yi, w, a, b);
-    add(xi, yi, wi);
-  }
-
+//    add(xi, yi, wi); calling itself with output
+//  }
+//
   void TRGCDCLpav::add_point(double xi, double yi,
                              double wi)
   {

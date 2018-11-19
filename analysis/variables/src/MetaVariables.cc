@@ -832,6 +832,96 @@ endloop:
       }
     }
 
+
+    Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(phi)");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
+    Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(clusterPhi)");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
+              return std::numeric_limits<float>::quiet_NaN();
+
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfClusterPhi");
+      }
+    }
+
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -1172,21 +1262,15 @@ endloop:
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr)
+          if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            if (particle->getMCParticle()) {
-              if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
-                return -999;
-              Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
-              return var->function(&tempParticle);
-            } else
+            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
               return -999;
-          }
-          if (daughterNumber >= int(particle->getRelated<MCParticle>()->getNDaughters()))
-            return -999;
-          else {
-            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getDaughters().at(daughterNumber));
+            }
+            Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             return var->function(&tempParticle);
+          } else {
+            return -999;
           }
         };
         return func;
@@ -1202,21 +1286,15 @@ endloop:
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr)
+          if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            if (particle->getMCParticle()) {
-              if (particle->getMCParticle()->getMother() == nullptr)
-                return -999;
-              Particle tempParticle = Particle(particle->getMCParticle()->getMother());
-              return var->function(&tempParticle);
-            } else
+            if (particle->getMCParticle()->getMother() == nullptr) {
               return -999;
-          }
-          if (particle->getRelated<MCParticle>()->getMother() == nullptr)
-            return -999;
-          else {
-            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getMother());
+            }
+            Particle tempParticle = Particle(particle->getMCParticle()->getMother());
             return var->function(&tempParticle);
+          } else {
+            return -999;
           }
         };
         return func;
@@ -1395,10 +1473,11 @@ endloop:
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          const MCParticle* mcp = particle->getRelated<MCParticle>();
-          if (!mcp)
+          const MCParticle* mcp = particle->getMCParticle();
+          if (!mcp)   // Has no MC match and is no MCParticle
+          {
             return -999;
-
+          }
           Particle tmpPart(mcp);
           return var->function(&tmpPart);
         };
@@ -1723,6 +1802,17 @@ endloop:
                       "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
                       "Returns the difference in phi between the ECLClusters of two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
+                      "Returns the difference in phi between the two given daughters in the CMS frame.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
+                      "Returns the difference in phi between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"

@@ -57,20 +57,20 @@ def add_skim(label, lists):
 
 
 # ISR cc skim
-from ISRpipicc_List import *
+from skim.quarkonium import ISRpipiccList
 add_skim('ISRpipicc', ISRpipiccList())
 
 # BtoPi0Pi0 Skim
-from BtoPi0Pi0_List import *
+from skim.btocharmless import BtoPi0Pi0List
 add_skim('BtoPi0Pi0', BtoPi0Pi0List())
 
 # Tau Skim
-from Tau_List import *
+from skim.tau import TauLFVList
 add_skim('Tau', TauLFVList())
 
 
 # TCPV Skim
-from TCPV_List import *
+from skim.tcpv import TCPVList
 add_skim('TCPV', TCPVList())
 
 

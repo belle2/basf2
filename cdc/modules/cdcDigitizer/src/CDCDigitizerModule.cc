@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
-#include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/utilities/ClosestApproach.h>
 
 #include <framework/datastore/RelationArray.h>
@@ -28,7 +27,7 @@ using namespace CDC;
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
-  m_cdcgp(), m_aCDCSimHit(), m_posFlag(0),
+  m_cdcgp(), m_gcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
@@ -97,7 +96,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
            "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas; for the gas+wire (MaterialDefinitionMode=0) case, (this value)/f will be used, where f is specified by GasToGasWire",
            25.0);
-  addParam("TDCThreshold4Innter", m_tdcThreshold4Inner,
+  addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
            "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
   addParam("GasToGasWire", m_gasToGasWire,
            "(Approximate) ratio of dE in He/C2H6-gas to dE in gas+wire, where dE is energy deposit.", 1. / 1.6);
@@ -119,6 +118,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   //Switch for database
   addParam("useDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", false);
   addParam("useDB4EDepToADC", m_useDB4EDepToADC, "Fetch and use edep-to-ADC conversion params. from database or not", false);
+
+  addParam("AdditionalFudgeFactorForSpaceResol", m_additionalFudgeFactorForSpaceResol,
+           "Additional fudge factor for space resol. (common to all cells)",  1.);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -156,6 +158,11 @@ void CDCDigitizerModule::initialize()
       //      m_adcThreshold = std::round(m_adcThreshold / m_gasToGasWire);
     }
   }
+  m_gcp = &(CDCGeoControlPar::getInstance());
+  m_totalFudgeFactor  = m_gcp->getFudgeFactorForSpaceResolForMC();
+  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
+  m_totalFudgeFactor *= m_additionalFudgeFactorForSpaceResol;
+  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
   /*
       m_fraction = 1.0;
       m_resolution1 = cdcgp.getNominalSpaceResol();
@@ -607,7 +614,8 @@ float CDCDigitizerModule::smearDriftLength(const float driftLength, const float 
   // Smear drift length
   float newDL = gRandom->Gaus(driftLength + mean , resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
-  return newDL;
+  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
+  return m_totalFudgeFactor * newDL;
 }
 
 
@@ -697,8 +705,8 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
     double propLength = (m_posWire - backWirePos).Mag();
     //    if (m_cdcgp->getSenseWireZposMode() == 1) {
     //TODO: replace the following with cached reference
-    //    std::cout << CDCGeoControlPar::getInstance().getSenseWireZposMode() << std::endl;
-    if (CDCGeoControlPar::getInstance().getSenseWireZposMode() == 1) {
+    //    std::cout << m_gcp->getInstance().getSenseWireZposMode() << std::endl;
+    if (m_gcp->getSenseWireZposMode() == 1) {
       const unsigned short layer = m_wireID.getICLayer();
       propLength += m_cdcgp->getBwdDeltaZ(layer);
     }

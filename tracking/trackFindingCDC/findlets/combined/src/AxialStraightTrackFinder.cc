@@ -60,10 +60,7 @@ void AxialStraightTrackFinder::apply(const std::vector<CDCWireHit>& wireHits,
   std::vector<const CDCWireHit*> axialWireHits;
   axialWireHits.reserve(wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {
-    wireHit->unsetTemporaryFlags();
-    wireHit->unsetMaskedFlag();
     if (not wireHit.isAxial()) continue;
-    if (wireHit->hasBackgroundFlag()) continue;
     axialWireHits.emplace_back(&wireHit);
   }
 

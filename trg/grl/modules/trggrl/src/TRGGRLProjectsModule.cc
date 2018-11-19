@@ -454,7 +454,7 @@ void TRGGRLProjectsModule::event()
       if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
       else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
       else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
-      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
+      else {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
 
       if (abs(phi_itrk - phi_jclu) <= 17 && abs(phi_itrk - phi_jclu) >= 19) {Trkcluster_b2b_1to3 = 1;}
       if (abs(phi_itrk - phi_jclu) <= 16 && abs(phi_itrk - phi_jclu) >= 20) {Trkcluster_b2b_1to5 = 1;}

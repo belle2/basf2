@@ -626,7 +626,7 @@ EKLM::GeometryData::~GeometryData()
 
 void EKLM::GeometryData::saveToDatabase(const IntervalOfValidity& iov) const
 {
-  Database::Instance().storeData("EKLMGeometry", (TObject*)m_Geometry, iov);
+  Database::Instance().storeData("EKLMGeometry", m_Geometry, iov);
 }
 
 double EKLM::GeometryData::getStripLength(int strip) const

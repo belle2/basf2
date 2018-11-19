@@ -36,6 +36,9 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
            "tracks with pt greater than this value will exclusively be matched based on angular distance", 0.3);
   addParam("brlEdgeTheta", m_brlEdgeTheta,
            "distance of polar angle from gaps where crystal-entering based matching is applied (in rad)", 0.1);
+  addParam("minimalCDCHits", m_minimalCDCHits,
+           "bad VXD-standalone tracks cause (too) low photon efficiency in end caps, temporarily fixed by requiring minimal number of CDC hits",
+           0);
 }
 
 ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()
@@ -95,6 +98,8 @@ void ECLTrackClusterMatchingModule::event()
   }
   for (const Track& track : m_tracks) {
     const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
+    // TEMPORARY FIX: require minimal number of CDC hits, otherwise exclude tracks from track-cluster matching procedure
+    if (!(fitResult->getHitPatternCDC().getNHits() > m_minimalCDCHits)) continue;
     double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
     double pt = fitResult->getTransverseMomentum();
     if (!m_angularDistanceMatching || pt < m_matchingPTThreshold || trackTowardsGap(theta)) {

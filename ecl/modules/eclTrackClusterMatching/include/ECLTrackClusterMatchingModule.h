@@ -18,6 +18,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -127,5 +128,6 @@ namespace Belle2 {
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */
     double m_matchingPTThreshold; /**< pt limit between angular-distance based and crystal-entering based matching algorithm */
     double m_brlEdgeTheta; /**< distance of polar angle from gaps where crystal-entering based matching is applied (in rad) */
+    int m_minimalCDCHits; /**< minimal required number of CDC hits before track-cluster match is initiated */
   };
 } //Belle2

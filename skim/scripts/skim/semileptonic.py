@@ -19,6 +19,7 @@ def SemileptonicList(path):
         * (Semi-)Leptonic Working Group skim for semi-leptonic analysis.
         * To be used initially for for B semileptonic decays (B to D l v) (l= electron, muon)
         * Skim code: 11160200
+        * Uses D:all lists
 
     **Decay Modes**:
         *B+ -> D0 e+
@@ -30,16 +31,12 @@ def SemileptonicList(path):
         *B0 ->  D*+ e-
         *B0 ->  D*+ mu-
 
-    Note:
-    Uses D:all lists
-
     **Cuts applied**:
 
     * lepton momentum > 0.35 GeV
     * 5.24 < B_Mbc < 5.29
     * | deltaE | < 0.5
     * nTracks > 4
-
     """
 
     __authors__ = [

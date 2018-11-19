@@ -176,6 +176,8 @@ namespace Belle2 {
     m_alignTree->Branch("phi", &m_phi);
     m_alignTree->Branch("r_poca", &m_pocaR);
     m_alignTree->Branch("z_poca", &m_pocaZ);
+    m_alignTree->Branch("x_poca", &m_pocaX);
+    m_alignTree->Branch("y_poca", &m_pocaY);
     m_alignTree->Branch("Ecms", &m_cmsE);
     m_alignTree->Branch("charge", &m_charge);
     m_alignTree->Branch("PDG", &m_PDG);
@@ -348,6 +350,8 @@ namespace Belle2 {
     auto pocaPosition = fit->getPosition();
     m_pocaR = pocaPosition.Perp();
     m_pocaZ = pocaPosition.Z();
+    m_pocaX = pocaPosition.X();
+    m_pocaY = pocaPosition.Y();
     if (m_pocaR > m_dr) return false;
     if (fabs(m_pocaZ) > m_dz) return false;
 

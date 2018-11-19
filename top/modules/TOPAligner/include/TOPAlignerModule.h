@@ -125,6 +125,8 @@ namespace Belle2 {
     float m_phi = 0; /**< track: extrapolated hit momentum in local (module) frame */
     float m_pocaR = 0; /**< r of POCA */
     float m_pocaZ = 0; /**< z of POCA */
+    float m_pocaX = 0; /**< x of POCA */
+    float m_pocaY = 0; /**< y of POCA */
     float m_cmsE = 0; /**< c.m.s. energy if dimuon or bhabha */
     int m_charge = 0; /**< track charge */
     int m_PDG = 0; /**< track MC truth (simulated data only) */

@@ -21,8 +21,7 @@ from stdPi0s import *
 inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 stdPhotons('loose')  # loose list also creates 'all' list
-loadStdPi0('all')
-loadStdLoosePi0()
+stdPi0('all')
 stdKshorts()
 
 # ----> NtupleMaker module

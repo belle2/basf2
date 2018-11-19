@@ -58,7 +58,7 @@ class TestStdCharged(unittest.TestCase):
         """
         for param in particleloader.available_params():
             if param.name == 'decayStringsWithCuts':
-                name = param.values[0][0].t(':')[1]
+                name = param.values[0][0].split(':')[1]
                 self.assertTrue(
                     name == target,
                     "Name: \"%s\" added by function %s, expecting \"%s\""

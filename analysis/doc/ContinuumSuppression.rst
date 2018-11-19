@@ -23,7 +23,7 @@ The generic interface is the following:
 
 ::
 
-  # build you signal ('B0')
+  # build your signal ('B0')
 
   buildRestOfEvent('B0', path=main)
    
@@ -37,38 +37,12 @@ which are in general analysis dependet. Some examples will be given below.
 
 .. autofunction:: modularAnalysis.buildContinuumSuppression
 
-Old interface
-"""""""""""""
-First a note to those who have been using the module prior to the Feb. 2017 B2GM:
-
-Up until commit ``4cd28b25fdc`` (1/3/2017), the module contained the following hard-coded
-cuts on the ROE, which were taken from the Belle software: 
-
-  * Maximum c.m. momentum of tracks & clusters in the ROE ≤ 3.2.
-  * Minimum lab momentum of clusters in the ROE ≥ 0.05.
-
-Starting with ``935cd4d6b95`` (1/3/2017), these hard-coded cuts have been removed from the
-module. They can now be applied via ROE masks in the steering file. If you are
-happy with the above momentum cuts and would like to continue your analysis
-without changing anything, you can re-apply them like this:
-
-::
- 
-  buildRestOfEvent('B0', path=main)
-   
-  cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-  appendROEMasks('B0', [cleanMask], path=main)
-   
-  buildContinuumSuppression('B0', 'cleanMask', path=main)
-
-In this case, your ntuples will remain the same. 
-
 Clean Mask
 """"""""""
 
-While the ROE cuts can now be tuned for each analysis, it may be a good idea to
-require a minimum of 1 CDC hit in the ROE, to exclude VXD-only fake tracks. You
-can add this to the above mask as follows:
+The ROE cuts should be tuned for each analysis.
+However it may be a good idea to require a minimum of 1 CDC hit in the ROE, to exclude VXD-only fake tracks.
+Here is a simple example that you can use as a starting point:
 
 ::
 
@@ -153,7 +127,7 @@ There are two big differences when using the DCS instead of the Continuum Suppre
 This following section provides additional information about the DCS, which supplements the information in the tutorials.
 
 Adversarial Networks
-~~~~~~~~~~~~~~~~~~~~
+""""""""""""""""""""
 
 Due to the new variables in the DCS, correlations between the classifier output
 and quantities like ``Mbc`` and :math:`\Delta{Z}` are much more likely to occur.

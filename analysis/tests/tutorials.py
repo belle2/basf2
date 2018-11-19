@@ -47,10 +47,6 @@ class TutorialsTest(unittest.TestCase):
                                'B2A904-LookUpTableCreation.py',
                                'B2A905-ApplyWeightsToTracks.py']
 
-        # We don't have exmples data available at Bamboo server, so
-        # I leave this hack here in before the better times.
-        supported_tutorials = []
-
         for t in supported_tutorials:
             with self.subTest(t):
                 self.assertEqual(test_one_tutorial(t), 0)

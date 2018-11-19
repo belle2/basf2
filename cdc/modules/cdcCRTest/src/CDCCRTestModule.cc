@@ -380,6 +380,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
   if (hittrig) {trighit = 1;}
   else {trighit = 0;}
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  static CDC::RealisticTDCCountTranslator* tdcTrans = new RealisticTDCCountTranslator(true);
   m_hNHits->Fill(track->getNumberOfCDCHits());
 
   std::vector<genfit::TrackPoint*> tps = track->getHitPointsWithMeasurement();
@@ -449,26 +450,8 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           res_b_err = std::sqrt(residual_b.getCov()(0, 0));
           res_u_err = std::sqrt(residual_u.getCov()(0, 0));
 
-          t = cdcgeo.getT0(wireid) - tdc * cdcgeo.getTdcBinWidth(); // - dt_flight - dt_prop;
-          dt_flight = mop.getTime();
-          if (dt_flight < 50 && m_ToF) {t -= dt_flight;}
-          //          else{B2WARNING("Flight length larger than cdc volume :"<<r_flight); dt_flight}
-          //estimate length for propagation
+          t = tdcTrans->getDriftTime(tdc, wireid, mop.getTime(), pocaOnWire.Z(), adc);
           z = pocaOnWire.Z();
-          TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
-          z_prop = z - m_backWirePos.Z();
-          B2DEBUG(199, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
-          dt_prop = z_prop * cdcgeo.getPropSpeedInv(lay);
-          if (z_prop < 240 && m_ToP) {t -= dt_prop;}
-
-          /*Time Walk*/
-          t -= cdcgeo.getTimeWalk(wireid, adc);
-
-          // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
-            //            evtT0 =  m_eventTimeStoreObject->getEventT0();
-            t -= evtT0;
-          }
 
           //    t = getCorrectedDriftTime(wireid, tdc, adc, z, z0);
           if (m_StoreCDCSimHitInfo) {

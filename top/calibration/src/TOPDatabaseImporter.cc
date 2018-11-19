@@ -62,6 +62,9 @@
 #include "TFile.h"
 #include "TTree.h"
 
+extern "C" {
+  float phind_lambda_(float*); // phase refractive index of quartz (top_geo.F)
+}
 
 using namespace std;
 
@@ -1206,9 +1209,38 @@ namespace Belle2 {
     return;
   }
 
+  void TOPDatabaseImporter::correctTOPPmtQE()
+  {
+    DBArray<TOPPmtQE> pmtQEData;
+    DBImportArray<TOPPmtQE> pmtQECorrected;
 
+    for (const auto& pmt : pmtQEData) {
+      auto* pmtCorr = pmtQECorrected.appendNew(pmt.getSerialNumber(),
+                                               pmt.getLambdaFirst(),
+                                               pmt.getLambdaStep(),
+                                               pmt.getCE(false),
+                                               pmt.getCE(true));
+      for (unsigned pmtPixel = 1; pmtPixel <= TOPPmtQE::c_NumPmtPixels; pmtPixel++) {
+        auto qeData = pmt.getQE(pmtPixel);
+        float lambda = pmt.getLambdaFirst();
+        float step = pmt.getLambdaStep();
+        for (auto& qe : qeData) {
+          double n = phind_lambda_(&lambda); // phase refractive index of quartz
+          double reflectance = pow((n - 1) / (n + 1), 2);
+          qe /= (1 - reflectance);
+          lambda += step;
+        }
+        pmtCorr->setQE(pmtPixel, qeData);
+      }
+    }
 
+    IntervalOfValidity iov(0, 0, -1, -1);
+    pmtQECorrected.import(iov);
 
+    B2RESULT("Corrected PMT QE data imported to database for "
+             << pmtQECorrected.getEntries() << " PMT's.");
+
+  }
 
 
 //---- for testing only -- will be removed --------------------------------

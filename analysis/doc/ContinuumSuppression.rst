@@ -48,6 +48,9 @@ Here is a simple example that you can use as a starting point:
 
   cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 
+.. note::
+        Prior to Feb. 2017 B2GM, these selections for ROE: ``'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2'`` were hard coded in the module. Since then the explicit usage of a cleanMask is mandatory.
+
 Another new feature is the addition of an event-level R2 variable
 (`R2EventLevel`). It has been added as a `Continuum Suppression` variable, even
 though it is event-level. This returns the event-level R2, where no cuts have

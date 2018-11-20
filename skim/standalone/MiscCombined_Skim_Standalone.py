@@ -3,9 +3,7 @@
 
 #######################################################
 #
-# Prepare all skims at once
-# P. Urquijo, 6/Jan/2015
-#
+# Run TCPV, Tau Generic and Tau LFV skims at once
 ######################################################
 
 from basf2 import *
@@ -16,9 +14,7 @@ from stdV0s import *
 from stdCharm import *
 from stdLightMesons import *
 from stdDiLeptons import *
-set_log_level(LogLevel.INFO)
-
-from skimExpertFunctions import *
+from skimExpertFunctions import setSkimLogging, add_skim, encodeSkimName
 
 
 fileList = [
@@ -46,32 +42,21 @@ loadStdDiLeptons(True)
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
 
 
-def add_skim(label, lists):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-    """
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists)
-    summaryOfLists(lists)
-
-
-# ISR cc skim
-from skim.quarkonium import ISRpipiccList
-add_skim('ISRpipicc', ISRpipiccList())
-
 # BtoPi0Pi0 Skim
-from skim.btocharmless import BtoPi0Pi0List
-add_skim('BtoPi0Pi0', BtoPi0Pi0List())
-
+# from skim.btocharmless import BtoPi0Pi0List
+# add_skim('BtoPi0Pi0', BtoPi0Pi0List())
 # Tau Skim
 from skim.taupair import TauLFVList
 add_skim('TauLFV', TauLFVList())
 
-
 # TCPV Skim
 from skim.tcpv import TCPVList
 add_skim('TCPV', TCPVList())
+
+
+# Tau Generic
+from skim.taupair import TauList
+add_skim('TauGeneric', TauList())
 
 
 setSkimLogging()

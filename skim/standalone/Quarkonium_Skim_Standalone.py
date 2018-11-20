@@ -3,19 +3,18 @@
 
 #######################################################
 #
-# Bottomonium skims
-# S. Spataro, 25/Jul/2016
+# All Quarkonium skims at once
+# Authors: S. Spataro,  Sen Jia
 #
 ######################################################
 
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
-from skimExpertFunctions import *
+from stdCharged import *
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
 gb2_setuprel = 'release-02-00-01'
-import sys
-import os
-import glob
+
 
 fileList = \
     [
@@ -28,21 +27,23 @@ inputMdstList('MC9', fileList)
 
 
 stdPhotons('loose')
+
+loadStdCharged()
+
+
 # Bottomonium Etab Skim: 15420100
-from skim.quarkonium import *
-EtabList = EtabList()
-skimCode1 = encodeSkimName('BottomoniumEtabExclusive')
-skimOutputUdst(skimCode1, EtabList)
-summaryOfLists(EtabList)
+from skim.quarkonium import EtabList
+add_skim('BottomoniumEtabExclusive', EtabList())
 
 
 # Bottomonium Upsilon Skim: 15440100
-from skim.quarkonium import *
-YList = UpsilonList()
-skimCode2 = encodeSkimName('BottomoniumUpsilon')
-skimOutputUdst(skimCode2, YList)
-summaryOfLists(YList)
+from skim.quarkonium import UpsilonList
+add_skim('BottomoniumUpsilon', UpsilonList())
 
+
+# ISR cc skim
+from skim.quarkonium import ISRpipiccList
+add_skim('ISRpipicc', ISRpipiccList())
 
 setSkimLogging()
 process(analysis_main)

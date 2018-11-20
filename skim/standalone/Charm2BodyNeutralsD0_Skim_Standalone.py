@@ -33,7 +33,7 @@ loadStdCharged()
 loadStdKS()
 # stdPi0s()
 
-from skim.charm import D0ToNeutralsList
+from skim.charm import D0ToNeutrals
 
 D0ToNeutralsList = D0ToNeutrals()
 skimOutputUdst(skimCode, D0ToNeutralsList)

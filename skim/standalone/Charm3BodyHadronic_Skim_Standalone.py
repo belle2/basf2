@@ -35,9 +35,7 @@ loadStdSkimPi0()
 loadStdCharged()
 loadStdKS()
 
-from skim.charm import DstToD0PiD0ToHpJmPi0List
-
-
+from skim.charm import DstToD0PiD0ToHpJmPi0
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0()
 skimOutputUdst(skimCode, DstToD0PiD0ToHpJmPi0List)
 

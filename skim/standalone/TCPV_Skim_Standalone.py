@@ -45,7 +45,7 @@ from stdV0s import *
 from stdLightMesons import *
 from stdDiLeptons import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
 
 
@@ -55,31 +55,34 @@ import glob
 skimCode = encodeSkimName('TCPV')
 
 
+# create a path
+tcpvskimpath = Path()
+
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=tcpvskimpath)
 
-loadStdSkimPi0()
-loadStdSkimPhoton()
-stdPi0s('loose')
-loadStdCharged()
-stdPhotons('loose')
-loadStdKS()
-loadStdDiLeptons(True)
-loadStdLightMesons()
-cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
+loadStdSkimPi0(path=tcpvskimpath)
+loadStdSkimPhoton(path=tcpvskimpath)
+stdPi0s('loose', path=tcpvskimpath)
+loadStdCharged(path=tcpvskimpath)
+stdPhotons('loose', path=tcpvskimpath)
+loadStdKS(path=tcpvskimpath)
+loadStdDiLeptons(True, path=tcpvskimpath)
+loadStdLightMesons(path=tcpvskimpath)
+cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
 # TCPV Skim
 from skim.tcpv import *
-tcpvList = TCPVList()
-skimOutputUdst(skimCode, tcpvList)
-summaryOfLists(tcpvList)
+tcpvList = TCPVList(path=tcpvskimpath)
+skimOutputUdst(skimCode, tcpvList, path=tcpvskimpath)
+summaryOfLists(tcpvList, path=tcpvskimpath)
 
 setSkimLogging()
-process(analysis_main)
+process(tcpvskimpath)
 
 # print out the summary
 print(statistics)

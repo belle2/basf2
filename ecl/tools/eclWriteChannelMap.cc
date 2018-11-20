@@ -32,11 +32,15 @@ using namespace ECL;
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    std::cout << "Usage: eclWriteChannelMap experiment run" << std::endl;
+    std::cout << "Usage: eclWriteChannelMap experiment run [experimentEnd] [runEnd]" << std::endl;
     return -1;
   }
   int experiment = std::stoi(argv[1]);
   int run = std::stoi(argv[2]);
+  int exp_end = -1;
+  int run_end = -1;
+  if (argc > 3) exp_end = std::stoi(argv[3]);
+  if (argc > 4) run_end = std::stoi(argv[4]);
 
   //------------------------------------------------------------------------
   //..Specify database
@@ -61,7 +65,8 @@ int main(int argc, char** argv)
   //..Write out to localdb
   Belle2::DBImportObjPtr<Belle2::ECLChannelMap> importer("ECLChannelMap");
   importer.construct(mapper.getDBObject());
-  importer.import(Belle2::IntervalOfValidity(experiment, run, -1, -1));
-  std::cout << "Successfully wrote payload ECLChannelMap with iov " << experiment << "," << run << ",-1,-1" << std::endl;
+  importer.import(Belle2::IntervalOfValidity(experiment, run, exp_end, run_end));
+  std::cout << "Successfully wrote payload ECLChannelMap with iov "
+            << experiment << "," << run << "," << exp_end << "," << run_end << std::endl;
 }
 

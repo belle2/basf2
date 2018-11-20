@@ -10,7 +10,7 @@
 
 from basf2 import process, statistics
 from modularAnalysis import analysis_main, inputMdstList, \
-        skimOutputUdst, summaryOfLists
+    skimOutputUdst, summaryOfLists
 from stdCharged import loadStdCharged
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 

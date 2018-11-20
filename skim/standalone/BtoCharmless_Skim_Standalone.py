@@ -15,11 +15,7 @@ from stdV0s import *
 from stdCharm import *
 from stdLightMesons import *
 from stdDiLeptons import *
-set_log_level(LogLevel.INFO)
-import os
-import sys
-import glob
-from skimExpertFunctions import *
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
 
 
 fileList = \
@@ -42,18 +38,6 @@ stdPi0s('loose')
 stdPi0s('all')
 loadStdSkimPi0()
 loadStdLightMesons()
-
-
-def add_skim(label, lists):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-
-    """
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists)
-    summaryOfLists(lists)
-
 
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
 Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()

@@ -3,9 +3,7 @@
 
 #######################################################
 #
-# Prepare all skims at once
-# P. Urquijo, 6/Jan/2015
-#
+# Run all dark skims at once
 ######################################################
 
 from basf2 import *
@@ -16,9 +14,8 @@ from stdV0s import *
 from stdCharm import *
 from stdLightMesons import *
 from stdDiLeptons import *
-set_log_level(LogLevel.INFO)
 
-from skimExpertFunctions import *
+from skimExpertFunctions import setSkimLogging, encodeSkimName, add_skim
 
 
 fileList = [
@@ -47,16 +44,6 @@ loadStdDiLeptons(True, path=darkskimpath)
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=darkskimpath)
 
 
-def add_skim(label, lists, path=darkskimpath):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-    """
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists, path=darkskimpath)
-    summaryOfLists(lists)
-
-
 from skim.dark import ALP3GammaList
 add_skim('ALP3Gamma', ALP3GammaList(path=darkskimpath))
 
@@ -69,9 +56,7 @@ add_skim('LFVZpVisible', LFVZpVisibleList(path=darkskimpath))
 
 
 from skim.dark import SinglePhotonDarkList
-darklist = SinglePhotonDarkList(path=darkskimpath)
-add_skim('SinglePhotonDark', darklist, path=darkskimpath)
-
+add_skim('SinglePhotonDark', SinglePhotonDarkList(path=darkskimpath))
 setSkimLogging(skim_path=darkskimpath)
 process(darkskimpath)
 

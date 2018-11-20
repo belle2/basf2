@@ -84,6 +84,17 @@ def decodeSkimName(skimCode):
     return lookup_dict[skimCode]
 
 
+def add_skim(label, lists):
+    """
+    create uDST skim for given lists, saving into $label.udst.root
+    Particles not necessary for the given particle lists are not saved.
+
+    """
+    skimCode = encodeSkimName(label)
+    skimOutputUdst(skimCode, lists)
+    summaryOfLists(lists)
+
+
 def setSkimLogging(skim_path=analysis_main, additional_modules=[]):
     """ Turns the log level to ERROR for  several modules to decrease the total size of the skim log files"""
     noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules

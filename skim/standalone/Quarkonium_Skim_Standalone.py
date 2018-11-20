@@ -3,8 +3,8 @@
 
 #######################################################
 #
-# Bottomonium skims
-# S. Spataro, 25/Jul/2016
+# All Quarkonium skims at once
+# Authors: S. Spataro,  Sen Jia
 #
 ######################################################
 
@@ -12,11 +12,9 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import *
-from skimExpertFunctions import *
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
 gb2_setuprel = 'release-02-00-01'
-import sys
-import os
-import glob
+
 
 fileList = \
     [
@@ -31,16 +29,6 @@ inputMdstList('MC9', fileList)
 stdPhotons('loose')
 
 loadStdCharged()
-
-
-def add_skim(label, lists):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-    """
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists)
-    summaryOfLists(lists)
 
 
 # Bottomonium Etab Skim: 15420100

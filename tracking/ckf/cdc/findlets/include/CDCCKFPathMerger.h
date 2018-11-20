@@ -17,8 +17,10 @@
 #include <boost/functional/hash.hpp>
 
 namespace Belle2 {
+  /// Merge similar paths
   class CDCCKFPathMerger : public TrackFindingCDC::Findlet<CDCCKFPath> {
   public:
+    /// main method of the findlet, reads/returns merged paths
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {
       /// TODO: Merging does not work properly, as the tracks we compare must not have the same number of hits (and must not be at the same stage)
@@ -42,6 +44,7 @@ namespace Belle2 {
     }
 
   private:
+    /// helper function, returns has of the last 3 wire hits on the path
     size_t lastThreeHitHash(const CDCCKFPath& path)
     {
       size_t seed = 0;

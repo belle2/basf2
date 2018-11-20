@@ -24,6 +24,7 @@
 
 
 namespace Belle2 {
+  /// CKF tree searcher which traces several best paths.
   class StackTreeSearcher : public
     TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const> {
   public:
@@ -44,6 +45,7 @@ namespace Belle2 {
       m_pathSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("path", prefix));
     }
 
+    /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.
     void apply(std::vector<CDCCKFPath>& paths,
                const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
     {
@@ -100,9 +102,13 @@ namespace Belle2 {
     }
 
   private:
+    /// algorthim to create CDC-CDF states while traversing the path
     CDCCKFStateCreator m_stateCreator;
+    /// algorithm to perform state filtering
     CDCCKFStateFilter m_stateFilter;
+    /// algorithm to merge similar paths
     CDCCKFPathMerger m_pathMerger;
+    /// algorithm to select N best paths, for further processing.
     CDCCKFPathSelector m_pathSelector;
   };
 }

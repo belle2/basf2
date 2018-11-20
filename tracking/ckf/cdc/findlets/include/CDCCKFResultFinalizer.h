@@ -23,10 +23,9 @@
 #include <vector>
 
 namespace Belle2 {
-  class RecoTrack;
-
   class ModuleParamList;
 
+  /// Findlet to finalize CKF Paths in terms of final result.
   class CDCCKFResultFinalizer : public TrackFindingCDC::Findlet<const CDCCKFPath, CDCCKFResult> {
   public:
     CDCCKFResultFinalizer()
@@ -34,11 +33,13 @@ namespace Belle2 {
       addProcessingSignalListener(&m_filter);
     }
 
+    /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
       m_filter.exposeParameters(moduleParamList, prefix);
     }
 
+    /// main method of the findlet, for a list of paths create a list of results.
     void apply(const std::vector<CDCCKFPath>& paths, std::vector<CDCCKFResult>& results) override
     {
       if (paths.empty()) {
@@ -63,6 +64,7 @@ namespace Belle2 {
     }
 
   private:
+    /// Filter to weigth the best path
     TrackFindingCDC::ChooseableFilter<CDCPathFilterFactory> m_filter;
   };
 }

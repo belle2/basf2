@@ -1,0 +1,138 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <tracking/ckf/cdc/utilities/CDCMCUtil.h>
+
+#include <tracking/ckf/cdc/entities/CDCCKFState.h>
+#include <tracking/mcMatcher/TrackMatchLookUp.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <functional>
+
+using namespace Belle2;
+
+bool MCUtil::hitIsCorrect(const RecoTrack* mcRecoTrack, const TrackFindingCDC::CDCRLWireHit& rlWireHit) const
+{
+  TrackFindingCDC::CDCMCManager& mcManager = TrackFindingCDC::CDCMCManager::getInstance();
+
+  const CDCHit* cdcHit = rlWireHit.getHit();
+
+  const TrackFindingCDC::CDCSimHitLookUp& simHitLookUp = mcManager.getSimHitLookUp();
+
+  const TrackFindingCDC::ERightLeft& mcRightLeftInfo = simHitLookUp.getRLInfo(cdcHit);
+
+  const auto isSameMCTrack = [&mcRecoTrack](const RecoTrack & hitRecoTrack) {
+    return &hitRecoTrack == mcRecoTrack;
+  };
+
+  const std::string& mcRecoTrackStoreArrayName = mcRecoTrack->getArrayName();
+
+  const auto& relatedMCTracksToHit = cdcHit->getRelationsTo<RecoTrack>(mcRecoTrackStoreArrayName);
+  if (not TrackFindingCDC::any(relatedMCTracksToHit, isSameMCTrack)) {
+    return false;
+  }
+
+  if (mcRightLeftInfo != TrackFindingCDC::ERightLeft::c_Invalid and mcRightLeftInfo != rlWireHit.getRLInfo()) {
+    return false;
+  }
+
+  return true;
+}
+
+unsigned int MCUtil::getNumberOfCorrectHits(const RecoTrack* mcRecoTrack,
+                                            const std::vector<const TrackFindingCDC::CDCRLWireHit>& hits) const
+{
+  const auto hitIsCorrectSpecialisation = [this, mcRecoTrack](const TrackFindingCDC::CDCRLWireHit rlWireHit) {
+    return hitIsCorrect(mcRecoTrack, rlWireHit);
+  };
+
+  const unsigned int numberOfCorrectHits = std::count_if(hits.begin(), hits.end(), hitIsCorrectSpecialisation);
+  return numberOfCorrectHits;
+}
+
+bool MCUtil::allStatesCorrect(const std::vector<CDCCKFState>& states) const
+{
+  // Test if
+  //  (a) all states are in the MC track and
+  //  (b) the MC track has from the first to the last state not any hit more than the given list
+
+  const RecoTrack* seed = states.front()->getSeed();
+
+  B2ASSERT("Path without a seed?", seed);
+
+  if (states.size() <= 1) {
+    // just the seed? this can not be correct...
+    return false;
+  }
+
+  const std::string& seedTrackStoreArrayName = seed->getArrayName();
+
+  TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
+  const RecoTrack* mcTrack = mcCDCMatchLookUp.getRelatedMCRecoTrack(*seed);
+
+  if (not mcTrack) {
+    // Track is a fake
+    B2DEBUG(100, "Seed is a fake");
+    return false;
+  }
+
+  std::vector<const TrackFindingCDC::CDCRLWireHit*> rlWireHits;
+  for (const CDCCKFState* state : states) {
+    const TrackFindingCDC::CDCRLWireHit* rlWireHit = state->getHit();
+    if (rlWireHit) {
+      rlWireHits.push_back(rlWireHit);
+    }
+  }
+
+  const unsigned int numberOfCorrectHits = getNumberOfCorrectHits(mcTrack, rlWireHits);
+
+  B2DEBUG(100, "Have found " << numberOfCorrectHits << " correct out of  " << rlWireHits.size() << " hits");
+  if (numberOfCorrectHits != rlWireHits.size()) {
+    return false;
+  }
+
+  // Test if there are missing hits in between
+  const TrackFindingCDC::CDCRLWireHit* lastWireHit = states.back()->getHit();
+
+  B2ASSERT("A hit must be present!", lastWireHit);
+
+  for (const CDCHit* cdcHit : mcTrack->getSortedCDCHitList()) {
+    if (cdcHit == lastWireHit->getHit()) {
+      break;
+    }
+
+    // it is ok to have missing hits on the last layer, as the CKF
+    // walks through the hits maybe in another direction as the
+    // MC track has them
+    if (cdcHit->getICLayer() == lastWireHit->getHit()->getICLayer()) {
+      continue;
+    }
+
+    const auto hasSameCDCHit = [&cdcHit](const CDCCKFState * state) {
+      const TrackFindingCDC::CDCRLWireHit* wireHit = state->getHit();
+      if (not wireHit) {
+        return false;
+      }
+
+      return wireHit->getHit() == cdcHit;
+    };
+    if (std::find_if(states.begin(), states.end(), hasSameCDCHit) == states.end()) {
+      return false;
+    }
+  }
+
+  return true;
+}

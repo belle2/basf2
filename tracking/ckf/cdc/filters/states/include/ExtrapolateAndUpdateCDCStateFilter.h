@@ -21,18 +21,22 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  /// A very extrapolateAndUpdate filter for all CDC states.
+  /// An extrapolateAndUpdate filter for all CDC states.
   class ExtrapolateAndUpdateCDCStateFilter : public BaseCDCStateFilter {
   public:
     ExtrapolateAndUpdateCDCStateFilter();
 
+    /// Extrapolate along the path (pair.first) to the CDC wireHit-state (pair.second). Return 1/chi2 if Ok, NAN otherwise.
     TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
+    /// Kalman filter extrapolator
     Advancer m_extrapolator;
+
+    /// Kalman filter updater
     KalmanStepper<1> m_updater;
   };
 }

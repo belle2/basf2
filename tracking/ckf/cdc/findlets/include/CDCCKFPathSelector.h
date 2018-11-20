@@ -19,6 +19,7 @@
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
+  /// Select the m_maximalCandidatesInFlight paths for further processing
   class CDCCKFPathSelector : public TrackFindingCDC::Findlet<CDCCKFPath> {
   public:
     CDCCKFPathSelector()
@@ -35,6 +36,7 @@ namespace Belle2 {
       m_filter.exposeParameters(moduleParamList, prefix);
     }
 
+    /// main method of the findlet, out of all paths "newPaths" select the best N=m_maximalCandidatesInFlight
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {
       const auto pathComparison = [&](const CDCCKFPath & lhs, const CDCCKFPath & rhs) {
@@ -46,7 +48,9 @@ namespace Belle2 {
     }
 
   private:
+    /// Maximum number of paths to select
     size_t m_maximalCandidatesInFlight = 3;
+    /// Filter to order paths
     TrackFindingCDC::ChooseableFilter<CDCPathPairFilterFactory> m_filter;
   };
 }

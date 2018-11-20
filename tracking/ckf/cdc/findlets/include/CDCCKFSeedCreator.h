@@ -19,8 +19,10 @@
 
 namespace Belle2 {
 
+  /// Create a CKF seed based on RecoTrack (presumably from VXDTF2)
   class CDCCKFSeedCreator : public TrackFindingCDC::Findlet<RecoTrack* const, CDCCKFPath> {
   public:
+    /// Main method of the findlet, loop over reco tracks, create seeds for each of them.
     void apply(const std::vector<RecoTrack*>& recoTracks, std::vector<CDCCKFPath>& seeds) override
     {
       for (RecoTrack* recoTrack : recoTracks) {

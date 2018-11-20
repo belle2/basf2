@@ -29,6 +29,7 @@ namespace Belle2 {
 
   class ModuleParamList;
 
+  /// Main findlet of the ToCDCCKF module
   class CKFToCDCFindlet : public TrackFindingCDC::Findlet<const TrackFindingCDC::CDCWireHit> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::CDCWireHit>;

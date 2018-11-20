@@ -23,7 +23,7 @@
 
 namespace Belle2 {
 
-
+  /// Create CKF states, based on the current path. Perform some basic selection at this stage (based on phi, max. jump of layers)
   class CDCCKFStateCreator
     : public TrackFindingCDC::Findlet<CDCCKFState, const CDCCKFState,
       const TrackFindingCDC::CDCWireHit* const > {
@@ -49,14 +49,14 @@ namespace Belle2 {
                                     m_maximalDeltaPhi, "Maximal distance in phi between wires for Z=0 plane", m_maximalDeltaPhi);
     }
 
-    /// Clear the wire cache
+    /// Clear the wireHit cache
     void beginEvent() override
     {
       Super::beginEvent();
       m_wireHitCache.clear();
     }
 
-
+    /// Main method of the findlet. Select + create states (output parameter nextStates) suitable for the input path, based on input wireHits
     void apply(std::vector<CDCCKFState>& nextStates, const CDCCKFPath& path,
                const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
     {
@@ -113,8 +113,11 @@ namespace Belle2 {
     }
 
   private:
+    /// Maximum allowed step over layers
     int m_maximalLayerJump = 2;
+    /// Maximal distance in phi between the path last hit/seed and the candidate hit
     double m_maximalDeltaPhi =  TMath::Pi() / 8;
+    /// Cache to store frequently used information
     std::vector<CDCCKFWireHitCache> m_wireHitCache = {};
   };
 }

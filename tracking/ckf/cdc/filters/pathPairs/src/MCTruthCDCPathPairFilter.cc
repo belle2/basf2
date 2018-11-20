@@ -49,6 +49,7 @@ TrackFindingCDC::Weight MCTruthCDCPathPairFilter::operator()(const BaseCDCPathPa
 
   const auto* lhsMCRecoTrack = lhsSeed.getMCRecoTrack();
   const auto* rhsMCRecoTrack = rhsSeed.getMCRecoTrack();
+  //  std::cout << "here " << lhsMCRecoTrack << " " << rhsMCRecoTrack << "\n";
 
   if (not lhsMCRecoTrack and rhsMCRecoTrack) {
     return -1;
@@ -63,6 +64,7 @@ TrackFindingCDC::Weight MCTruthCDCPathPairFilter::operator()(const BaseCDCPathPa
   const unsigned int lhsCorrectHits = countCorrectHits(lhs, lhsMCRecoTrack);
   const unsigned int rhsCorrectHits = countCorrectHits(rhs, rhsMCRecoTrack);
 
+
   if (lhsCorrectHits > rhsCorrectHits) {
     return 1;
   } else if (lhsCorrectHits < rhsCorrectHits) {
@@ -72,6 +74,8 @@ TrackFindingCDC::Weight MCTruthCDCPathPairFilter::operator()(const BaseCDCPathPa
   // In case both have the same number of correct hits, return the shortest (which has the highest purity)
   const unsigned int lhsSize = lhs.size();
   const unsigned int rhsSize = rhs.size();
+
+  // std::cout << "len select lhs:" << lhsSize << " rhs: " << rhsSize << "\n";
 
   if (lhsSize > rhsSize) {
     return -1;

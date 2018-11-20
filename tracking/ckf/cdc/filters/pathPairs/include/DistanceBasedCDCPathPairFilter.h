@@ -15,10 +15,10 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
-  /// Return the size of the path
+  /// For the two paths with the same number of hits prefers one with smallest sum dist^2
   class DistanceBasedCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
-    /// Main function: return the size of the path
+    /// Input: pair of paths, returns 1 if pair.first to be selected, 0 otherwise.
     TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;

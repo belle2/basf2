@@ -10,6 +10,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
 #include <framework/io/RootIOUtilities.h>
 
 #include <cmath>
@@ -48,6 +49,7 @@ SeqRootInputModule::SeqRootInputModule() : Module()
            "filename as a boost::format pattern instead of the standard where "
            "subsequent files are named .sroot-N. For example 'myfile-f%08d.sroot'",
            false);
+  addParam("declareRealData", m_realData, "Declare the input to be real, not generated data", false);
 }
 
 
@@ -118,6 +120,12 @@ void SeqRootInputModule::initialize()
   }
   m_fileptr = 0;
 
+  if (m_realData) {
+    StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+    fileMetaData.registerInDataStore();
+    fileMetaData.create();
+    fileMetaData->declareRealData();
+  }
 
   B2INFO("SeqRootInput: initialized.");
 }

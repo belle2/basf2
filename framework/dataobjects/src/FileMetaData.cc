@@ -27,7 +27,7 @@ using namespace boost::python;
 FileMetaData::FileMetaData() :
   m_lfn(""), m_nEvents(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
   m_experimentHigh(0), m_runHigh(0), m_eventHigh(0), m_date(""), m_site(""), m_user(""), m_release(""),
-  m_steering(""), m_mcEvents(0)
+  m_steering(""), m_isMC(true), m_mcEvents(0)
 {
 }
 
@@ -66,6 +66,7 @@ void FileMetaData::exposePythonAPI()
   .def("get_random_seed", &FileMetaData::getRandomSeed, return_value_policy<copy_const_reference>())
   .def("get_release", &FileMetaData::getRelease, return_value_policy<copy_const_reference>())
   .def("get_steering", &FileMetaData::getSteering, return_value_policy<copy_const_reference>())
+  .def("is_mc", &FileMetaData::isMC)
   .def("get_mc_events", &FileMetaData::getMcEvents)
   .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag, return_value_policy<copy_const_reference>())
   .def("get_data_description", &FileMetaData::getDataDescription, return_value_policy<copy_const_reference>())
@@ -102,6 +103,7 @@ void FileMetaData::Print(Option_t* option) const
     printer.put("user", m_user);
     printer.put("randomSeed", m_randomSeed);
     printer.put("release", m_release);
+    printer.put("type", m_isMC ? "mc" : "real");
     printer.put("mcEvents", m_mcEvents);
     printer.put("globalTag", m_databaseGlobalTag);
     printer.put("dataDescription", m_dataDescription);

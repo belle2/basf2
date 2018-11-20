@@ -59,6 +59,8 @@ namespace Belle2 {
     DecayDescriptor();
     /** Copy ctor. */
     DecayDescriptor(const DecayDescriptor& other);
+    /** Assignment operator. */
+    DecayDescriptor& operator =(const DecayDescriptor& other);
 
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */

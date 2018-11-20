@@ -39,6 +39,16 @@ bool DecayDescriptorParticle::init(const DecayStringParticle& p)
   return true;
 }
 
+
+DecayDescriptorParticle& DecayDescriptorParticle::operator =(const DecayDescriptorParticle& other)
+{
+  m_strName = other.m_strName;
+  m_isSelected = other.m_isSelected;
+  m_strLabel = other.m_strLabel;
+  m_iPDGCode = other.m_iPDGCode;
+  return *this;
+}
+
 string DecayDescriptorParticle::getNameSimple() const
 {
   string strNameSimple(m_strName);

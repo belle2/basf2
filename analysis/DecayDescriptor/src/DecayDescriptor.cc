@@ -47,6 +47,18 @@ DecayDescriptor::DecayDescriptor(const DecayDescriptor& other) :
 {
 }
 
+DecayDescriptor& DecayDescriptor::operator =(const DecayDescriptor& other)
+{
+  m_mother = other.m_mother;
+  m_iDaughter_p = other.m_iDaughter_p;
+  m_daughters = other.m_daughters;
+  m_isIgnorePhotons = other.m_isIgnorePhotons;
+  m_isIgnoreIntermediate = other.m_isIgnoreIntermediate;
+  m_isInclusive = other.m_isInclusive;
+  m_isNULL = other.m_isNULL;
+  return *this;
+}
+
 bool DecayDescriptor::init(const std::string& str)
 {
   // The decay string grammar

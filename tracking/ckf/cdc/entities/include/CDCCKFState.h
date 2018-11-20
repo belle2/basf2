@@ -29,7 +29,7 @@ namespace Belle2 {
       m_seed(seed), m_trackState(trackState) {}
 
     /// constructor from the CDC wireHit
-    CDCCKFState(const TrackFindingCDC::CDCWireHit* wireHit) : m_cdcWireHit(wireHit) {}
+    explicit CDCCKFState(const TrackFindingCDC::CDCWireHit* wireHit) : m_cdcWireHit(wireHit) {}
 
     /// Get CDCWireHit corresponding to the state
     const TrackFindingCDC::CDCWireHit* getWireHit() const

@@ -22,7 +22,7 @@ namespace Belle2 {
 
   public:
     /// Constructor forwarding the default filter name
-    CDCPathPairFilterFactory(const std::string& defaultFilterName = "distance");
+    explicit CDCPathPairFilterFactory(const std::string& defaultFilterName = "distance");
 
     /// Default destructor
     ~CDCPathPairFilterFactory();

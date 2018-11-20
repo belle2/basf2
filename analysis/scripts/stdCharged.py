@@ -39,7 +39,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
     @param path         modules are added to this path
     """
 
-    if particletype is not in chargednames:
+    if particletype not in chargednames:
         B2FATAL("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
     else:
         particleindex = chargednames.index(particletype)
@@ -64,7 +64,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
             PIDnames[particleindex] + ' > 0.002 and ' + goodTrack,
             True,
             path=path)
-    elif listtype is not in effnames:
+    elif listtype not in effnames:
         B2FATAL("The requested list is not defined. Please refer to the stdCharged documentation.")
     else:
         effindex = effnames.index(listtype)

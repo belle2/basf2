@@ -140,9 +140,8 @@ void ECLUnpackerModule::initialize()
 
 void ECLUnpackerModule::beginRun()
 {
-  //TODO
-  m_tagsReported   = false;
-  m_phasesReported = false;
+  m_tagsReportedMask   = 0;
+  m_phasesReportedMask = 0;
 }
 
 void ECLUnpackerModule::event()
@@ -320,11 +319,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         // check that trigger phases for all shapers in the crate are equal
         if (triggerPhase0 == -1) triggerPhase0 = triggerPhase;
-        else if (triggerPhase != triggerPhase0 && !m_phasesReported) {
-          B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
-                  << LogVar("crate", iCrate)
-                  << LogVar("trigger phase1", triggerPhase) << LogVar("trigger phase0", triggerPhase0));
-          m_phasesReported = true;
+        else if (triggerPhase != triggerPhase0) {
+          doPhasesReport(iCrate, triggerPhase0, triggerPhase);
         }
 
         B2DEBUG_eclunpacker(22, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel <<
@@ -339,12 +335,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
         else if (triggerTag != triggerTag0) {
-          if (!m_tagsReported) {
-            B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
-                    << LogVar("crate", iCrate)
-                    << LogVar("trigger tag1", triggerTag) << LogVar("trigger tag0", triggerTag0));
-            m_tagsReported = true;
-          }
+          doTagsReport(iCrate, triggerTag0, triggerTag);
           triggerTag0 |= (1 << 16);
         }
 
@@ -495,3 +486,23 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   }// loop ove FINESSes
 
 }
+
+void ECLUnpackerModule::doTagsReport(int iCrate, int tag0, int tag1)
+{
+  if (!tagsReported(iCrate)) {
+    B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger tag0", tag0) << LogVar("trigger tag1", tag1));
+    m_tagsReportedMask |= 1 << (iCrate - 1);
+  }
+}
+void ECLUnpackerModule::doPhasesReport(int iCrate, int phase0, int phase1)
+{
+  if (!phasesReported(iCrate)) {
+    B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger phase0", phase0) << LogVar("trigger phase1", phase1));
+    m_phasesReportedMask |= 1 << (iCrate - 1);
+  }
+}
+

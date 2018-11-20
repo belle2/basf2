@@ -13,7 +13,7 @@ from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
-from skim.standardparticles.lightmesons import *
+from skim.standardlists.lightmesons import *
 
 
 def SetTauGenericSkimVariables():

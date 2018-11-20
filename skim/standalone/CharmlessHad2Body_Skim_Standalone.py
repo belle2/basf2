@@ -11,7 +11,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from skim.standardparticles.lightmesons import *
+from skim.standardlists.lightmesons import *
 from stdCharged import stdLoosePi
 from stdCharged import stdLooseK
 from stdPi0s import loadStdSkimPi0

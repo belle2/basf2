@@ -13,7 +13,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-from skim.standardparticles.charm import *
+from skim.standardlists.charm import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
@@ -33,7 +33,7 @@ inputMdstList('MC9', fileList)
 
 loadStdCharged()
 
-stdPi0s('loose')  # for skim.standardparticles.charm
+stdPi0s('loose')  # for skim.standardlists.charm
 stdPhotons('loose')
 stdKshorts()
 

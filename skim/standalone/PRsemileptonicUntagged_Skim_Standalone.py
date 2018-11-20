@@ -18,7 +18,7 @@ from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import *
-from skim.standardparticles.charm import *
+from skim.standardlists.charm import *
 set_log_level(LogLevel.INFO)
 import sys
 import os

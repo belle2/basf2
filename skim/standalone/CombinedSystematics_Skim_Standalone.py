@@ -19,9 +19,9 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-from skim.standardparticles.charm import *
-from skim.standardparticles.lightmesons import *
-from skim.standardparticles.dileptons import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
 

@@ -9,9 +9,9 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from stdLightMesons import *
-from stdDiLeptons import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
 
 from skimExpertFunctions import *
@@ -22,7 +22,7 @@ inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 loadStdCharged()
 stdPi0s('loose')
 stdPhotons('loose')
-loadStdKS()
+stdKshorts()
 loadStdLightMesons()
 loadStdSkimPi0()
 loadStdSkimPhoton()

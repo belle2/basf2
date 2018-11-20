@@ -42,8 +42,8 @@ from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
-from skim.standardparticles.lightmesons import *
-from skim.standardparticles.dileptons import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)

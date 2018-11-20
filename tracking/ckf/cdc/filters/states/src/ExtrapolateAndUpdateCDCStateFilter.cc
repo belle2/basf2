@@ -84,7 +84,7 @@ TrackFindingCDC::Weight ExtrapolateAndUpdateCDCStateFilter::operator()(const Bas
     setRLInfo(mSoP, state);
 
     return 1. / state.getChi2();
-  } catch (genfit::Exception) {
+  } catch (const genfit::Exception& e) {
     return NAN;
   }
 }

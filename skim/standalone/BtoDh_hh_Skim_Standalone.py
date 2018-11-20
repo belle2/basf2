@@ -12,7 +12,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 import os
 import sys
 import glob
@@ -33,7 +33,7 @@ inputMdstList('MC9', fileList)
 loadStdCharged()
 
 # B+ to D(->h+h-)h+ Skim
-from BtoDh_hh_List import *
+from skim.btocharm import loadD0bar, BsigToDhTohhList()
 loadD0bar()
 BtoDhList = BsigToDhTohhList()
 skimOutputUdst(skimCode, BtoDhList)

@@ -17,7 +17,7 @@ from skim.standardparticles.lightmesons import *
 from stdPhotons import *
 set_log_level(LogLevel.INFO)
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 import sys
 import os
 import glob
@@ -44,7 +44,7 @@ stdKshorts()
 loadStdLightMesons()
 
 # EWP Skim
-from BtoXll_List import *
+from skim.ewp import B2XllList
 XllList = B2XllList()
 skimOutputUdst(skimCode, XllList)
 summaryOfLists(XllList)

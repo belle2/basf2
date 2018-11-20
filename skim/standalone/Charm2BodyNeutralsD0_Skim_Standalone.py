@@ -15,7 +15,7 @@ from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 import os
 import sys
 import glob
@@ -33,7 +33,7 @@ loadStdCharged()
 stdKshorts()
 # stdPi0s()
 
-from Charm2BodyNeutralsD0_List import *
+from skim.charm import D0ToNeutralsList
 
 D0ToNeutralsList = D0ToNeutrals()
 skimOutputUdst(skimCode, D0ToNeutralsList)

@@ -15,7 +15,7 @@ from stdPi0s import *
 from stdV0s import *
 from skim.standardparticles.charm import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import os
 import sys
@@ -35,7 +35,7 @@ loadStdSkimPi0()
 stdKshorts()
 
 # B- to D(->Kspi0)h- Skim
-from BtoDh_Kspi0_List import *
+from skim.btocharm import loadDkspi0, BsigToDhToKspi0List
 loadDkspi0()
 BtoDhList = BsigToDhToKspi0List()
 skimOutputUdst(skimCode, BtoDhList)

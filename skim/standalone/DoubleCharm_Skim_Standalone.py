@@ -18,7 +18,7 @@ from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
 
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 import os
 import sys
 import glob
@@ -42,7 +42,7 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # Double Charm Skim
-from DoubleCharm_List import *
+from skim.btocharm import *
 DCList = DoubleCharmList()
 skimOutputUdst(skimCode, DCList)
 summaryOfLists(DCList)

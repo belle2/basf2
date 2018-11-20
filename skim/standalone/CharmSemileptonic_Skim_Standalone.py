@@ -14,7 +14,7 @@ from stdPhotons import *
 from stdPi0s import *
 from stdCharged import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import os
 import sys
@@ -40,7 +40,7 @@ fillParticleList('e+:std', 'electronID > 0.1 and chiProb > 0.001 and p > 0.25', 
 fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
 
 # CSL Skim
-from CharmSemileptonic_List import *
+from skim.charm import CSLList
 CSLList = CharmSemileptonicList()
 skimOutputUdst(skimCode, CSLList)
 summaryOfLists(CSLList)

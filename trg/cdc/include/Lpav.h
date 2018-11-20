@@ -84,7 +84,7 @@ namespace Belle2 {
     bool operator!=(const TRGCDCLpav&) const;
 
     // private member functions
-    void add(double x, double y, double w = 1, double a = 0, double b = 0);
+//    void add(double x, double y, double w = 1, double a = 0, double b = 0);
     void sub(double x, double y, double w = 1, double a = 0, double b = 0);
     void calculate_average_n(double xxav, double yyav, double xyav,
                              double xrrav, double yrrav, double rrrrav);

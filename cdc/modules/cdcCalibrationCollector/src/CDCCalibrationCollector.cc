@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "cdc/modules/cdcCalibrationCollector/CDCCalibrationCollector.h"
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -185,6 +186,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
 {
   B2DEBUG(99, "start collect hit");
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  static CDC::RealisticTDCCountTranslator* tdcTrans = new RealisticTDCCountTranslator(true);
 
   for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
     const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
@@ -228,22 +230,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         alpha *= 180 / M_PI;
         theta *= 180 / M_PI;
         //estimate drift time
-        double dt_flight;
-        double dt_prop;
-        t = cdcgeo.getT0(wireid) - tdc * cdcgeo.getTdcBinWidth(); // - dt_flight - dt_prop;
-        dt_flight = mop.getTime();
-        if (dt_flight < 50) {t -= dt_flight;}
-        double z = pocaOnWire.Z();
-        TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
-        double z_prop = z - m_backWirePos.Z();
-        B2DEBUG(99, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
-        dt_prop = z_prop * cdcgeo.getPropSpeedInv(lay);
-        if (z_prop < 240) {t -= dt_prop;}
-        // Time Walk
-        t -= cdcgeo.getTimeWalk(wireid, adc);
-        // substract event t0;
-        t -= evtT0;
-
+        t = tdcTrans->getDriftTime(tdc, wireid, mop.getTime(), pocaOnWire.Z(), adc);
         getObjectPtr<TTree>("tree")->Fill();
       } //NDF
       // }//end of if isU

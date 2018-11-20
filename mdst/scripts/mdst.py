@@ -14,13 +14,15 @@ def add_mdst_output(
     dataDescription=None,
 ):
     """
-    This function adds the MDST output modules to a path, saving only objects defined as part of the MDST data format.
+    Add the mDST output module to a path.
+    This function defines the mDST data format.
 
-    @param path Path to add modules to
-    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
-    @param filename Output file name.
-    @param additionalBranches Additional objects/arrays of event durability to save
-    @param dataDescription Additional key->value pairs to be added as data description
+    Arguments:
+        path (basf2.Path): Path to add module to
+        mc (bool): Save Monte Carlo quantities? (MCParticles and corresponding relations)
+        filename (str): Output file name.
+        additionalBranches (list): Additional objects/arrays of event durability to save
+        dataDescription (dict or None): Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     """
 
@@ -62,9 +64,13 @@ def add_mdst_output(
 
 
 def add_mdst_dump(path, print_untested=False):
-    """This adds a PrintObjectsModule to the path for printing the mDST content.
+    """
+    Add a PrintObjectsModule to a path for printing the mDST content.
 
-    @param path Path to add modules to
+    Arguments:
+        path (basf2.Path): Path to add module to
+        print_untested (bool): If True print the names of all methods which are not
+            explicitly printed to make sure we don't miss addition of new members
     """
 
     # prepare a list of PID detector sets and charged stable particles

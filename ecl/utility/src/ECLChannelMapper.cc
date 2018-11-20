@@ -100,6 +100,10 @@ bool ECLChannelMapper::initFromDB()
 {
   DBObjPtr<Belle2::ECLChannelMap> channelMap("ECLChannelMap");
 
+  if (!channelMap.isValid()) {
+    B2FATAL("ECLChannelMapper:: Could not get ECLChannelMap from the database.");
+  }
+
   const auto& mappingBAR = channelMap->getMappingVectorBAR();
   const auto& mappingFWD = channelMap->getMappingVectorFWD();
   const auto& mappingBWD = channelMap->getMappingVectorBWD();
@@ -127,7 +131,7 @@ bool ECLChannelMapper::initFromDB()
     }
 
     if (cellID > ECL_TOTAL_CHANNELS) {
-      B2ERROR("ECLChannelMapper:: wrong cellID (" << cellID << ") in the database payload");
+      B2FATAL("ECLChannelMapper:: wrong cellID (" << cellID << ") in the database payload");
       return false;
     }
 

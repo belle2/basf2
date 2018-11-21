@@ -250,15 +250,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   // loop over FINESSEs in the COPPER
   for (int iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
 
-    ECLTrig* eclTrig = 0;
-
     m_bitPos = 0;
     m_bufPos = 0;
-
-    // trigger phase of the Collector connected to this FINESSE
-    // -1 if there are no triggered shapers
-    int triggerPhase0 = -1;
-    int triggerTag0   = -1;
 
     m_bufLength = rawCOPPERData->GetDetectorNwords(n, iFINESSE);
 
@@ -291,6 +284,12 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     }
 
     try {
+
+      ECLTrig* eclTrig = 0;
+      // trigger phase of the Collector connected to this FINESSE
+      // -1 if there are no triggered shapers
+      int triggerPhase0 = -1;
+      int triggerTag0   = -1;
 
       // read the collector header
       value = readNextCollectorWord();
@@ -480,10 +479,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         eclTrig->setTimeTrig(triggerPhase0);
         eclTrig->setTrigTag(triggerTag0);
       }
-
-
-
-
 
     } // try
     catch (...) {

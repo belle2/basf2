@@ -17,6 +17,7 @@ CHANGES since release-00-09-03:
   + hasPulseShapeDiscrimination
   + hasTriggerClusterMatching
   + isTriggerCluster
+  * getCovarianceMatrixAsArray removed
 - KlIds are added
 - TRGSummary:
   * getTimTypeBits is replaced by getTimType

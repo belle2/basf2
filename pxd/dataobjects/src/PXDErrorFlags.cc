@@ -47,7 +47,7 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
     // 56-59
     "TriggerGate differ for DHEs in event", "Trigger FrameNr differ for DHEs in event", "DHP row w/o Pix", "DHE_START is not third frame",
     // 60-63
-    "Fake and NoFake frames for DHH", "unused", "unused", "unused"
+    "Fake and NoFake frames for DHH", "Unreasonable Data", "unused", "unused"
   };
   if (bit < 0 || bit >= ONSEN_MAX_TYPE_ERR) return undefined;
   return error_name[bit];

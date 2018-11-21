@@ -64,7 +64,7 @@ or ask a question at
 [FATAL] Invalid inputs. Please set a vaild root output file name (fileName) or valid TTree name (treeName) module parameters.  { module: NtupleMaker_ntupleTree_ }
 [INFO] ================================================================================
 
-[?1034h[WARNING] You are not processing the (deprecated) analysis_main path, but it has the following modules:
+[WARNING] You are not processing the (deprecated) analysis_main path, but it has the following modules:
 NtupleMaker_ntupleFile_hello.root
 NtupleMaker_ntupleTree_
 [INFO] Starting event processing, random seed is set to '1337'
@@ -76,4 +76,3 @@ NtupleMaker_ntupleTree_
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] ================================================================================
 
-[?1034h[?1034h

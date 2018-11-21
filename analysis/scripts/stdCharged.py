@@ -4,21 +4,6 @@
 from basf2 import *
 from modularAnalysis import *
 
-# basic quality cut strings
-_trackQuality = 'thetaInCDCAcceptance and chiProb > 0.001'
-_ipCut = 'd0 < 0.5 and abs(z0) < 2'
-_goodTrack = _trackQuality + ' and ' + _ipCut
-# define arrays to interpret cut matrix
-_chargednames = ['pi', 'K', 'p', 'e', 'mu']
-_pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
-_effnames = ['95eff', '90eff', '85eff']
-# efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
-_effcuts = [[0.002, 0.075, 0.275],
-            [0.002, 0.043, 0.218],
-            [0.000, 0.061, 1.000],
-            [0.047, 1.000, 1.000],
-            [0.008, 1.000, 1.000]]
-
 
 # standard particles master function
 def stdCharged(particletype, listtype, path=analysis_main):
@@ -39,46 +24,61 @@ def stdCharged(particletype, listtype, path=analysis_main):
     @param path         modules are added to this path
     """
 
-    if particletype not in _chargednames:
+    # basic quality cut strings
+    trackQuality = 'thetaInCDCAcceptance and chiProb > 0.001'
+    ipCut = 'd0 < 0.5 and abs(z0) < 2'
+    goodTrack = trackQuality + ' and ' + ipCut
+    # define arrays to interpret cut matrix
+    chargednames = ['pi', 'K', 'p', 'e', 'mu']
+    pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
+    effnames = ['95eff', '90eff', '85eff']
+    # efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
+    effcuts = [[0.002, 0.075, 0.275],
+               [0.002, 0.043, 0.218],
+               [0.000, 0.061, 1.000],
+               [0.047, 1.000, 1.000],
+               [0.008, 1.000, 1.000]]
+
+    if particletype not in chargednames:
         B2FATAL("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
     else:
-        particleindex = _chargednames.index(particletype)
+        particleindex = chargednames.index(particletype)
 
     if listtype == 'all':
         fillParticleList(particletype + '+:all', '', True, path=path)
     elif listtype == 'good':
         fillParticleList(
             particletype + '+:good',
-            _pidnames[particleindex] + ' > 0.5 and ' + _goodTrack,
+            pidnames[particleindex] + ' > 0.5 and ' + goodTrack,
             True,
             path=path)
     elif listtype == 'loose':
         fillParticleList(
             particletype + '+:loose',
-            _pidnames[particleindex] + ' > 0.1 and ' + _goodTrack,
+            pidnames[particleindex] + ' > 0.1 and ' + goodTrack,
             True,
             path=path)
     elif listtype == 'higheff':
         fillParticleList(
             particletype + '+:higheff',
-            _pidnames[particleindex] + ' > 0.002 and ' + _goodTrack,
+            pidnames[particleindex] + ' > 0.002 and ' + goodTrack,
             True,
             path=path)
-    elif listtype not in _effnames:
+    elif listtype not in effnames:
         B2FATAL("The requested list is not defined. Please refer to the stdCharged documentation.")
     else:
-        effindex = _effnames.index(listtype)
-        pidcut = _effcuts[particleindex][effindex]
+        effindex = effnames.index(listtype)
+        pidcut = effcuts[particleindex][effindex]
         if 0.0 < pidcut < 1.0:
             fillParticleList(
                 particletype +
                 '+:' +
                 listtype,
-                _pidnames[particleindex] +
+                pidnames[particleindex] +
                 ' > ' +
                 str(pidcut) +
                 ' and ' +
-                _goodTrack,
+                goodTrack,
                 True,
                 path=path)
         else:

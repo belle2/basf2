@@ -251,9 +251,8 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   // Correction factor (multiplicative).
   double result = 1.0;
-  double x = 0.0;
   double x0 = 0.0;
-  double  x1 = 0.0;
+  double x1 = 0.0;
   double xd = 0.0;
 
   // Convert -180..180 to 0..360
@@ -261,14 +260,13 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   int x0Bin = 0;
   int x1Bin = m_numOfPhiBins - 1;
-  int phiGap = 0;
-  phiGap = int(phiMod / (360.0 / (m_phiPeriodicity * 1.0)));
-  x = phiMod - phiGap * (360.0 / (m_phiPeriodicity * 1.0));
+  int phiGap = int(phiMod / (360.0 / (m_phiPeriodicity * 1.0)));
+  double x = phiMod - phiGap * (360.0 / (m_phiPeriodicity * 1.0));
 
   const double phiBinWidth = 360.0 / (1.0 * m_numOfPhiBins * m_phiPeriodicity);
 
   if (x <= phiBinWidth / 2.0) {
-    x0 = 0.00;
+    x0 = 0.0;
     x1 = phiBinWidth / 2.0;
     x0Bin = 0;
     x1Bin = m_numOfPhiBins - 1;
@@ -395,7 +393,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
   int z0Bin = 0;
   int z1Bin = 1;
 
-  if (z >= 0.00 and z < m_avgRecEn[0]) {
+  if (z >= 0.0 and z < m_avgRecEn[0]) {
     z0 = 0.01;
     z1 = m_avgRecEn[0];
     z0Bin = 0;

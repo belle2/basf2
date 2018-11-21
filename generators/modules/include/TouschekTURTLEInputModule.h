@@ -51,6 +51,12 @@ namespace Belle2 {
     /** Reads the data and stores it into the MCParticle collection. */
     virtual void event() override;
 
+    /** no copy */
+    TouschekTURTLEInputModule(const TouschekTURTLEInputModule&) = delete;
+
+    /** no assignment */
+    TouschekTURTLEInputModule& operator=(const TouschekTURTLEInputModule&) = delete;
+
 
   protected:
 

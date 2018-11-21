@@ -11,7 +11,7 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdMu, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import *
@@ -32,12 +32,17 @@ inputMdstList('MC9', fileList)
 
 loadStdSkimPhoton()
 loadStdSkimPi0()
-loadStdCharged()
-loadStdKS()
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+stdKshorts()
 
-from skim.charm import DstToD0PiD0ToHpJmPi0List
-
-
+from skim.charm import DstToD0PiD0ToHpJmPi0
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0()
 skimOutputUdst(skimCode, DstToD0PiD0ToHpJmPi0List)
 

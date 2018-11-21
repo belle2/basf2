@@ -14,11 +14,11 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import *
-from stdCharm import *
+from skim.standardlists.charm import *
 set_log_level(LogLevel.INFO)
 import sys
 import os
@@ -37,7 +37,9 @@ fileList = [
 PRSLpath = Path()
 
 inputMdstList('MC9', fileList, path=PRSLpath)
-loadStdCharged(path=PRSLpath)
+stdPi('all', path=PRSLpath)
+stdE('all', path=PRSLpath)
+stdMu('all', path=PRSLpath)
 # PR Skim
 from skim.semileptonic import PRList
 PRList = PRList(path=PRSLpath)

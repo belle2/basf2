@@ -11,7 +11,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
@@ -29,7 +29,15 @@ fileList = [
 ]
 inputMdstList('MC9', fileList, path=lfvzppath)
 
-loadStdCharged(path=lfvzppath)
+stdPi('loose', path=lfvzppath)
+stdK('loose', path=lfvzppath)
+stdE('loose', path=lfvzppath)
+stdMu('loose', path=lfvzppath)
+stdPi('all', path=lfvzppath)
+stdK('all', path=lfvzppath)
+stdE('all', path=lfvzppath)
+stdMu('all', path=lfvzppath)
+
 
 from skim.dark import LFVZpVisibleList
 SysList = LFVZpVisibleList(path=lfvzppath)

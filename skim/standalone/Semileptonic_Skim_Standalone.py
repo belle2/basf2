@@ -10,10 +10,10 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
+from skim.standardlists.charm import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
@@ -32,10 +32,14 @@ SLskimpath = Path()
 inputMdstList('MC9', fileList, path=SLskimpath)
 stdPi0s('loose', path=SLskimpath)
 stdPhotons('loose', path=SLskimpath)
-loadStdCharged(path=SLskimpath)
+stdPi('loose', path=SLskimpath)
+stdK('loose', path=SLskimpath)
+stdPi('all', path=SLskimpath)
+stdE('all', path=SLskimpath)
+stdMu('all', path=SLskimpath)
 loadStdSkimPi0(path=SLskimpath)
 loadStdSkimPhoton(path=SLskimpath)
-loadStdKS(path=SLskimpath)
+stdKshorts(path=SLskimpath)
 
 loadStdD0(path=SLskimpath)
 loadStdDplus(path=SLskimpath)

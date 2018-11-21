@@ -1132,26 +1132,26 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
 
 
 
-  int bit_hit = hit && 0x01;
-  int bit_Timing = (Timing && 0x7F) ;
-  int bit_RevoFAM = (RevoFAM && 0x7F) ;
-  int bit_TimingSource  = (TimingSource && 0x07) ;
-  int bit_physics = (physics &&  0x01) ;
-  int bit_2Dbhabha = (bhabhaveto && 0x01) ;
-  int bit_bhabhatype = (Bhabhatype && 0x3FFF);
-  int bit_etot = (((int)etot) && 0x1FFF) ;
-  int bit_elow = (elow && 0x01);
-  int bit_ehigh = (ehigh && 0x01) ;
-  int bit_elum = (elum && 0x01) ;
-  int bit_ICN = (ICN && 0x7F) ;
-  int bit_BGVeto = (BGVeto && 0x07) ;
-  int bit_ClusterOverflow = (ClusterOverflow && 0x01);
-  int bit_3Dbhabha = (bhabha3D && 0x01);
-  int bit_lowmulti = lowmultibit && 0x0FFF;
+  int bit_hit = hit & 0x01;
+  int bit_Timing = (Timing & 0x7F) ;
+  int bit_RevoFAM = (RevoFAM & 0x7F) ;
+  int bit_TimingSource  = (TimingSource & 0x07) ;
+  int bit_physics = (physics &  0x01) ;
+  int bit_2Dbhabha = (bhabhaveto & 0x01) ;
+  int bit_bhabhatype = (Bhabhatype & 0x3FFF);
+  int bit_etot = (((int)etot) & 0x1FFF) ;
+  int bit_elow = (elow & 0x01);
+  int bit_ehigh = (ehigh & 0x01) ;
+  int bit_elum = (elum & 0x01) ;
+  int bit_ICN = (ICN & 0x7F) ;
+  int bit_BGVeto = (BGVeto & 0x07) ;
+  int bit_ClusterOverflow = (ClusterOverflow & 0x01);
+  int bit_3Dbhabha = (bhabha3D & 0x01);
+  int bit_lowmulti = lowmultibit & 0x0FFF;
 
 
 
-  _Triggerbit[2] |= ((bit_lowmulti) >> 2) && 0x3FF;
+  _Triggerbit[2] |= ((bit_lowmulti) >> 2) & 0x3FF;
 
   _Triggerbit[1] |= (bit_lowmulti & 0x03);
   _Triggerbit[1] <<= 2;

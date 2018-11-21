@@ -24,7 +24,7 @@ namespace Belle2 {
       /** Enums for used error bits (out of maximum).
        * used for e.g. plotting ranges
        */
-      enum { ONSEN_USED_TYPE_ERR = 61};
+      enum { ONSEN_USED_TYPE_ERR = 62};
 
       /** Typedef the flag variable type (uint64_t)
        */
@@ -113,7 +113,8 @@ namespace Belle2 {
         c_DHE_START_THIRD = 1ull << 59,
         //
         c_FAKE_NO_FAKE_DATA = 1ull << 60,
-        // 61, 62, 63 unused
+        c_UNREASONABLE_DATA = 1ull << 61,
+        // 62, 63 unused
       };
 
       /** Get the description for the given error bit set above

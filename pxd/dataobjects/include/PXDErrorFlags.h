@@ -113,7 +113,7 @@ namespace Belle2 {
         c_DHE_START_THIRD = 1ull << 59,
         //
         c_FAKE_NO_FAKE_DATA = 1ull << 60,
-        c_UNREASONABLE_DATA = 1ull << 61,
+        c_UNUSABLE_DATA = 1ull << 61,
         // 62, 63 unused
       };
 

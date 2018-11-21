@@ -21,6 +21,7 @@ namespace Belle2 {
   // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
   typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
   using Belle2::PXD::PXDError::PXDErrorFlags;
+  using Belle2::PXD::PXDError::EPXDErrMask;
 
   /**
    * The PXD DAQ DHE Status class
@@ -55,7 +56,7 @@ namespace Belle2 {
 
     /** Mark Data in DHE as Unusable
      */
-    void markUnusable() { m_usable = false; }
+    void markUnusable() { m_usable = false; m_errorMask |= EPXDErrMask::c_UNUSABLE_DATA;}
 
     /** Set Error bit mask
      * @param m Bit Mask to set
@@ -82,7 +83,7 @@ namespace Belle2 {
      * the PXD data from this DHE is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0ull && (m_errorMask & EPXDErrMask::c_UNUSABLE_DATA) == 0ull;}
 
     /** Set VxdID and DHE ID of sensor */
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};

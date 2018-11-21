@@ -29,7 +29,7 @@ namespace Belle2 {
       ECL_BKW_CRATES         = 8,
       ECL_COPPERS            = 26,
       ECL_BARREL_COPPERS     = 18,
-      ECL_ENCAP_COPPERS      = 8,
+      ECL_ENDCAP_COPPERS     = 8,
       ECL_TOTAL_CHANNELS     = 8736,
       ECL_BARREL_CHANNELS    = 6624,
       ECL_FWD_CHANNELS       = 1152,

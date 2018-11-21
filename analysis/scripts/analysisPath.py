@@ -18,11 +18,11 @@ If your code looked something like:
 
 please replace it with your own path:
 
-   from basf2 import Path, process
+   import basf2
    from modularAnalysis import doSomething
-   mypath = Path() # create your own path (call it what you like)
+   mypath = basf2.Path() # create your own path (call it what you like)
    doSomething(path=mypath)
-   process(mypath)
+   basf2.process(mypath)
 
 For more hints, check the documentation
   https://software.belle2.org/framework/doc/index-03-framework.html#modules-and-paths

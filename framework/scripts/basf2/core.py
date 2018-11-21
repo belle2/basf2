@@ -172,6 +172,8 @@ def process(path, max_event=0):
     if path is None:
         return
 
+    # check if this is analysis_main (or any other global path object we
+    # deprecated) and print the warning attached to it
     try:
         pybasf2.B2WARNING(path._deprecation_warning)
     except AttributeError:

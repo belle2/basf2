@@ -113,6 +113,8 @@ void PXDDAQDQMModule::beginRun()
   hDAQErrorEvent->Reset();
   hDAQErrorDHC->Reset();
   hDAQErrorDHE->Reset();
+  hDAQUseableModule->Reset();
+  hDAQNotUseableModule->Reset();
 }
 
 void PXDDAQDQMModule::event()

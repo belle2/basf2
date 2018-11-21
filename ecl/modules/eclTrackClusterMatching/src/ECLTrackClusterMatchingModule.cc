@@ -61,30 +61,43 @@ void ECLTrackClusterMatchingModule::initialize()
     m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
     m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "AngularDistance");
 
-    m_parametrizationFunctions = m_matchingParameterizations->getRMSParameterizations();
+    // function to update parameterization functions if the payload changes
+    auto updateParameterizationFunctions = [this]() {
+      const auto& map = m_matchingParameterizations->getRMSParameterizations();
 
-    f_phiRMSFWDCROSS = m_parametrizationFunctions.at("PhiFWDCROSS");
-    f_phiRMSFWDDL = m_parametrizationFunctions.at("PhiFWDDL");
-    f_phiRMSFWDNEAR = m_parametrizationFunctions.at("PhiFWDNEAR");
-    f_phiRMSBRLCROSS = m_parametrizationFunctions.at("PhiBRLCROSS");
-    f_phiRMSBRLDL = m_parametrizationFunctions.at("PhiBRLDL");
-    f_phiRMSBRLNEAR = m_parametrizationFunctions.at("PhiBRLNEAR");
-    f_phiRMSBWDCROSS = m_parametrizationFunctions.at("PhiBWDCROSS");
-    f_phiRMSBWDDL = m_parametrizationFunctions.at("PhiBWDDL");
-    f_phiRMSBWDNEAR = m_parametrizationFunctions.at("PhiBWDNEAR");
-    f_thetaRMSFWDCROSS = m_parametrizationFunctions.at("ThetaFWDCROSS");
-    f_thetaRMSFWDDL = m_parametrizationFunctions.at("ThetaFWDDL");
-    f_thetaRMSFWDNEAR = m_parametrizationFunctions.at("ThetaFWDNEAR");
-    f_thetaRMSBRLCROSS = m_parametrizationFunctions.at("ThetaBRLCROSS");
-    f_thetaRMSBRLDL = m_parametrizationFunctions.at("ThetaBRLDL");
-    f_thetaRMSBRLNEAR = m_parametrizationFunctions.at("ThetaBRLNEAR");
-    f_thetaRMSBWDCROSS = m_parametrizationFunctions.at("ThetaBWDCROSS");
-    f_thetaRMSBWDDL = m_parametrizationFunctions.at("ThetaBWDDL");
-    f_thetaRMSBWDNEAR = m_parametrizationFunctions.at("ThetaBWDNEAR");
+      f_phiRMSFWDCROSS = map.at("PhiFWDCROSS");
+      f_phiRMSFWDDL = map.at("PhiFWDDL");
+      f_phiRMSFWDNEAR = map.at("PhiFWDNEAR");
+      f_phiRMSBRLCROSS = map.at("PhiBRLCROSS");
+      f_phiRMSBRLDL = map.at("PhiBRLDL");
+      f_phiRMSBRLNEAR = map.at("PhiBRLNEAR");
+      f_phiRMSBWDCROSS = map.at("PhiBWDCROSS");
+      f_phiRMSBWDDL = map.at("PhiBWDDL");
+      f_phiRMSBWDNEAR = map.at("PhiBWDNEAR");
+      f_thetaRMSFWDCROSS = map.at("ThetaFWDCROSS");
+      f_thetaRMSFWDDL = map.at("ThetaFWDDL");
+      f_thetaRMSFWDNEAR = map.at("ThetaFWDNEAR");
+      f_thetaRMSBRLCROSS = map.at("ThetaBRLCROSS");
+      f_thetaRMSBRLDL = map.at("ThetaBRLDL");
+      f_thetaRMSBRLNEAR = map.at("ThetaBRLNEAR");
+      f_thetaRMSBWDCROSS = map.at("ThetaBWDCROSS");
+      f_thetaRMSBWDDL = map.at("ThetaBWDDL");
+      f_thetaRMSBWDNEAR = map.at("ThetaBWDNEAR");
+    };
 
-    m_matchingThresholdValuesFWD = m_matchingThresholds->getFWDMatchingThresholdValues();
-    m_matchingThresholdValuesBRL = m_matchingThresholds->getBRLMatchingThresholdValues();
-    m_matchingThresholdValuesBWD = m_matchingThresholds->getBWDMatchingThresholdValues();
+    // function to update matching threshold functions if the payload changes
+    auto updateMatchingThresholds = [this]() {
+      m_matchingThresholdValuesFWD = m_matchingThresholds->getFWDMatchingThresholdValues();
+      m_matchingThresholdValuesBRL = m_matchingThresholds->getBRLMatchingThresholdValues();
+      m_matchingThresholdValuesBWD = m_matchingThresholds->getBWDMatchingThresholdValues();
+    };
+
+    // Update once right away
+    updateParameterizationFunctions();
+    updateMatchingThresholds();
+    // And register to be called every time the payloads change
+    m_matchingParameterizations.addCallback(updateParameterizationFunctions);
+    m_matchingThresholds.addCallback(updateMatchingThresholds);
   } else {
     m_tracks.registerRelationTo(m_eclShowers, DataStore::c_Event, DataStore::c_WriteOut, "EnterCrystal");
     m_tracks.registerRelationTo(m_eclClusters, DataStore::c_Event, DataStore::c_WriteOut, "EnterCrystal");

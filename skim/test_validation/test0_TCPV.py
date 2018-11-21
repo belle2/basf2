@@ -32,7 +32,7 @@ eventinfosetter.param('expList', [0])
 tcpvskimpath.add_module(eventinfosetter)
 
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('TCPV.dec'))
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('skim/test_validation/TCPV.dec'))
 tcpvskimpath.add_module(evtgeninput)
 
 # detector simulation

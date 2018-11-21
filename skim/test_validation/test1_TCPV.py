@@ -11,21 +11,42 @@ __author__ = "Reem Rasheed"
 
 
 import sys
-import os.path
 
 from basf2 import *
 from modularAnalysis import *
-from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
+
+
+from basf2 import *
+from modularAnalysis import *
+from stdCharged import *
+from stdPhotons import *
+from stdPi0s import *
+from stdV0s import *
+from stdLightMesons import *
+from stdDiLeptons import *
+from skimExpertFunctions import *
+
 
 tcpvskimpath = Path()
 fileList = ['../TCPV.dst.root']
 inputMdstList('MC9', fileList, path=tcpvskimpath)
 
 
-# Hadronic B0 skim
-from skim.tcpv import *
+loadStdSkimPi0(path=tcpvskimpath)
+loadStdSkimPhoton(path=tcpvskimpath)
+stdPi0s('loose', path=tcpvskimpath)
+loadStdCharged(path=tcpvskimpath)
+stdPhotons('loose', path=tcpvskimpath)
+loadStdKS(path=tcpvskimpath)
+loadStdDiLeptons(True, path=tcpvskimpath)
+loadStdLightMesons(path=tcpvskimpath)
+cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
+
+
+# TCPV  B0 skim
+from skim.tcpv import TCPVList
 TCPVList = TCPVList(path=tcpvskimpath)
 skimOutputUdst('../TCPV.udst.root', TCPVList, path=tcpvskimpath)
 summaryOfLists(TCPVList, path=tcpvskimpath)

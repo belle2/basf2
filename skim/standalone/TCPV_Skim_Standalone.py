@@ -76,7 +76,7 @@ loadStdDiLeptons(True, path=tcpvskimpath)
 loadStdLightMesons(path=tcpvskimpath)
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)
 # TCPV Skim
-from skim.tcpv import *
+from skim.tcpv import TCPVList
 tcpvList = TCPVList(path=tcpvskimpath)
 skimOutputUdst(skimCode, tcpvList, path=tcpvskimpath)
 summaryOfLists(tcpvList, path=tcpvskimpath)

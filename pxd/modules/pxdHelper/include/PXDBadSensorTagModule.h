@@ -21,18 +21,18 @@ namespace Belle2 {
 
   namespace PXD {
 
-    /** The PXD bad event select module.
+    /** The PXD bad sensor tagger module.
      *
      * This module flags sensors/modules (by DHE id) with broken data content
      * (e.g. daq says data is o.k., but content is crap
      *
      */
 
-    class PXDBadEventSelectModule : public Module {
+    class PXDBadSensorTagModule : public Module {
 
     public:
       /** Constructor defining the parameters */
-      PXDBadEventSelectModule();
+      PXDBadSensorTagModule();
 
     private:
 

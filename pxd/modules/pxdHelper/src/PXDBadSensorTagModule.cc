@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdHelper/PXDBadEventSelectModule.h>
-// #include <framework/datastore/DataStore.h>
+#include <pxd/modules/pxdHelper/PXDBadSensorTagModule.h>
 
 
 using namespace std;
@@ -18,10 +17,10 @@ using namespace Belle2::PXD;
 using namespace Belle2::PXD::PXDError;
 
 
-REG_MODULE(PXDBadEventSelect)
+REG_MODULE(PXDBadSensorTag)
 
 
-PXDBadEventSelectModule::PXDBadEventSelectModule() :
+PXDBadSensorTagModule::PXDBadSensorTagModule() :
   Module()
 {
   //Set module properties
@@ -29,7 +28,7 @@ PXDBadEventSelectModule::PXDBadEventSelectModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void PXDBadEventSelectModule::initialize()
+void PXDBadSensorTagModule::initialize()
 {
   //Register output collections
   m_storeRawHits.isRequired(m_PXDRawHitsName);
@@ -62,7 +61,7 @@ void PXDBadEventSelectModule::initialize()
   };
 }
 
-void PXDBadEventSelectModule::event()
+void PXDBadSensorTagModule::event()
 {
   std::map <VxdID, int> freq;
   for (auto& p : m_storeRawHits) {

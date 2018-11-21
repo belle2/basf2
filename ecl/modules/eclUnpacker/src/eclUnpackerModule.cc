@@ -140,8 +140,9 @@ void ECLUnpackerModule::initialize()
 
 void ECLUnpackerModule::beginRun()
 {
-  m_tagsReportedMask   = 0;
-  m_phasesReportedMask = 0;
+  m_tagsReportedMask      = 0;
+  m_phasesReportedMask    = 0;
+  m_badHeaderReportedMask = 0;
 }
 
 void ECLUnpackerModule::event()
@@ -307,7 +308,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         B2DEBUG_eclunpacker(22, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
         // check shaperDSP header
         if ((value & 0x00FF0000) != 0x00100000) {
-          B2ERROR("Ecl Unpacker:: bad shaper header");
+          doBadHeaderReport(iCrate);
           throw Bad_ShaperDSP_header();
         }
 
@@ -503,6 +504,14 @@ void ECLUnpackerModule::doPhasesReport(int iCrate, int phase0, int phase1)
             << LogVar("crate", iCrate)
             << LogVar("trigger phase0", phase0) << LogVar("trigger phase1", phase1));
     m_phasesReportedMask |= 1 << (iCrate - 1);
+  }
+}
+void ECLUnpackerModule::doBadHeaderReport(int iCrate)
+{
+  if (!badHeaderReported(iCrate)) {
+    B2ERROR("Bad shaper header."
+            << LogVar("crate", iCrate));
+    m_badHeaderReportedMask |= 1 << (iCrate - 1);
   }
 }
 

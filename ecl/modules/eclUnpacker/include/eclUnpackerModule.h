@@ -61,12 +61,14 @@ namespace Belle2 {
 
     /** flag for whether or not to store collection with trigger times */
     bool m_storeTrigTime;
-    /** flag for whether or not to store ECLDsp data for unmapped channels*/
+    /** flag for whether or not to store ECLDsp data for unmapped channels */
     bool m_storeUnmapped;
-    /** report only once per crate about problem with different trg tags*/
+    /** report only once per crate about problem with different trg tags */
     long m_tagsReportedMask;
-    /** report only once per crate about problem with different trg phases*/
+    /** report only once per crate about problem with different trg phases */
     long m_phasesReportedMask;
+    /** report only once per crate about problem with shaper header */
+    long m_badHeaderReportedMask;
 
     /**
      * Report the problem with trigger tags and exclude the crate
@@ -78,6 +80,11 @@ namespace Belle2 {
      * from further reports of this type.
      */
     void doPhasesReport(int iCrate, int phase0, int phase1);
+    /**
+     * Report the problem with bad shaper header and exclude the crate
+     * from further reports of this type.
+     */
+    void doBadHeaderReport(int iCrate);
 
     /**
      * Check if the problem with different trigger tags was already reported
@@ -89,6 +96,11 @@ namespace Belle2 {
      * for crate iCrate.
      */
     bool phasesReported(int iCrate) { return m_phasesReportedMask & (1 << (iCrate - 1)); }
+    /**
+     * Check if the problem with bad shaper header was already reported
+     * for crate iCrate.
+     */
+    bool badHeaderReported(int iCrate) { return m_badHeaderReportedMask & (1 << (iCrate - 1)); }
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;

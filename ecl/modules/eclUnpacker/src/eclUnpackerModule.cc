@@ -488,7 +488,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
 }
 
-void ECLUnpackerModule::doTagsReport(int iCrate, int tag0, int tag1)
+void ECLUnpackerModule::doTagsReport(unsigned int iCrate, int tag0, int tag1)
 {
   if (!tagsReported(iCrate)) {
     B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
@@ -497,7 +497,7 @@ void ECLUnpackerModule::doTagsReport(int iCrate, int tag0, int tag1)
     m_tagsReportedMask |= 1 << (iCrate - 1);
   }
 }
-void ECLUnpackerModule::doPhasesReport(int iCrate, int phase0, int phase1)
+void ECLUnpackerModule::doPhasesReport(unsigned int iCrate, int phase0, int phase1)
 {
   if (!phasesReported(iCrate)) {
     B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
@@ -506,7 +506,7 @@ void ECLUnpackerModule::doPhasesReport(int iCrate, int phase0, int phase1)
     m_phasesReportedMask |= 1 << (iCrate - 1);
   }
 }
-void ECLUnpackerModule::doBadHeaderReport(int iCrate)
+void ECLUnpackerModule::doBadHeaderReport(unsigned int iCrate)
 {
   if (!badHeaderReported(iCrate)) {
     B2ERROR("Bad shaper header."

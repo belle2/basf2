@@ -63,6 +63,7 @@ namespace Belle2 {
     bool m_storeTrigTime;
     /** flag for whether or not to store ECLDsp data for unmapped channels */
     bool m_storeUnmapped;
+
     /** report only once per crate about problem with different trg tags */
     long m_tagsReportedMask;
     /** report only once per crate about problem with different trg phases */
@@ -74,33 +75,33 @@ namespace Belle2 {
      * Report the problem with trigger tags and exclude the crate
      * from further reports of this type.
      */
-    void doTagsReport(int iCrate, int tag0, int tag1);
+    void doTagsReport(unsigned int iCrate, int tag0, int tag1);
     /**
      * Report the problem with trigger phases and exclude the crate
      * from further reports of this type.
      */
-    void doPhasesReport(int iCrate, int phase0, int phase1);
+    void doPhasesReport(unsigned int iCrate, int phase0, int phase1);
     /**
      * Report the problem with bad shaper header and exclude the crate
      * from further reports of this type.
      */
-    void doBadHeaderReport(int iCrate);
+    void doBadHeaderReport(unsigned int iCrate);
 
     /**
      * Check if the problem with different trigger tags was already reported
      * for crate iCrate.
      */
-    bool tagsReported(int iCrate) { return m_tagsReportedMask & (1 << (iCrate - 1)); }
+    bool tagsReported(unsigned int iCrate) { return m_tagsReportedMask & (1 << (iCrate - 1)); }
     /**
      * Check if the problem with different trigger phases was already reported
      * for crate iCrate.
      */
-    bool phasesReported(int iCrate) { return m_phasesReportedMask & (1 << (iCrate - 1)); }
+    bool phasesReported(unsigned int iCrate) { return m_phasesReportedMask & (1 << (iCrate - 1)); }
     /**
      * Check if the problem with bad shaper header was already reported
      * for crate iCrate.
      */
-    bool badHeaderReported(int iCrate) { return m_badHeaderReportedMask & (1 << (iCrate - 1)); }
+    bool badHeaderReported(unsigned int iCrate) { return m_badHeaderReportedMask & (1 << (iCrate - 1)); }
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;

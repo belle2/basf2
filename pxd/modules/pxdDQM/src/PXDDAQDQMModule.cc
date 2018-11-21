@@ -50,6 +50,8 @@ void PXDDAQDQMModule::defineHisto()
   hDAQErrorEvent = new TH1F("PXDDAQError", "PXDDAQError/Event;;Count", ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHC = new TH2F("PXDDAQDHCError", "PXDDAQError/DHC;DHC ID;", 16, 0, 16, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
+  hDAQUseableModule = new TH1F("PXDDAQUseableModule", "PXDDAQUseableModule/DHE;DHE ID;", 64, 0, 64);
+  hDAQNotUseableModule = new TH1F("PXDDAQNotUseableModule", "PXDDAQNotUseableModule/DHE;DHE ID;", 64, 0, 64);
 
   // histograms might get unreadable, but, if necessary, you can zoom in anyways.
   // we could use full alphanumeric histograms, but then, the labels would change (in the worst case) depending on observed errors
@@ -144,6 +146,11 @@ void PXDDAQDQMModule::event()
         for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
           PXDErrorFlags mask = (1ull << i);
           if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
+        }
+        if (dhe.isUsable()) {
+          hDAQUseableModule->Fill(dhe.getDHEID());
+        } else {
+          hDAQNotUseableModule->Fill(dhe.getDHEID());
         }
 
         if (hDAQDHETriggerGate[dhe.getSensorID()]) hDAQDHETriggerGate[dhe.getSensorID()]->Fill(dhe.getTriggerGate());

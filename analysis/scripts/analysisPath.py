@@ -3,11 +3,10 @@
 
 from basf2 import create_path
 analysis_main = create_path()
-analysis_main._deprecation_warning = """
+analysis_main._deprecation_warning = """\
 Use of analysis_main is deprecated, please update your scripts.
-You should now create a basf2.Path, and add modules there. If you
-are using modularAnalysis convenience functions, you should pass
-it into them.
+You should now create a basf2.Path, and add modules there. If you are
+using modularAnalysis convenience functions, you should pass it into them.
 
 If your code looked something like:
 

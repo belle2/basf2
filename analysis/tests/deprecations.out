@@ -1,9 +1,8 @@
 [INFO] Steering file: analysis/tests/deprecations.py
-
+[INFO] The random number seed is set to "1337"
 Use of analysis_main is deprecated, please update your scripts.
-You should now create a basf2.Path, and add modules there. If you
-are using modularAnalysis convenience functions, you should pass
-it into them.
+You should now create a basf2.Path, and add modules there. If you are 
+using modularAnalysis convenience functions, you should pass it into them.
 
 If your code looked something like:
 
@@ -30,12 +29,9 @@ or ask a question at
 Please see modularAnalysis.variablesToNtuple for the recommended alternative.
 [WARNING] NtupleTools are going to be deprecated from release-03 and we aim to remove them from release-04.
 Please see modularAnalysis.variablesToNtuple for the recommended alternative.
-[INFO] The random number seed is set to "1337"
-[WARNING] 
-Use of analysis_main is deprecated, please update your scripts.
-You should now create a basf2.Path, and add modules there. If you
-are using modularAnalysis convenience functions, you should pass
-it into them.
+[WARNING] Use of analysis_main is deprecated, please update your scripts.
+You should now create a basf2.Path, and add modules there. If you are 
+using modularAnalysis convenience functions, you should pass it into them.
 
 If your code looked something like:
 

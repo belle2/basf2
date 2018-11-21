@@ -12,7 +12,7 @@ Time dependent CP violation skim standalone for the analysis of TDCPV analysis i
 Physics channels : bd → qqs and bd → ccs .
 Skim code : 13160100
 for analysis users we will reconstruct again in the analysis steering file
-The skim uses standard paticles from analysis package , exept one list of gamma:E15,
+The skim uses standard particles from analysis package , except one list of gamma:E15,
 of specific energy range, for 'B0 -> Kshort pi+ pi- gamma' channel.
 
 Particle lists used :
@@ -38,7 +38,7 @@ __author__ = " Reem Rasheed"
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
@@ -66,7 +66,11 @@ inputMdstList('MC9', fileList)
 loadStdSkimPi0()
 loadStdSkimPhoton()
 stdPi0s('loose')
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
 stdPhotons('loose')
 stdKshorts()
 loadStdDiLeptons(True)

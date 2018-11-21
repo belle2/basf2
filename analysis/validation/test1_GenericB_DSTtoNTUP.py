@@ -14,12 +14,11 @@ import os
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from stdV0s import *
 from stdPhotons import *
 from stdPi0s import *
 
 inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
-loadStdCharged()
+stdPi('all')
 stdPhotons('loose')  # loose list also creates 'all' list
 stdPi0('all')
 stdKshorts()

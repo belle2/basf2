@@ -10,7 +10,6 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
 from stdPhotons import *
 from skimExpertFunctions import *
 
@@ -28,7 +27,6 @@ fileList = [
 
 
 inputMdstList('MC9', fileList)
-loadStdCharged()
 
 from skim.systematics import *
 SysList = SystematicsLambdaList()

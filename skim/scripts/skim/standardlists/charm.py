@@ -3,9 +3,6 @@
 
 from basf2 import *
 from modularAnalysis import *
-# from stdCharged import *
-# from stdPi0 import *
-# from stdKS import *
 
 
 def loadStdD0(path=analysis_main):

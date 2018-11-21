@@ -11,7 +11,7 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import *
@@ -30,8 +30,14 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
-
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 stdKshorts()
 loadStdSkimPi0()
 

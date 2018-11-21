@@ -28,7 +28,15 @@ inputMdstList('default', fileList)
 
 stdPi0s()
 stdKshorts()
-loadStdCharged()  # Loading Charged particle lists: kaons, pions, leptons
+# Loading Charged particle lists: kaons, pions, leptons
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 # load D mesons from skim.standardlists.charm.py
 loadStdD0()
 loadStdDplus()

@@ -175,7 +175,6 @@ inputMdstList('default', fileList)  # '/ghi/fs01/belle2/bdata/group/physics/semi
 # release-00-09-01/DB00000276/MC9/1193300007/BGx0/sub00/*.root')
 
 
-loadStdCharged()
 stdPi('95eff')
 stdK('85eff')
 stdE('95eff')

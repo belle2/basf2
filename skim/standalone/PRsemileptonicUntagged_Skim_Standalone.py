@@ -14,7 +14,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import *
@@ -35,7 +35,9 @@ fileList = [
 
 
 inputMdstList('MC9', fileList)
-loadStdCharged()
+stdPi('all')
+stdE('all')
+stdMu('all')
 # PR Skim
 from skim.semileptonic import PRList
 PRList = PRList()

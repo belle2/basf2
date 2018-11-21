@@ -12,7 +12,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdPi0s import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 

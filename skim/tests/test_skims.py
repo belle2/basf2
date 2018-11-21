@@ -6,7 +6,7 @@ from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu, stdPr
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
@@ -19,10 +19,20 @@ from skimExpertFunctions import *
 
 inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 
-loadStdCharged()
+
 stdPi0s('loose')
 stdPhotons('loose')
 stdKshorts()
+stdPi('loose')
+stdK('loose')
+stdPr('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+
 loadStdLightMesons()
 loadStdSkimPi0()
 loadStdSkimPhoton()
@@ -30,10 +40,9 @@ stdPhotons('all')
 stdPhotons('tight')  # also builds loose list
 stdK('95eff')
 stdPi('95eff')
-
 stdE('95eff')
 stdMu('95eff')
-stdMu('90eff')
+stdPr('90eff')
 
 loadStdD0()
 loadStdDplus()

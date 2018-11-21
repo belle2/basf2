@@ -10,7 +10,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
@@ -33,7 +33,11 @@ inputMdstList('MC9', fileList)
 
 loadStdSkimPi0()
 loadStdSkimPhoton()
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdPi('all')
+stdE('all')
+stdMu('all')
 stdPi0s('loose')  # for skim.standardlists.charm
 stdPhotons('loose')
 stdKshorts()

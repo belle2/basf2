@@ -20,7 +20,15 @@ fileList =\
      ]
 inputMdstList('default', fileList)
 
-loadStdCharged()  # Loading Charged particle lists: kaons, pions, leptons
+# Loading Charged particle lists: kaons, pions, leptons
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 
 # Hadronic Skim with Full  Reconstruction
 

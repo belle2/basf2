@@ -16,12 +16,12 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from stdLightMesons import *
-from stdDiLeptons import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
 
@@ -32,7 +32,15 @@ fileList = [
 ]
 
 inputMdstList('MC9', fileList)
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+
 stdPi0s('looseFit')
 stdPhotons('loose')
 setSkimLogging()

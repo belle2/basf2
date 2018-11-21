@@ -3,7 +3,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdMu
 
 filelist = ['ISRpipimumu.udst.root']
 inputMdstList('default', filelist)

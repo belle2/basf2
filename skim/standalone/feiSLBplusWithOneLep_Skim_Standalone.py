@@ -17,7 +17,6 @@ from basf2 import *
 from modularAnalysis import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
-from stdCharged import *
 from skimExpertFunctions import *
 
 gb2_setuprel = 'release-02-00-01'

@@ -11,7 +11,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 
@@ -32,7 +32,9 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
-loadStdCharged()
+stdE('all')
+stdMu('all')
+
 
 from skim.systematics import *
 SysList = EELLList()

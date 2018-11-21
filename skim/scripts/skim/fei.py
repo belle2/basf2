@@ -77,6 +77,13 @@ def B0hadronic(path):
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
+
     """
 
     applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
@@ -141,6 +148,12 @@ def BplusHadronic(path):
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
     """
 
     # B+:generic list from FEI must already exist in path
@@ -209,6 +222,12 @@ def runFEIforB0Hadronic(path):
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
  """
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
@@ -282,6 +301,12 @@ def runFEIforBplusHadronic(path):
         * Mbc > 5.24
         * abs(deltaE) < 0.200
         * sigProb > 0.001
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
     """
 
     # Pre-selection cuts
@@ -320,7 +345,14 @@ def runFEIforHadronicCombined(path):
         Event precuts:
 
         * R2EventLevel < 0.4
-        * nTracks >= 4"""
+        * nTracks >= 4
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
+"""
 
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
@@ -383,6 +415,12 @@ def B0SLWithOneLep(path):
 
         * electron or muon from list 95eff
         * B Mbc > 0
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
 """
     # Reconstruct tag side
     # Apply cuts
@@ -449,7 +487,13 @@ def BplusSLWithOneLep(path):
         Signal side:
         * electron or muon from list 95eff
         * B Mbc > 0
-    """
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
+"""
 
     # Reconstruct tag side
     # Apply cuts
@@ -521,6 +565,12 @@ def runFEIforB0SLWithOneLep(path):
 
         * electron or muon from list 95eff
         * B Mbc > 0
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
  """
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
@@ -590,6 +640,11 @@ def runFEIforBplusSLWithOneLep(path):
 
         * electron or muon from list 95eff
         * B Mbc > 0
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+    Returns:
+        list name of the skim candidates
  """
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
@@ -683,7 +738,13 @@ def runFEIforSkimCombined(path):
 
         * R2EventLevel < 0.4
         * nTracks >= 4
-    """
+
+    Parameters:
+        path (basf2.Path) the path to add the skim list builders
+
+    Returns:
+        list name of the skim candidates
+"""
     # Pre-selection cuts
     applyEventCuts('R2EventLevel<0.4 and nTracks>=4', path=path)
 

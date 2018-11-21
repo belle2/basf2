@@ -146,14 +146,14 @@ add_skim('BtoXgamma', B2XgammaList())
 
 
 from skim.semileptonic import SemileptonicList
-add_skim('SLUntagged', SemileptonicList())
+add_skim('SLUntagged', SemileptonicList(path=analysis_main))
 
 from skim.leptonic import LeptonicList
-add_skim('LeptonicUntagged', LeptonicList())
+add_skim('LeptonicUntagged', LeptonicList(path=analysis_main))
 
 
 from skim.semileptonic import PRList
-add_skim('PRsemileptonicUntagged', PRList())
+add_skim('PRsemileptonicUntagged', PRList(path=analysis_main))
 
 
 from fei import backward_compatibility_layer
@@ -179,7 +179,6 @@ add_skim('feiSLBplusWithOneLep', BplusSLWithOneLep(path=analysis_main))
 
 
 from skim.fei import*
-
 add_skim('feiSLB0WithOneLep', B0SLWithOneLep(path=analysis_main))
 
 

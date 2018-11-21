@@ -28,35 +28,35 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
+SLpath = Path()
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=SLpath)
 
-stdPi('loose')
-stdK('loose')
-stdPi('all')
-stdE('all')
-stdMu('all')
+stdPi('loose', path=SLpath)
+stdK('loose', path=SLpath)
+stdPi('all', path=SLpath)
+stdE('all', path=SLpath)
+stdMu('all', path=SLpath)
 
+stdPi0s('loose', path=SLpath)  # for skim.standardlists.charm
+stdPhotons('loose', path=SLpath)
+stdKshorts(path=SLpath)
 
-stdPi0s('loose')  # for skim.standardlists.charm
-stdPhotons('loose')
-stdKshorts()
-
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
+loadStdD0(path=SLpath)
+loadStdDplus(path=SLpath)
+loadStdDstar0(path=SLpath)
+loadStdDstarPlus(path=SLpath)
 
 # SL Skim
 from skim.semileptonic import SemileptonicList
-SLList = SemileptonicList()
-skimOutputUdst(skimCode, SLList)
+SLList = SemileptonicList(SLpath)
+skimOutputUdst(skimCode, SLList, path=SLpath)
 
-summaryOfLists(SLList)
+summaryOfLists(SLList, path=SLpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=SLpath)
+process(SLpath)
 
 # print out the summary
 print(statistics)

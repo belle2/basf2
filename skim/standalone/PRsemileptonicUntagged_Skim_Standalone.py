@@ -33,20 +33,22 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
+# create a new path
+PRSLpath = Path()
 
-inputMdstList('MC9', fileList)
-stdPi('all')
-stdE('all')
-stdMu('all')
+inputMdstList('MC9', fileList, path=PRSLpath)
+stdPi('all', path=PRSLpath)
+stdE('all', path=PRSLpath)
+stdMu('all', path=PRSLpath)
 # PR Skim
 from skim.semileptonic import PRList
-PRList = PRList()
-skimOutputUdst(skimCode, PRList)
+PRList = PRList(path=PRSLpath)
+skimOutputUdst(skimCode, PRList, path=PRSLpath)
 
-summaryOfLists(PRList)
+summaryOfLists(PRList, path=PRSLpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=PRSLpath)
+process(path=PRSLpath)
 # print out the summary
 print(statistics)

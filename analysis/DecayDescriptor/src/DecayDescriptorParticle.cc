@@ -16,13 +16,6 @@ DecayDescriptorParticle::DecayDescriptorParticle() :
   m_iPDGCode(0)
 {}
 
-DecayDescriptorParticle::DecayDescriptorParticle(const DecayDescriptorParticle& other) :
-  m_strName(other.m_strName),
-  m_isSelected(other.m_isSelected),
-  m_strLabel(other.m_strLabel),
-  m_iPDGCode(other.m_iPDGCode)
-{}
-
 bool DecayDescriptorParticle::init(const DecayStringParticle& p)
 {
   // Set member variables from the information in the DecayStringParticle p
@@ -37,16 +30,6 @@ bool DecayDescriptorParticle::init(const DecayStringParticle& p)
   }
   m_iPDGCode = particle->PdgCode();
   return true;
-}
-
-
-DecayDescriptorParticle& DecayDescriptorParticle::operator =(const DecayDescriptorParticle& other)
-{
-  m_strName = other.m_strName;
-  m_isSelected = other.m_isSelected;
-  m_strLabel = other.m_strLabel;
-  m_iPDGCode = other.m_iPDGCode;
-  return *this;
 }
 
 string DecayDescriptorParticle::getNameSimple() const

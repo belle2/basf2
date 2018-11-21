@@ -10,7 +10,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from stdPhotons import *
 from stdPi0s import *
 from skimExpertFunctions import *
@@ -34,10 +34,9 @@ fileList = [
 
 
 inputMdstList('MC9', fileList, path=skimpath)
-
-stdPi0s('looseFit', path=skimpath)
-loadStdCharged(path=skimpath)
-
+stdPi('loose', path=skimpath)
+stdK('loose', path=skimpath)
+stdPi0s('loose', path=skimpath)
 
 skimCode = encodeSkimName('SystematicsTracking')
 

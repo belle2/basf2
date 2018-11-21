@@ -50,9 +50,9 @@ inputMdstList('default', filelistSIG)
 # creates "pi+:all" ParticleList (and c.c.)
 stdPi('all')
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdPi('loose')
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdK('loose')
 
 # reconstruct D0 -> K- pi+ decay
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV

@@ -12,7 +12,7 @@
 
 from basf2 import process, statistics, Path, set_log_level, LogLevel
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
-from stdCharged import loadStdCharged
+from stdCharged import stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
@@ -26,7 +26,7 @@ fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002314/e0000/4S/r00000/mumu_ecldigits/sub00/' +
     'mdst_000001_prod00002314_task00000001.root']
 inputMdstList('MC9', fileList, path=skimpath)
-loadStdCharged(path=skimpath)
+stdMu('all', path=skimpath)
 
 # setup the skim get the skim code
 from skim.systematics import SystematicsRadMuMuList

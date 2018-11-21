@@ -323,7 +323,7 @@ def SystematicsLambdaList(path):
 
     fillParticleList('p+:all', '', enforceFitHypothesis=True, path=path)
     fillParticleList('pi-:all', '', enforceFitHypothesis=True, path=path)
-    LambdaChannel = ['p+:all pi-:loose']
+    LambdaChannel = ['p+:all pi-:all']
 
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):

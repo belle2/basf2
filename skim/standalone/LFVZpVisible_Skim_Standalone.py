@@ -11,9 +11,8 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
-
 
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
@@ -22,22 +21,30 @@ import sys
 import os
 import glob
 
+lfvzppath = Path()
+
 fileList = [
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
-    ]
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
+]
+inputMdstList('MC9', fileList, path=lfvzppath)
 
+stdPi('loose', path=lfvzppath)
+stdK('loose', path=lfvzppath)
+stdE('loose', path=lfvzppath)
+stdMu('loose', path=lfvzppath)
+stdPi('all', path=lfvzppath)
+stdK('all', path=lfvzppath)
+stdE('all', path=lfvzppath)
+stdMu('all', path=lfvzppath)
 
-inputMdstList('MC9', fileList)
-
-loadStdCharged()
 
 from skim.dark import LFVZpVisibleList
-SysList = LFVZpVisibleList()
-skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+SysList = LFVZpVisibleList(path=lfvzppath)
+skimOutputUdst(skimCode, SysList, path=lfvzppath)
+summaryOfLists(SysList, path=lfvzppath)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=lfvzppath)
+process(lfvzppath)
 
 print(statistics)

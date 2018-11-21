@@ -14,7 +14,7 @@ from basf2 import *
 from modularAnalysis import *  # Standard Analysis Tools
 from stdCharged import *  # Standard Charged Particle lists
 from stdPi0s import *  # Standard Pi0 list
-from stdCharm import *  # D0, D+, D*0 and D*+ list
+from skim.standardlists.charm import *  # D0, D+, D*0 and D*+ list
 from stdV0s import *  # Standard KS
 
 fileList =\
@@ -26,10 +26,18 @@ fileList =\
 inputMdstList('default', fileList)
 
 
-loadStdPi0()
-loadStdKS()
-loadStdCharged()  # Loading Charged particle lists: kaons, pions, leptons
-# load D mesons from stdCharm.py
+stdPi0s()
+stdKshorts()
+# Loading Charged particle lists: kaons, pions, leptons
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+# load D mesons from skim.standardlists.charm.py
 loadStdD0()
 loadStdDplus()
 loadStdDstar0()

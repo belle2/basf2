@@ -10,7 +10,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
@@ -31,8 +31,12 @@ fileList = [
 
 inputMdstList('MC9', fileList, path=skimpath)
 
-
-loadStdCharged(path=skimpath)
+stdE('loose', path=skimpath)
+stdMu('loose', path=skimpath)
+stdPi('all', path=skimpath)
+stdK('all', path=skimpath)
+stdE('all', path=skimpath)
+stdMu('all', path=skimpath)
 
 from skim.systematics import SystematicsList
 SysList = SystematicsList(skimpath)

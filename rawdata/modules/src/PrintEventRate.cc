@@ -78,7 +78,7 @@ void PrintEventRateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
   unsigned int error_flag = 0;
   error_flag = (unsigned int)(raw_copper->GetDataType(i));
   if (error_flag) {
-    printf("!!!!!!!!! ERROR (RawCOPPER hdr) !!!!!!!!!! : run %d sub %d event %d errflag %.8x nodeID %.8x\n",
+    printf("!!!!!!!!! ERROR (RawCOPPER hdr) !!!!!!!!!! : run %d sub %d event %u errflag %.8x nodeID %.8x\n",
            m_run, m_subrun, m_cur_event, error_flag , raw_copper->GetNodeID(i));
     m_errcpr++;
   }
@@ -111,7 +111,7 @@ void PrintEventRateModule::endRun()
   localtime_r(&timer, &t_st);
 
   if (interval != 0) {
-    printf("END %d/%d/%d/%d:%d:%d run %d sub %d Event %d Rate %lf [kHz] %lf [MB/s] RunTime %d [s] interval %d [s] total %lf [bytes] cpr %d s %d c %d to %d a %d e %d k %d tr %d other %d erreve %d errcpr %d\n",
+    printf("END %d/%d/%d/%d:%d:%d run %d sub %d Event %u Rate %lf [kHz] %lf [MB/s] RunTime %d [s] interval %d [s] total %lf [bytes] cpr %d s %d c %d to %d a %d e %d k %d tr %d other %d erreve %d errcpr %d\n",
            t_st.tm_year + 1900, t_st.tm_mon + 1, t_st.tm_mday, t_st.tm_hour, t_st.tm_min, t_st.tm_sec,
            m_run, m_subrun,   m_n_basf2evt, (double)(m_n_basf2evt  - m_prev_event) / interval / 1.e3,
            (double)(m_tot_bytes - m_prev_tot_bytes) / interval / 1.e6,
@@ -119,7 +119,7 @@ void PrintEventRateModule::endRun()
            m_cpr, m_cpr_svd, m_cpr_cdc, m_cpr_top, m_cpr_arich, m_cpr_ecl, m_cpr_klm, m_cpr_trg, m_cpr_others, m_erreve, m_errcpr);
 
   } else {
-    printf("END %d/%d/%d/%d:%d:%d run %d sub %d Event %d Rate %lf [kHz] %lf [MB/s] RunTime %d [s] interval %d [s] total %lf [bytes] cpr %d s %d c %d to %d a %d e %d k %d tr %d other %d erreve %d errcpr %d\n",
+    printf("END %d/%d/%d/%d:%d:%d run %d sub %d Event %u Rate %lf [kHz] %lf [MB/s] RunTime %d [s] interval %d [s] total %lf [bytes] cpr %d s %d c %d to %d a %d e %d k %d tr %d other %d erreve %d errcpr %d\n",
            t_st.tm_year + 1900, t_st.tm_mon + 1, t_st.tm_mday, t_st.tm_hour, t_st.tm_min, t_st.tm_sec,
            m_run, m_subrun,   m_n_basf2evt, 0., 0.,
            total_time, interval, m_tot_bytes / 1.e6,
@@ -189,33 +189,6 @@ void PrintEventRateModule::event()
                       + m_cpr_ecl
                       + m_cpr_klm
                       + m_cpr_trg);
-
-
-    // m_datablk_blksize = new int[datablk_blknum];
-    // m_cpr_blksize = new int[cpr_blknum];
-    // m_tlu_blksize = new int[tlu_blknum];
-    // m_ftsw_blksize = new int[ftsw_blknum];
-    // m_pxd_blksize = new int[pxd_blknum];
-    // m_svd_blksize = new int[svd_blknum];
-    // m_cdc_blksize = new int[cdc_blknum];
-    // m_top_blksize = new int[top_blknum];
-    // m_arich_blksize = new int[arich_blknum];
-    // m_ecl_blksize = new int[ecl_blknum];
-    // m_klm_blksize = new int[klm_blknum];
-    // m_trg_blksize = new int[trg_blknum];
-
-    // m_datablk_evecnt = new int[datablk_blknum];
-    // m_cpr_evecnt = new int[cpr_blknum];
-    // m_tlu_evecnt = new int[tlu_blknum];
-    // m_ftsw_evecnt = new int[ftsw_blknum];
-    // m_pxd_evecnt = new int[pxd_blknum];
-    // m_svd_evecnt = new int[svd_blknum];
-    // m_cdc_evecnt = new int[cdc_blknum];
-    // m_top_evecnt = new int[top_blknum];
-    // m_arich_evecnt = new int[arich_blknum];
-    // m_ecl_evecnt = new int[ecl_blknum];
-    // m_klm_evecnt = new int[klm_blknum];
-    // m_trg_evecnt = new int[trg_blknum];
   }
 
 
@@ -308,7 +281,7 @@ void PrintEventRateModule::event()
     //    time(&timer);
     localtime_r(&timer, &t_st);
 
-    printf("MID %d/%d/%d/%d:%d:%d run %d sub %d Event %d Rate %lf [kHz] %lf [MB/s] RunTime %d [s] interval %d [s] total %lf [bytes]\n",
+    printf("MID %d/%d/%d/%d:%d:%d run %d sub %d Event %u Rate %lf [kHz] %lf [MB/s] RunTime %d [s] interval %d [s] total %lf [bytes]\n",
            t_st.tm_year + 1900, t_st.tm_mon + 1, t_st.tm_mday, t_st.tm_hour, t_st.tm_min, t_st.tm_sec,
            m_run, m_subrun,   m_n_basf2evt, (double)(m_n_basf2evt  - m_prev_event) / interval / 1.e3,
            (double)(m_tot_bytes - m_prev_tot_bytes) / interval / 1.e6,

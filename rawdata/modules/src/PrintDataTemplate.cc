@@ -100,7 +100,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   timeval tv;
   int n = 0;
   rawftsw.GetTTTimeVal(n , &tv);
-  printf("eve %d TLU %d: %d %d %.8x: tv %d %d\n",
+  printf("eve %u TLU %d: %d %d %.8x: tv %d %d\n",
          rawftsw.GetEveNo(n),
          rawftsw.Get15bitTLUTag(n),
          rawftsw.GetBlockNwords(n),
@@ -117,7 +117,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
 
-  printf(": Event %8d node 0x%.8x block %d by: sum det %d by : A %d by B %d by C %d by D %d by\n",
+  printf(": Event %8u node 0x%.8x block %d by: sum det %d by : A %d by B %d by C %d by D %d by\n",
          raw_copper->GetEveNo(i), raw_copper->GetNodeID(i),
          (int)(sizeof(int) * raw_copper->GetBlockNwords(i)),
          (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 0) + raw_copper->GetDetectorNwords(i, 1) +
@@ -127,11 +127,11 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 2))),
          (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 3)))
         );
-  printf("EventMetaData : exp %d run %d subrun %d eve %.8x\n", m_eventMetaDataPtr->getExperiment(),
+  printf("EventMetaData : exp %d run %d subrun %d eve %.8d\n", m_eventMetaDataPtr->getExperiment(),
          m_eventMetaDataPtr->getRun(), m_eventMetaDataPtr->getSubrun(), m_eventMetaDataPtr->getEvent());
 
   if (m_eventMetaDataPtr->getErrorFlag()) {
-    printf("!!!!!!!!! ERROR event !!!!!!!!!! : eve %d errflag %.8x\n", raw_copper->GetEveNo(i), m_eventMetaDataPtr->getErrorFlag());
+    printf("!!!!!!!!! ERROR event !!!!!!!!!! : eve %u errflag %.8x\n", raw_copper->GetEveNo(i), m_eventMetaDataPtr->getErrorFlag());
   }
 
   printBuffer(raw_copper->GetWholeBuffer(), raw_copper->TotalBufNwords());
@@ -228,7 +228,7 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
       pos += nframesv[ i ] / 4;
     }
   }
-  printf("PXD FTSW %u TRG %u DHE %u\n", ctime_type, hlttrg, dhe_time);
+  printf("PXD FTSW %d TRG %u DHE %d\n", ctime_type, hlttrg, dhe_time);
 
 
 }

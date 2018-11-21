@@ -27,6 +27,7 @@ REG_MODULE(MakeDumHSLBData)
 MakeDumHSLBDataModule::MakeDumHSLBDataModule() : PrintDataTemplateModule()
 {
   addParam("OutputFileName", m_out_fname, "Name of an output file", string("dumhslb.dat"));
+  m_filefd = 0;
 }
 
 MakeDumHSLBDataModule::~MakeDumHSLBDataModule()
@@ -79,7 +80,7 @@ void MakeDumHSLBDataModule::writeData(RawCOPPER* raw_copper, int i)
         exit(1);
       }
       write(m_filefd, raw_copper->GetDetectorBuffer(i, 0), sizeof(int)*nwords);
-      printf("hdr 0x%.8x eve %10d cprid 0x%.8x nwrods %d\n", header, eve_num, cpr_id, nwords);
+      printf("hdr 0x%.8x eve %10u cprid 0x%.8x nwrods %d\n", header, eve_num, cpr_id, nwords);
     }
   }
 }

@@ -34,7 +34,7 @@ inputMdst('default', '../2210022100.dst.root')
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-loadStdKS()
+stdKshorts()
 stdPi0s('veryLoose')
 
 # reconstruct D0:kpi and perform a mass constrained vertex fit

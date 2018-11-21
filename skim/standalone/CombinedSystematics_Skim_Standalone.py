@@ -16,36 +16,34 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from stdLightMesons import *
-from stdDiLeptons import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
 
-from skimExpertFunctions import *
+from skimExpertFunctions import setSkimLogging, encodeSkimName, add_skim
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
 inputMdstList('MC9', fileList)
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+
 stdPi0s('looseFit')
 stdPhotons('loose')
 setSkimLogging()
-
-
-def add_skim(label, lists):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-    """
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists)
-    summaryOfLists(lists)
 
 
 # Systematics skim

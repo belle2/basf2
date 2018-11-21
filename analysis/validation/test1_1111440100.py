@@ -29,7 +29,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdCharged import *
+from stdCharged import stdMu
 from variables import variables
 from ROOT import Belle2
 from glob import glob
@@ -43,9 +43,7 @@ inputMdst('default', input_mdst)
 # default: for analysis of Belle II MC samples produced
 # with releases with release-00-08-00 or newer
 
-
-loadStdCharged()
-stdLooseMu()
+stdMu('loose')
 cutAndCopyList('mu+:Jp', 'mu+:loose', '')
 
 reconstructDecay('J/psi -> mu-:Jp mu+:Jp', '2.8 < M < 3.3')

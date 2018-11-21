@@ -10,7 +10,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
@@ -28,7 +28,14 @@ fileList = [
     '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
 ]
 inputMdstList('MC9', fileList, path=lfvzppath)
-loadStdCharged(path=lfvzppath)
+stdPi('loose', path=lfvzppath)
+stdK('loose', path=lfvzppath)
+stdE('loose', path=lfvzppath)
+stdMu('loose', path=lfvzppath)
+stdPi('all', path=lfvzppath)
+stdK('all', path=lfvzppath)
+stdE('all', path=lfvzppath)
+stdMu('all', path=lfvzppath)
 
 from skim.dark import LFVZpInvisibleList
 SysList = LFVZpInvisibleList(path=lfvzppath)

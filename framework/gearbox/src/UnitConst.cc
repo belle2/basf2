@@ -242,6 +242,22 @@ size_t Const::DetectorSet::size() const
   return size;
 }
 
+std::string Const::DetectorSet::__repr__() const
+{
+  std::string result = "<set: ";
+  std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};
+  for (size_t index = 1; index <= Const::TEST; index++) {
+    if (contains(EDetector(index))) {
+      if (result.size() > 6) {
+        result += ",";
+      }
+      result += detectorNames[index];
+    }
+  }
+  result += ">";
+  return result;
+}
+
 
 const Const::DetectorSet Const::VXDDetectors::c_set = Const::PXD + Const::SVD;
 
@@ -287,6 +303,14 @@ const TParticlePDG* Const::ParticleType::getParticlePDG() const
 double Const::ParticleType::getMass() const
 {
   return getParticlePDG()->Mass();
+}
+
+std::string Const::ParticleType::__repr__() const
+{
+  std::string result = "<type: ";
+  result += getParticlePDG()->GetName();
+  result += ">";
+  return result;
 }
 
 const Const::ParticleSet Const::chargedStableSet =

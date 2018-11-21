@@ -10,11 +10,11 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from stdLightMesons import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
 from stdPhotons import *
 from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
@@ -33,11 +33,11 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 stdPi0s('loose')
-# stdPhotons('loose')
 stdPhotons('tight')  # also builds loose list
 loadStdSkimPhoton()
 loadStdSkimPi0()
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
 stdK('95eff')
 stdPi('95eff')
 stdKshorts()

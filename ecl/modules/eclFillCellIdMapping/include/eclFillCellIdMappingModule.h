@@ -49,14 +49,14 @@ namespace Belle2 {
 
   private:
     /** Geometry */
-    ECL::ECLGeometryPar* m_geom;
+    ECL::ECLGeometryPar* m_geom{nullptr};
 
     /** Store array: ECLCalDigit. */
     StoreArray<ECLCalDigit> m_eclCalDigits;
 
     /** Neighbour maps */
-    ECL::ECLNeighbours* m_NeighbourMap5; /**< 5x5 */
-    ECL::ECLNeighbours* m_NeighbourMap7; /**< 7x7 */
+    ECL::ECLNeighbours* m_NeighbourMap5{nullptr}; /**< 5x5 */
+    ECL::ECLNeighbours* m_NeighbourMap7{nullptr}; /**< 7x7 */
 
     /** Store object pointer: ECLCellIdToECLCalDigitMapping. */
     StoreObjPtr<ECLCellIdMapping> m_eclCellIdMapping;

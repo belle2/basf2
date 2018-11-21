@@ -92,8 +92,8 @@ namespace Belle2 {
     int m_fullBkgdCount; /**< Number of expected background digits at full background. TODO move to DB*/
 
     /** Other variables. */
-    double m_energyCutMod[3]; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
-    int m_tempCRId; /**< Temporary CR ID*/
+    double m_energyCutMod[3] {}; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
+    int m_tempCRId = -1; /**< Temporary CR ID*/
 
     /** Digit vectors. */
     std::vector <int>  m_cellIdToSeedVec; /**< cellid -> seed digit. */

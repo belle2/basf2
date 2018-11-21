@@ -9,7 +9,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdMu, stdPr
 from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import *
@@ -31,7 +31,10 @@ inputMdstList('MC9', fileList)
 argvs = sys.argv
 argc = len(argvs)
 
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdMu('loose')
+stdPr('loose')
 stdPi0s('looseFit')
 
 

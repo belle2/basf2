@@ -496,7 +496,7 @@ void ECLDatabaseImporter::importTrackClusterMatchingParameterizations()
   if (!inputFile || inputFile->IsZombie())
     B2FATAL("Could not open file " << m_inputFileNames[0]);
 
-  map<string, TF1*> m_parametrizationFunctions;
+  map<string, TF1> m_parametrizationFunctions;
   vector<string> angles = {"Theta", "Phi"};
   vector<string> regions = {"BRL", "BWD", "FWD"};
   vector<string> hittypes = {"CROSS", "DL", "NEAR"};
@@ -504,8 +504,8 @@ void ECLDatabaseImporter::importTrackClusterMatchingParameterizations()
   for (const auto& angle : angles) {
     for (const auto& region : regions) {
       for (const auto& hittype : hittypes) {
-        m_parametrizationFunctions.insert(make_pair(angle + region + hittype, getRootObjectFromFile<TF1*>(inputFile,
-                                                    "RMSParameterization" + angle + region + hittype)));
+        m_parametrizationFunctions.insert(make_pair(angle + region + hittype, *(getRootObjectFromFile<TF1*>(inputFile,
+                                                    "RMSParameterization" + angle + region + hittype))));
       }
     }
   }

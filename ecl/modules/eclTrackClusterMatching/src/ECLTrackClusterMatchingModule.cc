@@ -275,26 +275,6 @@ void ECLTrackClusterMatchingModule::event()
 
 void ECLTrackClusterMatchingModule::terminate()
 {
-  if (m_angularDistanceMatching) {
-    delete f_phiRMSFWDCROSS;
-    delete f_phiRMSFWDDL;
-    delete f_phiRMSFWDNEAR;
-    delete f_phiRMSBRLCROSS;
-    delete f_phiRMSBRLDL;
-    delete f_phiRMSBRLNEAR;
-    delete f_phiRMSBWDCROSS;
-    delete f_phiRMSBWDDL;
-    delete f_phiRMSBWDNEAR;
-    delete f_thetaRMSFWDCROSS;
-    delete f_thetaRMSFWDDL;
-    delete f_thetaRMSFWDNEAR;
-    delete f_thetaRMSBRLCROSS;
-    delete f_thetaRMSBRLDL;
-    delete f_thetaRMSBRLNEAR;
-    delete f_thetaRMSBWDCROSS;
-    delete f_thetaRMSBWDDL;
-    delete f_thetaRMSBWDNEAR;
-  }
 }
 
 bool ECLTrackClusterMatchingModule::isECLEnterHit(const ExtHit& extHit) const
@@ -326,27 +306,27 @@ double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double pt,
   double phi_RMS;
   if (eclDetectorRegion == ECL::DetectorRegion::FWD || eclDetectorRegion == ECL::DetectorRegion::FWDGap) {
     if (hitStatus == EXT_ECLCROSS) {
-      phi_RMS = f_phiRMSFWDCROSS->Eval(pt);
+      phi_RMS = f_phiRMSFWDCROSS.Eval(pt);
     } else if (hitStatus == EXT_ECLDL) {
-      phi_RMS = f_phiRMSFWDDL->Eval(pt);
+      phi_RMS = f_phiRMSFWDDL.Eval(pt);
     } else {
-      phi_RMS = f_phiRMSFWDNEAR->Eval(pt);
+      phi_RMS = f_phiRMSFWDNEAR.Eval(pt);
     }
   } else if (eclDetectorRegion == ECL::DetectorRegion::BRL) {
     if (hitStatus == EXT_ECLCROSS) {
-      phi_RMS = f_phiRMSBRLCROSS->Eval(pt);
+      phi_RMS = f_phiRMSBRLCROSS.Eval(pt);
     } else if (hitStatus == EXT_ECLDL) {
-      phi_RMS = f_phiRMSBRLDL->Eval(pt);
+      phi_RMS = f_phiRMSBRLDL.Eval(pt);
     } else {
-      phi_RMS = f_phiRMSBRLNEAR->Eval(pt);
+      phi_RMS = f_phiRMSBRLNEAR.Eval(pt);
     }
   } else if (eclDetectorRegion == ECL::DetectorRegion::BWD || eclDetectorRegion == ECL::DetectorRegion::BWDGap) {
     if (hitStatus == EXT_ECLCROSS) {
-      phi_RMS = f_phiRMSBWDCROSS->Eval(pt);
+      phi_RMS = f_phiRMSBWDCROSS.Eval(pt);
     } else if (hitStatus == EXT_ECLDL) {
-      phi_RMS = f_phiRMSBWDDL->Eval(pt);
+      phi_RMS = f_phiRMSBWDDL.Eval(pt);
     } else {
-      phi_RMS = f_phiRMSBWDNEAR->Eval(pt);
+      phi_RMS = f_phiRMSBWDNEAR.Eval(pt);
     }
   } else { /* ECL cluster below acceptance */
     return 0;
@@ -359,27 +339,27 @@ double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double
   double theta_RMS;
   if (eclDetectorRegion == ECL::DetectorRegion::FWD || eclDetectorRegion == ECL::DetectorRegion::FWDGap) {
     if (hitStatus == EXT_ECLCROSS) {
-      theta_RMS = f_thetaRMSFWDCROSS->Eval(pt);
+      theta_RMS = f_thetaRMSFWDCROSS.Eval(pt);
     } else if (hitStatus == EXT_ECLDL) {
-      theta_RMS = f_thetaRMSFWDDL->Eval(pt);
+      theta_RMS = f_thetaRMSFWDDL.Eval(pt);
     } else {
-      theta_RMS = f_thetaRMSFWDNEAR->Eval(pt);
+      theta_RMS = f_thetaRMSFWDNEAR.Eval(pt);
     }
   } else if (eclDetectorRegion == ECL::DetectorRegion::BRL) {
     if (hitStatus == EXT_ECLCROSS) {
-      theta_RMS = f_thetaRMSBRLCROSS->Eval(pt);
+      theta_RMS = f_thetaRMSBRLCROSS.Eval(pt);
     } else if (hitStatus == EXT_ECLDL) {
-      theta_RMS = f_thetaRMSBRLDL->Eval(pt);
+      theta_RMS = f_thetaRMSBRLDL.Eval(pt);
     } else {
-      theta_RMS = f_thetaRMSBRLNEAR->Eval(pt);
+      theta_RMS = f_thetaRMSBRLNEAR.Eval(pt);
     }
   } else if (eclDetectorRegion == ECL::DetectorRegion::BWD || eclDetectorRegion == ECL::DetectorRegion::BWDGap) {
     if (hitStatus == EXT_ECLCROSS) {
-      theta_RMS = f_thetaRMSBWDCROSS->Eval(pt);
+      theta_RMS = f_thetaRMSBWDCROSS.Eval(pt);
     } else if (hitStatus == EXT_ECLDL) {
-      theta_RMS = f_thetaRMSBWDDL->Eval(pt);
+      theta_RMS = f_thetaRMSBWDDL.Eval(pt);
     } else {
-      theta_RMS = f_thetaRMSBWDNEAR->Eval(pt);
+      theta_RMS = f_thetaRMSBWDNEAR.Eval(pt);
     }
   } else { /* ECL cluster below acceptance */
     return 0;

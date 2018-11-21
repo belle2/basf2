@@ -90,26 +90,26 @@ namespace Belle2 {
 
     DBObjPtr<ECLTrackClusterMatchingParameterizations> m_matchingParameterizations; /**< Parameterizations of RMS */
 
-    std::map<std::string, TF1*> m_parametrizationFunctions; /**< map containing all RMS parametrization functions */
+    std::map<std::string, TF1> m_parametrizationFunctions; /**< map containing all RMS parametrization functions */
 
-    TF1* f_phiRMSFWDCROSS; /**< function to describe phi RMS for FWD CROSS */
-    TF1* f_phiRMSFWDDL; /**< function to describe phi RMS for FWD DL */
-    TF1* f_phiRMSFWDNEAR; /**< function to describe phi RMS for FWD NEAR */
-    TF1* f_phiRMSBRLCROSS; /**< function to describe phi RMS for BRL CROSS */
-    TF1* f_phiRMSBRLDL; /**< function to describe phi RMS for BRL DL */
-    TF1* f_phiRMSBRLNEAR; /**< function to describe phi RMS for BRL NEAR */
-    TF1* f_phiRMSBWDCROSS; /**< function to describe phi RMS for BWD CROSS */
-    TF1* f_phiRMSBWDDL; /**< function to describe phi RMS for BWD DL */
-    TF1* f_phiRMSBWDNEAR; /**< function to describe phi RMS for BWD NEAR */
-    TF1* f_thetaRMSFWDCROSS; /**< function to describe theta RMS for FWD CROSS */
-    TF1* f_thetaRMSFWDDL; /**< function to describe theta RMS for FWD DL */
-    TF1* f_thetaRMSFWDNEAR; /**< function to describe theta RMS for FWD NEAR */
-    TF1* f_thetaRMSBRLCROSS; /**< function to describe theta RMS for BRL CROSS */
-    TF1* f_thetaRMSBRLDL; /**< function to describe theta RMS for BRL DL */
-    TF1* f_thetaRMSBRLNEAR; /**< function to describe theta RMS for BRL NEAR */
-    TF1* f_thetaRMSBWDCROSS; /**< function to describe theta RMS for BWD CROSS */
-    TF1* f_thetaRMSBWDDL; /**< function to describe theta RMS for BWD DL */
-    TF1* f_thetaRMSBWDNEAR; /**< function to describe theta RMS for BWD NEAR */
+    TF1 f_phiRMSFWDCROSS; /**< function to describe phi RMS for FWD CROSS */
+    TF1 f_phiRMSFWDDL; /**< function to describe phi RMS for FWD DL */
+    TF1 f_phiRMSFWDNEAR; /**< function to describe phi RMS for FWD NEAR */
+    TF1 f_phiRMSBRLCROSS; /**< function to describe phi RMS for BRL CROSS */
+    TF1 f_phiRMSBRLDL; /**< function to describe phi RMS for BRL DL */
+    TF1 f_phiRMSBRLNEAR; /**< function to describe phi RMS for BRL NEAR */
+    TF1 f_phiRMSBWDCROSS; /**< function to describe phi RMS for BWD CROSS */
+    TF1 f_phiRMSBWDDL; /**< function to describe phi RMS for BWD DL */
+    TF1 f_phiRMSBWDNEAR; /**< function to describe phi RMS for BWD NEAR */
+    TF1 f_thetaRMSFWDCROSS; /**< function to describe theta RMS for FWD CROSS */
+    TF1 f_thetaRMSFWDDL; /**< function to describe theta RMS for FWD DL */
+    TF1 f_thetaRMSFWDNEAR; /**< function to describe theta RMS for FWD NEAR */
+    TF1 f_thetaRMSBRLCROSS; /**< function to describe theta RMS for BRL CROSS */
+    TF1 f_thetaRMSBRLDL; /**< function to describe theta RMS for BRL DL */
+    TF1 f_thetaRMSBRLNEAR; /**< function to describe theta RMS for BRL NEAR */
+    TF1 f_thetaRMSBWDCROSS; /**< function to describe theta RMS for BWD CROSS */
+    TF1 f_thetaRMSBWDDL; /**< function to describe theta RMS for BWD DL */
+    TF1 f_thetaRMSBWDNEAR; /**< function to describe theta RMS for BWD NEAR */
 
     DBObjPtr<ECLTrackClusterMatchingThresholds> m_matchingThresholds; /**< Optimized matching thresholds */
 

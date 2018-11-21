@@ -177,6 +177,13 @@ def process(path, max_event=0):
     try:
         pybasf2.B2WARNING(path._deprecation_warning)
     except AttributeError:
+        import analysisPath
+        if analysisPath.analysis_main.modules():
+            modulenames = [m.name() for m in analysisPath.analysis_main.modules()]
+            modulenames = "\n".join(modulenames)
+            pybasf2.B2WARNING(
+                "You are not processing the (deprecated) analysis_main path,"
+                " but it has the following modules:\n", modulenames)
         pass
 
     pybasf2.B2INFO("Starting event processing, random seed is set to '" + pybasf2.get_random_seed() + "'")

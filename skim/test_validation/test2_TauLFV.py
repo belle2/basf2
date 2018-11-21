@@ -3,6 +3,11 @@
 
 from basf2 import *
 from modularAnalysis import *
+from stdCharged import *
+from stdPhotons import *
+from stdLightMesons import *
+from stdPi0s import *
+from stdV0s import *
 
 """
 <header>
@@ -13,6 +18,13 @@ from modularAnalysis import *
 """
 
 inputMdst('MC9', '../TauLFV.udst.root')
+
+loadStdCharged()
+stdPhotons('loose')
+loadStdSkimPi0()
+stdPi0s('loose')
+stdKshorts()
+loadStdLightMesons()
 
 from skim.taupair import *
 tauList = TauLFVList(0)

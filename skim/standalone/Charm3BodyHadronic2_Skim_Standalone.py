@@ -41,7 +41,7 @@ stdK('all')
 stdE('all')
 stdMu('all')
 
-from skim.charm import DstToD0PiD0ToHpHmKsList
+from skim.charm import DstToD0PiD0ToHpHmKs
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs()
 skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList)
 

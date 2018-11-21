@@ -39,7 +39,7 @@ stdE('all')
 stdMu('all')
 stdKshorts()
 
-from skim.charm import D0ToNeutralsList
+from skim.charm import D0ToNeutrals
 
 D0ToNeutralsList = D0ToNeutrals()
 skimOutputUdst(skimCode, D0ToNeutralsList)

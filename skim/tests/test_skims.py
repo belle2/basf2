@@ -14,8 +14,7 @@ from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
 
-from skimExpertFunctions import *
-
+from skimExpertFunctions import setSkimLogging, add_skim
 
 inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 
@@ -51,17 +50,6 @@ loadStdDstarPlus()
 loadStdDiLeptons(True)
 
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
-
-
-def add_skim(label, lists):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-    """
-    print('Running over ' + label)
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists)
-    summaryOfLists(lists)
 
 
 # ISR cc skim

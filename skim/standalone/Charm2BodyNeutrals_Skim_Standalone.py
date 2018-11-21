@@ -41,7 +41,7 @@ stdMu('all')
 stdKshorts()
 loadStdSkimPi0()
 
-from skim.charm import DstList
+from skim.charm import DstToD0Neutrals
 DstList = DstToD0Neutrals()
 skimOutputUdst(skimCode, DstList)
 

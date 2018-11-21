@@ -12,6 +12,7 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
+from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
 
@@ -38,7 +39,7 @@ stdK('all')
 stdE('all')
 stdMu('all')
 
-from skim.charm import D0ToHpJmList
+from skim.charm import D0ToHpJm
 D0ToHpJmList = D0ToHpJm()
 skimOutputUdst(skimCode, D0ToHpJmList)
 summaryOfLists(D0ToHpJmList)

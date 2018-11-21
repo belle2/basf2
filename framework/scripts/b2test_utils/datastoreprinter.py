@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ROOT import Belle2, kIsPublic, kIsStatic
+from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
 from basf2 import Module
 
 
@@ -197,6 +197,11 @@ class DataStorePrinter(object):
                     print("%13.6e " % result(row, col), end="")
 
             print()
+        # or is it a TVector3 or TLorentzVector?
+        elif isinstance(result, TVector3):
+            print("(" + ",".join("%.6g" % result[i] for i in range(3)) + ")")
+        elif isinstance(result, TLorentzVector):
+            print("(" + ",".join("%.6g" % result[i] for i in range(4)) + ")")
         # or, does it look like a std::pair?
         elif hasattr(result, "first") and hasattr(result, "second"):
             print("pair%s" % weight)
@@ -215,9 +220,6 @@ class DataStorePrinter(object):
                 if weight_getter is not None:
                     weight = weight_getter(i)
                 self._printResult(e, depth + 1, weight=weight)
-        # or, is it a HitPattern?
-        elif hasattr(result, "getInteger"):
-            print(bin(result.getInteger()), weight, sep="")
         # print floats with 6 valid digits
         elif isinstance(result, float):
             print("%.6g%s" % (result, weight))

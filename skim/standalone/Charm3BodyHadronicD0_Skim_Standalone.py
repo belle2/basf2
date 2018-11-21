@@ -14,7 +14,7 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
-from skimExpertFunction import *
+from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 
@@ -42,7 +42,7 @@ stdK('all')
 stdE('all')
 stdMu('all')
 
-from skim.charm import D0ToHpJmPi0List
+from skim.charm import D0ToHpJmPi0
 D0ToHpJmPi0List = D0ToHpJmPi0()
 skimOutputUdst(skimCode, D0ToHpJmPi0List)
 

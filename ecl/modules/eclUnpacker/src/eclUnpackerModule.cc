@@ -81,7 +81,15 @@ ADC_NUM*SAMPLES_NUM |                                                           
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_eclDigits("", DataStore::c_Event)
+  m_eclDigits("", DataStore::c_Event),
+  m_bitPos(0),
+  m_bufLength(0),
+  m_bufPos(0),
+  m_bufPtr(0),
+  m_debugLevel(0),
+  m_tagsReportedMask(0),
+  m_phasesReportedMask(0),
+  m_badHeaderReportedMask(0)
 {
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
 

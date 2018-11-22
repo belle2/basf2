@@ -18,7 +18,6 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdKlongs import *
-from stdLightMesons import *
 from ROOT import Belle2
 from vertex import vertexRave
 from vertex import TagV

@@ -11,7 +11,7 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
@@ -29,10 +29,16 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 
-loadStdCharged()
-
-from skim.charm import DstToD0PiD0ToHpJmList
+from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm()
 skimOutputUdst(skimCode, DstToD0PiD0ToHpJmList)
 summaryOfLists(DstToD0PiD0ToHpJmList)

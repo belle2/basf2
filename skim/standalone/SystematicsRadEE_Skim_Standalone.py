@@ -9,9 +9,8 @@
 #######################################################
 
 from basf2 import process, statistics
-from modularAnalysis import analysis_main, inputMdstList, \
-        skimOutputUdst, summaryOfLists
-from stdCharged import loadStdCharged
+from modularAnalysis import analysis_main, inputMdstList, skimOutputUdst, summaryOfLists
+from stdCharged import stdE
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 gb2_setuprel = 'release-02-00-01'
@@ -21,7 +20,7 @@ fileList = [
     'mdst_000001_prod00002314_task00000001.root']
 
 inputMdstList('MC9', fileList)
-loadStdCharged()
+stdE('all')
 
 from skim.systematics import SystematicsRadEEList
 radeelist = SystematicsRadEEList()

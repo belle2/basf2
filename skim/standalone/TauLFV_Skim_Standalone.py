@@ -9,9 +9,9 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu, stdPr
 from stdPhotons import *
-from stdLightMesons import *
+from skim.standardlists.lightmesons import *
 from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import *
@@ -31,10 +31,16 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
-loadStdCharged()
-stdPhotons('loose')
-loadStdSkimPi0()
 stdPi0s('loose')
+stdPi('all')
+stdK('all')
+stdPi('loose')
+stdK('loose')
+stdPr('loose')
+stdE('loose')
+stdMu('loose')
+loadStdSkimPhoton()
+loadStdSkimPi0()
 stdKshorts()
 loadStdLightMesons()
 

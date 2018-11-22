@@ -45,19 +45,19 @@ namespace Belle2 {
     virtual ~TRGECLRawdataAnalysisModule();
 
     /** Initilizes TRGECLModule.*/
-    virtual void initialize() override;
+    virtual void initialize();
 
     /** Called when new run started.*/
-    virtual void beginRun() override;
+    virtual void beginRun();
 
     /** Called event by event.*/
-    virtual void event() override;
+    virtual void event();
 
     /** Called when run ended.*/
-    virtual void endRun() override;
+    virtual void endRun();
 
     /** Called when processing ended.*/
-    virtual void terminate() override;
+    virtual void terminate();
 
   public:
 
@@ -101,8 +101,8 @@ namespace Belle2 {
     int  m_nEvent;
     //! Clustering option
     int _Clustering;
-    //! Object of Clustering Util
-    TrgEclCluster* obj_cluster;
+
+
 
   };
 

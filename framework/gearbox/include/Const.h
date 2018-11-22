@@ -16,6 +16,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <string>
 
 class TDatabasePDG;
 class TParticlePDG;
@@ -128,6 +129,11 @@ namespace Belle2 {
        * Getter for number of detector IDs in this set.
        */
       size_t size() const;
+
+      /**
+       * String for printing in python.
+       */
+      std::string __repr__() const;
 
     private:
 
@@ -343,6 +349,11 @@ namespace Belle2 {
        * @return The mass of the particle.
        */
       double getMass() const;
+
+      /**
+       * String for printing in python.
+       */
+      std::string __repr__() const;
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/

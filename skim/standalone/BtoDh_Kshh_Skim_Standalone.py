@@ -10,7 +10,7 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import sdPi, stdK
 from stdV0s import *
 from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
@@ -29,11 +29,9 @@ fileList = [
 inputMdstList('MC9', fileList)
 
 
-loadStdCharged()
-loadStdKS()
-
-fillParticleList('pi+:all', '')
-fillParticleList('K+:all', '')
+stdPi('all')
+stdK('all')
+stdKshorts()
 
 # B- to D(->Kshh)h- Skim
 from skim.btocharm import loadDkshh, BsigToDhToKshhList

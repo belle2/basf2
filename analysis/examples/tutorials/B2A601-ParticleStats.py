@@ -53,9 +53,9 @@ ma.inputMdst(environmentType='default',
 # create and fill final state ParticleLists
 # use standard lists
 # creates "pi+:loose" ParticleList (and c.c.)
-stdc.stdPi(listtype='all', path=my_path)
+stdc.stdPi(listtype='loose', path=my_path)
 # creates "K+:loose" ParticleList (and c.c.)
-stdc.stdK(listtype='all', path=my_path)
+stdc.stdK(listtype='loose', path=my_path)
 
 
 stdPi0s(listtype='looseFit', path=my_path)

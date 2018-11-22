@@ -27,13 +27,9 @@ Available vertex fit libraries
 RAVE
 ~~~~
 
-Rave is an already highly developed vertex fitter.
+Rave is a Kalman-based vertex fitter implemented as an external library (CMS vertexing library)
 
-* **Developers/basf2 maintener** None / Luigi Li Gioi
-* **Status**
-
-  * External library (CMS vertexing library)
-  * Some potential for custom constraints
+* **Developers/basf2 maintainer** None / Luigi Li Gioi
 
 * **Physics Use Case**
 
@@ -78,24 +74,22 @@ Rave is an already highly developed vertex fitter.
 GFRave
 ~~~~~~
 
-* **Developers/basf2 maintener** None / Luigi Li Gioi
-* **Status** Implementation of RAVE in Genfit
+Implementation of RAVE in Genfit for V0 finding.
 
-* **Physics Use Case** V0 Fit
+* **Developers/basf2 maintainer** None / Luigi Li Gioi
 
-* **basf2 implementation** V0Finder
+* **Physics Use Case** 
+  * V0 Fit
 
-* **Issues**
+* **basf2 implementation** 
+  * V0Finder
 
 KFit
 ~~~~
 
-* **Developers/basf2 maintener** J. Tanaka / Luigi Li Gioi
-* **Status**
+Port of the Belle vertex fitter.
 
-  * Inside the analysis package
-  * Ported from Belle
-  * 4C constraint not completed
+* **Developers/basf2 maintainer** J. Tanaka / Luigi Li Gioi
 
 * **Physics Use Case**
 
@@ -109,41 +103,35 @@ KFit
 
 * **Issues**
 
+  * 4C constraint not completed
+
 TreeFitter
 ~~~~~~~~~~
 
 (`Nuclear Instruments and Methods in Physics Research A 552 (2005) 566–575 <https://doi.org/10.1016/j.nima.2005.06.078>`_)
+(`Belle 2 Article <https://docs.belle2.org/record/841>`_)
 
-This is a progressive decay chain fitting tool from BaBar and LHCb. It uses a
-Kalman Filter. It is currently under development in basf2. More detail can be
-found in the page :doc:`TreeFitter`.
+This is a progressive decay chain fitting tool from BaBar and LHCb, based on a
+Kalman Filter. More detail can be found in the page :doc:`TreeFitter`.
 
-* **Developers/basf2 maintener** Francesco Tenchini, Jo-Frederik Krohn
-
-* **Status**
-  
-  * inside the analysis package
-  * Ported from BaBar/LHCb
+* **Developers/basf2 maintainers** Francesco Tenchini, Jo-Frederik Krohn
 
 * **Physics Use Case**
 
   * Fit of the entire decay tree
+  * Fit of neutral-rich decay chains
+  * Access to the full observable covariance matrix
 
 * **basf2 implementation**
 
   * Now outperforming RAVE/KFit
-  * More information at :doc:`TreeFitter`
 
-* **Issues**
-
-MarlinKinFit/OrcaKinFit
+OrcaKinFit
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* **Developers/basf2 maintener** Torben Ferber
+Kinematic fitter implementation, based on a fork of MarlinKinFit with modifications (remove all ILC dependency).
 
-* **Status**
-
-  * Ready for tests:  `PullRequest <https://stash.desy.de/projects/B2/repos/software/pull-requests/298/overview>`_
+* **Developers/basf2 maintainer** Torben Ferber
 
 * **Physics Use Case**
 
@@ -151,45 +139,15 @@ MarlinKinFit/OrcaKinFit
     particles. Arbitrary constraints (e.g., recoil mass: `BELLE2-NOTE-PH-2017-002
     <https://docs.belle2.org/record/483?ln=en>`_)
 
-* **basf2 implementation**
-
-  * Ready for tests: (`Pull request <https://stash.desy.de/projects/B2/repos/software/pull-requests/298/overview>`_)
-  * Actual implementation would be based on a fork of MarlinKinFit with modifications (remove all ILC dependency).
-
-* **Issues**
-
-ExKFitter
-~~~~~~~~~
-
-This is a global decay chain fitting tool from Belle (`Link to Belle page <http://belle.kek.jp/~kfchen/private/ExKFitter/>`_).
-It uses the Lagrange multiplier formalism, which comes with high computing
-costs.
-Because of the existence of the TreeFitter and of a possible implementation of
-the global fit in RAVE, it hasn't been ported over.
-However, it could yet prove of some use, so that should be investigated.
-
-* **Developers/basf2 maintener** 
-* **Status**
-
-* **Physics Use Case**
-
-* **basf2 implementaion**
-
-* **Issues**
-
 TagV
 ~~~~
 
-The module TagVertex performs the Btag Vertex Fit. It takes as input the tracks
-of the Rest Of Event and performs a geometric fit using the RAVE AVF algorithm.
+Module to perform the Btag vertex geometric fit using the RAVE adaptive vertex fitting algorithm. It takes as input the tracks
+of the Rest Of Event. More info about interface in :b2:mod:`TagVertex`, `vertex.TagV`
 
-More info about interface in :b2:mod:`TagVertex`, `vertex.TagV`
-
-* **Developers/basf2 maintener** 
-* **Status**
+* **Developers/basf2 maintener** - / -
 
 * **Physics Use Case**
 
-* **basf2 implementaion**
+  * TDCPV measurements
 
-* **Issues**

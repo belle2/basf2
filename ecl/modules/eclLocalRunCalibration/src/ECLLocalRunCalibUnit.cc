@@ -12,6 +12,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <iostream>
 // FRAMEWORK
 #include <framework/database/DBObjPtr.h>
 // ECL
@@ -115,7 +116,13 @@ void ECLLocalRunCalibUnit::writeToDB(
   int exp = iov.getExperimentLow();
   ECLCrystalLocalRunCalib data(isNegAmpl());
   if (m_unitData.size() > 0) {
-    int nevents = m_unitData[0].getNOfEvents();
+    int nevents = 0;
+    for (const auto& cellAcc : m_unitData) {
+      nevents = cellAcc.getNOfEvents();
+      if (nevents != 0) {
+        break;
+      }
+    }
     std::vector<int> counts;
     counts.reserve(m_unitData.size());
     callAccGetter<int>(&counts,

@@ -21,8 +21,10 @@ def loadOptions():
     optfile = os.path.join(dirname, 'options_eclLocalRunCalib.json')
     with open(optfile) as fl:
         data = json.load(fl)
-        opts = '--dbname %s' % (
+        opts = '--dbname %s ' % (
             data['dboptions']['dbname'],)
+        opts += '--timetab %s' % (
+            data['timetab'])
         if data['dboptions']['centraldb']:
             opts += ' --centraldb'
         if data['reference']:
@@ -44,6 +46,7 @@ def getCommand():
 def main():
     if len(sys.argv) == 5 or len(sys.argv) == 6:
         cmd = getCommand()
+        print(cmd)
         subprocess.call(cmd, shell=True)
     else:
         print('Atguments:\n'

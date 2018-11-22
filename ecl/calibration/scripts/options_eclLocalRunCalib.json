@@ -1,1 +1,8 @@
-{"dboptions": {"centraldb": false, "dbname": "localrundb-0004/database.txt"}, "dir": "/hsm/belle2/bdata/group/detector/ECL", "exp": 4, "reference": true}
+{
+"dboptions": {
+"centraldb": false,
+"dbname": "localdb-0003/database.txt"}, 
+"dir": "/group/belle2/users/remnev",
+"exp": 4,
+"reference": true,
+"timetab" : "timetab-0003.cvs"}

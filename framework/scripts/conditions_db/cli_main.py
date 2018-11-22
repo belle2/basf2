@@ -445,8 +445,12 @@ def command_diff(args, db):
             row = json.loads(token[2:])
             diff.append([token[0]] + row)
 
-        print(f"Differences betwen {args.tagA} and {args.tagB}")
-        pretty_print_table(diff, [1, 6, 6, 6, 6, "+", -8, 10], transform=color_row)
+        # print the table but make sure the first column is empty except for
+        # added/removed lines so that it can be copy-pasted into a diff syntax
+        # highlighting area (say pull request description)
+        print(f" Differences between {args.tagA} and {args.tagB}")
+        pretty_print_table(diff, [1, 6, 6, 6, 6, "+", -8, 10], transform=color_row,
+                           hline_format=lambda w: " " + (w-1)*'-')
 
 
 def command_iov(args, db):

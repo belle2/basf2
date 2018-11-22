@@ -46,8 +46,8 @@ void TRGCDCT3DUnpackerModule::terminate()
 
 void TRGCDCT3DUnpackerModule::initialize()
 {
-
-  StoreArray<TRGCDCT3DUnpackerStore>::registerPersistent();
+  m_store.registerInDataStore();
+  //StoreArray<TRGCDCT3DUnpackerStore>::registerPersistent();
 }
 
 void TRGCDCT3DUnpackerModule::beginRun()
@@ -77,19 +77,19 @@ void TRGCDCT3DUnpackerModule::fillTreeTRGCDCT3DUnpacker(int* buf, int evt)
 
   const unsigned nword_header = 2;
 
-  StoreArray<TRGCDCT3DUnpackerStore> storeAry;
+  //StoreArray<TRGCDCT3DUnpackerStore> storeAry;
   for (int clk = 0; clk < nClks; clk++) { // 0..47
 
-    storeAry.appendNew();
-    int ntups = storeAry.getEntries() - 1;
+    m_store.appendNew();
+    int ntups = m_store.getEntries() - 1;
     int* bitArray[nLeafs + nLeafsExtra];
-    setLeafPointersArray(storeAry[ntups], bitArray);
+    setLeafPointersArray(m_store[ntups], bitArray);
     for (int l = 0; l < nLeafs + nLeafsExtra; l++) *bitArray[l] = 0;
 
-    storeAry[ntups]->m_evt = evt;
-    storeAry[ntups]->m_clk = clk;
-    storeAry[ntups]->m_firmid  = buf[0];
-    storeAry[ntups]->m_firmver = buf[1];
+    m_store[ntups]->m_evt = evt;
+    m_store[ntups]->m_clk = clk;
+    m_store[ntups]->m_firmid  = buf[0];
+    m_store[ntups]->m_firmver = buf[1];
 
     //// Print data
     //cout<<"nClks: "<<nClks<<endl;

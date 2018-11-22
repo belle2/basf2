@@ -1318,6 +1318,11 @@ namespace Belle2 {
       /** Unpacker main function.*/
       virtual void fillTreeTRGCDCT3DUnpacker(int* buf, int evt);
 
+    private:
+
+      /** Output datastore for unpacker **/
+      StoreArray<TRGCDCT3DUnpackerStore> m_store;
+
     };
   }
 } // end namespace Belle2

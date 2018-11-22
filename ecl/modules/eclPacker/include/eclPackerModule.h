@@ -82,7 +82,7 @@ namespace Belle2 {
     int m_EclWaveformSamples[ECL_ADC_SAMPLES_PER_CHANNEL]; // == 31
 
     /** channel mapper */
-    ECL::ECLChannelMapper* m_eclMapper;
+    ECL::ECLChannelMapper m_eclMapper;
 
     /** Output data  */
     StoreArray<RawECL> m_eclRawCOPPERs;

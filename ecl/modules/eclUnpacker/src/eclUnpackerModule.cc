@@ -130,12 +130,6 @@ void ECLUnpackerModule::initialize()
   m_eclDsps.registerInDataStore(m_eclDspsName);
   m_eclDigits.registerRelationTo(m_eclDsps);
 
-  // initialize channel mapper from the database
-  if (! m_eclMapper.initFromDB()) {
-    B2FATAL("ECL Unpacker: Can't initialize eclChannelMapper!");
-  }
-
-  B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
 }
 
 void ECLUnpackerModule::beginRun()
@@ -143,6 +137,15 @@ void ECLUnpackerModule::beginRun()
   m_tagsReportedMask      = 0;
   m_phasesReportedMask    = 0;
   m_badHeaderReportedMask = 0;
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_eclMapper.initFromDB()) {
+    B2FATAL("ECL Unpacker: Can't initialize eclChannelMapper!");
+  }
+
+  //TODO
+  m_tagsReported   = false;
+  m_phasesReported = false;
 }
 
 void ECLUnpackerModule::event()

@@ -233,6 +233,8 @@ namespace Belle2 {
         B2FATAL("ParticleKinematicFitterModule:  " << m_orcaFitterEngine << " is an invalid OrcaKinFit fitter engine!");
       }
 
+      if (!pfitter) return false;
+
       BaseFitter& fitter = *pfitter;
 
       // reset fitter

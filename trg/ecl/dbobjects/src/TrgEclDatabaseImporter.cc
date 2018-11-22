@@ -64,7 +64,7 @@ namespace Belle2 {
     }
 
     std::ifstream stream2;
-    stream1.open(InputFileNoise.c_str());
+    stream2.open(InputFileNoise.c_str());
     if (!stream2) {
       B2ERROR("openFile: " << InputFileNoise << " *** failed to open");
       return;
@@ -98,58 +98,45 @@ namespace Belle2 {
     Wavemean.clear();
     Wavesigma.clear();
 
-    FPGAversion.resize(624);
-    TCId.resize(624);
-    FAMId.resize(624);
-    ChannelId.resize(624);
-    TEreconstruction.resize(624);
-    Threshold.resize(624);
-    Conversionfactor.resize(624);
-    Toffset.resize(624);
+    FPGAversion.resize(624, 0);
+    TCId.resize(624, 0);
+    FAMId.resize(624, 0);
+    ChannelId.resize(624, 0);
+    TEreconstruction.resize(624, 0);
+    Threshold.resize(624, 0);
+    Conversionfactor.resize(624, 0);
+    Toffset.resize(624, 0);
 
-    Wavemean.resize(624);
-    Wavesigma.resize(624);
+    Wavemean.resize(624, 0);
+    Wavesigma.resize(624, 0);
 
 
-    std::vector<std::vector<int> > SinalPDF;
-    SinalPDF.clear();
-    std::vector<std::vector<int> >  NoiseCovarianceMatrix;
+    std::vector<std::vector<double> > SignalPDF;
+    SignalPDF.clear();
+    std::vector<std::vector<double> >  NoiseCovarianceMatrix;
     NoiseCovarianceMatrix.clear();
-    SinalPDF.resize(624, std::vector<int>(8, 0));
-    NoiseCovarianceMatrix.resize(624, std::vector<int>(78, 0));
-
-
+    SignalPDF.resize(624, std::vector<double>(8, 0));
+    NoiseCovarianceMatrix.resize(624, std::vector<double>(78, 0));
 
     int Id = 0;
     while (!stream.eof()) {
-
-      stream >> FAMId[Id];
-      stream >> ChannelId[Id];
-      //  stream >> TCId[Id];
-      stream >> FPGAversion [Id];
-      stream >> TEreconstruction[Id];
-      stream >> Threshold[Id];
-      stream >> Conversionfactor[Id];
-      stream >> Toffset[Id];
-      stream >> Wavemean[Id];
-      stream >> Wavesigma[Id];
+      stream >> FAMId[Id]  >> ChannelId[Id] >> FPGAversion [Id]  >> TEreconstruction[Id] >> Threshold[Id] >>  Conversionfactor[Id] >>
+             Toffset[Id]  >> Wavemean[Id]  >> Wavesigma[Id];
       TCId[Id] = _map -> getTCIdFromFAMChannel(FAMId[Id], ChannelId[Id]);
       Id++;
-
     }
     stream.close();
     Id = 0;
     int line = 0;
+
     while (!stream1.eof()) {
-      stream1 >> SinalPDF[Id][0]
-              >> SinalPDF[Id][1]
-              >> SinalPDF[Id][2]
-              >> SinalPDF[Id][3]
-              >> SinalPDF[Id][4]
-              >> SinalPDF[Id][5]
-              >> SinalPDF[Id][6]
-              >> SinalPDF[Id][7];
-      Id++;
+      stream1 >> SignalPDF[Id][line];
+      line++;
+      if (line == 8) {
+        line = 0;
+        Id++;
+      }
+
     }
     stream1.close();
 
@@ -167,7 +154,6 @@ namespace Belle2 {
     stream2.close();
 
 
-
     //Import to DB
     for (int iTCId = 0; iTCId < 624; iTCId++) {
       fampara.appendNew(FPGAversion[iTCId],
@@ -180,10 +166,11 @@ namespace Belle2 {
                         Threshold[iTCId],
                         Wavemean[iTCId],
                         Wavesigma[iTCId],
-                        SinalPDF[iTCId],
+                        SignalPDF[iTCId],
                         NoiseCovarianceMatrix[iTCId]
                        );
     }
+
     IntervalOfValidity iov(startExp, startRun, endExp, endRun);
 
     fampara.import(iov);
@@ -207,10 +194,8 @@ namespace Belle2 {
     //  fampara.construct();
 
     int FPGAversion;
-    while (!stream.eof()) {
-      stream >> FPGAversion ;
-      tmmpara.appendNew(FPGAversion);
-    }
+    stream >> FPGAversion ;
+    tmmpara.appendNew(FPGAversion);
     stream.close();
     //Import to DB
     IntervalOfValidity iov(startExp, startRun, endExp, endRun);
@@ -245,39 +230,40 @@ namespace Belle2 {
     int TriggerLatency;
     int ETMDelay;
 
-    while (!stream.eof()) {
-      stream >> FPGAversion
-             >> ADCto100MeV
-             >> ELow
-             >> EHigh
-             >> ELum
-             >> FWD2DBhabha[0]    >> BWD2DBhabha[0]
-             >> FWD2DBhabha[1]    >> BWD2DBhabha[1]
-             >> FWD2DBhabha[2]    >> BWD2DBhabha[2]
-             >> FWD2DBhabha[3]    >> BWD2DBhabha[3]
-             >> FWD2DBhabha[4]    >> BWD2DBhabha[4]
-             >> FWD2DBhabha[5]    >> BWD2DBhabha[5]
-             >> FWD2DBhabha[6]    >> BWD2DBhabha[6]
-             >> FWD2DBhabha[7]    >> BWD2DBhabha[7]
-             >> FWD2DBhabha[8]    >> BWD2DBhabha[8]
-             >> FWD2DBhabha[9]    >> BWD2DBhabha[9]
-             >> FWD2DBhabha[10]   >> BWD2DBhabha[10]
-             >> FWD2DBhabha[11]   >> BWD2DBhabha[11]
-             >> FWD2DBhabha[12]   >> BWD2DBhabha[12]
-             >> FWD2DBhabha[13]   >> BWD2DBhabha[13]
-             >> Bhabha3DThreshold[0]
-             >> Bhabha3DThreshold[1]
-             >> LowMultiThreshold[0]
-             >> LowMultiThreshold[1]
-             >> LowMultiThreshold[2]
-             >> LowMultiThreshold[3]
-             >> TriggerLatency
-             >> ETMDelay;
+
+    stream >> FPGAversion
+           >> ADCto100MeV
+           >> ELow
+           >> EHigh
+           >> ELum
+           >> FWD2DBhabha[0]    >> BWD2DBhabha[0]
+           >> FWD2DBhabha[1]    >> BWD2DBhabha[1]
+           >> FWD2DBhabha[2]    >> BWD2DBhabha[2]
+           >> FWD2DBhabha[3]    >> BWD2DBhabha[3]
+           >> FWD2DBhabha[4]    >> BWD2DBhabha[4]
+           >> FWD2DBhabha[5]    >> BWD2DBhabha[5]
+           >> FWD2DBhabha[6]    >> BWD2DBhabha[6]
+           >> FWD2DBhabha[7]    >> BWD2DBhabha[7]
+           >> FWD2DBhabha[8]    >> BWD2DBhabha[8]
+           >> FWD2DBhabha[9]    >> BWD2DBhabha[9]
+           >> FWD2DBhabha[10]   >> BWD2DBhabha[10]
+           >> FWD2DBhabha[11]   >> BWD2DBhabha[11]
+           >> FWD2DBhabha[12]   >> BWD2DBhabha[12]
+           >> FWD2DBhabha[13]   >> BWD2DBhabha[13]
+           >> Bhabha3DThreshold[0]
+           >> Bhabha3DThreshold[1]
+           >> LowMultiThreshold[0]
+           >> LowMultiThreshold[1]
+           >> LowMultiThreshold[2]
+           >> LowMultiThreshold[3]
+           >> TriggerLatency
+           >> ETMDelay;
 
 
-      etmpara.appendNew(FPGAversion, ADCto100MeV, ELow, EHigh, ELum, FWD2DBhabha, BWD2DBhabha, Bhabha3DThreshold, LowMultiThreshold,
-                        TriggerLatency, ETMDelay);
-    }
+
+    etmpara.appendNew(FPGAversion, ADCto100MeV, ELow, EHigh, ELum, FWD2DBhabha, BWD2DBhabha, Bhabha3DThreshold, LowMultiThreshold,
+                      TriggerLatency, ETMDelay);
+
     stream.close();
     //Import to DB
     IntervalOfValidity iov(startExp, startRun, endExp, endRun);

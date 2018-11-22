@@ -1438,7 +1438,18 @@ int
 TrgEclMapping::getTCIdFromFAMChannel(int NFAM, int NChannel)
 {
 
+  if (NFAM < 1 || NFAM > 52) {
+
+    B2ERROR("TrgEclMapping> input FAM # is wrong!!!");
+    return -1;
+  }
+  if (NChannel < 1 || NChannel > 12) {
+    B2ERROR("TrgEclMapping> input Channel # is wrong!!!");
+    return -1;
+  }
+
   std::vector<std::vector<int>> FAMChannel ;
+
 
   FAMChannel = {{ 76, 77, 78, 79, 80, -1, 1, 2, 3, 4, 5, -1 },
     { 6, 7, 8, 9, 10, -1, 11, 12, 13, 14, 15, -1 },
@@ -2100,7 +2111,6 @@ TrgEclMapping::getFAMChannelFromTCId(int TCId)
 
 
 }
-
 
 //
 //===<END>

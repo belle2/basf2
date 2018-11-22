@@ -23,8 +23,7 @@ bklm_dataObjects = ['BKLMDigits',
                     'BKLMDigitEventInfos',
                     'BKLMHit1ds',
                     'BKLMHit2ds',
-                    'BKLMTracks'
-                    ]
+                    'BKLMTracks']
 use_KKMC = False
 
 # Create the main path

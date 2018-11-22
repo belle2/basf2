@@ -59,14 +59,17 @@ BKLMUnpackerModule::~BKLMUnpackerModule()
 
 void BKLMUnpackerModule::initialize()
 {
-  rawKLM.isRequired();
+  m_rawKLMs.isRequired();
 
-  bklmDigits.registerInDataStore(m_outputDigitsName);
-  bklmDigitOutOfRanges.registerInDataStore();
-  bklmEventDigitDebugs.registerInDataStore();
+  m_bklmDigits.registerInDataStore(m_outputDigitsName);
+  m_bklmDigitRaws.registerInDataStore();
+  m_bklmDigitOutOfRanges.registerInDataStore();
+  m_bklmDigitEventInfos.registerInDataStore();
 
-  bklmEventDigitDebugs.registerRelationTo(bklmDigits);
-  bklmEventDigitDebugs.registerRelationTo(bklmDigitOutOfRanges);
+  m_bklmDigits.registerRelationTo(m_bklmDigitRaws);
+  m_bklmDigitOutOfRanges.registerRelationTo(m_bklmDigitRaws);
+  m_bklmDigitEventInfos.registerRelationTo(m_bklmDigits);
+  m_bklmDigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
 
   if (m_loadMapFromDB)
     loadMapFromDB();
@@ -88,65 +91,61 @@ void BKLMUnpackerModule::beginRun()
 
 void BKLMUnpackerModule::event()
 {
-  bklmDigits.clear();
-  bklmDigitOutOfRanges.clear();
-  bklmEventDigitDebugs.clear();
+  m_bklmDigits.clear();
+  m_bklmDigitRaws.clear();
+  m_bklmDigitOutOfRanges.clear();
+  m_bklmDigitEventInfos.clear();
 
-  BKLMEventDigitDebug* bklmEventDigitDebug = bklmEventDigitDebugs.appendNew(0);
+  B2DEBUG(1, "BKLMUnpackerModule:: there are " << m_rawKLMs.getEntries() << " RawKLM entries");
+  for (int i = 0; i < m_rawKLMs.getEntries(); i++) {
 
-  B2DEBUG(1, "BKLMUnpackerModule:: there are " << rawKLM.getEntries() << " RawKLM entries");
-  for (int i = 0; i < rawKLM.getEntries(); i++) {
-
-    if (rawKLM[i]->GetNumEvents() != 1) {
-      B2DEBUG(1, "BKLMUnpackerModule:: RawKLM index " << i << " has more than one entry: " << rawKLM[i]->GetNumEvents());
+    if (m_rawKLMs[i]->GetNumEvents() != 1) {
+      B2DEBUG(1, "BKLMUnpackerModule:: RawKLM index " << i << " has more than one entry: " << m_rawKLMs[i]->GetNumEvents());
       continue;
     }
 
-    B2DEBUG(1, "BKLMUnpackerModule:: events in buffer: " << rawKLM[i]->GetNumEvents() << " ; number of nodes (copper boards): " <<
-            rawKLM[i]->GetNumNodes());
+    B2DEBUG(1, "BKLMUnpackerModule:: events in buffer: " << m_rawKLMs[i]->GetNumEvents() << " ; number of nodes (copper boards): " <<
+            m_rawKLMs[i]->GetNumNodes());
 
     // getNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents
-    for (int j = 0; j < rawKLM[i]->GetNumEntries(); j++) {
+    for (int j = 0; j < m_rawKLMs[i]->GetNumEntries(); j++) {
 
-      // store event-level debugging informations
-      if ((i < 1) && (j < 1)) {
-        bklmEventDigitDebug->setThisEventHasHits(1);
+      BKLMDigitEventInfo* bklmDigitEventInfo = m_bklmDigitEventInfos.appendNew();
 
-        int triggerCTime = rawKLM[i]->GetTTCtime(j) & 0xFFFF;
-        bklmEventDigitDebug->setTriggerCTime(triggerCTime);
+      int triggerCTime = m_rawKLMs[i]->GetTTCtime(j) & 0xFFFF;
+      bklmDigitEventInfo->setTriggerCTime(triggerCTime);
 
-        int triggerUTime = rawKLM[i]->GetTTUtime(j) & 0xFFFF;
-        bklmEventDigitDebug->setTriggerUTime(triggerUTime);
+      int triggerUTime = m_rawKLMs[i]->GetTTUtime(j) & 0xFFFF;
+      bklmDigitEventInfo->setTriggerUTime(triggerUTime);
 
-        int windowStart = rawKLM[i]->GetTrailerChksum(j);
-        bklmEventDigitDebug->setWindowStart(windowStart);
+      int windowStart = m_rawKLMs[i]->GetTrailerChksum(j);
+      bklmDigitEventInfo->setWindowStart(windowStart);
 
-        bklmEventDigitDebug->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
-        m_triggerCTimeOfPreviousEvent = triggerCTime;
-      }
+      bklmDigitEventInfo->setPreviousEventTriggerCTime(m_triggerCTimeOfPreviousEvent);
+      m_triggerCTimeOfPreviousEvent = triggerCTime;
 
       // since the buffer has multiple events this gets each event/node... but how to disentangle events? Maybe only one event there?
 
       // are finesse and detector the same?
-      // int nWords = rawKLM[i]->Get1stFINESSENwords(j);
+      // int nWords = m_rawKLMs[i]->Get1stFINESSENwords(j);
       // is this the same as get1stDetectorBuffer?
-      // int* data = rawKLM[i]->Get1stFINESSEBuffer(j);
+      // int* data = m_rawKLMs[i]->Get1stFINESSEBuffer(j);
 
-      unsigned int copperId = rawKLM[i]->GetNodeID(j);
+      unsigned int copperId = m_rawKLMs[i]->GetNodeID(j);
       //old 117440512 - 117440515 , new Data: 117440513 -- 117440516
 
       if (copperId < BKLM_ID  || copperId > BKLM_ID + 4)
         continue;
 
-      //short sCopperId = rawKLM[i]->GetCOPPERNodeId(j);
-      rawKLM[i]->GetBuffer(j);
+      //short sCopperId = m_rawKLMs[i]->GetCOPPERNodeId(j);
+      m_rawKLMs[i]->GetBuffer(j);
 
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         // addendum: there is always an additional word (count) at the end!
 
-        int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
+        int numDetNwords = m_rawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int numHits = numDetNwords / hitLength;
-        int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
+        int* buf_slot = m_rawKLMs[i]->GetDetectorBuffer(j, finesse_num);
 
         // cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,             finesse_num) << " words, " << numHits << " hits)" << endl;
         // if (numDetNwords > 0) {
@@ -187,7 +186,6 @@ void BKLMUnpackerModule::event()
           // cout << endl;
         }
 
-
         // either no data (finesse not connected) or with the count word
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           if (!m_keepEvenPackages) {
@@ -212,6 +210,8 @@ void BKLMUnpackerModule::event()
           unsigned short bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
           unsigned short bword4 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
           unsigned short bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
+
+          BKLMDigitRaw* bklmDigitRaw = m_bklmDigitRaws.appendNew(bword1, bword2, bword3, bword4);
 
           B2DEBUG(1, "BKLMUnpackerModule:: unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4);
 
@@ -263,11 +263,12 @@ void BKLMUnpackerModule::event()
 
           if (outRange) {
             // increase by 1 the event-counter of outOfRange-flagged hits
-            bklmEventDigitDebug->increaseOutOfRangeHits();
+            bklmDigitEventInfo->increaseOutOfRangeHits();
 
             // store the digit in the appropriate dataobject
-            BKLMDigitOutOfRange* bklmDigitOutOfRange = bklmDigitOutOfRanges.appendNew(moduleId, ctime, tdc, m_scintADCOffset - charge);
-            bklmEventDigitDebug->addRelationTo(bklmDigitOutOfRange);
+            BKLMDigitOutOfRange* bklmDigitOutOfRange = m_bklmDigitOutOfRanges.appendNew(moduleId, ctime, tdc, m_scintADCOffset - charge);
+            bklmDigitOutOfRange->addRelationTo(bklmDigitRaw);
+            bklmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
             std::string message = "BKLMUnpackerModule:: channel number is out of range ";
             m_rejected[message] += 1;
@@ -284,13 +285,13 @@ void BKLMUnpackerModule::event()
           // still have to add channel and axis to moduleId
           if (layer > 1) {
             moduleId |= BKLM_INRPC_MASK;
-            bklmEventDigitDebug->increaseRPCHits();
+            bklmDigitEventInfo->increaseRPCHits();
           } else
-            bklmEventDigitDebug->increaseSciHits();
+            bklmDigitEventInfo->increaseSciHits();
           // moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
           moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          BKLMDigit* bklmDigit = bklmDigits.appendNew(moduleId, ctime, tdc, m_scintADCOffset - charge);
+          BKLMDigit* bklmDigit = m_bklmDigits.appendNew(moduleId, ctime, tdc, m_scintADCOffset - charge);
           if (layer < 2 && ((m_scintADCOffset - charge) > m_scintThreshold))
             bklmDigit->isAboveThreshold(true);
 
@@ -302,7 +303,8 @@ void BKLMUnpackerModule::event()
                   " isAboveThreshold " << bklmDigit->isAboveThreshold() << " isRPC " << bklmDigit->inRPC() << " moduleId " <<
                   bklmDigit->getModuleID());
 
-          bklmEventDigitDebug->addRelationTo(bklmDigit);
+          bklmDigit->addRelationTo(bklmDigitRaw);
+          bklmDigitEventInfo->addRelationTo(bklmDigit);
 
         } // iHit for cycle
 

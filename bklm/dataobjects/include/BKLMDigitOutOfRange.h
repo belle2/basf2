@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <vector>
 
 namespace Belle2 {
 
@@ -25,7 +24,8 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    BKLMDigitOutOfRange()
+    BKLMDigitOutOfRange():
+      BKLMDigit()
     {}
 
     /**

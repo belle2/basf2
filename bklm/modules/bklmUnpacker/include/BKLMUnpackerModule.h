@@ -20,8 +20,9 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <bklm/dataobjects/BKLMDigitRaw.h>
 #include <bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <bklm/dataobjects/BKLMEventDigitDebug.h>
+#include <bklm/dataobjects/BKLMDigitEventInfo.h>
 
 #include <map>
 #include <string>
@@ -121,16 +122,19 @@ namespace Belle2 {
     DBObjPtr<BKLMADCThreshold> m_ADCParams;
 
     //! rawKLM StoreArray
-    StoreArray<RawKLM> rawKLM;
+    StoreArray<RawKLM> m_rawKLMs;
 
     //! BKLMDigit Array
-    StoreArray<BKLMDigit> bklmDigits;
+    StoreArray<BKLMDigit> m_bklmDigits;
 
     //! BKLMDigitDebug StoreArray
-    StoreArray<BKLMDigitOutOfRange> bklmDigitOutOfRanges;
+    StoreArray<BKLMDigitRaw> m_bklmDigitRaws;
 
-    //! BKLMEventDigitDebug StoreArray
-    StoreArray<BKLMEventDigitDebug> bklmEventDigitDebugs;
+    //! BKLMDigitOutOfRange StoreArray
+    StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;
+
+    //! BKLMDigitEventInfo StoreArray
+    StoreArray<BKLMDigitEventInfo> m_bklmDigitEventInfos;
 
     //! trigger ctime of the previous event
     unsigned int m_triggerCTimeOfPreviousEvent;

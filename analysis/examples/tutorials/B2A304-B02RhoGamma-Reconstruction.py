@@ -39,7 +39,7 @@ ma.inputMdst(environmentType='default',
 stdPhotons(listtype='tight', path=my_path)
 
 # creates "pi+:loose" ParticleList (and c.c.)
-stdc.stdLoosePi(path=my_path)
+stdc.stdPi(listtype='all', path=my_path)
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV

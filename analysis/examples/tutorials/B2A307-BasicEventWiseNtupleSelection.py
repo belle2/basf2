@@ -57,11 +57,12 @@ ma.applyEventCuts(cut='R2EventLevel < 0.3', path=my_path)
 # create and fill final state ParticleLists
 # use standard lists
 # creates "pi+:loose" ParticleList (and c.c.)
-stdc.stdLoosePi(path=my_path)
+stdc.stdPi(listtype='all', path=my_path)
 # creates "K+:loose" ParticleList (and c.c.)
-stdc.stdLooseK(path=my_path)
+stdc.stdK(listtype='all', path=my_path)
 # creates "mu+:loose" ParticleList (and c.c.)
-stdc.stdLooseMu(path=my_path)
+stdc.stdMu(listtype='all', path=my_path)
+
 
 # creates "pi0:looseFit" ParticleList
 stdPi0s(listtype='looseFit', path=my_path)

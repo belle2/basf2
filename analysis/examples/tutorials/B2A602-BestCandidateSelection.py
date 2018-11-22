@@ -56,7 +56,7 @@ ma.rankByLowest(particleList='pi+:all',
 va.variables.addAlias('pi_p_rank', 'extraInfo(pi_p_rank)')
 
 # creates "K+:loose" ParticleList (and c.c.)
-stdc.stdLooseK(path=my_path)
+stdc.stdK(listtype='all', path=my_path)
 
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 ma.reconstructDecay(decayString='D0 -> K-:loose pi+:all',

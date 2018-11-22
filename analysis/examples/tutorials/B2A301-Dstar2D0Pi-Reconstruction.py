@@ -39,9 +39,9 @@ ma.inputMdst(environmentType='default',
 # creates "pi+:all" ParticleList (and c.c.)
 stdc.stdPi(listtype='all', path=my_path)
 # creates "pi+:loose" ParticleList (and c.c.)
-stdc.stdLoosePi(path=my_path)
+stdc.stdPi(listtype='loose', path=my_path)
 # creates "K+:loose" ParticleList (and c.c.)
-stdc.stdLooseK(path=my_path)
+stdc.stdK(listtype='loose', path=my_path)
 
 # reconstruct D0 -> K- pi+ decay
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV

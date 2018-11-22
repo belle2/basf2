@@ -151,23 +151,3 @@ def loadStdGoodBellePhoton(path=analysis_main):
     """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)
-
-# old, will be removed/replaced
-
-
-def loadStdPhotonE12(path=analysis_main):
-    """
-    Warning:
-        This function is deprecated.
-    """
-    loadStdAllPhoton(path)
-    cutAndCopyList('gamma:E12', 'gamma:all', '1.2 < E < 100', True, path)
-
-
-def loadStdPhotonE15(path=analysis_main):
-    """
-    Warning:
-        This function is deprecated.
-    """
-    loadStdAllPhoton(path)
-    cutAndCopyList('gamma:E15', 'gamma:all', '1.5 < E < 100', True, path)

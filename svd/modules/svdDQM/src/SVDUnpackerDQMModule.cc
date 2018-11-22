@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "svd/modules/svdDQM/SVDUnpackerDQMModule.h"
+#include <svd/online/SVDOnlineToOfflineMap.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -22,7 +23,7 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 
-#include <boost/format.hpp>
+#include <algorithm>
 #include <string>
 #include "TDirectory.h"
 
@@ -30,8 +31,8 @@
 #include <TStyle.h>
 #include <TLine.h>
 
+
 using namespace std;
-using boost::format;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -44,7 +45,9 @@ REG_MODULE(SVDUnpackerDQM)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDUnpackerDQMModule::SVDUnpackerDQMModule() : Module()
+std::string SVDUnpackerDQMModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
+
+SVDUnpackerDQMModule::SVDUnpackerDQMModule() : Module(), m_mapping(m_xmlFileName)
 {
   //Set module properties
   setDescription("DQM Histograms");
@@ -54,7 +57,6 @@ SVDUnpackerDQMModule::SVDUnpackerDQMModule() : Module()
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDDQMHisto.root"));
   addParam("ShaperDigitsName", m_ShaperDigitName, "Name of ShaperDigit Store Array.", std::string(""));
   addParam("DiagnosticsName", m_SVDDAQDiagnosticsName, "Name of DAQDiagnostics Store Array.", std::string(""));
-
 }
 
 
@@ -69,15 +71,18 @@ void SVDUnpackerDQMModule::initialize()
   m_svdShapers.isRequired(m_ShaperDigitName);
   m_svdDAQDiagnostics.isRequired(m_SVDDAQDiagnosticsName);
 
-  //B2INFO("    ShaperDigits: " << m_ShaperDigitName);
-
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
-
 }
 
 
 void SVDUnpackerDQMModule::beginRun()
 {
+  if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
+  changeFADCaxis = false;
+
+  //getting fadc numbers from the mapping
+  FADCs = &(m_map->FADCnumbers);
 
   unsigned short Bins_FTBFlags = 5;
   unsigned short Bins_FTBError = 4;
@@ -85,31 +90,38 @@ void SVDUnpackerDQMModule::beginRun()
   unsigned short Bins_APVMatch = 1;
   unsigned short Bins_FADCMatch = 1;
   unsigned short Bins_UpsetAPV = 1;
+  unsigned short Bins_BadMapping = 1;
 
-  nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV;
+  unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
+                         Bins_BadMapping;
 
-  DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 48, 1, 49);
+  DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 48, 1, 49);
 
   DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
 
 
-  TString Xlables[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV"};
+  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "badMapping"};
 
-  for (unsigned short i = 0; i < nBits; i++) DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlables[i].Data());
+  //preparing X axis of the histogram
+  for (unsigned short i = 0; i < nBits; i++) DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
 
-  // Just to make sure, reset all the histograms.
-  if (DQMUnpackerHisto != NULL) DQMUnpackerHisto->Reset();
+  //copy FADC numbers to vector and sort them
+  vec_fadc.insert(vec_fadc.end(), FADCs->begin(), FADCs->end());
+  std::sort(vec_fadc.begin(), vec_fadc.end());
 
+  unsigned short ifadc = 0;
+  for (const auto& fadc : vec_fadc) {
+    fadc_map.insert(make_pair(fadc, ++ifadc));
+    DQMUnpackerHisto->GetYaxis()->SetBinLabel(ifadc, to_string(fadc).c_str());
+  }
 }
 
 
 void SVDUnpackerDQMModule::event()
 {
-
   if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) {
-    cout << "straszny syff - nie ma Diagnostics" << endl;
-    return;
+    B2ERROR("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD monitoring disabled");
   }
 
   if (m_eventMetaDataPtr->getEvent() % 1000 == 0) B2INFO("event number: " << m_eventMetaDataPtr->getEvent());
@@ -127,15 +139,29 @@ void SVDUnpackerDQMModule::event()
     apvMatch = m_svdDAQDiagnostics[i]->getAPVMatch();
     fadcMatch = m_svdDAQDiagnostics[i]->getFADCMatch();
     upsetAPV = m_svdDAQDiagnostics[i]->getUpsetAPV();
+    badMapping = m_svdDAQDiagnostics[i]->getBadMapping();
 
     fadcNo = m_svdDAQDiagnostics[i]->getFADCNumber();
-    apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
+    //apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
 
     // insert FADCnumber into the map (if not already there) and assign the next bin to it.
-    if (fadc_map.find(fadcNo) == fadc_map.end())   fadc_map.insert(make_pair(fadcNo, ++bin_no));
+    if (changeFADCaxis) {
+      if (fadc_map.find(fadcNo) == fadc_map.end())   fadc_map.insert(make_pair(fadcNo, ++bin_no));
+    }
 
-    if (ftbFlags != 0 or ftbError != 240 or apvError != 0 or !apvMatch or !fadcMatch or upsetAPV) {
+    if (ftbFlags != 0 or ftbError != 240 or apvError != 0 or !apvMatch or !fadcMatch or upsetAPV or badMapping) {
       auto ybin = fadc_map.find(fadcNo);
+
+      if (badMapping)  {
+        if (!changeFADCaxis) {
+          changeFADCaxis = true;
+          fadc_map.clear();
+          break;
+        } else {
+          DQMUnpackerHisto->Fill(17, ybin->second);
+        }
+      }
+
       if (ftbFlags != 0) {
         if (ftbFlags & 16) DQMUnpackerHisto->Fill(5, ybin->second);
         if (ftbFlags & 8) DQMUnpackerHisto->Fill(4, ybin->second);
@@ -165,34 +191,34 @@ void SVDUnpackerDQMModule::event()
         if (apvError & 2) DQMUnpackerHisto->Fill(11, ybin->second);
         if (apvError & 4) DQMUnpackerHisto->Fill(12, ybin->second);
         if (apvError & 8) DQMUnpackerHisto->Fill(13, ybin->second);
-
       }
 
       if (!apvMatch) DQMUnpackerHisto->Fill(14, ybin->second);
       if (!fadcMatch) DQMUnpackerHisto->Fill(15, ybin->second);
       if (upsetAPV) DQMUnpackerHisto->Fill(16, ybin->second);
 
-
     }
+  } //end Diagnostics loop
+
+  if (changeFADCaxis) {
+    for (auto& iFADC : fadc_map)  DQMUnpackerHisto->GetYaxis()->SetBinLabel(iFADC.second, to_string(iFADC.first).c_str());
   }
 
-  for (auto& iFADC : fadc_map)  DQMUnpackerHisto->GetYaxis()->SetBinLabel(iFADC.second, to_string(iFADC.first).c_str());
-
-}
+} // end event function
 
 
 void SVDUnpackerDQMModule::endRun()
 {
 
   if (m_rootFilePtr != NULL) {
-    m_rootFilePtr->cd();
-
     m_rootFilePtr->Write();
     m_rootFilePtr->Close();
   }
+// delete DQMUnpackerHisto;
 }
 
 void SVDUnpackerDQMModule::terminate()
 {
+// delete m_rootFilePtr;
 }
 

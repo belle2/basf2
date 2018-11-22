@@ -47,9 +47,11 @@ namespace Belle2 {
       APVMatchBits = 1,
       /** Number of bits available to represent an upset APV code */
       UpsetAPVBits = 1,
+      /** Number of bits available to represent bad mapping code */
+      BadMappingBits = 1,
 
       /** Total bit size of the SVDDAQDiagnostic */
-      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits + FADCMatchBits + APVMatchBits + UpsetAPVBits
+      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits + FADCMatchBits + APVMatchBits + UpsetAPVBits + BadMappingBits
     };
 
 
@@ -82,6 +84,7 @@ namespace Belle2 {
       m_fadcNo = fadcNo;
       m_apvNo = apvNo;
       m_upsetApv = 0;
+      m_badMapping = 0;
     }
 
     /** Default constructor */
@@ -113,6 +116,9 @@ namespace Belle2 {
     bool getFADCMatch() const {return m_fadcMatch; }
     /** Get the UpsetAPV code */
     bool getUpsetAPV() const {return m_upsetApv; }
+    /** Get the BadMapping code */
+    bool getBadMapping() const {return m_badMapping; }
+
     /** Get FADC number */
     unsigned short getFADCNumber() const { return m_fadcNo; }
     /** Get APV number */
@@ -131,6 +137,7 @@ namespace Belle2 {
     void setApvErrorOR(uint8_t apvErrorOR) { m_apvErrorOR = apvErrorOR; }
     void setAPVMatch(bool APVMatch) { m_apvMatch = APVMatch; }
     void setUpsetAPV(bool UpsetAPV) { m_upsetApv = UpsetAPV; }
+    void setBadMapping(bool BadMapping) { m_badMapping = BadMapping; }
 
 
   private:
@@ -160,6 +167,8 @@ namespace Belle2 {
     bool m_apvMatch;
     /**Upset APV */
     bool m_upsetApv;
+    /**Bad mapping */
+    bool m_badMapping;
     /**FADC # */
     uint8_t m_fadcNo;
     /**APV # */

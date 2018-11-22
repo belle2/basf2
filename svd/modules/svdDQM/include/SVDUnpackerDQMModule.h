@@ -18,8 +18,13 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
+
 #include <svd/dataobjects/SVDHistograms.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <svd/online/SVDOnlineToOfflineMap.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
+#include <memory>
 
 #include <string>
 #include <TTree.h>
@@ -65,11 +70,16 @@ namespace Belle2 {
     /** SVD diagnostics module name */
     std::string m_SVDDAQDiagnosticsName;
 
+    /** mapping implementation */
+    std::unique_ptr<SVDOnlineToOfflineMap> m_map;
+    static std::string m_xmlFileName;
+    DBObjPtr<PayloadFile> m_mapping;
+
     StoreArray<SVDShaperDigit> m_svdShapers;
     StoreArray<SVDDAQDiagnostic> m_svdDAQDiagnostics;
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
-    unsigned short nBits;
+    bool changeFADCaxis;
 
     uint16_t ftbError;
     uint16_t ftbFlags;
@@ -77,15 +87,16 @@ namespace Belle2 {
     bool apvMatch;
     bool fadcMatch;
     bool upsetAPV;
+    bool badMapping;
     unsigned short fadcNo;
-    unsigned short apvNo;
+    //unsigned short apvNo;
 
-    std::map<unsigned short, unsigned short> fadc_map;
+    std::unordered_set<unsigned char>* FADCs;
+    std::unordered_map<unsigned short, unsigned short> fadc_map;
+    std::vector<unsigned short> vec_fadc;
 
-    // tu będzie histogram(y)
-    TH2F* DQMUnpackerHisto;
-    //SVDHistograms<TH2F>* m_DQMUnpackerHisto;
-
+    //histogram
+    TH2S* DQMUnpackerHisto;
 
   };
 

@@ -5,9 +5,9 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from stdLightMesons import *
 from stdPi0s import *
 from stdV0s import *
+from skim.standardlists.lightmesons import *
 
 """
 <header>
@@ -19,10 +19,14 @@ from stdV0s import *
 
 inputMdst('MC9', '../TauLFV.udst.root')
 
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdPr('loose')
+stdE('loose')
+stdMu('loose')
 stdPhotons('loose')
-loadStdSkimPi0()
 stdPi0s('loose')
+loadStdSkimPi0()
 stdKshorts()
 loadStdLightMesons()
 

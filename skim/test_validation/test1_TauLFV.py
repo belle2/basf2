@@ -20,18 +20,22 @@ from modularAnalysis import *
 from skimExpertFunctions import *
 from stdCharged import *
 from stdPhotons import *
-from stdLightMesons import *
 from stdPi0s import *
 from stdV0s import *
+from skim.standardlists.lightmesons import *
 
 fileList = ['../TauLFV.dst.root']
 
 inputMdstList('MC9', fileList)
 
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdPr('loose')
+stdE('loose')
+stdMu('loose')
 stdPhotons('loose')
-loadStdSkimPi0()
 stdPi0s('loose')
+loadStdSkimPi0()
 stdKshorts()
 loadStdLightMesons()
 

@@ -285,7 +285,7 @@ void ECLLocalRunCalibratorModule::endRun()
     // into a database.
     writeCalibResultsToDB();
     if (m_fulltree) {
-      auto fl = TFile::Open("ecl_local_run_fulltree.root",
+      auto fl = TFile::Open("/ghi/fs01/belle2/bdata/group/detector/ECL/local-run-db/data-full/ecl_local_run_fulltree.root",
                             "recreate");
       fl->cd();
       m_tree->Write();

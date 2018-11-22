@@ -32,6 +32,11 @@ def getLocalRunFileParams(path):
     if len(flst) != 1:
         return False
     else:
+        tpath = os.path.join(path, flst[0])
+        size = subprocess.check_output(['du', '-sh', tpath]).split()[0].decode('utf-8')
+        if size == '0':
+            return False
+
         res = re.search(p, flst[0])
         flpath = os.path.join(path, flst[0])
         epochTime = os.path.getctime(flpath)
@@ -57,8 +62,8 @@ def main():
     lst = sorted(lst, key=lambda x: x['time'])
     print('exp/I:run/I:run_start/C:run_end/C:evt_count/I')
     for el in lst:
-        sqlTimeEnd = sqlTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(el['time']))
-        sqlTimeBegin = sqlTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(el['time'] - 1))
+        sqlTimeEnd = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(el['time']))
+        sqlTimeBegin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(el['time'] - 1))
         print('%d, %d, %s, %s, %d' % (int(el['exp']), int(el['run']), sqlTimeBegin, sqlTimeEnd, 1000))
 
 

@@ -29,7 +29,8 @@ class EclLRCalibrator:
         self.__userName = ''
         self.__userId = None
         self.__loginTime = None
-        self.__tmpLastRunFigs = '/tmp/ecl_localrun_shift_last_check.root'
+        self.__pathToTmpTree = '/ghi/fs01/belle2/bdata/group/detector/ECL/local-run-db/data-full/ecl_local_run_fulltree.root'
+        self.__tmpLastRunFigs = '/gpfs/group/belle2/group/detector/ECL/local-run-db/ecl_localrun_shift_last_check.root'
         self.loadOptions()
         if not os.path.exists(self.__eclClbrLogDB):
             self.__createClbrLogDB__()
@@ -704,15 +705,17 @@ The current experiment number has been set to %(expnum)04d.''' % {
             return
 
         isNewExp = self.isNewExp()
+
         out = True
         if not isNewExp:
             out = self.__canBeNewRun__(runnum)
 
         if not out:
             print('''The run %(run)05d already \
-exists or is not the last one. \
-The local run calibration for \
-run %(run)05d is not completed.''' % {
+exists or is not the last one.
+If you want to draw quality histograms \
+for the run, use 'draw_abs' and 'draw_norm' commands \
+(see 'help draw_abs' for detailed description).''' % {
                 'run': runnum})
             self.logEventSuccess(eventTime, 0)
             self.logEventLog(eventTime, '''The run %(run)05d already exists or not \
@@ -732,7 +735,7 @@ of experiment %(expnum)04d does not exist.''' % {
             print(msg)
             return
 
-        cmd = 'ecl/calibration/scripts/eclLocalRunCalib.py'
+        cmd = 'ecl/calibration/scripts/eclLocalRunCalib.py --tree'
         cmd += ' --dbname %s' % (self.__getLocalDBPath__(self.__curexp),)
         cmd += ' --filename %s' % (path,)
         if not isNewExp:
@@ -740,6 +743,7 @@ of experiment %(expnum)04d does not exist.''' % {
 
         subprocess.call(cmd, shell=True)
         self.__recursiveChmod__(self.__getLocalDBPath__(self.__curexp), 0o777)
+        os.chmod(self.__pathToTmpTree, 0o777)
         self.logEventSuccess(eventTime, 1)
         self.logEventLog(eventTime, 'Succesfully finished.')
         self.__clbrDBAdd__(runnum)
@@ -1085,9 +1089,22 @@ without checking the current run.''')
                 self.calibrator.logEventLog(eventTime, 'NO')
                 return
 
-        isNewExp = self.calibrator.isNewExp()
         self.calibrator.logEventLog(eventTime, 'YES')
+        if self.calibrator.isRunInDB(self.calibrator.getCurExpNum(), runnum):
+            self.calibrator.logEventSuccess(eventTime, 0)
+            msg = 'The run number %(runnum)05d of experiment \
+%(expnum)04d already exists in the database.' % {
+                'runnum': runnum,
+                'expnum': self.calibrator.getCurExpNum()}
+            self.calibrator.logEventLog(eventTime, msg)
+            print(msg)
+            return
+
         self.calibrator.calib(eventTime, runnum)
+        if self.calibrator.getCurExpNum() is None:
+            return
+
+        isNewExp = self.calibrator.isNewExp()
         if isNewExp:
             self.do_draw_abs('')
         else:

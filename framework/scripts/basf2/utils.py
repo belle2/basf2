@@ -22,7 +22,7 @@ def get_terminal_width():
 
 
 def pretty_print_table(table, column_widths, first_row_is_heading=True, transform=None, min_flexible_width=10, *,
-                       hline_format=None):
+                       hline_formatter=None):
     """
     Pretty print a given table, by using available terminal size and
     word wrapping fields as needed.
@@ -66,7 +66,7 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
       min_flexible_width: the minimum amount of characters for every column
           marked with *
 
-      hline_format: A callable function to format horizontal lines (above and
+      hline_formatter: A callable function to format horizontal lines (above and
           below the table header). Should be a callback with one parameter for
           the total width of the table in characters and return a string that
           is the horizontal line. If None is returned no line is printed.
@@ -138,8 +138,8 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
     # don't print extra spaces at end of each line
     format_string += ' %s'
 
-    if hline_format is not None:
-        hline = hline_format(total_used_width)
+    if hline_formatter is not None:
+        hline = hline_formatter(total_used_width)
     else:
         hline = total_used_width * "-"
 

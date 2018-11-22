@@ -450,7 +450,7 @@ def command_diff(args, db):
         # highlighting area (say pull request description)
         print(f" Differences between {args.tagA} and {args.tagB}")
         pretty_print_table(diff, [1, 6, 6, 6, 6, "+", -8, 10], transform=color_row,
-                           hline_format=lambda w: " " + (w-1)*'-')
+                           hline_formatter=lambda w: " " + (w-1)*'-')
 
 
 def command_iov(args, db):

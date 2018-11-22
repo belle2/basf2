@@ -106,7 +106,7 @@ bool ECLChannelMapper::initFromDB()
   }
 
   if (!channelMap.isValid()) {
-    B2ERROR("ECLChannelMapper:: Could not get ECLChannelMap from the database. Trying to initialize from text file");
+    B2WARNING("ECLChannelMapper:: Could not get ECLChannelMap from the database. Trying to initialize from text file");
     std::string filePath = FileSystem::findFile("ecl/data/ecl_channels_map.txt");
     return initFromFile(filePath.c_str());
   }

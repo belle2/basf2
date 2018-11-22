@@ -12,4 +12,5 @@
 #pragma link C++ class Belle2::CDCTriggerMLPData+;
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+;
 
+#pragma link C++ class Belle2::TRGCDCT3DUnpackerStore+;
 #endif

@@ -152,7 +152,7 @@ namespace Belle2 {
     unsigned short m_groupID = 0;   /*!< Group id (parameterized per group) */
     std::map<unsigned short, std::vector<float>> m_cvs; /**< cv list */
 
-    ClassDef(CDCEDepToADCConversions, 1); /**< ClassDef */
+    ClassDef(CDCEDepToADCConversions, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

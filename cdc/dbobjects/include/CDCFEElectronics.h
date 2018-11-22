@@ -69,7 +69,7 @@ namespace Belle2 {
     short m_adcThresh = 2;          /**< Threshold for FADC (count) */
     short m_tdcThreshInMV = 3750;   /**< Voltage threshold for timing signal (mV) */
 
-    ClassDef(CDCFEElectronics, 1); /**< ClassDef */
+    ClassDef(CDCFEElectronics, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

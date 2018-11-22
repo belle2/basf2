@@ -11,11 +11,11 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import sys
 import os
@@ -27,8 +27,7 @@ fileList = [
 
 
 inputMdstList('MC9', fileList)
-
-loadStdCharged()
+stdMu('all')
 
 from skim.systematics import SystematicsRadMuMuList
 SysList = SystematicsRadMuMuList()

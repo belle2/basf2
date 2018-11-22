@@ -26,7 +26,7 @@ from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from stdPhotons import stdPhotons
-from stdCharged import stdLoosePi
+from stdCharged import stdPi
 
 # Run this tutorial either over signal MC or background MC (K*gamma)
 # Add 10 signal MC files (each containing 1000 generated events)
@@ -48,7 +48,7 @@ inputMdstList('default', filelistSIG)
 stdPhotons('tight')
 
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdPi('loose')
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV

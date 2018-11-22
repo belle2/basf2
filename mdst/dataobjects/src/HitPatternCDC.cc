@@ -167,3 +167,8 @@ bool HitPatternCDC::hasStereoLayer() const
   return ((s_sLayerMasks[1] | s_sLayerMasks[3] | s_sLayerMasks[5] | s_sLayerMasks[7])
           & m_pattern).any();
 }
+
+std::string HitPatternCDC::__repr__() const
+{
+  return m_pattern.to_string();
+}

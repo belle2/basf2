@@ -218,7 +218,7 @@ void ECLTrackBremFinderModule::event()
             }
           } catch (NoTrackFitResult&) {
             B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
-          } catch (genfit::Exception e) {
+          } catch (genfit::Exception& e) {
             B2WARNING("Exception" << e.what());
           }
         }

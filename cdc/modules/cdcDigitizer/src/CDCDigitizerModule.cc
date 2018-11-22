@@ -27,7 +27,7 @@ using namespace CDC;
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
-  m_cdcgp(), m_aCDCSimHit(), m_posFlag(0),
+  m_cdcgp(), m_gcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
@@ -96,7 +96,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
            "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas; for the gas+wire (MaterialDefinitionMode=0) case, (this value)/f will be used, where f is specified by GasToGasWire",
            25.0);
-  addParam("TDCThreshold4Innter", m_tdcThreshold4Inner,
+  addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
            "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
   addParam("GasToGasWire", m_gasToGasWire,
            "(Approximate) ratio of dE in He/C2H6-gas to dE in gas+wire, where dE is energy deposit.", 1. / 1.6);

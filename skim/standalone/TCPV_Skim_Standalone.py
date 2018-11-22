@@ -8,7 +8,7 @@
 #
 ######################################################
 """
-Time dependent CP violation skim standalone for the analysis of TDCPV analysis in WG3 .
+Time dependent CP violation skim  for the analysis of TDCPV analysis in WG3 .
 Physics channels : bd → qqs and bd → ccs .
 Skim code : 13160100
 for analysis users we will reconstruct again in the analysis steering file
@@ -38,13 +38,15 @@ __author__ = " Reem Rasheed"
 
 from basf2 import *
 from modularAnalysis import *
+from beamparameters import add_beamparameters
+from skimExpertFunctions import *
 from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.lightmesons import *
-from skim.standardlists.dileptons import *
-from skimExpertFunctions import *
+from skim.standardlists.dileptons import loadStdDiLeptons
+
 gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
 

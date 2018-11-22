@@ -37,13 +37,10 @@ ECLPackerModule::ECLPackerModule() :
 
   iEclDigIndices = new int[ECL_TOTAL_CHANNELS];
   iEclWfIndices  = new int[ECL_TOTAL_CHANNELS];
-
-  m_eclMapper = new ECLChannelMapper();
 }
 
 ECLPackerModule::~ECLPackerModule()
 {
-  delete m_eclMapper;
   delete[] iEclDigIndices;
   delete[] iEclWfIndices;
 }
@@ -57,12 +54,11 @@ void ECLPackerModule::initialize()
   // register output container in data store
   m_eclRawCOPPERs.registerInDataStore(m_eclRawCOPPERsName);
 
-  // initialize channel mapper from the database
-  if (! m_eclMapper->initFromDB()) {
+  // Initialize channel mapper from the database
+  if (!m_eclMapper.initFromDB()) {
     B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
   }
 
-  B2INFO("ECL Packer: eclChannelMapper initialized successfully");
   B2INFO("ECL Packer: Compress mode = " << m_compressMode);
 }
 
@@ -117,9 +113,9 @@ void ECLPackerModule::event()
     if (amp < m_ampThreshold) continue;
 
     //TODO: Threshold
-    iCrate = m_eclMapper->getCrateID(cid);
-    iShaper = m_eclMapper->getShaperPosition(cid);
-    iChannel = m_eclMapper->getShaperChannel(cid);
+    iCrate = m_eclMapper.getCrateID(cid);
+    iShaper = m_eclMapper.getShaperPosition(cid);
+    iChannel = m_eclMapper.getShaperChannel(cid);
 
     if (iCrate < 1 && iShaper < 1 && iChannel < 1) {
       B2ERROR("Wrong crate/shaper/channel ids: " << iCrate << " " << iShaper << " " << iChannel << " for CID " << cid);
@@ -141,9 +137,9 @@ void ECLPackerModule::event()
       B2DEBUG(100, "ECL Packer:: Pack waveform data for this event: " << m_EvtNum);
       for (int i_wf = 0; i_wf < nEclWaveform; i_wf++) {
         int cid = m_eclDsps[i_wf]->getCellId();
-        iCrate = m_eclMapper->getCrateID(cid);
-        iShaper = m_eclMapper->getShaperPosition(cid);
-        iChannel = m_eclMapper->getShaperChannel(cid);
+        iCrate = m_eclMapper.getCrateID(cid);
+        iShaper = m_eclMapper.getShaperPosition(cid);
+        iChannel = m_eclMapper.getShaperChannel(cid);
 
         //check corresponding amplitude in ecl digits
         int amp = 0;
@@ -184,8 +180,8 @@ void ECLPackerModule::event()
     int iCOPPERNode = (iCOPPER <= ECL_BARREL_COPPERS) ? BECL_ID + iCOPPER : EECL_ID + iCOPPER - ECL_BARREL_COPPERS;
 
     //check if at least one of FINESSES have hits
-    int icr1 = m_eclMapper->getCrateID(iCOPPERNode, 0);
-    int icr2 = m_eclMapper->getCrateID(iCOPPERNode, 1);
+    int icr1 = m_eclMapper.getCrateID(iCOPPERNode, 0);
+    int icr2 = m_eclMapper.getCrateID(iCOPPERNode, 1);
     B2DEBUG(200, "iCOPPERNode = 0x" << std::hex << iCOPPERNode << std::dec << " nCrate1 = " << icr1 << " nCrate2 = " << icr2);
     if (!(collectorMaskArray[icr1 - 1] || collectorMaskArray[icr2 - 1])) continue;
 
@@ -197,9 +193,9 @@ void ECLPackerModule::event()
 
     //cycle over finesses in copper
     for (iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
-      iCrate = m_eclMapper->getCrateID(iCOPPERNode, iFINESSE);
+      iCrate = m_eclMapper.getCrateID(iCOPPERNode, iFINESSE);
 
-      nShapers = m_eclMapper->getNShapersInCrate(iCrate);
+      nShapers = m_eclMapper.getNShapersInCrate(iCrate);
       if (!nShapers) B2ERROR("Ecl packer:: Wrong shapers number " << nShapers);
 
       if (!shaperMaskArray[iCrate - 1]) continue;
@@ -245,7 +241,7 @@ void ECLPackerModule::event()
         // cycle over shaper channels and push DSP data to buffer
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
 
-          const int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
+          const int cid = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
           if (cid < 1) continue;
 
@@ -282,7 +278,7 @@ void ECLPackerModule::event()
         resetBuffPosition();
         setBuffLength(ECL_ADC_SAMPLES_PER_CHANNEL * ECL_CHANNELS_IN_SHAPER);
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
-          int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
+          int cid = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
           if (cid < 1) continue;
           int i_wf   = iEclWfIndices[cid - 1];
           if (i_wf < 0) continue;

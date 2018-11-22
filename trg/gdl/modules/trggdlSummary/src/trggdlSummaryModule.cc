@@ -188,18 +188,6 @@ void TRGGDLSummaryModule::event()
     }
   }
 
-  //set prescale
-  for (int j = 0; j < nword_output; j++) {
-    for (int bit = 0; bit < 32 ; bit++) {
-      GDLResult->setPreScale(j, bit, m_prescales->getprescales(j * 32 + bit));
-    }
-  }
-  //set bitname
-  for (int j = 0; j < nword_output; j++) {
-    for (int bit = 0; bit < 32 ; bit++) {
-      GDLResult->setFtdlBitsName(j, bit, m_ftdlbits->getoutbitname(j * 32 + bit));
-    }
-  }
 
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
 

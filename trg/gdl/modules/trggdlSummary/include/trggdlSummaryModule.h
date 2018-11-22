@@ -52,10 +52,6 @@ namespace Belle2 {
     int ee_psn[10];
     int ee_ftd[10];
     int ee_itd[10];
-    //condition database for prescale
-    DBObjPtr<TRGGDLDBPrescales> m_prescales;
-    //condition database for bitname
-    DBObjPtr<TRGGDLDBFTDLBits> m_ftdlbits;
 
   };
 

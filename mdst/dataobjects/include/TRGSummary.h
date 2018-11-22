@@ -87,9 +87,6 @@ namespace Belle2 {
     /**set the prescale factor of each bit*/
     void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
 
-    /**set the ftdl bits name*/
-    void setFtdlBitsName(int i, int bit, const char* c) {strcpy(m_ftdlBitsname[i][bit], c);}
-
     /**set the input bits*/
     void setInputBits(int i, int word) {m_inputBits[i] = word;}
 
@@ -104,9 +101,6 @@ namespace Belle2 {
 
     /** get the prescale factor which the bit is corresponding*/
     unsigned int getPreScale(int i, int bit) const {return m_prescaleBits[i][bit];}
-
-    /**get the ftdl bits name*/
-    const char* getFtdlBitsName(int i, int bit) const {return m_ftdlBitsname[i][bit];}
 
     /**set the timType */
     void setTimType(ETimingType timType) {m_timType = timType;}
@@ -175,9 +169,6 @@ namespace Belle2 {
 
     /** the prescale factor of each bit*/
     int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
-
-    /** the prescale factor of each bit*/
-    char m_ftdlBitsname[c_ntrgWords][c_trgWordSize][100] = {};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
     ClassDefOverride(TRGSummary, 5);

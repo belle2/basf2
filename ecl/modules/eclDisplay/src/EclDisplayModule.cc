@@ -62,10 +62,6 @@ void EclDisplayModule::initialize()
 {
   m_eclarray.isRequired();
 
-  if (!m_mapper.initFromDB()) {
-    B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
-  }
-
   initFrame();
 }
 
@@ -90,6 +86,11 @@ void EclDisplayModule::handleClosedFrame()
 
 void EclDisplayModule::beginRun()
 {
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_mapper.initFromDB()) {
+    B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  }
 }
 
 void EclDisplayModule::event()

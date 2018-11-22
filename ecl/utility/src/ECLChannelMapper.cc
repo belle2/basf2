@@ -2,6 +2,7 @@
 #include <ecl/utility/ECLChannelMapper.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/utilities/FileSystem.h>
 //
 #include <iostream>
 #include <fstream>
@@ -99,9 +100,15 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName)
 bool ECLChannelMapper::initFromDB()
 {
   DBObjPtr<Belle2::ECLChannelMap> channelMap("ECLChannelMap");
+  // Re-initialize only if interval of validity was changed
+  if (isInitialized && !channelMap.hasChanged()) {
+    return true;
+  }
 
   if (!channelMap.isValid()) {
-    B2FATAL("ECLChannelMapper:: Could not get ECLChannelMap from the database.");
+    B2ERROR("ECLChannelMapper:: Could not get ECLChannelMap from the database. Trying to initialize from text file");
+    std::string filePath = FileSystem::findFile("ecl/data/ecl_channels_map.txt");
+    return initFromFile(filePath.c_str());
   }
 
   const auto& mappingBAR = channelMap->getMappingVectorBAR();

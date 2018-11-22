@@ -54,16 +54,17 @@ void ECLPackerModule::initialize()
   // register output container in data store
   m_eclRawCOPPERs.registerInDataStore(m_eclRawCOPPERsName);
 
-  // Initialize channel mapper from the database
-  if (!m_eclMapper.initFromDB()) {
-    B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
-  }
-
   B2INFO("ECL Packer: Compress mode = " << m_compressMode);
 }
 
 void ECLPackerModule::beginRun()
 {
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_eclMapper.initFromDB()) {
+    B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
+  }
+
   //TODO
 }
 

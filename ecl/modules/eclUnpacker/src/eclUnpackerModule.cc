@@ -81,15 +81,16 @@ ADC_NUM*SAMPLES_NUM |                                                           
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_eclDigits("", DataStore::c_Event),
+  m_EvtNum(0),
+  m_bufPtr(0),
   m_bitPos(0),
   m_bufLength(0),
   m_bufPos(0),
-  m_bufPtr(0),
-  m_debugLevel(0),
   m_tagsReportedMask(0),
   m_phasesReportedMask(0),
-  m_badHeaderReportedMask(0)
+  m_badHeaderReportedMask(0),
+  m_eclDigits("", DataStore::c_Event),
+  m_debugLevel(0)
 {
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
 
@@ -142,10 +143,6 @@ void ECLUnpackerModule::beginRun()
   if (!m_eclMapper.initFromDB()) {
     B2FATAL("ECL Unpacker: Can't initialize eclChannelMapper!");
   }
-
-  //TODO
-  m_tagsReported   = false;
-  m_phasesReported = false;
 }
 
 void ECLUnpackerModule::event()

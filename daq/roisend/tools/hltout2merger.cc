@@ -25,13 +25,15 @@ using namespace std;
 /* HRP_DEBUG<=0 ... no debug, HRP_DEBUG==1 ... data dump to file, HRP_DEBUG==2 ... data dump to stderr */
 #define HRP_DEBUG (0)
 
+/// TODO add proper logging
+#define ERR_FPRINTF fprintf
 
 FILE* HRP_debug_fp;
 
 
 /* connect */
-static const int
-HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
+static int
+HRP_init_connect_to_merger_merger(const char* host, const unsigned short port)
 {
   int ret, sd;
   struct pollfd fds;
@@ -52,11 +54,11 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
       return -1;
 
     case  0:
-      fprintf(stderr, "%s:%d: connect(): Connection timed out (%d secs)\n", NETWORK_ESTABLISH_TIMEOUT);
+      fprintf(stderr, "%s:%d: connect(): Connection timed out (%d secs)\n", __FILE__, __LINE__, NETWORK_ESTABLISH_TIMEOUT);
       return -1;
 
     case  1: {
-      int ret, connection_error;
+      int connection_error;
       socklen_t optlen;
 
       optlen = sizeof(connection_error);
@@ -89,7 +91,7 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
 }
 
 
-static const mqd_t
+static mqd_t
 HRP_init_mqueue(char* name)
 {
   mqd_t ret;
@@ -123,8 +125,8 @@ HRP_init_mqueue(char* name)
 }
 
 
-static const ssize_t
-HRP_build_header(struct h2m_header_t* h, const unsigned char* roi, const size_t n_bytes_roi)
+static ssize_t
+HRP_build_header(struct h2m_header_t* h, const unsigned char* /*roi*/, const size_t n_bytes_roi)
 {
   size_t n_bytes_total = sizeof(struct h2m_header_t) + n_bytes_roi + sizeof(struct h2m_footer_t);
   size_t n_words_total = n_bytes_total / sizeof(unsigned int);
@@ -136,13 +138,12 @@ HRP_build_header(struct h2m_header_t* h, const unsigned char* roi, const size_t 
   h->h_reserved[1]       = 0x02410835;
   h->h_marker            = 0x5f5f5f5f;
 
-
   return sizeof(struct h2m_header_t);
 }
 
 
-static const size_t
-HRP_build_footer(struct h2m_footer_t* f, const unsigned char* roi, const size_t n_bytes_roi)
+static size_t
+HRP_build_footer(struct h2m_footer_t* f, const unsigned char* /*roi*/, const size_t /*n_bytes_roi*/)
 {
   f->f_reserved[0]       = 0x02701144;
   f->f_reserved[1]       = 0x02410835;
@@ -183,19 +184,18 @@ HRP_roi_get(const mqd_t mqd, void* buf, const int timeout /* secs */)
     return (ssize_t) - 1;
   }
 
-
   return (ssize_t)ret;
 }
 
 
-static const int
-HRP_term_connect_to_merger_meger(const int sd)
+static int
+HRP_term_connect_to_merger_merger(const int sd)
 {
   return close(sd);
 }
 
 
-static const int
+static int
 HRP_term_mqueue(const mqd_t mqd)
 {
   mq_close(mqd);
@@ -208,11 +208,8 @@ HRP_term_mqueue(const mqd_t mqd)
 int
 main(int argc, char* argv[])
 {
-  int i;
   int sd;
   mqd_t mqd[10];
-  const size_t n_bytes_header  = sizeof(struct h2m_header_t);
-  const size_t n_bytes_footer  = sizeof(struct h2m_footer_t);
   char merger_host[256];
   unsigned short merger_port;
 
@@ -222,7 +219,7 @@ main(int argc, char* argv[])
 
 
   if (argc < 3) {
-    printf("hltout2merger : mergerhost mergerport\n");
+    printf("[ERROR] hltout2merger : mergerhost mergerport\n");
     exit(-1);
   }
 
@@ -233,6 +230,7 @@ main(int argc, char* argv[])
     //    p = getenv("ROI_MERGER_HOST");
     if (!p) {
       fprintf(stderr, "%s:%d: main(): export \"ROI_MERGER_HOST\"\n", __FILE__, __LINE__);
+      ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
       exit(1);
     }
     strcpy(merger_host, p);
@@ -241,6 +239,7 @@ main(int argc, char* argv[])
     //    p = getenv("ROI_MERGER_PORT");
     if (!p) {
       fprintf(stderr, "%s:%d: main(): export \"ROI_MERGER_PORT\"\n", __FILE__, __LINE__);
+      ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
       exit(1);
     }
     merger_port = atoi(p);
@@ -265,9 +264,10 @@ main(int argc, char* argv[])
 
     signal(SIGPIPE, SIG_IGN);
 
-    sd = HRP_init_connect_to_merger_meger(merger_host, merger_port);
+    sd = HRP_init_connect_to_merger_merger(merger_host, merger_port);
     if (sd == -1) {
-      ERROR(HRP_init_connect_to_merger_meger);
+      ERROR(HRP_init_connect_to_merger_merger);
+      ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
       exit(1);
     }
     printf("%s:%d: main(): Connected to MERGER_MERGE\n", __FILE__, __LINE__);
@@ -276,6 +276,7 @@ main(int argc, char* argv[])
       mqd[i] = HRP_init_mqueue(qname[i]);
       if (mqd[i] == (mqd_t) - 1) {
         ERROR(HRP_init_mqueue);
+        ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
         exit(1);
       }
     }
@@ -284,16 +285,17 @@ main(int argc, char* argv[])
 
   /* forever (mq_receive -> send) */
   int curqid = 0;
-  for (i = 0;; i++) {
+  while (true) {
     unsigned char* ptr_packet;
     size_t n_bytes_packet;
     unsigned char* buf;
 
     /* buffer setup */
     {
-      buf = (unsigned char*)valloc(n_bytes_header + ROI_MAX_PACKET_SIZE + n_bytes_footer);
+      buf = (unsigned char*)valloc(sizeof(struct h2m_header_t) + ROI_MAX_PACKET_SIZE + sizeof(struct h2m_footer_t));
       if (!buf) {
         ERROR(valloc);
+        ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
         exit(1);
       }
     }
@@ -303,11 +305,9 @@ main(int argc, char* argv[])
       unsigned char* ptr_roi;
       ssize_t n_bytes_roi;
       unsigned char* ptr_header;
-      ssize_t n_bytes_header = sizeof(struct h2m_header_t);
       unsigned char* ptr_footer;
-      ssize_t n_bytes_footer = sizeof(struct h2m_header_t);
 
-      ptr_roi        = buf + n_bytes_header;
+      ptr_roi        = buf + sizeof(struct h2m_header_t);
       n_bytes_roi    = HRP_roi_get(mqd[curqid], ptr_roi, ROI_IO_TIMEOUT);
       if (n_bytes_roi == -1) {
         ERROR(n_bytes_roi);
@@ -317,10 +317,10 @@ main(int argc, char* argv[])
       if (curqid >= num_queue) curqid = 0;
 
       ptr_header     = buf;
-      n_bytes_header = HRP_build_header((struct h2m_header_t*)ptr_header, ptr_roi, n_bytes_roi);
+      ssize_t n_bytes_header = HRP_build_header((struct h2m_header_t*)ptr_header, ptr_roi, n_bytes_roi);
 
       ptr_footer     = buf + n_bytes_header + n_bytes_roi;
-      n_bytes_footer = HRP_build_footer((struct h2m_footer_t*)ptr_footer, ptr_roi, n_bytes_roi);
+      ssize_t n_bytes_footer = HRP_build_footer((struct h2m_footer_t*)ptr_footer, ptr_roi, n_bytes_roi);
 
       ptr_packet     = buf;
       n_bytes_packet = n_bytes_header + n_bytes_roi + n_bytes_footer;
@@ -339,10 +339,12 @@ main(int argc, char* argv[])
       ret = b2_send(sd, ptr_packet, n_bytes_packet);
       if (ret == -1) {
         ERROR(b2_send);
+        ERR_FPRINTF(stderr, "Send to merger (roisenderd) failed.\n%s terminated\n", argv[0]);
         exit(1);
       }
       if (ret == 0) {
         fprintf(stderr, "%s:%d: b2_send(): Connection closed\n", __FILE__, __LINE__);
+        ERR_FPRINTF(stderr, "Connection to merger was closed on merger side (roisenderd)\n%s terminated\n", argv[0]);
         exit(1);
       }
 
@@ -357,13 +359,14 @@ main(int argc, char* argv[])
   }
 
   /* termination: never reached */
-  HRP_term_connect_to_merger_meger(sd);
+  HRP_term_connect_to_merger_merger(sd);
   //  HRP_term_mqueue(mqd);
   for (int i = 0; i < num_queue; i++) {
     mq_close(mqd[i]);
     mq_unlink(qname[i]);
   }
 
+  ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
 
   return 0;
 }

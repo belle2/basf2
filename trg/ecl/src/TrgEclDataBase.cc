@@ -26,6 +26,214 @@
 using namespace std;
 using namespace Belle2;
 
+TrgEclDataBase::TrgEclDataBase()
+{
+  _AmpCoefficient.clear();
+  _TimingCoefficient.clear();
+
+
+}
+void TrgEclDataBase::MakeFitterCoefficient(std::vector<int> SignalPDF, std::vector<int> NoiseMatrix)
+{
+  double DeltaTTT = 0.125;
+  const  int NFitBin = 12; // The # of bin for fit
+  int Nsmalldt  = 10; // # of bin between 2 Sampling point
+  int Nsmalldt2 = Nsmalldt * 2;
+  double Smalldt = DeltaTTT / Nsmalldt; // [us]
+  double SmallOffset = 1.0; // factor of table shift
+  // (NBitLutOffset)
+  // o For conversion from real to integer
+  // o Larger gives good E/T resolution.
+  // o Smaller is good, and ensitive for high E.
+  // o 12 is ok but 11 is bad
+  //  int NBitLutOffset = 13;
+  int NBitLutOffset = 13;
+
+
+  //==========================
+  // noise average
+  //==========================
+  double noise_ave = 0.0; // [MeV]
+  for (int jjj = 0; jjj < 78; jjj++) {
+    noise_ave += NoiseMatrix[jjj];
+  }
+  noise_ave /= 78.;
+
+  //=========================
+  // noise matrix
+  //=========================
+  std::vector<std::vector<double>> noise_cm0 ;
+  noise_cm0.clear();
+  noise_cm0.resize(12, std::vector<double>(12, 0.0));
+  // sum noise matrix
+  for (int jjj = 0; jjj < NFitBin; jjj++) {
+    for (int kkk = 0; kkk < jjj + 1; kkk++) {
+      noise_cm0[jjj][kkk] += (NoiseMatrix[jjj] - noise_ave) * (NoiseMatrix[kkk] - noise_ave);
+    }
+  }
+
+
+
+  TMatrixT<double> noise_cm1(NFitBin, NFitBin); // NFitBin x NFitBin noise matrix
+  for (int kkk = 0; kkk < NFitBin; kkk++) {
+    for (int jjj = 0; jjj < kkk + 1; jjj++) {
+      for (int iii = 0; iii < kkk + 1; iii++) {
+        noise_cm1(jjj, iii) = noise_cm0[jjj][iii];
+      }
+    }
+  }
+  //  noise_cm1.Print();
+  double determinant = noise_cm1.Determinant();
+  std::cout << "Determinant = " << determinant << std::endl;
+  if (determinant < 0.0) {
+    std::cout << "Error matrix not positive !!!!!! " << std::endl;
+  }
+  std::cout << "Noise Matrix inversion" << std::endl;
+  noise_cm1.Invert();
+  //  noise_cm1.Print();
+
+
+  //===========================
+  // coefficient preparation
+  //===========================
+  // coefficient for A,B,P
+  std::vector<std::vector<double>> sg0;
+  std::vector<std::vector<double>> sg1;
+  std::vector<std::vector<double>> sg2;
+  sg0.clear();
+  sg1.clear();
+  sg2.clear();
+  sg0.resize(12, std::vector<double>(20, 0.0));
+  sg1.resize(12, std::vector<double>(20, 0.0));
+  sg2.resize(12, std::vector<double>(20, 0.0));
+  std::vector<std::vector<double>> f0;
+  std::vector<std::vector<double>> f1;
+  f0.clear();
+  f1.clear();
+  f0.resize(12, std::vector<double>(12, 0.0));
+  f1.resize(12, std::vector<double>(12, 0.0));
+
+  // coefficient for inverse covariance matrix
+  double g0g0[20] = {0}, g0g1[20] = {0}, g0g2[20] = {0};
+  double g1g1[20] = {0}, g1g2[20] = {0}, g2g2[20] = {0};
+  // determinant for inverse covariance matrix
+  // double dgg0[20] = {0};
+  // double dgg1[20] = {0};
+  double dgg2[20] = {0};
+
+  _AmpCoefficient.resize(12, std::vector<int>(10, 0));
+  _TimingCoefficient.resize(12, std::vector<int>(10, 0));
+
+  std::vector<std::vector<double>> fg31;
+  std::vector<std::vector<double>> fg32;
+  fg31.clear();
+  fg32.clear();
+  fg31.resize(20, std::vector<double>(12, 0.0));
+  fg32.resize(20, std::vector<double>(12, 0.0));
+
+  for (int kkk = 0; kkk < Nsmalldt2; kkk++) { // Nsmalldt2 loops for dt intervals
+    double ttt = -(SmallOffset + 4) * DeltaTTT + Smalldt * (kkk + 1);
+
+    for (int jjj = 0; jjj < NFitBin; jjj++) {
+      // (DeltaTTT=0.1 case)
+      // ttt ~= (-0.549 -> 0.751) [us] when kkk=  0
+      // ttt  = (-0.500 -> 0.800) [us] when kkk= 47
+      // ttt  = (-0.450 -> 0.850) [us] when kkk= 95
+      // ttt  = (-0.400 -> 0.900) [us] when kkk=143
+      // ttt  = (-0.350 -> 0.950) [us] when kkk=191
+      if (ttt > 0.0) {
+        // signal PDF calculation
+        f0[jjj][kkk] = interFADC(ttt, SignalPDF);
+        // signal PDF derivative calculation
+        double ddt = 0.005 * DeltaTTT;
+        //        double ttt01 = ttt + ddt;
+        double ttt02 = ttt - ddt;
+        if (ttt > ddt) {
+          f1[jjj][kkk] = (f1[jjj][kkk] - interFADC(ttt02, SignalPDF)) / (2.0 * ddt);
+        } else {
+          f1[jjj][kkk] = f1[jjj][kkk] / (ddt + ttt);
+        }
+      } else {
+        f0[jjj][kkk] = 0.0;
+        f1[jjj][kkk] = 0.0;
+      }
+      ttt += DeltaTTT;
+
+    }
+    //
+    //
+    //
+    for (int jjj = 0; jjj < NFitBin; jjj++) {
+      double SigPDFj0 = f0[jjj][kkk];
+      double SigPDFj1 = f1[jjj][kkk];
+      double NoiseICM = 0.0; // Noise Inverse Covariance Matrix
+      for (int iii = 0; iii < NFitBin; iii++) {
+        //
+        if (jjj >= NFitBin || iii >= NFitBin) {NoiseICM = 0.0; }
+        else                            {NoiseICM = noise_cm1(jjj, iii);}
+        //
+        double SigPDFi0 = f0[iii][kkk];
+        double SigPDFi1 = f1[iii][kkk];
+        //
+        sg0[jjj][kkk] += NoiseICM * SigPDFi0;
+        sg1[jjj][kkk] += NoiseICM * SigPDFi1;
+        sg2[jjj][kkk] += NoiseICM;
+        //
+        g0g0[kkk] += NoiseICM * SigPDFj0 * SigPDFi0;
+        g0g1[kkk] += NoiseICM * SigPDFj0 * SigPDFi1;
+        g1g1[kkk] += NoiseICM * SigPDFi1 * SigPDFj1;
+        g0g2[kkk] += NoiseICM * SigPDFj0;
+        g1g2[kkk] += NoiseICM * SigPDFj1;
+        g2g2[kkk] += NoiseICM;
+      } // iii-loop end
+    } // jjj-loop end
+    //
+    //    dgg0[kkk] = g0g0[kkk] * g1g1[kkk] - g0g1[kkk] * g0g1[kkk];
+    //    dgg1[kkk] = g0g0[kkk] * g2g2[kkk] - g0g2[kkk] * g0g2[kkk];
+    dgg2[kkk] =
+      + g0g0[kkk] * g1g1[kkk] * g2g2[kkk]
+      - g0g1[kkk] * g0g1[kkk] * g2g2[kkk]
+      + g0g1[kkk] * g1g2[kkk] * g0g2[kkk] * 2
+      - g0g2[kkk] * g0g2[kkk] * g1g1[kkk]
+      - g1g2[kkk] * g1g2[kkk] * g0g0[kkk];
+    //
+    for (int iii = 0; iii < NFitBin; iii++) {
+      fg31[iii][kkk] = (1.0 / dgg2[kkk]) *
+                       ((g1g1[kkk] * g2g2[kkk] - g1g2[kkk] * g1g2[kkk]) * sg0[iii][kkk] +
+                        (g1g2[kkk] * g0g2[kkk] - g0g1[kkk] * g2g2[kkk]) * sg1[iii][kkk] +
+                        (g0g1[kkk] * g1g2[kkk] - g1g1[kkk] * g0g2[kkk]) * sg2[iii][kkk]);
+      fg32[iii][kkk] = (1.0 / dgg2[kkk]) *
+                       ((g1g2[kkk] * g0g2[kkk] - g0g1[kkk] * g2g2[kkk]) * sg0[iii][kkk] +
+                        (g0g0[kkk] * g2g2[kkk] - g0g2[kkk] * g0g2[kkk]) * sg1[iii][kkk] +
+                        (g0g1[kkk] * g0g2[kkk] - g0g0[kkk] * g1g2[kkk]) * sg2[iii][kkk]);
+      // fg33[iii][kkk] = (1.0/dgg2[kkk]) *
+      //    ((g0g1[kkk]*g1g2[kkk]-g1g1[kkk]*g0g2[kkk]) * sg0[iii][kkk]+
+      //   (g0g1[kkk]*g0g2[kkk]-g0g0[kkk]*g1g2[kkk]) * sg1[iii][kkk]+
+      //     (g0g0[kkk]*g1g1[kkk]-g0g1[kkk]*g0g1[kkk]) * sg2[iii][kkk] );
+    }
+  } // kkk-loop end
+  //--------------------
+  // make integer
+  //--------------------
+  //  int LutIntOffset = 10000; // this is correction from [us] to [0.1ns]
+  //  int NBitLutOffset = 13; // this is minimum for both low and high energy.
+  int LutIntOffset = (int) pow(2, NBitLutOffset);
+  for (int kkk = 0; kkk < Nsmalldt2; kkk++) {
+    for (int iii = 0; iii < NFitBin; iii++) {
+      // int_f0[iii][kkk]   = int (f0[iii][kkk]*LutIntOffset);
+      // int_f1[iii][kkk]   = int (f1[iii][kkk]*LutIntOffset);
+      _AmpCoefficient[iii][kkk] = int (fg31[iii][kkk] * LutIntOffset);
+      _TimingCoefficient[iii][kkk] = int (fg32[iii][kkk] * LutIntOffset);
+      //      int_fg33[iii][kkk] = int (fg33[iii][kkk]*LutIntOffset);
+    }
+  }
+
+
+
+}
+
+
+
 
 double TrgEclDataBase::GetTCFLatency(int TCId)
 {
@@ -506,5 +714,44 @@ int TrgEclDataBase::Get3DBhabhaLUT(int tcid)
                                  0, 0, 0, 0, 0, 0, 0, 0
                                 };
   return BhabhaLUT[tcid];
+
+}
+
+
+
+//
+//
+
+
+double
+TrgEclDataBase::interFADC(double timing, std::vector<int> SignalAmp)
+{
+
+  //  std::vector<double> SignalAmp;
+  std::vector<double> SignalTime;
+
+  //  SignalAmp.clear();
+  SignalTime.clear();
+
+  timing = timing * 1000;
+
+  int startbin = (int)(timing) / 125;
+  int endbin = startbin + 1;
+
+  SignalTime = {0, 125, 250, 375, 500, 625, 750, 875};
+
+  double E_out = 0;
+  if (timing < 0 || timing > 875) {return E_out;}
+
+  if (timing > SignalTime[startbin] && timing < SignalTime[endbin]) {
+    E_out = ((((double)SignalAmp[endbin] - (double)SignalAmp[startbin])) / (SignalTime[endbin] - SignalTime[startbin])) *
+            (timing - SignalTime[startbin]) + (double)SignalAmp[startbin];
+    return E_out;
+  } else {
+    E_out = 0;
+  }
+
+
+  return E_out;
 
 }

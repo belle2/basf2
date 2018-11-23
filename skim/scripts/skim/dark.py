@@ -26,7 +26,7 @@ def SinglePhotonDarkList(path):
     Build the list  of single photon candidates for the dark photon to
     invisible final state analysis.
 
-    Paramteters:
+    Parameters:
         path (basf2.Path) the path to add the skim
 
     Returns:
@@ -67,7 +67,7 @@ def _initialALP(path):
     An list builder function for the ALP decays. Part of the
     `ALP3GammaList` skim functions.
 
-    Paramteters:
+    Parameters:
         path (basf2.Path) the path to add the skim
 
     Returns:
@@ -109,7 +109,7 @@ def ALP3GammaList(path):
         * Physics channel: ee → aγ; a → γγ
         * Skim category: physics, dark sector
 
-    Paramteters:
+    Parameters:
         path (basf2.Path) the path to add the skim list builders
 
     Returns:
@@ -148,7 +148,7 @@ def LFVZpInvisibleList(path):
 
     The skim list for the LFV Z' to invisible final state search
 
-    Paramteters:
+    Parameters:
         path (basf2.Path) the path to add the skim list builders
 
     Returns:
@@ -186,7 +186,7 @@ def LFVZpVisibleList(path):
 
     The skim list for the LFV Z' to visible final state search
 
-    Paramteters:
+    Parameters:
         path (basf2.Path) the path to add the skim list builders
 
     Returns:

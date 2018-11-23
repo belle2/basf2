@@ -114,6 +114,43 @@ def DstToD0Neutrals():
     return DstList
 
 
+def DstToD0PiD0ToHpHmKs():
+
+    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
+    Dstcuts = '0 < Q < 0.04'
+
+    D0_Channels = ['pi-:loose pi+:loose K_S0:all',
+                   'K-:loose K+:loose K_S0:all'
+                   ]
+    DstList = []
+
+    for chID, channel in enumerate(D0_Channels):
+        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID)
+        vertexRave('D0:' + str(chID), 0.001)
+
+        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all D0:' + str(chID), Dstcuts, chID)
+        vertexRave('D*+:' + str(chID), 0.001)
+        DstList.append('D*+:' + str(chID))
+
+    return DstList
+
+
+def CharmRareList():
+    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
+    D0_Channels = ['gamma:skim gamma:skim',
+                   'e+:loose e-:loose',
+                   'mu+:loose mu-:loose pi0:skim'
+                   ]
+
+    D0List = []
+    for chID, channel in enumerate(D0_Channels):
+        reconstructDecay('D0:Rare' + str(chID) + ' -> ' + channel, charmcuts, chID)
+        D0List.append('D0:Rare' + str(chID))
+
+    Lists = D0List
+    return Lists
+
+
 def CharmSemileptonicList():
     Dcuts = '1.82 < M < 1.92'
     DstarSLcuts = '1.9 < M < 2.1'

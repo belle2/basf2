@@ -10,10 +10,10 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
+from skim.standardlists.charm import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
@@ -28,30 +28,35 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
+SLpath = Path()
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=SLpath)
 
-loadStdCharged()
+stdPi('loose', path=SLpath)
+stdK('loose', path=SLpath)
+stdPi('all', path=SLpath)
+stdE('all', path=SLpath)
+stdMu('all', path=SLpath)
 
-stdPi0s('loose')  # for stdCharm.py
-stdPhotons('loose')
-loadStdKS()
+stdPi0s('loose', path=SLpath)  # for skim.standardlists.charm
+stdPhotons('loose', path=SLpath)
+stdKshorts(path=SLpath)
 
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
+loadStdD0(path=SLpath)
+loadStdDplus(path=SLpath)
+loadStdDstar0(path=SLpath)
+loadStdDstarPlus(path=SLpath)
 
 # SL Skim
 from skim.semileptonic import SemileptonicList
-SLList = SemileptonicList()
-skimOutputUdst(skimCode, SLList)
+SLList = SemileptonicList(SLpath)
+skimOutputUdst(skimCode, SLList, path=SLpath)
 
-summaryOfLists(SLList)
+summaryOfLists(SLList, path=SLpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=SLpath)
+process(SLpath)
 
 # print out the summary
 print(statistics)

@@ -10,7 +10,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdE, stdMu
 from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import *
@@ -29,8 +29,8 @@ inputMdstList('MC9', fileList)
 
 loadStdSkimPi0()
 loadStdSkimPhoton()
-stdLooseMu()
-stdLooseE()
+stdMu('loose')
+stdE('loose')
 from skim.charm import CharmRareList
 CharmRareList = CharmRareList()
 skimOutputUdst(skimCode, CharmRareList)

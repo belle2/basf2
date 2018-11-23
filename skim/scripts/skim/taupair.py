@@ -11,9 +11,9 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from stdLightMesons import *
 from stdPi0s import *
 from stdV0s import *
+from skim.standardlists.lightmesons import *
 
 
 def SetTauGenericSkimVariables():
@@ -50,10 +50,10 @@ def SetTauGenericSkimVariables():
     buildEventKinematics(['pi+:all', 'gamma:all'])
 
     # Split in signal and tag
-    cutAndCopyList('pi+:S1', 'pi+:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('pi+:S2', 'pi+:all', 'cosToEvtThrust < 0')
-    cutAndCopyList('gamma:S1', 'gamma:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('gamma:S2', 'gamma:all', 'cosToEvtThrust < 0')
+    cutAndCopyList('pi+:S1', 'pi+:all', 'cosToThrustOfEvent > 0')
+    cutAndCopyList('pi+:S2', 'pi+:all', 'cosToThrustOfEvent < 0')
+    cutAndCopyList('gamma:S1', 'gamma:all', 'cosToThrustOfEvent > 0')
+    cutAndCopyList('gamma:S2', 'gamma:all', 'cosToThrustOfEvent < 0')
 
     variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:all)')
     variables.addAlias('netCharge', 'formula(countInList(pi+:all, charge == 1) - countInList(pi+:all, charge == -1))')

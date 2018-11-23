@@ -6,23 +6,32 @@ from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu, stdPr
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from stdLightMesons import *
-from stdDiLeptons import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
 set_log_level(LogLevel.INFO)
 
-from skimExpertFunctions import *
-
+from skimExpertFunctions import setSkimLogging, add_skim
 
 inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 
-loadStdCharged()
+
 stdPi0s('loose')
 stdPhotons('loose')
-loadStdKS()
+stdKshorts()
+stdPi('loose')
+stdK('loose')
+stdPr('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+
 loadStdLightMesons()
 loadStdSkimPi0()
 loadStdSkimPhoton()
@@ -30,10 +39,9 @@ stdPhotons('all')
 stdPhotons('tight')  # also builds loose list
 stdK('95eff')
 stdPi('95eff')
-
 stdE('95eff')
 stdMu('95eff')
-stdMu('90eff')
+stdPr('90eff')
 
 loadStdD0()
 loadStdDplus()
@@ -42,17 +50,6 @@ loadStdDstarPlus()
 loadStdDiLeptons(True)
 
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
-
-
-def add_skim(label, lists):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-    """
-    print('Running over ' + label)
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists)
-    summaryOfLists(lists)
 
 
 # ISR cc skim
@@ -149,14 +146,14 @@ add_skim('BtoXgamma', B2XgammaList())
 
 
 from skim.semileptonic import SemileptonicList
-add_skim('SLUntagged', SemileptonicList())
+add_skim('SLUntagged', SemileptonicList(path=analysis_main))
 
 from skim.leptonic import LeptonicList
-add_skim('LeptonicUntagged', LeptonicList())
+add_skim('LeptonicUntagged', LeptonicList(path=analysis_main))
 
 
 from skim.semileptonic import PRList
-add_skim('PRsemileptonicUntagged', PRList())
+add_skim('PRsemileptonicUntagged', PRList(path=analysis_main))
 
 
 from fei import backward_compatibility_layer
@@ -182,7 +179,6 @@ add_skim('feiSLBplusWithOneLep', BplusSLWithOneLep(path=analysis_main))
 
 
 from skim.fei import*
-
 add_skim('feiSLB0WithOneLep', B0SLWithOneLep(path=analysis_main))
 
 

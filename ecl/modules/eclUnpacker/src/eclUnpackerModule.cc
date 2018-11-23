@@ -81,7 +81,15 @@ ADC_NUM*SAMPLES_NUM |                                                           
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_eclDigits("", DataStore::c_Event)
+  m_eclDigits("", DataStore::c_Event),
+  m_bitPos(0),
+  m_bufLength(0),
+  m_bufPos(0),
+  m_bufPtr(0),
+  m_debugLevel(0),
+  m_tagsReportedMask(0),
+  m_phasesReportedMask(0),
+  m_badHeaderReportedMask(0)
 {
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
 
@@ -140,9 +148,9 @@ void ECLUnpackerModule::initialize()
 
 void ECLUnpackerModule::beginRun()
 {
-  //TODO
-  m_tagsReported   = false;
-  m_phasesReported = false;
+  m_tagsReportedMask      = 0;
+  m_phasesReportedMask    = 0;
+  m_badHeaderReportedMask = 0;
 }
 
 void ECLUnpackerModule::event()
@@ -242,15 +250,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   // loop over FINESSEs in the COPPER
   for (int iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
 
-    ECLTrig* eclTrig = 0;
-
     m_bitPos = 0;
     m_bufPos = 0;
-
-    // trigger phase of the Collector connected to this FINESSE
-    // -1 if there are no triggered shapers
-    int triggerPhase0 = -1;
-    int triggerTag0   = -1;
 
     m_bufLength = rawCOPPERData->GetDetectorNwords(n, iFINESSE);
 
@@ -284,6 +285,12 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
     try {
 
+      ECLTrig* eclTrig = 0;
+      // trigger phase of the Collector connected to this FINESSE
+      // -1 if there are no triggered shapers
+      int triggerPhase0 = -1;
+      int triggerTag0   = -1;
+
       // read the collector header
       value = readNextCollectorWord();
       shapersMask = value & 0xFFF;           // mask of active shapers
@@ -308,7 +315,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         B2DEBUG_eclunpacker(22, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
         // check shaperDSP header
         if ((value & 0x00FF0000) != 0x00100000) {
-          B2ERROR("Ecl Unpacker:: bad shaper header");
+          doBadHeaderReport(iCrate);
           throw Bad_ShaperDSP_header();
         }
 
@@ -320,11 +327,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         // check that trigger phases for all shapers in the crate are equal
         if (triggerPhase0 == -1) triggerPhase0 = triggerPhase;
-        else if (triggerPhase != triggerPhase0 && !m_phasesReported) {
-          B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
-                  << LogVar("crate", iCrate)
-                  << LogVar("trigger phase1", triggerPhase) << LogVar("trigger phase0", triggerPhase0));
-          m_phasesReported = true;
+        else if (triggerPhase != triggerPhase0) {
+          doPhasesReport(iCrate, triggerPhase0, triggerPhase);
         }
 
         B2DEBUG_eclunpacker(22, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel <<
@@ -339,12 +343,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
         else if (triggerTag != triggerTag0) {
-          if (!m_tagsReported) {
-            B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
-                    << LogVar("crate", iCrate)
-                    << LogVar("trigger tag1", triggerTag) << LogVar("trigger tag0", triggerTag0));
-            m_tagsReported = true;
-          }
+          doTagsReport(iCrate, triggerTag0, triggerTag);
           triggerTag0 |= (1 << 16);
         }
 
@@ -481,10 +480,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         eclTrig->setTrigTag(triggerTag0);
       }
 
-
-
-
-
     } // try
     catch (...) {
       // errors while reading data block
@@ -495,3 +490,31 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   }// loop ove FINESSes
 
 }
+
+void ECLUnpackerModule::doTagsReport(unsigned int iCrate, int tag0, int tag1)
+{
+  if (!tagsReported(iCrate)) {
+    B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger tag0", tag0) << LogVar("trigger tag1", tag1));
+    m_tagsReportedMask |= 1 << (iCrate - 1);
+  }
+}
+void ECLUnpackerModule::doPhasesReport(unsigned int iCrate, int phase0, int phase1)
+{
+  if (!phasesReported(iCrate)) {
+    B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger phase0", phase0) << LogVar("trigger phase1", phase1));
+    m_phasesReportedMask |= 1 << (iCrate - 1);
+  }
+}
+void ECLUnpackerModule::doBadHeaderReport(unsigned int iCrate)
+{
+  if (!badHeaderReported(iCrate)) {
+    B2ERROR("Bad shaper header."
+            << LogVar("crate", iCrate));
+    m_badHeaderReportedMask |= 1 << (iCrate - 1);
+  }
+}
+

@@ -96,32 +96,20 @@ namespace Belle2 {
       // 1. Collections
       /** Name of the collection for the MCParticles */
       std::string m_storeMCParticlesName;
-      /** Name of the (optional) collection for the SVDDigits */
-      std::string m_storeDigitsName;
       /** Name of the collection for the SVDSimhits */
       std::string m_storeSimHitsName;
       /** Name of the collection for the SVDTrueHits */
       std::string m_storeTrueHitsName;
       /** Name of the relation between MCParticles and SVDSimHits */
       std::string m_relMCParticleSimHitName;
-      /** Name of the relation between SVDDigits and MCParticles */
-      std::string m_relDigitMCParticleName;
       /** Name of the relation between SVDTrueHits and SVDSimHits */
       std::string m_relTrueHitSimHitName;
-      /** Name of the relation between SVDDigits and SVDTrueHits */
-      std::string m_relDigitTrueHitName;
-
-      // 1* Production of SVDShaperDigits
-      /** Whether or not to generate single-sample SVDDigits */
-      bool m_generateDigits;
       /** Name of the collection for the SVDShaperDigits */
       std::string m_storeShaperDigitsName;
       /** Name of the relation between SVDShaperDigits and MCParticles */
       std::string m_relShaperDigitMCParticleName;
       /** Name of the relation between SVDShaperDigits and SVDTrueHits */
       std::string m_relShaperDigitTrueHitName;
-      /** Name of the relation between SVDShaperDigits and SVDDigits */
-      std::string m_relShaperDigitDigitName;
 
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
@@ -136,8 +124,10 @@ namespace Belle2 {
       bool  m_applyNoise = false;
       /** Zero-suppression cut. */
       double m_SNAdjacent = 3.0;
-      /** Use 3-sample filter? */
-      bool m_3sampleFilter = true;
+      /** Round ZS cut to nearest ADU */
+      bool m_roundZS = true;
+      /** Keek digit if at least m_nSamplesOverZS are over threshold */
+      unsigned short m_nSamplesOverZS = 1;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction;
 

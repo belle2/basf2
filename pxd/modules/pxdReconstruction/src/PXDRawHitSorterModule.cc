@@ -59,6 +59,7 @@ void PXDRawHitSorterModule::initialize()
   m_storeDaqStatus.isRequired();
   //m_storeDigits.registerInDataStore(m_storeDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
   m_storeDigits.registerInDataStore(m_storeDigitsName);
+
 }
 
 void PXDRawHitSorterModule::event()

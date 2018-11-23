@@ -21,7 +21,8 @@ def get_terminal_width():
     return get_terminal_size(fallback=(80, 24)).columns
 
 
-def pretty_print_table(table, column_widths, first_row_is_heading=True, transform=None, min_flexible_width=10):
+def pretty_print_table(table, column_widths, first_row_is_heading=True, transform=None, min_flexible_width=10, *,
+                       hline_formatter=None):
     """
     Pretty print a given table, by using available terminal size and
     word wrapping fields as needed.
@@ -63,7 +64,16 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
           printed.
 
       min_flexible_width: the minimum amount of characters for every column
-          marked with * """
+          marked with *
+
+      hline_formatter: A callable function to format horizontal lines (above and
+          below the table header). Should be a callback with one parameter for
+          the total width of the table in characters and return a string that
+          is the horizontal line. If None is returned no line is printed.
+
+          If argument is not given or given as None the default of printing '-'
+          signs are printed over the whole table width is used.
+    """
 
     import textwrap
 
@@ -128,9 +138,14 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
     # don't print extra spaces at end of each line
     format_string += ' %s'
 
+    if hline_formatter is not None:
+        hline = hline_formatter(total_used_width)
+    else:
+        hline = total_used_width * "-"
+
     # print table
-    if first_row_is_heading:
-        print(total_used_width * '-')
+    if first_row_is_heading and hline is not None:
+        print(hline)
 
     header_shown = False
     for row in table:
@@ -149,8 +164,8 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
                 line = transform(row, act_column_widths, line)
             print(line)
 
-        if not header_shown and first_row_is_heading:
-            print(total_used_width * '-')
+        if not header_shown and first_row_is_heading and hline is not None:
+            print(hline)
             header_shown = True
 
 

@@ -10,10 +10,10 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
+from skim.standardlists.charm import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
@@ -27,45 +27,51 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-inputMdstList('MC9', fileList)
-stdPi0s('loose')
-stdPhotons('loose')
-loadStdCharged()
-loadStdSkimPi0()
-loadStdSkimPhoton()
-loadStdKS()
+SLskimpath = Path()
 
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
+inputMdstList('MC9', fileList, path=SLskimpath)
+stdPi0s('loose', path=SLskimpath)
+stdPhotons('loose', path=SLskimpath)
+stdPi('loose', path=SLskimpath)
+stdK('loose', path=SLskimpath)
+stdPi('all', path=SLskimpath)
+stdE('all', path=SLskimpath)
+stdMu('all', path=SLskimpath)
+loadStdSkimPi0(path=SLskimpath)
+loadStdSkimPhoton(path=SLskimpath)
+stdKshorts(path=SLskimpath)
+
+loadStdD0(path=SLskimpath)
+loadStdDplus(path=SLskimpath)
+loadStdDstar0(path=SLskimpath)
+loadStdDstarPlus(path=SLskimpath)
 
 # SL Skim
 from skim.semileptonic import SemileptonicList
-SLList = SemileptonicList()
+SLList = SemileptonicList(SLskimpath)
 skimCode1 = encodeSkimName('SLUntagged')
 print(skimCode1)
-skimOutputUdst(skimCode1, SLList)
-summaryOfLists(SLList)
+skimOutputUdst(skimCode1, SLList, path=SLskimpath)
+summaryOfLists(SLList, path=SLskimpath)
 
 
 from skim.leptonic import LeptonicList
-lepList = LeptonicList()
+lepList = LeptonicList(SLskimpath)
 skimCode2 = encodeSkimName('LeptonicUntagged')
 print(skimCode2)
-skimOutputUdst(skimCode2, lepList)
-summaryOfLists(lepList)
+skimOutputUdst(skimCode2, lepList, path=SLskimpath)
+summaryOfLists(lepList, path=SLskimpath)
 
 
 from skim.semileptonic import PRList
-PRList = PRList()
+PRList = PRList(path=SLskimpath)
 skimCode3 = encodeSkimName('PRsemileptonicUntagged')
-skimOutputUdst(skimCode3, PRList)
+skimOutputUdst(skimCode3, PRList, path=SLskimpath)
 
 
-summaryOfLists(PRList)
-setSkimLogging()
-process(analysis_main)
+summaryOfLists(PRList, path=SLskimpath)
+setSkimLogging(skim_path=SLskimpath)
+process(SLskimpath)
 
 # print out the summary
 print(statistics)

@@ -121,8 +121,6 @@ void TRGECLDQMModule::event()
     if (TCID < 1 || TCID > 576 || HitEnergy == 0) {continue;}
     if (!(hit_win == 2 || hit_win == 3)) {continue;}
     HitTiming    = aTRGECLUnpackerStore ->getTCTime();
-    HitRevoFam = aTRGECLUnpackerStore -> getRevoFAM();
-    HitRevoTrg = aTRGECLUnpackerStore -> getRevoGDL();
 
 
     TCId.push_back(TCID);
@@ -138,6 +136,7 @@ void TRGECLDQMModule::event()
 
     HitFineTiming = aTRGECLUnpackerEvtStore ->  getEvtTime();
     HitRevoTrg = aTRGECLUnpackerEvtStore -> getL1Revo();
+    HitRevoFam = aTRGECLUnpackerEvtStore -> getEvtRevo();
 
     RevoTrg.push_back(HitRevoTrg);
     FineTiming.push_back(HitFineTiming);

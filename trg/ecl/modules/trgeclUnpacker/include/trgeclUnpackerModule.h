@@ -80,6 +80,10 @@ namespace Belle2 {
     int n_basf2evt;
     int etm_version;
 
+    unsigned int nodeid;
+    int nwords;
+    int iFiness;
+
   private :
 
     StoreArray<TRGECLUnpackerStore>     m_TRGECLTCArray;

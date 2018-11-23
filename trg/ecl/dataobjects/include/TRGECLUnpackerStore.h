@@ -39,12 +39,6 @@ namespace Belle2 {
     //! The revo clk of FAM
     int m_revo_fam;
 
-    //! The EVT Timing of TRG Timing
-    int m_evttime;
-
-    //! The revo clk of gdl
-    int m_revo_gdl;
-
     //! The Energy of hitted TC
     int m_energy;
 
@@ -60,9 +54,6 @@ namespace Belle2 {
     //! The method to set hit time
     void setTCTime(int TCT) { m_time = TCT;}
 
-    //! The method to set evt timing
-    void setEVTTime(int EVTTIME) { m_evttime = EVTTIME;}
-
     //! The method to set cal timing
     void setTCCALTime(int TCCALT) { m_caltime = TCCALT;}
 
@@ -71,9 +62,6 @@ namespace Belle2 {
 
     //! The method to set revo clock of FAM
     void setRevoFAM(int RevoFAM) { m_revo_fam = RevoFAM;}
-
-    //! The method to set revo clock of GDL
-    void setRevoGDL(int RevoGDL) { m_revo_gdl = RevoGDL;}
 
     //! The method to set deposited energy
     void setTCEnergy(int TCE) { m_energy = TCE;}
@@ -90,17 +78,11 @@ namespace Belle2 {
     //! The method to get hit average time
     int getTCTime() const {return m_time;}
 
-    //! The method to get evt timing
-    int getEVTTime() const {return m_evttime;}
-
     //! The method to get cal timing
     int getTCCALTime() const {return m_caltime;}
 
     //! The method to get revo clock of FAM
     int getRevoFAM() const {return m_revo_fam;}
-
-    //! The method to get revo clock of GDL
-    int getRevoGDL() const {return m_revo_gdl;}
 
     //! The method to get Hit Win
     int getHitWin() const {return m_hit_win;}
@@ -123,9 +105,6 @@ namespace Belle2 {
       m_revo_fam   = 0;
       m_energy     = 0;
       m_checksum   = 0;
-      m_evttime    = 0;
-      m_revo_gdl   = 0;
-
 
     }
 
@@ -135,10 +114,8 @@ namespace Belle2 {
       int TCId,
       int TCT,
       int TCCALT,
-      int EVTTIME,
       int HitWin,
       int RevoFAM,
-      int RevoGDL,
       int TCE,
       int checksum
     )
@@ -147,10 +124,8 @@ namespace Belle2 {
       m_tcid       = TCId;
       m_time       = TCT;
       m_caltime    = TCCALT;
-      m_evttime    = EVTTIME;
       m_hit_win    = HitWin;
       m_revo_fam   = RevoFAM;
-      m_revo_gdl   = RevoGDL;
       m_energy     = TCE;
       m_checksum   = checksum;
     }

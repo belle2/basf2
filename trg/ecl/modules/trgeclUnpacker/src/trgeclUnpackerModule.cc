@@ -59,14 +59,19 @@ void TRGECLUnpackerModule::event()
 {
 
   StoreArray<RawTRG> raw_trgarray;
-  unsigned int nodeid;
-  int nwords;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+    iFiness = i;
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
       nodeid = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
       nwords = raw_trgarray[i]->GetDetectorNwords(j, 0);
       if (nodeid == 0x13) {
+        if (nwords < 10) {
+          B2ERROR("Consistecy error in unpacker.");
+          B2ERROR("data length " << nwords << " nWord " << nwords);
+          B2ERROR("Node ID " << nodeid << ", Finness ID " << iFiness);
+          continue;
+        }
         readCOPPEREvent(raw_trgarray[i], j, nwords);
         n_basf2evt++;
       }
@@ -74,37 +79,37 @@ void TRGECLUnpackerModule::event()
   }
 }
 
-void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nwords)
+void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn)
 {
 
   if (raw_copper->GetDetectorNwords(i, 0) > 0) {
-    checkBuffer(raw_copper->GetDetectorBuffer(i, 0), nwords);
+    checkBuffer(raw_copper->GetDetectorBuffer(i, 0), nnn);
   }
 }
 
-void TRGECLUnpackerModule::checkBuffer(int* rdat, int nwords)
+void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
 {
 
   int version_check = (rdat[0] >> 12) & 0xf;
   etm_version       = (rdat[0] >> 16) & 0xffff;
   if (version_check == 15) {
     if (etm_version >= 115) {
-      checkBuffer_115(rdat, nwords);
+      checkBuffer_115(rdat, nnn);
     }
   } else {
-    checkBuffer_114(rdat, nwords);
+    checkBuffer_114(rdat, nnn);
   }
 
 }
 
-void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nwords)
+void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nnn)
 {
 
   // Checksum variable
-  unsigned char check_sum = (rdat[nwords - 1] >> 24) & 0xFF;
+  unsigned char check_sum = (rdat[nnn - 1] >> 24) & 0xFF;
   unsigned char data_sum  = 0;
   unsigned char kdat[4]   = {0};
-  for (int j = nwords - 2; j > -1; j--) {
+  for (int j = nnn - 2; j > -1; j--) {
     kdat[0] =  rdat[j]        & 0xff;
     kdat[1] = (rdat[j] >>  8) & 0xff;
     kdat[2] = (rdat[j] >> 16) & 0xff;
@@ -152,7 +157,7 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nwords)
   vector<vector<int>> tc_info;
 
   // Unpacking ---->
-  while (i < nwords - 2) {
+  while (i < nnn - 2) {
     summary_data = rdat[i + 1];
     summary_trg  = (summary_data >> 23) & 0x1;
     summary_revo = (summary_data >> 16) & 0x7f;
@@ -384,7 +389,7 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nwords)
   int m_revo     = 0;
   int m_caltime  = -9999;
 
-  if (evt_ntc != 0 && flag_checksum == 0 && nwords > 7) {
+  if (evt_ntc != 0 && flag_checksum == 0 && nnn > 7) {
     // Find most energetic TC timing
     sort(tc_info.begin(), tc_info.end(),
     [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
@@ -400,7 +405,7 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nwords)
       m_energy  = tc_info[ii][2];
       m_win     = tc_info[ii][3];
       m_revo    = tc_info[ii][4];
-      m_caltime = (evt_win - 3) * evt_timing - m_time;
+      m_caltime = evt_timing - m_time;
 
       evt_etot += m_energy;
       if ((m_tcid < 81 && m_tcid % 5 != 1) || (m_tcid > 80 && m_tcid < 513)) {
@@ -466,10 +471,10 @@ void TRGECLUnpackerModule::checkBuffer_115(int* rdat, int nwords)
   return;
 }
 
-void TRGECLUnpackerModule::checkBuffer_114(int* rdat, int nwords)
+void TRGECLUnpackerModule::checkBuffer_114(int* rdat, int nnn)
 {
 
-  unsigned char check_sum = (rdat[nwords - 1] >> 8) & 0xFF;
+  unsigned char check_sum = (rdat[nnn - 1] >> 8) & 0xFF;
 
   unsigned char data_sum  = 0; // checksum
   unsigned char summary_data[4] = {0};
@@ -495,7 +500,7 @@ void TRGECLUnpackerModule::checkBuffer_114(int* rdat, int nwords)
   l1_revo = (rdat[0] >> 16) & 0xffff;
   data_sum = ((l1_revo >> 8) & 0xFF) + (l1_revo & 0xff);
 
-  while (i < nwords - 1) {
+  while (i < nnn - 1) {
     summary_data[0] = (rdat[i] >> 8) & 0xff;
     summary_data[1] =  rdat[i] & 0xff;
     summary_data[2] = (rdat[i + 1] >> 24) & 0xff;
@@ -562,7 +567,7 @@ void TRGECLUnpackerModule::checkBuffer_114(int* rdat, int nwords)
   int m_hitNum;
   int m_evtNum;
 
-  if (evt_size != 0 && flag_checksum == 0 && nwords > 7) {
+  if (evt_size != 0 && flag_checksum == 0 && nnn > 7) {
     // Find most energetic TC timing
     sort(evt_info.begin(), evt_info.end(),
     [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});

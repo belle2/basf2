@@ -434,7 +434,9 @@ void PXDDQMClustersModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    counts.at(index).insert(cluster.GetUniqueID());
+    // counts.at(index).insert(cluster.GetUniqueID());  // cluster.uniqeID is = 0, so not usable for this task.
+    PXDDigit digitTemp(sensorID, cluster.getUStart(), cluster.getVStart(), 0);  // cluster corner digit.
+    counts.at(index).insert(digitTemp.getUniqueChannelID());
     int iChip = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);

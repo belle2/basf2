@@ -60,12 +60,12 @@ namespace Belle2 {
 
     // Dumps debug information.
     void dump(const std::string& message = std::string(""),
-              const std::string& prefix = std::string("")) const;
+              const std::string& prefix = std::string("")) const override;
 
   public:// Modifiers
 
     /// Clears all entries and regions.
-    void clear(void);
+    void clear(void) override;
 
     /// Clears only specified layer ID.
     void clear(unsigned layerId);

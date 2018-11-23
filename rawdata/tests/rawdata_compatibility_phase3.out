@@ -1,4 +1,4 @@
-
+[INFO] Steering file: rawdata/tests/rawdata_compatibility_phase3.py
 
 *************************************************************
  Geant4 version Name: geant4-10-01-patch-02    (19-June-2015)
@@ -6544,375 +6544,375 @@ TOPDigit#123:
   getPulseWidth(): 2.12358
   getRawTime(): 75.413
 ARICHDigit#0:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 113
   getModuleID(): 43
 ARICHDigit#1:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 116
   getModuleID(): 2
 ARICHDigit#2:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 111
   getModuleID(): 2
 ARICHDigit#3:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 49
   getModuleID(): 46
 ARICHDigit#4:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 20
   getModuleID(): 49
 ARICHDigit#5:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 1
   getModuleID(): 207
 ARICHDigit#6:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 9
   getModuleID(): 147
 ARICHDigit#7:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 45
   getModuleID(): 215
 ARICHDigit#8:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 62
   getModuleID(): 272
 ARICHDigit#9:
-  getBitmap(): 
+  getBitmap(): 15
   getChannelID(): 25
   getModuleID(): 212
 ARICHDigit#10:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 32
   getModuleID(): 212
 ARICHDigit#11:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 57
   getModuleID(): 212
 ARICHDigit#12:
-  getBitmap(): 
+  getBitmap(): 7
   getChannelID(): 81
   getModuleID(): 212
 ARICHDigit#13:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 63
   getModuleID(): 210
 ARICHDigit#14:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 73
   getModuleID(): 52
 ARICHDigit#15:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 63
   getModuleID(): 52
 ARICHDigit#16:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 63
   getModuleID(): 13
 ARICHDigit#17:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 125
   getModuleID(): 57
 ARICHDigit#18:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 120
   getModuleID(): 216
 ARICHDigit#19:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 96
   getModuleID(): 157
 ARICHDigit#20:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 31
   getModuleID(): 102
 ARICHDigit#21:
-  getBitmap(): 
+  getBitmap(): 3
   getChannelID(): 15
   getModuleID(): 158
 ARICHDigit#22:
-  getBitmap(): 
+  getBitmap(): 7
   getChannelID(): 27
   getModuleID(): 158
 ARICHDigit#23:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 88
   getModuleID(): 158
 ARICHDigit#24:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 102
   getModuleID(): 158
 ARICHDigit#25:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 127
   getModuleID(): 161
 ARICHDigit#26:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 107
   getModuleID(): 162
 ARICHDigit#27:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 58
   getModuleID(): 225
 ARICHDigit#28:
-  getBitmap(): 
+  getBitmap(): 15
   getChannelID(): 27
   getModuleID(): 357
 ARICHDigit#29:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 33
   getModuleID(): 357
 ARICHDigit#30:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 64
   getModuleID(): 357
 ARICHDigit#31:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 105
   getModuleID(): 357
 ARICHDigit#32:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 57
   getModuleID(): 285
 ARICHDigit#33:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 41
   getModuleID(): 359
 ARICHDigit#34:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 51
   getModuleID(): 290
 ARICHDigit#35:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 26
   getModuleID(): 223
 ARICHDigit#36:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 52
   getModuleID(): 366
 ARICHDigit#37:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 130
   getModuleID(): 366
 ARICHDigit#38:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 97
   getModuleID(): 288
 ARICHDigit#39:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 131
   getModuleID(): 15
 ARICHDigit#40:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 24
   getModuleID(): 15
 ARICHDigit#41:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 111
   getModuleID(): 113
 ARICHDigit#42:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 21
 ARICHDigit#43:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 59
   getModuleID(): 109
 ARICHDigit#44:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 24
   getModuleID(): 110
 ARICHDigit#45:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 8
   getModuleID(): 228
 ARICHDigit#46:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 58
   getModuleID(): 228
 ARICHDigit#47:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 106
   getModuleID(): 172
 ARICHDigit#48:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 22
   getModuleID(): 116
 ARICHDigit#49:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 41
   getModuleID(): 373
 ARICHDigit#50:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 79
   getModuleID(): 373
 ARICHDigit#51:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 88
   getModuleID(): 381
 ARICHDigit#52:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 86
   getModuleID(): 376
 ARICHDigit#53:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 232
 ARICHDigit#54:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 51
   getModuleID(): 375
 ARICHDigit#55:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 109
   getModuleID(): 69
 ARICHDigit#56:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 45
   getModuleID(): 69
 ARICHDigit#57:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 74
   getModuleID(): 74
 ARICHDigit#58:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 62
   getModuleID(): 175
 ARICHDigit#59:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 45
   getModuleID(): 180
 ARICHDigit#60:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 119
   getModuleID(): 183
 ARICHDigit#61:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 97
   getModuleID(): 384
 ARICHDigit#62:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 78
   getModuleID(): 391
 ARICHDigit#63:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 23
   getModuleID(): 393
 ARICHDigit#64:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 81
   getModuleID(): 389
 ARICHDigit#65:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 123
   getModuleID(): 313
 ARICHDigit#66:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 92
   getModuleID(): 243
 ARICHDigit#67:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 42
   getModuleID(): 76
 ARICHDigit#68:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 131
   getModuleID(): 77
 ARICHDigit#69:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 136
   getModuleID(): 130
 ARICHDigit#70:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 143
   getModuleID(): 32
 ARICHDigit#71:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 7
   getModuleID(): 80
 ARICHDigit#72:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 61
   getModuleID(): 35
 ARICHDigit#73:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 124
   getModuleID(): 396
 ARICHDigit#74:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 24
   getModuleID(): 252
 ARICHDigit#75:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 138
   getModuleID(): 323
 ARICHDigit#76:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 58
   getModuleID(): 399
 ARICHDigit#77:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 29
   getModuleID(): 256
 ARICHDigit#78:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 101
   getModuleID(): 139
 ARICHDigit#79:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 16
   getModuleID(): 86
 ARICHDigit#80:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 103
   getModuleID(): 196
 ARICHDigit#81:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 96
   getModuleID(): 261
 ARICHDigit#82:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 118
   getModuleID(): 262
 ARICHDigit#83:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 15
   getModuleID(): 269
 ARICHDigit#84:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 95
   getModuleID(): 143
 ARICHDigit#85:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 116
   getModuleID(): 332
 ARICHDigit#86:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 5
   getModuleID(): 333
 ARICHDigit#87:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 113
   getModuleID(): 264
 ARICHDigit#88:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 94
   getModuleID(): 416
 ARICHDigit#89:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 7
   getModuleID(): 416
 ARICHDigit#90:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 22
   getModuleID(): 420
 ARICHDigit#91:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 128
   getModuleID(): 419
 ARICHDigit#92:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 10
   getModuleID(): 336
 BKLMDigit#0:
@@ -18019,359 +18019,359 @@ TOPDigit#270:
   getPulseWidth(): 2.18548
   getRawTime(): 185.335
 ARICHDigit#0:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 55
   getModuleID(): 50
 ARICHDigit#1:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 20
   getModuleID(): 91
 ARICHDigit#2:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 54
   getModuleID(): 273
 ARICHDigit#3:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 92
   getModuleID(): 345
 ARICHDigit#4:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 51
   getModuleID(): 209
 ARICHDigit#5:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 54
   getModuleID(): 209
 ARICHDigit#6:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 38
   getModuleID(): 351
 ARICHDigit#7:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 83
   getModuleID(): 281
 ARICHDigit#8:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 50
   getModuleID(): 277
 ARICHDigit#9:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 129
   getModuleID(): 8
 ARICHDigit#10:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 59
   getModuleID(): 103
 ARICHDigit#11:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 76
   getModuleID(): 54
 ARICHDigit#12:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 110
   getModuleID(): 54
 ARICHDigit#13:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 92
   getModuleID(): 58
 ARICHDigit#14:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 25
   getModuleID(): 14
 ARICHDigit#15:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 62
   getModuleID(): 155
 ARICHDigit#16:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 19
   getModuleID(): 101
 ARICHDigit#17:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 70
   getModuleID(): 161
 ARICHDigit#18:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 64
   getModuleID(): 161
 ARICHDigit#19:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 28
   getModuleID(): 286
 ARICHDigit#20:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 14
   getModuleID(): 220
 ARICHDigit#21:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 136
   getModuleID(): 365
 ARICHDigit#22:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 81
   getModuleID(): 293
 ARICHDigit#23:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 44
   getModuleID(): 288
 ARICHDigit#24:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 15
   getModuleID(): 288
 ARICHDigit#25:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 136
   getModuleID(): 361
 ARICHDigit#26:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 59
 ARICHDigit#27:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 60
 ARICHDigit#28:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 72
   getModuleID(): 62
 ARICHDigit#29:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 125
   getModuleID(): 113
 ARICHDigit#30:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 98
   getModuleID(): 65
 ARICHDigit#31:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 11
   getModuleID(): 66
 ARICHDigit#32:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 79
   getModuleID(): 229
 ARICHDigit#33:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 10
   getModuleID(): 111
 ARICHDigit#34:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 79
   getModuleID(): 116
 ARICHDigit#35:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 33
   getModuleID(): 173
 ARICHDigit#36:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 19
   getModuleID(): 174
 ARICHDigit#37:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 12
   getModuleID(): 372
 ARICHDigit#38:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 76
   getModuleID(): 298
 ARICHDigit#39:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 109
   getModuleID(): 303
 ARICHDigit#40:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 89
   getModuleID(): 303
 ARICHDigit#41:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 109
   getModuleID(): 379
 ARICHDigit#42:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 71
   getModuleID(): 239
 ARICHDigit#43:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 76
   getModuleID(): 177
 ARICHDigit#44:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 44
   getModuleID(): 120
 ARICHDigit#45:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 47
   getModuleID(): 120
 ARICHDigit#46:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 85
   getModuleID(): 120
 ARICHDigit#47:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 106
   getModuleID(): 124
 ARICHDigit#48:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 136
   getModuleID(): 126
 ARICHDigit#49:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 65
   getModuleID(): 385
 ARICHDigit#50:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 16
   getModuleID(): 310
 ARICHDigit#51:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 68
   getModuleID(): 318
 ARICHDigit#52:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 394
 ARICHDigit#53:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 73
   getModuleID(): 313
 ARICHDigit#54:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 41
   getModuleID(): 313
 ARICHDigit#55:
-  getBitmap(): 
+  getBitmap(): 3
   getChannelID(): 31
   getModuleID(): 243
 ARICHDigit#56:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 243
 ARICHDigit#57:
-  getBitmap(): 
+  getBitmap(): 3
   getChannelID(): 72
   getModuleID(): 243
 ARICHDigit#58:
-  getBitmap(): 
+  getBitmap(): 3
   getChannelID(): 75
   getModuleID(): 243
 ARICHDigit#59:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 94
   getModuleID(): 243
 ARICHDigit#60:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 243
 ARICHDigit#61:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 45
   getModuleID(): 388
 ARICHDigit#62:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 12
   getModuleID(): 80
 ARICHDigit#63:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 14
   getModuleID(): 128
 ARICHDigit#64:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 141
   getModuleID(): 129
 ARICHDigit#65:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 33
   getModuleID(): 189
 ARICHDigit#66:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 137
   getModuleID(): 191
 ARICHDigit#67:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 62
   getModuleID(): 135
 ARICHDigit#68:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 58
   getModuleID(): 397
 ARICHDigit#69:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 79
   getModuleID(): 330
 ARICHDigit#70:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 84
   getModuleID(): 330
 ARICHDigit#71:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 78
   getModuleID(): 402
 ARICHDigit#72:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 45
   getModuleID(): 83
 ARICHDigit#73:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 101
   getModuleID(): 38
 ARICHDigit#74:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 36
   getModuleID(): 41
 ARICHDigit#75:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 94
   getModuleID(): 260
 ARICHDigit#76:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 76
   getModuleID(): 138
 ARICHDigit#77:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 34
   getModuleID(): 200
 ARICHDigit#78:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 93
   getModuleID(): 142
 ARICHDigit#79:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 74
   getModuleID(): 269
 ARICHDigit#80:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 32
   getModuleID(): 270
 ARICHDigit#81:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 12
   getModuleID(): 331
 ARICHDigit#82:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 53
   getModuleID(): 266
 ARICHDigit#83:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 29
   getModuleID(): 338
 ARICHDigit#84:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 121
   getModuleID(): 340
 ARICHDigit#85:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 114
   getModuleID(): 415
 ARICHDigit#86:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 132
   getModuleID(): 337
 ARICHDigit#87:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 57
   getModuleID(): 337
 ARICHDigit#88:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 93
   getModuleID(): 413
 BKLMDigit#0:
@@ -23795,343 +23795,343 @@ TOPDigit#119:
   getPulseWidth(): 2.24214
   getRawTime(): 165.943
 ARICHDigit#0:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 143
   getModuleID(): 2
 ARICHDigit#1:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 70
   getModuleID(): 44
 ARICHDigit#2:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 26
   getModuleID(): 45
 ARICHDigit#3:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 134
   getModuleID(): 5
 ARICHDigit#4:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 96
   getModuleID(): 7
 ARICHDigit#5:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 40
   getModuleID(): 7
 ARICHDigit#6:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 66
   getModuleID(): 92
 ARICHDigit#7:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 31
   getModuleID(): 148
 ARICHDigit#8:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 8
   getModuleID(): 151
 ARICHDigit#9:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 99
   getModuleID(): 213
 ARICHDigit#10:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 2
   getModuleID(): 153
 ARICHDigit#11:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 94
   getModuleID(): 154
 ARICHDigit#12:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 108
   getModuleID(): 99
 ARICHDigit#13:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 22
   getModuleID(): 273
 ARICHDigit#14:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 38
   getModuleID(): 282
 ARICHDigit#15:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 56
   getModuleID(): 10
 ARICHDigit#16:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 92
   getModuleID(): 103
 ARICHDigit#17:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 0
   getModuleID(): 104
 ARICHDigit#18:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 39
   getModuleID(): 224
 ARICHDigit#19:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 137
   getModuleID(): 225
 ARICHDigit#20:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 96
   getModuleID(): 285
 ARICHDigit#21:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 52
   getModuleID(): 219
 ARICHDigit#22:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 44
   getModuleID(): 360
 ARICHDigit#23:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 105
   getModuleID(): 289
 ARICHDigit#24:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 74
   getModuleID(): 362
 ARICHDigit#25:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 98
   getModuleID(): 16
 ARICHDigit#26:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 65
 ARICHDigit#27:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 76
   getModuleID(): 228
 ARICHDigit#28:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 3
   getModuleID(): 111
 ARICHDigit#29:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 77
   getModuleID(): 169
 ARICHDigit#30:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 71
   getModuleID(): 236
 ARICHDigit#31:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 128
   getModuleID(): 174
 ARICHDigit#32:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 60
   getModuleID(): 237
 ARICHDigit#33:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 121
   getModuleID(): 237
 ARICHDigit#34:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 24
   getModuleID(): 371
 ARICHDigit#35:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 91
   getModuleID(): 372
 ARICHDigit#36:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 124
   getModuleID(): 230
 ARICHDigit#37:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 72
   getModuleID(): 304
 ARICHDigit#38:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 122
   getModuleID(): 301
 ARICHDigit#39:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 116
   getModuleID(): 375
 ARICHDigit#40:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 3
   getModuleID(): 22
 ARICHDigit#41:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 128
   getModuleID(): 68
 ARICHDigit#42:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 95
   getModuleID(): 26
 ARICHDigit#43:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 33
   getModuleID(): 72
 ARICHDigit#44:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 106
   getModuleID(): 238
 ARICHDigit#45:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 70
   getModuleID(): 238
 ARICHDigit#46:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 99
   getModuleID(): 119
 ARICHDigit#47:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 78
   getModuleID(): 178
 ARICHDigit#48:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 96
   getModuleID(): 183
 ARICHDigit#49:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 52
   getModuleID(): 308
 ARICHDigit#50:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 22
   getModuleID(): 382
 ARICHDigit#51:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 119
   getModuleID(): 382
 ARICHDigit#52:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 15
   getModuleID(): 307
 ARICHDigit#53:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 68
   getModuleID(): 307
 ARICHDigit#54:
-  getBitmap(): 
+  getBitmap(): 7
   getChannelID(): 74
   getModuleID(): 307
 ARICHDigit#55:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 72
   getModuleID(): 310
 ARICHDigit#56:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 241
 ARICHDigit#57:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 53
   getModuleID(): 242
 ARICHDigit#58:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 81
   getModuleID(): 393
 ARICHDigit#59:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 37
   getModuleID(): 387
 ARICHDigit#60:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 43
   getModuleID(): 77
 ARICHDigit#61:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 129
   getModuleID(): 251
 ARICHDigit#62:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 139
   getModuleID(): 192
 ARICHDigit#63:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 134
   getModuleID(): 134
 ARICHDigit#64:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 10
   getModuleID(): 320
 ARICHDigit#65:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 48
   getModuleID(): 399
 ARICHDigit#66:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 4
   getModuleID(): 399
 ARICHDigit#67:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 101
   getModuleID(): 404
 ARICHDigit#68:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 109
   getModuleID(): 407
 ARICHDigit#69:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 141
   getModuleID(): 402
 ARICHDigit#70:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 30
   getModuleID(): 324
 ARICHDigit#71:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 33
   getModuleID(): 324
 ARICHDigit#72:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 105
   getModuleID(): 36
 ARICHDigit#73:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 19
   getModuleID(): 139
 ARICHDigit#74:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 124
   getModuleID(): 40
 ARICHDigit#75:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 39
   getModuleID(): 40
 ARICHDigit#76:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 52
   getModuleID(): 88
 ARICHDigit#77:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 195
 ARICHDigit#78:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 71
   getModuleID(): 199
 ARICHDigit#79:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 75
   getModuleID(): 143
 ARICHDigit#80:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 82
   getModuleID(): 263
 ARICHDigit#81:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 54
   getModuleID(): 338
 ARICHDigit#82:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 34
   getModuleID(): 417
 ARICHDigit#83:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 13
   getModuleID(): 419
 ARICHDigit#84:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 119
   getModuleID(): 265
 BKLMDigit#0:
@@ -34724,515 +34724,515 @@ TOPDigit#183:
   getPulseWidth(): 2.22913
   getRawTime(): 94.6346
 ARICHDigit#0:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 1
 ARICHDigit#1:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 53
   getModuleID(): 44
 ARICHDigit#2:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 21
   getModuleID(): 94
 ARICHDigit#3:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 4
   getModuleID(): 46
 ARICHDigit#4:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 19
   getModuleID(): 50
 ARICHDigit#5:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 132
   getModuleID(): 92
 ARICHDigit#6:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 128
   getModuleID(): 93
 ARICHDigit#7:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 113
   getModuleID(): 93
 ARICHDigit#8:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 118
   getModuleID(): 148
 ARICHDigit#9:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 75
   getModuleID(): 151
 ARICHDigit#10:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 21
   getModuleID(): 213
 ARICHDigit#11:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 12
   getModuleID(): 98
 ARICHDigit#12:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 40
   getModuleID(): 343
 ARICHDigit#13:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 82
   getModuleID(): 271
 ARICHDigit#14:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 31
   getModuleID(): 274
 ARICHDigit#15:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 68
   getModuleID(): 212
 ARICHDigit#16:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 137
   getModuleID(): 212
 ARICHDigit#17:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 280
 ARICHDigit#18:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 18
   getModuleID(): 210
 ARICHDigit#19:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 107
   getModuleID(): 13
 ARICHDigit#20:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 60
   getModuleID(): 156
 ARICHDigit#21:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 22
   getModuleID(): 156
 ARICHDigit#22:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 38
   getModuleID(): 158
 ARICHDigit#23:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 40
   getModuleID(): 226
 ARICHDigit#24:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 28
   getModuleID(): 219
 ARICHDigit#25:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 131
   getModuleID(): 222
 ARICHDigit#26:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 21
   getModuleID(): 222
 ARICHDigit#27:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 142
   getModuleID(): 364
 ARICHDigit#28:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 19
   getModuleID(): 18
 ARICHDigit#29:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 4
   getModuleID(): 63
 ARICHDigit#30:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 4
   getModuleID(): 173
 ARICHDigit#31:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 64
   getModuleID(): 173
 ARICHDigit#32:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 44
   getModuleID(): 299
 ARICHDigit#33:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 93
   getModuleID(): 373
 ARICHDigit#34:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 43
   getModuleID(): 378
 ARICHDigit#35:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 67
   getModuleID(): 306
 ARICHDigit#36:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 77
   getModuleID(): 305
 ARICHDigit#37:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 14
   getModuleID(): 374
 ARICHDigit#38:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 110
   getModuleID(): 67
 ARICHDigit#39:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 8
   getModuleID(): 68
 ARICHDigit#40:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 61
   getModuleID(): 69
 ARICHDigit#41:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 105
   getModuleID(): 74
 ARICHDigit#42:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 132
   getModuleID(): 120
 ARICHDigit#43:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 12
   getModuleID(): 179
 ARICHDigit#44:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 73
   getModuleID(): 246
 ARICHDigit#45:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 1
   getModuleID(): 310
 ARICHDigit#46:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 55
   getModuleID(): 241
 ARICHDigit#47:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 73
   getModuleID(): 241
 ARICHDigit#48:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 27
   getModuleID(): 390
 ARICHDigit#49:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 5
   getModuleID(): 314
 ARICHDigit#50:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 63
   getModuleID(): 245
 ARICHDigit#51:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 48
   getModuleID(): 315
 ARICHDigit#52:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 132
   getModuleID(): 315
 ARICHDigit#53:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 317
 ARICHDigit#54:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 100
   getModuleID(): 313
 ARICHDigit#55:
-  getBitmap(): 
+  getBitmap(): 3
   getChannelID(): 4
   getModuleID(): 75
 ARICHDigit#56:
-  getBitmap(): 
+  getBitmap(): 7
   getChannelID(): 9
   getModuleID(): 75
 ARICHDigit#57:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 64
   getModuleID(): 75
 ARICHDigit#58:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 72
   getModuleID(): 75
 ARICHDigit#59:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 111
   getModuleID(): 75
 ARICHDigit#60:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 23
   getModuleID(): 131
 ARICHDigit#61:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 109
   getModuleID(): 81
 ARICHDigit#62:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 37
   getModuleID(): 128
 ARICHDigit#63:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 91
   getModuleID(): 251
 ARICHDigit#64:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 86
   getModuleID(): 251
 ARICHDigit#65:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 23
   getModuleID(): 192
 ARICHDigit#66:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 67
   getModuleID(): 257
 ARICHDigit#67:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 129
   getModuleID(): 135
 ARICHDigit#68:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 26
   getModuleID(): 396
 ARICHDigit#69:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 115
   getModuleID(): 396
 ARICHDigit#70:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 23
   getModuleID(): 397
 ARICHDigit#71:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 12
   getModuleID(): 255
 ARICHDigit#72:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 37
   getModuleID(): 255
 ARICHDigit#73:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 0
   getModuleID(): 255
 ARICHDigit#74:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 128
   getModuleID(): 255
 ARICHDigit#75:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 98
   getModuleID(): 326
 ARICHDigit#76:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 82
   getModuleID(): 256
 ARICHDigit#77:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 99
   getModuleID(): 327
 ARICHDigit#78:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 20
   getModuleID(): 404
 ARICHDigit#79:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 404
 ARICHDigit#80:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 81
   getModuleID(): 404
 ARICHDigit#81:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 140
   getModuleID(): 404
 ARICHDigit#82:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 0
   getModuleID(): 405
 ARICHDigit#83:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 42
   getModuleID(): 405
 ARICHDigit#84:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 100
   getModuleID(): 405
 ARICHDigit#85:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 105
   getModuleID(): 405
 ARICHDigit#86:
-  getBitmap(): 
+  getBitmap(): 7
   getChannelID(): 106
   getModuleID(): 405
 ARICHDigit#87:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 121
   getModuleID(): 405
 ARICHDigit#88:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 84
   getModuleID(): 328
 ARICHDigit#89:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 120
   getModuleID(): 328
 ARICHDigit#90:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 60
   getModuleID(): 330
 ARICHDigit#91:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 79
   getModuleID(): 329
 ARICHDigit#92:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 139
   getModuleID(): 329
 ARICHDigit#93:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 49
   getModuleID(): 406
 ARICHDigit#94:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 69
   getModuleID(): 406
 ARICHDigit#95:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 108
   getModuleID(): 406
 ARICHDigit#96:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 123
   getModuleID(): 406
 ARICHDigit#97:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 127
   getModuleID(): 402
 ARICHDigit#98:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 25
   getModuleID(): 402
 ARICHDigit#99:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 401
 ARICHDigit#100:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 103
   getModuleID(): 401
 ARICHDigit#101:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 8
   getModuleID(): 85
 ARICHDigit#102:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 1
   getModuleID(): 41
 ARICHDigit#103:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 90
 ARICHDigit#104:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 20
   getModuleID(): 202
 ARICHDigit#105:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 81
   getModuleID(): 202
 ARICHDigit#106:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 101
   getModuleID(): 269
 ARICHDigit#107:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 130
   getModuleID(): 269
 ARICHDigit#108:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 129
   getModuleID(): 417
 ARICHDigit#109:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 52
   getModuleID(): 418
 ARICHDigit#110:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 61
   getModuleID(): 418
 ARICHDigit#111:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 79
   getModuleID(): 418
 ARICHDigit#112:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 93
   getModuleID(): 418
 ARICHDigit#113:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 104
   getModuleID(): 418
 ARICHDigit#114:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 118
   getModuleID(): 340
 ARICHDigit#115:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 20
   getModuleID(): 340
 ARICHDigit#116:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 138
   getModuleID(): 342
 ARICHDigit#117:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 139
   getModuleID(): 342
 ARICHDigit#118:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 128
   getModuleID(): 420
 ARICHDigit#119:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 131
   getModuleID(): 420
 ARICHDigit#120:
-  getBitmap(): 
+  getBitmap(): 3
   getChannelID(): 2
   getModuleID(): 341
 ARICHDigit#121:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 35
   getModuleID(): 341
 ARICHDigit#122:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 62
   getModuleID(): 341
 ARICHDigit#123:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 130
   getModuleID(): 341
 ARICHDigit#124:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 16
   getModuleID(): 419
 ARICHDigit#125:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 49
   getModuleID(): 419
 ARICHDigit#126:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 37
   getModuleID(): 265
 ARICHDigit#127:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 121
   getModuleID(): 336
 BKLMDigit#0:
@@ -44791,415 +44791,415 @@ TOPDigit#176:
   getPulseWidth(): 2.14259
   getRawTime(): 211.53
 ARICHDigit#0:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 68
   getModuleID(): 2
 ARICHDigit#1:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 74
   getModuleID(): 95
 ARICHDigit#2:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 142
   getModuleID(): 50
 ARICHDigit#3:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 50
 ARICHDigit#4:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 139
   getModuleID(): 205
 ARICHDigit#5:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 16
   getModuleID(): 145
 ARICHDigit#6:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 4
   getModuleID(): 145
 ARICHDigit#7:
-  getBitmap(): 
+  getBitmap(): 15
   getChannelID(): 137
   getModuleID(): 98
 ARICHDigit#8:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 5
   getModuleID(): 346
 ARICHDigit#9:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 106
   getModuleID(): 274
 ARICHDigit#10:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 15
   getModuleID(): 275
 ARICHDigit#11:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 31
   getModuleID(): 354
 ARICHDigit#12:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 17
   getModuleID(): 354
 ARICHDigit#13:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 90
   getModuleID(): 349
 ARICHDigit#14:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 125
   getModuleID(): 51
 ARICHDigit#15:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 117
   getModuleID(): 9
 ARICHDigit#16:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 20
   getModuleID(): 9
 ARICHDigit#17:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 123
   getModuleID(): 10
 ARICHDigit#18:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 121
   getModuleID(): 11
 ARICHDigit#19:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 32
   getModuleID(): 56
 ARICHDigit#20:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 73
   getModuleID(): 56
 ARICHDigit#21:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 124
   getModuleID(): 155
 ARICHDigit#22:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 87
   getModuleID(): 218
 ARICHDigit#23:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 103
   getModuleID(): 218
 ARICHDigit#24:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 123
   getModuleID(): 102
 ARICHDigit#25:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 2
   getModuleID(): 160
 ARICHDigit#26:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 103
   getModuleID(): 224
 ARICHDigit#27:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 140
   getModuleID(): 356
 ARICHDigit#28:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 124
   getModuleID(): 365
 ARICHDigit#29:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 57
   getModuleID(): 366
 ARICHDigit#30:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 115
   getModuleID(): 363
 ARICHDigit#31:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 11
   getModuleID(): 289
 ARICHDigit#32:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 91
   getModuleID(): 288
 ARICHDigit#33:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 24
   getModuleID(): 61
 ARICHDigit#34:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 36
   getModuleID(): 18
 ARICHDigit#35:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 99
   getModuleID(): 18
 ARICHDigit#36:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 91
   getModuleID(): 114
 ARICHDigit#37:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 4
   getModuleID(): 19
 ARICHDigit#38:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 45
   getModuleID(): 19
 ARICHDigit#39:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 30
   getModuleID(): 21
 ARICHDigit#40:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 40
   getModuleID(): 228
 ARICHDigit#41:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 125
   getModuleID(): 169
 ARICHDigit#42:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 112
   getModuleID(): 171
 ARICHDigit#43:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 85
   getModuleID(): 174
 ARICHDigit#44:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 72
   getModuleID(): 296
 ARICHDigit#45:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 89
   getModuleID(): 298
 ARICHDigit#46:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 56
   getModuleID(): 231
 ARICHDigit#47:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 135
   getModuleID(): 233
 ARICHDigit#48:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 11
   getModuleID(): 233
 ARICHDigit#49:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 129
   getModuleID(): 302
 ARICHDigit#50:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 30
   getModuleID(): 302
 ARICHDigit#51:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 74
   getModuleID(): 378
 ARICHDigit#52:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 25
   getModuleID(): 304
 ARICHDigit#53:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 80
   getModuleID(): 305
 ARICHDigit#54:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 55
   getModuleID(): 380
 ARICHDigit#55:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 45
   getModuleID(): 376
 ARICHDigit#56:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 117
   getModuleID(): 232
 ARICHDigit#57:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 46
   getModuleID(): 375
 ARICHDigit#58:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 78
   getModuleID(): 375
 ARICHDigit#59:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 123
   getModuleID(): 375
 ARICHDigit#60:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 92
   getModuleID(): 300
 ARICHDigit#61:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 93
   getModuleID(): 300
 ARICHDigit#62:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 105
   getModuleID(): 300
 ARICHDigit#63:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 83
   getModuleID(): 23
 ARICHDigit#64:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 101
   getModuleID(): 69
 ARICHDigit#65:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 47
   getModuleID(): 123
 ARICHDigit#66:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 131
   getModuleID(): 123
 ARICHDigit#67:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 102
   getModuleID(): 27
 ARICHDigit#68:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 99
   getModuleID(): 175
 ARICHDigit#69:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 125
   getModuleID(): 246
 ARICHDigit#70:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 132
   getModuleID(): 308
 ARICHDigit#71:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 120
   getModuleID(): 307
 ARICHDigit#72:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 53
   getModuleID(): 309
 ARICHDigit#73:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 127
   getModuleID(): 242
 ARICHDigit#74:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 134
   getModuleID(): 244
 ARICHDigit#75:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 21
   getModuleID(): 314
 ARICHDigit#76:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 90
   getModuleID(): 245
 ARICHDigit#77:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 106
   getModuleID(): 245
 ARICHDigit#78:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 42
   getModuleID(): 391
 ARICHDigit#79:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 64
   getModuleID(): 391
 ARICHDigit#80:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 39
   getModuleID(): 394
 ARICHDigit#81:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 8
   getModuleID(): 75
 ARICHDigit#82:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 127
   getModuleID(): 32
 ARICHDigit#83:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 82
   getModuleID(): 32
 ARICHDigit#84:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 126
   getModuleID(): 35
 ARICHDigit#85:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 109
   getModuleID(): 249
 ARICHDigit#86:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 5
   getModuleID(): 128
 ARICHDigit#87:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 139
   getModuleID(): 251
 ARICHDigit#88:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 58
   getModuleID(): 189
 ARICHDigit#89:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 88
   getModuleID(): 320
 ARICHDigit#90:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 42
   getModuleID(): 397
 ARICHDigit#91:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 83
   getModuleID(): 326
 ARICHDigit#92:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 100
   getModuleID(): 404
 ARICHDigit#93:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 128
   getModuleID(): 324
 ARICHDigit#94:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 65
   getModuleID(): 42
 ARICHDigit#95:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 88
   getModuleID(): 201
 ARICHDigit#96:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 13
   getModuleID(): 144
 ARICHDigit#97:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 124
   getModuleID(): 411
 ARICHDigit#98:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 83
   getModuleID(): 338
 ARICHDigit#99:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 121
   getModuleID(): 267
 ARICHDigit#100:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 113
   getModuleID(): 417
 ARICHDigit#101:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 26
   getModuleID(): 341
 ARICHDigit#102:
-  getBitmap(): 
+  getBitmap(): 1
   getChannelID(): 118
   getModuleID(): 336
 BKLMDigit#0:

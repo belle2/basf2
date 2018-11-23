@@ -67,6 +67,7 @@ namespace Belle2 {
                   << "  view : " << view);
 
         returnValue = m_defaultHistogram;
+
       }
 
       return returnValue;

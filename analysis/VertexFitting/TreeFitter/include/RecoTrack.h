@@ -27,34 +27,34 @@ namespace TreeFitter {
     virtual ~RecoTrack() {};
 
     /**   init with mother particle (replacing initPar2)  */
-    virtual ErrCode initParticleWithMother(FitParams& fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init without mother particle   */
-    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** init covariance matrix of this particle constraint */
-    ErrCode initCovariance(FitParams& fitparams) const;
+    ErrCode initCovariance(FitParams& fitparams) const override;
 
     /** update m_flt */
     ErrCode updFltToMotherCopy(const FitParams* fitparams);
 
     /**   project the constraint (calculate residuals)  */
-    virtual ErrCode projectRecoConstraint(const FitParams&, Projection&) const;
+    virtual ErrCode projectRecoConstraint(const FitParams&, Projection&) const override;
 
     /** updated the cahed parameters */
     ErrCode updateParams(double flt);
 
     /** dimension (5) */
-    virtual int dimM() const { return 5 ; }
+    virtual int dimM() const override { return 5 ; }
 
     /**  type of the constraint   */
-    virtual int type() const { return kRecoTrack ; }
+    virtual int type() const override { return kRecoTrack ; }
 
     /** number of final charged candidates */
-    virtual int nFinalChargedCandidates() const { return 1 ; }
+    virtual int nFinalChargedCandidates() const override { return 1 ; }
 
     /** add to the list of constraints */
-    virtual void addToConstraintList(constraintlist& alist, int depth) const
+    virtual void addToConstraintList(constraintlist& alist, int depth) const override
     {
       alist.push_back(Constraint(this, Constraint::track, depth, dimM(), 1)) ;
     }

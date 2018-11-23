@@ -48,7 +48,7 @@ namespace Belle2 {
      * Full constructor
      * @param serialNumber serial number
      */
-    TOPPmtTTSPar(const std::string& serialNumber):
+    explicit TOPPmtTTSPar(const std::string& serialNumber):
       m_serialNumber(serialNumber)
     {}
 

@@ -58,28 +58,28 @@ namespace Belle2 {
      * Initialize the module.
      * data store registration of PIDLikelihoods and relations to Tracks
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when a new run is started.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Called for each event.
      * loop over Tracks, collect likelihoods and fill PIDLikelihoods
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Called when run ended.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Terminates the module.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

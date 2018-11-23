@@ -382,7 +382,7 @@ namespace Belle2 {
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
      * @return unique channel ID, composed of pixel ID (1-512) and module ID (1-16)
      */
-    unsigned int getUniqueChannelID() const {return m_pixelID + (m_moduleID << 16);}
+    unsigned int getUniqueChannelID() const override {return m_pixelID + (m_moduleID << 16);}
 
     /**
      * Implementation of the base class function.
@@ -390,7 +390,7 @@ namespace Belle2 {
      * @param bg BG digit
      * @return append status
      */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override;
 
 
   private:
@@ -411,7 +411,7 @@ namespace Belle2 {
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 15); /**< ClassDef */
+    ClassDefOverride(TOPDigit, 15); /**< ClassDef */
 
   };
 

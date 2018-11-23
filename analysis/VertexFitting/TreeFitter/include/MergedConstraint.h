@@ -26,7 +26,7 @@ namespace TreeFitter {
     /** destructor */
     virtual ~MergedConstraint() {}
     /** constructor with constraint list */
-    MergedConstraint(const constraintlist& list) :
+    explicit MergedConstraint(const constraintlist& list) :
       Constraint(Constraint::merged), m_list(list)
     {
       int d = 0;
@@ -38,7 +38,7 @@ namespace TreeFitter {
 
 
     /** project the constraints */
-    virtual ErrCode project(const FitParams& fitpar, Projection& p) const ;
+    virtual ErrCode project(const FitParams& fitpar, Projection& p) const override ;
 
     /** push back a new constrint */
     void push_back(Constraint* c)

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KLMK0LRECONSTRUCTORMODULE_H
-#define KLMK0LRECONSTRUCTORMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
@@ -58,27 +57,27 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    void beginRun();
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    void event();
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    void endRun();
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate();
+    void terminate() override;
 
   private:
 
@@ -112,6 +111,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

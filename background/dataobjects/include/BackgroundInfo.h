@@ -232,12 +232,12 @@ namespace Belle2 {
     /**
      * Implementation of abstract class function
      */
-    virtual void merge(const Mergeable* other);
+    virtual void merge(const Mergeable* other) override;
 
     /**
      * Implementation of abstract class function
      */
-    virtual void clear();
+    virtual void clear() override;
 
     /**
      * Print the info
@@ -276,7 +276,7 @@ namespace Belle2 {
     double m_maxEdepECL = 0;  /**< maximal allowed deposited energy in ECL */
     std::string m_extensionName; /**< name added to default branch names of background */
 
-    ClassDef(BackgroundInfo, 4); /**< Class definition */
+    ClassDefOverride(BackgroundInfo, 4); /**< Class definition */
   };
 }
 

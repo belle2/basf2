@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEHELICITYTOOL_H
-#define NTUPLEHELICITYTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TTree.h>
@@ -29,7 +28,7 @@ namespace Belle2 {
     float m_helA;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
 
   public:
 
@@ -41,10 +40,9 @@ namespace Belle2 {
     }
 
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
 
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLEHELICITYTOOL_H

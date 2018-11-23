@@ -14,6 +14,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -63,7 +64,6 @@ namespace Belle2 {
 
   };
 
-
   /** simply store one spacePoint for each existing SVDCluster.
    *
    * first parameter is a storeArray containing SVDClusters.
@@ -91,16 +91,16 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, float minClusterTime)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, float minClusterTime_U, float minClusterTime_V)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
-      if (uCluster->getClsTime() < minClusterTime) {
+      if (uCluster->getClsTime() < minClusterTime_U) {
         B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
       }
       for (const SVDCluster* vCluster : aSensor.clustersV) {
-        if (vCluster->getClsTime() < minClusterTime) {
+        if (vCluster->getClsTime() < minClusterTime_V) {
           B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
           continue;
         }
@@ -228,7 +228,6 @@ namespace Belle2 {
                         pow(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError() , 2));
   }
 
-
   /** finds all possible combinations of U and V Clusters for SVDClusters.
    *
    * first parameter is a storeArray containing SVDClusters.
@@ -237,7 +236,8 @@ namespace Belle2 {
    * relationweights code the type of the cluster. +1 for u and -1 for v
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-      StoreArray<SpacePointType>& spacePoints, float minClusterTime, bool useQualityEstimator, TFile* pdfFile, bool useLegacyNaming)
+      StoreArray<SpacePointType>& spacePoints, SVDClusterCalibrations& clusterCal, bool useQualityEstimator, TFile* pdfFile,
+      bool useLegacyNaming)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -256,7 +256,9 @@ namespace Belle2 {
 
 
     for (auto& aSensor : activatedSensors) {
-      findPossibleCombinations(aSensor.second, foundCombinations, minClusterTime);
+      float minClusterTime_U = clusterCal.getMinClusterTime(aSensor.first, 1);
+      float minClusterTime_V = clusterCal.getMinClusterTime(aSensor.first, 0);
+      findPossibleCombinations(aSensor.second, foundCombinations, minClusterTime_U, minClusterTime_V);
     }
 
     for (auto& clusterCombi : foundCombinations) {
@@ -271,5 +273,6 @@ namespace Belle2 {
       }
     }
   }
+
 
 } //Belle2 namespace

@@ -45,7 +45,7 @@ namespace Belle2 {
             string name;
             try {
               name = property.getString("@name");
-            } catch (gearbox::PathEmptyError) {
+            } catch (gearbox::PathEmptyError&) {
               B2ERROR("Property at " << property.getPath() << " does not have a name attribute, ignoring");
               continue;
             }

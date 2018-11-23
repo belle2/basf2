@@ -356,12 +356,51 @@ namespace {
 
   }
 
-  TEST(ROEVariablesTest, Variable)
-  {
+  class ROEVariablesTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
 
+      StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
+      DataStore::Instance().setInitializeActive(true);
+      pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
+      StoreArray<ECLCluster> myECLClusters;
+      StoreArray<KLMCluster> myKLMClusters;
+      StoreArray<TrackFitResult> myTFRs;
+      StoreArray<Track> myTracks;
+      StoreArray<Particle> myParticles;
+      StoreArray<RestOfEvent> myROEs;
+      StoreArray<PIDLikelihood> myPIDLikelihoods;
+      myECLClusters.registerInDataStore();
+      myKLMClusters.registerInDataStore();
+      myTFRs.registerInDataStore();
+      myTracks.registerInDataStore();
+      myParticles.registerInDataStore();
+      myROEs.registerInDataStore();
+      myPIDLikelihoods.registerInDataStore();
+      myParticles.registerRelationTo(myROEs);
+      myTracks.registerRelationTo(myPIDLikelihoods);
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+//
+// TODO: redo all ROE variable tests
+//
+
+  TEST_F(ROEVariablesTest, Variable)
+  {
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
     StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
-    DataStore::Instance().setInitializeActive(true);
-    pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
     StoreArray<TrackFitResult> myTFRs;
@@ -369,16 +408,6 @@ namespace {
     StoreArray<Particle> myParticles;
     StoreArray<RestOfEvent> myROEs;
     StoreArray<PIDLikelihood> myPIDLikelihoods;
-    myECLClusters.registerInDataStore();
-    myKLMClusters.registerInDataStore();
-    myTFRs.registerInDataStore();
-    myTracks.registerInDataStore();
-    myParticles.registerInDataStore();
-    myROEs.registerInDataStore();
-    myPIDLikelihoods.registerInDataStore();
-    myParticles.registerRelationTo(myROEs);
-    myTracks.registerRelationTo(myPIDLikelihoods);
-    DataStore::Instance().setInitializeActive(false);
 
     pi0ParticleList.create();
     pi0ParticleList->initialize(111, "pi0:vartest");
@@ -402,14 +431,14 @@ namespace {
     myROEECL.setEnergy(eclROE);
     myROEECL.setHypothesisId(5);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
-
+    Particle* roeECLParticle = myParticles.appendNew(savedROEECL);
     // Create KLMCluster on ROE side
     KLMCluster myROEKLM;
     KLMCluster* savedROEKLM = myKLMClusters.appendNew(myROEKLM);
+    Particle* roeKLMParticle = myParticles.appendNew(savedROEKLM);
 
     // Create Track on ROE side
     // - create TFR
-    TRandom3 generator;
 
     const float pValue = 0.5;
     const float bField = 1.5;
@@ -425,27 +454,35 @@ namespace {
 
     // - create Track
     Track myROETrack;
-    myROETrack.setTrackFitResultIndex(Const::muon, 1);
+    myROETrack.setTrackFitResultIndex(Const::muon, 0);
     Track* savedROETrack = myTracks.appendNew(myROETrack);
-
     // - create PID information, add relation
     PIDLikelihood myPID;
-    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.5);
-    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.52);
-    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.54);
-    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.56);
-    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.15);
+    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.152);
+    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.154);
+    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.156);
+    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.158);
+    myPID.setLogLikelihood(Const::TOP, Const::pion, 0.5);
+    myPID.setLogLikelihood(Const::ARICH, Const::pion, 0.52);
+    myPID.setLogLikelihood(Const::ECL, Const::pion, 0.54);
+    myPID.setLogLikelihood(Const::CDC, Const::pion, 0.56);
+    myPID.setLogLikelihood(Const::SVD, Const::pion, 0.58);
     PIDLikelihood* savedPID = myPIDLikelihoods.appendNew(myPID);
 
     savedROETrack->addRelationTo(savedPID);
+    Particle* roeTrackParticle = myParticles.appendNew(savedROETrack, Const::muon);
 
     // Create ROE object, append tracks, clusters, add relation to particle
+    //TODO: make particles
     RestOfEvent roe;
-    roe.addTrack(savedROETrack);
-    roe.addECLCluster(savedROEECL);
-    roe.addKLMCluster(savedROEKLM);
+    vector<const Particle*> roeParticlesToAdd;
+    roeParticlesToAdd.push_back(roeTrackParticle);
+    roeParticlesToAdd.push_back(roeECLParticle);
+    roeParticlesToAdd.push_back(roeKLMParticle);
+    roe.addParticles(roeParticlesToAdd);
     RestOfEvent* savedROE = myROEs.appendNew(roe);
-
+    /*
     std::map<std::string, std::map<unsigned int, bool>> tMasks;
     std::map<std::string, std::map<unsigned int, bool>> cMasks;
     std::map<std::string, std::vector<double>> fracs;
@@ -475,14 +512,22 @@ namespace {
     savedROE->appendTrackMasks(tMasks);
     savedROE->appendECLClusterMasks(cMasks);
     savedROE->appendChargedStableFractionsSet(fracs);
-
+    */
+    savedROE->initializeMask("mask1", "test");
+    std::shared_ptr<Variable::Cut> trackSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    std::shared_ptr<Variable::Cut> eclSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    savedROE->updateMaskWithCuts("mask1");
+    savedROE->initializeMask("mask2", "test");
+    savedROE->updateMaskWithCuts("mask2",  trackSelection,  eclSelection);
     part->addRelationTo(savedROE);
 
     // ROE variables
     PCmsLabTransform T;
     float E0 = T.getCMSEnergy() / 2;
-
-    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::pion.getMass()*Const::pion.getMass() + 1.0 /*momentum.Mag2()*/));
+    B2INFO("E0 is " << E0);
+    //*/
+    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + 1.0 /*momentum.Mag2()*/));
+    pTrack_ROE_Lab = roeTrackParticle->get4Vector();
     TLorentzVector pECL_ROE_Lab(0, 0, eclROE, eclROE);
     TLorentzVector pECL_REC_Lab(0, 0, eclREC, eclREC);
 
@@ -521,14 +566,18 @@ namespace {
     neutrino4vecCMS.SetE(neutrino4vecCMS.Vect().Mag());
 
     TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
-
+    B2INFO("roe4vecCMS.E() = " << roe4vecCMS.E());
     // TESTS FOR ROE STRUCTURE
-    EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
-    EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
-    double fArray[6];
-    EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
+    //double fArray[6];
+    //EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithCuts("noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithV0("noSuchMask", part));
+    EXPECT_B2FATAL(savedROE->hasParticle(part, "noSuchMask"));
 
     // TESTS FOR ROE VARIABLES
+
     const Manager::Var* var = Manager::Instance().getVariable("nROE_Tracks(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
@@ -612,6 +661,7 @@ namespace {
     var = Manager::Instance().getVariable("WE_MissM2(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
+
   }
 
 
@@ -2266,7 +2316,8 @@ namespace {
       // we're done setting up the datastore
       DataStore::Instance().setInitializeActive(false);
 
-      // add some tracks
+      // add some tracks the zeroth one is not going to be matched
+      tracks.appendNew(Track());
       const Track* t1 = tracks.appendNew(Track());
       const Track* t2 = tracks.appendNew(Track());
       const Track* t3 = tracks.appendNew(Track());
@@ -2295,12 +2346,19 @@ namespace {
       e1->setEnergy(0.3);
       e1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e1->setClusterId(1);
+      // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
       e2->setEnergy(0.6);
+      e2->setTheta(1.0); // somewhere in the barrel
+      e2->setPhi(2.0);
+      e2->setR(148.5);
       e2->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e2->setClusterId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
+      e3->setTheta(0.2); // somewhere in the fwd encap
+      e3->setPhi(1.5);
+      e3->setR(200.0);
       e3->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e3->setClusterId(3);
 
@@ -2337,6 +2395,68 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+
+  TEST_F(ECLVariableTest, b2bKinematicsTest)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // connect gearbox for CMS boosting etc
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // get the zeroth track in the array (is not associated to a cluster)
+    const Particle* noclustertrack = particles.appendNew(Particle(tracks[0], Const::pion));
+
+    // grab variables for testing
+    const Manager::Var* b2bClusterTheta = Manager::Instance().getVariable("b2bClusterTheta");
+    const Manager::Var* b2bClusterPhi = Manager::Instance().getVariable("b2bClusterPhi");
+
+    EXPECT_EQ(gammalist->getListSize(), 3);
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)), 3.0276606);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)), 0.0);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(1)), 1.6036042);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(1)), -1.0607308);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(2)), 2.7840068);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(2)), -1.3155469);
+
+    // track (or anything without a cluster) should be nan
+    ASSERT_TRUE(std::isnan(b2bClusterTheta->function(noclustertrack)));
+    ASSERT_TRUE(std::isnan(b2bClusterPhi->function(noclustertrack)));
+
+    // the "normal" (not cluster based) variables should be the same for photons
+    // (who have no track information)
+    const Manager::Var* b2bTheta = Manager::Instance().getVariable("b2bTheta");
+    const Manager::Var* b2bPhi = Manager::Instance().getVariable("b2bPhi");
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)),
+                    b2bTheta->function(gammalist->getParticle(0)));
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)),
+                    b2bPhi->function(gammalist->getParticle(0)));
+  }
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {

@@ -98,7 +98,7 @@ namespace Belle2 {
     void readPersistentEntry(long fileEntry);
 
     /** Check if we warn the user or abort after an entry was missing after changing files. */
-    void entryNotFound(std::string entryOrigin, std::string name, bool fileChanged = true);
+    void entryNotFound(const std::string& entryOrigin, const std::string& name, bool fileChanged = true);
 
     /** For index files, this creates TEventList/TEntryListArray to enable better cache use. */
     void addEventListForIndexFile(const std::string& parentLfn);

@@ -232,7 +232,7 @@ namespace Belle2 {
     if (m_vertexFitter == "rave") {
       try {
         ok = doRaveFit(mother);
-      } catch (rave::CheckedFloatException) {
+      } catch (const rave::CheckedFloatException&) {
         B2ERROR("Invalid inputs (nan/inf)?");
         ok = false;
       }

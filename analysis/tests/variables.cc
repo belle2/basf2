@@ -1441,6 +1441,43 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 2;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+
+    const float px_CM = 2.;
+    const float py_CM = 1.;
+    const float pz_CM = 3.;
+    float E_CM;
+    E_CM = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
+    TLorentzVector dau0_4vec_CM(px_CM, py_CM, pz_CM, E_CM), dau1_4vec_CM(-px_CM, -py_CM, -pz_CM, E_CM);
+    //now I need to boost the 2 4vecs into the lab frame with the cool function (pcmslabtransform?)
+    //after that I use those boosted 4vecs to "feed" the loop below
+    //I run the test and get the values of theta and phi for the 2 4vecs in the lab frame
+    //I use those values to create 2 eclclusters and I set relations between 'em and the particles
+    //I also use the numbers I just got to set the proper comparisons for the tests
+    //Then if I use useCMSFrame I should get "exatly" pi as the angle between these 2 clusters
+    //Urra!
+    //Pigeons
+
+    for (int i = 0; i < nDaughters; i++) {
+      Particle dau(TLorentzVector(px, py, pz, E), 22);
+      momentum += dau.get4Vector();
+      Particle* newDaughters = particles.appendNew(dau);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* par = particles.appendNew(momentum, pdgCODE, Particle::c_Unflavored, daughterIndices);
+
+
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterClusterAngleInBetween(0, 1)")
+                              ASSERT_NE();
+    EXPECT_FLOAT_EQ();
+  }
+
   TEST_F(MetaVariableTest, daughterNormDiffOf)
   {
     TLorentzVector momentum;

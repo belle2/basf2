@@ -65,7 +65,10 @@ def writeClosestParticleExtraClusterInfo(
     # only keep the one with the smallest opening angle
     rankByLowest(pListPair, 'daughterClusterAngleInBetween(0, 1)', 1, path=roe_path)
 
-    # add new variables to the signal side particle
+    # add new variables to the signal side particle (MEMORANDUM: if somebody
+    # needs these variables in the CMS frame, we need to create them ex novo,
+    # as 3 new variables, explictly using useCMSFrame instead of useLabFrame,
+    # cause it doesn't work from "outside")
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterClusterAngleInBetween(0, 1))': 'openingAngle'}, path=roe_path)
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, clusterTheta))': 'deltaTheta'}, path=roe_path)
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfClusterPhi(0, 1))': 'deltaPhi'}, path=roe_path)

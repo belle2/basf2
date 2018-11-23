@@ -1069,7 +1069,7 @@ endloop:
           if (daughterIndices.size() == 2)
           {
             if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
-              return -999;
+              return -998;
             else {
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
@@ -1085,7 +1085,7 @@ endloop:
           } else if (daughterIndices.size() == 3)
           {
             if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
-                || daughterIndices[2] >= int(particle->getNDaughters())) return -999;
+                || daughterIndices[2] >= int(particle->getNDaughters())) return -997;
             else {
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
@@ -1100,7 +1100,7 @@ endloop:
               }
               return std::numeric_limits<float>::quiet_NaN();
             }
-          } else return -999;
+          } else return -996;
 
         };
         return func;

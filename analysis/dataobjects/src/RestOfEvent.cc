@@ -102,6 +102,44 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
   }
   return result;
 }
+std::vector<const Particle*> RestOfEvent::getPhotons(const std::string& maskName, bool unpackComposite) const
+{
+  auto particles = getParticles(maskName, unpackComposite);
+  std::vector<const Particle*> photons;
+  for (auto* particle : particles) {
+    if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+      photons.push_back(particle);
+    }
+  }
+  return photons;
+}
+std::vector<const Particle*> RestOfEvent::getHadrons(const std::string& maskName, bool unpackComposite) const
+{
+  auto particles = getParticles(maskName, unpackComposite);
+  std::vector<const Particle*> hadrons;
+  for (auto* particle : particles) {
+    if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
+      hadrons.push_back(particle);
+    }
+  }
+  return hadrons;
+}
+
+std::vector<const Particle*> RestOfEvent::getChargedParticles(const std::string& maskName, unsigned int pdg,
+    bool unpackComposite) const
+{
+  auto particles = getParticles(maskName, unpackComposite);
+  std::vector<const Particle*> charged;
+  for (auto* particle : particles) {
+    if (particle->getParticleType() == Particle::EParticleType::c_Track) {
+      if (pdg == 0 || pdg == abs(particle->getPDGCode())) {
+        charged.push_back(particle);
+      }
+    }
+  }
+  return charged;
+}
+
 
 bool RestOfEvent::hasParticle(const Particle* particle, const std::string& maskName) const
 {

@@ -25,7 +25,7 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    TrgEclDataBase() {}
+    TrgEclDataBase();
     /** Destructor */
     virtual ~TrgEclDataBase() {}
 
@@ -46,6 +46,16 @@ namespace Belle2 {
     double GetCMEnergy(int);
     /** TC CM Phi  */
     int Get3DBhabhaLUT(int);
+    //! Make Fitter Coefficients from Signal PDF and Noise covariance metrix
+    void MakeFitterCoefficient(std::vector<int>, std::vector<int>);
+    //! Util to interpalate Signal Shape
+    double interFADC(double , std::vector<int>);
+
+  private:
+    /** Amplitude Coefficient */
+    std::vector<std::vector<int>> _AmpCoefficient;
+    /** Timing Coefficient */
+    std::vector<std::vector<int>> _TimingCoefficient;
 
 
 

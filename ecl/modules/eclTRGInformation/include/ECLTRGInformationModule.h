@@ -59,7 +59,7 @@ namespace Belle2 {
     std::vector< int > m_TCStoreArrPosition;
 
     /** TC mapping class */
-    TrgEclMapping* m_trgmap;
+    TrgEclMapping* m_trgmap{nullptr};
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits  */
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters  */

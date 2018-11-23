@@ -12,7 +12,7 @@
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
@@ -29,7 +29,14 @@ fileList = [
 inputMdstList('MC9', fileList)
 
 # use standard final state particle lists
-loadStdCharged()
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 
 # importing the reconstructed events from the ISRpipicc_List file
 from skim.quarkonium import ISRpipiccList

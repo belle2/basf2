@@ -10,10 +10,10 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
+from skim.standardlists.charm import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 
@@ -30,9 +30,10 @@ fileList = [
 inputMdstList('MC9', fileList)
 
 
-loadStdCharged()
+stdPi('all')
+stdK('all')
 loadStdSkimPi0()
-loadStdKS()
+stdKshorts()
 
 # B- to D(->Kspi0)h- Skim
 from skim.btocharm import loadDkspi0, BsigToDhToKspi0List

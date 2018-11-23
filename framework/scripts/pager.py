@@ -32,7 +32,7 @@ class Pager(object):
     Parameters:
         prompt (str): a string argument allows overriding the description
             provided by ``less``. Special characters may need escaping.
-            Will only be shown if pagind is used the pager is actually ``less``.
+            Will only be shown if paging is used and the pager is actually ``less``.
         quit_if_one_screen (bool): indicating whether the Pager should quit
             automatically if the content fits on one screen. This implies that
             the content stays visible on pager exit. True is similar to the
@@ -72,7 +72,7 @@ class Pager(object):
         self._original_stderr = sys.__stderr__
         self._original_stderr = sys.__stdout__
         try:
-            # and duplicate the curent output file descriptors
+            # and duplicate the current output file descriptors
             self._original_stdout_fd = os.dup(sys.stdout.fileno())
             self._original_stderr_fd = os.dup(sys.stderr.fileno())
         except Exception:
@@ -80,12 +80,19 @@ class Pager(object):
             # don't support paging
             return
 
-        # this is a bit annoying: Usually in python the __stdout__ and
-        # sys.__stderr__ point to the original stdout/stderr. However we modify
-        # the file descriptors for those so they acutually will not, they will
-        # also be redirected. Butquerying the terminal size looks as
-        # sys.__stdout__ which is no longer a tty ...
-        # So lets provide objects pointing to the original file descriptors
+        # This is a bit annoying: Usually in python the sys.__stdout__ and
+        # sys.__stderr__ objects point to the original stdout/stderr on program start.
+        #
+        # However we modify the file descriptors directly so these objects will
+        # also be redirected automatically. The documentation for
+        # sys.__stdout__ says it "could be useful to print to the actual
+        # standard stream no matter if the sys.std* object has been
+        # redirected". Also,  querying the terminal size looks at
+        # sys.__stdout__ which would no longer be pointing to a tty.
+        #
+        # So lets provide objects pointing to the original file descriptors so
+        # that they behave as expected, i.e. as if we would only have
+        # redirected sys.stdout and sys.stderr ...
         sys.__stdout__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
         sys.__stderr__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
 

@@ -3,7 +3,7 @@
 
 """
 SVD Default Cluster Calibration importer.
-t_min = -20,
+t_min = -80,
 """
 import basf2
 from basf2 import *
@@ -98,7 +98,7 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
 
 
 use_database_chain()
-use_local_database("localDB/database.txt", "localDB", invertLogging=True)
+use_local_database("localdb_clusterCal/database.txt", "localdb_clusterCal", invertLogging=True)
 
 main = create_path()
 

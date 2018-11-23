@@ -53,7 +53,6 @@ namespace Belle2 {
   protected:
 
     /** Module parameters */
-    int m_boostMode;             /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     std::string m_dataPath;      /**< The path to the KoralW input data files. */
     std::string m_userDataFile;  /**< The filename of the user KoralW input data file. */
     int m_seed;                  /**< The random seed of the generator. */

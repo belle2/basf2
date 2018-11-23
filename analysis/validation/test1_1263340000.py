@@ -187,7 +187,7 @@ cutAndCopyList('pi+:lowp', 'pi+:95effptcut', '0.06<useCMSFrame(p)<0.25')
 
 # pi0
 # KSs
-loadStdKS()
+stdKshorts()
 vertexKFit('K_S0:all', 0.001)
 cutAndCopyList('K_S0:sig', 'K_S0:all', 'distance>0.5 and significanceOfDistance>2')
 # Photons

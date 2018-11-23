@@ -156,8 +156,8 @@ void ECLTrackShowerMatchModule::event()
     // and on the extrapolated track direction corresponding to the minimum
     // distance among the two lines.
     // if more than one track is related to a shower the one with highest momentum is used
-    double lTrk, lShower;
     if (shower.getIsTrack()) {
+      double lTrk, lShower;
       computeDepth(shower, lTrk, lShower);
       B2DEBUG(29, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
       shower.setTrkDepth(lTrk);

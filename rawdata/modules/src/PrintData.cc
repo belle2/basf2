@@ -41,6 +41,10 @@ PrintDataModule::PrintDataModule() : Module()
   m_ncpr = 0;
   m_nftsw = 0;
   m_print_cnt = 0;
+  m_start_utime = 0;
+  for (int i = 0; i < 10; i++) hist[ i ] = NULL;
+  for (int i = 0; i < 1000; i++) prev_tv_eve[ i ] = 0;
+  prev_tv_pos = 0;
 
 
 }

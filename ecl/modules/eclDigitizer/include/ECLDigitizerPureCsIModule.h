@@ -75,7 +75,7 @@ namespace Belle2 {
 
   private:
     /** ECL ring ID. */
-    int m_thetaID[ECL::EclConfigurationPure::m_nch];
+    int m_thetaID[ECL::EclConfigurationPure::m_nch] {};
     /** Returns ring ID for a certain crystal. */
     void mapGeometry();
     /** Returns 1 if corresponding crystal is set as pure CsI crystal. */
@@ -125,10 +125,8 @@ namespace Belle2 {
     std::vector<ECLNoiseData> m_noise;
     /** read Shaper-DSP data from root file. */
     void readDSPDB();
-
     /** Event number */
-    int    m_nEvent;
-
+    int m_nEvent = 0;
     /** Module parameters. */
     /** Ring ID of first pure CsI ring. */
     int m_thetaIdMin;

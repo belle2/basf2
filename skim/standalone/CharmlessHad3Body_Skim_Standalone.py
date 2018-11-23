@@ -11,9 +11,9 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdLightMesons import *
-from stdCharged import stdLoosePi
-from stdCharged import stdLooseK
+from skim.standardlists.lightmesons import *
+from stdCharged import stdPi
+from stdCharged import stdK
 from stdPi0s import loadStdSkimPi0
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
@@ -36,9 +36,9 @@ inputMdstList('MC9', fileList)
 
 # Load particle lists
 stdPhotons('loose')
-stdLooseK()
+stdK('loose')
 stdKshorts()
-stdLoosePi()
+stdPi('loose')
 stdPi0s('loose')
 stdPi0s('all')
 loadStdSkimPi0()

@@ -52,7 +52,7 @@ inputMdstList('default', filelistSIG)
 # use standard final state particle lists
 #
 # creates "mu+:loose" ParticleList (and c.c.)
-stdLooseMu()
+stdMu('loose')
 
 # create Ks -> pi+ pi- list from V0
 # keep only candidates with 0.4 < M(pipi) < 0.6 GeV

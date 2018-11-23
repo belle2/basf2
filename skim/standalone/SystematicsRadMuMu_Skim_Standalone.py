@@ -11,7 +11,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
@@ -27,8 +27,7 @@ fileList = [
 
 
 inputMdstList('MC9', fileList)
-
-loadStdCharged()
+stdMu('all')
 
 from skim.systematics import SystematicsRadMuMuList
 SysList = SystematicsRadMuMuList()

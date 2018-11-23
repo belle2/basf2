@@ -1211,6 +1211,9 @@ namespace Belle2 {
 
   void TOPDatabaseImporter::correctTOPPmtQE()
   {
+    B2ERROR("Function disabled since the corrected payload TOPPmtQEs already imported");
+    return;
+
     DBArray<TOPPmtQE> pmtQEData;
     DBImportArray<TOPPmtQE> pmtQECorrected;
 

@@ -43,7 +43,7 @@ void TRGECLUnpackerModule::terminate()
 {
 
   // Debug
-  cout << "total TRG ECL events : " << n_basf2evt << endl;
+  //  cout << "total TRG ECL events : " << n_basf2evt << endl;
 }
 
 void TRGECLUnpackerModule::initialize()

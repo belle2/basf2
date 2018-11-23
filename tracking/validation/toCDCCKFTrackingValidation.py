@@ -6,7 +6,7 @@
   <contact>glazov@mail.desy.de</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>toCDCCKFTrackingValidation.root</output>
-  <description>This module validates that legendre track finding is capable of reconstructing tracks in Y(4S) runs.</description>
+  <description>This module validates ToCDCCKF module using Y(4S) runs.</description>
 </header>
 """
 

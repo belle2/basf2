@@ -160,20 +160,15 @@ namespace Belle2 {
 
 
     }
-    TrgEclCluster* obj_cluster = new TrgEclCluster();
+    TrgEclCluster obj_cluster;
     if (TCId.size() > 0) {
 
-      // TrgEclCluster obj_cluster;
-      obj_cluster->setClusteringMethod(_Clustering);
-      obj_cluster->setEventId(m_nEvent);
-      obj_cluster->setICN(TCId, TCEnergy, TCTiming);
-      //    Module::~TRGECLRa
-      // int icn = obj_cluster->getICNFwBr();
-      // int icnfwd  = obj_cluster->getICNSub(0);
-      //      int icnbr   = obj_cluster->getICNSub(1);
-      // int icnbwd = obj_cluster->getICNSub(2);
+      obj_cluster.setClusteringMethod(_Clustering);
+      obj_cluster.setEventId(m_nEvent);
+      obj_cluster.setICN(TCId, TCEnergy, TCTiming); // Make Cluster
+      obj_cluster.save(m_nEvent); // Save Clusters to TRGECLCluster
+
     }
-    delete obj_cluster;
 
     int Timing = ((HitFineTime >> 3) & 0xF) + ((HitRevoFAM & 0x7F) << 4);
 

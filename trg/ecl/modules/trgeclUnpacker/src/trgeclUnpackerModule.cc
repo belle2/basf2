@@ -43,7 +43,7 @@ void TRGECLUnpackerModule::terminate()
 {
 
   // Debug
-  //    cout << "total TRG ECL events : " << n_basf2evt << endl;
+  cout << "total TRG ECL events : " << n_basf2evt << endl;
 }
 
 void TRGECLUnpackerModule::initialize()
@@ -69,12 +69,6 @@ void TRGECLUnpackerModule::event()
       if (nodeid == 0x13) {
         readCOPPEREvent(raw_trgarray[i], j, nwords);
         n_basf2evt++;
-        // Debug
-        // if(n_basf2evt % 1000 == 0){
-        //     printf("%.5dK", (int)n_basf2evt / 1000);
-        //     fflush(stdout);
-        //     printf("\r");
-        // }
       }
     }
   }

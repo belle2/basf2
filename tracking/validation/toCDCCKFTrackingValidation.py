@@ -44,13 +44,18 @@ class toCDCCKF(TrackingValidationRun):
         path.add_module("ToCDCCKF",
                         inputWireHits="CDCWireHitVector",
                         inputRecoTrackStoreArrayName="RecoTracksSVD",
-                        relatedRecoTrackStoreArrayName="RecoTracks",
+                        relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
                         relationCheckForDirection="backward",
-                        outputRecoTrackStoreArrayName="RecoTracks",
+                        outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
                         outputRelationRecoTrackStoreArrayName="RecoTracksSVD",
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.75},
                         pathFilter="arc_length")
+
+        path.add_module("RelatedTracksCombiner",
+                        CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
+                        VXDRecoTracksStoreArrayName="RecoTracksSVD",
+                        recoTracksStoreArrayName="RecoTracks")
 
     tracking_coverage = {
         'UsePXDHits': False,

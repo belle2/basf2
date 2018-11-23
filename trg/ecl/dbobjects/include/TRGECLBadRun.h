@@ -11,8 +11,8 @@
 // $Log$
 //-----------------------------------------------------------
 
-#ifndef TRGECLTMMPARA_H
-#define TRGECLTMMPARA_H
+#ifndef TRGECLBADRUN_H
+#define TRGECLBADRUN_H
 
 #include <TObject.h>
 #include <TVector3.h>

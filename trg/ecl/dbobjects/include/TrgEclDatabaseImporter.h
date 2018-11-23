@@ -51,12 +51,16 @@ namespace Belle2 {
     // TMM Parameters
     //------------------------------------
     void importTMMParameter(std::string);
-
     //-----------------------------------
     // ETM Parameters
     //------------------------------------
     /** Import ETM Parameters */
     void importETMParameter(std::string);
+    //-----------------------------------
+    // Bad Run List
+    //------------------------------------
+    /** Import Bad Run Number */
+    void importBadRunNumber(std::string);
 
     /**Print TC energy Threshold*/
     void printTCThreshold();

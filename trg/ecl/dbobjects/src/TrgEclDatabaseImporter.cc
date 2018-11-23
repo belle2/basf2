@@ -31,6 +31,7 @@
 #include "trg/ecl/dbobjects/TRGECLFAMPara.h"
 #include "trg/ecl/dbobjects/TRGECLTMMPara.h"
 #include "trg/ecl/dbobjects/TRGECLETMPara.h"
+#include "trg/ecl/dbobjects/TRGECLBadRun.h"
 
 #include "trg/ecl/TrgEclMapping.h"
 
@@ -189,9 +190,8 @@ namespace Belle2 {
       B2ERROR("openFile: " << InputFileName << " *** failed to open");
       return;
     }
-    //  cout << "Import FAM Parameters  " << endl;
+
     DBImportArray<TRGECLTMMPara> tmmpara;
-    //  fampara.construct();
 
     int FPGAversion;
     stream >> FPGAversion ;
@@ -215,7 +215,7 @@ namespace Belle2 {
       B2ERROR("openFile: " << InputFileName << " *** failed to open");
       return;
     }
-    //  cout << "Import FAM Parameters  " << endl;
+
     DBImportArray<TRGECLETMPara> etmpara;
 
     int FPGAversion;
@@ -271,6 +271,33 @@ namespace Belle2 {
     etmpara.import(iov);
 
     B2RESULT("ETM Parameters are imported to database.");
+
+  }
+
+  void TrgEclDatabaseImporter::importBadRunNumber(std::string InputFileName)
+  {
+    std::ifstream stream;
+    stream.open(InputFileName.c_str());
+    if (!stream) {
+      B2ERROR("openFile: " << InputFileName << " *** failed to open");
+      return;
+    }
+
+    DBImportArray<TRGECLBadRun> badrun;
+
+    int BadRunNumber;
+    while (!stream.eof()) {
+
+      stream >> BadRunNumber ;
+      badrun.appendNew(BadRunNumber);
+    }
+    stream.close();
+    //Import to DB
+    IntervalOfValidity iov(startExp, startRun, endExp, endRun);
+
+    badrun.import(iov);
+
+    B2RESULT("BadRunList are imported to database.");
 
   }
 

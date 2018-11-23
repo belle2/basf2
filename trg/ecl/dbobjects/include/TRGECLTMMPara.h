@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
     //! the class title
-    ClassDef(TRGECLTMMPara, 0); /*< the class title */
+    ClassDef(TRGECLTMMPara, 1); /*< the class title */
   };
 } //! end namespace Belle2
 

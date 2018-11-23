@@ -553,7 +553,7 @@ def command_dump(args, db):
     ``b2conditionsdb iov``), the payload name and its revision in the central
     database, or directly specify a local database payload file.
 
-    .. rubic:: Examples
+    .. rubric:: Examples
 
     Dump the content of a previously downloaded payload file::
 

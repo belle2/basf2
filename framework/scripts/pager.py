@@ -18,19 +18,26 @@ class Pager(object):
     """
     Context manager providing page-wise output using ``less`` for
     some Python code. Output is delayed until all commands are
-    finished.
+    finished. Paging will only be active if the output is to a terminal and not
+    piped into a file or to a different program.
+
+    You can set the environment variable ``$PAGER`` to an empty string to
+    disable paging or to a different program (for example ``more``) which should
+    retrieve the output and display it.
 
     >>> with Pager():
     >>>     for i in range(30):
     >>>         print("This is an example on how to use the pager.")
 
-    @param prompt a string argument allows overriding
-                  the description provided by ``less``. Special characters may need
-                  escaping. By default, the temporary filename is shown.
-    @param quit_if_one_screen a bool indicating whether the Pager should quit
-        automatically if the content fits on one screen. This implies that the
-        content stays visible on pager exit. True is similar to the behavior of
-        :program:`git diff`, False is similar to :program:`git --help`
+    Parameters:
+        prompt (str): a string argument allows overriding the description
+            provided by ``less``. Special characters may need escaping.
+            Will only be shown if pagind is used the pager is actually ``less``.
+        quit_if_one_screen (bool): indicating whether the Pager should quit
+            automatically if the content fits on one screen. This implies that
+            the content stays visible on pager exit. True is similar to the
+            behavior of :program:`git diff`, False is similar to :program:`git
+            --help`
     """
 
     def __init__(self, prompt=None, quit_if_one_screen=False):
@@ -48,9 +55,9 @@ class Pager(object):
         #: Pager subprocess
         self._pager_process = None
         #: Original file descriptor for stdout before entering the context
-        self._original_stdout_fd = os.dup(sys.stdout.fileno())
+        self._original_stdout_fd = None
         #: Original file descriptor for stderr before entering the context
-        self._original_stderr_fd = os.dup(sys.stderr.fileno())
+        self._original_stderr_fd = None
         #: Original sys.__stdout__ before entering the context
         self._original_stdout = None
         #: Original sys.__stderr__ before entering the context
@@ -64,9 +71,14 @@ class Pager(object):
         # save old sys.__stderr__ and sys.__stdout__ objects
         self._original_stderr = sys.__stderr__
         self._original_stderr = sys.__stdout__
-        # and duplicate the curent output file descriptors
-        self._original_stdout_fd = os.dup(sys.stdout.fileno())
-        self._original_stderr_fd = os.dup(sys.stderr.fileno())
+        try:
+            # and duplicate the curent output file descriptors
+            self._original_stdout_fd = os.dup(sys.stdout.fileno())
+            self._original_stderr_fd = os.dup(sys.stderr.fileno())
+        except Exception:
+            # jupyter notebook stdout/stderr objects don't have a fileno so
+            # don't support paging
+            return
 
         # this is a bit annoying: Usually in python the __stdout__ and
         # sys.__stderr__ point to the original stdout/stderr. However we modify

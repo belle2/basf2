@@ -553,19 +553,19 @@ def command_dump(args, db):
     ``b2conditionsdb iov``), the payload name and its revision in the central
     database, or directly specify a local database payload file.
 
-    Examples:
+    .. rubric:: Examples
 
-        Dump the content of a previously downloaded payload file::
+    Dump the content of a previously downloaded payload file::
 
-          $ b2conditionsdb dump -f localdb/dbstore_BeamParameters_rev_59449.root
+        $ b2conditionsdb dump -f localdb/dbstore_BeamParameters_rev_59449.root
 
-        Dump the content of a payload by name and revision directly from the central database::
+    Dump the content of a payload by name and revision directly from the central database::
 
-          $ b2conditionsdb dump -r BeamParameters 59449
+        $ b2conditionsdb dump -r BeamParameters 59449
 
-        Or directly by payload id from a previous call to ``b2conditionsdb iov``
+    Or directly by payload id from a previous call to ``b2conditionsdb iov``::
 
-          $ b2conditionsdb dump -i 59685
+        $ b2conditionsdb dump -i 59685
     """
     if db is None:
         group = args.add_mutually_exclusive_group(required=True)
@@ -576,6 +576,11 @@ def command_dump(args, db):
         args.add_argument("--show-typenames", default=False, action="store_true",
                           help="If given show the type names of all classes. "
                           "This makes output more crowded but can be helpful for complex objects.")
+        args.add_argument("--show-streamerinfo", default=False, action="store_true",
+                          help="If given show the StreamerInfo for the classes in the the payload file. "
+                          "This can be helpful to find out which version of a payload object "
+                          "is included and what are the members")
+
         return
 
     payload = None
@@ -620,7 +625,7 @@ def command_dump(args, db):
         del payload, base, url
 
     # late import of ROOT because of all the side effects
-    from ROOT import TFile, TBufferJSON
+    from ROOT import TFile, TBufferJSON, cout
 
     # remote http opening or local file
     tfile = TFile.Open(filename)
@@ -634,7 +639,6 @@ def command_dump(args, db):
         return 1
 
     json_str = TBufferJSON.ConvertToJSON(obj)
-    tfile.Close()
 
     def drop_fbits(obj):
         """
@@ -651,12 +655,23 @@ def command_dump(args, db):
         return obj
 
     with Pager(f"Contents of Payload {name}, revision {revision} (id {payloadId})", True):
+        if args.show_streamerinfo:
+            B2INFO("StreamerInfo of Payload {name}, revision {revision} (id {payloadId})")
+            tfile.ShowStreamerInfo()
+            # sadly this prints to std::cout or even stdout but doesn't flush ... so we have
+            # to make sure std::cout is flushed before printing anything else
+            cout.flush()
+            # and add a newline
+            print()
+
         B2INFO(f"Contents of Payload {name}, revision {revision} (id {payloadId})")
         # load the json as python object dropping some things we don't want to
         # print
         obj = json.loads(json_str.Data(), object_hook=drop_fbits)
         # print the object content using pretty print with a certain width
         pprint.pprint(obj, compact=True, width=shutil.get_terminal_size((80, 20))[0])
+
+    tfile.Close()
 
 
 class FullHelpAction(argparse._HelpAction):
@@ -769,6 +784,8 @@ def main():
 
     # disable error summary
     logging.enable_summary(False)
+    # log via python stdout to be able to capture
+    logging.enable_python_logging = True
     # modify logging to remove the useless module: lines
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)

@@ -39,6 +39,19 @@
 namespace Belle2 {
   namespace Variable {
 
+    double eclClusterHadronIntensity(const Particle* particle)
+    {
+      B2WARNING("eclClusterHadronIntensity will be removed in release-04.  eclPulseShapeDiscriminationMVA variable introduced in release-03 should be used in place of eclClusterHadronIntensity.");
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          return cluster->getClusterHadronIntensity();
+        } else
+          return -1.0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
     double eclPulseShapeDiscriminationMVA(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();

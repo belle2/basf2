@@ -86,6 +86,7 @@ namespace Belle2 {
       m_logEnergy(-5.),
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.),
+      m_ClusterHadronIntensity(0.),
       m_PulseShapeDiscriminationMVA(0.5),
       m_NumberOfHadronDigits(0.) {}
 
@@ -161,6 +162,9 @@ namespace Belle2 {
 
     /** Set E9/E21 energy ratio. */
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
+
+    /** set Cluster Hadron Component Intensity. */
+    void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
 
     /** set Pulse Shape Discrimination MVA */
     void setPulseShapeDiscriminationMVA(double PulseShapeDiscriminationMVA) { m_PulseShapeDiscriminationMVA = PulseShapeDiscriminationMVA; }
@@ -239,6 +243,9 @@ namespace Belle2 {
 
     /** Return E9/E21 (shower shape variable). */
     double getE9oE21() const { return m_E9oE21; }
+
+    /** Return Cluster hadron intensity*/
+    double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
 
     /** Return MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.*/
     double getPulseShapeDiscriminationMVA() const { return m_PulseShapeDiscriminationMVA; }
@@ -418,12 +425,15 @@ namespace Belle2 {
     /** MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. Classifier value is 1.0 EM showers and 0.0 for hadronic showers. */
     Double32_t  m_PulseShapeDiscriminationMVA;  //[0.0, 1.0, 18]
 
+    /** Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. Will be removed in release-04*/
+    Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
+
     /** Number of hadron digits in cluster (pulse shape discrimination variable).  Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component.*/
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
     ClassDef(ECLCluster, 12);
-    // 12: Replaced m_ClusterHadronIntensity with m_PulseShapeDiscriminationMVA
+    // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.
     // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.

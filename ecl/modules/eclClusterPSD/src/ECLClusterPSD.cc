@@ -217,6 +217,8 @@ void ECLClusterPSDModule::event()
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
 
+    double cluster2CTotalEnergy = 0;
+    double cluster2CHadronEnergy = 0;
     double numberofHadronDigits = 0;
     double nWaveforminCluster = 0;
 
@@ -234,18 +236,23 @@ void ECLClusterPSDModule::event()
         const double digit2CTotalEnergy = caldigit->getTwoComponentTotalEnergy();
         const double digit2CHadronComponentEnergy = caldigit->getTwoComponentHadronEnergy();
 
+        cluster2CTotalEnergy += digit2CTotalEnergy;
+        cluster2CHadronEnergy += digit2CHadronComponentEnergy;
+
         if (digit2CTotalEnergy < 0.6) {
           if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits += weight;
         } else {
           const double digitHadronComponentIntensity = digit2CHadronComponentEnergy / digit2CTotalEnergy;
           if (digitHadronComponentIntensity > m_CrystalHadronIntensityThreshold)  numberofHadronDigits += weight;
         }
+
         nWaveforminCluster += weight;
+
       }
     }
 
     if (nWaveforminCluster > 0) {
-
+      if (cluster2CTotalEnergy != 0) shower.setShowerHadronIntensity(cluster2CHadronEnergy / cluster2CTotalEnergy);
       //evaluates mva classifier only if waveforms are available in the cluster
       const double mvaout = evaluateMVA(&shower);
       shower.setPulseShapeDiscriminationMVA(mvaout);
@@ -254,6 +261,7 @@ void ECLClusterPSDModule::event()
       shower.addStatus(ECLShower::c_hasPulseShapeDiscrimination);
 
     } else {
+      shower.setShowerHadronIntensity(0);
       shower.setPulseShapeDiscriminationMVA(0.5);
       shower.setNumberOfHadronDigits(0);
     }

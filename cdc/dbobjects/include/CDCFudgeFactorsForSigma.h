@@ -18,27 +18,19 @@
 namespace Belle2 {
 
   /**
-   * Database object for energy-deposit to ADC-count conversion.
+   * Database object for fudge factors for CDC space resol. Needed both for MC and data production. This object would probably be tentative; may be merged into the CDCSpaceResols object in future...
    */
-  class CDCEDepToADCConversions: public TObject {
+  class CDCFudgeFactorsForSigma: public TObject {
   public:
 
     /**
      * Default constructor
      */
-    CDCEDepToADCConversions() {}
+    CDCFudgeFactorsForSigma() {}
 
     /**
-     * Set conversion parameterization mode
-     */
-    void setParamMode(unsigned short mode)
-    {
-      m_paramMode = mode;
-    }
-
-    /**
-     * Set group id (parameterized per group)
-     * id=0: superLayerID; =1: layerID; =1: wireID
+     * Set group id (factors per group)
+     * id=0: all-wires; >=1: not ready
      */
     void setGroupID(unsigned short mode)
     {
@@ -46,21 +38,13 @@ namespace Belle2 {
     }
 
     /**
-     * Set the conv. paramseters in the list
-     * @param id superLayerid(0-8), laerID(0-55) or wireID
-     * @param params parameters for conversion
+     * Set the factors in the list
+     * @param id laerID(0-55) or wireID
+     * @param factors factors
      */
-    void setParams(unsigned short id, const std::vector<float>& params)
+    void setFactors(unsigned short id, const std::vector<float>& factors)
     {
-      m_cvs.insert(std::pair<unsigned short, std::vector<float>>(id, params));
-    }
-
-    /**
-     * Get mode of conversion parameterization
-     */
-    unsigned short getParamMode() const
-    {
-      return m_paramMode;
+      m_ffs.insert(std::pair<unsigned short, std::vector<float>>(id, factors));
     }
 
     /**
@@ -76,29 +60,29 @@ namespace Belle2 {
      */
     unsigned short getEntries() const
     {
-      return m_cvs.size();
+      return m_ffs.size();
     }
 
     /**
      * Get the whole list
      */
-    std::map<unsigned short, std::vector<float>> getParams() const
+    std::map<unsigned short, std::vector<float>> getFactors() const
     {
-      return m_cvs;
+      return m_ffs;
     }
 
     /**
-     * Get the conv. parameters for the id
+     * Get the factors for the id
      * @param  id layerID or wireID
-     * @return conversion paramseters for the id
+     * @return fudge factors for the id
      */
-    const std::vector<float>& getParams(unsigned short id) const
+    const std::vector<float>& getFactors(unsigned short id) const
     {
-      std::map<unsigned short, std::vector<float>>::const_iterator it = m_cvs.find(id);
-      if (it != m_cvs.end()) {
+      std::map<unsigned short, std::vector<float>>::const_iterator it = m_ffs.find(id);
+      if (it != m_ffs.end()) {
         return it->second;
       } else {
-        B2FATAL("Specified id not found in getParams !");
+        B2FATAL("Specified id not found in getFactors !");
       }
     }
 
@@ -108,12 +92,11 @@ namespace Belle2 {
     void dump() const
     {
       std::cout << " " << std::endl;
-      std::cout << "Edep-to-ADC conversion list" << std::endl;
-      std::cout << "#entries= " << m_cvs.size() << std::endl;
-      std::cout << m_paramMode << std::endl;
-      std::cout << "in order of id and parameters" << std::endl;
+      std::cout << "Fudge factor list" << std::endl;
+      std::cout << "#entries= " << m_ffs.size() << std::endl;
+      std::cout << "in order of id and factors" << std::endl;
 
-      for (auto const& ent : m_cvs) {
+      for (auto const& ent : m_ffs) {
         std::cout << ent.first;
         unsigned short np = (ent.second).size();
         for (unsigned short i = 0; i < np; ++i) {
@@ -148,11 +131,11 @@ namespace Belle2 {
     */
 
   private:
-    unsigned short m_paramMode = 0; /*!< Mode for parameterization */
-    unsigned short m_groupID = 0;   /*!< Group id (parameterized per group) */
-    std::map<unsigned short, std::vector<float>> m_cvs; /**< cv list */
+    unsigned short m_groupID = 0;   /*!< Group id (factors per group) */
+    std::map<unsigned short, std::vector<float>> m_ffs; /**< cv list */
 
-    ClassDef(CDCEDepToADCConversions, 2); /**< ClassDef */
+    ClassDef(CDCFudgeFactorsForSigma, 1); /**< ClassDef */
   };
 
 } // end namespace Belle2
+

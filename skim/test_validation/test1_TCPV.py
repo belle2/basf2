@@ -24,8 +24,9 @@ from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *
 from stdV0s import *
-from stdLightMesons import *
-from stdDiLeptons import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import loadStdDiLeptons
+
 from skimExpertFunctions import *
 
 
@@ -37,9 +38,13 @@ inputMdstList('MC9', fileList, path=tcpvskimpath)
 loadStdSkimPi0(path=tcpvskimpath)
 loadStdSkimPhoton(path=tcpvskimpath)
 stdPi0s('loose', path=tcpvskimpath)
-loadStdCharged(path=tcpvskimpath)
+stdPi('loose', path=tcpvskimpath)
+stdK('loose', path=tcpvskimpath)
+stdE('loose', path=tcpvskimpath)
+stdMu('loose', path=tcpvskimpath)
+stdPi('all', path=tcpvskimpath)
 stdPhotons('loose', path=tcpvskimpath)
-loadStdKS(path=tcpvskimpath)
+stdKshorts(path=tcpvskimpath)
 loadStdDiLeptons(True, path=tcpvskimpath)
 loadStdLightMesons(path=tcpvskimpath)
 cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=tcpvskimpath)

@@ -23,8 +23,20 @@ using namespace ECL;
 REG_MODULE(ECLPacker)
 
 ECLPackerModule::ECLPackerModule() :
-  m_compressMode(false),
-  m_eclRawCOPPERs("", DataStore::c_Event)
+  m_bufPos(0),
+  m_bufLength(0),
+  m_bitPos(0),
+  m_EclWaveformSamples(),
+  m_eclMapper(),
+  m_eclRawCOPPERs("", DataStore::c_Event),
+  adcBuffer_temp(),
+  collectorMaskArray(),
+  shaperMaskArray(),
+  shaperADCMaskArray(),
+  shaperNWaveform(),
+  shaperNHits(),
+  iEclDigIndices(),
+  iEclWfIndices()
 {
   setDescription("The module reads ECLDigits from the DataStore and writes ECLRaw data.");
   addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string("/ecl/data/ecl_channels_map.txt"));
@@ -34,15 +46,10 @@ ECLPackerModule::ECLPackerModule() :
   addParam("PackWfRareFactor", m_WaveformRareFactor, "Pack ADC samples for one of N events. No waveform is packed if 0", 100);
 
   m_EvtNum = 0;
-
-  iEclDigIndices = new int[ECL_TOTAL_CHANNELS];
-  iEclWfIndices  = new int[ECL_TOTAL_CHANNELS];
 }
 
 ECLPackerModule::~ECLPackerModule()
 {
-  delete[] iEclDigIndices;
-  delete[] iEclWfIndices;
 }
 
 void ECLPackerModule::initialize()
@@ -252,9 +259,10 @@ void ECLPackerModule::event()
           const int amp = m_eclDigits[i_digit]->getAmp();
           const int chi = m_eclDigits[i_digit]->getChi();
           int tim = 0;
-          int chi_mantissa = 0, chi_exponent = 0;
           if (qua == 2) {
             // pack chisquare
+
+            int chi_mantissa = 0, chi_exponent = 0;
             int n_bits = ceil(log2(double(chi)));
             if (n_bits > 9) {
               chi_exponent = ceil(float(n_bits - 9) / 2.0);
@@ -265,6 +273,7 @@ void ECLPackerModule::event()
             }
             tim = (chi_exponent << 9) | chi_mantissa;
           } else {
+            // pack time
             tim = m_eclDigits[i_digit]->getTimeFit();
           }
           unsigned int hit_data = ((qua & 3) << 30) & 0xC0000000;
@@ -286,11 +295,10 @@ void ECLPackerModule::event()
           B2DEBUG(200, "i_wf = " << i_wf);
           m_eclDsps[i_wf]->getDspA(m_EclWaveformSamples); // Check this method in implementation of ECLDsp.h!!!
 
-          unsigned int adc_data_base = 0;
-          unsigned int adc_data_diff_width = 0;
-          unsigned int adc_data_offset = 0;
-
           if (m_compressMode) {
+            unsigned int adc_data_base = 0;
+            unsigned int adc_data_diff_width = 0;
+
             // calculate adc_data_base and adc_data_diff_width for compressed mode
             unsigned int ampMin = m_EclWaveformSamples[0];
             unsigned int ampMax = m_EclWaveformSamples[0];
@@ -311,7 +319,7 @@ void ECLPackerModule::event()
             B2DEBUG(250, "Width = " << adc_data_diff_width << " Base = " << adc_data_base);
 
             for (unsigned int iSample = 0; iSample < ECL_ADC_SAMPLES_PER_CHANNEL; iSample++) {
-              adc_data_offset = m_EclWaveformSamples[iSample] - adc_data_base;
+              unsigned int adc_data_offset = m_EclWaveformSamples[iSample] - adc_data_base;
               B2DEBUG(250, "offset = " << adc_data_offset);
               writeNBits(adcBuffer_temp, adc_data_offset, adc_data_diff_width);
             }

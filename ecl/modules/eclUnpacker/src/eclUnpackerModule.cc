@@ -83,9 +83,11 @@ REG_MODULE(ECLUnpacker)
 ECLUnpackerModule::ECLUnpackerModule() :
   m_EvtNum(0),
   m_bufPtr(0),
-  m_bitPos(0),
-  m_bufLength(0),
   m_bufPos(0),
+  m_bufLength(0),
+  m_bitPos(0),
+  m_storeTrigTime(0),
+  m_storeUnmapped(0),
   m_tagsReportedMask(0),
   m_phasesReportedMask(0),
   m_badHeaderReportedMask(0),

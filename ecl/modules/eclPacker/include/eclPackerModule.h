@@ -52,7 +52,7 @@ namespace Belle2 {
 
   private:
     /** Event number */
-    int    m_EvtNum;
+    int m_EvtNum;
 
     /** position in the  data array */
     int m_bufPos;
@@ -103,10 +103,10 @@ namespace Belle2 {
     int shaperNHits[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
 
     /** indexes of related eclDigits*/
-    int* iEclDigIndices;
+    int iEclDigIndices[ECL::ECL_TOTAL_CHANNELS];
 
     /** indexes of related waveforms*/
-    int* iEclWfIndices;
+    int iEclWfIndices[ECL::ECL_TOTAL_CHANNELS];
 
     //DataStore variables
     StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/

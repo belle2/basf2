@@ -12,7 +12,7 @@
 		<radius unit="mm"> 80.000</radius>
 		<slantedAngle unit="deg"> 11.900</slantedAngle>
 		<slantedRadius unit="mm"> 66.890</slantedRadius>
-		<Sensor type="Slanted1" id="1" unit="mm"> 149.042</Sensor> 
+		<Sensor type="Slanted1" id="1" unit="mm"> 149.042</Sensor>
 		<Sensor type="Origami1" id="2" unit="mm">  24.760</Sensor>
 		<Sensor type="Barrel2"  id="3" unit="mm">-100.240</Sensor>
 	</Ladder>
@@ -68,15 +68,15 @@
 			<DepletionVoltage unit="V">40.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
 			<BackplaneCapacitanceU unit="pF/cm">0.11</BackplaneCapacitanceU>
-			<InterstripCapacitanceU unit="pF/cm">0.45</InterstripCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">0.85</InterstripCapacitanceU>
                         <CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
 			<BackplaneCapacitanceV unit="pF/cm">0.42</BackplaneCapacitanceV>
-			<InterstripCapacitanceV unit="pF/cm">0.58</InterstripCapacitanceV>
+			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
-                        <ADUEquivalentU unit="e">270</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">259</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">820</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">716</ElectronicNoiseV>
+                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">900</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">700</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -97,7 +97,7 @@
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
 			<stepSize unit="um">5</stepSize>
-		
+
 			<!-- Sensor operation parameters. -->
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
@@ -108,14 +108,14 @@
 			<InterstripCapacitanceV unit="pF/cm">0.58</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <!-- All except backward sensors are on Origami -->
-                        <ADUEquivalentU unit="e">297</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">231</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">984</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">527</ElectronicNoiseV>
-                        <ADUEquivalentSbwU unit="e">274</ADUEquivalentSbwU>
-                        <ADUEquivalentSbwV unit="e">260</ADUEquivalentSbwV>
-                        <ElectronicNoiseSbwU unit="e">853</ElectronicNoiseSbwU>
-                        <ElectronicNoiseSbwV unit="e">716</ElectronicNoiseSbwV>
+                        <ADUEquivalentU unit="e">410</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">395</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">1181</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">685</ElectronicNoiseV>
+                        <ADUEquivalentSbwU unit="e">375</ADUEquivalentSbwU>
+                        <ADUEquivalentSbwV unit="e">375</ADUEquivalentSbwV>
+                        <ElectronicNoiseSbwU unit="e">950</ElectronicNoiseSbwU>
+                        <ElectronicNoiseSbwV unit="e">750</ElectronicNoiseSbwV>
 		</Active>
 	</SensorBase>
 
@@ -136,7 +136,7 @@
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
 			<stepSize unit="um">5</stepSize>
-			
+
 			<!-- Sensor operation parameters. -->
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
 			<BiasVoltage unit="V">100</BiasVoltage>
@@ -146,10 +146,10 @@
 			<BackplaneCapacitanceV unit="pF/cm">0.26</BackplaneCapacitanceV>
 	        	<InterstripCapacitanceV unit="pF/cm">0.41</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
-                        <ADUEquivalentU unit="e">320</ADUEquivalentU>
-                        <ADUEquivalentV unit="e">323</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">1054</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">798</ElectronicNoiseV>
+                        <ADUEquivalentU unit="e">425</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">440</ADUEquivalentV>
+                        <ElectronicNoiseU unit="e">1065</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">763</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">
@@ -404,7 +404,7 @@
 		<activeChipID>1</activeChipID>
 		<width  unit="mm">8.055</width>
 		<length unit="mm">7.100</length>
-		<height unit="mm">0.009</height>	
+		<height unit="mm">0.009</height>
 	</Component>
 
     <Component name="Keratherm">

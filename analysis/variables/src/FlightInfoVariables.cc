@@ -12,6 +12,7 @@
 #include <analysis/variables/FlightInfoVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <framework/utilities/Conversion.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -35,9 +36,19 @@ namespace Belle2 {
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
-        if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
-        if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+        if (particle->hasExtraInfo("prodVertX") ||
+            particle->hasExtraInfo("prodVertY") ||
+            particle->hasExtraInfo("prodVertY")) {
+          if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
+          if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
+          if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+        } else {
+          //if no production vertex assume the particle originated at the ip
+          PCmsLabTransform T;
+          mumvtxX = T.getBeamParams().getVertex().X();
+          mumvtxY = T.getBeamParams().getVertex().Y();
+          mumvtxZ = T.getBeamParams().getVertex().Z();
+        }
       }
       //daughter vertex
       double vtxX =  daughter->getX();
@@ -65,15 +76,28 @@ namespace Belle2 {
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
-        if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
-        if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
-        if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
-        if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
-        if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
-        if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
-        if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
-        if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+        if (particle->hasExtraInfo("prodVertSxx") ||
+            particle->hasExtraInfo("prodVertSxy") ||
+            particle->hasExtraInfo("prodVertSxz") ||
+            particle->hasExtraInfo("prodVertSyx") ||
+            particle->hasExtraInfo("prodVertSyy") ||
+            particle->hasExtraInfo("prodVertSyz") ||
+            particle->hasExtraInfo("prodVertSzx") ||
+            particle->hasExtraInfo("prodVertSzy") ||
+            particle->hasExtraInfo("prodVertSzz")) {
+          if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
+          if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
+          if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
+          if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
+          if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
+          if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
+          if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
+          if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
+          if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+        } else {
+          PCmsLabTransform T;
+          mumCov = T.getBeamParams().getCovVertex();
+        }
       }
       //compute total covariance matrix
       //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
@@ -121,9 +145,19 @@ namespace Belle2 {
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
-        if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
-        if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+        if (particle->hasExtraInfo("prodVertX") ||
+            particle->hasExtraInfo("prodVertY") ||
+            particle->hasExtraInfo("prodVertY")) {
+          if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
+          if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
+          if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+        } else {
+          //if no production vertex assume the particle originated at the ip
+          PCmsLabTransform T;
+          mumvtxX = T.getBeamParams().getVertex().X();
+          mumvtxY = T.getBeamParams().getVertex().Y();
+          mumvtxZ = T.getBeamParams().getVertex().Z();
+        }
       }
       //daughter vertex
       double vtxX =  daughter->getX();
@@ -154,17 +188,29 @@ namespace Belle2 {
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
-        if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
-        if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
-        if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
-        if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
-        if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
-        if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
-        if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
-        if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+        if (particle->hasExtraInfo("prodVertSxx") ||
+            particle->hasExtraInfo("prodVertSxy") ||
+            particle->hasExtraInfo("prodVertSxz") ||
+            particle->hasExtraInfo("prodVertSyx") ||
+            particle->hasExtraInfo("prodVertSyy") ||
+            particle->hasExtraInfo("prodVertSyz") ||
+            particle->hasExtraInfo("prodVertSzx") ||
+            particle->hasExtraInfo("prodVertSzy") ||
+            particle->hasExtraInfo("prodVertSzz")) {
+          if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
+          if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
+          if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
+          if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
+          if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
+          if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
+          if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
+          if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
+          if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+        } else {
+          PCmsLabTransform T;
+          mumCov = T.getBeamParams().getCovVertex();
+        }
       }
-
       //compute total covariance matrix
       //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
 
@@ -240,27 +286,18 @@ namespace Belle2 {
     double flightDistance(const Particle* part)
     {
       double flightDistanceErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
       return getFlightInfoDistanceBtw(part, part, flightDistanceErr);
     }
 
     double flightTime(const Particle* part)
     {
       double flightTimeErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
       return getFlightInfoTimeBtw(part, part, flightTimeErr);
     }
 
     double flightDistanceErr(const Particle* part)
     {
       double flightDistanceErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
       getFlightInfoDistanceBtw(part, part, flightDistanceErr);
       return flightDistanceErr;
 
@@ -269,9 +306,6 @@ namespace Belle2 {
     double flightTimeErr(const Particle* part)
     {
       double flightTimeErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
       getFlightInfoTimeBtw(part, part, flightTimeErr);
       return flightTimeErr;
     }

@@ -603,13 +603,13 @@ namespace Belle2 {
     VARIABLE_GROUP("Flight Information");
     // Daughters
     REGISTER_VARIABLE("flightTime", flightTime,
-                      "Returns the flight time of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight time of particle using its production and decay vertex. If particle has no production vertex the interaction point is used instead.");
     REGISTER_VARIABLE("flightDistance", flightDistance,
-                      "Returns the flight distance of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight distance of particle using its production and decay vertex. If particle has no production vertex the interaction point is used instead.");
     REGISTER_VARIABLE("flightTimeErr", flightTimeErr,
-                      "Returns the flight time uncertainty of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight time uncertainty of particle using its production and decay vertex. If particle has no production vertex the interaction point is used instead");
     REGISTER_VARIABLE("flightDistanceErr", flightDistanceErr,
-                      "Returns the flight distance uncertainty of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight distance uncertainty of particle using its production and decay vertex. If particle has no production vertex the interaction point is used instead.");
     REGISTER_VARIABLE("flightTimeOfDaughter(daughterN, gdaughterN = -1)", flightTimeOfDaughter,
                       "Returns the flight time between mother and daughter particle with daughterN index.");
     REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN, gdaughterN = -1)", flightTimeOfDaughterErr,

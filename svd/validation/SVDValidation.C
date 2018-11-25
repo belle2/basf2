@@ -295,7 +295,7 @@ void SVDValidation()
   TFile* inputSimhit = TFile::Open("../SVDValidationTTreeSimhit.root");
   
   // open the output file for the validation histograms
-  TFile* output = TFile::Open("../SVDValidation.root", "recreate");
+  TFile* output = TFile::Open("SVDValidation.root", "recreate");
   
   //------------------------------------------------------------------  
   // loads ttrees

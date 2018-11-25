@@ -9,15 +9,15 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu, stdPr
 from stdPhotons import *
-from stdLightMesons import *
+from skim.standardlists.lightmesons import *
 from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 skimCode = encodeSkimName('TauLFV')
 
@@ -30,6 +30,20 @@ fileList = [
 ]
 
 inputMdstList('MC9', fileList)
+
+stdPi0s('loose')
+stdPi('all')
+stdK('all')
+stdPi('loose')
+stdK('loose')
+stdPr('loose')
+stdE('loose')
+stdMu('loose')
+loadStdSkimPhoton()
+loadStdSkimPi0()
+stdKshorts()
+stdPhotons('loose')
+loadStdLightMesons()
 
 # Tau Skim
 from skim.taupair import *

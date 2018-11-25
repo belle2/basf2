@@ -102,7 +102,7 @@ void KKGenInputModule::event()
     MCParticleGraph::GraphParticle* p = &mpg[i];
     int moID = 0;
     char buf[200];
-    sprintf(buf, "IntC: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
+    sprintf(buf, "IntC: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
             p->getIndex(), p->getStatus(), p->getPDG(), moID,
             p->getFirstDaughter(), p->getLastDaughter(),
             p->get4Vector().Px(), p->get4Vector().Py(),

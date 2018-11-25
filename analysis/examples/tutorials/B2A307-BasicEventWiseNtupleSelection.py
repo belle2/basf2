@@ -70,11 +70,11 @@ applyEventCuts('R2EventLevel < 0.3')
 # create and fill final state ParticleLists
 # use standard lists
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdPi('loose')
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdK('loose')
 # creates "mu+:loose" ParticleList (and c.c.)
-stdLooseMu()
+stdMu('loose')
 
 # creates "pi0:looseFit" ParticleList
 stdPi0s('looseFit')

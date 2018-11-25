@@ -604,7 +604,9 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the MCParticle object that was used to create this Particle (ParticleType == c_MCParticle).
-     * NULL pointer is returned, if the Particle was not made from MCParticle.
+     * Returns the best MC match for this particle (if ParticleType == c_Track or c_ECLCluster or c_KLMCluster)
+     * NULL pointer is returned, if the Particle was not made from MCParticle or not matched.
+     *
      * @return const pointer to the MCParticle
      */
     const MCParticle* getMCParticle() const;
@@ -648,6 +650,11 @@ namespace Belle2 {
     {
       return m_extraInfo.size();
     }
+
+    /**
+     * Sets the user defined extraInfo. Adds it if necessary, overwrites existing ones if they share the same name.
+     * */
+    void writeExtraInfo(const std::string& name, const float value);
 
     /** Sets the user-defined data of given name to the given value.
      *

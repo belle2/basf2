@@ -22,4 +22,5 @@
 #pragma link C++ class Belle2::ECLTrackClusterMatchingThresholds;
 #pragma link C++ class Belle2::ECLTrackClusterMatchingParameterizations+;
 #pragma link C++ class Belle2::ECLHadronComponentEmissionFunction;
+#pragma link C++ class Belle2::ECLDspData;
 #endif

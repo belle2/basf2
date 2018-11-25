@@ -203,7 +203,7 @@ namespace Belle2 {
     }
 
 
-    /** converts the SpacePoints into a SecMapTrainerTC */
+    /** converts the SpacePoints into a SecMapTrainerTC and stores it to m_TCs */
     void convertSP2TC(
       std::vector<std::pair< FullSecID, const SpacePoint*> >& goodSPs,
       unsigned tcID, double pTValue, int pdgCode)
@@ -376,10 +376,24 @@ namespace Belle2 {
 
       // catch tracks which have not enough accepted hits.
       B2DEBUG(10, "SecMapTrainer::storeTC: the TC has now nHits/threshold: " << goodSPs.size() << "/" << m_config.nHitsMin);
-      if (goodSPs.size() < m_config.nHitsMin) return false;
+      if (goodSPs.size() < m_config.nHitsMin || goodSPs.size() == 0) return false;
 
       // want to have hits going from outer to inner ones
       if (tc.isOutgoing()) std::reverse(goodSPs.begin(), goodSPs.end());
+
+
+      // enfoce a direction in the layer numbering, because else this could generate loops in the sectormap
+      int prevLayerNum = goodSPs.at(0).second->getVxdID().getLayerNumber();
+      for (auto& spCand : goodSPs) {
+        int thisLayerNum = spCand.second->getVxdID().getLayerNumber();
+        // allow same layer
+        if (thisLayerNum > prevLayerNum) {
+          B2DEBUG(20, "Rejected TC due to layer ordering of SPs! previous layer: " << prevLayerNum << " this layer: " << thisLayerNum);
+          return false;
+        }
+        prevLayerNum = thisLayerNum;
+      }
+
 
       convertSP2TC(goodSPs, iD, tc.getMomSeed().Perp(), tc.getPdgCode());
 

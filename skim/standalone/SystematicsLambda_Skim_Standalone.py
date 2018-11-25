@@ -10,12 +10,11 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
 from stdPhotons import *
 from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import sys
 import os
@@ -28,9 +27,8 @@ fileList = [
 
 
 inputMdstList('MC9', fileList)
-loadStdCharged()
 
-from SystematicsLambda_List import *
+from skim.systematics import *
 SysList = SystematicsLambdaList()
 
 skimCode = encodeSkimName('SystematicsLambda')

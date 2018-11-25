@@ -10,15 +10,15 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from stdLightMesons import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
 from stdPhotons import *
 from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 import sys
 import os
 import glob
@@ -32,24 +32,23 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 stdPi0s('loose')
-# stdPhotons('loose')
 stdPhotons('tight')  # also builds loose list
 loadStdSkimPhoton()
 loadStdSkimPi0()
-loadStdCharged()
+stdK('loose')
+stdPi('loose')
 stdK('95eff')
 stdPi('95eff')
 stdKshorts()
 stdPhotons('loose')
 stdE('95eff')
 stdMu('95eff')
-stdMu('90eff')
 
 loadStdLightMesons()
 
 
 # EWP Skim
-from BtoXll_List import *
+from skim.ewp import B2XllList
 XllList = B2XllList()
 skimCode1 = encodeSkimName('BtoXll')
 skimOutputUdst(skimCode1, XllList)
@@ -57,7 +56,7 @@ summaryOfLists(XllList)
 
 
 # EWP Skim
-from BtoXgamma_List import *
+from skim.ewp import B2XgammaList
 XgammaList = B2XgammaList()
 skimCode2 = encodeSkimName('BtoXgamma')
 skimOutputUdst(skimCode2, XgammaList)

@@ -44,7 +44,7 @@ stdPi('all')
 rankByLowest('pi+:all', 'p', outputVariable='pi_p_rank')
 variables.addAlias('pi_p_rank', 'extraInfo(pi_p_rank)')
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdK('loose')
 
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 reconstructDecay('D0 -> K-:loose pi+:all', '1.8 < M < 1.9')

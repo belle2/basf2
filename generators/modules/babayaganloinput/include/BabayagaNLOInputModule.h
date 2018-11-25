@@ -74,8 +74,6 @@ namespace Belle2 {
     double m_eMin; /**< Minimum energy for leptons in the final state, in GeV. */
     double m_epsilon; /**< Soft/hard photon separator in units of CMS/2. */
     double m_maxAcollinearity; /**< maximum acollinearity angle between finale state leptons in degrees. */
-    double m_cmsEnergy; /**< CMS energy. */
-    int m_boostMode; /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     double m_fMax; /**< Maximum differential cross section weight. */
     int m_nSearchMax; /**< Events used to search maximum of differential cross section. */
     int m_nPhot; /**< fixed number of nphot (hard) photons are generated. A negative value means all possible photons. */

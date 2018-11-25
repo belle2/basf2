@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    ECLDatabaseImporter(std::vector<std::string> inputFileNames, std::string m_name);
+    ECLDatabaseImporter(std::vector<std::string> inputFileNames, const std::string& m_name);
 
     /**
      * Destructor.

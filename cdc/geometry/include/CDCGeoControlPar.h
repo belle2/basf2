@@ -256,6 +256,22 @@ namespace Belle2 {
       }
 
       /**
+       * Set fudge factor for space resol. for data
+       */
+      void setFudgeFactorForSpaceResolForData(double input)
+      {
+        m_fudgeFactorForSpaceResolForData = input;
+      }
+
+      /**
+       * Set fudge factor for space resol. for MC
+       */
+      void setFudgeFactorForSpaceResolForMC(double input)
+      {
+        m_fudgeFactorForSpaceResolForMC = input;
+      }
+
+      /**
        * Set mapper geometry flag
        */
       void setMapperGeometry(bool torf)
@@ -497,6 +513,22 @@ namespace Belle2 {
       }
 
       /**
+       * Get fudge factor for space resol for data
+       */
+      double getFudgeFactorForSpaceResolForData() const
+      {
+        return m_fudgeFactorForSpaceResolForData;
+      }
+
+      /**
+       * Get fudge factor for space resol for MC
+       */
+      double getFudgeFactorForSpaceResolForMC() const
+      {
+        return m_fudgeFactorForSpaceResolForMC;
+      }
+
+      /**
        * Get mapper geometry flag
        */
       bool getMapperGeometry()
@@ -542,6 +574,8 @@ namespace Belle2 {
       bool m_chMapInputType = true;  /**< Input type for channel map. */
 
       double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
+      double m_fudgeFactorForSpaceResolForData = 1.; /**< Fudge factor for space resol. for data */
+      double m_fudgeFactorForSpaceResolForMC = 1.; /**< Fudge factor for space resol. for MC */
       bool m_mapperGeometry = false;  /**< B-field mapper geometry flag. */
       double m_mapperPhiAngle = 16.7; /**< B-field mapper phi-angle (deg). */
 

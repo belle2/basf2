@@ -47,8 +47,8 @@ namespace Belle2 {
      * Input:
      * @param sensor ID: identity of the sensor for which the
      * calibration is required
-     * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
      * @param size: cluster size
      * @param raw_error : error provided by the algorithm in the SVDSimpleClusterizer
      *
@@ -63,8 +63,8 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              0,
-                              m_aDBObjPtr->sideIndex(isU)).getCorrectedValue(raw_error, size);
+                              m_aDBObjPtr->sideIndex(isU),
+                              0).getCorrectedValue(raw_error, size);
 
     }
 
@@ -73,8 +73,8 @@ namespace Belle2 {
      * Input:
      * @param sensor ID: identity of the sensor for which the
      * calibration is required
-     * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
      *
      * Output: double corresponding to the minimum SNR for the seed
      */
@@ -86,8 +86,8 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              0,
-                              m_aDBObjPtr->sideIndex(isU)).minSeedSNR;
+                              m_aDBObjPtr->sideIndex(isU),
+                              0).minSeedSNR;
 
     }
 
@@ -96,8 +96,8 @@ namespace Belle2 {
      * Input:
      * @param sensor ID: identity of the sensor for which the
      * calibration is required
-     * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
      *
      * Output: double corresponding to the minimum SNR for the adjacent
      */
@@ -109,8 +109,8 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              0,
-                              m_aDBObjPtr->sideIndex(isU)).minAdjSNR;
+                              m_aDBObjPtr->sideIndex(isU),
+                              0).minAdjSNR;
 
     }
 
@@ -119,8 +119,8 @@ namespace Belle2 {
      * Input:
      * @param sensor ID: identity of the sensor for which the
      * calibration is required
-     * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
      *
      * Output: double corresponding to the minimum SNR for the cluster
      */
@@ -132,8 +132,8 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(),
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
-                              0,
-                              m_aDBObjPtr->sideIndex(isU)).minClusterSNR;
+                              m_aDBObjPtr->sideIndex(isU),
+                              0).minClusterSNR;
 
     }
 
@@ -143,8 +143,8 @@ namespace Belle2 {
      * Input:
      * @param sensor ID: identity of the sensor for which the
      * calibration is required
-     * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
      * @param svdTime: cluster time
      * @param svdTimeError: cluster time error
      * @param t0: event t0
@@ -162,8 +162,8 @@ namespace Belle2 {
       return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
                                    sensorID.getLadderNumber(),
                                    sensorID.getSensorNumber(),
-                                   0,
-                                   m_aDBObjPtr->sideIndex(isU)).isOnTime(svdTime, svdTimeError, t0, t0Error);
+                                   m_aDBObjPtr->sideIndex(isU),
+                                   0).isOnTime(svdTime, svdTimeError, t0, t0Error);
 
     }
 
@@ -173,8 +173,8 @@ namespace Belle2 {
      * Input:
      * @param sensor ID: identity of the sensor for which the
      * calibration is required
-     * @param strip: NOT USED
      * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
      *
      * Output:
      */
@@ -186,8 +186,8 @@ namespace Belle2 {
       return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
                                    sensorID.getLadderNumber(),
                                    sensorID.getSensorNumber(),
-                                   0,
-                                   m_aDBObjPtr->sideIndex(isU)).getMinTime();
+                                   m_aDBObjPtr->sideIndex(isU),
+                                   0).getMinTime();
 
     }
 

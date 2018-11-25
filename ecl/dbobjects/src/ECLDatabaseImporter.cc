@@ -52,7 +52,7 @@
 using namespace std;
 using namespace Belle2;
 
-ECLDatabaseImporter::ECLDatabaseImporter(vector<string> inputFileNames, std::string name)
+ECLDatabaseImporter::ECLDatabaseImporter(vector<string> inputFileNames, const std::string& name)
 {
   //input file names
   for (auto& inputFileName : inputFileNames)

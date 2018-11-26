@@ -28,6 +28,9 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
+stdPi('all')
+stdPhotons('all')
+
 # Tau Skim
 from skim.taupair import *
 tauList = TauList()

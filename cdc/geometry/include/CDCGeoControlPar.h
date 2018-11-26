@@ -128,6 +128,14 @@ namespace Belle2 {
       }
 
       /**
+       * Set input type for fudge factor
+       */
+      void setFFactorInputType(bool input)
+      {
+        m_fFactorInputType = input;
+      }
+
+      /**
        * Set input type for prop. speed
        */
       void setPropSpeedInputType(bool input)
@@ -165,6 +173,14 @@ namespace Belle2 {
       void setChMapInputType(bool input)
       {
         m_chMapInputType = input;
+      }
+
+      /**
+       * Set input type for edep-to-adc
+       */
+      void setEDepToADCInputType(bool input)
+      {
+        m_eDepToADCInputType = input;
       }
 
       /**
@@ -208,6 +224,14 @@ namespace Belle2 {
       }
 
       /**
+       * Set input file name for fudge factor
+       */
+      void setFFactorFile(std::string& input)
+      {
+        m_fFactorFile = input;
+      }
+
+      /**
        * Set input file name for prop-speed
        */
       void setPropSpeedFile(std::string& input)
@@ -248,6 +272,14 @@ namespace Belle2 {
       }
 
       /**
+       * Set input file name for edep-to-adc
+       */
+      void setEDepToADCFile(std::string& input)
+      {
+        m_eDepToADCFile = input;
+      }
+
+      /**
        * Set max. space resolution (cm)
        */
       void setMaxSpaceResolution(double input)
@@ -256,19 +288,19 @@ namespace Belle2 {
       }
 
       /**
-       * Set fudge factor for space resol. for data
+       * Set additional fudge factor for space resol. for data
        */
-      void setFudgeFactorForSpaceResolForData(double input)
+      void setAddFudgeFactorForSigmaForData(double input)
       {
-        m_fudgeFactorForSpaceResolForData = input;
+        m_addFudgeFactorForSigmaForData = input;
       }
 
       /**
-       * Set fudge factor for space resol. for MC
+       * Set additional fudge factor for space resol. for MC
        */
-      void setFudgeFactorForSpaceResolForMC(double input)
+      void setAddFudgeFactorForSigmaForMC(double input)
       {
-        m_fudgeFactorForSpaceResolForMC = input;
+        m_addFudgeFactorForSigmaForMC = input;
       }
 
       /**
@@ -385,6 +417,14 @@ namespace Belle2 {
       }
 
       /**
+       * Get input type for fuge factor
+       */
+      bool getFFactorInputType()
+      {
+        return m_fFactorInputType;
+      }
+
+      /**
        * Get input type for prop. speed
        */
       bool getPropSpeedInputType()
@@ -422,6 +462,14 @@ namespace Belle2 {
       bool getChMapInputType()
       {
         return m_chMapInputType;
+      }
+
+      /**
+       * Get input type for edeptoadc
+       */
+      bool getEDepToADCInputType()
+      {
+        return m_eDepToADCInputType;
       }
 
       /**
@@ -465,6 +513,14 @@ namespace Belle2 {
       }
 
       /**
+       * Get input file name for fudge factor
+       */
+      std::string getFFactorFile() const
+      {
+        return m_fFactorFile;
+      }
+
+      /**
        * Get input file name for prop-speed
        */
       std::string getPropSpeedFile() const
@@ -505,6 +561,14 @@ namespace Belle2 {
       }
 
       /**
+       * Get input file name for edeptoadc
+       */
+      std::string getEDepToADCFile() const
+      {
+        return m_eDepToADCFile;
+      }
+
+      /**
        * Get max. space resolution
        */
       double getMaxSpaceResolution()
@@ -513,19 +577,19 @@ namespace Belle2 {
       }
 
       /**
-       * Get fudge factor for space resol for data
+       * Get additional fudge factor for space resol for data
        */
-      double getFudgeFactorForSpaceResolForData() const
+      double getAddFudgeFactorForSigmaForData() const
       {
-        return m_fudgeFactorForSpaceResolForData;
+        return m_addFudgeFactorForSigmaForData;
       }
 
       /**
-       * Get fudge factor for space resol for MC
+       * Get additional fudge factor for space resol for MC
        */
-      double getFudgeFactorForSpaceResolForMC() const
+      double getAddFudgeFactorForSigmaForMC() const
       {
-        return m_fudgeFactorForSpaceResolForMC;
+        return m_addFudgeFactorForSigmaForMC;
       }
 
       /**
@@ -567,15 +631,17 @@ namespace Belle2 {
       bool m_misalignmentInputType = true;  /**< Input type for misalignment. */
       bool m_xtInputType = true;  /**< Input type for xt. */
       bool m_sigmaInputType = true;  /**< Input type for sigma. */
+      bool m_fFactorInputType = true;  /**< Input type for fudge factor. */
       bool m_propSpeedInputType = true;  /**< Input type for prop. speed. */
       bool m_t0InputType = true;  /**< Input type for t0. */
       bool m_twInputType = true;  /**< Input type for time-walk. */
       bool m_bwInputType = true;  /**< Input type for bad wire. */
       bool m_chMapInputType = true;  /**< Input type for channel map. */
+      bool m_eDepToADCInputType = false;  /**< Input type for edep-to-adc. */
 
       double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
-      double m_fudgeFactorForSpaceResolForData = 1.; /**< Fudge factor for space resol. for data */
-      double m_fudgeFactorForSpaceResolForMC = 1.; /**< Fudge factor for space resol. for MC */
+      double m_addFudgeFactorForSigmaForData = 1.; /**< Additional fudge factor for space resol. for data */
+      double m_addFudgeFactorForSigmaForMC = 1.; /**< Additional fudge factor for space resol. for MC */
       bool m_mapperGeometry = false;  /**< B-field mapper geometry flag. */
       double m_mapperPhiAngle = 16.7; /**< B-field mapper phi-angle (deg). */
 
@@ -584,11 +650,13 @@ namespace Belle2 {
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */
       std::string m_xtFile = "xt_v3_chebyshev.dat.gz";  /**< Xt file. */
       std::string m_sigmaFile = "sigma_v2.dat";  /**< Sigma file. */
+      std::string m_fFactorFile = "fFactor.dat";  /**< Fudge factor file. */
       std::string m_propSpeedFile = "propspeed_v0.dat";  /**< Prop-apeed file. */
       std::string m_t0File = "t0_v1.dat";  /**< T0 file. */
       std::string m_twFile = "tw_off.dat";  /**< Time walk file. */
       std::string m_bwFile = "badwire_v1.dat";  /**< Bad wire file. */
       std::string m_chMapFile = "ch_map.dat";  /**< Channel map file. */
+      std::string m_eDepToADCFile = "edeptoadc.dat";  /**< Edep-to-adc file. */
 
       static CDCGeoControlPar* m_pntr;  /*!< Pointer that saves the instance of this class. */
     };

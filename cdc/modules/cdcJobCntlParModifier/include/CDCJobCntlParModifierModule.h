@@ -49,8 +49,8 @@ namespace Belle2 {
     double m_thresholdEnergyDeposit;  /*!< Energy thresh. for G4 step (GeV) */
     double m_minTrackLength;              /*!< Minimum track length for G4 step (cm) */
     double m_maxSpaceResol;   /**< Max. space resolution allowed (cm). */
-    double m_fudgeFactorForSpaceResolForData;   /**< Fudge factor for space resol. for data. */
-    double m_fudgeFactorForSpaceResolForMC;   /**< Fudge factor for space resol. for MC. */
+    double m_addFudgeFactorForSigmaForData;   /**< Additional fudge factor for space resol. for data. */
+    double m_addFudgeFactorForSigmaForMC;   /**< Additional fudge factor for space resol. for MC. */
     bool   m_mapperGeometry;  /**< Mapper geometry flag. */
     double m_mapperPhiAngle;  /**< Mapper phi-angle(deg). */
 
@@ -74,6 +74,7 @@ namespace Belle2 {
     bool m_twInputType;   /**< Time walk input type. */
     bool m_bwInputType;   /**< Bad wire input type. */
     bool m_chMapInputType;   /**< Channel map input type. */
+    bool m_eDepToADCInputType;   /**< EDep-to-adc input type. */
 
     std::string m_displacementFile;  /**< Displacement file. */
     std::string m_alignmentFile;  /**< Alignment file. */
@@ -85,7 +86,7 @@ namespace Belle2 {
     std::string m_twFile;   /**< Time walk file. */
     std::string m_bwFile;   /**< Bad wire file. */
     std::string m_chMapFile;   /**< Channel map file. */
-
+    std::string m_eDepToADCFile;   /**< EDep-to-adc file. */
   };
 
 } // end of Belle2 namespace

@@ -37,6 +37,13 @@
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsBitmap> +;
 #pragma link C++ class Belle2::SVDCalibrationsBitmap +;
 
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar< Belle2::SVDCoGCalibrationFunction >> +;
+#pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDCoGCalibrationFunction> +;
+#pragma link C++ class Belle2::SVDCoGCalibrationFunction +;
+
+#pragma link C++ struct Belle2::SVDStripCalAmp +;
+#pragma link C++ struct Belle2::SVDTriggerBinDependentConstants +;
+
 #pragma link C++ class Belle2::SVDCalibrationsBase< Belle2::SVDCalibrationsScalar< Belle2::SVDClusterCuts>> +;
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDClusterCuts> +;
 #pragma link C++ struct Belle2::SVDClusterCuts +;
@@ -44,7 +51,5 @@
 #pragma link C++ class Belle2::SVDCalibrationsBase< Belle2::SVDCalibrationsScalar< Belle2::SVDHitTimeSelectionFunction>> +;
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDHitTimeSelectionFunction> +;
 #pragma link C++ class Belle2::SVDHitTimeSelectionFunction +;
-
-
 
 #endif

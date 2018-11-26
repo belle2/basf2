@@ -47,10 +47,7 @@ namespace Belle2 {
     /** Set flag for saving analysis table*/
     void SetAnaTagFlag(int anatagflag) {_AnaTag = anatagflag;}
     /** Set Threshold */
-    void SetThreshold(std::vector<int> threshold)
-    {
-      Threshold = threshold;
-    };
+    void SetThreshold(int threshold) {_Threshold = threshold;}
     /** Set Beam Background Tag */
     void SetBeamBkgTag();
 
@@ -99,7 +96,7 @@ namespace Belle2 {
     /** Fill Analysis table */
     int _AnaTag;
     /** Threshold (MeV) */
-    std::vector<int> Threshold;
+    double _Threshold;
     /** Fill Analysis table */
     int EventId;
 

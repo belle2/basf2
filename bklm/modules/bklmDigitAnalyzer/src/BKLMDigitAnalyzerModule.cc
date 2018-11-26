@@ -59,18 +59,27 @@ void BKLMDigitAnalyzerModule::beginRun()
 
   for (int fb = 0; fb < 2; fb++) {
 
-    m_histoLayerPerSector[fb] = createTH2("SectLay" + label[fb], label[fb] + " Hitmap -- run" + runNumberTString, 31, -0.5, 15.,
-                                          "Layer (0-based)", 17, -0.5, 8., "BF Sector", 0, m_histoList);
+    m_histoLayerVsSector[fb] = createTH2("SectLay" + label[fb], label[fb] + " Hitmap -- run" + runNumberTString, 31, -0.5, 15.,
+                                         "Layer (0-based)", 17, -0.5, 8., "BF Sector", 0, m_histoList);
 
-    for (int iSector = 0; iSector < 8; iSector++) {
+    for (int isRPCorPhi = 0; isRPCorPhi < 2; isRPCorPhi++) {
 
-      TString iSectorTString(toString(iSector).c_str());
-      TString nameSector = label[fb] + iSectorTString;
+      if (isRPCorPhi == 0)
+        m_histoLayerVsSectorPerPlane[fb][isRPCorPhi] = createTH2("SectLayPlaneZ" + label[fb],
+                                                                 label[fb] + " Hitmap of plane z -- run" + runNumberTString, 31, -0.5, 15., "Layer (0-based)", 17, -0.5, 8., "BF Sector", 0,
+                                                                 m_histoList);
+      else
+        m_histoLayerVsSectorPerPlane[fb][isRPCorPhi] = createTH2("SectLayPlanePhi" + label[fb],
+                                                                 label[fb] + " Hitmap of plane phi -- run" + runNumberTString, 31, -0.5, 15., "Layer (0-based)", 17, -0.5, 8., "BF Sector", 0,
+                                                                 m_histoList);
 
-      m_histoLayer[fb][iSector] = createTH1("Layer" + nameSector, nameSector + " Layer -- run" + runNumberTString, 31, -0.5, 15.,
-                                            "Layer (0-based)", "Counts", 1, m_histoList);
+      for (int iSector = 0; iSector < 8; iSector++) {
 
-      for (int isRPCorPhi = 0; isRPCorPhi < 2; isRPCorPhi++) {
+        TString iSectorTString(toString(iSector).c_str());
+        TString nameSector = label[fb] + iSectorTString;
+
+        m_histoLayer[fb][iSector] = createTH1("Layer" + nameSector, nameSector + " Layer -- run" + runNumberTString, 31, -0.5, 15.,
+                                              "Layer (0-based)", "Counts", 1, m_histoList);
 
         if (isRPCorPhi == 0) {
 
@@ -116,7 +125,9 @@ void BKLMDigitAnalyzerModule::event()
 
       BKLMDigitRaw* digitRaw = digit.getRelatedTo<BKLMDigitRaw>();
 
-      m_histoLayerPerSector[1 - digit.isForward()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
+      m_histoLayerVsSector[1 - digit.isForward()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
+
+      m_histoLayerVsSectorPerPlane[1 - digit.isForward()][digit.isPhiReadout()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
 
       m_histoLayer[1 - digit.isForward()][digit.getSector() - 1]->Fill(digit.getLayer() - 1);
 

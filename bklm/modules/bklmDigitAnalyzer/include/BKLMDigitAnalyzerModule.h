@@ -81,7 +81,9 @@ namespace Belle2 {
     TList* m_histoList;
 
     // Histograms
-    TH2F* m_histoLayerPerSector[2];
+    TH2F* m_histoLayerVsSector[2];
+
+    TH2F* m_histoLayerVsSectorPerPlane[2][2];
 
     TH1F* m_histoLayer[2][8];
 
@@ -108,7 +110,6 @@ namespace Belle2 {
 
     TH2F* createTH2(const char* name, const char* title, Int_t nBinsX, Double_t minX, Double_t maxX, const char* titleX, Int_t nBinsY,
                     Double_t minY, Double_t maxY, const char* titleY, bool drawStat, TList* histoList = NULL);
-
   };
 
 }

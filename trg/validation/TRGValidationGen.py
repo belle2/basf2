@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# The example of running simulation of L1 trigger
+"""
+<header>
+<output>TRGValidationGen.root</output>
+<contact>Yun-Tsung Lai, ytlai@post.kek.jp</contact>
+<description>This steering file generates 1000 e+/e- particle guns to validate the trg package.</description>
+</header>
+"""
 
 import os
 from basf2 import *

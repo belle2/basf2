@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <output>fullTrackingValidationTable.root</output>
   <input>matching_validation.root</input>
   <description>This module generates events for the validation using the full tracking with a tabular output.</description>

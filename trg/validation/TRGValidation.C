@@ -1,0 +1,100 @@
+void TRGValidation()
+{
+  TChain* tree = new TChain("tree");
+  tree->Add("../TRGValidationGen.root");
+
+  TFile* output = TFile::Open("TRGValidation.root", "recreate");
+
+  TCut mc("abs(MCParticles.m_pdg)==11&&MCParticles.m_status==11");
+  TH1F* d_w = new TH1F("d_w", "d_w", 50, -0.02, 0.02);
+  TH1F* d_w_2 = new TH1F("d_w_2", "d_w_2", 50, -0.02, 0.02);
+  TH1F* d_phi = new TH1F("d_phi", "d_phi", 50, -0.5, 0.5);
+  TH1F* d_phi_2 = new TH1F("d_phi_2", "d_phi_2", 50, -0.5, 0.5);
+  TH1F* d_phi_3 = new TH1F("d_phi_3", "d_phi_3", 50, -0.5, 0.5);
+  TH1F* d_z0_3d = new TH1F("d_z0_3d", "d_z0_3d", 60, -30, 30);
+  TH1F* d_z0_nn = new TH1F("d_z0_nn", "d_z0_nn", 60, -30, 30);
+  TH1F* d_E_ECL = new TH1F("d_E_ECL", "d_E_ECL", 50, -6, 0);
+
+  tree->Draw("TRGCDC2DFinderTracks.m_omega-0.00449/sqrt(MCParticles.m_momentum_x*MCParticles.m_momentum_x+MCParticles.m_momentum_y*MCParticles.m_momentum_y)>>d_w",
+             "MCParticles.m_pdg<0" && mc);
+  tree->Draw("TRGCDC2DFinderTracks.m_omega+0.00449/sqrt(MCParticles.m_momentum_x*MCParticles.m_momentum_x+MCParticles.m_momentum_y*MCParticles.m_momentum_y)>>d_w_2",
+             "MCParticles.m_pdg>0" && mc);
+  tree->Draw("TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x)>>d_phi",
+             "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
+             "fabs(TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x))<3.1415936" && mc);
+  tree->Draw("TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x)-3.1415936>>d_phi_2",
+             "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
+             "TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x)>=3.1415936" && mc);
+  tree->Draw("TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x)+3.1415936>>d_phi_2",
+             "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
+             "TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x)<=-3.1415936" && mc);
+
+  tree->Draw("TRGCDC3DFitterTracks.m_z0-MCParticles.m_productionVertex_z>>d_z0_3d", mc);
+  tree->Draw("TRGCDCNeuroTracks.m_z0-MCParticles.m_productionVertex_z>>d_z0_nn", mc);
+
+  tree->Draw("TRGECLClusters.m_edep-MCParticles.m_energy>>d_E_ECL", mc);
+
+  d_w->Add(d_w_2);
+  d_w->SetLineColor(kBlack);
+  d_w->SetLineWidth(3);
+  d_w->Draw();
+
+  d_w->SetTitle("#Deltaw of CDC 2D finder, w = 0.00449/p_{t}");
+  d_w->GetXaxis()->SetTitle("#Deltaw");
+  d_w->GetYaxis()->SetTitle("Events/(0.08)");
+  d_w->GetYaxis()->SetTitleOffset(1.4);
+  d_w->GetXaxis()->SetTitleSize(0.045);
+  d_w->GetYaxis()->SetLabelSize(0.020);
+
+  d_phi->Add(d_phi_2);
+  d_phi->Add(d_phi_3);
+  d_phi->SetLineColor(kBlack);
+  d_phi->SetLineWidth(3);
+
+  d_phi->SetTitle("#Delta#phi of CDC 2D finder");
+  d_phi->GetXaxis()->SetTitle("#Delta#phi [rad]");
+  d_phi->GetYaxis()->SetTitle("Events/(0.02 rad)");
+  d_phi->GetYaxis()->SetTitleOffset(1.4);
+  d_phi->GetXaxis()->SetTitleSize(0.045);
+  d_phi->GetYaxis()->SetLabelSize(0.020);
+
+  d_z0_3d->SetLineColor(kBlack);
+  d_z0_3d->SetLineWidth(3);
+
+  d_z0_3d->SetTitle("#Deltaz0 of CDC 3D fitter");
+  d_z0_3d->GetXaxis()->SetTitle("#Deltaz0 [cm]");
+  d_z0_3d->GetYaxis()->SetTitle("Events/(1 cm)");
+  d_z0_3d->GetYaxis()->SetTitleOffset(1.4);
+  d_z0_3d->GetXaxis()->SetTitleSize(0.045);
+  d_z0_3d->GetYaxis()->SetLabelSize(0.020);
+
+  d_z0_nn->SetLineColor(kBlack);
+  d_z0_nn->SetLineWidth(3);
+
+  d_z0_nn->SetTitle("#Deltaz0 of CDC Neuro");
+  d_z0_nn->GetXaxis()->SetTitle("#Deltaz0 [cm]");
+  d_z0_nn->GetYaxis()->SetTitle("Events/(1 cm)");
+  d_z0_nn->GetYaxis()->SetTitleOffset(1.4);
+  d_z0_nn->GetXaxis()->SetTitleSize(0.045);
+  d_z0_nn->GetYaxis()->SetLabelSize(0.020);
+
+  d_E_ECL->SetLineColor(kBlack);
+  d_E_ECL->SetLineWidth(3);
+
+  d_E_ECL->SetTitle("#E of ECL clustering");
+  d_E_ECL->GetXaxis()->SetTitle("#DeltaE [GeV]");
+  d_E_ECL->GetYaxis()->SetTitle("Events/(0.12 GeV)");
+  d_E_ECL->GetYaxis()->SetTitleOffset(1.4);
+  d_E_ECL->GetXaxis()->SetTitleSize(0.045);
+  d_E_ECL->GetYaxis()->SetLabelSize(0.020);
+
+  d_w->Write();
+  d_phi->Write();
+  d_z0_3d->Write();
+  d_z0_nn->Write();
+  d_E_ECL->Write();
+  output->Close();
+  delete output;
+
+
+}

@@ -57,6 +57,10 @@ class toCDCCKF(TrackingValidationRun):
                         VXDRecoTracksStoreArrayName="RecoTracksSVD",
                         recoTracksStoreArrayName="RecoTracks")
 
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
+
+        path.add_module('TrackCreator', recoTrackColName='RecoTracks', pdgCodes=[13])
+
     tracking_coverage = {
         'UsePXDHits': False,
         'UseSVDHits': True,
@@ -64,7 +68,11 @@ class toCDCCKF(TrackingValidationRun):
         'WhichParticles': [],
     }
 
+    # Already fitted in the finder_module
+    fit_tracks = False
+    use_fit_information = True
     pulls = True
+    resolution = True
     output_file_name = VALIDATION_OUTPUT_FILE
 
 

@@ -36,7 +36,7 @@ ma.fillParticleListFromMC(decayString='pi-:gen', cut='', path=my_path)
 # and x,y,z components of momenta for generated pions
 #
 # the list of all available variables can be obtained by executing
-# basf2 analysis/scripts/variables.py
+# basf2 analysis/scripts/variables/print_variables.py
 ma.printVariableValues(list_name='K-:gen', var_names=['charge', 'E', 'p'], path=my_path)
 ma.printVariableValues(list_name='pi-:gen', var_names=['charge', 'px', 'py', 'pz'], path=my_path)
 

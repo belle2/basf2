@@ -90,8 +90,9 @@ namespace Belle2 {
     double m_trackPositionResolution;/**< Track position resolution; simulation smearing. */
     double m_trackAngleResolution;   /**< Track direction resolution; simulation smearing. */
     int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-    int    m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
+    int m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
     bool m_align;                    /** If==1 alignment constants are used for global->local track transformation */
+    bool m_alignMirrors;             /** If==1 alignment constants for mirrors are used */
   };
 
 } // Belle2 namespace

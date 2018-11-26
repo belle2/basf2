@@ -54,8 +54,5 @@ void ARICHGlobalAlignment::setTransformation() const
 void ARICHGlobalAlignment::print(const std::string& title) const
 {
   ARICHGeoBase::print(title);
-
-  cout << "Positioning parameters (in Belle II global frame)" << endl;
-  //  ARICHGeoBase::printPlacement(m_dx, m_dy, m_dz, m_drx, m_dry, m_drz);
-
+  m_alignPars.print();
 }

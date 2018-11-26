@@ -148,6 +148,22 @@ void ARICHGeometryConfig::read(const GearDir& content)
     m_mirrors.initializeDefault();
   }
 
+  GearDir mirrDisplParams(content, "MirrorDisplacement");
+
+  for (auto plate : mirrDisplParams.getNodes("Plate")) {
+    int id = plate.getInt("@id");
+    double r = plate.getLength("r");
+    double phi = plate.getAngle("phi");
+    double z = plate.getLength("z");
+    double alpha = plate.getLength("alpha");
+    double beta = plate.getLength("beta");
+    double gamma = plate.getLength("gamma");
+
+    ARICHPositionElement displEl(r * cos(phi), r * sin(phi), z, alpha, beta, gamma);
+    m_mirrorDispl.setDisplacementElement(id, displEl);
+    displEl.print();
+  }
+
   // read and prepare aerogel plane parameters
   GearDir aerogel(content, "Aerogel");
 

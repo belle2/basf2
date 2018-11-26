@@ -11,6 +11,7 @@
 #pragma once
 
 #include <arich/dbobjects/ARICHGeoBase.h>
+#include <framework/gearbox/Unit.h>
 #include <TVector3.h>
 #include <TRotation.h>
 #include <iostream>
@@ -20,13 +21,13 @@ namespace Belle2 {
   /**
    * Alignment element for ARICH.
    */
-  class ARICHAlignmentElement: public ARICHGeoBase {
+  class ARICHPositionElement: public ARICHGeoBase {
   public:
 
     /**
      * Default constructor
      */
-    ARICHAlignmentElement()
+    ARICHPositionElement()
     {}
 
     /**
@@ -39,14 +40,14 @@ namespace Belle2 {
      * @param gamma rotation angle around z
      * @param name object name
      */
-    ARICHAlignmentElement(double x, double y, double z,
-                          double alpha, double beta, double gamma, const std::string& name = "ARICHAlignment"):
+    ARICHPositionElement(double x, double y, double z,
+                         double alpha, double beta, double gamma, const std::string& name = "ARICHAlignment"):
       ARICHGeoBase(name),
       m_x(x), m_y(y), m_z(z),
       m_alpha(alpha), m_beta(beta), m_gamma(gamma)
     {}
 
-    ~ARICHAlignmentElement()
+    ~ARICHPositionElement()
     {}
 
     /**
@@ -66,6 +67,17 @@ namespace Belle2 {
      * @param z translation in z
      */
     void setZ(double z) {m_z = z;}
+
+    /**
+     * Sets x,y from r,phi
+     * @param r radius
+     * @param phi phi angle
+     */
+    void setRPhi(double r, double phi)
+    {
+      m_x = r * cos(phi / Unit::rad);
+      m_y = r * sin(phi / Unit::rad);
+    }
 
     /**
      * Sets rotation around x
@@ -160,7 +172,7 @@ namespace Belle2 {
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Parmeters of alignment element")
+    void print(const std::string& title = "Parmeters of alignment element") const
     {
       std::cout << title << std::endl;
       std::cout << "translations (x,y,z): " << m_x << " " << m_y << " " << m_z << std::endl;
@@ -177,7 +189,7 @@ namespace Belle2 {
     float m_beta = 0;  /**< rotation angle around y */
     float m_gamma = 0; /**< rotation angle around z */
 
-    ClassDef(ARICHAlignmentElement, 1); /**< ClassDef */
+    ClassDef(ARICHPositionElement, 1); /**< ClassDef */
 
   };
 

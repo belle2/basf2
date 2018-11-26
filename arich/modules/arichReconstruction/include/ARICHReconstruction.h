@@ -16,6 +16,7 @@
 #include <arich/dbobjects/ARICHChannelMask.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <arich/dbobjects/ARICHGlobalAlignment.h>
+#include <arich/dbobjects/ARICHMirrorAlignment.h>
 #include "framework/datastore/StoreArray.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
@@ -72,6 +73,12 @@ namespace Belle2 {
     //! Sets track direction resolution (from tracking)
     void setTrackAngleResolution(double aRes);
 
+    void useMirrorAlignment(bool align)
+    {
+      m_alignMirrors = align;
+    };
+
+
   private:
 
     static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize; /**< Number of hypotheses to loop over */
@@ -83,9 +90,11 @@ namespace Belle2 {
     DBObjPtr<ARICHChannelMask> m_chnMask; /**< map of masked channels from the DB */
     DBObjPtr<ARICHChannelMapping> m_chnMap; /**< map x,y channels to asic channels from the DB */
     DBObjPtr<ARICHGlobalAlignment> m_alignp; /**< global alignment parameters from the DB */
+    DBObjPtr<ARICHMirrorAlignment> m_mirrAlign; /**< global alignment parameters from the DB */
 
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */
+    bool   m_alignMirrors; /**< if set to true mirror alignment constants from DB are used*/
 
     unsigned int m_nAerogelLayers; /**< number of aerogel layers */
     double  m_refractiveInd[c_noOfAerogels]; /**< refractive indices of aerogel layers */
@@ -156,7 +165,8 @@ namespace Belle2 {
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
     TVector3 getTrackPositionAtZ(const ARICHTrack& track, double zout);
 
-
+    TVector3 getMirrorPoint(int mirrorID);
+    TVector3 getMirrorNorm(int mirrorID);
 
   };
 

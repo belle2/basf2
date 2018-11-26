@@ -43,6 +43,7 @@ namespace Belle2 {
     m_recPars(),
     m_trackPosRes(0),
     m_trackAngRes(0),
+    m_alignMirrors(true),
     m_nAerogelLayers(0),
     m_storePhot(storePhot)
   {
@@ -160,8 +161,6 @@ namespace Belle2 {
       if (trkangle > 2 * M_PI) trkangle -= 2 * M_PI;
 
       section[1]  = int(trkangle / dangle) + 1;
-
-
     }
 
     bool reflok = false; bool refl = false;
@@ -185,16 +184,14 @@ namespace Belle2 {
       if (angle > 2 * M_PI) angle -= 2 * M_PI;
       double dangle = 2 * M_PI / nmir;
       section[0] = int(angle / dangle) + 1;
-      if (r.Mag() > (r - 2 * m_arichgp->getMirrors().getPoint(section[0])).Mag()) {
+      if (r.Mag() > (r - 2 * getMirrorPoint(section[0])).Mag()) {
         refl = true;
         int nrefl = 2;
         if (section[0] == section[1]) nrefl = 1;
         for (int k = 0; k < nrefl; k++) {
-
           if (!HitsMirror(r0, dirf, section[k])) continue;
-
-          TVector3 mirpoint = m_arichgp->getMirrors().getPoint(section[k]);
-          TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(section[k]);
+          TVector3 mirpoint = getMirrorPoint(section[k]);
+          TVector3 mirnorm = getMirrorNorm(section[k]);
           double s = dirf * mirnorm;
           double s1 = (mirpoint - r0) * mirnorm;
           r = r0 + s1 / s * dirf;
@@ -215,8 +212,8 @@ namespace Belle2 {
   {
 
     if (mirrorID == 0) return hitpos;
-    TVector3 mirpoint = m_arichgp->getMirrors().getPoint(mirrorID);
-    TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
+    TVector3 mirpoint = getMirrorPoint(mirrorID);
+    TVector3 mirnorm = getMirrorNorm(mirrorID);
     return hitpos - 2 * ((hitpos - mirpoint) * mirnorm) * mirnorm;
   }
 
@@ -224,8 +221,8 @@ namespace Belle2 {
   bool ARICHReconstruction::HitsMirror(const TVector3& pos, const TVector3& dir, int mirrorID)
   {
 
-    TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
-    TVector3 mirpoint = m_arichgp->getMirrors().getPoint(mirrorID);
+    TVector3 mirnorm = getMirrorNorm(mirrorID);
+    TVector3 mirpoint = getMirrorPoint(mirrorID);
     TRotation rot = TransformToFixed(mirnorm);
     TVector3 dirTr = rot * dir;
     if (dirTr.Z() < 0) return 0; // comes from outter side
@@ -528,7 +525,7 @@ namespace Belle2 {
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii = fi_cer;
           if (mirr > 0) {
-            double fi_mir = m_arichgp->getMirrors().getNormVector(mirrors[mirr]).XYvector().Phi();
+            double fi_mir = getMirrorNorm(mirrors[mirr]).XYvector().Phi();
             fii = 2 * fi_mir - fi_cer - M_PI;
           }
 
@@ -705,6 +702,24 @@ namespace Belle2 {
     // is it needed to extrapolate to z of aerogel in local frame?? tabun
     arichTrack.setReconstructedValues(locPos, locDir, arichTrack.getMomentum());
     return;
+  }
+
+
+  TVector3 ARICHReconstruction::getMirrorPoint(int mirrorID)
+  {
+
+    TVector3 mirpoint = m_arichgp->getMirrors().getPoint(mirrorID);
+    if (m_alignMirrors && m_mirrAlign.isValid()) mirpoint += m_mirrAlign->getAlignmentElement(mirrorID).getTranslation();
+    return mirpoint;
+
+  }
+
+
+  TVector3 ARICHReconstruction::getMirrorNorm(int mirrorID)
+  {
+    TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
+    if (m_alignMirrors && m_mirrAlign.isValid()) mirnorm.Transform(m_mirrAlign->getAlignmentElement(mirrorID).getRotation());
+    return mirnorm;
   }
 
 

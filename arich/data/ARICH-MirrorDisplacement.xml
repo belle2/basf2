@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<GlobalDisplacement>
-  <x desc="displacement in x" unit="mm">0.0</x>
-  <y desc="displacement in y" unit="mm">0.0</y>
-  <z desc="displacement in z" unit="mm">0</z>
-  <alpha desc="x angle displacement" unit="deg">0.0</alpha>
-  <beta desc="y angle displacement" unit="deg">0.0</beta>
-  <gamma desc="z angle displacement" unit="deg">0.0</gamma>   
-</GlobalDisplacement>
-
-
-<!--MirrorDisplacement>
+<MirrorDisplacement>
   <Plate id="1">
     <r desc="displacement in r" unit="mm">1.0</r>
     <phi desc="displacement in phi" unit="deg">0.0</phi>
@@ -155,4 +145,4 @@
    <beta desc="y angle displacement" unit="deg">0.0</beta>
    <gamma desc="z angle displacement" unit="deg">0.0</gamma>
  </Plate>
-</MirrorDisplacement-->
+</MirrorDisplacement>

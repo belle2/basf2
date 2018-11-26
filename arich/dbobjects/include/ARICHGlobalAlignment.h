@@ -13,7 +13,7 @@
 #include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeoBase.h>
-#include <arich/dbobjects/ARICHAlignmentElement.h>
+#include <arich/dbobjects/ARICHPositionElement.h>
 #include <string>
 #include <TVector3.h>
 #include <TVector2.h>
@@ -81,7 +81,7 @@ namespace Belle2 {
      * Sets alignment parameters (element)
      * @param align alignment element
      */
-    void setAlignmentElement(const ARICHAlignmentElement& align)
+    void setAlignmentElement(const ARICHPositionElement& align)
     {
       m_alignPars = align;
     }
@@ -90,7 +90,7 @@ namespace Belle2 {
      * Returns alignment parameters (element)
      * @return alignment element
      */
-    const ARICHAlignmentElement& getAlignmentElement() const
+    const ARICHPositionElement& getAlignmentElement() const
     {
       return m_alignPars;
     }
@@ -124,12 +124,11 @@ namespace Belle2 {
     TVector3 pointToLocal(const TVector3& point) const;
     TVector3 momentumToLocal(const TVector3& momentum) const;
 
-
   private:
 
     void setTransformation() const;
 
-    ARICHAlignmentElement m_alignPars;
+    ARICHPositionElement m_alignPars;
 
     mutable TRotation* m_rotation = 0 ;
     mutable TRotation* m_rotationInverse = 0;

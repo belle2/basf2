@@ -20,6 +20,7 @@
 #include <arich/simulation/SensitiveDetector.h>
 #include <arich/simulation/SensitiveAero.h>
 #include <simulation/background/BkgSensitiveDetector.h>
+#include <arich/dbobjects/ARICHPositionElement.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -242,8 +243,11 @@ namespace Belle2 {
       double dphi = 2 * M_PI / nMirrors;
       for (int i = 1; i < nMirrors + 1; i++) {
         G4RotationMatrix rotMirror;
-        rotMirror.rotateZ(angl);
-        G4ThreeVector transMirror(mirRad * cos(angl), mirRad * sin(angl), mirZPos + zShift);
+        const ARICHPositionElement& displ = m_config.getMirrorDisplacement().getDisplacementElement(i);
+        rotMirror.rotateX(angl + displ.getAlpha());
+        rotMirror.rotateY(angl + displ.getBeta());
+        rotMirror.rotateZ(angl + displ.getGamma());
+        G4ThreeVector transMirror(mirRad * cos(angl) + displ.getX(), mirRad * sin(angl) + displ.getY(), mirZPos + displ.getX() + zShift);
         new G4PVPlacement(G4Transform3D(rotMirror, transMirror), mirrorLV, "ARICH.mirrorPlate", masterLV, false, i);
         angl += dphi;
       }

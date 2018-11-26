@@ -41,7 +41,8 @@
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHAeroTilesInfo.h>
 #include <arich/dbobjects/ARICHGlobalAlignment.h>
-#include <arich/dbobjects/ARICHAlignmentElement.h>
+#include <arich/dbobjects/ARICHMirrorAlignment.h>
+#include <arich/dbobjects/ARICHPositionElement.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
@@ -206,13 +207,41 @@ void ARICHDatabaseImporter::importGlobalAlignment()
   GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
   GearDir alignPars(content, "GlobalAlignment");
   ARICHGlobalAlignment arichAlign;
-  ARICHAlignmentElement alignel(alignPars.getLength("x"), alignPars.getLength("y"), alignPars.getLength("z"),
-                                alignPars.getAngle("alpha"), alignPars.getAngle("beta"), alignPars.getAngle("gamma"));
+  ARICHPositionElement alignel(alignPars.getLength("x"), alignPars.getLength("y"), alignPars.getLength("z"),
+                               alignPars.getAngle("alpha"), alignPars.getAngle("beta"), alignPars.getAngle("gamma"));
   arichAlign.setAlignmentElement(alignel);
 
   DBImportObjPtr<ARICHGlobalAlignment> importObj;
   importObj.construct(arichAlign);
   importObj.import(m_iov);
+}
+
+
+void ARICHDatabaseImporter::importMirrorAlignment()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir alignPars(content, "MirrorAlignment");
+
+  ARICHMirrorAlignment mirrAlign;
+
+  for (auto plate : alignPars.getNodes("Plate")) {
+    int id = plate.getInt("@id");
+    double r = plate.getLength("r");
+    double phi = plate.getAngle("phi");
+    double z = plate.getLength("z");
+    double alpha = plate.getLength("alpha");
+    double beta = plate.getLength("beta");
+    double gamma = plate.getLength("gamma");
+    ARICHPositionElement alignEl(r * cos(phi), r * sin(phi), z, alpha, beta, gamma);
+    mirrAlign.setAlignmentElement(id, alignEl);
+    alignEl.print();
+  }
+
+  DBImportObjPtr<ARICHMirrorAlignment> importObj;
+  importObj.construct(mirrAlign);
+  importObj.import(m_iov);
+
 }
 
 void ARICHDatabaseImporter::importChannelMask()
@@ -563,6 +592,17 @@ void ARICHDatabaseImporter::printAeroTileInfo()
   tilesInfo->print();
 }
 
+void ARICHDatabaseImporter::printGlobalAlignment()
+{
+  DBObjPtr<ARICHGlobalAlignment> align;
+  align->print();
+}
+
+void ARICHDatabaseImporter::printMirrorAlignment()
+{
+  DBObjPtr<ARICHMirrorAlignment> align;
+  align->print();
+}
 
 // classes for DAQ
 

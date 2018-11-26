@@ -82,12 +82,19 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
 
 void Variable::Manager::printAliases()
 {
-  B2INFO("=========================");
-  B2INFO("Following aliases exists:");
+  long unsigned int longest_alias_size = 0;
   for (auto a : m_alias) {
-    B2INFO("'" << a.first << "' --> '" << a.second << "'");
+    if (a.first.length() > longest_alias_size) {
+      longest_alias_size = a.first.length();
+    }
   }
-  B2INFO("=========================");
+  B2INFO("=====================================");
+  B2INFO("The following aliases are registered:");
+  for (auto a : m_alias) {
+    B2INFO("'" << std::string(a.first, 0, longest_alias_size) << std::string(longest_alias_size - a.first.length(),
+           ' ') << "' --> '" << a.second << "'");
+  }
+  B2INFO("=====================================");
 }
 
 bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)

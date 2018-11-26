@@ -758,7 +758,7 @@ namespace Belle2 {
     }
 
 
-    /*! A module of TRG TRG Unpacker */
+    /*! A module of TRGCDCTSF Unpacker */
     class TRGCDCTSFUnpackerModule : public Module {
 
     public:

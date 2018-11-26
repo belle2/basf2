@@ -56,9 +56,15 @@ void TRGCDCTSFDQMModule::defineHisto()
   dirDQM = NULL;
   dirDQM = oldDir->mkdir("TRGCDCTSF");
   dirDQM->cd();
-  h_nhit = new TH1I("hCDCTSF_nhit", "nhit", 7, 0, 7);
-  h_nhit->SetTitle("test");
-  h_nhit->GetXaxis()->SetTitle("test");
+  //Total number of TSF hits per event in each superlayer
+  h_nhit = new TH1I("hCDCTSF_nhit", "nhit", 10, 0, 10);
+  h_nhit->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, 0));
+  h_nhit->GetXaxis()->SetTitle("Total number of TSF hits/event");
+  //Total number of hits in each TSF
+  h_nhit_tsf = new TH1I("hCDCTSF_nhit_tsf", "nhit_tsf", 200, 0, 200);
+  h_nhit_tsf->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, 0));
+  h_nhit_tsf->GetXaxis()->SetTitle("TSF ID");
+  h_nhit_tsf->GetYaxis()->SetTitle("Total number of hits");
   oldDir->cd();
 }
 
@@ -68,6 +74,7 @@ void TRGCDCTSFDQMModule::beginRun()
   dirDQM->cd();
 
   h_nhit->Reset();
+  h_nhit_tsf->Reset();
 
   oldDir->cd();
 }
@@ -85,30 +92,69 @@ void TRGCDCTSFDQMModule::initialize()
 
 void TRGCDCTSFDQMModule::endRun()
 {
+  dirDQM->cd();
+
+  //Draw and save histograms
   if (m_generatePostscript) {
-    TPostScript* ps = new TPostScript(m_postScriptName.c_str(), 112);
     gStyle->SetOptStat(0);
     TCanvas c1("c1", "", 0, 0, 500, 300);
     c1.cd();
 
+    TPostScript* ps_nhit = new TPostScript((m_postScriptName + ".nhit.ps").c_str(), 112);
     h_nhit->Draw();
     c1.Update();
-    ps->Close();
+    ps_nhit->Close();
+
+    TPostScript* ps_nhit_tsf = new TPostScript((m_postScriptName + ".nhit_tsf.ps").c_str(), 112);
+    h_nhit_tsf->Draw();
+    c1.Update();
+    ps_nhit_tsf->Close();
+
   }
+
+  oldDir->cd();
 }
 
 void TRGCDCTSFDQMModule::event()
 {
 
+  dirDQM->cd();
+
   StoreArray<TRGCDCTSFUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) return;
 
+  //Fill
   int nhit = 0;
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
     nhit += entAry[ii]->m_netfhit;
   }
-
   h_nhit->Fill(nhit);
+
+  int id = 0;
+  for (int ii = 0; ii < entAry.getEntries(); ii++) {
+    id = entAry[ii]->m_trackerhit0id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit1id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit2id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit3id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit4id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit5id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit6id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit7id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit8id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+    id = entAry[ii]->m_trackerhit9id;
+    if (id != 0)h_nhit_tsf->Fill(id);
+  }
+
+  oldDir->cd();
 
 }
 

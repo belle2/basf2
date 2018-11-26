@@ -22,7 +22,6 @@ parser = argparse.ArgumentParser(description="SVD Local Calibrations Importer")
 parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
-parser.add_argument('--hot_xml', metavar='hotStrFile', dest='hot', type=str, nargs=1, help='Hot Strips xml file')
 parser.add_argument(
     '--FADCMasked_xml',
     metavar='FADCMaskedStrFile',
@@ -56,11 +55,6 @@ if args.mapp is not None:
     mappingfile = args.mapp[0]
 else:
     mappingfile = args.mapp
-if args.hot is not None:
-    hotfile = args.hot[0]
-else:
-    hotfile = args.hot
-
 if args.FADCMasked is not None:
     FADCMaskedfile = args.FADCMasked[0]
 else:
@@ -69,7 +63,6 @@ else:
 print('experiment number = ' + str(experiment))
 print('       run number = ' + str(run))
 print('  calibration xml = ' + str(calibfile))
-print('   hot strips xml = ' + str(hotfile))
 print('   FADC Masked strips xml = ' + str(FADCMaskedfile))
 print('      mapping xml = ' + str(mappingfile))
 
@@ -114,12 +107,6 @@ class dbImporterModule(Module):
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
             print("Channel Mapping Imported")
-        if args.hot is not None:
-            # import hot strips: ATTENTION! Do we want to import the hot strips at any
-            # local run? is these fields correctly updated in the xml?
-            dbImporter.importSVDHotStripsCalibrationsFromXML(hotfile)
-            print("Hot Strips List Imported")
-            # dbImporter.importSVDHotStripsCalibrations()
         if args.FADCMasked is not None:
             # import FADCMasked strips
             dbImporter.importSVDFADCMaskedStripsFromXML(FADCMaskedfile)

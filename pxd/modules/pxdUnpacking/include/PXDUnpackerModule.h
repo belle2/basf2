@@ -91,6 +91,10 @@ namespace Belle2 {
       unsigned int m_unpackedEventsCount;
       /** Error counters */
       unsigned int m_errorCounter[PXDError::ONSEN_MAX_TYPE_ERR];
+      /** give verbose unpacking information */
+      bool m_verbose{false};
+      /** flag continue unpacking of frames even after crc error (for debugging) */
+      bool m_continueOnCRCError{false};
 
       /** Input array for PXD Raw. */
       StoreArray<RawPXD> m_storeRawPXD;
@@ -162,8 +166,6 @@ namespace Belle2 {
       PXDError::PXDErrorFlags m_errorMaskPacket;
       /** Error Mask set per packet / event */
       PXDError::PXDErrorFlags m_errorMaskEvent;
-      /** give verbose unpacking information -> TODO will be a parameter in next release */
-      bool verbose = true;
 
       /** counter for not accepted events... should not happen TODO discussion ongoing with DAQ group */
       unsigned int m_notaccepted{0};

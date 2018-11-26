@@ -11,7 +11,7 @@
 // $Log$
 //---------------------------------------------------------------
 
-#include <trg/cdc/modules/TRGCDCT3DConverter/TRGCDCT3DConverterModule.h>
+#include <trg/cdc/modules/trgcdct3dConverter/TRGCDCT3DConverterModule.h>
 #include <bitset>
 #include <iomanip>
 #include "trg/cdc/Fitter3D.h"

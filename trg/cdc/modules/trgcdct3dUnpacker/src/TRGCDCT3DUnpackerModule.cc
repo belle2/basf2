@@ -11,7 +11,7 @@
 // $Log$
 //---------------------------------------------------------------
 
-#include <trg/cdc/modules/TRGCDCT3DUnpacker/TRGCDCT3DUnpackerModule.h>
+#include <trg/cdc/modules/trgcdct3dUnpacker/TRGCDCT3DUnpackerModule.h>
 #include <bitset>
 #include <iomanip>
 

@@ -11,12 +11,12 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 skimCode = encodeSkimName('SystematicsEELL')
 import sys
@@ -25,14 +25,16 @@ import glob
 
 
 fileList = [
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
-    ]
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
+]
 
 
 inputMdstList('MC9', fileList)
 
-loadStdCharged()
+stdE('all')
+stdMu('all')
+
 
 from skim.systematics import *
 SysList = EELLList()

@@ -3,24 +3,19 @@
 
 #######################################################
 #
-# Prepare all skims at once
-# P. Urquijo, 6/Jan/2015
+# All BtoCharmSkims in one _standalone
 #
 ######################################################
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
-from stdLightMesons import *
-from stdDiLeptons import *
-set_log_level(LogLevel.INFO)
-import os
-import sys
-import glob
-from skimExpertFunctions import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
 
 
 fileList = \
@@ -31,48 +26,42 @@ fileList = \
 inputMdstList('MC9', fileList)
 
 
-loadStdCharged()
+stdPi('all')
+stdK('all')
+stdPi('loose')
+stdK('loose')
 stdPi0s('loose')
 stdPhotons('loose')
-loadStdKS()
+stdKshorts()
 loadStdLightMesons()
 loadStdSkimPi0()
 loadStdSkimPhoton()
 
 
-def add_skim(label, lists):
-    """
-    create uDST skim for given lists, saving into $label.udst.root
-    Particles not necessary for the given particle lists are not saved.
-    """
-    skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode, lists)
-    summaryOfLists(lists)
-
-
-from BtoDh_hh_List import *
+# B- to D(->hh)h- Skim
+from skim.btocharm import BsigToDhTohhList, loadD0bar
 loadD0bar()
 BtoDhhhList = BsigToDhTohhList()
 add_skim('BtoDh_hh', BtoDhhhList)
 
 
 # B- to D(->Kshh)h- Skim
-from BtoDh_Kshh_List import *
+from skim.btocharm import BsigToDhToKshhList, loadDkshh
 loadDkshh()
 BtoDhKshhList = BsigToDhToKshhList()
 add_skim('BtoDh_Kshh', BtoDhKshhList)
 
-
-from BtoDh_Kspi0_List import *
+# B- to D(->Kspi0)h- Skim
+from skim.btocharm import BsigToDhToKspi0List, loadDkspi0
 loadDkspi0()
 BtoDhKspi0List = BsigToDhToKspi0List()
 add_skim('BtoDh_Kspi0', BtoDhKspi0List)
 
-from BtoDh_Kspipipi0_List import *
+# B- to D(->Kspipipi0)h- Skim
+from skim.btocharm import BsigToDhToKspipipi0List, loadDkspipipi0
 loadDkspipipi0()
 BtoDhKspipipi0List = BsigToDhToKspipipi0List()
 add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List)
-
 
 setSkimLogging()
 process(analysis_main)

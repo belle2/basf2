@@ -12,19 +12,19 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdPi0s import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import os
 import sys
 import glob
 skimCode = encodeSkimName("CharmSemileptonic")
-fileList = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
-     'mdst_0005*_prod00000198_task000005*.root'
-     ]
 
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 inputMdstList('MC9', fileList)
 
 
@@ -40,7 +40,7 @@ fillParticleList('e+:std', 'electronID > 0.1 and chiProb > 0.001 and p > 0.25', 
 fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
 
 # CSL Skim
-from CharmSemileptonic_List import *
+from skim.charm import CharmSemileptonicList
 CSLList = CharmSemileptonicList()
 skimOutputUdst(skimCode, CSLList)
 summaryOfLists(CSLList)

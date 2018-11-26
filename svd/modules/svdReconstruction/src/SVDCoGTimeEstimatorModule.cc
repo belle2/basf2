@@ -37,11 +37,13 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   addParam("Correction_StripCalPeakTime", Correction_1,
            "Correct for the different peaking times of the strips, obtained from local run calibration", true);
   addParam("Correction_TBTimeWindow", Correction_2,
-           "Subtract the central value of the time window corresponding to the event Trigger Bin", true);
-  addParam("Correction_ShiftMeanToZero", Correction_3, "Apply correction to shift the mean of the time distribution to zero", true);
+           "Subtract the central value of the time window corresponding to the event Trigger Bin", false);
+  addParam("Correction_ShiftMeanToZero", Correction_3, "Apply correction to shift the mean of the time distribution to zero", false);
   addParam("Correction_ShiftMeanToZeroTBDep", Correction_4,
            "Apply correction to shift the mean of the time distribution to zero, Trigger Bin dependent", false);
-
+  addParam("Correction_Using_CDC", Correction_Using_CDC,
+           "Use the timing informations of CDC in order to calibrate the CoG. If it is set True it is not possible apply Correction_2, Correction_3 and Correction_4: set False if you want to use those corrections",
+           true);
 
 }
 
@@ -175,13 +177,16 @@ void SVDCoGTimeEstimatorModule::event()
     if (Correction_1) //first correction
       m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
     SVDModeByte::baseType triggerBin = (shaper.getModeByte()).getTriggerBin();
-    if (Correction_2) //second correction
-      m_weightedMeanTime -= (DeltaT / 8 + ((int)triggerBin) * DeltaT / 4);
-    if (Correction_3) //third correction
-      m_weightedMeanTime -= m_PulseShapeCal.getTimeShiftCorrection(thisSensorID, thisSide, thisCellID);
-    if (Correction_4) //fourth correction
-      m_weightedMeanTime -= m_PulseShapeCal.getTriggerBinDependentCorrection(thisSensorID, thisSide, thisCellID, (int)triggerBin);
-
+    if (Correction_Using_CDC)
+      m_weightedMeanTime = m_TimeCal.getCorrectedTime(thisSensorID, thisSide, thisCellID, m_weightedMeanTime, triggerBin);
+    else {
+      if (Correction_2) //second correction
+        m_weightedMeanTime -= (DeltaT / 8 + ((int)triggerBin) * DeltaT / 4);
+      if (Correction_3) //third correction
+        m_weightedMeanTime -= m_PulseShapeCal.getTimeShiftCorrection(thisSensorID, thisSide, thisCellID);
+      if (Correction_4) //fourth correction
+        m_weightedMeanTime -= m_PulseShapeCal.getTriggerBinDependentCorrection(thisSensorID, thisSide, thisCellID, (int)triggerBin);
+    }
     //check high charges and too high ADC
     if (m_amplitude > 100000) {
       B2DEBUG(42, "Charge = " << m_amplitude);

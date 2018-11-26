@@ -22,15 +22,14 @@ using namespace Belle2;
 REG_MODULE(ECLTrackClusterMatchingParametrizationExpert)
 
 ECLTrackClusterMatchingParametrizationExpertModule::ECLTrackClusterMatchingParametrizationExpertModule() : Module(),
-  m_rootFilePtr(0),
   m_writeToRoot(1),
-  m_tree(0),
   m_iExperiment(0),
   m_iRun(0),
   m_iEvent(0),
   m_trackNo(0),
   m_trackMomentum(0),
   m_pT(0),
+  m_trackTheta(0),
   m_deltaPhi(0),
   m_phiCluster(0),
   m_phiHit(0),
@@ -110,10 +109,6 @@ void ECLTrackClusterMatchingParametrizationExpertModule::initialize()
     m_tree->Branch("trueTrackPDG", &m_true_track_pdg, "trueTrackPDG/I");
     m_tree->Branch("trueMatch", &m_true_match, "trueMatch/I");
   }
-}
-
-void ECLTrackClusterMatchingParametrizationExpertModule::beginRun()
-{
 }
 
 void ECLTrackClusterMatchingParametrizationExpertModule::event()
@@ -234,10 +229,6 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
     } // end loop on ExtHits related to Track
   } // end loop on Tracks
   if (m_useArray) m_tree->Fill();
-}
-
-void ECLTrackClusterMatchingParametrizationExpertModule::endRun()
-{
 }
 
 void ECLTrackClusterMatchingParametrizationExpertModule::terminate()

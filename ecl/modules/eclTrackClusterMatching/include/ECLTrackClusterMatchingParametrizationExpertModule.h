@@ -41,28 +41,16 @@ namespace Belle2 {
      *  Also register any outputs of your module (StoreArrays, RelationArrays,
      *  StoreObjPtrs) here, see the respective class documentation for details.
      */
-    virtual void initialize();
-
-    /** Called once before a new run begins.
-     *
-     * This method gives you the chance to change run dependent constants like alignment parameters, etc.
-     */
-    virtual void beginRun();
+    virtual void initialize() override;
 
     /** Called once for each event.
      *
      * This is most likely where your module will actually do anything.
      */
-    virtual void event();
-
-    /** Called once when a run ends.
-     *
-     *  Use this method to save run information, which you aggregated over the last run.
-     */
-    virtual void endRun();
+    virtual void event() override;
 
     /** Clean up anything you created in initialize(). */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -81,11 +69,11 @@ namespace Belle2 {
 
     /** members of ECLTrackClusterMatching Module */
 
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
+    TFile* m_rootFilePtr{nullptr}; /**< pointer at root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_useArray; /**< if true, info is stored event-wise using array, otherwise hit-wise */
-    TTree* m_tree; /**< Root tree for saving the output */
+    TTree* m_tree{nullptr}; /**< Root tree for saving the output */
 
     // variables
     int m_iExperiment; /**< Experiment number */
@@ -108,20 +96,20 @@ namespace Belle2 {
     int m_true_track_pdg; /**< PDG ID of track according to MC */
     int m_true_match; /**< cluster related to hit is related to same MCParticle as track */
 
-    std::vector<int>* m_trackNo_array; /**< array of track numbers */
-    std::vector<float>* m_trackMomentum_array; /**< array of track momenta */
-    std::vector<float>* m_pT_array; /**< array of transversal track momenta */
-    std::vector<float>* m_trackTheta_array; /**< array of track's polar angles */
-    std::vector<float>* m_deltaPhi_array; /**< array of differences in azimuthal angle between hit and cluster */
-    std::vector<float>* m_phiCluster_array; /**< array of azimuthal angles of cluster */
-    std::vector<float>* m_phiHit_array; /**< array of azimuthal angles of hit */
-    std::vector<float>* m_errorPhi_array; /**< array of uncertainties on azimuthal angle of hit */
-    std::vector<float>* m_deltaTheta_array; /**< array of differences in polar angle between hit and cluster */
-    std::vector<float>* m_thetaCluster_array; /**< array of polar angles of cluster */
-    std::vector<float>* m_thetaHit_array; /**< array of polar angles of hit */
-    std::vector<float>* m_errorTheta_array; /**< array of uncertainties on polar angle of hit */
-    std::vector<int>* m_hitstatus_array; /**< array of hit status */
-    std::vector<int>* m_true_track_pdg_array; /**< array of true PDG IDs of track */
-    std::vector<int>* m_true_match_array; /**< array of booleans indicating if cluster of hit is related to same MCParticle as track */
+    std::vector<int>* m_trackNo_array = {}; /**< array of track numbers */
+    std::vector<float>* m_trackMomentum_array = {}; /**< array of track momenta */
+    std::vector<float>* m_pT_array = {}; /**< array of transversal track momenta */
+    std::vector<float>* m_trackTheta_array = {}; /**< array of track's polar angles */
+    std::vector<float>* m_deltaPhi_array = {}; /**< array of differences in azimuthal angle between hit and cluster */
+    std::vector<float>* m_phiCluster_array = {}; /**< array of azimuthal angles of cluster */
+    std::vector<float>* m_phiHit_array = {}; /**< array of azimuthal angles of hit */
+    std::vector<float>* m_errorPhi_array = {}; /**< array of uncertainties on azimuthal angle of hit */
+    std::vector<float>* m_deltaTheta_array = {}; /**< array of differences in polar angle between hit and cluster */
+    std::vector<float>* m_thetaCluster_array = {}; /**< array of polar angles of cluster */
+    std::vector<float>* m_thetaHit_array = {}; /**< array of polar angles of hit */
+    std::vector<float>* m_errorTheta_array = {}; /**< array of uncertainties on polar angle of hit */
+    std::vector<int>* m_hitstatus_array = {}; /**< array of hit status */
+    std::vector<int>* m_true_track_pdg_array = {}; /**< array of true PDG IDs of track */
+    std::vector<int>* m_true_match_array = {}; /**< array of booleans indicating if cluster of hit is related to same MCParticle as track */
   };
 } //namespace Belle2

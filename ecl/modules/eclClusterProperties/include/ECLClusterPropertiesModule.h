@@ -38,13 +38,10 @@ namespace Belle2 {
     virtual ~ECLClusterPropertiesModule();
 
     /** Initialize the required input arrays */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Event loop */
-    virtual void event();
-
-    /** Delete pointer created during initialize */
-    virtual void terminate();
+    virtual void event() override;
 
 
   private:

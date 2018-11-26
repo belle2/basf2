@@ -24,9 +24,9 @@ namespace Belle2 {
     ECLTrackClusterMatchingThresholds() {};
 
     /** Constructor */
-    ECLTrackClusterMatchingThresholds(const std::vector<std::pair<double, double>> matchingThresholdsFWD,
-                                      const std::vector<std::pair<double, double>> matchingThresholdsBWD,
-                                      const std::vector<std::pair<double, std::pair<double, double>>> matchingThresholdsBRL):
+    ECLTrackClusterMatchingThresholds(const std::vector<std::pair<double, double>>& matchingThresholdsFWD,
+                                      const std::vector<std::pair<double, double>>& matchingThresholdsBWD,
+                                      const std::vector<std::pair<double, std::pair<double, double>>>& matchingThresholdsBRL):
       m_matchingThresholdsFWD(matchingThresholdsFWD),
       m_matchingThresholdsBWD(matchingThresholdsBWD),
       m_matchingThresholdsBRL(matchingThresholdsBRL)
@@ -37,13 +37,13 @@ namespace Belle2 {
     ~ECLTrackClusterMatchingThresholds() {};
 
     /** Get matching thresholds for FWD */
-    std::vector<std::pair<double, double>> getFWDMatchingThresholdValues() const {return m_matchingThresholdsFWD;};
+    const std::vector<std::pair<double, double>>& getFWDMatchingThresholdValues() const {return m_matchingThresholdsFWD;};
 
     /** Get matching thresholds for BWD */
-    std::vector<std::pair<double, double>> getBWDMatchingThresholdValues() const {return m_matchingThresholdsBWD;};
+    const std::vector<std::pair<double, double>>& getBWDMatchingThresholdValues() const {return m_matchingThresholdsBWD;};
 
     /** Get matching thresholds for BRL */
-    std::vector<std::pair<double, std::pair<double, double>>> getBRLMatchingThresholdValues() const {return m_matchingThresholdsBRL;};
+    const std::vector<std::pair<double, std::pair<double, double>>>& getBRLMatchingThresholdValues() const {return m_matchingThresholdsBRL;};
 
   private:
 

@@ -27,7 +27,7 @@ using namespace Belle2;
 REG_MODULE(ECLTrackClusterMatchingPerformance)
 
 ECLTrackClusterMatchingPerformanceModule::ECLTrackClusterMatchingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_tracksTree(NULL), m_clusterTree(NULL)
+  Module(), m_trackProperties()
 {
   setDescription("Module to test the track cluster matching efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);

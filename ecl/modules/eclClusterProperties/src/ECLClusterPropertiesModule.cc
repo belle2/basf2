@@ -59,8 +59,8 @@ void ECLClusterPropertiesModule::event()
       // direction and on the extrapolated track direction corresponding to
       // the minimum distance among the two lines. if more than one track is
       // related to a cluster the one with the highest momentum is used
-      double lTrk, lShower;
       if (cluster->isTrack()) {
+        double lTrk, lShower;
         computeDepth(shower, lTrk, lShower);
         B2DEBUG(29, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
         shower.setTrkDepth(lTrk);
@@ -69,10 +69,6 @@ void ECLClusterPropertiesModule::event()
       }
     }
   }
-}
-
-void ECLClusterPropertiesModule::terminate()
-{
 }
 
 double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower, StoreArray<Track>& tracks) const

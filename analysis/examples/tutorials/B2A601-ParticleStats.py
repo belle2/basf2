@@ -37,8 +37,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 

@@ -36,7 +36,7 @@ from modularAnalysis import buildRestOfEvent
 from modularAnalysis import fillParticleList
 from vertex import TagV
 from stdCharged import stdLooseMu
-import variableCollections as vc
+import variables.collections as vc
 from modularAnalysis import variablesToNtuple
 
 # Add signal MC files for release 9.

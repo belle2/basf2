@@ -21,8 +21,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 from stdPhotons import stdPhotons
 import stdCharged as stdc
 
@@ -66,12 +66,12 @@ b_vars = vc.event_meta_data + \
     vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
-    vct.create_aliases_for_selected(list_of_variables=gamma_vars,
-                                    decay_string='B0 -> rho0 ^gamma') + \
-    vct.create_aliases_for_selected(list_of_variables=rho_vars,
-                                    decay_string='B0 -> ^rho0 gamma') + \
-    vct.create_aliases_for_selected(list_of_variables=rho_vars,
-                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma')
+    vu.create_aliases_for_selected(list_of_variables=gamma_vars,
+                                   decay_string='B0 -> rho0 ^gamma') + \
+    vu.create_aliases_for_selected(list_of_variables=rho_vars,
+                                   decay_string='B0 -> ^rho0 gamma') + \
+    vu.create_aliases_for_selected(list_of_variables=rho_vars,
+                                   decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma')
 
 # Saving variables to ntuple
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'

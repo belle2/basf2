@@ -19,8 +19,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 import stdCharged as stdc
 from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
@@ -58,11 +58,11 @@ ma.matchMCTruth(list_name='D*+', path=my_path)
 # Select variables that we want to store to ntuple
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
-fs_hadron_vars = vct.create_aliases_for_selected(
+fs_hadron_vars = vu.create_aliases_for_selected(
     list_of_variables=vc.pid + vc.track + vc.mc_truth,
     decay_string='D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-d0_vars = vct.create_aliases_for_selected(
+d0_vars = vu.create_aliases_for_selected(
     list_of_variables=vc.inv_mass + vc.mc_truth,
     decay_string='D*+ -> ^D0 pi+',
     prefix='D0')

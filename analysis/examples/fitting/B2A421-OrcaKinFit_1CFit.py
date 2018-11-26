@@ -24,7 +24,7 @@ from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
-import variableCollections as vc
+import variables.collections as vc
 
 set_log_level(LogLevel.WARNING)
 # set_log_level(LogLevel.DEBUG)

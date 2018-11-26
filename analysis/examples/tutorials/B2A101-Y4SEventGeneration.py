@@ -46,7 +46,7 @@ ge.add_evtgen_generator(path=my_path,
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.
-ma.loadGearbox()
+ma.loadGearbox(path=my_path)
 
 # dump generated events in DST format to the output ROOT file
 #
@@ -54,7 +54,7 @@ my_path.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtge
 
 # process all modules added to the analysis_main path
 # (note: analysis_main is the default path created in the modularAnapys.py)
-b2.process(my_path)
+b2.process(path=my_path)
 
 # print out the summary
 print(b2.statistics)

@@ -26,8 +26,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 import stdV0s as stdv
 
 # create path
@@ -101,8 +101,8 @@ v0_vars = vc.event_meta_data + \
     vc.mc_truth + \
     vc.mc_hierarchy +\
     ['chiProb'] +\
-    vct.create_daughter_aliases(pi0_vars, 0) +\
-    vct.create_daughter_aliases(pi0_vars, 1)
+    vu.create_daughter_aliases(pi0_vars, 0) +\
+    vu.create_daughter_aliases(pi0_vars, 1)
 
 
 # saving variables to ntuple

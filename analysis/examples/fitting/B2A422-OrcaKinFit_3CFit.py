@@ -25,7 +25,7 @@ from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
-import variableCollections as vc
+import variables.collections as vc
 from stdPhotons import *
 
 set_log_level(LogLevel.WARNING)
@@ -58,7 +58,7 @@ matchMCTruth('Z0:mm_kinfit')
 fitKinematic3C('Z0:mm_kinfit')
 
 # Select variables that we want to store to ntuple
-import variableCollections as vc
+import variables.collections as vc
 
 mugvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
 z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \

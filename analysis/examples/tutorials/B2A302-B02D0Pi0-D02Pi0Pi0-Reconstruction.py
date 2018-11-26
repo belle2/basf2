@@ -23,8 +23,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 from stdPi0s import stdPi0s
 
 # create path
@@ -64,10 +64,10 @@ ma.matchMCTruth(list_name='B0:all',
 B0_vars = vc.event_meta_data + \
     vc.inv_mass + \
     vc.mc_truth + \
-    vct.create_aliases_for_selected(
+    vu.create_aliases_for_selected(
         list_of_variables=vc.inv_mass + vc.mc_truth,
         decay_string='B0 -> ^D0 ^pi0') + \
-    vct.create_aliases_for_selected(
+    vu.create_aliases_for_selected(
         list_of_variables=vc.cluster,
         decay_string='B0 -> D0 [pi0 -> ^gamma ^gamma]')
 
@@ -76,7 +76,7 @@ pi0_vars = vc.mc_truth + \
     vc.mass_before_fit + \
     vc.event_meta_data + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
-    vct.create_aliases_for_selected(
+    vu.create_aliases_for_selected(
         list_of_variables=vc.cluster + vc.kinematics,
         decay_string='pi0 -> ^gamma ^gamma')
 

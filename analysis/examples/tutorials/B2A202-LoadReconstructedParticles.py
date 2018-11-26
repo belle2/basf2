@@ -22,8 +22,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 
@@ -152,7 +152,7 @@ ma.variablesToNtuple(decayString='gamma:all',
 # we convert names of te variables from the gamma list in the way that they will
 # correspond to given gammas.
 ma.variablesToNtuple(decayString='pi0:looseFit',
-                     variables=pi0_variables + vct.create_aliases_for_selected(gamma_variables, 'pi0 -> ^gamma ^gamma'),
+                     variables=pi0_variables + vu.create_aliases_for_selected(gamma_variables, 'pi0 -> ^gamma ^gamma'),
                      filename=output_file,
                      treename='pi0',
                      path=my_path)
@@ -161,8 +161,8 @@ ma.variablesToNtuple(decayString='pi0:looseFit',
 # (see ntuples to see the difference)
 ma.variablesToNtuple(decayString='K_S0:all',
                      variables=K0s_variables +
-                     vct.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
-                     vct.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),
+                     vu.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
+                     vu.create_aliases_for_selected(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),
                      filename=output_file,
                      treename='kshort',
                      path=my_path)

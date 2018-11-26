@@ -34,8 +34,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 import stdCharged as stdc
 
 # create path
@@ -203,15 +203,15 @@ b_vars = vc.event_meta_data + \
     vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
-    vct.create_aliases_for_selected(list_of_variables=gamma_vars,
-                                    decay_string='B0 -> rho0 ^gamma') + \
-    vct.create_aliases_for_selected(list_of_variables=rho_vars,
-                                    decay_string='B0 -> ^rho0 gamma') + \
-    vct.create_aliases_for_selected(list_of_variables=rho_vars,
-                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
-    vct.create_aliases(list_of_variables=['Pi0_Prob', 'Eta_Prob', 'pi0veto'],
-                       wrapper='extraInfo(variable)',
-                       prefix="B")
+    vu.create_aliases_for_selected(list_of_variables=gamma_vars,
+                                   decay_string='B0 -> rho0 ^gamma') + \
+    vu.create_aliases_for_selected(list_of_variables=rho_vars,
+                                   decay_string='B0 -> ^rho0 gamma') + \
+    vu.create_aliases_for_selected(list_of_variables=rho_vars,
+                                   decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
+    vu.create_aliases(list_of_variables=['Pi0_Prob', 'Eta_Prob', 'pi0veto'],
+                      wrapper='extraInfo(variable)',
+                      prefix="B")
 
 # Saving variables to ntuple
 rootOutputFile = "B2A306-B02RhoGamma-withPi0EtaVeto.root"

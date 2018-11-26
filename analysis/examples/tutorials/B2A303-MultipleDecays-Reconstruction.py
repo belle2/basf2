@@ -28,8 +28,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 from stdV0s import stdKshorts
 from stdV0s import stdLambdas
 
@@ -97,15 +97,15 @@ pi_vars = vc.kinematics
 b_vars = vc.event_meta_data + \
     vc.deltae_mbc + \
     vc.mc_truth + \
-    vct.create_aliases_for_selected(list_of_variables=d_vars,
-                                    decay_string='B+ -> ^anti-D0 pi+',
-                                    prefix='D0') + \
-    vct.create_aliases_for_selected(list_of_variables=pi_vars,
-                                    decay_string='B+ -> anti-D0 ^pi+',
-                                    prefix='pi') + \
-    vct.create_aliases(list_of_variables=['decayModeID'],
-                       wrapper='daughter(0,extraInfo(variable))',
-                       prefix="")
+    vu.create_aliases_for_selected(list_of_variables=d_vars,
+                                   decay_string='B+ -> ^anti-D0 pi+',
+                                   prefix='D0') + \
+    vu.create_aliases_for_selected(list_of_variables=pi_vars,
+                                   decay_string='B+ -> anti-D0 ^pi+',
+                                   prefix='pi') + \
+    vu.create_aliases(list_of_variables=['decayModeID'],
+                      wrapper='daughter(0,extraInfo(variable))',
+                      prefix="")
 
 # Saving variables to ntuple
 output_file = 'B2A303-MultipleDecays-Reconstruction.root'

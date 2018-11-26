@@ -41,8 +41,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 from stdPhotons import stdPhotons
 import stdCharged as stdc
 from stdPi0s import stdPi0s
@@ -121,21 +121,21 @@ ma.buildRestOfEvent(target_list_name='Upsilon(4S)',
 d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass
 b_vars = vc.mc_truth + \
     vc.deltae_mbc + \
-    vct.create_aliases_for_selected(list_of_variables=d_vars,
-                                    decay_string='B- -> ^D0 pi-') + \
-    vct.create_aliases(list_of_variables=['decayModeID'],
-                       wrapper='daughter(0,extraInfo(variable))',
-                       prefix="D")
+    vu.create_aliases_for_selected(list_of_variables=d_vars,
+                                   decay_string='B- -> ^D0 pi-') + \
+    vu.create_aliases(list_of_variables=['decayModeID'],
+                      wrapper='daughter(0,extraInfo(variable))',
+                      prefix="D")
 mu_vars = vc.mc_truth
 
 u4s_vars = vc.mc_truth + \
     vc.roe_multiplicities + \
     vc.recoil_kinematics + \
     vc.kinematics + \
-    vct.create_aliases_for_selected(list_of_variables=b_vars,
-                                    decay_string='Upsilon(4S) -> ^B- mu+') + \
-    vct.create_aliases_for_selected(list_of_variables=mu_vars,
-                                    decay_string='Upsilon(4S) -> B- ^mu+')
+    vu.create_aliases_for_selected(list_of_variables=b_vars,
+                                   decay_string='Upsilon(4S) -> ^B- mu+') + \
+    vu.create_aliases_for_selected(list_of_variables=mu_vars,
+                                   decay_string='Upsilon(4S) -> B- ^mu+')
 
 
 # 7. Saving variables to ntuple

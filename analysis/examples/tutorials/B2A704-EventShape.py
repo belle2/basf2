@@ -16,7 +16,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variableCollections
+import variables.collections
 
 # create path
 my_path = b2.create_path()
@@ -51,13 +51,13 @@ ma.buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
                    checkForDuplicates=False,
                    path=my_path)
 
-# Here we use the pre-defined collection 'EventShape', that contains
+# Here we use the pre-defined collection 'event_shape', that contains
 # thrust, sphericity, aplanarity, FW ratios up to 4, harmonic moments w/respect to
 # the thrust axis up to 4 and all the cleo cones w/respect to the thrust axis.
 # In addition, we will save also the forward and backward hemisphere (or "jet") energies,
 # and the 2nd order harmonic moment calculate respect to the collision axis (i.e. the z axis)
 ma.variablesToNtuple('',
-                     variables=['EventShape',
+                     variables=['event_shape',
                                 'backwardHemisphereEnergy',
                                 'forwardHemisphereEnergy',
                                 'harmonicMoment(2, collision)'],

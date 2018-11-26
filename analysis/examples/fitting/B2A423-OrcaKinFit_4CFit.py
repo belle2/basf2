@@ -32,7 +32,7 @@ from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
-import variableCollections as vc
+import variables.collections as vc
 from stdPhotons import *
 
 beamparameters = add_beamparameters(analysis_main, "Y4S")

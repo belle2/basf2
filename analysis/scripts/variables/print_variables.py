@@ -2,34 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-Makes analysis variables (which can be used in many of the functions defined
-in :mod:`modularAnalysis`) available to Python.
-Details can be found on https://confluence.desy.de/display/BI/Physics+VariableManager
-
-You can also run ``basf2 variables.py`` to list all available variables.
+You can run ``basf2 variables.py`` to list all available variables.
 """
 
 import basf2.utils as b2utils
-from ROOT import gSystem
-import argparse
 import pager
-gSystem.Load('libanalysis.so')
-
-# import everything into current namespace.
-from ROOT import Belle2
-variables = Belle2.Variable.Manager.Instance()
-
-import ROOT
-
-
-def std_vector(*args):
-    """
-    Creates an std::vector which can be passed to pyROOT
-    """
-    v = ROOT.std.vector(type(args[0]))()
-    for x in args:
-        v.push_back(x)
-    return v
+import argparse
+from variables import variables as cpp_variables
 
 
 def getCommandLineOptions():
@@ -47,7 +26,7 @@ def printVars():
     """
 
     print('Available variables in Variable::Manager:')
-    allVars = variables.getVariables()
+    allVars = cpp_variables.getVariables()
     vars = []
     for v in allVars:
         vars.append((v.group, v.name, v.description))
@@ -66,7 +45,7 @@ if __name__ == "__main__":
     args = getCommandLineOptions()
 
     if args.pager:
-        with pager.Pager('Available variables in Variable\:\:Manager'):
+        with pager.Pager(r'Available variables in Variable\:\:Manager'):
             printVars()
     else:
         printVars()

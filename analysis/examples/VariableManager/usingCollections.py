@@ -14,7 +14,7 @@
 import os
 import basf2
 import variables
-import variableCollections  # collections of variables
+import variables.collections  # collections of variables
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
 from variables import variables as vm  # shorthand name for the VariableManager instance
 

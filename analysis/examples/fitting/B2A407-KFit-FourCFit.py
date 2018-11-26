@@ -33,7 +33,7 @@ from modularAnalysis import fourCKFit
 from modularAnalysis import matchMCTruth
 from modularAnalysis import variablesToNtuple
 from stdPhotons import stdPhotons
-import variableCollections as vc
+import variables.collections as vc
 
 
 # load input ROOT file

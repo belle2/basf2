@@ -31,7 +31,7 @@ from modularAnalysis import analysis_main
 from modularAnalysis import massKFit
 from modularAnalysis import variablesToNtuple
 from stdPi0s import stdPi0s
-import variableCollections as vc
+import variables.collections as vc
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst-B0D0pi0.root']

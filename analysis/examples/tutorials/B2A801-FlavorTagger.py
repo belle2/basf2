@@ -28,8 +28,8 @@ import basf2 as b2
 import modularAnalysis as ma
 import flavorTagger as ft
 import vertex as vx
-import variableCollections as vc
-import variableCollectionsTools as vct
+import variables.collections as vc
+import variables.utils as vu
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 
@@ -200,10 +200,10 @@ bvars = vc.event_meta_data + \
     vc.flavor_tagging + \
     vc.tag_vertex + \
     vc.mc_tag_vertex + \
-    vct.create_aliases_for_selected(list_of_variables=fs_vars,
-                                    decay_string='B0 -> [J/psi -> ^mu+ ^mu-] pi0') + \
-    vct.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
-                                    decay_string='B0 -> [^J/psi -> mu+ mu-] ^pi0')
+    vu.create_aliases_for_selected(list_of_variables=fs_vars,
+                                   decay_string='B0 -> [J/psi -> ^mu+ ^mu-] pi0') + \
+    vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
+                                   decay_string='B0 -> [^J/psi -> mu+ mu-] ^pi0')
 
 
 # Saving variables to ntuple

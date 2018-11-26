@@ -33,7 +33,7 @@ from modularAnalysis import variablesToNtuple
 import sys
 import pdg
 from beamparameters import add_beamparameters
-import variableCollections as vc
+import variables.collections as vc
 from stdPhotons import *
 
 # load input ROOT file

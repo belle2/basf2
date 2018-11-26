@@ -35,7 +35,7 @@ from modularAnalysis import analysis_main
 from modularAnalysis import vertexKFit
 from stdCharged import stdPi, stdLoosePi, stdLooseK
 from modularAnalysis import variablesToNtuple
-import variableCollections as vc
+import variables.collections as vc
 
 # Add MC9 signal samples
 filelistSIG = [('/group/belle2/tutorial/release_01-00-00/\

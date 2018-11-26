@@ -36,7 +36,7 @@ from modularAnalysis import massVertexRave
 from modularAnalysis import vertexRaveDaughtersUpdate
 from stdCharged import stdPi, stdLoosePi, stdLooseK
 from modularAnalysis import variablesToNtuple
-import variableCollections as vc
+import variables.collections as vc
 
 
 # Add MC9 signal samples

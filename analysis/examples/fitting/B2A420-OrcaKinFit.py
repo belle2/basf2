@@ -25,7 +25,7 @@ from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import sys
 from beamparameters import add_beamparameters
-import variableCollections as vc
+import variables.collections as vc
 
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
     sys.exit('Required input file (B2A424-SimulateMuonPairs.root) does not exist. '

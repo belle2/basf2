@@ -40,10 +40,10 @@ namespace Belle2 {
     virtual ~LHEInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
 

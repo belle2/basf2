@@ -65,7 +65,10 @@ void EKLMDatabaseImporter::importDigitizationParameters()
   digPar->setADCRange(dig.getInt("ADCRange"));
   digPar->setADCSamplingFrequency(dig.getDouble("ADCSamplingFrequency"));
   digPar->setNDigitizations(dig.getInt("nDigitizations"));
-  digPar->setADCSaturation(dig.getDouble("ADCSaturation"));
+  digPar->setADCPedestal(dig.getDouble("ADCPedestal"));
+  digPar->setADCPEAmplitude(dig.getDouble("ADCPEAmplitude"));
+  digPar->setADCThreshold(dig.getInt("ADCThreshold"));
+  digPar->setADCSaturation(dig.getInt("ADCSaturation"));
   digPar->setNPEperMeV(dig.getDouble("nPEperMeV"));
   digPar->setMinCosTheta(cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI));
   digPar->setMirrorReflectiveIndex(dig.getDouble("MirrorReflectiveIndex"));

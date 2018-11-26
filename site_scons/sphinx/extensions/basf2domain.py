@@ -61,7 +61,8 @@ class Basf2Object(ObjectDescription):
             # already exists, give warning
             self.env.warn(self.env.docname,
                           "Duplicate description of basf2 %s %s, " % (self.objtype, name) +
-                          "Other instance in " + self.env.doc2path(ddata[name][0]),
+                          "Other instance in " + self.env.doc2path(ddata[name][0]) +
+                          ", please add ':noindex:' to one",
                           self.lineno)
         else:
             ddata[name] = (self.env.docname, targetname)
@@ -92,6 +93,7 @@ class Basf2VariableIndex(Index):
     def generate(self, docnames=None):
         content = {}
         modules = self.domain.data["variables"].items()
+        modules = sorted(modules, key=lambda x: x[0].lower())
         for modname, (docname, target) in modules:
             letter = modname[0].upper()
             content.setdefault(letter, [])

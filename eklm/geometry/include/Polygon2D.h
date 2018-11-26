@@ -42,6 +42,11 @@ namespace Belle2 {
       Polygon2D(const Polygon2D&) = delete;
 
       /**
+       * Operator = (disabled).
+       */
+      Polygon2D& operator=(const Polygon2D&) = delete;
+
+      /**
        * Destructor.
        */
       ~Polygon2D();

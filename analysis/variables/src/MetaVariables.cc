@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2010 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Thomas Keck                                              *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 
 #include <analysis/variables/MetaVariables.h>
@@ -772,6 +772,47 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
+              return std::numeric_limits<float>::quiet_NaN();
+
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfClusterPhi");
+      }
+    }
+
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -917,7 +958,7 @@ endloop:
             for (auto& index : daughterIndices)
             {
               if (index >= int(particle->getNDaughters())) {
-                return -999; break;
+                return -999;
               } else pSum += frame.getMomentum(particle->getDaughter(index));
             }
 
@@ -1393,6 +1434,78 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr totalPxOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalPxOfParticlesInList");
+          double totalPx = 0;
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalPx += frame.getMomentum(part).Px();
+          }
+          return totalPx;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalPxOfParticlesInList");
+      }
+    }
+
+    Manager::FunctionPtr totalPyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalPyOfParticlesInList");
+          double totalPy = 0;
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalPy += frame.getMomentum(part).Py();
+          }
+          return totalPy;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalPyOfParticlesInList");
+      }
+    }
+
+    Manager::FunctionPtr totalPzOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalPzOfParticlesInList");
+          double totalPz = 0;
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalPz += frame.getMomentum(part).Pz();
+          }
+          return totalPz;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalPzOfParticlesInList");
+      }
+    }
+
     Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 0) {
@@ -1465,6 +1578,30 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxPtInList");
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          double maxPt = 0;
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            const double Pt = frame.getMomentum(part).Pt();
+            if (Pt > maxPt) maxPt = Pt;
+          }
+          return maxPt;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function maxPtInList");
+      }
+    }
 
 
     VARIABLE_GROUP("MetaFunctions");
@@ -1556,6 +1693,12 @@ endloop:
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
+                      "Returns the difference in phi between the ECLClusters of two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
@@ -1638,9 +1781,17 @@ endloop:
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
     REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
                       "Returns the total energy of particles in the given particle List.");
+    REGISTER_VARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
+                      "Returns the total momentum Px of particles in the given particle List.");
+    REGISTER_VARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
+                      "Returns the total momentum Py of particles in the given particle List.");
+    REGISTER_VARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
+                      "Returns the total momentum Pz of particles in the given particle List.");
     REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
                       "Returns the invariant mass of the combination of particles in the given particle lists.");
     REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
                       "Returns the total ECL energy of particles in the given particle List.");
+    REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
+                      "Returns maximum transverse momentum Pt in the given particle List.");
   }
 }

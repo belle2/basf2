@@ -76,9 +76,14 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
         continue;
       }
 
-      // TODO: RL info + track finder info
+
       const TrackFindingCDC::CDCWireHit* wireHit = state.getWireHit();
-      newRecoTrack->addCDCHit(wireHit->getHit(), sortingParameter);
+
+      auto rl = state.getRLinfo()  == TrackFindingCDC::ERightLeft::c_Right ?
+                RecoHitInformation::RightLeftInformation::c_right :
+                RecoHitInformation::RightLeftInformation::c_left;
+
+      newRecoTrack->addCDCHit(wireHit->getHit(), sortingParameter, rl);
 
       sortingParameter++;
     }
@@ -87,6 +92,6 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
     if (not seed) {
       continue;
     }
-    seed->addRelationTo(newRecoTrack);
+    seed->addRelationTo(newRecoTrack, m_param_writeOutDirection);
   }
 }

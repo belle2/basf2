@@ -45,11 +45,16 @@ namespace Belle2 {
                           const std::vector<std::string>& inputFilesAsicTxt, const std::vector<std::string>& inputFilesHapdQE,
                           const std::vector<std::string>& inputFilesFebTest);
 
+
+    ARICHDatabaseImporter(int experiment, int run);
+
+
     /**
      * Destructor
      */
     virtual ~ARICHDatabaseImporter() {};
 
+    void setExperimentAndRun(int experiment, int run);
 
     // classes used in simulation/reconstruction software
 
@@ -106,7 +111,7 @@ namespace Belle2 {
     /**
      * Print channel mask of all HAPD modules from the database (lightweight class for sim/rec)
      */
-    void printChannelMask();
+    void printChannelMask(bool makeHist = false);
 
     /**
      * Imports HAPD (asic) channel mappings from the xml file

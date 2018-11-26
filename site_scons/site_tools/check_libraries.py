@@ -20,11 +20,11 @@ def get_dtneeded(filename):
     try:
         re_readelf = re.compile(r"^\s*0x0.*\(NEEDED\).*\[(.*)\]\s*$", re.M)
         readelf_out = subprocess.check_output(["readelf", "-d", filename], stderr=subprocess.STDOUT,
-                                              env=dict(os.environ, LC_ALL="C"))
+                                              env=dict(os.environ, LC_ALL="C"), encoding="utf-8")
         needed_entries = re_readelf.findall(readelf_out)
         return needed_entries
     except Exception as e:
-        print "Could not get dependencies for library %s: %s" % (filename, e)
+        print("Could not get dependencies for library %s: %s" % (filename, e))
         return None
 
 
@@ -55,13 +55,13 @@ def get_package(env, node):
             else:
                 return components[0]
 
-    return None
+    return "none"
 
 
 def print_libs(title, text, pkg, lib, libs):
     """Print information on extra/missing libraries"""
     for l in sorted(libs):
-        print "%s:%s:%s -> %s (%s)" % (title, pkg, lib, l, text)
+        print("%s:%s:%s -> %s (%s)" % (title, pkg, lib, l, text))
 
 
 def check_libraries(target, source, env):
@@ -144,7 +144,7 @@ def check_libraries(target, source, env):
             missing = needed_internal - given_internal
             print_libs("LIB_MISSING", "library needed directly, please add to SConscript", pkg, lib, missing)
 
-    print "*** finished checking library dependencies"
+    print("*** finished checking library dependencies")
 
 
 def run(env):

@@ -102,7 +102,7 @@ namespace Belle2 {
     /** Minimal amplitude. */
     int m_MinimalAmplitude;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMFPGAFit, 2);
 
   };

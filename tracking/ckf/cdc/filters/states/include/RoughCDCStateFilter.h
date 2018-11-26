@@ -21,12 +21,14 @@ namespace Belle2 {
   /// A very rough filter for all CDC states.
   class RoughCDCStateFilter : public BaseCDCStateFilter {
   public:
+    /// return 1 if distance < m_maximalHitDistance, NAN otherwise
     TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
+    /// maximal distance from track to trajectory (in XY)
     double m_maximalHitDistance = 2;
   };
 }

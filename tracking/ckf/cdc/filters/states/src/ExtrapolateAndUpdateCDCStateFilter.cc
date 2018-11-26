@@ -20,6 +20,23 @@
 
 using namespace Belle2;
 
+namespace {
+  TrackFindingCDC::ERightLeft setRLInfo(const genfit::MeasuredStateOnPlane& mSoP, CDCCKFState& state)
+  {
+    const auto& mom = TrackFindingCDC::Vector3D(mSoP.getMom());
+    const auto& wire = state.getWireHit()->getWire();
+
+    const auto& trackPosition = TrackFindingCDC::Vector3D(mSoP.getPos());
+    const auto& hitPosition = wire.getWirePos3DAtZ(trackPosition.z());
+
+    TrackFindingCDC::Vector3D trackPosToWire{hitPosition - trackPosition};
+    TrackFindingCDC::ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(mom.xy());
+
+    state.setRLinfo(rlInfo);
+    return rlInfo;
+  }
+}
+
 ExtrapolateAndUpdateCDCStateFilter::ExtrapolateAndUpdateCDCStateFilter()
 {
   addProcessingSignalListener(&m_extrapolator);
@@ -52,8 +69,8 @@ TrackFindingCDC::Weight ExtrapolateAndUpdateCDCStateFilter::operator()(const Bas
     const auto& measurements = recoHit.constructMeasurementsOnPlane(mSoP);
     B2ASSERT("Should be exactly two measurements", measurements.size() == 2);
 
-    const auto rightLeft = static_cast<TrackFindingCDC::ERightLeft>(TrackFindingCDC::sign(
-                             state.getHitDistance()));
+    const auto& rightLeft = setRLInfo(mSoP, state);
+
     if (rightLeft == TrackFindingCDC::ERightLeft::c_Right) {
       state.setChi2(m_updater.kalmanStep(mSoP, *(measurements[1])));
     } else {
@@ -64,8 +81,10 @@ TrackFindingCDC::Weight ExtrapolateAndUpdateCDCStateFilter::operator()(const Bas
     delete measurements[1];
 
     state.setTrackState(mSoP);
-    return state.getChi2();
-  } catch (genfit::Exception) {
+    setRLInfo(mSoP, state);
+
+    return 1. / state.getChi2();
+  } catch (const genfit::Exception& e) {
     return NAN;
   }
 }

@@ -30,6 +30,7 @@
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
+  /// A stack of pre-, helix-extrapolation- , Kalman-extrapolation- and Kalman-update-filters.
   class CDCCKFStateFilter : public TrackFindingCDC::Findlet<const CDCCKFState, CDCCKFState> {
   public:
     /// Add all sub findlets
@@ -113,11 +114,11 @@ namespace Belle2 {
     size_t m_maximalHitCandidates = 4;
     /// Pre Filter
     TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_preFilter;
-    /// Basic Filter
+    /// Basic Filter (uses helix extrapolation)
     TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_basicFilter;
-    /// Extrapolation Filter
+    /// Extrapolation Filter  (after Kalman extrapolation)
     TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_extrapolationFilter;
-    /// Final Selection Filter
+    /// Final Selection Filter (after Kalman update)
     TrackFindingCDC::ChooseableFilter<CDCStateFilterFactory> m_finalSelection;
 
     /// Helper function to reconstruct the arc length and the hit distance of a state according to the trajectory
@@ -149,10 +150,12 @@ namespace Belle2 {
       }
 
       const double arcLength = trajectory2D.calcArcLength2D(recoPos2D);
+      const double z = trajectorySZ.mapSToZ(arcLength);
       const double distanceToHit = trajectory2D.getDist2D(recoPos2D);
 
       state.setArcLength(lastArcLength + arcLength);
       state.setHitDistance(distanceToHit);
+      state.setReconstructedZ(z);
     }
   };
 }

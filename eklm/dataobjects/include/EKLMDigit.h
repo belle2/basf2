@@ -49,12 +49,12 @@ namespace Belle2 {
     /**
      * Get unique channel identifier.
      */
-    unsigned int getUniqueChannelID() const;
+    unsigned int getUniqueChannelID() const override;
 
     /**
      * The pile-up method.
      */
-    EAppendStatus addBGDigit(const DigitBase* bg);
+    EAppendStatus addBGDigit(const DigitBase* bg) override;
 
     /**
      * Get charge.
@@ -214,8 +214,8 @@ namespace Belle2 {
     /** MC time at SiPM. */
     float m_sMCTime;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 10);
+    /** Class version. */
+    ClassDefOverride(Belle2::EKLMDigit, 10);
 
   };
 

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Martin Ritter                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,7 +13,7 @@
 #include <framework/logging/LogConnectionBase.h>
 
 #include <string>
-#include <iosfwd>
+#include <fstream>
 
 namespace Belle2 {
 
@@ -22,7 +22,7 @@ namespace Belle2 {
    *
    * Inherits from the abstract base class LogConnectionBase.
   */
-  class LogConnectionTxtFile : public LogConnectionBase {
+  class LogConnectionTxtFile final: public LogConnectionBase {
 
   public:
 
@@ -44,20 +44,20 @@ namespace Belle2 {
      * @param message The log message object.
      * @return Returns true if the message could be send.
      */
-    virtual bool sendMessage(const LogMessage& message);
+    bool sendMessage(const LogMessage& message) override;
 
     /**
      * Returns true if the connection to the text file could be established.
      *
      * @return True if the connection to the text file could be established.
      */
-    virtual bool isConnected();
+    bool isConnected() override;
 
-  protected:
+    /** Make sure the file is closed on abort */
+    void finalizeOnAbort() override;
 
   private:
-
-    std::ofstream* m_fileStream; /**< The file output stream used for sending the log message.*/
+    std::ofstream m_fileStream; /**< The file output stream used for sending the log message.*/
 
   };
 

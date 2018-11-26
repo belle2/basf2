@@ -171,9 +171,9 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_cCharge->Pad()->SetFillColor(0);// White
   }
 
-  double data = 0;
-  double diff = 0;
   if (m_hCharge) {
+    double data = 0;
+    double diff = 0;
     double currentMin, currentMax;
     m_hCharge->Draw("");
 //     m_line1->Draw();
@@ -184,16 +184,16 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
     B2INFO("Mean: " << data << " Max Diff: " << diff);
+
+#ifdef _BELLE2_EPICS
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
   }
 
   m_cCharge->Modified();
   m_cCharge->Update();
-
-#ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
 }
 
 void DQMHistAnalysisPXDChargeModule::endRun()

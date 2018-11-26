@@ -87,10 +87,17 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
-     * * Returns function which returns the difference of the angular variable phi between the two given daughters
-     * * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
-     * */
+     * Returns function which returns the difference of the angular variable phi between the two given daughters
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the angular variable clusterPhi between the two given daughters
+     * If (at least) one of the daughters does not have a (matched) ECLCluster, the function returns NaN
+     * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the normalized difference of the given variable between the two given daughters
@@ -234,6 +241,21 @@ namespace Belle2 {
     Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
     /**
+    * Returns function which returns the x-component of total momentum Px of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPxOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the y-component of total momentum Py of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPyOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the z-component of total momentum Pz of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPzOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
     * Returns function which returns the invariant mass of the combination of particles in the given particle Lists.
     */
     Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments);
@@ -243,5 +265,9 @@ namespace Belle2 {
     */
     Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
+    /**
+    * Returns function which returns maximum transverse momentum Pt in the given particle Lists.
+    */
+    Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
   }
 }

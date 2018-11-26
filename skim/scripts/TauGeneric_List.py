@@ -21,13 +21,16 @@ def TauList():
     applyCuts('gamma:all', gammaCuts)
 
     # Get EventShape variables
-    buildEventShape(['pi+:all', 'gamma:all'])
+    buildEventShape(['pi+:all', 'gamma:all'], foxWolfram=False, cleoCones=False,
+                    jets=False, multipoleMoments=False, allMoments=False,
+                    collisionAxis=False, sphericity=False, thrust=True)
+    buildEventKinematics(['pi+:all', 'gamma:all'])
 
     # Split in signal and tag
-    cutAndCopyList('pi+:S1', 'pi+:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('pi+:S2', 'pi+:all', 'cosToEvtThrust < 0')
-    cutAndCopyList('gamma:S1', 'gamma:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('gamma:S2', 'gamma:all', 'cosToEvtThrust < 0')
+    cutAndCopyList('pi+:S1', 'pi+:all', 'cosToThrustOfEvent > 0')
+    cutAndCopyList('pi+:S2', 'pi+:all', 'cosToThrustOfEvent < 0')
+    cutAndCopyList('gamma:S1', 'gamma:all', 'cosToThrustOfEvent > 0')
+    cutAndCopyList('gamma:S2', 'gamma:all', 'cosToThrustOfEvent < 0')
 
     variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:all)')
     variables.addAlias('netCharge', 'formula(countInList(pi+:all, charge == 1) - countInList(pi+:all, charge == -1))')

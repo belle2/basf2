@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef KFITCONST_H
-#define KFITCONST_H
+#pragma once
 
 
 namespace Belle2 {
@@ -55,5 +54,4 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif  /* KFITCONST_H */
 

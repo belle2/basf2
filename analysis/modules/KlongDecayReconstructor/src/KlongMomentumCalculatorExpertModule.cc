@@ -39,7 +39,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
   KlongMomentumCalculatorExpertModule::KlongMomentumCalculatorExpertModule() :
-    Module()
+    Module(), m_pdgCode(0)
 
   {
     // set module description (e.g. insert text)
@@ -84,7 +84,6 @@ namespace Belle2 {
     m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
     m_klistName = m_recoList;
-    m_kpdgCode = Const::Klong.getPDGCode();
 
     // Daughters
     bool k_check = 0;
@@ -118,7 +117,7 @@ namespace Belle2 {
 
     StoreObjPtr<ParticleList> koutputList(m_klistName);
     koutputList.create();
-    koutputList->initialize(m_kpdgCode, m_klistName);
+    koutputList->initialize(Const::Klong.getPDGCode(), m_klistName);
 
     m_generator->init();
 

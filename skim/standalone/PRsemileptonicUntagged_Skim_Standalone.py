@@ -24,7 +24,7 @@ import sys
 import os
 import glob
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 skimCode = encodeSkimName('PRsemileptonicUntagged')
 
@@ -37,7 +37,7 @@ fileList = [
 inputMdstList('MC9', fileList)
 loadStdCharged()
 # PR Skim
-from PRsemileptonicUntagged_List import *
+from skim.semileptonic import PRList
 PRList = PRList()
 skimOutputUdst(skimCode, PRList)
 

@@ -24,7 +24,9 @@
 
 
 namespace Belle2 {
-  class StackTreeSearcher : public TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const> {
+  /// CKF tree searcher which traces several best paths.
+  class StackTreeSearcher : public
+    TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const> {
   public:
     StackTreeSearcher()
     {
@@ -38,11 +40,12 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
       m_stateCreator.exposeParameters(moduleParamList, prefix);
-      m_stateFilter.exposeParameters(moduleParamList, prefix);
+      m_stateFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("state", prefix));
       m_pathMerger.exposeParameters(moduleParamList, prefix);
-      m_pathSelector.exposeParameters(moduleParamList, prefix);
+      m_pathSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("path", prefix));
     }
 
+    /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.
     void apply(std::vector<CDCCKFPath>& paths,
                const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
     {
@@ -99,9 +102,13 @@ namespace Belle2 {
     }
 
   private:
+    /// algorthim to create CDC-CDF states while traversing the path
     CDCCKFStateCreator m_stateCreator;
+    /// algorithm to perform state filtering
     CDCCKFStateFilter m_stateFilter;
+    /// algorithm to merge similar paths
     CDCCKFPathMerger m_pathMerger;
+    /// algorithm to select N best paths, for further processing.
     CDCCKFPathSelector m_pathSelector;
   };
 }

@@ -30,20 +30,20 @@ Enddecay
 
 
 Decay B+sig
-0.01325   anti-D*0    mytau+ nu_tau        PHOTOS        HQET3 0.920 1.205 1.21 1.404 0.854;
-0.00689   anti-D0    mytau+ nu_tau         PHOTOS       HQET3 1.0541 1.128 1.0;
+0.0134976   anti-D*0    mytau+ nu_tau        PHOTOS        HQET3 0.912 1.205 1.15 1.404 0.854; 
+0.0068527   anti-D0     mytau+ nu_tau        PHOTOS        HQET3 1.0541 1.128 1.0;
 Enddecay
 CDecay B-sig
 
 Decay mytau-
-0.154002925 e-      anti-nu_e nu_tau                        PHOTOS TAULNUNU; 
+0.154002925 e-    anti-nu_e nu_tau                        PHOTOS TAULNUNU; 
 0.1700000 mu-     anti-nu_mu nu_tau                       PHOTOS  TAULNUNU; 
 Enddecay
 CDecay mytau+
 
 Decay myJpsi
-0.500 e+      e-                                      PHOTOS   VLL; 
-0.500 mu+     mu-                                     PHOTOS   VLL; 
+0.05940 e+      e-                                      PHOTOS   VLL; 
+0.05930 mu+     mu-                                     PHOTOS   VLL; 
 Enddecay
 
 

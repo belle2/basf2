@@ -26,6 +26,6 @@ namespace Belle2 {
     /** Initialises the module.
     * Where the datastore entries are marked for WriteOut.
     */
-    virtual void initialize();
+    virtual void initialize() override;
   };
 }

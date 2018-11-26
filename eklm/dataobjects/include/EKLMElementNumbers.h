@@ -323,7 +323,7 @@ namespace Belle2 {
 
   private:
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(EKLMElementNumbers, 2);
 
   };

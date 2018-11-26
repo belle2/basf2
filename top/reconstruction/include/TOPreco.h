@@ -69,6 +69,11 @@ namespace Belle2 {
                                  bool printMask = false);
 
       /**
+       * Set relative efficiencies of pixels
+       */
+      static void setChannelEffi();
+
+      /**
        * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
        * @param NumHyp number of mass hypotheses
        * @param HypID internal codes in the same order as Masses[]

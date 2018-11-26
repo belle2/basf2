@@ -23,8 +23,8 @@ namespace TreeFitter {
                          bool forceFitAll,
                          const bool ipConstraint,
                          const bool customOrigin,
-                         const std::vector<double> customOriginVertex,
-                         const std::vector<double> customOriginCovariance
+                         const std::vector<double>& customOriginVertex,
+                         const std::vector<double>& customOriginCovariance
                         ) :
     m_dim(0),
     m_headOfChain(0),

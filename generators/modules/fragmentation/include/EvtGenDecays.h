@@ -32,7 +32,7 @@ class EvtGenRandom : public EvtRandomEngine {
 public:
 
   // Constructor.
-  EvtGenRandom(Pythia8::Rndm* rndmPtrIn) {rndmPtr = rndmPtrIn;}
+  explicit EvtGenRandom(Pythia8::Rndm* rndmPtrIn) {rndmPtr = rndmPtrIn;}
 
   // Return a random number.
   double random() {if (rndmPtr) return rndmPtr->flat(); else return -1.0;}
@@ -105,6 +105,12 @@ public:
     if (extOwner && extPtr) delete extPtr;
     if (fsrOwner && fsrPtr) delete fsrPtr;
   }
+
+  // forbid copy
+  EvtGenDecays(const EvtGenDecays&) = delete;
+
+  // forbid assignment
+  EvtGenDecays& operator=(const EvtGenDecays&) = delete;
 
   // Get the Decay limits from Pythia
   void getDecayLimits(bool limit);
@@ -361,8 +367,10 @@ double EvtGenDecays::decay()
   }
 
   // Determine the decays of the signal particles (signal or background).
-  std::vector<int> modes; int force(-1), n(0);
+  std::vector<int> modes; int force(-1);
   for (int iTry = 1; iTry <= NTRYDECAY; ++iTry) {
+    int n(0);
+
     modes.clear(); force = pythiaPtr->rndm.pick(bfs); n = 0;
     for (int iSig = 0; iSig < (int)pySigs.size(); ++iSig) {
       if (iSig == force) modes.push_back(0);

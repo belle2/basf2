@@ -31,7 +31,6 @@ packer.param('dhe_to_dhc', [
 # ])
 
 unpacker = register_module('PXDUnpacker')
-unpacker.param('IgnoreMetaFlags', False)
 
 packercheck = register_module('PXDPackerErr')
 packercheck.param('dhe_to_dhc', [

@@ -23,5 +23,5 @@ in CMS using ``useCMSFrame(variable)`` meta-variable:
 
 Functions for list operations are stored below.
 
-.. automodule:: variableCollectionsTools
+.. automodule:: variables.utils
    :members:

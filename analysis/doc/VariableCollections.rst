@@ -7,5 +7,5 @@ To avoid very long lists of variable names in `variablesToNtuple <modularAnalysi
 it is possible to use predefined collections of variables (that are nothing else but python lists) instead.
 Commonly used variable collections presents here.
 
-.. automodule:: variableCollections
+.. automodule:: variables.collections
    :members:

@@ -107,7 +107,7 @@ namespace Belle2 {
     static std::vector < selFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 
-    ClassDef(SVDHitTimeSelectionFunction, 1)
+    ClassDef(SVDHitTimeSelectionFunction, 2)
   };
 
 }

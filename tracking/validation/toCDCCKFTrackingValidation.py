@@ -59,7 +59,7 @@ class toCDCCKF(TrackingValidationRun):
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 
-        path.add_module('TrackCreator', recoTrackColName='RecoTracks', pdgCodes=[13])
+        path.add_module('TrackCreator', recoTrackColName='RecoTracks')
 
     tracking_coverage = {
         'UsePXDHits': False,

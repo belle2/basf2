@@ -66,11 +66,6 @@ def ISRpipiccList(path):
     (3) Apply -4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4} to extract ISR signal events
     """
 
-    # create and fill standard e/mu/pi ParticleLists
-    fillParticleList('e+:loose', '')
-    fillParticleList('mu+:loose', '')
-    fillParticleList('pi+:loose', '')
-
     # intermediate state J/psi and psi(2S) are reconstructed
     # add mass window cut for J/psi and psi(2S) candidates
     reconstructDecay('J/psi:ee -> e+:loose e-:loose', 'M>3.0 and M<3.2', path=path)

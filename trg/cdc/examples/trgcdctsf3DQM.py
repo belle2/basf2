@@ -45,14 +45,14 @@ histo.param("histoFileName", "dqm.%s.root" % basename)
 
 # Unpacker
 trgcdctsfUnpacker = register_module("TRGCDCTSFUnpacker")
-trgcdctsfUnpacker.param('TSFMOD', 0)
+trgcdctsfUnpacker.param('TSFMOD', 3)
 main.add_module(trgcdctsfUnpacker)
 main.add_module(histo)
 
 # DQM
 trgcdctsfdqm = register_module('TRGCDCTSFDQM')
 trgcdctsfdqm.param('generatePostscript', True)
-trgcdctsfdqm.param('TSFMOD', 0)
+trgcdctsfdqm.param('TSFMOD', 3)
 # postscript file name
 psname = "dqm.%s.ps" % basename
 trgcdctsfdqm.param('postScriptName', psname)

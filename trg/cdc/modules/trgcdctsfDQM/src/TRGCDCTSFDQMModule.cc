@@ -41,12 +41,16 @@ TRGCDCTSFDQMModule::TRGCDCTSFDQMModule() : HistoModule()
   setDescription("DQM for CDCTSF Trigger system");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("TSFMOD", m_TSFMOD,
+           "TSF module number",
+           0);
   addParam("generatePostscript", m_generatePostscript,
            "Genarete postscript file or not",
            false);
   addParam("postScriptName", m_postScriptName,
            "postscript file name",
            string("gdldqm.ps"));
+
 
 }
 
@@ -58,11 +62,11 @@ void TRGCDCTSFDQMModule::defineHisto()
   dirDQM->cd();
   //Total number of TSF hits per event in each superlayer
   h_nhit = new TH1I("hCDCTSF_nhit", "nhit", 10, 0, 10);
-  h_nhit->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, 0));
+  h_nhit->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit->GetXaxis()->SetTitle("Total number of TSF hits/event");
   //Total number of hits in each TSF
   h_nhit_tsf = new TH1I("hCDCTSF_nhit_tsf", "nhit_tsf", 200, 0, 200);
-  h_nhit_tsf->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, 0));
+  h_nhit_tsf->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit_tsf->GetXaxis()->SetTitle("TSF ID");
   h_nhit_tsf->GetYaxis()->SetTitle("Total number of hits");
   oldDir->cd();
@@ -100,12 +104,13 @@ void TRGCDCTSFDQMModule::endRun()
     TCanvas c1("c1", "", 0, 0, 500, 300);
     c1.cd();
 
-    TPostScript* ps_nhit = new TPostScript((m_postScriptName + ".nhit.ps").c_str(), 112);
+    TPostScript* ps_nhit = new TPostScript((m_postScriptName + ".tsf_total_nhit_superlayer" + to_string(m_TSFMOD) + ".ps").c_str(),
+                                           112);
     h_nhit->Draw();
     c1.Update();
     ps_nhit->Close();
 
-    TPostScript* ps_nhit_tsf = new TPostScript((m_postScriptName + ".nhit_tsf.ps").c_str(), 112);
+    TPostScript* ps_nhit_tsf = new TPostScript((m_postScriptName + ".tsf_nhit_superlayer" + to_string(m_TSFMOD) + ".ps").c_str(), 112);
     h_nhit_tsf->Draw();
     c1.Update();
     ps_nhit_tsf->Close();

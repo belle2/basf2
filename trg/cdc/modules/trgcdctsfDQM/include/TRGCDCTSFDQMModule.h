@@ -38,16 +38,28 @@ namespace Belle2 {
   protected:
     //Total number of TSF hits per event in each superlayer
     TH1I* h_nhit;
+
     //Total number of hits in each TSF
     TH1I* h_nhit_tsf;
 
+    //TDirectories
     TDirectory* oldDir;
     TDirectory* dirDQM;
 
+    //flag to save ps file
     bool m_generatePostscript;
+
+    //name of ps file
     std::string m_postScriptName;
+
+    //experiment number
     unsigned _exp;
+
+    //run number
     unsigned _run;
+
+    //TSF module number
+    int m_TSFMOD;
 
   };
 

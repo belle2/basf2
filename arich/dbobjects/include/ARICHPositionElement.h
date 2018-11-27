@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /**
-   * Alignment element for ARICH.
+   * Position element for ARICH. Holding parameters for displacement and alignment of arich components
    */
   class ARICHPositionElement: public ARICHGeoBase {
   public:
@@ -99,6 +99,15 @@ namespace Belle2 {
      */
     void setGamma(double gamma) {m_gamma = gamma;}
 
+    /**
+     * Shift the existing values of parameters
+     * @param dx translation in x
+     * @param dy translation in y
+     * @param dz translation in z
+     * @param dalpha rotation angle around x
+     * @param dbeta rotation angle around y
+     * @param dgamma rotation angle around z
+     */
     void addShift(double dx, double dy, double dz, double dalpha, double dbeta, double dgamma)
     {
       m_x += dx;
@@ -172,7 +181,7 @@ namespace Belle2 {
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Parmeters of alignment element") const
+    void print(const std::string& title = "Parmeters of position element") const
     {
       std::cout << title << std::endl;
       std::cout << "translations (x,y,z): " << m_x << " " << m_y << " " << m_z << std::endl;

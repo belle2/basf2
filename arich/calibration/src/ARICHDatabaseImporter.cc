@@ -223,6 +223,8 @@ void ARICHDatabaseImporter::importMirrorAlignment()
   GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
   GearDir alignPars(content, "MirrorAlignment");
 
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
   ARICHMirrorAlignment mirrAlign;
 
   for (auto plate : alignPars.getNodes("Plate")) {
@@ -233,7 +235,8 @@ void ARICHDatabaseImporter::importMirrorAlignment()
     double alpha = plate.getLength("alpha");
     double beta = plate.getLength("beta");
     double gamma = plate.getLength("gamma");
-    ARICHPositionElement alignEl(r * cos(phi), r * sin(phi), z, alpha, beta, gamma);
+    double origPhi = geoConfig->getMirrors().getPoint(id).Phi();
+    ARICHPositionElement alignEl(r * cos(origPhi + phi), r * sin(origPhi + phi), z, alpha, beta, gamma);
     mirrAlign.setAlignmentElement(id, alignEl);
     alignEl.print();
   }

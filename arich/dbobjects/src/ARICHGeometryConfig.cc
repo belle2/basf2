@@ -43,6 +43,7 @@ void ARICHGeometryConfig::read(const GearDir& content)
                               envParams.getAngle("yRotation"), envParams.getAngle("zRotation"));
 
   GearDir displParams(content, "GlobalDisplacement");
+  m_displaceGlobal = !displParams.getBool("Disable");
   m_globalDispl.setX(displParams.getLength("x"));
   m_globalDispl.setY(displParams.getLength("y"));
   m_globalDispl.setZ(displParams.getLength("z"));
@@ -149,21 +150,22 @@ void ARICHGeometryConfig::read(const GearDir& content)
   }
 
   GearDir mirrDisplParams(content, "MirrorDisplacement");
-
-  for (auto plate : mirrDisplParams.getNodes("Plate")) {
-    int id = plate.getInt("@id");
-    double r = plate.getLength("r");
-    double phi = plate.getAngle("phi");
-    double z = plate.getLength("z");
-    double alpha = plate.getLength("alpha");
-    double beta = plate.getLength("beta");
-    double gamma = plate.getLength("gamma");
-
-    ARICHPositionElement displEl(r * cos(phi), r * sin(phi), z, alpha, beta, gamma);
-    m_mirrorDispl.setDisplacementElement(id, displEl);
-    displEl.print();
+  if (mirrDisplParams) {
+    m_displaceMirrors = !mirrDisplParams.getBool("Disable");
+    for (auto plate : mirrDisplParams.getNodes("Plate")) {
+      int id = plate.getInt("@id");
+      double r = plate.getLength("r");
+      double phi = plate.getAngle("phi");
+      double z = plate.getLength("z");
+      double alpha = plate.getLength("alpha");
+      double beta = plate.getLength("beta");
+      double gamma = plate.getLength("gamma");
+      double origPhi = m_mirrors.getPoint(id).Phi();
+      ARICHPositionElement displEl(r * cos(origPhi + phi), r * sin(origPhi + phi), z, alpha, beta, gamma);
+      m_mirrorDispl.setDisplacementElement(id, displEl);
+      displEl.print();
+    }
   }
-
   // read and prepare aerogel plane parameters
   GearDir aerogel(content, "Aerogel");
 

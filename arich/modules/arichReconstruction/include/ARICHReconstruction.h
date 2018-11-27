@@ -73,6 +73,7 @@ namespace Belle2 {
     //! Sets track direction resolution (from tracking)
     void setTrackAngleResolution(double aRes);
 
+    //! use mirror alignment or not
     void useMirrorAlignment(bool align)
     {
       m_alignMirrors = align;
@@ -91,6 +92,9 @@ namespace Belle2 {
     DBObjPtr<ARICHChannelMapping> m_chnMap; /**< map x,y channels to asic channels from the DB */
     DBObjPtr<ARICHGlobalAlignment> m_alignp; /**< global alignment parameters from the DB */
     DBObjPtr<ARICHMirrorAlignment> m_mirrAlign; /**< global alignment parameters from the DB */
+
+    std::vector<TVector3> m_mirrorPoints; /**< vector of points on all mirror plates */
+    std::vector<TVector3> m_mirrorNorms;  /**< vector of nomal vectors of all mirror plates */
 
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */
@@ -165,7 +169,10 @@ namespace Belle2 {
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
     TVector3 getTrackPositionAtZ(const ARICHTrack& track, double zout);
 
+    //! Returns point on the mirror plate with id mirrorID
     TVector3 getMirrorPoint(int mirrorID);
+
+    //! Returns normal vector of the mirror plate with id mirrorID
     TVector3 getMirrorNorm(int mirrorID);
 
   };

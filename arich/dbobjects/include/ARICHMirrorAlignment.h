@@ -53,7 +53,6 @@ namespace Belle2 {
 
     void print(const std::string& title = "Mirror Alignment Parameters") const
     {
-
       ARICHGeoBase::print(title);
       int i = 1;
       for (auto el : m_elements) { std::cout << "Mirror plate " << i++ << std::endl; el.print(); std::cout << std::endl;}
@@ -62,7 +61,7 @@ namespace Belle2 {
 
   private:
 
-    std::vector<ARICHPositionElement> m_elements{std::vector<ARICHPositionElement>(18)};
+    std::vector<ARICHPositionElement> m_elements{std::vector<ARICHPositionElement>(18)}; /**< vector of position elements for alignment */
     ClassDef(ARICHMirrorAlignment, 1); /**< ClassDef */
 
   };

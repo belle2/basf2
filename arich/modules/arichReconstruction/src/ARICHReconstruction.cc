@@ -89,6 +89,12 @@ namespace Belle2 {
     m_zaero[m_nAerogelLayers  ] = m_arichgp->getDetectorZPosition();
     m_zaero[m_nAerogelLayers + 1] = m_zaero[m_nAerogelLayers] + m_arichgp->getHAPDGeometry().getWinThickness();
 
+    m_mirrorNorms.clear();
+    m_mirrorPoints.clear();
+    for (unsigned i = 1; i < m_arichgp->getMirrors().getNMirrors() + 1; i++) {
+      m_mirrorNorms.push_back(getMirrorNorm(i));
+      m_mirrorPoints.push_back(getMirrorPoint(i));
+    }
   }
 
 
@@ -144,7 +150,7 @@ namespace Belle2 {
     //  z[0] .. 1st aerogel exit
     //  z[n-1] .. 2nd aerogel exit
 
-    double rmir = 0; double angmir = 0; int section[2] = {0, 0};
+    double angmir = 0; int section[2] = {0, 0};
 
     unsigned tileID = m_arichgp->getAerogelPlane().getAerogelTileID(r.X(), r.Y());
 
@@ -152,7 +158,6 @@ namespace Belle2 {
 
     int nmir = m_arichgp->getMirrors().getNMirrors();
     if (nmir > 0) {
-      rmir = m_arichgp->getMirrors().getPoint(1).XYvector().Mod();
       double dangle = 2 * M_PI / nmir;
       angmir = m_arichgp->getMirrors().getStartAngle() - dangle / 2.;
 
@@ -178,20 +183,20 @@ namespace Belle2 {
       r += dirf * path;
       TVector2 rxy = r.XYvector();
       // check for possible reflections
-      if (a != n || rxy.Mod() < rmir || nmir == 0) continue;
+      if (a != n || nmir == 0) continue;
       double angle = rxy.Phi() - angmir;
       if (angle < 0) angle += 2 * M_PI;
       if (angle > 2 * M_PI) angle -= 2 * M_PI;
       double dangle = 2 * M_PI / nmir;
       section[0] = int(angle / dangle) + 1;
-      if (r.Mag() > (r - 2 * getMirrorPoint(section[0])).Mag()) {
+      if (r.Mag() > (r - 2 * m_mirrorPoints[section[0] - 1]).Mag()) {
         refl = true;
         int nrefl = 2;
         if (section[0] == section[1]) nrefl = 1;
         for (int k = 0; k < nrefl; k++) {
           if (!HitsMirror(r0, dirf, section[k])) continue;
-          TVector3 mirpoint = getMirrorPoint(section[k]);
-          TVector3 mirnorm = getMirrorNorm(section[k]);
+          TVector3 mirpoint = m_mirrorPoints[section[k] - 1];
+          TVector3 mirnorm = m_mirrorNorms[section[k] - 1];
           double s = dirf * mirnorm;
           double s1 = (mirpoint - r0) * mirnorm;
           r = r0 + s1 / s * dirf;
@@ -212,8 +217,8 @@ namespace Belle2 {
   {
 
     if (mirrorID == 0) return hitpos;
-    TVector3 mirpoint = getMirrorPoint(mirrorID);
-    TVector3 mirnorm = getMirrorNorm(mirrorID);
+    TVector3 mirpoint = m_mirrorPoints[mirrorID - 1];
+    TVector3 mirnorm = m_mirrorNorms[mirrorID - 1];
     return hitpos - 2 * ((hitpos - mirpoint) * mirnorm) * mirnorm;
   }
 
@@ -221,8 +226,8 @@ namespace Belle2 {
   bool ARICHReconstruction::HitsMirror(const TVector3& pos, const TVector3& dir, int mirrorID)
   {
 
-    TVector3 mirnorm = getMirrorNorm(mirrorID);
-    TVector3 mirpoint = getMirrorPoint(mirrorID);
+    TVector3 mirnorm = m_mirrorNorms[mirrorID - 1];
+    TVector3 mirpoint = m_mirrorPoints[mirrorID - 1];
     TRotation rot = TransformToFixed(mirnorm);
     TVector3 dirTr = rot * dir;
     if (dirTr.Z() < 0) return 0; // comes from outter side
@@ -525,7 +530,7 @@ namespace Belle2 {
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii = fi_cer;
           if (mirr > 0) {
-            double fi_mir = getMirrorNorm(mirrors[mirr]).XYvector().Phi();
+            double fi_mir = m_mirrorNorms[mirrors[mirr] - 1].XYvector().Phi();
             fii = 2 * fi_mir - fi_cer - M_PI;
           }
 
@@ -714,12 +719,16 @@ namespace Belle2 {
 
   }
 
-
   TVector3 ARICHReconstruction::getMirrorNorm(int mirrorID)
   {
-    TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
-    if (m_alignMirrors && m_mirrAlign.isValid()) mirnorm.Transform(m_mirrAlign->getAlignmentElement(mirrorID).getRotation());
-    return mirnorm;
+    if (m_alignMirrors && m_mirrAlign.isValid()) {
+      TVector3 mirnorm(1, 0, 0);
+      mirnorm.RotateX(m_mirrAlign->getAlignmentElement(mirrorID).getAlpha());
+      mirnorm.RotateY(m_mirrAlign->getAlignmentElement(mirrorID).getBeta());
+      mirnorm.RotateZ(m_arichgp->getMirrors().getNormVector(mirrorID).Phi() + m_mirrAlign->getAlignmentElement(mirrorID).getGamma());
+      return mirnorm;
+    }
+    return m_arichgp->getMirrors().getNormVector(mirrorID);
   }
 
 

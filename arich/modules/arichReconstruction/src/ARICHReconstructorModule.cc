@@ -84,8 +84,6 @@ namespace Belle2 {
     m_ana->setTrackPositionResolution(m_trackPositionResolution);
     m_ana->setTrackAngleResolution(m_trackAngleResolution);
     m_ana->useMirrorAlignment(m_alignMirrors);
-    m_ana->initialize();
-
 
     StoreArray<ARICHHit> arichHits;
     arichHits.isRequired();
@@ -122,6 +120,7 @@ namespace Belle2 {
 
   void ARICHReconstructorModule::beginRun()
   {
+    m_ana->initialize();
   }
 
   void ARICHReconstructorModule::event()

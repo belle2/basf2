@@ -213,21 +213,42 @@ namespace Belle2 {
       m_mirrorDispl = displ;
     }
 
+    void setUseGlobalDisplacement(bool use)
+    {
+      m_displaceGlobal = use;
+    }
+
+    void setUseMirrorDisplacement(bool use)
+    {
+      m_displaceMirrors = use;
+    }
+
+    bool useGlobalDisplacement() const
+    {
+      return m_displaceGlobal;
+    }
+
+    bool useMirrorDisplacement() const
+    {
+      return m_displaceMirrors;
+    }
 
 
   private:
 
-    ARICHGeoDetectorPlane m_detectorPlane;   /**< detector plane geometry configuration */
-    ARICHGeoAerogelPlane m_aerogelPlane;     /**< aerogel plane geometry configuration */
-    ARICHGeoMirrors m_mirrors;               /**< mirrors geometry configuration */
-    ARICHGeoMasterVolume m_masterVolume;     /**< master volume geometry configuration */
-    ARICHGeoSupport m_supportStructure;      /**< support structure geometry configuration */
-    ARICHGeoHAPD m_hapd;                     /**< HAPD geometry configuration */
-    ARICHGeoMerger m_merger;                 /**< Merger PCB geometry configuration */
-    ARICHGeoCablesEnvelope m_cablesenvelope; /**< ARICH cables envelop geometry configuration */
-    ARICHGeoCooling m_cooling;               /**< ARICH cooling system geometry configuration */
+    ARICHGeoDetectorPlane m_detectorPlane;    /**< detector plane geometry configuration */
+    ARICHGeoAerogelPlane m_aerogelPlane;      /**< aerogel plane geometry configuration */
+    ARICHGeoMirrors m_mirrors;                /**< mirrors geometry configuration */
+    ARICHGeoMasterVolume m_masterVolume;      /**< master volume geometry configuration */
+    ARICHGeoSupport m_supportStructure;       /**< support structure geometry configuration */
+    ARICHGeoHAPD m_hapd;                      /**< HAPD geometry configuration */
+    ARICHGeoMerger m_merger;                  /**< Merger PCB geometry configuration */
+    ARICHGeoCablesEnvelope m_cablesenvelope;  /**< ARICH cables envelop geometry configuration */
+    ARICHGeoCooling m_cooling;                /**< ARICH cooling system geometry configuration */
     ARICHGeoGlobalDisplacement m_globalDispl;  /**< global displacement parameters */
     ARICHGeoMirrorDisplacement m_mirrorDispl;  /**< mirror displacement parameters */
+    bool m_displaceMirrors = 0;                 /**< use mirror displacement parameters */
+    bool m_displaceGlobal = 0;                  /**< use global displacement parameters */
 
     int m_bbstudy = 0; /**< is beam background study */
 

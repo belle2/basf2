@@ -110,22 +110,28 @@ namespace Belle2 {
       setVisibility(*masterLV, false);
 
       G4RotationMatrix rotMaster;
-      rotMaster.rotateX(m_config.getMasterVolume().getRotationX() + m_config.getGlobalDisplacement().getAlpha());
-      rotMaster.rotateY(m_config.getMasterVolume().getRotationY() + m_config.getGlobalDisplacement().getBeta());
-      rotMaster.rotateZ(m_config.getMasterVolume().getRotationZ() + m_config.getGlobalDisplacement().getGamma());
+      double rot_x = m_config.getMasterVolume().getRotationX();
+      double rot_y = m_config.getMasterVolume().getRotationX();
+      double rot_z = m_config.getMasterVolume().getRotationX();
+      double tr_x = m_config.getMasterVolume().getPosition().X();
+      double tr_y = m_config.getMasterVolume().getPosition().Y();
+      double tr_z = m_config.getMasterVolume().getPosition().Z();
 
-      G4ThreeVector transMaster(m_config.getMasterVolume().getPosition().X() + m_config.getGlobalDisplacement().getX(),
-                                m_config.getMasterVolume().getPosition().Y() + m_config.getGlobalDisplacement().getY(),
-                                m_config.getMasterVolume().getPosition().Z() + m_config.getGlobalDisplacement().getZ());
+      if (m_config.useGlobalDisplacement()) {
+        rot_x += m_config.getGlobalDisplacement().getAlpha();
+        rot_y += m_config.getGlobalDisplacement().getBeta();
+        rot_z += m_config.getGlobalDisplacement().getGamma();
+        tr_x +=  m_config.getGlobalDisplacement().getX();
+        tr_y +=  m_config.getGlobalDisplacement().getY();
+        tr_z +=  m_config.getGlobalDisplacement().getZ();
+        B2WARNING("ARICH global displacement parameters from DB will be taken into account.");
+      }
+      rotMaster.rotateX(rot_x);
+      rotMaster.rotateX(rot_y);
+      rotMaster.rotateX(rot_z);
 
+      G4ThreeVector transMaster(tr_x, tr_y, tr_z);
 
-      /*rotMaster.rotateX(m_config.getMasterVolume().getRotationX());
-      rotMaster.rotateY(m_config.getMasterVolume().getRotationY());
-      rotMaster.rotateZ(m_config.getMasterVolume().getRotationZ());
-
-      G4ThreeVector transMaster(m_config.getMasterVolume().getPosition().X(), m_config.getMasterVolume().getPosition().Y(),
-                                m_config.getMasterVolume().getPosition().Z());
-      */
       new G4PVPlacement(G4Transform3D(rotMaster, transMaster), masterLV, "ARICH.MasterVolume", &topVolume, false, 1);
 
       m_isBeamBkgStudy = m_config.doBeamBackgroundStudy();
@@ -241,13 +247,28 @@ namespace Belle2 {
 
       double angl = mirStart;
       double dphi = 2 * M_PI / nMirrors;
+      if (m_config.useMirrorDisplacement()) B2WARNING("ARICH mirrors displacement parameters from DB will be used.");
       for (int i = 1; i < nMirrors + 1; i++) {
+        double mrot_x = 0;
+        double mrot_y = 0;
+        double mrot_z = angl;
+        double mtr_x  = mirRad * cos(angl);
+        double mtr_y  = mirRad * sin(angl);
+        double mtr_z  = mirZPos + zShift;
+        if (m_config.useMirrorDisplacement()) {
+          const ARICHPositionElement& displ = m_config.getMirrorDisplacement().getDisplacementElement(i);
+          mrot_x += displ.getAlpha();
+          mrot_y += displ.getBeta();
+          mrot_z += displ.getGamma();
+          mtr_x += displ.getX();
+          mtr_y += displ.getY();
+          mtr_z += displ.getZ();
+        }
         G4RotationMatrix rotMirror;
-        const ARICHPositionElement& displ = m_config.getMirrorDisplacement().getDisplacementElement(i);
-        rotMirror.rotateX(angl + displ.getAlpha());
-        rotMirror.rotateY(angl + displ.getBeta());
-        rotMirror.rotateZ(angl + displ.getGamma());
-        G4ThreeVector transMirror(mirRad * cos(angl) + displ.getX(), mirRad * sin(angl) + displ.getY(), mirZPos + displ.getX() + zShift);
+        rotMirror.rotateX(mrot_x);
+        rotMirror.rotateY(mrot_y);
+        rotMirror.rotateZ(mrot_z);
+        G4ThreeVector transMirror(mtr_x, mtr_y, mtr_z);
         new G4PVPlacement(G4Transform3D(rotMirror, transMirror), mirrorLV, "ARICH.mirrorPlate", masterLV, false, i);
         angl += dphi;
       }

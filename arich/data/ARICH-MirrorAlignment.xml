@@ -2,17 +2,17 @@
 
 <MirrorAlignment>
   <Plate id="1">
-    <r desc="alignment in r" unit="mm">1.0</r>
+    <r desc="alignment in r" unit="mm">0.0</r>
     <phi desc="alignment in phi" unit="deg">0.0</phi>
-    <z desc="alignment in z" unit="mm">0</z>
-    <alpha desc="x angle alignment" unit="deg">1.0</alpha>
+    <z desc="alignment in z" unit="mm">0.0</z>
+    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
     <beta desc="y angle alignment" unit="deg">0.0</beta>
     <gamma desc="z angle alignment" unit="deg">0.0</gamma>
   </Plate>
  <Plate id="2">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -20,23 +20,23 @@
  <Plate id="3">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
  </Plate>
  <Plate id="4">
-   <r desc="alignment in r" unit="mm">2.0</r>
+   <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
-   <alpha desc="x angle alignment" unit="deg">2.0</alpha>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
  </Plate>
  <Plate id="5">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -44,7 +44,7 @@
  <Plate id="6">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -52,7 +52,7 @@
  <Plate id="7">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -60,7 +60,7 @@
  <Plate id="8">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -68,7 +68,7 @@
  <Plate id="9">
     <r desc="alignment in r" unit="mm">0.0</r>
     <phi desc="alignment in phi" unit="deg">0.0</phi>
-    <z desc="alignment in z" unit="mm">0</z>
+    <z desc="alignment in z" unit="mm">0.0</z>
     <alpha desc="x angle alignment" unit="deg">0.0</alpha>
     <beta desc="y angle alignment" unit="deg">0.0</beta>
     <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -76,7 +76,7 @@
  <Plate id="10">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -84,7 +84,7 @@
  <Plate id="11">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -92,7 +92,7 @@
  <Plate id="12">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -100,7 +100,7 @@
  <Plate id="13">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -108,7 +108,7 @@
  <Plate id="14">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -116,7 +116,7 @@
  <Plate id="15">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -124,7 +124,7 @@
  <Plate id="16">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -132,7 +132,7 @@
  <Plate id="17">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
@@ -140,7 +140,7 @@
  <Plate id="18">
    <r desc="alignment in r" unit="mm">0.0</r>
    <phi desc="alignment in phi" unit="deg">0.0</phi>
-   <z desc="alignment in z" unit="mm">0</z>
+   <z desc="alignment in z" unit="mm">0.0</z>
    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
    <beta desc="y angle alignment" unit="deg">0.0</beta>
    <gamma desc="z angle alignment" unit="deg">0.0</gamma>

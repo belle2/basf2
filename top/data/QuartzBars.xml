@@ -255,123 +255,123 @@
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="451368"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="451368">
     <Module descr="module construction number">16</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.36</Length>
+    <Width unit="mm">450.10</Width>
+    <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="451635"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="451635">
     <Module descr="module construction number">12</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.40</Length>
+    <Width unit="mm">450.15</Width>
+    <Thickness unit="mm">20.05</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="451849"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="451849">
     <Module descr="module construction number">12</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.15</Length>
+    <Width unit="mm">450.12</Width>
+    <Thickness unit="mm">20.06</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="450691"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="450691">
     <Module descr="module construction number">13</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.35</Length>
+    <Width unit="mm">450.10</Width>
+    <Thickness unit="mm">20.07</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="450693"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="450693">
     <Module descr="module construction number">13</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.35</Length>
+    <Width unit="mm">450.17</Width>
+    <Thickness unit="mm">20.07</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="450694"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="450694">
     <Module descr="module construction number">14</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.16</Length>
+    <Width unit="mm">450.13</Width>
+    <Thickness unit="mm">20.03</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="451369"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="451369">
     <Module descr="module construction number">14</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.34</Length>
+    <Width unit="mm">450.12</Width>
+    <Thickness unit="mm">20.04</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="451370"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="451370">
     <Module descr="module construction number">15</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.39</Length>
+    <Width unit="mm">450.12</Width>
+    <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="452291"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="452291">
     <Module descr="module construction number">15</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.40</Length>
+    <Width unit="mm">450.12</Width>
+    <Thickness unit="mm">20.095</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="452339"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="452339">
     <Module descr="module construction number">17</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.35</Length>
+    <Width unit="mm">450.09</Width>
+    <Thickness unit="mm">20.08</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>
 
-  <QuartzBar SerialNumber="452338"> <!-- nominal values only -->
+  <QuartzBar SerialNumber="452338">
     <Module descr="module construction number">17</Module>
-    <Vendor>xxx</Vendor>
+    <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">1250</Length>
-    <Width unit="mm">450</Width>
-    <Thickness unit="mm">20</Thickness>
+    <Length unit="mm">1250.37</Length>
+    <Width unit="mm">450.08</Width>
+    <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </QuartzBar>

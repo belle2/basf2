@@ -427,7 +427,7 @@ namespace Belle2 {
 
       // PMT array
 
-      GearDir pmtParams(content, "PMTs/Module");
+      GearDir pmtParams(content, "PMTs/PMT");
       TOPGeoPMT pmt(pmtParams.getLength("ModuleXSize"),
                     pmtParams.getLength("ModuleYSize"),
                     pmtParams.getLength("ModuleZSize") +
@@ -460,6 +460,10 @@ namespace Belle2 {
                               arrayParams.getLength("Ygap"),
                               arrayParams.getString("stackMaterial"),
                               pmt);
+      pmtArray.setSiliconeCookie(arrayParams.getLength("siliconeCookie/thickness"),
+                                 arrayParams.getString("siliconeCookie/material"));
+      pmtArray.setWavelengthFilter(arrayParams.getLength("wavelengthFilter/thickness"),
+                                   arrayParams.getString("wavelengthFilter/material"));
       pmtArray.setAirGap(arrayParams.getLength("airGap", 0));
       double decoupledFraction = arrayParams.getDouble("decoupledFraction", 0);
 
@@ -481,8 +485,6 @@ namespace Belle2 {
 
         auto prism = createPrism(content, slotParams.getString("Prism"));
         prism.setName(addNumber(prism.getName(), cNumber));
-        prism.setGlue(arrayParams.getLength("dGlue"),
-                      arrayParams.getString("glueMaterial"));
         module.setPrism(prism);
 
         auto barSegment2 = createBarSegment(content, slotParams.getString("BarSegment2"));
@@ -828,7 +830,7 @@ namespace Belle2 {
         double lambdaLast = c_hc / energies[0];
         double lambdaStep = 5; // [nm]
         int numSteps = (lambdaLast - lambdaFirst) / lambdaStep + 1;
-        const double filterThickness = arrayParams.getLength("dGlue");
+        const double filterThickness = arrayParams.getLength("wavelengthFilter/thickness");
         std::vector<float> bulkTransmittances;
         for (int i = 0; i < numSteps; i++) {
           double wavelength = lambdaFirst + lambdaStep * i;
@@ -886,8 +888,7 @@ namespace Belle2 {
       // mirror reflective coating
       auto& materials = geometry::Materials::getInstance();
       GearDir coatingParams(params, "Surface");
-      mirror.setCoating(params.getLength("mirrorThickness"),
-                        params.getString("Material"),
+      mirror.setCoating(params.getLength("mirrorThickness"), "Al",
                         materials.createOpticalSurfaceConfig(coatingParams));
 
       // optical surface

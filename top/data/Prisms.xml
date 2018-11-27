@@ -145,79 +145,79 @@
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
-  <Prism SerialNumber="451252"> <!-- nominal values only -->
+  <Prism SerialNumber="451252">
     <Module descr="module construction number">17</Module>
     <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">100</Length>
-    <Width unit="mm">456</Width>
-    <Thickness unit="mm">20</Thickness>
-    <ExitThickness unit="mm">51</ExitThickness>
+    <Length unit="mm">100.05</Length>
+    <Width unit="mm">456.10</Width>
+    <Thickness unit="mm">20.04</Thickness>
+    <ExitThickness unit="mm">51.05</ExitThickness>
     <Angle unit="deg">18.075</Angle>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
-  <Prism SerialNumber="450943"> <!-- nominal values only -->
+  <Prism SerialNumber="450943">
     <Module descr="module construction number">13</Module>
     <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">100</Length>
-    <Width unit="mm">456</Width>
-    <Thickness unit="mm">20</Thickness>
-    <ExitThickness unit="mm">51</ExitThickness>
+    <Length unit="mm">99.99</Length>
+    <Width unit="mm">456.06</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <ExitThickness unit="mm">51.08</ExitThickness>
     <Angle unit="deg">18.08</Angle>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
-  <Prism SerialNumber="450946"> <!-- nominal values only -->
+  <Prism SerialNumber="450946">
     <Module descr="module construction number">16</Module>
     <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">100</Length>
-    <Width unit="mm">456</Width>
-    <Thickness unit="mm">20</Thickness>
-    <ExitThickness unit="mm">51</ExitThickness>
+    <Length unit="mm">100.01</Length>
+    <Width unit="mm">456.02</Width>
+    <Thickness unit="mm">20.06</Thickness>
+    <ExitThickness unit="mm">51.05</ExitThickness>
     <Angle unit="deg">18.077</Angle>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
-  <Prism SerialNumber="450944"> <!-- nominal values only -->
+  <Prism SerialNumber="450944">
     <Module descr="module construction number">14</Module>
     <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">100</Length>
-    <Width unit="mm">456</Width>
-    <Thickness unit="mm">20</Thickness>
-    <ExitThickness unit="mm">51</ExitThickness>
+    <Length unit="mm">100.04</Length>
+    <Width unit="mm">456.12</Width>
+    <Thickness unit="mm">20.07</Thickness>
+    <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.077</Angle>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
-  <Prism SerialNumber="450942"> <!-- nominal values only -->
+  <Prism SerialNumber="450942">
     <Module descr="module construction number">12</Module>
     <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">100</Length>
-    <Width unit="mm">456</Width>
-    <Thickness unit="mm">20</Thickness>
-    <ExitThickness unit="mm">51</ExitThickness>
+    <Length unit="mm">100.04</Length>
+    <Width unit="mm">456.04</Width>
+    <Thickness unit="mm">20.04</Thickness>
+    <ExitThickness unit="mm">51.05</ExitThickness>
     <Angle unit="deg">18.08</Angle>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
-  <Prism SerialNumber="450945"> <!-- nominal values only -->
+  <Prism SerialNumber="450945">
     <Module descr="module construction number">15</Module>
     <Vendor>Zygo</Vendor>
     <Material>TOPSiO2</Material>
-    <Length unit="mm">100</Length>
-    <Width unit="mm">456</Width>
-    <Thickness unit="mm">20</Thickness>
-    <ExitThickness unit="mm">51</ExitThickness>
+    <Length unit="mm">100.07</Length>
+    <Width unit="mm">456.04</Width>
+    <Thickness unit="mm">20.06</Thickness>
+    <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.076</Angle>
     <OpticalSurface>QuartzSurface</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>

@@ -23,6 +23,8 @@ parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1,
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
+parser.add_argument('--nomask', metavar='maskField', dest='mask', type=int, nargs=1,
+                    help='Old xml format with no mask field corresponds to nomask = 1')
 
 '''
 if(len(sys.argv) != 7):
@@ -40,25 +42,38 @@ args = parser.parse_args()
 
 experiment = args.exp[0]
 run = args.run[0]
+
 if args.calib is not None:
     calibfile = args.calib[0]
 else:
     calibfile = args.calib
+
 if args.mapp is not None:
     mappingfile = args.mapp[0]
 else:
     mappingfile = args.mapp
 
+if args.mask is not None:
+    masking = args.mask[0]
+else:
+    masking = args.mask
+
+
 print('experiment number = ' + str(experiment))
 print('       run number = ' + str(run))
 print('  calibration xml = ' + str(calibfile))
 print('      mapping xml = ' + str(mappingfile))
+print('      no_masks = ' + str(masking))
 
 reset_database()
 use_database_chain()
 # central DB needed for the channel mapping DB object
-use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
+use_central_database("Calibration_Offline_Development")
 use_local_database("localDB/database.txt", "localDB")
+
+# global tag and database needed for commissioning
+# GLOBAL_TAG = "vxd_commissioning_20181030"
+# use_central_database(GLOBAL_TAG)
 
 main = create_path()
 
@@ -92,8 +107,11 @@ class dbImporterModule(Module):
             dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
             print("Pulse Shape Calibrations Imported")
             # import FADCMasked strips
-            dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
-            print("FADC Masked Strips Imported")
+            if args.mask is None:
+                dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
+                print("FADC Masked Strips Imported")
+            elif (masking == 1):
+                print("FADC Masked Strips can not be imported. The local calibration xml file has NO masks field!")
         if args.mapp is not None:
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)

@@ -6,8 +6,7 @@
 #pragma link C++ nestedclasses;
 
 // The following two are needed for the python interface
-#pragma link C++ class Belle2::SVDDatabaseImporter+;
 #pragma link C++ class Belle2::SVDCoGCalibrationsImporter;
 #pragma link C++ class Belle2::SVDNoiseCalibrations;
-
+#pragma link C++ class Belle2::SVDLocalCalibrationsImporter+;
 #endif

@@ -26,19 +26,17 @@
 #include <framework/database/PayloadFile.h>
 #include <memory>
 
+#include <framework/core/HistoModule.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <TH2S.h>
 #include <TDirectory.h>
 #include <TCollection.h>
 #include <map>
 
 namespace Belle2 {
 
-  /** SVD DQM Module .......*/
-  class SVDUnpackerDQMModule : public Module {
+  /** SVD DQM Module for the Unpacker*/
+  class SVDUnpackerDQMModule : public HistoModule {
 
   public:
 
@@ -48,15 +46,19 @@ namespace Belle2 {
     /* Destructor */
     virtual ~SVDUnpackerDQMModule();
 
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    /** Module function initialize */
+    void initialize() override final;
+    /** Module function beginRun */
+    void beginRun() override final;
+    /** Module function event */
+    void event() override final;
 
-    /* ROOT File */
-    std::string m_rootFileName;
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    /**
+     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
+     * to be placed in this function.
+    */
+    void defineHisto() override final;
+
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
 

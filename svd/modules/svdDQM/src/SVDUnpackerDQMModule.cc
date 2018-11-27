@@ -18,7 +18,6 @@
 
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDCluster.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
@@ -47,16 +46,17 @@ REG_MODULE(SVDUnpackerDQM)
 
 std::string SVDUnpackerDQMModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
-SVDUnpackerDQMModule::SVDUnpackerDQMModule() : Module(), m_mapping(m_xmlFileName)
+SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFileName)
 {
   //Set module properties
-  setDescription("DQM Histograms");
+  setDescription("DQM Histogram for the SVD Unpacker");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
-           std::string("SVDDQM"));
-  addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDDQMHisto.root"));
+           std::string("SVDUnpacker"));
   addParam("ShaperDigitsName", m_ShaperDigitName, "Name of ShaperDigit Store Array.", std::string(""));
   addParam("DiagnosticsName", m_SVDDAQDiagnosticsName, "Name of DAQDiagnostics Store Array.", std::string(""));
+
+  setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 }
 
 
@@ -64,25 +64,19 @@ SVDUnpackerDQMModule::~SVDUnpackerDQMModule()
 {
 }
 
+//------------------------------------------------------------------
+// Function to define histograms
+//-----------------------------------------------------------------
 
-void SVDUnpackerDQMModule::initialize()
+void SVDUnpackerDQMModule::defineHisto()
 {
-  m_eventMetaData.isRequired();
-  m_svdShapers.isRequired(m_ShaperDigitName);
-  m_svdDAQDiagnostics.isRequired(m_SVDDAQDiagnosticsName);
 
-  m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
-}
-
-
-void SVDUnpackerDQMModule::beginRun()
-{
-  if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
-
-  changeFADCaxis = false;
-
-  //getting fadc numbers from the mapping
-  FADCs = &(m_map->FADCnumbers);
+  // Create a separate histogram directories and cd into it.
+  TDirectory* oldDir = gDirectory;
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not use return value with ->cd(), its ZERO if dir already exists
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   unsigned short Bins_FTBFlags = 5;
   unsigned short Bins_FTBError = 4;
@@ -105,6 +99,33 @@ void SVDUnpackerDQMModule::beginRun()
 
   //preparing X axis of the histogram
   for (unsigned short i = 0; i < nBits; i++) DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
+
+
+  oldDir->cd();
+}
+
+void SVDUnpackerDQMModule::initialize()
+{
+  m_eventMetaData.isRequired();
+  m_svdShapers.isRequired(m_ShaperDigitName);
+  m_svdDAQDiagnostics.isRequired(m_SVDDAQDiagnosticsName);
+
+  // Register histograms (calls back defineHisto)
+  REG_HISTOGRAM
+}
+
+
+void SVDUnpackerDQMModule::beginRun()
+{
+
+  if (DQMUnpackerHisto != NULL) DQMUnpackerHisto->Reset();
+
+  if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
+  changeFADCaxis = false;
+
+  //getting fadc numbers from the mapping
+  FADCs = &(m_map->FADCnumbers);
 
   //copy FADC numbers to vector and sort them
   vec_fadc.insert(vec_fadc.end(), FADCs->begin(), FADCs->end());
@@ -205,20 +226,4 @@ void SVDUnpackerDQMModule::event()
   }
 
 } // end event function
-
-
-void SVDUnpackerDQMModule::endRun()
-{
-
-  if (m_rootFilePtr != NULL) {
-    m_rootFilePtr->Write();
-    m_rootFilePtr->Close();
-  }
-// delete DQMUnpackerHisto;
-}
-
-void SVDUnpackerDQMModule::terminate()
-{
-// delete m_rootFilePtr;
-}
 

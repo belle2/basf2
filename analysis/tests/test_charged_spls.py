@@ -6,46 +6,19 @@ from basf2 import create_path
 import stdCharged
 
 #: the basic std functions
-_base_functions = {
+_base_functions = [
     stdCharged.stdPi,
     stdCharged.stdK,
     stdCharged.stdPr,
     stdCharged.stdE,
     stdCharged.stdMu
-}
-
-#: the functions with 95% lists
-_95_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK,
-    stdCharged.stdMu,
-    stdCharged.stdE
-}
-
-#: the functions with 90% lists
-_90_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK,
-    stdCharged.stdPr
-}
-
-#: the functions with 85% lists
-_85_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK
-}
-
-#: the stdLoose functions
-_loose_functions = {
-    stdCharged.stdPi,
-    stdCharged.stdK,
-    stdCharged.stdPr,
-    stdCharged.stdE,
-    stdCharged.stdMu
-}
+]
+_chargednames = ['pi', 'K', 'p', 'e', 'mu']
 
 #: the default particle list loaded
 _defaultlist = "good"
+#: the names of cuts for fixed efficiency percentiles
+_effnames = ['95eff', '90eff', '85eff']
 
 
 class TestStdCharged(unittest.TestCase):
@@ -105,10 +78,6 @@ class TestStdCharged(unittest.TestCase):
         """check that the builder functions all work with the all list"""
         self._check_listtype_does_not_exist("flibble")
 
-    def test_loose(self):
-        """check that all functions can be called with no argument"""
-        self._check_listtype_exists("loose")
-
     def test_all_list(self):
         """check that the builder functions all work with the all list"""
         self._check_listtype_exists("all")
@@ -123,23 +92,26 @@ class TestStdCharged(unittest.TestCase):
         """check that the builder functions all work with the higheff list"""
         self._check_listtype_exists("higheff")
 
-    def test_95(self):
-        """check that the builder functions all work with the 95eff list"""
-        self._check_listtype_exists("95eff", _95_functions)
-        without_95 = _base_functions - _95_functions
-        self._check_listtype_does_not_exist("95eff", without_95)
+    def test_loose(self):
+        """check that the builder functions all work with the loose list"""
+        self._check_listtype_exists("loose")
 
-    def test_90(self):
-        """check that the builder functions all work with the 90eff list"""
-        self._check_listtype_exists("90eff", _90_functions)
-        without_90 = _base_functions - _90_functions
-        self._check_listtype_does_not_exist("90eff", without_90)
-
-    def test_85(self):
-        """check that the builder functions all work with the 85eff list"""
-        self._check_listtype_exists("85eff", _85_functions)
-        without_85 = _base_functions - _85_functions
-        self._check_listtype_does_not_exist("85eff", without_85)
+    def test_percentile_eff(self):
+        """check that the builder functions all work with the percentile eff lists"""
+        for function in _base_functions:
+            eff_exists = 0
+            for ename in _effnames:
+                cut = stdCharged.stdChargedEffCuts(_chargednames[_base_functions.index(function)],
+                                                   ename)
+                if 0.0 < cut < 1.0:
+                    self._check_listtype_exists(ename, [function])
+                    eff_exists += 1
+                else:
+                    self._check_listtype_does_not_exist(ename, [function])
+            self.assertTrue(
+                eff_exists,
+                "Function: \"%s\" has no valid list based on efficiency percentile."
+                % (function.__name__))
 
 
 if __name__ == '__main__':

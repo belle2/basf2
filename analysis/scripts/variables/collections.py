@@ -123,10 +123,15 @@ mc_kinematics = [
 ]
 
 #: Replacement for MCHierarchy tool
-#: What's missing: grandmother and grand-grand-mother ID
-#: [BII-3870]
-mc_hierarchy = [
-    'genMotherID']
+mc_hierarchy = ut.create_aliases(["mcPDG"],
+                                 "mcMother({variable})",
+                                 "mother")
+mc_hierarchy += ut.create_aliases(["mcPDG"],
+                                  "mcMother(mcMother({variable}))",
+                                  "grandmother")
+mc_hierarchy += ut.create_aliases(["mcPDG"],
+                                  "mcMother(mcMother(mcMother({variable})))",
+                                  "grandgrandmother")
 
 #: Truth-matching related variables
 mc_variables = [
@@ -185,19 +190,39 @@ flight_info = ['flightTime',
 mc_flight_info = ut.make_mc(flight_info)
 
 #: Replacement for Vertex tuple tool
-#: see BII-3876
 vertex = [
+    'distance',
+    'significanceOfDistance',
+    'dx',
+    'dy',
+    'dz',
     'x',
-    'x_uncertainty',
     'y',
-    'y_uncertainty',
     'z',
+    'x_uncertainty',
+    'y_uncertainty',
     'z_uncertainty',
+    'dr',
+    'dphi',
+    'dcosTheta',
+    'prodVertexX',
+    'prodVertexY',
+    'prodVertexZ',
+    'prodVertexXErr',
+    'prodVertexYErr',
+    'prodVertexZErr',
     'pValue']
 
-#: Replacement for MVVertex tuple tool
-#: see BII-3876
-mc_vertex = ut.make_mc(vertex)
+#: Replacement for MCVertex tuple tool
+mc_vertex = [
+    'mcX',
+    'mcY',
+    'mcZ',
+    'mcDistance',
+    'mcRho',
+    'mcProdVertexX',
+    'mcProdVertexY',
+    'mcProdVertexZ']
 
 #: Tag-side related variables
 tag_vertex = [
@@ -235,7 +260,6 @@ momentum_uncertainty = [
     'pzErr']
 
 #: Replacement for RecoStats tool
-#: [BII-3759]
 reco_stats = [
     'nECLClusters',
     'nTracks',

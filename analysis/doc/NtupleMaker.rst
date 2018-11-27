@@ -6,7 +6,7 @@ The :doc:`NtupleMaker`  module builds ntuples from a `ParticleList`_  . There is
 Click here to learn how to develop your own NtupleTool
 
 How to create ntuples using the :doc:`NtupleMaker` module
-----------------------------------------------------
+---------------------------------------------------------
 
 At the end of an analysis chain you end up with a list of Particle objects in the DataStore and you want to write the properties (e.g. kinematics or truth information) of these particles to an ntuple (TTree). Everybody who has done this before knows that this is a lot of work because every variable has to be defined, introduced to the TTree and set to the correct value.
 

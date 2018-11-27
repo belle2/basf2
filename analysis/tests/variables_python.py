@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import variables
+
+from variables import printVars
+from variables import std_vector
 from variables import variables as v
 
 # some variables should be there
 assert len(v.getVariables()) > 0
 
-variables.printVars()
+printVars()
 
 var = v.getVariable('M')
 assert 'M' == var.name
@@ -24,7 +26,7 @@ import ROOT
 assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')
 assert 'extraInfo(SignalProbability)' == ROOT.Belle2.invertMakeROOTCompatible('extraInfo__boSignalProbability__bc')
 
-v.addCollection('kin', variables.std_vector('p', 'px', 'py', 'pz'))
+v.addCollection('kin', std_vector('p', 'px', 'py', 'pz'))
 vec = v.getCollection('kin')
 assert vec[0] == 'p'
 assert vec[1] == 'px'

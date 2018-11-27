@@ -26,6 +26,7 @@
 
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 
+#include <framework/particledb/EvtGenDatabasePDG.h>
 using namespace Belle2;
 
 REG_MODULE(TreeFitter)
@@ -42,6 +43,7 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            1.);
   addParam("massConstraintList", m_massConstraintList,
            "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).");
+  addParam("massConstraintList_particlename", m_massConstraintList_particlename, "");
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
@@ -146,7 +148,17 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     )
   );
   /** TODO this is a bit of a hack. Make a config struct or so. */
-  TreeFitter::massConstraintListPDG = m_massConstraintList;
+  //  TreeFitter::massConstraintListPDG = m_massConstraintList;
+  if ((m_massConstraintList.size()) == 0 && (m_massConstraintList_particlename.size()) > 0) {
+    for (unsigned int i = 0; i < m_massConstraintList_particlename.size(); i++) {
+      TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((m_massConstraintList_particlename[i]).c_str());
+      m_massConstraintList.push_back(particletemp->PdgCode());
+    }
+    TreeFitter::massConstraintListPDG = m_massConstraintList;
+  } else {
+    TreeFitter::massConstraintListPDG = m_massConstraintList;
+  }
+
   TreeFitter::massConstraintType = m_massConstraintType;
   TreeFitter::removeConstraintList = m_removeConstraintList;
 

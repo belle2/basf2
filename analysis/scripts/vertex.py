@@ -401,6 +401,7 @@ def vertexTree(
     list_name,
     conf_level=0.001,
     massConstraint=[],
+    massConstraint_particlename=[''],
     ipConstraint=False,
     updateAllDaughters=False,
     customOriginConstraint=False,
@@ -423,6 +424,7 @@ def vertexTree(
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
     @param massConstraint list of PDG ids which are mass-constrained
+    @param massConstraint list of Name of the particles which are mass-constrained
     @param ipConstraint constrain head production vertex to IP (x-y-z) constraint, default: False)
     @param customOriginConstraint use a costum origin vertex as the production vertex of your particle." + \
         "This is usefull when fitting D*/D without wanting to fit a B but constraining the process to be B-decay like + \
@@ -443,6 +445,7 @@ def vertexTree(
     treeFitter.param('particleList', list_name)
     treeFitter.param('confidenceLevel', conf_level)
     treeFitter.param('massConstraintList', massConstraint)
+    treeFitter.param('massConstraintList_particlename', massConstraint_particlename)
     treeFitter.param('ipConstraint', ipConstraint)
     treeFitter.param('updateAllDaughters', updateAllDaughters)
     treeFitter.param('customOriginConstraint', customOriginConstraint)

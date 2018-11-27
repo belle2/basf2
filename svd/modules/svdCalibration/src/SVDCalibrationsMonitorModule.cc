@@ -210,13 +210,21 @@ void SVDCalibrationsMonitorModule::initialize()
 
 
 
+          //CLUSTER Time Selection Function
+          NameOfHisto = "cls_ClusterTimeSelFunction_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Time Selection Function Version(Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + ","
+                         + nameSide +
+                         " side)";
+          h_clsTimeFuncVersion[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 5, -0.5, 4.5,
+                                                              "cls time Sel Function ID", m_histoList_cluster);
+
           //CLUSTER Time
           NameOfHisto = "cls_ClusterTime_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfHisto = "Cluster Minimum Time (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
                          " side)";
-          h_clsTime[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100,
-                                                                     "cls min Time",
-                                                                     m_histoList_cluster);
+          h_clsTimeMin[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100,
+                                                      "cls min Time",
+                                                      m_histoList_cluster);
 
 
         }
@@ -314,8 +322,12 @@ void SVDCalibrationsMonitorModule::event()
           float clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 3, 1);
           h_clsScaleErr3[layer][ladder][sensor][1]->Fill(clsScaleErr3);
 
-          float clsTime = m_ClusterCal.getMinClusterTime(theVxdID, 1);
-          h_clsTime[layer][ladder][sensor][1]->Fill(clsTime);
+          float clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, 1);
+          h_clsTimeMin[layer][ladder][sensor][1]->Fill(clsTimeMin);
+
+          float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 1);
+          h_clsTimeFuncVersion[layer][ladder][sensor][1]->Fill(clsTimeFunc);
+
 
         } //histogram filled for U side
 
@@ -354,8 +366,11 @@ void SVDCalibrationsMonitorModule::event()
           float clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 0, 3, 1);
           h_clsScaleErr3[layer][ladder][sensor][0]->Fill(clsScaleErr3);
 
-          float clsTime = m_ClusterCal.getMinClusterTime(theVxdID, 0);
-          h_clsTime[layer][ladder][sensor][0]->Fill(clsTime);
+          float clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, 0);
+          h_clsTimeMin[layer][ladder][sensor][0]->Fill(clsTimeMin);
+
+          float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 0);
+          h_clsTimeFuncVersion[layer][ladder][sensor][0]->Fill(clsTimeFunc);
 
 
         } //histogram filled for V side

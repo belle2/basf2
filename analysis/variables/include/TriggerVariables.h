@@ -14,6 +14,11 @@
 #include <vector>
 #include <string>
 #include <analysis/VariableManager/Manager.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/gdl/dbobjects/TRGGDLDBPrescales.h>
+#include <trg/gdl/dbobjects/TRGGDLDBFTDLBits.h>
+
 
 namespace Belle2 {
   class Particle;
@@ -29,6 +34,11 @@ namespace Belle2 {
      * returns trigger FTDL bit (Final Trigger Decision Logic before prescale)
      */
     double L1FTDLBit(const Particle*, const std::vector<double>& bit);
+
+    /**
+     * returns name of trigger FTDL bit (Final Trigger Decision Logic before prescale)
+     */
+    const char* L1FTDLBitName(const Particle*, const std::vector<double>& bit);
 
     /**
      * returns trigger PSNM bit (prescale and mask), i.e. after prescale
@@ -59,5 +69,11 @@ namespace Belle2 {
      * returns 1 if the event passes the fast reco trigger
      */
     double passesAnyFastRecoTrigger(const Particle*);
+
+    //condition database for prescale
+    DBObjPtr<TRGGDLDBPrescales> m_prescales;
+
+    //condition database for FTDL bitname
+    DBObjPtr<TRGGDLDBFTDLBits> m_ftdlbits;
   }
 }

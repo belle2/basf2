@@ -88,6 +88,19 @@ namespace Belle2 {
       return isL1Trigger;
     }
 
+    const char* L1FTDLBitName(const Particle*, const std::vector<double>& bit)
+    {
+      char name[100] = "";
+
+      if (bit.size() != 1) return name;
+
+      const unsigned int trgWordSize = 32;
+      const unsigned int ntrgWords = 10;
+      if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return name;
+
+      return m_ftdlbits->getoutbitname(bit[0]);
+    }
+
     double L1InputBit(const Particle*, const std::vector<double>& bit)
     {
       double isL1Trigger = 0.0;
@@ -122,14 +135,17 @@ namespace Belle2 {
       const unsigned int ntrgWords = 10;
       if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return prescale;
 
-      // Get the prescale word that contains this bit
-      const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
-      const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
-
-      StoreObjPtr<TRGSummary> trg;
-      prescale = trg->getPreScale(ntrgWord, bitInWord);
-
+      prescale = (double) m_prescales->getprescales(bit[0]);
       return prescale;
+
+      //// Get the prescale word that contains this bit
+      //const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
+      //const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
+
+      //StoreObjPtr<TRGSummary> trg;
+      //prescale = trg->getPreScale(ntrgWord, bitInWord);
+
+      //return prescale;
     }
 
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args)

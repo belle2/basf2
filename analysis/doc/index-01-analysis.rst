@@ -74,10 +74,6 @@ The documentation is included here for backward compatibility.
 
 .. toctree:: NtupleMaker
 
-.. toctree:: VariableCollections
-
-.. toctree:: VariableCollectionsTools
-
 Event-based analysis
 ====================
 

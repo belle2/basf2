@@ -11,11 +11,11 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import os
 import sys
@@ -30,14 +30,18 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
-
-loadStdCharged()
-loadStdKS()
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+stdKshorts()
 loadStdSkimPi0()
 
-from Charm2BodyNeutrals_List import *
-
-
+from skim.charm import DstToD0Neutrals
 DstList = DstToD0Neutrals()
 skimOutputUdst(skimCode, DstList)
 

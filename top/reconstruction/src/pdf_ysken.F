@@ -75,7 +75,7 @@
          SCAN_FLAG=.TRUE.
       ELSE
          SCAN_FLAG=DELY_E/DELY.GT.0.1.AND.DELY.LT.100*QBAR_B(MODUL)
-         IF(SCAN_FLAG) SCAN_FLAG=IS_SCAN(TIM,WID,IX,IPMTX)
+         IF(SCAN_FLAG) SCAN_FLAG=IS_SCAN(TIM,WID,IX,IPMTX,MODUL,LR)
       ENDIF
 
       IF(SCAN_FLAG) THEN
@@ -214,16 +214,23 @@ c--   mirror reflectivity, total internal reflectivity, bulk absorption
       END
 
 
-      LOGICAL FUNCTION IS_SCAN(TIM,WID,IX,IPMTX)
+      LOGICAL FUNCTION IS_SCAN(TIM,WID,IX,IPMTX,MDN,LR)
 
       IMPLICIT NONE
       REAL TIM, WID
       INTEGER IX, IPMTX
-
+      INTEGER MDN, LR
+      
 #include "TOP_PHTIM.fi"
 #include "TOP_PMT.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_PMTTYPE.fi"
+      
       INTEGER ICHX, K, I
       REAL SIG, X
+      INTEGER TYP
+      INTEGER ICHAN, ICH, IPMTY
 
       IS_SCAN=.TRUE.
       IF(FORCE_SCAN) RETURN
@@ -233,10 +240,14 @@ c--   mirror reflectivity, total internal reflectivity, bulk absorption
       IF(NUM_PHOT(ICHX).GT.MAX_PHOT) RETURN
 
       DO K=1,NUM_PHOT(ICHX)
-         DO I=1,TTS_NG
-            SIG=WID+TTS_SIG(I)**2+PH_TERRS(K,ICHX)**2
-            X=(PH_TIMES(K,ICHX)-TIM-TTS_T0(I))**2/SIG
-            IF(X.LT.10) RETURN
+         DO IPMTY=0,N_PMTY(LR,MDN)-1
+            ICH=ICHAN(IX,0,IPMTX,IPMTY,LR,MDN)
+            TYP=PMT_TYPE(ICH,MDN)
+            DO I=1,TTS_NG(TYP)
+               SIG=WID+TTS_SIG(I,TYP)**2+PH_TERRS(K,ICHX)**2
+               X=(PH_TIMES(K,ICHX)-TIM-TTS_T0(I,TYP))**2/SIG
+               IF(X.LT.10) RETURN
+            ENDDO
          ENDDO
       ENDDO
 

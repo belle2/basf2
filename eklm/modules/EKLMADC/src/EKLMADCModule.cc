@@ -42,8 +42,8 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
 {
   int j;
   double t, s;
-  EKLM::FiberAndElectronics fe(&(*m_DigPar), NULL, 0, false);
-  TH1F* h = NULL;
+  EKLM::FiberAndElectronics fe(m_DigPar, nullptr, 0, false);
+  TH1F* h = nullptr;
   t = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   try {
     h = new TH1F(name, "", m_DigPar->getNDigitizations(), 0, t);
@@ -69,8 +69,11 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
 
 void EKLMADCModule::initialize()
 {
+  /* cppcheck-suppress variableScope */
   char str[32];
+  /* cppcheck-suppress variableScope */
   int i;
+  /* cppcheck-suppress variableScope */
   double l;
   if (!m_DigParDatabase.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
@@ -82,10 +85,10 @@ void EKLMADCModule::initialize()
     B2FATAL(MemErr);
   }
   m_hDir = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
-  if (m_hDir == NULL)
+  if (m_hDir == nullptr)
     B2FATAL(MemErr);
   m_hRef = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
-  if (m_hRef == NULL)
+  if (m_hRef == nullptr)
     B2FATAL(MemErr);
   if (m_mode.compare("Strips") == 0) {
     for (i = 1; i <= geoDat->getNStrips(); i++) {

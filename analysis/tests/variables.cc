@@ -1619,11 +1619,15 @@ namespace {
     auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
 
+    // Test if matchedMC also works for particle which already is an MCParticle.
+    auto* p4 = particles.appendNew(mcParticle);
+
     const Manager::Var* var = Manager::Instance().getVariable("matchedMC(charge)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p1), -1);
     EXPECT_FLOAT_EQ(var->function(p2), 1);
     EXPECT_FLOAT_EQ(var->function(p3), 0);
+    EXPECT_FLOAT_EQ(var->function(p4), 0);
   }
 
   TEST_F(MetaVariableTest, countInList)
@@ -2316,7 +2320,8 @@ namespace {
       // we're done setting up the datastore
       DataStore::Instance().setInitializeActive(false);
 
-      // add some tracks
+      // add some tracks the zeroth one is not going to be matched
+      tracks.appendNew(Track());
       const Track* t1 = tracks.appendNew(Track());
       const Track* t2 = tracks.appendNew(Track());
       const Track* t3 = tracks.appendNew(Track());
@@ -2345,12 +2350,19 @@ namespace {
       e1->setEnergy(0.3);
       e1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e1->setClusterId(1);
+      // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
       e2->setEnergy(0.6);
+      e2->setTheta(1.0); // somewhere in the barrel
+      e2->setPhi(2.0);
+      e2->setR(148.5);
       e2->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e2->setClusterId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
+      e3->setTheta(0.2); // somewhere in the fwd encap
+      e3->setPhi(1.5);
+      e3->setR(200.0);
       e3->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
       e3->setClusterId(3);
 
@@ -2387,6 +2399,120 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+
+
+
+  TEST_F(ECLVariableTest, b2bKinematicsTest)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // connect gearbox for CMS boosting etc
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // get the zeroth track in the array (is not associated to a cluster)
+    const Particle* noclustertrack = particles.appendNew(Particle(tracks[0], Const::pion));
+
+    // grab variables for testing
+    const Manager::Var* b2bClusterTheta = Manager::Instance().getVariable("b2bClusterTheta");
+    const Manager::Var* b2bClusterPhi = Manager::Instance().getVariable("b2bClusterPhi");
+
+    EXPECT_EQ(gammalist->getListSize(), 3);
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)), 3.0276606);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)), 0.0);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(1)), 1.6036042);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(1)), -1.0607308);
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(2)), 2.7840068);
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(2)), -1.3155469);
+
+    // track (or anything without a cluster) should be nan
+    ASSERT_TRUE(std::isnan(b2bClusterTheta->function(noclustertrack)));
+    ASSERT_TRUE(std::isnan(b2bClusterPhi->function(noclustertrack)));
+
+    // the "normal" (not cluster based) variables should be the same for photons
+    // (who have no track information)
+    const Manager::Var* b2bTheta = Manager::Instance().getVariable("b2bTheta");
+    const Manager::Var* b2bPhi = Manager::Instance().getVariable("b2bPhi");
+
+    EXPECT_FLOAT_EQ(b2bClusterTheta->function(gammalist->getParticle(0)),
+                    b2bTheta->function(gammalist->getParticle(0)));
+    EXPECT_FLOAT_EQ(b2bClusterPhi->function(gammalist->getParticle(0)),
+                    b2bPhi->function(gammalist->getParticle(0)));
+  }
+
+  TEST_F(ECLVariableTest, clusterKinematicsTest)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // connect gearbox for CMS boosting etc
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // grab variables for testing
+    const Manager::Var* clusterPhi = Manager::Instance().getVariable("clusterPhi");
+    const Manager::Var* clusterPhiCMS = Manager::Instance().getVariable("useCMSFrame(clusterPhi)");
+    const Manager::Var* clusterTheta = Manager::Instance().getVariable("clusterTheta");
+    const Manager::Var* clusterThetaCMS = Manager::Instance().getVariable("useCMSFrame(clusterTheta)");
+
+    EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(1)), 2.0);
+    EXPECT_FLOAT_EQ(clusterPhiCMS->function(gammalist->getParticle(1)), 2.0442522);
+    EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(1)), 1.0);
+    EXPECT_FLOAT_EQ(clusterThetaCMS->function(gammalist->getParticle(1)), 1.2625268);
+
+    // test cluster quantities directly (lab system only)
+    EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(0)), eclclusters[0]->getPhi());
+    EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(0)), eclclusters[0]->getTheta());
+
+
+  }
+
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {

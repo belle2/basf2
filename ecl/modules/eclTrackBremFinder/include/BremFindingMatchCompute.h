@@ -67,12 +67,12 @@ namespace Belle2 {
     /**
      * Difference between the angles of extrapolation and cluster position
      */
-    double m_distanceHitCluster;
+    double m_distanceHitCluster = 0;
 
     /**
      * The effective acceptance factor, needed to assign the radiation
      */
-    double m_effAcceptanceFactor;
+    double m_effAcceptanceFactor = -1;
 
   };
 

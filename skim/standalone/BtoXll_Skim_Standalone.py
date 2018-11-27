@@ -10,14 +10,14 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
-from stdLightMesons import *
+from skim.standardlists.lightmesons import *
 from stdPhotons import *
 set_log_level(LogLevel.INFO)
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 import sys
 import os
 import glob
@@ -34,17 +34,17 @@ loadStdSkimPi0()
 loadStdSkimPhoton()
 stdPi0s('loose')
 stdPhotons('loose')
-loadStdCharged()
 stdK('95eff')
 stdPi('95eff')
 stdE('95eff')
 stdMu('95eff')
-stdMu('90eff')
+stdK('loose')
+stdPi('loose')
 stdKshorts()
 loadStdLightMesons()
 
 # EWP Skim
-from BtoXll_List import *
+from skim.ewp import B2XllList
 XllList = B2XllList()
 skimOutputUdst(skimCode, XllList)
 summaryOfLists(XllList)

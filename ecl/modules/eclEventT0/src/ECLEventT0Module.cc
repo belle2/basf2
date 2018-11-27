@@ -220,9 +220,9 @@ void ECLEventT0Module::event()
       if (itlocal[imin] > 0 && itlocal[imin] < nhypo) {
         float chiTarget = chiVsT0[itlocal[imin]] + 4.;
         int ih = itlocal[imin];
-        do {ih++;} while (chiVsT0[ih] < chiTarget && ih < nhypo - 1);
+        while (chiVsT0[ih] < chiTarget && ih < nhypo - 1) {ih++;};
         int il = itlocal[imin];
-        do {il--;} while (chiVsT0[il] < chiTarget && il > 0);
+        while (chiVsT0[il] < chiTarget && il > 0) {il--;};
         localUnc = (t0hypo[ih] - t0hypo[il]) / 4.;
       }
       localT0Unc.push_back(localUnc);

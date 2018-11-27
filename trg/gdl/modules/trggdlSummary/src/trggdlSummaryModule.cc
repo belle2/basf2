@@ -21,6 +21,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
+
 using namespace Belle2;
 using namespace GDL;
 
@@ -145,7 +149,7 @@ void TRGGDLSummaryModule::event()
 
   unsigned ored = 0;
 
-  for (int j = 0; j < nword_input; j++) {
+  for (int j = 0; j < (int)nword_input; j++) {
     ored = 0;
     for (int clk = 0; clk < n_clocks; clk++) {
       ored |= _data[ee_itd[j]][clk];
@@ -178,7 +182,7 @@ void TRGGDLSummaryModule::event()
     }
     GDLResult->setPsnmBits(1, ored);
   } else {
-    for (int j = 0; j < nword_output; j++) {
+    for (int j = 0; j < (int)nword_output; j++) {
       ored = 0;
       for (int clk = 0; clk < n_clocks; clk++) {
         ored |= _data[ee_ftd[j]][clk];
@@ -186,7 +190,7 @@ void TRGGDLSummaryModule::event()
       GDLResult->setFtdlBits(j, ored);
     }
 
-    for (int j = 0; j < nword_output; j++) {
+    for (int j = 0; j < (int)nword_output; j++) {
       ored = 0;
       for (int clk = 0; clk < n_clocks; clk++) {
         ored |= _data[ee_psn[j]][clk];

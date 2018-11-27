@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMFPGAFIT_H
-#define EKLMFPGAFIT_H
+#pragma once
 
 /* Belle2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -108,6 +107,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

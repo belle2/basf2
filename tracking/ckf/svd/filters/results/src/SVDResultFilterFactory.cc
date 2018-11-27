@@ -92,9 +92,9 @@ SVDResultFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "recording_with_relations") {
     return std::make_unique<RecordingSVDSeededResultFilter>();
   } else if (filterName == "mva") {
-    return std::make_unique<MVASVDResultFilter>("tracking/data/ckf_CDCToSVDResult.xml");
+    return std::make_unique<MVASVDResultFilter>("ckf_CDCToSVDResult");
   } else if (filterName == "mva_with_relations") {
-    return std::make_unique<MVASVDSeededResultFilter>("tracking/data/ckf_SeededCDCToSVDResult.xml");
+    return std::make_unique<MVASVDSeededResultFilter>("ckf_SeededCDCToSVDResult");
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth");
   } else if (filterName == "truth_svd_cdc_relation") {

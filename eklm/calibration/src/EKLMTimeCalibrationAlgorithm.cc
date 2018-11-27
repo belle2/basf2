@@ -17,6 +17,7 @@
 
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMTimeCalibration.h>
 
 using namespace Belle2;
@@ -43,8 +44,6 @@ static double CrystalBall(double* x, double* par)
 EKLMTimeCalibrationAlgorithm::EKLMTimeCalibrationAlgorithm() :
   CalibrationAlgorithm("EKLMTimeCalibrationCollector")
 {
-  m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_Debug = false;
 }
 
@@ -54,7 +53,7 @@ EKLMTimeCalibrationAlgorithm::~EKLMTimeCalibrationAlgorithm()
 
 CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
 {
-  int i, j1, j2, n, strip;
+  int i, j1, j2, n, strip, maxStrip;
   double s[2][3], k[2][3], dt, dl, dn, effectiveLightSpeed, tau;
   double* averageDist, *averageTime, *averageSqrtN, *timeShift, timeShift0;
   struct Event ev;
@@ -62,20 +61,23 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   std::vector<struct Event>::iterator it;
   EKLMTimeCalibration* calibration = new EKLMTimeCalibration();
   EKLMTimeCalibrationData calibrationData;
+  const EKLM::ElementNumbersSingleton& elementNumbers =
+    EKLM::ElementNumbersSingleton::Instance();
+  maxStrip = elementNumbers.getMaximalStripGlobalNumber();
   bool* calibrateStrip;
   TH1F* h, *h2;
   TF1* fcn;
   std::shared_ptr<TTree> t;
-  TCanvas* c1 = NULL;
+  TCanvas* c1 = nullptr;
   if (m_Debug)
     c1 = new TCanvas();
   fcn = new TF1("fcn", CrystalBall, 0, 10, 6);
-  stripEvents = new std::vector<struct Event>[m_maxStrip];
-  averageDist = new double[m_maxStrip];
-  averageTime = new double[m_maxStrip];
-  averageSqrtN = new double[m_maxStrip];
-  timeShift = new double[m_maxStrip];
-  calibrateStrip = new bool[m_maxStrip];
+  stripEvents = new std::vector<struct Event>[maxStrip];
+  averageDist = new double[maxStrip];
+  averageTime = new double[maxStrip];
+  averageSqrtN = new double[maxStrip];
+  timeShift = new double[maxStrip];
+  calibrateStrip = new bool[maxStrip];
   t = getObjectPtr<TTree>("calibration_data");
   t->SetBranchAddress("time", &ev.time);
   t->SetBranchAddress("dist", &ev.dist);
@@ -110,7 +112,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
    * calculation. Partial derivatives of Eq. (2) by c_{eff} and \tau are equal
    * to 0 at the minimum.
    */
-  for (i = 0; i < m_maxStrip; i++) {
+  for (i = 0; i < maxStrip; i++) {
     n = stripEvents[i].size();
     if (n < 2) {
       B2WARNING("Not enough calibration data collected."
@@ -173,7 +175,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
          << LogVar("Amplitude time constant, ns", tau));
   calibration->setEffectiveLightSpeed(effectiveLightSpeed);
   calibration->setAmplitudeTimeConstant(tau);
-  for (i = 0; i < m_maxStrip; i++) {
+  for (i = 0; i < maxStrip; i++) {
     if (!calibrateStrip[i])
       continue;
     timeShift[i] = averageTime[i] - averageDist[i] / effectiveLightSpeed -
@@ -204,7 +206,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
     h->Draw();
     c1->Print("corrtime.eps");
   }
-  for (i = 0; i < m_maxStrip; i++) {
+  for (i = 0; i < maxStrip; i++) {
     if (!calibrateStrip[i])
       continue;
     timeShift[i] = timeShift[i] + timeShift0;

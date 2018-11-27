@@ -20,7 +20,6 @@ getting the payload information and payloads and then we run through different s
 import sys
 import os
 import basf2
-from ROOT import Belle2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from b2test_utils import clean_working_directory, safe_process, skip_test
@@ -105,11 +104,11 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
                 baseurl = "http://%s:%s" % self.server.socket.getsockname()
                 return self.reply(self.payloads[exp] % dict(exp=exp, run=run, baseurl=baseurl))
         else:
-            # check if a fallback payload file exists in the data/framework directory
+            # check if a fallback payload file exists in the conditions_testpayloads directory
             filename = os.path.basename(url.path)
             # replace rev_3 with rev_1
             filename = filename.replace("rev_3", "rev_1")
-            basedir = Belle2.FileSystem.findFile("data/framework")
+            basedir = basf2.find_file("framework/tests/conditions_testpayloads")
             path = os.path.join(basedir, filename)
             if os.path.isfile(path):
                 # ok, file exists. let's serve it

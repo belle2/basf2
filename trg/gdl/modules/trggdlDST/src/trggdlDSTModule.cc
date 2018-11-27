@@ -22,6 +22,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
+
 using namespace Belle2;
 using namespace GDL;
 

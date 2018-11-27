@@ -19,6 +19,7 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/Variables.h>
+#include <analysis/variables/MCTruthVariables.h>
 
 #include <iostream>
 #include <vector>

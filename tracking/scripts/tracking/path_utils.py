@@ -518,6 +518,8 @@ def add_cdc_monopole_track_finding(path, output_reco_tracks="RecoTracksMpl"):
     :param output_reco_tracks: Name of the output RecoTracks, Defaults to RecoTracksMpl.
     """
 
+    path.add_module("TFCDC_HitReclaimer")
+
     path.add_module("TFCDC_AxialStraightTrackFinder")
     # path.add_module("TFCDC_MonopoleAxialTrackFinderLegendre")
 

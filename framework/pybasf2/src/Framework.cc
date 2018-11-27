@@ -21,6 +21,7 @@
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
@@ -181,6 +182,26 @@ void Framework::setStreamingObjects(boost::python::list streamingObjects)
 {
   auto vec = PyObjConvUtils::convertPythonObject(streamingObjects, std::vector<std::string>());
   Environment::Instance().setStreamingObjects(vec);
+}
+
+std::string Framework::findFile(const std::string& filename, const std::string& type, bool ignore_errors)
+{
+  std::string result;
+  if (type.empty()) {
+    //behave like FileSystem.findFile by using it
+    result = FileSystem::findFile(filename, true);
+  } else {
+    result = FileSystem::findFile(filename, type, ignore_errors);
+  }
+  if (!ignore_errors and result.empty()) {
+    // Still not found ... see if we raise an exception or not.
+    // We want a FileNotFoundError ... so lets fudge the errno to the correct
+    // error value and then create the correct exception in python
+    errno = ENOENT;
+    PyErr_SetFromErrnoWithFilename(PyExc_FileNotFoundError, filename.c_str());
+    boost::python::throw_error_already_set();
+  }
+  return result;
 }
 
 //=====================================================================
@@ -357,4 +378,38 @@ Processes up to max_events events by starting with the first module in the speci
 )DOCSTRING"));
     ;
   }
+
+  def("find_file", &Framework::findFile, (arg("filename"), arg("data_type") = "", arg("silent") = false), R"DOC(
+  Try to find a file and return its full path
+
+  If ``data_type`` is empty this function will try to find the file
+
+  1. in ``$BELLE2_LOCAL_DIR``,
+  2. in ``$BELLE2_RELEASE_DIR``
+  3. relative to the current working directory.
+
+  Other known ``data_type`` values are
+
+  ``examples``
+      Example data for examples and tutorials. Will try to find the file
+
+      1. in ``$BELLE2_EXAMPLES_DATA_DIR``
+      2. in ``$VO_BELLE2_SW_DIR/examples-data``
+      3. relative to the current working directory
+
+  ``validation``
+      Data for Validation purposes. Will try to find the file in
+
+      1. in ``$BELLE2_VALIDATION_DATA_DIR``
+      2. in ``$VO_BELLE2_SW_DIR/validation-data``
+      3. relative to the current working directory
+
+  Arguments:
+    filename (str): relative filename to look for, either in a central place or
+        in the current working directory
+    data_type (str): case insensitive data type to find. Either empty string or
+        one of ``"examples"`` or ``"validation"``
+    silent (bool): If True don't print any errors and just return an empty
+        string if the file cannot be found
+  )DOC");
 }

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCMATCHERKLMCLUSTERSMODULE_H
-#define MCMATCHERKLMCLUSTERSMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
@@ -71,6 +70,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

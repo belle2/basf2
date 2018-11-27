@@ -26,20 +26,21 @@ EKLMDQMModule::EKLMDQMModule() : HistoModule()
            "Directory for EKLM DQM histograms in ROOT file.",
            std::string("EKLM"));
   m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
-  m_Sector = NULL;
-  m_Time = NULL;
-  m_StripLayer = NULL;
+  m_Sector = nullptr;
+  m_Time = nullptr;
+  m_StripLayer = nullptr;
 }
 
 EKLMDQMModule::~EKLMDQMModule()
 {
-  if (m_StripLayer != NULL)
+  if (m_StripLayer != nullptr)
     delete m_StripLayer;
 }
 
 void EKLMDQMModule::defineHisto()
 {
   int i;
+  /* cppcheck-suppress variableScope */
   int endcap, layer, detectorLayer, stripMin, stripMax;
   int maxLayerGlobal, maxSector, maxPlane, maxStrip;
   std::string str, str2;

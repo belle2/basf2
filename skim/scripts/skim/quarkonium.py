@@ -52,7 +52,7 @@ def UpsilonList():
     return Lists
 
 
-def ISRpipiccList():
+def ISRpipiccList(path):
     """
     Skim code: 16460100
     Skim selection of the following channels:
@@ -73,10 +73,10 @@ def ISRpipiccList():
 
     # intermediate state J/psi and psi(2S) are reconstructed
     # add mass window cut for J/psi and psi(2S) candidates
-    reconstructDecay('J/psi:ee -> e+:loose e-:loose', 'M>3.0 and M<3.2')
-    reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', 'M>3.0 and M<3.2')
-    reconstructDecay('psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose', 'M>3.64 and M<3.74')
-    reconstructDecay('psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose', 'M>3.64 and M<3.74')
+    reconstructDecay('J/psi:ee -> e+:loose e-:loose', 'M>3.0 and M<3.2', path=path)
+    reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', 'M>3.0 and M<3.2', path=path)
+    reconstructDecay('psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose', 'M>3.64 and M<3.74', path=path)
+    reconstructDecay('psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose', 'M>3.64 and M<3.74', path=path)
 
     # the requirement of recoil mass square of hadrons
     MMScuts = '-4 < m2Recoil < 4'
@@ -98,7 +98,7 @@ def ISRpipiccList():
 
     # reconstruct the different ISR channels and append to the virtual photon
     for chID, channel in enumerate(vpho_Channels):
-        reconstructDecay('vpho:myCombination' + str(chID) + ' -> ' + channel, MMScuts, chID)
+        reconstructDecay('vpho:myCombination' + str(chID) + ' -> ' + channel, MMScuts, chID, path=path)
         vphoList.append('vpho:myCombination' + str(chID))
 
     # return the ISR process list

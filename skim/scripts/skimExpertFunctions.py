@@ -34,15 +34,18 @@ _skimNameMatching = [
     ('12160100', 'BtoXgamma'),
     ('12160200', 'BtoXll'),
     ('14120500', 'BtoPi0Pi0'),
-    ('17240100', 'Charm2BodyHadronic'),
-    ('17230200', 'Charm2BodyHadronicD0'),
-    ('17240300', 'Charm2BodyNeutrals'),
-    ('17230400', 'Charm2BodyNeutralsD0'),
-    ('17240500', 'Charm3BodyHadronic2'),
-    ('17240600', 'Charm3BodyHadronic'),
-    ('17230700', 'Charm3BodyHadronicD0'),
-    ('17230800', 'CharmRare'),
-    ('17260900', 'CharmSemileptonic'),
+    ('2210020000', 'Charm2BodyHadronicD0'),  # D0 -> K pi/pi pi/K K
+    ('2610030000', 'Charm2BodyHadronic'),  # D* -> D0 -> K pi/pi pi/K K
+    ('2610032000', 'Charm3BodyHadronic'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
+    ('2210022000', 'Charm3BodyHadronicD0'),  # D0 -> h h pi0
+    ('2610032001', 'Charm3BodyHadronic1'),  # D* -> D0 -> h h pi0
+    ('2610038000', 'Charm3BodyHadronic3'),  # D* -> D0 -> K- pi+ eta (RS+WS)
+    ('2610052100', 'Charm2BodyNeutrals2'),  # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0
+    ('2210004000', 'Charm2BodyNeutralsD0'),  # D0 -> pi0 pi0/Ks pi0/Ks Ks
+    ('2610014000', 'Charm2BodyNeutrals'),  # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
+    ('2610050100', 'Charm3BodyHadronic2'),  # D* -> D0 -> h h Ks
+    ('2710000000', 'CharmRare'),  # D0 -> g g/e e/mu mu
+    ('27260900', 'CharmSemileptonic'),
     ('19130100', 'CharmlessHad2Body'),
     ('19130200', 'CharmlessHad3Body'),
     ('14130200', 'DoubleCharm'),

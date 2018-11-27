@@ -42,11 +42,11 @@ stdK('all')
 stdE('all')
 stdMu('all')
 
-from skim.charm import D0ToHpJmPi0
-D0ToHpJmPi0List = D0ToHpJmPi0()
-skimOutputUdst(skimCode, D0ToHpJmPi0List)
+from skim.charm import D0ToHpHmPi0
+D0ToHpHmPi0List = D0ToHpHmPi0()
+skimOutputUdst(skimCode, D0ToHpHmPi0List)
 
-summaryOfLists(D0ToHpJmPi0List)
+summaryOfLists(D0ToHpHmPi0List)
 
 setSkimLogging()
 process(analysis_main)

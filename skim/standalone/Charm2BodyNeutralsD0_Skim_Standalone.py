@@ -38,6 +38,7 @@ stdK('all')
 stdE('all')
 stdMu('all')
 stdKshorts()
+mergedKshorts()
 
 from skim.charm import D0ToNeutrals
 

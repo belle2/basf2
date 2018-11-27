@@ -50,14 +50,6 @@ namespace Belle2 {
     std::vector<double> GetBhabhaComb() {return BhabhaComb ;}
     //! Save
     void save(int);
-    //! set 2D Bhabha Energy Threshold
-    void set2DBhabhaThreshold(std::vector<double> i2DBhabhaThresholdFWD, std::vector<double> i2DBhabhaThresholdBWD)
-    {
-      _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
-      _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
-    }
-    //! set 2D Bhabha Energy Threshold
-    void set3DBhabhaThreshold(std::vector<double> i3DBhabhaThreshold) { _3DBhabhaThreshold = i3DBhabhaThreshold; };
 
   private:
     /** Object of TC Mapping */
@@ -75,12 +67,6 @@ namespace Belle2 {
     std::vector<double> ClusterTiming;
     /** Cluster Timing*/
     std::vector<TVector3> ClusterPosition;
-    //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdFWD;
-    //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdBWD;
-    //! 3D Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaThreshold;
 
 
   };

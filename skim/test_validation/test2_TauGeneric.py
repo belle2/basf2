@@ -4,6 +4,8 @@
 from basf2 import *
 from modularAnalysis import *
 from variables import variables
+from stdCharged import *
+from stdPhotons import *
 
 """
 <header>
@@ -14,6 +16,9 @@ from variables import variables
 """
 
 inputMdst('MC9', '../TauGeneric.udst.root')
+
+stdPi('all')
+stdPhotons('all')
 
 # set variables
 from skim.taupair import *

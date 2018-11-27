@@ -97,20 +97,6 @@ namespace Belle2 {
     double setTotalEnergy(std::vector<double>);
     int getTriggerbit(int i) {return _Triggerbit[i];}
     int getLowmultibit() {return _Lowmultibit;}
-    //! set 2D Bhabha Energy Threshold
-    void set2DBhabhaThreshold(std::vector<double> i2DBhabhaThresholdFWD, std::vector<double> i2DBhabhaThresholdBWD)
-    {
-      _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
-      _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
-    }
-    //! set 2D Bhabha Energy Threshold
-    void set3DBhabhaThreshold(std::vector<double> i3DBhabhaThreshold) { _3DBhabhaThreshold = i3DBhabhaThreshold; };
-
-    //! set Total Energy Theshold (low, high, lum)
-    void setTotalEnergyThreshold(std::vector<double>  iTotalEnergy) {_TotalEnergy = iTotalEnergy; }
-    //! set Low Multiplicity Threshold
-    void setLowMultiplicityThreshold(std::vector<double> iLowMultiThreshold) { _LowMultiThreshold = iLowMultiThreshold;}
-
 
 
   private:
@@ -166,17 +152,6 @@ namespace Belle2 {
     int _Triggerbit[4];
     //  LowMultibit
     int _Lowmultibit;
-
-    //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdFWD;
-    //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdBWD;
-    //! 3D Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaThreshold;
-    //! Total Energy Theshold (low, high, lum)
-    std::vector<double> _TotalEnergy;
-    //! Low Multiplicity Threshold
-    std::vector<double> _LowMultiThreshold;
 
 
     /** ecl object */

@@ -29,7 +29,9 @@
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string.hpp>
 
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 
 using namespace std;
 using namespace Belle2;

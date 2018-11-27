@@ -32,7 +32,6 @@
 #include "trg/ecl/TrgEclDigitizer.h"
 #include "trg/ecl/TrgEclFAMFit.h"
 
-#include "trg/ecl/dbobjects/TRGECLFAMPara.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -64,9 +63,7 @@ namespace Belle2 {
       _beambkgtag(0),
       _famana(0),
       _threshold(100.0),
-      _FADC(1),
-      _ConditionDB(0)
-
+      _FADC(1)
   {
 
     string desc = "TRGECLFAMModule(" + version() + ")";
@@ -86,14 +83,11 @@ namespace Belle2 {
     addParam("TCThreshold", _threshold, "Set FAM TC threshold ",
              _threshold);
     addParam("ShapingFunction", _FADC, "Set function of shaper ",  _FADC);
-    addParam("ConditionDB", _ConditionDB, "Use conditionDB ",  _ConditionDB);
 
-    if (_ConditionDB == 1) { //Use global tag
-      m_FAMPara.addCallback(this, &TRGECLFAMModule::beginRun);
-    }
+
+
+
     B2DEBUG(100, "TRGECLFAMModule ... created");
-    Threshold.clear();
-    Threshold.resize(576, 0);
   }
 //
 //
@@ -102,8 +96,6 @@ namespace Belle2 {
   {
 
     B2DEBUG(100, "TRGECLFAMModule ... destructed ");
-
-
   }
 //
 //
@@ -123,7 +115,7 @@ namespace Belle2 {
     m_TRGECLWaveform.registerInDataStore();
     m_TRGECLHit.registerInDataStore();
     m_TRGECLFAMAna.registerInDataStore();
-    //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
+
   }
 //
 //
@@ -131,14 +123,6 @@ namespace Belle2 {
   void
   TRGECLFAMModule::beginRun()
   {
-    if (_ConditionDB == 0) {
-      Threshold.resize(576, _threshold);
-    } else if (_ConditionDB == 1) { //Use global tag
-      Threshold.resize(576, 0);
-      for (const auto& para : m_FAMPara) {
-        Threshold[para.getTCId() - 1] = (int)((para.getThreshold()) * (para.getConversionFactor()));
-      }
-    }
 
     B2DEBUG(200, "TRGECLFAMModule ... beginRun called ");
 
@@ -172,18 +156,18 @@ namespace Belle2 {
     else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
     obj_trgeclDigi-> save(m_nEvent);
 
-
     // FAM Fitter
     TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();
     obj_trgeclfit-> SetBeamBkgTagFlag(_beambkgtag);
     obj_trgeclfit-> SetAnaTagFlag(_famana);
+    obj_trgeclfit-> SetThreshold(_threshold);
     obj_trgeclfit-> setup(m_nEvent);
-    obj_trgeclfit-> SetThreshold(Threshold);
 
     if (_famMethod == 1) {obj_trgeclfit->  FAMFit01(TCDigiE, TCDigiT); } // fitting method
     else if (_famMethod == 2) {obj_trgeclfit->  FAMFit02(TCDigiE, TCDigiT); } // no-fit method = backup method 1
     else if (_famMethod == 3) { obj_trgeclfit-> FAMFit03(TCDigiE, TCDigiT); } // orignal method = backup method 2
     obj_trgeclfit-> save(m_nEvent);
+
 
 
     //

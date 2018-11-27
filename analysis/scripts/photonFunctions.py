@@ -67,8 +67,7 @@ def writeClosestParticleExtraClusterInfo(
 
     # add new variables to the signal side particle
     # NOTE: if somebody needs these variables in the CMS frame, they need to
-    # they need to modify this function since it's not possible outside the
-    # roe_path
+    # modify this function since it's not possible outside the roe_path
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterClusterAngleInBetween(0, 1))': 'openingAngle'}, path=roe_path)
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, clusterTheta))': 'deltaTheta'}, path=roe_path)
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfClusterPhi(0, 1))': 'deltaPhi'}, path=roe_path)

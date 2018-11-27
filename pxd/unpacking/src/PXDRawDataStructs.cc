@@ -50,9 +50,8 @@ namespace Belle2 {
         (const char*)"ONS_TRG",
         (const char*)"ONS_ROI"
       };
-      B2DEBUG(20, "DHC FRAME TYP $" << std::hex << getFrameType() << " -> " << dhc_type_name[getFrameType()] << " (ERR " << getErrorFlag()
-              <<
-              ") data " << data);
+      B2DEBUG(99, "DHC FRAME TYP $" << std::hex << getFrameType() << " -> " << dhc_type_name[getFrameType()] << " (ERR " << getErrorFlag()
+              << ") data " << data);
     };
 
     bool dhc_start_frame::isFakedData(void) const
@@ -72,7 +71,7 @@ namespace Belle2 {
     void dhc_start_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "DHC Start Frame TNRLO $" << std::hex << trigger_nr_lo << " TNRHI $" << std::hex << trigger_nr_hi << " TTLO $" <<
+      B2DEBUG(99, "DHC Start Frame TNRLO $" << std::hex << trigger_nr_lo << " TNRHI $" << std::hex << trigger_nr_hi << " TTLO $" <<
               std::hex <<
               time_tag_lo_and_type
               << " TTMID $" << std::hex << time_tag_mid << " TTHI $" << std::hex << time_tag_hi << " Exp/Run/Subrun $" << std::hex << exp_run <<
@@ -84,7 +83,7 @@ namespace Belle2 {
     void dhc_dhe_start_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "DHC Event Frame TNRLO $" << std::hex << trigger_nr_lo  << " DTTLO $" << std::hex << dhe_time_tag_lo << " DTTHI $" <<
+      B2DEBUG(99, "DHC Event Frame TNRLO $" << std::hex << trigger_nr_lo  << " DTTLO $" << std::hex << dhe_time_tag_lo << " DTTHI $" <<
               std::hex <<
               dhe_time_tag_hi
               << " DHEID $" << std::hex << getDHEId()
@@ -97,7 +96,7 @@ namespace Belle2 {
     void dhc_direct_readout_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << std::hex << trigger_nr_lo << " DHE ID $" << getDHEId() <<
+      B2DEBUG(99, "DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << std::hex << trigger_nr_lo << " DHE ID $" << getDHEId() <<
               " DHP port $"
               <<
               getDHPPort());
@@ -106,40 +105,42 @@ namespace Belle2 {
     void dhc_onsen_trigger_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "ONSEN Trigger Frame TNRLO $" << std::hex << trignr0);
+      B2DEBUG(99, "ONSEN Trigger Frame TNRLO $" << std::hex << trignr0);
     };
-    PXDError::PXDErrorFlags dhc_onsen_trigger_frame::check_error(bool ignore_datcon_flag) const
+
+    PXDError::PXDErrorFlags dhc_onsen_trigger_frame::check_error(bool ignore_datcon_flag, bool ignore_hltroi_magic_flag,
+        bool ignore_merger_mm_flag) const
     {
       PXDError::PXDErrorFlags m_errorMask = PXDError::EPXDErrMask::c_NO_ERROR;
       if ((magic1 & 0xFFFF0000) != 0xCAFE0000) {
-        B2ERROR("ONSEN Trigger Magic 1 error $" << std::hex << magic1);
+        if (!ignore_hltroi_magic_flag) B2WARNING("ONSEN Trigger Magic 1 error $" << std::hex << magic1);
         m_errorMask |= PXDError::EPXDErrMask::c_HLTROI_MAGIC;
       }
       if ((magic2 & 0xFFFF0000) != 0xCAFE0000) {
-        B2ERROR("ONSEN Trigger Magic 2 error $" << std::hex << magic2);
+        if (!ignore_hltroi_magic_flag) B2WARNING("ONSEN Trigger Magic 2 error $" << std::hex << magic2);
         m_errorMask |= PXDError::EPXDErrMask::c_HLTROI_MAGIC;
       }
       if (is_fake_datcon()) {
-        if (!ignore_datcon_flag) B2WARNING("ONSEN Trigger Frame: No DATCON data $" << std::hex << trignr1 << "!=$" << trignr2);
+        if (!ignore_datcon_flag) B2INFO("ONSEN Trigger Frame: No DATCON data $" << std::hex << trignr1 << "!=$" << trignr2);
         m_errorMask |= PXDError::EPXDErrMask::c_NO_DATCON;
       } else {
         if (trignr1 != trignr2) {
-          B2ERROR("ONSEN Trigger Frame Trigger Nr Mismatch $" << std::hex << trignr1 << "!=$" << trignr2);
+          if (!ignore_merger_mm_flag) B2WARNING("ONSEN Trigger Frame Trigger Nr Mismatch $" << std::hex << trignr1 << "!=$" << trignr2);
           m_errorMask |= PXDError::EPXDErrMask::c_MERGER_TRIGNR;
         }
       }
       return m_errorMask;
     };
 
-    PXDError::PXDErrorFlags dhc_onsen_roi_frame::check_error(int length) const
+    PXDError::PXDErrorFlags dhc_onsen_roi_frame::check_error(int length, bool ignore_inv_size_flag) const
     {
-      PXDError::PXDErrorFlags m_errorMask = 0;
+      PXDError::PXDErrorFlags m_errorMask = PXDError::EPXDErrMask::c_NO_ERROR;
       // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
       if (length < getMinSize()) {
-        B2ERROR("DHC ONSEN HLT/ROI Frame too small to hold any ROIs!");
+        if (!ignore_inv_size_flag) B2WARNING("DHC ONSEN HLT/ROI Frame too small to hold any ROIs!");
         m_errorMask |= PXDError::c_ROI_PACKET_INV_SIZE;
       } else if ((length - getMinSize()) % 8 != 0) {
-        B2ERROR("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
+        if (!ignore_inv_size_flag) B2WARNING("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
         m_errorMask |= PXDError::c_ROI_PACKET_INV_SIZE;
       }
       return m_errorMask;
@@ -147,13 +148,13 @@ namespace Belle2 {
     void dhc_onsen_roi_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "DHC HLT/ROI Frame");
+      B2DEBUG(99, "DHC HLT/ROI Frame");
     };
 
     void dhc_ghost_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "DHC Ghost Frame TNRLO $" << std::hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" << getDHPPort() <<
+      B2DEBUG(99, "DHC Ghost Frame TNRLO $" << std::hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" << getDHPPort() <<
               " CRC $");
     };
 
@@ -169,7 +170,7 @@ namespace Belle2 {
     void dhc_end_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "DHC End Frame TNRLO $" << std::hex << trigger_nr_lo << " WIEVT $" << std::hex << wordsinevent << " ERR $" << std::hex
+      B2DEBUG(99, "DHC End Frame TNRLO $" << std::hex << trigger_nr_lo << " WIEVT $" << std::hex << wordsinevent << " ERR $" << std::hex
               << errorinfo
               << " CRC " << std::hex << crc32);
     };
@@ -178,11 +179,8 @@ namespace Belle2 {
     void dhc_dhe_end_frame::print(void) const
     {
       word0.print();
-      B2DEBUG(20, "DHC DHE End Frame TNRLO $" << std::hex << trigger_nr_lo << " WIEVT $" << std::hex << wordsineventhi << "." <<
-              wordsineventlo <<
-              " ERR $"
-              << std::hex << errorinfo
-              << " CRC " << std::hex << crc32);
+      B2DEBUG(99, "DHC DHE End Frame TNRLO $" << std::hex << trigger_nr_lo << " WIEVT $" << std::hex << wordsineventhi << "." <<
+              wordsineventlo << " ERR $" << std::hex << errorinfo << " CRC " << std::hex << crc32);
     };
 
     PXDError::PXDErrorFlags dhc_frames::check_padding(void)
@@ -190,18 +188,19 @@ namespace Belle2 {
       unsigned int crc = *(ubig32_t*)(((unsigned char*)data) + length - 4);
       if ((crc & 0xFFFF0000) == 0 || (crc & 0xFFFF) == 0) {
         /// TODO many false positives, we should remove that check after we KNOW that it has been fixed in DHH Firmware
-        B2WARNING("Suspicious Padding $" << std::hex << crc);
+        B2INFO("Suspicious Padding $" << std::hex << crc);
         return PXDError::EPXDErrMask::c_SUSP_PADDING;
       }
       return PXDError::EPXDErrMask::c_NO_ERROR;
     };
 
-    PXDError::PXDErrorFlags dhc_frames::check_crc(void)
+    PXDError::PXDErrorFlags dhc_frames::check_crc(bool ignore_crc_flag)
     {
       dhc_crc_32_type bocrc;
 
       if (length > 65536 * 16) {
-        B2WARNING("DHC Data Frame CRC not calculated because of too large packet (>1MB)!");
+        if (!ignore_crc_flag) B2WARNING("DHC Data Frame CRC not calculated because of too large packet (>1MB)!");
+        return PXDError::EPXDErrMask::c_NO_ERROR; // such large packets should trigger an error elsewhere
       } else {
         bocrc.process_bytes(data, length - 4);
       }
@@ -211,27 +210,14 @@ namespace Belle2 {
       ubig32_t crc32;
       crc32 = *(ubig32_t*)(((unsigned char*)data) + length - 4);
 
-      if (c == crc32) {
-//       if (verbose)
-        //         B2INFO("DHE Data Frame CRC: " << std::hex << c << "==" << crc32);
-//         B2INFO("DHC Data Frame CRC OK: " << std::hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-//                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-      } else {
-//       crc_error++;
-//       if (verbose) {
-        B2ERROR("DHC Data Frame CRC FAIL: " << std::hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(((
-                  unsigned char*)data) + length - 8) << " "
-                << * (unsigned int*)(((unsigned char*)data) + length - 6) << " " << * (unsigned int*)(((unsigned char*)data) + length - 4) <<
-                " len $" << length);
-        /// others would be interessting but possible subjects to access outside of buffer
-        /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
-        //if (length <= 32) {
-        //  for (int i = 0; i < length / 4; i++) {
-        //    B2ERROR("== " << i << "  $" << std::hex << ((unsigned int*)d)[i]);
-        //  }
-        //}
-//       };
-//       error_flag = true;
+      if (c != crc32) {
+        if (!ignore_crc_flag) {
+          B2WARNING("DHC Data Frame CRC FAIL");
+          B2DEBUG(1, "DHC Data Frame CRC FAIL: " << std::hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(((
+                    unsigned char*)data) + length - 8) << " "
+                  << * (unsigned int*)(((unsigned char*)data) + length - 6) << " " << * (unsigned int*)(((unsigned char*)data) + length - 4) <<
+                  " len $" << length);
+        }
         return PXDError::EPXDErrMask::c_DHE_CRC;
       }
       return PXDError::EPXDErrMask::c_NO_ERROR;
@@ -278,8 +264,8 @@ namespace Belle2 {
           s = data_onsen_trigger_frame->getFixedSize();
           break;
         default:
-          B2ERROR("Error: not a valid data frame!");
-//         error_flag = true;
+          B2INFO("Error: not a valid data frame!");
+          // Error will be set elsewhere in another check
           s = 0;
           break;
       }

@@ -10,7 +10,7 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
 import os
@@ -29,11 +29,11 @@ inputMdstList('MC9', fileList)
 
 
 # create and fill pion and kaon ParticleLists
-# second argument are the selection criteria: '' means no cut, take all
-loadStdCharged()
+stdPi('all')
+stdK('all')
 
 # B+ to D(->h+h-)h+ Skim
-from skim.btocharm import loadD0bar, BsigToDhTohhList()
+from skim.btocharm import loadD0bar, BsigToDhTohhList
 loadD0bar()
 BtoDhList = BsigToDhTohhList()
 skimOutputUdst(skimCode, BtoDhList)

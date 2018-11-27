@@ -11,7 +11,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdE, stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 
@@ -23,23 +23,25 @@ import sys
 import os
 import glob
 
+skimpath = Path()
 
 fileList = [
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
-        '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
-    ]
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
+    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
+]
 
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=skimpath)
 
-loadStdCharged()
+stdE('all', path=skimpath)
+stdMu('all', path=skimpath)
 
 from skim.systematics import *
-SysList = EELLList()
-skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+SysList = EELLList(skimpath)
+skimOutputUdst(skimCode, SysList, path=skimpath)
+summaryOfLists(SysList, path=skimpath)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=skimpath)
+process(skimpath)
 
 print(statistics)

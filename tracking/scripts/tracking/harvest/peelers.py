@@ -83,9 +83,9 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
         nan = float('nan')
         return dict(
             # At origin assuming perfect magnetic field
-            omega_truth=nan,
-            phi0_truth=nan,
             d0_truth=nan,
+            phi0_truth=nan,
+            omega_truth=nan,
             z0_truth=nan,
             tan_lambda_truth=nan,
 
@@ -97,6 +97,14 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             x_truth=nan,
             y_truth=nan,
             z_truth=nan,
+
+            decay_vertex_radius_truth=nan,
+            decay_vertex_x_truth=nan,
+            decay_vertex_y_truth=nan,
+            decay_vertex_z_truth=nan,
+            number_of_daughters_truth=nan,
+            status_truth=nan,
+
 
             # MC Particle information
             charge_truth=nan,
@@ -119,7 +127,7 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
         n_cdc_hits = reco_track.getNumberOfCDCHits()
         n_svd_hits = reco_track.getNumberOfSVDHits()
         n_pxd_hits = reco_track.getNumberOfPXDHits()
-        ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
+        ndf = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
 
         pxd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getPXDHitList()]
         if pxd_hits:
@@ -349,6 +357,8 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_estimate=nan,
             pt_variance=nan,
             pt_resolution=nan,
+
+            b_field=nan,
 
             px_estimate=nan,
             px_variance=nan,

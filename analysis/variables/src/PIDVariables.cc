@@ -409,44 +409,50 @@ namespace Belle2 {
     }
 
 
-    VARIABLE_GROUP("PID");
 
 
     // PID variables to be used for analysis
+    VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("particleID", particleID, "the particle identification probability under the particle's own hypothesis");
-    REGISTER_VARIABLE("electronID", electronID, "electron identification probability");
-    REGISTER_VARIABLE("muonID", muonID, "muon identification probability");
-    REGISTER_VARIABLE("pionID", pionID, "pion identification probability");
-    REGISTER_VARIABLE("kaonID", kaonID, "kaon identification probability");
-    REGISTER_VARIABLE("protonID", protonID, "proton identification probability");
-    REGISTER_VARIABLE("deuteronID", deuteronID, "deuteron identification probability");
+
+    REGISTER_VARIABLE("electronID", electronID,
+                      "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+    REGISTER_VARIABLE("muonID", muonID,
+                      "muon identification probability defined as :math:`\\mathcal{L}_\\mu/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+    REGISTER_VARIABLE("pionID", pionID,
+                      "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+    REGISTER_VARIABLE("kaonID", kaonID,
+                      "kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+    REGISTER_VARIABLE("protonID", protonID,
+                      "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+    REGISTER_VARIABLE("deuteronID", deuteronID,
+                      "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
 
     // Metafunctions for experts to access the basic PID quantities
+    VARIABLE_GROUP("PID_expert");
     REGISTER_VARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
-                      "returns the likelihood value of for a specific mass hypothesis and  set of detectors. Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "returns the log likelihood value of for a specific mass hypothesis and  set of detectors.");
     REGISTER_VARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
-                      "returns LogL(hyp1) - LogL(hyp2). Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypoteses and a set of detectors.");
     REGISTER_VARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
-                      "probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "Pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp}`");
     REGISTER_VARIABLE("pidProbabilityExpert(pdgCodeHyp, detectorList)", pidProbabilityExpert,
-                      "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ");
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                       "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
 
     // B2BII PID
+    VARIABLE_GROUP("PID_belle");
     REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
                       "returns Belle's PID atc variable: atc_pid(3,1,5,i,j).prob().\n"
-                      "To be used only when analysing converted Belle samples.");
+                      "Parameters i,j are signal and backgroud hypotesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)");
     REGISTER_VARIABLE("muIDBelle", muIDBelle,
-                      "returns Belle's PID Muon_likelihood() variable.\n"
-                      "To be used only when analysing converted Belle samples.");
+                      "returns Belle's PID Muon_likelihood() variable.");
     REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,
-                      "returns true if Belle's PID Muon_likelihood() is usable (reliable).\n"
-                      "To be used only when analysing converted Belle samples.");
+                      "returns true if Belle's PID Muon_likelihood() is usable (reliable).");
     REGISTER_VARIABLE("eIDBelle", eIDBelle,
-                      "returns Belle's electron ID (eid(3,-1,5).prob()) variable.\n"
-                      "To be used only when analysing converted Belle samples.");
-    REGISTER_VARIABLE("kIDBelle", kIDBelle, "kaon identification probability bellestyle.");
+                      "returns Belle's electron ID (eid(3,-1,5).prob()) variable.");
+    REGISTER_VARIABLE("kIDBelle", kIDBelle, "kaon identification probability belle-style.");
 
 
   }

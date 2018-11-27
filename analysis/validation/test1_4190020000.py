@@ -14,8 +14,6 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
-from stdPhotons import *
 from beamparameters import add_beamparameters
 
 
@@ -26,7 +24,6 @@ inputMdst('default', '../4190020000.dst.root')
 beamparameters = add_beamparameters(analysis_main, "Y6S")
 # pdg.add_particle("Upsilon(6S)", 9010553, 11.0190e+00, 0.0790e+00, 0, 1)
 
-# loadStdCharged()
 fillParticleList('pi+:std', '')
 ntupleFile('../4190020000.ntup.root')
 

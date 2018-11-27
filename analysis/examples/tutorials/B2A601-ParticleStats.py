@@ -63,9 +63,9 @@ inputMdstList('default', filelistMIX + filelistCHG + filelistCC + filelistSS + f
 # create and fill final state ParticleLists
 # use standard lists
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdPi('loose')
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdK('loose')
 
 stdPi0s('looseFit')
 

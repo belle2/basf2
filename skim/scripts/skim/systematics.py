@@ -14,7 +14,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
+def SystematicsRadEEList(path, prescale_all=1, prescale_fwd_electron=1):
     """
     Note:
         * Systematics skim(s) for radiative electron pairs
@@ -35,6 +35,7 @@ def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
     100 is 1% of events kept, etc.
 
     Parameters:
+        path (basf2.Path): skim lists are added to this path
         prescale_all (int): the global prescale for this skim
         prescale_fwd_electron (int): the prescale electrons (e-) in
                                      the forward endcap
@@ -52,13 +53,13 @@ def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
     # with 3 GeV of energy
     goodtrack = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0'
     goodtrackwithcluster = '%s and clusterE > 3.0' % goodtrack
-    cutAndCopyList('e+:skimtight', 'e+:all', goodtrackwithcluster)
-    cutAndCopyList('e+:skimloose', 'e+:all', goodtrack)
+    cutAndCopyList('e+:skimtight', 'e+:all', goodtrackwithcluster, path=path)
+    cutAndCopyList('e+:skimloose', 'e+:all', goodtrack, path=path)
 
     # a minimum momentum of 75 MeV/c recoiling against the pair,
     # and require that the recoil is within the CDC acceptance
     recoil = 'pRecoil > 0.075 and 0.296706 < pRecoilTheta < 2.61799'  # GeV/c, rad
-    reconstructDecay('vpho:radee -> e+:skimtight e-:skimloose', recoil)
+    reconstructDecay('vpho:radee -> e+:skimtight e-:skimloose', recoil, path=path)
 
     # apply event cuts (exactly two clean tracks in the event, and prescale
     # the whole event regardless of where the electron went)
@@ -90,11 +91,11 @@ def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
 
     # final candidate building with cuts and prescales
     prescale_logic = '[%s]' % prescale_logic
-    applyCuts('vpho:radee', event_cuts + ' and ' + prescale_logic)
+    applyCuts('vpho:radee', event_cuts + ' and ' + prescale_logic, path=path)
     return ['vpho:radee']
 
 
-def SystematicsRadMuMuList():
+def SystematicsRadMuMuList(path):
     """
     Note:
         * Systematics skim(s) for radiative muon pairs
@@ -106,6 +107,9 @@ def SystematicsRadMuMuList():
     We require one cluster-matched electron (the other is not required to match
     a cluster). No selection on the photon as the sample must be unbiased.
 
+    Parameters:
+        path (basf2.Path): skim lists are added to this path
+
     Returns:
         list name of the skim candidates
     """
@@ -113,13 +117,13 @@ def SystematicsRadMuMuList():
 
     # the tight selection starts with all muons, but they  must be cluster-matched and not be an electron
     MuonTightSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0 and clusterE > 0.0 and clusterE < 1.0'
-    cutAndCopyList('mu+:skimtight', 'mu+:all', MuonTightSelection)
+    cutAndCopyList('mu+:skimtight', 'mu+:all', MuonTightSelection, path=path)
 
     # for the loose selection starts with all muons, but we accept tracks that
     # are not matched to a cluster, but if they are, they must not be an
     # electron
     MuonLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0 and clusterE < 1.0'
-    cutAndCopyList('mu+:skimloose', 'mu+:all', MuonLooseSelection)
+    cutAndCopyList('mu+:skimloose', 'mu+:all', MuonLooseSelection, path=path)
 
     # create a list of possible selections
     radmumulist = []
@@ -129,9 +133,9 @@ def SystematicsRadMuMuList():
     RadMuMuSelection = 'pRecoil > 0.075 and pRecoilTheta > 0.296706 and pRecoilTheta < 2.61799'
     RadMuMuPairChannel = 'mu+:skimtight mu-:skimloose'
     chID = 0
-    reconstructDecay('vpho:radmumu' + str(chID) + ' -> ' + RadMuMuPairChannel, RadMuMuSelection, chID)
+    reconstructDecay('vpho:radmumu' + str(chID) + ' -> ' + RadMuMuPairChannel, RadMuMuSelection, chID, path=path)
     eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
-    applyCuts('vpho:radmumu' + str(chID), eventCuts)
+    applyCuts('vpho:radmumu' + str(chID), eventCuts, path=path)
     radmumulist.append('vpho:radmumu' + str(chID))
 
     # selection Id1:
@@ -140,7 +144,7 @@ def SystematicsRadMuMuList():
     return radmumulist
 
 
-def EELLList():
+def EELLList(path):
     """
     Note:
         * Systematics skim list for eell events
@@ -156,7 +160,7 @@ def EELLList():
     # At skim level we avoid any PID-like requirements and just select events
     # with two good tracks coming from the interavtion region.
     eLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5'
-    cutAndCopyList('e+:skimloose', 'e+:all', eLooseSelection)
+    cutAndCopyList('e+:skimloose', 'e+:all', eLooseSelection, path=path)
 
     # create a list of possible selections
     eelllist = []
@@ -164,40 +168,40 @@ def EELLList():
     # Lepon pair has low invariant mass and tracks are back-to-back-like
     EELLSelection = 'M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75'
     eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
-    reconstructDecay('gamma:eell -> e+:skimloose e-:skimloose', EELLSelection + " and " + eventCuts)
+    reconstructDecay('gamma:eell -> e+:skimloose e-:skimloose', EELLSelection + " and " + eventCuts, path=path)
     eelllist.append('gamma:eell')
 
     return eelllist
 
 
-def ResonanceList():
-    DsList = getDsList()
-    DstarList = getDstarList()
-    SigmacList = getSigmacList()
-    MuMugList = getmumugList()
-    BZeroList = getBZeroList()
-    BPlusList = getBPlusList()
+def ResonanceList(path):
+    DsList = getDsList(path)
+    DstarList = getDstarList(path)
+    SigmacList = getSigmacList(path)
+    MuMugList = getmumugList(path)
+    BZeroList = getBZeroList(path)
+    BPlusList = getBPlusList(path)
     return (DsList + DstarList + SigmacList + MuMugList + BZeroList + BPlusList)
 
 
-def getDsList():
+def getDsList(path):
     DsCuts = '1.90 < M < 2.04'
 
-    reconstructDecay('phi:res -> K+:loose K-:loose', '1.01 < M < 1.03')
-    reconstructDecay('K*0:res -> K+:loose pi-:loose', '0.7 < M < 1.1')
+    reconstructDecay('phi:res -> K+:loose K-:loose', '1.01 < M < 1.03', path=path)
+    reconstructDecay('K*0:res -> K+:loose pi-:loose', '0.7 < M < 1.1', path=path)
 
     DsChannel = ['phi:res pi+:loose']
     DsList = []
     for chID, channel in enumerate(DsChannel):
         particlename = 'D_s+:Resonance%d' % (chID)
-        reconstructDecay(particlename + ' -> ' + channel, DsCuts, chID)
-        matchMCTruth(particlename)
+        reconstructDecay(particlename + ' -> ' + channel, DsCuts, chID, path=path)
+        matchMCTruth(particlename, path)
         DsList.append(particlename)
 
     return DsList
 
 
-def getDstarList():
+def getDstarList(path):
     DplusCuts = '1.8 < M < 1.93'
     DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p)>2.0'
 
@@ -205,8 +209,8 @@ def getDstarList():
 
     DplusList = []
     for chID, channel in enumerate(DplusChannel):
-        reconstructDecay('D+:resonance' + str(chID) + ' -> ' + channel, DplusCuts, chID)
-        vertexRave('D+:resonance' + str(chID), 0.0)
+        reconstructDecay('D+:resonance' + str(chID) + ' -> ' + channel, DplusCuts, chID, path=path)
+        vertexRave('D+:resonance' + str(chID), 0.0, path=path)
         DplusList.append('D+:resonance' + str(chID))
 
     DstarChannel = []
@@ -215,22 +219,22 @@ def getDstarList():
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
-        reconstructDecay('D*+:resonance' + str(chID) + ' -> ' + channel, DstarCuts, chID)
+        reconstructDecay('D*+:resonance' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path)
         DstarList.append('D*+:resonance' + str(chID))
-        matchMCTruth('D*+:resonance0')
+        matchMCTruth('D*+:resonance0', path=path)
 
     return DstarList
 
 
-def getSigmacList():
+def getSigmacList(path):
     LambdacCuts = '2.24 < M < 2.33'
     SigmacCuts = 'massDifference(0)<0.28 and useCMSFrame(p) > 2.5'
 
     LambdacChannel = ['p+:loose K-:loose pi+:loose']
     LambdacList = []
     for chID, channel in enumerate(LambdacChannel):
-        reconstructDecay('Lambda_c+:resonance' + str(chID) + ' -> ' + channel, LambdacCuts, chID)
-        vertexRave('Lambda_c+:resonance' + str(chID), 0.0)
+        reconstructDecay('Lambda_c+:resonance' + str(chID) + ' -> ' + channel, LambdacCuts, chID, path=path)
+        vertexRave('Lambda_c+:resonance' + str(chID), 0.0, path=path)
         LambdacList.append('Lambda_c+:resonance' + str(chID))
 
     SigmacList = []
@@ -240,9 +244,9 @@ def getSigmacList():
         SigmacPlusChannel.append(channel + ' pi+:loose')
 
     for chID, channel in enumerate(SigmacPlusChannel):
-        reconstructDecay('Sigma_c++:resonance' + str(chID) + ' -> ' + channel, SigmacCuts, chID)
+        reconstructDecay('Sigma_c++:resonance' + str(chID) + ' -> ' + channel, SigmacCuts, chID, path=path)
         SigmacList.append('Sigma_c++:resonance' + str(chID))
-        matchMCTruth('Sigma_c++:resonance0')
+        matchMCTruth('Sigma_c++:resonance0', path=path)
 
 # Sigma_c0
     Sigmac0Channel = []
@@ -251,39 +255,39 @@ def getSigmacList():
 
     Sigmac0List = []
     for chID, channel in enumerate(Sigmac0Channel):
-        reconstructDecay('Sigma_c0:resonance' + str(chID) + ' -> ' + channel, SigmacCuts, chID)
+        reconstructDecay('Sigma_c0:resonance' + str(chID) + ' -> ' + channel, SigmacCuts, chID, path=path)
         SigmacList.append('Sigma_c0:resonance' + str(chID))
-        matchMCTruth('Sigma_c0:resonance0')
+        matchMCTruth('Sigma_c0:resonance0', path=path)
 
     return SigmacList
 
 
-def getmumugList():
+def getmumugList(path):
 
     vphoChannel = ['mu+:loose mu-:loose']
     vphocuts = ''
     vphoList = []
     for chID, channel in enumerate(vphoChannel):
         resonanceName = 'vpho:resonance' + str(chID)
-        reconstructDecay('vpho:resonance' + str(chID) + ' -> ' + channel, vphocuts, chID)
-        applyCuts(resonanceName, 'nTracks == 2 and M < formula(Ecms*0.9877)')
-        matchMCTruth(resonanceName)
-        vertexRave(resonanceName, 0.0)
-        applyCuts(resonanceName, 'M < formula(Ecms*0.9877)')
+        reconstructDecay('vpho:resonance' + str(chID) + ' -> ' + channel, vphocuts, chID, path=path)
+        applyCuts(resonanceName, 'nTracks == 2 and M < formula(Ecms*0.9877)', path=path)
+        matchMCTruth(resonanceName, path=path)
+        vertexRave(resonanceName, 0.0, path=path)
+        applyCuts(resonanceName, 'M < formula(Ecms*0.9877)', path=path)
         vphoList.append(resonanceName)
 
     return vphoList
 
 
-def getBPlusList():
+def getBPlusList(path):
     antiDZeroCut = '1.82 < M < 1.90'
     antiDZeroChannel = ['K+:loose pi-:loose']
     antiDZeroList = []
 
     for chID, channel in enumerate(antiDZeroChannel):
         resonanceName = 'anti-D0:resonance' + str(chID)
-        reconstructDecay(resonanceName + ' -> ' + channel, antiDZeroCut, chID)
-        vertexRave(resonanceName, 0.0)
+        reconstructDecay(resonanceName + ' -> ' + channel, antiDZeroCut, chID, path=path)
+        vertexRave(resonanceName, 0.0, path=path)
         antiDZeroList.append(resonanceName)
 
     BPlusChannel = []
@@ -293,59 +297,63 @@ def getBPlusList():
     BPlusCuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
     BPlusList = []
     for chID, channel in enumerate(BPlusChannel):
-        reconstructDecay('B+:resonance' + str(chID) + ' -> ' + channel, BPlusCuts, chID)
+        reconstructDecay('B+:resonance' + str(chID) + ' -> ' + channel, BPlusCuts, chID, path=path)
         BPlusList.append('B+:resonance' + str(chID))
-        matchMCTruth('B+:resonance' + str(chID))
+        matchMCTruth('B+:resonance' + str(chID), path=path)
 
     return BPlusList
 
 
-def getBZeroList():
+def getBZeroList(path):
     BZeroCuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
     BZeroChannel = ['D-:resonance0 pi+:loose']
     BZeroList = []
 
     for chID, channel in enumerate(BZeroChannel):
         resonanceName = 'B0:resonance' + str(chID)
-        reconstructDecay(resonanceName + ' -> ' + channel, BZeroCuts, chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, BZeroCuts, chID, path=path)
         BZeroList.append(resonanceName)
-        matchMCTruth(resonanceName)
+        matchMCTruth(resonanceName, path=path)
 
     return BZeroList
 
 
-def SystematicsLambdaList():
+def SystematicsLambdaList(path):
     LambdaCuts = 'M < 1.2'
 
-    fillParticleList('p+:all', '', enforceFitHypothesis=True)
-    fillParticleList('pi-:all', '', enforceFitHypothesis=True)
-    LambdaChannel = ['p+:all pi-:loose']
+    fillParticleList('p+:all', '', enforceFitHypothesis=True, path=path)
+    fillParticleList('pi-:all', '', enforceFitHypothesis=True, path=path)
+    LambdaChannel = ['p+:all pi-:all']
 
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):
-        reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID)
-        vertexKFit('Lambda0:syst' + str(chID), 0.002)
-        applyCuts('Lambda0:syst' + str(chID), '1.10<M<1.13')
-        applyCuts('Lambda0:syst' + str(chID), 'formula(x*x+y*y)>0.0225')
-        applyCuts('Lambda0:syst' + str(chID), 'formula(x*px+y*py)>0')
-        applyCuts('Lambda0:syst' + str(chID), 'formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009')
-        applyCuts('Lambda0:syst' + str(chID), 'p>0.2')
-        matchMCTruth('Lambda0:syst0')
+        reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID, path=path)
+        vertexKFit('Lambda0:syst' + str(chID), 0.002, path=path)
+        applyCuts('Lambda0:syst' + str(chID), '1.10<M<1.13', path=path)
+        applyCuts('Lambda0:syst' + str(chID), 'formula(x*x+y*y)>0.0225', path=path)
+        applyCuts('Lambda0:syst' + str(chID), 'formula(x*px+y*py)>0', path=path)
+        applyCuts(
+            'Lambda0:syst' +
+            str(chID),
+            'formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009',
+            path=path)
+        applyCuts('Lambda0:syst' + str(chID), 'p>0.2', path=path)
+        matchMCTruth('Lambda0:syst0', path=path)
         LambdaList.append('Lambda0:syst' + str(chID))
 
     return LambdaList
 
 
-def SystematicsList():
+def SystematicsList(path):
 
     Lists = []
-    Lists += JpsimumuTagProbe()
-    Lists += JpsieeTagProbe()
-    Lists += PiKFromDstarList()
+    Lists += JpsimumuTagProbe(path)
+    Lists += JpsieeTagProbe(path)
+    Lists += PiKFromDstarList(path)
     return Lists
 
 
-def PiKFromDstarList():
+def PiKFromDstarList(path):
     D0Cuts = '1.81 < M < 1.91'
 #   DstarCuts = 'massDifference(0)<0.16'
     DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
@@ -355,8 +363,8 @@ def PiKFromDstarList():
 
     D0List = []
     for chID, channel in enumerate(D0Channel):
-        reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID)
-        vertexRave('D0:syst' + str(chID), 0.0)
+        reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID, path=path)
+        vertexRave('D0:syst' + str(chID), 0.0, path=path)
         D0List.append('D0:syst' + str(chID))
 
     DstarChannel = []
@@ -365,49 +373,49 @@ def PiKFromDstarList():
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
-        reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID)
+        reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path)
         DstarList.append('D*-:syst' + str(chID))
-        matchMCTruth('D*+:syst0')
+        matchMCTruth('D*+:syst0', path=path)
 
     return DstarList
 
 
-def JpsimumuTagProbe():
+def JpsimumuTagProbe(path):
     #   Cuts = '2.8 < M < 3.4'
     Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
     Channel = 'mu+:all mu-:loose'
     jpsiList = []
     chID = 0
-    reconstructDecay('J/psi:mumutagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID)
+    reconstructDecay('J/psi:mumutagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID, path=path)
     jpsiList.append('J/psi:mumutagprobe' + str(chID))
-    matchMCTruth('J/psi:mumutagprobe0')
+    matchMCTruth('J/psi:mumutagprobe0', path=path)
     return jpsiList
 
 
-def JpsieeTagProbe():
+def JpsieeTagProbe(path):
     #   Cuts = '2.7 < M < 3.4'
     Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
     Channel = 'e+:all e-:loose'
     jpsiList = []
     chID = 0
-    reconstructDecay('J/psi:eetagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID)
+    reconstructDecay('J/psi:eetagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID, path=path)
     jpsiList.append('J/psi:eetagprobe' + str(chID))
-    matchMCTruth('J/psi:eetagprobe0')
+    matchMCTruth('J/psi:eetagprobe0', path=path)
     return jpsiList
 
 
-def SystematicsTrackingList():
+def SystematicsTrackingList(path):
 
     Lists = []
-    Lists += BtoDStarPiList()
-    Lists += DstarToD0PiPartList()
+    Lists += BtoDStarPiList(path)
+    Lists += DstarToD0PiPartList(path)
 
     return Lists
 
 
-def DstarToD0PiPartList():
+def DstarToD0PiPartList(path):
 
-    fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1")
+    fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
 
 # D-
     DminusCuts = '1.0 < M < 1.75'
@@ -415,7 +423,7 @@ def DstarToD0PiPartList():
 
     for chID, channel in enumerate(DminusChannel):
         resonanceName = 'D-:loose' + str(chID)
-        reconstructDecay(resonanceName + ' -> ' + channel, DminusCuts, chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, DminusCuts, chID, path=path)
 
 # Dstar
 
@@ -426,14 +434,14 @@ def DstarToD0PiPartList():
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
         resonanceName = 'D*0:loose' + str(chID)
-        reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID, path=path)
         DstarList.append(resonanceName)
-        matchMCTruth(resonanceName)
+        matchMCTruth(resonanceName, path=path)
 
     return DstarList
 
 
-def BtoDStarPiList():
+def BtoDStarPiList(path):
     D0Cuts = '1.835 < M < 1.895'
     DstarCuts = 'massDifference(0)<0.16'
     B0Cuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
@@ -445,10 +453,10 @@ def BtoDStarPiList():
     D0List = []
     for chID, channel in enumerate(D0Channel):
         resonanceName = 'anti-D0:loose' + str(chID)
-        reconstructDecay(resonanceName + ' -> ' + channel, D0Cuts, chID)
-#        vertexRave(resonanceName, 0.0)
-        matchMCTruth(resonanceName)
-    copyLists('anti-D0:loose', ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"])
+        reconstructDecay(resonanceName + ' -> ' + channel, D0Cuts, chID, path=path)
+#        vertexRave(resonanceName, 0.0, path=path)
+        matchMCTruth(resonanceName, path=path)
+    copyLists('anti-D0:loose', ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"], path=path)
     D0List.append('anti-D0:loose')
 # Dstar
 
@@ -459,10 +467,10 @@ def BtoDStarPiList():
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
         resonanceName = 'D*-:loose' + str(chID)
-        reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID, path=path)
 #        vertexRave(resonanceName, 0.0)
         DstarList.append(resonanceName)
-        matchMCTruth(resonanceName)
+        matchMCTruth(resonanceName, path=path)
 
 # B0
 
@@ -473,15 +481,15 @@ def BtoDStarPiList():
     B0List = []
     for chID, channel in enumerate(B0Channel):
         resonanceName = 'B0:sys' + str(chID)
-        reconstructDecay(resonanceName + ' -> ' + channel, B0Cuts, chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, B0Cuts, chID, path=path)
         B0List.append(resonanceName)
 #        vertexRave(resonanceName, 0.0)
-        matchMCTruth(resonanceName)
+        matchMCTruth(resonanceName, path=path)
 
     return B0List
 
 
-def XiList():
+def XiList(path):
     LambdaCuts = '1.10 < M < 1.13'
     XiCuts = '1.3 < M < 1.34'
 
@@ -490,8 +498,8 @@ def XiList():
 
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):
-        reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID)
-        massVertexRave('Lambda0:syst' + str(chID), 0.001)
+        reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID, path=path)
+        massVertexRave('Lambda0:syst' + str(chID), 0.001, path=path)
         LambdaList.append('Lambda0:syst' + str(chID))
 
     XiChannel = []
@@ -500,7 +508,7 @@ def XiList():
 
     XiList = []
     for chID, channel in enumerate(XiChannel):
-        reconstructDecay('Xi-:syst' + str(chID) + ' -> ' + channel, XiCuts, chID)
+        reconstructDecay('Xi-:syst' + str(chID) + ' -> ' + channel, XiCuts, chID, path=path)
         XiList.append('Xi-:syst' + str(chID))
 
     return XiList

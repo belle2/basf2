@@ -10,16 +10,13 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 
-
-import sys
-import os
-import glob
+skimpath = Path()
 
 skimCode = encodeSkimName('Systematics')
 argvs = sys.argv
@@ -32,46 +29,50 @@ fileList = [
 ]
 
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=skimpath)
 
-
-loadStdCharged()
+stdE('loose', path=skimpath)
+stdMu('loose', path=skimpath)
+stdPi('all', path=skimpath)
+stdK('all', path=skimpath)
+stdE('all', path=skimpath)
+stdMu('all', path=skimpath)
 
 from skim.systematics import SystematicsList
-SysList = SystematicsList()
-skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+SysList = SystematicsList(skimpath)
+skimOutputUdst(skimCode, SysList, path=skimpath)
+summaryOfLists(SysList, path=skimpath)
 
 if 'Validation' in argvs:
-    ntupleFile('Validation_Jpsimumu.root')
+    ntupleFile('Validation_Jpsimumu.root', path=skimpath)
     toolsdstar = ['EventMetaData', '^J/psi -> mu+ mu-']
     toolsdstar += ['InvMass', '^J/psi -> mu+ mu-']
     toolsdstar += ['Kinematics', '^J/psi -> ^mu+ ^mu-']
     toolsdstar += ['Track', '^J/psi -> mu+ mu-']
     toolsdstar += ['MCTruth', '^J/psi -> mu+ mu-']
     toolsdstar += ['CMSKinematics', '^J/psi -> mu+ mu-']
-    ntupleTree('Jpsimumu', 'J/psi:mumutagprobe0', toolsdstar)
+    ntupleTree('Jpsimumu', 'J/psi:mumutagprobe0', toolsdstar, path=skimpath)
 
-    ntupleFile('Validation_Jpsiee.root')
+    ntupleFile('Validation_Jpsiee.root', path=skimpath)
     toolsdstar = ['EventMetaData', '^J/psi -> e+ e-']
     toolsdstar += ['InvMass', '^J/psi -> e+ e-']
     toolsdstar += ['Kinematics', '^J/psi -> ^e+ ^e-']
     toolsdstar += ['Track', '^J/psi -> e+ e-']
     toolsdstar += ['MCTruth', '^J/psi -> e+ e-']
     toolsdstar += ['CMSKinematics', '^J/psi -> e+ e-']
-    ntupleTree('Jpsiee', 'J/psi:eetagprobe0', toolsdstar)
+    ntupleTree('Jpsiee', 'J/psi:eetagprobe0', toolsdstar, path=skimpath)
 
-    ntupleFile('Validation_Dstar.root')
+    ntupleFile('Validation_Dstar.root', path=skimpath)
     toolsdstar = ['EventMetaData', '^D*+ -> D0 pi+']
     toolsdstar += ['InvMass', '^D*+ -> ^D0 pi+']
     toolsdstar += ['Kinematics', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
     toolsdstar += ['Track', '^D*+ -> ^D0 pi+']
     toolsdstar += ['MCTruth', '^D*+ -> ^D0 pi+']
     toolsdstar += ['CMSKinematics', '^D*+ -> ^D0 pi+']
-    ntupleTree('Dstar', 'D*+:syst0', toolsdstar)
+    ntupleTree('Dstar', 'D*+:syst0', toolsdstar, path=skimpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=skimpath)
+process(skimpath)
 
 print(statistics)

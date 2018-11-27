@@ -69,8 +69,6 @@ void EvtGenDecayModule::beginRun()
 void EvtGenDecayModule::event()
 {
   int i, n;
-  bool decay;
-  MCParticleGraph::GraphParticle* graphParticle;
   if (m_BeamParameters.hasChanged()) {
     if (!m_Initialized) {
       initializeGenerator();
@@ -83,8 +81,9 @@ void EvtGenDecayModule::event()
   m_Graph.loadList(m_MCParticleColName);
   n = m_Graph.size();
   for (i = 0; i < n; i++) {
-    graphParticle = &m_Graph[i];
-    decay = true;
+    bool decay = true;
+    MCParticleGraph::GraphParticle* graphParticle = &m_Graph[i];
+
     if (graphParticle->isInitial())
       decay = false;
     else if (graphParticle->getNDaughters() > 0)

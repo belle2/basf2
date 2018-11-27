@@ -1,6 +1,14 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+"""
+<header>
+    <input>CharmlessHad2BodyCharged.udst.root</input>
+    <output>CharmlessHad2BodyCharged_Validation.root</output>
+    <contact>khsmith@student.unimelb.edu.au</contact>
+</header>
+"""
+
 from basf2 import *
 from modularAnalysis import *
 

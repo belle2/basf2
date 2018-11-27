@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+    <input>../CharmlessHad2BodyCharged.dst.root</input>
+    <output>CharmlessHad2BodyCharged.udst.root</output>
+    <contact>khsmith@student.unimelb.edu.au</contact>
+    <interval>nightly</interval>
+</header>
+"""
 __author__ = "K. Smith"
-
 
 from basf2 import *
 from modularAnalysis import *

@@ -21,7 +21,7 @@ set_random_seed(12345)
 bg = glob.glob('./BG/[A-Z]*.root')
 
 # create path
-main = create_path()
+charmless2neutralpath = Path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
@@ -36,17 +36,16 @@ evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('../../decfiles/dec/
 main.add_module(evtgeninput)
 
 # detector simulation
-# add_simulation(main, bkgfiles=bg)
-add_simulation(main)
+add_simulation(path=charmless2neutralpath)
 
 # reconstruction
-add_reconstruction(main)
+add_reconstruction(path=charmless2neutralpath)
 
 
 # Finally add mdst output
 output_filename = "../CharmlessHad2BodyNeutral.dst.root"
-add_mdst_output(main, filename=output_filename)
+add_mdst_output(charmless2neutralpath, filename=output_filename)
 
 # process events and print call statistics
-process(main)
+process(charmless2neutralpath)
 print(statistics)

@@ -61,23 +61,6 @@ def DstToD0PiD0ToHpJmPi0():
     return DstList
 
 
-def D0ToHpHmPi0():
-    cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28')
-    charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    D0_Channels = ['pi+:loose pi-:loose pi0:myskim',
-                   'K+:loose K-:loose pi0:myskim',
-                   ]
-
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID)
-        vertexTree('D0:' + str(chID), 0.001)
-        D0List.append('D0:' + str(chID))
-
-    Lists = D0List
-    return Lists
-
-
 def DstToD0PiD0ToHpHmPi0():
     Dstcuts = '0 < Q < 0.018'
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'

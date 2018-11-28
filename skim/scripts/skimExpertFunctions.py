@@ -37,7 +37,6 @@ _skimNameMatching = [
     ('2210020000', 'Charm2BodyHadronicD0'),  # D0 -> K pi/pi pi/K K
     ('2610030000', 'Charm2BodyHadronic'),  # D* -> D0 -> K pi/pi pi/K K
     ('2610032000', 'Charm3BodyHadronic'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
-    ('2210022000', 'Charm3BodyHadronicD0'),  # D0 -> h h pi0
     ('2610032001', 'Charm3BodyHadronic1'),  # D* -> D0 -> h h pi0
     ('2610038000', 'Charm3BodyHadronic3'),  # D* -> D0 -> K- pi+ eta (RS+WS)
     ('2610052100', 'Charm2BodyNeutrals2'),  # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0

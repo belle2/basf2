@@ -132,6 +132,7 @@ void ECLUnpackerModule::initialize()
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
   m_eclDigits.registerRelationTo(m_eclDsps);
+  m_eclDsps.registerRelationTo(m_eclDigits);
 
 }
 

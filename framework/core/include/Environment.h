@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 namespace Belle2 {
   class Path;
@@ -340,7 +342,7 @@ namespace Belle2 {
     bool m_zmqUseEventBackup = false; /**< If a worker dies, store its events in a backup. */
     bool m_zmqRestartFailedWorkers = false; /**< If a worker dies, restart it. */
     bool m_zmqFailOnFailedWorkers = true; /**< If a worker dies, fail also. Will not be used if restartFailedWorkers is true. */
-
+    StoreObjPtr<FileMetaData> m_fileMetaData;  /**< File meta data pointer for determining the type of data */
     /**
      *  Set up environment from standard BELLE2_ environment variables.
      *

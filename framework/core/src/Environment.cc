@@ -14,8 +14,6 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/core/InputController.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/FileMetaData.h>
 
 #include <boost/filesystem.hpp>
 #include <memory>
@@ -56,8 +54,8 @@ unsigned int Environment::getNumberOfEvents() const
 
 bool Environment::isMC() const
 {
-  static StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
-  if (fileMetaData) return fileMetaData->isMC();
+  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+  if (m_fileMetaData) return m_fileMetaData->isMC();
   return true;
 }
 
@@ -94,7 +92,8 @@ Environment::Environment() :
   m_mcEvents(0),
   m_run(-1),
   m_experiment(-1),
-  m_skipNEvents(0)
+  m_skipNEvents(0),
+  m_fileMetaData("", DataStore::c_Persistent)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");

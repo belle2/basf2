@@ -1556,9 +1556,7 @@ endloop:
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
     REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula,
                       "Returns the result of the given formula, where v1-v6 are variables.\n"
-                      "Parenthesis MUST be in the form of square brackets: [v1 * v2].\n"
-                      "Currently only supports one level of round parentheses () in variable names,"
-                      " i.e. passesCut(cut) as an input variable will fail if the cut also contains ( or ).");
+                      "Parenthesis may be in the form of square brackets: [v1 * v2] or round ones (v1 * v2).");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
                       "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");

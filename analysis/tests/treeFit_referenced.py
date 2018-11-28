@@ -35,6 +35,7 @@ class TestTreeFits(unittest.TestCase):
                         particleList='B0:rec',
                         confidenceLevel=-1,
                         massConstraintList=[],
+                        massConstraintListParticlename=[],
                         expertUseReferencing=True,
                         ipConstraint=True,
                         updateAllDaughters=True)

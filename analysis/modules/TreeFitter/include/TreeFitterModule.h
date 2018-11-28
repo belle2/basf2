@@ -59,8 +59,8 @@ namespace Belle2 {
 
     /** vector carrying the PDG codes of the particles to be mass constraint */
     std::vector<int> m_massConstraintList;
-    /** vector carrying the names s of the particles to be mass constraint */
-    std::vector<std::string> m_massConstraintList_particlename;
+    /** vector carrying the names of the particles to be mass constraint */
+    std::vector<std::string> m_massConstraintListParticlename;
     /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental!
      *  WARNING not even guaranteed that it works
      * */

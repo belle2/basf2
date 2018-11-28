@@ -324,105 +324,6 @@ def setupEventInfo(noEvents, path=analysis_main):
     path.add_module(evtnumbers)
 
 
-def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=False):
-    """
-    Warning:
-        This functions is deprecated. Please call ``setupEventInfo`` then
-        ``add_evtgen_generator`` from the `generators`` package.
-
-    ::
-        from modularAnalysis import setupEventInfo
-        from generators import add_evtgen_generator
-        setupEventInfo(noEvents, path)
-        add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)
-        # or, for example:
-        add_evtgen_generator(path=analysis_main, finalstate='mixed')
-
-    Parameters:
-        noEvents (int): number of events to be generated
-        decayTable (str): file name of the decay table to be used
-        path (basf2.Path): modules are added to this path
-        override_fatal (bool): force this function to run ignoring the deprecation
-    """
-
-    message = (
-        "The generateY4S function from modularAnalysis is deprecated.\n"
-        "This function will be removed after release - 02. Please update your scripts.\n"
-        "Please replace it with functions from generators. Here is some example code: \n"
-        "\n"
-        "    from modularAnalysis import setupEventInfo"
-        "    from generators import add_evtgen_generator\n"
-        "    setupEventInfo(noEvents)\n"
-        "    add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)\n"
-    )
-    if (override_fatal):
-        B2ERROR(message)
-    else:
-        B2FATAL(message)
-
-    from generators import add_evtgen_generator
-    setupEventInfo(noEvents, path)
-    if not os.path.exists(decayTable):
-        B2FATAL('The specifed decay table file does not exist:' + decayTable)
-    add_evtgen_generator(path, 'signal', decayTable)
-
-
-def generateContinuum(
-    noEvents,
-    inclusiveP,
-    decayTable,
-    inclusiveT=2,
-    path=analysis_main,
-    override_fatal=False,
-):
-    """
-    Warning:
-        This functions is deprecated. Please call :func:`setupEventInfo` then
-        :func:`add_continuum_generator` from the :doc:`generators` package.
-
-    ::
-
-        from modularAnalysis import setupEventInfo
-        from generators import add_continuum_generator, add_inclusive_continuum_generator
-        setupEventInfo(noEvents, path)
-        add_continuum_generator(path=analysis_main, finalstate='ccbar')
-
-    Parameters:
-        noEvents (int):  number of events to be generated
-        inclusiveP (str): each event will contain this particle
-        decayTable (str): file name of the decay table to be used
-        inclusiveT (int) whether (2) or not (1) charge conjugated inclusive Particles should be included
-        path (basf2.Path): modules are added to this path
-        override_fatal (bool): force this function to run ignoring the deprecation
-    """
-    message = (
-        "The generateContinuum function from modularAnalysis is deprecated.\n"
-        "This function will be removed after release - 02. Please update your scripts.\n"
-        "Please replace it with functions from generators. Here is some example code: \n"
-        "\n"
-        "    from modularAnalysis import setupEventInfo\n"
-        "    from generators import add_continuum_generator, add_inclusive_continuum_generator\n"
-        "    setupEventInfo(noEvents)\n"
-        "    add_continuum_generator(path, \"ccbar\")  # for example"
-    )
-    if (override_fatal):
-        B2ERROR(message)
-    else:
-        B2FATAL(message)
-
-    from generators import add_inclusive_continuum_generator
-    setupEventInfo(noEvents)
-    for finalstate in ['uubar', 'ddbar', 'ssbar', 'ccbar']:
-        if decayTable.count(finalstate):
-            B2INFO("Have parsed your decfile and will generate %s" % finalstate)
-            add_inclusive_continuum_generator(path, finalstate, [inclusiveP], include_conjugates=inclusiveT - 1)
-            return
-
-    add_inclusive_continuum_generator(path, finalstate='', particles=[inclusiveP],
-                                      userdecfile=decayTable, include_conjugates=inclusiveT - 1)
-    return
-
-
 def loadGearbox(path=analysis_main):
     """
     Loads Gearbox module to the path.
@@ -2189,8 +2090,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
-        fillParticleList('pi+:evtkin', '')
-        fillParticleList('gamma:evtkin', '')
+        fillParticleList('pi+:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
 
         if default_cleanup:
@@ -2199,11 +2100,11 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:evtkin', trackCuts)
+            applyCuts('pi+:evtkin', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:evtkin', gammaCuts)
+            applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
             B2INFO("No cleanup in EventKinematics module.")
     else:
@@ -2249,8 +2150,8 @@ def buildEventShape(inputListNames=[],
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
-        fillParticleList('pi+:evtshape', '')
-        fillParticleList('gamma:evtshape', '')
+        fillParticleList('pi+:evtshape', '', path=path)
+        fillParticleList('gamma:evtshape', '', path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
@@ -2259,13 +2160,13 @@ def buildEventShape(inputListNames=[],
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:evtshape', trackCuts)
+            applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:evtshape', gammaCuts)
+            applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
-            B2WARNIG("Creating the default lists with no cleanup. This can be potentially dangerous")
+            B2WARNING("Creating the default lists with no cleanup. This can be potentially dangerous")
     else:
         particleLists = inputListNames
 

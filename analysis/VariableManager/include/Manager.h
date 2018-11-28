@@ -161,6 +161,11 @@ namespace Belle2 {
        */
       bool addAlias(const std::string& alias, const std::string& variable);
 
+      /**
+       * Print existing aliases
+       */
+      void printAliases();
+
       /** Add collection
        * Return true if the collection was successfully added
        */

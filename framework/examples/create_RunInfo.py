@@ -14,7 +14,9 @@ import os
 import argparse
 # make sure ROOT does not steal our command line arguments
 from ROOT import PyConfig
+#: Tell ROOT to not mangle our command line options
 PyConfig.IgnoreCommandLineOptions = True
+#: And we don't need a gui thread
 PyConfig.StartGuiThread = False
 # now we can import the Belle2 namespace
 from ROOT import Belle2
@@ -32,13 +34,19 @@ def get_argument_parser():
     return parser
 
 
+# Doxygen complains about undocumented variables below which are not exported
+# ... so hide them on purpose
+# @cond this_is_a_main_block_and_not_exported
+
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()
     if not os.path.exists(args.filename):
         B2FATAL(f"Input filename {args.filename} does not exist")
 
+    # Number of errors
     errors = 0
+    # Number of successfully imported run infos
     imported = 0
     # in reality this should probably not come from a text file but directly
     # from a postgres query in python and skip the intermediate file.
@@ -86,6 +94,8 @@ if __name__ == "__main__":
             Belle2.Database.Instance().storeData("RunInfo", info, iov)
             imported += 1
 
-B2INFO(f"Imported {imported} RunInfo objects")
-if errors > 0:
-    B2FATAL(f"{errors} errors occured")
+    B2INFO(f"Imported {imported} RunInfo objects")
+    if errors > 0:
+        B2FATAL(f"{errors} errors occured")
+
+# @endcond

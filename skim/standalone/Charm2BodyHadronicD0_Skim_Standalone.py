@@ -11,12 +11,12 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
-
+from stdCharged import stdPi, stdK, stdE, stdMu
+from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 
 import os
 import sys
@@ -28,17 +28,20 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-
 inputMdstList('MC9', fileList)
 
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 
-loadStdCharged()
-
-from Charm2BodyHadronicD0_List import *
-
+from skim.charm import D0ToHpJm
 D0ToHpJmList = D0ToHpJm()
 skimOutputUdst(skimCode, D0ToHpJmList)
-
 summaryOfLists(D0ToHpJmList)
 
 

@@ -67,6 +67,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   m_calibrationCrystalEnergy("ECLCrystalEnergy"),
   m_calibrationCrystalElectronicsTime("ECLCrystalElectronicsTime"),
   m_calibrationCrystalTimeOffset("ECLCrystalTimeOffset"),
+  m_calibrationCrateTimeOffset("ECLCrateTimeOffset"),
   m_calibrationCrystalFlightTime("ECLCrystalFlightTime"),
   m_eclDigits(eclDigitArrayName()),
   m_eclCalDigits(eclCalDigitArrayName()),
@@ -110,6 +111,7 @@ void ECLDigitCalibratorModule::initializeCalibration()
   callbackCalibration(m_calibrationCrystalElectronicsTime, v_calibrationCrystalElectronicsTime,
                       v_calibrationCrystalElectronicsTimeUnc);
   callbackCalibration(m_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffsetUnc);
+  callbackCalibration(m_calibrationCrateTimeOffset, v_calibrationCrateTimeOffset, v_calibrationCrateTimeOffsetUnc);
   callbackCalibration(m_calibrationCrystalFlightTime, v_calibrationCrystalFlightTime, v_calibrationCrystalFlightTimeUnc);
 }
 
@@ -188,6 +190,12 @@ void ECLDigitCalibratorModule::beginRun()
     } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalTimeOffset for current run!");
   }
 
+  if (m_calibrationCrateTimeOffset.hasChanged()) {
+    if (m_calibrationCrateTimeOffset) {
+      callbackCalibration(m_calibrationCrateTimeOffset, v_calibrationCrateTimeOffset, v_calibrationCrateTimeOffsetUnc);
+    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrateTimeOffset for current run!");
+  }
+
   if (m_calibrationCrystalFlightTime.hasChanged()) {
     if (m_calibrationCrystalFlightTime) {
       callbackCalibration(m_calibrationCrystalFlightTime, v_calibrationCrystalFlightTime, v_calibrationCrystalFlightTimeUnc);
@@ -242,10 +250,12 @@ void ECLDigitCalibratorModule::event()
     } else { //only calibrate digit time if we have a good waveform fit
       if (is_pure_csi) {
         calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                                                    v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1] + m_pureCsITimeOffset;
+                                                                    v_calibrationCrystalTimeOffset[cellid - 1] -
+                                                                    v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1] + m_pureCsITimeOffset;
       } else {
         calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                               v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
+                                               v_calibrationCrystalTimeOffset[cellid - 1] -
+                                               v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
       }
     }
 

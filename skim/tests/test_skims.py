@@ -54,7 +54,7 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
 
 # ISR cc skim
 from skim.quarkonium import ISRpipiccList
-add_skim('ISRpipicc', ISRpipiccList())
+add_skim('ISRpipicc', ISRpipiccList(path=analysis_main))
 
 # BtoPi0Pi0 Skim
 from skim.btocharmless import BtoPi0Pi0List

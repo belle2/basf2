@@ -70,7 +70,7 @@ from skim.taupair import TauList
 
 # TCPV Skim
 from skim.tcpv import TCPVList
-add_skim('TCPV', TCPVList())
+add_skim('TCPV', TCPVList(tcpvskimpath))
 
 # Bottomonium Etab Skim: 15420100
 from skim.quarkonium import *

@@ -213,10 +213,10 @@ namespace Belle2 {
       if (c != crc32) {
         if (!ignore_crc_flag) {
           B2WARNING("DHC Data Frame CRC FAIL");
-          B2DEBUG(1, "DHC Data Frame CRC FAIL: " << std::hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(((
-                    unsigned char*)data) + length - 8) << " "
-                  << * (unsigned int*)(((unsigned char*)data) + length - 6) << " " << * (unsigned int*)(((unsigned char*)data) + length - 4) <<
-                  " len $" << length);
+          B2DEBUG(1, "DHC Data Frame CRC FAIL: " << std::hex << c << "!=" << crc32 << " data "
+                  << * (unsigned int*)(((unsigned char*)data) + length - 8) << " "
+                  << * (unsigned int*)(((unsigned char*)data) + length - 6) << " "
+                  << * (unsigned int*)(((unsigned char*)data) + length - 4) << " len $" << length);
         }
         return PXDError::EPXDErrMask::c_DHE_CRC;
       }

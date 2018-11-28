@@ -79,13 +79,14 @@ add_skim('BottomoniumEtabExclusive', EtabList())
 from skim.quarkonium import *
 add_skim('BottomoniumUpsilon', UpsilonList())
 
-
+# B to Charmless skim
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
-Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()
+Had2BodyList = CharmlessHad2BodyB0List(path=analysis_main) + CharmlessHad2BodyBmList(path=analysis_main)
 add_skim('CharmlessHad2Body', Had2BodyList)
 
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
-
+Had3BodyList = CharmlessHad3BodyB0List(path=analysis_main) + CharmlessHad3BodyBmList(path=analysis_main)
+add_skim('CharmlessHad3Body', Had3BodyList)
 
 # Systematics skim
 from skim.systematics import *

@@ -15,8 +15,12 @@ import os
 import itertools
 import sys
 import collections
+from skimExpertFunctions import *
+import subprocess
+import json
 
-skims = 'BottomoniumEtabExclusive'
+
+skims = 'TauLFV ALP3Gamma BottomoniumEtabExclusive'
 
 #  skimNames1 = ' BtoDh_Kspi0 BtoDh_Kspipipi0 BtoDh_Kshh BtoDh_hh BtoPi0Pi0
 # BottomoniumEtabExclusive BottomoniumUpsilon  SLUntagged LeptonicUntagged
@@ -27,24 +31,26 @@ skims = 'BottomoniumEtabExclusive'
 #  PRsemileptonicUntagged DoubleCharm feiHadronicB0 feiHadronicBplus
 # feiSLB0WithOneLep feiSLBplusWithOneLep '
 
-bkgs = ' bsbs_6S_BGx1 mixedBGx1  chargedBGx1 ccbarBGx1 ssbarBGx1 uubarBGx0  ddbarBGx1  taupairBGx1 '
-# mixedBGx0 chargedBGx0 ccbarBGx0 ssbarBGx0 uubarBGx0 ddbarBGx0 taupairBGx0
+bkgs = 'MC9_mixedBGx1  MC9_chargedBGx1 MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1'
+# ' MC9_ mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')
 jsonTimeInput = open('JsonTimeInput.txt', 'w')
 
-nFullFiles = 1000
+nFullFiles = 10000
 nFullEvents = 200000
-
+avgUdstSizePerEventPerSample = 0
+avgRetentionPerSample = 0
+avgProcessingTimePerEventPerSample = 0
 for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
-    title = '|Bkg        |     Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
+    title = '|Bkg        |  InputEvents  |  Skimmed Events  |   Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
-    title += ' AvgMemory/Evt(KB)|MaxMemory/Evt(KB)| FullSkimSize(GB)|'
+    title += ' AvgMemory   |MaxMemory | FullSkimSize(GB)|'
     title += ' FullSkimLogSize(GB)|'
     print(title)
     for bkg in bkgs.split():
@@ -52,56 +58,23 @@ for skim in skims.split():
         outputFileName = skim + '_' + bkg
         outputUdstName = skim + '_' + bkg
 
-        if (bkg == 'mixedBGx1'):
-            nFullEvents = 120000
-            nFullFiles = 3564
-        if (bkg == 'chargededBGx1'):
-            nFullEvents = 120000
-            nFullFiles = 3770
-        if (bkg == 'uubarBGx1'):
-            nFullEvents = 210000
-            nFullFiles = 6115
-        if (bkg == 'ddbarBGx1'):
-            nFullEvents = 180000
-            nFullFiles = 1783
-        if (bkg == 'ssbarBGx1'):
-            nFullEvents = 180000
-            nFullFiles = 1704
-        if (bkg == 'ccbarBGx1'):
-            nFullEvents = 150000
-            nFullFiles = 7088
-        if (bkg == 'taupairBGx1'):
-            nFullEvents = 210000
-            nFullFiles = 3501
-
-        if (bkg == 'mixedBGx0'):
-            nFullEvents = 300000
-            nFullFiles = 357
-        if (bkg == 'chargededBGx0'):
-            nFullEvents = 300000
-            nFullFiles = 377
-        if (bkg == 'uubarBGx0'):
-            nFullEvents = 400000
-            nFullFiles = 803
-        if (bkg == 'ddbarBGx0'):
-            nFullEvents = 400000
-            nFullFiles = 201
-        if (bkg == 'ssbarBGx0'):
-            nFullEvents = 400000
-            nFullFiles = 192
-        if (bkg == 'ccbarBGx0'):
-            nFullEvents = 350000
-            nFullFiles = 760
-        if (bkg == 'taupairBGx0'):
-            nFullEvents = 500000
-            nFullFiles = 368
-
-        n = 0
+        pos = bkg.find('_')
+        skimCampaign = bkg[0:pos]
+        sampleType = bkg[pos + 1:]
+        fileList = getTestFile(sampleType, skimCampaign)
+        nFullEvents = getNEvents(fileList)
+        nSkimmedEvents = getNEvents(outputUdstName + '.udst.root')
+        print(nFullEvents)
+        print('nSkimmed ' + str(nSkimmedEvents))
+        nFullFiles = getNumberOfInputMdstFilesPerSample(sampleType, skimCampaign)
+        print(nFullFiles)
+        # These counters are included to determine the number  of lines with retention and candidate multiplicity information.
+        lineCounter = 0
         l = 0
-        a = 0
-        z = 0
-        s = 0
-        f = 0
+        a = 0  # Line number of first occurrence of retention value
+        z = 0  # Line number of second occurrence retention value
+        s = 0  # Line number of  the start of the mode list  candidate multiplicity determination
+        f = 0  # Line number of the end of the mode list for candidate multiplcity determination
         acmCounter = 0
         acmN = 0
         acmD = 0
@@ -123,7 +96,7 @@ for skim in skims.split():
         with open(inputFileName, 'r') as inF:
             content = []
             for line in inF:
-                n += 1
+                lineCounter += 1
                 content.append(line)
                 if 'Total                ' in line:  # find line with total time
                     tline = line.split()
@@ -139,52 +112,44 @@ for skim in skims.split():
                     avgMemline = line.split()
                     avgMemory = float(avgMemline[3]) * 1000
                     avgMemoryPerEvent = avgMemory / events
-                if l == 0 and 'Total Retention' in line:  # Find line with total retention
-                    l += 1  # print(line)
+                if 'Total Retention' in line:  # Find line with total retention
+                    # l += 1
+                    # print(line)
                     rline = line.split(' ')
                     retention = float(rline[2])  # print('Total retention is ' + str(retention))
                 if z == 0 and line.find('Candidate Multiplicity') >= 0:  # Find line with Candidate Multiplicity
                     z += 1
-                    s = int(n) + 2
+                    s = int(lineCounter) + 2
                 if a == 0 and line.find('Total Retention') >= 0:
                     a += 1
-                    f = int(n) - 3
+                    f = int(lineCounter) - 3
 
 # Candidate multiplicity is printed out per decay mode, We need the average so
 # we count how many modes (i.e. lines) and then we use that as a
 # denominator to determine the average candidate multiplicity
         if (s != 0 and f != 0):
-            diff = f - s
+            diff = f - s - 1  # Here diff should give you number of modes that you need to average over
         for i in range(0, diff):
             sline = content[s + i].split()
             if (i < 10):
-                acmTemp = '1'  # sline[4]
-                if any(("INFO" or "ARNING" or "WARNING") in strip for strip in sline):
-                    # print('warning')#<-----------------PRINT THIS OUT TO SEE WHEN YOU HAVE A STUPID WARNING FOR NO APPARENT REASON
-                    nModes = diff - i
-                    skipped = True
-                    break
+                acmTemp = sline[3]
                 if acmTemp[:1].isdigit():
-                    acmN = acmN + float(sline[4])
+                    acmN = acmN + float(acmTemp)
                 else:
                     acmN = acmN + 0
                     nModes += 1
                     skipped = True
+                    print('Could not determine candidate multiplicity in one mode')
             elif (i > 9):
-                acmTemp = sline[3]
-                if any(("INFO" or "ARNING" or "WARNING") in strip for strip in sline):
-                    # print('warning')#<-----------------PRINT THIS OUT TO SEE WHEN YOU HAVE A STUPID WARNING FOR NO APPARENT REASON
-                    nModes = diff - i
-                    skipped = True
-                    break
-                elif acmTemp[:1].isdigit():
-                    acmN = acmN + float(sline[3])
+                acmTemp = sline[2]
+                print(sline[2])
+                if acmTemp[:1].isdigit():
+                    acmN = acmN + float(sline[2])
                 else:
                     acmN = acmN + 0
                     nModes = +1
-                    skipped = True
-
-        acm = acmN / diff
+                    print('Could not determine candidate multiplicity in one mode')
+        acm = acmN / diff  # Determine the average candidate multiplicity
         # GET AND PRINT UDST EVENT SIZE:
         if retention == 0:
             udstSizePerEvent = 0
@@ -214,9 +179,15 @@ for skim in skims.split():
 
         totalTime = timePerEvent * nFullEvents / 23.57
         maxMemory = maxMemoryPerEvent * nFullEvents / 1000000
-
+        avgRetentionPerSample += retention
+        avgUdstSizePerEventPerSample += udstSizePerEvent
+        avgProcessingTimePerEventPerSample += timePerEvent
         print('|' +
               bkg +
+              '     |     ' +
+              str(nFullEvents) +
+              '     |     ' +
+              str(nSkimmedEvents) +
               '     |     ' +
               str(retention) +
               '     |     ' +
@@ -235,16 +206,14 @@ for skim in skims.split():
               '     |     ' +
               str(fullLogFileMB)[:5] +
               '     |    ' +
-              str(maxMemoryPerEvent)[:5] +
+              str(maxMemory)[:5] +
               '     |      ' +
-              str(avgMemoryPerEvent)[:5] +
+              str(avgMemory)[:5] +
               '      |      ' +
               str(fullSkimSizeGB)[:5] +
               '   |    ' +
               str(fullLogSkimSizeGB)[:5] +
               "\n")
-        # if skipped:#<-----PRINT THIS OUT TO KNOW HOW ACCURATE ACMPE IS
-        # print('Skipped '+str(nModes)+' in the calculation of ACMPE')
         outTimePerEvent = timePerEvent
         if (timePerEvent >= 0.5):
             outTimePerEvent = timePerEvent + 1

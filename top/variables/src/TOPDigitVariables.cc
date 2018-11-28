@@ -7,24 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-// analysis
-#include <analysis/VariableManager/Manager.h>
-
-// framework
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
-
-// dataobjects
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/Track.h>
-#include <analysis/dataobjects/Particle.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <framework/gearbox/Const.h>
-#include <top/geometry/TOPGeometryPar.h>
-#include <top/dataobjects/TOPLikelihood.h>
-#include <top/dataobjects/TOPRecBunch.h>
+#include <top/variables/TOPDigitVariables.h>
 
 #include <algorithm> // for sort
 using namespace std;
@@ -82,7 +65,7 @@ namespace Belle2 {
 
     // counts the number of photons in the TOP in a given time frame
     // if tmin < 0, count from the time of the first photon
-    int countHits(const Particle* particle, double tmin, double tmax, bool clean = true)
+    int countHits(const Particle* particle, double tmin, double tmax, bool clean)
     {
       int slotID = getSlotID(particle);
       StoreArray<TOPDigit> digits;
@@ -111,7 +94,7 @@ namespace Belle2 {
     }
 
     // returns the expected number of photons for a given hypothesis
-    double getExpectedPhotonCount(const Particle* particle, int pdg = 0)
+    double getExpectedPhotonCount(const Particle* particle, int pdg)
     {
       const auto* topLikelihood = getTOPLikelihood(particle);
       if (not topLikelihood) return 0;
@@ -519,7 +502,5 @@ namespace Belle2 {
     REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPGoodPhotonsInSlot,
                       "[calibration] The number of good photons in the given slot");
   }
-// Create an empty module which allows basf2 to easily find the library and load it from the steering file
-  class EnableTOPDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
   REG_MODULE(EnableTOPDigitVariables);
 }

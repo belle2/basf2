@@ -74,6 +74,8 @@ namespace Belle2 {
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
       /** Mask for suppressing selected error messages */
       uint64_t m_suppressErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      /** Mask for error which stop package unpacking directly */
+      uint64_t m_errorSkipPacketMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
 
       /** Event Number from MetaInfo */
       unsigned long m_meta_event_nr;
@@ -96,8 +98,8 @@ namespace Belle2 {
       unsigned int m_errorCounter[PXDError::ONSEN_MAX_TYPE_ERR];
       /** give verbose unpacking information */
       bool m_verbose{false};
-      /** flag continue unpacking of frames even after crc error (for debugging) */
-      bool m_continueOnCRCError{false};
+      /** flag continue unpacking of frames even after error (for debugging) */
+      bool m_continueOnError{false};
 
       /** Input array for PXD Raw. */
       StoreArray<RawPXD> m_storeRawPXD;

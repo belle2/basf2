@@ -65,13 +65,16 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("MaxDHPFrameDiff", m_maxDHPFrameDiff, "Maximum DHP Frame Nr Difference w/o reporting error", 2u);
   addParam("FormatBonnDAQ", m_formatBonnDAQ, "ONSEN or BonnDAQ format", false);
   addParam("Verbose", m_verbose, "Turn on extra verbosity for log-level debug", false);
-  addParam("ContinueOnCRCError", m_continueOnCRCError, "Continue package depacking on CRC error", false);
+  addParam("ContinueOnError", m_continueOnError, "Continue package depacking on error (for debugging)", false);
 //   (
 //              /*EPXDErrFlag::c_DHC_END | EPXDErrFlag::c_DHE_START | EPXDErrFlag::c_DATA_OUTSIDE |*/
 //              EPXDErrFlag::c_FIX_SIZE | EPXDErrFlag::c_DHE_CRC | EPXDErrFlag::c_DHC_UNKNOWN | /*EPXDErrFlag::c_MERGER_CRC |*/
 //              EPXDErrFlag::c_DHP_SIZE | /*EPXDErrFlag::c_DHP_PIX_WO_ROW | EPXDErrFlag::c_DHE_START_END_ID | EPXDErrFlag::c_DHE_START_ID |*/
 //              EPXDErrFlag::c_DHE_START_WO_END | EPXDErrFlag::c_DHP_NOT_CONT
 //            ));
+
+  // this is not really a parameter, it should be fixed.
+  m_errorSkipPacketMask = c_DHE_CRC | c_FIX_SIZE;
 }
 
 void PXDUnpackerModule::initialize()
@@ -285,8 +288,13 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
     m_errorMaskPacket |= m_errorMask;
     m_errorMaskEvent |= m_errorMask;
     m_errorMask = 0;
-    if (!m_continueOnCRCError && (m_errorMaskPacket & c_DHE_CRC) != 0) {
-      break; // skip full package on CRC error
+
+    if (!m_continueOnError && (m_errorMaskPacket & m_errorSkipPacketMask) != 0) {
+      // skip full package on error, recovery to next DHC/DHE Start might be possible in some cases
+      // But thats to hard to implement
+      // Remark: PXD data for broken events is removed in next PXDPostChecker module, thus skipping the
+      // unpacking is not strictly necessary here.
+      break;
     }
   }
   daqpktstat.setErrorMask(m_errorMaskPacket);
@@ -309,6 +317,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   if (frame_len != 0xC008) {
     if (!(m_suppressErrorMask & c_FIX_SIZE)) B2WARNING("Frame size unsupported for RAW ADC frame! $" <<
                                                          LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str()));
+    m_errorMask |= c_FIX_SIZE;
     return;
   }
   unsigned int dhp_header_type  = 0;
@@ -417,8 +426,7 @@ void PXDUnpackerModule::dump_roi(void* data, unsigned int frame_len)
   ubig32_t* d = (ubig32_t*)data;
 
   B2WARNING("HEADER --  $" << hex << d[0] << ",$" << hex << d[1] << ",$" << hex << d[2] << ",$" << hex << d[3] << " -- Len $" << hex
-            <<
-            frame_len);
+            << frame_len);
 
   for (unsigned int i = 0; i < w; i++) {
     B2WARNING("ROI DATA $" << hex << d[i]);
@@ -634,8 +642,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   if (printflag) {
     B2DEBUG(20, "(DHE) DHE_ID $" << hex << dhe_ID << " (DHE) DHP ID $" << hex << dhe_DHPport << " (DHP) DHE_ID $" << hex << dhp_dhe_id
-            <<
-            " (DHP) DHP ID $" << hex << dhp_dhp_id);
+            << " (DHP) DHP ID $" << hex << dhp_dhp_id);
     /*for (int i = 0; i < raw_nr_words ; i++) {
       B2DEBUG(20, "RAW      |   " << hex << p_pix[i]);
       printf("raw %08X  |  ", p_pix[i]);
@@ -683,35 +690,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static bool isUnfiltered_event = false;
 
 
-  dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
-
-  dhc_frames dhc;
-  dhc.set(data, hw->getFrameType(), len);
-
-  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them alltogether.
-  // As they might contain HEADER Info, we might better skip the processing of the full package, too.
-
-  m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
-  if (!m_continueOnCRCError && (m_errorMask & c_DHE_CRC) != 0) {
-    return;
-  }
-
-  // TODO How do we handle Frames where Error Bit is set in header?
-  // Currently there is no documentation what it actually means... ony an error bit is set (below)
-
-  {
-    int s = dhc.getFixedSize();
-    if (len != s && s != 0) {
-      if (!(m_suppressErrorMask & c_FIX_SIZE)) B2WARNING("Fixed frame type size does not match specs" << LogVar("expeted length",
-                                                           len) << LogVar("length in data", s));
-      m_errorMask |= c_FIX_SIZE;
-    }
-  }
-
-  unsigned int eventNrOfThisFrame = dhc.getEventNrLo();
-  int type = dhc.getFrameType();
-
-  if (Frame_Number == 0) { /// We reset the counters on the first event
+  if (Frame_Number == 0) {
+    // We reset the counters on the first event
+    // we do this before any other check is done
     eventNrOfOnsenTrgFrame = 0;
     countedDHEStartFrames = 0;
     countedDHEEndFrames = 0;
@@ -728,16 +709,52 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     nr_active_dhe = 0;
     mask_active_dhp = 0;
     found_mask_active_dhp = 0;
+  }
+
+  dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
+
+  dhc_frames dhc;
+  dhc.set(data, hw->getFrameType(), len);
+
+  {
+    // if a fixed size frame has a different length, how can we rely on its content???
+    // AND we could by typecasting access memory beyond end of data (but very unlikely)
+    // for that reason this we have to check before any CRC and stop unpacking the frame
+    int s = dhc.getFixedSize();
+    if (len != s && s != 0) {
+      if (!(m_suppressErrorMask & c_FIX_SIZE)) {
+        B2WARNING("Fixed frame type size does not match specs" << LogVar("expeted length",
+                  len) << LogVar("length in data", s));
+      }
+      m_errorMask |= c_FIX_SIZE;
+      if (!m_continueOnError) return;
+    }
+  }
+
+  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them alltogether.
+  // As they might contain HEADER Info, we might better skip the processing of the full package, too.
+  m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
+  if (!m_continueOnError && (m_errorMask & c_DHE_CRC) != 0) {
+    // if CRC is wrong, we cannot rely on the content of the frame, thus skipping is the best option
+    return;
+  }
+
+  unsigned int eventNrOfThisFrame = dhc.getEventNrLo();
+  int type = dhc.getFrameType();
+
+  if (Frame_Number == 0) { /// We reset the counters on the first event
     if (m_formatBonnDAQ) {
       if (type != EDHCFrameHeaderDataType::c_DHC_START) {
         if (!(m_suppressErrorMask & c_EVENT_STRUCT)) B2WARNING("This looks not like BonnDAQ format.");
         m_errorMask |= c_EVENT_STRUCT;
+//         if (!m_continueOnError) return; // requires more testing
       }
     } else {
       if (type == EDHCFrameHeaderDataType::c_DHC_START) {
         if (!(m_suppressErrorMask & c_EVENT_STRUCT))
           B2WARNING("This looks like BonnDAQ or old Desy 2013/14 testbeam format. Please use formatBonnDAQ or the pxdUnpackerDesy1314 module.");
         m_errorMask |= c_EVENT_STRUCT;
+//         if (!m_continueOnError) return; // requires more testing
       }
     }
   }
@@ -762,6 +779,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
                          static_cast < std::ostringstream && >(std::ostringstream() << hex << m_meta_event_nr).str()));
         }
         m_errorMask |= c_META_MM;
+//         if (!m_continueOnError) return; // requires more testing
       }
     }
 
@@ -770,10 +788,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         if (type != EDHCFrameHeaderDataType::c_ONSEN_ROI && type != EDHCFrameHeaderDataType::c_DHE_START) {
           if (!(m_suppressErrorMask & c_DATA_OUTSIDE)) B2WARNING("Data Frame outside a DHE START/END");
           m_errorMask |= c_DATA_OUTSIDE;
+//           if (!m_continueOnError) return; // requires more testing
         }
     }
   }
 
+  // TODO How do we handle Frames where Error Bit is set in header?
+  // Currently there is no documentation what it actually means... ony an error bit is set (below)
+  // the following errors must be "accepted", as all firmware sets it wrong fro Ghost frames.
   if (hw->getErrorFlag()) {
     if (type != EDHCFrameHeaderDataType::c_GHOST) {
       m_errorMask |= c_HEADER_ERR;// TODO this should have some effect ... when does it mean something? documentation missing

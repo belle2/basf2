@@ -56,7 +56,7 @@ unsigned int Environment::getNumberOfEvents() const
 
 bool Environment::isMC() const
 {
-  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+  static StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   if (fileMetaData) return fileMetaData->isMC();
   return true;
 }

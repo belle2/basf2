@@ -103,7 +103,7 @@ void FileMetaData::Print(Option_t* option) const
     printer.put("user", m_user);
     printer.put("randomSeed", m_randomSeed);
     printer.put("release", m_release);
-    printer.put("type", m_isMC ? "mc" : "real");
+    printer.put("isMC", m_isMC);
     printer.put("mcEvents", m_mcEvents);
     printer.put("globalTag", m_databaseGlobalTag);
     printer.put("dataDescription", m_dataDescription);

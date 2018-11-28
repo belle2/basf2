@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <mva/methods/TMVA.h>
+#include <framework/utilities/ScopeGuard.h>
 #include <TPluginManager.h>
 
 #include <boost/algorithm/string.hpp>
@@ -193,7 +194,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      WorkingDirectoryManager dummy(directory);
+      auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())
@@ -303,7 +304,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      WorkingDirectoryManager dummy(directory);
+      auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())

@@ -32,7 +32,8 @@ from urllib.parse import urljoin
 import shutil
 import pprint
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
-    pretty_print_table, LogPythonInterface
+    LogPythonInterface
+from basf2.utils import pretty_print_table
 from pager import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
@@ -444,8 +445,12 @@ def command_diff(args, db):
             row = json.loads(token[2:])
             diff.append([token[0]] + row)
 
-        print(f"Differences betwen {args.tagA} and {args.tagB}")
-        pretty_print_table(diff, [1, 6, 6, 6, 6, "+", -8, 10], transform=color_row)
+        # print the table but make sure the first column is empty except for
+        # added/removed lines so that it can be copy-pasted into a diff syntax
+        # highlighting area (say pull request description)
+        print(f" Differences between {args.tagA} and {args.tagB}")
+        pretty_print_table(diff, [1, 6, 6, 6, 6, "+", -8, 10], transform=color_row,
+                           hline_formatter=lambda w: " " + (w-1)*'-')
 
 
 def command_iov(args, db):
@@ -545,52 +550,95 @@ def command_dump(args, db):
 
     This command will dump the payload contents stored in a given payload. One
     can either specify the payloadId (from a previous output of
-    ``b2conditionsdb iov``) or the payload name and its revision.
+    ``b2conditionsdb iov``), the payload name and its revision in the central
+    database, or directly specify a local database payload file.
+
+    .. rubric:: Examples
+
+    Dump the content of a previously downloaded payload file::
+
+        $ b2conditionsdb dump -f localdb/dbstore_BeamParameters_rev_59449.root
+
+    Dump the content of a payload by name and revision directly from the central database::
+
+        $ b2conditionsdb dump -r BeamParameters 59449
+
+    Or directly by payload id from a previous call to ``b2conditionsdb iov``::
+
+        $ b2conditionsdb dump -i 59685
     """
     if db is None:
         group = args.add_mutually_exclusive_group(required=True)
         group.add_argument("-i", "--id", metavar="PAYLOADID", help="payload id to dump")
         group.add_argument("-r", "--revision", metavar=("NAME", "REVISION"), nargs=2,
                            help="Name and revision of the payload to dump")
+        group.add_argument("-f", "--file", metavar="FILENAME", help="Dump local payload file")
+        args.add_argument("--show-typenames", default=False, action="store_true",
+                          help="If given show the type names of all classes. "
+                          "This makes output more crowded but can be helpful for complex objects.")
+        args.add_argument("--show-streamerinfo", default=False, action="store_true",
+                          help="If given show the StreamerInfo for the classes in the the payload file. "
+                          "This can be helpful to find out which version of a payload object "
+                          "is included and what are the members")
+
         return
 
     payload = None
-    if args.id:
-        req = db.request("GET", f"/payload/{args.id}", "Getting payload info")
-        payload = req.json()
-    elif args.revision:
-        name, rev = args.revision
-        rev = int(rev)
-        req = db.request("GET", f"/module/{name}/payloads", "Getting payload info")
-        for p in req.json():
-            if p["revision"] == rev:
-                payload = p
-                break
-        else:
-            B2ERROR(f"Cannot find payload {name} with revision {rev}")
+    # local file, don't query database at all
+    if args.file:
+        filename = args.file
+        if not os.path.isfile(filename):
+            B2ERROR(f"Payloadfile {filename} could not be found")
             return 1
 
-    name = payload["basf2Module"]["name"]
-    url = payload["payloadUrl"]
-    base = payload["baseUrl"]
-    remote_file = urljoin(base + "/", url)
+        match = re.match(r"^dbstore_(.*)_rev_(\d*).root$", os.path.basename(filename))
+        if not match:
+            B2ERROR("Filename doesn't follow database convention. Should be dbstore_${payloadname}_rev_${revision}.root")
+            return 1
+        name = match.group(1)
+        revision = int(match.group(2))
+        payloadId = "Unknown"
+    else:
+        # otherwise do just that: query the database for either payload id or
+        # the name,revision
+        if args.id:
+            req = db.request("GET", f"/payload/{args.id}", "Getting payload info")
+            payload = req.json()
+        elif args.revision:
+            name, rev = args.revision
+            rev = int(rev)
+            req = db.request("GET", f"/module/{name}/payloads", "Getting payload info")
+            for p in req.json():
+                if p["revision"] == rev:
+                    payload = p
+                    break
+            else:
+                B2ERROR(f"Cannot find payload {name} with revision {rev}")
+                return 1
+
+        name = payload["basf2Module"]["name"]
+        url = payload["payloadUrl"]
+        base = payload["baseUrl"]
+        payloadId = payload["payloadId"]
+        filename = urljoin(base + "/", url)
+        revision = payload["revision"]
+        del payload, base, url
 
     # late import of ROOT because of all the side effects
-    from ROOT import TFile, TBufferJSON
+    from ROOT import TFile, TBufferJSON, cout
 
-    # remote http opening ...
-    tfile = TFile.Open(remote_file)
+    # remote http opening or local file
+    tfile = TFile.Open(filename)
     if not tfile.IsOpen():
-        B2ERROR(f"Could not open payload file {remote_file}")
+        B2ERROR(f"Could not open payload file {filename}")
         return 1
 
     obj = tfile.Get(name)
     if not obj:
-        B2ERROR(f"Could not find payload object in payload {remote_file}")
+        B2ERROR(f"Could not find payload object in payload {filename}")
         return 1
 
     json_str = TBufferJSON.ConvertToJSON(obj)
-    tfile.Close()
 
     def drop_fbits(obj):
         """
@@ -602,16 +650,28 @@ def command_dump(args, db):
         """
         obj.pop("fBits", None)
         obj.pop("fUniqueID", None)
-        obj.pop("_typename", None)
+        if not args.show_typenames:
+            obj.pop("_typename", None)
         return obj
 
-    with Pager(f"Contents of Payload {name}, revision {payload['revision']} (id {payload['payloadId']})", True):
-        B2INFO(f"Contents of Payload {name}, revision {payload['revision']} (id {payload['payloadId']})")
+    with Pager(f"Contents of Payload {name}, revision {revision} (id {payloadId})", True):
+        if args.show_streamerinfo:
+            B2INFO("StreamerInfo of Payload {name}, revision {revision} (id {payloadId})")
+            tfile.ShowStreamerInfo()
+            # sadly this prints to std::cout or even stdout but doesn't flush ... so we have
+            # to make sure std::cout is flushed before printing anything else
+            cout.flush()
+            # and add a newline
+            print()
+
+        B2INFO(f"Contents of Payload {name}, revision {revision} (id {payloadId})")
         # load the json as python object dropping some things we don't want to
         # print
         obj = json.loads(json_str.Data(), object_hook=drop_fbits)
         # print the object content using pretty print with a certain width
         pprint.pprint(obj, compact=True, width=shutil.get_terminal_size((80, 20))[0])
+
+    tfile.Close()
 
 
 class FullHelpAction(argparse._HelpAction):
@@ -724,6 +784,8 @@ def main():
 
     # disable error summary
     logging.enable_summary(False)
+    # log via python stdout to be able to capture
+    logging.enable_python_logging = True
     # modify logging to remove the useless module: lines
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)

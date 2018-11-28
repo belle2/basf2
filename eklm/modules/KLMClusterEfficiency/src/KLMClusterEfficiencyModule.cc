@@ -99,11 +99,13 @@ void KLMClusterEfficiencyModule::beginRun()
 void KLMClusterEfficiencyModule::event()
 {
   static int nevent = 0;
+  /* cppcheck-suppress variableScope */
   char str[128];
   int i1, i2, i3, n1, n2, n3;
   int bs1, bs2, es1, es2;
   TVector3 decayVertex, clusterPosition, hitPosition;
   float angle;
+  /* cppcheck-suppress variableScope */
   bool haveKL0;
   n1 = m_KLMClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {

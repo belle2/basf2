@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef VERTEXFITKFIT_H
-#define VERTEXFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -179,6 +176,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* VERTEXFITKFIT_H */
-

@@ -165,6 +165,50 @@ class AlgResult(enum.Enum):
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
 
 
+class LocalDatabase():
+    """
+    Simple class to hold the information about a basf2 Local database.
+    Does a bit of checking that the file path entered is valid etc.
+
+    Paramters:
+        filepath (str): The file path of the database.txt file of the localdb
+
+    Keyword Arguments:
+        payload_dir (str): If the payload directory is different to the directory containing the filepath, you can set it here.
+    """
+    db_type = "local"
+
+    def __init__(self, filepath, payload_dir=''):
+        f = pathlib.Path(filepath)
+        if f.exists():
+            self.filepath = f.resolve()
+            if not payload_dir:
+                self.payload_dir = pathlib.Path(self.filepath.parent)
+            else:
+                p = pathlib.Path(payload_dir)
+                if p.exists():
+                    self.payload_dir = p.resolve()
+                else:
+                    raise ValueError("The LocalDatabase payload_dir: {} does not exist.".format(p))
+        else:
+            raise ValueError("The LocalDatabase filepath: {} does not exist.".format(f))
+
+
+class CentralDatabase():
+    """
+    Simple class to hold the information about a bas2 Central database.
+    Does no checking that a global tag exists.
+    This class could be made much simpler, but it's made to be similar to LocalDatabase.
+
+    Parameters:
+        global_tag (str): The Global Tag of the central database
+    """
+    db_type = "central"
+
+    def __init__(self, global_tag):
+        self.global_tag = global_tag
+
+
 def runs_overlapping_iov(iov, runs):
     """
     Takes an overall IoV() object and a list of Exp,Run tuples (i,j)

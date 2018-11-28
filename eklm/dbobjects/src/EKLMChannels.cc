@@ -38,7 +38,7 @@ const EKLMChannelData* EKLMChannels::getChannelData(uint16_t strip) const
   std::map<uint16_t, EKLMChannelData>::const_iterator it;
   it = m_Channels.find(strip);
   if (it == m_Channels.end())
-    return NULL;
+    return nullptr;
   return &(it->second);
 }
 

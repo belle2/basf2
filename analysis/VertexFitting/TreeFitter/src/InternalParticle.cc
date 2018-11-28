@@ -100,7 +100,6 @@ namespace TreeFitter {
           }
         }
 
-        double flt1(0), flt2(0);
         TVector3 v;
 
         if (trkdaughters.size() >= 2) {
@@ -112,6 +111,7 @@ namespace TreeFitter {
           Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
           Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
 
+          double flt1(0), flt2(0);
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
           fitparams.getStateVector()(posindex)     = -v.x();
@@ -148,14 +148,13 @@ namespace TreeFitter {
   ErrCode InternalParticle::initParticleWithMother(FitParams& fitparams)
   {
     int posindex = posIndex();
-    int posindexmom = 0;
 
     if (hasPosition() &&
         mother() &&
         fitparams.getStateVector()(posindex) == 0 &&
         fitparams.getStateVector()(posindex + 1) == 0 && \
         fitparams.getStateVector()(posindex + 2) == 0) {
-      posindexmom = mother()->posIndex();
+      int posindexmom = mother()->posIndex();
       fitparams.getStateVector().segment(posindex , 3) = fitparams.getStateVector().segment(posindexmom, 3);
     }
     return initTau(fitparams);
@@ -166,18 +165,15 @@ namespace TreeFitter {
     int momindex = momIndex();
     fitparams.getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
 
-    int daumomindex = 0, maxrow = 0;
-    double e2 = 0, mass = 0;
-
     for (auto daughter : m_daughters) {
-      daumomindex = daughter->momIndex();
-      maxrow = daughter->hasEnergy() ? 4 : 3;
+      int daumomindex = daughter->momIndex();
+      int maxrow = daughter->hasEnergy() ? 4 : 3;
 
-      e2 = fitparams.getStateVector().segment(daumomindex, maxrow).squaredNorm();
+      double e2 = fitparams.getStateVector().segment(daumomindex, maxrow).squaredNorm();
       fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
-        mass = daughter->pdgMass();
+        double mass = daughter->pdgMass();
         fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
     }
@@ -209,14 +205,13 @@ namespace TreeFitter {
 
     for (const auto daughter : m_daughters) {
 
-      int dautauindex = 0, daumomindex = 0, maxrow = 0;
-      double mass = 0, e2 = 0, px = 0, py = 0, energy = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
+      int dautauindex = daughter->tauIndex();
+      int daumomindex = daughter->momIndex();
+      double mass = daughter->pdgMass();
+      int maxrow = daughter->hasEnergy() ? 4 : 3;
+      double e2 = mass * mass;
 
-      dautauindex = daughter->tauIndex();
-      daumomindex = daughter->momIndex();
-      mass = daughter->pdgMass();
-      maxrow = daughter->hasEnergy() ? 4 : 3;
-      e2 = mass * mass;
+      double px = 0, py = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
 
       for (int imom = 0; imom < maxrow; ++imom) {
         px = fitparams.getStateVector()(daumomindex + imom);
@@ -226,7 +221,7 @@ namespace TreeFitter {
       }
 
       if (maxrow == 3) {
-        energy = sqrt(e2);
+        double energy = sqrt(e2);
         p.getResiduals()(3) += -energy;
 
         for (int jmom = 0; jmom < 3; ++jmom) {

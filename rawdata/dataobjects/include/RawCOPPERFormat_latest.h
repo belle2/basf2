@@ -49,73 +49,73 @@ namespace Belle2 {
 
 
     //! get Detector buffer length of slot A
-    int Get1stDetectorNwords(int n);
+    int Get1stDetectorNwords(int n) override;
 
     //! get Detector buffer length of slot B
-    int Get2ndDetectorNwords(int n);
+    int Get2ndDetectorNwords(int n) override;
 
     //! get Detector buffer length of slot C
-    int Get3rdDetectorNwords(int n);
+    int Get3rdDetectorNwords(int n) override;
 
     //! get Detector buffer length of slot D
-    int Get4thDetectorNwords(int n);
+    int Get4thDetectorNwords(int n) override;
 
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get buffer pointer of rawcopper trailer
-    int* GetRawTrlBufPtr(int n);
+    int* GetRawTrlBufPtr(int n) override;
 
     //
     // Get information from "RawCOPPERFormat_latest header" attached by DAQ software
     //
 
-    int GetExpNo(int n);    //! get Experimental # from header
+    int GetExpNo(int n) override;    //! get Experimental # from header
 
-    unsigned int GetExpRunSubrun(int n);    //! Exp# (10bit) run# (14bit) restart # (8bit)
+    unsigned int GetExpRunSubrun(int n) override;    //! Exp# (10bit) run# (14bit) restart # (8bit)
 
-    int GetRunNo(int n);    //! get run # (14bit)
+    int GetRunNo(int n) override;    //! get run # (14bit)
 
-    int GetSubRunNo(int n);    //! get subrun #(8bit)
+    int GetSubRunNo(int n) override;    //! get subrun #(8bit)
 
-    unsigned int GetEveNo(int n);    //! get contents of header
+    unsigned int GetEveNo(int n) override;    //! get contents of header
 
-    int GetDataType(int n);    //! get contents of header
+    int GetDataType(int n) override;    //! get contents of header
 
-    int GetTruncMask(int n);    //! get contents of header
+    int GetTruncMask(int n) override;    //! get contents of header
 
     //! Get Detected Error bitflag
-    unsigned int GetErrorBitFlag(int n);
+    unsigned int GetErrorBitFlag(int n) override;
 
     //! Add Detected Error bitflag
-    void AddErrorBitFlag(int n, unsigned int error_bit_flag);
+    void AddErrorBitFlag(int n, unsigned int error_bit_flag) override;
 
     //! check CRC packet Error
-    int GetPacketCRCError(int n);
+    int GetPacketCRCError(int n) override;
 
     //! check CRC event Error
-    int GetEventCRCError(int n);
+    int GetEventCRCError(int n) override;
 
     //! get node-ID from data
-    unsigned int GetNodeID(int n);
+    unsigned int GetNodeID(int n) override;
 
     //
     // Get information from 13words "COPPER header" attached by COPPER board
     //
 
     //! get # of FINNESEs which contains data
-    virtual int GetNumFINESSEBlock(int n);
+    virtual int GetNumFINESSEBlock(int n) override;
 
     //! get data size of  FINESSE slot A buffer
-    int Get1stFINESSENwords(int n);
+    int Get1stFINESSENwords(int n) override;
 
     //! get data size of  FINESSE slot B buffer
-    int Get2ndFINESSENwords(int n);
+    int Get2ndFINESSENwords(int n) override;
 
     //! get data size of  FINESSE slot C buffer
-    int Get3rdFINESSENwords(int n);
+    int Get3rdFINESSENwords(int n) override;
 
     //! get data size of  FINESSE slot D buffer
-    int Get4thFINESSENwords(int n);
+    int Get4thFINESSENwords(int n) override;
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
@@ -125,27 +125,27 @@ namespace Belle2 {
 
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
     //! Check B2LFEE header version
-    void CheckB2LFEEHeaderVersion(int  n);
+    void CheckB2LFEEHeaderVersion(int  n) override;
 #endif
 
     //! Check if COPPER Magic words are correct
-    unsigned int GetTTCtimeTRGType(int n);
+    unsigned int GetTTCtimeTRGType(int n) override;
 
     //! Check if COPPER Magic words are correct
-    unsigned int GetTTUtime(int n);
+    unsigned int GetTTUtime(int n) override;
 
     /*     //! calc COPPER driver's checksum value */
     /*     virtual unsigned int CalcDriverChkSum(int n) = 0; */
 
 
     //! Get ctime
-    int GetTTCtime(int n);
+    int GetTTCtime(int n) override;
 
     //! Get trgtype
-    int GetTRGType(int n);
+    int GetTRGType(int n) override;
 
     //! Get timeval
-    void GetTTTimeVal(int n, struct timeval* tv);
+    void GetTTTimeVal(int n, struct timeval* tv) override;
 
     /// Format version number
     enum {
@@ -161,7 +161,7 @@ namespace Belle2 {
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    //    ClassDef(RawCOPPERFormat_latest, 2);
+    //    ClassDefOverride(RawCOPPERFormat_latest, 2);
   };
 
 

@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import sys
+import os
+import basf2
 from ROOT import Belle2
 
-set_random_seed("something important")
+basf2.set_random_seed("something important")
 
-path = create_path()
+path = basf2.Path()
 path.add_module('EventInfoSetter', evtNumList=[5, 1], runList=[0, 1], expList=[0, 1])
 pgun = path.add_module('ParticleGun', nTracks=3)
 
 
-class TestModule(Module):
+class TestModule(basf2.Module):
 
     """print some debug info"""
 
@@ -19,19 +21,19 @@ class TestModule(Module):
         """reimplementation of Module::event()."""
 
         part = Belle2.PyStoreObj('MCParticle')
-        B2INFO("MCPart: " + str(part.obj().getIndex()))
+        basf2.B2INFO("MCPart: " + str(part.obj().getIndex()))
 
     def beginRun(self):
         """reimplementation of Module::beginRun()."""
-        B2INFO("TestModule: beginRun()")
+        basf2.B2INFO("TestModule: beginRun()")
 
 
 for use_pp in [False, True]:
     if os.fork() == 0:
-        subeventpath = create_path()
+        subeventpath = basf2.Path()
         testmod = TestModule()
         if use_pp:
-            testmod.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+            testmod.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
         else:
             subeventpath.add_module('EventInfoPrinter')
         subeventpath.add_module(testmod)
@@ -39,28 +41,28 @@ for use_pp in [False, True]:
         path.for_each('MCParticle', 'MCParticles', subeventpath)
         path.add_module('PrintCollections', printForEvent=0)
         if use_pp:
-            set_nprocesses(2)
-            logging.log_level = LogLevel.WARNING  # suppress output
-            process(path)
+            basf2.set_nprocesses(2)
+            basf2.logging.log_level = basf2.LogLevel.WARNING  # suppress output
+            basf2.process(path)
         else:
             print(path)
-            process(path)
+            basf2.process(path)
         # print(statistics)
         # initialize/terminate once
-        assert statistics.get(pgun).calls(statistics.INIT) == 1
-        assert statistics.get(testmod).calls(statistics.INIT) == 1
+        assert basf2.statistics.get(pgun).calls(basf2.statistics.INIT) == 1
+        assert basf2.statistics.get(testmod).calls(basf2.statistics.INIT) == 1
         if not use_pp:
-            # for pp, term statistics are wrong, begin/end run are complicated
-            assert statistics.get(pgun).calls(statistics.TERM) == 1
-            assert statistics.get(testmod).calls(statistics.TERM) == 1
+            # for pp, term basf2.statistics are wrong, begin/end run are complicated
+            assert basf2.statistics.get(pgun).calls(basf2.statistics.TERM) == 1
+            assert basf2.statistics.get(testmod).calls(basf2.statistics.TERM) == 1
             # 2 runs
-            assert statistics.get(pgun).calls(statistics.BEGIN_RUN) == 2
-            assert statistics.get(testmod).calls(statistics.BEGIN_RUN) == 2
-            assert statistics.get(pgun).calls(statistics.END_RUN) == 2
-            assert statistics.get(testmod).calls(statistics.END_RUN) == 2
+            assert basf2.statistics.get(pgun).calls(basf2.statistics.BEGIN_RUN) == 2
+            assert basf2.statistics.get(testmod).calls(basf2.statistics.BEGIN_RUN) == 2
+            assert basf2.statistics.get(pgun).calls(basf2.statistics.END_RUN) == 2
+            assert basf2.statistics.get(testmod).calls(basf2.statistics.END_RUN) == 2
         # 6 events, a 3 particles
-        assert statistics.get(pgun).calls(statistics.EVENT) == 6
-        assert statistics.get(testmod).calls(statistics.EVENT) == 3 * 6
+        assert basf2.statistics.get(pgun).calls(basf2.statistics.EVENT) == 6
+        assert basf2.statistics.get(testmod).calls(basf2.statistics.EVENT) == 3 * 6
 
         sys.exit(0)
     retbytes = os.wait()[1]

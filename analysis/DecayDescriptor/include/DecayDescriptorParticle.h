@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYDESCRIPTORPARTICLE_H
-#define DECAYDESCRIPTORPARTICLE_H
+#pragma once
 
 #include <string>
 
@@ -34,8 +33,7 @@ namespace Belle2 {
   public:
     /** Default ctor. */
     DecayDescriptorParticle();
-    /** Copy ctor. */
-    DecayDescriptorParticle(const DecayDescriptorParticle& other);
+
     /** initialise member variables from std::string member variables contained in a DecayStringParticle struct. */
     bool init(const DecayStringParticle& p);
     /** evt.pdl name of the particle. */
@@ -73,5 +71,4 @@ namespace Belle2 {
   };
 }
 
-#endif // DECAYDESCRIPTORPARTICLE_H
 

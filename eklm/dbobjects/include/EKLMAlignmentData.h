@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENTDATA_H
-#define EKLMALIGNMENTDATA_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -88,6 +87,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

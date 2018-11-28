@@ -4,7 +4,7 @@
 #######################################################
 #
 # Charmonium skims
-# Sen Jia, 11/Jun/2018
+# Sen Jia, 27/Sep/2018
 # ISRpipicc_List skim
 #
 ######################################################
@@ -12,15 +12,14 @@
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 set_log_level(LogLevel.INFO)
 
 import os
 import sys
 import glob
-skimCode = encodeSkimName('ISRpipicc')
 
 # Add MC9 samples
 fileList = [
@@ -30,14 +29,21 @@ fileList = [
 inputMdstList('MC9', fileList)
 
 # use standard final state particle lists
-loadStdCharged()
-stdPhotons('tight')
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 
 # importing the reconstructed events from the ISRpipicc_List file
-from ISRpipicc_List import *
+from skim.quarkonium import ISRpipiccList
 ISRpipicc = ISRpipiccList()
 
 # output to Udst file
+skimCode = encodeSkimName('ISRpipicc')
 skimOutputUdst(skimCode, ISRpipicc)
 
 # print out Particle List statistics

@@ -168,9 +168,9 @@ void ECLDigitizerPureCsIModule::event()
     int  energyFit = 0; // fit output : Amplitude 18 bits
     double    tFit = 0; // fit output : T_ave     12 bits
     int qualityFit = 0; // fit output : quality    2 bits
-    double fitChi2 = 0;
 
     if (! m_calibration) {
+      double fitChi2 = 0;
       if (m_debug) {
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
         /*

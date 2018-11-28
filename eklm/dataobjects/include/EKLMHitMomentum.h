@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMHITMOMENTUM_H
-#define EKLMHITMOMENTUM_H
+#pragma once
 
 /* External headers. */
 #include <TLorentzVector.h>
@@ -68,6 +67,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

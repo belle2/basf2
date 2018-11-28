@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEEVENTWEIGHTSTOOL_H
-#define NTUPLEEVENTWEIGHTSTOOL_H
+#pragma once
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -30,4 +29,3 @@ namespace Belle2 {
   };
 } // namepspace Belle2
 
-#endif // NTUPLEEVENTWEIGHTSTOOL_H

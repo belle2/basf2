@@ -25,14 +25,15 @@ Here is an example of writing event-wise information for all pions in the event:
 
 .. code-block:: python
 
-    from modularAnalysis import analysis_main
+    import basf2
     from stdCharged import stdPi
      
-    stdPi('all')
-    analysis_main.add_module('VariablesToEventBasedTree',
-                             particleList='pi+:all',
-                             variables=['isSignal', 'mcErrors', 'p', 'E'],
-                             event_variables=['nTracks', 'expNum', 'runNum', 'evtNum'])
+    mypath = basf2.Path()
+    stdPi('all', path=mypath)
+    mypath.add_module('VariablesToEventBasedTree',
+                      particleList='pi+:all',
+                      variables=['isSignal', 'mcErrors', 'p', 'E'],
+                      event_variables=['nTracks', 'expNum', 'runNum', 'evtNum'])
 
 
 .. b2-modules::

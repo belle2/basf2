@@ -24,18 +24,34 @@ namespace TreeFitter {
   public:
 
     /** Constructor */
-    FitParams(int dim);
+    explicit FitParams(int dim);
 
     /** Destructor */
     ~FitParams() {};
 
     /** copy constructor */
     FitParams(const FitParams& toCopy)
+      : m_dim(toCopy.m_dim),
+        m_chiSquare(toCopy.m_chiSquare),
+        m_nConstraints(toCopy.m_nConstraints),
+        m_dimensionReduction(toCopy.m_dimensionReduction)
     {
       this->m_globalState =
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > (toCopy.m_globalState);
       this->m_globalCovariance =
         Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance);
+    }
+
+    /** Assignment operator. */
+    FitParams& operator =(const FitParams& other)
+    {
+      m_dim = other.m_dim;
+      m_chiSquare = other.m_chiSquare;
+      m_nConstraints = other.m_nConstraints;
+      m_dimensionReduction = other.m_dimensionReduction;
+      m_globalState = other.m_globalState;
+      m_globalCovariance = other.m_globalCovariance;
+      return *this;
     }
 
     /** getter for the states covariance */

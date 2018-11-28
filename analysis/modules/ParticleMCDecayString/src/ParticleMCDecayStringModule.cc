@@ -32,7 +32,7 @@ namespace Belle2 {
   REG_MODULE(ParticleMCDecayString)
 
   ParticleMCDecayStringModule::ParticleMCDecayStringModule() : Module(), m_tree("", DataStore::c_Persistent), m_hashset("",
-        DataStore::c_Persistent)
+        DataStore::c_Persistent), m_decayHash(0.0), m_decayHashExtended(0.0)
   {
     setDescription("Creates the Monte Carlo decay string of a Particle and its daughters. "
                    "The MC decay string of the particle is hashed and saved as a 32bit pattern in the extra info field decayHash of the particle.  "

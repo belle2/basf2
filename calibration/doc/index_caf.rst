@@ -87,6 +87,23 @@ Put simply, if you get a failure when running the CAF try to fix the problem and
 The CAF should restart from a safe position and try to run the (now fixed) code again.
 
 
+Multiple Collections
+--------------------
+
+Sometimes you may have multiple data types which you want to use as input to your `Calibration`.
+In this case you essentially want to run your Collector module with different pre-collection reconstruction
+parameters and use all the data merged as input to the algorithm.
+By using the `Calibration.add_collection` function you can add multiple different `Collection` objects to your
+`Calibration`.
+
+.. autoclass:: caf.framework.Collection
+    :members:
+
+.. warning:: If you are merging different data types in this way it is likely that they come from very different run ranges.
+             Therefore your should take care that your AlgorithmStrategy setup makes sense and that you have checked that the
+             output IoVs of the payloads are correct.
+
+
 The b2caf-status Tool
 ---------------------
 

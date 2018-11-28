@@ -19,6 +19,8 @@
 #include <vector>
 
 #include "trg/ecl/TrgEclMapping.h"
+#include "trg/ecl/TrgEclDataBase.h"
+
 #include "TVector3.h"
 //
 //
@@ -52,6 +54,9 @@ namespace Belle2 {
   private:
     /** Object of TC Mapping */
     TrgEclMapping* _TCMap;
+    /** Object of Trigger ECL DataBase */
+    TrgEclDataBase* _database;
+
     /** Bhabha Combination*/
     std::vector<double> BhabhaComb;
     /** Max TC Id */

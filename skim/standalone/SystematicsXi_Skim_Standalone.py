@@ -11,11 +11,11 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdE, stdMu
 from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-02-00-01'
 skimCode = encodeSkimName('SystematicsXi')
 import sys
 import os
@@ -29,10 +29,16 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
 
-loadStdCharged()
-
-from SystematicsXi_List import *
+from skim.systematics import SystematicsList
 SysList = SystematicsList()
 skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)

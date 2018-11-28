@@ -58,6 +58,12 @@ namespace Belle2 {
     /** Defaut ctor. */
     DecayDescriptor();
 
+    /** Want the default copy ctor. */
+    DecayDescriptor(const DecayDescriptor&) = default;
+
+    /** Want the default assignment operator */
+    DecayDescriptor& operator=(const DecayDescriptor&) = default;
+
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */
     bool init(const std::string& str);

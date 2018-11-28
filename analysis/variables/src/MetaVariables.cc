@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2010 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Thomas Keck                                              *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 
 #include <analysis/variables/MetaVariables.h>
@@ -19,6 +19,7 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/variables/VariableFormulaConstructor.h>
 
 #include <framework/logging/Logger.h>
@@ -888,6 +889,62 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2 || arguments.size() == 3) {
+        std::vector<int> daughterIndices;
+        try {
+          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The arguments of daughterClusterAngleInBetween meta function must be integers!");
+          return nullptr;
+        }
+        auto func = [daughterIndices](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterIndices.size() == 2)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
+              return -998;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              if (clusteri and clusterj) {
+                ClusterUtils clusutils;
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                return pi.Angle(pj);
+              }
+              return std::numeric_limits<float>::quiet_NaN();
+            }
+          } else if (daughterIndices.size() == 3)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
+                || daughterIndices[2] >= int(particle->getNDaughters())) return -997;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
+              if (clusteri and clusterj and clusterk) {
+                ClusterUtils clusutils;
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk)).Vect();
+                return pk.Angle(pi + pj);
+              }
+              return std::numeric_limits<float>::quiet_NaN();
+            }
+          } else return -996;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterClusterAngleInBetween");
+      }
+    }
+
     Manager::FunctionPtr daughterInvM(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 1) {
@@ -1673,6 +1730,13 @@ arguments. Operator precedence is taken into account. For example::
                       "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
                       "which is the sum of the first two daughter momenta.\n"
                       "E.g. useLabFrame(daughterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
+    REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
+                      "Returns function which returns the angle between clusters associated to the two daughters."
+                      "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
+                      "If three indices given: returns the angle between the momentum of the third particle's cluster and a vector "
+                      "which is the sum of the first two daughter's cluster momenta."
+                      "Returns nan if any of the daughters specified don't have an associated cluster."
+                      "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
                       "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");

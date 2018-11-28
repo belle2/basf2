@@ -75,6 +75,12 @@ namespace Belle2 {
     /** Defaut ctor. */
     DecayDescriptor();
 
+    /** Want the default copy ctor. */
+    DecayDescriptor(const DecayDescriptor&) = default;
+
+    /** Want the default assignment operator */
+    DecayDescriptor& operator=(const DecayDescriptor&) = default;
+
     /** Function to get hierarchy of selected particles  and their names (for python use) */
     std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected();
 

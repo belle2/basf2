@@ -276,8 +276,9 @@ namespace Belle2 {
       }
 
       // The number of reflected digits is defined as the number of digits after the gap
-      //! @returns the number of reflected digits in the same module as the particle
-      double topReflectedDigitCount(const Particle* particle)
+      // This method is a helper function to count the top digits after the largest gap
+      // between subsequent hits, under the constraints gap > minGap and gap < maxGap
+      double topCountPhotonsAfterLargesGapWithin(const Particle* particle, double minGap, double maxGap)
       {
         auto trk = particle->getTrack();
         if (not trk) {
@@ -296,9 +297,7 @@ namespace Belle2 {
           return -1.0;
         }
         StoreArray<TOPDigit> topDigits;
-        double maxGap = 0; // the largest time difference between two consecutive hits
-        size_t maxGapIndex = 0; // the index of the first hit *after* the gap
-        vector<double> digitTimes; // all digits in the module that the track entered
+        vector<double> digitTimes; // the times for all digits in the module that the track entered
         for (auto t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
@@ -307,15 +306,33 @@ namespace Belle2 {
         if (digitTimes.empty()) {
           return -1.0;
         }
+
+        double currentMaxGap = -1; // the largest time difference between two consecutive hits
+        size_t maxGapIndex = 0; // the index of the first hit *after* the gap
         sort(digitTimes.begin(), digitTimes.end());
         for (size_t i = 0; i < digitTimes.size() - 1; ++i) {
           double gap = digitTimes[i + 1] - digitTimes[i];
-          if (gap > maxGap) {
-            maxGap = gap;
+          if ((gap > minGap) and (gap < maxGap) and (gap > currentMaxGap)) {
+            currentMaxGap = gap;
             maxGapIndex = i + 1;
           }
         }
         return digitTimes.size() - maxGapIndex;
+      }
+
+
+      //! @returns the number of reflected digits in the same module as the particle
+      double topReflectedDigitCount(const Particle* particle)
+      {
+        return topCountPhotonsAfterLargesGapWithin(particle, 0, 10000);
+      }
+
+      double topReflectedDigitCountExpert(const Particle* particle, const vector<double>& vars)
+      {
+        if (vars.size() != 2) {
+          B2FATAL("Need exactly two parameters (min, max)");
+        }
+        return topCountPhotonsAfterLargesGapWithin(particle, vars[0], vars[1]);
       }
 
       //! @returns the X coordinate of the particle entry point to the TOP in the local frame
@@ -478,6 +495,8 @@ namespace Belle2 {
                       "[calibration] The number of TOPDigits in the module to which the track was extrapolated, regardless of hit quality");
     REGISTER_VARIABLE("topReflectedDigitCount", TOPVariable::topReflectedDigitCount,
                       "[calibration] The number of reflected photons in the same module");
+    REGISTER_VARIABLE("topReflectedDigitCountExpert(minGap, maxGap)", TOPVariable::topReflectedDigitCountExpert,
+                      "[calibration] The number of photons after the largest gap between minGap and maxGap")
     REGISTER_VARIABLE("topDigitGapSize", TOPVariable::topDigitGapSize,
                       "[calibration] The largest time difference between two consecutive hits in the same module");
     REGISTER_VARIABLE("topLocalX", TOPVariable::getTOPLocalX,

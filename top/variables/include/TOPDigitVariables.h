@@ -92,6 +92,10 @@ namespace Belle2 {
     double topDigitGapSize(const Particle* particle);
 
     // The number of reflected digits is defined as the number of digits after the gap
+    // This method is a helper function to count the top digits after the largest gap
+    // between subsequent hits, under the constraints gap > minGap and gap < maxGap
+    double topCountPhotonsAfterLargesGapWithin(const Particle* particle, double min, double max);
+
     //! @returns the number of reflected digits in the same module as the particle
     double topReflectedDigitCount(const Particle* particle);
 

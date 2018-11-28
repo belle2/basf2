@@ -434,11 +434,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   bool pixelflag = true; // just for first row start
 
   if (nr_words < 4) {
-    if (!(m_suppressErrorMask & c_DHP_SIZE)) B2WARNING("DHP frame size error (too small) " << nr_words);
+    if (!(m_suppressErrorMask & c_DHP_SIZE)) B2WARNING("DHP frame size error (too small)" << LogVar("Nr words", nr_words));
     m_errorMask |= c_DHP_SIZE;
-//     dhp_size_error++;
     return;
-    //return -1;
   }
 
   if (printflag)
@@ -459,14 +457,17 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   }
 
   if (dhe_ID != dhp_dhe_id) {
-    if (!(m_suppressErrorMask & c_DHE_DHP_DHEID)) B2WARNING("DHE ID in DHE and DHP header differ $" << hex << dhe_ID <<
-                                                              " != $"
-                                                              << dhp_dhe_id);
+    if (!(m_suppressErrorMask & c_DHE_DHP_DHEID)) {
+      B2WARNING("DHE ID in DHE and DHP header differ");
+      B2DEBUG(1, "DHE ID in DHE and DHP header differ $" << hex << dhe_ID << " != $" << dhp_dhe_id);
+    }
     m_errorMask |= c_DHE_DHP_DHEID;
   }
   if (dhe_DHPport != dhp_dhp_id) {
-    if (!(m_suppressErrorMask & c_DHE_DHP_PORT)) B2WARNING("DHP ID (Chip/Port) in DHE and DHP header differ $" << hex <<
-                                                             dhe_DHPport << " != $" << dhp_dhp_id);
+    if (!(m_suppressErrorMask & c_DHE_DHP_PORT)) {
+      B2WARNING("DHP ID (Chip/Port) in DHE and DHP header differ");
+      B2DEBUG(1, "DHP ID (Chip/Port) in DHE and DHP header differ $" << hex << dhe_DHPport << " != $" << dhp_dhp_id);
+    }
     m_errorMask |= c_DHE_DHP_PORT;
   }
 
@@ -527,8 +528,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 // TODO Please check if this can happen by accident with valid data!
   if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
     // We see a second "header" with framenr+1 ...
-    if (!(m_suppressErrorMask & c_DHP_DBL_HEADER)) B2WARNING("DHP data: seems to be double header! skipping ... len " <<
-                                                               frame_len);
+    if (!(m_suppressErrorMask & c_DHP_DBL_HEADER)) B2WARNING("DHP data: seems to be double header! skipping." << LogVar("Length",
+                                                               frame_len));
     m_errorMask |= c_DHP_DBL_HEADER;
     // dump_dhp(data, frame_len); print out guilty dhp packet
 //    B2WARNING("Mask $" << hex <<m_errorMask);
@@ -574,7 +575,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           unsigned int v_cellID, u_cellID;
           v_cellID = dhp_row;// defaults for no mapping
           if (dhp_row >= 768) {
-            if (!(m_suppressErrorMask & c_ROW_OVERFLOW)) B2WARNING("DHP ROW Overflow " << dhp_row);
+            if (!(m_suppressErrorMask & c_ROW_OVERFLOW)) B2WARNING("DHP ROW Overflow " << LogVar("Row", dhp_row));
             m_errorMask |= c_ROW_OVERFLOW;
           }
           // we cannot do col overflow check before mapping :-(
@@ -592,10 +593,11 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             u_cellID = dhp_col + 64 * dhp_dhp_id; // defaults for already mapped
           }
           if (u_cellID >= 250) {
-            if (!(m_suppressErrorMask & c_COL_OVERFLOW)) B2WARNING("DHP COL Overflow (unconnected drain lines) " << u_cellID <<
-                                                                     ", ref " <<
-                                                                     dhe_reformat << ", dhpcol " << dhp_col << ", id "
-                                                                     << dhp_dhp_id);
+            if (!(m_suppressErrorMask & c_COL_OVERFLOW)) {
+              B2WARNING("DHP COL Overflow (unconnected drain lines)");
+              B2DEBUG(1, "DHP COL Overflow (unconnected drain lines) " << u_cellID << ", reformat " << dhe_reformat << ", dhpcol " << dhp_col <<
+                      ", id " << dhp_dhp_id);
+            }
             m_errorMask |= c_COL_OVERFLOW;
           }
           dhp_adc = dhp_pix[i] & 0xFF;
@@ -677,7 +679,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them alltogether.
   // As they might contain HEADER Info, we might better skip the processing of the full package, too.
 
-  m_errorMask |= dhc.check_crc();
+  m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
   if (!m_continueOnCRCError && (m_errorMask & c_DHE_CRC) != 0) {
     return;
   }
@@ -739,10 +741,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     // we can use more bits in the DHC and DHE START Frame
     if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
       if (!isFakedData_event) {
-        if (!(m_suppressErrorMask & c_META_MM)) B2WARNING("Event Numbers do not match for this frame" <<
-                                                            LogVar("Event nr in frame $", static_cast < std::ostringstream
-                                                                   && >(std::ostringstream() << hex << eventNrOfThisFrame).str()) << LogVar("Event nr in MetaInfo (bits masked) $",
-                                                                       static_cast < std::ostringstream && >(std::ostringstream() << hex << m_meta_event_nr).str()));
+        if (!(m_suppressErrorMask & c_META_MM)) {
+          B2WARNING("Event Numbers do not match for this frame");
+          B2DEBUG(1, "Event Numbers do not match for this frame" <<
+                  LogVar("Event nr in frame $", static_cast < std::ostringstream
+                         && >(std::ostringstream() << hex << eventNrOfThisFrame).str()) <<
+                  LogVar("Event nr in MetaInfo (bits masked) $",
+                         static_cast < std::ostringstream && >(std::ostringstream() << hex << m_meta_event_nr).str()));
+        }
         m_errorMask |= c_META_MM;
       }
     }
@@ -771,13 +777,16 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       if (m_verbose) dhc.data_direct_readout_frame_raw->print();
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
-        if (!(m_suppressErrorMask & c_DHE_START_ID)) B2WARNING("DHE ID from DHE Start and this frame do not match" <<
-                                                                 LogVar("DHEID in this frame $", static_cast < std::ostringstream
-                                                                     && >(std::ostringstream() << hex << dhc.data_direct_readout_frame_raw->getDHEId()).str()) <<
-                                                                 LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        if (!(m_suppressErrorMask & c_DHE_START_ID)) {
+          B2WARNING("DHE ID from DHE Start and this frame do not match");
+          B2DEBUG(1, "DHE ID from DHE Start and this frame do not match" <<
+                  LogVar("DHEID in this frame $", static_cast < std::ostringstream
+                         && >(std::ostringstream() << hex << dhc.data_direct_readout_frame_raw->getDHEId()).str()) <<
+                  LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        }
         m_errorMask |= c_DHE_START_ID;
       }
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       unpack_dhp_raw(data, len - 4,
@@ -804,13 +813,16 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       //m_errorMask |= dhc.data_direct_readout_frame->check_error();
 
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
-        if (!(m_suppressErrorMask & c_DHE_START_ID)) B2WARNING("DHE ID from DHE Start and this frame do not match" <<
-                                                                 LogVar("DHEID in this frame $", static_cast < std::ostringstream
-                                                                     && >(std::ostringstream() << hex << dhc.data_direct_readout_frame_raw->getDHEId()).str()) <<
-                                                                 LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        if (!(m_suppressErrorMask & c_DHE_START_ID)) {
+          B2WARNING("DHE ID from DHE Start and this frame do not match");
+          B2DEBUG(1, "DHE ID from DHE Start and this frame do not match" <<
+                  LogVar("DHEID in this frame $", static_cast < std::ostringstream
+                         && >(std::ostringstream() << hex << dhc.data_direct_readout_frame_raw->getDHEId()).str()) <<
+                  LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        }
         m_errorMask |= c_DHE_START_ID;
       }
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
       if (m_checkPaddingCRC) m_errorMask |= dhc.check_padding(); // isUnfiltered_event
 
@@ -846,13 +858,16 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       }
 
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
-        if (!(m_suppressErrorMask & c_DHE_START_ID)) B2WARNING("DHE ID from DHE Start and this frame do not match" <<
-                                                                 LogVar("DHEID in this frame $", static_cast < std::ostringstream
-                                                                     && >(std::ostringstream() << hex << dhc.data_direct_readout_frame_raw->getDHEId()).str()) <<
-                                                                 LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        if (!(m_suppressErrorMask & c_DHE_START_ID)) {
+          B2WARNING("DHE ID from DHE Start and this frame do not match");
+          B2DEBUG(1, "DHE ID from DHE Start and this frame do not match" <<
+                  LogVar("DHEID in this frame $", static_cast < std::ostringstream
+                         && >(std::ostringstream() << hex << dhc.data_direct_readout_frame_raw->getDHEId()).str()) <<
+                  LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        }
         m_errorMask |= c_DHE_START_ID;
       }
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       B2DEBUG(20, "UNPACK FCE FRAME with len $" << hex << len);
@@ -867,21 +882,23 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       if (m_verbose) hw->print();
       if (currentDHEID != dhc.data_commode_frame->getDHEId()) {
-        if (!(m_suppressErrorMask & c_DHE_START_ID)) B2WARNING("DHE ID from DHE Start and this frame do not match" <<
-                                                                 LogVar("DHEID in this frame $", static_cast < std::ostringstream
-                                                                     && >(std::ostringstream() << hex << dhc.data_commode_frame->getDHEId()).str()) <<
-                                                                 LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        if (!(m_suppressErrorMask & c_DHE_START_ID)) {
+          B2WARNING("DHE ID from DHE Start and this frame do not match");
+          B2DEBUG(1, "DHE ID from DHE Start and this frame do not match" <<
+                  LogVar("DHEID in this frame $", static_cast < std::ostringstream
+                         && >(std::ostringstream() << hex << dhc.data_commode_frame->getDHEId()).str()) <<
+                  LogVar("DHEID expected $", static_cast < std::ostringstream && >(std::ostringstream() << hex << currentDHEID).str()));
+        }
         m_errorMask |= c_DHE_START_ID;
       }
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       break;
     };
     case EDHCFrameHeaderDataType::c_DHC_START: {
       countedBytesInDHC = 0;
       cancheck_countedBytesInDHC = true;
       if (isFakedData_event != dhc.data_dhc_start_frame->isFakedData()) {
-        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA))
-          B2WARNING("DHC START is but no Fake event OR Fake Event but DHE END is not.");
+        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA)) B2WARNING("DHC START is but no Fake event OR Fake Event but DHE END is not.");
         m_errorMask |= c_FAKE_NO_FAKE_DATA;
       }
       if (dhc.data_dhc_start_frame->isFakedData()) {
@@ -895,34 +912,52 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       currentDHEID = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
       currentDHCID = dhc.data_dhc_start_frame->get_dhc_id();
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
 
-      if (m_formatBonnDAQ)             eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
+      if (m_formatBonnDAQ) eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
 
       if (!isFakedData_event) {
         /// TODO here we should check full(!) Event Number, Run Number, Subrun Nr and Exp Number
         /// of this frame against the one from MEta Event Info
         if (dhc.data_dhc_start_frame->get_experiment() != m_meta_experiment) {
-          if (!(m_suppressErrorMask & c_META_MM_DHC_ERS)) B2WARNING("DHC Experiment number mismatch: " << LogVar("DHC exp nr",
-                                                                      dhc.data_dhc_start_frame->get_experiment()) << LogVar("META exp nr" , m_meta_experiment));
+          if (!(m_suppressErrorMask & c_META_MM_DHC_ERS)) {
+            B2WARNING("DHC-Meta Experiment number mismatch");
+            B2DEBUG(1, "DHC-Meta Experiment number mismatch" <<
+                    LogVar("DHC exp nr",
+                           dhc.data_dhc_start_frame->get_experiment()) <<
+                    LogVar("META exp nr" , m_meta_experiment));
+          }
           m_errorMask |= c_META_MM_DHC_ERS;
         }
         if (dhc.data_dhc_start_frame->get_run() != m_meta_run_nr) {
-          if (!(m_suppressErrorMask & c_META_MM_DHC_ERS)) B2WARNING("DHC Run number mismatch: " << LogVar("DHC Run nr" ,
-                                                                      dhc.data_dhc_start_frame->get_run()) << LogVar("META run nr", m_meta_run_nr));
+          if (!(m_suppressErrorMask & c_META_MM_DHC_ERS)) {
+            B2WARNING("DHC-Meta Run number mismatch");
+            B2DEBUG(1, "DHC-Meta Run number mismatch" <<
+                    LogVar("DHC Run nr" ,
+                           dhc.data_dhc_start_frame->get_run()) <<
+                    LogVar("META run nr", m_meta_run_nr));
+          }
           m_errorMask |= c_META_MM_DHC_ERS;
         }
         if (dhc.data_dhc_start_frame->get_subrun() != m_meta_subrun_nr) {
-          if (!(m_suppressErrorMask & c_META_MM_DHC_ERS)) B2WARNING("DHC Sub-Run number mismatch" << LogVar("DHC subrun nr",
-                                                                      dhc.data_dhc_start_frame->get_subrun()) << LogVar("META subrun nr", m_meta_subrun_nr));
+          if (!(m_suppressErrorMask & c_META_MM_DHC_ERS)) {
+            B2WARNING("DHC-Meta Sub-Run number mismatch");
+            B2DEBUG(1, "DHC-Meta Sub-Run number mismatch" <<
+                    LogVar("DHC subrun nr",
+                           dhc.data_dhc_start_frame->get_subrun()) <<
+                    LogVar("META subrun nr", m_meta_subrun_nr));
+          }
           m_errorMask |= c_META_MM_DHC_ERS;
         }
         if ((((unsigned int)dhc.data_dhc_start_frame->getEventNrHi() << 16) | dhc.data_dhc_start_frame->getEventNrLo()) !=
             (m_meta_event_nr & 0xFFFFFFFF)) {
-          if (!(m_suppressErrorMask & c_META_MM_DHC)) B2WARNING("DHC 32 bit event number mismatch" << LogVar("DHC trigger nr", ((
-                                                                    (unsigned int) dhc.data_dhc_start_frame->getEventNrHi() <<
-                                                                    16) | dhc.data_dhc_start_frame->getEventNrLo())) << LogVar(
-                                                                    "META trigger nr" , (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)));
+          if (!(m_suppressErrorMask & c_META_MM_DHC)) {
+            B2WARNING("DHC-Meta 32 bit event number mismatch");
+            B2DEBUG(1, "DHC-Meta 32 bit event number mismatch" <<
+                    LogVar("DHC trigger nr", (((unsigned int) dhc.data_dhc_start_frame->getEventNrHi() << 16) |
+                                              dhc.data_dhc_start_frame->getEventNrLo())) <<
+                    LogVar("META trigger nr" , (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)));
+          }
           m_errorMask |= c_META_MM_DHC;
         }
         uint32_t trig_ticks = (((unsigned int)dhc.data_dhc_start_frame->time_tag_mid & 0x7FFF) << 12) | ((unsigned int)
@@ -933,13 +968,23 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         if ((trig_ticks - m_meta_ticks) != 0 || (trig_sec - m_meta_sec) != 0) {
           m_errorMask |= c_META_MM_DHC_TT;
           if (!(m_suppressErrorMask & c_META_MM_DHC_TT)) {
-            B2WARNING("DHC-Meta TimeTag mismatch: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." <<
-                      dhc.data_dhc_start_frame->time_tag_mid << "." <<
-                      dhc.data_dhc_start_frame->time_tag_lo_and_type << " META " << m_meta_time << " TRG Type " <<
-                      (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF) << endl <<
-                      "Seconds: Meta $" << hex << m_meta_sec << " header $" << hex << trig_sec << " Diff: $" << (trig_sec - m_meta_sec) << endl <<
-                      "Ticks from 127MHz: Meta $" << hex << m_meta_ticks << " header $" << trig_ticks << " Diff: " <<
-                      (trig_ticks - m_meta_ticks));
+            B2WARNING("DHC-Meta TimeTag mismatch");
+            B2DEBUG(1, "DHC-Meta TimeTag mismatch" <<
+                    LogVar("Header Time $", static_cast < std::ostringstream && >(std::ostringstream() <<
+                           hex << dhc.data_dhc_start_frame->time_tag_hi << "." <<
+                           dhc.data_dhc_start_frame->time_tag_mid << "." <<
+                           dhc.data_dhc_start_frame->time_tag_lo_and_type).str()) <<
+                    LogVar("Meta Time $", static_cast < std::ostringstream && >(std::ostringstream() << hex << m_meta_time).str()) <<
+                    LogVar("Trigger Type",  static_cast < std::ostringstream
+                           && >(std::ostringstream() << hex << (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF)).str()) <<
+                    LogVar("Meta seconds: $" , static_cast < std::ostringstream && >(std::ostringstream() <<  hex << m_meta_sec).str()) <<
+                    LogVar("DHC seconds $" , static_cast < std::ostringstream && >(std::ostringstream() <<  hex << trig_sec).str()) <<
+                    LogVar("Seconds difference $" , static_cast < std::ostringstream
+                           && >(std::ostringstream() << hex << (trig_sec - m_meta_sec)).str()) <<
+                    LogVar("Meta ticks from 127MHz $" , static_cast < std::ostringstream && >(std::ostringstream() <<  hex << m_meta_ticks).str()) <<
+                    LogVar("DHC ticks from 127MHz $" , static_cast < std::ostringstream && >(std::ostringstream() << hex << trig_ticks).str()) <<
+                    LogVar("Tick difference $" , static_cast < std::ostringstream
+                           && >(std::ostringstream() << hex << (trig_ticks - m_meta_ticks)).str()));
           }
         } else {
           B2DEBUG(20, "DHC TT: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." << dhc.data_dhc_start_frame->time_tag_mid << "." <<
@@ -965,12 +1010,16 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
       dhe_first_triggergate = dhc.data_dhe_start_frame->getTriggerGate();
       if (currentDHEID != 0xFFFFFFFF && (currentDHEID & 0xFFFF) >= dhc.data_dhe_start_frame->getDHEId()) {
-        if (!(m_suppressErrorMask & c_DHE_WRONG_ID_SEQ)) B2WARNING("DHH IDs are not in expected order! " <<
-                                                                     (currentDHEID & 0xFFFF) << " >= " << dhc.data_dhe_start_frame->getDHEId());
+        if (!(m_suppressErrorMask & c_DHE_WRONG_ID_SEQ)) {
+          B2WARNING("DHH IDs are not in expected order");
+          B2DEBUG(1, "DHH IDs are not in expected order" <<
+                  LogVar("Previous ID", (currentDHEID & 0xFFFF)) <<
+                  LogVar("Current ID", dhc.data_dhe_start_frame->getDHEId()));
+        }
         m_errorMask |= c_DHE_WRONG_ID_SEQ;
       }
       currentDHEID = dhc.data_dhe_start_frame->getDHEId();
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
 
       if (countedDHEStartFrames > countedDHEEndFrames) {
         if (!(m_suppressErrorMask & c_DHE_START_WO_END)) B2WARNING("DHE_START without DHE_END");
@@ -983,9 +1032,12 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       if ((((unsigned int)dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) != (unsigned int)(
             m_meta_event_nr & 0xFFFFFFFF)) {
-        if (!(m_suppressErrorMask & c_META_MM_DHE)) B2WARNING("DHE EVT32b (HI WORD): " << ((
-                                                                  dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) <<
-                                                                " META " << (m_meta_event_nr & 0xFFFFFFFF));
+        if (!(m_suppressErrorMask & c_META_MM_DHE)) {
+          B2WARNING("DHE START trigger mismatch in EVT32b/HI WORD");
+          B2DEBUG(1, "DHE START trigger mismatch in EVT32b/HI WORD" <<
+                  LogVar("DHE Start trigger nr", (dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) <<
+                  LogVar("Meta trigger nr", (m_meta_event_nr & 0xFFFFFFFF)));
+        }
         m_errorMask |= c_META_MM_DHE;
       }
 //        B2WARNING("DHE TT: $" << hex << dhc.data_dhe_start_frame->dhe_time_tag_hi << "." << dhc.data_dhe_start_frame->dhe_time_tag_lo <<
@@ -1009,10 +1061,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         layer = ((currentDHEID & 0x20) >> 5) + 1;
         currentVxdId = VxdID(layer, ladder, sensor);
         if (ladder == 0 || (layer == 1 && ladder > 8) || (layer == 2 && ladder > 12)) {
-          if (!(m_suppressErrorMask & c_DHE_ID_INVALID)) B2WARNING("DHE ID is invalid = $" << hex << currentDHEID << ", " << dec
-                                                                     <<
-                                                                     currentDHEID << " (" << layer << "," << ladder << "," <<
-                                                                     sensor << ")");
+          if (!(m_suppressErrorMask & c_DHE_ID_INVALID)) {
+            B2WARNING("DHE ID is invalid");
+            B2DEBUG(1, "DHE ID is invalid" <<
+                    LogVar("DHE ID", currentDHEID) <<
+                    LogVar("Layer", layer) <<
+                    LogVar("Ladder", ladder) <<
+                    LogVar("Sensor", sensor));
+          }
           m_errorMask |= c_DHE_ID_INVALID;
         }
       }
@@ -1027,9 +1083,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     case EDHCFrameHeaderDataType::c_GHOST:
       if (m_verbose)dhc.data_ghost_frame->print();
       if (currentDHEID != dhc.data_ghost_frame->getDHEId()) {
-        if (!(m_suppressErrorMask & c_DHE_START_ID)) B2WARNING("DHE ID from DHE Start and this frame do not match $" << hex <<
-                                                                 currentDHEID << " != $" <<
-                                                                 dhc.data_ghost_frame->getDHEId());
+        if (!(m_suppressErrorMask & c_DHE_START_ID)) {
+          B2WARNING("DHE ID from DHE Start and this frame do not match");
+          B2DEBUG(1, "Start ID $" << hex << currentDHEID << " != $" << dhc.data_ghost_frame->getDHEId());
+        }
         m_errorMask |= c_DHE_START_ID;
       }
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
@@ -1037,13 +1094,12 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       //found_mask_active_dhp = mask_active_dhp;/// TODO Workaround for DESY TB 2016 doesnt work
 
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
 
       break;
     case EDHCFrameHeaderDataType::c_DHC_END: {
       if (dhc.data_dhc_end_frame->isFakedData() != isFakedData_event) {
-        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA))
-          B2WARNING("DHC END is but no Fake event OR Fake Event but DHE END is not.");
+        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA)) B2WARNING("DHC END is but no Fake event OR Fake Event but DHE END is not.");
         m_errorMask |= c_FAKE_NO_FAKE_DATA;
       }
       if (isFakedData_event) {
@@ -1055,16 +1111,21 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
       if (!isFakedData_event) {
         if (dhc.data_dhc_end_frame->get_dhc_id() != currentDHCID) {
-          if (!(m_suppressErrorMask & c_DHC_DHCID_START_END_MM)) B2WARNING("DHC ID Mismatch between Start and End $" << std::hex <<
-                currentDHCID << "!=$" << dhc.data_dhc_end_frame->get_dhc_id());
+          if (!(m_suppressErrorMask & c_DHC_DHCID_START_END_MM)) {
+            B2WARNING("DHC ID Mismatch between Start and End");
+            B2DEBUG(1, "DHC ID Mismatch between Start and End $" << std::hex <<
+                    currentDHCID << "!=$" << dhc.data_dhc_end_frame->get_dhc_id());
+          }
           m_errorMask |= c_DHC_DHCID_START_END_MM;
         }
         int w;
         w = dhc.data_dhc_end_frame->get_words() * 4;
         if (cancheck_countedBytesInDHC) {
           if (countedBytesInDHC != w) {
-            if (!(m_suppressErrorMask & c_DHC_WIE)) B2WARNING("Error: WIE $" << hex << countedBytesInDHC << " != DHC END $" << hex <<
-                                                                w);
+            if (!(m_suppressErrorMask & c_DHC_WIE)) {
+              B2WARNING("Number of Words in DHC END does not match");
+              B2DEBUG(1, "Number of Words in DHC END does not match: WIE $" << hex << countedBytesInDHC << " != DHC END $" << hex << w);
+            }
             m_errorMask |= c_DHC_WIE;
           } else {
             if (m_verbose)
@@ -1074,7 +1135,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         }
       }
       /// TODO how to handle error flags set in in DHC_END?
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       m_errorMaskDHC |= m_errorMask; // do latest updates
 
       if (daqpktstat.dhc_size() > 0) {
@@ -1094,19 +1155,21 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     case EDHCFrameHeaderDataType::c_DHE_END: {
       if (m_verbose) dhc.data_dhe_end_frame->print();
       if (currentDHEID != dhc.data_dhe_end_frame->getDHEId()) {
-        if (!(m_suppressErrorMask & c_DHE_START_END_ID)) B2WARNING("DHE ID from DHE Start and this frame do not match $" << hex
-                                                                     <<
-                                                                     currentDHEID << " != $" <<
-                                                                     dhc.data_dhe_end_frame->getDHEId());
+        if (!(m_suppressErrorMask & c_DHE_START_END_ID)) {
+          B2WARNING("DHE ID from DHE Start and this frame do not match");
+          B2DEBUG(1, "DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
+                  dhc.data_dhe_end_frame->getDHEId());
+        }
         m_errorMask |= c_DHE_START_END_ID;
       }
       /// TODO how to handle error flags set in in DHE_END?
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       if (found_mask_active_dhp != mask_active_dhp) {
-        if (!(m_suppressErrorMask & c_DHP_ACTIVE)) B2WARNING("DHE_END: DHP active mask $" << hex << mask_active_dhp << " != $"
-                                                               <<
-                                                               hex << found_mask_active_dhp <<
-                                                               " mask of found dhp/ghost frames");
+        if (!(m_suppressErrorMask & c_DHP_ACTIVE)) {
+          B2WARNING("DHE_END: DHP active mask differs from found data");
+          B2DEBUG(1, "DHE_END: DHP active mask differs from found data $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp
+                  << " mask of found dhp/ghost frames");
+        }
         m_errorMask |= c_DHP_ACTIVE;
       }
       countedDHEEndFrames++;
@@ -1120,8 +1183,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         w = dhc.data_dhe_end_frame->get_words() * 2;
         if (cancheck_countedBytesInDHE) {
           if (countedBytesInDHE != w) {
-            if (!(m_suppressErrorMask & c_DHE_WIE)) B2WARNING("Error: WIE $" << hex << countedBytesInDHE <<
-                                                                " != DHE END $" << hex << w);
+            if (!(m_suppressErrorMask & c_DHE_WIE)) {
+              B2WARNING("Number of Words in DHE END does not match");
+              B2DEBUG(1, "Number of Words in DHE END does not match: WIE $" << hex << countedBytesInDHE << " != DHE END $" << hex << w);
+            }
             m_errorMask |= c_DHE_WIE;
           } else {
             if (m_verbose)
@@ -1149,9 +1214,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     };
     case EDHCFrameHeaderDataType::c_ONSEN_ROI:
       if (m_verbose) dhc.data_onsen_roi_frame->print();
-      m_errorMask |= dhc.data_onsen_roi_frame->check_error(len);
+      m_errorMask |= dhc.data_onsen_roi_frame->check_error(len, m_suppressErrorMask & c_ROI_PACKET_INV_SIZE);
       m_errorMask |= dhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHC header, see reason in function
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       if (!m_doNotStore) {
         //dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
         // void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) const
@@ -1171,55 +1236,45 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     case EDHCFrameHeaderDataType::c_ONSEN_TRG:
       eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
       if (dhc.data_onsen_trigger_frame->get_trig_nr1() != (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)) {
-        if (!(m_suppressErrorMask & c_META_MM_ONS_HLT)) B2WARNING("TRG HLT MM: $" << dhc.data_onsen_trigger_frame->get_trig_nr1()
-                                                                    << " META " <<
-                                                                    (m_meta_event_nr & 0xFFFFFFFF));
+        if (!(m_suppressErrorMask & c_META_MM_ONS_HLT)) {
+          B2WARNING("Trigger Frame HLT Trigger Nr mismatch");
+          B2DEBUG(1, "Trigger Frame HLT Trigger Nr mismatch: HLT $" <<
+                  dhc.data_onsen_trigger_frame->get_trig_nr1() << " META " << (m_meta_event_nr & 0xFFFFFFFF));
+        }
         m_errorMask |= c_META_MM_ONS_HLT;
       }
-      if (dhc.data_onsen_trigger_frame->get_experiment1() != m_meta_experiment) {
-        if (!(m_suppressErrorMask & c_META_MM_ONS_HLT)) B2WARNING("TRG HLT EXP MM: $" <<
-                                                                    dhc.data_onsen_trigger_frame->get_experiment1() << " META " <<
-                                                                    m_meta_experiment);
-        m_errorMask |= c_META_MM_ONS_HLT;
-      }
-      if (dhc.data_onsen_trigger_frame->get_run1() != m_meta_run_nr) {
-        if (!(m_suppressErrorMask & c_META_MM_ONS_HLT)) B2WARNING("TRG HLT RUN MM: $" << dhc.data_onsen_trigger_frame->get_run1()
-                                                                    << " META " <<
-                                                                    m_meta_run_nr);
-        m_errorMask |= c_META_MM_ONS_HLT;
-      }
-      if (dhc.data_onsen_trigger_frame->get_subrun1() != m_meta_subrun_nr) {
-        if (!(m_suppressErrorMask & c_META_MM_ONS_HLT)) B2WARNING("TRG HLT SUBRUN MM: $" <<
-                                                                    dhc.data_onsen_trigger_frame->get_subrun1() << " META " <<
-                                                                    m_meta_subrun_nr);
+      if (dhc.data_onsen_trigger_frame->get_experiment1() != m_meta_experiment ||
+          dhc.data_onsen_trigger_frame->get_run1() != m_meta_run_nr ||
+          dhc.data_onsen_trigger_frame->get_subrun1() != m_meta_subrun_nr) {
+        if (!(m_suppressErrorMask & c_META_MM_ONS_HLT)) {
+          B2WARNING("Trigger Frame HLT Exp/Run/Subrun Nr mismatch");
+          B2DEBUG(1, "Trigger Frame HLT Exp/Run/Subrun Nr mismatch: Exp HLT $" <<
+                  dhc.data_onsen_trigger_frame->get_experiment1() << " META " <<  m_meta_experiment <<
+                  " Run HLT $" << dhc.data_onsen_trigger_frame->get_run1()  << " META " << m_meta_run_nr <<
+                  " Subrun HLT $" << dhc.data_onsen_trigger_frame->get_subrun1() << " META " <<  m_meta_subrun_nr);
+        }
         m_errorMask |= c_META_MM_ONS_HLT;
       }
 
       if (!dhc.data_onsen_trigger_frame->is_fake_datcon()) {
         if (dhc.data_onsen_trigger_frame->get_trig_nr2() != (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)) {
-          if (!(m_suppressErrorMask & c_META_MM_ONS_DC)) B2WARNING("TRG DC MM: $" << dhc.data_onsen_trigger_frame->get_trig_nr2()
-                                                                     <<
-                                                                     " META " <<
-                                                                     (m_meta_event_nr & 0xFFFFFFFF));
+          if (!(m_suppressErrorMask & c_META_MM_ONS_DC)) {
+            B2WARNING("Trigger Frame DATCON Trigger Nr mismatch");
+            B2DEBUG(1, "Trigger Frame DATCON Trigger Nr mismatch: DC $" <<
+                    dhc.data_onsen_trigger_frame->get_trig_nr2() << " META " << (m_meta_event_nr & 0xFFFFFFFF));
+          }
           m_errorMask |= c_META_MM_ONS_DC;
         }
-        if (dhc.data_onsen_trigger_frame->get_experiment2() != m_meta_experiment) {
-          if (!(m_suppressErrorMask & c_META_MM_ONS_DC)) B2WARNING("TRG DC EXP MM: $" <<
-                                                                     dhc.data_onsen_trigger_frame->get_experiment2() << " META " <<
-                                                                     m_meta_experiment);
-          m_errorMask |= c_META_MM_ONS_DC;
-        }
-        if (dhc.data_onsen_trigger_frame->get_run2() != m_meta_run_nr) {
-          if (!(m_suppressErrorMask & c_META_MM_ONS_DC)) B2WARNING("TRG DC RUN MM: $" << dhc.data_onsen_trigger_frame->get_run2()
-                                                                     <<
-                                                                     " META " <<
-                                                                     m_meta_run_nr);
-          m_errorMask |= c_META_MM_ONS_DC;
-        }
-        if (dhc.data_onsen_trigger_frame->get_subrun2() != m_meta_subrun_nr) {
-          if (!(m_suppressErrorMask & c_META_MM_ONS_DC)) B2WARNING("TRG DC SUBRUN MM: $" <<
-                                                                     dhc.data_onsen_trigger_frame->get_subrun2() << " META " <<
-                                                                     m_meta_subrun_nr);
+        if (dhc.data_onsen_trigger_frame->get_experiment2() != m_meta_experiment ||
+            dhc.data_onsen_trigger_frame->get_run2() != m_meta_run_nr ||
+            dhc.data_onsen_trigger_frame->get_subrun2() != m_meta_subrun_nr) {
+          if (!(m_suppressErrorMask & c_META_MM_ONS_DC)) {
+            B2WARNING("Trigger Frame DATCON Exp/Run/Subrun Nr mismatch");
+            B2DEBUG(1, "Trigger Frame DATCON Exp/Run/Subrun Nr mismatch: Exp DC $" <<
+                    dhc.data_onsen_trigger_frame->get_experiment2() << " META " <<  m_meta_experiment <<
+                    " Run DC $" << dhc.data_onsen_trigger_frame->get_run2() << " META " <<  m_meta_run_nr <<
+                    " Subrun DC $" << dhc.data_onsen_trigger_frame->get_subrun2() << " META " << m_meta_subrun_nr);
+          }
           m_errorMask |= c_META_MM_ONS_DC;
         }
       }
@@ -1227,8 +1282,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 //       B2WARNING("TRG TAG HLT: $" << hex << dhc.data_onsen_trigger_frame->get_trig_tag1() << " DATCON $" <<  dhc.data_onsen_trigger_frame->get_trig_tag2() << " META " << m_meta_time);
 
       if (m_verbose) dhc.data_onsen_trigger_frame->print();
-      m_errorMask |= dhc.data_onsen_trigger_frame->check_error(!(m_suppressErrorMask & c_NO_DATCON));
-      m_errorMask |= dhc.check_crc();
+      m_errorMask |= dhc.data_onsen_trigger_frame->check_error(m_suppressErrorMask & c_NO_DATCON, m_suppressErrorMask & c_HLTROI_MAGIC,
+                                                               m_suppressErrorMask & c_MERGER_TRIGNR);
+      m_errorMask |= dhc.check_crc(m_suppressErrorMask & c_DHE_CRC);
       if (Frame_Number != 0) {
         if (!(m_suppressErrorMask & c_EVENT_STRUCT)) B2WARNING("ONSEN TRG Frame must be the first one.");
         m_errorMask |= c_EVENT_STRUCT;
@@ -1246,8 +1302,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
 
   if (eventNrOfThisFrame != eventNrOfOnsenTrgFrame && !isFakedData_event) {
-    if (!(m_suppressErrorMask & c_FRAME_TNR_MM)) B2WARNING("Frame TrigNr != ONSEN Trig Nr $" << hex << eventNrOfThisFrame <<
-                                                             " != $" << eventNrOfOnsenTrgFrame);
+    if (!(m_suppressErrorMask & c_FRAME_TNR_MM)) {
+      B2WARNING("Frame TrigNr != ONSEN Trig Nr");
+      B2DEBUG(1, "Frame TrigNr != ONSEN Trig Nr $" << hex << eventNrOfThisFrame << " != $" << eventNrOfOnsenTrgFrame);
+    }
     m_errorMask |= c_FRAME_TNR_MM;
   }
 
@@ -1255,16 +1313,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     /// Check that ONSEN Trg is first Frame
     if (type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {
       if (!m_formatBonnDAQ) {
-        if (!(m_suppressErrorMask & c_ONSEN_TRG_FIRST)) B2WARNING("First frame is not a ONSEN Trigger frame in Event Nr " <<
-                                                                    eventNrOfThisFrame);
+        if (!(m_suppressErrorMask & c_ONSEN_TRG_FIRST)) B2WARNING("First frame is not a ONSEN Trigger frame");
         m_errorMask |= c_ONSEN_TRG_FIRST;
       }
     }
   } else { // (Frame_Number != 0 &&
     /// Check that there is no other DHC Start
     if (type == EDHCFrameHeaderDataType::c_ONSEN_TRG) {
-      if (!(m_suppressErrorMask & c_ONSEN_TRG_FIRST)) B2WARNING("More than one ONSEN Trigger frame in Event Nr " <<
-                                                                  eventNrOfThisFrame);
+      if (!(m_suppressErrorMask & c_ONSEN_TRG_FIRST)) B2WARNING("More than one ONSEN Trigger frame");
       m_errorMask |= c_ONSEN_TRG_FIRST;
     }
   }
@@ -1273,16 +1329,13 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     if (Frame_Number == 1) {
       /// Check that DHC Start is first Frame
       if (type != EDHCFrameHeaderDataType::c_DHC_START) {
-        if (!(m_suppressErrorMask & c_DHC_START_SECOND))
-          B2WARNING("Second frame is not a DHC start of subevent frame in Event Nr "
-                    << eventNrOfThisFrame);
+        if (!(m_suppressErrorMask & c_DHC_START_SECOND)) B2WARNING("Second frame is not a DHC start of subevent frame");
         m_errorMask |= c_DHC_START_SECOND;
       }
     } else { // (Frame_Number != 0 &&
       /// Check that there is no other DHC Start
       if (type == EDHCFrameHeaderDataType::c_DHC_START) {
-        if (!(m_suppressErrorMask & c_DHC_START_SECOND)) B2WARNING("More than one DHC start of subevent frame in Event Nr " <<
-                                                                     eventNrOfThisFrame);
+        if (!(m_suppressErrorMask & c_DHC_START_SECOND)) B2WARNING("More than one DHC start of subevent frame");
         m_errorMask |= c_DHC_START_SECOND;
       }
     }
@@ -1291,18 +1344,19 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   if (Frame_Number == Frames_in_event - 1) {
     /// Check that DHC End is last Frame
     if (type != EDHCFrameHeaderDataType::c_DHC_END) {
-      if (!(m_suppressErrorMask & c_DHC_END_MISS)) B2WARNING("Last frame is not a DHC end of subevent frame in Event Nr " <<
-                                                               eventNrOfThisFrame);
+      if (!(m_suppressErrorMask & c_DHC_END_MISS)) B2WARNING("Last frame is not a DHC end of subevent frame");
       m_errorMask |= c_DHC_END_MISS;
     }
 
     /// As we now have processed the whole event, we can do some more consistency checks!
     if (countedDHEStartFrames != countedDHEEndFrames || countedDHEStartFrames != nr_active_dhe) {
       if (!(m_suppressErrorMask & c_DHE_ACTIVE) || !(m_suppressErrorMask & c_DHE_START_WO_END)
-          || !(m_suppressErrorMask & c_DHE_END_WO_START))
-        B2WARNING("The number of DHE Start/End does not match the number of active DHE in DHC Header! Header: " << nr_active_dhe <<
-                  " Start: " << countedDHEStartFrames << " End: " << countedDHEEndFrames << " Mask: $" << hex << mask_active_dhe << " in Event Nr " <<
-                  eventNrOfThisFrame);
+          || !(m_suppressErrorMask & c_DHE_END_WO_START)) {
+        B2WARNING("The number of DHE Start/End does not match the number of active DHE in DHC Header!");
+        B2DEBUG(1, "The number of DHE Start/End does not match the number of active DHE in DHC Header! Header: " << nr_active_dhe <<
+                " Start: " << countedDHEStartFrames << " End: " << countedDHEEndFrames << " Mask: $" << hex << mask_active_dhe << " in Event Nr " <<
+                eventNrOfThisFrame);
+      }
       if (countedDHEStartFrames == countedDHEEndFrames) m_errorMask |= c_DHE_ACTIVE;
       if (countedDHEStartFrames > countedDHEEndFrames)  m_errorMask |= c_DHE_START_WO_END;
       if (countedDHEStartFrames < countedDHEEndFrames)  m_errorMask |= c_DHE_END_WO_START;
@@ -1311,8 +1365,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   } else { //  (Frame_Number != Frames_in_event - 1 &&
     /// Check that there is no other DHC End
     if (type == EDHCFrameHeaderDataType::c_DHC_END) {
-      if (!(m_suppressErrorMask & c_DHC_END_DBL)) B2WARNING("More than one DHC end of subevent frame in frame in Event Nr " <<
-                                                              eventNrOfThisFrame);
+      if (!(m_suppressErrorMask & c_DHC_END_DBL)) B2WARNING("More than one DHC end of subevent frame");
       m_errorMask |= c_DHC_END_DBL;
     }
   }
@@ -1320,8 +1373,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   if (!m_formatBonnDAQ) {
     /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
     if (Frame_Number == 2 && nr_active_dhe != 0 && type != EDHCFrameHeaderDataType::c_DHE_START) {
-      if (!(m_suppressErrorMask & c_DHE_START_THIRD)) B2WARNING("Third frame is not a DHE start frame in Event Nr " <<
-                                                                  eventNrOfThisFrame);
+      if (!(m_suppressErrorMask & c_DHE_START_THIRD)) B2WARNING("Third frame is not a DHE start frame");
       m_errorMask |= c_DHE_START_THIRD;
     }
   }

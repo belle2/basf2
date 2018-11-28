@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import b2test_utils
 from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
@@ -197,6 +198,8 @@ from skim.dark import ALP3GammaList
 add_skim('ALP3Gamma', ALP3GammaList(path=analysis_main))
 
 setSkimLogging()
-process(analysis_main)
+
+with b2test_utils.clean_working_directory():
+    process(analysis_main)
 
 print(statistics)

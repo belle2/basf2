@@ -1441,6 +1441,79 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
+  {
+    // declare all the array we need
+    StoreArray<Particle> particles, particles_noclst;
+    std::vector<int> daughterIndices, daughterIndices_noclst;
+
+    //proxy initialize where to declare the needed array
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<ECLCluster> eclclusters;
+    eclclusters.registerInDataStore();
+    particles.registerRelationTo(eclclusters);
+    DataStore::Instance().setInitializeActive(false);
+
+    // create two Lorentz vectors that are back to back in the CMS and boost them to the Lab frame
+    const float px_CM = 2.;
+    const float py_CM = 1.;
+    const float pz_CM = 3.;
+    float E_CM;
+    E_CM = sqrt(pow(px_CM, 2) + pow(py_CM, 2) + pow(pz_CM, 2));
+    TLorentzVector momentum, momentum_noclst;
+    TLorentzVector dau0_4vec_CM(px_CM, py_CM, pz_CM, E_CM), dau1_4vec_CM(-px_CM, -py_CM, -pz_CM, E_CM);
+    TLorentzVector dau0_4vec_Lab, dau1_4vec_Lab;
+    dau0_4vec_Lab = PCmsLabTransform::cmsToLab(
+                      dau0_4vec_CM); //why is eveybody using the extendend method when there are the functions that do all the steps for us?
+    dau1_4vec_Lab = PCmsLabTransform::cmsToLab(dau1_4vec_CM);
+
+    // add the two photons (now in the Lab frame) as the two daughters of some particle and create the latter
+    Particle dau0_noclst(dau0_4vec_Lab, 22);
+    momentum += dau0_noclst.get4Vector();
+    Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
+    daughterIndices_noclst.push_back(newDaughter0_noclst->getArrayIndex());
+    Particle dau1_noclst(dau1_4vec_Lab, 22);
+    momentum += dau1_noclst.get4Vector();
+    Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    daughterIndices_noclst.push_back(newDaughter1_noclst->getArrayIndex());
+    const Particle* par_noclst = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices_noclst);
+
+    // grab variables
+    const Manager::Var* var = Manager::Instance().getVariable("daughterClusterAngleInBetween(0, 1)");
+    const Manager::Var* varCMS = Manager::Instance().getVariable("useCMSFrame(daughterClusterAngleInBetween(0, 1))");
+
+    // when no relations are set between the particles and the eclClusters, nan is expected to be returned
+    ASSERT_NE(var, nullptr);
+    EXPECT_TRUE(std::isnan(var->function(par_noclst)));
+
+    // set relations between particles and eclClusters
+    ECLCluster* eclst0 = eclclusters.appendNew(ECLCluster());
+    eclst0->setEnergy(dau0_4vec_Lab.E());
+    eclst0->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+    eclst0->setClusterId(1);
+    eclst0->setTheta(dau0_4vec_Lab.Theta());
+    eclst0->setPhi(dau0_4vec_Lab.Phi());
+    eclst0->setR(148.4);
+    ECLCluster* eclst1 = eclclusters.appendNew(ECLCluster());
+    eclst1->setEnergy(dau1_4vec_Lab.E());
+    eclst1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+    eclst1->setClusterId(2);
+    eclst1->setTheta(dau1_4vec_Lab.Theta());
+    eclst1->setPhi(dau1_4vec_Lab.Phi());
+    eclst1->setR(148.5);
+
+    const Particle* newDaughter0 = particles.appendNew(Particle(eclclusters[0]));
+    daughterIndices.push_back(newDaughter0->getArrayIndex());
+    const Particle* newDaughter1 = particles.appendNew(Particle(eclclusters[1]));
+    daughterIndices.push_back(newDaughter1->getArrayIndex());
+
+    const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
+
+    //now we expect non-nan results
+    EXPECT_FLOAT_EQ(var->function(par), 2.8614323);
+    EXPECT_FLOAT_EQ(varCMS->function(par), M_PI);
+  }
+
   TEST_F(MetaVariableTest, daughterNormDiffOf)
   {
     TLorentzVector momentum;

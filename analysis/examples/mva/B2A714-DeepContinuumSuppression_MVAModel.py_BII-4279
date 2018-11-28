@@ -130,7 +130,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         relations_clusters = Lambda(slice, arguments={'begin': 340, 'end': 560})(low_level_input)
         relations_clusters = Reshape((20, 11))(relations_clusters)
 
-        relations1 = EnhancedRelations(number_features=20, hidden_feature_shape=[80, 80, 80])([relations_tracks, high_level_input])
+        relations1 = EnhancedRelations(number_features=20, hidden_feature_shape=[
+                                       80, 80, 80])([relations_tracks, high_level_input])
         relations2 = EnhancedRelations(number_features=20, hidden_feature_shape=[
                                        80, 80, 80])([relations_clusters, high_level_input])
 

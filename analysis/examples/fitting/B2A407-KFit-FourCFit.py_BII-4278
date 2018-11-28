@@ -26,8 +26,15 @@
 #
 
 from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
+from modularAnalysis import inputMdst
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import fourCKFit
+from modularAnalysis import matchMCTruth
+from modularAnalysis import variablesToNtuple
+from stdPhotons import stdPhotons
+import variables.collections as vc
+
 
 # load input ROOT file
 filelistSIG = '/group/belle2/tutorial/release_01-00-00/mdst-Y4setaY.root'
@@ -58,19 +65,21 @@ fourCKFit("Upsilon(4S)", 0.0)
 # Associates the MC truth to the reconstructed D0
 matchMCTruth('Upsilon(4S)')
 
-# here you can put whatever you like....
-toolsD0 = ['EventMetaData', '^Upsilon(4S)']
-toolsD0 += ['InvMass', '^Upsilon(4S) -> ^eta ^Upsilon']
-toolsD0 += ['Kinematics', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['PID', 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['MCTruth', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['MCHierarchy', '^Upsilon(4S) -> ^eta ^Upsilon']
-toolsD0 += ['CustomFloats[extraInfo(FourCFitProb)]', '^Upsilon(4S)']
-toolsD0 += ['CustomFloats[extraInfo(FourCFitChi2)]', '^Upsilon(4S)']
+# Select variables that we want to store to ntuple
+muvars = vc.mc_truth + vc.pid + vc.kinematics
+gvars = vc.kinematics + vc.mc_truth
+etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
+u4svars = vc.event_meta_data + vc.inv_mass + vc.kinematics + \
+    vc.mc_truth + vc.mc_hierarchy + \
+    vc.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vc.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    vc.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    vc.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
-# ntupleFile('B2A407-KFit-FourCFit_updateDaughters.root')
-ntupleFile('B2A407-KFit-FourCFit.root')
-ntupleTree('Upsilon4s', 'Upsilon(4S)', toolsD0)
+# Saving variables to ntuple
+output_file = 'B2A407-KFit-FourCFit.root'
+variablesToNtuple('Upsilon(4S)', u4svars,
+                  filename=output_file, treename='Upsilon4s')
 
 #
 # Process and print statistics

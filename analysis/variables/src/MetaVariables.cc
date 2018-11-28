@@ -1554,9 +1554,19 @@ endloop:
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
                       "[Eventbased] Returns the number of clean Tracks in the event\n"
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
-    REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula,
-                      "Returns the result of the given formula, where v1-v6 are variables.\n"
-                      "Parenthesis may be in the form of square brackets: [v1 * v2] or round ones (v1 * v2).");
+    REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula, R"DOCSTRING(
+Returns the result of the given formula, where v1 to vN are variables or floating
+point numbers. Currently the only supported operations are addtion (``+``),
+subtraction (``-``), multiplication (``*``), division (``/``) and power (``^``
+or ``**``). Parenthesis can be in the form of square brackets ``[v1 * v2]``
+or normal brackets ``(v1 * v2)``. It will work also with variables taking
+arguments. Operator precedence is taken into account. For example::
+
+    (daughter(0, E) + daughter(1, E))**2 - p**2 + 0.138
+
+)DOCSTRING");
+                      "Currently only supports one level of round parentheses () in variable names,"
+                      " i.e. passesCut(cut) as an input variable will fail if the cut also contains ( or ).");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
                       "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");

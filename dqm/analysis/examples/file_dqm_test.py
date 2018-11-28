@@ -15,9 +15,8 @@ main = create_path()
 # Modules
 input = register_module('DQMHistAnalysisInputRootFile')
 input.param('SelectFolders', ['TOP'])  # leave blank to include all folders
-# input.param('SelectHistograms',
-# ['TOP/good_hits_per_event16','TOP/good_hits_per_event15'])  # full
-# histogram names, leave blank to include all histograms
+# use full histogram names, leave blank to include all histograms
+input.param('SelectHistograms', ['TOP/recoTime', 'TOP/recoPull'])
 input.param('InputRootFile', "dqm_e0003r003772.root")
 main.add_module(input)
 

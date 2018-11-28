@@ -87,6 +87,7 @@ namespace Belle2 {
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.),
       m_ClusterHadronIntensity(0.),
+      m_PulseShapeDiscriminationMVA(0.5),
       m_NumberOfHadronDigits(0.) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */
@@ -164,6 +165,9 @@ namespace Belle2 {
 
     /** set Cluster Hadron Component Intensity. */
     void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
+
+    /** set Pulse Shape Discrimination MVA */
+    void setPulseShapeDiscriminationMVA(double PulseShapeDiscriminationMVA) { m_PulseShapeDiscriminationMVA = PulseShapeDiscriminationMVA; }
 
     /** set Number of hadron digits in cluster . */
     void setNumberOfHadronDigits(double NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
@@ -243,6 +247,9 @@ namespace Belle2 {
     /** Return Cluster hadron intensity*/
     double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
 
+    /** Return MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.*/
+    double getPulseShapeDiscriminationMVA() const { return m_PulseShapeDiscriminationMVA; }
+
     /** Return number of hadron digits in cluster*/
     double getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
 
@@ -318,7 +325,7 @@ namespace Belle2 {
     /** Check if ECLTRGCluster to ECLCluster matcher has run */
     bool hasTriggerClusterMatching() const {return hasStatus(c_TriggerClusterMatching);}
 
-    /** Check if ECLCluster had any ECLDigits with waveforms that also passed two component fit chi2 threshold in eclClusterPSD module. */
+    /** Check if ECLCluster has any ECLDigits with waveforms that also passed two component fit chi2 threshold in eclClusterPSD module. */
     bool hasPulseShapeDiscrimination() const {return hasStatus(c_PulseShapeDiscrimination);}
 
   private:
@@ -415,14 +422,18 @@ namespace Belle2 {
     /** Log. Highest Crystal Energy [GeV]. */
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
-    /** Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. */
+    /** MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. Classifier value is 1.0 EM showers and 0.0 for hadronic showers. */
+    Double32_t  m_PulseShapeDiscriminationMVA;  //[0.0, 1.0, 18]
+
+    /** Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. Will be removed in release-04*/
     Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
 
     /** Number of hadron digits in cluster (pulse shape discrimination variable).  Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component.*/
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 11);
+    ClassDef(ECLCluster, 12);
+    // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.
     // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables
     // 10: Added status enum, added status setter
     // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.

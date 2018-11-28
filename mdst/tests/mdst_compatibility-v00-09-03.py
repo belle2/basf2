@@ -12,6 +12,7 @@ CHANGES since release-00-09-03:
   * getTrackFitResult behavior changed for non-pion tracks
   + getQualityIndicator
 - ECLCluster:
+  + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
   + getNumberOfHadronDigits
   + hasPulseShapeDiscrimination

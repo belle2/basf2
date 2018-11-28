@@ -7,6 +7,8 @@ Test backwards compatibility for an mdst file produced with release-02-01-00.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-02-01-00:
+- ECLCluster:
+  + getPulseShapeDiscriminationMVA
 
 """
 

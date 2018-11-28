@@ -128,13 +128,13 @@ def loadRootFile(path):
     while crate <= 52:
         cell_id = -1
         if crate <= 36:
-            cell_id = ecl_ch_map.getMappingVectorBAR()[array_index]
+            cell_id = ecl_ch_map.getMappingBAR()[array_index]
             map_bar.append((crate, shaper, channel, cell_id))
         elif crate <= 44:
-            cell_id = ecl_ch_map.getMappingVectorFWD()[array_index]
+            cell_id = ecl_ch_map.getMappingFWD()[array_index]
             map_fwd.append((crate, shaper, channel, cell_id))
         else:
-            cell_id = ecl_ch_map.getMappingVectorBWD()[array_index]
+            cell_id = ecl_ch_map.getMappingBWD()[array_index]
             map_bwd.append((crate, shaper, channel, cell_id))
 
         array_index += 1

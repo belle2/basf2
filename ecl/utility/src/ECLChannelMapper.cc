@@ -111,9 +111,9 @@ bool ECLChannelMapper::initFromDB()
     return initFromFile(filePath.c_str());
   }
 
-  const auto& mappingBAR = channelMap->getMappingVectorBAR();
-  const auto& mappingFWD = channelMap->getMappingVectorFWD();
-  const auto& mappingBWD = channelMap->getMappingVectorBWD();
+  const auto& mappingBAR = channelMap->getMappingBAR();
+  const auto& mappingFWD = channelMap->getMappingFWD();
+  const auto& mappingBWD = channelMap->getMappingBWD();
 
   int cellID;
   // Loop variables

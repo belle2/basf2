@@ -49,11 +49,11 @@ namespace Belle2 {
     ECLChannelMap() : m_MappingBAR(), m_MappingFWD(), m_MappingBWD() { };
 
     /** Get vector of map entries for ECL barrel */
-    const std::vector<int>& getMappingVectorBAR() const {return m_MappingBAR;}
+    const std::vector<int>& getMappingBAR() const {return m_MappingBAR;}
     /** Get vector of map entries for ECL forward endcap */
-    const std::vector<int>& getMappingVectorFWD() const {return m_MappingFWD;}
+    const std::vector<int>& getMappingFWD() const {return m_MappingFWD;}
     /** Get vector of map entries for ECL backward endcap */
-    const std::vector<int>& getMappingVectorBWD() const {return m_MappingBWD;}
+    const std::vector<int>& getMappingBWD() const {return m_MappingBWD;}
 
     /**
      * Set three vectors of map entries

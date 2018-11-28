@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 from variables import printVars
 from variables import std_vector
 from variables import variables as v

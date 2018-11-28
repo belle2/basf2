@@ -15,7 +15,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-#include <iostream>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 
 using namespace Belle2;
@@ -59,13 +58,13 @@ void setconfig_nnt()
   nc->add_B2FormatLine(2032,   2047,   0,      "hex'dddd'",            "");
 
   //set neural network filename:
-  nc->set_NNName("v0.0.0_default_20181120");
+  nc->set_NNName("v3.0.0_Neuro20170109_20170109");
 
   // loading MLPs:
   nc->load_MLPs("trg/cdc/data/Neuro20170109.root", "MLPs");
 
-  //add notes for neurotrigger object
-  nc->set_NNNotes("Just a NeuroTrigger object with default values");
+  //add notes for expert networks
+  nc->set_NNNotes("Default weights from the basf2 data directory");
 
   //define to use the ETF:
   nc->set_useETF(true);
@@ -77,9 +76,9 @@ void setconfig_nnt()
   nc->set_NNTFirmwareVersionID("v0.0.0_default_20181120");
 
   // add comment about firmware:
-  nc->set_NNTFirmwareComment("does not exist");
+  nc->set_NNTFirmwareComment("not known yet");
 
-  IntervalOfValidity iov(0, 0, 0, 0);
+  IntervalOfValidity iov(1003, 0, 1003, -1);
   nc.import(iov);
 }
 

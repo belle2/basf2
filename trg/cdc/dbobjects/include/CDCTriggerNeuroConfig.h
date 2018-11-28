@@ -15,12 +15,11 @@
 #include <string>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <iostream>
 
 namespace Belle2 {
 
   /** The payload class for all CDC Neurotrigger information
-   * TODO: Describe, what is stored
+   *
    */
 
   class CDCTriggerNeuroConfig: public TObject {
@@ -32,10 +31,8 @@ namespace Belle2 {
       std::string name;
       std::string description;
     };
-    /** Default constructor */
     CDCTriggerNeuroConfig() {}
 
-    /** default destructor */
     virtual ~CDCTriggerNeuroConfig() {};
 
     void set_B2Format(const std::vector<B2FormatLine>& format)
@@ -70,18 +67,15 @@ namespace Belle2 {
       TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
       if (!MLPs) {
         datafile.Close();
-        std::cout << "File " << filename << " does not contain key " << arrayname << std::endl;
       }
       m_MLPs.clear();
       for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
         CDCTriggerMLP* expert = dynamic_cast<CDCTriggerMLP*>(MLPs->At(isector));
         if (expert) m_MLPs.push_back(*expert);
-        else std::cout << "Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry." << std::endl;
       }
       MLPs->Clear();
       delete MLPs;
       datafile.Close();
-      std::cout << "loaded " << m_MLPs.size() << " networks" << std::endl;
     }
     void set_NNNotes(const std::string& notes)
     {
@@ -126,21 +120,12 @@ namespace Belle2 {
 
     // Used neurotrigger filename
     std::string m_NNName;
-    //m_NNName.reserve(255);
 
-    // Used neurotrigger object
-    /** struct NN_special {
-        int mask;
-        CDCTriggerMLP nnobject;
-    }
-    std::vector<NN_special> m_NNArray = {};
-    */
-
+    // weights of expert networks
     std::vector<CDCTriggerMLP> m_MLPs;
 
     // short field for notes
     std::string m_NNNotes;
-    //m_NNNotes.reserve(255);
 
     /** switch wether the ETF is used or the first priority time of the
      * TSF is  used during preprocessing**/
@@ -148,15 +133,12 @@ namespace Belle2 {
 
     // short field for notes
     std::string m_PPNotes;
-    //m_PPNotes.reserve(255);
 
     /** Firmware Version ID **/
     std::string m_NNTFirmwareVersionID;
-    //m_NNTFirmwareVersionID.reserve(255);
 
     /** Short comment on Firmware **/
     std::string m_NNTFirmwareComment;
-    //m_NNTFirmwareComment.reserve(255);
 
     ClassDef(CDCTriggerNeuroConfig, 1); /**< ClassDef, must be the last term before the closing {}*/
   };

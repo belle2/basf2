@@ -33,7 +33,7 @@ using namespace Belle2;
 REG_MODULE(ECLMatchingPerformanceExpert)
 
 ECLMatchingPerformanceExpertModule::ECLMatchingPerformanceExpertModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL)
+  Module(), m_trackProperties()
 {
   setDescription("Module to test the matching efficiency between tracks and ECLClusters. Additionally, information about the tracks are written into a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);

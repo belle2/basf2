@@ -898,7 +898,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       countedBytesInDHC = 0;
       cancheck_countedBytesInDHC = true;
       if (isFakedData_event != dhc.data_dhc_start_frame->isFakedData()) {
-        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA)) B2WARNING("DHC START is but no Fake event OR Fake Event but DHE END is not.");
+        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA)) B2WARNING("DHC START mixed Fake/no Fake event.");
         m_errorMask |= c_FAKE_NO_FAKE_DATA;
       }
       if (dhc.data_dhc_start_frame->isFakedData()) {
@@ -1099,7 +1099,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       break;
     case EDHCFrameHeaderDataType::c_DHC_END: {
       if (dhc.data_dhc_end_frame->isFakedData() != isFakedData_event) {
-        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA)) B2WARNING("DHC END is but no Fake event OR Fake Event but DHE END is not.");
+        if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA)) B2WARNING("DHC END mixed Fake/no Fake event.");
         m_errorMask |= c_FAKE_NO_FAKE_DATA;
       }
       if (isFakedData_event) {

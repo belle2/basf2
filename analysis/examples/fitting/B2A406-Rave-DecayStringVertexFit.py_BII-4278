@@ -31,12 +31,12 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
 from modularAnalysis import vertexRave
 from modularAnalysis import massVertexRave
 from modularAnalysis import vertexRaveDaughtersUpdate
-from stdCharged import *
+from stdCharged import stdPi, stdLoosePi, stdLooseK
+from modularAnalysis import variablesToNtuple
+import variables.collections as vc
 
 
 # Add MC9 signal samples
@@ -101,36 +101,39 @@ matchMCTruth('D*+:1')
 matchMCTruth('D*+:2')
 matchMCTruth('D*+:3')
 
-# create and fill flat Ntuple with MCTruth, kinematic information and D0 FlightInfo
-toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['InvMass[BeforeFit]', '^D*+ -> ^D0 pi+']
-toolsDST += ['CMSKinematics', '^D*+']
-toolsDST += ['Kinematics', 'D*+ -> [^D0 -> ^K- ^pi+] pi+']
-toolsDST += ['Vertex', '^D*+ -> ^D0 pi+']
-toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']
-toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
-toolsDST += ['MCFlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
-toolsDST += ['FlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
+# Select variables that we want to store to ntuple
+dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth + \
+    vc.mc_flight_info + vc.flight_info + vc.vertex
 
-# create flat Ntuple for D:st (single track vertex fit)
-toolsDSTst = ['EventMetaData', '^D0']
-toolsDSTst = ['Kinematics', '^D0 -> ^K- ^pi+']
-toolsDSTst += ['Vertex', '^D0']
-toolsDSTst += ['MCVertex', '^D0']
-toolsDSTst += ['FlightInfo', '^D0 -> K- pi+']
+fs_hadron_vars = vc.create_aliases_for_selected(
+    vc.pid + vc.track + vc.mc_truth,
+    'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-# create flat Ntuple for D:du (daughters update)
-toolsDSTdu = ['Kinematics', '^D0 -> ^K- ^pi+']
+d0_vars = vc.create_aliases_for_selected(
+    vc.inv_mass + vc.mc_truth + vc.vertex,
+    'D*+ -> ^D0 pi+', 'D0')
 
-# write out the flat ntuples
-ntupleFile('B2A406-Rave-DecayStringVertexFit.root')
-ntupleTree('dsttree1', 'D*+:1', toolsDST)
-ntupleTree('dsttree2', 'D*+:2', toolsDST)
-ntupleTree('dsttree3', 'D*+:3', toolsDST)
-ntupleTree('d0tree1', 'D0:st', toolsDSTst)
-ntupleTree('d0tree2', 'D0:du', toolsDSTdu)
+dstt = vc.event_meta_data + vc.kinematics + vc.vertex + vc.mc_vertex + vc.flight_info + \
+    vc.create_aliases_for_selected(
+        vc.kinematics,
+        '^D0 -> ^K- ^pi+')
+
+dstu = vc.kinematics + vc.create_aliases_for_selected(
+    vc.kinematics,
+    '^D0 -> ^K- ^pi+')
+
+# Saving variables to ntuple
+output_file = 'B2A406-Rave-DecayStringVertexFit.root'
+variablesToNtuple('D*+:1', dstar_vars + d0_vars + fs_hadron_vars,
+                  filename=output_file, treename='dsttree1')
+variablesToNtuple('D*+:2', dstar_vars + d0_vars + fs_hadron_vars,
+                  filename=output_file, treename='dsttree2')
+variablesToNtuple('D*+:3', dstar_vars + d0_vars + fs_hadron_vars,
+                  filename=output_file, treename='dsttree3')
+variablesToNtuple('D0:st', dstt,
+                  filename=output_file, treename='d0tree1')
+variablesToNtuple('D0:du', dstu,
+                  filename=output_file, treename='d0tree2')
 
 
 # Process the events

@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-from basf2 import *
+import b2test_utils
+import basf2
 from ROOT import Belle2
 from modularAnalysis import *
 
@@ -54,7 +55,7 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
 
 # ISR cc skim
 from skim.quarkonium import ISRpipiccList
-add_skim('ISRpipicc', ISRpipiccList())
+add_skim('ISRpipicc', ISRpipiccList(path=analysis_main))
 
 # BtoPi0Pi0 Skim
 from skim.btocharmless import BtoPi0Pi0List
@@ -197,6 +198,10 @@ from skim.dark import ALP3GammaList
 add_skim('ALP3Gamma', ALP3GammaList(path=analysis_main))
 
 setSkimLogging()
-process(analysis_main)
+
+# process the basf2 path in a temporary directory (so all of the skimmed udst
+# files get cleaned up afterwards).
+with b2test_utils.clean_working_directory():
+    basf2.process(analysis_main, 1)  # just process one event
 
 print(statistics)

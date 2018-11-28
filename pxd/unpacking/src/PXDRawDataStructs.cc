@@ -97,9 +97,7 @@ namespace Belle2 {
     {
       word0.print();
       B2DEBUG(99, "DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << std::hex << trigger_nr_lo << " DHE ID $" << getDHEId() <<
-              " DHP port $"
-              <<
-              getDHPPort());
+              " DHP port $" << getDHPPort());
     };
 
     void dhc_onsen_trigger_frame::print(void) const
@@ -171,8 +169,7 @@ namespace Belle2 {
     {
       word0.print();
       B2DEBUG(99, "DHC End Frame TNRLO $" << std::hex << trigger_nr_lo << " WIEVT $" << std::hex << wordsinevent << " ERR $" << std::hex
-              << errorinfo
-              << " CRC " << std::hex << crc32);
+              << errorinfo << " CRC " << std::hex << crc32);
     };
 
 

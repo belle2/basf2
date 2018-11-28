@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ namespace Belle2::ParticleListName-;
+#pragma link C++ class Belle2::DecayDescriptor-;
 
 #endif

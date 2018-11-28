@@ -30,6 +30,7 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   //Parameter definition
   addParam("InputRootFile", m_input_name, "Name of the input root file", std::string("input_histo.root"));
   addParam("SelectFolders", m_folders, "List of folders for which to process, empty for all", std::vector<std::string>());
+  addParam("SelectHistograms", m_histograms, "List of histograms for which to process, empty for all", std::vector<std::string>());
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -88,6 +89,19 @@ void DQMHistAnalysisInputRootFileModule::event()
       if (h->InheritsFrom("TH2")) h->SetOption("col");
       else h->SetOption("hist");
       std::string hname = h->GetName();
+
+      bool hpass = false;
+      if (m_histograms.size() == 0) {
+        hpass = true;
+      } else {
+        for (auto& wanted_histogram : m_histograms) {
+          if (wanted_histogram == dirname + "/" + hname) {
+            hpass = true;
+            break;
+          }
+        }
+      }
+      if (!hpass) continue;
 
       h->SetName((dirname + "/" + hname).c_str());
       hs.push_back(h);

@@ -50,6 +50,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     std::map<std::string, TCanvas*> m_cs;
     std::vector<std::string> m_folders;
+    std::vector<std::string> m_histograms;
 
     //! Exp number, Run number
     unsigned int m_expno = 0;

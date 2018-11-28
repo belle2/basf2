@@ -40,6 +40,7 @@ from modularAnalysis import ntupleTree
 from modularAnalysis import massKFit
 from stdPi0s import stdPi0s
 
+from vertex import vertexTree
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst-B0D0pi0.root']
 out_put_name = 'mdst-B0D0pi0-TreeFitted.root'
@@ -66,7 +67,8 @@ vertexTree(list_name='B0:all',
            ipConstraint=True,
            # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
            updateAllDaughters=True,  # update momenta off ALL particles
-           massConstraint=[111]  # mass constrain ALL pi0
+           massConstraintUser=[111],
+
            )
 
 # perform MC matching (MC truth association)

@@ -7,58 +7,75 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+#pragma once
 // analysis
 #include <analysis/VariableManager/Manager.h>
 
-// framework
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
+// // framework
+// #include <framework/core/Module.h>
+// #include <framework/datastore/StoreObjPtr.h>
+// #include <framework/datastore/RelationArray.h>
+// #include <framework/datastore/StoreArray.h>
 
-// dataobjects
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/Track.h>
-#include <analysis/dataobjects/Particle.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <framework/gearbox/Const.h>
-#include <top/geometry/TOPGeometryPar.h>
-#include <top/dataobjects/TOPLikelihood.h>
-#include <top/dataobjects/TOPRecBunch.h>
+// // dataobjects
+// #include <tracking/dataobjects/ExtHit.h>
+// #include <mdst/dataobjects/Track.h>
+// #include <analysis/dataobjects/Particle.h>
+// #include <top/dataobjects/TOPDigit.h>
+// #include <framework/gearbox/Const.h>
+// #include <top/geometry/TOPGeometryPar.h>
+// #include <top/dataobjects/TOPLikelihood.h>
+// #include <top/dataobjects/TOPRecBunch.h>
 
-#include <algorithm> // for sort
+// #include <algorithm> // for sort
 using namespace std;
-
+class TVector3;
 namespace Belle2 {
-  // contains a couple of helper functions that are related to TOP variables
-  namespace topDigitVariables {
-    // returns the TOP likelihood that is associated with a given particle
-    const TOPLikelihood* getTOPLikelihood(const Particle* particle);
-
-    // returns the ExtHit that is associated with a given particle
-    const ExtHit* getExtHit(const Particle* particle);
-
-    // returns the TOP slot ID of the particle
-    double getSlotID(const Particle* particle);
-
-    // returns the local coordinate of the particle's entry point to the TOP
-    TVector3 getLocalPosition(const Particle* particle);
-
-    // returns the local coordinates of the particles momentum in the TOP
-    TVector3 getLocalMomentum(const Particle* particle);
-
-    // counts the number of photons in the TOP in a given time frame
-    // if tmin < 0, count from the time of the first photon
-    int countHits(const Particle* particle, double tmin, double tmax, bool clean = true);
-
-    // counts the number of photons regardless of hit quality
-    int countRawHits(const Particle* particle, double tmin, double tmax);
-
-    // returns the expected number of photons for a given hypothesis
-    double getExpectedPhotonCount(const Particle* particle, int pdg = 0);
-
-  }
+  class Particle;
+  class TOPLikelihood;
+  class ExtHit;
   namespace Variable {
+    // contains a couple of helper functions that are related to TOP variables
+    namespace TOPVariable {
+      /**
+       * Returns pointer to related TOPLikelihood or nullptr in case of no relation
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return pointer to TOP likelihood or nullptr
+       */
+      const TOPLikelihood* getTOPLikelihood(const Particle* particle);
+
+      /**
+       * Returns pointer to related ExtHit or nullptr in case of no relation
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return pointer to extrapolated hit at entrance to TOP or nullptr
+       */
+      const ExtHit* getExtHit(const Particle* particle);
+
+      /**
+       * Returns slot ID of a particle at TOP
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return slot ID or 0 if particle doesn't hit any slot
+       */
+      double getSlotID(const Particle* particle);
+
+      // returns the local coordinate of the particle's entry point to the TOP
+      TVector3 getLocalPosition(const Particle* particle);
+
+      // returns the local coordinates of the particles momentum in the TOP
+      TVector3 getLocalMomentum(const Particle* particle);
+
+      // counts the number of photons in the TOP in a given time frame
+      // if tmin < 0, count from the time of the first photon
+      int countHits(const Particle* particle, double tmin, double tmax, bool clean = true);
+
+      // counts the number of photons regardless of hit quality
+      int countRawHits(const Particle* particle, double tmin, double tmax);
+
+      // returns the expected number of photons for a given hypothesis
+      double getExpectedPhotonCount(const Particle* particle, int pdg = 0);
+
+    }
     //! @returns the number of digits in the same module as the particle
     double topDigitCount(const Particle* particle);
 
@@ -113,27 +130,25 @@ namespace Belle2 {
 
     //---------------- TOPRecBunch related --------------------
     //! @returns whether the rec bunch is reconstructed
-    double isTOPRecBunchReconstructed(const Particle* particle);
+    double isTOPRecBunchReconstructed([[maybe_unused]] const Particle* particle);
 
     //! returns the bunch number. Use -9999 to indicate error
-    double TOPRecBunchNumber(const Particle* particle);
+    double TOPRecBunchNumber([[maybe_unused]] const Particle* particle);
 
     //! returns the current offset
-    double TOPRecBunchCurrentOffset(const Particle* particle);
+    double TOPRecBunchCurrentOffset([[maybe_unused]] const Particle* particle);
 
     //! returns the number of tracks in the TOP acceptance
-    double TOPRecBunchTrackCount(const Particle* particle);
+    double TOPRecBunchTrackCount([[maybe_unused]] const Particle* particle);
 
     //! returns the number of tracks used in the bunch reconstruction
-    double TOPRecBunchUsedTrackCount(const Particle* particle);
+    double TOPRecBunchUsedTrackCount([[maybe_unused]] const Particle* particle);
 
     //-------------- Event based -----------------------------------
     //! returns the number of photons in a given slot without cleaning
-    double TOPRawPhotonsInSlot(const Particle* particle, const vector<double>& vars);
+    double TOPRawPhotonsInSlot([[maybe_unused]] const Particle* particle, const vector<double>& vars);
 
     //! returns the number of good photons in a given slot
-    double TOPGoodPhotonsInSlot(const Particle* particle, const vector<double>& vars);
+    double TOPGoodPhotonsInSlot([[maybe_unused]] const Particle* particle, const vector<double>& vars);
   }
-// Create an empty module which allows basf2 to easily find the library and load it from the steering file
-  class EnableTOPDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
 }

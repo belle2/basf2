@@ -14,7 +14,7 @@
 import os
 import basf2
 import variables
-import variableCollections  # collections of variables
+import variables.collections  # collections of variables
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
 from variables import variables as vm  # shorthand name for the VariableManager instance
 
@@ -38,7 +38,7 @@ ma.matchMCTruth('D0', path=mypath)
 # this will write out one row per candidate in the D0 list
 mypath.add_module('VariablesToNtuple',
                   particleList='D0',
-                  variables=['Kinematics', 'MCTruth', 'MyCollection'],
+                  variables=['kinematics', 'mc_truth', 'MyCollection'],
                   fileName='CollectionVariables.root')
 
 # you might also like to uncomment the following, and read the help for the

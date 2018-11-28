@@ -2090,8 +2090,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
-        fillParticleList('pi+:evtkin', '')
-        fillParticleList('gamma:evtkin', '')
+        fillParticleList('pi+:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
 
         if default_cleanup:
@@ -2100,11 +2100,11 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:evtkin', trackCuts)
+            applyCuts('pi+:evtkin', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:evtkin', gammaCuts)
+            applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
             B2INFO("No cleanup in EventKinematics module.")
     else:
@@ -2150,8 +2150,8 @@ def buildEventShape(inputListNames=[],
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
-        fillParticleList('pi+:evtshape', '')
-        fillParticleList('gamma:evtshape', '')
+        fillParticleList('pi+:evtshape', '', path=path)
+        fillParticleList('gamma:evtshape', '', path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
@@ -2160,13 +2160,13 @@ def buildEventShape(inputListNames=[],
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:evtshape', trackCuts)
+            applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:evtshape', gammaCuts)
+            applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
-            B2WARNIG("Creating the default lists with no cleanup. This can be potentially dangerous")
+            B2WARNING("Creating the default lists with no cleanup. This can be potentially dangerous")
     else:
         particleLists = inputListNames
 

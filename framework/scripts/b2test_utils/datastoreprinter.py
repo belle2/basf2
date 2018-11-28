@@ -251,6 +251,7 @@ class PrintObjectsModule(Module):
         super().__init__()
 
     def initialize(self):
+        """Print all untested members if requested"""
         if not self.print_untested:
             return
 

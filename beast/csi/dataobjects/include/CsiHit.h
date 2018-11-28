@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Shift the Hit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) {  m_TimeAve += delta; }
+    void shiftInTime(float delta) override {  m_TimeAve += delta; }
 
 
   private:
@@ -100,7 +100,7 @@ namespace Belle2 {
     float m_TimeAve;   /**< average time */
     float m_TimeVar;   /**< time variance*/
 
-    ClassDef(CsiHit, 3); /**< ClassDef */
+    ClassDefOverride(CsiHit, 3); /**< ClassDef */
 
   };
 

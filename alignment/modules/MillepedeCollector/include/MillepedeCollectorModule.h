@@ -76,6 +76,10 @@ namespace Belle2 {
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
+    /** d(Px,Py,Pz)/d(vx,vy,vz,px,py,pz,theta,phi,M) **/
+    std::pair<TMatrixD, TMatrixD> getLocalToCommonTwoBodyExtParametersTransform(Particle& mother, double motherMass);
+
+
   private:
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
@@ -83,12 +87,26 @@ namespace Belle2 {
     std::vector<std::string> m_particles;
     /** Name of particle list with mothers of daughters to be used with vertex constraint in calibration */
     std::vector<std::string> m_vertices;
-    /** Name of particle list with mothers of daughters to be used with vertex + IP profile constraint in calibration */
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile (+ optional calibration) constraint in calibration */
     std::vector<std::string> m_primaryVertices;
+    /** Name of particle list with mothers of daughters to be used with vertex + mass constraint in calibration */
+    std::vector<std::string> m_twoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile (+ optional calibration) + IP kinematics (+ optional calibration) constraint in calibration */
+    std::vector<std::string> m_primaryTwoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
+    std::vector<std::string> m_primaryMassTwoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
+    std::vector<std::string> m_primaryMassVertexTwoBodyDecays;
+
+    /** Width (in GeV/c/c) to use for invariant mass constraint for 'stable' particles (like K short). Temporary until proper solution is found */
+    double m_stableParticleWidth;
+
     /** Use double (instead of single/float) precision for binary files */
     bool m_doublePrecision;
-    /** Add derivatives for beam spot calibration for primary vertices */
+    /** Add derivatives for beam spot vertex calibration for primary vertices */
     bool m_calibrateVertex;
+    /** Add derivatives for beam spot kinematics calibration for primary vertices */
+    bool m_calibrateKinematics = true;
     /** Minimum p.value for output */
     double m_minPValue;
     /** Whether to use TTree to accumulate GBL data instead of binary files*/

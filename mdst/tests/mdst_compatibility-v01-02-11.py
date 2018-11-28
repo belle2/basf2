@@ -17,6 +17,7 @@ CHANGES since release-01-02-11:
   + hasPulseShapeDiscrimination
   + hasTriggerClusterMatching
   + isTriggerCluster
+  * getCovarianceMatrixAsArray removed
 - KlIds are added
 """
 

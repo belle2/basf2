@@ -52,7 +52,7 @@ vm.addAlias('pxcms', 'useCMSFrame(px)')
 vm.addAlias('pycms', 'useCMSFrame(py)')
 vm.addAlias('pzcms', 'useCMSFrame(pz)')
 vm.addAlias('pecms', 'useCMSFrame(E)')
-variables = ['runNum', 'expNum', 'M', 'px', 'py', 'pz', 'E',
+variables = ['M', 'px', 'py', 'pz', 'E',
              'pxcms', 'pycms', 'pzcms', 'pecms']
 v2nt('A:gen', variables, 'darkphoton', 'test.root', path=testpath)
 v2nt('gamma:gen', variables, 'gammas', 'test.root', path=testpath)
@@ -75,8 +75,8 @@ with TemporaryDirectory() as tmp:
     t1.GetEntry(0)
     t2.GetEntry(0)
 
-    assert t1.runNum == 1337, 'Run number not set correctly'
-    assert t1.expNum == 0, 'Expt number not set correctly'
+    assert t1.__run__ == 1337, 'Run number not set correctly'
+    assert t1.__experiment__ == 0, 'Experiment number not set correctly'
     assert t2.M == 0, 'Photon is not as expected'
 
     # a float is only 7 decimal digits of precision, we might get improvements

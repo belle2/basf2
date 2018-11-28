@@ -144,6 +144,16 @@ namespace Belle2 {
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the angle between clusters associated to the two daughters.
+     * If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters.
+     * If three indices given: returns the angle between the momentum of the third particle's cluster and a vector
+     * which is the sum of the first two daughter's cluster momenta.
+     * Returns nan if any of the daughters specified don't have an associated cluster.
+     * The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.
+     */
+    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the invariant Mass m_ij=sqrt((pi + pj)^2) of the two given daughters
      * The two possible arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      */

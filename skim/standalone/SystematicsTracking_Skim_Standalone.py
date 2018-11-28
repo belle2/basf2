@@ -25,34 +25,34 @@ import glob
 argvs = sys.argv
 argc = len(argvs)
 
+skimpath = Path()
+
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
 
-inputMdstList('MC9', fileList)
-
-stdPi0s('looseFit')
-
-stdPi('loose')
-stdK('loose')
+inputMdstList('MC9', fileList, path=skimpath)
+stdPi('loose', path=skimpath)
+stdK('loose', path=skimpath)
+stdPi0s('loose', path=skimpath)
 
 skimCode = encodeSkimName('SystematicsTracking')
 
 from skim.systematics import SystematicsTrackingList
-SysList = SystematicsTrackingList()
+SysList = SystematicsTrackingList(skimpath)
 if 'Validation' in argvs and argc > 2:
-    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)
+    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList, path=skimpath)
 else:
-    skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+    skimOutputUdst(skimCode, SysList, path=skimpath)
+summaryOfLists(SysList, path=skimpath)
 
 if 'Validation' in argvs:
     if argc > 2:
-        ntupleFile('Validation_%s_%s.root' % (skimCode, argvs[argvs.index('Validation') + 1]))
+        ntupleFile('Validation_%s_%s.root' % (skimCode, argvs[argvs.index('Validation') + 1]), path=skimpath)
     else:
-        ntupleFile('Validation_%s.root' % (skimCode))
+        ntupleFile('Validation_%s.root' % (skimCode), path=skimpath)
 
     toolsb = ['EventMetaData', '^B0']
     toolsb += ['InvMass', '^B0 -> ^D*- pi+']
@@ -61,10 +61,10 @@ if 'Validation' in argvs:
     toolsb += ['MCTruth', '^B0 -> ^D*- pi+']
     toolsb += ['CustomFloats[massDifference(0)]', 'B0 -> ^D*- pi+']
     toolsb += ['CustomFloats[extraInfo(decayModeID)]', 'B0 -> [D*- -> ^anti-D0  pi+] pi+ ']
-    ntupleTree('B0', 'B0:sys0', toolsb)
+    ntupleTree('B0', 'B0:sys0', toolsb, path=skimpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=skimpath)
+process(skimpath)
 
 print(statistics)

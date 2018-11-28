@@ -68,7 +68,7 @@ New users are encouraged to start with this.
 
 .. toctree:: VariableManagerOutput
 
-We also support `NtupleMaker` tools which were developed first.
+We also support :doc:`NtupleMaker` tools which were developed first.
 However we expect to deprecate this method in the next release, and eventually remove.
 The documentation is included here for backward compatibility.
 

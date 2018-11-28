@@ -8,8 +8,8 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-02-01-00:
 - ECLCluster:
-  + getPulseShapeDiscriminationMVA
-
+  + getPulseShapeDiscriminationMVA added
+  - getCovarianceMatrixAsArray removed
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel

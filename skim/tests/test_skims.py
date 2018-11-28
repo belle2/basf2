@@ -3,7 +3,7 @@
 
 import os
 import b2test_utils
-from basf2 import *
+import basf2
 from ROOT import Belle2
 from modularAnalysis import *
 
@@ -199,7 +199,9 @@ add_skim('ALP3Gamma', ALP3GammaList(path=analysis_main))
 
 setSkimLogging()
 
+# process the basf2 path in a temporary directory (so all of the skimmed udst
+# files get cleaned up afterwards).
 with b2test_utils.clean_working_directory():
-    process(analysis_main)
+    basf2.process(analysis_main, 1)  # just process one event
 
 print(statistics)

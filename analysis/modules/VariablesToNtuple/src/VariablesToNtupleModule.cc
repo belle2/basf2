@@ -38,8 +38,7 @@ REG_MODULE(VariablesToNtuple)
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
-  Module(),
-  m_tree("", DataStore::c_Persistent), m_sampling_variable(nullptr)
+  Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");
@@ -60,8 +59,6 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("sampling", m_sampling,
            "Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate.",
            default_sampling);
-
-  m_file = nullptr;
 }
 
 void VariablesToNtupleModule::initialize()

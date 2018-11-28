@@ -1565,8 +1565,6 @@ arguments. Operator precedence is taken into account. For example::
     (daughter(0, E) + daughter(1, E))**2 - p**2 + 0.138
 
 )DOCSTRING");
-                      "Currently only supports one level of round parentheses () in variable names,"
-                      " i.e. passesCut(cut) as an input variable will fail if the cut also contains ( or ).");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
                       "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");

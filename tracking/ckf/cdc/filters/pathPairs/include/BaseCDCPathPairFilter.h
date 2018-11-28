@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <memory>
+#include <utility>
 
 namespace Belle2 {
   /// Base filter for CKF CDC paths

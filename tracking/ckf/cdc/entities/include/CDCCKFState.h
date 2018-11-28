@@ -21,7 +21,7 @@
 
 namespace Belle2 {
 
-  /// Define states for CKF algorith, which can be seed track or CDC wire hit.
+  /// Define states for CKF algorithm, which can be seed track or CDC wire hit.
   class CDCCKFState {
   public:
     /// constructor from the seed recoTrack and genfit trackState
@@ -72,7 +72,7 @@ namespace Belle2 {
     }
 
     /// Set right-left info for the hit
-    void setRLinfo(const  TrackFindingCDC::ERightLeft rl)
+    void setRLinfo(const TrackFindingCDC::ERightLeft& rl)
     {
       m_rl = rl;
     }

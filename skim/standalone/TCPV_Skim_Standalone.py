@@ -8,7 +8,7 @@
 #
 ######################################################
 """
-Time dependent CP violation skim  for the analysis of TDCPV analysis in WG3 .
+Time dependent CP violation skim for the analysis of TDCPV analysis in WG3 .
 Physics channels : bd → qqs and bd → ccs .
 Skim code : 13160100
 for analysis users we will reconstruct again in the analysis steering file
@@ -55,7 +55,6 @@ import sys
 import os
 import glob
 skimCode = encodeSkimName('TCPV')
-
 
 # create a path
 tcpvskimpath = Path()

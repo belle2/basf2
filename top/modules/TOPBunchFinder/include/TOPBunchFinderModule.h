@@ -20,11 +20,9 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 
 namespace Belle2 {
-
-  class CDCDedxLikelihood;
-  class VXDDedxLikelihood;
 
   /**
    * Bunch finder: searches for the bunch crossing where the interaction happened
@@ -43,30 +41,28 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
     /**
      * Return mass of the most probable charged stable particle according to dEdx
      * and predefined prior probabilities
-     * @param cdcdedx dE/dx likelihoods from CDC
-     * @param vxddedx dE/dx likelihoods from VXD
+     * @param track reconstructed track
      * @return mass
      */
-    double getMostProbableMass(const CDCDedxLikelihood* cdcdedx,
-                               const VXDDedxLikelihood* vxddedx);
+    double getMostProbableMass(const Track& track);
 
     // steering parameters
     int m_numBins;      /**< number of bins to which search region is divided */
@@ -84,6 +80,7 @@ namespace Belle2 {
     bool m_addOffset; /**< add running average offset to bunch time */
     double m_bias; /**< bias to be subtracted */
     int m_bunchesPerSSTclk; /**< number of bunches per SST clock */
+    bool m_usePIDLikelihoods; /**< if true, use PIDLikelihoods (only on cdst files) */
 
     // internal variables shared between events
     double m_bunchTimeSep; /**< time between two filled bunches */
@@ -93,12 +90,14 @@ namespace Belle2 {
     unsigned m_eventCount = 0; /**< event counter */
     unsigned m_processed = 0; /**< processed events */
     unsigned m_success = 0; /**< events with reconstructed bunch */
+    int m_nodEdxCount = 0; /**< counter of tracks with no dEdx, reset at each event */
 
     // collections
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
     StoreArray<TOPRawDigit> m_topRawDigits; /**< collection of TOP raw digits */
     StoreArray<Track> m_tracks; /**< collection of tracks */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
+    StoreObjPtr<MCInitialParticles> m_initialParticles; /**< simulated beam particles */
 
   };
 

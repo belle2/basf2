@@ -44,10 +44,10 @@ void NtupleMCVertexTool::deallocateMemory()
   for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++)
     delete [] m_fTruthProdV[iProduct];
   delete [] m_fTruthProdV;
-  delete m_fTruthRho;
-  delete m_fTruthZ;
-  delete m_fTruthY;
-  delete m_fTruthX;
+  delete [] m_fTruthRho;
+  delete [] m_fTruthZ;
+  delete [] m_fTruthY;
+  delete [] m_fTruthX;
 }
 
 void NtupleMCVertexTool::eval(const Particle* particle)

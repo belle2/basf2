@@ -123,8 +123,8 @@ namespace Belle2 {
      */
     class ECLBaseCompress: public ECLCompress {
     public:
-      void compress(BitStream& out, const int* adc);
-      void uncompress(BitStream& out, int* adc);
+      void compress(BitStream& out, const int* adc) override;
+      void uncompress(BitStream& out, int* adc) override;
     };
 
     /** ECL waveform compression/decompression to/from the BitStream
@@ -132,8 +132,8 @@ namespace Belle2 {
      */
     class ECLDeltaCompress: public ECLCompress {
     public:
-      void compress(BitStream& out, const int* adc);
-      void uncompress(BitStream& out, int* adc);
+      void compress(BitStream& out, const int* adc) override;
+      void uncompress(BitStream& out, int* adc) override;
     };
 
     /** ECL waveform compression/decompression to/from the BitStream
@@ -147,8 +147,8 @@ namespace Belle2 {
        *  @w DCT coefficient probability density based bit widths for quantized coefficients
        */
       ECLDCTCompress(double scale, double c0, width_t* w);
-      void compress(BitStream& out, const int* adc);
-      void uncompress(BitStream& out, int* adc);
+      void compress(BitStream& out, const int* adc) override;
+      void uncompress(BitStream& out, int* adc) override;
     protected:
       const double m_scale; /**< Scale factor for quantization. */
       const double m_c0; /**< Average waveform amplitude */

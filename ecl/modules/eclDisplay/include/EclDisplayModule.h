@@ -51,28 +51,28 @@ namespace Belle2 {
     /**
      * Initialize EclChannelMapper.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Empty method.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Handle event. Loads events into EclData and updates EclFrame
      * if m_autoDisplay flag is set.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Empty method.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Wait till EclFrame is closed then free allocated resources.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /**
@@ -113,6 +113,6 @@ namespace Belle2 {
      */
     void handleClosedFrame();
 
-    ClassDef(EclDisplayModule, 0)
+    ClassDefNV(EclDisplayModule, 0)
   };
 }

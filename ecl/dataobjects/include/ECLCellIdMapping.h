@@ -55,7 +55,7 @@ namespace Belle2 {
     }
 
     /** Set celld id to neighbour5*/
-    void setCellIdToNeighbour5(const int& cellid, std::vector<short int> neighbours)
+    void setCellIdToNeighbour5(const int& cellid, const std::vector<short int>& neighbours)
     {
       if (cellid > 0 and cellid < c_nECLCellIds + 1) {
         m_CellIdToNeighbours5[cellid] = neighbours;
@@ -65,7 +65,7 @@ namespace Belle2 {
     }
 
     /** Set celld id to neighbour7*/
-    void setCellIdToNeighbour7(const int& cellid, std::vector<short int> neighbours)
+    void setCellIdToNeighbour7(const int& cellid, const std::vector<short int>& neighbours)
     {
       if (cellid > 0 and cellid < c_nECLCellIds + 1) {
         m_CellIdToNeighbours7[cellid] = neighbours;

@@ -88,6 +88,8 @@ namespace Belle2 {
     int getFwICNCluster(int ICNId, int);///0 : center , 1; upper , 2: right , 3: lower , 4: lower right
     /** Output # of cluster */
     int getNofCluster() {return _BRICN + _FWDICN + _BWDICN;}
+    /** get # Cluster in case of exceeding limit*/
+    int getNofExceedCluster();
 
 
     //

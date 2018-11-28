@@ -35,10 +35,10 @@ namespace Belle2 {
     eclGammaGammaECollectorModule();
 
     /** Define histograms and read payloads from DB */
-    void prepare();
+    void prepare() override;
 
     /** Select events and crystals and accumulate histograms */
-    void collect();
+    void collect() override;
 
   private:
     /** Parameters to control the job */

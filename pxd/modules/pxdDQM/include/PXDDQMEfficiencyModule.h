@@ -54,22 +54,22 @@ namespace Belle2 {
     /**
      * main function which fills trees and histograms
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * initializes the need store arrays, trees and histograms
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * actually defines the trees and histograms
      */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /**
      * Do the initialization here
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
 
 

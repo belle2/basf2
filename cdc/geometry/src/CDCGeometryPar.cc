@@ -91,6 +91,13 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     }
   }
 
+  if (gcp.getFFactorInputType()) {
+    m_fFactorFromDB = new DBObjPtr<CDCFudgeFactorsForSigma>;
+    if ((*m_fFactorFromDB).isValid()) {
+      (*m_fFactorFromDB).addCallback(this, &CDCGeometryPar::setFFactor);
+    }
+  }
+
   if (gcp.getChMapInputType()) {
     m_chMapFromDB = new DBArray<CDCChannelMap>;
     if ((*m_chMapFromDB).isValid()) {
@@ -118,6 +125,13 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
       if ((*m_misalignmentFromDB).isValid()) {
         (*m_misalignmentFromDB).addCallback(this, &CDCGeometryPar::setWirPosMisalignParams);
       }
+    }
+  }
+
+  if (gcp.getEDepToADCInputType()) {
+    m_eDepToADCConversionsFromDB = new DBObjPtr<CDCEDepToADCConversions>;
+    if ((*m_eDepToADCConversionsFromDB).isValid()) {
+      (*m_eDepToADCConversionsFromDB).addCallback(this, &CDCGeometryPar::setEDepToADCConversions);
     }
   }
 
@@ -398,6 +412,13 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
       readSigma(gbxParams);  //Read sigma params. (from file)
     }
 
+    if (gcp.getFFactorInputType()) {
+      B2DEBUG(100, "CDCGeometryPar: Read fudge factors from DB");
+      setFFactor();  //Set fudge factors (from DB)
+    } else {
+      readFFactor(gbxParams);  //Read fudge factors (from file)
+    }
+
     if (gcp.getPropSpeedInputType()) {
       B2DEBUG(100, "CDCGeometryPar: Read prop-speed from DB");
       setPropSpeed();  //Set prop-speed (from DB)
@@ -433,6 +454,13 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
       readTW(gbxParams);  //Read time-walk coeffs. (from file)
     }
     B2DEBUG(100, "CDCGeometryPar: Time-walk param. mode= " << m_twParamMode);
+
+    if (gcp.getEDepToADCInputType()) {
+      B2DEBUG(29, "CDCGeometryPar: Read EDepToADC from DB");
+      setEDepToADCConversions(); //Set edep-to-adc (from DB)
+    } else {
+      readEDepToADC(gbxParams);  //Read edep-to-adc params. (from file)
+    }
   }
 
   m_XTetc4Recon = 0;
@@ -925,6 +953,18 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
 }
 
 
+// Read fudge factors
+void CDCGeometryPar::readFFactor(const GearDir gbxParams, const int mode)
+{
+  B2WARNING("CDCGeometryPar: readFFactor is not ready!");
+  std::string fileName0 = CDCGeoControlPar::getInstance().getFFactorFile();
+  if (mode == 1) {
+    fileName0 = gbxParams.getString("fudgeFactorFileName");
+  }
+  //TODO; implement the following part.
+}
+
+
 // Read propagation speed param.
 void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 {
@@ -1027,6 +1067,8 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
                                       ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
   ifs.close();
+
+  calcMeanT0();
 }
 
 
@@ -1136,15 +1178,120 @@ void CDCGeometryPar::readChMap()
 }
 
 
+// Read edep-to-adc
+void CDCGeometryPar::readEDepToADC(const GearDir gbxParams, const int mode)
+{
+  //  B2WARNING("CDCGeometryPar: readEDepToADC is not ready!");
+  std::string fileName0 = CDCGeoControlPar::getInstance().getEDepToADCFile();
+  if (mode == 1) {
+    fileName0 = gbxParams.getString("fudgeFactorFileName");
+  }
+
+  ifstream ifs;
+  //  openFileA(ifs, fileName0);
+  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName1, true);
+
+  if (fileName == "") {
+    fileName = FileSystem::findFile(fileName0, true);
+  }
+
+  if (fileName == "") {
+    B2FATAL("CDC::openFile: " << fileName0 << " not exist!");
+  } else {
+    //    B2INFO("CDC::openFile: open " << fileName);
+    B2DEBUG(29, "CDC::openFile: open " << fileName);
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDC::openFile: cannot open " << fileName << " !");
+  }
+
+  unsigned short paramMode(0), nParams(0);
+  ifs >> paramMode >> nParams;
+  if (paramMode > 0) B2FATAL("Param mode > 0!");
+  if (nParams > 4)   B2FATAL("No. of params. > 4!");
+  unsigned short groupId(0);
+  ifs >> groupId;
+  B2DEBUG(29, paramMode << " " << nParams << " " << groupId);
+  if (groupId > 0) B2FATAL("GgroupId > 0!");
+
+
+  unsigned short cLMin[nSuperLayers], cLMax[nSuperLayers]; //min and max clayer per super-layer
+  cLMin[0] = 0;
+  cLMax[0] = 7;
+  for (unsigned int sl = 1; sl < nSuperLayers; ++sl) {
+    cLMin[sl] = cLMax[0] + 6 * sl - 5;
+    cLMax[sl] = cLMax[0] + 6 * sl;
+  }
+  int nCell[56] = {160, 160, 160, 160, 160, 160, 160, 160,
+                   160, 160, 160, 160, 160, 160,
+                   192, 192, 192, 192, 192, 192,
+                   224, 224, 224, 224, 224, 224,
+                   256, 256, 256, 256, 256, 256,
+                   288, 288, 288, 288, 288, 288,
+                   320, 320, 320, 320, 320, 320,
+                   352, 352, 352, 352, 352, 352,
+                   384, 384, 384, 384, 384, 384
+                  }; //no. of cells in clayer
+
+  unsigned short id = 0;
+  double coef = 0.;
+  unsigned short nRead = 0;
+  while (ifs >> id) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      ifs  >> coef;
+      for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
+        for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
+          m_eDepToADCParams[cL][cell][i] = coef;
+          //    B2DEBUG(29, "cL,cell,i,coef= "<< cL <<" "<< cell <<" "<< i <<" "<< coef);
+        }
+      }
+    }
+    ++nRead;
+    if (nRead > nSuperLayers) B2FATAL("No. of read in lines > " << nSuperLayers << " !");
+  }
+
+  ifs.close();
+}
+
+
 // Set t0 (from DB)
 void CDCGeometryPar::setT0()
 {
+  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+    for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
+      m_t0[iCL][iW] = 0.;
+    }
+  }
+
   for (auto const& ent : (*m_t0FromDB)->getT0s()) {
     const WireID wid = WireID(ent.first);
     const unsigned short iCL = wid.getICLayer();
     const unsigned short iW  = wid.getIWire();
     m_t0[iCL][iW]            = ent.second;
   }
+
+  calcMeanT0();
+}
+
+
+// Calculate mean t0
+void CDCGeometryPar::calcMeanT0()
+{
+  B2DEBUG(29, "calcMeanT0 start");
+  unsigned short nw = 0;
+  m_meanT0 = 0.;
+  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+    for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
+      if (m_t0[iCL][iW] == 0.) continue;
+      const WireID wid = WireID(iCL, iW);
+      if (isBadWire(wid)) continue;
+      //TODO try to reject strage t0s more
+      ++nw;
+      m_meanT0 += m_t0[iCL][iW];
+    }
+  }
+  if (nw > 0) m_meanT0 /= nw;
+  B2DEBUG(29, "calcMeanT0 end");
 }
 
 
@@ -1152,6 +1299,7 @@ void CDCGeometryPar::setT0()
 void CDCGeometryPar::setBadWire()
 {
   m_badWire = (*m_badWireFromDB)->getWires();
+  calcMeanT0();
 }
 
 
@@ -1272,6 +1420,36 @@ void CDCGeometryPar::setSResol()
 }
 
 
+// Set fudge factors (from DB)
+void CDCGeometryPar::setFFactor()
+{
+  unsigned short groupId = (*m_fFactorFromDB)->getGroupID();
+  unsigned short nEnt    = (*m_fFactorFromDB)->getEntries();
+  B2DEBUG(29, "setFFactor called: groupId,nEnt= " << groupId << " " << nEnt);
+
+  if (groupId == 0) { //per all-layers mode
+  } else {
+    B2FATAL("CDCGeometryPar:: Invalid group-id " << groupId << " specified!");
+  }
+
+  for (unsigned short id = 0; id < nEnt; ++id) {
+    unsigned short np = ((*m_fFactorFromDB)->getFactors(id)).size();
+    if (np != 3) B2FATAL("CDCGeometryPar:: No. of fudge factors != 3!");
+    if (groupId == 0) { //per all-layers
+      for (unsigned short i = 0; i < np; ++i) {
+        m_fudgeFactorForSigma[i] = ((*m_fFactorFromDB)->getFactors(id))[i];
+        B2DEBUG(29, i << " " << m_fudgeFactorForSigma[i]);
+      }
+    }
+  }
+
+  CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+  m_fudgeFactorForSigma[0] *= gcp.getAddFudgeFactorForSigmaForData();
+  m_fudgeFactorForSigma[1] *= gcp.getAddFudgeFactorForSigmaForMC();
+  B2DEBUG(29, "fudge factors= " << m_fudgeFactorForSigma[0] << " " << m_fudgeFactorForSigma[1] << " " << m_fudgeFactorForSigma[2]);
+}
+
+
 // Set ch-map (from DB)
 void CDCGeometryPar::setChMap()
 {
@@ -1284,6 +1462,104 @@ void CDCGeometryPar::setChMap()
     const WireID wID(isl, il, iw);
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iBd));
   }
+}
+
+// Set edep-to-ADC conversion params. (from DB)
+void CDCGeometryPar::setEDepToADCConversions()
+{
+  unsigned short groupId = (*m_eDepToADCConversionsFromDB)->getGroupID();
+  unsigned short nEnt    = (*m_eDepToADCConversionsFromDB)->getEntries();
+  if (groupId == 0) { //per super-layer mode
+    if (nEnt > nSuperLayers) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
+  } else if (groupId == 1) { //per layer mode
+    if (nEnt > MAX_N_SLAYERS) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
+  } else {
+    B2FATAL("CDCGeometryPar:: Invalid group-id " << groupId << " specified !");
+  }
+
+  unsigned short cLMin[nSuperLayers], cLMax[nSuperLayers]; //min and max clayer per super-layer
+  cLMin[0] = 0;
+  cLMax[0] = 7;
+  for (unsigned int sl = 1; sl < nSuperLayers; ++sl) {
+    cLMin[sl] = cLMax[0] + 6 * sl - 5;
+    cLMax[sl] = cLMax[0] + 6 * sl;
+  }
+  int nCell[56] = {160, 160, 160, 160, 160, 160, 160, 160,
+                   160, 160, 160, 160, 160, 160,
+                   192, 192, 192, 192, 192, 192,
+                   224, 224, 224, 224, 224, 224,
+                   256, 256, 256, 256, 256, 256,
+                   288, 288, 288, 288, 288, 288,
+                   320, 320, 320, 320, 320, 320,
+                   352, 352, 352, 352, 352, 352,
+                   384, 384, 384, 384, 384, 384
+                  }; //no. of cells in clayer
+
+  for (unsigned short id = 0; id < nEnt; ++id) {
+    unsigned short np = ((*m_eDepToADCConversionsFromDB)->getParams(id)).size();
+    if (np > 4) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 4");
+    if (groupId == 0) { //per super-layer; id=super-layer
+      for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
+        for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
+          for (unsigned short i = 0; i < np; ++i) {
+            m_eDepToADCParams[cL][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
+          }
+        }
+      }
+    } else if (groupId == 1) { //per clayer; id=clayer
+      for (unsigned short cell = 0; cell < nCell[id]; ++cell) { //cell loop
+        for (unsigned short i = 0; i < np; ++i) {
+          m_eDepToADCParams[id][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
+        }
+      }
+    } else if (groupId == 2) { //per wire
+      //not ready
+      B2FATAL("CDCGeometryPar::setEDepToADCConversions(): groupId=2 not ready!");
+    }
+  }
+}
+
+
+double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short iW, double edep, double dx, double costh)
+{
+  //  double convF = (100.0 / 3.2); //keV -> count
+  //Model assumed here is from CLEO-c:
+  //Igen = Imea * [1 + alf*Imea/cth] / [1 + gam*Imea/cth];
+  //cth = |costh| + dlt;
+  //Igen: original dE/dx; Imea: measured dE/dx with space-charge effect
+  const double  mainF = m_eDepToADCParams[iCL][iW][0];
+  const double& alf   = m_eDepToADCParams[iCL][iW][1];
+  const double& gam   = m_eDepToADCParams[iCL][iW][2];
+  const double& dlt   = m_eDepToADCParams[iCL][iW][3];
+  const double cth  = fabs(costh) + dlt;
+  const double iGen = edep / dx; // keV/cm
+  const double tmp  = cth - gam * iGen;
+  const double disc = tmp * tmp + 4.*alf * cth * iGen;
+
+  double iMea = 0.;
+  if (alf == 0.) {
+    iMea = cth * iGen / tmp;
+  } else if (disc >= 0.) {
+    iMea = (-tmp + sqrt(disc)) / (2.*alf);
+    //    if (alf < 0.) {
+    //      B2INFO("alf<0:CHECK");
+    //      B2INFO(-tmp + sqrt(disc)) / (2.*alf));
+    //      B2INFO(-tmp - sqrt(disc)) / (2.*alf));
+    //    }
+  }
+
+  double convF = mainF;
+  if (iMea > 0.) {
+    convF = mainF * std::min(iMea / iGen, 1.);
+    //    if (iMea > iGen) B2DEBUG(29, "iMea > iGen " << iMea <<" "<< iGen);
+  } else {
+    //TODO: check the following issue more
+    //    B2WARNING("CDCGeometryPar: Measured dE/dx <= 0!");
+    //    B2DEBUG(29, "CDCGeometryPar: Measured dE/dx <= 0!" << std::endl;
+    //    B2DEBUG(29, "iGen,iMea= " << std::setw(15) << std::scientific << std::setprecision(8) << iGen <<" "<< iMea);
+    //    B2DEBUG(29, "dx,mainF,alf,gam,dlt,cth,tmp,disc= " << dx <<" "<< mainF <<" "<< alf <<" "<< gam <<" "<< dlt <<" "<<" "<< tmp <<" "<< disc);
+  }
+  return convF;
 }
 
 

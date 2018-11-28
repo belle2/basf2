@@ -35,11 +35,11 @@ namespace Belle2 {
 
       // virtual ~PXDRawDQMChipsModule();
 
-      virtual void initialize();
+      virtual void initialize() override;
 
-      virtual void beginRun();
+      virtual void beginRun() override;
 
-      virtual void event();
+      virtual void event() override;
 
     private:
 
@@ -55,7 +55,7 @@ namespace Belle2 {
       /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge[eNumSensors][eNumSwitcher][eNumDCD];
 
-      virtual void defineHisto();
+      virtual void defineHisto() override;
 
     };//end class declaration
 

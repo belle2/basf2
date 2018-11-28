@@ -7,7 +7,6 @@ Simple example for testing the SVDCalibrationMonitorModule
 """
 
 from basf2 import *
-# from svd.testbeam_utils import *
 import ROOT
 
 import argparse
@@ -18,8 +17,9 @@ import subprocess
 from fnmatch import fnmatch
 
 parser = argparse.ArgumentParser(description="SVD Calibration Monitor")
+GLOBAL_TAG = "data_reprocessing_prod6"
 
-# 2017 testbeam
+# 2017 testbeam - WILL NOT WORK
 parser.add_argument('--TB-magnet-on', dest='TB_magnet_on', action='store_const', const=True, default=False, help='testbeam run 400')
 parser.add_argument(
     '--TB-magnet-off',
@@ -52,9 +52,9 @@ if(args.TB_magnet_on or args.TB_magnet_off):
         geom = 1
 else:
     #    reset_database()
-    #    use_database_chain()
-    use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
-#    use_local_database("localDB/database.txt")
+    use_database_chain()
+    use_central_database(GLOBAL_TAG)
+#    use_local_database("localDB/database.txt",invertLogging=True)
     RunList = args.run
     ExpList = args.exp
     filename = "SVDCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
@@ -70,6 +70,7 @@ main.add_module(eventinfosetter)
 
 if(args.TB_magnet_on or args.TB_magnet_off):
     main.add_module('Gearbox')
+    # the following line will not work, as testbeam package is not in basf2
     add_geometry(main, magnet=True, field_override=None, target=None, geometry_version=geom)
 else:
     main.add_module("Gearbox")

@@ -1,13 +1,13 @@
+# coding: utf-8
+
 import basf2
-from svd import *
-import ROOT
-from ROOT import Belle2
 import b2test_utils
+from svd import add_svd_unpacker, add_svd_reconstruction
 
 # ====================================================================
 # Here we test the following behaviour of SVDUnpacker:
-# 1. In case there is a pre-existing non-empty StoreArray of SVDDigits
-#    or SVDShaperDigits, the unpacker throws B2FATAL unless the
+# 1. In case there is a pre-existing non-empty StoreArray of
+#    SVDShaperDigits, the unpacker throws B2FATAL unless the
 #    silentAppend parameter of the module is set.
 #    RATIONALE: This situation leads to unsorted digit arrays, and
 #    it can occur by error easily (by forgetting to exclude digits from
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
         basf2.B2INFO('Test 1. \nBehaviour with residual digits\n')
 
-        basf2.B2INFO('1/6 \nSet up: Using ParticleGun and SVDPacker, we generate\n' +
+        basf2.B2INFO('1/5 \nSet up: Using ParticleGun and SVDPacker, we generate\n' +
                      'a file with RawSVDs and residual digits.')
 
         create_input = basf2.create_path()
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         create_input.add_module('ParticleGun')
         create_input.add_module('FullSim')
 
-        create_input.add_module('SVDDigitizer', GenerateDigits=True)
+        create_input.add_module('SVDDigitizer')
         create_input.add_module('SVDPacker')
         create_input.add_module('RootOutput', outputFileName='rawPlusDigits.root')
         with b2test_utils.show_only_errors():
@@ -50,27 +50,11 @@ if __name__ == "__main__":
         test_successful = test_successful and (result == 0)
         basf2.B2INFO('Generation {0}.\n'.format(test_message[result]))
 
-        basf2.B2INFO('2/6\nRead using default settings of SVDUnpacker.' +
-                     '\nWe should see FATAL with message for SVDDigits.')
-
-        read_digits_default = basf2.create_path()
-        read_digits_default.add_module('RootInput', inputFileName='rawPlusDigits.root')
-        read_digits_default.add_module('Gearbox')
-        read_digits_default.add_module('Geometry', components=['MagneticField', 'SVD'])
-        read_digits_default.add_module('SVDUnpacker', GenerateOldDigits=True)
-        add_svd_reconstruction(read_digits_default)
-
-        with b2test_utils.show_only_errors():
-            result = b2test_utils.safe_process(read_digits_default)
-
-        test_successful = test_successful and (result == 1)
-        basf2.B2INFO('Test {0}.\n'.format(test_message[1 - result]))
-
-        basf2.B2INFO('3/6\nRead shaper digits using default settings of SVDUnpacker.' +
+        basf2.B2INFO('2/5\nRead shaper digits using default settings of SVDUnpacker.' +
                      '\nWe should see FATAL with message for SVDShaperDigits.')
 
         read_shapers_default = basf2.create_path()
-        read_shapers_default.add_module('RootInput', inputFileName='rawPlusDigits.root', excludeBranchNames=['SVDDigits'])
+        read_shapers_default.add_module('RootInput', inputFileName='rawPlusDigits.root')
         read_shapers_default.add_module('Gearbox')
         read_shapers_default.add_module('Geometry', components=['MagneticField', 'SVD'])
         read_shapers_default.add_module('SVDUnpacker')
@@ -82,7 +66,7 @@ if __name__ == "__main__":
         test_successful = test_successful and (result == 1)
         basf2.B2INFO('Test {0}.\n'.format(test_message[1 - result]))
 
-        basf2.B2INFO('4/6\nRead the safe way, excluding branches.\nWe should see no errors.')
+        basf2.B2INFO('3/5\nRead the safe way, excluding branches.\nWe should see no errors.')
 
         read_safe_way = basf2.create_path()
         read_safe_way.add_module('RootInput',
@@ -99,7 +83,7 @@ if __name__ == "__main__":
         test_successful = test_successful and (result == 0)
         basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
 
-        basf2.B2INFO('5/6\nRead with the Unpacker silentlyAppend switch on.\n' +
+        basf2.B2INFO('4/5\nRead with the Unpacker silentlyAppend switch on.\n' +
                      'We also include the SVDShaperDigitSorter.\n' +
                      'We should see no errors.')
 
@@ -119,7 +103,7 @@ if __name__ == "__main__":
         test_successful = test_successful and (result == 0)
         basf2.B2INFO('Test {0}.\n'.format(test_message[result]))
 
-        basf2.B2INFO('6/6\nRead with the Unpacker silentAppend switch on.\n' +
+        basf2.B2INFO('5/5\nRead with the Unpacker silentAppend switch on.\n' +
                      'We don\'t include the SVDShaperDigitSorter.\n' +
                      'THERE WILL BE NO ERRORS, but digits and clusters may be duplicated!')
 
@@ -150,9 +134,7 @@ if __name__ == "__main__":
         unpack_with_data.add_module(
             'RootInput',
             inputFileName='rawPlusDigits.root',
-            excludeBranchNames=[
-                'SVDDigits',
-                'SVDShaperDigits'])
+            excludeBranchNames=['SVDShaperDigits'])
         unpack_with_data.add_module('Gearbox')
         unpack_with_data.add_module('Geometry', components=['MagneticField', 'SVD'])
         add_svd_unpacker(unpack_with_data)

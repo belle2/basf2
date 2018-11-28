@@ -130,13 +130,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Nominal quantum efficiency") const;
+    void print(const std::string& title = "Nominal quantum efficiency") const override;
 
 
   private:
@@ -146,7 +146,7 @@ namespace Belle2 {
     float m_CE = 0;          /**< collection efficiency */
     std::vector<float> m_QE; /**< QE data points */
 
-    ClassDef(TOPNominalQE, 1); /**< ClassDef */
+    ClassDefOverride(TOPNominalQE, 1); /**< ClassDef */
 
   };
 

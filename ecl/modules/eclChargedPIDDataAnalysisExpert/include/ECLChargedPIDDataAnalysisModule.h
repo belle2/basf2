@@ -57,19 +57,19 @@ namespace Belle2 {
     virtual ~ECLChargedPIDDataAnalysisModule();
     /** Initializes the Module.
      */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Called once before a new run begins.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
     /** Called once for each event.
      */
-    virtual void event();
+    virtual void event() override;
     /** Called once when a run ends.
      */
-    virtual void endRun();
+    virtual void endRun() override;
     /** Termination action.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

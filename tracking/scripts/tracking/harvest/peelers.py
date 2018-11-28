@@ -83,9 +83,9 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
         nan = float('nan')
         return dict(
             # At origin assuming perfect magnetic field
-            omega_truth=nan,
-            phi0_truth=nan,
             d0_truth=nan,
+            phi0_truth=nan,
+            omega_truth=nan,
             z0_truth=nan,
             tan_lambda_truth=nan,
 
@@ -97,6 +97,14 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             x_truth=nan,
             y_truth=nan,
             z_truth=nan,
+
+            decay_vertex_radius_truth=nan,
+            decay_vertex_x_truth=nan,
+            decay_vertex_y_truth=nan,
+            decay_vertex_z_truth=nan,
+            number_of_daughters_truth=nan,
+            status_truth=nan,
+
 
             # MC Particle information
             charge_truth=nan,
@@ -119,7 +127,7 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
         n_cdc_hits = reco_track.getNumberOfCDCHits()
         n_svd_hits = reco_track.getNumberOfSVDHits()
         n_pxd_hits = reco_track.getNumberOfPXDHits()
-        ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
+        ndf = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
 
         pxd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getPXDHitList()]
         if pxd_hits:
@@ -206,7 +214,7 @@ def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}")
         return dict(
             has_vxdtf2_failure_flag=False,
             has_unspecified_trackfinding_failure=False,
-             )
+        )
     return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
                 )
@@ -265,7 +273,7 @@ def peel_fit_status(reco_track, key="{part_name}"):
             for crop in crops.keys():
                 if crop.startswith("fit_"):
                     particle_name = crop.split("_")[1]
-                    if getattr(Belle2.Const, particle_name).getPDGCode() == pdg_code:
+                    if abs(getattr(Belle2.Const, particle_name).getPDGCode()) == abs(pdg_code):
                         crops[crop] = was_successful
 
                         if was_successful:
@@ -350,6 +358,8 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_variance=nan,
             pt_resolution=nan,
 
+            b_field=nan,
+
             px_estimate=nan,
             px_variance=nan,
             py_estimate=nan,
@@ -363,6 +373,13 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
     return fit_crops
 
 
+def get_reco_hit_information(reco_track, hit):
+    """Helper function for getting the correct reco hit info"""
+    for info in hit.getRelationsFrom("RecoHitInformations"):
+        if info.getRelatedFrom(reco_track.getArrayName()) == reco_track:
+            return info
+
+
 # Custom peel function to get the sub detector hit efficiencies
 @format_crop_keys
 def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"):
@@ -371,19 +388,28 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
             hit_efficiency = float("nan")
         else:
             mc_reco_hits = getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()
-            mc_reco_hit_size = mc_reco_hits.size()
-
-            if mc_reco_hit_size == 0:
+            if mc_reco_hits.size() == 0:
                 hit_efficiency = float('nan')
             else:
+                mc_reco_hit_size = 0
                 hit_efficiency = 0.
                 for mc_reco_hit in mc_reco_hits:
+                    info = get_reco_hit_information(mc_reco_track, mc_reco_hit)
+
+                    if info.getFoundByTrackFinder() == Belle2.RecoHitInformation.c_MCTrackFinderAuxiliaryHit:
+                        continue
+
+                    mc_reco_hit_size += 1
+
                     for reco_hit in getattr(reco_track, "get{}HitList".format(detector_string.upper()))():
                         if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
                             hit_efficiency += 1
                             break
 
-                hit_efficiency /= mc_reco_hit_size
+                if not mc_reco_hit_size:
+                    hit_efficiency = float('nan')
+                else:
+                    hit_efficiency /= mc_reco_hit_size
 
         return {"{}_hit_efficiency".format(detector_string.lower()): hit_efficiency}
 

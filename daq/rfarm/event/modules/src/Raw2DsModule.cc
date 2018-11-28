@@ -188,11 +188,11 @@ void Raw2DsModule::registerRawCOPPERs()
       continue;
     } else if (store_time_flag == 0) {
       // Tentative until RawFTSW data stream is established. 2018.5.28
-      StoreArray<RawCOPPER> ary;
-      RawCOPPER* copper = ary.appendNew();
-      copper->SetBuffer(cprbuf, nwds_buf, false, 1, 1); // buffer will be deleted by the destructor of Raw***, which is set later
-      utime = (unsigned int)(copper->GetTTUtime(0));
-      ctime = (unsigned int)(copper->GetTTCtime(0));
+      // Not store RawCOPPER here. 2018.11.23
+      RawCOPPER tempcpr_time;
+      tempcpr_time.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
+      utime = (unsigned int)(tempcpr_time.GetTTUtime(0));
+      ctime = (unsigned int)(tempcpr_time.GetTTCtime(0));
       mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
       store_time_flag = 1;
     }
@@ -233,8 +233,17 @@ void Raw2DsModule::registerRawCOPPERs()
       StoreArray<RawTRG> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else {
-      StoreArray<RawCOPPER> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+
+      // Do not store Unknown RawCOPPER object. 2018.11.25
+      printf("[WARNING] Unknown COPPER ID : ");
+      for (int i = 0; i < 12; i++) {
+        printf("0x%.8x ", cprbuf[ i ]);
+      }
+      printf("\n");
+      B2FATAL("Unknown COPPER ID is found. CPRID = " << hex << subsysid << " Please check. Exiting...");
+      exit(1);
+      // StoreArray<RawCOPPER> ary;
+      // (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     }
     //    delete[] cprbuf;
   }

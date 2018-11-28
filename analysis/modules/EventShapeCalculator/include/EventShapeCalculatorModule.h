@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTSHAPECALCULATORMODULE_H
-#define EVENTSHAPECALCULATORMODULE_H
+#pragma once
 
 #include <cstdlib>
 #include <ctime>
@@ -58,14 +57,14 @@ namespace Belle2 {
     virtual ~EventShapeCalculatorModule() {};
 
     /** Define the physical parameters. look for them in database. */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
     /**
      * Main method, called for each events.
      * It calles the event shape core functions and stores the output in an EventShapeContainer object.
      */
-    virtual void event();
+    virtual void event() override;
 
 
     /**
@@ -94,4 +93,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* EVENTSHAPEMODULE_H */

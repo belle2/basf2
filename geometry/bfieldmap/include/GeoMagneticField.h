@@ -50,12 +50,12 @@ namespace Belle2 {
      *
      * @param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
      */
-    virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+    virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
     /** Nothing to be done when creating from DB, the payload should be found automatically */
-    virtual void createFromDB(const std::string&, G4LogicalVolume&, geometry::GeometryTypes) {}
+    virtual void createFromDB(const std::string&, G4LogicalVolume&, geometry::GeometryTypes) override {}
 
-    virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
+    virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override;
 
     /** Create a Database configuration from Gearbox parameters */
     MagneticField createConfiguration(const GearDir& content);

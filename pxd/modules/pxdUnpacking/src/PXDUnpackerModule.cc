@@ -143,7 +143,7 @@ void PXDUnpackerModule::event()
     m_meta_subrun_nr = m_eventMetaData->getSubrun();
     m_meta_experiment = m_eventMetaData->getExperiment();
     m_meta_time = m_eventMetaData->getTime();
-    m_meta_ticks = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216);
+    m_meta_ticks = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216); // calculate ticks in 127MHz RF clock
     m_meta_sec = (unsigned int)(m_meta_time / 1000000000ull) & 0x1FFFF;
 
     int inx = 0; // count index for output objects
@@ -168,7 +168,7 @@ void PXDUnpackerModule::event()
     }
   }
 
-  if ((m_criticalErrorMask & m_errorMaskEvent) != 0) B2WARNING("Error in PXD unpacking" << LogVar("event nr", m_meta_event_nr));
+  if ((m_criticalErrorMask & m_errorMaskEvent) != 0) B2ERROR("Error in PXD unpacking" << LogVar("event nr", m_meta_event_nr));
   setReturnValue(0 == (m_criticalErrorMask & m_errorMaskEvent));
 }
 
@@ -184,8 +184,10 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
   PXDDAQPacketStatus& daqpktstat = m_storeDAQEvtStats->newPacket(inx);
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
-    if (!(m_suppressErrorMask & c_PACKET_SIZE)) B2WARNING("PXD Unpacker --> invalid packet size" <<
-                                                            LogVar("size [32bit words] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << px.size()).str()));
+    if (!(m_suppressErrorMask & c_PACKET_SIZE)) {
+      B2WARNING("PXD Unpacker --> invalid packet size" <<
+                LogVar("size [32bit words] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << px.size()).str()));
+    }
     m_errorMask |= c_PACKET_SIZE;
     return;
   }
@@ -194,17 +196,19 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
   std::copy_n(px.data(), px.size(), data.begin());
 
   if (fullsize < 8) {
-    if (!(m_suppressErrorMask & c_PACKET_SIZE))
+    if (!(m_suppressErrorMask & c_PACKET_SIZE)) {
       B2WARNING("Data is to small to hold a valid Header! Will not unpack anything." << LogVar("size [32bit words] $",
                 static_cast < std::ostringstream && >(std::ostringstream() << hex << fullsize).str()));
+    }
     m_errorMask |= c_PACKET_SIZE;
     return;
   }
 
   if (data[0] != 0xCAFEBABE && data[0] != 0xBEBAFECA) {
-    if (!(m_suppressErrorMask & c_MAGIC)) B2WARNING("Magic invalid: Will not unpack anything. Header corrupted! " <<
-                                                      LogVar("Header Magic $",
-                                                             static_cast < std::ostringstream && >(std::ostringstream() << hex << data[0]).str()));
+    if (!(m_suppressErrorMask & c_MAGIC)) {
+      B2WARNING("Magic invalid: Will not unpack anything. Header corrupted." <<
+                LogVar("Header Magic $", static_cast < std::ostringstream && >(std::ostringstream() << hex << data[0]).str()));
+    }
     m_errorMask |= c_MAGIC;
     return;
   }
@@ -212,14 +216,16 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
 
   Frames_in_event = ((ubig32_t*)data.data())[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
-    if (!(m_suppressErrorMask & c_FRAME_NR))
+    if (!(m_suppressErrorMask & c_FRAME_NR)) {
       B2WARNING("Number of Frames invalid: Will not unpack anything. Header corrupted!" << LogVar("Frames in event", Frames_in_event));
+    }
     m_errorMask |= c_FRAME_NR;
     return;
   }
   if (Frames_in_event < 3) {
-    if (!(m_suppressErrorMask & c_NR_FRAMES_TO_SMALL))
+    if (!(m_suppressErrorMask & c_NR_FRAMES_TO_SMALL)) {
       B2WARNING("Number of Frames too small: It cannot contain anything useful." << LogVar("Frames in event", Frames_in_event));
+    }
     m_errorMask |= c_NR_FRAMES_TO_SMALL;
   }
 
@@ -246,21 +252,27 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
 
     lo = ((ubig32_t*)tableptr)[j];
     if (lo <= 0) {
-      if (!(m_suppressErrorMask & c_FRAME_SIZE)) B2WARNING("size of frame invalid: " << j << "size " << lo <<
-                                                             " at byte offset in dataptr " << ll);
+      if (!(m_suppressErrorMask & c_FRAME_SIZE)) {
+        B2WARNING("size of frame invalid");
+        B2DEBUG(1, "size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
+      }
       m_errorMask |= c_FRAME_SIZE;
       return;
     }
     if (ll + lo > datafullsize) {
-      if (!(m_suppressErrorMask & c_FRAME_SIZE)) B2WARNING("frames exceed packet size: " << j  << " size " << lo <<
-                                                             " at byte offset in dataptr " << ll << " of datafullsize " <<
-                                                             datafullsize << " of fullsize " << fullsize);
+      if (!(m_suppressErrorMask & c_FRAME_SIZE)) {
+        B2WARNING("Frames exceed packet size");
+        B2DEBUG(1, "Frames exceed packet size: " << j  << " size " << lo << " at byte offset in dataptr " << ll << " of datafullsize " <<
+                datafullsize << " of fullsize " << fullsize);
+      }
       m_errorMask |= c_FRAME_SIZE;
       return;
     }
     if (lo & 0x3) {
-      if (!(m_suppressErrorMask & c_FRAME_SIZE)) B2WARNING("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo
-                                                             << " ) ");
+      if (!(m_suppressErrorMask & c_FRAME_SIZE)) {
+        B2WARNING("SKIP Frame with Data with not MOD 4 length");
+        B2DEBUG(1, "SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo  << " ) ");
+      }
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
       m_errorMask |= c_FRAME_SIZE;
     } else {

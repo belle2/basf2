@@ -108,6 +108,12 @@ namespace Belle2 {
      * (distance relative to interaction point)/ ( error on distance measurement )
      */
     double particleDistanceSignificance(const Particle* part);
+
+    /**
+     * returns true if the particle has the production vertex vector and covariance matrix defined
+     */
+    bool hasProductionVertex(const Particle* part);
+
     // Production vertex position
     /**
      * return x component of particle production vertex

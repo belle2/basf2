@@ -187,8 +187,22 @@ namespace Belle2 {
       return vertex.Mag2() / std::sqrt(denominator);
     }
 
-    // Production vertex position
+    bool hasProductionVertex(const Particle* part)
+    {
+      bool outBool = true;
+      std::vector<std::string> directions = {"x", "y", "z"};
+      for (auto ielement : directions) {
+        std::string prodVertPositionElement =  boost::str(boost::format("prodVert%s") % boost::to_upper_copy(ielement));
+        outBool &= part -> hasExtraInfo(prodVertPositionElement);
+        for (auto jelement : directions) {
+          std::string prodVertCovarianceElement =  boost::str(boost::format("prodVertS%s%s") % ielement % jelement);
+          outBool &= part -> hasExtraInfo(prodVertCovarianceElement);
+        }
+      }
+      return outBool;
+    }
 
+    // Production vertex position
     double particleProductionX(const Particle* part)
     {
       if (part->hasExtraInfo("prodVertX")) {
@@ -304,6 +318,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
     REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
+    REGISTER_VARIABLE("hasProdVertex", hasProductionVertex,
+                      "Returns true if all elements of the particle's production vertex position vector and covariance matrix are defined.")
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
                       "Returns the x position of particle production vertex. Returns -999 if particle has no production vertex.");

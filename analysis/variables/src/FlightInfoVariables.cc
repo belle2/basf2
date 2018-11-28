@@ -10,6 +10,7 @@
  ******************************************************************************/
 
 #include <analysis/variables/FlightInfoVariables.h>
+#include <analysis/variables/VertexVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -36,12 +37,10 @@ namespace Belle2 {
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertX") ||
-            particle->hasExtraInfo("prodVertY") ||
-            particle->hasExtraInfo("prodVertY")) {
-          if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
-          if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
-          if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+        if (hasProductionVertex(particle)) {
+          mumvtxX = particle->getExtraInfo("prodVertX");
+          mumvtxY = particle->getExtraInfo("prodVertY");
+          mumvtxZ = particle->getExtraInfo("prodVertZ");
         } else {
           //if no production vertex assume the particle originated at the ip
           PCmsLabTransform T;
@@ -76,24 +75,13 @@ namespace Belle2 {
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertSxx") ||
-            particle->hasExtraInfo("prodVertSxy") ||
-            particle->hasExtraInfo("prodVertSxz") ||
-            particle->hasExtraInfo("prodVertSyx") ||
-            particle->hasExtraInfo("prodVertSyy") ||
-            particle->hasExtraInfo("prodVertSyz") ||
-            particle->hasExtraInfo("prodVertSzx") ||
-            particle->hasExtraInfo("prodVertSzy") ||
-            particle->hasExtraInfo("prodVertSzz")) {
-          if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
-          if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
-          if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
-          if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
-          if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
-          if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
-          if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
-          if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
-          if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+        if (hasProductionVertex(particle)) {
+          std::vector<std::string> directions = {"x", "y", "z"};
+          for (unsigned int i = 0; i < directions.size(); i++) {
+            for (unsigned int j = 0; j < directions.size(); j++) {
+              mumCov[i][j] = particle->getExtraInfo(boost::str(boost::format("prodVertS%s%s") % directions[i] % directions[j]));
+            }
+          }
         } else {
           PCmsLabTransform T;
           mumCov = T.getBeamParams().getCovVertex();
@@ -145,12 +133,10 @@ namespace Belle2 {
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertX") ||
-            particle->hasExtraInfo("prodVertY") ||
-            particle->hasExtraInfo("prodVertY")) {
-          if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
-          if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
-          if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+        if (hasProductionVertex(particle)) {
+          mumvtxX = particle->getExtraInfo("prodVertX");
+          mumvtxY = particle->getExtraInfo("prodVertY");
+          mumvtxZ = particle->getExtraInfo("prodVertZ");
         } else {
           //if no production vertex assume the particle originated at the ip
           PCmsLabTransform T;
@@ -188,24 +174,13 @@ namespace Belle2 {
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertSxx") ||
-            particle->hasExtraInfo("prodVertSxy") ||
-            particle->hasExtraInfo("prodVertSxz") ||
-            particle->hasExtraInfo("prodVertSyx") ||
-            particle->hasExtraInfo("prodVertSyy") ||
-            particle->hasExtraInfo("prodVertSyz") ||
-            particle->hasExtraInfo("prodVertSzx") ||
-            particle->hasExtraInfo("prodVertSzy") ||
-            particle->hasExtraInfo("prodVertSzz")) {
-          if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
-          if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
-          if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
-          if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
-          if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
-          if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
-          if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
-          if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
-          if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+        if (hasProductionVertex(particle)) {
+          std::vector<std::string> directions = {"x", "y", "z"};
+          for (unsigned int i = 0; i < directions.size(); i++) {
+            for (unsigned int j = 0; j < directions.size(); j++) {
+              mumCov[i][j] = particle->getExtraInfo(boost::str(boost::format("prodVertS%s%s") % directions[i] % directions[j]));
+            }
+          }
         } else {
           PCmsLabTransform T;
           mumCov = T.getBeamParams().getCovVertex();

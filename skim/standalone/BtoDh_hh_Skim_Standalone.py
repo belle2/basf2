@@ -11,12 +11,13 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK
+from skimExpertFunctions import encodeSkimName, setSkimLogging
+
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
-import os
-import sys
-import glob
-from skimExpertFunctions import *
+
+hhpath = Path()
+
 skimCode = encodeSkimName('BtoDh_hh')
 
 fileList = [
@@ -25,23 +26,23 @@ fileList = [
 ]
 
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=hhpath)
 
 
 # create and fill pion and kaon ParticleLists
-stdPi('all')
-stdK('all')
+stdPi('all', path=hhpath)
+stdK('all', path=hhpath)
 
 # B+ to D(->h+h-)h+ Skim
 from skim.btocharm import loadD0bar, BsigToDhTohhList
-loadD0bar()
-BtoDhList = BsigToDhTohhList()
-skimOutputUdst(skimCode, BtoDhList)
-summaryOfLists(BtoDhList)
+loadD0bar(path=hhpath)
+BtoDhList = BsigToDhTohhList(path=hhpath)
+skimOutputUdst(skimCode, BtoDhList, path=hhpath)
+summaryOfLists(BtoDhList, path=hhpath)
 
 
 setSkimLogging()
-process(analysis_main)
+process(hhpath)
 
 # print out the summary
-print(statistics)
+print(statistics, path=hhpath)

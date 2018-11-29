@@ -12,7 +12,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def D0ToHpJm(CharmPath):
+def D0ToHpJm(path):
     charmcuts = '1.80 < M < 1.93 and useCMSFrame(p)>2.2'
     D0_Channels = ['K-:loose pi+:loose',
                    'pi+:loose pi-:loose',
@@ -21,50 +21,50 @@ def D0ToHpJm(CharmPath):
 
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=CharmPath)
-        vertexKFit('D0:' + str(chID), 0.001, path=CharmPath)
+        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexKFit('D0:' + str(chID), 0.001, path=path)
         D0List.append('D0:' + str(chID))
 
     Lists = D0List
     return Lists
 
 
-def DstToD0PiD0ToHpJm(CharmPath):
+def DstToD0PiD0ToHpJm(path):
 
-    D0List = D0ToHpJm(CharmPath)
+    D0List = D0ToHpJm(path)
 
     Dstcuts = '0 < Q < 0.018'
 
     DstList = []
     for chID, channel in enumerate(D0List):
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=CharmPath)
-        vertexRave('D*+:' + str(chID), 0.001, path=CharmPath)
+        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
+        vertexRave('D*+:' + str(chID), 0.001, path=path)
         DstList.append('D*+:' + str(chID))
 
     return DstList
 
 
-def DstToD0PiD0ToHpJmPi0(CharmPath):
+def DstToD0PiD0ToHpJmPi0(path):
     Dstcuts = '0 < Q < 0.018'
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28', path=CharmPath)
+    cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28', path=path)
 
     DstList = []
-    reconstructDecay('D0:sig -> K-:loose pi+:loose pi0:myskim', charmcuts, chID, path=CharmPath)
-    vertexTree('D0:sig', 0.001, path=CharmPath)
-    reconstructDecay('D*+:RS -> D0:RS pi+:all', Dstcuts, path=CharmPath)
-    reconstructDecay('D*+:WS -> D0:WS pi+:all', Dstcuts, path=CharmPath)
-    copyLists('D*+:sig', ['D*+:RS', 'D*+:WS'], path=CharmPath)
-    vertexKFit('D*+:sig', 0.001, path=CharmPath)
+    reconstructDecay('D0:sig -> K-:loose pi+:loose pi0:myskim', charmcuts, chID, path=path)
+    vertexTree('D0:sig', 0.001, path=path)
+    reconstructDecay('D*+:RS -> D0:RS pi+:all', Dstcuts, path=path)
+    reconstructDecay('D*+:WS -> D0:WS pi+:all', Dstcuts, path=path)
+    copyLists('D*+:sig', ['D*+:RS', 'D*+:WS'], path=path)
+    vertexKFit('D*+:sig', 0.001, path=path)
     DstList.append('D*+:sig')
 
     return DstList
 
 
-def DstToD0PiD0ToHpHmPi0(CharmPath):
+def DstToD0PiD0ToHpHmPi0(path):
     Dstcuts = '0 < Q < 0.018'
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28', path=CharmPath)
+    cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28', path=path)
     D0_Channels = ['pi+:loose pi-:loose pi0:myskim',
                    'K+:loose K-:loose pi0:myskim',
                    ]
@@ -72,53 +72,53 @@ def DstToD0PiD0ToHpHmPi0(CharmPath):
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=CharmPath)
-        vertexTree('D0:' + str(chID), 0.001, path=CharmPath)
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all D0:' + str(chID), Dstcuts, chID, path=CharmPath)
-        vertexKFit('D*+:' + str(chID), 0.001, path=CharmPath)
+        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexTree('D0:' + str(chID), 0.001, path=path)
+        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all D0:' + str(chID), Dstcuts, chID, path=path)
+        vertexKFit('D*+:' + str(chID), 0.001, path=path)
         DstList.append('D*+:' + str(chID))
 
     return DstList
 
 
-def DstToD0PiD0ToHpJmEta(CharmPath):
-    reconstructDecay('eta:myskim -> gamma:loose gamma:loose', '0.49 < M < 0.55 and p > 0.28', path=CharmPath)
+def DstToD0PiD0ToHpJmEta(path):
+    reconstructDecay('eta:myskim -> gamma:loose gamma:loose', '0.49 < M < 0.55 and p > 0.28', path=path)
     Dstcuts = '0 < Q < 0.018'
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p) > 2.2'
 
     DstList = []
-    reconstructDecay('D0:sig -> K-:loose pi+:loose eta:myskim', charmcuts, path=CharmPath)
-    vertexTree('D0:sig', 0.001, path=CharmPath)
-    reconstructDecay('D*+:RS -> D0:sig pi+:all', Dstcuts, path=CharmPath)
-    reconstructDecay('D*-:WS -> D0:sig pi-:all', Dstcuts, path=CharmPath)
-    vertexKFit('D*+:RS', conf_level=0.001, path=CharmPath)
-    vertexKFit('D*+:WS', conf_level=0.001, path=CharmPath)
+    reconstructDecay('D0:sig -> K-:loose pi+:loose eta:myskim', charmcuts, path=path)
+    vertexTree('D0:sig', 0.001, path=path)
+    reconstructDecay('D*+:RS -> D0:sig pi+:all', Dstcuts, path=path)
+    reconstructDecay('D*-:WS -> D0:sig pi-:all', Dstcuts, path=path)
+    vertexKFit('D*+:RS', conf_level=0.001, path=path)
+    vertexKFit('D*+:WS', conf_level=0.001, path=path)
     DstList.append('D*+:RS')
     DstList.append('D*+:WS')
 
     return DstList
 
 
-def DstToD0PiD0ToKsOmega(CharmPath):
-    cutAndCopyList('pi0:mypi0', 'pi0:skim', '0.11 < M < 0.15 and p > 0.25 ', path=CharmPath)
-    reconstructDecay('eta:3pi -> pi+:good pi-:good pi0:mypi0', '0.4 < M < 0.65', path=CharmPath)
-    reconstructDecay('omega:3pi -> pi+:good pi-:good pi0:mypi0', '0.65 < M < 0.9', path=CharmPath)
+def DstToD0PiD0ToKsOmega(path):
+    cutAndCopyList('pi0:mypi0', 'pi0:skim', '0.11 < M < 0.15 and p > 0.25 ', path=path)
+    reconstructDecay('eta:3pi -> pi+:good pi-:good pi0:mypi0', '0.4 < M < 0.65', path=path)
+    reconstructDecay('omega:3pi -> pi+:good pi-:good pi0:mypi0', '0.65 < M < 0.9', path=path)
 
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    reconstructDecay('D0:KsEta -> K_S0:merged eta:3pi', charmcuts, path=CharmPath)
-    vertexTree('D0:KsEta', conf_level=0.001, path=CharmPath)
-    reconstructDecay('D0:KsOmega -> K_S0:merged omega:3pi', charmcuts, path=CharmPath)
-    vertexTree('D0:KsOmega', conf_level=0.001, path=CharmPath)
-    copyLists('D0:sig', ['D0:KsEta', 'D0:KsOmega'], path=CharmPath)
+    reconstructDecay('D0:KsEta -> K_S0:merged eta:3pi', charmcuts, path=path)
+    vertexTree('D0:KsEta', conf_level=0.001, path=path)
+    reconstructDecay('D0:KsOmega -> K_S0:merged omega:3pi', charmcuts, path=path)
+    vertexTree('D0:KsOmega', conf_level=0.001, path=path)
+    copyLists('D0:sig', ['D0:KsEta', 'D0:KsOmega'], path=path)
 
-    reconstructDecay('D*+:sig -> D0:sig pi+:slow', '0 < Q < 0.018', path=CharmPath)
-    vertexKFit('D*+:sig', conf_level=0.001, path=CharmPath)
+    reconstructDecay('D*+:sig -> D0:sig pi+:slow', '0 < Q < 0.018', path=path)
+    vertexKFit('D*+:sig', conf_level=0.001, path=path)
     DstList.append('D*+:sig')
 
     return DstList
 
 
-def D0ToNeutrals(CharmPath):
+def D0ToNeutrals(path):
     charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2.2'
     D0_Channels = ['pi0:skim pi0:skim',
                    'K_S0:merged pi0:skim',
@@ -127,30 +127,30 @@ def D0ToNeutrals(CharmPath):
 
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=CharmPath)
-        vertexRave('D0:' + str(chID), 0.001, path=CharmPath)
+        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexRave('D0:' + str(chID), 0.001, path=path)
         D0List.append('D0:' + str(chID))
 
     Lists = D0List
     return Lists
 
 
-def DstToD0Neutrals(CharmPath):
+def DstToD0Neutrals(path):
 
-    D0List = D0ToNeutrals(CharmPath)
+    D0List = D0ToNeutrals(path)
 
     Dstcuts = '0 < Q < 0.02'
 
     DstList = []
     for chID, channel in enumerate(D0List):
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=CharmPath)
-        massVertexRave('D*+:' + str(chID), 0.001, path=CharmPath)
+        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
+        massVertexRave('D*+:' + str(chID), 0.001, path=path)
         DstList.append('D*+:' + str(chID))
 
     return DstList
 
 
-def DstToD0PiD0ToHpHmKs(CharmPath):
+def DstToD0PiD0ToHpHmKs(path):
 
     charmcuts = '1.80 < M < 1.93 and useCMSFrame(p)>2.2'
     Dstcuts = '0 < Q < 0.018'
@@ -161,17 +161,17 @@ def DstToD0PiD0ToHpHmKs(CharmPath):
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=CharmPath)
-        vertexKFit('D0:' + str(chID), 0.001, path=CharmPath)
+        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexKFit('D0:' + str(chID), 0.001, path=path)
 
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all D0:' + str(chID), Dstcuts, chID, path=CharmPath)
-        vertexKFit('D*+:' + str(chID), 0.001, path=CharmPath)
+        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all D0:' + str(chID), Dstcuts, chID, path=path)
+        vertexKFit('D*+:' + str(chID), 0.001, path=path)
         DstList.append('D*+:' + str(chID))
 
     return DstList
 
 
-def CharmRareList(CharmPath):
+def CharmRareList(path):
     charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2.2'
     D0_Channels = ['gamma:skim gamma:skim',
                    'e+:loose e-:loose',
@@ -180,14 +180,14 @@ def CharmRareList(CharmPath):
 
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Rare' + str(chID) + ' -> ' + channel, charmcuts, chID, path=CharmPath)
+        reconstructDecay('D0:Rare' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
         D0List.append('D0:Rare' + str(chID))
 
     Lists = D0List
     return Lists
 
 
-def CharmSemileptonicList(CharmPath):
+def CharmSemileptonicList(path):
     Dcuts = '1.82 < M < 1.92'
     DstarSLcuts = '1.9 < M < 2.1'
     antiD0SLcuts = 'massDifference(0)<0.15'
@@ -200,7 +200,7 @@ def CharmSemileptonicList(CharmPath):
 
     DList = []
     for chID, channel in enumerate(D_Channels):
-        reconstructDecay('D0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=CharmPath)
+        reconstructDecay('D0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         DList.append('D0:std' + str(chID))
     copyLists('D0:all', DList)
 
@@ -209,9 +209,9 @@ def CharmSemileptonicList(CharmPath):
 
     antiD0List = []
     for chID, channel in enumerate(DstarSLRecoilChannels):
-        reconstructRecoil('D*-:SL' + str(chID) + ' -> ' + channel, DstarSLcuts, chID, path=CharmPath)
+        reconstructRecoil('D*-:SL' + str(chID) + ' -> ' + channel, DstarSLcuts, chID, path=path)
         reconstructRecoilDaughter('anti-D0:SL' + str(chID) + ' -> D*-:SL' + str(chID) +
-                                  ' pi-:95eff', antiD0SLcuts, chID, path=CharmPath)
+                                  ' pi-:95eff', antiD0SLcuts, chID, path=path)
         antiD0List.append('anti-D0:SL' + str(chID))
 
     nueRecoilChannels = []
@@ -226,12 +226,12 @@ def CharmSemileptonicList(CharmPath):
 
     nueList = []
     for chID, channel in enumerate(nueRecoilChannels):
-        reconstructRecoilDaughter('anti-nu_e:SL' + str(chID) + ' -> ' + channel, '', chID, path=CharmPath)
+        reconstructRecoilDaughter('anti-nu_e:SL' + str(chID) + ' -> ' + channel, '', chID, path=path)
         nueList.append('anti-nu_e:SL' + str(chID))
 
     numuList = []
     for chID, channel in enumerate(numuRecoilChannels):
-        reconstructRecoilDaughter('anti-nu_mu:SL' + str(chID) + ' -> ' + channel, '', chID, path=CharmPath)
+        reconstructRecoilDaughter('anti-nu_mu:SL' + str(chID) + ' -> ' + channel, '', chID, path=path)
         numuList.append('anti-nu_mu:SL' + str(chID))
 
     allLists = nueList + numuList

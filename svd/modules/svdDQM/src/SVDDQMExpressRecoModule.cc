@@ -94,6 +94,10 @@ void SVDDQMExpressRecoModule::defineHisto()
   int nSVDSensors = gTools->getNumberOfSVDSensors();
   int nSVDChips = gTools->getTotalSVDChips();
 
+  // number of events counter
+  m_nEvents = new TH1I("DQMER_SVD_nEvents", "DQM ER SVD Number of Events", 1, -0.5, 0.5);
+  m_nEvents->GetYaxis()->SetTitle("N events");
+
   // Create basic histograms:
   // basic counters per sensor:
   m_hitMapCountsU = new TH1I("DQMER_SVD_StripCountsU", "DQM ER SVD Integrated number of fired U strips per sensor",
@@ -190,48 +194,6 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_clusterTimeVAll = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeVAll->GetXaxis()->SetTitle("time of v clusters [ns]");
   m_clusterTimeVAll->GetYaxis()->SetTitle("count");
-
-  /*
-  for (int i = 0; i < c_nFADC; i++) {
-    //----------------------------------------------------------------
-    // Counter of APV errors (16) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterOfAPVErrors") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of APV errors") % i);
-    m_CounterAPVErrors[i] = new TH1I(name.c_str(), title.c_str(), 16, 0, 16);
-    m_CounterAPVErrors[i]->GetXaxis()->SetTitle("Error ID");
-    m_CounterAPVErrors[i]->GetYaxis()->SetTitle("counts");
-    //----------------------------------------------------------------
-    // Counter of FTB errors (256) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterOfFTBErrors") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of FTB errors") % i);
-    m_CounterFTBErrors[i] = new TH1I(name.c_str(), title.c_str(), 256, 0, 256);
-    m_CounterFTBErrors[i]->GetXaxis()->SetTitle("Error ID");
-    m_CounterFTBErrors[i]->GetYaxis()->SetTitle("counts");
-    //----------------------------------------------------------------
-    // Counter of apvErrorOR (4) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterOfApvErrorOR") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of ApvErrorOR") % i);
-    m_CounterApvErrorORErrors[i] = new TH1I(name.c_str(), title.c_str(), 5, 0, 5);
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetTitle("Error ID");
-    m_CounterApvErrorORErrors[i]->GetYaxis()->SetTitle("counts");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(1, "No errors");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(2, "APV error OR");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(3, "FADC FIFO full OR");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(4, "Frame error OR");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(5, "Detection error OR");
-    //----------------------------------------------------------------
-    // Counter of FTB Flags (32) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterFTBFlags") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of FTB flags") % i);
-    m_CounterFTBFlags[i] = new TH1I(name.c_str(), title.c_str(), 32, 0, 32);
-    m_CounterFTBFlags[i]->GetXaxis()->SetTitle("Flag");
-    m_CounterFTBFlags[i]->GetYaxis()->SetTitle("counts");
-  }
-  */
 
   for (int i = 0; i < nSVDSensors; i++) {
     VxdID id = gTools->getSensorIDFromSVDIndex(i);
@@ -460,6 +422,7 @@ void SVDDQMExpressRecoModule::beginRun()
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
   // Just to make sure, reset all the histograms.
+  if (m_nEvents != NULL) m_nEvents->Reset();
   if (m_hitMapCountsU != NULL) m_hitMapCountsU->Reset();
   if (m_hitMapCountsV != NULL) m_hitMapCountsV->Reset();
   if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Reset();
@@ -511,6 +474,10 @@ void SVDDQMExpressRecoModule::beginRun()
 
 void SVDDQMExpressRecoModule::event()
 {
+
+  //increase the numbe rof processed events
+  m_nEvents->Fill(0);
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 

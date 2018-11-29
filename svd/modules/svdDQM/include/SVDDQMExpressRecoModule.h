@@ -72,6 +72,9 @@ namespace Belle2 {
     /** SVD diagnostics module name */
     std::string m_svdDAQDiagnosticsListName;
 
+    /** number of events */
+    TH1I* m_nEvents;
+
     /** Hitmaps u of Digits */
     TH1I* m_hitMapCountsU;
     /** Hitmaps v of Digits */

@@ -13,6 +13,9 @@
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 
+#include <boost/regex.hpp>
+#include <boost/algorithm/string/replace.hpp>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -40,6 +43,30 @@ void DQMHistAnalysisInputRootFileModule::initialize()
   m_file = new TFile(m_input_name.c_str());
   m_eventMetaDataPtr.registerInDataStore();
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
+}
+
+bool DQMHistAnalysisInputRootFileModule::hname_pattern_match(std::string pattern, std::string text)
+{
+  boost::replace_all(pattern, "\\", "\\\\");
+  boost::replace_all(pattern, "^", "\\^");
+  boost::replace_all(pattern, ".", "\\.");
+  boost::replace_all(pattern, "$", "\\$");
+  boost::replace_all(pattern, "|", "\\|");
+  boost::replace_all(pattern, "(", "\\(");
+  boost::replace_all(pattern, ")", "\\)");
+  boost::replace_all(pattern, "[", "\\[");
+  boost::replace_all(pattern, "]", "\\]");
+  boost::replace_all(pattern, "*", "\\*");
+  boost::replace_all(pattern, "+", "\\+");
+  boost::replace_all(pattern, "?", "\\?");
+  boost::replace_all(pattern, "/", "\\/");
+
+  boost::replace_all(pattern, "\\?", ".");
+  boost::replace_all(pattern, "\\*", ".*");
+
+  boost::regex bpattern(pattern);
+
+  return regex_match(text, bpattern);
 }
 
 void DQMHistAnalysisInputRootFileModule::beginRun()
@@ -94,8 +121,8 @@ void DQMHistAnalysisInputRootFileModule::event()
       if (m_histograms.size() == 0) {
         hpass = true;
       } else {
-        for (auto& wanted_histogram : m_histograms) {
-          if (wanted_histogram == dirname + "/" + hname) {
+        for (auto& hpattern : m_histograms) {
+          if (hname_pattern_match(hpattern, dirname + "/" + hname)) {
             hpass = true;
             break;
           }

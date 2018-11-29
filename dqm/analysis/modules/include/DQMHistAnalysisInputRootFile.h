@@ -43,6 +43,7 @@ namespace Belle2 {
 
     // Data members
   private:
+    bool hname_pattern_match(std::string pattern, std::string text);
     //int m_interval;
     std::string m_input_name;
     TFile* m_file = nullptr;

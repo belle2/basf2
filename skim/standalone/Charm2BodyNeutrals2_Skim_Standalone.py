@@ -31,30 +31,6 @@ fileList = [
 
 inputMdstList('MC9', fileList, path=c2bn2path)
 
-"""
-if len(sys.argv)>1:
-  bkgType=sys.argv[1]
-  f=open('inputFiles/'+bkgType+'.txt','r')
-  fileList=f.read()
-  f.close()
-  if not os.path.isfile(fileList[:-1]):
-    sys.exit('Could not find root file : ' +fileList[:-1])
-  print('Running over file ' + fileList[:-1])
-elif len(sys.argv)==1:
-  fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-
-    ]
-  bkgType='old'
-
-
-if len(sys.argv)>1:
-  inputMdstList('MC9',fileList[:-1])
-elif len(sys.argv)==1:
-  inputMdstList('MC9',fileList)
-"""
-
 stdPi('loose', path=c2bn2path)
 stdK('loose', path=c2bn2path)
 stdE('loose', path=c2bn2path)

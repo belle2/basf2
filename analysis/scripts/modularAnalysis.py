@@ -1525,6 +1525,18 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     path.add_module(roeBuilder)
 
 
+def buildNestedRestOfEvent(target_list_name, maskName='', path=analysis_main):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent
+    """
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('nestedROEMask', maskName)
+    roeBuilder.param('createNestedROE', True)
+    path.add_module(roeBuilder)
+
+
 def appendROEMask(
     list_name,
     mask_name,

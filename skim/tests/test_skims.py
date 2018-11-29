@@ -86,7 +86,7 @@ Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()
 add_skim('CharmlessHad2Body', Had2BodyList)
 
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
-Had3BodyList = CharmlessHad3BodyB0List(path=analysis_main) + CharmlessHad3BodyBmList(path=analysis_main)
+Had3BodyList = CharmlessHad3BodyB0List() + CharmlessHad3BodyBmList()
 add_skim('CharmlessHad3Body', Had3BodyList)
 
 

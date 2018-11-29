@@ -24,7 +24,7 @@ parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1,
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 parser.add_argument('--nomask', metavar='maskField', dest='mask', type=int, nargs=1,
-                    help='Old xml format with no mask field corresponds to nomask = 1')
+                    help='When in the local calibrations xml there is NOT the attribute <masks>, set --nomask 1')
 
 '''
 if(len(sys.argv) != 7):
@@ -56,7 +56,7 @@ else:
 if args.mask is not None:
     masking = args.mask[0]
 else:
-    masking = args.mask
+    masking = 0
 
 
 print('experiment number = ' + str(experiment))
@@ -97,6 +97,12 @@ class dbImporterModule(Module):
         # call the importer class
         dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
         if args.calib is not None:
+            # import FADCMasked strips only if --nomask 1
+            if masking is not 1:
+                dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
+                print("FADC Masked Strips Imported")
+            else:
+                print("FADC Masked Strips can not be imported. The local calibration xml file has NO masks field!")
             # import the noises
             dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
             print("Noise Imported")
@@ -106,12 +112,6 @@ class dbImporterModule(Module):
             # import pulse shape calibrations
             dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
             print("Pulse Shape Calibrations Imported")
-            # import FADCMasked strips
-            if args.mask is None:
-                dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
-                print("FADC Masked Strips Imported")
-            elif (masking == 1):
-                print("FADC Masked Strips can not be imported. The local calibration xml file has NO masks field!")
         if args.mapp is not None:
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)

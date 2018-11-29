@@ -52,8 +52,8 @@ def DstToD0PiD0ToHpJmPi0(path):
     DstList = []
     reconstructDecay('D0:sig -> K-:loose pi+:loose pi0:myskim', charmcuts, chID, path=path)
     vertexTree('D0:sig', 0.001, path=path)
-    reconstructDecay('D*+:RS -> D0:RS pi+:all', Dstcuts, path=path)
-    reconstructDecay('D*+:WS -> D0:WS pi+:all', Dstcuts, path=path)
+    reconstructDecay('D*+:RS -> D0:sig pi+:all', Dstcuts, path=path)
+    reconstructDecay('D*-:WS -> D0:sig pi-:all', Dstcuts, path=path)
     copyLists('D*+:sig', ['D*+:RS', 'D*+:WS'], path=path)
     vertexKFit('D*+:sig', 0.001, path=path)
     DstList.append('D*+:sig')

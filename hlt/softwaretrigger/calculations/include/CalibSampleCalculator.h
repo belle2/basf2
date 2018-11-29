@@ -11,6 +11,7 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
+#include <hlt/softwaretrigger/calculations/HLTCalculator.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -54,6 +55,12 @@ namespace Belle2 {
 
       /** the name of extra info */
       std::vector<std::string> m_extrainfoname;
+
+      /**
+       * Also include the variables of the HLT calculator. This is just a temporary fix
+       * until both the HLT and calibration menu is actually fixed.
+       * */
+      HLTCalculator m_hltCalculator;
     };
   }
 }

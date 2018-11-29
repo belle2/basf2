@@ -75,10 +75,10 @@ add_skim('TCPV', TCPVList())
 
 # Bottomonium Etab Skim: 15420100
 from skim.quarkonium import *
-add_skim('BottomoniumEtabExclusive', EtabList())
+add_skim('BottomoniumEtabExclusive', EtabList(path=analysis_main))
 
 from skim.quarkonium import *
-add_skim('BottomoniumUpsilon', UpsilonList())
+add_skim('BottomoniumUpsilon', UpsilonList(path=analysis_main))
 
 # B to Charmless skim
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList

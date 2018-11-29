@@ -62,10 +62,10 @@ add_skim('BtoPi0Pi0', BtoPi0Pi0List())
 
 # Tau Skim
 from skim.taupair import TauLFVList
-add_skim('TauLFV', TauLFVList())
+add_skim('TauLFV', TauLFVList(1, path=analysis_main))
 
 from skim.taupair import TauList
-# add_skim('TauGeneric', TauList())
+add_skim('TauGeneric', TauList(path=analysis_main))
 
 
 # TCPV Skim

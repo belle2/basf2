@@ -72,7 +72,7 @@ void TRGCDCT3DDQMModule::defineHisto()
   h_tanlambda->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_tanlambda->GetXaxis()->SetTitle("tanlambda");
   //pt distribution
-  h_pt = new TH1D("hpt", "npt", 100, -2.5, 2.5);
+  h_pt = new TH1D("hpt", "npt", 100, 0, 3);
   h_pt->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_pt->GetXaxis()->SetTitle("pt");
 
@@ -81,7 +81,7 @@ void TRGCDCT3DDQMModule::defineHisto()
   h_phi_2D->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_phi_2D->GetXaxis()->SetTitle("phi_2D");
   //2D pt distribution
-  h_pt_2D = new TH1D("hpt_2D", "npt_2D", 100, -2.5, 2.5);
+  h_pt_2D = new TH1D("hpt_2D", "npt_2D", 100, 0, 3);
   h_pt_2D->SetTitle(Form("Exp%d Run%d 3Dmodule%d", _exp, _run, m_T3DMOD));
   h_pt_2D->GetXaxis()->SetTitle("pt_2D");
   oldDir->cd();
@@ -121,7 +121,7 @@ void TRGCDCT3DDQMModule::endRun()
 
   //Draw and save histograms
   if (m_generatePostscript) {
-    gStyle->SetOptStat(0);
+    //gStyle->SetOptStat(0);
     TCanvas c1("c1", "", 0, 0, 500, 300);
     c1.cd();
 
@@ -164,22 +164,24 @@ void TRGCDCT3DDQMModule::event()
 
   dirDQM->cd();
 
-  if (!entAry || !entAry.getEntries()) {
-    return;
+  //Fill 3D histo
+  if (!(!entAry || !entAry.getEntries())) {
+    for (int i = 0; i < entAry.getEntries(); i++) {
+      h_dz->Fill(entAry[i]->getZ0());
+      h_phi->Fill(entAry[i]->getPhi0());
+      h_tanlambda->Fill(entAry[i]->getTanLambda());
+      if (entAry[i]->getOmega() != 0)
+        h_pt->Fill(fabs(1. / entAry[i]->getOmega() * 0.3 * 1.5 * 0.01));
+    }
   }
-  //Fill
-  h_dz->Fill(entAry[0]->getZ0());
-  h_phi->Fill(entAry[0]->getPhi0());
-  h_tanlambda->Fill(entAry[0]->getTanLambda());
-  if (entAry[0]->getOmega() != 0)
-    h_pt->Fill(1. / entAry[0]->getOmega() * 0.3 * 1.5 * 0.01);
-
-  if (!entAry_2D || !entAry_2D.getEntries()) {
-    return;
+  //Fill 2D histo
+  if (!(!entAry_2D || !entAry_2D.getEntries())) {
+    for (int i = 0; i < entAry_2D.getEntries(); i++) {
+      h_phi_2D->Fill(entAry_2D[i]->getPhi0());
+      if (entAry_2D[i]->getOmega() != 0)
+        h_pt_2D->Fill(fabs(1. / entAry_2D[i]->getOmega() * 0.3 * 1.5 * 0.01));
+    }
   }
-  h_phi_2D->Fill(entAry_2D[0]->getPhi0());
-  if (entAry_2D[0]->getOmega() != 0)
-    h_pt_2D->Fill(1. / entAry_2D[0]->getOmega() * 0.3 * 1.5 * 0.01);
 
   oldDir->cd();
 

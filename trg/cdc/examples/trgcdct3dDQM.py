@@ -11,6 +11,19 @@
 import basf2
 import ROOT.Belle2
 
+import sys  # get argv
+import os.path
+argvs = sys.argv  # get arg
+argc = len(argvs)  # of arg
+
+if argc == 3:
+    inname = argvs[1]
+    histname = argvs[2]
+    # outname=argvs[2]
+    # histname=argvs[3]
+else:
+    sys.exit("trgcdct3dDQM.py> # of arg is strange. Exit.")
+
 
 class is2DSkim(basf2.Module):
     def event(self):
@@ -64,7 +77,7 @@ if __name__ == '__main__':
     # Create main path
     main = basf2.create_path()
     # Add modules to main path
-    main.add_module('RootInput')
+    main.add_module('RootInput', inputFileName=inname)
     main.add_module('TRGCDCT3DUnpacker')
     main.add_module(skim)
     main.add_module('Gearbox')
@@ -80,15 +93,9 @@ if __name__ == '__main__':
                     fit3DWithTSIM=0,
                     firmwareResultCollectionName='TRGCDCT3DUnpackerStores',
                     isVerbose=0)
-    main.add_module('TRGCDCT3DDQM')
-    main.add_module(
-        'RootOutput',
-        branchNames=[
-            'TRGCDCT3DUnpackerStores',
-            'FirmCDCTriggerSegmentHits',
-            'FirmBinnedEventT0',
-            'FirmTRGCDC2DFinderTracks',
-            'FirmTRGCDC3DFitterTracks'])
+    main.add_module('TRGCDCT3DDQM', postScriptName=histname)
+    main.add_module('HistoManager', histoFileName=histname)
+
     # Process all events
     basf2.process(main)
     print(basf2.statistics)

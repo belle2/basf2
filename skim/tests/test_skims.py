@@ -22,6 +22,7 @@ inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 stdPi0s('loose')
 stdPhotons('loose')
 stdKshorts()
+mergedKshorts()  # add due to charm skims need it
 stdPi('loose')
 stdK('loose')
 stdPr('loose')

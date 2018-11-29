@@ -20,35 +20,57 @@ import os
 import sys
 import glob
 skimCode = encodeSkimName('Charm2BodyNeutralsD0')
+
+c2bndpath = Path()
+
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=c2bndpath)
+
+"""
+if len(sys.argv)>1:
+  bkgType=sys.argv[1]
+  f=open('inputFiles/'+bkgType+'.txt','r')
+  fileList=f.read()
+  f.close()
+  if not os.path.isfile(fileList[:-1]):
+    sys.exit('Could not find root file : ' +fileList[:-1])
+  print('Running over file ' + fileList[:-1])
+elif len(sys.argv)==1:
+  fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+
+    ]
+  bkgType='old'
 
 
-loadStdSkimPi0()
-stdPi('loose')
-stdK('loose')
-stdE('loose')
-stdMu('loose')
-stdPi('all')
-stdK('all')
-stdE('all')
-stdMu('all')
-stdKshorts()
-mergedKshorts()
+if len(sys.argv)>1:
+  inputMdstList('MC9',fileList[:-1])
+elif len(sys.argv)==1:
+  inputMdstList('MC9',fileList)
+"""
+
+loadStdSkimPi0(path=c2bndpath)
+stdPi('loose', path=c2bndpath)
+stdK('loose', path=c2bndpath)
+stdPi('all', path=c2bndpath)
+stdK('all', path=c2bndpath)
+stdKshorts(path=c2bndpath)
+mergedKshorts(path=c2bndpath)
 
 from skim.charm import D0ToNeutrals
 
-D0ToNeutralsList = D0ToNeutrals()
-skimOutputUdst(skimCode, D0ToNeutralsList)
+D0ToNeutralsList = D0ToNeutrals(c2bndpath)
+skimOutputUdst(skimCode, D0ToNeutralsList, path=c2bndpath)
 
-summaryOfLists(D0ToNeutralsList)
+summaryOfLists(D0ToNeutralsList, path=c2bndpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=c2bndpath)
+process(c2bndpath)
 
 print(statistics)

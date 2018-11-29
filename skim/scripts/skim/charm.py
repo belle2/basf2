@@ -137,7 +137,7 @@ def D0ToNeutrals(CharmPath):
 
 def DstToD0Neutrals(CharmPath):
 
-    D0List = D0ToNeutrals()
+    D0List = D0ToNeutrals(CharmPath)
 
     Dstcuts = '0 < Q < 0.02'
 

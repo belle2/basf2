@@ -163,7 +163,7 @@ void ARICHGeometryConfig::read(const GearDir& content)
       double origPhi = m_mirrors.getPoint(id).Phi();
       ARICHPositionElement displEl(r * cos(origPhi + phi), r * sin(origPhi + phi), z, alpha, beta, gamma);
       m_mirrorDispl.setDisplacementElement(id, displEl);
-      displEl.print();
+      // displEl.print();
     }
   }
   // read and prepare aerogel plane parameters

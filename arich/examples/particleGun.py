@@ -46,17 +46,6 @@ main.add_module(histo)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
-# Geometry
-geometry = register_module('Geometry')
-geometry.param('components', [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'ARICH'])
-main.add_module(geometry)
-
 # Particle gun: generate multiple tracks
 particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])
@@ -74,13 +63,6 @@ particlegun.param('yVertexParams', [0])
 particlegun.param('zVertexParams', [0])
 particlegun.param('independentVertices', False)
 main.add_module(particlegun)
-
-
-# PXD digitization & clustering
-pxd_digitizer = register_module('PXDDigitizer')
-main.add_module(pxd_digitizer)
-pxd_clusterizer = register_module('PXDClusterizer')
-main.add_module(pxd_clusterizer)
 
 # Simulation & Digitizer of inner detectors
 add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC', 'ARICH'], usePXDDataReduction=False)

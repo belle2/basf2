@@ -552,8 +552,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     // We see a second "header" with framenr+1 ...
     if (!(m_suppressErrorMask & c_DHP_DBL_HEADER)) {
       B2WARNING("DHP data: seems to be double header! skipping.");
-      B2EBUG(1, "DHP data: seems to be double header! skipping." << LogVar("Length",
-             frame_len));
+      B2DEBUG(1, "DHP data: seems to be double header! skipping." << LogVar("Length",
+              frame_len));
     }
     m_errorMask |= c_DHP_DBL_HEADER;
     // dump_dhp(data, frame_len); print out guilty dhp packet

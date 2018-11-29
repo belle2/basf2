@@ -8,7 +8,7 @@ Script to Import Calibrations into a local DB
 
 from basf2 import *
 import ROOT
-from ROOT.Belle2 import SVDDatabaseImporter
+from ROOT.Belle2 import SVDLocalCalibrationsImporter
 from ROOT.Belle2 import FileSystem
 import os
 import sys
@@ -18,19 +18,13 @@ import interactive
 import argparse
 from fnmatch import fnmatch
 
-parser = argparse.ArgumentParser(description="SVD Database Importer")
+parser = argparse.ArgumentParser(description="SVD Local Calibrations Importer")
 parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
-parser.add_argument('--hot_xml', metavar='hotStrFile', dest='hot', type=str, nargs=1, help='Hot Strips xml file')
-parser.add_argument(
-    '--FADCMasked_xml',
-    metavar='FADCMaskedStrFile',
-    dest='FADCMasked',
-    type=str,
-    nargs=1,
-    help='FADC Masked Strips xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
+parser.add_argument('--nomask', metavar='maskField', dest='mask', type=int, nargs=1,
+                    help='When in the local calibrations xml there is NOT the attribute <masks>, set --nomask 1')
 
 '''
 if(len(sys.argv) != 7):
@@ -48,36 +42,38 @@ args = parser.parse_args()
 
 experiment = args.exp[0]
 run = args.run[0]
+
 if args.calib is not None:
     calibfile = args.calib[0]
 else:
     calibfile = args.calib
+
 if args.mapp is not None:
     mappingfile = args.mapp[0]
 else:
     mappingfile = args.mapp
-if args.hot is not None:
-    hotfile = args.hot[0]
-else:
-    hotfile = args.hot
 
-if args.FADCMasked is not None:
-    FADCMaskedfile = args.FADCMasked[0]
+if args.mask is not None:
+    masking = args.mask[0]
 else:
-    FADCMaskedfile = args.FADCMasked
+    masking = 0
+
 
 print('experiment number = ' + str(experiment))
 print('       run number = ' + str(run))
 print('  calibration xml = ' + str(calibfile))
-print('   hot strips xml = ' + str(hotfile))
-print('   FADC Masked strips xml = ' + str(FADCMaskedfile))
 print('      mapping xml = ' + str(mappingfile))
+print('      no_masks = ' + str(masking))
 
 reset_database()
 use_database_chain()
 # central DB needed for the channel mapping DB object
-use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
+use_central_database("Calibration_Offline_Development")
 use_local_database("localDB/database.txt", "localDB")
+
+# global tag and database needed for commissioning
+# GLOBAL_TAG = "vxd_commissioning_20181030"
+# use_central_database(GLOBAL_TAG)
 
 main = create_path()
 
@@ -99,8 +95,14 @@ run = int(int(run) + 1)
 class dbImporterModule(Module):
     def beginRun(self):
         # call the importer class
-        dbImporter = SVDDatabaseImporter(experiment, run, experiment, -1)
+        dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
         if args.calib is not None:
+            # import FADCMasked strips only if --nomask 1
+            if masking is not 1:
+                dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
+                print("FADC Masked Strips Imported")
+            else:
+                print("FADC Masked Strips can not be imported. The local calibration xml file has NO masks field!")
             # import the noises
             dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
             print("Noise Imported")
@@ -114,16 +116,6 @@ class dbImporterModule(Module):
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
             print("Channel Mapping Imported")
-        if args.hot is not None:
-            # import hot strips
-            dbImporter.importSVDHotStripsCalibrationsFromXML(hotfile)
-            print("Hot Strips List Imported")
-            # dbImporter.importSVDHotStripsCalibrations()
-        if args.FADCMasked is not None:
-            # import FADCMasked strips
-            dbImporter.importSVDFADCMaskedStripsFromXML(FADCMaskedfile)
-            # print("FADC Masked Strips List Imported")
-            # dbImporter.importSVDFADCMaskedStrips()
 
 
 main.add_module(dbImporterModule())

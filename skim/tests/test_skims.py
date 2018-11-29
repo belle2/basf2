@@ -114,26 +114,26 @@ add_skim('SystematicsRadEE', SystematicsRadEEList(analysis_main))
 
 
 from skim.btocharm import BsigToDhTohhList, loadD0bar
-loadD0bar()
-add_skim('BtoDh_hh', BsigToDhTohhList())
+loadD0bar(path=analysis_main)
+add_skim('BtoDh_hh', BsigToDhTohhList(path=analysis_main))
 
 
 # B- to D(->Kshh)h- Skim
 from skim.btocharm import BsigToDhToKshhList, loadDkshh
-loadDkshh()
-BtoDhKshhList = BsigToDhToKshhList()
+loadDkshh(path=analysis_main)
+BtoDhKshhList = BsigToDhToKshhList(path=analysis_main)
 add_skim('BtoDh_Kshh', BtoDhKshhList)
 
 # B- to D(->Kspi0)h- Skim
 from skim.btocharm import BsigToDhToKspi0List, loadDkspi0
-loadDkspi0()
-BtoDhKspi0List = BsigToDhToKspi0List()
+loadDkspi0(path=analysis_main)
+BtoDhKspi0List = BsigToDhToKspi0List(path=analysis_main)
 add_skim('BtoDh_Kspi0', BtoDhKspi0List)
 
 # B- to D(->Kspipipi0)h- Skim
 from skim.btocharm import BsigToDhToKspipipi0List, loadDkspipipi0
-loadDkspipipi0()
-BtoDhKspipipi0List = BsigToDhToKspipipi0List()
+loadDkspipipi0(path=analysis_main)
+BtoDhKspipipi0List = BsigToDhToKspipipi0List(path=analysis_main)
 add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List)
 
 

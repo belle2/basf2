@@ -75,7 +75,7 @@ class TestStdCharged(unittest.TestCase):
             self.assertFalse(any(module.type() == "ParticleLoader" for module in testpath.modules()))
 
     def test_nonesense_list(self):
-        """check that the builder functions all work with the all list"""
+        """check that the builder functions fail with a nonexisting list"""
         self._check_listtype_does_not_exist("flibble")
 
     def test_all_list(self):

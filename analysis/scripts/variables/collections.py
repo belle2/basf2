@@ -37,7 +37,7 @@ ckm_kinematics = ut.create_aliases(kinematics,
 
 #: Cluster-related variables
 cluster = [
-    'ClusterHadronIntensity',
+    'PulseShapeDiscriminationMVA',
     'ClusterHasPulseShapeDiscrimination',
     'ClusterNumberOfHadronDigits',
     'clusterDeltaLTemp',

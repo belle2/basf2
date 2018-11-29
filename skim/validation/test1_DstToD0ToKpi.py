@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# Charm skims
-# L.K. Li, 26/Nov/2018
-#
-######################################################
+"""
+<header>
+  <input>./WG6_DstToD0pi_D0ToKpi.dst.root</input>
+  <output>./WG6_DstToD0ToKpi.udst.root</output>
+  <contact>lilongke@ihep.ac.cn</contact>
+</header>
+"""
 
 from ROOT import Belle2
 from basf2 import *

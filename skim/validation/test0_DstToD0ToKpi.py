@@ -2,6 +2,13 @@
 # -*- coding: utf-8 -*-
 # Descriptor: [D*+ -> [D0 -> K- pi+] pi+ ]
 
+"""
+<header>
+  <output>./WG6_DstToD0pi_D0ToKpi.dst.root</output>
+  <contact>lilongke@ihep.ac.cn</contact>
+</header>
+"""
+
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output

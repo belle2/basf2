@@ -1,22 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# Reconstruct D* tagged D0 for charm validation.
-# Check proper time resolution,
-# slow pion efficiency and impact parameters resolution
-#
-# ccbar -> D*+ anything
-#           |
-#           +-> D0:kpi pi+
-#                |
-#                +-> K- pi+
-#
-#
-# Contributors: Longke Li (Nov 2018)
-#
-######################################################
+"""
+<header>
+  <input>./WG6_DstToD0ToKpi.udst.root</input>
+  <output>./WG6_DstToD0ToKpi.ntup.root</output>
+  <contact>lilongke@ihep.ac.cn</contact>
+</header>
+"""
 
 from basf2 import *
 from vertex import *

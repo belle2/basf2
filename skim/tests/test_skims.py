@@ -71,7 +71,7 @@ add_skim('TauGeneric', TauList(path=analysis_main))
 
 # TCPV Skim
 from skim.tcpv import TCPVList
-add_skim('TCPV', TCPVList())
+add_skim('TCPV', TCPVList(analysis_main))
 
 # Bottomonium Etab Skim: 15420100
 from skim.quarkonium import *

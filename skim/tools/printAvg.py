@@ -1,40 +1,49 @@
-#####################################################################################
-#
-#
-#
-#
-#
-#  This module prints out the AVERAGE preformance PER MC samplesof the different skimming scripts
-#
-#        By Racha Cheaib Dec 1st, 2018
-################################################################################
 
 # !/usr/bin/env python3
+
+
+"""
+This is a tool that prints out the follwing information about a skim per MC sample type:
+   1) Total Retention Rate
+   2) Total Time/Event  (HEPSEC)
+   3) Total uDST size /Event (kB)
+
+   1) Average Retention Rate
+   2) Average Time/Event  (HEPSEC)
+   3) Average uDST size /Event (kB)
+
+
+
+To run printAvg.py, you need to have run your skim on a set of input mDST files
+(you can use skimRun.csh), and produce a set of uDST and log files with the following
+name scheme:
+  SkimName_SampleName.udst.root
+  SkimName_SampleName.out
+
+"""
+
+__author__ = " R. Cheaib"
+
+
 from basf2 import *
 import os
 import itertools
 import sys
 import collections
-from skimExpertFunctions import *
-import subprocess
-import json
+from skimExpertFunctions import getTestFile, getNEvents
 
-
-skims = 'TauLFV ALP3Gamma BottomoniumEtabExclusive'
-#  skimNames1 = ' BtoDh_Kspi0 BtoDh_Kspipipi0 BtoDh_Kshh BtoDh_hh BtoPi0Pi0
-# BottomoniumEtabExclusive BottomoniumUpsilon  SLUntagged LeptonicUntagged
-# skimName2 = ' Charm2BodyHadronic Charm3BodyHadronic Charm3BodyHadronic2
-# Charm2BodyHadronicD0 CharmSemileptonic  Charm2BodyNeutrals
-# Charm2BodyNeutralsD0 CharmRare CharmlessHad SystematicsJpsiee'
-# skiName3 = ' SystematicsJpsimumu SystematicsDstar Tau TCPV
-#  PRsemileptonicUntagged DoubleCharm feiHadronicB0 feiHadronicBplus
-# feiSLB0WithOneLep feiSLBplusWithOneLep '
+skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
+skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
+skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
+skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
+skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV'
+skims += ' CharmRare BtoXll BtoXgamma  TauLFV '
+skims += ' Charm3BodyHadronic2  Charm3BodyHadronicD0   Charm2BodyNeutrals Charm2BodyNeutralsD0'
 
 bkgs = 'MC9_mixedBGx1  MC9_chargedBGx1 MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1'
-# ' MC9_ mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
+bkgs += ' MC9_mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
 
 
-nFullFiles = 10000
 nFullEvents = 200000
 nSkims = 0
 
@@ -64,7 +73,6 @@ for bkg in bkgs.split():
         fileList = getTestFile(sampleType, skimCampaign)
         nFullEvents = getNEvents(fileList)
         nSkimmedEvents = getNEvents(outputUdstName + '.udst.root')
-        nFullFiles = getNumberOfInputMdstFilesPerSample(sampleType, skimCampaign)
         # These counters are included to determine the number  of lines with retention and candidate multiplicity information.
         lineCounter = 0
         l = 0

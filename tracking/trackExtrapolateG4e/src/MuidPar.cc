@@ -206,12 +206,10 @@ namespace Belle2 {
         } else {
           if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
             //pdf treatment used to avoid layer inefficiency problems
-            unsigned int BKLMhitLayerPattern_low = 0;
-            unsigned int BKLMhitLayerPattern_high = 0;
-            BKLMhitLayerPattern_low = layer >> 1;
-            BKLMhitLayerPattern_high = layer << 1;
-            if (BKLMhitLayerPattern_low != 0 && BKLMhitLayerPattern_high != 0) {
-              pdf = pdf * pdf;//if there is no hit in this Layer, leave the same pdf as previous layer
+            unsigned int testBitPrev = testBit >> 1;
+            unsigned int testBitNext = testBit << 1;
+            if (((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) {
+              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer - 1]; //if there is no hit in this Layer, use the pdf of the previous layer
             } else {
               pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
             }
@@ -229,12 +227,10 @@ namespace Belle2 {
         } else {
           if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer)) {
             //pdf treatment used to avoid layer inefficiency problems
-            unsigned int EKLMhitLayerPattern_low = 0;
-            unsigned int EKLMhitLayerPattern_high = 0;
-            EKLMhitLayerPattern_low = layer >> 1;
-            EKLMhitLayerPattern_high = layer << 1;
-            if (EKLMhitLayerPattern_low != 0 && EKLMhitLayerPattern_high != 0) {
-              pdf = pdf * pdf;//if there is no hit in this Layer, leave the same pdf as previous layer
+            unsigned int testBitPrev = testBit >> 1;
+            unsigned int testBitNext = testBit << 1;
+            if (((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) {
+              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer - 1]; //if there is no hit in this Layer, use the pdf of the previous layer
             } else {
               pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
             }

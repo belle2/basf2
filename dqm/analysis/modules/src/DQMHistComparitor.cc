@@ -276,7 +276,7 @@ void DQMHistComparitorModule::event()
     TH1* h;
     if (1) {
       h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
-      if (abs(hist2->Integral()) > 1e-3)
+      if (abs(hist2->Integral()) > 0)
         h->Scale(hist1->Integral() / hist2->Integral());
     } else {
       hist2->Draw("hist");

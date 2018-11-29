@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-from basf2 import *
+import b2test_utils
+import basf2
 from ROOT import Belle2
 from modularAnalysis import *
 
@@ -54,18 +55,18 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
 
 # ISR cc skim
 from skim.quarkonium import ISRpipiccList
-add_skim('ISRpipicc', ISRpipiccList())
+add_skim('ISRpipicc', ISRpipiccList(path=analysis_main))
 
 # BtoPi0Pi0 Skim
 from skim.btocharmless import BtoPi0Pi0List
-add_skim('BtoPi0Pi0', BtoPi0Pi0List())
+add_skim('BtoPi0Pi0', BtoPi0Pi0List(path=analysis_main))
 
 # Tau Skim
 from skim.taupair import TauLFVList
-add_skim('TauLFV', TauLFVList())
+add_skim('TauLFV', TauLFVList(1, path=analysis_main))
 
 from skim.taupair import TauList
-# add_skim('TauGeneric', TauList())
+add_skim('TauGeneric', TauList(path=analysis_main))
 
 
 # TCPV Skim
@@ -74,18 +75,19 @@ add_skim('TCPV', TCPVList())
 
 # Bottomonium Etab Skim: 15420100
 from skim.quarkonium import *
-add_skim('BottomoniumEtabExclusive', EtabList())
+add_skim('BottomoniumEtabExclusive', EtabList(path=analysis_main))
 
 from skim.quarkonium import *
-add_skim('BottomoniumUpsilon', UpsilonList())
+add_skim('BottomoniumUpsilon', UpsilonList(path=analysis_main))
 
-
+# B to Charmless skim
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
-Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()
+Had2BodyList = CharmlessHad2BodyB0List(path=analysis_main) + CharmlessHad2BodyBmList(path=analysis_main)
 add_skim('CharmlessHad2Body', Had2BodyList)
 
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
-
+Had3BodyList = CharmlessHad3BodyB0List(path=analysis_main) + CharmlessHad3BodyBmList(path=analysis_main)
+add_skim('CharmlessHad3Body', Had3BodyList)
 
 # Systematics skim
 from skim.systematics import SystematicsList
@@ -197,6 +199,10 @@ from skim.dark import ALP3GammaList
 add_skim('ALP3Gamma', ALP3GammaList(path=analysis_main))
 
 setSkimLogging()
-process(analysis_main)
+
+# process the basf2 path in a temporary directory (so all of the skimmed udst
+# files get cleaned up afterwards).
+with b2test_utils.clean_working_directory():
+    basf2.process(analysis_main, 1)  # just process one event
 
 print(statistics)

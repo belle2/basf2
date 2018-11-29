@@ -14,10 +14,6 @@
 #include <vector>
 #include <string>
 #include <analysis/VariableManager/Manager.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <trg/gdl/dbobjects/TRGGDLDBPrescales.h>
-#include <trg/gdl/dbobjects/TRGGDLDBFTDLBits.h>
 
 
 namespace Belle2 {
@@ -29,11 +25,6 @@ namespace Belle2 {
      * returns true if any L1 PSNM bit is true
      */
     double L1Trigger(const Particle*);
-
-    /**
-     * returns trigger FTDL bit (Final Trigger Decision Logic before prescale)
-     */
-    double L1FTDLBit(const Particle*, const std::vector<double>& bit);
 
     /**
      * returns name of trigger FTDL bit (Final Trigger Decision Logic before prescale)
@@ -70,10 +61,5 @@ namespace Belle2 {
      */
     double passesAnyFastRecoTrigger(const Particle*);
 
-    //condition database for prescale
-    DBObjPtr<TRGGDLDBPrescales> m_prescales;
-
-    //condition database for FTDL bitname
-    DBObjPtr<TRGGDLDBFTDLBits> m_ftdlbits;
   }
 }

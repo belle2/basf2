@@ -85,7 +85,11 @@ Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()
 add_skim('CharmlessHad2Body', Had2BodyList)
 
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
+Had3BodyList = CharmlessHad3BodyB0List(path=analysis_main) + CharmlessHad3BodyBmList(path=analysis_main)
+add_skim('CharmlessHad3Body', Had3BodyList)
 
+
+# Charm skims
 # charm Skim: D0 -> K pi/ pi pi /K K
 from skim.charm import D0ToHpJm
 add_skim('Charm2BodyHadronicD0', D0ToHpJm())

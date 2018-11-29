@@ -81,8 +81,8 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   auto drldg = drldrg * (drdm * dmdg);
 
   // wire ends
-  const double zWireM = s_cdcGeometryTranslator->getWireBackwardPosition(getWireID())[2];
-  const double zWireP = s_cdcGeometryTranslator->getWireForwardPosition(getWireID())[2];
+  const double zWireM = s_cdcGeometryTranslator->getWireBackwardPosition(getWireID(), CDCGeometryPar::c_Aligned)[2];
+  const double zWireP = s_cdcGeometryTranslator->getWireForwardPosition(getWireID(), CDCGeometryPar::c_Aligned)[2];
   // relative Z position [0..1]
   const double zRel = std::max(0., std::min(1., (pos[2] - zWireM) / (zWireP - zWireM)));
 

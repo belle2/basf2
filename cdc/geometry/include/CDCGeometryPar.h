@@ -31,6 +31,9 @@
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
+#include <cdc/dbobjects/CDCLayerAlignment.h>
+
+
 #include <vector>
 #include <string>
 #include <map>
@@ -1126,6 +1129,7 @@ namespace Belle2 {
       DBObjPtr<CDCAlignment>* m_alignmentFromDB; /*!< alignment params. retrieved from DB. */
       DBObjPtr<CDCMisalignment>* m_misalignmentFromDB; /*!< misalignment params. retrieved from DB. */
       DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
     };

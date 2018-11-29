@@ -58,7 +58,7 @@ add_skim('ISRpipicc', ISRpipiccList())
 
 # BtoPi0Pi0 Skim
 from skim.btocharmless import BtoPi0Pi0List
-add_skim('BtoPi0Pi0', BtoPi0Pi0List())
+add_skim('BtoPi0Pi0', BtoPi0Pi0List(path=analysis_main))
 
 # Tau Skim
 from skim.taupair import TauLFVList

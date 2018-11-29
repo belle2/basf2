@@ -40,13 +40,13 @@ namespace Belle2 {
     DisplayModule();
 
     /// Sets up geometry if needed.
-    void initialize();
+    void initialize() override;
 
     /// Show various reconstructed or simulated objects in the event viewer until the next event is requested.
-    void event();
+    void event() override;
 
     /// Terminate gEve to avoid problems with root's cleanup.
-    void terminate();
+    void terminate() override;
 
   private:
     /** List of drawing options, see EVEVisualization::setOptions() */

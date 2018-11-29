@@ -53,7 +53,7 @@ skimOutputUdst(skimCode, ISRpipicc, path=ISRskimpath)
 summaryOfLists(ISRpipicc, path=ISRskimpath)
 
 # output skim log information
-setSkimLogging(skim_path=ISRskimpath)
+setSkimLogging(path=ISRskimpath)
 
 # process the path
 process(ISRskimpath)

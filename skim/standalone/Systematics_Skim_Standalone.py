@@ -72,7 +72,7 @@ if 'Validation' in argvs:
     ntupleTree('Dstar', 'D*+:syst0', toolsdstar, path=skimpath)
 
 
-setSkimLogging(skim_path=skimpath)
+setSkimLogging(path=skimpath)
 process(skimpath)
 
 print(statistics)

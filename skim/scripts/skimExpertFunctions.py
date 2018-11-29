@@ -4,21 +4,18 @@
 """
 Functions for skim testing and for skim name encoding.
 """
-
+from modularAnalysis import *
 from basf2 import *
 import os
 import sys
 import inspect
-from vertex import *
 from analysisPath import *
-from modularAnalysis import *
-
 import subprocess
 import json
 # For channels in fei skim
 # from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 
-_totalNumberOfMdstInputFiles = [
+_totalNumberOfMdstInputFiles = {
     ('MC9_mixedBGx1', 3564),
     ('MC9_chargededBGx1', 3770),
     ('MC9_uubarBGx1', 6115),
@@ -33,8 +30,8 @@ _totalNumberOfMdstInputFiles = [
     ('MC9_ssbarBGx0', 192),
     ('MC9_ccbarBGx0', 760),
     ('MC9_taupairBGx0', 368),
-]
-_testFileList = [
+}
+_testFileList = {
     ('MC10_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-01-00-03/DB00000294/MC10/prod00004770/s00/e0000/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000001_prod00004770_task00000001.root'),
     ('MC10_mixedBGx0', '/ghi/fs01/belle2/bdata/MC/release-01-00-03/DB00000294/MC10/prod00003591/s00/e0000/4S/r00000/mixed/' +
@@ -148,7 +145,7 @@ _testFileList = [
     ('MC9_taupair6SBGx1', '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002703/e0000/6S/r00000/taupair/sub00/' +
 
      'mdst_000001_prod00002703_task00000001.root'),
-]
+}
 
 _skimNameMatching = [
     ('11110100', 'PRsemileptonicUntagged'),
@@ -217,7 +214,7 @@ def decodeSkimName(skimCode):
     return lookup_dict[skimCode]
 
 
-def getTestFile(sample, skimCampaign):
+def get_test_file(sample, skimCampaign):
     """
     Returns the KEKcc location of files used specifically for skim testing
 
@@ -232,7 +229,7 @@ def getTestFile(sample, skimCampaign):
     return lookup_dict[sampleName]
 
 
-def getNumberOfInputMdstFilesPerSample(sample, skimCampaign):
+def get_total_infiles(sample, skimCampaign):
     """
     Returns the total number of input Mdst files for a given sample. This is useful for resource estimate.
     Arguments:
@@ -262,7 +259,7 @@ def add_skim(label, lists, path):
     summaryOfLists(lists)
 
 
-def setSkimLogging(skim_path=analysis_main, additional_modules=[]):
+def setSkimLogging(path=analysis_main, additional_modules=[]):
     """
     Turns the log level to ERROR for  several modules to decrease
     the total size of the skim log files
@@ -273,7 +270,7 @@ def setSkimLogging(skim_path=analysis_main, additional_modules=[]):
             names that should be silenced
     """
     noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
-    for module in skim_path.modules():
+    for module in path.modules():
         if module.type() in noisy_modules:
             module.set_log_level(LogLevel.ERROR)
     return
@@ -293,7 +290,7 @@ def ifEventPasses(cut, conditional_path, path=analysis_main):
     eselect.if_value('>=1', conditional_path, AfterConditionPath.CONTINUE)
 
 
-def getNEvents(fileName):
+def get_eventN(fileName):
     """
     Returns the number of events in a specific file
 

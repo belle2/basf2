@@ -168,7 +168,7 @@ namespace Belle2 {
     ETimingType m_timType = TTYP_NONE;
 
     /** the prescale factor of each bit*/
-    int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
+    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
     ClassDefOverride(TRGSummary, 5);

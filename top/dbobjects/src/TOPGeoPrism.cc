@@ -22,7 +22,13 @@ namespace Belle2 {
   {
     if (m_exitThickness <= 0) return false;
     if (m_flatLength < 0) return false;
-    if (!TOPGeoBarSegment::isConsistent()) return false;
+    if (m_width <= 0) return false;
+    if (m_thickness <= 0) return false;
+    if (m_length <= 0) return false;
+    if (m_material.empty()) return false;
+    if (m_surface.getName().empty() and !m_surface.hasProperties()) return false;
+    if (m_sigmaAlpha < 0) return false;
+    if (m_brokenFraction > 0 and m_brokenGlueMaterial.empty()) return false;
     if (!m_peelOffRegions.empty()) {
       if (m_peelOffSize <= 0) return false;
       if (m_peelOffThickness <= 0) return false;
@@ -47,8 +53,10 @@ namespace Belle2 {
     cout << " Prism angle: " << getAngle() / Unit::deg << " deg";
     cout << ", flat surface length: " << getFlatLength() << " " << s_unitName << endl;
     cout << " Material: " << getMaterial() << endl;
-    cout << " Wavelenght filter: " << getFilterMaterial()
-         << ", thickness: " << getFilterThickness() << " " << s_unitName << endl;
+    if (getFilterThickness() > 0) { // old payload
+      cout << " Wavelenght filter: " << getFilterMaterial()
+           << ", thickness: " << getFilterThickness() << " " << s_unitName << endl;
+    }
     if (!m_peelOffRegions.empty()) {
       cout << " Peel-off cookie regions: ";
       cout << " size = " << getPeelOffSize() << " " << s_unitName;

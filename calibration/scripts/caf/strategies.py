@@ -228,6 +228,9 @@ class SequentialRunByRun(AlgorithmStrategy):
     is enough data in the remaining runs to get a full execution. If there isn't enough data remaining, the last runs
     are merged with the previous successful execution's runs and a final execution is performed on all remaining runs.
 
+    Additionally this strategy will automatically make sure that IoV gaps in your input data are covered by a payload.
+    This means that there shouldn't be any IoVs that don't get a new payload by the  end of runnning an iteration.
+
     This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
     a CalibrationAlgorithm C++ class directly.
 """
@@ -426,7 +429,7 @@ class SequentialRunByRun(AlgorithmStrategy):
                 elif not remaining_runs and not last_successful_result:
                     B2ERROR("There aren't any more runs remaining to merge with, and we never had a previous success."
                             " There wasn't enough data in the full input data requested.")
-                    self.results.appemd(self.machine.result)
+                    self.results.append(self.machine.result)
                     self.queue.put(self.machine.result)
                     self.machine.fail()
                     break

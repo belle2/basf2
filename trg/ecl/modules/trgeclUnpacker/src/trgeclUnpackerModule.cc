@@ -67,9 +67,9 @@ void TRGECLUnpackerModule::event()
       nwords = raw_trgarray[i]->GetDetectorNwords(j, 0);
       if (nodeid == 0x13) {
         if (nwords < 10) {
-          B2ERROR("Consistecy error in unpacker.");
-          B2ERROR("data length " << nwords << " nWord " << nwords);
-          B2ERROR("Node ID " << nodeid << ", Finness ID " << iFiness);
+          B2ERROR("Consistecy error in unpacker."
+                  << LogVar("data length ", nwords) << LogVar("nWord" , nwords)
+                  << LogVar("Node ID ", nodeid) << LogVar("Finness ID " , iFiness));
           continue;
         }
         readCOPPEREvent(raw_trgarray[i], j, nwords);

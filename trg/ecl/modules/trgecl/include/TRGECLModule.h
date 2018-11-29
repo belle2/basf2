@@ -17,10 +17,15 @@
 #include <string>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+
+
 #include "trg/ecl/TrgEclMaster.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
+#include "trg/ecl/dbobjects/TRGECLETMPara.h"
 
 namespace Belle2 {
 
@@ -90,9 +95,9 @@ namespace Belle2 {
 
     // double m_timeCPU;        //  CPU time
     //!  Run number
-    int    m_nRun;
+    int m_nRun;
     //!  Event number
-    int    m_nEvent;
+    int m_nEvent;
     //! Bhabha option
     int _Bhabha;
     //! Clustering option
@@ -109,10 +114,23 @@ namespace Belle2 {
     int _NofTopTC;
     //! Event selection
     int _SelectEvent;
+    //! Flag to use Condition DB
+    int _ConditionDB;
+    //! 2D Bhabha Energy Threshold
+    std::vector<double> _2DBhabhaThresholdFWD;
+    //! 2D Bhabha Energy Threshold
+    std::vector<double> _2DBhabhaThresholdBWD;
+    //! 3D Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaThreshold;
+    //! Total Energy Theshold (low, high, lum)
+    std::vector<double> _TotalEnergy;
+    //! Low Multiplicity Threshold
+    std::vector<double> _LowMultiThreshold;
 
     StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
     StoreArray<TRGECLTrg> m_TRGECLTrg; /**< output for TRGECLTrg */
     StoreArray<TRGECLCluster> m_TRGECLCluster; /**< output for TRGECLCluster */
+    DBArray<TRGECLETMPara> m_ETMPara; /** ETN Parameters */
 
   };
 

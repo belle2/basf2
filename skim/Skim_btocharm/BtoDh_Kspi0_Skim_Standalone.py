@@ -14,12 +14,8 @@ from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging
 gb2_setuprel = 'release-02-00-01'
-
-import os.path
-import sys
-import glob
 
 kspi0path = Path()
 

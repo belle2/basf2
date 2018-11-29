@@ -11,12 +11,10 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK
+from skimExpertFunctions import encodeSkimName, setSkimLogging
+
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
-import os
-import sys
-import glob
-from skimExpertFunctions import *
 
 hhpath = Path()
 

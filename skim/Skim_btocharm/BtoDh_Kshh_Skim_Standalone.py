@@ -12,14 +12,10 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import stdPi, stdK
 from stdV0s import *
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging
+
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
-
-import os
-import sys
-import glob
-import basf2
 
 mypath = Path()
 

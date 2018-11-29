@@ -24,6 +24,7 @@ namespace Belle2 {
 
   class CDCTriggerNeuroConfig: public TObject {
   public:
+    /** struct to hold a line of information of b2link format */
     struct B2FormatLine {
       int start;
       int end;
@@ -31,21 +32,26 @@ namespace Belle2 {
       std::string name;
       std::string description;
     };
+    /** constructor */
     CDCTriggerNeuroConfig() {}
 
+    /** destructor */
     virtual ~CDCTriggerNeuroConfig() {};
 
-    void set_B2Format(const std::vector<B2FormatLine>& format)
+    /** function to directly set b2link format */
+    void setB2Format(const std::vector<B2FormatLine>& format)
     {
       for (auto line : format) {
-        add_B2FormatLine(line);
+        addB2FormatLine(line);
       }
     }
-    void add_B2FormatLine(const B2FormatLine& line)
+    /** function to add line to b2link format, overloaded  */
+    void addB2FormatLine(const B2FormatLine& line)
     {
       m_B2Format.push_back(line);
     }
-    void add_B2FormatLine(int start, int end, int offset, std::string name, std::string description)
+    /** function to add line to b2link format, overloaded  */
+    void addB2FormatLine(int start, int end, int offset, std::string name, std::string description)
     {
       B2FormatLine b;
       b.start = start;
@@ -53,15 +59,17 @@ namespace Belle2 {
       b.offset = offset;
       b.name = name;
       b.description = description;
-      add_B2FormatLine(b);
+      addB2FormatLine(b);
     }
-    void set_NNName(const std::string& filename)
+    /** set name of neural network version  */
+    void setNNName(const std::string& filename)
     {
       if (filename.size() <= 255) {
         m_NNName = filename;
       }
     }
-    void load_MLPs(const std::string& filename, const std::string& arrayname)
+    /** load MLP objects from file */
+    void loadMLPs(const std::string& filename, const std::string& arrayname)
     {
       TFile datafile(filename.c_str(), "READ");
       TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
@@ -77,42 +85,55 @@ namespace Belle2 {
       delete MLPs;
       datafile.Close();
     }
-    void set_NNNotes(const std::string& notes)
+    /** add some notes to the verison of MLPS  */
+    void setNNNotes(const std::string& notes)
     {
       if (notes.size() <= 255) {
         m_NNNotes = notes;
       }
     }
-    void set_useETF(bool b)
+    /** set bool wether ETF is used or not */
+    void setUseETF(bool b)
     {
       m_useETF = b;
     }
-    void set_PPNotes(const std::string& notes)
+    /** add some notes about the preprocessing */
+    void setPPNotes(const std::string& notes)
     {
       if (notes.size() <= 255) {
         m_PPNotes = notes;
       }
     }
-    void set_NNTFirmwareVersionID(const std::string& version)
+    /** set the firmware version id */
+    void setNNTFirmwareVersionID(const std::string& version)
     {
       if (version.size() <= 255) {
         m_NNTFirmwareVersionID = version;
       }
     }
-    void set_NNTFirmwareComment(const std::string& notes)
+    /** add a comment to the firmware version */
+    void setNNTFirmwareComment(const std::string& notes)
     {
       if (notes.size() <= 255) {
         m_NNTFirmwareComment = notes;
       }
     }
-    std::vector<B2FormatLine> get_B2Format()  const  {return m_B2Format;}
-    std::string get_NNName()                  const  {return m_NNName;}
-    std::vector<CDCTriggerMLP> get_MLPs()     const  {return m_MLPs;}
-    std::string get_NNNotes()                 const  {return m_NNNotes;}
-    bool get_useETF()                         const  {return m_useETF;}
-    std::string get_PPNotes()                 const  {return m_PPNotes;}
-    std::string get_NNTFirmwareVersionID()    const  {return m_NNTFirmwareVersionID;}
-    std::string get_NNTFirmwareComment()      const  {return m_NNTFirmwareComment;}
+    /** return b2link format  */
+    std::vector<B2FormatLine> getB2Format()  const  {return m_B2Format;}
+    /** return neural network name  */
+    std::string getNNName()                  const  {return m_NNName;}
+    /**return loaded CDCTriggerMPL objects  */
+    std::vector<CDCTriggerMLP> getMLPs()     const  {return m_MLPs;}
+    /**return neural network notes  */
+    std::string getNNNotes()                 const  {return m_NNNotes;}
+    /** return bool wether ETF is used or not  */
+    bool getUseETF()                         const  {return m_useETF;}
+    /**return notes on preprocessing  */
+    std::string getPPNotes()                 const  {return m_PPNotes;}
+    /** return firmware version  */
+    std::string getNNTFirmwareVersionID()    const  {return m_NNTFirmwareVersionID;}
+    /** returncomment on firmware version  */
+    std::string getNNTFirmwareComment()      const  {return m_NNTFirmwareComment;}
 
   private:
     // B2Format

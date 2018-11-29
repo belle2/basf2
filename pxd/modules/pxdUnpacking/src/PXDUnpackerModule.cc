@@ -400,6 +400,7 @@ void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, Vx
 
 void PXDUnpackerModule::dump_dhp(void* data, unsigned int frame_len)
 {
+  // called only for debugging purpose, will never be called in normal running
   unsigned int w = frame_len / 2;
   ubig16_t* d = (ubig16_t*)data;
 
@@ -422,6 +423,7 @@ void PXDUnpackerModule::dump_dhp(void* data, unsigned int frame_len)
 
 void PXDUnpackerModule::dump_roi(void* data, unsigned int frame_len)
 {
+  // called only for debugging purpose, will never be called in normal running
   unsigned int w = frame_len / 4;
   ubig32_t* d = (ubig32_t*)data;
 
@@ -548,11 +550,13 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 // TODO Please check if this can happen by accident with valid data!
   if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
     // We see a second "header" with framenr+1 ...
-    if (!(m_suppressErrorMask & c_DHP_DBL_HEADER)) B2WARNING("DHP data: seems to be double header! skipping." << LogVar("Length",
-                                                               frame_len));
+    if (!(m_suppressErrorMask & c_DHP_DBL_HEADER)) {
+      B2WARNING("DHP data: seems to be double header! skipping.");
+      B2EBUG(1, "DHP data: seems to be double header! skipping." << LogVar("Length",
+             frame_len));
+    }
     m_errorMask |= c_DHP_DBL_HEADER;
     // dump_dhp(data, frame_len); print out guilty dhp packet
-//    B2WARNING("Mask $" << hex <<m_errorMask);
     return;
   }
 
@@ -1040,7 +1044,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       last_dhp_readout_frame_lo[1] = -1;
       last_dhp_readout_frame_lo[2] = -1;
       last_dhp_readout_frame_lo[3] = -1;
-      if (m_verbose)dhc.data_dhe_start_frame->print();
+      if (m_verbose) dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
       dhe_first_triggergate = dhc.data_dhe_start_frame->getTriggerGate();
       if (currentDHEID != 0xFFFFFFFF && (currentDHEID & 0xFFFF) >= dhc.data_dhe_start_frame->getDHEId()) {
@@ -1115,7 +1119,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       break;
     };
     case EDHCFrameHeaderDataType::c_GHOST:
-      if (m_verbose)dhc.data_ghost_frame->print();
+      if (m_verbose) dhc.data_ghost_frame->print();
       if (currentDHEID != dhc.data_ghost_frame->getDHEId()) {
         if (!(m_suppressErrorMask & c_DHE_START_ID)) {
           B2WARNING("DHE ID from DHE Start and this frame do not match");
@@ -1140,7 +1144,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         if (!(m_suppressErrorMask & c_FAKE_NO_DATA_TRIG)) B2WARNING("Faked DHC END Data -> trigger without Data!");
         m_errorMask |= c_FAKE_NO_DATA_TRIG;
       } else {
-        if (m_verbose)dhc.data_dhc_end_frame->print();
+        if (m_verbose) dhc.data_dhc_end_frame->print();
       }
 
       if (!isFakedData_event) {

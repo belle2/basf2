@@ -25,19 +25,20 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   StoreObjPtr<FileMetaData> filPtr("", DataStore::c_Persistent);
   if (filPtr) {
     if (filPtr->getMcEvents() == 0) m_realData = true;
-//    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
+    //    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
   } else { //judge from MCParticle
     StoreArray<MCParticle> mcp;
     if (!mcp) m_realData = true;
-//    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
+    //    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
   }
-//  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
+  //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
 
   if (m_realData) {
-    m_fudgeFactor = m_gcp.getFudgeFactorForSpaceResolForData();
+    m_fudgeFactor = m_cdcp.getFudgeFactorForSigma(0);
   } else {
-    m_fudgeFactor = m_gcp.getFudgeFactorForSpaceResolForMC();
+    m_fudgeFactor = m_cdcp.getFudgeFactorForSigma(1);
   }
+  //  B2INFO("RealisticTDCCountTranslator:: m_fudgeFactor= " << m_fudgeFactor);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -140,7 +141,7 @@ double RealisticTDCCountTranslator::getDriftLengthResolution(double driftLength,
 {
   static_cast<void>(z); //just to suppress warning of unused
   double resol = m_fudgeFactor * m_cdcp.getSigma(driftLength, wireID.getICLayer(), leftRight, alpha, theta);
-  //  cout << "fudgeFactor in transl= " << m_fudgeFactor << endl;
+  //  B2DEBUG(29, "fudgeFactor in TDCTranslator= " << m_fudgeFactor);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

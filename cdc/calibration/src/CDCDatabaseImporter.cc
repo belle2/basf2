@@ -36,10 +36,12 @@
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
+#include <cdc/dbobjects/CDCFudgeFactorsForSigma.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
+#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -128,6 +130,7 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
 
 }
 
+
 void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 {
   std::ifstream stream;
@@ -140,14 +143,17 @@ void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 
   DBImportArray<CDCFEElectronics> cf;
 
-  short width, delay, aTh, tThmV, tTheV, l1late;
+  //  short width, delay, aTh, tThmV, tTheV, l1late;
+  short ib, width, delay, aTh, tThmV;
 
   //  int i=-1;
-  while (stream >> width) {
-    stream >> delay >> aTh >> tThmV >> tTheV >> l1late;
+  while (stream >> ib) {
+    //    stream >> delay >> aTh >> tThmV >> tTheV >> l1late;
+    stream >> width >> delay >> aTh >> tThmV;
     //    ++i;
     //    std::cout << i <<" "<< width << std::endl;
-    cf.appendNew(width, delay, aTh, tThmV, tTheV, l1late);
+    //    cf.appendNew(width, delay, aTh, tThmV, tTheV, l1late);
+    cf.appendNew(ib, width, delay, aTh, tThmV);
   }
   stream.close();
 
@@ -156,9 +162,60 @@ void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 
   cf.import(iov);
 
-  B2RESULT("FEElectronics imported to database.");
-
+  B2RESULT("FEEElectronics imported to database.");
 }
+
+
+void CDCDatabaseImporter::importEDepToADC(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCEDepToADCConversions> etoa;
+  etoa.construct();
+
+  unsigned short paramMode(0), nParams(0);
+  stream >> paramMode >> nParams;
+  etoa->setParamMode(paramMode);
+
+  unsigned short groupId(0);
+  stream >> groupId;
+  B2INFO(paramMode << " " << nParams << " " << groupId);
+  if (groupId > 1) B2FATAL("invalid groupId now !");
+  etoa->setGroupID(groupId);
+
+  unsigned short id = 0;
+  std::vector<float> coeffs(nParams);
+  int nRead = 0;
+
+  while (stream >> id) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
+    ++nRead;
+    etoa->setParams(id, coeffs);
+  }
+  stream.close();
+
+  unsigned short nId = 9;
+  if (groupId == 1) {
+    nId = MAX_N_SLAYERS;
+  } else if (groupId == 2) {
+    nId = 14336;
+  }
+  if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  etoa.import(iov);
+  B2RESULT("EDep-toADC table imported to database.");
+}
+
 
 void CDCDatabaseImporter::importBadWire(std::string fileName)
 {
@@ -505,6 +562,48 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
 }
 
 
+void CDCDatabaseImporter::importFFactor(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCFudgeFactorsForSigma> etoa;
+  etoa.construct();
+
+  unsigned short groupId(0), nParams(0);
+  stream >> groupId >> nParams;
+  B2INFO(groupId << " " << nParams);
+  if (groupId != 0) B2FATAL("invalid groupId now !");
+  etoa->setGroupID(groupId);
+
+  unsigned short id = 0;
+  std::vector<float> coeffs(nParams);
+  int nRead = 0;
+
+  while (stream >> id) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
+    ++nRead;
+    etoa->setFactors(id, coeffs);
+  }
+  stream.close();
+
+  unsigned short nId = 1;
+  if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  etoa.import(iov);
+  B2RESULT("Fudge factor table imported to database.");
+}
+
+
 void CDCDatabaseImporter::importDisplacement(std::string fileName)
 {
   //read alpha bins
@@ -638,12 +737,18 @@ void CDCDatabaseImporter::printFEElectronics()
 {
   DBArray<CDCFEElectronics> fEElectronics;
   for (const auto& cf : fEElectronics) {
-    std::cout << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " "
-              << cf.getADCThresh() << " "
-              << cf.getTDCThreshInMV() << " "
-              << cf.getTDCThreshInEV() << " "
-              << cf.getL1TrgLatency() << std::endl;
+    std::cout << cf.getBoardID() << " " << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " " << cf.getADCThresh() << " " <<
+              cf.getTDCThreshInMV() << std::endl;
   }
+  //              << cf.getTDCThreshInMV() << " "
+  //              << cf.getTDCThreshInEV() << " "
+  //              << cf.getL1TrgLatency() << std::endl;
+}
+
+void CDCDatabaseImporter::printEDepToADC()
+{
+  DBObjPtr<CDCEDepToADCConversions> etoa;
+  etoa->dump();
 }
 
 void CDCDatabaseImporter::printTimeZero()
@@ -688,6 +793,12 @@ void CDCDatabaseImporter::printSigma()
 {
   DBObjPtr<CDCSpaceResols> sgm;
   sgm->dump();
+}
+
+void CDCDatabaseImporter::printFFactor()
+{
+  DBObjPtr<CDCFudgeFactorsForSigma> ff;
+  ff->dump();
 }
 
 void CDCDatabaseImporter::printDisplacement()

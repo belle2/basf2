@@ -19,16 +19,17 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_maxSpaceResol(), m_fudgeFactorForSpaceResolForData(), m_fudgeFactorForSpaceResolForMC(),
+  m_minTrackLength(), m_maxSpaceResol(), m_addFudgeFactorForSigmaForData(), m_addFudgeFactorForSigmaForMC(),
   m_mapperGeometry(), m_mapperPhiAngle(), m_debug4Geo(), m_printMaterialTable(),
   m_materialDefinitionMode(), m_senseWireZposMode(),
   m_displacement(),
   m_alignment(),
   m_misalignment(),
   m_displacementInputType(), m_alignmentInputType(), m_misalignmentInputType(), m_xtInputType(), m_sigmaInputType(),
-  m_propSpeedInputType(), m_t0InputType(), m_twInputType(), m_bwInputType(), m_chMapInputType(), m_displacementFile(),
+  m_propSpeedInputType(), m_t0InputType(), m_twInputType(), m_bwInputType(), m_chMapInputType(), m_eDepToADCInputType(),
+  m_displacementFile(),
   m_alignmentFile(), m_misalignmentFile(), m_xtFile(), m_sigmaFile(), m_propSpeedFile(), m_t0File(), m_twFile(), m_bwFile(),
-  m_chMapFile()
+  m_chMapFile(), m_eDepToADCFile()
 
 {
   //  B2INFO("CDCJobCntlParModifierModule::constructor called.");
@@ -99,6 +100,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("BadWireInputType", m_bwInputType, "Input type for bad wires; db-object (true); text-file (false).", true);
   //input type for channel map
   addParam("ChannelMapInputType", m_chMapInputType, "Input type for channel map; db-object (true); text-file (false).", true);
+  //input type for edep-to-adc
+  addParam("EDepToADCInputType", m_eDepToADCInputType, "Input type for edep-to-adc; db-object (true); text-file (false).", false);
 
 
   //displacement file
@@ -124,20 +127,22 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("BadWireFile", m_bwFile, "Input file name (on cdc/data) for bad wires.",  string("badwire_v1.dat"));
   //channel map
   addParam("ChannelMapFile", m_chMapFile, "Input file name (on cdc/data) for channel map.",  string("ch_map.dat"));
+  //edep-to-adc
+  addParam("EDepToADCFile", m_eDepToADCFile, "Input file name (on cdc/data) for edep-to-adc.",  string("edeptoadc.dat"));
 
   //max. space resolution
   addParam("MaxSpaceResol", m_maxSpaceResol,
            "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
            double(2.5 * 0.0130));
 
-  //fudge factor for data
-  addParam("FudgeFactorForSpaceResolForData", m_fudgeFactorForSpaceResolForData,
-           "Fudge factor for space resol for data (common to all cells).",
+  //additional fudge factor for data
+  addParam("AddFudgeFactorForSigmaForData", m_addFudgeFactorForSigmaForData,
+           "Additional fudge factor for space resol. used in real data event reconstruction (common to all cells).",
            double(1.));
 
-  //fudge factor for MC
-  addParam("FudgeFactorForSpaceResolForMC", m_fudgeFactorForSpaceResolForMC,
-           "Fudge factor for space resol for MC (common to all cells).",
+  //additional fudge factor for MC
+  addParam("AddFudgeFactorForSigmaForMC", m_addFudgeFactorForSigmaForMC,
+           "Additional fudge factor for space resol. used in MC event reconstruction (common to all cells). N.B. This factor is not applied in digitization; only applied in reconstruction. Pplease set the fudge parameter of digitizer instead if you want to change the digitization sigma indep. of sigma used in reconstruction.",
            double(1.));
 
   //mapper geometry flag
@@ -269,6 +274,11 @@ void CDCJobCntlParModifierModule::initialize()
     m_gcp.setChMapInputType(m_chMapInputType);
   }
 
+  if (m_gcp.getEDepToADCInputType() != m_eDepToADCInputType) {
+    B2INFO("CDCJobCntlParModifier: edep-to-adc modified: " << m_gcp.getEDepToADCInputType() << " to " << m_eDepToADCInputType);
+    m_gcp.setEDepToADCInputType(m_eDepToADCInputType);
+  }
+
   if (m_gcp.getDisplacementFile() != m_displacementFile) {
     B2INFO("CDCJobCntlParModifier: displacementFile modified: " << m_gcp.getDisplacementFile() << " to " << m_displacementFile);
     m_gcp.setDisplacementFile(m_displacementFile);
@@ -319,21 +329,26 @@ void CDCJobCntlParModifierModule::initialize()
     m_gcp.setChMapFile(m_chMapFile);
   }
 
+  if (m_gcp.getEDepToADCFile() != m_eDepToADCFile) {
+    B2INFO("CDCJobCntlParModifier: edep-to-adcFile modified: " << m_gcp.getEDepToADCFile() << " to " << m_eDepToADCFile);
+    m_gcp.setEDepToADCFile(m_eDepToADCFile);
+  }
+
   if (m_gcp.getMaxSpaceResolution() != m_maxSpaceResol) {
     B2INFO("CDCJobCntlParModifier: maxSpaceResol modified: " << m_gcp.getMaxSpaceResolution() << " to " << m_maxSpaceResol);
     m_gcp.setMaxSpaceResolution(m_maxSpaceResol);
   }
 
-  if (m_gcp.getFudgeFactorForSpaceResolForData() != m_fudgeFactorForSpaceResolForData) {
-    B2INFO("CDCJobCntlParModifier: fudgeFactorForSpaceResolForData modified: " << m_gcp.getFudgeFactorForSpaceResolForData() << " to "
-           << m_fudgeFactorForSpaceResolForData);
-    m_gcp.setFudgeFactorForSpaceResolForData(m_fudgeFactorForSpaceResolForData);
+  if (m_gcp.getAddFudgeFactorForSigmaForData() != m_addFudgeFactorForSigmaForData) {
+    B2INFO("CDCJobCntlParModifier: addFudgeFactorForSigmaForData modified: " << m_gcp.getAddFudgeFactorForSigmaForData() << " to "
+           << m_addFudgeFactorForSigmaForData);
+    m_gcp.setAddFudgeFactorForSigmaForData(m_addFudgeFactorForSigmaForData);
   }
 
-  if (m_gcp.getFudgeFactorForSpaceResolForMC() != m_fudgeFactorForSpaceResolForMC) {
-    B2INFO("CDCJobCntlParModifier: fudgeFactorForSpaceResolForMC modified: " << m_gcp.getFudgeFactorForSpaceResolForMC() << " to " <<
-           m_fudgeFactorForSpaceResolForMC);
-    m_gcp.setFudgeFactorForSpaceResolForMC(m_fudgeFactorForSpaceResolForMC);
+  if (m_gcp.getAddFudgeFactorForSigmaForMC() != m_addFudgeFactorForSigmaForMC) {
+    B2INFO("CDCJobCntlParModifier: addFudgeFactorForSigmaForMC modified: " << m_gcp.getAddFudgeFactorForSigmaForMC() << " to " <<
+           m_addFudgeFactorForSigmaForMC);
+    m_gcp.setAddFudgeFactorForSigmaForMC(m_addFudgeFactorForSigmaForMC);
   }
 
   if (m_gcp.getMapperGeometry() != m_mapperGeometry) {

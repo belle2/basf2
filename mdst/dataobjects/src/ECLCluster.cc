@@ -41,16 +41,6 @@ TMatrixDSym ECLCluster::getCovarianceMatrix3x3() const
   return covmatecl;
 }
 
-void ECLCluster::getCovarianceMatrixAsArray(double covArray[6]) const
-{
-  covArray[0] = m_sqrtcovmat_00 * m_sqrtcovmat_00;
-  covArray[1] = m_covmat_10;
-  covArray[2] = m_sqrtcovmat_11 * m_sqrtcovmat_11;
-  covArray[3] = m_covmat_20;
-  covArray[4] = m_covmat_21;
-  covArray[5] = m_sqrtcovmat_22 * m_sqrtcovmat_22;
-}
-
 
 int ECLCluster::getDetectorRegion() const
 {

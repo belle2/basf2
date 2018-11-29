@@ -3,8 +3,8 @@
 
 #######################################################
 #
-# All Quarkonium skims at once
-# Authors: S. Spataro,  Sen Jia
+# Bottomonium skims
+# S. Spataro & Sen Jia, 14/Nov/2018
 #
 ######################################################
 
@@ -12,9 +12,17 @@ from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
 from stdCharged import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-02-00-01'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
+import sys
+import os
+import glob
 
+# create a new path
+BottomoniumEtabskimpath = Path()
+
+# create a new path
+BottomoniumUpsilonskimpath = Path()
 
 fileList = \
     [
@@ -23,30 +31,37 @@ fileList = \
     ]
 
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=BottomoniumEtabskimpath)
+inputMdstList('MC9', fileList, path=BottomoniumUpsilonskimpath)
 
+# use standard final state particle lists
+stdPi('loose', path=BottomoniumUpsilonskimpath)
+stdE('loose', path=BottomoniumUpsilonskimpath)
+stdMu('loose', path=BottomoniumUpsilonskimpath)
 
-stdPhotons('loose')
-
-loadStdCharged()
-
+stdPhotons('loose', path=BottomoniumUpsilonskimpath)
+stdPhotons('loose', path=BottomoniumEtabskimpath)
 
 # Bottomonium Etab Skim: 15420100
 from skim.quarkonium import EtabList
-add_skim('BottomoniumEtabExclusive', EtabList())
+EtabList = EtabList(path=BottomoniumEtabskimpath)
+skimCode1 = encodeSkimName('BottomoniumEtabExclusive')
+skimOutputUdst(skimCode1, EtabList, path=BottomoniumEtabskimpath)
+summaryOfLists(EtabList, path=BottomoniumEtabskimpath)
 
 
 # Bottomonium Upsilon Skim: 15440100
 from skim.quarkonium import UpsilonList
-add_skim('BottomoniumUpsilon', UpsilonList())
+YList = UpsilonList(path=BottomoniumUpsilonskimpath)
+skimCode2 = encodeSkimName('BottomoniumUpsilon')
+skimOutputUdst(skimCode2, YList, path=BottomoniumUpsilonskimpath)
+summaryOfLists(YList, path=BottomoniumUpsilonskimpath)
 
 
-# ISR cc skim
-from skim.quarkonium import ISRpipiccList
-add_skim('ISRpipicc', ISRpipiccList())
-
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(skim_path=BottomoniumEtabskimpath)
+setSkimLogging(skim_path=BottomoniumUpsilonskimpath)
+process(BottomoniumEtabskimpath)
+process(BottomoniumUpsilonskimpath)
 
 # print out the summary
 print(statistics)

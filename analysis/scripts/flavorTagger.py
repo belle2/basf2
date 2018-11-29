@@ -897,16 +897,30 @@ def flavorTagger(
       This module can be used to sample the training information, to train and/or to test the flavorTagger.
 
       @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists.
-      @param mode                              The available modes are "Sampler", "Teacher" or "Expert".
-      @param weightFiles                       Weight files name. Default= "B2JpsiKs_muBGx1". Use 'B2JpsiKs_muBGx0' with BGx0 MC.
+      @param mode                              The available modes are
+                                               ``Expert`` (default), ``Sampler``, and ``Teacher``. In the ``Expert`` mode
+                                               Flavor Tagging is applied to the analysis,. In the ``Sampler`` mode you save
+                                               save the variables for training. In the ``Teacher`` mode the FlavorTagger is
+                                               trained, for this step you do not reconstruct any particle or do any analysis,
+                                               you just run the flavorTagger alone.
+      @param weightFiles                       Weight files name. Default=
+                                               ``B2JpsiKs_muBGx1``. Use ``B2JpsiKs_muBGx0`` with BGx0 MC. If the user self
+                                               wants to train the FlavorTagger, the weightfiles name should correspond to the
+                                               analysed CP channel in order to avoid confusions. The default name
+                                               ``B2JpsiKs_mu`` corresponds to Breco
+                                               :math:`\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: 'TMVA-FBDT' or 'FANN-MLP'. Both used by default.
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
-      @param belleOrBelle2                     Uses files trained for "Belle" or "Belle2" MC.
+      @param belleOrBelle2                     Uses files trained for ``Belle`` or ``Belle2`` MC.
       @param saveCategoriesInfo                Sets to save information of individual categories.
-      @param downloadFromDatabaseIfNotfound    Weight files are downloaded from the conditions database if not in workingDirectory.
-      @param uploadToDatabaseAfterTraining     For librarians: uploads weight files to localdb after training.
-      @param samplerFileId                     Identifier to paralellize sampling. Only used in "Sampler" mode.
+      @param downloadFromDatabaseIfNotfound    Weight files are downloaded from
+                                               the conditions database if not available in workingDirectory.
+      @param uploadToDatabaseAfterTraining     For librarians only: uploads weight files to localdb after training.
+      @param samplerFileId                     Identifier to paralellize
+                                               sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
+                                               want to parallelize the sampling, you can run several sampling scripts in
+                                               parallel. By changing this parameter you will not overwrite an older sample.
       @param path                              Modules are added to this path
 
     """

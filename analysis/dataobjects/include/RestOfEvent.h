@@ -200,7 +200,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    RestOfEvent() { };
+    RestOfEvent(bool isNested = false): m_isNested(isNested) { };
 
     // setters
     /**
@@ -263,7 +263,10 @@ namespace Belle2 {
      * @return fractions
      */
     std::vector<double> getChargedStableFractions(const std::string& maskName) const;
-
+    /**
+     * Returns true if the ROE is nested
+     */
+    bool getIsNested() const {return m_isNested;}
     /**
      * Update or add a priori ChargedStable fractions for a specific mask name in the ROE object.
      *
@@ -407,6 +410,7 @@ namespace Belle2 {
     // persistent data members
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
     std::vector<Mask> m_masks;         /**< List of the ROE masks */
+    bool m_isNested;                   /**< Nested ROE indicator */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list

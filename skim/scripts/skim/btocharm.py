@@ -13,9 +13,13 @@ __authors__ = [
 
 from basf2 import *
 from modularAnalysis import *
+import sys
+import glob
+import os.path
+import basf2
 
 
-def BsigToDhTohhList():
+def BsigToDhTohhList(path):
     """
     Skim list definitions for all charged  B to charm 2 body decays.
 
@@ -62,14 +66,14 @@ def BsigToDhTohhList():
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B+:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B+:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B+:BtoDh' + str(chID))
 
     Lists = BsigList
     return Lists
 
 
-def loadD0bar():
+def loadD0bar(path):
 
     Dcuts = '1.5 < M < 2.2'
     D0barChannels = [
@@ -80,13 +84,13 @@ def loadD0bar():
     ]
     D0barList = []
     for chID, channel in enumerate(D0barChannels):
-        reconstructDecay('anti-D0:D0Bar' + str(chID) + ' -> ' + channel, Dcuts, chID)
+        reconstructDecay('anti-D0:D0Bar' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0barList.append('anti-D0:D0Bar' + str(chID))
-        copyLists('anti-D0:hh', D0barList)
+        copyLists('anti-D0:hh', D0barList, path=path)
     return D0barList
 
 
-def BsigToDhToKshhList():
+def BsigToDhToKshhList(path):
     """
     **Skim Author**: M. Nayak
 
@@ -129,14 +133,14 @@ def BsigToDhToKshhList():
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkshh' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:BtoDhkshh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B-:BtoDhkshh' + str(chID))
 
     Lists = BsigList
     return Lists
 
 
-def loadDkshh():
+def loadDkshh(path):
     Dcuts = '1.5 < M < 2.2'
 
     D0_Channels = [
@@ -145,13 +149,13 @@ def loadDkshh():
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kshh' + str(chID) + ' -> ' + channel, Dcuts, chID)
+        reconstructDecay('D0:Kshh' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0List.append('D0:Kshh' + str(chID))
-        copyLists('D0:Kshh', D0List)
+        copyLists('D0:Kshh', D0List, path=path)
     return D0List
 
 
-def BsigToDhToKspi0List():
+def BsigToDhToKspi0List(path):
     """
     **Skim Author**: M. Nayak
 
@@ -188,14 +192,14 @@ def BsigToDhToKspi0List():
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkspi0' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:BtoDhkspi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B-:BtoDhkspi0' + str(chID))
 
     Lists = BsigList
     return Lists
 
 
-def loadDkspi0():
+def loadDkspi0(path):
     Dcuts = '1.5 < M < 2.2'
 
     D0_Channels = [
@@ -204,13 +208,13 @@ def loadDkspi0():
 
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kspi0' + str(chID) + ' -> ' + channel, Dcuts, chID)
+        reconstructDecay('D0:Kspi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0List.append('D0:Kspi0' + str(chID))
-        copyLists('D0:Kspi0', D0List)
+        copyLists('D0:Kspi0', D0List, path=path)
     return D0List
 
 
-def BsigToDhToKspipipi0List():
+def BsigToDhToKspipipi0List(path):
     """
     **Skim Author**: N. Rout
 
@@ -247,14 +251,14 @@ def BsigToDhToKspipipi0List():
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkspipipi0' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B-:BtoDhkspipipi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B-:BtoDhkspipipi0' + str(chID))
 
     Lists = BsigList
     return Lists
 
 
-def loadDkspipipi0():
+def loadDkspipipi0(path):
     Dcuts = '1.8 < M < 1.9'
 
     D0_Channels = [
@@ -262,13 +266,13 @@ def loadDkspipipi0():
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kspipipi0' + str(chID) + ' -> ' + channel, Dcuts, chID)
+        reconstructDecay('D0:Kspipipi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         D0List.append('D0:Kspipipi0' + str(chID))
-        copyLists('D0:Kspipipi0', D0List)
+        copyLists('D0:Kspipipi0', D0List, path=path)
     return D0List
 
 
-def DoubleCharmList():
+def DoubleCharmList(path):
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
     B0_Channels = ['D0:all D0:all',
@@ -278,7 +282,7 @@ def DoubleCharmList():
 
     B0List = []
     for chID, channel in enumerate(B0_Channels):
-        reconstructDecay('B0:DC' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        reconstructDecay('B0:DC' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         B0List.append('B0:DC' + str(chID))
 
     Lists = B0List

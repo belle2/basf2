@@ -251,6 +251,11 @@ def add_skim(label, lists, path):
     create uDST skim for given lists, saving into $label.udst.root
     Particles not necessary for the given particle lists are not saved.
 
+    Parameters:
+        label (str): the registered skim name
+        lists (list(str)): the list of ParticleList names that have been created by a skim list builder function
+        path (basf2.Path): modules are added to this path
+
     """
     skimCode = encodeSkimName(label)
     skimOutputUdst(skimCode, lists, path=path)
@@ -258,7 +263,15 @@ def add_skim(label, lists, path):
 
 
 def setSkimLogging(skim_path=analysis_main, additional_modules=[]):
-    """ Turns the log level to ERROR for  several modules to decrease the total size of the skim log files"""
+    """
+    Turns the log level to ERROR for  several modules to decrease
+    the total size of the skim log files
+
+    Parameters:
+        skim_path (basf2.Path): modules are added to this path
+        additional_modules (list(str)): an optional list of extra noisy module
+            names that should be silenced
+    """
     noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
     for module in skim_path.modules():
         if module.type() in noisy_modules:

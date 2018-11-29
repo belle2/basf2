@@ -119,9 +119,6 @@ namespace Belle2 {
       //! @returns the expected number of photons for the assigned hypothesis
       double getExpectedTOPPhotonCount(const Particle* particle, const vector<double>& vars);
 
-      //! @returns the slot ID of the TOP for the particle
-      double getTOPSlotID(const Particle* particle);
-
       //! @returns the number of TOP photons in the given time interval
       double countTOPHitsInInterval(const Particle* particle, const vector<double>& vars);
 

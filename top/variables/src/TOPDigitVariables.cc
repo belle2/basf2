@@ -35,6 +35,7 @@ namespace Belle2 {
       // returns the TOP likelihood that is associated with a given particle
       const TOPLikelihood* getTOPLikelihood(const Particle* particle)
       {
+        if (not particle) return nullptr;
         const auto* track = particle->getTrack();
         return track ? track->getRelated<TOPLikelihood>() : nullptr;
       }
@@ -84,11 +85,11 @@ namespace Belle2 {
       // if tmin < 0, count from the time of the first photon
       int countHits(const Particle* particle, double tmin, double tmax, bool clean)
       {
-        int slotID = getSlotID(particle);
+        int slotID = static_cast<int>(getSlotID(particle));
         StoreArray<TOPDigit> digits;
         vector<double> digitTimes;
         for (const auto& digit : digits) {
-          if (abs(digit.getModuleID()) != abs(slotID)) continue;
+          if (digit.getModuleID() != slotID) continue;
           // skip bad digits only when we want to clean
           if (clean && digit.getHitQuality() != TOPDigit::c_Good) continue;
           digitTimes.push_back(digit.getTime());
@@ -129,21 +130,12 @@ namespace Belle2 {
           return -1.0;
         }
         auto extHits = trk->getRelationsWith<ExtHit>();
-        int thisModuleID = 77; // default to sentinel value
-        for (auto h : extHits) {
-          if (h.getDetectorID() != Const::EDetector::TOP) continue;
-          if (h.getStatus() != EXT_ENTER) continue;
-          // now find the module of this hit.
-          thisModuleID = h.getCopyID(); // could be positive or negative
-          break;
-        }
-        if (thisModuleID == 77) {
-          return -1;
-        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
         for (auto t : topDigits) {
-          if (abs(t.getModuleID()) != abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
+          if (t.getModuleID() != thisModuleID) continue; // catch the case where one of the module IDs is negative
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
         }
@@ -158,17 +150,8 @@ namespace Belle2 {
           return -1.0;
         }
         auto extHits = trk->getRelationsWith<ExtHit>();
-        int thisModuleID = 77; // default to sentinel value
-        for (auto h : extHits) {
-          if (h.getDetectorID() != Const::EDetector::TOP) continue;
-          if (h.getStatus() != EXT_ENTER) continue;
-          // now find the module of this hit.
-          thisModuleID = h.getCopyID(); // could be positive or negative
-          break;
-        }
-        if (thisModuleID == 77) {
-          return -1;
-        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
         for (auto t : topDigits) {
@@ -187,17 +170,8 @@ namespace Belle2 {
           return -1.0;
         }
         auto extHits = trk->getRelationsWith<ExtHit>();
-        int thisModuleID = 77; // default to sentinel value
-        for (auto h : extHits) {
-          if (h.getDetectorID() != Const::EDetector::TOP) continue;
-          if (h.getStatus() != EXT_ENTER) continue;
-          // now find the module of this hit.
-          thisModuleID = h.getCopyID(); // could be positive or negative
-          break;
-        }
-        if (thisModuleID == 77) {
-          return -1;
-        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
         for (auto t : topDigits) {
@@ -215,17 +189,8 @@ namespace Belle2 {
           return -1.0;
         }
         auto extHits = trk->getRelationsWith<ExtHit>();
-        int thisModuleID = 77; // default to sentinel value
-        for (auto h : extHits) {
-          if (h.getDetectorID() != Const::EDetector::TOP) continue;
-          if (h.getStatus() != EXT_ENTER) continue;
-          // now find the module of this hit.
-          thisModuleID = h.getCopyID(); // could be positive or negative
-          break;
-        }
-        if (thisModuleID == 77) {
-          return -1;
-        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
         for (auto t : topDigits) {
@@ -243,17 +208,8 @@ namespace Belle2 {
           return -1.0;
         }
         auto extHits = trk->getRelationsWith<ExtHit>();
-        int thisModuleID = 77; // default to sentinel value
-        for (auto h : extHits) {
-          if (h.getDetectorID() != 4) continue; // 4 == iTOP, see Const::EDetectors
-          if (h.getStatus() != 0) continue; // 0 == EXT_ENTER
-          // now find the module of this hit.
-          thisModuleID = h.getCopyID(); // could be positive or negative
-          break;
-        }
-        if (thisModuleID == 77) {
-          return -1.0;
-        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         double maxGap = 0; // the largest time difference between two consecutive hits
         vector<double> digitTimes; // all digits in the module that the track entered
@@ -285,17 +241,8 @@ namespace Belle2 {
           return -1.0;
         }
         auto extHits = trk->getRelationsWith<ExtHit>();
-        int thisModuleID = 77; // default to sentinel value
-        for (auto h : extHits) {
-          if (h.getDetectorID() != 4) continue; // 4 == iTOP, see Const::EDetectors
-          if (h.getStatus() != 0) continue; // 0 == EXT_ENTER
-          // now find the module of this hit.
-          thisModuleID = h.getCopyID(); // could be positive or negative
-          break;
-        }
-        if (thisModuleID == 77) {
-          return -1.0;
-        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         vector<double> digitTimes; // the times for all digits in the module that the track entered
         for (auto t : topDigits) {
@@ -379,12 +326,6 @@ namespace Belle2 {
           B2FATAL("Need exactly one parameter (pdg id).");
         }
         return TOPVariable::getExpectedPhotonCount(particle, static_cast<int>(vars[0]));
-      }
-
-      //! @returns the slot ID of the TOP for the particle
-      double getTOPSlotID(const Particle* particle)
-      {
-        return TOPVariable::getSlotID(particle);
       }
 
       //! @returns the number of TOP photons in the given time interval
@@ -509,7 +450,7 @@ namespace Belle2 {
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
     REGISTER_VARIABLE("topLocalTheta", TOPVariable::getTOPLocalTheta,
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
-    REGISTER_VARIABLE("topSlotID", TOPVariable::getTOPSlotID,
+    REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
                       "[calibration] The ID of the TOP slot that was hit by the particle");
     REGISTER_VARIABLE("topExpectedPhotonCount(pdg)", TOPVariable::getExpectedTOPPhotonCount,
                       "[calibration] The expected number of photons in the TOP for the particle under the given hypothesis");

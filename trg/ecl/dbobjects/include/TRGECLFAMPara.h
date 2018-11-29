@@ -188,7 +188,7 @@ namespace Belle2 {
 
 
     //! the class title
-    ClassDef(TRGECLFAMPara, 2); /*< the class title */
+    ClassDef(TRGECLFAMPara, 1); /*< the class title */
   };
 } //! end namespace Belle2
 

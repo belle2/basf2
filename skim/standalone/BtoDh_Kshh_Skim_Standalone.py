@@ -10,15 +10,15 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import sdPi, stdK
+from stdCharged import stdPi, stdK
 from stdV0s import *
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging
+
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-01'
 
-import os
-import sys
-import glob
+mypath = Path()
+
 skimCode = encodeSkimName('BtoDh_Kshh')
 
 fileList = [
@@ -26,23 +26,23 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=mypath)
 
 
-stdPi('all')
-stdK('all')
-stdKshorts()
+stdPi('all', path=mypath)
+stdK('all', path=mypath)
+stdKshorts(path=mypath)
 
 # B- to D(->Kshh)h- Skim
 from skim.btocharm import loadDkshh, BsigToDhToKshhList
-loadDkshh()
-BtoDhList = BsigToDhToKshhList()
-skimOutputUdst(skimCode, BtoDhList)
-summaryOfLists(BtoDhList)
+loadDkshh(path=mypath)
+BtoDhList = BsigToDhToKshhList(path=mypath)
+skimOutputUdst(skimCode, BtoDhList, path=mypath)
+summaryOfLists(BtoDhList, path=mypath)
 
 
 setSkimLogging()
-process(analysis_main)
+process(mypath)
 
 # print out the summary
-print(statistics)
+print(statistics, path=mypath)

@@ -34,6 +34,7 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
@@ -82,10 +83,17 @@ void SVDLocalCalibrationsImporter::importSVDPedestalCalibrationsFromXML(const st
       -1.0, errorTollerant);
 }
 
+void SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
+      xmlFileName, "hot_strips",
+      -1.0, errorTollerant);
+}
+
 void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
   importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
-      xmlFileName, "FADCMasked_strips",
+      xmlFileName, "masks",
       -1.0, errorTollerant);
 }
 

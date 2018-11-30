@@ -185,6 +185,22 @@ namespace Belle2 {
       return result;
     }
 
+    double particleTagVNTracks(const Particle* particle)
+    {
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getNTracks();
+    }
+
+    double particleTagVType(const Particle* particle)
+    {
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+      if (!vert)
+        return -1111.0;
+      return vert->getFitType();
+    }
+
 
     // Delta t and related
 
@@ -485,6 +501,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y Error");
     REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z Error");
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
+    REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
+    REGISTER_VARIABLE("TagVType", particleTagVType, "Fit type of the tag vertex");
 
 
     REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
@@ -519,10 +537,6 @@ namespace Belle2 {
                       "Returns the error of TagV in the boost direction");
     REGISTER_VARIABLE("TagVOBoostErr", tagVErrOrthogonalBoostDirection,
                       "Returns the error of TagV in the direction orthogonal to the boost");
-
-
-
-
 
   }
 }

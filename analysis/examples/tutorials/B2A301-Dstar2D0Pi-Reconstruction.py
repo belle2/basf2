@@ -56,7 +56,7 @@ ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.020 an
 ma.matchMCTruth(list_name='D*+', path=my_path)
 
 # Select variables that we want to store to ntuple
-dstar_vars = vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
+dstar_vars = vc.inv_mass + vc.mc_truth
 
 fs_hadron_vars = vu.create_aliases_for_selected(
     list_of_variables=vc.pid + vc.track + vc.mc_truth,

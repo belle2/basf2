@@ -111,7 +111,7 @@ namespace Belle2 {
     TH1F* m_neuroInPhi0;            /**< Phi0 of incoming 2dtrack */
     TH1F* m_neuroInm_time;          /**< m_time distribution from incoming 2dtracks */
     TH1F* m_neuroInTrackCount;      /**< number of 2dtracks per event */
-
+    TH1F* m_neuroInVs2DOutTrackCount;    /**< number of tracks neuro input 2dtracks vs 2doutput tracks*/
   };
 
 }

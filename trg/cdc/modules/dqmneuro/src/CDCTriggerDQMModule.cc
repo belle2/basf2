@@ -148,7 +148,8 @@ void CDCTriggerDQMModule::defineHisto()
                              48, 0, 48);
   m_neuroInTrackCount = new TH1F("neuroInTrackCount", "number of 2dtracks per event",
                                  20, 0, 20);
-
+  m_neuroInVs2DOutTrackCount = new TH1F("neuroInVs2DOutTrackCount", "Count of neuro input tracks vs. 2d output tracks",
+                                        20, -10, 10);
 
   // cd back to root directory
   oldDir->cd();
@@ -204,7 +205,7 @@ void CDCTriggerDQMModule::beginRun()
   m_neuroInm_time->Reset();
   m_neuroInInvPt->Reset();
   m_neuroInTrackCount->Reset();
-
+  m_neuroInVs2DOutTrackCount->Reset();
 }
 
 
@@ -214,6 +215,7 @@ void CDCTriggerDQMModule::event()
   unsigned int nofouttracks = 0;
   unsigned int nofintracks = 0;
   unsigned int nofinsegments = 0;
+  unsigned int nof2douttracks = 0;
   for (CDCTriggerTrack& neuroTrack : m_unpackedNeuroTracks) {
     // count number of tracks
     nofouttracks ++;
@@ -280,6 +282,12 @@ void CDCTriggerDQMModule::event()
   }
 
 
+  for (CDCTriggerTrack& output2dfindertrack : m_unpacked2DTracks) {
+    nof2douttracks ++;
+  }
+  if (nof2douttracks > 0) {
+    m_neuroInVs2DOutTrackCount->Fill(nofintracks - nof2douttracks);
+  }
 }
 
 

@@ -27,7 +27,9 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
   m_passYX(nullptr),
   m_totalYX(nullptr),
   m_passYZ(nullptr),
-  m_totalYZ(nullptr)
+  m_totalYZ(nullptr),
+  m_runTotalEvents(0),
+  m_runTotalEventsWithTracks(0)
 {
   for (int i = 0; i < 8; ++i) {
     m_total[0][i] = nullptr;

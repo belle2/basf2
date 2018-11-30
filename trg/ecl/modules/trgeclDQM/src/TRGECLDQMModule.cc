@@ -81,6 +81,7 @@ void TRGECLDQMModule::initialize()
 
   REG_HISTOGRAM
   trgeclHitArray.registerInDataStore();
+  trgeclEvtArray.registerInDataStore();
   trgeclCluster.registerInDataStore();
 
   defineHisto();
@@ -115,23 +116,34 @@ void TRGECLDQMModule::event()
   for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
     TRGECLUnpackerStore* aTRGECLUnpackerStore = trgeclHitArray[ii];
     int TCID = (aTRGECLUnpackerStore->getTCId());
+    int hit_win =  aTRGECLUnpackerStore -> getHitWin();
     HitEnergy =  aTRGECLUnpackerStore -> getTCEnergy();
     if (TCID < 1 || TCID > 576 || HitEnergy == 0) {continue;}
-
+    if (!(hit_win == 2 || hit_win == 3)) {continue;}
     HitTiming    = aTRGECLUnpackerStore ->getTCTime();
-    HitRevoFam = aTRGECLUnpackerStore -> getRevoFAM();
-    HitRevoTrg = aTRGECLUnpackerStore -> getRevoGDL();
-    HitFineTiming = aTRGECLUnpackerStore -> getEVTTime();
 
 
     TCId.push_back(TCID);
     TCEnergy.push_back(HitEnergy);
     TCTiming.push_back(HitTiming);
     RevoFAM.push_back(HitRevoFam);
+  }
+  //
+  //
+
+  for (int iii = 0; iii < trgeclEvtArray.getEntries(); iii++) {
+    TRGECLUnpackerEvtStore* aTRGECLUnpackerEvtStore = trgeclEvtArray[iii];
+
+    HitFineTiming = aTRGECLUnpackerEvtStore ->  getEvtTime();
+    HitRevoTrg = aTRGECLUnpackerEvtStore -> getL1Revo();
+    HitRevoFam = aTRGECLUnpackerEvtStore -> getEvtRevo();
+
     RevoTrg.push_back(HitRevoTrg);
     FineTiming.push_back(HitFineTiming);
 
+
   }
+
   //----------------------
   //Clustering
   //----------------------

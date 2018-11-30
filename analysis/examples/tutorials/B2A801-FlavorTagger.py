@@ -191,8 +191,7 @@ vx.TagV(list_name='B0:jspipi0',
 # Select variables that we want to store to ntuple
 fs_vars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
 jpsiandk0s_vars = vc.mc_truth
-bvars = vc.event_meta_data + \
-    vc.reco_stats + \
+bvars = vc.reco_stats + \
     vc.deltae_mbc + \
     vc.ckm_kinematics + \
     vc.mc_truth + \

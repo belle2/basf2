@@ -78,16 +78,16 @@ void SVDUnpackerDQMModule::defineHisto()
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
 
-  unsigned short Bins_FTBFlags = 5;
-  unsigned short Bins_FTBError = 4;
-  unsigned short Bins_APVError = 4;
-  unsigned short Bins_APVMatch = 1;
-  unsigned short Bins_FADCMatch = 1;
-  unsigned short Bins_UpsetAPV = 1;
-  unsigned short Bins_BadMapping = 1;
+  const unsigned short Bins_FTBFlags = 5;
+  const unsigned short Bins_FTBError = 4;
+  const unsigned short Bins_APVError = 4;
+  const unsigned short Bins_APVMatch = 1;
+  const unsigned short Bins_FADCMatch = 1;
+  const unsigned short Bins_UpsetAPV = 1;
+  const unsigned short Bins_BadMapping = 1;
 
-  unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
-                         Bins_BadMapping;
+  const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
+                               Bins_BadMapping;
 
   DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 48, 1, 49);
 

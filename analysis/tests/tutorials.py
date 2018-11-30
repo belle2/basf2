@@ -5,6 +5,7 @@ import os
 from ROOT import Belle2
 import unittest
 import glob
+import b2test_utils
 
 
 def test_one_tutorial(tutorial_name):
@@ -13,9 +14,13 @@ def test_one_tutorial(tutorial_name):
 
 
 class TutorialsTest(unittest.TestCase):
+    """Test to run all tutorials"""
+
+    #: list of supported tutorials (everything in the tutorials directory)
     supported_tutorials = [x.split("/")[-1]
                            for x in glob.glob(Belle2.FileSystem.findFile('analysis/examples/tutorials/') + "*.py")]
 
+    #: list of the broken tutorials (to be removed when they are individually fixed)
     broken_tutorials = ['B2A701-ContinuumSuppression_Input.py',  # BII-4246
                         'B2A702-ContinuumSuppression_MVATrain.py',  # BII-4246
                         'B2A703-ContinuumSuppression_MVAExpert.py',  # BII-4246
@@ -38,4 +43,5 @@ class TutorialsTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

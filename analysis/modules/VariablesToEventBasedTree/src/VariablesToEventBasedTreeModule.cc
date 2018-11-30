@@ -29,8 +29,7 @@ REG_MODULE(VariablesToEventBasedTree)
 
 
 VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
-  Module(), m_tree("", DataStore::c_Persistent),
-  m_ncandidates(-1), m_weight(0.0), m_sampling_variable(nullptr)
+  Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event are saved in an array of a branch of the Tree.");

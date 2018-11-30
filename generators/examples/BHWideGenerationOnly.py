@@ -8,19 +8,18 @@
 # Example steering file
 ########################################################
 
-from basf2 import *
-
+import basf2
 # Set the global log level
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-main = create_path()
+main = basf2.create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
 
 # Register the BHWIDE module
-bhwide = register_module('BHWideInput')
-bhwide.set_log_level(LogLevel.INFO)
+bhwide = basf2.register_module('BHWideInput')
+bhwide.set_log_level(basf2.LogLevel.INFO)
 
 # min/max angle in CMS, applied to positron, in degrees CMS
 bhwide.param('ScatteringAngleRangePositron', [15., 165.])
@@ -44,7 +43,7 @@ bhwide.param('WeakCorrections', True)
 bhwide.param('WtMax', 3.0)
 
 # gearbox
-gearbox = register_module('Gearbox')
+gearbox = basf2.register_module('Gearbox')
 
 # Create the main path and add the modules
 main.add_module("Progress")
@@ -52,10 +51,10 @@ main.add_module(gearbox)
 main.add_module(bhwide)
 main.add_module("RootOutput", outputFileName="bhwide.root")
 
-main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

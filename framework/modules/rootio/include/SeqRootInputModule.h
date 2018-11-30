@@ -40,6 +40,9 @@ namespace Belle2 {
     //! If true the output filename will be interpreted as a boost::format pattern
     bool m_fileNameIsPattern{false};
 
+    //! Is the input real data?
+    bool m_realData{false};
+
     //! Blocked file handler
     SeqFile* m_file{nullptr};
 

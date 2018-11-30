@@ -94,8 +94,7 @@ ma.matchMCTruth(list_name='B+:D0pi',
 # Select variables that we want to store to ntuple
 d_vars = vc.inv_mass + vc.kinematics
 pi_vars = vc.kinematics
-b_vars = vc.event_meta_data + \
-    vc.deltae_mbc + \
+b_vars = vc.deltae_mbc + \
     vc.mc_truth + \
     vu.create_aliases_for_selected(list_of_variables=d_vars,
                                    decay_string='B+ -> ^anti-D0 pi+',

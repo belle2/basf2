@@ -50,33 +50,33 @@ namespace Belle2 {
      * Initialize the Module.
      *
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      *
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      *
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      *
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      *
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 

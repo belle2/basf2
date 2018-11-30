@@ -148,7 +148,7 @@ Here is a list of variables getting info from particle's daughters:
    :group: DirectDaughterInfo
 
 KLM Cluster and :math:`K_{L}^0` Identification
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 

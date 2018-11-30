@@ -18,8 +18,25 @@ using namespace Belle2;
 REG_MODULE(BKLMDigitAnalyzer)
 
 
-BKLMDigitAnalyzerModule::BKLMDigitAnalyzerModule() : Module()
+BKLMDigitAnalyzerModule::BKLMDigitAnalyzerModule() : Module(),
+  m_runNumber(0),
+  m_outputRootFile(nullptr),
+  m_histoList(nullptr)
 {
+  for (int i = 0; i < 2; ++i) {
+    m_histoLayerVsSector[i] = nullptr;
+    m_histoLayerVsSectorPerPlane[i][0] = nullptr;
+    m_histoLayerVsSectorPerPlane[i][1] = nullptr;
+    for (int s = 0; s < 8; ++s) {
+      m_histoLayer[i][s] = nullptr;
+      for (int p = 0; p < 2; ++p) {
+        m_histoChannel[i][s][p] = nullptr;
+        m_histoTdc[i][s][p] = nullptr;
+        m_histoCTimeDiff[i][s][p] = nullptr;
+      }
+    }
+  }
+
   // Set module properties
   setDescription("Module useful to quickly analyze BKLM unpacked data.");
 

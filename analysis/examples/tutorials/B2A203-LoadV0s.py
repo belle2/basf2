@@ -94,8 +94,7 @@ pi0_vars = vc.kinematics + \
     vc.track_hits + \
     vc.mc_truth
 
-v0_vars = vc.event_meta_data + \
-    vc.kinematics + \
+v0_vars = vc.kinematics + \
     vc.inv_mass + \
     vc.vertex +\
     vc.mc_truth + \

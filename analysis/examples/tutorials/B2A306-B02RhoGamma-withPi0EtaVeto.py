@@ -199,8 +199,7 @@ rho_vars = vc.cluster + \
 
 pi_vars = vc.track
 
-b_vars = vc.event_meta_data + \
-    vc.kinematics + \
+b_vars = vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
     vu.create_aliases_for_selected(list_of_variables=gamma_vars,

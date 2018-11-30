@@ -57,6 +57,7 @@ Untested method ECLCluster::setMinTrkDistance
 Untested method ECLCluster::setNumberOfCrystals
 Untested method ECLCluster::setNumberOfHadronDigits
 Untested method ECLCluster::setPhi
+Untested method ECLCluster::setPulseShapeDiscriminationMVA
 Untested method ECLCluster::setR
 Untested method ECLCluster::setSecondMoment
 Untested method ECLCluster::setStatus
@@ -3902,6 +3903,7 @@ ECLCluster#0:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): 0.00709466
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 217.342
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -3945,6 +3947,7 @@ ECLCluster#1:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -1.81662
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 225.99
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -3988,6 +3991,7 @@ ECLCluster#2:
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): 2.55235
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 225.928
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4031,6 +4035,7 @@ ECLCluster#3:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -0.91454
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 246.325
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -4076,6 +4081,7 @@ ECLCluster#4:
   getNumberOfCrystals(): 4.88281
   getNumberOfHadronDigits(): 0
   getPhi(): -0.80534
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 226.78
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -4121,6 +4127,7 @@ ECLCluster#5:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -0.693551
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 211.052
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -4165,6 +4172,7 @@ ECLCluster#6:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 1.18586
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 201.999
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4208,6 +4216,7 @@ ECLCluster#7:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -0.476013
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 193.227
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4251,6 +4260,7 @@ ECLCluster#8:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.93886
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 187.246
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4294,6 +4304,7 @@ ECLCluster#9:
   getNumberOfCrystals(): 0.976562
   getNumberOfHadronDigits(): 0
   getPhi(): 0.765936
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 167.804
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4337,6 +4348,7 @@ ECLCluster#10:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -0.948288
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 168.291
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -4381,6 +4393,7 @@ ECLCluster#11:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.396055
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 160.817
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4424,6 +4437,7 @@ ECLCluster#12:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -1.49208
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 154.998
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -4468,6 +4482,7 @@ ECLCluster#13:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 2.995
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.148
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -4512,6 +4527,7 @@ ECLCluster#14:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -3.02146
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 142.281
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4555,6 +4571,7 @@ ECLCluster#15:
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 0.380907
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 140.54
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4598,6 +4615,7 @@ ECLCluster#16:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.68427
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 140.695
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4641,6 +4659,7 @@ ECLCluster#17:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -0.117925
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 142.315
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4684,6 +4703,7 @@ ECLCluster#18:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.620687
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.479
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -4728,6 +4748,7 @@ ECLCluster#19:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 1.6521
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 150.205
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4771,6 +4792,7 @@ ECLCluster#20:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -3.09442
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 164.106
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4814,6 +4836,7 @@ ECLCluster#21:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 1.39736
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 149.484
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4857,6 +4880,7 @@ ECLCluster#22:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 0.122718
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 145.161
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(4)
@@ -4903,6 +4927,7 @@ ECLCluster#23:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 1.00524
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 140.691
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -4946,6 +4971,7 @@ ECLCluster#24:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.94001
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 130.601
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -4990,6 +5016,7 @@ ECLCluster#25:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -0.302194
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 131.003
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5033,6 +5060,7 @@ ECLCluster#26:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): 0.00709466
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 217.342
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5076,6 +5104,7 @@ ECLCluster#27:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -1.81662
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 225.99
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5119,6 +5148,7 @@ ECLCluster#28:
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): 2.55235
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 225.925
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5162,6 +5192,7 @@ ECLCluster#29:
   getNumberOfCrystals(): 16.9922
   getNumberOfHadronDigits(): 0
   getPhi(): -0.819433
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 229.835
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(5)
@@ -5209,6 +5240,7 @@ ECLCluster#30:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 1.18586
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 201.999
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5252,6 +5284,7 @@ ECLCluster#31:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -0.476013
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 193.227
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5295,6 +5328,7 @@ ECLCluster#32:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.93886
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 187.246
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5338,6 +5372,7 @@ ECLCluster#33:
   getNumberOfCrystals(): 0.976562
   getNumberOfHadronDigits(): 0
   getPhi(): 0.765936
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 167.804
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5381,6 +5416,7 @@ ECLCluster#34:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -0.948288
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 168.291
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -5425,6 +5461,7 @@ ECLCluster#35:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.396055
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 160.817
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5468,6 +5505,7 @@ ECLCluster#36:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -1.49208
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 154.998
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -5512,6 +5550,7 @@ ECLCluster#37:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 2.995
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.148
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -5556,6 +5595,7 @@ ECLCluster#38:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -3.02146
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 142.281
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5599,6 +5639,7 @@ ECLCluster#39:
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 0.380907
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 140.54
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5642,6 +5683,7 @@ ECLCluster#40:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.68427
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 140.695
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5685,6 +5727,7 @@ ECLCluster#41:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -0.117925
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 142.315
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5728,6 +5771,7 @@ ECLCluster#42:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.620687
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.479
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -5772,6 +5816,7 @@ ECLCluster#43:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 1.6521
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 150.205
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5815,6 +5860,7 @@ ECLCluster#44:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -3.09442
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 164.106
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5858,6 +5904,7 @@ ECLCluster#45:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 1.39736
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 149.484
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5901,6 +5948,7 @@ ECLCluster#46:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 0.122718
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 145.161
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(4)
@@ -5947,6 +5995,7 @@ ECLCluster#47:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 1.00524
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 140.691
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -5990,6 +6039,7 @@ ECLCluster#48:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.94001
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 130.601
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -6034,6 +6084,7 @@ ECLCluster#49:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -0.302194
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 131.003
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13011,6 +13062,7 @@ ECLCluster#0:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -2.48879
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 219.292
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13054,6 +13106,7 @@ ECLCluster#1:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -0.850784
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 219.336
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13097,6 +13150,7 @@ ECLCluster#2:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -2.71534
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 230.426
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -13142,6 +13196,7 @@ ECLCluster#3:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.216483
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 250.496
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13185,6 +13240,7 @@ ECLCluster#4:
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): -1.3638
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 247.386
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -13229,6 +13285,7 @@ ECLCluster#5:
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): -1.76082
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 208.982
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -13273,6 +13330,7 @@ ECLCluster#6:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.000958738
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 175.858
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13316,6 +13374,7 @@ ECLCluster#7:
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
   getPhi(): -1.85334
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 166.839
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -13360,6 +13419,7 @@ ECLCluster#8:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.52468
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 157.796
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13403,6 +13463,7 @@ ECLCluster#9:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 2.29167
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 154.96
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -13448,6 +13509,7 @@ ECLCluster#10:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 2.43395
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 152.927
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13491,6 +13553,7 @@ ECLCluster#11:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -0.00268447
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 154.49
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13534,6 +13597,7 @@ ECLCluster#12:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -2.52599
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.517
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13577,6 +13641,7 @@ ECLCluster#13:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 1.94758
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 142.494
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -13622,6 +13687,7 @@ ECLCluster#14:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -0.390973
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 141.364
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13665,6 +13731,7 @@ ECLCluster#15:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 1.55095
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 144.725
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -13709,6 +13776,7 @@ ECLCluster#16:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 0.892106
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.128
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13752,6 +13820,7 @@ ECLCluster#17:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 1.91412
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.481
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13795,6 +13864,7 @@ ECLCluster#18:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.352144
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.536
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -13838,6 +13908,7 @@ ECLCluster#19:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 3.08905
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 149.216
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -13883,6 +13954,7 @@ ECLCluster#20:
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): 1.23246
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 147.647
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -13928,6 +14000,7 @@ ECLCluster#21:
   getNumberOfCrystals(): 12.5
   getNumberOfHadronDigits(): 0
   getPhi(): 1.39161
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 150.143
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(4)
@@ -13974,6 +14047,7 @@ ECLCluster#22:
   getNumberOfCrystals(): 4.6875
   getNumberOfHadronDigits(): 0
   getPhi(): 1.5242
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 149.498
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(5)
@@ -14021,6 +14095,7 @@ ECLCluster#23:
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 0.121568
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.41
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -14066,6 +14141,7 @@ ECLCluster#24:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -2.48879
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 219.292
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14109,6 +14185,7 @@ ECLCluster#25:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -0.850784
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 219.336
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14152,6 +14229,7 @@ ECLCluster#26:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -2.71534
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 230.426
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -14197,6 +14275,7 @@ ECLCluster#27:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.216483
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 250.496
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14240,6 +14319,7 @@ ECLCluster#28:
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): -1.3638
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 247.386
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -14284,6 +14364,7 @@ ECLCluster#29:
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): -1.76082
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 208.982
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -14328,6 +14409,7 @@ ECLCluster#30:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.000958738
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 175.858
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14371,6 +14453,7 @@ ECLCluster#31:
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
   getPhi(): -1.85334
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 166.839
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -14415,6 +14498,7 @@ ECLCluster#32:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.52468
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 157.796
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14458,6 +14542,7 @@ ECLCluster#33:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 2.3445
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 153.817
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -14503,6 +14588,7 @@ ECLCluster#34:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -0.00268447
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 154.49
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14546,6 +14632,7 @@ ECLCluster#35:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -2.52599
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.517
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14589,6 +14676,7 @@ ECLCluster#36:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 1.94758
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 142.494
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -14634,6 +14722,7 @@ ECLCluster#37:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -0.390973
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 141.364
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14677,6 +14766,7 @@ ECLCluster#38:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 1.55095
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 144.725
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -14721,6 +14811,7 @@ ECLCluster#39:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 0.892106
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.128
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14764,6 +14855,7 @@ ECLCluster#40:
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 1.91412
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.481
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14807,6 +14899,7 @@ ECLCluster#41:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.352144
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.536
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -14850,6 +14943,7 @@ ECLCluster#42:
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 3.08905
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 149.216
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -14895,6 +14989,7 @@ ECLCluster#43:
   getNumberOfCrystals(): 27.9297
   getNumberOfHadronDigits(): 0
   getPhi(): 1.33581
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 148.33
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(6)
@@ -14943,6 +15038,7 @@ ECLCluster#44:
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 0.121568
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.41
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(3)
@@ -21741,6 +21837,7 @@ ECLCluster#0:
   getNumberOfCrystals(): 1.5625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.510624
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 224.057
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -21784,6 +21881,7 @@ ECLCluster#1:
   getNumberOfCrystals(): 2.34375
   getNumberOfHadronDigits(): 0
   getPhi(): -0.37199
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 224.054
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -21827,6 +21925,7 @@ ECLCluster#2:
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): -1.99906
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 225.228
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -21870,6 +21969,7 @@ ECLCluster#3:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.6684
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 234.655
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -21914,6 +22014,7 @@ ECLCluster#4:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.7752
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 245.419
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -21957,6 +22058,7 @@ ECLCluster#5:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -1.55038
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 246.675
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -22001,6 +22103,7 @@ ECLCluster#6:
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.58163
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 227.068
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22044,6 +22147,7 @@ ECLCluster#7:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.32833
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 195.678
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -22088,6 +22192,7 @@ ECLCluster#8:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): 0.0879163
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 184.946
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22131,6 +22236,7 @@ ECLCluster#9:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.411011
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 164.422
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22174,6 +22280,7 @@ ECLCluster#10:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -0.362211
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 144.763
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22217,6 +22324,7 @@ ECLCluster#11:
   getNumberOfCrystals(): 16.0156
   getNumberOfHadronDigits(): 0
   getPhi(): -2.98091
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.469
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -22261,6 +22369,7 @@ ECLCluster#12:
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
   getPhi(): 2.16541
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 154.785
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22304,6 +22413,7 @@ ECLCluster#13:
   getNumberOfCrystals(): 4.88281
   getNumberOfHadronDigits(): 0
   getPhi(): 1.00437
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 159.615
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22347,6 +22457,7 @@ ECLCluster#14:
   getNumberOfCrystals(): 4.10156
   getNumberOfHadronDigits(): 0
   getPhi(): 1.07235
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 167.886
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22390,6 +22501,7 @@ ECLCluster#15:
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.44495
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 223.985
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22433,6 +22545,7 @@ ECLCluster#16:
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.99906
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 225.228
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22476,6 +22589,7 @@ ECLCluster#17:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.6684
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 234.655
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -22520,6 +22634,7 @@ ECLCluster#18:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.7752
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 245.419
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22563,6 +22678,7 @@ ECLCluster#19:
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -1.55038
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 246.675
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -22607,6 +22723,7 @@ ECLCluster#20:
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.58163
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 227.068
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22650,6 +22767,7 @@ ECLCluster#21:
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.32833
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 195.678
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -22694,6 +22812,7 @@ ECLCluster#22:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): 0.0879163
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 184.946
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22737,6 +22856,7 @@ ECLCluster#23:
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 0.411011
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 164.422
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22780,6 +22900,7 @@ ECLCluster#24:
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -0.362211
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 144.763
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22823,6 +22944,7 @@ ECLCluster#25:
   getNumberOfCrystals(): 16.0156
   getNumberOfHadronDigits(): 0
   getPhi(): -2.98091
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 143.469
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(2)
@@ -22867,6 +22989,7 @@ ECLCluster#26:
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
   getPhi(): 2.16541
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 154.785
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)
@@ -22910,6 +23033,7 @@ ECLCluster#27:
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 1.03467
+  getPulseShapeDiscriminationMVA(): 0.5
   getR(): 163.018
   getRelationsWith(KlIds): size(0)
   getRelationsWith(MCParticles): size(1)

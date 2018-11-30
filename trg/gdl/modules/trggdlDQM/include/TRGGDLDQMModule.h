@@ -5,6 +5,9 @@
 #include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <trg/gdl/TrgBit.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
@@ -112,6 +115,22 @@ namespace Belle2 {
 
     static const int n_output_extra;
     static const char* output_extra[4];
+
+    //condition database for unpacer
+    DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
+    int LeafBitMap[320];
+    char LeafNames[320][100];
+    int _e_timtype;
+    int _e_gdll1rvc;
+    int _e_coml1rvc;
+    int _e_ecltiming;
+    int _e_cdctiming;
+    int _e_eclrvc;
+    int _e_toptiming;
+    int ee_psn[10];
+    int ee_ftd[10];
+    int ee_itd[10];
+
 
   };
 

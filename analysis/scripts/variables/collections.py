@@ -24,7 +24,7 @@ kinematics = ['px',
 
 #: Cluster-related variables
 cluster = [
-    'ClusterHadronIntensity',
+    'PulseShapeDiscriminationMVA',
     'ClusterHasPulseShapeDiscrimination',
     'ClusterNumberOfHadronDigits',
     'clusterDeltaLTemp',

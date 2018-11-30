@@ -253,6 +253,6 @@ setSkimLogging(path=skimpath)
 # process the basf2 path in a temporary directory (so all of the skimmed udst
 # files get cleaned up afterwards).
 with b2test_utils.clean_working_directory():
-    basf2.process(path=skimpath)  # just process one event
+    basf2.process(skimpath, 1)  # just process one event
 
 print(statistics)

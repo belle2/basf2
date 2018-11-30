@@ -22,20 +22,35 @@ class PhokharaEvtgenAnalysisModule(Module):
     def __init__(self):
         """Initialization."""
         super(PhokharaEvtgenAnalysisModule, self).__init__()
+        #: Output file.
         self.output_file = ROOT.TFile('PhokharaEvtgenAnalysis.root', 'recreate')
+        #: Output tree.
         self.tree = ROOT.TTree('tree', '')
+        #: Beam energy/
         self.ecms = numpy.zeros(1, dtype=numpy.float32)
+        #: Virtual photon energy.
         self.gamma_e = numpy.zeros(1, dtype=numpy.float32)
+        #: Virtual photon momentum (x component).
         self.gamma_px = numpy.zeros(1, dtype=numpy.float32)
+        #: Virtual photon momentum (y component).
         self.gamma_py = numpy.zeros(1, dtype=numpy.float32)
+        #: Virtual photon momentum (z component).
         self.gamma_pz = numpy.zeros(1, dtype=numpy.float32)
+        #: J/psi energy/
         self.jpsi_e = numpy.zeros(1, dtype=numpy.float32)
+        #: J/psi momentum (x component).
         self.jpsi_px = numpy.zeros(1, dtype=numpy.float32)
+        #: J/psi momentum (y component).
         self.jpsi_py = numpy.zeros(1, dtype=numpy.float32)
+        #: J/psi momentum (z component).
         self.jpsi_pz = numpy.zeros(1, dtype=numpy.float32)
+        #: Lepton energy.
         self.lepton_e = numpy.zeros(1, dtype=numpy.float32)
+        #: Lepton momentum (x component).
         self.lepton_px = numpy.zeros(1, dtype=numpy.float32)
+        #: Lepton momentum (y component).
         self.lepton_py = numpy.zeros(1, dtype=numpy.float32)
+        #: Lepton momentum (z component).
         self.lepton_pz = numpy.zeros(1, dtype=numpy.float32)
         self.tree.Branch('ecms', self.ecms, 'ecms/F')
         self.tree.Branch('gamma_e', self.gamma_e, 'gamma_e/F')

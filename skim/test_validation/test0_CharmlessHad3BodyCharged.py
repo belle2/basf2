@@ -21,7 +21,7 @@ set_random_seed(12345)
 bg = glob.glob('./BG/[A-Z]*.root')
 
 # create path
-main = create_path()
+charmless3chargedpath = Path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
@@ -36,17 +36,16 @@ evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('../../decfiles/dec/
 main.add_module(evtgeninput)
 
 # detector simulation
-# add_simulation(main, bkgfiles=bg)
-add_simulation(main)
+add_simulation(path=charmless3chargedpath)
 
 # reconstruction
-add_reconstruction(main)
+add_reconstruction(path=charmless3chargedpath)
 
 
 # Finally add mdst output
 output_filename = "../CharmlessHad3BodyCharged.dst.root"
-add_mdst_output(main, filename=output_filename)
+add_mdst_output(charmless3chargedpath, filename=output_filename)
 
 # process events and print call statistics
-process(main)
+process(charmless3chargedpath)
 print(statistics)

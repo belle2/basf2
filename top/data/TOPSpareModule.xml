@@ -16,8 +16,10 @@
   <DetectorComponent name="TOP" xmlns:xi="http://www.w3.org/2001/XInclude">
     <Creator library="top">TOPCreator</Creator>
     <Content>
-      <xi:include href="TOPSpareModule-Bars.xml"/>
-      <xi:include href="TOP-Mirror.xml"/>
+      <xi:include href="SpareModule.xml"/>
+      <xi:include href="QuartzBars.xml"/>
+      <xi:include href="Mirrors.xml"/>
+      <xi:include href="Prisms.xml"/>
       <xi:include href="TOP-PMT.xml"/>
       <xi:include href="TTSofPMTs.xml"/>
       <xi:include href="TOP-TDC.xml"/>

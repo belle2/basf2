@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-from basf2 import *
+import b2test_utils
+import basf2
 from ROOT import Belle2
 from modularAnalysis import *
 
@@ -22,6 +23,7 @@ inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 stdPi0s('loose')
 stdPhotons('loose')
 stdKshorts()
+mergedKshorts()  # add due to charm skims need it
 stdPi('loose')
 stdK('loose')
 stdPr('loose')
@@ -54,85 +56,132 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
 
 # ISR cc skim
 from skim.quarkonium import ISRpipiccList
-add_skim('ISRpipicc', ISRpipiccList())
+add_skim('ISRpipicc', ISRpipiccList(path=analysis_main))
 
 # BtoPi0Pi0 Skim
 from skim.btocharmless import BtoPi0Pi0List
-add_skim('BtoPi0Pi0', BtoPi0Pi0List())
+add_skim('BtoPi0Pi0', BtoPi0Pi0List(path=analysis_main))
 
 # Tau Skim
 from skim.taupair import TauLFVList
-add_skim('TauLFV', TauLFVList())
+add_skim('TauLFV', TauLFVList(1, path=analysis_main))
 
 from skim.taupair import TauList
-# add_skim('TauGeneric', TauList())
+add_skim('TauGeneric', TauList(path=analysis_main))
 
 
 # TCPV Skim
 from skim.tcpv import TCPVList
-add_skim('TCPV', TCPVList())
+add_skim('TCPV', TCPVList(analysis_main))
 
 # Bottomonium Etab Skim: 15420100
 from skim.quarkonium import *
-add_skim('BottomoniumEtabExclusive', EtabList())
+add_skim('BottomoniumEtabExclusive', EtabList(path=analysis_main))
 
 from skim.quarkonium import *
-add_skim('BottomoniumUpsilon', UpsilonList())
+add_skim('BottomoniumUpsilon', UpsilonList(path=analysis_main))
 
-
+# B to Charmless skim
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
-Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()
+Had2BodyList = CharmlessHad2BodyB0List(path=analysis_main) + CharmlessHad2BodyBmList(path=analysis_main)
 add_skim('CharmlessHad2Body', Had2BodyList)
 
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
+Had3BodyList = CharmlessHad3BodyB0List(path=analysis_main) + CharmlessHad3BodyBmList(path=analysis_main)
+add_skim('CharmlessHad3Body', Had3BodyList)
+
+
+# Charm skims
+# charm Skim: D0 -> K pi/ pi pi /K K
+from skim.charm import D0ToHpJm
+add_skim('Charm2BodyHadronicD0', D0ToHpJm(analysis_main))
+
+# charm Skim: D* -> D0 (-> K pi/ pi pi /K K) pi
+from skim.charm import DstToD0PiD0ToHpJm
+add_skim('Charm2BodyHadronic', DstToD0PiD0ToHpJm(analysis_main))
+
+# charm Skim: D* -> D0 (-> K pi pi0) pi
+from skim.charm import DstToD0PiD0ToHpJmPi0
+add_skim('Charm3BodyHadronic', DstToD0PiD0ToHpJmPi0(analysis_main))
+
+# charm Skim: D* -> D0 (-> pi pi pi0/K K pi0) pi
+from skim.charm import DstToD0PiD0ToHpHmPi0
+add_skim('Charm3BodyHadronic1', DstToD0PiD0ToHpHmPi0(analysis_main))
+
+# charm Skim: D* -> D0 (-> K pi eta) pi
+from skim.charm import DstToD0PiD0ToHpJmEta
+add_skim('Charm3BodyHadronic3', DstToD0PiD0ToHpJmEta(analysis_main))
+
+# charm Skim: D*+ -> D0 (-> Ks omega/eta (-> pi pi pi0)) pi
+from skim.charm import DstToD0PiD0ToKsOmega
+add_skim('Charm2BodyNeutrals2', DstToD0PiD0ToKsOmega(analysis_main))
+
+# charm Skim: D0 -> pi0 pi0/Ks pi0/Ks Ks
+from skim.charm import D0ToNeutrals
+add_skim('Charm2BodyNeutralsD0', D0ToNeutrals(analysis_main))
+
+# charm Skim: D* -> D0 (-> pi0 pi0/Ks pi0/Ks Ks) pi
+from skim.charm import DstToD0Neutrals
+add_skim('Charm2BodyNeutrals', DstToD0Neutrals(analysis_main))
+
+# charm Skim: D* -> D0 (-> pi pi Ks/ K K Ks) pi
+from skim.charm import DstToD0PiD0ToHpHmKs
+add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(analysis_main))
+
+# charm Skim: D -> gamma gamma/ e e/ mu mu
+from skim.charm import CharmRareList
+add_skim('CharmRare', CharmRareList(analysis_main))
+
+from skim.charm import CharmSemileptonicList
+add_skim('CharmSemileptonic', CharmSemileptonicList(analysis_main))
 
 
 # Systematics skim
-from skim.systematics import *
-add_skim('Systematics', SystematicsList())
+from skim.systematics import SystematicsList
+add_skim('Systematics', SystematicsList(analysis_main))
 
 # Systematics Lambda Skim
-from skim.systematics import *
-add_skim('SystematicsLambda', SystematicsLambdaList())
+from skim.systematics import SystematicsLambdaList
+add_skim('SystematicsLambda', SystematicsLambdaList(analysis_main))
 
 # Systematics Tracking
-from skim.systematics import *
-add_skim('SystematicsTracking', SystematicsTrackingList())
+from skim.systematics import SystematicsTrackingList
+add_skim('SystematicsTracking', SystematicsTrackingList(analysis_main))
 
 # Resonan ce
-from skim.systematics import *
-add_skim('Resonance', ResonanceList())
+from skim.systematics import ResonanceList
+add_skim('Resonance', ResonanceList(analysis_main))
 
 # Systematics Rad mu mu
-from skim.systematics import *
-add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
-#
+from skim.systematics import SystematicsRadMuMuList
+add_skim('SystematicsRadMuMu', SystematicsRadMuMuList(analysis_main))
+
 # Systematics Rad mu mu
-from skim.systematics import *
-add_skim('SystematicsRadEE', SystematicsRadEEList())
+from skim.systematics import SystematicsRadEEList
+add_skim('SystematicsRadEE', SystematicsRadEEList(analysis_main))
 
 
 from skim.btocharm import BsigToDhTohhList, loadD0bar
-loadD0bar()
-add_skim('BtoDh_hh', BsigToDhTohhList())
+loadD0bar(path=analysis_main)
+add_skim('BtoDh_hh', BsigToDhTohhList(path=analysis_main))
 
 
 # B- to D(->Kshh)h- Skim
 from skim.btocharm import BsigToDhToKshhList, loadDkshh
-loadDkshh()
-BtoDhKshhList = BsigToDhToKshhList()
+loadDkshh(path=analysis_main)
+BtoDhKshhList = BsigToDhToKshhList(path=analysis_main)
 add_skim('BtoDh_Kshh', BtoDhKshhList)
 
 # B- to D(->Kspi0)h- Skim
 from skim.btocharm import BsigToDhToKspi0List, loadDkspi0
-loadDkspi0()
-BtoDhKspi0List = BsigToDhToKspi0List()
+loadDkspi0(path=analysis_main)
+BtoDhKspi0List = BsigToDhToKspi0List(path=analysis_main)
 add_skim('BtoDh_Kspi0', BtoDhKspi0List)
 
 # B- to D(->Kspipipi0)h- Skim
 from skim.btocharm import BsigToDhToKspipipi0List, loadDkspipipi0
-loadDkspipipi0()
-BtoDhKspipipi0List = BsigToDhToKspipipi0List()
+loadDkspipipi0(path=analysis_main)
+BtoDhKspipipi0List = BsigToDhToKspipipi0List(path=analysis_main)
 add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List)
 
 
@@ -197,6 +246,10 @@ from skim.dark import ALP3GammaList
 add_skim('ALP3Gamma', ALP3GammaList(path=analysis_main))
 
 setSkimLogging()
-process(analysis_main)
+
+# process the basf2 path in a temporary directory (so all of the skimmed udst
+# files get cleaned up afterwards).
+with b2test_utils.clean_working_directory():
+    basf2.process(analysis_main, 1)  # just process one event
 
 print(statistics)

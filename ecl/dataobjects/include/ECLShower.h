@@ -78,7 +78,8 @@ namespace Belle2 {
       m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
       m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
-      m_ShowerHadronIntensity = 0.0;         /**< Shower Hadron Intensity*/
+      m_ShowerHadronIntensity = 0.0;         /**< Shower Hadron Intensity. Will be removed in release-04.*/
+      m_PulseShapeDiscriminationMVA = 0.5;        /**< Digit level MVA classifier that uses pulse shape discrimination.*/
       m_NumberOfHadronDigits = 0.0;         /**< Shower Number of hadron digits*/
 
     }
@@ -198,6 +199,10 @@ namespace Belle2 {
     /*! Set shower hadron intensity
      */
     void setShowerHadronIntensity(double hadronIntensity) { m_ShowerHadronIntensity = hadronIntensity; }
+
+    /*! Set shower hadron intensity
+     */
+    void setPulseShapeDiscriminationMVA(double mvaVal) { m_PulseShapeDiscriminationMVA = mvaVal; }
 
     /*! Set numver of hadron digits
      */
@@ -358,6 +363,11 @@ namespace Belle2 {
      */
     double getShowerHadronIntensity() const { return m_ShowerHadronIntensity; }
 
+    /*! Get shower hadron intensity
+     * @return m_PulseShapeDiscriminationMVA
+     */
+    double getPulseShapeDiscriminationMVA() const { return m_PulseShapeDiscriminationMVA; }
+
     /*! Get number of hadron digits
      * @return m_NumberOfHadronDigits
      */
@@ -473,6 +483,8 @@ namespace Belle2 {
     Double32_t
     m_ShowerHadronIntensity;        /**< Shower Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using showers digits with energy greater than 50 MeV and good offline waveform fit chi2. (SL) */
     Double32_t
+    m_PulseShapeDiscriminationMVA;        /**< MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. */
+    Double32_t
     m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
 
     // 2: added uniqueID and highestE (TF)
@@ -485,7 +497,8 @@ namespace Belle2 {
     // 9: renamed variables according to the new mdst scheme (TF)
     // 10: added getUniqueId()
     // 11: added m_ShowerHadronIntensity and m_NumberOfHadronDigits variables (SL)
-    ClassDef(ECLShower, 11);/**< ClassDef */
+    // 12: added m_PulseShapeDiscriminationMVA.  Noted m_ShowerHadronIntensity will be removed in release-04 (SL)
+    ClassDef(ECLShower, 12);/**< ClassDef */
 
   };
 

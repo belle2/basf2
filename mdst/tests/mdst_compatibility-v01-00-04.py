@@ -11,11 +11,13 @@ CHANGES since release-01-00-04:
 - Track:
   + getQualityIndicator
 - ECLCluster:
+  + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
   + getNumberOfHadronDigits
   + hasPulseShapeDiscrimination
   + hasTriggerClusterMatching
   + isTriggerCluster
+  * getCovarianceMatrixAsArray removed
 - KlIds are added
 - TRGSummary:
   * getTimTypeBits is replaced by getTimType

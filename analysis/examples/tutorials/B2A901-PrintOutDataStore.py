@@ -11,30 +11,26 @@
 # the MC files contain the neccessary (MDST) StoreArrays.
 #
 # Contributors: A. Zupanc (June 2014)
+#               I. Komarov (September 2018)
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import printDataStore
-from modularAnalysis import analysis_main
+import basf2 as b2
+import modularAnalysis as ma
 
-# check if the required input file exists (from B2A101 example)
-import os.path
-import sys
-if not os.path.isfile('B2A101-Y4SEventGeneration-gsim-BKGx0.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-gsim-BKGx0.root) does not exist. '
-             'Please run B2A101-Y4SEventGeneration.py and B2A103-SimulateAndReconstruct-withoutBeamBkg.py '
-             'tutorial scripts first.')
+# create path
+my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx0.root')
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+             path=my_path)
 
 # print out the contents of the DataStore
-printDataStore()
+ma.printDataStore(path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

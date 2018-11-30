@@ -533,6 +533,9 @@ void RestOfEvent::print() const
   for (auto mask : m_masks) {
     mask.print();
   }
+  if (m_isNested) {
+    B2INFO("This ROE is nested.");
+  }
 }
 
 void RestOfEvent::printIndices(std::set<int> indices) const

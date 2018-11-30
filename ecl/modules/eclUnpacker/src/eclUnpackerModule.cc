@@ -81,15 +81,18 @@ ADC_NUM*SAMPLES_NUM |                                                           
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_eclDigits("", DataStore::c_Event),
-  m_bitPos(0),
-  m_bufLength(0),
-  m_bufPos(0),
+  m_EvtNum(0),
   m_bufPtr(0),
-  m_debugLevel(0),
+  m_bufPos(0),
+  m_bufLength(0),
+  m_bitPos(0),
+  m_storeTrigTime(0),
+  m_storeUnmapped(0),
   m_tagsReportedMask(0),
   m_phasesReportedMask(0),
-  m_badHeaderReportedMask(0)
+  m_badHeaderReportedMask(0),
+  m_eclDigits("", DataStore::c_Event),
+  m_debugLevel(0)
 {
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
 
@@ -129,21 +132,8 @@ void ECLUnpackerModule::initialize()
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
   m_eclDigits.registerRelationTo(m_eclDsps);
+  m_eclDsps.registerRelationTo(m_eclDigits);
 
-  // make full name of the initialization file
-  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
-  if (! FileSystem::fileExists(ini_file_name)) {
-    B2FATAL("ECL Unpacker : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-  }
-
-  // initialize channel mapper from file (temporary)
-  if (! m_eclMapper.initFromFile(ini_file_name.data())) {
-    B2FATAL("ECL Unpacker:: Can't initialize eclChannelMapper");
-  }
-
-  B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
-
-  // or initialize it from DB TODO
 }
 
 void ECLUnpackerModule::beginRun()
@@ -151,6 +141,11 @@ void ECLUnpackerModule::beginRun()
   m_tagsReportedMask      = 0;
   m_phasesReportedMask    = 0;
   m_badHeaderReportedMask = 0;
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_eclMapper.initFromDB()) {
+    B2FATAL("ECL Unpacker: Can't initialize eclChannelMapper!");
+  }
 }
 
 void ECLUnpackerModule::event()

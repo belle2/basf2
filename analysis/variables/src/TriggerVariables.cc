@@ -88,6 +88,7 @@ namespace Belle2 {
       return isL1Trigger;
     }
 
+
     double L1InputBit(const Particle*, const std::vector<double>& bit)
     {
       double isL1Trigger = 0.0;
@@ -121,6 +122,7 @@ namespace Belle2 {
       const unsigned int trgWordSize = 32;
       const unsigned int ntrgWords = 10;
       if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return prescale;
+
 
       // Get the prescale word that contains this bit
       const unsigned int ntrgWord = (int) bit[0] / trgWordSize;

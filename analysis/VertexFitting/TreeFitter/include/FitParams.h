@@ -42,6 +42,18 @@ namespace TreeFitter {
         Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance);
     }
 
+    /** Assignment operator. */
+    FitParams& operator =(const FitParams& other)
+    {
+      m_dim = other.m_dim;
+      m_chiSquare = other.m_chiSquare;
+      m_nConstraints = other.m_nConstraints;
+      m_dimensionReduction = other.m_dimensionReduction;
+      m_globalState = other.m_globalState;
+      m_globalCovariance = other.m_globalCovariance;
+      return *this;
+    }
+
     /** getter for the states covariance */
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > & getCovariance()
     {

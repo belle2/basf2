@@ -3,16 +3,20 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors:  Nils Braun                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
-
-using namespace Belle2;
-
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
-REG_MODULE(ToCDCCKF)
+namespace Belle2 {
+  std::ostream& operator<<(std::ostream& output, const CDCCKFPath& path)
+  {
+    output << "[";
+    for (const auto& state : path) {
+      output << state << ", ";
+    }
+    output << "]";
+    return output;
+  }
+}

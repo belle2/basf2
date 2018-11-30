@@ -7,12 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/cdc/filters/paths/BaseCDCPathFilter.h>
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-using namespace Belle2;
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
-REG_MODULE(ToCDCCKF)
+namespace Belle2 {
+  /// Return the size of the path
+  class SizeCDCPathFilter : public BaseCDCPathFilter {
+  public:
+    /// Main function: return the size of the path
+    TrackFindingCDC::Weight operator()(const BaseCDCPathFilter::Object& path) final {
+      return path.size();
+    }
+  };
+}

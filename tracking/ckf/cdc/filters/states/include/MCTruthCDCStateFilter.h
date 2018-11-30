@@ -7,12 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
+#include <tracking/ckf/cdc/entities/CDCCKFState.h>
 
-using namespace Belle2;
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
-REG_MODULE(ToCDCCKF)
+namespace Belle2 {
+  /// Give a weight based on the mc truth information (1 or NAN)
+  class MCTruthCDCStateFilter : public BaseCDCStateFilter {
+  public:
+    /// return 1 if matched truth hit belongs to matched truth track, NAN otherwise
+    TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
+  };
+}

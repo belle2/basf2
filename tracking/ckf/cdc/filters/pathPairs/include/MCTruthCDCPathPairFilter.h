@@ -7,12 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/cdc/filters/pathPairs/BaseCDCPathPairFilter.h>
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-using namespace Belle2;
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
-REG_MODULE(ToCDCCKF)
+
+namespace Belle2 {
+  /// For the two paths select the one with the most of MC matched hits.
+  class MCTruthCDCPathPairFilter : public BaseCDCPathPairFilter {
+  public:
+    /// Input: pair of paths, returns 1 if pair.first to be selected, 0 otherwise.
+    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final;
+  };
+}

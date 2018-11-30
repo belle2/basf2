@@ -25,6 +25,8 @@
 
 //TRG
 #include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
+#include <trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h>
+
 #include <trg/ecl/TrgEclMapping.h>
 
 //Analysis
@@ -59,6 +61,7 @@ void ECLTRGInformationModule::initialize()
   m_eclCalDigits.isRequired();
   m_eclClusters.isRequired();
   m_trgUnpackerStore.isRequired();
+  m_trgUnpackerEvtStore.isRequired();
 
   /** output dataobjects */
   m_eclTRGInformation.registerInDataStore();
@@ -84,6 +87,15 @@ void ECLTRGInformationModule::event()
     m_calDigitStoreArrPosition[m_eclCalDigits[i]->getCellId()] = i;
   }
 
+  int EventTiming = 0;
+  int RevoGDL = 0; // L1 Revo clk  (Same value in an evnet)
+  int RevoFAM = 0; // FAM Revo clk (Same value in an event)
+  for (const auto& trgEvt : m_trgUnpackerEvtStore) {
+    EventTiming = trgEvt.getEvtTime();
+    RevoGDL = trgEvt.getL1Revo();
+    RevoFAM = trgEvt.getEvtRevo();
+  }
+
   // Store each TC and set relations to ECLClusters
   for (const auto& trg : m_trgUnpackerStore) {
 
@@ -96,9 +108,9 @@ void ECLTRGInformationModule::event()
     aTC->setTCId(idx);
     aTC->setFADC(trg.getTCEnergy());
     aTC->setTiming(trg.getTCTime());
-    aTC->setEvtTiming(trg.getEVTTime());
-    aTC->setRevoGDL(trg.getRevoGDL());
-    aTC->setRevoFAM(trg.getRevoFAM());
+    aTC->setEvtTiming(EventTiming);
+    aTC->setRevoGDL(RevoGDL);
+    aTC->setRevoFAM(RevoFAM);
     aTC->setThetaId(m_trgmap->getTCThetaIdFromTCId(idx));
     aTC->setPhiId(m_trgmap->getTCPhiIdFromTCId(idx));
     aTC->setHitWin(trg.getHitWin());
@@ -185,12 +197,12 @@ void ECLTRGInformationModule::event()
 
     m_eclTRGInformation->setEnergyTC(tcid, trg.getTCEnergy());
     m_eclTRGInformation->setTimingTC(tcid, trg.getTCTime());
-    m_eclTRGInformation->setRevoGDLTC(tcid, trg.getRevoGDL());
-    m_eclTRGInformation->setRevoFAMTC(tcid, trg.getRevoFAM());
+    m_eclTRGInformation->setRevoGDLTC(tcid, RevoGDL);
+    m_eclTRGInformation->setRevoFAMTC(tcid, RevoFAM);
     m_eclTRGInformation->setHitWinTC(tcid, trg.getHitWin());
 
     if (trg.getTCEnergy() > 0 and std::isnan(eventtiming)) {
-      eventtiming = trg.getEVTTime();
+      eventtiming = EventTiming;
     }
 
     B2DEBUG(29, "TC Id: (1.." << ECLTRGInformation::c_nTCs << ") " << trg.getTCId() << " FADC="  << trg.getTCEnergy() << ",  t=" <<

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from basf2 import *
 import os
 import sys
-from basf2 import *
 from ROOT import Belle2
 
 set_log_level(LogLevel.INFO)

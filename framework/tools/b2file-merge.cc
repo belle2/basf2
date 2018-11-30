@@ -244,6 +244,9 @@ The following restrictions apply:
 
         B2ERROR("dataDescription in " << boost::io::quoted(input) << " differs from previous files:\n" << cur.string() << " vs.\n" << prev.string());
       }
+      if(fileMetaData->isMC() != outputMetaData->isMC()){
+        B2ERROR("Type (real/MC) for " << boost::io::quoted(input) << " differs from previous files.");
+      }
       // update event numbers ...
       outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData->getMcEvents());
       outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData->getNEvents());

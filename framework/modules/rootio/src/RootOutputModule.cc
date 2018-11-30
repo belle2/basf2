@@ -340,7 +340,9 @@ void RootOutputModule::event()
 
 void RootOutputModule::fillFileMetaData()
 {
+  bool isMC = (m_fileMetaData) ? m_fileMetaData->isMC() : true;
   m_fileMetaData.create(true);
+  if (!isMC) m_fileMetaData->declareRealData();
 
   if (m_tree[DataStore::c_Event]) {
     //create an index for the event tree

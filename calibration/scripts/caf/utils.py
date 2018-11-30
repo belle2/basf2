@@ -17,6 +17,7 @@ from functools import singledispatch, update_wrapper
 import contextlib
 import enum
 import shutil
+import itertools
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
@@ -37,6 +38,15 @@ def B2INFO_MULTILINE(lines):
     """
     log_string = b2info_newline.join(lines)
     B2INFO(log_string)
+
+
+def grouper(n, iterable):
+    it = iter(iterable)
+    while True:
+        chunk = tuple(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
 
 
 def find_gaps_in_iov_list(iov_list):
@@ -109,7 +119,7 @@ class IoV(namedtuple('IoV_Factory', ['exp_low', 'run_low', 'exp_high', 'run_high
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
     It is derived from a namedtuple created class.
 
-    We use the name 'ExpRun_Factory' in the factory creation so that
+    We use the name 'IoV_Factory' in the factory creation so that
     the MRO doesn't contain two of the same class names which is probably fine
     but feels wrong.
 
@@ -209,18 +219,41 @@ class CentralDatabase():
         self.global_tag = global_tag
 
 
+def split_runs_by_exp(runs):
+    """
+    Parameters:
+      runs (list[ExpRun]): Ordered list of ExpRuns we want to split by Exp value
+
+    Returns:
+      list[list[ExpRun]]: Same as original list but sublists are generated for each Exp value
+    """
+    split_by_runs = []
+    current_exp = runs[0].exp
+    exp_list = []
+    for exprun in runs:
+        if exprun.exp != current_exp:
+            split_by_runs.append(exp_list)
+            exp_list = [exprun]
+        else:
+            exp_list.append(exprun)
+        current_exp = exprun.exp
+    else:
+        split_by_runs.append(exp_list)
+    return split_by_runs
+
+
 def runs_overlapping_iov(iov, runs):
     """
-    Takes an overall IoV() object and a list of Exp,Run tuples (i,j)
-    and returns the list of Exp,Run tuples containing only those runs that overlap
-    with the IoV range.
+    Takes an overall IoV() object and a list of ExpRun
+    and returns the set of ExpRun containing only those runs that overlap
+    with the IoV.
     """
-    overlapping_runs = []
+    overlapping_runs = set()
     for run in runs:
         # Construct an IOV of one run
-        run_iov = IoV(run[0], run[1], run[0], run[1])
+        run_iov = run.make_iov()
         if run_iov.overlaps(iov):
-            overlapping_runs.append(run)
+            overlapping_runs.add(run)
     return overlapping_runs
 
 
@@ -233,7 +266,7 @@ def iov_from_runs(runs):
         exprun_low, exprun_high = runs[0], runs[-1]
     else:
         exprun_low, exprun_high = runs[0], runs[0]
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
 
 
 def iov_from_runvector(iov_vector):
@@ -243,12 +276,12 @@ def iov_from_runvector(iov_vector):
     an IoV() object. It assumes that the vector was in order to begin with.
     """
     import copy
-    exprun_list = [list((iov.first, iov.second)) for iov in iov_vector]
+    exprun_list = [list(ExpRun(iov.first, iov.second)) for iov in iov_vector]
     if len(exprun_list) > 1:
         exprun_low, exprun_high = exprun_list[0], exprun_list[-1]
     else:
         exprun_low, exprun_high = exprun_list[0], copy.deepcopy(exprun_list[0])
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
 
 
 def runs_from_vector(exprun_vector):
@@ -256,7 +289,7 @@ def runs_from_vector(exprun_vector):
     Takes a vector of ExpRun from CalibrationAlgorithm and returns
     a Python list of (exp,run) tuples in the same order.
     """
-    return [(exprun.first, exprun.second) for exprun in exprun_vector]
+    return [ExpRun(exprun.first, exprun.second) for exprun in exprun_vector]
 
 
 def find_sources(dependencies):
@@ -532,7 +565,7 @@ def get_file_iov_tuple(file_path):
     return (file_path, get_iov_from_file(file_path))
 
 
-def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
+def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None, filterfalse=None):
     """
     Takes a list of file path patterns (things that glob would understand) and runs b2file-metadata-show over them to
     extract the IoV.
@@ -544,11 +577,19 @@ def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
         polling_time (int): Time between checking if our results are ready.
         pool: Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
             We don't close or join the Pool as you might want to use it yourself, we just wait until the results are ready.
+        filterfalse (function): An optional function object that will be called on each absolute filepath found from your patterns.
+            If True is returned the file will have its metadata returned. If False it will be skipped.
+            The filter function should take the filepath string as its only argument.
 
     Returns:
-        dict: Maping of matching input file paths (Key) to their IoV (Value)
+        dict: Mapping of matching input file paths (Key) to their IoV (Value)
     """
     absolute_file_paths = find_absolute_file_paths(file_path_patterns)
+    # Optionally filter out files matching our filter function
+    if filterfalse:
+        import itertools
+        absolute_file_paths = list(itertools.filterfalse(filterfalse, absolute_file_paths))
+
     file_to_iov = {}
     if not pool:
         for file_path in absolute_file_paths:

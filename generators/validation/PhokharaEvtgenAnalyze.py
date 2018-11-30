@@ -26,7 +26,7 @@ class PhokharaEvtgenAnalysisModule(Module):
         self.output_file = ROOT.TFile('PhokharaEvtgenAnalysis.root', 'recreate')
         #: Output tree.
         self.tree = ROOT.TTree('tree', '')
-        #: Beam energy/
+        #: Beam energy.
         self.ecms = numpy.zeros(1, dtype=numpy.float32)
         #: Virtual photon energy.
         self.gamma_e = numpy.zeros(1, dtype=numpy.float32)

@@ -72,7 +72,7 @@ namespace Belle2 {
     size(2, 2) = 0.;
 
     bs3.setSize(size);
-    size(2, 2) = std::numeric_limits<float>::min();
+    size(2, 2) = std::numeric_limits<double>::min();
     bs4.setSize(size);
 
     EXPECT_EQ(bs4 == bs3, false);

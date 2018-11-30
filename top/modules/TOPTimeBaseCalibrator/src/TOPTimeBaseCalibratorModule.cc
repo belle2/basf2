@@ -201,8 +201,13 @@ namespace Belle2 {
         double sig1 = channelHits[1].timeErr;
         double sigma = sqrt(sig0 * sig0 + sig1 * sig1);
         m_ntuples[channel].push_back(TwoTimes(t0, t1, sigma));
-        m_calPulseFirst.Fill(channelHits[0].pulseWidth, channelHits[0].pulseHeight);
-        m_calPulseSecond.Fill(channelHits[1].pulseWidth, channelHits[1].pulseHeight);
+        if (t0 < t1) { // check, since not sorted yet
+          m_calPulseFirst.Fill(channelHits[0].pulseWidth, channelHits[0].pulseHeight);
+          m_calPulseSecond.Fill(channelHits[1].pulseWidth, channelHits[1].pulseHeight);
+        } else {
+          m_calPulseSecond.Fill(channelHits[0].pulseWidth, channelHits[0].pulseHeight);
+          m_calPulseFirst.Fill(channelHits[1].pulseWidth, channelHits[1].pulseHeight);
+        }
       } else if (channelHits.size() > 2) {
         B2WARNING("More than two cal pulses per channel found - ignored");
       }

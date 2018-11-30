@@ -14,7 +14,6 @@
 #include <TStyle.h>
 #include <TString.h>
 #include <TPaletteAxis.h>
-#include <TPaveText.h>
 #include <TBox.h>
 #include <TAxis.h>
 
@@ -62,10 +61,37 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   }
   std::sort(m_SVDModules.begin(), m_SVDModules.end());  // back to natural order
 
+  /**
+     FIXME: colors do not work, no legend is needed
+  //occupancy plots legend
+  m_leg = new TPaveText(9.5, 26, 13.5, 27);
+  m_leg->AddText("legend");
+  m_leg->SetFillStyle(0);
+  m_leg->SetBorderSize(0);
+  m_legProblem = new TPaveText(12.5, 24.9, 13.5, 25.9);
+  m_legProblem->AddText("PROBLEM");
+  m_legProblem->SetFillStyle(0);
+  m_legWarning = new TPaveText(11.5, 24.9, 12.5, 25.9);
+  m_legWarning->AddText("WARNING");
+  m_legWarning->SetFillStyle(0);
+  m_legNormal = new TPaveText(10.5, 24.9, 11.5, 25.9);
+  m_legNormal->AddText("NORMAL");
+  m_legNormal->SetFillStyle(0);
+  m_legEmpty = new TPaveText(9.5, 24.9, 10.5, 25.9);
+  m_legEmpty->AddText("EMPTY");
+  m_legEmpty->SetFillStyle(0);
+  m_legEmpty->SetTextColor(kWhite);
+  */
+
   gROOT->cd();
   m_cUnpacker = new TCanvas("c_SVDDataFormat");
+  m_cUnpacker->SetGrid(1);
   m_cOccupancyU = new TCanvas("c_SVDOccupancyU");
+  //  m_cOccupancyU->SetGrid(1);
   m_cOccupancyV = new TCanvas("c_SVDOccupancyV");
+  //  m_cOccupancyV->SetGrid(1);
+
+
 
   m_hOccupancyUtext =  new TH2F("hOccupancyU", "Average Sensor Occupancy (%), U side", 16, 0.5, 16.5, 46, 20.5, 70.5);
   m_hOccupancyUtext->SetMarkerSize(1.1);
@@ -114,7 +140,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (h != NULL) {
     h->SetTitle("SVD Data Format Monitor");
     m_cUnpacker->cd();
-    m_cUnpacker->SetGrid(1);
 
     //no entries mean no error
     if (h->GetEntries() == 0)
@@ -163,12 +188,13 @@ void DQMHistAnalysisSVDGeneralModule::event()
     tmp_sensor = m_SVDModules[i].getSensorNumber();
 
     Int_t bin = m_hOccupancyUtext->FindBin(tmp_ladder, tmp_layer * 10 + tmp_sensor);
+
+    //look for U histogram
     TString tmpname = Form("SVDExpReco/DQMER_SVD_%d_%d_%d_StripCountU", tmp_layer, tmp_ladder, tmp_sensor);
 
     htmp = findHist(tmpname.Data());
     if (htmp == NULL) {
-      B2DEBUG(10, "Occupancy histogram not found");
-      m_cOccupancyV->SetFillColor(kRed);
+      B2DEBUG(10, "Occupancy U histogram not found");
       m_cOccupancyU->SetFillColor(kRed);
     } else {
       Float_t occU = htmp->GetEntries() / nStrips / nEvents * 100;
@@ -183,10 +209,18 @@ void DQMHistAnalysisSVDGeneralModule::event()
       else
         m_hOccupancyUcolz->SetBinContent(bin, 4);
 
-      tmpname = Form("SVDExpReco/DQMER_SVD_%d_%d_%d_StripCountV", tmp_layer, tmp_ladder, tmp_sensor);
-      htmp = findHist(tmpname.Data());
-      if (htmp == NULL)
-        B2DEBUG(10, "Occupancy histogram not found");
+      B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU);
+    }
+
+    //look for V histogram
+    tmpname = Form("SVDExpReco/DQMER_SVD_%d_%d_%d_StripCountV", tmp_layer, tmp_ladder, tmp_sensor);
+
+    htmp = findHist(tmpname.Data());
+    if (htmp == NULL) {
+      B2DEBUG(10, "Occupancy V histogram not found");
+      m_cOccupancyV->SetFillColor(kRed);
+    } else {
+
       if (tmp_layer != 3)
         nStrips = 512;
 
@@ -202,70 +236,52 @@ void DQMHistAnalysisSVDGeneralModule::event()
       else
         m_hOccupancyVcolz->SetBinContent(bin, 4);
 
-      B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << ", V occ = " << occV);
-
+      B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occV);
     }
-    m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(10, 25), 1);
-    m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(11, 25), 2);
-    m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(12, 25), 3);
-    m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(13, 25), 4);
-
-    m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(10, 25), 1);
-    m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(11, 25), 2);
-    m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(12, 25), 3);
-    m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(13, 25), 4);
-
-    //legend
-    TPaveText* leg = new TPaveText(9.5, 26, 13.5, 27);
-    leg->AddText("legend");
-    leg->SetFillStyle(0);
-    leg->SetBorderSize(0);
-    TPaveText* legProblem = new TPaveText(12.5, 24.9, 13.5, 25.9);
-    legProblem->AddText("PROBLEM");
-    legProblem->SetFillStyle(0);
-    TPaveText* legWarning = new TPaveText(11.5, 24.9, 12.5, 25.9);
-    legWarning->AddText("WARNING");
-    legWarning->SetFillStyle(0);
-    TPaveText* legNormal = new TPaveText(10.5, 24.9, 11.5, 25.9);
-    legNormal->AddText("NORMAL");
-    legNormal->SetFillStyle(0);
-    TPaveText* legEmpty = new TPaveText(9.5, 24.9, 10.5, 25.9);
-    legEmpty->AddText("EMPTY");
-    legEmpty->SetFillStyle(0);
-    legEmpty->SetTextColor(kWhite);
-
-    //update U canvas
-    m_cOccupancyU->cd();
-    m_hOccupancyUtext->Draw("text");
-    /*
-      FIXME: colors are not shown correctly
-      m_hOccupancyUcolz->Draw("samecolz");
-      m_hOccupancyUtext->Draw("sametext");
-      leg->Draw("same");
-      legProblem->Draw("same");
-      legWarning->Draw("same");
-      legNormal->Draw("same");
-      legEmpty->Draw("same");*/
-    m_cOccupancyU->Modified();
-    m_cOccupancyU->Update();
-    //update V canvas
-    m_cOccupancyV->cd();
-    m_hOccupancyVtext->Draw("text");
-    /*
-      FIXME: colors are not shown correctly
-      m_hOccupancyVcolz->Draw("samecolz");
-      m_hOccupancyVtext->Draw("sametext");
-      leg->Draw("same");
-      legProblem->Draw("same");
-      legWarning->Draw("same");
-      legNormal->Draw("same");
-      legEmpty->Draw("same");
-    */
-    m_cOccupancyV->Modified();
-    m_cOccupancyV->Update();
-
-
   }
+  /**
+     FIXME: colors are not shown correctly
+     m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(10, 25), 1);
+     m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(11, 25), 2);
+     m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(12, 25), 3);
+     m_hOccupancyUcolz->SetBinContent(m_hOccupancyUtext->FindBin(13, 25), 4);
+
+     m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(10, 25), 1);
+     m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(11, 25), 2);
+     m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(12, 25), 3);
+     m_hOccupancyVcolz->SetBinContent(m_hOccupancyVtext->FindBin(13, 25), 4);
+  */
+
+  //update U canvas
+  m_cOccupancyU->cd();
+  m_hOccupancyUtext->Draw("text");
+  /*
+    FIXME: colors are not shown correctly
+    m_hOccupancyUcolz->Draw("samecolz");
+    m_hOccupancyUtext->Draw("sametext");
+    m_leg->Draw("same");
+    m_legProblem->Draw("same");
+    m_legWarning->Draw("same");
+    m_legNormal->Draw("same");
+    m_legEmpty->Draw("same");*/
+  m_cOccupancyU->Modified();
+  m_cOccupancyU->Update();
+  //update V canvas
+  m_cOccupancyV->cd();
+  m_hOccupancyVtext->Draw("text");
+  /*
+    FIXME: colors are not shown correctly
+    m_hOccupancyVcolz->Draw("samecolz");
+    m_hOccupancyVtext->Draw("sametext");
+    m_leg->Draw("same");
+    m_legProblem->Draw("same");
+    m_legWarning->Draw("same");
+    m_legNormal->Draw("same");
+    m_legEmpty->Draw("same");
+  */
+  m_cOccupancyV->Modified();
+  m_cOccupancyV->Update();
+
 
   if (m_printCanvas) {
     m_cOccupancyU->Print("c_SVDOccupancyU.pdf");

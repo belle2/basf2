@@ -12,6 +12,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <TPaveText.h>
 #include <TCanvas.h>
 #include <TH2F.h>
 
@@ -53,7 +54,14 @@ namespace Belle2 {
     TH2F* m_hOccupancyVtext = nullptr;
     TH2F* m_hOccupancyVcolz = nullptr;
     TCanvas* m_cOccupancyV = nullptr;
-
+    /**
+       FIXME: color do not work, no legend needed for the moment
+       TPaveText* m_leg = nullptr;
+       TPaveText* m_legProblem = nullptr;
+       TPaveText* m_legWarning = nullptr;
+       TPaveText* m_legNormal = nullptr;
+       TPaveText* m_legEmpty = nullptr;
+    */
     //! IDs of all SXD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 

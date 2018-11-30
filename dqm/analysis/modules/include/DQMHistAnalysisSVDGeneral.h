@@ -12,6 +12,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <TText.h>
 #include <TPaveText.h>
 #include <TCanvas.h>
 #include <TH2F.h>
@@ -48,20 +49,22 @@ namespace Belle2 {
     //! Data members
   private:
     TCanvas* m_cUnpacker = nullptr;
-    TH2F* m_hOccupancyUtext = nullptr;
-    TH2F* m_hOccupancyUcolz = nullptr;
+    TH2F* m_hOccupancyU = nullptr;
     TCanvas* m_cOccupancyU = nullptr;
-    TH2F* m_hOccupancyVtext = nullptr;
-    TH2F* m_hOccupancyVcolz = nullptr;
+    TH2F* m_hOccupancyV = nullptr;
     TCanvas* m_cOccupancyV = nullptr;
-    /**
-       FIXME: color do not work, no legend needed for the moment
-       TPaveText* m_leg = nullptr;
-       TPaveText* m_legProblem = nullptr;
-       TPaveText* m_legWarning = nullptr;
-       TPaveText* m_legNormal = nullptr;
-       TPaveText* m_legEmpty = nullptr;
-    */
+
+    TPaveText* boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color);
+    Int_t findBinY(Int_t layer, Int_t sensor);
+
+    TPaveText* m_leg = nullptr;
+    TPaveText* m_legProblem = nullptr;
+    TPaveText* m_legWarning = nullptr;
+    TPaveText* m_legNormal = nullptr;
+    TPaveText* m_legEmpty = nullptr;
+    TPaveText* m_legError = nullptr;
+    TText* m_yTitle = nullptr;
+
     //! IDs of all SXD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 

@@ -2,7 +2,7 @@
 // File : DQMHistAnalysisSVDGeneral.h
 // Description : An example module for DQM histogram analysis
 //
-// Author : Giulia Casarosa
+// Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20181128
 //-
 

@@ -2,7 +2,7 @@
 // File : DQMHistAnalysisSVDGeneral.cc
 // Description :
 //
-// Author : Giulia Casarosa
+// Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20181127
 //-
 

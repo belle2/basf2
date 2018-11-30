@@ -578,7 +578,35 @@ namespace {
 
     // TESTS FOR ROE VARIABLES
 
-    const Manager::Var* var = Manager::Instance().getVariable("nROE_Tracks(mask1)");
+    const Manager::Var* var = Manager::Instance().getVariable("nROE_Charged(mask1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_Charged(mask2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+
+    var = Manager::Instance().getVariable("nROE_Charged(mask1, 13)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_Charged(mask1, 211)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+
+    var = Manager::Instance().getVariable("nROE_Photons(mask1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_Photons(mask2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+
+    var = Manager::Instance().getVariable("nROE_NeutralHadrons(mask1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_Tracks(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
 

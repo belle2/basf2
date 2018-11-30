@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                *
+ * Contributors: Andreas Moll, Thomas Kuhr, Martin Ritter                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,7 @@
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionFilter.h>
-#include <framework/logging/LogConnectionFileDescriptor.h>
+#include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
@@ -43,8 +43,8 @@ void LogSystem::addLogConnection(LogConnectionBase* logConnection)
 
 void LogSystem::resetLogConnections()
 {
-  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
-    delete m_logConnections[i];
+  for (auto connection : m_logConnections) {
+    delete connection;
   }
   m_logConnections.clear();
 }
@@ -60,7 +60,7 @@ bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const
 }
 
 
-bool LogSystem::sendMessage(LogMessage message)
+bool LogSystem::sendMessage(LogMessage&& message)
 {
   LogConfig::ELogLevel logLevel = message.getLogLevel();
   map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
@@ -75,8 +75,8 @@ bool LogSystem::sendMessage(LogMessage message)
   message.setModule(m_moduleName);
 
   bool messageSent = false;
-  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
-    if (m_logConnections[i]->sendMessage(message)) {
+  for (auto con : m_logConnections) {
+    if (con->sendMessage(message)) {
       messageSent = true;
     }
   }
@@ -85,11 +85,15 @@ bool LogSystem::sendMessage(LogMessage message)
     incMessageCounter(logLevel);
   }
   if (m_printErrorSummary && logLevel >= LogConfig::c_Warning && m_errorLog.size() < c_errorSummaryMaxLines) {
-    m_errorLog.push_back(message);
+    m_errorLog.emplace_back(std::move(message));
   }
 
   if (logLevel >= m_logConfig.getAbortLevel()) {
     printErrorSummary();
+    // make sure loc connections are finalized to not loose output
+    for (auto connection : m_logConnections) {
+      connection->finalizeOnAbort();
+    }
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
 
     //in good tradition, ROOT signal handlers are unsafe.
@@ -175,7 +179,7 @@ void LogSystem::resetLogging()
 
   resetMessageCounter();
   resetLogConnections();
-  addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+  addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 
   m_errorLog.clear();
   m_errorLog.reserve(100);
@@ -222,23 +226,28 @@ void LogSystem::printErrorSummary()
   std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
 
   // log in chronological order, with repetitions removed
-  std::vector<LogMessage> uniqueLog;
-  uniqueLog.reserve(100);
+  // additional scope to ensure uniqueLog will not be used
+  // later, as its items are undefinde after the call to sendMessage
+  {
+    std::vector<LogMessage> uniqueLog;
+    uniqueLog.reserve(100);
 
-  for (const LogMessage& msg : m_errorLog) {
-    int count = errorCount[msg]++;
+    for (const LogMessage& msg : m_errorLog) {
+      int count = errorCount[msg]++;
 
-    if (count == 0) // this is the first time we see this message
-      uniqueLog.push_back(msg);
-  }
-  m_errorLog.clear(); // only do this once (e.g. not again when used through python)
+      if (count == 0) // this is the first time we see this message
+        uniqueLog.push_back(msg);
+    }
+    m_errorLog.clear(); // only do this once (e.g. not again when used through python)
 
-  for (const LogMessage& msg : uniqueLog) {
-    sendMessage(msg);
-
-    int count = errorCount[msg];
-    if (count != 1) {
-      B2INFO(" (last message occurred " << count << " times in total)");
+    for (LogMessage& msg : uniqueLog) {
+      int count = errorCount[msg];
+      // move the message out to the sendMessage command, but leave the vector intact
+      // it will be cleared at the end of this loop
+      sendMessage(std::move(msg));
+      if (count != 1) {
+        B2INFO(" (last message occurred " << count << " times in total)");
+      }
     }
   }
   B2INFO("================================================================================\n");

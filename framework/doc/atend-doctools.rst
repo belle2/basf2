@@ -50,15 +50,15 @@ the following rules:
    something like
 
    .. code-block:: rst
- 
+
      Analysis Package
      ================
- 
+
      Some text describing the structure of the package
- 
+
      .. toctree:
         :glob:
- 
+
         variables
         variable_groups/*
 
@@ -71,7 +71,7 @@ the following rules:
 6. Every file can limit the depth to which the table of contents is expanded by
    adding ``:tocdepth: N`` at the top of the file. The global table of contents
    is limited to two levels.
-   
+
    .. note:: This will not have any effect on latex output. For the PDF output
       the depth of the table of contents is always set to 3 levels
 
@@ -125,7 +125,7 @@ For example, in order to create a reference to this section this code was used
 .. code-block:: rst
 
   .. _referencing_things:
-  
+
   Referencing Components
   ----------------------
 
@@ -135,6 +135,11 @@ For example, in order to create a reference to this section this code was used
 We can then make a reference to this section by using ``:ref:`referencing_things``` which displays as :ref:`referencing_things`.
 If you prefer to have a numbered reference, we could instead use ``:numref:`referencing_things``` which displays as
 :numref:`referencing_things`.
+
+We also have enabled a extension to automatically define references for all
+sections. So without adding anything this section could also be referenced by
+``:ref:`framework/doc/atend-doctools:Referencing Components``` which still
+result in :ref:`framework/doc/atend-doctools:Referencing Components`.
 
 Inserting Figures
 -----------------
@@ -151,7 +156,7 @@ you can then place the image (in this case ``cat.jpg``) into the documentation b
   .. figure:: cat.jpg
     :width: 40em
     :align: center
-  
+
     Why is it always cats?
 
 where we have also included the reference ``cat_picture`` to use later.
@@ -254,7 +259,7 @@ The known sections you can and should use if appropriate are
 * ``Yields``
 
 
-You can see a more complete example of this format at 
+You can see a more complete example of this format at
 http://www.sphinx-doc.org/en/stable/ext/example_google.html
 
 .. _Google style docstrings: http://www.sphinx-doc.org/en/stable/ext/napoleon.html
@@ -319,6 +324,12 @@ Basf2 Module documentation can be added to sphinx automatically using
     if present it will try to include a graph showing the required, optional
     and registered DataStore elements.
 
+  .. rst:role:: noindex
+
+    if present the modules will not be added to the index. This is useful if
+    the same module is documented multiple times to select which of these
+    should show up in the index.
+
 
 For this automatic documentation to work all documentation strings passed to
 ``setDescription()`` and ``addParam()`` should be valid reStructuredText_ (see
@@ -367,6 +378,13 @@ We can also add documentation for basf2 variables with a very similar syntax to 
            :group: Kinematics
            :regex-filter: ^x.*
 
+  .. rst:role:: noindex
+
+    if present the variables will not be added to the index. This is useful if
+    the same variable is documented multiple times to select which of these
+    should show up in the index.
+
+
 For this automatic documentation to work all documentation strings passed to
 ``REGISTER_VARIABLE()`` should be valid reStructuredText_ (see
 :ref:`multiline_cpp_strings`) It is also possible to reference variables
@@ -385,10 +403,23 @@ Additional Features
 * All documented basf2 modules and variables are automatically added to a
   separate, alphabetic index page for easy lookup. They can be referenced with
 
-  - ``:ref:`b2-modindex``` (:ref:`b2-modindex`)  
+  - ``:ref:`b2-modindex``` (:ref:`b2-modindex`)
   - ``:ref:`b2-varindex``` (:ref:`b2-varindex`)
 
 * We have support for easy linking to JIRA issues by using
   ``:issue:`BII-XXXX```, for example ``:issue:`BII-8``` (:issue:`BII-8`)
 
 
+How to test locally
+-------------------
+
+You can test locally your changes in the Sphinx documentation by compiling your
+code with the following command:
+
+::
+
+    scons --sphinx html
+
+The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
+navigate it with your favorite browser to check if the output is what you
+expect.

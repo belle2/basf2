@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
+from basf2 import register_module
 import sys
 import inspect
-from analysisPath import *
+from analysisPath import analysis_main
 
 
 def fitVertex(
@@ -412,6 +411,15 @@ def vertexTree(
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
+    :Example:
+        An example of usage for decay chain :math:`B\\to\pi^+\pi^-\pi^0` is the following:
+
+    ::
+
+      reconstructDecay('pi0:A -> gamma:pi0 gamma:pi0', '0.130 < InvM < 0.14')
+      reconstructDecay('B0:treefit -> pi+:my pi-:my pi0:A ', '')
+      vertexTree('B0:treefit', ipConstraint=True)
+
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
     @param massConstraint list of PDG ids which are mass-constrained
@@ -423,7 +431,10 @@ def vertexTree(
         "Default numbers are taken for B-mesons
     @param customOriginCovariance 3x3 covariance matrix for the custom vertex (type: vector)." +\
         " Default numbers extracted from generator distribtuion width of B-mesons.
-    @param updateAllDaughters if true the entire tree will be updated with the fitted values. Otherwise only the head.
+    @param updateAllDaughters if true the entire tree will be updated with the fitted values "+\
+    "for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated, "+\
+    "however for all daughters we also update the vertex position with the fit results as this would "+\
+    "otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
     @param path         modules are added to this path
     """
 
@@ -475,10 +486,7 @@ def TagV(
 
 
 if __name__ == '__main__':
-    desc_list = []
-    for function_name in sorted(list_functions(sys.modules[__name__])):
-        function = globals()[function_name]
-        signature = inspect.formatargspec(*inspect.getargspec(function))
-        signature = signature.replace(repr(analysis_main), 'analysis_main')
-        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
-    pretty_print_description_list(desc_list)
+    from basf2.utils import pretty_print_module
+    pretty_print_module(__name__, "vertex", {
+        repr(analysis_main): "analysis_main",
+    })

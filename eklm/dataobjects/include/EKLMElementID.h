@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMELEMENTID_H
-#define EKLMELEMENTID_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -61,7 +60,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] globalNumber Element global number.
      */
-    EKLMElementID(int globalNumber);
+    explicit EKLMElementID(int globalNumber);
 
     /**
      * Destructor.
@@ -176,6 +175,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

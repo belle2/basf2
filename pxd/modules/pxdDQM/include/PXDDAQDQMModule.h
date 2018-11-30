@@ -38,11 +38,11 @@ namespace Belle2 {
 
       // virtual ~PXDDAQDQMModule();
 
-      virtual void initialize();
+      virtual void initialize() override;
 
-      virtual void beginRun();
+      virtual void beginRun() override;
 
-      virtual void event();
+      virtual void event() override;
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -63,9 +63,10 @@ namespace Belle2 {
       std::map<VxdID, TH1F*> hDAQDHETriggerGate;/** DHE Trigger Gate ("start Row")  */
       std::map<VxdID, TH1F*> hDAQDHEReduction;/** DHE data reduction  */
       std::map<VxdID, TH2F*> hDAQCM;/** Common Mode per DHE to gate and DHP level */
+      std::map<VxdID, TH1F*> hDAQCM2;/** Common Mode per DHE to gate and DHP level */
       std::map<int, TH1F*> hDAQDHCReduction;/** DHC data reduction  */
 
-      virtual void defineHisto();
+      virtual void defineHisto() override;
 
       std::vector<std::string> err;
 

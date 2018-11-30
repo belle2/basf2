@@ -171,7 +171,6 @@ namespace Belle2 {
     static B2Vector3<double> getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID vxdID,
                                                   const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
-
     /** converts a local hit into sensor-independent relative coordinates.
       *
       * first parameter is the local hit (as provided by DATCONSVDSpacePoint::getUWedged(...) and Cluster::getV!) stored as a pair of doubles.
@@ -212,8 +211,6 @@ namespace Belle2 {
       return (aSensorInfo->getWidth(hitLocalUnwedged.second) / aSensorInfo->getWidth()) * hitLocalUnwedged.first;
     }
 
-
-
     /** takes a wedged uCoordinate, and transforms it to general uCoordinate.
     *
     * Use this if you want to "unwedge" your u-coordinate.
@@ -227,9 +224,8 @@ namespace Belle2 {
       return (aSensorInfo->getWidth() / aSensorInfo->getWidth(hitLocalWedged.second)) * hitLocalWedged.first;
     }
 
+    /** Getter function for the DATCONSVDClusters assigned to this DATCONSVDSpacePoint */
     std::vector<SVDCluster> getAssignedDATCONSVDClusters() { return m_assignedDATCONSVDClusters; }
-
-
 
     /** Enforce  @param value in the  range [ @param lower, @param higher ].
     * param = min ( max( param,lower)  ,higher )
@@ -285,6 +281,7 @@ namespace Belle2 {
     */
     std::pair<bool, bool> m_clustersAssigned {false, false};
 
+    /** Vector containing the DATCONSVDClusters assigned to this DATCONSVDSpacePoint */
     std::vector<SVDCluster> m_assignedDATCONSVDClusters;
 
     /** Stores the VxdID. */

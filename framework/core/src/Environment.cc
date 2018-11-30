@@ -153,7 +153,6 @@ void Environment::setJobInformation(const std::shared_ptr<Path>& path)
       }
     }
     if (m->hasProperties(Module::c_Output)) {
-      std::string out = Environment::Instance().getOutputFileOverride();
       std::vector<std::string> outputFiles = m->getFileNames(true);
       for (const string& file : outputFiles) {
         m_jobInfoOutput += "OUTPUT FILE: " + file + "\n";

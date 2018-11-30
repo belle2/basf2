@@ -294,11 +294,6 @@ namespace Belle2 {
     /** Return TMatrixDsym 3x3 covariance matrix for E, Phi and Theta */
     TMatrixDSym getCovarianceMatrix3x3() const;
 
-    /*! Get covariance matrix as array for Energy->[0], Phi->[2], Theta->[5]
-     * @return covariance matrix array for Energy->[0], Phi->[2], Theta->[5]
-     */
-    void getCovarianceMatrixAsArray(double covArray[6]) const;
-
     /** Return detector region: 0: below acceptance, 1: FWD, 2: BRL, 3: BWD, 11: FWDGAP, 13: BWDGAP */
     int getDetectorRegion() const;
 

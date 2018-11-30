@@ -1,8 +1,8 @@
 import basf2
+from basf2 import _constwrapper
 import ROOT
 from ROOT import Belle2
 import multiprocessing
-import sys
 import unittest
 
 # @cond internal_test
@@ -73,9 +73,9 @@ class DBInterface(unittest.TestCase):
         # and compare
         self.assertEqual(copy, bp.obj())
 
-        # ok, finally we want to make sur we can convert it back to non-const.
+        # ok, finally we want to make sure we can convert it back to non-const.
         # Hopefully nobody finds this :D
-        e = basf2._make_tobject_nonconst(bp.obj())
+        e = _constwrapper._make_tobject_nonconst(bp.obj())
         e.setVertex(ROOT.TVector3(0, 0, 0), ROOT.std.vector("double")())
         self.assertEqual(bp.obj().getVertex(), ROOT.TVector3(0, 0, 0))
 
@@ -123,11 +123,12 @@ class DBInterface(unittest.TestCase):
             with self.assertRaises(AttributeError):
                 e.foo = "bar"
 
-        self.assertEqual(i+1, len(bplist))
+        self.assertEqual(i + 1, len(bplist))
 
         # make sure item assignment is off
         with self.assertRaises(TypeError):
             bplist[0] = Belle2.BeamParameters()
+
 
 if __name__ == "__main__":
     unittest.main()

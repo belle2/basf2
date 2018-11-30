@@ -87,22 +87,22 @@ namespace Belle2 {
      * Defining the histograms. Reads once the  m_inputDirectoryList to initialize the proper amount of histograms.
      * Every new histogram added to the module has to be initialized here.
      */
-    void defineHisto();
+    void defineHisto() override;
 
     /**
      * Initialize the module
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * Called when entering a new run
      */
-    void beginRun();
+    void beginRun() override;
 
     /**
      * Event processor
      */
-    void event();
+    void event() override;
 
     /**
      * End-of-run action.
@@ -110,13 +110,13 @@ namespace Belle2 {
      * of the TOPTimeBaseCalibrator module output is changed
      * Both the core functions analyzeCalFile() and makeComparisons() are called here.
      */
-    void endRun();
+    void endRun() override;
 
     /**
      * Termination action.
      * The historam writing takes place here
      */
-    void terminate();
+    void terminate() override;
 
     /**
      * Analyzes the calibrations stored in the file m_calSetFile. This is the main function in which the analysis and the hisogram filling takes place.

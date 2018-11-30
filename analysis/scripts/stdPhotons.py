@@ -17,7 +17,8 @@ def stdPhotons(listtype='loose', path=analysis_main):
     """
     Function to prepare one of several standardized types of photon lists:
 
-    - 'gamma:all' with no cuts
+    - 'gamma:all' with no cuts this will be polluted by tracks from outside the acceptance
+    - 'gamma:cdc' all clusters inside the CDC tracking acceptance
     - 'gamma:loose' (default) with some loose quality selections
     - 'gamma:tight' like loose but with higher energy cuts depending on detector regions
     - 'gamma:pi0eff60' gamma list for 60% pi0 efficiency list
@@ -35,14 +36,24 @@ def stdPhotons(listtype='loose', path=analysis_main):
     # all photons (reconstructed using the N1 clustering)
     if listtype == 'all':
         fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path)
+    # all photons within the cdc tracking acceptance: remove un track-matched
+    # electrons from outside the tracking acceptance
+    elif listtype == 'cdc':
+        stdPhotons('all', path)
+        cutAndCopyList(
+            'gamma:cdc',
+            'gamma:all',
+            'theta > 0.296706 and theta < 2.61799',
+            True,
+            path)
     # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficienct cut
     # is already applied on mdst level for photons with E < 50 MeV.
     elif listtype == 'loose':
-        stdPhotons('all', path)
+        stdPhotons('cdc', path)
         cutAndCopyList(
             'gamma:loose',
-            'gamma:all',
-            'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]',
+            'gamma:cdc',
+            'clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]',
             True,
             path)
     # additional region dependent energy cuts
@@ -109,6 +120,16 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
 # Used in skimming code
 def loadStdSkimPhoton(path=analysis_main):
+    """
+    Function to prepare the skim photon lists.
+
+    Warning:
+        Should only be used by skims.
+
+    Parameters:
+        path (basf2.Path): modules are added to this path
+
+    """
     stdPhotons('loose', path)
     cutAndCopyList(
         'gamma:skim',
@@ -121,17 +142,12 @@ def loadStdSkimPhoton(path=analysis_main):
 
 
 def loadStdGoodBellePhoton(path=analysis_main):
+    """
+    Load the Belle goodBelle list. Creates a ParticleList named
+    'gamma:goodBelle' with '0.5 < :b2:var:`goodBelleGamma` < 1.5'
+
+    Parameters:
+        path (basf2.Path): the path to load the modules
+    """
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)
-
-# old, will be removed/replaced
-
-
-def loadStdPhotonE12(path=analysis_main):
-    loadStdAllPhoton(path)
-    cutAndCopyList('gamma:E12', 'gamma:all', '1.2 < E < 100', True, path)
-
-
-def loadStdPhotonE15(path=analysis_main):
-    loadStdAllPhoton(path)
-    cutAndCopyList('gamma:E15', 'gamma:all', '1.5 < E < 100', True, path)

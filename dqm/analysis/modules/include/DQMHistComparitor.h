@@ -48,13 +48,14 @@ namespace Belle2 {
     virtual ~DQMHistComparitorModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
+    CMPNODE* find_pnode(TString a);
 
     // Data members
   private:
@@ -65,7 +66,7 @@ namespace Belle2 {
     /** Reference Histogram Root file name */
     std::string m_refFileName;
     /** The pointer to the reference file */
-    TFile* m_refFile;
+    TFile* m_refFile = nullptr;
 
     TH1* GetHisto(TString histoname);
 

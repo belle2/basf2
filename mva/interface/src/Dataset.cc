@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck                                              *
+ *               Jochen Gemmler                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -396,12 +397,21 @@ namespace Belle2 {
         std::vector<float> values(nentries, 1.);
         return values;
       }
+      if (branchName == "__weight__") {
+        if (!checkForBranch(m_tree, "__weight__")) {
+          B2INFO("No default weight branch with name __weight__ found. Using 1s as default weights.");
+          int nentries = getNumberOfEvents();
+          std::vector<float> values(nentries, 1.);
+          return values;
+        }
+      }
+
       std::string typeName = "weights";
 
       if (m_isDoubleInputType)
         return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight_double);
-      else
-        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight);
+
+      return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight);
     }
 
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
@@ -416,8 +426,8 @@ namespace Belle2 {
 
       if (m_isDoubleInputType)
         return ROOTDataset::getVectorFromTTree(typeName, branchName, m_input_double[iFeature]);
-      else
-        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_input[iFeature]);
+
+      return ROOTDataset::getVectorFromTTree(typeName, branchName, m_input[iFeature]);
     }
 
     std::vector<float> ROOTDataset::getSpectator(unsigned int iSpectator)
@@ -432,8 +442,8 @@ namespace Belle2 {
 
       if (m_isDoubleInputType)
         return ROOTDataset::getVectorFromTTree(typeName, branchName, m_spectators_double[iSpectator]);
-      else
-        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_spectators[iSpectator]);
+
+      return ROOTDataset::getVectorFromTTree(typeName, branchName, m_spectators[iSpectator]);
     }
 
     ROOTDataset::~ROOTDataset()
@@ -519,6 +529,12 @@ namespace Belle2 {
       m_tree->SetBranchStatus("*", 0);
       std::string typeName;
 
+      if (m_general_options.m_weight_variable.empty()) {
+        m_weight = 1;
+        m_weight_double = 1;
+        B2INFO("No weight variable provided. The weight will be set to 1.");
+      }
+
       if (m_general_options.m_weight_variable == "__weight__") {
         if (checkForBranch(m_tree, "__weight__")) {
           m_tree->SetBranchStatus("__weight__", 1);
@@ -560,12 +576,16 @@ namespace Belle2 {
 
     void ROOTDataset::setRootInputType()
     {
+      std::string control_variable;
       for (auto& variable : m_general_options.m_variables) {
-        if (checkForBranch(m_tree, variable)) {
-          TBranch* branch = m_tree->GetBranch(variable.c_str());
-          TLeaf* leaf = branch->GetLeaf(variable.c_str());
+        if (checkForBranch(m_tree, variable))
+          control_variable = variable;
+        else if (checkForBranch(m_tree, Belle2::makeROOTCompatible(variable)))
+          control_variable = Belle2::makeROOTCompatible(variable);
+        if (not control_variable.empty()) {
+          TBranch* branch = m_tree->GetBranch(control_variable.c_str());
+          TLeaf* leaf = branch->GetLeaf(control_variable.c_str());
           std::string type_name = leaf->GetTypeName();
-
           if (type_name == "Double_t")
             m_isDoubleInputType = true;
           else if (type_name == "Float_t")

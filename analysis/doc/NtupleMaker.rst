@@ -1,20 +1,20 @@
 NTupleMaker
 ============
 
-The `NtupleMaker`  module builds ntuples from a `ParticleList`_  . There is a number of ready-to-use plugins called `NtupleTool` for saving standard variables to the ntuples. These plugins can be selected and configured directly in the basf2 script.
+The :doc:`NtupleMaker`  module builds ntuples from a `ParticleList`_  . There is a number of ready-to-use plugins called `NtupleTool` for saving standard variables to the ntuples. These plugins can be selected and configured directly in the basf2 script.
 
 Click here to learn how to develop your own NtupleTool
 
-How to create ntuples using the `NtupleMaker` module
-----------------------------------------------------
+How to create ntuples using the :doc:`NtupleMaker` module
+---------------------------------------------------------
 
 At the end of an analysis chain you end up with a list of Particle objects in the DataStore and you want to write the properties (e.g. kinematics or truth information) of these particles to an ntuple (TTree). Everybody who has done this before knows that this is a lot of work because every variable has to be defined, introduced to the TTree and set to the correct value.
 
-In Belle II this work is done for you by the `NtupleMaker` module! Although individual analyses differ in particle reconstruction or selection criteria, at the end you need the same variables in the ntuple, e.g. the kinematics of the particles.
+In Belle II this work is done for you by the :doc:`NtupleMaker` module! Although individual analyses differ in particle reconstruction or selection criteria, at the end you need the same variables in the ntuple, e.g. the kinematics of the particles.
 
 Let's consider that you reconstructed the decay :math:`B^-\to D^0(K^+\pi^-)\pi^-` by the other analysis modules and that a list 'B-:d0pi' with :math:`B^-` candidates is on the DataStore.
 
-To create an ntuple in a ROOT file you need to add the `NtupleMaker`  module to you basf2 path (here by default to: `analysis_main` ). Instead of registering the module and setting its parameter by yourself you can use ntupleFile and ntupleTree python wrapper functions. In the beginning of your python script import these two functions from :code:`modularAnalysis.py`:
+To create an ntuple in a ROOT file you need to add the :doc:`NtupleMaker`  module to you basf2 path (here by default to: `analysis_main` ). Instead of registering the module and setting its parameter by yourself you can use ntupleFile and ntupleTree python wrapper functions. In the beginning of your python script import these two functions from :code:`modularAnalysis.py`:
 
 .. code-block:: python
 
@@ -52,7 +52,7 @@ On the other hand, `Mbc` and `deltaE` are meaningful only for B candidates there
 
     toolsB += ['DeltaEMbc', '^B-']
 
-Finally, tell the `NtupleMaker` what should be the name of the output tree and make the connection between `ParticleList`_  and the Ntuple tools
+Finally, tell the :doc:`NtupleMaker` what should be the name of the output tree and make the connection between `ParticleList`_  and the Ntuple tools
 
  
 .. code-block:: python
@@ -60,7 +60,7 @@ Finally, tell the `NtupleMaker` what should be the name of the output tree and m
     ntupleTree('btree', 'B-:d0pi', toolsB)
 
 
-Ok, the `NtupleMaker`  is now initialised and it will create the ntuple btree in the file :code:`B2D0Pi-output.root`. The tree will contain variables given by the selected NtupleTools. The full list of these tools can be found here.
+Ok, the :doc:`NtupleMaker`  is now initialised and it will create the ntuple btree in the file :code:`B2D0Pi-output.root`. The tree will contain variables given by the selected NtupleTools. The full list of these tools can be found here.
 
 The name of the NtupleTool is followed by a DecayString. The :ref:`DecayString` holds the information how the :math:`B^-` particles are reconstructed, e.g. that the first daughter of the :math:`B^-` is a :math:`D^0` decaying to (:math:`K^+,\pi^-`). Only the kinematics of the particles selected with a preceeding :code:`^` are saved. In the case of the `EventMetaData` and `RecoStats` `NtupleTools` the :ref:`DecayString` is ignored. `Particle`_  names are defined to be those in evt.pdl, the `EvtGen <https://confluence.desy.de/display/BI/Software+EvtGen>`_ particle data table.
 
@@ -68,7 +68,7 @@ The name of the NtupleTool is followed by a DecayString. The :ref:`DecayString` 
 What if I want to create more than one ntuple?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can add several `NtupleMaker` modules to the same path for example to save different decay channels. Just add a second `NtupleMaker` to the path and initialise it as described above:
+You can add several :doc:`NtupleMaker` modules to the same path for example to save different decay channels. Just add a second :doc:`NtupleMaker` to the path and initialise it as described above:
 
 .. code-block:: python
 
@@ -85,7 +85,7 @@ Please note that the output file names have to be identical. Output to multiple 
 How do I save information for every event?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you provide an empty string for the `ParticleList`_  name, the `NtupleMaker`  runs the `NtupleTools` for each event.
+If you provide an empty string for the `ParticleList`_  name, the :doc:`NtupleMaker`  runs the `NtupleTools` for each event.
 
 (You need to provide a valid :ref:`DecayString` for the NtupleTools, just use :code:`B-` or similar, it has no influence on the output.)
 
@@ -153,7 +153,7 @@ Finally, we define how the variable is calculated. The pointer p refers to a Par
         }
     }
 
-To tell the `NtupleMaker`  of the existence of the new NtupleTool we add in :code:`analysis/NtupleTools/src/NtupleToolList.cc`: 
+To tell the :doc:`NtupleMaker`  of the existence of the new NtupleTool we add in :code:`analysis/NtupleTools/src/NtupleToolList.cc`: 
 
 .. code-block:: C++
 

@@ -64,10 +64,12 @@ namespace Belle2 {
     }
 
     /** Add a single hit to the object */
-    void addHit(int lwire, int wire, int layer, double doca, double enta, int adcCount, double dE, double path, double dedx,
+    void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS, int adcCount, double dE,
+                double path, double dedx,
                 double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
                 double onedcor)
     {
+
       m_hLWire.push_back(lwire);
       m_hWire.push_back(wire);
       m_hLayer.push_back(layer);
@@ -75,15 +77,15 @@ namespace Belle2 {
       m_hDedx.push_back(dedx);
       m_hADCCount.push_back(adcCount);
       m_hDoca.push_back(doca);
+      m_hDocaRS.push_back(docaRS);
       m_hEnta.push_back(enta);
+      m_hEntaRS.push_back(entaRS);
       m_hDriftT.push_back(driftT);
-
       m_hdE.push_back(dE);
       m_hCellHeight.push_back(cellHeight);
       m_hCellHalfWidth.push_back(cellHalfWidth);
       m_hDriftD.push_back(driftD);
       m_hDriftDRes.push_back(driftDRes);
-
       m_hWireGain.push_back(wiregain);
       m_hTwodCor.push_back(twodcor);
       m_hOnedCor.push_back(onedcor);
@@ -181,6 +183,12 @@ namespace Belle2 {
     double getDoca(int i) const { return m_hDoca[i]; }
     /** Return the entrance angle in the CDC cell for this hit */
     double getEnta(int i) const { return m_hEnta[i]; }
+
+    /** Return rescaled doca value for cell height=width assumption */
+    double getDocaRS(int i) const { return m_hDocaRS[i]; }
+    /** Return rescaled enta value for cell height=width assumption */
+    double getEntaRS(int i) const { return m_hEntaRS[i]; }
+
     /** Return the drift time for this hit */
     int getDriftT(int i) const { return m_hDriftT[i]; }
 
@@ -264,6 +272,8 @@ namespace Belle2 {
     std::vector<int> m_hADCCount; /**< adcCount per hit */
     std::vector<double> m_hDoca;  /**< distance of closest approach to sense wire */
     std::vector<double> m_hEnta;  /**< entrance angle in CDC cell */
+    std::vector<double> m_hDocaRS;/**< distance of closest approach to sense wire after rescalling cell L=W */
+    std::vector<double> m_hEntaRS;/**< entrance angle in CDC cell after rescalling cell L=W */
     std::vector<double> m_hdE;    /**< charge per hit */
     std::vector<int> m_hDriftT;       /**< drift time for each hit */
     std::vector<double> m_hDriftD;    /**< drift distance for each hit */
@@ -272,7 +282,7 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 12); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 13); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

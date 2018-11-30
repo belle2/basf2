@@ -12,7 +12,9 @@
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <string>
 
 namespace Belle2 {
@@ -27,10 +29,11 @@ namespace Belle2 {
     class CalibSampleCalculator : public SoftwareTriggerCalculation {
     public:
       /// Set the default names for the store object particle lists.
-      CalibSampleCalculator(): m_particlelist(), m_extrainfoname() {};
+      CalibSampleCalculator() {}
 
       /// Set the default names for the store object particle lists.
-      CalibSampleCalculator(std::vector<std::string> prt, std::vector<std::string>ext) { m_particlelist = prt; m_extrainfoname = ext;};
+      CalibSampleCalculator(const std::vector<std::string>& prt, const std::vector<std::string>& ext) :
+        m_particlelist(prt), m_extrainfoname(ext) {}
 
       /// Require the particle list. We do not need more here.
       void requireStoreArrays() override;
@@ -42,6 +45,9 @@ namespace Belle2 {
     private:
       /** required input for ParticleList */
       StoreObjPtr<ParticleList> m_particleList;
+
+      /** required input for monopoles*/
+      StoreArray<RecoTrack> m_recoTracksMpl;
 
       /** the name of particle list */
       std::vector<std::string> m_particlelist;

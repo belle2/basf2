@@ -52,15 +52,13 @@ static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
 }
 
 EKLMReconstructorModule::EKLMReconstructorModule() : Module(),
-  m_DefaultTimeCalibrationData(0)
+  m_GeoDat(nullptr), m_nStrip(0), m_TransformData(nullptr),
+  m_TimeCalibrationData(nullptr)
 {
   setDescription("EKLM reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("CheckSegmentIntersection", m_CheckSegmentIntersection,
            "Check if segments intersect.", true);
-  m_TransformData = NULL;
-  m_GeoDat = NULL;
-  m_TimeCalibrationData = NULL;
 }
 
 EKLMReconstructorModule::~EKLMReconstructorModule()
@@ -85,6 +83,7 @@ void EKLMReconstructorModule::initialize()
 
 void EKLMReconstructorModule::beginRun()
 {
+  /* cppcheck-suppress variableScope */
   int i;
   if (!m_RecPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
@@ -94,7 +93,7 @@ void EKLMReconstructorModule::beginRun()
     for (i = 0; i < m_nStrip; i++) {
       m_TimeCalibrationData[i] =
         m_TimeCalibration->getTimeCalibrationData(i + 1);
-      if (m_TimeCalibrationData[i] == NULL) {
+      if (m_TimeCalibrationData[i] == nullptr) {
         B2FATAL("EKLM time calibration data is missing for strip "
                 << i + 1 << ".");
         m_TimeCalibrationData[i] = &m_DefaultTimeCalibrationData;

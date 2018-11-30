@@ -34,9 +34,9 @@ namespace Belle2 {
       PXDRawHitSorterModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the sorting */
-      virtual void event();
+      virtual void event() override;
 
     private:
       /**< Required input for PXDRawHit */
@@ -59,8 +59,6 @@ namespace Belle2 {
       std::string m_storeDigitsName;
       /** Mode: if true, merge duplicate pixels, otherwise only keep the first. */
       bool m_mergeDuplicates;
-      /** Mode: if true, merge frames, otherwise keep separate frames */
-      bool m_mergeFrames;
       /** Minimum charge for a digit to carry */
       int m_0cut;
       /** Discard out-of-range hits. */

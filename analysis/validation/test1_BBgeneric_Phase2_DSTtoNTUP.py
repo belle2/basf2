@@ -13,17 +13,14 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
-from stdV0s import *
-from stdPhotons import *
-from stdPi0s import *
+from stdCharged import stdPi
 
 from beamparameters import add_beamparameters
 # create main path
 main = create_path()
 
 inputMdst('default', '../BBgeneric_Phase2.dst.root')
-loadStdCharged()
+stdPi('all')
 
 # ----> NtupleMaker module
 ntupleFile('../BBgeneric_Phase2.ntup.root')

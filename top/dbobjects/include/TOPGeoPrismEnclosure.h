@@ -124,13 +124,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    virtual void print(const std::string& title = "QBB prism enclosure geometry parameters") const;
+    virtual void print(const std::string& title = "QBB prism enclosure geometry parameters") const override;
 
   private:
 
@@ -144,7 +144,7 @@ namespace Belle2 {
     float m_extensionThickness = 0;  /**< extension plate thickness */
     std::string m_material; /**< material name */
 
-    ClassDef(TOPGeoPrismEnclosure, 1); /**< ClassDef */
+    ClassDefOverride(TOPGeoPrismEnclosure, 1); /**< ClassDef */
 
   };
 

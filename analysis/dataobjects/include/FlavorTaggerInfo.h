@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FLAVORTAGGERINFO_H
-#define FLAVORTAGGERINFO_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <analysis/dataobjects/Particle.h>
@@ -78,7 +77,7 @@ namespace Belle2 {
     * Saves the usemode of the FlavorTagger
     * @param mode "Teacher" or "Expert"
     */
-    void setUseModeFlavorTagger(std::string mode);
+    void setUseModeFlavorTagger(const std::string& mode);
 
     /**
     * Saves the method and the correspondig FlavorTaggerMap
@@ -396,4 +395,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

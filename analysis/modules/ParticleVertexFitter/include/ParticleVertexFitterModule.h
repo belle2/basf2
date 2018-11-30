@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEVERTEXFITTERMODULE_H
-#define PARTICLEVERTEXFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -156,7 +155,8 @@ namespace Belle2 {
     * @param l represent the tracks ID
     * @param p pointer to particle
      */
-    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
+    void updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                     std::vector<Particle*>&  allparticles, const Particle* daughter);
 
     /**
      * Adds given particle to the VertexFitKFit.
@@ -241,4 +241,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

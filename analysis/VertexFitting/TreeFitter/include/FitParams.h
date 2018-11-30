@@ -24,10 +24,35 @@ namespace TreeFitter {
   public:
 
     /** Constructor */
-    FitParams(int dim);
+    explicit FitParams(int dim);
 
     /** Destructor */
     ~FitParams() {};
+
+    /** copy constructor */
+    FitParams(const FitParams& toCopy)
+      : m_dim(toCopy.m_dim),
+        m_chiSquare(toCopy.m_chiSquare),
+        m_nConstraints(toCopy.m_nConstraints),
+        m_dimensionReduction(toCopy.m_dimensionReduction)
+    {
+      this->m_globalState =
+        Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > (toCopy.m_globalState);
+      this->m_globalCovariance =
+        Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance);
+    }
+
+    /** Assignment operator. */
+    FitParams& operator =(const FitParams& other)
+    {
+      m_dim = other.m_dim;
+      m_chiSquare = other.m_chiSquare;
+      m_nConstraints = other.m_nConstraints;
+      m_dimensionReduction = other.m_dimensionReduction;
+      m_globalState = other.m_globalState;
+      m_globalCovariance = other.m_globalCovariance;
+      return *this;
+    }
 
     /** getter for the states covariance */
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > & getCovariance()
@@ -74,20 +99,13 @@ namespace TreeFitter {
     /** get dimension sum of constraints */
     int getNConstraints() {return m_nConstraints;}
 
-    /** get degress of freedom */
-    int getNDOF() {return m_nConstraints - m_dim; }
-
     /** test if the covariance makes sense */
     bool testCovariance() const;
 
     /** increment nconstraints vec */
     int& incrementNConstraintsVec(int row) { return m_nConstraintsVec[row];}
 
-    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value.
-     *  FIXME this is stupid.
-     *    replace with with setter.
-     *    only used in resetCov and KalmanCalculator.cc
-     * */
+    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value. */
     int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1]; }
 
     /** get dimension od statevector */
@@ -113,15 +131,6 @@ namespace TreeFitter {
 
     /** some constraints are special the geometric for example */
     void addNConstraint(int value) { m_nConstraints += value; }
-
-    /** some constraints are special the geometric for example */
-    void reduceNDF(int value) { m_dimensionReduction += value; }
-
-    /** getter for the dim reduction counter */
-    int getReduction() { return m_dimensionReduction; }
-
-    /** reesst reduction in the beginning of each iteration */
-    void resetReduction() { m_dimensionReduction = 0; }
 
     /** increment global chi2 */
     void addChiSquare(double chisq, int nconstraints)

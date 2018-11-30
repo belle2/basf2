@@ -48,22 +48,22 @@ namespace Belle2 {
       virtual ~CsIDigitizerModule();
 
       /** Register input and output data */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** To do before each runs. NOOP.*/
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /** Each event
        * This is where the actual digitization is done,
        * and the hits are written to the DataStore
        */
-      virtual void event();
+      virtual void event() override;
 
       /** Clean up. NOOP. */
-      virtual void endRun();
+      virtual void endRun() override;
 
       /** Final clean up. CPU clock stops */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:

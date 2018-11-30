@@ -50,13 +50,8 @@ class CheckCalibDB(Module):
         if not db:
             B2ERROR(payload + ' not found')
             return
-        active = 0
-        all = 0
-        for moduleID in range(1, 17):
-            for channel in range(512):
-                all += 1
-                if db.isActive(moduleID, channel):
-                    active += 1
+        active = db.getNumOfActiveChannels()
+        all = db.getNumOfChannels()
         print(payload + ': ' + str(active) + '/' + str(all) + ' active')
 
     def printModule(self, payload):

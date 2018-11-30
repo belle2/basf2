@@ -1,842 +1,727 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Michael De Nuccio, Giulia Casarosa                       *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
 #include <svd/modules/svdPerformance/SVDClusterEvaluationModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDSimHit.h>
-#include <TFile.h>
-#include <TText.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <TF1.h>
+#include <TMath.h>
+#include <TCanvas.h>
+#include <TGraphErrors.h>
+#include <TGraph.h>
+#include <TLegend.h>
 
-#include <string>
-#include "TMath.h"
-#include <algorithm>
-#include <functional>
-
-
+using namespace std;
 using namespace Belle2;
-
 
 REG_MODULE(SVDClusterEvaluation)
 
-
-SVDClusterEvaluationModule::SVDClusterEvaluationModule() : Module()
+SVDClusterEvaluationModule::SVDClusterEvaluationModule(): Module()
+  , m_interCoor(NULL)
+  , m_interSigma(NULL)
+  , m_clsCoor(NULL)
+  , m_clsResid(NULL)
+  , m_clsMinResid(NULL)
+  , m_clsResid2D(NULL)
 {
-  setDescription("This modules generates performance plots on SVD clustering.");
 
-  addParam("outputFileName", m_outputFileName, "output rootfile name", std::string("SVDClusterEvaluation.root"));
+  setDescription("This module check performances of SVD reconstruction of VXD TB data");
+
+  addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDClusterEvaluation_output.root"));
+
+  addParam("LayerUnderStudy", m_theLayer, "Number of the layer under study. If 0, then all layers are plotted", int(0));
+  addParam("InterceptSigmaMax", m_interSigmaMax,
+           "Max of the histogram that contains the intercept statistical error. Default is OK for Phase2.", double(0.35));
+  addParam("uFiducialLength", m_uFiducial,
+           "length to be subtracted from the U-edge to consider intercepts inside the sensor. Positive values reduce the area; negative values increase the area",
+           double(0));
+  addParam("vFiducialLength", m_vFiducial,
+           "length to be subtracted from the V-edge to consider intercepts inside the sensor. Positive values reduce the area; negative values increase the area",
+           double(0));
+  addParam("efficiency_nSigma", m_nSigma, " number of residual sigmas for the determination of the efficiency", float(5));
+  addParam("ClustersName", m_ClusterName, "Name of DUTs Cluster Store Array.", std::string(""));
+  addParam("InterceptsName", m_InterceptName, "Name of Intercept Store Array.", std::string(""));
+  addParam("TracksName", m_TrackName, "Name of Track Store Array.", std::string(""));
+  addParam("UbinWidth", m_UbinWidth, "Histograms U-bin width (in um)", double(10));
+  addParam("VbinWidth", m_VbinWidth, "Histograms V-bin width (in um)", double(10));
+  addParam("groupNstrips", m_groupNstrips, "How many strips group together in the 2D residual VS position plot", int(128));
 }
-
 
 SVDClusterEvaluationModule::~SVDClusterEvaluationModule()
 {
-}
 
+}
 
 void SVDClusterEvaluationModule::initialize()
 {
 
-  /* initialize useful store array */
-  StoreArray<SVDShaperDigit> SVDShaperDigits;
-  StoreArray<SVDRecoDigit> SVDRecoDigits;
-  StoreArray<SVDCluster> SVDClusters;
-  StoreArray<SVDTrueHit> SVDTrueHits;
+  m_eventMetaData.isRequired();
+  m_svdClusters.isRequired(m_ClusterName);
+  m_svdIntercepts.isRequired(m_InterceptName);
+  m_tracks.isRequired(m_TrackName);
 
-  SVDShaperDigits.isRequired();
-  SVDRecoDigits.isRequired();
-  SVDClusters.isRequired();
-  SVDTrueHits.isRequired();
+  m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
-  m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
+  m_width_LargeS_U = 5.772;
+  m_width_LargeS_V = 12.290;
+  m_width_SmallS_U = 3.855;
+  m_width_SmallS_V = m_width_LargeS_V;
 
-  m_histoList_StripTimeResolution = new TList;
-  m_histoList_ClusterTimeResolution = new TList;
-  m_histoList_ClusterTimePull = new TList;
-  m_histoList_ClusterPositionResolution = new TList;
-  m_histoList_ClusterPositionPull = new TList;
-  m_histo2DList_TresVsPosres = new TList;
-  m_histoList_PurityInsideTMCluster = new TList;
-  m_histo2DList_PurityInsideTMCluster = new TList;
-  m_histoList_PurityInsideNOTMCluster = new TList;
-  m_histoList_THinCluster = new TList;
-  m_histoList_THinClusterTM = new TList;
-  m_histoList_GoodTHinClusterTM = new TList;
-  m_histoList_GoodTHinClusterTMGood = new TList;
-  m_graphList = new TList;
-  //Control List
-  m_histoList_Control = new TList;
+  m_safety_margin = 0.2;
 
-  for (int i = 0; i < m_Nsets; i ++) {
+  m_UbinWidth /= m_cmTomicron;
+  m_VbinWidth /= m_cmTomicron;
 
-    if (i % 2 == 0) { //even index, U side
-      NameOfHisto = "histo_ClusterUPositionResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
-      TitleOfHisto = "U-Cluster Position Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
-      m_histo_ClusterUPositionResolution[i / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -0.1, 0.1,
-                                                  "U_reco - U_true (cm)",
-                                                  m_histoList_ClusterPositionResolution);
+  m_nBins_LargeS_U = m_width_LargeS_U / m_UbinWidth;
+  m_nBins_LargeS_V = m_width_LargeS_V / m_VbinWidth;
+  m_nBins_SmallS_U = m_width_SmallS_U / m_UbinWidth;
+  m_nBins_SmallS_V = m_width_SmallS_V / m_VbinWidth;
 
-      NameOfHisto = "histo_ClusterUPositionPull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
-      TitleOfHisto = "U-Cluster Position Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
-      m_histo_ClusterUPositionPull[i / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11,
-                                                              "(U_reco - U_true)/U_sigma",
-                                                              m_histoList_ClusterPositionPull);
-    } else { //odd index, V side
-      NameOfHisto = "histo_ClusterVPositionResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
-      TitleOfHisto = "V-Cluster Position Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
-      m_histo_ClusterVPositionResolution[(i - 1) / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -0.1, 0.1,
-                                                        "V_reco - V_true (cm)", m_histoList_ClusterPositionResolution);
+  m_abs_LargeS_U = m_width_LargeS_U / 2 + m_safety_margin;
+  m_abs_LargeS_V = m_width_LargeS_V / 2 + m_safety_margin;
+  m_abs_SmallS_U = m_width_SmallS_U / 2 + m_safety_margin;
+  m_abs_SmallS_V = m_width_SmallS_V / 2 + m_safety_margin;
 
-      NameOfHisto = "histo_ClusterVPositionPull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
-      TitleOfHisto = "Cluster V Position Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
-      m_histo_ClusterVPositionPull[(i - 1) / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11,
-                                                  "(V_reco- V_true)/V_sigma", m_histoList_ClusterPositionPull);
-    }
-
-    NameOfHisto = "histo_StripTimeResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Strip Time Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_StripTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
-                                                       m_histoList_StripTimeResolution);
-
-    NameOfHisto = "histo_ClusterTimeResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Cluster Time Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_ClusterTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
-                                                         m_histoList_ClusterTimeResolution);
-
-    NameOfHisto = "histo_ClusterTimeResolution_bin1_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Cluster Time Resolution TriggerBin=1(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
-                     i) + ")";
-    m_histo_ClusterTimeResolution_bin1[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
-                                                              m_histoList_ClusterTimeResolution);
-    NameOfHisto = "histo_ClusterTimeResolution_bin2_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Cluster Time Resolution TriggerBin=2(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
-                     i) + ")";
-    m_histo_ClusterTimeResolution_bin2[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
-                                                              m_histoList_ClusterTimeResolution);
-    NameOfHisto = "histo_ClusterTimeResolution_bin3_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Cluster Time Resolution TriggerBin=3(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
-                     i) + ")";
-    m_histo_ClusterTimeResolution_bin3[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
-                                                              m_histoList_ClusterTimeResolution);
-    NameOfHisto = "histo_ClusterTimeResolution_bin4_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Cluster Time Resolution TriggerBin=4(" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
-                     i) + ")";
-    m_histo_ClusterTimeResolution_bin4[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
-                                                              m_histoList_ClusterTimeResolution);
-
-    NameOfHisto = "histo_ClusterTimePull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Cluster Time Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_ClusterTimePull[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11, "(t_reco - t_true)/t_sigma",
-                                                   m_histoList_ClusterTimePull);
-
-    NameOfHisto = "histo2D_TresVsPosres_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Time Residuals Vs U/V Position Residuals (" + IntExtFromIndex(
-                     i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo2D_TresVsPosres[i] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -0.1, 0.1, "U/V_reco - U/V_true (cm)", 180, -120, 60,
-                                                  "t_reco - t_true (ns)", m_histo2DList_TresVsPosres);
-
-    NameOfHisto = "histo_PurityInsideTMCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Fraction of Truth-Matched RecoDigits inside a Truth-Matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
-                     i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_PurityInsideTMCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 110, 0, 1.10,
-                                                         "number of TM recoDigits / cluster size",
-                                                         m_histoList_PurityInsideTMCluster);
-
-    NameOfHisto = "histo2D_PurityInsideTMCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Number of Truth-matched Recos vs Number of Recos inside a Truth-matched Cluster (" + IntExtFromIndex(
-                     i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo2D_PurityInsideTMCluster[i] = createHistogram2D(NameOfHisto, TitleOfHisto, 42, 0, 42, "cluster size", 42, 0, 42,
-                                                           "number of TM recos", m_histo2DList_PurityInsideTMCluster);
-
-    NameOfHisto = "histo_PurityInsideNOTMCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Fraction of Truth-matched RecoDigits inside a NOT Truth-matched Cluster (" + IntExtFromIndex(
-                     i) + ", " + FWFromIndex(
-                     i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_PurityInsideNOTMCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 110, 0, 1.10,
-                                                           "number of TM recoDigits / cluster size",
-                                                           m_histoList_PurityInsideNOTMCluster);
-
-    NameOfHisto = "histo_THinCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Number of True Hits inside a Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
-                     i) + ")";
-    m_histo_THinCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
-                                               m_histoList_THinCluster);
-
-    NameOfHisto = "histo_THinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Number of True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
-                     i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_THinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per TM cluster",
-                                                 m_histoList_THinClusterTM);
-
-    NameOfHisto = "histo_GoodTHinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Number of Good True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
-                     i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_GoodTHinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per TM cluster",
-                                                     m_histoList_GoodTHinClusterTM);
-
-    NameOfHisto = "histo_GoodTHinClusterTMGood_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Number of Good True Hits inside a Good Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
-                     i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_GoodTHinClusterTMGood[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per Good TM cluster",
-                                                         m_histoList_GoodTHinClusterTMGood);
-  }
-
-  //Control Histos
-  m_histoControl_MCcharge = createHistogram1D("m_histoControl_MCcharge", "m_histoControl_MCcharge", 5, -2, 3,
-                                              "charge of the first MC particle related to a True Hit", m_histoList_Control);
-  m_histoControl_MCisPrimary = createHistogram1D("m_histoControl_MCisPrimary", "m_histoControl_MCisPrimary", 2, 0, 2,
-                                                 "isPrimary of the first MC particle related to a True Hit", m_histoList_Control);
-  m_histoControl_THToMCsize = createHistogram1D("m_histoControl_THToMCsize", "m_histoControl_THToMCsize", 10, -1, 9,
-                                                "size of the THToMC relation arrau", m_histoList_Control);
 }
 
 
 void SVDClusterEvaluationModule::beginRun()
 {
-}
 
+  if (m_interCoor == NULL) {
+
+    //INTERCEPTS
+    create_SVDHistograms_interCoor();
+
+    create_SVDHistograms_interSigma();
+
+    //CLUSTERS
+    create_SVDHistograms_clsCoor();
+
+    create_SVDHistograms_clsResid();
+
+    B2DEBUG(10, "Empty histograms have beein created");
+    B2DEBUG(10, "Large sensors, U side: width = " << m_width_LargeS_U << " cm, bin width = " << m_UbinWidth << " cm -> Nbins = " <<
+            m_nBins_LargeS_U);
+    B2DEBUG(10, "Large sensors, V side: width = " << m_width_LargeS_V << " cm, bin width = " << m_UbinWidth << " cm -> Nbins = " <<
+            m_nBins_LargeS_V);
+
+    B2DEBUG(10, "Small sensors, U side: width = " << m_width_SmallS_U << " cm, bin width = " << m_UbinWidth << " cm -> Nbins = " <<
+            m_nBins_SmallS_U);
+    B2DEBUG(10, "Small sensors, V side: width = " << m_width_SmallS_V << " cm, bin width = " << m_UbinWidth << " cm -> Nbins = " <<
+            m_nBins_SmallS_V);
+  }
+
+
+
+
+
+
+}
 
 void SVDClusterEvaluationModule::event()
 {
+  //  int nEvent = m_eventMetaData->getEvent();
+  //  B2DEBUG(10, "nEvent = " << nEvent << ": n intercepts = " << m_svdIntercepts.getEntries() << "n clusters DUT = " << m_svdClusters.getEntries());
+  bool isU = true;
 
-  StoreArray<SVDShaperDigit> SVDShaperDigits;
-  StoreArray<SVDRecoDigit> SVDRecoDigits;
-  StoreArray<SVDCluster> SVDClusters;
-  StoreArray<SVDTrueHit> SVDTrueHits;
+  //intercepts
+  for (int inter = 0 ; inter < m_svdIntercepts.getEntries(); inter++) {
 
-  //////////
-  //STRIPS//
-  //////////
+    if (!isRelatedToTrack(m_svdIntercepts[inter]))
+      continue;
 
-  //loop on ShaperDigits
-  for (const SVDShaperDigit& shape : SVDShaperDigits) {
-    indexForHistosAndGraphs = indexFromLayerSensorSide(shape.getSensorID().getLayerNumber() , shape.getSensorID().getSensorNumber() ,
-                                                       shape.isUStrip());
+    B2DEBUG(10, "this intercept is related to a good track");
 
-    RelationVector<SVDRecoDigit> relatVectorShaperToReco = DataStore::getRelationsWithObj<SVDRecoDigit>(&shape);
+    VxdID::baseType theVxdID = (VxdID::baseType)m_svdIntercepts[inter]->getSensorID();
+    double coorU = m_svdIntercepts[inter]->getCoorU();
+    double coorV = m_svdIntercepts[inter]->getCoorV();
+    double sigmaU = m_svdIntercepts[inter]->getSigmaU();
+    double sigmaV = m_svdIntercepts[inter]->getSigmaV();
 
-    //efficiency shaper to reco
-    m_NumberOfShaperDigit[indexForHistosAndGraphs] ++;
-    if (relatVectorShaperToReco.size() > 0)
-      m_NumberOfRecoDigit[indexForHistosAndGraphs] ++;
-  }
-  //close loop on ShaperDigits
+    const VXD::SensorInfoBase& theSensorInfo = m_geoCache.getSensorInfo(theVxdID);
+    if (theSensorInfo.inside(coorU, coorV, -m_uFiducial, -m_vFiducial)) {
+      B2DEBUG(10, "intercept is inside fiducial area");
 
-  //loop on RecoDigits
-  for (const SVDRecoDigit& reco : SVDRecoDigits) {
-    indexForHistosAndGraphs = indexFromLayerSensorSide(reco.getSensorID().getLayerNumber() , reco.getSensorID().getSensorNumber() ,
-                                                       reco.isUStrip());
+      m_interCoor->fill(theVxdID, isU, coorU, coorV);
+      m_interSigma->fill(theVxdID, isU, sigmaU);
+      m_interSigma->fill(theVxdID, !isU, sigmaV);
 
-    RelationVector<SVDTrueHit> relatVectorRecoToTH = DataStore::getRelationsWithObj<SVDTrueHit>(&reco);
+      double minresidU = 999;
+      bool minfoundU = false;
+      double minresidV = 999;
+      bool minfoundV = false;
 
-    //strip time resolution
-    if (relatVectorRecoToTH.size() > 0)
-      m_histo_StripTimeResolution[indexForHistosAndGraphs]->Fill(reco.getTime() - (relatVectorRecoToTH[0])->getGlobalTime());
+      //loop on clusters
+      for (int cls = 0 ; cls < m_svdClusters.getEntries(); cls++) {
 
-  }
-  //close loop on RecoDigits
+        VxdID::baseType clVxdID = (VxdID::baseType)m_svdClusters[cls]->getSensorID();
+        if (clVxdID != theVxdID)
+          continue;
 
-  ////////////
-  //CLUSTERS//
-  ////////////
+        double interCoor = coorV;
+        //      double interSigma = sigmaV;
+        if (m_svdClusters[cls]->isUCluster()) {
+          interCoor = coorU;
+          //interSigma = sigmaU;
+        }
+        double resid = interCoor - m_svdClusters[cls]->getPosition();
+        m_clsResid->fill(theVxdID, m_svdClusters[cls]->isUCluster(), resid);
+        m_clsResid2D->fill(theVxdID, m_svdClusters[cls]->isUCluster(), m_svdClusters[cls]->getPosition(), resid);
 
-  //loop on TrueHits
-  for (const SVDTrueHit& trhi : SVDTrueHits) {
-
-    if (goodTrueHit(&trhi)) { //enter only if the TH is related to a primary and charged MC particle
-      indexForHistosAndGraphs = indexFromLayerSensorSide(trhi.getSensorID().getLayerNumber() , trhi.getSensorID().getSensorNumber() , 1);
-
-      RelationVector<SVDCluster> relatVectorTHToClus = DataStore::getRelationsWithObj<SVDCluster>(&trhi);
-
-      //efficiencies TH to cluster
-      m_NumberOfTH[indexForHistosAndGraphs] ++; //U
-      m_NumberOfTH[indexForHistosAndGraphs + 1] ++; //V
-
-      bool hasU = false;
-      bool hasV = false;
-
-      for (int j = 0; j < (int) relatVectorTHToClus.size(); j ++) {
-        indexForHistosAndGraphs = indexFromLayerSensorSide(relatVectorTHToClus[j]->getSensorID().getLayerNumber() ,
-                                                           relatVectorTHToClus[j]->getSensorID().getSensorNumber() , relatVectorTHToClus[j]->isUCluster());
-
-        if (relatVectorTHToClus[j]->isUCluster() && ! hasU) {
-          m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
-          hasU = true;
-        } else if (!relatVectorTHToClus[j]->isUCluster() && ! hasV) {
-          m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
-          hasV = true;
+        //looking for the minimal residual
+        if (m_svdClusters[cls]->isUCluster()) {
+          if (fabs(resid) < fabs(minresidU)) {
+            minfoundU = true;
+            minresidU = resid;
+          }
+        } else {
+          if (fabs(resid) < fabs(minresidV)) {
+            minfoundV = true;
+            minresidV = resid;
+          }
         }
       }
+      if (minfoundU)
+        m_clsMinResid->fill(theVxdID, true, minresidU);
+      if (minfoundV)
+        m_clsMinResid->fill(theVxdID, false, minresidV);
     }
   }
-  //close loop on TrueHits
 
-  //loop on Clusters
-  for (const SVDCluster& clus : SVDClusters) {
-    indexForHistosAndGraphs = indexFromLayerSensorSide(clus.getSensorID().getLayerNumber() , clus.getSensorID().getSensorNumber() ,
-                                                       clus.isUCluster());
+  //clusters
+  for (int cls = 0 ; cls < m_svdClusters.getEntries(); cls++) {
 
-    RelationVector<SVDTrueHit> relatVectorClusToTH = DataStore::getRelationsWithObj<SVDTrueHit>(&clus);
+    VxdID::baseType theVxdID = (VxdID::baseType)m_svdClusters[cls]->getSensorID();
+    m_clsCoor->fill(theVxdID, m_svdClusters[cls]->isUCluster(), m_svdClusters[cls]->getPosition());
 
-    //purity "outside" clusters
-    m_NumberOfClusters[indexForHistosAndGraphs] ++;
-    if (relatVectorClusToTH.size() > 0)
-      m_NumberOfTMClusters[indexForHistosAndGraphs] ++;
-
-    //fill the THinCluster histo with the number of TH a cluster is composed of
-    m_histo_THinCluster[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
-
-    //loop on the TH related to the cluster
-    for (int q = 0; q < (int)relatVectorClusToTH.size(); q ++) {
-      //cluster time resolution and pull
-      m_histo_ClusterTimeResolution[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
-
-      //get trigger bin
-      int triggerBin = 0;
-      RelationVector<SVDRecoDigit> relatVectorClusToRD = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
-      SVDModeByte modeByte = relatVectorClusToRD[0]->getModeByte();
-      triggerBin = (int)modeByte.getTriggerBin();
-
-      if (triggerBin == 0)
-        m_histo_ClusterTimeResolution_bin1[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
-      else if (triggerBin == 1)
-        m_histo_ClusterTimeResolution_bin2[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
-      else if (triggerBin == 2)
-        m_histo_ClusterTimeResolution_bin3[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
-      else if (triggerBin == 3)
-        m_histo_ClusterTimeResolution_bin4[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
-
-      m_histo_ClusterTimePull[indexForHistosAndGraphs]->Fill((clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()) /
-                                                             (clus.getClsTimeSigma()));
-
-      //cluster position resolution and pull, also correlation between time res and position res
-      if (clus.isUCluster()) {
-        m_histo_ClusterUPositionResolution[indexForHistosAndGraphs / 2]->Fill(clus.getPosition((relatVectorClusToTH[q])->getV()) -
-            (relatVectorClusToTH[q])->getU());
-        m_histo_ClusterUPositionPull[indexForHistosAndGraphs / 2]->Fill((clus.getPosition((relatVectorClusToTH[q])->getV()) -
-            (relatVectorClusToTH[q])->getU()) / (clus.getPositionSigma()));
-        m_histo2D_TresVsPosres[indexForHistosAndGraphs]->Fill((clus.getPosition((relatVectorClusToTH[q])->getV()) -
-                                                               (relatVectorClusToTH[q])->getU()) , (clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()));
-      } else {
-        m_histo_ClusterVPositionResolution[(indexForHistosAndGraphs - 1) / 2]->Fill(clus.getPosition() - (relatVectorClusToTH[q])->getV());
-        m_histo_ClusterVPositionPull[(indexForHistosAndGraphs - 1) / 2]->Fill((clus.getPosition() - (relatVectorClusToTH[q])->getV()) /
-            (clus.getPositionSigma()));
-        m_histo2D_TresVsPosres[indexForHistosAndGraphs]->Fill((clus.getPosition() - (relatVectorClusToTH[q])->getV()) ,
-                                                              (clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()));
-      }
-    }
-
-    RelationVector<SVDRecoDigit> relatVectorClusToReco = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
-    //enter only if the cluster is TM
-    if (relatVectorClusToTH.size() > 0) {
-
-      //fill the THinCluster histo with the number of TH (and good TH) a TM cluster (and a Good TM cluster) is composed of
-      m_histo_THinClusterTM[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
-      int numberOfGoodTHInACluster = 0;
-      int numberOfGoodTHInAClusterGood = 0;
-      for (int k = 0; k < (int)(relatVectorClusToTH.size()); k ++) {
-        if (goodTrueHit(relatVectorClusToTH[k])) {
-          numberOfGoodTHInACluster ++;
-          numberOfGoodTHInAClusterGood ++;
-        }
-      }
-      m_histo_GoodTHinClusterTM[indexForHistosAndGraphs]->Fill(numberOfGoodTHInACluster);
-      if (numberOfGoodTHInAClusterGood > 0)
-        m_histo_GoodTHinClusterTMGood[indexForHistosAndGraphs]->Fill(numberOfGoodTHInAClusterGood);
-
-      //count number of recodigit, composing the Truth-matched cluster, that are linked with a TH (internal purity)
-      m_NumberOfTMRecoInTMCluster = 0;
-      for (int k = 0; k < (int)relatVectorClusToReco.size(); k++) { //loop on the recodigits composing the TM cluster
-        RelationVector<SVDTrueHit> relatVectorRecoFromClusToTH = DataStore::getRelationsWithObj<SVDTrueHit>(relatVectorClusToReco[k]);
-
-        if (relatVectorRecoFromClusToTH.size() > 0)
-          m_NumberOfTMRecoInTMCluster ++;
-      }
-
-      m_histo_PurityInsideTMCluster[indexForHistosAndGraphs]->Fill((float)m_NumberOfTMRecoInTMCluster / (float)(clus.getSize()));
-      m_histo2D_PurityInsideTMCluster[indexForHistosAndGraphs]->Fill(clus.getSize(), m_NumberOfTMRecoInTMCluster);
-
-    }
-    //count number of recodigit, composing a NOT Truth-matched cluster, that are linked with a TH
-    else {
-
-      m_NumberOfTMRecoInNOTMCluster = 0;
-      for (int k = 0; k < (int)relatVectorClusToReco.size(); k++) { //loop on the recodigits composing the NOTM cluster
-        RelationVector<SVDTrueHit> relatVectorRecoFromClusToTH = DataStore::getRelationsWithObj<SVDTrueHit>(relatVectorClusToReco[k]);
-
-        if (relatVectorRecoFromClusToTH.size() > 0)
-          m_NumberOfTMRecoInNOTMCluster ++;
-      }
-
-      m_histo_PurityInsideNOTMCluster[indexForHistosAndGraphs]->Fill((float)m_NumberOfTMRecoInNOTMCluster / (float)(clus.getSize()));
-
-    }
   }
-  //close loop on clusters
+
+
 }
 
 
 void SVDClusterEvaluationModule::endRun()
 {
 
-  //extract mean and sigma values from histos to plot them in graphs
-  for (int k = 0; k < m_Nsets; k ++) {
-    m_mean_StripTimeResolution[k] = m_histo_StripTimeResolution[k]->GetMean();
-    m_RMS_StripTimeResolution[k] = m_histo_StripTimeResolution[k]->GetRMS();
-
-    m_mean_ClusterTimeResolution[k] = m_histo_ClusterTimeResolution[k]->GetMean();
-    m_RMS_ClusterTimeResolution[k] = m_histo_ClusterTimeResolution[k]->GetRMS();
-
-    m_mean_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetMean();
-    m_RMS_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetRMS() / sqrt(m_histo_PurityInsideTMCluster[k]->GetEntries());
-
-    m_mean_THinCluster[k] = m_histo_THinCluster[k]->GetMean();
-    m_RMS_THinCluster[k] = m_histo_THinCluster[k]->GetRMS() / sqrt(m_histo_THinCluster[k]->GetEntries());
-
-    m_mean_THinClusterTM[k] = m_histo_THinClusterTM[k]->GetMean();
-    m_RMS_THinClusterTM[k] = m_histo_THinClusterTM[k]->GetRMS() / sqrt(m_histo_THinClusterTM[k]->GetEntries());
-
-    m_mean_GoodTHinClusterTM[k] = m_histo_GoodTHinClusterTM[k]->GetMean();
-    m_RMS_GoodTHinClusterTM[k] = m_histo_GoodTHinClusterTM[k]->GetRMS() / sqrt(m_histo_GoodTHinClusterTM[k]->GetEntries());
-
-    m_mean_GoodTHinClusterTMGood[k] = m_histo_GoodTHinClusterTMGood[k]->GetMean();
-    m_RMS_GoodTHinClusterTMGood[k] = m_histo_GoodTHinClusterTMGood[k]->GetRMS() / sqrt(m_histo_GoodTHinClusterTMGood[k]->GetEntries());
-  }
-  for (int k = 0; k < m_NsetsRed; k ++) {
-    m_mean_ClusterUPositionResolution[k] = m_histo_ClusterUPositionResolution[k]->GetMean();
-    m_RMS_ClusterUPositionResolution[k] = m_histo_ClusterUPositionResolution[k]->GetRMS();
-
-    m_mean_ClusterVPositionResolution[k] = m_histo_ClusterVPositionResolution[k]->GetMean();
-    m_RMS_ClusterVPositionResolution[k] = m_histo_ClusterVPositionResolution[k]->GetRMS();
-  }
-
-  //GRAPHS
-  createEfficiencyGraph("recoEff", "Strip Fit Efficiency ( RecoDigits / ShaperDigits )", m_NumberOfRecoDigit, m_NumberOfShaperDigit,
-                        "set", "efficiency", m_graphList);
-
-  createEfficiencyGraph("clusterEff", "Clustering Efficiency ( Truth-Matched Clusters / TrueHits )", m_NumberOfClustersRelatedToTH,
-                        m_NumberOfTH, "set", "efficiency", m_graphList);
-
-  createEfficiencyGraph("clusterPurity", "Purity of Clusters ( Truth-Matched Clusters / All Clusters )", m_NumberOfTMClusters,
-                        m_NumberOfClusters, "set", "purity", m_graphList);
-
-  //means-from-histos graphs
-  createArbitraryGraphErrorChooser("stripTime_Means", "Strip Time Resolution", m_OrderingVec, m_NullVec, m_mean_StripTimeResolution,
-                                   m_RMS_StripTimeResolution, "set", "time residuals (ns)", m_graphList, m_Nsets);
-
-  createArbitraryGraphErrorChooser("clusterTime_Means", "Cluster Time Resolution", m_OrderingVec, m_NullVec,
-                                   m_mean_ClusterTimeResolution, m_RMS_ClusterTimeResolution, "set", "time residuals (ns)", m_graphList, m_Nsets);
-
-  createArbitraryGraphErrorChooser("clusterUposition_Means", "Cluster U Position Resolution", m_OrderingVec, m_NullVec,
-                                   m_mean_ClusterUPositionResolution, m_RMS_ClusterUPositionResolution, "set", "U position residuals (cm)", m_graphList,
-                                   m_NsetsRed);
-
-  createArbitraryGraphErrorChooser("clusterVposition_Means", "Cluster V Position Resolution", m_OrderingVec, m_NullVec,
-                                   m_mean_ClusterVPositionResolution, m_RMS_ClusterVPositionResolution, "set", "V position residuals (cm)", m_graphList,
-                                   m_NsetsRed);
-
-  createArbitraryGraphErrorChooser("clusterInternalPurity_Means", "Fraction of Truth-matched Recos inside a Truth-matched Cluster",
-                                   m_OrderingVec, m_NullVec, m_mean_PurityInsideTMCluster, m_RMS_PurityInsideTMCluster, "set",
-                                   "number of TM recos / cluster size", m_graphList, m_Nsets);
-
-  createArbitraryGraphErrorChooser("THinCluster_Means", "Number of True Hits inside a Cluster", m_OrderingVec, m_NullVec,
-                                   m_mean_THinCluster, m_RMS_THinCluster, "set", "number of TH per cluster", m_graphList, m_Nsets);
-
-  createArbitraryGraphErrorChooser("THinClusterTM_Means", "Number of True Hits inside a TM Cluster", m_OrderingVec, m_NullVec,
-                                   m_mean_THinClusterTM, m_RMS_THinClusterTM, "set", "number of TH per TM cluster", m_graphList, m_Nsets);
-
-  createArbitraryGraphErrorChooser("goodTHinClusterTM_Means", "Number of Good True Hits inside a TM Cluster", m_OrderingVec,
-                                   m_NullVec,
-                                   m_mean_GoodTHinClusterTM, m_RMS_GoodTHinClusterTM, "set", "number of Good TH per TM cluster", m_graphList, m_Nsets);
-
-  createArbitraryGraphErrorChooser("goodTHinClusterTMGood_Means", "Number of Good True Hits inside a Good TM Cluster", m_OrderingVec,
-                                   m_NullVec,
-                                   m_mean_GoodTHinClusterTMGood, m_RMS_GoodTHinClusterTMGood, "set", "number of Good TH per Good TM cluster", m_graphList, m_Nsets);
-  ///////////////////////////
-  //WRITE HISTOS AND GRAPHS//
-  ///////////////////////////
-
-  if (m_outputFile != NULL) {
-    m_outputFile->cd();
-
-    TDirectory* oldDir = gDirectory;
-    TObject* obj;
-
-    TDirectory* dir_strtime = oldDir->mkdir("strip_time");
-    dir_strtime->cd();
-    TIter nextH_strtime(m_histoList_StripTimeResolution);
-    while ((obj = nextH_strtime()))
-      obj->Write();
-
-    TDirectory* dir_cltime = oldDir->mkdir("cluster_time");
-    dir_cltime->cd();
-    TIter nextH_cltime(m_histoList_ClusterTimeResolution);
-    while ((obj = nextH_cltime()))
-      obj->Write();
-
-    TDirectory* dir_cltimepull = oldDir->mkdir("cluster_time_pull");
-    dir_cltimepull->cd();
-    TIter nextH_cltimepull(m_histoList_ClusterTimePull);
-    while ((obj = nextH_cltimepull()))
-      obj->Write();
-
-    TDirectory* dir_clpos = oldDir->mkdir("cluster_position");
-    dir_clpos->cd();
-    TIter nextH_clpos(m_histoList_ClusterPositionResolution);
-    while ((obj = nextH_clpos()))
-      obj->Write();
-
-    TDirectory* dir_clpospull = oldDir->mkdir("cluster_position_pull");
-    dir_clpospull->cd();
-    TIter nextH_clpospull(m_histoList_ClusterPositionPull);
-    while ((obj = nextH_clpospull()))
-      obj->Write();
-
-    TDirectory* dir_clpostime = oldDir->mkdir("cluster_timeVSposition");
-    dir_clpostime->cd();
-    TIter nextH_clpostime(m_histo2DList_TresVsPosres);
-    while ((obj = nextH_clpostime()))
-      obj->Write();
-
-    TDirectory* dir_clinpurTM = oldDir->mkdir("intra_cluster_purity_TM");
-    dir_clinpurTM->cd();
-    TIter nextH_clinpurTM(m_histoList_PurityInsideTMCluster);
-    while ((obj = nextH_clinpurTM()))
-      obj->Write();
-
-    TDirectory* dir_clinpurTM2D = oldDir->mkdir("intra_cluster_purity_TM2D");
-    dir_clinpurTM2D->cd();
-    TIter nextH_clinpurTM2D(m_histo2DList_PurityInsideTMCluster);
-    while ((obj = nextH_clinpurTM2D()))
-      obj->Write();
-
-    TDirectory* dir_clinpurNOTM = oldDir->mkdir("intra_cluster_purity_NOTM");
-    dir_clinpurNOTM->cd();
-    TIter nextH_clinpurNOTM(m_histoList_PurityInsideNOTMCluster);
-    while ((obj = nextH_clinpurNOTM()))
-      obj->Write();
-
-    TDirectory* dir_puddle = oldDir->mkdir("trueHits_in_cluster");
-    dir_puddle->cd();
-    TIter nextH_puddle(m_histoList_THinCluster);
-    while ((obj = nextH_puddle()))
-      obj->Write();
-
-    TDirectory* dir_puddleTM = oldDir->mkdir("trueHits_in_TMcluster");
-    dir_puddleTM->cd();
-    TIter nextH_puddleTM(m_histoList_THinClusterTM);
-    while ((obj = nextH_puddleTM()))
-      obj->Write();
-
-    TDirectory* dir_goodPuddleTM = oldDir->mkdir("goodTrueHits_in_TMcluster");
-    dir_goodPuddleTM->cd();
-    TIter nextH_GoodPuddleTM(m_histoList_GoodTHinClusterTM);
-    while ((obj = nextH_GoodPuddleTM()))
-      obj->Write();
-
-    TDirectory* dir_goodPuddleTMGood = oldDir->mkdir("goodTrueHits_in_GoodTMcluster");
-    dir_goodPuddleTMGood->cd();
-    TIter nextH_GoodPuddleTMGood(m_histoList_GoodTHinClusterTMGood);
-    while ((obj = nextH_GoodPuddleTMGood()))
-      obj->Write();
-
-    TDirectory* dir_graph = oldDir->mkdir("graphs");
-    dir_graph->cd();
-    TIter nextH_graph(m_graphList);
-    while ((obj = nextH_graph()))
-      obj->Write();
-
-    TDirectory* dir_controlsMC = oldDir->mkdir("controlMC");
-    dir_controlsMC->cd();
-    TIter nextH_controlsMC(m_histoList_Control);
-    while ((obj = nextH_controlsMC()))
-      obj->Write();
-
-    m_outputFile->Close();
-  }
 }
 
 
 void SVDClusterEvaluationModule::terminate()
 {
-}
 
+  if (m_rootFilePtr != NULL) {
+    m_rootFilePtr->cd();
 
-///////////////////
-//EXTRA FUNCTIONS//
-///////////////////
+    const int Nsensors = 172;//L6
+    float sensors[Nsensors]; //sensor identificator
+    float sensorsErr[Nsensors]; //sensor identificator
+    float residU[Nsensors]; //U residuals
+    float residV[Nsensors]; //V residuals
+    float misU[Nsensors]; //U misalignment
+    float misV[Nsensors]; //V misalignment
+    //    float resolU[Nsensors]; //U residuals
+    //    float resolV[Nsensors]; //V residuals
+    float effU[Nsensors];
+    float effV[Nsensors];
+    float effUErr[Nsensors];
+    float effVErr[Nsensors];
+    TString sensorU[Nsensors];
+    TString sensorV[Nsensors];
 
-TH1F* SVDClusterEvaluationModule::createHistogram1D(const char* name, const char* title,
-                                                    Int_t nbins, Double_t min, Double_t max,
-                                                    const char* xtitle, TList* histoList)
-{
-  TH1F* h = new TH1F(name, title, nbins, min, max);
-
-  h->GetXaxis()->SetTitle(xtitle);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-TH2F* SVDClusterEvaluationModule::createHistogram2D(const char* name, const char* title,
-                                                    Int_t nbinsX, Double_t minX, Double_t maxX,
-                                                    const char* titleX,
-                                                    Int_t nbinsY, Double_t minY, Double_t maxY,
-                                                    const char* titleY, TList* histoList)
-{
-
-  TH2F* h = new TH2F(name, title, nbinsX, minX, maxX, nbinsY, minY, maxY);
-
-  h->GetXaxis()->SetTitle(titleX);
-  h->GetYaxis()->SetTitle(titleY);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-int SVDClusterEvaluationModule::indexFromLayerSensorSide(int LayerNumber, int SensorNumber, int UVNumber)
-{
-  int Index;
-
-  if (LayerNumber == 3) { //L3
-    if (UVNumber) //U
-      Index = 0;
-    else //V
-      Index = 1;
-  } else { //L456
-    if (SensorNumber == 1) { //FW
-      if (UVNumber) //U
-        Index = 2;
-      else //V
-        Index = 3;
-    } else { //barrel
-      if (UVNumber) //U
-        Index = 4;
-      else //V
-        Index = 5;
-    }
-  }
-
-  return Index;
-}
-
-TString SVDClusterEvaluationModule::IntExtFromIndex(int idx)
-{
-  TString name = "";
-
-  if (idx < 2)
-    name = "L3";
-  else
-    name = "L456";
-
-  return name;
-}
-
-TString SVDClusterEvaluationModule::FWFromIndex(int idx)
-{
-  TString name = "";
-
-  if (idx == 2 || idx == 3)
-    name = "FWD";
-  else
-    name = "Barrel";
-
-  return name;
-}
-
-TString SVDClusterEvaluationModule::UVFromIndex(int idx)
-{
-  TString name = "";
-
-  if (idx % 2 == 0)
-    name = "U";
-  else
-    name = "V";
-
-  return name;
-}
-
-void SVDClusterEvaluationModule::createEfficiencyGraph(const char* name, const char* title, int vNum[m_Nsets], int vDen[m_Nsets],
-                                                       TString xTitle, TString yTitle, TList* list)
-{
-
-  float ratio[m_Nsets];
-  float ratioErr[m_Nsets];
-  float x[m_Nsets];
-  float xErr[m_Nsets];
-
-  for (int set = 0; set < m_Nsets; set++) {
-
-    x[set] = set + 1;
-    xErr[set] = 0;
-
-    if (vDen[set] > 0) {
-      ratio[set] = (float)vNum[set] / (float)vDen[set];
-      ratioErr[set] = sqrt(ratio[set] * (1 - ratio[set]) / (float)vDen[set]);
+    for (int i = 0; i < Nsensors; i++) {
+      sensors[i] = i;
+      sensorsErr[i] = 0;
+      residU[i] = 0;
+      residV[i] = 0;
+      misU[i] = 0;
+      misV[i] = 0;
+      //      resolU[i] = 0;
+      //      resolV[i] = 0;
+      effU[i] = -1;
+      effV[i] = -1;
+      effUErr[i] = 0;
+      effVErr[i] = 0;
+      sensorU[i] = "";
+      sensorV[i] = "";
     }
 
+    TH1F* h_residU = new TH1F("hResidU", "U Residuals", 1, 0, 1);
+    h_residU->SetCanExtend(TH1::kAllAxes);
+    h_residU->SetStats(0);
+    h_residU->GetXaxis()->SetTitle("sensor");
+    h_residU->GetYaxis()->SetTitle("U residuals (#mum)");
+    TH1F* h_residV = new TH1F("hResidV", "V Residuals", 1, 0, 1);
+    h_residV->SetCanExtend(TH1::kAllAxes);
+    h_residV->SetStats(0);
+    h_residV->GetXaxis()->SetTitle("sensor");
+    h_residV->GetYaxis()->SetTitle("V residuals (#mum)");
+
+    TH1F* h_statU = new TH1F("hStatU", "U Intercept Statistical Error", 1, 0, 1);
+    h_statU->SetCanExtend(TH1::kAllAxes);
+    h_statU->SetStats(0);
+    h_statU->GetXaxis()->SetTitle("sensor");
+    h_statU->GetYaxis()->SetTitle("U extrap. error (#mum)");
+    TH1F* h_statV = new TH1F("hStatV", "V Intercept Statistical Error", 1, 0, 1);
+    h_statV->SetCanExtend(TH1::kAllAxes);
+    h_statV->SetStats(0);
+    h_statV->GetXaxis()->SetTitle("sensor");
+    h_statV->GetYaxis()->SetTitle("V extrap. error (#mum)");
+
+    TH1F* h_misU = new TH1F("hMisU", "U Residual Misalignment", 1, 0, 1);
+    h_misU->SetCanExtend(TH1::kAllAxes);
+    h_misU->SetStats(0);
+    h_misU->GetXaxis()->SetTitle("sensor");
+    h_misU->GetYaxis()->SetTitle("U misalignment (#mum)");
+    TH1F* h_misV = new TH1F("hMisV", "V Residual Misalignment", 1, 0, 1);
+    h_misV->SetCanExtend(TH1::kAllAxes);
+    h_misV->SetStats(0);
+    h_misV->GetXaxis()->SetTitle("sensor");
+    h_misV->GetYaxis()->SetTitle("V misalignment (#mum)");
+
+
+    TH1F* h_effU = new TH1F("hEffU", Form("U-Side Summary, %.1f#sigma", m_nSigma), 1, 0, 1);
+    h_effU->SetCanExtend(TH1::kAllAxes);
+    h_effU->SetStats(0);
+    h_effU->GetXaxis()->SetTitle("sensor");
+    h_effU->GetYaxis()->SetTitle("U efficiency");
+    TH1F* h_effV = new TH1F("hEffV", Form("V-Side Summary, %.1f#sigma", m_nSigma), 1, 0, 1);
+    h_effV->SetCanExtend(TH1::kAllAxes);
+    h_effV->SetStats(0);
+    h_effV->GetXaxis()->SetTitle("sensor");
+    h_effV->GetYaxis()->SetTitle("V efficiency");
+
+    TDirectory* oldDir = gDirectory;
+
+    int s = 0; //sensor counter;
+
+    for (auto layer : m_geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
+      int currentLayer = layer.getLayerNumber();
+
+      if (m_theLayer != 0 && currentLayer != m_theLayer)
+        continue;
+
+      TString interName = Form("interceptsL%d", layer.getLayerNumber());
+      TString clsName = Form("clustersL%d", layer.getLayerNumber());
+      TString residName = Form("residualsL%d", layer.getLayerNumber());
+      TDirectory* dir_inter = oldDir->mkdir(interName.Data());
+      TDirectory* dir_cls = oldDir->mkdir(clsName.Data());
+      TDirectory* dir_resid = oldDir->mkdir(residName.Data());
+      for (auto ladder : m_geoCache.getLadders(layer))
+        for (Belle2::VxdID sensor :  m_geoCache.getSensors(ladder)) {
+          dir_inter->cd();
+          (m_interCoor->getHistogram(sensor, 1))->Write();
+          for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
+            dir_cls->cd();
+            (m_clsCoor->getHistogram(sensor, view))->Write();
+
+            dir_inter->cd();
+            float stat = (m_interSigma->getHistogram(sensor, view))->GetMean() * m_cmTomicron;;
+            int den = (m_interSigma->getHistogram(sensor, view))->GetEntries();
+            (m_interSigma->getHistogram(sensor, view))->Write();
+
+            dir_resid->cd();
+            TH1F* res = m_clsMinResid->getHistogram(sensor, view);
+            if (! fitResiduals(res)) {
+              if (view == SVDHistograms<TH1F>::UIndex)
+                B2DEBUG(10, "Fit to the Residuals of U-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
+                        << " not succesfull, skipping this side");
+              else
+                B2DEBUG(10, "Fit to the Residuals of V-side " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber()
+                        << " not succesfull, skipping this side");
+              continue;
+            }
+            TF1* func = res->GetFunction("function");
+            if (func == NULL) func = res->GetFunction("functionG1");
+            if (func != NULL) {
+              if (view == SVDHistograms<TH1F>::UIndex) {
+                sensorU[s] = Form("%d.%d.%dU", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
+                B2DEBUG(10, "U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
+                residU[s] = func->GetParameter("sigma1");
+                misU[s] = func->GetParameter("mean1");
+                int binMin = res->FindBin(misU[s] - m_nSigma * residU[s]);
+                int binMax = res->FindBin(misU[s] + m_nSigma * residU[s]);
+                B2DEBUG(10, "from " << misU[s] - m_nSigma * residU[s] << " -> binMin = " << binMin);
+                B2DEBUG(10, "to " << misU[s] + m_nSigma * residU[s] << " -> binMax = " << binMax);
+                int num = 0;
+                for (int bin = binMin; bin < binMax + 1; bin++)
+                  num = num + res->GetBinContent(bin);
+                if (den > 0) {
+                  effU[s] = 1.*num / den;
+                  //filling efficiency histogram
+                  h_effU->Fill(sensorU[s], effU[s]);
+                  if (effU[s] > 1)
+                    B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
+                  effUErr[s] = sqrt(effU[s] * (1 - effU[s]) / den);
+                }
+                B2DEBUG(10, "num = " << num);
+                B2DEBUG(10, "den = " << den);
+                B2RESULT("U-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber() << " = " <<
+                         effU[s] << " ± " << effUErr[s]);
+
+                //filling summary Histograms for the U side
+                h_statU->Fill(sensorU[s], stat);
+
+                residU[s] *= m_cmTomicron;
+                h_residU->Fill(sensorU[s], residU[s]);
+
+                misU[s] *= m_cmTomicron;
+                h_misU->Fill(sensorU[s], misU[s]);
+              } else {
+                sensorV[s] = Form("%d.%d.%dV", currentLayer, ladder.getLadderNumber(), sensor.getSensorNumber());
+                B2DEBUG(10, "V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber());
+                residV[s] = func->GetParameter("sigma1");
+                misV[s] = func->GetParameter("mean1");
+                int binMin = res->FindBin(misV[s] - m_nSigma * residV[s]);
+                int binMax = res->FindBin(misV[s] + m_nSigma * residV[s]);
+                B2DEBUG(10, "from " << misV[s] - m_nSigma * residV[s] << " -> binMin = " << binMin);
+                B2DEBUG(10, "to " << misV[s] + m_nSigma * residV[s] << " -> binMax = " << binMax);
+                int num = 0;
+                for (int bin = binMin; bin < binMax + 1; bin++)
+                  num = num + res->GetBinContent(bin);
+                if (den > 0) {
+                  effV[s] = 1.*num / den;
+                  //filling efficiency histogram
+                  h_effV->Fill(sensorV[s], effV[s]);
+                  if (effV[s] > 1)
+                    B2WARNING("something is wrong! efficiency greater than 1: " << num << "/" << den);
+                  effVErr[s] = sqrt(effV[s] * (1 - effV[s]) / den);
+                }
+                B2DEBUG(10, "num = " << num);
+                B2DEBUG(10, "den = " << den);
+                B2RESULT("V-side efficiency for " << currentLayer << "." << ladder.getLadderNumber() << "." << sensor.getSensorNumber() << " = " <<
+                         effV[s] << " ± " << effVErr[s]);
+
+                //filing summay histograms for the V side
+                h_statV->Fill(sensorV[s], stat);
+
+                residV[s] *= m_cmTomicron;
+                h_residV->Fill(sensorV[s], residV[s]);
+                misV[s] *= m_cmTomicron;
+                h_misV->Fill(sensorV[s], misV[s]);
+              }
+            }
+            B2INFO("writing out resid histograms for " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." <<
+                   sensor.getSensorNumber() << "." << view);
+            (m_clsResid->getHistogram(sensor, view))->Write();
+            (res)->Write();
+            (m_clsResid2D->getHistogram(sensor, view))->Write();
+
+
+          }
+          s++;
+        }
+    }
+
+
+
+    TGraphErrors* g_effU = new TGraphErrors(Nsensors, sensors, effU, sensorsErr, effUErr);
+    g_effU->SetName("geffU");
+    g_effU->SetTitle(Form("U-Side Summary, %.1f#sigma", m_nSigma));
+    TGraphErrors* g_effV = new TGraphErrors(Nsensors, sensors, effV, sensorsErr, effVErr);
+    g_effV->SetName("geffV");
+    g_effV->SetTitle(Form("V-Side Summary, %.1f#sigma", m_nSigma));
+
+    oldDir->cd();
+    for (int bin = 0; bin < h_residU->GetNbinsX(); bin++)
+      h_residU->SetBinError(bin, 0.);
+    h_residU->Write();
+    for (int bin = 0; bin < h_residV->GetNbinsX(); bin++)
+      h_residV->SetBinError(bin, 0.);
+    h_residV->Write();
+    for (int bin = 0; bin < h_statU->GetNbinsX(); bin++)
+      h_statU->SetBinError(bin, 0.);
+    h_statU->Write();
+    for (int bin = 0; bin < h_statV->GetNbinsX(); bin++)
+      h_statV->SetBinError(bin, 0.);
+    h_statV->Write();
+    for (int bin = 0; bin < h_misU->GetNbinsX(); bin++)
+      h_misU->SetBinError(bin, 0.);
+    h_misU->Write();
+    for (int bin = 0; bin < h_misV->GetNbinsX(); bin++)
+      h_misV->SetBinError(bin, 0.);
+    h_misV->Write();
+    for (int bin = 0; bin < h_effU->GetNbinsX(); bin++)
+      h_effU->SetBinError(bin, 0.);
+    h_effU->Write();
+    for (int bin = 0; bin < h_effV->GetNbinsX(); bin++)
+      h_effV->SetBinError(bin, 0.);
+    h_effV->Write();
+
+    TCanvas* c_summaryU = new TCanvas("summaryU", "U-side Summary");
+    h_residU->Draw("P");
+    h_residU->SetLineColor(kRed);
+    h_residU->SetMarkerColor(kRed);
+    h_residU->SetMarkerStyle(20);
+    h_statU->Draw("sameP");
+    h_statU->SetLineColor(kBlue);
+    h_statU->SetMarkerColor(kBlue);
+    h_statU->SetMarkerStyle(22);
+    h_misU->Draw("sameP");
+    h_misU->SetLineColor(kBlack);
+    h_misU->SetMarkerColor(kBlack);
+    h_misU->SetMarkerStyle(21);
+    TLegend* leg = new TLegend(0.7, 0.7, 0.9, 0.9);
+    leg->AddEntry(h_residU, "residuals", "lP");
+    leg->AddEntry(h_statU, "extrapolation", "lP");
+    leg->AddEntry(h_misU, "misalignment", "lP");
+    leg->Draw("same");
+    c_summaryU->Write();
+
+    TCanvas* c_summaryV = new TCanvas("summaryV", "V-side Summary");
+    h_residV->Draw("P");
+    h_residV->SetLineColor(kRed);
+    h_residV->SetMarkerColor(kRed);
+    h_residV->SetMarkerStyle(20);
+    h_statV->Draw("sameP");
+    h_statV->SetLineColor(kBlue);
+    h_statV->SetMarkerColor(kBlue);
+    h_statV->SetMarkerStyle(22);
+    h_misV->Draw("sameP");
+    h_misV->SetLineColor(kBlack);
+    h_misV->SetMarkerColor(kBlack);
+    h_misV->SetMarkerStyle(21);
+    leg->Draw("same");
+    c_summaryV->Write();
+
+    TCanvas* c_effU = new TCanvas("effU", "U-side Cluster Efficiency");
+    h_effU->Draw("P");
+    h_effU->SetLineColor(kRed);
+    h_effU->SetMarkerColor(kRed);
+    h_effU->SetMarkerStyle(20);
+    c_effU->Write();
+    TCanvas* c_effV = new TCanvas("effV", "V-side Cluster Efficiency");
+    h_effV->Draw("P");
+    h_effV->SetLineColor(kRed);
+    h_effV->SetMarkerColor(kRed);
+    h_effV->SetMarkerStyle(20);
+    c_effV->Write();
   }
 
-  TCanvas* c = new TCanvas(name, title);
-  TGraphErrors* g = new TGraphErrors(m_Nsets, x, ratio, xErr, ratioErr);
-  g->SetName(name);
-  g->SetTitle(title);
-  g->GetXaxis()->SetTitle(xTitle.Data());
-  g->GetYaxis()->SetTitle(yTitle.Data());
-  g->GetYaxis()->SetRangeUser(0.00001, 1.10);
-  g->Draw("AP");
-  g->SetMarkerStyle(20);
-  g->SetMarkerSize(0.8);
-  TAxis* xAxis = g->GetXaxis();
+  m_rootFilePtr->Close();
+}
 
-  TText* t = new TText();
-  t->SetTextAlign(32);
-  t->SetTextSize(0.035);
-  t->SetTextFont(72);
-  TString labels[m_Nsets] = {"3U", "3V", "456FU", "456FV", "456BU", "456BV"};
-  for (Int_t i = 0; i < m_Nsets; i++) {
-    xAxis->SetBinLabel(xAxis->FindBin(i + 1) , labels[i].Data());
-  }
 
-  if (list)
-    list->Add(c);
+
+bool SVDClusterEvaluationModule::isRelatedToTrack(SVDIntercept* inter)
+{
+
+  RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(inter);
+  if (theRC.size() == 0)
+    return false;
+
+  RelationVector<Track> theTrack = theRC[0]->getRelationsWith<Track>(m_TrackName);
+
+  if (theTrack.size() == 0)
+    return false;
+
+  return true;
 
 }
 
-void SVDClusterEvaluationModule::createArbitraryGraphErrorChooser(const char* name, const char* title, float x[m_Nsets],
-    float xErr[m_Nsets], float y[m_Nsets], float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list, int len)
+bool SVDClusterEvaluationModule::fitResiduals(TH1F* res)
 {
-  if (len == m_NsetsRed)
-    createArbitraryGraphError_Red(name, title, x, xErr, y, yErr, xTitle, yTitle, list);
-  else if (len == m_Nsets)
-    createArbitraryGraphError_Std(name, title, x, xErr, y, yErr, xTitle, yTitle, list);
+
+  float range = 0.4;
+
+  B2DEBUG(10, "fitting N1G1+N2G2 " << res->GetName());
+  TF1* function = new TF1("function", "gaus(0)+gaus(3)", -range, range);
+  function->SetParNames("N1", "mean1", "sigma1", "N2", "mean2", "sigma2");
+  function->SetParameter(0, 10);
+  function->SetParLimits(0, 0, 1000000);
+  function->SetParameter(1, 0);
+  function->SetParameter(2, 0.01);
+  function->SetParLimits(2, 0, 0.1);
+  function->SetParameter(3, 1);
+  function->SetParLimits(3, 0, 1000000);
+  function->SetParameter(4, 0);
+  function->SetParameter(5, 1);
+  function->SetParLimits(5, 0, 10);
+
+  int fitStatus =  res->Fit(function, "R");
+
+  if (fitStatus != 0) {
+    B2DEBUG(10, "previous fit failed, now trying with N1G1 " << res->GetName());
+    TF1* function1 = new TF1("functionG1", "gaus(0)", -range, range);
+    function1->SetParNames("N1", "mean1", "sigma1");
+    function1->SetParameter(0, 10);
+    function1->SetParLimits(0, 0, 1000000);
+    function1->SetParameter(1, 0);
+    function1->SetParameter(2, 0.01);
+    function1->SetParLimits(2, 0, 0.1);
+
+    fitStatus =  res->Fit(function1, "R");
+  }
+  if (fitStatus == 0)
+    return true;
   else
-    B2INFO("ERROR, WRONG LENGTH FOR MEANS TGRAPH CREATION!!!");
+    return false;
+
 }
 
-void SVDClusterEvaluationModule::createArbitraryGraphError_Std(const char* name, const char* title, float x[m_Nsets],
-    float xErr[m_Nsets], float y[m_Nsets], float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list)
+void SVDClusterEvaluationModule::create_SVDHistograms_interCoor()
 {
 
-  TCanvas* c = new TCanvas(name, title);
-  TGraphErrors* g = new TGraphErrors(m_Nsets, x, y, xErr, yErr);
-  g->SetName(name);
-  g->SetTitle(title);
-  g->GetXaxis()->SetTitle(xTitle.Data());
-  g->GetYaxis()->SetTitle(yTitle.Data());
-  g->Draw("AP");
-  g->SetMarkerStyle(20);
-  g->SetMarkerSize(0.8);
-  TAxis* xAxis = g->GetXaxis();
+  TH2F h_coorUV_LargeSensor("interCoor_Large_L@layerL@ladderS@sensor",
+                            "Intercept 2D Coordinate (layer @layer, ladder @ladder, sensor @sensor)",
+                            m_nBins_LargeS_U, -m_abs_LargeS_U, m_abs_LargeS_U,
+                            m_nBins_LargeS_V, -m_abs_LargeS_V, m_abs_LargeS_V);
+  h_coorUV_LargeSensor.GetXaxis()->SetTitle("Intercept U coordinate (cm)");
+  h_coorUV_LargeSensor.GetYaxis()->SetTitle("Intercept V coordinate (cm)");
 
-  TText* t = new TText();
-  t->SetTextAlign(32);
-  t->SetTextSize(0.035);
-  t->SetTextFont(72);
-  TString labels[m_Nsets] = {"3U", "3V", "456FU", "456FV", "456BU", "456BV"};
-  for (Int_t i = 0; i < m_Nsets; i++) {
-    xAxis->SetBinLabel(xAxis->FindBin(i + 1) , labels[i].Data());
-  }
+  TH2F h_coorUV_SmallSensor("interCoor_Small_L@layerL@ladderS@sensor",
+                            "Intercept 2D Coordinate (layer @layer, ladder @ladder, sensor @sensor)",
+                            m_nBins_SmallS_U, -m_abs_SmallS_U, m_abs_SmallS_U,
+                            m_nBins_SmallS_V, -m_abs_SmallS_V, m_abs_SmallS_V);
+  h_coorUV_SmallSensor.GetXaxis()->SetTitle("Intercept U coordinate (cm)");
+  h_coorUV_SmallSensor.GetYaxis()->SetTitle("Intercept V coordinate (cm)");
 
-  if (list)
-    list->Add(c);
 
+  m_interCoor = new SVDHistograms<TH2F>(h_coorUV_SmallSensor, h_coorUV_SmallSensor, h_coorUV_LargeSensor, h_coorUV_LargeSensor);
 }
 
-void SVDClusterEvaluationModule::createArbitraryGraphError_Red(const char* name, const char* title, float x[m_NsetsRed],
-    float xErr[m_NsetsRed], float y[m_NsetsRed], float yErr[m_NsetsRed], TString xTitle, TString yTitle, TList* list)
+
+void SVDClusterEvaluationModule::create_SVDHistograms_interSigma()
 {
 
-  TCanvas* c = new TCanvas(name, title);
-  TGraphErrors* g = new TGraphErrors(m_NsetsRed, x, y, xErr, yErr);
-  g->SetName(name);
-  g->SetTitle(title);
-  g->GetXaxis()->SetTitle(xTitle.Data());
-  g->GetYaxis()->SetTitle(yTitle.Data());
-  g->Draw("AP");
-  g->SetMarkerStyle(20);
-  g->SetMarkerSize(0.8);
-  TAxis* xAxis = g->GetXaxis();
+  TH1F h_sigmaU("interSigmaU_L@layerL@ladderS@sensor@view",
+                "U Intercept Sigma (layer @layer, ladder @ladder, sensor @sensor)",
+                100, 0, m_interSigmaMax);
+  h_sigmaU.GetXaxis()->SetTitle("Intercept U Error (cm)");
 
-  TText* t = new TText();
-  t->SetTextAlign(32);
-  t->SetTextSize(0.035);
-  t->SetTextFont(72);
-  TString labels[m_NsetsRed] = {"3", "456F", "456B"};
-  for (Int_t i = 0; i < m_NsetsRed; i++) {
-    xAxis->SetBinLabel(xAxis->FindBin(i + 1) , labels[i].Data());
-  }
+  TH1F h_sigmaV("interSigmaV_L@layerL@ladderS@sensor@view",
+                "V Intercept Sigma (layer @layer, ladder @ladder, sensor @sensor)",
+                100, 0, m_interSigmaMax);
+  h_sigmaV.GetXaxis()->SetTitle("Intercept V Error (cm)");
 
-  if (list)
-    list->Add(c);
 
+  m_interSigma = new SVDHistograms<TH1F>(h_sigmaU, h_sigmaV, h_sigmaU, h_sigmaV);
 }
 
-bool SVDClusterEvaluationModule::goodTrueHit(const SVDTrueHit* thino)
+
+void SVDClusterEvaluationModule::create_SVDHistograms_clsCoor()
 {
 
-  float charge = 0;
-  bool primary = false;
 
-  bool isGood = false;
+  TH1F h_clcoorU_LargeSensor("clsCoorU_LS_L@layerL@ladderS@sensor@view",
+                             "Cluster U Coordinate (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                             m_nBins_LargeS_U, -m_abs_LargeS_U, m_abs_LargeS_U);
+  h_clcoorU_LargeSensor.GetXaxis()->SetTitle("Cluster U coordinate (cm)");
 
-  RelationVector<MCParticle> relatVectorTHToMC = thino->getRelationsFrom<MCParticle>();
+  TH1F h_clcoorV_LargeSensor("clsCoorV_LS_L@layerL@ladderS@sensor@view",
+                             "Cluster V Coordinate (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                             m_nBins_LargeS_V, -m_abs_LargeS_V, m_abs_LargeS_V);
+  h_clcoorV_LargeSensor.GetXaxis()->SetTitle("Cluster V coordinate (cm)");
 
-  if (relatVectorTHToMC.size() > 0) {
+  TH1F h_clcoorU_SmallSensor("clsCoorU_SS_L@layerL@ladderS@sensor@view",
+                             "Cluster U Coordinate (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                             m_nBins_SmallS_U, -m_abs_SmallS_U, m_abs_SmallS_U);
+  h_clcoorU_SmallSensor.GetXaxis()->SetTitle("Cluster U coordinate (cm)");
 
-    m_histoControl_THToMCsize->Fill(relatVectorTHToMC.size());
+  TH1F h_clcoorV_SmallSensor("clsCoorV_SS_L@layerL@ladderS@sensor@view",
+                             "Cluster V Coordinate (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                             m_nBins_SmallS_V, -m_abs_SmallS_V, m_abs_SmallS_V);
+  h_clcoorV_SmallSensor.GetXaxis()->SetTitle("Cluster V coordinate (cm)");
 
-    charge = relatVectorTHToMC[0]->getCharge();
-    primary = relatVectorTHToMC[0]->isPrimaryParticle();
 
-    m_histoControl_MCcharge->Fill(charge);
-    m_histoControl_MCisPrimary->Fill(primary);
+  m_clsCoor = new SVDHistograms<TH1F>(h_clcoorU_SmallSensor, h_clcoorV_SmallSensor, h_clcoorU_LargeSensor, h_clcoorV_LargeSensor);
 
-    if (charge != 0 && primary)
-      isGood = true;
-  }
-
-  return isGood;
 }
 
+void SVDClusterEvaluationModule::create_SVDHistograms_clsResid()
+{
+
+  float range = 0.5;
+  int NbinsU = 200;//range*0.0001*2/m_UbinWidth;
+  int NbinsV = 200;//range*0.0001*2/m_VbinWidth;
+
+  //CLUSTER RESIDUALS
+  TH1F h_clresidU_LargeSensor("clsResidU_LS_L@layerL@ladderS@sensor@view",
+                              "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                              //                             m_nBins_LargeS_U, -m_abs_LargeS_U, m_abs_LargeS_U);
+                              NbinsU, -range, range);
+  h_clresidU_LargeSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clresidV_LargeSensor("clsResidV_LS_L@layerL@ladderS@sensor@view",
+                              "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                              //            m_nBins_LargeS_V, -m_abs_LargeS_V, m_abs_LargeS_V);
+                              NbinsV, -range, range);
+  h_clresidV_LargeSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clresidU_SmallSensor("clsResidU_SS_L@layerL@ladderS@sensor@view",
+                              "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                              //                             m_nBins_SmallS_U, -m_abs_SmallS_U, m_abs_SmallS_U);
+                              NbinsU, -range, range);
+  h_clresidU_SmallSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clresidV_SmallSensor("clsResidV_SS_L@layerL@ladderS@sensor@view",
+                              "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                              //                             m_nBins_SmallS_V, -m_abs_SmallS_V, m_abs_SmallS_V);
+                              NbinsU, -range, range);
+  h_clresidV_SmallSensor.GetXaxis()->SetTitle("residual (cm)");
 
 
 
+  m_clsResid = new SVDHistograms<TH1F>(h_clresidU_SmallSensor, h_clresidV_SmallSensor, h_clresidU_LargeSensor,
+                                       h_clresidV_LargeSensor);
+
+  //CLUSTER RESIDUALS VS CL POSITION
+  const int Nzones_768 = 768 / m_groupNstrips;
+  const int Nzones_512 = 512 / m_groupNstrips;
+
+  TH2F h2_clresidU_LargeSensor("clsResid2DU_LS_L@layerL@ladderS@sensor@view",
+                               "U Cluster Residuals VS U Cluster Position(layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               Nzones_768, -m_width_LargeS_U / 2, m_width_LargeS_U / 2, NbinsU, -range, range);
+  h2_clresidU_LargeSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidU_LargeSensor.GetXaxis()->SetTitle("cluster position (cm)");
+
+  TH2F h2_clresidV_LargeSensor("clsResid2DV_LS_L@layerL@ladderS@sensor@view",
+                               "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               Nzones_512, -m_width_LargeS_V / 2, m_width_LargeS_V / 2, NbinsV, -range, range);
+  h2_clresidV_LargeSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidV_LargeSensor.GetXaxis()->SetTitle("cluster position (cm)");
+
+  TH2F h2_clresidU_SmallSensor("clsResid2DU_SS_L@layerL@ladderS@sensor@view",
+                               "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               Nzones_768, -m_width_SmallS_U / 2, m_width_SmallS_U / 2, NbinsU, -range, range);
+  h2_clresidU_SmallSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidU_SmallSensor.GetXaxis()->SetTitle("cluster position (cm)");
+
+  TH2F h2_clresidV_SmallSensor("clsResid2DV_SS_L@layerL@ladderS@sensor@view",
+                               "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               Nzones_512, -m_width_SmallS_V / 2, m_width_SmallS_V / 2, NbinsU, -range, range);
+  h2_clresidV_SmallSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidV_SmallSensor.GetXaxis()->SetTitle("cluster position (cm)");
+
+  m_clsResid2D = new SVDHistograms<TH2F>(h2_clresidU_SmallSensor, h2_clresidV_SmallSensor, h2_clresidU_LargeSensor,
+                                         h2_clresidV_LargeSensor);
+
+  //CLUSTER MINIMUM RESIDUAL
+  //CLUSTER RESIDUALS
+  TH1F h_clminresidU_LargeSensor("clsMinResidU_LS_L@layerL@ladderS@sensor@view",
+                                 "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //                             m_nBins_LargeS_U, -m_abs_LargeS_U, m_abs_LargeS_U);
+                                 NbinsU, -range, range);
+  h_clminresidU_LargeSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clminresidV_LargeSensor("clsMinResidV_LS_L@layerL@ladderS@sensor@view",
+                                 "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //            m_nBins_LargeS_V, -m_abs_LargeS_V, m_abs_LargeS_V);
+                                 NbinsV, -range, range);
+  h_clminresidV_LargeSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clminresidU_SmallSensor("clsMinResidU_SS_L@layerL@ladderS@sensor@view",
+                                 "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //                             m_nBins_SmallS_U, -m_abs_SmallS_U, m_abs_SmallS_U);
+                                 NbinsU, -range, range);
+  h_clminresidU_SmallSensor.GetXaxis()->SetTitle("residual (cm)");
+
+  TH1F h_clminresidV_SmallSensor("clsMinResidV_SS_L@layerL@ladderS@sensor@view",
+                                 "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                                 //                             m_nBins_SmallS_V, -m_abs_SmallS_V, m_abs_SmallS_V);
+                                 NbinsU, -range, range);
+  h_clminresidV_SmallSensor.GetXaxis()->SetTitle("residual (cm)");
 
 
 
+  m_clsMinResid = new SVDHistograms<TH1F>(h_clminresidU_SmallSensor, h_clminresidV_SmallSensor, h_clminresidU_LargeSensor,
+                                          h_clminresidV_LargeSensor);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

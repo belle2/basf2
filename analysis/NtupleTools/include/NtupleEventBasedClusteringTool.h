@@ -32,12 +32,12 @@ namespace Belle2 {
     /** number of showers in the ECL that do not become clusters, BW endcap */
     int m_nRejectedECLShowersBWD;
     /** declare branches */
-    void setupTree();
+    void setupTree() override;
   public:
     /** constuctor */
     NtupleEventBasedClusteringTool(TTree* tree, DecayDescriptor& decaydescriptor)
       : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** evaluate the variables */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 } // namepspace Belle2

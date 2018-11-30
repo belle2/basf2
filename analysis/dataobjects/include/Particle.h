@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -597,14 +596,17 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * NULL pointer is returned, if the Particle was not made from KLMCluster.
+     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */
     const KLMCluster* getKLMCluster() const;
 
     /**
      * Returns the pointer to the MCParticle object that was used to create this Particle (ParticleType == c_MCParticle).
-     * NULL pointer is returned, if the Particle was not made from MCParticle.
+     * Returns the best MC match for this particle (if ParticleType == c_Track or c_ECLCluster or c_KLMCluster)
+     * NULL pointer is returned, if the Particle was not made from MCParticle or not matched.
+     *
      * @return const pointer to the MCParticle
      */
     const MCParticle* getMCParticle() const;
@@ -619,6 +621,9 @@ namespace Belle2 {
      * Prints the contents of a Particle object to standard output.
      */
     void print() const;
+
+    /** get a list of the extra info names */
+    std::vector<std::string> getExtraInfoNames() const;
 
     /**
      * Remove all stored extra info fields
@@ -645,6 +650,11 @@ namespace Belle2 {
     {
       return m_extraInfo.size();
     }
+
+    /**
+     * Sets the user defined extraInfo. Adds it if necessary, overwrites existing ones if they share the same name.
+     * */
+    void writeExtraInfo(const std::string& name, const float value);
 
     /** Sets the user-defined data of given name to the given value.
      *
@@ -788,5 +798,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

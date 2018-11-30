@@ -14,6 +14,7 @@
 #pragma link C++ class Belle2::CDCTriggerMLPInput+;
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+;
 #pragma link C++ class Belle2::CDCTriggerFinderClone+;
+#pragma link C++ class Belle2::TRGCDCTSFUnpackerStore+;
 
 #pragma link C++ class Belle2::Bitstream<array<bitset<MERGER_WIDTH>, NUM_MERGER> >+;
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, TSF_TO_2D_WIDTH>, NUM_2D>, NUM_TSF> >+;

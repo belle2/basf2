@@ -184,9 +184,11 @@ class FSPLoader(object):
                 copyParticles(outputList, inputList, writeOut=True, path=path)
         else:
             fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                               ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0', ''),
-                               ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')], writeOut=True, path=path)
-            fillConvertedPhotonsList('gamma:V0', '', writeOut=True, path=path)
+                               ('mu+:FSP', ''), ('gamma:FSP', ''),
+                               ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
+            fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
+            fillParticleList('Lambda0:FSP -> p+ pi-', '', writeOut=True, path=path)
+            fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
 
         if self.config.monitor:
             names = ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'K_S0', 'p+', 'K_L0', 'Lambda0', 'pi0']
@@ -501,7 +503,7 @@ class PostReconstruction(object):
                                      filename=config.removeJPsiSlash(filename), path=path)
 
                 variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                             'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                             'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 filename = 'Monitor_Final_{}.root'.format(particle.identifier)
                 variablesToNtuple(particle.identifier, variables, treename='variables',
                                   filename=config.removeJPsiSlash(filename), path=path)

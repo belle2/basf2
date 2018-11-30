@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Martin Ritter                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -41,10 +41,9 @@ namespace Belle2 {
     */
     virtual bool isConnected() = 0;
 
-  protected:
-
-  private:
-
+    /** Called just before the system exists after a fatal error. Can be used
+     * to flush the output or close the file */
+    virtual void finalizeOnAbort() {}
   };
 
 } // end namespace Belle2

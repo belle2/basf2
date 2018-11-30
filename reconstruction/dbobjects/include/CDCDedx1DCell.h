@@ -110,8 +110,8 @@ namespace Belle2 {
       if (enta < -3.1416 / 2.0) enta += 3.1416 / 2.0;
       if (enta > 3.1416 / 2.0) enta -= 3.1416 / 2.0;
 
-      double binsize = (m_onedgains[mylayer].size() != 0) ? 2.0 / m_onedgains[mylayer].size() : 0.0;
-      int bin = (binsize != 0.0) ? std::floor((std::sin(enta) + 1.0) / binsize) : -1;
+      double binsize = (m_onedgains[mylayer].size() != 0) ? 3.14159 / m_onedgains[mylayer].size() : 0.0;
+      int bin = (binsize != 0.0) ? std::floor((enta + 3.14159 / 2.0) / binsize) : -1;
       if (bin < 0 || (unsigned)bin >= m_onedgains[mylayer].size()) {
         B2WARNING("Problem with CDC dE/dx 1D binning!");
         return 1.0;

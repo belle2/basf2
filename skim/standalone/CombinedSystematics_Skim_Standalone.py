@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+#######################################################
+#
+# Combined all systematic skims at once
+#  * Final state particles
+#  * Charged tracks
+#  * Lambda
+#  * Radiative Muon pair
+#  * Resonance discovery
+#
+# R. Cheaib , May 28, 2018
+#
+######################################################
+
+from basf2 import *
+from modularAnalysis import *
+from stdCharged import stdPi, stdK, stdE, stdMu
+from stdPi0s import *
+from stdV0s import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
+set_log_level(LogLevel.INFO)
+gb2_setuprel = 'release-02-00-01'
+
+from skimExpertFunctions import setSkimLogging, encodeSkimName, add_skim
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
+
+inputMdstList('MC9', fileList)
+stdPi('loose')
+stdK('loose')
+stdE('loose')
+stdMu('loose')
+stdPi('all')
+stdK('all')
+stdE('all')
+stdMu('all')
+
+stdPi0s('looseFit')
+stdPhotons('loose')
+setSkimLogging()
+
+
+# Systematics skim
+from skim.systematics import *
+add_skim('Systematics', SystematicsList())
+
+# Systematics Lambda Skim
+from skim.systematics import *
+add_skim('SystematicsLambda', SystematicsLambdaList())
+
+# Systematics Tracking
+from skim.systematics import *
+add_skim('SystematicsTracking', SystematicsTrackingList())
+
+# Resonan ce
+from skim.systematics import *
+add_skim('Resonance', ResonanceList())
+
+# Systematics Rad mu mu
+from skim.systematics import *
+add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
+
+# Systematics Rad mu mu
+from skim.systematics import *
+add_skim('SystematicsRadEE', SystematicsRadEEList())
+
+process(analysis_main)
+
+# print out the summary
+print(statistics)

@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYSTRING_H
-#define DECAYSTRING_H
+#pragma once
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <boost/variant/recursive_variant.hpp>
 
@@ -22,4 +21,3 @@ namespace Belle2 {
   typedef boost::variant< boost::recursive_wrapper<DecayStringDecay>, DecayStringParticle > DecayString;
 }
 
-#endif // DECAYSTRING_H

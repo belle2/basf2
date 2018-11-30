@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMFIBERANDELECTRONICS_H
-#define EKLMFIBERANDELECTRONICS_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
@@ -46,6 +45,16 @@ namespace Belle2 {
       FiberAndElectronics(const EKLMDigitizationParameters* digPar,
                           FPGAFitter* fitter, double digitizationInitialTime,
                           bool debug);
+
+      /**
+       * Copy constructor (disabled).
+       */
+      FiberAndElectronics(const FiberAndElectronics&) = delete;
+
+      /**
+       * Operator = (disabled).
+       */
+      FiberAndElectronics& operator=(const FiberAndElectronics&) = delete;
 
       /**
        * Destructor.
@@ -176,8 +185,14 @@ namespace Belle2 {
       /** Name of the strip. */
       std::string m_stripName;
 
-      /** Channel data. */
-      const EKLMChannelData* m_ChannelData;
+      /** Pedestal. */
+      double m_Pedestal;
+
+      /** Photoelectron amplitude. */
+      double m_PhotoelectronAmplitude;
+
+      /** Threshold. */
+      int m_Threshold;
 
       /**
        * Reallocate photoelectron buffers.
@@ -212,6 +227,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

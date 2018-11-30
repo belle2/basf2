@@ -23,7 +23,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdCharged import *
+from stdCharged import stdE
 from variables import variables
 from ROOT import Belle2
 from glob import glob
@@ -42,12 +42,13 @@ inputMdst('default', input_mdst)
 # default: for analysis of Belle II MC samples produced
 # with releases with release-00-08-00 or newer
 
-loadStdCharged()
+stdE('all')
 reconstructDecay('J/psi -> e-:all e+:all', '2.8 < M < 3.3')
 vertexRave('J/psi', 0.0, "J/psi -> ^e-:all ^e+:all")
 
-fillParticleList('K_S0', '0.3 < M < 0.7')
-vertexRave('K_S0', 0.0, "K_S0 -> ^pi+:all ^pi-:all")
+# load V0 Kshorts
+fillParticleList('K_S0 -> pi+ pi-', '0.3 < M < 0.7')
+vertexRave('K_S0', 0.0, "K_S0 -> ^pi+ ^pi-")
 
 # Prepare the B candidates
 reconstructDecay('B0 -> J/psi  K_S0', '5.2 < M < 5.4')

@@ -43,7 +43,15 @@ namespace Belle2 {
        */
       float getGainCorrection(VxdID id, unsigned int uid, unsigned int vid) const;
 
-      /** Get gain correction bin along u side (first part of gainID)
+      /** Get conversion factor from ADU to energy
+       * @param sensorID unique ID of the sensor
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @return ADUToEnergy conversion factor
+       */
+      float getADUToEnergy(VxdID id, unsigned int uid, unsigned int vid) const;
+
+      /** Get gain correction bin along sensor u side
        * @param sensorID unique ID of the sensor
        * @param uid uCell of single pixel
        * @param vid vCell of single pixel
@@ -51,14 +59,14 @@ namespace Belle2 {
        */
       unsigned short getBinU(VxdID id, unsigned int uid, unsigned int vid) const;
 
-      /** Get gain correction bin along v side (second part of gainID)
+      /** Get gain correction bin along sensor v side
        * @param sensorID unique ID of the sensor
        * @param vid vCell of single pixel
        * @return vBin correction bin along v side of sensor
        */
       unsigned short getBinV(VxdID id, unsigned int vid) const;
 
-      /** Get gain correction bin along u side (first part of gainID)
+      /** Get gain correction bin along sensor u side
        * @param sensorID unique ID of the sensor
        * @param uid uCell of single pixel
        * @param vid vCell of single pixel
@@ -67,7 +75,7 @@ namespace Belle2 {
        */
       unsigned short getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU) const;
 
-      /** Get gain correction bin along v side (second part of gainID)
+      /** Get gain correction bin along v side
        * @param sensorID unique ID of the sensor
        * @param vid vCell of single pixel
        * @param nBinsV number of gain bins along v side
@@ -75,13 +83,13 @@ namespace Belle2 {
        */
       unsigned short getBinV(VxdID id, unsigned int vid, unsigned short nBinsV) const;
 
-      /** Get unique gain ID for gain correction on a sensor
+      /** Get global ID for gain correction on a sensor
        * @param sensorID unique ID of the sensor
        * @param uid uCell of single pixel
        * @param vid vCell of single pixel
-       * @return gainID Unique ID for gain correction
+       * @return globalID Unique ID for gain correction
        */
-      unsigned short getGainID(VxdID id, unsigned int uid, unsigned int vid) const;
+      unsigned short getGlobalID(VxdID id, unsigned int uid, unsigned int vid) const;
 
       /** Return current gain correction payload */
       const PXDGainMapPar& getGainMapParameters() const {return m_gains;}

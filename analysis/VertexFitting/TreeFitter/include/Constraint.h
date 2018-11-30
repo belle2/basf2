@@ -97,7 +97,10 @@ namespace TreeFitter {
     virtual ErrCode project(const FitParams& fitpar, Projection& p) const;
 
     /** filter this constraint */
-    virtual ErrCode filter(FitParams* fitpar);
+    virtual ErrCode filter(FitParams& fitpar);
+
+    /** filter this constraint */
+    virtual ErrCode filterWithReference(FitParams& fitpar, const FitParams& oldState);
 
     /** get name of constraint  */
     std::string name() const;
@@ -113,7 +116,7 @@ namespace TreeFitter {
   protected:
 
     /**  constructor */
-    Constraint(Constraint::Type type) :
+    explicit Constraint(Constraint::Type type) :
       m_node(0),
       m_chi2(1e10),
       m_depth(0),

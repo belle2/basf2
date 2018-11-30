@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "cdc/modules/cdcCalibrationCollector/CDCCalibrationCollector.h"
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -40,15 +41,14 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
 {
   setDescription("Collector module for cdc calibration");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
-  addParam("BField", m_BField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
+  addParam("recoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
+  addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            false);
-  addParam("StoreTrackParams", m_StoreTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
-  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
-  addParam("MinimumPt", m_MinimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
-
-
+  addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
+  addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", false);
+  addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
+  addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
 }
 
 CDCCalibrationCollectorModule::~CDCCalibrationCollectorModule()
@@ -82,7 +82,7 @@ void CDCCalibrationCollectorModule::prepare()
   m_tree->Branch<int>("IWire", &IWire);
   m_tree->Branch<double>("Pval", &Pval);
   m_tree->Branch<double>("ndf", &ndf);
-  if (m_StoreTrackParams) {
+  if (m_storeTrackParams) {
     m_tree->Branch<double>("d0", &d0);
     m_tree->Branch<double>("z0", &z0);
     m_tree->Branch<double>("phi0", &phi0);
@@ -115,7 +115,7 @@ void CDCCalibrationCollectorModule::collect()
   /* CDCHit distribution */
   //  make evt t0 incase we dont use evt t0
   evtT0 = 0;
-  int nTr = recoTracks.getEntries();
+  const int nTr = recoTracks.getEntries();
 
   for (int i = 0; i < nTr; ++i) {
     RecoTrack* track = recoTracks[i];
@@ -132,7 +132,7 @@ void CDCCalibrationCollectorModule::collect()
       B2WARNING("track was fitted but Relation not found");
       continue;
     }
-    if (!m_BField) {
+    if (!m_bField) {
       ndf = fs->getNdf() + 1;
     } else {
       ndf = fs->getNdf();
@@ -147,17 +147,21 @@ void CDCCalibrationCollectorModule::collect()
     double Chi2 = fs->getChi2();
     Pval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     //store track parameters
-    if (m_StoreTrackParams) {
-      d0 = fitresult->getD0();
-      z0 = fitresult->getZ0();
-      tanL = fitresult->getTanLambda();
-      omega = fitresult->getOmega();
-      phi0 = fitresult->getPhi0() * 180 / M_PI;
-    }
+
+    d0 = fitresult->getD0();
+    z0 = fitresult->getZ0();
+    tanL = fitresult->getTanLambda();
+    omega = fitresult->getOmega();
+    phi0 = fitresult->getPhi0() * 180 / M_PI;
+
+    // Rejection of suspicious cosmic tracks.
+    // phi0 of cosmic track must be negative in our definition!
+    if (m_isCosmic == true && phi0 > 0.0) continue;
+
     //cut at Pt
-    if (fitresult->getMomentum().Perp() < m_MinimumPt) continue;
+    if (fitresult->getMomentum().Perp() < m_minimumPt) continue;
     //reject events don't have eventT0
-    if (m_EventT0Extraction) {
+    if (m_eventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
       if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
         evtT0 =  m_eventTimeStoreObject->getEventT0();
@@ -182,6 +186,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
 {
   B2DEBUG(99, "start collect hit");
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  static CDC::RealisticTDCCountTranslator* tdcTrans = new RealisticTDCCountTranslator(true);
 
   for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
     const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
@@ -225,22 +230,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         alpha *= 180 / M_PI;
         theta *= 180 / M_PI;
         //estimate drift time
-        double dt_flight;
-        double dt_prop;
-        t = cdcgeo.getT0(wireid) - tdc * cdcgeo.getTdcBinWidth(); // - dt_flight - dt_prop;
-        dt_flight = mop.getTime();
-        if (dt_flight < 50) {t -= dt_flight;}
-        double z = pocaOnWire.Z();
-        TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
-        double z_prop = z - m_backWirePos.Z();
-        B2DEBUG(99, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
-        dt_prop = z_prop * cdcgeo.getPropSpeedInv(lay);
-        if (z_prop < 240) {t -= dt_prop;}
-        // Time Walk
-        t -= cdcgeo.getTimeWalk(wireid, adc);
-        // substract event t0;
-        t -= evtT0;
-
+        t = tdcTrans->getDriftTime(tdc, wireid, mop.getTime(), pocaOnWire.Z(), adc);
         getObjectPtr<TTree>("tree")->Fill();
       } //NDF
       // }//end of if isU

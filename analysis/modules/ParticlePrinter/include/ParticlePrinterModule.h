@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEPRINTERMODULE_H
-#define PARTICLEPRINTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -59,4 +58,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

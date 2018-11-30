@@ -24,14 +24,13 @@ using namespace Belle2;
 
 int TCPServerSocket::open(const std::string& ip, unsigned short port,
                           int nqueue)
-throw(IOException)
 {
   m_ip = ip;
   m_port = port;
   return open(nqueue);
 }
 
-int TCPServerSocket::open(int nqueue) throw(IOException)
+int TCPServerSocket::open(int nqueue)
 {
   if (m_fd > 0) {
     throw (IOException("Socket is working already."));
@@ -77,7 +76,7 @@ int TCPServerSocket::open(int nqueue) throw(IOException)
   return m_fd;
 }
 
-TCPSocket TCPServerSocket::accept() throw(IOException)
+TCPSocket TCPServerSocket::accept()
 {
   socklen_t len = sizeof(sockaddr_in);
   sockaddr_in addr;

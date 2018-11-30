@@ -12,7 +12,7 @@
 #include <TH2I.h>
 #include <TH1I.h>
 
-using namespace std;
+//using namespace std;
 
 namespace Belle2 {
 
@@ -26,15 +26,15 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun() {}
+    virtual void beginRun() override {}
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun() {}
+    virtual void endRun() override {}
     //! terminate
-    virtual void terminate() {}
+    virtual void terminate() override {}
 
   private:
 

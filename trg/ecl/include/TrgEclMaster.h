@@ -77,6 +77,8 @@ namespace Belle2 {
     //    void getEventTiming(int option);
     /** Set Cluster*/
     void setClusterMethod(int cluster) {_Clustering = cluster;}
+    /** Set the limit # of Cluster*/
+    void setClusterLimit(int limit) {_ClusterLimit = limit;}
     /** Set Bhabha*/
     void setBhabhaMethod(int bhabha) {_Bhabha = bhabha;}
     /** Set Cluster*/
@@ -87,7 +89,14 @@ namespace Belle2 {
     void setOverlapWindow(int overlapwindow) {OverlapWindow = overlapwindow;}
     /** set # of considered TC in energy weighted Timing method */
     void setNofTopTC(int noftoptc) {_NofTopTC = noftoptc;}
-
+    /** make LowMultiTriggerBit **/
+    void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
+    /** make Trigger bit except for Low Multiplicity related bit **/
+    void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int);
+    /** Set Total Energy*/
+    double setTotalEnergy(std::vector<double>);
+    int getTriggerbit(int i) {return _Triggerbit[i];}
+    int getLowmultibit() {return _Lowmultibit;}
 
 
   private:
@@ -114,9 +123,9 @@ namespace Belle2 {
     std::vector<std::vector<std::vector<double>>> ThetaRingSum;
 
     /** Hit TC Energy in time window */
-    std::vector<double> ClusterEnergy;
+    //   std::vector<double> ClusterEnergy;
     /** Hit TC Timing in time window*/
-    std::vector<double>  ClusterTiming;
+    //    std::vector<double>  ClusterTiming;
 
 
 
@@ -137,6 +146,12 @@ namespace Belle2 {
     int _EventTiming;
     /** # of considered TC in energy weighted Timing method */
     int _NofTopTC;
+    /** The limit number of Cluster */
+    int _ClusterLimit;
+    // ETM bit
+    int _Triggerbit[4];
+    //  LowMultibit
+    int _Lowmultibit;
 
 
     /** ecl object */
@@ -151,6 +166,8 @@ namespace Belle2 {
     TrgEclBhabha* obj_bhabha;
     /**  Beam Backgroud veto object */
     TrgEclBeamBKG* obj_beambkg;
+    /**  Beam Backgroud veto object */
+    TrgEclDataBase* obj_database;
 
 
   };

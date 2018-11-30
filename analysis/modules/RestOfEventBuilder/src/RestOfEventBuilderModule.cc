@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Sviatoslav Bilokin                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -44,7 +44,12 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
+  std::vector<std::string> emptyList;
   addParam("particleList", m_particleList, "Name of the ParticleList");
+  addParam("particleListsInput", m_particleListsInput, "List of the particle lists, which serve as a source of particles", emptyList);
+  addParam("createNestedROE", m_createNestedROE, "A switch to create nested ROE", false);
+  addParam("nestedROEMask", m_nestedMask, "A switch to create nested ROE", std::string(""));
+  m_nestedROEArrayName = "NestedRestOfEvents";
 }
 
 void RestOfEventBuilderModule::initialize()
@@ -58,11 +63,71 @@ void RestOfEventBuilderModule::initialize()
   StoreArray<RestOfEvent> roeArray;
   roeArray.registerInDataStore();
   particles.registerRelationTo(roeArray);
+  if (m_createNestedROE) {
+    StoreArray<RestOfEvent> nestedROEArray(m_nestedROEArrayName);
+    nestedROEArray.registerInDataStore();
+    particles.registerRelationTo(nestedROEArray);
+    roeArray.registerRelationTo(nestedROEArray);
+  }
 }
 
 void RestOfEventBuilderModule::event()
 {
-  // input Particle
+  if (!m_createNestedROE) {
+    createROE();
+  } else {
+    createNestedROE();
+  }
+
+}
+
+
+void RestOfEventBuilderModule::createNestedROE()
+{
+  // input target Particle
+  StoreObjPtr<ParticleList> plist(m_particleList);
+  StoreArray<RestOfEvent> nestedROEArray(m_nestedROEArrayName);
+  StoreObjPtr<RestOfEvent> hostROE("RestOfEvent");
+  if (!hostROE.isValid()) {
+    B2WARNING("ROE list is not valid somehow, nested ROE is not created!");
+    return;
+  }
+  auto outerROEParticles = hostROE->getParticles(m_nestedMask);
+  unsigned int nParticles = plist->getListSize();
+  for (unsigned i = 0; i < nParticles; i++) {
+    const Particle* particle = plist->getParticle(i);
+    // check if a Particle object is already related to a RestOfEvent object
+    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    if (check_roe != nullptr) {
+      return;
+    }
+    // create nested RestOfEvent object:
+    RestOfEvent* nestedROE = nestedROEArray.appendNew(true);
+    // create relation: Particle <-> RestOfEvent
+    particle->addRelationTo(nestedROE);
+    // create relation: host ROE <-> nested ROE
+    hostROE->addRelationTo(nestedROE);
+    auto fsdaughters =  particle->getFinalStateDaughters();
+    std::vector<const Particle* > particlesToAdd;
+    for (auto* outerROEParticle : outerROEParticles) {
+      bool toAdd = true;
+      for (auto* daughter : fsdaughters) {
+        if (RestOfEvent::compareParticles(outerROEParticle, daughter)) {
+          toAdd = false;
+          break;
+        }
+      }
+      if (toAdd) {
+        particlesToAdd.push_back(outerROEParticle);
+      }
+    }
+    nestedROE->addParticles(particlesToAdd);
+  }
+}
+
+void RestOfEventBuilderModule::createROE()
+{
+  // input target Particle
   StoreObjPtr<ParticleList> plist(m_particleList);
 
   // output
@@ -83,133 +148,55 @@ void RestOfEventBuilderModule::event()
     particle->addRelationTo(roe);
 
     // fill RestOfEvent with content
-    addRemainingTracks(particle, roe);
-    addRemainingECLClusters(particle, roe);
-    addRemainingKLMClusters(particle, roe);
+    addRemainingParticles(particle, roe);
   }
 }
 
-void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, RestOfEvent* roe)
+void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, RestOfEvent* roe)
 {
-  StoreArray<Track> tracks;
-
-  // vector of all final state particle daughters created from Tracks
-  std::vector<int> fspTracks = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
-
-  for (int i = 0; i < tracks.getEntries(); i++) {
-    const Track* track = tracks[i];
-
-    // ignore tracks with charge = 0
-    const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::pion);
-    int charge = trackFit->getChargeSign();
-    if (charge == 0) {
-      B2WARNING("Track with charge = 0 not added to ROE!");
-      continue;
-    }
-
-    bool remainingTrack = true;
-    for (unsigned j = 0; j < fspTracks.size(); j++) {
-      if (track->getArrayIndex() == fspTracks[j]) {
-        remainingTrack = false;
-        break;
-      }
-    }
-
-    if (remainingTrack)
-      roe->addTrack(track);
+  StoreArray<Particle> particlesArray;
+  auto fsdaughters =  particle->getFinalStateDaughters();
+  int nParticleLists = m_particleListsInput.size();
+  B2DEBUG(10, "Particle has " + std::to_string(fsdaughters.size()) + " daughters");
+  for (auto* daughter : fsdaughters) {
+    B2DEBUG(10, "\t" << daughter->getArrayIndex() << ": pdg " << daughter->getPDGCode());
+    B2DEBUG(10, "\t\t Store array particle: " << particlesArray[daughter->getArrayIndex()]->getPDGCode());
   }
-}
+  unsigned int nExcludedParticles = 0;
+  std::vector<const Particle* > particlesToAdd;
+  for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
 
-void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle, RestOfEvent* roe)
-{
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<Track>      tracks;
+    std::string particleListName = m_particleListsInput[i_pl];
+    B2DEBUG(10, "ParticleList: " << particleListName);
+    StoreObjPtr<ParticleList> plist(particleListName);
+    int m_part = plist->getListSize();
+    for (int i = 0; i < m_part; i++) {
+      Particle* storedParticle = plist->getParticle(i);
 
-  // vector of all final state particle daughters created from energy cluster or charged track
-  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
-  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
-
-  // Add remaining ECLClusters
-  for (int i = 0; i < eclClusters.getEntries(); i++) {
-    const ECLCluster* cluster = eclClusters[i];
-
-    // allow only N1 (n photons) cluster hypotheses to enter the ROE
-    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
-      continue;
-
-    bool remainingCluster = true;
-    for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      if (cluster->getArrayIndex() == eclFSPs[j]) {
-        remainingCluster = false;
-        break;
+      bool toAdd = true;
+      for (auto* daughter : fsdaughters) {
+        if (RestOfEvent::compareParticles(storedParticle, daughter)) {
+          B2DEBUG(10, "Ignoring Particle with PDG " << storedParticle->getPDGCode() << " index " << storedParticle->getMdstArrayIndex() <<
+                  " to "
+                  <<
+                  daughter->getMdstArrayIndex());
+          B2DEBUG(10, "Is copy " << storedParticle->isCopyOf(daughter));
+          toAdd = false;
+          nExcludedParticles++;
+          break;
+        }
+      }
+      if (toAdd) {
+        //roe->addParticle(storedParticle);
+        particlesToAdd.push_back(storedParticle);
       }
     }
-
-    if (!remainingCluster)
-      continue;
-
-    // check if the ECLCluster is matched to any track used in reconstruction
-    for (unsigned j = 0; j < trackFSPs.size(); j++) {
-      const Track* track = tracks[trackFSPs[j]];
-      const ECLCluster* trackCluster = track->getRelated<ECLCluster>();
-
-      if (!trackCluster)
-        continue;
-
-      if (cluster->getArrayIndex() == trackCluster->getArrayIndex()) {
-        remainingCluster = false;
-        break;
-      }
-    }
-
-    if (remainingCluster)
-      roe->addECLCluster(cluster);
   }
-}
-
-void RestOfEventBuilderModule::addRemainingKLMClusters(const Particle* particle, RestOfEvent* roe)
-{
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<Track>      tracks;
-
-  // vector of all final state particle daughters created from energy cluster or charged track
-  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_KLMCluster);
-  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
-
-  // Add remaining KLMClusters
-  for (int i = 0; i < klmClusters.getEntries(); i++) {
-    const KLMCluster* cluster = klmClusters[i];
-
-    bool remainingCluster = true;
-    for (unsigned j = 0; j < klmFSPs.size(); j++) {
-      if (cluster->getArrayIndex() == klmFSPs[j]) {
-        remainingCluster = false;
-        break;
-      }
-    }
-
-    if (!remainingCluster)
-      continue;
-
-    // check if the KLMCluster is matched to any track used in reconstruction
-    for (unsigned j = 0; j < trackFSPs.size(); j++) {
-      const Track* track = tracks[trackFSPs[j]];
-      const KLMCluster* trackCluster = track->getRelated<KLMCluster>();
-
-      if (!trackCluster)
-        continue;
-
-      if (cluster->getArrayIndex() == trackCluster->getArrayIndex()) {
-        remainingCluster = false;
-        break;
-      }
-    }
-
-    if (remainingCluster)
-      roe->addKLMCluster(cluster);
+  if (fsdaughters.size() > nExcludedParticles) {
+    B2WARNING("Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete");
   }
+  roe->addParticles(particlesToAdd);
 }
-
 void RestOfEventBuilderModule::printEvent()
 {
   StoreArray<ECLCluster> eclClusters;

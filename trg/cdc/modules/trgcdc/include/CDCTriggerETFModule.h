@@ -23,10 +23,10 @@ namespace Belle2 {
     virtual ~CDCTriggerETFModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Run the ETF for an event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** if true, always output 0 (assuming this is the true event time for MC) */

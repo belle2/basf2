@@ -12,6 +12,7 @@
 using namespace Belle2;
 
 NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
+  : m_value(NULL)
 {
   int* v = (int*)malloc(value.size() * sizeof(int));
   for (size_t i = 0; i < value.size(); i++)
@@ -25,6 +26,7 @@ NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
 }
 
 NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
+  : m_value(NULL)
 {
   float* v = (float*)malloc(value.size() * sizeof(float));
   for (size_t i = 0; i < value.size(); i++)
@@ -93,6 +95,8 @@ void NSMVar::copy(const std::string& name,
                   Type type, int len, const void* value,
                   int id, int rev)
 {
+  if (m_value) free(m_value);
+  m_value = NULL;
   m_name = name;
   m_type = type;
   m_len = len;
@@ -110,12 +114,12 @@ void NSMVar::copy(const std::string& name,
   }
 }
 
-NSMVar::~NSMVar() throw()
+NSMVar::~NSMVar()
 {
   if (m_value) free(m_value);
 }
 
-void NSMVar::readObject(Reader& reader) throw(IOException)
+void NSMVar::readObject(Reader& reader)
 {
   m_node = reader.readString();
   m_name = reader.readString();
@@ -153,7 +157,7 @@ void NSMVar::readObject(Reader& reader) throw(IOException)
   }
 }
 
-void NSMVar::writeObject(Writer& writer) const throw(IOException)
+void NSMVar::writeObject(Writer& writer) const
 {
   writer.writeString(m_node);
   writer.writeString(m_name);

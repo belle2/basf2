@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+#######################################################
+#
+# All BtoCharmSkims in one _standalone
+#
+######################################################
+
+from basf2 import *
+from modularAnalysis import *
+from stdCharged import stdPi, stdK
+from stdPi0s import *
+from stdV0s import *
+from skim.standardlists.charm import *
+from skim.standardlists.lightmesons import *
+from skim.standardlists.dileptons import *
+from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging
+
+
+fileList = \
+    [
+        '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+        'mdst_000001_prod00002288_task00000001.root'
+    ]
+inputMdstList('MC9', fileList)
+
+
+stdPi('all')
+stdK('all')
+stdPi('loose')
+stdK('loose')
+stdPi0s('loose')
+stdPhotons('loose')
+stdKshorts()
+loadStdLightMesons()
+loadStdSkimPi0()
+loadStdSkimPhoton()
+
+
+# B- to D(->hh)h- Skim
+from skim.btocharm import BsigToDhTohhList, loadD0bar
+loadD0bar()
+BtoDhhhList = BsigToDhTohhList()
+add_skim('BtoDh_hh', BtoDhhhList)
+
+
+# B- to D(->Kshh)h- Skim
+from skim.btocharm import BsigToDhToKshhList, loadDkshh
+loadDkshh()
+BtoDhKshhList = BsigToDhToKshhList()
+add_skim('BtoDh_Kshh', BtoDhKshhList)
+
+# B- to D(->Kspi0)h- Skim
+from skim.btocharm import BsigToDhToKspi0List, loadDkspi0
+loadDkspi0()
+BtoDhKspi0List = BsigToDhToKspi0List()
+add_skim('BtoDh_Kspi0', BtoDhKspi0List)
+
+# B- to D(->Kspipipi0)h- Skim
+from skim.btocharm import BsigToDhToKspipipi0List, loadDkspipipi0
+loadDkspipipi0()
+BtoDhKspipipi0List = BsigToDhToKspipipi0List()
+add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List)
+
+setSkimLogging()
+process(analysis_main)
+
+# print out the summary
+print(statistics)

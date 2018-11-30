@@ -4,6 +4,8 @@
 # or just make your own any change the input data below.
 
 from basf2 import *
+# set_log_level(LogLevel.DEBUG)
+# set_debug_level(29)
 set_log_level(LogLevel.INFO)
 
 import os
@@ -63,6 +65,7 @@ def main(argv):
         cal_test.pre_algorithms = pre_alg_test
 
         cal_test.max_files_per_collector_job = 1
+        cal_test.max_iterations = 5  # Each calibration will end iteration after this many attempts (if reached)
         # If you have some local databases or want to override the default global tag for this calibration you can do that
         # with these functions
 #        cal_test.use_local_database("mylocaldb/database.txt")
@@ -83,7 +86,6 @@ def main(argv):
     ###################################################
     # Create a CAF instance to configure how we will run
     cal_fw = CAF()
-    cal_fw.max_iterations = 5  # Each calibration will end iteration after this many attempts (if reached)
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)

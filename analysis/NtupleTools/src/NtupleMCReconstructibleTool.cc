@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
-#include <analysis/VariableManager/MCTruthVariables.h>
+#include <analysis/variables/MCTruthVariables.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <TBranch.h>
 

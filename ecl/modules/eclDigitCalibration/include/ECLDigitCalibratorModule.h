@@ -27,7 +27,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
-class TH1D;
+class TH1F;
 class TFile;
 
 namespace Belle2 {
@@ -55,20 +55,20 @@ namespace Belle2 {
     ~ECLDigitCalibratorModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** begin run.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** event per event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** end run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Name of the ECLDigit.*/
     virtual const char* eclDigitArrayName() const
@@ -116,6 +116,11 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalTimeOffsetUnc;  /**< single crystal time calibration offset as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset*/
 
+    std::vector < float > v_calibrationCrateTimeOffset;  /**< single crate time calibration offset as vector (per crystal) */
+    std::vector < float >
+    v_calibrationCrateTimeOffsetUnc;  /**< single crate time calibration offset as vector uncertainty (per crystal) */
+    DBObjPtr<ECLCrystalCalib> m_calibrationCrateTimeOffset;  /**< single crate time calibration offset (per crystal) */
+
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
@@ -137,25 +142,16 @@ namespace Belle2 {
     void callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
                              std::vector<float>& constantsUnc); /**< reads calibration constants */
 
-
-
-//      double getCalibratedEnergy(const int cellid, const int energy) const; /**< energy calibration */
-//      double getCalibratedTime(const int cellid, const int time, const bool fitfailed) const; /**< timing correction. */
     double getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const; /**< t99%. */
-//      double getInterpolatedTimeResolution(const double x, const int bin) const; /**< timing resolution interpolation. */
-//      void prepareEnergyCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
-//      void prepareTimeCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
     int determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
 
-    double m_timeResolutionPointResolution[4]; /**< Time resolution calibration interpolation parameter "Resolution". */
-    double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
     const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */
     const double c_timeForFitFailed            = 0.0; /**< Time for failed fits". */
 
     // new time calibration from Kim and Chris
     std::string m_fileBackgroundName; /**< Background filename. */
-    TFile* m_fileBackground; /**< Background file. */
-    TH1D* m_th1dBackground; /**< Background histogram. */
+    TFile* m_fileBackground{nullptr}; /**< Background file. */
+    TH1F* m_th1fBackground{nullptr}; /**< Background histogram. */
 
     const double c_pol2Var1 = 1684.0; /**< 2-order fit for p1 Var1 + Var2*bg + Var3*bg^2. */
     const double c_pol2Var2 = 3080.0; /**< 2-order fit for p1. */

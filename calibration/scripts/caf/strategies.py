@@ -496,6 +496,9 @@ class SimpleRunByRun(AlgorithmStrategy):
 """
 
     allowed_granularities = ["run"]
+    #: The params that you could set on the Algorithm object which this Strategy would use.
+    #: Just here for documentation reasons.
+    usable_params = {}
 
     def __init__(self, algorithm):
         """
@@ -509,9 +512,11 @@ class SimpleRunByRun(AlgorithmStrategy):
         """
         Runs the algorithm machine over the collected data and fills the results.
         """
+
         if not self.is_valid():
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
         self.queue = queue
+
         B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
@@ -520,30 +525,37 @@ class SimpleRunByRun(AlgorithmStrategy):
         machine_params["output_dir"] = self.output_dir
         machine_params["output_database_dir"] = self.output_database_dir
         machine_params["input_files"] = self.input_files
+        machine_params["ignored_runs"] = self.ignored_runs
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
+        B2INFO("Starting AlgorithmMachine of {}".format(self.algorithm.name))
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm
         B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
-        runs_to_execute = []
-        all_runs_collected = runs_from_vector(self.algorithm.algorithm.getRunListFromAllData())
-        # If we were given a specific IoV to calibrate we just execute over runs in that IoV
+
+        all_runs_collected = set(runs_from_vector(self.algorithm.algorithm.getRunListFromAllData()))
+        # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
         if iov:
             runs_to_execute = runs_overlapping_iov(iov, all_runs_collected)
         else:
-            runs_to_execute = all_runs_collected[:]
-        # The runs we have left to execute
-        remaining_runs = runs_to_execute[:]
+            runs_to_execute = all_runs_collected
+
+        # Remove the ignored runs from our run list to execute
+        if self.ignored_runs:
+            B2INFO("Removing the ignored_runs from the runs to execute for {}".format(self.algorithm.name))
+            runs_to_execute.difference_update(set(self.ignored_runs))
+        # Sets aren't ordered so lets go back to lists and sort
+        runs_to_execute = sorted(runs_to_execute)
+
         # Is this the first time executing the algorithm?
         first_execution = True
         for exprun in runs_to_execute:
             if not first_execution:
                 self.machine.setup_algorithm()
             current_runs = exprun
-            # Remove current run from our remaining runs
-            remaining_runs.pop(0)
-            B2INFO("Executing on IoV = {}".format(iov_from_runs([current_runs])))
-            self.machine.execute_runs(runs=[current_runs], iteration=iteration)
+            apply_iov = iov_from_runs([current_runs])
+            B2INFO("Executing on IoV = {}".format(apply_iov))
+            self.machine.execute_runs(runs=[current_runs], iteration=iteration, apply_iov=apply_iov)
             first_execution = False
             B2INFO("Finished execution with result code {}".format(self.machine.result.result))
             # Does this count as a successful execution?

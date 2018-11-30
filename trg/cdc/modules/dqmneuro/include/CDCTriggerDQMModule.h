@@ -80,10 +80,11 @@ namespace Belle2 {
 
     // histograms for neurotrigger
     TH1F* m_neuroOutZ;              /**< z distribution from unpacker */
-    TH1F* m_neuroOutCotTheta;       /**< cot theta distribution from unpacker */
+    TH1F* m_neuroOutCosTheta;       /**< cos theta distribution from unpacker */
     TH1F* m_neuroOutHitPattern;     /**< number of hits related to unpacked track */
     TH1F* m_neuroOutPhi0;           /**< phi distribution from unpacker */
-    TH1F* m_neuroOutPt;             /**< Pt distribution from unpacker */
+    TH1F* m_neuroOutInvPt;          /**< Inverse Pt distribution from unpacker */
+    TH1F* m_neuroOutm_time;         /**< m_time distribution from unpacker */
     TH1F* m_neuroOutTrackCount;     /**< number of tracks per event */
     TH1F* m_neuroOutVsInTrackCount; /**< number of neuroOutTracks - number of 2dinTracks */
     TH1F* m_neuroInTSID;            /**< ID of incoming track segments */
@@ -96,9 +97,17 @@ namespace Belle2 {
     TH1F* m_neuroInTSPrioT_Layer6;  /**< Priority time of track segments in layer 6 */
     TH1F* m_neuroInTSPrioT_Layer7;  /**< Priority time of track segments in layer 7 */
     TH1F* m_neuroInTSPrioT_Layer8;  /**< Priority time of track segments in layer 8 */
+    TH1F* m_neuroInTSFoundT_Layer0; /**< Found time of track segments in layer 0 */
+    TH1F* m_neuroInTSFoundT_Layer1; /**< Found time of track segments in layer 1 */
+    TH1F* m_neuroInTSFoundT_Layer2; /**< Found time of track segments in layer 2 */
+    TH1F* m_neuroInTSFoundT_Layer3; /**< Found time of track segments in layer 3 */
+    TH1F* m_neuroInTSFoundT_Layer4; /**< Found time of track segments in layer 4 */
+    TH1F* m_neuroInTSFoundT_Layer5; /**< Found time of track segments in layer 5 */
+    TH1F* m_neuroInTSFoundT_Layer6; /**< Found time of track segments in layer 6 */
+    TH1F* m_neuroInTSFoundT_Layer7; /**< Found time of track segments in layer 7 */
+    TH1F* m_neuroInTSFoundT_Layer8; /**< Found time of track segments in layer 8 */
     TH1F* m_neuroInTSCount;         /**< number of TS per track */
-    TH1F* m_neuroInCotTheta;        /**< Cos theta of incoming 2dtrack */
-    TH1F* m_neuroInPt;             /**< Pt distribution from incoming 2dtrack */
+    TH1F* m_neuroInInvPt;           /**< Inverse Pt distribution from incoming 2dtrack */
     TH1F* m_neuroInPhi0;            /**< Phi0 of incoming 2dtrack */
     TH1F* m_neuroInm_time;          /**< m_time distribution from incoming 2dtracks */
     TH1F* m_neuroInTrackCount;      /**< number of 2dtracks per event */

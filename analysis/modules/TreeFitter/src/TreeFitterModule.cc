@@ -42,9 +42,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            "Upper limit for chi2 fluctuations to accept result. Larger value = less signal rejection but also less background rejection. Optimized for FOM on different topologies - don't touch unless you REALLY want this.",
            1.);
   addParam("massConstraintList", m_massConstraintList,
-           "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).");
+           "Type::[int]. List of particles to mass constrain with int = pdg code. Note that the variables 'M': fit result for the particle and 'InvM': calculated from the daughter momenta, will look different (especially if you don't update the daughters!).", {});
   addParam("massConstraintListParticlename", m_massConstraintListParticlename,
-           "Type::[string]. List of particles to mass constrain with string = particle name.");
+           "Type::[string]. List of particles to mass constrain with string = particle name.", {});
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,

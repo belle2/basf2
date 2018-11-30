@@ -192,6 +192,8 @@ def CharmSemileptonicList(path):
     Dcuts = '1.82 < M < 1.92'
     DstarSLcuts = '1.9 < M < 2.1'
     antiD0SLcuts = 'massDifference(0)<0.15'
+    fillParticleList('e+:std', 'electronID > 0.1 and chiProb > 0.001 and p > 0.25', True, path=path)
+    fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', True, path=path)
 
     D_Channels = ['K-:95eff pi+:95eff',
                   'K-:95eff pi+:95eff pi0:skim',

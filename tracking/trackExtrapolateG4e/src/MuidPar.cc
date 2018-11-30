@@ -22,7 +22,6 @@
 #include <framework/logging/Logger.h>
 
 using namespace std;
-
 namespace Belle2 {
 
   MuidPar::MuidPar() : m_ReducedChiSquaredDx(0.0)
@@ -205,8 +204,18 @@ namespace Belle2 {
         if ((testBit & hitLayerPattern) != 0) {
           pdf *= m_LayerPDF[outcome][lastLayer][layer];
         } else {
-          if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer))
-            pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
+          if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer)) {
+            //pdf treatment used to avoid layer inefficiency problems
+            unsigned int testBitPrev = testBit >> 1;
+            unsigned int testBitNext = testBit << 1;
+            unsigned int testBitNextNext = testBit << 2;
+            if ((((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) || (((testBitNext & hitLayerPattern) != 0)
+                && ((testBitNextNext & hitLayerPattern) != 0))) {
+              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer];//if there is no hit in this Layer, use the pdf of the previous layer
+            } else {
+              pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
+            }
+          }
         }
       }
       testBit <<= 1; // move to next bit
@@ -218,8 +227,18 @@ namespace Belle2 {
         if ((testBit & hitLayerPattern) != 0) {
           pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
         } else {
-          if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer))
-            pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
+          if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer)) {
+            //pdf treatment used to avoid layer inefficiency problems
+            unsigned int testBitPrev = testBit >> 1;
+            unsigned int testBitNext = testBit << 1;
+            unsigned int testBitNextNext = testBit << 2;
+            if ((((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) || (((testBitNext & hitLayerPattern) != 0)
+                && ((testBitNextNext & hitLayerPattern) != 0))) {
+              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer];//if there is no hit in this Layer, use the pdf of the previous layer
+            } else {
+              pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
+            }
+          }
         }
       }
       testBit <<= 1; // move to next bit

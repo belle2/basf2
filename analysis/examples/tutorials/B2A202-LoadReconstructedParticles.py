@@ -89,7 +89,6 @@ ma.printList('pi0:looseFit', False, path=my_path)
 # Or use your own lists. Both options are shown here.
 
 charged_particle_variables = vc.reco_stats + \
-    vc.event_meta_data + \
     vc.kinematics + \
     vc.track + \
     vc.track_hits + \
@@ -103,8 +102,7 @@ gamma_variables = vc.kinematics + \
     vc.mc_kinematics + \
     vc.cluster
 
-K0s_variables = vc.event_meta_data + \
-    vc.kinematics + \
+K0s_variables = vc.kinematics + \
     vc.inv_mass + \
     vc.vertex + \
     vc.mc_vertex + \
@@ -116,7 +114,6 @@ K0s_variables = vc.event_meta_data + \
 pi0_variables = vc.mc_truth + \
     vc.kinematics + \
     vc.mass_before_fit + \
-    vc.event_meta_data + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vc.mc_hierarchy
 

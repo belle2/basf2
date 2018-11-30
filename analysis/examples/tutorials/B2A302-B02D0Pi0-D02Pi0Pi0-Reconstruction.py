@@ -61,8 +61,7 @@ ma.matchMCTruth(list_name='B0:all',
 
 
 # Select variables that we want to store to ntuple
-B0_vars = vc.event_meta_data + \
-    vc.inv_mass + \
+B0_vars = vc.inv_mass + \
     vc.mc_truth + \
     vu.create_aliases_for_selected(
         list_of_variables=vc.inv_mass + vc.mc_truth,
@@ -74,7 +73,6 @@ B0_vars = vc.event_meta_data + \
 pi0_vars = vc.mc_truth + \
     vc.kinematics + \
     vc.mass_before_fit + \
-    vc.event_meta_data + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vu.create_aliases_for_selected(
         list_of_variables=vc.cluster + vc.kinematics,

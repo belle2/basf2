@@ -1987,9 +1987,9 @@ namespace Belle2 {
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
     REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
-                      "Returns number of all charged particles in the related RestOfEvent object, first optional argument is ROE mask name. "
+                      "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
                       "Second argument is a PDG code to count only one charged particle species, independently of charge. "
-                      "For example: nROE_Charged(cleanMask, 321) will output number of kaons in Rest Of Event with 'cleanMask'"
+                      "For example: nROE_Charged(cleanMask, 321) will output number of kaons in Rest Of Event with 'cleanMask'. "
                       "PDG code 0 is used to count all charged particles");
 
     REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,

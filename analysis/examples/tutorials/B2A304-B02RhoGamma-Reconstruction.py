@@ -62,8 +62,7 @@ ma.matchMCTruth(list_name='B0', path=my_path)
 gamma_vars = vc.cluster + vc.mc_truth + vc.kinematics
 rho_vars = vc.cluster + vc.mc_truth + vc.kinematics + vc.inv_mass
 pi_vars = vc.pid + vc.track
-b_vars = vc.event_meta_data + \
-    vc.kinematics + \
+b_vars = vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
     vu.create_aliases_for_selected(list_of_variables=gamma_vars,

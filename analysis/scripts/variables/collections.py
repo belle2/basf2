@@ -13,14 +13,6 @@ deltae_mbc = [
     "Mbc",
     "deltaE"]
 
-#: Event variables
-#: (Replacement for EventMetaData tool)
-event_meta_data = [
-    'evtNum',
-    'expNum',
-    'productionIdentifier',
-    'runNum']
-
 #: Replacement to Kinematics tool
 kinematics = ['px',
               'py',

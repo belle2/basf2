@@ -101,8 +101,8 @@ def DstToD0PiD0ToHpJmEta(path):
 
 def DstToD0PiD0ToKsOmega(path):
     cutAndCopyList('pi0:mypi0', 'pi0:skim', '0.11 < M < 0.15 and p > 0.25 ', path=path)
-    reconstructDecay('eta:3pi -> pi+:good pi-:good pi0:mypi0', '0.4 < M < 0.65', path=path)
-    reconstructDecay('omega:3pi -> pi+:good pi-:good pi0:mypi0', '0.65 < M < 0.9', path=path)
+    reconstructDecay('eta:3pi -> pi+:loose pi-:loose pi0:mypi0', '0.4 < M < 0.65', path=path)
+    reconstructDecay('omega:3pi -> pi+:loose pi-:loose pi0:mypi0', '0.65 < M < 0.9', path=path)
 
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
     reconstructDecay('D0:KsEta -> K_S0:merged eta:3pi', charmcuts, path=path)
@@ -112,7 +112,7 @@ def DstToD0PiD0ToKsOmega(path):
     copyLists('D0:sig', ['D0:KsEta', 'D0:KsOmega'], path=path)
 
     DstList = []
-    reconstructDecay('D*+:sig -> D0:sig pi+:slow', '0 < Q < 0.018', path=path)
+    reconstructDecay('D*+:sig -> D0:sig pi+:all', '0 < Q < 0.018', path=path)
     vertexKFit('D*+:sig', conf_level=0.001, path=path)
     DstList.append('D*+:sig')
 

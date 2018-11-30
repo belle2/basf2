@@ -42,12 +42,20 @@ namespace Belle2 {
   protected:
     //! timestamp diff from gdlL1 to comL1 in LSB8nsec
     TH1I* h_c8_gdlL1TocomL1;
-    //! timestamp diff from fit on fam to gdlL1 in LSB8nsec
+    //! timestamp diff from t0(top) to gdlL1 in LSB8nsec
+    TH1I* h_c8_topTogdlL1;
+    //! timestamp diff from t0(ecl) to gdlL1 in LSB8nsec
     TH1I* h_c8_eclTogdlL1;
-    //! timestamp diff from ecl_timing to gdlL1 in LSB8nsec
-    TH1I* h_c8_ecl8mToGDL;
+    //! timestamp diff from t0(cdc) to gdlL1 in LSB8nsec
+    TH1I* h_c8_cdcTogdlL1;
     //! timestamp diff from fit on fam to GDL in LSB8nsec
+    TH1I* h_c8_ecl8mToGDL;
+    //! timestamp diff from t0(top) to GDL in LSB8nsec
+    TH1I* h_c8_topToGDL;
+    //! timestamp diff from t0(ecl) to GDL in LSB8nsec
     TH1I* h_c8_eclToGDL;
+    //! timestamp diff from t0(cdc) to GDL in LSB8nsec
+    TH1I* h_c8_cdcToGDL;
     //! timestamp diff from cdc_timing to comL1 in LSB2nsec
     TH1I* h_c2_cdcTocomL1;
     //! timestamp diff from cdc_timing to comL1 in nsec
@@ -123,10 +131,12 @@ namespace Belle2 {
     int _e_timtype;
     int _e_gdll1rvc;
     int _e_coml1rvc;
+    int _e_toptiming;
     int _e_ecltiming;
     int _e_cdctiming;
+    int _e_toprvc;
     int _e_eclrvc;
-    int _e_toptiming;
+    int _e_cdcrvc;
     int ee_psn[10];
     int ee_ftd[10];
     int ee_itd[10];

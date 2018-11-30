@@ -546,7 +546,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr nROE_Hadrons(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments)
     {
       std::string maskName = "";
 
@@ -554,7 +554,7 @@ namespace Belle2 {
         maskName = arguments[0];
       }
       if (arguments.size() > 1) {
-        B2FATAL("Wrong number of arguments (1 optional only) for meta function nROE_Hadrons");
+        B2FATAL("Wrong number of arguments (1 optional only) for meta function nROE_NeutralHadrons");
       }
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -584,7 +584,7 @@ namespace Belle2 {
         try {
           pdgCode = std::stoi(arguments[1]);
         } catch (std::invalid_argument& e) {
-          B2ERROR("Second argument of nROE_ChargedParticles must be a PDG code");
+          B2ERROR("First argument of nROE_ChargedParticles must be a PDG code");
           return nullptr;
         }
       }
@@ -1986,16 +1986,17 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode)", nROE_ChargedParticles,
-                      "Returns number of all hadrons in the related RestOfEvent object. "
-                      "Second argument is a PDG code of a charged particle to select. "
-                      "For example: nROE_Charged(cleanMask,311) will output number of kaons in Rest Of Event with 'cleanMask'");
+    REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
+                      "Returns number of all charged particles in the related RestOfEvent object, first optional argument is ROE mask name. "
+                      "Second argument is a PDG code to count only one charged particle species, independently of charge. "
+                      "For example: nROE_Charged(cleanMask, 321) will output number of kaons in Rest Of Event with 'cleanMask'"
+                      "PDG code 0 is used to count all charged particles");
 
     REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,
-                      "Returns number of all photons in the related RestOfEvent object. ");
+                      "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
 
-    REGISTER_VARIABLE("nROE_Hadrons(maskName)", nROE_Hadrons,
-                      "Returns number of all hadrons in the related RestOfEvent object. ");
+    REGISTER_VARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
+                      "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
 
     REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
                       "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"

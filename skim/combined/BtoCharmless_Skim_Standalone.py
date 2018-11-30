@@ -43,13 +43,12 @@ loadStdLightMesons(path=btocharmlesspath)
 # Import skim decay mode lists and perform skim
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
 Had2BodyList = CharmlessHad2BodyB0List(path=btocharmlesspath) + CharmlessHad2BodyBmList(path=btocharmlesspath)
-add_skim("CharmlessHad2Body", Had2BodyList)
+add_skim("CharmlessHad2Body", Had2BodyList, path=btocharmlesspath)
 
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
 Had3BodyList = CharmlessHad3BodyB0List(path=btocharmlesspath) + CharmlessHad3BodyBmList(path=btocharmlesspath)
-add_skim('CharmlessHad3Body', Had3BodyList)
-
-setSkimLogging()
+add_skim('CharmlessHad3Body', Had3BodyList, path=btocharmlesspath)
+setSkimLogging(path=btocharmlesspath)
 process(btocharmlesspath)
 
 # print out the summary

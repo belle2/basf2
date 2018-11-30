@@ -20,9 +20,6 @@ from stdV0s import *
 from skimExpertFunctions import *
 from skim.standardlists.charm import *
 set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
 
 gb2_setuprel = 'release-02-00-01'
 
@@ -48,7 +45,7 @@ skimOutputUdst(skimCode, PRList, path=PRSLpath)
 summaryOfLists(PRList, path=PRSLpath)
 
 
-setSkimLogging(skim_path=PRSLpath)
+setSkimLogging(path=PRSLpath)
 process(path=PRSLpath)
 # print out the summary
 print(statistics)

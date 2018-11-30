@@ -8,7 +8,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import stdPi, stdMu
+from stdCharged import stdPi, stdMu, stdK, stdE
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
@@ -27,6 +27,10 @@ darkskimpath = Path()
 inputMdstList('MC9', fileList, path=darkskimpath)
 
 
+stdMu('all', path=darkskimpath)
+stdMu('loose', path=darkskimpath)
+stdE('all', path=darkskimpath)
+stdE('loose', path=darkskimpath)
 stdPi('all', path=darkskimpath)
 stdPi('loose', path=darkskimpath)
 stdK('all', path=darkskimpath)
@@ -48,19 +52,19 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=darkskimpath)
 
 
 from skim.dark import ALP3GammaList
-add_skim('ALP3Gamma', ALP3GammaList(path=darkskimpath))
+add_skim('ALP3Gamma', ALP3GammaList(path=darkskimpath), path=darkskimpath)
 
 
 from skim.dark import LFVZpInvisibleList
-add_skim('LFVZpInvisible', LFVZpInvisibleList(path=darkskimpath))
+add_skim('LFVZpInvisible', LFVZpInvisibleList(path=darkskimpath), path=darkskimpath)
 
 from skim.dark import LFVZpVisibleList
-add_skim('LFVZpVisible', LFVZpVisibleList(path=darkskimpath))
+add_skim('LFVZpVisible', LFVZpVisibleList(path=darkskimpath), path=darkskimpath)
 
 
 from skim.dark import SinglePhotonDarkList
-add_skim('SinglePhotonDark', SinglePhotonDarkList(path=darkskimpath))
-setSkimLogging(skim_path=darkskimpath)
+add_skim('SinglePhotonDark', SinglePhotonDarkList(path=darkskimpath), path=darkskimpath)
+setSkimLogging(path=darkskimpath)
 process(darkskimpath)
 
 # print out the summary

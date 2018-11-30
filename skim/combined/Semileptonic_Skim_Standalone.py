@@ -70,7 +70,7 @@ skimOutputUdst(skimCode3, PRList, path=SLskimpath)
 
 
 summaryOfLists(PRList, path=SLskimpath)
-setSkimLogging(skim_path=SLskimpath)
+setSkimLogging(path=SLskimpath)
 process(SLskimpath)
 
 # print out the summary

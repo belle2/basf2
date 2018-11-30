@@ -80,24 +80,9 @@ def goodBelleKshort(path=analysis_main):
     applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path)
 
 
-def loadStdKS(path=analysis_main):
-    """
-     Warining:
-        This function is deprecated. Please use :func:`stdKshorts` directly
-
-    Loads the standard :math:`K_{S}^{0}` list.
-    Kept for backward compatibility.
-
-    Parameters:
-        path (basf2.Path): modules are added to this path
-
-    """
-    stdKshorts(path)
-
-
 def stdLambdas(path=analysis_main):
     """
-    Load :math:`Lambda^{0}` from the mdst V0 objects (created when the
+    Load :math:`\Lambda^{0}`s from the mdst V0 objects (created when the
     tracking was run). The ParticleList is named "Lambda0:all". A vertex fit is
     performed and only candidates with an invariant mass in the range
     :math:`1.10 < M < 1.13~GeV`, and for which the vertex fit did not fail, are

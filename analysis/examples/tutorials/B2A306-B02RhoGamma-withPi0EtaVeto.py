@@ -189,8 +189,7 @@ my_path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 gamma_vars = vc.cluster + \
     vc.mc_truth + \
-    vc.kinematics + \
-    vc.mc_hierarchy
+    vc.kinematics
 
 rho_vars = vc.cluster + \
     vc.mc_truth + \

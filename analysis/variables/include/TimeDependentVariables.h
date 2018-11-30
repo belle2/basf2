@@ -70,6 +70,19 @@ namespace Belle2 {
      */
     double particleTagVpVal(const Particle* particle);
 
+    /**
+     * return the number of tracks in the tag vertex
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleTagVNTracks(const Particle* particle);
+
+    /**
+     * return the fit type of the tag vertex
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleTagVNTracks(const Particle* particle);
 
 
     /**

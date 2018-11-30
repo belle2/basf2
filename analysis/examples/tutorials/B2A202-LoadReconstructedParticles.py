@@ -94,9 +94,7 @@ charged_particle_variables = vc.reco_stats + \
     vc.track_hits + \
     vc.pid + \
     vc.mc_truth + \
-    vc.mc_kinematics + \
-    vc.mc_hierarchy
-
+    vc.mc_kinematics
 
 gamma_variables = vc.kinematics + \
     vc.mc_kinematics + \
@@ -108,14 +106,12 @@ K0s_variables = vc.kinematics + \
     vc.mc_vertex + \
     vc.pid + \
     vc.mc_truth + \
-    vc.mc_hierarchy + \
     ['dr', 'dz', 'isSignal', 'chiProb']
 
 pi0_variables = vc.mc_truth + \
     vc.kinematics + \
     vc.mass_before_fit + \
-    ['extraInfo(BDT)', 'decayAngle(0)'] + \
-    vc.mc_hierarchy
+    ['extraInfo(BDT)', 'decayAngle(0)']
 
 # Saving variables to ntuple
 output_file = 'B2A202-LoadReconstructedParticles.root'

@@ -188,7 +188,7 @@ namespace Belle2 {
     double particleTagVNTracks(const Particle* particle)
     {
       Vertex* vert = particle->getRelatedTo<Vertex>();
-      if (vert)
+      if (!vert)
         return -1111.0;
       return vert->getNTracks();
     }
@@ -196,7 +196,7 @@ namespace Belle2 {
     double particleTagVType(const Particle* particle)
     {
       Vertex* vert = particle->getRelatedTo<Vertex>();
-      if (vert)
+      if (!vert)
         return -1111.0;
       return vert->getFitType();
     }

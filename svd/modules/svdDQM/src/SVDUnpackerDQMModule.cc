@@ -86,8 +86,8 @@ void SVDUnpackerDQMModule::defineHisto()
   unsigned short Bins_UpsetAPV = 1;
   unsigned short Bins_BadMapping = 1;
 
-  unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
-                         Bins_BadMapping;
+  const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
+                               Bins_BadMapping;
 
   DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "Monitor SVD Histo", nBits, 1, nBits + 1, 48, 1, 49);
 

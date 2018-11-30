@@ -208,8 +208,10 @@ namespace Belle2 {
             //pdf treatment used to avoid layer inefficiency problems
             unsigned int testBitPrev = testBit >> 1;
             unsigned int testBitNext = testBit << 1;
-            if (((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) {
-              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer - 1]; //if there is no hit in this Layer, use the pdf of the previous layer
+            unsigned int testBitNextNext = testBit << 2;
+            if ((((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) || (((testBitNext & hitLayerPattern) != 0)
+                && ((testBitNextNext & hitLayerPattern) != 0))) {
+              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer];//if there is no hit in this Layer, use the pdf of the previous layer
             } else {
               pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
             }
@@ -229,8 +231,10 @@ namespace Belle2 {
             //pdf treatment used to avoid layer inefficiency problems
             unsigned int testBitPrev = testBit >> 1;
             unsigned int testBitNext = testBit << 1;
-            if (((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) {
-              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer - 1]; //if there is no hit in this Layer, use the pdf of the previous layer
+            unsigned int testBitNextNext = testBit << 2;
+            if ((((testBitPrev & hitLayerPattern) != 0) && ((testBitNext & hitLayerPattern) != 0)) || (((testBitNext & hitLayerPattern) != 0)
+                && ((testBitNextNext & hitLayerPattern) != 0))) {
+              pdf = pdf * m_LayerPDF[outcome][lastLayer][layer];//if there is no hit in this Layer, use the pdf of the previous layer
             } else {
               pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
             }

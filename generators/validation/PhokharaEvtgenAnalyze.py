@@ -36,7 +36,7 @@ class PhokharaEvtgenAnalysisModule(Module):
         self.gamma_py = numpy.zeros(1, dtype=numpy.float32)
         #: Virtual photon momentum (z component).
         self.gamma_pz = numpy.zeros(1, dtype=numpy.float32)
-        #: J/psi energy/
+        #: J/psi energy.
         self.jpsi_e = numpy.zeros(1, dtype=numpy.float32)
         #: J/psi momentum (x component).
         self.jpsi_px = numpy.zeros(1, dtype=numpy.float32)

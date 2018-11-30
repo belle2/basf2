@@ -26,7 +26,11 @@ parser.add_option('-r', '--run', dest='run',
 
 
 # set database tag
-use_central_database(options.tag)
+if options.tag == 'local':
+    use_local_database("localdb/database.txt", "localdb")
+else:
+    use_central_database(options.tag)
+
 
 # EventInfoSetter is only needed to register EventMetaData...
 # (will try to get rid of this)
@@ -50,6 +54,8 @@ if exp > 0 and run > 0:
 # dbImporter.printChannelMask() # use dbImporter.printChannelMask(True) to make 2d map of active channels
 # dbImporter.printChannelMapping()
 # dbImporter.printFEMappings()
+# dbImporter.printGlobalAlignment()
+# dbImporter.printMirrorAlignment()
 
 # creates root file with full detector plane QE map (all HAPDs) as stored in the database
 

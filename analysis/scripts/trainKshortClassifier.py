@@ -2,10 +2,11 @@
 # -*-  coding: utf-8 -*-
 # Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
-from basf2 import *
-from modularAnalysis import *
-from stdV0s import *
+import basf2.core
+from modularAnalysis import inputMdst, matchMCTruth, variablesToNtuple, process, statistics
+from stdV0s import stdKshorts
 import sys
+import os
 
 try:
     input_file_name = str(sys.argv[1])
@@ -46,17 +47,19 @@ target_variable = 'isSignal'
 
 
 # --- create training data set ---
-inputMdst('default', input_file_name)
-stdKshorts()
-matchMCTruth('K_S0:all')
+training_path = basf2.core.Path()
+inputMdst('default', input_file_name, path=training_path)
+stdKshorts('all', path=training_path)
+matchMCTruth('K_S0:all', path=training_path)
 
 variablesToNtuple('K_S0:all',
                   variables + [target_variable],
                   tree_name,
                   training_file_name,
+                  path=training_path
                   )
 
-process(analysis_main, int(1e5))
+process(training_path, int(1e5))
 print(statistics)
 
 # --- train variables ---
@@ -78,7 +81,7 @@ run_e = -1   # run end, -1 for all of them
 tag_name = "development"  # global tag name
 
 upload = True  # upload to conditions database
-remove_local_files = False  # delete local db and training data
+remove_local_files = True  # delete local db and training data
 
 # upload to local database from xml file
 os.system('basf2_mva_upload --identifier {identifier} --db_identifier {identifier_db}'

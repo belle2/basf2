@@ -111,6 +111,7 @@ def DstToD0PiD0ToKsOmega(path):
     vertexTree('D0:KsOmega', conf_level=0.001, path=path)
     copyLists('D0:sig', ['D0:KsEta', 'D0:KsOmega'], path=path)
 
+    DstList = []
     reconstructDecay('D*+:sig -> D0:sig pi+:slow', '0 < Q < 0.018', path=path)
     vertexKFit('D*+:sig', conf_level=0.001, path=path)
     DstList.append('D*+:sig')

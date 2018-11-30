@@ -15,7 +15,25 @@ import json
 # For channels in fei skim
 # from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 
-_totalNumberOfMdstInputFiles = {
+
+all_skims = [
+    "Dark", "BtoCharmless", "BtoCharm", "ALP3Gamma",
+    "BottomoniumEtabExclusive", "BottomoniumUpsilon", "TauGeneric",
+    "SystematicsRadMuMu", "SystematicsRadEE", "LFVZpInvisible", "LFVZpVisible",
+    "SinglePhotonDark", "SystematicsTracking", "BottomoniumUpsilon",
+    "BottomoniumEtabExclusive", "SystematicsLambda", "Systematics",
+    "Resonance", "ISRpipicc", "BtoDh_Kspipipi0", "BtoPi0Pi0",
+    "CharmSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
+    "feiSLB0WithOneLep", "feiBplusWithOneLep", "feiHadronicB0",
+    "feiHadronicBplus", "BtoPi0Pi0", "Charm3BodyHadronic2",
+    "Charm3BodyHadronic", "Charm3BodyHadronicD0", "Charm2BodyHadronic",
+    "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "BtoDh_Kspi0", "BtoDh_hh",
+    "BtoDh_Kshh", "Tau", "PRsemileptonicUntagged", "SLUntagged",
+    "LeptonicUntagged", "TCPV", "CharmRare", "BtoXll", "BtoXgamma", "TauLFV",
+]
+
+
+_total_input_files = {
     ('MC9_mixedBGx1', 3564),
     ('MC9_chargededBGx1', 3770),
     ('MC9_uubarBGx1', 6115),
@@ -31,7 +49,7 @@ _totalNumberOfMdstInputFiles = {
     ('MC9_ccbarBGx0', 760),
     ('MC9_taupairBGx0', 368),
 }
-_testFileList = {
+_test_file_list = {
     ('MC10_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-01-00-03/DB00000294/MC10/prod00004770/s00/e0000/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000001_prod00004770_task00000001.root'),
     ('MC10_mixedBGx0', '/ghi/fs01/belle2/bdata/MC/release-01-00-03/DB00000294/MC10/prod00003591/s00/e0000/4S/r00000/mixed/' +
@@ -225,7 +243,7 @@ def get_test_file(sample, skimCampaign):
         skimCampaign: MC9, MC10, MC11, etc..
     """
     sampleName = skimCampaign + '_' + sample
-    lookup_dict = {s: f for s, f in _testFileList}
+    lookup_dict = {s: f for s, f in _test_file_list}
     if sampleName not in lookup_dict:
         B2ERROR("Testing file for this sample and skim campaign is not available.")
     return lookup_dict[sampleName]
@@ -239,7 +257,7 @@ def get_total_infiles(sample, skimCampaign):
         skimCampaign: MC9, MC10, MC11, etc..
     """
     sampleName = skimCampaign + '_' + sample
-    lookup_dict = {s: f for s, f in _totalNumberOfMdstInputFiles}
+    lookup_dict = {s: f for s, f in _total_input_files}
     if sampleName not in lookup_dict:
         return 1000
     return lookup_dict[sampleName]

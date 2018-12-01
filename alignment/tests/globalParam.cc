@@ -193,10 +193,8 @@ namespace {
     newgpv.updateGlobalParam(42., BeamParameters::getGlobalUniqueID(), 0, 1);
     EXPECT_EQ(newgpv.getGlobalParam(BeamParameters::getGlobalUniqueID(), 0, 1), 42.);
 
-    // CDCAlignment does not contain automatic global params -> set/get does nothing
-    // Filled manually by interface from pede result
     newgpv.setGlobalParam(42., CDCAlignment::getGlobalUniqueID(), 0, 1);
-    EXPECT_EQ(newgpv.getGlobalParam(CDCAlignment::getGlobalUniqueID(), 0, 1), 0.);
+    EXPECT_EQ(newgpv.getGlobalParam(CDCAlignment::getGlobalUniqueID(), 0, 1), 42.);
   }
 
 }  // namespace

@@ -8,14 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SELECTDAUGHTERSMODULE_H
-#define SELECTDAUGHTERSMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-//#include <vector>
-//#include <tuple>
-//#include <memory>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 
@@ -38,37 +34,17 @@ namespace Belle2 {
   class SelectDaughtersModule : public Module {
 
   public:
-
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** constructor */
     SelectDaughtersModule();
-
-    /** sdf */
-    virtual ~SelectDaughtersModule();
-
-    /** sdf */
-    virtual void initialize();
-
-    /** sdf */
-    virtual void beginRun();
-
-    /** sdf */
-    virtual void event();
-
-    /** sdfy */
-    virtual void endRun();
-
-    /** sdf */
-    virtual void terminate();
-
-
+    /** destructor */
+    ~SelectDaughtersModule() {}
+    /** set up datastore */
+    virtual void initialize() override;
+    /** process the event */
+    virtual void event() override;
   private:
-
     std::string m_listName;  /**< name of particle list */
     std::string m_decayString;    /**< daughter particles selection */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
   };
 }
-
-#endif /* SELECTDAUGHTERSMODULE_H */

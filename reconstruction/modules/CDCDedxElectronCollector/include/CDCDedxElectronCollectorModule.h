@@ -39,12 +39,12 @@ namespace Belle2 {
     /**
      * Create and book ROOT objects
      */
-    virtual void prepare();
+    virtual void prepare() override;
 
     /**
      * Fill ROOT objects
      */
-    virtual void collect();
+    virtual void collect() override;
 
     /**
     * if bad phi region removal is demanded

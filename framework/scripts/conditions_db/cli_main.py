@@ -32,9 +32,11 @@ from urllib.parse import urljoin
 import shutil
 import pprint
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
-    pretty_print_table, LogPythonInterface
+    LogPythonInterface
+from basf2.utils import pretty_print_table
 from pager import Pager
 from dateutil.parser import parse as parse_date
+from getpass import getuser
 from . import ConditionsDB, enable_debugging, encode_name
 from .cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
@@ -226,7 +228,7 @@ def command_tag_create(args, db=None):
     info = {"name": args.tag, "description": args.description, "modifiedBy": args.user, "isDefault": False}
     # add user information if not given by command line
     if args.user is None:
-        info["modifiedBy"] = os.environ.get("BELLE2_USER", os.getlogin())
+        info["modifiedBy"] = os.environ.get("BELLE2_USER", getuser())
 
     typeinfo = db.get_globalTagType(args.type)
     if typeinfo is None:

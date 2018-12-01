@@ -6,6 +6,7 @@
  * Contributors:                                                          *
  *    Jan Strube (jan.strube@pnnl.gov)                                    *
  *    Sam Cunliffe (sam.cunliffe@desy.de)                                 *
+ *    Marko Staric                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,9 +14,15 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h> // data store framework
+#include <top/dataobjects/TOPDigit.h>       // data Cherenkov hits
 #include <framework/database/DBObjPtr.h>     // database objects framwork
+#include <framework/database/DBArray.h>
 #include <top/dbobjects/TOPCalChannelMask.h> // Umberto's database object
-
+#include <top/dbobjects/TOPPmtInstallation.h>
+#include <top/dbobjects/TOPPmtQE.h>
+#include <top/dbobjects/TOPCalChannelRQE.h>
+#include <top/dbobjects/TOPCalChannelThresholdEff.h>
 
 namespace Belle2 {
   /**
@@ -24,22 +31,36 @@ namespace Belle2 {
    *    *
    */
   class TOPChannelMaskerModule : public Module {
+
   public:
+
     /**
      * Constructor: Sets the description of the module
      */
     TOPChannelMaskerModule();
+
     /**
      * initialize method: registers datastore objects (the TOP hits)
      */
-    virtual void initialize();
+    virtual void initialize() override;
+
     /**
      * event method: removes channels from the reconstruction pdf, flags hits
      * from noisy channels as junk
      */
-    virtual void event();
+    virtual void event() override;
+
   private:
-    /** list of dead/noisy channels from the DB */
-    DBObjPtr<TOPCalChannelMask> m_channelMask;
+
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+
+    DBObjPtr<TOPCalChannelMask> m_channelMask; /**< list of dead/noisy channels */
+
+    // those below are used only to check "hasChanged" status
+    DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
+    DBArray<TOPPmtQE> m_pmtQEData; /**< quantum efficiencies */
+    DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
+    DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
+
   };
 }

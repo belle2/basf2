@@ -3,6 +3,7 @@
 ! M. Staric, sept-2008, sept-2011, avg-2014
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
+! oct-2018: change in some commons
 !-----------------------------------------------------------------------
 
       INTEGER FUNCTION ICH_DIGI(XH,YH,LR,M) ! chID from x,y,lr,m

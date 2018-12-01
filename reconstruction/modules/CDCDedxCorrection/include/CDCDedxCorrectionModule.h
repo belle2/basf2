@@ -59,14 +59,14 @@ namespace Belle2 {
     /** Initialize the Module.
      * This method is called only once before the actual event processing
      * starts. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * has to take place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Perform a run gain correction */
     void RunGainCorrection(double& dedx) const;

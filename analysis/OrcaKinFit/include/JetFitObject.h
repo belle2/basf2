@@ -52,38 +52,38 @@ namespace Belle2 {
       virtual ~JetFitObject();
 
       /// Return a new copy of itself
-      virtual JetFitObject* copy() const;
+      virtual JetFitObject* copy() const override;
 
       /// Assign from anther object, if of same type
       virtual JetFitObject& assign(const BaseFitObject& source    ///< The source object
-                                  );
+                                  ) override;
 
       /// Get name of parameter ilocal
       virtual const char* getParamName(int ilocal      ///< Local parameter number
-                                      ) const;
+                                      ) const override;
 
       /// Read values from global vector, readjust vector; return: significant change
       virtual bool   updateParams(double p[],    ///< The parameter vector
                                   int idim      ///< Length of the vector
-                                 );
+                                 ) override;
 
-      virtual int getNPar() const {return NPAR;}
+      virtual int getNPar() const override {return NPAR;}
 
       // these depend on actual parametrisation!
 
-      virtual double getDPx(int ilocal) const;
-      virtual double getDPy(int ilocal) const;
-      virtual double getDPz(int ilocal) const;
-      virtual double getDE(int ilocal) const;
+      virtual double getDPx(int ilocal) const override;
+      virtual double getDPy(int ilocal) const override;
+      virtual double getDPz(int ilocal) const override;
+      virtual double getDE(int ilocal) const override;
 
       virtual double getCov(int
                             ilocal,     ///< Local parameter number i
                             int jlocal     ///< Local parameter number j
-                           ) const ;
+                           ) const override;
 
       /// Get error of parameter ilocal
       virtual double getError(int ilocal      ///< Local parameter number
-                             ) const;
+                             ) const override;
 
 
       /// add derivatives to vector der of size idim
@@ -98,8 +98,8 @@ namespace Belle2 {
 
       // daniel's new method
       // derivatives of intermediate variable wrt local variable
-      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const;
-      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const;
+      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const override;
+      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const override;
 
       /// Get chi squared from measured and fitted parameters
       //    virtual double getChi2() const;
@@ -108,7 +108,7 @@ namespace Belle2 {
 
       enum {NPAR = 3};
 
-      void updateCache() const;
+      void updateCache() const override;
 
       mutable double ctheta, stheta, cphi, sphi,
               p2, p, pt, px, py, pz, dpdE, dptdE,

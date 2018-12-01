@@ -15,12 +15,11 @@ from ROOT import Belle2
 # -----------------------------------------------------------------------------------
 
 # define global tag
-globalTag = 'data_reprocessing_prod4'
+globalTag = 'data_reprocessing_prod6'
 
 
 class SelectTRGTypeRandom(Module):
     ''' select random triggered events from TRGSummary '''
-    # unreliable because of bugs in TRGUnpacker - do not use it before bugs are fixed
 
     def event(self):
         ''' event processing '''
@@ -33,8 +32,7 @@ class SelectTRGTypeRandom(Module):
             self.return_value(0)
             return
 
-        # print('Event', evtmetadata.getEvent(), 'type', trg_summary.getTimType())
-
+        # to be replaced with TTYP_DPHY when those triggers implemented
         if trg_summary.getTimType() == Belle2.TRGSummary.TTYP_RAND:
             self.return_value(1)
         else:
@@ -42,7 +40,7 @@ class SelectTRGTypeRandom(Module):
 
 
 class AdjustTOPDigitsTime(Module):
-    ''' adjust time of TOPDigits '''
+    ''' adjust time of TOPDigits: a temporary solution for exp 3 '''
 
     def event(self):
         ''' event processing '''
@@ -69,12 +67,12 @@ add_unpackers(main)
 progress = register_module('Progress')
 main.add_module(progress)
 
-# Select random trigger events -> not usable before bug fixes in TRGUnpacker
-# selector = SelectTRGTypeRandom()
-# main.add_module(selector)
-# selector.if_false(emptypath)
+# Select random trigger events
+selector = SelectTRGTypeRandom()
+main.add_module(selector)
+selector.if_false(emptypath)
 
-# convert ECLDsps to ECLWaveforms (used also to select random trigger events)
+# Convert ECLDsps to ECLWaveforms
 compress = register_module('ECLCompressBGOverlay')
 main.add_module(compress, CompressionAlgorithm=3)
 compress.if_false(emptypath)

@@ -104,7 +104,7 @@ namespace Belle2 {
     /**
      * Run algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
 
   private:

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATION_H
-#define EKLMTIMECALIBRATION_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -92,12 +91,9 @@ namespace Belle2 {
     /** Amplitude dependence time constant. */
     float m_AmplitudeTimeConstant;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMTimeCalibration, 2);
 
   };
 
 }
-
-#endif
-

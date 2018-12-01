@@ -63,14 +63,14 @@ namespace Belle2 {
     virtual ~HitLevelInfoWriterModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Create the output TFiles and TTrees. */
     void bookOutput(std::string filename);

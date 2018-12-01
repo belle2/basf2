@@ -89,7 +89,7 @@ namespace Belle2 {
      *
      * Useable in Python via '"ModuleType" in path' syntax.
      */
-    bool contains(std::string moduleType) const;
+    bool contains(const std::string& moduleType) const;
 
     /** Create an independent copy of this path, recreating all contained modules with the same parameters.
      *

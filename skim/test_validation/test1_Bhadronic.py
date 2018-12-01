@@ -28,7 +28,7 @@ use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_da
 
 import fei
 particles = fei.get_default_channels(neutralB=True, chargedB=False, hadronic=True, semileptonic=False, KLong=False)
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 

@@ -38,8 +38,7 @@ DQMHistAnalysisInputSrvModule::~DQMHistAnalysisInputSrvModule() { }
 
 void DQMHistAnalysisInputSrvModule::initialize()
 {
-  m_expno = m_runno = 0;
-  m_count = 0;
+  if (m_memory != nullptr) delete m_memory;
   m_memory = new DqmMemFile(m_mempath.c_str());
   m_eventMetaDataPtr.registerInDataStore();
   //m_serv = new THttpServer("http:8081");

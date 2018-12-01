@@ -63,6 +63,7 @@ ECLClusterInfoModule::ECLClusterInfoModule() : Module()
   m_absZernikeMoment51 = 0;
   m_zernikeMVA = 0;
   m_secondMoment = 0;
+  m_LAT = 0;
   m_NC = 0;
   m_Err00 = 0;
   m_Err10 = 0;

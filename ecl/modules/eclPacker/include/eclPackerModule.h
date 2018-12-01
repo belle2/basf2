@@ -33,15 +33,15 @@ namespace Belle2 {
     virtual ~ECLPackerModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
     /** beginRun */
-    virtual void beginRun();
+    virtual void beginRun() override;
     /** event */
-    virtual void event();
+    virtual void event() override;
     /** endRun */
-    virtual void endRun();
+    virtual void endRun() override;
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /// exception for errors during packing ADC data buffer
     BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,

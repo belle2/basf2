@@ -81,11 +81,11 @@ namespace Belle2 {
     CDCTrigger2DFinderModule();
 
     /** Initialize the module and check module parameters */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Run tracking */
-    virtual void event();
+    virtual void event() override;
     /** Clean up */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Fast intercept finder
      *  Divide Hough plane recursively to find cells with enough crossing lines.

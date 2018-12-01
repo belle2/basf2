@@ -165,11 +165,11 @@ namespace Belle2 {
     ThicknessDensityPar(int IRCDCB = 0, int IPhiCDCB = 0, int IRCDCF = 0, int IPhiCDCF = 0,
                         int IRECLB = 0, int IPhiECLB = 0, int IRECLF = 0, int IPhiECLF = 0,
                         int IRARICHF = 0, int IPhiARICHF = 0,  int IPhiTOPB = 0, int IPhiTOPF = 0,
-                        std::vector<double> thicknisses = std::vector<double>(),
-                        std::vector<double> density = std::vector<double>()):
+                        const std::vector<double>& thicknesses = std::vector<double>(),
+                        const std::vector<double>& density = std::vector<double>()):
       m_IRCDCB(IRCDCB), m_IPhiCDCB(IPhiCDCB), m_IRCDCF(IRCDCF), m_IPhiCDCF(IPhiCDCF), m_IRECLB(IRECLB),
       m_IPhiECLB(IPhiECLB), m_IRECLF(IRECLF), m_IPhiECLF(IPhiECLF), m_IRARICHF(IRARICHF),
-      m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF), m_thick(thicknisses), m_density(density) {}
+      m_IPhiARICHF(IPhiARICHF), m_IPhiTOPB(IPhiTOPB), m_IPhiTOPF(IPhiTOPF), m_thick(thicknesses), m_density(density) {}
 
     /** Destructor */
     ~ThicknessDensityPar() {}
@@ -254,7 +254,7 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    ServiceGapsMaterialsPar(bool recordBackground = false): m_recordBackground(recordBackground) {}
+    explicit ServiceGapsMaterialsPar(bool recordBackground = false): m_recordBackground(recordBackground) {}
 
     /** Destructor */
     ~ServiceGapsMaterialsPar() {}

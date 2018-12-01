@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_TRANSFORMDATAGLOBALALIGNED_H
-#define EKLM_TRANSFORMDATAGLOBALALIGNED_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/geometry/TransformData.h>
@@ -47,6 +46,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

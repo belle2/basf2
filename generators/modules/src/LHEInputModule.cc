@@ -144,7 +144,7 @@ void LHEInputModule::event()
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-  } catch (LHEReader::LHEEmptyEventError) {
+  } catch (LHEReader::LHEEmptyEventError&) {
     B2DEBUG(100, "Reached end of LHE file.");
     m_lhe.closeCurrentInputFile();
     m_iFile++;

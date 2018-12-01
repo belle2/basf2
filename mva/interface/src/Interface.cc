@@ -10,6 +10,7 @@
 
 #include <mva/interface/Interface.h>
 #include <mva/methods/FastBDT.h>
+#include <mva/methods/RegressionFastBDT.h>
 #include <mva/methods/TMVA.h>
 #include <mva/methods/Python.h>
 #include <mva/methods/FANN.h>
@@ -42,6 +43,7 @@ namespace Belle2 {
     void AbstractInterface::initSupportedInterfaces()
     {
       static Interface<FastBDTOptions, FastBDTTeacher, FastBDTExpert> interface_FastBDT;
+      static Interface<RegressionFastBDTOptions, RegressionFastBDTTeacher, RegressionFastBDTExpert> interface_RegressionFastBDT;
       static Interface<FANNOptions, FANNTeacher, FANNExpert> interface_FANN;
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
       interface_TMVAClassification;

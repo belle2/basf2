@@ -12,7 +12,7 @@ BottomoniumPiPiUpsilonskimpath = Path()
 # set up for running at Y(3S)
 beamparameters = add_beamparameters(BottomoniumPiPiUpsilonskimpath, "Y3S")
 
-filelist = ['BottomoniumPiPiUpsilon.udst.root']
+filelist = ['../BottomoniumPiPiUpsilon.udst.root']
 inputMdstList('default', filelist, path=BottomoniumPiPiUpsilonskimpath)
 
 # use standard final state particle lists
@@ -24,6 +24,8 @@ reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', '', path=BottomoniumPiPi
 reconstructDecay('Upsilon(3S):pipirecoil -> pi+:loose pi-:loose', '', path=BottomoniumPiPiUpsilonskimpath)
 reconstructDecay('Upsilon(3S):12Smumu -> Upsilon(3S):pipirecoil Upsilon:mumu', '', path=BottomoniumPiPiUpsilonskimpath)
 
+# the variables that are printed out are: the invariant mass of Y(1S,2S), the invariant mass
+# of Y(3S), and the recoil mass of pi+pi-
 from variables import variables
 variablesToHistogram(
     filename='BottomoniumPiPiUpsilon_Validation.root',

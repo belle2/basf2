@@ -13,7 +13,7 @@ BottomoniumGammaUpsilonskimpath = Path()
 # set up for running at Y(3S)
 beamparameters = add_beamparameters(BottomoniumGammaUpsilonskimpath, "Y3S")
 
-filelist = ['BottomoniumGammaUpsilon.udst.root']
+filelist = ['../BottomoniumGammaUpsilon.udst.root']
 inputMdstList('default', filelist, path=BottomoniumGammaUpsilonskimpath)
 
 # use standard final state particle lists
@@ -27,6 +27,8 @@ reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', '', path=BottomoniumGamm
 reconstructDecay('chi_b1(2P):mychibJ -> gamma:loose Upsilon:mumu', '', path=BottomoniumGammaUpsilonskimpath)
 reconstructDecay('Upsilon(3S) -> gamma:loose chi_b1(2P):mychibJ', '', path=BottomoniumGammaUpsilonskimpath)
 
+# the variables that are printed out are: the invariant mass of chib, the invariant mass
+# of Y(1S,2S), and the invariant mass of Y(3S)
 from variables import variables
 variablesToHistogram(
     filename='BottomoniumGammaUpsilon_Validation.root',

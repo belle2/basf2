@@ -37,7 +37,8 @@ using namespace Belle2;
 REG_MODULE(BKLMUnpacker)
 
 
-BKLMUnpackerModule::BKLMUnpackerModule() : Module()
+BKLMUnpackerModule::BKLMUnpackerModule() : Module(),
+  m_triggerCTimeOfPreviousEvent(0)
 {
   setDescription("Produce BKLMDigits from RawBKLM");
   setPropertyFlags(c_ParallelProcessingCertified);

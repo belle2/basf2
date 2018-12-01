@@ -65,9 +65,9 @@ matchMCTruth('beam:selv4c')
 
 # Select variables that we want to store to ntuple
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.pid + vc.momentum_uncertainty
-gammavars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
-avars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
-uvars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + \
+gammavars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.momentum_uncertainty
+avars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.momentum_uncertainty
+uvars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
     vc.create_aliases_for_selected(muvars, 'beam -> [A -> ^mu+ ^mu-] gamma') + \
     vc.create_aliases_for_selected(gammavars, 'beam -> A ^gamma') + \
     vc.create_aliases_for_selected(avars, 'beam -> ^A gamma')

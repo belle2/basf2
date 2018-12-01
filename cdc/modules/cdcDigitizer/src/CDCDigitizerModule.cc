@@ -812,10 +812,9 @@ void CDCDigitizerModule::setFEElectronics()
     }
   }
 
-  int bdi = 0;
   if (mode == 0) {
     for (const auto& fp : (*m_fEElectronicsFromDB)) {
-      bdi = fp.getBoardID();
+      int bdi = fp.getBoardID();
       if (bdi < 0 || bdi >= static_cast<int>(nBoards)) B2FATAL("CDCDigitizer:: Invalid no. of FEE boards !");
       if (bdi == 0) continue; //bdi=0 is dummy (not used)
       m_uprEdgeOfTimeWindow[bdi] = el1TrgLatency - c * (fp.getTrgDelay() + 1);

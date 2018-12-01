@@ -28,28 +28,28 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-
-inputMdstList('MC9', fileList)
-stdPi('all')
-stdPi('loose')
-stdK('loose')
-stdKshorts()
-loadStdSkimPi0()
-loadStdSkimPhoton()
-stdPi0s('loose')
-stdPhotons('loose')
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
+path = Path()
+inputMdstList('MC9', fileList, path=path)
+stdPi('all', path=path)
+stdPi('loose', path=path)
+stdK('loose', path=path)
+stdKshorts(path=path)
+loadStdSkimPi0(path=path)
+loadStdSkimPhoton(path=path)
+stdPi0s('loose', path=path)
+stdPhotons('loose', path=path)
+loadStdD0(path=path)
+loadStdDplus(path=path)
+loadStdDstar0(path=path)
+loadStdDstarPlus(path=path)
 
 # Double Charm Skim
 from skim.btocharm import *
-DCList = DoubleCharmList()
-skimOutputUdst(skimCode, DCList)
-summaryOfLists(DCList)
-setSkimLogging()
-process(analysis_main)
+DCList = DoubleCharmList(path=path)
+skimOutputUdst(skimCode, DCList, path=path)
+summaryOfLists(DCList, path=path)
+setSkimLogging(path=path)
+process(path=path)
 
 # print out the summary
 print(statistics)

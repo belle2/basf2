@@ -18,12 +18,17 @@ import os.path
 from basf2 import *
 from modularAnalysis import *
 from skimExpertFunctions import *
+from stdCharged import *
+from stdPhotons import *
 
 fileList = ['../TauGeneric.dst.root']
 
 inputMdstList('MC9', fileList)
 
-# Hadronic B0 skim
+stdPi('all')
+stdPhotons('all')
+
+# TauGeneric skim
 from skim.taupair import *
 tauList = TauList()
 skimOutputUdst('../TauGeneric.udst.root', tauList)

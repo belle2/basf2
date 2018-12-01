@@ -55,7 +55,7 @@ skimOutputUdst(skimCode, SLList, path=SLpath)
 summaryOfLists(SLList, path=SLpath)
 
 
-setSkimLogging(skim_path=SLpath)
+setSkimLogging(path=SLpath)
 process(SLpath)
 
 # print out the summary

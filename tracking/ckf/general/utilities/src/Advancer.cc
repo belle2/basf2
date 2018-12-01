@@ -22,7 +22,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 double Advancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                    const genfit::SharedPlanePtr& plane)
+                                    const genfit::SharedPlanePtr& plane) const
 {
   setMaterialEffectsToParameterValue();
 

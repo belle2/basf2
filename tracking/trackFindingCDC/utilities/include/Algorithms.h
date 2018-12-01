@@ -57,6 +57,13 @@ namespace Belle2 {
       ts.erase(std::remove_if(std::begin(ts), std::end(ts), predicate), std::end(ts));
     }
 
+    template<class Ts>
+    void only_best_N(Ts& ts, const size_t N)
+    {
+      auto newEnd = std::next(ts.begin(), std::min(N, ts.size()));
+      ts.erase(newEnd, ts.end());
+    }
+
     /**
      *  Erase unique idiom in a more concise form
      */

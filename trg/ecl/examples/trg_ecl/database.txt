@@ -1,0 +1,4 @@
+dbstore/TRGECLFAMParas 1 0,0,-1,-1
+dbstore/TRGECLTMMParas 1 0,0,-1,-1
+dbstore/TRGECLETMParas 1 0,0,-1,-1
+dbstore/TRGECLBadRuns 1 0,0,-1,-1

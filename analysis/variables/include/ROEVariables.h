@@ -118,6 +118,21 @@ namespace Belle2 {
     Manager::FunctionPtr nROE_NeutralECLClusters(const std::vector<std::string>& arguments);
 
     /**
+     * Returns number of charged particles in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROE_ChargedParticles(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of photons in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROE_Photons(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of neutral hadrons in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments);
+
+    /**
      * Returns the number of particles in ROE from the given particle list.
      * Use of variable aliases is advised.
      */

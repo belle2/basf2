@@ -83,7 +83,7 @@ The order of provided particle lists matters, so preferably, the particle lists 
 
 Changing charged particle hypothesis is important, as the charged particles have different mass, and it will 
 affect the computation of the ROE mass or energy.
-Also, this method allows to study the ROE particle composition.
+Also, this method allows to study the ROE particle composition by using ``nROE_Charged(...)`` metavariable, as well as ``nROE_Photons(...)`` and ``nROE_NeutralHadrons(...)`` metavariables, see ``basf2 variables.py``.
 
 
 Accessing ROE particles

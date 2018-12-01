@@ -13,14 +13,6 @@ deltae_mbc = [
     "Mbc",
     "deltaE"]
 
-#: Event variables
-#: (Replacement for EventMetaData tool)
-event_meta_data = [
-    'evtNum',
-    'expNum',
-    'productionIdentifier',
-    'runNum']
-
 #: Replacement to Kinematics tool
 kinematics = ['px',
               'py',
@@ -30,14 +22,9 @@ kinematics = ['px',
               'E']
 
 
-#: Kinematic variables in CMS
-ckm_kinematics = ut.create_aliases(kinematics,
-                                   "useCMSFrame({variable})",
-                                   "CMS")
-
 #: Cluster-related variables
 cluster = [
-    'ClusterHadronIntensity',
+    'PulseShapeDiscriminationMVA',
     'ClusterHasPulseShapeDiscrimination',
     'ClusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
@@ -86,6 +73,16 @@ cluster = [
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap']
 
+#: Dalitz masses for three body decays
+dalitz_3body = [
+    'daughterInvM(0, 1)',  # invariant mass of daughters 1 and 2
+    'daughterInvM(0, 2)',  # invariant mass of daughters 1 and 3
+    'daughterInvM(1, 2)'  # invariant mass of daughters 2 and 3
+]
+# Hint: you can set aliases for convenient names as follows:
+# from variables import variables as vm
+# vm.addAlias("msq12", "formula(daughterInvM(0, 1) **2))
+
 #: Tracking variables
 #: Replacement for Track tool
 track = [
@@ -122,17 +119,6 @@ mc_kinematics = [
     'mcPhi'
 ]
 
-#: Replacement for MCHierarchy tool
-mc_hierarchy = ut.create_aliases(["mcPDG"],
-                                 "mcMother({variable})",
-                                 "mother")
-mc_hierarchy += ut.create_aliases(["mcPDG"],
-                                  "mcMother(mcMother({variable}))",
-                                  "grandmother")
-mc_hierarchy += ut.create_aliases(["mcPDG"],
-                                  "mcMother(mcMother(mcMother({variable})))",
-                                  "grandgrandmother")
-
 #: Truth-matching related variables
 mc_variables = [
     'genMotherID',
@@ -155,7 +141,8 @@ mc_variables = [
     'mcPZ',
     'mcPhi',
     'mcVirtual',
-    'nMCMatches']
+    'nMCMatches'
+]
 
 #: PID variables
 pid = [
@@ -178,7 +165,8 @@ recoil_kinematics = [
     'pRecoilTheta',
     'pxRecoil',
     'pyRecoil',
-    'pzRecoil']
+    'pzRecoil'
+]
 
 #: Flight info variables
 flight_info = ['flightTime',
@@ -257,7 +245,8 @@ momentum_uncertainty = [
     'E_uncertainty',
     'pxErr',
     'pyErr',
-    'pzErr']
+    'pzErr'
+]
 
 #: Replacement for RecoStats tool
 reco_stats = [

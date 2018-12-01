@@ -38,7 +38,7 @@ skimOutputUdst(skimCode, EtabList, path=BottomoniumEtabskimpath)
 summaryOfLists(EtabList, path=BottomoniumEtabskimpath)
 
 
-setSkimLogging(skim_path=BottomoniumEtabskimpath)
+setSkimLogging(path=BottomoniumEtabskimpath)
 process(BottomoniumEtabskimpath)
 
 # print out the summary

@@ -30,7 +30,8 @@ namespace Belle2 {
       m_nSciHits(0),
       m_triggerCTime(0),
       m_triggerUTime(0),
-      m_windowStart(0)
+      m_windowStart(0),
+      m_triggerCTimeOfPreviousEvent(0)
     {}
 
     /**

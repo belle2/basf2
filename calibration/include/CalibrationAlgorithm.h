@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 #include <utility>
 #include <list>
 #include <TClonesArray.h>
@@ -171,6 +172,9 @@ namespace Belle2 {
     /// Get the complete IoV from inspection of collected data
     IntervalOfValidity getIovFromAllData() const;
 
+    /// Fill the mapping of ExpRun -> Files
+    void fillRunToInputFilesMap();
+
     /// Get the granularity of collected data
     std::string getGranularity() const {return m_granularityOfData;};
 
@@ -232,6 +236,8 @@ namespace Belle2 {
     template<class T>
     std::shared_ptr<T> getObjectPtr(std::string name)
     {
+      if (m_runsToInputFiles.size() == 0)
+        fillRunToInputFilesMap();
       return getObjectPtr<T>(name, m_data.getRequestedRuns());
     }
 
@@ -282,6 +288,9 @@ namespace Belle2 {
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;
 
+    /// Map of Runs to input files. Gets filled when you call getRunRangeFromAllData, gets cleared when setting input files again
+    std::map<Calibration::ExpRun, std::vector<std::string>> m_runsToInputFiles;
+
     /// Granularity of input data. This only changes when the input files change so it isn't specific to an execution
     std::string m_granularityOfData;
 
@@ -325,46 +334,58 @@ namespace Belle2 {
     // Construct the TDirectory names where we expect our objects to be
     std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
 
-    for (const auto& fileName : m_inputFileNames) {
-      RunRange* runRangeData;
-      //Open TFile to get the objects
-      std::unique_ptr<TFile> f;
-      f.reset(TFile::Open(fileName.c_str(), "READ"));
-      runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
-
-      if (strcmp(getGranularity().c_str(), "run") == 0) {
-        if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-          B2DEBUG(100, "Found requested ExpRun in file: " << fileName);
-          // Loop over runs in data and check if they exist in our requested ones, then add if they do
-          for (auto expRunData : runRangeData->getExpRunSet()) {
-            for (auto expRunRequested : requestedRuns) {
-              if (expRunData == expRunRequested) {
-                // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
-                std::string objDirName = getFullObjectPath(name, expRunData);
-                TDirectory* objDir = f->GetDirectory(objDirName.c_str());
-                // Find all the objects inside, there may be more than one
-                for (auto key : * (objDir->GetListOfKeys())) {
-                  std::string keyName = key->GetName();
-                  B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
-                  T* objOther = (T*)objDir->Get(keyName.c_str());
-                  if (objOther) {
-                    if (mergedEmpty) {
-                      mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
-                      mergedObjPtr->SetDirectory(0);
-                      mergedEmpty = false;
-                    } else {
-                      list.Add(objOther);
-                    }
-                  }
+    if (strcmp(getGranularity().c_str(), "run") == 0) {
+      // Loop over our runs requested for the right files
+      for (auto expRunRequested : requestedRuns) {
+        // Find the relevant files for this ExpRun
+        auto searchFiles = m_runsToInputFiles.find(expRunRequested);
+        if (searchFiles == m_runsToInputFiles.end()) {
+          B2WARNING("No input file found with data collected from run "
+                    "(" << expRunRequested.first << "," << expRunRequested.second << ")");
+          continue;
+        } else {
+          auto files = searchFiles->second;
+          for (auto fileName : files) {
+            RunRange* runRangeData;
+            //Open TFile to get the objects
+            std::unique_ptr<TFile> f;
+            f.reset(TFile::Open(fileName.c_str(), "READ"));
+            runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+            // Check that nothing went wrong in the mapping and that this file definitely contains this run's data
+            auto runSet = runRangeData->getExpRunSet();
+            if (runSet.find(expRunRequested) == runSet.end()) {
+              B2WARNING("Something went wrong with the mapping of ExpRun -> Input Files. "
+                        "(" << expRunRequested.first << "," << expRunRequested.second << ") not in " << fileName);
+            }
+            // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
+            std::string objDirName = getFullObjectPath(name, expRunRequested);
+            TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            // Find all the objects inside, there may be more than one
+            for (auto key : * (objDir->GetListOfKeys())) {
+              std::string keyName = key->GetName();
+              B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
+              T* objOther = (T*)objDir->Get(keyName.c_str());
+              if (objOther) {
+                if (mergedEmpty) {
+                  mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
+                  mergedObjPtr->SetDirectory(0);
+                  mergedEmpty = false;
+                } else {
+                  list.Add(objOther);
                 }
               }
             }
+            if (!mergedEmpty)
+              mergedObjPtr->Merge(&list);
+            list.Clear();
           }
-        } else {
-          B2DEBUG(100, "No overlapping data found in file: " << fileName);
-          continue;
         }
-      } else {
+      }
+    } else {
+      for (auto fileName : m_inputFileNames) {
+        //Open TFile to get the objects
+        std::unique_ptr<TFile> f;
+        f.reset(TFile::Open(fileName.c_str(), "READ"));
         Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
         std::string objDirName = getFullObjectPath(name, allGranExpRun);
         std::string objPath = objDirName + "/" + name + "_1";
@@ -379,10 +400,10 @@ namespace Belle2 {
             list.Add(objOther);
           }
         }
+        if (!mergedEmpty)
+          mergedObjPtr->Merge(&list);
+        list.Clear();
       }
-      if (!mergedEmpty)
-        mergedObjPtr->Merge(&list);
-      list.Clear();
     }
     dir->cd();
     objOutputPtr = mergedObjPtr;

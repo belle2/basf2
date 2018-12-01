@@ -12,8 +12,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <string>
 
 namespace Belle2 {
@@ -41,6 +43,8 @@ namespace Belle2 {
     private:
       /**< Required input for PXDRawHit */
       StoreArray<PXDRawHit> m_storeRawHits;
+      /**< Required input for PXD Daq Status */
+      StoreObjPtr<PXDDAQStatus> m_storeDaqStatus;
       /** Output array for PXDDigits. */
       StoreArray<PXDDigit> m_storeDigits;
 

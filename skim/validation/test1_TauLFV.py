@@ -18,12 +18,28 @@ import os.path
 from basf2 import *
 from modularAnalysis import *
 from skimExpertFunctions import *
+from stdCharged import *
+from stdPhotons import *
+from stdPi0s import *
+from stdV0s import *
+from skim.standardlists.lightmesons import *
 
 fileList = ['../TauLFV.dst.root']
 
 inputMdstList('MC9', fileList)
 
-# Hadronic B0 skim
+stdPi('loose')
+stdK('loose')
+stdPr('loose')
+stdE('loose')
+stdMu('loose')
+stdPhotons('loose')
+stdPi0s('loose')
+loadStdSkimPi0()
+stdKshorts()
+loadStdLightMesons()
+
+# TauLFV skim
 from skim.taupair import *
 tauList = TauLFVList(1)
 skimOutputUdst('../TauLFV.udst.root', tauList)

@@ -101,8 +101,8 @@ namespace Belle2 {
     int  m_nEvent;
     //! Clustering option
     int _Clustering;
-    //! Object of Clustering Util
-    TrgEclCluster* obj_cluster;
+
+
 
   };
 

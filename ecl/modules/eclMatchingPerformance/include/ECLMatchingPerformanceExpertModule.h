@@ -66,105 +66,105 @@ namespace Belle2 {
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
 
-    ECL::ECLNeighbours* m_eclNeighbours1x1; /**< Neighbour map of 1 crystal */
-    ECL::ECLNeighbours* m_eclNeighbours3x3; /**< Neighbour map of 9 crystals */
-    ECL::ECLNeighbours* m_eclNeighbours5x5; /**< Neighbour map of 25 crystals */
+    ECL::ECLNeighbours* m_eclNeighbours1x1{nullptr}; /**< Neighbour map of 1 crystal */
+    ECL::ECLNeighbours* m_eclNeighbours3x3{nullptr}; /**< Neighbour map of 9 crystals */
+    ECL::ECLNeighbours* m_eclNeighbours5x5{nullptr}; /**< Neighbour map of 25 crystals */
 
-    TFile* m_outputFile; /**< output root file */
-    TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
+    TFile* m_outputFile{nullptr}; /**< output root file */
+    TTree* m_dataTree{nullptr}; /**< root tree with all output data. Tree will be written to the output root file */
 
     /** properties of a reconstructed track */
     ParticleProperties m_trackProperties;
 
     /** Experiment number */
-    int m_iExperiment;
+    int m_iExperiment = 0;
 
     /** Run number */
-    int m_iRun;
+    int m_iRun = 0;
 
     /** Event number */
-    int m_iEvent;
+    int m_iEvent = 0;
 
     /** Track Multiplicity */
-    int m_trackMultiplicity;
+    int m_trackMultiplicity = 0;
 
     /** pValue of track fit */
-    double m_pValue;
+    double m_pValue = 0.0;
 
     /** charge */
-    int m_charge;
+    int m_charge = 0;
 
     /** signed distance of the track to the IP in the r-phi plane */
-    double m_d0;
+    double m_d0 = 0.0;
 
     /** distance of the track to the IP along the beam axis */
-    double m_z0;
+    double m_z0 = 0.0;
 
     /** boolean for match between track and ECL cluster */
-    int m_matchedToECLCluster;
+    int m_matchedToECLCluster = 0;
 
     /** hypothesis of matched ECL cluster */
-    int m_hypothesisOfMatchedECLCluster;
+    int m_hypothesisOfMatchedECLCluster = 0;
 
     /** minimal distance between track and ECLCluster */
-    double m_distance;
+    double m_distance = 0.0;
 
     /** length of track in ECL */
-    double m_trackLength;
+    double m_trackLength = 0.0;
 
     /** energy loss of track in ECL */
-    double m_deposited_energy;
+    double m_deposited_energy = 0.0;
 
     /** minimal distance between track at center of ECL and ECLCalDigit with at least 10 MeV */
-    double m_innerdistance;
+    double m_innerdistance = 0.0;
 
     /** boolean for match between track and ECLCalDigit cell */
-    int m_matchedTo1x1Neighbours;
+    int m_matchedTo1x1Neighbours = 0;
 
     /** boolean for match between track and one of 9 ECLCalDigit neighbouring cells */
-    int m_matchedTo3x3Neighbours;
+    int m_matchedTo3x3Neighbours = 0;
 
     /** boolean for match between track and one of 25 ECLCalDigit neighbouring cells */
-    int m_matchedTo5x5Neighbours;
+    int m_matchedTo5x5Neighbours = 0;
 
     /** boolean for match between track and neighbouring cell with lower phi value */
-    int m_matchedToDecreasedPhi;
+    int m_matchedToDecreasedPhi = 0;
 
     /** boolean for match between track and neighbouring cell with higher phi value */
-    int m_matchedToIncreasedPhi;
+    int m_matchedToIncreasedPhi = 0;
 
     /** boolean for match between track and neighbouring cell with lower phi value */
-    int m_matchedToDecreasedTheta;
+    int m_matchedToDecreasedTheta = 0;
 
     /** boolean for match between track and neighbouring cell with higher phi value */
-    int m_matchedToIncreasedTheta;
+    int m_matchedToIncreasedTheta = 0;
 
     /** boolean for match between track and neighbouring cell with lower phi value */
-    int m_matchedToDecreasedPhiDecreasedTheta;
+    int m_matchedToDecreasedPhiDecreasedTheta = 0;
 
     /** boolean for match between track and neighbouring cell with higher phi value */
-    int m_matchedToIncreasedPhiDecreasedTheta;
+    int m_matchedToIncreasedPhiDecreasedTheta = 0;
 
     /** boolean for match between track and neighbouring cell with lower phi value */
-    int m_matchedToDecreasedPhiIncreasedTheta;
+    int m_matchedToDecreasedPhiIncreasedTheta = 0;
 
     /** boolean for match between track and neighbouring cell with higher phi value */
-    int m_matchedToIncreasedPhiIncreasedTheta;
+    int m_matchedToIncreasedPhiIncreasedTheta = 0;
 
     /** number of times track enters ECL */
-    int m_enter;
+    int m_enter = 0;
 
     /** number of times track leaves ECL */
-    int m_exit;
+    int m_exit = 0;
 
     /** cell id of first crystal that is entered by track */
-    int m_enteringcellid;
+    int m_enteringcellid = 0;
 
     /** theta of first crystal that is entered by track */
-    double m_enteringcelltheta;
+    double m_enteringcelltheta = 0.0;
 
     /** number of degrees of freedom of the track (should be #CDC hits - 5 (helix parameters)) */
-    int m_ndf;
+    int m_ndf = 0;
 
     /**
      * Sets all variables to the default value, here -999.

@@ -39,7 +39,7 @@ skimOutputUdst(skimCode, darklist, path=darkskimpath)
 summaryOfLists(darklist, path=darkskimpath)
 
 # suppress noisy modules, and then process
-setSkimLogging(skim_path=darkskimpath)
+setSkimLogging(path=darkskimpath)
 process(darkskimpath)
 
 # print out the summary

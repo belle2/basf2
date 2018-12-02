@@ -47,32 +47,25 @@ namespace Belle2 {
       m_TwoComponentSavedChi2[2] = -1;  /**< Offline two component chi2 FT=2*/
       m_TwoComponentTime = 1;  /**< Offline two component time */
       m_TwoComponentBaseline = 1;  /**< Offline two component baseline */
-      m_IsData = false;  /**< Data = true MC = false */
     }
 
     /** Constructor for data*/
-    ECLDsp(int CellId, int NADCPoints, int* ADCData, bool flag)
+    ECLDsp(int CellId, int NADCPoints, int* ADCData)
     {
       m_CellId     = CellId;
       m_DspAVector.assign(ADCData, ADCData + NADCPoints);
-      m_IsData = flag;
     }
 
     /** Constructor for data*/
-    ECLDsp(int CellId, std::vector<int> ADCData, bool flag)
+    ECLDsp(int CellId, std::vector<int> ADCData)
     {
       m_CellId     = CellId;
       m_DspAVector = ADCData;
-      m_IsData = flag;
     }
 
     /*! Set Cell ID
      */
     void setCellId(int CellId) { m_CellId = CellId; }
-
-    /*! Set Data or MC flag. MC = false. Data = true
-     */
-    void setIsData(bool flag) { m_IsData = flag; }
 
     /*! Set Dsp array
      */
@@ -137,11 +130,6 @@ namespace Belle2 {
      * @return cell ID
      */
     int getCellId() const { return m_CellId; }
-
-    /*! Get Data or MC flag
-     * @return Data or MC flag. MC=false Data=true;
-     */
-    bool getIsData() const { return m_IsData; }
 
     /*! Get Dsp Array
      * @return Dsp Array 0~31
@@ -227,7 +215,6 @@ namespace Belle2 {
   private:
 
     int m_CellId;      /**< Cell ID */
-    bool m_IsData;      /**< Data = true, MC = false*/
     double m_TwoComponentTotalAmp; /**< Two comp total amp */
     double m_TwoComponentHadronAmp;   /**< Two comp hadron amp */
     double m_TwoComponentDiodeAmp;   /**< Two comp diode amp */
@@ -244,7 +231,8 @@ namespace Belle2 {
     /*3 Add two component variables*/
     /*4 Add diode and pile-up photon offline fit hypothesis*/
     /*5 Added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried */
-    ClassDef(ECLDsp, 5);
+    /*5 removed IsData member */
+    ClassDef(ECLDsp, 6);
 
   };
 } // end namespace Belle2

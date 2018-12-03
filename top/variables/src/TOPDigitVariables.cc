@@ -424,7 +424,8 @@ namespace Belle2 {
         }
         return count;
       }
-    }
+    } // TOPVariable
+
     VARIABLE_GROUP("TOP Calibration");
     REGISTER_VARIABLE("topDigitCount", TOPVariable::topDigitCount,
                       "[calibration] The number of TOPDigits in the module to which the track was extrapolated");
@@ -476,5 +477,5 @@ namespace Belle2 {
                       "[calibration] The number of all photons in the given slot");
     REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPVariable::TOPGoodPhotonsInSlot,
                       "[calibration] The number of good photons in the given slot");
-  }
-}
+  } // Variable
+} // Belle2

@@ -152,12 +152,13 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
       fold->SetParameter(p, m_tw_old[ib][p]);
     }
 
-    m_h1[ib]->Add(fold);
+
     if (m_twParamMode == 0) {
       TF1* func = new TF1("func", "[0]+[1]/sqrt(x)", 0, 500);
       func->SetParameters(-4, 28);
       m_h1[ib]->Fit("func", "MQ", "", 20, 150);
     } else if (m_twParamMode == 1) {
+      m_h1[ib]->Add(fold);
       fitToExponentialFunc(m_h1[ib]);
     } else {
       B2FATAL("Mode " << m_twParamMode << " is not available, please check again");

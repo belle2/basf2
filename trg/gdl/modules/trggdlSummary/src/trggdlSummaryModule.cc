@@ -195,6 +195,7 @@ void TRGGDLSummaryModule::event()
 
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
 
+  /*
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
@@ -209,7 +210,8 @@ void TRGGDLSummaryModule::event()
   } else {
     tt = TRGSummary::TTYP_NONE;
   }
+  */
 
-  GDLResult->setTimType(tt);
+  GDLResult->setTimType((TRGSummary::ETimingType)gtt);
 
 }

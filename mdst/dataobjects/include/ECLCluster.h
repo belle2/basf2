@@ -86,8 +86,8 @@ namespace Belle2 {
       m_logEnergy(-5.),
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.),
-      m_ClusterHadronIntensity(0.),
       m_PulseShapeDiscriminationMVA(0.5),
+      m_ClusterHadronIntensity(0.),
       m_NumberOfHadronDigits(0.) {}
 
     /** Set m_isTrack true if the cluster matches with a track. */

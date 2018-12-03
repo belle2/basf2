@@ -93,12 +93,23 @@ void TRGGDLDQMModule::defineHisto()
 
   h_c8_gdlL1TocomL1  = new TH1I("hGDL_gdlL1TocomL1",  "comL1 - gdlL1 [clk8ns]", 100, 0, 100);
   h_c8_gdlL1TocomL1->GetXaxis()->SetTitle("clk8ns");
+
+  h_c8_topTogdlL1    = new TH1I("hGDL_topTogdlL1",    "gdlL1 - top_timing [clk8ns]", 700, 0, 700);
+  h_c8_topTogdlL1->GetXaxis()->SetTitle("clk8ns");
   h_c8_eclTogdlL1    = new TH1I("hGDL_eclTogdlL1",    "gdlL1 - ecl_timing [clk8ns]", 500, 0, 500);
   h_c8_eclTogdlL1->GetXaxis()->SetTitle("clk8ns");
+  h_c8_cdcTogdlL1    = new TH1I("hGDL_cdcTogdlL1",    "gdlL1 - cdc_timing [clk8ns]", 700, 0, 700);
+  h_c8_cdcTogdlL1->GetXaxis()->SetTitle("clk8ns");
+
   h_c8_ecl8mToGDL    = new TH1I("hGDL_ecl8mToGDL",    "gdlIn^{8MHz} - ecl_timing [clk8ns]", 500, 0, 500);
   h_c8_ecl8mToGDL->GetXaxis()->SetTitle("clk8ns");
+  h_c8_topToGDL      = new TH1I("hGDL_topToGDL",      "gdlIn - top_timing [clk8ns]", 700, 0, 700);
+  h_c8_topToGDL->GetXaxis()->SetTitle("clk8ns");
   h_c8_eclToGDL      = new TH1I("hGDL_eclToGDL",      "gdlIn - ecl_timing [clk8ns]", 500, 0, 500);
   h_c8_eclToGDL->GetXaxis()->SetTitle("clk8ns");
+  h_c8_cdcToGDL      = new TH1I("hGDL_cdcToGDL",      "gdlIn - cdc_timing [clk8ns]", 700, 0, 700);
+  h_c8_cdcToGDL->GetXaxis()->SetTitle("clk8ns");
+
   h_c2_cdcTocomL1 = new TH1I("hGDL_cdcTocomL1", "comL1 - cdc_timing [clk2ns]", 520, 0, 5200);
   h_c2_cdcTocomL1->GetXaxis()->SetTitle("clk2ns");
   h_ns_cdcTocomL1 = new TH1D("hGDL_ns_cdcTocomL1", "comL1 - cdc_timing [ns]", 2600, 0, 10400);
@@ -107,17 +118,20 @@ void TRGGDLDQMModule::defineHisto()
   h_ns_cdcTogdlL1 = new TH1D("hGDL_ns_cdcTogdlL1", "gdlL1 - cdc_timing [ns]", 2600, 0, 10400);
   h_ns_cdcTogdlL1->GetXaxis()->SetTitle("ns");
   h_ns_cdcTogdlL1->GetYaxis()->SetTitle("evt / 4ns");
+
   h_ns_topToecl = new TH1D("hGDL_ns_topToecl", "ecl_timing - top_timing [ns]", 800, 0, 4000);
   h_ns_topToecl->GetXaxis()->SetTitle("ns");
   h_ns_topToecl->GetYaxis()->SetTitle("evt / 5ns");
   h_ns_topTocdc = new TH1D("hGDL_ns_topTocdc", "cdc_timing - top_timing [ns]", 800, 0, 4000);
   h_ns_topTocdc->GetXaxis()->SetTitle("ns");
   h_ns_topTocdc->GetYaxis()->SetTitle("evt / 5ns");
-  h_c2_cdcToecl = new TH1I("hGDL_cdcToecl", "ecl_timing - cdc_timing [clk2ns]", 1000, 0, 2000);
-  h_c2_cdcToecl->GetXaxis()->SetTitle("clk2ns");
   h_ns_cdcToecl = new TH1D("hGDL_ns_cdcToecl", "ecl_timing - cdc_timing [ns]", 2000, 0, 4000);
   h_ns_cdcToecl->GetXaxis()->SetTitle("ns");
   h_ns_cdcToecl->GetYaxis()->SetTitle("evt / 2ns");
+
+  h_c2_cdcToecl = new TH1I("hGDL_cdcToecl", "ecl_timing - cdc_timing [clk2ns]", 1000, 0, 2000);
+  h_c2_cdcToecl->GetXaxis()->SetTitle("clk2ns");
+
   TrgBit tb;
   h_itd = new TH1I("hGDL_itd", "itd", tb.getNumOfInputs() + 1, -1, tb.getNumOfInputs());
   h_ftd = new TH1I("hGDL_ftd", "ftd", tb.getNumOfOutputs() + 1, -1, tb.getNumOfOutputs());
@@ -170,9 +184,13 @@ void TRGGDLDQMModule::beginRun()
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1->Reset();
+  h_c8_topTogdlL1->Reset();
   h_c8_eclTogdlL1->Reset();
+  h_c8_cdcTogdlL1->Reset();
   h_c8_ecl8mToGDL->Reset();
+  h_c8_topToGDL->Reset();
   h_c8_eclToGDL->Reset();
+  h_c8_cdcToGDL->Reset();
   h_c2_cdcTocomL1->Reset();
   h_ns_cdcTocomL1->Reset();
   h_ns_cdcTogdlL1->Reset();
@@ -205,11 +223,13 @@ void TRGGDLDQMModule::initialize()
   }
   _e_timtype = 0;
   _e_gdll1rvc = 0;
-  _e_coml1rvc    = 0;
+  _e_coml1rvc = 0;
+  _e_toptiming = 0;
   _e_ecltiming = 0;
   _e_cdctiming = 0;
+  _e_toprvc  = 0;
   _e_eclrvc  = 0;
-  _e_toptiming = 0;
+  _e_cdcrvc  = 0;
   for (int i = 0; i < 10; i++) {
     ee_psn[i] = {0};
     ee_ftd[i] = {0};
@@ -219,10 +239,12 @@ void TRGGDLDQMModule::initialize()
     if (strcmp(LeafNames[i], "timtype") == 0)  _e_timtype  = LeafBitMap[i];
     if (strcmp(LeafNames[i], "gdll1rvc") == 0) _e_gdll1rvc = LeafBitMap[i];
     if (strcmp(LeafNames[i], "coml1rvc") == 0) _e_coml1rvc = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "toptiming") == 0)_e_toptiming = LeafBitMap[i];
     if (strcmp(LeafNames[i], "ecltiming") == 0)_e_ecltiming = LeafBitMap[i];
     if (strcmp(LeafNames[i], "cdctiming") == 0)_e_cdctiming = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "toprvc") == 0)   _e_toprvc   = LeafBitMap[i];
     if (strcmp(LeafNames[i], "eclrvc") == 0)   _e_eclrvc   = LeafBitMap[i];
-    if (strcmp(LeafNames[i], "toptiming") == 0)_e_toptiming = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "cdcrvc") == 0)   _e_cdcrvc   = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn0") == 0)       ee_psn[0] = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn1") == 0)       ee_psn[1] = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn2") == 0)       ee_psn[2] = LeafBitMap[i];
@@ -298,11 +320,19 @@ void TRGGDLDQMModule::endRun()
     c1.Update();
     h_c8_gdlL1TocomL1->Draw();
     c1.Update();
+    h_c8_topTogdlL1->Draw();
+    c1.Update();
     h_c8_eclTogdlL1->Draw();
+    c1.Update();
+    h_c8_cdcTogdlL1->Draw();
     c1.Update();
     h_c8_ecl8mToGDL->Draw();
     c1.Update();
+    h_c8_topToGDL->Draw();
+    c1.Update();
     h_c8_eclToGDL->Draw();
+    c1.Update();
+    h_c8_cdcToGDL->Draw();
     c1.Update();
     h_c2_cdcTocomL1->Draw();
     c1.Update();
@@ -389,17 +419,19 @@ void TRGGDLDQMModule::event()
     if (LeafBitMap[leaf] != -1)h_0->GetYaxis()->SetBinLabel(LeafBitMap[leaf] + 1, LeafNames[LeafBitMap[leaf]]);
   }
 
-
-  int coml1rvc    = 0;
-  int c1_ecl_timing = 0;
-  int c2_cdc_timing = 0;
-  int eclrvc  = 0;
-  int c1_top_timing = 0;
-  coml1rvc      = h_0->GetBinContent(1,        1 + _e_coml1rvc);
-  c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + _e_ecltiming);
-  c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + _e_cdctiming) / 2;
-  eclrvc        = h_0->GetBinContent(1,        1 + _e_eclrvc);
-  c1_top_timing = h_0->GetBinContent(n_clocks, 1 + _e_toptiming);
+  int coml1rvc      = h_0->GetBinContent(1,        1 + _e_coml1rvc);
+  int toprvc        = h_0->GetBinContent(1,        1 + _e_toprvc);
+  int eclrvc        = h_0->GetBinContent(1,        1 + _e_eclrvc);
+  int cdcrvc        = h_0->GetBinContent(1,        1 + _e_cdcrvc);
+  int c1_top_timing = h_0->GetBinContent(n_clocks, 1 + _e_toptiming);
+  int c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + _e_ecltiming);
+  int c1_cdc_timing = h_0->GetBinContent(n_clocks, 1 + _e_cdctiming);
+  int c8_top_timing = c1_top_timing >> 3;
+  int c2_top_timing = c1_top_timing >> 1;
+  int c8_ecl_timing = c1_ecl_timing >> 3;
+  int c2_ecl_timing = c1_ecl_timing >> 1;
+  int c8_cdc_timing = c1_cdc_timing >> 3;
+  int c2_cdc_timing = c1_cdc_timing >> 1;
 
   if (begin_run) {
     B2DEBUG(20, "nconf(" << nconf
@@ -414,10 +446,7 @@ void TRGGDLDQMModule::event()
   int ftd[3] = {0};
   int itd[5] = {0};
   int timtype  = 0;
-  int c8_ecl_timing   = (c1_ecl_timing >> 3);
-  int c2_ecl_timing   = (c1_ecl_timing >> 1);
 
-  int c2_top_timing = c1_top_timing >> 1;
 
   int gdll1_rvc = h_0->GetBinContent(h_0->GetXaxis()->FindBin(n_clocks - 0.5), 1 + _e_gdll1rvc);
 
@@ -491,15 +520,25 @@ void TRGGDLDQMModule::event()
   int gdlL1TocomL1 = gdll1_rvc < coml1rvc ? coml1rvc - gdll1_rvc : (coml1rvc + 1280) - gdll1_rvc;
   h_c8_gdlL1TocomL1->Fill(gdlL1TocomL1);
 
+  int topTogdlL1 = gdll1_rvc < c8_top_timing ? (gdll1_rvc + 1280) - c8_top_timing : gdll1_rvc - c8_top_timing;
+  h_c8_topTogdlL1->Fill(topTogdlL1);
+
   int eclTogdlL1 = gdll1_rvc < c8_ecl_timing ? (gdll1_rvc + 1280) - c8_ecl_timing : gdll1_rvc - c8_ecl_timing;
   h_c8_eclTogdlL1->Fill(eclTogdlL1);
+
+  int cdcTogdlL1 = gdll1_rvc < c8_cdc_timing ? (gdll1_rvc + 1280) - c8_cdc_timing : gdll1_rvc - c8_cdc_timing;
+  h_c8_cdcTogdlL1->Fill(cdcTogdlL1);
 
   int c127_ecl_timing = c8_ecl_timing & (((1 << 7) - 1) << 4);
   int fit8mToGDL = c127_ecl_timing < eclrvc ? eclrvc - c127_ecl_timing : (eclrvc + 1280) - c127_ecl_timing;
   h_c8_ecl8mToGDL->Fill(fit8mToGDL);
 
+  int topToGDL = c8_top_timing < toprvc ? toprvc - c8_top_timing : (toprvc + 1280) - c8_top_timing;
+  h_c8_topToGDL->Fill(topToGDL);
   int eclToGDL = c8_ecl_timing < eclrvc ? eclrvc - c8_ecl_timing : (eclrvc + 1280) - c8_ecl_timing;
   h_c8_eclToGDL->Fill(eclToGDL);
+  int cdcToGDL = c8_cdc_timing < cdcrvc ? cdcrvc - c8_cdc_timing : (cdcrvc + 1280) - c8_cdc_timing;
+  h_c8_cdcToGDL->Fill(cdcToGDL);
 
   int c2_comL1 = coml1rvc << 2;
   int c2_gdlL1 = gdll1_rvc << 2;

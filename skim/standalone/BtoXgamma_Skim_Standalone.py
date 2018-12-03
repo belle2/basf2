@@ -16,12 +16,9 @@ from stdV0s import *
 from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from stdPhotons import *
-from skimExpertFunctions import *
-set_log_level(LogLevel.INFO)
+from skimExpertFunctions import setSkimLogging, encodeSkimName
+
 gb2_setuprel = 'release-02-00-01'
-import sys
-import os
-import glob
 
 
 skimCode = encodeSkimName('BtoXgamma')
@@ -30,28 +27,30 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
+path = Path()
+inputMdstList('MC9', fileList, path=path)
+stdPi0s('loose', path=path)
+stdPhotons('tight', path=path)  # also builds loose list
+loadStdSkimPhoton(path=path)
+loadStdSkimPi0(path=path)
+stdPi('loose', path=path)
+stdK('loose', path=path)
+stdK('95eff', path=path)
+stdPi('95eff', path=path)
+stdKshorts(path=path)
+loadStdLightMesons(path=path)
 
-inputMdstList('MC9', fileList)
-stdPi0s('loose')
-stdPhotons('tight')  # also builds loose list
-loadStdSkimPhoton()
-loadStdSkimPi0()
-stdPi('loose')
-stdK('loose')
-stdK('95eff')
-stdPi('95eff')
-stdKshorts()
-loadStdLightMesons()
-
+cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=path)
+reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=path)
 # EWP Skim
 from skim.ewp import B2XgammaList
-XgammaList = B2XgammaList()
-skimOutputUdst(skimCode, XgammaList)
-summaryOfLists(XgammaList)
+XgammaList = B2XgammaList(path=path)
+skimOutputUdst(skimCode, XgammaList, path=path)
+summaryOfLists(XgammaList, path=path)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=path)
+process(path=path)
 
 # print out the summary
 print(statistics)

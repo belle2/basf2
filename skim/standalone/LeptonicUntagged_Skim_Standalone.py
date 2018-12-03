@@ -57,7 +57,7 @@ skimOutputUdst(skimCode, lepList, path=leppath)
 summaryOfLists(lepList, path=leppath)
 
 
-setSkimLogging(skim_path=leppath)
+setSkimLogging(path=leppath)
 process(leppath)
 
 # print out the summary

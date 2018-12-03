@@ -131,13 +131,33 @@ Here is a list of variables that returns extra info of a given particle:
 .. b2-variables::
    :group: MetaFunctions   
 
-MC Matching
-~~~~~~~~~~~
+MC matching and MC truth
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of truth-matching variables:
+Here is a list of MC truth-related variables.
+For some variables, you will need to run truth matching in order to get sensible results.
+
+.. code-block:: python
+
+    from modularAnalysis import matchMCTruth
+    matchMCTruth("B0:myCandidates")  # for example
+
+
+Variables will also work on generator-level particles:
+
+.. code-block:: python
+
+    from modularAnalysis import fillParticleListFromMC
+    fillParticleListFromMC("B0:generator", "") # the generator-level B particles
+
 
 .. b2-variables::
-   :group: MC Matching
+   :group: MC matching and MC truth
+
+
+.. b2-variables::
+   :group: MC particle seen in subdetectors
+
 
 Daughter info
 ~~~~~~~~~~~~~
@@ -148,7 +168,7 @@ Here is a list of variables getting info from particle's daughters:
    :group: DirectDaughterInfo
 
 KLM Cluster and :math:`K_{L}^0` Identification
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 
@@ -223,3 +243,65 @@ They have a *[Calibration]* pretag.
    :group: ECL trigger calibration
 .. b2-variables::
    :group: KLM Calibration | PID
+
+Variables Collections and Lists
+===============================
+
+To avoid very long lists of variable names in `variablesToNtuple <modularAnalysis.variablesToNtuple>`,
+it is possible to use collections of variables or lists of variables instead.
+
+Lists of variables are just python lists of variables names. 
+One can use the list in the steering file as follows:
+
+.. code:: python
+
+  # Defining the list
+  my_list = ['p','E']
+
+  # Passing it as an argumet to variablesToNtuple
+  modular_analusis.variablesToNtuple(variables=my_list,
+                                     ...)
+
+It is also possible to use `variableCollection`. Name of the variable collection can
+be threated as a variable name, and hence one would have the following syntax in the steering file:
+
+.. code:: python
+
+  # Defining the collection
+  variables.utils.add_collection(['p','E'],"my_collection")
+
+  # Passing it as an argumet to variablesToNtuple
+  modular_analusis.variablesToNtuple(variables=['my_collection'],
+                                     ...)
+
+There are several predefined lists of variables and for each predefined list it exists a collection with the same name:
+
+.. automodule:: variables.collections
+   :members:
+
+Operations with variable lists
+==============================
+
+It is possible to create new variable lists using meta-variables. 
+For example, one can define list of kinematical variables in LAB frame and create another lists of kinematic variabels 
+in CMS using ``useCMSFrame(variable)`` meta-variable:
+
+.. code:: python
+
+  # Replacement to Kinematics tool
+  kinematics = ['px',
+                'py',
+                'pz',
+                'pt',
+                'p',
+                'E']
+  # Kinematic variables in CMS
+  ckm_kinematics = wrap_list(kinematics,
+                             "useCMSFrame(variable)",
+                             "CMS")
+
+Functions for list operations are stored below.
+
+.. automodule:: variables.utils
+   :members:
+

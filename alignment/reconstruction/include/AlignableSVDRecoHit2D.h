@@ -32,7 +32,7 @@ namespace Belle2 {
     virtual ~AlignableSVDRecoHit2D() {}
 
     /** Creating a deep copy of this hit. */
-    genfit::AbsMeasurement* clone() const
+    genfit::AbsMeasurement* clone() const override
     {
       return new AlignableSVDRecoHit2D(*this);
     }
@@ -68,11 +68,11 @@ namespace Belle2 {
      * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
      * #columns must match vector<int>.size().
      */
-    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 
   private:
 
     /** ROOT Macro.*/
-    ClassDef(AlignableSVDRecoHit2D, 4);
+    ClassDefOverride(AlignableSVDRecoHit2D, 4);
   };
 }

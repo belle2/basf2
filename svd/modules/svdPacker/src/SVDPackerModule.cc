@@ -272,7 +272,7 @@ void SVDPackerModule::event()
     } // end APV loop
 
     // here goes FADC trailer
-    m_FADCTrailer.FTBFlags = 0x001f;
+    m_FADCTrailer.FTBFlags = 0;
     m_FADCTrailer.emPipeAddr = 0;
     m_FADCTrailer.fifoErrOR = 0;
     m_FADCTrailer.frameErrOR = 0;

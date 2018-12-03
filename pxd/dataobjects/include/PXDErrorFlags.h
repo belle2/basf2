@@ -36,6 +36,7 @@ namespace Belle2 {
        */
       enum EPXDErrMask : uint64_t {
         c_NO_ERROR = 0ull,
+        c_ALL_ERROR = ~0ull,
         //
         c_EVENT_STRUCT = 1ull << 0,
         c_FRAME_TNR_MM = 1ull << 1,

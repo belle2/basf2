@@ -70,6 +70,8 @@ def checkFile(args):
         stats['compression_algorithm'] = root_file.GetCompressionAlgorithm()
         stats['compression_level'] = root_file.GetCompressionLevel()
         stats['compression_factor'] = root_file.GetCompressionFactor()
+        size_kib = root_file.GetSize() / 1024.0
+        stats['filesize_kib'] = size_kib
 
         checks_passed['contains_tree'] = False
         tree = root_file.Get('tree')
@@ -101,6 +103,13 @@ def checkFile(args):
             if not checks_passed['entries_eq_expectation']:
                 print('expected %d events, but file contains %d!' % (args.expected_no_of_events, nevents))
 
+        if args.BRANCH:
+            checks_passed['branches_present'] = all([tree.GetBranch(b) for b in args.BRANCH])
+
+        if nevents == 0 and args.expected_event_size is None:
+            print('file contains zero events')
+            return checks_passed, stats
+
         checks_passed['eventmetadata_readable'] = False
         if tree.GetEntry(0) > 0:
             eventmetadata = tree.EventMetaData.Clone()
@@ -108,12 +117,7 @@ def checkFile(args):
             checks_passed['eventmetadata_readable'] = True
             del eventmetadata
 
-        if args.BRANCH:
-            checks_passed['branches_present'] = all([tree.GetBranch(b) for b in args.BRANCH])
-
-        size_kib = root_file.GetSize() / 1024.0
         size_kib_per_event = size_kib / nevents
-        stats['filesize_kib'] = size_kib
         stats['size_per_event_kib'] = size_kib_per_event
         if args.expected_event_size is not None:
             exp_size_kib, rel_uncertainty = args.expected_event_size

@@ -16,6 +16,9 @@ import sys
 import os
 import glob
 
+# create a new path
+BottomoniumEtabskimpath = Path()
+
 skimCode = encodeSkimName('BottomoniumEtabExclusive')
 fileList = \
     [
@@ -24,19 +27,19 @@ fileList = \
     ]
 
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=BottomoniumEtabskimpath)
 
 
-stdPhotons('loose')
+stdPhotons('loose', path=BottomoniumEtabskimpath)
 # Bottomonium Skim
 from skim.quarkonium import *
-EtabList = EtabList()
-skimOutputUdst(skimCode, EtabList)
-summaryOfLists(EtabList)
+EtabList = EtabList(path=BottomoniumEtabskimpath)
+skimOutputUdst(skimCode, EtabList, path=BottomoniumEtabskimpath)
+summaryOfLists(EtabList, path=BottomoniumEtabskimpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=BottomoniumEtabskimpath)
+process(BottomoniumEtabskimpath)
 
 # print out the summary
 print(statistics)

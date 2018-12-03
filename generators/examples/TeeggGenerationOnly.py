@@ -8,7 +8,7 @@
 # Example steering file
 ########################################################
 
-from basf2 import *
+from basf2 import set_log_level, LogLevel, register_module, create_path, process, statistics
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
@@ -17,7 +17,7 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
 
 # Register the BABAYAGA.NLO module
 teegg = register_module('TeeggInput')

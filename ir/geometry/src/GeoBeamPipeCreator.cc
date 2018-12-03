@@ -186,11 +186,46 @@ namespace Belle2 {
       setColor(*logi_Lv1SUS, "#666666");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv1SUS, "phys_Lv1SUS_name", &topVolume, false, 0);
 
+
+      //----------
+      //- Lv2OutTi added for Phase 3.
       //-
       //----------
+      //get parameters from .xml file
+      if (m_config.getParameter("Lv2OutTi.L1", -1) > 0) {
+        prep = "Lv2OutTi.";
+        //
+        const int Lv2OutTi_num = 2;
+        //
+        double Lv2OutTi_Z[Lv2OutTi_num];
+        Lv2OutTi_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+        Lv2OutTi_Z[1] = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+        //
+        double Lv2OutTi_rI[Lv2OutTi_num];
+        Lv2OutTi_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+        Lv2OutTi_rI[1] = Lv2OutTi_rI[0];
+        //
+        double Lv2OutTi_rO[Lv2OutTi_num];
+        Lv2OutTi_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+        Lv2OutTi_rO[1] = Lv2OutTi_rO[0];
+        //
+        string strMat_Lv2OutTi =  m_config.getParameterStr(prep + "Material");
+        G4Material* mat_Lv2OutTi = Materials::get(strMat_Lv2OutTi);
+
+        //define geometry
+        G4Polycone* geo_Lv2OutTi = new G4Polycone("geo_Lv2OutTi_name", 0, 2 * M_PI, Lv2OutTi_num, Lv2OutTi_Z, Lv2OutTi_rI, Lv2OutTi_rO);
+        G4LogicalVolume* logi_Lv2OutTi = new G4LogicalVolume(geo_Lv2OutTi, mat_Lv2OutTi, "logi_Lv2OutTi_name");
+
+        //-   put volume
+        setColor(*logi_Lv2OutTi, "#333300");
+        new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2OutTi, "phys_Lv2OutTi_name", logi_Lv1SUS, false, 0);
+      }
+
 
       //----------
       //- Lv2OutBe
+      //-
+      //----------
 
       //get parameters from .xml file
       prep = "Lv2OutBe.";
@@ -220,8 +255,6 @@ namespace Belle2 {
       setColor(*logi_Lv2OutBe, "#333300");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2OutBe, "phys_Lv2OutBe_name", logi_Lv1SUS, false, 0);
 
-      //-
-      //----------
 
       //----------
       //- Lv2InBe

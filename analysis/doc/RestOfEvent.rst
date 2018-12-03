@@ -83,7 +83,7 @@ The order of provided particle lists matters, so preferably, the particle lists 
 
 Changing charged particle hypothesis is important, as the charged particles have different mass, and it will 
 affect the computation of the ROE mass or energy.
-Also, this method allows to study the ROE particle composition.
+Also, this method allows to study the ROE particle composition by using ``nROE_Charged(...)`` metavariable, as well as ``nROE_Photons(...)`` and ``nROE_NeutralHadrons(...)`` metavariables, see ``basf2 variables.py``.
 
 
 Accessing ROE particles
@@ -144,7 +144,7 @@ Most of ROE variables accept mask name as an argument, which allows user to comp
 variable distributions from different ROE masks. 
 For example, the ``ROE_E(cleanMask)`` variable will be computed only using only ROE particles from a corresponding mask. 
 
-Note:
+.. note::
   Hard cuts on track impact parameters :math:`d_0` and :math:`z_0` are not recommended since one can throw away tracks from long lived decaying
   particles.
 
@@ -191,6 +191,52 @@ These methods should be executed inside the ROE loop:
   mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 These advanced ROE methods can be used for further clean up from beam-induced pollution and for applications of MVA training.
+
+Nested ROE
+----------
+
+To analyze some decay channels, particularly in charm physics, it is necessary to reconstruct a nested ROE object around a target particle and using
+particles from host ROE object:
+
+::
+
+  import basf2 as b2
+  import modularAnalysis as ma
+  mainPath = b2.create_path()
+  # Suppose we have a signal B meson stored in a particle list 'B0:rec'
+  ma.fillParticleList('B0:rec', path = mainPath)
+  # build the ROE object
+  ma.buildRestOfEvent('B0:rec', path = mainPath)
+  # Create a mask tuple:
+  cleanMask = ('cleanMask', 'abs(d0) < 10.0 and abs(z0) < 20.0', 'E > 0.06 and abs(clusterTiming) < 20')
+  # append masks to existing ROE object
+  appendROEMasks('D0:tag', [cleanMask], path = mainPath)
+  # Create a path for ROE logic
+  roe_path = b2.create_path()
+  # Associate a module to be executed for each ROE candidate:
+  ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1', path = roe_path)
+  # reconstructing an energetic pi0 inside host ROE:
+  ma.reconstructDecay('pi0:roe -> gamma:roe gamma:roe', 'p > 0.5', path = roe_path)
+  # build a nested ROE using a mask
+  ma.buildNestedRestOfEvent('pi0:roe', maskName = 'cleanMask', path = roe_path)
+  nestedroe_path = b2.create_path()
+  # fill a pion list in nested ROE, please notice the change of path
+  ma.fillParticleList('pi+:nestedroe', 'isInRestOfEvent == 1', path = nestedroe_path)
+  # reconstructing a K_S0 inside nested ROE:
+  ma.reconstructDecay('K_S0:nestedroe -> pi+:nestedroe pi-:nestedroe', 'p > 0.5', path = nestedroe_path)
+  # Execute loop for each nested ROE:
+  roe_path.for_each('RestOfEvent', 'NestedRestOfEvents', path = nestedroe_path)
+  # Execute loop for each host ROE:
+  mainPath.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
+
+In this piece of code, we first reconstruct a host ROE object with a mask *cleanMask*, we create ``roe_path`` path for it, 
+and we reconstruct a :math:`\pi_0` object inside the host ROE, similarly to the previous code snippets.
+Then we create a nested ROE using :func:`modularAnalysis.buildNestedRestOfEvent`, which
+is going to be reconstructed using particles from *cleanMask* of the host ROE.
+This is needed to clean up the nested ROE from the beam-background energy depositions. 
+Then we create ``nestedroe_path`` path for the nested ROE modules and finally we reconstruct a :math:`K_S^0` inside the nested ROE.
+One can execute all possible ROE-related methods using nested ROE objects or loops. 
+
 
 
 MVA based cleaning

@@ -1,0 +1,25 @@
+Import('env')
+
+env['SUBLIB'] = True
+#env['LIBS'] = ['CLHEP','framework','analysis','mdst_dataobjects']
+
+env['LIBS'] = [
+    'framework',
+    'analysis_dataobjects',
+    'mdst_dataobjects',
+    '$ROOT_LIBS',
+    'EG',
+    'CLHEP',
+    'RooFit',
+    'RooFitCore',
+    'RooStats',
+    'boost_program_options',
+    'fann',
+    'analysis_utility',
+    'analysis_ContinuumSuppression',
+    'analysis_ClusterUtility'
+]
+
+    
+Return('env')
+

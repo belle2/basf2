@@ -65,7 +65,7 @@ namespace Belle2 {
 
     int m_decayModeID; /**< user specified decay mode identifier */
 
-    bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
+    bool m_isSelfConjugatedParticle{true}; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
     std::string m_cutParameter;  /**< selection criteria */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */

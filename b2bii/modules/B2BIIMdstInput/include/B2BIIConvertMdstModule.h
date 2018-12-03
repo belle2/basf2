@@ -338,6 +338,27 @@ namespace Belle2 {
     //! map of Klong Panther IDs and corresponding Particle StoreArray indices
     std::map<int, int> mdstKlongToParticle;
 
+    /** MC particles. */
+    StoreArray<MCParticle> m_mcParticles;
+
+    /** ECL clusters. */
+    StoreArray<ECLCluster> m_eclClusters;
+
+    /** KLM clusters. */
+    StoreArray<KLMCluster> m_klmClusters;
+
+    /** Tracks. */
+    StoreArray<Track> m_tracks;
+
+    /** Track fir results. */
+    StoreArray<TrackFitResult> m_trackFitResults;
+
+    /** V0-particles. */
+    StoreArray<V0> m_v0s;
+
+    /** Partciles. */
+    StoreArray<Particle> m_particles;
+
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 

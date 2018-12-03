@@ -158,6 +158,30 @@ namespace Belle2 {
       TOPGeometry* createConfiguration(const GearDir& content);
 
       /**
+       * Create a parameter object from gearbox for bar segment
+       * @param content XML data directory
+       * @param serialNumber bar segment serial number
+       */
+      TOPGeoBarSegment createBarSegment(const GearDir& content,
+                                        const std::string serialNumber);
+
+      /**
+       * Create a parameter object from gearbox for mirror segment
+       * @param content XML data directory
+       * @param serialNumber mirror segment serial number
+       */
+      TOPGeoMirrorSegment createMirrorSegment(const GearDir& content,
+                                              const std::string serialNumber);
+
+      /**
+       * Create a parameter object from gearbox for prism
+       * @param content XML data directory
+       * @param serialNumber prism serial number
+       */
+      TOPGeoPrism createPrism(const GearDir& content,
+                              const std::string serialNumber);
+
+      /**
        * Adds number to string
        * @param str string
        * @param number number to be added

@@ -22,9 +22,8 @@
 # Contributors: Jonas Wagner, Felix Metzner
 #####################################################################
 
-
 from basf2 import *
-from setup_modules import setup_Geometry
+import sys
 import argparse
 
 

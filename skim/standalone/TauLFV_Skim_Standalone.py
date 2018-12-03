@@ -31,18 +31,15 @@ fileList = [
 
 inputMdstList('MC9', fileList)
 
-stdPi0s('loose')
-stdPi('all')
-stdK('all')
 stdPi('loose')
 stdK('loose')
 stdPr('loose')
 stdE('loose')
 stdMu('loose')
-loadStdSkimPhoton()
+stdPhotons('loose')
+stdPi0s('loose')
 loadStdSkimPi0()
 stdKshorts()
-stdPhotons('loose')
 loadStdLightMesons()
 
 # Tau Skim

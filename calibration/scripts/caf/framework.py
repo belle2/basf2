@@ -426,6 +426,11 @@ class Calibration(CalibrationBase):
         #: Variable to define the maximum number of iterations for this calibration specifically.
         #: It overrides tha CAF calibration_defaults value if set.
         self.max_iterations = None
+        #: List of ExpRun that will be ignored by this Calibration. This runs will not have Collector jobs run on
+        #: them (if possible). And the algorithm execution will exclude them from a ExpRun list. However, the
+        #: algorithm execution may merge IoVs of final payloads to cover the 'gaps' caused by these runs.
+        #: You should pay attention to what the AlgorithmStrategy you choose will do in these cases.
+        self.ignored_runs = None
         if self.algorithms:
             #: The strategy that the algorithm(s) will be run against. Assign a list of strategies the same length as the number of
             #: algorithms, or assign a single strategy to apply it to all algorithms in this `Calibration`. You can see the choices
@@ -981,7 +986,7 @@ class Algorithm():
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
         #: The name of the algorithm, default is the Algorithm class name
-        self.name = algorithm.__cppname__[algorithm.__cppname__.rfind('::')+2:]
+        self.name = algorithm.__cppname__[algorithm.__cppname__.rfind('::') + 2:]
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
         #: The list of files matching the `Calibration.output_patterns` from the collector output
         #: directories will be passed to it
@@ -1034,6 +1039,10 @@ class CAF():
     `CalibrationBase` instances.
     """
 
+    #: Default attributes and their config file Key, that will be used to assign values to Calibrations
+    #: if they weren't set directly on the Calibration
+    _calibration_default_setup = {"max_iterations": "MaxIterations", "ignored_runs": "IgnoredRuns"}
+
     #: The name of the SQLite DB that gets created
     _db_name = "caf_state.db"
 
@@ -1068,8 +1077,9 @@ class CAF():
 
         if not calibration_defaults:
             calibration_defaults = {}
-        if "max_iterations" not in calibration_defaults:
-            calibration_defaults["max_iterations"] = decode_json_string(self.config["CAF_DEFAULTS"]["MaxIterations"])
+        for attribute_name, config_key in self._calibration_default_setup.items():
+            if attribute_name not in calibration_defaults:
+                calibration_defaults[attribute_name] = decode_json_string(self.config["CAF_DEFAULTS"][config_key])
         #: Default options applied to each calibration known to the `CAF`, if the `Calibration` has these defined by the user
         #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the `CAF`.
         self.calibration_defaults = calibration_defaults

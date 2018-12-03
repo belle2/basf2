@@ -25,8 +25,10 @@ from variables import variables
 # create path
 mypath = b2.create_path()
 
-# load input ROOT file (overwrite using -i)
-inputMdst('default', 'B2A101-Y4SEventGeneration-gsim-BKGx0.root', path=mypath)
+# load input ROOT file
+inputMdst(environmentType='default',
+          filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu_evtgen.root', 'examples', False),
+          path=mypath)
 
 # fill an all photon and all charged particle (does not really matter which one) list
 fillParticleList('gamma:all', 'clusterE > 0.1', path=mypath)  # neutral clusters

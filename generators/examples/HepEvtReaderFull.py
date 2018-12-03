@@ -16,21 +16,21 @@
 # Example steering file - 2011 Belle II Collaboration
 ########################################################
 
-from basf2 import *
+import basf2
 from beamparameters import add_beamparameters
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+basf2.set_log_level(basf2.LogLevel.ERROR)
 # set_log_level(LogLevel.DEBUG)
 
 # creating the path for the processing
-main = create_path()
+main = basf2.create_path()
 
 # beam parameters
 beamparameters = add_beamparameters(main, "SuperKEKB")
 
 # to run the framework the used modules need to be registered
-hepevtreader = register_module('HepevtInput')
+hepevtreader = basf2.register_module('HepevtInput')
 
 # setting the options for the HEPEVT reader:
 #
@@ -78,20 +78,14 @@ hepevtreader.param('wrongSignPz', True)
 #
 # for a simple simulation job with output to a root file these additional
 # modules are needed
-eventinfosetter = register_module('EventInfoSetter')
-progress = register_module('Progress')
-paramloader = register_module('Gearbox')
-geobuilder = register_module('Geometry')
-g4sim = register_module('FullSim')
-simpleoutput = register_module('RootOutput')
+eventinfosetter = basf2.register_module('EventInfoSetter')
+progress = basf2.register_module('Progress')
+simpleoutput = basf2.register_module('RootOutput')
 
 # Setting the option for all non-hepevt reader modules:
 eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
 eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
-
-# paramloader.param('InputFileXML', os.path.join(basf2datadir,
-# 'simulation/Belle2.xml'))
+eventinfosetter.param('expList', [0])  # and experiment number 1
 
 simpleoutput.param('outputFileName', 'HepEvtReaderOutput.root')
 
@@ -102,15 +96,12 @@ main.add_module(progress)
 # Add hepevtreader module to path:
 main.add_module(hepevtreader)
 # and print parameters for hepevtreader on startup of process
-print_params(hepevtreader)
+basf2.print_params(hepevtreader)
 
 # Add all other modules for simple processing to path
-main.add_module(paramloader)
-main.add_module(geobuilder)
-main.add_module(g4sim)
 main.add_module(simpleoutput)
 
 # Process the events
-process(main)
+basf2.process(main)
 # if there are less events in the input file the processing will be stopped at
 # EOF.

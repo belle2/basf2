@@ -23,25 +23,25 @@ import sys
 import os
 import glob
 
+skimpath = Path()
+
 
 fileList = [
-    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
-    '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
 ]
 
+inputMdstList('MC9', fileList, path=skimpath)
 
-inputMdstList('MC9', fileList)
-
-stdE('all')
-stdMu('all')
-
+stdE('all', path=skimpath)
+stdMu('all', path=skimpath)
 
 from skim.systematics import *
-SysList = EELLList()
-skimOutputUdst(skimCode, SysList)
-summaryOfLists(SysList)
+SysList = EELLList(skimpath)
+skimOutputUdst(skimCode, SysList, path=skimpath)
+summaryOfLists(SysList, path=skimpath)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=skimpath)
+process(skimpath)
 
 print(statistics)

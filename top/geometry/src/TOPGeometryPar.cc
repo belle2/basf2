@@ -850,7 +850,7 @@ namespace Belle2 {
 
 
     TOPGeoBarSegment TOPGeometryPar::createBarSegment(const GearDir& content,
-                                                      const std::string SN)
+                                                      const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "QuartzBars/QuartzBar[@SerialNumber='" + SN + "']");
@@ -873,7 +873,7 @@ namespace Belle2 {
 
 
     TOPGeoMirrorSegment TOPGeometryPar::createMirrorSegment(const GearDir& content,
-                                                            const std::string SN)
+                                                            const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "Mirrors/Mirror[@SerialNumber='" + SN + "']");
@@ -903,7 +903,7 @@ namespace Belle2 {
 
 
     TOPGeoPrism TOPGeometryPar::createPrism(const GearDir& content,
-                                            const std::string SN)
+                                            const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "Prisms/Prism[@SerialNumber='" + SN + "']");

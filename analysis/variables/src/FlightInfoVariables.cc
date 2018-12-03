@@ -10,7 +10,6 @@
  ******************************************************************************/
 
 #include <analysis/variables/FlightInfoVariables.h>
-#include <analysis/variables/VertexVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -26,6 +25,22 @@ namespace Belle2 {
 
   namespace Variable {
 
+    //Function to check if a beam constrained rave fit has been performed
+    bool hasRAVEBeamConstrainedProductionVertex(const Particle* particle)
+    {
+      bool hasRAVEProdVertex = true;
+      std::vector<std::string> directions = {"x", "y", "z"};
+      for (auto ielement : directions) {
+        std::string prodVertPositionElement = boost::str(boost::format("prodVert%s") % boost::to_upper_copy(ielement));
+        hasRAVEProdVertex &= particle -> hasExtraInfo(prodVertPositionElement);
+        for (auto jelement : directions) {
+          std::string prodVertCovarianceElement = boost::str(boost::format("prodVertS%s%s") % ielement % jelement);
+          hasRAVEProdVertex &= particle -> hasExtraInfo(prodVertCovarianceElement);
+        }
+      }
+      return hasRAVEProdVertex;
+    }
+
     // Helper function for flight distance and its uncertainty (provided as it is)
     inline double getFlightInfoDistanceBtw(const Particle* particle, const Particle* daughter, double& distanceErr)
     {
@@ -37,7 +52,7 @@ namespace Belle2 {
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
-        if (hasProductionVertex(particle)) {
+        if (hasRAVEBeamConstrainedProductionVertex(particle)) {
           mumvtxX = particle->getExtraInfo("prodVertX");
           mumvtxY = particle->getExtraInfo("prodVertY");
           mumvtxZ = particle->getExtraInfo("prodVertZ");
@@ -75,7 +90,7 @@ namespace Belle2 {
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
       if (particle == daughter) {
-        if (hasProductionVertex(particle)) {
+        if (hasRAVEBeamConstrainedProductionVertex(particle)) {
           std::vector<std::string> directions = {"x", "y", "z"};
           for (unsigned int i = 0; i < directions.size(); i++) {
             for (unsigned int j = 0; j < directions.size(); j++) {
@@ -133,7 +148,7 @@ namespace Belle2 {
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
-        if (hasProductionVertex(particle)) {
+        if (hasRAVEBeamConstrainedProductionVertex(particle)) {
           mumvtxX = particle->getExtraInfo("prodVertX");
           mumvtxY = particle->getExtraInfo("prodVertY");
           mumvtxZ = particle->getExtraInfo("prodVertZ");
@@ -174,7 +189,7 @@ namespace Belle2 {
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
       if (particle == daughter) {
-        if (hasProductionVertex(particle)) {
+        if (hasRAVEBeamConstrainedProductionVertex(particle)) {
           std::vector<std::string> directions = {"x", "y", "z"};
           for (unsigned int i = 0; i < directions.size(); i++) {
             for (unsigned int j = 0; j < directions.size(); j++) {

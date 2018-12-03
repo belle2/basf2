@@ -31,13 +31,17 @@ namespace Belle2 {
      * Full constructor
      * @param scrodID hardware SCROD ID
      */
-    TOPProductionEventDebug(unsigned scrodID,
+    TOPProductionEventDebug(unsigned short formatType,
+                            unsigned short formatVersion,
+                            unsigned scrodID,
                             bool skipProcessingFlag,
                             unsigned short ctime,
                             unsigned short phase,
                             unsigned short asicMask,
                             unsigned short eventQueueDepth,
                             unsigned short eventNumberByte):
+      m_formatType(formatType),
+      m_formatVersion(formatVersion),
       m_scrodID(scrodID),
       m_skipProcessingFlag(skipProcessingFlag),
       m_ctime(ctime),
@@ -49,6 +53,18 @@ namespace Belle2 {
 
     }
 
+
+    /**
+     * Returns data format type number
+     * @return format type
+     */
+    unsigned short getFormatType() const { return m_formatType; }
+
+    /**
+     * Returns data format version number
+     * @return data format version
+     */
+    unsigned short getFormatVersion() const { return m_formatVersion; }
 
     /**
      * Returns SCROD ID
@@ -95,6 +111,13 @@ namespace Belle2 {
 
 
   private:
+    <<< <<< < HEAD
+    unsigned short m_formatType = 0;      /**<data format type specifier */
+    unsigned short m_formatVersion = 0;      /**<data format version specifier */
+    == == == =
+      unsigned int m_formatType = 0;      /**<data format type specifier */
+    unsigned int m_formatVersion = 0;      /**<data format version specifier */
+    >>> >>> > 03363797a9b9cd150c0a86dc70ea90584318a4ae
     unsigned short m_scrodID = 0;       /**< hardware SCROD ID */
     bool m_skipProcessingFlag = false;      /**< skip processing bit, set if hit processing skipped due to queueDepth too high */
     unsigned short m_ctime = 0;       /**< event header ctime */

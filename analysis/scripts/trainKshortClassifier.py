@@ -50,6 +50,7 @@ target_variable = 'isSignal'
 training_path = basf2.core.Path()
 inputMdst('default', input_file_name, path=training_path)
 stdKshorts('all', path=training_path)
+fitVertex('K_S0:all', 0.0, '^K_S0 -> pi+ pi-', fitter='rave', constraint='ipprofile', path=training_path)
 matchMCTruth('K_S0:all', path=training_path)
 
 variablesToNtuple('K_S0:all',
@@ -59,7 +60,7 @@ variablesToNtuple('K_S0:all',
                   path=training_path
                   )
 
-process(training_path, int(1e5))
+process(training_path, int(2e5))
 print(statistics)
 
 # --- train variables ---
@@ -81,7 +82,7 @@ run_e = -1   # run end, -1 for all of them
 tag_name = "development"  # global tag name
 
 upload = True  # upload to conditions database
-remove_local_files = True  # delete local db and training data
+remove_local_files = False  # delete local db and training data
 
 # upload to local database from xml file
 os.system('basf2_mva_upload --identifier {identifier} --db_identifier {identifier_db}'

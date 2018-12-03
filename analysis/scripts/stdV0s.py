@@ -6,38 +6,23 @@ from modularAnalysis import *
 from stdCharged import stdPi, stdPr
 
 
-def stdKshorts(listtype='all', path=analysis_main):
+def stdKshorts(path=analysis_main):
     """
-    Function to prepare one of two standardised types of K_S0 lists. In both cases :math:`K_{S}^{0}` s
-    are loaded from the mdst V0 objects (created when the tracking was run).
-
-    - 'K_S0:all' a vertex fit is performed and only candidates with an invariant mass in the range
-      :math:`0.450 < M < 0.550~GeV`, and for which the vertex fit did not fail, are kept.
-
-    - 'K_S0:good' a beam constrained vertex fit is performed and only candidates that pass an MVA selection
-      with an invariant mass in the range :math:`0.450 < M < 0.550~GeV`, and for which the fit did not fail, are kept.
+    Load :math:`K_{S}^{0}` s from the mdst V0 objects (created when the
+    tracking was run). The ParticleList is named 'K_S0:all'. A vertex fit is
+    performed and only candidates with an invariant mass in the range
+    :math:`0.450 < M < 0.550~GeV`, and for which the vertex fit did not fail, are kept
 
     Note:
-      when filling a particleList, for V0s the whole decay chain has to be
+      when filling a particleList, for V0s the whole dacay chain has to be
       specified (the two daughters as well)
 
     Parameters:
-        listtype (str): name of standard list. Either 'all' or 'good'
         path (basf2.Path): the path to load the modules
     """
-    if listtype == 'all':
-        fillParticleList('K_S0:all -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-        vertexKFit('K_S0:all', 0.0, '', '', path)
-        applyCuts('K_S0:all', '0.450 < M < 0.550', path)
-    elif listtype == 'good':
-        fillParticleList('K_S0:good -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-        vertexKFit('K_S0:good', 0.0, '', '', path)  # required for the rave fit to succeed
-        fitVertex('K_S0:good', 0.0, '^K_S0 -> pi+ pi-', fitter='rave', constraint='ipprofile', path=path)
-        path.add_module('MVAExpert',
-                        listNames=['K_S0:good'],
-                        extraInfoName='isKshort',
-                        identifier='Kshort_FastBDT')
-        applyCuts('K_S0:good', 'extraInfo(isKshort) > 0.5 and 0.450 < M < 0.550', path)
+    fillParticleList('K_S0:all -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
+    vertexKFit('K_S0:all', 0.0, '', '', path)
+    applyCuts('K_S0:all', '0.450 < M < 0.550', path)
 
 
 def mergedKshorts(prioritiseV0=True, path=analysis_main):

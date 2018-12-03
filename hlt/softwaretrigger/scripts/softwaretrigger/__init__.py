@@ -89,12 +89,12 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
 
     # Lambda0->p pi-, Xi-->Lambda0 pi-
     modularAnalysis.reconstructDecay('Lambda0:calib -> pi-:calib p+:calib', '', path=path)
-    vertex.fitVertex('Lambda0:calib', 0.001, fitter='kfitter', path=path)
+    vertex.vertexKFit('Lambda0:calib', 0.001, path=path)
     modularAnalysis.rankByHighest('Lambda0:calib', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('Lambda0:calib', {'chiProb': 'Lambda0_chiProb'}, path=path)
 
     modularAnalysis.reconstructDecay('Xi-:calib -> Lambda0:calib pi-:calib', '', path=path)
-    vertex.fitVertex('Xi-:calib', 0.001, fitter='kfitter', path=path)
+    vertex.vertexKFit('Xi-:calib', 0.001, path=path)
     modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
     calib_particle_list.append('Xi-:calib')

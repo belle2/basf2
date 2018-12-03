@@ -81,7 +81,7 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max
     reconstructDecay('K_S0:pipi -> pi+:highPID pi-:highPID', '.25 <= M <= .75', path=main)
     # fit K_S0 Vertex
 
-    fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False, path=main)
+    vertexRave('K_S0:pipi', 0., path=main)
 
     # reconstruct J/psi -> mu+ mu- decay and fit vertex
     reconstructDecay('J/psi:mumu -> mu+:highPID mu-:highPID', '3.0 <= M <= 3.2 ', path=main)

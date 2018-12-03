@@ -24,13 +24,13 @@ reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
 matchMCTruth('pi0', path=main)
 
 # KFit
-fitVertex('pi0', 0.0, '', 'kfitter', 'vertex', path=main)
+vertexKFit('pi0', 0.0, path=main)
 
 reconstructDecay('D0 -> K- pi+', '', 0, path=main)
 matchMCTruth('D0', path=main)
 
 # Rave
-fitVertex('D0', 0.0, '', 'rave', 'vertex', path=main)
+vertexRave('D0', 0.0, path=main)
 
 ntupler = register_module('VariablesToNtuple')
 ntupler.param('fileName', testFile.name)

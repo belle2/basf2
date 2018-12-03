@@ -39,10 +39,6 @@ ana.reconstructDecay('K_S0:pipi -> pi-:K_S0 pi+:K_S0', 'InvM > 0.44761 and InvM 
 ana.vertexRaveDaughtersUpdate('J/psi:mumu', 0.0, path=main)
 ana.vertexRaveDaughtersUpdate('K_S0:pipi', 0.0, path=main)
 
-# ana.fitVertex(list_name='Z0:mumu', conf_level=0.0, fitter='kfitter', fit_type='fourC', daughtersUpdate=True, path=main)
-# ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main)#, constraint='ipprofile')
-# ana.vertexRaveDaughtersUpdate('K_S0:pipi', 0.0, path=main)
-
 ana.printVariableValues('J/psi:mumu', ['InvM'], path=main)
 ana.printVariableValues('K_S0:pipi', ['InvM'], path=main)
 

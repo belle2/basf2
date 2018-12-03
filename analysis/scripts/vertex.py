@@ -7,7 +7,7 @@ import inspect
 from analysisPath import analysis_main
 
 
-def fitVertex(
+def _fitVertex(
     list_name,
     conf_level,
     decay_string='',
@@ -19,6 +19,7 @@ def fitVertex(
 ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
+    This is a private function, please use one of the aliases provided below.
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
@@ -59,7 +60,7 @@ def vertexKFit(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -86,7 +87,7 @@ def vertexKFitDaughtersUpdate(
     @param path         modules are added to this path
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         '',
@@ -113,7 +114,7 @@ def massVertexKFit(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -140,7 +141,7 @@ def massVertexKFitDaughtersUpdate(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -167,7 +168,7 @@ def massKFit(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -194,7 +195,7 @@ def massKFitDaughtersUpdate(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -221,7 +222,7 @@ def fourCKFit(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -248,7 +249,7 @@ def fourCKFitDaughtersUpdate(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -277,7 +278,7 @@ def vertexRave(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -330,7 +331,7 @@ def massVertexRave(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -357,7 +358,7 @@ def massVertexRaveDaughtersUpdate(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,
@@ -385,7 +386,7 @@ def massRave(
     @param decay_string select particles used for the vertex fit
     """
 
-    fitVertex(
+    _fitVertex(
         list_name,
         conf_level,
         decay_string,

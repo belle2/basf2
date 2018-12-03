@@ -41,7 +41,7 @@ def reconstruction_path(inputfiles):
                        ('pi+', 'atcPIDBelle(3,2) < 0.2 and dr < 2 and abs(dz) < 4')], path=path)
     massVertexKFit('pi0:mdst', 0.1, path=path)
     reconstructDecay('D0 -> K- pi+ pi0:mdst', '1.7 < M < 2.0', path=path)
-    fitVertex('D0', 0.1, fitter='kfitter', path=path)
+    vertexKFit('D0', 0.1, path=path)
     applyCuts('D0', '1.7 < M < 2.0', path=path)
     matchMCTruth('D0', path=path)
     return path

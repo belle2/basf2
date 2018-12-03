@@ -71,7 +71,6 @@ FragmentationModule::FragmentationModule() : Module()
   nVpho   = 0;
   nAll    = 0;
   nGood   = 0;
-
   pythia = nullptr;
   PythiaEvent = nullptr;
 }
@@ -91,10 +90,15 @@ void FragmentationModule::terminate()
   pythia->stat();
   statLogCapture.finish();
 
+  if (nAll != nGood) {
+    double ratio = 0.; //ratio of good over all events
+    if (nAll) ratio = 100.0 * nGood / nAll;
 
-  double ratio = 0.; //ratio of good over all events
-  if (nAll) ratio = 100.0 * nGood / nAll;
-  B2RESULT("Total number of events: " << nAll << ", of these fragmented: " << nGood << ", ratio: " << ratio << "%");
+    B2WARNING("Not all events could be fragmented: " << nAll - nGood << " events failed.");
+    B2WARNING("Total number of events: " << nAll << ", of these fragmented: " << nGood << ", success-ratio (should be >97%): " << ratio
+              << "%");
+    B2WARNING("Treat the success-ratio as correction of the effective cross section due to unphysical events.");
+  }
 }
 
 //-----------------------------------------------------------------
@@ -230,7 +234,6 @@ void FragmentationModule::event()
   eventLogCapture.finish();
 
   if (!success) {
-    B2WARNING("pythia->next() failed, event generation aborted prematurely! Set LogLevel to Debug 50 to see PYTHIA event listing.");
     IOIntercept::OutputToLogMessages listLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
     listLogCapture.start();
     PythiaEvent->list();

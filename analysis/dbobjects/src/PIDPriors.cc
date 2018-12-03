@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <TObject.h>
 #include <TMath.h>
 #include <TH2F.h>
@@ -18,46 +17,35 @@
 #include <analysis/dbobjects/PIDPriorsTable.h>
 #include <analysis/dbobjects/PIDPriors.h>
 
-
 using namespace Belle2;
 
-
-void PIDPriors::setPriors(int PDGCode, TH2F* priorHistogram)
+void PIDPriors::setPriors(const Const::ChargedStable& particle, TH2F* priorHistogram)
 {
-  auto index = parsePDGForPriors(PDGCode);
-  if (index < 0) {
-    B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-    return ;
-  }
-
-  double xStart = priorHistogram->GetXaxis()->GetBinLowEdge(priorHistogram->GetXaxis()->GetFirst());
-  double xStop = priorHistogram->GetXaxis()->GetBinUpEdge(priorHistogram->GetXaxis()->GetLast());
-  double xWidth = priorHistogram->GetXaxis()->GetBinWidth(1);
-
-  double yStart = priorHistogram->GetYaxis()->GetBinLowEdge(priorHistogram->GetYaxis()->GetFirst());
-  double yStop = priorHistogram->GetYaxis()->GetBinUpEdge(priorHistogram->GetYaxis()->GetLast());
-  double yWidth = priorHistogram->GetYaxis()->GetBinWidth(1);
+  auto index = particle.getIndex();
 
   std::vector<float> xEdges;
   std::vector<float> yEdges;
 
-  while (xStart < xStop + xWidth * 0.5) {
-    xEdges.push_back(xStart);
-    xStart += xWidth;
+  auto& xaxis = *(priorHistogram->GetXaxis());
+  for (int i = xaxis.GetFirst(); i <= xaxis.GetLast(); ++i) {
+    xEdges.push_back(xaxis.GetBinLowEdge(i));
   }
+  xEdges.push_back(xaxis.GetBinUpEdge(xaxis.GetLast()));
 
-  while (yStart < yStop + yWidth * 0.5) {
-    yEdges.push_back(yStart);
-    yStart += yWidth;
+  auto& yaxis = *(priorHistogram->GetYaxis());
+  for (int i = yaxis.GetFirst(); i <= yaxis.GetLast(); ++i) {
+    yEdges.push_back(yaxis.GetBinLowEdge(i));
   }
+  yEdges.push_back(yaxis.GetBinUpEdge(yaxis.GetLast()));
 
-  std::vector<std::vector<float>>  prior(yEdges.size() - 1, std::vector<float>(xEdges.size() - 1));
-  std::vector<std::vector<float>>  error(yEdges.size() - 1, std::vector<float>(xEdges.size() - 1));
+
+  std::vector<float>  prior;
+  std::vector<float>  error;
 
   for (int ix = 0; ix < (int)xEdges.size() - 1; ix++) {
     for (int iy = 0; iy < (int)yEdges.size() - 1; iy++) {
-      prior[iy][ix] = priorHistogram->GetBinContent(ix + 1, iy + 1);
-      error[iy][ix] = priorHistogram->GetBinError(ix + 1, iy + 1);
+      prior.push_back(priorHistogram->GetBinContent(ix + 1, iy + 1));
+      error.push_back(priorHistogram->GetBinError(ix + 1, iy + 1));
     }
   }
 
@@ -70,14 +58,14 @@ void PIDPriors::setPriors(int PDGCode, TH2F* priorHistogram)
 
 
 
-void PIDPriors::setPriors(int PDGCode, TH2F* counts, TH2F* normalization)
+void PIDPriors::setPriors(const Const::ChargedStable& particle, TH2F* counts, TH2F* normalization)
 {
   TH2F* priorHistogram = (TH2F*)counts->Clone();
 
   priorHistogram->Sumw2();
   priorHistogram->Divide(normalization);
 
-  setPriors(PDGCode, priorHistogram);
+  setPriors(particle, priorHistogram);
 };
 
 

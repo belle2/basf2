@@ -11,56 +11,34 @@
 #pragma once
 
 #include <TObject.h>
-#include <TMath.h>
-#include <TH2F.h>
-#include <TAxis.h>
 
 #include <framework/gearbox/Unit.h>
 #include <analysis/dbobjects/PIDPriorsTable.h>
+#include <framework/gearbox/Const.h>
+
+class TH2F;
 
 namespace Belle2 {
 
   /**
    * A database class to hold the prior probability for
-   * the particle identification. The piors are defined as the
-   * fraction of particle of each species in a given bin of the kinematic variables.
-   * This prior for each particle species are stored as PIDPriorsTable object. This class provides
-   * a container for 6 PIDPriorsTable objects, some wrappers areound the most used getters and setteres, and
+   * the particle identification.
+   * This prior probability  for each particle species is stored as PIDPriorsTable object, that allows to bin it in 2 dimensions defined by two kinematic variables.
+   * This class provides a container for 6 PIDPriorsTable objects, some wrappers around the most used getters and setteres, and
    * some setters that allow the user to load the priors starting from a TH2 object.
    */
   class PIDPriors : public TObject {
+
+
+    ClassDef(PIDPriors, 1);
+
 
   public:
 
     /**
      * Default constructor.
      */
-    PIDPriors()
-    {
-      for (int iHyp = 0; iHyp < 6; iHyp++)
-        m_priors[iHyp] = PIDPriorsTable();
-    };
-
-
-    /**
-     * A small function that converts the PDG code into the internal code (i.e. the index in the array of TOPPriorsTable)
-     * used to store the prior: e=0, mu=1, pi=2, K=3, p=4, d=5.
-     * If the PDG code does not correspond to any of the "stable" particles,
-     * -1 is retured
-     * @param pdg the PDG code
-     * @return  the internal code corresponding to the PDG code
-     */
-    short parsePDGForPriors(int pdg) const
-    {
-      pdg = TMath::Abs(pdg);
-      if (pdg == 11) return 0;
-      else if (pdg == 13) return 1;
-      else if (pdg == 211) return 2;
-      else if (pdg == 321) return 3;
-      else if (pdg == 2212) return 4;
-      else if (pdg == 1000010020) return 5;
-      else return -1;
-    };
+    PIDPriors() {};
 
 
     /**
@@ -68,13 +46,9 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the particle
      * @param table the priors table
      */
-    void setPriors(int PDGCode, PIDPriorsTable table)
+    void setPriors(const Const::ChargedStable& particle, PIDPriorsTable table)
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return;
-      }
+      auto index = particle.getIndex();
       m_priors[index] = table;
       return;
     }
@@ -88,14 +62,10 @@ namespace Belle2 {
      * @param priorsTable the 2D std::vector<float> containing the prior probabilities
      * @param errorsTable the 2D std::vector<float> containing the errors on prior probabilities
      */
-    void setPriors(int PDGCode, std::vector<float> xAxisEdges, std::vector<float> yAxisEdges,
-                   std::vector<std::vector<float>> priorsTable, std::vector<std::vector<float>> errorsTable)
+    void setPriors(const Const::ChargedStable& particle, std::vector<float> xAxisEdges, std::vector<float> yAxisEdges,
+                   std::vector<float> priorsTable, std::vector<float> errorsTable)
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return;
-      }
+      auto index = particle.getIndex();
       m_priors[index].setBinEdges(xAxisEdges, yAxisEdges);
       m_priors[index].setBinEdges(xAxisEdges, yAxisEdges);
       m_priors[index].setPriorsTable(priorsTable);
@@ -110,7 +80,7 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the particle
      * @param priorHistogram the prior for the particle specie
      */
-    void setPriors(int PDGCode, TH2F* priorHistogram);
+    void setPriors(const Const::ChargedStable& particle, TH2F* priorHistogram);
 
 
     /**
@@ -120,7 +90,7 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the particle
      * @param priorHistogram the prior for the particle species
      */
-    void setPriors(int PDGCode, TH2F* counts, TH2F* normalization);
+    void setPriors(const Const::ChargedStable& particle, TH2F* counts, TH2F* normalization);
 
 
     /**
@@ -130,13 +100,9 @@ namespace Belle2 {
      * @param xAxisEdge the vector of edges of the X axis
      * @param yAxisEdge the vector of edges of the Y axis
      */
-    void setPriorsAxes(int PDGCode, std::vector<float> xAxisEdges, std::vector<float> yAxisEdges)
+    void setPriorsAxes(const Const::ChargedStable& particle, std::vector<float> xAxisEdges, std::vector<float> yAxisEdges)
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return;
-      }
+      auto index = particle.getIndex();
       m_priors[index].setBinEdges(xAxisEdges, yAxisEdges);
       m_priors[index].setBinEdges(xAxisEdges, yAxisEdges);
       return;
@@ -149,13 +115,9 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the prior's species
      * @param priorsTable a 2D vector containing the prior probabilities
      */
-    void setPriorsTable(int PDGCode, std::vector<std::vector<float>> priorsTable)
+    void setPriorsTable(const Const::ChargedStable& particle, std::vector<float> priorsTable)
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return;
-      }
+      auto index = particle.getIndex();
       m_priors[index].setPriorsTable(priorsTable);
       return;
     }
@@ -167,13 +129,9 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the prior's species
      * @param errorsTable a 2D vector containing the prior probabilities
      */
-    void setErrorsTable(int PDGCode, std::vector<std::vector<float>>errorsTable)
+    void setErrorsTable(const Const::ChargedStable& particle, std::vector<float> errorsTable)
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return;
-      }
+      auto index = particle.getIndex();
       m_priors[index].setErrorsTable(errorsTable);
       return;
     }
@@ -185,13 +143,9 @@ namespace Belle2 {
      * @param xAxisLabel the label of the X axis
      * @param yAxisLabel the label of the Y axis
      */
-    void setAxisLabels(int PDGCode, std::string xAxisLabel, std::string yAxisLabel)
+    void setAxisLabels(const Const::ChargedStable& particle, std::string xAxisLabel, std::string yAxisLabel)
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return;
-      }
+      auto index = particle.getIndex();
       m_priors[index].setAxisLabels(xAxisLabel, yAxisLabel);
       return;
     }
@@ -202,12 +156,9 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the prior's species
      * @return the priors table
      */
-    PIDPriorsTable getPriorsTable(int PDGCode) const
+    PIDPriorsTable getPriorsTable(const Const::ChargedStable& particle) const
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-      }
+      auto index = particle.getIndex();
       return m_priors[index];
     }
 
@@ -219,13 +170,9 @@ namespace Belle2 {
      * @param y the value of the y-axis coordinate
      * @return the prior probability value
      */
-    float getPriorValue(int PDGCode, float x, float y) const
+    float getPriorValue(const Const::ChargedStable& particle, float x, float y) const
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return NAN;
-      }
+      auto index = particle.getIndex();
       return m_priors[index].getPriorValue(x, y);
     }
 
@@ -237,13 +184,9 @@ namespace Belle2 {
      * @param y the value of the y-axis coordinate
      * @return the prior probability error
      */
-    float getPriorError(int PDGCode, float x, float y) const
+    float getPriorError(const Const::ChargedStable& particle, float x, float y) const
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-        return NAN;
-      }
+      auto index = particle.getIndex();
       return m_priors[index].getErrorValue(x, y);
     }
 
@@ -253,12 +196,9 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the prior's species
      * @return the X axis label for the prior tabel of the selected particle species
      */
-    std::string getXAxisLabel(int PDGCode)
+    std::string getXAxisLabel(const Const::ChargedStable& particle) const
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-      }
+      auto index = particle.getIndex();
       return m_priors[index].getXAxisLabel();
     }
 
@@ -268,18 +208,18 @@ namespace Belle2 {
      * @param PDGCode the PDG code of the prior's species
      * @return the Y axis label for the prior tabel of the selected particle species
      */
-    std::string getYAxisLabel(int PDGCode)
+    std::string getYAxisLabel(const Const::ChargedStable& particle) const
     {
-      auto index = parsePDGForPriors(PDGCode);
-      if (index < 0) {
-        B2ERROR("The PDG code " << PDGCode << " does not belong to a stable particle. Priors not set");
-      }
+      auto index = particle.getIndex();
       return m_priors[index].getYAxisLabel();
     }
 
   private:
-    PIDPriorsTable m_priors[6]; /**< The array of PIDPiorsTable, one per particle species. */
+    PIDPriorsTable m_priors[Const::ChargedStable::c_SetSize]; /**< The array of PIDPiorsTable, one per particle species. */
+
+
   };
+
 
 } // Belle2 namespace
 

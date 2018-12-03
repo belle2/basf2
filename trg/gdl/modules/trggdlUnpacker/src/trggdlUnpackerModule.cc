@@ -13,6 +13,10 @@
 
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
+
 using namespace std;
 using namespace Belle2;
 using namespace GDL;

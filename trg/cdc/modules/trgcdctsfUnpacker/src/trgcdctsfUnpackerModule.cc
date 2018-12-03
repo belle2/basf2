@@ -55,7 +55,8 @@ void TRGCDCTSFUnpackerModule::terminate()
 void TRGCDCTSFUnpackerModule::initialize()
 {
 
-  StoreArray<TRGCDCTSFUnpackerStore>::registerPersistent();
+  StoreArray<TRGCDCTSFUnpackerStore> storeAry;
+  storeAry.registerInDataStore();
 
 
   //set copper address

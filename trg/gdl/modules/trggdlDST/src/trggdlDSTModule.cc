@@ -81,7 +81,7 @@ void TRGGDLDSTModule::event()
   int n_leafsExtra = 0;
   n_leafsExtra = m_unpacker->getnLeafsExtra();
   int n_clocks = m_unpacker->getnClks();
-  int nconf = m_unpacker->getconf();
+  //int nconf = m_unpacker->getconf(); // unused
 
 
   StoreArray<TRGGDLUnpackerStore> entAry;

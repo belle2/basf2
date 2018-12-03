@@ -28,7 +28,7 @@ namespace Belle2 {
     /** Default constructor */
     TRGGDLDBPrescales(): m_noutbit{0}, m_prescales{0} {}
     /** copy constructor */
-    TRGGDLDBPrescales(const TRGGDLDBPrescales& b)
+    TRGGDLDBPrescales(const TRGGDLDBPrescales& b): TObject(b)
     {
       m_noutbit = b.m_noutbit;
       for (int i = 0; i < 320; i++) {

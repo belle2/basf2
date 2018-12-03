@@ -286,8 +286,8 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     double E_phys = 0;
     double E_total = 0;
     for (int iii = 0; iii <= 16; iii++) {
-      if (iii > 1 && iii < 15) {E_phys += phiringsum[iii];}
-      if (iii > 0 && iii < 3) {E_fwd += phiringsum[iii];}
+      if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
+      if (iii < 3) {E_fwd += phiringsum[iii];}
       if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
       if (iii > 14) {E_bwd += phiringsum[iii];}
       E_total += phiringsum[iii];
@@ -709,8 +709,8 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   double E_phys = 0;
   double E_total = 0;
   for (int iii = 0; iii <= 16; iii++) {
-    if (iii > 1 && iii < 15) {E_phys += phiringsum[iii];}
-    if (iii > 0 && iii < 3) {E_fwd += phiringsum[iii];}
+    if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
+    if (iii < 3) {E_fwd += phiringsum[iii];}
     if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
     if (iii > 14) {E_bwd += phiringsum[iii];}
     E_total += phiringsum[iii];
@@ -1362,7 +1362,7 @@ double TrgEclMaster::setTotalEnergy(std::vector<double> phisum)
 
   double E_phys = 0;
   for (int iii = 0; iii <= 16; iii++) {
-    if (iii > 1 && iii < 15) {E_phys += phisum[iii];}
+    if (iii > 0 && iii < 15) {E_phys += phisum[iii];}
   }
   return E_phys;
 }

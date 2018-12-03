@@ -98,13 +98,8 @@ namespace Belle2 {
 
     /**
      * Returns physical window address for straddled window
-     * @return physicalWindowStradde
+     * @return physical window
      */
-    unsigned short getPhysicalWindowStraddle() const { return m_physicalWindowStraddle; }
-
-    * Returns physical window address for straddled window
-    * @return physical window
-              * /
     unsigned short getPhysicalWindowStraddle() const { return m_physicalWindowStraddle; }
 
     /**

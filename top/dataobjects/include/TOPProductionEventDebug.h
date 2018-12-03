@@ -111,13 +111,8 @@ namespace Belle2 {
 
 
   private:
-    <<< <<< < HEAD
     unsigned short m_formatType = 0;      /**<data format type specifier */
     unsigned short m_formatVersion = 0;      /**<data format version specifier */
-    == == == =
-      unsigned int m_formatType = 0;      /**<data format type specifier */
-    unsigned int m_formatVersion = 0;      /**<data format version specifier */
-    >>> >>> > 03363797a9b9cd150c0a86dc70ea90584318a4ae
     unsigned short m_scrodID = 0;       /**< hardware SCROD ID */
     bool m_skipProcessingFlag = false;      /**< skip processing bit, set if hit processing skipped due to queueDepth too high */
     unsigned short m_ctime = 0;       /**< event header ctime */

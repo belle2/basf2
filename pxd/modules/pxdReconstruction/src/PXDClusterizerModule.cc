@@ -109,25 +109,25 @@ void PXDClusterizerModule::initialize()
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
-  B2INFO(
-    "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
-  B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
-  B2INFO(" -->  NoiseSN:            " << m_cutAdjacent);
-  B2INFO(" -->  SeedSN:             " << m_cutSeed);
-  B2INFO(" -->  ClusterSN:          " << m_cutCluster);
-  B2INFO(
-    " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(
-    " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
-  B2INFO(
-    " -->  Clusters:           " << DataStore::arrayName<PXDCluster>(m_storeClustersName));
-  B2INFO(
-    " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
-  B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
-  B2INFO(" -->  ClusterMCRel:       " << m_relClusterMCParticleName);
-  B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
-  B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2DEBUG(10,
+          "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
+  B2DEBUG(10, " -->  ElectronicNoise:    " << m_elNoise);
+  B2DEBUG(10, " -->  NoiseSN:            " << m_cutAdjacent);
+  B2DEBUG(10, " -->  SeedSN:             " << m_cutSeed);
+  B2DEBUG(10, " -->  ClusterSN:          " << m_cutCluster);
+  B2DEBUG(10,
+          " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2DEBUG(10,
+          " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
+  B2DEBUG(10,
+          " -->  Clusters:           " << DataStore::arrayName<PXDCluster>(m_storeClustersName));
+  B2DEBUG(10,
+          " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
+  B2DEBUG(10, " -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2DEBUG(10, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
+  B2DEBUG(10, " -->  ClusterDigitRel:    " << m_relClusterDigitName);
+  B2DEBUG(10, " -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  B2DEBUG(10, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
 
 
   m_noiseMap.setNoiseLevel(m_elNoise);

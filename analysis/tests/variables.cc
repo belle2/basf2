@@ -2999,7 +2999,7 @@ namespace {
       error(1, 1) = 0.2;
       error(2, 2) = 0.4;
       error(3, 3) = 0.01;
-      error(4, 4) = 0.09;
+      error(4, 4) = 0.04;
       error(5, 5) = 0.01;
       error(6, 6) = 0.01;
       Particle pi(TLorentzVector(1.59607, 1.19705, 0, 2), 211);
@@ -3014,11 +3014,11 @@ namespace {
       Ks.addExtraInfo("prodVertX", 1.0);
       Ks.addExtraInfo("prodVertY", 1.0);
       Ks.addExtraInfo("prodVertZ", 0.0);
-      Ks.addExtraInfo("prodVertSxx", 0.09);
+      Ks.addExtraInfo("prodVertSxx", 0.04);
       Ks.addExtraInfo("prodVertSxy", 0.0);
       Ks.addExtraInfo("prodVertSxz", 0.0);
       Ks.addExtraInfo("prodVertSyx", 0.0);
-      Ks.addExtraInfo("prodVertSyy", 0.01);
+      Ks.addExtraInfo("prodVertSyy", 0.0075);
       Ks.addExtraInfo("prodVertSyz", 0.0);
       Ks.addExtraInfo("prodVertSzx", 0.0);
       Ks.addExtraInfo("prodVertSzy", 0.0);
@@ -3167,6 +3167,37 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
   }
+
+  TEST_F(FlightInfoTest, vertexDistance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKS), 5.0);
+  }
+
+  TEST_F(FlightInfoTest, vertexDistanceError)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKS), 0.2);
+  }
+
+  TEST_F(FlightInfoTest, vertexDistanceSignificance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceSignificance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKS), 25);
+  }
+
   class VertexVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */

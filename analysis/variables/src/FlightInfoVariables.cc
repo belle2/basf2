@@ -276,6 +276,103 @@ namespace Belle2 {
       return flightTimeErr;
     }
 
+    inline double getVertexDistance(const Particle* particle, double& vertexDistanceErr)
+    {
+      if (!particle) {
+        vertexDistanceErr = -999;
+        return -999;
+      }
+
+      // production vertex
+      double prodVtxX = particle->getExtraInfo("prodVertX");
+      double prodVtxY = particle->getExtraInfo("prodVertY");
+      double prodVtxZ = particle->getExtraInfo("prodVertZ");
+
+      // decay vertex
+      double vtxX =  particle->getX();
+      double vtxY =  particle->getY();
+      double vtxZ =  particle->getZ();
+
+      // difference between vertices
+      double lX = vtxX - prodVtxX;
+      double lY = vtxY - prodVtxY;
+      double lZ = vtxZ - prodVtxZ;
+
+      // vertex distance
+      double lD = sqrt(lX * lX + lY * lY + lZ * lZ);
+
+      // covariance matrix of both vertices
+      TMatrixFSym decCov = particle->getVertexErrorMatrix();
+      TMatrixFSym prodCov(3);
+      prodCov[0][0] = particle->getExtraInfo("prodVertSxx");
+      prodCov[0][1] = particle->getExtraInfo("prodVertSxy");
+      prodCov[0][2] = particle->getExtraInfo("prodVertSxz");
+      prodCov[1][0] = particle->getExtraInfo("prodVertSyx");
+      prodCov[1][1] = particle->getExtraInfo("prodVertSyy");
+      prodCov[1][2] = particle->getExtraInfo("prodVertSyz");
+      prodCov[2][0] = particle->getExtraInfo("prodVertSzx");
+      prodCov[2][1] = particle->getExtraInfo("prodVertSzy");
+      prodCov[2][2] = particle->getExtraInfo("prodVertSzz");
+
+      // compute total covariance matrix
+      // ORDER = prod x, prod y, prod z, decay x, decay y, decay z
+
+      TMatrixFSym Cov(6);
+      for (int i = 0; i < 6; i++)
+        for (int j = 0; j < 6; j++)
+          if (i < 3 && j < 3)
+            Cov[i][j] = prodCov[i][j];
+          else if (i > 2 && j > 2)
+            Cov[i][j] = decCov[i - 3][j - 3];
+          else
+            Cov[i][j] = 0;
+
+      TMatrixF deriv(6, 1);
+      deriv[0][0] = - lX / lD; // prodVtxX
+      deriv[1][0] = - lY / lD; // prodVtxY
+      deriv[2][0] = - lZ / lD; // prodVtxZ
+      deriv[3][0] =   lX / lD; // vtxX
+      deriv[4][0] =   lY / lD; // vtxY
+      deriv[5][0] =   lZ / lD; // vtxZ
+
+
+      TMatrixF tmp(6, 1);
+      tmp.Mult(Cov, deriv);
+
+      TMatrixF result(1, 1);
+      result.Mult(deriv.T(), tmp);
+
+      vertexDistanceErr = sqrt(result[0][0]);
+      return lD;
+    }
+
+    double vertexDistance(const Particle* part)
+    {
+      double vertexDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      return getVertexDistance(part, vertexDistanceErr);
+    }
+
+    double vertexDistanceErr(const Particle* part)
+    {
+      double vertexDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      getVertexDistance(part, vertexDistanceErr);
+      return vertexDistanceErr;
+    }
+
+    double vertexDistanceSignificance(const Particle* part)
+    {
+      double vertexDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      return getVertexDistance(part, vertexDistanceErr) / vertexDistanceErr;
+    }
 
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments)
     {
@@ -365,6 +462,7 @@ namespace Belle2 {
       }
       return nullptr;
     }
+
     Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments)
     {
       int daughterNumber = -1;
@@ -584,6 +682,12 @@ namespace Belle2 {
                       "Returns the flight distance between mother and daughter particle with daughterN index. If second integer is provided, the value will be computed w.r.t. of gdaughterN granddaughter particle.");
     REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN, gdaughterN = -1)", flightDistanceOfDaughterErr,
                       "Returns the flight distance uncertainty between mother and daughter particle");
+    REGISTER_VARIABLE("vertexDistance", vertexDistance,
+                      "Returns the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+    REGISTER_VARIABLE("vertexDistanceErr", vertexDistanceErr,
+                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+    REGISTER_VARIABLE("vertexDistanceSignificance", vertexDistanceSignificance,
+                      "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.");
     // GrandDaughters
     //REGISTER_VARIABLE("flightDistanceOfGrandDaughter(daughterN)", flightDistanceOfGrandDaughter,
     //                  "Returns the flight distance between mother and daughter particle");

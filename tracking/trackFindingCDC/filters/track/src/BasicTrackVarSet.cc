@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Nils Braun, Michael Eliachevitch                         *
@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include<numeric>
+#include <numeric>
 
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -38,7 +38,6 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
   // data that they accumulate (i.e. are "filled" with).
-  // TODO Maybe wrap the accumulators code in an interface and put them in some utility file
   statistics_accumulator drift_length_acc;
   statistics_accumulator adc_acc;
   statistics_accumulator empty_s_acc;
@@ -99,9 +98,6 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   var<named("size")>() = size;
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
-  // var<named("fit_prob_3d")>() = trajectory3D.getPValue();
-  // var<named("fit_prob_2d")>() = trajectory2D.getPValue();
-  // var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
   var<named("drift_length_mean")>() = toFinite(bacc::mean(drift_length_acc), 0);

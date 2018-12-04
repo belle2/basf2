@@ -7,6 +7,50 @@ import inspect
 from analysisPath import analysis_main
 
 
+def fitVertex(
+    list_name,
+    conf_level,
+    decay_string='',
+    fitter='rave',
+    fit_type='vertex',
+    constraint='',
+    daughtersUpdate=False,
+    path=analysis_main,
+):
+    """
+    Perform the specified kinematic fit for each Particle in the given ParticleList.
+    Wrapper function to provide a deprecation warning.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
+    @param decay_string select particles used for the vertex fit
+    @param fitter       rave or kfitter
+    @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
+    @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube/mother)
+    @param updateDaughters make copy of the daughters and update them after the vertex fit
+    @param path         modules are added to this path
+    """
+
+    warning = (
+        "Direct use of fitVertex is deprecated."
+        "Please use vertexKFit, vertexRave, or any of the other convenience functions as appropriate."
+        "See documentation at https://b2-master.belle2.org/software/development/sphinx/analysis/doc/Vertex.html"
+        )
+
+    B2WARNING(warning)
+
+    _fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        fitter,
+        fit_type,
+        constraint,
+        daugthersUpdate,
+        path,
+    )
+
+
 def _fitVertex(
     list_name,
     conf_level,

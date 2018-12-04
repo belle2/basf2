@@ -97,7 +97,8 @@ void FragmentationModule::terminate()
     B2WARNING("Not all events could be fragmented: " << nAll - nGood << " events failed.");
     B2WARNING("Total number of events: " << nAll << ", of these fragmented: " << nGood << ", success-ratio (should be >97%): " << ratio
               << "%");
-    B2WARNING("Treat the success-ratio as correction of the effective cross section due to unphysical events.");
+    B2WARNING("Please contact the generator librarian if the success ratio is below 97%.");
+    B2WARNING("Please treat the success-ratio as correction of the effective cross section due to unphysical events.");
   }
 }
 

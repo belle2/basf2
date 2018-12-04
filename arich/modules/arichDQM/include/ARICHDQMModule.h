@@ -54,32 +54,32 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:
@@ -102,20 +102,15 @@ namespace Belle2 {
     TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chip*/
     TH1* h_hapdHit = NULL;/**<The number of hits in each HAPD*/
     TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
-    TH1* h_chHitWoHot = NULL;/**<The number of hits in each channels*/
-    TH1* h_chipHitWoHot = NULL;/**<The number of hits in each ASIC chips*/
-    TH1* h_hapdHitWoHot = NULL;/**<The number of hits in each HAPDs*/
-    TH1* h_mergerHitWoHot = NULL;/**<The number of hits in each Merger Boards*/
     TH1* h_secHapdHit[6] = {};/**<The number of hits in each HAPDs of each sector*/
     TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
     TH1* h_aerogelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
     TH1* h_bits = NULL;/**<Timing bits*/
-    TH2* h_hits2D = NULL;/**<2D hit map of whale ARICH*/
     TH2* h_hitsPerTrack2D = NULL;/**<Sum of 2D hit/track map on each position of track*/
     TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
-    TH2* h_aerogelHits2D[124] = {};/**<2D hit maps of each aerogel tiles*/
-    TH2* h_aerogelTracks2D[124] = {};/**<2D track distributions of each aerogel tiles*/
-
+    TH3* h_aerogelHits3D = NULL; /**< 3D histogram of */
+    TH3* h_mirrorThetaPhi = NULL; /**< cherenkov theta vs phi for mirror reflected photons (for each mirror plate)*/
+    TH2* h_thetaPhi = NULL;  /**< cherenkov theta vs phi for non-mirror-reflected photons*/
     TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
     TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/
     TH1* h_hitsPerTrack = NULL;/**<Average hits/track calculated from h_hits2D and h_track2D*/

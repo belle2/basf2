@@ -136,6 +136,11 @@ We can then make a reference to this section by using ``:ref:`referencing_things
 If you prefer to have a numbered reference, we could instead use ``:numref:`referencing_things``` which displays as
 :numref:`referencing_things`.
 
+We also have enabled a extension to automatically define references for all
+sections. So without adding anything this section could also be referenced by
+``:ref:`framework/doc/atend-doctools:Referencing Components``` which still
+result in :ref:`framework/doc/atend-doctools:Referencing Components`.
+
 Inserting Figures
 -----------------
 

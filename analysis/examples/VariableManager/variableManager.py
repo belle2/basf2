@@ -9,24 +9,29 @@
 # Therefore we have to escape the variable names before putting them into ROOT files, you can get
 # the branch-names outputted by modules like VariablesToHistogram, VariablesToNtuple and VariablesToTree
 # using the makeROOTCompatible function
+#
+# Thomas Keck
+#
+# For full documentation please refer to https://software.belle2.org
+# Anything unclear? Ask questions at https://questions.belle2.org
 
 import variables
-from variables import variables as v
+from variables import variables as vm  # shorthand name for the VariableManager instance
 
-var = v.getVariable('M')
+var = vm.getVariable('M')
 print("Name and Description of Variable M")
 print(var.name)
 print(var.description)
 
-v.addAlias('sigProb', 'extraInfo(SignalProbability)')
-var = v.getVariable('sigProb')
+vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+var = vm.getVariable('sigProb')
 print("Real name of sigProb: ", var.name)
 
-v.addCollection('Kinematics', variables.std_vector('px', 'py', 'pz'))
-var = v.getCollection('Kinematics')
+vm.addCollection('Kinematics', variables.std_vector('px', 'py', 'pz'))
+var = vm.getCollection('Kinematics')
 print("Collection named Kinematics: ", list(var))
 
-result = v.evaluate('constant(123)', None)
+result = vm.evaluate('constant(123)', None)
 print("Result of evaluating the variable 'constant(123)' ", result)
 
 import ROOT

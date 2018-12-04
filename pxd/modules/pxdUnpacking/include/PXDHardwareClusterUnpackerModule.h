@@ -40,11 +40,11 @@ namespace Belle2 {
       PXDHardwareClusterUnpackerModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the unpacking */
-      virtual void event();
+      virtual void event() override;
       /** Terminate the module */
-      virtual void terminate();
+      virtual void terminate() override;
 
     private:
 

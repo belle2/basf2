@@ -682,8 +682,13 @@ c     print refractive index in xml format
 
       INTEGER I
       REAL X, B(3), C(3)
-      DATA B /0.6961663, 0.4079426, 0.8974794/
-      DATA C /0.0046791, 0.0135121, 97.9340025/
+c--   parameters of SellMeier equation (K. Inami, avg-2013)
+C     DATA B /0.6961663, 0.4079426, 0.8974794/
+C     DATA C /0.0046791, 0.0135121, 97.9340025/
+c--   new parameters of SellMeier equation (Matsuoka, 24.11.2018)
+c--   from the specs of Corning HPFS 7980 
+      DATA B /0.683740494, 0.420323613, 0.585027480/
+      DATA C /0.00460352869, 0.0133968856, 64.4932732/
       SAVE B, C
 
 C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)

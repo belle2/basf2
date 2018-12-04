@@ -22,7 +22,13 @@ namespace Belle2 {
   {
     if (m_exitThickness <= 0) return false;
     if (m_flatLength < 0) return false;
-    if (!TOPGeoBarSegment::isConsistent()) return false;
+    if (m_width <= 0) return false;
+    if (m_thickness <= 0) return false;
+    if (m_length <= 0) return false;
+    if (m_material.empty()) return false;
+    if (m_surface.getName().empty() and !m_surface.hasProperties()) return false;
+    if (m_sigmaAlpha < 0) return false;
+    if (m_brokenFraction > 0 and m_brokenGlueMaterial.empty()) return false;
     if (!m_peelOffRegions.empty()) {
       if (m_peelOffSize <= 0) return false;
       if (m_peelOffThickness <= 0) return false;
@@ -47,8 +53,10 @@ namespace Belle2 {
     cout << " Prism angle: " << getAngle() / Unit::deg << " deg";
     cout << ", flat surface length: " << getFlatLength() << " " << s_unitName << endl;
     cout << " Material: " << getMaterial() << endl;
-    cout << " Wavelenght filter: " << getFilterMaterial()
-         << ", thickness: " << getFilterThickness() << " " << s_unitName << endl;
+    if (getFilterThickness() > 0) { // old payload
+      cout << " Wavelenght filter: " << getFilterMaterial()
+           << ", thickness: " << getFilterThickness() << " " << s_unitName << endl;
+    }
     if (!m_peelOffRegions.empty()) {
       cout << " Peel-off cookie regions: ";
       cout << " size = " << getPeelOffSize() << " " << s_unitName;
@@ -72,8 +80,8 @@ namespace Belle2 {
   {
     for (const auto& region : m_peelOffRegions) {
       if (region.ID == ID) {
-        B2ERROR("TOPGeoPrism::appendPeelOffRegion: region ID = " << ID
-                << " already appended");
+        B2ERROR("TOPGeoPrism::appendPeelOffRegion: region already appended."
+                << LogVar("region ID", ID));
         return;
       }
     }
@@ -83,8 +91,8 @@ namespace Belle2 {
     region.angle = angle;
     double halfSize = (getWidth() - getPeelOffSize()) / 2;
     if (fabs(getPeelOffCenter(region)) > halfSize) {
-      B2ERROR("TOPGeoPrism::appendPeelOffRegion: region ID = " << ID
-              << " doesn't fit into prism");
+      B2ERROR("TOPGeoPrism::appendPeelOffRegion: region doesn't fit into prism."
+              << LogVar("region ID", ID));
       return;
     }
     m_peelOffRegions.push_back(region);

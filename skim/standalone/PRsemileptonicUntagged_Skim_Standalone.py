@@ -14,15 +14,12 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdE, stdMu
 from stdPi0s import *
 from stdV0s import *
 from skimExpertFunctions import *
-from stdCharm import *
+from skim.standardlists.charm import *
 set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
 
 gb2_setuprel = 'release-02-00-01'
 
@@ -33,18 +30,22 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
+# create a new path
+PRSLpath = Path()
 
-inputMdstList('MC9', fileList)
-loadStdCharged()
+inputMdstList('MC9', fileList, path=PRSLpath)
+stdPi('all', path=PRSLpath)
+stdE('all', path=PRSLpath)
+stdMu('all', path=PRSLpath)
 # PR Skim
 from skim.semileptonic import PRList
-PRList = PRList()
-skimOutputUdst(skimCode, PRList)
+PRList = PRList(path=PRSLpath)
+skimOutputUdst(skimCode, PRList, path=PRSLpath)
 
-summaryOfLists(PRList)
+summaryOfLists(PRList, path=PRSLpath)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=PRSLpath)
+process(path=PRSLpath)
 # print out the summary
 print(statistics)

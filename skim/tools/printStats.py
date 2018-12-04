@@ -15,8 +15,12 @@ import os
 import itertools
 import sys
 import collections
+from skimExpertFunctions import *
+import subprocess
+import json
 
-skims = 'BottomoniumEtabExclusive'
+
+skims = 'BottomoniumEtabExclusive ALP3Gamma'
 
 #  skimNames1 = ' BtoDh_Kspi0 BtoDh_Kspipipi0 BtoDh_Kshh BtoDh_hh BtoPi0Pi0
 # BottomoniumEtabExclusive BottomoniumUpsilon  SLUntagged LeptonicUntagged
@@ -27,7 +31,7 @@ skims = 'BottomoniumEtabExclusive'
 #  PRsemileptonicUntagged DoubleCharm feiHadronicB0 feiHadronicBplus
 # feiSLB0WithOneLep feiSLBplusWithOneLep '
 
-bkgs = ' bsbs_6S_BGx1 mixedBGx1  chargedBGx1 ccbarBGx1 ssbarBGx1 uubarBGx0  ddbarBGx1  taupairBGx1 '
+bkgs = 'MC9_mixedBGx1   MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1 '
 # mixedBGx0 chargedBGx0 ccbarBGx0 ssbarBGx0 uubarBGx0 ddbarBGx0 taupairBGx0
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
@@ -37,6 +41,8 @@ jsonTimeInput = open('JsonTimeInput.txt', 'w')
 nFullFiles = 1000
 nFullEvents = 200000
 
+fileList = getTestFile('mixedBGx1', 'MC10')
+print(str(getNEvents(fileList)))
 for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
@@ -51,7 +57,12 @@ for skim in skims.split():
         inputFileName = skim + '_' + bkg + '.out'
         outputFileName = skim + '_' + bkg
         outputUdstName = skim + '_' + bkg
-
+        process = subprocess.Popen(['b2file-metadata-show', '--json', getTestFile('mixedBGx1', 'MC9')], stdout=subprocess.PIPE)
+        out = process.communicate()[0]
+        if process.returncode == 0:
+            metadata = json.loads(out)
+            nevents = metadata['nEvents']
+            print(str(nevents))
         if (bkg == 'mixedBGx1'):
             nFullEvents = 120000
             nFullFiles = 3564

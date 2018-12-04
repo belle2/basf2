@@ -25,6 +25,7 @@
 #include <top/dataobjects/TOPBarHit.h>
 #include <reconstruction/dataobjects/CDCDedxLikelihood.h>
 #include <reconstruction/dataobjects/VXDDedxLikelihood.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <top/dataobjects/TOPRecBunch.h>
 
 // framework - DataStore
@@ -93,6 +94,9 @@ namespace Belle2 {
              "bias in bunch time determination [ns], to be subtracted", 0.0);
     addParam("bunchesPerSSTclk", m_bunchesPerSSTclk,
              "number of bunches per SST clock period", 24);
+    addParam("usePIDLikelihoods", m_usePIDLikelihoods,
+             "use PIDLikelihoods instead of DedxLikelihoods (only if run on cdst files)",
+             false);
   }
 
 
@@ -105,6 +109,7 @@ namespace Belle2 {
     m_tracks.isRequired();
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
+    m_initialParticles.isOptional();
 
     if (m_useMCTruth) {
       StoreArray<MCParticle> mcParticles;
@@ -112,10 +117,15 @@ namespace Belle2 {
       StoreArray<TOPBarHit> barHits;
       barHits.isRequired();
     } else {
-      StoreArray<CDCDedxLikelihood> cdcDedxLikelihoods;
-      cdcDedxLikelihoods.isRequired();
-      StoreArray<VXDDedxLikelihood> vxdDedxLikelihoods;
-      vxdDedxLikelihoods.isOptional();
+      if (m_usePIDLikelihoods) {
+        StoreArray<PIDLikelihood> pidLikelihoods;
+        pidLikelihoods.isRequired();
+      } else {
+        StoreArray<CDCDedxLikelihood> cdcDedxLikelihoods;
+        cdcDedxLikelihoods.isRequired();
+        StoreArray<VXDDedxLikelihood> vxdDedxLikelihoods;
+        vxdDedxLikelihoods.isOptional();
+      }
     }
 
     // output
@@ -153,11 +163,23 @@ namespace Belle2 {
 
     m_processed++;
 
-    // define output for reconstructed bunch values
+    // define output for the reconstructed bunch
 
-    if (!m_recBunch.isValid()) m_recBunch.create();
+    if (!m_recBunch.isValid()) {
+      m_recBunch.create();
+    } else {
+      m_recBunch->clearReconstructed();
+    }
 
-    // set revo9 counter from the first raw digit (all should be the same)
+    // set MC truth if available
+
+    if (m_initialParticles.isValid()) {
+      double simTime = m_initialParticles->getTime();
+      int simBunchNumber = round(simTime / m_bunchTimeSep);
+      m_recBunch->setSimulated(simBunchNumber, simTime);
+    }
+
+    // set revo9 counter from the first raw digit if available (all should be the same)
 
     if (m_topRawDigits.getEntries() > 0) {
       const auto* rawDigit = m_topRawDigits[0];
@@ -182,7 +204,7 @@ namespace Belle2 {
     // counters and temporary containers
 
     int numTrk = 0;
-    int nodEdxTrk = 0;
+    m_nodEdxCount = 0;
     std::vector<TOPtrack> topTracks;
     std::vector<double> masses;
     std::vector<TOP1Dpdf> top1Dpdfs;
@@ -194,22 +216,13 @@ namespace Belle2 {
       if (!trk.isValid()) continue;
 
       // determine most probable particle mass
-      double mass = Const::pion.getMass();
-      bool nodEdx = false;
+      double mass = 0;
       if (m_useMCTruth) {
         if (!trk.getMCParticle()) continue;
         if (!trk.getBarHit()) continue;
         mass = trk.getMCParticle()->getMass();
       } else {
-        auto cdcdedx = track.getRelated<CDCDedxLikelihood>();
-        auto vxddedx = track.getRelated<VXDDedxLikelihood>();
-        if (cdcdedx or vxddedx) {
-          mass = getMostProbableMass(cdcdedx, vxddedx);
-        } else {
-          nodEdx = true;
-          B2DEBUG(100, "TOPBunchFinder: track has no relation to DedxLikelihoods - "
-                  "pion mass used instead");
-        }
+        mass = getMostProbableMass(track);
       }
 
       // reconstruct (e.g. set PDF internally)
@@ -233,11 +246,10 @@ namespace Belle2 {
 
       topTracks.push_back(trk);
       masses.push_back(mass);
-      if (nodEdx) nodEdxTrk++;
       top1Dpdfs.push_back(pdf1d);
 
     }
-    m_recBunch->setNumTracks(numTrk, topTracks.size(), nodEdxTrk);
+    m_recBunch->setNumTracks(numTrk, topTracks.size(), m_nodEdxCount);
     if (topTracks.empty()) return;
 
     // determine search region
@@ -268,7 +280,7 @@ namespace Belle2 {
                                                         "rough T0; t_{0} [ns]; -2 log L"));
     }
     if (t0Rough.position < minT0 or t0Rough.position > maxT0 or !t0Rough.valid) {
-      B2WARNING("rough t0: invalid or out of range!");
+      B2DEBUG(100, "Rough T0 finder: returning invalid or out of range T0");
       return;
     }
 
@@ -306,7 +318,7 @@ namespace Belle2 {
                                                      "precise T0; t_{0} [ns]; -2 log L"));
       }
       if (t0Fine.position < t0min or t0Fine.position > t0max or !t0Fine.valid) {
-        B2WARNING("fine t0: invalid or out of range!");
+        B2DEBUG(100, "Fine T0 finder: returning invalid or out of range T0");
         return;
       }
 
@@ -376,7 +388,7 @@ namespace Belle2 {
         if (m_addOffset) {
           double err = digit.getTimeError();
           digit.setTimeError(sqrt(err * err + m_error * m_error));
-          digit.addStatus(TOPDigit::c_OffsetSubtracted);
+          digit.addStatus(TOPDigit::c_BunchOffsetSubtracted);
         }
       }
     }
@@ -391,37 +403,59 @@ namespace Belle2 {
   }
 
 
-  double TOPBunchFinderModule::getMostProbableMass(const CDCDedxLikelihood* cdcdedx,
-                                                   const VXDDedxLikelihood* vxddedx)
+  double TOPBunchFinderModule::getMostProbableMass(const Track& track)
   {
-    if (!cdcdedx and !vxddedx) return 0;
 
     std::vector<double> logL;
     std::vector<double> masses;
     std::vector<double> priors;
-    for (const auto& type : Const::chargedStableSet) {
-      if (cdcdedx and vxddedx) {
-        logL.push_back(cdcdedx->getLogL(type) + vxddedx->getLogL(type));
-      } else if (cdcdedx) {
-        logL.push_back(cdcdedx->getLogL(type));
-      } else {
-        logL.push_back(vxddedx->getLogL(type));
+
+    if (m_usePIDLikelihoods) {
+      const auto* pid = track.getRelated<PIDLikelihood>();
+      if (!pid) {
+        m_nodEdxCount++;
+        return Const::pion.getMass();
       }
-      masses.push_back(type.getMass());
-      priors.push_back(m_priors[abs(type.getPDGCode())]);
+      auto subset = Const::PIDDetectorSet(Const::SVD);
+      subset += Const::PIDDetectorSet(Const::CDC);
+      for (const auto& type : Const::chargedStableSet) {
+        logL.push_back(pid->getLogL(type, subset));
+        masses.push_back(type.getMass());
+        priors.push_back(m_priors[abs(type.getPDGCode())]);
+      }
+    } else {
+      const auto* cdcdedx = track.getRelated<CDCDedxLikelihood>();
+      const auto* vxddedx = track.getRelated<VXDDedxLikelihood>();
+      if (!cdcdedx and !vxddedx) {
+        m_nodEdxCount++;
+        return Const::pion.getMass();
+      }
+      for (const auto& type : Const::chargedStableSet) {
+        if (cdcdedx and vxddedx) {
+          logL.push_back(cdcdedx->getLogL(type) + vxddedx->getLogL(type));
+        } else if (cdcdedx) {
+          logL.push_back(cdcdedx->getLogL(type));
+        } else {
+          logL.push_back(vxddedx->getLogL(type));
+        }
+        masses.push_back(type.getMass());
+        priors.push_back(m_priors[abs(type.getPDGCode())]);
+      }
     }
 
-    // get maximum
+    // get maximal logL
     auto logL_max = logL[0];
     for (auto x : logL) {
       if (x > logL_max) logL_max = x;
     }
+
     // calculate probabilities, normalizaton is not needed
     std::vector<double> probability(logL.size());
     for (unsigned i = 0; i < logL.size(); ++i) {
       probability[i] = exp(logL[i] - logL_max) * priors[i];
     }
 
+    // find most probable mass
     unsigned i0 = 0;
     for (unsigned i = 0; i < probability.size(); ++i) {
       if (probability[i] > probability[i0]) i0 = i;

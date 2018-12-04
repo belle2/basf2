@@ -179,7 +179,7 @@ class Mails:
             # if user already is in mail_log, add the failed scripts
             else:
                 for script in contact:
-                    mail_log[contact][script] = failed_script[contact][script]
+                    mail_log[contact][script] = failed_scripts[contact][script]
 
         return mail_log
 

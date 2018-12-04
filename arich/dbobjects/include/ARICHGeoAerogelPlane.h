@@ -63,13 +63,13 @@ namespace Belle2 {
      * Consistency check of geometry parameters
      * @return true if consistent
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Aerogel plane parameters:") const;
+    void print(const std::string& title = "Aerogel plane parameters:") const override;
 
     /**
      * Set aerogel plane positioning within ARICH local volume
@@ -521,7 +521,7 @@ namespace Belle2 {
 
     double m_compensationARICHairVolumeThick_min; /**< Minimum thickness of the compensation volume with ARICH air */
 
-    ClassDef(ARICHGeoAerogelPlane, 3); /**< ClassDef */
+    ClassDefOverride(ARICHGeoAerogelPlane, 3); /**< ClassDef */
 
   };
 

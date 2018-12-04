@@ -73,7 +73,7 @@ namespace Belle2 {
     int m_narres;  /**< narr_res: no narrow resonances (0), J/psi (1) and psi(2S) (2) only for m_finalState = 0,1,6,7 */
     int m_protonff;  /**< ProtonFormFactor old(0), ProtonFormFactor new(1) */
 
-    double m_cmsEnergy; /**< CMS energy. */
+    double m_cmsEnergy = -1.0; /**< CMS energy. */
     std::vector<double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::vector<double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
     double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV^2]. */

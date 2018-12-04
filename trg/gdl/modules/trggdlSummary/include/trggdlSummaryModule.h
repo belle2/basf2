@@ -8,6 +8,10 @@
 #include <mdst/dataobjects/TRGSummary.h>
 #include <stdlib.h>
 #include <iostream>
+#include <framework/database/DBObjPtr.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
+#include <trg/gdl/dbobjects/TRGGDLDBPrescales.h>
+#include <trg/gdl/dbobjects/TRGGDLDBFTDLBits.h>
 
 #include <TH2I.h>
 #include <TH1I.h>
@@ -39,6 +43,15 @@ namespace Belle2 {
   private:
 
     StoreObjPtr<TRGSummary> GDLResult; /**< output for TRGSummary */
+
+    //condition database for unpacer
+    DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
+    int LeafBitMap[320];
+    char LeafNames[320][100];
+    int _e_timtype;
+    int ee_psn[10];
+    int ee_ftd[10];
+    int ee_itd[10];
 
   };
 

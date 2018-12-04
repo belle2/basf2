@@ -109,25 +109,25 @@ void PXDClusterizerModule::initialize()
   m_relDigitTrueHitName = relDigitTrueHits.getName();
   m_relDigitMCParticleName = relDigitMCParticles.getName();
 
-  B2DEBUG(10,
+  B2DEBUG(20,
           "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
-  B2DEBUG(10, " -->  ElectronicNoise:    " << m_elNoise);
-  B2DEBUG(10, " -->  NoiseSN:            " << m_cutAdjacent);
-  B2DEBUG(10, " -->  SeedSN:             " << m_cutSeed);
-  B2DEBUG(10, " -->  ClusterSN:          " << m_cutCluster);
-  B2DEBUG(10,
+  B2DEBUG(20, " -->  ElectronicNoise:    " << m_elNoise);
+  B2DEBUG(20, " -->  NoiseSN:            " << m_cutAdjacent);
+  B2DEBUG(20, " -->  SeedSN:             " << m_cutSeed);
+  B2DEBUG(20, " -->  ClusterSN:          " << m_cutCluster);
+  B2DEBUG(20,
           " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2DEBUG(10,
+  B2DEBUG(20,
           " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
-  B2DEBUG(10,
+  B2DEBUG(20,
           " -->  Clusters:           " << DataStore::arrayName<PXDCluster>(m_storeClustersName));
-  B2DEBUG(10,
+  B2DEBUG(20,
           " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
-  B2DEBUG(10, " -->  DigitMCRel:         " << m_relDigitMCParticleName);
-  B2DEBUG(10, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
-  B2DEBUG(10, " -->  ClusterDigitRel:    " << m_relClusterDigitName);
-  B2DEBUG(10, " -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  B2DEBUG(10, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2DEBUG(20, " -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2DEBUG(20, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
+  B2DEBUG(20, " -->  ClusterDigitRel:    " << m_relClusterDigitName);
+  B2DEBUG(20, " -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  B2DEBUG(20, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
 
 
   m_noiseMap.setNoiseLevel(m_elNoise);
@@ -333,7 +333,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     TVector3 lorentzShift = info.getLorentzShift(projU.getPos(), projV.getPos());
     projU.setPos(projU.getPos() - lorentzShift.X());
     projV.setPos(projV.getPos() - lorentzShift.Y());
-    B2DEBUG(100, "Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
+    B2DEBUG(20, "Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
 
     // Pre classification of cluster looking at pitch type of pixels and if they touch sensor edges
     int clusterkind = PXDClusterPositionEstimator::getInstance().getClusterkind(cls.pixels(), sensorID);

@@ -67,10 +67,11 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
     std::vector<double> empty_s_gaps;
     std::adjacent_difference(begin(arc_lengths), end(arc_lengths), back_inserter(empty_s_gaps));
 
+    // Wrap a reference to empty_s_acc in a lambda, b/c it is passed by value to the following
+    // for_each. If used directly, only a copy would filled in the for_each.
+    auto empty_s_acc_ref = [&empty_s_acc](double s) { empty_s_acc(s); };
     // start filling accumulator with hit gaps, but skip first which is not a difference
-    std::for_each(next(begin(empty_s_gaps)), end(empty_s_gaps), [&empty_s_acc](double empty_s) {
-      empty_s_acc(empty_s);
-    });
+    std::for_each(next(begin(empty_s_gaps)), end(empty_s_gaps), empty_s_acc_ref);
   }
 
   unsigned int empty_s_size = bacc::count(empty_s_acc);

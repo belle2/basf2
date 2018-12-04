@@ -80,8 +80,8 @@ namespace Belle2 {
   {
     for (const auto& region : m_peelOffRegions) {
       if (region.ID == ID) {
-        B2ERROR("TOPGeoPrism::appendPeelOffRegion: region ID = " << ID
-                << " already appended");
+        B2ERROR("TOPGeoPrism::appendPeelOffRegion: region already appended."
+                << LogVar("region ID", ID));
         return;
       }
     }
@@ -91,8 +91,8 @@ namespace Belle2 {
     region.angle = angle;
     double halfSize = (getWidth() - getPeelOffSize()) / 2;
     if (fabs(getPeelOffCenter(region)) > halfSize) {
-      B2ERROR("TOPGeoPrism::appendPeelOffRegion: region ID = " << ID
-              << " doesn't fit into prism");
+      B2ERROR("TOPGeoPrism::appendPeelOffRegion: region doesn't fit into prism."
+              << LogVar("region ID", ID));
       return;
     }
     m_peelOffRegions.push_back(region);

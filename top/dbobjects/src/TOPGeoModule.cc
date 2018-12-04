@@ -32,7 +32,8 @@ namespace Belle2 {
         m_bar2.setGlueDelamination(fraction, angle, material);
         break;
       default:
-        B2ERROR("TOPGeoModule::setBrokenGlue: invalid glue ID " << glueID);
+        B2ERROR("TOPGeoModule::setBrokenGlue: invalid glue ID."
+                << LogVar("glue ID", glueID));
     }
   }
 

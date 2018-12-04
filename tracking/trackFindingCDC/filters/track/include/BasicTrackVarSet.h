@@ -78,14 +78,25 @@ namespace Belle2 {
     public:
       /// Generate and assign the contained variables
       bool extract(const CDCTrack* track) override;
-      // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
-      // data that they accumulate (i.e. are "filled" with).
+
+      /** Set of statistics/features to accumulate for each variable category (e.g. drift length).
+       * The statistics set is defined with the boost::accumulator framework, which handles the
+       * interdependencies in a smart way. E.g. the calculation of the mean reuses the previously
+       * calculated sum. New statistics can be easily added if necessary.
+       */
       using statistics_set = bacc::features<bacc::tag::count,
             bacc::tag::sum,
             bacc::tag::min,
             bacc::tag::max,
             bacc::tag::mean,
             bacc::tag::lazy_variance>;
+
+      /** A boost accumulators set that aggregates statistics for the values it is called with.
+          It is used to calculate the variables in the extract method.  An accumulator set should be
+          created for each category of variables, such as drift length, ADC count, etc. Calling it
+          can be thought of as "filling" it with new values. It then calculates all statistics
+          (corresponding to the final variables) while handling interdependencies in a smart way.
+      */
       using statistics_accumulator = bacc::accumulator_set<double, statistics_set>;
     };
   }

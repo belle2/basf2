@@ -163,7 +163,7 @@ namespace Belle2 {
        * @param serialNumber bar segment serial number
        */
       TOPGeoBarSegment createBarSegment(const GearDir& content,
-                                        const std::string serialNumber);
+                                        const std::string& serialNumber);
 
       /**
        * Create a parameter object from gearbox for mirror segment
@@ -171,7 +171,7 @@ namespace Belle2 {
        * @param serialNumber mirror segment serial number
        */
       TOPGeoMirrorSegment createMirrorSegment(const GearDir& content,
-                                              const std::string serialNumber);
+                                              const std::string& serialNumber);
 
       /**
        * Create a parameter object from gearbox for prism
@@ -179,7 +179,7 @@ namespace Belle2 {
        * @param serialNumber prism serial number
        */
       TOPGeoPrism createPrism(const GearDir& content,
-                              const std::string serialNumber);
+                              const std::string& serialNumber);
 
       /**
        * Adds number to string

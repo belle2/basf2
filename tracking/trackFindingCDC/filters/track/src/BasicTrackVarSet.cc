@@ -21,6 +21,7 @@
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <numeric>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -53,14 +54,12 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   // Extract empty_s (ArcLength2D gap) information
   double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
 
-  // fill vector with all 2D arc lengths
+  // fill a vector with all 2D arc lengths in track
   std::vector<double> arc_lengths;
-  std::transform(begin(*track),
-                 end(*track),
-                 back_inserter(arc_lengths),
-  [](const CDCRecoHit3D & recoHit) { return recoHit.getArcLength2D(); });
+  auto get_arc_length = [](const CDCRecoHit3D & recoHit) { return recoHit.getArcLength2D(); };
+  std::transform(begin(*track), end(*track), back_inserter(arc_lengths), get_arc_length);
   // Remove all NAN elements. For some reason, last hit in track is sometimes NAN
-  erase_remove_if(arc_lengths, [](double x) { return std::isnan(x); });
+  erase_remove_if(arc_lengths, IsNaN());
 
   // calculate gaps in arc length s between adjacent hits
   // beware: first element not a difference but mapped onto itself, empty_s_gaps[0] = arc_lengths[0]

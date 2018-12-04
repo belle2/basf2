@@ -115,7 +115,7 @@ namespace Belle2 {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Invalid slot number, "
-                  "returning parameters of slot 0 channel 0 (" << ClassName() << ")"
+                  "returning parameters of slot 1 channel 0 (" << ClassName() << ")"
                   << LogVar("slot", moduleID));
         return m_par[0][0];
       }

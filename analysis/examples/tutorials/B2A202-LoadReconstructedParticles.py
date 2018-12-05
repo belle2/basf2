@@ -110,7 +110,6 @@ K0s_variables = vc.kinematics + \
 
 pi0_variables = vc.mc_truth + \
     vc.kinematics + \
-    vc.mass_before_fit + \
     ['extraInfo(BDT)', 'decayAngle(0)']
 
 # Saving variables to ntuple

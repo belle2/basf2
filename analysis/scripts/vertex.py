@@ -35,7 +35,7 @@ def fitVertex(
     warning = (
         "Direct use of fitVertex is deprecated.\n"
         "Please use vertexKFit, vertexRave, or any of the other convenience functions as appropriate.\n"
-        "See documentation at \n  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/Vertex.html"
+        "See documentation at \n  https://software.belle2.org/analysis/doc/Vertex.html"
         )
 
     B2WARNING(warning)
@@ -119,7 +119,7 @@ def vertexKFit(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -167,7 +167,7 @@ def vertexKFitDaughtersUpdate(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -215,7 +215,7 @@ def massVertexKFit(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -263,7 +263,7 @@ def massVertexKFitDaughtersUpdate(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -311,7 +311,7 @@ def massKFit(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -359,7 +359,7 @@ def massKFitDaughtersUpdate(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -463,7 +463,7 @@ def vertexRave(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -513,7 +513,7 @@ def vertexRaveDaughtersUpdate(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -558,7 +558,7 @@ def massVertexRave(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -606,7 +606,7 @@ def massVertexRaveDaughtersUpdate(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 
@@ -655,7 +655,7 @@ def massRave(
     else:
         message_if = (
             "Please consult the documentation at\n"
-            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "  https://software.belle2.org/analysis/doc/TreeFitter.html\n"
             "for special constraints.\n"
             )
 

@@ -21,22 +21,23 @@ from skimExpertFunctions import *
 from stdCharged import *
 from stdPhotons import *
 
+taugenericskim = Path()
+
 fileList = ['../TauGeneric.dst.root']
+inputMdstList('MC9', fileList, path=taugenericskim)
 
-inputMdstList('MC9', fileList)
-
-stdPi('all')
-stdPhotons('all')
+stdPi('all', path=taugenericskim)
+stdPhotons('all', path=taugenericskim)
 
 # TauGeneric skim
 from skim.taupair import *
-tauList = TauList()
-skimOutputUdst('../TauGeneric.udst.root', tauList)
-summaryOfLists(tauList)
+tauList = TauList(path=taugenericskim)
+skimOutputUdst('../TauGeneric.udst.root', tauList, path=taugenericskim)
+summaryOfLists(tauList, path=taugenericskim)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taugenericskim)
+process(taugenericskim)
 
 # print out the summary
 print(statistics)

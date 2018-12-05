@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import register_module
+from basf2 import B2WARNING
 import sys
 import inspect
 from analysisPath import analysis_main
@@ -32,9 +33,9 @@ def fitVertex(
     """
 
     warning = (
-        "Direct use of fitVertex is deprecated."
-        "Please use vertexKFit, vertexRave, or any of the other convenience functions as appropriate."
-        "See documentation at https://b2-master.belle2.org/software/development/sphinx/analysis/doc/Vertex.html"
+        "Direct use of fitVertex is deprecated.\n"
+        "Please use vertexKFit, vertexRave, or any of the other convenience functions as appropriate.\n"
+        "See documentation at \n  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/Vertex.html"
         )
 
     B2WARNING(warning)
@@ -93,16 +94,37 @@ def vertexKFit(
     decay_string='',
     constraint='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
 
-    @param list_name    name of the input ParticleList
-    @param conf_level   minimum value of the confidence level to accept the fit
-    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
-    @param path         modules are added to this path
-    @param decay_string select particles used for the vertex fit
+    @param list_name       name of the input ParticleList
+    @param conf_level      minimum value of the confidence level to accept the fit
+    @param constraint      add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path            modules are added to this path
+    @param decay_string    select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ", updateAllDaughters=False)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if constraint is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -121,15 +143,36 @@ def vertexKFitDaughtersUpdate(
     conf_level,
     constraint='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the Daughters.
 
-    @param list_name    name of the input ParticleList
-    @param conf_level   minimum value of the confidence level to accept the fit
-    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
-    @param path         modules are added to this path
+    @param list_name      name of the input ParticleList
+    @param conf_level      minimum value of the confidence level to accept the fit
+    @param constraint      add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path            modules are added to this path
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ", updateAllDaughters=True)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if constraint is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -148,15 +191,36 @@ def massVertexKFit(
     conf_level,
     decay_string='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
 
-    @param list_name    name of the input ParticleList
-    @param conf_level   minimum value of the confidence level to accept the fit
-    @param path         modules are added to this path
-    @param decay_string select particles used for the vertex fit
+    @param list_name       name of the input ParticleList
+    @param conf_level      minimum value of the confidence level to accept the fit
+    @param path            modules are added to this path
+    @param decay_string    select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if decay_string is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -175,6 +239,7 @@ def massVertexKFitDaughtersUpdate(
     conf_level,
     decay_string='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -183,7 +248,27 @@ def massVertexKFitDaughtersUpdate(
     @param conf_level   minimum value of the confidence level to accept the fit
     @param path         modules are added to this path
     @param decay_string select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if decay_string is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -202,6 +287,7 @@ def massKFit(
     conf_level,
     decay_string='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
@@ -210,7 +296,27 @@ def massKFit(
     @param conf_level   minimum value of the confidence level to accept the fit
     @param path         modules are added to this path
     @param decay_string select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if decay_string is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -229,6 +335,7 @@ def massKFitDaughtersUpdate(
     conf_level,
     decay_string='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
@@ -237,7 +344,27 @@ def massKFitDaughtersUpdate(
     @param conf_level   minimum value of the confidence level to accept the fit
     @param path         modules are added to this path
     @param decay_string select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if decay_string is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -311,6 +438,7 @@ def vertexRave(
     decay_string='',
     constraint='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform vertex fit using the RAVE for each Particle in the given ParticleList.
@@ -320,7 +448,27 @@ def vertexRave(
     @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
     @param path         modules are added to this path
     @param decay_string select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ", updateAllDaughters=False)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if constraint is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -340,6 +488,7 @@ def vertexRaveDaughtersUpdate(
     decay_string='',
     constraint='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform vertex fit using RAVE for each Particle in the given ParticleList and update the Daughters.
@@ -349,7 +498,27 @@ def vertexRaveDaughtersUpdate(
     @param decay_string select particles used for the vertex fit
     @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
     @param path         modules are added to this path
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ", updateAllDaughters=True)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if constraint is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     puvfit = register_module('VertexFitUpdateDaughters')
     puvfit.set_name('VertexFitUpdateDaughters_' + list_name)
@@ -365,6 +534,7 @@ def massVertexRave(
     conf_level,
     decay_string='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList.
@@ -373,7 +543,27 @@ def massVertexRave(
     @param conf_level   minimum value of the confidence level to accept the fit
     @param path         modules are added to this path
     @param decay_string select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if decay_string is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -392,6 +582,7 @@ def massVertexRaveDaughtersUpdate(
     conf_level,
     decay_string='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList and update the daughters.
@@ -400,7 +591,27 @@ def massVertexRaveDaughtersUpdate(
     @param conf_level   minimum value of the confidence level to accept the fit
     @param path         modules are added to this path
     @param decay_string select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=True)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if decay_string is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,
@@ -419,6 +630,7 @@ def massRave(
     conf_level,
     decay_string='',
     path=analysis_main,
+    silence_warning=False,
 ):
     """
     Perform mass fit using the RAVE for each Particle in the given ParticleList.
@@ -428,7 +640,27 @@ def massRave(
     @param conf_level   minimum value of the confidence level to accept the fit
     @param path         modules are added to this path
     @param decay_string select particles used for the vertex fit
+    @param silence_warning silence warning advertising TreeFitter use
     """
+
+    message_a = (
+        "Hello there. You seem to want to perform a vertex fit. Please consider using TreeFitter, even for single vertices.\n"
+        "Try: \n  vertexTree(\'" + list_name + "\'," + str(conf_level) +
+        ",massConstraint=[\'" + list_name.split(':')[0] + "\'], updateAllDaughters=False)\n"
+        )
+    message_b = "To remove this warning, add silence_warning=True to the arguments of this function."
+
+    if decay_string is '':
+        message_if = ""
+    else:
+        message_if = (
+            "Please consult the documentation at\n"
+            "  https://b2-master.belle2.org/software/development/sphinx/analysis/doc/TreeFitter.html\n"
+            "for special constraints.\n"
+            )
+
+    if not silence_warning:
+        B2WARNING(message_a + message_if + message_b)
 
     _fitVertex(
         list_name,

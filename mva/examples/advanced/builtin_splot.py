@@ -98,7 +98,7 @@ if __name__ == "__main__":
     inputMdstList('MC6', ['/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_0001*.root'], path=path)
     fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5')], path=path)
     reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
-    vertexKFit('D0', 0.1, path=path)
+    vertexKFit('D0', 0.1, path=path, silence_warning=True)
     applyCuts('D0', '1.8 < M < 1.9', path=path)
     matchMCTruth('D0', path=path)
 

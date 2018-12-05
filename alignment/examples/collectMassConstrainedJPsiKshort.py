@@ -36,8 +36,8 @@ ana.fillParticleList('pi+:K_S0', 'pionID > 0.1', writeOut=True, path=main)
 ana.reconstructDecay('J/psi:mumu -> mu-:Jpsi mu+:Jpsi', 'InvM > 2.9969 and InvM <  3.1969', writeOut=True, path=main)
 ana.reconstructDecay('K_S0:pipi -> pi-:K_S0 pi+:K_S0', 'InvM > 0.44761 and InvM <  0.54761', writeOut=True, path=main)
 
-ana.vertexRaveDaughtersUpdate('J/psi:mumu', 0.0, path=main)
-ana.vertexRaveDaughtersUpdate('K_S0:pipi', 0.0, path=main)
+ana.vertexRaveDaughtersUpdate('J/psi:mumu', 0.0, path=main, silence_warning=True)
+ana.vertexRaveDaughtersUpdate('K_S0:pipi', 0.0, path=main, silence_warning=True)
 
 ana.printVariableValues('J/psi:mumu', ['InvM'], path=main)
 ana.printVariableValues('K_S0:pipi', ['InvM'], path=main)

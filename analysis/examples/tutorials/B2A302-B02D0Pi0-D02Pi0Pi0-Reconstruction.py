@@ -72,7 +72,6 @@ B0_vars = vc.inv_mass + \
 
 pi0_vars = vc.mc_truth + \
     vc.kinematics + \
-    vc.mass_before_fit + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vu.create_aliases_for_selected(
         list_of_variables=vc.cluster + vc.kinematics,

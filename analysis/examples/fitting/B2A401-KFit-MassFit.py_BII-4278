@@ -67,7 +67,11 @@ B0_vars = vc.event_meta_data + vc.inv_mass + vc.mc_truth + \
     vc.create_aliases_for_selected(
         vc.cluster, 'B0 -> D0 [pi0 -> ^gamma ^gamma]')
 
+<<<<<<< HEAD
 pi0_vars = vc.mc_truth + vc.kinematics + vc.mass_before_fit + vc.event_meta_data + \
+=======
+pi0_vars = vc.mc_truth + vc.kinematics + \
+>>>>>>> 008de079c1... Delete misleading variable collection and remove wrong examples.
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vc.create_aliases_for_selected(
         vc.cluster + vc.kinematics, 'pi0 -> ^gamma ^gamma')

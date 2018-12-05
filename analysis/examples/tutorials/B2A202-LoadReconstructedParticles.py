@@ -115,10 +115,14 @@ K0s_variables = vc.event_meta_data + \
 
 pi0_variables = vc.mc_truth + \
     vc.kinematics + \
-    vc.mass_before_fit + \
+    << << << < HEAD
+vc.mass_before_fit + \
     vc.event_meta_data + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vc.mc_hierarchy
+== == == =
+['extraInfo(BDT)', 'decayAngle(0)']
+>>>>>> > 008de079c1... Delete misleading variable collection and remove wrong examples.
 
 # Saving variables to ntuple
 output_file = 'B2A202-LoadReconstructedParticles.root'

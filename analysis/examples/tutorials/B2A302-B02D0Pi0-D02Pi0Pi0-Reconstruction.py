@@ -73,12 +73,15 @@ B0_vars = vc.event_meta_data + \
 
 pi0_vars = vc.mc_truth + \
     vc.kinematics + \
-    vc.mass_before_fit + \
+    << << << < HEAD
+vc.mass_before_fit + \
     vc.event_meta_data + \
-    ['extraInfo(BDT)', 'decayAngle(0)'] + \
+    == == == =
+>>>>>> > 008de079c1... Delete misleading variable collection and remove wrong examples.
+['extraInfo(BDT)', 'decayAngle(0)'] + \
     vu.create_aliases_for_selected(
-        list_of_variables=vc.cluster + vc.kinematics,
-        decay_string='pi0 -> ^gamma ^gamma')
+    list_of_variables=vc.cluster + vc.kinematics,
+    decay_string='pi0 -> ^gamma ^gamma')
 
 
 # Saving variables to ntuple

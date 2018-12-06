@@ -48,7 +48,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   // Fill accumulators with ADC and drift circle information
   for (const CDCRecoHit3D& recoHit : *track) {
     drift_length_acc(recoHit.getWireHit().getRefDriftLength());
-    adc_acc(recoHit.getWireHit().getHit()->getADCCount());
+    adc_acc(static_cast<unsigned int>(recoHit.getWireHit().getHit()->getADCCount()));
   }
 
   // Extract empty_s (ArcLength2D gap) information
@@ -82,13 +82,13 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   double adc_variance = -1;
   if (size > 1) {
     // for more than two elements, calculate variance with bessel correction
-    double bessel_corr = size / (size - 1);
+    double bessel_corr = (double)size / (size - 1.0);
     drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * bessel_corr);
     adc_variance = std::sqrt(bacc::variance(adc_acc) * bessel_corr);
   }
   double empty_s_variance = -1;
   if (empty_s_size > 1) {
-    double empty_s_bessel_corr = empty_s_size / (empty_s_size - 1);
+    double empty_s_bessel_corr = (double)empty_s_size / (empty_s_size - 1.0);
     empty_s_variance = std::sqrt(bacc::variance(empty_s_acc) * empty_s_bessel_corr);
   }
 

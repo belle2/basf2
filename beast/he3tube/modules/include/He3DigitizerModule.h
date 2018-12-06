@@ -14,6 +14,9 @@
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/he3tube/dataobjects/He3tubeHit.h>
 #include <string>
 #include <vector>
 
@@ -40,17 +43,18 @@ namespace Belle2 {
       /**  */
       virtual ~He3DigitizerModule();
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
       /**  */
-      virtual void event();
+      virtual void event() override;
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
     private:
+      StoreArray<He3tubeHit> m_he3tubeHit; /** Array for He3tubeHit */
 
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

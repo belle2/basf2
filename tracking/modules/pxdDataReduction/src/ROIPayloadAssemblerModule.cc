@@ -8,19 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <tracking/modules/pxdDataReduction/ROIPayloadAssemblerModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/ROIid.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <tracking/dataobjects/ROIpayload.h>
 #include <stdlib.h>
 #include <set>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+// #include <tracking/dataobjects/ROIrawID.h>
 
 using namespace std;
 using namespace Belle2;
@@ -54,69 +50,65 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
   addParam("NoRejectFlag", mNoRejectFlag, "Never reject, just send no ROI", true);
 }
 
-ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
-{
-}
-
-
 void ROIPayloadAssemblerModule::initialize()
 {
+  m_eventMetaData.isRequired();
+  m_ROIList.isOptional(m_ROIListName);
 
-  StoreArray<ROIid>::required(m_ROIListName);
-  StoreObjPtr<EventMetaData>::required();
-  StoreObjPtr<ROIpayload>::registerPersistent(m_ROIpayloadName);
+  m_roiPayloads.registerInDataStore(
+    m_ROIpayloadName); // DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered will not work with two modules in seperate path branches
 
-}
-
-
-void ROIPayloadAssemblerModule::beginRun()
-{
+  // in case we don't accept all events, we have to look
+  // up the trigger decision
+  if (!mAcceptAll) {
+    StoreObjPtr<SoftwareTriggerResult> result;
+    result.isRequired();
+  }
 }
 
 
 void ROIPayloadAssemblerModule::event()
 {
-  StoreArray<ROIid> ROIList(m_ROIListName);
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-  unsigned int evtNr = eventMetaDataPtr->getEvent();
+  unsigned int evtNr = m_eventMetaData->getEvent();
   unsigned int countROIs = 0;
   bool accepted = true;
 
   if (!mAcceptAll) {
     StoreObjPtr<SoftwareTriggerResult> result;
+    if (!result.isValid()) {
+      B2FATAL("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+    }
     accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
   }
-
 
   map<VxdID, set<ROIrawID, ROIrawID>> mapOrderedROIraw;
 
   if (accepted) {
     // skip the preprocessing if the event is not accepted to save CPU time
 
-    B2DEBUG(1, " number of ROIs in the list = " << ROIList.getEntries());
+    B2DEBUG(1, " number of ROIs in the list = " << m_ROIList.getEntries());
 
-    /// This is necessary as long as DHH is NOT delivering the DHP coordinates in local sensor coordinates (Ucell/Vcell)
-    for (auto& iROI : ROIList) {
-      // The following would be needed if we make some overflow checks ... but they should not be necessary!
+    for (auto& iROI : m_ROIList) {
+      ROIrawID roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
 
       int layer = (iROI.getSensorID()).getLayerNumber() - 1;
       int ladder = (iROI.getSensorID()).getLadderNumber();
       int sensor = (iROI.getSensorID()).getSensorNumber() - 1;
 
-      m_roiraw.setSystemFlag(0);// System 0 is HLT, 1 would be DATCON
-      m_roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
+      roiraw.setSystemFlag(0);// System 0 is HLT, 1 would be DATCON
+      roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
 
-      m_roiraw.setMinVid(iROI.getMinVid());
-      m_roiraw.setMaxVid(iROI.getMaxVid());
-      m_roiraw.setMinUid(iROI.getMinUid());
-      m_roiraw.setMaxUid(iROI.getMaxUid());
+      roiraw.setMinVid(iROI.getMinVid());
+      roiraw.setMaxVid(iROI.getMaxVid());
+      roiraw.setMinUid(iROI.getMinUid());
+      roiraw.setMaxUid(iROI.getMaxUid());
 
       // order set will drop identical ROIs automatically
-      mapOrderedROIraw[iROI.getSensorID()].insert(m_roiraw);
+      mapOrderedROIraw[iROI.getSensorID()].insert(roiraw);
     }
 
-    B2DEBUG(1, " number of original ROIs = " << ROIList.getEntries());
+    B2DEBUG(1, " number of original ROIs = " << m_ROIList.getEntries());
 
     // The payload is created with a buffer long enough to contains all
     // the ROIs but the actual payload could be smaller, if the ROIs per
@@ -128,11 +120,13 @@ void ROIPayloadAssemblerModule::event()
     }
   }
 
+  if (m_roiPayloads.isValid()) {
+    B2FATAL("ROIpayload already in datastore, this must not be the case when calling the ROIPayloadAssemblerModule.");
+  }
+
   ROIpayload* payload = new ROIpayload(countROIs);// let the ROIpayload compute the size itself
 
-  StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
-
-  payloadPtr.assign(payload);
+  m_roiPayloads.assign(payload);
 
   // set all the Header flags and event number
   payload->setHeader(accepted || mNoRejectFlag,
@@ -140,7 +134,7 @@ void ROIPayloadAssemblerModule::event()
   payload->setTriggerNumber(evtNr);
 
   // Set run subrun exp number
-  payload->setRunSubrunExpNumber(eventMetaDataPtr->getRun(), eventMetaDataPtr->getSubrun(), eventMetaDataPtr->getExperiment());
+  payload->setRunSubrunExpNumber(m_eventMetaData->getRun(), m_eventMetaData->getSubrun(), m_eventMetaData->getExperiment());
 
   unsigned int addROI = 0;
 
@@ -156,21 +150,22 @@ void ROIPayloadAssemblerModule::event()
             addROI++;
           }
         } else {
+          ROIrawID roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
           B2INFO("Nr ROI on DHHID " << it.second.begin()->getDHHID() << endl <<
                  " exceeds limit CutNrROIs, thus full sensor ROI is created.");
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(it.first);
           const int nPixelsU = aSensorInfo.getUCells();
           const int nPixelsV = aSensorInfo.getVCells();
 
-          m_roiraw.setSystemFlag(0);
-          m_roiraw.setDHHID(it.second.begin()->getDHHID());
+          roiraw.setSystemFlag(0);
+          roiraw.setDHHID(it.second.begin()->getDHHID());
 
-          m_roiraw.setMinVid(0);
-          m_roiraw.setMaxVid(nPixelsV - 1);
-          m_roiraw.setMinUid(0);
-          m_roiraw.setMaxUid(nPixelsU - 1);
+          roiraw.setMinVid(0);
+          roiraw.setMaxVid(nPixelsV - 1);
+          roiraw.setMinUid(0);
+          roiraw.setMaxUid(nPixelsU - 1);
 
-          payload->addROIraw(m_roiraw.getBigEndian());
+          payload->addROIraw(roiraw.getBigEndian());
         }
       }
     }
@@ -180,14 +175,4 @@ void ROIPayloadAssemblerModule::event()
   payload->setCRC();
 
   B2DEBUG(1, " number of ROIs in payload = " << addROI);
-}
-
-
-void ROIPayloadAssemblerModule::endRun()
-{
-}
-
-
-void ROIPayloadAssemblerModule::terminate()
-{
 }

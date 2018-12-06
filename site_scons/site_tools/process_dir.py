@@ -260,15 +260,12 @@ def process_dir(
             # install corresponding pcm file in lib (for cling)
             pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
             pcm_name = os.path.basename(pcm_path)
-            pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
-                                       pcm_path)
+            pcm_target = env.Copy(os.path.join(env['LIBDIR'], pcm_name), pcm_path)
             # install corresponding rootmap files to support auto-loading of libraries
             # once used via ROOT
             rootmap_path = str(dict_file[0])[:-3] + '.rootmap'
             rootmap_name = os.path.basename(rootmap_path)
-
-            rootmap_target = env.InstallAs(os.path.join(env['LIBDIR'], rootmap_name),
-                                           rootmap_path)
+            rootmap_target = env.Copy(os.path.join(env['LIBDIR'], rootmap_name), rootmap_path)
 
             # Ensure InstallAs() comes after the dictionary build
             env.Depends(rootmap_path, dict_file)
@@ -294,10 +291,11 @@ def process_dir(
             # create library and map for modules
             lib = env.SharedLibrary(os.path.join(lib_dir_name, lib_name),
                                     [env['SRC_FILES'], dict_files])
+            debug = env.StripDebug(lib)
 
-            lib_files = [lib] + aux_dict_targets
+            lib_files = [lib, debug] + aux_dict_targets
             if is_module_dir:
-                map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.map')
+                map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.b2modmap')
                 # Adding lib_files is important to ensure we load local module
                 # libraries if they are newer than those in central directory
                 map_sources = env['SRC_FILES'] + lib_files
@@ -358,10 +356,11 @@ def process_dir(
         tool = bin_env.Program(os.path.join(bin_env['BINDIR'], bin_filename),
                                os.path.join(bin_env['BUILDDIR'],
                                             str(bin_file)))
-        env.Alias(os.path.join(dir_name, 'tools', bin_filename), tool)
-        env.Alias(os.path.join(dir_name, 'tools'), tool)
-        env.Alias(os.path.join(dir_name, bin_filename), tool)
-        define_aliases(env, tool, dir_name, 'bin')
+        debug = bin_env.StripDebug(tool)
+        env.Alias(os.path.join(dir_name, 'tools', bin_filename), [tool, debug])
+        env.Alias(os.path.join(dir_name, 'tools'), [tool, debug])
+        env.Alias(os.path.join(dir_name, bin_filename), [tool, debug])
+        define_aliases(env, [tool, debug], dir_name, 'bin')
 
     # restore original environment
     env = save_env
@@ -389,6 +388,7 @@ def process_dir(
         test_env['LIBS'] = env['TEST_LIBS']
         test = test_env.Program(os.path.join(test_env['BINDIR'],
                                              test_filename), env['TEST_FILES'])
+        env.StripDebug(test)
         env.Alias(os.path.join(dir_name, 'tests', test_filename), test)
         env.Alias(os.path.join(dir_name, 'tests'), test)
         env.Alias(os.path.join(dir_name, test_filename), test)

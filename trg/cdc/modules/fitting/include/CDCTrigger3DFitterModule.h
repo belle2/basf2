@@ -8,9 +8,13 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
+
+  class TRGCDCJSignal;
+  class TRGCDCJLUT;
+  class TRGCDCJSignalData;
 
   /** Module for the 3D Fitter of the CDC trigger. */
   class CDCTrigger3DFitterModule : public Module {
@@ -24,10 +28,10 @@ namespace Belle2 {
     virtual ~CDCTrigger3DFitterModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Run the 3D fitter for an event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Select stereo hits.
@@ -61,10 +65,14 @@ namespace Belle2 {
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting 3D tracks. */
     std::string m_outputCollectionName;
+    /** Fitter mode: 1: fast, 2: firmware. */
+    unsigned m_fitterMode;
     /** Minimal number of hits required for fitting. */
     unsigned m_minHits;
     /** Switch between nominal drift velocity and xt table */
     bool m_xtSimple;
+    /** Switch printing detail information.  */
+    bool m_isVerbose;
 
   private:
     /** geometry constants: number of wires per super layer */
@@ -80,6 +88,22 @@ namespace Belle2 {
     /** geometry constants: drift length - drift time relation */
     std::vector<std::vector<double>> xtTables = {};
 
+    /** map of geometry constants **/
+    std::map<std::string, std::vector<double> > m_stGeometry;
+    /** stereo xt tables **/
+    std::vector<std::vector<double> > m_stXts;
+
+    /** Datastore for firmware simulation **/
+    Belle2::TRGCDCJSignalData* m_commonData;
+    /** Signalstore for firmware simulation **/
+    std::map<std::string, Belle2::TRGCDCJSignal> m_mSignalStorage;
+    /** Lutstore for firmware simulation **/
+    std::map<std::string, Belle2::TRGCDCJLUT*> m_mLutStorage;
+    /** Constants for firmware simulation **/
+    std::map<std::string, double> m_mConstD;
+    /** Constants for firmware simulation **/
+    std::map<std::string, std::vector<double> > m_mConstV;
+
     /** list of 2D input tracks */
     StoreArray<CDCTriggerTrack> m_tracks2D;
     /** list of 3D output tracks*/
@@ -87,7 +111,7 @@ namespace Belle2 {
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_hits;
     /** StoreObjPtr containing the event time */
-    StoreObjPtr<EventT0> m_eventTime;
+    StoreObjPtr<BinnedEventT0> m_eventTime;
   };
 
 } // namespace Belle2

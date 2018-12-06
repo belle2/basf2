@@ -6,7 +6,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 
-#include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
@@ -14,6 +13,7 @@
 #include <sstream>
 #include <exception>
 #include <string>
+#include <regex>
 
 using namespace Belle2;
 
@@ -63,7 +63,9 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   assertValidName(alias);
 
   if (m_alias.find(alias) != m_alias.end()) {
-    B2WARNING("Another alias with the name'" << alias << "' is already set! I overwrite it!");
+    if (variable == m_alias[alias]) { return true; }
+    B2WARNING("An alias with the name '" << alias << "' exists and is set to '" << m_alias[alias] << "', setting it to '" << variable <<
+              "'. Be aware: only the last alias defined before processing the events will be used!");
     m_alias[alias] = variable;
     return true;
   }
@@ -75,6 +77,24 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
 
   m_alias.insert(std::make_pair(alias, variable));
   return true;
+}
+
+
+void Variable::Manager::printAliases()
+{
+  long unsigned int longest_alias_size = 0;
+  for (auto a : m_alias) {
+    if (a.first.length() > longest_alias_size) {
+      longest_alias_size = a.first.length();
+    }
+  }
+  B2INFO("=====================================");
+  B2INFO("The following aliases are registered:");
+  for (auto a : m_alias) {
+    B2INFO(std::string(a.first, 0, longest_alias_size) << std::string(longest_alias_size - a.first.length(),
+           ' ') << " --> " << a.second);
+  }
+  B2INFO("=====================================");
 }
 
 bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
@@ -125,9 +145,9 @@ std::vector<std::string> Variable::Manager::resolveCollections(const std::vector
 
 void Variable::Manager::assertValidName(const std::string& name)
 {
-  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
+  const static std::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
 
-  if (!boost::regex_match(name, allowedNameRegex)) {
+  if (!std::regex_match(name, allowedNameRegex)) {
     B2FATAL("Variable '" << name <<
             "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
   }
@@ -141,10 +161,10 @@ void Variable::Manager::setVariableGroup(const std::string& groupName)
 
 bool Variable::Manager::createVariable(const std::string& name)
 {
-  boost::match_results<std::string::const_iterator> results;
+  std::match_results<std::string::const_iterator> results;
 
   // Check if name is a simple number
-  if (boost::regex_match(name, results, boost::regex("^([0-9]+\\.?[0-9]*)$"))) {
+  if (std::regex_match(name, results, std::regex("^([0-9]+\\.?[0-9]*)$"))) {
     float float_number = std::stof(results[1]);
     auto func = [float_number](const Particle*) -> double {
       return float_number;
@@ -154,7 +174,7 @@ bool Variable::Manager::createVariable(const std::string& name)
   }
 
   // Check if name is a function call
-  if (boost::regex_match(name, results, boost::regex("^([a-zA-Z0-9_]*)\\((.*)\\)$"))) {
+  if (std::regex_match(name, results, std::regex("^([a-zA-Z0-9_]*)\\((.*)\\)$"))) {
 
     std::string functionName = results[1];
     boost::algorithm::trim(functionName);
@@ -189,7 +209,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
 
-  B2WARNING("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
+  B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
   return false;
 }
 
@@ -205,7 +225,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
     auto var = std::make_shared<Var>(name, f, description, m_currentGroup);
-    B2DEBUG(100, "Registered Variable " << name);
+    B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {
@@ -225,7 +245,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
-    B2DEBUG(100, "Registered parameter Variable " << rawName);
+    B2DEBUG(19, "Registered parameter Variable " << rawName);
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {
@@ -245,7 +265,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
-    B2DEBUG(100, "Registered meta Variable " << rawName);
+    B2DEBUG(19, "Registered meta Variable " << rawName);
     m_meta_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {

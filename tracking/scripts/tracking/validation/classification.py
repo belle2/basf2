@@ -2,20 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import math
 import collections
 import numbers
 import copy
-
-from tracking.root_utils import root_save_name
 
 from . import scores
 from . import statistics
 
 from .plot import ValidationPlot, compose_axis_label
 from .fom import ValidationFiguresOfMerit
-# get error function as a np.ufunc vectorised for numpy array
-from .utilities import erf
 from .tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()

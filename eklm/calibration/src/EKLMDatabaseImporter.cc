@@ -11,16 +11,23 @@
 /* C++ headers. */
 #include <cmath>
 
+/* External headers. */
+#include <TFile.h>
+#include <TTree.h>
+
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
-#include <eklm/dbobjects/EKLMChannels.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
+#include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -56,11 +63,12 @@ void EKLMDatabaseImporter::importDigitizationParameters()
   GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/"
               "Content/DigitizationParams");
   digPar->setADCRange(dig.getInt("ADCRange"));
-  digPar->setADCSamplingTime(dig.getDouble("ADCSamplingTime"));
+  digPar->setADCSamplingFrequency(dig.getDouble("ADCSamplingFrequency"));
   digPar->setNDigitizations(dig.getInt("nDigitizations"));
   digPar->setADCPedestal(dig.getDouble("ADCPedestal"));
   digPar->setADCPEAmplitude(dig.getDouble("ADCPEAmplitude"));
-  digPar->setADCSaturation(dig.getDouble("ADCSaturation"));
+  digPar->setADCThreshold(dig.getInt("ADCThreshold"));
+  digPar->setADCSaturation(dig.getInt("ADCSaturation"));
   digPar->setNPEperMeV(dig.getDouble("nPEperMeV"));
   digPar->setMinCosTheta(cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI));
   digPar->setMirrorReflectiveIndex(dig.getDouble("MirrorReflectiveIndex"));
@@ -99,46 +107,6 @@ void EKLMDatabaseImporter::importSimulationParameters()
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   simPar.import(iov);
-}
-
-void EKLMDatabaseImporter::loadDefaultChannelData()
-{
-  EKLMChannelData channelData;
-  m_Channels.construct();
-  channelData.setActive(true);
-  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  int iEndcap, iLayer, iSector, iPlane, iStrip, strip;
-  for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
-    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iEndcap);
-         iLayer++) {
-      for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
-        for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
-          for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
-            strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
-                                        iStrip);
-            m_Channels->setChannelData(strip, &channelData);
-          }
-        }
-      }
-    }
-  }
-}
-
-void EKLMDatabaseImporter::setChannelData(
-  int endcap, int layer, int sector, int plane, int strip,
-  EKLMChannelData* channelData)
-{
-  int stripGlobal;
-  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  stripGlobal = geoDat->stripNumber(endcap, layer, sector, plane, strip);
-  m_Channels->setChannelData(stripGlobal, channelData);
-}
-
-void EKLMDatabaseImporter::importChannelData()
-{
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  m_Channels.import(iov);
 }
 
 void EKLMDatabaseImporter::loadDefaultDisplacement()
@@ -189,11 +157,11 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   EKLMAlignmentData segmentAlignment(dx, dy, dalpha);
   EKLM::AlignmentChecker alignmentChecker(false);
-  EKLMAlignmentData* sectorAlignment;
+  const EKLMAlignmentData* sectorAlignment;
   int sectorGlobal, segmentGlobal;
   sectorGlobal = geoDat->sectorNumber(endcap, layer, sector);
   sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);
-  if (sectorAlignment == NULL)
+  if (sectorAlignment == nullptr)
     B2FATAL("Incomplete alignment data.");
   segmentGlobal = geoDat->segmentNumber(endcap, layer, sector, plane, segment);
   if (!alignmentChecker.checkSegmentAlignment(endcap, layer, sector, plane,
@@ -230,5 +198,18 @@ void EKLMDatabaseImporter::importElectronicsMap()
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   m_ElectronicsMap.import(iov);
+}
+
+void EKLMDatabaseImporter::importTimeConversion()
+{
+  DBImportObjPtr<EKLMTimeConversion> timeConversion;
+  timeConversion.construct();
+  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
+             "Content/TimeConversion");
+  timeConversion->setTDCFrequency(gd.getDouble("TDCFrequency"));
+  timeConversion->setTimeOffset(gd.getDouble("TimeOffset"));
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  timeConversion.import(iov);
 }
 

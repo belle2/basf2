@@ -36,16 +36,6 @@ namespace Belle2 {
     EXPECT_EQ(Const::proton, antiLambdaTracks.second);
   }
 
-  /// Test enable validation.
-  TEST_F(V0FitterTest, EnableValidation)
-  {
-    V0Fitter v0Fitter;
-    EXPECT_EQ(false, v0Fitter.m_validation);
-
-    v0Fitter.enableValidation();
-    EXPECT_EQ(true, v0Fitter.m_validation);
-  }
-
   /// Test initialization of cuts.
   TEST_F(V0FitterTest, InitializeCuts)
   {

@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to include the flavor
 # tagging user interphase into your analysis.
 # The following decay chain:
@@ -17,68 +19,74 @@
 # flavor*dilution factor of the not reconstructed B0,
 # is saved as extraInfo to the reconstructed B0.
 #
-#
-# Note: The weight files for the trained TMVA methods
-# were produced using the signal MC sample created in
-# MC campaign 5.
-#
 # Contributors: F. Abudinen & Moritz Gelb (February 2015)
+#               I. Komarov (September 2018)
 #
 ######################################################
 
-from basf2 import *
-# The FlavorTagger already imports  modularAnalysis
-from flavorTagger import *
-from stdFSParticles import *
-from stdCharged import *
+import basf2 as b2
+import modularAnalysis as ma
+import flavorTagger as ft
+import vertex as vx
+import variables.collections as vc
+import variables.utils as vu
+import stdCharged as stdc
+from stdPi0s import stdPi0s
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    [
-        '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000103/s00/e0000/4S/' +
-        'r00000/1111440100/sub00/mdst_00000*_prod00000103_task0000000*.root'
-    ]
+# create path
+my_path = b2.create_path()
 
-inputMdstList('MC5', filelistSIG)
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B2JPsipi0_JPsi2mumu.root', 'examples', False),
+             path=my_path)
 
 # use standard final state particle lists
 #
+# creates "pi0:looseFit" ParticleList
+# https://confluence.desy.de/display/BI/Physics+StandardParticles
+stdPi0s(listtype='looseFit', path=my_path)
 # creates "highPID" ParticleLists (and c.c.)
-fillParticleList('pi+:highPID', 'pionID > 0.5 and d0 < 5 and abs(z0) < 10')
-fillParticleList('mu+:highPID', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4')
+ma.fillParticleList(decayString='mu+:highPID',
+                    cut='muonID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    path=my_path)
 
 
-# reconstruct Ks -> pi+ pi- decay
-# keep only candidates with dM<0.25
-reconstructDecay('K_S0:pipi -> pi+:highPID pi-:highPID', 'dM<0.25')
-# fit K_S0 Vertex
-fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False)
-
-# reconstruct J/psi -> mu+ mu- decay and fit vertex
+# reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with dM<0.11
-reconstructDecay('J/psi:mumu -> mu+:highPID mu-:highPID', 'dM<0.11')
-applyCuts('J/psi:mumu', '3.07 < M < 3.11')
-massVertexRave('J/psi:mumu', 0., '')
+ma.reconstructDecay(decayString='J/psi:mumu -> mu+:highPID mu-:highPID',
+                    cut='dM<0.11 and 3.07 < M < 3.11',
+                    path=my_path)
 
 # reconstruct B0 -> J/psi Ks decay
 # keep only candidates with Mbc > 5.1 and abs(deltaE)<0.15
-reconstructDecay('B0:jspiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.1 and abs(deltaE)<0.15')
+ma.reconstructDecay(decayString='B0:jspipi0 -> J/psi:mumu pi0:looseFit',
+                    cut='Mbc > 5.1 and abs(deltaE)<0.15',
+                    path=my_path)
 
-# Fit the B0 Vertex
-vertexRave('B0:jspiks', 0., 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '')
+vx.vertexTree(list_name='B0:jspipi0',
+              conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
+              ipConstraint=True,
+              # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
+              updateAllDaughters=True,  # update momenta off ALL particles
+              path=my_path
+              )
 
 # perform MC matching (MC truth asociation). Always before TagV
-matchMCTruth('B0:jspiks')
+ma.matchMCTruth(list_name='B0:jspipi0', path=my_path)
 
 # build the rest of the event associated to the B0
-buildRestOfEvent('B0:jspiks')
+ma.buildRestOfEvent(target_list_name='B0:jspipi0',
+                    path=my_path)
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
 # You just have to use a special global tag of the conditions database. Check in
 # https://confluence.desy.de/display/BI/Physics+FlavorTagger
 # E.g. for release-00-09-01
-use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
+
+# use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
+
 # The default working directory is '.'
 # If you have an own analysis package it is recomended to use
 # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'.
@@ -88,10 +96,17 @@ use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
-flavorTagger(
-    particleLists=['B0:jspiks'],
+ft.flavorTagger(
+    particleLists=['B0:jspipi0'],
     weightFiles='B2JpsiKs_muBGx1',
-    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data')
+    path=my_path)
+
+# NOTE: for Belle data, (i.e. b2bii users) should use modified line:
+# ft.flavorTagger(
+#     particleLists=['B0:jspipi0'],
+#     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
+#     belleOrBelle2='Belle')
+
 #
 # BGx0 stays for MC generated without machine Background.
 # Please use B2JpsiKs_muBGx1 if you use MC generated with machine background.
@@ -109,13 +124,13 @@ flavorTagger(
 # If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
 # you want to use like:
 #
-# flavorTagger(particleLists=['B0:jspiks'], mode = 'Sampler', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Sampler', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.]
 # )
 #
 # After the Sampling process:
 #
-# flavorTagger(particleLists=['B0:jspiks'], mode = 'Teacher', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Teacher', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.]
 # )
 #
@@ -148,53 +163,64 @@ flavorTagger(
 # It is also possible to train different combiners consecutively using the same weightFiles name.
 # You just need always to specify the desired category combination while using the expert mode as:
 #
-# flavorTagger(particleLists=['B0:jspiks'], mode = 'Expert', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Expert', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
 
 # You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
 # provide flavor information using the tag side
-applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
+ma.applyCuts(list_name='B0:jspipi0',
+             cut='qrOutput(FBDT) > -2',
+             path=my_path)
 
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
-rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
+ma.rankByHighest(particleList='B0:jspipi0',
+                 variable='abs(qrOutput(FBDT))',
+                 numBest=0,
+                 outputVariable='Dilution_rank',
+                 path=my_path)
 
 # Fit Vertex of the B0 on the tag side
-TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
+vx.TagV(list_name='B0:jspipi0',
+        MCassociation='breco',
+        confidenceLevel=0.001,
+        useFitAlgorithm='standard_PXD',
+        path=my_path)
 
-toolsDST = ['EventMetaData', '^B0']
-toolsDST += ['RecoStats', '^B0']
-toolsDST += ['DeltaEMbc', '^B0']
-toolsDST += ['CMSKinematics', '^B0']
-toolsDST += ['MCHierarchy', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['ROEMultiplicities', '^B0']
-# create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
-# Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
-# If you set qrCategories, the output of each category is saved.
-toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
+# Select variables that we want to store to ntuple
+fs_vars = vc.pid + vc.track + vc.mc_truth
+jpsiandk0s_vars = vc.mc_truth
+bvars = vc.reco_stats + \
+    vc.deltae_mbc + \
+    vc.mc_truth + \
+    vc.roe_multiplicities + \
+    vc.flavor_tagging + \
+    vc.tag_vertex + \
+    vc.mc_tag_vertex + \
+    vu.create_aliases_for_selected(list_of_variables=fs_vars,
+                                   decay_string='B0 -> [J/psi -> ^mu+ ^mu-] pi0') + \
+    vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
+                                   decay_string='B0 -> [^J/psi -> mu+ mu-] ^pi0')
 
-toolsDST += ['TagVertex', '^B0']
-toolsDST += ['DeltaT', '^B0']
-toolsDST += ['MCTagVertex', '^B0']
-toolsDST += ['MCDeltaT', '^B0']
-# Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
 
-# write out the flat ntuples
-ntupleFile('B2A801-FlavorTagger.root')
-ntupleTree('B0tree', 'B0:jspiks', toolsDST)
+# Saving variables to ntuple
+output_file = 'B2A801-FlavorTagger.root'
+ma.variablesToNtuple(decayString='B0:jspipi0',
+                     variables=bvars,
+                     filename=output_file,
+                     treename='B0tree',
+                     path=my_path)
 
 # Summary of created Lists
-summaryOfLists(['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'])
+ma.summaryOfLists(particleLists=['J/psi:mumu', 'pi0:looseFit', 'B0:jspipi0'],
+                  path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)
 
 # If you want to calculate the efficiency of the FlavorTagger on your own
 # File use the script analysis/examples/FlavorTaggerEfficiency.py giving

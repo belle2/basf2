@@ -3,13 +3,13 @@
 <input>../1310040140.ntup.root</input>
 <output>1310040140_Validation.root</output>
 <contact>Bilas Pal; palbs@ucmail.uc.edu</contact>
-<description> Reference plots for Bs->KsKs analysis</descrtiption>
+<description> Reference plots for Bs->KsKs analysis</description>
 </header>
 */
 
 ////////////////////////////////////////////////////////////
 //
-// test2_1213012101.C
+// test2_1310040140.C
 // Check Mbc, DeltaE,  MKs
 //
 // Constributor: Bilas Pal

@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to write out the
 # decay hash. This allows to store information on
 # the reconstructed and original decay and use it
@@ -27,12 +29,14 @@
 
 import root_pandas
 import decayHash
+import basf2 as b2
 from decayHash import DecayHashMap
+import sys
 
 # read in root-file as a pandas dataframe
-data = root_pandas.read_root('Jpsi.root')
-hashmap = DecayHashMap('hashmap_Jpsi.root', removeRadiativeGammaFlag=False)
-hashmap2 = DecayHashMap('hashmap_Jpsi.root', removeRadiativeGammaFlag=True)
+data = root_pandas.read_root(b2.find_file('Jpsi_from_B2A502.root', 'examples', False))
+hashmap = DecayHashMap(b2.find_file('hashmap_Jpsi_from_B2A502.root', 'examples', False), removeRadiativeGammaFlag=False)
+hashmap2 = DecayHashMap(b2.find_file('hashmap_Jpsi_from_B2A502.root', 'examples', False), removeRadiativeGammaFlag=True)
 
 # get one reconstructed J/psi
 candidate42 = data.iloc[42][["extraInfo__boDecayHash__bc", "extraInfo__boDecayHashExtended__bc"]].values
@@ -59,3 +63,4 @@ print(search_decay.to_string())
 found = hashmap.get_original_decay(data.iloc[42]["extraInfo__boDecayHash__bc"],
                                    data.iloc[42]["extraInfo__boDecayHashExtended__bc"]).find_decay(search_decay)
 print("Found: ", found)
+sys.exit(0)

@@ -7,15 +7,54 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclFrame.h>
 
-// #define DEFAULT_PAINTER PAINTER_CHANNEL_2D
+//ROOT
+#include <TFile.h>
+#include <TCanvas.h>
+#include <TSystem.h>
+#include <TRootEmbeddedCanvas.h>
+#include <TGDoubleSlider.h>
+#include <TGNumberEntry.h>
+#include <TGListTree.h>
+#include <TGFileDialog.h>
+#include <TStyle.h>
+#include <TGLabel.h>
+#include <TGComboBox.h>
+#include <TGeoVolume.h>
+#include <TGMenu.h>
+
+//ECL
+#include <ecl/modules/eclDisplay/geometry.h>
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/modules/eclDisplay/MultilineWidget.h>
+#include <ecl/modules/eclDisplay/EclPainter.h>
+#include <ecl/modules/eclDisplay/EclPainter1D.h>
 
 using namespace Belle2;
+using namespace ECL;
 using namespace ECLDisplayUtility;
 
-EclFrame::EclFrame(int painter_type, EclData* data, bool auto_display, ECLChannelMapper* mapper)
+const char* EclFrame::filetypes[] = {
+  "PDF",                        "*.pdf",
+  "PostScript",                 "*.ps",
+  "Encapsulated PostScript",    "*.eps",
+  "SVG",                        "*.svg",
+  "TeX",                        "*.tex",
+  "GIF",                        "*.gif",
+  "ROOT macros",                "*.C",
+  "ROOT files",                 "*.root",
+  "XML",                        "*.xml",
+  "PNG",                        "*.png",
+  "XPM",                        "*.xpm",
+  "JPEG",                       "*.jpg",
+  "TIFF",                       "*.tiff",
+  "XCF",                        "*.xcf",
+  0,                            0
+};
+
+EclFrame::EclFrame(int painter_type, EclData* data, bool auto_display, ECL::ECLChannelMapper* mapper)
 {
   m_open = true;
   m_subsys = EclData::ALL;
@@ -38,8 +77,6 @@ EclFrame::EclFrame(int painter_type, EclData* data, bool auto_display, ECLChanne
 
   m_auto_display = auto_display;
 
-  Connect("CloseWindow()", "Belle2::EclFrame", this, "setClosed()");
-
   gStyle->SetOptStat(0);
 
   doDraw();
@@ -61,6 +98,8 @@ void EclFrame::initGUI(int w, int h)
   /* Menu bar */
 
   TGPopupMenu* menu_file = new TGPopupMenu(gClient->GetRoot());
+  menu_file->AddEntry("&Open...", M_FILE_OPEN);
+  menu_file->AddEntry("&Export TTree...", M_FILE_EXPORT_TREE);
   menu_file->AddEntry("&Save As...", M_FILE_SAVE);
   menu_file->AddSeparator();
   menu_file->AddEntry("&Exit", M_FILE_EXIT);
@@ -254,6 +293,7 @@ void EclFrame::initData()
   m_events_max->SetLimits(TGNumberFormat::kNELLimitMinMax,
                           0, m_ecl_data->getLastEventId());
 
+  B2DEBUG(500, "Last event id: " << m_ecl_data->getLastEventId());
   m_ev_slider->SetRange(0, m_ecl_data->getLastEventId());
   m_ev_slider->SetPosition(0, 0);
   m_ev_slider->Connect("TGDoubleHSlider", "PositionChanged()",
@@ -265,13 +305,40 @@ void EclFrame::handleMenu(int id)
 {
   static TString dir(".");
   TGFileInfo fi;
+  TFile* file;
+
   switch (id) {
+    case M_FILE_OPEN:
+      fi.fFileTypes = 0;
+      fi.fIniDir    = StrDup(dir);
+      new TGFileDialog(gClient->GetRoot(), this, kFDOpen, &fi);
+      if (fi.fFilename) {
+        if (gSystem->AccessPathName(fi.fFilename, kFileExists) == 0) {
+          B2DEBUG(50, "ECLFrame:: Opening file " << fi.fFilename);
+          m_ecl_data->loadRootFile(fi.fFilename);
+          loadNewData();
+        }
+      }
+      // doDraw();
+      break;
     case M_FILE_SAVE:
       fi.fFileTypes = filetypes;
       fi.fIniDir    = StrDup(dir);
       new TGFileDialog(gClient->GetRoot(), this, kFDSave, &fi);
-      printf("Save file: %s (dir: %s)\n", fi.fFilename, fi.fIniDir);
+      B2DEBUG(50, "Save file: " << fi.fFilename
+              << "(dir: " << fi.fIniDir << ")");
       m_ecanvas->GetCanvas()->SaveAs(fi.fFilename);
+      break;
+    case M_FILE_EXPORT_TREE:
+      static const char* filetypes_root[] = {"Root", "*.root", 0, 0};
+      fi.fFileTypes = filetypes_root;
+      fi.fIniDir    = StrDup(dir);
+      new TGFileDialog(gClient->GetRoot(), this, kFDSave, &fi);
+      B2DEBUG(50, "Save file: " << fi.fFilename
+              << "(dir: " << fi.fIniDir << ")");
+      file = new TFile(fi.fFilename, "RECREATE");
+      m_ecl_data->getTree()->Write("tree");
+      file->Close();
       break;
     case M_FILE_EXIT:
       CloseWindow();
@@ -326,14 +393,9 @@ void EclFrame::loadNewData()
       m_settings->MapSubwindows();
       MapSubwindows();
 
-//      Layout();
-//      MapSubwindows();
-//      Layout();
-
       m_ev_slider->SetPosition(0, 0);
     }
     updateEventRange();
-//    gSystem->ProcessEvents();
   }
 }
 
@@ -356,10 +418,8 @@ void EclFrame::updateEventRange()
   m_events_min->SetNumber(ev_min);
   m_events_max->SetNumber(ev_max);
 
-//  m_settings->MapSubwindows();
-//  m_ev_slider->Layout();
   m_ev_slider->MapWindow();
-  m_ev_slider->MapSubwindows(); // Doesn't work without MapWindow
+  m_ev_slider->MapSubwindows();
 }
 
 void EclFrame::showPrevEvents()
@@ -472,7 +532,6 @@ void EclFrame::changeRange(TGListTreeItem* entry, int)
       changeType(PAINTER_SHAPER, false);
       long crate = (long)entry->GetUserData();
       m_ecl_painter->setXRange(crate * 12, crate * 12 + 11);
-      //((EclPainter1D*)m_ecl_painter)->setCrate(crate + 1);
       doDraw();
     } else {
       // Shaper entry had been selected.
@@ -480,7 +539,6 @@ void EclFrame::changeRange(TGListTreeItem* entry, int)
       long shaper = (long)entry->GetUserData();
       long crate  = (long)parent->GetUserData();
       shaper = 12 * crate + shaper;
-      //m_ecl_painter->setXRange(shaper * 16, shaper * 16 + 15);
       ((EclPainter1D*)m_ecl_painter)->setShaper(crate + 1, shaper + 1);
       doDraw();
     }
@@ -510,14 +568,4 @@ void EclFrame::changeType(int type, bool redraw)
     if (redraw)
       doDraw();
   }
-}
-
-bool EclFrame::isOpen()
-{
-  return m_open;
-}
-
-void EclFrame::setClosed()
-{
-  m_open = false;
 }

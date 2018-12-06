@@ -96,7 +96,7 @@ void CurlingTrackCandSplitterModule::initialize()
   B2WARNING("CurlingTrackCandSplitter is deprecated and will be removed from framework in the near future! use SPTCReferee instead!");
   // check if all necessary StoreArrays are present
   StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMsptcName);
-  spacePointTCs.required(m_PARAMsptcName);
+  spacePointTCs.isRequired(m_PARAMsptcName);
 
   // count all empty input parameter strings, and issue a warning if more than one is empty (COULDDO: B2FATAL instead of warning)
   int emptyCtr = 0;
@@ -110,20 +110,20 @@ void CurlingTrackCandSplitterModule::initialize()
 
   // register new StoreArrays, and relation to original TrackCand
   StoreArray<SpacePointTrackCand> curlingFirstOuts(m_PARAMcurlingOutFirstName);
-  curlingFirstOuts.registerPersistent(m_PARAMcurlingOutFirstName);
+  curlingFirstOuts.registerInDataStore(m_PARAMcurlingOutFirstName, DataStore::c_ErrorIfAlreadyRegistered);
   curlingFirstOuts.registerRelationTo(spacePointTCs);
 
   StoreArray<SpacePointTrackCand> curlingAllIns(m_PARAMcurlingAllInName);
-  curlingAllIns.registerPersistent(m_PARAMcurlingAllInName);
+  curlingAllIns.registerInDataStore(m_PARAMcurlingAllInName, DataStore::c_ErrorIfAlreadyRegistered);
   curlingAllIns.registerRelationTo(spacePointTCs);
 
   StoreArray<SpacePointTrackCand> curlingRestOuts(m_PARAMcurlingOutRestName);
-  curlingRestOuts.registerPersistent(m_PARAMcurlingOutRestName);
+  curlingRestOuts.registerInDataStore(m_PARAMcurlingOutRestName, DataStore::c_ErrorIfAlreadyRegistered);
   curlingRestOuts.registerRelationTo(spacePointTCs);
 
   // have to do this here, because in event() I do not want to check every time if this string is empty or not and act accordingly. If I register this with an empty string here, I can use it with an empty string in event() and only store stuff into it, when it is actually named with a non-empty string
   StoreArray<SpacePointTrackCand> curlingCompletes(m_PARAMcompleteCurlerName);
-  curlingCompletes.registerPersistent(m_PARAMcompleteCurlerName);
+  curlingCompletes.registerInDataStore(m_PARAMcompleteCurlerName, DataStore::c_ErrorIfAlreadyRegistered);
   curlingCompletes.registerRelationTo(spacePointTCs);
 
   if (!m_PARAMcompleteCurlerName.empty()) {
@@ -543,12 +543,12 @@ CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
   // get position
   B2Vector3<double> hitLocal = B2Vector3<double>(aTrueHit->getU(), aTrueHit->getV(), 0);
   B2Vector3<double> hitGlobal = sensorInfoBase.pointToGlobal(
-                                  hitLocal); // should work like this, since local coordinates are only 2D
+                                  hitLocal, true); // should work like this, since local coordinates are only 2D
   B2DEBUG(100, "Local position of hit is (" << hitLocal.X() << "," << hitLocal.Y() << "," << hitLocal.Z() <<
           "), Global position of hit is (" << hitGlobal.X() << "," << hitGlobal.Y() << "," << hitGlobal.Z() << ")");
 
   // get momentum
-  B2Vector3<double> pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum());
+  B2Vector3<double> pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum(), true);
   B2DEBUG(100, "Global momentum of hit is (" << pGlobal.X() << "," << pGlobal.Y() << "," << pGlobal.Z() << ")");
 
   return std::make_pair(hitGlobal, pGlobal);
@@ -679,7 +679,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
   const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(trueHitVxdId);
 
   // get global position from TrueHit
-  const B2Vector3<double> trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal);
+  const B2Vector3<double> trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal, true);
 
   // Layer numbering starts at 1 not at 0 so deduce layer by one to access array
   int spLayer = spacePointVxdId.getLayerNumber() - 1;

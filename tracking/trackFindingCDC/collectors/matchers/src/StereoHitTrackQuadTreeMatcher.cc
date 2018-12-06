@@ -3,13 +3,14 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Dmitrii Neverov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
+#include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -19,7 +20,7 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -152,6 +153,21 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
   auto foundStereoHits = foundStereoHitsWithNode[0].second;
   const auto& node = foundStereoHitsWithNode[0].first;
 
+  if (m_param_writeDebugInformation) {
+    std::vector<CDCRecoHit3D> allHits;
+    std::vector<CDCRecoHit3D> foundHits;
+    // Turn vector of pairs into vector of first items
+    for (const CDCRecoHitWithRLPointer recoHitWithRL : recoHits) {
+      const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
+      allHits.push_back(recoHit3D);
+    }
+    for (const CDCRecoHitWithRLPointer recoHitWithRL : foundStereoHits) {
+      const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
+      foundHits.push_back(recoHit3D);
+    }
+    m_quadTreeInstance.drawDebugPlot(allHits, foundHits, node);
+  }
+
   // Remove all assigned hits, which where already found before (and do not need to be added again)
   const auto& isAssignedHit = [](const CDCRecoHitWithRLPointer & recoHitWithRLPointer) {
     const CDCRecoHit3D& recoHit3D = recoHitWithRLPointer.first;
@@ -165,10 +181,12 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
                         foundStereoHits.end());
 
   // Sort the found stereo hits by same CDCHit and smaller distance to the node
-  const double tanLMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
-  const double z0Mean = (node.getLowerZ0() + node.getUpperZ0()) / 2.0;
-
-  auto sortByHitAndNodeCenterDistance = [tanLMean, z0Mean](const CDCRecoHitWithRLPointer & lhs,
+  // FIXME there should be a way to call the right function depending on the templated class
+  // i.e. .getLowerZ0() and .getLowerTanLambda() for z(s)=z0 + tanLambda * s
+  // or .getLowerP() and .getLowerQ() for z(s)=(p + 4q) * s - q^2 / 25 * s^2
+  const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or P
+  const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Q
+  auto sortByHitAndNodeCenterDistance = [xMean, yMean](const CDCRecoHitWithRLPointer & lhs,
   const CDCRecoHitWithRLPointer & rhs) {
 
     const CDCRecoHit3D& rhsRecoHit = rhs.first;
@@ -188,8 +206,16 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const double lhsS = lhsRecoHit.getArcLength2D();
       const double rhsS = rhsRecoHit.getArcLength2D();
 
-      const double lhsZDistance = lhsS * tanLMean + z0Mean - lhsZ;
-      const double rhsZDistance = rhsS * tanLMean + z0Mean - rhsZ;
+      double lhsZDistance;
+      double rhsZDistance;
+
+      if (AQuadTree::m_lookingForQuadraticTracks) {
+        lhsZDistance = (xMean + 4 * yMean) * lhsS - yMean / 25 * lhsS * lhsS - lhsZ;
+        rhsZDistance = (xMean + 4 * yMean) * rhsS - yMean / 25 * rhsS * rhsS - rhsZ;
+      } else {
+        lhsZDistance = lhsS * yMean + xMean - lhsZ;
+        rhsZDistance = rhsS * yMean + xMean - rhsZ;
+      }
 
       return lhsZDistance < rhsZDistance;
     }
@@ -230,3 +256,4 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::writeDebugInformation()
 }
 
 template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitZ0TanLambdaLegendre>;
+template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre>;

@@ -207,7 +207,7 @@ def WhichCategories(categories=[
                 trackLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][1]))
             if (AvailableCategories[category][0],
-                    AvailableCategories[category][2]) \
+                    AvailableCategories[category][2], AvailableCategories[category][3]) \
                     not in eventLevelParticleLists:
                 eventLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][2], AvailableCategories[category][3]))
@@ -431,7 +431,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             continue
 
         # Select particles in ROE for different categories according to mass hypothesis.
-        if particleList != ('Lambda0:inRoe' or 'K+:inRoe'):
+        if particleList != 'Lambda0:inRoe' and particleList != 'K+:inRoe' and particleList != 'pi+:inRoe':
 
             # Filling particle list for actual category
             fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
@@ -454,8 +454,8 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             if particleList == 'K+:inRoe':
                 fillParticleList(
                     particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                # Precut done to prevent from overtraining, might be redundant
-                applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
+                # Precut done to prevent from overtraining, found not necessary now
+                # applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
                 readyParticleLists.append(particleList)
 
             if particleList == 'Lambda0:inRoe':
@@ -481,7 +481,6 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
     identifiersExtraInfosDict = dict()
-    isKaonPionReady = True
     identifiersExtraInfosKaonPion = []
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
@@ -509,11 +508,14 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
             B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
 
             if mode == 'Sampler':
-                methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
-                identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
-                if not os.path.isfile(identifierEventLevelKaonPion):
-                    if category != "SlowPion" and category != "Kaon":
-                        continue
+                if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
+                    methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
+                    identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
+                    if not os.path.isfile(identifierEventLevelKaonPion):
+                        # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
+                        # sampling. The others are not needed and skipped
+                        if category != "SlowPion" and category != "Kaon":
+                            continue
 
             if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
                 identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
@@ -895,16 +897,30 @@ def flavorTagger(
       This module can be used to sample the training information, to train and/or to test the flavorTagger.
 
       @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists.
-      @param mode                              The available modes are "Sampler", "Teacher" or "Expert".
-      @param weightFiles                       Weight files name. Default= "B2JpsiKs_muBGx1". Use 'B2JpsiKs_muBGx0' with BGx0 MC.
+      @param mode                              The available modes are
+                                               ``Expert`` (default), ``Sampler``, and ``Teacher``. In the ``Expert`` mode
+                                               Flavor Tagging is applied to the analysis,. In the ``Sampler`` mode you save
+                                               save the variables for training. In the ``Teacher`` mode the FlavorTagger is
+                                               trained, for this step you do not reconstruct any particle or do any analysis,
+                                               you just run the flavorTagger alone.
+      @param weightFiles                       Weight files name. Default=
+                                               ``B2JpsiKs_muBGx1``. Use ``B2JpsiKs_muBGx0`` with BGx0 MC. If the user self
+                                               wants to train the FlavorTagger, the weightfiles name should correspond to the
+                                               analysed CP channel in order to avoid confusions. The default name
+                                               ``B2JpsiKs_mu`` corresponds to Breco
+                                               :math:`\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: 'TMVA-FBDT' or 'FANN-MLP'. Both used by default.
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
-      @param belleOrBelle2                     Uses files trained for "Belle" or "Belle2" MC.
+      @param belleOrBelle2                     Uses files trained for ``Belle`` or ``Belle2`` MC.
       @param saveCategoriesInfo                Sets to save information of individual categories.
-      @param downloadFromDatabaseIfNotfound    Weight files are downloaded from the conditions database if not in workingDirectory.
-      @param uploadToDatabaseAfterTraining     For librarians: uploads weight files to localdb after training.
-      @param samplerFileId                     Identifier to paralellize sampling. Only used in "Sampler" mode.
+      @param downloadFromDatabaseIfNotfound    Weight files are downloaded from
+                                               the conditions database if not available in workingDirectory.
+      @param uploadToDatabaseAfterTraining     For librarians only: uploads weight files to localdb after training.
+      @param samplerFileId                     Identifier to paralellize
+                                               sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
+                                               want to parallelize the sampling, you can run several sampling scripts in
+                                               parallel. By changing this parameter you will not overwrite an older sample.
       @param path                              Modules are added to this path
 
     """
@@ -1022,5 +1038,6 @@ if __name__ == '__main__':
     desc_list.append((function.__name__, signature + '\n' + function.__doc__))
 
     from pager import Pager
+    from basf2.utils import pretty_print_description_list
     with Pager('Flavor Tagger function accepts the following arguments:'):
         pretty_print_description_list(desc_list)

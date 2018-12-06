@@ -11,6 +11,7 @@
 #include <ecl/utility/ECLShowerId.h>
 
 using namespace Belle2;
+using namespace ECL;
 
 ECLShowerId::ECLShowerId()
 { }

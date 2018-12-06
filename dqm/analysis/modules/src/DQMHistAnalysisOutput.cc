@@ -9,7 +9,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
-#include <TString.h>
+#include <daq/slc/base/StringUtil.h>
 
 using namespace std;
 using namespace Belle2;
@@ -26,7 +26,7 @@ REG_MODULE(DQMHistAnalysisOutput)
 DQMHistAnalysisOutputModule::DQMHistAnalysisOutputModule() : DQMHistAnalysisModule()
 {
   //Parameter definition
-  B2DEBUG(1, "DQMHistAnalysisOutput: Constructor done.");
+  B2DEBUG(20, "DQMHistAnalysisOutput: Constructor done.");
 }
 
 
@@ -35,17 +35,17 @@ DQMHistAnalysisOutputModule::~DQMHistAnalysisOutputModule() { }
 void DQMHistAnalysisOutputModule::initialize()
 {
   ParamTypeList& parnames(getParNames());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
     std::string pname = i->first;
-    B2INFO("Addding : " << pname);
+    B2DEBUG(20, "Adding : " << pname);
   }
-  B2INFO("DQMHistAnalysisOutput: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisOutput: initialized.");
 }
 
 
 void DQMHistAnalysisOutputModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisOutput: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisOutput: beginRun called.");
 }
 
 void DQMHistAnalysisOutputModule::event()
@@ -54,20 +54,18 @@ void DQMHistAnalysisOutputModule::event()
   IntValueList& vints(getIntValues());
   FloatValueList& vfloats(getFloatValues());
   TextList& texts(getTexts());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
     std::string pname = i->first;
-    TString& vvname = TString(pname).ReplaceAll('/', '.');
-    vvname.ToLower();
-    std::string vname = vvname.Data();
+    std::string vname = StringUtil::tolower(StringUtil::replace(pname, "/", "."));
     switch (i->second) {
-      case INT:
-        B2INFO(vname << " " << vints[pname]);
+      case c_ParamINT:
+        B2DEBUG(20, vname << " " << vints[pname]);
         break;
-      case FLOAT:
-        B2INFO(vname << " " << vfloats[pname]);
+      case c_ParamFLOAT:
+        B2DEBUG(20, vname << " " << vfloats[pname]);
         break;
-      case TEXT:
-        B2INFO(vname << " " << texts[pname]);
+      case c_ParamTEXT:
+        B2DEBUG(20, vname << " " << texts[pname]);
         break;
     }
   }
@@ -75,12 +73,12 @@ void DQMHistAnalysisOutputModule::event()
 
 void DQMHistAnalysisOutputModule::endRun()
 {
-  B2INFO("DQMHistAnalysisOutput : endRun called");
+  B2DEBUG(20, "DQMHistAnalysisOutput : endRun called");
 }
 
 
 void DQMHistAnalysisOutputModule::terminate()
 {
-  B2INFO("terminate called");
+  B2DEBUG(20, "terminate called");
 }
 

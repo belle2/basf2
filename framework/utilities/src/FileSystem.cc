@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2013-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Thomas Kuhr                               *
+ * Contributors: Christian Pulvermacher, Thomas Kuhr, Martin Ritter       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <chrono>
 #include <random>
@@ -21,6 +22,8 @@
 //dlopen etc.
 #include <dlfcn.h>
 #include <fcntl.h>
+
+#include <TMD5.h>
 
 using namespace std;
 using namespace Belle2;
@@ -66,29 +69,64 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   return true;
 }
 
-std::string FileSystem::findFile(const string& path, bool silent)
+std::string FileSystem::calculateMD5(const std::string& filename)
 {
-  //environment doesn't change, so only done once
-  static const char* localdir = getenv("BELLE2_LOCAL_DIR");
-  static const char* reldir = getenv("BELLE2_RELEASE_DIR");
+  if (not isFile(filename)) return "";
+  fs::path fullPath = fs::absolute(filename);
+  std::unique_ptr<TMD5> md5(TMD5::FileChecksum(fullPath.c_str()));
+  return md5->AsString();
+}
 
-  //check in local directory
+std::string FileSystem::findFile(const string& path, const std::vector<std::string>& dirs, bool silent)
+{
+  // check given directories
   string fullpath;
-  if (localdir and fileExists(fullpath = (fs::path(localdir) / path).string()))
-    return fullpath;
-  //check in central release directory
-  else if (reldir and fileExists(fullpath = (fs::path(reldir) / path).string()))
-    return fullpath;
-  //check if this thing exists as normal path (absolute / relative to PWD)
-  else if (fileExists(fullpath = (fs::absolute(path).string())))
-    return fullpath;
+  for (auto dir : dirs) {
+    if (dir.empty()) continue;
+    fullpath = (fs::path(dir) / path).string();
+    if (fileExists(fullpath)) return fullpath;
+  }
 
-  //nothing found
+  // check local directory
+  fullpath = fs::absolute(path).string();
+  if (fileExists(fullpath)) return fullpath;
+
+  // nothing found
   if (!silent)
-    B2ERROR("findFile(): Could not find '" << path << "'!");
+    B2ERROR("findFile(): Could not find file." << LogVar("path", path));
   return string("");
 }
 
+std::string FileSystem::findFile(const string& path, bool silent)
+{
+  std::vector<std::string> dirs;
+  if (getenv("BELLE2_LOCAL_DIR")) {
+    dirs.push_back(getenv("BELLE2_LOCAL_DIR"));
+  }
+  if (getenv("BELLE2_RELEASE_DIR")) {
+    dirs.push_back(getenv("BELLE2_RELEASE_DIR"));
+  }
+  return findFile(path, dirs, silent);
+}
+
+std::string FileSystem::findFile(const string& path, const std::string& dataType, bool silent)
+{
+  std::vector<std::string> dirs;
+  std::string envVar = "BELLE2_" + boost::to_upper_copy(dataType) + "_DATA_DIR";
+  if (getenv(envVar.c_str())) {
+    dirs.push_back(getenv(envVar.c_str()));
+  }
+  std::string dirName = boost::to_lower_copy(dataType) + "-data";
+  if (getenv("VO_BELL2_SW_DIR")) {
+    dirs.push_back((fs::path(getenv("VO_BELL2_SW_DIR")) / dirName).string());
+  }
+  dirs.push_back(dirName);
+  std::string result = findFile(path, dirs, true);
+  if (result.empty() && !silent)
+    B2ERROR("findFile(): Could not find data file. You may want to use the 'b2install-data' tool to get the file."
+            << LogVar("path", path) << LogVar("data type", dataType));
+  return result;
+}
 
 FileSystem::Lock::Lock(std::string fileName, bool readonly) :
   m_readOnly(readonly)

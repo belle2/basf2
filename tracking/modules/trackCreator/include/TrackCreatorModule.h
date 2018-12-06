@@ -29,10 +29,10 @@ namespace Belle2 {
     TrackCreatorModule();
 
     /// Require and register the store arrays.
-    void initialize();
+    void initialize() override;
 
     /// Build/fit the track fit results.
-    void event();
+    void event() override;
 
   private:
     // Input

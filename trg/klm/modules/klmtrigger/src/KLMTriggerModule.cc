@@ -43,6 +43,7 @@ REG_MODULE(KLMTrigger)
 KLMTriggerModule::KLMTriggerModule() : Module()
 {
   setDescription("KLM trigger simulation");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("MaxChisq", m_maxChisq,
            "Maximum chi squared for a track",
            double(7.0));
@@ -72,7 +73,7 @@ void KLMTriggerModule::initialize()
 void KLMTriggerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
+  B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
   m_nEvents = 0;
   m_nTracks = 0;
 }

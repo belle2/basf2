@@ -12,6 +12,9 @@
 #define BGODIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/bgo/dataobjects/BgoHit.h>
 #include <string>
 #include <vector>
 
@@ -43,21 +46,24 @@ namespace Belle2 {
       virtual ~BgoDigitizerModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
+
+      StoreArray<BgoHit> m_bgoHit; /** Array for Bgo Hits */
+
 
       /** reads data from BGO.xml: threshold in MeV, range in MeV, and resolution in % */
       virtual void getXMLData();

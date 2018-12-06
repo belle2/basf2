@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Moritz Gelb                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -43,7 +43,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
   FSRCorrectionModule::FSRCorrectionModule() :
-    Module()
+    Module(), m_pdgCode(0), m_maxAngle(-1.0)
 
   {
     // set module description (e.g. insert text)
@@ -59,9 +59,6 @@ namespace Belle2 {
     addParam("energyThreshold", m_energyThres, "The maximum energy of the (radiative) gamma to be accepted.", 1.0);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
-
-    // initializing the rest of private members
-    m_pdgCode   = 0;
   }
 
   void FSRCorrectionModule::initialize()
@@ -82,13 +79,13 @@ namespace Belle2 {
     } else if (!m_decaydescriptor.init(m_inputListName)) {
       B2ERROR("[FSRCorrectionModule] Invalid input particle list name: " << m_inputListName);
     } else {
-      StoreObjPtr<ParticleList>::required(m_inputListName);
+      StoreObjPtr<ParticleList>().isRequired(m_inputListName);
     }
 
     if (!m_decaydescriptorGamma.init(m_gammaListName)) {
       B2ERROR("[FSRCorrectionModule] Invalid gamma particle list name: " << m_gammaListName);
     } else {
-      StoreObjPtr<ParticleList>::required(m_gammaListName);
+      StoreObjPtr<ParticleList>().isRequired(m_gammaListName);
     }
 
     // make output list

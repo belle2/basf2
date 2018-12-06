@@ -54,7 +54,8 @@ struct BoundedSpaceSet {
   /** Get the median (mid-range) value of the set.
    * @return (upper bound on) the median of set elements
    */
-  inline CIRC::tag_type getMedian() const {
+  inline CIRC::tag_type getMedian() const
+  {
     if (m_set.size() < 5) return 0;
     auto it = m_set.begin(); std::advance(it, m_set.size() / 2);
     return *it;
@@ -72,7 +73,8 @@ struct BoundedSpaceSet {
    * @return if there is no element with label k, pair (reference to an empty array at k, true).
    * if there is such an element, the pair (reference to existing array at k, false)
    */
-  inline void put(CIRC::tag_type k) {
+  inline void put(CIRC::tag_type k)
+  {
     m_set.insert(k);
     // We don't shrink if adding a minimum element to a full buffer.
     if (getFreeSize() > 0 || k >= getBottom()) ensureSize();
@@ -94,7 +96,8 @@ private:
   /** Drop extra elements to keep size at or below m_maxSize */
   inline void ensureSize() { while (m_set.size() > m_maxSize) m_set.erase(m_set.begin()); }
 
-  std::size_t m_maxSize;  /**< Maximum size of the container; when reached, elements will be dropped to make space for new elements. */
+  std::size_t
+  m_maxSize;  /**< Maximum size of the container; when reached, elements will be dropped to make space for new elements. */
   set_type m_set;         /**< The set holding the values.*/
 
 };
@@ -148,7 +151,8 @@ struct BoundedSpaceMap {
   /** Get the median (mid-range) label of the map.
    * @return (upper bound on) the median of map labels
    */
-  inline CIRC::tag_type getMedian() const {
+  inline CIRC::tag_type getMedian() const
+  {
     // Only report when stable enough
     if (m_map.size() < 5) return 0;
     auto it = m_map.begin(); std::advance(it, m_map.size() / 2);
@@ -168,7 +172,8 @@ struct BoundedSpaceMap {
    * @return if there is no element with label k, pair (reference to an empty array at k, true).
    * if there is such an element, the pair (reference to existing array at k, false)
    */
-  inline void put(CIRC::tag_type k, timestamp_type timestamp, collection_type& v) {
+  inline void put(CIRC::tag_type k, timestamp_type timestamp, collection_type& v)
+  {
     // Don't create map[k] if there is nothing to insert
     if (v.size() == 0) return;
     std::get<0>(m_map[k]) = timestamp;
@@ -183,7 +188,8 @@ struct BoundedSpaceMap {
    * @param k the key to search for
    * @return true if key found, otherwise false.
    */
-  inline bool hasKey(CIRC::tag_type k) {
+  inline bool hasKey(CIRC::tag_type k)
+  {
     auto iv = m_map.find(k);
     if (iv != m_map.end()) {
       m_lastIter = iv;
@@ -197,7 +203,8 @@ struct BoundedSpaceMap {
    * @param k the key whose timestamp is requested
    * @return the timestamp of event at k, or 0 if not found - check with hasKey!
    */
-  timestamp_type getTimeStamp(CIRC::tag_type k) {
+  timestamp_type getTimeStamp(CIRC::tag_type k)
+  {
     map_iterator iv = (m_lastTag == k) ? m_lastIter : m_map.find(k);
     if (iv != m_map.end()) {
       return std::get<0>(iv->second);
@@ -212,7 +219,8 @@ struct BoundedSpaceMap {
    * @param k the key whose value is searched for
    * @return const ref to the collection at k, if it exists, otherwise empty collection.
    */
-  inline const collection_type& getData(CIRC::tag_type k) {
+  inline const collection_type& getData(CIRC::tag_type k)
+  {
     m_returnVector.clear();
     map_iterator iv = (m_lastTag == k) ? m_lastIter : m_map.find(k);
     if (iv != m_map.end()) {
@@ -228,7 +236,8 @@ private:
 
   inline void ensureSize() { while (m_map.size() > m_maxSize) m_map.erase(m_map.begin()); }
 
-  std::size_t m_maxSize;          /**< Maximum allowed size of the map. If reached, oldest events are dropped when new events are added.*/
+  std::size_t
+  m_maxSize;          /**< Maximum allowed size of the map. If reached, oldest events are dropped when new events are added.*/
   map_type m_map;                 /**< The map holding tags, timestamps and collection data.*/
   collection_type m_returnVector; /**< Collection to hold retrieved data, because original entry is deleted on retrieval.*/
   map_iterator m_lastIter;        /**< The last queried position, presumably by hasKey or getTimeStamp, to save map searches. */

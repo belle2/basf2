@@ -7,12 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
 
-using namespace Belle2;
-using namespace ECL;
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 
+//ECL
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+
+using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -164,6 +173,8 @@ void MCMatcherECLClustersModule::event()
   // the relation between ECLShower->MCParticle.  StoreArray<ECLCluster> eclClusters;
   for (const auto& eclShower : m_eclShowers) {
     const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>(eclClusterArrayName());
+    if (!eclCluster) continue;
+
     const RelationVector<MCParticle> mcParticles = eclShower.getRelationsTo<MCParticle>();
     for (unsigned int i = 0; i < mcParticles.size(); ++i) {
       const auto mcParticle = mcParticles.object(i);

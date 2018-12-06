@@ -242,17 +242,20 @@ void MCRecoTracksMatcherModule::initialize()
     // We make them optional in case of limited detector setup.
     // PXD
     if (m_param_usePXDHits) {
-      StoreArray<PXDCluster>::optional();
+      StoreArray<PXDCluster> pxdClusters;
+      pxdClusters.isOptional();
     }
 
     // SVD
     if (m_param_useSVDHits) {
-      StoreArray<SVDCluster>::optional();
+      StoreArray<SVDCluster> svdClusters;
+      svdClusters.isOptional();
     }
 
     // CDC
     if (m_param_useCDCHits) {
-      StoreArray<CDCHit>::optional();
+      StoreArray<CDCHit> cdcHits;
+      cdcHits.isOptional();
     }
   }
 }

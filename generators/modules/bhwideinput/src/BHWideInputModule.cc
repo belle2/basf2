@@ -64,7 +64,8 @@ BHWideInputModule::~BHWideInputModule()
 
 void BHWideInputModule::initialize()
 {
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Beam Parameters, initial particle - BHWIDE cannot handle beam energy spread
   m_initial.initialize();
@@ -113,7 +114,6 @@ void BHWideInputModule::initializeGenerator()
   const BeamParameters& nominal = m_initial.getBeamParameters();
   double ecm = nominal.getMass();
 
-  //   m_generator.enableBoost(m_boostMode > 0);
   m_generator.setScatAnglePositron(vectorToPair(m_ScatteringAngleRangePositron, "ScatteringAngleRangePositron"));
   m_generator.setScatAngleElectron(vectorToPair(m_ScatteringAngleRangeElectron, "ScatteringAngleRangeElectron"));
 

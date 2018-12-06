@@ -18,6 +18,7 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
+from background import get_background_files
 import validationtools
 
 set_random_seed(12345)
@@ -29,7 +30,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # will roughly run for 10 hours
 eventinfosetter.param('evtNumList', [40000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # beam parameters
@@ -41,8 +42,7 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation
-bg = validationtools.get_background_files()
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=get_background_files())
 
 # trigger simulation
 add_tsim(main)

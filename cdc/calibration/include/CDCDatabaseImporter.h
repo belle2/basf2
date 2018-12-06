@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <string>
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -57,6 +57,24 @@ namespace Belle2 {
     void printChannelMap();
 
     /**
+     * Import FEE params. to the data base.
+     */
+    void importFEElectronics(std::string fileName);
+    /**
+     * Get FEE params. from the database and print.
+     */
+    void printFEElectronics();
+
+    /**
+     * Import edep-to-adc params. to the data base.
+     */
+    void importEDepToADC(std::string fileName);
+    /**
+     * Get edep-to-adc params. from the database and print.
+     */
+    void printEDepToADC();
+
+    /**
      * Import t0 table to the data base.
      */
     void importTimeZero(std::string fileName);
@@ -65,6 +83,22 @@ namespace Belle2 {
      * print it.
      */
     void printTimeZero();
+
+    /**
+     * Import ADC delta pedestal table to the data base specifying the text data.
+     */
+    void importADCDeltaPedestal(std::string fileName);
+
+    /**
+     * Import ADC delta pedestal with all 0.
+     */
+    void importADCDeltaPedestal();
+
+    /**
+     * Get the ADC delta pedestal table from the database and
+     * print it.
+     */
+    void printADCDeltaPedestal();
 
     /**
      * Import badwire table to the data base.
@@ -117,6 +151,16 @@ namespace Belle2 {
     void printSigma();
 
     /**
+     * Import fudge factor table to the database.
+     */
+    void importFFactor(std::string fileName);
+    /**
+     * Get the fudge factor table from the database and
+     * print it.
+     */
+    void printFFactor();
+
+    /**
      * Import displacement of wire position to the database.
      */
     void importDisplacement(std::string fileName);
@@ -152,7 +196,6 @@ namespace Belle2 {
     /**
      * CDC geometory parameter.
      */
-    //    CDC::CDCGeometryPar& m_cdcgp = CDC::CDCGeometryPar::Instance();
     int m_firstExperiment; /**< First experiment. */
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */

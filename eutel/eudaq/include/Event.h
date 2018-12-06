@@ -56,13 +56,15 @@ namespace eudaq {
 
     Event& SetTag(const std::string& name, const std::string& val);
     template <typename T>
-    Event& SetTag(const std::string& name, const T& val) {
+    Event& SetTag(const std::string& name, const T& val)
+    {
       return SetTag(name, eudaq::to_string(val));
     }
     std::string GetTag(const std::string& name, const std::string& def = "") const;
     std::string GetTag(const std::string& name, const char* def) const { return GetTag(name, std::string(def)); }
     template <typename T>
-    T GetTag(const std::string& name, T def) const {
+    T GetTag(const std::string& name, T def) const
+    {
       return eudaq::from_string(GetTag(name), def);
     }
 
@@ -90,7 +92,8 @@ namespace eudaq {
 
   class EventFactory {
   public:
-    static Event* Create(Deserializer& ds) {
+    static Event* Create(Deserializer& ds)
+    {
       unsigned id = 0;
       ds.read(id);
       //std::cout << "Create id = " << std::hex << id << std::dec << std::endl;
@@ -112,10 +115,12 @@ namespace eudaq {
    */
   template <typename T_Evt>
   struct RegisterEventType {
-    RegisterEventType() {
+    RegisterEventType()
+    {
       EventFactory::Register(T_Evt::eudaq_static_id(), &factory_func);
     }
-    static Event* factory_func(Deserializer& ds) {
+    static Event* factory_func(Deserializer& ds)
+    {
       return new T_Evt(ds);
     }
   };

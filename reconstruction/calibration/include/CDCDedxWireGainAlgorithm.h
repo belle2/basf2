@@ -13,6 +13,15 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dataobjects/WireID.h>
+#include <framework/database/DBObjPtr.h>
+#include <TH1F.h>
+#include <TLine.h>
+#include <TCanvas.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <TMath.h>
 
 namespace Belle2 {
   /**
@@ -33,12 +42,50 @@ namespace Belle2 {
      */
     virtual ~CDCDedxWireGainAlgorithm() {}
 
+    /**
+    * reading input file and storing bad wire values in vectors
+    */
+    void setBadWiresdatafile(const std::string& fPath, const std::string& fName)
+    {
+
+      m_badWireFPath = fPath;
+      m_badWireFName = fName;
+      isRmBadwires = true;
+
+      printf("INF0: Taking bad wire list file from: %s/%s \n", m_badWireFPath.data(), m_badWireFName.data());
+
+      std::ifstream inputfile;
+      inputfile.open(Form("%s/%s", m_badWireFPath.data(), m_badWireFName.data()));
+      if (inputfile.fail()) {
+        printf("%s\n", "input file of bad wires does not exits or corrupted!");
+      }
+
+      int ibadwire = -999, nBadwires = 0;
+      printf("--- List of Bad wires \n");
+      while (true) {
+        nBadwires++;
+        inputfile >> ibadwire;
+        if (inputfile.eof()) break;
+        printf("%d),  Global Wire ID # = %d\n", nBadwires, ibadwire);
+        listofbadwires.push_back(ibadwire);
+      }
+
+      std::sort(listofbadwires.begin(), listofbadwires.end());
+      inputfile.close();
+    }
+
+    /**
+    * funtion to set flag active for plotting
+    */
+    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+
+
   protected:
 
     /**
-     * Run algorithm
+     * Wire gain algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
 
   private:
@@ -49,7 +96,12 @@ namespace Belle2 {
      * @param removeLowest      lowest fraction of hits to remove (0.05)
      * @param removeHighest     highest fraction of hits to remove (0.25)
      */
-    double calculateMean(const std::vector<double>& dedx, double removeLowest, double removeHighest) const;
+    std::string m_badWireFPath; /**< path of bad wire file */
+    std::string m_badWireFName; /**< name of bad wire file */
+    bool isRmBadwires; /**< if bad wire consideration */
+    bool isMakePlots; /**< produce plots for status */
+
+    std::vector<int> listofbadwires; /**< vector of bad ru list */
 
   };
 } // namespace Belle2

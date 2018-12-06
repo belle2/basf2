@@ -1,11 +1,20 @@
+//This module
 #include <ecl/modules/eclPacker/eclPackerModule.h>
+
+//STL
+#include <ios>
+#include <iomanip>
+
+//Framework
+#include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
+
+//ECL
+#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 
-#include <framework/utilities/FileSystem.h>
-#include <iostream>
-#include <iomanip>
-#include <stdio.h>
-#include <stdlib.h>
+//Raw data
+#include <rawdata/dataobjects/RawECL.h>
 
 using namespace std;
 using namespace Belle2;
@@ -14,8 +23,20 @@ using namespace ECL;
 REG_MODULE(ECLPacker)
 
 ECLPackerModule::ECLPackerModule() :
-  m_compressMode(false),
-  m_eclRawCOPPERs("", DataStore::c_Event)
+  m_bufPos(0),
+  m_bufLength(0),
+  m_bitPos(0),
+  m_EclWaveformSamples(),
+  m_eclMapper(),
+  m_eclRawCOPPERs("", DataStore::c_Event),
+  adcBuffer_temp(),
+  collectorMaskArray(),
+  shaperMaskArray(),
+  shaperADCMaskArray(),
+  shaperNWaveform(),
+  shaperNHits(),
+  iEclDigIndices(),
+  iEclWfIndices()
 {
   setDescription("The module reads ECLDigits from the DataStore and writes ECLRaw data.");
   addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string("/ecl/data/ecl_channels_map.txt"));
@@ -25,51 +46,32 @@ ECLPackerModule::ECLPackerModule() :
   addParam("PackWfRareFactor", m_WaveformRareFactor, "Pack ADC samples for one of N events. No waveform is packed if 0", 100);
 
   m_EvtNum = 0;
-
-  iEclDigIndices = new int[ECL_TOTAL_CHANNELS];
-  iEclWfIndices  = new int[ECL_TOTAL_CHANNELS];
-
-  m_eclMapper = new ECLChannelMapper();
 }
 
 ECLPackerModule::~ECLPackerModule()
 {
-
-  delete m_eclMapper;
-  delete[] iEclDigIndices;
-  delete[] iEclWfIndices;
-
 }
 
 void ECLPackerModule::initialize()
 {
-
   // require input data
-  StoreArray<ECLDigit>::required();
-  StoreArray<ECLDsp>::optional();
+  m_eclDigits.isRequired();
+  m_eclDsps.isOptional();
 
   // register output container in data store
   m_eclRawCOPPERs.registerInDataStore(m_eclRawCOPPERsName);
 
-  // initialize channel mapper from file (temporary)
-
-  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
-  if (! FileSystem::fileExists(ini_file_name)) {
-    B2FATAL("eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-  }
-
-  if (! m_eclMapper->initFromFile(ini_file_name.data())) {
-    B2FATAL("Can't initialize eclChannelMapper!");
-  }
-
-  // of initialize if from DB TODO
-  B2INFO("ECL Packer: eclChannelMapper initialized successfully");
   B2INFO("ECL Packer: Compress mode = " << m_compressMode);
-
 }
 
 void ECLPackerModule::beginRun()
 {
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_eclMapper.initFromDB()) {
+    B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
+  }
+
   //TODO
 }
 
@@ -77,10 +79,6 @@ void ECLPackerModule::event()
 {
 
   B2DEBUG(50, "EclPacker:: event called ");
-  // input data
-  StoreArray<ECLDigit> ECLDigitData;
-  StoreArray<ECLDsp>   ECLWaveformData;
-
   // output data
   m_eclRawCOPPERs.clear();
 
@@ -90,8 +88,8 @@ void ECLPackerModule::event()
   int triggerPhase = 0, dspMask = 0;
 
   // get total number of hits
-  int nEclDigits   = ECLDigitData.getEntries();
-  int nEclWaveform = ECLWaveformData.getEntries();
+  int nEclDigits   = m_eclDigits.getEntries();
+  int nEclWaveform = m_eclDsps.getEntries();
 
   for (int i = 0; i < ECL_CRATES; i++) {
     collectorMaskArray[i] = 0;
@@ -108,7 +106,6 @@ void ECLPackerModule::event()
     iEclWfIndices[j] = -1;
   }
 
-
   B2DEBUG(100, "EclPacker:: N_Digits    = " << nEclDigits);
   B2DEBUG(100, "EclPacker:: N_Waveforms = " << nEclWaveform);
 
@@ -118,51 +115,45 @@ void ECLPackerModule::event()
   int tot_dsp_hits = 0;
   // fill number of hits, masks and fill correspondance between cellID and index in container
   for (int i_digit = 0; i_digit < nEclDigits; i_digit++) {
-    int cid = ECLDigitData[i_digit]->getCellId();
-    int amp = ECLDigitData[i_digit]->getAmp();
+    int cid = m_eclDigits[i_digit]->getCellId();
+    int amp = m_eclDigits[i_digit]->getAmp();
 
     if (amp < m_ampThreshold) continue;
 
-    //  int tim = ECLDigitData[i_digit]->getTimeFit();
-    //  int qua = ECLDigitData[i]->getQuality();
     //TODO: Threshold
-    iCrate = m_eclMapper->getCrateID(cid);
-    iShaper = m_eclMapper->getShaperPosition(cid);
-    iChannel = m_eclMapper->getShaperChannel(cid);
+    iCrate = m_eclMapper.getCrateID(cid);
+    iShaper = m_eclMapper.getShaperPosition(cid);
+    iChannel = m_eclMapper.getShaperChannel(cid);
 
     if (iCrate < 1 && iShaper < 1 && iChannel < 1) {
       B2ERROR("Wrong crate/shaper/channel ids: " << iCrate << " " << iShaper << " " << iChannel << " for CID " << cid);
       throw eclPacker_internal_error();
     }
-
-    //B2INFO("cid = " << cid << " iCrate = " << iCrate << " iShaper = " << iShaper << " iChannel = " << iChannel);
-
     collectorMaskArray[iCrate - 1] |= (1 << (iShaper - 1));
 
     shaperMaskArray[iCrate - 1][iShaper - 1] |= (1 << (iChannel - 1));
     shaperNHits[iCrate - 1][iShaper - 1]++;
 
     iEclDigIndices[cid - 1] = i_digit;
-
     tot_dsp_hits++;
   }
 
-  B2INFO("ECL Packer:: N Hits above threshold  = " << tot_dsp_hits << " nWaveforms = " << nEclWaveform);
+  B2DEBUG(100, "ECL Packer:: N Hits above threshold  = " << tot_dsp_hits << " nWaveforms = " << nEclWaveform);
 
   if (m_WaveformRareFactor != 0)
     if (m_EvtNum % m_WaveformRareFactor == 0) {
-      B2INFO("ECL Packer:: Pack waveform data for this event: " << m_EvtNum);
+      B2DEBUG(100, "ECL Packer:: Pack waveform data for this event: " << m_EvtNum);
       for (int i_wf = 0; i_wf < nEclWaveform; i_wf++) {
-        int cid = ECLWaveformData[i_wf]->getCellId();
-        iCrate = m_eclMapper->getCrateID(cid);
-        iShaper = m_eclMapper->getShaperPosition(cid);
-        iChannel = m_eclMapper->getShaperChannel(cid);
+        int cid = m_eclDsps[i_wf]->getCellId();
+        iCrate = m_eclMapper.getCrateID(cid);
+        iShaper = m_eclMapper.getShaperPosition(cid);
+        iChannel = m_eclMapper.getShaperChannel(cid);
 
         //check corresponding amplitude in ecl digits
         int amp = 0;
         for (int i_digit = 0; i_digit < nEclDigits; i_digit++) {
-          if (ECLDigitData[i_digit]->getCellId() == cid) {
-            amp = ECLDigitData[i_digit]->getAmp();
+          if (m_eclDigits[i_digit]->getCellId() == cid) {
+            amp = m_eclDigits[i_digit]->getAmp();
             break;
           }
         }
@@ -197,8 +188,8 @@ void ECLPackerModule::event()
     int iCOPPERNode = (iCOPPER <= ECL_BARREL_COPPERS) ? BECL_ID + iCOPPER : EECL_ID + iCOPPER - ECL_BARREL_COPPERS;
 
     //check if at least one of FINESSES have hits
-    int icr1 = m_eclMapper->getCrateID(iCOPPERNode, 0);
-    int icr2 = m_eclMapper->getCrateID(iCOPPERNode, 1);
+    int icr1 = m_eclMapper.getCrateID(iCOPPERNode, 0);
+    int icr2 = m_eclMapper.getCrateID(iCOPPERNode, 1);
     B2DEBUG(200, "iCOPPERNode = 0x" << std::hex << iCOPPERNode << std::dec << " nCrate1 = " << icr1 << " nCrate2 = " << icr2);
     if (!(collectorMaskArray[icr1 - 1] || collectorMaskArray[icr2 - 1])) continue;
 
@@ -209,26 +200,14 @@ void ECLPackerModule::event()
     const int finesseHeaderNWords = 3;
 
     //cycle over finesses in copper
-
     for (iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
-      //  for (iCrate = 1; iCrate <= ECL_CRATES; iCrate++)
+      iCrate = m_eclMapper.getCrateID(iCOPPERNode, iFINESSE);
 
-      iCrate = m_eclMapper->getCrateID(iCOPPERNode, iFINESSE);
-
-      nShapers = m_eclMapper->getNShapersInCrate(iCrate);
+      nShapers = m_eclMapper.getNShapersInCrate(iCrate);
       if (!nShapers) B2ERROR("Ecl packer:: Wrong shapers number " << nShapers);
 
       if (!shaperMaskArray[iCrate - 1]) continue;
       B2DEBUG(200, "Pack data for iCrate = " << iCrate << " nShapers = " << nShapers);
-
-//      int type   = 0;
-//      int fee_id = 0;
-//      int ver    = 0;
-//      const short trigTime = 0x0;
-
-//      buff[iFINESSE].push_back((type << 24) | (ver << 16) | fee_id);
-//      buff[iFINESSE].push_back((trigTime << 16) | nwords[iFINESSE]); // recalculate nwords later
-//      buff[iFINESSE].push_back(m_EvtNum);
 
       // write EclCollector header to the buffer
       unsigned int eclCollectorHeader = (1 << nShapers) - 1;
@@ -270,52 +249,56 @@ void ECLPackerModule::event()
         // cycle over shaper channels and push DSP data to buffer
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
 
-          int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
+          const int cid = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
           if (cid < 1) continue;
 
-          int i_digit = iEclDigIndices[cid - 1];
+          const int i_digit = iEclDigIndices[cid - 1];
           if (i_digit < 0) continue;
-          int qua = ECLDigitData[i_digit]->getQuality();
-          int amp = ECLDigitData[i_digit]->getAmp();
-          int tim = ECLDigitData[i_digit]->getTimeFit();
+          const int qua = m_eclDigits[i_digit]->getQuality();
+          const int amp = m_eclDigits[i_digit]->getAmp();
+          const int chi = m_eclDigits[i_digit]->getChi();
+          int tim = 0;
+          if (qua == 2) {
+            // pack chisquare
+
+            int chi_mantissa = 0, chi_exponent = 0;
+            int n_bits = ceil(log2(double(chi)));
+            if (n_bits > 9) {
+              chi_exponent = ceil(float(n_bits - 9) / 2.0);
+              chi_mantissa = chi >> chi_exponent * 2;
+            } else {
+              chi_exponent = 0;
+              chi_mantissa = chi;
+            }
+            tim = (chi_exponent << 9) | chi_mantissa;
+          } else {
+            // pack time
+            tim = m_eclDigits[i_digit]->getTimeFit();
+          }
           unsigned int hit_data = ((qua & 3) << 30) & 0xC0000000;
-//          hit_data |= (tim & 0x1FFF) << 18;
-          hit_data |= (tim & 0x1FFF) << 18;
+          hit_data |= (tim & 0xFFF) << 18;
           hit_data |= ((amp + 128) & 0x3FFFF);
           buff[iFINESSE].push_back(hit_data);
 
           B2DEBUG(100, "cid = " << cid << " amp = " << amp << " tim = " << tim);
-
         }
 
-        //unsigned int* adcBuffer_temp = new unsigned int[nActiveChannelsWithADCData];
         for (int i = 0; i < ECL_CHANNELS_IN_SHAPER; i++) adcBuffer_temp[i] = 0;
         resetBuffPosition();
         setBuffLength(ECL_ADC_SAMPLES_PER_CHANNEL * ECL_CHANNELS_IN_SHAPER);
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
-          int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
+          int cid = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
           if (cid < 1) continue;
           int i_wf   = iEclWfIndices[cid - 1];
           if (i_wf < 0) continue;
           B2DEBUG(200, "i_wf = " << i_wf);
-          ECLWaveformData[i_wf]->getDspA(m_EclWaveformSamples); // Check this method in implementation of ECLDsp.h!!!
-
-          //int cellID = ECLWaveformData[i_wf]->getCellId();
-
-          /*
-          std::cout << "event " << m_EvtNum << " cid " << cellID << " : " << std::endl;
-          for (int i = 0; i < 31; i++){
-              std::cout << m_EclWaveformSamples[i] << " ";
-          }
-          std::cout << std::endl;
-          */
-
-          unsigned int adc_data_base = 0;
-          unsigned int adc_data_diff_width = 0;
-          unsigned int adc_data_offset = 0;
+          m_eclDsps[i_wf]->getDspA(m_EclWaveformSamples); // Check this method in implementation of ECLDsp.h!!!
 
           if (m_compressMode) {
+            unsigned int adc_data_base = 0;
+            unsigned int adc_data_diff_width = 0;
+
             // calculate adc_data_base and adc_data_diff_width for compressed mode
             unsigned int ampMin = m_EclWaveformSamples[0];
             unsigned int ampMax = m_EclWaveformSamples[0];
@@ -336,7 +319,7 @@ void ECLPackerModule::event()
             B2DEBUG(250, "Width = " << adc_data_diff_width << " Base = " << adc_data_base);
 
             for (unsigned int iSample = 0; iSample < ECL_ADC_SAMPLES_PER_CHANNEL; iSample++) {
-              adc_data_offset = m_EclWaveformSamples[iSample] - adc_data_base;
+              unsigned int adc_data_offset = m_EclWaveformSamples[iSample] - adc_data_base;
               B2DEBUG(250, "offset = " << adc_data_offset);
               writeNBits(adcBuffer_temp, adc_data_offset, adc_data_diff_width);
             }
@@ -356,18 +339,10 @@ void ECLPackerModule::event()
             B2DEBUG(500, "Buff word " << std::hex << adcBuffer_temp[i]);
           }
         }
-
-
       }
-
     }
 
-
-
-    //  B2DEBUG(200,"iShaper =  " << iShaper << " processing iChan   = " << iChannel);
-
     RawECL* newRawECL = m_eclRawCOPPERs.appendNew();
-
 
     nwords[0] = buff[0].size();
     nwords[1] = buff[1].size();
@@ -384,14 +359,8 @@ void ECLPackerModule::event()
     B2DEBUG(100, "Call PackDetectorBuf");
     newRawECL->PackDetectorBuf((int*)buff[0].data(), nwords[0], (int*)buff[1].data(), nwords[1],
                                NULL, 0, NULL, 0, rawcprpacker_info);
-
   }
-
-
-
-
   m_EvtNum++;
-
 }
 
 void ECLPackerModule::endRun()
@@ -412,10 +381,7 @@ void ECLPackerModule::resetBuffPosition()
 {
   m_bufPos = 0;
   m_bitPos = 0;
-
 }
-
-
 
 void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite)
 {
@@ -433,7 +399,6 @@ void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigne
       B2ERROR("Error compressing ADC samples: unexpectedly reach end of buffer");
       throw Write_adc_samples_error();
     } else {
-//      tmpval = (1 << (32 - m_bitPos)) - 1;
       tmpval = (1 << m_bitPos) - 1;
       buff[m_bufPos] &= tmpval;
       buff[m_bufPos] += value << m_bitPos;
@@ -454,11 +419,3 @@ void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigne
   }
 
 }
-
-
-
-
-
-
-
-

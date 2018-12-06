@@ -20,6 +20,7 @@
 #include <framework/datastore/RelationArray.h>
 
 // framework aux
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -241,7 +242,7 @@ namespace Belle2 {
     for (auto& bkg : m_backgrounds) {
 
       // define TChain for reading SimHits
-      bkg.tree = new TChain("tree");
+      bkg.tree.reset(new TChain("tree"));
       for (unsigned i = 0; i < bkg.fileNames.size(); ++i) {
         bkg.numFiles += bkg.tree->Add(bkg.fileNames[i].c_str());
       }
@@ -514,7 +515,7 @@ namespace Belle2 {
     }
 
     for (auto& bkg : m_backgrounds) {
-      delete bkg.tree;
+      bkg.tree.reset();
     }
 
   }

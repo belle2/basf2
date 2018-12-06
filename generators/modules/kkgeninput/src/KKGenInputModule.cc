@@ -21,6 +21,9 @@
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
 
+#include <framework/logging/Logger.h>
+#include <framework/utilities/IOIntercept.h>
+
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
@@ -60,7 +63,8 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
 void KKGenInputModule::initialize()
 {
   //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Initialize initial particle for beam parameters.
   m_initial.initialize();
@@ -98,7 +102,7 @@ void KKGenInputModule::event()
     MCParticleGraph::GraphParticle* p = &mpg[i];
     int moID = 0;
     char buf[200];
-    sprintf(buf, "IntC: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
+    sprintf(buf, "IntC: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
             p->getIndex(), p->getStatus(), p->getPDG(), moID,
             p->getFirstDaughter(), p->getLastDaughter(),
             p->get4Vector().Px(), p->get4Vector().Py(),
@@ -121,7 +125,7 @@ void KKGenInputModule::initializeGenerator()
 
   if (m_KKMCOutputFileName.empty()) {
     m_KKMCOutputFileName = boost::filesystem::unique_path("KKMC-%%%%%%%%%%.txt").native();
-    B2INFO("Using KKMC output file " << m_KKMCOutputFileName);
+    B2DEBUG(150, "Using KKMC output file " << m_KKMCOutputFileName);
   }
   if (FileSystem::fileExists(m_KKMCOutputFileName)) {
     auto uniqueOutputFileName = boost::filesystem::unique_path(m_KKMCOutputFileName + "-%%%%%%%%%%").native();
@@ -141,6 +145,9 @@ void KKGenInputModule::initializeGenerator()
   B2DEBUG(150, "m_taudecaytableFileName: " << m_taudecaytableFileName);
   B2DEBUG(150, "m_KKMCOutputFileName: " << m_KKMCOutputFileName);
 
+
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Info, 100, 100);
+  initLogCapture.start();
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
                  m_taudecaytableFileName, m_KKMCOutputFileName);
 
@@ -150,6 +157,7 @@ void KKGenInputModule::initializeGenerator()
 
   //set the beam parameters, ignoring beam energy spread for the moment
   m_Ikkgen.set_beam_info(v_ler, 0.0, v_her, 0.0);
+  initLogCapture.finish();
 
   m_initialized = true;
 

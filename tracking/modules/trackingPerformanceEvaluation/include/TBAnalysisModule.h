@@ -35,12 +35,12 @@ namespace Belle2 {
 
     TBAnalysisModule();
 
-    virtual ~TBAnalysisModule();
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    ~TBAnalysisModule();
+    void initialize() override;
+    void beginRun() override;
+    void event() override;
+    void endRun() override;
+    void terminate() override;
 
     int m_TrigDiv; /**< */
     std::string m_TrackCandName; /**< */

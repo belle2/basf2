@@ -95,7 +95,7 @@ namespace Belle2 {
       return m_pt.get<float>("signal_fraction");
     }
 
-    std::string Weightfile::getFileName(const std::string& suffix)
+    std::string Weightfile::generateFileName(const std::string& suffix)
     {
       char* directory_template = strdup((m_temporary_directory + "/Basf2MVA.XXXXXX").c_str());
       auto directory = mkdtemp(directory_template);
@@ -214,7 +214,7 @@ namespace Belle2 {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 
-      TFile file(filename.c_str(), "UPDATE");
+      TFile file(filename.c_str(), "READ");
       if (file.IsZombie() or not file.IsOpen()) {
         throw std::runtime_error("Error during open of ROOT file named " + filename);
       }

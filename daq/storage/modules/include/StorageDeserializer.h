@@ -32,14 +32,16 @@ namespace Belle2 {
   /*! A class definition of an input module for Sequential ROOT I/O */
   class StorageDeserializerModule : public Module {
 
-  private:
+    /*
+    private:
     static StorageDeserializerModule* g_module;
 
-  public:
+    public:
     static StorageDeserializerModule* get() { return g_module; }
     static DataStorePackage& getPackage() { return *(g_module->m_package); }
     static RunInfoBuffer& getInfo() { return g_module->m_info; }
     static EvtMessage* streamDataStore();
+    */
 
     // Public functions
   public:

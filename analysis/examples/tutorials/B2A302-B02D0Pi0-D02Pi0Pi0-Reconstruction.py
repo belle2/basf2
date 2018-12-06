@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following  decay chain:
 #
@@ -15,65 +17,80 @@
 # MC campaign 3.5, therefore it can be ran only on KEKCC computers.
 #
 # Contributors: A. Zupanc (June 2014)
+#               I. Komarov (Demeber 2017)
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
-from stdFSParticles import stdPi0s
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
+from stdPi0s import stdPi0s
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
-     ]
+# create path
+my_path = b2.create_path()
 
-inputMdstList('MC5', filelistSIG)
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+             path=my_path)
+
 
 # use standard final state particle lists
 #
 # creates "pi0:looseFit" ParticleList
 # https://confluence.desy.de/display/BI/Physics+StandardParticles
-stdPi0s('looseFit')
+stdPi0s(listtype='looseFit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-reconstructDecay('D0:pi0pi0 -> pi0:looseFit pi0:looseFit', '1.7 < M < 2.0')
+ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:looseFit pi0:looseFit',
+                    cut='1.7 < M < 2.0',
+                    path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
+ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
+                    cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
+                    path=my_path)
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('B0:all')
+ma.matchMCTruth(list_name='B0:all',
+                path=my_path)
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsB0 = ['EventMetaData', '^B0']
-toolsB0 += ['InvMass[BeforeFit]', 'B0 -> ^D0 ^pi0']
-toolsB0 += ['DeltaEMbc', '^B0']
-toolsB0 += ['Cluster', 'B0 -> D0 [pi0 -> ^gamma ^gamma]']
-toolsB0 += ['MCTruth', '^B0 -> ^D0 ^pi0']
 
-# create another set of tools for saving out all pi0 candidates
-toolsPI0 = ['MCTruth', '^pi0 -> gamma gamma']
-toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']
-toolsPI0 += ['MassBeforeFit', '^pi0']
-toolsPI0 += ['EventMetaData', '^pi0']
-toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
-toolsPI0 += ['CustomFloats[extraInfo(BDT):decayAngle(0)]', '^pi0']
+# Select variables that we want to store to ntuple
+B0_vars = vc.inv_mass + \
+    vc.mc_truth + \
+    vu.create_aliases_for_selected(
+        list_of_variables=vc.inv_mass + vc.mc_truth,
+        decay_string='B0 -> ^D0 ^pi0') + \
+    vu.create_aliases_for_selected(
+        list_of_variables=vc.cluster,
+        decay_string='B0 -> D0 [pi0 -> ^gamma ^gamma]')
 
-# write out the flat ntuple
-ntupleFile('B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root')
-ntupleTree('b0', 'B0:all', toolsB0)
-ntupleTree('pi0', 'pi0:looseFit', toolsPI0)
+pi0_vars = vc.mc_truth + \
+    vc.kinematics + \
+    ['extraInfo(BDT)', 'decayAngle(0)'] + \
+    vu.create_aliases_for_selected(
+        list_of_variables=vc.cluster + vc.kinematics,
+        decay_string='pi0 -> ^gamma ^gamma')
+
+
+# Saving variables to ntuple
+output_file = 'B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root'
+ma.variablesToNtuple('B0:all', B0_vars,
+                     filename=output_file,
+                     treename='b0',
+                     path=my_path)
+ma.variablesToNtuple('pi0:looseFit', pi0_vars,
+                     filename=output_file,
+                     treename='pi0',
+                     path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

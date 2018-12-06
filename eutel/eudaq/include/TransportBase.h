@@ -102,7 +102,8 @@ namespace eudaq {
       typedef T ObjType;
       typedef void (ObjType::*FuncType)(TransportEvent&);
       HelperMember(ObjType* obj, FuncType func) : m_obj(obj), m_func(func) {}
-      virtual void call(TransportEvent& ev) {
+      virtual void call(TransportEvent& ev)
+      {
         (m_obj->*m_func)(ev);
       }
       virtual Helper* Clone() const { return new HelperMember(*this); }
@@ -117,12 +118,14 @@ namespace eudaq {
     template <typename T>
     TransportCallback(T* obj, typename HelperMember<T>::FuncType func)
       : m_helper(new HelperMember<T>(obj, func)) {}
-    void operator()(TransportEvent& ev) {
+    void operator()(TransportEvent& ev)
+    {
       if (m_helper) m_helper->call(ev);
     }
     TransportCallback(const TransportCallback& other)
       : m_helper(other.m_helper->Clone()) {}
-    TransportCallback& operator=(const TransportCallback& other) {
+    TransportCallback& operator=(const TransportCallback& other)
+    {
       delete m_helper;
       m_helper = other.m_helper->Clone();
       return *this;
@@ -149,15 +152,18 @@ namespace eudaq {
     virtual void SendPacket(const unsigned char* data, size_t len,
                             const ConnectionInfo& = ConnectionInfo::ALL,
                             bool duringconnect = false) = 0;
-    void SendPacket(const std::string& data, const ConnectionInfo& inf = ConnectionInfo::ALL, bool duringconnect = false) {
+    void SendPacket(const std::string& data, const ConnectionInfo& inf = ConnectionInfo::ALL, bool duringconnect = false)
+    {
       //std::cout << "SendPacket (string)" << std::endl;
       SendPacket(reinterpret_cast<const unsigned char*>(&data[0]), data.length(), inf, duringconnect);
     }
-    void SendPacket(const char* str, const ConnectionInfo& inf = ConnectionInfo::ALL, bool duringconnect = false) {
+    void SendPacket(const char* str, const ConnectionInfo& inf = ConnectionInfo::ALL, bool duringconnect = false)
+    {
       //std::cout << "SendPacket (char*)" << std::endl;
       SendPacket(reinterpret_cast<const unsigned char*>(str), std::strlen(str), inf, duringconnect);
     }
-    void SendPacket(const BufferSerializer& t, const ConnectionInfo& inf = ConnectionInfo::ALL, bool duringconnect = false) {
+    void SendPacket(const BufferSerializer& t, const ConnectionInfo& inf = ConnectionInfo::ALL, bool duringconnect = false)
+    {
       SendPacket(&t[0], t.size(), inf, duringconnect);
     }
 

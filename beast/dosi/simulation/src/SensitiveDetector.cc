@@ -26,7 +26,6 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("DosiSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
       m_hitNum = 0;
       m_EvnetNumber = 0;
       m_oldEvnetNumber = 0;
@@ -200,10 +199,10 @@ namespace Belle2 {
 
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       simHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
-      int m_simhitNumber = simHits.getEntries() - 1;
-      B2DEBUG(150, "HitNumber: " << m_simhitNumber);
-      relMCSimHit.add(trackID, m_simhitNumber, 1.0);
-      return (m_simhitNumber);
+      int simhitNumber = simHits.getEntries() - 1;
+      B2DEBUG(150, "HitNumber: " << simhitNumber);
+      relMCSimHit.add(trackID, simhitNumber, 1.0);
+      return (simhitNumber);
     }//saveSimHit
 
 

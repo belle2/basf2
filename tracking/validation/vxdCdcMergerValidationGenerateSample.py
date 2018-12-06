@@ -14,7 +14,6 @@ import basf2
 from ROOT import Belle2
 from simulation import add_simulation
 from tracking import add_tracking_reconstruction
-from modularAnalysis import generateY4S
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
 from tracking.validation import tracking_efficiency_helpers
@@ -26,8 +25,6 @@ def run():
     Generate and reconstruct Generic BBar
     and evaluate the merger performance
     """
-    components = tracking_efficiency_helpers.get_simulation_components()
-
     basf2.set_random_seed(1337)
     path = basf2.create_path()
 
@@ -36,14 +33,14 @@ def run():
     path.add_module(rootinput)
     path.add_module('Gearbox')
 
-    add_tracking_reconstruction(path, components=components, pruneTracks=False, prune_temporary_tracks=False)
+    add_tracking_reconstruction(path, components=["CDC", "SVD"], pruneTracks=False, prune_temporary_tracks=False)
 
     # add additional matching for vxd and cdc only tracks here
 
     # for VXD only track
     mctrackmatcher_vxd = basf2.register_module('MCRecoTracksMatcher')
     mctrackmatcher_vxd.param('mcRecoTracksStoreArrayName', 'MCRecoTracks')
-    mctrackmatcher_vxd.param('prRecoTracksStoreArrayName', 'VXDRecoTracks')
+    mctrackmatcher_vxd.param('prRecoTracksStoreArrayName', 'SVDRecoTracks')
     mctrackmatcher_vxd.param('UseCDCHits', False)
     path.add_module(mctrackmatcher_vxd)
 
@@ -72,9 +69,9 @@ class VxdCdcMergerHarvester(HarvestingModule):
         #: matcher used for the final MCTrack list
         self.mc_track_matcher = Belle2.TrackMatchLookUp("MCRecoTracks")
         #: matcher used for the MCTracks from the CDC
-        self.mc_track_matcher_cdc = Belle2.TrackMatchLookUp("MCRecoTracks", "CDCGFTrackCands")
+        self.mc_track_matcher_cdc = Belle2.TrackMatchLookUp("MCRecoTracks", "CDCRecoTracks")
         #: matcher used for the MCTracks from the VXD
-        self.mc_track_matcher_vxd = Belle2.TrackMatchLookUp("MCRecoTracks", "VXDGFTrackCands")
+        self.mc_track_matcher_vxd = Belle2.TrackMatchLookUp("MCRecoTracks", "SVDRecoTracks")
 
     def pick(self, mc_particle):
         # mc_track = mc_particle.getRelated("MCRecoTracks")
@@ -94,10 +91,6 @@ class VxdCdcMergerHarvester(HarvestingModule):
         mc_pt = mc_particle.getMomentum().Pt()
         mc_theta = mc_particle.getMomentum().Theta()
 
-        reco_pxd_hits = Belle2.PyStoreArray('PXDRecoHits')
-        reco_svd_hits = Belle2.PyStoreArray('SVDRecoHits')
-        reco_cdc_hits = Belle2.PyStoreArray('CDCHits')
-
         reco_tracks = Belle2.PyStoreArray('RecoTracks')
 
         this_best_track_cdc = self.mc_track_matcher_cdc.getRelatedPRRecoTrack(mc_track)
@@ -107,11 +100,6 @@ class VxdCdcMergerHarvester(HarvestingModule):
         # from the same MC Track. Have they?
 
         this_best_track_merged = self.mc_track_matcher.getRelatedPRRecoTrack(mc_track)
-
-        # todo: once moved to RecoTrack: use more elaborate comparison method to indentify vxd/cdc tracks
-        # in merged tracks
-        # cdc_merge_fraction = sameHitFractionCdc( this_best_track_merged, this_best_track_cdc, reco_cdc_hits )
-        # vxd_merge_fraction = sameHitFractionVxd( this_best_track_merged, this_best_track_vxd, reco_pxd_hits, reco_svd_hits)
 
         good_merge = False
         vxd_hits = 0

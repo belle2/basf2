@@ -11,15 +11,12 @@
 #include <b2bii/modules/B2BIIMdstInput/B2BIIMdstInputModule.h>
 
 #include <framework/core/Environment.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/FileSystem.h>
 
 // Belle tables
 #include "belle_legacy/tables/belletdf.h"
 
 // Belle II dataobjects
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/NumberSequence.h>
 
 #include <cstdlib>
@@ -149,8 +146,7 @@ void B2BIIMdstInputModule::initializeDataStore()
 {
   B2DEBUG(99, "[B2BIIMdstInputModule::initializeDataStore] initialization of DataStore started");
 
-  // event meta data Object pointer
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  m_evtMetaData.registerInDataStore();
 
   B2DEBUG(99, "[B2BIIMdstInputModule::initializeDataStore] initialization of DataStore ended");
 }
@@ -226,18 +222,17 @@ void B2BIIMdstInputModule::event()
 
   // Fill EventMetaData
   StoreObjPtr<EventMetaData> evtmetadata;
-  evtmetadata.create();
 
   // Read next event: We try to read the next event from the current file
   // if thist fails, open the next file and try again
   // if we cannot open the next file then stop processing
   while (!readNextEvent()) {
     if (!openNextFile()) {
-      evtmetadata->setEndOfData(); // stop event processing
       B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". No more files");
       return;
     }
   }
+  evtmetadata.create();
 
   // Convert the Belle_event -> EventMetaData
   // Get Belle_event_Manager

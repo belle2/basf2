@@ -9,8 +9,8 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
-#include <analysis/VariableManager/FlavorTaggingVariables.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/Variables.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 
@@ -125,6 +125,20 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
     qrCombinedFANN[iProduct] = -2;
     qrMC[iProduct] = 0;
 
+    if (m_saveCategories == true and (m_useFBDT == true or m_useFANN == true)) {
+      for (auto& categoryEntry : m_qpCategories) {
+        categoryEntry.second[iProduct] = -2;
+      }
+
+      for (auto& categoryEntry : m_hasTrueTargets) {
+        categoryEntry.second[iProduct] = -2;
+      }
+
+      for (auto& categoryEntry : m_isTrueCategories) {
+        categoryEntry.second[iProduct] = -2;
+      }
+    }
+
     FlavorTaggerInfo* flavorTaggerInfo = selparticles[iProduct]->getRelatedTo<FlavorTaggerInfo>();
 
     if (flavorTaggerInfo != nullptr) {
@@ -136,17 +150,6 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
         if (m_useFANN == true) qrCombinedFANN[iProduct] = flavorTaggerInfo->getMethodMap("FANN")->getQrCombined();
 
         if (m_saveCategories == true and (m_useFBDT == true or m_useFANN == true)) {
-          for (auto& categoryEntry : m_qpCategories) {
-            categoryEntry.second[iProduct] = 0;
-          }
-
-          for (auto& categoryEntry : m_hasTrueTargets) {
-            categoryEntry.second[iProduct] = 0;
-          }
-
-          for (auto& categoryEntry : m_isTrueCategories) {
-            categoryEntry.second[iProduct] = 0;
-          }
 
           std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo -> getMethodMap("FBDT")-> getHasTrueTarget();
           std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getIsTrueCategory();

@@ -36,9 +36,14 @@
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
+#include <cdc/dbobjects/CDCFudgeFactorsForSigma.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
-//#include <cdc/dbobjects/CDCMisalignment.h>
+#include <cdc/dbobjects/CDCADCDeltaPedestals.h>
+#include <cdc/dbobjects/CDCFEElectronics.h>
+#include <cdc/dbobjects/CDCEDepToADCConversions.h>
+
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <iostream>
 #include <fstream>
@@ -91,6 +96,7 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
 
 }
 
+
 void CDCDatabaseImporter::importChannelMap(std::string fileName)
 {
   std::ifstream stream;
@@ -123,6 +129,93 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
   B2RESULT("Channel map imported to database.");
 
 }
+
+
+void CDCDatabaseImporter::importFEElectronics(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportArray<CDCFEElectronics> cf;
+
+  //  short width, delay, aTh, tThmV, tTheV, l1late;
+  short ib, width, delay, aTh, tThmV;
+
+  //  int i=-1;
+  while (stream >> ib) {
+    //    stream >> delay >> aTh >> tThmV >> tTheV >> l1late;
+    stream >> width >> delay >> aTh >> tThmV;
+    //    ++i;
+    //    std::cout << i <<" "<< width << std::endl;
+    //    cf.appendNew(width, delay, aTh, tThmV, tTheV, l1late);
+    cf.appendNew(ib, width, delay, aTh, tThmV);
+  }
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  cf.import(iov);
+
+  B2RESULT("FEEElectronics imported to database.");
+}
+
+
+void CDCDatabaseImporter::importEDepToADC(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCEDepToADCConversions> etoa;
+  etoa.construct();
+
+  unsigned short paramMode(0), nParams(0);
+  stream >> paramMode >> nParams;
+  etoa->setParamMode(paramMode);
+
+  unsigned short groupId(0);
+  stream >> groupId;
+  B2INFO(paramMode << " " << nParams << " " << groupId);
+  if (groupId > 1) B2FATAL("invalid groupId now !");
+  etoa->setGroupID(groupId);
+
+  unsigned short id = 0;
+  std::vector<float> coeffs(nParams);
+  int nRead = 0;
+
+  while (stream >> id) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
+    ++nRead;
+    etoa->setParams(id, coeffs);
+  }
+  stream.close();
+
+  unsigned short nId = 9;
+  if (groupId == 1) {
+    nId = MAX_N_SLAYERS;
+  } else if (groupId == 2) {
+    nId = 14336;
+  }
+  if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  etoa.import(iov);
+  B2RESULT("EDep-toADC table imported to database.");
+}
+
 
 void CDCDatabaseImporter::importBadWire(std::string fileName)
 {
@@ -211,15 +304,20 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
   DBImportObjPtr<CDCTimeWalks> tw;
   tw.construct();
 
-  unsigned short iBoard(0);
-  int nRead(0);
-  double coeff(0.);
+  unsigned short mode(0), nParams(0);
+  stream >> mode >> nParams;
+  tw->setTwParamMode(mode);
 
-  while (true) {
-    stream >> iBoard >> coeff;
-    if (stream.eof()) break;
+  unsigned short iBoard(0);
+  std::vector<float> coeffs(nParams);
+  int nRead(0);
+
+  while (stream >> iBoard) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
     ++nRead;
-    tw->setTimeWalkParam(iBoard, coeff);
+    tw->setTimeWalkParams(iBoard, coeffs);
     //      if (m_debug) {
     //  std::cout << iBoard << " " << coeff << std::endl;
     //      }
@@ -463,50 +561,47 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   B2RESULT("Sigma table imported to database.");
 }
 
-/*
-void CDCDatabaseImporter::importSigma(std::string fileName)
+
+void CDCDatabaseImporter::importFFactor(std::string fileName)
 {
-  std::ifstream ifs;
-  ifs.open(fileName.c_str());
-  if (!ifs) {
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
     B2FATAL("openFile: " << fileName << " *** failed to open");
     return;
   }
   B2INFO(fileName << ": open for reading");
 
-  DBImportObjPtr<CDCSigmas> sgm;
-  sgm.construct();
+  DBImportObjPtr<CDCFudgeFactorsForSigma> etoa;
+  etoa.construct();
 
-  int iL;
-  const int np = nSigmaParams;
-  double sigma[np];
-  unsigned nRead = 0;
+  unsigned short groupId(0), nParams(0);
+  stream >> groupId >> nParams;
+  B2INFO(groupId << " " << nParams);
+  if (groupId != 0) B2FATAL("invalid groupId now !");
+  etoa->setGroupID(groupId);
 
-  while (true) {
-    ifs >> iL;
-    for (int i = 0; i < np; ++i) {
-      ifs >> sigma[i];
+  unsigned short id = 0;
+  std::vector<float> coeffs(nParams);
+  int nRead = 0;
+
+  while (stream >> id) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
     }
-    if (ifs.eof()) break;
-
     ++nRead;
-
-    for (int i = 0; i < np; ++i) {
-      sgm->setSigmaParam(iL, i, sigma[i]);
-    }
+    etoa->setFactors(id, coeffs);
   }
+  stream.close();
 
-  ifs.close();
-
-  if (nRead != MAX_N_SLAYERS) B2FATAL("importSigma: #lines read-in (=" << nRead << ") is inconsistent with total #layers (=" <<
-                                        MAX_N_SLAYERS << ") !");
+  unsigned short nId = 1;
+  if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
-  sgm.import(iov);
-  B2RESULT("Sigma table imported to database.");
+  etoa.import(iov);
+  B2RESULT("Fudge factor table imported to database.");
 }
-*/
 
 
 void CDCDatabaseImporter::importDisplacement(std::string fileName)
@@ -638,6 +733,24 @@ void CDCDatabaseImporter::printChannelMap()
 
 }
 
+void CDCDatabaseImporter::printFEElectronics()
+{
+  DBArray<CDCFEElectronics> fEElectronics;
+  for (const auto& cf : fEElectronics) {
+    std::cout << cf.getBoardID() << " " << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " " << cf.getADCThresh() << " " <<
+              cf.getTDCThreshInMV() << std::endl;
+  }
+  //              << cf.getTDCThreshInMV() << " "
+  //              << cf.getTDCThreshInEV() << " "
+  //              << cf.getL1TrgLatency() << std::endl;
+}
+
+void CDCDatabaseImporter::printEDepToADC()
+{
+  DBObjPtr<CDCEDepToADCConversions> etoa;
+  etoa->dump();
+}
+
 void CDCDatabaseImporter::printTimeZero()
 {
 
@@ -682,6 +795,12 @@ void CDCDatabaseImporter::printSigma()
   sgm->dump();
 }
 
+void CDCDatabaseImporter::printFFactor()
+{
+  DBObjPtr<CDCFudgeFactorsForSigma> ff;
+  ff->dump();
+}
+
 void CDCDatabaseImporter::printDisplacement()
 {
   DBArray<CDCDisplacement> displacements;
@@ -702,6 +821,73 @@ void CDCDatabaseImporter::printWirPosMisalign()
 {
   DBObjPtr<CDCMisalignment> mal;
   mal->dump();
+}
+
+
+void CDCDatabaseImporter::importADCDeltaPedestal(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream.is_open()) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCADCDeltaPedestals> dbPed;
+  dbPed.construct();
+
+  int iB(0);
+  int iC(0);
+  float ped(0);
+  int nRead(0);
+  int sample(0);
+
+  while (true) {
+    if (nRead == 0) {
+      stream >> sample;
+    } else {
+      stream >> iB >> iC >> ped;
+    }
+    if (stream.eof()) break;
+    if (nRead == 0) {
+      if (sample == 0) {
+        B2FATAL("sample window is zero !");
+      }
+      dbPed->setSamplingWindow(sample);
+    } else {
+      dbPed->setPedestal(iB, iC, ped);
+    }
+    ++nRead;
+
+  }
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbPed.import(iov);
+
+  B2RESULT("ADC delta pedestal table imported to database.");
+}
+
+void CDCDatabaseImporter::importADCDeltaPedestal()
+{
+
+  DBImportObjPtr<CDCADCDeltaPedestals> dbPed;
+  dbPed.construct();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbPed.import(iov);
+
+  B2RESULT("ADC delta pedestal w/ zero  imported to database.");
+}
+
+void CDCDatabaseImporter::printADCDeltaPedestal()
+{
+
+  DBObjPtr<CDCADCDeltaPedestals> dbPed;
+  dbPed->dump();
 }
 
 //Note; the following function is no longer needed
@@ -760,3 +946,4 @@ void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
   B2RESULT("Wire misalignment table imported to database.");
 }
 #endif
+

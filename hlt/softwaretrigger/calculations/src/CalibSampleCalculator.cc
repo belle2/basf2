@@ -15,14 +15,17 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     void CalibSampleCalculator::requireStoreArrays()
     {
-      for (unsigned int i = 0; i < m_particlelist.size(); i++)
-      {StoreObjPtr<ParticleList>::required(m_particlelist[i]);}
-      StoreObjPtr<ParticleList>::required("pi+:calib");
-      StoreObjPtr<ParticleList>::required("gamma:calib");
+      for (unsigned int i = 0; i < m_particlelist.size(); i++) {
+        m_particleList.isRequired(m_particlelist[i]);
+      }
+      m_particleList.isRequired("pi+:calib");
+      m_particleList.isRequired("gamma:calib");
+      m_recoTracksMpl.isRequired("RecoTracksMpl");
 
+      m_hltCalculator.requireStoreArrays();
     };
 
-    void CalibSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
+    void CalibSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     {
       for (unsigned int i = 0; i < m_particlelist.size(); i++) {
         StoreObjPtr<ParticleList> plist(m_particlelist[i]);
@@ -34,12 +37,12 @@ namespace Belle2 {
         }
       }
 
-
       StoreObjPtr<ParticleList> pionlist("pi+:calib");
       StoreObjPtr<ParticleList> gammalist("gamma:calib");
 
       calculationResult["ntracks"] = pionlist->getListSize();
       calculationResult["ngamma"] = gammalist->getListSize();
+      calculationResult["nMplTracks"] = m_recoTracksMpl.getEntries();
 
       // total Charge
       int totalCharge = 0;
@@ -59,6 +62,9 @@ namespace Belle2 {
       }
       calculationResult["netCharge"] = totalCharge;
       calculationResult["Pt_event"] = sqrt(totpx * totpx + totpy * totpy);
+
+      // FIXME: once the HLT and calibration menu is fixed, remove this!
+      m_hltCalculator.doCalculation(calculationResult);
     }
   }
 

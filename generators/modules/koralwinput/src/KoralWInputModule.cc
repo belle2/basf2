@@ -55,7 +55,8 @@ KoralWInputModule::~KoralWInputModule()
 
 void KoralWInputModule::initialize()
 {
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   //Beam Parameters, initial particle - KORALW cannot handle beam energy spread
   m_initial.initialize();

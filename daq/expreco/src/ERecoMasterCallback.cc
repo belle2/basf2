@@ -16,7 +16,7 @@
 
 using namespace Belle2;
 
-ERecoMasterCallback::ERecoMasterCallback() throw() : m_callback(NULL)
+ERecoMasterCallback::ERecoMasterCallback() : m_callback(NULL)
 {
   reg(RFCommand::CONFIGURE);
   reg(RFCommand::UNCONFIGURE);
@@ -28,12 +28,12 @@ ERecoMasterCallback::ERecoMasterCallback() throw() : m_callback(NULL)
   reg(RFCommand::STATUS);
 }
 
-void ERecoMasterCallback::initialize(const DBObject& obj) throw(RCHandlerException)
+void ERecoMasterCallback::initialize(const DBObject& obj)
 {
   configure(obj);
 }
 
-void ERecoMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
+void ERecoMasterCallback::configure(const DBObject& obj)
 {
   m_nodes = NSMNodeList();
   m_dataname = StringList();
@@ -104,7 +104,7 @@ void ERecoMasterCallback::setState(NSMNode& node, const RCState& state)
   set(vname, state.getLabel());
 }
 
-void ERecoMasterCallback::monitor() throw(RCHandlerException)
+void ERecoMasterCallback::monitor()
 {
   if (!m_callback->getData().isAvailable()) return;
   RfUnitInfo* unitinfo = (RfUnitInfo*)m_callback->getData().get();
@@ -137,7 +137,7 @@ void ERecoMasterCallback::monitor() throw(RCHandlerException)
   count++;
 }
 
-void ERecoMasterCallback::ok(const char* nodename, const char* data) throw()
+void ERecoMasterCallback::ok(const char* nodename, const char* data)
 {
   for (NSMNodeList::iterator it = m_nodes.begin();
        it != m_nodes.end(); it++) {
@@ -161,7 +161,7 @@ void ERecoMasterCallback::ok(const char* nodename, const char* data) throw()
   LogFile::warning("OK from unknown node %s (%s)", nodename, data);
 }
 
-void ERecoMasterCallback::error(const char* nodename, const char* data) throw()
+void ERecoMasterCallback::error(const char* nodename, const char* data)
 {
   for (NSMNodeList::iterator it = m_nodes.begin();
        it != m_nodes.end(); it++) {
@@ -175,10 +175,11 @@ void ERecoMasterCallback::error(const char* nodename, const char* data) throw()
   LogFile::warning("Error from unknwon node %s : %s)", nodename, data);
 }
 
-void ERecoMasterCallback::load(const DBObject& db) throw(RCHandlerException)
+void ERecoMasterCallback::load(const DBObject& db, const std::string& runtype)
 {
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
+    printf("Loading : %s\n", node.getName().c_str());
     if (node.getName().find("EVP") == std::string::npos) {
       while (true) {
         bool configured = true;
@@ -194,21 +195,12 @@ void ERecoMasterCallback::load(const DBObject& db) throw(RCHandlerException)
       }
     }
     if (node.getState() != RCState::READY_S) {
-      if (node.getName() == "ROISENDER") {
-        std::string enabled = std::string("ROI=") + db("roisender").getText("enabled");
-        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD, enabled))) {
-          setState(node, RCState::LOADING_TS);
-          LogFile::debug("%s >> LOADING", node.getName().c_str());
-        } else {
-          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
-        }
+      printf("ERecoMasterCallback::load : loading %s\n", (node.getName()).c_str());
+      if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD))) {
+        setState(node, RCState::LOADING_TS);
+        LogFile::debug("%s >> LOADING", node.getName().c_str());
       } else {
-        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD))) {
-          setState(node, RCState::LOADING_TS);
-          LogFile::debug("%s >> LOADING", node.getName().c_str());
-        } else {
-          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
-        }
+        throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
       }
     } else {
       LogFile::debug("%s is READY", node.getName().c_str());
@@ -229,7 +221,7 @@ void ERecoMasterCallback::load(const DBObject& db) throw(RCHandlerException)
   RCCallback::setState(RCState::READY_S);
 }
 
-void ERecoMasterCallback::abort() throw(RCHandlerException)
+void ERecoMasterCallback::abort()
 {
   for (NSMNodeList::reverse_iterator it = m_nodes.rbegin();
        it != m_nodes.rend(); it++) {
@@ -274,7 +266,7 @@ void ERecoMasterCallback::abort() throw(RCHandlerException)
   RCCallback::setState(RCState::NOTREADY_S);
 }
 
-void ERecoMasterCallback::start(int expno, int runno) throw(RCHandlerException)
+void ERecoMasterCallback::start(int expno, int runno)
 {
   int pars[] = {expno, runno};
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
@@ -319,7 +311,7 @@ void ERecoMasterCallback::start(int expno, int runno) throw(RCHandlerException)
   RCCallback::setState(RCState::RUNNING_S);
 }
 
-void ERecoMasterCallback::stop() throw(RCHandlerException)
+void ERecoMasterCallback::stop()
 {
   for (NSMNodeList::reverse_iterator it = m_nodes.rbegin();
        it != m_nodes.rend(); it++) {
@@ -364,20 +356,20 @@ void ERecoMasterCallback::stop() throw(RCHandlerException)
   RCCallback::setState(RCState::READY_S);
 }
 
-bool ERecoMasterCallback::pause() throw(RCHandlerException)
+bool ERecoMasterCallback::pause()
 {
   return true;
 }
 
-bool ERecoMasterCallback::resume(int /*subno*/) throw(RCHandlerException)
+bool ERecoMasterCallback::resume(int /*subno*/)
 {
   return true;
 }
 
-void ERecoMasterCallback::recover(const DBObject& obj) throw(RCHandlerException)
+void ERecoMasterCallback::recover(const DBObject& obj, const std::string& runtype)
 {
   abort();
-  load(obj);
+  load(obj, runtype);
 }
 
 void ERecoMasterCallback::addData(const std::string& dataname, const std::string& format)
@@ -391,7 +383,7 @@ void ERecoMasterCallback::addData(const std::string& dataname, const std::string
   m_dataname.push_back(dataname);
 }
 
-bool ERecoMasterCallback::perform(NSMCommunicator& com) throw()
+bool ERecoMasterCallback::perform(NSMCommunicator& com)
 {
   const NSMMessage msg = com.getMessage();
   if (RCCallback::perform(com)) {
@@ -400,7 +392,7 @@ bool ERecoMasterCallback::perform(NSMCommunicator& com) throw()
   const RFCommand cmd = msg.getRequestName();
   try {
     if (cmd == RFCommand::CONFIGURE) {
-      load(getDBObject());
+      load(getDBObject(), "");
       return true;
     } else if (cmd == RFCommand::UNCONFIGURE) {
       abort();

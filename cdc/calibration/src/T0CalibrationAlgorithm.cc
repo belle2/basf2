@@ -1,7 +1,6 @@
 #include <cdc/calibration/T0CalibrationAlgorithm.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <TError.h>
@@ -15,8 +14,6 @@
 #include "iostream"
 #include "string"
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -36,7 +33,7 @@ T0CalibrationAlgorithm::T0CalibrationAlgorithm(): CalibrationAlgorithm("CDCCalib
 void T0CalibrationAlgorithm::createHisto()
 {
 
-  B2INFO("CreateHisto");
+  B2INFO("Creating histograms");
   double x;
   double t_mea;
   double w;
@@ -56,7 +53,9 @@ void T0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
   double halfCSize[56];
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
   for (int i = 0; i < 56; ++i) {
     double R = cdcgeo.senseWireR(i);
     double nW = cdcgeo.nWiresInLayer(i);
@@ -88,7 +87,8 @@ void T0CalibrationAlgorithm::createHisto()
     m_hTotal->Fill(t_mea - t_fit);
     m_h1[lay][IWire]->Fill(t_mea - t_fit);
     //each board
-    m_hT0b[cdcgeo.getBoardID(WireID(lay, IWire))]->Fill(t_mea - t_fit);
+    int boardID = cdcgeo.getBoardID(WireID(lay, IWire));
+    m_hT0b[boardID]->Fill(t_mea - t_fit);
   }
   B2INFO("Finish making histogram for all channels");
 }
@@ -100,10 +100,30 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  createHisto();
+  // We are potentially using data from several runs at once during execution
+  // (which may have different DBObject values). So in general you would need to
+  // average them, or aply them to the correct collector data.
 
-  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels;#DeltaT;#channels", 100, -10, 10);
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  // However since this is the geometry lets assume it is fixed for now.
+  const auto exprun = getRunList()[0];
+  B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
+  updateDBObjPtrs(1, exprun.second, exprun.first);
+
+  // CDCGeometryPar basically constructs a ton of objects and other DB objects.
+  // Normally we'd call updateDBObjPtrs to set the values of the requested DB objects.
+  // But in CDCGeometryPar the DB objects get used during the constructor so they must
+  // be set before/during the constructor.
+
+  // Since we are avoiding using the DataStore EventMetaData, we need to pass in
+  // an EventMetaData object to be used when constructing the DB objects.
+
+  B2INFO("Creating CDCGeometryPar object");
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
+
+  createHisto();
+  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
+  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, 0, 10);
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
   vector<double> b, db, Sb, dSb;
@@ -114,9 +134,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   B2INFO("Gaus fitting for whole channel");
   double par[3];
-  double mean = 0.;
   m_hTotal->SetDirectory(0);
-  mean = m_hTotal->GetMean();
+  double mean = m_hTotal->GetMean();
   m_hTotal->Fit("g1", "Q", "", mean - 15, mean + 15);
   g1->GetParameters(par);
 
@@ -138,7 +157,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       const int n = m_h1[ilay][iwire]->GetEntries();
-      B2DEBUG(99, "layer " << ilay << " wire " << iwire << " entries " << n);
+      B2DEBUG(21, "layer " << ilay << " wire " << iwire << " entries " << n);
       if (n < 10) continue;
       mean = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);
@@ -151,19 +170,22 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
       dt[ilay][iwire] = par[1];
       err_dt[ilay][iwire] = g1->GetParError(1);
-      hm_All->Fill(par[1]);
+      hm_All->Fill(par[1]);// mean of gauss fitting.
+      hs_All->Fill(par[2]); // sigma of gauss fitting.
     }
   }
 
 
   if (m_storeHisto) {
-    B2INFO("Store histo");
-    TFile* fout = new TFile("Correct_T0.root", "RECREATE");
+    B2INFO("Storing histograms");
+
+    TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
     m_hTotal->Write();
     hm_All->Write();
+    hs_All->Write();
     TDirectory* subDir[56];
     for (int ilay = 0; ilay < 56; ++ilay) {
       subDir[ilay] = top ->mkdir(Form("lay_%d", ilay));
@@ -199,19 +221,24 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     }
     fout->Close();
   }
-  B2INFO("Write constants");
+  B2INFO("Writing constants");
   write();
-  if (fabs(hm_All->GetMean()) < m_maxMeanDt && hm_All->GetRMS() < m_maxRMSDt) {
+
+
+  if (fabs(hm_All->GetMean()) < m_maxMeanDt && fabs(hm_All->GetRMS()) < m_maxRMSDt) {
+    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
+    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
     return c_OK;
   } else {
+    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
+    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
     return c_Iterate;
   }
 }
 
 void T0CalibrationAlgorithm::write()
 {
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  ofstream ofs(m_outputT0FileName.c_str());
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   TH1F* T0B[300];
@@ -238,10 +265,12 @@ void T0CalibrationAlgorithm::write()
       } else {
         T0 = cdcgeo.getT0(wireid);
       }
-      ofs <<  ilay << "\t" << iwire << "\t" << T0 - dt[ilay][iwire] << std::endl;
       tz->setT0(wireid, T0 - dt[ilay][iwire]);
     }
   }
-  ofs.close();
+
+  if (m_textOutput == true) {
+    tz->outputToFile(m_outputT0FileName);
+  }
   saveCalibration(tz, "CDCTimeZeros");
 }

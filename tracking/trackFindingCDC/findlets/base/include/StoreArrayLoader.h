@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <vector>
@@ -45,7 +45,7 @@ namespace Belle2 {
           if (m_classMnemomicName != "") {
             m_classMnemomicDescription = m_classMnemomicName;
           } else {
-            // Just a little bit of ADL, takem from StoreArraySwapper
+            // Just a little bit of ADL, taken from StoreArraySwapper
             m_classMnemomicDescription = getClassMnemomicParameterDescription(static_cast<IOType*>(nullptr));
           }
         }

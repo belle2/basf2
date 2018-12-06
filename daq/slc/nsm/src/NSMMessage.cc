@@ -5,11 +5,6 @@
 #include <errno.h>
 #include <stdlib.h>
 
-extern "C" {
-#include "nsm2/nsmlib2.h"
-#include "nsm2/belle2nsm.h"
-}
-
 #include <daq/slc/nsm/NSMData.h>
 
 #include <daq/slc/system/BufferedReader.h>
@@ -23,14 +18,14 @@ using namespace Belle2;
 
 const unsigned int NSMMessage::DATA_SIZE = NSM_TCPDATSIZ;
 
-void NSMMessage::init() throw()
+void NSMMessage::init()
 {
   m_nsmc = NULL;
   memset(&m_nsm_msg, 0, sizeof(NSMmsg));
   m_hasobj = false;
 }
 
-void NSMMessage::init(const NSMNode& node, const NSMVar& var) throw()
+void NSMMessage::init(const NSMNode& node, const NSMVar& var)
 {
   init();
   m_nodename = node.getName();
@@ -61,7 +56,7 @@ void NSMMessage::init(const NSMNode& node, const NSMVar& var) throw()
   }
 }
 
-void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log) throw()
+void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log)
 {
   init();
   m_nodename = node.getName();
@@ -74,7 +69,7 @@ void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log) throw()
 }
 
 void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log,
-                      const NSMCommand& cmd) throw()
+                      const NSMCommand& cmd)
 {
   init();
   m_nodename = node.getName();
@@ -86,7 +81,7 @@ void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log,
   setData(log.getMessage());
 }
 
-void NSMMessage::init(const NSMNode& node, const NSMData& data) throw()
+void NSMMessage::init(const NSMNode& node, const NSMData& data)
 {
   init();
   m_nodename = node.getName();
@@ -103,19 +98,19 @@ void NSMMessage::init(const NSMNode& node, const NSMData& data) throw()
   m_hasobj = false;
 }
 
-NSMMessage::NSMMessage() throw()
+NSMMessage::NSMMessage()
 {
   init();
 }
 
-NSMMessage::NSMMessage(const NSMNode& node) throw()
+NSMMessage::NSMMessage(const NSMNode& node)
 {
   init();
   m_nodename = node.getName();
 }
 
 NSMMessage::NSMMessage(const NSMNode& node,
-                       const NSMCommand& cmd) throw()
+                       const NSMCommand& cmd)
 {
   init();
   m_nodename = node.getName();
@@ -124,7 +119,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       int npar, int* pars) throw()
+                       int npar, int* pars)
 {
   init();
   m_nodename = node.getName();
@@ -136,7 +131,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
                        int npar, int* pars,
-                       const std::string& data) throw()
+                       const std::string& data)
 {
   init();
   m_nodename = node.getName();
@@ -148,7 +143,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       int par, const std::string& obj) throw()
+                       int par, const std::string& obj)
 {
   init();
   m_nodename = node.getName();
@@ -159,7 +154,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 }
 
 NSMMessage::NSMMessage(const NSMCommand& cmd,
-                       int par) throw()
+                       int par)
 {
   init();
   m_reqname = cmd.getLabel();
@@ -168,7 +163,7 @@ NSMMessage::NSMMessage(const NSMCommand& cmd,
 }
 
 NSMMessage::NSMMessage(const NSMCommand& cmd,
-                       const std::string& data) throw()
+                       const std::string& data)
 {
   init();
   m_reqname = cmd.getLabel();
@@ -176,7 +171,7 @@ NSMMessage::NSMMessage(const NSMCommand& cmd,
 }
 
 NSMMessage::NSMMessage(const NSMNode& node,
-                       const NSMCommand& cmd, int par) throw()
+                       const NSMCommand& cmd, int par)
 {
   init();
   m_nodename = node.getName();
@@ -187,7 +182,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       const std::string& data) throw()
+                       const std::string& data)
 {
   init();
   m_nodename = node.getName();
@@ -195,56 +190,56 @@ NSMMessage::NSMMessage(const NSMNode& node,
   setData(data);
 }
 
-NSMMessage::NSMMessage(const NSMCommand& cmd) throw()
+NSMMessage::NSMMessage(const NSMCommand& cmd)
 {
   init();
   m_reqname = cmd.getLabel();
 }
 
-NSMMessage::NSMMessage(const NSMMessage& msg) throw()
+NSMMessage::NSMMessage(const NSMMessage& msg)
 {
   init();
   *this = msg;
 }
 
-NSMMessage::NSMMessage(const NSMNode& node, const NSMVar& var) throw()
+NSMMessage::NSMMessage(const NSMNode& node, const NSMVar& var)
 {
   init(node, var);
 }
 
-NSMMessage::NSMMessage(const NSMNode& node, const NSMData& data) throw()
+NSMMessage::NSMMessage(const NSMNode& node, const NSMData& data)
 {
   init(node, data);
 }
 
-NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log) throw()
+NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log)
 {
   init(node, log);
 }
 
 NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log,
-                       const NSMCommand& cmd) throw()
+                       const NSMCommand& cmd)
 {
   init(node, log, cmd);
 }
 
-NSMMessage::NSMMessage(const NSMVar& var) throw()
+NSMMessage::NSMMessage(const NSMVar& var)
 {
   init(NSMNode(), var);
 }
 
-NSMMessage::NSMMessage(const NSMData& data) throw()
+NSMMessage::NSMMessage(const NSMData& data)
 {
   init(NSMNode(), data);
 }
 
-NSMMessage::NSMMessage(const DAQLogMessage& log) throw()
+NSMMessage::NSMMessage(const DAQLogMessage& log)
 {
   init(NSMNode(), log);
 }
 
 NSMMessage::NSMMessage(const NSMCommand& cmd,
-                       int npar, int* pars) throw()
+                       int npar, int* pars)
 {
   init();
   m_reqname = cmd.getLabel();
@@ -252,7 +247,7 @@ NSMMessage::NSMMessage(const NSMCommand& cmd,
   memcpy(m_nsm_msg.pars, pars, sizeof(int) * npar);
 }
 
-const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
+const NSMMessage& NSMMessage::operator=(const NSMMessage& msg)
 {
   m_nsmc = msg.m_nsmc;
   memcpy(&m_nsm_msg, &(msg.m_nsm_msg), sizeof(m_nsm_msg));
@@ -267,7 +262,7 @@ const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
   return *this;
 }
 
-const char* NSMMessage::getRequestName() const throw()
+const char* NSMMessage::getRequestName() const
 {
   if (m_reqname.size() > 0) return m_reqname.c_str();
   if (m_nsmc != NULL) {
@@ -282,7 +277,7 @@ const char* NSMMessage::getRequestName() const throw()
   }
 }
 
-void NSMMessage::setRequestName() throw()
+void NSMMessage::setRequestName()
 {
   if (m_nsmc != NULL) {
     const char* reqname = nsmlib_reqname(m_nsmc, m_nsm_msg.req);
@@ -292,27 +287,27 @@ void NSMMessage::setRequestName() throw()
   }
 }
 
-void NSMMessage::setRequestName(const std::string& reqname) throw()
+void NSMMessage::setRequestName(const std::string& reqname)
 {
   m_reqname = reqname;
 }
 
-void NSMMessage::setRequestName(const NSMCommand& cmd) throw()
+void NSMMessage::setRequestName(const NSMCommand& cmd)
 {
   m_reqname = cmd.getLabel();
 }
 
-void NSMMessage::setNodeName(const std::string& nodename) throw()
+void NSMMessage::setNodeName(const std::string& nodename)
 {
   m_nodename = nodename;
 }
 
-void NSMMessage::setNodeName(const NSMNode& node) throw()
+void NSMMessage::setNodeName(const NSMNode& node)
 {
   m_nodename = node.getName();
 }
 
-const char* NSMMessage::getNodeName() const throw()
+const char* NSMMessage::getNodeName() const
 {
   if (m_nodename.size() > 0) return m_nodename.c_str();
   if (m_nsmc != NULL)
@@ -321,91 +316,91 @@ const char* NSMMessage::getNodeName() const throw()
     return m_nodename.c_str();
 }
 
-unsigned short NSMMessage::getRequestId() const throw()
+unsigned short NSMMessage::getRequestId() const
 {
   return m_nsm_msg.req;
 }
 
-unsigned short NSMMessage::getSequenceId() const throw()
+unsigned short NSMMessage::getSequenceId() const
 {
   return m_nsm_msg.seq;
 }
 
-unsigned short NSMMessage::getNodeId() const throw()
+unsigned short NSMMessage::getNodeId() const
 {
   return m_nsm_msg.node;
 }
 
-unsigned short NSMMessage::getNParams() const throw()
+unsigned short NSMMessage::getNParams() const
 {
   return m_nsm_msg.npar;
 }
 
-int NSMMessage::getParam(int i) const throw()
+int NSMMessage::getParam(int i) const
 {
   return m_nsm_msg.pars[i];
 }
 
 #if NSM_PACKAGE_VERSION >= 1914
-const int* NSMMessage::getParams() const throw()
+const int* NSMMessage::getParams() const
 {
   return m_nsm_msg.pars;
 }
 
-int* NSMMessage::getParams() throw()
+int* NSMMessage::getParams()
 {
   return m_nsm_msg.pars;
 }
 #else
-const unsigned int* NSMMessage::getParams() const throw()
+const unsigned int* NSMMessage::getParams() const
 {
   return m_nsm_msg.pars;
 }
 
-unsigned int* NSMMessage::getParams() throw()
+unsigned int* NSMMessage::getParams()
 {
   return m_nsm_msg.pars;
 }
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif
 
-unsigned int NSMMessage::getLength() const throw()
+unsigned int NSMMessage::getLength() const
 {
   return m_nsm_msg.len;
 }
 
-const char* NSMMessage::getData() const throw()
+const char* NSMMessage::getData() const
 {
   if (m_nsm_msg.len > 0) return (const char*)m_data.ptr();
   else return NULL;
 }
 
-void NSMMessage::setRequestId(unsigned short id) throw()
+void NSMMessage::setRequestId(unsigned short id)
 {
   m_nsm_msg.req = id;
 }
 
-void NSMMessage::setSequenceId(unsigned short id) throw()
+void NSMMessage::setSequenceId(unsigned short id)
 {
   m_nsm_msg.seq = id;
 }
 
-void NSMMessage::setNodeId(unsigned short id) throw()
+void NSMMessage::setNodeId(unsigned short id)
 {
   m_nsm_msg.node = id;
 }
 
-void NSMMessage::setNParams(unsigned short npar) throw()
+void NSMMessage::setNParams(unsigned short npar)
 {
   m_nsm_msg.npar = npar;
 }
 
-void NSMMessage::setParam(int i, unsigned int v) throw()
+void NSMMessage::setParam(int i, unsigned int v)
 {
   m_nsm_msg.pars[i] = v;
 }
 
-void NSMMessage::setData(int len, const char* data)  throw()
+void NSMMessage::setData(int len, const char* data)
 {
   m_nsm_msg.len = len;
   if (len > 0 && data != NULL) {
@@ -415,7 +410,7 @@ void NSMMessage::setData(int len, const char* data)  throw()
   m_hasobj = false;
 }
 
-void NSMMessage::setData(const std::string& text)  throw()
+void NSMMessage::setData(const std::string& text)
 {
   setData(text.size() + 1, text.c_str());
 }
@@ -434,7 +429,7 @@ int NSMMessage::try_read(int sock, char* buf, int datalen)
   return recvlen;
 }
 
-size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
+size_t NSMMessage::read(NSMcontext* nsmc)
 {
   if (nsmc == NULL) return 0;
   m_nsmc = nsmc;
@@ -476,7 +471,7 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
   return count;
 }
 
-void NSMMessage::readObject(Reader& reader) throw(IOException)
+void NSMMessage::readObject(Reader& reader)
 {
   setRequestName(reader.readString());
   setNodeName(reader.readString());
@@ -492,7 +487,7 @@ void NSMMessage::readObject(Reader& reader) throw(IOException)
   }
 }
 
-void NSMMessage::writeObject(Writer& writer) const throw(IOException)
+void NSMMessage::writeObject(Writer& writer) const
 {
   writer.writeString(getRequestName());
   writer.writeString(getNodeName());

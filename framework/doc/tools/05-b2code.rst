@@ -1,6 +1,16 @@
 Tools to help with debugging and checking code quality
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+``b2code-module``: Create a source code template for a module
+-------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2code-module
+    :func: get_argument_parser
+    :prog: b2code-module
+    :nodefault:
+    :nogroupsections:
+
 ``b2code-memoryusage``: Show memory usage of a program
 ------------------------------------------------------
 
@@ -46,6 +56,29 @@ supply them as arguments::
 To run on the full release directory run it without any arguments::
 
     b2code-doxygen-warnings
+
+
+``b2code-cppcheck``: Run cppcheck static analyzer
+-------------------------------------------------
+
+This script will run cppcheck with the appropriate arguments to check for
+warnings from cppcheck as shown on the development build.
+
+To run it on single files or directories just supply them as arguments::
+
+    b2code-cppcheck [<directory>...] [<filename>...]
+
+To run on the full release directory run it without any arguments::
+
+    b2code-cppcheck
+
+Additional options can be passed to cppcheck as well, for example -j to run
+cppcheck in parallel::
+
+    b2code-cppcheck -j50 framework
+
+However in this case a directory to check has to be provided
+
 
 ``b2code-parallel_processing-benchmark``: Measure multi-core performance
 ------------------------------------------------------------------------

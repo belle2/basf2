@@ -36,10 +36,6 @@ tagname = name
 
 from basf2 import *
 
-# from ROOT import Belle2
-# reset_database()
-# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
-
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.DEBUG)

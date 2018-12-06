@@ -2,35 +2,43 @@
 # -*- coding: utf-8 -*-
 
 ########################################################
-# 100 generic BBbar events using EvtGen
 #
-# Example steering file
+# Generate 100 generic BBbar events using EvtGen
+#
+# Contributor(s): Torben Ferber (torben.ferber@desy.de)
+#
 ########################################################
 
-from basf2 import *
+import os
+import sys
+import basf2
+from generators import add_evtgen_generator
 
-# suppress messages and warnings during processing:
-set_log_level(LogLevel.INFO)
+# interpret the first input argument as decay file to facilitate testing of dec-files
+dec_file = None
+final_state = 'mixed'
+if len(sys.argv) > 1:
+    dec_file = os.path.abspath(sys.argv[1])
+    final_state = 'signal'
+    print("using following decay file: " + dec_file)
+
 
 # main path
-main = create_path()
+main = basf2.create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
 
 # EvtGen
-evtgen = register_module('EvtGenInput')
-evtgen.set_log_level(LogLevel.INFO)
+add_evtgen_generator(path=main, finalstate=final_state, signaldecfile=dec_file)
 
 # run
 main.add_module("Progress")
-main.add_module("Gearbox")
-main.add_module(evtgen)
 main.add_module("RootOutput", outputFileName="evtgen_upsilon4s.root")
-main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

@@ -7,7 +7,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
 
@@ -23,10 +23,10 @@ namespace Belle2 {
     virtual ~CDCTriggerETFModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Run the ETF for an event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** if true, always output 0 (assuming this is the true event time for MC) */
@@ -40,7 +40,7 @@ namespace Belle2 {
 
   private:
     /** StoreObjPtr holding the event time */
-    StoreObjPtr<EventT0> m_eventTime;
+    StoreObjPtr<BinnedEventT0> m_eventTime;
     /** list of input track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_hits;
   };

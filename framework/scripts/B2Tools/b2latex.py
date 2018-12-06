@@ -47,6 +47,7 @@ class LatexObject(object):
         output = r"""
             \documentclass[10pt,a4paper]{article}
             \usepackage[latin1]{inputenc}
+            \usepackage[T1]{fontenc}
             \usepackage{amsmath}
             \usepackage{amsfonts}
             \usepackage{amssymb}

@@ -26,12 +26,14 @@ REG_MODULE(DQMHistAnalysisEpicsExample)
 DQMHistAnalysisEpicsExampleModule::DQMHistAnalysisEpicsExampleModule()
   : DQMHistAnalysisModule()
 {
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("Function", m_function, "Fit function definition", std::string("gaus"));
   addParam("Parameters", m_parameters, "Fit function parameters for EPICS", 3);
-  addParam("PVName", m_pvname, "PV Prefix", std::string("PXD:DQM:hist"));
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: Constructor done.");
+  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: Constructor done.");
 }
 
 
@@ -39,7 +41,7 @@ DQMHistAnalysisEpicsExampleModule::~DQMHistAnalysisEpicsExampleModule() { }
 
 void DQMHistAnalysisEpicsExampleModule::initialize()
 {
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: initialized.");
 
   TString a;
   a = m_histoname;
@@ -75,19 +77,25 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
   m_line_hi->SetX2(50);
 
   // need the function to get parameter names
-  if (m_parameters > 0 && m_pvname != "") {
+  if (m_parameters > 0) {
     if (m_parameters > 10) m_parameters = 10; // hard limit
-//    SEVCHK(ca_context_create(ca_disable_preemptive_callback),"ca_context_create");
+#ifdef _BELLE2_EPICS
+    SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+#endif
     for (auto i = 0; i < m_parameters; i++) {
       std::string aa;
       aa = m_f1->GetParName(i);
-      if (aa == "") aa = "par" + std::to_string(i);
-      aa = m_pvname + ":" + aa;
-//      SEVCHK(ca_create_channel(a.c_str(),NULL,NULL,10,&mychid[i]),"ca_create_channel failure");
+      if (aa == "") aa = string("par") + string(TString::Itoa(i, 10).Data());
+      aa = m_pvPrefix + aa;
+#ifdef _BELLE2_EPICS
+      SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
       // Read LO and HI limits from EPICS, seems this needs additional channels?
-      //SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+      // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+#endif
     }
-//    SEVCHK(ca_pend_io(5.0),"ca_pend_io failure");
+#ifdef _BELLE2_EPICS
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
   } else {
     m_parameters = 0;
   }
@@ -97,15 +105,14 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
 void DQMHistAnalysisEpicsExampleModule::beginRun()
 {
   //m_serv->SetTimer(100, kFALSE);
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: beginRun called.");
   m_c1->Clear();
 
   TH1* hh1;
   hh1 = findHist(m_histoname.c_str());
 
-  hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
-    B2INFO("Histo " << m_histoname << " not in memfile");
+    B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
     // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
@@ -118,7 +125,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
       if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
         auto e = d->GetDirectory(tok);
         if (e) {
-          B2INFO("Cd Dir " << tok);
+          B2DEBUG(20, "Cd Dir " << tok);
           d = e;
         }
         d->cd();
@@ -129,11 +136,11 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
     TObject* obj = d->FindObject(tok);
     if (obj != NULL) {
       if (obj->IsA()->InheritsFrom("TH1")) {
-        B2INFO("Histo " << m_histoname << " found in mem");
+        B2DEBUG(20, "Histo " << m_histoname << " found in mem");
         hh1 = (TH1*)obj;
       }
     } else {
-      B2INFO("Histo " << m_histoname << " NOT found in mem");
+      B2DEBUG(20, "Histo " << m_histoname << " NOT found in mem");
     }
   }
 
@@ -144,7 +151,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
     m_line_lo->Draw();
     m_line_hi->Draw();
   } else {
-    B2INFO("Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
 }
 
@@ -155,7 +162,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
 
   hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
-    B2INFO("Histo " << m_histoname << " not in memfile");
+    B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
     // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
@@ -168,7 +175,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
       if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
         auto e = d->GetDirectory(tok);
         if (e) {
-          B2INFO("Cd Dir " << tok);
+          B2DEBUG(20, "Cd Dir " << tok);
           d = e;
         }
         d->cd();
@@ -179,12 +186,12 @@ void DQMHistAnalysisEpicsExampleModule::event()
     TObject* obj = d->FindObject(tok);
     if (obj != NULL) {
       if (obj->IsA()->InheritsFrom("TH1")) {
-        B2INFO("Histo " << m_histoname << " found in mem");
+        B2DEBUG(20, "Histo " << m_histoname << " found in mem");
         hh1 = (TH1*)obj;
         flag = true;
       }
     } else {
-      B2INFO("Histo " << m_histoname << " NOT found in mem");
+      B2DEBUG(20, "Histo " << m_histoname << " NOT found in mem");
     }
   }
   if (hh1 != NULL) {
@@ -210,27 +217,38 @@ void DQMHistAnalysisEpicsExampleModule::event()
     m_c1->Modified();
     m_c1->Update();
   } else {
-    B2INFO("Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
 
+#ifdef _BELLE2_EPICS
   if (m_parameters > 0) {
     for (auto i = 0; i < m_parameters; i++) {
-      //double data;
-      //data = m_f1->GetParameter(i);
-//      SEVCHK(ca_put(DBR_DOUBLE,mychid[i],(void*)&data),"ca_set failure");
+      double data;
+      data = m_f1->GetParameter(i);
+      SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
     }
-//    SEVCHK(ca_pend_io(5.0),"ca_pend_io failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
+#endif
 }
 
 void DQMHistAnalysisEpicsExampleModule::endRun()
 {
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample : endRun called");
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample : endRun called");
 }
 
 
 void DQMHistAnalysisEpicsExampleModule::terminate()
 {
-  B2DEBUG(1, "DQMHistAnalysisEpicsExample: terminate called");
+#ifdef _BELLE2_EPICS
+  if (m_parameters > 0) {
+    for (auto i = 0; i < m_parameters; i++) {
+      SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+    }
+  }
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  ca_context_destroy();
+#endif
+  B2DEBUG(20, "DQMHistAnalysisEpicsExample: terminate called");
 }
 

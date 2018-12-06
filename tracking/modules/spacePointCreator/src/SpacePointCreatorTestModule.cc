@@ -29,7 +29,7 @@ SpacePointCreatorTestModule::SpacePointCreatorTestModule() :
 {
   setDescription("Tester module for the validity of the SpacePointCreatorModule. TODO: at the moment, the genfit-output can only verified visually (by checking, whether the detector types match the number of dimensions stored in the trackPoint)! when full reco chain is working, this testerModule should be extended! -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!");
 
-  vector<string> containerSpapacePointsName = { string("") };
+  vector<string> containerSpacePointsName = { "SVDSpacePoints", "PXDSpacePoints" };
 
   // 1. Collections.
   addParam("PXDClusters", m_pxdClustersName,
@@ -37,7 +37,7 @@ SpacePointCreatorTestModule::SpacePointCreatorTestModule() :
   addParam("SVDClusters", m_svdClustersName,
            "SVDCluster collection name", string(""));
   addParam("AllSpacePointContainers", m_containerSpacePointsName,
-           "SpacePoints collection name", containerSpapacePointsName);
+           "SpacePoints collection name", containerSpacePointsName);
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,

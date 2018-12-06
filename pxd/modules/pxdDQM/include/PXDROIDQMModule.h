@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDROIDQMModule_H
-#define PXDROIDQMModule_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
@@ -34,11 +33,14 @@ namespace Belle2 {
 
       // virtual ~PXDROIDQMModule();
 
-      virtual void initialize();
+    private:
+      void initialize() override final;
 
-      virtual void beginRun();
+      void beginRun() override final;
 
-      virtual void event();
+      void event() override final;
+
+      void defineHisto() override final;
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -77,12 +79,9 @@ namespace Belle2 {
 
       //map<int,int> sensor_to_histindex;
 
-      virtual void defineHisto();
-
     };//end class declaration
 
 
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDROIDQMModule_H

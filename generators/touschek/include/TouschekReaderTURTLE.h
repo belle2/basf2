@@ -56,7 +56,7 @@ namespace Belle2 {
      * Opens an ascii file and prepares it for reading.
      * @param filename The filename of the Touschek ascii file which should be read.
      */
-    void open(const std::string& filename) throw(TouschekCouldNotOpenFileError);
+    void open(const std::string& filename);
 
     /**
      * Reads the specified number of particles from the file and stores the result in the given MCParticle graph.
@@ -67,7 +67,7 @@ namespace Belle2 {
      * @param graph Reference to the graph which should be filled with the information from the Touschek file.
      * @return The number of particles which were read.
      */
-    int getParticles(int number, MCParticleGraph& graph) throw(TouschekConvertFieldError);
+    int getParticles(int number, MCParticleGraph& graph);
 
 
   protected:

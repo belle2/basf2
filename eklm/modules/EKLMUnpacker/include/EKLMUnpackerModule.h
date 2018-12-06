@@ -8,16 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMUNPACKERMODULE_H
-#define EKLMUNPACKERMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <eklm/geometry/GeometryData.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -45,38 +46,65 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
     /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Print data. */
+    bool m_PrintData;
+
+    /** Check calibration-mode data. */
+    bool m_CheckCalibration;
+
+    /** Record wrong hits (e.g. for debugging). */
+    bool m_WriteWrongHits;
+
+    /**
+     * Do not issue B2ERROR on wrong hits, with certain firmware versions
+     * wrong strip numbers are expected.
+     */
+    bool m_IgnoreWrongHits;
+
+    /**
+     * Ignore hits with strip = 0. Such hits are normally expected for normal
+     * firmware versions.
+     */
+    bool m_IgnoreStrip0;
+
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Electronics map. */
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+
+    /** Time conversion. */
+    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+
+    /** Channels. */
+    DBObjPtr<EKLMChannels> m_Channels;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
@@ -87,6 +115,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

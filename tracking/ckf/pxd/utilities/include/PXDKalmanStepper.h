@@ -19,15 +19,17 @@ namespace Belle2 {
   class SpacePoint;
   class CKFToPXDState;
 
+  /// Kalman stepper implementation for the PXD CKF
   class PXDKalmanStepper {
   public:
+    /// Do a kalman step of the mSoP to the measurement in the state. Returns the chi2.
     double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state);
 
-    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint);
-
-    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToPXDState& state);
+    /// Calculate the residual between the mSoP and the measurement in the state.
+    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state);
 
   private:
+    /// Implementation using the general kalman stepper
     KalmanStepper<2> m_kalmanStepper;
   };
 }

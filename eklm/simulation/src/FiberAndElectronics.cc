@@ -46,46 +46,48 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
   m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
                                         size * sizeof(int));
   if (size != 0) {
-    if (m_Photoelectrons == NULL || m_PhotoelectronIndex == NULL ||
-        m_PhotoelectronIndex2 == NULL)
+    if (m_Photoelectrons == nullptr || m_PhotoelectronIndex == nullptr ||
+        m_PhotoelectronIndex2 == nullptr)
       B2FATAL(MemErr);
   }
 }
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
-  double digitizationInitialTime, bool debug)
+  const EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
+  double digitizationInitialTime, bool debug) :
+  m_DigPar(digPar), m_fitter(fitter),
+  m_DigitizationInitialTime(digitizationInitialTime), m_Debug(debug),
+  m_FPGAStat(c_FPGANoSignal), m_npe(0)
 {
   int i;
+  /* cppcheck-suppress variableScope */
   double time, attenuationTime;
-  m_DigPar = digPar;
-  m_fitter = fitter;
-  m_DigitizationInitialTime = digitizationInitialTime;
-  m_Debug = debug;
-  m_npe = 0;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
+  m_Pedestal = m_DigPar->getADCPedestal();
+  m_PhotoelectronAmplitude = m_DigPar->getADCPEAmplitude();
+  m_Threshold = m_DigPar->getADCThreshold();
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
                                      sizeof(float));
-  if (m_amplitudeDirect == NULL)
+  if (m_amplitudeDirect == nullptr)
     B2FATAL(MemErr);
   m_amplitudeReflected = (float*)malloc(m_DigPar->getNDigitizations() *
                                         sizeof(float));
-  if (m_amplitudeReflected == NULL)
+  if (m_amplitudeReflected == nullptr)
     B2FATAL(MemErr);
   m_amplitude = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
-  if (m_amplitude == NULL)
+  if (m_amplitude == nullptr)
     B2FATAL(MemErr);
   m_ADCAmplitude = (int*)malloc(m_DigPar->getNDigitizations() * sizeof(int));
-  if (m_ADCAmplitude == NULL)
+  if (m_ADCAmplitude == nullptr)
     B2FATAL(MemErr);
   m_SignalTimeDependence = (double*)malloc((m_DigPar->getNDigitizations() + 1) *
                                            sizeof(double));
-  if (m_SignalTimeDependence == NULL)
+  if (m_SignalTimeDependence == nullptr)
     B2FATAL(MemErr);
   m_SignalTimeDependenceDiff = (double*)malloc(m_DigPar->getNDigitizations() *
                                                sizeof(double));
-  if (m_SignalTimeDependenceDiff == NULL)
+  if (m_SignalTimeDependenceDiff == nullptr)
     B2FATAL(MemErr);
   attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
   for (i = 0; i <= m_DigPar->getNDigitizations(); i++) {
@@ -97,9 +99,9 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
                                           m_SignalTimeDependence[i];
     }
   }
-  m_Photoelectrons = NULL;
-  m_PhotoelectronIndex = NULL;
-  m_PhotoelectronIndex2 = NULL;
+  m_Photoelectrons = nullptr;
+  m_PhotoelectronIndex = nullptr;
+  m_PhotoelectronIndex2 = nullptr;
   reallocPhotoElectronBuffers(100);
 }
 
@@ -126,16 +128,19 @@ void EKLM::FiberAndElectronics::setHitRange(
   m_stripName = "strip_" + std::to_string(it->first);
 }
 
-void EKLM::FiberAndElectronics::setThreshold(double threshold)
+void EKLM::FiberAndElectronics::setChannelData(
+  const EKLMChannelData* channelData)
 {
-  m_Threshold = threshold;
+  m_Pedestal = channelData->getPedestal();
+  m_PhotoelectronAmplitude = channelData->getPedestal();
+  m_Threshold = channelData->getThreshold();
 }
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-  int i, threshold;
-  double l, d, t;
-  double nPhotons;
+  int i;
+  /* cppcheck-suppress variableScope */
+  double l, d, t, nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
   EKLMSimHit* hit;
   m_MCTime = -1;
@@ -178,24 +183,9 @@ void EKLM::FiberAndElectronics::processEntry()
   if (m_DigPar->getMeanSiPMNoise() > 0)
     addRandomSiPMNoise();
   simulateADC();
-  /*
-   * Fit. Threshold is 7 photoelectron signal, it has average simulated maximal
-   * amplitude about 3 maximal amplitudes of 1 photoelectron signal.
-   */
-  threshold = m_DigPar->getADCPedestal() +
-              m_DigPar->getADCPEAmplitude() * m_Threshold;
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_Threshold, &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
-  /**
-   * TODO: Change units.
-   * FPGA fitter now uses units:
-   * time = ADC conversion time,
-   * amplitude = amplitude * 0.5 * m_DigPar->ADCRange.
-   */
-  m_FPGAFit.setStartTime(m_FPGAFit.getStartTime() *
-                         m_DigPar->getADCSamplingTime() +
-                         m_DigitizationInitialTime);
   if (m_Debug)
     if (m_npe >= 10)
       debugOutput();
@@ -264,6 +254,7 @@ void EKLM::FiberAndElectronics::generatePhotoelectrons(
   const double maxHitTime = m_DigPar->getNDigitizations() *
                             m_DigPar->getADCSamplingTime();
   int i;
+  /* cppcheck-suppress variableScope */
   double hitTime, deExcitationTime, cosTheta, hitDist;
   double inverseLightSpeed, inverseAttenuationLength;
   inverseLightSpeed = 1.0 / m_DigPar->getFiberLightSpeed();
@@ -358,8 +349,10 @@ void EKLM::FiberAndElectronics::generatePhotoelectrons(
 void EKLM::FiberAndElectronics::fillSiPMOutput(float* hist, bool useDirect,
                                                bool useReflected)
 {
+  /* cppcheck-suppress variableScope */
   int i, bin, maxBin;
   double attenuationTime, sig, expSum;
+  /* cppcheck-suppress variableScope */
   int ind1, ind2, ind3;
   int* indexArray;
   if (m_npe == 0)
@@ -408,13 +401,15 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(float* hist, bool useDirect,
 void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
+  /* cppcheck-suppress variableScope */
   double amp;
+  if (m_Pedestal == 0 || m_PhotoelectronAmplitude == 0)
+    B2FATAL("Incorrect EKLM ADC simulation parameters.");
   for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
-    amp = m_DigPar->getADCPedestal() +
-          m_DigPar->getADCPEAmplitude() * m_amplitude[i];
-    if (amp > m_DigPar->getADCSaturation())
+    amp = m_Pedestal - m_PhotoelectronAmplitude * m_amplitude[i];
+    if (amp < m_DigPar->getADCSaturation())
       amp = m_DigPar->getADCSaturation();
-    m_ADCAmplitude[i] = amp;
+    m_ADCAmplitude[i] = floor(amp);
   }
 }
 
@@ -433,7 +428,7 @@ double EKLM::FiberAndElectronics::getNPE()
   double intg;
   intg = m_FPGAFit.getAmplitude();
   return intg * m_DigPar->getPEAttenuationFrequency() /
-         m_DigPar->getADCPEAmplitude();
+         m_PhotoelectronAmplitude;
 }
 
 int EKLM::FiberAndElectronics::getGeneratedNPE()
@@ -446,11 +441,11 @@ void EKLM::FiberAndElectronics::debugOutput()
   int i;
   std::string str;
   StoreObjPtr<EventMetaData> event;
-  TFile* hfile = NULL;
-  TH1D* histAmplitudeDirect = NULL;
-  TH1D* histAmplitudeReflected = NULL;
-  TH1D* histAmplitude = NULL;
-  TH1D* histADCAmplitude = NULL;
+  TFile* hfile = nullptr;
+  TH1D* histAmplitudeDirect = nullptr;
+  TH1D* histAmplitudeReflected = nullptr;
+  TH1D* histAmplitude = nullptr;
+  TH1D* histADCAmplitude = nullptr;
   try {
     histAmplitudeDirect =
       new TH1D("histAmplitudeDirect", m_stripName.c_str(),

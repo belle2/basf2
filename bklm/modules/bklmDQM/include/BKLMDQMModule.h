@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMDQMMODULE_H
-#define BKLMDQMMODULE_H
+#pragma once
 
 // Copied 6 lines below from PXDDQMModule.h
 #undef DQM
@@ -19,8 +18,8 @@
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 #endif
 
-#include <framework/dataobjects/DigitBase.h>   //Missing
-#include <bklm/dataobjects/BKLMStatus.h>       //Missing
+#include <framework/dataobjects/DigitBase.h>
+#include <bklm/dataobjects/BKLMStatus.h>
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
@@ -51,70 +50,100 @@ namespace Belle2 {
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
     // module parameters
 
     //! Histogram: number of hits per layer
-    TH1F* m_LayerHits;
+    TH1F* h_layerHits;
 
     //! Histogram: Lowest 16 bits of the B2TT CTIME signal
-    TH1F* m_CTime;
+    TH1F* h_ctime;
 
     //! Histogram: MC simulation event hit time
-    TH1F* m_SimTime;
+    TH1F* h_simtime;
 
     //! Histogram: Reconstructed hit time relative to trigger
-    TH1F* m_Time;
+    TH1F* h_time;
 
     //! Histogram: MC simulation pulse height
-    TH1F* m_SimEDep;
+    TH1F* h_simEDep;
 
     //! Histogram: Reconstructed pulse height
-    TH1F* m_EDep;
+    TH1F* h_eDep;
 
     //! Histogram: Simulated number of MPPC pixels
-    TH1F* m_SimNPixel;
+    TH1F* h_simNPixel;
 
     //! Histogram: Reconstructed number MPPC pixels
-    TH1F* m_NPixel;
+    TH1F* h_nPixel;
 
+    //! Histogram: Detector-module identifier
+    TH1F* h_moduleID;
+
+    //! Histogram: z-measuring strip numbers of the 2D hit
+    TH1F* h_zStrips;
+
+    //! Histogram: Phi strip number of muon hit
+    TH1F* h_phiStrip;
+
+    //! Histogram: Sector number of muon hit
+    TH1F* h_sector;
+
+    //! Histogram: Layer number of muon hit
+    TH1F* h_layer;
+
+    //! Histogram: Distance from z axis in transverse plane of muon hit
+    TH1F* h_rBKLMHit2ds;
+
+    //! Histogram: Axial position of muon hit
+    TH1F* h_zBKLMHit2ds;
+
+    //! Histogram: Position projected into transverse plane of muon hit
+    TH2F* h_yvsxBKLMHit2ds;
+
+    //! Histogram: Position projected into x-z plane of muon hit
+    TH2F* h_xvszBKLMHit2ds;
+
+    //! Histogram: Position projected into y-z plane of muon hit
+    TH2F* h_yvszBKLMHit2ds;
+
+    // other
     //! name of BKLMDigit store array
-    std::string m_OutputDigitsName;
-
+    std::string m_outputDigitsName;
+    //! name of BKLMHit store array
+    std::string m_outputHitsName;
   };
 
 } // Belle2 namespace
-
-#endif

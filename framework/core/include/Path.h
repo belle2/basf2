@@ -89,7 +89,7 @@ namespace Belle2 {
      *
      * Useable in Python via '"ModuleType" in path' syntax.
      */
-    bool contains(std::string moduleType) const;
+    bool contains(const std::string& moduleType) const;
 
     /** Create an independent copy of this path, recreating all contained modules with the same parameters.
      *
@@ -108,6 +108,9 @@ namespace Belle2 {
 
     /** See 'pydoc3 basf2.Path' */
     void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
+
+    /** See 'pydoc3 basf2.Path' */
+    void doWhile(PathPtr path, const std::string& condition, unsigned int maxIterations);
 
     /** See 'pydoc3 basf2.Path' */
     void addIndependentPath(PathPtr independent_path, std::string ds_ID, boost::python::list merge_back);

@@ -10,11 +10,8 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
 
 #include <mva/utility/Utility.h>
-
-#include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
 using namespace Belle2::MVA;

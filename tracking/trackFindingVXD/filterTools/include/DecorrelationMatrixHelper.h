@@ -13,8 +13,6 @@
 #include <Eigen/Core>
 #include <framework/logging/Logger.h>
 
-// #include <tracking/trackFindingVXD/analyzingTools/TicTocTimer.h>
-
 #include <array>
 #include <vector>
 #include <numeric>

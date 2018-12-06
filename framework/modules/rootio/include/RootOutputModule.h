@@ -13,6 +13,9 @@
 #include <framework/core/Module.h>
 #include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/FileMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -20,7 +23,7 @@
 #include <string>
 #include <vector>
 
-
+#include <boost/optional.hpp>
 
 namespace Belle2 {
   /** Write objects from DataStore into a ROOT file.
@@ -47,33 +50,42 @@ namespace Belle2 {
      *
      *  Opens a file and creates TTree(s)
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Write data in c_Event DataStore maps.
      *
      *  Loops over all objects in event maps (in the first call of the function) and writes them to event-TTree.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Write data in the c_Persistent DataStore maps.
      *
      *  Loops over all objects in persistent maps and writes them to persistent-TTree.
      *  Finally the TTree(s) is/are written out.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Set the used output file, taking into account -o argument to basf2. */
-    void setOutputFile()
+    virtual std::vector<std::string> getFileNames(bool outputFiles = true) override
     {
-      if (m_ignoreCommandLineOverride)
-        return;
-      const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-      if (!outputFileArgument.empty())
-        m_outputFileName = outputFileArgument;
+      B2ASSERT("RootOutput is not an input module", outputFiles);
+      if (!m_ignoreCommandLineOverride) {
+        // This will warn if already consumed which is what we want
+        std::string outputFileArgument = Environment::Instance().consumeOutputFileOverride(getName());
+        if (!outputFileArgument.empty())
+          m_outputFileName = outputFileArgument;
+        m_ignoreCommandLineOverride = true;
+      }
+      return {m_outputFileName};
     }
 
-
   private:
+
+    /** Finalize the output file */
+    void closeFile();
+
+    /** Open the next output file */
+    void openFile();
 
     /** Fill TTree.
      *
@@ -114,8 +126,11 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
+    /** TFile compression algorithm.  */
+    int m_compressionAlgorithm{0};
+
     /** TFile compression level.  */
-    int m_compressionLevel;
+    int m_compressionLevel{1};
 
     /** Branch split level.
      *
@@ -139,8 +154,14 @@ namespace Belle2 {
      */
     bool m_ignoreCommandLineOverride;
 
+    /** Maximum output file size in MB. If not set we don't split. Otherwise we split
+     * if the event tree in output file has reached the given size in MB */
+    boost::optional<uint64_t> m_outputSplitSize{boost::none};
 
     //then those for purely internal use:
+
+    /** Keep track of the file index: if we split files than we add '.f{fileIndex:05d}' in front of the ROOT extension */
+    int m_fileIndex{0};
 
     /** TFile for output. */
     TFile* m_file;
@@ -183,5 +204,16 @@ namespace Belle2 {
 
     /** Whether or not we want to build an event index */
     bool m_buildIndex{true};
+
+    /** Whether to keep parents same as that of input file */
+    bool m_keepParents{false};
+
+    /** Whether this is a regular, local file where we can actually create directories */
+    bool m_regularFile{true};
+
+    /** Pointer to the event meta data */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+    /** Pointer to the file meta data */
+    StoreObjPtr<FileMetaData> m_fileMetaData{"", DataStore::c_Persistent};
   };
 } // end namespace Belle2

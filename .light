@@ -1,0 +1,10 @@
+/.light
+/.externals
+/index.rst
+/site_scons/
+/framework/
+/mdst/
+/mva/
+/analysis/
+/skim/
+/geometry/

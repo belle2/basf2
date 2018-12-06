@@ -5,6 +5,24 @@
 # steering file - 2017 Belle II Collaboration
 ######################################################
 
+
+# we need to modify this to get data from different coppers
+
+# 4 2Ds
+# hslb = (('11000001', 'b'),
+#         ('11000001', 'a'),
+#         ('11000002', 'a'),
+#         ('11000002', 'b'))
+
+# 2D0 and NN
+
+hslb = (('11000001', 'b'),
+        ('11000003', 'b'),
+        )
+
+
+integrity_check = False
+
 from basf2 import *
 import interactive
 
@@ -27,30 +45,21 @@ else:
 pickleIt = len(sys.argv) == 2 or isPickleFile
 
 
+def finesse(x): return ord(x) - ord('a')
+
+
+def copper(x): return int(x, 16)
+
+
+hslb = [(copper(ele[0]), finesse(ele[1])) for ele in hslb]
+
+
 def join(ary):
     return BitArray([]).join([BitArray(uint=i, length=32) for i in ary])
 
 
-def printBin(evt, wordwidth=8, linewidth=8, paraheight=4):
-    words = [evt[word:word + wordwidth].bin for word in range(0, len(evt), wordwidth)]
-    lines = ([' '.join(words[n:n + linewidth]) for n in range(0, len(words), linewidth)])
-    paras = (['\n'.join(lines[n:n + paraheight]) for n in range(0, len(lines), paraheight)])
-    print('\n\n'.join(paras))
-
-
-def printHex(evt, wordwidth=32, linewidth=8, paraheight=4):
-    words = [evt[word:word + wordwidth].hex for word in range(0, len(evt), wordwidth)]
-    lines = ([' '.join(words[n:n + linewidth]) for n in range(0, len(words), linewidth)])
-    paras = (['\n'.join(lines[n:n + paraheight]) for n in range(0, len(lines), paraheight)])
-    print('\n\n'.join(paras))
-
-
 data = []
-if pickleIt:
-    pica = pickleSigFile if isPickleFile else re.sub(r'.+/', '', re.sub(r'sroot', 'p', srootFile))
-    wfp = open(pica, 'wb')
-    pickle.dump(data, wfp, protocol=2)
-    wfp.close()
+meta = []
 
 
 class MinModule(Module):
@@ -66,44 +75,57 @@ class MinModule(Module):
         """
         reimplement Module::event()
         """
+        self.return_value(0)
+        # function namespace caching
+        frombuffer = np.frombuffer
+        GetNodeID = Belle2.RawTRG.GetNodeID
+        GetDetectorNwords = Belle2.RawTRG.GetDetectorNwords
+        GetDetectorBuffer = Belle2.RawTRG.GetDetectorBuffer
         trgary = Belle2.PyStoreArray("RawTRGs")
+
+        evtmeta = Belle2.PyStoreObj("EventMetaData")
         trgs = []
+
+        # integrity check
+        if integrity_check:
+            print(len(trgary), 'copper(s)')
+            for evt in trgary:
+                for entry in range(evt.GetNumEntries()):  # flattened. Usually only 1 entry
+                    print('{:0x}'.format(GetNodeID(evt, entry)))
+                    entrylist = []
+                    for bid in range(4):
+                        if (GetNodeID(evt, entry), bid) in hslb:
+                            count = GetDetectorNwords(evt, entry, bid)
+                            print(bid, "exist, ", count, "words.")
+            return
+        dataList = []
         for evt in trgary:
+            # assuming smaller Copper ID comes first
             for entry in range(evt.GetNumEntries()):  # flattened. Usually only 1 entry
-                entrylist = [BitArray([])] * 4
+                # print('{:0x}'.format(GetNodeID(evt, entry)))
+                entrylist = []
                 for bid in range(4):
-                    # if bid != 1: continue # TSF2 uses Finesse B
-                    # if bid != 0: continue # 2D uses Finesse A
-                    count = evt.GetDetectorNwords(entry, bid)
-                    # print(bid, count)
-                    if count == 0:
+                    if (GetNodeID(evt, entry), bid) not in hslb:
                         continue
-                    bf = evt.GetDetectorBuffer(entry, bid)
-                    ary = np.frombuffer(bf, np.uintc, count)
-                    # print( ['{:x}'.format(nu) for nu in ary[:10]] )
-                    entrylist[bid] = join(ary)
-                trgs.append(entrylist)
-        # B2INFO(80 * '=')
-        # B2INFO('You are now in basf2 session')
-        # B2INFO('TRG B2L data are loaded now. Try these:')
-        # B2INFO('>>> printHex(trgs[0])')
-        # B2INFO('>>> printBin(trgs[1], wordwidth=4, linewidth=10, paraheight=5)')
-        # B2INFO(80 * '=')
-        # interactive.embed()
+                    count = GetDetectorNwords(evt, entry, bid)
+                    if count == 0:
+                        # continue
+                        pass
+                    bf = GetDetectorBuffer(evt, entry, bid)
+                    ary = frombuffer(bf, np.uintc, count)
+                    # obsolete: skipping dummy buffers
+                    # if '{:0x}'.format(ary[0])[:4] == 'dddd':
+                    #     self.return_value(1)
+                    # else:
+                    #     return
+                    self.return_value(1)
+                    dataList.append(join(ary))
 
-        if not pickleIt:
-            global data
-        else:
-            rfp = open(pica, 'rb')
-            data = pickle.load(rfp)
-            rfp.close()
-
-        data.append(trgs)
-
-        if pickleIt:
-            wfp = open(pica, 'wb')
-            pickle.dump(data, wfp, protocol=2)
-            wfp.close()
+        event = evtmeta.getEvent()
+        run = evtmeta.getRun()
+        subrun = evtmeta.getSubrun()
+        meta.append((event, run, subrun))
+        data.append(dataList)
 
 
 # Set the log level to show only error and fatal messages
@@ -114,39 +136,46 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 # input
-input = register_module('SeqRootInput')
-input.param('inputFileName', srootFile)
-
-# readout
-# readout = register_module('ReadOut')
-
-# dump = register_module('SeqRootOutput')
-# dump = register_module('RootOutput')
-# dump.param('outputFileName', 'readout.root')
+if srootFile[-5:] == 'sroot':
+    root_input = register_module('SeqRootInput')
+else:
+    root_input = register_module('RootInput')
+root_input.param('inputFileName', srootFile)
 
 prog = register_module('Progress')
 
-
 # Add modules to main path
-main.add_module(input)
-# main.add_module(readout)
-# main.add_module(dump)
+main.add_module(root_input)
 main.add_module(prog)
-main.add_module(MinModule())
+
+readout = MinModule()
+main.add_module(readout)
+
+emptypath = create_path()
+readout.if_false(emptypath)
 
 # check signal file before processing
 if not pickleIt:
-    import b2vcd
+    import b2vcd_48
     vcdFile = sys.argv[3] if len(sys.argv) >= 4 else re.sub(r'.+/', '', re.sub(r'sroot', 'vcd', srootFile))
     with open(pickleSigFile) as fin:
         evtsize = [int(width) for width in fin.readline().split()]
         B2INFO('Interpreting B2L data format with dimension ' + str(evtsize))
-        atlas = b2vcd.makeAtlas(fin.read(), evtsize)
+        atlas = b2vcd_48.makeAtlas(fin.read(), evtsize)
 
 # Process all events
 process(main)
 
 if pickleIt:
+    pica = pickleSigFile if isPickleFile else re.sub(r'.+/', 'ana/', re.sub(r'sroot', 'p', srootFile))
+    wfp = open(pica, 'wb')
+    pickle.dump(data, wfp, protocol=2)
+    pickle.dump(meta, wfp, protocol=2)
+    wfp.close()
+
+print(statistics)
+
+if pickleIt:
     B2INFO('Output pickle file ' + pica + ' saved.')
 else:
-    b2vcd.writeVCD(data, atlas, vcdFile, evtsize)
+    b2vcd_48.writeVCD(meta, data, atlas, vcdFile, evtsize)

@@ -254,10 +254,10 @@ void VXDTFDQMModule::initialize()
   B2DEBUG(1, "end REG_HISTOGRAM");
 
   //Register collections
-  StoreArray<SVDCluster>::required();
+  StoreArray<SVDCluster> SVDCluster;  SVDCluster.isRequired();
 //   StoreArray<SVDCluster> svdClusters(m_storeClustersName);
-  StoreArray<genfit::TrackCand>::required(m_storeTrackCandsName);
-  StoreArray<genfit::TrackCand>::optional(m_storeReferenceTCsColName);
+  StoreArray<genfit::TrackCand> TrackCandName(m_storeTrackCandsName);    TrackCandName.isRequired();
+  StoreArray<genfit::TrackCand> TrackCandRefCol(m_storeReferenceTCsColName);  TrackCandRefCol.isOptional();
 //   StoreArray<genfit::TrackCand> caTrackCandidates(m_storeTrackCandsName);
   B2DEBUG(1, "end get StoreArrays");
 

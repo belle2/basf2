@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGITIZATIONPARAMETERS_H
-#define EKLMDIGITIZATIONPARAMETERS_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -44,12 +43,22 @@ namespace Belle2 {
     void setADCRange(int range);
 
     /**
-     * Get ADC sampling time.
+     * Get ADC sampling frequency in GHz.
+     */
+    float getADCSamplingFrequency() const;
+
+    /**
+     * Set ADC sampling frequency in GHz.
+     */
+    void setADCSamplingFrequency(float frequency);
+
+    /**
+     * Get ADC sampling time in ns.
      */
     float getADCSamplingTime() const;
 
     /**
-     * Set ADC sampling time.
+     * Set ADC sampling time in ns.
      */
     void setADCSamplingTime(float time);
 
@@ -86,12 +95,22 @@ namespace Belle2 {
     /**
      * Get ADC readout corresponding to saturation.
      */
-    float getADCSaturation() const;
+    int getADCThreshold() const;
 
     /**
      * Set ADC readout corresponding to saturation.
      */
-    void setADCSaturation(float saturation);
+    void setADCThreshold(int threshold);
+
+    /**
+     * Get ADC readout corresponding to saturation.
+     */
+    int getADCSaturation() const;
+
+    /**
+     * Set ADC readout corresponding to saturation.
+     */
+    void setADCSaturation(int saturation);
 
     /**
      * Get number of photoelectrons / 1 MeV.
@@ -210,8 +229,11 @@ namespace Belle2 {
     /** ADC photoelectron amplitude. */
     float m_ADCPEAmplitude;
 
+    /** ADC threshold. */
+    float m_ADCThreshold;
+
     /** ADC readout corresponding to saturation. */
-    float m_ADCSaturation;
+    int m_ADCSaturation;
 
     /** Number of photoelectrons / 1 MeV. */
     float m_NPEperMeV;
@@ -245,12 +267,9 @@ namespace Belle2 {
     /** Enable background in fitting. */
     bool m_EnableConstBkg;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigitizationParameters, 2);
+    /** Class version. */
+    ClassDef(Belle2::EKLMDigitizationParameters, 3);
 
   };
 
 }
-
-#endif
-

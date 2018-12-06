@@ -38,7 +38,7 @@ namespace Belle2 {
     public:
 
       /** Constructor to create an empty Cluster */
-      SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent);
+      SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent, double cutSNR);
 
       /**
        * Add a Strip to the current cluster.
@@ -117,6 +117,9 @@ namespace Belle2 {
 
     protected:
 
+      /** cluster is not good if something goes wrong */
+      bool m_stopCreationCluster = false;
+
       /** VxdID of the cluster */
       VxdID m_vxdID;
 
@@ -132,18 +135,27 @@ namespace Belle2 {
       /** SNR above which the strip can be considered for clustering*/
       double m_cutAdjacent;
 
+      /** SNR above which the cluster is ok*/
+      double m_cutCluster;
+
       /** Charge of the cluster */
       float m_charge;
+
       /** Error on Charge of the cluster */
       float m_chargeError;
+
       /** Seed Charge of the cluster */
       float m_seedCharge;
+
       /** Time of the cluster */
       float m_time;
+
       /** Error on Time of the cluster (not implemented yet)*/
       float m_timeError;
+
       /** Position of the cluster */
       float m_position;
+
       /** Error on Position of the cluster */
       float m_positionError;
 
@@ -157,7 +169,6 @@ namespace Belle2 {
       int m_seedIndex;
 
       /** vector containing the strips in the cluster */
-
       std::vector<stripInCluster> m_strips;
 
     };

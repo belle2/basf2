@@ -10,10 +10,6 @@
 
 from basf2 import *
 
-# database
-reset_database()
-use_local_database("localDB/localDB.txt", "localDB")
-
 # Create path
 main = create_path()
 
@@ -32,13 +28,12 @@ main.add_module(gearbox)
 
 # Geometry (only TOP needed)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
-# Unpacking
+# Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')
-unpack.param('swapBytes', True)
-unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline

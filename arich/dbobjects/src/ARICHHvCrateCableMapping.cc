@@ -33,9 +33,9 @@ int ARICHHvCrateCableMapping::getCable(int connectionID) const
   return sectorCable[1];
 }
 
-int ARICHHvCrateCableMapping::getConnectionID(std::vector<int> sectorCable) const
+int ARICHHvCrateCableMapping::getConnectionID(const std::vector<int>& sectorCable) const
 {
-  int connectionID = 99;
+  int connectionID = -1;
   for (auto& i : m_connection2cable) {
     if (i.second == sectorCable) connectionID = i.first;
   }
@@ -48,7 +48,7 @@ void ARICHHvCrateCableMapping::addMapping(int connectionID, std::vector<int> sec
   m_connection2cable.insert(std::pair<int, std::vector<int>>(connectionID, sectorCable));
 }
 
-void ARICHHvCrateCableMapping::print()
+void ARICHHvCrateCableMapping::print() const
 {
   for (auto const& x : m_connection2cable)  {
     int connectionID = x.first;

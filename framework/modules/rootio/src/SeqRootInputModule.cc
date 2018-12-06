@@ -10,6 +10,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
 #include <framework/io/RootIOUtilities.h>
 
 #include <cmath>
@@ -31,14 +32,11 @@ REG_MODULE(SeqRootInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size(0), m_size2(0)
+SeqRootInputModule::SeqRootInputModule() : Module()
 {
   //Set module properties
   setDescription("Read .sroot files produced by SeqRootOutput.");
   setPropertyFlags(c_Input);
-
-  m_file = 0;
-  m_nevt = -1;
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName,
@@ -51,6 +49,7 @@ SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size
            "filename as a boost::format pattern instead of the standard where "
            "subsequent files are named .sroot-N. For example 'myfile-f%08d.sroot'",
            false);
+  addParam("declareRealData", m_realData, "Declare the input to be real, not generated data", false);
 }
 
 
@@ -60,8 +59,6 @@ SeqRootInputModule::~SeqRootInputModule()
 
 void SeqRootInputModule::initialize()
 {
-  RootIOUtilities::loadDictionaries();
-
   // Specify input file(list)
   if (!m_inputFileName.empty() && !m_filelist.empty()) {
     B2FATAL("Cannot specify both 'inputFileName' and 'inputFileNames'");
@@ -76,8 +73,9 @@ void SeqRootInputModule::initialize()
   } else if (m_filelist.size() > 0) {
     m_nfile = m_filelist.size();
     m_inputFileName = m_filelist[0];
-  } else
+  } else {
     m_nfile = 1;
+  }
 
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer();
@@ -122,6 +120,12 @@ void SeqRootInputModule::initialize()
   }
   m_fileptr = 0;
 
+  if (m_realData) {
+    StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+    fileMetaData.registerInDataStore();
+    fileMetaData.create();
+    fileMetaData->declareRealData();
+  }
 
   B2INFO("SeqRootInput: initialized.");
 }
@@ -139,9 +143,10 @@ void SeqRootInputModule::beginRun()
 
 void SeqRootInputModule::event()
 {
-  m_nevt++;
-  // First event is already loaded
-  if (m_nevt == 0) return;
+  // on first call: first event is already loaded. This is actually called once
+  // before the first beginRun() since we are the module setting the EventInfo
+  // so don't get confused by the m_nevt=0 in beginRun()
+  if (++m_nevt == 0) return;
 
   // Get a SeqRoot record from the file
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];

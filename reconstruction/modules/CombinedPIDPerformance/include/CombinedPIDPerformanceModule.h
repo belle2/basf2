@@ -21,6 +21,11 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // forward declarations
 class TTree;
@@ -49,15 +54,21 @@ namespace Belle2 {
     virtual ~CombinedPIDPerformanceModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
+
+    // required input
+    StoreArray<Track> m_tracks; /**< Required array of input Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /**< Required array of input TrackFitResults */
+    StoreArray<PIDLikelihood> m_pidLikelihoods; /**< Required array of input PIDLikelihoods */
+    StoreArray<MCParticle> m_mcParticles; /**< Required array of input MCParticles */
 
     /** list to store TObjects */
     TList* m_histoList;

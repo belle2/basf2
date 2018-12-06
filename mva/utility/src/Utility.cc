@@ -15,32 +15,16 @@
 #include <mva/methods/Trivial.h>
 #include <mva/methods/Combination.h>
 
-#include <mva/interface/Interface.h>
-#include <mva/interface/Options.h>
-#include <mva/interface/Weightfile.h>
-
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/dataobjects/EventMetaData.h>
-
 #include <framework/logging/Logger.h>
 
 #include <framework/utilities/MakeROOTCompatible.h>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <TFile.h>
-#include <TTree.h>
-#include <TBranch.h>
-
 #include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <cerrno>
-#include <memory>
 #include <chrono>
+#include <string>
 
 namespace Belle2 {
   namespace MVA {
@@ -132,7 +116,7 @@ namespace Belle2 {
     }
 
     void expert(const std::vector<std::string>& filenames, const std::vector<std::string>& datafiles, const std::string& treename,
-                const std::string& outputfile, int experiment, int run, int event)
+                const std::string& outputfile, int experiment, int run, int event, bool copy_target)
     {
 
       std::vector<Weightfile> weightfiles;
@@ -161,12 +145,16 @@ namespace Belle2 {
         GeneralOptions general_options;
         weightfile.getOptions(general_options);
         general_options.m_treename = treename;
-        // Override possible restritction of number of evetns in training
+        // Override possible restriction of number of events in training
         // otherwise this would apply to the expert as well.
         general_options.m_max_events = 0;
 
         auto expert = supported_interfaces[general_options.m_method]->getExpert();
         expert->load(weightfile);
+        // define if target variables should be copied
+        if (not copy_target) {
+          general_options.m_target_variable = std::string();
+        }
 
         general_options.m_datafiles = datafiles;
         auto& branch = branches[i];

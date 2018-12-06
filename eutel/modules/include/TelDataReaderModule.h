@@ -44,7 +44,8 @@ namespace Belle2 {
     // Private Member Functions
 
     /** Get list of input files, taking -i command line overrides into account. */
-    std::vector<std::string> getInputFiles() const {
+    std::vector<std::string> getInputFiles() const
+    {
       std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
       if (! inputFiles.empty()) {
         return inputFiles;

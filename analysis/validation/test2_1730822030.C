@@ -26,7 +26,7 @@
 
 void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString pidCut1 ("Upsilon3S_chi_b12P_Upsilon_mu0_PIDmu > 0.1 && Upsilon3S_chi_b12P_Upsilon_mu1_PIDmu >0.1 ");
+   TString pidCut1 ("Upsilon3S_chi_b12P_Upsilon_mu0_muonID > 0.1 && Upsilon3S_chi_b12P_Upsilon_mu1_muonID >0.1 ");
    
    TH1F *h_M_Y1S_mumu = new TH1F ("h_M_Y1S_mumu","M[Y(1S)->mumu]",20,9.36,9.56);
    ptree->Project("h_M_Y1S_mumu","Upsilon3S_chi_b12P_Upsilon_M",pidCut1);
@@ -54,7 +54,7 @@ void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
    
-   TString pidCut2 ("Upsilon3S_chi_b12P_Upsilon_e0_PIDe >0.1 && Upsilon3S_chi_b12P_Upsilon_e1_PIDe > 0.1");
+   TString pidCut2 ("Upsilon3S_chi_b12P_Upsilon_e0_electronID >0.1 && Upsilon3S_chi_b12P_Upsilon_e1_electronID > 0.1");
   
    TH1F* h_M_Y1S_ee = new TH1F("h_M_Y1S_ee","M[Y(1S)->ee]",20,9.36,9.56);
    ptree->Project("h_M_Y1S_ee","Upsilon3S_chi_b12P_Upsilon_M",pidCut2);
@@ -81,7 +81,7 @@ void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_2Smumu(TFile* pfile,TTree *ptree, TFile* outputFile){
 
-   TString pidCut3 ("Upsilon3S_chi_b12P_Upsilon2S_mu0_PIDmu > 0.1 && Upsilon3S_chi_b12P_Upsilon2S_mu1_PIDmu >0.1");
+   TString pidCut3 ("Upsilon3S_chi_b12P_Upsilon2S_mu0_muonID > 0.1 && Upsilon3S_chi_b12P_Upsilon2S_mu1_muonID >0.1");
   
    TH1F* h_M_Y2S_mumu = new TH1F("h_M_Y2S_mumu","M[Y(2S)->mumu]",20,9.9232,10.1232);
    ptree->Project("h_M_Y2S_mumu","Upsilon3S_chi_b12P_Upsilon2S_M",pidCut3);
@@ -109,7 +109,7 @@ void plot_2Smumu(TFile* pfile,TTree *ptree, TFile* outputFile){
 
 void plot_2See(TFile* pfile,TTree *ptree, TFile* outputFile){
 
-   TString pidCut4 ("Upsilon3S_chi_b12P_Upsilon2S_e0_PIDe > 0.1 && Upsilon3S_chi_b12P_Upsilon2S_e1_PIDe > 0.1");
+   TString pidCut4 ("Upsilon3S_chi_b12P_Upsilon2S_e0_electronID > 0.1 && Upsilon3S_chi_b12P_Upsilon2S_e1_electronID > 0.1");
    
    TH1F* h_M_Y2S_ee = new TH1F("h_M_Y2S_ee","M[Y(2S)->ee]",20,9.9232,10.1232);
    ptree->Project("h_M_Y2S_ee","Upsilon3S_chi_b12P_Upsilon2S_M",pidCut4);

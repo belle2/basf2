@@ -12,6 +12,9 @@ namespace Belle2 {
      *
      * Ex: antiParticleListName("B+:somelabel") -> "B-:somelabel"
      *     antiParticleListName("gamma") -> "gamma"
+     *
+     * User documentation is located at analysis/doc/DecayDescriptor.rst
+     * Please modify in accordingly to introduced changes.
      */
     std::string antiParticleListName(const std::string& listName);
 

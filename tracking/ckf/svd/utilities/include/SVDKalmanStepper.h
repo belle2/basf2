@@ -19,15 +19,17 @@ namespace Belle2 {
   class SpacePoint;
   class CKFToSVDState;
 
+  /// Kalman stepper implementation for the SVD CKF
   class SVDKalmanStepper {
   public:
+    /// Do a kalman step of the mSoP to the measurement in the state. Returns the chi2.
     double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state);
 
-    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint);
-
-    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToSVDState& state);
+    /// Calculate the residual between the mSoP and the measurement in the state.
+    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state);
 
   private:
+    /// Implementation using the general kalman stepper
     KalmanStepper<1> m_kalmanStepper;
   };
 }

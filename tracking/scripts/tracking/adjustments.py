@@ -21,6 +21,8 @@ def adjust_module(path, module_type, params={}, **kwds):
         if module.type() == module_type:
             module.param(params)
             module.param(kwds)
+        for sub_path in module.get_all_condition_paths():
+            adjust_module(sub_path, module_type, params=params, **kwds)
 
 
 def skip_modules_after(path, module_type):

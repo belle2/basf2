@@ -12,7 +12,11 @@
 #include <stdio.h>
 #include <algorithm>
 
+#include <TMatrixFSym.h>
+
+#include <analysis/KFit/MakeMotherKFit.h>
 #include <analysis/KFit/VertexFitKFit.h>
+#include <analysis/utility/CLHEPToROOT.h>
 
 
 using namespace std;
@@ -52,6 +56,12 @@ VertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
+enum KFitError::ECode VertexFitKFit::setInitialVertex(const TVector3& v)
+{
+  m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
+}
 
 enum KFitError::ECode
 VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe) {
@@ -793,7 +803,7 @@ VertexFitKFit::makeCoreMatrix(void) {
       B = a * a2 * invPt2;
       if (fabs(B) > 1) {
         m_ErrorCode = KFitError::kCannotGetARCSIN;
-        B2DEBUG(1, "KFitError: Cannot calculate arcsin");
+        B2DEBUG(10, "KFitError: Cannot calculate arcsin");
         //KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }
@@ -895,5 +905,35 @@ VertexFitKFit::deleteTube(void) {
   m_iTrackTube = -1;
 
   return m_ErrorCode = KFitError::kNoError;
+}
+
+enum KFitError::ECode VertexFitKFit::updateMother(Particle* mother)
+{
+  MakeMotherKFit kmm;
+  kmm.setMagneticField(m_MagneticField);
+  unsigned n = getTrackCount();
+  for (unsigned i = 0; i < n; ++i) {
+    kmm.addTrack(getTrackMomentum(i), getTrackPosition(i), getTrackError(i),
+                 getTrack(i).getCharge());
+    kmm.setTrackVertexError(getTrackVertexError(i));
+    for (unsigned j = i + 1; j < n; ++j) {
+      kmm.setCorrelation(getCorrelation(i, j));
+    }
+  }
+  kmm.setVertex(getVertex());
+  kmm.setVertexError(getVertexError());
+  m_ErrorCode = kmm.doMake();
+  if (m_ErrorCode != KFitError::kNoError)
+    return m_ErrorCode;
+  double chi2 = getCHIsq();
+  int ndf = getNDF();
+  double prob = TMath::Prob(chi2, ndf);
+  mother->updateMomentum(
+    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
+    prob);
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
 }
 

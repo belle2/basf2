@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # charm meson in various decay modes and print out
 # ParticleList summary at the end:
@@ -22,66 +24,84 @@
 # Note: This tutorial uses generic MC therefore it can be
 # ran only on KEKCC.
 #
-# Contributors: A. Zupanc (June 2014)
+# Note 2: Running over all samples might take time.
+# Consider manual limit of the number of processed events:
 #
-######################################################
+# > basf2 B2A601-ParticleStats.py -n 1000
+#
+# Contributors: A. Zupanc (June 2014),
+#               I. Komarov (December 2017)
+#               I. Komarov (September 2018)
+#
+################################################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import fillParticleList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import copyLists
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import summaryOfLists
-from stdCharged import *
-from stdFSParticles import stdPi0s
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
+import stdCharged as stdc
+from stdPi0s import stdPi0s
 
-filelistMIX = ['/hsm/belle2/bdata/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s01/mixed_e0001r0010_s01_BGx1.mdst.root']
-filelistCHG = ['/hsm/belle2/bdata/MC/generic/charged/mcprod1405/BGx1/mc35_charged_BGx1_s01/charged_e0001r0010_s01_BGx1.mdst.root']
-filelistCC = ['/hsm/belle2/bdata/MC/generic/ccbar/mcprod1405/BGx1/mc35_ccbar_BGx1_s01/ccbar_e0001r0010_s01_BGx1.mdst.root']
-filelistSS = ['/hsm/belle2/bdata/MC/generic/ssbar/mcprod1405/BGx1/mc35_ssbar_BGx1_s01/ssbar_e0001r0010_s01_BGx1.mdst.root']
-filelistDD = ['/hsm/belle2/bdata/MC/generic/ddbar/mcprod1405/BGx1/mc35_ddbar_BGx1_s01/ddbar_e0001r0010_s01_BGx1.mdst.root']
-filelistUU = ['/hsm/belle2/bdata/MC/generic/uubar/mcprod1405/BGx1/mc35_uubar_BGx1_s01/uubar_e0001r0010_s01_BGx1.mdst.root']
+# create path
+my_path = b2.create_path()
 
-inputMdstList('MC5', filelistMIX + filelistCHG + filelistCC + filelistSS + filelistDD + filelistUU)
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+             path=my_path)
 
 # create and fill final state ParticleLists
 # use standard lists
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdc.stdPi(listtype='loose', path=my_path)
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdc.stdK(listtype='loose', path=my_path)
 
-stdPi0s('looseFit')
+
+stdPi0s(listtype='looseFit', path=my_path)
 
 # 1. reconstruct D0 in multiple decay modes
-reconstructDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5', 1)
-reconstructDecay('D0:ch2 -> K-:loose pi+:loose pi0:looseFit', '1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5', 2)
-reconstructDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5', 3)
+ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
+                    cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
+                    dmID=1,
+                    path=my_path)
+ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:looseFit',
+                    cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
+                    dmID=2,
+                    path=my_path)
+ma.reconstructDecay(decayString='D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose',
+                    cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
+                    dmID=3,
+                    path=my_path)
 
 # merge the D0 lists together into one single list
-copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3'])
+ma.copyLists(outputListName='D0:all', inputListNames=['D0:ch1', 'D0:ch2', 'D0:ch3'], path=my_path)
 
 # 2. reconstruct D+ -> K- pi+ pi+
-reconstructDecay('D+:kpipi -> K-:loose pi+:loose pi+:loose', '1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5', 1)
+ma.reconstructDecay(decayString='D+:kpipi -> K-:loose pi+:loose pi+:loose',
+                    cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
+                    dmID=1,
+                    path=my_path)
 
 # 3. reconstruct Ds+ -> K- K+ pi+
-reconstructDecay('D_s+:kkpi -> K-:loose K+:loose pi+:loose', '1.9 < M < 2.0 and 2.5 < useCMSFrame(p) < 5.5', 1)
+ma.reconstructDecay(decayString='D_s+:kkpi -> K-:loose K+:loose pi+:loose',
+                    cut='1.9 < M < 2.0 and 2.5 < useCMSFrame(p) < 5.5',
+                    dmID=1,
+                    path=my_path)
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('D0:all')
-matchMCTruth('D+:kpipi')
-matchMCTruth('D_s+:kkpi')
+ma.matchMCTruth(list_name='D0:all', path=my_path)
+ma.matchMCTruth(list_name='D+:kpipi', path=my_path)
+ma.matchMCTruth(list_name='D_s+:kkpi', path=my_path)
 
 # print out summary of lists
 # first for D0 lists only
-summaryOfLists(['D0:ch1', 'D0:ch2', 'D0:ch3'])
+ma.summaryOfLists(particleLists=['D0:ch1', 'D0:ch2', 'D0:ch3'], path=my_path)
 # and for all charm
-summaryOfLists(['D0:all', 'D+:kpipi', 'D_s+:kkpi'])
+ma.summaryOfLists(particleLists=['D0:all', 'D+:kpipi', 'D_s+:kkpi'], path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

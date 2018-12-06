@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>GenericB_GENSIMRECtoDST.dst.root</input>
-  <output>GenericB.ntup.root</output>
+  <input>../GenericB_GENSIMRECtoDST.dst.root</input>
+  <output>../GenericB.ntup.root</output>
   <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
 </header>
 """
@@ -14,19 +14,14 @@ import os
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from stdV0s import *
 from stdPhotons import *
 from stdPi0s import *
-from stdLightMesons import *
 
 inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
-loadStdCharged()
+stdPi('all')
 stdPhotons('loose')  # loose list also creates 'all' list
-loadStdPi0('all')
-loadStdLoosePi0()
-loadStdKS()
-loadStdLightMesons()
-
+stdPi0s('all')
+stdKshorts()
 
 # ----> NtupleMaker module
 ntupleFile('../GenericB.ntup.root')

@@ -98,7 +98,7 @@ class Ntuple(Module):
                 self.tree.Fill()
 
                 self.histTimeCh.Fill(digit.getChannel(), digit.getTime())
-                self.histCalTimeCh.Fill(digit.getChannel(), digit.getTime() + t0const.get(digit.getChannel()))
+                self.histCalTimeCh.Fill(digit.getChannel(), digit.getTime() - t0const.get(digit.getChannel()))
 
     def terminate(self):
         ''' Write the file '''

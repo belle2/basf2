@@ -11,7 +11,6 @@
 #include <reconstruction/modules/CDCDedxPID/CDCDedxScanModule.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -67,7 +66,7 @@ void CDCDedxScanModule::initialize()
 {
 
   // register outputs
-  StoreArray<CDCDedxTrack>::registerPersistent();
+  m_dedxArray.registerInDataStore();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -80,9 +79,6 @@ void CDCDedxScanModule::initialize()
 
 void CDCDedxScanModule::event()
 {
-
-  // outputs
-  StoreArray<CDCDedxTrack> dedxArray;
 
   // get the geometry of the cdc
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -128,14 +124,23 @@ void CDCDedxScanModule::event()
         double doca = j * cellHalfWidth / 50.0 - cellHalfWidth;
         double entAng = k * 3.14159265 / 100.0 - 3.14159265 / 2.0;
 
+        // re-scaled (RS) doca and entAng variable: map to square cell
+        double cellR = 2 * cellHalfWidth / cellHeight;
+        double tana = 100.0;
+        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100 * (entAng / std::abs(entAng)); //avoid infinity at pi/2
+        else tana =  std::tan(entAng);
+        double docaRS = doca * std::sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
+        double entAngRS = std::atan(tana / cellR);
+
         // now calculate the path length for this hit
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(0, 0, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0, 1.0);
+        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
+                          1.0);
       }
     }
-    dedxArray.appendNew(*dedxTrack);
+    m_dedxArray.appendNew(*dedxTrack);
   }
 }
 

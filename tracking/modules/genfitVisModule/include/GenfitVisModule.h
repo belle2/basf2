@@ -33,16 +33,16 @@ namespace Belle2 {
     GenfitVisModule();
 
     /** Initialize the EventDisplay */
-    virtual void initialize();
+    void initialize() override;
 
     /** Add genfit::Tracks to display. */
-    virtual void event();
+    void event() override;
 
     /** Open display. */
-    virtual void endRun();
+    void endRun() override;
 
     /** Close display. */
-    virtual void terminate();
+    void terminate() override;
 
 
   private:

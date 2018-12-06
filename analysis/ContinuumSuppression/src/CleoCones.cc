@@ -46,7 +46,7 @@ namespace Belle2 {
           float angle = ((180 * (thrustB.Angle(*iter0))) / M_PI);
           if (((((i - 1) * 10) <= angle) && (angle < (i * 10))) || (((180 - (i * 10)) < angle) && (angle <= (180 - ((i - 1) * 10))))) {
             momentum_flow_all += (*iter0).Mag();
-            // std::cout << "interval " << ((i-1)*10) << " to " << (i*10) << " and " << (180-(i*10)) << " to " << (180-((i-1)*10)) << " has value " << (180*(thrustB.angle(*iter0)))/M_PI << ", momentum flow is " << momentum_flow << std::endl;
+            // B2DEBUG(19, "interval " << ((i-1)*10) << " to " << (i*10) << " and " << (180-(i*10)) << " to " << (180-((i-1)*10)) << " has value " << (180*(thrustB.angle(*iter0)))/M_PI << ", momentum flow is " << momentum_flow );
           }
           if ((i == 9) && (angle == 90)) {
             momentum_flow_all += (*iter0).Mag();

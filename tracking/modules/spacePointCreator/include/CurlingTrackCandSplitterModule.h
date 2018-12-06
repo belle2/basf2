@@ -48,11 +48,11 @@ namespace Belle2 {
     CurlingTrackCandSplitterModule(); /**< Constructor */
 
     /** initialize: initialize counters, register stuff in DataStore, check if all necessary StoreArrays are present, etc. */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void event(); /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
+    void event() override; /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
 
-    virtual void terminate(); /**< terminate: print some summary on the modules work */
+    void terminate() override; /**< terminate: print some summary on the modules work */
 
     /** Some constants for initialization */
     enum {
@@ -175,8 +175,10 @@ namespace Belle2 {
      */
     const std::vector<int> checkTrackCandForCurling(const Belle2::SpacePointTrackCand&, RootVariables& rootVariables);
 
-    /**
-     * Get the global position and momentum for a given TrueHit (PXD or SVD at the moment). .first is position, .second is momentum
+    /** Get the global position and momentum for a given TrueHit (PXD or SVD at the moment).
+     * @tparam TrueHit TrueHit type
+     * @param aTrueHit pointer to a trueHit
+     * @return pair of global position and momentum for a given TrueHit. .first is position, .second is momentum
      */
     template<class TrueHit>
     std::pair<const B2Vector3<double>, const B2Vector3<double> >

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-//Identify duplicate vertices (distinct particles, but built from the same daughters) and mark the one with best chi2.
+//Identify duplicate vertices (distinct particles, but built from the same daughters).
 //Only works if the particle has exactly two daughters. Mainly used to deal when merging V0 vertices with hand-built ones.
 
 //Functionality is designed to be expanded as needed.
@@ -16,7 +16,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -50,7 +50,7 @@ DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module(), m_targetV
 
 void DuplicateVertexMarkerModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   Variable::Manager& manager = Variable::Manager::Instance();
   m_targetVar = manager.getVariable("chiProb");
@@ -66,7 +66,6 @@ void DuplicateVertexMarkerModule::event()
     return;
 
   const int size = inPList->getListSize();
-  std::set<const Particle*> foundParticles;
   for (int i = 0; i < size; i++) {
     Particle* part = inPList->getParticle(i);
     if (part->getNDaughters() != 2) { //ignore 3+ vertices
@@ -75,7 +74,7 @@ void DuplicateVertexMarkerModule::event()
     }
     if (part->hasExtraInfo(
           m_extraInfoName)) { //if it already has info, it means it's already been discarded (or it won, but that shouldn't be possible here)
-      B2DEBUG(80, "Extra Info with given name is already set!");
+      B2DEBUG(10, "Extra Info with given name is already set!");
       continue;
     }
     for (int j = 0; j < size; j++) {//look for a clone among other particles in the event
@@ -84,8 +83,8 @@ void DuplicateVertexMarkerModule::event()
       if (cloneCand->getNDaughters() == 2) { //check if it's another 2-vertex with the same exact daughters
         if (part == cloneCand) continue; //but not itself
         if (cloneCand->hasExtraInfo(m_extraInfoName)) continue; //nor an already discarded one
-        B2DEBUG(80, "part has daughters (" << part->getDaughter(0)->getTrack() << ") and (" << part->getDaughter(1)->getTrack() << ")");
-        B2DEBUG(80, "cloneCand has daughters (" << cloneCand->getDaughter(0)->getTrack() << ") and (" << cloneCand->getDaughter(
+        B2DEBUG(10, "part has daughters (" << part->getDaughter(0)->getTrack() << ") and (" << part->getDaughter(1)->getTrack() << ")");
+        B2DEBUG(10, "cloneCand has daughters (" << cloneCand->getDaughter(0)->getTrack() << ") and (" << cloneCand->getDaughter(
                   1)->getTrack() << ")");
         if (part->getDaughter(0)->getTrack() == cloneCand->getDaughter(0)->getTrack() &&
             part->getDaughter(1)->getTrack() == cloneCand->getDaughter(1)->getTrack()) {
@@ -102,13 +101,13 @@ void DuplicateVertexMarkerModule::event()
           if (partNotV0 != cloneNotV0) { //one of them is V0 and the other not
             (partNotV0) ? (part->addExtraInfo(m_extraInfoName, 0.0)) : (cloneCand->addExtraInfo(m_extraInfoName, 0.0));
             if (partNotV0) {
-              B2DEBUG(80, "V0: Discarding Particle.");
-            } else B2DEBUG(80, "V0: Discarding Clone");
+              B2DEBUG(10, "V0: Discarding Particle.");
+            } else B2DEBUG(10, "V0: Discarding Clone");
           }
         }
         if (!(part->hasExtraInfo(m_extraInfoName) || cloneCand->hasExtraInfo(m_extraInfoName))) {
           //if V0s aren't being checked, or have been checked but inconclusive (should not happen) check best fit
-          B2DEBUG(80, m_targetVar->function(part) << " vs " << m_targetVar->function(cloneCand));
+          B2DEBUG(10, m_targetVar->function(part) << " vs " << m_targetVar->function(cloneCand));
           if (m_targetVar->function(part) > m_targetVar->function(cloneCand)) {
             cloneCand->addExtraInfo(m_extraInfoName, 0.0);
           } else {

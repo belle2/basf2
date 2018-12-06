@@ -12,6 +12,8 @@
 #include <map>
 #include <array>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <algorithm>
 #include <TObject.h>
 
@@ -187,7 +189,7 @@ namespace Belle2 {
     /**
      * Get xt parameterization mode
      */
-    unsigned short getXtParamMode()
+    unsigned short getXtParamMode() const
     {
       return m_xtParamMode;
     }
@@ -325,12 +327,61 @@ namespace Belle2 {
       }
     }
 
+    /**
+     * Output the contents in test file format
+     */
+    void outputToFile(std::string fileName) const
+    {
+      std::ofstream fout(fileName);
+
+      if (fout.bad()) {
+        B2ERROR("Specified output file could not be opened!");
+      } else {
+        const double deg = 180. / M_PI;
+
+        unsigned short nAlphaBins = m_alphaBins.size();
+        fout << nAlphaBins << std::endl;
+
+        for (unsigned short i = 0; i < nAlphaBins; ++i) {
+          fout << deg* m_alphaBins[i][0] << "  " << deg* m_alphaBins[i][1] << "  " << deg* m_alphaBins[i][2] << std::endl;
+        }
+
+        unsigned short nThetaBins = m_thetaBins.size();
+        fout << nThetaBins << std::endl;
+
+        for (unsigned short i = 0; i < nThetaBins; ++i) {
+          fout << deg* m_thetaBins[i][0] << "  " << deg* m_thetaBins[i][1] << "  " << deg* m_thetaBins[i][2] << std::endl;
+        }
+
+        fout << m_xtParamMode << "  " << m_nXtParams << std::endl;
+
+        signed short phiAngle = 0.;
+        for (unsigned short iT = 0; iT < nThetaBins; ++iT) {
+          for (unsigned short iA = 0; iA < nAlphaBins; ++iA) {
+            for (unsigned short iCL = 0; iCL < c_nSLayers; ++iCL) {
+              for (unsigned short iLR = 0; iLR < 2; ++iLR) {
+                unsigned short iLRp = abs(iLR - 1);
+                fout << std::setw(2) << std::right << std::fixed << iCL << "  " << std::setw(5) << std::setprecision(
+                       1) << deg* m_thetaBins[iT][2] << "  " << std::setw(5) << std::right << deg* m_alphaBins[iA][2] << "  " << std::setw(
+                       1) << std::setprecision(1) << phiAngle << "  " << std::setw(1) << iLRp;
+                const std::vector<float> params = getXtParams(iCL, iLRp, iA, iT);
+                for (unsigned short i = 0; i < m_nXtParams; ++i) {
+                  fout << "  " << std::setw(15) << std::scientific << std::setprecision(8) << params[i];
+                }
+                fout << std::endl;
+              }
+            }
+          }
+        }
+        fout.close();
+      }
+    }
 
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 29;}
     /// Get global parameter FIXME does nothing because CDC is not ready
-    double getGlobalParam(unsigned short xtId, unsigned short xtParam)
+    double getGlobalParam(unsigned short xtId, unsigned short xtParam) const
     {
       return getXtParams(xtId).at(xtParam);
     }
@@ -342,7 +393,7 @@ namespace Belle2 {
       setXtParams(xtId, allParams);
     }
     /// list stored global parameters TODO FIXME CDC not ready
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() const
     {
       return {};
     }

@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYSTRINGDECAY_H
-#define DECAYSTRINGDECAY_H
+#pragma once
 #include <string>
 #include <vector>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -18,7 +17,10 @@
 
 namespace Belle2 {
   /** Holds the information of a decay. Defined recursively,
-  that is the daughters m_daughters can be a DecayString themselves. */
+  that is the daughters m_daughters can be a DecayString themselves.
+
+  User documentation is located at analysis/doc/DecayDescriptor.rst
+  Please modify in accordingly to introduced changes.*/
   struct DecayStringDecay {
     /** Mother particle. */
     DecayStringParticle m_mother;
@@ -42,5 +44,4 @@ BOOST_FUSION_ADAPT_STRUCT(
   (std::string, m_strInclusive)
 )
 
-#endif // DECAYSTRINGDECAY_H
 

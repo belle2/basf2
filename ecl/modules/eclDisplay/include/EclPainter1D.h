@@ -8,11 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_1D
-#define ECL_CANVAS_1D
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH1.h>
+
+class TH1F;
 
 namespace Belle2 {
   /**
@@ -24,7 +25,9 @@ namespace Belle2 {
     enum Type {
       CHANNEL, /**< Events/energy per channel */
       SHAPER, /**< Events/energy per ShaperDSP */
-      CRATE /**< Events/energy per crate/ECLCollector */
+      CRATE, /**< Events/energy per crate/ECLCollector */
+      PHI,
+      THETA
     };
 
     /**
@@ -71,7 +74,7 @@ namespace Belle2 {
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
      */
-    virtual void getInformation(int px, int py, MultilineWidget* panel);
+    virtual void getInformation(int px, int py, MultilineWidget* panel) override;
 
     /**
      * Return subtype of ECLPainter1D.
@@ -82,12 +85,12 @@ namespace Belle2 {
      * Creates sub-histogram for crates and shapers. This function is
      * called upon click in EclFrame.
      */
-    virtual EclPainter* handleClick(int px, int py);
+    virtual EclPainter* handleClick(int px, int py) override;
 
     /**
      * Set XRange for histogram.
      */
-    void setXRange(int xmin, int xmax);
+    void setXRange(int xmin, int xmax) override;
 
     /**
      * Show data only from specific shaper.
@@ -104,8 +107,6 @@ namespace Belle2 {
     /**
      * Redraw the canvas.
      */
-    void Draw();
+    void Draw() override;
   };
 }
-
-#endif // ECL_CANVAS_1D

@@ -18,7 +18,11 @@
 
 #include <string>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include "trg/ecl/TrgEclCluster.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
+#include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
+#include "trg/ecl/dataobjects/TRGECLTiming.h"
 
 
 namespace Belle2 {
@@ -41,19 +45,19 @@ namespace Belle2 {
     virtual ~TRGECLRawdataAnalysisModule();
 
     /** Initilizes TRGECLModule.*/
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called when new run started.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Called event by event.*/
-    virtual void event();
+    virtual void event() override;
 
     /** Called when run ended.*/
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Called when processing ended.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
   public:
 
@@ -61,6 +65,9 @@ namespace Belle2 {
     std::string version(void) const;
 
   private: // Parameters
+    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerStore; /**< output for TRGECLUnpackerStore */
+    StoreArray<TRGECLCluster> m_TRGECLCluster; /**< output for TRGECLCluster */
+    StoreArray<TRGECLTiming> m_TRGECLTiming; /**< output for TRGECLTiming */
 
     /** Debug level.*/
     int _debugLevel;
@@ -94,8 +101,8 @@ namespace Belle2 {
     int  m_nEvent;
     //! Clustering option
     int _Clustering;
-    //! Object of Clustering Util
-    TrgEclCluster* obj_cluster;
+
+
 
   };
 

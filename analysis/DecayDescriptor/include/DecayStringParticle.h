@@ -7,13 +7,16 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-#ifndef DECAYSTRINGPARTICLE_H
-#define DECAYSTRINGPARTICLE_H
+
+#pragma once
 #include <string>
 #include <boost/fusion/include/adapt_struct.hpp>
 
 namespace Belle2 {
-  /** Holds the information of a particle in the decay string. Example: ^pi+:slow */
+  /** Holds the information of a particle in the decay string. Example: ^pi+:slow
+
+  User documentation is located at analysis/doc/DecayDescriptor.rst
+  Please modify in accordingly to introduced changes.*/
   struct DecayStringParticle {
     /** If the particle is selected by a preceding "^", this is stored here, if not, this is empty. */
     std::string m_strSelector;
@@ -33,6 +36,3 @@ BOOST_FUSION_ADAPT_STRUCT(
   (std::string, m_strName)
   (std::string, m_strLabel)
 )
-
-#endif // DECAYSTRINGPARTICLE_H
-

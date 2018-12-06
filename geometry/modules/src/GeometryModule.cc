@@ -13,6 +13,9 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBImportObjPtr.h>
 
+#include <algorithm>
+#include <iterator>
+
 using namespace std;
 using namespace Belle2;
 
@@ -61,7 +64,13 @@ void GeometryModule::initialize()
       B2FATAL("Geometry already created, more than one Geometry module present?");
     }
   }
-  geoManager.setDetectorComponents(m_components);
+
+  // filter out components which are not part of the load-able geometry
+  vector<string> filteredComponents;
+  copy_if(m_components.begin(), m_components.end(),
+  std::back_inserter(filteredComponents), [](std::string component) { return component != "TRG"; });
+
+  geoManager.setDetectorComponents(filteredComponents);
   geoManager.setExcludedComponents(m_excluded);
   geoManager.setAdditionalComponents(m_additional);
   geoManager.setAssignRegions(m_assignRegions);
@@ -81,6 +90,11 @@ void GeometryModule::initialize()
     import.construct(geoManager.createGeometryConfig(GearDir(m_geometryPath), iov));
     import.import(iov);
     return;
+  }
+
+  // Add a warning because we changed behavior. FIXME: To be removed after release-03-00-00
+  if (!getParam<bool>("useDB").isSetInSteering()) {
+    B2WARNING("Geometry is now loaded from the database by default. Please check your script to make sure this is what you want");
   }
 
   if (m_useDB) {

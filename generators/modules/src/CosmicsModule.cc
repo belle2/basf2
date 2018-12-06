@@ -62,7 +62,9 @@ CosmicsModule::CosmicsModule() : Module()
 void CosmicsModule::initialize()
 {
   // Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
+
   m_cosmics.setParameters(m_parameters);
 }
 

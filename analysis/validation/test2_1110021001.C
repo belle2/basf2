@@ -31,6 +31,7 @@ void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_mbc->GetListOfFunctions()->Add(new TNamed("Description", "Beam constrained invariant mass distrubtion of B0 -> K*0 gamma"));
   h_mbc->GetListOfFunctions()->Add(new TNamed("Check", "Distribution should be centred at B^{0} mass. Tail at low mass"));
   h_mbc->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
+  h_mbc->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
 
   TH1F* h_mkpi = new TH1F("h_mkpi",title,60,0.6,1.2);
   ptree->Project("h_mkpi", "B0_KST0_M", "1==1");
@@ -38,6 +39,7 @@ void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_mkpi->GetListOfFunctions()->Add(new TNamed("Description", "K#pi invariant mass distrubtion of K*(892)^{0} from B0 -> K*0 gamma"));
   h_mkpi->GetListOfFunctions()->Add(new TNamed("Check", "Distribution should be a Breit-Wigner shape centred at 0.896 GeV/c^{2}. "));
   h_mkpi->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
+  h_mkpi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
 
 
   TH1F* h_deltae = new TH1F("h_deltae",title,100,-0.5,0.5);
@@ -46,6 +48,7 @@ void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "#Delta E distribution from the decay B0 -> K*0 gamma"));
   h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "Distribution should be centred at zero, tail to LHS."));
   h_deltae->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
+  h_deltae->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
   
   TH1F* h_egam = new TH1F("h_egam",title,50,1.5,4.0);
   ptree->Project("h_egam", "B0_gamma_P", "1==1");
@@ -53,12 +56,14 @@ void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_egam->GetListOfFunctions()->Add(new TNamed("Description", "Lab frame photon energy distribution from the decay B0 -> K*0 gamma"));
   h_egam->GetListOfFunctions()->Add(new TNamed("Check", "Broad distribution bewteen 1.5 and 3 GeV."));
   h_egam->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
+  h_egam->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
 
   TH1F* h_eparentgam = new TH1F("h_eparentgam",title,100,1.5,4.0); ptree->Project("h_eparentgam", "B0_Egamma", "1==1");
   h_eparentgam->GetXaxis()->SetTitle("E(#gamma) (GeV)");
   h_eparentgam->GetListOfFunctions()->Add(new TNamed("Description", "Parent rest frame photon energy distribution from the decay B0 -> K*0 gamma"));
   h_eparentgam->GetListOfFunctions()->Add(new TNamed("Check", "Sharp distribution at 2.5 GeV."));
   h_eparentgam->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
+  h_eparentgam->GetListOfFunctions()->Add(new TNamed("MetaOptions", "pvalue-warn=0.7, pvalue-error=0.05"));
 
 
   outputFile->cd();

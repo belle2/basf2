@@ -11,7 +11,7 @@ input = register_module('RootInput')
 
 unpacker = register_module('PXDUnpacker')
 # unpacker.param('DoNotStore',True);
-unpacker.param('HeaderEndianSwap', False)
+# unpacker.param('HeaderEndianSwap', False)
 
 histoman = register_module('HistoManager')
 histoman.param('histoFileName', 'your_histo_file.root')
@@ -25,9 +25,9 @@ main = create_path()
 main.add_module(input)
 main.add_module(histoman)
 main.add_module(unpacker)
-main.add_module(register_module('PXDRawDQM'))
-main.add_module(register_module('PXDROIDQM'))
-main.add_module(register_module('Progress'))
+main.add_module('PXDRawDQM')
+main.add_module('PXDROIDQM')
+main.add_module('Progress')
 main.add_module(simpleoutput)
 
 process(main)

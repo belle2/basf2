@@ -20,7 +20,8 @@ namespace Belle2 {
       hitCounters.push_back(counters);
     }
     /** increase counter for super layer and track segment number in super layer.
-     *  track segment number can be negative. */
+     *  track segment number can be negative.
+     *  hits in the wrong hemisphere (not in [-nWires/4, nWires/4]) are skipped. */
     void addHit(unsigned iSL, int iTS);
     /** increase track counter */
     void countTrack() { ++trackCounter; }

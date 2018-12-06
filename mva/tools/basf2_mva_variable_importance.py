@@ -7,15 +7,11 @@ from basf2_mva_evaluation import plotting
 import argparse
 import tempfile
 
-import ROOT
 from ROOT import Belle2
 import numpy as np
-from B2Tools import b2latex, format
+from B2Tools import b2latex
 
 import os
-import shutil
-import sys
-import hashlib
 
 
 def getCommandLineOptions():

@@ -55,15 +55,14 @@ namespace Belle2 {
       phVtx(TVector3()), phMmom(TVector3()), phMvtx(TVector3()), phPvtx(TVector3()), phPmom(TVector3()),
       phGMvtx(TVector3()), phGMmom(TVector3()), modOrig(TVector3()), source(0), phPDG(0), phMPDG(0), phPPDG(0),
       phGMPDG(0), type(0), edep(0.0), ttime(0.0), moduleID(0), phnw(0.0), trlen(0.0), en(0.0), ff(NULL),
-      TrHits(NULL), m_arichgp(ARICHGeometryPar::Instance())
+      TrHits(NULL)
     {
       // Set description()
       setDescription("ARICHBackground module. Used to extract information relevant for ARICH background from background files");
 
       // Add parameters
       addParam("FileName", m_filename, "output file name", string("mytree.root"));
-      addParam("BkgType", m_bkgType, "source of background (RBB_HER(LER),Touschek_HER(LER),Coulomb_HER(LER),other", string("RBB_HER"));
-
+      addParam("BkgTag", m_bkgTag, "background type tag (appended to hits in the output tree", 0);
 
     }
 
@@ -103,17 +102,7 @@ namespace Belle2 {
       TrHits->Branch("trlen", &trlen, "trlen/D");
       TrHits->Branch("en", &en, "en/D");
 
-
-      if (m_bkgType == "RBB_HER")           source = 1;
-      else if (m_bkgType == "RBB_LER")      source = 2;
-      else if (m_bkgType == "Touschek_HER") source = 3;
-      else if (m_bkgType == "Touschek_LER") source = 4;
-      else if (m_bkgType == "Coulomb_HER")  source = 5;
-      else if (m_bkgType == "Coulomb_LER")  source = 6;
-      else if (m_bkgType == "BHWide_HER")   source = 7;
-      else if (m_bkgType == "BHWide_LER")   source = 8;
-      else                                source = atoi(m_bkgType.c_str());
-
+      source = m_bkgTag;
     }
 
     void ARICHBackgroundModule::beginRun()
@@ -148,8 +137,10 @@ namespace Belle2 {
         phPDG = arichhit->getPDG();
         phpos = arichhit->getPosition();
         phmom = arichhit->getMomentum();
-        moduleID = m_arichgp->getCopyNo(phpos);
-        modOrig = m_arichgp->getOrigin(moduleID);
+        moduleID = m_arichgp->getDetectorPlane().pointSlotID(phpos.X(), phpos.Y());
+        double r = m_arichgp->getDetectorPlane().getSlotR(moduleID);
+        double phi = m_arichgp->getDetectorPlane().getSlotPhi(moduleID);
+        modOrig = TVector3(r * cos(phi), r * sin(phi), 0);
         en = arichhit->getEnergy();
 
         if (phPDG == 2112) {
@@ -195,13 +186,7 @@ namespace Belle2 {
 
       for (int iHit = 0; iHit < nHits; ++iHit) {
         ARICHSimHit* simHit = arichSimHits[iHit];
-        TVector2 locpos(simHit->getLocalPosition().X(), simHit->getLocalPosition().Y());
-        int channelID = m_arichgp->getChannelID(locpos);
-
-        if (channelID < 0) continue;
         moduleID = simHit->getModuleID();
-        modOrig = m_arichgp->getOrigin(moduleID);
-        phpos = m_arichgp->getChannelCenterGlob(moduleID, channelID);
         type = 2;
         phPDG = 0;
         edep = 0;

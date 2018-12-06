@@ -44,16 +44,16 @@ void SPTC2GFTCConverterModule::initialize()
 
   // Register StoreArray<genfit::TrackCand> in the DataStore
   StoreArray<genfit::TrackCand> genfitTCs(m_genfitTCName);
-  genfitTCs.registerPersistent(m_genfitTCName);
+  genfitTCs.registerInDataStore(m_genfitTCName, DataStore::c_ErrorIfAlreadyRegistered);
 
   StoreArray<SpacePointTrackCand> spTCs(m_SPTCName);
-  spTCs.required(m_SPTCName);
+  spTCs.isRequired(m_SPTCName);
 
   // Register Relation between the two StoreArrays
   spTCs.registerRelationTo(genfitTCs);
 
-  StoreArray<PXDCluster>::required(m_PXDClustersName);
-  StoreArray<SVDCluster>::required(m_SVDClustersName);
+  StoreArray<PXDCluster> PXDClusters(m_PXDClustersName); PXDClusters.isRequired(m_PXDClustersName);
+  StoreArray<SVDCluster> SVDClusters(m_SVDClustersName); SVDClusters.isRequired(m_SVDClustersName);
 }
 
 void SPTC2GFTCConverterModule::event()

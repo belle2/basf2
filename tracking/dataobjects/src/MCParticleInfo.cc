@@ -23,8 +23,6 @@ MCParticleInfo::MCParticleInfo(const MCParticle& the_mcParticle, const TVector3&
   m_myBz *= 0.299792 / 100;
 } ;
 
-MCParticleInfo::~MCParticleInfo() {};
-
 double
 MCParticleInfo::getD0()
 {

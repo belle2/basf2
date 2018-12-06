@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/modules/SignalSideVariablesToExtraInfo/SignalSideVariablesToExtraInfoModule.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
@@ -36,29 +37,25 @@ SignalSideVariablesToExtraInfoModule::SignalSideVariablesToExtraInfoModule() : M
   std::map<std::string, std::string> emptymap;
   addParam("particleListName", m_particleListName, "The input particleList name. This list should contain at most 1 particle",
            std::string(""));
-  addParam("variableToExtraInfo", m_variableToExtraInfo, "Dictionary of variable and extraInfo name to save in the extra-info field.",
+  addParam("variableToExtraInfo", m_variableToExtraInfo,
+           "Dictionary of variables and extraInfo names to save in the extra-info field.",
            emptymap);
 }
 
 void SignalSideVariablesToExtraInfoModule::initialize()
 {
-  StoreArray<Particle>::required();
+  StoreArray<Particle>().isRequired();
   m_inputList.isRequired(m_particleListName);
-
-  // function pointer
-  if (m_variableToExtraInfo.size() != 1)
-    B2ERROR("Have to provide exactly one variable and extraInfo name pair!");
 
   for (const auto& pair : m_variableToExtraInfo) {
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(pair.first);
     if (!var) {
       B2ERROR("Variable '" << pair.first << "' is not available in Variable::Manager!");
     } else {
-      m_function = var->function;
-      m_extraInfoName = pair.second;
+      m_functions.push_back(var->function);
+      m_extraInfoNames.push_back(pair.second);
     }
   }
-
 }
 
 void SignalSideVariablesToExtraInfoModule::event()
@@ -70,22 +67,19 @@ void SignalSideVariablesToExtraInfoModule::event()
     return;
 
   if (n > 1)
-    B2WARNING("Input ParticleList " << m_particleListName << " contains more then 1 particle. plist.size = " << n);
+    B2WARNING("Input ParticleList " << m_particleListName << " contains more than 1 particle. plist.size = " << n);
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
     Particle* signalSide = roe->getRelated<Particle>();
 
-    // get the value
-    double value = m_function(plist->getParticle(0));
-
-    // write extra info
-    if (signalSide->hasExtraInfo(m_extraInfoName)) {
-      B2WARNING("Extra info with given name " << m_extraInfoName << " already set, I won't set it again.");
-    } else {
-      signalSide->addExtraInfo(m_extraInfoName, value);
+    const unsigned int nVars = m_functions.size();
+    for (unsigned int iVar = 0; iVar < nVars; iVar++) {
+      if (signalSide->hasExtraInfo(m_extraInfoNames[iVar])) {
+        B2WARNING("Extra info with given name " << m_extraInfoNames[iVar] << " already set, I won't set it again.");
+      } else {
+        signalSide->addExtraInfo(m_extraInfoNames[iVar], m_functions[iVar](plist->getParticle(0)));
+      }
     }
   }
 }
-
-

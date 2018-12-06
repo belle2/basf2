@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
 
     /**! The Class title*/
-    ClassDef(TRGGDLResults, 1); /*< the class title */
+    ClassDef(TRGGDLResults, 2); /*< the class title */
     TRGGDLResults(): m_L1TriggerResults(0) {}
     ~TRGGDLResults() {}
 

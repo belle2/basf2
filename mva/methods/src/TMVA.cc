@@ -9,22 +9,11 @@
  **************************************************************************/
 
 #include <mva/methods/TMVA.h>
-
-#include <framework/logging/Logger.h>
-
-#include <TFile.h>
-#include <TTree.h>
+#include <framework/utilities/ScopeGuard.h>
 #include <TPluginManager.h>
-#include <TROOT.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 
 namespace Belle2 {
   namespace MVA {
@@ -128,7 +117,7 @@ namespace Belle2 {
       }
 
       Weightfile weightfile;
-      std::string logfilename = weightfile.getFileName(".log");
+      std::string logfilename = weightfile.generateFileName(".log");
 
       // Pipe stdout into a logfile to get TMVA output, which contains valueable information
       // which cannot be retreived otherwise!
@@ -205,7 +194,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      WorkingDirectoryManager dummy(directory);
+      auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())
@@ -315,7 +304,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      WorkingDirectoryManager dummy(directory);
+      auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())
@@ -413,7 +402,7 @@ namespace Belle2 {
       }
 
       if (weightfile.containsElement("TMVA_Logfile")) {
-        std::string custom_weightfile = weightfile.getFileName("logfile");
+        std::string custom_weightfile = weightfile.generateFileName("logfile");
         weightfile.getFile("TMVA_Logfile", custom_weightfile);
       }
 
@@ -426,7 +415,7 @@ namespace Belle2 {
       expert_signalFraction = weightfile.getSignalFraction();
 
       // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
-      std::string custom_weightfile = weightfile.getFileName(std::string("_") + specific_options.m_method + ".weights.xml");
+      std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");
       weightfile.getFile("TMVA_Weightfile", custom_weightfile);
 
       TMVAExpert::load(weightfile);
@@ -457,7 +446,7 @@ namespace Belle2 {
       weightfile.getOptions(specific_options);
 
       // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
-      std::string custom_weightfile = weightfile.getFileName(std::string("_") + specific_options.m_method + ".weights.xml");
+      std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");
       weightfile.getFile("TMVA_Weightfile", custom_weightfile);
 
       TMVAExpert::load(weightfile);

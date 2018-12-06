@@ -11,6 +11,13 @@
 #ifndef ARICHRELATEMODULE_H
 #define ARICHRELATEMODULE_H
 
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
+
+#include <framework/datastore/StoreArray.h>
+
 #include <framework/core/Module.h>
 #include <string>
 #include <TFile.h>
@@ -39,30 +46,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * Prints module parameters.
@@ -70,6 +77,12 @@ namespace Belle2 {
     void printModuleParams() const;
 
   private:
+
+    // required input
+    StoreArray<MCParticle> m_mcParticles; /**< Required array of input MCParticles */
+    StoreArray<Track> m_mdstTracks; /**< Required array of input Tracks */
+    StoreArray<ARICHAeroHit> m_aeroHits; /**< Required array of input ARICHAeroHits */
+    StoreArray<ExtHit> m_extHits; /**< Required array of input ExtHits */
 
   };
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# @cond
+
 # Thomas Keck 2016
 
 """
@@ -97,7 +99,7 @@ MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'isPrimarySignal': ('isPrimarySignal', 2, -0.5, 1.5),
                              'chiProb': ('chiProb', 100, 0.0, 1.0),
                              'Mbc': ('Mbc', 100, 5.1, 5.4),
-                             'cosThetaBetweenParticleAndTrueB': ('cosThetaBetweenParticleAndTrueB', 100, -10.0, 10.0),
+                             'cosThetaBetweenParticleAndNominalB': ('cosThetaBetweenParticleAndNominalB', 100, -10.0, 10.0),
                              'extraInfo(SignalProbability)': ('extraInfo(SignalProbability)', 100, 0.0, 1.0),
                              'extraInfo(decayModeID)': ('extraInfo(decayModeID)', 101, -0.5, 100.5),
                              'extraInfo(uniqueSignal)': ('extraInfo(uniqueSignal)', 2, -0.5, 1.5),

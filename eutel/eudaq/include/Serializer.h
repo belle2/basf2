@@ -12,13 +12,14 @@
 namespace eudaq {
 
   class InterruptedException : public std::exception {
-    const char* what() const throw() { return "InterruptedException"; }
+    const char* what() const noexcept { return "InterruptedException"; }
   };
 
   class Serializer {
   public:
     virtual void Flush() {}
-    void write(const Serializable& t) {
+    void write(const Serializable& t)
+    {
       t.Serialize(*this);
     }
     template<typename T>
@@ -45,10 +46,12 @@ namespace eudaq {
     static writer GetFunc(double*) { return write_double; }
     static writer GetFunc(...) { return write_int; }
 
-    static void write_ser(Serializer& sr, const T& v) {
+    static void write_ser(Serializer& sr, const T& v)
+    {
       v.Serialize(sr);
     }
-    static void write_int(Serializer& sr, const T& v) {
+    static void write_int(Serializer& sr, const T& v)
+    {
       T t = v;
       unsigned char buf[sizeof t];
       for (size_t i = 0; i < sizeof t; ++i) {
@@ -57,7 +60,8 @@ namespace eudaq {
       }
       sr.Serialize(buf, sizeof t);
     }
-    static void write_float(Serializer& sr, const float& v) {
+    static void write_float(Serializer& sr, const float& v)
+    {
       unsigned t = *(unsigned*)&v;
       unsigned char buf[sizeof t];
       for (size_t i = 0; i < sizeof t; ++i) {
@@ -66,7 +70,8 @@ namespace eudaq {
       }
       sr.Serialize(buf, sizeof t);
     }
-    static void write_double(Serializer& sr, const double& v) {
+    static void write_double(Serializer& sr, const double& v)
+    {
       unsigned long long t = *(unsigned long long*)&v;
       unsigned char buf[sizeof t];
       for (size_t i = 0; i < sizeof t; ++i) {
@@ -158,7 +163,8 @@ namespace eudaq {
     void read(std::pair<T, U>& t);
 
     template <typename T>
-    T read() {
+    T read()
+    {
       T t;
       read(t);
       return t;
@@ -181,10 +187,12 @@ namespace eudaq {
     static reader GetFunc(double*) { return read_double; }
     static reader GetFunc(...) { return read_int; }
 
-    static T read_ser(Deserializer& ds) {
+    static T read_ser(Deserializer& ds)
+    {
       return T(ds);
     }
-    static T read_int(Deserializer& ds) {
+    static T read_int(Deserializer& ds)
+    {
       unsigned char buf[sizeof(T)];
       ds.Deserialize(buf, sizeof(T));
       T t = 0;
@@ -194,7 +202,8 @@ namespace eudaq {
       }
       return t;
     }
-    static float read_float(Deserializer& ds) {
+    static float read_float(Deserializer& ds)
+    {
       unsigned char buf[sizeof(float)];
       ds.Deserialize(buf, sizeof buf);
       unsigned t = 0;
@@ -204,7 +213,8 @@ namespace eudaq {
       }
       return *(float*)&t;
     }
-    static double read_double(Deserializer& ds) {
+    static double read_double(Deserializer& ds)
+    {
       union { double d; unsigned long long i; unsigned char b[sizeof(double)]; } u;
       //unsigned char buf[sizeof (double)];
       ds.Deserialize(u.b, sizeof u.b);

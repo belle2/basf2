@@ -8,14 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_POLAR
-#define ECL_CANVAS_POLAR
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH2.h>
-#include <TCrown.h>
-#include <TText.h>
-#include <TAxis.h>
+
+class TH2F;
+class TCrown;
+class TText;
 
 namespace Belle2 {
   /**
@@ -67,7 +67,7 @@ namespace Belle2 {
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
      */
-    virtual void getInformation(int px, int py, MultilineWidget* panel);
+    virtual void getInformation(int px, int py, MultilineWidget* panel) override;
 
     /**
      * Return subtype of ECLPainterPolar.
@@ -77,8 +77,6 @@ namespace Belle2 {
     /**
      * Redraw the canvas.
      */
-    virtual void Draw();
+    virtual void Draw() override;
   };
 }
-
-#endif // ECL_CANVAS_POLAR

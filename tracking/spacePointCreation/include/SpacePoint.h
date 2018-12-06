@@ -172,6 +172,13 @@ namespace Belle2 {
     /** Setter for association with a track.*/
     void setAssignmentState(bool isAssigned) const { m_isAssigned = isAssigned; }
 
+    /// Returns true if the SP is single clustered and the cluster is a u cluster
+    bool isUOnly() const { return m_clustersAssigned.first and not m_clustersAssigned.second; }
+    /// Returns true if the SP is single clustered and the cluster is a v cluster
+    bool isVOnly() const { return not m_clustersAssigned.first and m_clustersAssigned.second; }
+    /// Returns true if the SP is not single clustered
+    bool isUAndV() const { return m_clustersAssigned.first and m_clustersAssigned.second; }
+
     /** Getter for status of assignment to a track.*/
     bool getAssignmentState() const { return m_isAssigned; }
 
@@ -180,6 +187,13 @@ namespace Belle2 {
 
     /** Getter for the quality of this SpacePoint.*/
     float getQualityEstimation() const { return m_qualityIndicator; }
+
+    /** Setter for the spacePoint quality index error */
+    void setQualityEstimationError(double qualityIndicatorError) {m_qualityIndicatorError = qualityIndicatorError;}
+
+    /** Getter for the spacePoint quality index error*/
+    float getQualityEstimationError() const {return m_qualityIndicatorError;}
+
 
 //---------------------------------------------------------------------------------------------------------------------
 //TODO: Some clarification, if the following conversions and especially the staticness of the functions below is needed
@@ -311,7 +325,8 @@ namespace Belle2 {
                             uSigma * uSigma,
                             vSigma * vSigma,
                             0
-                          )
+                          ),
+                          true // use alignment in transformation
                         );
       m_positionError.Sqrt();
     }
@@ -368,6 +383,13 @@ namespace Belle2 {
      */
     float m_qualityIndicator {0.5};
 
+
+    /** Stores the error on the quality indicator.
+     *
+     * The value comes from the binning error on the pdfs from which the QI is derived.
+     */
+    float m_qualityIndicatorError {0.5};
+
     /** Stores whether this SpacePoint is connected to a track.
      *
      *  We assume, that const for SpacePoint means, things like position et cetera remain constant.
@@ -376,6 +398,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 12)
+    ClassDefOverride(SpacePoint, 13)
   };
 }

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <TFile.h>
 #include <TObject.h>
 
 namespace Belle2 {
@@ -33,6 +34,11 @@ namespace Belle2 {
     virtual ~CDCDedxDatabaseImporter() {};
 
     /**
+     * Import a set of dedx:momentum pdfs
+     */
+    void importPDFs();
+
+    /**
      * Import a scale factor to make electron dE/dx ~ 1
      */
     void importScaleFactor(double scale);
@@ -45,7 +51,7 @@ namespace Belle2 {
     /**
      * Import predicted mean parameters to the database
      */
-    void importCurveParameters();
+    void importMeanParameters();
 
     /**
      * Import predicted resolution parameters to the database
@@ -57,7 +63,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputFileNames; /**< Name of input ROOT files */
     std::string m_name; /**< Name of database ROOT file */
 
-    ClassDef(CDCDedxDatabaseImporter, 1); /**< ClassDef */
+    ClassDef(CDCDedxDatabaseImporter, 2); /**< ClassDef */
   };
 
 } // Belle2 namespace

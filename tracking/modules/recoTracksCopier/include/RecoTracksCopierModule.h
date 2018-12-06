@@ -13,6 +13,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
 
 /**
  * Very simple module to copy an array of RecoTracks into another one. Copies all hits but not the fitted information.
@@ -26,10 +27,10 @@ namespace Belle2 {
     RecoTracksCopierModule();
 
     /// Declare required StoreArray
-    virtual void initialize() override;
+    void initialize() override;
 
     /// Event processing, copies store array
-    virtual void event() override;
+    void event() override;
 
   private:
     /// Name of the input StoreArray
@@ -41,6 +42,11 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_inputRecoTracks;
     /// Store Array of the output tracks
     StoreArray<RecoTrack> m_outputRecoTracks;
+    /// Store Array of the input tracks (for relations)
+    StoreArray<Track> m_tracks;
+
+    /// Parameter: Copy only fitted tracks
+    bool m_param_onlyFittedTracks = false;
   };
 }
 

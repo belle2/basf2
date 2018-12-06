@@ -5,9 +5,9 @@
 
 """
 <header>
-  <input>MDSTtoUDST.udst.root</input>
-  <output>UDSTtoNTUP.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+<input>../MDSTtoUDST.udst.root</input>
+<output>../UDSTtoNTUP.ntup.root</output>
+<contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>
 """
 
@@ -20,11 +20,11 @@ sys.stdout = open(logFileName, 'w')
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
-from stdPhotons import *
+from stdCharged import stdPi
+from stdPhotons import stdPhotons
 
 inputMdst('default', '../MDSTtoUDST.udst.root')
-loadStdCharged()
+stdPi('all')
 stdPhotons('all')
 
 # Here the ParticleLists will be extracted from the UDST to dump to ntuple

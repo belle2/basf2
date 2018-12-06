@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Matic Lubej                                              *
+ * Contributors: Matic Lubej, Sviatoslav Bilokin                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,7 +13,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -24,6 +24,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <iostream>
 #include <utility>
@@ -64,12 +65,13 @@ namespace Belle2 {
   void RestOfEventInterpreterModule::initialize()
   {
     // input
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
     StoreArray<Particle> particles;
     particles.isRequired();
 
     for (auto ROEMask : m_ROEMasksWithFractions) {
       // parsing of the input tuple (maskName, trackSelectionCut, eclClusterSelectionCut, fractions)
+
       std::string maskName = get<0>(ROEMask);
       std::string trackSelection = get<1>(ROEMask);
       std::string eclClusterSelection = get<2>(ROEMask);
@@ -90,7 +92,6 @@ namespace Belle2 {
 
   void RestOfEventInterpreterModule::event()
   {
-    // input Particle
     StoreObjPtr<ParticleList> plist(m_particleList);
 
     unsigned int nParts = plist->getListSize();
@@ -98,164 +99,14 @@ namespace Belle2 {
     for (unsigned i = 0; i < nParts; i++) {
       const Particle* particle = plist->getParticle(i);
       RestOfEvent* roe = particle->getRelated<RestOfEvent>();
-
-      // Get vector of all pre-existing mask names
-      std::vector<std::string> allMaskNames = roe->getMaskNames();
-
-      stringAndMapOfIntAndBoolMap trackMasks;
-      stringAndMapOfIntAndBoolMap eclClusterMasks;
-      stringAndVectorMap subsetOfFractions;
-
-      // Create track and cluster masks for all interpretations
-      for (auto maskName : m_maskNames) {
-
-        intAndBoolMap trackMask;
-        intAndBoolMap eclClusterMask;
-
-        // Create track masks
-        std::vector<const Track*> roeTracks = roe->getTracks();
-        std::vector<double> fractionsVector = m_setOfFractions.at(maskName);
-
-        if (fractionsVector.empty())
-          if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) != allMaskNames.end())
-            fractionsVector = roe->getChargedStableFractions(maskName);
-
-        const int n = Const::ChargedStable::c_SetSize;
-        double fractionsArray[n];
-
-        if (fractionsVector.size() == n) {
-          for (unsigned int j = 0; j < n; j++)
-            fractionsArray[j] = fractionsVector[j];
+      for (auto& maskName : m_maskNames) {
+        if (!m_update) {
+          roe->initializeMask(maskName, "ROEInterpreterModule");
         }
-
-        for (unsigned j = 0; j < roeTracks.size(); j++) {
-          const Track* track = roeTracks[j];
-          const PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
-          int particlePDG = Const::pion.getPDGCode();
-
-          if (fractionsVector.size() == n)
-            particlePDG = pid->getMostLikely(fractionsArray).getPDGCode();
-          else if (fractionsVector.size() == 1 and fractionsVector[0] == -1) {
-            const MCParticle* mcp = track->getRelatedTo<MCParticle>();
-            // Use pion as default if not MC particle is found
-            if (mcp)
-              particlePDG = abs(mcp->getPDG());
-          } else
-            B2FATAL("Size of fractions vector not appropriate! Check the fractions in the ROEInterpreter with mask name: " << maskName);
-
-          // Skip tracks with charge 0
-          Const::ChargedStable type(particlePDG);
-          const TrackFitResult* tfr = track->getTrackFitResultWithClosestMass(type);
-
-          if (!tfr)
-            continue;
-
-          int charge = tfr->getChargeSign();
-
-          if (charge == 0) {
-            B2WARNING("Track with charge=0, this track will always be ignored in ROE!");
-
-            // If it's a new mask, set to zero, otherwise leave unchanged
-            if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) == allMaskNames.end()) {
-              std::pair<intAndBoolMap::iterator, bool> ret;
-              ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), false));
-
-              if (!ret.second)
-                B2FATAL("Failed to add Track with ID '" << track->getArrayIndex() << "' to this Track mask! Something is wrong.");
-            }
-          } else {
-
-            Particle p(track, type);
-            Particle* tempPart = &p;
-
-            // Is it a new mask?
-            if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) == allMaskNames.end()) {
-              std::pair<intAndBoolMap::iterator, bool> ret;
-              if (m_trackCuts.at(maskName)->check(tempPart))
-                ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), true));
-              else
-                ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), false));
-
-              if (!ret.second)
-                B2FATAL("Failed to add Track with ID '" << track->getArrayIndex() << "' to this Track mask! Something is wrong.");
-            }
-            // Or does it already exist?
-            else if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) != allMaskNames.end()) {
-              // If updating set to true OK, otherwise fatal
-              if (m_update) {
-                intAndBoolMap existingTrackMask = roe->getTrackMask(maskName);
-                if (!m_trackCuts.at(maskName)->check(tempPart))
-                  existingTrackMask.at(track->getArrayIndex()) = false;
-                roe->updateTrackMask(maskName, existingTrackMask);
-              } else
-                B2FATAL("ROE mask with name \'" << maskName <<
-                        "\' already exists! If you want to update with new cuts, use updateROEMask- python functions!");
-            }
-          }
-        }
-
-        // Create cluster masks
-        std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters();
-        for (unsigned j = 0; j < roeECLClusters.size(); j++) {
-          const ECLCluster* cluster = roeECLClusters[j];
-
-          Particle p(cluster);
-          Particle* tempPart = &p;
-
-          // Is it a new mask?
-          if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) == allMaskNames.end()) {
-            std::pair<intAndBoolMap::iterator, bool> ret;
-            if (m_eclClusterCuts.at(maskName)->check(tempPart))
-              ret = eclClusterMask.insert(intAndBoolMap::value_type(cluster->getArrayIndex(), true));
-            else
-              ret = eclClusterMask.insert(intAndBoolMap::value_type(cluster->getArrayIndex(), false));
-
-            if (!ret.second)
-              B2FATAL("Failed to add ECLCluster with ID '" << cluster->getArrayIndex() << "' to this ECLCluster mask! Something is wrong.");
-          }
-          // Or does it already exist?
-          else if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) != allMaskNames.end()) {
-            // If updating set to true OK, otherwise fatal
-            if (m_update) {
-              intAndBoolMap existingECLClusterMask = roe->getECLClusterMask(maskName);
-              if (!m_eclClusterCuts.at(maskName)->check(tempPart))
-                existingECLClusterMask.at(cluster->getArrayIndex()) = false;
-              roe->updateECLClusterMask(maskName, existingECLClusterMask);
-            } else
-              B2FATAL("ROE mask with name \'" << maskName <<
-                      "\' already exists! If you want to update with new cuts, use updateROE- python functions!");
-          }
-        }
-
-        // If mask already exists, no need to append it again
-        if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) != allMaskNames.end()) {
-          if (!m_setOfFractions.at(maskName).empty())
-            roe->updateChargedStableFractions(maskName, m_setOfFractions.at(maskName));
-          continue;
-        }
-
-        // Final check, just in case
-        if (trackMask.size() != (unsigned) roe->getNTracks())
-          B2FATAL("Track mask size does not have appropriate size!");
-        if (eclClusterMask.size() != (unsigned) roe->getNECLClusters())
-          B2FATAL("ECLCluster mask size does not have appropriate size!");
-
-        // Insert mask to map of masks
-        std::pair<stringAndMapOfIntAndBoolMap::iterator, bool> retT;
-        std::pair<stringAndMapOfIntAndBoolMap::iterator, bool> retE;
-        std::pair<stringAndVectorMap::iterator, bool> retF;
-
-        retT = trackMasks.insert(stringAndMapOfIntAndBoolMap::value_type(maskName, trackMask));
-        retE = eclClusterMasks.insert(stringAndMapOfIntAndBoolMap::value_type(maskName, eclClusterMask));
-        retF = subsetOfFractions.insert(stringAndVectorMap::value_type(maskName, m_setOfFractions.at(maskName)));
-
-        if (!retT.second or !retE.second or !retF.second)
-          B2ERROR("Something wrong with collecting ROE mask with name '" << maskName << "'!");
+        roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), nullptr, m_update);
+        roe->updateChargedStableFractions(maskName, m_setOfFractions.at(maskName));
       }
-
-      roe->appendTrackMasks(trackMasks);
-      roe->appendECLClusterMasks(eclClusterMasks);
-      roe->appendChargedStableFractionsSet(subsetOfFractions);
     }
   }
+
 }

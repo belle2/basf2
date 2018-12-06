@@ -31,12 +31,12 @@ RoiSenderCallback::RoiSenderCallback()
   s_roisender = this;
 }
 
-RoiSenderCallback::~RoiSenderCallback() throw()
+RoiSenderCallback::~RoiSenderCallback()
 {
 
 }
 
-void RoiSenderCallback::load(const DBObject&) throw(RCHandlerException)
+void RoiSenderCallback::load(const DBObject&, const std::string&)
 {
   // 1. Set execution directory
   //  char* chr_execdir = m_conf->getconf("expreco","execdir_base");
@@ -53,7 +53,7 @@ void RoiSenderCallback::load(const DBObject&) throw(RCHandlerException)
   m_proc = new RFProcessManager(nodename);
 
   // 3. Initialize log manager
-  m_log = new RFLogManager(nodename);
+  m_log = new RFLogManager(nodename, nodename);
 
   // 4. Initialize local shared memory
   m_shm = new RFSharedMem(nodename);
@@ -62,7 +62,7 @@ void RoiSenderCallback::load(const DBObject&) throw(RCHandlerException)
   // 5. Run MergerMerge
   char* merger = m_conf->getconf("roisender", "merger");
   char* mergerport = m_conf->getconf("roisender", "mergerport");
-  char* mergerhost = m_conf->getconf("roisender", "mergerhost");
+//   char* mergerhost = m_conf->getconf("roisender", "mergerhost");
   char* onsenhost = m_conf->getconf("roisender", "onsenhost");
   char* onsenport = m_conf->getconf("roisender", "onsenport");
 
@@ -84,15 +84,15 @@ void RoiSenderCallback::load(const DBObject&) throw(RCHandlerException)
 
 }
 
-void RoiSenderCallback::start() throw(RCHandlerException)
+void RoiSenderCallback::start()
 {
 }
 
-void RoiSenderCallback::stop() throw(RCHandlerException)
+void RoiSenderCallback::stop()
 {
 }
 
-void RoiSenderCallback::abort() throw(RCHandlerException)
+void RoiSenderCallback::abort()
 {
   // Kill processes
   int status;
@@ -106,7 +106,7 @@ void RoiSenderCallback::abort() throw(RCHandlerException)
 
 }
 
-void RoiSenderCallback::recover(const DBObject&) throw(RCHandlerException)
+void RoiSenderCallback::recover(const DBObject&, const std::string&)
 {
   // Kill processes
   int status;
@@ -119,7 +119,7 @@ void RoiSenderCallback::recover(const DBObject&) throw(RCHandlerException)
   // 1. Run merger first
   char* merger = m_conf->getconf("roisender", "merger");
   char* mergerport = m_conf->getconf("roisender", "mergerport");
-  char* mergerhost = m_conf->getconf("roisender", "mergerhost");
+//   char* mergerhost = m_conf->getconf("roisender", "mergerhost");
   char* onsenhost = m_conf->getconf("roisender", "onsenhost");
   char* onsenport = m_conf->getconf("roisender", "onsenport");
 

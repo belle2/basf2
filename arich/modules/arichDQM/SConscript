@@ -1,5 +1,6 @@
 Import('env')
- 	
-env['LIBS'] = ['framework', 'arich_dataobjects', 'arich']
+
+env['LIBS'] = ['framework', 'arich_dataobjects', 'arich', 'rawdata_dataobjects','tracking_dataobjects',
+               '$ROOT_LIBS']
 
 Return('env')

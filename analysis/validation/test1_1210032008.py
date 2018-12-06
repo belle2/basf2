@@ -31,7 +31,6 @@ from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from modularAnalysis import fillParticleList, fillParticleListFromMC
-from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
 from modularAnalysis import vertexKFit, massKFit, massVertexKFit
 from modularAnalysis import vertexRave, massVertexRave

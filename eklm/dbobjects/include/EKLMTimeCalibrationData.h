@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONDATA_H
-#define EKLMTIMECALIBRATIONDATA_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -32,7 +31,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] timeShift Time shift.
      */
-    EKLMTimeCalibrationData(double timeShift);
+    explicit EKLMTimeCalibrationData(float timeShift);
 
     /**
      * Destructor.
@@ -42,24 +41,21 @@ namespace Belle2 {
     /**
      * Set time shift.
      */
-    void setTimeShift(double timeShift);
+    void setTimeShift(float timeShift);
 
     /**
      * Get time shift.
      */
-    double getTimeShift();
+    float getTimeShift() const;
 
   private:
 
     /** Additional rotation of the segment. */
-    double m_TimeShift;
+    float m_TimeShift;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMTimeCalibrationData, 1);
+    /** Class version. */
+    ClassDef(Belle2::EKLMTimeCalibrationData, 2);
 
   };
 
 }
-
-#endif
-

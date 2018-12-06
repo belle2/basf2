@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * This module calculates the covariance matrix for a N1 showers.         *
+ * This module calculates the covariance matrix for photon showers.       *
  * The matrix depends on the shower region (FWD, Bartel, BWD)             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -17,16 +17,15 @@
 // ROOT
 #include "TMath.h"
 
-// FRAMEWORK
-#include <framework/datastore/StoreArray.h>
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
 
 // NAMESPACES
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -39,10 +38,10 @@ REG_MODULE(ECLCovarianceMatrixPureCsI)
 //-----------------------------------------------------------------
 ECLCovarianceMatrixModule::ECLCovarianceMatrixModule() : Module(),
   m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
   // Set description
-  setDescription("ECLCovarianceMatrix: Calculates ECL N1 shower covariance matrix.");
+  setDescription("ECLCovarianceMatrix: Sets the ECL photon shower covariance matrix.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 }
@@ -55,7 +54,7 @@ void ECLCovarianceMatrixModule::initialize()
 {
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 }
 
 void ECLCovarianceMatrixModule::beginRun()
@@ -68,7 +67,7 @@ void ECLCovarianceMatrixModule::event()
 {
 
   // Get the event background level
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double background = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     background = static_cast<double>(bkgdcount) / m_fullBkgdCount;
@@ -77,8 +76,8 @@ void ECLCovarianceMatrixModule::event()
   // loop over all ECLShowers
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct for N1 showers!
-    if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) {
+    // Only correct for photon showers and high energey electrons
+    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
 
       const double energy = eclShower.getEnergy();
 
@@ -101,7 +100,7 @@ void ECLCovarianceMatrixModule::event()
       double sigmaTheta = 0.;
       double sigmaPhi = 0.;
 
-      // three background levels, three detector regions, energy, theta and phi (workaround for release-00-08-00) TF
+      // three background levels, three detector regions, energy, theta and phi (needs to be revisited soon!)
       if (detregion == 1 and background < 0.05) {
         if (energy <= 0.022) {sigmaEnergy = energy * (0.0449188); }
         else {sigmaEnergy = energy * (-0.0912379 * invEnergy + 1.91849 * invRoot2Energy + -2.82169 * invRoot4Energy + 3.03119) / 100.;}

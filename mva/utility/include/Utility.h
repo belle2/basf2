@@ -82,9 +82,14 @@ namespace Belle2 {
      * @param datafiles ROOT files containing the data
      * @param treename treename of ROOT file
      * @param outputfile name of the output ROOT file
+     * @param experiment number of the experiment
+     * @param run number of the run
+     * @param event number of the event
+     * @param copy_target define if the target variable should be copied, if no target is found, an exception will be
+     * raised
      */
     void expert(const std::vector<std::string>& filenames, const std::vector<std::string>& datafile, const std::string& treename,
-                const std::string& outputfile, int experiment = 0, int run = 0, int event = 0);
+                const std::string& outputfile, int experiment = 0, int run = 0, int event = 0, bool copy_target = true);
 
     /**
      * Convenience function which performs a training on a dataset
@@ -96,7 +101,7 @@ namespace Belle2 {
                                                          Dataset& data);
 
     /**
-     * Performs an splot training, convienence function
+     * Performs an splot training, convenience function
      * @param general_options shared options of all methods
      * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method
@@ -105,7 +110,7 @@ namespace Belle2 {
                                                        const MetaOptions& meta_options);
 
     /**
-     * Performs a sideband substraction training, convienence function
+     * Performs a sideband substraction training, convenience function
      * @param general_options shared options of all methods
      * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method
@@ -115,7 +120,7 @@ namespace Belle2 {
         const MetaOptions& meta_options);
 
     /**
-     * Performs a MC vs data pre-training and afterwards reweighted training, convienence function
+     * Performs a MC vs data pre-training and afterwards reweighted training, convenience function
      * @param general_options shared options of all methods
      * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method

@@ -1,0 +1,41 @@
+# EventType: 1510830400
+# Descriptor: [B- -> Lambda0 anti-p- nu_e anti-nu_e] cc
+# NickName: LambdaPbarNuNubar
+# Documentation: 
+# Tested: Yes
+# PhysicsWG: SL&L
+# Responsible: Racha Cheaib, Mario Merola
+# Email: rcheaib@olemiss.edu, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20180117
+#
+#
+
+Alias MyB+ B+
+Alias MyB- B-
+Alias MyL Lambda0
+Alias Myanti-L anti-Lambda0
+
+Decay Upsilon(4S)
+ 0.5000 MyB+ B-                         VSS;
+ 0.5000 B+ MyB-                         VSS;
+Enddecay
+
+Decay MyB+
+ 1.0000  Myanti-L p+ nu_e anti-nu_e           PHSP;
+Enddecay
+
+Decay MyB-
+ 1.0000  MyL anti-p- nu_e anti-nu_e      PHSP;
+Enddecay
+
+Decay MyL
+ 1.0000  p+  pi-                    PHSP;
+Enddecay
+
+Decay Myanti-L
+ 1.0000  anti-p- pi+               PHSP;
+Enddecay
+
+End
+

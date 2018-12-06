@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2016-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -74,19 +74,33 @@ namespace Belle2 {
 
     /** Create a new payload downloader
      * @param localDir output directory for payloads that need to be downloaded
-     * @param restUrl base url for rest requests
+     * @param restUrl base url for rest requests. If empty a default list of
+     *    locations will be checked. The list can be changed with setServerList()
      * @param timeout timeout to wait for lock on file when another process is
      *    already downloading a payload. After that time the payload will be
      *    loaded into a temporary file.
      */
     ConditionsPayloadDownloader(const std::string& localDir = "centraldb",
-                                const std::string& restUrl = "http://belle2db.hep.pnnl.gov/b2s/rest/",
+                                const std::string& restUrl = "",
                                 int timeout = 10);
     /** Destructor */
     ~ConditionsPayloadDownloader();
 
     /** Set the base of the url used for REST requests to the central server */
-    void setRESTBase(const std::string& restUrl) { m_restUrl = restUrl; }
+    void setRESTBase(const std::string& restUrl)
+    {
+      m_restUrl = restUrl;
+    }
+
+    /** Set the server list to try to connect to a central server
+     *  @param servList list of urls to try in turn to find a suitable server
+     *    to connect to. The servers will be tried in order until one succeeds
+     */
+    void setServerList(const std::vector<std::string>& serverList)
+    {
+      m_serverList = serverList;
+      m_restUrl = "";
+    }
 
     /** Add a directory to the list of directories to look for payloads before
      * downloading them.
@@ -204,6 +218,8 @@ namespace Belle2 {
     std::unique_ptr<ConditionsCurlSession> m_session;
     /** flag to indicate whether curl has been initialized already */
     static bool s_globalInit;
+    /** fallback URLs in case primary one doesn't work */
+    std::vector<std::string> m_serverList{"http://belle2db.sdcc.bnl.gov/b2s/rest/", "http://belle2db.hep.pnnl.gov/b2s/rest/"};
     /** base url to prepend to the rest calls */
     std::string m_restUrl;
     /** local directories where we look for payloads. If we cannot find them

@@ -4,7 +4,7 @@
 #
 # This is example script to run extract ARICH background relevant data
 # from prepared background samples. In runs ARICHBackground module and
-# produces root file with TTree, needed to produce bakcground plots.
+# produces root file with TTree, needed to produce arich background plots.
 #
 # Please check and adjust input file list and method, as this example is
 # specific for background files produced by Nakayama-san.
@@ -19,11 +19,13 @@ logging.log_level = LogLevel.WARNING
 
 print('')
 print('Use the script as: basf2 ARICHBkg.py arguments')
-print('Arguments are in the following order: type (RBB_HER,Touschek_HER,...), path to files , '
-      'job number , number of files to analyse')
+print('Arguments are in the following order: type (RBB,Touschek_HER,...), path to files , '
+      'job number , number of input files , background tag')
 print('')
-print('example: basf2 ARICHBkg.py RBB_HER /gpfs/home/belle/nakayama/basf2_opt/release_201502_development/Work_MCgen/output/ 0 100')
-print('will analyse first hundred RBB_HER files')
+print('example: basf2 ARICHBkg.py RBB /gpfs/home/belle/nakayama/basf2_opt/release_201502_development/Work_MCgen/output/ 2 100 0')
+print('will analyse files in output dir with index numbers from 200-299.')
+print('Background tag is int appended to all hits (to identify contributions from different sources at later analysis')
+print('use 0 for RBB, 1 for BHWide, 2 Touschek_HER, 3 Touschek_LER, 4 Coulomb_HER, 5 Coulomb_LER, 6 2-photon, 7 BHWideLargeAngle')
 print('')
 
 # -------------------------
@@ -43,21 +45,28 @@ typee = sys.argv[1]
 path = sys.argv[2]
 n = int(sys.argv[3])
 nfiles = int(sys.argv[4])
+tag = int(sys.argv[5])
+
 fnames = []
 
-patha = path + 'output_' + typee + '_study_'
+# input file naming
+# patha = path + typee + '_study-phase2-'
+patha = path + typee + '_study-phase3-'
 
-for i in range(nfiles * n, nfiles * (n + 1)):
+for i in range(n * nfiles, (n + 1) * nfiles):
     filenn = patha + str(i) + '.root'
     fnames.append(filenn)
 
-out = 'arich_' + typee + '_' + str(n) + '.root'
+# output file name
+out = 'arich_' + typee + '_' + sys.argv[3] + '.root'
+# out = 'arich_' + typee + '_' + sys.argv[3] + '_phase2.root'
+
 print('Output file: ' + out)
 
 input.param('inputFileNames', fnames)
 geobuilder.param('components', ['ARICH'])
 back.param('FileName', out)
-
+back.param('BkgTag', tag)
 # create path
 main = create_path()
 

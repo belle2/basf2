@@ -6,8 +6,7 @@
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisExample_h
-#define _Belle2_DQMHistAnalysisExample_h
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -29,13 +28,13 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisExampleModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     //! Parameters accesible from basf2 scripts
   protected:
@@ -44,10 +43,9 @@ namespace Belle2 {
 
     //! Data members
   private:
-    TF1* m_f;
-    TCanvas* m_c;
+    TF1* m_f = nullptr;
+    TCanvas* m_c = nullptr;
 
   };
 } // end namespace Belle2
 
-#endif

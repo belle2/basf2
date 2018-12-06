@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef DECAYSTRINGGRAMMAR_H
-#define DECAYSTRINGGRAMMAR_H
+#pragma once
 #include <boost/spirit/include/qi.hpp>
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <analysis/DecayDescriptor/DecayStringDecay.h>
@@ -20,10 +19,14 @@
 namespace Belle2 {
   /** This class describes the grammar and the syntax elements of decay strings.
   It is used to parse a given decay string to C++ structs which are then used
-  to initialise the DecayDescriptor class. */
+  to initialise the DecayDescriptor class.
+
+  User documentation is located at analysis/doc/DecayDescriptor.rst
+  Please modify in accordingly to introduced changes.*/
   template <typename Iterator>
   struct DecayStringGrammar : boost::spirit::qi::grammar<Iterator, DecayString(), boost::spirit::ascii::space_type> {
-    DecayStringGrammar() : DecayStringGrammar::base_type(start) {
+    DecayStringGrammar() : DecayStringGrammar::base_type(start)
+  {
     using boost::spirit::ascii::char_;
     using boost::spirit::ascii::string;
     using boost::spirit::ascii::space;
@@ -31,8 +34,10 @@ namespace Belle2 {
     using boost::spirit::qi::lexeme;
     using boost::spirit::repeat;
 
-    // Reserved characters for steering
-    reserved = space || '^' || '[' || ']' || '>' || ':';
+    // Reserved characters for steering - cppcheck doesn't understand the
+    // boost::spirit syntax so we suppress warnings
+    // cppcheck-suppress knownConditionTrueFalse
+    reserved = space || '^' || '[' || ']' || '>' || ':' || '.';
 
     // particle composed of selector, particle name, and user label: "^D_s+:label"
     particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;
@@ -79,4 +84,3 @@ namespace Belle2 {
   boost::spirit::qi::rule<Iterator, DecayString(), boost::spirit::ascii::space_type> start;
   };
 }
-#endif // DECAYSTRINGGRAMMAR_H

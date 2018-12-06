@@ -21,6 +21,7 @@ import datetime
 import localcontrol
 
 import json_objects
+import mail_log
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
 import pprint
@@ -87,7 +88,7 @@ def statistics_plots(
             by load from other processes on the execution host."""))
     if contact:
         hGlobalTiming.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
-    for (index, method) in statistics.EStatisticCounters.values.items():
+    for (index, method) in statistics.StatisticCounters.values.items():
         methodName[method] = str(method)[0] \
             + str(method).lower()[1:].replace('_r', 'R')
         if index == 5:
@@ -1203,6 +1204,15 @@ def execute(tag=None, isTest=None):
             validation.log.note('Start creating plots...')
             validation.create_plots()
             validation.log.note('Plots have been created...')
+            # send mails
+            if cmd_arguments.send_mails:
+                mails = mail_log.Mails(validation)
+                validation.log.note('Send mails...')
+                # send mails to all users with failed scripts/comparison
+                mails.send_all_mails()
+                validation.log.note('Save mail data to {}'.format(validation.get_log_folder()))
+                # save json with data about outgoing mails
+                mails.write_log()
         else:
             validation.log.note('Skipping plot creation (dry run)...')
 

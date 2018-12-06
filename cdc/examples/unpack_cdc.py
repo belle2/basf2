@@ -14,8 +14,9 @@ from ROOT import Belle2
 set_log_level(LogLevel.INFO)
 
 # Set Database
+reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+use_central_database("Calibration_Offline_Development", LogLevel.INFO)
 
 # Input file
 # Get type of input file to decide, which input module we want to use

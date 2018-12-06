@@ -30,10 +30,10 @@ namespace Belle2 {
     PXDSVDCutModule();
 
     /** Initializes the Module. */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** Applies the selected quality estimation method for a given set of TCs */
-    virtual void event() override;
+    void event() override;
 
 
   protected:

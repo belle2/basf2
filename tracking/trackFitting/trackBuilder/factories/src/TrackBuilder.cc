@@ -35,7 +35,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(100, trackReps.size() << " track representations available.");
-  Track newTrack;
+  Track newTrack(recoTrack.getQualityIndicator());
 
   bool repAlreadySet = false;
   unsigned int repIDPlusOne = 0;
@@ -120,10 +120,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
   if (newTrack.getNumberOfFittedHypotheses() > 0) {
     Track* addedTrack = tracks.appendNew(newTrack);
     addedTrack->addRelationTo(&recoTrack);
-    const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);
+    const auto& mcParticleWithWeight = recoTrack.getRelatedToWithWeight<MCParticle>(m_mcParticleColName);
+    const MCParticle* mcParticle = mcParticleWithWeight.first;
     if (mcParticle) {
       B2DEBUG(200, "Relation to MCParticle set.");
-      addedTrack->addRelationTo(mcParticle);
+      addedTrack->addRelationTo(mcParticle, mcParticleWithWeight.second);
     } else {
       B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
     }

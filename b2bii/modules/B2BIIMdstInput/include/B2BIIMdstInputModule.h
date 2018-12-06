@@ -10,6 +10,9 @@
 #define B2BIIMDST_INPUT_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
 #include "belle_legacy/panther/panther.h"
@@ -45,6 +48,9 @@ namespace Belle2 {
 
     // Data members
   private:
+
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< event meta data Object pointer */
+
     /** Get list of input files, taking -i command line overrides into account. */
     std::vector<std::string> getInputFiles() const;
 

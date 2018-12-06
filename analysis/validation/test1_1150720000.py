@@ -72,14 +72,14 @@ appendROEMasks('B0:sl_rec', [m0, m1])
 def setVars(mask_i):
     variables.addAlias('ROECharge' + str(mask_i), 'ROE_charge(m' + str(mask_i) + ')')
     variables.addAlias('ROEDE' + str(mask_i), 'ROE_deltae(m' + str(mask_i) + ')')
-    variables.addAlias('sigDE' + str(mask_i), 'correctedB_deltae(m' + str(mask_i) + ',0)')
-    variables.addAlias('sigMbc' + str(mask_i), 'correctedB_mbc(m' + str(mask_i) + ',0)')
-    variables.addAlias('sigDELab' + str(mask_i), 'correctedB_deltae(m' + str(mask_i) + ',1)')
-    variables.addAlias('sigMbcLab' + str(mask_i), 'correctedB_mbc(m' + str(mask_i) + ',1)')
+    variables.addAlias('sigDE' + str(mask_i), 'WE_deltae(m' + str(mask_i) + ',0)')
+    variables.addAlias('sigMbc' + str(mask_i), 'WE_mbc(m' + str(mask_i) + ',0)')
+    variables.addAlias('sigDELab' + str(mask_i), 'WE_deltae(m' + str(mask_i) + ',1)')
+    variables.addAlias('sigMbcLab' + str(mask_i), 'WE_mbc(m' + str(mask_i) + ',1)')
     variables.addAlias('missM2' + str(mask_i), 'missM2(m' + str(mask_i) + ',0)')
     variables.addAlias('missM2Lab' + str(mask_i), 'missM2(m' + str(mask_i) + ',6)')
-    variables.addAlias('m2OverEmiss' + str(mask_i), 'missM2OverMissE(m' + str(mask_i) + ')')
-    variables.addAlias('roeFlags' + str(mask_i), 'ROE_mcMissFlags(m' + str(mask_i) + ')')
+    variables.addAlias('m2OverEmiss' + str(mask_i), 'WE_MissM2OverMissE(m' + str(mask_i) + ')')
+    variables.addAlias('roeFlags' + str(mask_i), 'ROE_MC_MissFlags(m' + str(mask_i) + ')')
 
 # which variables to save
 varArray = ['ROECharge', 'roeFlags', 'sigDE', 'sigMbc', 'm2OverEmiss']
@@ -99,7 +99,7 @@ def appendVariables(maskIterator_i, array):
 # define ntuple tool
 recInfo = ['EventMetaData', '^B0']
 recInfo += ['CustomFloats[decayTypeRecoil]', '^B0']
-recInfo += ['CustomFloats[cosThetaBetweenParticleAndTrueB]', '^B0']
+recInfo += ['CustomFloats[cosThetaBetweenParticleAndNominalB]', '^B0']
 recInfo += ['CustomFloats[isSignalAcceptMissingNeutrino]', '^B0']
 
 # append ROE variables to ntuple tool

@@ -12,26 +12,8 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TH1F.h>
 
 namespace Belle2 {
-
-  /**
-   * Structure to hold value and error
-   */
-  struct PointWithError {
-    double value = 0; /**< central value */
-    double error = 0; /**< uncertainty */
-
-    /**
-     * Constructor with value and error
-     * @param value central value
-     * @param error uncertainty
-     */
-    PointWithError(double val, double err): value(val), error(err)
-    {}
-  };
-
 
   /**
    * Event T0 finder for global cosmic runs
@@ -54,61 +36,45 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
-    /**
-     * Return parabolic maximum
-     * @param i0 index of the bin with the maximal value
-     * @return position of the maximum with uncertainty
-     */
-    PointWithError getParabolicMaximum(unsigned i0);
-
-    /**
-     * Return parabolic maximum
-     * @param yLeft bin content of left-to-maximal bin
-     * @param yCenter bin content of maximal bin
-     * @param yRight bin content of right-to-maximal bin
-     * @return a fraction of step to be added to central bin position + error
-     */
-    PointWithError getParabolicMaximum(double yLeft, double yCenter, double yRight);
-
     bool m_useIncomingTrack; /**< if true use incoming track, otherwise use outcoming */
-    unsigned m_minCDCHits; /**< minimal number of CDC hits of the track */
+    unsigned m_minHits; /**< minimal number of hits on TOP module */
+    double m_minSignal; /**< minimal number of expected signal photons */
     bool m_applyT0; /**< if true, subtract T0 in TOPDigits */
     int m_numBins;      /**< number of bins to which time range is divided */
     double m_timeRange; /**< time range in which to search [ns] */
-    double m_maxTime;   /**< time limit for photons [ns] */
+    double m_sigma;     /**< additional time spread added to PDF [ns] */
+    bool m_saveHistograms; /**< flag to save histograms */
 
-    std::vector<double> m_logLikelihoods; /**< container for log likelihoods */
-    std::vector<double> m_t0;  /**< container for time axis */
-    double m_dt = 0;  /**< bin size */
-
-    std::vector<TH1F*> m_histograms; /**< container for histograms */
+    int m_num = 0; /**< histogram number */
+    int m_acceptedCount = 0;  /**< counter for accepted events */
+    int m_successCount = 0; /**< counter for successfully determined T0 */
 
   };
 

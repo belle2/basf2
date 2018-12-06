@@ -29,7 +29,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -107,7 +107,7 @@ namespace Belle2 {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
 
-      AxialTrackUtil::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
+      AxialTrackUtil::addCandidateFromHits(foundWireHits, m_axialWireHits, m_tracks, true);
 
       // Sync up the marks with the used hits
       for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {

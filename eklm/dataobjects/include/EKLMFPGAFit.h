@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMFPGAFIT_H
-#define EKLMFPGAFIT_H
+#pragma once
 
 /* Belle2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -46,15 +45,15 @@ namespace Belle2 {
     ~EKLMFPGAFit();
 
     /**
-     * Get signal start time.
+     * Get signal start time (in TDC counts).
      */
-    float getStartTime() const;
+    int getStartTime() const;
 
     /**
-     * Set signal start time.
+     * Set signal start time (in TDC counts).
      * @param[in] startTime Signal start time.
      */
-    void setStartTime(float startTime);
+    void setStartTime(int startTime);
 
     /**
      * Get amplitude.
@@ -79,19 +78,19 @@ namespace Belle2 {
     void setBackgroundAmplitude(float amplitude);
 
     /**
-     * Get maximal amplitude (ADC output).
+     * Get minimal amplitude (ADC output).
      */
-    int getMaximalAmplitude() const;
+    int getMinimalAmplitude() const;
 
     /**
-     * Set maximal amplitude.
+     * Set minimal amplitude.
      */
-    void setMaximalAmplitude(int amplitude);
+    void setMinimalAmplitude(int amplitude);
 
   private:
 
     /** Start of signal. */
-    float m_StartTime;
+    int m_StartTime;
 
     /** Amplitude. */
     float m_Amplitude;
@@ -99,15 +98,12 @@ namespace Belle2 {
     /** Background amplitude. */
     float m_BackgroundAmplitude;
 
-    /** Maximal amplitude. */
-    int m_MaximalAmplitude;
+    /** Minimal amplitude. */
+    int m_MinimalAmplitude;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMFPGAFit, 1);
+    /** Class version. */
+    ClassDef(Belle2::EKLMFPGAFit, 2);
 
   };
 
 }
-
-#endif
-

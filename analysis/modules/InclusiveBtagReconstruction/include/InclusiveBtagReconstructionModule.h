@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef INCLUSIVEBTAGRECONSTRUCTIONMODULE_H
-#define INCLUSIVEBTAGRECONSTRUCTIONMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -41,10 +40,10 @@ namespace Belle2 {
     virtual ~InclusiveBtagReconstructionModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void event();
+    virtual void event() override;
 
 
   private:
@@ -97,4 +96,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* INCLUSIVEBTAGRECONSTRUCTIONMODULE_H */

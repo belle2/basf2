@@ -14,8 +14,17 @@
 #ifndef ARICHNTUPLEMODULE_H
 #define ARICHNTUPLEMODULE_H
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <string>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <arich/dataobjects/ARICHLikelihood.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
+#include <arich/dataobjects/ARICHTrack.h>
+#include <arich/dataobjects/ARICHInfo.h>
+
 
 // ROOT
 #include <string>
@@ -65,32 +74,42 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
+
+    // required input
+    StoreArray<ARICHTrack> m_arichTracks; /**< Required array of input ARICHTracks */
+    StoreArray<ARICHLikelihood> m_arichLikelihoods; /**< Required array of input ARICHLikelihoods */
+
+    // optional input
+    StoreArray<Track> m_tracks; /**< Optional input array of Tracks */
+    StoreArray<MCParticle> m_arichMCPs; /**< Optional input array of MCParticles */
+    StoreArray<ARICHAeroHit> m_arichAeroHits; /**< Optional input array of ARICHAeroHits */
+    StoreArray<ARICHInfo> m_arichInfo; /**< Optional input array of ARICHInfo */
 
     std::string m_outputFile; /**< output root file */
 

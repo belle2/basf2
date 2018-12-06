@@ -17,27 +17,21 @@
 #include <ecl/modules/eclShowerCorrection/ECLShowerCorrectorModule.h>
 
 // FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/database/DBArray.h>
-
-// ECL
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLShower.h>
 
 // ROOT
 #include <TMath.h>
 
-// OTHER
-#include <vector>
-#include <fstream>      // std::ifstream
+// ECL
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
+#include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -54,7 +48,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
   m_leakageCorrectionPtr_phase2bgx1("ECLShowerEnergyCorrectionTemporary_phase2"),
   m_leakageCorrectionPtr_phase3bgx1("ECLShowerEnergyCorrectionTemporary_phase3"),
   m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
 
   // Set description
@@ -74,7 +68,7 @@ void ECLShowerCorrectorModule::initialize()
 
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 }
 
 void ECLShowerCorrectorModule::beginRun()
@@ -87,7 +81,7 @@ void ECLShowerCorrectorModule::event()
 {
 
   // Get the event background level.
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double backgroundLevel = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     backgroundLevel = static_cast<double>(bkgdcount) / m_fullBkgdCount;
@@ -96,8 +90,8 @@ void ECLShowerCorrectorModule::event()
   // Loop over all ECLShowers.
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct N1 showers! N2 showers keep the raw energy! (TF)
-    if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) {
+    // Only correct EM showers! Other showers keep the raw energy!
+    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
 
       const double energy        = eclShower.getEnergy();
       const double energyHighest = eclShower.getEnergyHighestCrystal();
@@ -127,7 +121,7 @@ void ECLShowerCorrectorModule::event()
       eclShower.setEnergy(correctedEnergy);
       eclShower.setEnergyHighestCrystal(correctedEnergyHighest);
 
-    } // end correction N1 only
+    } // end correction
   } // end loop over all shower
 
 }
@@ -257,9 +251,8 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   // Correction factor (multiplicative).
   double result = 1.0;
-  double x = 0.0;
   double x0 = 0.0;
-  double  x1 = 0.0;
+  double x1 = 0.0;
   double xd = 0.0;
 
   // Convert -180..180 to 0..360
@@ -267,14 +260,13 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   int x0Bin = 0;
   int x1Bin = m_numOfPhiBins - 1;
-  int phiGap = 0;
-  phiGap = int(phiMod / (360.0 / (m_phiPeriodicity * 1.0)));
-  x = phiMod - phiGap * (360.0 / (m_phiPeriodicity * 1.0));
+  int phiGap = int(phiMod / (360.0 / (m_phiPeriodicity * 1.0)));
+  double x = phiMod - phiGap * (360.0 / (m_phiPeriodicity * 1.0));
 
   const double phiBinWidth = 360.0 / (1.0 * m_numOfPhiBins * m_phiPeriodicity);
 
   if (x <= phiBinWidth / 2.0) {
-    x0 = 0.00;
+    x0 = 0.0;
     x1 = phiBinWidth / 2.0;
     x0Bin = 0;
     x1Bin = m_numOfPhiBins - 1;
@@ -401,7 +393,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
   int z0Bin = 0;
   int z1Bin = 1;
 
-  if (z >= 0.00 and z < m_avgRecEn[0]) {
+  if (z >= 0.0 and z < m_avgRecEn[0]) {
     z0 = 0.01;
     z1 = m_avgRecEn[0];
     z0Bin = 0;
@@ -472,4 +464,3 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   return result;
 }
-

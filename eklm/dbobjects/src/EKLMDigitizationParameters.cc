@@ -20,6 +20,7 @@ EKLMDigitizationParameters::EKLMDigitizationParameters()
   m_NDigitizations = 0;
   m_ADCPedestal = 0;
   m_ADCPEAmplitude = 0;
+  m_ADCThreshold = 0;
   m_ADCSaturation = 0;
   m_NPEperMeV = 0;
   m_MinCosTheta = 0;
@@ -45,6 +46,16 @@ int EKLMDigitizationParameters::getADCRange() const
 void EKLMDigitizationParameters::setADCRange(int range)
 {
   m_ADCRange = range;
+}
+
+float EKLMDigitizationParameters::getADCSamplingFrequency() const
+{
+  return 1.0 / m_ADCSamplingTime;
+}
+
+void EKLMDigitizationParameters::setADCSamplingFrequency(float frequency)
+{
+  m_ADCSamplingTime = 1.0 / frequency;
 }
 
 float EKLMDigitizationParameters::getADCSamplingTime() const
@@ -87,12 +98,22 @@ void EKLMDigitizationParameters::setADCPEAmplitude(float amplitude)
   m_ADCPEAmplitude = amplitude;
 }
 
-float EKLMDigitizationParameters::getADCSaturation() const
+int EKLMDigitizationParameters::getADCThreshold() const
+{
+  return m_ADCThreshold;
+}
+
+void EKLMDigitizationParameters::setADCThreshold(int threshold)
+{
+  m_ADCThreshold = threshold;
+}
+
+int EKLMDigitizationParameters::getADCSaturation() const
 {
   return m_ADCSaturation;
 }
 
-void EKLMDigitizationParameters::setADCSaturation(float saturation)
+void EKLMDigitizationParameters::setADCSaturation(int saturation)
 {
   m_ADCSaturation = saturation;
 }

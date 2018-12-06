@@ -34,7 +34,7 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
   double sin_alpha;
   double cos_alpha;
   G4Transform3D t;
-  m_is = NULL;
+  m_is = nullptr;
   try {
     m_tube = new G4Tubs("Tube_" + name, 0., std::max(r1, r2), halfZlen,
                         phi1, fabs(phi2 - phi1));

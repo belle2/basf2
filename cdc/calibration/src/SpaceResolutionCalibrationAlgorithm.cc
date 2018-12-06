@@ -44,7 +44,7 @@ SpaceResolutionCalibrationAlgorithm::SpaceResolutionCalibrationAlgorithm() :
 }
 void SpaceResolutionCalibrationAlgorithm::createHisto()
 {
-  readProfile();
+  B2INFO("Creating histograms");
   const int np = floor(1 / m_binWidth);
 
   vector<double> yu;
@@ -67,12 +67,12 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-          hist_b[il][lr][al][th] = new TH2F(Form("hb_%d_%d_%d_%d", il, lr, al, th),
-                                            Form("lay_%d_lr%d_al_%3.0f_th_%3.0f;Drift Length [cm];#DeltaX", il, lr, m_iAlpha[al], m_iTheta[th]),
-                                            xbin.size() - 1, &xbin.at(0), yb.size() - 1, &yb.at(0));
-          hist_u[il][lr][al][th] = new TH2F(Form("hu_%d_%d_%d_%d", il, lr, al, th),
-                                            Form("lay_%d_lr%d_al_%3.0f_th_%3.0f;Drift Length [cm];#DeltaX", il, lr, m_iAlpha[al], m_iTheta[th]),
-                                            xbin.size() - 1, &xbin.at(0), yu.size() - 1, &yu.at(0));
+          m_hBiased[il][lr][al][th] = new TH2F(Form("hb_%d_%d_%d_%d", il, lr, al, th),
+                                               Form("lay_%d_lr%d_al_%3.0f_th_%3.0f;Drift Length [cm];#DeltaX", il, lr, m_iAlpha[al], m_iTheta[th]),
+                                               xbin.size() - 1, &xbin.at(0), yb.size() - 1, &yb.at(0));
+          m_hUnbiased[il][lr][al][th] = new TH2F(Form("hu_%d_%d_%d_%d", il, lr, al, th),
+                                                 Form("lay_%d_lr%d_al_%3.0f_th_%3.0f;Drift Length [cm];#DeltaX", il, lr, m_iAlpha[al], m_iTheta[th]),
+                                                 xbin.size() - 1, &xbin.at(0), yu.size() - 1, &yu.at(0));
         }
       }
     }
@@ -135,20 +135,17 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
     absRes_u = fabs(x_mea) - fabs(x_u);
     absRes_b = fabs(x_mea) - fabs(x_b);
 
-    hist_u[lay][ilr][ial][ith]->Fill(fabs(x_u), absRes_u, w);
-    hist_b[lay][ilr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
-
+    m_hUnbiased[lay][ilr][ial][ith]->Fill(fabs(x_u), absRes_u, w);
+    m_hBiased[lay][ilr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
   }
 
 
-  B2INFO("Start to obtain the biase and unbiased sigmas");
+  B2INFO("Start to obtain the biased and unbiased sigmas");
 
-  TF1* gb = new TF1("gb", "gaus", -0.05, 0.05);
-  TF1* gu = new TF1("gu", "gaus", -0.06, 0.06);
-  TF1* g0b = new TF1("g0b", "gaus", -0.015, 0.07);
-  TF1* g0u = new TF1("g0u", "gaus", -0.015, 0.08);
-  g0b->SetParLimits(1, -0.005, 0.004);
-  g0u->SetParLimits(1, -0.005, 0.004);
+  TF1* gb = new TF1("gb", "gausn", -0.05, 0.05);
+  TF1* gu = new TF1("gu", "gausn", -0.06, 0.06);
+  TF1* g0b = new TF1("g0b", "gausn", -0.015, 0.07);
+  TF1* g0u = new TF1("g0u", "gausn", -0.015, 0.08);
 
   std::vector<double> sigma;
   std::vector<double> dsigma;
@@ -167,73 +164,95 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
 
-          B2DEBUG(199, "layer-lr-al-th " << il << " - " << lr << " - " << al << " - " << th);
-          if (hist_b[il][lr][al][th]->GetEntries() < 5000) {
+          B2DEBUG(21, "layer-lr-al-th " << il << " - " << lr << " - " << al << " - " << th);
+          if (m_hBiased[il][lr][al][th]->GetEntries() < 5000) {
             m_fitStatus[il][lr][al][th] = -1;
             continue;
           }
-          B2DEBUG(199, "Nentries: " << hist_b[il][lr][al][th]->GetEntries());
-          hist_b[il][lr][al][th]->SetDirectory(0);
-          hist_u[il][lr][al][th]->SetDirectory(0);
+
+          auto* proYb = m_hBiased[il][lr][al][th]->ProjectionY();
+          auto* proYu = m_hUnbiased[il][lr][al][th]->ProjectionY();
+
+          g0b->SetParLimits(0, 0, m_hBiased[il][lr][al][th]->GetEntries() * 5);
+          g0u->SetParLimits(0, 0, m_hUnbiased[il][lr][al][th]->GetEntries() * 5);
+          g0b->SetParLimits(1, -0.1, 0.1);
+          g0u->SetParLimits(1, -0.1, 0.1);
+          g0b->SetParLimits(2, 0.0, proYb->GetRMS() * 5);
+          g0u->SetParLimits(2, 0.0, proYu->GetRMS() * 5);
+
+          g0b->SetParameter(0, m_hBiased[il][lr][al][th]->GetEntries());
+          g0u->SetParameter(0, m_hUnbiased[il][lr][al][th]->GetEntries());
+          g0b->SetParameter(1, 0);
+          g0u->SetParameter(1, 0);
+          g0b->SetParameter(2, proYb->GetRMS());
+          g0u->SetParameter(2, proYu->GetRMS());
+
+          B2DEBUG(21, "Nentries: " << m_hBiased[il][lr][al][th]->GetEntries());
+          m_hBiased[il][lr][al][th]->SetDirectory(0);
+          m_hUnbiased[il][lr][al][th]->SetDirectory(0);
 
           // With biased track fit result
 
           // Apply slice fit for the region near sense wire
-          hist_b[il][lr][al][th]->FitSlicesY(g0b, firstbin, ib1, minEntry);
+          m_hBiased[il][lr][al][th]->FitSlicesY(g0b, firstbin, ib1, minEntry);
 
           // mean
-          hb_m[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_m", il, lr, al,
-                                 th));
+          m_hMeanBiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_m", il,
+                                          lr, al,
+                                          th));
           // sigma
-          hb_s[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_s", il, lr, al,
-                                 th));
-          hb_m[il][lr][al][th]->SetDirectory(0);
-          hb_s[il][lr][al][th]->SetDirectory(0);
+          m_hSigmaBiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_s",
+                                           il, lr, al,
+                                           th));
+          m_hMeanBiased[il][lr][al][th]->SetDirectory(0);
+          m_hSigmaBiased[il][lr][al][th]->SetDirectory(0);
 
           //Apply slice fit for other regions
-          hist_b[il][lr][al][th]->FitSlicesY(gb, ib1 + 1, np, minEntry);
+          m_hBiased[il][lr][al][th]->FitSlicesY(gb, ib1 + 1, np, minEntry);
           // mean
-          hb_m[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th)));
+          m_hMeanBiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th)));
           //sigma
-          hb_s[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th)));
-          B2DEBUG(199, "entries (2nd): " << hb_s[il][lr][al][th]->GetEntries());
+          m_hSigmaBiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th)));
+          B2DEBUG(21, "entries (2nd): " << m_hSigmaBiased[il][lr][al][th]->GetEntries());
 
           // With unbiased track fit result
 
           // Apply slice fit for the region near sense wire
-          hist_u[il][lr][al][th]->FitSlicesY(g0u, firstbin, ib1, minEntry);
+          m_hUnbiased[il][lr][al][th]->FitSlicesY(g0u, firstbin, ib1, minEntry);
           // mean
-          hu_m[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m", il, lr, al,
-                                 th));
+          m_hMeanUnbiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m",
+                                            il, lr, al,
+                                            th));
           // sigma
-          hu_s[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_s", il, lr, al,
-                                 th));
-          hu_m[il][lr][al][th]->SetDirectory(0);
-          hu_s[il][lr][al][th]->SetDirectory(0);
+          m_hSigmaUnbiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_s",
+                                             il, lr, al,
+                                             th));
+          m_hMeanUnbiased[il][lr][al][th]->SetDirectory(0);
+          m_hSigmaUnbiased[il][lr][al][th]->SetDirectory(0);
 
 
           //Apply slice fit for other regions
-          hist_u[il][lr][al][th]->FitSlicesY(gu, ib1 + 1, np, minEntry);
+          m_hUnbiased[il][lr][al][th]->FitSlicesY(gu, ib1 + 1, np, minEntry);
           //mean
-          hu_m[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th)));
+          m_hMeanUnbiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th)));
           //sigma
-          hu_s[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th)));
-          if (!hu_s[il][lr][al][th] || !hb_s[il][lr][al][th]) {
-            B2WARNING("slice histo do not found");
+          m_hSigmaUnbiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th)));
+          if (!m_hSigmaUnbiased[il][lr][al][th] || !m_hSigmaBiased[il][lr][al][th]) {
+            B2WARNING("sliced histo  not found");
             m_fitStatus[il][lr][al][th] = -1;
             continue;
           }
 
-          for (int j = 1; j < hu_s[il][lr][al][th]->GetNbinsX(); j++) {
-            if (hu_s[il][lr][al][th]->GetBinContent(j) == 0) continue;
-            if (hb_s[il][lr][al][th]->GetBinContent(j) == 0) continue;
-            double sb = hb_s[il][lr][al][th]->GetBinContent(j);
-            double su = hu_s[il][lr][al][th]->GetBinContent(j);
+          for (int j = 1; j < m_hSigmaUnbiased[il][lr][al][th]->GetNbinsX(); j++) {
+            if (m_hSigmaUnbiased[il][lr][al][th]->GetBinContent(j) == 0) continue;
+            if (m_hSigmaBiased[il][lr][al][th]->GetBinContent(j) == 0) continue;
+            double sb = m_hSigmaBiased[il][lr][al][th]->GetBinContent(j);
+            double su = m_hSigmaUnbiased[il][lr][al][th]->GetBinContent(j);
 
-            double dsb = hb_s[il][lr][al][th]->GetBinError(j);
-            double dsu = hu_s[il][lr][al][th]->GetBinError(j);
-            double XL = hb_s[il][lr][al][th]->GetXaxis()->GetBinCenter(j);
-            double dXL = (hb_s[il][lr][al][th]->GetXaxis()->GetBinWidth(j)) / 2;
+            double dsb = m_hSigmaBiased[il][lr][al][th]->GetBinError(j);
+            double dsu = m_hSigmaUnbiased[il][lr][al][th]->GetBinError(j);
+            double XL = m_hSigmaBiased[il][lr][al][th]->GetXaxis()->GetBinCenter(j);
+            double dXL = (m_hSigmaBiased[il][lr][al][th]->GetXaxis()->GetBinWidth(j)) / 2;
             double  s_int = std::sqrt(sb * su);
             double  ds_int = 0.5 * s_int * (dsb / sb + dsu / su);
             if (ds_int > 0.02) continue;
@@ -254,21 +273,19 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
           }
 
           //Intrinsic resolution
-          B2DEBUG(199, "Create Histo for layer-lr: " << il << " " << lr);
-          gr[il][lr][al][th] = new TGraphErrors(xl.size(), &xl.at(0), &sigma.at(0), &dxl.at(0), &dsigma.at(0));
-          gr[il][lr][al][th]->SetMarkerSize(0.5);
-          gr[il][lr][al][th]->SetMarkerStyle(8);
-          gr[il][lr][al][th]->SetTitle(Form("Layer_%d lr%d | #alpha = %3.0f | #theta = %3.0f", il, lr, m_iAlpha[al], m_iTheta[th]));
-          gr[il][lr][al][th]->SetName(Form("lay%d_lr%d_al%d_th%d", il, lr, al, th));
+          B2DEBUG(21, "Create Histo for layer-lr: " << il << " " << lr);
+          m_graph[il][lr][al][th] = new TGraphErrors(xl.size(), &xl.at(0), &sigma.at(0), &dxl.at(0), &dsigma.at(0));
+          m_graph[il][lr][al][th]->SetMarkerSize(0.5);
+          m_graph[il][lr][al][th]->SetMarkerStyle(8);
+          m_graph[il][lr][al][th]->SetTitle(Form("Layer_%d lr%d #alpha = %3.0f #theta = %3.0f", il, lr, m_iAlpha[al], m_iTheta[th]));
+          m_graph[il][lr][al][th]->SetName(Form("lay%d_lr%d_al%d_th%d", il, lr, al, th));
 
-          //s2 for fitting
-          gfit[il][lr][al][th] = new TGraphErrors(xl.size(), &xl.at(0), &s2.at(0), &dxl0.at(0), &ds2.at(0));
-          gfit[il][lr][al][th]->SetMarkerSize(0.5);
-          gfit[il][lr][al][th]->SetMarkerStyle(8);
-          //          gfit[il][lr][al][th]->SetMarkerColor(1 + lr + al * 2 + th * 3);
-          //gfit[il][lr][al][th]->SetLineColor(1 + lr + al * 2 + th * 3);
-          gfit[il][lr][al][th]->SetTitle(Form("L%d-lr%d | #alpha = %3.0f | #theta = %3.0f ", il, lr, m_iAlpha[al], m_iTheta[th]));
-          gfit[il][lr][al][th]->SetName(Form("sigma2_lay%d_lr%d_al%d_th%d", il, lr, al, th));
+          //square of sigma for fitting
+          m_gFit[il][lr][al][th] = new TGraphErrors(xl.size(), &xl.at(0), &s2.at(0), &dxl0.at(0), &ds2.at(0));
+          m_gFit[il][lr][al][th]->SetMarkerSize(0.5);
+          m_gFit[il][lr][al][th]->SetMarkerStyle(8);
+          m_gFit[il][lr][al][th]->SetTitle(Form("L%d lr%d #alpha = %3.0f #theta = %3.0f ", il, lr, m_iAlpha[al], m_iTheta[th]));
+          m_gFit[il][lr][al][th]->SetName(Form("sigma2_lay%d_lr%d_al%d_th%d", il, lr, al, th));
 
           xl.clear();
           dxl.clear();
@@ -290,13 +307,21 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
 {
 
   B2INFO("Start calibration");
-
+  gPrintViaErrorHandler = true; // Suppress huge log output from TMinuit
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
+
+  const auto exprun = getRunList()[0];
+  B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
+  updateDBObjPtrs(1, exprun.second, exprun.first);
+  B2INFO("Creating CDCGeometryPar object");
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
+
+  prepare();
   createHisto();
 
   //half cell size
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   double halfCSize[56];
   for (int i = 0; i < 56; ++i) {
     double R = cdcgeo.senseWireR(i);
@@ -358,47 +383,48 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
           func->SetParLimits(4, 0., 0.001);
           func->SetParLimits(5, -40, 0.);
           func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
-          B2DEBUG(199, "FITTING for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
-          B2DEBUG(199, "Fit flag before fit:" << m_fitStatus[i][lr][al][th]);
-          if (!gfit[i][lr][al][th]) continue;
+          B2DEBUG(21, "Fitting for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
+          B2DEBUG(21, "Fit status before fit:" << m_fitStatus[i][lr][al][th]);
+          if (!m_gFit[i][lr][al][th]) continue;
           if (m_fitStatus[i][lr][al][th] != -1) { /*if graph exist, do fitting*/
 
             for (int j = 0; j < 10; j++) {
 
-              B2DEBUG(199, "loop: " << j);
-              B2DEBUG(199, "Int p6: " << intp6);
-              B2DEBUG(199, "Number of Point: " << gfit[i][lr][al][th]->GetN());
-              Int_t stat = gfit[i][lr][al][th]->Fit("func", "MQE", "", 0.05, upFit);
-              B2DEBUG(199, "stat of fit" << stat);
+              B2DEBUG(21, "loop: " << j);
+              B2DEBUG(21, "Int p6: " << intp6);
+              B2DEBUG(21, "Number of Point: " << m_gFit[i][lr][al][th]->GetN());
+              Int_t stat = m_gFit[i][lr][al][th]->Fit("func", "MQE", "", 0.05, upFit);
+              B2DEBUG(21, "stat of fit" << stat);
               std::string Fit_status = gMinuit->fCstatu.Data();
-              B2DEBUG(199, "FIT STATUS: " << Fit_status);
-              //      stat=gfit[i]->Fit(Form("ffit[%d]",i),"M "+Q,"",0.0,cellsize(i)+0.05+j*0.005);
+              B2DEBUG(21, "FIT STATUS: " << Fit_status);
               if (Fit_status == "OK" || Fit_status == "SUCCESSFUL") {//need to found better way
                 if (fabs(func->Eval(0.3)) > 0.00035 || func->Eval(0.3) < 0) {
                   func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
+                  func->SetParLimits(6, intp6 + 0.05 * j - 0.5, intp6 + 0.05 * j + 0.2);
                   //    func->SetParameters(defaultparsmall);
                   m_fitStatus[i][lr][al][th] = 0;
                 } else {
-                  B2DEBUG(199, "Prob of fit: " << func->GetProb());
+                  B2DEBUG(21, "Prob of fit: " << func->GetProb());
                   m_fitStatus[i][lr][al][th] = 1;
                   break;
                 }
               } else {
                 m_fitStatus[i][lr][al][th] = 0;
                 func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
+                func->SetParLimits(6, intp6 + 0.05 * j - 0.5, intp6 + 0.05 * j + 0.2);
                 upFit += 0.025;
                 if (j == 9) {
-                  TCanvas* c1 =  new TCanvas("c1", "", 600, 600);
-                  gfit[i][lr][al][th]->Draw();
-                  c1->SaveAs(Form("Sigma_Fit_Error_%s_%d_%d_%d_%d.png", Fit_status.c_str(), i, lr, al, th));
-                  B2WARNING("Fit error: " << i << " " << lr << " " << al << " " << th);
+                  // TCanvas* c1 =  new TCanvas("c1", "", 600, 600);
+                  // m_gFit[i][lr][al][th]->Draw();
+                  // c1->SaveAs(Form("Sigma_Fit_Error_%s_%d_%d_%d_%d.png", Fit_status.c_str(), i, lr, al, th));
+                  // B2WARNING("Fit error: " << i << " " << lr << " " << al << " " << th);
                 }
               }
             }
             if (m_fitStatus[i][lr][al][th] == 1) {
-              B2DEBUG(199, "ProbFit: Lay_lr_al_th: " << i << " " << lr << " " << al << " " << th << func->GetProb());
+              B2DEBUG(21, "ProbFit: Lay_lr_al_th: " << i << " " << lr << " " << al << " " << th << func->GetProb());
               hprob->Fill(func->GetProb());
-              func->GetParameters(sigma_new[i][lr][al][th]);
+              func->GetParameters(m_sigma[i][lr][al][th]);
             }
           }
         }
@@ -411,11 +437,12 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
 
   return c_OK;
 }
+
 void SpaceResolutionCalibrationAlgorithm::storeHisto()
 {
-  B2INFO("storeHisto");
+  B2INFO("Storing histo");
 
-  TFile*  ff = new TFile("sigma_histo.root", "RECREATE");
+  TFile*  ff = new TFile(m_histName.c_str(), "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
 
@@ -427,17 +454,17 @@ void SpaceResolutionCalibrationAlgorithm::storeHisto()
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
-          if (!gr[il][lr][al][th]) continue;
-          if (!gfit[il][lr][al][th]) continue;
+          if (!m_graph[il][lr][al][th]) continue;
+          if (!m_gFit[il][lr][al][th]) continue;
           if (m_fitStatus[il][lr][al][th] == 1) {
-            hist_b[il][lr][al][th]->Write();
-            hist_u[il][lr][al][th]->Write();
-            hb_m[il][lr][al][th]->Write();
-            hb_s[il][lr][al][th]->Write();
-            hu_m[il][lr][al][th]->Write();
-            hu_s[il][lr][al][th]->Write();
-            gr[il][lr][al][th]->Write();
-            gfit[il][lr][al][th]->Write();
+            m_hBiased[il][lr][al][th]->Write();
+            m_hUnbiased[il][lr][al][th]->Write();
+            m_hMeanBiased[il][lr][al][th]->Write();
+            m_hSigmaBiased[il][lr][al][th]->Write();
+            m_hMeanUnbiased[il][lr][al][th]->Write();
+            m_hSigmaUnbiased[il][lr][al][th]->Write();
+            m_graph[il][lr][al][th]->Write();
+            m_gFit[il][lr][al][th]->Write();
           }
         }
       }
@@ -449,60 +476,76 @@ void SpaceResolutionCalibrationAlgorithm::storeHisto()
 }
 void SpaceResolutionCalibrationAlgorithm::write()
 {
-  B2INFO("write calibrated sigma");
+  B2INFO("Writing calibrated sigma's");
   int nfitted = 0;
   int nfailure = 0;
 
-  ofstream ofs(m_outputSigmaFileName.c_str());
-  ofs << m_nAlphaBins << endl;
-  for (int i = 0; i < m_nAlphaBins; ++i) {
-    ofs << std::setprecision(4) << m_lowerAlpha[i] << "   " << std::setprecision(4) << m_upperAlpha[i] << "   " << std::setprecision(
-          4) << m_iAlpha[i] << endl;
+  CDCSpaceResols* dbSigma = new CDCSpaceResols();
+
+  const float deg2rad = M_PI / 180.0;
+
+  for (unsigned short i = 0; i < m_nAlphaBins; ++i) {
+    std::array<float, 3> alpha3 = {m_lowerAlpha[i]* deg2rad,
+                                   m_upperAlpha[i]* deg2rad,
+                                   m_iAlpha[i]*   deg2rad
+                                  };
+    dbSigma->setAlphaBin(alpha3);
   }
 
-  ofs << m_nThetaBins << endl;
-  for (int i = 0; i < m_nThetaBins; ++i) {
-    ofs << std::setprecision(4) << m_lowerTheta[i] << "   " << std::setprecision(4) << m_upperTheta[i] << "   " << std::setprecision(
-          4) << m_iTheta[i] << endl;
+
+  for (unsigned short i = 0; i < m_nThetaBins; ++i) {
+    std::array<float, 3> theta3 = {m_lowerTheta[i]* deg2rad,
+                                   m_upperTheta[i]* deg2rad,
+                                   m_iTheta[i]* deg2rad
+                                  };
+    dbSigma->setThetaBin(theta3);
   }
 
-  ofs << 0 << "  " << 7 << endl; //mode and number of params;
-  for (int al = 0; al < m_nAlphaBins; ++al) {
-    for (int th = 0; th < m_nThetaBins; ++th) {
-      for (int i = 0; i < 56; ++i) {
-        for (int lr = 1; lr >= 0; --lr) {
-          ofs << i << std::setw(4) << m_iTheta[th] << std::setw(4) << m_iAlpha[al] << std::setw(4) << lr << std::setw(15);
-          if (m_fitStatus[i][lr][al][th] == 1) {
-            nfitted += 1;
-            for (int p = 0; p < 7; ++p) {
-              if (p != 6) { ofs << std::setprecision(7) << sigma_new[i][lr][al][th][p] << std::setw(15);}
-              if (p == 6) { ofs << std::setprecision(7) << sigma_new[i][lr][al][th][p] << std::endl;}
+  dbSigma->setSigmaParamMode(m_sigmaParamMode);
+  for (int ialpha = 0; ialpha < m_nAlphaBins; ++ialpha) {
+    for (int itheta = 0; itheta < m_nThetaBins; ++itheta) {
+      for (int iCL = 0; iCL < 56; ++iCL) {
+        for (int iLR = 1; iLR >= 0; --iLR) {
+          std::vector<float> sgbuff;
+          if (m_fitStatus[iCL][iLR][ialpha][itheta] == 1) {
+            nfitted += 1;  // inclement number of successfully fitted sigma's
+            for (int i = 0; i < 7; ++i) {
+              sgbuff.push_back(m_sigma[iCL][iLR][ialpha][itheta][i]);
             }
           } else {
-            B2FATAL("Fitting error and old sigma will be used. (Layer " << i << ") (lr = " << lr << ") (al = " << al << ") (th = " << th <<
-                    ")");
+            //B2WARNING("Fitting error and old sigma will be used. (Layer " << iCL << ") (lr = " << iLR <<
+            //                      ") (al = " << ialpha << ") (th = " << itheta << ")");
+            nfailure += 1; // inclement number of fit failed sigma's
+            for (int i = 0; i < 7; ++i) {
+              sgbuff.push_back(m_sigmaPost[iCL][iLR][ialpha][itheta][i]);
+            }
           }
+          dbSigma->setSigmaParams(iCL, iLR, ialpha, itheta, sgbuff);
         }
       }
     }
   }
-  ofs.close();
+
+  if (m_textOutput == true) {
+    dbSigma->outputToFile(m_outputFileName);
+  }
+
+  saveCalibration(dbSigma, "CDCSpaceResols");
+
   B2RESULT("Number of histogram: " << 56 * 2 * m_nAlphaBins * m_nThetaBins);
   B2RESULT("Histos succesfully fitted: " << nfitted);
   B2RESULT("Histos fit failure: " << nfailure);
 
-  //  CDCSpaceResols* dbSigma;
-  //  saveCalibration(dbSigmal, "CDCSpaceResols");
+
 }
 
-void SpaceResolutionCalibrationAlgorithm::readProfile()
+void SpaceResolutionCalibrationAlgorithm::prepare()
 {
-  B2INFO("read Profile");
+  B2INFO("Prepare calibration of space resolution");
 
   const double rad2deg = 180 / M_PI;
 
   DBObjPtr<CDCSpaceResols> dbSigma;
-  DBStore::Instance().update();
 
   m_nAlphaBins = dbSigma->getNoOfAlphaBins();
   m_nThetaBins = dbSigma->getNoOfThetaBins();
@@ -522,6 +565,20 @@ void SpaceResolutionCalibrationAlgorithm::readProfile()
     m_upperTheta[i] = theta[1] * rad2deg;
     m_iTheta[i] = theta[2] * rad2deg;
   }
+  m_sigmaParamModePost = dbSigma->getSigmaParamMode();
 
-  m_sigmaParamMode = dbSigma->getSigmaParamMode();
+  for (unsigned short iCL = 0; iCL < 56; ++iCL) {
+    for (unsigned short iLR = 0; iLR < 2; ++iLR) {
+      for (unsigned short iA = 0; iA < m_nAlphaBins; ++iA) {
+        for (unsigned short iT = 0; iT < m_nThetaBins; ++iT) {
+          const std::vector<float> params = dbSigma->getSigmaParams(iCL, iLR, iA, iT);
+          unsigned short np = params.size();
+          //    std::cout <<"np4sigma= " << np << std::endl;
+          for (unsigned short i = 0; i < np; ++i) {
+            m_sigmaPost[iCL][iLR][iA][iT][i] = params[i];
+          }
+        }
+      }
+    }
+  }
 }

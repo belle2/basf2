@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEVERTEXFITTERMODULE_H
-#define PARTICLEVERTEXFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -29,9 +28,9 @@
 #include <analysis/KFit/MakeMotherKFit.h>
 
 // rave
-#include <analysis/raveInterface/RaveSetup.h>
-#include <analysis/raveInterface/RaveVertexFitter.h>
-#include <analysis/raveInterface/RaveKinematicVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 namespace Belle2 {
 
@@ -156,35 +155,8 @@ namespace Belle2 {
     * @param l represent the tracks ID
     * @param p pointer to particle
      */
-    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
-
-    /**
-     * Adds given particle to the VertexFitKFit.
-     * @param kv reference to Kfitter VertexFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::VertexFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the MassVertexFitKFit.
-     * @param kv reference to Kfitter MassVertexFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::MassVertexFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the MassFitKFit.
-     * @param kv reference to Kfitter MassFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::MassFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the FourCFitKFit.
-     * @param kv reference to Kfitter FourCFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
+    void updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                     std::vector<Particle*>&  allparticles, const Particle* daughter);
 
     /**
      * Adds given particle's child to the FourCFitKFit.
@@ -192,22 +164,6 @@ namespace Belle2 {
      * @param particle pointer to particle
      */
     bool addChildofParticletoKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
-
-
-    /**
-     * Returns particle's 4-momentum as a HepLorentzVector
-     */
-    CLHEP::HepLorentzVector getCLHEPLorentzVector(const Particle* particle);
-
-    /**
-     * Returns particle's position as a HepPoint3D
-     */
-    HepPoint3D getCLHEPPoint3D(const Particle* particle);
-
-    /**
-     * Returns particle's 7x7 momentum-vertex-error matrix as a HepSymMatrix
-     */
-    CLHEP::HepSymMatrix getCLHEPSymMatrix(const Particle* particle);
 
     /**
      * Adds IPProfile constraint to the vertex fit using kfitter.
@@ -241,4 +197,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

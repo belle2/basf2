@@ -9,17 +9,15 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
-#include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/utilities/ClosestApproach.h>
 
 #include <framework/datastore/RelationArray.h>
 //#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <cdc/utilities/ClosestApproach.h>
-
 #include <TRandom.h>
-
+#include <map>
 #include <utility>
 
 using namespace std;
@@ -30,10 +28,10 @@ using namespace CDC;
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
-  m_cdcgp(), m_aCDCSimHit(), m_posFlag(0),
+  m_cdcgp(), m_gcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
-  m_tdcResol(0.2887), m_driftV(4.0e-3),
+  m_tdcResol(0.9825), m_driftV(4.0e-3),
   m_driftVInv(250.0), m_propSpeedInv(27.25), m_align(true)
 {
   // Set description
@@ -77,6 +75,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
            0.);
   //Switches to control time information handling
+  addParam("AddTimeWalk", m_addTimeWalk, "A switch for time-walk (pulse-heght dep. delay); true: on; false: off", false);
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
            "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", true);
   addParam("AddInWirePropagationDelay4Bg",  m_addInWirePropagationDelay4Bg,
@@ -94,12 +93,18 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
            true);
 
-  //TDC Threshold
-  addParam("Threshold", m_tdcThreshold,
-           "dEdx value for TDC Threshold in eV", 40.0);
+  //Threshold
+  addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
+           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas; for the gas+wire (MaterialDefinitionMode=0) case, (this value)*f will be used, where f is specified by GasToGasWire",
+           25.0);
+  addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
+           "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
+  addParam("GasToGasWire", m_gasToGasWire,
+           "(Approximate) ratio of dE in He/C2H6-gas to dE in gas+wire, where dE is energy deposit.", 1. / 1.478);
+
   //ADC Threshold
-  addParam("Threshold4ADC", m_adcThreshold,
-           "Threshold for ADC-count (in unit of count). ADC-count <= threshold is treated as count=0.", 0);
+  addParam("ADCThreshold", m_adcThreshold,
+           "Threshold for ADC-count (in unit of count). ADC-count < threshold is treated as count=0.", 2);
   addParam("tMin", m_tMin, "Lower edge of time window in ns", -100.);
   addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the normal-cell layers", 500.);
   addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the small-cell layers", 300.);
@@ -107,6 +112,20 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   // activated. Then there has to be event by event jitter.
   /*  addParam("EventTime",                   m_eventTime,
              "It is a timing of event, which includes a time jitter due to the trigger system, set in ns",     float(0.0));*/
+
+  //Switch for database
+  addParam("UseDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", true);
+  addParam("UseDB4EDepToADC", m_useDB4EDepToADC, "Fetch and use edep-to-ADC conversion params. from database or not", true);
+
+  //Some FEE params.
+  addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3820.);
+  addParam("AnalogGain",   m_analogGain, "Analog  gain (V/pC)", 1.1);
+  addParam("DigitalGain", m_digitalGain, "Digital gain (V/pC)", 15.);
+  addParam("ADCBinWidth", m_adcBinWidth, "ADC bin width  (mV)",  2.);
+
+  addParam("AddFudgeFactorForSigma", m_addFudgeFactorForSigma,
+           "Additional fudge factor for space resol. (common to all cells)",  1.);
+  addParam("SpaceChargeEffect", m_spaceChargeEffect, "Switch for space charge effect", false);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -135,12 +154,43 @@ void CDCDigitizerModule::initialize()
   m_driftV       = cdcgp.getNominalDriftV();
   m_driftVInv    = 1. / m_driftV;
   m_propSpeedInv = 1. / cdcgp.getNominalPropSpeed();
+  m_scaleFac = 1.;
+  if (m_cdcgp->getMaterialDefinitionMode() == 0) { //gas+wire mode
+    m_scaleFac = m_gasToGasWire;
+  }
+  m_scaleFac *= Unit::GeV;
+  m_gcp = &(CDCGeoControlPar::getInstance());
+  m_totalFudgeFactor  = m_cdcgp->getFudgeFactorForSigma(2);
+  m_totalFudgeFactor *= m_addFudgeFactorForSigma;
+  B2DEBUG(29, "totalFugeF in Digi= " << m_totalFudgeFactor);
   /*
       m_fraction = 1.0;
       m_resolution1 = cdcgp.getNominalSpaceResol();
       m_resolution2 = 0.;
       m_mean1 = 0.;
       m_mean2 = 0.;
+  */
+
+  if (m_useDB4FEE) {
+    m_fEElectronicsFromDB = new DBArray<CDCFEElectronics>;
+    if ((*m_fEElectronicsFromDB).isValid()) {
+      (*m_fEElectronicsFromDB).addCallback(this, &CDCDigitizerModule::setFEElectronics);
+      setFEElectronics();
+    } else {
+      B2FATAL("CDCDigitizer:: CDCFEElectronics not valid !");
+    }
+  }
+
+  /*
+  if (m_useDB4EDepToADC) {
+    m_eDepToADCConversionsFromDB = new DBObjPtr<CDCEDepToADCConversions>;
+    if ((*m_eDepToADCConversionsFromDB).isValid()) {
+      (*m_eDepToADCConversionsFromDB).addCallback(this, &CDCDigitizerModule::setEDepToADCConversions);
+      setEDepToADCConversions();
+    } else {
+      B2FATAL("CDCDigitizer:: CDCEDepToADCConversions not valid !");
+    }
+  }
   */
 
 #if defined(CDC_DEBUG)
@@ -175,6 +225,11 @@ void CDCDigitizerModule::event()
   // Define signal map
   map<WireID, SignalInfo> signalMap;
   map<WireID, SignalInfo>::iterator iterSignalMap;
+  // Define adc map
+  map<WireID, unsigned short> adcMap;
+  map<WireID, unsigned short>::iterator iterADCMap;
+  //  map<WireID, double> adcMap;
+  //  map<WireID, double>::iterator iterADCMap;
 
   // signal map for trigger
   map<pair<WireID, unsigned>, SignalInfo> signalMapTrg;
@@ -185,14 +240,14 @@ void CDCDigitizerModule::event()
   //  std::cout << "trigTiming= " << trigTiming << std::endl;
   // Loop over all hits
   int nHits = m_simHits.getEntries();
-  B2DEBUG(250, "Number of CDCSimHits in the current event: " << nHits);
+  B2DEBUG(29, "Number of CDCSimHits in the current event: " << nHits);
   for (int iHits = 0; iHits < nHits; ++iHits) {
     // Get a hit
     m_aCDCSimHit = m_simHits[iHits];
 
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
-    B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
+    //    B2DEBUG(29, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
     // Reject bad wire
     if (m_cdcgp->isBadWire(m_wireID)) {
@@ -208,6 +263,8 @@ void CDCDigitizerModule::event()
     */
 
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
+    m_boardID    = m_cdcgp->getBoardID(m_wireID);
+    //    B2DEBUG(29, "m_boardID= " << m_boardID);
     m_posWire    = m_aCDCSimHit->getPosWire();
     m_posTrack   = m_aCDCSimHit->getPosTrack();
     m_momentum   = m_aCDCSimHit->getMomentum();
@@ -268,25 +325,10 @@ void CDCDigitizerModule::event()
       m_posFlag = m_cdcgp->getNewLeftRightRaw(m_posWire, m_posTrack, m_momentum);
     }
 
-    // Hit phys. info
-    float hitdEdx        = m_aCDCSimHit->getEnergyDep()   * Unit::GeV;
-    float hitDriftLength = m_driftLength;
-    float dedxThreshold = m_tdcThreshold * Unit::eV;
-
-    // If hitdEdx < dedxThreshold (default 40 eV), the hit is ignored
-    // M. Uchida 2012.08.31
-    //
-    if (hitdEdx < dedxThreshold) {
-      B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
-      continue;
-    }
-
-    B2DEBUG(250, "Energy deposition: " << hitdEdx << ", DriftLength: " << hitDriftLength);
-
-    // calculate measurement time.
-
-    // smear drift length
-    float dDdt = getdDdt(hitDriftLength);
+    // Calculate measurement time.
+    // Smear drift length
+    double hitDriftLength = m_driftLength;
+    double dDdt = getdDdt(hitDriftLength);
     if (m_doSmearing) {
       hitDriftLength = smearDriftLength(hitDriftLength, dDdt);
     }
@@ -298,7 +340,7 @@ void CDCDigitizerModule::event()
       addTof   = m_addTimeOfFlight;
       addDelay = m_addInWirePropagationDelay;
     }
-    float hitDriftTime = getDriftTime(hitDriftLength, addTof, addDelay);
+    double hitDriftTime = getDriftTime(hitDriftLength, addTof, addDelay);
 
     //add randamized event time for a beam bg. hit
     if (m_aCDCSimHit->getBackgroundTag() != 0) {
@@ -309,21 +351,60 @@ void CDCDigitizerModule::event()
     hitDriftTime += trigTiming;
 
     //apply time window cut
+    double tMin = m_tMin;
     double tMax = m_tMaxOuter;
     if (m_wireID.getISuperLayer() == 0) tMax = m_tMaxInner;
-    if (hitDriftTime < m_tMin || hitDriftTime > tMax) continue;
+    if (m_useDB4FEE) {
+      tMin = m_lowEdgeOfTimeWindow[m_boardID];
+      tMax = m_uprEdgeOfTimeWindow[m_boardID];
+    }
+    if (hitDriftTime < tMin || hitDriftTime > tMax) continue;
 
-    unsigned short adcCount = getADCCount(hitdEdx);
-    if (adcCount <= m_adcThreshold) adcCount = 0;
-    //    B2INFO("adcCount= " << adcCount);
+    //Sum ADC count
+    const double stepLength  = m_aCDCSimHit->getStepLength() * Unit::cm;
+    const double costh = m_momentum.z() / m_momentum.Mag();
+    const double hitdE = m_scaleFac * m_aCDCSimHit->getEnergyDep();
+    //    B2DEBUG(29, "m_scaleFac,UnitGeV= " << m_scaleFac <<" "<< Unit::GeV);
+    unsigned short layerID = m_wireID.getICLayer();
+    unsigned short cellID  = m_wireID.getIWire();
+    //    unsigned short adcCount = getADCCount(layerID, cellID, hitdE, stepLength, costh);
+    unsigned short adcCount = getADCCount(m_wireID, hitdE, stepLength, costh);
+    const unsigned short adcTh = m_useDB4FEE ? m_adcThresh[m_boardID] : m_adcThreshold;
+    //    B2DEBUG(29, "adcTh,adcCount= " << adcTh <<" "<< adcCount);
+    if (adcCount < adcTh) adcCount = 0;
+    iterADCMap = adcMap.find(m_wireID);
+    if (iterADCMap == adcMap.end()) {
+      adcMap.insert(make_pair(m_wireID, adcCount));
+      //      adcMap.insert(make_pair(m_wireID, hitdE));
+    } else {
+      iterADCMap->second += adcCount;
+      //      iterADCMap->second += hitdE;
+    }
+
+    //Apply energy threshold
+    // If hitdE < dEThreshold, the hit is ignored
+    // M. Uchida 2012.08.31
+    double dEThreshold = 0.;
+    if (m_useDB4FEE && m_useDB4EDepToADC) {
+      dEThreshold = (m_tdcThresh[m_boardID] / m_cdcgp->getEDepToADCMainFactor(layerID, cellID)) * Unit::keV;
+    } else {
+      dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
+      dEThreshold *= Unit::eV;
+    }
+    B2DEBUG(29, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
+
+    if (hitdE < dEThreshold) {
+      B2DEBUG(29, "Below Ethreshold: " << hitdE << " " << dEThreshold);
+      continue;
+    }
 
     iterSignalMap = signalMap.find(m_wireID);
 
     if (iterSignalMap == signalMap.end()) {
       // new entry
-      //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdEdx)));
+      //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdE)));
       signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, adcCount)));
-      B2DEBUG(150, "Creating new Signal with encoded wire number: " << m_wireID);
+      B2DEBUG(29, "Creating new Signal with encoded wire number: " << m_wireID);
     } else {
       // ... smallest drift time has to be checked, ...
       if (hitDriftTime < iterSignalMap->second.m_driftTime) {
@@ -333,7 +414,7 @@ void CDCDigitizerModule::event()
         iterSignalMap->second.m_simHitIndex2 = iterSignalMap->second.m_simHitIndex;
         iterSignalMap->second.m_driftTime   = hitDriftTime;
         iterSignalMap->second.m_simHitIndex = iHits;
-        B2DEBUG(250, "hitDriftTime of current Signal: " << hitDriftTime << ",  hitDriftLength: " << hitDriftLength);
+        B2DEBUG(29, "hitDriftTime of current Signal: " << hitDriftTime << ",  hitDriftLength: " << hitDriftLength);
       } else if (hitDriftTime < iterSignalMap->second.m_driftTime2) {
         iterSignalMap->second.m_driftTime3 = iterSignalMap->second.m_driftTime2;
         iterSignalMap->second.m_simHitIndex3 = iterSignalMap->second.m_simHitIndex2;
@@ -344,7 +425,7 @@ void CDCDigitizerModule::event()
         iterSignalMap->second.m_simHitIndex3 = iHits;
       }
       // ... total charge has to be updated.
-      //      iterSignalMap->second.m_charge += hitdEdx;
+      //      iterSignalMap->second.m_charge += hitdE;
       iterSignalMap->second.m_charge += adcCount;
     }
 
@@ -352,14 +433,17 @@ void CDCDigitizerModule::event()
     unsigned short trigWindow = floor((hitDriftTime - m_tMin) * m_tdcBinWidthInv / 32);
     iterSignalMapTrg = signalMapTrg.find(make_pair(m_wireID, trigWindow));
     if (iterSignalMapTrg == signalMapTrg.end()) {
+      //      signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
+      //                                    SignalInfo(iHits, hitDriftTime, hitdE)));
       signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
-                                    SignalInfo(iHits, hitDriftTime, hitdEdx)));
+                                    SignalInfo(iHits, hitDriftTime, adcCount)));
     } else {
       if (hitDriftTime < iterSignalMapTrg->second.m_driftTime) {
         iterSignalMapTrg->second.m_driftTime = hitDriftTime;
         iterSignalMapTrg->second.m_simHitIndex = iHits;
       }
-      iterSignalMapTrg->second.m_charge += hitdEdx;
+      //      iterSignalMapTrg->second.m_charge += hitdE;
+      iterSignalMapTrg->second.m_charge += adcCount;
     }
   } // end loop over SimHits.
 
@@ -372,11 +456,25 @@ void CDCDigitizerModule::event()
 
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
-    //switch off time-walk effect for a while
     //add time-walk (here for simplicity)
     //    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
-    unsigned short adcCount = iterSignalMap->second.m_charge;
-    //    iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount);
+    //    unsigned short adcCount = iterSignalMap->second.m_charge;
+    iterADCMap = adcMap.find(iterSignalMap->first);
+    unsigned short adcCount = iterADCMap != adcMap.end() ? iterADCMap->second : 0;
+    /*
+    unsigned short adcCount = 0;
+    if (iterADCMap != adcMap.end()) {
+      adcCount = getADCCount(iterSignalMap->first, iterADCMap->second, 1., 0.);
+      unsigned short boardID = m_cdcgp->getBoardID(iterSignalMap->first);
+      //      B2DEBUG(29, "boardID= " << boardID);
+      const unsigned short adcTh = m_useDB4FEE ? m_adcThresh[boardID] : m_adcThreshold;
+      if (adcCount < adcTh) adcCount = 0;
+    }
+    */
+
+    if (m_addTimeWalk) {
+      iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount);
+    }
 
     //remove negative drift time (TDC) upon request
     if (!m_outputNegativeDriftTime &&
@@ -473,7 +571,15 @@ void CDCDigitizerModule::event()
   // Store the results with trigger time window in a separate array
   // with corresponding relations.
   for (iterSignalMapTrg = signalMapTrg.begin(); iterSignalMapTrg != signalMapTrg.end(); ++iterSignalMapTrg) {
-    unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
+    /*
+    unsigned short adcCount = getADCCount(iterSignalMapTrg->first.first, iterSignalMapTrg->second.m_charge, 1., 0.);
+    unsigned short boardID = m_cdcgp->getBoardID(iterSignalMapTrg->first.first);
+    //    B2DEBUG(29, "boardID= " << boardID);
+    const unsigned short adcTh = m_useDB4FEE ? m_adcThresh[boardID] : m_adcThreshold;
+    if (adcCount < adcTh) adcCount = 0;
+    */
+    //    unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
+    unsigned short adcCount = iterSignalMapTrg->second.m_charge;
     unsigned short tdcCount =
       static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMapTrg->first.first) -
                                    iterSignalMapTrg->second.m_driftTime) * m_tdcBinWidthInv + 0.5);
@@ -504,10 +610,10 @@ void CDCDigitizerModule::event()
   */
 }
 
-float CDCDigitizerModule::smearDriftLength(const float driftLength, const float dDdt)
+double CDCDigitizerModule::smearDriftLength(const double driftLength, const double dDdt)
 {
-  float mean = 0.;
-  float resolution;
+  double mean = 0.;
+  double resolution;
 
   if (m_useSimpleDigitization) {
     if (gRandom->Uniform() <= m_fraction) {
@@ -522,6 +628,7 @@ float CDCDigitizerModule::smearDriftLength(const float driftLength, const float 
     double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
     double theta = m_cdcgp->getTheta(m_momentum);
     resolution = m_cdcgp->getSigma(driftLength, m_wireID.getICLayer(), leftRight, alpha, theta);
+    resolution *= m_totalFudgeFactor;
   }
 
   //subtract resol. due to digitization, which'll be added later in the digitization
@@ -541,19 +648,20 @@ float CDCDigitizerModule::smearDriftLength(const float driftLength, const float 
 #endif
 
   // Smear drift length
-  float newDL = gRandom->Gaus(driftLength + mean , resolution);
+  double newDL = gRandom->Gaus(driftLength + mean , resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
+  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
   return newDL;
 }
 
 
-float CDCDigitizerModule::getdDdt(const float driftL)
+double CDCDigitizerModule::getdDdt(const double driftL)
 {
   //---------------------------------------------------------------------------------
   // Calculates the 1'st derivative: dD/dt, where D: drift length before smearing; t: drift time
   //---------------------------------------------------------------------------------
 
-  float dDdt = m_driftV;
+  double dDdt = m_driftV;
 
   if (!m_useSimpleDigitization) {
     const unsigned short layer = m_wireID.getICLayer();
@@ -593,7 +701,7 @@ float CDCDigitizerModule::getdDdt(const float driftL)
 }
 
 
-float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTof, const bool addDelay)
+double CDCDigitizerModule::getDriftTime(const double driftLength, const bool addTof, const bool addDelay)
 {
   //---------------------------------------------------------------------------------
   // Method returning electron drift time (parameters: position in cm)
@@ -602,7 +710,7 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
   // the trigger system.
   //---------------------------------------------------------------------------------
 
-  float driftT = 0.;
+  double driftT = 0.;
 
   if (m_useSimpleDigitization) {
     driftT = (driftLength / Unit::cm) * m_driftVInv;
@@ -633,12 +741,12 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
     double propLength = (m_posWire - backWirePos).Mag();
     //    if (m_cdcgp->getSenseWireZposMode() == 1) {
     //TODO: replace the following with cached reference
-    //    std::cout << CDCGeoControlPar::getInstance().getSenseWireZposMode() << std::endl;
-    if (CDCGeoControlPar::getInstance().getSenseWireZposMode() == 1) {
+    //    std::cout << m_gcp->getInstance().getSenseWireZposMode() << std::endl;
+    if (m_gcp->getSenseWireZposMode() == 1) {
       const unsigned short layer = m_wireID.getICLayer();
       propLength += m_cdcgp->getBwdDeltaZ(layer);
     }
-    B2DEBUG(250, "Propagation in wire length: " << propLength);
+    //    B2DEBUG(29, "Propagation in wire length: " << propLength);
 
     if (m_useSimpleDigitization) {
       driftT += (propLength / Unit::cm) * m_propSpeedInv;
@@ -658,20 +766,67 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
   return driftT;
 }
 
-unsigned short CDCDigitizerModule::getADCCount(const float charge)
+
+//unsigned short CDCDigitizerModule::getADCCount(unsigned short layer, unsigned short cell, double edep, double dx, double costh)
+unsigned short CDCDigitizerModule::getADCCount(const WireID& wid, double dEinGeV, double dx, double costh)
 {
+  unsigned short adcCount = 0;
+  if (dEinGeV <= 0. || dx <= 0.) return adcCount;
+
   // The current value is taken from E. Nakano from some test beam results. This should be a somewhat realistic value, but doesn't need to be exact.
   // Similar as geometry parameters are for the ideal geometry, not the real one.
-  const float conversionChargeToADC = (100.0 / 3.2) * 1e6;
-  //  return static_cast<unsigned short>(conversionChargeToADC * charge);
-  //round-down -> round-up to be consistent with real adc module
-  unsigned short adcCount = static_cast<unsigned short>(std::ceil(conversionChargeToADC * charge));
-  /*
-  unsigned short adcCount1 = static_cast<unsigned short>(conversionChargeToADC * charge) + 1;
-  if (adcCount != adcCount1) {
-    std::cout << adcCount <<" " << adcCount1 << std::endl;
-    exit(-1);
+  //  const double conversionEDepToADC = (100.0 / 3.2) * 1e6;
+  double conv  = (100.0 / 3.2); //keV -> count
+  const unsigned short layer = wid.getICLayer();
+  const unsigned short cell  = wid.getIWire();
+  double dEInkeV = dEinGeV / Unit::keV;
+  if (m_spaceChargeEffect) {
+    if (m_useDB4EDepToADC) conv = m_cdcgp->getEDepToADCConvFactor(layer, cell, dEInkeV, dx, costh);
+  } else {
+    if (m_useDB4EDepToADC) conv = m_cdcgp->getEDepToADCMainFactor(layer, cell);
   }
-  */
+
+  //The ADCcount is obtained by rounding-up (measured voltage)/bin in real ADC. This is true both for pedestal and signal voltages, so the pedestal-subtracted ADCcount (simulated here) is rounded.
+  adcCount = static_cast<unsigned short>(std::round(conv * dEInkeV));
   return adcCount;
 }
+
+
+// Set FEE parameters (from DB)
+void CDCDigitizerModule::setFEElectronics()
+{
+  const double& off   = m_tdcThresholdOffset;
+  const double& gA    = m_analogGain;
+  const double& gD    = m_digitalGain;
+  const double& adcBW = m_adcBinWidth;
+  const double convF  = gA / gD / adcBW;
+  const double el1TrgLatency = m_cdcgp->getMeanT0(); // ns
+  B2DEBUG(29, "L1TRGLatency= " << el1TrgLatency);
+  const double c = 32. * m_tdcBinWidth;
+
+  int mode = 0;
+  for (const auto& fp : (*m_fEElectronicsFromDB)) {
+    if (fp.getBoardID() == -1) {
+      mode = 1;
+      break;
+    }
+  }
+
+  if (mode == 0) {
+    for (const auto& fp : (*m_fEElectronicsFromDB)) {
+      int bdi = fp.getBoardID();
+      if (bdi < 0 || bdi >= static_cast<int>(nBoards)) B2FATAL("CDCDigitizer:: Invalid no. of FEE boards !");
+      if (bdi == 0) continue; //bdi=0 is dummy (not used)
+      m_uprEdgeOfTimeWindow[bdi] = el1TrgLatency - c * (fp.getTrgDelay() + 1);
+      if (m_uprEdgeOfTimeWindow[bdi] < 0.) B2FATAL("CDCDigitizer: Upper edge of time window < 0!");
+      m_lowEdgeOfTimeWindow[bdi] = m_uprEdgeOfTimeWindow[bdi] - c * (fp.getWidthOfTimeWindow() + 1);
+      if (m_lowEdgeOfTimeWindow[bdi] > 0.) B2FATAL("CDCDigitizer: Lower edge of time window > 0!");
+      m_adcThresh[bdi] = fp.getADCThresh();
+      m_tdcThresh[bdi] = convF * (off - fp.getTDCThreshInMV());
+
+      B2DEBUG(29, bdi << " " << m_lowEdgeOfTimeWindow[bdi] << " " << m_uprEdgeOfTimeWindow[bdi] << " " << m_adcThresh[bdi] << " " <<
+              m_tdcThresh[bdi]);
+    }
+  }
+}
+

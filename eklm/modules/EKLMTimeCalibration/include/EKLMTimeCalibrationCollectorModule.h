@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONCOLLECTORMODULE_H
-#define EKLMTIMECALIBRATIONCOLLECTORMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -23,7 +22,9 @@
 #include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
+#include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 
 namespace Belle2 {
@@ -49,19 +50,22 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void prepare();
+    void prepare() override;
 
     /**
      * This method is called for each event.
      */
-    void collect();
+    void collect() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void finish();
+    void finish() override;
 
   private:
+
+    /** Use enent T0 or not. */
+    bool m_UseEventT0;
 
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
@@ -75,6 +79,9 @@ namespace Belle2 {
     /** Tracks. */
     StoreArray<Track> m_Tracks;
 
+    /** Event T0. */
+    StoreObjPtr<EventT0> m_EventT0;
+
     /** Event (for tree branches). */
     struct EKLMTimeCalibrationAlgorithm::Event m_ev;
 
@@ -84,6 +91,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

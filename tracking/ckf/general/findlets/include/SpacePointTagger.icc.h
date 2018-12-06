@@ -16,7 +16,7 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
   /// Clear the used clusters

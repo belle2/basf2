@@ -10,37 +10,30 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 
-#ifndef ECLBGMODULE_H_
-#define ECLBGMODULE_H_
-
-//basf2 framework headers
-#include <framework/core/HistoModule.h>
-#include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>  //contains ECLCrystalData class
-#include <ecl/dataobjects/ECLSimHit.h>
-
-#include <simulation/dataobjects/BeamBackHit.h>
-
-
-// if the ARICH package is installed, compile ARICH components
-#ifdef DOARICH
-#include <arich/geometry/ARICHGeometryPar.h>
-#endif
-
-//C++/C standard lib elements
-#include <string>
+//STL
 #include <vector>
-#include <queue>
-#include <map>
 
-//ROOT
-#include <TRandom3.h>
-#include <TVector3.h>
-#include <TH1.h>
-#include <TH2.h>
+//Framework
+#include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+
+
+class TH1F;
+class TH2F;
 
 namespace Belle2 {
 
+  class ECLSimHit;
+  class MCParticle;
+  class ECLShower;
+  class BeamBackHit;
+  class ECLCrystalData;
+
+#ifdef DOARICH
+  class ARICHGeometryPar;
+#endif
 
   class ECLBackgroundModule : public HistoModule {
 
@@ -53,24 +46,36 @@ namespace Belle2 {
     virtual ~ECLBackgroundModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
-    /** */
-    virtual void beginRun();
+    /** beginRun */
+    virtual void beginRun() override;
 
-    /* Event method  */
-    virtual void event();
+    /** Event method  */
+    virtual void event() override;
 
-    /**  */
-    virtual void endRun();
+    /** endRun */
+    virtual void endRun() override;
 
-    /** */
-    virtual void terminate();
+    /** terminate */
+    virtual void terminate() override;
 
     /** Initalize the histograms*/
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
+
+    /** Store array: ECLSimHit. */
+    StoreArray<ECLSimHit> m_eclArray;
+
+    /** Store array: MCParticle. */
+    StoreArray<MCParticle> m_mcParticles;
+
+    /** Store array: BeamBackHit. */
+    StoreArray<BeamBackHit> m_BeamBackArray;
+
+    /** Store array: ECLShower. */
+    StoreArray<ECLShower> m_eclShowerArray;
 
     /** length of sample in us */
     int m_sampleTime;
@@ -260,5 +265,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // ECLBGMODULE_H

@@ -35,7 +35,7 @@ TouschekReaderTURTLE::~TouschekReaderTURTLE()
 }
 
 
-void TouschekReaderTURTLE::open(const string& filename) throw(TouschekCouldNotOpenFileError)
+void TouschekReaderTURTLE::open(const string& filename)
 {
   m_lineNum = 0;
   m_input.open(filename.c_str());
@@ -43,7 +43,7 @@ void TouschekReaderTURTLE::open(const string& filename) throw(TouschekCouldNotOp
 }
 
 
-int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw(TouschekConvertFieldError)
+int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph)
 {
   if (m_transMatrix == NULL) {
     B2ERROR("The transformation matrix is NULL !");
@@ -77,7 +77,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw
         }
         fields[index] = boost::lexical_cast<double>(tok);
         index++;
-      } catch (boost::bad_lexical_cast) {
+      } catch (boost::bad_lexical_cast&) {
         throw (TouschekConvertFieldError() << m_lineNum << index << tok);
       }
     }

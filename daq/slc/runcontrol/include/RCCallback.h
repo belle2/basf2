@@ -1,3 +1,4 @@
+
 #ifndef _Belle2_RCCallback_hh
 #define _Belle2_RCCallback_hh
 
@@ -24,31 +25,34 @@ namespace Belle2 {
     friend class RCConfigHandler;
 
   public:
-    RCCallback(int timeout = 4) throw();
-    virtual ~RCCallback() throw() {}
+    RCCallback(int timeout = 4);
+    virtual ~RCCallback() {}
 
   public:
-    virtual void init(NSMCommunicator& com) throw();
-    virtual void boot(const DBObject&) throw(RCHandlerException) {}
-    virtual void load(const DBObject&) throw(RCHandlerException) {}
-    virtual void start(int /*expno*/, int /*runno*/) throw(RCHandlerException) {}
-    virtual void stop() throw(RCHandlerException) {}
-    virtual void recover(const DBObject&) throw(RCHandlerException) {}
-    virtual bool resume(int /*subno*/) throw(RCHandlerException) { return true; }
-    virtual bool pause() throw(RCHandlerException) { return true; }
-    virtual void abort() throw(RCHandlerException) {}
-    virtual void monitor() throw(RCHandlerException) {}
+    virtual void init(NSMCommunicator& com);
+    virtual void boot(const std::string& /* opt */, const DBObject&) {}
+    virtual void load(const DBObject&, const std::string& /*runtype*/) {}
+    virtual void start(int /*expno*/, int /*runno*/) {}
+    virtual void stop() {}
+    virtual void recover(const DBObject&, const std::string& /*runtype*/) {}
+    virtual bool resume(int /*subno*/) { return true; }
+    virtual bool pause() { return true; }
+    virtual void abort() {}
+    virtual void monitor() {}
+    virtual std::string dbdump();
 
   public:
-    virtual bool perform(NSMCommunicator& com) throw();
-    virtual void timeout(NSMCommunicator& com) throw();
+    virtual bool perform(NSMCommunicator& com);
+    virtual void timeout(NSMCommunicator& com);
 
   public:
-    virtual void initialize(const DBObject&) throw(RCHandlerException) {}
-    virtual void configure(const DBObject&) throw(RCHandlerException) {}
+    virtual void initialize(const DBObject&) {}
+    virtual void configure(const DBObject&) {}
+    void dump(bool isstart);
 
   public:
-    void setState(const RCState& state) throw();
+    const NSMNode& getRuncontrol() const { return m_runcontrol; }
+    void setState(const RCState& state);
     void setRCConfig(const std::string& rcconfig) { m_rcconfig = rcconfig; }
     void setDBTable(const std::string& table) { m_table = table; }
     void setDBFile(const std::string& file) { m_file = file; }
@@ -61,7 +65,7 @@ namespace Belle2 {
       m_provider_host = host;
       m_provider_port = port;
     }
-    DBObject& getDBObject() throw() { return m_obj; }
+    DBObject& getDBObject() { return m_obj; }
     void setRunNumbers(int expno, int runno)
     {
       m_expno = expno;
@@ -69,14 +73,15 @@ namespace Belle2 {
     }
     int getExpNumber() const { return m_expno; }
     int getRunNumber() const { return m_runno; }
+    void setRunTypeRecord(const std::string& runtype) { m_runtype_record = runtype; }
+    const std::string& getRunTypeRecord() const { return m_runtype_record; }
 
   private:
-    void dbload(int length, const char* data) throw(IOException);
+    void dbload(int length, const char* data);
 
   public:
     DBObject dbload(const std::string& path);
-  protected:
-    void dbrecord(DBObject obj, int expno, int runno, bool isstart) throw(IOException);
+    void configure_raw(int length, const char* data);
 
   private:
     RCState m_state_demand;
@@ -90,6 +95,8 @@ namespace Belle2 {
     int m_provider_port;
     int m_expno;
     int m_runno;
+    NSMNode m_runcontrol;
+    std::string m_runtype_record;
 
   protected:
     bool m_showall;

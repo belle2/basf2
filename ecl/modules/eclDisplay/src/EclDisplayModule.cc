@@ -8,8 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+//This module
 #include <ecl/modules/eclDisplay/EclDisplayModule.h>
+
+//Root
+#include <TApplication.h>
+#include <TSystem.h>
+
+//Framework
 #include <framework/utilities/FileSystem.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/modules/eclDisplay/EclFrame.h>
+#include <ecl/modules/eclDisplay/EclData.h>
+#include <ecl/modules/eclDisplay/geometry.h>
 
 using namespace Belle2;
 using namespace ECLDisplayUtility;
@@ -32,7 +45,7 @@ EclDisplayModule::EclDisplayModule() : Module()
   addParam("displayEnergy", m_displayEnergy,
            "If true, energy distribution per channel (shaper, crate) is displayed. Otherwise, number of counts is displayed", false);
   addParam("displayMode", m_displayMode,
-           "Default display mode. Can be later changed in GUI.", 7);
+           "Default display mode. Can be later changed in GUI.", 9);
   addParam("autoDisplay", m_autoDisplay,
            "If true, events are displayed as soon as they are loaded.", true);
   addParam("InitFileName", m_eclMapperInitFileName,
@@ -47,17 +60,7 @@ EclDisplayModule::~EclDisplayModule()
 
 void EclDisplayModule::initialize()
 {
-  StoreArray<ECLDigit>::required();
-
-  // Loading code from ECLUnpacker
-  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
-  if (!FileSystem::fileExists(ini_file_name)) {
-    B2FATAL("ECL Display : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-  }
-  // TODO: DB initialization is necessary.
-  if (!m_mapper.initFromFile(ini_file_name.data())) {
-    B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
-  }
+  m_eclarray.isRequired();
 
   initFrame();
 }
@@ -83,21 +86,23 @@ void EclDisplayModule::handleClosedFrame()
 
 void EclDisplayModule::beginRun()
 {
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_mapper.initFromDB()) {
+    B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  }
 }
 
 void EclDisplayModule::event()
 {
-  StoreArray<ECLDigit> eclarray;
-//  B2DEBUG(150, "eclarray.getEntries() == " << eclarray.getEntries());
-
   // EclFrame is closed, skipping data reading.
   if (m_frame_closed) return;
 
   int added_entries = 0;
 
-  for (int i = 0; i < eclarray.getEntries(); i++) {
-    ECLDigit* record = eclarray[i];
-    if (record->getAmp() > 20) {
+  for (int i = 0; i < m_eclarray.getEntries(); i++) {
+    ECLCalDigit* record = m_eclarray[i];
+    if (record->getEnergy() >= 1e-4) { //TODO: Move to constant ENERGY_THRESHOLD.
       if (m_data->addEvent(record, m_evtNum) == 0) {
         added_entries++;
       }
@@ -133,4 +138,3 @@ void EclDisplayModule::terminate()
   delete m_frame;
   delete m_data;
 }
-

@@ -34,7 +34,7 @@ def get_rfgetconf(conffile, item1, item2='NULL', item3='NULL'):
                          stderr=subprocess.PIPE)
     p.wait()
     output = p.stdout.read()
-#    print output
+#    print "getconf = ", output
     return output
 
 
@@ -48,7 +48,8 @@ def run_nsmd(nsmdir, port, nsmhost):
     # Check directory for loggin
     if not os.path.exists(nsmdir + '/' + nsmhost):
         os.mkdir(nsmdir + '/' + nsmhost)
-    nsmd = str(os.environ.get('BELLE2_EXTERNALS_BIN')) + '/nsmd2 -f -p ' \
+#    nsmd = str(os.environ.get('BELLE2_EXTERNALS_BIN')) + '/nsmd2 -f -p ' \
+    nsmd = 'nsmd2 -f -p ' \
         + port + ' -s ' + port + ' -h '
     cmd = 'ssh ' + nsmhost + ' "cd ' + nsmdir + '/' + nsmhost \
         + '; setenv NSMLOGDIR ' + nsmdir + '/' + nsmhost + ';' + nsmd \
@@ -172,9 +173,9 @@ def stop_eventserver(conffile):
     ringbuf = get_rfgetconf(conffile, 'distributor', 'ringbuffer')
     rbufname = unit + ':' + ringbuf
     shmname = unit + ':distributor'
-    p = subprocess.Popen('rfcommand ' + conffile +
-                         ' distributor RC_ABORT', shell=True)
-    p.wait()
+#    p = subprocess.Popen('rfcommand ' + conffile +
+#                         ' distributor RC_ABORT', shell=True)
+#    p.wait()
     pidfile = basedir + '/distributor/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + evshost + ' "kill ' + pid + '; removerb ' + rbufname \
@@ -211,8 +212,8 @@ def stop_outputserver(conffile):
     rbufinname = unit + ':' + rbufin
     rbufoutname = unit + ':' + rbufout
     shmname = unit + ':collector'
-    p = subprocess.Popen('rfcommand ' + conffile + ' collector RC_ABORT', shell=True)
-    p.wait()
+#    p = subprocess.Popen('rfcommand ' + conffile + ' collector RC_ABORT', shell=True)
+#    p.wait()
     pidfile = basedir + '/collector/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + opshost + ' "kill ' + pid + '; removerb ' + rbufinname \
@@ -275,9 +276,9 @@ def stop_eventprocessor(conffile):
             nodename = 'evp_' + nodebase + nodeid
             shmname = unit + ':' + nodename
             print shmname
-            p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename +
-                                 ' RC_ABORT', shell=True)
-            p.wait()
+#            p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename +
+#                                 ' RC_ABORT', shell=True)
+#            p.wait()
             pidfile = basedir + '/' + nodename + '/pid.data'
             for pid in open(pidfile, 'r'):
                 cmd = 'ssh ' + evphost + ' "kill ' + pid + '; removerb ' \
@@ -311,8 +312,8 @@ def run_dqmserver(conffile):
 def stop_dqmserver(conffile):
     dqmhost = get_rfgetconf(conffile, 'dqmserver', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
-    p = subprocess.Popen('rfcommand ' + conffile + ' dqmserver RC_ABORT', shell=True)
-    p.wait()
+#    p = subprocess.Popen('rfcommand ' + conffile + ' dqmserver RC_ABORT', shell=True)
+#    p.wait()
     pidfile = basedir + '/dqmserver/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + dqmhost + ' "kill ' + pid + '"'
@@ -344,8 +345,8 @@ def stop_roisender(conffile):
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
     unit = get_rfgetconf(conffile, 'system', 'unitname')
     shmname = unit + ':roisender'
-    p = subprocess.Popen('rfcommand ' + conffile + ' roisender RC_ABORT', shell=True)
-    p.wait()
+#    p = subprocess.Popen('rfcommand ' + conffile + ' roisender RC_ABORT', shell=True)
+#    p.wait()
     pidfile = basedir + '/roisender/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + roihost + ' "kill ' + pid + '; removeshm ' + shmname + '"'

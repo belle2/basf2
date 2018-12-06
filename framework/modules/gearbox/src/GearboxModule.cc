@@ -12,6 +12,8 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+// needed for complex module parameter
+#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;

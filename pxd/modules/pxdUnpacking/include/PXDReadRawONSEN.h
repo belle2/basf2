@@ -7,9 +7,7 @@
 // Date : 15 - Apr - 2014
 //-
 
-#ifndef PXDREADRAWONSEN_H
-#define PXDREADRAWONSEN_H
-
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
@@ -32,34 +30,35 @@ namespace Belle2 {
 
     /*! A class definition of an input module for Sequential ROOT I/O */
 
-#define MAXEVTSIZE (4*1024*1024)
 
     class PXDReadRawONSENModule : public Module {
+      enum {MAXEVTSIZE = 4 * 1024 * 1024};
 
       // Public functions
     public:
 
       //! Constructor / Destructor
       PXDReadRawONSENModule();
-      virtual ~PXDReadRawONSENModule();
+      ~PXDReadRawONSENModule();
 
-      //! Module functions to be called from main process
-      virtual void initialize();
 
-      //! Module functions to be called from event process
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
-
-      // Data members
     private:
 
-      // Parallel processing parameters
+      //! Module functions to be called from main process
+      void initialize() override final;
+
+      //! Module functions to be called from event process
+      void event() override final;
+      void terminate() override final;
+
+
+      // Data members
 
       //! Event Meta Data
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
+      //! Set Event Meta Info
+      bool m_setEvtMeta;
       //! File Name
       std::string m_filename;
 
@@ -87,4 +86,3 @@ namespace Belle2 {
   } // end namespace PXD
 } // end namespace Belle2
 
-#endif // PXDEADdRAWONSEN_H

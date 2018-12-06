@@ -12,26 +12,51 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 #include <tracking/ckf/general/utilities/Advancer.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/Exception.h>
 #include <framework/logging/Logger.h>
 
+#include <vector>
+#include <string>
+
 namespace Belle2 {
+  class ModuleParamList;
+
+  /**
+   * Filter which can be used on a pair of path (vector of states) and states,
+   * which will call the extrapolate function of the given advancer class, to extrapolate
+   * the last path state to the plane of the new state and store the mSoP in the
+   * new state. Will return the result of the advancers extrapolation function as a filter result or NAN
+   * of the extrapolation throws a genfit::Exception.
+   *
+   * @tparam AState: should have the basic functionality of a CKFState.
+   * @tparam AnAdvancer: The class to be used during extrapolation. Should have the functions:
+   *     * exposeParameters(moduleParamList, prefix)
+   *     * setMaterialEffectsToParameterValue()
+   *     * extrapolateToPlane(mSoP, plane)
+   *     * resetMaterialEffects()
+   *     should be a ProcessingSignalListener.
+   */
   template <class AState, class AnAdvancer>
   class AdvanceFilter : public
     TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>> {
+    using Super = TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>>;
+
   public:
-    AdvanceFilter()
+    AdvanceFilter() : Super()
     {
-      this->addProcessingSignalListener(&m_advancer);
+      Super::addProcessingSignalListener(&m_advancer);
     }
 
+    /// Expose the parameters of the advancer.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
       m_advancer.exposeParameters(moduleParamList, prefix);
     }
 
+    /// Extrapolate and return the result. Update the mSoP of the new state.
     TrackFindingCDC::Weight operator()(const std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>& pair)
     override
     {
@@ -64,6 +89,7 @@ namespace Belle2 {
     }
 
   private:
+    /// The advancer to use.
     AnAdvancer m_advancer;
   };
 }

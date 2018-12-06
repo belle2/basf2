@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMFIBERANDELECTRONICS_H
-#define EKLMFIBERANDELECTRONICS_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dbobjects/EKLMChannelData.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/simulation/FPGAFitter.h>
 
@@ -42,9 +42,19 @@ namespace Belle2 {
        * @param[in] fitter                  Fitter.
        * @param[in] debug                   Use debug mode.
        */
-      FiberAndElectronics(EKLMDigitizationParameters* digPar,
+      FiberAndElectronics(const EKLMDigitizationParameters* digPar,
                           FPGAFitter* fitter, double digitizationInitialTime,
                           bool debug);
+
+      /**
+       * Copy constructor (disabled).
+       */
+      FiberAndElectronics(const FiberAndElectronics&) = delete;
+
+      /**
+       * Operator = (disabled).
+       */
+      FiberAndElectronics& operator=(const FiberAndElectronics&) = delete;
 
       /**
        * Destructor.
@@ -86,9 +96,9 @@ namespace Belle2 {
                        std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
-       * Set threshold.
+       * Set channel data.
        */
-      void setThreshold(double threshold);
+      void setChannelData(const EKLMChannelData* channelData);
 
       /**
        * Generate photoelectrons.
@@ -113,7 +123,7 @@ namespace Belle2 {
     private:
 
       /** Parameters. */
-      EKLMDigitizationParameters* m_DigPar;
+      const EKLMDigitizationParameters* m_DigPar;
 
       /** Fitter. */
       FPGAFitter* m_fitter;
@@ -175,8 +185,14 @@ namespace Belle2 {
       /** Name of the strip. */
       std::string m_stripName;
 
+      /** Pedestal. */
+      double m_Pedestal;
+
+      /** Photoelectron amplitude. */
+      double m_PhotoelectronAmplitude;
+
       /** Threshold. */
-      double m_Threshold;
+      int m_Threshold;
 
       /**
        * Reallocate photoelectron buffers.
@@ -211,6 +227,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

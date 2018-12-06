@@ -18,7 +18,6 @@
 
 from basf2 import *
 from setup_modules import setup_RTCtoSPTCConverters
-from setup_modules import setup_Geometry
 import argparse
 import os
 
@@ -35,6 +34,14 @@ parser.add_argument(
     default=False,
     help='enable the selection of training sample based on track parameters')
 
+parser.add_argument(
+    '--disable_checkFit',
+    dest='checkFit',
+    action='store_const',
+    const=False,
+    default=True,
+    help="By default only RecoTracks with valid fit are taken for training. Using this option will disable that. ")
+
 arguments = parser.parse_args()
 use_noKick = arguments.use_NoKick
 
@@ -47,11 +54,13 @@ use_noKick = arguments.use_NoKick
 set_log_level(LogLevel.ERROR)
 log_to_file('logVXDTF2Preparation.log', append=False)
 # if false PXD hits will be ignored in the trainings data collection
+# Currently we dont do PXD tracking with vxdtf2 (as of 15.02.2018)
 usePXD = False
 
 # ---------------------------------------------------------------------------------------
 # Create paths
 path = create_path()
+
 
 # Input Module
 rootInputM = register_module('RootInput')
@@ -61,37 +70,47 @@ path.add_module(rootInputM)
 eventinfoprinter = register_module('EventInfoPrinter')
 path.add_module(eventinfoprinter)
 
+path.add_module("PrintCollections", printForEvent=1)
+
+
 # puts the geometry and gearbox in the path
-setup_Geometry(path)
+gearbox = register_module('Gearbox')
+path.add_module(gearbox)
+# the geometry is loaded from the DB by default now! The correct geometry
+# should be pickked according to exp number for the generated events.
+geometry = register_module('Geometry')
+path.add_module(geometry)
 
 # Event counter
-eventCounter = register_module('EventCounter')
-path.add_module(eventCounter)
+# eventCounter = register_module('EventCounter')
+# path.add_module(eventCounter)
 
 
 # put PXD and SVD SpacePoints into the same StoreArray
 if usePXD:
     spCreatorPXD = register_module('PXDSpacePointCreator')
-    spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-    spCreatorPXD.param('SpacePoints', 'SpacePoints')
+    spCreatorPXD.param('NameOfInstance', 'PXDSpacePointCreator')
+    spCreatorPXD.param('SpacePoints', 'PXDSpacePoints')
     path.add_module(spCreatorPXD)
 
 spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-spCreatorSVD.param('SpacePoints', 'SpacePoints')
+spCreatorSVD.param('NameOfInstance', 'SVDSpacePointCreator')
+spCreatorSVD.param('SpacePoints', 'SVDSpacePoints')
 path.add_module(spCreatorSVD)
 
 
 # Converts GenFit track candidates and checks them, with respect to the SecMap settings
 # Produces SpacePoint TrackCand which is used in VXDTFTrainingDataCollector.
 setup_RTCtoSPTCConverters(path=path,
-                          SPscollection='SpacePoints',
+                          SVDSPscollection='SVDSpacePoints',
+                          PXDSPscollection='PXDSpacePoints',
                           RTCinput='MCRecoTracks',
                           sptcOutput='checkedSPTCs',
                           usePXD=usePXD,
                           logLevel=LogLevel.ERROR,
-                          useNoKick=use_noKick)
+                          useNoKick=use_noKick,
+                          useOnlyFittedTracks=True)  # train on fitted tracks only
 
 
 # SecMap BootStrap
@@ -115,13 +134,17 @@ if usePXD:
 else:
     nameTag += '_SVDOnly'
 
+#
 SecMapTrainerBase = register_module('VXDTFTrainingDataCollector')
 SecMapTrainerBase.param('NameTag', nameTag)
 SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')
+# SecMapTrainerBase.logging.log_level = LogLevel.DEBUG
 path.add_module(SecMapTrainerBase)
 
 # this can take quite long so it is good to know if it is still running
 path.add_module('Progress')
+
+path.add_module("PrintCollections", printForEvent=1)
 
 process(path)
 

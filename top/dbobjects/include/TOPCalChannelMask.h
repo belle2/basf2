@@ -51,6 +51,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status not set");
         return;
       }
       m_status[module][channel] = status;
@@ -65,6 +66,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status 'active' not set");
         return;
       }
       m_status[module][channel] = c_Active;
@@ -79,6 +81,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status 'dead' not set");
         return;
       }
       m_status[module][channel] = c_Dead;
@@ -93,6 +96,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
+        B2WARNING("Channel status 'noisy' not set");
         return;
       }
       m_status[module][channel] = c_Noisy;
@@ -108,7 +112,7 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
-        B2ERROR("Returning dead channel value");
+        B2WARNING("Returning dead channel value");
         return c_Dead;
       }
       return m_status[module][channel];
@@ -124,31 +128,69 @@ namespace Belle2 {
     {
       int module = moduleID - 1;
       if (!check(module, channel)) {
-        B2ERROR("Returning false");
+        B2WARNING("Returning false");
         return false;
       }
       return (m_status[module][channel] == c_Active);
     }
 
+    /**
+     * Returns number of all channels
+     */
+    int getNumOfChannels() const {return c_numChannels * c_numModules;}
+
+    /**
+     * Returns number of active channels
+     */
+    int getNumOfActiveChannels() const {return getNumOf(c_Active);}
+
+    /**
+     * Returns number of dead channels
+     */
+    int getNumOfDeadChannels() const {return getNumOf(c_Dead);}
+
+    /**
+     * Returns number of noisy channels
+     */
+    int getNumOfNoisyChannels() const {return getNumOf(c_Noisy);}
+
+
   private:
+
     /**
      * Check input module and channel arguments are sane
      */
     bool check(const int module, const unsigned channel) const
     {
       if (module >= c_numModules) {
-        B2ERROR("Module number greater than " << c_numModules);
+        B2ERROR("Invalid module number (" << ClassName() << ")");
         return false;
       }
       if (module < 0) {
-        B2ERROR("Module number has gone negative");
+        B2ERROR("Invalid module number (" << ClassName() << ")");
         return false;
       }
       if (channel >= c_numChannels) {
-        B2ERROR("Channel number greater than " << c_numChannels);
+        B2ERROR("Invalid module number (" << ClassName() << ")");
         return false;
       }
       return true;
+    }
+
+    /**
+     * Counts and returns the number of channels having a given status
+     * @param check status to be checked
+     * @return number of channels of this status
+     */
+    int getNumOf(EStatus check) const
+    {
+      int n = 0;
+      for (const auto& statuses : m_status) {
+        for (const auto status : statuses) {
+          if (status == check) n++;
+        }
+      }
+      return n;
     }
 
     /**

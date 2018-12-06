@@ -5,7 +5,8 @@ namespace eudaq {
 
   EUDAQ_DEFINE_EVENT(StandardEvent, str2id("_STD"));
 
-  StandardPlane::StandardPlane() : m_id(0), m_tluevent(0), m_xsize(0), m_ysize(0), m_flags(0), m_pivotpixel(0), m_result_pix(0), m_result_x(0), m_result_y(0) {}
+  StandardPlane::StandardPlane() : m_id(0), m_tluevent(0), m_xsize(0), m_ysize(0), m_flags(0), m_pivotpixel(0), m_result_pix(0),
+    m_result_x(0), m_result_y(0) {}
 
   StandardPlane::StandardPlane(unsigned id, const std::string& type, const std::string& sensor)
     : m_type(type), m_sensor(sensor), m_id(id), m_tluevent(0), m_xsize(0), m_ysize(0),

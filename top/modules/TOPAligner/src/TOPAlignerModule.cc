@@ -25,10 +25,13 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// datastore classes
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <top/dataobjects/TOPDigit.h>
+// analysis
+#include <analysis/utility/PCmsLabTransform.h>
+
+// root
+#include <TH1F.h>
+#include <TH2F.h>
+
 
 using namespace std;
 
@@ -62,8 +65,40 @@ namespace Belle2 {
              "Module to be aligned. Must be 1 <= Mid <= 16.", 1);
     addParam("maxFails", m_maxFails,
              "Maximum number of consecutive failed iterations before resetting the procedure", 100);
+    addParam("sample", m_sample,
+             "sample type: one of dimuon, bhabha or cosmics", std::string("dimuon"));
+    addParam("minMomentum", m_minMomentum,
+             "minimal track momentum if sample is cosmics", 1.0);
+    addParam("deltaEcms", m_deltaEcms,
+             "c.m.s energy window (half size) if sample is dimuon or bhabha", 0.1);
+    addParam("dr", m_dr, "cut on POCA in r", 2.0);
+    addParam("dz", m_dz, "cut on POCA in abs(z)", 4.0);
+    addParam("minZ", m_minZ,
+             "minimal local z of extrapolated hit", -130.0);
+    addParam("maxZ", m_maxZ,
+             "maximal local z of extrapolated hit", 130.0);
     addParam("outFileName", m_outFileName,
-             "Root output file name containing alignment results", std::string("TopAlignPars.root"));
+             "Root output file name containing alignment results",
+             std::string("TopAlignPars.root"));
+    addParam("stepPosition", m_stepPosition, "step size for translations", 1.0);
+    addParam("stepAngle", m_stepAngle, "step size for rotations", 0.01);
+    addParam("stepTime", m_stepTime, "step size for t0", 0.05);
+    addParam("stepRefind", m_stepRefind,
+             "step size for scaling of refractive index (dn/n)", 0.005);
+    addParam("gridSize", m_gridSize,
+             "size of a 2D grid for time-of-propagation averaging in analytic PDF: "
+             "[number of emission points along track, number of Cerenkov angles]. "
+             "No grid used if list is empty.", m_gridSize);
+    std::string names;
+    for (const auto& parName : m_align.getParameterNames()) names += parName + ", ";
+    names.pop_back();
+    names.pop_back();
+    addParam("parInit", m_parInit,
+             "initial parameter values in the order [" + names + "]. "
+             "If list is too short, the missing ones are set to 0.", m_parInit);
+    auto parFixed = m_parFixed;
+    addParam("parFixed", m_parFixed, "list of names of parameters to be fixed. "
+             "Valid names are: " + names, parFixed);
 
   }
 
@@ -74,19 +109,31 @@ namespace Belle2 {
   void TOPAlignerModule::initialize()
   {
 
-    // check if the target module is correctly set
-
-    if (m_targetMid < 1 || m_targetMid > 16)
-      B2FATAL("Target ModuleId is not correctly set, use targetModule in [1, 16]. Exiting...");
-
-
     // check if target module ID is valid
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     if (!geo->isModuleIDValid(m_targetMid))
-      B2FATAL("Target module " << m_targetMid << " is invalid. Exiting...");
+      B2FATAL("Target module ID = " << m_targetMid << " is invalid. Exiting...");
 
-    m_align = TOPalign(m_targetMid);
+    // check if sample type is valid
+
+    if (!(m_sample == "dimuon" or m_sample == "bhabha" or m_sample == "cosmics")) {
+      B2FATAL("Invalid sample type " << m_sample << ". Exiting...");
+    }
+    if (m_sample == "bhabha") m_chargedStable = Const::electron;
+
+    // set alignment object
+
+    m_align.setModuleID(m_targetMid);
+    m_align.setSteps(m_stepPosition, m_stepAngle, m_stepTime, m_stepRefind);
+    if (m_gridSize.size() == 2) {
+      m_align.setGrid(m_gridSize[0], m_gridSize[1]);
+      B2INFO("TOPAligner: grid for time-of-propagation averaging is set");
+    }
+    m_align.setParameters(m_parInit);
+    for (const auto& parName : m_parFixed) {
+      m_align.fixParameter(parName);
+    }
 
     // configure detector in reconstruction code
 
@@ -94,22 +141,16 @@ namespace Belle2 {
 
     // input
 
-    StoreArray<TOPDigit> digits;
-    digits.isRequired();
-
-    StoreArray<Track> tracks;
-    tracks.isRequired();
-
-    StoreArray<ExtHit> extHits;
-    extHits.isRequired();
-
+    m_digits.isRequired();
+    m_tracks.isRequired();
+    m_extHits.isRequired();
+    m_recBunch.isOptional();
 
     // set counter for failed iterations:
 
     m_countFails = 0;
 
-
-    // output file
+    // open output file
 
     m_file = new TFile(m_outFileName.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
@@ -117,13 +158,29 @@ namespace Belle2 {
       return;
     }
 
+    // create output tree
 
     m_alignTree = new TTree("alignTree", "TOP alignment results");
-
     m_alignTree->Branch("ModuleId", &m_targetMid);
+    m_alignTree->Branch("iter", &m_iter);
     m_alignTree->Branch("ntrk", &m_ntrk);
     m_alignTree->Branch("errorCode", &m_errorCode);
     m_alignTree->Branch("iterPars", &m_vAlignPars);
+    m_alignTree->Branch("iterParsErr", &m_vAlignParsErr);
+    m_alignTree->Branch("valid", &m_valid);
+    m_alignTree->Branch("x", &m_x);
+    m_alignTree->Branch("y", &m_y);
+    m_alignTree->Branch("z", &m_z);
+    m_alignTree->Branch("p", &m_p);
+    m_alignTree->Branch("theta", &m_theta);
+    m_alignTree->Branch("phi", &m_phi);
+    m_alignTree->Branch("r_poca", &m_pocaR);
+    m_alignTree->Branch("z_poca", &m_pocaZ);
+    m_alignTree->Branch("x_poca", &m_pocaX);
+    m_alignTree->Branch("y_poca", &m_pocaY);
+    m_alignTree->Branch("Ecms", &m_cmsE);
+    m_alignTree->Branch("charge", &m_charge);
+    m_alignTree->Branch("PDG", &m_PDG);
 
   }
 
@@ -134,63 +191,80 @@ namespace Belle2 {
   void TOPAlignerModule::event()
   {
 
+    // check bunch reconstruction status and run alignment:
+    // - if object exists and bunch is found (collision data w/ bunch finder in the path)
+    // - if object doesn't exist (cosmic data and other cases w/o bunch finder)
+
+    if (m_recBunch.isValid()) {
+      if (!m_recBunch->isReconstructed()) return;
+    }
+
     // add photons
 
     TOPalign::clearData();
 
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTime());
+        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
+                          digit.getTimeError());
     }
 
     TOPalign::setPhotonYields(m_minBkgPerBar, m_scaleN0);
 
     // track-by-track iterations
 
-    StoreArray<Track> tracks;
-    for (const auto& track : tracks) {
+    for (const auto& track : m_tracks) {
 
       // construct TOPtrack from mdst track
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 
-      // do iteration
-      int i = trk.getModuleID() - 1;
+      // skip if track not hitting target module
+      if (trk.getModuleID() != m_targetMid) continue;
 
-      // skip if moduleID != target module
-      if (m_targetMid != (i + 1)) continue;
+      // track selection
+      if (!selectTrack(trk)) continue;
 
-      auto& align = m_align;
-      int err = align.iterate(trk, Const::muon);
+      // do an iteration
+      int err = m_align.iterate(trk, m_chargedStable);
+      m_iter++;
 
       // check number of consecutive failures, and in case reset
-
-      if (err == 0) m_countFails = 0;
-      else if (m_countFails <= m_maxFails) m_countFails++;
-      else {
-        B2INFO("Reached maximum allowed number of failed iterations. Resetting TOPalign object(s)");
-        m_align = TOPalign(m_targetMid);
+      if (err == 0) {
+        m_countFails = 0;
+      } else if (m_countFails <= m_maxFails) {
+        m_countFails++;
+      } else {
+        B2INFO("Reached maximum allowed number of failed iterations. "
+               "Resetting TOPalign object");
+        m_align.reset();
         m_countFails = 0;
       }
 
-      const std::vector<float>& curPars = align.getParameters();
-
-      m_ntrk = align.getNumTracks();
+      // get new parameter values and estimated errors
+      m_vAlignPars = m_align.getParameters();
+      m_vAlignParsErr = m_align.getErrors();
+      m_ntrk = m_align.getNumUsedTracks();
       m_errorCode = err;
-      m_vAlignPars = curPars;
-
-      B2INFO("M=" << align.getModuleID() << " ntr=" << m_ntrk << " err=" << m_errorCode << " v=" << align.isValid()
-             << " " << curPars.at(0)
-             << " " << curPars.at(1)
-             << " " << curPars.at(2)
-             << " " << curPars.at(3)
-             << " " << curPars.at(4)
-             << " " << curPars.at(5)
-             << " " << curPars.at(6));
+      m_valid = m_align.isValid();
 
       // fill output tree
       m_alignTree->Fill();
+
+      // print info
+      TString resMsg = "M= ";
+      resMsg += m_align.getModuleID();
+      resMsg += " ntr=";
+      resMsg += m_ntrk;
+      resMsg += " err=";
+      resMsg += m_errorCode;
+      resMsg += " v=";
+      resMsg += m_align.isValid();
+      for (auto par : m_vAlignPars) {
+        resMsg += " ";
+        resMsg += par;
+      }
+      B2DEBUG(100, resMsg);
 
     }
 
@@ -206,10 +280,113 @@ namespace Belle2 {
 
     m_file->cd();
     m_alignTree->Write();
+
+    TH1F valid("valid", "status valid", 16, 0.5, 16.5);
+    valid.SetXTitle("slot ID");
+    valid.SetBinContent(m_targetMid, m_valid);
+    valid.Write();
+
+    TH1F ntrk("ntrk", "number of tracks", 16, 0.5, 16.5);
+    ntrk.SetXTitle("slot ID");
+    ntrk.SetBinContent(m_targetMid, m_ntrk);
+    ntrk.Write();
+
+    std::string name, title;
+    name = "results_slot" + to_string(m_targetMid);
+    title = "alignment parameters, slot " + to_string(m_targetMid);
+    int npar = m_align.getParameters().size();
+    TH1F h0(name.c_str(), title.c_str(), npar, 0, npar);
+    const auto& par = m_align.getParameters();
+    const auto& err = m_align.getErrors();
+    for (int i = 0; i < npar; i++) {
+      h0.SetBinContent(i + 1, par[i]);
+      h0.SetBinError(i + 1, err[i]);
+    }
+    h0.Write();
+
+    name = "errMatrix_slot" + to_string(m_targetMid);
+    title = "error matrix, slot " + to_string(m_targetMid);
+    TH2F h1(name.c_str(), title.c_str(), npar, 0, npar, npar, 0, npar);
+    const auto& errMatrix = m_align.getErrorMatrix();
+    for (int i = 0; i < npar; i++) {
+      for (int k = 0; k < npar; k++) {
+        h1.SetBinContent(i + 1, k + 1, errMatrix[i + npar * k]);
+      }
+    }
+    h1.Write();
+
+    name = "corMatrix_slot" + to_string(m_targetMid);
+    title = "correlation matrix, slot " + to_string(m_targetMid);
+    TH2F h2(name.c_str(), title.c_str(), npar, 0, npar, npar, 0, npar);
+    std::vector<double> diag;
+    for (int i = 0; i < npar; i++) {
+      double d = errMatrix[i * (1 + npar)];
+      if (d != 0) d = 1.0 / sqrt(d);
+      diag.push_back(d);
+    }
+    for (int i = 0; i < npar; i++) {
+      for (int k = 0; k < npar; k++) {
+        h2.SetBinContent(i + 1, k + 1, diag[i] * diag[k] * errMatrix[i + npar * k]);
+      }
+    }
+    h2.Write();
+
     m_file->Close();
 
+    if (m_valid) {
+      B2RESULT("TOPAligner: slot = " << m_targetMid << ", status = successful, "
+               << "iterations = " << m_iter << ", tracks used = " << m_ntrk);
+    } else {
+      B2RESULT("TOPAligner: slot = " << m_targetMid << ", status = failed, "
+               << "error code = " << m_errorCode
+               << ", iterations = " << m_iter << ", tracks used = " << m_ntrk);
+    }
   }
 
+  bool TOPAlignerModule::selectTrack(const TOP::TOPtrack& trk)
+  {
+
+    const auto* fit = trk.getTrack()->getTrackFitResultWithClosestMass(m_chargedStable);
+    auto pocaPosition = fit->getPosition();
+    m_pocaR = pocaPosition.Perp();
+    m_pocaZ = pocaPosition.Z();
+    m_pocaX = pocaPosition.X();
+    m_pocaY = pocaPosition.Y();
+    if (m_pocaR > m_dr) return false;
+    if (fabs(m_pocaZ) > m_dz) return false;
+
+    auto pocaMomentum = fit->getMomentum();
+
+    if (m_sample == "cosmics") {
+      if (pocaMomentum.Mag() < m_minMomentum) return false;
+    } else {
+      TLorentzVector lorentzLab;
+      lorentzLab.SetXYZM(pocaMomentum.X(), pocaMomentum.Y(), pocaMomentum.Z(),
+                         m_chargedStable.getMass());
+      PCmsLabTransform T;
+      auto lorentzCms = T.labToCms(lorentzLab);
+      m_cmsE = lorentzCms.Energy();
+      double dE = m_cmsE - T.getCMSEnergy() / 2;
+      if (fabs(dE) > m_deltaEcms) return false;
+    }
+
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    const auto& module = geo->getModule(m_targetMid);
+    auto position = module.pointToLocal(trk.getPosition());
+    auto momentum = module.momentumToLocal(trk.getMomentum());
+    m_x = position.X();
+    m_y = position.Y();
+    m_z = position.Z();
+    m_p = momentum.Mag();
+    m_theta = momentum.Theta();
+    m_phi = momentum.Phi();
+    m_charge = trk.getCharge();
+    m_PDG = trk.getPDGcode();
+
+    if (m_z < m_minZ or m_z > m_maxZ) return false;
+
+    return true;
+  }
 
 } // end Belle2 namespace
 

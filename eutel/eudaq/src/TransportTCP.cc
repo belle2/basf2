@@ -311,7 +311,8 @@ namespace eudaq {
               }
             } //else /*if (result == 0)*/ {
             if (result == 0) {
-              if (dbg) std::cout << "Server #" << j << ", return=" << result << " WSAError:" << LastSockError() << ", --> was closed " << std::endl;
+              if (dbg) std::cout << "Server #" << j << ", return=" << result << " WSAError:" << LastSockError() << ", --> was closed " <<
+                                   std::endl;
               ConnectionInfoTCP& m = GetInfo(j);
               m_events.push(TransportEvent(TransportEvent::DISCONNECT, m));
               m.Disable();
@@ -415,7 +416,8 @@ namespace eudaq {
           if (dbg) std::cout << "Client, return=" << result << " WSAError:" << LastSockError() << ", --> Time out. " << std::endl;
         }
         if (result == 0) {
-          if (dbg) std::cout << "Client, return=" << result << " WSAError:" << LastSockError() << ", --> WARN: Connection closed (?) " << std::endl;
+          if (dbg) std::cout << "Client, return=" << result << " WSAError:" << LastSockError() << ", --> WARN: Connection closed (?) " <<
+                               std::endl;
           donereading = true;
           EUDAQ_THROW(LastSockErrorString("SocketClient Error (" + to_string(LastSockError()) + ")"));
         }

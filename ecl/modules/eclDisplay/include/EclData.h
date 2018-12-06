@@ -8,16 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_DATA
-#define ECL_DATA
+#pragma once
 
+//STL
+#include <vector>
+#include <set>
+
+//Root
 #include <TTree.h>
 #include <TH1F.h>
-#include <vector>
-#include <framework/logging/Logger.h>
-#include <ecl/dataobjects/ECLDigit.h>
+
+class TTree;
+
 
 namespace Belle2 {
+
+  class ECLCalDigit;
+
   /**
    * This class contains data for ECLSimHit's and provides several
    * relevant conversion functions for better event display.
@@ -27,21 +34,21 @@ namespace Belle2 {
     /**  Tree with loaded events. */
     TTree* m_tree;
     /**  Tree channel field */
-    int ch;
-    /**  Tree amplitude field */
-    int amp;
-    /**  Tree time field */
-    int time;
-    /**  Tree event number field. */
-    int evtn;
+    int m_branch_ch;
+    /**  Tree energy branch */
+    double m_branch_energy;
+    /**  Tree time branch */
+    double m_branch_time;
+    /**  Tree event number branch. */
+    int m_branch_evtn;
 
     /**  Number of events for each crystal. */
     int* m_event_counts;
     /**  Max value in event_counts array. */
     int m_event_count_max;
-    /**  Sum of amplitudes of every event captured by crystal. */
+    /**  Sum of energies of every event captured by crystal (MeV). */
     float* m_energy_sums;
-    /**  Max value in amp_sums array. */
+    /**  Max value in m_energy_sums array. */
     float m_energy_sums_max;
     /**  Total energy for last displayed range of events. */
     float m_energy_total;
@@ -80,21 +87,7 @@ namespace Belle2 {
     /**  First crystal id in the beginning of i-th ECL ring.
      *  Taken from basf2/ecl/data/ecl_channels_map (two last columns)
      */
-    const int ring_start_id[70] = {
-      // forward (0-12)
-      1,    49,   97,   161,  225,  289,  385,  481,  577,  673,
-      769,  865,  1009,
-      // barrel (13-58)
-      1153, 1297, 1441, 1585, 1729, 1873, 2017, 2161, 2305, 2449,
-      2593, 2737, 2881, 3025, 3169, 3313, 3457, 3601, 3745, 3889,
-      4033, 4177, 4321, 4465, 4609, 4753, 4897, 5041, 5185, 5329,
-      5473, 5617, 5761, 5905, 6049, 6193, 6337, 6481, 6625, 6769,
-      6913, 7057, 7201, 7345, 7489, 7633,
-      // forward (59-68)
-      7777, 7921, 8065, 8161, 8257, 8353, 8449, 8545, 8609, 8673,
-      // last_crystal+1
-      getCrystalCount() + 1
-    };
+    static const int ring_start_id[70];
 
   public:
     /**  Subsystems of ECL:
@@ -114,11 +107,20 @@ namespace Belle2 {
      * Copy constructor. Resets m_excluded_ch upon copy.
      */
     EclData(const EclData& data);
+    /**
+     * Assignment operator: utilizes copy constructor.
+     */
+    EclData& operator=(const EclData& other);
 
 
     ~EclData();
 
   private:
+    /**
+     * Clone attributes from other EclData.
+     */
+    void cloneFrom(const EclData& other);
+
     /**
      * Initialization of arrays.
      */
@@ -132,7 +134,7 @@ namespace Belle2 {
     /**
      * Get number of crystals in ECL.
      */
-    int getCrystalCount();
+    static int getCrystalCount();
 
     /**
      * Returns data contained in EclDisplay.
@@ -249,29 +251,32 @@ namespace Belle2 {
     void includeChannel(int ch, bool do_update = false);
 
     /**
-     * Update time_min, time_max, event_counts and amp_sums.
+     * Load root file containing ECLCalDigit data from the specified path.
+     */
+    void loadRootFile(const char* path);
+
+    /**
+     * Update time_min, time_max, event_counts and energy_sums.
      */
     void update(bool reset_event_ranges = false);
 
-    // Deprecated method.
-    //void addEvent(int ch, int amp, int time, int evtn);
     /**
      * Add ECLDigit event to inner TTree (m_tree).
      * @param event ECLDigit event
      * @param evtn Number of event.
      * @return If ECLDigit contains incorrect data, negative values are returned. Otherwise, return value is 0.
      */
-    int addEvent(ECLDigit* event, int evtn);
+    int addEvent(ECLCalDigit* event, int evtn);
     /**
-     * Fill amplitude per channel histogram for the specified EclSubsystem
+     * Fill energy per channel histogram for the specified EclSubsystem
      * (Barrel, forward endcap, backward endcap, all of them).
      */
-    void fillAmpHistogram(TH1F* hist, int amp_min, int amp_max, EclSubsystem subsys);
+    void fillEnergyHistogram(TH1F* hist, int energy_min, int energy_max, EclSubsystem subsys);
     /**
-     * Fill amplitude per event histogram for the specified EclSubsystem
+     * Fill energy per event histogram for the specified EclSubsystem
      * (Barrel, forward endcap, backward endcap, all of them).
      */
-    void fillAmpSumHistogram(TH1F* hist, int amp_min, int amp_max, EclSubsystem subsys);
+    void fillEnergySumHistogram(TH1F* hist, int energy_min, int energy_max, EclSubsystem subsys);
     /**
      * Fill time histogram for the specified EclSubsystem
      * (Barrel, forward endcap, backward endcap, all of them).
@@ -279,5 +284,3 @@ namespace Belle2 {
     void fillTimeHistogram(TH1F* hist, int time_min, int time_max, EclSubsystem subsys);
   };
 }
-
-#endif // ECL_DATA

@@ -24,7 +24,7 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
     Py_ssize_t nObj = PySequence_Length(pyObj);
     // Does it have 2 objects in it?
     if (nObj != 2) {
-      B2DEBUG(100, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
+      B2DEBUG(29, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
       return false;
     }
     long value1, value2;
@@ -33,7 +33,7 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
     item2 = PySequence_GetItem(pyObj, 1);
     // Did the GetItem work?
     if ((item1 == NULL) || (item2 == NULL)) {
-      B2DEBUG(100, "A PyObject pointer was NULL in the sequence");
+      B2DEBUG(29, "A PyObject pointer was NULL in the sequence");
       return false;
     }
     // Are they longs?
@@ -41,18 +41,18 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
       value1 = PyLong_AsLong(item1);
       value2 = PyLong_AsLong(item2);
       if (((value1 == -1) || (value2 == -1)) && PyErr_Occurred()) {
-        B2DEBUG(100, "An error occurred while converting the PyLong to long");
+        B2DEBUG(29, "An error occurred while converting the PyLong to long");
         return false;
       }
     } else {
-      B2DEBUG(100, "One or more of the PyObjects in the ExpRun wasn't a long");
+      B2DEBUG(29, "One or more of the PyObjects in the ExpRun wasn't a long");
       return false;
     }
     // Make sure to kill off the reference GetItem gave us responsibility for
     Py_DECREF(item1);
     Py_DECREF(item2);
   } else {
-    B2DEBUG(100, "ExpRun was not a Python sequence.");
+    B2DEBUG(29, "ExpRun was not a Python sequence.");
     return false;
   }
   return true;
@@ -74,7 +74,7 @@ ExpRun CalibrationAlgorithm::convertPyExpRun(PyObject* pyObj)
 
 CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(PyObject* runs, int iteration, IntervalOfValidity iov)
 {
-  B2DEBUG(100, "Running execute() using Python Object as input argument");
+  B2DEBUG(29, "Running execute() using Python Object as input argument");
   // Reset the execution specific data in case the algorithm was previously called
   m_data.reset();
   m_data.setIteration(iteration);
@@ -120,7 +120,7 @@ CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<ExpRun> runs,
   // Did we receive runs to execute over explicitly?
   if (!(runs.empty())) {
     for (auto expRun : runs) {
-      B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
+      B2DEBUG(29, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
     }
     // We've asked explicitly for certain runs, but we should check if the data granularity is 'run'
     if (strcmp(getGranularity().c_str(), "all") == 0) {
@@ -137,7 +137,7 @@ CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector<ExpRun> runs,
       return c_Failure;
     }
     for (auto expRun : runs) {
-      B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
+      B2DEBUG(29, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
     }
   }
 
@@ -208,9 +208,12 @@ void CalibrationAlgorithm::setInputFileNames(vector<string> inputFileNames)
   if (setInputFileNames.empty()) {
     B2WARNING("No valid files specified!");
     return;
+  } else {
+    // Reset the run -> files map as our files are likely different
+    m_runsToInputFiles.clear();
   }
 
-  //Open TFile to check they can be accessed by ROOT
+  // Open TFile to check they can be accessed by ROOT
   TDirectory* dir = gDirectory;
   for (const string& fileName : setInputFileNames) {
     unique_ptr<TFile> f;
@@ -258,13 +261,13 @@ string CalibrationAlgorithm::getFullObjectPath(string name, ExpRun expRun) const
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
-  B2DEBUG(100, "Saving calibration TObject = '" <<  name << "' to payloads list.");
+  B2DEBUG(29, "Saving calibration TObject = '" <<  name << "' to payloads list.");
   getPayloads().emplace_back(name, data, iov);
 }
 
 void CalibrationAlgorithm::saveCalibration(TClonesArray* data, const string& name, const IntervalOfValidity& iov)
 {
-  B2DEBUG(100, "Saving calibration TClonesArray '" <<  name << "' to payloads list.");
+  B2DEBUG(29, "Saving calibration TClonesArray '" <<  name << "' to payloads list.");
   getPayloads().emplace_back(name, data, iov);
 }
 
@@ -292,12 +295,12 @@ bool CalibrationAlgorithm::commit()
 {
   if (getPayloads().empty())
     return false;
-  list<Database::DBQuery> payloads = getPayloads();
+  list<Database::DBImportQuery> payloads = getPayloads();
   B2INFO("Committing " << payloads.size()  << " payloads to database.");
   return Database::Instance().storeData(payloads);
 }
 
-bool CalibrationAlgorithm::commit(list<Database::DBQuery> payloads)
+bool CalibrationAlgorithm::commit(list<Database::DBImportQuery> payloads)
 {
   if (payloads.empty())
     return false;
@@ -314,6 +317,37 @@ vector<ExpRun> CalibrationAlgorithm::getRunListFromAllData() const
 IntervalOfValidity CalibrationAlgorithm::getIovFromAllData() const
 {
   return getRunRangeFromAllData().getIntervalOfValidity();
+}
+
+void CalibrationAlgorithm::fillRunToInputFilesMap()
+{
+  m_runsToInputFiles.clear();
+  // Save TDirectory to change back at the end
+  TDirectory* dir = gDirectory;
+  RunRange* runRange;
+  // Construct the TDirectory name where we expect our objects to be
+  string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
+  for (const auto& fileName : m_inputFileNames) {
+    //Open TFile to get the objects
+    unique_ptr<TFile> f;
+    f.reset(TFile::Open(fileName.c_str(), "READ"));
+    runRange = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+    if (runRange) {
+      // Insert or extend the run -> file mapping for this ExpRun
+      auto expRuns = runRange->getExpRunSet();
+      for (const auto& expRun : expRuns) {
+        auto runFiles = m_runsToInputFiles.find(expRun);
+        if (runFiles != m_runsToInputFiles.end()) {
+          (runFiles->second).push_back(fileName);
+        } else {
+          m_runsToInputFiles.insert(std::make_pair(expRun, std::vector<std::string> {fileName}));
+        }
+      }
+    } else {
+      B2WARNING("Missing a RunRange object for file: " << fileName);
+    }
+  }
+  dir->cd();
 }
 
 RunRange CalibrationAlgorithm::getRunRangeFromAllData() const
@@ -360,6 +394,16 @@ string CalibrationAlgorithm::getGranularityFromData() const
   return granularity;
 }
 
+void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event = 1, const int run = 0, const int experiment = 0)
+{
+  // Construct an EventMetaData object but NOT in the Datastore
+  EventMetaData emd(event, run, experiment);
+  // Explicitly update while avoiding registering a Datastore object
+  DBStore::Instance().update(emd);
+  // Also update the intra-run objects to the event at the same time (maybe unnessary...)
+  DBStore::Instance().updateEvent(event);
+}
+
 // Have to put the explicit template specialization in the enclosing namespace
 namespace Belle2 {
   /** We cheekily cast the TChain to TTree for the returned pointer so that the user never knows
@@ -369,7 +413,7 @@ namespace Belle2 {
   shared_ptr<TTree> CalibrationAlgorithm::getObjectPtr<TTree>(const string& name,
                                                               const vector<ExpRun>& requestedRuns)
   {
-    // Check if this object already exists in our map
+    // Check if this object already exists
     RunRange runRangeRequested(requestedRuns);
     std::shared_ptr<TTree> objOutputPtr = std::dynamic_pointer_cast<TTree>(m_data.getCalibObj(name, runRangeRequested));
     if (objOutputPtr)
@@ -380,38 +424,41 @@ namespace Belle2 {
     chain->SetDirectory(0);
     // Construct the TDirectory names where we expect our objects to be
     string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
+
     if (strcmp(getGranularity().c_str(), "run") == 0) {
-      RunRange* runRangeData;
-      for (const auto& fileName : m_inputFileNames) {
-        //Open TFile to get the objects
-        unique_ptr<TFile> f;
-        f.reset(TFile::Open(fileName.c_str(), "READ"));
-        runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
-        if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-          B2DEBUG(100, "Found requested data in file: " << fileName);
-          // Loop over runs in data and check if they exist in our requested ones, then add if they do
-          for (auto expRunData : runRangeData->getExpRunSet()) {
-            for (auto expRunRequested : requestedRuns) {
-              if (expRunData == expRunRequested) {
-                string objDirName = getFullObjectPath(name, expRunData);
-                TDirectory* objDir = f->GetDirectory(objDirName.c_str());
-                // Annoyingly GetPath() returns a string that isn't useful to TChain.Add(), it contains a
-                // filename.root:/path/to/dir  instead of filename.root/path/to/dir
-                // So we have to construct the path explicitly
-                string objDirPath = objDir->GetPath();
-                // Find all the objects inside, there may be more than one
-                for (auto key : * (objDir->GetListOfKeys())) {
-                  string keyName = key->GetName();
-                  string objectPath = fileName + "/" + objDirName + "/" + keyName;
-                  B2DEBUG(100, "Adding TTree " << objectPath);
-                  chain->Add(objectPath.c_str());
-                }
-              }
+      // Loop over our runs requested for the right files
+      for (auto expRunRequested : requestedRuns) {
+        // Find the relevant files for this ExpRun
+        auto searchFiles = m_runsToInputFiles.find(expRunRequested);
+        if (searchFiles == m_runsToInputFiles.end()) {
+          B2WARNING("No input file found with data collected from run "
+                    "(" << expRunRequested.first << "," << expRunRequested.second << ")");
+          continue;
+        } else {
+          auto files = searchFiles->second;
+          for (auto fileName : files) {
+            RunRange* runRangeData;
+            //Open TFile to get the objects
+            std::unique_ptr<TFile> f;
+            f.reset(TFile::Open(fileName.c_str(), "READ"));
+            runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+            // Check that nothing went wrong in the mapping and that this file definitely contains this run's data
+            auto runSet = runRangeData->getExpRunSet();
+            if (runSet.find(expRunRequested) == runSet.end()) {
+              B2WARNING("Something went wrong with the mapping of ExpRun -> Input Files. "
+                        "(" << expRunRequested.first << "," << expRunRequested.second << ") not in " << fileName);
+            }
+            // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
+            std::string objDirName = getFullObjectPath(name, expRunRequested);
+            TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            // Find all the objects inside, there may be more than one
+            for (auto key : * (objDir->GetListOfKeys())) {
+              string keyName = key->GetName();
+              string objectPath = fileName + "/" + objDirName + "/" + keyName;
+              B2DEBUG(29, "Adding TTree " << objectPath);
+              chain->Add(objectPath.c_str());
             }
           }
-        } else {
-          B2DEBUG(100, "No overlapping data found in file: " << fileName);
-          continue;
         }
       }
     } else {
@@ -419,7 +466,7 @@ namespace Belle2 {
       string objDirName = getFullObjectPath(name, allGranExpRun);
       for (const auto& fileName : m_inputFileNames) {
         string objectPath = fileName + "/" + objDirName + "/" + name + "_1";  // Only one index for this granularity
-        B2DEBUG(100, "Adding TTree " << objectPath);
+        B2DEBUG(29, "Adding TTree " << objectPath);
         chain->Add(objectPath.c_str());
       }
     }
@@ -431,7 +478,7 @@ namespace Belle2 {
     // make a TNamed version to input to the map of previous calib objects
     shared_ptr<TNamed> storedObjPtr = static_pointer_cast<TNamed>(objOutputPtr);
     m_data.setCalibObj(name, runRangeRequested, storedObjPtr);
-    B2DEBUG(100, "Passing back merged data " << name);
+    B2DEBUG(29, "Passing back merged data " << name);
     return objOutputPtr;
   }
 }

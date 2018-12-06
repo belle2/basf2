@@ -10,19 +10,6 @@
 
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-
-// data objects:
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <top/dataobjects/TOPLikelihood.h>
-#include <arich/dataobjects/ARICHLikelihood.h>
-#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
-#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
-#include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/Muid.h>
-
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -49,19 +36,20 @@ namespace Belle2 {
 
   void MdstPIDModule::initialize()
   {
-    StoreArray<Track> tracks;
-    StoreArray<PIDLikelihood> pidLikelihoods;
     // data store registration
-    pidLikelihoods.registerInDataStore();
-    tracks.registerRelationTo(pidLikelihoods);
 
-    tracks.isRequired();
-    StoreArray<TOPLikelihood>::optional();
-    StoreArray<ARICHLikelihood>::optional();
-    StoreArray<CDCDedxLikelihood>::optional();
-    StoreArray<VXDDedxLikelihood>::optional();
-    StoreArray<ECLPidLikelihood>::optional();
-    StoreArray<Muid>::optional();
+    // required input
+    m_tracks.isRequired();
+    m_pidLikelihoods.registerInDataStore();
+    m_tracks.registerRelationTo(m_pidLikelihoods);
+
+    // optional input
+    m_topLikelihoods.isOptional();
+    m_arichLikelihoods.isOptional();
+    m_cdcDedxLikelihoods.isOptional();
+    m_vxdDedxLikelihoods.isOptional();
+    m_eclLikelihoods.isOptional();
+    m_muid.isOptional();
   }
 
 
@@ -79,20 +67,14 @@ namespace Belle2 {
 
   void MdstPIDModule::event()
   {
-    // input: reconstructed tracks
-    StoreArray<Track> tracks;
-
-    // output
-    StoreArray<PIDLikelihood> pidLikelihoods;
-
     // loop over reconstructed tracks and collect likelihoods
-    for (int itra = 0; itra < tracks.getEntries(); ++itra) {
+    for (int itra = 0; itra < m_tracks.getEntries(); ++itra) {
 
       // reconstructed track
-      const Track* track = tracks[itra];
+      const Track* track = m_tracks[itra];
 
       // append new and set relation
-      m_pid = pidLikelihoods.appendNew();
+      m_pid = m_pidLikelihoods.appendNew();
       track->addRelationTo(m_pid);
 
       // set top likelihoods

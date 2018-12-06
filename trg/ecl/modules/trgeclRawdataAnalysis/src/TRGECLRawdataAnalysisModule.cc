@@ -15,7 +15,6 @@
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
@@ -25,9 +24,6 @@
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgeclRawdataAnalysis/TRGECLRawdataAnalysisModule.h"
-#include "trg/ecl/dataobjects/TRGECLCluster.h"
-#include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
-#include "trg/ecl/dataobjects/TRGECLTiming.h"
 
 #include <stdlib.h>
 
@@ -64,7 +60,6 @@ namespace Belle2 {
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
     addParam("Clustering", _Clustering, "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Defult)", _Clustering);
 
-    obj_cluster = new TrgEclCluster();
 
 
     if (TRGDebug::level()) {
@@ -76,7 +71,7 @@ namespace Belle2 {
 //
   TRGECLRawdataAnalysisModule::~TRGECLRawdataAnalysisModule()
   {
-    delete obj_cluster;
+
     if (TRGDebug::level()) {
       std::cout << "TRGECLRawdataAnalysisModule ... destructed " << std::endl;
 
@@ -104,9 +99,9 @@ namespace Belle2 {
     m_hitNum = 0;
     m_hitTCNum = 0;
 
-    StoreArray<TRGECLUnpackerStore>::registerPersistent();
-    StoreArray<TRGECLCluster>::registerPersistent();
-    StoreArray<TRGECLTiming>::registerPersistent();
+    m_TRGECLUnpackerStore.registerInDataStore();
+    m_TRGECLCluster.registerInDataStore();
+    m_TRGECLTiming.registerInDataStore();
 
   }
 //
@@ -154,9 +149,9 @@ namespace Belle2 {
       int HitTiming    = TCHit ->getTCTime();
       int HitEnergy =  TCHit -> getTCEnergy();
       HitRevoFAM = TCHit -> getRevoFAM();
-      HitFineTime = TCHit -> getFineTime();
+      HitFineTime = TCHit -> getTCTime();
 
-      if (iTCID == -1 && HitTiming == 0 && HitEnergy == 0) {continue;}
+      if (iTCID == -1) {continue;}
 
       TCId.push_back(iTCID + 1);
       TCTiming.push_back(HitTiming);
@@ -165,24 +160,19 @@ namespace Belle2 {
 
 
     }
-    obj_cluster = new TrgEclCluster();
+    TrgEclCluster obj_cluster;
     if (TCId.size() > 0) {
 
-      // TrgEclCluster obj_cluster;
-      obj_cluster->setClusteringMethod(_Clustering);
-      obj_cluster->setEventId(m_nEvent);
-      obj_cluster->setICN(TCId, TCEnergy, TCTiming);
-      //    Module::~TRGECLRa
-      // int icn = obj_cluster->getICNFwBr();
-      // int icnfwd  = obj_cluster->getICNSub(0);
-      //      int icnbr   = obj_cluster->getICNSub(1);
-      // int icnbwd = obj_cluster->getICNSub(2);
-    }
+      obj_cluster.setClusteringMethod(_Clustering);
+      obj_cluster.setEventId(m_nEvent);
+      obj_cluster.setICN(TCId, TCEnergy, TCTiming); // Make Cluster
+      obj_cluster.save(m_nEvent); // Save Clusters to TRGECLCluster
 
+    }
 
     int Timing = ((HitFineTime >> 3) & 0xF) + ((HitRevoFAM & 0x7F) << 4);
 
-    int m_hitNum = 0;
+    m_hitNum = 0;
     StoreArray<TRGECLTiming> TimingArray;
     TimingArray.appendNew();
     m_hitNum = TimingArray.getEntries() - 1;

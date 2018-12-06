@@ -20,7 +20,6 @@
 
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
@@ -33,10 +32,7 @@
 #include "trg/ecl/TrgEclDigitizer.h"
 #include "trg/ecl/TrgEclFAMFit.h"
 
-#include "trg/ecl/dataobjects/TRGECLFAMAna.h"
-#include "trg/ecl/dataobjects/TRGECLDigi0.h"
-#include "trg/ecl/dataobjects/TRGECLHit.h"
-#include "trg/ecl/dataobjects/TRGECLWaveform.h"
+#include "trg/ecl/dbobjects/TRGECLFAMPara.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -68,11 +64,14 @@ namespace Belle2 {
       _beambkgtag(0),
       _famana(0),
       _threshold(100.0),
-      _FADC(1)
+      _FADC(1),
+      _ConditionDB(0)
+
   {
 
     string desc = "TRGECLFAMModule(" + version() + ")";
     setDescription(desc);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
     addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
@@ -87,13 +86,14 @@ namespace Belle2 {
     addParam("TCThreshold", _threshold, "Set FAM TC threshold ",
              _threshold);
     addParam("ShapingFunction", _FADC, "Set function of shaper ",  _FADC);
+    addParam("ConditionDB", _ConditionDB, "Use conditionDB ",  _ConditionDB);
 
-
-
-
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... created" << std::endl;
+    if (_ConditionDB == 1) { //Use global tag
+      m_FAMPara.addCallback(this, &TRGECLFAMModule::beginRun);
     }
+    B2DEBUG(100, "TRGECLFAMModule ... created");
+    Threshold.clear();
+    Threshold.resize(576, 0);
   }
 //
 //
@@ -101,9 +101,9 @@ namespace Belle2 {
   TRGECLFAMModule::~TRGECLFAMModule()
   {
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... destructed " << std::endl;
-    }
+    B2DEBUG(100, "TRGECLFAMModule ... destructed ");
+
+
   }
 //
 //
@@ -112,33 +112,18 @@ namespace Belle2 {
   TRGECLFAMModule::initialize()
   {
 
-    TRGDebug::level(_debugLevel);
+    B2DEBUG(100, "TRGECLFAMModule::initialize ... options");
+    B2DEBUG(100, "TRGECLFAMModule::initialize> FAM Fit Method = "
+            << _famMethod << "  ; Bin of Time Interval = " << _binTimeInterval << " ;output TC waveforml = " << _waveform);
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule::initialize ... options" << std::endl;
-      std::cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-                << std::endl;
-    }
-    //
-    std::cout << "TRGECLFAMModule::initialize> FAM Fit Method = "
-              << _famMethod
-              << std::endl;
-    std::cout << "TRGECLFAMModule::initialize> FAM Bin of Time Interval = "
-              << _binTimeInterval
-              << std::endl;
-    std::cout << "TRGECLFAMModule::initialize> FAM output TC waveforml = "
-              << _waveform
-              << std::endl;
-
-    //
     m_nRun   = 0;
     m_nEvent = 1;
 
-    StoreArray<TRGECLDigi0>::registerPersistent();
-    StoreArray<TRGECLWaveform>::registerPersistent();
-    StoreArray<TRGECLHit>::registerPersistent();
-    StoreArray<TRGECLFAMAna>::registerPersistent();
-
+    m_TRGECLDigi0.registerInDataStore();
+    m_TRGECLWaveform.registerInDataStore();
+    m_TRGECLHit.registerInDataStore();
+    m_TRGECLFAMAna.registerInDataStore();
+    //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
   }
 //
 //
@@ -146,10 +131,16 @@ namespace Belle2 {
   void
   TRGECLFAMModule::beginRun()
   {
-
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... beginRun called " << std::endl;
+    if (_ConditionDB == 0) {
+      Threshold.resize(576, _threshold);
+    } else if (_ConditionDB == 1) { //Use global tag
+      Threshold.resize(576, 0);
+      for (const auto& para : m_FAMPara) {
+        Threshold[para.getTCId() - 1] = (int)((para.getThreshold()) * (para.getConversionFactor()));
+      }
     }
+
+    B2DEBUG(200, "TRGECLFAMModule ... beginRun called ");
 
   }
 //
@@ -159,17 +150,14 @@ namespace Belle2 {
   TRGECLFAMModule::event()
   {
 
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMMoudle ... event called" << std::endl;
-    }
+    B2DEBUG(200, "TRGECLFAMMoudle ... event called");
     //
     //
-    //
-    if (m_nEvent < 1e2) {if (m_nEvent %    10 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e3) {if (m_nEvent %   100 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e4) {if (m_nEvent %  1000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e5) {if (m_nEvent % 10000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
+    if (m_nEvent < 1e2) {if (m_nEvent %    10 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e3) {if (m_nEvent %   100 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e4) {if (m_nEvent %  1000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e5) {if (m_nEvent % 10000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
 
 
     //
@@ -184,18 +172,18 @@ namespace Belle2 {
     else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
     obj_trgeclDigi-> save(m_nEvent);
 
+
     // FAM Fitter
     TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();
     obj_trgeclfit-> SetBeamBkgTagFlag(_beambkgtag);
     obj_trgeclfit-> SetAnaTagFlag(_famana);
-    obj_trgeclfit-> SetThreshold(_threshold);
     obj_trgeclfit-> setup(m_nEvent);
+    obj_trgeclfit-> SetThreshold(Threshold);
 
     if (_famMethod == 1) {obj_trgeclfit->  FAMFit01(TCDigiE, TCDigiT); } // fitting method
     else if (_famMethod == 2) {obj_trgeclfit->  FAMFit02(TCDigiE, TCDigiT); } // no-fit method = backup method 1
     else if (_famMethod == 3) { obj_trgeclfit-> FAMFit03(TCDigiE, TCDigiT); } // orignal method = backup method 2
     obj_trgeclfit-> save(m_nEvent);
-
 
 
     //
@@ -214,9 +202,7 @@ namespace Belle2 {
   void
   TRGECLFAMModule::endRun()
   {
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... endRun called " << std::endl;
-    }
+    B2DEBUG(200, "TRGECLFAMModule ... endRun called ");
   }
 //
 //
@@ -224,9 +210,7 @@ namespace Belle2 {
   void
   TRGECLFAMModule::terminate()
   {
-    if (TRGDebug::level()) {
-      std::cout << "TRGECLFAMModule ... terminate called " << std::endl;
-    }
+    B2DEBUG(100, "TRGECLFAMModule ... terminate called ");
   }
 //
 //

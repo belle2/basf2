@@ -3,51 +3,5 @@
 an entry within this list has to be added after adding the friendList-file to this directory-->
 
 <CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
-	<xi:include href="TB4GeVFullMagnetNoAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
-	<xi:include href="TB4GeVFullMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD.xml"/>
-
-	<xi:include href="TB4GeVNoMagnetBestAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
-	<xi:include href="TB4GeVNoMagnetBestAlignedSource2014May21SVD-moreThan1500MeV_SVD.xml"/>
-
-	<xi:include href="TB4GeVNoMagnetNoAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
-	<xi:include href="TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD.xml"/>
-	
-	<xi:include href="TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD.xml"/>
-	
-	<!-- tests may27 - run 470 -->
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIInnerTEL-moreThan1500MeV_TEL.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIOuterTEL-moreThan1500MeV_TEL.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIPXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINISVD-moreThan1500MeV_SVD.xml"/>
-
-	<!-- tests may27 - run 470 fine -->
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINESVD-moreThan1500MeV_SVD.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEPXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEOuterTEL-moreThan1500MeV_TEL.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEInnerTEL-moreThan1500MeV_TEL.xml"/>
-	
-	<!-- tests june7 - run 470 -->
-	<xi:include href="testBeamMini6GeVJune08MagnetOnSVD-moreThan1500MeV_SVD.xml"/>
-	<xi:include href="testBeamMini6GeVJune08MagnetOffSVD-moreThan1500MeV_SVD.xml"/>
-
-  <!-- 2016 test beam geometry -->
-  <xi:include href="TB2016Test8Feb2016MagnetOffPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
-  <xi:include href="TB2016Test8Feb2016MagnetOffSVD-moreThan1500MeV_SVD.xml"/>
-  <xi:include href="TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
-  <xi:include href="TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD.xml"/>
-
-  <!-- 2017 test beam geometry -->
-  <xi:include href="SecMapTB2017MagnetOffPXDSVD-moreThan1000MeV_PXDSVD.xml"/>
-  <xi:include href="SecMapTB2017MagnetOffSVD-moreThan1000MeV_SVD.xml"/>
-  <xi:include href="SecMapTB2017MagnetOnPXDSVD-moreThan1000MeV_PXDSVD.xml"/>
-  <xi:include href="SecMapTB2017MagnetOnSVD-moreThan1000MeV_SVD.xml"/>
-
-  <!-- 2017 test beam altered geometry, to be used for runs after March 1st 2017-->
-  <xi:include href="SecMapTB2017MagnetOffPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD.xml"/>
-  <xi:include href="SecMapTB2017MagnetOffSVD_afterMarch1st-moreThan1000MeV_SVD.xml"/>
-  <xi:include href="SecMapTB2017MagnetOnPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD.xml"/>
-  <xi:include href="SecMapTB2017MagnetOnSVD_afterMarch1st-moreThan1000MeV_SVD.xml"/>
 
 </CATFParameters>

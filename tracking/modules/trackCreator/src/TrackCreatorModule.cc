@@ -68,11 +68,11 @@ void TrackCreatorModule::initialize()
   const bool mcParticlesPresent = mcParticles.isOptional();
 
   StoreArray<Track> tracks(m_trackColName);
-  const bool tracksRegistered = tracks.registerInDataStore();
+  const bool tracksRegistered = tracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
   StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
   const bool trackFitResultsRegistered = trackFitResults.registerInDataStore();
 
-  B2ASSERT(tracksRegistered and trackFitResultsRegistered, "Could not register output store arrays.");
+  B2ASSERT((tracksRegistered and trackFitResultsRegistered), "Could not register output store arrays.");
 
   tracks.registerRelationTo(recoTracks);
 
@@ -91,7 +91,7 @@ void TrackCreatorModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
   if (recoTracks.getEntries() == 0) {
-    B2WARNING("RecoTrack StoreArray does not contain any RecoTracks.");
+    B2DEBUG(20, "RecoTrack StoreArray does not contain any RecoTracks.");
   }
 
   TrackFitter trackFitter;

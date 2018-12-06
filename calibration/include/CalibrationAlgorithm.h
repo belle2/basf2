@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 #include <utility>
 #include <list>
 #include <TClonesArray.h>
@@ -63,25 +64,29 @@ namespace Belle2 {
       /// Returns the vector of ExpRuns
       const std::vector<Calibration::ExpRun>& getRequestedRuns() const {return m_requestedRuns;}
       /// Sets the vector of ExpRuns
-      void setRequestedRuns(std::vector<Calibration::ExpRun> requestedRuns) {m_requestedRuns = requestedRuns;}
+      void setRequestedRuns(const std::vector<Calibration::ExpRun>& requestedRuns) {m_requestedRuns = requestedRuns;}
       /// Getter for current iteration
       int getIteration() const {return m_iteration;}
       /// Setter for current iteration
-      void setIteration(int iteration) {m_iteration = iteration;}
+      void setIteration(int iteration)
+      {
+        B2DEBUG(29, "Setting Iteration of Algorithm to " << iteration);
+        m_iteration = iteration;
+      }
       /// Getter for current result
       EResult getResult() const {return m_result;}
       /// Setter for current iteration
       void setResult(EResult result) {m_result = result;}
       /// Sets the requested IoV for this execution, based on the
-      void setRequestedIov(IntervalOfValidity iov = IntervalOfValidity(0, 0, -1, -1)) {m_iov = iov;}
+      void setRequestedIov(const IntervalOfValidity& iov = IntervalOfValidity(0, 0, -1, -1)) {m_iov = iov;}
       /// Getter for requested IOV
       const IntervalOfValidity& getRequestedIov() const {return m_iov;}
       /// Get constants (in TObjects) for database update from last calibration
-      std::list<Database::DBQuery>& getPayloads() {return m_payloads;}
+      std::list<Database::DBImportQuery>& getPayloads() {return m_payloads;}
       /// Get constants (in TObjects) for database update from last calibration but passed by VALUE
-      std::list<Database::DBQuery> getPayloadValues() {return m_payloads;}
+      std::list<Database::DBImportQuery> getPayloadValues() {return m_payloads;}
       /// Get a previously created object in m_mapCalibData if one exists, otherwise return shared_ptr(nullptr)
-      std::shared_ptr<TNamed> getCalibObj(const std::string name, const RunRange runRange) const
+      std::shared_ptr<TNamed> getCalibObj(const std::string& name, const RunRange& runRange) const
       {
         auto it = m_mapCalibData.find(std::make_pair(name, runRange));
         if (it == m_mapCalibData.end()) {
@@ -90,7 +95,7 @@ namespace Belle2 {
         return it->second;
       }
       /// Insert a newly created object in m_mapCalibData. Overwrites a previous entry if one exists
-      void setCalibObj(const std::string name, const RunRange runRange, const std::shared_ptr<TNamed>& objectPtr)
+      void setCalibObj(const std::string& name, const RunRange& runRange, const std::shared_ptr<TNamed>& objectPtr)
       {
         m_mapCalibData[std::make_pair(name, runRange)] = objectPtr;
       }
@@ -105,7 +110,7 @@ namespace Belle2 {
       /// Current IoV to be executed, default empty. Will be either set by user explicitly or generated from collected/requested runs
       IntervalOfValidity m_iov;
       /// Payloads saved by execution
-      std::list<Database::DBQuery> m_payloads{};
+      std::list<Database::DBImportQuery> m_payloads{};
       /**  Map of shared pointers to merged calibration objects created by getObjectPtr() calls.
         *  Used to lookup previously created objects instead of recreating them needlessly.
         *  Using shared_ptr allows us to return a shared_ptr so the user knows that they don't
@@ -167,6 +172,9 @@ namespace Belle2 {
     /// Get the complete IoV from inspection of collected data
     IntervalOfValidity getIovFromAllData() const;
 
+    /// Fill the mapping of ExpRun -> Files
+    void fillRunToInputFilesMap();
+
     /// Get the granularity of collected data
     std::string getGranularity() const {return m_granularityOfData;};
 
@@ -184,16 +192,16 @@ namespace Belle2 {
     EResult execute(PyObject* runs, int iteration = 0, IntervalOfValidity iov = IntervalOfValidity());
 
     /// Get constants (in TObjects) for database update from last execution
-    std::list<Database::DBQuery>& getPayloads() {return m_data.getPayloads();}
+    std::list<Database::DBImportQuery>& getPayloads() {return m_data.getPayloads();}
 
     /// Get constants (in TObjects) for database update from last execution but passed by VALUE
-    std::list<Database::DBQuery> getPayloadValues() {return m_data.getPayloadValues();}
+    std::list<Database::DBImportQuery> getPayloadValues() {return m_data.getPayloadValues();}
 
     /// Submit constants from last calibration into database
     bool commit();
 
     /// Submit constants from a (potentially previous) set of payloads
-    bool commit(std::list<Database::DBQuery> payloads);
+    bool commit(std::list<Database::DBImportQuery> payloads);
 
     /// Get the description of the algoithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}
@@ -228,6 +236,8 @@ namespace Belle2 {
     template<class T>
     std::shared_ptr<T> getObjectPtr(std::string name)
     {
+      if (m_runsToInputFiles.size() == 0)
+        fillRunToInputFilesMap();
       return getObjectPtr<T>(name, m_data.getRequestedRuns());
     }
 
@@ -254,6 +264,9 @@ namespace Belle2 {
     /// Store DB payload with given name and custom IOV
     void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
 
+    /// Updates any DBObjPtrs by calling update(event) for DBStore
+    void updateDBObjPtrs(const unsigned int event, const int run, const int experiment);
+
     // -----------------------------------------------
 
     /// Set algorithm description (in constructor)
@@ -274,6 +287,9 @@ namespace Belle2 {
 
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;
+
+    /// Map of Runs to input files. Gets filled when you call getRunRangeFromAllData, gets cleared when setting input files again
+    std::map<Calibration::ExpRun, std::vector<std::string>> m_runsToInputFiles;
 
     /// Granularity of input data. This only changes when the input files change so it isn't specific to an execution
     std::string m_granularityOfData;
@@ -317,46 +333,59 @@ namespace Belle2 {
 
     // Construct the TDirectory names where we expect our objects to be
     std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-    RunRange* runRangeData;
-    for (const auto& fileName : m_inputFileNames) {
-      //Open TFile to get the objects
-      std::unique_ptr<TFile> f;
-      f.reset(TFile::Open(fileName.c_str(), "READ"));
-      runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
 
-      if (strcmp(getGranularity().c_str(), "run") == 0) {
-        if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-          B2DEBUG(100, "Found requested ExpRun in file: " << fileName);
-          // Loop over runs in data and check if they exist in our requested ones, then add if they do
-          for (auto expRunData : runRangeData->getExpRunSet()) {
-            for (auto expRunRequested : requestedRuns) {
-              if (expRunData == expRunRequested) {
-                // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
-                std::string objDirName = getFullObjectPath(name, expRunData);
-                TDirectory* objDir = f->GetDirectory(objDirName.c_str());
-                // Find all the objects inside, there may be more than one
-                for (auto key : * (objDir->GetListOfKeys())) {
-                  std::string keyName = key->GetName();
-                  B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
-                  T* objOther = (T*)objDir->Get(keyName.c_str());
-                  if (objOther) {
-                    if (mergedEmpty) {
-                      mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
-                      mergedObjPtr->SetDirectory(0);
-                      mergedEmpty = false;
-                    } else {
-                      list.Add(objOther);
-                    }
-                  }
+    if (strcmp(getGranularity().c_str(), "run") == 0) {
+      // Loop over our runs requested for the right files
+      for (auto expRunRequested : requestedRuns) {
+        // Find the relevant files for this ExpRun
+        auto searchFiles = m_runsToInputFiles.find(expRunRequested);
+        if (searchFiles == m_runsToInputFiles.end()) {
+          B2WARNING("No input file found with data collected from run "
+                    "(" << expRunRequested.first << "," << expRunRequested.second << ")");
+          continue;
+        } else {
+          auto files = searchFiles->second;
+          for (auto fileName : files) {
+            RunRange* runRangeData;
+            //Open TFile to get the objects
+            std::unique_ptr<TFile> f;
+            f.reset(TFile::Open(fileName.c_str(), "READ"));
+            runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+            // Check that nothing went wrong in the mapping and that this file definitely contains this run's data
+            auto runSet = runRangeData->getExpRunSet();
+            if (runSet.find(expRunRequested) == runSet.end()) {
+              B2WARNING("Something went wrong with the mapping of ExpRun -> Input Files. "
+                        "(" << expRunRequested.first << "," << expRunRequested.second << ") not in " << fileName);
+            }
+            // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
+            std::string objDirName = getFullObjectPath(name, expRunRequested);
+            TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            // Find all the objects inside, there may be more than one
+            for (auto key : * (objDir->GetListOfKeys())) {
+              std::string keyName = key->GetName();
+              B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
+              T* objOther = (T*)objDir->Get(keyName.c_str());
+              if (objOther) {
+                if (mergedEmpty) {
+                  mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
+                  mergedObjPtr->SetDirectory(0);
+                  mergedEmpty = false;
+                } else {
+                  list.Add(objOther);
                 }
               }
             }
+            if (!mergedEmpty)
+              mergedObjPtr->Merge(&list);
+            list.Clear();
           }
-        } else {
-          B2DEBUG(100, "No overlapping data found in file: " << fileName);
-          continue;
         }
-      } else {
+      }
+    } else {
+      for (auto fileName : m_inputFileNames) {
+        //Open TFile to get the objects
+        std::unique_ptr<TFile> f;
+        f.reset(TFile::Open(fileName.c_str(), "READ"));
         Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
         std::string objDirName = getFullObjectPath(name, allGranExpRun);
         std::string objPath = objDirName + "/" + name + "_1";
@@ -371,10 +400,10 @@ namespace Belle2 {
             list.Add(objOther);
           }
         }
+        if (!mergedEmpty)
+          mergedObjPtr->Merge(&list);
+        list.Clear();
       }
-      if (!mergedEmpty)
-        mergedObjPtr->Merge(&list);
-      list.Clear();
     }
     dir->cd();
     objOutputPtr = mergedObjPtr;

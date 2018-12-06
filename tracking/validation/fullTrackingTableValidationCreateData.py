@@ -34,7 +34,7 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         #: matcher used for the MCTracks from the CDC
         self.mc_track_matcher_cdc = Belle2.TrackMatchLookUp("MCRecoTracks", "CDCRecoTracks")
         #: matcher used for the MCTracks from the VXD
-        self.mc_track_matcher_vxd = Belle2.TrackMatchLookUp("MCRecoTracks", "VXDRecoTracks")
+        self.mc_track_matcher_vxd = Belle2.TrackMatchLookUp("MCRecoTracks", "SVDRecoTracks")
         #: matcher used for the MCTracks from both
         self.mc_track_matcher = Belle2.TrackMatchLookUp("MCRecoTracks", "RecoTracks")
         #: matcher used for the MCTracks from fitted tracks
@@ -97,7 +97,7 @@ def run():
     path.add_module("Gearbox")
 
     # Add the tracking reconstruction and store the fitted RecoTracks elsewhere
-    tracking.add_tracking_reconstruction(path, prune_temporary_tracks=False)
+    tracking.add_tracking_reconstruction(path, prune_temporary_tracks=False, components=["SVD", "CDC"])
     path.add_module("FittedTracksStorer", inputRecoTracksStoreArrayName="RecoTracks",
                     outputRecoTracksStoreArrayName="FittedRecoTracks")
 
@@ -115,7 +115,7 @@ def run():
         UseSVDHits=True,
         UseCDCHits=False,
         mcRecoTracksStoreArrayName="MCRecoTracks",
-        prRecoTracksStoreArrayName="VXDRecoTracks")
+        prRecoTracksStoreArrayName="SVDRecoTracks")
 
     path.add_module(
         "MCRecoTracksMatcher",

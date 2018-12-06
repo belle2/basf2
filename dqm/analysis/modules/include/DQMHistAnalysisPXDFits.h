@@ -2,12 +2,11 @@
 // File : DQMHistAnalysisPXDFits.h
 // Description : An example module for DQM histogram analysis
 //
-// Author : Tomoyuki Konno, Tokyo Metroplitan Univerisity
-// Date : 25  - Dec - 2015 ; first commit
+// Author : Bjoern Spruck, University Mainz
+// Date : 2017
 //-
 
-#ifndef _Belle2_DQMHistAnalysisPXDFits_h
-#define _Belle2_DQMHistAnalysisPXDFits_h
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -23,38 +22,41 @@ namespace Belle2 {
 
   class DQMHistAnalysisPXDFitsModule : public DQMHistAnalysisModule {
 
+    enum { NUM_MODULES = 40}; // we want that from geometry
     // Public functions
   public:
 
     //! Constructor / Destructor
     DQMHistAnalysisPXDFitsModule();
-    virtual ~DQMHistAnalysisPXDFitsModule();
+
+  private:
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     // Data members
-  private:
-    std::string m_histoname;
+    std::string m_histogramDirectoryName;
+    std::map <int, int> m_id_to_inx;
+    std::map <int, int> m_inx_to_id;
 
-    TH2F* m_hSignal[64];
-    TH2F* m_hCommon[64];
-    TH2F* m_hCounts[64];
-    TCanvas* m_cSignal[64];
-    TCanvas* m_cCommon[64];
-    TCanvas* m_cCounts[64];
-    TF1* m_fLandau;// only one fit function
-    TF1* m_fGaus;// only one fit function
+    TH1F* m_hSignalAll = nullptr, *m_hCommonAll = nullptr, *m_hCountsAll = nullptr, *m_hOccupancyAll = nullptr;
+    TCanvas* m_cSignalAll = nullptr, *m_cCommonAll = nullptr, *m_cCountsAll = nullptr, *m_cOccupancyAll = nullptr;
 
-    TH1* findHistLocal(TString& a);
+    TH2F* m_hSignal[NUM_MODULES];
+    TH2F* m_hCommon[NUM_MODULES];
+    TH2F* m_hCounts[NUM_MODULES];
+    TCanvas* m_cSignal[NUM_MODULES];
+    TCanvas* m_cCommon[NUM_MODULES];
+    TCanvas* m_cCounts[NUM_MODULES];
+    TF1* m_fLandau = nullptr; // only one fit function
+    TF1* m_fGaus = nullptr; // only one fit function
 
   };
 } // end namespace Belle2
 
-#endif

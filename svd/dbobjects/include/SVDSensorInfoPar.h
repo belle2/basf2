@@ -42,7 +42,9 @@ namespace Belle2 {
       m_depletionVoltage(0), m_biasVoltage(0),
       m_backplaneCapacitanceU(0), m_interstripCapacitanceU(0), m_couplingCapacitanceU(0),
       m_backplaneCapacitanceV(0), m_interstripCapacitanceV(0), m_couplingCapacitanceV(0),
+      m_aduEquivalentU(0), m_aduEquivalentV(0),
       m_electronicNoiseU(0), m_electronicNoiseV(0),
+      m_aduEquivalentSbwU(0), m_aduEquivalentSbwV(0),
       m_electronicNoiseSbwU(0), m_electronicNoiseSbwV(0)
     {}
 

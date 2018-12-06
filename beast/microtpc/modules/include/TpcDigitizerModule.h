@@ -12,6 +12,9 @@
 #define TPCDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/microtpc/dataobjects/MicrotpcHit.h>
 
 #include <TRandom3.h>
 #include <TF1.h>
@@ -72,6 +75,8 @@ namespace Belle2 {
 
 
     private:
+
+      StoreArray<MicrotpcHit> m_microtpcHit; /** Array for MicrotpcHit */
 
       /** reads data from MICROTPC.xml: tube location, drift data filename, sigma of impulse response function */
       void getXMLData();

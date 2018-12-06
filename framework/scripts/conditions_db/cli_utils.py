@@ -31,7 +31,8 @@ class ItemFilter:
         """
         Add arguments to the parser
 
-        :param name: Name of the objects to be filtered in the help text
+        Parameters:
+          name: Name of the objects to be filtered in the help text
         """
         self._args.add_argument("-f", "--filter", metavar="SEARCHTERM",
                                 help="only {} matching this pattern will be "
@@ -91,10 +92,64 @@ class ItemFilter:
         Check an item. True is returned if it should be kept, False if it is
         filtered out or excluded.
 
-        :param item: item to be filtered
+        Parameters:
+          item: item to be filtered
         """
         if self._filter is not None and not self._filter.search(item):
             return False
         if self._exclude is not None and self._exclude.search(item):
             return False
         return True
+
+
+class PayloadInformation:
+    """Small container class to help compare payload information for efficient
+    comparison between global tags"""
+    def __init__(self, payload, iov):
+        #: name of the payload
+        self.name = payload['basf2Module']['name']
+        #: checksum of the payload
+        self.checksum = payload['checksum']
+        #: interval of validity
+        self.iov = iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
+        #: revision, not used for comparisons
+        self.rev = payload["revision"]
+        #: payload id in CDB, not used for comparisons
+        self.payload_id = payload["payloadId"]
+        #: iov id in CDB, not used for comparisons
+        self.iov_id = iov["payloadIovId"]
+
+    def __hash__(self):
+        """Make object hashable"""
+        return hash((self.name, self.checksum, self.iov))
+
+    def __eq__(self, other):
+        """Check if two payloads are equal"""
+        return (self.name, self.checksum, self.iov) == (other.name, other.checksum, other.iov)
+
+    def __lt__(self, other):
+        """Sort payloads by name, iov, revision"""
+        return (self.name.lower(), self.iov, self.rev) < (other.name.lower(), other.iov, other.rev)
+
+    def readable_iov(self):
+        """return a human readable name for the IoV"""
+        if self.iov == (0, 0, -1, -1):
+            return "always"
+
+        e1, r1, e2, r2 = self.iov
+        if e1 == e2:
+            if r1 == 0 and r2 == -1:
+                return f"exp {e1}"
+            elif r2 == -1:
+                return f"exp {e1}, runs {r1}+"
+            elif r1 == r2:
+                return f"exp {e1}, run {r1}"
+            else:
+                return f"exp {e1}, runs {r1} - {r2}"
+        else:
+            if r1 == 0 and r2 == -1:
+                return f"exp {e1}-{e2}, all runs"
+            elif r2 == -1:
+                return f"exp {e1}, run {r1} - exp {e2}, all runs"
+            else:
+                return f"exp {e1}, run {r1} - exp {e2}, run {r2}"

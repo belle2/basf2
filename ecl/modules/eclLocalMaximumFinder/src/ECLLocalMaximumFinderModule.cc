@@ -17,11 +17,26 @@
 // THIS MODULE
 #include <ecl/modules/eclLocalMaximumFinder/ECLLocalMaximumFinderModule.h>
 
+// ROOT
+#include "TFile.h"
+#include "TTree.h"
+
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/utilities/FileSystem.h>
+
+// MDST
+#include <mdst/dataobjects/MCParticle.h>
+
+// ECL
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 // NAMESPACE(S)
 using namespace Belle2;
@@ -241,8 +256,6 @@ void ECLLocalMaximumFinderModule::event()
           }
 
           if (m_isTrainingMode > 0) { // This requires MC matching before this stage!
-            int motherpdg   = -1;
-            int motherindex = -1;
             int pi0index    = -1;
             int maxtype     = 0;
             int maxpos      = 0;
@@ -253,8 +266,8 @@ void ECLLocalMaximumFinderModule::event()
               const auto particle = relatedParticlePairs.object(irel);
               const double weight = relatedParticlePairs.weight(irel);
 
-              motherpdg = -1;
-              motherindex = -1;
+              int motherpdg = -1;
+              int motherindex = -1;
               pi0index = -1;
               getEnteringMother(*particle, motherpdg, motherindex, pi0index);
               addToSignalEnergy(motherpdg, motherindex, pi0index, weight);
@@ -362,12 +375,8 @@ void ECLLocalMaximumFinderModule::terminate()
 
 void ECLLocalMaximumFinderModule::makeLocalMaximum(const ECLConnectedRegion& aCR, const int cellId, const int lmId)
 {
-
-  // Output Array
-  StoreArray<ECLLocalMaximum> eclLocalMaximums(eclLocalMaximumArrayName());
-
   // Set the local maximum dataobject.
-  const auto aLocalMaximum = eclLocalMaximums.appendNew();
+  const auto aLocalMaximum = m_eclLocalMaximums.appendNew();
 
   B2DEBUG(175, "ECLLocalMaximumFinderModule::makeLocalMaximum(): local maximum cellid: " << cellId);
 

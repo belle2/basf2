@@ -437,7 +437,7 @@ void EnergyLossForExtrapolator::ComputeElectronDEDX(const G4ParticleDefinition* 
   m_ChargeSq = 1.0;
   m_Particle = part;
 
-  B2INFO("EnergyLossForExtrapolator::ComputeElectronDEDX for " << part->GetParticleName());
+  B2DEBUG(1, "EnergyLossForExtrapolator::ComputeElectronDEDX for " << part->GetParticleName());
 
   for (G4int i = 0; i < m_NMaterials; i++) {
 
@@ -488,7 +488,7 @@ void EnergyLossForExtrapolator::ComputeMuonDEDX(const G4ParticleDefinition* part
   m_ChargeSq = 1.0;
   m_Particle = part;
 
-  B2INFO("EnergyLossForExtrapolator::ComputeMuonDEDX for " << part->GetParticleName());
+  B2DEBUG(1, "EnergyLossForExtrapolator::ComputeMuonDEDX for " << part->GetParticleName());
 
   for (G4int i = 0; i < m_NMaterials; i++) {
 
@@ -531,7 +531,7 @@ void EnergyLossForExtrapolator::ComputeHadronDEDX(const G4ParticleDefinition* pa
   m_ChargeSq = q * q;
   m_Particle = part;
 
-  B2INFO("EnergyLossForExtrapolator::ComputeHadronDEDX for " << part->GetParticleName());
+  B2DEBUG(1, "EnergyLossForExtrapolator::ComputeHadronDEDX for " << part->GetParticleName());
 
   for (G4int i = 0; i < m_NMaterials; i++) {
 
@@ -572,7 +572,7 @@ void EnergyLossForExtrapolator::ComputeTransportXS(const G4ParticleDefinition* p
   m_Particle = part;
 
   const G4MaterialTable* mtable = G4Material::GetMaterialTable();
-  B2INFO("EnergyLossForExtrapolator::ComputeTransportXS for " << part->GetParticleName());
+  B2DEBUG(1, "EnergyLossForExtrapolator::ComputeTransportXS for " << part->GetParticleName());
 
   for (G4int i = 0; i < m_NMaterials; i++) {
 

@@ -4,7 +4,7 @@
 <input>../1263700001.ntup.root</input>
 <output>1263700001_Validation.root</output>
 <contact> Racha Cheaib, rcheaib@olemiss.edu, Mario Merola, mario.merola@na.infn.it</contact>
-<interval>release</interval>
+<interval>nightly</interval>
 </header>
 */
 ////////////////////////////////////////////////////////////
@@ -154,9 +154,9 @@ void plotUpsSL(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_SigProb->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_SigProb->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F * h_cosThetaBtag= new TH1F("h_sl_cosThetaBtag","Btag cos Theta between particle and true B", 100,-10,5);
-  ptree->Project("h_sl_cosThetaBtag","Upsilon4S_B0_cosThetaBetweenParticleAndTrueB");
+  ptree->Project("h_sl_cosThetaBtag","Upsilon4S_B0_cosThetaBetweenParticleAndNominalB");
   h_cosThetaBtag->GetXaxis()->SetTitle("cos(#theta_{Btag})");
-  h_cosThetaBtag->GetListOfFunctions()->Add(new TNamed("Description", "Btag cos Theta between particle and true B"));
+  h_cosThetaBtag->GetListOfFunctions()->Add(new TNamed("Description", "Btag cos Theta between particle and a nominal B meson"));
   h_cosThetaBtag->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_cosThetaBtag->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 

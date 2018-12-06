@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIGNALSIDEPARTICLEFILTERMODULE_H
-#define SIGNALSIDEPARTICLEFILTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Utility.h>
@@ -39,10 +38,10 @@ namespace Belle2 {
     SignalSideParticleFilterModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void event();
+    virtual void event() override;
 
 
   private:
@@ -55,4 +54,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* SIGNALSIDEPARTICLEFILTERMODULE_H */

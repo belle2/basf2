@@ -34,13 +34,12 @@ main.add_module(gearbox)
 
 # Geometry (only TOP needed)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
-# Unpacking
+# Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')
-unpack.param('swapBytes', True)
-unpack.param('dataFormat', 0x0301)
 unpack.logging.log_level = LogLevel.DEBUG
 unpack.logging.debug_level = debuglevel
 main.add_module(unpack)

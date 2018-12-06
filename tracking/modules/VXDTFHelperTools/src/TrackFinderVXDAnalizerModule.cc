@@ -11,6 +11,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 //tracking:
 #include <tracking/modules/VXDTFHelperTools/TrackFinderVXDAnalizerModule.h>
@@ -179,8 +180,8 @@ void TrackFinderVXDAnalizerModule::initialize()
 {
   m_referenceTCs.isRequired(m_PARAMreferenceTCname);
   m_testTCs.isRequired(m_PARAMtestTCname);
-  m_acceptedTCs.registerInDataStore(m_PARAMacceptedTCname, DataStore::c_DontWriteOut);
-  m_lostTCs.registerInDataStore(m_PARAMlostTCname, DataStore::c_DontWriteOut);
+  m_acceptedTCs.registerInDataStore(m_PARAMacceptedTCname, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  m_lostTCs.registerInDataStore(m_PARAMlostTCname, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
 
   if (m_PARAMorigin.size() != 3) {

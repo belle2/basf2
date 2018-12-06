@@ -31,9 +31,13 @@ namespace Belle2 {
     } else { // constants already there
       if (replace) {
         const_cast<TOPSampleTimes*>(it->second)->setTimeAxis(sampleTimes, m_syncTimeBase);
-        B2WARNING("Constants for scrod " << scrodID << " channel " << channel << ": replaced");
+        B2WARNING("TOPCalTimebase: constants replaced."
+                  << LogVar("scrodID", scrodID)
+                  << LogVar("channel", channel));
       } else {
-        B2WARNING("Constants for scrod " << scrodID << " channel " << channel << ": previous kept");
+        B2WARNING("TOPCalTimebase: old constants kept."
+                  << LogVar("scrodID", scrodID)
+                  << LogVar("channel", channel));
       }
     }
 

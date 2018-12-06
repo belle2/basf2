@@ -3,6 +3,7 @@
 
 from basf2 import *
 from tracking import add_tracking_reconstruction
+from simulation import add_svd_simulation
 
 # --------------------------------------------------------------------
 # Example of using TOP reconstruction
@@ -33,14 +34,6 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
-geometry.param('components', [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-])
 main.add_module(geometry)
 
 # Particle gun: generate multiple tracks
@@ -72,10 +65,7 @@ pxd_clusterizer = register_module('PXDClusterizer')
 main.add_module(pxd_clusterizer)
 
 # SVD digitization & clustering
-svd_digitizer = register_module('SVDDigitizer')
-main.add_module(svd_digitizer)
-svd_clusterizer = register_module('SVDClusterizer')
-main.add_module(svd_clusterizer)
+add_svd_simulation(main)
 
 # CDC digitization
 cdcDigitizer = register_module('CDCDigitizer')
@@ -91,6 +81,9 @@ add_tracking_reconstruction(main)
 # Track extrapolation
 ext = register_module('Ext')
 main.add_module(ext)
+
+# Channel masker
+main.add_module('TOPChannelMasker')
 
 # TOP reconstruction
 topreco = register_module('TOPReconstructor')

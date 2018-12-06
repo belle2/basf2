@@ -54,6 +54,13 @@ RFOutputServer::RFOutputServer(string conffile)
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
 
+  // 7. Clear PID list
+  m_pid_sender = 0;
+  m_pid_basf2 = 0;
+  m_nnodes = m_conf->getconfi("processor", "nnodes");
+  for (int i = 0; i < m_nnodes; i++)
+    m_pid_receiver[i] = 0;
+
 }
 
 RFOutputServer::~RFOutputServer()
@@ -199,8 +206,8 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
 int RFOutputServer::Start(NSMmsg*, NSMcontext*)
 {
   // Clear RingBuffer
-  m_rbufin->forceClear();
-  m_rbufout->forceClear();
+  //  m_rbufin->forceClear();
+  //  m_rbufout->forceClear();
   return 0;
 }
 

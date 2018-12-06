@@ -28,54 +28,6 @@ namespace Belle2 {
     class  StoreWrappedObjPtr : public StoreObjPtr<StoreWrapper<T> > {
 
     public:
-
-#if 0 //use of static StoreObjPtr members is discouraged.
-      /** Register an object, that should not be written to the output by default, in the data store.
-       *
-       *  This must be called in the initialization phase.
-       *
-       *  @param name        Name under which the object is stored.
-       *  @param durability  Specifies lifetime of object in question.
-       *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
-       *  @return            True if the registration succeeded.
-       */
-      static bool registerTransient(const std::string& name = "",
-                                    DataStore::EDurability durability = DataStore::c_Event,
-                                    bool errorIfExisting = false)
-      {
-        return StoreObjPtr<StoreWrapper<T> >::registerTransient(name, durability, errorIfExisting);
-      }
-
-      /** Check whether an object was registered before.
-       *
-       *  It will cause an error if the object does not exist.
-       *  This must be called in the initialization phase.
-       *
-       *  @param name        Name under which the object is stored.
-       *  @param durability  Specifies lifetime of object in question.
-       *  @return            True if the object exists.
-       */
-      static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-      {
-        return StoreObjPtr<StoreWrapper<T> >::required(name, durability);
-      }
-
-      /** Tell the data store about an optional input.
-       *
-       *  Mainly useful for creating diagrams of module inputs and outputs.
-       *  This must be called in the initialization phase.
-       *
-       *  @param name        Name under which the object is stored.
-       *  @param durability  Specifies lifetime of object in question.
-       *  @return            True if the object exists.
-       */
-      static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
-      {
-        return StoreObjPtr<StoreWrapper<T> >::optional(name, durability);
-      }
-#endif
-
-    public:
       /** Constructor to access an object in the DataStore.
        *
        *  @param name       Name under which the object is stored in the DataStore.
@@ -90,10 +42,10 @@ namespace Belle2 {
       /** Register the object/array in the DataStore.
        *  This must be called in the initialization phase.
        *
-       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut.
+       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut | c_ErrorIfAlreadyRegistered.
        *  @return            True if the registration succeeded.
        */
-      bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut)
+      bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)
       {
         return StoreObjPtr<StoreWrapper<T> >::registerInDataStore(storeFlags);
       }
@@ -102,10 +54,11 @@ namespace Belle2 {
        *  This must be called in the initialization phase.
        *
        *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerInDataStore("myName") in initialize(), this object will continue refer to 'myName' in event().
-       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut.
+       *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered.
        *  @return            True if the registration succeeded.
        */
-      bool registerInDataStore(const std::string& name, DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut)
+      bool registerInDataStore(const std::string& name,
+                               DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)
       {
         return StoreObjPtr<StoreWrapper<T> >::registerInDataStore(name, storeFlags);
       }

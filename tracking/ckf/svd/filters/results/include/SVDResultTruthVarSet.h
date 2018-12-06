@@ -24,6 +24,7 @@ namespace Belle2 {
   constexpr
   static char const* const svdResultTruthNames[] = {
     "truth",
+    "truth_svd_cdc_relation",
     "truth_number_of_correct_hits",
     "truth_number_of_mc_pxd_hits",
     "truth_number_of_mc_svd_hits",

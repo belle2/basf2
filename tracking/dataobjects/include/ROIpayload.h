@@ -20,6 +20,15 @@ namespace Belle2 {
 
   /** ROIpayload
    * @TODO: Better explanation, Is there a reason to inherit from TObject and not Relationsobject here?
+   * This Object contains a binary blob which is send as whole from the HLT Roi Sender output
+   * node to the ONSEN system, containing the trigger decision and the Region od Interest (ROI)
+   * for data selection on the PXD modules
+   * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+   *
+   * Warning: The class does not allow to be updated in data store! (BII-3191)
+   * -> a module might corrupt entries in the data store if a previous ROIpayload is already in the DataStore
+   * A complete rewrite of gthe class might be needed for that. For now, you have to check that there
+   * is no object in data store before, and raise a FATAL if so.
    */
 
   class ROIpayload : public TObject {

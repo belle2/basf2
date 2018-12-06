@@ -69,7 +69,7 @@ namespace Belle2 {
 
 
     /** Destructor of the module. */
-    virtual ~RawSecMapMergerModule() {}
+    ~RawSecMapMergerModule() {}
 
 
     /** returns all names of root-files fitting given parameter mapName  */
@@ -242,7 +242,7 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize()
+    void initialize() override
     {
       FiltersContainer<SpacePoint>& filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
       B2INFO("RawSecMapMerger::initialize():");

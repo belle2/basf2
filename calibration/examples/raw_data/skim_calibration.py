@@ -19,6 +19,7 @@ main = create_path()
 
 # Root input
 roinput = register_module('SeqRootInput')
+# roinput = register_module('RootInput')
 main.add_module(roinput)
 
 # Output only events that pass
@@ -30,6 +31,8 @@ output_calib_path.add_module(output)
 cut_decision = register_module("TriggerSkim")
 cut_decision.param('triggerLines', ['software_trigger_cut&hlt&accept_2_tracks',
                                     'software_trigger_cut&hlt&accept_mu_mu'])
+cut_decision.param('expectedResult', 1)
+# cut_decision.param('logicMode', 'and')  # Default == 'or'
 cut_decision.if_value("==1", output_calib_path, AfterConditionPath.CONTINUE)
 main.add_module(cut_decision)
 

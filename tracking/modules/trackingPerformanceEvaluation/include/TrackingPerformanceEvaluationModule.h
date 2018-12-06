@@ -43,17 +43,17 @@ namespace Belle2 {
 
     TrackingPerformanceEvaluationModule();
 
-    virtual ~TrackingPerformanceEvaluationModule();
+    ~TrackingPerformanceEvaluationModule();
 
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
+    void beginRun() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
+    void endRun() override;
 
-    virtual void terminate();
+    void terminate() override;
 
   private:
 
@@ -141,9 +141,13 @@ namespace Belle2 {
 
     TH2F* m_h2_OmegaerrOmegaVSpt;  /**< error */
 
+    TH2F* m_h2_z0errVSpt_wtpxd;  /**< error */
+    TH2F* m_h2_z0errVSpt_wfpxd;  /**< error */
     TH2F* m_h2_z0errVSpt_wpxd;  /**< error */
     TH2F* m_h2_z0errVSpt_wopxd; /**< error */
     TH2F* m_h2_z0errVSpt; /**< error */
+    TH2F* m_h2_d0errVSpt_wtpxd; /**< error */
+    TH2F* m_h2_d0errVSpt_wfpxd; /**< error */
     TH2F* m_h2_d0errVSpt_wpxd; /**< error */
     TH2F* m_h2_d0errVSpt_wopxd; /**< error */
     TH2F* m_h2_d0errVSpt; /**< error */

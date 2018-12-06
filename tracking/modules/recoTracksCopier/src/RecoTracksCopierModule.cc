@@ -24,6 +24,7 @@ RecoTracksCopierModule::RecoTracksCopierModule() :
            "Name of the input StoreArray");
   addParam("outputStoreArrayName", m_outputStoreArrayName,
            "Name of the output StoreArray");
+  addParam("onlyFittedTracks", m_param_onlyFittedTracks, "Only copy fitted tracks", m_param_onlyFittedTracks);
 
 }
 
@@ -31,15 +32,29 @@ void RecoTracksCopierModule::initialize()
 {
   m_inputRecoTracks.isRequired(m_inputStoreArrayName);
 
-  m_outputRecoTracks.registerInDataStore(m_outputStoreArrayName);
+  m_outputRecoTracks.registerInDataStore(m_outputStoreArrayName, DataStore::c_ErrorIfAlreadyRegistered);
   RecoTrack::registerRequiredRelations(m_outputRecoTracks);
+
+  m_outputRecoTracks.registerRelationTo(m_inputRecoTracks);
+
+  if (m_tracks.optionalRelationTo(m_inputRecoTracks)) {
+    m_tracks.registerRelationTo(m_outputRecoTracks);
+  }
 }
 
 void RecoTracksCopierModule::event()
 {
   for (const RecoTrack& recoTrack : m_inputRecoTracks) {
+    if (m_param_onlyFittedTracks and not recoTrack.wasFitSuccessful()) {
+      continue;
+    }
     RecoTrack* newRecoTrack = recoTrack.copyToStoreArray(m_outputRecoTracks);
     newRecoTrack->addHitsFromRecoTrack(&recoTrack);
+    newRecoTrack->addRelationTo(&recoTrack);
+
+    for (Track& track : recoTrack.getRelationsWith<Track>()) {
+      track.addRelationTo(newRecoTrack);
+    }
   }
 }
 

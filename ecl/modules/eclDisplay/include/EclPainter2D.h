@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_2D
-#define ECL_CANVAS_2D
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH2.h>
-#include <TPad.h>
-#include <TLine.h>
+
+class TH2C;
+class TH2F;
+class TPad;
 
 namespace Belle2 {
   /**
@@ -84,7 +85,7 @@ namespace Belle2 {
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
      */
-    virtual void getInformation(int px, int py, MultilineWidget* panel);
+    virtual void getInformation(int px, int py, MultilineWidget* panel) override;
 
     /**
      * Return subtype of ECLPainter2D.
@@ -94,8 +95,6 @@ namespace Belle2 {
     /**
      * Redraw the canvas.
      */
-    virtual void Draw();
+    virtual void Draw() override;
   };
 }
-
-#endif // ECL_CANVAS_2D

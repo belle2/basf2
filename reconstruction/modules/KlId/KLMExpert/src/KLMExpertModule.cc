@@ -10,21 +10,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <reconstruction/modules/KlId/KLMExpert/KLMExpertModule.h>
-#include <reconstruction/dataobjects/KlId.h>
+#include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
-#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/Exception.h>
-#include <cstring>
-
-#include <boost/algorithm/string/predicate.hpp>
 
 #include <mva/interface/Interface.h>
+#include <boost/algorithm/string/predicate.hpp>
 
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
@@ -55,18 +49,11 @@ KLMExpertModule::~KLMExpertModule()
 void KLMExpertModule::initialize()
 {
   // require existence of necessary datastore obj
-  StoreArray<KLMCluster>::required();
-  StoreArray<RecoTrack>::required();
-  StoreArray<ECLCluster>::required();
 
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-  klmClusters.registerRelationTo(eclClusters);
+  m_klmClusters.isRequired();
 
-  StoreArray<KlId>::registerPersistent();//Transient
-
-  StoreArray<KlId> klids;
-  klmClusters.registerRelationTo(klids);
+  m_klids.registerInDataStore();
+  m_klmClusters.registerRelationTo(m_klids);
 
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
@@ -113,23 +100,18 @@ void KLMExpertModule::init_mva(MVA::Weightfile& weightfile)
 
 void KLMExpertModule::event()
 {
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<RecoTrack> genfitTracks;
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KlId> KlIds;
 
   //overwritten at the end of the cluster loop
   KlId* klid = nullptr;
-  double IDMVAOut;
 
   // loop thru clusters in event and classify
-  for (KLMCluster& cluster : klmClusters) {
+  for (KLMCluster& cluster : m_klmClusters) {
 
     const TVector3& clusterPos = cluster.getClusterPosition();
 
     // get various KLMCluster vars
     m_KLMglobalZ         = clusterPos.Z();
-    m_KLMnCluster        = klmClusters.getEntries();
+    m_KLMnCluster        = m_klmClusters.getEntries();
     m_KLMnLayer          = cluster.getLayers();
     m_KLMnInnermostLayer = cluster.getInnermostLayer();
     m_KLMtime            = cluster.getTime();
@@ -171,41 +153,26 @@ void KLMExpertModule::event()
     m_KLMnextCluster = get<1>(closestKLMAndDist);
     m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
-
     m_KLMTrackSepDist         = -999;
     m_KLMTrackSepAngle        = -999;
     m_KLMInitialTrackSepAngle = -999;
     m_KLMTrackRotationAngle   = -999;
     m_KLMTrackClusterSepAngle = -999;
+
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
-    TrackClusterSeparation* trackSep;
-    float best_dist = 100000000;
+    float best_dist = 1e10;
     float dist;
     for (auto trackSeperation :  trackSeperations) {
       dist = trackSeperation.getDistance();
       if (dist < best_dist) {
         best_dist = dist;
-        trackSep = &trackSeperation;
-        m_KLMTrackSepDist         = trackSep->getDistance();
-        m_KLMTrackSepAngle        = trackSep->getTrackClusterAngle();
-        m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
-        m_KLMTrackRotationAngle   = trackSep->getTrackRotationAngle();
-        m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
+        m_KLMTrackSepDist         = trackSeperation.getDistance();
+        m_KLMTrackSepAngle        = trackSeperation.getTrackClusterAngle();
+        m_KLMInitialTrackSepAngle = trackSeperation.getTrackClusterInitialSeparationAngle();
+        m_KLMTrackRotationAngle   = trackSeperation.getTrackRotationAngle();
+        m_KLMTrackClusterSepAngle = trackSeperation.getTrackClusterSeparationAngle();
       }
     }
-
-    if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}
-    if (isnan(m_KLMnCluster))             { m_KLMnCluster             = -999;}
-    if (isnan(m_KLMnLayer))               { m_KLMnLayer               = -999;}
-    if (isnan(m_KLMnInnermostLayer))      { m_KLMnInnermostLayer      = -999;}
-    if (isnan(m_KLMtime))                 { m_KLMtime                 = -999;}
-    if (isnan(m_KLMenergy))               { m_KLMenergy               = -999;}
-    if (isnan(m_KLMhitDepth))             { m_KLMhitDepth             = -999;}
-    if (isnan(m_KLMTrackSepDist))         { m_KLMTrackSepDist         = -999;}
-    if (isnan(m_KLMTrackSepAngle))        { m_KLMTrackSepAngle        = -999;}
-    if (isnan(m_KLMInitialTrackSepAngle)) { m_KLMInitialTrackSepAngle = -999;}
-    if (isnan(m_KLMTrackRotationAngle))   { m_KLMTrackRotationAngle   = -999;}
-    if (isnan(m_KLMTrackClusterSepAngle)) { m_KLMTrackClusterSepAngle = -999;}
 
 //    reduced vars set
     m_feature_variables[0] = m_KLMnLayer;
@@ -228,21 +195,15 @@ void KLMExpertModule::event()
     m_feature_variables[17] = m_KLMECLZ51;
 
 
-    // rewrite dataset
     for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
+      if (std::isfinite(m_feature_variables[i])) { m_feature_variables[i] = -999; }
       m_dataset->m_input[i] = m_feature_variables[i];
     }
 
-    IDMVAOut = m_expert->apply(*m_dataset)[0];
+    double IDMVAOut = m_expert->apply(*m_dataset)[0];
     B2DEBUG(175, "KLM Expert classification: " << IDMVAOut);
-    // KlId, bkg prob, KLM, ECL
-    klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
-    cluster.addRelationTo(klid);
-
+    klid = m_klids.appendNew();
+    cluster.addRelationTo(klid, IDMVAOut);
 
   }// for cluster in clusters
 } // event
-
-
-
-

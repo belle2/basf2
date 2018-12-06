@@ -50,7 +50,8 @@ namespace CIRC {
   {
     tag_type dist1 = wrap(tag1 - tag2);
     tag_type dist2 = wrap(tag2 - tag1);
-    if (dist1 > dist2) return true; else return false;
+    if (dist1 > dist2) return true;
+    else return false;
   }
 
   /** Calculate distance between two tag values.

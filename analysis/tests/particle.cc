@@ -24,11 +24,12 @@ namespace {
     virtual void SetUp()
     {
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+      StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
       StoreArray<Particle> particles;
       StoreArray<MCParticle> mcparticles;
       StoreArray<RestOfEvent> roes;
       StoreArray<ECLCluster> eclClusters;
+      particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       eclClusters.registerInDataStore();
@@ -112,6 +113,68 @@ namespace {
     Particle outsideArray;
     EXPECT_TRUE(outsideArray.getArrayPointer() == nullptr);
     EXPECT_B2FATAL(Particle p2 = Particle(momentum, 411, Particle::c_Unflavored, daughterIndices));
+  }
+
+  /** Functor to count children of a particle */
+  struct ParticleChildrenCounter {
+    int count{0}; /**< number of calls to this object */
+    /** increase counter ... duh */
+    bool operator()(const Particle*) { ++count; return false; }
+  };
+
+  TEST_F(ParticleTest, ForEachDaughters)
+  {
+    // setup a particle with some daughters and grand daughters
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    int nGrandDaughters = 0;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      if (i % 2 == 0) {
+        Particle* grandDaughter = particles.appendNew(d);
+        newDaughters->appendDaughter(grandDaughter);
+        ++nGrandDaughters;
+      }
+    }
+    const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
+
+    // Check if we get called the correct amount of times
+    int count{0};
+    auto counterFct = [&count](const Particle*) { ++count; return false; };
+    EXPECT_FALSE(p.forEachDaughter(counterFct, false, false));
+    EXPECT_EQ(count, nDaughters);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, true, false));
+    EXPECT_EQ(count, nDaughters + nGrandDaughters);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, false, true));
+    EXPECT_EQ(count, nDaughters + 1);
+    count = 0;
+    EXPECT_FALSE(p.forEachDaughter(counterFct, true, true));
+    EXPECT_EQ(count, nDaughters + nGrandDaughters + 1);
+
+    // Functors passed by value don't return the state
+    ParticleChildrenCounter counterStruct;
+    EXPECT_FALSE(p.forEachDaughter(counterStruct));
+    EXPECT_EQ(counterStruct.count, 0);
+    // But if reference_wrapped it should work fine
+    EXPECT_FALSE(p.forEachDaughter(std::reference_wrapper<ParticleChildrenCounter>(counterStruct)));
+    EXPECT_EQ(counterStruct.count, nDaughters + nGrandDaughters + 1);
+
+    // Test return value: if we return true the processing should be stopped so
+    // count should not be increased anymore
+    int maxchildren{1}, total{nDaughters + nGrandDaughters + 1};
+    auto returnFctTester = [&count, &maxchildren](const Particle*) {++count; return count >= maxchildren; };
+    for (; maxchildren < 2 * total; ++maxchildren) {
+      count = 0;
+      EXPECT_EQ(p.forEachDaughter(returnFctTester), maxchildren <= total);
+      EXPECT_EQ(count, std::min(maxchildren, total));
+    }
   }
 
   /** test some basics for extra information. */
@@ -370,6 +433,8 @@ namespace {
     MC3->setPDG(3);
     T3Kaon->addExtraInfo("test_var", 3.0);
     T3Kaon->addRelationTo(MC3);
+    Particle* ROEPion    = particles.appendNew(Particle(TLorentzVector(3.5, 3.5, 3.5, 3.5),  211, Particle::c_Flavored,
+                                                        Particle::c_Track, 4));
 
     // Construct composite particles
     Particle* D0KK = particles.appendNew(Particle(TLorentzVector(4, 4, 4, 4), 421));
@@ -381,21 +446,21 @@ namespace {
     B0->appendDaughter(T1Pion);
 
     RestOfEvent* roe = roes.appendNew(RestOfEvent());
-    std::vector<int> roeTracks = {4, 5, 6, 7};
-    roe->addTracks(roeTracks);
+
+    roe->addParticles({ROEPion});
     B0->addRelationTo(roe);
 
     // Perform tests
     // First sanity check
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 5/3/1
-    EXPECT_EQ(particles.getEntries(), 5);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 6/3/1
+    EXPECT_EQ(particles.getEntries(), 6);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
     // now make a copy of B0
     Particle* B0_copy = copyParticle(B0);
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 10/3/1
-    EXPECT_EQ(particles.getEntries(), 10);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 11/3/1
+    EXPECT_EQ(particles.getEntries(), 11);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
@@ -445,7 +510,7 @@ namespace {
     EXPECT_TRUE(mc2orig->getPDG() == mc2copy->getPDG());
     EXPECT_TRUE(mc3orig->getPDG() == mc3copy->getPDG());
 
-    EXPECT_TRUE(roeorig->getNTracks() == roecopy->getNTracks());
+    EXPECT_TRUE(roeorig->hasParticle(ROEPion) && roecopy->hasParticle(ROEPion));
 
     // modify original and check the copy
     MCParticle* MC4      = mcparticles. appendNew(MCParticle());

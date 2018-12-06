@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to write out the
 # decay hash. This allows to store information on
 # the reconstructed and original decay and use it
@@ -16,29 +18,38 @@
 #  1) No guarantee for collisions!
 #
 # Contributors: Moritz Gelb (June 2017)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import *
-from decayHash import DecayHashMap
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
 
-# set the log level
-set_log_level(LogLevel.WARNING)
+# create path
+my_path = b2.create_path()
 
-# Bd_JpsiKL_ee Signal MC 7 file
-inputFile = "/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/" \
-            "prod00000628/s00/e0000/4S/r00000/signal/sub00/mdst_000001_prod00000628_task00000001.root"
-inputMdstList('MC7', inputFile)
-
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('JPsi2ee_e2egamma.root', 'examples', False),
+             path=my_path)
 
 # reconstruct the decay
-fillParticleList('e+', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4', False)
-fillParticleList('gamma', '', False)
-reconstructDecay('J/psi -> e+ e-', '')
+ma.fillParticleList(decayString='e+',
+                    cut='electronID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    writeOut=False,
+                    path=my_path)
+ma.fillParticleList(decayString='gamma',
+                    cut='',
+                    writeOut=False,
+                    path=my_path)
+ma.reconstructDecay(decayString='J/psi -> e+ e-',
+                    cut='',
+                    path=my_path)
 
 # generate the decay string
-analysis_main.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi.root')
+my_path.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi_from_B2A502.root')
 
 
 # write out ntuples
@@ -50,10 +61,13 @@ var = ['M',
        'extraInfo(DecayHashExtended)',
        ]
 
-variablesToNTuple('J/psi', var, filename='Jpsi.root')
+ma.variablesToNtuple(decayString='J/psi',
+                     variables=var,
+                     filename='Jpsi_from_B2A502.root',
+                     path=my_path)
 
 # process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

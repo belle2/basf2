@@ -52,7 +52,7 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
   overlapResolverNodeInfos.reserve(m_spacePointTrackCands.getEntries());
 
   for (const SpacePointTrackCand& sPTC : m_spacePointTrackCands) {
-    overlapResolverNodeInfos.emplace_back(sPTC.getQualityIndex(), sPTC.getArrayIndex(),
+    overlapResolverNodeInfos.emplace_back(sPTC.getQualityIndicator(), sPTC.getArrayIndex(),
                                           m_overlapNetworks[0]->getOverlapForTrackIndex(sPTC.getArrayIndex()), 1.0);
   }
 

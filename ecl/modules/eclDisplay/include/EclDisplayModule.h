@@ -8,23 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDISPLAYMODULE_H
-#define ECLDISPLAYMODULE_H
+#pragma once
 
-#include <rawdata/dataobjects/RawECL.h>
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/dataobjects/ECLDigit.h>
-
-#include <TSystem.h>
-#include <TApplication.h>
+//STL
 #include <string>
 
-#include <ecl/modules/eclDisplay/EclFrame.h>
-#include <ecl/modules/eclDisplay/EclData.h>
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+//ECL
+#include <ecl/utility/ECLChannelMapper.h>
+
+class TApplication;
 
 namespace Belle2 {
+
+  class ECLCalDigit;
+  class EclFrame;
+  class EclData;
+
   /**
    * Displays energy distribution in ECL.
    *
@@ -48,28 +51,28 @@ namespace Belle2 {
     /**
      * Initialize EclChannelMapper.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Empty method.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Handle event. Loads events into EclData and updates EclFrame
      * if m_autoDisplay flag is set.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Empty method.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Wait till EclFrame is closed then free allocated resources.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /**
@@ -99,9 +102,9 @@ namespace Belle2 {
      *   large number of events. */
     EclData* m_data;
     /**  Displayed ECL events. */
-    StoreArray<ECLDigit> eclarray;
+    StoreArray<ECLCalDigit> m_eclarray;
     /**  Channel mapper to show channel <-> (crate, shaper) distributions. */
-    ECLChannelMapper m_mapper;
+    ECL::ECLChannelMapper m_mapper;
 
   public:
     /* SLOTS */
@@ -110,8 +113,6 @@ namespace Belle2 {
      */
     void handleClosedFrame();
 
-    ClassDef(EclDisplayModule, 0)
+    ClassDefNV(EclDisplayModule, 0)
   };
 }
-
-#endif /* ECLDISPLAYMODULE_H */

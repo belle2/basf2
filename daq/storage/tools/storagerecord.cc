@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/SeqFile.h>
 
 #include <daq/storage/BinData.h>
@@ -81,36 +82,54 @@ public:
     m_runno = runno;
     m_fileid = fileid;
     bool available = false;
-    for (int i = 0; i < ndisks; i++) {
-      struct statvfs statfs;
-      char filename[1024];
-      sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
+    char filename[1024];
+    struct statvfs statfs;
+    if (g_diskid > 0) {
+      sprintf(filename, "%s%02d", dir.c_str(), g_diskid);
       statvfs(filename, &statfs);
       float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
       if (usage < 0.9) {
+        m_diskid = g_diskid;
+        available = true;
+      }
+    } else {
+      for (int i = 0; i < ndisks; i++) {
+        sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
+        statvfs(filename, &statfs);
+        float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
         sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
         std::ifstream fin(filename);
         int flag = 0;
         fin >> flag;
-        if (flag != 1) {
+        if (usage < 0.05) {
+          if (flag == 1) {
+            ::unlink(filename);
+            std::cout << "[DEBUG] disk : " << m_diskid << " is available again (full_flag removed)" << std::endl;
+          }
           available = true;
           std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
+          fin.close();
           break;
+        } else if (usage < 0.9) {
+          if (flag != 1) {
+            available = true;
+            std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
+            break;
+          }
+          fin.close();
+          std::cout << "[DEBUG] disk : " << m_diskid << " is with full_flag" << std::endl;
+        } else {
+          std::ofstream fout(filename);
+          fout << 1;
+          fout.close();
+          B2WARNING("disk-" << m_diskid << " is full " << usage);
         }
-        fin.close();
-        std::cout << "[DEBUG] disk : " << m_diskid << " is still full" << std::endl;
-      } else {
-        sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
-        std::ofstream fout(filename);
-        fout << 1;
-        fout.close();
-        B2WARNING("disk-" << m_diskid << " is full " << usage);
+        m_diskid++;
+        if (m_diskid > ndisks) m_diskid = 1;
       }
-      m_diskid++;
-      if (m_diskid > ndisks) m_diskid = 1;
     }
     if (!available) {
-      B2FATAL("No disk available for writing");
+      B2FATAL("No disk available for writing " << __FILE__ << ":" << __LINE__);
       exit(1);
     }
     std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
@@ -168,12 +187,12 @@ public:
 
   int write(char* evtbuf, int nbyte, bool isstreamer = false)
   {
+    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     int ret = ::write(m_file, evtbuf, nbyte);
     m_filesize += nbyte;
     if (!isstreamer) {
       m_nevents++;
     }
-    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     return ret;
   }
 
@@ -216,11 +235,13 @@ int main(int argc, char** argv)
            "<filepath_dbtmp> [<obufname> <obufsize> nodename, nodeid]\n", argv[0]);
     return 1;
   }
+  //storagerecord STORE02:REC 10 HLT2 debug /rawdata/disk 11 /home/usr/stordaq/data/dbtmp.txt STORE02:OUT 10 store02_storagerecord 3
   const unsigned interval = 1;
   const char* ibufname = argv[1];
   const int ibufsize = atoi(argv[2]);
   const char* hostname = argv[3];
   const char* runtype = argv[4];
+  const bool not_record = std::string(runtype) == "null";
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];
@@ -228,11 +249,17 @@ int main(int argc, char** argv)
   const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
   const char* nodename = (argc > 9) ? argv[10] : "";
   const int nodeid = (argc > 10) ? atoi(argv[11]) : -1;
+  const unsigned int ninput = (argc > 11) ? atoi(argv[12]) : 1;
+
   RunInfoBuffer info;
   const bool use_info = nodeid >= 0;
-  if (use_info) info.open(nodename, nodeid);
-  SharedEventBuffer ibuf;
-  ibuf.open(ibufname, ibufsize * 1000000);//, true);
+  if (use_info) {
+    info.open(nodename, nodeid);
+  }
+  SharedEventBuffer ibuf[10];
+  for (unsigned int ib = 0; ib < ninput; ib++) {
+    ibuf[ib].open(StringUtil::form("%s_%d", ibufname, ib), ibufsize * 1000000);//, true);
+  }
   signal(SIGINT, signalHandler);
   signal(SIGKILL, signalHandler);
   ConfigFile config("slowcontrol");
@@ -262,76 +289,93 @@ int main(int argc, char** argv)
     unsigned int expno;
     unsigned int runno;
   } hd;
+  g_streamersize = 0;
   while (true) {
     if (use_info) info.reportRunning();
-    ibuf.lock();
-    ibuf.read((int*)&hd, true, true);
-    ibuf.read(evtbuf, true, true);
-    ibuf.unlock();
-    int nbyte = evtbuf[0];
-    int nword = (nbyte - 1) / 4 + 1;
-    bool isnew = false;
-    if (!newrun || expno < hd.expno || runno < hd.runno) {
-      newrun = true;
-      isnew = true;
-      expno = hd.expno;
-      runno = hd.runno;
-      fileid = 0;
+    for (unsigned int ib = 0; ib < ninput; ib++) {
+      ibuf[ib].lock();
+      ibuf[ib].read((int*)&hd, true, true);
+      ibuf[ib].read(evtbuf, true, true);
+      ibuf[ib].unlock();
+      int nbyte = evtbuf[0];
+      int nword = (nbyte - 1) / 4 + 1;
+      bool isnew = false;
+      //      if (not_record) continue;
+      if (hd.type == MSG_STREAMERINFO) {
+        memcpy(g_streamerinfo, evtbuf, nbyte);
+        g_streamersize = nbyte;
+      }
+      if (expno > hd.expno || runno > hd.runno) {
+        B2WARNING("Old run was detected => discard event exp = " << hd.expno << " (" << expno << "), runno" << hd.runno << "(" << runno <<
+                  ")");
+        continue;
+      }
+      if (!newrun || expno < hd.expno || runno < hd.runno) {
+        newrun = true;
+        isnew = true;
+        expno = hd.expno;
+        runno = hd.runno;
+        fileid = 0;
+        if (use_info) {
+          info.setExpNumber(expno);
+          info.setRunNumber(runno);
+          info.setSubNumber(subno);
+          info.setInputCount(0);
+          info.setInputNBytes(0);
+          info.setOutputCount(0);
+          info.setOutputNBytes(0);
+          nbyte_out = 0;
+          count_out = 0;
+        }
+        obuf.lock();
+        SharedEventBuffer::Header* oheader = obuf.getHeader();
+        oheader->expno = expno;
+        oheader->runno = runno;
+        obuf.unlock();
+        if (!not_record) {
+          if (file) {
+            file.close();
+          }
+          file.open(path, ndisks, expno, runno, fileid);
+          nbyte_out += nbyte;
+          fileid++;
+        }
+        continue;
+      }
       if (use_info) {
-        info.setExpNumber(expno);
-        info.setRunNumber(runno);
-        info.setSubNumber(subno);
-        info.setInputCount(0);
-        info.setInputNBytes(0);
-        info.setOutputCount(0);
-        info.setOutputNBytes(0);
-        nbyte_out = 0;
-        count_out = 0;
+        info.addInputCount(1);
+        info.addInputNBytes(nbyte);
       }
-      obuf.lock();
-      SharedEventBuffer::Header* oheader = obuf.getHeader();
-      oheader->expno = expno;
-      oheader->runno = runno;
-      obuf.unlock();
+      if (hd.type == MSG_STREAMERINFO) {
+        continue;
+      }
       if (file) {
-        file.close();
+        if (nbyte_out > MAX_FILE_SIZE) {
+          file.close();
+          nbyte_out = 0;
+          file.open(path, ndisks, expno, runno, fileid);
+          fileid++;
+        }
+        file.write((char*)evtbuf, nbyte);
+        nbyte_out += nbyte;
+        if (use_info) {
+          info.addOutputCount(1);
+          info.addOutputNBytes(nbyte);
+          info.get()->reserved[0] = file.getFileId();
+          info.get()->reserved[1] = file.getDiskId();
+          info.get()->reserved_f[0] = (float)info.getOutputNBytes() / 1024. / 1024.;
+        }
+      } else {
+        if (!ecount) {
+          B2WARNING("no run was initialzed for recording : " << hd.expno << "." << hd.runno);
+        }
+        ecount = 1;
       }
-      memcpy(g_streamerinfo, evtbuf, nbyte);
-      g_streamersize = nbyte;
-      file.open(path, ndisks, expno, runno, fileid);
-      nbyte_out += nbyte;
-      fileid++;
-      continue;
-    }
-    if (use_info) {
-      info.addInputCount(1);
-      info.addInputNBytes(nbyte);
-    }
-    if (file) {
-      if (nbyte_out > MAX_FILE_SIZE) {
-        file.close();
-        nbyte_out = 0;
-        file.open(path, ndisks, expno, runno, fileid);
-        fileid++;
-      }
-      file.write((char*)evtbuf, nbyte);
-      nbyte_out += nbyte;
+      // Dump data into output buffer
       if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
         obuf.write(evtbuf, nword, true);
       }
       count_out++;
-      if (use_info) {
-        info.addOutputCount(1);
-        info.addOutputNBytes(nbyte);
-        info.get()->reserved[0] = file.getFileId();
-        info.get()->reserved[1] = file.getDiskId();
-        info.get()->reserved_f[0] = (float)info.getOutputNBytes() / 1024. / 1024.;
-      }
-    } else {
-      if (!ecount) {
-        B2WARNING("no run was initialzed for recording : " << hd.expno << "." << hd.runno);
-      }
-      ecount = 1;
     }
   }
   return 0;

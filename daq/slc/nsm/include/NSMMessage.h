@@ -2,8 +2,9 @@
 #define _Belle2_NSMMessage_hh
 
 extern "C" {
-#include "nsm2/nsm2.h"
-#include "nsm2/nsmsys2.h"
+#include <nsm2/nsm2.h>
+#include <nsm2/nsmlib2.h>
+#include <nsm2/nsmsys2.h>
 }
 
 #include "daq/slc/nsm/NSMHandlerException.h"
@@ -30,69 +31,69 @@ namespace Belle2 {
     static const unsigned int DATA_SIZE;
 
   public:
-    NSMMessage() throw();
-    NSMMessage(const NSMNode& node) throw();
-    NSMMessage(const NSMNode& node, const NSMCommand& cmd) throw();
+    NSMMessage();
+    NSMMessage(const NSMNode& node);
+    NSMMessage(const NSMNode& node, const NSMCommand& cmd);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
-               int npar, int* pars) throw();
+               int npar, int* pars);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
-               int par, const std::string& data) throw();
-    NSMMessage(const NSMNode& node, const NSMCommand& cmd, int par) throw();
+               int par, const std::string& data);
+    NSMMessage(const NSMNode& node, const NSMCommand& cmd, int par);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
-               const std::string& data) throw();
-    NSMMessage(const NSMNode& node, const NSMVar& var) throw();
-    NSMMessage(const NSMNode& node, const DAQLogMessage& log) throw();
-    NSMMessage(const NSMNode& node, const DAQLogMessage& log, const NSMCommand& cmd) throw();
-    NSMMessage(const NSMNode& node, const NSMData& data) throw();
-    NSMMessage(const NSMCommand& cmd) throw();
-    NSMMessage(const NSMCommand& cmd, int par) throw();
-    NSMMessage(const NSMCommand& cmd, int npar, int* pars) throw();
+               const std::string& data);
+    NSMMessage(const NSMNode& node, const NSMVar& var);
+    NSMMessage(const NSMNode& node, const DAQLogMessage& log);
+    NSMMessage(const NSMNode& node, const DAQLogMessage& log, const NSMCommand& cmd);
+    NSMMessage(const NSMNode& node, const NSMData& data);
+    NSMMessage(const NSMCommand& cmd);
+    NSMMessage(const NSMCommand& cmd, int par);
+    NSMMessage(const NSMCommand& cmd, int npar, int* pars);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd, int npar, int* pars,
-               const std::string& data) throw();
-    NSMMessage(const NSMCommand& cmd, const std::string& data) throw();
-    NSMMessage(const NSMVar& var) throw();
-    NSMMessage(const DAQLogMessage& log) throw();
-    NSMMessage(const NSMData& data) throw();
-    NSMMessage(const NSMMessage& msg) throw();
-    virtual ~NSMMessage() throw() { }
+               const std::string& data);
+    NSMMessage(const NSMCommand& cmd, const std::string& data);
+    NSMMessage(const NSMVar& var);
+    NSMMessage(const DAQLogMessage& log);
+    NSMMessage(const NSMData& data);
+    NSMMessage(const NSMMessage& msg);
+    virtual ~NSMMessage() { }
 
   public:
-    const NSMMessage& operator=(const NSMMessage& msg) throw();
+    const NSMMessage& operator=(const NSMMessage& msg);
 
   public:
-    void init() throw();
-    void init(const NSMNode& node, const NSMVar& var) throw();
-    void init(const NSMNode& node, const DAQLogMessage& log) throw();
-    void init(const NSMNode& node, const DAQLogMessage& log, const NSMCommand& cmd) throw();
-    void init(const NSMNode& node, const NSMData& data) throw();
-    const char* getRequestName() const throw();
-    const char* getNodeName() const throw();
-    unsigned short getRequestId() const throw();
-    unsigned short getSequenceId() const throw();
-    unsigned short getNodeId() const throw();
-    unsigned short getNParams() const throw();
-    int getParam(int i) const throw();
+    void init();
+    void init(const NSMNode& node, const NSMVar& var);
+    void init(const NSMNode& node, const DAQLogMessage& log);
+    void init(const NSMNode& node, const DAQLogMessage& log, const NSMCommand& cmd);
+    void init(const NSMNode& node, const NSMData& data);
+    const char* getRequestName() const;
+    const char* getNodeName() const;
+    unsigned short getRequestId() const;
+    unsigned short getSequenceId() const;
+    unsigned short getNodeId() const;
+    unsigned short getNParams() const;
+    int getParam(int i) const;
 #if NSM_PACKAGE_VERSION >= 1914
-    int* getParams() throw();
-    const int* getParams() const throw();
+    int* getParams();
+    const int* getParams() const;
 #else
-    unsigned int* getParams() throw();
-    const unsigned int* getParams() const throw();
+    unsigned int* getParams();
+    const unsigned int* getParams() const;
 #endif
-    unsigned int getLength() const throw();
-    const char* getData() const throw();
-    void setRequestName(const std::string& name) throw();
-    void setRequestName(const NSMCommand& cmd) throw();
-    void setRequestName() throw();
-    void setNodeName(const std::string& name) throw();
-    void setNodeName(const NSMNode& node) throw();
-    void setRequestId(unsigned short id) throw();
-    void setSequenceId(unsigned short id) throw();
-    void setNodeId(unsigned short id) throw();
-    void setNParams(unsigned short id) throw();
-    void setParam(int i, unsigned int v) throw();
-    void setData(int len, const char* data)  throw();
-    void setData(const std::string& text)  throw();
+    unsigned int getLength() const;
+    const char* getData() const;
+    void setRequestName(const std::string& name);
+    void setRequestName(const NSMCommand& cmd);
+    void setRequestName();
+    void setNodeName(const std::string& name);
+    void setNodeName(const NSMNode& node);
+    void setRequestId(unsigned short id);
+    void setSequenceId(unsigned short id);
+    void setNodeId(unsigned short id);
+    void setNParams(unsigned short id);
+    void setParam(int i, unsigned int v);
+    void setData(int len, const char* data) ;
+    void setData(const std::string& text) ;
     const NSMVar getVar();
 
   public:
@@ -100,11 +101,11 @@ namespace Belle2 {
     void push(const NSMMessage& msg);
 
   public:
-    virtual void readObject(Reader&) throw(IOException);
-    virtual void writeObject(Writer&) const throw(IOException);
+    virtual void readObject(Reader&);
+    virtual void writeObject(Writer&) const;
 
   public:
-    size_t read(NSMcontext* nsmc) throw(NSMHandlerException);
+    size_t read(NSMcontext* nsmc);
     NSMmsg* getMsg() { return &m_nsm_msg; }
 
   private:

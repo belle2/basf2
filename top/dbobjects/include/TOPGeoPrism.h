@@ -118,22 +118,24 @@ namespace Belle2 {
     }
 
     /**
-     * Returns wavelength filter thickness (filter on -z side)
+     * Returns wavelength filter thickness (filter on -z side).
+     * For backward compatibility, since now the filter is part of TOPGeoPMTArray
      * @return thickness
      */
     double getFilterThickness() const {return m_glueThickness / s_unit;}
 
     /**
      * Returns wavelength filter material name (filter on -z side)
+     * For backward compatibility, since now the filter is part of TOPGeoPMTArray
      * @return material name
      */
     const std::string& getFilterMaterial() const {return m_glueMaterial;}
 
     /**
-     * Returns glue thickness (no glue on -z side, instead there is a wavelength filter)
+     * Returns glue thickness (no glue on -z side)
      * @return thickness
      */
-    double getGlueThickness() const {return 0;}
+    double getGlueThickness() const override {return 0;}
 
     /**
      * Returns cookie size in x (corresponding to 2x2 PMT)
@@ -180,16 +182,26 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "Prism geometry parameters") const;
+    void print(const std::string& title = "Prism geometry parameters") const override;
 
 
   private:
+
+    /**
+     * Disable setting the glue, since there is none
+     */
+    void setGlue(double, const std::string&) override {}
+
+    /**
+     * Disable setting the glue delamination, since there is no glue
+     */
+    void setGlueDelamination(double, double, const std::string&) override {}
 
     float m_exitThickness = 0; /**< thickness at PMT side */
     float m_flatLength = 0; /**< length of the flat part at the bottom */
@@ -200,7 +212,7 @@ namespace Belle2 {
     std::string m_peelOffMaterial; /**< material name of peel-off volume */
     std::vector<PeelOffRegion> m_peelOffRegions; /**< peel-off regions */
 
-    ClassDef(TOPGeoPrism, 2); /**< ClassDef */
+    ClassDefOverride(TOPGeoPrism, 2); /**< ClassDef */
 
   };
 

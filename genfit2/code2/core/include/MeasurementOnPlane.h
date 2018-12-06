@@ -68,7 +68,7 @@ class MeasurementOnPlane : public MeasuredStateOnPlane {
   void setHMatrix(const AbsHMatrix* hMatrix) {hMatrix_.reset(hMatrix);}
   void setWeight(double weight) {weight_ = fmax(weight, 1.E-10);}
 
-  void Print(Option_t* option = "") const ;
+  void Print(Option_t* option = "") const override ;
 
  private:
   TVector3 getPos() const;
@@ -93,15 +93,11 @@ class MeasurementOnPlane : public MeasuredStateOnPlane {
 
  protected:
 
-#ifndef __CINT__
   std::unique_ptr<const AbsHMatrix> hMatrix_; // Ownership
-#else
-  const AbsHMatrix* hMatrix_; //! Ownership. Projection matrix
-#endif
   double weight_;
 
  public:
-  ClassDef(MeasurementOnPlane,1)
+  ClassDefOverride(MeasurementOnPlane,1)
 
 };
 

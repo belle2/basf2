@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TObject.h>
+#include <framework/logging/Logger.h>
 #include <vector>
 
 #include <TRandom.h>
@@ -18,7 +19,7 @@
 namespace Belle2 {
 
   /**
-   * Parameterized TTS for each PMT channel
+   * Parameterized TTS for each PMT pixel
    */
   class TOPPmtTTSPar : public TObject {
 
@@ -33,9 +34,9 @@ namespace Belle2 {
     };
 
     /**
-     * number of PMT channels
+     * number of PMT pixels
      */
-    enum {c_NumChannels = 16};
+    enum {c_NumPmtPixels = 16};
 
     /**
      * Default constructor
@@ -47,35 +48,49 @@ namespace Belle2 {
      * Full constructor
      * @param serialNumber serial number
      */
-    TOPPmtTTSPar(const std::string& serialNumber):
+    explicit TOPPmtTTSPar(const std::string& serialNumber):
       m_serialNumber(serialNumber)
     {}
 
 
     /**
      * Append struct gauss
-     * @param channel PMT channel number (1-based)
+     * @param pmtPixel PMT pixel number (1-based)
      * @param gaus gaussian to be appended
      */
-    void appendGaussian(unsigned channel, const Gaussian& gaus) { m_gaussians[channel - 1].push_back(gaus);}
+    void appendGaussian(unsigned pmtPixel, const Gaussian& gaus)
+    {
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) {
+        B2ERROR("TOPPmtTTSPar::appendGaussian: invalid PMT pixel "
+                << LogVar("PMT pixel", pmtPixel + 1));
+        return;
+      }
+      m_gaussians[pmtPixel].push_back(gaus);
+    }
 
 
     /**
      * Append gaussian using its parameters (frac, mean, sigma)
-     * @param channel PMT channel number (1-based)
+     * @param pmtPixel PMT pixel number (1-based)
      * @param fraction normalization fraction of the gaussian
      * @param mean mean of the gaussian
      * @param sigma sigma of the gaussian
      */
-    void appendGaussian(unsigned channel, double fraction, double mean, double sigma)
+    void appendGaussian(unsigned pmtPixel, double fraction, double mean, double sigma)
     {
       Gaussian gaus;
       gaus.fraction = fraction;
       gaus.mean = mean;
       gaus.sigma = sigma;
-      appendGaussian(channel, gaus);
+      appendGaussian(pmtPixel, gaus);
     }
 
+    /**
+     * Returns number of PMT pixels
+     * @return number of pixels
+     */
+    int getNumOfPixels() const {return c_NumPmtPixels;}
 
     /**
      * Returns PMT serial number
@@ -86,22 +101,35 @@ namespace Belle2 {
 
     /**
      * Returns vector of gaussians
-     * @param channel PMT channel number (1-based)
+     * @param pmtPixel PMT pixel number (1-based)
      * @return vector of gaussians
      */
-    const std::vector<Gaussian>& getGaussians(unsigned channel) const {return m_gaussians[channel - 1];}
+    const std::vector<Gaussian>& getGaussians(unsigned pmtPixel) const
+    {
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) {
+        B2ERROR("TOPPmtTTSPar::getGaussians: invalid PMT pixel. "
+                "Returning data for pixel 1."
+                << LogVar("PMT pixel", pmtPixel + 1));
+        pmtPixel = 0;
+      }
+      return m_gaussians[pmtPixel];
+    }
 
 
     /**
      * Returns a random number, generated according to the distribution
-     * @param channel PMT channel number (1-based)
-     * @return random time
+     * @param pmtPixel PMT pixel number (1-based)
+     * @return random time or 0 for invalid pixel
      */
-    double getRandomTime(unsigned channel) const
+    double getRandomTime(unsigned pmtPixel) const
     {
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) return 0;
+
       double prob = gRandom->Rndm();
       double s = 0;
-      for (const auto& gaus : m_gaussians[channel - 1]) {
+      for (const auto& gaus : m_gaussians[pmtPixel]) {
         s = s + gaus.fraction;
         if (prob < s) {
           return gRandom->Gaus(gaus.mean, gaus.sigma);
@@ -117,7 +145,7 @@ namespace Belle2 {
     void normalizeFractions()
     {
       double sum = 0;
-      for (int ich = 0 ; ich < c_NumChannels ; ich++) {
+      for (int ich = 0 ; ich < c_NumPmtPixels ; ich++) {
         for (const auto& gaus : m_gaussians[ich]) {
           sum = sum + gaus.fraction;
         }
@@ -134,9 +162,9 @@ namespace Belle2 {
   private:
 
     std::string m_serialNumber;                          /**< serial number, e.g. JTxxxx */
-    std::vector<Gaussian> m_gaussians[c_NumChannels];    /**< TTS distribution composed of Gaussians */
+    std::vector<Gaussian> m_gaussians[c_NumPmtPixels];    /**< TTS distribution composed of Gaussians */
 
-    ClassDef(TOPPmtTTSPar, 1); /**< ClassDef */
+    ClassDef(TOPPmtTTSPar, 2); /**< ClassDef */
 
   };
 

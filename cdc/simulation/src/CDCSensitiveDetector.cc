@@ -76,19 +76,19 @@ namespace Belle2 {
 
     m_thresholdEnergyDeposit = cntlp.getThresholdEnergyDeposit();
     m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
-    B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
+    B2DEBUG(150, "CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
 
     m_wireSag = cntlp.getWireSag();
     //    m_wireSag = false;
-    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
+    B2DEBUG(150, "CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
 
     m_modifiedLeftRightFlag = cntlp.getModLeftRightFlag();
-    B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
+    B2DEBUG(150, "CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
 
     m_minTrackLength = cntlp.getMinTrackLength();
     m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
-    B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+    B2DEBUG(150, "CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
 
     //For activating Initialize and EndOfEvent functions
     //but not work --> commented out  for a while...
@@ -638,7 +638,6 @@ namespace Belle2 {
 
     m_hitNumber = cdcArray.getEntries();
 
-    // cppcheck-suppress memleak
     CDCSimHit* simHit =  cdcArray.appendNew();
 
     simHit->setWireID(layerId, wireId);
@@ -678,7 +677,6 @@ namespace Belle2 {
     //    if (hitWeight < 0) m_nNegHits++;
     //    std::cout <<"trackID,HitNumber,weight,driftL,edep= "<< trackID <<" "<< m_hitNumber <<" "<< hitWeight <<" "<< distance <<" "<< edep << std::endl;
     //    return (m_hitNumber);
-    // cppcheck-suppress memleak
   }
 
 

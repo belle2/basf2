@@ -8,16 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGISTUDYMODULE_H
-#define ECLDIGISTUDYMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
-
+//STL
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
+
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+class TFile;
+class TTree;
 
 namespace Belle2 {
+
+  class ECLDsp;
+  class ECLDigit;
+  class ECLTrig;
+  class ECLHit;
 
   class ECLDigiStudyModule : public Module {
 
@@ -33,12 +41,13 @@ namespace Belle2 {
     virtual ~ECLDigiStudyModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
-    virtual void terminate();
+    /** terminate */
+    virtual void terminate() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** output root file name (given as Module parameter) */
@@ -76,9 +85,25 @@ namespace Belle2 {
            m_digiE2[8736]; /**< Deposited energy for second digit array */
     double m_trig1, /**< Trigger time for array 1 */
            m_trig2; /**< Trigger time for array 2 */
+  private:
+    /** Store array: ECLDsp. */
+    StoreArray<ECLDsp> m_eclDspArray1;
+
+    /** Store array: ECLDsp. */
+    StoreArray<ECLDsp> m_eclDspArray2;
+
+    /** Store array: ECLDigit. */
+    StoreArray<ECLDigit> m_eclDigiArray1;
+
+    /** Store array: ECLDigit. */
+    StoreArray<ECLDigit> m_eclDigiArray2;
+
+    /** Store array: ECLTrig. */
+    StoreArray<ECLTrig> m_eclTrigArray;
+
+    /** Store array: ECLHit. */
+    StoreArray<ECLHit> m_eclHitsArray;
 
   };
 
 } // end namespace Belle2
-
-#endif

@@ -15,6 +15,6 @@ namespace Belle2 {
   /// A very simple filter for all space points.
   class AllSVDStateFilter : public BaseSVDStateFilter {
   public:
-    TrackFindingCDC::Weight operator()(const BaseSVDStateFilter::Object& pair) final;
+    TrackFindingCDC::Weight operator()(const BaseSVDStateFilter::Object& pair) override;
   };
 }

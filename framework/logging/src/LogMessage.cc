@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                *
+ * Contributors: Andreas Moll, Thomas Kuhr, Thomas Hauth                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/pcore/ProcHandler.h>
 
+#include <boost/property_tree/json_parser.hpp>
 #include <ostream>
 
 using namespace std;
@@ -34,18 +35,75 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
 {
 }
 
+LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
+                       const std::string& function, const std::string& file, unsigned int line, int debugLevel) :
+  m_logLevel(logLevel),
+  m_message(std::move(messageStream)),
+  m_module(""),
+  m_package(package ? package : ""),
+  m_function(function),
+  m_file(file),
+  m_line(line),
+  m_debugLevel(debugLevel),
+  m_logInfo(0)
+{
+}
+
 
 bool LogMessage::operator==(const LogMessage& message) const
 {
-  return (m_logLevel == message.m_logLevel) &&
-         (m_line == message.m_line) &&
-         (m_message == message.m_message) &&
-         (m_module == message.m_module) &&
-         (m_package == message.m_package) &&
-         (m_function == message.m_function) &&
-         (m_file == message.m_file);
+  return ((m_logLevel == message.m_logLevel) &&
+          (m_line == message.m_line) &&
+          (m_message == message.m_message) &&
+          (m_module == message.m_module) &&
+          (m_package == message.m_package) &&
+          (m_function == message.m_function) &&
+          (m_file == message.m_file));
 }
 
+std::string LogMessage::toJSON(bool complete) const
+{
+  using namespace boost::property_tree::json_parser;
+  std::stringstream buffer;
+  static const double startClock = Utils::getClock();
+  double time = (Utils::getClock() - startClock) / Unit::s;
+  int logInfo = (m_logInfo and not complete) ? m_logInfo :
+                (LogConfig::c_Timestamp | LogConfig::c_Level | LogConfig::c_Message | LogConfig::c_Module |
+                 LogConfig::c_Package | LogConfig::c_Function | LogConfig::c_File | LogConfig::c_Line);
+  // in JSON we always output level, independent of what the log info says, otherwise it is hard to parse
+  buffer << "{\"level\":\"" << LogConfig::logLevelToString(m_logLevel) << '"';
+  if (logInfo & LogConfig::c_Message) {
+    buffer << ",\"message\":\"" << create_escapes(m_message.getMessage()) << '"';
+    const auto& vars = m_message.getVariables();
+    if (vars.size() > 0 or complete) {
+      buffer << ",\"variables\":{";
+      bool first{true};
+      for (const auto& v : vars) {
+        if (!first) buffer << ",";
+        buffer << '"' << create_escapes(v.getName()) << "\":\"" << create_escapes(v.getValue()) << '"';
+        first = false;
+      }
+      buffer << '}';
+    }
+  }
+  if (logInfo & LogConfig::c_Module)
+    buffer << ",\"module\":\"" << create_escapes(m_module) << '"';
+  if (logInfo & LogConfig::c_Package)
+    buffer << ",\"package\":\"" << create_escapes(m_package) << '"';
+  if (logInfo & LogConfig::c_Function)
+    buffer << ",\"function\":\"" << create_escapes(m_function) << '"';
+  if (logInfo & LogConfig::c_File)
+    buffer << ",\"file\":\"" << create_escapes(m_file) << '"';
+  if (logInfo & LogConfig::c_Line)
+    buffer << ",\"line\":" << m_line;
+  if (logInfo & LogConfig::c_Timestamp)
+    buffer << ",\"timestamp\":" << std::fixed << std::setprecision(3) << time;
+  if (ProcHandler::EvtProcID() != -1 or complete)
+    buffer << ",\"proc\":" << ProcHandler::EvtProcID();
+  //variables ...
+  buffer << "}\n";
+  return buffer.str();
+}
 
 std::ostream& LogMessage::print(std::ostream& out) const
 {
@@ -69,7 +127,7 @@ std::ostream& LogMessage::print(std::ostream& out) const
     out << "(" << ProcHandler::EvtProcID() << ") ";
   }
   if (logInfo & LogConfig::c_Message) {
-    out << m_message;
+    out << m_message.str();
   }
   // if there is no module or package or similar there's no need to print them
   if (m_module.empty()) logInfo &= ~LogConfig::c_Module;
@@ -115,7 +173,7 @@ namespace Belle2 {
   size_t hash(const LogMessage& msg)
   {
     return (
-             std::hash<std::string>()(msg.m_message)
+             std::hash<std::string>()(msg.m_message.str())
              ^ std::hash<std::string>()(msg.m_module)
              ^ std::hash<std::string>()(msg.m_package)
              ^ std::hash<std::string>()(msg.m_function)

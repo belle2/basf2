@@ -25,7 +25,8 @@ namespace eudaq {
     typedef std::vector<unsigned char> datavect;
     typedef std::vector<unsigned char>::const_iterator datait;
   public:
-    virtual void Initialize(const Event& bore, const Configuration& /*c*/) {
+    virtual void Initialize(const Event& bore, const Configuration& /*c*/)
+    {
       m_boards = from_string(bore.GetTag("BOARDS"), 0);
       m_ids.clear();
       for (unsigned i = 0; i < m_boards; ++i) {
@@ -34,13 +35,15 @@ namespace eudaq {
       }
     }
 
-    virtual unsigned GetTriggerID(Event const& ev) const {
+    virtual unsigned GetTriggerID(Event const& ev) const
+    {
       const RawDataEvent& rawev = dynamic_cast<const RawDataEvent&>(ev);
       if (rawev.NumBlocks() < 1 || rawev.GetBlock(0).size() < 8) return (unsigned) - 1;
       return GET(rawev.GetBlock(0), 1) >> 16;
     }
 
-    virtual bool GetStandardSubEvent(StandardEvent& result, const Event& source) const {
+    virtual bool GetStandardSubEvent(StandardEvent& result, const Event& source) const
+    {
       if (source.IsBORE()) {
         // shouldn't happen
         return true;
@@ -125,7 +128,8 @@ namespace eudaq {
       }
       return true;
     }
-    void DecodeFrame(StandardPlane& plane, size_t len, datait it, int frame) const {
+    void DecodeFrame(StandardPlane& plane, size_t len, datait it, int frame) const
+    {
       std::vector<unsigned short> vec;
       for (size_t i = 0; i < len; ++i) {
         unsigned v = GET(it, i);

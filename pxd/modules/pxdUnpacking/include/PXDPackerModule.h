@@ -8,22 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDPackerModule_H
-#define PXDPackerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
 namespace Belle2 {
 
   namespace PXD {
-
-#define PACKER_NUM_ROWS 768
-#define PACKER_NUM_COLS 250
-
 
     /** The PXDPacker module.
      *
@@ -33,25 +30,28 @@ namespace Belle2 {
      * Not yet ready for MC Production, only lab use recommended.
      */
     class PXDPackerModule : public Module {
+      enum {PACKER_NUM_ROWS = 768};
+      enum {PACKER_NUM_COLS = 250};
 
     public:
       /** Constructor defining the parameters */
       PXDPackerModule();
 
-      /** Initialize the module */
-      virtual void initialize();
-      /** do the packing */
-      virtual void event();
-      /** Terminate the module */
-      virtual void terminate();
-
     private:
+
+      /** Initialize the module */
+      void initialize() override final;
+      /** do the packing */
+      void event() override final;
+      /** Terminate the module */
+      void terminate() override final;
 
       std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
+      std::string m_InjectionBGTimingName;  /**< The name of the StoreObj InjectionBGTiming */
 
-      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
-      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
+      bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
+      bool m_Clusterize; /** Use clusterizer (FCE format) */
 
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
@@ -73,6 +73,11 @@ namespace Belle2 {
       /** Time(Tag) from MetaInfo */
       unsigned long long int m_meta_time;
 
+      /** DHP Readout Frame Nr for DHP and DHE headers */
+      unsigned int m_trigger_dhp_framenr;
+      /** DHE Trigger Gate for DHE headers */
+      unsigned int m_trigger_dhe_gate;
+
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
 
@@ -83,9 +88,11 @@ namespace Belle2 {
       std::vector <unsigned char> m_current_frame;
 
       /** Input array for Digits. */
-      StoreArray<PXDDigit> storeDigits;
+      StoreArray<PXDDigit> m_storeDigits;
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
+      /** Input Obj InjectionBGTiming */
+      StoreObjPtr<PXDInjectionBGTiming> m_storeInjectionBGTiming;
 
       /** Pack one event (several DHC) stored in seperate RawPXD object.
        */
@@ -101,11 +108,11 @@ namespace Belle2 {
 
       /** Pack one DHP to buffer.
        */
-      void pack_dhp(int dhp_id, int dhe_id, int dhe_reformat);
+      void pack_dhp(int dhp_id, int dhe_id, int dhe_reformat, int startrow = 0);
 
       /** Pack one DHP RAW to buffer.
        */
-      void pack_dhp_raw(int dhp_id, int dhe_id, bool adcpedestal);
+      void pack_dhp_raw(int dhp_id, int dhe_id);
 
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame
@@ -124,14 +131,14 @@ namespace Belle2 {
       /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;
 
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];//! temporary hitmap buffer for pixel to raw data conversion
+      /** temporary hitmap buffer for pixel to raw data conversion */
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
 
-      // ignore common mode for now...
+      unsigned int dhe_byte_count; /**< Byte count in current DHE package */
+      unsigned int dhc_byte_count; /**< Byte count in current DHC package */
 
     };//end class declaration
 
 
   } //end PXD namespace;
 } // end namespace Belle2
-
-#endif // PXDPackerModule_H

@@ -30,48 +30,47 @@ namespace Belle2 {
     DBObject();
     DBObject(const std::string& path);
     DBObject(const DBObject& obj);
-    virtual ~DBObject() throw();
-    const DBObject& operator=(const DBObject& obj) throw();
+    virtual ~DBObject();
+    const DBObject& operator=(const DBObject& obj);
 
   public:
-    int getNObjects(const std::string& name) const throw();
-    DBObjectList& getObjects(const std::string& name) throw(std::out_of_range);
-    const DBObjectList& getObjects(const std::string& name) const throw(std::out_of_range);
-    DBObject& getObject(const std::string& name, int i = 0) throw(std::out_of_range);
-    const DBObject& getObject(const std::string& name, int i = 0) const throw(std::out_of_range);
-    void addObjects(const std::string& name, const DBObjectList& obj) throw();
-    void addObject(const std::string& name, const DBObject& obj) throw();
+    int getNObjects(const std::string& name) const;
+    DBObjectList& getObjects(const std::string& name);
+    const DBObjectList& getObjects(const std::string& name) const;
+    DBObject& getObject(const std::string& name, int i = 0);
+    const DBObject& getObject(const std::string& name, int i = 0) const;
+    void addObjects(const std::string& name, const DBObjectList& obj);
+    void addObject(const std::string& name, const DBObject& obj);
 
   public:
-    DBObject& operator()(const std::string& name, int index = 0) throw(std::out_of_range)
+    DBObject& operator()(const std::string& name, int index = 0)
     {
       return getObject(name, index);
     }
-    const DBObject& operator()(const std::string& name, int index = 0) const throw(std::out_of_range)
+    const DBObject& operator()(const std::string& name, int index = 0) const
     {
       return getObject(name, index);
     }
 
   public:
-    StringList getNameList(bool isfull) const throw();
-    void print(bool isfull = true) const throw();
-    const std::string sprint(bool isfull) const throw();
-    void printHTML(bool isfull = true) const throw();
-    void printSQL(const std::string& table, std::ostream& out,
-                  const std::string& name = "", int index = -1) const throw();
-    void search(NameValueList& map, const std::string& name = "", bool isfull = true) const throw();
+    StringList getNameList(bool isfull) const;
+    void print(bool isfull = true) const;
+    const std::string sprint(bool isfull) const;
+    void printHTML(bool isfull = true) const;
+    const std::string printSQL(const std::string& table, int id) const;
+    void search(NameValueList& map, const std::string& name = "", bool isfull = true) const;
 
   public:
-    virtual const void* getValue(const std::string& name) const throw(std::out_of_range);
-    virtual const std::string& getText(const std::string& name) const throw(std::out_of_range);
-    virtual void addText(const std::string& name, const std::string& value) throw();
+    virtual const void* getValue(const std::string& name) const;
+    virtual const std::string& getText(const std::string& name) const;
+    virtual void addText(const std::string& name, const std::string& value);
     virtual void addValue(const std::string& name, const void* value,
-                          DBField::Type type, int length) throw();
-    virtual void setValue(const std::string& name, const void* value, int length) throw();
+                          DBField::Type type, int length);
+    virtual void setValue(const std::string& name, const void* value, int length);
 
   public:
-    virtual void readObject(Reader& reader) throw(IOException);
-    virtual void writeObject(Writer& writer) const throw(IOException);
+    virtual void readObject(Reader& reader);
+    virtual void writeObject(Writer& writer) const;
 
   private:
     FieldValueList m_value_m;
@@ -80,7 +79,7 @@ namespace Belle2 {
     std::string m_empty;
 
   protected:
-    virtual void reset() throw();
+    virtual void reset();
 
   private:
     void copy(const DBObject& obj);

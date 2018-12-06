@@ -37,16 +37,16 @@ namespace Belle2 {
     MillepedeCollectorModule();
 
     /** Prepration */
-    virtual void prepare();
+    virtual void prepare() override;
 
     /** Data collection */
-    virtual void collect();
+    virtual void collect() override;
 
     /** Only for closing mille binaries after each run */
-    virtual void closeRun();
+    virtual void closeRun() override;
 
     /** Register mille binaries in file catalog */
-    virtual void finish();
+    virtual void finish() override;
 
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();
@@ -62,8 +62,10 @@ namespace Belle2 {
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
      * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
+     *
+     * @return true for success, false when some problems occured (or track too much down-weighted by previous DAF fit)
      */
-    void fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
+    bool fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);
@@ -74,6 +76,10 @@ namespace Belle2 {
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
+    /** d(Px,Py,Pz)/d(vx,vy,vz,px,py,pz,theta,phi,M) **/
+    std::pair<TMatrixD, TMatrixD> getLocalToCommonTwoBodyExtParametersTransform(Particle& mother, double motherMass);
+
+
   private:
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
@@ -81,12 +87,26 @@ namespace Belle2 {
     std::vector<std::string> m_particles;
     /** Name of particle list with mothers of daughters to be used with vertex constraint in calibration */
     std::vector<std::string> m_vertices;
-    /** Name of particle list with mothers of daughters to be used with vertex + IP profile constraint in calibration */
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile (+ optional calibration) constraint in calibration */
     std::vector<std::string> m_primaryVertices;
+    /** Name of particle list with mothers of daughters to be used with vertex + mass constraint in calibration */
+    std::vector<std::string> m_twoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile (+ optional calibration) + IP kinematics (+ optional calibration) constraint in calibration */
+    std::vector<std::string> m_primaryTwoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
+    std::vector<std::string> m_primaryMassTwoBodyDecays;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile + mass constraint in calibration */
+    std::vector<std::string> m_primaryMassVertexTwoBodyDecays;
+
+    /** Width (in GeV/c/c) to use for invariant mass constraint for 'stable' particles (like K short). Temporary until proper solution is found */
+    double m_stableParticleWidth;
+
     /** Use double (instead of single/float) precision for binary files */
     bool m_doublePrecision;
-    /** Add derivatives for beam spot calibration for primary vertices */
+    /** Add derivatives for beam spot vertex calibration for primary vertices */
     bool m_calibrateVertex;
+    /** Add derivatives for beam spot kinematics calibration for primary vertices */
+    bool m_calibrateKinematics = true;
     /** Minimum p.value for output */
     double m_minPValue;
     /** Whether to use TTree to accumulate GBL data instead of binary files*/
@@ -98,6 +118,15 @@ namespace Belle2 {
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
+
+    /** Add local parameter for event T0 fit in GBL **/
+    bool m_fitEventT0;
+    /** Update L/R weights from previous DAF fit result? **/
+    bool m_updateCDCWeights;
+    /** Minimum CDC hit weight **/
+    double m_minCDCHitWeight;
+    /** Minimum CDC used hit fraction **/
+    double m_minUsedCDCHitFraction;
 
   };
 }

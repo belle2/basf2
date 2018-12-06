@@ -2,30 +2,6 @@
 
 <FrontEndMapping descr="Mapping of SCROD's to TOP modules">
 
-  <TOPModule CNumber="1">
-    <moduleID descr="slot number">0</moduleID>  <!-- not installed -->
-    <Boardstack col="0">
-      <SCRODid>110</SCRODid>
-      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
-      <FinesseSlot>A</FinesseSlot>
-    </Boardstack>
-    <Boardstack col="1">
-      <SCRODid>28</SCRODid>
-      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
-      <FinesseSlot>B</FinesseSlot>
-    </Boardstack>
-    <Boardstack col="2">
-      <SCRODid>68</SCRODid>
-      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
-      <FinesseSlot>C</FinesseSlot>
-    </Boardstack>
-    <Boardstack col="3">
-      <SCRODid>112</SCRODid>
-      <COPPERid>1001</COPPERid> <!-- arbitrary! -->
-      <FinesseSlot>D</FinesseSlot>
-    </Boardstack>
-  </TOPModule>
-
   <TOPModule CNumber="2">
     <moduleID descr="slot number">6</moduleID>
     <Boardstack col="0">

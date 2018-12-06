@@ -38,6 +38,7 @@ particlegun.param('phiParams', [0, 360])
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
 geometry.param('components', ['EKLM'])
+geometry.param('useDB', False)
 g4sim = register_module('FullSim')
 
 # EKLM Modules

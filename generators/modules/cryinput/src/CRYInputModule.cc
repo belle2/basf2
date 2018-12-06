@@ -76,7 +76,8 @@ CRYInputModule::~CRYInputModule()
 
 void CRYInputModule::initialize()
 {
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   m_generator.setSetupFile(m_setupfile);
   m_generator.setCosmicDataDir(m_cosmicdatadir);

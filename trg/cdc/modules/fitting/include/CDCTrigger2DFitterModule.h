@@ -9,7 +9,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
 
@@ -25,10 +25,10 @@ namespace Belle2 {
     virtual ~CDCTrigger2DFitterModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Run the 2D fitter for an event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Name of the StoreArray containing the input track segment hits. */
@@ -59,7 +59,7 @@ namespace Belle2 {
     /** list of output tracks from fitter */
     StoreArray<CDCTriggerTrack> m_fitterTracks;
     /** StoreObjPtr contraining the event time */
-    StoreObjPtr<EventT0> m_eventTime;
+    StoreObjPtr<BinnedEventT0> m_eventTime;
   };
 
 } // namespace Belle2

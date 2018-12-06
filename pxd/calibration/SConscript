@@ -1,3 +1,0 @@
-Import('env')
-env['TOOLS_LIBS'][''] = ['boost_multiarray', 'boost_functional'];
-Return('env')

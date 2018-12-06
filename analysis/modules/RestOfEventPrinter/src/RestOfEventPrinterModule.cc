@@ -21,7 +21,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -59,7 +58,7 @@ namespace Belle2 {
 
   void RestOfEventPrinterModule::initialize()
   {
-    StoreArray<RestOfEvent>::required();
+    StoreArray<RestOfEvent>().isRequired();
   }
 
   void RestOfEventPrinterModule::event()
@@ -75,6 +74,7 @@ namespace Belle2 {
 
       unsigned int nAllTracks = roe->getNTracks();
       unsigned int nAllECLClusters = roe->getNECLClusters();
+      unsigned int nAllKLMClusters = roe->getNKLMClusters();
       int relatedPDG = part->getPDGCode();
       int relatedMCPDG;
       if (mcpart)
@@ -87,68 +87,33 @@ namespace Belle2 {
       B2INFO(" - " << "ROE related to MC particle with PDG: " << relatedMCPDG);
       B2INFO(" - " << "No. of Tracks in ROE: " << nAllTracks);
       B2INFO(" - " << "No. of ECLClusters in ROE: " << nAllECLClusters);
+      B2INFO(" - " << "No. of KLMClusters in ROE: " << nAllKLMClusters);
 
       for (std::vector<std::string>::iterator it = m_maskNames.begin() ; it != m_maskNames.end(); ++it) {
         std::string maskName = *it;
         unsigned int nTracks = roe->getNTracks(maskName);
         unsigned int nECLClusters = roe->getNECLClusters(maskName);
-        std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
-        std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
 
 
         B2INFO(" - " << "Info for ROEMask with name: \'" << maskName << "\'");
 
         B2INFO("    o) " << "No. of Tracks which pass the mask: " << nTracks);
 
-        if ((m_whichMask == "track" or m_whichMask == "both") and m_fullPrint)
-          printTrackMask(trackMask);
-
         B2INFO("    o) " << "No. of ECLClusters which pass the mask: " << nECLClusters);
-
-        if ((m_whichMask == "cluster" or m_whichMask == "both") and m_fullPrint)
-          printECLClusterMask(eclClusterMask);
+        if (m_fullPrint) {
+          printMaskParticles(roe->getParticles(maskName));
+        }
       }
     } else
       B2ERROR("RestOfEvent object not valid! Did you build ROE?");
 
     B2INFO("[RestOfEventPrinterModule] END ------------------------------------------");
   }
-
-  void RestOfEventPrinterModule::printTrackMask(std::map<unsigned int, bool> trackMask) const
+  void RestOfEventPrinterModule::printMaskParticles(const std::vector<const Particle*>& maskParticles) const
   {
-    StoreArray<Track> tracks;
-
-    std::cout << std::endl << "           Track (ID, PDG, Mask): ";
-    for (const auto& it : trackMask) {
-      const Track* track = tracks[it.first];
-      const MCParticle* mcp = track->getRelated<MCParticle>();
-      int mcPDG;
-      if (mcp)
-        mcPDG = mcp->getPDG();
-      else
-        mcPDG = -1;
-      std::cout << "(" << it.first << ", " << mcPDG << ", " << it.second << ")   ";
+    for (auto* particle : maskParticles) {
+      particle->print();
     }
-    std::cout << std::endl << std::endl;
   }
-
-  void RestOfEventPrinterModule::printECLClusterMask(std::map<unsigned int, bool> eclClusterMask) const
-  {
-    StoreArray<ECLCluster> eclClusters;
-
-    std::cout << std::endl << "           ECLCluster (ID, PDG, Mask): ";
-    for (const auto& it : eclClusterMask) {
-      const ECLCluster* cluster = eclClusters[it.first];
-      const MCParticle* mcp = cluster->getRelated<MCParticle>();
-      int mcPDG;
-      if (mcp)
-        mcPDG = mcp->getPDG();
-      else
-        mcPDG = -1;
-      std::cout << "(" << it.first << ", " << mcPDG << ", " << it.second << ")   ";
-    }
-    std::cout << std::endl << std::endl;
-  }
-
 } // end Belle2 namespace
 

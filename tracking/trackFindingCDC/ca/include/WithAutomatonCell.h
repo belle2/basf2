@@ -31,21 +31,30 @@ namespace Belle2 {
       {
       }
 
-      /// Getter for the automaton cell
-      AutomatonCell& getAutomatonCell()
+      /// Mutable getter for the automaton cell
+      AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
 
-      /// Constant getter for the automaton cell
-      const AutomatonCell& getAutomatonCell() const
+      /// Mockup as we do not have any sub-items
+      void unsetAndForwardMaskedFlag() const
       {
-        return m_automatonCell;
+        getAutomatonCell().unsetMaskedFlag();
       }
+
+      /// Mockup as we do not have any sub-items
+      void setAndForwardMaskedFlag() const
+      {
+        getAutomatonCell().setMaskedFlag();
+      }
+
+      /// Mockup as we do not have any sub-items
+      void receiveMaskedFlag() const {}
 
     private:
       /// Memory for the automaton cell
-      AutomatonCell m_automatonCell;
+      mutable AutomatonCell m_automatonCell;
     };
   }
 }

@@ -19,9 +19,30 @@
 #include <TMatrixDSym.h>
 #include <TProfile.h>
 #include <TH1F.h>
-
+#include <TH2F.h>
 
 namespace Belle2 {
+
+  /**
+   * Structure to hold some of the calpulse data
+   */
+  struct Hit {
+    double time = 0; /**< raw time [samples] */
+    double timeErr = 0; /**< raw time uncertainty [samples] */
+    int pulseHeight = 0; /**< pulse height [ADC counts] */
+    double pulseWidth = 0; /**< pulse width [ns] */
+
+    /**
+     * Full constructor
+     */
+    Hit(double t, double et, int height, double width)
+    {
+      time = t;
+      timeErr = et;
+      pulseHeight = height;
+      pulseWidth = width;
+    }
+  };
 
   /**
    * Structure to hold calpulse raw times expressed in samples since sample 0 of window 0.
@@ -49,7 +70,6 @@ namespace Belle2 {
     }
   };
 
-
   /**
    * Time base calibrator
    */
@@ -71,30 +91,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -218,19 +238,17 @@ namespace Belle2 {
     unsigned m_numIterations = 100;    /**< Number of Iterations of iTBC */
     std::string m_directoryName; /**< directory name for the output root files */
     unsigned m_method = 0; /**< method to use */
+    bool m_useFallingEdge = false; /**< if true, use falling edge instead of rising */
 
     std::vector<TwoTimes> m_ntuples[c_NumChannels]; /**< channel wise data */
     double m_syncTimeBase = 0; /**< synchronization time (two ASIC windows) */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
+    TH2F m_goodHits;       /**< pulse height versus width of all good hits */
+    TH2F m_calPulseFirst;  /**< pulse height versus width of the first calibration pulse */
+    TH2F m_calPulseSecond; /**< pulse height versus width of the second calibration pulse */
 
-    /**
-     * parameters for iTBC
-     *
-     */
-
-
+    // parameters for iTBC
     int m_good = 0;   /**<   good events used for chisq cal. */
-
     double m_dt_min = 20.0; /**<   minimum Delta T of raw calpulse */
     double m_dt_max = 24.0; /**<   maximum Delta T of raw calpulse */
     double m_dev_step = 0.001; /**< a step size to calculate the value of d(chisq)/dxval*/

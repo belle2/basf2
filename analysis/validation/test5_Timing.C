@@ -1,6 +1,6 @@
 /*
 <header>
-  <input>GenericB_GENSIMRECtoDST.dst.root,DSTtoMDST.mdst.root,MDSTtoUDST.udst.root,UDSTtoNTUP.ntup.root,FileEventSizes.root</input>
+  <input>../GenericB_GENSIMRECtoDST.dst.root,../DSTtoMDST.mdst.root,../MDSTtoUDST.udst.root,../UDSTtoNTUP.ntup.root,FileEventSizes.root</input>
   <output>Timing.root</output>
   <contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
 </header>
@@ -15,7 +15,8 @@
 
 
 //how often do we want to execute stuff? (result of first execution ignored to warm caches)
-const int nRuns = 1; //make this >= 3
+const int nRuns = 2;
+//make this >= 3
 
 /** Helper function to get stdout of 'cmd'. */
 TString exec(const char* cmd) {
@@ -36,23 +37,25 @@ TString exec(const char* cmd) {
 }
 
 /** Run each DST analysis steering file in a list of files a few times, store execution time in Ntuple. */
-void test4_Timing()
+void test5_Timing()
 {
     const char* files[] = {
         "analysis/validation/test1_DSTtoMDST.py",
         "analysis/validation/test2_MDSTtoUDST.py",
         "analysis/validation/test3_UDSTtoNTUP.py"
     };
-    TFile* output = TFile::Open("../Timing.root", "recreate");
+    TFile* output = TFile::Open("Timing.root", "recreate");
     output->cd();
 
     const TString tmpdir = exec("mktemp -d").Strip(TString::kTrailing, '\n');
 
-    // const int nFiles = sizeof(files)/sizeof(const char*);
-    for (int iFile = 0; iFile < 1; iFile++) {
+    for (int iFile = 0; iFile < 3; iFile++) {
         TString path(files[iFile]);
         int lastslash = path.Last('/');
         TNtuple* bench = new TNtuple(path.Remove(0, lastslash+1), "", "time_avg_ms:time_stdev_ms");
+        bench->SetAlias("Description", "Time to execute scripts.");
+        bench->SetAlias("Check", "Consistency with previous.");
+        bench->SetAlias("Contact", "sam.cunliffe@desy.de;thomas.kuhr@lmu.de");
         std::vector<double> times_ms;
 
         for (int iRun = 0; iRun < nRuns; iRun++) {

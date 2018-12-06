@@ -11,6 +11,7 @@
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
 #include <TH1F.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 #include "vector"
 #include "string"
 namespace Belle2 {
@@ -23,11 +24,11 @@ namespace Belle2 {
       /// Constructor.
       T0CalibrationAlgorithm();
       /// Destructor
-      virtual ~T0CalibrationAlgorithm() {}
+      ~T0CalibrationAlgorithm() {}
       /// turn on/off debug.
-      virtual void setDebug(bool debug = false) {m_debug = debug; }
+      void setDebug(bool debug = false) {m_debug = debug; }
       /// store Hisotgram or not.
-      virtual void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
+      void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// minimum ndf require for track.
       void setMinimumNDF(double minndf) {m_ndfmin = minndf;}
       /// minimum pvalue requirement.
@@ -37,16 +38,22 @@ namespace Belle2 {
       /// Maximum mean of dt of all channels distribution, condition to stop iterating
       void setMaxMeanDt(double maxMeanDt) {m_maxMeanDt = maxMeanDt;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
       /// output xt T0 file name (for text mode)
-      void outputT0FileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
+      void setOutputFileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
+
+      /// Set name for histogram output
+      void setHistFileName(const std::string& name) {m_histName = "histT0_" + name + ".root";}
 
     protected:
       /// Run algo on data
-      virtual EResult calibrate();
+      EResult calibrate() override;
       ///create histo for each channel
-      virtual void createHisto();
+      void createHisto();
       /// write outut or store db
-      virtual void write();
+      void write();
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
@@ -55,16 +62,19 @@ namespace Belle2 {
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
       /*Condition to stop iterate minDt <m_maxDt and rmsDt<m_maxRMS*/
-      double m_maxMeanDt = 0.2;   /**< Mean of dT distribution  of all channels;*/
-      double m_maxRMSDt = 1;   /**< RMS of dT distribution  of all channels*/
+      double m_maxMeanDt = 0.15;   /**< Mean of dT distribution  of all channels;*/
+      double m_maxRMSDt = 0.8;   /**< RMS of dT distribution  of all channels*/
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/
       double err_dtb[300] =  {0.};    /**< error of dt of board*/
 
-      bool m_debug;   /**< debug. */
-      bool m_storeHisto; /**< store histo or not*/
+      bool m_debug = false;   /**< debug. */
+      bool m_storeHisto = false; /**< store histo or not*/
+      bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
+      std::string m_histName = "histT0.root"; /**< root file name */
+      DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
     };
   }// name space CDC
 } // namespace Belle2

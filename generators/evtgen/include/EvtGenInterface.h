@@ -50,7 +50,8 @@ namespace Belle2 {
      * Constructor.
      */
     EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0),
-      m_logCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Warning) {}
+      m_ParentInitialized(false),
+      m_logCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100) {}
 
     /**
      * Destructor.
@@ -65,9 +66,14 @@ namespace Belle2 {
     int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
                       TVector3 pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
 
+    /** Simulate a particle decay. */
+    int simulateDecay(MCParticleGraph& graph,
+                      MCParticleGraph::GraphParticle& parent);
+
   private:
     /** Convert EvtParticle structure to flat MCParticle list */
-    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex);
+    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+                           MCParticleGraph::GraphParticle* parent);
 
     /** Copy parameters from EvtParticle to MCParticle */
     void updateGraphParticle(EvtParticle* eParticle,
@@ -79,6 +85,7 @@ namespace Belle2 {
     EvtGen* m_Generator;        /**<Variable needed for EvtGen generator. */
     EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */
     EvtId m_ParentParticle;     /**<Variable needed for parent particle ID. */
+    bool m_ParentInitialized;   /**< Whether parent particle is initialized. */
     IOIntercept::OutputToLogMessages m_logCapture; /**< Capture evtgen log and transform into basf2 logging. */
   }; //! end of EvtGen Interface
 

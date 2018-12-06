@@ -12,32 +12,45 @@ import sys
 # -----------------------------------------------------------------------------------
 
 argvs = sys.argv
-if len(argvs) == 2:
+if len(argvs) > 1:
     if argvs[1] == 'phase2':
+        phase = 2
         compression = 3
     elif argvs[1] == 'phase3':
+        phase = 3
         compression = 4
     else:
         B2ERROR('The argument can be either phase2 or phase3')
         sys.exit()
 else:
     B2ERROR('No argument given specifying the running phase')
-    B2INFO('Usage: basf2 ' + argvs[0] + ' phase2/phase3')
+    B2INFO('Usage: basf2 ' + argvs[0] + ' phase2/phase3' + ' [scaleFactor=1]')
     sys.exit()
 
+scaleFactor = 1.0
+if len(argvs) > 2:
+    scaleFactor = float(argvs[2])
 
-if 'BELLE2_BACKGROUND_DIR' not in os.environ:
-    B2ERROR('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG samples')
+if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
+    B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG samples')
     sys.exit()
 
-bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
 if len(bg) == 0:
-    B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_DIR'])
+    B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
+
+if phase == 2:
+    for fileName in bg:
+        if 'phase2' not in fileName:
+            B2ERROR('BG mixing samples given in BELLE2_BACKGROUND_MIXING_DIR are not for phase 2')
+            B2INFO('Try:\n export BELLE2_BACKGROUND_MIXING_DIR=/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2/set0/')
+            sys.exit()
 
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression))
-B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_DIR'])
+B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+B2INFO('With scaling factor: ' + str(scaleFactor))
 
 set_log_level(LogLevel.ERROR)
 
@@ -51,19 +64,24 @@ main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
 gearbox = register_module('Gearbox')
+if phase == 2:
+    gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 main.add_module(geometry)
 
 # Beam background mixer
 bkgmixer = register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)
+bkgmixer.param('overallScaleFactor', scaleFactor)
 main.add_module(bkgmixer)
 
 # PXD digitizer (no data reduction!)
 pxd_digitizer = register_module('PXDDigitizer')
+pxd_digitizer.param('IntegrationWindow', False)
 main.add_module(pxd_digitizer)
 
 # SVD digitizer

@@ -138,7 +138,7 @@ class SVDValidationTTree(Module):
                     uPos = 0
                     vPos = cluster_position
                 localPosition = TVector3(uPos, vPos, 0)  # sensor center at (0, 0, 0)
-                globalPosition = sensorInfo.pointToGlobal(localPosition)
+                globalPosition = sensorInfo.pointToGlobal(localPosition, True)
                 x = globalPosition[0]
                 y = globalPosition[1]
                 z = globalPosition[2]

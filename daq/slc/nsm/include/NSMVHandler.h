@@ -4,6 +4,7 @@
 #include <daq/slc/nsm/NSMVar.h>
 
 #include <vector>
+#include <map>
 
 namespace Belle2 {
 
@@ -21,7 +22,7 @@ namespace Belle2 {
                 bool useget, bool useset)
       : m_id(0), m_timestamp(0), m_node(node), m_name(name),
         m_useget(useget), m_useset(useset), m_var(name) {}
-    virtual ~NSMVHandler() throw() {}
+    virtual ~NSMVHandler() {}
 
   public:
     virtual bool handleGet(NSMVar& var)
@@ -56,6 +57,8 @@ namespace Belle2 {
     NSMVar& get() { return m_var; }
     NSMVar::Type getType() const { return m_var.getType(); }
     const char* getTypeLabel() const { return m_var.getTypeLabel(); }
+    bool isDumped() const { return m_isdump; }
+    void setDumped(bool isdump) { m_isdump = isdump; }
 
   protected:
     int m_id;
@@ -65,10 +68,11 @@ namespace Belle2 {
     bool m_useget;
     bool m_useset;
     NSMVar m_var;
+    bool m_isdump;
 
   };
 
-  typedef std::vector<NSMVHandler*> NSMVHandlerList;
+  typedef std::map<std::string, NSMVHandler*> NSMVHandlerList;
 
   class NSMVHandlerInt : public NSMVHandler {
 
@@ -85,7 +89,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerInt() throw() {}
+    virtual ~NSMVHandlerInt() {}
 
   public:
     virtual bool handleGet(NSMVar& var);
@@ -120,7 +124,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerFloat() throw() {}
+    virtual ~NSMVHandlerFloat() {}
 
   private:
     virtual bool handleGet(NSMVar& var);
@@ -155,7 +159,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerText() throw() {}
+    virtual ~NSMVHandlerText() {}
 
   private:
     virtual bool handleGet(NSMVar& var);
@@ -192,7 +196,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerIntArray() throw() {}
+    virtual ~NSMVHandlerIntArray() {}
 
   public:
     virtual bool handleGet(NSMVar& var);
@@ -225,7 +229,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerFloatArray() throw() {}
+    virtual ~NSMVHandlerFloatArray() {}
 
   public:
     virtual bool handleGet(NSMVar& var);
@@ -238,6 +242,28 @@ namespace Belle2 {
       m_var = val;
       return true;
     }
+
+  };
+
+  class NSMCallback;
+
+  class NSMVHandlerRef : public NSMVHandler {
+
+  public:
+    NSMVHandlerRef(NSMCallback& callback,
+                   const std::string& name,
+                   const std::string& refname)
+      : NSMVHandler("", name, true, true),
+        m_callback(callback), m_refname(refname) {}
+    virtual ~NSMVHandlerRef() {}
+
+  public:
+    virtual bool handleGet(NSMVar& var);
+    virtual bool handleSet(const NSMVar& var);
+
+  private:
+    NSMCallback& m_callback;
+    std::string m_refname;
 
   };
 

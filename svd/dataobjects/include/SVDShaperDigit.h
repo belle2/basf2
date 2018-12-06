@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka                                          *
+ * Contributors: Peter Kvasnicka, Giulia Casarosa                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,7 +14,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <framework/dataobjects/DigitBase.h>
-
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -69,7 +68,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
-                     [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
+                     [](T x)->APVRawSampleType { return trimToSampleRange(x); }
                     );
     }
 
@@ -89,7 +88,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
-                     [this](typename T::value_type x)->APVRawSampleType
+                     [](typename T::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
                     );
     }
@@ -121,7 +120,7 @@ namespace Belle2 {
      */
     short int getCellID() const { return m_cellID; }
 
-    /** Get arrray of samples.
+    /** Get array of samples.
      * @return std::array of 6 APV25 samples.
      */
     APVFloatSamples getSamples() const
@@ -168,8 +167,8 @@ namespace Belle2 {
       os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
-                std::ostream_iterator<APVRawSampleType>(os, " "));
-      os << "FADC time: " << m_FADCTime << " " << thisMode << std::endl;
+                std::ostream_iterator<unsigned int>(os, " "));
+      os << "FADC time: " << (unsigned int)m_FADCTime << " " << thisMode << std::endl;
       return os.str();
     }
 
@@ -180,7 +179,7 @@ namespace Belle2 {
     * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), and
     * strip number (18-28)
     */
-    unsigned int getUniqueChannelID() const
+    unsigned int getUniqueChannelID() const override
     { return m_cellID + ((m_isU ? 1 : 0) << 11) + (m_sensorID << 12); }
 
     /**
@@ -190,7 +189,7 @@ namespace Belle2 {
     * @param bg beam background digit
     * @return append status
     */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override
     {
       // Don't modify and don't append when bg points nowhere.
       if (!bg) return DigitBase::c_DontAppend;
@@ -198,7 +197,7 @@ namespace Belle2 {
       // Add background samples to the digit's and trim back to range
       std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
                      m_samples.begin(),
-                     [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+                     [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
       { return trimToSampleRange(x + y); }
                     );
       // FIXME: Reset FADC time flag in mode byte.
@@ -212,15 +211,6 @@ namespace Belle2 {
     */
     bool operator < (const SVDShaperDigit&   x)const
     {
-
-      /*
-      //to be re-checked
-      bool sensorOrder = getSensorID()  <= x.getSensorID() ;
-      bool sideOrder = isUStrip() || ( (! isUStrip() && ! x.isUStrip()) );
-      bool cellOrder = getCellID() < x.getCellID();
-      return sensorOrder && sideOrder && cellOrder ;
-      */
-
       if (getSensorID() != x.getSensorID())
         return getSensorID() < x. getSensorID();
       if (isUStrip() != x.isUStrip())
@@ -229,16 +219,56 @@ namespace Belle2 {
         return getCellID() < x.getCellID();
     }
 
+    /**
+     * does the strip pass the ZS cut?
+     * @param nSamples min number of samples above threshold
+     * @param cutMinSignal SN threshold
+     * @return true if the strip have st least nSamples above threshold, false otherwise
+     */
+    bool passesZS(int nSamples, float cutMinSignal) const
+    {
+      int nOKSamples = 0;
+      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
+      for (int k = 0; k < this->getNSamples(); k ++)
+        if (samples_vec[k] >= cutMinSignal)
+          nOKSamples++;
+
+      if (nOKSamples >= nSamples)
+        return true;
+
+      return false;
+    }
+
+
+    /** returns the number of samples, 6, 3 or 1 */
+    int getNSamples() const
+    {
+
+      SVDModeByte thisMode(m_mode);
+      int modality = (int)thisMode.getDAQMode();
+
+      if (modality == 2)
+        return 6;
+      else if (modality == 1)
+        return 3;
+      else if (modality == 0)
+        return 1;
+
+      return -1;
+    }
+
   private:
 
-    VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
-    bool m_isU; /**< True if U, false if V. */
-    short m_cellID; /**< Strip coordinate in pitch units. */
+    VxdID::baseType m_sensorID = 0; /**< Compressed sensor identifier.*/
+    bool m_isU = false; /**< True if U, false if V. */
+    short m_cellID = 0; /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples; /**< 6 APV signals from the strip. */
-    int8_t m_FADCTime; /**< digit time estimate from the FADC, in ns */
-    SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
+    int8_t m_FADCTime = 0; /**< digit time estimate from the FADC, in ns */
+    SVDModeByte::baseType m_mode = SVDModeByte::c_DefaultID;
+    /**< Mode byte, trigger FADCTime + DAQ mode */
 
-    ClassDef(SVDShaperDigit, 2)
+
+    ClassDefOverride(SVDShaperDigit, 3)
 
   }; // class SVDShaperDigit
 

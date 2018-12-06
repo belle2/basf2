@@ -28,6 +28,7 @@
 #include "StateOnPlane.h"
 #include "RKTools.h"
 #include "StepLimits.h"
+#include "Material.h"
 
 #include <algorithm>
 
@@ -81,12 +82,12 @@ class RKTrackRep : public AbsTrackRep {
 
   virtual ~RKTrackRep();
 
-  virtual AbsTrackRep* clone() const {return new RKTrackRep(*this);}
+  virtual AbsTrackRep* clone() const override {return new RKTrackRep(*this);}
 
   virtual double extrapolateToPlane(StateOnPlane& state,
       const SharedPlanePtr& plane,
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const;
+      bool calcJacobianNoise = false) const override;
 
   using AbsTrackRep::extrapolateToLine;
 
@@ -94,12 +95,12 @@ class RKTrackRep : public AbsTrackRep {
       const TVector3& linePoint,
       const TVector3& lineDirection,
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const;
+      bool calcJacobianNoise = false) const override;
 
   virtual double extrapolateToPoint(StateOnPlane& state,
       const TVector3& point,
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const {
+      bool calcJacobianNoise = false) const override {
     return extrapToPoint(state, point, nullptr, stopAtBoundary, calcJacobianNoise);
   }
 
@@ -107,7 +108,7 @@ class RKTrackRep : public AbsTrackRep {
       const TVector3& point,
       const TMatrixDSym& G, // weight matrix (metric)
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const {
+      bool calcJacobianNoise = false) const override {
     return extrapToPoint(state, point, &G, stopAtBoundary, calcJacobianNoise);
   }
 
@@ -116,7 +117,7 @@ class RKTrackRep : public AbsTrackRep {
       const TVector3& linePoint = TVector3(0.,0.,0.),
       const TVector3& lineDirection = TVector3(0.,0.,1.),
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const;
+      bool calcJacobianNoise = false) const override;
 
   
   virtual double extrapolateToCone(StateOnPlane& state,
@@ -124,56 +125,56 @@ class RKTrackRep : public AbsTrackRep {
       const TVector3& linePoint = TVector3(0.,0.,0.),
       const TVector3& lineDirection = TVector3(0.,0.,1.),
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const;
+      bool calcJacobianNoise = false) const override ;
 
   virtual double extrapolateToSphere(StateOnPlane& state,
       double radius,
       const TVector3& point = TVector3(0.,0.,0.),
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const;
+      bool calcJacobianNoise = false) const override;
 
   virtual double extrapolateBy(StateOnPlane& state,
       double step,
       bool stopAtBoundary = false,
-      bool calcJacobianNoise = false) const;
+      bool calcJacobianNoise = false) const override;
 
 
-  unsigned int getDim() const {return 5;}
+  unsigned int getDim() const override {return 5;}
 
-  virtual TVector3 getPos(const StateOnPlane& state) const;
+  virtual TVector3 getPos(const StateOnPlane& state) const override;
 
-  virtual TVector3 getMom(const StateOnPlane& state) const;
-  virtual void getPosMom(const StateOnPlane& state, TVector3& pos, TVector3& mom) const;
+  virtual TVector3 getMom(const StateOnPlane& state) const override;
+  virtual void getPosMom(const StateOnPlane& state, TVector3& pos, TVector3& mom) const override;
 
-  virtual double getMomMag(const StateOnPlane& state) const;
-  virtual double getMomVar(const MeasuredStateOnPlane& state) const;
+  virtual double getMomMag(const StateOnPlane& state) const override;
+  virtual double getMomVar(const MeasuredStateOnPlane& state) const override;
 
-  virtual TMatrixDSym get6DCov(const MeasuredStateOnPlane& state) const;
-  virtual void getPosMomCov(const MeasuredStateOnPlane& state, TVector3& pos, TVector3& mom, TMatrixDSym& cov) const;
-  virtual double getCharge(const StateOnPlane& state) const;
-  virtual double getQop(const StateOnPlane& state) const {return state.getState()(0);}
+  virtual TMatrixDSym get6DCov(const MeasuredStateOnPlane& state) const override;
+  virtual void getPosMomCov(const MeasuredStateOnPlane& state, TVector3& pos, TVector3& mom, TMatrixDSym& cov) const override;
+  virtual double getCharge(const StateOnPlane& state) const override;
+  virtual double getQop(const StateOnPlane& state) const override {return state.getState()(0);}
   double getSpu(const StateOnPlane& state) const;
-  double getTime(const StateOnPlane& state) const;
+  double getTime(const StateOnPlane& state) const override;
 
-  virtual void getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise, TVectorD& deltaState) const;
+  virtual void getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise, TVectorD& deltaState) const override;
 
-  virtual void getBackwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise, TVectorD& deltaState) const;
+  virtual void getBackwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise, TVectorD& deltaState) const override;
 
-  std::vector<genfit::MatStep> getSteps() const;
+  std::vector<genfit::MatStep> getSteps() const override;
 
-  virtual double getRadiationLenght() const;
+  virtual double getRadiationLenght() const override;
 
-  virtual void setPosMom(StateOnPlane& state, const TVector3& pos, const TVector3& mom) const;
-  virtual void setPosMom(StateOnPlane& state, const TVectorD& state6) const;
-  virtual void setPosMomErr(MeasuredStateOnPlane& state, const TVector3& pos, const TVector3& mom, const TVector3& posErr, const TVector3& momErr) const;
-  virtual void setPosMomCov(MeasuredStateOnPlane& state, const TVector3& pos, const TVector3& mom, const TMatrixDSym& cov6x6) const;
-  virtual void setPosMomCov(MeasuredStateOnPlane& state, const TVectorD& state6, const TMatrixDSym& cov6x6) const;
+  virtual void setPosMom(StateOnPlane& state, const TVector3& pos, const TVector3& mom) const override;
+  virtual void setPosMom(StateOnPlane& state, const TVectorD& state6) const override;
+  virtual void setPosMomErr(MeasuredStateOnPlane& state, const TVector3& pos, const TVector3& mom, const TVector3& posErr, const TVector3& momErr) const override;
+  virtual void setPosMomCov(MeasuredStateOnPlane& state, const TVector3& pos, const TVector3& mom, const TMatrixDSym& cov6x6) const override;
+  virtual void setPosMomCov(MeasuredStateOnPlane& state, const TVectorD& state6, const TMatrixDSym& cov6x6) const override;
 
-  virtual void setChargeSign(StateOnPlane& state, double charge) const;
-  virtual void setQop(StateOnPlane& state, double qop) const {state.getState()(0) = qop;}
+  virtual void setChargeSign(StateOnPlane& state, double charge) const override;
+  virtual void setQop(StateOnPlane& state, double qop) const override {state.getState()(0) = qop;}
 
   void setSpu(StateOnPlane& state, double spu) const;
-  void setTime(StateOnPlane& state, double time) const;
+  void setTime(StateOnPlane& state, double time) const override;
 
   //! The actual Runge Kutta propagation
   /** propagate state7 with step S. Fills SA (Start directions derivatives dA/S).
@@ -191,8 +192,8 @@ class RKTrackRep : public AbsTrackRep {
                      bool varField = true,
                      bool calcOnlyLastRowOfJ = false) const;
 
-  virtual bool isSameType(const AbsTrackRep* other);
-  virtual bool isSame(const AbsTrackRep* other);
+  virtual bool isSameType(const AbsTrackRep* other) override;
+  virtual bool isSame(const AbsTrackRep* other) override;
 
  private:
 
@@ -207,19 +208,10 @@ class RKTrackRep : public AbsTrackRep {
   void getState7(const StateOnPlane& state, M1x7& state7) const;
   void getState5(StateOnPlane& state, const M1x7& state7) const; // state7 must already lie on plane of state!
 
-  /// TODO: Never used, can be deleted!
-  void transformPM7(const MeasuredStateOnPlane& state,
-                    M7x7& out7x7) const;
-
   void calcJ_pM_5x7(M5x7& J_pM, const TVector3& U, const TVector3& V, const M1x3& pTilde, double spu) const;
 
   void transformPM6(const MeasuredStateOnPlane& state,
                     M6x6& out6x6) const;
-
-  /// TODO: Never used, can be deleted!
-  void transformM7P(const M7x7& in7x7,
-                    const M1x7& state7,
-                    MeasuredStateOnPlane& state) const; // plane must already be set!
 
   void calcJ_Mp_7x5(M7x5& J_Mp, const TVector3& U, const TVector3& V, const TVector3& W, const M1x3& A) const;
 
@@ -315,7 +307,7 @@ class RKTrackRep : public AbsTrackRep {
 
  public:
 
-  ClassDef(RKTrackRep, 1)
+  ClassDefOverride(RKTrackRep, 1)
 
 };
 

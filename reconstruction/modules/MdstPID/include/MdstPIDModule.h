@@ -12,6 +12,18 @@
 #define MDSTPIDMODULE
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+
+#include <top/dataobjects/TOPLikelihood.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
+#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
+#include <ecl/dataobjects/ECLPidLikelihood.h>
+#include <tracking/dataobjects/Muid.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -46,30 +58,42 @@ namespace Belle2 {
      * Initialize the module.
      * data store registration of PIDLikelihoods and relations to Tracks
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when a new run is started.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Called for each event.
      * loop over Tracks, collect likelihoods and fill PIDLikelihoods
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Called when run ended.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Terminates the module.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
+
+    // required input
+    StoreArray<Track> m_tracks; /**< Required array for Tracks */
+    StoreArray<PIDLikelihood> m_pidLikelihoods; /**< Required array for PIDLikelihoods */
+
+    // optional input
+    StoreArray<TOPLikelihood> m_topLikelihoods; /**< Optional array for TOPLikelihoods */
+    StoreArray<ARICHLikelihood> m_arichLikelihoods; /**< Optional array for ARICHLikelihoods */
+    StoreArray<CDCDedxLikelihood> m_cdcDedxLikelihoods; /**< Optional array for CDCDedxLikelihoods */
+    StoreArray<VXDDedxLikelihood> m_vxdDedxLikelihoods; /**< Optional array for VXDDedxLikelihoods */
+    StoreArray<ECLPidLikelihood> m_eclLikelihoods; /**< Optional array for ECLPidLikelihoods */
+    StoreArray<Muid> m_muid; /**< Optional array for Muid */
 
     /**
      * Set TOP log likelihoods and corresponding reconstruction flag

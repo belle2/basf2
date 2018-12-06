@@ -46,15 +46,15 @@ namespace Belle2 {
     *
     * prepares all store- and relationArrays.
     */
-    virtual void initialize();
+    void initialize() override;
 
 
     /** eventWise jobs (e.g. storing spacepoints */
-    virtual void event();
+    void event() override;
 
 
     /** final output with mini-feedback */
-    virtual void terminate() {}
+    void terminate() override {}
 
 
     /** initialize variables in constructor to avoid nondeterministic behavior */

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -8,28 +8,70 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MATERIALSCANMODULE_H_
-#define MATERIALSCANMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
 
 #include <string>
 #include <vector>
+#include <set>
 
 #include <G4UserSteppingAction.hh>
 #include <G4ThreeVector.hh>
 
 #include <TFile.h>
+class TH1D;
 class TH2D;
 
 namespace Belle2 {
+
+  /** Base class for Material Scans */
+  class MaterialScanBase: public G4UserSteppingAction {
+  public:
+    /** This is indeed the constructor and it creates a TDirectory in the
+     * output root file and sets all variables */
+    MaterialScanBase(TFile* rootFile, const std::string& name, const std::string& axisLabel):
+      m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel)
+    {
+      m_rootFile->mkdir(name.c_str());
+    }
+    /** Return the name of the scan */
+    std::string getName() const { return m_name; }
+    /** Return the number of rays necessary to perform the scan */
+    virtual int getNRays() const = 0;
+    /** Get the origin and direction for the next scan particle.
+     * @param[out] origin Origin of the next scan particle
+     * @param[out[ direction Direction of the next scan particle
+     * @return false if the scan is finished
+     */
+    virtual bool createNext(G4ThreeVector& origin, G4ThreeVector& direction) = 0;
+
+  protected:
+    /** check for stuck tracks by looking at the step length */
+    bool checkStep(const G4Step* step);
+    /** Pointer to the root file for the histograms */
+    TFile* m_rootFile;
+    /** Name of the scan, will be prefixed to all histogram names */
+    std::string m_name;
+    /** Labels for the coordinate axes */
+    std::string m_axisLabel;
+  private:
+    /** maximum Step length to be considered zero */
+    static constexpr double c_zeroTolerance = 1e-6;
+    /** maximum number of consecutive zero steps before nudging the track along */
+    static constexpr int c_maxZeroStepsNudge = 10;
+    /** maximum number of consecutive zero steps before killing the track */
+    static constexpr int c_maxZeroStepsKill = 20;
+    /** Count the number of steps with (almost) zero length */
+    int m_zeroSteps {0};
+  };
 
   /** Base class to create a Material Scan of the detector geometry.
    * This class is used to record the Material budget encountered by a particle
    * and provide origin and directions of all particles used for the scan.
    */
-  class MaterialScan: public G4UserSteppingAction {
+  class MaterialScan2D: public MaterialScanBase {
   public:
     /**Helper struct to Store Parameters of a Scan. */
     struct ScanParams {
@@ -55,43 +97,31 @@ namespace Belle2 {
       bool splitByMaterials;
     };
 
-    /** maximum Step length to be considered zero */
-    static constexpr double c_zeroTolerance = 1e-6;
-    /** maximum number of consecutive zero steps before nudging the track along */
-    static constexpr int c_maxZeroStepsNudge = 10;
-    /** maximum number of consecutive zero steps before killing the track */
-    static constexpr int c_maxZeroStepsKill = 20;
-
     /** Constructor
      * @param rootFile Pointer to the ROOTFile where the histograms will be stored.
      * @param name Prefix to preprend to all Histograms
      * @param axisLabel Labels for the histogram axes, separated by semicolon
      * @param params Parameters for the scan
      */
-    MaterialScan(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params);
-
-    /** virtual destructor */
-    virtual ~MaterialScan() {};
+    MaterialScan2D(TFile* rootFile, const std::string& name, const std::string& axisLabel, const ScanParams& params);
 
     /** Get the origin and direction for the next scan particle.
      * @param[out] origin Origin of the next scan particle
-     * @param[out[ direction Direction of the next scan particle
+     * @param[out] direction Direction of the next scan particle
      * @return false if the scan is finished
      */
-    bool createNext(G4ThreeVector& origin, G4ThreeVector& direction);
+    bool createNext(G4ThreeVector& origin, G4ThreeVector& direction) override;
 
-    /** Return the name of the scan */
-    std::string getName() const { return m_name; }
-    /** Return the number of rays necessary to perform the scan */
-    int getNRays() const { return m_params.nU * m_params.nV; }
+    /** Return the number of rays in this scan */
+    int getNRays() const override { return m_params.nU * m_params.nV; }
 
     /** Record the material budget for each step of the particles */
-    void UserSteppingAction(const G4Step* step);
+    void UserSteppingAction(const G4Step* step) override;
   protected:
     /** Get the origin and direction for the next scan particle.
      * To be overridden by descendents
      * @param[out] origin Origin of the next scan particle
-     * @param[out[ direction Direction of the next scan particle
+     * @param[out] direction Direction of the next scan particle
      */
     virtual void getRay(G4ThreeVector& origin, G4ThreeVector& direction) = 0;
 
@@ -106,12 +136,6 @@ namespace Belle2 {
      */
     void fillValue(const std::string& name, double value);
 
-    /** Pointer to the root file for the histograms */
-    TFile* m_rootFile;
-    /** Name of the scan, will be prefixed to all histogram names */
-    std::string m_name;
-    /** Labels for the coordinate axes */
-    std::string m_axisLabel;
     /** Parameters for the scan */
     ScanParams m_params;
     /** Current value of the parametetr u */
@@ -124,24 +148,22 @@ namespace Belle2 {
     double m_stepV;
     /** Tracklength of the current Ray */
     double m_curDepth;
-    /** Count the number of steps with (almost) zero length */
-    int m_zeroSteps {0};
     /** Map holding pointers to all created histograms */
-    std::map<std::string, TH2D*> m_regions;
+    std::map<std::string, std::unique_ptr<TH2D>> m_regions;
   };
 
   /** Specific implementation of MaterialScan to do Spherical scanning.
    * That is shooting rays from the origin with varying aximuth and polar angle.
    */
-  class MaterialScanSpherical: public MaterialScan {
+  class MaterialScanSpherical: public MaterialScan2D {
   public:
     /** Create a Spherical Scan object with the given parameters
      * @param rootFile pointer to the ROOT File containing the histograms
      * @param origin Origin for the spherical scan
      * @param params Parameters of the scan
      */
-    MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, ScanParams params, bool doCosTheta):
-      MaterialScan(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin),
+    MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, const ScanParams& params, bool doCosTheta):
+      MaterialScan2D(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin),
       m_doCosTheta(doCosTheta)
     {
       if (doCosTheta) {
@@ -154,7 +176,7 @@ namespace Belle2 {
     }
   protected:
     /** Create a ray with the current parameter values according to a spherical distribution */
-    void getRay(G4ThreeVector& origin, G4ThreeVector& direction);
+    void getRay(G4ThreeVector& origin, G4ThreeVector& direction) override;
 
     /** Origin for the spherical scan */
     G4ThreeVector m_origin;
@@ -170,7 +192,7 @@ namespace Belle2 {
    * directions of the grid coordinates u and v. The flight direction is
    * determined by the cross product between the u and v axis.
    */
-  class MaterialScanPlanar: public MaterialScan {
+  class MaterialScanPlanar: public MaterialScan2D {
   public:
     /** Create a Planar Scan object with the given parameters
      * @param rootFile pointer to the ROOT File containing the histograms
@@ -180,14 +202,14 @@ namespace Belle2 {
      * @param params Parameters of the scan
      */
     MaterialScanPlanar(TFile* rootFile, const G4ThreeVector& origin, const G4ThreeVector& dirU, const G4ThreeVector& dirV,
-                       ScanParams params):
-      MaterialScan(rootFile, "Planar", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()),
+                       const ScanParams& params):
+      MaterialScan2D(rootFile, "Planar", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()),
       m_dirW(m_dirU.cross(m_dirV))
     {
     }
   protected:
     /** Create a ray with the current parameter values according to a planar distribution */
-    void getRay(G4ThreeVector& origin, G4ThreeVector& direction);
+    void getRay(G4ThreeVector& origin, G4ThreeVector& direction) override;
   protected:
     /** Origin of the scan plane */
     G4ThreeVector m_origin;
@@ -197,6 +219,76 @@ namespace Belle2 {
     G4ThreeVector m_dirV;
     /** direction perpendicluar to u and v */
     G4ThreeVector m_dirW;
+  };
+
+  /** MaterialScan implementation to shoot one ray along a defined direction
+   * and record the Material as a function of travel depth.
+   *
+   * In contrast to the other implementations this produces a 1D histogram per
+   * region (plus a cumulative one) which contains the X_0 per bin so that the
+   * integral of the histogram (\f$\sum_i binwidth_i * bincontent_i\f$) is equal to
+   * the total number of X_0 seen.
+   */
+  class MaterialScanRay: public MaterialScanBase {
+  public:
+    /** Construct a new instance and set all parameters */
+    MaterialScanRay(TFile* rootFile, const G4ThreeVector& origin, const G4ThreeVector& dir, double opening,
+                    int count, double sampleDepth, double maxDepth, bool splitByMaterials,
+                    const std::vector<std::string>& ignoredMaterials):
+      MaterialScanBase(rootFile, "Ray", "ray length [cm]; material budget [X_0/cm]"),
+      m_ignoredMaterials(ignoredMaterials.begin(), ignoredMaterials.end()),
+      m_origin(origin), m_dir(dir), m_opening(opening), m_sampleDepth(sampleDepth),
+      m_maxDepth(maxDepth), m_count(std::max(1, count)), m_splitByMaterials(splitByMaterials)
+    {
+      if (m_opening <= 0) m_count = 1;
+    }
+
+    /** Return the number of rays. We have one extra ray to scan the maximum depth */
+    int getNRays() const override { return m_count + 1; }
+    /** Record the material budget for each step of the particles */
+    void UserSteppingAction(const G4Step* step) override;
+    /** Implement shooting along the ray */
+    bool createNext(G4ThreeVector& origin, G4ThreeVector& direction) override;
+  private:
+    /** get histogram for a given name, create if needed.
+     * @param name Name of the histogram
+     */
+    TH1D* getHistogram(const std::string& name);
+    /** Fill the recorded material budget into the corresponding histogram
+     * @param name Name of the histogram
+     * @param value Value to store
+     * @param steplength The Steplength which produced the value (for correct subsampling)
+     */
+    void fillValue(const std::string& name, double value, double steplength);
+
+    /** Materials ignored when scanning */
+    std::set<std::string> m_ignoredMaterials;
+    /** Map holding pointers to all created histograms */
+    std::map<std::string, std::unique_ptr<TH1D>> m_regions;
+    /** Origin of the scan */
+    G4ThreeVector m_origin;
+    /** Direction of the ray */
+    G4ThreeVector m_dir;
+    /** Opening angle in radian */
+    double m_opening;
+    /** The ray length after which to sample. Basically the bin width of the histogram */
+    double m_sampleDepth;
+    /** Maximum depth for each ray after which it will be stopped. 0=no limit. */
+    double m_maxDepth{0};
+    /** Current depth of the current ray */
+    double m_curDepth{0};
+    /** The first ray does not record any material but just checks for the
+     * maximum useful depth to not get a plot which contains the PXD at the
+     * front and then continues for 500 more cm without any content. This
+     * variable stores the maximum depth seen by this ray in non-ignored
+     * matierals */
+    double m_scanDepth{0};
+    /** Amount of rays to shoot */
+    int m_count;
+    /** Current Ray number: 0 = scan for maximum depth, 1..N = record materials */
+    int m_curRay{ -1};
+    /** If true Split by materials instead of regions */
+    bool m_splitByMaterials;
   };
 
   /**
@@ -219,13 +311,10 @@ namespace Belle2 {
     MaterialScanModule();
 
     /** Initialize the output file and check the parameters. */
-    void initialize();
+    void initialize() override;
 
     /** Do the actual scanning */
-    void beginRun();
-
-    /** Save the output */
-    void terminate();
+    void beginRun() override;
   private:
     /** Return a vector along the axis with the given name
      * @param name Name of the axis */
@@ -235,22 +324,44 @@ namespace Belle2 {
     TFile* m_rootFile;
     /** Filename for the ROOT output */
     std::string m_filename;
+    /** Name of the plane to use for scanning */
+    std::string m_planeName;
+    /** Scan parameters for the spherical scan */
+    MaterialScan2D::ScanParams m_spherical;
+    /** Scan parameters for the planar scan */
+    MaterialScan2D::ScanParams m_planar;
+    /** Custom plane definition if m_planName is "custom" */
+    std::vector<double> m_customPlane;
+    /** Origin for spherical scan */
+    std::vector<double> m_sphericalOrigin;
+    /** Origin of the ray if a ray scan is performed  */
+    std::vector<double> m_rayOrigin{0, 0, 0};
+    /** Materials ignored when ray scanning */
+    std::vector<std::string> m_rayIgnoredMaterials;
+    /** Direction of the ray, cannot be set at the same time as Theta and Phi */
+    boost::optional<std::vector<double>> m_rayDirection;
+    /** Theta direction of the ray if custom direction is not set */
+    double m_rayTheta{0};
+    /** Phi direction of the ray if custom direction is not set */
+    double m_rayPhi{0};
+    /** Opening angle of the ray */
+    double m_rayOpening{0};
+    /** Sample depth of the ray: create one bin every x cm */
+    double m_raySampleDepth{0.1};
+    /** Max depth of the ray before stopping */
+    double m_rayMaxDepth{1000};
+    /** Number of rays to shoot (if opening angle is >0) */
+    unsigned int m_rayCount{0};
     /** Wether or not to do a spherical scan */
     bool m_doSpherical;
     /** Wether or not to do a planar scan */
     bool m_doPlanar;
-    /** Name of the plane to use for scanning */
-    std::string m_planeName;
-    /** Scan parameters for the spherical scan */
-    MaterialScan::ScanParams m_spherical;
-    /** Scan parameters for the planar scan */
-    MaterialScan::ScanParams m_planar;
-    /** Custom plane definition if m_planName is "custom" */
-    std::vector<double> m_customPlane;       /** Custom plane parameter  */
-    std::vector<double> m_sphericalOrigin;   /** original position in spherical coordinate  */
     /** Perform the spherical scan uniform in cos(theta) instead of theta */
     bool m_doCosTheta;
+    /** Perform a material ray scan: scan along a certain direction with a
+     * given opening angle and plot material vs ray depth */
+    bool m_doRay;
+    /** If true Split by materials instead of regions when doing ray scan */
+    bool m_raySplitByMaterials{false};
   };
 }
-
-#endif /* MATERIALSCANMODULE_H_ */

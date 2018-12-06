@@ -11,6 +11,10 @@
 #pragma once
 
 #include <top/reconstruction/TOPf77fun.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+#include <top/dbobjects/TOPCalModuleAlignment.h>
+#include <top/dbobjects/TOPPmtInstallation.h>
 
 extern "C" {void top_geo_dump_();}
 
@@ -42,6 +46,17 @@ namespace Belle2 {
        * Constructor (which does the stuff if reconstruction geometry not configured yet)
        */
       TOPconfigure();
+
+      /**
+       * Passes alignment constants to FORTRAN code
+       * function is used in call-back
+       */
+      static void setAlignmentConstants();
+
+      /**
+       * Sets PMT types pixel table
+       */
+      static void setPMTTypes();
 
       /**
        * Defines TOP counter volume (must be called first)
@@ -107,6 +122,11 @@ namespace Belle2 {
       {
         set_tts_(&ng, Frac, Mean, Sigma);
       }
+
+      /**
+       * Sets PMT dependent TTS-es
+       */
+      void setPMTDependentTTSes();
 
       /**
        * Sets quantum efficiency
@@ -386,6 +406,8 @@ namespace Belle2 {
 
     private:
       static bool m_configured; /**< set to true when done */
+      static DBObjPtr<TOPCalModuleAlignment> m_alignment; /**< alignment constants */
+      static DBArray<TOPPmtInstallation> m_pmtInstalled; /**< PMT installation data */
       double m_R1 = 0;   /**< inner radius */
       double m_R2 = 0;   /**< outer radius */
       double m_Z1 = 0;   /**< backward z */

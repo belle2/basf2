@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+  /*! Module to make a binary file from Raw*** events for input of wirte-dumhsbx */
   class MakeDumHSLBDataModule : public PrintDataTemplateModule {
     // Public functions
   public:
@@ -26,11 +26,11 @@ namespace Belle2 {
     MakeDumHSLBDataModule();
     virtual ~MakeDumHSLBDataModule();
 
-    //! Module functions to be called from main process
-    virtual void initialize();
+    //! initialization
+    virtual void initialize() override;
 
-    //! Module functions to be called from event process
-    virtual void event();
+    //! event module
+    virtual void event() override;
 
     //! write data
     virtual void writeData(RawCOPPER* raw_copper, int i);

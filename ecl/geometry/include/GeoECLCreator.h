@@ -22,10 +22,11 @@
 class G4LogicalVolume;
 
 namespace Belle2 {
-
-  struct shape_t;
   class ECLCrystalsShapeAndPosition;
   namespace ECL {
+
+    struct shape_t;
+
 
 
     //!  The GeoECLCreator class.
@@ -48,7 +49,7 @@ namespace Belle2 {
        * @param topVolume Top volume in which the geometry has to be placed
        * @param type Type of geometry to be build
        */
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
       /**
        * Function to create the geometry from the Database
@@ -56,14 +57,14 @@ namespace Belle2 {
        * @param topVolume Top volume in which the geometry has to be placed
        * @param type Type of geometry to be build
        */
-      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
       /** Function to create the geometry database.
        * This function should be implemented to convert Gearbox parameters to one ore more database payloads
        * @param content GearDir pointing to the parameters which should be used for construction
        * @param iov interval of validity to use when generating payloads
        */
-      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override;
 
     private:
 
@@ -87,7 +88,7 @@ namespace Belle2 {
       double get_pa_box_height() const {return 2;}
 
       /** pointer to a storage with crystal shapes and positions */
-      ECLCrystalsShapeAndPosition* m_sap;
+      const ECLCrystalsShapeAndPosition* m_sap;
 
       /** Sensitive detector */
       Simulation::SensitiveDetectorBase* m_sensitive;

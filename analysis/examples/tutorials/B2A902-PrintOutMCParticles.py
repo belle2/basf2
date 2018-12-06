@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to print out the
 # contents of the StoreArray<MCParticle>.
 #
@@ -9,29 +12,26 @@
 # the MC files contain the desired processes/decays.
 #
 # Contributors: A. Zupanc (June 2014)
+#               I. Komarov (September 2018)
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import printPrimaryMCParticles
-from modularAnalysis import analysis_main
+import basf2 as b2
+import modularAnalysis as ma
 
-# check if the required input file exists (from B2A101 example)
-import os.path
-import sys
-if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. '
-             'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
+# create path
+my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+             path=my_path)
 
 # print out the contents of the StoreArray<MCParticle>
-printPrimaryMCParticles()
+ma.printPrimaryMCParticles(path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

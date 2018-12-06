@@ -3,6 +3,8 @@
 
 ################################################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial runs over flat NTuples of reconstructed B->KsPi0 decays,
 # which were created running B2A701. The training and test datasets consist of
 # a mixture of reconstructed Bd->KsPi0 and qqbqr MC. The apply datasets are
@@ -12,20 +14,25 @@
 #   basf2 B2A702-ContinuumSuppression_MVATrain.py
 #
 # Contributors: P. Goldenzweig (October 2016)
+#               I. Komarov (September 2018)
 #
 ################################################################################
 
 import basf2_mva
 import subprocess
+import sys
 
 if __name__ == "__main__":
 
     # Note that the target variable 'isNotContinuum' needs to be
     # saved in your train.root and test.root files, along with the
     # trainingVars, listed again here (see B2A701).
+    import os
+    if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
+        b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
     # Use this path to run over Bd_KsPi0 reconstructed signal and qqbar skims.
-    path = '/gpfs/fs02/belle2/users/pablog/inputForTutorials/'
+    path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/'
 
     train_data = path + 'train.root'
     test_data = path + 'test.root'
@@ -94,5 +101,5 @@ if __name__ == "__main__":
     # comment these in to apply the trained methods on an independent sample
     # (produced in B2A701 if you ran with the `apply_signal` and `apply_qqbar` options).
     #
-    # basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_signal_data), 'tree', 'MVAExpert_signal.root')
-    # basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')
+    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_signal_data), 'tree', 'MVAExpert_signal.root')
+    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')

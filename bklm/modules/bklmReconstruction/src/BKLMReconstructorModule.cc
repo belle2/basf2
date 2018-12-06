@@ -36,7 +36,7 @@ REG_MODULE(BKLMReconstructor)
 //                 Implementation
 //-----------------------------------------------------------------
 
-BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
+BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(nullptr)
 {
   setDescription("BKLM reconstruction module of 1D and 2D hits");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -82,7 +82,7 @@ void BKLMReconstructorModule::initialize()
 void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+  B2DEBUG(1, "BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
 
   if (m_loadTimingFromDB) {
     m_DtMax = m_timing->getCoincidenceWindow();

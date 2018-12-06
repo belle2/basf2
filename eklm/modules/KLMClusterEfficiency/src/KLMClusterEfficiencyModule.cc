@@ -27,9 +27,16 @@ using namespace Belle2;
 
 REG_MODULE(KLMClusterEfficiency)
 
-KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
+KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module(),
+  m_OutputFile(nullptr), m_ClusterTree(nullptr), m_ReconstructionTree(nullptr),
+  m_DecayVertexX(0), m_DecayVertexY(0), m_DecayVertexZ(0),
+  m_MaxDecayVertexHitAngle(0), m_ClusterX(0), m_ClusterY(0), m_ClusterZ(0),
+  m_MaxClusterHitAngle(0), m_KL0Clusters(0), m_PartlyKL0Clusters(0),
+  m_OtherClusters(0), m_NonreconstructedKL0(0),
+  m_ReconstructedKL01Cluster{0, 0, 0}, m_ExactlyReconstructedKL0(0),
+  m_ReconstructedKL02Clusters{0, 0, 0, 0, 0, 0},
+  m_ReconstructedKL03Clusters(0)
 {
-  int i;
   setDescription("Module for KLM cluster reconstruction efficiency studies.");
   addParam("SaveClusterData", m_SaveClusterData,
            "Whether to save cluster data or not.", false);
@@ -39,18 +46,6 @@ KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
            std::string("KLMClusterEfficiency.root"));
   addParam("EventsClusterHistograms", m_EventsClusterHistograms,
            "Draw cluster histograms for this number of events.", 0);
-  m_OutputFile = NULL;
-  m_ClusterTree = NULL;
-  m_KL0Clusters = 0;
-  m_PartlyKL0Clusters = 0;
-  m_OtherClusters = 0;
-  m_NonreconstructedKL0 = 0;
-  for (i = 0; i < 3; i++)
-    m_ReconstructedKL01Cluster[i] = 0;
-  m_ExactlyReconstructedKL0 = 0;
-  for (i = 0; i < 6; i++)
-    m_ReconstructedKL02Clusters[i] = 0;
-  m_ReconstructedKL03Clusters = 0;
 }
 
 KLMClusterEfficiencyModule::~KLMClusterEfficiencyModule()
@@ -104,11 +99,13 @@ void KLMClusterEfficiencyModule::beginRun()
 void KLMClusterEfficiencyModule::event()
 {
   static int nevent = 0;
+  /* cppcheck-suppress variableScope */
   char str[128];
   int i1, i2, i3, n1, n2, n3;
   int bs1, bs2, es1, es2;
   TVector3 decayVertex, clusterPosition, hitPosition;
   float angle;
+  /* cppcheck-suppress variableScope */
   bool haveKL0;
   n1 = m_KLMClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
@@ -350,6 +347,7 @@ void KLMClusterEfficiencyModule::terminate()
     rec1Cluster = rec1Cluster + m_ReconstructedKL01Cluster[i];
   for (i = 0; i < 6; i++)
     rec2Clusters = rec2Clusters + m_ReconstructedKL02Clusters[i];
+  /* Always printed once, not necessary to use LogVar. */
   B2INFO("Total number of KLM clusters: " << m_KL0Clusters +
          m_PartlyKL0Clusters + m_OtherClusters);
   B2INFO("K_L0 clusters: " << m_KL0Clusters);

@@ -4,7 +4,11 @@
   <Content>
     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
     <xi:include href="ARICH-Aerogel.xml"/>
+    <xi:include href="ARICH-Aerogel-tiles.xml"/>
     <xi:include href="ARICH-Detectors.xml"/>
+    <xi:include href="ARICH-Merger.xml"/>
+    <xi:include href="ARICH-Cables.xml"/>
+    <xi:include href="ARICH-Cooling.xml"/>
     <xi:include href="ARICH-Mirrors.xml"/>
     <xi:include href="ARICH-FrontEndMapping.xml"/>
     <xi:include href="ARICH-SupportStructure.xml"/>
@@ -12,7 +16,11 @@
     <xi:include href="ARICH-ChannelMapping.xml"/>
     <xi:include href="ARICH-InstalledModules.xml"/>
     <xi:include href="ARICH-CosmicTest.xml"/>
-	
+    <xi:include href="ARICH-Displacement.xml"/>
+    <xi:include href="ARICH-MirrorDisplacement.xml"/>
+    <xi:include href="ARICH-GlobalAlignment.xml"/>
+    <xi:include href="ARICH-MirrorAlignment.xml"/>
+    
     <Envelope>
       <length desc="z length of ARICH envelope" unit="mm">280</length>
       <xPosition desc="center x position of ARICH envelope" unit="mm">0.0</xPosition>

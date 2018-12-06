@@ -21,6 +21,7 @@
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDCoGTimeCalibrations.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -89,6 +90,9 @@ namespace Belle2 {
     /** Time width of a sampling */
     float DeltaT = 31.44; //ns
 
+    /** To stop creation of the SVDShaperDigit if something is wrong */
+    bool m_StopCreationReco = false;
+
   protected:
 
     /** Create lookup maps for relations
@@ -133,6 +137,13 @@ namespace Belle2 {
     /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
     std::string m_relRecoDigitShaperDigitName;
 
+    /** Parameters for the corrections */
+    bool Correction_1;
+    bool Correction_2;
+    bool Correction_3;
+    bool Correction_4;
+    bool Correction_Using_CDC;
+
     /** Name of the relation between SVDShaperDigits and MCParticles */
     std::string m_relShaperDigitMCParticleName;
     /** Name of the relation between SVDShaperDigits and SVDTrueHits */
@@ -157,10 +168,16 @@ namespace Belle2 {
     float CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID);
     /** Function to calculate chi2, that is not used here, so just set at 0.01 */
     float CalculateChi2();
+    /** Function to convert SVDModeByte into the number of samples used */
+    int fromModeToNumberOfSample(int modality);
 
     //calibration objects
     SVDPulseShapeCalibrations m_PulseShapeCal;
     SVDNoiseCalibrations m_NoiseCal;
+    SVDCoGTimeCalibrations m_TimeCal;
+
+    //number of samples
+    int m_NumberOfAPVSamples = 6;
 
   };
 }

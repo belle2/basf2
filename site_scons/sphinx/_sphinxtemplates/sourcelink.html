@@ -1,0 +1,9 @@
+{%- if show_source and has_source and sourcename %}
+  <div role="note" aria-label="source link">
+    <h3>{{ _('This Page') }}</h3>
+    <ul class="this-page-menu">
+      <li><a href="{{ source_url }}"
+            rel="nofollow">{{ 'Show in Stash' }}</a></li>
+    </ul>
+   </div>
+{%- endif %}

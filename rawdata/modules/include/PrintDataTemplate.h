@@ -1,8 +1,8 @@
 //+
 // File : PrintData.h
-// Description : Module to get data from DataStore and send it to another network node
+// Description : Read RawCOPPER objects and shows their hex dump
 //
-// Author : Satoru Yamada Itoh, IPNS, KEK
+// Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
@@ -58,7 +58,7 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+  /*! Module to get data from DataStore and send it to another network node */
 
   class PrintDataTemplateModule : public Module {
 
@@ -70,10 +70,10 @@ namespace Belle2 {
     virtual ~PrintDataTemplateModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    virtual void event() override;
 
     //! print the contents of a RawCOPPER event
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);

@@ -25,7 +25,7 @@ ARICHHvChannelsMapping::ARICHHvChannelsMapping()
 std::vector<int> ARICHHvChannelsMapping::getChannelValues(int connectionID, int pinID) const
 {
 
-  vector<int> channel{99, 99, 99};
+  vector<int> channel{ -2, -2, -2};
   for (auto& i : m_channel2type) {
     if (((i.second)[0] == connectionID) && ((i.second)[1] == pinID)) channel = i.first;
   }

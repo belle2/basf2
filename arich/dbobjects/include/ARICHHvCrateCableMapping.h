@@ -46,7 +46,7 @@ namespace Belle2 {
     * @param sectorCable vector of sector and cable numbers
     * @return connectionID connection ID
     */
-    int getConnectionID(std::vector<int> sectorCable) const;
+    int getConnectionID(const std::vector<int>& sectorCable) const;
 
     /**
      * Add new entry to the mapping table
@@ -55,7 +55,10 @@ namespace Belle2 {
      */
     void addMapping(int connectionID, std::vector<int> sectorCable);
 
-    void print();
+    /**
+    * Print mapping parameters
+    */
+    void print() const;
 
   private:
 

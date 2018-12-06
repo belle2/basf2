@@ -3,33 +3,38 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Kindo Haruki                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef ARICHDQMMODULE_H
+#define ARICHDQMMODULE_H
 
-// I copied 6 lines below from PXDDQMModule.h - is it realy needed?
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
 
-#include <framework/core/Module.h>
-#include <string>
+//ARICH dataobjects
+#include <arich/dataobjects/ARICHHit.h>
+#include <arich/dataobjects/ARICHTrack.h>
+#include <arich/dataobjects/ARICHPhoton.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
+
+#include <TCanvas.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TH2Poly.h>
-#include <TCanvas.h>
-#include <arich/utility/ARICHChannelHist.h>
+#include <TH3F.h>
+#include <TVector2.h>
+#include <TText.h>
+#include <TFile.h>
+
+#include <vector>
+#include <string>
+#include <map>
 
 namespace Belle2 {
 
   /**
-   * Simple DQM module for occuppancy plots etc.
+   * Make summary of data quality from reconstruction
    */
   class ARICHDQMModule : public HistoModule {
 
@@ -46,49 +51,80 @@ namespace Belle2 {
     virtual ~ARICHDQMModule();
 
     /**
-     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
-     * to be placed in this function.
-     */
-    virtual void defineHisto();
-
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
+
+    virtual void defineHisto() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
-  private:
-    std::string m_histogramDirectoryName; /**< histogram directory in ROOT file */
-    TH1F* m_hHits = 0; /**< histogram for number of hits / event  */
-    TH1F* m_hBits = 0; /**< histogram for acumulative hit bitmap distribution (4-bits / hit) */
-    TH2F* m_hHitsHapd = 0; /**< accumulated hits per channel */
-    TH1F* m_hHitsMerger = 0; /**< accumulated hits per merger board */
-    TH1F* m_hHitsCopper = 0; /**< accumulated hits per copper board */
+
+  protected:
+    bool m_debug;/**<debug*/
+
+    bool m_arichEvents; /**< process only events that have extrapolated hit in arich */
+    int m_maxHits; /**< exclude events with very large number of hits in arich */
+    int m_minHits; /**< exclude events with number of hits lower than this */
+    int m_hotThr; /**< Threshold scale of hits/channel to dicide hot channels */
+
+    //Histograms to show status by 1/0
+    TH1* h_chStat = NULL;/**<Status of each channels*/
+    TH1* h_aeroStat = NULL;/**<Status of each aerogel tiles*/
+
+    //Hitograms to show the data quality
+    TH1* h_chDigit   = NULL;/**<The number of raw digits in each channel*/
+    TH1* h_chipDigit = NULL;/**<The number of raw digits in each ASIC chip*/
+    TH1* h_hapdDigit = NULL;/**<The number of raw digits in each HAPD*/
+    TH1* h_chHit = NULL;/**<The number of hits in each channel*/
+    TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chip*/
+    TH1* h_hapdHit = NULL;/**<The number of hits in each HAPD*/
+    TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
+    TH1* h_secHapdHit[6] = {};/**<The number of hits in each HAPDs of each sector*/
+    TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
+    TH1* h_aerogelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
+    TH1* h_bits = NULL;/**<Timing bits*/
+    TH2* h_hitsPerTrack2D = NULL;/**<Sum of 2D hit/track map on each position of track*/
+    TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
+    TH3* h_aerogelHits3D = NULL; /**< 3D histogram of */
+    TH3* h_mirrorThetaPhi = NULL; /**< cherenkov theta vs phi for mirror reflected photons (for each mirror plate)*/
+    TH2* h_thetaPhi = NULL;  /**< cherenkov theta vs phi for non-mirror-reflected photons*/
+    TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
+    TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/
+    TH1* h_hitsPerTrack = NULL;/**<Average hits/track calculated from h_hits2D and h_track2D*/
+
+    TH1* h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
+    TH1* h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/
+
+    //Monitoring parameters
+
+    double m_momUpLim = 0;/**<Upper momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
+    double m_momDnLim = 0;/**<Lower momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
+
   };
 
 } // Belle2 namespace
 
+#endif

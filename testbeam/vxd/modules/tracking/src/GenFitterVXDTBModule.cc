@@ -183,10 +183,10 @@ void GenFitterVXDTBModule::initialize()
 
   trackcands.isRequired();
 
-  tracks.registerPersistent();
-  trackfitresults.registerPersistent();
-  gf2tracks.registerPersistent();
-  trackcands.registerPersistent();
+  tracks.registerInDataStore();
+  trackfitresults.registerInDataStore();
+  gf2tracks.registerInDataStore();
+  trackcands.registerInDataStore();
 
   gf2tracks.registerRelationTo(mcparticles);
   mcparticles.registerRelationTo(tracks);
@@ -621,9 +621,9 @@ void GenFitterVXDTBModule::event()
               mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
             }
 
-            genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
-            int charge = fs->getCharge();
-            double pVal = fs->getBackwardPVal();
+            genfit::KalmanFitStatus* Kfs = gfTrack.getKalmanFitStatus();
+            int charge = Kfs->getCharge();
+            double pVal = Kfs->getBackwardPVal();
             float bField = 1.5; //TODO: get magnetic field from genfit
 
             trackFitResults.appendNew(TrackFitResult(poca, dirInPoca, cov, charge, chargedStable, pVal, bField, 0, 0));

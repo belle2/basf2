@@ -40,14 +40,13 @@ namespace Belle2 {
        * @param step the G4Step with the current step information
        * @return true if a Hit has been created, false if the hit was ignored
        */
-      bool step(G4Step* step, G4TouchableHistory*);
+      bool step(G4Step* step, G4TouchableHistory*) override;
 
     private:
 
       /** members of  SensitiveDetector  */
       //G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
       //G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
-      int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
       int m_hitNum;                     /** The current number of created hits in an event. Used to fill the DataStore ECLHit.*/
       int m_EvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array. */
       int m_oldEvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore  */

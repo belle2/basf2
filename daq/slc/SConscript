@@ -1,9 +1,3 @@
 Import('env')
 
-import os
-
-#env['CONTINUE'] = True
-#if not env.has_key('CONTINUE') or env['CONTINUE'] == False:
-#   os.system("make -C ${BELLE2_LOCAL_DIR}/daq/slc/extra/nsm2/ install")
-
 Return('env')

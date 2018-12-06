@@ -59,21 +59,21 @@ void plotTrack(TFile* pfile, TTree* ptree, TFile *outputFile){
   TString nHits("D_pi_nPXDHits > 0");
   TString cuts(nHits+"&&"+tmCuts);
 
-  h_pi_d0 = new TH2F("h_pi_d0VSpt","d0 error vs transverse momentum", 6,0,4, 6,0,0.1);
+  TH2F* h_pi_d0 = new TH2F("h_pi_d0VSpt","d0 error vs transverse momentum", 10,0,4, 10,0,0.02);
   ptree->Project("h_pi_d0VSpt","D_pi_d0err:sqrt(D_pi_P4[0]*D_pi_P4[0] + D_pi_P4[1]*D_pi_P4[1])",cuts);
   TProfile * pfx_pi_d0 = h_pi_d0->ProfileX("hprof_pi_d0");
   pfx_pi_d0->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, hist->GetTitle()"));
   pfx_pi_d0->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   pfx_pi_d0->GetListOfFunctions()->Add(new TNamed("Check", "ProjectionX of d0 error vs transverse momentum for pion"));
 
-  h_pi_z0 = new TH2F("h_pi_z0VSpt","z0 error vs transverse momentum", 6,0,4, 6,0,0.1);
+  TH2F* h_pi_z0 = new TH2F("h_pi_z0VSpt","z0 error vs transverse momentum", 10,0,4, 10,0,0.05);
   ptree->Project("h_pi_z0VSpt","D_pi_z0err:sqrt(D_pi_P4[0]*D_pi_P4[0] + D_pi_P4[1]*D_pi_P4[1])",cuts);
   TProfile * pfx_pi_z0 = h_pi_z0->ProfileX("hprof_pi_z0");
   pfx_pi_z0->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, hist->GetTitle()"));
   pfx_pi_z0->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   pfx_pi_z0->GetListOfFunctions()->Add(new TNamed("Check", "ProjectionX of z0 error vs transverse momentum for pion"));
 
-  h_pi_pVal = new TH1F("h_pi_pVal", "pVal pion", 20, 0 , 1 );
+  TH1F* h_pi_pVal = new TH1F("h_pi_pVal", "pVal pion", 20, 0 , 1 );
   ptree->Project("h_pi_pVal", "D_pi_TrPval",cuts);
   h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, hist->GetTitle()"));
   h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));

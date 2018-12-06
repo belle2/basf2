@@ -4,9 +4,13 @@
   Run it as: root -l 'BeamBack_arich.cc(simulated time in us,"path to files")'
 
   Path to files should be directory containing files produced by "ARICHBkg.py".
-  It is assumed file names contain source of background ...RBB_HER...,...
+  It is assumed file names contain source of background ...RBB,BHWide...,...
+
+  !! IMPORTANT
+  set the correct scalings in case of using samples of different time lenghts (in line 36)
 
   Author: Luka Santelj
+  Contributor: Manca Mrvar, Leonid Burmistrov
 */
 
 #include <iostream>
@@ -29,24 +33,9 @@
 
 using namespace std;
 
-/*
-map<float,float> createMap(){
-
-  map<float,float> dfact;
-  FILE* file=fopen("d_fact.dat","r");
-  if (file==NULL)
-    std::cout << "Error opening file" << std::endl;
-  else{
-    while(feof(file) == 0){
-      float energy, d;
-      fscanf(file, "%e %e", &energy, &d);
-      dfact.insert(pair<float,float>(energy,d));
-    }
-    fclose(file);
-  }
-  return dfact;
-}
-*/
+// scalings for "RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER","2-photon", "BHWideLargeAngle"
+double scaling[8] = {100., 1, 10., 10., 10., 10., 10., 0.001};
+int sourceType[8] = {0, 1, 2, 3, 4, 5, 6, 1};
 
 // returns "ring number" of HAPD module with id modID
 int mod2row(int modID)
@@ -58,21 +47,23 @@ int mod2row(int modID)
   if (modID <= 270) return 4;
   if (modID <= 342) return 5;
   if (modID <= 420) return 6;
+  return -1; // -1 if invalid input
 }
 
-TCanvas* make_plot(double data[][6], TString title, int type)
+TCanvas* make_plot(double data[][7], TString title, int type)
 {
 
-  TH1F* h1 = new TH1F(title + "h1", "Bhabha HER", 7, 0.5, 7.5);
-  TH1F* h2 = new TH1F(title + "h2", "Bhabha LER", 7, 0.5, 7.5);
+  TH1F* h1 = new TH1F(title + "h1", "RBB", 7, 0.5, 7.5);
+  TH1F* h2 = new TH1F(title + "h2", "BHWide", 7, 0.5, 7.5);
   TH1F* h3 = new TH1F(title + "h3", "Touschek HER", 7, 0.5, 7.5);
   TH1F* h4 = new TH1F(title + "h4", "Touschek LER", 7, 0.5, 7.5);
   TH1F* h5 = new TH1F(title + "h5", "Coulomb HER", 7, 0.5, 7.5);
   TH1F* h6 = new TH1F(title + "h6", "Coulomb LER", 7, 0.5, 7.5);
+  TH1F* h7 = new TH1F(title + "h7", "2-photon", 7, 0.5, 7.5);
   h1->SetStats(0); h2->SetStats(0); h3->SetStats(0);
-  h4->SetStats(0); h5->SetStats(0); h6->SetStats(0);
+  h4->SetStats(0); h5->SetStats(0); h6->SetStats(0); h7->SetStats(0);
   h1->SetBit(TH1::kNoTitle); h2->SetBit(TH1::kNoTitle); h3->SetBit(TH1::kNoTitle);
-  h4->SetBit(TH1::kNoTitle); h5->SetBit(TH1::kNoTitle); h6->SetBit(TH1::kNoTitle);
+  h4->SetBit(TH1::kNoTitle); h5->SetBit(TH1::kNoTitle); h6->SetBit(TH1::kNoTitle); h7->SetBit(TH1::kNoTitle);
 
   for (int i = 0; i < 7; i++) {
     h1->SetBinContent(i + 1, data[i][0]);
@@ -81,18 +72,24 @@ TCanvas* make_plot(double data[][6], TString title, int type)
     h4->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3]);
     h5->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3] + data[i][4]);
     h6->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3] + data[i][4] + data[i][5]);
+    h7->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3] + data[i][4] + data[i][5] + data[i][6]);
   }
   TCanvas* c1 = new TCanvas(title);
-  h6->SetLineColor(7);
-  h6->GetXaxis()->SetTitle("HAPD ring #");
+  h7->SetLineColor(7);
+  h7->GetXaxis()->SetTitle("HAPD ring #");
   TPaveText* pt1 = new TPaveText(0.20, 0.92, 0.8, 0.99, "NDC");
-  if (type == 1) { h6->GetYaxis()->SetTitle("radiation dose [gray/year]"); pt1->AddText("Radiation dose");}
-  if (type == 2) { h6->GetYaxis()->SetTitle("1MeV equiv. neutrons / cm^2 / year"); pt1->AddText("1Mev equiv. neutron flux");}
-  if (type == 3) { h6->GetYaxis()->SetTitle("photons / cm^2 / s"); pt1->AddText("photon flux on HAPDs");}
+  if (type == 1) { h7->GetYaxis()->SetTitle("radiation dose [gray/year]"); pt1->AddText("Radiation dose");}
+  if (type == 2) { h7->GetYaxis()->SetTitle("1MeV equiv. neutrons / cm^2 / year"); pt1->AddText("1Mev equiv. neutron flux");}
+  if (type == 3) { h7->GetYaxis()->SetTitle("photons / cm^2 / s"); pt1->AddText("photon flux on HAPDs");}
 
-  h6->SetFillColor(7);
-  h6->Draw();
+  h7->SetFillColor(7);
+  h7->Draw();
   pt1->Draw();
+
+  h6->SetFillColor(1);
+  h6->SetLineColor(1);
+  h6->Draw("same");
+
   h5->SetFillColor(6);
   h5->SetLineColor(6);
   h5->Draw("same");
@@ -114,12 +111,16 @@ TCanvas* make_plot(double data[][6], TString title, int type)
 }
 
 
-int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2/background_files/feb2015/arich_")
+//int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
+void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
 {
 
   gROOT->SetBatch(kTRUE);
   TGraph2D* dteb = new TGraph2D(420);
   TGraph2D* dtnb = new TGraph2D(420);
+  Belle2::ARICHChannelHist* chHits = new Belle2::ARICHChannelHist("neutronFlux", "1MeV eq. neutron flux /cm2 / year on HAPD board",
+      1);
+
   TGraph2D* dteh = new TGraph2D(420);
   TGraph2D* dtnh = new TGraph2D(420);
   TGraph2D* dtp = new TGraph2D(420);
@@ -129,11 +130,11 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   dtnh->SetName("dtnh"); dtnh->SetTitle("1MeV equiv. neutron flux / cm2 / year on HAPD bottom [x10^{11}]");
   dtp->SetName("dtp");   dtp->SetTitle("Optical photon flux on hapd [photons / s]");
 
-  double edep_board[420][6]; // background contribution from each source
-  double edep_hapd[420][6];
-  double nflux_board[420][6]; // This holds neutron flux on each HAPD module
-  double nflux_hapd[420][6];
-  double flux_phot[420][6];
+  double edep_board[420][7]; // background contribution from each source
+  double edep_hapd[420][7];
+  double nflux_board[420][7]; // This holds neutron flux on each HAPD module
+  double nflux_hapd[420][7];
+  double flux_phot[420][7];
   double edep_board_all[420]; // sum of background from all sources
   double nflux_board_all[420];
   double edep_hapd_all[420];
@@ -144,7 +145,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   double origins[420][2];
 
   // intialize
-  for (int j = 0; j < 6; j++) {
+  for (int j = 0; j < 7; j++) {
     for (int i = 0; i < 420; i++) {
       edep_board[i][j] = 0;
       edep_hapd[i][j] = 0;
@@ -161,17 +162,22 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   TChain* tree = new TChain("TrHits");
 
   // sources
-  TString tip[6] = {"RBB_HER", "RBB_LER", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER"};
+  //TString tip[7] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "2-photon"};
+
 
   // input file names
-  for (int j = 0; j < 6; j++) {
-    for (int i = 0; i < 1; i++) {
+  /*  for (int j = 0; j < 7; j++) {
+      for (int i = 0; i < 1; i++) {
       stringstream filename;
-      filename << path << "*" << tip[j] << "*" << ".root";
+      filename << path.c_str() << "*" << tip[j] << "*" << ".root";
       printf("%s\n", filename.str().c_str());
       tree->Add(filename.str().c_str());
-    }
-  }
+      }
+      }*/
+
+  stringstream filename;
+  filename << path.c_str() << "*.root";
+  tree->Add(filename.str().c_str());
 
   // this is neutron energy spectrum
   TH1D* nenergy = new TH1D("nenergy", "neutron spectrum; log10(k.e./MeV)", 2000, -10., 2.);
@@ -197,7 +203,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   tree->SetBranchAddress("source", &source);
 
   int nevents = tree->GetEntries();
-
+  //double nmax = 0;
   // loop over all hits
   for (int e = 0; e < nevents; e++) {
 
@@ -206,11 +212,9 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
     pdg = -1;
     //modID = 1;
     mom->SetXYZ(0., 0., 0.);
-    //source = 1;
 
     tree->GetEvent(e);
 
-    source--;
     if (source < 0) continue;
     if (modID < 1) continue;
 
@@ -222,7 +226,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
 
     // this is for photon flux
     if (type == 2) {
-      flux_phot[modID - 1][source] += 1.;
+      flux_phot[modID - 1][sourceType[source]] += scaling[source];
     }
 
     if (type != 2) {
@@ -230,9 +234,9 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
       //  energy deposit from a hit (two volumes are sensitive el. board and hapd bottom, commonly I show results for board.
       //  Anyhow the rates are approximately equal.)
       if (pdg != 2112) {
-        if (source == 5) edep *= 1.0; // ?? this is scaling of Coulomb LER ?? check this
-        if (type == 0) edep_board[modID - 1][source] += edep;
-        if (type == 1) edep_hapd[modID - 1][source]  += edep;
+        edep *= scaling[source];
+        if (type == 0) edep_board[modID - 1][sourceType[source]] += edep;
+        if (type == 1) edep_hapd[modID - 1][sourceType[source]]  += edep;
       }
 
       else { // if neutron
@@ -245,13 +249,15 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
 
         // contibution to neutron flux
         if (type == 0) {
-          if (source == 5) phnw *= 1.0; // ?? this is scaling of Coulomb LER ?? check this
-          nflux_board[modID - 1][source] += phnw * trlen / 0.2; // trlen/0.2, this is kind of cos(theta) correction to the flux.
+          if (modID == 10) continue;
+          phnw *= scaling[source];
+          nflux_board[modID - 1][sourceType[source]] += phnw * trlen / 0.2; // trlen/0.2, this is kind of cos(theta) correction to the flux.
           // trlen = track length in volume, and 0.2cm is thickness of board.
           nenergy->Fill(lee);
         }
         if (type == 1) {
-          nflux_hapd[modID - 1][source] += phnw * trlen / 0.05;
+          phnw *= scaling[source];
+          nflux_hapd[modID - 1][sourceType[source]] += phnw * trlen / 0.05;
         }
       }
     }
@@ -260,14 +266,14 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
 
 
   // values averaged over HAPD rings;
-  double avgeb[7][6];
-  double avgeh[7][6];
-  double avgnb[7][6];
-  double avgnh[7][6];
-  double avgf[7][6];
+  double avgeb[7][7];
+  double avgeh[7][7];
+  double avgnb[7][7];
+  double avgnh[7][7];
+  double avgf[7][7];
 
   for (int i = 0; i < 7; i++) {
-    for (int j = 0; j < 6; j++) {
+    for (int j = 0; j < 7; j++) {
       avgeb[i][j] = 0;  avgeh[i][j] = 0;
       avgnb[i][j] = 0;  avgnh[i][j] = 0;
       avgf[i][j] = 0;
@@ -284,15 +290,15 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
 
   for (int i = 0; i < 420; i++) {
     int nrow = mod2row(i + 1);
-    for (int j = 0; j < 6; j++) {
+    for (int j = 0; j < 7; j++) {
 
-      edep_board[i][j] = edep_board[i][j] * 1.6E+6 / 47.25 / time;
-      edep_hapd[i][j] = edep_hapd[i][j] * 1.6E+6 / 5.7 / time;
+      edep_board[i][j] = edep_board[i][j] * 1.6E+6 / 47.25 / time; // 47.25 mass of FEB in grams
+      edep_hapd[i][j] = edep_hapd[i][j] * 1.6E+6 / 5.49 / time; // 5.49 mass of APD chip (volume 62.7x62.7x0.06)
 
       nflux_board[i][j] = nflux_board[i][j] * 1.E+13 / 56.25 / time; // board surface is 56.25 cm^2
-      nflux_hapd[i][j] = nflux_hapd[i][j] * 1.E+13 / 47.6 / time;
+      nflux_hapd[i][j] = nflux_hapd[i][j] * 1.E+13 / 39.3 / time; // apd surface
 
-      flux_phot[i][j] = flux_phot[i][j] * 1.E+6 / 40.0 / time;
+      flux_phot[i][j] = flux_phot[i][j] * 1.E+6 / 53.29 / time;  // photocathode size = 7.3x7.3cm
 
       edep_board_all[i] += edep_board[i][j];
       edep_hapd_all[i] += edep_hapd[i][j];
@@ -316,6 +322,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
     dteh->SetPoint(i, origins[i][0], origins[i][1], edep_hapd_all[i]);
     dtnh->SetPoint(i, origins[i][0], origins[i][1], nflux_hapd_all[i]);
     dtp->SetPoint(i, origins[i][0], origins[i][1], phot_all[i]);
+    chHits->setBinContent(i + 1, nn);
 
   } // end of HAPD loop
 
@@ -324,7 +331,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   dtnb->SetMarkerStyle(21);
   dteh->SetMarkerStyle(21);
   dtp->SetMarkerStyle(21);
-
+  //chHits->SetMarkerStyle(21);
 
 
   TGaxis::SetMaxDigits(1);
@@ -339,12 +346,13 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   TCanvas* c5 = make_plot(avgf, "photons", 3);
 
   // write output file
-  TFile* f = new TFile("arich_background.root", "RECREATE");
+  TFile* f = new TFile("arich_background_phase3.root", "RECREATE");
 
   c1->Write(); c2->Write(); c3->Write(); c4->Write(); c5->Write();
   dteb->Write(); dteh->Write();
   dtnb->Write(); dtnh->Write();
   dtp->Write();
+  chHits->Write();
   ndist->Write();
   edist->Write();
   nenergy->Write();
@@ -356,7 +364,5 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   delete c4;
   delete c5;
 
-  return 0;
+  //return 0;
 }
-
-

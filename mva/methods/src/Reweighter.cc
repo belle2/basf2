@@ -10,9 +10,6 @@
 
 #include <mva/methods/Reweighter.h>
 #include <mva/interface/Interface.h>
-
-#include <algorithm>
-
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -157,7 +154,7 @@ namespace Belle2 {
 
       weightfile.getOptions(m_specific_options);
 
-      std::string sub_weightfile_name = weightfile.getFileName(".xml");
+      std::string sub_weightfile_name = weightfile.generateFileName(".xml");
       weightfile.getFile("Reweighter_Weightfile", sub_weightfile_name);
       auto sub_weightfile = Weightfile::load(sub_weightfile_name);
       sub_weightfile.getOptions(m_expert_options);

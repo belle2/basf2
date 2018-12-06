@@ -15,25 +15,18 @@
 #include <ecl/modules/eclFinalize/ECLFinalizerModule.h>
 
 // FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/dataobjects/EventT0.h>
 
-// ECL
+//ECL
 #include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/utility/utilityFunctions.h>
 
-// MDST
+//MDST
 #include <mdst/dataobjects/ECLCluster.h>
-
-// OTHER
-#include <ecl/utility/ECLShowerId.h>
-
-// ROOT
-#include <TVector3.h>
-#include <TMatrixFSym.h>
-#include <TMath.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // NAMESPACES
 using namespace Belle2;
@@ -68,13 +61,15 @@ ECLFinalizerModule::~ECLFinalizerModule()
 void ECLFinalizerModule::initialize()
 {
   // Register in datastore.
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-  eclShowers.registerInDataStore();
-  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
-  eclClusters.registerInDataStore();
+  m_eclShowers.isRequired(eclShowerArrayName());
+  m_eclClusters.registerInDataStore(eclClusterArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eventLevelClusteringInfo.registerInDataStore();
+  m_eventT0.isRequired();
 
   // Register relations.
-  eclClusters.registerRelationTo(eclShowers);
+  m_eclClusters.registerRelationTo(m_eclShowers);
+  m_eclClusters.registerRelationTo(m_eclCalDigits);
 
 }
 
@@ -86,17 +81,22 @@ void ECLFinalizerModule::beginRun()
 
 void ECLFinalizerModule::event()
 {
-  // Input array
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
+  //EventLevelClusteringInfo counters
+  uint rejectedShowersFwd = 0;
+  uint rejectedShowersBrl = 0;
+  uint rejectedShowersBwd = 0;
 
-  // Output array
-  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
+  // event T0
+  double eventT0 = 0.;
+  if (m_eventT0->hasEventT0()) {
+    eventT0 = m_eventT0->getEventT0();
+  }
 
   // loop over all ECLShowers
-  for (const auto& eclShower : eclShowers) {
+  for (const auto& eclShower : m_eclShowers) {
 
     // get shower time, energy and highest energy for cuts
-    const double showerTime = eclShower.getTime();
+    const double showerTime = eclShower.getTime() - eventT0;
     const double showerdt99 = eclShower.getDeltaTime99();
     const double showerEnergy = eclShower.getEnergy();
 
@@ -108,7 +108,7 @@ void ECLFinalizerModule::event()
         and ((fabs(showerTime) < showerdt99) or (showerEnergy > m_clusterTimeCutMaxEnergy))) {
 
       // create an mdst cluster for each ecl shower
-      const auto eclCluster = eclClusters.appendNew();
+      const auto eclCluster = m_eclClusters.appendNew();
 
       // set all variables
       eclCluster->setStatus(eclShower.getStatus());
@@ -130,14 +130,6 @@ void ECLFinalizerModule::event()
       };
       eclCluster->setCovarianceMatrix(covmat);
 
-      //TMatrixDSym covmatecls = eclShower.getCovarianceMatrix3x3();
-      //covmatecls.Print();
-      //TMatrixDSym covmatecl = eclCluster->getCovarianceMatrix3x3();
-      //covmatecl.Print();
-
-      // m_deltaL is set in track-cluster matching
-      // m_minTrkDistance is set in track-cluster matching
-
       eclCluster->setAbsZernike40(eclShower.getAbsZernike40());
       eclCluster->setAbsZernike51(eclShower.getAbsZernike51());
       eclCluster->setZernikeMVA(eclShower.getZernikeMVA());
@@ -146,25 +138,61 @@ void ECLFinalizerModule::event()
       eclCluster->setSecondMoment(eclShower.getSecondMoment());
       eclCluster->setLAT(eclShower.getLateralEnergy());
       eclCluster->setNumberOfCrystals(eclShower.getNumberOfCrystals());
-      eclCluster->setTime(eclShower.getTime());
+      eclCluster->setTime(showerTime);
       eclCluster->setDeltaTime99(eclShower.getDeltaTime99());
       eclCluster->setTheta(eclShower.getTheta());
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
+      eclCluster->setPulseShapeDiscriminationMVA(eclShower.getPulseShapeDiscriminationMVA());
+      eclCluster->setClusterHadronIntensity(eclShower.getShowerHadronIntensity());
+      eclCluster->setNumberOfHadronDigits(eclShower.getNumberOfHadronDigits());
 
       // set relation to ECLShower
       eclCluster->addRelationTo(&eclShower);
 
+      // set relation to ECLCalDigits
+      auto showerDigitRelations = eclShower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
+      for (unsigned int iRel = 0; iRel < showerDigitRelations.size(); ++iRel) {
+        const auto calDigit = showerDigitRelations.object(iRel);
+        const auto weight = showerDigitRelations.weight(iRel);
+
+        eclCluster->addRelationTo(calDigit, weight);
+      }
+
+    } else { // Count number of c_nPhotons showers that aren't converted into clusters for monitoring
+
+      // Get detector region
+      if (eclShower.getHypothesisId() == Belle2::ECLCluster::c_nPhotons) {
+
+        const auto detectorRegion = eclShower.getDetectorRegion();
+
+        B2DEBUG(39, "ECLFinalizerModule::event: Rejected shower with energy " << showerEnergy << ", time = " << showerTime << ", theta = "
+                << eclShower.getTheta()
+                << ", region " << detectorRegion);
+        // Increment counters
+        if (detectorRegion == static_cast<int>(ECL::DetectorRegion::FWD)) {
+          ++rejectedShowersFwd;
+        } else if (detectorRegion == ECL::DetectorRegion::BRL) {
+          ++rejectedShowersBrl;
+        } else if (detectorRegion == ECL::DetectorRegion::BWD) {
+          ++rejectedShowersBwd;
+        }
+      }
     }
   }
+
+  // Save EventLevelClusteringInfo
+  if (!m_eventLevelClusteringInfo) {
+    m_eventLevelClusteringInfo.create();
+  }
+  m_eventLevelClusteringInfo->setNECLShowersRejectedFWD(rejectedShowersFwd);
+  m_eventLevelClusteringInfo->setNECLShowersRejectedBarrel(rejectedShowersBrl);
+  m_eventLevelClusteringInfo->setNECLShowersRejectedBWD(rejectedShowersBwd);
+
+  B2DEBUG(35, "ECLFinalizerModule::event found " << rejectedShowersFwd << ", " << rejectedShowersBrl << ", " << rejectedShowersBwd
+          << " rejected showers in FWD, BRL, BWD");
 }
 
-void ECLFinalizerModule::endRun()
-{
-  ;
-}
+void ECLFinalizerModule::endRun() { ; }
 
-void ECLFinalizerModule::terminate()
-{
-  ;
-}
+void ECLFinalizerModule::terminate() { ; }

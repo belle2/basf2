@@ -21,12 +21,14 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/dbobjects/CDCFEElectronics.h>
+//#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
 //C++/C standard lib elements.
 #include <string>
 #include <vector>
-#include <queue>
-#include <map>
+//#include <queue>
 #include <limits>
 
 namespace Belle2 {
@@ -49,13 +51,20 @@ namespace Belle2 {
     CDCDigitizerModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    void initialize();
+    void initialize() override;
 
     /** Actual digitization of all hits in the CDC.
      *
      *  The digitized hits are written into the DataStore.
      */
-    void event();
+    void event() override;
+
+    /** Terminate func. */
+    void terminate() override
+    {
+      if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
+      //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
+    };
 
   private:
     /** Method used to smear the drift length.
@@ -69,7 +78,7 @@ namespace Belle2 {
      *
      *  @return Drift length after smearing.
      */
-    float smearDriftLength(float driftLength, float dDdt);
+    double smearDriftLength(double driftLength, double dDdt);
 
 
     /** The method to get dD/dt
@@ -81,7 +90,7 @@ namespace Belle2 {
      *  @return dDdt.
      *
      */
-    float getdDdt(float driftLength);
+    double getdDdt(double driftLength);
 
 
     /** The method to get drift time based on drift length
@@ -95,11 +104,18 @@ namespace Belle2 {
      *  @return Drift time.
      *
      */
-    float getDriftTime(float driftLength, bool addTof, bool addDelay);
+    double getDriftTime(double driftLength, bool addTof, bool addDelay);
 
 
-    /** Charge to ADC Count converter. */
-    unsigned short getADCCount(float charge);
+    /** Edep to ADC Count converter */
+    //    unsigned short getADCCount(unsigned short layer, unsigned short cell, double edep, double dx, double costh);
+    unsigned short getADCCount(const WireID& wid, double edep, double dx, double costh);
+
+    /** Set FEE parameters (from DB) */
+    void setFEElectronics();
+
+    /** Set edep-to-ADC conversion params. (from DB) */
+    //    void setEDepToADCConversions();
 
     StoreArray<MCParticle> m_mcParticles; /**< MCParticle array */
     StoreArray<CDCSimHit>  m_simHits;     /**< CDCSimHit  array */
@@ -120,18 +136,23 @@ namespace Belle2 {
     double m_resolution1;       /**< Resolution of the first Gassian used to smear drift length */
     double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
-    double m_tdcThreshold;      /**< dEdx value for TDC Threshold in unit of eV */
-    int m_adcThreshold;         /**< Threshold for ADC in unit of count */
+    double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
+    double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
+    double m_gasToGasWire;      /**< Approx. ratio of dE(gas) to dE(gas+wire) */
+    double m_scaleFac = 1.;     /**< Factor to mutiply to edep */
+    int    m_adcThreshold;      /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
     //    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
     double m_trigTimeJitter;   /**< Magnitude of trigger timing jitter (ns). */
 
-    CDC::CDCGeometryPar* m_cdcgp;  /**< Pointer to CDCGeometryPar */
+    CDC::CDCGeometryPar* m_cdcgp;  /**< Cached Pointer to CDCGeometryPar */
+    CDC::CDCGeoControlPar* m_gcp;  /**< Cached pointer to CDCGeoControlPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
     WireID m_wireID;            /**< WireID of this hit */
     unsigned short m_posFlag;   /**< left or right flag of this hit */
+    unsigned short m_boardID = 0; /**< FEE board ID */
     TVector3 m_posWire;         /**< wire position of this hit */
     TVector3 m_posTrack;        /**< track position of this hit */
     TVector3 m_momentum;        /**< 3-momentum of this hit */
@@ -146,9 +167,18 @@ namespace Belle2 {
     double m_driftVInv;         /**< m_driftV^-1 (in ns/cm)*/
     double m_propSpeedInv;      /**< Inv. of nominal signal propagation speed in a wire (in ns/cm)*/
 
+    double m_tdcThresholdOffset; /**< Offset for TDC(digital) threshold (mV)*/
+    double m_analogGain;         /**< analog gain (V/pC) */
+    double m_digitalGain;        /**< digital gain (V/pC) */
+    double m_adcBinWidth;        /**< ADC bin width (mV) */
+
+    double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
+    double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
+
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     //    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
+    bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
@@ -158,6 +188,19 @@ namespace Belle2 {
     bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
+
+    bool m_useDB4FEE;             /**< Fetch FEE params from DB */
+    DBArray<CDCFEElectronics>* m_fEElectronicsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
+    float m_lowEdgeOfTimeWindow[nBoards] = {0}; /*!< Lower edge of time-window */
+    float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
+    float m_tdcThresh          [nBoards] = {0}; /*!< Threshold for timing-signal */
+    float m_adcThresh          [nBoards] = {0}; /*!< Threshold for FADC */
+
+    bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
+    bool m_spaceChargeEffect;           /**< Space charge effect */
+
+    //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+    //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {

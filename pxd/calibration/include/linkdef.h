@@ -10,4 +10,5 @@
 #pragma link C++ class Belle2::PXDGainCalibrationAlgorithm-;
 #pragma link C++ class Belle2::PXDMedianChargeCalibrationAlgorithm-;
 #pragma link C++ class Belle2::PXDLandauCalibrationAlgorithm.h-;
+#pragma link C++ class Belle2::PXDLandauGainCalibrationAlgorithm-;
 #endif

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Benjamin Schwenker, Jonas Roetter                       *
+ * Contributors:  Benjamin Schwenker                                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,15 +16,15 @@
 
 namespace Belle2 {
   /**
-   * Class implementing the PXD Landau calibration algorithm
+   * Class implementing the PXD gain calibration algorithm
    */
-  class  PXDLandauCalibrationAlgorithm : public CalibrationAlgorithm {
+  class  PXDLandauGainCalibrationAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /// Constructor set the prefix to PXDLandauCalibrationAlgorithm
-    PXDLandauCalibrationAlgorithm();
+    /// Constructor set the prefix to PXDLandauGainCalibrationAlgorithm
+    PXDLandauGainCalibrationAlgorithm();
 
-    /// Minimum number of collected clusters for estimating median charge
+    /// Minimum number of collected clusters for estimating gains
     int minClusters;
 
     /// Artificial noise sigma for smearing cluster charge
@@ -43,11 +43,15 @@ namespace Belle2 {
 
   private:
 
-    /// Estimate Landau parameters from collected clusters on part of PXD
-    double EstimateLandau(VxdID sensorID, unsigned short uBin, unsigned short vBin);
+    /// Estimate gain as ratio of medians from MC and data for a part of PXD
+    double EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin);
 
-    /// fit a Landau to an unsorted signal vector.
+    /// Calculate a median from unsorted signal vector. The input vector gets sorted.
     double FitLandau(std::vector<double>& signals, const char* histname);
+
+    /// Retrive charge median value from pulled in data base payload
+    double GetChargeMPVFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
   };
 } // namespace Belle2
+
 

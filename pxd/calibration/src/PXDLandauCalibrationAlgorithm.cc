@@ -39,8 +39,8 @@ namespace {
 
   /** Signal in ADU of collected clusters */
   int m_signal;
-  int m_run;
-  int m_exp;
+  //int m_run;
+  //int m_exp;
   //PXDClusterChargeMapPar m_chargeMap;
 
   PXDClusterChargeMapPar m_landauMap;
@@ -184,28 +184,29 @@ CalibrationAlgorithm::EResult PXDLandauCalibrationAlgorithm::calibrate()
     } else {
       B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
                 "). Use default value.");
-      landauMapPar->setContent(sensorID.getID(), uBin, vBin, 1);
+      landauMapPar->setContent(sensorID.getID(), uBin, vBin, 0.0);
     }
   }
 
   // Save the landau map to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
-  saveCalibration(landauMapPar, "PXDLandauMapPar");
+  saveCalibration(landauMapPar, "PXDClusterChargeMapPar");
 
   B2INFO("PXD Cluster Charge Calibration Successful");
   return c_OK;
 }
 
 
-float PXDLandauCalibrationAlgorithm::EstimateLandau(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+double PXDLandauCalibrationAlgorithm::EstimateLandau(VxdID sensorID, unsigned short uBin, unsigned short vBin)
 {
 
   // Construct a tree name for requested part of PXD
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
-  const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
-  const string histname = str(format("hist_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
+  std::string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
+  std::string histname_s = str(format("hist_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
+  const char* histname = histname_s.c_str();
   // Vector with cluster signals from collected data
   vector<double> signals;
 
@@ -221,19 +222,14 @@ float PXDLandauCalibrationAlgorithm::EstimateLandau(VxdID sensorID, unsigned sho
     double noise = gRandom->Gaus(0.0, noiseSigma);
     signals.push_back(m_signal + noise);
   }
-  auto size = signals.size();
-  // get max and min values of vector
-  int max = *max_element(signals.begin(), signals.end());
-  int min = *min_element(signals.begin(), signals.end());
 
-  //TH1D hist_signals = new TH1D("signals","", max-min, min, max);
-  //registerObject<TH1D>(histname, hist_signals);
 
-  return FitLandau(signals);
+
+  return FitLandau(signals, histname);
 }
 
 
-float PXDLandauCalibrationAlgorithm::FitLandau(vector<double>& signals)
+double PXDLandauCalibrationAlgorithm::FitLandau(vector<double>& signals, const char* histname)
 {
   auto size = signals.size();
   // get max and min values of vector
@@ -242,29 +238,40 @@ float PXDLandauCalibrationAlgorithm::FitLandau(vector<double>& signals)
 
 
   // create histogram to hold signals
-  TH1I* hist_signals = new TH1I("signals", "", max - min, min, max);
+  TH1D* hist_signals = new TH1D(histname, "", max - min, min, max);
   // create fit function
-  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])", min, max);
-  landau->SetParNames("MPV", "sigma");
-
+  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
+  landau->SetParNames("MPV", "sigma", "scale");
+  landau->SetParameters(100, 1, 1000);
   // fill histrogram
   for (auto it = signals.begin(); it != signals.end(); ++it) {
     hist_signals->Fill(*it);
   }
 
   if (size == 0) {
-    return 0.0; // Undefined, really.
+    return 1.0; // Undefined, really.
   } else {
-    hist_signals->Fit("landau");
+    Int_t status = hist_signals->Fit("landau", "L0", "", 30, 350);
     double MPV = landau->GetParameter("MPV");
     double sigma = landau->GetParameter("sigma");
-    cout << MPV << " " << sigma << endl;
+    cout << "Status=" << status << " " << MPV << " " << sigma << endl;
 
+// save output signals and fit in root file for inspection
+    TFile* f1 = new TFile("signals.root", "UPDATE");
+    f1->cd();
+    hist_signals->Write();
+    f1->Close();
+    // check if fit converged
 
     delete hist_signals;
     delete landau;
-//  return std::make_pair(1, 1);
-    return MPV;
+    delete f1;
+    if (status == 0) return MPV;
+
+    else {
+      B2WARNING(histname << ": Fit failed! using default value.");
+      return 0.0;
+    }
   }
 }
 

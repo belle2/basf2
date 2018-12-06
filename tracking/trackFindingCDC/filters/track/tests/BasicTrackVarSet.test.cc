@@ -33,7 +33,7 @@ TEST(BasicTrackVarSetCalculation, test_empty_track)
   // that the BDT cannot train on. Should be converted to 0 via the toFinite function.
 
   // create an empty track containing no hits
-  const CDCTrack emptyTrack {};
+  const CDCTrack emptyTrack;
   // extract variables from emtpy track
   BasicTrackVarSet trackVarSet;
 
@@ -81,7 +81,8 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_one_hit_track)
   double some_arbitrary_z_coord = 0.0;
   const Vector3D aRecoPos(aRLWireHit.getRefPos2D(), some_arbitrary_z_coord);
   const CDCRecoHit3D aCDCHit(aRLWireHit, aRecoPos, arcLength2D);
-  const CDCTrack track(std::vector<CDCRecoHit3D> {aCDCHit});
+  const std::vector<CDCRecoHit3D> aHitVector{aCDCHit};
+  const CDCTrack track(aHitVector);
 
   // extrack variables from track
   BasicTrackVarSet trackVarSet;
@@ -122,13 +123,13 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_two_hit_track)
 
   const WireID& aWireID = wireTopology.getWire(0, 0, 0).getWireID();
   const WireID& bWireID = wireTopology.getWire(0, 0, 1).getWireID();
-  std::vector<WireID> wireIDs{aWireID, bWireID};
+  std::vector<WireID> wireIDs = {aWireID, bWireID};
 
-  std::vector<double> drift_lengths{2.0, 3.0};
+  std::vector<double> drift_lengths = {2.0, 3.0};
   // large ADC counts might cause errors in calculation due to short data type
   // for example when squaring to get the variance
-  std::vector<unsigned short> adc_counts{30, 500};
-  std::vector<double> arc_length_2Ds{2.0, -3.0};
+  std::vector<unsigned short> adc_counts = {30, 500};
+  std::vector<double> arc_length_2Ds = {2.0, -3.0};
 
   std::vector<CDCHit> cdcHits;
   std::vector<CDCWireHit> cdcWireHits;
@@ -182,9 +183,9 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_empty_s_for_three_
   const WireID& aWireID = wireTopology.getWire(0, 0, 0).getWireID();
   const WireID& bWireID = wireTopology.getWire(0, 0, 1).getWireID();
   const WireID& cWireID = wireTopology.getWire(0, 0, 2).getWireID();
-  std::vector<WireID> wireIDs{aWireID, bWireID, cWireID};
+  std::vector<WireID> wireIDs = {aWireID, bWireID, cWireID};
 
-  std::vector<double> arc_length_2Ds{ -2.0, 0.0, 3.0}; // -> empty_s hit gaps = [2, 3]
+  std::vector<double> arc_length_2Ds = { -2.0, 0.0, 3.0}; // -> empty_s hit gaps = [2, 3]
 
   std::vector<CDCHit> cdcHits;
   std::vector<CDCWireHit> cdcWireHits;

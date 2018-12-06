@@ -53,6 +53,11 @@ namespace Belle2 {
       TVector3 getLocalMomentum(const Particle* particle);
 
       /**
+       * returns the time of flight from the origin to the TOP
+       */
+      double getTOF(const Particle* particle);
+
+      /**
        * counts the number of photons in the TOP in a given time frame
        * if tmin < 0, count from the time of the first photon
        */

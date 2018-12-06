@@ -81,6 +81,14 @@ namespace Belle2 {
         return module.momentumToLocal(momentum); // TVector3
       }
 
+      // returns the time of flight from the origin to the TOP
+      double getTOF(const Particle* particle)
+      {
+        const auto* extHit = getExtHit(particle);
+        if (not extHit) return 0;
+        return extHit->getTOF();
+      }
+
       // counts the number of photons in the TOP in a given time frame
       // if tmin < 0, count from the time of the first photon
       int countHits(const Particle* particle, double tmin, double tmax, bool clean)
@@ -451,6 +459,8 @@ namespace Belle2 {
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
     REGISTER_VARIABLE("topLocalTheta", TOPVariable::getTOPLocalTheta,
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
+    REGISTER_VARIABLE("topTOF", TOPVariable::getTOF,
+                      "[calibration] The time of flight from the origin to the TOP");
     REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
                       "[calibration] The ID of the TOP slot that was hit by the particle");
     REGISTER_VARIABLE("topExpectedPhotonCount(pdg)", TOPVariable::getExpectedTOPPhotonCount,

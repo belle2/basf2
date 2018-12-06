@@ -34,6 +34,9 @@
 #include <cdc/dbobjects/CDCLayerAlignment.h>
 
 
+#include <cdc/dbobjects/CDCLayerAlignment.h>
+
+
 #include <vector>
 #include <string>
 #include <map>

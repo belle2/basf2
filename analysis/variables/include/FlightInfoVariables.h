@@ -32,6 +32,9 @@ namespace Belle2 {
     Manager::FunctionPtr flightDistanceOfDaughterErr(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr vertexDistanceOfDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr vertexDistanceOfDaughterErr(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr vertexDistanceOfDaughterSignificance(const std::vector<std::string>& arguments);
     Manager::FunctionPtr mcFlightDistanceOfDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr mcFlightTimeOfDaughter(const std::vector<std::string>& arguments);
   }

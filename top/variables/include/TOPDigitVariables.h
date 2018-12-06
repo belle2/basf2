@@ -58,6 +58,12 @@ namespace Belle2 {
       double getTOF(const Particle* particle);
 
       /**
+       * returns the time of flight from the origin to the TOP under a given hypothesis
+       */
+      double getTOFExpert(const Particle* particle, const std::vector<double>& vars);
+
+
+      /**
        * counts the number of photons in the TOP in a given time frame
        * if tmin < 0, count from the time of the first photon
        */

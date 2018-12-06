@@ -86,38 +86,39 @@ namespace Belle2 {
     TH1F* h_TracksnSVDhits; /**< Number of SVDhits for a track. */
 
     // Cluster charge.
-    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes]; /**< */
-    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< */
-    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< */
-    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< */
+    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge. */
+    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. track momentum. */
+    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. incident angle. */
+    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. SVDCluster SNR. */
 
     // Cluster size.
-    TH1F* h_clSize[m_nSensorTypes][m_nSides]; /**< */
-    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides]; /**< */
-    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides]; /**< */
-    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides]; /**< */
+    TH1F* h_clSize[m_nSensorTypes][m_nSides]; /**< SVDCluster size */
+    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. track momentum. */
+    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. incident angle. */
+    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. SVDCluster SNR. */
 
     // cluster SNR.
-    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< */
-    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< */
-    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< */
+    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR. */
+    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR vs. track momentum. */
+    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR vs. incident angle. */
 
     // histogram lists.
+    /** List of all histograms concerning track information: nTracks, Track P Value, momentum and SVD hits */
     TList* m_histoList_Tracks;
 
-    TList* m_histoList_clCharge[m_nSensorTypes]; /**< */
-    TList* m_histoList_clChargeVsMomentum[m_nSensorTypes]; /**< */
-    TList* m_histoList_clChargeVsIncidentAngle[m_nSensorTypes]; /**< */
-    TList* m_histoList_clChargeVsSNR[m_nSensorTypes]; /**< */
+    TList* m_histoList_clCharge[m_nSensorTypes]; /**< SVDCluster charge histogram list. */
+    TList* m_histoList_clChargeVsMomentum[m_nSensorTypes]; /**< SVDCluster charge vs. momentum histogram list. */
+    TList* m_histoList_clChargeVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster charge vs. incident angle hist list. */
+    TList* m_histoList_clChargeVsSNR[m_nSensorTypes]; /**< SVDCluster charge vs. SVDCluster SNR histogram list. */
 
-    TList* m_histoList_clSize[m_nSensorTypes]; /**< */
-    TList* m_histoList_clSizeVsMomentum[m_nSensorTypes]; /**< */
-    TList* m_histoList_clSizeVsIncidentAngle[m_nSensorTypes]; /**< */
-    TList* m_histoList_clSizeVsSNR[m_nSensorTypes]; /**< */
+    TList* m_histoList_clSize[m_nSensorTypes]; /**< SVDCluster size histogram list. */
+    TList* m_histoList_clSizeVsMomentum[m_nSensorTypes]; /**< SVDCluster size vs. track momentum histogram list. */
+    TList* m_histoList_clSizeVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster size vs. incident angle histogram list. */
+    TList* m_histoList_clSizeVsSNR[m_nSensorTypes]; /**< SVDCluster size vs. SVDCluster SNR histogram list. */
 
-    TList* m_histoList_clSNR[m_nSensorTypes]; /**< */
-    TList* m_histoList_clSNRVsMomentum[m_nSensorTypes]; /**< */
-    TList* m_histoList_clSNRVsIncidentAngle[m_nSensorTypes]; /**< */
+    TList* m_histoList_clSNR[m_nSensorTypes]; /**< SVDCluster SNR histogram list. */
+    TList* m_histoList_clSNRVsMomentum[m_nSensorTypes]; /**< SVDCluster SNR vs. track momentum histogram list. */
+    TList* m_histoList_clSNRVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster SNR vs. incident angle histogram list. */
 
     // utility methods
     /** 1D histogram creator. */

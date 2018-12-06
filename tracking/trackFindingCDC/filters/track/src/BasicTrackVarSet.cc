@@ -117,9 +117,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   var<named("empty_s_mean")>() = toFinite(bacc::mean(empty_s_acc), 0);
   var<named("empty_s_sum")>() = toFinite(bacc::sum(empty_s_acc), 0);
   var<named("empty_s_variance")>() = toFinite(empty_s_variance, 0);
-  // bacc::min/max returns max/min double for no entries which happens for empty_s
-  // toFinite only works here because of implicit conversion to float, turning max doubles to inf
-  // TODO: This is future-unsafe, write tests to ensure that this works
+
   var<named("empty_s_max")>() = toFinite(bacc::max(empty_s_acc), 0);
   var<named("empty_s_min")>() = toFinite(bacc::min(empty_s_acc), 0);
   var<named("s_range")>() = toFinite(s_range, 0);

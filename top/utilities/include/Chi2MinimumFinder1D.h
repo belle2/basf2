@@ -48,6 +48,11 @@ namespace Belle2 {
         {}
       };
 
+      /**
+       * Default constructor
+       */
+      Chi2MinimumFinder1D()
+      {}
 
       /**
        * Class constructor, similar to 1D histogram
@@ -72,6 +77,13 @@ namespace Belle2 {
        * @param chi2 value to be added
        */
       void add(unsigned i, double chi2);
+
+      /**
+       * Add data from another finder
+       * Finders must be defined with the same range and binning
+       * @return a reference to this finder
+       */
+      Chi2MinimumFinder1D& add(const Chi2MinimumFinder1D& other);
 
       /**
        * Returns lower limit of search region
@@ -108,6 +120,12 @@ namespace Belle2 {
        * @return chi^2 values
        */
       const std::vector<double>& getChi2Values() const {return m_chi2;}
+
+      /**
+       * Returns number of entries (counted for bin 0)
+       * @return number of entries
+       */
+      int getEntries() const {return m_entries;}
 
       /**
        * Returns parabolic minimum
@@ -150,6 +168,7 @@ namespace Belle2 {
       double m_dx = 0; /**< bin size */
       std::vector<double> m_x;  /**< bin centers */
       std::vector<double> m_chi2; /**< chi^2 values at bin centers */
+      int m_entries = 0; /**< number of entries (counted for bin 0) */
 
       bool m_searched = false; /**< internal flag */
       Minimum m_minimum; /**< result: global minimum */

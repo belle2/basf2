@@ -40,7 +40,28 @@ namespace Belle2 {
       if (i < m_chi2.size()) {
         m_chi2[i] += chi2;
         m_searched = false;
-      } else B2WARNING("Chi2MinimumFinder1D::add: index out of range");
+        if (i == 0) m_entries++;
+      } else {
+        B2WARNING("Chi2MinimumFinder1D::add: index out of range");
+      }
+    }
+
+
+    Chi2MinimumFinder1D& Chi2MinimumFinder1D::add(const Chi2MinimumFinder1D& other)
+    {
+      if (other.getXmin() !=  m_xmin or other.getXmax() !=  m_xmax or
+          other.getBinCenters().size() != m_x.size()) {
+        B2ERROR("Chi2MinimumFinder1D::add: finders with different ranges or binning "
+                "can't be added");
+        return *this;
+      }
+      const auto& chi2 = other.getChi2Values();
+      for (unsigned i = 0; i < m_chi2.size(); i++) {
+        m_chi2[i] += chi2[i];
+      }
+      m_entries += other.getEntries();
+      m_searched = false;
+      return *this;
     }
 
 

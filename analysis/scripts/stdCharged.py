@@ -9,9 +9,11 @@ from modularAnalysis import *
 _chargednames = ['pi', 'K', 'p', 'e', 'mu']
 _pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
 _effnames = ['95eff', '90eff', '85eff']
+# default particle list for stdPi() and similar functions
+_defaultlist = 'good'
 
 
-def stdChargedEffCuts(particletype, listtype):
+def _stdChargedEffCuts(particletype, listtype):
     """
     Provides the PID cut corresponding to a given efficiency percentile
 
@@ -81,7 +83,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
     elif listtype not in _effnames:
         B2ERROR("The requested list is not defined. Please refer to the stdCharged documentation.")
     else:
-        pidcut = stdChargedEffCuts(particletype, listtype)
+        pidcut = _stdChargedEffCuts(particletype, listtype)
         if 0.0 < pidcut < 1.0:
             fillParticleList(
                 particletype +
@@ -101,7 +103,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 ###
 
 
-def stdPi(listtype='good', path=analysis_main):
+def stdPi(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard pion lists, refer to stdCharged for details
 
@@ -111,7 +113,7 @@ def stdPi(listtype='good', path=analysis_main):
     stdCharged('pi', listtype, path)
 
 
-def stdK(listtype='good', path=analysis_main):
+def stdK(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard kaon lists, refer to stdCharged for details
 
@@ -121,7 +123,7 @@ def stdK(listtype='good', path=analysis_main):
     stdCharged('K', listtype, path)
 
 
-def stdPr(listtype='good', path=analysis_main):
+def stdPr(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard proton lists, refer to stdCharged for details
 
@@ -131,7 +133,7 @@ def stdPr(listtype='good', path=analysis_main):
     stdCharged('p', listtype, path)
 
 
-def stdE(listtype='good', path=analysis_main):
+def stdE(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard electron lists, refer to stdCharged for details
 
@@ -141,7 +143,7 @@ def stdE(listtype='good', path=analysis_main):
     stdCharged('e', listtype, path)
 
 
-def stdMu(listtype='good', path=analysis_main):
+def stdMu(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard muon lists, refer to stdCharged for details
 

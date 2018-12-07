@@ -13,12 +13,6 @@ _base_functions = [
     stdCharged.stdE,
     stdCharged.stdMu
 ]
-_chargednames = ['pi', 'K', 'p', 'e', 'mu']
-
-#: the default particle list loaded
-_defaultlist = "good"
-#: the names of cuts for fixed efficiency percentiles
-_effnames = ['95eff', '90eff', '85eff']
 
 
 class TestStdCharged(unittest.TestCase):
@@ -52,7 +46,7 @@ class TestStdCharged(unittest.TestCase):
             loader = testpath.modules()[0]
             self._check_list_name(listtype, f.__name__, loader)
 
-    def _check_function_call(self, functions=_base_functions, expectedlist=_defaultlist):
+    def _check_function_call(self, functions=_base_functions, expectedlist=stdCharged._defaultlist):
         """check that a function works (i.e. adds a particle loader)"""
         for f in functions:
             testpath = create_path()
@@ -100,9 +94,9 @@ class TestStdCharged(unittest.TestCase):
         """check that the builder functions all work with the percentile eff lists"""
         for function in _base_functions:
             eff_exists = 0
-            for ename in _effnames:
-                cut = stdCharged.stdChargedEffCuts(_chargednames[_base_functions.index(function)],
-                                                   ename)
+            for ename in stdCharged._effnames:
+                cut = stdCharged._stdChargedEffCuts(stdCharged._chargednames[_base_functions.index(function)],
+                                                    ename)
                 if 0.0 < cut < 1.0:
                     self._check_listtype_exists(ename, [function])
                     eff_exists += 1

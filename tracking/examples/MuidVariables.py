@@ -4,12 +4,16 @@
 ########################################################
 #
 #  This steering file shows how to correctly "load"
-#  the Muid variables and use them at analysis level.
+#  the Muid variables and use them in a steering file
+#  for calibration studies.
 #
 #  In the first part of the script we generate a sample
 #  of muons and we simulate and reconstuct them.
 #  In the second part we run a (very) simple analysis
-#  and print out some variables.
+#  and save some variables to ntuple.
+#
+#  Note that the Muid variables are intended to be used
+#  by experts for calibration studies!
 #
 #  Contact: Giacomo De Pietro (2018)
 #           giacomo.depietro@roma3.infn.it
@@ -55,7 +59,7 @@ else:  # Use ParticleGun to generate 4GeV mu+ and mu-
                     pdgCodes=[13, -13],
                     momentumGeneration='fixed',
                     momentumParams=[4],
-                    thetaGeneration='uniform',
+                    thetaGeneration='uniformCos',
                     thetaParams=[37, 130])
 
 # Add simulation and reconstruction
@@ -67,13 +71,13 @@ rec.add_reconstruction(path=main)
 # ANALYSIS #
 ############
 
-# Reconstruct the muon-candidates in the event with ECL-based cuts
+# Reconstruct muon-candidates in the event with ECL-based cuts
 ma.fillParticleList(
     'mu+:basic',
     'nCDCHits > 20 and abs(dz) < 2.0 and abs(dr) < 0.5 and 0.15 < clusterE < 0.4 and formula(clusterE/p) < 0.4',
     path=main)
 
-# Select muons requiring at least 4 hits in the KLM
+# Select better muon-candidates requiring at least one hit after layer 3 of KLM
 ma.cutAndCopyList('mu+:klm',
                   'mu+:basic',
                   'muidHitLayer > 3',
@@ -87,8 +91,8 @@ listOfVariables = ['p',
                    'muonID',
                    'pionID',
                    # Here we select some Muid variables
-                   'muonPdf',
-                   'pionPdf',
+                   'muidMuonProbability',
+                   'muidPionProbability',
                    'muidOutcomeExtTrack',
                    'muidHitLayer',
                    'muidExtLayer',

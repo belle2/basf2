@@ -23,7 +23,7 @@ import modularAnalysis as ma
 from ROOT import Belle2
 
 # Load the tracking libraries
-# Fundamental to use the Muid variables!
+# Fundamental for using the Muid variables!
 from ROOT import gSystem
 gSystem.Load('libtracking.so')
 
@@ -42,7 +42,7 @@ main.add_module('EventInfoSetter',
 main.add_module('Progress')
 main.add_module('ProgressBar')
 
-use_KKMC = False
+use_KKMC = True
 if use_KKMC:  # Use KKMC to generate generic mu+mu- events
     main.add_module('KKGenInput',
                     tauinputFile=Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'),
@@ -74,17 +74,26 @@ ma.fillParticleList(
     path=main)
 
 # Select muons requiring at least 4 hits in the KLM
-ma.cutAndCopyList('mu+:klm', 'mu+:basic', 'muidHitLayer > 3', path=main)
+ma.cutAndCopyList('mu+:klm',
+                  'mu+:basic',
+                  'muidHitLayer > 3',
+                  path=main)
 
 # Saving variables to a flat ntuple
 listOfVariables = ['p',
+                   'charge',
                    'theta',
                    'phi',
                    'muonID',
+                   'pionID',
+                   # Here we select some Muid variables
                    'muonPdf',
+                   'pionPdf',
                    'muidOutcomeExtTrack',
                    'muidHitLayer',
                    'muidExtLayer',
+                   # Here we select some KLMCluster variables
+                   'klmClusterIsBKLM',
                    'klmClusterInnermostLayer',
                    'klmClusterLayers']
 ma.variablesToNtuple('mu+:klm',

@@ -87,10 +87,6 @@ namespace Belle2 {
         const auto* extHit = getExtHit(particle);
         if (not extHit) return 0;
         auto extPDGCode = abs(extHit->getPdgCode());
-        // in many cases, we just want to get the TOF under the pion hypothesis
-        if ((pdg == 0) and (abs(particle->getPDGCode()) == extPDGCode)) {
-          return extHit->getTOF();
-        }
         double pmom = particle->getMomentumMagnitude();
         double massExtHit = Const::ChargedStable(extPDGCode).getMass();
         double betaExtHit = pmom / sqrt(pmom * pmom + massExtHit * massExtHit);

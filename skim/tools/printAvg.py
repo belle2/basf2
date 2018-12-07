@@ -30,7 +30,7 @@ import os
 import itertools
 import sys
 import collections
-from skimExpertFunctions import getTestFile, getNEvents
+from skimExpertFunctions import get_test_file, get_eventN
 
 skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
 skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
@@ -48,20 +48,22 @@ nFullEvents = 200000
 nSkims = 0
 
 
-totalUdstSizePerEventPerSample = 0
-totalRetentionPerSample = 0
-totalProcessingTimePerEventPerSample = 0
-
-avgUdstSizePerEventPerSample = 0
-avgRetentionPerSample = 0
-avgProcessingTimePerEventPerSample = 0
-
 for bkg in bkgs.split():
     print('|Bkg:' + bkg)
-    title = '|Skim       |  Total   Retention   | Total Time/Evt(HEPSEC)| Total uDSTSize/Evt(KB)|'
+    title = '|Sample       |  Total   Retention   | Total Time/Evt(HEPSEC)| Total uDSTSize/Evt(KB)|'
 
     title += '  Average   Retention   | Average Time/Evt(HEPSEC)| Average uDSTSize/Evt(KB)|'
     print(title)
+
+    totalUdstSizePerEventPerSample = 0
+    totalRetentionPerSample = 0
+    totalProcessingTimePerEventPerSample = 0
+
+    avgUdstSizePerEventPerSample = 0
+    avgRetentionPerSample = 0
+    avgProcessingTimePerEventPerSample = 0
+    nSkims = 0
+
     for skim in skims.split():
         inputFileName = skim + '_' + bkg + '.out'
         outputFileName = skim + '_' + bkg
@@ -70,9 +72,9 @@ for bkg in bkgs.split():
         pos = bkg.find('_')
         skimCampaign = bkg[0:pos]
         sampleType = bkg[pos + 1:]
-        fileList = getTestFile(sampleType, skimCampaign)
-        nFullEvents = getNEvents(fileList)
-        nSkimmedEvents = getNEvents(outputUdstName + '.udst.root')
+        fileList = get_test_file(sampleType, skimCampaign)
+        nFullEvents = get_eventN(fileList)
+        nSkimmedEvents = get_eventN(outputUdstName + '.udst.root')
         # These counters are included to determine the number  of lines with retention and candidate multiplicity information.
         lineCounter = 0
         l = 0
@@ -116,13 +118,11 @@ for bkg in bkgs.split():
         totalRetentionPerSample += retention
         totalUdstSizePerEventPerSample += udstSizePerEvent
         totalProcessingTimePerEventPerSample += timePerEvent
-
-    print('Average calculated over ' + str(nSkims) + ' skims')
     avgRetentionPerSample = totalRetentionPerSample / nSkims
     avgUdstSizePerEventPerSample = totalUdstSizePerEventPerSample / nSkims
     avgProcessingTimePerEventPerSample = totalProcessingTimePerEventPerSample / nSkims
 
-    result = '|' + skim + '    |  ' + str(totalRetentionPerSample) + ' | ' + \
+    result = '|' + bkg + '    |  ' + str(totalRetentionPerSample) + ' | ' + \
         str(totalProcessingTimePerEventPerSample) + '  |  ' + str(totalUdstSizePerEventPerSample) + '|'
 
     result += ' ' + str(avgRetentionPerSample) + ' | ' + str(avgProcessingTimePerEventPerSample) + \

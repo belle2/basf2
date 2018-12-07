@@ -23,11 +23,9 @@ from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
-import sys
 from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
-
 
 # create path
 mypath = b2.create_path()

@@ -525,14 +525,14 @@ void SVDUnpackerModule::printB2Debug(uint32_t* data32, uint32_t* data32_min, uin
   uint32_t* ptr = min;
   int counter = 0;
 
-  char message[256] = "";
+  char message[264] = "";
   ostringstream os;
   os << endl;
 
   while (ptr < max + 1) {
     char prev_message[256] = "";
     strcpy(prev_message, message);
-    sprintf(message, "%s%.8x ", prev_message, *ptr);
+    sprintf(message, "%s%.8x" , prev_message, *ptr);
     if (counter++ % 10 == 9) {
       os << message << endl;
       //sprintf(message,"");

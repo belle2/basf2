@@ -705,7 +705,7 @@ namespace Belle2 {
       StoreArray<CDCTriggerMLPInput>* storeNNInputs)
     {
       constexpr short delayNNOutput = 8;
-      constexpr short delayNNSelect = 4;
+      constexpr short delayNNSelect = 3;
       for (short iclock = 0; iclock < bitsFromNN->getEntries(); ++iclock) {
         NNInputBitStream* bitsIn = (*bitsToNN)[iclock];
         for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {

@@ -110,6 +110,7 @@ namespace Belle2 {
       distanceErr = sqrt(result[0][0]);
       return fD;
     }
+
     // Helper function for flight time and its uncertainty (provided as it is)
     inline double getFlightInfoTimeBtw(const Particle* particle, const Particle* daughter, double& timeErr)
     {
@@ -200,6 +201,7 @@ namespace Belle2 {
       timeErr = sqrt(result[0][0]);
       return fT;
     }
+
     // Helper function for MC flight distance
     inline double getMCFlightInfoDistanceBtw(const MCParticle* particle, const MCParticle* daughter)
     {
@@ -234,7 +236,6 @@ namespace Belle2 {
 
       //flight distance
       return lX * nX + lY * nY + lZ * nZ;
-
     }
 
     double flightDistance(const Particle* part)
@@ -263,7 +264,6 @@ namespace Belle2 {
       }
       getFlightInfoDistanceBtw(part, part, flightDistanceErr);
       return flightDistanceErr;
-
     }
 
     double flightTimeErr(const Particle* part)
@@ -276,6 +276,111 @@ namespace Belle2 {
       return flightTimeErr;
     }
 
+    inline double getVertexDistance(const Particle* particle, const Particle* daughter, double& vertexDistanceErr,
+                                    bool prodVertIsIP = false)
+    {
+      if (!particle || !daughter) {
+        vertexDistanceErr = -999;
+        return -999;
+      }
+
+      // production vertex
+      double prodVtxX = particle->getX();
+      double prodVtxY = particle->getY();
+      double prodVtxZ = particle->getZ();
+      if (particle == daughter || prodVertIsIP) {
+        if (particle->hasExtraInfo("prodVertX")) prodVtxX = particle->getExtraInfo("prodVertX");
+        if (particle->hasExtraInfo("prodVertY")) prodVtxY = particle->getExtraInfo("prodVertY");
+        if (particle->hasExtraInfo("prodVertZ")) prodVtxZ = particle->getExtraInfo("prodVertZ");
+      }
+
+      // decay vertex
+      double vtxX =  daughter->getX();
+      double vtxY =  daughter->getY();
+      double vtxZ =  daughter->getZ();
+
+      // difference between vertices
+      double lX = vtxX - prodVtxX;
+      double lY = vtxY - prodVtxY;
+      double lZ = vtxZ - prodVtxZ;
+
+      // vertex distance
+      double lD = sqrt(lX * lX + lY * lY + lZ * lZ);
+
+      // covariance matrix of both vertices
+      TMatrixFSym decCov = daughter->getVertexErrorMatrix();
+      TMatrixFSym prodCov = particle->getVertexErrorMatrix();
+      if (particle == daughter || prodVertIsIP) {
+        if (particle->hasExtraInfo("prodVertSxx")) prodCov[0][0] = particle->getExtraInfo("prodVertSxx");
+        if (particle->hasExtraInfo("prodVertSxy")) prodCov[0][1] = particle->getExtraInfo("prodVertSxy");
+        if (particle->hasExtraInfo("prodVertSxz")) prodCov[0][2] = particle->getExtraInfo("prodVertSxz");
+        if (particle->hasExtraInfo("prodVertSyx")) prodCov[1][0] = particle->getExtraInfo("prodVertSyx");
+        if (particle->hasExtraInfo("prodVertSyy")) prodCov[1][1] = particle->getExtraInfo("prodVertSyy");
+        if (particle->hasExtraInfo("prodVertSyz")) prodCov[1][2] = particle->getExtraInfo("prodVertSyz");
+        if (particle->hasExtraInfo("prodVertSzx")) prodCov[2][0] = particle->getExtraInfo("prodVertSzx");
+        if (particle->hasExtraInfo("prodVertSzy")) prodCov[2][1] = particle->getExtraInfo("prodVertSzy");
+        if (particle->hasExtraInfo("prodVertSzz")) prodCov[2][2] = particle->getExtraInfo("prodVertSzz");
+      }
+
+      // compute total covariance matrix
+      // ORDER = prod x, prod y, prod z, decay x, decay y, decay z
+
+      TMatrixFSym Cov(6);
+      for (int i = 0; i < 6; i++)
+        for (int j = 0; j < 6; j++)
+          if (i < 3 && j < 3)
+            Cov[i][j] = prodCov[i][j];
+          else if (i > 2 && j > 2)
+            Cov[i][j] = decCov[i - 3][j - 3];
+          else
+            Cov[i][j] = 0;
+
+      TMatrixF deriv(6, 1);
+      deriv[0][0] = - lX / lD; // prodVtxX
+      deriv[1][0] = - lY / lD; // prodVtxY
+      deriv[2][0] = - lZ / lD; // prodVtxZ
+      deriv[3][0] =   lX / lD; // vtxX
+      deriv[4][0] =   lY / lD; // vtxY
+      deriv[5][0] =   lZ / lD; // vtxZ
+
+
+      TMatrixF tmp(6, 1);
+      tmp.Mult(Cov, deriv);
+
+      TMatrixF result(1, 1);
+      result.Mult(deriv.T(), tmp);
+
+      vertexDistanceErr = sqrt(result[0][0]);
+      return lD;
+    }
+
+    double vertexDistance(const Particle* part)
+    {
+      double vertexDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      return getVertexDistance(part, part, vertexDistanceErr);
+    }
+
+    double vertexDistanceErr(const Particle* part)
+    {
+      double vertexDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      getVertexDistance(part, part, vertexDistanceErr);
+      return vertexDistanceErr;
+    }
+
+    double vertexDistanceSignificance(const Particle* part)
+    {
+      double vertexDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      return getVertexDistance(part, part, vertexDistanceErr) / vertexDistanceErr;
+    }
 
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments)
     {
@@ -365,6 +470,7 @@ namespace Belle2 {
       }
       return nullptr;
     }
+
     Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments)
     {
       int daughterNumber = -1;
@@ -408,7 +514,7 @@ namespace Belle2 {
       return nullptr;
     }
 
-    //Flight distance uncertainty
+    // Flight distance uncertainty
     Manager::FunctionPtr flightDistanceOfDaughterErr(const std::vector<std::string>& arguments)
     {
       int daughterNumber = -1;
@@ -448,6 +554,100 @@ namespace Belle2 {
             return flightDistanceErr;
           };
           return -999;
+        }; // Lambda function END
+        return func;
+      }
+      return nullptr;
+    }
+
+    // Distance between mother and daughter vertices
+    Manager::FunctionPtr vertexDistanceOfDaughter(const std::vector<std::string>& arguments)
+    {
+      int daughterNumber = -1;
+      bool prodVertIsIP = true;
+      if (arguments.size() == 1 || arguments.size() == 2) {
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of vertexDistanceOfDaughter function must be integer!");
+          return nullptr;
+        }
+      }
+      if (arguments.size() == 2) {
+        prodVertIsIP = false;
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, prodVertIsIP](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999; // Initial particle is NULL
+          if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
+            return -999; // Daughter number or daughters are inconsistent
+          const Particle* daughter = particle->getDaughter(daughterNumber);
+          double vertexDistanceErr = -999;
+          return getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP);
+        }; // Lambda function END
+        return func;
+      }
+      return nullptr;
+    }
+
+    // Uncertainty on distance between mother and daughter vertices
+    Manager::FunctionPtr vertexDistanceOfDaughterErr(const std::vector<std::string>& arguments)
+    {
+      int daughterNumber = -1;
+      bool prodVertIsIP = true;
+      if (arguments.size() == 1 || arguments.size() == 2) {
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of vertexDistanceOfDaughterErr function must be integer!");
+          return nullptr;
+        }
+      }
+      if (arguments.size() == 2) {
+        prodVertIsIP = false;
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, prodVertIsIP](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999; // Initial particle is NULL
+          if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
+            return -999; // Daughter number or daughters are inconsistent
+          const Particle* daughter = particle->getDaughter(daughterNumber);
+          double vertexDistanceErr = -999;
+          getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP);
+          return vertexDistanceErr;
+        }; // Lambda function END
+        return func;
+      }
+      return nullptr;
+    }
+
+    // Significance of distance between mother and daughter vertices
+    Manager::FunctionPtr vertexDistanceOfDaughterSignificance(const std::vector<std::string>& arguments)
+    {
+      int daughterNumber = -1;
+      bool prodVertIsIP = true;
+      if (arguments.size() == 1 || arguments.size() == 2) {
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of vertexDistanceOfDaughterSignificance function must be integer!");
+          return nullptr;
+        }
+      }
+      if (arguments.size() == 2) {
+        prodVertIsIP = false;
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, prodVertIsIP](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999; // Initial particle is NULL
+          if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
+            return -999; // Daughter number or daughters are inconsistent
+          const Particle* daughter = particle->getDaughter(daughterNumber);
+          double vertexDistanceErr = 0.0;
+          return getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP) / vertexDistanceErr;
         }; // Lambda function END
         return func;
       }
@@ -584,6 +784,23 @@ namespace Belle2 {
                       "Returns the flight distance between mother and daughter particle with daughterN index. If second integer is provided, the value will be computed w.r.t. of gdaughterN granddaughter particle.");
     REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN, gdaughterN = -1)", flightDistanceOfDaughterErr,
                       "Returns the flight distance uncertainty between mother and daughter particle");
+    REGISTER_VARIABLE("vertexDistance", vertexDistance,
+                      "Returns the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+    REGISTER_VARIABLE("vertexDistanceErr", vertexDistanceErr,
+                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+    REGISTER_VARIABLE("vertexDistanceSignificance", vertexDistanceSignificance,
+                      "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.");
+    REGISTER_VARIABLE("vertexDistanceOfDaughter(daughterN, option = '')", vertexDistanceOfDaughter,
+                      "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
+                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
+                      "Returns -999 in case anything goes wrong.");
+    REGISTER_VARIABLE("vertexDistanceOfDaughterErr(daughterN, option = '')", vertexDistanceOfDaughterErr,
+                      "If any second argument is provided it returns the uncertainty on the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
+                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix to calculate the uncertainty on the distance to the daughter's decay vertex.\n"
+                      "Returns -999 in case anything goes wrong.");
+    REGISTER_VARIABLE("vertexDistanceOfDaughterSignificance(daughterN, option = '')", vertexDistanceOfDaughterSignificance,
+                      "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN in units of the uncertainty on this value.\n"
+                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.");
     // GrandDaughters
     //REGISTER_VARIABLE("flightDistanceOfGrandDaughter(daughterN)", flightDistanceOfGrandDaughter,
     //                  "Returns the flight distance between mother and daughter particle");

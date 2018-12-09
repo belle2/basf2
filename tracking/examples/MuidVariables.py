@@ -21,10 +21,10 @@
 ########################################################
 
 import basf2 as b2
+import generators as gen
 import simulation as sim
 import reconstruction as rec
 import modularAnalysis as ma
-from ROOT import Belle2
 
 # Load the tracking libraries
 # Fundamental for using the Muid variables!
@@ -48,11 +48,8 @@ main.add_module('ProgressBar')
 
 use_KKMC = True
 if use_KKMC:  # Use KKMC to generate generic mu+mu- events
-    main.add_module('KKGenInput',
-                    tauinputFile=Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'),
-                    KKdefaultFile=Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'),
-                    taudecaytableFile='',
-                    kkmcoutputfilename='output.kkmc.dat')
+    gen.add_kkmc_generator(finalstate='mu+mu-',
+                           path=main)
 else:  # Use ParticleGun to generate 4GeV mu+ and mu-
     main.add_module('ParticleGun',
                     nTracks=1,
@@ -60,7 +57,7 @@ else:  # Use ParticleGun to generate 4GeV mu+ and mu-
                     momentumGeneration='fixed',
                     momentumParams=[4],
                     thetaGeneration='uniformCos',
-                    thetaParams=[37, 130])
+                    thetaParams=[20, 47])
 
 # Add simulation and reconstruction
 # Note that we skip the trigger simulation in this example
@@ -78,7 +75,8 @@ ma.fillParticleList(
     path=main)
 
 # Select better muon-candidates requiring at least one hit after layer 3 of KLM
-ma.cutAndCopyList('mu+:klm',
+# Note that we are using a Muid variable
+ma.cutAndCopyList('mu+:muid',
                   'mu+:basic',
                   'muidHitLayer > 3',
                   path=main)
@@ -93,17 +91,21 @@ listOfVariables = ['p',
                    # Here we select some Muid variables
                    'muidMuonProbability',
                    'muidPionProbability',
+                   'muidMuonLogLikelihood',
+                   'muidPionLogLikelihood',
                    'muidOutcomeExtTrack',
                    'muidHitLayer',
                    'muidExtLayer',
+                   'muidHitLayerPattern',
+                   'muidExtLayerPattern',
                    # Here we select some KLMCluster variables
                    'klmClusterIsBKLM',
                    'klmClusterInnermostLayer',
                    'klmClusterLayers']
-ma.variablesToNtuple('mu+:klm',
+ma.variablesToNtuple('mu+:muid',
                      listOfVariables,
                      filename='MuidVariables.root',
-                     treename='muonKLM',
+                     treename='muons',
                      path=main)
 
 # Process the path

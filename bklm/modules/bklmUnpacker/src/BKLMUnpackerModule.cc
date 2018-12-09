@@ -101,7 +101,10 @@ void BKLMUnpackerModule::event()
   for (int i = 0; i < m_rawKLMs.getEntries(); i++) {
 
     if (m_rawKLMs[i]->GetNumEvents() != 1) {
-      B2DEBUG(1, "BKLMUnpackerModule:: RawKLM index " << i << " has more than one entry: " << m_rawKLMs[i]->GetNumEvents());
+      //B2DEBUG(1, "BKLMUnpackerModule:: RawKLM index " << i << " has more than one entry: " << m_rawKLMs[i]->GetNumEvents());
+      B2WARNING("BKLMUnpackerModule:: RawKLM has more than one entry"
+                << LogVar("RawKLM.Index:", i)
+                << LogVar("RawKLM.Entries", m_rawKLMs[i]->GetNumEvents()));
       continue;
     }
 
@@ -245,7 +248,7 @@ void BKLMUnpackerModule::event()
           } else {
             // found moduleId in the mapping
             moduleId = m_electIdToModuleId[electId];
-            B2DEBUG(1, " BKLMUnpackerModule:: electId: " << electId << " module: " << moduleId);
+            B2DEBUG(1, "BKLMUnpackerModule:: electId: " << electId << " module: " << moduleId);
 
             // only channel and inRpc flag are not set yet
           }
@@ -271,14 +274,16 @@ void BKLMUnpackerModule::event()
             bklmDigitOutOfRange->addRelationTo(bklmDigitRaw);
             bklmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
-            std::string message = "BKLMUnpackerModule:: channel number is out of range ";
+            std::string message = "BKLMUnpackerModule:: channel number is out of range";
             m_rejected[message] += 1;
             m_rejectedCount++;
             if (m_rejectedCount < 10) {
-              B2INFO("BKLMUnpackerModule:: channel number is out of range " << channel);
+              B2WARNING("BKLMUnpackerModule:: channel number is out of range"
+                        << LogVar("Channel", channel));
             } else if (m_rejectedCount == 10) {
-              B2INFO("BKLMUnpackerModule:: channel number is out of range "
-                     << "(message will be suppressed now)");
+              B2WARNING("BKLMUnpackerModule:: channel number is out of range"
+                        << LogVar("Channel", channel)
+                        << " (message will be suppressed now)");
             }
             continue;
           }

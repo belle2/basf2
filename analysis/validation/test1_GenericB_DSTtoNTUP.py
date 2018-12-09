@@ -13,6 +13,7 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
+from stdV0s import *
 from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *

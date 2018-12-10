@@ -27,7 +27,6 @@
 
 // root
 #include <TRandom.h>
-#include <TH1F.h>
 
 
 using namespace std;
@@ -117,6 +116,29 @@ namespace Belle2 {
     // open root file for ntuple and histogram output
     m_file = TFile::Open(m_outFileName.c_str(), "RECREATE");
 
+    // histograms
+    for (unsigned module = 0; module < c_numModules; module++) {
+      int moduleID = module + 1;
+
+      std::string slotNum = std::to_string(moduleID);
+      if (moduleID < 10) slotNum = "0" + slotNum;
+
+      std::string name = "numHits_slot" + slotNum;
+      std::string title = "Number of hits per channel for slot " + slotNum;
+      TH1F h1(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels);
+      h1.SetXTitle("channel number");
+      h1.SetYTitle("hits per channel");
+      m_hits1D.push_back(h1);
+
+      name = "timeHits_slot" + slotNum;
+      title = "hit time vs. channel for slot " + slotNum;
+      TH2F h2(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels,
+              200, 0.0, 20.0);
+      h2.SetXTitle("channel number");
+      h2.SetYTitle("time [ns]");
+      m_hits2D.push_back(h2);
+    }
+
     // create output tree
 
     m_tree = new TTree("tree", "Channel T0 calibration results");
@@ -188,7 +210,7 @@ namespace Belle2 {
       if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
 
       // minimization procedure: accumulate
-      unsigned module = trk.getModuleID() - 1;
+      const unsigned module = trk.getModuleID() - 1;
       if (module >= c_numModules) continue;
       int sub = gRandom->Integer(2); // generate sub-sample number
       auto& finders = m_finders[sub][module];
@@ -202,6 +224,18 @@ namespace Belle2 {
           int pix = chMapper.getPixelID(channel) - 1;
           finders[channel].add(ibin, -2 * logL[pix]);
         }
+      }
+
+      // fill histograms of hits
+      for (const auto& digit : m_digits) {
+        if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+        if (digit.getModuleID() != trk.getModuleID()) continue;
+        if (digit.getTime() < timeMin) continue;
+        if (digit.getTime() > timeMax) continue;
+        auto& h1 = m_hits1D[module];
+        h1.Fill(digit.getChannel());
+        auto& h2 = m_hits2D[module];
+        h2.Fill(digit.getChannel(), digit.getTime());
       }
 
       // fill output tree
@@ -258,41 +292,71 @@ namespace Belle2 {
     h_pulls.Write();
     double scaleError = h_pulls.GetRMS();
 
-    // merge two statistically independent results and store into histograms
+    // merge two statistically independent finders and store results into histograms
 
     for (unsigned module = 0; module < c_numModules; module++) {
       int moduleID = module + 1;
 
       std::string slotNum = std::to_string(moduleID);
       if (moduleID < 10) slotNum = "0" + slotNum;
-      std::string name, title;
 
-      name = "valid_slot" + slotNum;
-      title = "status 'valid' for slot " + slotNum;
-      TH1F h_valid(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels);
-      h_valid.SetXTitle("channel number");
-      h_valid.SetYTitle("minimization status (1 = OK)");
-
-      name = "relT0_slot" + slotNum;
-      title = "channel T0 for slot " + slotNum;
-      TH1F h_relT0(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels);
-      h_relT0.SetXTitle("channel number");
-      h_relT0.SetYTitle("relative channel T0 [ns]");
+      std::string name = "channelT0_slot" + slotNum;
+      std::string title = "Relative channel T0 for slot " + slotNum;
+      TH1F h_channelT0(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels);
+      h_channelT0.SetXTitle("channel number");
+      h_channelT0.SetYTitle("relative channel T0 [ns]");
 
       for (unsigned channel = 0; channel < c_numChannels; channel++) {
         auto& finder = m_finders[0][module][channel].add(m_finders[1][module][channel]);
         const auto& minimum = finder.getMinimum();
-        h_valid.SetBinContent(channel + 1, minimum.valid);
         if (minimum.valid) {
-          h_relT0.SetBinContent(channel + 1, minimum.position);
-          h_relT0.SetBinError(channel + 1, minimum.error * scaleError);
+          h_channelT0.SetBinContent(channel + 1, minimum.position);
+          h_channelT0.SetBinError(channel + 1, minimum.error * scaleError);
         }
       }
 
-      h_relT0.Write();
-      h_valid.Write();
+      h_channelT0.Write();
 
     }
+
+    // merge all finders of a slot to find module T0
+
+    TH1F h_moduleT0("moduleT0", "Relative module T0",
+                    c_numModules, 0.5, c_numModules + 0.5);
+    h_moduleT0.SetXTitle("slot number");
+    h_moduleT0.SetYTitle("relative module T0 [ns]");
+    auto finderCommon = m_finders[0][0][0];
+    finderCommon.clear();
+    for (unsigned module = 0; module < c_numModules; module++) {
+      auto finder = m_finders[0][module][0];
+      finder.clear();
+      for (unsigned channel = 0; channel < c_numChannels; channel++) {
+        finder.add(m_finders[0][module][channel]);
+      }
+      finderCommon.add(finder);
+      const auto& minimum = finder.getMinimum();
+      if (minimum.valid) {
+        h_moduleT0.SetBinContent(module + 1, minimum.position);
+        h_moduleT0.SetBinError(module + 1, minimum.error * scaleError);
+      }
+    }
+    h_moduleT0.Write();
+
+    // find common T0
+
+    TH1F h_commonT0("commonT0", "Relative common T0", 1, 0, 1);
+    h_commonT0.SetYTitle("relative common T0 [ns]");
+    const auto& minimum = finderCommon.getMinimum();
+    if (minimum.valid) {
+      h_commonT0.SetBinContent(1, minimum.position);
+      h_commonT0.SetBinError(1, minimum.error * scaleError);
+    }
+    h_commonT0.Write();
+
+    // write other histograms and ntuple; close the file
+
+    for (auto& h : m_hits1D) h.Write();
+    for (auto& h : m_hits2D) h.Write();
 
     m_tree->Write();
     m_file->Close();

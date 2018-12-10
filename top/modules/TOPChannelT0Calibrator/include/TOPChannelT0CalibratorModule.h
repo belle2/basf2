@@ -21,9 +21,12 @@
 #include <top/utilities/Chi2MinimumFinder1D.h>
 
 #include <string>
+#include <vector>
 
-#include "TFile.h"
-#include "TTree.h"
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -110,6 +113,10 @@ namespace Belle2 {
 
     // output root file
     TFile* m_file = 0;                 /**< TFile */
+
+    // histograms
+    std::vector<TH1F> m_hits1D;  /**< number photon hits in a channel */
+    std::vector<TH2F> m_hits2D;  /**< hit times vs. channel */
 
     // tree and its variables
     TTree* m_tree = 0;  /**< TTree containing selected track parameters etc */

@@ -34,6 +34,13 @@ namespace Belle2 {
       m_chi2.resize(m_x.size(), 0);
     }
 
+    void Chi2MinimumFinder1D::clear()
+    {
+      for (auto& chi2 : m_chi2) chi2 = 0;
+      m_entries = 0;
+      m_searched = false;
+    }
+
 
     void Chi2MinimumFinder1D::add(unsigned i, double chi2)
     {

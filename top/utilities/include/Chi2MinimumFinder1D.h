@@ -63,13 +63,9 @@ namespace Belle2 {
       Chi2MinimumFinder1D(int nbins, double xmin, double xmax);
 
       /**
-       * Clear chi^2 values
+       * Set chi^2 values to zero
        */
-      void clear()
-      {
-        m_chi2.clear();
-        m_searched = false;
-      }
+      void clear();
 
       /**
        * Add chi^2 value to bin i

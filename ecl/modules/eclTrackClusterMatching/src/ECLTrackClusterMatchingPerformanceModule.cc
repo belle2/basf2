@@ -47,10 +47,8 @@ void ECLTrackClusterMatchingPerformanceModule::initialize()
   // MCParticles and Tracks needed for this module
   m_mcParticles.isRequired();
   m_tracks.isRequired();
-  m_recoTracks.isRequired();
   m_trackFitResults.isRequired();
   m_eclClusters.isRequired();
-  m_eclShowers.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -131,27 +129,21 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       m_trackProperties.y_gen = mcParticle.getVertex().Y();
       m_trackProperties.z_gen = mcParticle.getVertex().Z();
 
-      const RecoTrack* recoTrack = nullptr;
+      const Track* b2Track = nullptr;
       double maximumWeight = -2;
       // find highest rated Track
-      const auto& relatedRecoTracks = mcParticle.getRelationsWith<RecoTrack>();
-      for (unsigned int index = 0; index < relatedRecoTracks.size(); ++index) {
-        const RecoTrack* relatedRecoTrack = relatedRecoTracks.object(index);
-        const double weight = relatedRecoTracks.weight(index);
+      const auto& relatedTracks = mcParticle.getRelationsWith<Track>();
+      for (unsigned int index = 0; index < relatedTracks.size(); ++index) {
+        const Track* relatedTrack = relatedTracks.object(index);
+        const double weight = relatedTracks.weight(index);
 
-        const unsigned int numberOfRelatedTracks = relatedRecoTrack->getRelationsWith<Track>().size();
-        B2ASSERT("B2Track <-> RecoTrack is not a 1:1 relation as expected!", numberOfRelatedTracks <= 1);
-        // use only the fitted reco tracks
-        if (numberOfRelatedTracks == 1) {
-          if (weight > maximumWeight) {
-            maximumWeight = weight;
-            recoTrack = relatedRecoTrack;
-          }
+        if (weight > maximumWeight) {
+          maximumWeight = weight;
+          b2Track = relatedTrack;
         }
       }
 
-      if (recoTrack) {
-        const Track* b2Track = recoTrack->getRelated<Track>();
+      if (b2Track) {
         const TrackFitResult* fitResult = b2Track->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(pdgCode)));
         B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 

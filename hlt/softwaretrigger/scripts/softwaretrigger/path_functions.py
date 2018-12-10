@@ -105,6 +105,30 @@ def add_pxd_fullframe_phase2(path):
                         MinU=0, MaxU=249, MinV=0, MaxV=767)
 
 
+def add_pxd_fullframe_phase3(path):
+    list = [[1, 1, 1], [1, 1, 2], [1, 2, 1], [1, 2, 2], [1, 3, 1], [1, 3, 2], [1, 4, 1], [1, 4, 2],
+            [1, 5, 1], [1, 5, 2], [1, 6, 1], [1, 6, 2], [1, 7, 1], [1, 7, 2], [1, 8, 1], [1, 8, 2],
+            [2, 4, 1], [2, 4, 2], [2, 5, 1], [2, 5, 2]]
+
+    for (layer, ladder, sensor) in list:
+        path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
+                        Layer=layer, Ladder=ladder, Sensor=sensor,
+                        MinU=0, MaxU=249, MinV=0, MaxV=767)
+
+
+def add_pxd_fullframe_phase31(path):
+    list = [[1, 1, 1], [1, 1, 2], [1, 2, 1], [1, 2, 2], [1, 3, 1], [1, 3, 2], [1, 4, 1], [1, 4, 2],
+            [1, 5, 1], [1, 5, 2], [1, 6, 1], [1, 6, 2], [1, 7, 1], [1, 7, 2], [1, 8, 1], [1, 8, 2],
+            [2, 1, 1], [2, 1, 2], [2, 2, 1], [2, 2, 2], [2, 3, 1], [2, 3, 2], [2, 4, 1], [2, 4, 2],
+            [2, 5, 1], [2, 5, 2], [2, 6, 1], [2, 6, 2], [2, 7, 1], [2, 7, 2], [2, 8, 1], [2, 8, 2],
+            [2, 9, 1], [2, 9, 2], [2, 10, 1], [2, 10, 2], [2, 11, 1], [2, 11, 2], [2, 12, 1], [2, 12, 2]]
+
+    for (layer, ladder, sensor) in list:
+        path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
+                        Layer=layer, Ladder=ladder, Sensor=sensor,
+                        MinU=0, MaxU=249, MinV=0, MaxV=767)
+
+
 def add_roi_payload_assembler(path, alwaysAcceptEvents=True, SendAllDownscaler=0, RejectByZeroROI=False):
     # send allDownscaler is set to two in order to get event 2nd full hit data
     # and the other half still the full frame because all 4 modules of phase 2 have
@@ -330,7 +354,7 @@ def add_hlt_processing(path, run_type="collision",
         reconstruction.add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False, **kwargs)
         if roi_take_fullframe:
             # only working for phase 2 atm
-            add_pxd_fullframe_phase2(path)
+            add_pxd_fullframe_phase3(path)
             sendAllDS = 2
         else:
             # this will generate ROIs using the output of CDC and SVD track finder
@@ -479,7 +503,7 @@ def add_softwaretrigger_reconstruction(
 
     if roi_take_fullframe:
         # this feature only works for phase 2 atm.
-        add_pxd_fullframe_phase2(fast_reco_reconstruction_path)
+        add_pxd_fullframe_phase3(fast_reco_reconstruction_path)
 
     # Add fast reco reconstruction
     if softwaretrigger_mode in ['monitoring', 'fast_reco_filter', 'hlt_filter']:

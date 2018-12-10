@@ -3007,7 +3007,7 @@ namespace {
       Particle* newpi = particles.appendNew(pi);
 
 
-      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310);
+      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
       Ks.setVertex(TVector3(4.0, 5.0, 0.0));
       Ks.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
       momentum += Ks.get4Vector();
@@ -3027,7 +3027,7 @@ namespace {
       newKs->addRelationTo(newMCKs);
 
 
-      Particle Dp(momentum, 411);
+      Particle Dp(momentum, 411,  Particle::c_Unflavored, Particle::c_Composite, 0);
       Dp.appendDaughter(newpi);
       Dp.appendDaughter(newKs);
       TVector3 motherVtx(1.0, 1.0, 0.0);

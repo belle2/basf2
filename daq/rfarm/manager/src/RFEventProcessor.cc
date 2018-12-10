@@ -342,5 +342,13 @@ void RFEventProcessor::server()
   }
 }
 
+void RFEventProcessor::cleanup()
+{
+  printf("RFEventProcessor : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFEventProcessor: Done. Exitting\n");
+  exit(-1);
+}
+
 
 

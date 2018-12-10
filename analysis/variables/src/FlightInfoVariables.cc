@@ -51,13 +51,13 @@ namespace Belle2 {
       }
       if (!(particle->getParticleType() == Particle::EParticleType::c_Composite) ||
           !(daughter->getParticleType() == Particle::EParticleType::c_Composite)) {
-        B2WARNING("Attempting to calculate flightInfo variable for non composite particle");
+        B2WARNING("Attempting to calculate flight " << mode << " for non composite particle");
         outErr = -999;
         return -999;
       }
       if (!(mode == "distance") && !(mode == "time")) {
-        B2WARNING(boost::str(boost::format("FlightInfo helper function called with mode '%s'. Only 'distance' and 'time' are available.") %
-                             mode));
+        B2WARNING("FlightInfo helper function called with mode '" << mode
+                  << "'. Only 'distance' and 'time' are available.");
         outErr = -999;
         return -999;
       }

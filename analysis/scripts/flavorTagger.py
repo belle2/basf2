@@ -83,7 +83,7 @@ mlpFANNCombiner.m_scale_target = False
 signalFraction = -2
 
 # Maximal number of events to train each method
-maxEventsNumber = 500000
+maxEventsNumber = 0  # 0 takes all the sampled events. The number in the past was 500000
 
 # Definition of all available categories, 'standard category name':
 # ['ParticleList', 'trackLevel category name', 'eventLevel category name',
@@ -448,7 +448,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                     cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
                 else:
                     reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                    fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
+                    vertexKFit('K_S0:inRoe', 0.01, path=path, silence_warning=True)
                 readyParticleLists.append('K_S0:inRoe')
 
             if particleList == 'K+:inRoe':
@@ -462,7 +462,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 fillParticleList(
                     'p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
-                fitVertex(particleList, 0.01, fitter='kfitter', path=path)
+                vertexKFit(particleList, 0.01, path=path, silence_warning=True)
                 # if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)
@@ -1018,6 +1018,7 @@ def flavorTagger(
 
     if mode == 'Expert':
         removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
+
     elif mode == 'Sampler':
         removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
 

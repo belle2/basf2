@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import variables.utils as ut
+from flavorTagger import AvailableCategories
 
-#: Placehoder for FT variables collection
-#: BII-3853
-flavor_tagging = [
-    "qrOutput(FBDT)"]
+#: Replacement for FlavorTagging nTupleTool
+ut.cpp_variables.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
+ut.cpp_variables.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined']
+
+for iCategory in AvailableCategories:
+    aliasForQp = 'qp' + iCategory
+    aliasForTrueTarget = 'hasTrueTarget' + iCategory
+    aliasForIsRightCategory = 'isRightCategory' + iCategory
+    ut.cpp_variables.addAlias(aliasForQp, 'qpCategory(' + iCategory + ')')
+    ut.cpp_variables.addAlias(aliasForTrueTarget, 'hasTrueTargets(' + iCategory + ')')
+    ut.cpp_variables.addAlias(aliasForIsRightCategory, 'isTrueFTCategory(' + iCategory + ')')
+    flavor_tagging.append(aliasForQp)
+    flavor_tagging.append(aliasForTrueTarget)
+    flavor_tagging.append(aliasForIsRightCategory)
 
 
 #: Replacement for DeltaEMbc
@@ -224,8 +236,12 @@ mc_vertex = [
     'mcProdVertexY',
     'mcProdVertexZ']
 
-#: Tag-side related variables
+#: CPV and Tag-side related variables
 tag_vertex = [
+    'DeltaT',
+    'DeltaTErr',
+    'DeltaZ',
+    'DeltaBoost',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',

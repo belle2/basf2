@@ -3027,7 +3027,7 @@ namespace {
       newKs->addRelationTo(newMCKs);
 
 
-      Particle Dp(momentum, 411,  Particle::c_Unflavored, Particle::c_Composite, 0);
+      Particle Dp(momentum, 411, Particle::c_Flavored, Particle::c_Composite, 0);
       Dp.appendDaughter(newpi);
       Dp.appendDaughter(newKs);
       TVector3 motherVtx(1.0, 1.0, 0.0);

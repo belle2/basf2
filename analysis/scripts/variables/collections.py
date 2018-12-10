@@ -262,12 +262,6 @@ inv_mass = [
     'InvM'
 ]
 
-#: Replacement for MassBeforeFit tool
-mass_before_fit = [
-    'ErrM',
-    'InvM'
-]
-
 #: Extra energy variables
 extra_energy = ["ROE_eextra()"]
 

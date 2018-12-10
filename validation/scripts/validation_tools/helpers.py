@@ -94,6 +94,10 @@ def fix_root_command_line():
 
 
 def get_git_hashes_between(git_end_hash, git_start_hash):
+    """
+    Return list of git hashes between `git_end_hash` and `git_start_hash`
+    (but not including them).
+    """
     try:
         git_hashs = check_output(["git", "log", str(git_start_hash + ".." + git_end_hash),
                                   "--pretty=format:%H"]).decode("utf-8").split("\n")

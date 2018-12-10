@@ -117,7 +117,7 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
       tmpPXDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
       tmpPXDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
       tmpPXDIntercept.setLambda(lambda);
-      tmpPXDIntercept.setVxdID(itPlanes->getSensorInfo());
+      tmpPXDIntercept.setVxdID(itPlanes->getVxdID());
 
       interceptList->appendNew(tmpPXDIntercept);
 

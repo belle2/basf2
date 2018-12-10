@@ -33,8 +33,8 @@ SVDROIGeometry::~SVDROIGeometry()
 }
 
 void
-SVDROIGeometry::fillPlaneList(__attribute__((unused)) double toleranceZ,
-                              __attribute__((unused)) double tolerancePhi)
+SVDROIGeometry::fillPlaneList(double toleranceZ,
+                              double tolerancePhi)
 {
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
@@ -58,7 +58,7 @@ SVDROIGeometry::fillPlaneList(__attribute__((unused)) double toleranceZ,
       while (itSvdSensors != svdSensors.end()) {
         B2DEBUG(1, "    svd sensor info " << *itSvdSensors);
 
-        ROIDetPlane plane(*itSvdSensors);//, toleranceZ, tolerancePhi);
+        ROIDetPlane plane(*itSvdSensors, toleranceZ, tolerancePhi);
         genfit::SharedPlanePtr sharedPlane(new ROIDetPlane(plane));
         plane.setSharedPlanePtr(sharedPlane);
 
@@ -96,7 +96,7 @@ SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVe
   B2DEBUG(1, " ..--list of sensor IDs of the selected planes for this track:");
   itPlanes = selectedPlanes->begin();
   while (itPlanes != selectedPlanes->end()) {
-    B2DEBUG(1, "     " << (itPlanes->getSensorInfo()));
+    B2DEBUG(1, "     " << (itPlanes->getVxdID()));
     itPlanes++;
   }
 

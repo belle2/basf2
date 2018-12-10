@@ -118,7 +118,7 @@ SVDInterceptor::appendIntercepts(StoreArray<SVDIntercept>* interceptList, std::l
       tmpSVDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
       tmpSVDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
       tmpSVDIntercept.setLambda(lambda);
-      tmpSVDIntercept.setVxdID(itPlanes->getSensorInfo());
+      tmpSVDIntercept.setVxdID(itPlanes->getVxdID());
       tmpSVDIntercept.setUprime(predictedIntersect[1]);
       tmpSVDIntercept.setVprime(predictedIntersect[2]);
 

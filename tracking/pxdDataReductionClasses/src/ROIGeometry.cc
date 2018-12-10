@@ -98,7 +98,7 @@ ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVecto
   B2DEBUG(1, " list of sensor IDs of the selected planes for this track:");
   itPlanes = selectedPlanes->begin();
   while (itPlanes != selectedPlanes->end()) {
-    B2DEBUG(1, "     " << (itPlanes->getSensorInfo()));
+    B2DEBUG(1, "     " << (itPlanes->getVxdID()));
     itPlanes++;
   }
 

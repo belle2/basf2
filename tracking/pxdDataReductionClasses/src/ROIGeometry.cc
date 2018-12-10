@@ -55,10 +55,10 @@ ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
 
       std::set<Belle2::VxdID> pxdSensors = aGeometry.getSensors(*itPxdLadders);
       std::set<Belle2::VxdID>::iterator itPxdSensors = pxdSensors.begin();
-      B2DEBUG(1, "    pxd sensor info " << * (pxdSensors.begin()));
+      B2DEBUG(20, "    pxd sensor info " << * (pxdSensors.begin()));
 
       while (itPxdSensors != pxdSensors.end()) {
-        B2DEBUG(1, "    pxd sensor info " << *itPxdSensors);
+        B2DEBUG(20, "    pxd sensor info " << *itPxdSensors);
 
         ROIDetPlane plane(*itPxdSensors, toleranceZ, tolerancePhi);
         genfit::SharedPlanePtr sharedPlane(new ROIDetPlane(plane));
@@ -73,7 +73,7 @@ ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
     ++itPxdLayers;
   }
 
-  B2DEBUG(1, "just filled the plane list with " << m_planeList.size() << "planes");
+  B2DEBUG(20, "just filled the plane list with " << m_planeList.size() << "planes");
 };
 
 
@@ -84,7 +84,7 @@ ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVecto
 
   std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
 
-  B2DEBUG(1, "append Planes, checking " << m_planeList.size() << " planes");
+  B2DEBUG(20, "append Planes, checking " << m_planeList.size() << " planes");
 
   while (itPlanes != m_planeList.end()) {
 
@@ -95,10 +95,10 @@ ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVecto
 
   }
 
-  B2DEBUG(1, " list of sensor IDs of the selected planes for this track:");
+  B2DEBUG(20, " list of sensor IDs of the selected planes for this track:");
   itPlanes = selectedPlanes->begin();
   while (itPlanes != selectedPlanes->end()) {
-    B2DEBUG(1, "     " << (itPlanes->getVxdID()));
+    B2DEBUG(20, "     " << (itPlanes->getVxdID()));
     itPlanes++;
   }
 

@@ -41,33 +41,33 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* interceptList, const
 
   for (int i = 0; i < trackList.getEntries(); ++i) { //loop over all tracks
 
-    B2DEBUG(1, " %%%%%  track candidate Nr. : " << i + 1);
+    B2DEBUG(20, " %%%%%  track candidate Nr. : " << i + 1);
 
     if (! trackList[i] ->wasFitSuccessful()) {
-      B2DEBUG(1, "%%%%% Fit not successful! discard this RecoTrack");
+      B2DEBUG(20, "%%%%% Fit not successful! discard this RecoTrack");
       continue;
     }
 
     // extrapolate track to cylinders (PXD layers 1 and 2)
     for (unsigned int pxdLayer = 0; pxdLayer < pxdLayers.size(); pxdLayer++) {
 
-      B2DEBUG(1, " fill intercept List, Layer: " << pxdLayer);
+      B2DEBUG(20, " fill intercept List, Layer: " << pxdLayer);
       // get current state of track
       genfit::MeasuredStateOnPlane gfTrackState = trackList[i]->getMeasuredStateOnPlaneFromFirstHit();
 
       try {
         gfTrackState.extrapolateToCylinder(m_pxdLayerRadius[pxdLayer]);
       }  catch (...) {
-        B2DEBUG(1, "extrapolation to cylinder failed");
+        B2DEBUG(20, "extrapolation to cylinder failed");
         continue;
       }
 
       std::list<ROIDetPlane> selectedPlanes;
-      B2DEBUG(1, "    append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
+      B2DEBUG(20, "    append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
               gfTrackState.getPos().Z());
       m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, gfTrackState.getPos(), pxdLayer + 1);
 
-      B2DEBUG(1, "    append intercepts for track " << i);
+      B2DEBUG(20, "    append intercepts for track " << i);
       appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToPXDIntercepts);
     } //loop on layers
   } //loop on the track list
@@ -86,7 +86,7 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
 
   std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
 
-  B2DEBUG(1, "appendIntercepts, checking " << planeList.size() << " planes");
+  B2DEBUG(20, "appendIntercepts, checking " << planeList.size() << " planes");
 
   double lambda = 0;
 
@@ -102,7 +102,7 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
         state = gfTrack.getFittedState();
         lambda = state.extrapolateToPlane(itPlanes->getSharedPlanePtr());
       }  catch (...) {
-        B2DEBUG(1, "extrapolation to plane failed");
+        B2DEBUG(20, "extrapolation to plane failed");
         ++itPlanes;
         continue;
       }

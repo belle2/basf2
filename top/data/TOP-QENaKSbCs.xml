@@ -4,29 +4,29 @@
   <ColEffi descr="average over all PMTs for 1.5 T">0.5677</ColEffi>
   <LambdaFirst unit="nm">280.0</LambdaFirst>
   <LambdaStep unit="nm">20.0</LambdaStep>
-  <Qeffi>0.211</Qeffi>
-  <Qeffi>0.228</Qeffi>
-  <Qeffi>0.248</Qeffi>
-  <Qeffi>0.271</Qeffi>
-  <Qeffi>0.292</Qeffi>
-  <Qeffi>0.285</Qeffi>
-  <Qeffi>0.271</Qeffi>
-  <Qeffi>0.241</Qeffi>
-  <Qeffi>0.206</Qeffi>
-  <Qeffi>0.173</Qeffi>
-  <Qeffi>0.145</Qeffi>
-  <Qeffi>0.122</Qeffi>
-  <Qeffi>0.103</Qeffi>
-  <Qeffi>0.087</Qeffi>
-  <Qeffi>0.073</Qeffi>
-  <Qeffi>0.061</Qeffi>
-  <Qeffi>0.051</Qeffi>
-  <Qeffi>0.043</Qeffi>
-  <Qeffi>0.035</Qeffi>
-  <Qeffi>0.028</Qeffi>
-  <Qeffi>0.022</Qeffi>
+  <Qeffi>0.22</Qeffi>
+  <Qeffi>0.238</Qeffi>
+  <Qeffi>0.258</Qeffi>
+  <Qeffi>0.281</Qeffi>
+  <Qeffi>0.304</Qeffi>
+  <Qeffi>0.296</Qeffi>
+  <Qeffi>0.281</Qeffi>
+  <Qeffi>0.25</Qeffi>
+  <Qeffi>0.214</Qeffi>
+  <Qeffi>0.179</Qeffi>
+  <Qeffi>0.151</Qeffi>
+  <Qeffi>0.127</Qeffi>
+  <Qeffi>0.107</Qeffi>
+  <Qeffi>0.09</Qeffi>
+  <Qeffi>0.075</Qeffi>
+  <Qeffi>0.064</Qeffi>
+  <Qeffi>0.053</Qeffi>
+  <Qeffi>0.044</Qeffi>
+  <Qeffi>0.036</Qeffi>
+  <Qeffi>0.029</Qeffi>
+  <Qeffi>0.023</Qeffi>
   <Qeffi>0.017</Qeffi>
-  <Qeffi>0.012</Qeffi>
+  <Qeffi>0.013</Qeffi>
   <Qeffi>0.009</Qeffi>
-  <Qeffi>0.006</Qeffi>
+  <Qeffi>0.007</Qeffi>
 </QE>

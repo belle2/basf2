@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef VERTEXFITKFIT_H
-#define VERTEXFITKFIT_H
-
+#pragma once
 
 #include <framework/logging/Logger.h>
 
@@ -45,6 +42,11 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setInitialVertex(const HepPoint3D& v);
+      /** Set an initial vertex point for the mass-vertex constraint fit.
+       * @param v initial vertex point
+       * @return error code (zero if success)
+       */
+      enum KFitError::ECode       setInitialVertex(const TVector3& v);
       /** Set an IP-ellipsoid shape for the vertex-vertex constraint fit.
        * @param ip IP position
        * @param ipe error matrix of the IP
@@ -107,6 +109,11 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
       /** Perform a standard vertex-constraint fit including IP-tube constraint.
@@ -179,6 +186,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* VERTEXFITKFIT_H */
-

@@ -20,6 +20,12 @@
 #include <map>
 
 namespace Belle2 {
+  /**
+   * Class to monitor all started framework processes (input, workers, output),
+   * kill them if requested and handle the signals from the OS.
+   *
+   * Is used in the ZMQ event processor and can only be used together with ZMQ.
+   */
   class ProcessMonitor {
   public:
     /// Start listening for process management information on the given address.

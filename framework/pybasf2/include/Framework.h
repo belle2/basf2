@@ -45,14 +45,14 @@ namespace Belle2 {
      *
      * @param path The module search path which should be added to the list of paths.
     */
-    void addModuleSearchPath(const std::string& path);
+    static void addModuleSearchPath(const std::string& path);
 
     /**
      * Sets the path in which the externals of the framework are located.
      *
      * @param path The path in which the externals of the framework are located.
     */
-    void setExternalsPath(const std::string& path);
+    static void setExternalsPath(const std::string& path);
 
     /**
      * Registers a new module to the framework and returns a shared pointer.
@@ -66,7 +66,7 @@ namespace Belle2 {
      * @param moduleName The unique name of the module which should be created.
      * @return A shared pointer of the newly created and registered module.
      */
-    ModulePtr registerModule(const std::string& moduleName);
+    static ModulePtr registerModule(const std::string& moduleName);
 
     /**
      * Registers a new module to the framework and returns a shared pointer.
@@ -81,7 +81,7 @@ namespace Belle2 {
      * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file !).
      * @return A shared pointer of the newly created and registered module.
      */
-    ModulePtr registerModule(const std::string& moduleName, const std::string& sharedLibPath);
+    static ModulePtr registerModule(const std::string& moduleName, const std::string& sharedLibPath);
 
     /**
      * Processes up to maxEvent events by starting with the first module in the specified path.
@@ -92,39 +92,64 @@ namespace Belle2 {
      * @param startPath The processing starts with the first module of this path.
      * @param maxEvent The maximum number of events that will be processed. If the number is smaller than 1, all events will be processed (default).
      */
-    void process(PathPtr startPath, long maxEvent = 0);
+    static void process(PathPtr startPath, long maxEvent = 0);
 
     /**
      * Function to set number of worker processes for parallel processing.
     */
-    void setNumberProcesses(int numProcesses);
+    static void setNumberProcesses(int numProcesses);
 
     /**
      * Function to get number of worker processes for parallel processing.
     */
-    int getNumberProcesses() const;
+    static int getNumberProcesses();
 
     /**
      * Function to set the path to the file where the pickled path is stored
      *
      * @param path path to file where the pickled path is stored
     */
-    void setPicklePath(std::string path);
+    static void setPicklePath(std::string path);
 
     /**
      * Function to get the path to the file where the pickled path is stored
      *
      * @return path to file where the pickled path is stored
     */
-    std::string getPicklePath() const;
+    static std::string getPicklePath();
 
     /**
      * Function to set streaming objects for Tx module
      *
      * @param streamingObjects objects to be streamed
     */
-    void setStreamingObjects(boost::python::list streamingObjects);
+    static void setStreamingObjects(boost::python::list streamingObjects);
 
+
+    /** Find a file. This is a wrapper around FileSystem::findFile() to be able
+     * to call it nicely from python and create a `FileNotFoundError` if the
+     * file cannot be found.
+     *
+     * Known types:
+     *
+     * - empty string: exactly like `FileSystem::findFile`, look in $BELLE2_LOCAL_DIR
+     *   and then $BELLE2_RELEASE_DIR and then relative to local dir
+     * - 'examples': look for example data in $BELLE2_EXAMPLES_DATA_DIR, then
+     *   in $VO_BELLE2_SW_DIR/examples-data, then relative to the local directory
+     * - 'validation': look for validation data in $BELLE2_VALIDATION_DATA_DIR, then
+     *   in $VO_BELLE2_SW_DIR/validation-data, then relative to the local directory
+     *
+     * @param filename relative filename to look for, either in a central place
+     *        or in the current working directory
+     * @param type if set, specifies where to look if the file cannot be found
+     *        locally
+     * @param ignore_errors if true don't print any errors and silently return
+     *        None. Otherwise this function will raise a FileNotFoundError
+     *        exception if the file cannot be found.
+     * @return relative or absolute filename if found, Emprt string if not
+     *        found and ignore_errors is true
+     */
+    static std::string findFile(const std::string& filename, const std::string& type, bool ignore_errors = false);
 
     //--------------------------------------------------
     //                   Python API
@@ -135,30 +160,26 @@ namespace Belle2 {
      *
      * @return A python list containing all module search paths known to the framework.
      */
-    boost::python::list getModuleSearchPathsPython() const;
+    static boost::python::list getModuleSearchPathsPython();
 
     /**
      * Returns a dictionary containing the found modules and the filenames of the shared libraries in which they can be found.
      *
      * @return A python dictionary dictionary containing the found modules.
      */
-    boost::python::dict getAvailableModulesPython() const;
+    static boost::python::dict getAvailableModulesPython();
 
     /**
      * Returns a list of all registered modules.
      *
      * @return A python list containing all registered modules.
      */
-    boost::python::list getRegisteredModulesPython() const;
+    static boost::python::list getRegisteredModulesPython();
 
     /**
      * Exposes methods of the Framework class to Python.
      */
     static void exposePythonAPI();
-
-
-  protected:
-
   };
 
 } //end of namespace Belle2

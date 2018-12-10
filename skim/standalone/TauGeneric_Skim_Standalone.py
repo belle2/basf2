@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -11,43 +11,37 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from stdLightMesons import *
-from stdPi0s import *
-from stdV0s import *
 from skimExpertFunctions import *
+
 set_log_level(LogLevel.INFO)
+gb2_setuprel = 'release-02-00-01'
 
-gb2_setuprel = 'release-02-00-00'
-
+skimCode = encodeSkimName('TauGeneric')
 import sys
 import os
 import glob
-skimCode = encodeSkimName('TauGeneric')
+
+taugenericskim = Path()
+
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
+inputMdstList('MC9', fileList, path=taugenericskim)
 
-inputMdstList('MC9', fileList)
-
-stdPi0s('loose')
-loadStdCharged()
-loadStdSkimPhoton()
-loadStdSkimPi0()
-loadStdKS()
-stdPhotons('loose')
-loadStdLightMesons()
+stdPi('all', path=taugenericskim)
+stdPhotons('all', path=taugenericskim)
 
 # Tau Skim
-from TauGeneric_List import *
-tauList = TauList()
+from skim.taupair import *
+tauList = TauList(path=taugenericskim)
 
-skimOutputUdst(skimCode, tauList)
-summaryOfLists(tauList)
+skimOutputUdst(skimCode, tauList, path=taugenericskim)
+summaryOfLists(tauList, path=taugenericskim)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=taugenericskim)
+process(taugenericskim)
 
 # print out the summary
 print(statistics)

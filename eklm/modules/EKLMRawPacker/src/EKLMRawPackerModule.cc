@@ -41,7 +41,6 @@ void EKLMRawPackerModule::beginRun()
 
 void EKLMRawPackerModule::event()
 {
-  int n_Gdidgits = 0;
   const EKLMDataConcentratorLane* lane;
   int i, j, k, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
   vector<uint32_t> dataWords[4][4]; // Indices: copper - 1, data concentrator.
@@ -49,7 +48,6 @@ void EKLMRawPackerModule::event()
   uint32_t buf[2];
   uint16_t bword1, bword2, bword3, bword4;
   RawCOPPERPackerInfo packerInfo;
-  RawKLM* rawKlm;
   EKLMDigit* eklmDigit;
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
@@ -57,7 +55,6 @@ void EKLMRawPackerModule::event()
     eklmDigit = m_Digits[i];
     if (!(eklmDigit->isGood()))
       continue;
-    n_Gdidgits++;
     buf[0] = 0;
     buf[1] = 0;
     bword1 = 0;
@@ -69,7 +66,7 @@ void EKLMRawPackerModule::event()
     sector = eklmDigit->getSector();
     sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
-    if (lane == NULL)
+    if (lane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
     formatData(lane, eklmDigit->getPlane(),
                eklmDigit->getStrip(), eklmDigit->getCharge(),
@@ -94,7 +91,7 @@ void EKLMRawPackerModule::event()
     packerInfo.tt_ctime = 0;
     packerInfo.tt_utime = 0;
     packerInfo.b2l_ctime = 0;
-    rawKlm = m_RawKLMs.appendNew();
+    RawKLM* rawKlm = m_RawKLMs.appendNew();
     for (j = 0; j < 4; j++) {
       nWords[j] = dataWords[i][j].size();
       detectorBuf[j] = new int[nWords[j] + 1];

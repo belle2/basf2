@@ -27,6 +27,9 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#ifdef ALIGNMENT_USING_BHABHA
+#include <mdst/dataobjects/ECLCluster.h>
+#endif
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -80,9 +83,16 @@ namespace Belle2 {
     m_tree->Branch("evt", &m_arich.evt, "evt/I");
     m_tree->Branch("run", &m_arich.run, "run/I");
 
+    m_tree->Branch("charge", &m_arich.charge, "charge/S");
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
     m_tree->Branch("d0", &m_arich.z0, "pValue/F");
     m_tree->Branch("z0", &m_arich.d0, "pValue/F");
+
+#ifdef ALIGNMENT_USING_BHABHA
+    m_tree->Branch("eop", &m_arich.eop, "eop/F");
+    m_tree->Branch("e9e21", &m_arich.e9e21, "e9e21/F");
+    m_tree->Branch("etot", &m_arich.etot, "etot/F");
+#endif
 
     m_tree->Branch("PDG", &m_arich.PDG, "PDG/I");
     m_tree->Branch("motherPDG", &m_arich.motherPDG, "motherPDG/I");
@@ -136,6 +146,23 @@ namespace Belle2 {
 
     if (!m_arichTracks.isValid()) return;
 
+#ifdef ALIGNMENT_USING_BHABHA
+    double E_tot = 0.;
+    StoreArray<ECLCluster> eclClusters;
+    for (const auto& trk : m_tracks) {
+      const ECLCluster* eclTrack = trk.getRelated<ECLCluster>();
+      if (eclTrack) {
+        if (eclTrack->getEnergy() > 0.1) E_tot += eclTrack->getEnergy();
+      }
+    }
+    for (const auto& cluster : eclClusters) {
+      if (!cluster.isNeutral()) continue;
+      if (cluster.getHypothesisId() != 5 && cluster.getHypothesisId() != 1)
+        continue;
+      if (cluster.getEnergy() > 0.1) E_tot += cluster.getEnergy();
+    }
+#endif
+
     for (const auto& arichTrack : m_arichTracks) {
 
       const ARICHLikelihood* lkh = arichTrack.getRelated<ARICHLikelihood>();
@@ -167,6 +194,9 @@ namespace Belle2 {
 
       m_arich.detPhot = lkh->getDetPhot();
 
+#ifdef ALIGNMENT_USING_BHABHA
+      m_arich.etot = E_tot;
+#endif
       m_arich.status = 1;
 
       m_arich.trgtype = 0;
@@ -183,8 +213,17 @@ namespace Belle2 {
         if (fitResult) {
           m_arich.pValue = fitResult->getPValue();
           TVector3 trkPos = fitResult->getPosition();
+          m_arich.charge = fitResult->getChargeSign();
           m_arich.z0 = trkPos.Z();
           m_arich.d0 = (trkPos.XYvector()).Mod();
+#ifdef ALIGNMENT_USING_BHABHA
+          TVector3 trkMom = fitResult->getMomentum();
+          const ECLCluster* eclTrack = mdstTrack->getRelated<ECLCluster>();
+          if (eclTrack) {
+            m_arich.eop = eclTrack->getEnergy() / trkMom.Mag();
+            m_arich.e9e21 = eclTrack->getE9oE21();
+          }
+#endif
         }
         m_arich.status += 10;
         int fromARICHMCP = 0;

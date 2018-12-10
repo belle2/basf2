@@ -37,11 +37,11 @@ _85_functions = {
 
 #: the stdLoose functions
 _loose_functions = {
-    stdCharged.stdLoosePi,
-    stdCharged.stdLooseK,
-    stdCharged.stdLoosePr,
-    stdCharged.stdLooseE,
-    stdCharged.stdLooseMu
+    stdCharged.stdPi,
+    stdCharged.stdK,
+    stdCharged.stdPr,
+    stdCharged.stdE,
+    stdCharged.stdMu
 }
 
 #: the default particle list loaded
@@ -107,7 +107,7 @@ class TestStdCharged(unittest.TestCase):
 
     def test_loose(self):
         """check that all functions can be called with no argument"""
-        self._check_function_call(_loose_functions, expectedlist="loose")
+        self._check_listtype_exists("loose")
 
     def test_all_list(self):
         """check that the builder functions all work with the all list"""

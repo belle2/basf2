@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef RaveKinematicVertexFitter_H
-#define RaveKinematicVertexFitter_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
@@ -188,4 +186,3 @@ namespace Belle2 {
 
 }
 
-#endif

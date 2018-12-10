@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLECLUSTERTOOL_H
-#define NTUPLECLUSTERTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -54,8 +53,8 @@ namespace Belle2 {
     /**  ratio of energies in central cell and 3x3 cells */
     float* m_e1e9;
 
-    /**  cluster hadron scintillation component intensity*/
-    float* m_ClusterHadronIntensity;
+    /**  Pulse Shape Discrimination based MVA classifier*/
+    float* m_PulseShapeDiscriminationMVA;
 
     /**  number of cluster digits with significant (>3 MeV) hadron component light output*/
     float* m_NumberOfHadronDigits;
@@ -95,4 +94,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLECLUSTERTOOL_H

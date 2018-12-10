@@ -19,8 +19,8 @@ namespace Belle2 {
 
   class V0DaughterMassUpdaterModule : public Module {
   private:
-    /**PDG code for V0's daughters*/
-    int m_pdg_pos_dau, m_pdg_neg_dau;
+    int m_pdg_pos_dau; /**< PDG code for V0's positive daughter */
+    int m_pdg_neg_dau; /**< PDG code for V0's negative daughter */
 
     /** Name of the lists */
     std::vector<std::string> m_strParticleLists;

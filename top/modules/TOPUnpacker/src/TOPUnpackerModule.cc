@@ -100,7 +100,7 @@ namespace Belle2 {
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
-    if (mapSize == 0) B2ERROR("No front-end mapping available for TOP");
+    if (mapSize == 0) B2ERROR("TOPUnpacker: No front-end mapping available for TOP");
 
   }
 
@@ -145,15 +145,13 @@ namespace Belle2 {
             if (evtMetaData->getExperiment() == 1) { // all exp.1 data was taken with interim format
               dataFormat = 0x0301;
               m_swapBytes = true;
-              // NOTE: we need to add extra clauses if there are GCR runs between
-              // phases II and III. (See pull request #644 for more details)
             } else {
               if (unpackHeadersInterimFEVer01(buffer, bufferSize, true)) { //if buffer unpacks without errors assuming it's interim format
                 B2DEBUG(200, "Assuming interim FW data format");
                 dataFormat = 0x0301; //assume it's interim format
                 m_swapBytes = true;
               } else {
-                B2ERROR("Could not establish data format.");
+                B2ERROR("TOPUnpacker: Could not establish data format.");
               }
             }
           }
@@ -173,18 +171,22 @@ namespace Belle2 {
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize);
             break;
-          case static_cast<int>(TOP::RawDataType::c_ProductionDebug):
-            err = unpackProdDebug(buffer, bufferSize, true);
+          case static_cast<int>(TOP::RawDataType::c_ProductionDebug01):
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true);
+            break;
+          case static_cast<int>(TOP::RawDataType::c_ProductionDebug02):
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true);
             break;
 
           default:
-            B2ERROR("TOPUnpacker: unknown data format, Type = " <<
-                    (dataFormat >> 8) << ", Version = " <<
-                    (dataFormat & 0xFF));
+            B2ERROR("TOPUnpacker: unknown data format."
+                    << LogVar("Type", (dataFormat >> 8))
+                    << LogVar("Version", (dataFormat & 0xFF)));
         }
 
         if (err != 0)
-          B2ERROR("TOPUnpacker: " << err << " words of data buffer not used");
+          B2ERROR("TOPUnpacker: extra or missing words in data buffer."
+                  << LogVar("Difference", err));
 
       } // finesse loop
     } // m_rawData loop
@@ -200,7 +202,8 @@ namespace Belle2 {
     unsigned short scrodID = buffer[0] & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
     if (!feemap) {
-      B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+      B2ERROR("TOPUnpacker: no front-end map available."
+              << LogVar("SCROD ID", scrodID));
       return;
     }
     int moduleID = feemap->getModuleID();
@@ -239,8 +242,8 @@ namespace Belle2 {
     unsigned last = array.getLastWord();
     int Nhits = last & 0x01FF;
     if (bufferSize != 5 * Nhits + 2) {
-      B2ERROR("TOPUnpacker: corrupted data (feature-extraction format) for SCROD ID = "
-              << scrodID);
+      B2ERROR("TOPUnpacker: corrupted data (feature-extraction format)."
+              << LogVar("SCROD ID", scrodID));
       return;
     }
 
@@ -299,8 +302,8 @@ namespace Belle2 {
 
     DataArray array(buffer, bufferSize, swapBytes);
 
-    unsigned word = array.getWord(); // header word 0
-    word = array.getWord(); // header word 1 (what it contains?)
+    array.getWord(); // header word 0
+    array.getWord(); // header word 1 (what it contains?)
     while (array.getRemainingWords() > 0) {
       unsigned header = array.getWord(); // word 0
       if ((header & 0xFF) == 0xBE) { //this is a super short FE header
@@ -312,42 +315,42 @@ namespace Belle2 {
       }
 
 
-      word = array.getWord(); // word 1
-      word = array.getWord(); // word 2
+      array.getWord(); // word 1
+      array.getWord(); // word 2
 
       if (header != 0xaaaa0104) {
         // feature-extracted data (positive signal)
-        word = array.getWord(); // word 3
-        word = array.getWord(); // word 4
-        word = array.getWord(); // word 5
-        word = array.getWord(); // word 6
-        word = array.getWord(); // word 7
-        word = array.getWord(); // word 8
-        word = array.getWord(); // word 9
-        word = array.getWord(); // word 10
-        word = array.getWord(); // word 11
-        word = array.getWord(); // word 12
-        word = array.getWord(); // word 13
-        word = array.getWord(); // word 14
+        array.getWord(); // word 3
+        array.getWord(); // word 4
+        array.getWord(); // word 5
+        array.getWord(); // word 6
+        array.getWord(); // word 7
+        array.getWord(); // word 8
+        array.getWord(); // word 9
+        array.getWord(); // word 10
+        array.getWord(); // word 11
+        array.getWord(); // word 12
+        array.getWord(); // word 13
+        array.getWord(); // word 14
       }
 
-      word = array.getWord(); // word 15
-      if (word != 0x7473616c) {//invalid magic word
+      unsigned magicWord = array.getWord(); // word 15
+      if (magicWord != 0x7473616c) {//invalid magic word
         return false; //abort
       }
 
       if (header != 0xaaaa0103) continue;
-      word = array.getWord(); // word 16
+      array.getWord(); // word 16
 
-      word = array.getWord(); // word 17
-      word = array.getWord(); // word 18
-      word = array.getWord(); // word 19
+      array.getWord(); // word 17
+      array.getWord(); // word 18
+      array.getWord(); // word 19
 
-      word = array.getWord(); // word 20
+      array.getWord(); // word 20
 
-      word = array.getWord(); // word 21
+      array.getWord(); // word 21
 
-      word = array.getWord(); // word 22
+      array.getWord(); // word 22
 
       int numWords = 4 * 32; // (numPoints + 1) / 2;
       if (array.getRemainingWords() < numWords) { //not enough remaining words for waveform data
@@ -355,7 +358,7 @@ namespace Belle2 {
       }
 
       for (int i = 0; i < numWords; i++) {
-        word = array.getWord();
+        array.getWord();
       }
     }
 
@@ -409,13 +412,17 @@ namespace Belle2 {
           moduleID = feemap->getModuleID();
           boardstack = feemap->getBoardstackNumber();
         } else {
-          B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+          B2ERROR("TOPUnpacker: no front-end map available."
+                  << LogVar("SCROD ID", scrodID_SSFE));
           info->setErrorFlag(TOPInterimFEInfo::c_InvalidScrodID);
         }
 
         if (scrodID_SSFE != scrodID) {
-          B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and super short FE header. SCROD: " << scrodID_SSFE << " (slot "
-                  << moduleID << " BS " << boardstack << ")");
+          B2ERROR("TOPUnpacker: corrupted data - "
+                  << "different scrodID's in HLSB and super short FE header."
+                  << LogVar("SCROD", scrodID_SSFE)
+                  << LogVar("slot", moduleID)
+                  << LogVar("BS", boardstack));
           B2DEBUG(100, "Different scrodID's in HLSB and FE header: " << scrodID << " " << scrodID_SSFE << " word = 0x" << std::hex << word);
           info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
           return array.getRemainingWords();
@@ -451,9 +458,10 @@ namespace Belle2 {
       evtNumCounter[evtNum_FEheader] += 1;
 
       if (scrodID_FE != scrodID) {
-        B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
-        B2ERROR("Different scrodID's in HLSB and FE header: "
-                << scrodID << " " << scrodID_FE << " word = 0x" << std::hex << word);
+        B2ERROR("TOPUnpacker: different scrodID's in HLSB and FE header."
+                << LogVar("scrodID (HSLB)", scrodID)
+                << LogVar("scrodID (FE)", scrodID_FE));
+
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
         return array.getRemainingWords();
       }
@@ -476,7 +484,7 @@ namespace Belle2 {
 
       if (header != 0xaaaa0104) {
         // feature-extracted data (positive signal)
-        word = array.getWord(); // word 3
+        array.getWord(); // word 3
         word = array.getWord(); // word 4
         short samplePeak_p = word & 0xFFFF;
         short valuePeak_p = (word >> 16) & 0xFFFF;
@@ -498,21 +506,25 @@ namespace Belle2 {
         //      short qualityFlags_p = (word >> 16) & 0xFFFF;
 
         // feature-extracted data (negative signal)
-        word = array.getWord(); // word 9
+        array.getWord(); // word 9
+        //word = array.getWord(); // word 9
         //short n_samp_i = (word >> 16) & 0xFFFF;
         word = array.getWord(); // word 10
         short samplePeak_n = word & 0xFFFF;
         short valuePeak_n = (word >> 16) & 0xFFFF;
 
-        word = array.getWord(); // word 11
+        array.getWord(); // word 11
+        //word = array.getWord(); // word 11
         //short sampleRise_n = word & 0xFFFF;
         //short valueRise0_n = (word >> 16) & 0xFFFF;
 
-        word = array.getWord(); // word 12
+        array.getWord(); // word 12
+        //word = array.getWord(); // word 12
         //short valueRise1_n = word & 0xFFFF;
         //short sampleFall_n = (word >> 16) & 0xFFFF;
 
-        word = array.getWord(); // word 13
+        array.getWord(); // word 13
+        //word = array.getWord(); // word 13
         //short valueFall0_n = word & 0xFFFF;
         //short valueFall1_n = (word >> 16) & 0xFFFF;
 
@@ -594,12 +606,13 @@ namespace Belle2 {
       unsigned short evtNum_WFheader = (evtNum_numWaves_refWin_WFheader >> 24) & 0xFF;
 
       if (evtNum_WFheader != evtNum_FEheader) {
-        B2ERROR("TOPUnpacker: different carrier event number in FE header (" << evtNum_FEheader << ") and WF header (" << evtNum_WFheader <<
-                ")");
+        B2ERROR("TOPUnpacker: different carrier event number in WF and FE header."
+                << LogVar("Event number (FE header)", evtNum_FEheader)
+                << LogVar("Event number (WF header)", evtNum_WFheader));
       }
 
-      word = array.getWord(); // word 17
-      word = array.getWord(); // word 18
+      array.getWord(); // word 17
+      array.getWord(); // word 18
       word = array.getWord(); // word 19
       // int numPoints = (word >> 16) & 0xFFFF;
       unsigned short carrier = (word >> 14) & 0x03;
@@ -649,7 +662,9 @@ namespace Belle2 {
 
       int numWords = 4 * 32; // (numPoints + 1) / 2;
       if (array.getRemainingWords() < numWords) {
-        B2ERROR("TOPUnpacker: too few words for waveform data, needed " << numWords);
+        B2ERROR("TOPUnpacker: too few words for waveform data."
+                << LogVar("needed", numWords)
+                << LogVar("available", array.getRemainingWords()));
         info->setErrorFlag(TOPInterimFEInfo::c_InsufficientWFData);
         return array.getRemainingWords();
       }
@@ -671,7 +686,8 @@ namespace Belle2 {
         moduleID = feemap->getModuleID();
         boardstack = feemap->getBoardstackNumber();
       } else {
-        B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+        B2ERROR("TOPUnpacker: no front-end map available."
+                << LogVar("SCROD ID", scrodID));
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidScrodID);
       }
 
@@ -695,8 +711,11 @@ namespace Belle2 {
     }
 
     if (evtNumCounter.size() != 1) {
-      B2ERROR("TOPUnpacker: Possible frame shift detected. (More than one unique carrier event number in this readout event).  SCROD: " <<
-              scrodID << " (slot " << moduleID << " BS " << boardstack << ")");
+      B2ERROR("TOPUnpacker: Possible frame shift detected "
+              << "(More than one unique carrier event number in this readout event)."
+              << LogVar("SCROD", scrodID)
+              << LogVar("slot", moduleID)
+              << LogVar("BS", boardstack));
     }
 
     int nASICs = 0;
@@ -732,8 +751,12 @@ namespace Belle2 {
       if (it != 1) {
         channelOutputString += "carrier: " + std::to_string(carrier) + " asic: " + std::to_string(asic) + " chn: " + std::to_string(
                                  chn) + " occurence: " + std::to_string(it) + "\n";
-        B2WARNING("ScrodID: " << scrodID << " carrier: " << carrier << " asic: " << asic << " chn: " << chn << " seen " << it <<
-                  " times instead of once");
+        B2WARNING("TOPUnpacker: interim FE - ASIC channel seen more than once"
+                  << LogVar("ScrodID", scrodID)
+                  << LogVar("carrier", carrier)
+                  << LogVar("ASIC", asic)
+                  << LogVar("channel", chn)
+                  << LogVar("times seen", it));
       }
       channelIndex += 1;
     }
@@ -749,7 +772,7 @@ namespace Belle2 {
   }
 
 
-  int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize,
+  int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat,
                                          bool pedestalSubtracted)
   {
 
@@ -773,7 +796,8 @@ namespace Belle2 {
             << ", evtScrodID = " << evtScrodID);
 
     if (evtMagicHeader != 0xA) {
-      B2ERROR("event header magic word mismatch. should be 0xA, is 0x" << std::hex << evtMagicHeader);
+      B2ERROR("TOPUnpacker: event header magic word mismatch. should be 0xA."
+              << LogVar("Magic word", evtMagicHeader));
       return array.getRemainingWords();
     }
 
@@ -812,7 +836,9 @@ namespace Belle2 {
             << ", evtEventQueueDepth = " << evtEventQueueDepth
             << ", evtEventNumberByte = " << evtEventNumberByte);
 
-    m_productionEventDebugs.appendNew(evtScrodID,
+    m_productionEventDebugs.appendNew(evtType,
+                                      evtVersion,
+                                      evtScrodID,
                                       evtSkipHit,
                                       evtCtime,
                                       evtPhase,
@@ -832,50 +858,117 @@ namespace Belle2 {
            && array.getIndex() < evtNumWordsCore - 2) {  // -1 for 0-based counting, -1 for hit footer word
       array.resetChecksum();
 
-      word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(4)/hasWaveform(1)/isOnHeap(1)/heapWindow(6)
-      unsigned int hitCarrier = word >> 30;
-      unsigned int hitAsic = (word >> 28) & 0x3;
-      unsigned int hitChannel = (word >> 25) & 0x7;
-      unsigned int hitWindow = (word >> 16) & 0x1FF;
-      unsigned int hitMagicHeader = (word >> 12) & 0xF;
-      unsigned int hitTFine = (word >> 8) & 0xF;
-      bool         hitHasWaveform = (word >> 7) & 0x1;
-      bool         hitIsOnHeap = (word >> 6) & 0x1;
-      unsigned int hitHeapWindow = word  & 0x3F;
+
+      //need to predefine some variables here as we need to branch out between two data format versions for the next two words
+      unsigned int hitCarrier = 0;
+      unsigned int hitAsic = 0;
+      unsigned int hitChannel = 0;
+      unsigned int hitWindow = 0;
+      unsigned int hitMagicHeader = 0;
+      unsigned int hitTFine = 0;
+      bool         hitHasWaveform = false;
+      bool         hitIsOnHeap = false;
+      unsigned int hitHeapWindow = 0;
+      bool         hitIsOnHeapStraddle = false;
+      unsigned int hitHeapWindowStraddle = 0;
+      bool         hitIsWindowStraddle = false;
+      short        hitIntegral = 0;
+      short        hitVPeak = 0;
+
+      if (dataFormat == TOP::RawDataType::c_ProductionDebug01) {    //dataformat 0x0401
+        word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(4)/hasWaveform(1)/isOnHeap(1)/heapWindow(6)
+        hitCarrier = word >> 30;
+        hitAsic = (word >> 28) & 0x3;
+        hitChannel = (word >> 25) & 0x7;
+        hitWindow = (word >> 16) & 0x1FF;
+        hitMagicHeader = (word >> 12) & 0xF;
+        hitTFine = (word >> 8) & 0xF;
+        hitHasWaveform = (word >> 7) & 0x1;
+        hitIsOnHeap = (word >> 6) & 0x1;
+        hitHeapWindow = word  & 0x3F;
 
 
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
-              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
-              << "\thitCarrier = " << hitCarrier
-              << ", hitAsic = " << hitAsic
-              << ", hitChannel = " << hitChannel
-              << ", hitWindow = " << hitWindow
-//      << ", hitMagicHeader = " << hitMagicHeader
-//      << ", hitTFine = " << hitTFine
-              << ", hitHasWaveform = " << hitHasWaveform
-//      << ", hitIsOnHeap = " << hitIsOnHeap
-//      << ", hitHeapWindow = " << hitHeapWindow
-             );
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitCarrier = " << hitCarrier
+                << ", hitAsic = " << hitAsic
+                << ", hitChannel = " << hitChannel
+                << ", hitWindow = " << hitWindow
+                //      << ", hitMagicHeader = " << hitMagicHeader
+                //      << ", hitTFine = " << hitTFine
+                << ", hitHasWaveform = " << hitHasWaveform
+                //      << ", hitIsOnHeap = " << hitIsOnHeap
+                //      << ", hitHeapWindow = " << hitHeapWindow
+               );
+
+
+        word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
+        hitVPeak = expand13to16bits(word >> 16);
+        hitIntegral = word & 0xFFFF;
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitVPeak = " << hitVPeak
+                << ", hitIntegral = " << hitIntegral);
+
+      } else if (dataFormat == TOP::RawDataType::c_ProductionDebug02) { //dataformat 0x0402
+        word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(4)/hasWaveform(1)/isWindowStraddle(1)/integral(6)
+        hitCarrier = word >> 30;
+        hitAsic = (word >> 28) & 0x3;
+        hitChannel = (word >> 25) & 0x7;
+        hitWindow = (word >> 16) & 0x1FF;
+        hitMagicHeader = (word >> 12) & 0xF;
+        hitTFine = (word >> 8) & 0xF;
+        hitHasWaveform = (word >> 7) & 0x1;
+        hitIsWindowStraddle = (word >> 6) & 0x1;
+        hitIntegral = word & 0x3F;
+
+
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitCarrier = " << hitCarrier
+                << ", hitAsic = " << hitAsic
+                << ", hitChannel = " << hitChannel
+                << ", hitWindow = " << hitWindow
+                //      << ", hitMagicHeader = " << hitMagicHeader
+                //      << ", hitTFine = " << hitTFine
+                << ", hitHasWaveform = " << hitHasWaveform
+                << ", hitIsWindowStraddle = " << hitHasWaveform
+                << ", hitIntegral = " << hitIntegral
+                //      << ", hitHeapWindow = " << hitHeapWindow
+               );
+
+        word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/isOnHeap1(1)/heapWindow1(7)/isOnHeap0(1)/heapWindow0(7)
+        hitVPeak = expand13to16bits(word >> 16);
+        hitIsOnHeapStraddle = (word >> 15) & 0x1;
+        hitHeapWindowStraddle = (word >> 8) & 0x7F;
+        hitIsOnHeap = (word >> 7) & 0x1;
+        hitHeapWindow = word & 0x1;
+
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitVPeak = " << hitVPeak
+                << ", hitIsOnHeapStraddle = " << hitIsOnHeapStraddle
+                << ", hitHeapWindowStraddle = " << hitHeapWindowStraddle
+                << ", hitIsOnHeap = " << hitIsOnHeap
+                << ", hitHeapWindow = " << hitHeapWindow);
+      } else { //could not match the data format
+        B2ERROR("TOPUnpacker: could not match data type inside unpackProdDebug()"
+                << LogVar("evtType", evtType) << LogVar("evtVersion", evtVersion));
+        return array.getRemainingWords();
+      }
+
 
       if (hitHasWaveform) {
         numExpectedWaveforms += 1;
       }
 
       if (hitMagicHeader != 0xB) {
-        B2ERROR("hit header magic word mismatch. should be 0xB, is 0x" << std::hex << hitMagicHeader);
+        B2ERROR("TOPUnpacker: hit header magic word mismatch. should be 0xB."
+                << LogVar("Magic word", hitMagicHeader));
         return array.getRemainingWords();
       }
 
-
-      word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
-      short hitVPeak = expand13to16bits(word >> 16);
-      short hitIntegral = word & 0xFFFF;
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
-              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
-              << "\thitVPeak = " << hitVPeak
-              << ", hitIntegral = " << hitIntegral);
-
-      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
+      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/vRise1(13)
       short hitVRise0 = expand13to16bits(word >> 16);
       short hitVRise1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
@@ -883,7 +976,7 @@ namespace Belle2 {
               << "\thitVRise0 = " << hitVRise0
               << ", hitVRise1 = " << hitVRise1);
 
-      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
+      word = array.getWord(); // hit word 3, reserved(3)/vFall0(13)/reserved(3)/vFall1(13)
       short hitVFall0 = expand13to16bits(word >> 16);
       short hitVFall1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
@@ -905,7 +998,7 @@ namespace Belle2 {
               << ", checksum " << (array.validateChecksum() ? "OK" : "NOT OK"));
 
       if (!array.validateChecksum()) {
-        B2ERROR("hit checksum invalid.");
+        B2ERROR("TOPUnpacker: hit checksum invalid.");
         return array.getRemainingWords();
       }
 
@@ -934,10 +1027,23 @@ namespace Belle2 {
         digitsWithWaveform.push_back(digit);
       }
 
-      auto* hitDebug = m_productionHitDebugs.appendNew(hitHasWaveform,
-                                                       hitIsOnHeap,
-                                                       hitWindow,
-                                                       hitIsOnHeap ? hitHeapWindow : hitWindow);
+      TOPProductionHitDebug* hitDebug = 0;
+      if (dataFormat == TOP::RawDataType::c_ProductionDebug01) { // dataformat 0x0401
+        hitDebug = m_productionHitDebugs.appendNew(hitHasWaveform,
+                                                   hitIsOnHeap,
+                                                   hitWindow,
+                                                   hitIsOnHeap ? 428 + hitHeapWindow : hitWindow, //hitHeapWindow is counted from the start of the heap
+                                                   hitIsWindowStraddle);
+      } else if (dataFormat == TOP::RawDataType::c_ProductionDebug02) { // dataformat 0x0402
+        hitDebug = m_productionHitDebugs.appendNew(hitHasWaveform,
+                                                   hitIsOnHeap,
+                                                   hitWindow,
+                                                   hitIsOnHeap ? 428 + hitHeapWindow : hitWindow, //hitHeapWindow is counted from the start of the heap
+                                                   hitIsWindowStraddle,
+                                                   hitWindow + 1, //logical address of straddle window is always +1
+                                                   hitIsOnHeapStraddle ? 428 + hitHeapWindowStraddle : hitWindow +
+                                                   1); //physical address might be entirely different if straddled window is on heap
+      }
 
       //parse extra words if exist:
       for (unsigned int i = 0; i < evtExtra; ++i) {
@@ -948,7 +1054,9 @@ namespace Belle2 {
         hitDebug->appendExtraWord(word);
       }
 
-      digit->addRelationTo(hitDebug);
+      if (hitDebug) {
+        digit->addRelationTo(hitDebug);
+      }
 
       numHitsFound += 1;
     } // end of hits loop
@@ -970,7 +1078,8 @@ namespace Belle2 {
     }
 
     if (evtMagicFooter != 0x5) {
-      B2ERROR("event footer magic word mismatch. should be 0x5, is 0x" << std::hex << evtMagicFooter);
+      B2ERROR("TOPUnpacker: event footer magic word mismatch. should be 0x5."
+              << LogVar("Magic word", evtMagicFooter));
       return array.getRemainingWords();
     }
 
@@ -984,7 +1093,8 @@ namespace Belle2 {
       moduleID = feemap->getModuleID();
       boardstack = feemap->getBoardstackNumber();
     } else {
-      B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << evtScrodID);
+      B2ERROR("TOPUnpacker: no front-end map available."
+              << LogVar("SCROD ID", evtScrodID));
     }
 
     unsigned int numParsedWaveforms = 0;
@@ -1012,7 +1122,8 @@ namespace Belle2 {
               << ", wfChannel " << wfChannel);
 
       if (wfNSamples != 32 && wfNSamples != 16) {
-        B2ERROR("suspicious value for wfNSamples: " << wfNSamples);
+        B2ERROR("TOPUnpacker: suspicious value for wfNSamples."
+                << LogVar("Value", wfNSamples));
         //return array.getRemainingWords();
       }
 
@@ -1065,8 +1176,9 @@ namespace Belle2 {
         if (digit->getScrodChannel() == channel % 128) {
           digit->addRelationTo(waveform);
         } else {
-          B2ERROR("hit and its waveform have different channel number: " << digit->getScrodChannel()
-                  << ", " << channel % 128);
+          B2ERROR("TOPUnpacker: hit and its waveform have different channel number."
+                  << LogVar("channel (hit)", digit->getScrodChannel())
+                  << LogVar("channel (waveform)", channel % 128));
         }
       }
       numParsedWaveforms += 1;
@@ -1074,8 +1186,9 @@ namespace Belle2 {
     } // end of waveform segments loop
 
     if (numExpectedWaveforms != numParsedWaveforms) {
-      B2ERROR("numExpectedWaveforms = " << numExpectedWaveforms
-              << " numParsedWaveforms = " << numParsedWaveforms << " does not match.");
+      B2ERROR("TOPUnpacker: number of expected and parsed waveforms does not match."
+              << LogVar("expected", numExpectedWaveforms)
+              << LogVar("parsed", numParsedWaveforms));
     }
 
     return array.getRemainingWords();

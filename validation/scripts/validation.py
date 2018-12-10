@@ -21,6 +21,7 @@ import datetime
 import localcontrol
 
 import json_objects
+import mail_log
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
 import pprint
@@ -328,7 +329,7 @@ class IntervalSelector:
 
     def __init__(self, intervals):
         """
-        Initialzes the IntervalSelector class with a list of intervals which
+        Initializes the IntervalSelector class with a list of intervals which
         should be selected
         """
 
@@ -716,7 +717,7 @@ class Validation:
 
     def apply_package_selection(self, selected_packages, ignore_dependencies=False):
         """
-        Only select packages from a specfic set of packages, but still honor the
+        Only select packages from a specific set of packages, but still honor the
         dependencies to outside scripts which may exist
         """
 
@@ -1081,7 +1082,7 @@ class Validation:
 
 def execute(tag=None, isTest=None):
     """!
-    Parses the comnmand line and executes the full validation suite
+    Parses the command line and executes the full validation suite
     """
 
     # If there is no release of basf2 set up, we can stop the execution right here!
@@ -1203,6 +1204,15 @@ def execute(tag=None, isTest=None):
             validation.log.note('Start creating plots...')
             validation.create_plots()
             validation.log.note('Plots have been created...')
+            # send mails
+            if cmd_arguments.send_mails:
+                mails = mail_log.Mails(validation)
+                validation.log.note('Send mails...')
+                # send mails to all users with failed scripts/comparison
+                mails.send_all_mails()
+                validation.log.note('Save mail data to {}'.format(validation.get_log_folder()))
+                # save json with data about outgoing mails
+                mails.write_log()
         else:
             validation.log.note('Skipping plot creation (dry run)...')
 

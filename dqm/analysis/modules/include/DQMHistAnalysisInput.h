@@ -44,21 +44,23 @@ namespace Belle2 {
     // Data members
   private:
     //! Hist memory
-    DqmMemFile* m_memory;
+    DqmMemFile* m_memory = nullptr;
     std::string m_mempath;
+    std::string m_memname;
     int m_memsize;
     int m_interval;
     bool m_autocanvas;
     bool m_remove_empty;
     std::vector<std::string> m_acfolders;
+    TCanvas* m_c_info = nullptr;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     std::map<std::string, TCanvas*> m_cs;
 
     //! Exp number, Run number
-    unsigned int m_expno;
-    unsigned int m_runno;
-    unsigned int m_count;
+    unsigned int m_expno = 0;
+    unsigned int m_runno = 0;
+    unsigned int m_count = 0;
   };
 } // end namespace Belle2
 

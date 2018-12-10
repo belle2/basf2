@@ -70,8 +70,7 @@ void HitPatternCDC::setNHits(unsigned short nHits)
 
 ULong64_t HitPatternCDC::getInteger() const
 {
-  // cppcheck-suppress knownConditionTrueFalse
-  if (sizeof(unsigned long) >= 8) {
+  if constexpr(sizeof(unsigned long) >= 8) {
     return m_pattern.to_ulong();
   } else {
     return m_pattern.to_ullong();
@@ -167,4 +166,9 @@ bool HitPatternCDC::hasStereoLayer() const
 {
   return ((s_sLayerMasks[1] | s_sLayerMasks[3] | s_sLayerMasks[5] | s_sLayerMasks[7])
           & m_pattern).any();
+}
+
+std::string HitPatternCDC::__repr__() const
+{
+  return m_pattern.to_string();
 }

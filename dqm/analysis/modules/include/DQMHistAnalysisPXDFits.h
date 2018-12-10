@@ -45,8 +45,8 @@ namespace Belle2 {
     std::map <int, int> m_id_to_inx;
     std::map <int, int> m_inx_to_id;
 
-    TH1F* m_hSignalAll, *m_hCommonAll, *m_hCountsAll, *m_hOccupancyAll;
-    TCanvas* m_cSignalAll, *m_cCommonAll, *m_cCountsAll, *m_cOccupancyAll;
+    TH1F* m_hSignalAll = nullptr, *m_hCommonAll = nullptr, *m_hCountsAll = nullptr, *m_hOccupancyAll = nullptr;
+    TCanvas* m_cSignalAll = nullptr, *m_cCommonAll = nullptr, *m_cCountsAll = nullptr, *m_cOccupancyAll = nullptr;
 
     TH2F* m_hSignal[NUM_MODULES];
     TH2F* m_hCommon[NUM_MODULES];
@@ -54,8 +54,8 @@ namespace Belle2 {
     TCanvas* m_cSignal[NUM_MODULES];
     TCanvas* m_cCommon[NUM_MODULES];
     TCanvas* m_cCounts[NUM_MODULES];
-    TF1* m_fLandau;// only one fit function
-    TF1* m_fGaus;// only one fit function
+    TF1* m_fLandau = nullptr; // only one fit function
+    TF1* m_fGaus = nullptr; // only one fit function
 
   };
 } // end namespace Belle2

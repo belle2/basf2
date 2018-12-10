@@ -1,30 +1,23 @@
 /**************************************************************************
- * Copyright(C) 2017 - Yu Hu                                              *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
- * Author: Yu Hu                                                          *
- * Contributor:  Chunhua Li                                               *
- *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Yu Hu                                                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef FOURCFITKFIT_H
-#define FOURCFITKFIT_H
-
-
+#pragma once
 #include <framework/logging/Logger.h>
-
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitBase.h>
 #include <TLorentzVector.h>
 
-
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
-
 
 namespace Belle2 {
 
@@ -130,6 +123,11 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
       enum KFitError::ECode prepareInputMatrix(void) override;
@@ -175,6 +173,3 @@ namespace Belle2 {
   } // namespace analysis
 
 } // namespace Belle2
-
-#endif /* FOURCFITKFIT_H */
-

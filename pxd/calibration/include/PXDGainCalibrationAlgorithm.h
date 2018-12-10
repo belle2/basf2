@@ -39,7 +39,7 @@ namespace Belle2 {
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
   private:
 
@@ -51,6 +51,9 @@ namespace Belle2 {
 
     /// Retrive charge median value from pulled in data base payload
     double GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
+
+    /// Retrive current gain value from pulled in data base payload
+    double GetCurrentGainFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
   };
 } // namespace Belle2
 

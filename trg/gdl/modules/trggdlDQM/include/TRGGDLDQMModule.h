@@ -5,6 +5,9 @@
 #include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <trg/gdl/TrgBit.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
@@ -24,27 +27,35 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun();
+    virtual void endRun() override;
     //! terminate
-    virtual void terminate() {}
+    virtual void terminate() override {}
     //! Define Histogram
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   protected:
     //! timestamp diff from gdlL1 to comL1 in LSB8nsec
     TH1I* h_c8_gdlL1TocomL1;
-    //! timestamp diff from fit on fam to gdlL1 in LSB8nsec
+    //! timestamp diff from t0(top) to gdlL1 in LSB8nsec
+    TH1I* h_c8_topTogdlL1;
+    //! timestamp diff from t0(ecl) to gdlL1 in LSB8nsec
     TH1I* h_c8_eclTogdlL1;
-    //! timestamp diff from ecl_timing to gdlL1 in LSB8nsec
-    TH1I* h_c8_ecl8mToGDL;
+    //! timestamp diff from t0(cdc) to gdlL1 in LSB8nsec
+    TH1I* h_c8_cdcTogdlL1;
     //! timestamp diff from fit on fam to GDL in LSB8nsec
+    TH1I* h_c8_ecl8mToGDL;
+    //! timestamp diff from t0(top) to GDL in LSB8nsec
+    TH1I* h_c8_topToGDL;
+    //! timestamp diff from t0(ecl) to GDL in LSB8nsec
     TH1I* h_c8_eclToGDL;
+    //! timestamp diff from t0(cdc) to GDL in LSB8nsec
+    TH1I* h_c8_cdcToGDL;
     //! timestamp diff from cdc_timing to comL1 in LSB2nsec
     TH1I* h_c2_cdcTocomL1;
     //! timestamp diff from cdc_timing to comL1 in nsec
@@ -112,6 +123,24 @@ namespace Belle2 {
 
     static const int n_output_extra;
     static const char* output_extra[4];
+
+    //condition database for unpacer
+    DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
+    int LeafBitMap[320];
+    char LeafNames[320][100];
+    int _e_timtype;
+    int _e_gdll1rvc;
+    int _e_coml1rvc;
+    int _e_toptiming;
+    int _e_ecltiming;
+    int _e_cdctiming;
+    int _e_toprvc;
+    int _e_eclrvc;
+    int _e_cdcrvc;
+    int ee_psn[10];
+    int ee_ftd[10];
+    int ee_itd[10];
+
 
   };
 

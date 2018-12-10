@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor with an array of 3-momenta.
      */
-    SphericityEigenvalues(const std::vector<TVector3> momenta)
+    explicit SphericityEigenvalues(const std::vector<TVector3>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;
@@ -46,7 +46,7 @@ namespace Belle2 {
      * Sets the list of momenta to be used in the calculation
      * overwriting the previous values
      */
-    void setMomenta(std::vector<TVector3> momenta)
+    void setMomenta(const std::vector<TVector3>& momenta)
     {
       m_momenta.clear();
       m_momenta = momenta;

@@ -21,6 +21,7 @@
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDCoGTimeCalibrations.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -141,6 +142,7 @@ namespace Belle2 {
     bool Correction_2;
     bool Correction_3;
     bool Correction_4;
+    bool Correction_Using_CDC;
 
     /** Name of the relation between SVDShaperDigits and MCParticles */
     std::string m_relShaperDigitMCParticleName;
@@ -172,6 +174,7 @@ namespace Belle2 {
     //calibration objects
     SVDPulseShapeCalibrations m_PulseShapeCal;
     SVDNoiseCalibrations m_NoiseCal;
+    SVDCoGTimeCalibrations m_TimeCal;
 
     //number of samples
     int m_NumberOfAPVSamples = 6;

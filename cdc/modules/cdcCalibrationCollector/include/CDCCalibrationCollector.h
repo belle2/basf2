@@ -92,12 +92,13 @@ namespace Belle2 {
       double phi0;              /**< Track Parameter, phi0. */
       double tanL;              /**< Track Parameter, tanL. */
       double omega;             /**< Track Parameter, omega. */
-      double m_MinimumPt = 0;   /**< minimum pt required for track*/
+      double m_minimumPt = 0;   /**< minimum pt required for track*/
 
-      bool m_calExpectedDriftTime;             /**< Calculate expected drift time from x_fit or not. */
-      bool m_BField;                           /**< fit incase no magnetic Field of not, if false, NDF=4 in cal P-value */
-      bool m_StoreTrackParams;                 /**< Store Track parameter or not. */
-      bool m_EventT0Extraction;                /**< use Event T0 extract t0 or not. */
+      bool m_calExpectedDriftTime = true;      /**< Calculate expected drift time from x_fit or not. */
+      bool m_bField = true;                    /**< fit incase no magnetic Field of not, if false, NDF=4 in cal P-value */
+      bool m_storeTrackParams = true;          /**< Store Track parameter or not. */
+      bool m_eventT0Extraction = true;         /**< use Event T0 extract t0 or not. */
+      bool m_isCosmic = false;                 /**< true when we process cosmic events, else false (collision). */
     };
   }
 }

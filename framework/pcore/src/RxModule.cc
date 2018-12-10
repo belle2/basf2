@@ -37,6 +37,7 @@ RxModule::~RxModule() { }
 
 void RxModule::initStreamer()
 {
+  delete m_streamer;
   m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
 }
 

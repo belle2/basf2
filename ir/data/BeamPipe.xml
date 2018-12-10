@@ -33,7 +33,7 @@
       <sec name="R3" unit="cm">2.25</sec>
       <sec name="R4" unit="cm">1.6</sec>
       <sec name="R5" unit="cm">1.25</sec>
-      <sec name="R6" unit="cm">1.2</sec>
+      <sec name="R6" unit="cm">1.2002</sec>
       <sec name="R7" unit="cm">1.25</sec>
       <sec name="R8" unit="cm">1.6</sec>
       <sec name="R9" unit="cm">2.25</sec>
@@ -42,6 +42,14 @@
       <Material desc="SUS">SUS316L</Material>      
     </Lv1SUS>
         
+    <Lv2OutTi>
+      <sec name="L1" unit="cm">2.90</sec>
+      <sec name="L2" unit="cm">5.10</sec>
+      <sec name="R1" unit="cm">1.20</sec>
+      <sec name="R2" unit="cm">1.2002</sec>
+      <Material>Ti</Material>
+    </Lv2OutTi>
+
     <Lv2OutBe>
       <sec name="L1" unit="cm">2.90</sec>
       <sec name="L2" unit="cm">5.10</sec>

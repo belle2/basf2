@@ -19,7 +19,6 @@ import re
 import glob
 import shutil
 import subprocess
-import basf2_version
 
 sys.path.insert(0, os.path.abspath("extensions"))
 
@@ -43,11 +42,16 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx.ext.autosectionlabel',
     'sphinxarg.ext',
     'basf2ext',
 ]
 
 # autosummary_generate = True
+
+# prefix each section with the name of the document it is in followed by a
+# colon
+autosectionlabel_prefix_document = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_sphinxtemplates']

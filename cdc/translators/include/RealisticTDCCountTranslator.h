@@ -134,6 +134,11 @@ namespace Belle2 {
        * N.B. The declaration should be after m_cdcp for proper initialization.
        */
       const double m_tdcBinWidth;
+
+      /**
+       * Cached fudge factor for space resol.
+       */
+      double m_fudgeFactor = 1.;
     };
   }
 }

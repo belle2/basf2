@@ -277,6 +277,13 @@ void RFOutputServer::server()
                               m_pid_basf2);
   }
 }
+void RFOutputServer::cleanup()
+{
+  printf("RFOutputServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFOutputServer: Done. Exitting\n");
+  exit(-1);
+}
 
 
 

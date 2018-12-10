@@ -16,11 +16,20 @@
 using namespace std;
 using namespace Belle2;
 
+static RFEventProcessor* evproc = NULL;
+
+extern "C" void sighandler(int sig)
+{
+  printf("SIGTERM handler here\n");
+  evproc->cleanup();
+}
+
 int main(int argc, char** argv)
 {
   RFConf conf(argv[1]);
 
-  RFEventProcessor* evproc = new RFEventProcessor(argv[1]);
+  //  RFEventProcessor* evproc = new RFEventProcessor(argv[1]);
+  evproc = new RFEventProcessor(argv[1]);
 
   char nodename[256];
   strcpy(nodename, "evp_");
@@ -38,6 +47,9 @@ int main(int argc, char** argv)
   printf("DESY node name = %s\n", nodename);
   // End of DESY special treatment
 #endif
+
+  signal(SIGINT, sighandler);
+  signal(SIGTERM, sighandler);
 
   RFNSM nsm(nodename, evproc);
   nsm.AllocMem(conf.getconf("system", "nsmdata"));

@@ -71,6 +71,7 @@ namespace Belle2 {
       cout << " -> vector is empty!" << endl;
       return;
     }
+    cout << " PMT type: " << m_type << endl;
 
     int i = 0;
     for (const auto& tts : m_tts) {

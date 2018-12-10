@@ -175,7 +175,6 @@ inputMdstList('default', fileList)  # '/ghi/fs01/belle2/bdata/group/physics/semi
 # release-00-09-01/DB00000276/MC9/1193300007/BGx0/sub00/*.root')
 
 
-loadStdCharged()
 stdPi('95eff')
 stdK('85eff')
 stdE('95eff')
@@ -199,7 +198,7 @@ reconstructDecay('B0:tag ->D-:tag pi+:sig', 'Mbc>5.27 and abs(deltaE)<0.2')
 
 # pi0
 # KSs
-loadStdKS()
+stdKshorts()
 vertexKFit('K_S0:all', 0.001)
 cutAndCopyList('K_S0:sig', 'K_S0:all', 'distance>0.5 and significanceOfDistance>2')
 # Photons

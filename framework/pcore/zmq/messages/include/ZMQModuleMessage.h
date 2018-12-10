@@ -47,7 +47,7 @@ namespace Belle2 {
   protected:
     /// Constructor out of different parts
     template <class ...T>
-    ZMQModuleMessage(const T& ... arguments) :
+    explicit ZMQModuleMessage(const T& ... arguments) :
       m_messageParts( {ZMQMessageHelper::createZMQMessage(arguments)...})
     {
     }

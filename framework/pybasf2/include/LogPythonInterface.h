@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Thomas Kuhr, Thomas Hauth                 *
@@ -133,6 +133,14 @@ namespace Belle2 {
     void addLogConsole();
 
     /**
+     * Add the console as output connection but print the log messages as json
+     * objects so that they can be parsed easily
+     * @param complete if true ignore the log info configuration and print all
+     *                 parts of the log message.
+     */
+    void addLogJSON(bool complete);
+
+    /**
      * Add the console as output connection
      *
      * @param color Flag whether color should be used
@@ -151,6 +159,16 @@ namespace Belle2 {
 
     /** Enable/Disable error summary */
     void enableErrorSummary(bool on);
+
+    /**
+     * Set flag if logging should be done via python `sys.stdout`
+     */
+    void setPythonLoggingEnabled(bool enabled) const;
+
+    /**
+     * Get flag if logging should be done via python `sys.stdout`
+     */
+    bool getPythonLoggingEnabled() const;
 
     /**
      * Produce debug message

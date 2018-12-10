@@ -38,12 +38,42 @@ DQMHistComparitorModule::DQMHistComparitorModule()
   //Parameter definition
   addParam("HistoList", m_histlist, "['histname', 'refhistname', 'canvas', 'minentry', 'warnlvl', 'errlvl', 'pvname'],[...],...");
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
+  addParam("ColorAlert", m_color, "Whether to show the color alert", true);
   B2DEBUG(1, "DQMHistComparitor: Constructor done.");
 }
 
 
 DQMHistComparitorModule::~DQMHistComparitorModule() { }
 
+TH1* DQMHistComparitorModule::find_histo_in_canvas(TString histo_name)
+{
+  StringList s = StringUtil::split(histo_name.Data(), '/');
+  std::string dirname = s[0];
+  std::string hname = s[1];
+  std::string canvas_name = dirname + "/c_" + hname;
+
+  TIter nextckey(gROOT->GetListOfCanvases());
+  TObject* cobj = NULL;
+
+  while ((cobj = (TObject*)nextckey())) {
+    if (cobj->IsA()->InheritsFrom("TCanvas")) {
+      if (cobj->GetName() == canvas_name)
+        break;
+    }
+  }
+  if (cobj == NULL) return NULL;
+
+  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
+  TObject* obj = NULL;
+
+  while ((obj = (TObject*)nextkey())) {
+    if (obj->IsA()->InheritsFrom("TH1")) {
+      if (obj->GetName() == histo_name)
+        return (TH1*)obj;
+    }
+  }
+  return NULL;
+}
 
 TH1* DQMHistComparitorModule::GetHisto(TString histoname)
 {
@@ -61,7 +91,7 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
       TString myl = histoname;
       TString tok;
       Ssiz_t from = 0;
-      B2INFO(myl);
+      B2DEBUG(20, myl);
       while (myl.Tokenize(tok, from, "/")) {
         TString dummy;
         Ssiz_t f;
@@ -81,10 +111,10 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
       TObject* obj = d->FindObject(tok);
       if (obj != NULL) {
         if (obj->IsA()->InheritsFrom("TH1")) {
-          B2INFO("Histo " << histoname << " found in ref file");
+          B2DEBUG(20, "Histo " << histoname << " found in ref file");
           hh1 = (TH1*)obj;
         } else {
-          B2INFO("Histo " << histoname << " found in ref file but wrong type");
+          B2DEBUG(20, "Histo " << histoname << " found in ref file but wrong type");
         }
       } else {
         // seems find will only find objects, not keys, thus get the object on first access
@@ -95,12 +125,12 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
           if (obj2->InheritsFrom("TH1")) {
             if (obj2->GetName() == tok) {
               hh1 = (TH1*)obj2;
-              B2INFO("Histo " << histoname << " found as key -> readobj");
+              B2DEBUG(20, "Histo " << histoname << " found as key -> readobj");
               break;
             }
           }
         }
-        if (hh1 == NULL) B2INFO("Histo " << histoname << " NOT found in ref file " << tok);
+        if (hh1 == NULL) B2DEBUG(20, "Histo " << histoname << " NOT found in ref file " << tok);
       }
     }
 
@@ -119,9 +149,9 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
         if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
           auto e = d->GetDirectory(tok);
           if (e) {
-            B2INFO("Cd Dir " << tok);
+            B2DEBUG(20, "Cd Dir " << tok);
             d = e;
-          } else B2INFO("cd failed " << tok);
+          } else B2DEBUG(20, "cd failed " << tok);
           d->cd();
         } else {
           break;
@@ -202,46 +232,14 @@ void DQMHistComparitorModule::beginRun()
   B2DEBUG(20, "DQMHistComparitor: beginRun called.");
 }
 
-DQMHistComparitorModule::CMPNODE* DQMHistComparitorModule::find_pnode(TString a)
-{
-  for (auto& it : m_pnode) {
-    if (it->histo1 == a)
-      return it;
-  }
-  return NULL;
-}
-
 void DQMHistComparitorModule::event()
 {
-  const HistList& hlist = getHistList();
-  for (HistList::const_iterator ihl = hlist.begin(); ihl != hlist.end(); ihl++) {
-    TString a = ihl->first;
-
-    CMPNODE* it = find_pnode(a);
-    if (it == NULL) { // new CMPNODE
-      it = new CMPNODE;
-
-      it->histo1 = a;
-      it->histo2 = "ref/" + a;
-      StringList s = StringUtil::split(a.Data(), '/');
-      std::string dirname = s[0];
-      std::string hname = s[1];
-      TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
-      it->canvas = c;
-
-      it->min_entries = 100;
-      it->warning = 0.9;
-      it->error = 0.6;
-      it->epicsflag = false;
-
-      m_pnode.push_back(it);
-    }
-
+  for (auto& it : m_pnode) {
 
     TH1* hist1, *hist2;
 
     B2DEBUG(20, "== Search for " << it->histo1 << " with ref " << it->histo2 << "==");
-    hist1 = ihl->second;
+    hist1 = find_histo_in_canvas(it->histo1);
     if (!hist1) B2DEBUG(20, "NOT Found " << it->histo1);
     hist2 = GetHisto(it->histo2);
     if (!hist2) B2DEBUG(20, "NOT Found " << it->histo2);
@@ -253,8 +251,7 @@ void DQMHistComparitorModule::event()
     // if compare normalized ... does not work!
     // hist2->Scale(hist1->GetEntries()/hist2->GetEntries());
 
-    double data = 0.0;
-    data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
+    double data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
     //     data = hist1->Chi2Test(hist2);// return p value (0 bad, 1 good), ignores normalization
     //     data= BinByBinTest(hits1,hist2);// user function (like Peters test)
     //     printf(" %.2f %.2f %.2f\n",(float)data,it->warning,it->error);
@@ -262,36 +259,60 @@ void DQMHistComparitorModule::event()
     if (it->epicsflag) SEVCHK(ca_put(DBR_DOUBLE, it->mychid, (void*)&data), "ca_set failure");
 #endif
     it->canvas->cd();
-    hist2->SetLineStyle(2);// 2 or 3
-    hist2->SetLineColor(1);
+    hist2->SetLineStyle(3);// 2 or 3
+    hist2->SetLineColor(3);
+
+    TIter nextkey(it->canvas->GetListOfPrimitives());
+    TObject* obj = NULL;
+    while ((obj = (TObject*)nextkey())) {
+      if (obj->IsA()->InheritsFrom("TH1")) {
+        if (string(obj->GetName()) == string(hist2->GetName())) {
+          delete obj;
+        }
+      }
+    }
+
     // if draw normalized
+    TH1* h;
     if (1) {
-      TH1* h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
-      h->Scale(hist1->GetEntries() / hist2->GetEntries());
-      h->Draw();
+      h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
+      if (abs(hist2->Integral()) > 0)
+        h->Scale(hist1->Integral() / hist2->Integral());
     } else {
       hist2->Draw("hist");
     }
-    hist1->Draw("hist,same");
-    it->canvas->Pad()->SetFrameFillStyle(1);
-    if (hist1->GetEntries() < it->min_entries) {
-      // not enough Entries
-      it->canvas->Pad()->SetFillColor(6);// Magenta
-    } else {
-      if (data < it->error) {
-        it->canvas->Pad()->SetFillColor(2);// Red
-      } else if (data < it->warning) {
-        it->canvas->Pad()->SetFillColor(5);// Yellow
+
+    h->SetFillColor(0);
+    h->SetStats(kFALSE);
+    hist1->SetFillColor(0);
+    if (h->GetMaximum() > hist1->GetMaximum())
+      hist1->SetMaximum(1.1 * h->GetMaximum());
+    hist1->Draw("hist");
+    h->Draw("hist,same");
+
+    it->canvas->Pad()->SetFrameFillColor(10);
+    if (m_color) {
+      if (hist1->GetEntries() < it->min_entries) {
+        // not enough Entries
+        it->canvas->Pad()->SetFillColor(6);// Magenta
       } else {
-        it->canvas->Pad()->SetFillColor(0);// White
+        if (data < it->error) {
+          it->canvas->Pad()->SetFillColor(2);// Red
+        } else if (data < it->warning) {
+          it->canvas->Pad()->SetFillColor(5);// Yellow
+        } else {
+          it->canvas->Pad()->SetFillColor(0);// White
+        }
       }
+    } else {
+      it->canvas->Pad()->SetFillColor(0);// White
     }
     it->canvas->Modified();
     it->canvas->Update();
-#ifdef _BELLE2_EPICS
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-#endif
   }
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+#endif
 }
 
 void DQMHistComparitorModule::endRun()

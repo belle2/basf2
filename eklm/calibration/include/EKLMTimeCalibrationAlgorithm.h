@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONALGORITHM_H
-#define EKLMTIMECALIBRATIONALGORITHM_H
+#pragma once
 
 /* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
-#include <eklm/geometry/GeometryData.h>
 
 namespace Belle2 {
 
@@ -55,18 +53,9 @@ namespace Belle2 {
 
   private:
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
-
-    /** Maximal strip number (= total number of strips). */
-    int m_maxStrip;
-
     /** Debug mode. */
     bool m_Debug;
 
   };
 
 }
-
-#endif
-

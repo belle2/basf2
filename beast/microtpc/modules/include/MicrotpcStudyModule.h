@@ -45,22 +45,22 @@ namespace Belle2 {
       virtual ~MicrotpcStudyModule();
 
       /**  */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /**  */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /**  */
-      virtual void event();
+      virtual void event() override;
 
       /**  */
-      virtual void endRun();
+      virtual void endRun() override;
 
       /**  */
-      virtual void terminate();
+      virtual void terminate() override;
 
       /** Defines the histograms*/
-      virtual void defineHisto();
+      virtual void defineHisto() override;
 
 
     private:

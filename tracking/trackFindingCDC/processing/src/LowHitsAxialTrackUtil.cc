@@ -64,7 +64,8 @@ void LowHitsAxialTrackUtil::addCandidateFromHits(const std::vector<const CDCWire
   }
 }
 
-bool LowHitsAxialTrackUtil::postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits)
+bool LowHitsAxialTrackUtil::postprocessTrack([[maybe_unused]] CDCTrack& track, [[maybe_unused]] const
+                                             std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   // No postprocessing yet
   return true;

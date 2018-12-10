@@ -42,7 +42,7 @@ namespace Belle2 {
       /// Initialisation before the event processing starts
       void initialize() final;
 
-      /// Execute one pass over a quad tree
+      /// Execute one pass over given clusters and wirehits and create tracks
       void apply(const std::vector<const ECLCluster*>& eclClusters,
                  const std::vector<const CDCWireHit*>& axialWireHits,
                  std::vector<CDCTrack>& tracks) final;
@@ -50,7 +50,7 @@ namespace Belle2 {
     private:
       // Search for hits compatible with given trajectory
       std::vector<const CDCWireHit*> search(const std::vector<const CDCWireHit*>& axialWireHits,
-                                            const CDCTrajectory2D& trajectory);
+                                            const CDCTrajectory2D& guidingTrajectory2D);
 
     private:
       // ECL cluster energy threshold

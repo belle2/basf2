@@ -388,6 +388,7 @@ def process_dir(
         test_env['LIBS'] = env['TEST_LIBS']
         test = test_env.Program(os.path.join(test_env['BINDIR'],
                                              test_filename), env['TEST_FILES'])
+        env.StripDebug(test)
         env.Alias(os.path.join(dir_name, 'tests', test_filename), test)
         env.Alias(os.path.join(dir_name, 'tests'), test)
         env.Alias(os.path.join(dir_name, test_filename), test)

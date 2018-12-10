@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSENSETIVEDETECTOR_H
-#define EKLMSENSETIVEDETECTOR_H
+#pragma once
 
 /* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
@@ -71,6 +70,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

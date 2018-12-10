@@ -9,11 +9,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DelayDQMMODULE_H_
-#define DelayDQMMODULE_H_
+#pragma once
 
 #include <framework/core/HistoModule.h>
-
 #include "TH1D.h"
 
 namespace Belle2 {
@@ -25,17 +23,13 @@ namespace Belle2 {
 
     /** Constructor */
     DelayDQMModule();
-    /* Destructor */
-    virtual ~DelayDQMModule();
 
     /** Module functions */
-    virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;
 
-    virtual void defineHisto() override;
+    void defineHisto() override final;
 
   private:
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
@@ -45,9 +39,7 @@ namespace Belle2 {
     TH1D* m_DelayMs = nullptr;        /**< Delay between trigger and end of processing in ms*/
     TH1D* m_DelayLog = nullptr;        /**< Delay between trigger and end of processing log scale */
 
-    void BinLogX(TH1* h);
+    void BinLogX(TH1* h); /**< helper function to replace X axis by a log scaled axis */
   };
 
 }
-#endif
-

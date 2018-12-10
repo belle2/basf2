@@ -33,25 +33,16 @@ REG_MODULE(DelayDQM)
 DelayDQMModule::DelayDQMModule() : HistoModule()
 {
   //Set module properties
-  setDescription(" Delay DQM module");
+  setDescription("Processing Delay DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string(""));
   addParam("title", m_title, "Prefix for Title (ERECO, HLT, ...)", std::string("Processing "));
 }
 
-
-DelayDQMModule::~DelayDQMModule()
-{
-}
-
-//------------------------------------------------------------------
-// Function to define histograms
-//-----------------------------------------------------------------
-
-// function copied from root-talk
 void DelayDQMModule::BinLogX(TH1* h)
 {
+// function copied from root-talk
 
   TAxis* axis = h->GetXaxis();
   Int_t bins = axis->GetNbins();
@@ -68,6 +59,9 @@ void DelayDQMModule::BinLogX(TH1* h)
   delete[] new_bins;
 }
 
+//------------------------------------------------------------------
+// Function to define histograms
+//-----------------------------------------------------------------
 
 void DelayDQMModule::defineHisto()
 {
@@ -103,7 +97,8 @@ void DelayDQMModule::beginRun()
 
 void DelayDQMModule::event()
 {
-  //
+  // Calculate the time difference between now and the trigger time
+  // This tells you how much delay we have summed up (it is NOT the processing time!)
   StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
   /** Time(Tag) from MetaInfo, ns since epoch */
   unsigned long long int meta_time = 0;
@@ -120,12 +115,3 @@ void DelayDQMModule::event()
   m_DelayLog->Fill(deltaT);
 }
 
-
-void DelayDQMModule::endRun()
-{
-}
-
-
-void DelayDQMModule::terminate()
-{
-}

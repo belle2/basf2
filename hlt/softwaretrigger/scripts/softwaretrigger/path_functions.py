@@ -105,7 +105,7 @@ def add_pxd_fullframe_phase2(path):
                         MinU=0, MaxU=249, MinV=0, MaxV=767)
 
 
-def add_pxd_fullframe_phase3(path):
+def add_pxd_fullframe_phase3_early(path):
     list = [[1, 1, 1], [1, 1, 2], [1, 2, 1], [1, 2, 2], [1, 3, 1], [1, 3, 2], [1, 4, 1], [1, 4, 2],
             [1, 5, 1], [1, 5, 2], [1, 6, 1], [1, 6, 2], [1, 7, 1], [1, 7, 2], [1, 8, 1], [1, 8, 2],
             [2, 4, 1], [2, 4, 2], [2, 5, 1], [2, 5, 2]]
@@ -116,7 +116,7 @@ def add_pxd_fullframe_phase3(path):
                         MinU=0, MaxU=249, MinV=0, MaxV=767)
 
 
-def add_pxd_fullframe_phase31(path):
+def add_pxd_fullframe_phase3(path):
     list = [[1, 1, 1], [1, 1, 2], [1, 2, 1], [1, 2, 2], [1, 3, 1], [1, 3, 2], [1, 4, 1], [1, 4, 2],
             [1, 5, 1], [1, 5, 2], [1, 6, 1], [1, 6, 2], [1, 7, 1], [1, 7, 2], [1, 8, 1], [1, 8, 2],
             [2, 1, 1], [2, 1, 2], [2, 2, 1], [2, 2, 2], [2, 3, 1], [2, 3, 2], [2, 4, 1], [2, 4, 2],
@@ -353,8 +353,7 @@ def add_hlt_processing(path, run_type="collision",
         sendAllDS = 0
         reconstruction.add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False, **kwargs)
         if roi_take_fullframe:
-            # only working for phase 2 atm
-            add_pxd_fullframe_phase3(path)
+            add_pxd_fullframe_phase3_early(path)
             sendAllDS = 2
         else:
             # this will generate ROIs using the output of CDC and SVD track finder
@@ -502,8 +501,7 @@ def add_softwaretrigger_reconstruction(
                       "the default is mode hlt_filter")
 
     if roi_take_fullframe:
-        # this feature only works for phase 2 atm.
-        add_pxd_fullframe_phase3(fast_reco_reconstruction_path)
+        add_pxd_fullframe_phase3_early(fast_reco_reconstruction_path)
 
     # Add fast reco reconstruction
     if softwaretrigger_mode in ['monitoring', 'fast_reco_filter', 'hlt_filter']:

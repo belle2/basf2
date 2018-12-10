@@ -27,30 +27,29 @@ REG_MODULE(CDCTriggerDQM)
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCTriggerDQMModule::CDCTriggerDQMModule() :
-  HistoModule(),
-  m_unpackedSegmentHits(), m_unpacked2DTracks(), m_unpackedNeuroTracks(),
-  m_unpackedNeuroInput2DTracks(), m_unpackedNeuroInputSegments()
+CDCTriggerDQMModule::CDCTriggerDQMModule() : HistoModule()
 {
   //Set module properties
   setDescription("CDC Trigger DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("UnpackedSegmentHitsName", m_unpackedSegmentHitsName,
+  addParam("unpackedSegmentHitsName", m_unpackedSegmentHitsName,
            "The name of the StoreArray of the unpacked CDCTriggerSegmentHits",
            string(""));
-  addParam("Unpacked2DTracksName", m_unpacked2DTracksName,
+  addParam("unpacked2DTracksName", m_unpacked2DTracksName,
            "The name of the StoreArray of the unpacked 2D finder tracks",
            string("CDCTrigger2DFinderTracks"));
-  addParam("UnpackedNeuroTracksName", m_unpackedNeuroTracksName,
+  addParam("unpackedNeuroTracksName", m_unpackedNeuroTracksName,
            "The name of the StoreArray of the unpacked neurotrigger tracks",
            string("CDCTriggerNeuroTracks"));
-  //m_unpackedNeuroInputName = m_unpackedNeuroTracksName + "Input";
-  addParam("UnpackedNeuroInput2dTracksName", m_unpackedNeuroInput2DTracksName,
+  addParam("unpackedNeuroInput2dTracksName", m_unpackedNeuroInput2DTracksName,
            "The name of the StoreArray of the neurotrigger input 2d tracks",
            string("CDCTriggerNNInput2DFinderTracks"));
-  addParam("UnpackedNeuroInputSegmentHits", m_unpackedNeuroInputSegmentsName,
+  addParam("unpackedNeuroInputSegmentHits", m_unpackedNeuroInputSegmentsName,
            "The name of the StoreArray of the neurotrigger input segment hits",
            string("CDCTriggerNNInputSegmentHits"));
+  addParam("simNeuroTracksName", m_simNeuroTracksName,
+           "The name of the StoreArray of the neurotrigger tracks from TSIM",
+           string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Name of the directory where histograms will be placed",
            string("cdctrigger"));
@@ -198,6 +197,63 @@ void CDCTriggerDQMModule::defineHisto()
   m_2DOutTrackCount = new TH1F("2DOutTrackCount", "number of 2dtracks per event", 20, 0, 20);
   m_neuroSelTSCount = new TH1F("neuroSelTSCount", "number of selected TS per SL", 9, 0, 8);
 
+  m_2DInTSID = new TH1F("2DInTSID", "ID of 2D incoming axial track segments",
+                        2336, 0, 2335);
+  m_2DInTSPrioT_Layer0 = new TH1F("2DInTSPrioT_Layer0", "Priority time of track segments in layer 0",
+                                  512, 0, 511);
+  m_2DInTSPrioT_Layer2 = new TH1F("2DInTSPrioT_Layer2", "Priority time of track segments in layer 2",
+                                  512, 0, 511);
+  m_2DInTSPrioT_Layer4 = new TH1F("2DInTSPrioT_Layer4", "Priority time of track segments in layer 4",
+                                  512, 0, 511);
+  m_2DInTSPrioT_Layer6 = new TH1F("2DInTSPrioT_Layer6", "Priority time of track segments in layer 6",
+                                  512, 0, 511);
+  m_2DInTSPrioT_Layer8 = new TH1F("2DInTSPrioT_Layer8", "Priority time of track segments in layer 8",
+                                  512, 0, 511);
+  m_2DInTSFoundT_Layer0 = new TH1F("2DInTSFoundT_Layer0", "Found time of track segments in layer 0",
+                                   96, -48, 48);
+  m_2DInTSFoundT_Layer2 = new TH1F("2DInTSFoundT_Layer2", "Found time of track segments in layer 2",
+                                   96, -48, 48);
+  m_2DInTSFoundT_Layer4 = new TH1F("2DInTSFoundT_Layer4", "Found time of track segments in layer 4",
+                                   96, -48, 48);
+  m_2DInTSFoundT_Layer6 = new TH1F("2DInTSFoundT_Layer6", "Found time of track segments in layer 6",
+                                   96, -48, 48);
+  m_2DInTSFoundT_Layer8 = new TH1F("2DInTSFoundT_Layer8", "Found time of track segments in layer 8",
+                                   96, -48, 48);
+  m_2DInTSCount = new TH1F("2DInTSCount", " number of 2D incoming TS per event",
+                           200, 0, 200);
+
+  if (m_simNeuroTracksName != "") {
+    m_neuroSector = new TH1F("NeuroSector",
+                             "unpacked sector",
+                             10, 0, 10);
+    m_neuroDeltaZ = new TH1F("NeuroDeltaZ",
+                             "difference between unpacked and simulated neuro z;delta z [cm]",
+                             100, -100, 100); // should be bit-precise, so look at very small range
+    m_neuroDeltaTheta = new TH1F("NeuroDeltaTheta",
+                                 "difference between unpacked and simulated neuro theta;delta theta [deg]",
+                                 100, -180, 180); // should be bit-precise, so look at very small range
+    m_neuroDeltaInputID = new TH1F("NeuroDeltaInputID",
+                                   "difference between unpacked and simulated ID input;delta ID",
+                                   100, -0.5, 0.5); // should be bit-precise, so look at very small range
+    m_neuroDeltaInputT = new TH1F("NeuroDeltaInputT",
+                                  "difference between unpacked and simulated time input;delta t",
+                                  100, -0.5, 0.5); // should be bit-precise, so look at very small range
+    m_neuroDeltaInputAlpha = new TH1F("NeuroDeltaInputAlpha",
+                                      "difference between unpacked and simulated alpha input;delta alpha",
+                                      100, -0.1, 0.1); // should be bit-precise, so look at very small range
+    m_neuroDeltaTSID = new TH1F("NeuroDeltaTSID",
+                                "difference between unpacked and simulated tsid",
+                                100, -50, 50);
+    m_neuroDeltaSector = new TH1F("NeuroDeltaSector",
+                                  "difference between unpacked and simulated sector",
+                                  20, -10, 10);
+    m_simSameTS = new TH1F("NeuroSimSameTS",
+                           "number of TS selected in both, unpacked and TSIM tracks",
+                           20, 0, 20);
+    m_simDiffTS = new TH1F("NeuroSimDiffTS",
+                           "number of TS selcted in TSIM but not in unpacker",
+                           20, 0, 20);
+  }
 
   // cd back to root directory
   oldDir->cd();
@@ -214,8 +270,18 @@ void CDCTriggerDQMModule::initialize()
   m_unpackedNeuroTracks.isRequired(m_unpackedNeuroTracksName);
   m_unpackedNeuroInput2DTracks.isRequired(m_unpackedNeuroInput2DTracksName);
   m_unpackedNeuroInputSegments.isRequired(m_unpackedNeuroInputSegmentsName);
-
   m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInputSegments);
+
+  if (m_simNeuroTracksName != "") {
+    m_unpackedNeuroInputName = m_unpackedNeuroTracksName + "Input";
+    m_unpackedNeuroInput.isRequired(m_unpackedNeuroInputName);
+    m_unpackedNeuroTracks.requireRelationTo(m_unpackedNeuroInput);
+    m_simNeuroInputName = m_simNeuroTracksName + "Input";
+    m_simNeuroTracks.isRequired(m_simNeuroTracksName);
+    m_simNeuroInput.isRequired(m_simNeuroInputName);
+    m_unpackedNeuroInput2DTracks.requireRelationTo(m_simNeuroTracks);
+    m_simNeuroTracks.requireRelationTo(m_simNeuroInput);
+  }
 }
 
 void CDCTriggerDQMModule::beginRun()
@@ -278,6 +344,31 @@ void CDCTriggerDQMModule::beginRun()
   m_2DOutTrackCount->Reset();
   m_neuroSelTSCount->Reset();
   m_neuroSelTSID->Reset();
+  m_2DInTSID->Reset();
+  m_2DInTSPrioT_Layer0->Reset();
+  m_2DInTSPrioT_Layer2->Reset();
+  m_2DInTSPrioT_Layer4->Reset();
+  m_2DInTSPrioT_Layer6->Reset();
+  m_2DInTSPrioT_Layer8->Reset();
+  m_2DInTSFoundT_Layer0->Reset();
+  m_2DInTSFoundT_Layer2->Reset();
+  m_2DInTSFoundT_Layer4->Reset();
+  m_2DInTSFoundT_Layer6->Reset();
+  m_2DInTSFoundT_Layer8->Reset();
+  m_2DInTSCount->Reset();
+
+  if (m_simNeuroTracksName != "") {
+    m_neuroSector->Reset();
+    m_neuroDeltaZ->Reset();
+    m_neuroDeltaTheta->Reset();
+    m_neuroDeltaInputID->Reset();
+    m_neuroDeltaInputT->Reset();
+    m_neuroDeltaInputAlpha->Reset();
+    m_neuroDeltaTSID->Reset();
+    m_neuroDeltaSector->Reset();
+    m_simSameTS->Reset();
+    m_simDiffTS->Reset();
+  }
 }
 
 
@@ -288,6 +379,7 @@ void CDCTriggerDQMModule::event()
   int nofintracks = 0;
   int nofinsegments = 0;
   int nof2douttracks = 0;
+  int nof2dinsegments = 0;
   for (CDCTriggerTrack& neuroTrack : m_unpackedNeuroTracks) {
     // count number of tracks
     nofouttracks ++;
@@ -338,6 +430,65 @@ void CDCTriggerDQMModule::event()
       if (sl % 2 == 1) pattern |= (1 << ((sl - 1) / 2));
     }
     m_neuroOutHitPattern->Fill(pattern);
+
+    if (m_simNeuroTracksName != "") {
+      // get related track from TSIM (via 2D finder track)
+      CDCTriggerTrack* finderTrack =
+        neuroTrack.getRelatedTo<CDCTriggerTrack>(m_unpackedNeuroInput2DTracksName);
+      if (finderTrack) {
+        CDCTriggerTrack* neuroSimTrack =
+          finderTrack->getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);
+        if (neuroSimTrack) {
+          // check if they same TS are selected in the unpacked and TSIM track
+          int nsameTS = 0;
+          int ndiffTS = 0;
+          for (const CDCTriggerSegmentHit& simhit :
+               neuroSimTrack->getRelationsTo<CDCTriggerSegmentHit>(m_unpackedNeuroInputSegmentsName)) {
+            unsigned int simsl = simhit.getISuperLayer();
+            for (const CDCTriggerSegmentHit& hit :
+                 neuroTrack.getRelationsTo<CDCTriggerSegmentHit>(m_unpackedNeuroInputSegmentsName)) {
+              unsigned int sl = hit.getISuperLayer();
+              if (sl == simsl) {
+                m_neuroDeltaTSID->Fill(hit.getSegmentID() - simhit.getSegmentID());
+                if (simhit.getSegmentID() == hit.getSegmentID() &&
+                    simhit.getPriorityPosition() == hit.getPriorityPosition() &&
+                    simhit.getLeftRight() == hit.getLeftRight() &&
+                    simhit.priorityTime() == hit.priorityTime()
+                   ) {
+                  nsameTS += 1;
+                } else {
+                  ndiffTS += 1;
+                }
+              }
+            }
+          }
+          m_simSameTS->Fill(nsameTS);
+          m_simDiffTS->Fill(ndiffTS);
+          // only calculate deltas if the same TS are selected in unpacker and TSIM
+          // TODO allow less then 9 TS per track
+          if (ndiffTS == 0 && nsameTS > 8) {
+            m_neuroDeltaZ->Fill(neuroTrack.getZ0() - neuroSimTrack->getZ0());
+            m_neuroDeltaTheta->Fill(neuroTrack.getDirection().Theta() * 180. / M_PI -
+                                    neuroSimTrack->getDirection().Theta() * 180. / M_PI);
+            vector<float> unpackedInput =
+              neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputName)->getInput();
+            vector<float> simInput =
+              neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputName)->getInput();
+            unsigned unpackedSector =
+              neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputName)->getSector();
+            unsigned simSector =
+              neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputName)->getSector();
+            m_neuroSector->Fill(unpackedSector);
+            m_neuroDeltaSector->Fill(unpackedSector - simSector);
+            for (unsigned ii = 0; ii < unpackedInput.size(); ii += 3) {
+              m_neuroDeltaInputID->Fill(unpackedInput[ii] - simInput[ii]);
+              m_neuroDeltaInputT->Fill(unpackedInput[ii + 1] - simInput[ii + 1]);
+              m_neuroDeltaInputAlpha->Fill(unpackedInput[ii + 2] - simInput[ii + 2]);
+            }
+          }
+        }
+      }
+    }
   }
   for (CDCTriggerTrack& neuroinput2dtrack : m_unpackedNeuroInput2DTracks) {
     nofintracks ++;
@@ -397,6 +548,30 @@ void CDCTriggerDQMModule::event()
     m_neuroInVs2DOutTrackCount->Fill((nofintracks - nof2douttracks));
     m_2DOutTrackCount->Fill(nof2douttracks);
   }
+  for (CDCTriggerSegmentHit& hit : m_unpackedSegmentHits) {
+    nof2dinsegments++;
+    m_2DInTSID->Fill(hit.getSegmentID());
+    unsigned int sl = hit.getISuperLayer();
+    switch (sl) {
+      case 0: m_2DInTSPrioT_Layer0->Fill(hit.priorityTime());
+        m_2DInTSFoundT_Layer0->Fill(hit.foundTime());
+        break;
+      case 2: m_2DInTSPrioT_Layer2->Fill(hit.priorityTime());
+        m_2DInTSFoundT_Layer2->Fill(hit.foundTime());
+        break;
+      case 4: m_2DInTSPrioT_Layer4->Fill(hit.priorityTime());
+        m_2DInTSFoundT_Layer4->Fill(hit.foundTime());
+        break;
+      case 6: m_2DInTSPrioT_Layer6->Fill(hit.priorityTime());
+        m_2DInTSFoundT_Layer6->Fill(hit.foundTime());
+        break;
+      case 8: m_2DInTSPrioT_Layer8->Fill(hit.priorityTime());
+        m_2DInTSFoundT_Layer8->Fill(hit.foundTime());
+        break;
+    }
+  }
+  if (nof2dinsegments > 0)
+    m_2DInTSCount->Fill(nof2dinsegments);
 }
 
 

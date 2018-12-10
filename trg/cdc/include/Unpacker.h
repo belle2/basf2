@@ -348,7 +348,7 @@ namespace Belle2 {
 
     /** Decode the neuro track from the bit string
      *
-     *  @param trackIn  NNOutput string from the clock cycle containing the neural network results results
+     *  @param trackIn  NNOutput string from the clock cycle containing the neural network results
      *
      *  @param selectIn NNOutput string from the clock cycle containing the input selection (TS and input vector)
      *
@@ -366,11 +366,11 @@ namespace Belle2 {
       foundTrack.sector = std::bitset<3>(trackIn.substr(2 * lenMLP + 1, 3)).to_ulong();
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         foundTrack.inputAlpha[iSL] =
-          mlp_bin_to_signed_int(selectIn.substr((2 + iSL) * lenMLP + 4, lenMLP)) * scale;
+          mlp_bin_to_signed_int(selectIn.substr((2 + (8 - iSL)) * lenMLP + 4, lenMLP)) * scale;
         foundTrack.inputT[iSL] =
-          mlp_bin_to_signed_int(selectIn.substr((11 + iSL) * lenMLP + 4, lenMLP)) * scale;
+          mlp_bin_to_signed_int(selectIn.substr((11 + (8 - iSL)) * lenMLP + 4, lenMLP)) * scale;
         foundTrack.inputID[iSL] =
-          mlp_bin_to_signed_int(selectIn.substr((20 + iSL) * lenMLP + 4, lenMLP)) * scale;
+          mlp_bin_to_signed_int(selectIn.substr((20 + (8 - iSL)) * lenMLP + 4, lenMLP)) * scale;
         foundTrack.ts[iSL] =  // order: SL8, ..., SL0
           decodeTSHit(selectIn.substr(29 * lenMLP + 4 + (8 - iSL) * lenTS, lenTS));
       }
@@ -465,7 +465,7 @@ namespace Belle2 {
                                     ts[2], // L/R
                                     ts[1], // priority time
                                     0, // fastest time (unknown)
-                                    0); // found time (unknown)
+                                    foundTime); // found time (using the unpacked clock cycle)
                 track->addRelationTo(hit);
               }
             }

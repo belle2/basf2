@@ -57,11 +57,17 @@ namespace Belle2 {
     /** CDCTriggerTrack StoreArray name for neuro tracks from unpacker */
     std::string m_unpackedNeuroTracksName;
     /** StoreArray name for neuro input vector from unpacker */
-//    std::string m_unpackedNeuroInputName;
+    std::string m_unpackedNeuroInputName;
     /** StoreArray name for neuro input 2d finder tracks */
     std::string m_unpackedNeuroInput2DTracksName;
     /** StoreArray name for neuro input Track segments */
     std::string m_unpackedNeuroInputSegmentsName;
+    // names for simulated objects
+    /** CDCTriggerTrack StoreArray name for neuro tracks from TSIM
+     *  (from CDCTriggerNeuro module with unpacked TS hits and 2D tracks as input) */
+    std::string m_simNeuroTracksName;
+    /** StoreArray name for neuro input vector from TSIM */
+    std::string m_simNeuroInputName;
     // store arrays for direct access
     /** Storearray for TS hits from unpacker */
     StoreArray<CDCTriggerSegmentHit> m_unpackedSegmentHits;
@@ -70,11 +76,15 @@ namespace Belle2 {
     /** Storearray for neuro tracks from unpacker */
     StoreArray<CDCTriggerTrack> m_unpackedNeuroTracks;
     /** Storearray for neuro input vector from unpacker */
-//    StoreArray<CDCTriggerMLPInput> m_unpackedNeuroInput;
+    StoreArray<CDCTriggerMLPInput> m_unpackedNeuroInput;
     /** Store array for neuro input 2dfinder tracks */
     StoreArray<CDCTriggerTrack> m_unpackedNeuroInput2DTracks;
     /** StoreArray for neuro input Track segments */
     StoreArray<CDCTriggerSegmentHit> m_unpackedNeuroInputSegments;
+    /** Storearray for neuro tracks from TSIM */
+    StoreArray<CDCTriggerTrack> m_simNeuroTracks;
+    /** Storearray for neuro input vector from TSIM */
+    StoreArray<CDCTriggerMLPInput> m_simNeuroInput;
 
 
     // histograms for neurotrigger
@@ -135,6 +145,28 @@ namespace Belle2 {
     TH1F* m_2DOutTrackCount;         /**< number of 2dtracks per event */
     TH1F* m_neuroSelTSCount;         /**< number of selected TS per SL */
     TH1F* m_neuroSelTSID;            /**< ID of selected track segments */
+    TH1F* m_2DInTSID;                /**< ID of 2D incoming axial track segments */
+    TH1F* m_2DInTSPrioT_Layer0;      /**< Priority time of 2D track segments in layer 0 */
+    TH1F* m_2DInTSPrioT_Layer2;      /**< Priority time of 2D track segments in layer 2 */
+    TH1F* m_2DInTSPrioT_Layer4;      /**< Priority time of 2D track segments in layer 4 */
+    TH1F* m_2DInTSPrioT_Layer6;      /**< Priority time of 2D track segments in layer 6 */
+    TH1F* m_2DInTSPrioT_Layer8;      /**< Priority time of 2D track segments in layer 8 */
+    TH1F* m_2DInTSFoundT_Layer0;     /**< Found time of 2D track segments in layer 0 */
+    TH1F* m_2DInTSFoundT_Layer2;     /**< Found time of 2D track segments in layer 2 */
+    TH1F* m_2DInTSFoundT_Layer4;     /**< Found time of 2D track segments in layer 4 */
+    TH1F* m_2DInTSFoundT_Layer6;     /**< Found time of 2D track segments in layer 6 */
+    TH1F* m_2DInTSFoundT_Layer8;     /**< Found time of 2D track segments in layer 8 */
+    TH1F* m_2DInTSCount;             /**< number of 2D incoming TS per SL */
+    TH1F* m_neuroSector;             /**< unpacked sector */
+    TH1F* m_neuroDeltaZ;             /**< unpacked z - TSIM z */
+    TH1F* m_neuroDeltaTheta;         /**< unpacked theta - TSIM theta */
+    TH1F* m_neuroDeltaInputID;       /**< unpacked ID input - TSIM ID input */
+    TH1F* m_neuroDeltaInputT;        /**< unpacked time input - TSIM time input */
+    TH1F* m_neuroDeltaInputAlpha;    /**< unpacked alpha input - TSIM alpha input */
+    TH1F* m_neuroDeltaTSID;          /**< unpacked selected TSID - TSIM selected TSID */
+    TH1F* m_neuroDeltaSector;        /**< unpacked sector - TSIM sector */
+    TH1F* m_simSameTS;               /**< number of TS selected in both, unpacked and TSIM tracks */
+    TH1F* m_simDiffTS;               /**< number of TS selcted in TSIM but not in unpacked */
 
   };
 

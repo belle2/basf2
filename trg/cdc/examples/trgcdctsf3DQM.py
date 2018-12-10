@@ -41,7 +41,7 @@ else:
 
 main.add_module(input)
 histo = register_module('HistoManager')
-histo.param("histoFileName", "dqm.%s.root" % basename)
+histo.param("histoFileName", "dqm.%s.superlayer3.root" % basename)
 
 # Unpacker
 trgcdctsfUnpacker = register_module("TRGCDCTSFUnpacker")

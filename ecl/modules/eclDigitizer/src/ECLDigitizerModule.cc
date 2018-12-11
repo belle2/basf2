@@ -76,15 +76,16 @@ void ECLDigitizerModule::initialize()
   m_eclTrigs.registerInDataStore();
 
   if (m_HadronPulseShape) {
-    B2INFO("Hadron pulse shapes for ECL simulations are enabled.  Pulse shape simulations use techniques validated with test beam data documented in: S. Longo and J. M. Roney 2018 JINST 13 P03018");
+    B2DEBUG(20,
+            "Hadron pulse shapes for ECL simulations are enabled.  Pulse shape simulations use techniques validated with test beam data documented in: S. Longo and J. M. Roney 2018 JINST 13 P03018");
   } else {
-    B2INFO("Hadron pulse shapes for ECL simulations are disabled.");
+    B2DEBUG(20, "Hadron pulse shapes for ECL simulations are disabled.");
   }
 
   if (m_inter) {
-    B2INFO("Diode-crossing pulse shapes for ECL simulations are enabled");
+    B2DEBUG(20, "Diode-crossing pulse shapes for ECL simulations are enabled");
   } else {
-    B2INFO("Diode-crossing pulse shapes for ECL simulations are disabled.");
+    B2DEBUG(20, "Diode-crossing pulse shapes for ECL simulations are disabled.");
   }
 
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");

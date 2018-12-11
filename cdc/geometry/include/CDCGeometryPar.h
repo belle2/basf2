@@ -31,12 +31,6 @@
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
-#include <cdc/dbobjects/CDCLayerAlignment.h>
-
-
-#include <cdc/dbobjects/CDCLayerAlignment.h>
-
-
 #include <vector>
 #include <string>
 #include <map>

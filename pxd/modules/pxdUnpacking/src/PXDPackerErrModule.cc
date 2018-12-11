@@ -202,12 +202,15 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
   c_FAKE_NO_FAKE_DATA,
   /*
    * 76 Fake no Fake mix, replaced DHC Start
-   * 77
-   * 78
-   * 79
-   * 80
+   * 77 ROI Frame without header/content, inside DHC Start/End
+   * 78 ROI Frame without header/content, outside DHC Start/End ... is this allowed?
+   * 79 TODO ROI Frame with header & content
+   * 80 TODO ROI Frame with header & content but errors
    */
   c_FAKE_NO_FAKE_DATA,
+  c_ROI_PACKET_INV_SIZE,
+  c_ROI_PACKET_INV_SIZE,
+  c_NO_ERROR,
 };
 
 bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFlags mask)
@@ -645,10 +648,14 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
     /// lets copy the HLT/ROI frame
 
-    // TODO add ROI Frame if header bit is set
-    //  start_frame();
-    //  append_int32((EDHCFrameHeaderDataType::c_ONSEN_ROI<<27) | (m_trigger_nr & 0xFFFF));
-    //  add_frame_to_payload();
+    if (isErrorIn(77)) {
+      // TODO add ROI Frame if header bit is set
+      int old = dhc_byte_count;
+      start_frame();
+      append_int32((EDHCFrameHeaderDataType::c_ONSEN_ROI << 27) | (m_trigger_nr & 0xFFFF));
+      add_frame_to_payload();
+      dhc_byte_count = old; // dont count
+    }
 
     /// DHC End
     if (isErrorIn(75)) {
@@ -673,6 +680,15 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
         m_onsen_payload.push_back(m_current_frame);
       }
     }
+    if (isErrorIn(78)) {
+      // TODO add ROI Frame if header bit is set
+      int old = dhc_byte_count;
+      start_frame();
+      append_int32((EDHCFrameHeaderDataType::c_ONSEN_ROI << 27) | (m_trigger_nr & 0xFFFF));
+      add_frame_to_payload();
+      dhc_byte_count = old; // dont count
+    }
+
   } else {
     // add a faked DHC, "no data"
     start_frame();

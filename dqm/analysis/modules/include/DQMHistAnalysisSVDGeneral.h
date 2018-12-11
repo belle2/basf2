@@ -61,7 +61,7 @@ namespace Belle2 {
     TH2F* m_hOccupancyV = nullptr;
     TCanvas* m_cOccupancyV = nullptr;
 
-    TPaveText* boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color);
+    TPaveText boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color);
     Int_t findBinY(Int_t layer, Int_t sensor);
 
     TPaveText* m_leg = nullptr;
@@ -71,6 +71,7 @@ namespace Belle2 {
     TPaveText* m_legEmpty = nullptr;
     TPaveText* m_legError = nullptr;
     TText* m_yTitle = nullptr;
+
 
     //! IDs of all SXD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

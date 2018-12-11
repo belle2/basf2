@@ -17,6 +17,7 @@
 #include <TBox.h>
 #include <TAxis.h>
 
+#define B2DEBUG(debugLevel, string) B2INFO(string)
 
 using namespace std;
 using namespace Belle2;
@@ -58,7 +59,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data(), "READ");
   }
-
 
   //search for reference
   if (m_refFile && m_refFile->IsOpen()) {
@@ -180,9 +180,9 @@ void DQMHistAnalysisSVDGeneralModule::event()
   //check DATA FORMAT
   TH1* h = findHist("SVDUnpacker/DQMUnpackerHisto");
 
-  TBox* b = new TBox(-1, -4.6, 20, 54.5);
-  b->SetLineWidth(12);
-  b->SetFillStyle(0);
+  TBox b(-1, -4.6, 20, 54.5);
+  b.SetLineWidth(12);
+  b.SetFillStyle(0);
   Int_t color = kGreen;
 
   if (h != NULL) {
@@ -196,8 +196,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
       color = kRed;
       m_legError->Draw("same");
     }
-    b->Draw("same");
-    b->SetLineColor(color);
+    b.SetLineColor(color);
+    b.DrawClone("same");
   } else {
     B2DEBUG(20, "Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackedDQM not found!");
     m_cUnpacker->SetFillColor(kRed);
@@ -207,6 +207,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   if (m_printCanvas)
     m_cUnpacker->Print("c_SVDDataFormat.pdf");
+
+
 
   //check MODULE OCCUPANCY
 
@@ -254,7 +256,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       else if (occU <= m_occError)
         color = kOrange;
       m_cOccupancyU->cd();
-      boxOcc(tmp_layer, tmp_ladder, tmp_sensor, color)->Draw("same");
+      boxOcc(tmp_layer, tmp_ladder, tmp_sensor, color).DrawClone("same");
 
       B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " color = " << color);
     }
@@ -282,7 +284,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       else if (occV <= m_occError)
         color = kOrange;
       m_cOccupancyV->cd();
-      boxOcc(tmp_layer, tmp_ladder, tmp_sensor, color)->Draw("same");
+      boxOcc(tmp_layer, tmp_ladder, tmp_sensor, color).DrawClone("same");
 
       B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " V occ = " << occV << " color = " << color);
     }
@@ -327,14 +329,29 @@ void DQMHistAnalysisSVDGeneralModule::endRun()
 void DQMHistAnalysisSVDGeneralModule::terminate()
 {
   B2DEBUG(20, "DQMHistAnalysisSVDGeneral: terminate called");
+
+  delete m_leg;
+  delete m_legProblem;
+  delete m_legWarning;
+  delete m_legNormal;
+  delete m_legEmpty;
+  delete m_legError;
+  delete m_yTitle;
+
+  delete m_cUnpacker;
+  delete m_hOccupancyU;
+  delete m_cOccupancyU;
+  delete m_hOccupancyV;
+  delete m_cOccupancyV;
+
 }
 
-TPaveText* DQMHistAnalysisSVDGeneralModule::boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color)
+TPaveText DQMHistAnalysisSVDGeneralModule::boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color)
 {
 
   Float_t y = findBinY(layer, sensor);
-  TPaveText* box = new TPaveText(ladder - 0.5, y, ladder + 0.5, y + 1);
-  box->SetFillColor(color);
+  TPaveText box(ladder - 0.5, y, ladder + 0.5, y + 1);
+  box.SetFillColor(color);
 
   return box;
 

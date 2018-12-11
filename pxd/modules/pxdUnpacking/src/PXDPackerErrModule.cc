@@ -74,17 +74,17 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
    * 14 - Missing DHC End frame
    * 15 - Missing DHE Start frame */
   c_FRAME_SIZE, // TODO can check more errors
-  c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO
+  c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD | c_EVENT_STRUCT, // TODO
   c_DHC_START_SECOND, // TODO
   c_DHC_END_MISS,
-  c_DHE_END_WO_START, // TODO
+  c_DHE_END_WO_START | c_DHE_START_THIRD, // TODO
   /* 16 - Missing DHE End frame
    * 17 - Double ONS Trig frame
    * 18 - Double DHC Start frame
    * 19 - Double DHC End frame
    * 20 - Double DHE Start frame*/
   c_DHE_START_WO_END, // TODO if two DHE, another error condition shoudl trigger, too
-  c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
+  c_ONSEN_TRG_FIRST | c_DHC_START_SECOND | c_DHE_START_THIRD | c_EVENT_STRUCT, // TODO why data outside of ...
   c_DHC_START_SECOND | c_DHE_START_THIRD, // TODO why data outside of ...
   c_DHC_END_DBL, // TODO
   c_DHE_WRONG_ID_SEQ | c_DHE_START_WO_END, // TODO
@@ -180,7 +180,7 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
   c_DHE_ID_INVALID,
   /* 66 - Doubled DHP Header
    * 67 - 'FAKE' DHC START/END (=no data)
-   * 68 - wrong trigger number in DHP header TODO
+   * 68 - wrong readout frame number in DHP header TODO
    * 69 - DHP frame with too small size
    * 70 - TimeTag Mismatch for DHC/Meta */
   c_DHP_DBL_HEADER,
@@ -188,6 +188,26 @@ std::vector <PXDErrorFlags> PXDPackerErrModule::m_errors =  {
   c_NO_ERROR,// TODO ===========================================TODO Unpacker is not detecting this
   c_DHP_SIZE,
   c_META_MM_DHC_TT,
+  /*
+   * 71 data outside of DHE
+   * 72 Fake no Fake mix, plus a second DHC
+   * 73 Fake no Fake mix, plus double DHC End
+   * 74 Fake no Fake mix, plus double DHC Start
+   * 75 Fake no Fake mix, replaced DHC End
+   */
+  c_DATA_OUTSIDE,
+  c_FAKE_NO_FAKE_DATA,
+  c_FAKE_NO_FAKE_DATA,
+  c_FAKE_NO_FAKE_DATA,
+  c_FAKE_NO_FAKE_DATA,
+  /*
+   * 76 Fake no Fake mix, replaced DHC Start
+   * 77
+   * 78
+   * 79
+   * 80
+   */
+  c_FAKE_NO_FAKE_DATA,
 };
 
 bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFlags mask)
@@ -404,9 +424,47 @@ void PXDPackerErrModule::pack_event(void)
 
     m_onsen_header.clear();// Reset
     m_onsen_payload.clear();// Reset
+    if (isErrorIn(74)) {
+      // add a faked DHC, "no data"
+      start_frame();
+      append_int32(EDHCFrameHeaderDataType::c_DHC_START << 27);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      add_frame_to_payload();
+    }
     if (!isErrorIn(53)) pack_dhc(it.first, act_port, dhe_ids);
     // and write to PxdRaw object
     // header will be finished and endian swapped by constructor; payload already has be on filling the vector
+    if (isErrorIn(73)) {
+      // add a faked DHC, "no data"
+      start_frame();
+      append_int32(EDHCFrameHeaderDataType::c_DHC_END << 27);
+      append_int32(0);
+      append_int32(0);
+      add_frame_to_payload();
+    }
+    if (isErrorIn(72)) {
+      // add a faked DHC, "no data"
+      start_frame();
+      append_int32(EDHCFrameHeaderDataType::c_DHC_START << 27);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      add_frame_to_payload();
+
+      start_frame();
+      append_int32(EDHCFrameHeaderDataType::c_DHC_END << 27);
+      append_int32(0);
+      append_int32(0);
+      add_frame_to_payload();
+    }
     auto objptr = m_storeRaws.appendNew(m_onsen_header, m_onsen_payload);
     if (isErrorIn(54)) {
       objptr->data()[0] = 0xDEADBEAF; // invalid magic
@@ -534,30 +592,43 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   if (!isErrorIn(67)) {
 
     dhc_byte_count = 0;
-    start_frame();
-    uint32_t header = (EDHCFrameHeaderDataType::c_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
-                      (m_trigger_nr & 0xFFFF);
-    if (isErrorIn(59)) header++;
-    append_int32(header);
-    if (!isErrorIn(58)) append_int16(m_trigger_nr >> 16);
-    else  append_int16((m_trigger_nr >> 16) + 1);
+    if (isErrorIn(76)) {
+      // add a faked DHC, "no data"
+      start_frame();
+      append_int32(EDHCFrameHeaderDataType::c_DHC_START << 27);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      append_int16(0);
+      add_frame_to_payload();
+    } else {
+      start_frame();
+      uint32_t header = (EDHCFrameHeaderDataType::c_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
+                        (m_trigger_nr & 0xFFFF);
+      if (isErrorIn(59)) header++;
+      append_int32(header);
+      if (!isErrorIn(58)) append_int16(m_trigger_nr >> 16);
+      else  append_int16((m_trigger_nr >> 16) + 1);
 
-    uint32_t mm = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216); // in 127MHz Ticks
-    uint32_t ss = (unsigned int)(m_meta_time / 1000000000ull) ; // in seconds
-    if (isErrorIn(70)) mm++;
-    if (isErrorIn(70)) ss++;
-    append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
-    append_int16(((mm >> 12) & 0x7FFF) | ((ss & 1) ? 0x8000 : 0x0)); // TT 27-12 ... not clear if completely filled by DHC
-    append_int16((ss >> 1) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
-    if (!isErrorIn(7)) {
-      append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
-      append_int16(m_run_nr_word2);  // Exp NR 9-0 | Run Nr 13-8
-    }
-    if (!isErrorIn(13)) add_frame_to_payload();
-    if (isErrorIn(18)) {
-      // double frame
-      m_onsen_header.push_back(m_current_frame.size());
-      m_onsen_payload.push_back(m_current_frame);
+      uint32_t mm = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216); // in 127MHz Ticks
+      uint32_t ss = (unsigned int)(m_meta_time / 1000000000ull) ; // in seconds
+      if (isErrorIn(70)) mm++;
+      if (isErrorIn(70)) ss++;
+      append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
+      append_int16(((mm >> 12) & 0x7FFF) | ((ss & 1) ? 0x8000 : 0x0)); // TT 27-12 ... not clear if completely filled by DHC
+      append_int16((ss >> 1) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
+      if (!isErrorIn(7)) {
+        append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
+        append_int16(m_run_nr_word2);  // Exp NR 9-0 | Run Nr 13-8
+      }
+      if (!isErrorIn(13)) add_frame_to_payload();
+      if (isErrorIn(18)) {
+        // double frame
+        m_onsen_header.push_back(m_current_frame.size());
+        m_onsen_payload.push_back(m_current_frame);
+      }
     }
 
     // loop for each DHE in system
@@ -566,6 +637,9 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
     if (isErrorIn(29)) dhe_active = 0; // dont send any DHE
     for (int i = 0; i < 5; i++) {
       if ((dhe_active & 0x1) or isErrorIn(28)) pack_dhe(dhe_ids[i], 0xF);
+      if (isErrorIn(71) && i == 2) {
+        pack_dhp(1, dhe_ids[i], 1);
+      }
       dhe_active >>= 1;
     }
 
@@ -577,18 +651,27 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
     //  add_frame_to_payload();
 
     /// DHC End
-    if (isErrorIn(31)) dhc_id += 1;
-    if (isErrorIn(33)) dhc_byte_count += 4;
-    unsigned int dlen = (dhc_byte_count / 4); // 32 bit words
-    start_frame();
-    append_int32((EDHCFrameHeaderDataType::c_DHC_END << 27) | ((dhc_id & 0xF) << 21) | (m_trigger_nr & 0xFFFF));
-    append_int32(dlen); // 32 bit word count
-    if (!isErrorIn(8)) append_int32(0x00000000);  // Error Flags
-    if (!isErrorIn(14)) add_frame_to_payload();
-    if (isErrorIn(19)) {
-      // double frame
-      m_onsen_header.push_back(m_current_frame.size());
-      m_onsen_payload.push_back(m_current_frame);
+    if (isErrorIn(75)) {
+      // add a faked DHC, "no data"
+      start_frame();
+      append_int32(EDHCFrameHeaderDataType::c_DHC_END << 27);
+      append_int32(0);
+      append_int32(0);
+      add_frame_to_payload();
+    } else {
+      if (isErrorIn(31)) dhc_id += 1;
+      if (isErrorIn(33)) dhc_byte_count += 4;
+      unsigned int dlen = (dhc_byte_count / 4); // 32 bit words
+      start_frame();
+      append_int32((EDHCFrameHeaderDataType::c_DHC_END << 27) | ((dhc_id & 0xF) << 21) | (m_trigger_nr & 0xFFFF));
+      append_int32(dlen); // 32 bit word count
+      if (!isErrorIn(8)) append_int32(0x00000000);  // Error Flags
+      if (!isErrorIn(14)) add_frame_to_payload();
+      if (isErrorIn(19)) {
+        // double frame
+        m_onsen_header.push_back(m_current_frame.size());
+        m_onsen_payload.push_back(m_current_frame);
+      }
     }
   } else {
     // add a faked DHC, "no data"

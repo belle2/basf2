@@ -331,20 +331,25 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
   if (dhe_ID != dhp_dhe_id) {
-    if (!(m_suppressErrorMask & c_DHE_DHP_DHEID)) B2WARNING("DHE ID in DHE and DHP header differ $" << hex << dhe_ID <<
-                                                              " != $"
-                                                              << dhp_dhe_id);
+    if (!(m_suppressErrorMask & c_DHE_DHP_DHEID)) {
+      B2WARNING("DHE ID in DHE and DHP header differ");
+      B2DEBUG(1, "DHE ID in DHE and DHP header differ $" << hex << dhe_ID << " != $" << dhp_dhe_id);
+    }
     m_errorMask |= c_DHE_DHP_DHEID;
   }
   if (dhe_DHPport != dhp_dhp_id) {
-    if (!(m_suppressErrorMask & c_DHE_DHP_PORT)) B2WARNING("DHP ID (Chip/Port) in DHE and DHP header differ $" << hex <<
-                                                             dhe_DHPport << " != $" << dhp_dhp_id);
+    if (!(m_suppressErrorMask & c_DHE_DHP_PORT)) {
+      B2WARNING("DHP ID (Chip/Port) in DHE and DHP header differ");
+      B2DEBUG(1, "DHP ID (Chip/Port) in DHE and DHP header differ $" << hex << dhe_DHPport << " != $" << dhp_dhp_id);
+    }
     m_errorMask |= c_DHE_DHP_PORT;
   }
 
   if (dhp_header_type != EDHPFrameHeaderDataType::c_RAW) {
-    if (!(m_suppressErrorMask & c_HEADERTYPE_INV)) B2WARNING("Header type invalid for this kind of DHE frame: $" << hex <<
-                                                               dhp_header_type);
+    if (!(m_suppressErrorMask & c_HEADERTYPE_INV)) {
+      B2WARNING("Header type invalid for this kind of DHE frame");
+      B2DEBUG(1, "Header type invalid for this kind of DHE frame: $" << hex << dhp_header_type);
+    }
     m_errorMask |= c_HEADERTYPE_INV;
     return;
   }
@@ -727,7 +732,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     int s = dhc.getFixedSize();
     if (len != s && s != 0) {
       if (!(m_suppressErrorMask & c_FIX_SIZE)) {
-        B2WARNING("Fixed frame type size does not match specs" << LogVar("expeted length",
+        B2WARNING("Fixed frame type size does not match specs" << LogVar("expected length",
                   len) << LogVar("length in data", s));
       }
       m_errorMask |= c_FIX_SIZE;
@@ -1140,7 +1145,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         if (!(m_suppressErrorMask & c_FAKE_NO_FAKE_DATA)) B2WARNING("DHC END mixed Fake/no Fake event.");
         m_errorMask |= c_FAKE_NO_FAKE_DATA;
       }
-      if (isFakedData_event) {
+      if (dhc.data_dhc_end_frame->isFakedData()) {
         if (!(m_suppressErrorMask & c_FAKE_NO_DATA_TRIG)) B2WARNING("Faked DHC END Data -> trigger without Data!");
         m_errorMask |= c_FAKE_NO_DATA_TRIG;
       } else {

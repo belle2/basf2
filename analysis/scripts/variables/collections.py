@@ -6,7 +6,8 @@ from flavorTagger import AvailableCategories
 #: Replacement for FlavorTagging nTupleTool
 ut.cpp_variables.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
 ut.cpp_variables.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
-flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined']
+ut.cpp_variables.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
+flavor_tagging = ['FBDT_qrCombined', 'FANN_qrCombined', 'qrMC']
 
 for iCategory in AvailableCategories:
     aliasForQp = 'qp' + iCategory

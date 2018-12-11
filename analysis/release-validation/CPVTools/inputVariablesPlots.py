@@ -21,7 +21,7 @@ ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 from ROOT import Belle2
 import flavorTagger as ft
 import basf2_mva
-from flavorTaggerEfficiency import r_subsample, r_size, categories
+from defaultEvaluationParameters import r_subsample, r_size, categories
 from array import array
 
 import numpy as np

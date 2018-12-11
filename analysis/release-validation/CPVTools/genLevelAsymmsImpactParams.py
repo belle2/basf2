@@ -32,6 +32,7 @@ from matplotlib.ticker import FormatStrFormatter
 import math
 import sys
 import glob
+import os
 
 if len(sys.argv) != 3:
     sys.exit("Must provide 2 arguments: [Belle or Belle2] [samplesWildCards]"

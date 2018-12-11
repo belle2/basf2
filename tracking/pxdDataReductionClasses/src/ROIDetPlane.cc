@@ -77,7 +77,7 @@ bool ROIDetPlane::isSensorInRange(const TVector3& trackPosition, int layer)
 
   double trackZ = trackPosition.Z();
   // check whether genfit track is in z range
-  if (not(m_sensorZMin <= trackZ && m_sensorZMax >= trackZ)) {
+  if (m_sensorZMin > trackZ || m_sensorZMax < trackZ) {
     return false;
   }
 
@@ -88,8 +88,9 @@ bool ROIDetPlane::isSensorInRange(const TVector3& trackPosition, int layer)
      the origin (which means the dot product of m_orthoVec_upper and the position is smaller 0) and "above" the lower plane
      defined by its orthogonal vector m_orthoVec_lower vector and the origin (which means the dot product with m_orthoVec_lower
      is greater 0) */
-  if (not(trackPosition.Dot(m_orthoVec_upper) <= 0 && trackPosition.Dot(m_orthoVec_lower) >= 0))
+  if (trackPosition.Dot(m_orthoVec_upper) > 0 || trackPosition.Dot(m_orthoVec_lower) < 0) {
     return false;
+  }
 
   // fullfilled all conditions
   return true;

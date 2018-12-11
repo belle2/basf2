@@ -20,7 +20,7 @@ const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& charg
 {
   const auto trackFitResultArrayIndex = m_trackFitIndices[chargedStable.getIndex()];
   if (trackFitResultArrayIndex < 0) {
-    B2DEBUG(30, "TrackFitResult for the requested hypothesis is not set. Returning a nullptr instead.");
+    B2DEBUG(20, "TrackFitResult for the requested hypothesis is not set. Returning a nullptr instead.");
     return nullptr;
   }
 

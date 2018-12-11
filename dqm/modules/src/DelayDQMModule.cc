@@ -10,10 +10,6 @@
  **************************************************************************/
 
 #include "dqm/modules/DelayDQMModule.h"
-
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 #include "TMath.h"
 #include "TDirectory.h"
 
@@ -82,6 +78,9 @@ void DelayDQMModule::defineHisto()
 
 void DelayDQMModule::initialize()
 {
+  // Required input
+  m_eventMetaData.isRequired();
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 }
@@ -99,10 +98,9 @@ void DelayDQMModule::event()
 {
   // Calculate the time difference between now and the trigger time
   // This tells you how much delay we have summed up (it is NOT the processing time!)
-  StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
   /** Time(Tag) from MetaInfo, ns since epoch */
   unsigned long long int meta_time = 0;
-  meta_time = evtPtr->getTime();
+  meta_time = m_eventMetaData->getTime();
 
   using namespace std::chrono;
   nanoseconds ns = duration_cast< nanoseconds >(

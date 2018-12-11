@@ -53,7 +53,9 @@ ROIDetPlane::ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerance
   // get points at upper and lower edge of the sensor
   TVector3 edgepoint_upper = globalSensorPos + maxDistU * globaluVector;
   TVector3 edgepoint_lower = globalSensorPos - maxDistU * globaluVector;
-  // get the orthogonal vectors, no need to normalize as we only test for the sign
+  /* Get the orthogonal vectors, no need to normalize as we only test for the sign.
+     These two vectors are defined so that they are orthogonal to  the plane spanned by the z-axis and the vector going from
+     the origin to the upper/lower edge of the sensor (global coordinates).*/
   m_orthoVec_upper = TVector3(0, 0, 1).Cross(edgepoint_upper);
   m_orthoVec_lower = TVector3(0, 0, 1).Cross(edgepoint_lower);
 
@@ -65,9 +67,6 @@ ROIDetPlane::ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerance
 
   m_layer = (aSensorInfo.getID()).getLayerNumber();
 }
-
-
-ROIDetPlane::~ROIDetPlane() {}
 
 
 bool ROIDetPlane::isSensorInRange(const TVector3& trackPosition, int layer)
@@ -82,8 +81,14 @@ bool ROIDetPlane::isSensorInRange(const TVector3& trackPosition, int layer)
     return false;
   }
 
-  // check if point is within the 2 planes defined by the normal vectors
-  if (trackPosition.Dot(m_orthoVec_upper) > 0 || trackPosition.Dot(m_orthoVec_lower) < 0)
+  /* Positions on the sensor have to lie between the planes that go through the upper edge of the sensor
+     and the lower edge of the senor (all w.r.t. the origin 0,0,0, and in r-phi-direction). That means for vectors pointing to the sensor
+     it has to be "below" (w.r.t. the plane) the plane going through the upper edge defined by its
+     orthogonal vector m_orthoVec_upper and
+     the origin (which means the dot product of m_orthoVec_upper and the position is smaller 0) and "above" the lower plane
+     defined by its orthogonal vector m_orthoVec_lower vector and the origin (which means the dot product with m_orthoVec_lower
+     is greater 0) */
+  if (not(trackPosition.Dot(m_orthoVec_upper) <= 0 && trackPosition.Dot(m_orthoVec_lower) >= 0))
     return false;
 
   // fullfilled all conditions

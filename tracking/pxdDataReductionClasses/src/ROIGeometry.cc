@@ -91,7 +91,7 @@ ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVecto
     if (itPlanes->isSensorInRange(recoTrackPosition, layer))
       selectedPlanes->push_back(*itPlanes);
 
-    itPlanes++;
+    ++itPlanes;
 
   }
 
@@ -99,7 +99,7 @@ ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVecto
   itPlanes = selectedPlanes->begin();
   while (itPlanes != selectedPlanes->end()) {
     B2DEBUG(20, "     " << (itPlanes->getVxdID()));
-    itPlanes++;
+    ++itPlanes;
   }
 
 }

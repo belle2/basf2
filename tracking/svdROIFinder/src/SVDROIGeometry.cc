@@ -53,7 +53,6 @@ SVDROIGeometry::fillPlaneList(double toleranceZ,
 
       std::set<Belle2::VxdID> svdSensors = geoCache.getSensors(*itSvdLadders);
       std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
-      //      B2DEBUG(20, "    svd sensor info " << * (svdSensors.begin()));
 
       while (itSvdSensors != svdSensors.end()) {
         B2DEBUG(20, "    svd sensor info " << *itSvdSensors);
@@ -89,7 +88,7 @@ SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVe
     if (itPlanes->isSensorInRange(recoTrackPosition, layer))
       selectedPlanes->push_back(*itPlanes);
 
-    itPlanes++;
+    ++itPlanes;
 
   }
 
@@ -97,7 +96,7 @@ SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVe
   itPlanes = selectedPlanes->begin();
   while (itPlanes != selectedPlanes->end()) {
     B2DEBUG(20, "     " << (itPlanes->getVxdID()));
-    itPlanes++;
+    ++itPlanes;
   }
 
 }

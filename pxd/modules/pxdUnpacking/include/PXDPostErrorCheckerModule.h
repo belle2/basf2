@@ -24,7 +24,14 @@ namespace Belle2 {
   namespace PXD {
     /** The PXD DAQ Post Unpacking Error Check.
      *
-     * does a few error checks which cannot be done during unpacking
+     * Does a few error checks which cannot be done during unpacking.
+     * Including double data checks and missing modules.
+     * In this process it is decided if an event is "good" for analysis.
+     * All data for "broken" events is deleted. (Add: we might decide
+     * for a finer granularity, e.g. module level. The data is then
+     * only tagged as bad, but not removed). PXDHitSorter etc must check
+     * the tags and exclude Hits before clustering.
+     *
      */
     class PXDPostErrorCheckerModule : public Module {
 
@@ -39,14 +46,15 @@ namespace Belle2 {
       void event() override final;
 
     private:
-      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
-      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
-      std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
-      std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
-      std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be read and modified */
+      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be modified */
+      std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be modified */
+      std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be modified */
+      std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be modified */
 
-      /** Critical error mask which defines return value of task */
+      /** Critical error mask which defines when data should be trashed, whole event only! */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      /// TODO another mask for DHE Level if we want to clean ONLY modules?
 
       /** Flag: Ignore different triggergate between DHEs */
       bool m_ignoreTriggerGate;
@@ -55,13 +63,13 @@ namespace Belle2 {
 
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
-      /** Output array for Raw Hits. */
+      /** In/Output array for Raw Hits. Only touched if data needs to be removed*/
       StoreArray<PXDRawHit> m_storeRawHits;
-      /** Output array for Raw ROIs. */
+      /** In/Output array for Raw ROIs. Only touched if data needs to be removed */
       StoreArray<PXDRawROIs> m_storeROIs;
-      /** Output array for Raw Adcs. */
+      /** In/Output array for Raw Adcs. Only touched if data needs to be removed */
       StoreArray<PXDRawAdc> m_storeRawAdc;
-      /** Output array for Clusters. */
+      /** In/Output array for Clusters. Only touched if data needs to be removed */
       StoreArray<PXDRawCluster> m_storeRawCluster;
     };//end class declaration
 

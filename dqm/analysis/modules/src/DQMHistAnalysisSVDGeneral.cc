@@ -34,7 +34,7 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  B2DEBUG(20, "DQMHistAnalysisSVDGeneral: Constructor done.");
+  B2INFO("DQMHistAnalysisSVDGeneral: Constructor done.");
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
   addParam("occLevel_Error", m_occError, "Maximum Occupancy (%) allowed for safe operations (red)", float(5));
   addParam("occLevel_Warning", m_occWarning, "Occupancy (%) at WARNING level (orange)", float(3));
@@ -49,6 +49,37 @@ DQMHistAnalysisSVDGeneralModule::~DQMHistAnalysisSVDGeneralModule() { }
 void DQMHistAnalysisSVDGeneralModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisSVDGeneral: initialized.");
+  B2DEBUG(20, " black = " << kBlack);
+  B2DEBUG(20, " green = " << kGreen);
+  B2DEBUG(20, " orange = " << kOrange);
+  B2DEBUG(20, " Red = " << kRed);
+
+  m_refFile = NULL;
+  if (m_refFileName != "") {
+    m_refFile = new TFile(m_refFileName.data(), "READ");
+  }
+
+
+  //search for reference
+  if (m_refFile && m_refFile->IsOpen()) {
+    B2DEBUG(20, "SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, reading ref histograms");
+
+    TH1F* ref_occ = NULL;
+    ref_occ = (TH1F*)m_refFile->Get("refOccupancy");
+    if (ref_occ == NULL)
+      B2WARNING("SVD DQMHistAnalysis: Occupancy Level Refence not found! using module parameters");
+    else {
+      m_occEmpty = ref_occ->GetBinContent(1);
+      m_occWarning = ref_occ->GetBinContent(2);
+      m_occError = ref_occ->GetBinContent(3);
+    }
+  } else
+    B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
+
+  B2DEBUG(20, " OCCUPANCY EMPTY occ < " << m_occEmpty);
+  B2DEBUG(20, " OCCUPANCY OK " << m_occEmpty << " < occ < " << m_occWarning);
+  B2DEBUG(20, " OCCUPANCY WARNING " << m_occWarning << " < occ < " << m_occError);
+  B2DEBUG(20, " OCCUPANCY EMPTY occ > " << m_occError);
 
   m_legError = new TPaveText(1, 49.5, 5, 53.5);
   m_legError->AddText("ERROR!!");
@@ -128,7 +159,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
 void DQMHistAnalysisSVDGeneralModule::beginRun()
 {
-  //B2DEBUG(20, "DQMHistAnalysisSVDGeneral: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisSVDGeneral: beginRun called.");
   m_cUnpacker->Clear();
   m_cOccupancyU->Clear();
   m_cOccupancyV->Clear();
@@ -186,7 +217,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.3f");
 
-  //search for reference
   //find nEvents
   TH1* hnEvnts = findHist("SVDExpReco/DQMER_SVD_nEvents");
   if (hnEvnts == NULL) {
@@ -194,6 +224,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
     return;
   }
   Float_t nEvents = hnEvnts->GetEntries();
+
+  TH1* htmp = NULL;
 
   Int_t nStrips = 768;
   for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
@@ -205,7 +237,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
     //look for U histogram
     TString tmpname = Form("SVDExpReco/DQMER_SVD_%d_%d_%d_StripCountU", tmp_layer, tmp_ladder, tmp_sensor);
 
-    TH1* htmp = NULL;
     htmp = findHist(tmpname.Data());
     if (htmp == NULL) {
       B2DEBUG(10, "Occupancy U histogram not found");
@@ -225,7 +256,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOccupancyU->cd();
       boxOcc(tmp_layer, tmp_ladder, tmp_sensor, color)->Draw("same");
 
-      B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU);
+      B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occU << " color = " << color);
     }
 
     //look for V histogram
@@ -242,8 +273,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
       Float_t occV = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOccupancyV->SetBinContent(bin, occV);
-      if (tmp_layer == 5 && tmp_ladder == 5 && tmp_sensor == 1)
-        B2INFO(htmp->GetEntries() << ", " << nStrips << ", " << nEvents << " = " << occV);
 
       color = kRed;
       if (occV <= m_occEmpty)
@@ -255,7 +284,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOccupancyV->cd();
       boxOcc(tmp_layer, tmp_ladder, tmp_sensor, color)->Draw("same");
 
-      B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " U occ = " << occV);
+      B2DEBUG(20, " x = " << tmp_ladder << ", y = " << tmp_layer * 10 + tmp_sensor << " V occ = " << occV << " color = " << color);
     }
   }
 

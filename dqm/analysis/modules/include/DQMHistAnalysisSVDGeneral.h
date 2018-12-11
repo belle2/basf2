@@ -12,6 +12,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <TFile.h>
 #include <TText.h>
 #include <TPaveText.h>
 #include <TCanvas.h>
@@ -48,6 +49,12 @@ namespace Belle2 {
 
     //! Data members
   private:
+
+    /** Reference Histogram Root file name */
+    std::string m_refFileName;
+    /** The pointer to the reference file */
+    TFile* m_refFile = nullptr;
+
     TCanvas* m_cUnpacker = nullptr;
     TH2F* m_hOccupancyU = nullptr;
     TCanvas* m_cOccupancyU = nullptr;

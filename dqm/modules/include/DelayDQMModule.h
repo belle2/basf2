@@ -16,13 +16,15 @@
 
 namespace Belle2 {
 
-  /**  Delay DQM  Module */
+  /** Processing Delay DQM Module */
   class DelayDQMModule : public HistoModule {
 
   public:
 
     /** Constructor */
     DelayDQMModule();
+
+  private:
 
     /** Module functions */
     void initialize() override final;

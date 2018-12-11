@@ -35,6 +35,7 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
 {
   //Parameter definition
   B2DEBUG(20, "DQMHistAnalysisSVDGeneral: Constructor done.");
+  addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
   addParam("occLevel_Error", m_occError, "Maximum Occupancy (%) allowed for safe operations (red)", float(5));
   addParam("occLevel_Warning", m_occWarning, "Occupancy (%) at WARNING level (orange)", float(3));
   addParam("occLevel_Empty", m_occEmpty, "Maximum Occupancy (%) for which the sensor is considered empty", float(0));
@@ -185,6 +186,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.3f");
 
+  //search for reference
   //find nEvents
   TH1* hnEvnts = findHist("SVDExpReco/DQMER_SVD_nEvents");
   if (hnEvnts == NULL) {
@@ -193,21 +195,17 @@ void DQMHistAnalysisSVDGeneralModule::event()
   }
   Float_t nEvents = hnEvnts->GetEntries();
 
-  int  tmp_layer;
-  int  tmp_ladder;
-  int  tmp_sensor;
-  TH1* htmp = NULL;
-
   Int_t nStrips = 768;
   for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
-    tmp_layer = m_SVDModules[i].getLayerNumber();
-    tmp_ladder = m_SVDModules[i].getLadderNumber();
-    tmp_sensor = m_SVDModules[i].getSensorNumber();
+    int tmp_layer = m_SVDModules[i].getLayerNumber();
+    int tmp_ladder = m_SVDModules[i].getLadderNumber();
+    int tmp_sensor = m_SVDModules[i].getSensorNumber();
 
     Int_t bin = m_hOccupancyU->FindBin(tmp_ladder, findBinY(tmp_layer, tmp_sensor));
     //look for U histogram
     TString tmpname = Form("SVDExpReco/DQMER_SVD_%d_%d_%d_StripCountU", tmp_layer, tmp_ladder, tmp_sensor);
 
+    TH1* htmp = NULL;
     htmp = findHist(tmpname.Data());
     if (htmp == NULL) {
       B2DEBUG(10, "Occupancy U histogram not found");

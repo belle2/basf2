@@ -55,7 +55,7 @@ void TRGCDCTSFUnpackerModule::terminate()
 void TRGCDCTSFUnpackerModule::initialize()
 {
 
-  store.registerInDataStore();
+  storeAry.registerInDataStore();
 
 
   //set copper address
@@ -137,7 +137,6 @@ void TRGCDCTSFUnpackerModule::fillTreeCDCTSF(int* buf, int evt)
 
   const unsigned nword_header = 3;
 
-  StoreArray<TRGCDCTSFUnpackerStore> storeAry;
   for (int clk = 0; clk < nClks; clk++) { // 0..47
 
     storeAry.appendNew();

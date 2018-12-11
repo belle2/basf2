@@ -1121,8 +1121,6 @@ namespace Belle2 {
       //TSF module number
       int m_TSFMOD;
 
-      //Datastore
-      StoreArray<TRGCDCTSFUnpackerStore> store;
     };
   }
 } // end namespace Belle2

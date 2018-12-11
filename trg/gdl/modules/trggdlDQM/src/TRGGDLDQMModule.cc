@@ -29,9 +29,6 @@
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string.hpp>
 
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
 
 using namespace std;
 using namespace Belle2;
@@ -404,7 +401,7 @@ void TRGGDLDQMModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[n_leafs + n_leafsExtra];
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
     //set pointer
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {

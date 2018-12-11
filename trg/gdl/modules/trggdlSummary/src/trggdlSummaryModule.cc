@@ -21,9 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
 
 using namespace Belle2;
 using namespace GDL;
@@ -126,7 +123,7 @@ void TRGGDLSummaryModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[n_leafs + n_leafsExtra];
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
     //set pointer
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {

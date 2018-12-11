@@ -99,12 +99,14 @@ void TRGGDLUnpackerModule::fillTreeGDLDB(int* buf, int evt)
   const int n_leafsExtra = m_unpacker->getnLeafsExtra();
   const int conf = m_unpacker->getconf();
 
-  int BitMap[n_leafs][2];
+  vector<vector<int>> BitMap;
+  BitMap = vector<vector<int>>(n_leafs, vector<int>(2, 0));
   for (int i = 0; i < n_leafs; i++) {
     BitMap[i][0] = m_unpacker->getBitMap(i, 0);
     BitMap[i][1] = m_unpacker->getBitMap(i, 1);
   }
-  int BitMap_extra[n_leafsExtra][3];
+  vector<vector<int>> BitMap_extra;
+  BitMap_extra = vector<vector<int>>(n_leafsExtra, vector<int>(3, 0));
   for (int i = 0; i < n_leafsExtra; i++) {
     BitMap_extra[i][0] = m_unpacker->getBitMap_extra(i, 0);
     BitMap_extra[i][1] = m_unpacker->getBitMap_extra(i, 1);
@@ -118,7 +120,7 @@ void TRGGDLUnpackerModule::fillTreeGDLDB(int* buf, int evt)
 
     storeAry.appendNew();
     int ntups = storeAry.getEntries() - 1;
-    int* Bits[n_leafs + n_leafsExtra];
+    vector<int*> Bits(n_leafs + n_leafsExtra);
 
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {

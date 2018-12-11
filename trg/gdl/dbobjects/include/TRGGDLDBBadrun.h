@@ -28,7 +28,7 @@ namespace Belle2 {
     /** Default constructor */
     TRGGDLDBBadrun(): m_flag{0} {}
     /** copy constructor */
-    TRGGDLDBBadrun(const TRGGDLDBBadrun& b)
+    TRGGDLDBBadrun(const TRGGDLDBBadrun& b): TObject(b)
     {
       m_flag = b.m_flag;
     }

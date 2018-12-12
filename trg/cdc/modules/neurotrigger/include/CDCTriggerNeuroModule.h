@@ -62,7 +62,17 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
-
+    /** way to obtain the event time, possible values are:
+     *   "ETF_only"             :   only ETF info is used, otherwise an error
+     *                              is thrown.
+     *   "fastestpriority_only" :   event time is estimated by fastest priority
+     *                              time in selected track segments.
+     *   "settozero"            :   the event time is set to 0.
+     *   "fallback"             :   the event time is obtained by the ETF, if
+     *                              not possible, the flag
+     *                              "fastestppriority_only" is used.
+     */
+    std::string m_et_option;
     /** list of input 2D tracks */
     StoreArray<CDCTriggerTrack> m_tracks2D;
     /** list of output NN tracks */

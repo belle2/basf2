@@ -50,6 +50,10 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "fixed point precision in bit after radix point (for track phi, "
            "scaling factor, reference id, MLP nodes, MLP weights, "
            "MLP activation function)", {12, 8, 8, 12, 10, 10});
+  addParam("et_option", m_et_option,
+           "option on how to obtain the event time. Possibilities are: "
+           "'ETF_only', 'fastestpriority_only', 'settozero', 'fallback'.",
+           string("fallback"));
 }
 
 
@@ -90,7 +94,7 @@ CDCTriggerNeuroModule::event()
                                 atan2(1., m_tracks2D[itrack]->getCotTheta()));
     if (geoSectors.size() == 0) continue;
     // read out or determine event time
-    m_NeuroTrigger.getEventTime(geoSectors[0], *m_tracks2D[itrack]);
+    m_NeuroTrigger.getEventTime(geoSectors[0], *m_tracks2D[itrack], m_et_option);
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack]);

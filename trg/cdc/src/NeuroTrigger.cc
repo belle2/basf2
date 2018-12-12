@@ -203,7 +203,7 @@ NeuroTrigger::initialize(const Parameters& p)
     m_MLPs.push_back(CDCTriggerMLP(nNodes, targetVars, outputScale,
                                    phiRange, invptRange, thetaRange,
                                    maxHits, SLpattern, SLpatternMask, p.tMax,
-                                   p.T0fromHits));
+                                   p.et_option));
   }
   // load some values from the geometry that will be needed for the input
   setConstants();
@@ -369,13 +369,17 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 }
 
 void
-NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track)
+NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option)
 {
-  bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
-  if (hasT0) {
-    m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
-    m_hasT0 = true;
-  } else if (m_MLPs[isector].getT0fromHits()) {
+  if (et_option == "fallback") {
+    bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
+    if (hasT0) {
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_hasT0 = true;
+    } else {
+      getEventTime(isector, track, "fastestpriority_only");
+    }
+  } else if (et_option == "fastestpriority_only") {
     m_T0 = 9999;
     // find shortest time of related and relevant axial hits
     RelationVector<CDCTriggerSegmentHit> axialHits =
@@ -408,10 +412,19 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track)
     if (m_T0 < 9999) {
       m_hasT0 = true;
     }
-  } else {
+  } else if (et_option == "settozero") {
+    m_hasT0 = true;
     m_T0 = 0;
-    m_hasT0 = false;
+  } else if (et_option == "ETF_only") {
+    bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
+    if (hasT0) {
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_hasT0 = true;
+    } else {
+      B2ERROR("No ETF output, but forced to use ETF!");
+    }
   }
+
 }
 
 unsigned long

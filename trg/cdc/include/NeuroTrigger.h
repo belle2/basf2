@@ -82,8 +82,18 @@ namespace Belle2 {
       std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;
-      /** If true, determine event time from relevant hits if it is missing. */
-      bool T0fromHits = false;
+      /** Determine, how the event time should be obtained. The options are:
+       * The different options are:
+       *   "ETF_only"             :   only ETF info is used, otherwise an error
+       *                              is thrown.
+       *   "fastestpriority_only" :   event time is estimated by fastest priority
+       *                              time in selected track segments.
+       *   "settozero"            :   the event time is set to 0.
+       *   "fallback"             :   the event time is obtained by the ETF, if
+       *                              not possible, the flag
+       *                              "fastestppriority_only" is used.
+       */
+      std::string et_option = "fallback";
     };
 
     /** Default constructor. */
@@ -157,12 +167,20 @@ namespace Belle2 {
     /** Calculate phi position of a hit relative to 2D track
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
-
     /** Read out the event time and store it.
-     * If there is no valid event time, it can be determined
-     * from the shortest priority time of all hit candidates,
-     * if the option is enabled for the given sector. */
-    void getEventTime(unsigned isector, const CDCTriggerTrack& track);
+     * It can be given different options in the et_option ("EventTime option")
+     * parameter.
+     * The different options are:
+     *   "ETF_only"             :   only ETF info is used, otherwise an error
+     *                              is thrown.
+     *   "fastestpriority_only" :   event time is estimated by fastest priority
+     *                              time in selected track segments.
+     *   "settozero"            :   the event time is set to 0.
+     *   "fallback"             :   the event time is obtained by the ETF, if
+     *                              not possible, the flag
+     *                              "fastestppriority_only" is used.
+     */
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option);
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input

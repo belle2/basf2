@@ -25,7 +25,7 @@ namespace Belle2 {
                   unsigned long pattern,
                   unsigned long patternMask,
                   unsigned short tmax,
-                  bool calcT0);
+                  std::string etoption);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerMLP() { }
@@ -58,7 +58,7 @@ namespace Belle2 {
       return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
     }
     /** get flag for event time definition */
-    bool getT0fromHits() const { return T0fromHits; }
+    std::string get_et_option() const { return et_option; }
 
     /** check whether given phi value is in sector */
     bool inPhiRange(float phi) const;
@@ -127,15 +127,22 @@ namespace Belle2 {
       * default for stereo layers is region spanned by stereos +- 1 wire. */
     std::vector<float> relevantID;
 
-    /** If true, the event time will be determined
-      * from hits within relevantID region, if it is missing.
-      * Otherwise, no drift times are used if the event time is missing.
-      * Stored here to make sure that the event time definition is the same
-      * during training and during execution. */
-    bool T0fromHits;
+    /**
+     * Returns way of obtaining the event time.
+     * The different options are:
+     *   "ETF_only"             :   only ETF info is used, otherwise an error
+     *                              is thrown.
+     *   "fastestpriority_only" :   event time is estimated by fastest priority
+     *                              time in selected track segments.
+     *   "settozero"            :   the event time is set to 0.
+     *   "fallback"             :   the event time is obtained by the ETF, if
+     *                              not possible, the flag
+     *                              "fastestppriority_only" is used.
+     */
+    std::string et_option;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 6);
+    ClassDef(CDCTriggerMLP, 7);
   };
 }
 #endif

@@ -56,6 +56,11 @@ ft_val_path = b2.create_path()
 
 
 def setEnvironment(belleOrBelle2Flag="Belle2"):
+    """
+    Sets the environment to analyse the mdst files for validation.'
+
+    @param belleOrBelle2Flag Default is 'Belle2' but 'Belle' is possible.
+    """
 
     environmentType = "default"
 
@@ -67,20 +72,17 @@ def setEnvironment(belleOrBelle2Flag="Belle2"):
         os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
         os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
-        # roinput = b2.register_module('RootInput')
-        # ft_val_path.add_module(roinput)
-        # progress = b2.register_module('ProgressBar')
-        # ft_val_path.add_module(progress)
-        #
-        # ft_val_path.add_module('Gearbox')
-        # ft_val_path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticFieldConstantBelle'])
-
         environmentType = "Belle"
 
     ma.inputMdstList(environmentType=environmentType, filelist=[], path=ft_val_path)
 
 
-def reconstructB2JpsiKs_mu(belleOrBelle2Flag="Belle2"):
+def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
+    """
+    Defines the reconstruction procedure for the benchmark channel 'B0 -> J/psi  K_S0'
+
+    @param belleOrBelle2Flag Default is 'Belle2' but 'Belle' is possible.
+    """
 
     # reconstruct J/psi -> mu+ mu- decay using standard muon list and perform MC association
     ma.fillParticleList(decayString='mu+:all', cut='', path=ft_val_path)
@@ -106,11 +108,20 @@ def reconstructB2JpsiKs_mu(belleOrBelle2Flag="Belle2"):
 
 
 def reconstructB2nunubar():
+    """
+    Defines the procedure to create a B0 list for the benchmark channel 'B0 -> nu_tau anti-nu_tau'
+    """
 
     ma.findMCDecay(list_name='B0:sig', decay='B0 -> nu_tau anti-nu_tau', writeOut=True, path=ft_val_path)
 
 
 def applyCPVTools(mode='Expert'):
+    """
+    Defines the procedure to use the flavor tagger and tagV on the signal 'B0:sig' list.
+    It saves also all variables to nTuples needed for evaluation of the performance
+
+    @param mode Default is 'Expert' but also needed for 'Sampler' mode.
+    """
 
     # perform MC matching (MC truth asociation). Always before TagV
     ma.matchMCTruth(list_name='B0:sig', path=ft_val_path)
@@ -144,65 +155,11 @@ def applyCPVTools(mode='Expert'):
 
     if doVertex == 'True' or mode == 'Expert':
 
-        # Due to a problem with TagV using Belle converted data within release 8. Release 9 is Ok!
-        # if belleOrBelle2Flag == "Belle2":
         if doVertex == 'True':
             vx.vertexRave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
                           constraint='', path=ft_val_path)
             vx.TagV(list_name='B0:sig', MCassociation='breco', path=ft_val_path)
             print("TagV will be used")
-
-        toolsDST = ['EventMetaData', '^B0']
-        # ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
-        toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
-        toolsDST += ['RecoStats', '^B0']
-        toolsDST += ['MCVertex', '^B0 ->  [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]']
-        toolsDST += ['Vertex', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
-        toolsDST += ['MCTagVertex', '^B0']
-        toolsDST += ['TagVertex', '^B0']
-        toolsDST += ['MCDeltaT', '^B0']
-        toolsDST += ['DeltaT', '^B0']
-        toolsDST += ['DeltaEMbc', '^B0']
-        toolsDST += ['InvMass', '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]']
-        toolsDST += ['CustomFloats[isSignal]', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
-        toolsDST += ['PDGCode', '^B0']
-        toolsDST += ['CMSKinematics', '^B0']
-        toolsDST += ['MCHierarchy', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-        toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-        toolsDST += ['TrackHits', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-        toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-        toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
-        toolsDST += ['ROEMultiplicities', '^B0']
-        toolsDST += ['CustomFloats[TagVOBoost]', '^B0']
-        toolsDST += ['CustomFloats[TagVmcOBoost]', '^B0']
-        toolsDST += ['CustomFloats[TagVLBoost]', '^B0']
-        toolsDST += ['CustomFloats[TagVmcLBoost]', '^B0']
-        toolsDST += ['CustomFloats[OBoost]', '^B0']
-        toolsDST += ['CustomFloats[mcOBoost]', '^B0']
-        toolsDST += ['CustomFloats[LBoost]', '^B0']
-        toolsDST += ['CustomFloats[mcLBoost]', '^B0']
-#          if mode == 'Expert':
-#              toolsDST += ['CustomFloats[extraInfo(QpOfKaon)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfKaon)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(QpOfLambda)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfLambda)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfElectron)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfIntermediateElectron)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfMuon)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfIntermediateMuon)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfKinLepton)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfIntermediateKinLepton)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfSlowPion)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfFSC)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfMaximumPstar)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfFastHadron)]', '^B0']
-#              toolsDST += ['CustomFloats[extraInfo(WeightedQpOfKaonPion)]', '^B0']
-        ma.ntupleFile(file_name=savingDirectory + '/' + 'B2A801-FlavorTagger' +
-                      mode + str(fileNumber) + belleOrBelle2Flag + MCtype + belleData + '.root',
-                      path=ft_val_path)
-        ma.ntupleTree(tree_name='B0tree',
-                      list_name='B0:sig',
-                      tools=toolsDST, path=ft_val_path)
 
     # Select variables that will be stored to ntuple
     fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
@@ -216,18 +173,19 @@ def applyCPVTools(mode='Expert'):
         vc.flavor_tagging + \
         vc.tag_vertex + \
         vc.mc_tag_vertex + \
+        vertex_vars + \
         vu.create_aliases_for_selected(list_of_variables=fs_vars,
                                        decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
         vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
                                        decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]') + \
         vu.create_aliases_for_selected(list_of_variables=vertex_vars,
-                                       decay_string='^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
+                                       decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
 
     # Saving variables to ntuple
     ma.variablesToNtuple(decayString='B0:sig',
                          variables=bvars,
                          filename=savingDirectory + '/' + 'B2A801-FlavorTagger' +
-                         mode + str(fileNumber) + belleOrBelle2Flag + MCtype + belleData + 'vToN.root',
+                         mode + str(fileNumber) + belleOrBelle2Flag + MCtype + belleData + '.root',
                          treename='B0tree',
                          path=ft_val_path)
 

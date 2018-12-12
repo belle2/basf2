@@ -2,6 +2,7 @@
 #define CDCTRIGGERMLP_H
 
 #include <TObject.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   /** Class to keep all parameters of an expert MLP for the neuro trigger. */
@@ -25,6 +26,7 @@ namespace Belle2 {
                   unsigned long pattern,
                   unsigned long patternMask,
                   unsigned short tmax,
+                  bool calcT0,
                   std::string etoption);
 
     /** destructor, empty because we don't allocate memory anywhere. */
@@ -58,6 +60,11 @@ namespace Belle2 {
       return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
     }
     /** get flag for event time definition */
+    bool getT0fromHits() const
+    {
+      B2WARNING("Use of this flag is deprecated! Use get_et_option() instead!");
+      return T0fromHits;
+    }
     std::string get_et_option() const { return et_option; }
 
     /** check whether given phi value is in sector */
@@ -130,16 +137,25 @@ namespace Belle2 {
     /**
      * Returns way of obtaining the event time.
      * The different options are:
-     *   "ETF_only"             :   only ETF info is used, otherwise an error
-     *                              is thrown.
-     *   "fastestpriority_only" :   event time is estimated by fastest priority
-     *                              time in selected track segments.
-     *   "settozero"            :   the event time is set to 0.
-     *   "fallback"             :   the event time is obtained by the ETF, if
-     *                              not possible, the flag
-     *                              "fastestppriority_only" is used.
+     *   "etf_only"                 :   only ETF info is used, otherwise an error
+     *                                  is thrown.
+     *   "fastestpriority"          :   event time is estimated by fastest priority
+     *                                  time in selected track segments. if something
+     *                                  fails, it is set to 0.
+     *   "zero"                     :   the event time is set to 0.
+     *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+     *                                  not possible, the flag
+     *                                  "fastestppriority" is used.
+     *   "etf_or_zero"              :   the event time is obtained by the ETF, if
      */
     std::string et_option;
+
+    /** DEPRECATED!! If true, the event time will be determined
+      * from hits within relevantID region, if it is missing.
+      * Otherwise, no drift times are used if the event time is missing.
+      * Stored here to make sure that the event time definition is the same
+      * during training and during execution. */
+    bool T0fromHits;
 
     //! Needed to make the ROOT object storable
     ClassDef(CDCTriggerMLP, 7);

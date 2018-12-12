@@ -83,17 +83,22 @@ namespace Belle2 {
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;
       /** Determine, how the event time should be obtained. The options are:
-       * The different options are:
-       *   "ETF_only"             :   only ETF info is used, otherwise an error
-       *                              is thrown.
-       *   "fastestpriority_only" :   event time is estimated by fastest priority
-       *                              time in selected track segments.
-       *   "settozero"            :   the event time is set to 0.
-       *   "fallback"             :   the event time is obtained by the ETF, if
-       *                              not possible, the flag
-       *                              "fastestppriority_only" is used.
-       */
-      std::string et_option = "fallback";
+      *   "etf_only"                 :   only ETF info is used, otherwise an error
+      *                                  is thrown.
+      *   "fastestpriority"          :   event time is estimated by fastest priority
+      *                                  time in selected track segments. if something
+      *                                  fails, it is set to 0.
+      *   "zero"                     :   the event time is set to 0.
+      *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+      *                                  not possible, the flag
+      *                                  "fastestppriority" is used.
+      *   "etf_or_zero"              :   the event time is obtained by the ETF, if
+      *                                  not possible, it es set to 0
+      */
+      std::string et_option = "etf_or_fastestpriority";
+      /** DEPRECATED!! If true, determine event time from relevant hits if it is missing. */
+      bool T0fromHits = false;
+
     };
 
     /** Default constructor. */
@@ -171,16 +176,25 @@ namespace Belle2 {
      * It can be given different options in the et_option ("EventTime option")
      * parameter.
      * The different options are:
-     *   "ETF_only"             :   only ETF info is used, otherwise an error
-     *                              is thrown.
-     *   "fastestpriority_only" :   event time is estimated by fastest priority
-     *                              time in selected track segments.
-     *   "settozero"            :   the event time is set to 0.
-     *   "fallback"             :   the event time is obtained by the ETF, if
-     *                              not possible, the flag
-     *                              "fastestppriority_only" is used.
+     *   "etf_only"                 :   only ETF info is used, otherwise an error
+     *                                  is thrown.
+     *   "fastestpriority"          :   event time is estimated by fastest priority
+     *                                  time in selected track segments. if something
+     *                                  fails, it is set to 0.
+     *   "zero"                     :   the event time is set to 0.
+     *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+     *                                  not possible, the flag
+     *                                  "fastestppriority" is used.
+     *   "etf_or_zero"              :   the event time is obtained by the ETF, if
      */
     void getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option);
+
+    /** DEPRECATED!! Read out the event time and store it.
+     * If there is no valid event time, it can be determined
+     * from the shortest priority time of all hit candidates,
+     * if the option is enabled for the given sector. */
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track);
+
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input

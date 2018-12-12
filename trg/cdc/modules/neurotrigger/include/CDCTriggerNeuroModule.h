@@ -63,14 +63,17 @@ namespace Belle2 {
      */
     std::vector<unsigned> m_precision;
     /** way to obtain the event time, possible values are:
-     *   "ETF_only"             :   only ETF info is used, otherwise an error
-     *                              is thrown.
-     *   "fastestpriority_only" :   event time is estimated by fastest priority
-     *                              time in selected track segments.
-     *   "settozero"            :   the event time is set to 0.
-     *   "fallback"             :   the event time is obtained by the ETF, if
-     *                              not possible, the flag
-     *                              "fastestppriority_only" is used.
+     *   "etf_only"                 :   only ETF info is used, otherwise an error
+     *                                  is thrown.
+     *   "fastestpriority"          :   event time is estimated by fastest priority
+     *                                  time in selected track segments. if something
+     *                                  fails, it is set to 0.
+     *   "zero"                     :   the event time is set to 0.
+     *   "etf_or_fastestpriority"   :   the event time is obtained by the ETF, if
+     *                                  not possible, the flag
+     *                                  "fastestppriority" is used.
+     *   "etf_or_zero"              :   the event time is obtained by the ETF, if
+     *                                  not possible, it es set to 0
      */
     std::string m_et_option;
     /** list of input 2D tracks */

@@ -1,3 +1,4 @@
+#include <framework/logging/Logger.h>
 #include <trg/cdc/NeuroTrigger.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -202,7 +203,7 @@ NeuroTrigger::initialize(const Parameters& p)
     //create new MLP
     m_MLPs.push_back(CDCTriggerMLP(nNodes, targetVars, outputScale,
                                    phiRange, invptRange, thetaRange,
-                                   maxHits, SLpattern, SLpatternMask, p.tMax,
+                                   maxHits, SLpattern, SLpatternMask, p.tMax, p.T0fromHits,
                                    p.et_option));
   }
   // load some values from the geometry that will be needed for the input
@@ -371,15 +372,19 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 void
 NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option)
 {
-  if (et_option == "fallback") {
+  //if (et_option != m_MLPs[isector].get_et_option()) {
+  //    B2WARNING("Used event time option is different to the one set in the MLP"
+  //              << LogVar("et_option", et_option) << LogVar("isector", isector)
+  //              << LogVar("et_option_mlp", m_MLPs[isector].get_et_option()));
+  if (et_option == "etf_or_fastestpriority") {
     bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
     if (hasT0) {
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      getEventTime(isector, track, "fastestpriority_only");
+      getEventTime(isector, track, "fastestpriority");
     }
-  } else if (et_option == "fastestpriority_only") {
+  } else if (et_option == "fastestpriority") {
     m_T0 = 9999;
     // find shortest time of related and relevant axial hits
     RelationVector<CDCTriggerSegmentHit> axialHits =
@@ -411,11 +416,14 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
     }
     if (m_T0 < 9999) {
       m_hasT0 = true;
+    } else {
+      m_T0 = 0;
+      m_hasT0 = false;
     }
-  } else if (et_option == "settozero") {
+  } else if (et_option == "zero") {
     m_hasT0 = true;
     m_T0 = 0;
-  } else if (et_option == "ETF_only") {
+  } else if (et_option == "etf_only") {
     bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
     if (hasT0) {
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
@@ -423,9 +431,33 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
     } else {
       B2ERROR("No ETF output, but forced to use ETF!");
     }
+  } else if (et_option == "etf_or_zero") {
+    bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
+    if (hasT0) {
+      m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
+      m_hasT0 = true;
+    } else {
+      m_T0 = 0;
+      m_hasT0 = false;
+    }
   }
 
 }
+void
+NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track)
+{
+  B2WARNING("This function is deprecated, it used the flag 'T0fromHits'. "
+            << "Give additionally et_option as argument to use the new function. "
+            << "et_option is now set for T0fromHits=True to 'etf_fastestpriority' "
+            << "and for T0fromHits=false to 'etf_or_zero'.");
+  if (m_MLPs[isector].getT0fromHits()) {
+    getEventTime(isector, track, "etf_or_fastestpriority");
+  } else {
+    getEventTime(isector, track, "etf_or_zero");
+  }
+}
+
+
 
 unsigned long
 NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)

@@ -137,8 +137,14 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
            "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
   addParam("et_option", m_parameters.et_option,
            "option on how to obtain the event time. Possibilities are: "
-           "'ETF_only', 'fastestpriority_only', 'settozero', 'fallback'.",
+           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero'.",
            m_parameters.et_option);
+  addParam("T0fromHits", m_parameters.T0fromHits,
+           "Deprecated, kept for backward compatibility. If true, the event time is "
+           "determined from all relevant hits in a sector, if there is no valid event "
+           "time from the event time finder. If false, no drift times are used if "
+           "there is no valid event time.",
+           m_parameters.T0fromHits);
   addParam("selectSectorByMC", m_selectSectorByMC,
            "If true, track parameters for sector selection are taken "
            "from MCParticle instead of CDCTriggerTrack.", false);

@@ -52,8 +52,8 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "MLP activation function)", {12, 8, 8, 12, 10, 10});
   addParam("et_option", m_et_option,
            "option on how to obtain the event time. Possibilities are: "
-           "'ETF_only', 'fastestpriority_only', 'settozero', 'fallback'.",
-           string("fallback"));
+           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero'.",
+           string("etf_or_fastestpriority"));
 }
 
 

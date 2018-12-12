@@ -47,15 +47,7 @@ r_subsample = array('d', [
     0.875,
     1.0])
 r_size = len(r_subsample)
-
-rbins = np.array([0.0,
-                  0.1,
-                  0.25,
-                  0.5,
-                  0.625,
-                  0.75,
-                  0.875,
-                  1.0])
+rbins = np.array(r_subsample)
 
 # All possible tagging categories
 categories = [

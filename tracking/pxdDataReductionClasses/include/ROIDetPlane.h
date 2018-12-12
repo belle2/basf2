@@ -31,8 +31,8 @@ namespace Belle2 {
 
     explicit ROIDetPlane(const VxdID& vxdID); /**< the constructor - needed for testbeam package*/
 
-    // seems to be needed by root. Dont use!
-    ROIDetPlane() {};
+    // Needed by root. Dont use!
+    ROIDetPlane() = default;
 
 
     /**return the sensor ID*/

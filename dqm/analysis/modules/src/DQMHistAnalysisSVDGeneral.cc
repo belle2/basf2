@@ -263,7 +263,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
     htmp = findHist(tmpname.Data());
     if (htmp == NULL) {
-      B2INFO(10, "Occupancy V histogram not found");
+      B2INFO("Occupancy V histogram not found");
       m_cOccupancyV->SetFillColor(kRed);
     } else {
 

@@ -183,7 +183,7 @@ void PXDUnpackerDHHModule::endian_swapper(void* a, unsigned int len)
 
 void PXDUnpackerDHHModule::unpack_rawdhh(RawDHH& px, int inx)
 {
-  int Frames_in_event;
+  //int Frames_in_event;
   int fullsize;
   int datafullsize;
 
@@ -575,16 +575,15 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   /// The following STATIC variables are used to save some state or count some things
   /// while depacking the frames. they are in most cases (re)set on the first frame or ONSEN trg frame
   /// Most could put in as a class member, but they are only needed within this function
-  static unsigned int eventNrOfOnsenTrgFrame = 0;
+  //static unsigned int eventNrOfOnsenTrgFrame = 0;
   static int countedBytesInDHC = 0;
   static bool cancheck_countedBytesInDHC = false;
   static int countedBytesInDHE = 0;
   static bool cancheck_countedBytesInDHE = false;
   static int countedDHEStartFrames = 0;
   static int countedDHEEndFrames = 0;
-  static int mask_active_dhe = 0;// DHE mask (5 bit)
-  static int nr_active_dhe =
-    0;// just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
+  //static int mask_active_dhe = 0;// DHE mask (5 bit)
+  //static int nr_active_dhe = 0;// just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
   static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHE
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
   static unsigned int dhe_first_readout_frame_id_lo = 0;
@@ -820,8 +819,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
                   (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF));
         }
       }
-      mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
-      nr_active_dhe = nr5bits(mask_active_dhe);
+      //mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
+      //nr_active_dhe = nr5bits(mask_active_dhe);
 
       m_errorMaskDHC = m_errorMask; // forget about anything before this frame
       daqpktstat.newDHC(currentDHCID, m_errorMask);
@@ -1027,7 +1026,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       break;
     case EDHCFrameHeaderDataType::c_ONSEN_TRG:
       /// we do not expect to see this frame in BonnDAQ DHH data
-      eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
+      //eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
       if (dhc.data_onsen_trigger_frame->get_trig_nr1() != (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)) {
         B2ERROR("TRG HLT MM: $" << dhc.data_onsen_trigger_frame->get_trig_nr1() << " META " <<
                 (m_meta_event_nr & 0xFFFFFFFF));

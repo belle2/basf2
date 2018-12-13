@@ -101,7 +101,8 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
     return -1;
   }
 
-  ret = b2_timed_blocking_io(sd, 0);
+  ret = b2_timed_blocking_io(sd,
+                             1);// This means, if the socket blocks longer than Xs, it will return a EAGAIN or EWOULDBLOCK (immediately)
   if (ret == -1) {
     ERROR(b2_timed_blocking_io);
     return -1;
@@ -433,7 +434,12 @@ main(int argc, char* argv[])
           unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
 
           n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
-          ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
+          while (1) {
+            ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
+            if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+              sleep(1);// Bad hack, wait a second
+            } else break;
+          }
 
           if (ret == -1) {
             ERROR(b2_send);

@@ -340,6 +340,7 @@ main(int argc, char* argv[])
       while (1) {
         ret = b2_send(sd, ptr_packet, n_bytes_packet);
         if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+          ERR_FPRINTF(stderr, "[WARNING] hltout2merger: socket buffer full, retry\n");
           sleep(1);// Bad hack, wait a second
         } else break;
       }

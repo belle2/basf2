@@ -437,6 +437,7 @@ main(int argc, char* argv[])
           while (1) {
             ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
             if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+              ERR_FPRINTF(stderr, "[WARNING] merger_merge: socket buffer full, retry\n");
               sleep(1);// Bad hack, wait a second
             } else break;
           }
@@ -462,7 +463,7 @@ main(int argc, char* argv[])
 
           flstat->log(n_bytes_to_onsen);
 
-          if (event_count < 40 || event_count % 10000 == 0) {
+          if (event_count < 10 /*|| event_count % 10000 == 0*/) {
             LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] sent event to ONSEN\n", event_count);
             dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
           }

@@ -84,12 +84,17 @@ Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
 Untested method KLMCluster::setTime
 Untested method TRGSummary::getInfoHTML
+Untested method TRGSummary::getPrescale
 Untested method TRGSummary::setFtdlBits
 Untested method TRGSummary::setInputBits
 Untested method TRGSummary::setPreScale
 Untested method TRGSummary::setPsnmBits
 Untested method TRGSummary::setTRGSummary
 Untested method TRGSummary::setTimType
+Untested method TRGSummary::test
+Untested method TRGSummary::testFtdl
+Untested method TRGSummary::testInput
+Untested method TRGSummary::testPsnm
 Untested method SoftwareTriggerResult::addResult
 Untested method SoftwareTriggerResult::clear
 Untested method SoftwareTriggerResult::getInfoHTML

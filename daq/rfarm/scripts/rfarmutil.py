@@ -414,6 +414,6 @@ def start_rfarm_local(conffile):
 # Stop RFARM local operation
 
 def stop_rfarm_local(conffile):
-    #    stop_eventprocessor(conffile)
+    stop_eventprocessor(conffile)
     stop_rfarm_components(conffile)
     stop_master(conffile)

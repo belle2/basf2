@@ -123,6 +123,7 @@ namespace Belle2 {
      */
     bool m_angularDistanceMatching;
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
+    bool m_skipZeroChargeTracks; /**< if true, tracks whose charge has been set to zero are excluded from track-cluster matching */
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */
     double m_matchingPTThreshold; /**< pt limit between angular-distance based and crystal-entering based matching algorithm */
     double m_brlEdgeTheta; /**< distance of polar angle from gaps where crystal-entering based matching is applied (in rad) */

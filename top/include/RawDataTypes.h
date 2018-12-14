@@ -26,7 +26,8 @@ namespace Belle2 {
       c_Type1Ver16 = 0x0110, /**< Passthru */
       c_Type2Ver16 = 0x0210, /**< Feature-extracted + raw waveforms */
       c_Type3Ver16 = 0x0310, /**< Feature-extracted + ped-subtracted waveforms */
-      c_ProductionDebug = 0x0401, /**< Production Debugging Data Format*/
+      c_ProductionDebug01 = 0x0401, /**< Production Debugging Data Format 01*/
+      c_ProductionDebug02 = 0x0402, /**< Production Debugging Data Format 02 with extended heap information*/
       c_Draft = 0xFF00  /**< tentative production format */
     };
 
@@ -43,7 +44,8 @@ namespace Belle2 {
                                                      RawDataType::c_Type1Ver16,
                                                      RawDataType::c_Type2Ver16,
                                                      RawDataType::c_Type3Ver16,
-                                                     RawDataType::c_ProductionDebug,
+                                                     RawDataType::c_ProductionDebug01,
+                                                     RawDataType::c_ProductionDebug02,
                                                      RawDataType::c_Draft
                                                     };
 

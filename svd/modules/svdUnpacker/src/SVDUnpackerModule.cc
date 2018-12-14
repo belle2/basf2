@@ -522,28 +522,16 @@ void SVDUnpackerModule::printB2Debug(uint32_t* data32, uint32_t* data32_min, uin
   uint32_t* min = std::max((data32 - nWords), data32_min);
   uint32_t* max = std::min((data32 + nWords), data32_max);
 
-  uint32_t* ptr = min;
-  int counter = 0;
-
-  char message[256] = "";
-  ostringstream os;
-  os << endl;
-
-  while (ptr < max + 1) {
-    char prev_message[256] = "";
-    strcpy(prev_message, message);
-    sprintf(message, "%s%.8x ", prev_message, *ptr);
-    if (counter++ % 10 == 9) {
-      os << message << endl;
-      //sprintf(message,"");
-      strcpy(message, "");
-    }
-
-    ptr++;
+  size_t counter{0};
+  std::stringstream os;
+  os << std::hex << std::setfill('0');
+  for (uint32_t* ptr = min; ptr <= max; ++ptr) {
+    os << std::setw(8) << *ptr;
+    if (++counter % 10 == 0) os << std::endl;
+    else os << " ";
   }
 
-  os << message << endl;
-  //B2DEBUG(1, os.str());
+  os << std::endl;
   B2INFO(os.str());
   return;
 

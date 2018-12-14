@@ -67,7 +67,7 @@ B0_vars = vc.inv_mass + vc.mc_truth + \
     vc.create_aliases_for_selected(
         vc.cluster, 'B0 -> D0 [pi0 -> ^gamma ^gamma]')
 
-pi0_vars = vc.mc_truth + vc.kinematics + vc.mass_before_fit + \
+pi0_vars = vc.mc_truth + vc.kinematics + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
     vc.create_aliases_for_selected(
         vc.cluster + vc.kinematics, 'pi0 -> ^gamma ^gamma')

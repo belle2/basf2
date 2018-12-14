@@ -29,9 +29,6 @@
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string.hpp>
 
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
 
 using namespace std;
 using namespace Belle2;
@@ -404,7 +401,7 @@ void TRGGDLDQMModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[n_leafs + n_leafsExtra];
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
     //set pointer
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {
@@ -455,7 +452,7 @@ void TRGGDLDQMModule::event()
     int psn_tmp[3] = {0};
     int ftd_tmp[3] = {0};
     int itd_tmp[5] = {0};
-    for (unsigned j = 0; j < nword_input; j++) {
+    for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
@@ -480,7 +477,7 @@ void TRGGDLDQMModule::event()
         if (ftd_tmp[1] & (1 << i)) h_f->SetBinContent(clk, i + 1 + 32, 1);
       }
     } else {
-      for (unsigned j = 0; j < nword_output; j++) {
+      for (unsigned j = 0; j < (unsigned)nword_output; j++) {
         psn_tmp[j] = h_0->GetBinContent(clk, 1 + ee_psn[j]);
         ftd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_ftd[j]);
         psn[j] |= psn_tmp[j];
@@ -507,10 +504,10 @@ void TRGGDLDQMModule::event()
   h_ftd->Fill(-0.5);
   h_psn->Fill(-0.5);
   for (int i = 0; i < 32; i++) {
-    for (unsigned j = 0; j < nword_input; j++) {
+    for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       if (itd[j] & (1 << i)) h_itd->Fill(i + 0.5 + 32 * j);
     }
-    for (unsigned j = 0; j < nword_output; j++) {
+    for (unsigned j = 0; j < (unsigned)nword_output; j++) {
       if (ftd[j] & (1 << i)) h_ftd->Fill(i + 0.5 + 32 * j);
       if (psn[j] & (1 << i)) h_psn->Fill(i + 0.5 + 32 * j);
     }

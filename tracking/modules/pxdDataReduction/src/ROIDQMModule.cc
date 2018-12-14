@@ -3,16 +3,15 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Giulia Casarosa, Eugenio Paoloni                        *
+ * Contributors:  Giulia Casarosa, Eugenio Paoloni, Bjoern Spruck         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/ROIDQMModule.h>
 #include <vxd/geometry/GeoCache.h>
-
-#include "time.h"
-#include "TDirectory.h"
+#include <TDirectory.h>
+#include <time.h>
 
 using namespace std;
 using namespace Belle2;
@@ -44,7 +43,7 @@ ROIDQMModule::ROIDQMModule()
 , h_HitCol_CellV(NULL)
 {
   //Set module properties
-  setDescription("Monitor of the  ROIs creation on HLT");
+  setDescription("Monitor of the ROI creation on HLT");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("PXDDigitsName", m_PXDDigitsName,
@@ -66,12 +65,13 @@ void ROIDQMModule::defineHisto()
   oldDir->mkdir("intercept");
   oldDir->cd("intercept");
   m_InterDir = gDirectory;
-
-  hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
-
   oldDir->mkdir("roi");
   oldDir->cd("roi");
   m_ROIDir =  gDirectory;
+
+  // TODO the following three hist end up in top directory?
+  // Anyway, why do we have these histograms at all?
+  // they are not even per-sensor and do not contain useful info
 
   hCellUV  = new TH2F("hCellU_vs_CellV", "CellID U vs CellID V", 480, 0, 480, 480, 0, 480);
   hCellUV->GetXaxis()->SetTitle("U cell ID");
@@ -85,11 +85,14 @@ void ROIDQMModule::defineHisto()
   h_HitCol_CellV->GetXaxis()->SetTitle("V cell ID");
   h_HitCol_CellV->GetYaxis()->SetTitle("COL ID");
 
+  m_InterDir->cd();
+  hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
+
+  m_ROIDir->cd();
   hnROIs  = new TH1F("hnROIs", "number of ROIs", 100, 0, 100);
   harea = new TH1F("harea", "ROI area", 100, 0, 100000);
   hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);
 
-  // now create the other histograms in their respective directory
 
   createHistosDictionaries();
 
@@ -101,7 +104,7 @@ void ROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 
-  m_rawFTSWs.isOptional();
+  m_eventMetaData.isRequired();
   m_pxdDigits.isOptional();
   m_pxdRawHits.isOptional();
   m_roiIDs.isRequired(m_ROIsName);
@@ -114,6 +117,15 @@ void ROIDQMModule::event()
 {
 
   n_events++;
+
+//   struct timeval triggerTime;
+//   // TODO Why not EvetMetaData time?
+//   long int time = 0;
+//   if (m_rawFTSWs.getEntries() > 0) {
+//     this->m_rawFTSWs[0]->GetTTTimeVal(0, & triggerTime);
+//     time =  triggerTime.tv_usec;
+//   }
+  m_time = m_eventMetaData->getTime() / 127.216; // time in 127MHz ticks ~ 8ns -> usec
 
   for (auto& it : m_pxdDigits)
     hCellUV->Fill(it.getUCellID(), it.getVCellID());
@@ -530,19 +542,11 @@ void ROIDQMModule::createHistosDictionaries()
                                   InterHistoAndFill(
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
-          struct timeval triggerTime;
-          // TODO Why not EvetMetaData time?
-          long int time = 0;
-          if (m_rawFTSWs.getEntries() > 0) {
-            m_rawFTSWs[0]->GetTTTimeVal(0, & triggerTime);
-            time =  triggerTime.tv_usec;
-          }
-
           for (auto& it : m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
-              hPtr->Fill(time, resid);
+              hPtr->Fill(m_time, resid);
             }
         }
                                   )
@@ -561,19 +565,11 @@ void ROIDQMModule::createHistosDictionaries()
                                     tmp2D,
         [this](TH1 * hPtr, const PXDIntercept * inter) {
 
-          struct timeval triggerTime;
-          // TODO Why not EvetMetaData time?
-          long int time = 0;
-          if (m_rawFTSWs.getEntries() > 0) {
-            m_rawFTSWs[0]->GetTTTimeVal(0, & triggerTime);
-            time =  triggerTime.tv_usec;
-          }
-
           for (auto& it : m_pxdDigits)
             if ((int)it.getSensorID() == (int)inter->getSensorID()) {
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
-              hPtr->Fill(time, resid);
+              hPtr->Fill(m_time, resid);
             }
         }
                                   )

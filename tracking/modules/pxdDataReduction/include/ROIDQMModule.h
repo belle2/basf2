@@ -13,6 +13,7 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
@@ -21,7 +22,7 @@
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDRawHit.h>
-#include <rawdata/dataobjects/RawFTSW.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <unordered_map>
 #include <map>
@@ -48,7 +49,8 @@ namespace Belle2 {
     ROIDQMModule();
 
   private:
-    StoreArray<RawFTSW> m_rawFTSWs;
+    /** Input ptr for EventMetaData. */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
     StoreArray<PXDDigit> m_pxdDigits;
     StoreArray<PXDRawHit> m_pxdRawHits;
     StoreArray<ROIid> m_roiIDs;
@@ -97,6 +99,9 @@ namespace Belle2 {
     TH1F* hredFactor; /**< reduction factor*/
     TH2F* hCellUV; /**< U,V cells */
     int n_events; /**< number of events*/
+
+    /** Time(Tag) from MetaInfo */
+    unsigned long long int m_time;
 
     TH2F* h_HitRow_CellU; /**< pxdRawHit ROW vs CellID U*/
     TH2F* h_HitCol_CellV; /**< pxdRawHit ROW vs CellID U*/

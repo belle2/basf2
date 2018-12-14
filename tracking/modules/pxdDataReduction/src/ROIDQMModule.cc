@@ -118,14 +118,7 @@ void ROIDQMModule::event()
 
   n_events++;
 
-//   struct timeval triggerTime;
-//   // TODO Why not EvetMetaData time?
-//   long int time = 0;
-//   if (m_rawFTSWs.getEntries() > 0) {
-//     this->m_rawFTSWs[0]->GetTTTimeVal(0, & triggerTime);
-//     time =  triggerTime.tv_usec;
-//   }
-  m_time = m_eventMetaData->getTime() / 127.216; // time in 127MHz ticks ~ 8ns -> usec
+  m_time = m_eventMetaData->getTime() * 1e-9 ; // time in ns -> s
 
   for (auto& it : m_pxdDigits)
     hCellUV->Fill(it.getUCellID(), it.getVCellID());

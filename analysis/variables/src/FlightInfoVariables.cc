@@ -68,14 +68,12 @@ namespace Belle2 {
         if (mode == "distance" &&
             daughter->hasExtraInfo("decayLength") &&
             daughter->hasExtraInfo("decayLengthErr")) {
-          B2INFO("Returning flight distance calculated by TreeFitter");
           outErr = daughter -> getExtraInfo("decayLengthErr");
           return daughter -> getExtraInfo("decayLength");
         }
         if (mode == "time" &&
             daughter->hasExtraInfo("lifeTime") &&
             daughter->hasExtraInfo("lifeTimeErr")) {
-          B2INFO("Returning flight time calculated by TreeFitter");
           outErr = daughter -> getExtraInfo("lifeTimeErr");
           return daughter -> getExtraInfo("lifeTime");
         }
@@ -86,13 +84,11 @@ namespace Belle2 {
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
         if (hasRAVEBeamConstrainedProductionVertex(particle)) {
-          B2INFO("Returning flightInfo variable using the beam constrained production vertex from RAVE");
           mumvtxX = particle->getExtraInfo("prodVertX");
           mumvtxY = particle->getExtraInfo("prodVertY");
           mumvtxZ = particle->getExtraInfo("prodVertZ");
         } else {
           //if no production vertex assume the particle originated at the ip
-          B2INFO("Returning flightInfo variable using the ip as the production vertex");
           PCmsLabTransform T;
           mumvtxX = T.getBeamParams().getVertex().X();
           mumvtxY = T.getBeamParams().getVertex().Y();

@@ -102,12 +102,12 @@ void ROIDQMModule::event()
 
   int ROIarea = 0;
   double redFactor = 0;
-  int minU;
-  int minV;
-  int maxU;
-  int maxV;
 
   for (auto& it : m_roiIDs) {
+    int minU;
+    int minV;
+    int maxU;
+    int maxV;
 
     fillSensorROIHistos(&it);
 
@@ -710,9 +710,8 @@ void ROIDQMModule::fillSensorROIHistos(const ROIid* roi)
     (it->second).accumulate(roi, (it->second).value);
 }
 
-void ROIDQMModule::endRun()
+void ROIDQMModule::terminate()
 {
-
   for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it)
     delete &(it->second);
 }

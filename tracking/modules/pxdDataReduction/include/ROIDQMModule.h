@@ -29,8 +29,6 @@
 #include <TH1.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TFile.h>
-#include <iostream>
 
 namespace Belle2 {
 
@@ -98,7 +96,7 @@ namespace Belle2 {
 
     void event(void) override final;
 
-    void endRun(void) override final;
+    void terminate(void) override final;
 
     void defineHisto() override final; /**< define histograms*/
 

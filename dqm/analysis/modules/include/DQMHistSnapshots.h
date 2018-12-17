@@ -31,6 +31,7 @@ namespace Belle2 {
     typedef struct {
       TH1* histo;
       TCanvas* canvas;
+      int stale;
     } SSNODE;
 
     // Public functions

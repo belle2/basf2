@@ -329,7 +329,7 @@ class IntervalSelector:
 
     def __init__(self, intervals):
         """
-        Initialzes the IntervalSelector class with a list of intervals which
+        Initializes the IntervalSelector class with a list of intervals which
         should be selected
         """
 
@@ -717,7 +717,7 @@ class Validation:
 
     def apply_package_selection(self, selected_packages, ignore_dependencies=False):
         """
-        Only select packages from a specfic set of packages, but still honor the
+        Only select packages from a specific set of packages, but still honor the
         dependencies to outside scripts which may exist
         """
 
@@ -1082,7 +1082,7 @@ class Validation:
 
 def execute(tag=None, isTest=None):
     """!
-    Parses the comnmand line and executes the full validation suite
+    Parses the command line and executes the full validation suite
     """
 
     # If there is no release of basf2 set up, we can stop the execution right here!

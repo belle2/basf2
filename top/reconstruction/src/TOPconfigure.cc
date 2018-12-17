@@ -124,10 +124,12 @@ namespace Belle2 {
         addExpansionVolume(id, c_Left, c_Prism, prismLength - prismFlat,
                            B / 2, B / 2 - prismExit, 0, 0, prismWidth);
 
-        double filterThickness = prism.getFilterThickness();
         const auto& pmtArray = module.getPMTArray();
         double pmtWindow = pmtArray.getPMT().getWinThickness();
-        setBBoxWindow(id, prismFlat + filterThickness + pmtWindow);
+        // a call to prism.getFilterThickness is added for backward compatibility
+        double filterThickness = pmtArray.getFilterThickness() + prism.getFilterThickness();
+        double cookieThickness = pmtArray.getCookieThickness();
+        setBBoxWindow(id, prismFlat + cookieThickness + filterThickness + pmtWindow);
 
         double x0 = module.getPMTArrayDisplacement().getX();
         double y0 = module.getPMTArrayDisplacement().getY();

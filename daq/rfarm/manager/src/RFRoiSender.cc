@@ -177,3 +177,10 @@ void RFRoiSender::server()
   }
 }
 
+void RFRoiSender::cleanup()
+{
+  printf("RFRoiSender : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFRoiSender: Done. Exitting\n");
+  exit(-1);
+}

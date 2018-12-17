@@ -131,13 +131,33 @@ Here is a list of variables that returns extra info of a given particle:
 .. b2-variables::
    :group: MetaFunctions   
 
-MC Matching
-~~~~~~~~~~~
+MC matching and MC truth
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of truth-matching variables:
+Here is a list of MC truth-related variables.
+For some variables, you will need to run truth matching in order to get sensible results.
+
+.. code-block:: python
+
+    from modularAnalysis import matchMCTruth
+    matchMCTruth("B0:myCandidates")  # for example
+
+
+Variables will also work on generator-level particles:
+
+.. code-block:: python
+
+    from modularAnalysis import fillParticleListFromMC
+    fillParticleListFromMC("B0:generator", "") # the generator-level B particles
+
 
 .. b2-variables::
-   :group: MC Matching
+   :group: MC matching and MC truth
+
+
+.. b2-variables::
+   :group: MC particle seen in subdetectors
+
 
 Daughter info
 ~~~~~~~~~~~~~
@@ -148,7 +168,7 @@ Here is a list of variables getting info from particle's daughters:
    :group: DirectDaughterInfo
 
 KLM Cluster and :math:`K_{L}^0` Identification
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
 

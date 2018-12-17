@@ -163,7 +163,31 @@ namespace Belle2 {
                                    sensorID.getLadderNumber(),
                                    sensorID.getSensorNumber(),
                                    m_aDBObjPtr->sideIndex(isU),
-                                   0).isOnTime(svdTime, svdTimeError, t0, t0Error);
+                                   0).isInTime(svdTime, svdTimeError, t0, t0Error);
+
+    }
+
+    /** Return the version of the function used to determine whether the
+     * cluster time is acceptable at the SP creation
+     *
+     * Input:
+     * @param sensor ID: identity of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
+     *
+     * Output:
+     */
+    inline int getTimeSelectionFunction(
+      const Belle2::VxdID& sensorID,
+      const bool& isU
+    ) const
+    {
+      return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
+                                   sensorID.getLadderNumber(),
+                                   sensorID.getSensorNumber(),
+                                   m_aDBObjPtr->sideIndex(isU),
+                                   0).getFunctionID();
 
     }
 

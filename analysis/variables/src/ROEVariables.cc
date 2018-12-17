@@ -520,6 +520,97 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr nROE_Photons(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() > 1) {
+        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Photons");
+      }
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->getPhotons(maskName).size();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() > 1) {
+        B2FATAL("Wrong number of arguments (1 optional only) for meta function nROE_NeutralHadrons");
+      }
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->getHadrons(maskName).size();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr nROE_ChargedParticles(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+      int pdgCode = 0;
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() == 2) {
+        maskName = arguments[0];
+        try {
+          pdgCode = std::stoi(arguments[1]);
+        } catch (std::invalid_argument& e) {
+          B2ERROR("First argument of nROE_ChargedParticles must be a PDG code");
+          return nullptr;
+        }
+      }
+      if (arguments.size() > 2)  {
+        B2FATAL("Wrong number of arguments (2 optional) for meta function nROE_ChargedParticles");
+      }
+      auto func = [maskName, pdgCode](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->getChargedParticles(maskName, abs(pdgCode)).size();
+      };
+      return func;
+    }
+
+
+
+
+
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
       std::string pListName;
@@ -1894,6 +1985,18 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
+
+    REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
+                      "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
+                      "Second argument is a PDG code to count only one charged particle species, independently of charge. "
+                      "For example: nROE_Charged(cleanMask, 321) will output number of kaons in Rest Of Event with 'cleanMask'. "
+                      "PDG code 0 is used to count all charged particles");
+
+    REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,
+                      "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
+
+    REGISTER_VARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
+                      "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
 
     REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
                       "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"

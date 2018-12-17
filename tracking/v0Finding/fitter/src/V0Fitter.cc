@@ -64,7 +64,7 @@ bool V0Fitter::rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::Mea
 }
 
 
-bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
+bool V0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
 {
   VertexVector vertexVector;
   std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
@@ -208,7 +208,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
 
   genfit::GFRaveVertex vert;
-  if (not fitVertex(gfTrackPlus, gfTrackMinus, vert)) {
+  if (not fitGFRaveVertex(gfTrackPlus, gfTrackMinus, vert)) {
     return false;
   }
 

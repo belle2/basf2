@@ -17,10 +17,15 @@
 #include <string>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+
 #include "trg/ecl/dataobjects/TRGECLFAMAna.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLWaveform.h"
+
+#include "trg/ecl/dbobjects/TRGECLFAMPara.h"
 
 namespace Belle2 {
 
@@ -40,15 +45,15 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TRGECLFAMModule();
     /** Initilizes TRGECLFAMModule. */
-    virtual void initialize() override;
+    virtual void initialize();
     /** Called when new run started.*/
-    virtual void beginRun() override;
+    virtual void beginRun();
     /** Called event by event. */
-    virtual void event() override;
+    virtual void event();
     /** Called when run ended. */
-    virtual void endRun() override;
+    virtual void endRun();
     /** Called when processing ended.*/
-    virtual void terminate() override;
+    virtual void terminate();
 
   public:
 
@@ -56,7 +61,6 @@ namespace Belle2 {
     std::string version(void) const;
 
   private: /** Parameters*/
-
     /** Debug level.*/
     int _debugLevel;
     /** fam Method*/
@@ -69,10 +73,12 @@ namespace Belle2 {
     int _beambkgtag;
     /** save FAM ana table */
     int _famana;
-    /** Set Threshold */
+    /** Threshold input*/
     int _threshold;
     /** Set Shaping Function */
     int _FADC;
+    /** Use Condition DB*/
+    int _ConditionDB;
 
 
 
@@ -98,14 +104,15 @@ namespace Belle2 {
     std::vector<std::vector<double>> TCFitE;
     /** Fit TC T [ns] */
     std::vector<std::vector<double>> TCFitT;
+    /** Threshold */
+    std::vector<int> Threshold;
 
 
     StoreArray<TRGECLDigi0> m_TRGECLDigi0; /**< output for TRGECLDigi0 */
     StoreArray<TRGECLWaveform> m_TRGECLWaveform; /**< output for TRGECLWaveform */
     StoreArray<TRGECLHit> m_TRGECLHit; /**< output for TRGECLHit */
     StoreArray<TRGECLFAMAna> m_TRGECLFAMAna; /**< output for TRGECLFAMAna */
-
-
+    DBArray<TRGECLFAMPara> m_FAMPara; /** FAM Parameters */
   };
 
 } // namespace Belle2

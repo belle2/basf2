@@ -189,8 +189,7 @@ my_path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 gamma_vars = vc.cluster + \
     vc.mc_truth + \
-    vc.kinematics + \
-    vc.mc_hierarchy
+    vc.kinematics
 
 rho_vars = vc.cluster + \
     vc.mc_truth + \
@@ -199,8 +198,7 @@ rho_vars = vc.cluster + \
 
 pi_vars = vc.track
 
-b_vars = vc.event_meta_data + \
-    vc.kinematics + \
+b_vars = vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
     vu.create_aliases_for_selected(list_of_variables=gamma_vars,

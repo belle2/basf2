@@ -97,7 +97,8 @@ namespace Belle2 {
       int moduleID = PrePosition->GetTouchableHandle()->GetReplicaNumber(m_replicaDepth);
       const auto* geo = m_topgp->getGeometry();
       if (!geo->isModuleIDValid(moduleID)) {
-        B2ERROR("SensitiveBar: undefined module ID = " << moduleID);
+        B2ERROR("TOP::SensitiveBar: undefined module ID."
+                << LogVar("moduleID", moduleID));
         return false;
       }
 

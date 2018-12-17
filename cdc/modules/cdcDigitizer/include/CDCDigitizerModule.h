@@ -173,7 +173,7 @@ namespace Belle2 {
     double m_adcBinWidth;        /**< ADC bin width (mV) */
 
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
-    double m_totalFudgeFactor;  /**< total fudge factor for space resol. */
+    double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */

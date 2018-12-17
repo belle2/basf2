@@ -122,7 +122,9 @@ namespace Belle2 {
 
     // check validity of steering parameters
     if (m_lookBackWindows >= (int) m_storageDepth)
-      B2ERROR("'lookBackWindows' must be less than 'storageDepth'");
+      B2ERROR("TOPRawDigitConverter: 'lookBackWindows' must be less than 'storageDepth'."
+              << LogVar("storage depth", m_storageDepth)
+              << LogVar("look-back windows", m_lookBackWindows));
 
   }
 
@@ -204,7 +206,8 @@ namespace Belle2 {
       auto scrodID = rawDigit.getScrodID();
       const auto* feemap = feMapper.getMap(scrodID);
       if (!feemap) {
-        B2ERROR("No front-end map available for SCROD " << scrodID);
+        B2ERROR("TOPRawDigitConverter: No front-end map available."
+                << LogVar("scrodID", scrodID));
         continue;
       }
       auto moduleID = feemap->getModuleID();
@@ -269,9 +272,9 @@ namespace Belle2 {
         storageDepth = lastDepth * 2;
 
         if (window >= storageDepth) {
-          B2WARNING("TOPRawDigitConverter: window number greater than depth (window = "
-                    << window << ", depth = "
-                    << storageDepth << ") - raw digit ignored");
+          B2WARNING("TOPRawDigitConverter: window number greater than storage depth."
+                    << LogVar("window number", window)
+                    << LogVar("storage depth", storageDepth));
           continue;
         }
 

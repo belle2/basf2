@@ -41,12 +41,26 @@ namespace Belle2 {
 
     double eclClusterHadronIntensity(const Particle* particle)
     {
+      B2WARNING("eclClusterHadronIntensity will be removed in release-04.  eclPulseShapeDiscriminationMVA variable introduced in release-03 should be used in place of eclClusterHadronIntensity.");
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getClusterHadronIntensity();
         } else
           return -1.0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclPulseShapeDiscriminationMVA(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          return cluster->getPulseShapeDiscriminationMVA();
+        } else {
+          return -1.0;
+        }
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -1097,10 +1111,9 @@ namespace Belle2 {
                       "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
                       "Status bit to indicate if cluster has digits with waveforms that passed energy and chi2 thresholds for computing PSD variables.");
-    REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
-                      "Returns ECL cluster's Cluster Hadron Component Intensity (pulse shape discrimination variable). \n"
-                      "Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission. \n"
-                      "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
+    REGISTER_VARIABLE("PulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA,
+                      "Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. \n"
+                      "Value is 1.0 for electromagnetic showers and 0.0 for hadronic showers. \n");
     REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
                       "Returns ECL cluster's Number of hadron digits in cluster (pulse shape discrimination variable). \n"
                       "Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. \n"

@@ -135,7 +135,8 @@ namespace Belle2 {
         emiMomDir = module.momentumToLocal(emiMomDir);
         detMomDir = module.momentumToLocal(detMomDir);
       } else {
-        B2ERROR("SensitivePMT: undefined module ID = " << moduleID);
+        B2ERROR("TOP::SensitivePMT: undefined module ID."
+                << LogVar("moduleID", moduleID));
       }
       TOPSimPhoton* simPhoton = simPhotons.appendNew(moduleID,
                                                      emiPoint, emiMomDir, emiTime,

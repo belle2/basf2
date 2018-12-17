@@ -66,6 +66,9 @@ namespace Belle2 {
      * valid number if next is appended to it */
     static ENumberStatus checkNumber(ENumberStatus current, char next);
 
+    /** Default constructor */
+    FormulaParserBase() = default;
+
     /** virtual, but empty destructor */
     virtual ~FormulaParserBase() = default;
   protected:
@@ -158,7 +161,7 @@ namespace Belle2 {
         raiseError(e);
       }
     }
-  private:
+  protected:
     /** Execute the given operator by taking the operands from the stack and applying the operator to them */
     void executeOperator(EOperator op) override
     {

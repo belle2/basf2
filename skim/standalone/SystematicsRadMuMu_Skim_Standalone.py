@@ -36,7 +36,7 @@ skimOutputUdst(skimCode, SysList, path=skimpath)
 summaryOfLists(SysList, path=skimpath)
 
 # silence noisy modules
-setSkimLogging(skim_path=skimpath)
+setSkimLogging(path=skimpath)
 
 # process the path (run the skim)
 process(skimpath)

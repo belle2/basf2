@@ -29,7 +29,15 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             path.add_module(pxdeff)
         # SVD
         if components is None or 'SVD' in components:
+            # ZeroSuppression Emulator
+            path.add_module(
+                'SVDZeroSuppressionEmulator',
+                SNthreshold=5,
+                ShaperDigits='SVDShaperDigits',
+                ShaperDigitsIN='SVDShaperDigitsZS5',
+                FADCmode=True)
             svddqm = register_module('SVDDQMExpressReco')
+            svddqm.param('ShaperDigits', 'SVDShaperDigitsZS5')
             path.add_module(svddqm)
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:

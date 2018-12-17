@@ -31,16 +31,16 @@ namespace Belle2 {
      * @param data Data to display.
      */
     explicit EclPainter(EclData* data);
+    /** Copy constructor */
+    EclPainter(const EclPainter& other) : EclPainter(new EclData(*other.getData())) {}
     virtual ~EclPainter();
 
-    /**
-     * Set EclData to display in painter.
-     */
-    void setData(EclData* data);
-    /**
-     * Return currently displayed EclData.
-     */
-    EclData* getData();
+    /** Set EclData to display in painter.  */
+    void setData(EclData* data) { m_ecl_data = data; }
+    /** Return currently displayed EclData. */
+    EclData* getData() { return m_ecl_data; }
+    /** Return currently displayed EclData. */
+    const EclData* getData() const { return m_ecl_data; }
 
     /**
      * Set ECLChannelMapper for CellID <-> (crate, shaper, chid) conversion.

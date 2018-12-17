@@ -40,11 +40,9 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor defining the parameters */
     ROIDQMModule();
 
   private:
-    /** Input ptr for EventMetaData. */
     StoreArray<PXDDigit> m_pxdDigits;
     StoreArray<ROIid> m_roiIDs;
     StoreArray<PXDIntercept> m_pxdIntercept;
@@ -90,7 +88,6 @@ namespace Belle2 {
     TH1F* hnInter; /**< number of intercpets*/
     TH1F* harea; /**< ROis area */
     TH1F* hredFactor; /**< reduction factor*/
-    int n_events; /**< number of events*/
 
     void initialize(void) override final;
 

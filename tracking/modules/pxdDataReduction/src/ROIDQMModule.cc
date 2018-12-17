@@ -674,11 +674,11 @@ void ROIDQMModule::createHistosDictionaries()
 
         //--------------------------
 
-        itPxdSensors++;
+        ++itPxdSensors;
       }
-      itPxdLadders++;
+      ++itPxdLadders;
     }
-    itPxdLayers++;
+    ++itPxdLayers;
   }
 
 }

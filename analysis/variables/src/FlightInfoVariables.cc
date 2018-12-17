@@ -12,6 +12,7 @@
 #include <analysis/variables/FlightInfoVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <framework/utilities/Conversion.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -24,107 +25,75 @@ namespace Belle2 {
 
   namespace Variable {
 
-    // Helper function for flight distance and its uncertainty (provided as it is)
-    inline double getFlightInfoDistanceBtw(const Particle* particle, const Particle* daughter, double& distanceErr)
+    //Function to check if a beam constrained rave fit has been performed
+    bool hasRAVEBeamConstrainedProductionVertex(const Particle* particle)
     {
-      if (!particle || !daughter) {
-        distanceErr = -999;
-        return -999;
+      bool hasRAVEProdVertex = true;
+      std::vector<std::string> directions = {"x", "y", "z"};
+      for (auto ielement : directions) {
+        std::string prodVertPositionElement = boost::str(boost::format("prodVert%s") % boost::to_upper_copy(ielement));
+        hasRAVEProdVertex &= particle -> hasExtraInfo(prodVertPositionElement);
+        for (auto jelement : directions) {
+          std::string prodVertCovarianceElement = boost::str(boost::format("prodVertS%s%s") % ielement % jelement);
+          hasRAVEProdVertex &= particle -> hasExtraInfo(prodVertCovarianceElement);
+        }
       }
-      double mumvtxX = particle->getX();
-      double mumvtxY = particle->getY();
-      double mumvtxZ = particle->getZ();
-      if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
-        if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
-        if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
-      }
-      //daughter vertex
-      double vtxX =  daughter->getX();
-      double vtxY =  daughter->getY();
-      double vtxZ =  daughter->getZ();
-      // daughter MOMENTUM
-      double p = daughter->getP();
-      double pX = daughter->getPx();
-      double pY = daughter->getPy();
-      double pZ = daughter->getPz();
-
-      //versor of the daughter momentum
-      double nX = pX / p;
-      double nY = pY / p;
-      double nZ = pZ / p;
-      //mother vertex
-      double lX = vtxX - mumvtxX;
-      double lY = vtxY - mumvtxY;
-      double lZ = vtxZ - mumvtxZ;
-
-      //flight distance
-      double fD      = lX * nX + lY * nY + lZ * nZ;
-      //covariance matrix of momentum and vertex for the Dz
-      //ORDER = px,py,pz,E,x,y,z
-      TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
-      TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
-      if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
-        if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
-        if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
-        if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
-        if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
-        if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
-        if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
-        if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
-        if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
-      }
-      //compute total covariance matrix
-      //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
-
-      TMatrixFSym Cov(10);
-      for (int i = 0; i < 10; i++)
-        for (int j = 0; j < 10; j++)
-          if (i < 7 && j < 7)
-            Cov[i][j] = dauCov[i][j];
-          else if (i > 6 && j > 6)
-            Cov[i][j] = mumCov[i - 7][j - 7];
-          else
-            Cov[i][j] = 0;
-
-      TMatrixF deriv(10, 1);
-      deriv[0][0] = (lX - nX * fD) / p;   //px Daughter
-      deriv[1][0] = (lY - nY * fD) / p;   //py Daughter
-      deriv[2][0] = (lZ - nZ * fD) / p;   //pz Daughter
-      deriv[3][0] = 0; //E Daughter
-      deriv[4][0] = nX;   //vtxX Daughter
-      deriv[5][0] = nY;   //vtxY Daughter
-      deriv[6][0] = nZ;   //vtxZ Daughter
-      deriv[7][0] = - nX;   //vtxX Mother
-      deriv[8][0] = - nY;   //vtxY Mother
-      deriv[9][0] = - nZ;   //vtxZ Mother
-
-
-      TMatrixF tmp(10, 1);
-      tmp.Mult(Cov, deriv);
-
-      TMatrixF result(1, 1);
-      result.Mult(deriv.T(), tmp);
-
-      distanceErr = sqrt(result[0][0]);
-      return fD;
+      return hasRAVEProdVertex;
     }
 
-    // Helper function for flight time and its uncertainty (provided as it is)
-    inline double getFlightInfoTimeBtw(const Particle* particle, const Particle* daughter, double& timeErr)
+    // Helper function for flight distance and its uncertainty (provided as it is)
+    inline double getFlightInfoBtw(const Particle* particle, const Particle* daughter, double& outErr, const std::string mode,
+                                   const bool motherToGranddaughter = false)
     {
       if (!particle || !daughter) {
-        timeErr = -999;
+        outErr = -999;
         return -999;
       }
+      if (!(particle->getParticleType() == Particle::EParticleType::c_Composite) ||
+          !(daughter->getParticleType() == Particle::EParticleType::c_Composite)) {
+        B2WARNING("Attempting to calculate flight " << mode << " for non composite particle");
+        outErr = -999;
+        return -999;
+      }
+      if (!(mode == "distance") && !(mode == "time")) {
+        B2WARNING("FlightInfo helper function called with mode '" << mode
+                  << "'. Only 'distance' and 'time' are available.");
+        outErr = -999;
+        return -999;
+      }
+      // get TreeFitter values if they exist.
+      // Bypass this in case the variables are requested for the granddaughter with respect to the mother as
+      // TreeFitter will return the values of the granddaughter with respect to the daughter
+      if (!motherToGranddaughter) {
+        if (mode == "distance" &&
+            daughter->hasExtraInfo("decayLength") &&
+            daughter->hasExtraInfo("decayLengthErr")) {
+          outErr = daughter -> getExtraInfo("decayLengthErr");
+          return daughter -> getExtraInfo("decayLength");
+        }
+        if (mode == "time" &&
+            daughter->hasExtraInfo("lifeTime") &&
+            daughter->hasExtraInfo("lifeTimeErr")) {
+          outErr = daughter -> getExtraInfo("lifeTimeErr");
+          return daughter -> getExtraInfo("lifeTime");
+        }
+      }
+
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
-        if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
-        if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+        if (hasRAVEBeamConstrainedProductionVertex(particle)) {
+          mumvtxX = particle->getExtraInfo("prodVertX");
+          mumvtxY = particle->getExtraInfo("prodVertY");
+          mumvtxZ = particle->getExtraInfo("prodVertZ");
+        } else {
+          //if no production vertex assume the particle originated at the ip
+          PCmsLabTransform T;
+          mumvtxX = T.getBeamParams().getVertex().X();
+          mumvtxY = T.getBeamParams().getVertex().Y();
+          mumvtxZ = T.getBeamParams().getVertex().Z();
+        }
       }
       //daughter vertex
       double vtxX =  daughter->getX();
@@ -155,17 +124,18 @@ namespace Belle2 {
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
       if (particle == daughter) {
-        if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
-        if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
-        if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
-        if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
-        if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
-        if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
-        if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
-        if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
-        if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+        if (hasRAVEBeamConstrainedProductionVertex(particle)) {
+          std::vector<std::string> directions = {"x", "y", "z"};
+          for (unsigned int i = 0; i < directions.size(); i++) {
+            for (unsigned int j = 0; j < directions.size(); j++) {
+              mumCov[i][j] = particle->getExtraInfo(boost::str(boost::format("prodVertS%s%s") % directions[i] % directions[j]));
+            }
+          }
+        } else {
+          PCmsLabTransform T;
+          mumCov = T.getBeamParams().getCovVertex();
+        }
       }
-
       //compute total covariance matrix
       //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
 
@@ -179,27 +149,53 @@ namespace Belle2 {
           else
             Cov[i][j] = 0;
 
+      if (mode == "distance") {
+        TMatrixF deriv(10, 1);
+        deriv[0][0] = (lX - nX * fD) / p;   //px Daughter
+        deriv[1][0] = (lY - nY * fD) / p;   //py Daughter
+        deriv[2][0] = (lZ - nZ * fD) / p;   //pz Daughter
+        deriv[3][0] = 0; //E Daughter
+        deriv[4][0] = nX;   //vtxX Daughter
+        deriv[5][0] = nY;   //vtxY Daughter
+        deriv[6][0] = nZ;   //vtxZ Daughter
+        deriv[7][0] = - nX;   //vtxX Mother
+        deriv[8][0] = - nY;   //vtxY Mother
+        deriv[9][0] = - nZ;   //vtxZ Mother
 
-      TMatrixF deriv(10, 1);
-      deriv[0][0] = (daughter->getPDGMass() / Const::speedOfLight * lX - 2 * pX * fT) / p / p; //px Daughter
-      deriv[1][0] = (daughter->getPDGMass() / Const::speedOfLight * lY - 2 * pY * fT) / p / p; //py Daughter
-      deriv[2][0] = (daughter->getPDGMass() / Const::speedOfLight * lZ - 2 * pZ * fT) / p / p; //pz Daughter
-      deriv[3][0] = 0; //E Daughter
-      deriv[4][0] = daughter->getPDGMass() / Const::speedOfLight * pX / p / p; //vtxX Daughter
-      deriv[5][0] = daughter->getPDGMass() / Const::speedOfLight * pY / p / p; //vtxY Daughter
-      deriv[6][0] = daughter->getPDGMass() / Const::speedOfLight * pZ / p / p; //vtxZ Daughter
-      deriv[7][0] = - daughter->getPDGMass() / Const::speedOfLight * pX / p / p; //vtxX Mother
-      deriv[8][0] = - daughter->getPDGMass() / Const::speedOfLight * pY / p / p; //vtxY Mother
-      deriv[9][0] = - daughter->getPDGMass() / Const::speedOfLight * pZ / p / p; //vtxZ Mother
+
+        TMatrixF tmp(10, 1);
+        tmp.Mult(Cov, deriv);
+
+        TMatrixF result(1, 1);
+        result.Mult(deriv.T(), tmp);
+
+        outErr = sqrt(result[0][0]);
+        return fD;
+      }
+      if (mode == "time") {
+        TMatrixF deriv(10, 1);
+        deriv[0][0] = (daughter->getPDGMass() / Const::speedOfLight * lX - 2 * pX * fT) / p / p; //px Daughter
+        deriv[1][0] = (daughter->getPDGMass() / Const::speedOfLight * lY - 2 * pY * fT) / p / p; //py Daughter
+        deriv[2][0] = (daughter->getPDGMass() / Const::speedOfLight * lZ - 2 * pZ * fT) / p / p; //pz Daughter
+        deriv[3][0] = 0; //E Daughter
+        deriv[4][0] = daughter->getPDGMass() / Const::speedOfLight * pX / p / p; //vtxX Daughter
+        deriv[5][0] = daughter->getPDGMass() / Const::speedOfLight * pY / p / p; //vtxY Daughter
+        deriv[6][0] = daughter->getPDGMass() / Const::speedOfLight * pZ / p / p; //vtxZ Daughter
+        deriv[7][0] = - daughter->getPDGMass() / Const::speedOfLight * pX / p / p; //vtxX Mother
+        deriv[8][0] = - daughter->getPDGMass() / Const::speedOfLight * pY / p / p; //vtxY Mother
+        deriv[9][0] = - daughter->getPDGMass() / Const::speedOfLight * pZ / p / p; //vtxZ Mother
 
 
-      TMatrixF tmp(10, 1);
-      tmp.Mult(Cov, deriv);
+        TMatrixF tmp(10, 1);
+        tmp.Mult(Cov, deriv);
 
-      TMatrixF result(1, 1);
-      result.Mult(deriv.T(), tmp);
-      timeErr = sqrt(result[0][0]);
-      return fT;
+        TMatrixF result(1, 1);
+        result.Mult(deriv.T(), tmp);
+        outErr = sqrt(result[0][0]);
+        return fT;
+      }
+      outErr = -999;
+      return -999;
     }
 
     // Helper function for MC flight distance
@@ -241,38 +237,26 @@ namespace Belle2 {
     double flightDistance(const Particle* part)
     {
       double flightDistanceErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
-      return getFlightInfoDistanceBtw(part, part, flightDistanceErr);
+      return getFlightInfoBtw(part, part, flightDistanceErr, "distance");
     }
 
     double flightTime(const Particle* part)
     {
       double flightTimeErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
-      return getFlightInfoTimeBtw(part, part, flightTimeErr);
+      return getFlightInfoBtw(part, part, flightTimeErr, "time");
     }
 
     double flightDistanceErr(const Particle* part)
     {
       double flightDistanceErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
-      getFlightInfoDistanceBtw(part, part, flightDistanceErr);
+      getFlightInfoBtw(part, part, flightDistanceErr, "distance");
       return flightDistanceErr;
     }
 
     double flightTimeErr(const Particle* part)
     {
       double flightTimeErr = -999;
-      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
-      }
-      getFlightInfoTimeBtw(part, part, flightTimeErr);
+      getFlightInfoBtw(part, part, flightTimeErr, "time");
       return flightTimeErr;
     }
 
@@ -413,10 +397,10 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              return getFlightInfoTimeBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr);
+              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
             }
           } else {
-            return getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
+            return getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
           };
           return -999;
         }; // Lambda function END
@@ -457,11 +441,11 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              getFlightInfoTimeBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr);
+              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
               return flightTimeErr;
             }
           } else {
-            getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
+            getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
             return flightTimeErr;
           };
           return -999;
@@ -502,10 +486,10 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              return getFlightInfoDistanceBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr);
+              return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
             }
           } else {
-            return getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
+            return getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
           };
           return -999;
         }; // Lambda function END
@@ -546,11 +530,11 @@ namespace Belle2 {
           if (grandDaughterNumber > -1)
           {
             if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-              getFlightInfoDistanceBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr);
+              getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
               return flightDistanceErr;
             }
           } else {
-            getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
+            getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
             return flightDistanceErr;
           };
           return -999;
@@ -767,23 +751,29 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Flight Information");
-    // Daughters
     REGISTER_VARIABLE("flightTime", flightTime,
-                      "Returns the flight time of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight time of particle. If a treeFit has been performed the flight time calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight time. If neither fit has been performed the i.p. is taken to be the production vertex.");
     REGISTER_VARIABLE("flightDistance", flightDistance,
-                      "Returns the flight distance of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight distance of particle. If a treeFit has been performed the flight distance calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight distance. If neither fit has been performed the i.p. is taken to be the production vertex.");
     REGISTER_VARIABLE("flightTimeErr", flightTimeErr,
-                      "Returns the flight time uncertainty of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight time error of particle. If a treeFit has been performed the flight time error calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight time error. If neither fit has been performed the i.p. is taken to be the production vertex.");
     REGISTER_VARIABLE("flightDistanceErr", flightDistanceErr,
-                      "Returns the flight distance uncertainty of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the flight distance error of particle. If a treeFit has been performed the flight distance error calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight distance error. If neither fit has been performed the i.p. is taken to be the production vertex.");
+    // Daughters
     REGISTER_VARIABLE("flightTimeOfDaughter(daughterN, gdaughterN = -1)", flightTimeOfDaughter,
-                      "Returns the flight time between mother and daughter particle with daughterN index.");
+                      "Returns the flight time between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).");
     REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN, gdaughterN = -1)", flightTimeOfDaughterErr,
-                      "Returns the flight time uncertainty between mother and daughter particle");
+                      "Returns the flight time error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).");
     REGISTER_VARIABLE("flightDistanceOfDaughter(daughterN, gdaughterN = -1)", flightDistanceOfDaughter,
-                      "Returns the flight distance between mother and daughter particle with daughterN index. If second integer is provided, the value will be computed w.r.t. of gdaughterN granddaughter particle.");
+                      "Returns the flight distance between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).");
     REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN, gdaughterN = -1)", flightDistanceOfDaughterErr,
-                      "Returns the flight distance uncertainty between mother and daughter particle");
+                      "Returns the flight distance error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).");
+    // MC Info
+    REGISTER_VARIABLE("mcFlightDistanceOfDaughter(daughterN, gdaughterN = -1)", mcFlightDistanceOfDaughter,
+                      "Returns the MC flight distance between mother and daughter particle using generated info");
+    REGISTER_VARIABLE("mcFlightTimeOfDaughter(daughterN, gdaughterN = -1)", mcFlightTimeOfDaughter,
+                      "Returns the MC flight time between mother and daughter particle using generated info");
+    //Vertex Distance
     REGISTER_VARIABLE("vertexDistance", vertexDistance,
                       "Returns the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
     REGISTER_VARIABLE("vertexDistanceErr", vertexDistanceErr,
@@ -804,10 +794,5 @@ namespace Belle2 {
     // GrandDaughters
     //REGISTER_VARIABLE("flightDistanceOfGrandDaughter(daughterN)", flightDistanceOfGrandDaughter,
     //                  "Returns the flight distance between mother and daughter particle");
-    // MC Info
-    REGISTER_VARIABLE("mcFlightDistanceOfDaughter(daughterN, gdaughterN = -1)", mcFlightDistanceOfDaughter,
-                      "Returns the MC flight distance between mother and daughter particle using generated info");
-    REGISTER_VARIABLE("mcFlightTimeOfDaughter(daughterN, gdaughterN = -1)", mcFlightTimeOfDaughter,
-                      "Returns the MC flight time between mother and daughter particle using generated info");
   }
 } // Belle2 namespace

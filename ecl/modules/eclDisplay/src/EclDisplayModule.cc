@@ -36,7 +36,11 @@ REG_MODULE(EclDisplay)
 //                 Implementation
 //-----------------------------------------------------------------
 
-EclDisplayModule::EclDisplayModule() : Module()
+EclDisplayModule::EclDisplayModule() : Module(),
+  m_frame_closed(false),
+  m_frame(0),
+  m_app(0),
+  m_data(0)
 {
   // Set module properties
   setDescription("Event display module for ECL.");
@@ -73,8 +77,6 @@ void EclDisplayModule::initFrame()
   m_frame = new EclFrame(m_displayMode, m_data, m_autoDisplay, &m_mapper);
 
   m_frame->Connect("CloseWindow()", "Belle2::EclDisplayModule", this, "handleClosedFrame()");
-
-  m_frame_closed = false;
 
   B2DEBUG(100, "EclDisplayModule::create ECLFrame");
 }

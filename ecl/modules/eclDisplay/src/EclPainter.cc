@@ -34,16 +34,6 @@ EclPainter::~EclPainter()
 
 }
 
-void EclPainter::setData(EclData* data)
-{
-  m_ecl_data = data;
-}
-
-EclData* EclPainter::getData()
-{
-  return m_ecl_data;
-}
-
 void EclPainter::setMapper(ECL::ECLChannelMapper* mapper)
 {
   m_mapper = mapper;

@@ -43,6 +43,12 @@ namespace Belle2 {
 
     // Data members
   private:
+    /**
+     * Pattern match for histogram name
+     * @param pattern Pattern used for matchng the histogram name. Wildcards (* and ?) are supported
+     * @param text    Histogram name to be matched
+     * @return true, if the pattern matches the text
+     */
     bool hname_pattern_match(std::string pattern, std::string text);
     //int m_interval;
     std::string m_input_name;

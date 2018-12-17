@@ -29,7 +29,7 @@ namespace Belle2 {
 
     private:
       EclConfiguration() {};
-      bool m_background;
+      bool m_background{false};
     public:
 
       struct signalsample_t {

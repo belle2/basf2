@@ -25,7 +25,7 @@ namespace Belle2 {
   class ECLDsp : public RelationsObject {
   public:
 
-    /**< Offline two component fit type */
+    /** Offline two component fit type */
     enum TwoComponentFitType {
       poorChi2 = -1,  /**< All offline fit attempts were greater than chi2 threshold */
       photonHadron = 0,  /**< photon + hadron template fit */
@@ -34,20 +34,7 @@ namespace Belle2 {
     };
 
     /** default constructor for ROOT */
-    ECLDsp() : m_DspAVector(31, 0)
-    {
-
-      m_TwoComponentFitType = poorChi2;  /**< Offline two component fit type */
-      m_CellId = 0;    /**< cell id */
-      m_TwoComponentTotalAmp = -1;  /**< Offline two component total amplitude */
-      m_TwoComponentHadronAmp = -1; /**< Offline two component hadron amplitude */
-      m_TwoComponentChi2 = -1;  /**< Offline two component chi2*/
-      m_TwoComponentSavedChi2[0] = -1;  /**< Offline two component chi2 FT=0*/
-      m_TwoComponentSavedChi2[1] = -1;  /**< Offline two component chi2 FT=1*/
-      m_TwoComponentSavedChi2[2] = -1;  /**< Offline two component chi2 FT=2*/
-      m_TwoComponentTime = 1;  /**< Offline two component time */
-      m_TwoComponentBaseline = 1;  /**< Offline two component baseline */
-    }
+    ECLDsp() : m_DspAVector(31, 0) {}
 
     /** Constructor for data*/
     ECLDsp(int CellId, int NADCPoints, int* ADCData)
@@ -57,11 +44,8 @@ namespace Belle2 {
     }
 
     /** Constructor for data*/
-    ECLDsp(int CellId, std::vector<int> ADCData)
-    {
-      m_CellId     = CellId;
-      m_DspAVector = ADCData;
-    }
+    ECLDsp(int CellId, const std::vector<int>& ADCData) :
+      m_CellId(CellId), m_DspAVector(ADCData) {}
 
     /*! Set Cell ID
      */
@@ -76,7 +60,7 @@ namespace Belle2 {
 
     /*! Set Dsp array
      */
-    void setDspA(std::vector <int> DspArrayVector)
+    void setDspA(const std::vector <int>& DspArrayVector)
     {
       m_DspAVector = DspArrayVector;
     }
@@ -95,7 +79,7 @@ namespace Belle2 {
 
     /*! Set two comp chi2
      */
-    void setTwoComponentChi2(double input) {      m_TwoComponentChi2 = input; }
+    void setTwoComponentChi2(double input) { m_TwoComponentChi2 = input; }
 
     /*! Set two comp chi2 for a fit type
      *   see enum TwoComponentFitType in ECLDsp.h for description of fit types.
@@ -108,7 +92,7 @@ namespace Belle2 {
 
     /*! Set two comp time
      */
-    void setTwoComponentTime(double input) {      m_TwoComponentTime = input; }
+    void setTwoComponentTime(double input) { m_TwoComponentTime = input; }
 
     /*! Set two comp baseline
      */
@@ -214,18 +198,18 @@ namespace Belle2 {
 
   private:
 
-    int m_CellId;      /**< Cell ID */
-    double m_TwoComponentTotalAmp; /**< Two comp total amp */
-    double m_TwoComponentHadronAmp;   /**< Two comp hadron amp */
-    double m_TwoComponentDiodeAmp;   /**< Two comp diode amp */
-    double m_TwoComponentChi2; /**< Two comp chi2 */
-    double m_TwoComponentSavedChi2[3]; /**< Two comp chi2 for each fit tried in reconstruction */
-    double m_TwoComponentTime; /**< Two comp time*/
-    double m_TwoComponentBaseline; /**< Two comp baseline*/
-    double m_backgroundPhotonEnergy;  /**< Pile-up photon energy*/
-    double m_backgroundPhotonTime;  /**< Pile-up photon time*/
-    TwoComponentFitType m_TwoComponentFitType;  /**< offline fit hypothesis.*/
-    std::vector <int> m_DspAVector; /**< Dsp array vith variable length for calibration, tests, etc.  */
+    int m_CellId{0};                      /**< Cell ID */
+    double m_TwoComponentTotalAmp{ -1};   /**< Two comp total amp */
+    double m_TwoComponentHadronAmp{ -1};  /**< Two comp hadron amp */
+    double m_TwoComponentDiodeAmp{ -1};   /**< Two comp diode amp */
+    double m_TwoComponentChi2{ -1};       /**< Two comp chi2 */
+    double m_TwoComponentSavedChi2[3] = { -1, -1, -1}; /**< Two comp chi2 for each fit tried in reconstruction */
+    double m_TwoComponentTime{1};         /**< Two comp time*/
+    double m_TwoComponentBaseline{1};     /**< Two comp baseline*/
+    double m_backgroundPhotonEnergy{ -1}; /**< Pile-up photon energy*/
+    double m_backgroundPhotonTime{ -1};   /**< Pile-up photon time*/
+    TwoComponentFitType m_TwoComponentFitType{poorChi2};  /**< offline fit hypothesis.*/
+    std::vector <int> m_DspAVector;       /**< Dsp array vith variable length for calibration, tests, etc.  */
 
     /*2 dspa array with variable length*/
     /*3 Add two component variables*/

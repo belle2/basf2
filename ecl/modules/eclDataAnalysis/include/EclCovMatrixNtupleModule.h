@@ -59,32 +59,32 @@ namespace Belle2 {
     std::string m_digiArrayName;
 
     /** Root tree name */
-    TTree* m_tree;
+    TTree* m_tree{nullptr};
     /** Root file for saving the output */
-    TFile* m_rootFile;
+    TFile* m_rootFile{nullptr};
 
-    double m_energy;
+    double m_energy{ -1};
     /** Event number */
-    int m_nevt;
+    int m_nevt{ -1};
     /** Number of eclHits */
-    int m_nhits;
+    int m_nhits{ -1};
 
     /** Crystal ID */
-    int m_cellID[8736];
+    int m_cellID[8736] = {};
     /** Crystal Theta ID */
-    int m_theta[8736];
+    int m_theta[8736] = {};
     /** Crystal Phi ID */
-    int m_phi[8736];
+    int m_phi[8736] = {};
     /** eclDsp sample Array */
-    int m_DspHit[8736][31];
+    int m_DspHit[8736][31] = {};
     /** eclHit Energy */
-    double m_hitE[8736];
+    double m_hitE[8736] = {};
     /** eclHit Time */
-    double m_hitTime[8736];
+    double m_hitTime[8736] = {};
     /** eclDigit Time */
-    int m_DigiTime[8736];
+    int m_DigiTime[8736] = {};
     /** eclTrig Time */
-    double m_DeltaT[8736];
+    double m_DeltaT[8736] = {};
 
   private:
     /** Store array: ECLDsp. */

@@ -36,7 +36,7 @@ use_local_database(
     LogLevel.WARNING)
 
 # particles = fei.get_default_channels(convertedFromBelle=True, chargedB=False, neutralB=False)
-particles = fei.get_default_channels(convertedFromBelle=True)
+particles = fei.get_default_channels(convertedFromBelle=True, upsilon5S=True)
 configuration = fei.config.FeiConfiguration(prefix='FEI_Belle1_Generic_2017_1', b2bii=True, training=True, monitor=True)
 feistate = fei.get_path(particles, configuration)
 

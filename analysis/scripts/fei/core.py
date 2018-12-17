@@ -503,7 +503,7 @@ class PostReconstruction(object):
                                      filename=config.removeJPsiSlash(filename), path=path)
 
                 variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                             'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                             'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 filename = 'Monitor_Final_{}.root'.format(particle.identifier)
                 variablesToNtuple(particle.identifier, variables, treename='variables',
                                   filename=config.removeJPsiSlash(filename), path=path)
@@ -699,7 +699,6 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
         [p for p in particles if p.name in ['D+', 'D0', 'D_s+']],
         [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],
         [p for p in particles if p.name in ['B0', 'B+', 'B_s0']],
-        # [p for p in particles if p.name in ['B0', 'B+', 'B_s+']],
         []
     ]
 

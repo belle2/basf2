@@ -14,6 +14,7 @@
    - running on Belle 1 MC/data (convertedFromBelle = True)
    - running a specific FEI which is optimized for a signal selection and uses ROEs (specific = True)
    - run without semileptonic D channels (removeSLD = True )
+   - Bs/anti-Bs (upsilon5S = True )
 
  Another interesting configuration is given by get_fr_channels,
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
@@ -25,7 +26,7 @@ from basf2 import B2FATAL, B2INFO
 
 
 def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLong=False, chargedB=True, neutralB=True,
-                         convertedFromBelle=False, specific=False, removeSLD=False, upsilon5S=True):
+                         convertedFromBelle=False, specific=False, removeSLD=False, upsilon5S=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
@@ -39,6 +40,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
+    @param upsilon5S if True, reconstructs Bs mesons (default is False)
     """
     if upsilon5S is True:
         B2INFO('Running 5S FEI')

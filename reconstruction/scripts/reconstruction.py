@@ -296,6 +296,7 @@ def add_cdst_output(
         'ECLCalDigits',
         'TRGECLClusters',
         'TRGECLUnpackerStores',
+        'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',

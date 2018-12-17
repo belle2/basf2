@@ -11,7 +11,6 @@
 #include <tracking/modules/pxdDataReduction/ROIDQMModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <TDirectory.h>
-#include <time.h>
 
 using namespace std;
 using namespace Belle2;
@@ -84,7 +83,6 @@ void ROIDQMModule::initialize()
   REG_HISTOGRAM
 
   m_pxdDigits.isOptional();
-  m_pxdRawHits.isOptional();
   m_roiIDs.isRequired(m_ROIsName);
   m_pxdIntercept.isRequired(m_InterceptsName);
 

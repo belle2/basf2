@@ -13,7 +13,6 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
@@ -21,8 +20,6 @@
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <unordered_map>
 #include <map>
@@ -51,7 +48,6 @@ namespace Belle2 {
   private:
     /** Input ptr for EventMetaData. */
     StoreArray<PXDDigit> m_pxdDigits;
-    StoreArray<PXDRawHit> m_pxdRawHits;
     StoreArray<ROIid> m_roiIDs;
     StoreArray<PXDIntercept> m_pxdIntercept;
 

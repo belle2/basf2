@@ -37,10 +37,6 @@ ROIDQMModule::ROIDQMModule()
 , hnInter(NULL)
 , harea(NULL)
 , hredFactor(NULL)
-, hCellUV(NULL)
-, n_events(0)
-, h_HitRow_CellU(NULL)
-, h_HitCol_CellV(NULL)
 {
   //Set module properties
   setDescription("Monitor of the ROI creation on HLT");
@@ -69,22 +65,6 @@ void ROIDQMModule::defineHisto()
   oldDir->cd("roi");
   m_ROIDir =  gDirectory;
 
-  // TODO the following three hist end up in top directory?
-  // Anyway, why do we have these histograms at all?
-  // they are not even per-sensor and do not contain useful info
-
-  hCellUV  = new TH2F("hCellU_vs_CellV", "CellID U vs CellID V", 480, 0, 480, 480, 0, 480);
-  hCellUV->GetXaxis()->SetTitle("U cell ID");
-  hCellUV->GetYaxis()->SetTitle("V cell ID");
-
-  h_HitRow_CellU  = new TH2F("hHitRow_vs_CellU", "PXDRawHit ROW  vs CellID U", 480, 0, 480, 480, 0, 480);
-  h_HitRow_CellU->GetXaxis()->SetTitle("U cell ID");
-  h_HitRow_CellU->GetYaxis()->SetTitle("ROW ID");
-
-  h_HitCol_CellV  = new TH2F("hHitCol_vs_CellV", "PXDRawHit COL vs CellID V", 480, 0, 480, 480, 0, 480);
-  h_HitCol_CellV->GetXaxis()->SetTitle("V cell ID");
-  h_HitCol_CellV->GetYaxis()->SetTitle("COL ID");
-
   m_InterDir->cd();
   hnInter  = new TH1F("hnInter", "number of intercepts", 100, 0, 100);
 
@@ -92,7 +72,6 @@ void ROIDQMModule::defineHisto()
   hnROIs  = new TH1F("hnROIs", "number of ROIs", 100, 0, 100);
   harea = new TH1F("harea", "ROI area", 100, 0, 100000);
   hredFactor = new TH1F("hredFactor", "ROI reduction factor", 1000, 0, 1);
-
 
   createHistosDictionaries();
 
@@ -104,30 +83,15 @@ void ROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 
-  m_eventMetaData.isRequired();
   m_pxdDigits.isOptional();
   m_pxdRawHits.isOptional();
   m_roiIDs.isRequired(m_ROIsName);
   m_pxdIntercept.isRequired(m_InterceptsName);
 
-  n_events = 0;
 }
 
 void ROIDQMModule::event()
 {
-
-  n_events++;
-
-  m_time = m_eventMetaData->getTime() * 1e-9 ; // time in ns -> s
-
-  for (auto& it : m_pxdDigits)
-    hCellUV->Fill(it.getUCellID(), it.getVCellID());
-
-  for (auto& itd : m_pxdDigits)
-    for (auto& itr : m_pxdRawHits) {
-      h_HitRow_CellU->Fill(itd.getUCellID(), itr.getRow());
-      h_HitCol_CellV->Fill(itd.getVCellID(), itr.getColumn());
-    }
 
   hnInter->Fill(m_pxdIntercept.getEntries());
 
@@ -523,51 +487,6 @@ void ROIDQMModule::createHistosDictionaries()
                                );
 
 
-        // scatter plot: U,V residuals VS time
-        name = "hResidU_vs_time_" + sensorid;
-        title = "U residual (cm) vs time " + sensorid;
-        tmp2D = new TH2F(name.c_str(), title.c_str(), 100, 0, 1e6, 100, -5, 5);
-        tmp2D->GetYaxis()->SetTitle("U resid (cm)");
-        tmp2D->GetXaxis()->SetTitle("time (folded in 1us)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
-                                (
-                                  (Belle2::VxdID)*itPxdSensors,
-                                  InterHistoAndFill(
-                                    tmp2D,
-        [this](TH1 * hPtr, const PXDIntercept * inter) {
-          for (auto& it : m_pxdDigits)
-            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
-              double resid = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
-              hPtr->Fill(m_time, resid);
-            }
-        }
-                                  )
-                                )
-                               );
-
-        name = "hResidV_vs_time_" + sensorid;
-        title = "V residual (cm) vs time " + sensorid;
-        tmp2D = new TH2F(name.c_str(), title.c_str(), 100, 0, 1e6, 100, -5, 5);
-        tmp2D->GetYaxis()->SetTitle("V resid (cm)");
-        tmp2D->GetXaxis()->SetTitle("time (folded in 1us)");
-        hInterDictionary.insert(pair< Belle2::VxdID, InterHistoAndFill >
-                                (
-                                  (Belle2::VxdID)*itPxdSensors,
-                                  InterHistoAndFill(
-                                    tmp2D,
-        [this](TH1 * hPtr, const PXDIntercept * inter) {
-
-          for (auto& it : m_pxdDigits)
-            if ((int)it.getSensorID() == (int)inter->getSensorID()) {
-              const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
-              double resid = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
-              hPtr->Fill(m_time, resid);
-            }
-        }
-                                  )
-                                )
-                               );
 
         //residual vs charge
         name = "hResidU_vs_charge_" + sensorid;
@@ -795,8 +714,6 @@ void ROIDQMModule::fillSensorROIHistos(const ROIid* roi)
 
 void ROIDQMModule::endRun()
 {
-
-  hCellUV->Scale((double)1 / n_events);
 
   for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it)
     delete &(it->second);

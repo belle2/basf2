@@ -50,7 +50,6 @@ namespace Belle2 {
 
   private:
     /** Input ptr for EventMetaData. */
-    StoreObjPtr<EventMetaData> m_eventMetaData;
     StoreArray<PXDDigit> m_pxdDigits;
     StoreArray<PXDRawHit> m_pxdRawHits;
     StoreArray<ROIid> m_roiIDs;
@@ -97,14 +96,7 @@ namespace Belle2 {
     TH1F* hnInter; /**< number of intercpets*/
     TH1F* harea; /**< ROis area */
     TH1F* hredFactor; /**< reduction factor*/
-    TH2F* hCellUV; /**< U,V cells */
     int n_events; /**< number of events*/
-
-    /** Time(Tag) from MetaInfo */
-    unsigned long long int m_time;
-
-    TH2F* h_HitRow_CellU; /**< pxdRawHit ROW vs CellID U*/
-    TH2F* h_HitCol_CellV; /**< pxdRawHit ROW vs CellID U*/
 
     void initialize(void) override final;
 

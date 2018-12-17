@@ -2,7 +2,7 @@
 # -*-  coding: utf-8 -*-
 # Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
-import basf2.core
+import basf2
 from modularAnalysis import inputMdst, matchMCTruth, variablesToNtuple, process, statistics
 from stdV0s import stdKshorts
 import sys
@@ -15,7 +15,7 @@ except BaseException:
         's00/e0000/4S/r00000/mixed/mdst/sub00/mdst_00000*_prod00004770_task0000000*.root'
 
 try:
-    identifier = str(sys.argv[2])
+    identifier = sys.argv[2]
 except BaseException:
     identifier = 'Kshort_FastBDT.xml'  # by default train to xml then upload to localdb
 
@@ -23,25 +23,13 @@ except BaseException:
 tree_name = 'ks_training_variables'
 training_file_name = 'KshortClassifierTrainingData.root'
 
-variables = ['SigM',
-             'formula( E / E_uncertainty )',
-             'pt',
-             'cosTheta',  # polar angle
-             'formula( x / x_uncertainty )',
-             'formula( y / y_uncertainty )',
-             'formula( z / z_uncertainty )',
-             'dr',
-             'formula( flightTime / flightTimeErr )',
-             'flightDistance',
-             'cosAngleBetweenMomentumAndVertexVector',
-             'formula( daughter(0, pValue) + daughter(1, pValue) )',
-             'min(abs(daughter(0, d0)),abs(daughter(1, d0)))',
-             'max(abs(daughter(0, d0)),abs(daughter(1, d0)))',
-             'min(abs(daughter(0, z0)),abs(daughter(1, z0)))',
-             'formula(daughter(0,  pionID) + daughter(1,  pionID))',
-             'formula(daughter(0,nCDCHits) + daughter(1,nCDCHits))',
-             'formula(daughter(0,nVXDHits) + daughter(1,nVXDHits))',
-             ]
+my_variables = ['SigM',
+                'formula( E / E_uncertainty )',
+                'formula( flightTime / flightTimeErr)',
+                'cosAngleBetweenMomentumAndVertexVector',
+                'min(abs(daughter(0, d0)),abs(daughter(1, d0)))',
+                'formula(daughter(0,  pionID) + daughter(1,  pionID))'
+                ]
 
 target_variable = 'isSignal'
 
@@ -49,12 +37,11 @@ target_variable = 'isSignal'
 # --- create training data set ---
 training_path = basf2.core.Path()
 inputMdst('default', input_file_name, path=training_path)
-stdKshorts('all', path=training_path)
-fitVertex('K_S0:all', 0.0, '^K_S0 -> pi+ pi-', fitter='rave', constraint='ipprofile', path=training_path)
+stdKshorts(path=training_path)
 matchMCTruth('K_S0:all', path=training_path)
 
 variablesToNtuple('K_S0:all',
-                  variables + [target_variable],
+                  my_variables + [target_variable],
                   tree_name,
                   training_file_name,
                   path=training_path
@@ -63,6 +50,7 @@ variablesToNtuple('K_S0:all',
 process(training_path, int(2e5))
 print(statistics)
 
+
 # --- train variables ---
 training_string = 'basf2_mva_teacher --datafiles {data_files} --treename {tree_name}'\
                   ' --identifier {identifier} --variables {variables} --target_variable'\
@@ -70,7 +58,7 @@ training_string = 'basf2_mva_teacher --datafiles {data_files} --treename {tree_n
                       data_files=training_file_name,
                       tree_name=tree_name,
                       identifier=identifier,
-                      variables=''.join([' "%s" ' % var for var in variables]),
+                      variables=''.join([' "%s" ' % var for var in my_variables]),
                       target_variable=target_variable)
 
 os.system(training_string)
@@ -81,7 +69,7 @@ run_b = 0   # run begin, 0 for all
 run_e = -1   # run end, -1 for all of them
 tag_name = "development"  # global tag name
 
-upload = True  # upload to conditions database
+upload = False  # upload to conditions database
 remove_local_files = False  # delete local db and training data
 
 # upload to local database from xml file

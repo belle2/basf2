@@ -4,7 +4,7 @@
 from basf2 import *
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.WARNING)
 
 # to run the framework the used modules need to be registered
 eventinfosetter = register_module('EventInfoSetter')
@@ -31,7 +31,7 @@ packer.param('dhe_to_dhc', [
 # ])
 
 unpacker = register_module('PXDUnpacker')
-unpacker.param('IgnoreMetaFlags', False)
+unpacker.param('ContinueOnError', True)
 
 packercheck = register_module('PXDPackerErr')
 packercheck.param('dhe_to_dhc', [
@@ -44,7 +44,7 @@ logging.enable_summary(False)
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(packer)
-unpacker.set_log_level(LogLevel.FATAL)  # this does not work yet, will fall back to ERROR
+unpacker.set_log_level(LogLevel.WARNING)  # this does not work yet, will fall back to ERROR
 main.add_module(unpacker)
 packercheck.set_log_level(LogLevel.INFO)  # tell us more in the log in case of any problem
 main.add_module(packercheck, Check=True)

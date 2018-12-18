@@ -31,10 +31,7 @@ reco.add_reconstruction(main, pruneTracks=False)
 ana.fillParticleList('mu+:qed', 'muonID > 0.1 and useCMSFrame(p) > 2.', writeOut=True, path=main)
 ana.reconstructDecay('Z0:mumu -> mu-:qed mu+:qed', 'InvM > 10.5296 and InvM < 10.6296', writeOut=True, path=main)
 
-ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main)
-
-# ana.fitVertex(list_name='Z0:mumu', conf_level=0.0, fitter='kfitter', fit_type='fourC', daughtersUpdate=True, path=main)
-# ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main)#, constraint='ipprofile')
+ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main, silence_warning=True)
 
 ana.matchMCTruth('mu+:qed', main)
 ana.matchMCTruth('Z0:mumu', main)

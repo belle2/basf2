@@ -1,5 +1,6 @@
 #!/bin/tcsh -m
-
+# To run this script you need to have gbasf2 set up. 
+# All the parameters (prod numbers, etc.. ) here have been modified for MC9. Feel free to edit this with parameters for the skim campaign you want to test.
 set MCcampaign='MC9'
 set release='release-00-09-01'
 set DBtag='DB00000276'

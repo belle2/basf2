@@ -191,7 +191,8 @@ namespace Belle2 {
       inline unsigned short get_run2(void) const {return ((trigtag2 & 0x003FFF00) >> 8);};
       inline unsigned short get_experiment2(void) const {return (trigtag2 & 0xFFC00000) >> 22 ;};
       void print(void) const;
-      PXDError::PXDErrorFlags check_error(bool ignore_datcon_flag = false) const;
+      PXDError::PXDErrorFlags check_error(bool ignore_datcon_flag = false, bool ignore_hltroi_magic_flag = false,
+                                          bool ignore_merger_mm_flag = false) const;
 
       inline bool is_fake_datcon(void) const { return (magic2 == 0xCAFE0000 && trignr2 == 0x00000000 && trigtag2 == 0x00000000);};
       inline bool is_Accepted(void) const  {    return (magic1 & 0x8000) != 0;  };
@@ -210,8 +211,8 @@ namespace Belle2 {
       /// plus inner checksum 32bit
       /// plus checksum 32bit
 
-      inline unsigned short get_trig_nr0(void) const   {    return trignr0;  };
-      PXDError::PXDErrorFlags check_error(int length) const;
+      inline unsigned short get_trig_nr0(void) const { return trignr0; };
+      PXDError::PXDErrorFlags check_error(int length, bool ignore_inv_size_flag = false) const;
       void print(void) const;
       // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
       inline int getMinSize(void) const {return 4 + 4 + 4;};
@@ -337,10 +338,10 @@ namespace Belle2 {
         type = ((dhc_frame_header_word0*)data)->getFrameType();
         length = 0;
       };
-      inline unsigned int getEventNrLo(void) const   {    return ((ubig16_t*)data)[1];  };
-      PXDError::PXDErrorFlags check_padding(void);
+      inline unsigned int getEventNrLo(void) const { return ((ubig16_t*)data)[1]; };
+      PXDError::PXDErrorFlags check_padding();
 
-      PXDError::PXDErrorFlags check_crc(void);
+      PXDError::PXDErrorFlags check_crc(bool ignore_crc_flag = false);
 
 
       unsigned int getFixedSize(void);

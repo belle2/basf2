@@ -15,6 +15,7 @@
 #include <string>
 #include <analysis/VariableManager/Manager.h>
 
+
 namespace Belle2 {
   class Particle;
 
@@ -59,5 +60,6 @@ namespace Belle2 {
      * returns 1 if the event passes the fast reco trigger
      */
     double passesAnyFastRecoTrigger(const Particle*);
+
   }
 }

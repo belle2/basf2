@@ -2,6 +2,12 @@ import json
 import enum
 import functools
 
+# todo: shouldn't I call super().__init__() or similar to make sure that I
+# execute code from mother classes?? This seems to only have been done for
+# some of the subclasses here... /klieret
+
+
+# todo: write a short overview over the many classes and their relationships here /klieret
 
 class JsonBase:
 
@@ -180,6 +186,7 @@ class Package(JsonBase):
     and output plot files
     """
 
+    # todo: do NOT use lists as default values /klieret
     def __init__(self, name, plotfiles=[], scriptfiles=[], fail_count=0):
         """
         Create a new NTuple object and fill all members
@@ -231,7 +238,7 @@ class ComparisonResult(JsonBase):
         Create a new ComparisonResult object and fill all members
         """
 
-        #: a string containing a describtion of the comparison's outcome
+        #: a string containing a description of the comparison's outcome
         self.state = state
         #: the chi2 value computed during the comparison
         self.chi2 = chi2
@@ -244,6 +251,7 @@ class ComparisonPlotFile(PlotFile):
     been performed for the content of this file
     """
 
+    # todo: do NOT use lists as default values /klieret
     def __init__(
             self,
             package,
@@ -278,7 +286,7 @@ class ComparisonPlotFile(PlotFile):
 class ComparisonPlot(Plot):
 
     """
-    One indidividual plot including its comparison outcome.
+    One individual plot including its comparison outcome.
     """
 
     def __init__(
@@ -384,7 +392,7 @@ class ComparisonHtmlContent(HtmlContent):
 class ComparisonPackage(Package):
 
     """
-    Informtion about a Package which was used in a comparison operation
+    Information about a Package which was used in a comparison operation
     """
 
     def __init__(self, name, plotfiles=[], scriptfiles=[], ntuplefiles=[]):
@@ -427,6 +435,7 @@ class Comparison(JsonBase):
     between revisions
     """
 
+    # todo: Don't use lists as default /klieret
     def __init__(self, revisions=[], packages=[]):
         """
         Create a new ComparisonRevision object and fill all members
@@ -484,7 +493,7 @@ def dump_rec(top_object):
 
             # store compiled list with corresponding key
             this_dict[k] = obj_list
-        # one of our objets, which might be nested and
+        # one of our objects, which might be nested and
         # needs special treatment ?
         elif isinstance(v, JsonBase):
             this_dict[k] = dump_rec(v)

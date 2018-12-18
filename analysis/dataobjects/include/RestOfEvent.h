@@ -200,7 +200,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    RestOfEvent(bool isNested = false): m_isNested(isNested) { };
+    explicit RestOfEvent(bool isNested = false): m_isNested(isNested) { };
 
     // setters
     /**

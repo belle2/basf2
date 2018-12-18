@@ -87,7 +87,7 @@ TagV('B0:jspiks', 'breco', path=my_path)
 
 fshars = vc.pid + vc.track + vc.mc_truth
 jpsiandk0svars = vc.inv_mass + vc.vertex + vc.mc_vertex + vc.mc_truth
-bvars = vc.event_meta_data + vc.inv_mass + deltae_mbs + vc.ckm_kinematics + \
+bvars = vc.inv_mass + deltae_mbs + \
     vc.vertex + vc.mc_vertex + vc.mc_truth + vc.tag_vertex + mc_vc.tag_vertex + \
     delta_t + mc_delta_t + \
     vu.create_aliases_for_selected(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \

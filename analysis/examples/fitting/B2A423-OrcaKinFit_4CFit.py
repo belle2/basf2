@@ -29,7 +29,6 @@ from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
-import sys
 from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
@@ -71,13 +70,12 @@ matchMCTruth('Upsilon(4S):4c', path=mypath)
 # Select variables that we want to store to ntuple
 muvars = vc.mc_truth + vc.pid + vc.kinematics
 gvars = vc.kinematics + vc.mc_truth + vc.inv_mass
-etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
-u4svars = vc.event_meta_data + vc.inv_mass + vc.kinematics + \
-    vc.mc_truth + vc.mc_hierarchy + \
-    vu.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
-    vu.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
-    vu.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
-    vu.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
+etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth
+u4svars = vc.inv_mass + vc.kinematics + vc.mc_truth +\
+    vc.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vc.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    vc.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    vc.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
 u4svars_4c = u4svars + vu.create_aliases(['OrcaKinFitProb',
                                           'OrcaKinFitChi2',

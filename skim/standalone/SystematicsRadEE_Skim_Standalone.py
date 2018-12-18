@@ -10,7 +10,7 @@
 
 from basf2 import process, statistics, Path
 from modularAnalysis import analysis_main, inputMdstList, \
-        skimOutputUdst, summaryOfLists
+    skimOutputUdst, summaryOfLists
 from stdCharged import stdE
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
@@ -34,7 +34,7 @@ skimOutputUdst(skimcode, radeelist, path=skimpath)
 summaryOfLists(radeelist, path=skimpath)
 
 # silence noisy modules
-setSkimLogging(skim_path=skimpath)
+setSkimLogging(path=skimpath)
 
 # process the path (run the skim)
 process(skimpath)

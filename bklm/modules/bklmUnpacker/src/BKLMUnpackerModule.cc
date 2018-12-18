@@ -37,7 +37,8 @@ using namespace Belle2;
 REG_MODULE(BKLMUnpacker)
 
 
-BKLMUnpackerModule::BKLMUnpackerModule() : Module()
+BKLMUnpackerModule::BKLMUnpackerModule() : Module(),
+  m_triggerCTimeOfPreviousEvent(0)
 {
   setDescription("Produce BKLMDigits from RawBKLM");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -96,15 +97,17 @@ void BKLMUnpackerModule::event()
   m_bklmDigitOutOfRanges.clear();
   m_bklmDigitEventInfos.clear();
 
-  B2DEBUG(1, "BKLMUnpackerModule:: there are " << m_rawKLMs.getEntries() << " RawKLM entries");
+  B2DEBUG(29, "BKLMUnpackerModule:: there are " << m_rawKLMs.getEntries() << " RawKLM entries");
   for (int i = 0; i < m_rawKLMs.getEntries(); i++) {
 
     if (m_rawKLMs[i]->GetNumEvents() != 1) {
-      B2DEBUG(1, "BKLMUnpackerModule:: RawKLM index " << i << " has more than one entry: " << m_rawKLMs[i]->GetNumEvents());
+      B2DEBUG(20, "BKLMUnpackerModule:: RawKLM has more than one entry"
+              << LogVar("RawKLM.Index", i)
+              << LogVar("RawKLM.Entries", m_rawKLMs[i]->GetNumEvents()));
       continue;
     }
 
-    B2DEBUG(1, "BKLMUnpackerModule:: events in buffer: " << m_rawKLMs[i]->GetNumEvents() << " ; number of nodes (copper boards): " <<
+    B2DEBUG(29, "BKLMUnpackerModule:: events in buffer: " << m_rawKLMs[i]->GetNumEvents() << " ; number of nodes (copper boards): " <<
             m_rawKLMs[i]->GetNumNodes());
 
     // getNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents
@@ -159,7 +162,7 @@ void BKLMUnpackerModule::event()
           int item = buf_slot[k];
           char buffer[200] = "";
           sprintf(buffer, "%.8x\n", item);
-          B2DEBUG(1, "BKLMUnpackerModule:: " << buffer);
+          B2DEBUG(29, "BKLMUnpackerModule:: " << buffer);
 
           // Brandon uses 4 words with 16 bit
           // int firstBrandonWord;
@@ -189,21 +192,22 @@ void BKLMUnpackerModule::event()
         // either no data (finesse not connected) or with the count word
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           if (!m_keepEvenPackages) {
-            B2DEBUG(1, "BKLMUnpackerModule:: word count incorrect: " << numDetNwords);
+            B2DEBUG(29, "BKLMUnpackerModule:: word count incorrect: "
+                    << LogVar("WordCount", numDetNwords));
             continue;
           }
         }
-        B2DEBUG(1, "BKLMUnpackerModule:: this finesse has " << numHits << " hits");
+        B2DEBUG(29, "BKLMUnpackerModule:: this finesse has " << numHits << " hits");
 
         if (numDetNwords > 0)
-          B2DEBUG(1, "BKLMUnpackerModule:: counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF));
+          B2DEBUG(29, "BKLMUnpackerModule:: counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF));
 
         // careful, changed start to 1 to get rid of the first rpc hit which is meaningless (at least as long no rpc data is taken)
         // for (int iHit = 1; iHit < numHits; iHit++) {
         // changed start to 0 to test BKLMRawPacker. Nov.13 2015)
         for (int iHit = 0; iHit < numHits; iHit++) {
 
-          B2DEBUG(1, "BKLMUnpackerModule:: unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit *
+          B2DEBUG(29, "BKLMUnpackerModule:: unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit *
                   hitLength + 1]);
           // first word is the leftmost, not the rightmost
           unsigned short bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
@@ -213,7 +217,7 @@ void BKLMUnpackerModule::event()
 
           BKLMDigitRaw* bklmDigitRaw = m_bklmDigitRaws.appendNew(bword1, bword2, bword3, bword4);
 
-          B2DEBUG(1, "BKLMUnpackerModule:: unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4);
+          B2DEBUG(29, "BKLMUnpackerModule:: unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4);
 
           unsigned short channel = bword1 & 0x7F;
           unsigned short axis = (bword1 >> 7) & 1;
@@ -224,19 +228,21 @@ void BKLMUnpackerModule::event()
           unsigned short tdc = bword3 & 0x7FF;
           unsigned short charge = bword4 & 0xFFF;
 
-          B2DEBUG(1, "BKLMUnpackerModule:: unpacked info: channel: " << channel << ", axis: " << axis << " lane: " << lane << " ctime: " <<
+          B2DEBUG(29, "BKLMUnpackerModule:: unpacked info: channel: " << channel << ", axis: " << axis << " lane: " << lane << " ctime: " <<
                   ctime << " tdc: " << tdc << " charge: " << charge);
 
-          B2DEBUG(1, "BKLMUnpackerModule:: copper: " << copperId << " finesse: " << finesse_num);
+          B2DEBUG(29, "BKLMUnpackerModule:: copper: " << copperId << " finesse: " << finesse_num);
 
           int electId = electCooToInt(copperId - BKLM_ID, finesse_num , lane, axis, channel);
           int moduleId = 0;
           bool outRange = false;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
             if (!m_useDefaultModuleId) {
-              B2DEBUG(1, "BKLMUnpackerModule:: could not find copper " << copperId << ", finesse " << finesse_num + 1 << ", lane " << lane <<
-                      ", axis " << axis <<
-                      " in mapping");
+              B2DEBUG(20, "BKLMUnpackerModule:: could not find in mapping"
+                      << LogVar("Copper", copperId)
+                      << LogVar("Finesse", finesse_num + 1)
+                      << LogVar("Lane", lane)
+                      << LogVar("Axis", axis));
               continue;
             } else {
               moduleId = getDefaultModuleId(copperId, finesse_num, lane, axis, channel, outRange);
@@ -244,7 +250,7 @@ void BKLMUnpackerModule::event()
           } else {
             // found moduleId in the mapping
             moduleId = m_electIdToModuleId[electId];
-            B2DEBUG(1, " BKLMUnpackerModule:: electId: " << electId << " module: " << moduleId);
+            B2DEBUG(29, "BKLMUnpackerModule:: electId: " << electId << " module: " << moduleId);
 
             // only channel and inRpc flag are not set yet
           }
@@ -257,7 +263,8 @@ void BKLMUnpackerModule::event()
           channel = (moduleId & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT;
 
           if (layer > 14) {
-            B2DEBUG(1, "BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer);
+            B2DEBUG(20, "BKLMUnpackerModule:: strange that the layer number is larger than 14 "
+                    << LogVar("Layer", layer));
             continue;
           }
 
@@ -270,15 +277,11 @@ void BKLMUnpackerModule::event()
             bklmDigitOutOfRange->addRelationTo(bklmDigitRaw);
             bklmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
 
-            std::string message = "BKLMUnpackerModule:: channel number is out of range ";
+            std::string message = "channel number is out of range";
             m_rejected[message] += 1;
             m_rejectedCount++;
-            if (m_rejectedCount < 10) {
-              B2INFO("BKLMUnpackerModule:: channel number is out of range " << channel);
-            } else if (m_rejectedCount == 10) {
-              B2INFO("BKLMUnpackerModule:: channel number is out of range "
-                     << "(message will be suppressed now)");
-            }
+            B2DEBUG(21, "BKLMUnpackerModule:: channel number is out of range"
+                    << LogVar("Channel", channel));
             continue;
           }
 
@@ -295,10 +298,10 @@ void BKLMUnpackerModule::event()
           if (layer < 2 && ((m_scintADCOffset - charge) > m_scintThreshold))
             bklmDigit->isAboveThreshold(true);
 
-          B2DEBUG(1, "BKLMUnpackerModule:: digit after Unpacker: sector: " << bklmDigit->getSector() << " isForward: " <<
+          B2DEBUG(29, "BKLMUnpackerModule:: digit after Unpacker: sector: " << bklmDigit->getSector() << " isForward: " <<
                   bklmDigit->isForward()
                   << " layer: " << bklmDigit->getLayer() << " strip: " << bklmDigit->getStrip() << " isPhi: " << bklmDigit->isPhiReadout());
-          B2DEBUG(1, "BKLMUnpackerModule:: charge " << bklmDigit->getCharge() << " tdc" << bklmDigit->getTime() << " ctime " <<
+          B2DEBUG(29, "BKLMUnpackerModule:: charge " << bklmDigit->getCharge() << " tdc" << bklmDigit->getTime() << " ctime " <<
                   bklmDigit->getCTime() <<
                   " isAboveThreshold " << bklmDigit->isAboveThreshold() << " isRPC " << bklmDigit->inRPC() << " moduleId " <<
                   bklmDigit->getModuleID());
@@ -324,17 +327,17 @@ void BKLMUnpackerModule::endRun()
 void BKLMUnpackerModule::terminate()
 {
   for (const auto& message : m_rejected) {
-    B2INFO(message.first << "(occured " << message.second << " times)");
+    B2DEBUG(20, "BKLMUnpackerModule:: " << message.first << " (occured " << message.second << " times)");
   }
 }
 
 void BKLMUnpackerModule::loadMapFromDB()
 {
-  B2DEBUG(1, "BKLMUnpackerModule:: reading from database...");
+  B2DEBUG(29, "BKLMUnpackerModule:: reading from database...");
 
   DBArray<BKLMElectronicMapping> elements;
   for (const auto& element : elements) {
-    B2DEBUG(1, "BKLMUnpackerModule:: version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " <<
+    B2DEBUG(29, "BKLMUnpackerModule:: version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " <<
             element.getCopperId() <<
             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
             ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
@@ -360,7 +363,7 @@ void BKLMUnpackerModule::loadMapFromDB()
                | ((stripId - 1) << BKLM_STRIP_BIT);
     m_electIdToModuleId[elecId] = moduleId;
 
-    B2DEBUG(1, "BKLMUnpackerModule:: electId: " << elecId << " moduleId: " << moduleId);
+    B2DEBUG(29, "BKLMUnpackerModule:: electId: " << elecId << " moduleId: " << moduleId);
   }
 }
 

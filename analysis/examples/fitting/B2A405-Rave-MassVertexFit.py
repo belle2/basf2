@@ -88,7 +88,7 @@ matchMCTruth('D*+:1', path=my_path)
 matchMCTruth('D*+:2', path=my_path)
 
 # Select variables that we want to store to ntuple
-dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth + \
+dstar_vars = vc.inv_mass + vc.mc_truth + \
     vc.mc_flight_info + vc.flight_info
 
 fs_hadron_vars = vu.create_aliases_for_selected(

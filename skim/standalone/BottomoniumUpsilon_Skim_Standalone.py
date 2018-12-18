@@ -45,7 +45,7 @@ skimOutputUdst(skimCode, YList, path=BottomoniumUpsilonskimpath)
 summaryOfLists(YList, path=BottomoniumUpsilonskimpath)
 
 
-setSkimLogging(skim_path=BottomoniumUpsilonskimpath)
+setSkimLogging(path=BottomoniumUpsilonskimpath)
 process(BottomoniumUpsilonskimpath)
 
 # print out the summary

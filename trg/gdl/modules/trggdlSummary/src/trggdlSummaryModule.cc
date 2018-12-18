@@ -21,9 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
 
 using namespace Belle2;
 using namespace GDL;
@@ -43,91 +40,79 @@ void TRGGDLSummaryModule::initialize()
 {
 
   GDLResult.registerInDataStore();
+  for (int i = 0; i < 320; i++) {
+    LeafBitMap[i] = m_unpacker->getLeafMap(i);
+  }
+  for (int i = 0; i < 320; i++) {
+    strcpy(LeafNames[i], m_unpacker->getLeafnames(i));
+  }
+
+  _e_timtype = 0;
+  for (int i = 0; i < 10; i++) {
+    ee_psn[i] = 0;
+    ee_ftd[i] = 0;
+    ee_itd[i] = 0;
+  }
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(LeafNames[i], "timtype") == 0)_e_timtype = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn0") == 0)   ee_psn[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn1") == 0)   ee_psn[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn2") == 0)   ee_psn[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn3") == 0)   ee_psn[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn4") == 0)   ee_psn[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn5") == 0)   ee_psn[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn6") == 0)   ee_psn[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn7") == 0)   ee_psn[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn8") == 0)   ee_psn[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn9") == 0)   ee_psn[9] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd0") == 0)   ee_ftd[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd1") == 0)   ee_ftd[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd2") == 0)   ee_ftd[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd3") == 0)   ee_ftd[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd4") == 0)   ee_ftd[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd5") == 0)   ee_ftd[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd6") == 0)   ee_ftd[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd7") == 0)   ee_ftd[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd8") == 0)   ee_ftd[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd9") == 0)   ee_ftd[9] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd0") == 0)   ee_itd[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd1") == 0)   ee_itd[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd2") == 0)   ee_itd[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd3") == 0)   ee_itd[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd4") == 0)   ee_itd[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd5") == 0)   ee_itd[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd6") == 0)   ee_itd[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd7") == 0)   ee_itd[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd8") == 0)   ee_itd[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd9") == 0)   ee_itd[9] = LeafBitMap[i];
+  }
+
 
 }
 
 void TRGGDLSummaryModule::event()
 {
 
-  int n_clocks = 0;
+
   int n_leafs = 0;
+  n_leafs  = m_unpacker->getnLeafs();
   int n_leafsExtra = 0;
-  int _e_timtype = 0;
-  unsigned ee_itd[10];
-  unsigned ee_ftd[10];
-  unsigned ee_psn[10];
-  unsigned nword_output = 3;
-  unsigned nword_input = 3;
-  void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
+  n_leafsExtra = m_unpacker->getnLeafsExtra();
+  int n_clocks = m_unpacker->getnClks();
+  int nconf = m_unpacker->getconf();
+  int nword_input  = m_unpacker->get_nword_input();
+  int nword_output = m_unpacker->get_nword_output();
+
+
+
+
   StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) return;
-  int nconf = entAry[0]->m_conf;
 
-  if (nconf == 6) {
-    nword_input = 5;
-    n_clocks = GDLCONF6::nClks;
-    n_leafs = GDLCONF6::nLeafs;
-    n_leafsExtra = GDLCONF6::nLeafsExtra;
-    ee_itd[0] = GDLCONF6::e_itd0; ee_itd[1] = GDLCONF6::e_itd1; ee_itd[2] = GDLCONF6::e_itd2;
-    ee_itd[3] = GDLCONF6::e_itd3; ee_itd[4] = GDLCONF6::e_itd4;
-    ee_psn[0] = GDLCONF6::e_psn0; ee_psn[1] = GDLCONF6::e_psn1; ee_psn[2] = GDLCONF6::e_psn2;
-    ee_ftd[0] = GDLCONF6::e_ftd0; ee_ftd[1] = GDLCONF6::e_ftd1; ee_ftd[2] = GDLCONF6::e_ftd2;
-    _e_timtype = GDLCONF6::e_timtype;
-    setPointer = GDLCONF6::setLeafPointersArray;
-  } else if (nconf == 5) {
-    n_clocks = GDLCONF5::nClks;
-    n_leafs = GDLCONF5::nLeafs;
-    n_leafsExtra = GDLCONF5::nLeafsExtra;
-    ee_itd[0] = GDLCONF5::e_itd0; ee_itd[1] = GDLCONF5::e_itd1; ee_itd[2] = GDLCONF5::e_itd2;
-    ee_psn[0] = GDLCONF5::e_psn0; ee_psn[1] = GDLCONF5::e_psn1; ee_psn[2] = GDLCONF5::e_psn2;
-    ee_ftd[0] = GDLCONF5::e_ftd0; ee_ftd[1] = GDLCONF5::e_ftd1; ee_ftd[2] = GDLCONF5::e_ftd2;
-    _e_timtype = GDLCONF5::e_timtype;
-    setPointer = GDLCONF5::setLeafPointersArray;
-  } else if (nconf == 4) {
-    n_clocks = GDLCONF4::nClks;
-    n_leafs = GDLCONF4::nLeafs;
-    n_leafsExtra = GDLCONF4::nLeafsExtra;
-    ee_itd[0] = GDLCONF4::e_itd0; ee_itd[1] = GDLCONF4::e_itd1; ee_itd[2] = GDLCONF4::e_itd2;
-    ee_psn[0] = GDLCONF4::e_psn0; ee_psn[1] = GDLCONF4::e_psn1; ee_psn[2] = GDLCONF4::e_psn2;
-    ee_ftd[0] = GDLCONF4::e_ftd0; ee_ftd[1] = GDLCONF4::e_ftd1; ee_ftd[2] = GDLCONF4::e_ftd2;
-    _e_timtype = GDLCONF4::e_timtype;
-    setPointer = GDLCONF4::setLeafPointersArray;
-  } else if (nconf == 3) {
-    n_clocks = GDLCONF3::nClks;
-    n_leafs = GDLCONF3::nLeafs;
-    n_leafsExtra = GDLCONF3::nLeafsExtra;
-    ee_itd[0] = GDLCONF3::e_itd0; ee_itd[1] = GDLCONF3::e_itd1; ee_itd[2] = GDLCONF3::e_itd2;
-    ee_psn[0] = GDLCONF3::e_psn0; ee_psn[1] = GDLCONF3::e_psn1; ee_psn[2] = GDLCONF3::e_psn2;
-    ee_ftd[0] = GDLCONF3::e_ftd0; ee_ftd[1] = GDLCONF3::e_ftd1; ee_ftd[2] = GDLCONF3::e_ftd2;
-    _e_timtype = GDLCONF3::e_timtype;
-    setPointer = GDLCONF3::setLeafPointersArray;
-  } else if (nconf == 2) {
-    n_clocks = GDLCONF2::nClks;
-    n_leafs = GDLCONF2::nLeafs;
-    n_leafsExtra = GDLCONF2::nLeafsExtra;
-    ee_itd[0] = GDLCONF2::e_itd0; ee_itd[1] = GDLCONF2::e_itd1; ee_itd[2] = GDLCONF2::e_itd2;
-    ee_psn[0] = GDLCONF2::e_psn0; ee_psn[1] = GDLCONF2::e_psn1; ee_psn[2] = GDLCONF2::e_psn2;
-    ee_ftd[0] = GDLCONF2::e_ftd0; ee_ftd[1] = GDLCONF2::e_ftd1; ee_ftd[2] = GDLCONF2::e_ftd2;
-    _e_timtype = GDLCONF2::e_timtype;
-    setPointer = GDLCONF2::setLeafPointersArray;
-  } else if (nconf == 1) {
-    n_clocks = GDLCONF1::nClks;
-    n_leafs = GDLCONF1::nLeafs;
-    n_leafsExtra = GDLCONF1::nLeafsExtra;
-    ee_itd[0] = GDLCONF1::e_itd0; ee_itd[1] = GDLCONF1::e_itd1; ee_itd[2] = GDLCONF1::e_itd2;
-    ee_psn[0] = GDLCONF1::e_psn0; ee_psn[1] = GDLCONF1::e_psn1; ee_psn[2] = GDLCONF1::e_psn2;
-    ee_ftd[0] = GDLCONF1::e_ftd0; ee_ftd[1] = GDLCONF1::e_ftd1; ee_ftd[2] = GDLCONF1::e_ftd2;
-    _e_timtype = GDLCONF1::e_timtype;
-    setPointer = GDLCONF1::setLeafPointersArray;
-  } else {
-    n_clocks = GDLCONF0::nClks;
-    n_leafs = GDLCONF0::nLeafs;
-    n_leafsExtra = GDLCONF0::nLeafsExtra;
-    ee_itd[0] = GDLCONF0::e_itd0; ee_itd[1] = GDLCONF0::e_itd1; ee_itd[2] = GDLCONF0::e_itd2;
-    ee_psn[0] = GDLCONF0::e_psn0; ee_psn[1] = GDLCONF0::e_psn1; ee_psn[2] = GDLCONF0::e_psn2;
-    ee_ftd[0] = GDLCONF0::e_ftd0; ee_ftd[1] = GDLCONF0::e_ftd1; ee_ftd[2] = GDLCONF0::e_ftd2;
-    _e_timtype = GDLCONF0::e_timtype;
-    setPointer = GDLCONF0::setLeafPointersArray;
+  //prepare entAry adress
+  int clk_map = 0;
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;
   }
 
   std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
@@ -138,10 +123,15 @@ void TRGGDLSummaryModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[n_leafs + n_leafsExtra];
-    setPointer(entAry[ii], Bits);
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
+    //set pointer
+    for (int i = 0; i < 320; i++) {
+      if (LeafBitMap[i] != -1) {
+        Bits[LeafBitMap[i]] = &(entAry[ii]->m_unpacker[i]);
+      }
+    }
     for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-      _data[leaf][entAry[ii]->m_clk] =  *Bits[leaf];
+      _data[leaf][entAry[ii]->m_unpacker[clk_map]] =  *Bits[leaf];
     }
   }
 
@@ -199,8 +189,10 @@ void TRGGDLSummaryModule::event()
     }
   }
 
+
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
 
+  /*
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
@@ -215,7 +207,8 @@ void TRGGDLSummaryModule::event()
   } else {
     tt = TRGSummary::TTYP_NONE;
   }
+  */
 
-  GDLResult->setTimType(tt);
+  GDLResult->setTimType((TRGSummary::ETimingType)gtt);
 
 }

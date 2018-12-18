@@ -130,7 +130,6 @@ namespace Belle2 {
        */
       enum KFitError::ECode doMake(void);
 
-
     private:
       /** Make a matrix to calculate error matrix of the mother particle.
        * @param e error matrix container

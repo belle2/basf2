@@ -22,7 +22,6 @@ from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import fitKinematic3C
 from modularAnalysis import variablesToNtuple
-import sys
 from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
@@ -63,8 +62,8 @@ fitKinematic3C('Z0:mm_kinfit', path=mypath)
 # Select variables that we want to store to ntuple
 
 mugvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
-z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
-    vu.create_aliases_for_selected(mugvars, 'Z0 -> ^gamma ^mu+ ^mu-')
+z0vars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
+    vc.create_aliases_for_selected(mugvars, 'Z0 -> ^gamma ^mu+ ^mu-')
 
 z0uvars = z0vars + \
     vu.create_aliases(['OrcaKinFitProb',

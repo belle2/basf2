@@ -1,9 +1,10 @@
 NTupleMaker
 ============
 
-The :doc:`NtupleMaker`  module builds ntuples from a `ParticleList`_  . There is a number of ready-to-use plugins called `NtupleTool` for saving standard variables to the ntuples. These plugins can be selected and configured directly in the basf2 script.
+.. warning::
+        These tools are deprecated and will be removed. Please see `VariableManagerOutput` as the recommended alternative.
 
-Click here to learn how to develop your own NtupleTool
+The `NtupleMaker`  module builds ntuples from a `ParticleList`_  . There is a number of ready-to-use plugins called `NtupleTool` for saving standard variables to the ntuples. These plugins can be selected and configured directly in the basf2 script.
 
 How to create ntuples using the :doc:`NtupleMaker` module
 ---------------------------------------------------------
@@ -94,87 +95,10 @@ If you provide an empty string for the `ParticleList`_  name, the :doc:`NtupleMa
 What if there is no NtupleTool for my brand new fancy variable?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can write your own NtupleTool. Detailed instructions can be found in this tutorial. Please consider uploading your NtupleTool to svn that your colleagues from the collaboration can profit, too.
+You can write your own variable and use the ``CustomFloats`` tool. Detailed instructions can be found in `here`_. 
+Please consider making a pull request so that your colleagues from the collaboration can profit, too.
 
- 
-
-Aren't the predefined tools limiting the creativity of my analysis?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-No, not at all. These tools do the boring part for you and you have more time for the real physics.
-
-How to develop your own NtupleTool
-----------------------------------
-
-Before starting developing a new `NtupleTool`, check here if not somebody else has already done the work for you. The `NtupleTool`s are located in the directory :code:`analysis/NtupleTools/`. A good start is to look there and see how the existing tools are implemented.
-
-Let's assume that you want to save the masses of the particles. Start by copying a header file of an existing `NtupleTool`, e.g. `Kinematics`. Change the name to the name you want, e.g. `NtupleMassTool` (don't forget to make sure you have a :code:`#pragma once` in your header). Then add the declaration of the variables you want to save. We use a pointer to an array of floats. Its length will be defined at run time depending on the number of particles selected in the basf2 steering script. Of course, it is possible to save more than one variable with a single `NtupleTool`.
-
-.. code-block:: C++
-
-    /** Particle mass. */
-    float* m_fMass;
-
-.. seealso:: 4-vectors are best saved as :code:`float[4]`. In your analysis macro you can initialise a `TLorentzVector` directly from :code:`float[4]`. (A `TLorentzVector` could be also written to the ntuple, but internally it uses double precision four the components which unnecessarily increases the size by a factor of two).
-
-
-Now, we move to the source file and define how the branches of the TTree are created. `NtupleTool` inherits from the class `NtupleFlatTool` a pointer to the TTree m_tree and the `DecayDescriptor` m_decaydescriptor. From m_decaydescriptor we obtain the number of selected particles and their names. You will need a function that sets up the tree. Note the golden rule: if you use the C++ keyword new you should have a matching delete.
-
-.. code-block:: C++
-
-    /** Constructor */
-    void NtupleMyTool::NtupleMyTool() {
-    vector<string> strNames = m_decaydescriptor.getSelectionNames();
-    int nDecayProducts = strNames.size();
-    m_fMass = new float[nDecayProducts];   
-    for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-        m_tree->Branch((strNames[iProduct] + "_M").c_str(), &m_fMass[iProduct], (strNames[iProduct] + "_M/F").c_str());
-        }
-    }
- 
-    /** Destructor */
-    void NtupleMyTool::~NtupleMyTool() {
-        delete[] m_fMass; // deallocates the memory
-    }
-
-Finally, we define how the variable is calculated. The pointer p refers to a Particle in the list defined by the NtupleMaker parameter :code:`strList`. If the particle itself is selected and/or some of its daughters is given by the decay string in the basf2 steering script. The list of selected particles selparticles is obtained with the :code:`getSelection(Particle* p)` method of the `DecayDescriptor`.
-
-.. code-block:: C++
-
-    void NtupleKinematicsTool::eval(const Particle* particle) {
-        if (!particle) {
-            printf("NtupleKinematicsTool::eval - ERROR, no Particle found!\n");
-            return;
-        }
-        vector <const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
-        int nDecayProducts = selparticles.size();
-        for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-            m_fMass[iProduct] = selparticles[iProduct]->getMass();
-        }
-    }
-
-To tell the :doc:`NtupleMaker`  of the existence of the new NtupleTool we add in :code:`analysis/NtupleTools/src/NtupleToolList.cc`: 
-
-.. code-block:: C++
-
-    else if (strName.compare("Mass") == 0) return new NtupleMassTool(tree, d);
-
-Comments
-~~~~~~~~
-
-Please share your tools with your colleagues from the collaboration.
-
-* Try to group related variables in one NtupleTool, but not too many. As a rule of thumb: 2-5 variables are appropriate.
-* Consider using Char_t (-127...127) for flags.
-* If you wrote your tuple tool but it doesn't work in your steering file, it might happen that you forget to add it to :code:`NtupleListTool.cc`
-
-
-
-NTuple tools
-------------
-
-Documentation about ntuple tool is not yet migrated from our `confluence page <https://confluence.desy.de/display/BI/Physics+NtupleTool>`_. 
-If you have time to do the migration, feel free to take `agira ticket <https://agira.desy.de/browse/BII-2976>`_. In this case you might need nice guid on Sphinx documentation: :ref:`doctools` .
+.. _here: https://confluence.desy.de/display/BI/How+to+add+a+variable+to+the+VariableManager
 
 .. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 

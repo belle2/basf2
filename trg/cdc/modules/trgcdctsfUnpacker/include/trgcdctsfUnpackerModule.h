@@ -1106,6 +1106,9 @@ namespace Belle2 {
 
     private:
 
+      // StoreArray of TRGCDCTSFUnpackerStore
+      StoreArray<TRGCDCTSFUnpackerStore> storeAry;
+
       //bitmap
       int m_BitMap[nLeafs][2];
       int m_nBits;

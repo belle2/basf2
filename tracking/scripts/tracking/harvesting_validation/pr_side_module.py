@@ -54,6 +54,9 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         #: Cache for the hit content of the Monte Carlo tracks - updated each event
         self.mc_reco_tracks_det_hit_ids = []
 
+        #: Cache for the MC hit lookup
+        self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
+
     def initialize(self):
         """Receive signal at the start of event processing"""
         super().initialize()
@@ -71,6 +74,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             mc_reco_tracks_det_hit_ids.append(mc_reco_track_det_hit_ids)
 
         self.mc_reco_tracks_det_hit_ids = mc_reco_tracks_det_hit_ids
+
+        self.mc_hit_lookup.fill()
 
     def pick(self, reco_track):
         """Method to filter the track candidates to reject part of them"""
@@ -102,7 +107,11 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         fit_crops = peelers.peel_track_fit_result(fit_result)
         fit_status_crops = peelers.peel_fit_status(reco_track)
 
+        correct_rl_information = sum(peelers.is_correct_rl_information(cdc_hit, reco_track, self.mc_hit_lookup)
+                                     for cdc_hit in reco_track.getCDCHitList())
+
         crops = dict(
+            correct_rl_information=correct_rl_information,
             **mc_particle_crops,
             **hit_content_crops,
             **pr_to_mc_match_info_crops,

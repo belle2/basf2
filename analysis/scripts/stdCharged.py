@@ -5,7 +5,35 @@ from basf2 import *
 from modularAnalysis import *
 
 
-# standard particles master function
+# define arrays to interpret cut matrix
+_chargednames = ['pi', 'K', 'p', 'e', 'mu']
+_pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
+_effnames = ['95eff', '90eff', '85eff']
+# default particle list for stdPi() and similar functions
+_defaultlist = 'good'
+
+
+def _stdChargedEffCuts(particletype, listtype):
+    """
+    Provides the PID cut corresponding to a given efficiency percentile
+
+    @param particletype  type of charged particle (pi, K, p, e, mu)
+    @param listtype      efficiency percentile for the list (95eff, 90eff, 85eff)
+    """
+
+    particleindex = _chargednames.index(particletype)
+    effindex = _effnames.index(listtype)
+
+    # efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
+    effcuts = [[0.002, 0.075, 0.275],
+               [0.002, 0.043, 0.218],
+               [0.000, 0.061, 1.000],
+               [0.047, 1.000, 1.000],
+               [0.008, 1.000, 1.000]]
+    #
+    return effcuts[particleindex][effindex]
+
+
 def stdCharged(particletype, listtype, path=analysis_main):
     """
     Function to prepare one of several standardized types of charged particle lists:
@@ -28,53 +56,40 @@ def stdCharged(particletype, listtype, path=analysis_main):
     trackQuality = 'thetaInCDCAcceptance and chiProb > 0.001'
     ipCut = 'd0 < 0.5 and abs(z0) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
-    # define arrays to interpret cut matrix
-    chargednames = ['pi', 'K', 'p', 'e', 'mu']
-    pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
-    effnames = ['95eff', '90eff', '85eff']
-    # efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
-    effcuts = [[0.002, 0.075, 0.275],
-               [0.002, 0.043, 0.218],
-               [0.000, 0.061, 1.000],
-               [0.047, 1.000, 1.000],
-               [0.008, 1.000, 1.000]]
 
-    if particletype not in chargednames:
+    if particletype not in _chargednames:
         B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
-    else:
-        particleindex = chargednames.index(particletype)
 
     if listtype == 'all':
         fillParticleList(particletype + '+:all', '', True, path=path)
     elif listtype == 'good':
         fillParticleList(
             particletype + '+:good',
-            pidnames[particleindex] + ' > 0.5 and ' + goodTrack,
+            _pidnames[_chargednames.index(particletype)] + ' > 0.5 and ' + goodTrack,
             True,
             path=path)
     elif listtype == 'loose':
         fillParticleList(
             particletype + '+:loose',
-            pidnames[particleindex] + ' > 0.1 and ' + goodTrack,
+            _pidnames[_chargednames.index(particletype)] + ' > 0.1 and ' + goodTrack,
             True,
             path=path)
     elif listtype == 'higheff':
         fillParticleList(
             particletype + '+:higheff',
-            pidnames[particleindex] + ' > 0.002 and ' + goodTrack,
+            _pidnames[_chargednames.index(particletype)] + ' > 0.002 and ' + goodTrack,
             True,
             path=path)
-    elif listtype not in effnames:
+    elif listtype not in _effnames:
         B2ERROR("The requested list is not defined. Please refer to the stdCharged documentation.")
     else:
-        effindex = effnames.index(listtype)
-        pidcut = effcuts[particleindex][effindex]
+        pidcut = _stdChargedEffCuts(particletype, listtype)
         if 0.0 < pidcut < 1.0:
             fillParticleList(
                 particletype +
                 '+:' +
                 listtype,
-                pidnames[particleindex] +
+                _pidnames[_chargednames.index(particletype)] +
                 ' > ' +
                 str(pidcut) +
                 ' and ' +
@@ -88,7 +103,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 ###
 
 
-def stdPi(listtype='good', path=analysis_main):
+def stdPi(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard pion lists, refer to stdCharged for details
 
@@ -98,7 +113,7 @@ def stdPi(listtype='good', path=analysis_main):
     stdCharged('pi', listtype, path)
 
 
-def stdK(listtype='good', path=analysis_main):
+def stdK(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard kaon lists, refer to stdCharged for details
 
@@ -108,7 +123,7 @@ def stdK(listtype='good', path=analysis_main):
     stdCharged('K', listtype, path)
 
 
-def stdPr(listtype='good', path=analysis_main):
+def stdPr(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard proton lists, refer to stdCharged for details
 
@@ -118,7 +133,7 @@ def stdPr(listtype='good', path=analysis_main):
     stdCharged('p', listtype, path)
 
 
-def stdE(listtype='good', path=analysis_main):
+def stdE(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard electron lists, refer to stdCharged for details
 
@@ -128,7 +143,7 @@ def stdE(listtype='good', path=analysis_main):
     stdCharged('e', listtype, path)
 
 
-def stdMu(listtype='good', path=analysis_main):
+def stdMu(listtype=_defaultlist, path=analysis_main):
     """
     Function to prepare standard muon lists, refer to stdCharged for details
 

@@ -97,6 +97,10 @@ TrgEclMaster::TrgEclMaster():
   _Triggerbit[2] = 0;
   _Triggerbit[3] = 0;
 
+  _2DBhabhaThresholdFWD.clear();
+  _2DBhabhaThresholdBWD.clear();
+  _3DBhabhaThreshold.clear();
+
 
   //ThetaRingSum.resize(3,std::vector<double>(36,0));
   //PhiRingSum.resize(17,0);
@@ -282,8 +286,8 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     double E_phys = 0;
     double E_total = 0;
     for (int iii = 0; iii <= 16; iii++) {
-      if (iii > 1 && iii < 15) {E_phys += phiringsum[iii];}
-      if (iii > 0 && iii < 3) {E_fwd += phiringsum[iii];}
+      if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
+      if (iii < 3) {E_fwd += phiringsum[iii];}
       if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
       if (iii > 14) {E_bwd += phiringsum[iii];}
       E_total += phiringsum[iii];
@@ -291,13 +295,13 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     if (E_total == 0) {continue;}
     int ELow, EHigh, ELum;
 
-    if (E_phys > 0.5) {
+    if (E_phys > _TotalEnergy[0] / 10) { // GeV
       ELow = 0x01;
     }
-    if (E_phys > 1.0) {
+    if (E_phys > _TotalEnergy[1] / 10) { // GeV
       EHigh = 0x01;
     }
-    if (E_phys > 3.0) {
+    if (E_phys > _TotalEnergy[2] / 10) { // GeV
       ELum = 0x01;
     }
 
@@ -350,22 +354,9 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     //--------------
     // Bhabha veto
     //--------------
-    //
-    //    obj_bhabha -> setup()
-    // std::vector<double> vct_bhabha;
-    // vct_bhabha.clear();
-    // bool boolBtoBTag  = false;
-    // if (_Bhabha == 0) { //belle I
-    //   boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
-    //   vct_bhabha = obj_bhabha -> GetBhabhaComb();
-    // } else if (_Bhabha == 1) {
-    //   vct_bhabha.resize(18, 0);
-    //   boolBtoBTag  =  obj_bhabha -> GetBhabha01();
-    // }
-    // int BtoBTag = 0;
-    // if (boolBtoBTag && icn < 4) {
-    //   BtoBTag = 1;
-    // }
+
+    obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
+    obj_bhabha-> set3DBhabhaThreshold(_3DBhabhaThreshold);
     std::vector<double> vct_bhabha;
     vct_bhabha.clear();
     int bhabha2D = 0 ;
@@ -718,22 +709,21 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   double E_phys = 0;
   double E_total = 0;
   for (int iii = 0; iii <= 16; iii++) {
-    if (iii > 1 && iii < 15) {E_phys += phiringsum[iii];}
-    if (iii > 0 && iii < 3) {E_fwd += phiringsum[iii];}
+    if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
+    if (iii < 3) {E_fwd += phiringsum[iii];}
     if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
     if (iii > 14) {E_bwd += phiringsum[iii];}
     E_total += phiringsum[iii];
   }
   if (E_total == 0) {return;}
   int ELow, EHigh, ELum;
-
-  if (E_phys > 0.5) {
+  if (E_phys > _TotalEnergy[0] / 10) { // GeV
     ELow = 0x01;
   }
-  if (E_phys > 1.0) {
+  if (E_phys > _TotalEnergy[1] / 10) { // GeV
     EHigh = 0x01;
   }
-  if (E_phys > 3.0) {
+  if (E_phys > _TotalEnergy[2] / 10) { // GeV
     ELum = 0x01;
   }
 
@@ -786,21 +776,8 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   // Bhabha veto
   //--------------
   //
-  //    obj_bhabha -> setup()
-  // std::vector<double> vct_bhabha;
-  // vct_bhabha.clear();
-  // bool boolBtoBTag  = false;
-  // if (_Bhabha == 0) { //belle I
-  //   boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
-  //   vct_bhabha = obj_bhabha -> GetBhabhaComb();
-  // } else if (_Bhabha == 1) {
-  //   vct_bhabha.resize(18);
-  //   boolBtoBTag  =  obj_bhabha -> GetBhabha01();
-  // }
-  // int BtoBTag = 0;
-  // if (boolBtoBTag && icn < 4) {
-  //   BtoBTag = 1;
-  // }
+  obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
+  obj_bhabha-> set3DBhabhaThreshold(_3DBhabhaThreshold);
   std::vector<double> vct_bhabha;
   vct_bhabha.clear();
   int bhabha2D = 0 ;
@@ -1234,13 +1211,13 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
     int thetaid = obj_map->getTCThetaIdFromTCId(CenterTCId[ic]);
     int lut = obj_database->Get3DBhabhaLUT(CenterTCId[ic]);
     int thresh = 15 & lut;
-    if (clusterenergy[ic] * 100 > (thresh * 20)) {
+    if (clusterenergy[ic] * 100 > (thresh * _LowMultiThreshold[1])) { //200 <MeV
       _n2GeV++;
       if (thetaid >= 4 && thetaid <= 14) {_n2GeV414++;}
       if (thetaid == 2 || thetaid == 3 || thetaid == 15 || thetaid == 16) {_n2GeV231516++;}
       if (thetaid == 1 || thetaid == 17) {_n2GeV117++;}
     }
-    if (clusterenergy[ic] * 100 > thresh * 10) {
+    if (clusterenergy[ic] * 100 > thresh * _LowMultiThreshold[0]) { // 100 MeV
       if (thetaid >= 4 && thetaid <= 15) {_n1GeV415++;}
       if (thetaid == 2 || thetaid == 3 || thetaid == 16) {_n1GeV2316++;}
       if (thetaid == 1 || thetaid == 17) {_n1GeV117++;}
@@ -1278,14 +1255,16 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
       // cout << dphi << " "  << thetaSum << endl;
       // cout << clusterenergy[i0] << " " << clusterenergy[i1] << endl;
       //  if (dphi > 180.) {dphi = 360 - dphi;}
-      if (dphi > 170. && clusterenergy[i0] > 0.25 && clusterenergy[i1] > 0.25) {_nPhiPairHigh++;}
-      if (dphi > 170. && (clusterenergy[i0] < 0.25 || clusterenergy[i1] < 0.25)) {_nPhiPairLow++;}
+      if (dphi > 170. && clusterenergy[i0] > _LowMultiThreshold[2] / 100
+          && clusterenergy[i1] >  _LowMultiThreshold[2] / 100) {_nPhiPairHigh++;}
+      if (dphi > 170. && (clusterenergy[i0] <  _LowMultiThreshold[2] / 100
+                          || clusterenergy[i1] <  _LowMultiThreshold[2] / 100)) {_nPhiPairLow++;}
       //..3D
       if (dphi > 160. && thetaSum > 160. && thetaSum < 200) {_n3DPair++;}
       //..ecl Bhabha
-      if (dphi > 160 && thetaSum > 165 && thetaSum < 190 && clusterenergy[i0] * 100 > 30 * energy1
-          && clusterenergy[i1] * 100 > 30 * energy2
-          && (clusterenergy[i0] * 100 > 45 * energy1 ||  clusterenergy[i1] * 100 > 45 * energy2)) {
+      if (dphi > 160 && thetaSum > 165 && thetaSum < 190 && clusterenergy[i0] * 100 > _3DBhabhaThreshold[0] * energy1
+          && clusterenergy[i1] * 100 > _3DBhabhaThreshold[0]  * energy2
+          && (clusterenergy[i0] * 100 > _3DBhabhaThreshold[1]  * energy1 ||  clusterenergy[i1] * 100 > _3DBhabhaThreshold[1]  * energy2)) {
         _nECLBhabha++;
 
       }
@@ -1383,7 +1362,7 @@ double TrgEclMaster::setTotalEnergy(std::vector<double> phisum)
 
   double E_phys = 0;
   for (int iii = 0; iii <= 16; iii++) {
-    if (iii > 1 && iii < 15) {E_phys += phisum[iii];}
+    if (iii > 0 && iii < 15) {E_phys += phisum[iii];}
   }
   return E_phys;
 }

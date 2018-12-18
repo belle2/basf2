@@ -111,8 +111,13 @@ Note:
   The output files will be approximately of the size given by
   ``outputSplitSize`` but they will be slightly larger since
   additional information has to be written at the end of the file. If necessary
-  please account for this. Also, using `buildIndex=False` might be beneficial
+  please account for this. Also, using ``buildIndex=False`` might be beneficial
   to reduce the overshoot.
+
+Warning:
+  This will set the amount of generated events stored in the file metadata to
+  zero as it is not possible to determine which fraction ends up in which
+  output file.
 )DOC", m_outputSplitSize);
 }
 

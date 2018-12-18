@@ -64,6 +64,8 @@ found as a parent file independent of the local name or folder structure::
 
     usage: b2file-catalog-add [--help] FILENAME
 
+.. _b2file-check:
+
 ``b2file-check``: Check a basf2 output file for consistency
 -----------------------------------------------------------
 
@@ -99,6 +101,9 @@ The ``--json`` parameter can be used to get detailed output for all tests in a m
         "size_per_event_kib": 12.3796875
       }
     }
+
+
+.. _b2file-merge:
 
 ``b2file-merge``: Merge multiple basf2 output files
 ---------------------------------------------------

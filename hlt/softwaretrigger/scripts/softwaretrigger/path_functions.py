@@ -96,51 +96,27 @@ def setup_basf2_and_db(dbfile=None):
     return args
 
 
-def add_pxd_fullframe_phase2(path):
-    one_two = [1, 2]
+def add_pxd_fullframe(path, min_ladders=(1, 1), max_ladders=(8, 12)):
+    modules = []
+    for layer in [1, 2]:
+        min_ladder = min_ladders[layer - 1]
+        max_ladder = max_ladders[layer - 1]
+        for ladder in range(min_ladder, max_ladder + 1):
+            for sensor in [1, 2]:
+                modules.append((layer, ladder, sensor))
 
-    for (layer, sensor) in itertools.product(one_two, one_two):
+    for (layer, ladder, sensor) in modules:
         path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
-                        Layer=layer, Ladder=1, Sensor=sensor,
+                        Layer=layer, Ladder=ladder, Sensor=sensor,
                         MinU=0, MaxU=249, MinV=0, MaxV=767)
+
+
+def add_pxd_fullframe_phase2(path):
+    add_pxd_fullframe(path, min_ladders=(1, 1), max_ladders=(1, 1))
 
 
 def add_pxd_fullframe_phase3_early(path):
-    modules = []
-    for layer in [1, 2]:
-        if layer == 1:
-            min_ladder = 1
-            max_ladder = 8
-        elif layer == 2:
-            min_ladder = 4
-            max_ladder = 5
-        for ladder in range(min_ladder, max_ladder + 1):
-            for sensor in [1, 2]:
-                modules.append((layer, ladder, sensor))
-
-    for (layer, ladder, sensor) in modules:
-        path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
-                        Layer=layer, Ladder=ladder, Sensor=sensor,
-                        MinU=0, MaxU=249, MinV=0, MaxV=767)
-
-
-def add_pxd_fullframe_phase3(path):
-    modules = []
-    for layer in [1, 2]:
-        if layer == 1:
-            min_ladder = 1
-            max_ladder = 8
-        elif layer == 2:
-            min_ladder = 1
-            max_ladder = 12
-        for ladder in range(min_ladder, max_ladder + 1):
-            for sensor in [1, 2]:
-                modules.append((layer, ladder, sensor))
-
-    for (layer, ladder, sensor) in modules:
-        path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
-                        Layer=layer, Ladder=ladder, Sensor=sensor,
-                        MinU=0, MaxU=249, MinV=0, MaxV=767)
+    add_pxd_fullframe(path, min_ladders=(1, 4), max_ladders=(8, 5))
 
 
 def add_roi_payload_assembler(path, alwaysAcceptEvents=True, SendAllDownscaler=0, RejectByZeroROI=False):

@@ -2999,26 +2999,26 @@ namespace {
       error(1, 1) = 0.2;
       error(2, 2) = 0.4;
       error(3, 3) = 0.01;
-      error(4, 4) = 0.09;
-      error(5, 5) = 0.01;
+      error(4, 4) = 0.04;
+      error(5, 5) = 0.00875;
       error(6, 6) = 0.01;
       Particle pi(TLorentzVector(1.59607, 1.19705, 0, 2), 211);
       momentum += pi.get4Vector();
       Particle* newpi = particles.appendNew(pi);
 
 
-      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310);
+      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
       Ks.setVertex(TVector3(4.0, 5.0, 0.0));
       Ks.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
       momentum += Ks.get4Vector();
       Ks.addExtraInfo("prodVertX", 1.0);
       Ks.addExtraInfo("prodVertY", 1.0);
       Ks.addExtraInfo("prodVertZ", 0.0);
-      Ks.addExtraInfo("prodVertSxx", 0.09);
+      Ks.addExtraInfo("prodVertSxx", 0.04);
       Ks.addExtraInfo("prodVertSxy", 0.0);
       Ks.addExtraInfo("prodVertSxz", 0.0);
       Ks.addExtraInfo("prodVertSyx", 0.0);
-      Ks.addExtraInfo("prodVertSyy", 0.01);
+      Ks.addExtraInfo("prodVertSyy", 0.00875);
       Ks.addExtraInfo("prodVertSyz", 0.0);
       Ks.addExtraInfo("prodVertSzx", 0.0);
       Ks.addExtraInfo("prodVertSzy", 0.0);
@@ -3027,12 +3027,24 @@ namespace {
       newKs->addRelationTo(newMCKs);
 
 
-      Particle Dp(momentum, 411);
+      Particle Dp(momentum, 411, Particle::c_Flavored, Particle::c_Composite, 0);
       Dp.appendDaughter(newpi);
       Dp.appendDaughter(newKs);
       TVector3 motherVtx(1.0, 1.0, 0.0);
       Dp.setVertex(motherVtx);
       Dp.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
+      Dp.addExtraInfo("prodVertX", 0.0);
+      Dp.addExtraInfo("prodVertY", 1.0);
+      Dp.addExtraInfo("prodVertZ", -2.0);
+      Dp.addExtraInfo("prodVertSxx", 0.04);
+      Dp.addExtraInfo("prodVertSxy", 0.0);
+      Dp.addExtraInfo("prodVertSxz", 0.0);
+      Dp.addExtraInfo("prodVertSyx", 0.0);
+      Dp.addExtraInfo("prodVertSyy", 0.01);
+      Dp.addExtraInfo("prodVertSyz", 0.0);
+      Dp.addExtraInfo("prodVertSzx", 0.0);
+      Dp.addExtraInfo("prodVertSzy", 0.0);
+      Dp.addExtraInfo("prodVertSzz", 0.1575);
       Particle* newDp = particles.appendNew(Dp);
       newDp->addRelationTo(newMCDp);
 
@@ -3167,6 +3179,83 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
   }
+
+  TEST_F(FlightInfoTest, vertexDistance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKS), 5.0);
+  }
+
+  TEST_F(FlightInfoTest, vertexDistanceError)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKS), 0.2);
+  }
+
+  TEST_F(FlightInfoTest, vertexDistanceSignificance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceSignificance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKS), 25);
+  }
+
+  TEST_F(FlightInfoTest, vertexDistanceOfDaughter)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, noIP)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), 5.0);
+
+    var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), 6.0);
+
+    var = Manager::Instance().getVariable("vertexDistanceOfDaughter(2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), -999);
+  }
+
+  TEST_F(FlightInfoTest, vertexDistanceOfDaughterError)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, noIP)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), 0.2);
+
+    var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), 0.25);
+  }
+
+  TEST_F(FlightInfoTest, vertexDistanceOfDaughterSignificance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
+
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, noIP)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), 25);
+
+    var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), 24);
+  }
+
   class VertexVariablesTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */

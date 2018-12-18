@@ -15,14 +15,16 @@ from stdPhotons import *
 </header>
 """
 
-inputMdst('MC9', '../TauGeneric.udst.root')
+taugenericskim = Path()
 
-stdPi('all')
-stdPhotons('all')
+inputMdst('MC9', '../TauGeneric.udst.root', path=taugenericskim)
+
+stdPi('all', path=taugenericskim)
+stdPhotons('all', path=taugenericskim)
 
 # set variables
 from skim.taupair import *
-SetTauGenericSkimVariables()
+SetTauGenericSkimVariables(path=taugenericskim)
 
 variables.addAlias('nGoodGammas', 'nParticlesInList(gamma:all)')
 variables.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
@@ -40,7 +42,8 @@ variablesToHistogram(
                   ('Theta_miss', 30, 0, 180, 'M2miss', 30, -20, 100),
                   ('E_S1', 30, 0, 6, 'MinvS1', 20, 0, 2),
                   ('E_S2', 30, 0, 6, 'MinvS2', 20, 0, 2),
-                  ('E_ECL', 30, 0, 12, 'Etot', 30, 0, 12)]
+                  ('E_ECL', 30, 0, 12, 'Etot', 30, 0, 12)],
+    path=taugenericskim
 )
-process(analysis_main)
+process(taugenericskim)
 print(statistics)

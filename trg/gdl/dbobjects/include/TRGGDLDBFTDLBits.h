@@ -27,7 +27,7 @@ namespace Belle2 {
     /** Default constructor */
     TRGGDLDBFTDLBits(): m_noutbit{0}, m_outbitname{} {}
     /** copy constructor */
-    TRGGDLDBFTDLBits(const TRGGDLDBFTDLBits& b)
+    TRGGDLDBFTDLBits(const TRGGDLDBFTDLBits& b): TObject(b)
     {
       m_noutbit = b.m_noutbit;
       for (int i = 0; i < 320; i++) {

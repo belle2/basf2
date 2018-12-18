@@ -106,6 +106,12 @@ class PayloadInformation:
     """Small container class to help compare payload information for efficient
     comparison between global tags"""
     def __init__(self, payload, iov):
+        """Set all internal members from the json information of the payload and the iov.
+
+        Arguments:
+            payload (dict): json information of the payload as returned by REST api
+            iov (dict): json information of the iov as returned by REST api
+        """
         #: name of the payload
         self.name = payload['basf2Module']['name']
         #: checksum of the payload

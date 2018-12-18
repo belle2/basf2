@@ -80,7 +80,8 @@ HRP_init_connect_to_merger_merger(const char* host, const unsigned short port)
       return -1;
   }
 
-  ret = b2_timed_blocking_io(sd, 0);
+  ret = b2_timed_blocking_io(sd,
+                             1);// This means, if the socket blocks longer than Xs, it will return a EAGAIN or EWOULDBLOCK (immediately)
   if (ret == -1) {
     ERROR(b2_timed_blocking_io);
     return -1;
@@ -336,7 +337,13 @@ main(int argc, char* argv[])
     {
       int ret;
 
-      ret = b2_send(sd, ptr_packet, n_bytes_packet);
+      while (1) {
+        ret = b2_send(sd, ptr_packet, n_bytes_packet);
+        if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+          ERR_FPRINTF(stderr, "[WARNING] hltout2merger: socket buffer full, retry\n");
+          sleep(1);// Bad hack, wait a second
+        } else break;
+      }
       if (ret == -1) {
         ERROR(b2_send);
         ERR_FPRINTF(stderr, "Send to merger (roisenderd) failed.\n%s terminated\n", argv[0]);

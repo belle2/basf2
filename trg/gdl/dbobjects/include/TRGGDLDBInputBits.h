@@ -28,7 +28,7 @@ namespace Belle2 {
     /** Default constructor */
     TRGGDLDBInputBits(): m_ninbit{0}, m_inbitname{} {}
     /** copy constructor */
-    TRGGDLDBInputBits(const TRGGDLDBInputBits& b)
+    TRGGDLDBInputBits(const TRGGDLDBInputBits& b): TObject(b)
     {
       m_ninbit = b.m_ninbit;
       for (int i = 0; i < 320; i++) {

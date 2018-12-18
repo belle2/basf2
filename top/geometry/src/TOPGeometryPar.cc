@@ -520,8 +520,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedGeometry.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoModuleDisplacement moduleDispl(slot.getLength("x"),
@@ -545,8 +545,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedPMTArrays.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoPMTArrayDisplacement arrayDispl(slot.getLength("x"),
@@ -567,7 +567,8 @@ namespace Belle2 {
           for (const GearDir& slot : brokenGlues.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID " << moduleID);
+              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -592,8 +593,8 @@ namespace Belle2 {
           for (const GearDir& slot : peelOff.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -850,7 +851,7 @@ namespace Belle2 {
 
 
     TOPGeoBarSegment TOPGeometryPar::createBarSegment(const GearDir& content,
-                                                      const std::string SN)
+                                                      const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "QuartzBars/QuartzBar[@SerialNumber='" + SN + "']");
@@ -873,7 +874,7 @@ namespace Belle2 {
 
 
     TOPGeoMirrorSegment TOPGeometryPar::createMirrorSegment(const GearDir& content,
-                                                            const std::string SN)
+                                                            const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "Mirrors/Mirror[@SerialNumber='" + SN + "']");
@@ -903,7 +904,7 @@ namespace Belle2 {
 
 
     TOPGeoPrism TOPGeometryPar::createPrism(const GearDir& content,
-                                            const std::string SN)
+                                            const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "Prisms/Prism[@SerialNumber='" + SN + "']");

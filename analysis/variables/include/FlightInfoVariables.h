@@ -25,10 +25,16 @@ namespace Belle2 {
     double flightDistance(const Particle* part);
     double flightTimeErr(const Particle* part);
     double flightDistanceErr(const Particle* part);
+    double vertexDistance(const Particle* part);
+    double vertexDistanceErr(const Particle* part);
+    double vertexDistanceSignificance(const Particle* part);
     Manager::FunctionPtr flightTimeOfDaughterErr(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightDistanceOfDaughterErr(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr vertexDistanceOfDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr vertexDistanceOfDaughterErr(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr vertexDistanceOfDaughterSignificance(const std::vector<std::string>& arguments);
     Manager::FunctionPtr mcFlightDistanceOfDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr mcFlightTimeOfDaughter(const std::vector<std::string>& arguments);
   }

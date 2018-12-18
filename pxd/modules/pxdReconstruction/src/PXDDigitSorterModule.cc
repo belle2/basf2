@@ -103,11 +103,11 @@ void PXDDigitSorterModule::event()
       if (!m_trimDigits || goodDigit(storeDigit)) {
         sensors[sensorID].insert(px);
       } else {
-        B2INFO("Encountered a malformed digit in PXDDigit sorter: " << endl
-               << "VxdID: " << sensorID.getLayerNumber() << "/"
-               << sensorID.getLadderNumber() << "/"
-               << sensorID.getSensorNumber() << " u = " << storeDigit->getUCellID() << "v = " << storeDigit->getVCellID()
-               << " DISCARDED.");
+        B2DEBUG(20, "Encountered a malformed digit in PXDDigit sorter: " << endl
+                << "VxdID: " << sensorID.getLayerNumber() << "/"
+                << sensorID.getLadderNumber() << "/"
+                << sensorID.getSensorNumber() << " u = " << storeDigit->getUCellID() << "v = " << storeDigit->getVCellID()
+                << " DISCARDED.");
       }
     }
   }

@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>Thomas.Hauth@kit.edu</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>CDCFullTrackingValidation.root</output>
   <description>This script validates the full CDC tracking chain with a legendre step first

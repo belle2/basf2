@@ -276,7 +276,7 @@ def add_skim(label, lists, path):
     """
     skimCode = encodeSkimName(label)
     skimOutputUdst(skimCode, lists, path=path)
-    summaryOfLists(lists)
+    summaryOfLists(lists, path=path)
 
 
 def setSkimLogging(path=analysis_main, additional_modules=[]):

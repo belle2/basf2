@@ -21,8 +21,8 @@ namespace Belle2 {
   void TOPGeometry::appendModule(const TOPGeoModule& module)
   {
     if (isModuleIDValid(module.getModuleID())) {
-      B2ERROR("TOPGeometry::appendModule: a module with ID = " << module.getModuleID()
-              << "already appended");
+      B2ERROR("TOPGeometry::appendModule: module already appended."
+              << LogVar("ID", module.getModuleID()));
       return;
     }
     m_modules.push_back(module);
@@ -43,7 +43,7 @@ namespace Belle2 {
     for (const auto& module : m_modules) {
       if (module.getModuleID() == moduleID) return module;
     }
-    B2FATAL("TOPGeometry::getModule: invalid module ID " << moduleID);
+    B2FATAL("TOPGeometry::getModule: invalid module, ID = " << moduleID);
   }
 
   const TOPNominalTTS& TOPGeometry::getTTS(unsigned type) const

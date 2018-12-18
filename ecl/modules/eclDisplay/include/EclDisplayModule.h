@@ -22,6 +22,8 @@
 
 class TApplication;
 
+class TFile;
+
 namespace Belle2 {
 
   class ECLCalDigit;
@@ -107,6 +109,10 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclarray;
     /**  Channel mapper to show channel <-> (crate, shaper) distributions. */
     ECL::ECLChannelMapper m_mapper;
+    /** Temporary file to store TTree */
+    TFile* m_tempfile;
+    /** Name of temporary file */
+    TString m_tempname;
 
   public:
     /* SLOTS */

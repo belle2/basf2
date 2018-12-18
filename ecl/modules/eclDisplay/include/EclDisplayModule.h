@@ -80,6 +80,8 @@ namespace Belle2 {
      */
     void initFrame();
 
+    /** Keep window open after all events have been processed. Default is false. */
+    bool m_keepOpen;
     /**  If true, energy distribution in ECL is displayed. Frequency of events per crystal is displayed otherwise. */
     bool m_displayEnergy;
     // TODO: List possible display mode IDs from EclPainterFactory.

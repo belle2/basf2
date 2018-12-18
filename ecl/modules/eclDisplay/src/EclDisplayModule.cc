@@ -46,6 +46,8 @@ EclDisplayModule::EclDisplayModule() : Module(),
   setDescription("Event display module for ECL.");
 
   // Parameter definitions
+  addParam("keepOpen", m_keepOpen,
+           "Keep window open after all events have been processed", false);
   addParam("displayEnergy", m_displayEnergy,
            "If true, energy distribution per channel (shaper, crate) is displayed. Otherwise, number of counts is displayed", false);
   addParam("displayMode", m_displayMode,
@@ -127,16 +129,19 @@ void EclDisplayModule::endRun()
 
 void EclDisplayModule::terminate()
 {
-  if (!m_frame_closed) {
-    m_data->update(false);
-    m_frame->loadNewData();
-  }
+  if (m_keepOpen) {
+    if (!m_frame_closed) {
+      m_data->update(false);
+      m_frame->loadNewData();
+    }
 
-  while (!m_frame_closed) {
-    gSystem->ProcessEvents();
-    gSystem->Sleep(0);
+    while (!m_frame_closed) {
+      gSystem->ProcessEvents();
+      gSystem->Sleep(0);
+    }
   }
 
   delete m_frame;
   delete m_data;
 }
+

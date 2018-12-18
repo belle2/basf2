@@ -14,6 +14,7 @@
 //Root
 #include <TApplication.h>
 #include <TSystem.h>
+#include <TFile.h>
 
 //Framework
 #include <framework/utilities/FileSystem.h>
@@ -73,6 +74,16 @@ void EclDisplayModule::initialize()
 
 void EclDisplayModule::initFrame()
 {
+  //== Init temporary file so TTree is not kept in memory.
+  m_tempname = "ecldisplay_tmp";
+
+  if (gSystem->TempFileName(m_tempname) == 0) {
+    throw std::runtime_error("ECLDisplay: failed to create temp file.");
+  } else {
+    m_tempfile = new TFile(m_tempname, "recreate");
+    gSystem->Unlink(m_tempname);
+  }
+
   SetMode(m_displayEnergy);
   m_app   = new TApplication("ECLDisplay App", 0, 0);
   m_data  = new EclData();

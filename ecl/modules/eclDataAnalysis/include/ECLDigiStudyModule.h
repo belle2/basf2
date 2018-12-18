@@ -27,6 +27,7 @@ namespace Belle2 {
   class ECLTrig;
   class ECLHit;
 
+  /** A module to analyse digit level information */
   class ECLDigiStudyModule : public Module {
 
   public:

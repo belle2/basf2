@@ -39,7 +39,7 @@ namespace Belle2 {
 
   private:
 
-    std::map<std::string, TF1> m_RMSParameterizationFunctions;
+    std::map<std::string, TF1> m_RMSParameterizationFunctions; /**< RMS parameterization functions */
 
     ClassDef(ECLTrackClusterMatchingParameterizations, 1); /**< ClassDef */
   };

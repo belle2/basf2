@@ -94,7 +94,10 @@ namespace Belle2 {
      * int fetch_int(BitStream& IN, const width_t& w) function for more details
      */
     struct width_t {
-      unsigned char w0, w1, w2, w3; /** Progressive bit widths to encode an integer value*/
+      unsigned char w0, /**< Progressive bit width to encode an integer value */
+               w1, /**< Progressive bit width to encode an integer value */
+               w2, /**< Progressive bit width to encode an integer value */
+               w3; /**< Progressive bit width to encode an integer value */
     };
 
     /** Abstract class (interface) for ECL waveform

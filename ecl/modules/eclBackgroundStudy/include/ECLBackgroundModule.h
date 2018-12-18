@@ -35,6 +35,7 @@ namespace Belle2 {
   class ARICHGeometryPar;
 #endif
 
+  /** A module to study background campaigns and produce histograms */
   class ECLBackgroundModule : public HistoModule {
 
   public:

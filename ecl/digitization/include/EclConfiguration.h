@@ -1,15 +1,31 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo                                       *
+ *               Alon Hershenhorn                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef ECLCONFIGURATION_H_
 #define ECLCONFIGURATION_H_
+
 namespace Belle2 {
   namespace ECL {
+    /** singleton class to hold the ECL configuration */
     class  EclConfiguration {
     public:
+      /** return this instance */
       static EclConfiguration& get()
       {
         static EclConfiguration instance;
         return instance;
       }
+      /** return the background flag */
       bool background() const { return m_background; }
+      /** set the background flag */
       void setBackground(bool val) { m_background = val; }
 
       static constexpr int        m_nch = 8736;  /**< total number of electronic channels (crystals) in calorimeter */
@@ -28,10 +44,11 @@ namespace Belle2 {
       static constexpr int        m_ndt = 96; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
 
     private:
-      EclConfiguration() {};
-      bool m_background{false};
+      EclConfiguration() {}; /**< constructor */
+      bool m_background{false}; /**< background configuration */
     public:
 
+      /** a struct for a signal sample */
       struct signalsample_t {
         void InitSample(const float*, double);
         void InitSample(const double*, double);
@@ -41,13 +58,16 @@ namespace Belle2 {
         double m_ft[m_nl * m_ns];
       };
 
+      /** a struct for the ADC count */
       struct adccounts_t {
+        /** add hit method */
         void AddHit(const double a, const double t0, const signalsample_t& q);
         double total; /**< total deposition (sum of m_s array) */
         double c[m_nsmp]; /**< flash ADC measurements */
         double totalHadron; /**< total hadron deposition*/
       };
 
+      /** a struct for the fit parameters */
       struct fitparams_t {
         typedef int int_array_192x16_t[2 * m_ndt][16];
         typedef int int_array_24x16_t[m_ndt / 4][16];
@@ -55,6 +75,7 @@ namespace Belle2 {
         int_array_24x16_t fg41, fg43;
       };
 
+      /** a struct for the parameters of the algorithm */
       struct algoparams_t {
         typedef short int shortint_array_16_t[16];
         typedef unsigned char uchar_array_32_t[32];

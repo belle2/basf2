@@ -62,7 +62,7 @@ namespace Belle2 {
     /** Some other useful quantities */
     double thetaLabMin{ -1.0};  /**< m_thetaLabMinDeg converted to radians (conversion in Module::init) */
     double thetaLabMax{ -1.0};  /**< m_thetaLabMaxDeg converted to radians (coneversion in Module::init) */
-    bool storeCalib = true;; /**< force the input calibration constants to be saved first event */
+    bool storeCalib = true; /**< force the input calibration constants to be saved first event */
     std::vector<float> EperCrys; /**< ECL digit energy for each crystal */
 
     double minTrkpt = 0.3; /**< (GeV/c) minimum pt of a good track */

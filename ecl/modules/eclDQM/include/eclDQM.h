@@ -32,15 +32,15 @@ class TH2F;
 
 namespace Belle2 {
 
-  /**
-   * This module is for ECL Data Quality Monitor.
-   */
   class ECLDigit;
   class EventMetaData;
   class ECLDsp;
   class ECLTrig;
   class ECLCalDigit;
 
+  /**
+   * This module is for ECL Data Quality Monitor.
+   */
   class ECLDQMModule : public HistoModule {  /**< derived from HistoModule class. */
 
   public:

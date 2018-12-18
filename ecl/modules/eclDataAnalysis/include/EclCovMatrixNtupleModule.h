@@ -26,6 +26,7 @@ namespace Belle2 {
   class ECLDigit;
   class ECLTrig;
 
+  /** a module to write ECL waveform and fitted time and amplitude information in a root ntuple */
   class EclCovMatrixNtupleModule : public Module {
 
   public:
@@ -63,6 +64,7 @@ namespace Belle2 {
     /** Root file for saving the output */
     TFile* m_rootFile{nullptr};
 
+    /** Energy */
     double m_energy{ -1};
     /** Event number */
     int m_nevt{ -1};

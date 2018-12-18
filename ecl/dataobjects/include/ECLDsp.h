@@ -211,11 +211,11 @@ namespace Belle2 {
     TwoComponentFitType m_TwoComponentFitType{poorChi2};  /**< offline fit hypothesis.*/
     std::vector <int> m_DspAVector;       /**< Dsp array vith variable length for calibration, tests, etc.  */
 
-    /*2 dspa array with variable length*/
-    /*3 Add two component variables*/
-    /*4 Add diode and pile-up photon offline fit hypothesis*/
-    /*5 Added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried */
-    /*6 removed IsData member */
+    /** 2 dspa array with variable length*/
+    /** 3 Add two component variables*/
+    /** 4 Add diode and pile-up photon offline fit hypothesis*/
+    /** 5 Added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried */
+    /** 6 removed IsData member */
     ClassDef(ECLDsp, 6);
 
   };

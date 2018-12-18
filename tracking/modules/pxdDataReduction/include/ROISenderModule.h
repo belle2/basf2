@@ -11,6 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIpayload.h>
 #include <string>
 
 #include <fcntl.h>           /* For O_* constants */
@@ -37,6 +40,10 @@ namespace Belle2 {
 
   private:
 
+    /** Input ptr for RoiPayload. */
+    StoreObjPtr<ROIpayload> m_roiPayload;
+    /** Input ptr for EventMetaData. */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /**
      *Initializes the Module.

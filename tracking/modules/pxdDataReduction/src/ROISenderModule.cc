@@ -8,10 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <tracking/modules/pxdDataReduction/ROISenderModule.h>
-#include <tracking/dataobjects/ROIpayload.h>
 #include <sys/stat.h>
+#include <chrono>
 
 using namespace std;
 using namespace Belle2;
@@ -44,8 +43,9 @@ ROISenderModule::ROISenderModule() :
 void
 ROISenderModule::initialize()
 {
-  StoreObjPtr<ROIpayload> roiPayloads;
-  roiPayloads.isRequired(m_ROIpayloadName);
+  // Required input
+  m_eventMetaData.isRequired();
+  m_roiPayload.isRequired(m_ROIpayloadName);
 
   m_messageQueueNameCstring =  m_messageQueueName.c_str();
 
@@ -66,9 +66,8 @@ void
 ROISenderModule::event()
 {
 
-  StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
-  int length = payloadPtr->getPacketLengthByte();
-  const char* data = (const char*) payloadPtr->getRootdata();
+  int length = m_roiPayload->getPacketLengthByte();
+  const char* data = (const char*) m_roiPayload->getRootdata();
 
   mqd_t ret;
 
@@ -80,11 +79,28 @@ ROISenderModule::event()
               ": error: " <<
               strerror(errno) <<
               " on mq_send");
-  } else
+  } else {
     B2WARNING(std::string(__FILE__) << ":" << __LINE__  <<
               " ROI payload too long." << endl <<
               " Payload length     = " << length << endl <<
               " Message max lengtt = " << m_messageQueueMsgSize << endl);
+    B2FATAL("This will result in Event mismatch on EB!!!!!!");
+  }
+
+  // Calculate the time difference between now and the trigger time
+  // This tells you how much delay we have summed up (it is NOT the processing time!)
+  /** Time(Tag) from MetaInfo, ns since epoch */
+  unsigned long long int meta_time = 0;
+  meta_time = m_eventMetaData->getTime();
+
+  using namespace std::chrono;
+  nanoseconds ns = duration_cast< nanoseconds >(system_clock::now().time_since_epoch());
+  Float_t deltaT = (std::chrono::duration_cast<seconds> (ns - (nanoseconds)meta_time)).count();
+  if (deltaT > 60) {
+    B2ERROR("Event took too long on HLT, PXD data for Event might be lost!" << LogVar("deltaT in s", deltaT));
+  } else if (deltaT > 30) {
+    B2WARNING("Event took too long on HLT, PXD data for Event might be lost!" << LogVar("deltaT in s", deltaT));
+  }
 
 }
 

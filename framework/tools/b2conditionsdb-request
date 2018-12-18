@@ -18,27 +18,46 @@ import getpass
 from versioning import upload_global_tag, jira_global_tag
 import readline  # wraps `input()` to have gnu readline functionality
 import tempfile
+import shutil
 
-
-def input_editor(default=None):
-    """Like the `input()` or `sys.stdin.readlines`, but using default EDITOR.
+def input_editor(initial_content=None, editor_command=None):
+    """Like the `input()` or `sys.stdin.readlines`, but using default editor.
 
     Similar to how `git commit` opens a text editor.  Enables longer multiline input with
     comfortable text editing functionality.
     Adapted from https://chase-seibert.github.io/blog/2012/10/31/python-fork-exec-vim-raw-input.html
     """
-    # get editor from environment
-    editor_command = (os.environ.get('VISUAL') or os.environ.get('EDITOR') or 'vi')
+    # split editor_command in case it contains cli arguments/options seperated by whitespace
+    editor_command = editor_command or get_editor()
     # split editor_command in case it contains cli arguments/options seperated by whitespace
     editor_command_list = editor_command.split()
 
+    # check if editor in command string exists, otherwise prompt for new editor command
+    while shutil.which(editor_command_list[0]) is None:
+        print(f"Editor '{editor_command_list[0]}' not found.")
+        if input("Enter new editor command (y/n) [y]? ").lower() not in ['y', '']:
+            sys.exit(0)
+        editor_command_list = input("Editor command to use instead: ").split()
+
     with tempfile.NamedTemporaryFile(mode='r+') as tmpfile:
-        if default:
-            tmpfile.write(default)
+        if initial_content:
+            tmpfile.write(initial_content)
             tmpfile.flush()
         subprocess.check_call(editor_command_list + [tmpfile.name])
         tmpfile.seek(0)
         return tmpfile.read().strip()
+
+
+def get_editor():
+    """
+    Get editor command string from environment variables.
+    """
+    editor_command = (os.environ.get('VISUAL')
+                      or os.environ.get('EDITOR')
+                      or shutil.which('vim') # return None which if not found
+                      or shutil.which('vi')
+    )
+    return editor_command
 
 
 def get_argument_parser():
@@ -218,11 +237,29 @@ if __name__ == "__main__":
     if len(set(data.keys()) & set(['data', 'mc', 'analysis'])) > 0:
         prompt_string = "Enter detailed instructions about targeted global tags/releases and the update procedure"
         print(prompt_string)
-        details_input_string = input_editor(default=f"# {prompt_string}\n# Lines starting with `#` will be ignored")
-        # remove commented lines from input string
-        details_input_string = "\n".join(
-            [l for l in details_input_string.splitlines() if not l.startswith("#")]
-        ).strip()
+        try:
+            editor_command = get_editor()
+            # define comment to show at the start of the temporary input file to guide the user
+            initial_comment_prompt = (
+                f"# {prompt_string}\n"
+                + "# Lines starting with `#` will be ignored\n"
+                + f"# Currently in editor '{editor_command}'. When finished, save and quit\n"
+            )
+            if 'vi' in editor_command:
+                initial_comment_prompt += "# Use :wq in vi(m) or :q! to discard changes\n"
+
+            details_input_string = input_editor(initial_content=initial_comment_prompt,
+                                                editor_command=editor_command)
+            # remove commented lines from input string
+            details_input_string = "\n".join(
+                [l for l in details_input_string.splitlines() if not l.startswith("#")]
+            ).strip()
+
+        except (FileNotFoundError or CalledProcessError):
+            # If file not found, fall back to command line input
+            print(f"Could not open editor '{editor_command}'")
+            print("Input details in command line instead and hit CTRL-D to finish")
+            details_input_string = sys.stdin.readlines()
 
         data['details'] = details_input_string
 

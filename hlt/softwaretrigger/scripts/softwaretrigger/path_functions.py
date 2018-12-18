@@ -106,24 +106,38 @@ def add_pxd_fullframe_phase2(path):
 
 
 def add_pxd_fullframe_phase3_early(path):
-    list = [[1, 1, 1], [1, 1, 2], [1, 2, 1], [1, 2, 2], [1, 3, 1], [1, 3, 2], [1, 4, 1], [1, 4, 2],
-            [1, 5, 1], [1, 5, 2], [1, 6, 1], [1, 6, 2], [1, 7, 1], [1, 7, 2], [1, 8, 1], [1, 8, 2],
-            [2, 4, 1], [2, 4, 2], [2, 5, 1], [2, 5, 2]]
+    modules = []
+    for layer in [1, 2]:
+        if layer == 1:
+            min_ladder = 1
+            max_ladder = 8
+        elif layer == 2:
+            min_ladder = 4
+            max_ladder = 5
+        for ladder in range(min_ladder, max_ladder + 1):
+            for sensor in [1, 2]:
+                modules.append((layer, ladder, sensor))
 
-    for (layer, ladder, sensor) in list:
+    for (layer, ladder, sensor) in modules:
         path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
                         Layer=layer, Ladder=ladder, Sensor=sensor,
                         MinU=0, MaxU=249, MinV=0, MaxV=767)
 
 
 def add_pxd_fullframe_phase3(path):
-    list = [[1, 1, 1], [1, 1, 2], [1, 2, 1], [1, 2, 2], [1, 3, 1], [1, 3, 2], [1, 4, 1], [1, 4, 2],
-            [1, 5, 1], [1, 5, 2], [1, 6, 1], [1, 6, 2], [1, 7, 1], [1, 7, 2], [1, 8, 1], [1, 8, 2],
-            [2, 1, 1], [2, 1, 2], [2, 2, 1], [2, 2, 2], [2, 3, 1], [2, 3, 2], [2, 4, 1], [2, 4, 2],
-            [2, 5, 1], [2, 5, 2], [2, 6, 1], [2, 6, 2], [2, 7, 1], [2, 7, 2], [2, 8, 1], [2, 8, 2],
-            [2, 9, 1], [2, 9, 2], [2, 10, 1], [2, 10, 2], [2, 11, 1], [2, 11, 2], [2, 12, 1], [2, 12, 2]]
+    modules = []
+    for layer in [1, 2]:
+        if layer == 1:
+            min_ladder = 1
+            max_ladder = 8
+        elif layer == 2:
+            min_ladder = 1
+            max_ladder = 12
+        for ladder in range(min_ladder, max_ladder + 1):
+            for sensor in [1, 2]:
+                modules.append((layer, ladder, sensor))
 
-    for (layer, ladder, sensor) in list:
+    for (layer, ladder, sensor) in modules:
         path.add_module('ROIGenerator', ROIListName='ROIs', nROIs=1, TrigDivider=1,
                         Layer=layer, Ladder=ladder, Sensor=sensor,
                         MinU=0, MaxU=249, MinV=0, MaxV=767)

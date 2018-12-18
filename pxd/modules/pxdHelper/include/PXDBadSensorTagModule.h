@@ -31,14 +31,13 @@ namespace Belle2 {
     class PXDBadSensorTagModule : public Module {
 
     public:
-      /** Constructor defining the parameters */
+      /** Constructor */
       PXDBadSensorTagModule();
 
     private:
 
       /** Initialize the module */
       void initialize() override final;
-      /** do the unpacking */
       void event() override final;
 
       std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
@@ -51,6 +50,8 @@ namespace Belle2 {
 
       /** Cuts fore each module */
       std::map <VxdID, int> m_cut;
+      /** Minimum charge for a digit to carry */
+      int m_0cut;
 
     };//end class declaration
 

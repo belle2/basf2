@@ -26,6 +26,7 @@ PXDBadSensorTagModule::PXDBadSensorTagModule() :
   //Set module properties
   setDescription("Mark bad-data PXD modules");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a raw hit to carry", 0);
 }
 
 void PXDBadSensorTagModule::initialize()
@@ -63,9 +64,9 @@ void PXDBadSensorTagModule::initialize()
 
 void PXDBadSensorTagModule::event()
 {
-  std::map <VxdID, int> freq;
+  std::map <VxdID, int> freq;// count the number of RawHits per sensor
   for (auto& p : m_storeRawHits) {
-    // if c.getSensorID() == a and c.getCharge()>15 and c.getCharge()<250]
+    if (p.getCharge() < m_0cut) continue;// only count above some threshold
     freq[p.getSensorID()]++;
   }
 

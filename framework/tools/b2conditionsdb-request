@@ -28,13 +28,15 @@ def input_editor(default=None):
     Adapted from https://chase-seibert.github.io/blog/2012/10/31/python-fork-exec-vim-raw-input.html
     """
     # get editor from environment
-    editor = (os.environ.get('VISUAL') or os.environ.get('EDITOR') or 'vi')
+    editor_command = (os.environ.get('VISUAL') or os.environ.get('EDITOR') or 'vi')
+    # split editor_command in case it contains cli arguments/options seperated by whitespace
+    editor_command_list = editor_command.split()
 
     with tempfile.NamedTemporaryFile(mode='r+') as tmpfile:
         if default:
             tmpfile.write(default)
             tmpfile.flush()
-        subprocess.check_call([editor, tmpfile.name])
+        subprocess.check_call(editor_command_list + [tmpfile.name])
         tmpfile.seek(0)
         return tmpfile.read().strip()
 

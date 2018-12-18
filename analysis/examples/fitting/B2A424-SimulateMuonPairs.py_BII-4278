@@ -13,27 +13,27 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
 from ROOT import Belle2
 from beamparameters import add_beamparameters
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10])
 main.add_module(eventinfosetter)
 
 beamparameters = add_beamparameters(main, "Y4S")
 beamparameters.param("smearVertex", False)
 beamparameters.param("smearEnergy", False)
-print_params(beamparameters)
+b2.print_params(beamparameters)
 
 # muon pair generator (BABAYAGA.NLO, born only)
-babayaganlo = register_module('BabayagaNLOInput')
+babayaganlo = b2.register_module('BabayagaNLOInput')
 babayaganlo.param('FinalState', 'mm')  # ee, gg, mm
 babayaganlo.param('SearchMax', 10000)
 babayaganlo.param('VacuumPolarization', 'hlmnt')
@@ -62,5 +62,5 @@ add_mdst_output(
 main.add_module('ProgressBar')
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

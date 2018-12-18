@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
+#######################################################
 #
 # Stuck? Ask for help at questions.belle2.org
 #
-# This tutorial demonstrates how to perform Vertex fits
-# using Rave. The following  decay chain (and c.c. decay
-# chain):
+# This tutorial demonstrates how to perform mass constraine
+# Vertex fits using Rave. The following  decay chain
+# (and c.c. decay chain):
+#
 #
 # D*+ -> D0 pi+
 #        |
@@ -19,10 +20,8 @@
 # Note: This example is build upon
 # B2A301-Dstar2D0Pi-Reconstruction.py
 #
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
-#
 # Contributors: L. Li Gioi (October 2014)
+#               I. Komarov (Demeber 2017)
 #
 ######################################################
 
@@ -33,7 +32,6 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import vertexRave
 from modularAnalysis import massVertexRave
-from modularAnalysis import vertexRaveDaughtersUpdate
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
 import variables.collections as vc
@@ -44,9 +42,8 @@ my_path = b2.create_path()
 
 # load input ROOT file
 inputMdst(environmentType='default',
-             filename=b2.find_file('mdst_000001_prod00002171_task00000001.root', 'examples', False),
-             path=my_path)
-
+          filename=b2.find_file('mdst_000001_prod00002171_task00000001.root', 'examples', False),
+          path=my_path)
 
 # use standard final state particle lists
 #
@@ -60,31 +57,22 @@ stdK('loose', path=my_path)
 # reconstruct D0 -> K- pi+ decay
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
-reconstructDecay('D0:st -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
-reconstructDecay('D0:du -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
+reconstructDecay('D0:kpi_mass -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
 
 # perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-massVertexRave('D0:kpi', 0.0, path=my_path)
+vertexRave('D0:kpi', 0.0, path=my_path)
 
-# perform D0 single track fit (production vertex)
-# D0 vertex and covariance matrix must be defined
-vertexRave('D0:st', 0.0, path=my_path)
+# perform mass constrained D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D0:st', 0.0, '^D0 -> K- pi+', 'ipprofile', path=my_path)
+massVertexRave('D0:kpi_mass', 0.0, path=my_path)
 
-# perform D0 vertex fit updating daughters
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRaveDaughtersUpdate('D0:du', 0.0, path=my_path)
-
-# reconstruct 3 times the D*+ -> D0 pi+ decay
+# reconstruct two D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
 # and D* CMS momentum > 2.5 GeV
 reconstructDecay('D*+:1 -> D0:kpi pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
-reconstructDecay('D*+:2 -> D0:kpi pi+:all',
-                 '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
-reconstructDecay('D*+:3 -> D0:kpi pi+:all',
+reconstructDecay('D*+:2 -> D0:kpi_mass pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
 
 # perform D*+ kinematic vertex fit using the D0 and the pi+
@@ -95,48 +83,29 @@ vertexRave('D*+:1', 0.0, path=my_path)
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 vertexRave('D*+:2', 0.0, '', 'ipprofile', path=my_path)
 
-# perform D*+ kinematic beam spot constrined vertex fit using only the pi+
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:3', 0.0, 'D*+ -> D0 ^pi+', 'ipprofile', path=my_path)
-
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+:1', path=my_path)
 matchMCTruth('D*+:2', path=my_path)
-matchMCTruth('D*+:3', path=my_path)
 
 # Select variables that we want to store to ntuple
 dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth + \
-    vc.mc_flight_info + vc.flight_info + vc.vertex
+    vc.mc_flight_info + vc.flight_info
 
 fs_hadron_vars = vu.create_aliases_for_selected(
     vc.pid + vc.track + vc.mc_truth,
     'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
 d0_vars = vu.create_aliases_for_selected(
-    vc.inv_mass + vc.mc_truth + vc.vertex,
+    vc.inv_mass + vc.mc_truth,
     'D*+ -> ^D0 pi+', 'D0')
 
-dstt = vc.event_meta_data + vc.kinematics + vc.vertex + vc.mc_vertex + vc.flight_info + \
-    vu.create_aliases_for_selected(
-        vc.kinematics,
-        '^D0 -> ^K- ^pi+')
-
-dstu = vc.kinematics + vu.create_aliases_for_selected(
-    vc.kinematics,
-    '^D0 -> ^K- ^pi+')
 
 # Saving variables to ntuple
-output_file = 'B2A406-Rave-DecayStringVertexFit.root'
+output_file = 'B2A405-Rave-MassVertexFit.root'
 variablesToNtuple('D*+:1', dstar_vars + d0_vars + fs_hadron_vars,
                   filename=output_file, treename='dsttree1', path=my_path)
 variablesToNtuple('D*+:2', dstar_vars + d0_vars + fs_hadron_vars,
                   filename=output_file, treename='dsttree2', path=my_path)
-variablesToNtuple('D*+:3', dstar_vars + d0_vars + fs_hadron_vars,
-                  filename=output_file, treename='dsttree3', path=my_path)
-variablesToNtuple('D0:st', dstt,
-                  filename=output_file, treename='d0tree1', path=my_path)
-variablesToNtuple('D0:du', dstu,
-                  filename=output_file, treename='d0tree2', path=my_path)
 
 
 # Process the events

@@ -31,7 +31,7 @@ import variables.utils as vu
 
 # create path
 mypath = b2.create_path()
-	
+
 b2.set_log_level(b2.LogLevel.WARNING)
 
 # not necessary, but set it explicitly
@@ -41,7 +41,7 @@ b2.print_params(beamparameters)
 # Input file(s).
 inputMdst(environmentType='default',
           filename=b2.find_file('B2A424-SimulateMuonPairs.root', 'examples', False),
-	  path=mypath)
+          path=mypath)
 
 # use standard final state particle lists for muons
 fillParticleList('mu-:z0', 'chiProb > 0.001 and p > 1.0', path=mypath)

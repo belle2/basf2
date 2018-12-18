@@ -35,15 +35,15 @@ from modularAnalysis import variablesToNtuple
 from stdPhotons import stdPhotons
 import variables.collections as vc
 import variables.utils as vu
-#b2.use_central_database('GT_gen_data_004.51_reprocessing-release-01-02-03')
+# b2.use_central_database('GT_gen_data_004.51_reprocessing-release-01-02-03')
 
 # create path
 my_path = b2.create_path()
 
 # load input ROOT file
 inputMdst(environmentType='default',
-             filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
-             path=my_path)
+          filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
+          path=my_path)
 
 
 # Creates a list of good pions and kaons with some PID and IP cut

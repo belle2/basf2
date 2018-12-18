@@ -41,8 +41,8 @@ my_path = b2.create_path()
 
 # load input ROOT file
 inputMdst(environmentType='default',
-             filename=b2.find_file('darkphotonmumu_mdst.root', 'examples', False),
-             path=my_path)
+          filename=b2.find_file('darkphotonmumu_mdst.root', 'examples', False),
+          path=my_path)
 
 # Creates a list of good photon and muons
 fillParticleList("gamma:sel", 'E > 0.1 and abs(formula(clusterTiming/clusterErrorTiming)) < 1.0', path=my_path)

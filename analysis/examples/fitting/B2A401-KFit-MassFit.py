@@ -39,8 +39,8 @@ my_path = b2.create_path()
 
 # load input ROOT file
 inputMdst(environmentType='default',
-             filename=b2.find_file('mdst-B0D0pi0.root', 'examples', False),
-             path=my_path)
+          filename=b2.find_file('mdst-B0D0pi0.root', 'examples', False),
+          path=my_path)
 
 # use standard final state particle lists
 #

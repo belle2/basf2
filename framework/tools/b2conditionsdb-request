@@ -245,27 +245,32 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if len(set(data.keys()) & set(['data', 'mc', 'analysis'])) > 0:
-        prompt_string = "Enter detailed instructions about targeted global tags/releases and the update procedure"
+        # Ask user to enter detailed instructions. For this multiline input, offer option to use temporary editor
+        prompt_string = 'Enter detailed instructions about targeted global tags/releases and the update procedure'
         print(prompt_string)
-        try:
-            editor_command = get_editor()
-            # define comment to show at the start of the temporary input file to guide the user
-            initial_comment_prompt = (
-                f"# {prompt_string}\n"
-                + "# Lines starting with `#` will be ignored\n"
-                + f"# Currently in editor '{editor_command}'. When finished, save and quit\n"
-            )
-            if 'vi' in editor_command:
-                initial_comment_prompt += "# Use :wq in vi(m) or :q! to discard changes\n"
+        editor_command = get_editor()
+        if input(f"Use editor '{editor_command}' (e) or command line (c) [e] for input? ").lower() in ['e', '']:
+            try:
+                # define comment to show at the start of the temporary input file to guide the user
+                initial_comment_prompt = (
+                    f"# {prompt_string}\n"
+                    + "# Lines starting with `#` will be ignored\n"
+                    + f"# Currently in editor '{editor_command}'. When finished, save and quit\n"
+                )
+                if 'vi' in editor_command:
+                    initial_comment_prompt += "# Use :wq in vi(m) or :q! to discard changes\n"
 
-            details_input_string = input_editor(initial_content=initial_comment_prompt,
-                                                editor_command=editor_command,
-                                                commentlines_start_with="#")
+                details_input_string = input_editor(initial_content=initial_comment_prompt,
+                                                    editor_command=editor_command,
+                                                    commentlines_start_with="#")
 
-        except (FileNotFoundError or CalledProcessError):
-            # If file not found, fall back to command line input
-            print(f"Could not open editor '{editor_command}'")
-            print("Input details in command line instead and hit CTRL-D to finish")
+            except (FileNotFoundError or CalledProcessError):
+                # If file not found, fall back to command line input
+                print(f"Could not open editor '{editor_command}'")
+                print("Input detailed instructions in command line instead and hit CTRL-D to finish")
+                details_input_string = sys.stdin.readlines()
+        else:
+            print("Input detailed instructions in command line instead and hit CTRL-D to finish")
             details_input_string = sys.stdin.readlines()
 
         data['details'] = details_input_string

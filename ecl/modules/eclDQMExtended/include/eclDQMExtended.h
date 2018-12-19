@@ -113,66 +113,66 @@ namespace Belle2 {
     std::vector<short int>  v_totalthrAhard;
 
     /** Signal amplitude obtaining from DSP emulator. */
-    int m_AmpFit;
+    int m_AmpFit{0};
     /** Signal time obtaining from DSP emulator. */
-    int m_TimeFit;
+    int m_TimeFit{0};
     /** Quality flag obtaining from DSP emulator. */
-    int m_QualityFit;
+    int m_QualityFit{0};
 
     /** Signal amplitude from ECL data. */
-    int m_AmpData;
+    int m_AmpData{0};
     /** Signal time from ECL data. */
-    int m_TimeData;
+    int m_TimeData{0};
     /** Quality flag from ECL data. */
-    int m_QualityData;
+    int m_QualityData{0};
 
     /** Cell ID number. */
-    int m_CellId;
+    int m_CellId{0};
     /** Trigger time value. */
-    int m_TrigTime;
+    int m_TrigTime{0};
 
     /** Histogram: Amplitude for time mismatches w/ QualityData == 0. */
-    TH1F* h_amp_timefail_q0;
+    TH1F* h_amp_timefail_q0{nullptr};
     /** Histogram: Amplitude for time mismathes w/ QualityData == 3. */
-    TH1F* h_amp_timefail_q3;
+    TH1F* h_amp_timefail_q3{nullptr};
     /** Histogram: Amplitude for QualityFit == 0 && QualityData == 3. */
-    TH1F* h_amp_qf0_qd3;
+    TH1F* h_amp_qf0_qd3{nullptr};
     /** Histogram: Amplitude for QualityFit == 3 && QualityData == 0. */
-    TH1F* h_amp_qf3_qd0;
+    TH1F* h_amp_qf3_qd0{nullptr};
     /** Histogram: Time for QualityFit == 0 && QualityData == 3. */
-    TH1F* h_time_qf0_qd3;
+    TH1F* h_time_qf0_qd3{nullptr};
     /** Histogram: Time for QualityFit == 3 && QualityData == 0. */
-    TH1F* h_time_qf3_qd0;
+    TH1F* h_time_qf3_qd0{nullptr};
 
     /**  Histogram: Amp. Control flags in bins of QualityData. */
-    TH1F* h_ampfail_quality;
+    TH1F* h_ampfail_quality{nullptr};
     /** Histogram: Time control flags in bins of QualityData. */
-    TH1F* h_timefail_quality;
+    TH1F* h_timefail_quality{nullptr};
     /** Histogram: CellIDs w/ failed amplitudes. */
-    TH1F* h_ampfail_cellid;
+    TH1F* h_ampfail_cellid{nullptr};
     /** Histogram: CellIDs w/ failed times. */
-    TH1F* h_timefail_cellid;
+    TH1F* h_timefail_cellid{nullptr};
     /** Histogram: CellIDs w/ failed qualities. */
-    TH1F* h_qualityfail_cellid;
+    TH1F* h_qualityfail_cellid{nullptr};
 
     /** Histogram: Amplitude diff. (Emulator - Data) for amp. fails. */
-    TH2F* h_ampdiff_cellid;
+    TH2F* h_ampdiff_cellid{nullptr};
     /** Histogram: Time diff.(Emulator-Data) for time fails. */
-    TH2F* h_timediff_cellid;
+    TH2F* h_timediff_cellid{nullptr};
     /** Histogram: Amp. diff. (Emulator-Data) for amp. fails in bins of QualityData. */
-    TH2F* h_ampdiff_quality;
+    TH2F* h_ampdiff_quality{nullptr};
     /** Histogram: Time diff. (Emulator-Data) for time fails in bins of QualityData. */
-    TH2F* h_timediff_quality;
+    TH2F* h_timediff_quality{nullptr};
     /** Histogram: Amp. diff. (Emulator-Data) for amp. fails in bins of Shaper Id. */
-    TH2F* h_ampdiff_shaper;
+    TH2F* h_ampdiff_shaper{nullptr};
     /** Histogram: Time diff. (Emulator-Data) for time fails in bins of Shaper Id. */
-    TH2F* h_timediff_shaper;
+    TH2F* h_timediff_shaper{nullptr};
     /** Histogram: QualityFit vs QualityData for quality fails. */
-    TH2F* h_quality_fit_data;
+    TH2F* h_quality_fit_data{nullptr};
     /** Histogram: Amp flag (0/1) w/ failed qualities in bins of QualityData. */
-    TH2F* h_ampflag_qualityfail;
+    TH2F* h_ampflag_qualityfail{nullptr};
     /**Histogram: Time flag (0/1) w/ failed qualities in bins of Quality Data. */
-    TH2F* h_timeflag_qualityfail;
+    TH2F* h_timeflag_qualityfail{nullptr};
 
 
     /** Convert a CellID number to the global Shaper number. */

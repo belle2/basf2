@@ -30,7 +30,6 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
 from vertex import vertexRave
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import fillParticleList

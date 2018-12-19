@@ -31,7 +31,6 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
 from modularAnalysis import vertexRave
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
@@ -97,7 +96,7 @@ variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
 
 
 # Process the events
-b2.process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
 print(b2.statistics)

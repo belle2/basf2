@@ -84,7 +84,7 @@ ROISenderModule::event()
               " ROI payload too long." << endl <<
               " Payload length     = " << length << endl <<
               " Message max lengtt = " << m_messageQueueMsgSize << endl);
-    B2FATAL("This will result in Event mismatch on EB!!!!!!");
+    B2FATAL("We stop here, as this will result in event mismatch on EB! Please increase message length on HLT and/or check size limit in ROIPayload Assembler");
   }
 
   // Calculate the time difference between now and the trigger time
@@ -96,12 +96,13 @@ ROISenderModule::event()
   using namespace std::chrono;
   nanoseconds ns = duration_cast< nanoseconds >(system_clock::now().time_since_epoch());
   Float_t deltaT = (std::chrono::duration_cast<seconds> (ns - (nanoseconds)meta_time)).count();
+  if (deltaT < 100) m_histo[int(deltaT)]++;
+  else m_histo[100]++;
   if (deltaT > 60) {
     B2ERROR("Event took too long on HLT, PXD data for Event might be lost!" << LogVar("deltaT in s", deltaT));
   } else if (deltaT > 30) {
     B2WARNING("Event took too long on HLT, PXD data for Event might be lost!" << LogVar("deltaT in s", deltaT));
   }
-
 }
 
 
@@ -112,6 +113,9 @@ ROISenderModule::terminate()
 {
   closeMessageQueue("on terminate");
   //  unlinkMessageQueue("on terminate");
+  B2RESULT("HLT Delay time distribution:");
+  int inx = 0;
+  for (auto& a : m_histo) B2RESULT(++inx << "s: " << a);
 }
 
 void

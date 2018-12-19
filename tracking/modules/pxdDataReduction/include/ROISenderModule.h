@@ -44,6 +44,8 @@ namespace Belle2 {
     StoreObjPtr<ROIpayload> m_roiPayload;
     /** Input ptr for EventMetaData. */
     StoreObjPtr<EventMetaData> m_eventMetaData;
+    /** poor mans histogramming in a vector */
+    std::vector <int> m_histo;
 
     /**
      *Initializes the Module.

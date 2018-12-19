@@ -8,6 +8,10 @@ This page explains the new features in the current release. This cannot cover
 all the changes in all packages but should help users to find out what needs to
 be adapted when changing to the new release.
 
+.. contents:: Table of Contents
+   :depth: 3
+   :local:
+
 .. after release-03 we can just add a new heading here and start collecting.
    That way it will be updated correctly in light releases and we don't have to
    change anything for release-04

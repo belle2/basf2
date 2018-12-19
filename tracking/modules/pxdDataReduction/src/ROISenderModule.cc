@@ -75,17 +75,19 @@ ROISenderModule::event()
   if (length <= m_messageQueueMsgSize) {
     ret = mq_send(m_messageQueue, data, length, 0 /* priority */);
 
-    if (ret == (mqd_t) - 1)
+    if (ret == (mqd_t) - 1) {
       B2FATAL(std::string(__FILE__) << ":" << __LINE__ <<
               ": error: " <<
               strerror(errno) <<
               " on mq_send");
+    }
   } else {
-    B2WARNING(std::string(__FILE__) << ":" << __LINE__  <<
-              " ROI payload too long." << endl <<
-              " Payload length     = " << length << endl <<
-              " Message max lengtt = " << m_messageQueueMsgSize << endl);
-    B2FATAL("We stop here, as this will result in event mismatch on EB! Please increase message length on HLT and/or check size limit in ROIPayload Assembler");
+    B2FATAL(std::string(__FILE__) << ":" << __LINE__  <<
+            "ROI payload too long." << endl <<
+            "Payload length     = " << length << endl <<
+            "Message max length = " << m_messageQueueMsgSize << endl <<
+            "We stop here, as this will result in event mismatch on EB! Please increase mqueue message length on HLT and/or check size limit in ROIPayload Assembler"
+            << endl);
   }
 
   // Calculate the time difference between now and the trigger time

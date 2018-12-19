@@ -103,6 +103,9 @@ The ``--json`` parameter can be used to get detailed output for all tests in a m
     }
 
 
+.. versionchanged:: release-03-00-00
+   files with zero events can now pass the checks
+
 .. _b2file-merge:
 
 ``b2file-merge``: Merge multiple basf2 output files
@@ -143,6 +146,12 @@ restrictions apply:
   exists and don't register in file catalog::
 
     $ b2file-merge -f -q --no-catalog full.root jobs/*.root
+
+
+.. versionchanged:: release-03-00-00
+   the tool now checks for consistency of the real/MC flag for all input files
+   and refues to merge mixed sets of real and MC data.
+
 
 ``b2file-mix``: Create a run of mixed data from a set of input files
 ---------------------------------------------------------------------------------

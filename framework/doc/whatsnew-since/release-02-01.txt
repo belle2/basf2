@@ -137,7 +137,7 @@ might notice are
 
   .. code-block:: c++
 
-     B2INFO("This is a log message" << LogVar("number", 3.14) << LogVar("text", "some text");
+     B2INFO("This is a log message" << LogVar("number", 3.14) << LogVar("text", "some text"));
 
   while in python the variables can be given as additional keyword arguments,
 
@@ -153,6 +153,8 @@ might notice are
      [INFO] This is a log message
              number = 3.14
              text = some text
+
+  .. seealso:: :ref:`logging_logvariables`
 
 * The logging system is now able to send its message to python `sys.stdout`
   objects to allow intercepting log messages in python. To enable please set

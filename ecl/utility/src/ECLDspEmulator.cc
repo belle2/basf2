@@ -18,6 +18,11 @@ namespace Belle2 {
       if (val > max) return max;
       return val;
     }
+
+    bool amplitudeOverflow(long long amp)
+    {
+      return amp > 262015;
+    }
   }
 }
 
@@ -28,6 +33,7 @@ namespace Belle2 {
                 int& m_AmpFit, int& m_TimeFit, int& m_QualityFit)
     {
       using namespace std;
+
       static long long int k_np[16] = {
         65536,
         32768,
@@ -47,36 +53,31 @@ namespace Belle2 {
         4096
       };
 
-      int ttrig;
-      int n16 = 16;
-      int kz_s =  0;
-
-      long long int z00;
-      long long int z0;
-
-      int it, it0;
-      int it_h, it_l;
-      long long A1, B1, A2, C1, ch1, ch2, B2, B3, B5;
-      int i, T;
-      ch1 = -1;
-      int lch3;
-
-      ttrig = ttrig2 / 6;
-      if (ttrig < 0) ttrig = 0;
+      const int ttrig = ttrig2 > 0 ? ttrig2 / 6 : 0;
+      const int n16 = 16;
+      const int kz_s = 0;
 
       if (k_16 + n16 != 16) {
         cout << "disagreement in number of the points " << k_16 << "and " << n16 << endl;
       }
 
+      long long z00 = 0;
+
+      // Time index, initial time index
+      int it, it0;
+      // Min time value, max time value
+      int it_l, it_h;
+      long long A1, B1, A2, C1, ch2, B2, B3, B5;
+
       int validity_code = 0;
-      for (i = k_16, z00 = 0; i < 16; i++) {
+      for (int i = k_16; i < 16; i++) {
         z00 += y[i];
-
       }
-      //initial time index
 
+      // initial time index
       it0 = 48 + ((23 - ttrig) << 2);
-      z0 = z00 >> kz_s;
+
+      const long long z0 = z00 >> kz_s;
 
       it_l = 0;
       it_h = 191;
@@ -88,21 +89,22 @@ namespace Belle2 {
 
       A2 = fg41[ttrig * 16] * z0;
 
-      for (i = 1; i < 16; i++) {
+      for (int i = 1; i < 16; i++) {
         A2 += y[15 + i] * (long long)fg41[ttrig * 16 + i];
       }
 
       A2 += (1 << (k_a - 1));
       A2 >>= k_a;
 
-      T = 0;
+      int T = 0;
+      long long ch1;
 
       //too large amplitude
-      if (A2 > 262015) {
+      if (amplitudeOverflow(A2)) {
         A1 = A2 >> 3;
         validity_code = 1;
 
-        if (A1 > 262015) A1 >>= 3;
+        if (amplitudeOverflow(A1)) A1 >>= 3;
         A1 -= 112;
         printf("%lld 2 \n", A1);
         goto ou;
@@ -117,7 +119,7 @@ namespace Belle2 {
           A1 = fg31[it * 16] * z0;
           B1 = fg32[it * 16] * z0;
 
-          for (i = 1; i < 16; i++) {
+          for (int i = 1; i < 16; i++) {
             A1 += fg31[it * 16 + i] * (long long)y[15 + i];
             B1 += fg32[it * 16 + i] * (long long)y[15 + i];
           }
@@ -134,15 +136,14 @@ namespace Belle2 {
             goto ou;
           }
 
-          if (A1 > 262015) {
+          if (amplitudeOverflow(A1)) {
             validity_code = 1;
             A1 = A1 >> 3;
-            if (A1 > 262015) A1 = A1 >> 3;
+            if (amplitudeOverflow(A1)) A1 = A1 >> 3;
             A1 = A1 - 112;
             printf("%lld 1\n", A1);
             goto ou;
           }
-          //===
 
           if (A1 < A0) {
             low_ampl = 1;
@@ -180,14 +181,11 @@ namespace Belle2 {
             T = setInRange(T, -2048, 2047);
 
             C1 = fg33[it * 16] * z0;
-            for (i = 1; i < 16; i++)
+            for (int i = 1; i < 16; i++)
               C1 += fg33[it * 16 + i] * y[15 + i];
             C1 += (1 << (k_c - 1));
             C1 >>= k_c;
-
-
           }
-
         } // for (iter...)
       } // if (low_ampl == 0)
 
@@ -201,7 +199,7 @@ namespace Belle2 {
         validity_code = 2;
         B1 = 0;
         C1 = fg43[ttrig * 16] * z0;
-        for (i = 1; i < 16; i++) {
+        for (int i = 1; i < 16; i++) {
           C1 += fg43[ttrig * 16 + i] * y[15 + i];
         }
         C1 += (1 << (k_c - 1));
@@ -214,8 +212,8 @@ namespace Belle2 {
       ch1 *= k_np[n16 - 1];
       ch1 >>= 16;
 
-      for (i = 1; i < 16; i++) {
-        ch2 = A1 * f[it * 16 + i] + B1 * f1[i + it * 16];
+      for (int i = 1; i < 16; i++) {
+        ch2 = A1 * f[it * 16 + i] + B1 * f1[it * 16 + i];
         ch2 >>= k1_chi;
         ch2 += C1 - y[i + 15];
 

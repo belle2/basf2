@@ -335,9 +335,6 @@ namespace Belle2 {
 
       //==
 
-      // TODO: Compare on large dataset.
-      // if (validity_code == c_LowAmp) T = 0;
-
       m_AmpFit = A1;
       m_TimeFit = T;
       m_QualityFit = validity_code;

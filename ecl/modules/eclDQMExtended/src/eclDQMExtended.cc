@@ -101,8 +101,7 @@ void ECLDQMEXTENDEDModule::defineHisto()
 
   // Create a separate histogram directory and cd into it.
 
-  TDirectory* dirDAQ = NULL;
-  dirDAQ = dynamic_cast<TDirectory*>(oldDir->Get(m_histogramDirectoryName.c_str()));
+  TDirectory* dirDAQ = dynamic_cast<TDirectory*>(oldDir->Get(m_histogramDirectoryName.c_str()));
   if (!dirDAQ) dirDAQ = oldDir->mkdir(m_histogramDirectoryName.c_str());
   dirDAQ->cd();
 
@@ -352,7 +351,6 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   short int* f, *f1, *fg41, *fg43, *fg31, *fg32, *fg33;
   int k_a, k_b, k_c, k_1, k_2, k_16, chi_thres;
   int A0, Ahard;
-  std::vector<short int> temp;
 
   map_vec = map_container_vec[iShaper];
   f    = vectorsplit(map_vec["F"], iChannelPosition);

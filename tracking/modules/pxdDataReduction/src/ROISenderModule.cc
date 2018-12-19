@@ -55,6 +55,7 @@ ROISenderModule::initialize()
     B2FATAL(__FILE__ << ":" << __LINE__ <<
             m_messageQueueName << " invalid. cfr: man mq_overview ");
 
+  m_histo.resize(101, 0); // 0-99, 100 is used as overflow bin
 
   //  unlinkMessageQueue("on initialize");
   openMessageQueue("on initialize");
@@ -90,14 +91,18 @@ ROISenderModule::event()
   // Calculate the time difference between now and the trigger time
   // This tells you how much delay we have summed up (it is NOT the processing time!)
   /** Time(Tag) from MetaInfo, ns since epoch */
-  unsigned long long int meta_time = 0;
-  meta_time = m_eventMetaData->getTime();
+  unsigned long long int meta_time = m_eventMetaData->getTime();
 
   using namespace std::chrono;
   nanoseconds ns = duration_cast< nanoseconds >(system_clock::now().time_since_epoch());
   Float_t deltaT = (std::chrono::duration_cast<seconds> (ns - (nanoseconds)meta_time)).count();
-  if (deltaT < 100) m_histo[int(deltaT)]++;
-  else m_histo[100]++;
+  if (deltaT < 0) {
+    m_histo[0]++;// just in case the clocks are slightly out of sync
+  } else if (deltaT < 100) {
+    m_histo[int(deltaT)]++;
+  } else {
+    m_histo[100]++;// overflow bin
+  }
   if (deltaT > 60) {
     B2ERROR("Event took too long on HLT, PXD data for Event might be lost!" << LogVar("deltaT in s", deltaT));
   } else if (deltaT > 30) {

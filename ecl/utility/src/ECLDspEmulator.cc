@@ -19,9 +19,11 @@ namespace Belle2 {
       return val;
     }
 
-    bool amplitudeOverflow(long long amp)
-    {
-      return amp > 262015;
+    namespace ShapeFitter {
+      bool amplitudeOverflow(long long amp)
+      {
+        return amp > 262015;
+      }
     }
   }
 }
@@ -32,6 +34,7 @@ namespace Belle2 {
                 int* y, int& ttrig2, int& A0, int& Ahard, int& k_a, int& k_b, int& k_c, int& k_16, int& k1_chi, int& k2_chi, int& chi_thres,
                 int& m_AmpFit, int& m_TimeFit, int& m_QualityFit)
     {
+      using namespace ShapeFitter;
       using namespace std;
 
       static long long int k_np[16] = {
@@ -113,6 +116,7 @@ namespace Belle2 {
       int low_ampl;
       if (A2 >= A0) low_ampl = 0;
       else low_ampl = 1;
+
 
       if (low_ampl == 0) {
         for (int iter = 1; iter <= 3; iter++) {

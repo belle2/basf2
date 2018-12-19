@@ -60,12 +60,12 @@ namespace Belle2 {
     /** typedef: histograms to be filled once per intercept + filling function*/
     typedef std::pair< TH1*, std::function< void(TH1*, const PXDIntercept*) > > InterHistoAndFill;
     /** map of histograms to be filled once per intercept */
-    std::unordered_multimap<Belle2::VxdID, InterHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > hInterDictionary;
+    std::unordered_multimap<Belle2::VxdID, InterHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > m_hInterDictionary;
 
     /** typedef: histograms to be filled once per roi + filling function*/
     typedef std::pair< TH1*, std::function< void(TH1*, const ROIid*) > > ROIHistoAndFill;
     /** map of histograms to be filled once per roi */
-    std::unordered_multimap<Belle2::VxdID, ROIHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > hROIDictionary;
+    std::unordered_multimap<Belle2::VxdID, ROIHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > m_hROIDictionary;
 
     /** struct: histograms to be filled once per event + filling fucntion + accumulate function*/
     struct ROIHistoAccumulateAndFill {
@@ -76,7 +76,7 @@ namespace Belle2 {
     };
     /** map of histograms to be filled once per event */
     std::unordered_multimap<Belle2::VxdID, ROIHistoAccumulateAndFill&, std::function<size_t (const Belle2::VxdID&) > >
-    hROIDictionaryEvt;
+    m_hROIDictionaryEvt;
 
     void createHistosDictionaries(); /**< create the dictionary*/
     void fillSensorROIHistos(const ROIid* roi); /**< fill histograms per sensor, filled once per ROI */
@@ -84,10 +84,10 @@ namespace Belle2 {
 
     int m_numModules; /**< number of modules*/
 
-    TH1F* hnROIs; /**< number of ROIs*/
-    TH1F* hnInter; /**< number of intercpets*/
-    TH1F* harea; /**< ROis area */
-    TH1F* hredFactor; /**< reduction factor*/
+    TH1F* m_hnROIs; /**< number of ROIs*/
+    TH1F* m_hnInter; /**< number of intercpets*/
+    TH1F* m_harea; /**< ROis area */
+    TH1F* m_hredFactor; /**< reduction factor*/
 
     void initialize(void) override final;
 

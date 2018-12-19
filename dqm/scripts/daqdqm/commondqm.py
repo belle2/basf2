@@ -65,6 +65,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'ECL' in components:
         ecldqm = register_module('ECLDQM')
         path.add_module(ecldqm)
+        ecldqmext = register_module('ECLDQMEXTENDED')
+        path.add_module(ecldqmext)
     # TOP
     if components is None or 'TOP' in components:
         topdqm = register_module('TOPDQM')

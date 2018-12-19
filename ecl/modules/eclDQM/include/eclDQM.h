@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
- * ECL Data Quality Monitor                                               *
+ * ECL Data Quality Monitor (First Module)                                *
  *                                                                        *
  * This module provides histograms for ECL Data Quality Monitoring        *
  *                                                                        *
@@ -32,15 +32,15 @@ class TH2F;
 
 namespace Belle2 {
 
-  /**
-   * This module is for ECL Data Quality Monitor.
-   */
   class ECLDigit;
   class EventMetaData;
   class ECLDsp;
   class ECLTrig;
   class ECLCalDigit;
 
+  /**
+   * This module is created to monitor ECL Data Quality.
+   */
   class ECLDQMModule : public HistoModule {  /**< derived from HistoModule class. */
 
   public:

@@ -120,9 +120,10 @@ ROISenderModule::terminate()
 {
   closeMessageQueue("on terminate");
   //  unlinkMessageQueue("on terminate");
-  B2RESULT("HLT Delay time distribution:");
-  int inx = 0;
-  for (auto& a : m_histo) B2RESULT(++inx << "s: " << a);
+  string str = "HLT Delay time distribution: ( ";
+  for (auto& a : m_histo) str += to_string(a) + ";";
+  str += " )";
+  B2RESULT(str);
 }
 
 void

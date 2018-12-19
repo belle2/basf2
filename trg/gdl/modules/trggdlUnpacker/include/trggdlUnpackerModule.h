@@ -28,7 +28,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-#include <trg/gdl/dbobjects/TRGGDLDBBadrun.h>
+#include <framework/dbobjects/TRGGDLDBBadrun.h>
 
 namespace Belle2 {
 

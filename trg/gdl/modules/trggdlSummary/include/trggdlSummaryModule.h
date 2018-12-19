@@ -9,9 +9,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/TRGGDLDBPrescales.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-#include <trg/gdl/dbobjects/TRGGDLDBPrescales.h>
-#include <trg/gdl/dbobjects/TRGGDLDBFTDLBits.h>
 
 #include <TH2I.h>
 #include <TH1I.h>
@@ -46,6 +45,8 @@ namespace Belle2 {
 
     //condition database for unpacer
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
+    //condition database for prescales
+    DBObjPtr<TRGGDLDBPrescales> m_prescales;
     int LeafBitMap[320];
     char LeafNames[320][100];
     int _e_timtype;

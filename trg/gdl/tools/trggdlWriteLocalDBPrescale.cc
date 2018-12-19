@@ -15,7 +15,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/LogSystem.h>
-#include <trg/gdl/dbobjects/TRGGDLDBPrescales.h>
+#include <framework/dbobjects/TRGGDLDBPrescales.h>
 #include <iostream>
 #include <fstream>
 //#include <TFile.h>

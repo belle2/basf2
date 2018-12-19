@@ -190,11 +190,11 @@ namespace Belle2 {
      * @return Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
     short int gethT() const { return m_hitThresh; }
-    /** chi2 threshold for fit quality flag */
+    /** Base value of chi2 threshold for fit quality flag */
     short int getchiThresh() const { return m_chiThresh; }
-    /** multipliers power of 2 for f, f1 */
+    /** Bit shift from chi2 calculation */
     unsigned char getk1() const { return m_k1Chi; }
-    /** multipliers power of 2 for chi2 calculation */
+    /** Bit shift for chi2 threshold calculation */
     unsigned char getk2() const { return m_k2Chi; }
     /** Number of bits for FG31, FG41 */
     unsigned char getka() const { return m_ka; }
@@ -202,7 +202,7 @@ namespace Belle2 {
     unsigned char getkb() const { return m_kb; }
     /** Number of bits for FG33, FG43 */
     unsigned char getkc() const { return m_kc; }
-    /** start point for pedestal calculation */
+    /** Start point for pedestal calculation */
     unsigned char gety0Startr() const { return m_y0Startr; }
 
     /** Return ShaperDSP board number, 0..11 */

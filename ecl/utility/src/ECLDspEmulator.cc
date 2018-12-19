@@ -58,28 +58,25 @@ namespace Belle2 {
 
       const int ttrig = ttrig2 > 0 ? ttrig2 / 6 : 0;
       const int n16 = 16;
-      const int kz_s = 0;
 
       if (k_16 + n16 != 16) {
         cout << "disagreement in number of the points " << k_16 << "and " << n16 << endl;
       }
 
-      long long z00 = 0;
-
-      // Time index, initial time index
-      int it, it0;
+      // Initial time index
+      int it0 = 48 + ((23 - ttrig) << 2);
+      // Time index
+      int it;
       // Min time value, max time value
       int it_l, it_h;
       long long A1, B1, A2, C1, ch2, B2, B3, B5;
 
-      int validity_code = 0;
+      long long z00 = 0;
       for (int i = k_16; i < 16; i++) {
         z00 += y[i];
       }
 
-      // initial time index
-      it0 = 48 + ((23 - ttrig) << 2);
-
+      const int kz_s = 0;
       const long long z0 = z00 >> kz_s;
 
       it_l = 0;
@@ -92,16 +89,18 @@ namespace Belle2 {
 
       A2 = fg41[ttrig * 16] * z0;
 
-      for (int i = 1; i < 16; i++) {
+      for (int i = 1; i < 16; i++)
         A2 += y[15 + i] * (long long)fg41[ttrig * 16 + i];
-      }
 
       A2 += (1 << (k_a - 1));
       A2 >>= k_a;
 
       int T = 0;
       long long ch1;
+      int validity_code = 0;
+      bool skip_fit = false;
 
+      //************* SCOPE (A1, validity_code) <= (A2)
       //too large amplitude
       if (amplitudeOverflow(A2)) {
         A1 = A2 >> 3;
@@ -110,15 +109,17 @@ namespace Belle2 {
         if (amplitudeOverflow(A1)) A1 >>= 3;
         A1 -= 112;
         printf("%lld 2 \n", A1);
-        goto ou;
+        skip_fit = true;
       }
+      //************* ENDSCOPE
 
-      int low_ampl;
-      if (A2 >= A0) low_ampl = 0;
-      else low_ampl = 1;
+      bool low_ampl = false;
+      if (A2 < A0) low_ampl = true;
 
+      // fitForNormalAmplitude(fg31, fg32, fg33, it0, A0, it_l, it_h, k_a, k_b, k_c, A1, B1, B2, B3, B5, C1, T, validity_code);
 
-      if (low_ampl == 0) {
+      //=== SCOPE (A1, B1, B2, B3, B5, C1, T, validity_code) <= (it0, A0, fg__, it_l, it_h, k_a, k_b, k_c)
+      if (!skip_fit && !low_ampl) {
         for (int iter = 1; iter <= 3; iter++) {
           A1 = fg31[it * 16] * z0;
           B1 = fg32[it * 16] * z0;
@@ -130,6 +131,7 @@ namespace Belle2 {
           A1 += (1 << (k_a - 1));
           A1 >>= k_a;
 
+          //=== SCOPE (A1, validity_code) <- (A1, A2)
           if (A1 < -128) {
             validity_code = 1;
             A1 = -128;
@@ -137,21 +139,26 @@ namespace Belle2 {
               validity_code = 2;
               A1 = A2;
             }
-            goto ou;
+            skip_fit = true;
+            break;
           }
+          //===
 
+          //=== SCOPE (A1, validity_code) <- (A1)
           if (amplitudeOverflow(A1)) {
             validity_code = 1;
             A1 = A1 >> 3;
             if (amplitudeOverflow(A1)) A1 = A1 >> 3;
             A1 = A1 - 112;
             printf("%lld 1\n", A1);
-            goto ou;
+            skip_fit = true;
+            break;
           }
+          //===
 
           if (A1 < A0) {
-            low_ampl = 1;
             it = it0;
+            low_ampl = true;
             break;
           }
 
@@ -172,13 +179,13 @@ namespace Belle2 {
             B2 += (A1 << 13);
             B3 = (B2 / A1);
 
-            T = ((it) << 3) + ((it) << 2) + (((B3 >> 1) + B3 + 2) >> 2) - 3072;
+            T = (it << 3) + (it << 2) + (((B3 >> 1) + B3 + 2) >> 2) - 3072;
 
             T = ((210 - ttrig2) << 3) - T;
 
             B1 = B5 >> 9;
-            B5 += (A1 << 9);
-            B3 = (B5 / A1);
+            B5 += A1 << 9;
+            B3 = B5 / A1;
             it += ((B3 + 1) >> 1) - 256;
             it = setInRange(it, it_l, it_h);
 
@@ -193,43 +200,44 @@ namespace Belle2 {
         } // for (iter...)
       } // if (low_ampl == 0)
 
-      if (low_ampl == 1) {
+      if (!skip_fit && low_ampl) {
         A1 = A2;
         if (A1 < -128) {
           validity_code = 1;
           A1 = -128;
-          goto ou;
+          skip_fit = true;
+        } else {
+          validity_code = 2;
+          B1 = 0;
+          C1 = fg43[ttrig * 16] * z0;
+          for (int i = 1; i < 16; i++)
+            C1 += fg43[ttrig * 16 + i] * y[15 + i];
+          C1 += (1 << (k_c - 1));
+          C1 >>= k_c;
         }
-        validity_code = 2;
-        B1 = 0;
-        C1 = fg43[ttrig * 16] * z0;
+      }
+
+      if (!skip_fit) {
+        ch2 = z00 - n16 * C1;
+
+        ch1 = ch2 * ch2;
+        ch1 *= k_np[n16 - 1];
+        ch1 >>= 16;
+
         for (int i = 1; i < 16; i++) {
-          C1 += fg43[ttrig * 16 + i] * y[15 + i];
+          ch2 = A1 * f[it * 16 + i] + B1 * f1[it * 16 + i];
+          ch2 >>= k1_chi;
+          ch2 += C1 - y[i + 15];
+
+          ch1 += ch2 * ch2;
         }
-        C1 += (1 << (k_c - 1));
-        C1 >>= k_c;
+        B2 = (A1 >> 1) * (A1 >> 1);
+        B2 >>= (k2_chi - 2);
+        B2 += chi_thres;
+        if (ch1 > B2 && validity_code != 2) validity_code = 3;
+        if (C1 < 0 && validity_code == 0) validity_code = 3;
       }
 
-      ch2 = z00 - n16 * C1;
-
-      ch1 = ch2 * ch2;
-      ch1 *= k_np[n16 - 1];
-      ch1 >>= 16;
-
-      for (int i = 1; i < 16; i++) {
-        ch2 = A1 * f[it * 16 + i] + B1 * f1[it * 16 + i];
-        ch2 >>= k1_chi;
-        ch2 += C1 - y[i + 15];
-
-        ch1 += ch2 * ch2;
-      }
-      B2 = (A1 >> 1) * (A1 >> 1);
-      B2 >>= (k2_chi - 2);
-      B2 += chi_thres;
-      if ((ch1 > B2) && (validity_code != 2))validity_code = 3;
-      if ((C1 < 0) && (validity_code == 0))validity_code = 3;
-
-ou:
       m_AmpFit = A1;
       m_TimeFit = T;
 
@@ -238,7 +246,6 @@ ou:
       if (ss <= Ahard) validity_code += 4;
 
       m_QualityFit = validity_code;
-
 
       return ;
     }

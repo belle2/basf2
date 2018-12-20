@@ -58,7 +58,7 @@ fitKinematic4C('Z0:mm_kinfit', path=mypath)
 # Select variables that we want to store to ntuple
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
 z0vars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
-    vc.create_aliases_for_selected(muvars, 'Z0 -> ^mu+ ^mu-')
+    vu.create_aliases_for_selected(muvars, 'Z0 -> ^mu+ ^mu-')
 
 z0uvars = z0vars + \
     vu.create_aliases(['OrcaKinFitProb', 'OrcaKinFitChi2', 'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")

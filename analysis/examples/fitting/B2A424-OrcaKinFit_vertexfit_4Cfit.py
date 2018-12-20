@@ -72,9 +72,9 @@ muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.pid + vc.momentum_u
 gammavars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.momentum_uncertainty
 avars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.momentum_uncertainty
 uvars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
-    vc.create_aliases_for_selected(muvars, 'beam -> [A -> ^mu+ ^mu-] gamma') + \
-    vc.create_aliases_for_selected(gammavars, 'beam -> A ^gamma') + \
-    vc.create_aliases_for_selected(avars, 'beam -> ^A gamma')
+    vu.create_aliases_for_selected(muvars, 'beam -> [A -> ^mu+ ^mu-] gamma') + \
+    vu.create_aliases_for_selected(gammavars, 'beam -> A ^gamma') + \
+    vu.create_aliases_for_selected(avars, 'beam -> ^A gamma')
 
 uvarsv = uvars + ['chiProb']
 

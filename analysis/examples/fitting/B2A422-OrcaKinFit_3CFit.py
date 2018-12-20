@@ -63,7 +63,7 @@ fitKinematic3C('Z0:mm_kinfit', path=mypath)
 
 mugvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertainty
 z0vars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
-    vc.create_aliases_for_selected(mugvars, 'Z0 -> ^gamma ^mu+ ^mu-')
+    vu.create_aliases_for_selected(mugvars, 'Z0 -> ^gamma ^mu+ ^mu-')
 
 z0uvars = z0vars + \
     vu.create_aliases(['OrcaKinFitProb',

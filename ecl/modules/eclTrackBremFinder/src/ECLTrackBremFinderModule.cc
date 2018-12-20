@@ -266,7 +266,6 @@ void ECLTrackBremFinderModule::event()
 
       // check for matches of the extrapolation of the virtual hits with the cluster position
       for (auto fitted_state : extrapolatedStates) {
-        //B2WARNING(fitted_state);
         auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
         if (bremFinder.isMatch()) {
           ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, bremFinder.getDistanceHitCluster(),

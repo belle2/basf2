@@ -105,11 +105,11 @@ def DstToD0PiD0ToKsOmega(path):
     reconstructDecay('omega:3pi -> pi+:loose pi-:loose pi0:mypi0', '0.65 < M < 0.9', path=path)
 
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    reconstructDecay('D0:KsEta -> K_S0:merged eta:3pi', charmcuts, path=path)
-    vertexTree('D0:KsEta', conf_level=0.001, path=path)
-    reconstructDecay('D0:KsOmega -> K_S0:merged omega:3pi', charmcuts, path=path)
-    vertexTree('D0:KsOmega', conf_level=0.001, path=path)
-    copyLists('D0:KsOmega', ['D0:KsEta', 'D0:KsOmega'], path=path)
+    reconstructDecay('D0:Eta -> K_S0:merged eta:3pi', charmcuts, path=path)
+    vertexTree('D0:Eta', conf_level=0.001, path=path)
+    reconstructDecay('D0:Omega -> K_S0:merged omega:3pi', charmcuts, path=path)
+    vertexTree('D0:Omega', conf_level=0.001, path=path)
+    copyLists('D0:KsOmega', ['D0:Eta', 'D0:Omega'], path=path)
 
     DstList = []
     reconstructDecay('D*+:KsOmega -> D0:KsOmega pi+:all', '0 < Q < 0.018', path=path)

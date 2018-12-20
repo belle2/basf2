@@ -2,18 +2,8 @@ import subprocess
 from skimExpertFunctions import *
 
 all_skims = [
-    "BtoPi0Pi0", "ALP3Gamma", "BottomoniumEtabExclusive", "BottomoniumUpsilon", "TauGeneric", "Semileptonic", "Quarkonium",
-    "SystematicsRadMuMu", "SystematicsRadEE", "LFVZpInvisible", "LFVZpVisible",
-    "SinglePhotonDark", "SystematicsTracking", "BottomoniumUpsilon",
-    "BottomoniumEtabExclusive", "SystematicsLambda", "Systematics",
-    "Resonance", "ISRpipicc", "BtoDh_Kspipipi0", "BtoPi0Pi0",
-    "CharmSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
-    "feiSLB0WithOneLep", "feiBplusWithOneLep", "feiHadronicB0",
-    "feiHadronicBplus", "Charm3BodyHadronic2",
-    "Charm3BodyHadronic", "Charm3BodyHadronicD0", "Charm2BodyHadronic",
-    "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "BtoDh_Kspi0", "BtoDh_hh",
-    "BtoDh_Kshh", "PRsemileptonicUntagged", "SLUntagged",
-    "LeptonicUntagged", "TCPV", "CharmRare", "BtoXll", "BtoXgamma", "TauLFV",
+    "Dark", "BtoCharmless", "BtoCharm", "CombinedSystematics", "EWP", "Tau", "MiscCombined", "feiHadronic", "ALP3Gamma",
+    "Semileptonic", "Quarkonium", "feiSLWithOneLepCombined"
 ]
 all_data_types = {
 
@@ -82,7 +72,7 @@ for skim in all_skims:
     for dtype, input_file in all_data_types.items():
         print(skim)
         print(dtype)
-        script = f"../standalone/{skim}_Skim_Standalone.py"
+        script = f"../combined/{skim}_Skim_Standalone.py"
         log_file = f"{skim}_{dtype}.out"
         err_file = f"{skim}_{dtype}.err"
         output_file = f"{skim}_{dtype}.udst.root"

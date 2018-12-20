@@ -1,7 +1,8 @@
 Changes in the framework package
 --------------------------------
 
-.. rubric:: Python Interface
+Python Interface
+++++++++++++++++
 
 The `basf2` python interface has been restructured into multiple files to ease
 maintenance. For the user this should be transparent. Some changes the user
@@ -32,7 +33,8 @@ might notice are
   from C++ programs and will display the output incrementally instead of
   waiting for all output before showing everything.
 
-.. rubric:: Command Line Tools:
+Command Line Tools
+++++++++++++++++++
 
 * :ref:`b2file-check <b2file-check>` now supports files with zero events correctly.
 
@@ -61,7 +63,8 @@ might notice are
   the official global tags.
 
 
-.. rubric:: Core framework:
+Core Framework
+++++++++++++++
 
 * ``Environment::isMC()`` is now available to consistently distinguish
   between real and MC data. To use it in C++ please use
@@ -94,7 +97,8 @@ might notice are
 * There is now support for named relations to allow multiple relations
   between the same pair of ``StoreArray``.
 
-.. rubric:: Core modules:
+Core Modules
+++++++++++++
 
 * The :b2:mod:`ProgressBar` module will now notice if the output is written to a log file
   instead of the terminal and behave accordingly which should clean up
@@ -127,7 +131,8 @@ might notice are
   information about each run now has support to contain the trigger pre-scale
   information.
 
-.. rubric:: Logging system
+Logging System
+++++++++++++++
 
 * We now have "Log message variables" which allow to send the same log
   message with varying content. This greatly helps with filtering log
@@ -167,7 +172,8 @@ might notice are
 
   .. seealso:: `basf2.logging.add_json() <basf2.LogPythonInterface.add_json>`
 
-.. rubric:: Utilities
+Utilities
++++++++++
 
 * We have a new and advanced formula parser implementation in the framework
   package. It manages to handle ``**`` correctly as in python and now allows
@@ -207,8 +213,5 @@ might notice are
   similar modules to allow having multiple ntuples or trees in the same root file.
 
 * We now have a implementation of the c++17 `std::visit overloaded pattern <https://en.cppreference.com/w/cpp/utility/variant/visit>`_ in ``framework/utils/Utils.h`` called ``Belle2::Utils::VisitOverload``.
-
-
-
 
 .. _Jupyter: https://jupyter.org/

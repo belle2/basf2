@@ -205,9 +205,9 @@ def CharmSemileptonicList(path):
     for chID, channel in enumerate(D_Channels):
         reconstructDecay('D0:std' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
         DList.append('D0:std' + str(chID))
-    copyLists('D0:all', DList)
+    copyLists('D0:SLall', DList)
 
-    DstarSLRecoilChannels = ['D0:all pi+:95eff',
+    DstarSLRecoilChannels = ['D0:SLall pi+:95eff',
                              ]
 
     antiD0List = []

@@ -727,10 +727,11 @@ class Validation:
         else:
             return None
 
-    def apply_package_selection(self, selected_packages, ignore_dependencies=False):
-        """
-        Only select packages from a specific set of packages, but still honor the
-        dependencies to outside scripts which may exist
+    def apply_package_selection(self, selected_packages,
+                                ignore_dependencies=False):
+        """!
+        Only select packages from a specific set of packages, but still
+        honor the dependencies to outside scripts which may exist
         """
 
         to_keep_dependencies = set()
@@ -742,7 +743,6 @@ class Validation:
                 if script_obj.package in selected_packages:
                     for dep in script_obj.dependencies:
                         to_keep_dependencies.add(dep.unique_name())
-
         # now, remove all scripts from the script list, which are either
         # not in the selected packages or have a dependency to them
         self.list_of_scripts = [
@@ -750,16 +750,30 @@ class Validation:
                 s.package in selected_packages) or (
                 s.unique_name() in to_keep_dependencies)]
 
-    def apply_script_selection(self, script_selection, ignore_dependencies=False):
+        # Check if some of the selected_packages were not found.
+        packages = set(s.package for s in self.list_of_scripts)
+        packages_not_found = list(set(selected_packages) - packages)
+        if packages_not_found:
+            msg = "You asked to select the package(s) {}, but they were not " \
+                  "found.".format(', '.join(packages_not_found))
+            self.log.note(msg)
+            self.log.warning(msg)
+
+    def apply_script_selection(self, script_selection,
+                               ignore_dependencies=False):
         """!
-        This method will take the validation file name ( e.g. "FullTrackingValidation.py" ), determine
-        all the script it depends on and set the status of theses scripts to "waiting",
-        The status of all other scripts will be set to "skipped", which means they will not be executed
-        in the validation run.  If ignore_dependencies is True, dependencies will also be set to "skipped".
+        This method will take the validation file name ( e.g.
+        "FullTrackingValidation.py" ), determine all the script it depends on
+        and set the status of theses scripts to "waiting", The status of all
+        other scripts will be set to "skipped", which means they will not be
+        executed in the validation run.  If ignore_dependencies is True,
+        dependencies will also be set to "skipped".
         """
 
         # change file extension
-        script_selection = [Script.sanitize_file_name(s) for s in script_selection]
+        script_selection = [
+            Script.sanitize_file_name(s) for s in script_selection
+        ]
 
         scripts_to_enable = set()
 
@@ -769,7 +783,8 @@ class Validation:
             script_obj = self.get_script_by_name(script)
 
             if script_obj is None:
-                self.log.error("Script with name {0} cannot be found, skipping for selection"
+                self.log.error("Script with name {0} cannot be found, "
+                               "skipping for selection"
                                .format(script))
                 continue
 
@@ -780,8 +795,8 @@ class Validation:
         # enable all selections and dependencies
         for script_obj in self.list_of_scripts:
             if script_obj.name in scripts_to_enable:
-                self.log.warning("Enabling script {0} because it was selected or a selected "
-                                 "script depends on it."
+                self.log.warning("Enabling script {0} because it was selected "
+                                 "or a selected script depends on it."
                                  .format(script_obj.name))
                 script_obj.status = ScriptStatus.waiting
             else:
@@ -789,6 +804,17 @@ class Validation:
                                  "selected."
                                  .format(script_obj.name))
                 script_obj.status = ScriptStatus.skipped
+
+        # Check if some of the selected_packages were not found.
+        script_names = set(
+            Script.sanitize_file_name(s.name) for s in self.list_of_scripts
+        )
+        scripts_not_found = set(script_selection) - script_names
+        if scripts_not_found:
+            msg = "You requested script(s) {}, but they seem to not have " \
+                  "been found.".format(", ".join(scripts_not_found))
+            self.log.note(msg)
+            self.log.warning(msg)
 
     def apply_script_caching(self):
         cacheable_scripts = [s for s in self.list_of_scripts if s.is_cacheable()]
@@ -1127,9 +1153,12 @@ def execute(tag=None, isTest=None):
         validation.log.note('Starting validation...')
         validation.log.note('Results will stored in a folder named "{0}"...'.
                             format(validation.tag))
-        validation.log.note('The log file(s) can be found at {}'.format(
+        validation.log.note('The (full) log file(s) can be found at {}'.format(
             ', '.join(get_log_file_paths(validation.log))
         ))
+        validation.log.note("Please check these logs when encountering "
+                            "unexpected results, as most of the warnings and "
+                            "errors are not written to stdout/stderr.")
 
         # Now we check whether we are running a complete validation or only
         # validating a certain set of packages:

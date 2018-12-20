@@ -1,6 +1,9 @@
 #include <mdst/dataobjects/TRGSummary.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 
 #include <TROOT.h>
 #include <TColor.h>
@@ -76,15 +79,10 @@ unsigned int TRGSummary::getPrescale(unsigned int bit) const
 
 unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
 {
-  //condition database for inputBits
-  DBObjPtr<TRGGDLDBInputBits> m_inputbits;
-  static std::string inputBitNames[c_trgWordSize * c_ntrgWords];
-  for (unsigned int i = 0; i < c_trgWordSize * c_ntrgWords; i++) {
-    inputBitNames[i] = m_inputbits->getinbitname((int)i);
-  }
+  static DBObjPtr<TRGGDLDBInputBits> inputBits;
 
   for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
-    if (inputBitNames[bit] == name) {
+    if (std::string(inputBits->getinbitname((int)bit)) == name) {
       return bit;
     }
   }
@@ -95,16 +93,10 @@ unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
 
 unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
 {
-
-  //condition database for FTDLBits
-  DBObjPtr<TRGGDLDBFTDLBits> m_ftdlbits;
-  static std::string outputBitNames[c_trgWordSize * c_ntrgWords];
-  for (unsigned int i = 0; i < c_trgWordSize * c_ntrgWords; i++) {
-    outputBitNames[i] = m_ftdlbits->getoutbitname((int)i);
-  }
+  static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
 
   for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
-    if (outputBitNames[bit] == name) {
+    if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {
       return bit;
     }
   }

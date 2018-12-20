@@ -12,10 +12,6 @@
 #define TRGSUMMARY_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/TRGGDLDBInputBits.h>
-#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
-#include <mdst/dbobjects/TRGGDLDBBadrun.h>
 
 #include <string>
 

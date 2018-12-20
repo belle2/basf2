@@ -28,8 +28,8 @@ import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 from validationscript import Script, ScriptStatus
-from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
-    parse_cmd_line_arguments
+from validationfunctions import get_start_time, get_validation_folders, \
+    scripts_in_dir, parse_cmd_line_arguments, get_log_file_paths
 import validationfunctions
 
 import validationserver
@@ -569,16 +569,16 @@ class Validation:
         # information available for debugging later.
 
         # Make sure the folder for the log file exists
-        log_dir = validationpath.get_results_tag_general_folder(self.work_folder, self.tag)
+        log_dir = self.get_log_folder()
         if not os.path.exists(log_dir):
             print("Creating " + log_dir)
             os.makedirs(log_dir)
 
         # Define the handler and its level (=DEBUG to get everything)
         file_handler = logging.FileHandler(
-            os.path.join(
-                validationpath.get_results_tag_general_folder(self.work_folder,
-                                                              self.tag), 'validate_basf2.log'), 'w+')
+            os.path.join(log_dir, 'validate_basf2.log'),
+            'w+'
+        )
         file_handler.setLevel(logging.DEBUG)
 
         # Format the handler. We want the datetime, the module that produced
@@ -646,18 +646,24 @@ class Validation:
         to be read in run_validation_server.py
         """
 
-        # Open the log for writing
-        list_failed = open(os.path.join(self.get_log_folder(), "list_of_failed_scripts.log"), "w+")
+        failed_log_path = os.path.join(
+            self.get_log_folder(),
+            "list_of_failed_scripts.log"
+        )
+        self.log.note("Writing list of failed scripts to {}.".format(
+            failed_log_path
+        ))
 
-        # Select only failed scripts
-        list_of_failed_scripts = [script for script in self.list_of_scripts if
-                                  script.status == ScriptStatus.failed]
+        with open(failed_log_path, "w+") as list_failed:
+            # Select only failed scripts
+            list_of_failed_scripts = [
+                script for script in self.list_of_scripts
+                if script.status == ScriptStatus.failed
+            ]
 
-        # log the name of all failed scripts
-        for script in list_of_failed_scripts:
-            list_failed.write(script.path.split("/")[-1] + "\n")
-        # close the log
-        list_failed.close()
+            # log the name of all failed scripts
+            for script in list_of_failed_scripts:
+                list_failed.write(script.path.split("/")[-1] + "\n")
 
     def log_skipped(self):
         """!
@@ -665,18 +671,24 @@ class Validation:
         to be read in run_validation_server.py
         """
 
-        # Open the log for writing
-        list_skipped = open(os.path.join(self.get_log_folder(), "list_of_skipped_scripts.log"), "w+")
+        skipped_log_path = os.path.join(
+            self.get_log_folder(),
+            "list_of_skipped_scripts.log"
+        )
+        self.log.note("Writing list of skipped scripts to {}.".format(
+            skipped_log_path
+        ))
 
-        # Select only failed scripts
-        list_of_skipped_scripts = [script for script in self.list_of_scripts if
-                                   script.status == ScriptStatus.skipped]
+        with open(skipped_log_path, "w+") as list_skipped:
+            # Select only failed scripts
+            list_of_skipped_scripts = [
+                script for script in self.list_of_scripts
+                if script.status == ScriptStatus.skipped
+            ]
 
-        # log the name of all failed scripts
-        for script in list_of_skipped_scripts:
-            list_skipped.write(script.path.split("/")[-1] + "\n")
-        # close the log
-        list_skipped.close()
+            # log the name of all failed scripts
+            for script in list_of_skipped_scripts:
+                list_skipped.write(script.path.split("/")[-1] + "\n")
 
     def set_runtime_data(self):
         """!
@@ -1115,6 +1127,9 @@ def execute(tag=None, isTest=None):
         validation.log.note('Starting validation...')
         validation.log.note('Results will stored in a folder named "{0}"...'.
                             format(validation.tag))
+        validation.log.note('The log file(s) can be found at {}'.format(
+            ', '.join(get_log_file_paths(validation.log))
+        ))
 
         # Now we check whether we are running a complete validation or only
         # validating a certain set of packages:

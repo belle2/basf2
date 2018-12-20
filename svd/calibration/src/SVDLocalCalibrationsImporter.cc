@@ -87,7 +87,7 @@ void SVDLocalCalibrationsImporter::importSVDHotStripsCalibrationsFromXML(const s
 {
   importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
       xmlFileName, "hot_strips",
-      -1.0, errorTollerant);
+      false, errorTollerant);
 }
 
 void SVDLocalCalibrationsImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)

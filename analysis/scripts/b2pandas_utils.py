@@ -7,7 +7,7 @@ from variables import variables as variable_manager
 from variables import std_vector
 
 """
-Python uilities to help create or manage ntuples and their work in pandas
+Python uilities to help create or manage ntuples and work with them in pandas
 """
 
 
@@ -75,8 +75,8 @@ class VariablesToHDF5(basf2.Module):
         buf["exp"] = self._evtmeta.getExperiment()
         buf["run"] = self._evtmeta.getRun()
         buf["evt"] = self._evtmeta.getEvent()
-        buf["_ncand_"] = len(buf)
-        buf["_icand_"] = np.arange(len(buf))
+        buf["ncand"] = len(buf)
+        buf["icand"] = np.arange(len(buf))
 
         for row, p in zip(buf, self._plist):
             for v in self._var_objects:

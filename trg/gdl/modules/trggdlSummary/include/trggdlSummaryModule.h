@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/TRGGDLDBPrescales.h>
+#include <mdst/dbobjects/TRGGDLDBPrescales.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 
 #include <TH2I.h>

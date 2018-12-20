@@ -13,9 +13,9 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/TRGGDLDBInputBits.h>
-#include <framework/dbobjects/TRGGDLDBFTDLBits.h>
-#include <framework/dbobjects/TRGGDLDBBadrun.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+#include <mdst/dbobjects/TRGGDLDBBadrun.h>
 
 #include <string>
 

@@ -8,7 +8,6 @@ all_skims = [
     "SinglePhotonDark", "SystematicsTracking", "BottomoniumUpsilon",
     "BottomoniumEtabExclusive", "SystematicsLambda", "Systematics",
     "Resonance", "ISRpipicc", "BtoDh_Kspipipi0", "BtoPi0Pi0",
-    # "CharmSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
     "BottomoniumEtabExclusive", "BottomoniumUpsilon",
     "feiSLB0WithOneLep", "feiBplusWithOneLep", "feiHadronicB0",
     "feiHadronicBplus", "BtoPi0Pi0", "Charm3BodyHadronic2",

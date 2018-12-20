@@ -11,7 +11,7 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
+from stdCharged import stdK, stdPi, stdE, stdMu
 from stdV0s import *
 from stdPi0s import *
 from skimExpertFunctions import *

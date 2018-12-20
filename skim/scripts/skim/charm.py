@@ -21,9 +21,9 @@ def D0ToHpJm(path):
 
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexKFit('D0:' + str(chID), 0.001, path=path)
-        D0List.append('D0:' + str(chID))
+        reconstructDecay('D0:HpJm' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexKFit('D0:HpJm' + str(chID), 0.001, path=path)
+        D0List.append('D0:HpJm' + str(chID))
 
     Lists = D0List
     return Lists
@@ -37,9 +37,9 @@ def DstToD0PiD0ToHpJm(path):
 
     DstList = []
     for chID, channel in enumerate(D0List):
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
-        vertexRave('D*+:' + str(chID), 0.001, path=path)
-        DstList.append('D*+:' + str(chID))
+        reconstructDecay('D*+:HpJm' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
+        vertexRave('D*+:HpJm' + str(chID), 0.001, path=path)
+        DstList.append('D*+:HpJm' + str(chID))
 
     return DstList
 
@@ -50,13 +50,13 @@ def DstToD0PiD0ToHpJmPi0(path):
     cutAndCopyList('pi0:myskim', 'pi0:skim', '0.11 < M < 0.15 and p > 0.28', path=path)
 
     DstList = []
-    reconstructDecay('D0:sig -> K-:loose pi+:loose pi0:myskim', charmcuts, path=path)
-    vertexTree('D0:sig', 0.001, path=path)
-    reconstructDecay('D*+:RS -> D0:sig pi+:all', Dstcuts, path=path)
-    reconstructDecay('D*-:WS -> D0:sig pi-:all', Dstcuts, path=path)
-    copyLists('D*+:sig', ['D*+:RS', 'D*+:WS'], path=path)
-    vertexKFit('D*+:sig', 0.001, path=path)
-    DstList.append('D*+:sig')
+    reconstructDecay('D0:HpJmPi0 -> K-:loose pi+:loose pi0:myskim', charmcuts, path=path)
+    vertexTree('D0:HpJmPi0', 0.001, path=path)
+    reconstructDecay('D*+:HpJmPi0RS -> D0:HpJmPi0 pi+:all', Dstcuts, path=path)
+    reconstructDecay('D*-:HpJmPi0WS -> D0:HpJmPi0 pi-:all', Dstcuts, path=path)
+    copyLists('D*+:HpJmPi0', ['D*+:HpJmPi0RS', 'D*+:HpJmPi0WS'], path=path)
+    vertexKFit('D*+:HpJmPi0', 0.001, path=path)
+    DstList.append('D*+:HpJmPi0')
 
     return DstList
 
@@ -72,11 +72,11 @@ def DstToD0PiD0ToHpHmPi0(path):
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexTree('D0:' + str(chID), 0.001, path=path)
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all D0:' + str(chID), Dstcuts, chID, path=path)
-        vertexKFit('D*+:' + str(chID), 0.001, path=path)
-        DstList.append('D*+:' + str(chID))
+        reconstructDecay('D0:HpHmPi0' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexTree('D0:HpHmPi0' + str(chID), 0.001, path=path)
+        reconstructDecay('D*+:HpHmPi0' + str(chID) + ' -> pi+:all D0:HpHmPi0' + str(chID), Dstcuts, chID, path=path)
+        vertexKFit('D*+:HpHmPi0' + str(chID), 0.001, path=path)
+        DstList.append('D*+:HpHmPi0' + str(chID))
 
     return DstList
 
@@ -87,14 +87,14 @@ def DstToD0PiD0ToHpJmEta(path):
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p) > 2.2'
 
     DstList = []
-    reconstructDecay('D0:sig -> K-:loose pi+:loose eta:myskim', charmcuts, path=path)
-    vertexTree('D0:sig', 0.001, path=path)
-    reconstructDecay('D*+:RS -> D0:sig pi+:all', Dstcuts, path=path)
-    reconstructDecay('D*-:WS -> D0:sig pi-:all', Dstcuts, path=path)
-    vertexKFit('D*+:RS', conf_level=0.001, path=path)
-    vertexKFit('D*+:WS', conf_level=0.001, path=path)
-    DstList.append('D*+:RS')
-    DstList.append('D*+:WS')
+    reconstructDecay('D0:HpJmEta -> K-:loose pi+:loose eta:myskim', charmcuts, path=path)
+    vertexTree('D0:HpJmEta', 0.001, path=path)
+    reconstructDecay('D*+:HpJmEtaRS -> D0:HpJmEta pi+:all', Dstcuts, path=path)
+    reconstructDecay('D*-:HpJmEtaWS -> D0:HpJmEta pi-:all', Dstcuts, path=path)
+    vertexKFit('D*+:HpJmEtaRS', conf_level=0.001, path=path)
+    vertexKFit('D*+:HpJmEtaWS', conf_level=0.001, path=path)
+    DstList.append('D*+:HpJmEtaRS')
+    DstList.append('D*+:HpJmEtaWS')
 
     return DstList
 
@@ -109,12 +109,12 @@ def DstToD0PiD0ToKsOmega(path):
     vertexTree('D0:KsEta', conf_level=0.001, path=path)
     reconstructDecay('D0:KsOmega -> K_S0:merged omega:3pi', charmcuts, path=path)
     vertexTree('D0:KsOmega', conf_level=0.001, path=path)
-    copyLists('D0:sig', ['D0:KsEta', 'D0:KsOmega'], path=path)
+    copyLists('D0:KsOmega', ['D0:KsEta', 'D0:KsOmega'], path=path)
 
     DstList = []
-    reconstructDecay('D*+:sig -> D0:sig pi+:all', '0 < Q < 0.018', path=path)
-    vertexKFit('D*+:sig', conf_level=0.001, path=path)
-    DstList.append('D*+:sig')
+    reconstructDecay('D*+:KsOmega -> D0:KsOmega pi+:all', '0 < Q < 0.018', path=path)
+    vertexKFit('D*+:KsOmega', conf_level=0.001, path=path)
+    DstList.append('D*+:KsOmega')
 
     return DstList
 
@@ -128,9 +128,9 @@ def D0ToNeutrals(path):
 
     D0List = []
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexRave('D0:' + str(chID), 0.001, path=path)
-        D0List.append('D0:' + str(chID))
+        reconstructDecay('D0:2Nbdy' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexRave('D0:2Nbdy' + str(chID), 0.001, path=path)
+        D0List.append('D0:2Nbdy' + str(chID))
 
     Lists = D0List
     return Lists
@@ -144,9 +144,9 @@ def DstToD0Neutrals(path):
 
     DstList = []
     for chID, channel in enumerate(D0List):
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
-        massVertexRave('D*+:' + str(chID), 0.001, path=path)
-        DstList.append('D*+:' + str(chID))
+        reconstructDecay('D*+:2Nbdy' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID, path=path)
+        massVertexRave('D*+:2Nbdy' + str(chID), 0.001, path=path)
+        DstList.append('D*+:2Nbdy' + str(chID))
 
     return DstList
 
@@ -162,12 +162,12 @@ def DstToD0PiD0ToHpHmKs(path):
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
-        vertexKFit('D0:' + str(chID), 0.001, path=path)
+        reconstructDecay('D0:HpHmKs' + str(chID) + ' -> ' + channel, charmcuts, chID, path=path)
+        vertexKFit('D0:HpHmKs' + str(chID), 0.001, path=path)
 
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all D0:' + str(chID), Dstcuts, chID, path=path)
-        vertexKFit('D*+:' + str(chID), 0.001, path=path)
-        DstList.append('D*+:' + str(chID))
+        reconstructDecay('D*+:HpHmKs' + str(chID) + ' -> pi+:all D0:HpHmKs' + str(chID), Dstcuts, chID, path=path)
+        vertexKFit('D*+:HpHmKs' + str(chID), 0.001, path=path)
+        DstList.append('D*+:HpHmKs' + str(chID))
 
     return DstList
 

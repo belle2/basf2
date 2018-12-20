@@ -16,10 +16,15 @@
 #include <mdst/dataobjects/TRGSummary.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
+// trigger dbobjects
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+#include <mdst/dbobjects/TRGGDLDBPrescales.h>
+
 // framework
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <cmath>
 #include <bitset> // bitwise stuff for L1
@@ -80,8 +85,15 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
-          StoreObjPtr<TRGSummary> trg;
-          return trg->getPrescale(name);
+          static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
+          static DBObjPtr<TRGGDLDBPrescales> prescales;
+          for (unsigned int bit = 0; bit < TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords; bit++)
+          {
+            if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {
+              return prescales->getprescales(bit);
+            }
+          }
+          return std::numeric_limits<float>::quiet_NaN();
         };
         return func;
       } else {

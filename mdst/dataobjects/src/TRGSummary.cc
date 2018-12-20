@@ -66,17 +66,6 @@ bool TRGSummary::testPsnm(unsigned int bit) const
   return (m_psnmBits[iWord] & (1 << iBit)) != 0;
 }
 
-unsigned int TRGSummary::getPrescale(unsigned int bit) const
-{
-  if (bit > c_trgWordSize * c_ntrgWords) {
-    B2ERROR("Requested prescale trigger bit number is out of range" << LogVar("bit", bit));
-    return 0;
-  }
-  int iWord = bit / c_trgWordSize;
-  int iBit = bit % c_trgWordSize;
-  return m_prescaleBits[iWord][iBit];
-}
-
 unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
 {
   static DBObjPtr<TRGGDLDBInputBits> inputBits;

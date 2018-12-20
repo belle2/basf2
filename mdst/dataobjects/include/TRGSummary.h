@@ -124,18 +124,6 @@ namespace Belle2 {
      */
     bool testPsnm(const std::string& name) const {return testPsnm(getOutputBitNumber(name));}
 
-    /** get the prescale factor of a psnm bit
-     * @param bit index of psnm bit.
-     * @return True if the bit is set
-     */
-    unsigned int getPrescale(unsigned int bit) const;
-
-    /** get the prescale factor of a psnm bit
-     * @param name name of psnm bit.
-     * @return True if the bit is set
-     */
-    unsigned int getPrescale(const std::string& name) const {return getPrescale(getOutputBitNumber(name));}
-
     /**set the Final Trigger Decision Logic bit*/
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
 

@@ -43,7 +43,7 @@ my_path = b2.create_path()
 
 # load input ROOT file
 inputMdst(environmentType='default',
-          filename=b2.find_file('mdst_000001_prod00002171_task00000001.root', 'examples', False),
+          filename=b2.find_file('B02pi0D0_D2kpi_B2Dstarpi_Dstar2Dpi_D2kpi.root', 'examples', False),
           path=my_path)
 
 
@@ -116,7 +116,7 @@ d0_vars = vu.create_aliases_for_selected(
     'D*+ -> ^D0 pi+', 'D0')
 
 dstt = vc.kinematics + vc.vertex + vc.mc_vertex + vc.flight_info + \
-    vc.create_aliases_for_selected(
+    vu.create_aliases_for_selected(
         vc.kinematics,
         '^D0 -> ^K- ^pi+')
 

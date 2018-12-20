@@ -105,9 +105,9 @@ void DelayDQMModule::event()
   using namespace std::chrono;
   nanoseconds meta_time = static_cast<nanoseconds>(m_eventMetaData->getTime());
   nanoseconds ns = duration_cast<nanoseconds> (system_clock::now().time_since_epoch());
-  m_DelayMs->Fill(Float_t((duration_cast<milliseconds> (ns - meta_time)).count()));
-  Float_t deltaT = (duration_cast<seconds> (ns - meta_time)).count();
-  m_DelayS->Fill(deltaT);
-  m_DelayLog->Fill(deltaT);
+  auto deltaT = (duration_cast<milliseconds> (ns - meta_time)).count();
+  m_DelayMs->Fill(deltaT);
+  m_DelayLog->Fill(1e-3 * deltaT);
+  m_DelayS->Fill(1e-3 * deltaT);
 }
 

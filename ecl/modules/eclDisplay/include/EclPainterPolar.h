@@ -48,10 +48,6 @@ namespace Belle2 {
     TText** m_labels;
 
     /**
-     * Initialize histogram.
-     */
-    void initHisto();
-    /**
      * Convert ECL channel id to id of the phi (theta) segment.
      */
     int channelToSegId(int channel);

@@ -55,11 +55,6 @@ EclPainterPolar::~EclPainterPolar()
   delete m_hist;
 }
 
-void EclPainterPolar::initHisto()
-{
-
-}
-
 int EclPainterPolar::channelToSegId(int ch)
 {
   if (m_type == PHI)

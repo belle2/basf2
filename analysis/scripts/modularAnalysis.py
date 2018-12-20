@@ -1970,7 +1970,7 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
         copyLists(outList, [firstList, secondList], False, path)
         vertexKFit(outList, 0.0, '', '', path)
         markDuplicate(outList, prioritiseV0, path)
-        applyCuts(outList, 'extraInfo(highQualityVertex)')
+        applyCuts(outList, 'extraInfo(highQualityVertex)', path)
     else:
         B2ERROR("Lists to be merged contain different particles")
 

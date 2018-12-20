@@ -13,7 +13,7 @@
 #        |    |
 #        |    +-> pi+ pi-
 #        |
-#        +-> K- pi+
+#        +-> mu+ mu-
 #
 # is reconstructed B0 vertex is fitted using the two m
 # the side vertex is fittes and Delta t (in ps.) is
@@ -36,6 +36,7 @@ from modularAnalysis import fillParticleList
 from vertex import TagV
 from stdCharged import stdMu
 import variables.collections as vc
+import variables.utils as vu
 from modularAnalysis import variablesToNtuple
 
 # Add signal MC files for release 9.
@@ -48,7 +49,7 @@ my_path = b2.create_path()
 
 # load input ROOT file
 inputMdst(environmentType='default',
-          filename=b2.find_file('mdst_000001_prod00002439_task00000001.root', 'examples', False),
+          filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples', False),
           path=my_path)
 
 # use standard final state particle lists
@@ -86,9 +87,9 @@ TagV('B0:jspiks', 'breco', path=my_path)
 
 fshars = vc.pid + vc.track + vc.mc_truth
 jpsiandk0svars = vc.inv_mass + vc.vertex + vc.mc_vertex + vc.mc_truth
-bvars = vc.inv_mass + deltae_mbs + \
-    vc.vertex + vc.mc_vertex + vc.mc_truth + vc.tag_vertex + mc_vc.tag_vertex + \
-    delta_t + mc_delta_t + \
+bvars = vc.inv_mass + vc.deltae_mbc + \
+    vc.vertex + vc.mc_vertex + vc.mc_truth + vc.tag_vertex + vc.tag_vertex + \
+    vc.mc_tag_vertex + \
     vu.create_aliases_for_selected(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
     vu.create_aliases_for_selected(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 

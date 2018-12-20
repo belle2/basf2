@@ -63,7 +63,10 @@ void DelayDQMModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  if (m_histogramDirectoryName != "") oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());// do not use return value with ->cd(), it is ZERO if dir already exists
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
   //----------------------------------------------------------------
 
   m_DelayS = new TH1D("DelayS", (m_title + "Delay;time /s").c_str(), 600, 0, 600);
@@ -99,16 +102,11 @@ void DelayDQMModule::event()
   // Calculate the time difference between now and the trigger time
   // This tells you how much delay we have summed up (it is NOT the processing time!)
   /** Time(Tag) from MetaInfo, ns since epoch */
-  unsigned long long int meta_time = 0;
-  meta_time = m_eventMetaData->getTime();
-
   using namespace std::chrono;
-  nanoseconds ns = duration_cast< nanoseconds >(
-                     system_clock::now().time_since_epoch());
-  Float_t deltaT = 0.0;
-  deltaT = (std::chrono::duration_cast<milliseconds> (ns - (nanoseconds)meta_time)).count();
-  m_DelayMs->Fill(deltaT);
-  deltaT = (std::chrono::duration_cast<seconds> (ns - (nanoseconds)meta_time)).count();
+  nanoseconds meta_time = static_cast<nanoseconds>(m_eventMetaData->getTime());
+  nanoseconds ns = duration_cast<nanoseconds> (system_clock::now().time_since_epoch());
+  m_DelayMs->Fill(Float_t((duration_cast<milliseconds> (ns - meta_time)).count()));
+  Float_t deltaT = (duration_cast<seconds> (ns - meta_time)).count();
   m_DelayS->Fill(deltaT);
   m_DelayLog->Fill(deltaT);
 }

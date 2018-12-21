@@ -155,10 +155,22 @@ void ECLDQMModule::defineHisto()
   h_adc_hits->GetXaxis()->SetTitle("Fraction of ADC samples");
   h_adc_hits->SetOption("LIVE");
 
+  for (int i = 0; i < ECL_CRATES; i++) {
+    int crate = i + 1;
+    std::string h_name, h_title;
+    TH1F* h = 0;
+    h_name = str(boost::format("time_crate_%1%_Thr1GeV") % (crate));
+    h_title = str(boost::format("Reconstructed time for ECL crate #%1% with Thr = 1 GeV") % (crate));
+    h = new TH1F(h_name.c_str(), h_title.c_str(), 8240, -1030, 1030);
+    h->GetXaxis()->SetTitle("time [ns]");
+    h->SetOption("LIVE");
+    h_time_crate_Thr1GeV.push_back(h);
+  }
+
   //2D histograms creation.
 
   h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Trig. Cell ID", 52, 1, 53, 11, -1, 10);
-  h_trigtag2_trigid->GetXaxis()->SetTitle("Trigger Cell ID");
+  h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID");
   h_trigtag2_trigid->GetYaxis()->SetTitle("Trigger tag flag #2");
   h_trigtag2_trigid->SetOption("LIVE");
 
@@ -175,7 +187,7 @@ void ECLDQMModule::defineHisto()
   h_pedrms_cellid->SetOption("LIVE");
 
   h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Trig. Cell ID", 52, 1, 53, 145, 0, 145);
-  h_trigtime_trigid->GetXaxis()->SetTitle("Trigger Cell ID");
+  h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID");
   h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time");
   h_trigtime_trigid->SetOption("LIVE");
 
@@ -191,10 +203,12 @@ void ECLDQMModule::initialize()
   m_ECLCalDigits.isOptional();
   m_ECLTrigs.isOptional();
   m_ECLDsps.isOptional();
+  if (!mapper.initFromDB()) B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
 }
 
 void ECLDQMModule::beginRun()
 {
+  for (int i = 0; i < ECL_CRATES; i++) h_time_crate_Thr1GeV[i]->Reset();
   h_cid->Reset();
   h_cid_Thr5MeV->Reset();
   h_cid_Thr10MeV->Reset();
@@ -277,6 +291,9 @@ void ECLDQMModule::event()
           && cid < ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrel_Thr50MeV->Fill(timing);
       else h_time_endcaps_Thr50MeV->Fill(timing); //Time histogram filling.
     }
+
+    if (energy > 1.000) h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+
     ecletot += energy;
   }
 

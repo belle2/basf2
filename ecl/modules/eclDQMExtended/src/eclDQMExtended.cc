@@ -216,10 +216,10 @@ void ECLDQMEXTENDEDModule::initialize()
   ECLDigits.isRequired();
 
   StoreArray<ECLTrig> ECLTrigs;
-  ECLTrigs.isRequired();
+  ECLTrigs.isOptional();
 
   StoreArray<ECLDsp> ECLDsps;
-  ECLDsps.isRequired();
+  ECLDsps.isOptional();
 
   if (!mapper.initFromDB()) B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
 

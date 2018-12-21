@@ -21,7 +21,6 @@
 #include <ecl/utility/ECLChannelMapper.h>
 
 class TApplication;
-
 class TFile;
 
 namespace Belle2 {
@@ -90,21 +89,21 @@ namespace Belle2 {
     /**  Default display mode. Can be later changed in GUI. */
     int m_displayMode;
     /**  If true, events are displayed as soon as they are loaded. */
-    bool m_autoDisplay;
+    bool m_autoDisplay{true};
     /**  filename to initialize ECLChannelMapper. */
     std::string m_eclMapperInitFileName;
 
     /**  Flag to check if EclFrame is closed; */
-    bool m_frame_closed;
+    bool m_frame_closed{false};
     /**  Counter of added events. */
-    int m_evtNum;
+    int m_evtNum{ -1};
     /**  Root GUI to display ECL data. */
-    EclFrame* m_frame;
+    EclFrame* m_frame{nullptr};
     /**  Application to contain EclFrame. */
-    TApplication* m_app;
+    TApplication* m_app{nullptr};
     /**  Class that provides interface for quick and comprehensive analysis of
      *   large number of events. */
-    EclData* m_data;
+    EclData* m_data{nullptr};
     /**  Displayed ECL events. */
     StoreArray<ECLCalDigit> m_eclarray;
     /**  Channel mapper to show channel <-> (crate, shaper) distributions. */

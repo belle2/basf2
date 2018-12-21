@@ -37,11 +37,7 @@ REG_MODULE(EclDisplay)
 //                 Implementation
 //-----------------------------------------------------------------
 
-EclDisplayModule::EclDisplayModule() : Module(),
-  m_frame_closed(false),
-  m_frame(0),
-  m_app(0),
-  m_data(0)
+EclDisplayModule::EclDisplayModule() : Module()
 {
   // Set module properties
   setDescription("Event display module for ECL.");

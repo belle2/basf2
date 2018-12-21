@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Milkail Remnev, Dmitry Matvienko                         *
+ * Contributors: Mikhail Remnev, Dmitry Matvienko                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
@@ -32,10 +32,15 @@ namespace Belle2 {
      * Constructor for EclPainter subclass.
      */
     EclPainterPolar(EclData* data, Type type);
+    /** Copy constructor */
+    EclPainterPolar(const EclPainterPolar& other) : EclPainter(other) { cloneFrom(other); }
     /**
      * Destructor for EclPainter subclass.
      */
     ~EclPainterPolar();
+
+    /** Assignment operator */
+    EclPainterPolar& operator=(const EclPainterPolar& other) { cloneFrom(other); return *this; }
 
   private:
     /**  Type for polar histogram. */
@@ -47,6 +52,10 @@ namespace Belle2 {
     /**  Labels for phi segments. */
     TText** m_labels;
 
+    /**
+     * Clone attributes from other EclPainterPolar
+     */
+    void cloneFrom(const EclPainterPolar& other);
     /**
      * Convert ECL channel id to id of the phi (theta) segment.
      */

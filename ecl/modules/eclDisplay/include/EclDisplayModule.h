@@ -21,7 +21,6 @@
 #include <ecl/utility/ECLChannelMapper.h>
 
 class TApplication;
-
 class TFile;
 
 namespace Belle2 {

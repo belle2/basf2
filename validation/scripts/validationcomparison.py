@@ -52,7 +52,6 @@ class ComparisonBase:
     pass
 
 
-# todo: perhaps give it
 class Chi2Test(ComparisonBase):
 
     """
@@ -224,8 +223,8 @@ class Chi2Test(ComparisonBase):
         """
         if not self.correct_types():
             msg = "Comparison of {} (Type {}) with {} (Type {}) not " \
-                  "supported.\nPlease contact Thomas.Hauth@kit.edu if you " \
-                  "need this supported. "
+                  "supported.\nPlease open a JIRA issue (validation " \
+                  "component) if you need this supported. "
             raise ObjectsNotSupported(
                 msg.format(
                     self.object_a.GetName(),
@@ -335,7 +334,8 @@ class Chi2Test(ComparisonBase):
                   "debugging, you can use the CLI of " \
                   "'validation/scripts/validationcomparison.py' on your root " \
                   "file and the reference. Run 'validationcomparison.py " \
-                  "--help' for info. "
+                  "--help' for info. If problem persists, please open " \
+                  "JIRA issue (validation component)."
             raise ComparisonFailed(msg)
 
         res_chi2ndf = res_chi2 / res_ndf

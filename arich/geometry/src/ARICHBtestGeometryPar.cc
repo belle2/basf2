@@ -56,13 +56,6 @@ namespace Belle2 {
     *m_mwpc = *arichPar.m_mwpc;
   }
 
-  void ARICHBtestGeometryPar::operator=(const ARICHBtestGeometryPar& arichPar)
-  {
-    *this = arichPar;
-    m_mwpc = new ARICHTracking();
-    *m_mwpc = *arichPar.m_mwpc;
-  }
-
   ARICHBtestGeometryPar::~ARICHBtestGeometryPar()
   {
   }

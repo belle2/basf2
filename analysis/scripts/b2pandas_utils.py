@@ -16,9 +16,7 @@ class VariablesToHDF5(basf2.Module):
     Dump variables directly to HDF5
 
     This Module is the equivalent of VariablesToNtuple but creates an hdf5 file
-    instead of a root file. It is slower at is implemented in pure python and
-    should currently be considered a proof of concept but creates an hdf5 file
-    instead of a root file. It is slower at is implemented in pure python and
+    instead of a root file. It is slower as it is implemented in pure python and
     should currently be considered a proof of concept.
     """
     def __init__(self, filename, listname, variables):
@@ -38,6 +36,8 @@ class VariablesToHDF5(basf2.Module):
         self._variables = variables
 
     def initialize(self):
+        """Create the hdf5 file and list of variable objects to be used during
+        event processing."""
         # get variables from manager
         varnames = variable_manager.resolveCollections(std_vector(*self._variables))
         #: variable objects for each variable
@@ -70,6 +70,7 @@ class VariablesToHDF5(basf2.Module):
             self._table = self._hdf5file.create_table("/", self._listname, obj=np.zeros(0, dtype), filters=filters)
 
     def event(self):
+        """Create a new row in the hdf5 file with for each particle in the list"""
         buf = np.empty(self._plist.getListSize(), dtype=self._dtype)
         # add some extra columns for bookkeeping
         buf["exp"] = self._evtmeta.getExperiment()
@@ -88,6 +89,7 @@ class VariablesToHDF5(basf2.Module):
         self._table.append(buf)
 
     def terminate(self):
+        """save and close the output"""
         self._table.flush()
         self._hdf5file.close()
 
@@ -128,15 +130,18 @@ def make_mcerrors_readable(dataframe, column="mcErrors"):
             dataframe[name] = (mcErrors & value) == value
 
 
+# This is just for testing, no need for doxygen to weirdly document it
+# @cond
 if __name__ == "__main__":
-    import modularAnalysis as ma
+    import modularAnalysis
 
     p = basf2.create_path()
     p.add_module("EventInfoSetter", evtNumList=100)
     p.add_module("EvtGenInput")
-    ma.fillParticleListsFromMC([("pi-:gen", "")], path=p)
+    modularAnalysis.fillParticleListsFromMC([("pi-:gen", "")], path=p)
     a = VariablesToHDF5("test.hdf5", "pi-:gen", ["M", "E", "px", "py", "pz"])
     p.add_module(a)
     # Process the events
     basf2.process(p)
     print(basf2.statistics)
+# @endcond

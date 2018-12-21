@@ -41,11 +41,12 @@ main.add_module(gearbox, fileName="/geometry/Belle2_earlyPhase3.xml")
 main.add_module(geometry)  # , useDB=True)
 
 pxd_charge = register_module('DQMHistAnalysisPXDCharge')
-pxd_charge.param('HistoDir', 'PXDExpReco')
+pxd_charge.param('histogramDirectoryName', 'PXDExpReco')
 main.add_module(pxd_charge)
 
 pxd_commode = register_module('DQMHistAnalysisPXDCM')
-pxd_commode.param('HistoDir', 'pxdDAQ')
+pxd_commode.param('histogramDirectoryName', 'pxdDAQ')
+
 main.add_module(pxd_commode)
 
 pxd_effi = register_module('DQMHistAnalysisPXDEff')
@@ -56,7 +57,7 @@ pxd_effi.param("singleHists", False)
 main.add_module(pxd_effi)
 
 pxd_redu = register_module('DQMHistAnalysisPXDReduction')
-pxd_redu.param('HistoDir', 'pxdDAQ')
+pxd_redu.param('histogramDirectoryName', 'pxdDAQ')
 main.add_module(pxd_redu)
 
 # output = register_module('DQMHistAnalysisOutputFile')

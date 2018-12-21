@@ -17,7 +17,7 @@
 #include <TFile.h>
 
 //Framework
-#include <framework/utilities/FileSystem.h>
+#include <framework/utilities/EnvironmentVariables.h>
 
 //ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
@@ -65,7 +65,16 @@ void EclDisplayModule::initialize()
 {
   m_eclarray.isRequired();
 
-  initFrame();
+  // Check if X display is available.
+
+  std::string display = EnvironmentVariables::get("DISPLAY", "");
+
+  if (display != "") {
+    initFrame();
+  } else {
+    B2WARNING("Environment variable DISPLAY is not set, event display won't be opened");
+    m_frame_closed = true;
+  }
 }
 
 void EclDisplayModule::initFrame()
@@ -148,7 +157,7 @@ void EclDisplayModule::terminate()
     }
   }
 
-  delete m_frame;
-  delete m_data;
+  if (m_frame) delete m_frame;
+  if (m_data) delete m_data;
 }
 

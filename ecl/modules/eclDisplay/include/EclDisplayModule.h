@@ -21,6 +21,7 @@
 #include <ecl/utility/ECLChannelMapper.h>
 
 class TApplication;
+class TFile;
 
 namespace Belle2 {
 
@@ -80,6 +81,8 @@ namespace Belle2 {
      */
     void initFrame();
 
+    /** Keep window open after all events have been processed. Default is false. */
+    bool m_keepOpen;
     /**  If true, energy distribution in ECL is displayed. Frequency of events per crystal is displayed otherwise. */
     bool m_displayEnergy;
     // TODO: List possible display mode IDs from EclPainterFactory.
@@ -105,6 +108,10 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclarray;
     /**  Channel mapper to show channel <-> (crate, shaper) distributions. */
     ECL::ECLChannelMapper m_mapper;
+    /** Temporary file to store TTree */
+    TFile* m_tempfile{nullptr};
+    /** Name of temporary file */
+    TString m_tempname;
 
   public:
     /* SLOTS */

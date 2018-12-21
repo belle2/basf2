@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Milkail Remnev, Dmitry Matvienko                         *
+ * Contributors: Mikhail Remnev, Dmitry Matvienko                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
@@ -53,6 +53,16 @@ EclPainterPolar::EclPainterPolar(EclData* data, EclPainterPolar::Type type) :
 EclPainterPolar::~EclPainterPolar()
 {
   delete m_hist;
+}
+
+void EclPainterPolar::cloneFrom(const EclPainterPolar& other)
+{
+  m_type = other.m_type;
+  m_hist = new TH2F(*other.m_hist);
+  m_segs = new TCrown*[36];
+  for (int i = 0; i < 36; i++) { m_segs[i] = other.m_segs[i]; }
+  m_labels = new TText*[36];
+  for (int i = 0; i < 36; i++) { m_labels[i] = other.m_labels[i]; }
 }
 
 int EclPainterPolar::channelToSegId(int ch)

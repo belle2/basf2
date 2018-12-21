@@ -46,6 +46,7 @@ main.add_module(pxd_charge)
 
 pxd_commode = register_module('DQMHistAnalysisPXDCM')
 pxd_commode.param('histogramDirectoryName', 'pxdDAQ')
+
 main.add_module(pxd_commode)
 
 pxd_effi = register_module('DQMHistAnalysisPXDEff')

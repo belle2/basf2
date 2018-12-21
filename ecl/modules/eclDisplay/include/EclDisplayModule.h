@@ -109,7 +109,7 @@ namespace Belle2 {
     /**  Channel mapper to show channel <-> (crate, shaper) distributions. */
     ECL::ECLChannelMapper m_mapper;
     /** Temporary file to store TTree */
-    TFile* m_tempfile;
+    TFile* m_tempfile{nullptr};
     /** Name of temporary file */
     TString m_tempname;
 

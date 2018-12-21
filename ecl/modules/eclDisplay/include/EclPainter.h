@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Milkail Remnev, Dmitry Matvienko                         *
+ * Contributors: Mikhail Remnev, Dmitry Matvienko                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
@@ -32,8 +32,11 @@ namespace Belle2 {
      */
     explicit EclPainter(EclData* data);
     /** Copy constructor */
-    EclPainter(const EclPainter& other) : EclPainter(new EclData(*other.getData())) {}
+    EclPainter(const EclPainter& other) { cloneFrom(other); }
     virtual ~EclPainter();
+
+    /** Assignment operator */
+    EclPainter& operator=(const EclPainter& other) { cloneFrom(other); return *this; }
 
     /** Set EclData to display in painter.  */
     void setData(EclData* data) { m_ecl_data = data; }
@@ -108,5 +111,10 @@ namespace Belle2 {
 
     /**  Identifier of displayed ECL subsystem. */
     EclData::EclSubsystem displayed_subsys;
+
+    /**
+     * Clone attributes from other EclPainter
+     */
+    void cloneFrom(const EclPainter& other);
   };
 }

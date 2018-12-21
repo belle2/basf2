@@ -43,6 +43,8 @@ EclDisplayModule::EclDisplayModule() : Module()
   setDescription("Event display module for ECL.");
 
   // Parameter definitions
+  addParam("showDisplay", m_showDisplay,
+           "Show GUI. Off by default because GUI crashes automatic tests.", false);
   addParam("keepOpen", m_keepOpen,
            "Keep window open after all events have been processed", false);
   addParam("displayEnergy", m_displayEnergy,
@@ -65,16 +67,19 @@ void EclDisplayModule::initialize()
 {
   m_eclarray.isRequired();
 
-  // Check if X display is available.
-
-  std::string display = EnvironmentVariables::get("DISPLAY", "");
-
-  if (display != "") {
-    initFrame();
-  } else {
-    B2WARNING("Environment variable DISPLAY is not set, event display won't be opened");
+  if (!m_showDisplay) {
     m_frame_closed = true;
+  } else {
+    // Check if X display is available.
+    std::string display = EnvironmentVariables::get("DISPLAY", "");
+    if (display == "") {
+      B2WARNING("Environment variable DISPLAY is not set, event display won't be opened");
+      m_frame_closed = true;
+    }
   }
+
+  if (!m_frame_closed)
+    initFrame();
 }
 
 void EclDisplayModule::initFrame()

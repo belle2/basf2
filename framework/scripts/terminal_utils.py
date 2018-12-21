@@ -236,11 +236,3 @@ class InputEditor():
             self._prompt_for_editor()
 
         self.editor_command_list = new_editor_command_list
-
-
-if __name__ == '__main__':
-    import time
-    with Pager():
-        for i in range(30):
-            print("This is an example on how to use the pager.")
-            time.sleep(0.1)

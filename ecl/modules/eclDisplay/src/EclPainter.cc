@@ -90,3 +90,11 @@ void EclPainter::getNewRootObjectName(char* buf, int n)
 {
   snprintf(buf, n, "ECL DATA_%d", m_obj_counter++);
 }
+
+void EclPainter::cloneFrom(const EclPainter& other)
+{
+  m_ecl_data = new EclData(*other.m_ecl_data);
+  m_mapper = other.m_mapper;
+  displayed_subsys = other.displayed_subsys;
+}
+

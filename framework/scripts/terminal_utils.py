@@ -12,6 +12,8 @@ import sys
 import subprocess
 import os
 import io
+import shutil
+import tempfile
 
 
 class Pager(object):
@@ -131,6 +133,61 @@ class Pager(object):
 
         # wait for pager
         self._pager_process.communicate()
+
+
+def input_editor(initial_content=None, editor_command=None, commentlines_start_with=None):
+    """Provide user input via opening a tmp file in a text editor.
+
+    It is an alternative to the python commands ``input()`` or ``sys.stdin.readlines`` and is
+    inspired by the behaviour of ``git commit`` for editing commit messages.  By using an editor
+    instead of the command line, the user is motivated to give expressive multi-line input,
+    leveraging the full text editing capabilities of his editor.  This function cannot be used for
+    example in interactive terminal scripts, whenever detailed user input is required.
+
+    Adapted from https://chase-seibert.github.io/blog/2012/10/31/python-fork-exec-vim-raw-input.html
+
+    :param initial_content: Initial string to insert into the tmp file that is opened for user
+        input.  Can be used for default input or to insert comment lines with instructions.
+    :param editor_command: Provide editor to open for user input.  If not given, try
+        $VISUAL/$EDITOR/vi(m)
+    :param commentlines_start_with: Optionally define string with which comment lines start
+    """
+    # split editor_command in case it contains cli arguments/options seperated by whitespace
+    editor_command = editor_command or get_editor()
+    # split editor_command in case it contains cli arguments/options seperated by whitespace
+    editor_command_list = editor_command.split()
+
+    # check if editor in command string exists, otherwise prompt for new editor command
+    while shutil.which(editor_command_list[0]) is None:
+        print(f"Editor '{editor_command_list[0]}' not found.")
+        if input("Enter new editor command (y/n) [y]? ").lower() not in ['y', '']:
+            sys.exit(0)
+        editor_command_list = input("Editor command to use instead: ").split()
+
+    with tempfile.NamedTemporaryFile(mode='r+') as tmpfile:
+        if initial_content:
+            tmpfile.write(initial_content)
+            tmpfile.flush()
+        subprocess.check_call(editor_command_list + [tmpfile.name])
+        tmpfile.seek(0)
+        input_string = tmpfile.read().strip()
+
+        # remove commented lines from input string
+        if commentlines_start_with is not None:
+            input_string = "\n".join([l for l in input_string.splitlines()
+                                      if not l.startswith(commentlines_start_with)])
+    return input_string
+
+
+def get_editor():
+    """
+    Get editor command string from environment variables.
+    """
+    editor_command = (os.environ.get('VISUAL') or
+                      os.environ.get('EDITOR') or
+                      shutil.which('vim') or
+                      shutil.which('vi'))
+    return editor_command
 
 
 if __name__ == '__main__':

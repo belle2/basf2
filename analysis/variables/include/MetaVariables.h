@@ -240,6 +240,23 @@ namespace Belle2 {
     Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the variable for the ith generator particle.
+     * The arguments of the function must be
+     *     argument 1: Index of the particle in the MCParticle Array
+     *     argument 2: Valid basf2 function name of the function that shall be evaluated.
+     * If the provided index goes beyond the length of the mcParticles array, -999 will be returned.
+     */
+    Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the variable for the generator level Upsilon(4S).
+     * The argument of the function must be a valid basf2 function name of the function
+     * that shall be evaluated.
+     * If no generator level Upsilon(4S) exists for this event, -999 will be returned.
+     */
+    Manager::FunctionPtr genUpsilon4S(const std::vector<std::string>& arguments);
+
+    /**
      * Returns a specific variable according to its rank in a particle list.
      * The rank is determined via BestCandidateSelection. BestCandidateSelection has to be used before.
      */

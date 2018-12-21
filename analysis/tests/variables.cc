@@ -1436,6 +1436,210 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(p1), -521);
   }
 
+  TEST_F(MetaVariableTest, genParticle)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for Upsilon(4S) -> (B^- -> electron + anti_electron_neutrino) + B^+
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleGrandMother = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleAunt = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+
+    graphParticleGrandMother.setPDG(300553);
+    graphParticleMother.setPDG(-521);
+    graphParticleAunt.setPDG(521);
+    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter2.setPDG(-12);
+
+    graphParticleGrandMother.setMomentum(0.0, 0.0, 0.4);
+    graphParticleMother.setMomentum(1.1, 1.3, 1.5);
+
+    graphParticleMother.comesFrom(graphParticleGrandMother);
+    graphParticleAunt.comesFrom(graphParticleGrandMother);
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+
+    mcGraph.generateList();
+
+    // Get MC Particles from StoreArray
+    auto* mcGrandMother = mcParticles[0];
+    mcGrandMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcMother = mcParticles[1];
+    mcMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcAunt = mcParticles[2];
+    mcAunt->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter1 = mcParticles[3];
+    mcDaughter1->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter2 = mcParticles[4];
+    mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p1->addRelationTo(mcDaughter1);
+
+    // For test of particle that has no MC match
+    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+
+    const Manager::Var* var = Manager::Instance().getVariable("genParticle(0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 300553);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), 300553);
+
+    var = Manager::Instance().getVariable("genParticle(0, matchedMC(pz))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 0.4);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), 0.4);
+
+    var = Manager::Instance().getVariable("genParticle(0, mcDaughter(0, PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), -521);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), -521);
+
+    var = Manager::Instance().getVariable("genParticle(0, mcDaughter(0, matchedMC(px)))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 1.1);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), 1.1);
+
+    var = Manager::Instance().getVariable("genParticle(1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), -521);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), -521);
+
+    var = Manager::Instance().getVariable("genParticle(4, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), -12);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), -12);
+
+    var = Manager::Instance().getVariable("genParticle(5, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), -999);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), -999);
+  }
+
+  TEST_F(MetaVariableTest, genUpsilon4S)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for Upsilon(4S) -> (B^- -> electron + anti_electron_neutrino) + B^+
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleGrandMother = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleAunt = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+
+    graphParticleGrandMother.setPDG(300553);
+    graphParticleMother.setPDG(-521);
+    graphParticleAunt.setPDG(521);
+    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter2.setPDG(-12);
+
+    graphParticleGrandMother.setMomentum(0.0, 0.0, 0.4);
+    graphParticleMother.setMomentum(1.1, 1.3, 1.5);
+
+    graphParticleMother.comesFrom(graphParticleGrandMother);
+    graphParticleAunt.comesFrom(graphParticleGrandMother);
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+
+    mcGraph.generateList();
+
+    // Get MC Particles from StoreArray
+    auto* mcGrandMother = mcParticles[0];
+    mcGrandMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcMother = mcParticles[1];
+    mcMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcAunt = mcParticles[2];
+    mcAunt->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter1 = mcParticles[3];
+    mcDaughter1->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter2 = mcParticles[4];
+    mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p1->addRelationTo(mcDaughter1);
+
+    // For test of particle that has no MC match
+    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+
+    const Manager::Var* var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 300553);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), 300553);
+
+    var = Manager::Instance().getVariable("genUpsilon4S(matchedMC(pz))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 0.4);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), 0.4);
+
+    var = Manager::Instance().getVariable("genUpsilon4S(mcDaughter(0, PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), -521);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), -521);
+
+    var = Manager::Instance().getVariable("genUpsilon4S(mcDaughter(0, matchedMC(px)))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 1.1);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), 1.1);
+
+    /// Test for event without generator level Upsilon(4S)
+    mcParticles.clear();
+    particles.clear();
+    MCParticleGraph mcGraph2;
+
+    MCParticleGraph::GraphParticle& graphParticle1 = mcGraph2.addParticle();
+    MCParticleGraph::GraphParticle& graphParticle2 = mcGraph2.addParticle();
+
+    graphParticle1.setPDG(11);
+    graphParticle2.setPDG(-11);
+
+    graphParticle1.setMomentum(1.1, 1.3, 1.4);
+    graphParticle1.setMomentum(-1.1, -1.3, 1.4);
+
+    mcGraph2.generateList();
+
+    auto* mcP1 = mcParticles[0];
+    mcP1->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcP2 = mcParticles[1];
+    mcP2->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* someParticle = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    someParticle->addRelationTo(mcP1);
+
+    var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(someParticle), -999);
+  }
+
   TEST_F(MetaVariableTest, daughterProductOf)
   {
     TLorentzVector momentum;

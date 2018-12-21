@@ -168,7 +168,7 @@ class InputEditor():
         # split editor_command to seperate executable name command line arguments
         self.editor_command_list = shlex.split(editor_command_string, posix=True)
         # check if editor executable exists and if not, prompt for new editor command
-        if shutil.which(self.editor_command_list[0]):
+        if shutil.which(self.editor_command_list[0]) is None:
             self._prompt_for_editor()
 
         self.initial_content = initial_content
@@ -227,12 +227,14 @@ class InputEditor():
         """
         Ask user to provide editor command
         """
-        new_editor_command_string = input("Use editor: ")
-        new_editor_command_list = shlex.split(new_editor_command_string, posix=True)
+        # Prompt user for editor command until one is found which exists in PATH
+        while True:
+            new_editor_command_string = input("Use editor: ")
+            new_editor_command_list = shlex.split(new_editor_command_string, posix=True)
 
-        # check if base executable exists and if not, ask again
-        if shutil.which(new_editor_command_list[0]) is None:
-            print(f"Editor '{self.editor_command_list[0]}' not found in $PATH.")
-            self._prompt_for_editor()
+            if shutil.which(new_editor_command_list[0]) is not None:
+                self.editor_command_list = new_editor_command_list
+                return self.editor_command_list
 
-        self.editor_command_list = new_editor_command_list
+            else:
+                print(f"Editor '{self.editor_command_list[0]}' not found in $PATH.")

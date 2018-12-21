@@ -198,16 +198,16 @@ if __name__ == "__main__":
         # Ask user to enter detailed instructions. For this multiline input, offer option to use temporary editor
         prompt_string = 'Enter detailed instructions about targeted global tags/releases and the update procedure'
         print(prompt_string)
-        if input(f"Use editor (e) or command line (c) [e] for input? ").lower() in ['e', '']:
+        if input(f"Use editor (e) or command line (c) [e] for multiline input? ").lower() != "c":
             input_editor = terminal_utils.InputEditor(commentlines_start_with="#")
             # define initial comment for the temporary input file to guide the user
             editor_help_comment = (
-                f"# {prompt_string}\n"
+                f"\n# {prompt_string}\n"
                 "# Lines starting with `#` will be ignored.\n"
                 f"# Currently in editor: {input_editor.get_editor_command()}.\n"
                 "# When finished, save and quit."
             )
-            if input_editor.editor_command_list[0] in ['vi', 'vim']
+            if input_editor.editor_command_list[0] in ['vi', 'vim']:
                 editor_help_comment += "#\nIf in vim: Use :wq to save and quit or :q! to discard changes."
             input_editor.initial_content = editor_help_comment
 

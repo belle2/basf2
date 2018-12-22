@@ -20,9 +20,15 @@
 
 namespace Belle2 {
 
+  /** The class for the NSM callback. */
   class DQMHistAnalysisCallback : public NSMCallback {
 
   public:
+    /**
+     * The constructor
+     * @param nodename The name of the NSM node.
+     * @param rcnodename The name of the RC NSM node.
+     */
     DQMHistAnalysisCallback(const std::string& nodename,
                             const std::string& rcnodename)
       : NSMCallback(5), m_rcnode(rcnodename)
@@ -32,6 +38,9 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisCallback() throw() {}
 
   public:
+    /**
+     * The timeout function for the NSM communication.
+     */
     virtual void timouet(NSMCommunicator&) throw()
     {
       try {
@@ -45,6 +54,7 @@ namespace Belle2 {
     }
 
   private:
+    /** The RC NSM node. */
     RCNode m_rcnode;
 
   };

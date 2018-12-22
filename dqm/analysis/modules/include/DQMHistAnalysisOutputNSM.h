@@ -12,9 +12,12 @@
 
 namespace Belle2 {
 
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /** Class definition for the output module of Sequential ROOT I/O */
   class NSMCallback;
 
+  /**
+   * The module to output values to NSM network.
+   */
   class DQMHistAnalysisOutputNSMModule : public DQMHistAnalysisOutputModule {
 
     // Public functions
@@ -35,8 +38,11 @@ namespace Belle2 {
 
     // Data members
   private:
+    /** The NSM node name. */
     std::string m_nodename;
+    /** The RC node name. */
     std::string m_rcnodename;
+    /** The NSM callback object. */
     NSMCallback* m_callback = nullptr;
 
   };

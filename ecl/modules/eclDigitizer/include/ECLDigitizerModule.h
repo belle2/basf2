@@ -90,15 +90,15 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-    using algoparams_t   = ECL::EclConfiguration::algoparams_t;
-    using fitparams_t    = ECL::EclConfiguration::fitparams_t;
-    using signalsample_t = ECL::EclConfiguration::signalsample_t;
-    using adccounts_t    = ECL::EclConfiguration::adccounts_t;
+    using algoparams_t   = ECL::EclConfiguration::algoparams_t;   /**< algorithm parameters */
+    using fitparams_t    = ECL::EclConfiguration::fitparams_t;    /**< fit parameters */
+    using signalsample_t = ECL::EclConfiguration::signalsample_t; /**< signal sample */
+    using adccounts_t    = ECL::EclConfiguration::adccounts_t;    /**< ADC counts */
 
     using int_array_192x16_t = fitparams_t::int_array_192x16_t; /**<  weighting coefficients for time and amplitude calculation */
     using int_array_24x16_t  =
       fitparams_t::int_array_24x16_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
-    using uint_pair_t        = std::pair<unsigned int, unsigned int>;
+    using uint_pair_t        = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
 
     /** ffsets for storages of ECL channels */
     struct crystallinks_t {

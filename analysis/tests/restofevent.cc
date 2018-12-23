@@ -242,6 +242,19 @@ namespace {
     EXPECT_FALSE(roe->hasParticle(myParticles[10])); // B0_K_S0_pi1
     EXPECT_FALSE(roe->hasParticle(myParticles[11])); // B0_pi0_gamma0
   }
+  TEST_F(ROETest, getParticles)
+  {
+    StoreArray<Particle> myParticles;
+    StoreArray<RestOfEvent> myROEs;
+    const RestOfEvent* roe = myROEs[0];
+
+    EXPECT_TRUE(roe->getParticles().size() == 6);
+    EXPECT_TRUE(roe->getPhotons().size() == 2);
+    EXPECT_TRUE(roe->getHadrons().size() == 0);
+    EXPECT_TRUE(roe->getChargedParticles().size() == 4);
+    EXPECT_TRUE(roe->getChargedParticles("", 321).size() == 1);
+    EXPECT_TRUE(roe->getChargedParticles("", 211).size() == 3);
+  }
 
   TEST_F(ROETest, updateMaskWithCuts)
   {

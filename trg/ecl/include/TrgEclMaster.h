@@ -89,6 +89,27 @@ namespace Belle2 {
     void setOverlapWindow(int overlapwindow) {OverlapWindow = overlapwindow;}
     /** set # of considered TC in energy weighted Timing method */
     void setNofTopTC(int noftoptc) {_NofTopTC = noftoptc;}
+    /** make LowMultiTriggerBit **/
+    void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
+    /** make Trigger bit except for Low Multiplicity related bit **/
+    void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int);
+    /** Set Total Energy*/
+    double setTotalEnergy(std::vector<double>);
+    int getTriggerbit(int i) {return _Triggerbit[i];}
+    int getLowmultibit() {return _Lowmultibit;}
+    //! set 2D Bhabha Energy Threshold
+    void set2DBhabhaThreshold(std::vector<double> i2DBhabhaThresholdFWD, std::vector<double> i2DBhabhaThresholdBWD)
+    {
+      _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
+      _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
+    }
+    //! set 2D Bhabha Energy Threshold
+    void set3DBhabhaThreshold(std::vector<double> i3DBhabhaThreshold) { _3DBhabhaThreshold = i3DBhabhaThreshold; };
+
+    //! set Total Energy Theshold (low, high, lum)
+    void setTotalEnergyThreshold(std::vector<double>  iTotalEnergy) {_TotalEnergy = iTotalEnergy; }
+    //! set Low Multiplicity Threshold
+    void setLowMultiplicityThreshold(std::vector<double> iLowMultiThreshold) { _LowMultiThreshold = iLowMultiThreshold;}
 
 
 
@@ -116,9 +137,9 @@ namespace Belle2 {
     std::vector<std::vector<std::vector<double>>> ThetaRingSum;
 
     /** Hit TC Energy in time window */
-    std::vector<double> ClusterEnergy;
+    //   std::vector<double> ClusterEnergy;
     /** Hit TC Timing in time window*/
-    std::vector<double>  ClusterTiming;
+    //    std::vector<double>  ClusterTiming;
 
 
 
@@ -141,6 +162,21 @@ namespace Belle2 {
     int _NofTopTC;
     /** The limit number of Cluster */
     int _ClusterLimit;
+    // ETM bit
+    int _Triggerbit[4];
+    //  LowMultibit
+    int _Lowmultibit;
+
+    //! 2D Bhabha Energy Threshold
+    std::vector<double> _2DBhabhaThresholdFWD;
+    //! 2D Bhabha Energy Threshold
+    std::vector<double> _2DBhabhaThresholdBWD;
+    //! 3D Bhabha Energy Threshold
+    std::vector<double> _3DBhabhaThreshold;
+    //! Total Energy Theshold (low, high, lum)
+    std::vector<double> _TotalEnergy;
+    //! Low Multiplicity Threshold
+    std::vector<double> _LowMultiThreshold;
 
 
     /** ecl object */
@@ -155,6 +191,8 @@ namespace Belle2 {
     TrgEclBhabha* obj_bhabha;
     /**  Beam Backgroud veto object */
     TrgEclBeamBKG* obj_beambkg;
+    /**  Beam Backgroud veto object */
+    TrgEclDataBase* obj_database;
 
 
   };

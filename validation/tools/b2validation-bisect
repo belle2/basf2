@@ -16,20 +16,17 @@ custom scripts can be used to distingush between good and bad commits.
 
 The syntax of the ``--check-quantity`` option is the following: ``<root filename>:<quantity>:<compare op>:<value>``
 
-quantity
-  is the name of a histogram in the given root file. For histograms, the
+- ``quantity``   is the name of a histogram in the given root file. For histograms, the 
   quantity to check for can be given in square brackets, for regular histograms,
   this is one of this strings:
-    - "mean_x" = mean of the histogram
-    - "entries" = number of entries in all bins
-    - "mean_y" = the mean of the bin content
-    - "mean_y_zero_suppressed" = the mean of the bin content, only with bins with > 0 filling
 
-compare op
-  can be ">" or "<"
+  - ``mean_x`` = mean of the histogram
+  - ``entries`` = number of entries in all bins
+  - ``mean_y`` = the mean of the bin content
+  - ``mean_y_zero_suppressed`` = the mean of the bin content, only with bins with > 0 filling
 
-value
-  is the reference value as a float to compare to
+- ``compare op`` can be ``>`` or ``<``
+- ``value`` is the reference value as a float to compare to
 
 As an example, to identfiy the commit which made the tracking efficiency drop below 0.93, the
 following snippet can be used::

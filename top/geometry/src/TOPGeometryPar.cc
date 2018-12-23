@@ -423,11 +423,11 @@ namespace Belle2 {
 
     TOPGeometry* TOPGeometryPar::createConfiguration(const GearDir& content)
     {
-      TOPGeometry* geo = new TOPGeometry("TOPGeometryIdealized");
+      TOPGeometry* geo = new TOPGeometry("TOPGeometry");
 
       // PMT array
 
-      GearDir pmtParams(content, "PMTs/Module");
+      GearDir pmtParams(content, "PMTs/PMT");
       TOPGeoPMT pmt(pmtParams.getLength("ModuleXSize"),
                     pmtParams.getLength("ModuleYSize"),
                     pmtParams.getLength("ModuleZSize") +
@@ -460,78 +460,55 @@ namespace Belle2 {
                               arrayParams.getLength("Ygap"),
                               arrayParams.getString("stackMaterial"),
                               pmt);
+      pmtArray.setSiliconeCookie(arrayParams.getLength("siliconeCookie/thickness"),
+                                 arrayParams.getString("siliconeCookie/material"));
+      pmtArray.setWavelengthFilter(arrayParams.getLength("wavelengthFilter/thickness"),
+                                   arrayParams.getString("wavelengthFilter/material"));
       pmtArray.setAirGap(arrayParams.getLength("airGap", 0));
       double decoupledFraction = arrayParams.getDouble("decoupledFraction", 0);
 
       // modules
 
-      GearDir barParams(content, "Bars");
-      GearDir barSurfParams(barParams, "Surface");
-      auto barSurface = materials.createOpticalSurfaceConfig(barSurfParams);
-      double sigmaAlpha = barSurfParams.getDouble("SigmaAlpha");
+      GearDir moduleParams(content, "Modules");
+      GearDir glueParams(moduleParams, "Glue");
+      int numModules = moduleParams.getNumberNodes("Module");
+      for (int slotID = 1; slotID <= numModules; slotID++) {
+        std::string gearName = "Module[@slotID='" + std::to_string(slotID) + "']";
+        GearDir slotParams(moduleParams, gearName);
+        TOPGeoModule module(slotID,
+                            slotParams.getLength("Radius"),
+                            slotParams.getAngle("Phi"),
+                            slotParams.getLength("BackwardZ"));
+        int cNumber = slotParams.getInt("ConstructionNumber");
+        module.setModuleCNumber(cNumber);
+        module.setName(addNumber(module.getName(), cNumber));
 
-      TOPGeoBarSegment bar1(barParams.getLength("QWidth"),
-                            barParams.getLength("QThickness"),
-                            barParams.getLength("QBar1Length"),
-                            barParams.getString("BarMaterial"));
-      bar1.setGlue(barParams.getLength("Glue/Thicknes2"),
-                   barParams.getString("Glue/GlueMaterial"));
-      bar1.setSurface(barSurface, sigmaAlpha);
-      bar1.setName(bar1.getName() + "1");
-
-      TOPGeoBarSegment bar2(barParams.getLength("QWidth"),
-                            barParams.getLength("QThickness"),
-                            barParams.getLength("QBar2Length"),
-                            barParams.getString("BarMaterial"));
-      bar2.setGlue(barParams.getLength("Glue/Thicknes1"),
-                   barParams.getString("Glue/GlueMaterial"));
-      bar2.setSurface(barSurface, sigmaAlpha);
-      bar2.setName(bar2.getName() + "2");
-
-      TOPGeoMirrorSegment mirror(barParams.getLength("QWidth"),
-                                 barParams.getLength("QThickness"),
-                                 barParams.getLength("QBarMirror"),
-                                 barParams.getString("BarMaterial"));
-      mirror.setGlue(barParams.getLength("Glue/Thicknes3"),
-                     barParams.getString("Glue/GlueMaterial"));
-      mirror.setSurface(barSurface, sigmaAlpha);
-      GearDir mirrorParams(content, "Mirror");
-      mirror.setRadius(mirrorParams.getLength("Radius"));
-      mirror.setCenterOfCurvature(mirrorParams.getLength("Xpos"),
-                                  mirrorParams.getLength("Ypos"));
-      GearDir mirrorSurfParams(mirrorParams, "Surface");
-      mirror.setCoating(mirrorParams.getLength("mirrorThickness"),
-                        mirrorParams.getString("Material"),
-                        materials.createOpticalSurfaceConfig(mirrorSurfParams));
-
-      TOPGeoPrism prism(barParams.getLength("QWedgeWidth"),
-                        barParams.getLength("QThickness"),
-                        barParams.getLength("QWedgeLength"),
-                        barParams.getLength("QWedgeDown") +
-                        barParams.getLength("QThickness"),
-                        barParams.getLength("QWedgeFlat"),
-                        barParams.getString("BarMaterial"));
-      prism.setGlue(arrayParams.getLength("dGlue"),
-                    arrayParams.getString("glueMaterial"));
-      prism.setSurface(barSurface, sigmaAlpha);
-
-      double R = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
-      double phi = barParams.getLength("Phi0");
-      double backwardZ = barParams.getLength("QZBackward");
-      int numModules = barParams.getInt("Nbar");
-      for (int i = 0; i < numModules; i++) {
-        unsigned id = i + 1;
-        TOPGeoModule module(id, R, phi, backwardZ);
-        module.setName(addNumber(module.getName(), id));
-        module.setBarSegment1(bar1);
-        module.setBarSegment2(bar2);
-        module.setMirrorSegment(mirror);
+        auto prism = createPrism(content, slotParams.getString("Prism"));
+        prism.setName(addNumber(prism.getName(), cNumber));
         module.setPrism(prism);
+
+        auto barSegment2 = createBarSegment(content, slotParams.getString("BarSegment2"));
+        barSegment2.setName(addNumber(barSegment2.getName() + "2-", cNumber));
+        barSegment2.setGlue(glueParams.getLength("Thicknes1"),
+                            glueParams.getString("GlueMaterial"));
+        module.setBarSegment2(barSegment2);
+
+        auto barSegment1 = createBarSegment(content, slotParams.getString("BarSegment1"));
+        barSegment1.setName(addNumber(barSegment1.getName() + "1-", cNumber));
+        barSegment1.setGlue(glueParams.getLength("Thicknes2"),
+                            glueParams.getString("GlueMaterial"));
+        module.setBarSegment1(barSegment1);
+
+        auto mirror = createMirrorSegment(content, slotParams.getString("Mirror"));
+        mirror.setName(addNumber(mirror.getName(), cNumber));
+        mirror.setGlue(glueParams.getLength("Thicknes3"),
+                       glueParams.getString("GlueMaterial"));
+        module.setMirrorSegment(mirror);
+
         module.setPMTArray(pmtArray);
         if (decoupledFraction > 0) module.generateDecoupledPMTs(decoupledFraction);
-        // module.setModuleCNumber(num);
+
         geo->appendModule(module);
-        phi += 2 * M_PI / numModules;
       }
 
       // displaced geometry (if defined)
@@ -543,8 +520,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedGeometry.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoModuleDisplacement moduleDispl(slot.getLength("x"),
@@ -568,8 +545,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedPMTArrays.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoPMTArrayDisplacement arrayDispl(slot.getLength("x"),
@@ -590,7 +567,8 @@ namespace Belle2 {
           for (const GearDir& slot : brokenGlues.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID " << moduleID);
+              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -615,8 +593,8 @@ namespace Belle2 {
           for (const GearDir& slot : peelOff.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -853,7 +831,7 @@ namespace Belle2 {
         double lambdaLast = c_hc / energies[0];
         double lambdaStep = 5; // [nm]
         int numSteps = (lambdaLast - lambdaFirst) / lambdaStep + 1;
-        const double filterThickness = prism.getFilterThickness();
+        const double filterThickness = arrayParams.getLength("wavelengthFilter/thickness");
         std::vector<float> bulkTransmittances;
         for (int i = 0; i < numSteps; i++) {
           double wavelength = lambdaFirst + lambdaStep * i;
@@ -871,6 +849,84 @@ namespace Belle2 {
       return geo;
     }
 
+
+    TOPGeoBarSegment TOPGeometryPar::createBarSegment(const GearDir& content,
+                                                      const std::string& SN)
+    {
+      // dimensions and material
+      GearDir params(content, "QuartzBars/QuartzBar[@SerialNumber='" + SN + "']");
+      TOPGeoBarSegment bar(params.getLength("Width"),
+                           params.getLength("Thickness"),
+                           params.getLength("Length"),
+                           params.getString("Material"));
+      bar.setVendorData(params.getString("Vendor"), SN);
+
+      // optical surface
+      std::string surfaceName = params.getString("OpticalSurface");
+      double sigmaAlpha = params.getDouble("SigmaAlpha");
+      GearDir surfaceParams(content, "Modules/Surface[@name='" + surfaceName + "']");
+      auto& materials = geometry::Materials::getInstance();
+      auto quartzSurface = materials.createOpticalSurfaceConfig(surfaceParams);
+      bar.setSurface(quartzSurface, sigmaAlpha);
+
+      return bar;
+    }
+
+
+    TOPGeoMirrorSegment TOPGeometryPar::createMirrorSegment(const GearDir& content,
+                                                            const std::string& SN)
+    {
+      // dimensions and material
+      GearDir params(content, "Mirrors/Mirror[@SerialNumber='" + SN + "']");
+      TOPGeoMirrorSegment mirror(params.getLength("Width"),
+                                 params.getLength("Thickness"),
+                                 params.getLength("Length"),
+                                 params.getString("Material"));
+      mirror.setVendorData(params.getString("Vendor"), SN);
+      mirror.setRadius(params.getLength("Radius"));
+      mirror.setCenterOfCurvature(params.getLength("Xpos"), params.getLength("Ypos"));
+
+      // mirror reflective coating
+      auto& materials = geometry::Materials::getInstance();
+      GearDir coatingParams(params, "Surface");
+      mirror.setCoating(params.getLength("mirrorThickness"), "Al",
+                        materials.createOpticalSurfaceConfig(coatingParams));
+
+      // optical surface
+      std::string surfaceName = params.getString("OpticalSurface");
+      double sigmaAlpha = params.getDouble("SigmaAlpha");
+      GearDir surfaceParams(content, "Modules/Surface[@name='" + surfaceName + "']");
+      auto quartzSurface = materials.createOpticalSurfaceConfig(surfaceParams);
+      mirror.setSurface(quartzSurface, sigmaAlpha);
+
+      return mirror;
+    }
+
+
+    TOPGeoPrism TOPGeometryPar::createPrism(const GearDir& content,
+                                            const std::string& SN)
+    {
+      // dimensions and material
+      GearDir params(content, "Prisms/Prism[@SerialNumber='" + SN + "']");
+      TOPGeoPrism prism(params.getLength("Width"),
+                        params.getLength("Thickness"),
+                        params.getLength("Length"),
+                        params.getLength("ExitThickness"),
+                        0.,
+                        params.getString("Material"));
+      prism.setAngle(params.getAngle("Angle"));
+      prism.setVendorData(params.getString("Vendor"), SN);
+
+      // optical surface
+      std::string surfaceName = params.getString("OpticalSurface");
+      double sigmaAlpha = params.getDouble("SigmaAlpha");
+      GearDir surfaceParams(content, "Modules/Surface[@name='" + surfaceName + "']");
+      auto& materials = geometry::Materials::getInstance();
+      auto quartzSurface = materials.createOpticalSurfaceConfig(surfaceParams);
+      prism.setSurface(quartzSurface, sigmaAlpha);
+
+      return prism;
+    }
 
     std::string TOPGeometryPar::addNumber(const std::string& str, unsigned number)
     {

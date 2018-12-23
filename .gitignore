@@ -102,3 +102,8 @@ Belle2FileCatalog.xml
 .dir-locals.el
 .project
 .idea
+
+# Compiler output #
+# ############### #
+*.o
+*.os

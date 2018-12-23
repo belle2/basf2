@@ -25,6 +25,8 @@
 #include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 #include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 #include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
+#include <ecl/dbobjects/ECLTrackClusterMatchingParameterizations.h>
+#include <ecl/dbobjects/ECLTrackClusterMatchingThresholds.h>
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -50,7 +52,7 @@
 using namespace std;
 using namespace Belle2;
 
-ECLDatabaseImporter::ECLDatabaseImporter(vector<string> inputFileNames, std::string name)
+ECLDatabaseImporter::ECLDatabaseImporter(vector<string> inputFileNames, const std::string& name)
 {
   //input file names
   for (auto& inputFileName : inputFileNames)
@@ -436,4 +438,85 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
   }
 
 
+}
+
+void ECLDatabaseImporter::importTrackClusterMatchingThresholds()
+{
+  if (m_inputFileNames.size() > 1)
+    B2FATAL("Sorry, you must only import one file at a time for now!");
+
+  //Expect a txt file
+  boost::filesystem::path path(m_inputFileNames[0]);
+  if (path.extension() != ".txt")
+    B2FATAL("Expecting a .txt file. Aborting");
+
+  vector<pair<double, double>> m_matchingThresholdPairsFWD;
+  vector<pair<double, double>> m_matchingThresholdPairsBWD;
+  vector<pair<double, pair<double, double>>> m_matchingThresholdPairsBRL;
+  pair<double, double> m_matchingThresholdPair;
+  pair<double, pair<double, double>> m_thetaMatchingThresholdPair;
+  double pt, threshold, thetalimit;
+  string eclregion;
+
+  ifstream infile(m_inputFileNames[0]);
+  string line;
+  while (getline(infile, line)) {
+    istringstream iss(line);
+    iss >> eclregion;
+    if (eclregion == "FWD" || eclregion == "BWD") {
+      iss >> pt >> threshold;
+      m_matchingThresholdPair = make_pair(pt, threshold);
+      if (eclregion == "FWD") m_matchingThresholdPairsFWD.push_back(m_matchingThresholdPair);
+      else m_matchingThresholdPairsBWD.push_back(m_matchingThresholdPair);
+    } else if (eclregion == "BRL") {
+      iss >> thetalimit >> pt >> threshold;
+      m_matchingThresholdPair = make_pair(pt, threshold);
+      m_thetaMatchingThresholdPair = make_pair(thetalimit, m_matchingThresholdPair);
+      m_matchingThresholdPairsBRL.push_back(m_thetaMatchingThresholdPair);
+    }
+  }
+
+  DBImportObjPtr<ECLTrackClusterMatchingThresholds> dbPtr("ECLTrackClusterMatchingThresholds");
+  dbPtr.construct(m_matchingThresholdPairsFWD, m_matchingThresholdPairsBWD, m_matchingThresholdPairsBRL);
+
+  IntervalOfValidity iov(0, 0, -1, -1);
+
+  //Import into local db
+  dbPtr.import(iov);
+}
+
+void ECLDatabaseImporter::importTrackClusterMatchingParameterizations()
+{
+  if (m_inputFileNames.size() > 1)
+    B2FATAL("Sorry, you must only import one file at a time for now!");
+
+  // Open file
+  TFile* inputFile = new TFile(m_inputFileNames[0].data(), "READ");
+
+  if (!inputFile || inputFile->IsZombie())
+    B2FATAL("Could not open file " << m_inputFileNames[0]);
+
+  map<string, TF1> m_parametrizationFunctions;
+  vector<string> angles = {"Theta", "Phi"};
+  vector<string> regions = {"BRL", "BWD", "FWD"};
+  vector<string> hittypes = {"CROSS", "DL", "NEAR"};
+
+  for (const auto& angle : angles) {
+    for (const auto& region : regions) {
+      for (const auto& hittype : hittypes) {
+        m_parametrizationFunctions.insert(make_pair(angle + region + hittype, *(getRootObjectFromFile<TF1*>(inputFile,
+                                                    "RMSParameterization" + angle + region + hittype))));
+      }
+    }
+  }
+
+  DBImportObjPtr<ECLTrackClusterMatchingParameterizations> dbPtr("ECLTrackClusterMatchingParameterizations");
+  dbPtr.construct(m_parametrizationFunctions);
+
+  IntervalOfValidity iov(0, 0, -1, -1);
+
+  //Import into local db
+  dbPtr.import(iov);
+
+  delete inputFile;
 }

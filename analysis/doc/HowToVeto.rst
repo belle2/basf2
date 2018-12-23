@@ -51,14 +51,18 @@ The code is taken from an existing tutorial: :code:`B2A306-B02RhoGamma-withPi0Ve
 
 .. code-block:: python
 
-    buildRestOfEvent('B0')   
+    import basf2
+    from modularAnalysis import buildRestOfEvent
+    
+    mymainpath = basf2.Path()
+    buildRestOfEvent('B0', path=mymainpath)   
  
 3. Create roe_path in which the veto will be constructed. In addition another dead-end path needs to be created, which will be used in step o)
 
 .. code-block:: python
 
-    roe_path = create_path() 
-    deadEndPath = create_path()    
+    roe_path = basf2.Path() 
+    deadEndPath = basf2.Path()    
 
 In next steps the veto is constructed. In this example the veto works in the following way:
 
@@ -112,14 +116,14 @@ vii. Connect the roe_path with the main path
 
 .. code-block:: python
 
-    analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+    mymainpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
  
 
 4. Continue with signal side reconstruction. At this point the B0 candidates have extraInfo(pi0veto) attached.
 
 .. code-block:: python
 
-    printVariableValues('B0', ['pi0veto'])
+    printVariableValues('B0', ['pi0veto'], path=mymainpath)
  
 
 If the signal photon candidate could not be paired with any other photon candidate from ROE to form a :math:`\pi^0` candidate, then extraInfo(pi0veto)=-999.

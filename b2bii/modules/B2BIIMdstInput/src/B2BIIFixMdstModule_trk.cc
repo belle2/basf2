@@ -2826,7 +2826,7 @@ namespace Belle2 {
           B2ERROR(
             "scale_error: error: scale error is not applied. Reason: it is not available for exp " << no_exp << ". Exit! (I'll crash job.)");
           exit(-1);
-          break;
+//          break; // redundant
         }
 
         default: assert(0); // Should not be here!

@@ -14,6 +14,8 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/core/InputController.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 #include <boost/filesystem.hpp>
 #include <memory>
@@ -50,6 +52,13 @@ unsigned int Environment::getNumberOfEvents() const
     return numEventsFromArgument;
   else
     return numEventsFromInput;
+}
+
+bool Environment::isMC() const
+{
+  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+  if (fileMetaData) return fileMetaData->isMC();
+  return true;
 }
 
 std::string Environment::consumeOutputFileOverride(const std::string& module)

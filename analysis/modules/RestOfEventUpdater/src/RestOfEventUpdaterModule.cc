@@ -122,13 +122,11 @@ namespace Belle2 {
                                                           std::vector<const Particle*>& particlesToUpdate, Particle::EParticleType listType)
   {
     for (auto& maskToUpdate : m_maskNamesForUpdating) {
-      std::string maskNameToGetParticles = maskToUpdate;
       if (maskToUpdate == "") {
         B2FATAL("Cannot update ROE mask with no name!");
       }
       if (!roe->hasMask(maskToUpdate)) {
         // Change name to get all ROE particles in case of new mask
-        maskNameToGetParticles = ""; // FIXME: should this be passed to excludeParticlesFromMask down below??
         roe->initializeMask(maskToUpdate, "ROEUpdaterModule");
       }
       roe->excludeParticlesFromMask(maskToUpdate, particlesToUpdate, listType, m_discard);

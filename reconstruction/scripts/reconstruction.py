@@ -215,10 +215,6 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_ecl_finalizer_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
-        add_ecl_track_matcher_module(path, components)
-        add_ecl_eip_module(path, components)
-
-    if trigger_mode in ["hlt", "all"]:
         add_ecl_mc_matcher_module(path, components)
 
         add_klm_modules(path, components)
@@ -226,6 +222,9 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_klm_mc_matcher_module(path, components)
 
         add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
+        add_ecl_track_cluster_modules(path, components)
+        add_ecl_cluster_properties_modules(path, components)
+        add_ecl_eip_module(path, components)
         add_pid_module(path, components)
 
     if trigger_mode in ["all"] and addClusterExpertModules:
@@ -297,6 +296,7 @@ def add_cdst_output(
         'ECLCalDigits',
         'TRGECLClusters',
         'TRGECLUnpackerStores',
+        'TRGECLUnpackerEvtStores',
         'BKLMHit2ds',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
@@ -507,17 +507,26 @@ def add_ecl_finalizer_module(path, components=None):
         path.add_module(ecl_finalize)
 
 
-def add_ecl_track_matcher_module(path, components=None):
+def add_ecl_track_cluster_modules(path, components=None):
     """
-    Add the ECL track matcher module to the path.
+    Add the ECL track cluster matching module to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
     if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
-        # track shower matching
-        ecl_track_match = register_module('ECLTrackShowerMatch')
-        path.add_module(ecl_track_match)
+        path.add_module('ECLTrackClusterMatching')
+
+
+def add_ecl_cluster_properties_modules(path, components=None):
+    """
+    Add the ECL cluster properties module to the path.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
+        path.add_module('ECLClusterProperties')
 
 
 def add_ecl_track_brem_finder(path, components=None):

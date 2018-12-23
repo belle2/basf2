@@ -11,16 +11,18 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-from stdLightMesons import *
 from stdPi0s import *
 from stdV0s import *
+from skim.standardlists.lightmesons import *
 
 
-def SetTauGenericSkimVariables():
+def SetTauGenericSkimVariables(path=analysis_main):
     """
     Set particle lists and variables for TauGeneric skim
 
-    * output particle lists: pi+:S1/S2, gamma:S1/S2
+    * inout particle lists: pi+:all, gamma:all
+
+    * output particle lists: pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2
 
     * nGoodTracks: number of good tracks in an event
     * netCharge: total net charge of good tracks
@@ -30,33 +32,30 @@ def SetTauGenericSkimVariables():
     * Etot: visibleEnergyOfEventCMS + missingMomentumOfEventCMS (sum of energy of particles and missing momentum in CMS)
     * E_ECL: total ECL energy of particles
 
-
     """
     __author__ = "Kenji Inami"
-
-    # All charged tracks and gammas
-    stdPi('all')
-    stdPhotons('all')
 
     # Track and gamma cuts
     trackCuts = 'pt > 0.1'
     gammaCuts = 'E > 0.1'
     gammaCuts += ' and -0.8660 < cosTheta < 0.9563'
-    applyCuts('pi+:all', trackCuts)
-    applyCuts('gamma:all', gammaCuts)
+    cutAndCopyList('pi+:tauskim', 'pi+:all', trackCuts, path=path)
+    cutAndCopyList('gamma:tauskim', 'gamma:all', gammaCuts, path=path)
 
     # Get EventShape variables
-    buildEventShape(['pi+:all', 'gamma:all'], allMoments=False, foxWolfram=False, cleoCones=False, sphericity=False, jets=False)
-    buildEventKinematics(['pi+:all', 'gamma:all'])
+    buildEventShape(['pi+:tauskim', 'gamma:tauskim'],
+                    allMoments=False, foxWolfram=False, cleoCones=False,
+                    sphericity=False, jets=False, path=path)
+    buildEventKinematics(['pi+:tauskim', 'gamma:tauskim'], path=path)
 
     # Split in signal and tag
-    cutAndCopyList('pi+:S1', 'pi+:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('pi+:S2', 'pi+:all', 'cosToEvtThrust < 0')
-    cutAndCopyList('gamma:S1', 'gamma:all', 'cosToEvtThrust > 0')
-    cutAndCopyList('gamma:S2', 'gamma:all', 'cosToEvtThrust < 0')
+    cutAndCopyList('pi+:S1', 'pi+:tauskim', 'cosToThrustOfEvent > 0', path=path)
+    cutAndCopyList('pi+:S2', 'pi+:tauskim', 'cosToThrustOfEvent < 0', path=path)
+    cutAndCopyList('gamma:S1', 'gamma:tauskim', 'cosToThrustOfEvent > 0', path=path)
+    cutAndCopyList('gamma:S2', 'gamma:tauskim', 'cosToThrustOfEvent < 0', path=path)
 
-    variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:all)')
-    variables.addAlias('netCharge', 'formula(countInList(pi+:all, charge == 1) - countInList(pi+:all, charge == -1))')
+    variables.addAlias('nGoodTracks', 'nParticlesInList(pi+:tauskim)')
+    variables.addAlias('netCharge', 'formula(countInList(pi+:tauskim, charge == 1) - countInList(pi+:tauskim, charge == -1))')
     variables.addAlias('nTracksS1', 'nParticlesInList(pi+:S1)')
     variables.addAlias('nTracksS2', 'nParticlesInList(pi+:S2)')
     variables.addAlias('MinvS1', 'invMassInLists(pi+:S1, gamma:S1)')
@@ -68,10 +67,11 @@ def SetTauGenericSkimVariables():
         'E_S2',
         'formula(useCMSFrame(totalEnergyOfParticlesInList(pi+:S2)) + useCMSFrame(totalEnergyOfParticlesInList(gamma:S2)))')
     variables.addAlias('Etot', 'formula(visibleEnergyOfEventCMS + missingMomentumOfEventCMS)')
-    variables.addAlias('E_ECL', 'formula(totalECLEnergyOfParticlesInList(pi+:all)+totalECLEnergyOfParticlesInList(gamma:all))')
+    variables.addAlias('E_ECL',
+                       'formula(totalECLEnergyOfParticlesInList(pi+:tauskim)+totalECLEnergyOfParticlesInList(gamma:tauskim))')
 
 
-def TauList():
+def TauList(path=analysis_main):
     """
     Note:
         * Skim for Tau generic decays
@@ -93,29 +93,29 @@ def TauList():
     """
     __author__ = "Kenji Inami"
 
-    SetTauGenericSkimVariables()
+    SetTauGenericSkimVariables(path=path)
 
     # Selection criteria
-    applyEventCuts('1 < nGoodTracks < 7')  # cut1
-    applyEventCuts('-2 < netCharge < 2')  # cut2
+    applyEventCuts('1 < nGoodTracks < 7', path=path)  # cut1
+    applyEventCuts('-2 < netCharge < 2', path=path)  # cut2
 
-    applyEventCuts('missingMomentumOfEvent > 0.4 and 0.0873 < missingMomentumOfEvent_theta < 2.6180')  # cut4
-    applyEventCuts('missingMass2OfEvent < 72.25 or missingMomentumOfEvent_theta > 0.2967')  # cut5
-    applyEventCuts('Etot < 9.0 or 1 < E_ECL < 9')  # cut7
+    applyEventCuts('missingMomentumOfEvent > 0.4 and 0.0873 < missingMomentumOfEvent_theta < 2.6180', path=path)  # cut4
+    applyEventCuts('missingMass2OfEvent < 72.25 or missingMomentumOfEvent_theta > 0.2967', path=path)  # cut5
+    applyEventCuts('Etot < 9.0 or 1 < E_ECL < 9', path=path)  # cut7
 
     applyEventCuts('[[ nTracksS1 == 1 or nTracksS1 == 3 ] and MinvS1 < 1.8 and E_S1 < 5]'
-                   ' or [[ nTracksS2 == 1 or nTracksS2 == 3 ] and MinvS2 < 1.8 and E_S2 < 5]')  # cut3+cut6
+                   ' or [[ nTracksS2 == 1 or nTracksS2 == 3 ] and MinvS2 < 1.8 and E_S2 < 5]', path=path)  # cut3+cut6
 
     # not use 'thrustOfEvent < 0.999'  (cut8) for now
 
     # For skimming, the important thing is if the final particleList is empty or not.
-    reconstructDecay('tau+:S1 -> pi+:S1', '')
+    reconstructDecay('tau+:S1 -> pi+:S1', '', path=path)
     eventParticle = ['tau+:S1']
 
     return eventParticle
 
 
-def TauLFVList(flag=1):
+def TauLFVList(flag=1, path=analysis_main):
     """
     Note:
         * Skim for Tau LFV decays
@@ -131,14 +131,6 @@ def TauLFVList(flag=1):
         (such as tau+:LFV_lgamma0, tau+:LFV_lgamma1, tau+:LFV_lll0, ...)
     """
     __author__ = "P. Urquijo, K. Inami"
-
-    stdPi0s('loose')
-    loadStdCharged()
-    loadStdSkimPhoton()
-    loadStdSkimPi0()
-    loadStdKS()
-    stdPhotons('loose')
-    loadStdLightMesons()
 
     tauLFVCuts = '1.58 < Mbc < 1.98 and abs(deltaE) < 1.0'
 
@@ -207,43 +199,43 @@ def TauLFVList(flag=1):
     tau_lgamma_list = []
     for chID, channel in enumerate(tau_lgamma_Channels):
         if(flag):
-            reconstructDecay('tau+:LFV_lgamma' + str(chID) + ' -> ' + channel, tauLFVCuts, chID)
+            reconstructDecay('tau+:LFV_lgamma' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
         tau_lgamma_list.append('tau+:LFV_lgamma' + str(chID))
 
     tau_lll_list = []
     for chID, channel in enumerate(tau_lll_Channels):
         if(flag):
-            reconstructDecay('tau+:LFV_lll' + str(chID) + ' -> ' + channel, tauLFVCuts, chID)
+            reconstructDecay('tau+:LFV_lll' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
         tau_lll_list.append('tau+:LFV_lll' + str(chID))
 
     tau_lP0_list = []
     for chID, channel in enumerate(tau_lP0_Channels):
         if(flag):
-            reconstructDecay('tau+:LFV_lP0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID)
+            reconstructDecay('tau+:LFV_lP0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
         tau_lP0_list.append('tau+:LFV_lP0' + str(chID))
 
     tau_lS0_list = []
     for chID, channel in enumerate(tau_lS0_Channels):
         if(flag):
-            reconstructDecay('tau+:LFV_lS0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID)
+            reconstructDecay('tau+:LFV_lS0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
         tau_lS0_list.append('tau+:LFV_lS0' + str(chID))
 
     tau_lV0_list = []
     for chID, channel in enumerate(tau_lV0_Channels):
         if(flag):
-            reconstructDecay('tau+:LFV_lV0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID)
+            reconstructDecay('tau+:LFV_lV0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
         tau_lV0_list.append('tau+:LFV_lV0' + str(chID))
 
     tau_lhh_list = []
     for chID, channel in enumerate(tau_lhh_Channels):
         if(flag):
-            reconstructDecay('tau+:LFV_lhh' + str(chID) + ' -> ' + channel, tauLFVCuts, chID)
+            reconstructDecay('tau+:LFV_lhh' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
         tau_lhh_list.append('tau+:LFV_lhh' + str(chID))
 
     tau_bnv_list = []
     for chID, channel in enumerate(tau_bnv_Channels):
         if(flag):
-            reconstructDecay('tau+:LFV_bnv' + str(chID) + ' -> ' + channel, tauLFVCuts, chID)
+            reconstructDecay('tau+:LFV_bnv' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
         tau_bnv_list.append('tau+:LFV_bnv' + str(chID))
 
     tau_lfv_lists = tau_lgamma_list + tau_lll_list + tau_lP0_list + tau_lS0_list + tau_lV0_list + tau_lhh_list + tau_bnv_list

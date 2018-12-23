@@ -13,8 +13,8 @@ import utils
 
 
 def parse_mail_address(obj):
-    """
-    take a string or list and return list of email addresses that appear in it
+    """!
+    Take a string or list and return list of email addresses that appear in it
     """
     if isinstance(obj, str):
         return re.findall(r'[\w\.-]+@[\w\.-]+', obj)
@@ -25,10 +25,12 @@ def parse_mail_address(obj):
 
 
 def check_if_same(new, old):
-    """
-    checks if the failed plots in new are the same as in old
-    new and old are only considered to be different if the comparison_result of a same plot
+    """!
+    Checks if the failed plots in new are the same as in old. new and old are
+    only considered to be different if the comparison_result of a same plot
     changed or if new contains _more_ failed plots than old.
+
+    @return: True if something has changed.
     """
 
     # if new is larger than old, there are new failed plots
@@ -46,19 +48,29 @@ def check_if_same(new, old):
 
 
 class Mails:
-    """
-    provides functionality to send mails in case of failed scripts / validation plots
+
+    """!
+    Provides functionality to send mails in case of failed scripts / validation
+    plots.
+
+    @var validator: Instance of validation.Validation
+    @var mail_data_new: Current mail data
+    @var comparison_json: Get JSON object with comparison data (serialization
+        of json_objects.Comparison)
+    @var mail_data_old: Yesterday's mail data (generated from comparison_json)
     """
 
     def __init__(self, validation):
-        """
-        initialize Mails instance
-        takes an instance of validation.Validation
-        this method assumes that a comparison json file exists, reads it and parses
-        it to extract information about failed plots. This information, together
-        with information about failed scripts, gets stored in self.mail_data_new.
-        If there is mail_data.json inside the log folder, its contents get stored
-        in self.mail_data_old for later comparison
+        """!
+        Initializes an instance of the Mail class from an instance of the
+        Validation class. Assumes that a comparison json file exists,
+        reads it and parses it to extract information about failed plots.
+        This information, together with information about failed scripts,
+        gets stored in self.mail_data_new. If there is mail_data.json inside
+        the log folder, its contents get stored in self.mail_data_old for
+        later comparison.
+
+        @param validation: validation.Validation instance
         """
 
         self.validator = validation
@@ -78,11 +90,12 @@ class Mails:
             with open(os.path.join(self.validator.get_log_folder(), "mail_data.json")) as f:
                 self.mail_data_old = json.load(f)
         except BaseException:
+            # todo: shouldn't we at least warn about this?
             self.mail_data_old = None
 
     def create_mail_log_failed_scripts(self):
-        """
-        looks up all scripts that failed and collects information about them
+        """!
+        Looks up all scripts that failed and collects information about them.
         """
 
         # get failed scripts
@@ -130,10 +143,11 @@ class Mails:
         return mail_log
 
     def create_mail_log(self, comparison):
-        """
-        takes the entire comparison json file, finds all the plots where comparison failed,
-        finds info about failed scripts
-        and saves them the following format:
+        """!
+        Takes the entire comparison json file, finds all the plots where
+        comparison failed, finds info about failed scripts and saves them in the
+        following format:
+
         {
              "email@address.test" : {
                  "title1": {
@@ -143,8 +157,9 @@ class Mails:
              },
              "mail@...": {...}
         }
-        The top level ordering is the email address of the contact to make sure every user
-        gets only one mail with everything in it.
+
+        The top level ordering is the email address of the contact to make
+        sure every user gets only one mail with everything in it.
         """
 
         mail_log = {}
@@ -179,13 +194,13 @@ class Mails:
             # if user already is in mail_log, add the failed scripts
             else:
                 for script in contact:
-                    mail_log[contact][script] = failed_script[contact][script]
+                    mail_log[contact][script] = failed_scripts[contact][script]
 
         return mail_log
 
     def compose_message(self, plots):
-        """
-        takes a dict (like in create_mail_log) and composes a mail body
+        """!
+        Takes a dict (like in create_mail_log) and composes a mail body
         """
 
         # link to validation page
@@ -217,8 +232,9 @@ class Mails:
 
     def send_all_mails(self):
         """
-        send mails to all contacts in self.mail_data_new.
-        if self.mail_data_old is given, a mail is only sent if there are new failed plots
+        Send mails to all contacts in self.mail_data_new. If
+        self.mail_data_old is given, a mail is only sent if there are new
+        failed plots
         """
 
         for contact in self.mail_data_new:
@@ -255,7 +271,7 @@ class Mails:
 
     def write_log(self):
         """
-        dump mailjson
+        Dump mail json.
         """
         with open(os.path.join(self.validator.get_log_folder(), "mail_data.json"), "w") as f:
             json.dump(self.mail_data_new, f, sort_keys=True, indent=4)

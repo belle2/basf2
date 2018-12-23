@@ -77,24 +77,26 @@ namespace Belle2 {
     const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
 
     // For temporary BGx1
+    /** the leakage in BGx1 */
     TGraph2D m_leakage_bgx1[2]; // 0: phase2, 1: phase3
+    /** limits for the leakage in BGx1 */
     std::vector<double> m_leakage_bgx1_limits[2];
 
     // For BGx0 (complicated theta and phi dependency)
     // Vectors with one entry each:
-    int m_numOfBfBins; /**< number of background fraction bins; currently only two */
-    int m_numOfEnergyBins; /**< number of energy bins */
-    int m_numOfPhiBins; /**< number of phi bins */
-    int m_numOfReg1ThetaBins; /**< number of region 1 theta bins */
-    int m_numOfReg2ThetaBins; /**< number of region 2 theta bins */
-    int m_numOfReg3ThetaBins; /**< number of region 3 theta bins */
-    int m_phiPeriodicity; /**< repeating pattern in phi direction, for barrel it is 72 */
-    float m_lReg1Theta; /**< lower boundary of the region 1 theta */
-    float m_hReg1Theta; /**< upper boundary of the region 1 theta */
-    float m_lReg2Theta; /**< lower boundary of the region 2 theta */
-    float m_hReg2Theta; /**< upper boundary of the region 2 theta */
-    float m_lReg3Theta; /**< lower boundary of the region 3 theta */
-    float m_hReg3Theta; /**< upper boundary of the region 3 theta */
+    int m_numOfBfBins = 0; /**< number of background fraction bins; currently only two */
+    int m_numOfEnergyBins = 0; /**< number of energy bins */
+    int m_numOfPhiBins = 0; /**< number of phi bins */
+    int m_numOfReg1ThetaBins = 0; /**< number of region 1 theta bins */
+    int m_numOfReg2ThetaBins = 0; /**< number of region 2 theta bins */
+    int m_numOfReg3ThetaBins = 0; /**< number of region 3 theta bins */
+    int m_phiPeriodicity = 0; /**< repeating pattern in phi direction, for barrel it is 72 */
+    float m_lReg1Theta = 0; /**< lower boundary of the region 1 theta */
+    float m_hReg1Theta = 0; /**< upper boundary of the region 1 theta */
+    float m_lReg2Theta = 0; /**< lower boundary of the region 2 theta */
+    float m_hReg2Theta = 0; /**< upper boundary of the region 2 theta */
+    float m_lReg3Theta = 0; /**< lower boundary of the region 3 theta */
+    float m_hReg3Theta = 0; /**< upper boundary of the region 3 theta */
 
     // Vector with (right now) 15 entries
     std::vector<float> m_avgRecEn; /**< averages of the energy bins */

@@ -2,6 +2,9 @@
 
 #include <Rtypes.h>
 
+class TEveElement;
+class TPRegexp;
+
 namespace Belle2 {
   /** Handles manipulation of detector geometry for the display. */
   namespace EveGeometry {
@@ -43,8 +46,15 @@ namespace Belle2 {
     /** Set custom path to the geometry extract (to change originally hard-coded value) */
     void setCustomExtractPath(const std::string& extractPath);
 
-    /** Set custom path to the geometry extract with corrected TOP bars (to change originally hard-coded value) */
-    void setCustomExtractPathTop(const std::string& extractPathTop);
+    /** List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden. */
+    void setHideVolumes(const std::vector<std::string>& volumes);
+
+    /** List of volumes to be removed. The volume and all its daughters will be deleted. Leading '#' switches to removal of daughter only. */
+    void setDeleteVolumes(const std::vector<std::string>& volumes);
+
+    /** Recursive removal of volumes based on regular expression pattern. Leading '#' switches to removal of daughter only. */
+    void removeChildrenByRegExp(TEveElement* parent, const std::string& pattern);
+
   }
 }
 

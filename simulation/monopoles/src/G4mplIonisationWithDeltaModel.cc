@@ -28,6 +28,7 @@
 #include <G4ProductionCutsTable.hh>
 #include <G4MaterialCutsCouple.hh>
 #include <G4Log.hh>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -46,13 +47,13 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
     bg2lim(beta2lim * (1.0 + beta2lim))
 {
   pi_hbarc2_over_mc2 = pi * hbarc * hbarc / electron_mass_c2;
+  nmpl = magCharge * 2 * fine_structure_const;
   chargeSquare = magCharge * magCharge * 4 * fine_structure_const *
                  fine_structure_const; //Formulas below assume Dirac charge units for magnetic charge, g_D = 68.5e
   dedxlim = 45. * chargeSquare * GeV * cm2 / g;
   fParticleChange = nullptr;
   theElectron = G4Electron::Electron();
-  G4cout << "### Monopole ionisation model with d-electron production, Gmag= "
-         << magCharge / eplus << G4endl;//TODO print it with B2INFO
+  B2INFO("### Monopole ionisation model with d-electron production, Gmag= "  << magCharge / eplus); 
   monopole = nullptr;
   mass = 0.0;
 }
@@ -156,6 +157,14 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
     0.5 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)) - 1.0);//"Conventional" ionisation
 //   G4double dedx =
 //     1.0 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon double ionisation
+
+
+  G4double k = 0;   // Kazama et al. cross-section correction
+  if (nmpl >= 0.5) { k = 0.406; }
+  if (nmpl >= 1) { k = 0.346; }
+  if (nmpl >= 1.5) { k = 0.3; }
+  const G4double B[7] = { 0.0, 0.248, 0.672, 1.022, 1.243, 1.464, 1.685};   // Bloch correction
+  dedx += 0.5 * k - B[int(floor(nmpl + 0.5))];
 
   // density effect correction
   G4double x = G4Log(bg2) / twoln10;

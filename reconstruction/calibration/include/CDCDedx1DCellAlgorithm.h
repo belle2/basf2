@@ -41,25 +41,18 @@ namespace Belle2 {
     virtual ~CDCDedx1DCellAlgorithm() {}
 
     /**
-    * Local vs Global bin map settings for enta
-    */
-    void GlobalToLocalEntaBinMap(Bool_t seeMap);
-
-    /**
     * Set etna angle bins, Global
     */
     void setGlobalEntaBins(int value) {fnEntaBinG = value;}
-
-    /**
-    * Set etna angle bins, locally
-    */
-    void setLocalEntaBins(int value) {fnEntaBinL = value;}
 
     /**
     * Set asym bins flag to on or off
     */
     void setAsymmetricBins(bool value) {IsLocalBin = value;}
 
+    /**
+    * Set rotation sys flag to on or off
+    */
     void setRotationSymBins(bool value) {IsRS = value;}
 
     /**
@@ -98,7 +91,7 @@ namespace Belle2 {
       std::vector<int> nBinEnta0to25Per;
       for (int ibin = 0; ibin < nbin / 4; ibin++) {
         if (ibin < nbin / 8) jbin++;
-        else if ((ibin - nbin / 8) % 2 == 0)jbin++;
+        else if (TMath::Abs(ibin - nbin / 8) % 2 == 0)jbin++;
         nBinEnta0to25Per.push_back(jbin);
       }
 
@@ -136,7 +129,7 @@ namespace Belle2 {
     /**
      * 1D cell algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
 
   private:
@@ -158,7 +151,6 @@ namespace Belle2 {
     std::vector<double> fEntaBinValues;  /**< Vector for doca asym bin values */
 
     bool IsLocalBin;  /**< if local asym bin  */
-    bool IsPrintBinMap;  /**< print glocal to loca bin mapping for etna and doca */
     bool IsMakePlots; /**< produce plots for status */
     bool IsVarBin; /**< if variable bin requested */
     bool IsRS; /**< if rotation symmtery requested */

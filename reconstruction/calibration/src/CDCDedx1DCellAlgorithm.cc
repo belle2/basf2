@@ -33,8 +33,8 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
   feaLE(-TMath::Pi() / 2),
   feaUE(+TMath::Pi() / 2),
   IsLocalBin(true),
-  IsPrintBinMap(true),
   IsMakePlots(false),
+  IsVarBin(false),
   IsRS(true)
 {
   // Set module properties
@@ -88,12 +88,12 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       ifeaUE = ifeaLE + feaBS;
     }
 
-    hILdEdxhitInEntaBin[iea] = new TH1F(Form("hILdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
+    hILdEdxhitInEntaBin[iea] = new TH1F(Form("hILdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0., 5.);
     hILdEdxhitInEntaBin[iea]->SetTitle(Form("IL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
     hILdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Inner Layer");
     hILdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
 
-    hOLdEdxhitInEntaBin[iea] = new TH1F(Form("hOLdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
+    hOLdEdxhitInEntaBin[iea] = new TH1F(Form("hOLdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0., 5.);
     hOLdEdxhitInEntaBin[iea]->SetTitle(Form("OL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
     hOLdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Outer Layer");
     hOLdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
@@ -119,9 +119,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   hOLEntaL->GetYaxis()->SetTitle("Entries");
   hOLEntaL->GetXaxis()->SetTitle("Entrance angle (#theta)");
 
-  TH1F* hILdEdx_all = new TH1F("hILdEdx_all", "", 250, 0, 5);
-  TH1F* hOLdEdx_all = new TH1F("hOLdEdx_all", "", 250, 0, 5);
-
+  TH1F* hILdEdx_all = new TH1F("hILdEdx_all", "", 250, 0., 5.);
+  TH1F* hOLdEdx_all = new TH1F("hOLdEdx_all", "", 250, 0., 5.);
 
   Int_t ibinEA = 0;
   for (int i = 0; i < ttree->GetEntries(); ++i) {
@@ -206,7 +205,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
   if (IsMakePlots) {
 
-    std::cout << "Jitendra Bins #" << std::endl;
+    std::cout << "Used bins for truncation from 5 to 75 per #" << std::endl;
     std::cout << "Inner Layes Bins = # from" << lBinInLayer << ", to " << hBinInLayer << std::endl;
     std::cout << "Outer Layes Bins = # from" << lBinOutLayer << ", to " << hBinOutLayer << std::endl;
 
@@ -260,9 +259,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     psname.str(""); psname << "dedx_1dcell.pdf";
   }
 
-  double truncMean = 1.0, binweights = 1.0;
-  int sumofbc = 1;
-
   TH1F* htemp = 0x0;
   std::vector<std::vector<double>> onedcors; // prev->std::vector<std::vector<double>> ones;
   std::vector<double> onedcorIorOL, onedcorIorOLtemp;
@@ -296,9 +292,11 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       else if (iIOLayer == 1)htemp = (TH1F*)hOLdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
       else continue;
 
-      truncMean  = 1.0; binweights = 0.0; sumofbc = 0;
+      double truncMean = 1.0;
       if (htemp->Integral() < 100) truncMean  = 1.0; //low stats
       else {
+        double binweights = 0.0;
+        int sumofbc = 0;
         for (int ibin = startfrom; ibin <= endat; ibin++) {
           //std::cout << " dedxhit bin = " << ibin << ", Entries =" << htemp->GetBinContent(ibin) << std::endl;
           if (htemp->GetBinContent(ibin) > 0) {

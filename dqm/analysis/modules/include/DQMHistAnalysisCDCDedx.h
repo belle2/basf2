@@ -24,40 +24,71 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+    * constructor
+    */
     DQMHistAnalysisCDCDedxModule();
+
+    /**
+    * destructor
+    */
     virtual ~DQMHistAnalysisCDCDedxModule();
 
-    //! Module functions to be called from main process
+    /**
+    * init function for default values
+    */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /**
+    * begin each run
+    */
     virtual void beginRun() override;
+
+    /**
+    * event by event function
+    */
     virtual void event() override;
+
+    /**
+    * end of each run
+    */
     virtual void endRun() override;
+
+    /**
+    * terminating at the end of last run
+    */
     virtual void terminate() override;
 
+    /**
+    * funtion to compute mean and sigma of dEdx distribution
+    */
     void computedEdxMeanSigma();
+
+    /**
+    * funtion to trending plots for mean and sigma of dEdx distribution
+    */
     void computedEdxBandPlot();
 
-    //! Data members
+
   private:
 
-    TCanvas* c_CDCdedxMean = nullptr;
-    TCanvas* c_CDCdedxSigma = nullptr;
+    /** Save fitted mean and sigma for the 'dedx' values */
 
-    TH1F* h_CDCdedxMean = nullptr;
-    TH1F* h_CDCdedxSigma = nullptr;
+    TCanvas* c_CDCdedxMean = nullptr; /**< canvas for dedx mean value */
+    TCanvas* c_CDCdedxSigma = nullptr; /**< canvas for dedx sigma value*/
 
-    TF1* f_fGaus = nullptr; // only one fit function
+    TH1F* h_CDCdedxMean = nullptr; /**< histogram for dedx mean value*/
+    TH1F* h_CDCdedxSigma = nullptr; /**< histogram for dedx sigma value */
 
-    TLine* tLine = nullptr;
+    TF1* f_fGaus = nullptr; /**< Gaus fit function for dEdx dist*/
 
-    std::string runstatus;
-    std::string runnumber;
+    TLine* tLine = nullptr; /**< Ref line for dEdx fit mean */
 
-    double dedxmean;
-    double dedxsigma;
+    std::string runstatus; /**< Status of run quality */
+    std::string runnumber; /**< Current Run number */
+
+    double dedxmean; /**< fit value for dedx mean */
+    double dedxsigma; /**< fit value for dedx sigma */
 
 
   };

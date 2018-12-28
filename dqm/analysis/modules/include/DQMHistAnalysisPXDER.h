@@ -213,6 +213,8 @@ namespace Belle2 {
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
+
+    // get a histogram by name DEPRECATED, better use function from base class!
     TH1* GetHisto(TString histoname);
 
   };

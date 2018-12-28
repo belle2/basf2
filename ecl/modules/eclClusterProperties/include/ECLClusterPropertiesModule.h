@@ -53,11 +53,11 @@ namespace Belle2 {
     void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
 
     // Required input
-    StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
-    StoreArray<Track> m_tracks; /** Required input array of Tracks */
-    StoreArray<ECLCluster> m_eclClusters; /** Required input array of ECLClusters */
-    StoreArray<ECLShower> m_eclShowers; /** Required input array of ECLShowers */
-    StoreArray<ECLCalDigit> m_eclCalDigits; /** Required input array of ECLCalDigits */
+    StoreArray<ExtHit> m_extHits;           /**< Required input array of ExtHits */
+    StoreArray<Track> m_tracks;             /**< Required input array of Tracks */
+    StoreArray<ECLCluster> m_eclClusters;   /**< Required input array of ECLClusters */
+    StoreArray<ECLShower> m_eclShowers;     /**< Required input array of ECLShowers */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits */
 
     std::string m_trackClusterRelationName; /**< name of relation array between tracks and ECL clusters */
 

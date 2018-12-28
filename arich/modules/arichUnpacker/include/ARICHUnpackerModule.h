@@ -99,7 +99,7 @@ namespace Belle2 {
   protected:
     unsigned int calbyte(const int* buf); /**< calculate number of bytes in raw Unpacker */
     unsigned int calword(const int* buf); /**< calculate number of words in raw Unpacker */
-    unsigned int m_ibyte; /**< bye index of raw unpacker */
+    unsigned int m_ibyte = 0; /**< bye index of raw unpacker */
   };
 
   /**

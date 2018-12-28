@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ECLHadronComponentEmissionFunction(TGraph* inHadronComponentEmissionFunction): m_HadronComponentEmissionFunction(
+    explicit ECLHadronComponentEmissionFunction(TGraph* inHadronComponentEmissionFunction): m_HadronComponentEmissionFunction(
         inHadronComponentEmissionFunction) {};
 
     /**

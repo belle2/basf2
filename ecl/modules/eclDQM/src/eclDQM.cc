@@ -71,8 +71,7 @@ void ECLDQMModule::defineHisto()
 
   // Create a separate histogram directory and cd into it.
 
-  TDirectory* dirDAQ = NULL;
-  dirDAQ = dynamic_cast<TDirectory*>(oldDir->Get(m_histogramDirectoryName.c_str()));
+  TDirectory* dirDAQ = dynamic_cast<TDirectory*>(oldDir->Get(m_histogramDirectoryName.c_str()));
   if (!dirDAQ) dirDAQ = oldDir->mkdir(m_histogramDirectoryName.c_str());
   dirDAQ->cd();
 

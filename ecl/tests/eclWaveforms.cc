@@ -49,13 +49,13 @@ namespace Belle2 {
       int N = 128;
       BitStream q(N);
 
-      for (int i = 0; i < 32; i++) {
+      for (unsigned int i = 0; i < 32; i++) {
         unsigned int k = 1 << i;
         q.putNBits(k, i + 1);
       }
       EXPECT_EQ(q.getPos(), 528);
       q.setPos(0);
-      for (int i = 0; i < 32; i++) {
+      for (unsigned int i = 0; i < 32; i++) {
         unsigned int k0 = 1 << i, k = q.getNBits(i + 1);
         EXPECT_EQ(k, k0);
       }
@@ -63,7 +63,7 @@ namespace Belle2 {
 
       q.resize();
       q.setPos(0);
-      for (int i = 0; i < 32; i++) {
+      for (unsigned int i = 0; i < 32; i++) {
         unsigned int k0 = 1 << i, k = q.getNBits(i + 1);
         EXPECT_EQ(k, k0);
       }

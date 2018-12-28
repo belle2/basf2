@@ -92,8 +92,7 @@ namespace Belle2 {
   {
 
     TDirectory* oldDir = gDirectory;
-    TDirectory* dirARICHDQM = NULL;
-    dirARICHDQM = oldDir->mkdir("ARICH");
+    TDirectory* dirARICHDQM = oldDir->mkdir("ARICH");
     dirARICHDQM->cd();
 
     //Histograms for analysis and statistics
@@ -126,8 +125,7 @@ namespace Belle2 {
                                  0.5, 71 - 0.5);
     }
 
-    TDirectory* dirAerogel = NULL;
-    dirAerogel =  dirARICHDQM->mkdir("expert");
+    TDirectory* dirAerogel =  dirARICHDQM->mkdir("expert");
     dirAerogel->cd();
 
     h_chDigit = new TH1D("chDigit", "Number of raw digits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);

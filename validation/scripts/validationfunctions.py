@@ -386,3 +386,18 @@ def index_from_revision(revision, work_folder):
         index = None
 
     return index
+
+
+def get_log_file_paths(logger):
+    """
+    Returns list of paths that the FileHandlers of logger write to.
+    :param logger: logging.logger object.
+    :return: List of paths
+    """
+    ret = []
+    for handler in logger.handlers:
+        try:
+            ret.append(handler.baseFilename)
+        except AttributeError:
+            pass
+    return ret

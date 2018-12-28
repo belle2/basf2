@@ -41,6 +41,7 @@ stdK('all', path=c2bnpath)
 stdE('all', path=c2bnpath)
 stdMu('all', path=c2bnpath)
 stdKshorts(path=c2bnpath)
+mergedKshorts(path=c2bnpath)
 loadStdSkimPi0(path=c2bnpath)
 
 from skim.charm import DstToD0Neutrals

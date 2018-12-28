@@ -2,7 +2,7 @@
 
 
 """
- This is a tool that prints out the follwing information about a skim:
+ This is a tool that prints out the follwing information about a combined skim:
 
    1) Retention Rate
    2) Number of Input Events
@@ -20,8 +20,8 @@
   13) Estimated total log file size  of a skim and a sample (GB).
       (taking into account the total number of input mdst files available per sample.)
 
- To run printSkimStats.py, you need to have run your skim on a set of input mDST files
- (you can use runSkims.py), and produce a set of uDST and log files with the following
+ To run printCombinedStats.py, you need to have run your skim on a set of input mDST files
+ (you can use runCombinedStats.py), and produce a set of uDST and log files with the following
  name scheme:
   SkimName_SampleName.udst.root
   SkimName_SampleName.out
@@ -41,20 +41,14 @@ import subprocess
 import json
 
 
-skims = ' ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon TauGeneric SystematicsRadMuMu SystematicsRadEE'
-skims += ' LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking'
-skims += '  SystematicsLambda  Systematics ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic   '
-skims += 'feiSLB0WithOneLep  feiHadronicB0 feiHadronicBplus  BtoPi0Pi0 '
-skims += '  BtoDh_Kspi0  BtoDh_hh TauGeneric  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  '
-skims += 'CharmRare BtoXll BtoXgamma  TauLFV CharmRare Charm2BodyNeutrals2'
-skims += ' Charm3BodyHadronic2  Charm3BodyHadronic1 Charm3BodyHadronic3   Charm2BodyNeutrals Charm2BodyNeutralsD0'
+skims = 'feiHadronic Dark Semileptonic feiHadronic BtoCharm BtoCharmless Quarkonium  CombinedSystematics MiscCombined'
 
-bkgs = 'MC9_mixedBGx1  MC9_chargedBGx1 MC9_ccbarBGx1 MC9_ssbarBGx1 MC9_uubarBGx0  MC9_ddbarBGx1  MC9_taupairBGx1'
-bkgs += ' MC9_mixedBGx0 MC9_chargedBGx0 MC9_ccbarBGx0 MC9_ssbarBGx0 MC9_uubarBGx0 MC9_ddbarBGx0 MC9_taupairBGx0'
-
+bkgs = 'MC10_chargedBGx1  MC10_chargedBGx1 MC10_ccbarBGx1 MC10_ssbarBGx1 MC10_uubarBGx0  MC10_ddbarBGx1  MC10_taupairBGx1'
+bkgs += ' MC10_mixedBGx0 MC10_chargedBGx0 MC10_ccbarBGx0 MC10_ssbarBGx0 MC10_uubarBGx0 MC10_ddbarBGx0 MC10_taupairBGx0'
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
 jsonEvtSizeInput = open('JsonEvtSizeInput.txt', 'w')
 jsonTimeInput = open('JsonTimeInput.txt', 'w')
+skimCampaign = 'MC9'
 
 nFullFiles = 10000
 nFullEvents = 200000
@@ -65,6 +59,38 @@ for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
+
+    if (skim == 'CombinedSystematics'):
+        nSkims = 6
+        partSkim = 'Systematics SystematicsLambda SystematicsTracking Resonance SystematicsRadMuMu SystematicsRadEE'
+
+    if (skim == 'Semileptonic'):
+        nSkims = 3
+        partSkim = 'PRsemileptonicUntagged LeptonicUntagged SLUntagged'
+
+    if (skim == 'MiscCombined'):
+        nSkims = 3
+        partSkim = 'BtoPi0Pi0 TauGeneric TauLFV'
+
+    if (skim == 'Dark'):
+        nSkims = 4
+        partSkim = 'ALP3Gamma SinglePhotonDark LFVZpVisible LFVZpInvisible'
+
+    if (skim == 'feiHadronic'):
+        nSkims = 2
+        partSkim = 'feiHadronicB0 feiHadronicBplus'
+
+    if (skim == 'Quarkonium'):
+        nSkims = 3
+        partSkim = 'ISRpipicc BottomoniumEtabExclusive BottomoniumUpsilon'
+
+    if (skim == 'BtoCharmless'):
+        nSkims = 2
+        partSkim = 'CharmlessHad2Body CharmlessHad3Body'
+
+    if (skim == 'BtoCharm'):
+        nSkims = 4
+        partSkim = 'BtoDh_Kshh BtoDh_hh BtoDh_Kspi0 BtoDh_Kspipipi0'
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
     title = '|Bkg        |  InputEvents  |  Skimmed Events  |   Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
@@ -73,15 +99,15 @@ for skim in skims.split():
     print(title)
     for bkg in bkgs.split():
         inputFileName = skim + '_' + bkg + '.out'
-        outputFileName = skim + '_' + bkg
-        outputUdstName = skim + '_' + bkg
-
+        outputFileName = '../standalone/outputFiles/' + skim + '_' + bkg
+        nSkimmedEvents = 0
+        nPartSkimmedEvents = 0
         pos = bkg.find('_')
         skimCampaign = bkg[0:pos]
         sampleType = bkg[pos + 1:]
+        skimCampaign = 'MC9'
         fileList = get_test_file(sampleType, skimCampaign)
         nFullEvents = get_eventN(fileList)
-        nSkimmedEvents = get_eventN(outputUdstName + '.udst.root')
         nFullFiles = get_total_infiles(sampleType, skimCampaign)
         # These counters are included to determine the number  of lines with retention and candidate multiplicity information.
         lineCounter = 0
@@ -99,12 +125,13 @@ for skim in skims.split():
         skipped = False
         timePerEvent = 0
         retention = 0
+        totalRetention = 0
         mdstSizeByte = 0
         mdstSizeKiloByte = 0
         mdstSizePerEvent = 0
         udstSizeByte = 0
         udstSizePerEvent = 0
-        udstSizePerEvent = 0
+        totalUdstSizePerEvent = 0
         totalTime = 0
         maxMemory = 0
         diff = 1
@@ -127,11 +154,18 @@ for skim in skims.split():
                     avgMemline = line.split()
                     avgMemory = float(avgMemline[3]) / 1000
                     avgMemoryPerEvent = avgMemory / events
-                if 'Total Retention' in line:  # Find line with total retention
-                    # l += 1
-                    # print(line)
+                if l == 0 and 'Total Retention' in line:  # Find line with total retention
+                    l += 1
                     rline = line.split(' ')
-                    retention = float(rline[2])  # print('Total retention is ' + str(retention))
+                    retention = float(rline[2])
+                    totalRetention += retention
+                if l == 1 and 'Total Retention' in line:  # Find line with total retention
+                    rline = line.split(' ')
+                    tempr = float(rline[2])
+                    if (tempr != retention):
+                        totalRetention += float(rline[2])
+                        retention = tempr
+
                 if z == 0 and line.find('Candidate Multiplicity') >= 0:  # Find line with Candidate Multiplicity
                     z += 1
                     s = int(lineCounter) + 2
@@ -154,7 +188,6 @@ for skim in skims.split():
                     acmN = acmN + 0
                     nModes += 1
                     skipped = True
-                    print('Could not determine candidate multiplicity in one mode')
             elif (i > 9):
                 acmTemp = sline[2]
                 if acmTemp[:1].isdigit():
@@ -162,28 +195,29 @@ for skim in skims.split():
                 else:
                     acmN = acmN + 0
                     nModes = +1
-                    print('Could not determine candidate multiplicity in one mode')
         acm = acmN / diff  # Determine the average candidate multiplicity
         # GET AND PRINT UDST EVENT SIZE:
         if retention == 0:
             udstSizePerEvent = 0
         if retention == 0:
             mdstSizePerEvent = 0
+        for part in partSkim.split():
+            outputUdstName = '../standalone/outputFiles/' + part + '_' + bkg
 
-        statinfo_udst = os.stat(outputUdstName + '.udst.root')
-        udstSizeByte = str(statinfo_udst.st_size)
-        udstSizeKiloByte = statinfo_udst.st_size / 1024
+            nPartSkimmedEvents = get_eventN(outputUdstName + '.udst.root')
+            statinfo_udst = os.stat(outputUdstName + '.udst.root')
+            udstSizeByte = str(statinfo_udst.st_size)
+            udstSizeKiloByte = statinfo_udst.st_size / 1024
+            if (retention != 0):
+                udstSizePerEvent = udstSizeKiloByte / (events * retention)
+            totalUdstSizePerEvent += udstSizePerEvent
 
-        statinfo_log = os.stat(outputFileName + '.out')
+        statinfo_log = os.stat(inputFileName)
         logFileSizeByte = str(statinfo_log.st_size)
         logFileSizeKiloByte = statinfo_log.st_size / 1024
         logFileSizePerEvent = logFileSizeKiloByte / events
 
-        if (retention != 0):
-            udstSizePerEvent = udstSizeKiloByte / (events * retention)
-        if (retention != 0):
-            mdstSizePerEvent = mdstSizeKiloByte / (events * retention)
-        fullFileSizeKB = udstSizePerEvent * retention * nFullEvents
+        fullFileSizeKB = totalUdstSizePerEvent * retention * nFullEvents
         fullFileSizeMB = fullFileSizeKB / 1000
 
         fullSkimSizeMB = fullFileSizeMB * nFullFiles
@@ -192,9 +226,6 @@ for skim in skims.split():
         fullLogSkimSizeGB = fullLogFileMB * nFullFiles / 1000
 
         totalTime = timePerEvent * nFullEvents / 23.57
-        avgRetentionPerSample += retention
-        avgUdstSizePerEventPerSample += udstSizePerEvent
-        avgProcessingTimePerEventPerSample += timePerEvent
         print('|' +
               bkg +
               '     |     ' +
@@ -202,14 +233,14 @@ for skim in skims.split():
               '     |     ' +
               str(nSkimmedEvents) +
               '     |     ' +
-              str(retention) +
+              str(totalRetention) +
               '     |     ' +
               str(timePerEvent)[:5] +
               '      |     ' +
 
               str(totalTime)[:5] +
               '      |     ' +
-              str(udstSizePerEvent)[:5] +
+              str(totalUdstSizePerEvent)[:5] +
               '     |     ' +
               str(fullFileSizeMB)[:5] +
               '    |   ' +

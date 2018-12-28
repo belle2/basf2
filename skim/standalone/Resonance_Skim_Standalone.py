@@ -16,7 +16,7 @@ from skimExpertFunctions import *
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 syspath = Path()
 fileList = [
@@ -114,4 +114,4 @@ if 'Validation' in argvs:
 setSkimLogging(path=syspath)
 process(syspath)
 
-print(statistics, path=syspath)
+print(statistics)

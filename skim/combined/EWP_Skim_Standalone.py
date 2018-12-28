@@ -17,7 +17,7 @@ from skim.standardlists.charm import *
 from skim.standardlists.lightmesons import *
 from stdPhotons import *
 from skimExpertFunctions import add_skim, setSkimLogging, encodeSkimName
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 
 fileList = [

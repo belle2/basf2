@@ -16,7 +16,7 @@ from stdCharged import stdMu
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 # create a path to build skim lists
 skimpath = Path()

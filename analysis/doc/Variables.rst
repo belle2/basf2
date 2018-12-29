@@ -191,6 +191,8 @@ Flavor Tagger
 .. b2-variables::
    :group: Flavor Tagger MetaFunctions
 
+.. _restOfEventVariables:
+
 Rest of Event
 ~~~~~~~~~~~~~
 
@@ -203,13 +205,30 @@ Continuum Suppression
 .. b2-variables::
     :group: Continuum Suppression
 
-Miscellaneous
-~~~~~~~~~~~~~
 
-Other variable that can be handy in development:
+.. _eventShapeVariables:
+
+Event Shape
+~~~~~~~~~~~
+
+These variables are available after adding the event shape builder modules.
+This can be done with the function `modularAnalysis.buildEventShape`.
 
 .. b2-variables::
-   :group: Miscellaneous
+    :group: EventShape
+
+.. _eventKinematicsVariables:
+
+Event Kinematics
+~~~~~~~~~~~~~~~~
+
+These variables are available after adding the event kinematics modules.
+This can be done with the function `modularAnalysis.buildEventKinematics`.
+
+.. b2-variables::
+    :group: EventKinematics
+         
+.. _flight_information:
 
 Flight Information
 ~~~~~~~~~~~~~~~~~~
@@ -219,6 +238,8 @@ Here is a list of flight time and distance variables of a (grand)daughter partic
 .. b2-variables::
    :group: Flight Information   
 
+.. _vertex_information:
+
 Vertex Information
 ~~~~~~~~~~~~~~~~~~
 
@@ -227,6 +248,15 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information   
 
+
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+Other variable that can be handy in development:
+
+.. b2-variables::
+   :group: Miscellaneous
 
 Calibration
 ~~~~~~~~~~~

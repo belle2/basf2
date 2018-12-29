@@ -26,7 +26,7 @@ might notice are
   have to use it and use the `sys` or `os` module in the script please make
   sure you import them yourself **after** ``from basf2 import *``
 
-* Display and coloring of log messages in Jupyter_ has been significantly
+* Display and colouring of log messages in Jupyter_ has been significantly
   improved and should now be much faster.
 
 * There's a new implementation for `pager.Pager` which can also show output
@@ -184,7 +184,7 @@ Utilities
 
 * We now provide a variety of `RAII <https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization>`_
   scope guards to free or restore a resource or value when the guard object
-  goes out of scope. For exmaple to make sure a
+  goes out of scope. For example to make sure a
   variable is reset to is original value one could use
 
   .. code-block:: c++

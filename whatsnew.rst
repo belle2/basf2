@@ -22,6 +22,63 @@ Changes since release-02-01
 .. important changes should go here. Especially things that break backwards
    compatibility 
 
+.. rubric:: Deprecated the ``analysis_main`` path and NtupleTools
+
+Two major backward-compatibility-breaking changes to `modularAnalysis` scripts come
+with this release.
+ 
+  1. The default path ("``analysis_main``") is now **deprecated**. 
+     This was originally intended to be a convenience but can cause subtle bugs.
+     Importantly, the default path also introduced misconceptions with what 
+     the active code actually does in user-analysis scripts.
+     More detail is available on the `ModularAnalysis <mawrappers>` page and 
+     there is also the full documentation for `Modules and Paths 
+     <general_modpath>` if you want a refresher.
+     There is an example of a script update below.
+
+
+  2. The suite of NtupleTools is now **deprecated** in favour of the
+     `variable manager tools <variablemanageroutput>` (such as 
+     `VariablesToNtuple <v2nt>`).
+
+
+
+To give a worked example, if your script from ``release-02-01-00`` looked something like this:
+
+.. code-block:: python
+
+         from basf2 import *
+         from stdCharged import stdPi
+         from modularAnalysis import *
+         stdPi("good")
+         ntupleFile("myFile.root") # <-- now deprecated
+         ntupleTree("pi+:good", ['pi+', 'Momentum']) # <-- now deprecated
+         process(analysis_main)
+         print(statistics)
+
+
+You should update it to this:
+
+.. code-block:: python
+
+         import basf2 # better not to import all
+         from stdCharged import stdPi
+         from modularAnalysis import variablesToNtuple
+         mypath = basf2.Path() # create your own path (call it what you like)
+         stdPi("good", path=mypath)
+         variablesToNtuple("pi+:good", ['px', 'py', 'pz', 'E'], path=mypath)
+         basf2.process(mypath)
+         print(basf2.statistics)
+
+
+.. seealso::
+        The example scripts available here:
+
+        .. code-block:: text
+
+              $BELLE2_RELEASE_DIR/analysis/examples/VariableManager
+
+
 .. rubric:: Moved to C++17
 
 The whole software including the ROOT in the externals is now compiled using

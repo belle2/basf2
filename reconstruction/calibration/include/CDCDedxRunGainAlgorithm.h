@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: jvbennett                                                *
+ * Contributors: jikumar, jvbennett                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -52,6 +52,7 @@ namespace Belle2 {
       inputfile.open(Form("%s/%s", m_badRunFPath.data(), m_badRunFName.data()));
       if (inputfile.fail()) {
         printf("%s\n", "input file of bad runs does not exits or corrupted!");
+        return;
       }
 
       int badrun = -999, nBadruns = 0;

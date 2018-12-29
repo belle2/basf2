@@ -54,7 +54,7 @@ Loading V0 Particles
 ++++++++++++++++++++
 
 * When loading V0 particles (i.e. :math:`K_S^0`, :math:`\Lambda^0`, or converted photons) using the ParticleLoader (`fillParticleList`) you must now specify the daughters in a decay string.
-  For example, to load V0s as :math:`\Lambda^0\to p^+\pi^-` decays from V0s:
+  For example, to load :math:`\Lambda^0\to p^+\pi^-` decays from V0s:
 
   .. code-block:: python
 

@@ -745,8 +745,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking_pi+:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_pi+:generic.root', treeName='variables',
-                        variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
-                                   'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                        variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
+                                   'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='pi+:generic')
 
         path.add_module('MVAExpert', identifier='UNITTEST_K+:generic ==> K+:FSP', extraInfoName='SignalProbability',
@@ -799,8 +799,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking_K+:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_K+:generic.root', treeName='variables',
-                        variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
-                                   'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                        variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
+                                   'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='K+:generic')
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> K-:generic pi+:generic',
@@ -872,8 +872,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking_D0:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_D0:generic.root', treeName='variables',
-                        variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isSignal',
-                                   'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                        variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isSignal',
+                                   'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='D0:generic')
 
         print_path(path, x.reconstruct())

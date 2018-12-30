@@ -45,7 +45,8 @@ if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), ResonanceList, path=syspath)
 else:
     skimOutputUdst(skimCode, ResonanceList, path=syspath)
-summaryOfLists(ResonanceList)
+summaryOfLists(ResonanceList, path=syspath)
+
 if 'Validation' in argvs:
     if argc > 2:
         ntupleFile('Validation_%s_%s.root' % (skimCode, (argvs[argvs.index('Validation') + 1])))

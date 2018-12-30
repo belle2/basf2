@@ -45,8 +45,8 @@ namespace Belle2 {
     /** Destructor. */
     virtual ~SmearPrimaryVertexModule() {}
 
-    virtual void initialize() override;
-    virtual void terminate() override;
+    virtual void initialize() override; /**< initialize the module */
+    virtual void terminate() override;  /**< terminate the module */
 
     /** Method is called for each run. */
     virtual void beginRun() override;

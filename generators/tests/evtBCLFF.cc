@@ -18,7 +18,7 @@
 
 #include <string>
 
-namespace Belle2 {
+namespace {
 
   /** The fixture for testing the EvtBCLFF. */
   class EvtBCLFFTest : public ::testing::Test {

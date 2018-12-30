@@ -40,10 +40,10 @@ namespace Belle2 {
     virtual void terminate() override;
 
     //parameters
-    bool m_printCanvas;
-    float m_occError;
-    float m_occWarning;
-    float m_occEmpty;
+    bool m_printCanvas; /**< if true print the pdf of the canvases */
+    float m_occError; /**<error level of the occupancy */
+    float m_occWarning; /**< warning level of the occupancy */
+    float m_occEmpty; /**<empty level of the occupancy */
     //! Parameters accesible from basf2 scripts
     //  protected:
 
@@ -55,22 +55,22 @@ namespace Belle2 {
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
 
-    TCanvas* m_cUnpacker = nullptr;
-    TH2F* m_hOccupancyU = nullptr;
-    TCanvas* m_cOccupancyU = nullptr;
-    TH2F* m_hOccupancyV = nullptr;
-    TCanvas* m_cOccupancyV = nullptr;
+    TCanvas* m_cUnpacker = nullptr; /**<unpacker plot canvas */
+    TH2F* m_hOccupancyU = nullptr; /**< occupnacy U histo */
+    TCanvas* m_cOccupancyU = nullptr; /**< occupacy U histo canvas */
+    TH2F* m_hOccupancyV = nullptr; /**< occupancy V histo */
+    TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
 
-    TPaveText boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color);
-    Int_t findBinY(Int_t layer, Int_t sensor);
+    TPaveText boxOcc(Int_t layer, Int_t ladder, Int_t sensor, Int_t color); /**< plot sensor-box in occupancy plot */
+    Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
-    TPaveText* m_leg = nullptr;
-    TPaveText* m_legProblem = nullptr;
-    TPaveText* m_legWarning = nullptr;
-    TPaveText* m_legNormal = nullptr;
-    TPaveText* m_legEmpty = nullptr;
-    TPaveText* m_legError = nullptr;
-    TText* m_yTitle = nullptr;
+    TPaveText* m_leg = nullptr; /**< occupancy plot legend */
+    TPaveText* m_legProblem = nullptr; /**< occupancy plot legend, problem */
+    TPaveText* m_legWarning = nullptr; /**< occupancy plot legend, warning */
+    TPaveText* m_legNormal = nullptr; /**< occupancy plot legend, normal */
+    TPaveText* m_legEmpty = nullptr; /**< occupancy plot legend, empty */
+    TPaveText* m_legError = nullptr; /**< occupancy plot legend, error*/
+    TText* m_yTitle = nullptr; /**< y axis title text*/
 
 
     //! IDs of all SXD Modules to iterate over

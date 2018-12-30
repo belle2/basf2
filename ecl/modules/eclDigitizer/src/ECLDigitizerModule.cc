@@ -59,7 +59,7 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
            false);
   addParam("DiodeDeposition", m_inter,
            "Flag to take into account energy deposition in photodiodes; Default diode is sensitive detector (default: true)", true);
-  addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits (default: true)", false);
+  addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits (default: false)", false);
   addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (default: 0u)", 0u);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
   addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction (default: true)",

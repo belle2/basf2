@@ -14,7 +14,7 @@ from stdPhotons import *
 from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 skimCode = encodeSkimName('TauGeneric')
 import sys
@@ -27,6 +27,9 @@ fileList = [
 ]
 
 inputMdstList('MC9', fileList)
+
+stdPi('all')
+stdPhotons('all')
 
 # Tau Skim
 from skim.taupair import *

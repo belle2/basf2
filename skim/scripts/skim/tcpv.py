@@ -35,7 +35,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def TCPVList():
+def TCPVList(path):
     btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
     bd_qqs_Channels = [
@@ -63,14 +63,14 @@ def TCPVList():
 
     bd_qqs_List = []
     for chID, channel in enumerate(bd_qqs_Channels):
-        reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID)
-        applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4')
+        reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4', path=path)
         bd_qqs_List.append('B0:TCPV_qqs' + str(chID))
 
     bd_ccs_List = []
     for chID, channel in enumerate(bd_ccs_Channels):
-        reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID)
-        applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4')
+        reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4', path=path)
         bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
     tcpvLists = bd_qqs_List + bd_ccs_List

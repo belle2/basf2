@@ -14,8 +14,6 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
-from stdPhotons import *
 from beamparameters import add_beamparameters
 
 # prepate files and particle lists
@@ -24,7 +22,6 @@ inputMdst('default', '../1730840030.dst.root')
 # set up for running at Y(3S)
 beamparameters = add_beamparameters(analysis_main, "Y3S")
 
-# loadStdCharged()
 # fill lists with some minimal 'goodness' requirements
 fillParticleList('mu-:all', 'chiProb>0.001 and abs(d0)<2 and abs(z0)<4')
 fillParticleList('e-:all', 'chiProb>0.001 and abs(d0)<2 and abs(z0)<4')

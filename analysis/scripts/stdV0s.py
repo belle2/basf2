@@ -65,21 +65,6 @@ def goodBelleKshort(path=analysis_main):
     applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path)
 
 
-def loadStdKS(path=analysis_main):
-    """
-     Warining:
-        This function is deprecated. Please use :func:`stdKshorts` directly
-
-    Loads the standard :math:`K_{S}^{0}` list.
-    Kept for backward compatibility.
-
-    Parameters:
-        path (basf2.Path): modules are added to this path
-
-    """
-    stdKshorts(path)
-
-
 def stdLambdas(path=analysis_main):
     """
     Load :math:`\Lambda^{0}`s from the mdst V0 objects (created when the
@@ -110,8 +95,8 @@ def mergedLambdas(prioritiseV0=True, path=analysis_main):
 
     ::
 
-        from stdV0s import stdKshorts
-        help(stdKshorts)
+        from stdV0s import stdLambdas
+        help(stdLambdas)
 
     Parameters:
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?

@@ -21,22 +21,24 @@ def getRandomId(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def writeClosestPhotonExtraInfo(
-    photonList,
-    photonSelection='True',
+def writeClosestParticleExtraClusterInfo(
+    particleList,
+    particleSelection='True',
     roe_path=None,
     deadend_path=None,
     path=None
 ):
     """
-    Add various variables to the first photon that are related to their angular separation and kinematics.
+    Add various variables to the first particle that are related to their angular separation and kinematics.
 
-    @param photonList Photon list with photon candidates that will have the extra information in the end
-    @param photonSelection Selection for the other photon
+    @param particleList Particle list with particle candidates that will have the extra information in the end
+    @param particleSelection Selection for the other particle
     @param roe_path a path for the rest of event to be executed
     @param deadend_path a path for skipping irrelevant RestOfEvent objects that may exist (if this was called twice, for instance)
     @param path modules are added to this path
     """
+
+    particleType = particleList.split(":")[0]
 
     if not roe_path:
         roe_path = create_path()
@@ -45,27 +47,29 @@ def writeClosestPhotonExtraInfo(
         deadend_path = create_path()
 
     # build rest of event
-    buildRestOfEvent(photonList, path=path)
+    buildRestOfEvent(particleList, path=path)
 
     # get random listnames (in case we run this function multiple times)
-    pListPair = 'vpho:writeClosestPhotonExtraInfo' + getRandomId()
-    pList0 = 'gamma:writeClosestPhotonExtraInfo' + getRandomId()
-    pList1 = 'gamma:writeClosestPhotonExtraInfo' + getRandomId()
+    pListPair = 'vpho:writeClosestParticleExtraClusterInfo' + getRandomId()
+    pList0 = particleType + ':writeClosestParticleExtraClusterInfo' + getRandomId()
+    pList1 = particleType + ':writeClosestParticleExtraClusterInfo' + getRandomId()
 
-    signalSideParticleFilter(photonList, '', roe_path, deadend_path)
+    signalSideParticleFilter(particleList, '', roe_path, deadend_path)
 
-    fillSignalSideParticleList(pList0, '^' + photonList, path=roe_path)
+    fillSignalSideParticleList(pList0, '^' + particleList, path=roe_path)
 
-    fillParticleList(pList1, 'isInRestOfEvent == 1 and ' + photonSelection, path=roe_path)
+    fillParticleList(pList1, 'isInRestOfEvent == 1 and ' + particleSelection, path=roe_path)
 
     reconstructDecay(pListPair + ' -> ' + pList0 + ' ' + pList1, '', path=roe_path)
 
     # only keep the one with the smallest opening angle
-    rankByLowest(pListPair, 'daughterAngleInBetween(0, 1)', 1, path=roe_path)
+    rankByLowest(pListPair, 'daughterClusterAngleInBetween(0, 1)', 1, path=roe_path)
 
     # add new variables to the signal side particle
-    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterAngleInBetween(0, 1))': 'openingAngle'}, path=roe_path)
-    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, theta))': 'deltaTheta'}, path=roe_path)
-    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfPhi(0, 1))': 'deltaPhi'}, path=roe_path)
+    # NOTE: if somebody needs these variables in the CMS frame, they need to
+    # modify this function since it's not possible outside the roe_path
+    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterClusterAngleInBetween(0, 1))': 'openingAngle'}, path=roe_path)
+    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, clusterTheta))': 'deltaTheta'}, path=roe_path)
+    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfClusterPhi(0, 1))': 'deltaPhi'}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

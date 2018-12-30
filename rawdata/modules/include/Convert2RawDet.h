@@ -55,7 +55,7 @@ namespace Belle2 {
 
   protected:
     //! function to register data buffer in DataStore as RawDetector
-    virtual void convertDataObject(RawDataBlock* raw_dblk);
+    virtual void convertDataObject(RawDataBlock* raw_dblk, std::vector<unsigned int>& cpr_id);
 
     //! No. of sent events
     int m_nevt;
@@ -72,7 +72,6 @@ namespace Belle2 {
     StoreArray<RawKLM>        m_rawKLM       ; /** Array for RawKLM      */
     StoreArray<RawTRG>        m_rawTRG       ; /** Array for RawTRG      */
     StoreArray<RawFTSW>       m_rawFTSW      ; /** Array for RawFTSW     */
-
 
   };
 

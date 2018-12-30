@@ -43,6 +43,11 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setInitialVertex(const HepPoint3D& v);
+      /** Set an initial vertex point for the mass-vertex constraint fit.
+       * @param v initial vertex point
+       * @return error code (zero if success)
+       */
+      enum KFitError::ECode       setInitialVertex(const TVector3& v);
       /** Set an invariant mass for the mass-vertex constraint fit.
        * @param m invariant mass
        * @return error code (zero if success)
@@ -93,6 +98,11 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
       enum KFitError::ECode prepareInputMatrix(void) override;

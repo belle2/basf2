@@ -14,29 +14,24 @@
 # have interfaces for ParticleLists so this step is
 # neccessary if analysis tools are to be used.
 #
-# Contributors: A. Zupanc (June 2014)
+# Contributors: A. Zupanc (June 2014) I.Komarov(Sep 2018)
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import printDataStore
-from modularAnalysis import printList
-from modularAnalysis import fillParticleListsFromMC
-from modularAnalysis import analysis_main
-
-# check if the required input file exists (from B2A101 example)
-import os.path
+import basf2 as b2
+import modularAnalysis as ma
 import sys
-if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. '
-             'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
+
+# create path
+my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+             path=my_path)
 
 # print contents of the DataStore before loading MCParticles
-printDataStore()
+ma.printDataStore(path=my_path)
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
@@ -47,23 +42,23 @@ pions = ('pi-:gen', '')
 kaons = ('K-:gen', '')
 protons = ('anti-p-:gen', '')
 
-fillParticleListsFromMC([photons, electrons, muons, pions, kaons, protons])
+ma.fillParticleListsFromMC([photons, electrons, muons, pions, kaons, protons], path=my_path)
 
 # print contents of the DataStore after loading MCParticles
 # the difference is that DataStore now contains StoreArray<Particle>
 # filled with Particles created from generated final state particles
-printDataStore()
+ma.printDataStore(path=my_path)
 
 # print out the contents of each ParticleList
-printList('gamma:gen', False)
-printList('e-:gen', False)
-printList('mu-:gen', False)
-printList('pi-:gen', False)
-printList('K-:gen', False)
-printList('anti-p-:gen', False)
+ma.printList(list_name='gamma:gen', full=False, path=my_path)
+ma.printList(list_name='e-:gen', full=False, path=my_path)
+ma.printList(list_name='mu-:gen', full=False, path=my_path)
+ma.printList(list_name='pi-:gen', full=False, path=my_path)
+ma.printList(list_name='K-:gen', full=False, path=my_path)
+ma.printList(list_name='anti-p-:gen', full=False, path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

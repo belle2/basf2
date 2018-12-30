@@ -8,8 +8,10 @@ import math
 import numpy as np
 
 import ROOT
+
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
+Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
 
 import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
@@ -72,7 +74,6 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             number_of_daughters_truth=number_of_daughters,
             status_truth=status,
 
-
             # MC Particle information
             charge_truth=charge,
             pdg_code_truth=pdg_code,
@@ -83,9 +84,9 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
         nan = float('nan')
         return dict(
             # At origin assuming perfect magnetic field
-            omega_truth=nan,
-            phi0_truth=nan,
             d0_truth=nan,
+            phi0_truth=nan,
+            omega_truth=nan,
             z0_truth=nan,
             tan_lambda_truth=nan,
 
@@ -97,6 +98,14 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             x_truth=nan,
             y_truth=nan,
             z_truth=nan,
+
+            decay_vertex_radius_truth=nan,
+            decay_vertex_x_truth=nan,
+            decay_vertex_y_truth=nan,
+            decay_vertex_z_truth=nan,
+            number_of_daughters_truth=nan,
+            status_truth=nan,
+
 
             # MC Particle information
             charge_truth=nan,
@@ -115,7 +124,13 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
     last_svd_layer = nan
     first_cdc_layer = nan
     last_cdc_layer = nan
+    sum_of_weights = nan
+    last_fit_layer = nan
+
     if reco_track:
+        sum_of_weights = 0
+        last_fit_layer = 0
+
         n_cdc_hits = reco_track.getNumberOfCDCHits()
         n_svd_hits = reco_track.getNumberOfSVDHits()
         n_pxd_hits = reco_track.getNumberOfPXDHits()
@@ -133,7 +148,17 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
         if cdc_hits:
             first_cdc_layer = min(cdc_hits)
             last_cdc_layer = max(cdc_hits)
-
+        for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
+            track_point = reco_track.getCreatedTrackPoint(hit_info)
+            if track_point:
+                fitted_state = track_point.getFitterInfo()
+                if fitted_state:
+                    W = max(fitted_state.getWeights())
+                    sum_of_weights += W
+                    if W > 0.5 and hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_CDC:
+                        layer = hit_info.getRelated("CDCHits").getICLayer()
+                        if layer > last_fit_layer:
+                            last_fit_layer = layer
         return dict(
             n_pxd_hits=n_pxd_hits,
             n_svd_hits=n_svd_hits,
@@ -146,6 +171,8 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
             last_svd_layer=last_svd_layer,
             first_cdc_layer=first_cdc_layer,
             last_cdc_layer=last_cdc_layer,
+            sum_of_weights=sum_of_weights,
+            last_fit_layer=last_fit_layer
         )
     else:
         return dict(
@@ -160,6 +187,8 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
             last_svd_layer=last_svd_layer,
             first_cdc_layer=first_cdc_layer,
             last_cdc_layer=last_cdc_layer,
+            sum_of_weights=sum_of_weights,
+            last_fit_layer=last_fit_layer
         )
 
 
@@ -285,7 +314,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
         pt_estimate = mom.Perp()
 
         pt_variance = np.divide(
-            mom.X()**2 * cov6(3, 3) + mom.Y()**2 * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3, 4),
+            mom.X() ** 2 * cov6(3, 3) + mom.Y() ** 2 * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3, 4),
             mom.Perp2()
         )
 
@@ -349,6 +378,8 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_estimate=nan,
             pt_variance=nan,
             pt_resolution=nan,
+
+            b_field=nan,
 
             px_estimate=nan,
             px_variance=nan,
@@ -527,3 +558,15 @@ def get_seed_track_fit_result(reco_track):
     )
 
     return track_fit_result
+
+
+def is_correct_rl_information(cdc_hit, reco_track, hit_lookup):
+    rl_info = reco_track.getRightLeftInformation("const Belle2::CDCHit")(cdc_hit)
+    truth_rl_info = hit_lookup.getRLInfo(cdc_hit)
+
+    if rl_info == Belle2.RecoHitInformation.c_right and truth_rl_info == 1:
+        return True
+    if rl_info == Belle2.RecoHitInformation.c_left and truth_rl_info == 65535:  # -1 as short
+        return True
+
+    return False

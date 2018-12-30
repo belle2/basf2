@@ -3,7 +3,7 @@
 
 """
 SVD Default Cluster Calibration importer.
-t_min = -20,
+t_min = -80,
 """
 import basf2
 from basf2 import *
@@ -16,7 +16,13 @@ from ROOT.Belle2 import SVDHitTimeSelectionFunction
 import os
 
 # default values
-clsMinTime = -20
+# cls hit time
+clsTimeMin = -80
+clsTimeFunctionID = 0  # default, t > clsTimeMin
+clsTimeDeltaT = 30  # NOT USED
+clsTimeNSigma = 10  # NOT USED
+
+# cls cuts
 clsSeedSNR = 5
 clsAdjSNR = 3
 clsMinSNR = 0
@@ -34,9 +40,16 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         cls_payload = Belle2.SVDClusterCalibrations.t_payload()
         time_payload = Belle2.SVDClusterCalibrations.t_time_payload()
 
-        # cluster time
+        # SpacePoint time
         hitTimeSelection = SVDHitTimeSelectionFunction()
-        hitTimeSelection.setMinTime(clsMinTime)
+        # set default version = 0
+        hitTimeSelection.setFunctionID(clsTimeFunctionID)
+        # version 0: t > tMin
+        hitTimeSelection.setMinTime(clsTimeMin)
+        # version 1: |t-t0|<deltaT - NOT USED
+        hitTimeSelection.setDeltaTime(clsTimeDeltaT)
+        # version 2: |t-t0|<nSgma*tErrTOT - NOT USED
+        hitTimeSelection.setNsigma(clsTimeNSigma)
 
         # cluster reconstruction & position error
         clsParam = SVDClusterCuts()
@@ -58,34 +71,35 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
                     for side in (0, 1):
                         print("setting SVDCluster calibrations for " +
                               str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber) + "." + str(side))
+
                         if side == 0:  # V
                             if layerNumber == 3:  # L3 V
-                                clsParam.scaleError_clSize1 = 1.57
-                                clsParam.scaleError_clSize2 = 1.32
-                                clsParam.scaleError_clSize3 = 0.70
+                                clsParam.scaleError_clSize1 = 1.638
+                                clsParam.scaleError_clSize2 = 1.168
+                                clsParam.scaleError_clSize3 = 0.430
                             else:
                                 if sensorNumber == 1:  # FW V
-                                    clsParam.scaleError_clSize1 = 1.84
-                                    clsParam.scaleError_clSize2 = 1.53
-                                    clsParam.scaleError_clSize3 = 0.67
+                                    clsParam.scaleError_clSize1 = 1.766
+                                    clsParam.scaleError_clSize2 = 1.481
+                                    clsParam.scaleError_clSize3 = 0.433
                                 else:  # BARREL V
-                                    clsParam.scaleError_clSize1 = 1.84
-                                    clsParam.scaleError_clSize2 = 1.40
-                                    clsParam.scaleError_clSize3 = 0.75
+                                    clsParam.scaleError_clSize1 = 2.338
+                                    clsParam.scaleError_clSize2 = 1.418
+                                    clsParam.scaleError_clSize3 = 0.468
                         if side == 1:  # U
                             if layerNumber == 3:  # L3 U
-                                clsParam.scaleError_clSize1 = 1.32
-                                clsParam.scaleError_clSize2 = 1.25
-                                clsParam.scaleError_clSize3 = 0.93
+                                clsParam.scaleError_clSize1 = 1.352
+                                clsParam.scaleError_clSize2 = 1.137
+                                clsParam.scaleError_clSize3 = 0.559
                             else:
                                 if sensorNumber == 1:  # FW U
-                                    clsParam.scaleError_clSize1 = 1.44
-                                    clsParam.scaleError_clSize2 = 1.28
-                                    clsParam.scaleError_clSize3 = 0.99
+                                    clsParam.scaleError_clSize1 = 1.728
+                                    clsParam.scaleError_clSize2 = 1.209
+                                    clsParam.scaleError_clSize3 = 0.662
                                 else:  # BARREL U
-                                    clsParam.scaleError_clSize1 = 1.15
-                                    clsParam.scaleError_clSize2 = 1.09
-                                    clsParam.scaleError_clSize3 = 0.95
+                                    clsParam.scaleError_clSize1 = 1.312
+                                    clsParam.scaleError_clSize2 = 0.871
+                                    clsParam.scaleError_clSize3 = 0.538
                         print(" size 1 = " + str(clsParam.scaleError_clSize1) + ", size 2 = " +
                               str(clsParam.scaleError_clSize2) + ", size >2 = " + str(clsParam.scaleError_clSize3))
 
@@ -97,7 +111,7 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
 
 
 use_database_chain()
-use_local_database("localDB/database.txt", "localDB", invertLogging=True)
+use_local_database("localdb_clusterCal/database.txt", "localdb_clusterCal", invertLogging=True)
 
 main = create_path()
 

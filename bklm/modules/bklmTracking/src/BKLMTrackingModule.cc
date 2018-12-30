@@ -27,7 +27,9 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
   m_passYX(nullptr),
   m_totalYX(nullptr),
   m_passYZ(nullptr),
-  m_totalYZ(nullptr)
+  m_totalYZ(nullptr),
+  m_runTotalEvents(0),
+  m_runTotalEventsWithTracks(0)
 {
   for (int i = 0; i < 8; ++i) {
     m_total[0][i] = nullptr;
@@ -37,7 +39,7 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
     m_effiVsLayer[0][i] = nullptr;
     m_effiVsLayer[1][i] = nullptr;
   }
-  setDescription("perform standard-alone straight line tracking for BKLM");
+  setDescription("Perform standard-alone straight line tracking for BKLM");
   addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,
            "[degree], match BKLMTrack to RecoTrack; angle between them is required to be smaller than (default 10)", double(10.0));
@@ -62,6 +64,9 @@ void BKLMTrackingModule::initialize()
   m_storeTracks.registerRelationTo(recoTracks);
   recoHitInformation.registerRelationTo(hits2D);
   hits2D.registerRelationTo(recoTracks);
+
+  if (m_studyEffi)
+    B2INFO("BKLMTrackingModule:: this module is running in efficiency study mode!");
 
   m_file =     new TFile(m_outPath.c_str(), "recreate");
   char hname[100];
@@ -98,6 +103,10 @@ void BKLMTrackingModule::initialize()
 
 void BKLMTrackingModule::beginRun()
 {
+  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
+  m_runNumber.push_back((int)eventMetaData->getRun());
+  m_runTotalEvents = 0;
+  m_runTotalEventsWithTracks = 0;
 }
 
 void BKLMTrackingModule::event()
@@ -111,23 +120,31 @@ void BKLMTrackingModule::event()
   //StoreArray<BKLMHit2d> hits2D;
   //StoreArray<BKLMTrack> m_storeTracks;
   m_storeTracks.clear();
+  bool thereIsATrack = false;
 
   if (!m_studyEffi) {
     runTracking(0, -1, -1, -1);
+    if (m_storeTracks.getEntries() > 0)
+      thereIsATrack = true;
   } else if (m_studyEffi) {
     for (int iForward = 0; iForward < 2; iForward++) {
       for (int iSector = 0; iSector < 8; iSector++) {
         //if(iSector!=2&&iSector!=6) continue;
         for (int iLayer = 0; iLayer < 15; iLayer++) {
           runTracking(1, iForward, iSector , iLayer);
+          if (m_storeTracks.getEntries() > 0)
+            thereIsATrack = true;
           generateEffi(iForward, iSector, iLayer);
           //clear tracks so prepare for the next layer efficieny study
           m_storeTracks.clear();
         }
       }
     }
-
   }
+
+  m_runTotalEvents++;
+  if (thereIsATrack)
+    m_runTotalEventsWithTracks++;
 }
 
 void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iLayer)
@@ -235,11 +252,16 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
 
 void BKLMTrackingModule::endRun()
 {
+  m_totalEvents.push_back(m_runTotalEvents);
+  m_totalEventsWithTracks.push_back(m_runTotalEventsWithTracks);
 }
 
 void BKLMTrackingModule::terminate()
 {
-
+  for (long unsigned int i = 0; i < m_runNumber.size(); i++) {
+    float ratio = (float)m_totalEventsWithTracks.at(i) / (float)m_totalEvents.at(i);
+    B2INFO("BKLMTrackingModule:: run " << m_runNumber.at(i) << " --> " << ratio * 100 << "% of events has 1+ BKLMTracks");
+  }
 
   m_file->cd();
   char name[100];

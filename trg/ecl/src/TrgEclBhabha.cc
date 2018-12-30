@@ -68,6 +68,11 @@ TrgEclBhabha::TrgEclBhabha()
 
   _database = new TrgEclDataBase();
 
+  _2DBhabhaThresholdFWD.clear();
+  _2DBhabhaThresholdBWD.clear();
+  _3DBhabhaThreshold.clear();
+
+
 }
 
 TrgEclBhabha::~TrgEclBhabha()
@@ -170,20 +175,20 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
 
 
   BtoBflag  =
-    ((BhabhaComb[0]  > 4 && BhabhaComb[1]  > 2.5) ||
-     (BhabhaComb[2]  > 4 && BhabhaComb[3]  > 2.5) ||
-     (BhabhaComb[6]  > 4 &&  BhabhaComb[7]  > 2.5) ||
-     (BhabhaComb[8]  > 4 &&  BhabhaComb[9]  > 2.5) ||
-     (BhabhaComb[10]  > 4 &&  BhabhaComb[11]  > 2.5) ||
-     (BhabhaComb[12]  > 4 &&  BhabhaComb[13]  > 2.5) ||
-     (BhabhaComb[14]  > 4 &&  BhabhaComb[15]  > 2.5) ||
-     (BhabhaComb[16]  > 4 &&  BhabhaComb[17]  > 2.5) ||
-     (BhabhaComb[18]  > 4 &&  BhabhaComb[19]  > 2.5) ||
-     (BhabhaComb[20]  > 4 &&  BhabhaComb[21]  > 2.5) ||
-     (BhabhaComb[22]  > 4 &&  BhabhaComb[23]  > 2.5) ||
-     (BhabhaComb[24]  > 4 &&  BhabhaComb[25]  > 2.5) ||
-     (BhabhaComb[26]  > 3 &&  BhabhaComb[27]  > 3) ||
-     (BhabhaComb[28]  > 3.5 &&  BhabhaComb[29]  > 3));
+    ((BhabhaComb[0] * 10  >= _2DBhabhaThresholdFWD[0] && BhabhaComb[1] * 10  >= _2DBhabhaThresholdBWD[0]) ||
+     (BhabhaComb[2] * 10  >= _2DBhabhaThresholdFWD[1] && BhabhaComb[3] * 10  >= _2DBhabhaThresholdBWD[1]) ||
+     (BhabhaComb[6] * 10  >= _2DBhabhaThresholdFWD[2] &&  BhabhaComb[7] * 10  >= _2DBhabhaThresholdBWD[2]) ||
+     (BhabhaComb[8] * 10  >= _2DBhabhaThresholdFWD[3] &&  BhabhaComb[9] * 10  >= _2DBhabhaThresholdBWD[3]) ||
+     (BhabhaComb[10] * 10  >= _2DBhabhaThresholdFWD[4] &&  BhabhaComb[11] * 10  >= _2DBhabhaThresholdBWD[4]) ||
+     (BhabhaComb[12] * 10  >= _2DBhabhaThresholdFWD[5] &&  BhabhaComb[13] * 10  >= _2DBhabhaThresholdBWD[5]) ||
+     (BhabhaComb[14] * 10  >= _2DBhabhaThresholdFWD[6] &&  BhabhaComb[15] * 10  >= _2DBhabhaThresholdBWD[6]) ||
+     (BhabhaComb[16] * 10  >= _2DBhabhaThresholdFWD[7] &&  BhabhaComb[17] * 10  >= _2DBhabhaThresholdBWD[7]) ||
+     (BhabhaComb[18] * 10  >= _2DBhabhaThresholdFWD[8] &&  BhabhaComb[19] * 10  >= _2DBhabhaThresholdBWD[8]) ||
+     (BhabhaComb[20] * 10  >= _2DBhabhaThresholdFWD[9] &&  BhabhaComb[21] * 10  >= _2DBhabhaThresholdBWD[9]) ||
+     (BhabhaComb[22] * 10  >= _2DBhabhaThresholdFWD[10] &&  BhabhaComb[23] * 10  >= _2DBhabhaThresholdBWD[10]) ||
+     (BhabhaComb[24] * 10  >= _2DBhabhaThresholdFWD[11] &&  BhabhaComb[25] * 10  >= _2DBhabhaThresholdBWD[11]) ||
+     (BhabhaComb[26] * 10  >= _2DBhabhaThresholdFWD[12] &&  BhabhaComb[27] * 10  >= _2DBhabhaThresholdBWD[12]) ||
+     (BhabhaComb[28] * 10  >= _2DBhabhaThresholdFWD[13] &&  BhabhaComb[29] * 10  >= _2DBhabhaThresholdBWD[13]));
 
   int bhabha01 = 0;
   int bhabha02 = 0;
@@ -200,20 +205,20 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
   int bhabha13 = 0;
   int bhabha14 = 0;
 
-  if ((BhabhaComb[0]  > 4.0 && BhabhaComb[1]  > 2.500)) {bhabha01 = 1;}
-  if ((BhabhaComb[2]  > 4.0 && BhabhaComb[3]  > 2.500)) {bhabha02 = 1;}
-  if ((BhabhaComb[6]  > 4.0 && BhabhaComb[7]  > 2.500)) {bhabha03 = 1;}
-  if ((BhabhaComb[8]  > 4.0 && BhabhaComb[9]  > 2.500)) {bhabha04 = 1;}
-  if ((BhabhaComb[10]  > 4.0 && BhabhaComb[11]  > 2.500)) {bhabha05 = 1;}
-  if ((BhabhaComb[12]  > 4.0 && BhabhaComb[13]  > 2.500)) {bhabha06 = 1;}
-  if ((BhabhaComb[14]  > 4.0 && BhabhaComb[15]  > 2.500)) {bhabha07 = 1;}
-  if ((BhabhaComb[16]  > 4.0 && BhabhaComb[17]  > 2.500)) {bhabha08 = 1;}
-  if ((BhabhaComb[18]  > 4.0 && BhabhaComb[19]  > 2.500)) {bhabha09 = 1;}
-  if ((BhabhaComb[20]  > 4.0 && BhabhaComb[21]  > 2.500)) {bhabha10 = 1;}
-  if ((BhabhaComb[22]  > 4.0 && BhabhaComb[23]  > 2.500)) {bhabha11 = 1;}
-  if ((BhabhaComb[24]  > 4.0 && BhabhaComb[25]  > 2.500)) {bhabha12 = 1;}
-  if ((BhabhaComb[26]  > 3.000 && BhabhaComb[27]  > 3.000)) {bhabha13 = 1;}
-  if ((BhabhaComb[28]  > 3.500 && BhabhaComb[29]  > 3.000)) {bhabha14 = 1;}
+  if ((BhabhaComb[0] * 10  >= _2DBhabhaThresholdFWD[0] && BhabhaComb[1] * 10  >= _2DBhabhaThresholdBWD[0])) {bhabha01 = 1;}
+  if ((BhabhaComb[2] * 10  >= _2DBhabhaThresholdFWD[1] && BhabhaComb[3] * 10  >= _2DBhabhaThresholdBWD[1])) {bhabha02 = 1;}
+  if ((BhabhaComb[6] * 10  >= _2DBhabhaThresholdFWD[2] && BhabhaComb[7] * 10  >= _2DBhabhaThresholdBWD[2])) {bhabha03 = 1;}
+  if ((BhabhaComb[8] * 10  >= _2DBhabhaThresholdFWD[3] && BhabhaComb[9] * 10  >= _2DBhabhaThresholdBWD[3])) {bhabha04 = 1;}
+  if ((BhabhaComb[10] * 10  >= _2DBhabhaThresholdFWD[4] && BhabhaComb[11] * 10  >= _2DBhabhaThresholdBWD[4])) {bhabha05 = 1;}
+  if ((BhabhaComb[12] * 10  >= _2DBhabhaThresholdFWD[5] && BhabhaComb[13] * 10  >= _2DBhabhaThresholdBWD[5])) {bhabha06 = 1;}
+  if ((BhabhaComb[14] * 10  >= _2DBhabhaThresholdFWD[6] && BhabhaComb[15] * 10  >= _2DBhabhaThresholdBWD[6])) {bhabha07 = 1;}
+  if ((BhabhaComb[16] * 10  >= _2DBhabhaThresholdFWD[7] && BhabhaComb[17] * 10  >= _2DBhabhaThresholdBWD[7])) {bhabha08 = 1;}
+  if ((BhabhaComb[18] * 10  >= _2DBhabhaThresholdFWD[8] && BhabhaComb[19] * 10  >= _2DBhabhaThresholdBWD[8])) {bhabha09 = 1;}
+  if ((BhabhaComb[20] * 10  >= _2DBhabhaThresholdFWD[9] && BhabhaComb[21] * 10  >= _2DBhabhaThresholdBWD[9])) {bhabha10 = 1;}
+  if ((BhabhaComb[22] * 10  >= _2DBhabhaThresholdFWD[10] && BhabhaComb[23] * 10  >= _2DBhabhaThresholdBWD[10])) {bhabha11 = 1;}
+  if ((BhabhaComb[24] * 10  >= _2DBhabhaThresholdFWD[11] && BhabhaComb[25] * 10  >= _2DBhabhaThresholdBWD[11])) {bhabha12 = 1;}
+  if ((BhabhaComb[26] * 10  >= _2DBhabhaThresholdFWD[12] && BhabhaComb[27] * 10  >= _2DBhabhaThresholdBWD[12])) {bhabha13 = 1;}
+  if ((BhabhaComb[28] * 10  >= _2DBhabhaThresholdFWD[13] && BhabhaComb[29] * 10  >= _2DBhabhaThresholdBWD[13])) {bhabha14 = 1;}
 
 
   BhabhaComb.clear();
@@ -252,6 +257,7 @@ bool TrgEclBhabha::GetBhabha01()
   // Read Cluster Table
   //
   //
+  MaxTCId.clear();
   ClusterEnergy.clear();
   ClusterTiming.clear();
   ClusterPosition.clear();
@@ -277,11 +283,11 @@ bool TrgEclBhabha::GetBhabha01()
   BhabhaComb.clear();
   BhabhaComb.resize(18, 0);
 
+  BtoBFlag = false;
 
   for (int icluster = 0; icluster < ncluster ; icluster++) {
     for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
-      BtoBFlag = false;
-      BhabhaFlag = false;
+
       if (icluster == jcluster) {continue;}
       int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
       int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
@@ -303,9 +309,10 @@ bool TrgEclBhabha::GetBhabha01()
 
 
       if (dphi > 160 && thetaSum > 165 && thetaSum < 190) {BtoBFlag = true;}
-
-      if ((ClusterEnergy[icluster] * 100.) > 30 * energy1 && (ClusterEnergy[jcluster] * 100.) > 30 * (energy2)
-          && ((ClusterEnergy[icluster] * 100.) > 45 * energy1 || (ClusterEnergy[jcluster] * 100.) > 45 * (energy2))) {
+      if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaThreshold[0] * energy1
+          && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaThreshold[0] * (energy2)
+          && ((ClusterEnergy[icluster] * 100.) > _3DBhabhaThreshold[1] * energy1
+              || (ClusterEnergy[jcluster] * 100.) > _3DBhabhaThreshold[1] * (energy2))) {
         if (BtoBFlag) {BhabhaFlag = true;}
       }
       // if (BhabhaFlag && icluster == 0 && jcluster == 1) {BhabhaComb[0] = 1;}

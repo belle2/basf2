@@ -305,7 +305,7 @@ namespace Belle2 {
      */
     void unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst);
 
-    ClassDef(ECLDspData, 1);
+    ClassDef(ECLDspData, 1); /**< ClassDef */
   };
 }
 

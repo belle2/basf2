@@ -332,6 +332,13 @@ namespace Belle2 {
                                         int lastExp = -1, int lastRun = -1);
 
     /**
+     * correct QE values in database for the reflection on window surface
+     * be sure that you run the function only once!
+     * see: BII-4230
+     */
+    void correctTOPPmtQE();
+
+    /**
      * for testing purposes only! - will be removed ...
      */
     void importTest(int runNumber, double syncTimeBase);

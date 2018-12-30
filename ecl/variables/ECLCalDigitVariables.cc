@@ -571,8 +571,35 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameter (energy threshold in GeV).");
+      }
+      const double threshold = vars[0];
 
-    VARIABLE_GROUP("ECL Calibration");
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        double nhits = 0.;
+
+        auto clusterDigitRelations = cluster->getRelationsTo<ECLCalDigit>();
+        for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
+          const auto calDigit = clusterDigitRelations.object(ir);
+          const auto weight = clusterDigitRelations.weight(ir);
+
+          // take the unweighted eclcaldigit energy for this check (closer to real hardware threshold)
+          if (calDigit->getEnergy() > threshold) {
+            nhits += weight;
+          }
+        }
+
+        return nhits;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+
+    VARIABLE_GROUP("ECL Calibration (cDST)");
     REGISTER_VARIABLE("eclcaldigitEnergy(i, j)", getECLCalDigitEnergy,
                       "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitTime(i, j)", getECLCalDigitTime,
@@ -603,8 +630,10 @@ namespace Belle2 {
                       "[calibration] Returns the center cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours)");
+    REGISTER_VARIABLE("clusterNHitsThreshold(i)", getClusterNHitsThreshold,
+                      "[calibration] Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster above threshold (in GeV)");
 
-    VARIABLE_GROUP("ECL Calibration (based on extrapolated tracks)");
+    VARIABLE_GROUP("ECL Calibration (based on extrapolated tracks) (cDST)");
     REGISTER_VARIABLE("eclcaldigitExtEnergy(i, j)", getExtECLCalDigitEnergy,
                       "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTime(i, j)", getExtECLCalDigitTime,
@@ -628,5 +657,5 @@ namespace Belle2 {
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file
   class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableECLCalDigitVariables);
+  REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
 }

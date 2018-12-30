@@ -554,6 +554,7 @@ def add_online_dqm(path, run_type, dqm_environment, components):
         add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
+    path.add_module('DelayDQM', title=dqm_environment)
 
 
 def add_hlt_dqm(path, run_type, standalone=False, components=DEFAULT_HLT_COMPONENTS):

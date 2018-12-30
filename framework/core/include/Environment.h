@@ -83,6 +83,9 @@ namespace Belle2 {
     /** Get skipNEvents override, or 0 if unset. */
     unsigned int getSkipEventsOverride() const { return m_skipNEvents; }
 
+    /** Do we have generated, not real data? */
+    bool isMC() const;
+
     /** Number of generated events (from EventInfoSetter). */
     unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
 

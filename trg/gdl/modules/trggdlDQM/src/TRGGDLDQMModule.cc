@@ -29,7 +29,6 @@
 #include <framework/logging/Logger.h>
 #include <boost/algorithm/string.hpp>
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
 
 using namespace std;
 using namespace Belle2;
@@ -91,12 +90,23 @@ void TRGGDLDQMModule::defineHisto()
 
   h_c8_gdlL1TocomL1  = new TH1I("hGDL_gdlL1TocomL1",  "comL1 - gdlL1 [clk8ns]", 100, 0, 100);
   h_c8_gdlL1TocomL1->GetXaxis()->SetTitle("clk8ns");
+
+  h_c8_topTogdlL1    = new TH1I("hGDL_topTogdlL1",    "gdlL1 - top_timing [clk8ns]", 700, 0, 700);
+  h_c8_topTogdlL1->GetXaxis()->SetTitle("clk8ns");
   h_c8_eclTogdlL1    = new TH1I("hGDL_eclTogdlL1",    "gdlL1 - ecl_timing [clk8ns]", 500, 0, 500);
   h_c8_eclTogdlL1->GetXaxis()->SetTitle("clk8ns");
+  h_c8_cdcTogdlL1    = new TH1I("hGDL_cdcTogdlL1",    "gdlL1 - cdc_timing [clk8ns]", 700, 0, 700);
+  h_c8_cdcTogdlL1->GetXaxis()->SetTitle("clk8ns");
+
   h_c8_ecl8mToGDL    = new TH1I("hGDL_ecl8mToGDL",    "gdlIn^{8MHz} - ecl_timing [clk8ns]", 500, 0, 500);
   h_c8_ecl8mToGDL->GetXaxis()->SetTitle("clk8ns");
+  h_c8_topToGDL      = new TH1I("hGDL_topToGDL",      "gdlIn - top_timing [clk8ns]", 700, 0, 700);
+  h_c8_topToGDL->GetXaxis()->SetTitle("clk8ns");
   h_c8_eclToGDL      = new TH1I("hGDL_eclToGDL",      "gdlIn - ecl_timing [clk8ns]", 500, 0, 500);
   h_c8_eclToGDL->GetXaxis()->SetTitle("clk8ns");
+  h_c8_cdcToGDL      = new TH1I("hGDL_cdcToGDL",      "gdlIn - cdc_timing [clk8ns]", 700, 0, 700);
+  h_c8_cdcToGDL->GetXaxis()->SetTitle("clk8ns");
+
   h_c2_cdcTocomL1 = new TH1I("hGDL_cdcTocomL1", "comL1 - cdc_timing [clk2ns]", 520, 0, 5200);
   h_c2_cdcTocomL1->GetXaxis()->SetTitle("clk2ns");
   h_ns_cdcTocomL1 = new TH1D("hGDL_ns_cdcTocomL1", "comL1 - cdc_timing [ns]", 2600, 0, 10400);
@@ -105,17 +115,20 @@ void TRGGDLDQMModule::defineHisto()
   h_ns_cdcTogdlL1 = new TH1D("hGDL_ns_cdcTogdlL1", "gdlL1 - cdc_timing [ns]", 2600, 0, 10400);
   h_ns_cdcTogdlL1->GetXaxis()->SetTitle("ns");
   h_ns_cdcTogdlL1->GetYaxis()->SetTitle("evt / 4ns");
+
   h_ns_topToecl = new TH1D("hGDL_ns_topToecl", "ecl_timing - top_timing [ns]", 800, 0, 4000);
   h_ns_topToecl->GetXaxis()->SetTitle("ns");
   h_ns_topToecl->GetYaxis()->SetTitle("evt / 5ns");
   h_ns_topTocdc = new TH1D("hGDL_ns_topTocdc", "cdc_timing - top_timing [ns]", 800, 0, 4000);
   h_ns_topTocdc->GetXaxis()->SetTitle("ns");
   h_ns_topTocdc->GetYaxis()->SetTitle("evt / 5ns");
-  h_c2_cdcToecl = new TH1I("hGDL_cdcToecl", "ecl_timing - cdc_timing [clk2ns]", 1000, 0, 2000);
-  h_c2_cdcToecl->GetXaxis()->SetTitle("clk2ns");
   h_ns_cdcToecl = new TH1D("hGDL_ns_cdcToecl", "ecl_timing - cdc_timing [ns]", 2000, 0, 4000);
   h_ns_cdcToecl->GetXaxis()->SetTitle("ns");
   h_ns_cdcToecl->GetYaxis()->SetTitle("evt / 2ns");
+
+  h_c2_cdcToecl = new TH1I("hGDL_cdcToecl", "ecl_timing - cdc_timing [clk2ns]", 1000, 0, 2000);
+  h_c2_cdcToecl->GetXaxis()->SetTitle("clk2ns");
+
   TrgBit tb;
   h_itd = new TH1I("hGDL_itd", "itd", tb.getNumOfInputs() + 1, -1, tb.getNumOfInputs());
   h_ftd = new TH1I("hGDL_ftd", "ftd", tb.getNumOfOutputs() + 1, -1, tb.getNumOfOutputs());
@@ -168,9 +181,13 @@ void TRGGDLDQMModule::beginRun()
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1->Reset();
+  h_c8_topTogdlL1->Reset();
   h_c8_eclTogdlL1->Reset();
+  h_c8_cdcTogdlL1->Reset();
   h_c8_ecl8mToGDL->Reset();
+  h_c8_topToGDL->Reset();
   h_c8_eclToGDL->Reset();
+  h_c8_cdcToGDL->Reset();
   h_c2_cdcTocomL1->Reset();
   h_ns_cdcTocomL1->Reset();
   h_ns_cdcTogdlL1->Reset();
@@ -194,6 +211,68 @@ void TRGGDLDQMModule::initialize()
   _run = bevt->getRun();
   REG_HISTOGRAM
   defineHisto();
+
+  for (int i = 0; i < 320; i++) {
+    LeafBitMap[i] = m_unpacker->getLeafMap(i);
+  }
+  for (int i = 0; i < 320; i++) {
+    strcpy(LeafNames[i], m_unpacker->getLeafnames(i));
+  }
+  _e_timtype = 0;
+  _e_gdll1rvc = 0;
+  _e_coml1rvc = 0;
+  _e_toptiming = 0;
+  _e_ecltiming = 0;
+  _e_cdctiming = 0;
+  _e_toprvc  = 0;
+  _e_eclrvc  = 0;
+  _e_cdcrvc  = 0;
+  for (int i = 0; i < 10; i++) {
+    ee_psn[i] = {0};
+    ee_ftd[i] = {0};
+    ee_itd[i] = {0};
+  }
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(LeafNames[i], "timtype") == 0)  _e_timtype  = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "gdll1rvc") == 0) _e_gdll1rvc = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "coml1rvc") == 0) _e_coml1rvc = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "toptiming") == 0)_e_toptiming = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ecltiming") == 0)_e_ecltiming = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "cdctiming") == 0)_e_cdctiming = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "toprvc") == 0)   _e_toprvc   = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "eclrvc") == 0)   _e_eclrvc   = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "cdcrvc") == 0)   _e_cdcrvc   = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn0") == 0)       ee_psn[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn1") == 0)       ee_psn[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn2") == 0)       ee_psn[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn3") == 0)       ee_psn[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn4") == 0)       ee_psn[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn5") == 0)       ee_psn[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn6") == 0)       ee_psn[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn7") == 0)       ee_psn[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn8") == 0)       ee_psn[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "psn9") == 0)       ee_psn[9] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd0") == 0)       ee_ftd[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd1") == 0)       ee_ftd[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd2") == 0)       ee_ftd[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd3") == 0)       ee_ftd[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd4") == 0)       ee_ftd[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd5") == 0)       ee_ftd[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd6") == 0)       ee_ftd[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd7") == 0)       ee_ftd[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd8") == 0)       ee_ftd[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ftd9") == 0)       ee_ftd[9] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd0") == 0)       ee_itd[0] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd1") == 0)       ee_itd[1] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd2") == 0)       ee_itd[2] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd3") == 0)       ee_itd[3] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd4") == 0)       ee_itd[4] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd5") == 0)       ee_itd[5] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd6") == 0)       ee_itd[6] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd7") == 0)       ee_itd[7] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd8") == 0)       ee_itd[8] = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "itd9") == 0)       ee_itd[9] = LeafBitMap[i];
+  }
 
 }
 
@@ -238,11 +317,19 @@ void TRGGDLDQMModule::endRun()
     c1.Update();
     h_c8_gdlL1TocomL1->Draw();
     c1.Update();
+    h_c8_topTogdlL1->Draw();
+    c1.Update();
     h_c8_eclTogdlL1->Draw();
+    c1.Update();
+    h_c8_cdcTogdlL1->Draw();
     c1.Update();
     h_c8_ecl8mToGDL->Draw();
     c1.Update();
+    h_c8_topToGDL->Draw();
+    c1.Update();
     h_c8_eclToGDL->Draw();
+    c1.Update();
+    h_c8_cdcToGDL->Draw();
     c1.Update();
     h_c2_cdcTocomL1->Draw();
     c1.Update();
@@ -271,101 +358,32 @@ void TRGGDLDQMModule::event()
   static bool begin_run = true;
 
   int n_leafs = 0;
+  n_leafs  = m_unpacker->getnLeafs();
   int n_leafsExtra = 0;
-  int ee_psn[10] = {0};
-  int ee_ftd[10] = {0};
-  int ee_itd[10] = {0};
-  unsigned nword_input = 3;
-  unsigned nword_output = 3;
-  unsigned _e_timtype = 0;
-  void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
-  unsigned _e_gdll1rvc = 0;
+  n_leafsExtra = m_unpacker->getnLeafsExtra();
+  n_clocks = m_unpacker->getnClks();
+  int nconf = m_unpacker->getconf();
+  int nword_input  = m_unpacker->get_nword_input();
+  int nword_output = m_unpacker->get_nword_output();
+
   StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) return;
 
-  int nconf = entAry[0]->m_conf;
-
-  if (nconf == 6) {
-    nword_input = 5;
-    n_clocks = GDLCONF6::nClks;
-    n_leafs = GDLCONF6::nLeafs;
-    n_leafsExtra = GDLCONF6::nLeafsExtra;
-    ee_itd[0] = GDLCONF6::e_itd0; ee_itd[1] = GDLCONF6::e_itd1; ee_itd[2] = GDLCONF6::e_itd2;
-    ee_itd[3] = GDLCONF6::e_itd3; ee_itd[4] = GDLCONF6::e_itd4;
-    ee_psn[0] = GDLCONF6::e_psn0; ee_psn[1] = GDLCONF6::e_psn1; ee_psn[2] = GDLCONF6::e_psn2;
-    ee_ftd[0] = GDLCONF6::e_ftd0; ee_ftd[1] = GDLCONF6::e_ftd1; ee_ftd[2] = GDLCONF6::e_ftd2;
-    _e_timtype = GDLCONF6::e_timtype;
-    setPointer = GDLCONF6::setLeafPointersArray;
-    _e_gdll1rvc = GDLCONF6::e_gdll1rvc;
-  } else if (nconf == 5) {
-    n_clocks = GDLCONF5::nClks;
-    n_leafs = GDLCONF5::nLeafs;
-    n_leafsExtra = GDLCONF5::nLeafsExtra;
-    ee_itd[0] = GDLCONF5::e_itd0; ee_itd[1] = GDLCONF5::e_itd1; ee_itd[2] = GDLCONF5::e_itd2;
-    ee_psn[0] = GDLCONF5::e_psn0; ee_psn[1] = GDLCONF5::e_psn1; ee_psn[2] = GDLCONF5::e_psn2;
-    ee_ftd[0] = GDLCONF5::e_ftd0; ee_ftd[1] = GDLCONF5::e_ftd1; ee_ftd[2] = GDLCONF5::e_ftd2;
-    _e_timtype = GDLCONF5::e_timtype;
-    setPointer = GDLCONF5::setLeafPointersArray;
-    _e_gdll1rvc = GDLCONF5::e_gdll1rvc;
-  } else if (nconf == 4) {
-    n_clocks = GDLCONF4::nClks;
-    n_leafs = GDLCONF4::nLeafs;
-    n_leafsExtra = GDLCONF4::nLeafsExtra;
-    ee_itd[0] = GDLCONF4::e_itd0; ee_itd[1] = GDLCONF4::e_itd1; ee_itd[2] = GDLCONF4::e_itd2;
-    ee_psn[0] = GDLCONF4::e_psn0; ee_psn[1] = GDLCONF4::e_psn1; ee_psn[2] = GDLCONF4::e_psn2;
-    ee_ftd[0] = GDLCONF4::e_ftd0; ee_ftd[1] = GDLCONF4::e_ftd1; ee_ftd[2] = GDLCONF4::e_ftd2;
-    _e_timtype = GDLCONF4::e_timtype;
-    setPointer = GDLCONF4::setLeafPointersArray;
-    _e_gdll1rvc = GDLCONF4::e_gdll1rvc;
-  } else if (nconf == 3) {
-    n_clocks = GDLCONF3::nClks;
-    n_leafs = GDLCONF3::nLeafs;
-    n_leafsExtra = GDLCONF3::nLeafsExtra;
-    ee_itd[0] = GDLCONF3::e_itd0; ee_itd[1] = GDLCONF3::e_itd1; ee_itd[2] = GDLCONF3::e_itd2;
-    ee_psn[0] = GDLCONF3::e_psn0; ee_psn[1] = GDLCONF3::e_psn1; ee_psn[2] = GDLCONF3::e_psn2;
-    ee_ftd[0] = GDLCONF3::e_ftd0; ee_ftd[1] = GDLCONF3::e_ftd1; ee_ftd[2] = GDLCONF3::e_ftd2;
-    _e_timtype = GDLCONF3::e_timtype;
-    setPointer = GDLCONF3::setLeafPointersArray;
-    _e_gdll1rvc = GDLCONF3::e_gdll1rvc;
-  } else if (nconf == 2) {
-    n_clocks = GDLCONF2::nClks;
-    n_leafs = GDLCONF2::nLeafs;
-    n_leafsExtra = GDLCONF2::nLeafsExtra;
-    ee_itd[0] = GDLCONF2::e_itd0; ee_itd[1] = GDLCONF2::e_itd1; ee_itd[2] = GDLCONF2::e_itd2;
-    ee_psn[0] = GDLCONF2::e_psn0; ee_psn[1] = GDLCONF2::e_psn1; ee_psn[2] = GDLCONF2::e_psn2;
-    ee_ftd[0] = GDLCONF2::e_ftd0; ee_ftd[1] = GDLCONF2::e_ftd1; ee_ftd[2] = GDLCONF2::e_ftd2;
-    _e_timtype = GDLCONF2::e_timtype;
-    setPointer = GDLCONF2::setLeafPointersArray;
-    _e_gdll1rvc = GDLCONF2::e_gdll1rvc;
-  } else if (nconf == 1) {
-    n_clocks = GDLCONF1::nClks;
-    n_leafs = GDLCONF1::nLeafs;
-    n_leafsExtra = GDLCONF1::nLeafsExtra;
-    ee_itd[0] = GDLCONF1::e_itd0; ee_itd[1] = GDLCONF1::e_itd1; ee_itd[2] = GDLCONF1::e_itd2;
-    ee_psn[0] = GDLCONF1::e_psn0; ee_psn[1] = GDLCONF1::e_psn1; ee_psn[2] = GDLCONF1::e_psn2;
-    ee_ftd[0] = GDLCONF1::e_ftd0; ee_ftd[1] = GDLCONF1::e_ftd1; ee_ftd[2] = GDLCONF1::e_ftd2;
-    _e_timtype = GDLCONF1::e_timtype;
-    setPointer = GDLCONF1::setLeafPointersArray;
-    _e_gdll1rvc = GDLCONF1::e_gdll1rvc;
-  } else {
-    n_clocks = GDLCONF0::nClks;
-    n_leafs = GDLCONF0::nLeafs;
-    n_leafsExtra = GDLCONF0::nLeafsExtra;
-    ee_itd[0] = GDLCONF0::e_itd0; ee_itd[1] = GDLCONF0::e_itd1; ee_itd[2] = GDLCONF0::e_itd2;
-    ee_psn[0] = GDLCONF0::e_psn0; ee_psn[1] = GDLCONF0::e_psn1; ee_psn[2] = GDLCONF0::e_psn2;
-    ee_ftd[0] = GDLCONF0::e_ftd0; ee_ftd[1] = GDLCONF0::e_ftd1; ee_ftd[2] = GDLCONF0::e_ftd2;
-    _e_timtype = GDLCONF0::e_timtype;
-    setPointer = GDLCONF0::setLeafPointersArray;
-    _e_gdll1rvc = GDLCONF0::e_gdll1rvc;
+  //prepare entAry adress
+  int clk_map = 0;
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(entAry[0]->m_unpackername[i], "evt") == 0) evtno = entAry[0]->m_unpacker[i];
+    if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;
   }
-
 
   const double clkTo2ns = 1. / .508877;
   const double clkTo1ns = 0.5 / .508877;
   TH2I* h_0;
 
   dirDQM->cd();
-  evtno = entAry[0]->m_evt;
+
+
+
   h_0 = new TH2I(Form("hgdl%08d", evtno), "", n_clocks, 0, n_clocks, n_leafs + n_leafsExtra, 0,
                  n_leafs + n_leafsExtra);
   h_p = new TH2I(Form("hpsn%08d", evtno), "", n_clocks, 0, n_clocks, tb.getNumOfOutputs(), 0, tb.getNumOfOutputs());
@@ -383,79 +401,34 @@ void TRGGDLDQMModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[n_leafs + n_leafsExtra];
-    setPointer(entAry[ii], Bits);
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
+    //set pointer
+    for (int i = 0; i < 320; i++) {
+      if (LeafBitMap[i] != -1) {
+        Bits[LeafBitMap[i]] = &(entAry[ii]->m_unpacker[i]);
+      }
+    }
     for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-      h_0->SetBinContent(entAry[ii]->m_clk + 1, leaf + 1, *Bits[leaf]);
+      h_0->SetBinContent(entAry[ii]->m_unpacker[clk_map] + 1, leaf + 1, *Bits[leaf]);
     }
   }
-  for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-    if (6 == nconf) {
-      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF6::LeafNames[leaf]);
-    } else if (5 == nconf) {
-      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF5::LeafNames[leaf]);
-    } else if (4 == nconf) {
-      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF4::LeafNames[leaf]);
-    } else if (3 == nconf) {
-      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF3::LeafNames[leaf]);
-    } else if (2 == nconf) {
-      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF2::LeafNames[leaf]);
-    } else if (1 == nconf) {
-      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF1::LeafNames[leaf]);
-    } else if (0 == nconf) {
-      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF0::LeafNames[leaf]);
-    }
+  for (int leaf = 0; leaf < 320; leaf++) {
+    if (LeafBitMap[leaf] != -1)h_0->GetYaxis()->SetBinLabel(LeafBitMap[leaf] + 1, LeafNames[LeafBitMap[leaf]]);
   }
 
-
-  int coml1rvc    = 0;
-  int c1_ecl_timing = 0;
-  int c2_cdc_timing = 0;
-  int eclrvc  = 0;
-  int c1_top_timing = 0;
-  if (6 == nconf) {
-    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF6::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_ecltiming);
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_cdctiming) / 2;
-    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF6::e_eclrvc);
-    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_toptiming);
-  } else if (5 == nconf) {
-    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF5::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_ecltiming);
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_cdctiming) / 2;
-    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF5::e_eclrvc);
-    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_toptiming);
-  } else if (4 == nconf) {
-    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF4::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_ecltiming);
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_cdctiming) / 2;
-    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF4::e_eclrvc);
-    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_toptiming);
-  } else if (3 == nconf) {
-    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF3::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_ecltiming);
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_cdctiming) / 2;
-    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF3::e_eclrvc);
-    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_toptiming);
-  } else if (2 == nconf) {
-    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF2::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_ecltiming);
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_cdctiming) / 2;
-    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF2::e_eclrvc);
-    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_toptiming);
-  } else if (1 <= nconf && nconf <= 2) {
-    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF1::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_ecltiming);
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_cdctiming) / 2;
-    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF1::e_eclrvc);
-    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_toptiming);
-  } else if (0 == nconf) {
-    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF0::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_cdctiming);
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_cdctiming);
-    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF0::e_eclrvc);
-    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_toptiming);
-  }
+  int coml1rvc      = h_0->GetBinContent(1,        1 + _e_coml1rvc);
+  int toprvc        = h_0->GetBinContent(1,        1 + _e_toprvc);
+  int eclrvc        = h_0->GetBinContent(1,        1 + _e_eclrvc);
+  int cdcrvc        = h_0->GetBinContent(1,        1 + _e_cdcrvc);
+  int c1_top_timing = h_0->GetBinContent(n_clocks, 1 + _e_toptiming);
+  int c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + _e_ecltiming);
+  int c1_cdc_timing = h_0->GetBinContent(n_clocks, 1 + _e_cdctiming);
+  int c8_top_timing = c1_top_timing >> 3;
+  int c2_top_timing = c1_top_timing >> 1;
+  int c8_ecl_timing = c1_ecl_timing >> 3;
+  int c2_ecl_timing = c1_ecl_timing >> 1;
+  int c8_cdc_timing = c1_cdc_timing >> 3;
+  int c2_cdc_timing = c1_cdc_timing >> 1;
 
   if (begin_run) {
     B2DEBUG(20, "nconf(" << nconf
@@ -470,10 +443,7 @@ void TRGGDLDQMModule::event()
   int ftd[3] = {0};
   int itd[5] = {0};
   int timtype  = 0;
-  int c8_ecl_timing   = (c1_ecl_timing >> 3);
-  int c2_ecl_timing   = (c1_ecl_timing >> 1);
 
-  int c2_top_timing = c1_top_timing >> 1;
 
   int gdll1_rvc = h_0->GetBinContent(h_0->GetXaxis()->FindBin(n_clocks - 0.5), 1 + _e_gdll1rvc);
 
@@ -482,7 +452,7 @@ void TRGGDLDQMModule::event()
     int psn_tmp[3] = {0};
     int ftd_tmp[3] = {0};
     int itd_tmp[5] = {0};
-    for (unsigned j = 0; j < nword_input; j++) {
+    for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       itd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_itd[j]);
       itd[j] |= itd_tmp[j];
       for (int i = 0; i < 32; i++) {
@@ -507,7 +477,7 @@ void TRGGDLDQMModule::event()
         if (ftd_tmp[1] & (1 << i)) h_f->SetBinContent(clk, i + 1 + 32, 1);
       }
     } else {
-      for (unsigned j = 0; j < nword_output; j++) {
+      for (unsigned j = 0; j < (unsigned)nword_output; j++) {
         psn_tmp[j] = h_0->GetBinContent(clk, 1 + ee_psn[j]);
         ftd_tmp[j] = h_0->GetBinContent(clk, 1 + ee_ftd[j]);
         psn[j] |= psn_tmp[j];
@@ -534,10 +504,10 @@ void TRGGDLDQMModule::event()
   h_ftd->Fill(-0.5);
   h_psn->Fill(-0.5);
   for (int i = 0; i < 32; i++) {
-    for (unsigned j = 0; j < nword_input; j++) {
+    for (unsigned j = 0; j < (unsigned)nword_input; j++) {
       if (itd[j] & (1 << i)) h_itd->Fill(i + 0.5 + 32 * j);
     }
-    for (unsigned j = 0; j < nword_output; j++) {
+    for (unsigned j = 0; j < (unsigned)nword_output; j++) {
       if (ftd[j] & (1 << i)) h_ftd->Fill(i + 0.5 + 32 * j);
       if (psn[j] & (1 << i)) h_psn->Fill(i + 0.5 + 32 * j);
     }
@@ -547,15 +517,25 @@ void TRGGDLDQMModule::event()
   int gdlL1TocomL1 = gdll1_rvc < coml1rvc ? coml1rvc - gdll1_rvc : (coml1rvc + 1280) - gdll1_rvc;
   h_c8_gdlL1TocomL1->Fill(gdlL1TocomL1);
 
+  int topTogdlL1 = gdll1_rvc < c8_top_timing ? (gdll1_rvc + 1280) - c8_top_timing : gdll1_rvc - c8_top_timing;
+  h_c8_topTogdlL1->Fill(topTogdlL1);
+
   int eclTogdlL1 = gdll1_rvc < c8_ecl_timing ? (gdll1_rvc + 1280) - c8_ecl_timing : gdll1_rvc - c8_ecl_timing;
   h_c8_eclTogdlL1->Fill(eclTogdlL1);
+
+  int cdcTogdlL1 = gdll1_rvc < c8_cdc_timing ? (gdll1_rvc + 1280) - c8_cdc_timing : gdll1_rvc - c8_cdc_timing;
+  h_c8_cdcTogdlL1->Fill(cdcTogdlL1);
 
   int c127_ecl_timing = c8_ecl_timing & (((1 << 7) - 1) << 4);
   int fit8mToGDL = c127_ecl_timing < eclrvc ? eclrvc - c127_ecl_timing : (eclrvc + 1280) - c127_ecl_timing;
   h_c8_ecl8mToGDL->Fill(fit8mToGDL);
 
+  int topToGDL = c8_top_timing < toprvc ? toprvc - c8_top_timing : (toprvc + 1280) - c8_top_timing;
+  h_c8_topToGDL->Fill(topToGDL);
   int eclToGDL = c8_ecl_timing < eclrvc ? eclrvc - c8_ecl_timing : (eclrvc + 1280) - c8_ecl_timing;
   h_c8_eclToGDL->Fill(eclToGDL);
+  int cdcToGDL = c8_cdc_timing < cdcrvc ? cdcrvc - c8_cdc_timing : (cdcrvc + 1280) - c8_cdc_timing;
+  h_c8_cdcToGDL->Fill(cdcToGDL);
 
   int c2_comL1 = coml1rvc << 2;
   int c2_gdlL1 = gdll1_rvc << 2;

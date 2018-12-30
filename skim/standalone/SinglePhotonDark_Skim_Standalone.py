@@ -11,11 +11,11 @@ __author__ = "Sam Cunliffe"
 
 from basf2 import process, statistics, Path
 from modularAnalysis import inputMdstList, skimOutputUdst, summaryOfLists
-from stdCharged import loadStdCharged
+from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from skimExpertFunctions import setSkimLogging, encodeSkimName
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-00-00'
 
 # create a path
 darkskimpath = Path()
@@ -27,7 +27,8 @@ fileList = [
 ]
 inputMdstList('MC9', fileList, path=darkskimpath)
 stdPhotons('all', path=darkskimpath)
-loadStdCharged(path=darkskimpath)
+stdE('all', path=darkskimpath)
+stdMu('all', path=darkskimpath)
 
 # dark photon skim
 from skim.dark import SinglePhotonDarkList
@@ -38,7 +39,7 @@ skimOutputUdst(skimCode, darklist, path=darkskimpath)
 summaryOfLists(darklist, path=darkskimpath)
 
 # suppress noisy modules, and then process
-setSkimLogging(skim_path=darkskimpath)
+setSkimLogging(path=darkskimpath)
 process(darkskimpath)
 
 # print out the summary

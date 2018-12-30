@@ -76,15 +76,16 @@ void ECLDigitizerModule::initialize()
   m_eclTrigs.registerInDataStore();
 
   if (m_HadronPulseShape) {
-    B2INFO("Hadron pulse shapes for ECL simulations are enabled.  Pulse shape simulations use techniques validated with test beam data documented in: S. Longo and J. M. Roney 2018 JINST 13 P03018");
+    B2DEBUG(20,
+            "Hadron pulse shapes for ECL simulations are enabled.  Pulse shape simulations use techniques validated with test beam data documented in: S. Longo and J. M. Roney 2018 JINST 13 P03018");
   } else {
-    B2INFO("Hadron pulse shapes for ECL simulations are disabled.");
+    B2DEBUG(20, "Hadron pulse shapes for ECL simulations are disabled.");
   }
 
   if (m_inter) {
-    B2INFO("Diode-crossing pulse shapes for ECL simulations are enabled");
+    B2DEBUG(20, "Diode-crossing pulse shapes for ECL simulations are enabled");
   } else {
-    B2INFO("Diode-crossing pulse shapes for ECL simulations are disabled.");
+    B2DEBUG(20, "Diode-crossing pulse shapes for ECL simulations are disabled.");
   }
 
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
@@ -109,6 +110,7 @@ void ECLDigitizerModule::beginRun()
       Aen("ECLCrystalEnergy"),
       Tel("ECLCrystalElectronicsTime"),
       Ten("ECLCrystalTimeOffset"),
+      Tct("ECLCrateTimeOffset"),
       Tmc("ECLMCTimeOffset");
   double ns_per_tick = 1.0 / (4.0 * ec.m_rf) * 1e3;// ~0.49126819903043308239 ns/tick
 
@@ -120,6 +122,7 @@ void ECLDigitizerModule::beginRun()
 
   if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ns_per_tick;
   if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
+  if (Tct) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tct->getCalibVector()[i] * ns_per_tick;
   if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
 
   if (m_HadronPulseShape)  callbackHadronSignalShapes();
@@ -321,7 +324,6 @@ void ECLDigitizerModule::event()
       const auto eclDsp = m_eclDsps.appendNew();
       eclDsp->setCellId(CellId);
       eclDsp->setDspA(FitA);
-      eclDsp->setIsData(false);
 
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736

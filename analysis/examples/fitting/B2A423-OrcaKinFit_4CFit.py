@@ -22,75 +22,77 @@
 # Import and mdst loading
 #
 
-from basf2 import *
-from modularAnalysis import add_beamparameters
+import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
-import sys
 from beamparameters import add_beamparameters
 import variables.collections as vc
-from stdPhotons import *
+import variables.utils as vu
+from stdPhotons import stdPhotons
+b2.use_central_database('GT_gen_data_004.51_reprocessing-release-01-02-03')
 
-beamparameters = add_beamparameters(analysis_main, "Y4S")
+# create path
+mypath = b2.create_path()
+
+beamparameters = add_beamparameters(mypath, "Y4S")
 
 # load input ROOT file
-inputMdst('MC9', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
+inputMdst(environmentType='default',
+          filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
+          path=mypath)
 
 # Creates a list of good photon and mu
-stdPhotons('loose')
-fillParticleList('mu+:pid', 'chiProb > 0.001 and p > 1.0')
+stdPhotons('loose', path=mypath)
+fillParticleList('mu+:pid', 'chiProb > 0.001 and p > 1.0', path=mypath)
 
 # Reconstructs eta -> gamma gamma
-reconstructDecay("eta:gg -> gamma:loose gamma:loose", "")
+reconstructDecay("eta:gg -> gamma:loose gamma:loose", "", path=mypath)
 # Reconstructs Upsilon -> u+ u-
-reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
+reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.", path=mypath)
 
 # Reconstructs Upsilon(4S) -> Upsilon eta
-reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")
-reconstructDecay("Upsilon(4S):4c -> eta:gg Upsilon:uu", "")
+reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "", path=mypath)
+reconstructDecay("Upsilon(4S):4c -> eta:gg Upsilon:uu", "", path=mypath)
 
 
 # Perform four momentum constraint fit using OrcaKinFit
-fitKinematic4C("Upsilon(4S):4c")
+fitKinematic4C("Upsilon(4S):4c", path=mypath)
 
 # Associates the MC truth to the reconstructed Upsilon(4S)
-matchMCTruth('Upsilon(4S)')
-matchMCTruth('Upsilon(4S):4c')
+matchMCTruth('Upsilon(4S)', path=mypath)
+matchMCTruth('Upsilon(4S):4c', path=mypath)
 
 
 # Select variables that we want to store to ntuple
 muvars = vc.mc_truth + vc.pid + vc.kinematics
 gvars = vc.kinematics + vc.mc_truth + vc.inv_mass
-etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth 
+etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth
 u4svars = vc.inv_mass + vc.kinematics + vc.mc_truth +\
-    vc.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
-    vc.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
-    vc.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
-    vc.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
+    vu.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vu.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    vu.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    vu.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
-u4svars_4c = u4svars + vc.create_aliases(['OrcaKinFitProb',
+u4svars_4c = u4svars + vu.create_aliases(['OrcaKinFitProb',
                                           'OrcaKinFitChi2',
                                           'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
 
-u4svars_def = u4svars + vc.create_aliases(['chiProb'], 'extraInfo(variable)', "")
+u4svars_def = u4svars + vu.create_aliases(['chiProb'], 'extraInfo(variable)', "")
 
 
 # Saving variables to ntuple
 output_file = 'B2A423-Orcakinfit_4CFit.root'
 variablesToNtuple('Upsilon(4S)', u4svars_def,
-                  filename=output_file, treename='Upsilon4s')
+                  filename=output_file, treename='Upsilon4s', path=mypath)
 variablesToNtuple('Upsilon(4S):4c', u4svars_4c,
-                  filename=output_file, treename='Upsilon4s_4c')
+                  filename=output_file, treename='Upsilon4s_4c', path=mypath)
 
-#
-# Process and print statistics
-#
 
 # Process the events
-process(analysis_main)
+b2.process(mypath)
 # print out the summary
-print(statistics)
+print(b2.statistics)

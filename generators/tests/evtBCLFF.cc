@@ -18,23 +18,26 @@
 
 #include <string>
 
-namespace {
+namespace Belle2 {
 
   /** The fixture for testing the EvtBCLFF. */
   class EvtBCLFFTest : public ::testing::Test {
   protected:
+    /** sets up the test */
     static void SetUpTestCase()
     {
       std::string decayFileName = FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC");
       s_evtgen = EvtGenInterface::createEvtGen(decayFileName);
     }
 
+    /** cleans up after the test */
     static void TearDownTestCase()
     {
       delete s_evtgen;
       s_evtgen = nullptr;
     }
 
+    /** pointer to the evtgen instance */
     static EvtGen* s_evtgen;
   };
 

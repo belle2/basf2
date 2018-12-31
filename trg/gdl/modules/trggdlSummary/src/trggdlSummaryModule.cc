@@ -192,6 +192,13 @@ void TRGGDLSummaryModule::event()
 
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
 
+  //get prescales
+  for (int i = 0; i < 320; i++) {
+    int bit1 = i / 32;
+    int bit2 = i % 32;
+    GDLResult->setPreScale(bit1, bit2, m_prescales->getprescales(i));
+  }
+
   /*
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {

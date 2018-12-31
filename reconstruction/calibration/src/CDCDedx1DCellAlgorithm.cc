@@ -34,7 +34,6 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
   feaUE(+TMath::Pi() / 2),
   IsLocalBin(true),
   IsMakePlots(false),
-  IsVarBin(false),
   IsRS(true)
 {
   // Set module properties

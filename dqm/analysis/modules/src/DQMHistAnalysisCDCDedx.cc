@@ -32,7 +32,9 @@ REG_MODULE(DQMHistAnalysisCDCDedx)
 //-----------------------------------------------------------------
 
 DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisModule(),
+    dedxmean(0.0),
+    dedxsigma(0.0)
 {
   //Parameter definition
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: Constructor done.");

@@ -32,7 +32,6 @@ CDCDedx2DCellAlgorithm::CDCDedx2DCellAlgorithm():
   fdocaUE(1.50),
   IsLocalBin(true),
   IsMakePlots(false),
-  IsVarBin(false),
   IsRS(true)
 {
   // Set module properties

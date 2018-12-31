@@ -163,9 +163,8 @@ namespace Belle2 {
     std::vector<int> fEntaBinNums;  /**< Vector for enta asym bin values */
     std::vector<double> fEntaBinValues;  /**< Vector for doca asym bin values */
 
-    bool IsLocalBin;  /**< if local asym bin  */
+    bool IsLocalBin;  /**< if local variable bin requested  */
     bool IsMakePlots; /**< produce plots for status */
-    bool IsVarBin; /**< if variable bin requested */
     bool IsRS; /**< if rotation symmtery requested */
   };
 } // namespace Belle2

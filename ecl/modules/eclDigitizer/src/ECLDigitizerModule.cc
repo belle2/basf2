@@ -64,7 +64,7 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
   addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction (default: true)",
            true);
-  addParam("ADCThreshold", m_ADCThreshold, "ADC threshold for wavefom fits (default: 25)", 25);
+  addParam("ADCThreshold", m_ADCThreshold, "ADC threshold for waveform fits (default: 25)", 25);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()

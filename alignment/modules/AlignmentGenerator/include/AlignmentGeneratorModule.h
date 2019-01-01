@@ -31,7 +31,7 @@ namespace Belle2 {
     AlignmentGeneratorModule();
 
     /** Generate misalignment and store in database */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
   private:

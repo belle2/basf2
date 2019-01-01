@@ -22,6 +22,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
 
@@ -36,7 +37,7 @@ namespace Belle2 {
      * Default constructor
      */
     ARICHDatabaseImporter(): m_inputFilesHapdQA(), m_inputFilesAsicRoot(), m_inputFilesAsicTxt(), m_inputFilesHapdQE(),
-      m_inputFilesFebTest() {};
+      m_inputFilesFebTest(), m_iov(0, 0, -1, -1) {};
 
     /**
      * Constructor
@@ -53,6 +54,8 @@ namespace Belle2 {
      * Destructor
      */
     virtual ~ARICHDatabaseImporter() {};
+
+    void SetIOV(int experimentLow, int runLow, int experimentHigh , int runHigh);
 
     void setExperimentAndRun(int experiment, int run);
 
@@ -93,6 +96,16 @@ namespace Belle2 {
     void setHAPDQE(unsigned modID, double qe = 0.27, bool import = false);
 
     /**
+     * Import global alignment parameters from ARICH-GlobalAlignment.xml
+     */
+    void importGlobalAlignment();
+
+    /**
+     * Import mirror alignment parameters from ARICH-MirrorAlignment.xml
+     */
+    void importMirrorAlignment();
+
+    /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
      * Goes through the list of installed modules in ARICH-InstalledModules.xml,
      * finds corresponding lists of dead channels in the database and imports lightweight
@@ -105,7 +118,7 @@ namespace Belle2 {
      * to ARICHChannelMask class into database.
      * @param h   TH1F root histogram with 420*144 bins
      */
-    void importChannelMask(TH1* h, int firstExp, int lastExp, int firstRun, int lastRun);
+    void importChannelMask(TH1* h);
 
 
     /**
@@ -193,6 +206,16 @@ namespace Belle2 {
      * Prints mapping of aerogel tiles and their optical properties
      */
     void printAeroTileInfo();
+
+    /**
+     * Prints global alignment constants
+     */
+    void printGlobalAlignment();
+
+    /**
+     * Prints mirror alignment constants
+     */
+    void printMirrorAlignment();
 
     // DAQ classes
 
@@ -521,6 +544,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesHapdQE;        /**< Input root files for HAPD quantum efficiency */
     std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
+    IntervalOfValidity m_iov;
 
     /**
      * @brief printContainer used for debugging purposes...

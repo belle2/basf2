@@ -18,6 +18,8 @@ argc = len(argvs)  # of arg
 
 set_log_level(LogLevel.DEBUG)
 
+use_central_database("TRGGDL_201811")
+
 main = create_path()
 
 if argc == 2 and argvs[1][-6:0] == ".sroot":

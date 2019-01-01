@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>giulia.casarosa@desy.de</contact>
+  <contact>software-tracking@belle2.org</contact>
   <output>ROIFindingValidation.root</output>
   <description>
   This module validates the ROI Finding module.
@@ -13,7 +13,7 @@
 #   <input>EvtGenSimNoBkg.root</input>
 
 NAME = 'ROIFinding'  # not used?
-CONTACT = 'giulia.casarosa@desy.de'
+CONTACT = 'software-tracking@belle2.org'
 # INPUT_FILE = '../EvtGenSimNoBkg.root' #can't use it because PXDDataReduction in simulated
 # INPUT_FILE = 'simRootOutput.root'  # for debugging purposes
 OUTPUT_FILE = 'ROIFindingTrackingValidation.root'

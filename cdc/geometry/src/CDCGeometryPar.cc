@@ -956,11 +956,11 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
 // Read fudge factors
 void CDCGeometryPar::readFFactor(const GearDir gbxParams, const int mode)
 {
-  B2WARNING("CDCGeometryPar: readFFactor is not ready!");
   std::string fileName0 = CDCGeoControlPar::getInstance().getFFactorFile();
   if (mode == 1) {
     fileName0 = gbxParams.getString("fudgeFactorFileName");
   }
+  B2WARNING("readFFactor is not ready! " << fileName0);
   //TODO; implement the following part.
 }
 

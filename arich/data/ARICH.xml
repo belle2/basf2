@@ -16,7 +16,11 @@
     <xi:include href="ARICH-ChannelMapping.xml"/>
     <xi:include href="ARICH-InstalledModules.xml"/>
     <xi:include href="ARICH-CosmicTest.xml"/>
-	
+    <xi:include href="ARICH-Displacement.xml"/>
+    <xi:include href="ARICH-MirrorDisplacement.xml"/>
+    <xi:include href="ARICH-GlobalAlignment.xml"/>
+    <xi:include href="ARICH-MirrorAlignment.xml"/>
+    
     <Envelope>
       <length desc="z length of ARICH envelope" unit="mm">280</length>
       <xPosition desc="center x position of ARICH envelope" unit="mm">0.0</xPosition>

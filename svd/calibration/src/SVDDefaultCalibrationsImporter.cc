@@ -215,10 +215,12 @@ void SVDDefaultCalibrationsImporter::importSVDPulseShapeCalibrations()
   funnyCalAmp.pulseWidth = 1.20;
   */
 
-  int experimentType =
-    -99; //Possible value: 0, 1, 2. experimentType = 0: default for phase3, experimentType = 1 : test beam run 111 ; experimentType = 2 : test beam run 400 (with magnetic field)
+  // Possible value of experimentType:
+  // 0 : default for phase3
+  // 1 : test beam run 111
+  // 2 : test beam run 400 (with magnetic field)
 
-  experimentType = 2; // doing the import to localDB of run 400
+  int experimentType = 2; // doing the import to localDB of run 400
   std::string fileName = "";
   if (experimentType == 1) {
     m_firstExperiment = 3;
@@ -264,7 +266,7 @@ void SVDDefaultCalibrationsImporter::importSVDPulseShapeCalibrations()
         //        B2INFO("layer: " << layer << "ladder: " << ladder << " sensor: " << sensor);
         Bool_t side = 1;
 
-        char s[8]; sprintf(s, "%d.%d.%d", layer, ladder, sensor);
+        char s[8]; sprintf(s, "%u.%u.%u", layer, ladder, sensor);
 
         TString uSideGain(s);
         uSideGain = uSideGain + ".u_peak";
@@ -280,12 +282,9 @@ void SVDDefaultCalibrationsImporter::importSVDPulseShapeCalibrations()
         TString vSideWidth(s);
         vSideWidth = vSideWidth + ".v_fwhm";
 
-        TVectorF* tmpSensorGain = NULL;
-        tmpSensorGain = (TVectorF*)(finTestBeam.Get(uSideGain.Data()));
-        TVectorF* tmpSensorTime = NULL;
-        tmpSensorTime = (TVectorF*)(finTestBeam.Get(uSideTime.Data()));
-        TVectorF* tmpSensorWidth = NULL;
-        tmpSensorWidth = (TVectorF*)(finTestBeam.Get(uSideWidth.Data()));
+        TVectorF* tmpSensorGain = (TVectorF*)(finTestBeam.Get(uSideGain.Data()));
+        TVectorF* tmpSensorTime = (TVectorF*)(finTestBeam.Get(uSideTime.Data()));
+        TVectorF* tmpSensorWidth = (TVectorF*)(finTestBeam.Get(uSideWidth.Data()));
 
 
         for (int strip = 0; strip < 768; strip++) {
@@ -400,7 +399,7 @@ void SVDDefaultCalibrationsImporter::importSVDNoiseCalibrations()
 
         /** Setting the correct noise value to fill*/
         Bool_t side = 1;
-        char s[8]; sprintf(s, "%d.%d.%d", layer, ladder, sensor);
+        char s[8]; sprintf(s, "%u.%u.%u", layer, ladder, sensor);
         TString uSide(s);
         uSide = uSide + ".u";
 

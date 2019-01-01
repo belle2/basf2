@@ -120,6 +120,7 @@ def add_mdst_dump(path, print_untested=False):
             "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
             "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",
             "isTriggerCluster", "hasTriggerClusterMatching", "hasPulseShapeDiscrimination",
+            "getPulseShapeDiscriminationMVA",
             ], {
                              "getRelationsWith": ["KlIds", "MCParticles"],
                              }),

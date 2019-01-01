@@ -21,7 +21,7 @@ else:
 mypath = basf2.Path()  # create a new path
 
 # add input data and ParticleLoader modules to the path
-ma.inputMdstList('MC7', [filename], path=mypath)
+ma.inputMdstList('default', [filename], path=mypath)
 ma.fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')], path=mypath)
 ma.reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95', path=mypath)
 ma.matchMCTruth('D0', path=mypath)

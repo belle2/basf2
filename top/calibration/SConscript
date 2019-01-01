@@ -1,6 +1,6 @@
 Import('env')
 	
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'top', 'top_reconstruction', 'gfortran']
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'top']
 env['SUBLIB'] = True
 
 Return('env')

@@ -31,102 +31,108 @@ namespace Belle2 {
 
   public:
 
-    /**
-    * Constructor: Sets the description, the properties and the parameters of the module.
-    */
+    /** Constructor: Sets the description, the properties and the parameters of the module. */
     SVDChargeSharingAnalysisModule();
 
-    /**  */
+    /** Default destructor. */
     virtual ~SVDChargeSharingAnalysisModule() override;
 
-    /**  */
+    /** Initialize the SVDChargeSharingAnalysi module. */
     virtual void initialize() override;
 
-    /**  */
+    /** Core method, called for each processed event. */
     virtual void event() override;
 
-    /**  */
+    /** Summary method, called after processing of all events. */
     virtual void terminate() override;
 
 
   private:
 
-    TFile* m_outputRootFile;
-    std::string m_outputDirName;
-    std::string m_outputRootFileName;
+    // Input, output.
+    TFile* m_outputRootFile; /**< root ouput file pointer. */
+    std::string m_outputDirName; /**< output directory. */
+    std::string m_outputRootFileName; /**< root output file name. */
 
-    bool m_useTrackInfo;
-    bool m_is2017TBanalysis;
+    // Module parameters.
+    bool m_useTrackInfo; /**< True if using clusters related to tracks. */
+    bool m_is2017TBanalysis; /**< True if analyzing 2017 testbeam data. */
 
-    StoreArray<SVDCluster> m_svdClusters;
-    StoreArray<RecoTrack> m_recoTracks;
-    StoreArray<Track> m_Tracks;
-    StoreArray<TrackFitResult> m_tfr;
+    // Store arrays.
+    StoreArray<SVDCluster> m_svdClusters; /**< SVD clusters store array. */
+    StoreArray<Track> m_Tracks; /**< SVD Tracks strore array. */
+    StoreArray<RecoTrack> m_recoTracks; /**< SVD RecoTracks store array. */
+    StoreArray<TrackFitResult> m_tfr; /**< Track Fit Result store array. */
 
-    static const int m_nLayers = 4;
-    static const int m_nSides = 2;
-    static const int m_nClSizes = 3;  //distinction between clSize = 1, clSize = 2 & clSize >= 3
-    static const int m_nSensorTypes = 4;  // L3 small rect., L456 Origami, L456 BWD, L456 FWD
+    // Constants related to SVD geometry.
+    static const int m_nLayers = 4; /**< Number of SVD layers. */
+    static const int m_nSides = 2; /**< DSSD sides */
+    static const int m_nClSizes = 3; /**< Distinction between clSize=1, clSize=2 & clSize>=3. */
+    static const int m_nSensorTypes = 4; /**< L3 small rect,. L456 Origami, L456 BWD, L456 FWD. */
 
-    std::string m_nameSensorTypes[m_nSensorTypes] = {"L3", "Origami", "BWD", "FWD"};
-    int m_nSensorsOnLayer[m_nLayers] = {2, 3, 4, 5};
+    std::string m_nameSensorTypes[m_nSensorTypes] = {"L3", "Origami", "BWD", "FWD"}; /**< Sensor type names. */
+    int m_nSensorsOnLayer[m_nLayers] = {2, 3, 4, 5}; /**< Total number of DSSDs on L3,4,5,6. */
 
-    const Double_t m_ADUEquivalent = 375.;
-    const Int_t m_nBins = 270;
-    const Double_t m_minCharge = 0.;
-    const Double_t m_maxCharge = m_nBins * m_ADUEquivalent; // 1 ADU bin width
+    // Histogram related parameters.
+    const Double_t m_ADUEquivalent = 375.; /**< Nominal ADUEquivalent, this is just a parameter for histogram bining.*/
+    const Int_t m_nBins = 270; /**< Number of bins. */
+    const Double_t m_minCharge = 0.; /**< Minimum charge in histogram. */
+    const Double_t m_maxCharge = m_nBins * m_ADUEquivalent; /**< 1ADU bin width. */
 
-    // tracks
-    TH1F* h_nTracks;
-    TH1F* h_TracksPvalue;
-    TH1F* h_TracksMomentum;
-    TH1F* h_TracksnSVDhits;
+    // tracks.
+    TH1F* h_nTracks; /**< Number of tracks. */
+    TH1F* h_TracksPvalue; /**< Tracks P value. */
+    TH1F* h_TracksMomentum; /**< Tracks momentum. */
+    TH1F* h_TracksnSVDhits; /**< Number of SVDhits for a track. */
 
-    // Cluster charge
-    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes];
-    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes];
-    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes];
-    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes];
+    // Cluster charge.
+    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge. */
+    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. track momentum. */
+    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. incident angle. */
+    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. SVDCluster SNR. */
 
-    // Cluster size
-    TH1F* h_clSize[m_nSensorTypes][m_nSides];
-    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides];
-    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides];
-    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides];
+    // Cluster size.
+    TH1F* h_clSize[m_nSensorTypes][m_nSides]; /**< SVDCluster size */
+    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. track momentum. */
+    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. incident angle. */
+    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. SVDCluster SNR. */
 
-    //cluster SNR
-    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes];
-    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes];
-    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes];
+    // cluster SNR.
+    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR. */
+    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR vs. track momentum. */
+    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR vs. incident angle. */
 
-    // histogram lists
+    // histogram lists.
+    /** List of all histograms concerning track information: nTracks, Track P Value, momentum and SVD hits */
     TList* m_histoList_Tracks;
 
-    TList* m_histoList_clCharge[m_nSensorTypes];
-    TList* m_histoList_clChargeVsMomentum[m_nSensorTypes];
-    TList* m_histoList_clChargeVsIncidentAngle[m_nSensorTypes];
-    TList* m_histoList_clChargeVsSNR[m_nSensorTypes];
+    TList* m_histoList_clCharge[m_nSensorTypes]; /**< SVDCluster charge histogram list. */
+    TList* m_histoList_clChargeVsMomentum[m_nSensorTypes]; /**< SVDCluster charge vs. momentum histogram list. */
+    TList* m_histoList_clChargeVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster charge vs. incident angle hist list. */
+    TList* m_histoList_clChargeVsSNR[m_nSensorTypes]; /**< SVDCluster charge vs. SVDCluster SNR histogram list. */
 
-    TList* m_histoList_clSize[m_nSensorTypes];
-    TList* m_histoList_clSizeVsMomentum[m_nSensorTypes];
-    TList* m_histoList_clSizeVsIncidentAngle[m_nSensorTypes];
-    TList* m_histoList_clSizeVsSNR[m_nSensorTypes];
+    TList* m_histoList_clSize[m_nSensorTypes]; /**< SVDCluster size histogram list. */
+    TList* m_histoList_clSizeVsMomentum[m_nSensorTypes]; /**< SVDCluster size vs. track momentum histogram list. */
+    TList* m_histoList_clSizeVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster size vs. incident angle histogram list. */
+    TList* m_histoList_clSizeVsSNR[m_nSensorTypes]; /**< SVDCluster size vs. SVDCluster SNR histogram list. */
 
-    TList* m_histoList_clSNR[m_nSensorTypes];
-    TList* m_histoList_clSNRVsMomentum[m_nSensorTypes];
-    TList* m_histoList_clSNRVsIncidentAngle[m_nSensorTypes];
+    TList* m_histoList_clSNR[m_nSensorTypes]; /**< SVDCluster SNR histogram list. */
+    TList* m_histoList_clSNRVsMomentum[m_nSensorTypes]; /**< SVDCluster SNR vs. track momentum histogram list. */
+    TList* m_histoList_clSNRVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster SNR vs. incident angle histogram list. */
 
     // utility methods
+    /** 1D histogram creator. */
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
                             const char* xtitle, const char* ytitle, TList* histoList = NULL);
 
+    /** 2D histogram creator. */
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX,
                             const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY,
                             const char* titleY, TList* histoList);
-
+    /** Used to compare charge histograms for different cluster sizes. */
     TCanvas* comparisonPlot(TH1F* h1, TH1F* h2, TH1F* h3);
   };
 }

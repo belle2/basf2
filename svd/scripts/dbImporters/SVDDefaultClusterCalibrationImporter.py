@@ -16,7 +16,13 @@ from ROOT.Belle2 import SVDHitTimeSelectionFunction
 import os
 
 # default values
-clsMinTime = -80
+# cls hit time
+clsTimeMin = -80
+clsTimeFunctionID = 0  # default, t > clsTimeMin
+clsTimeDeltaT = 30  # NOT USED
+clsTimeNSigma = 10  # NOT USED
+
+# cls cuts
 clsSeedSNR = 5
 clsAdjSNR = 3
 clsMinSNR = 0
@@ -34,9 +40,16 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         cls_payload = Belle2.SVDClusterCalibrations.t_payload()
         time_payload = Belle2.SVDClusterCalibrations.t_time_payload()
 
-        # cluster time
+        # SpacePoint time
         hitTimeSelection = SVDHitTimeSelectionFunction()
-        hitTimeSelection.setMinTime(clsMinTime)
+        # set default version = 0
+        hitTimeSelection.setFunctionID(clsTimeFunctionID)
+        # version 0: t > tMin
+        hitTimeSelection.setMinTime(clsTimeMin)
+        # version 1: |t-t0|<deltaT - NOT USED
+        hitTimeSelection.setDeltaTime(clsTimeDeltaT)
+        # version 2: |t-t0|<nSgma*tErrTOT - NOT USED
+        hitTimeSelection.setNsigma(clsTimeNSigma)
 
         # cluster reconstruction & position error
         clsParam = SVDClusterCuts()

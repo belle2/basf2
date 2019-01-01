@@ -14,7 +14,7 @@ from stdPhotons import *
 from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 import sys
 import os
@@ -60,7 +60,7 @@ if 'Validation' in sys.argv:
     ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar, path=skimpath)
 
 
-setSkimLogging(skim_path=skimpath)
+setSkimLogging(path=skimpath)
 process(skimpath)
 
 print(statistics)

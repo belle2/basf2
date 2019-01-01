@@ -280,7 +280,7 @@ namespace Belle2 {
                                                         "rough T0; t_{0} [ns]; -2 log L"));
     }
     if (t0Rough.position < minT0 or t0Rough.position > maxT0 or !t0Rough.valid) {
-      B2WARNING("rough t0: invalid or out of range!");
+      B2DEBUG(100, "Rough T0 finder: returning invalid or out of range T0");
       return;
     }
 
@@ -318,7 +318,7 @@ namespace Belle2 {
                                                      "precise T0; t_{0} [ns]; -2 log L"));
       }
       if (t0Fine.position < t0min or t0Fine.position > t0max or !t0Fine.valid) {
-        B2WARNING("fine t0: invalid or out of range!");
+        B2DEBUG(100, "Fine T0 finder: returning invalid or out of range T0");
         return;
       }
 

@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>VxdCdcValidationHarvested.root</input>
   <description>This module creates efficiency plots for the V0 validation.</description>
 </header>

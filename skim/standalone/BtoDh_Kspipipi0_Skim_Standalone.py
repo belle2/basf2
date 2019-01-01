@@ -14,13 +14,12 @@ from stdCharged import stdPi, stdK
 from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
-from skimExpertFunctions import *
+from skimExpertFunctions import encodeSkimName, setSkimLogging
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
-import os
-import sys
-import glob
+kspipipi0path = Path()
+
 skimCode = encodeSkimName('BtoDh_Kspipipi0')
 
 fileList = [
@@ -29,24 +28,24 @@ fileList = [
 ]
 
 
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=kspipipi0path)
 
 
-stdPi('all')
-stdK('all')
-stdKshorts()
-loadStdSkimPi0()
+stdPi('all', path=kspipipi0path)
+stdK('all', path=kspipipi0path)
+stdKshorts(path=kspipipi0path)
+loadStdSkimPi0(path=kspipipi0path)
 
 # B- to D(->Kspipipi0)h- Skim
 from skim.btocharm import loadDkspipipi0, BsigToDhToKspipipi0List
-loadDkspipipi0()
-BtoDhList = BsigToDhToKspipipi0List()
-skimOutputUdst(skimCode, BtoDhList)
-summaryOfLists(BtoDhList)
+loadDkspipipi0(path=kspipipi0path)
+BtoDhList = BsigToDhToKspipipi0List(path=kspipipi0path)
+skimOutputUdst(skimCode, BtoDhList, path=kspipipi0path)
+summaryOfLists(BtoDhList, path=kspipipi0path)
 
 
 setSkimLogging()
-process(analysis_main)
+process(kspipipi0path)
 
 # print out the summary
 print(statistics)

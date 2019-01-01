@@ -1557,5 +1557,136 @@ namespace Belle2 {
     return m_name;
   }
 
+  void TRGCDCFitter3D::getStereoGeometry(map<string, vector<double> >& stGeometry)
+  {
+    stGeometry["priorityLayer"] = {10, 22, 34, 46};
+    stGeometry["nWires"] = vector<double> (4);
+    stGeometry["cdcRadius"] = vector<double> (4);
+    stGeometry["zToStraw"] = vector<double> (4);
+    stGeometry["nShift"] = vector<double> (4);
+    stGeometry["angleSt"] = vector<double> (4);
+    CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+    for (int iSt = 0; iSt < 4; ++iSt) {
+      stGeometry["nWires"][iSt] = cdc.nWiresInLayer(stGeometry["priorityLayer"][iSt]) * 2;
+      stGeometry["cdcRadius"][iSt] = cdc.senseWireR(stGeometry["priorityLayer"][iSt]);
+      stGeometry["zToStraw"][iSt] = cdc.senseWireBZ(stGeometry["priorityLayer"][iSt]);
+      stGeometry["nShift"][iSt] = cdc.nShifts(stGeometry["priorityLayer"][iSt]);
+      stGeometry["angleSt"][iSt] = 2 * stGeometry["cdcRadius"][iSt] * sin(M_PI * stGeometry["nShift"][iSt] /
+                                   (stGeometry["nWires"][iSt])) /
+                                   (cdc.senseWireFZ(stGeometry["priorityLayer"][iSt]) - stGeometry["zToStraw"][iSt]);
+    }
+  }
+
+  void TRGCDCFitter3D::getStereoXt(vector<double> const& stPriorityLayer, vector<vector<double> >& stXts, bool isSimple)
+  {
+    stXts.resize(stPriorityLayer.size(), vector<double> (512));
+    CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+    for (unsigned iSt = 0; iSt < stPriorityLayer.size(); ++iSt) {
+      for (unsigned iTick = 0; iTick < stXts[iSt].size(); ++iTick) {
+        double t = iTick * 2 * cdc.getTdcBinWidth();
+        if (isSimple) {
+          stXts[iSt][iTick] = cdc.getNominalDriftV() * t;
+        } else {
+          double driftLength_0 = cdc.getDriftLength(t, stPriorityLayer[iSt], 0);
+          double driftLength_1 = cdc.getDriftLength(t, stPriorityLayer[iSt], 1);
+          stXts[iSt][iTick] = (driftLength_0 + driftLength_1) / 2;
+        }
+      }
+    }
+  }
+
+  void TRGCDCFitter3D::getConstants(std::map<std::string, double>& mConstD, std::map<std::string, std::vector<double> >& mConstV,
+                                    bool isXtSimple)
+  {
+    CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+    mConstD["Trg_PI"] = 3.141592653589793;
+    mConstV["priorityLayer"] = {3, 10, 16, 22, 28, 34, 40, 46, 52};
+    mConstV["rr"] = vector<double> (9);
+    mConstV["nWires"] = vector<double> (9);
+    mConstV["nTSs"] = vector<double> (9);
+    for (unsigned iSL = 0; iSL < 9; iSL++) {
+      unsigned t_layerId = mConstV["priorityLayer"][iSL];
+      mConstV["rr"][iSL] = cdc.senseWireR(t_layerId);
+      mConstV["nWires"][iSL] = cdc.nWiresInLayer(t_layerId) * 2;
+      mConstV["nTSs"][iSL] = cdc.nWiresInLayer(t_layerId);
+    }
+    mConstV["nTSs2D"] = vector<double> (5);
+    for (unsigned iAx = 0; iAx < 5; iAx++) {
+      mConstV["nTSs2D"][iAx] = mConstV["nTSs"][2 * iAx];
+    }
+    mConstV["zToStraw"] = vector<double> (4);
+    mConstV["zToOppositeStraw"] = vector<double> (4);
+    mConstV["angleSt"] = vector<double> (4);
+    mConstV["nShift"] = vector<double> (4);
+    for (int iSt = 0; iSt < 4; iSt++) {
+      unsigned t_layerId = mConstV["priorityLayer"][iSt * 2 + 1];
+      mConstV["zToStraw"][iSt] = cdc.senseWireBZ(t_layerId);
+      mConstV["zToOppositeStraw"][iSt] = cdc.senseWireFZ(t_layerId);
+      mConstV["angleSt"][iSt] = 2 * mConstV["rr"][2 * iSt + 1] * sin(mConstD["Trg_PI"] * cdc.nShifts(t_layerId) /
+                                (2 * cdc.nWiresInLayer(t_layerId))) / (cdc.senseWireFZ(t_layerId) - cdc.senseWireBZ(t_layerId));
+      mConstV["nShift"][iSt] = cdc.nShifts(t_layerId);
+    }
+
+    mConstV["rr2D"] = vector<double> (5);
+    mConstV["rr3D"] = vector<double> (4);
+    for (int iAx = 0; iAx < 5; iAx++) mConstV["rr2D"][iAx] = mConstV["rr"][iAx * 2];
+    for (int iSt = 0; iSt < 4; iSt++) mConstV["rr3D"][iSt] = mConstV["rr"][iSt * 2 + 1];
+
+    mConstV["wirePhi2DError"] = vector<double> (5);
+    mConstV["driftPhi2DError"] = vector<double> (5);
+    mConstV["wirePhi2DError"][0] = 0.00085106;
+    mConstV["wirePhi2DError"][1] = 0.00039841;
+    mConstV["wirePhi2DError"][2] = 0.00025806;
+    mConstV["wirePhi2DError"][3] = 0.00019084;
+    mConstV["wirePhi2DError"][4] = 0.0001514;
+    mConstV["driftPhi2DError"][0] = 0.00085106;
+    mConstV["driftPhi2DError"][1] = 0.00039841;
+    mConstV["driftPhi2DError"][2] = 0.00025806;
+    mConstV["driftPhi2DError"][3] = 0.00019084;
+    mConstV["driftPhi2DError"][4] = 0.0001514;
+    mConstV["driftZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
+    mConstV["wireZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
+
+    // Make driftLength table for each superlayer. Up to 511 clock ticks.
+    // driftLengthTableSLX[ tdcCount (~2ns unit) ] = drift length (cm)
+    for (unsigned iSl = 0; iSl < 9; iSl++) {
+      string tableName = "driftLengthTableSL" + to_string(iSl);
+      unsigned tableSize = 512;
+      mConstV[tableName] = vector<double> (tableSize);
+      unsigned t_layer = mConstV["priorityLayer"][iSl];
+      for (unsigned iTick = 0; iTick < tableSize; iTick++) {
+        double t_driftTime = iTick * 2 * cdc.getTdcBinWidth();
+        double avgDriftLength = 0;
+        if (isXtSimple == 1) {
+          avgDriftLength = cdc.getNominalDriftV() * t_driftTime;
+        } else {
+          double driftLength_0 = cdc.getDriftLength(t_driftTime, t_layer, 0);
+          double driftLength_1 = cdc.getDriftLength(t_driftTime, t_layer, 1);
+          avgDriftLength = (driftLength_0 + driftLength_1) / 2;
+        }
+        mConstV[tableName][iTick] = avgDriftLength;
+      }
+    }
+
+    mConstD["tdcBitSize"] = 9;
+    mConstD["rhoBitSize"] = 11;
+    mConstD["iError2BitSize"] = 8;
+    mConstD["iError2Max"] = 1 / pow(mConstV["wireZError"][0], 2);
+    // LUT values
+    mConstD["JB"] = 0;
+    mConstD["phiMax"] = mConstD["Trg_PI"];
+    mConstD["phiMin"] = -mConstD["Trg_PI"];
+    mConstD["rhoMin"] = 20;
+    mConstD["rhoMax"] = 2500;
+    mConstD["phiBitSize"] = 13;
+    mConstD["driftPhiLUTOutBitSize"] = mConstD["phiBitSize"] - 1;
+    mConstD["driftPhiLUTInBitSize"] = mConstD["tdcBitSize"];
+    mConstD["acosLUTOutBitSize"] = mConstD["phiBitSize"] - 1;
+    mConstD["acosLUTInBitSize"] = mConstD["rhoBitSize"];
+    mConstD["zLUTInBitSize"] = mConstD["phiBitSize"];
+    mConstD["zLUTOutBitSize"] = 9;
+    mConstD["iDenLUTInBitSize"] = 13;
+    mConstD["iDenLUTOutBitSize"] = 11; // To increase wireZError = 2.5*driftZError
+  }
 
 } // namespace Belle2

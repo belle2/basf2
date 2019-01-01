@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -439,6 +440,14 @@ namespace Belle2 {
       }
     }
 
+    double generatorEventWeight(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      if (!evtMetaData)
+        return std::numeric_limits<double>::quiet_NaN();
+      return evtMetaData->getGeneratedWeight();
+    }
+
     int tauPlusMcMode(const Particle*)
     {
       StoreObjPtr<TauPairDecay> tauDecay;
@@ -548,7 +557,7 @@ namespace Belle2 {
       return (double)mcp->hasSeenInDetector(Const::KLM);
     }
 
-    VARIABLE_GROUP("MC Matching");
+    VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
@@ -635,10 +644,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
+                      "[Eventbased] Returns the event weight produced by the event generator")
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
                       "Decay ID for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
                       "Decay ID for the negative tau lepton in a tau pair generated event.")
+
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

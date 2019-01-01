@@ -19,8 +19,8 @@ namespace Belle2 {
 
   /** packed covariance matrix */
   struct PackedAutoCovariance {
-    float sigmaNoiseSq; /**< sigma noise squared in ADC channels */
-    short int packedCovMat[30]; /**< packed covariance, the range [-1.0, 1.0] is mapped to [-32767, 32767] */
+    float sigmaNoiseSq = -1; /**< sigma noise squared in ADC channels */
+    short int packedCovMat[30] = {}; /**< packed covariance, the range [-1.0, 1.0] is mapped to [-32767, 32767] */
     ClassDef(PackedAutoCovariance, 1); /**< ClassDef to make streamer*/
   };
 
@@ -69,7 +69,7 @@ namespace Belle2 {
     }
 
   private:
-    PackedAutoCovariance m_acov[8736]; /**< Packed autocovariance matrix for each crystal */
+    PackedAutoCovariance m_acov[8736] = {}; /**< Packed autocovariance matrix for each crystal */
 
     //Initial Version
     ClassDef(ECLAutoCovariance, 1); /**< ClassDef */

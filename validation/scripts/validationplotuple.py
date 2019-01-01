@@ -451,6 +451,10 @@ class Plotuple:
         else:
             ROOT.gStyle.SetOptStat("nemr")
 
+        if self.is_expert():
+            canvas.SetFillStyle(3004)
+            ROOT.gStyle.SetHatchesLineWidth(2)
+
         # If there is a reference object, and the list of plots is not empty,
         # perform a Chi^2-Test on the reference object and the first object in
         # the plot list:

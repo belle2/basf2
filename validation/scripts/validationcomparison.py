@@ -154,7 +154,7 @@ class Chi2Test(ComparisonBase):
 
         #: compute and store quantities
         self._pvalue, self._chi2, self._chi2ndf, self._ndf = \
-            self.__internal_compare()
+            self._internal_compare()
         self.computed = True
 
     def ensure_zero_error_has_no_content(self, a, b):
@@ -191,7 +191,7 @@ class Chi2Test(ComparisonBase):
         return nbins_a == nbins_b
 
     @staticmethod
-    def __convert_teff_to_hist(teff_a):
+    def _convert_teff_to_hist(teff_a):
         """
         Convert the content of a TEfficiency plot to a histogram and set
         the bin content and errors
@@ -216,7 +216,7 @@ class Chi2Test(ComparisonBase):
 
         return th1
 
-    def __internal_compare(self):
+    def _internal_compare(self):
         """
         Performs the actual Chi^2 test
         @return: The request result quantity
@@ -250,8 +250,8 @@ class Chi2Test(ComparisonBase):
 
         # very special handling for TEfficiencies
         if self.object_a.ClassName() == "TEfficiency":
-            local_object_a = self.__convert_teff_to_hist(self.object_a)
-            local_object_b = self.__convert_teff_to_hist(self.object_b)
+            local_object_a = self._convert_teff_to_hist(self.object_a)
+            local_object_b = self._convert_teff_to_hist(self.object_b)
             if self.debug:
                 print("Converting TEfficiency objects to histograms.")
 

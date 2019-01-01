@@ -1,19 +1,20 @@
 <div id="topmost_viewselection">
- 
-  <input id="check_show_overview" type="checkbox" checked='{{show_overview}}'><label for="check_show_overview">Compact View</label>
-  <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}'><label for="check_show_expert_plots">Expert Plots</label>
+    <input id="check_show_overview" type="checkbox" checked='{{show_overview}}'>
+    <label for="check_show_overview">Compact View</label>
+    <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}'>
+    <label for="check_show_expert_plots">Expert Plots</label>
 </div>
 
-      <div id="outer">
-	<div id="table-container">
-          <div id="table-cell">
-	    <img src="images/refresh.png" alt="Loading...">
-               <h1>Images are being created!</h1>
-               <h2 id="plot_creation_progress"></h2>
-               <h2 id="plot_creation_package"></h2>
-          </div>
+<div id="outer">
+    <div id="table-container">
+        <div id="table-cell">
+	        <img src="images/refresh.png" alt="Loading...">
+            <h1>Images are being created!</h1>
+            <h2 id="plot_creation_progress"></h2>
+            <h2 id="plot_creation_package"></h2>
+         </div>
 	</div>
-      </div>
+</div>
 
 {{#packages}}
 <div intro="fade">
@@ -29,7 +30,7 @@
     <h2>Result File: {{rootfile}} <a href="../results/{{newest_revision}}/{{package}}/{{rootfile}}.root">download {{newest_revision}}</a>
     {{#if !has_reference}}
     <div class="no_reference">NO REFERENCE FILE</div>
-    {{/if}} 
+    {{/if}}
     </h2>
     <br>
 
@@ -57,7 +58,7 @@
     {{>plot_full_view}}
     {{else}}
     {{>plot_matrix}}
-    {{/if}}    
+    {{/if}}
     </div>
 	{{/plotfiles}}
 </div>

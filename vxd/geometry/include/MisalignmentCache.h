@@ -92,7 +92,7 @@ namespace Belle2 {
       MisalignmentCache& operator=(const MisalignmentCache&) = delete;
 
       /** Is the cache alive? */
-      bool m_isAlive;
+      bool m_isAlive{false};
       /** Map to hold solid body misalignments for sensors. */
       MisalignmentMap m_misalignments;
     };

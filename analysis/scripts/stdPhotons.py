@@ -149,5 +149,5 @@ def loadStdGoodBellePhoton(path=analysis_main):
     Parameters:
         path (basf2.Path): the path to load the modules
     """
-    loadStdAllPhoton(path)
+    stdPhotons('all', path)
     cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)

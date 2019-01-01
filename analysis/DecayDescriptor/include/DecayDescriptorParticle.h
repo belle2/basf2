@@ -34,6 +34,12 @@ namespace Belle2 {
     /** Default ctor. */
     DecayDescriptorParticle();
 
+    /** Want the default copy ctor. */
+    DecayDescriptorParticle(const DecayDescriptorParticle&) = default;
+
+    /** Want the default assignment operator */
+    DecayDescriptorParticle& operator=(const DecayDescriptorParticle&) = default;
+
     /** initialise member variables from std::string member variables contained in a DecayStringParticle struct. */
     bool init(const DecayStringParticle& p);
     /** evt.pdl name of the particle. */

@@ -1287,11 +1287,12 @@ def variablesToExtraInfo(
     path=analysis_main,
 ):
     """
-    For each particle in the input list the selected variables are saved in an extra-info field witht he given name.
+    For each particle in the input list the selected variables are saved in an extra-info field with the given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
 
-    It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given
-    name already exists (-1/0/1).
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
 
     @param particleList  The input ParticleList
     @param variables     Dictionary of Variables and extraInfo names.
@@ -1318,11 +1319,12 @@ def variablesToDaughterExtraInfo(
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
     to specified daughter particle.
 
-    It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name
-    already exists (-1/0/1)
+    An existing extra info with the same name will be overwritten if the new
+    value is lower / will never be overwritten / will be overwritten if the
+    new value is higher / will always be overwritten (-1/0/1/2).
 
     @param particleList  The input ParticleList
-    @param decayString   Decay string that specifiec to which daughter the extra infor should be appended
+    @param decayString   Decay string that specifies to which daughter the extra info should be appended
     @param variables     Dictionary of Variables and extraInfo names.
     @param option        Various options for overwriting
     @param path          modules are added to this path
@@ -1343,12 +1345,12 @@ def variableToSignalSideExtraInfo(
     path,
 ):
     """
-    Write the value of specified variable estimated For the single particle in the input list (has to contain exactly 1
+    Write the value of specified variables estimated for the single particle in the input list (has to contain exactly 1
     particle) as an extra info to the particle related to current ROE.
     Should be used only in the for_each roe path.
 
     @param particleList  The input ParticleList
-    @param varToExtraInfo Dictionary of Variable and extraInfo name.
+    @param varToExtraInfo Dictionary of Variables and extraInfo names.
     @param path          modules are added to this path
     """
     mod = register_module('SignalSideVariablesToExtraInfo')
@@ -1522,6 +1524,18 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
+    path.add_module(roeBuilder)
+
+
+def buildNestedRestOfEvent(target_list_name, maskName='', path=analysis_main):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent
+    """
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('nestedROEMask', maskName)
+    roeBuilder.param('createNestedROE', True)
     path.add_module(roeBuilder)
 
 
@@ -1956,7 +1970,7 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
         copyLists(outList, [firstList, secondList], False, path)
         vertexKFit(outList, 0.0, '', '', path)
         markDuplicate(outList, prioritiseV0, path)
-        applyCuts(outList, 'extraInfo(highQualityVertex)')
+        applyCuts(outList, 'extraInfo(highQualityVertex)', path)
     else:
         B2ERROR("Lists to be merged contain different particles")
 
@@ -2090,8 +2104,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
-        fillParticleList('pi+:evtkin', '')
-        fillParticleList('gamma:evtkin', '')
+        fillParticleList('pi+:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
 
         if default_cleanup:
@@ -2100,11 +2114,11 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:evtkin', trackCuts)
+            applyCuts('pi+:evtkin', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:evtkin', gammaCuts)
+            applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
             B2INFO("No cleanup in EventKinematics module.")
     else:
@@ -2150,8 +2164,8 @@ def buildEventShape(inputListNames=[],
     """
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
-        fillParticleList('pi+:evtshape', '')
-        fillParticleList('gamma:evtshape', '')
+        fillParticleList('pi+:evtshape', '', path=path)
+        fillParticleList('gamma:evtshape', '', path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
@@ -2160,13 +2174,13 @@ def buildEventShape(inputListNames=[],
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:evtshape', trackCuts)
+            applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:evtshape', gammaCuts)
+            applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
-            B2WARNIG("Creating the default lists with no cleanup. This can be potentially dangerous")
+            B2WARNING("Creating the default lists with no cleanup. This can be potentially dangerous")
     else:
         particleLists = inputListNames
 

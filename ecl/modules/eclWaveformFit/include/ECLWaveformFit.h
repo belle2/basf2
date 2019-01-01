@@ -33,9 +33,9 @@ namespace Belle2 {
   */
   struct CovariancePacked {
     /** packed matrix*/
-    float m_covMatPacked[31 * (31 + 1) / 2];
+    float m_covMatPacked[31 * (31 + 1) / 2] = {};
     /** sigma noise*/
-    float sigma;
+    float sigma{ -1};
     /** lvalue access by index */
     float& operator[](int i) { return m_covMatPacked[i];}
     /** rvalue access by index */
@@ -93,7 +93,7 @@ namespace Belle2 {
     /** Default constructor. */
     SignalInterpolation2() {};
     /** Constructor with parameters with the parameter layout as in ECLDigitWaveformParameters*/
-    SignalInterpolation2(const std::vector<double>&);
+    explicit SignalInterpolation2(const std::vector<double>&);
     /**
      *  returns signal shape(+derivatives) in 31 equidistant time points
      *  starting from T0
@@ -141,23 +141,24 @@ namespace Belle2 {
 
 
   private:
-    StoreArray<ECLDsp> m_eclDSPs;  /** StoreArray ECLDsp*/
-    StoreArray<ECLDigit> m_eclDigits;   /** StoreArray ECLDigit*/
+    StoreArray<ECLDsp> m_eclDSPs;  /**< StoreArray ECLDsp */
+    StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
-    double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
-    double m_chi2Threshold;  /*chi2 threshold to classify offline fit as good fit*/
-    bool m_TemplatesLoaded;  /**Flag to indicate if waveform templates are loaded from database.*/
-    void loadTemplateParameterArray(bool IsDataFlag);  /** loads waveform templates from database.*/
-    std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
+    double m_EnergyThreshold{0.03};  /**< energy threshold to fit pulse offline*/
+    double m_chi2Threshold{60.0};  /**< chi2 threshold to classify offline fit as good fit*/
+    bool m_TemplatesLoaded{false};  /**< Flag to indicate if waveform templates are loaded from database.*/
+    void loadTemplateParameterArray();  /**< loads waveform templates from database.*/
+    std::vector<double> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/
 
-    TMinuit* m_Minit2h;   /** minuit minimizer for optimized fit*/
-    TMinuit* m_Minit2h2;   /** minuit minimizer for optimized fit with background photon*/
-    void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /** Optimized fit using hadron component model*/
+    TMinuit* m_Minit2h{nullptr};   /**< minuit minimizer for optimized fit*/
+    TMinuit* m_Minit2h2{nullptr};   /**< minuit minimizer for optimized fit with background photon*/
+    void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /**< Optimized fit using hadron component model*/
     void Fit2hExtraPhoton(double& b, double& a0, double& t0, double& a1, double& A2, double& T2,
-                          double& chi2);  /** Optimized fit using hadron component model plus out of time background photon*/
-    SignalInterpolation2 m_si[8736][3];  /**ShaperDSP signal shapes.*/
+                          double& chi2);  /**< Optimized fit using hadron component model plus out of time background photon*/
+    SignalInterpolation2 m_si[8736][3];  /**< ShaperDSP signal shapes.*/
 
-    CovariancePacked m_c[8736];  /** Packed covariance matrices */
-    bool m_CovarianceMatrix;  /**Option to use crystal dependent covariance matrices.*/
+    CovariancePacked m_c[8736] = {};  /**< Packed covariance matrices */
+    bool m_CovarianceMatrix{true};  /**< Option to use crystal dependent covariance matrices.*/
+    bool m_IsMCFlag{false};  /**< Flag to indicate if running over data or MC.*/
   };
 } // end Belle2 namespace

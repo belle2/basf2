@@ -657,5 +657,5 @@ namespace Belle2 {
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file
   class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableECLCalDigitVariables);
+  REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
 }

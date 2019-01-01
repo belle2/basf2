@@ -3,7 +3,8 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Alon Hershenhorn, Torben Ferber                          *
+ * Contributors: Torben Ferber                                            *
+ *               Alon Hershenhorn                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -41,12 +42,26 @@ namespace Belle2 {
 
     double eclClusterHadronIntensity(const Particle* particle)
     {
+      B2WARNING("eclClusterHadronIntensity will be removed in release-04.  eclPulseShapeDiscriminationMVA variable introduced in release-03 should be used in place of eclClusterHadronIntensity.");
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getClusterHadronIntensity();
         } else
           return -1.0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclPulseShapeDiscriminationMVA(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          return cluster->getPulseShapeDiscriminationMVA();
+        } else {
+          return -1.0;
+        }
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -559,7 +574,7 @@ namespace Belle2 {
 
       double numer = 0, denom = 0;
       double time, deltatime;
-      int numberOfPhotonicDaughters = 0;
+      int numberOfClusterDaughters = 0;
 
       /*
                                       ** TODO !!! **
@@ -571,18 +586,18 @@ namespace Belle2 {
         const Particle* current = stacked.top();
         stacked.pop();
 
-        int PDGcode = current->getPDGCode();
-        if (PDGcode == 22) {
-          numberOfPhotonicDaughters ++;
-          const ECLCluster* cluster = current->getECLCluster();
+        const ECLCluster* cluster = current->getECLCluster();
+        if (cluster) {
+          numberOfClusterDaughters ++;
+
           time = cluster->getTime();
-          B2DEBUG(10, "time[" << numberOfPhotonicDaughters << "] = " << time);
+          B2DEBUG(10, "time[" << numberOfClusterDaughters << "] = " << time);
           deltatime = cluster->getDeltaTime99();
-          B2DEBUG(10, "deltatime[" << numberOfPhotonicDaughters << "] = " << deltatime);
+          B2DEBUG(10, "deltatime[" << numberOfClusterDaughters << "] = " << deltatime);
           numer += time / pow(deltatime, 2);
-          B2DEBUG(11, "numer[" << numberOfPhotonicDaughters << "] = " << numer);
+          B2DEBUG(11, "numer[" << numberOfClusterDaughters << "] = " << numer);
           denom += 1 / pow(deltatime, 2);
-          B2DEBUG(11, "denom[" << numberOfPhotonicDaughters << "] = " << denom);
+          B2DEBUG(11, "denom[" << numberOfClusterDaughters << "] = " << denom);
         } else {
           const std::vector<Particle*> daughters = current->getDaughters();
           for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
@@ -590,8 +605,8 @@ namespace Belle2 {
           }
         }
       }
-      if (numberOfPhotonicDaughters < 1) {
-        B2WARNING("There are no photons amongst the daughters of the provided particle!");
+      if (numberOfClusterDaughters < 1) {
+        B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
         return std::numeric_limits<float>::quiet_NaN();
       }
 
@@ -614,7 +629,7 @@ namespace Belle2 {
 
       double averageECLTime, maxTimeDiff = -1;
       double time, deltatime, maxTimeDiff_temp;
-      int numberOfPhotonicDaughters = 0;
+      int numberOfClusterDaughters = 0;
 
       averageECLTime = weightedAverageECLTime(particle);
 
@@ -624,19 +639,19 @@ namespace Belle2 {
         const Particle* current = stacked.top();
         stacked.pop();
 
-        int PDGcode = current->getPDGCode();
-        if (PDGcode == 22) {
-          numberOfPhotonicDaughters ++;
-          const ECLCluster* cluster = current->getECLCluster();
+        const ECLCluster* cluster = current->getECLCluster();
+        if (cluster) {
+          numberOfClusterDaughters ++;
+
           time = cluster->getTime();
-          B2DEBUG(10, "time[" << numberOfPhotonicDaughters << "] = " << time);
+          B2DEBUG(10, "time[" << numberOfClusterDaughters << "] = " << time);
           deltatime = cluster->getDeltaTime99();
-          B2DEBUG(10, "deltatime[" << numberOfPhotonicDaughters << "] = " << deltatime);
+          B2DEBUG(10, "deltatime[" << numberOfClusterDaughters << "] = " << deltatime);
           maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
-          B2DEBUG(11, "maxTimeDiff_temp[" << numberOfPhotonicDaughters << "] = " << maxTimeDiff_temp);
+          B2DEBUG(11, "maxTimeDiff_temp[" << numberOfClusterDaughters << "] = " << maxTimeDiff_temp);
           if (maxTimeDiff_temp > maxTimeDiff)
             maxTimeDiff = maxTimeDiff_temp;
-          B2DEBUG(11, "maxTimeDiff[" << numberOfPhotonicDaughters << "] = " << maxTimeDiff);
+          B2DEBUG(11, "maxTimeDiff[" << numberOfClusterDaughters << "] = " << maxTimeDiff);
         } else {
           const std::vector<Particle*> daughters = current->getDaughters();
           for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
@@ -644,8 +659,8 @@ namespace Belle2 {
           }
         }
       }
-      if (numberOfPhotonicDaughters < 1) {
-        B2WARNING("There are no photons amongst the daughters of the provided particle!");
+      if (numberOfClusterDaughters < 1) {
+        B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
         return std::numeric_limits<float>::quiet_NaN();
       }
 
@@ -1097,10 +1112,15 @@ namespace Belle2 {
                       "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
                       "Status bit to indicate if cluster has digits with waveforms that passed energy and chi2 thresholds for computing PSD variables.");
+    REGISTER_VARIABLE("PulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA,
+                      "Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. \n"
+                      "Value is 1.0 for electromagnetic showers and 0.0 for hadronic showers. \n");
     REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
                       "Returns ECL cluster's Cluster Hadron Component Intensity (pulse shape discrimination variable). \n"
                       "Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission. \n"
-                      "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
+                      "Computed only using cluster digits with energy greater than 30 MeV and good offline waveform fit chi2. \n"
+                      "eclClusterHadronIntensity will be removed in release-04.  eclPulseShapeDiscriminationMVA variable introduced in release-03 \n"
+                      "should be used in place of eclClusterHadronIntensity. \n");
     REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
                       "Returns ECL cluster's Number of hadron digits in cluster (pulse shape discrimination variable). \n"
                       "Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. \n"
@@ -1111,15 +1131,13 @@ namespace Belle2 {
                       "Returns the hypothesis ID of this ECL cluster.");
     REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
                       "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
-    REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger,
-                      "Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)) and 0 otherwise. Returns -1 if the matching code was not run.");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, "Returns extrapolated phi.");
-    REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi id.");
+    REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi Id.");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime,
-                      "Returns the ECL weighted average time of all the photons daughters (of any generation) of the provided particle");
+                      "Returns the ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters (of any generation) of the provided particle");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime,
-                      "Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time, amongst the cluster associated to the photonic daughters (of all generations) of the provided particle");
+                      "Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time, amongst the clusters (neutrals) and matched clusters (charged) of daughters (of all generations) of the provided particle");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals,
                       "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time");
@@ -1156,7 +1174,8 @@ namespace Belle2 {
                       "[Calibration] return the total FADC sum related to this ECLCluster for a given TC theta Id range (i, j) and hit window (k, l)");
     REGISTER_VARIABLE("clusterTCIsMaximum", eclTCIsMaximumForCluster,
                       "[Calibration] return true if cluster is related to maximum TC");
-
+    REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger,
+                      "[Calibration] Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)) and 0 otherwise. Returns -1 if the matching code was not run. NOT FOR PHASE2 DATA!");
     REGISTER_VARIABLE("eclEnergyTC(i)", getEnergyTC,
                       "[Eventbased][Calibration] return the energy (in FADC counts) for the i-th trigger cell (TC), 1 based (1..576)");
     REGISTER_VARIABLE("eclEnergyTCECLCalDigit(i)", getEnergyTCECLCalDigit,

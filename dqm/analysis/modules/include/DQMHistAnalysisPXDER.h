@@ -149,13 +149,6 @@ namespace Belle2 {
     int c_nPXDSensors = 0;
 
     /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
@@ -220,6 +213,8 @@ namespace Belle2 {
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
+
+    // get a histogram by name DEPRECATED, better use function from base class!
     TH1* GetHisto(TString histoname);
 
   };

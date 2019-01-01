@@ -21,6 +21,7 @@
 
 #include <framework/logging/Logger.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitTrack.h>
@@ -58,6 +59,13 @@ namespace Belle2 {
        */
       enum KFitError::ECode               addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
                                                    const double q);
+      /** Add a particle to the fitter.
+       * The function gets track parameters from the Particle dataobject and
+       * calls addTrack().
+       * @param[in] particle Particle.
+       * @return error code (zero if success)
+       */
+      enum KFitError::ECode addParticle(const Particle* particle);
       /** Set a correlation matrix.  Not intended for end user's use.
        * @param c (7x7) correlation matrix
        * @return error code (zero if success)
@@ -103,7 +111,7 @@ namespace Belle2 {
        * @param id track id
        * @return Lorentz vector of the track
        */
-      const CLHEP::HepLorentzVector              getTrackMomentum(const int id) const;
+      const CLHEP::HepLorentzVector       getTrackMomentum(const int id) const;
       /** Get a position of the track.
        * @param id track id
        * @return position of the track
@@ -113,7 +121,7 @@ namespace Belle2 {
        * @param id track id
        * @return error matrix of the track
        */
-      const CLHEP::HepSymMatrix                  getTrackError(const int id) const;
+      const CLHEP::HepSymMatrix           getTrackError(const int id) const;
       /** Get a specified track object.
        * @param id track id
        * @return specified track object

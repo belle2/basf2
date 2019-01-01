@@ -119,6 +119,23 @@ This could be useful if a Collector step succeeded previously, but now needs to 
     :prog: b2caf-status
 
 
+The b2caf-filemap Tool
+----------------------
+
+Sometimes you will want to run over many input files. If you are ignoring certain runs from these files the CAF requires
+that it knows which IoV each file corresponds to.
+This is handled automatically by the CAF during startup, however this can take a long time to process if you have many files.
+A better solution is to use the `caf.framework.Calibration.files_to_iovs` attribute and set a pre-calculated dictionary
+manually.
+To create this dictionary the b2caf-filemap tool can be used (though it isn't necessary to use it) to create a pickle file
+containing the dictionary.
+
+.. argparse::
+    :filename: calibration/tools/b2caf-filemap
+    :func: get_argparser
+    :prog: b2caf-filemap
+
+
 Job Submission Backends
 -----------------------
 

@@ -8,8 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <TMatrixFSym.h>
 
+#include <analysis/KFit/MakeMotherKFit.h>
 #include <analysis/KFit/MassVertexFitKFit.h>
+#include <analysis/utility/CLHEPToROOT.h>
 
 
 using namespace std;
@@ -42,6 +45,12 @@ MassVertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
+enum KFitError::ECode MassVertexFitKFit::setInitialVertex(const TVector3& v)
+{
+  m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
+}
 
 enum KFitError::ECode
 MassVertexFitKFit::setInvariantMass(const double m) {
@@ -562,5 +571,35 @@ MassVertexFitKFit::calculateNDF(void) {
   m_NDF = 2 * m_TrackCount - 3 + 1;
 
   return m_ErrorCode = KFitError::kNoError;
+}
+
+enum KFitError::ECode MassVertexFitKFit::updateMother(Particle* mother)
+{
+  MakeMotherKFit kmm;
+  kmm.setMagneticField(m_MagneticField);
+  unsigned n = getTrackCount();
+  for (unsigned i = 0; i < n; ++i) {
+    kmm.addTrack(getTrackMomentum(i), getTrackPosition(i), getTrackError(i),
+                 getTrack(i).getCharge());
+    kmm.setTrackVertexError(getTrackVertexError(i));
+    for (unsigned j = i + 1; j < n; ++j) {
+      kmm.setCorrelation(getCorrelation(i, j));
+    }
+  }
+  kmm.setVertex(getVertex());
+  kmm.setVertexError(getVertexError());
+  m_ErrorCode = kmm.doMake();
+  if (m_ErrorCode != KFitError::kNoError)
+    return m_ErrorCode;
+  double chi2 = getCHIsq();
+  int ndf = getNDF();
+  double prob = TMath::Prob(chi2, ndf);
+  mother->updateMomentum(
+    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
+    prob);
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
 }
 

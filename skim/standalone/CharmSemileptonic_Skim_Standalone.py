@@ -14,39 +14,39 @@ from stdPhotons import *
 from stdPi0s import *
 from stdCharged import stdPi, stdK
 from skimExpertFunctions import *
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 import os
 import sys
 import glob
 skimCode = encodeSkimName("CharmSemileptonic")
 
+cslpath = Path()
+
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=cslpath)
 
 
-stdPi('95eff')
-stdK('95eff')
-loadStdSkimPi0()
-reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, analysis_main)
-vertexKFit('K_S0:all', 0.0)
-applyCuts('K_S0:all', '0.477614 < M < 0.517614')
+stdPi('95eff', path=cslpath)
+stdK('95eff', path=cslpath)
+loadStdSkimPi0(path=cslpath)
 
-fillParticleList('e+:std', 'electronID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
+reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, path=cslpath)
+vertexKFit('K_S0:all', 0.0, path=cslpath)
+applyCuts('K_S0:all', '0.477614 < M < 0.517614', path=cslpath)
 
-fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
 
 # CSL Skim
 from skim.charm import CharmSemileptonicList
-CSLList = CharmSemileptonicList()
-skimOutputUdst(skimCode, CSLList)
-summaryOfLists(CSLList)
+CSLList = CharmSemileptonicList(cslpath)
+skimOutputUdst(skimCode, CSLList, path=cslpath)
+summaryOfLists(CSLList, path=cslpath)
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=cslpath)
+process(cslpath)
 
 # print out the summary
 print(statistics)

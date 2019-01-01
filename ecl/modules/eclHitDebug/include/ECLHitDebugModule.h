@@ -58,15 +58,15 @@ namespace Belle2 {
     std::string m_eclHitOutColName;
 
     /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-    int m_hitNum;
+    int m_hitNum{ -1};
 
   private:
     /** CPU time     */
-    double m_timeCPU;
+    double m_timeCPU{ -1.0};
     /** Run number   */
-    int    m_nRun;
+    int    m_nRun{ -1};
     /** Event number */
-    int    m_nEvent;
+    int    m_nEvent{ -1};
 
     //DataStore variables
     StoreArray<ECLDebugHit> m_eclDebugHits; /**< ECLDebugHit datastore object */

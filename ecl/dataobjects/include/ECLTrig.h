@@ -68,12 +68,12 @@ namespace Belle2 {
   private:
     int m_TrigId;      /**< Trig ID */
     double m_TimeTrig; /**< Trig Time */
-    int m_TrigTag;
+    int m_TrigTag;     /**< Trig tag */
 
 
-//    ClassDef(ECLTrig, 1);/**< ClassDef */
-//    ClassDef(ECLTrig, 2); // CellId -> TrigId
-    ClassDef(ECLTrig, 3); // TrigTag added
+    /** 2 CellId -> TrigIdvariable lengthx */
+    /** 3 TrgTag added */
+    ClassDef(ECLTrig, 3);
 
   };
 } // end namespace Belle2

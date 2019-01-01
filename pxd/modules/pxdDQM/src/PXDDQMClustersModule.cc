@@ -396,7 +396,7 @@ void PXDDQMClustersModule::event()
 
   // PXD basic histograms:
   // Fired pixels
-  vector< set<int> > Pixels(nPXDSensors); // sets to eliminate multiple samples per pixel
+  vector< int > Pixels(nPXDSensors);
   for (const PXDDigit& digit2 : storePXDDigits) {
     int iLayer = digit2.getSensorID().getLayerNumber();
     if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
@@ -405,7 +405,7 @@ void PXDDQMClustersModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    Pixels.at(index).insert(digit2.getUniqueChannelID());
+    Pixels[index]++;
     int iChip = PXDMappingLookup::getDCDID(digit2.getUCellID(), digit2.getVCellID(), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
@@ -421,11 +421,11 @@ void PXDDQMClustersModule::event()
 
   }
   for (int i = 0; i < nPXDSensors; i++) {
-    if ((m_fired[i] != NULL) && (Pixels[i].size() > 0)) m_fired[i]->Fill(Pixels[i].size());
+    if ((m_fired[i] != NULL) && (Pixels[i] > 0)) m_fired[i]->Fill(Pixels[i]);
   }
 
-  vector< set<int> > counts(nPXDSensors);
   // Hitmaps, Charge, Seed, Size, ...
+  vector< int > counts(nPXDSensors);
   for (const PXDCluster& cluster : storePXDClusters) {
     int iLayer = cluster.getSensorID().getLayerNumber();
     if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
@@ -434,7 +434,7 @@ void PXDDQMClustersModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    counts.at(index).insert(cluster.GetUniqueID());
+    counts[index]++;
     int iChip = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
@@ -465,8 +465,8 @@ void PXDDQMClustersModule::event()
 
   }
   for (int i = 0; i < nPXDSensors; i++) {
-    if ((m_clusters[i] != NULL) && (counts[i].size() > 0))
-      m_clusters[i]->Fill(counts[i].size());
+    if ((m_clusters[i] != NULL) && (counts[i] > 0))
+      m_clusters[i]->Fill(counts[i]);
   }
 
   // Only fill start row (triggergate) histos when data is available

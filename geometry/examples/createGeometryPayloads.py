@@ -28,7 +28,7 @@ basf2.process(phase2)
 # most of the components are identical so we avoid uploading two
 # revisions so we remove most of them. We only need separate payloads for the
 # general configuration and PXD and SVD
-varying = ["GeoConfiguration", "PXDGeometryPar", "SVDGeometryPar"]
+varying = ["GeoConfiguration", "PXDGeometryPar", "SVDGeometryPar", "BeamPipeGeo"]
 database_content = []
 line_match = re.compile("^dbstore/(.*?) (\d+)")
 with open("localdb/database.txt") as dbfile:
@@ -36,8 +36,8 @@ with open("localdb/database.txt") as dbfile:
         match = line_match.search(line)
         if (match.group(1) in varying):
             if match.group(2) == "1":
-                # limit phase3 to max experiment 999
-                database_content.append("%s 0,0,999,-1\n" % match.group(0))
+                # limit phase3 to max experiment 0
+                database_content.append("%s 0,0,0,-1\n" % match.group(0))
                 continue
         elif match.group(2) != "1":
             continue

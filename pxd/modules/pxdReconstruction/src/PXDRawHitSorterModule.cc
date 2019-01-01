@@ -56,8 +56,10 @@ void PXDRawHitSorterModule::initialize()
 {
   //Register collections
   m_storeRawHits.isRequired(m_storeRawHitsName);
+  m_storeDaqStatus.isRequired();
   //m_storeDigits.registerInDataStore(m_storeDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
   m_storeDigits.registerInDataStore(m_storeDigitsName);
+
 }
 
 void PXDRawHitSorterModule::event()
@@ -69,6 +71,8 @@ void PXDRawHitSorterModule::event()
 
   //Mapping of Pixel information to sort according to VxdID, row, column
   std::map<VxdID, std::multiset<Pixel>> sensors;
+  // Get Map of (un)usable modules
+  auto usability = m_storeDaqStatus->getUsable();
 
   // Fill sensor information to get sorted Pixel indices
   const int nPixels = m_storeRawHits.getEntries();
@@ -80,6 +84,7 @@ void PXDRawHitSorterModule::event()
       B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
       continue;
     }
+    if (!usability[sensorID]) continue;// masked as bad sensor data
     if (m_trimOutOfRange && !goodHit(rawhit))
       continue;
     // Zero-suppression cut

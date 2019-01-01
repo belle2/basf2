@@ -15,7 +15,7 @@ from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from skimExpertFunctions import setSkimLogging, encodeSkimName
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-00-00'
 
 # create a path
 darkskimpath = Path()
@@ -39,7 +39,7 @@ skimOutputUdst(skimCode, darklist, path=darkskimpath)
 summaryOfLists(darklist, path=darkskimpath)
 
 # suppress noisy modules, and then process
-setSkimLogging(skim_path=darkskimpath)
+setSkimLogging(path=darkskimpath)
 process(darkskimpath)
 
 # print out the summary

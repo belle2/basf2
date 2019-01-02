@@ -12,9 +12,21 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
-.. after release-03 we can just add a new heading here and start collecting.
-   That way it will be updated correctly in light releases and we don't have to
-   change anything for release-04
+
+Changes since release-03-00
+===========================
+
+.. Now let's add the detailed changes for the analysis package first, that's
+   what user will want to see
+
+.. include:: analysis/doc/whatsnew-since/release-03-00.txt
+
+.. And then for framework as well. If something is more important we can always
+   move it directly in here
+
+.. include:: framework/doc/whatsnew-since/release-03-00.txt
+
+
 
 Changes since release-02-01
 ===========================

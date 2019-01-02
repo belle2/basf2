@@ -28,7 +28,7 @@ REG_MODULE(PXDROIPlot)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDROIPlotModule::PXDROIPlotModule() : Module() , m_storeRawHits() , m_storeROIs() , m_storeDCROIs() , m_storeHLTROIs()
+PXDROIPlotModule::PXDROIPlotModule() : Module()
 {
   //Set module properties
   setDescription("Plot ROIs on PXD Hit/Charge Maps and write pictures");
@@ -96,6 +96,8 @@ void PXDROIPlotModule::event()
 
     h->Draw("colz");
 
+    // Alpha Blending only works in ROOT's Batch Mode, but LineStyle won't.
+    // LineStyle works in normal mode, but Alpha won't
     for (auto& it : list[currentVxdId]) {
       TBox* b;
       b = new TBox(it.getMinVid(), it.getMinUid(), it.getMaxVid(), it.getMaxUid());
@@ -104,19 +106,24 @@ void PXDROIPlotModule::event()
       b->SetFillStyle(0);// Hollow
       b->Draw();
     }
+    // we move the other box by more than half a bin. this is needed as alpha seems not to work
     for (auto& it : listDC[currentVxdId]) {
       TBox* b;
-      b = new TBox(it.getMinVid(), it.getMinUid(), it.getMaxVid(), it.getMaxUid());
+      b = new TBox(it.getMinVid() + 0.7, it.getMinUid() + 0.7, it.getMaxVid() + 0.7, it.getMaxUid() + 0.7);
       b->SetLineColorAlpha(kBlue, 0.3);
-      b->SetLineWidth(3);
+      b->SetLineWidth(2);
+      b->SetLineStyle(2);
       b->SetFillStyle(0);// Hollow
       b->Draw();
     }
+    // we move the other box by half a bin. this is needed as alpha seems not to work, in addition we use a dashed style
+    // dashed style doesnt work with png export, thus if all ROIs are identical, lines might overlap completely
     for (auto& it : listHLT[currentVxdId]) {
       TBox* b;
-      b = new TBox(it.getMinVid(), it.getMinUid(), it.getMaxVid(), it.getMaxUid());
+      b = new TBox(it.getMinVid() - 0.7, it.getMinUid() - 0.7, it.getMaxVid() - 0.7, it.getMaxUid() - 0.7);
       b->SetLineColorAlpha(kGreen, 0.3);
-      b->SetLineWidth(3);
+      b->SetLineWidth(2);
+      b->SetLineStyle(7);
       b->SetFillStyle(0);// Hollow
       b->Draw();
     }

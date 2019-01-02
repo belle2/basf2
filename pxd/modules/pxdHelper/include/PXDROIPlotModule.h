@@ -45,15 +45,15 @@ namespace Belle2 {
 
       StoreObjPtr<EventMetaData> m_eventMetaData;/**< Event Metadata StorePtr */
 
+      /** Storearray for raw pixels   */
+      StoreArray<PXDRawHit> m_storeRawHits;
+
       /** Storearray for ROIs  */
       StoreArray<ROIid> m_storeROIs;
       /** Storearray for ROIs (DC) */
       StoreArray<ROIid> m_storeDCROIs;
       /** Storearray for ROIs (HLT) */
       StoreArray<ROIid> m_storeHLTROIs;
-
-      /** Storearray for raw pixels   */
-      StoreArray<PXDRawHit> m_storeRawHits;
 
     };//end class declaration
 

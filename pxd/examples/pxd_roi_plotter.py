@@ -6,8 +6,12 @@ import sys
 
 from basf2 import *
 from ROOT import Belle2
+from ROOT import gROOT
 
 import PXDROIUnpackerModule
+
+# prevent Canvases from popping up on x11
+gROOT.SetBatch()
 
 main = create_path()
 

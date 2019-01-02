@@ -1,6 +1,6 @@
-=========
+========
 Analysis
-=========
+========
 
 The analysis package collects modules and tools for high-level analysis of Belle II data.
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.

@@ -74,7 +74,7 @@ PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to ke
 DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
 DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
-DecayChannel.name.__doc__ = "Name of the channel e.g. D0:generic_0"
+DecayChannel.name.__doc__ = "str:Name of the channel e.g. D0:generic_0"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weightfiles independent of decayModeID"
 DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"

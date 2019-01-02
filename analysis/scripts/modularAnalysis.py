@@ -552,8 +552,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main,
                       enforceFitHypothesis=False):
     """
-    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
-    loads them to the StoreArray<Particle> and fills the ParticleLists.
+    Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
+    loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
     via list tuples (decayString, cut), for example
@@ -568,16 +568,16 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the `mdst` dataobject that is used as an input is determined from the type of
+    The type of the ``mdst`` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input `mdst` type = Tracks)
+    * charged final state particles (input ``mdst`` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input `mdst` type = ECLCluster)
-        - "K_S0", "Lambda0" (input `mdst` type = V0)
-        - "K_L0"            (input `mdst` type = KLMCluster)
+        - "gamma"           (input ``mdst`` type = ECLCluster)
+        - "K_S0", "Lambda0" (input ``mdst`` type = V0)
+        - "K_L0"            (input ``mdst`` type = KLMCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -624,23 +624,23 @@ def fillParticleList(
     enforceFitHypothesis=False
 ):
     """
-    Creates Particles of the desired type from the corresponding `mdst` dataobjects,
+    Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
     See also:
         the :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the `mdst` dataobject that is used as an input is determined from the type of
+    The type of the ``mdst`` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input `mdst` type = Tracks)
+    * charged final state particles (input ``mdst`` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input `mdst` type = ECLCluster)
-        - "K_S0", "Lambda0" (input `mdst` type = V0)
-        - "K_L0"            (input `mdst` type = KLMCluster)
+        - "gamma"           (input ``mdst`` type = ECLCluster)
+        - "K_S0", "Lambda0" (input ``mdst`` type = V0)
+        - "K_L0"            (input ``mdst`` type = KLMCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -1206,7 +1206,7 @@ def ntupleTree(
     Parameters:
         tree_name (str): the output nutple (TTree) name
         list_name (str): input ParticleList name
-        tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
+        tools (list(str)): list of Ntuple tools to be included, tool-decaystring pairs.
     """
 
     message = (
@@ -1238,7 +1238,7 @@ def variablesToNtuple(
 
     Parameters:
         decayString (str): specifies type of Particles and determines the name of the ParticleList
-        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        variables (list(str)): the list of variables (which must be registered in the VariableManager)
         treename (str): name of the ntuple tree
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
@@ -1265,8 +1265,8 @@ def variablesToHistogram(
 
     Parameters:
         decayString (str): specifies type of Particles and determines the name of the ParticleList
-        variables (list of tuple): variables + binning which must be registered in the VariableManager
-        variables_2d (list of tuple): pair of variables + binning for each which must be registered in the VariableManager
+        variables (list(tuple))): variables + binning which must be registered in the VariableManager
+        variables_2d (list(tuple)): pair of variables + binning for each which must be registered in the VariableManager
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
     """

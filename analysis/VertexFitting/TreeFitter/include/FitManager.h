@@ -45,6 +45,12 @@ namespace TreeFitter {
                const bool useReferencing = false
               );
 
+    /** explicitly remove the copy constructor */
+    FitManager(const FitManager&) = delete;
+
+    /** explicitly remove the assignment operator */
+    FitManager operator=(const FitManager&) = delete;
+
     /** destructor does stuff */
     ~FitManager();
 

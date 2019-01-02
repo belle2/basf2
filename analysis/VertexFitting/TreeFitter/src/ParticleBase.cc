@@ -122,7 +122,14 @@ namespace TreeFitter {
     ParticleBase* rc = 0;
     const int pdgcode = particle->getPDGCode();
 
-    bool validfit  = false; // ? SC
+    // constraint if not at head of tree.
+    // FIXME JFK we might want to check here for a valid cov
+    // FT: for now we refit everything since doing otherwise sometimes
+    // causes loss of mother-daughter relations
+    // this is due to the way we build the tree...
+    //
+    // cppcheck-suppress knownConditionTrueFalse
+    bool validfit  = false;
 
     if (Belle2::Const::ParticleType(pdgcode) == Belle2::Const::pi0 && validfit) {
       B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.");

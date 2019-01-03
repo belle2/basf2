@@ -84,7 +84,7 @@ void DQMHistOutputToEPICSModule::event()
           }
         }
 
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)&data), "ca_set failure");
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)data), "ca_set failure");
         delete []data;
       }
     }

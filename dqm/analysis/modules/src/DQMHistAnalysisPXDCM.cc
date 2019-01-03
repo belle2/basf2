@@ -133,7 +133,7 @@ void DQMHistAnalysisPXDCMModule::event()
   // not enough Entries
   // it->canvas->Pad()->SetFillColor(6);// Magenta
 //   B2INFO("data "<<data);
-  /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
+  /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
   if (data > 100.) {
     m_cCommonMode->Pad()->SetFillColor(2);// Red
   } else if (data > 50.) {

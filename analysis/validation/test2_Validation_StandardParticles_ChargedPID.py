@@ -125,7 +125,9 @@ def plot_pidEfficiency(pid, sample, vs='P', isExpertMode=False, detector=""):
 
     s.tree.Project(hist['total'].GetName(), f"{track}_{vs}", cuts)
     s.tree.Project(hist['passed'].GetName(), f"{track}_{vs}", selection)
-    h = TEfficiency(hist['passed'], hist['total'])
+    eff = TEfficiency(hist['passed'], hist['total'])
+    eff.Draw()
+    h = eff.GetPaintedGraph()
     h.SetName(f"{pid}_{pidString}_efficiency_vs_{vs}")
     h.SetTitle(f"{pid} {pidString} efficiency vs {vs} ({pidcut:.2f} PID cut);\
               {axisName};\

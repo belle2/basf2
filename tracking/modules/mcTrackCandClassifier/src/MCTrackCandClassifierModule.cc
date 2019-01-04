@@ -537,13 +537,6 @@ void MCTrackCandClassifierModule::terminate()
 }
 
 
-double MCTrackCandClassifierModule::getXintersect(double d0, double omega, double R)
-{
-  double Xc = d0 + 1 / omega;
-  return (R * R + Xc * Xc - 1 / omega / omega) / 2 / Xc;
-}
-
-
 double MCTrackCandClassifierModule::semiPlane(TVector3 vertex, TVector3 center, TVector3 hit)
 {
   TVector3 err = center - vertex;

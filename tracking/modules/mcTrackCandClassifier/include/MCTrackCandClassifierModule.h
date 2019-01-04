@@ -126,14 +126,6 @@ namespace Belle2 {
 
   private:
 
-    /** Returns the x intersect. TODO: Function is never used...?
-    * @param d0: Point of closest approach in the r-phi-plane.
-    * @param omega: Signed curvature
-    * @param R: Radius
-    * @return x intersect
-    */
-    double getXintersect(double d0, double omega, double R);
-
     /** Function to get semiplane.
      * @param vertex: Vertex position
      * @param center: center positon

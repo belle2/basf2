@@ -127,6 +127,8 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
     try {
       vector<double> calcVal = anAlgorithm->calcData(aTC);
       dataVector->push_back(calcVal);
+      // the following line causes a false positive
+      // cppcheck-suppress unreadVariable
       auto printVec = [&]() -> string { string out; for (double val : calcVal) { out += (" " + to_string(val)); } return (out += "\n"); };
       B2DEBUG(20, "RootParameterTracker::collectData4VecDoubleAlgorithms(), tc with type " << tcTypeName <<
               " and applied algorithm " << algoName <<

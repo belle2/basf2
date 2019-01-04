@@ -82,8 +82,8 @@ namespace Belle2 {
     //! User-define maximum step size in cm (0 for no upper limit)
     double m_MaxStep;
 
-    //! User-defined flag for source (0 = beam, 1 = cosmic ray)
-    int    m_Cosmic;
+    //! User-defined flag for source (0 = beam, 1 = cosmic ray), which is currently not used
+    //int    m_Cosmic;
 
     //! User-defined tracking verbosity:
     //! 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info

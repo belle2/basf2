@@ -59,7 +59,6 @@ namespace Belle2 {
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID,
                    T samples[c_nAPVSamples]):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID)
-      //m_totalCharge(0), m_maxSampleIndex(0)
     {
       m_totalCharge = 0;
       m_maxSampleIndex = 0;
@@ -76,7 +75,7 @@ namespace Belle2 {
     */
     template<typename T>
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, T samples) :
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID)//, m_totalCharge(0), m_maxSampleIndex(0)
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID)
     {
       m_totalCharge = 0;
       m_maxSampleIndex = 0;

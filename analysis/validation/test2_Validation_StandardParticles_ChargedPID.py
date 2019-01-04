@@ -175,10 +175,10 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
             s.tree.GetEntries(selection) / total
         )
         h.GetXaxis().SetBinLabel(bin + 1, pid)
-        h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
-        h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
-        h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
-        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
+    h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
+    h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
+    h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
+    h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
     outputFile.WriteTObject(h)
     # printout(h)
 

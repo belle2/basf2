@@ -31,7 +31,7 @@ from ROOT import Belle2
 
 
 main = b2.create_path()
-DR2 = '/ghi/fs01/belle2/bdata/users/karim/MC/DR2/release-01-00-00/eegamma/mdst/eegamma_1.root'
+DR2 = '/ghi/fs01/belle2/bdata/users/karim/MC/DR2/release-02-01-00/eegamma/cdst/eegamma_1.root'
 main.add_module('RootInput', inputFileNames=[DR2])
 
 narg = len(sys.argv)

@@ -179,15 +179,13 @@ void eclee5x5CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   //..Derive ThetaID of each crystal, and cut on dPhi* as a function of thetaID
-  const short m_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 96, 96, 96, 96, 96, 64, 64, 64};
-
   int crysID = 0;
   for (int it = 0; it < 69; it++) {
 
     //..dPhi* cuts are actually a function of thetaID, not crysID
     m_dPhiMin.push_back(meandPhi[crysID] - m_dPhiScale * widthdPhi[crysID]);
     m_dPhiMax.push_back(meandPhi[crysID] + m_dPhiScale * widthdPhi[crysID]);
-    for (int ic = 0; ic < m_crystalsPerRing[it]; ic++) {
+    for (int ic = 0; ic < m_eclNeighbours5x5->getCrystalsPerRing(it); ic++) {
       m_thetaID.at(crysID) = it;
       crysID++;
     }

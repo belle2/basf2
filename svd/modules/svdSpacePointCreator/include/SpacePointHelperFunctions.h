@@ -91,17 +91,17 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, float minClusterTime_U, float minClusterTime_V)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, SVDClusterCalibrations& clusterCal)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
-      if (uCluster->getClsTime() < minClusterTime_U) {
+      if (! clusterCal.isClusterInTime(uCluster->getSensorID(), 1, uCluster->getClsTime())) {
         B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
       }
       for (const SVDCluster* vCluster : aSensor.clustersV) {
-        if (vCluster->getClsTime() < minClusterTime_V) {
-          B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
+        if (! clusterCal.isClusterInTime(vCluster->getSensorID(), 0, vCluster->getClsTime())) {
+          B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
         }
         foundCombinations.push_back({uCluster, vCluster});
@@ -255,11 +255,9 @@ namespace Belle2 {
     }
 
 
-    for (auto& aSensor : activatedSensors) {
-      float minClusterTime_U = clusterCal.getMinClusterTime(aSensor.first, 1);
-      float minClusterTime_V = clusterCal.getMinClusterTime(aSensor.first, 0);
-      findPossibleCombinations(aSensor.second, foundCombinations, minClusterTime_U, minClusterTime_V);
-    }
+    for (auto& aSensor : activatedSensors)
+      findPossibleCombinations(aSensor.second, foundCombinations, clusterCal);
+
 
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);

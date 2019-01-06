@@ -124,6 +124,22 @@ namespace Belle2 {
     // synchronization time corresponding to two ASIC windows
     m_syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
 
+    // control histograms
+    m_goodHits = TH2F("goodHits", "pulse height vs. pulse width of all good hits",
+                      100, 0, 10, 100, 0, 2000);
+    m_goodHits.SetXTitle("pulse width (FWHM) [ns]");
+    m_goodHits.SetYTitle("pulse height [ADC counts]");
+    m_calPulseFirst = TH2F("calPulseFirst",
+                           "pulse height vs. pulse width of the first calibration pulse",
+                           100, 0, 10, 100, 0, 2000);
+    m_calPulseFirst.SetXTitle("pulse width (FWHM) [ns]");
+    m_calPulseFirst.SetYTitle("pulse height [ADC counts]");
+    m_calPulseSecond = TH2F("calPulseSecond",
+                            "pulse height vs. pulse width of the second calibration pulse",
+                            100, 0, 10, 100, 0, 2000);
+    m_calPulseSecond.SetXTitle("pulse width (FWHM) [ns]");
+    m_calPulseSecond.SetYTitle("pulse height [ADC counts]");
+
   }
 
 
@@ -136,10 +152,13 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     double sampleWidth = geo->getNominalTDC().getSampleWidth();
 
-    vector<pair<double, double> > hits[c_NumChannels];
+    vector<Hit> hits[c_NumChannels];
 
     for (const auto& digit : m_digits) {
       if (digit.getModuleID() != m_moduleID) continue;
+      if (digit.getHitQuality() != TOPDigit::c_Junk) {
+        m_goodHits.Fill(digit.getPulseWidth(), digit.getPulseHeight());
+      }
       if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
       double rawTime = digit.getRawTime();
       double errScaleFactor = 1;
@@ -165,21 +184,30 @@ namespace Belle2 {
         continue;
       }
       unsigned channel = digit.getChannel();
-      if (channel < c_NumChannels) hits[channel].push_back(make_pair(t, et));
+      if (channel < c_NumChannels) {
+        hits[channel].push_back(Hit(t, et, digit.getPulseHeight(), digit.getPulseWidth()));
+      }
     }
 
     for (unsigned channel = 0; channel < c_NumChannels; channel++) {
       const auto& channelHits = hits[channel];
       if (channelHits.size() == 2) {
-        double t0 = channelHits[0].first;
-        double t1 = channelHits[1].first;
+        double t0 = channelHits[0].time;
+        double t1 = channelHits[1].time;
         auto diff = fabs(t0 - t1); // since not sorted yet
         if (diff < m_minTimeDiff) continue;
         if (diff > m_maxTimeDiff) continue;
-        double sig0 = channelHits[0].second;
-        double sig1 = channelHits[1].second;
+        double sig0 = channelHits[0].timeErr;
+        double sig1 = channelHits[1].timeErr;
         double sigma = sqrt(sig0 * sig0 + sig1 * sig1);
         m_ntuples[channel].push_back(TwoTimes(t0, t1, sigma));
+        if (t0 < t1) { // check, since not sorted yet
+          m_calPulseFirst.Fill(channelHits[0].pulseWidth, channelHits[0].pulseHeight);
+          m_calPulseSecond.Fill(channelHits[1].pulseWidth, channelHits[1].pulseHeight);
+        } else {
+          m_calPulseSecond.Fill(channelHits[0].pulseWidth, channelHits[0].pulseHeight);
+          m_calPulseFirst.Fill(channelHits[1].pulseWidth, channelHits[1].pulseHeight);
+        }
       } else if (channelHits.size() > 2) {
         B2WARNING("More than two cal pulses per channel found - ignored");
       }
@@ -223,6 +251,12 @@ namespace Belle2 {
         B2ERROR("Can't open the output file " << fileName);
         continue;
       }
+
+      // write control histograms
+
+      m_goodHits.Write();
+      m_calPulseFirst.Write();
+      m_calPulseSecond.Write();
 
       B2INFO("Fitting time base corrections for SCROD " << scrodID
              << ", output file: " << fileName);

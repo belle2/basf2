@@ -82,7 +82,8 @@ namespace Belle2 {
       rawDigits.isRequired();
 
     } else {
-      B2ERROR("TOPPacker: data format '" << m_format << "' unknown or not implemented");
+      B2ERROR("TOPPacker: unknown data format."
+              << LogVar("format", m_format));
     }
 
     StoreArray<RawTOP> rawData(m_outputRawDataName);
@@ -141,8 +142,9 @@ namespace Belle2 {
       int boardstack = digit.getChannel() / 128;
       const auto* feemap = mapper.getMap(moduleID, boardstack);
       if (!feemap) {
-        B2ERROR("TOPPacker: no front-end map available for module " << moduleID <<
-                " boardstack# " << boardstack);
+        B2ERROR("TOPPacker: no front-end map available."
+                << LogVar("moduleID", moduleID)
+                << LogVar("boardstack", boardstack));
         continue;
       }
       sortedDigits[feemap->getIndex()].push_back(&digit);
@@ -208,7 +210,8 @@ namespace Belle2 {
       auto scrodID = digit.getScrodID();
       const auto* feemap = mapper.getMap(scrodID);
       if (!feemap) {
-        B2ERROR("TOPPacker: no front-end map available for SCROD " << scrodID);
+        B2ERROR("TOPPacker: no front-end map available."
+                << LogVar("scrodID", scrodID));
         continue;
       }
       sortedDigits[feemap->getIndex()].push_back(&digit);

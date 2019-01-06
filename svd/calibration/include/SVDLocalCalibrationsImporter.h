@@ -80,6 +80,15 @@ namespace Belle2 {
 
 
     /**
+     * This method import to the database the list of hot
+     * strips flagged online and written in the local run xml output.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+    void importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+
+
+    /**
          * This method import to the database the list of strips
          * masked at FADC level.
          * @param xmlFileName is the file name of the xml file

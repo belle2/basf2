@@ -277,4 +277,29 @@ namespace {
 
     DataStore::Instance().reset();
   }
+
+  TEST(DecayDescriptorTest, HierarchyDefinitionTest)
+  {
+    DecayDescriptor dd;
+    bool initok = dd.init("B+ -> [ D+ -> ^K+ pi0 ] ^pi0");
+    EXPECT_EQ(initok, true);
+
+    auto selected_hierarchies = dd.getHierarchyOfSelected();
+
+    std::vector<std::vector<std::pair<int, std::string>>> expected_hierarchies;
+    std::vector<std::pair<int, std::string>> K_path;
+    std::vector<std::pair<int, std::string>> pi0_path;
+
+    K_path.push_back(std::make_pair(0, std::string("B")));
+    K_path.push_back(std::make_pair(0, std::string("D")));
+    K_path.push_back(std::make_pair(0, std::string("K")));
+
+    pi0_path.push_back(std::make_pair(0, std::string("B")));
+    pi0_path.push_back(std::make_pair(1, std::string("pi0")));
+
+    EXPECT_NE(expected_hierarchies, selected_hierarchies);
+    expected_hierarchies.push_back(K_path);
+    expected_hierarchies.push_back(pi0_path);
+    EXPECT_EQ(expected_hierarchies, selected_hierarchies);
+  }
 }

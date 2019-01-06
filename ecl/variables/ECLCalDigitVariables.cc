@@ -58,10 +58,11 @@ namespace Belle2 {
     int getCenterCell(const Particle* particle)
     {
       // get maximum cell id for this cluster (ignore weights)
-      int maxCellId = -1;
-      double maxEnergy = -1.;
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
+        int maxCellId = -1;
+        double maxEnergy = -1.;
+
         auto clusterDigitRelations = cluster->getRelationsTo<ECLCalDigit>();
         for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
           const auto calDigit = clusterDigitRelations.object(ir);
@@ -243,6 +244,17 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the eclcaldigit time from ext
+    double getExtECLCalDigitTimeResolution(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::timeResolution, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
     //! @returns the eclcaldigit time resolution
     double getECLCalDigitTimeResolution(const Particle* particle, const std::vector<double>& vars)
     {
@@ -385,6 +397,36 @@ namespace Belle2 {
       return centercellid;
     }
 
+    //! @returns the eclcaldigit center cell crystal theta
+    double getCenterCellCrystalTheta(const Particle* particle)
+    {
+      const int centercellid = ECLCalDigitVariable::getCenterCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (centercellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToTheta(centercellid);
+    }
+
+    //! @returns the eclcaldigit center cell crystal phi
+    double getCenterCellCrystalPhi(const Particle* particle)
+    {
+      const int centercellid = ECLCalDigitVariable::getCenterCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (centercellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToPhi(centercellid);
+    }
+
     //! @returns the eclcaldigit ext cell id
     double getExtCellId(const Particle* particle)
     {
@@ -424,6 +466,35 @@ namespace Belle2 {
       return mapping->getCellIdToThetaId(extcellid);
     }
 
+    //! @returns the eclcaldigit ext cell crystal theta
+    double getExtCellCrystalTheta(const Particle* particle)
+    {
+      const int extcellid = ECLCalDigitVariable::getExtCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (extcellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToTheta(extcellid);
+    }
+
+    //! @returns the eclcaldigit ext cell crystal phi
+    double getExtCellCrystalPhi(const Particle* particle)
+    {
+      const int extcellid = ECLCalDigitVariable::getExtCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (extcellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToPhi(extcellid);
+    }
 
     //! @returns the eclcaldigit center cell index
     double getCenterCellIndex(const Particle* particle, const std::vector<double>& vars)
@@ -500,13 +571,40 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameter (energy threshold in GeV).");
+      }
+      const double threshold = vars[0];
 
-    VARIABLE_GROUP("ECL Calibration");
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        double nhits = 0.;
+
+        auto clusterDigitRelations = cluster->getRelationsTo<ECLCalDigit>();
+        for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
+          const auto calDigit = clusterDigitRelations.object(ir);
+          const auto weight = clusterDigitRelations.weight(ir);
+
+          // take the unweighted eclcaldigit energy for this check (closer to real hardware threshold)
+          if (calDigit->getEnergy() > threshold) {
+            nhits += weight;
+          }
+        }
+
+        return nhits;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+
+    VARIABLE_GROUP("ECL Calibration (cDST)");
     REGISTER_VARIABLE("eclcaldigitEnergy(i, j)", getECLCalDigitEnergy,
                       "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitTime(i, j)", getECLCalDigitTime,
                       "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
-    REGISTER_VARIABLE("eclcaldigitTimeResoltion(i, j)", getECLCalDigitTimeResolution,
+    REGISTER_VARIABLE("eclcaldigitTimeResolution(i, j)", getECLCalDigitTimeResolution,
                       "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2(i, j)", getTwoComponentChi2,
                       "[calibration] Returns the two component fit chi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
@@ -526,14 +624,22 @@ namespace Belle2 {
                       "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
     REGISTER_VARIABLE("eclcaldigitCenterCellId", getCenterCellId, "[calibration] Returns the center cell id");
     REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id");
+    REGISTER_VARIABLE("eclcaldigitCenterCellCrystalTheta", getCenterCellCrystalTheta,
+                      "[calibration] Returns the center cell crystal theta");
+    REGISTER_VARIABLE("eclcaldigitCenterCellCrystalPhi", getCenterCellCrystalPhi,
+                      "[calibration] Returns the center cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours)");
+    REGISTER_VARIABLE("clusterNHitsThreshold(i)", getClusterNHitsThreshold,
+                      "[calibration] Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster above threshold (in GeV)");
 
-    VARIABLE_GROUP("ECL Calibration (based on extrapolated tracks)");
+    VARIABLE_GROUP("ECL Calibration (based on extrapolated tracks) (cDST)");
     REGISTER_VARIABLE("eclcaldigitExtEnergy(i, j)", getExtECLCalDigitEnergy,
                       "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTime(i, j)", getExtECLCalDigitTime,
                       "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTimeResolution(i, j)", getExtECLCalDigitTimeResolution,
+                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentTotalEnergy(i, j)", getExtECLCalDigitTwoComponentTotalEnergy,
                       "[calibration] Returns the TwoComponentTotalEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentHadronEnergy(i, j)", getExtECLCalDigitTwoComponentHadronEnergy,
@@ -542,6 +648,8 @@ namespace Belle2 {
                       "[calibration] Returns the TwoComponentchi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtCellId", getExtCellId, "[calibration] Returns the extrapolated cell id");
     REGISTER_VARIABLE("eclcaldigitExtCellThetaId", getExtCellThetaId, "[calibration] Returns the ext cell theta id");
+    REGISTER_VARIABLE("eclcaldigitExtCellCrystalTheta", getExtCellCrystalTheta, "[calibration] Returns the ext cell crystal theta");
+    REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
                       "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours) for an ext track");
 
@@ -549,5 +657,5 @@ namespace Belle2 {
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file
   class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableECLCalDigitVariables);
+  REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
 }

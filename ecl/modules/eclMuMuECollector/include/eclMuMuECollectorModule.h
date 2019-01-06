@@ -47,13 +47,13 @@ namespace Belle2 {
   private:
 
     /** Parameters to control the job */
-    double m_minPairMass; /**< minimum invariant mass of the muon pair (9 GeV/c^2) */
-    double m_minTrackLength; /**< minimum extrapolated track length in the crystal (30 cm) */
-    double m_MaxNeighbourE; /**< maximum signal allowed in a neighbouring crystal (0.010 GeV) */
-    double m_thetaLabMinDeg; /**< miniumum muon theta in lab (17 degrees) */
-    double m_thetaLabMaxDeg; /**< maximum muon theta in lab (150 degrees) */
-    bool m_measureTrueEnergy; /**< use eclCalDigit to determine MC deposited energy (false) */
-    bool m_requireL1; /**< require events to satisfy a level 1 trigger (true) */
+    double m_minPairMass{9.0}; /**< minimum invariant mass of the muon pair (9 GeV/c^2) */
+    double m_minTrackLength{30.0}; /**< minimum extrapolated track length in the crystal (30 cm) */
+    double m_MaxNeighbourE{0.010}; /**< maximum signal allowed in a neighbouring crystal (0.010 GeV) */
+    double m_thetaLabMinDeg{17.0}; /**< miniumum muon theta in lab (17 degrees) */
+    double m_thetaLabMaxDeg{150.0}; /**< maximum muon theta in lab (150 degrees) */
+    bool m_measureTrueEnergy{false}; /**< use eclCalDigit to determine MC deposited energy (false) */
+    bool m_requireL1{true}; /**< require events to satisfy a level 1 trigger (true) */
 
     /** Neighbours of each ECL crystal. 4 Neighbours for barrel and outer endcap; ;~8 otherwise */
     int firstcellIDN4 = 1009; /**< first cellID where we only need 4 neighbours */
@@ -69,8 +69,8 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< DataStore TRGSummary */
 
     /** Some other useful quantities */
-    double cotThetaLabMin = 0.;  /**< m_thetaLabMinDeg converted to cotangent */
-    double cotThetaLabMax = 0.;  /**< m_thetaLabMaxDeg converted to cotangent */
+    double cotThetaLabMin{0.0};  /**< m_thetaLabMinDeg converted to cotangent */
+    double cotThetaLabMax{0.0};  /**< m_thetaLabMaxDeg converted to cotangent */
     int iEvent = 0; /**< event counter */
     std::vector<float> EperCrys; /**< ECL digit energy for each crystal */
 

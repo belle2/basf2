@@ -194,6 +194,11 @@ namespace Belle2 {
     double particleMCRecoilMass(const Particle* particle);
 
     /**
+     * return the weight produced by the event generator
+     */
+    double generatorEventWeight(const Particle*);
+
+    /**
      * return the ID of the generated decay of positive tau in a tau pair event.
      */
     int tauPlusMcMode(const Particle*);

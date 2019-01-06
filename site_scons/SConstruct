@@ -113,11 +113,14 @@ global_env = Environment(
     ],
 )
 
-# recalculate MD5 sums only if the time stamp differs
-global_env.Decider('MD5-timestamp')
+# recalculate MD5 sums only if the file changed in the last 10 minutes
+SetOption("max_drift", 600)
 
 # cache implicit dependencies (#includes)
 SetOption('implicit_cache', 1)
+
+# disable source code checks
+global_env.SourceCode(".", None)
 
 # include extra library paths and compiler flags
 if GetOption('extralibpath'):

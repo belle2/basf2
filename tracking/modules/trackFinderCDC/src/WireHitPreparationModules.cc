@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun, Oliver Frost                                 *
+ * Contributors: Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(TFCDC_WireHitPreparer);
 REG_MODULE(TFCDC_WireHitCreator);
+REG_MODULE(TFCDC_HitReclaimer);
 
 TFCDC_WireHitPreparerModule::TFCDC_WireHitPreparerModule()
   : Super( {"CDCWireHitVector"})
@@ -21,6 +22,11 @@ TFCDC_WireHitPreparerModule::TFCDC_WireHitPreparerModule()
 }
 
 TFCDC_WireHitCreatorModule::TFCDC_WireHitCreatorModule()
+  : Super( {"CDCWireHitVector"})
+{
+}
+
+TFCDC_HitReclaimerModule::TFCDC_HitReclaimerModule()
   : Super( {"CDCWireHitVector"})
 {
 }

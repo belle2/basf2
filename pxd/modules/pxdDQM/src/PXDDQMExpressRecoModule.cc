@@ -284,7 +284,7 @@ void PXDDQMExpressRecoModule::event()
   int nPXDSensors = gTools->getNumberOfPXDSensors();
 
   // PXD basic histograms:
-  // Fired strips
+  // Fired pixels
   vector< int > Pixels(nPXDSensors);
   for (const PXDDigit& digit : m_storePXDDigits) {
     int iLayer = digit.getSensorID().getLayerNumber();

@@ -21,6 +21,7 @@
 #include <TH1.h>
 #include <TCanvas.h>
 #include <TFile.h>
+#include <TString.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -47,6 +48,7 @@ namespace Belle2 {
     DQMHistComparitorModule();
     virtual ~DQMHistComparitorModule();
 
+    TH1* find_histo_in_canvas(TString);
     //! Module functions to be called from main process
     virtual void initialize() override;
 
@@ -55,7 +57,6 @@ namespace Belle2 {
     virtual void event() override;
     virtual void endRun() override;
     virtual void terminate() override;
-    CMPNODE* find_pnode(TString a);
 
     // Data members
   private:
@@ -67,6 +68,7 @@ namespace Belle2 {
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
+    bool m_color = true;
 
     TH1* GetHisto(TString histoname);
 

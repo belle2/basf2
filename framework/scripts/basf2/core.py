@@ -147,10 +147,30 @@ def process(path, max_event=0):
     modules need to perform proper cleanup & reinitialisation, if Geometry is
     involved this might be difficult to achieve.)
 
+    When used in a Jupyter notebook this function will automatically print a
+    nice progress bar and display the log messages in an advanced way once the
+    processing is complete.
+
+    Note:
+     This also means that in a Jupyter Notebook, modifications to class members
+     or global variables will not be visible after processing is complete as
+     the processing is performed in a subprocess.
+
+     To restore the old behavior you can use ``basf2.core.process()`` which
+     will behave exactly identical in Jupyter notebooks as it does in normal
+     python scripts ::
+
+           from basf2 import core
+           core.process(path)
+
+
     Parameters:
       path: The path with which the processing starts
       max_event:  The maximal number of events which will be processed,
                 0 for no limit
+
+    .. versionchanged:: release-03-00-00
+       automatic Jupyter integration
     """
 
     # if we are running in an ipython session set the steering file to the
@@ -171,6 +191,20 @@ def process(path, max_event=0):
     # apparently nothing to do
     if path is None:
         return
+
+    # check if this is analysis_main (or any other global path object we
+    # deprecated) and print the warning attached to it
+    try:
+        pybasf2.B2WARNING(path._deprecation_warning)
+    except AttributeError:
+        import analysisPath
+        if analysisPath.analysis_main.modules():
+            modulenames = [m.name() for m in analysisPath.analysis_main.modules()]
+            modulenames = "\n".join(modulenames)
+            pybasf2.B2WARNING(
+                "You are not processing the (deprecated) analysis_main path,"
+                " but it has the following modules:\n", modulenames)
+        pass
 
     pybasf2.B2INFO("Starting event processing, random seed is set to '" + pybasf2.get_random_seed() + "'")
 

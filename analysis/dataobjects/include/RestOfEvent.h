@@ -200,7 +200,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    RestOfEvent() { };
+    explicit RestOfEvent(bool isNested = false): m_isNested(isNested) { };
 
     // setters
     /**
@@ -263,7 +263,10 @@ namespace Belle2 {
      * @return fractions
      */
     std::vector<double> getChargedStableFractions(const std::string& maskName) const;
-
+    /**
+     * Returns true if the ROE is nested
+     */
+    bool getIsNested() const {return m_isNested;}
     /**
      * Update or add a priori ChargedStable fractions for a specific mask name in the ROE object.
      *
@@ -273,12 +276,40 @@ namespace Belle2 {
     void updateChargedStableFractions(const std::string& maskName, std::vector<double>& fractions);
     // getters
     /**
-     * Get vector of all (no mask) or a subset (use mask) of all Particles in ROE.
+     * Get all Particles from ROE mask.
      *
      * @param name of mask
-     * @return vector of pointers to unused Particles
+     * @param return daughters of composite particles
+     * @return vector of pointers to ROE Particles
      */
     std::vector<const Particle*> getParticles(const std::string& maskName = "", bool unpackComposite = true) const;
+    /**
+    * Get photons from ROE mask.
+    *
+    * @param name of mask
+    * @param return daughters of composite particles
+    * @return vector of pointers to unused Particles
+    */
+    std::vector<const Particle*> getPhotons(const std::string& maskName = "", bool unpackComposite = true) const;
+    /**
+     * Get hadrons from ROE mask.
+     *
+     * @param name of mask
+     * @param return daughters of composite particles
+     * @return vector of pointers to ROE Particles
+     */
+    std::vector<const Particle*> getHadrons(const std::string& maskName = "", bool unpackComposite = true) const;
+    /**
+    * Get charged particles from ROE mask.
+    *
+    * @param name of mask
+    * @param absolute value of PDG code of charged particle
+    * @param return daughters of composite particles
+    * @return vector of pointers to ROE Particles
+    */
+    std::vector<const Particle*> getChargedParticles(const std::string& maskName = "", unsigned int pdg = 0,
+                                                     bool unpackComposite = true) const;
+
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
@@ -379,6 +410,7 @@ namespace Belle2 {
     // persistent data members
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
     std::vector<Mask> m_masks;         /**< List of the ROE masks */
+    bool m_isNested;                   /**< Nested ROE indicator */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list

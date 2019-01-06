@@ -4,275 +4,150 @@
 from basf2 import *
 from modularAnalysis import *
 
-# Prepare all standard final state particles
+
+# define arrays to interpret cut matrix
+_chargednames = ['pi', 'K', 'p', 'e', 'mu']
+_pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
+_effnames = ['95eff', '90eff', '85eff']
+# default particle list for stdPi() and similar functions
+_defaultlist = 'good'
 
 
-def stdPi(listtype='good', path=analysis_main):
+def _stdChargedEffCuts(particletype, listtype):
     """
-    Function to prepare one of several standardized types of pion lists:
-      - 'pi+:all' with no cuts on track
-      - 'pi+:good' high purity lists for data studies
-      - 'pi+:higheff' high efficiency list with loose global ID cut for data studies
-      - 'pi+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
-      - 'pi+:90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
-      - 'pi+:85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    Provides the PID cut corresponding to a given efficiency percentile
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    @param particletype  type of charged particle (pi, K, p, e, mu)
+    @param listtype      efficiency percentile for the list (95eff, 90eff, 85eff)
     """
+
+    particleindex = _chargednames.index(particletype)
+    effindex = _effnames.index(listtype)
+
+    # efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
+    effcuts = [[0.002, 0.075, 0.275],
+               [0.002, 0.043, 0.218],
+               [0.000, 0.061, 1.000],
+               [0.047, 1.000, 1.000],
+               [0.008, 1.000, 1.000]]
+    #
+    return effcuts[particleindex][effindex]
+
+
+def stdCharged(particletype, listtype, path=analysis_main):
+    """
+    Function to prepare one of several standardized types of charged particle lists:
+      - 'all' with no cuts on track
+      - 'good' high purity lists for data studies
+      - 'loose' loose selections for skimming
+      - 'higheff' high efficiency list with loose global ID cut for data studies
+    Also the following lists, which may or may not be available depending on the release
+      - '99eff' with 99% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      - '95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      - '90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      - '85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+
+    @param particletype type of charged particle to make a list of
+    @param listtype     name of standard list
+    @param path         modules are added to this path
+    """
+
+    # basic quality cut strings
+    trackQuality = 'thetaInCDCAcceptance and chiProb > 0.001'
+    ipCut = 'd0 < 0.5 and abs(z0) < 2'
+    goodTrack = trackQuality + ' and ' + ipCut
+
+    if particletype not in _chargednames:
+        B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
     if listtype == 'all':
-        fillParticleList('pi+:all', '', True, path=path)
+        fillParticleList(particletype + '+:all', '', True, path=path)
     elif listtype == 'good':
         fillParticleList(
-            'pi+:good',
-            'pionID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
+            particletype + '+:good',
+            _pidnames[_chargednames.index(particletype)] + ' > 0.5 and ' + goodTrack,
+            True,
+            path=path)
+    elif listtype == 'loose':
+        fillParticleList(
+            particletype + '+:loose',
+            _pidnames[_chargednames.index(particletype)] + ' > 0.1 and ' + goodTrack,
             True,
             path=path)
     elif listtype == 'higheff':
         fillParticleList(
-            'pi+:higheff',
-            'pionID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
+            particletype + '+:higheff',
+            _pidnames[_chargednames.index(particletype)] + ' > 0.002 and ' + goodTrack,
             True,
             path=path)
-    elif listtype == '95eff':
-        fillParticleList('pi+:95eff', 'pionID > 0.002 and chiProb > 0.001', True, path=path)
-    elif listtype == '90eff':
-        fillParticleList('pi+:90eff', 'pionID > 0.075 and chiProb > 0.001', True, path=path)
-    elif listtype == '85eff':
-        fillParticleList('pi+:85eff', 'pionID > 0.275 and chiProb > 0.001', True, path=path)
+    elif listtype not in _effnames:
+        B2ERROR("The requested list is not defined. Please refer to the stdCharged documentation.")
+    else:
+        pidcut = _stdChargedEffCuts(particletype, listtype)
+        if 0.0 < pidcut < 1.0:
+            fillParticleList(
+                particletype +
+                '+:' +
+                listtype,
+                _pidnames[_chargednames.index(particletype)] +
+                ' > ' +
+                str(pidcut) +
+                ' and ' +
+                goodTrack,
+                True,
+                path=path)
+        else:
+            B2ERROR('The requested standard particle list ' + particletype +
+                    '+:' + listtype + ' is not available in this release.')
 
 ###
 
 
-def stdK(listtype='good', path=analysis_main):
+def stdPi(listtype=_defaultlist, path=analysis_main):
     """
-    Function to prepare one of several standardized types of kaon lists:
-      - 'K+:all' with no cuts on track
-      - 'K+:good' high purity lists for data studies
-      - 'K+:higheff' high efficiency list with loose global ID cut for data studies
-      - 'K+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
-      - 'K+:90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
-      - 'K+:85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    Function to prepare standard pion lists, refer to stdCharged for details
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    @param listtype     name of standard list
+    @param path         modules are added to this path
     """
-
-    if listtype == 'all':
-        fillParticleList('K+:all', '', True, path=path)
-    elif listtype == 'good':
-        fillParticleList(
-            'K+:good',
-            'kaonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == 'higheff':
-        fillParticleList(
-            'K+:higheff',
-            'kaonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == '95eff':
-        fillParticleList('K+:95eff', 'kaonID > 0.002 and chiProb > 0.001', True, path=path)
-    elif listtype == '90eff':
-        fillParticleList('K+:90eff', 'kaonID > 0.043 and chiProb > 0.001', True, path=path)
-    elif listtype == '85eff':
-        fillParticleList('K+:85eff', 'kaonID > 0.218 and chiProb > 0.001', True, path=path)
-
-###
+    stdCharged('pi', listtype, path)
 
 
-def stdPr(listtype='good', path=analysis_main):
+def stdK(listtype=_defaultlist, path=analysis_main):
     """
-    Function to prepare one of several standardized types of proton lists:
-      - 'p+:all' with no cuts on track
-      - 'p+:good' high purity lists for data studies
-      - 'p+:higheff' high efficiency list with loose global ID cut for data studies
-      - 'p+:90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    Function to prepare standard kaon lists, refer to stdCharged for details
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    @param listtype     name of standard list
+    @param path         modules are added to this path
     """
-
-    if listtype == 'all':
-        fillParticleList('p+:all', '', True, path=path)
-    elif listtype == 'good':
-        fillParticleList(
-            'p+:good',
-            'protonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == 'higheff':
-        fillParticleList(
-            'p+:higheff',
-            'protonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == '90eff':
-        fillParticleList('p+:90eff', 'protonID > 0.061 and chiProb > 0.001', True, path=path)
-
-###
+    stdCharged('K', listtype, path)
 
 
-def stdE(listtype='good', path=analysis_main):
+def stdPr(listtype=_defaultlist, path=analysis_main):
     """
-    Function to prepare one of several standardized types of electron lists:
-      - 'e+:all' with no cuts on track
-      - 'e+:good' high purity lists for data studies
-      - 'e+:higheff' high efficiency list with loose global ID cut for data studies
-      - 'e+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    Function to prepare standard proton lists, refer to stdCharged for details
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    @param listtype     name of standard list
+    @param path         modules are added to this path
     """
-
-    if listtype == 'all':
-        fillParticleList('e+:all', '', True, path=path)
-    elif listtype == 'good':
-        fillParticleList(
-            'e+:good',
-            'electronID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == 'higheff':
-        fillParticleList(
-            'e+:higheff',
-            'electronID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == '95eff':
-        fillParticleList('e+:95eff', 'electronID > 0.047 and chiProb > 0.001', True, path=path)
-
-###
+    stdCharged('p', listtype, path)
 
 
-def stdMu(listtype='good', path=analysis_main):
+def stdE(listtype=_defaultlist, path=analysis_main):
     """
-    Function to prepare one of several standardized types of muon lists:
-      - 'mu+:all' with no cuts on track
-      - 'mu+:good' high purity lists for data studies
-      - 'mu+:higheff' high efficiency list with loose global ID cut for data studies
-      - 'mu+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+    Function to prepare standard electron lists, refer to stdCharged for details
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    @param listtype     name of standard list
+    @param path         modules are added to this path
     """
-
-    if listtype == 'all':
-        fillParticleList('mu+:all', '', True, path=path)
-    elif listtype == 'good':
-        fillParticleList(
-            'mu+:good',
-            'muonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == 'higheff':
-        fillParticleList(
-            'mu+:higheff',
-            'muonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
-            True,
-            path=path)
-    elif listtype == '95eff':
-        fillParticleList('mu+:95eff', 'muonID > 0.008 and chiProb > 0.001', True, path=path)
-
-###
+    stdCharged('e', listtype, path)
 
 
-def loadStdCharged(path=analysis_main):
+def stdMu(listtype=_defaultlist, path=analysis_main):
     """
-    Creating following lists of charged tracks:
+    Function to prepare standard muon lists, refer to stdCharged for details
 
-      - 'pi+:all'
-      - 'K+:all'
-      - 'p+:all'
-      - 'e+:all'
-      - 'mu+:all'
-
-    No requirements to tracks applied.
-
-    @param path     modules are added to this path
+    @param listtype     name of standard list
+    @param path         modules are added to this path
     """
-
-    # No PID
-    stdK('all', path=path)
-    stdPi('all', path=path)
-    stdPr('all', path=path)
-    stdE('all', path=path)
-    stdMu('all', path=path)
-
-    # Loose PID
-    stdLooseK(path=path)
-    stdLoosePi(path=path)
-    stdLooseE(path=path)
-    stdLooseMu(path=path)
-    stdLoosePr(path=path)
-
-###
-
-# Loose FSParticles used for skimming
-
-
-def stdLoosePi(path=analysis_main):
-    """
-    Creation of 'pi+:loose' list with the following requirements to the track:
-
-      - 'pionID > 0.1'
-      - 'chiProb > 0.001'
-
-    @param path     modules are added to this path
-    """
-
-    fillParticleList('pi+:loose', 'pionID > 0.1 and chiProb > 0.001', True, path=path)
-
-
-def stdLooseK(path=analysis_main):
-    """
-    Creation of 'K+:loose' list with the following requirements to the track:
-
-      - 'kaonID > 0.1'
-      - 'chiProb > 0.001'
-
-    @param path     modules are added to this path
-    """
-
-    fillParticleList('K+:loose', 'kaonID > 0.1 and chiProb > 0.001', True, path=path)
-
-
-def stdLooseMu(path=analysis_main):
-    """
-    Creation of 'mu+:loose' list with the following requirements to the track:
-
-      - 'muonID > 0.1'
-      - 'chiProb > 0.001'
-
-    @param path     modules are added to this path
-    """
-
-    fillParticleList('mu+:loose', 'muonID > 0.1 and chiProb > 0.001', True, path=path)
-
-
-def stdLooseE(path=analysis_main):
-    """
-    Creation of 'e+:loose' list with the following requirements to the track:
-
-      - 'electronID > 0.1'
-      - 'chiProb > 0.001'
-
-    @param path     modules are added to this path
-    """
-
-    fillParticleList('e+:loose', 'electronID > 0.1 and chiProb > 0.001', True, path=path)
-
-
-def stdLoosePr(path=analysis_main):
-    """
-    Creation of 'p+:loose' list with the following requirements to the track:
-
-      - 'protonID > 0.1'
-      - 'chiProb > 0.001'
-
-    @param path     modules are added to this path
-    """
-
-    fillParticleList('p+:loose', 'protonID > 0.1 and chiProb > 0.001', True, path=path)
+    stdCharged('mu', listtype, path)

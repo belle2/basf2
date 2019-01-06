@@ -116,6 +116,11 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalTimeOffsetUnc;  /**< single crystal time calibration offset as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset*/
 
+    std::vector < float > v_calibrationCrateTimeOffset;  /**< single crate time calibration offset as vector (per crystal) */
+    std::vector < float >
+    v_calibrationCrateTimeOffsetUnc;  /**< single crate time calibration offset as vector uncertainty (per crystal) */
+    DBObjPtr<ECLCrystalCalib> m_calibrationCrateTimeOffset;  /**< single crate time calibration offset (per crystal) */
+
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
@@ -151,12 +156,12 @@ namespace Belle2 {
     const double c_pol2Var1 = 1684.0; /**< 2-order fit for p1 Var1 + Var2*bg + Var3*bg^2. */
     const double c_pol2Var2 = 3080.0; /**< 2-order fit for p1. */
     const double c_pol2Var3 = -613.9; /**< 2-order fit for p1. */
-    double m_pol2Max; /** < Maximum of p1 2-order fit to limit values */
+    double m_pol2Max; /**< Maximum of p1 2-order fit to limit values */
     const int c_nominalBG = 183; /**< Number of out of time digits at BGx1.0. */
-    double m_averageBG; /** < Average dose per crystal calculated from m_th1dBackground */
-    const double c_minT99 = 3.5;
+    double m_averageBG; /**< Average dose per crystal calculated from m_th1dBackground */
+    const double c_minT99 = 3.5; /**< The minimum t99 */
 
-    bool m_simulatePure = 0; /** < Flag to set pure CsI simulation option */
+    bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
   };
 
   /** Class derived from ECLDigitCalibratorModule, only difference are the names */

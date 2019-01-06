@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>Thomas.Hauth@kit.edu</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>CDCLegendreTrackingValidation.root</output>
   <description>This module validates that legendre track finding is capable of reconstructing tracks in Y(4S) runs.</description>

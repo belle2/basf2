@@ -44,20 +44,22 @@ namespace Belle2 {
       }
       return *this;
     }
-
+    /** set prescale of i-th output trigger bit**/
     void setprescales(int i, int j)
     {
       m_prescales[i] = j;
     }
+    /** set the number of output trigger bit**/
     void setnoutbit(int i)
     {
       m_noutbit = i;
     }
-
+    /** get prescale of i-th output trigger bit**/
     int getprescales(int i) const
     {
       return m_prescales[i];
     }
+    /** get the number of output trigger bit**/
     int getnoutbit() const
     {
       return m_noutbit;

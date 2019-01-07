@@ -19,7 +19,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class GridEventTimeExtractor<DriftLengthBasedEventTimeExtractor>;
+template class Belle2::GridEventTimeExtractor<DriftLengthBasedEventTimeExtractor>;
 
 FullGridDriftLengthTrackTimeExtractor::FullGridDriftLengthTrackTimeExtractor()
 {

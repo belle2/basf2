@@ -9,7 +9,6 @@ import metaoptions
 import sys
 import math
 import json
-import numbers
 
 from validationfunctions import strip_ext, index_from_revision, get_style
 
@@ -19,6 +18,7 @@ class Plotuple:
     """!
     A Plotuple is either a Plot or an N-Tuple
 
+    @var work_folder: the work folder containing the results and plots
     @var list_of_root_objects: A list of Root-objects which belong
         together (i.e. should be drawn into one histogram or one table)
     @var list_of_revisions: The list of revisions
@@ -79,10 +79,11 @@ class Plotuple:
         # All elements of the Plotuple that are not the reference-object
         # Get the elements, i.e. all RootObjects except for the
         # reference object. May be either histograms or n-tuples.
-        self.elements = sorted([_ for _ in list_of_root_objects if _ is not
-                                self.reference],
-                               key=lambda _: _.date,
-                               reverse=True)
+        self.elements = sorted(
+            [_ for _ in list_of_root_objects if _ is not self.reference],
+            key=lambda _: _.date,
+            reverse=True
+        )
 
         # The newest element, i.e. the element belonging the revision
         # whose data were created most recently.
@@ -133,11 +134,13 @@ class Plotuple:
         # The p-value that the Chi^2-Test returned.
         self.pvalue = 'n/a'
 
-        #: an comparison error will be shown if the p-value is smaller than this number
+        #: an comparison error will be shown if the p-value is smaller than
+        #: this number
         #: will bet set by the chi2test function
         self.pvalue_error = None
 
-        #: an comparison warning will be shown if the p-value is smaller than this number
+        #: an comparison warning will be shown if the p-value is smaller than
+        #: this number
         #: will bet set by the chi2test function
         self.pvalue_warn = None
 
@@ -146,10 +149,12 @@ class Plotuple:
 
         self.html_content = None
 
-        #: width of the plotted image in pixels, will be set by the draw function
+        #: width of the plotted image in pixels, will be set by the draw
+        #: function
         self.width = None
 
-        #: height of the plotted image in pixels, will be set by the draw function
+        #: height of the plotted image in pixels, will be set by the draw
+        #: function
         self.height = None
 
         # Deal with incomplete information
@@ -191,6 +196,7 @@ class Plotuple:
         elif self.type == 'TNtuple':
             self.create_ntuple_table_json()
         else:
+            # fixme: shouldn't we rather throw an exception /klieret
             sys.exit('Tried to create histogram/n-tuple, '
                      'but received invalid type')
 
@@ -203,9 +209,10 @@ class Plotuple:
 
     def chi2test(self, canvas):
         """!
-        Takes two RootObject-objects and a canvas. Performs a Chi^2-Test on the
+        Takes the reference (self.reference.object) and the newest revision
+        (self.newest.object) and a canvas. Performs a Chi^2-Test on the
         two histograms and sets the background of the canvas correspondingly.
-        Returns the p-value of the Chi^2-Test.
+        Sets self.pvalue to the p-value of the Chi^2-Test.
         @param canvas: Reference to the canvas on which we will draw (chi2test
             may change the background color of the plot depending on the
             p-value)
@@ -220,15 +227,21 @@ class Plotuple:
             return
 
         fail_message = "Comparison failed: "
-        pvalue = None
-        # will be set to true, if for some reason no Chi^2 test could be performed,
-        # but the two objects are still different (for example different bin size)
+
+        # will be set to true, if for some reason no Chi^2 test could be
+        # performed, but the two objects are still different (for example
+        # different bin size)
         no_comparison_but_still_different = False
 
         # execute the chi2 test, extract the relevant values and handle
         # possible exceptions
+        pvalue = None
+        chi2 = None
+        chi2ndf = None
+        ndf = None
         try:
-            ctest = validationcomparison.Chi2Test(self.reference.object, self.newest.object)
+            ctest = validationcomparison.Chi2Test(self.reference.object,
+                                                  self.newest.object)
             pvalue = ctest.pvalue()
             chi2 = ctest.chi2()
             chi2ndf = ctest.chi2ndf()
@@ -259,7 +272,8 @@ class Plotuple:
             if self.pvalue_error is None:
                 self.pvalue_error = 0.01
 
-            # If pvalue < 0.01: Very strong presumption against neutral hypothesis
+            # If pvalue < 0.01: Very strong presumption against neutral
+            # hypothesis
             if pvalue < self.pvalue_error:
                 canvas.SetFillColor(ROOT.kRed)
                 self.comparison_result = "error"
@@ -273,17 +287,18 @@ class Plotuple:
                 # that the result was equal
                 canvas.SetFillColor(ROOT.kGreen - 3)
 
-            self.chi2test_result = ('Performed Chi^2-Test between '
-                                    'reference and {} (Chi^2 = {} NDF = {} Chi^2/NDF = {})'
-                                    .format(self.newest.revision, chi2, ndf, chi2ndf))
+            self.chi2test_result = \
+                'Performed Chi^2-Test between reference and {} (Chi^2 = {} ' \
+                'NDF = {} Chi^2/NDF = {})'.format(
+                    self.newest.revision, chi2, ndf, chi2ndf)
             self.pvalue = pvalue
         else:
             self.pvalue = None
 
     def draw_ref(self, canvas):
         """!
-        Takes a reference RootObject and a (sub)canvas and plots it with the
-        correct line-style etc.
+        Takes the reference RootObject (self.reference.object)
+        and a (sub)canvas and plots it with the correct line-style etc.
         @param canvas: Reference to the canvas on which we will draw the
             reference object.
         @return. None
@@ -300,22 +315,27 @@ class Plotuple:
         self.reference.object.SetFillStyle(1001)
 
         # Draw the reference on the canvas
-        self.draw_root_object(self.type, self.reference.object, self.reference.object.GetOption())
+        self.draw_root_object(
+            self.type,
+            self.reference.object,
+            self.reference.object.GetOption()
+        )
         canvas.Update()
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
-    def remove_stats_tf1(self, object):
+    @staticmethod
+    def remove_stats_tf1(obj):
         # removed TF1s which might have been added by validation scripts
         # in tracking/scripts/tracking/validation/plot.py:1597
-        tf1 = object.FindObject("FitAndStats")
+        tf1 = obj.FindObject("FitAndStats")
         if tf1:
-            function_list = object.GetListOfFunctions()
+            function_list = obj.GetListOfFunctions()
             function_list.Remove(tf1)
 
+    # TODO: is this actually used or can it be removed ?
     def create_image_plot(self):
         """!
         Creates image plot for TASImage-objects.
-        TODO: is this actually used or can it be removed ?
         @return: None
         """
 
@@ -351,12 +371,12 @@ class Plotuple:
             self.draw_ref(pad)
 
         # Now draw the normal plots
-        itemsToPlotCount = len(self.elements)
+        items_to_plot_count = len(self.elements)
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
             index = index_from_revision(plot.revision, self.work_folder)
-            style = get_style(index, itemsToPlotCount)
+            style = get_style(index, items_to_plot_count)
 
             self.remove_stats_tf1(plot.object)
 
@@ -377,7 +397,10 @@ class Plotuple:
             pad.SetFillColor(ROOT.kWhite)
 
             # Draw the reference on the canvas
-            self.draw_root_object(self.type, plot.object, plot.object.GetOption())
+            self.draw_root_object(
+                self.type, plot.object,
+                plot.object.GetOption()
+            )
             pad.Update()
             pad.GetFrame().SetFillColor(ROOT.kWhite)
 
@@ -387,8 +410,10 @@ class Plotuple:
                 title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions))) +
-                self.package)
+        path = './plots/{}/{}'.format(
+            '_'.join(sorted(self.list_of_revisions)),
+            self.package
+        )
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -398,9 +423,13 @@ class Plotuple:
 
         # todo: use the self.work_folder here
         self.path = path
-        self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
-                                           strip_ext(self.rootfile), self.key)
+        self.file = './{0}/{1}_{2}'.format(
+            '/'.join(path.split('/')[2:]),
+            strip_ext(self.rootfile),
+            self.key
+        )
 
+    # todo: not super elegant, this is why you should use os.path.join etc. /klieret
     def get_plot_path(self):
         return self.path + "/"
 
@@ -410,17 +439,18 @@ class Plotuple:
     def get_pdf_filename(self):
         return '{}_{}.pdf'.format(strip_ext(self.rootfile), self.key)
 
-    def draw_root_object(self, type, object, options):
+    @staticmethod
+    def draw_root_object(typ, obj, options):
         """
         Special handling of the ROOT Draw calls, as some
         ROOT objects have a slightly differen flavour.
         """
 
-        if type == 'TEfficiency' or type == "TGraph":
+        if typ == 'TEfficiency' or typ == "TGraph":
             # TEff does not provide DrawCopy
-            object.Draw(options)
+            obj.Draw(options)
         else:
-            object.DrawCopy(options)
+            obj.DrawCopy(options)
 
     def create_histogram_plot(self, mode):
         """!
@@ -506,13 +536,13 @@ class Plotuple:
             if self.reference is not None:
                 self.draw_ref(pad)
 
-        itemsToPlotCount = len(self.elements)
+        items_to_plot_count = len(self.elements)
         # Now draw the normal plots
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
             index = index_from_revision(plot.revision, self.work_folder)
-            style = get_style(index, itemsToPlotCount)
+            style = get_style(index, items_to_plot_count)
 
             self.remove_stats_tf1(plot.object)
 
@@ -532,8 +562,11 @@ class Plotuple:
                             additional_options += ' ' + _
 
                     # Draw the reference on the canvas
-                    self.draw_root_object(self.type, plot.object, plot.object.GetOption() +
-                                          additional_options)
+                    self.draw_root_object(
+                        self.type,
+                        plot.object,
+                        plot.object.GetOption() + additional_options
+                    )
                     drawn = True
                 else:
                     self.draw_root_object(self.type, plot.object, "SAME")
@@ -562,8 +595,11 @@ class Plotuple:
                         additional_options += ' ' + _
 
                 # Draw the reference on the canvas
-                self.draw_root_object(self.type, plot.object, plot.object.GetOption() +
-                                      additional_options)
+                self.draw_root_object(
+                    self.type,
+                    plot.object,
+                    plot.object.GetOption() + additional_options
+                )
                 pad.Update()
                 pad.GetFrame().SetFillColor(ROOT.kWhite)
 
@@ -573,8 +609,10 @@ class Plotuple:
                     title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions))) +
-                self.package)
+        path = './plots/{}/{}'.format(
+            '_'.join(sorted(self.list_of_revisions)),
+            self.package
+        )
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -629,13 +667,13 @@ class Plotuple:
             self.draw_ref(canvas)
             drawn = True
 
-        itemsToPlotCount = len(self.elements)
+        items_to_plot_count = len(self.elements)
         # Now draw the normal plots
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
             index = index_from_revision(plot.revision, self.work_folder)
-            style = get_style(index, itemsToPlotCount)
+            style = get_style(index, items_to_plot_count)
 
             # self.remove_stats_tf1(plot.object)
 
@@ -654,8 +692,11 @@ class Plotuple:
                         additional_options += ' ' + _
 
                 # Draw the reference on the canvas
-                self.draw_root_object(self.type, plot.object, plot.object.GetOption() +
-                                      additional_options)
+                self.draw_root_object(
+                    self.type,
+                    plot.object,
+                    plot.object.GetOption() + additional_options
+                )
                 drawn = True
             else:
                 self.draw_root_object(self.type, plot.object, "SAME")
@@ -665,8 +706,10 @@ class Plotuple:
                 canvas.RedrawAxis("g")
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions))) +
-                self.package)
+        path = './plots/{}/{}'.format(
+            '_'.join(sorted(self.list_of_revisions)),
+            self.package
+        )
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -688,7 +731,10 @@ class Plotuple:
         self.html_content = ""
 
         for elem in self.elements:
-            self.html_content = self.html_content + "<p>" + elem.revision + "</p>" + elem.object.GetTitle()
+            self.html_content += "<p>" + \
+                                 elem.revision + \
+                                 "</p>" + \
+                                 elem.object.GetTitle()
 
         # there is no file storing this, because it is directly in the json file
         self.file = None
@@ -716,7 +762,9 @@ class Plotuple:
             key_list = list(self.reference.object.keys())
             for column in colum_names:
                 if column in key_list:
-                    json_nutple['reference'].append((column, self.reference.object[column]))
+                    json_nutple['reference'].append(
+                        (column, self.reference.object[column])
+                    )
                 else:
                     json_nutple['reference'].append((column, None))
 
@@ -727,21 +775,27 @@ class Plotuple:
 
             for column in colum_names:
                 if column in ntuple.object:
-                    json_nutple[ntuple.revision].append((column, ntuple.object[column]))
+                    json_nutple[ntuple.revision].append(
+                        (column, ntuple.object[column])
+                    )
                 else:
                     json_nutple[ntuple.revision].append((column, None))
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'
-                .format('_'
-                        .join(sorted(self
-                                     .list_of_revisions))) + self.package)
+        path = './plots/{}/{}'.format(
+            '_'.join(sorted(self.list_of_revisions)),
+            self.package
+        )
         if not os.path.isdir(path):
             os.makedirs(path)
 
         self.path = path
 
-        json_ntuple_file = '{0}/{1}_{2}.json'.format(path, strip_ext(self.rootfile), self.key)
+        json_ntuple_file = '{0}/{1}_{2}.json'.format(
+            path,
+            strip_ext(self.rootfile),
+            self.key
+        )
 
         with open(json_ntuple_file, 'w+') as json_file:
             json.dump(json_nutple, json_file)

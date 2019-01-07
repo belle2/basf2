@@ -159,6 +159,36 @@ namespace Belle2 {
       double countRawTOPHitsInInterval(const Particle* particle,
                                        const std::vector<double>& vars);
 
+      /**
+       * returns reconstruction flag
+       */
+      double getFlag(const Particle* particle);
+
+      /**
+       * returns electron log likelihood
+       */
+      double getElectronLogL(const Particle* particle);
+
+      /**
+       * returns muon log likelihood
+       */
+      double getMuonLogL(const Particle* particle);
+
+      /**
+       * returns pion log likelihood
+       */
+      double getPionLogL(const Particle* particle);
+
+      /**
+       * returns kaon log likelihood
+       */
+      double getKaonLogL(const Particle* particle);
+
+      /**
+       * returns proton log likelihood
+       */
+      double getProtonLogL(const Particle* particle);
+
       //---------------- TOPRecBunch related --------------------
 
       /**

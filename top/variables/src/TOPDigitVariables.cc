@@ -351,6 +351,49 @@ namespace Belle2 {
         }
         return TOPVariable::countRawHits(particle, vars[0], vars[1]);
       }
+
+      double getFlag(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getFlag();
+      }
+
+      double getElectronLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_e();
+      }
+
+      double getMuonLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_mu();
+      }
+
+      double getPionLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_pi();
+      }
+
+      double getKaonLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_K();
+      }
+
+      double getProtonLogL(const Particle* particle)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return 0;
+        return topLikelihood->getLogL_p();
+      }
+
       //---------------- TOPRecBunch related --------------------
 
       //! @returns whether the rec bunch is reconstructed
@@ -463,6 +506,18 @@ namespace Belle2 {
                       "[calibration] The number of photons in the first 20 ns after the first photon");
     REGISTER_VARIABLE("countRawTOPHitsInInterval(tmin, tmax)", TOPVariable::countRawTOPHitsInInterval,
                       "[calibration] The number of photons in the given interval");
+    REGISTER_VARIABLE("topFlag", TOPVariable::getFlag,
+                      "[calibration] reconstruction flag, log likelihoods are valid if flag==1");
+    REGISTER_VARIABLE("topElectronLogL", TOPVariable::getElectronLogL,
+                      "[calibration] electron log likelihood");
+    REGISTER_VARIABLE("topMuonLogL", TOPVariable::getMuonLogL,
+                      "[calibration] muon log likelihood");
+    REGISTER_VARIABLE("topPionLogL", TOPVariable::getPionLogL,
+                      "[calibration] pion log likelihood");
+    REGISTER_VARIABLE("topKaonLogL", TOPVariable::getKaonLogL,
+                      "[calibration] kaon log likelihood");
+    REGISTER_VARIABLE("topProtonLogL", TOPVariable::getProtonLogL,
+                      "[calibration] proton log likelihood");
     REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPVariable::TOPRecBunchUsedTrackCount,
                       "[calibration] The number of tracks used in the bunch reconstruction");
     REGISTER_VARIABLE("topRecBunchTrackCount", TOPVariable::TOPRecBunchTrackCount,

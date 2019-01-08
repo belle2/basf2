@@ -33,7 +33,7 @@ and fix any issues you have introduced. Here is what the test {toolname} found:\
 try:
     cppcheck_output = subprocess.check_output(["b2code-cppcheck", "analysis"])
 except subprocess.CalledProcessError as error:
-    cppcheck = error.output
+    cppcheck_output = error.output
 
 # ignore the nofile .. [missingInclude] that is always at the end of cppcheck
 ignoreme = 'Cppcheck cannot find all the include files'

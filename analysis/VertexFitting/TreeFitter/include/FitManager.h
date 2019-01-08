@@ -45,6 +45,12 @@ namespace TreeFitter {
                const bool useReferencing = false
               );
 
+    /** use default copy constructor */
+    FitManager(const FitManager&) = default;
+
+    /** use default assignment op */
+    FitManager operator=(const FitManager&) = default;
+
     /** destructor does stuff */
     ~FitManager();
 

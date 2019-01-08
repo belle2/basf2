@@ -1156,9 +1156,6 @@ void PXDROIFinderAnalysisModule::terminate()
     m_h1redFactor_L1->Write();
     m_h1redFactor_L2->Write();
 
-    //    m_h2_VXDhitsPR_xy->Write();
-    //    m_h2_VXDhitsPR_rz->Write();
-
 
     m_h2ROIbottomLeft->Write();
     m_h2ROItopRight->Write();

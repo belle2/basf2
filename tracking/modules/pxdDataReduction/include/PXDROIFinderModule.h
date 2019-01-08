@@ -18,9 +18,6 @@
 #include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 #include <tracking/pxdDataReductionClasses/ROIPixelTranslator.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
-#include <time.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
 namespace Belle2 {

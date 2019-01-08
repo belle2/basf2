@@ -12,16 +12,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>
-#include <geometry/GeometryManager.h>
-#include <TGeoManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
-#include <genfit/FieldManager.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <time.h>
-#include <list>
-#include <genfit/Track.h> //giulia
 
 using namespace std;
 using namespace Belle2;

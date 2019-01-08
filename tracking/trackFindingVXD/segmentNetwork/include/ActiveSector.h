@@ -46,7 +46,7 @@ namespace Belle2 {
     /** Constructor.
     *      //      * @param staticSector pointer to static sector associated with this one.
      *      //      */
-    ActiveSector(const StaticSectorType* staticSector):
+    explicit ActiveSector(const StaticSectorType* staticSector):
       m_staticSector(staticSector), m_identifier(staticSector->getFullSecID())
     {}
 

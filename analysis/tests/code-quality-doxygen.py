@@ -8,19 +8,13 @@ Eventually these checks can be included as git hooks.
 
 import subprocess
 import re
+import sys
 
 
-def split_and_remove_empty_strings(output):
-    """Split output into list of str (one for each line). Remove the emptys."""
-    output = str(output).split('\\n')
-    while "" in output:
-        output.remove("")
-    return output
-
-
-def check_error_free(cleaned_output_log, tool, toolname):
+def check_error_free(log, tool, toolname, filter=lambda x: True):
     """Check that the provided code tool's log has no comments or warnings"""
-    if cleaned_output_log:
+    clean_log = [e for e in str(log).split('\\n') if e and filter(e)]
+    if clean_log:
         message = """\
 The analysis package has some {toolname} issues, which is now not allowed.
 Please run:
@@ -29,10 +23,11 @@ Please run:
 
 and fix any issues you have introduced. Here is what the test {toolname} found:\
     """.format(toolname=toolname, tool=tool)
-        print(message)
-        for line in cleaned_output_log:
-            print(line)
-        assert False
+        print(message, file=sys.stderr)
+        for line in clean_log:
+            print(line, file=sys.stderr)
+        sys.exit(1)
+    return
 
 # check doxygen
 try:
@@ -40,10 +35,6 @@ try:
 except subprocess.CalledProcessError as error:
     doxygen_output = error.output
 
-doxygen_output = split_and_remove_empty_strings(doxygen_output)
-
-# special case to ignore OrcaKinFit
-doxygen_output = [el for el in doxygen_output if not re.findall('Belle2::OrcaKinFit', el)]
-
-# throw an error if the remaining doxygen list is not empty
-check_error_free(doxygen_output, "b2code-doxygen-warnings", "doxygen")
+# run the check ignoring OrcaKinFit errors and weird surviving apostrophes
+check_error_free(doxygen_output, "b2code-doxygen-warnings", "doxygen",
+                 lambda x: not re.findall('Belle2::OrcaKinFit', x) and x is not "'")

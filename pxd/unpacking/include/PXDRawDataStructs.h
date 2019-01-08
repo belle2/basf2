@@ -335,7 +335,7 @@ namespace Belle2 {
       void set(void* d)
       {
         data = d;
-        type = ((dhc_frame_header_word0*)data)->getFrameType();
+        type = (reinterpret_cast <dhc_frame_header_word0*>data)->getFrameType();
         length = 0;
       };
       inline unsigned int getEventNrLo(void) const { return ((ubig16_t*)data)[1]; };

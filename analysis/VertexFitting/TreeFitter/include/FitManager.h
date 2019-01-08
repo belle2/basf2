@@ -46,10 +46,10 @@ namespace TreeFitter {
               );
 
     /** use default copy constructor */
-    FitManager(const FitManager&) = default;
+    FitManager(const FitManager& other) = default;
 
     /** use default assignment op */
-    FitManager operator=(const FitManager&) = default;
+    FitManager& operator=(const FitManager& other) = default;
 
     /** destructor does stuff */
     ~FitManager();

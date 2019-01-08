@@ -53,8 +53,8 @@ namespace Belle2 {
 
     void endRun() override;
 
-    ROIPixelTranslator* m_thePixelTranslator; /**< the pixel translator object*/
-    PXDInterceptor* m_thePXDInterceptor; /**< the pxd interceptor object*/
+    ROIPixelTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
+    PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
     std::string m_PXDInterceptListName; /**< intercept list name*/
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/

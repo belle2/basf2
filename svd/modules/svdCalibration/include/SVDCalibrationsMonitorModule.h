@@ -28,6 +28,7 @@
 #include <TBranch.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TProfile.h>
 
 namespace Belle2 {
   /**
@@ -65,6 +66,7 @@ namespace Belle2 {
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
     TTree* m_tree; /**<pointer at tree containing the mean and RMS of calibration constants */
+    TTree* m_treeDetailed; /**<pointer at tree containing the calibration constants of each strip*/
 
     //branches
     TBranch* b_run;
@@ -72,12 +74,17 @@ namespace Belle2 {
     TBranch* b_layer;
     TBranch* b_sensor;
     TBranch* b_side;
+    TBranch* b_strip;
+    TBranch* b_gain;
     TBranch* b_gainAVE;
     TBranch* b_gainRMS;
+    TBranch* b_noise;
     TBranch* b_noiseAVE;
     TBranch* b_noiseRMS;
+    TBranch* b_peakTime;
     TBranch* b_peakTimeAVE;
     TBranch* b_peakTimeRMS;
+    TBranch* b_pulseWidth;
     TBranch* b_pulseWidthAVE;
     TBranch* b_pulseWidthRMS;
 
@@ -87,12 +94,17 @@ namespace Belle2 {
     int m_layer;
     int m_sensor;
     int m_side;
+    int m_strip;
+    float m_noise;
     float m_noiseAVE;
     float m_noiseRMS;
+    float m_gain;
     float m_gainAVE;
     float m_gainRMS;
+    float m_peakTime;
     float m_peakTimeAVE;
     float m_peakTimeRMS;
+    float m_pulseWidth;
     float m_pulseWidthAVE;
     float m_pulseWidthRMS;
 
@@ -122,6 +134,7 @@ namespace Belle2 {
     TList* m_histoList_triggerbin;
 
     /** NOISES */
+    TProfile* p_noise[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**< noise in ADC units*/
     TH1F* h_noise[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**< noise in ADC units*/
     TH1F* h_noiseInElectrons[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**< noise in electrons*/
 
@@ -175,6 +188,10 @@ namespace Belle2 {
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
                             const char* xtitle, TList* histoList = NULL);  /**< thf */
+    //list of functions to create profiles:
+    TProfile* createProfile(const char* name, const char* title,
+                            Int_t nbins, Double_t min, Double_t max,
+                            const char* xtitle, const char* ytitle, TList* histoList = NULL); /**< thf */
 
   };
 }

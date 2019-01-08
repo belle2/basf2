@@ -67,10 +67,22 @@ void SVDCalibrationsMonitorModule::initialize()
   b_pulseWidthAVE = m_tree->Branch("pulseWidthAVE", &m_pulseWidthAVE, "pulseWidthAVE/F");
   b_pulseWidthRMS = m_tree->Branch("pulseWidthRMS", &m_pulseWidthRMS, "pulseWidthRMS/F");
 
-
+  m_treeDetailed = new TTree("calibDetailed", "RECREATE");
+  b_run = m_treeDetailed->Branch("run", &m_run, "run/i");
+  b_layer = m_treeDetailed->Branch("layer", &m_layer, "layer/i");
+  b_ladder = m_treeDetailed->Branch("ladder", &m_ladder, "ladder/i");
+  b_sensor = m_treeDetailed->Branch("sensor", &m_sensor, "sensor/i");
+  b_side = m_treeDetailed->Branch("side", &m_side, "side/i");
+  b_strip = m_treeDetailed->Branch("strip", &m_strip, "strip/i");
+  b_noise = m_treeDetailed->Branch("noise", &m_noise, "noise/F");
+  b_gain = m_treeDetailed->Branch("gain", &m_gain, "gain/F");
+  b_peakTime = m_treeDetailed->Branch("peakTime", &m_peakTime, "peakTime/F");
+  b_pulseWidth = m_treeDetailed->Branch("pulseWidth", &m_pulseWidth, "pulseWidth/F");
 
   TString NameOfHisto = "";
   TString TitleOfHisto = "";
+  TString NameOfProf = "";
+  TString TitleOfProf = "";
 
   //call for a geometry instance
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
@@ -123,6 +135,15 @@ void SVDCalibrationsMonitorModule::initialize()
           TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
           h_noiseInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 600, 199.5, 1499.5,
                                                             "strip noise (e-)", m_histoList_noiseInElectrons);
+          Int_t mult = 6;
+          if ((side == 0) && (layer != 3))
+            mult = 4;
+
+          NameOfProf = "prof_noiseADC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfProf = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                        " side) VS strip";
+          p_noise[layer][ladder][sensor][side] = createProfile(NameOfProf, TitleOfProf, 128 * mult, -0.5, 128 * mult - 0.5, "strip",
+                                                               "strip noise (ADC)", m_histoList_noise);
 
 
           // GAIN
@@ -289,6 +310,10 @@ void SVDCalibrationsMonitorModule::event()
         Belle2::VxdID theVxdID(layer, ladder, sensor);
         const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
 
+        m_layer = layer;
+        m_ladder = ladder;
+        m_sensor = sensor;
+
         for (int Ustrip = 0; Ustrip < currentSensorInfo->getUCells(); Ustrip++) {
           //fill your histogram for U side
 
@@ -328,6 +353,13 @@ void SVDCalibrationsMonitorModule::event()
           float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 1);
           h_clsTimeFuncVersion[layer][ladder][sensor][1]->Fill(clsTimeFunc);
 
+          m_side = 1;
+          m_strip = Ustrip;
+          m_noise = ADCnoise;
+          m_gain = ELECgain;
+          m_pulseWidth = width;
+          m_peakTime = time;
+          m_treeDetailed->Fill();
 
         } //histogram filled for U side
 
@@ -372,12 +404,18 @@ void SVDCalibrationsMonitorModule::event()
           float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 0);
           h_clsTimeFuncVersion[layer][ladder][sensor][0]->Fill(clsTimeFunc);
 
+          m_side = 0;
+          m_strip = Vstrip;
+          m_noise = ADCnoise;
+          m_gain = ELECgain;
+          m_pulseWidth = width;
+          m_peakTime = time;
+          m_treeDetailed->Fill();
+
 
         } //histogram filled for V side
 
-        m_layer = layer;
-        m_ladder = ladder;
-        m_sensor = sensor;
+
         for (int s = 0; s < 2; s++) {
           m_side = s;
           m_noiseAVE = h_noise[layer][ladder][sensor][s]->GetMean();
@@ -388,9 +426,21 @@ void SVDCalibrationsMonitorModule::event()
           m_peakTimeRMS = h_peakTime[layer][ladder][sensor][s]->GetRMS();
           m_pulseWidthAVE = h_pulseWidth[layer][ladder][sensor][s]->GetMean();
           m_pulseWidthRMS = h_pulseWidth[layer][ladder][sensor][s]->GetRMS();
-
-
           m_tree->Fill();
+
+          //fill TProfiles
+          char profName[128];
+          char selection[128];
+          TString nameSide = "";
+          if (s == 1)
+            nameSide = "U";
+          else if (s == 0)
+            nameSide = "V";
+          //
+          sprintf(profName, "prof_noiseADC_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
+          sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, s);
+          m_treeDetailed->Project(profName, "noise:strip", selection);
+
         }
         ++itSvdSensors;
       }
@@ -419,6 +469,7 @@ void SVDCalibrationsMonitorModule::terminate()
   if (m_rootFilePtr != NULL) {
 
     //write the tree
+    m_treeDetailed->Write();
     m_tree->Write();
 
     //writing the histogram list for the noises in ADC units
@@ -504,6 +555,22 @@ TH1F*  SVDCalibrationsMonitorModule::createHistogram1D(const char* name, const c
   TH1F* h = new TH1F(name, title, nbins, min, max);
 
   h->GetXaxis()->SetTitle(xtitle);
+
+  if (histoList)
+    histoList->Add(h);
+
+  return h;
+}
+
+TProfile*  SVDCalibrationsMonitorModule::createProfile(const char* name, const char* title,
+                                                       Int_t nbins, Double_t min, Double_t max,
+                                                       const char* xtitle, const char* ytitle, TList* histoList)
+{
+
+  TProfile* h = new TProfile(name, title, nbins, min, max);
+
+  h->GetXaxis()->SetTitle(xtitle);
+  h->GetYaxis()->SetTitle(ytitle);
 
   if (histoList)
     histoList->Add(h);

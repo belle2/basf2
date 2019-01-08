@@ -31,27 +31,14 @@ namespace Belle2 {
 
   public:
 
-    /** Number of PXD planes and their numbers.
-     * The actual (layer, ladder, sensor numbers are (i,1,i), i = 1,2
-     */
-    enum {
-      c_nPXDPlanes = 2,
-      c_firstPXDPlane = 1,
-      c_lastPXDPlane = 2,
-    };
-
     /** Constructor */
     PXDDQMCorrModule();
-    /* Destructor */
-    virtual ~PXDDQMCorrModule();
 
   private:
     /** Module functions */
     void initialize() override final;
     void beginRun() override final;
     void event() override final;
-    void endRun() override final;
-    void terminate() override final;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -60,26 +47,6 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
-    /** Utility function to convert index to plane number
-     * and to protect against range errors.
-     */
-    inline int indexToPlane(int index) const
-    {
-      return c_firstPXDPlane + index;
-    }
-    /** Utility function to convert plane number to index
-     * and to protect against range errors.
-     */
-    inline int planeToIndex(int iPlane) const
-    {
-      return iPlane - c_firstPXDPlane;
-    }
-    /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
-     * @param index Index of the sensor (0,1), _not_ layer number!
-     * @return SensorInfo object for the desired plane.
-     */
-    inline const PXD::SensorInfo& getInfo(int index) const;
-
     /** PXDClusters StoreArray name */
     std::string m_storeClustersName;
     /** Name of the histogram directory in ROOT file */
@@ -90,25 +57,14 @@ namespace Belle2 {
 
     // +1 in dimensions to protect against noisy VXDID values.
     /** Correlation Sensor 1 vs 2 */
-    TH2F* m_CorrelationU;
+    TH2F* m_CorrelationU = {};
     /** Correlation Sensor 1 vs 2 */
-    TH2F* m_CorrelationV;
+    TH2F* m_CorrelationV = {};
     /** Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaU;
+    TH1F* m_DeltaU = {};
     /** Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaV;
+    TH1F* m_DeltaV = {};
   };
-
-  /** Utility function to find sonsor ID
-    * @param index Index of the sensor (0,1), _not_ layer number!
-    * @return SensorInfo object for the desired sensor.
-    */
-  inline const PXD::SensorInfo& PXDDQMCorrModule::getInfo(int index) const
-  {
-    int iPlane = indexToPlane(index);
-    VxdID sensorID(iPlane, 1, iPlane);
-    return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-  }
 
 }
 

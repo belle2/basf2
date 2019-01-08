@@ -320,22 +320,22 @@ namespace Belle2 {
       {
         return type;
       };
-      void set(void* d, unsigned int t)
+      void set(const void* d, unsigned int t)
       {
         data = d;
         type = t;
         length = 0;
       };
-      void set(void* d, unsigned int t, unsigned int l)
+      void set(const void* d, unsigned int t, unsigned int l)
       {
         data = d;
         type = t;
         length = l;
       };
-      void set(void* d)
+      void set(const void* d)
       {
         data = d;
-        type = (reinterpret_cast <dhc_frame_header_word0*>data)->getFrameType();
+        type = reinterpret_cast <const dhc_frame_header_word0*>(data)->getFrameType();
         length = 0;
       };
       inline unsigned int getEventNrLo(void) const { return ((ubig16_t*)data)[1]; };

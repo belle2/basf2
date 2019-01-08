@@ -3,15 +3,14 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa, Eugenio Paoloni, Bjoern Spruck          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <tracking/modules/pxdDataReduction/ROISenderModule.h>
-#include <tracking/dataobjects/ROIpayload.h>
 #include <sys/stat.h>
+#include <chrono>
 
 using namespace std;
 using namespace Belle2;
@@ -44,8 +43,9 @@ ROISenderModule::ROISenderModule() :
 void
 ROISenderModule::initialize()
 {
-  StoreObjPtr<ROIpayload> roiPayloads;
-  roiPayloads.isRequired(m_ROIpayloadName);
+  // Required input
+  m_eventMetaData.isRequired();
+  m_roiPayload.isRequired(m_ROIpayloadName);
 
   m_messageQueueNameCstring =  m_messageQueueName.c_str();
 
@@ -55,6 +55,7 @@ ROISenderModule::initialize()
     B2FATAL(__FILE__ << ":" << __LINE__ <<
             m_messageQueueName << " invalid. cfr: man mq_overview ");
 
+  m_histo.resize(101, 0); // 0-99, 100 is used as overflow bin
 
   //  unlinkMessageQueue("on initialize");
   openMessageQueue("on initialize");
@@ -66,26 +67,49 @@ void
 ROISenderModule::event()
 {
 
-  StoreObjPtr<ROIpayload> payloadPtr(m_ROIpayloadName);
-  int length = payloadPtr->getPacketLengthByte();
-  const char* data = (const char*) payloadPtr->getRootdata();
+  int length = m_roiPayload->getPacketLengthByte();
+  const char* data = (const char*) m_roiPayload->getRootdata();
 
   mqd_t ret;
 
   if (length <= m_messageQueueMsgSize) {
     ret = mq_send(m_messageQueue, data, length, 0 /* priority */);
 
-    if (ret == (mqd_t) - 1)
+    if (ret == (mqd_t) - 1) {
       B2FATAL(std::string(__FILE__) << ":" << __LINE__ <<
               ": error: " <<
               strerror(errno) <<
               " on mq_send");
-  } else
-    B2WARNING(std::string(__FILE__) << ":" << __LINE__  <<
-              " ROI payload too long." << endl <<
-              " Payload length     = " << length << endl <<
-              " Message max lengtt = " << m_messageQueueMsgSize << endl);
+    }
+  } else {
+    B2FATAL(std::string(__FILE__) << ":" << __LINE__  <<
+            "ROI payload too long." << endl <<
+            "Payload length     = " << length << endl <<
+            "Message max length = " << m_messageQueueMsgSize << endl <<
+            "We stop here, as this will result in event mismatch on EB! Please increase mqueue message length on HLT and/or check size limit in ROIPayload Assembler"
+            << endl);
+  }
 
+  // Calculate the time difference between now and the trigger time
+  // This tells you how much delay we have summed up (it is NOT the processing time!)
+  /** Time(Tag) from MetaInfo, ns since epoch */
+  unsigned long long int meta_time = m_eventMetaData->getTime();
+
+  using namespace std::chrono;
+  nanoseconds ns = duration_cast< nanoseconds >(system_clock::now().time_since_epoch());
+  Float_t deltaT = (std::chrono::duration_cast<seconds> (ns - (nanoseconds)meta_time)).count();
+  if (deltaT < 0) {
+    m_histo[0]++;// just in case the clocks are slightly out of sync
+  } else if (deltaT < 100) {
+    m_histo[int(deltaT)]++;
+  } else {
+    m_histo[100]++;// overflow bin
+  }
+  if (deltaT > 60) {
+    B2ERROR("Event took too long on HLT, PXD data for Event might be lost!" << LogVar("deltaT in s", deltaT));
+  } else if (deltaT > 30) {
+    B2WARNING("Event took too long on HLT, PXD data for Event might be lost!" << LogVar("deltaT in s", deltaT));
+  }
 }
 
 
@@ -96,6 +120,10 @@ ROISenderModule::terminate()
 {
   closeMessageQueue("on terminate");
   //  unlinkMessageQueue("on terminate");
+  string str = "HLT Delay time distribution: ( ";
+  for (auto& a : m_histo) str += to_string(a) + ";";
+  str += " )";
+  B2RESULT(str);
 }
 
 void

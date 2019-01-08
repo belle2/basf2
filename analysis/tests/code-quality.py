@@ -36,7 +36,11 @@ and fix any issues you have introduced. Here is what the test {toolname} found:\
 
 
 # run cppcheck
-cppcheck_output = subprocess.check_output(["b2code-cppcheck", "analysis"])
+try:
+    cppcheck_output = subprocess.check_output(["b2code-cppcheck", "analysis"])
+except subprocess.CalledProcessError as error:
+    cppcheck = error.output
+
 cppcheck_output = split_and_remove_empty_strings(cppcheck_output)
 
 # ignore the missingInclude that is always at the end of cppcheck

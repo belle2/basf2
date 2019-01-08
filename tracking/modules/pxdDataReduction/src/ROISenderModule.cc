@@ -138,6 +138,7 @@ ROISenderModule::closeMessageQueue(const char* log_string)
 }
 
 
+/// Not sure if we ever need to unlink the queue, but lets keep the code for reference
 void
 ROISenderModule::unlinkMessageQueue(const char* log_string)
 {

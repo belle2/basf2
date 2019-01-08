@@ -59,7 +59,7 @@ namespace Belle2 {
     std::string m_PXDInterceptListName; /**< Intercept list name */
     std::string m_ROIListName; /**< ROI list name */
 
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing infos for debugging and validating purposes */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing infos for debugging and validating purposes */
     std::string m_rootFileName; /**< root file name */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
 
@@ -73,128 +73,124 @@ namespace Belle2 {
     Double_t pt[6]  = {0.05, 0.15, 0.25, 0.4, 0.75, 1.5}; /**< bin edges (in pt = transverse momentum)*/
     Double_t ptErr[6] = { 0.05, 0.05, 0.05, 0.1, 0.25, 0.5}; /**< bin widths (transverse momentum) */
 
-    TGraphErrors* m_gEff2; /**< efficiency graph */
-    TGraphErrors* m_gEff; /**< efficiency graph */
+    TGraphErrors* m_gEff2 = nullptr; /**< efficiency graph */
+    TGraphErrors* m_gEff = nullptr; /**< efficiency graph */
 
-    TH1F* m_h1DigitsPerParticle;
-    TH1F* m_h1RecoTracksPerParticle;
+    TH1F* m_h1DigitsPerParticle = nullptr;
+    TH1F* m_h1RecoTracksPerParticle = nullptr;
 
-    TH1F* m_h1digiIn; /**< digits contained in ROI histogram*/
-    TH1F* m_h1digiOut2; /**< lost digit: ROI exist with right vxdID */
-    TH1F* m_h1digiOut3; /**< lost digit: ROI exist with wrong vxdID */
-    TH1F* m_h1digiOut4; /**< lost digit: ROI does not exist, intercept with right vxdID */
-    TH1F* m_h1digiOut5; /**< lost digit: ROI does not exist, intercept with wrong vxdID */
+    TH1F* m_h1digiIn = nullptr; /**< digits contained in ROI histogram*/
+    TH1F* m_h1digiOut2 = nullptr; /**< lost digit: ROI exist with right vxdID */
+    TH1F* m_h1digiOut3 = nullptr; /**< lost digit: ROI exist with wrong vxdID */
+    TH1F* m_h1digiOut4 = nullptr; /**< lost digit: ROI does not exist, intercept with right vxdID */
+    TH1F* m_h1digiOut5 = nullptr; /**< lost digit: ROI does not exist, intercept with wrong vxdID */
 
-    TH1F* m_h1TrackOneDigiIn; /**<tracks with at least digit contained in ROI*/
-    TH1F* m_h1nnotINtrack2; /**< tracks with lost digit: ROI exist with right vxdID */
-    TH1F* m_h1nnotINtrack3; /**< lost digit: ROI exist with wrong vxdID */
-    TH1F* m_h1nnotINtrack4; /**< lost digit: ROI does not exist, intercept with right vxdID */
-    TH1F* m_h1nnotINtrack5; /**< lost digit: ROI does not exist, intercept with wrong vxdID */
+    TH1F* m_h1TrackOneDigiIn = nullptr; /**<tracks with at least digit contained in ROI*/
+    TH1F* m_h1nnotINtrack2 = nullptr; /**< tracks with lost digit: ROI exist with right vxdID */
+    TH1F* m_h1nnotINtrack3 = nullptr; /**< lost digit: ROI exist with wrong vxdID */
+    TH1F* m_h1nnotINtrack4 = nullptr; /**< lost digit: ROI does not exist, intercept with right vxdID */
+    TH1F* m_h1nnotINtrack5 = nullptr; /**< lost digit: ROI does not exist, intercept with wrong vxdID */
 
-    TH1F* m_h1Track; /**< denominator track  */
-    TH1F* m_h1Track_pt; /**< denominator track pT*/
-    TH1F* m_h1Track_phi; /**< denominator track phi*/
-    TH1F* m_h1Track_lambda; /**< denominator track lambda*/
-    TH1F* m_h1Track_cosTheta; /**< denominator track cosTheta*/
-    TH1F* m_h1Track_pVal; /**< denominator track pVal*/
-    TH1F* m_h1Track_nSVDhits; /**< denominator track pVal*/
-    TH1F* m_h1Track_nCDChits; /**< denominator track pVal*/
+    TH1F* m_h1Track = nullptr; /**< denominator track  */
+    TH1F* m_h1Track_pt = nullptr; /**< denominator track pT*/
+    TH1F* m_h1Track_phi = nullptr; /**< denominator track phi*/
+    TH1F* m_h1Track_lambda = nullptr; /**< denominator track lambda*/
+    TH1F* m_h1Track_cosTheta = nullptr; /**< denominator track cosTheta*/
+    TH1F* m_h1Track_pVal = nullptr; /**< denominator track pVal*/
+    TH1F* m_h1Track_nSVDhits = nullptr; /**< denominator track pVal*/
+    TH1F* m_h1Track_nCDChits = nullptr; /**< denominator track pVal*/
 
-    TH1F* m_h1INtrack1; /**< track with no intercept  */
-    TH1F* m_h1INtrack1_pt; /**<  track with no intercept pT*/
-    TH1F* m_h1INtrack1_phi; /**< track with no intercept phi*/
-    TH1F* m_h1INtrack1_lambda; /**< track with no intercept lambda*/
-    TH1F* m_h1INtrack1_cosTheta; /**< track with no intercept costheta*/
-    TH1F* m_h1INtrack1_pVal; /**< denominator track pVal*/
-    TH1F* m_h1INtrack1_nSVDhits; /**< denominator track pVal*/
-    TH1F* m_h1INtrack1_nCDChits; /**< denominator track pVal*/
+    TH1F* m_h1INtrack1 = nullptr; /**< track with no intercept  */
+    TH1F* m_h1INtrack1_pt = nullptr; /**<  track with no intercept pT*/
+    TH1F* m_h1INtrack1_phi = nullptr; /**< track with no intercept phi*/
+    TH1F* m_h1INtrack1_lambda = nullptr; /**< track with no intercept lambda*/
+    TH1F* m_h1INtrack1_cosTheta = nullptr; /**< track with no intercept costheta*/
+    TH1F* m_h1INtrack1_pVal = nullptr; /**< denominator track pVal*/
+    TH1F* m_h1INtrack1_nSVDhits = nullptr; /**< denominator track pVal*/
+    TH1F* m_h1INtrack1_nCDChits = nullptr; /**< denominator track pVal*/
 
-    TH1F* m_h1notINtrack5; /**< track with no intercept  */
-    TH1F* m_h1notINtrack5_pt; /**<  track with no intercept pT*/
-    TH1F* m_h1notINtrack5_phi; /**< track with no intercept phi*/
-    TH1F* m_h1notINtrack5_lambda; /**< track with no intercept lambda*/
-    TH1F* m_h1notINtrack5_cosTheta; /**< track with no intercept costheta*/
-    TH1F* m_h1notINtrack5_pVal; /**< denominator track pVal*/
-    TH1F* m_h1notINtrack5_nSVDhits; /**< denominator track pVal*/
-    TH1F* m_h1notINtrack5_nCDChits; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack5 = nullptr; /**< track with no intercept  */
+    TH1F* m_h1notINtrack5_pt = nullptr; /**<  track with no intercept pT*/
+    TH1F* m_h1notINtrack5_phi = nullptr; /**< track with no intercept phi*/
+    TH1F* m_h1notINtrack5_lambda = nullptr; /**< track with no intercept lambda*/
+    TH1F* m_h1notINtrack5_cosTheta = nullptr; /**< track with no intercept costheta*/
+    TH1F* m_h1notINtrack5_pVal = nullptr; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack5_nSVDhits = nullptr; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack5_nCDChits = nullptr; /**< denominator track pVal*/
 
 
     //fill digits inside ROIs
-    TH1F* m_h1PullU; /**< distribution of U pulls for PDXDigits contained in a ROI*/
-    TH1F* m_h1PullV; /**< distribution of V pulls for PDXDigits contained in a ROI*/
-    TH2F* m_h2sigmaUphi; /**< distribution of sigmaU VS phi for PDXDigits contained in a ROI*/
-    TH2F* m_h2sigmaVphi; /**< distribution of sigmaV VS phi for PDXDigits contained in a ROI*/
-    TH1F* m_h1ResidU; /**< distribution of U resid for PXDDigits contained in a ROI*/
-    TH1F* m_h1ResidV; /**< distribution of V resid for PXDDigits contained in a ROI*/
-    TH2F* m_h2ResidUV; /**< distribution of V resid for PXDDigits contained in a ROI*/
-    TH1F* m_h1SigmaU; /**< distribution of sigmaU for PXDDigits contained in a ROI*/
-    TH1F* m_h1SigmaV; /**< distribution of sigmaV for PXDDigits contained in a ROI*/
-    TH1F* m_h1GlobalTime; /**< distribution of global time for PDXDigits contained in a ROI*/
-    TH2F* m_h2Mapglob; /**<sensor perp,phi */
-    TH2F* m_h2MaplocL1; /**< L1 ladder u,v */
-    TH2F* m_h2MaplocL2; /**< L2 ladder u,v */
+    TH1F* m_h1PullU = nullptr; /**< distribution of U pulls for PDXDigits contained in a ROI*/
+    TH1F* m_h1PullV = nullptr; /**< distribution of V pulls for PDXDigits contained in a ROI*/
+    TH2F* m_h2sigmaUphi = nullptr; /**< distribution of sigmaU VS phi for PDXDigits contained in a ROI*/
+    TH2F* m_h2sigmaVphi = nullptr; /**< distribution of sigmaV VS phi for PDXDigits contained in a ROI*/
+    TH1F* m_h1ResidU = nullptr; /**< distribution of U resid for PXDDigits contained in a ROI*/
+    TH1F* m_h1ResidV = nullptr; /**< distribution of V resid for PXDDigits contained in a ROI*/
+    TH2F* m_h2ResidUV = nullptr; /**< distribution of V resid for PXDDigits contained in a ROI*/
+    TH1F* m_h1SigmaU = nullptr; /**< distribution of sigmaU for PXDDigits contained in a ROI*/
+    TH1F* m_h1SigmaV = nullptr; /**< distribution of sigmaV for PXDDigits contained in a ROI*/
+    TH1F* m_h1GlobalTime = nullptr; /**< distribution of global time for PDXDigits contained in a ROI*/
+    TH2F* m_h2Mapglob = nullptr; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1 = nullptr; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2 = nullptr; /**< L2 ladder u,v */
 
     //fill digits outside2 ROIs
-    TH2F* m_h2sigmaUphi_out2; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
-    TH2F* m_h2sigmaVphi_out2; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
-    TH1F* m_h1ResidU_out2; /**< distribution of U resid for PXDDigits not contained in a ROI*/
-    TH1F* m_h1ResidV_out2; /**< distribution of V resid for PXDDigits not contained in a ROI*/
-    TH2F* m_h2ResidUV_out2; /**< distribution of V resid for PXDDigits not contained in a ROI*/
-    TH1F* m_h1SigmaU_out2; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
-    TH1F* m_h1SigmaV_out2; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
-    TH1F* m_h1GlobalTime_out2; /**< distribution of global time for PDXDigits not contained in a ROI*/
-    TH2F* m_h2Mapglob_out2; /**<sensor perp,phi */
-    TH2F* m_h2MaplocL1_out2; /**< L1 ladder u,v */
-    TH2F* m_h2MaplocL2_out2; /**< L2 ladder u,v */
+    TH2F* m_h2sigmaUphi_out2 = nullptr; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
+    TH2F* m_h2sigmaVphi_out2 = nullptr; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
+    TH1F* m_h1ResidU_out2 = nullptr; /**< distribution of U resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1ResidV_out2 = nullptr; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH2F* m_h2ResidUV_out2 = nullptr; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaU_out2 = nullptr; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaV_out2 = nullptr; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
+    TH1F* m_h1GlobalTime_out2 = nullptr; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out2 = nullptr; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out2 = nullptr; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out2 = nullptr; /**< L2 ladder u,v */
 
     //fill digits outside3 ROIs
-    TH2F* m_h2sigmaUphi_out3; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
-    TH2F* m_h2sigmaVphi_out3; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
-    TH1F* m_h1ResidU_out3; /**< distribution of U resid for PXDDigits not contained in a ROI*/
-    TH1F* m_h1ResidV_out3; /**< distribution of V resid for PXDDigits not contained in a ROI*/
-    TH2F* m_h2ResidUV_out3; /**< distribution of V resid for PXDDigits not contained in a ROI*/
-    TH1F* m_h1SigmaU_out3; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
-    TH1F* m_h1SigmaV_out3; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
-    TH1F* m_h1GlobalTime_out3; /**< distribution of global time for PDXDigits not contained in a ROI*/
-    TH2F* m_h2Mapglob_out3; /**<sensor perp,phi */
-    TH2F* m_h2MaplocL1_out3; /**< L1 ladder u,v */
-    TH2F* m_h2MaplocL2_out3; /**< L2 ladder u,v */
+    TH2F* m_h2sigmaUphi_out3 = nullptr; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
+    TH2F* m_h2sigmaVphi_out3 = nullptr; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
+    TH1F* m_h1ResidU_out3 = nullptr; /**< distribution of U resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1ResidV_out3 = nullptr; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH2F* m_h2ResidUV_out3 = nullptr; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaU_out3 = nullptr; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaV_out3 = nullptr; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
+    TH1F* m_h1GlobalTime_out3 = nullptr; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out3 = nullptr; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out3 = nullptr; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out3 = nullptr; /**< L2 ladder u,v */
 
     //fill digits outside4 ROIs
-    TH2F* m_h2sigmaUphi_out4; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
-    TH2F* m_h2sigmaVphi_out4; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
-    TH1F* m_h1SigmaU_out4; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
-    TH1F* m_h1SigmaV_out4; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
-    TH1F* m_h1GlobalTime_out4; /**< distribution of global time for PDXDigits not contained in a ROI*/
-    TH2F* m_h2Mapglob_out4; /**<sensor perp,phi */
-    TH2F* m_h2MaplocL1_out4; /**< L1 ladder u,v */
-    TH2F* m_h2MaplocL2_out4; /**< L2 ladder u,v */
+    TH2F* m_h2sigmaUphi_out4 = nullptr; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
+    TH2F* m_h2sigmaVphi_out4 = nullptr; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
+    TH1F* m_h1SigmaU_out4 = nullptr; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaV_out4 = nullptr; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
+    TH1F* m_h1GlobalTime_out4 = nullptr; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out4 = nullptr; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out4 = nullptr; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out4 = nullptr; /**< L2 ladder u,v */
 
     //fill digits outside5 ROIs
-    TH1F* m_h1GlobalTime_out5; /**< distribution of global time for PDXDigits not contained in a ROI*/
-    TH2F* m_h2Mapglob_out5; /**<sensor perp,phi */
-    TH2F* m_h2MaplocL1_out5; /**< L1 ladder u,v */
-    TH2F* m_h2MaplocL2_out5; /**< L2 ladder u,v */
-
-    //BOH
-    //    TH2F* m_h2_VXDhitsPR_xy;
-    //    TH2F* m_h2_VXDhitsPR_rz;
+    TH1F* m_h1GlobalTime_out5 = nullptr; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out5 = nullptr; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out5 = nullptr; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out5 = nullptr; /**< L2 ladder u,v */
 
     //ROI stuff
-    TH2F* m_h2ROIbottomLeft;
-    TH2F* m_h2ROItopRight;
-    TH2F* m_h2ROIuMinMax;
-    TH2F* m_h2ROIvMinMax;
-    TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
-    TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a PXDDigit*/
-    TH1F* m_h1okROIfrac; /**< distribution of number of ROIsreduction factor*/
-    TH1F* m_h1redFactor; /**< distribution of number of ROIsreduction factor*/
-    TH1F* m_h1redFactor_L1; /**< distribution of number of ROIsreduction factor*/
-    TH1F* m_h1redFactor_L2; /**< distribution of number of ROIsreduction factor*/
-    TH1F* m_h1totArea; /**< distribution of Area of all ROIs*/
-    TH1F* m_h1okArea; /**< distribution of Area of ROIs containing a PXDDigit*/
+    TH2F* m_h2ROIbottomLeft = nullptr;
+    TH2F* m_h2ROItopRight = nullptr;
+    TH2F* m_h2ROIuMinMax = nullptr;
+    TH2F* m_h2ROIvMinMax = nullptr;
+    TH1F* m_h1totROIs = nullptr; /**< distribution of number of all ROIs*/
+    TH1F* m_h1okROIs = nullptr; /**< distribution of number of ROIs containin a PXDDigit*/
+    TH1F* m_h1okROIfrac = nullptr; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1redFactor = nullptr; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1redFactor_L1 = nullptr; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1redFactor_L2 = nullptr; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1totArea = nullptr; /**< distribution of Area of all ROIs*/
+    TH1F* m_h1okArea = nullptr; /**< distribution of Area of ROIs containing a PXDDigit*/
 
-    TH1F* m_h1effPerTrack;
+    TH1F* m_h1effPerTrack = nullptr;
 
 
 

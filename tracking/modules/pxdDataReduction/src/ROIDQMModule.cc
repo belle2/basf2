@@ -135,10 +135,6 @@ void ROIDQMModule::event()
 
   int ROIarea = 0;
   double redFactor = 0;
-  int minU;
-  int minV;
-  int maxU;
-  int maxV;
 
   for (auto& it : m_roiIDs) {
 
@@ -148,10 +144,10 @@ void ROIDQMModule::event()
     const int nPixelsU = aSensorInfo.getUCells();
     const int nPixelsV = aSensorInfo.getVCells();
 
-    minU = it.getMinUid();
-    minV = it.getMinVid();
-    maxU = it.getMaxUid();
-    maxV = it.getMaxVid();
+    const int minU = it.getMinUid();
+    const int minV = it.getMinVid();
+    const int maxU = it.getMaxUid();
+    const int maxV = it.getMaxVid();
 
     int tmpROIarea = (maxU - minU) * (maxV - minV);
     ROIarea += tmpROIarea;
@@ -768,11 +764,11 @@ void ROIDQMModule::createHistosDictionaries()
 
         //--------------------------
 
-        itPxdSensors++;
+        ++itPxdSensors;
       }
-      itPxdLadders++;
+      ++itPxdLadders;
     }
-    itPxdLayers++;
+    ++itPxdLayers;
   }
 
 }

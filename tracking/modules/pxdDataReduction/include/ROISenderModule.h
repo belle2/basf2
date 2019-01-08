@@ -71,6 +71,7 @@ namespace Belle2 {
 
     void openMessageQueue(const char* log_string); /**< open message queue*/
     void closeMessageQueue(const char* log_string); /**< close message queue*/
+    /* cppcheck-suppress unusedPrivateFunction */
     void unlinkMessageQueue(const char* log_string); /**< unlink message queue*/
   };
 }

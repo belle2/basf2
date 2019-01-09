@@ -39,10 +39,6 @@ void SVDCalibrationsMonitorModule::initialize()
 {
 
 
-  m_histoList_mask = new TList;
-  m_histoList_noise = new TList;
-  m_histoList_noiseInElectrons = new TList;
-  m_histoList_gainInElectrons = new TList;
   m_histoList_peakTime = new TList;
   m_histoList_pulseWidth = new TList;
   m_histoList_timeshift = new TList;
@@ -75,7 +71,9 @@ void SVDCalibrationsMonitorModule::initialize()
   b_strip = m_treeDetailed->Branch("strip", &m_strip, "strip/i");
   b_mask = m_treeDetailed->Branch("mask", &m_mask, "mask/F");
   b_noise = m_treeDetailed->Branch("noise", &m_noise, "noise/F");
+  b_noiseEl = m_treeDetailed->Branch("noiseEl", &m_noiseEl, "noiseEl/F");
   b_gain = m_treeDetailed->Branch("gain", &m_gain, "gain/F");
+  b_pedestal = m_treeDetailed->Branch("pedestal", &m_pedestal, "pedestal/F");
   b_peakTime = m_treeDetailed->Branch("peakTime", &m_peakTime, "peakTime/F");
   b_pulseWidth = m_treeDetailed->Branch("pulseWidth", &m_pulseWidth, "pulseWidth/F");
 
@@ -125,50 +123,6 @@ void SVDCalibrationsMonitorModule::initialize()
             nameSide = "V";
 
 
-
-          Int_t mult = 6;
-          if ((side == 0) && (layer != 3))
-            mult = 4;
-
-
-          ///MASKS
-
-          NameOfHisto = "masked_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "strip mask (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_mask[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 80, -0.5, 9.5, "strip masked",
-                                                                  m_histoList_mask);
-
-          NameOfProf = "prof_masked_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfProf = "strip mask (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
-                        " side) VS strip";
-          p_mask[layer][ladder][sensor][side] = createProfile(NameOfProf, TitleOfProf, 128 * mult, -0.5, 128 * mult - 0.5, "strip",
-                                                              "masked", m_histoList_mask);
-
-          ///NOISES
-
-          NameOfHisto = "noiseADC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_noise[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 80, -0.5, 9.5, "strip noise (ADC)",
-                                                                   m_histoList_noise);
-
-          NameOfHisto = "noiseELEC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_noiseInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 600, 199.5, 1499.5,
-                                                            "strip noise (e-)", m_histoList_noiseInElectrons);
-
-          NameOfProf = "prof_noiseADC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfProf = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
-                        " side) VS strip";
-          p_noise[layer][ladder][sensor][side] = createProfile(NameOfProf, TitleOfProf, 128 * mult, -0.5, 128 * mult - 0.5, "strip",
-                                                               "strip noise (ADC)", m_histoList_noise);
-
-
-          // GAIN
-          NameOfHisto = "gainInElectrons_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "Gain (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_gainInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 600, 0., 600,
-                                                           "Gain (electron charge)",
-                                                           m_histoList_gainInElectrons);
 
           //PEAK TIME
           NameOfHisto = "peakTime_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
@@ -286,17 +240,126 @@ void SVDCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDFADCMaskedStrip for the requested IoV");
   if (!m_NoiseCal.isValid())
     B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
+  if (!m_PedestalCal.isValid())
+    B2WARNING("No valid SVDPedestalCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
   if (! m_ClusterCal.isValid())
     B2WARNING("No valid SVDClusterCalibrations for the requested IoV");
-  /*  if(!m_PedCal.isValid())
-    B2WARNING("No valid SVDPedestalCalibrations for the requested IoV");
+  /*
   if(!m_OccCal.isValid())
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
   if(!m_HotStripsCal.isValid())
     B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
   */
+
+
+  ///MASKS
+  TH1F hMask("masked_L@layerL@ladderS@sensor@view",
+             "masked strip in @layer.@ladder.@sensor @view/@side",
+             2, -0.5, 1.5);
+  hMask.GetXaxis()->SetTitle("isMasked");
+  m_hMask = new SVDHistograms<TH1F>(hMask);
+
+  TH2F h2Mask_512("masked2D_512_L@layerL@ladderS@sensor@view",
+                  "masked strip in @layer.@ladder.@sensor @view/@side VS strip number",
+                  128 * 4, -0.5, 128 * 4 - 0.5, 2, -0.5, 1.5);
+  h2Mask_512.GetYaxis()->SetTitle("isMasked");
+  h2Mask_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2Mask_768("masked2D_768_L@layerL@ladderS@sensor@view",
+                  "masked strip in @layer.@ladder.@sensor @view/@side VS strip number",
+                  128 * 6, -0.5, 128 * 6 - 0.5, 2, -0.5, 1.5);
+  h2Mask_768.GetYaxis()->SetTitle("isMasked");
+  h2Mask_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2Mask = new SVDHistograms<TH2F>(h2Mask_768, h2Mask_768, h2Mask_768, h2Mask_512);
+
+  ///NOISE ADC
+  TH1F hNoise("noiseADC_L@layerL@ladderS@sensor@view",
+              "noise in ADC in @layer.@ladder.@sensor @view/@side",
+              80, -0.5, 9.5);
+  hNoise.GetXaxis()->SetTitle("strip noise (ADC)");
+  m_hNoise = new SVDHistograms<TH1F>(hNoise);
+
+  TH2F h2Noise_512("noise2D_512_L@layerL@ladderS@sensor@view",
+                   "noise in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                   128 * 4, -0.5, 128 * 4 - 0.5, 80, -0.5, 9.5);
+  h2Noise_512.GetYaxis()->SetTitle("strip noise (ADC)");
+  h2Noise_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2Noise_768("noise2D_768_L@layerL@ladderS@sensor@view",
+                   "noise in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                   128 * 6, -0.5, 128 * 6 - 0.5, 80, -0.5, 9.5);
+  h2Noise_768.GetYaxis()->SetTitle("strip noise (ADC)");
+  h2Noise_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2Noise = new SVDHistograms<TH2F>(h2Noise_768, h2Noise_768, h2Noise_768, h2Noise_512);
+
+
+  ///NOISE e-
+  TH1F hNoiseEl("noiseEl_L@layerL@ladderS@sensor@view",
+                "noise in e- in @layer.@ladder.@sensor @view/@side",
+                600, -199.5, 1499.5);
+  hNoiseEl.GetXaxis()->SetTitle("strip noise (e-)");
+  m_hNoiseEl = new SVDHistograms<TH1F>(hNoiseEl);
+
+  TH2F h2NoiseEl_512("noiseEl2D_512_L@layerL@ladderS@sensor@view",
+                     "noise in e- in @layer.@ladder.@sensor @view/@side VS strip number",
+                     128 * 4, -0.5, 128 * 4 - 0.5, 600, -199.5, 1499.5);
+  h2NoiseEl_512.GetYaxis()->SetTitle("strip noise (e-)");
+  h2NoiseEl_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2NoiseEl_768("noiseEl2D_768_L@layerL@ladderS@sensor@view",
+                     "noise in e- in @layer.@ladder.@sensor @view/@side VS strip number",
+                     128 * 6, -0.5, 128 * 6 - 0.5, 600, -199.5, 1499.5);
+  h2NoiseEl_768.GetYaxis()->SetTitle("strip noise (e-)");
+  h2NoiseEl_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2NoiseEl = new SVDHistograms<TH2F>(h2NoiseEl_768, h2NoiseEl_768, h2NoiseEl_768, h2NoiseEl_512);
+
+
+  ///PEDESTAL ADC
+  TH1F hPedestal("pedestalADC_L@layerL@ladderS@sensor@view",
+                 "pedestal in ADC in @layer.@ladder.@sensor @view/@side",
+                 200, -199.5, 599.5);
+  hPedestal.GetXaxis()->SetTitle("strip pedestal (ADC)");
+  m_hPedestal = new SVDHistograms<TH1F>(hPedestal);
+
+  TH2F h2Pedestal_512("pedestal2D_512_L@layerL@ladderS@sensor@view",
+                      "pedestal in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                      128 * 4, -0.5, 128 * 4 - 0.5, 200, -199.5, 599.5);
+  h2Pedestal_512.GetYaxis()->SetTitle("strip pedestal (ADC)");
+  h2Pedestal_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2Pedestal_768("pedestal2D_768_L@layerL@ladderS@sensor@view",
+                      "pedestal in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                      128 * 6, -0.5, 128 * 6 - 0.5, 200, -199.5, 599.5);
+  h2Pedestal_768.GetYaxis()->SetTitle("strip pedestal (ADC)");
+  h2Pedestal_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2Pedestal = new SVDHistograms<TH2F>(h2Pedestal_768, h2Pedestal_768, h2Pedestal_768, h2Pedestal_512);
+
+  /// 1/GAIN (e-/ADC)
+  TH1F hGain("gainADC_L@layerL@ladderS@sensor@view",
+             "1/gain in @layer.@ladder.@sensor @view/@side",
+             300, -0.5, 499.5);
+  hGain.GetXaxis()->SetTitle("strip 1/gain (e-/ADC)");
+  m_hGain = new SVDHistograms<TH1F>(hGain);
+
+  TH2F h2Gain_512("gain2D_512_L@layerL@ladderS@sensor@view",
+                  "1/gain in @layer.@ladder.@sensor @view/@side VS strip number",
+                  128 * 4, -0.5, 128 * 4 - 0.5, 300, -0.5, 499.5);
+  h2Gain_512.GetYaxis()->SetTitle("strip 1/gain (e-/ADC)");
+  h2Gain_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2Gain_768("gain2D_768_L@layerL@ladderS@sensor@view",
+                  "1/gain in @layer.@ladder.@sensor @view/@side VS strip number",
+                  128 * 6, -0.5, 128 * 6 - 0.5, 300, -0.5, 499.5);
+  h2Gain_768.GetYaxis()->SetTitle("strip 1/gain (e-/ADC)");
+  h2Gain_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2Gain = new SVDHistograms<TH2F>(h2Gain_768, h2Gain_768, h2Gain_768, h2Gain_512);
 
 }
 
@@ -335,152 +398,119 @@ void SVDCalibrationsMonitorModule::event()
         m_ladder = ladder;
         m_sensor = sensor;
 
-        for (int Ustrip = 0; Ustrip < currentSensorInfo->getUCells(); Ustrip++) {
-          //fill your histogram for U side
-          m_mask = -1;
-          if (m_MaskedStr.isValid())
-            m_mask = m_MaskedStr.isMasked(theVxdID, 1, Ustrip);
-          h_mask[layer][ladder][sensor][1]->Fill(m_mask);
+        for (m_side = 0; m_side < 2; m_side++) {
 
-          float ADCnoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
-          h_noise[layer][ladder][sensor][1]->Fill(ADCnoise);
-          double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 1, Ustrip);
-          h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
+          int Ncells = currentSensorInfo->getUCells();
+          if (m_side == 0)
+            Ncells = currentSensorInfo->getVCells();
 
-          float ELECgain = m_PulseShapeCal.getChargeFromADC(theVxdID, 1, Ustrip, 1);
-          h_gainInElectrons[layer][ladder][sensor][1]->Fill(ELECgain);
-          float time = m_PulseShapeCal.getPeakTime(theVxdID, 1, Ustrip);
-          h_peakTime[layer][ladder][sensor][1]->Fill(time);
-          float width =  m_PulseShapeCal.getWidth(theVxdID, 1, Ustrip);
-          h_pulseWidth[layer][ladder][sensor][1]->Fill(width);
-          float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, 1, Ustrip);
-          h_timeshift[layer][ladder][sensor][1]->Fill(time_shift);
-          float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 1, Ustrip,
-                                   0); /*reading by default the trigger bin #0*/
-          h_triggerbin[layer][ladder][sensor][1]->Fill(triggerbin_shift);
+          for (m_strip = 0; m_strip < Ncells; m_strip++) {
 
-          float clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, 1);
-          h_clsSNR[layer][ladder][sensor][1]->Fill(clsSNR);
-          float clsSeedSNR = m_ClusterCal.getMinSeedSNR(theVxdID, 1);
-          h_clsSeedSNR[layer][ladder][sensor][1]->Fill(clsSeedSNR);
-          float clsAdjSNR = m_ClusterCal.getMinAdjSNR(theVxdID, 1);
-          h_clsAdjSNR[layer][ladder][sensor][1]->Fill(clsAdjSNR);
-          float clsScaleErr1 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 1, 1);
-          h_clsScaleErr1[layer][ladder][sensor][1]->Fill(clsScaleErr1);
-          float clsScaleErr2 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 2, 1);
-          h_clsScaleErr2[layer][ladder][sensor][1]->Fill(clsScaleErr2);
-          float clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 3, 1);
-          h_clsScaleErr3[layer][ladder][sensor][1]->Fill(clsScaleErr3);
+            m_mask = -1;
+            if (m_MaskedStr.isValid())
+              m_mask = m_MaskedStr.isMasked(theVxdID, m_side, m_strip);
+            m_hMask->fill(theVxdID, m_side, m_mask);
+            m_h2Mask->fill(theVxdID, m_side, m_strip, m_mask);
 
-          float clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, 1);
-          h_clsTimeMin[layer][ladder][sensor][1]->Fill(clsTimeMin);
+            m_noise = -1;
+            m_noiseEl = -1;
+            if (m_NoiseCal.isValid()) {
+              m_noise = m_NoiseCal.getNoise(theVxdID, m_side, m_strip);
+              m_noiseEl = m_NoiseCal.getNoiseInElectrons(theVxdID, m_side, m_strip);
+            }
+            m_hNoise->fill(theVxdID, m_side, m_noise);
+            m_h2Noise->fill(theVxdID, m_side, m_strip, m_noise);
+            m_hNoiseEl->fill(theVxdID, m_side, m_noiseEl);
+            m_h2NoiseEl->fill(theVxdID, m_side, m_strip, m_noiseEl);
 
-          float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 1);
-          h_clsTimeFuncVersion[layer][ladder][sensor][1]->Fill(clsTimeFunc);
+            m_pedestal = -1;
+            if (m_PedestalCal.isValid())
+              m_pedestal = m_PedestalCal.getPedestal(theVxdID, m_side, m_strip);
+            m_hPedestal->fill(theVxdID, m_side, m_pedestal);
+            m_h2Pedestal->fill(theVxdID, m_side, m_strip, m_pedestal);
 
-          m_side = 1;
-          m_strip = Ustrip;
-          m_noise = ADCnoise;
-          m_gain = ELECgain;
-          m_pulseWidth = width;
-          m_peakTime = time;
-          m_treeDetailed->Fill();
-
-        } //histogram filled for U side
-
-        for (int Vstrip = 0; Vstrip < currentSensorInfo->getVCells(); Vstrip++) {
-          //fill your histogram for V side
+            m_gain = -1;
+            if (m_PulseShapeCal.isValid())
+              m_gain = m_PulseShapeCal.getChargeFromADC(theVxdID, m_side, m_strip, 1/*ADC*/);
+            m_hGain->fill(theVxdID, m_side, m_gain);
+            m_h2Gain->fill(theVxdID, m_side, m_strip, m_gain);
 
 
-          m_mask = -1;
-          if (m_MaskedStr.isValid())
-            m_mask = m_MaskedStr.isMasked(theVxdID, 1, Vstrip);
+            float time = m_PulseShapeCal.getPeakTime(theVxdID, m_side, m_strip);
+            h_peakTime[layer][ladder][sensor][m_side]->Fill(time);
+            float width =  m_PulseShapeCal.getWidth(theVxdID, m_side, m_strip);
+            h_pulseWidth[layer][ladder][sensor][m_side]->Fill(width);
+            float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, m_side, m_strip);
+            h_timeshift[layer][ladder][sensor][m_side]->Fill(time_shift);
+            float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, m_side, m_strip,
+                                     0); /*reading by default the trigger bin #0*/
+            h_triggerbin[layer][ladder][sensor][m_side]->Fill(triggerbin_shift);
 
-          float ADCnoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
-          h_noise[layer][ladder][sensor][0]->Fill(ADCnoise);
-          double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 0, Vstrip);
-          h_noiseInElectrons[layer][ladder][sensor][0]->Fill(noiseInElectrons);
+            float clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, m_side);
+            h_clsSNR[layer][ladder][sensor][m_side]->Fill(clsSNR);
+            float clsSeedSNR = m_ClusterCal.getMinSeedSNR(theVxdID, m_side);
+            h_clsSeedSNR[layer][ladder][sensor][m_side]->Fill(clsSeedSNR);
+            float clsAdjSNR = m_ClusterCal.getMinAdjSNR(theVxdID, m_side);
+            h_clsAdjSNR[layer][ladder][sensor][m_side]->Fill(clsAdjSNR);
+            float clsScaleErr1 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 1, 1);
+            h_clsScaleErr1[layer][ladder][sensor][m_side]->Fill(clsScaleErr1);
+            float clsScaleErr2 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 2, 1);
+            h_clsScaleErr2[layer][ladder][sensor][m_side]->Fill(clsScaleErr2);
+            float clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 3, 1);
+            h_clsScaleErr3[layer][ladder][sensor][m_side]->Fill(clsScaleErr3);
 
-          float ELECgain = m_PulseShapeCal.getChargeFromADC(theVxdID, 0, Vstrip, 1);
-          h_gainInElectrons[layer][ladder][sensor][0]->Fill(ELECgain);
-          float time = m_PulseShapeCal.getPeakTime(theVxdID, 0, Vstrip);
-          h_peakTime[layer][ladder][sensor][0]->Fill(time);
-          float width =  m_PulseShapeCal.getWidth(theVxdID, 0, Vstrip);
-          h_pulseWidth[layer][ladder][sensor][0]->Fill(width);
-          float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, 0, Vstrip);
-          h_timeshift[layer][ladder][sensor][0]->Fill(time_shift);
-          float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 0, Vstrip,
-                                   0); /*reading by default the trigger bin #0*/
-          h_triggerbin[layer][ladder][sensor][0]->Fill(triggerbin_shift);
+            float clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, m_side);
+            h_clsTimeMin[layer][ladder][sensor][m_side]->Fill(clsTimeMin);
 
-          float clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, 0);
-          h_clsSNR[layer][ladder][sensor][0]->Fill(clsSNR);
-          float clsSeedSNR = m_ClusterCal.getMinSeedSNR(theVxdID, 0);
-          h_clsSeedSNR[layer][ladder][sensor][0]->Fill(clsSeedSNR);
-          float clsAdjSNR = m_ClusterCal.getMinAdjSNR(theVxdID, 0);
-          h_clsAdjSNR[layer][ladder][sensor][0]->Fill(clsAdjSNR);
-          float clsScaleErr1 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 0, 1, 1);
-          h_clsScaleErr1[layer][ladder][sensor][0]->Fill(clsScaleErr1);
-          float clsScaleErr2 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 0, 2, 1);
-          h_clsScaleErr2[layer][ladder][sensor][0]->Fill(clsScaleErr2);
-          float clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 0, 3, 1);
-          h_clsScaleErr3[layer][ladder][sensor][0]->Fill(clsScaleErr3);
+            float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, m_side);
+            h_clsTimeFuncVersion[layer][ladder][sensor][m_side]->Fill(clsTimeFunc);
 
-          float clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, 0);
-          h_clsTimeMin[layer][ladder][sensor][0]->Fill(clsTimeMin);
+            m_pulseWidth = width;
+            m_peakTime = time;
+            m_treeDetailed->Fill();
 
-          float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 0);
-          h_clsTimeFuncVersion[layer][ladder][sensor][0]->Fill(clsTimeFunc);
+          }
 
-          m_side = 0;
-          m_strip = Vstrip;
-          m_noise = ADCnoise;
-          m_gain = ELECgain;
-          m_pulseWidth = width;
-          m_peakTime = time;
-          m_treeDetailed->Fill();
+        }
 
-
-        } //histogram filled for V side
-
-
-        for (int s = 0; s < 2; s++) {
-          m_side = s;
-          m_noiseAVE = h_noise[layer][ladder][sensor][s]->GetMean();
-          m_noiseRMS = h_noise[layer][ladder][sensor][s]->GetRMS();
-          m_gainAVE = h_gainInElectrons[layer][ladder][sensor][s]->GetMean();
-          m_gainRMS = h_gainInElectrons[layer][ladder][sensor][s]->GetRMS();
-          m_peakTimeAVE = h_peakTime[layer][ladder][sensor][s]->GetMean();
-          m_peakTimeRMS = h_peakTime[layer][ladder][sensor][s]->GetRMS();
-          m_pulseWidthAVE = h_pulseWidth[layer][ladder][sensor][s]->GetMean();
-          m_pulseWidthRMS = h_pulseWidth[layer][ladder][sensor][s]->GetRMS();
+        //compute averages adn RMS
+        for (m_side = 0; m_side < 2; m_side++) {
+          m_noiseAVE = -1; //h_noise[layer][ladder][sensor][m_side]->GetMean();
+          m_noiseRMS = -1; //h_noise[layer][ladder][sensor][m_side]->GetRMS();
+          m_gainAVE = -1;//h_gainInElectrons[layer][ladder][sensor][m_side]->GetMean();
+          m_gainRMS = -1;//h_gainInElectrons[layer][ladder][sensor][m_side]->GetRMS();
+          m_peakTimeAVE = h_peakTime[layer][ladder][sensor][m_side]->GetMean();
+          m_peakTimeRMS = h_peakTime[layer][ladder][sensor][m_side]->GetRMS();
+          m_pulseWidthAVE = h_pulseWidth[layer][ladder][sensor][m_side]->GetMean();
+          m_pulseWidthRMS = h_pulseWidth[layer][ladder][sensor][m_side]->GetRMS();
           m_tree->Fill();
 
-          //fill TProfiles
-          char profName[128];
-          char selection[128];
-          TString nameSide = "";
-          if (s == 1)
-            nameSide = "U";
-          else if (s == 0)
-            nameSide = "V";
+          /*
+                //fill TProfiles
+                char profName[128];
+                char selection[128];
+                TString nameSide = "";
+                if (m_side == 1)
+                  nameSide = "U";
+                else if (m_side == 0)
+                  nameSide = "V";
 
-          //mask
-          sprintf(profName, "prof_masked_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
-          sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, s);
-          m_treeDetailed->Project(profName, "mask:strip", selection);
+                //mask
+                sprintf(profName, "prof_masked_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
+                sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, m_side);
+          //          m_treeDetailed->Project(profName, "mask:strip", selection);
 
-          //noise
-          sprintf(profName, "prof_noiseADC_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
-          sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, s);
+                //noise
+                sprintf(profName, "prof_noiseADC_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
+                sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, m_side);
           m_treeDetailed->Project(profName, "noise:strip", selection);
 
 
-          //gain
-          sprintf(profName, "prof_gain_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
-          sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, s);
-          m_treeDetailed->Project(profName, "gain:strip", selection);
-
+                //gain
+                sprintf(profName, "prof_gain_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
+                sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, m_side);
+                m_treeDetailed->Project(profName, "gain:strip", selection);
+          */
         }
         ++itSvdSensors;
       }
@@ -513,38 +543,43 @@ void SVDCalibrationsMonitorModule::terminate()
     m_treeDetailed->Write();
     m_tree->Write();
 
-    //writing the histogram list for the masks in ADC units
     m_rootFilePtr->mkdir("masked_strips");
-    m_rootFilePtr->cd("masked_strips");
-
-    TIter nextH_mask(m_histoList_mask);
-    while ((obj = nextH_mask()))
-      obj->Write();
-
-    //writing the histogram list for the noises in ADC units
+    m_rootFilePtr->mkdir("pedestal_ADCunits");
     m_rootFilePtr->mkdir("noise_ADCunits");
-    m_rootFilePtr->cd("noise_ADCunits");
-    TIter nextH_noise(m_histoList_noise);
-    while ((obj = nextH_noise()))
-      obj->Write();
-
-
-    //writing the histogram list for the noises in electron charge
     m_rootFilePtr->mkdir("noise_electronsCharge");
-    m_rootFilePtr->cd("noise_electronsCharge");
-    TIter nextH_noiseInElectrons(m_histoList_noiseInElectrons);
-    while ((obj = nextH_noiseInElectrons()))
-      obj->Write();
-
-
-
-    //writing the histogram list for the gains in electron charge
     m_rootFilePtr->mkdir("gain_electronsCharge");
-    m_rootFilePtr->cd("gain_electronsCharge");
-    TIter nextH_gainInElectrons(m_histoList_gainInElectrons);
-    while ((obj = nextH_gainInElectrons()))
-      obj->Write();
+    VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
+    for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+      for (auto ladder : geoCache.getLadders(layer))
+        for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+          for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
+
+            //writing the histogram list for the masks in ADC units
+            m_rootFilePtr->cd("masked_strips");
+            (m_hMask->getHistogram(sensor, view))->Write();
+            (m_h2Mask->getHistogram(sensor, view))->Write();
+
+            //writing the histogram list for the pedestals in ADC units
+            m_rootFilePtr->cd("pedestal_ADCunits");
+            (m_hPedestal->getHistogram(sensor, view))->Write();
+            (m_h2Pedestal->getHistogram(sensor, view))->Write();
+
+            //writing the histogram list for the noises in ADC units
+            m_rootFilePtr->cd("noise_ADCunits");
+            (m_hNoise->getHistogram(sensor, view))->Write();
+            (m_h2Noise->getHistogram(sensor, view))->Write();
+
+            //writing the histogram list for the noises in electron charge
+            m_rootFilePtr->cd("noise_electronsCharge");
+            (m_hNoiseEl->getHistogram(sensor, view))->Write();
+            (m_h2NoiseEl->getHistogram(sensor, view))->Write();
+
+            //writing the histogram list for the gains in electron charge
+            m_rootFilePtr->cd("gain_electronsCharge");
+            (m_hGain->getHistogram(sensor, view))->Write();
+            (m_h2Gain->getHistogram(sensor, view))->Write();
+          }
 
     //writing the histogram list for the peak times in ns
     m_rootFilePtr->mkdir("peakTime");

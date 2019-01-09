@@ -1025,6 +1025,128 @@ class Validation:
         # execute slow scripts first
         self.sort_scripts(remaining_scripts)
 
+        def handle_finished_script(script_obj):
+            # Write to log that the script finished
+            self.log.debug('Finished: ' + script_obj.path)
+
+            # If we are running locally, log a runtime
+            script_obj.runtime = time.time() - script_obj.start_time
+            if self.mode == "local":
+                runtimes.write(script_obj.name + "=" +
+                               str(script_obj.runtime) + "\n")
+
+            # Check for the return code and set variables accordingly
+            script_obj.status = ScriptStatus.finished
+            script_obj.returncode = result[1]
+            if result[1] != 0:
+                script_obj.status = ScriptStatus.failed
+                self.log.warning(
+                    'exit_status was {0} for {1}'.format(
+                        result[1], script_obj.path
+                    )
+                )
+
+                # Skip all dependent scripts
+                self.skip_script(script_obj)
+
+            else:
+                # Remove this script from the dependencies of dependent
+                # script objects
+                for dependent_script in remaining_scripts:
+                    if script_obj in dependent_script.dependencies:
+                        dependent_script.dependencies.remove(script_obj)
+
+            # Some printout in quiet mode
+            if self.quiet:
+                waiting = [script for script in remaining_scripts
+                           if script.status == ScriptStatus.waiting]
+                running = [script for script in remaining_scripts
+                           if script.status == ScriptStatus.running]
+                print(
+                    'Finished [{0},{1}]: {2} -> {3}'.format(
+                        len(waiting),
+                        len(running),
+                        script_obj.path,
+                        script_obj.status
+                    )
+                )
+
+        def handle_unfinished_script(script_obj):
+            if (time.time() - script_obj.last_report_time) / 60.0 > \
+                    self.running_script_reporting_interval:
+                print(
+                    "Script {} running since {} seconds".format(
+                        script_obj.name_not_sanitized,
+                        time.time() - script_obj.start_time))
+                # explicit flush so this will show up in log file right away
+                sys.stdout.flush()
+
+                # not finished yet, log time
+                script_obj.last_report_time = time.time()
+
+            # check for the maximum time a script is allow to run and
+            # terminate if exceeded
+            total_runtime_in_minutes = \
+                (time.time() - script_obj.start_time) / 60.0
+            if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
+                script_obj.status = ScriptStatus.failed
+                self.log.warning(
+                    'Script {0} did not finish after {1} minutes, '
+                    'skipping '.format(
+                        script_obj.path,
+                        total_runtime_in_minutes)
+                )
+                # kill the running process
+                script_obj.control.terminate(script_obj)
+                # Skip all dependent scripts
+                self.skip_script(script_obj)
+
+        def handle_waiting_script(script_obj):
+            # Determine the way of execution depending on whether
+            # data files are created
+            if script_obj.header and \
+               script_obj.header.get('output', []):
+                script_obj.control = control
+            else:
+                script_obj.control = local_control
+
+            # Do not spawn processes if there are already too many!
+            if script_obj.control.available():
+
+                # Write to log which script is being started
+                self.log.debug('Starting ' + script_obj.path)
+
+                # Set script object variables accordingly
+                if script_obj.status == ScriptStatus.failed:
+                    self.log.warning(
+                        'Starting of {0} failed'.format(script_obj.path)
+                    )
+                else:
+                    script_obj.status = ScriptStatus.running
+
+                # Actually start the script execution
+                script_obj.control.execute(
+                    script_obj,
+                    self.basf2_options,
+                    self.dry,
+                    self.tag
+                )
+
+                # Log the script execution start time
+                script_obj.start_time = time.time()
+                script_obj.last_report_time = time.time()
+
+                # Some printout in quiet mode
+                if self.quiet:
+                    waiting = [_ for _ in remaining_scripts
+                               if _.status == ScriptStatus.waiting]
+                    running = [_ for _ in remaining_scripts
+                               if _.status == ScriptStatus.running]
+                    print('Started [{0},{1}]: {2}'.format(
+                        len(waiting), len(running),
+                        script_obj.path)
+                    )
+
         # While there are scripts that have not yet been executed...
         while remaining_scripts:
 
@@ -1040,118 +1162,21 @@ class Validation:
 
                     # If it has finished:
                     if result[0]:
-
-                        # Write to log that the script finished
-                        self.log.debug('Finished: ' + script_object.path)
-
-                        # If we are running locally, log a runtime
-                        script_object.runtime = time.time() - script_object.start_time
-                        if self.mode == "local":
-                            runtimes.write(script_object.name + "=" + str(script_object.runtime) + "\n")
-
-                        # Check for the return code and set variables
-                        # accordingly
-                        script_object.status = ScriptStatus.finished
-                        script_object.returncode = result[1]
-                        if result[1] != 0:
-                            script_object.status = ScriptStatus.failed
-                            self.log.warning('exit_status was {0} for {1}'
-                                             .format(result[1],
-                                                     script_object.path))
-
-                            # Skip all dependent scripts
-                            self.skip_script(script_object)
-
-                        else:
-                            # Remove this script from the dependencies
-                            # of dependent script objects
-                            for dependent_script in remaining_scripts:
-                                if script_object in \
-                                   dependent_script.dependencies:
-                                    dependent_script.dependencies.\
-                                        remove(script_object)
-
-                        # Some printout in quiet mode
-                        if self.quiet:
-                            waiting = [script for script in remaining_scripts
-                                       if script.status == ScriptStatus.waiting]
-                            running = [script for script in remaining_scripts
-                                       if script.status == ScriptStatus.running]
-                            print('Finished [{0},{1}]: {2} -> {3}'.format(
-                                len(waiting), len(running),
-                                script_object.path,
-                                script_object.status))
+                        handle_finished_script(script_object)
                     else:
-
-                        if (time.time() - script_object.last_report_time) / 60.0 > self.running_script_reporting_interval:
-                            print(
-                                "Script {} running since {} seconds".format(
-                                    script_object.name_not_sanitized,
-                                    time.time() - script_object.start_time))
-                            # explicit flush so this will show up in log file right away
-                            sys.stdout.flush()
-
-                            # not finished yet, log time
-                            script_object.last_report_time = time.time()
-
-                        # check for the maximum time a script is allow to run and terminate if exceeded
-                        total_runtime_in_minutes = (time.time() - script_object.start_time) / 60.0
-                        if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
-                            script_object.status = ScriptStatus.failed
-                            self.log.warning('Script {0} did not finish after {1} minutes, skipping '
-                                             .format(script_object.path, total_runtime_in_minutes))
-                            # kill the running process
-                            script_object.control.terminate(script_object)
-                            # Skip all dependent scripts
-                            self.skip_script(script_object)
+                        handle_unfinished_script(script_object)
 
                 # Otherwise (the script is waiting) and if it is ready to be
                 # executed
                 elif not script_object.dependencies:
-
-                    # Determine the way of execution depending on whether
-                    # data files are created
-                    if script_object.header and \
-                       script_object.header.get('output', []):
-                        script_object.control = control
-                    else:
-                        script_object.control = local_control
-
-                    # Do not spawn processes if there are already too many!
-                    if script_object.control.available():
-
-                        # Write to log which script is being started
-                        self.log.debug('Starting ' + script_object.path)
-
-                        # Set script object variables accordingly
-                        if script_object.status == ScriptStatus.failed:
-                            self.log.warning('Starting of {0} failed'.
-                                             format(script_object.path))
-                        else:
-                            script_object.status = ScriptStatus.running
-
-                        # Actually start the script execution
-                        script_object.control.execute(script_object,
-                                                      self.basf2_options,
-                                                      self.dry, self.tag)
-
-                        # Log the script execution start time
-                        script_object.start_time = time.time()
-                        script_object.last_report_time = time.time()
-
-                        # Some printout in quiet mode
-                        if self.quiet:
-                            waiting = [_ for _ in remaining_scripts
-                                       if _.status == ScriptStatus.waiting]
-                            running = [_ for _ in remaining_scripts
-                                       if _.status == ScriptStatus.running]
-                            print('Started [{0},{1}]: {2}'.format(
-                                len(waiting), len(running),
-                                script_object.path))
+                    handle_waiting_script(script_object)
 
             # Update the list of scripts that have to be processed
-            remaining_scripts = [script for script in remaining_scripts if
-                                 script.status in [ScriptStatus.waiting, ScriptStatus.running]]
+            remaining_scripts = [
+                script for script in remaining_scripts
+                if script.status in [ScriptStatus.waiting,
+                                     ScriptStatus.running]
+            ]
 
             # Sort them again, Justin Case
             self.sort_scripts(remaining_scripts)

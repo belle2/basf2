@@ -39,8 +39,6 @@ void SVDCalibrationsMonitorModule::initialize()
 {
 
 
-  m_histoList_peakTime = new TList;
-  m_histoList_pulseWidth = new TList;
   m_histoList_timeshift = new TList;
   m_histoList_triggerbin = new TList;
   m_histoList_cluster = new TList;
@@ -123,19 +121,6 @@ void SVDCalibrationsMonitorModule::initialize()
             nameSide = "V";
 
 
-
-          //PEAK TIME
-          NameOfHisto = "peakTime_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "Peak time (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_peakTime[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5, "Peak Time (ns)",
-                                                                      m_histoList_peakTime);
-
-
-          //PULSE WIDTH
-          NameOfHisto = "pulseWidth_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "Pulse width (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
-          h_pulseWidth[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5, "Pulse width (ns)",
-                                                      m_histoList_pulseWidth);
 
           //------ OFFLINE CALIBRATION CONSTANTS ------
 
@@ -361,6 +346,48 @@ void SVDCalibrationsMonitorModule::beginRun()
 
   m_h2Gain = new SVDHistograms<TH2F>(h2Gain_768, h2Gain_768, h2Gain_768, h2Gain_512);
 
+  // PEAKTIME (ns)
+  TH1F hPeakTime("peakTime_L@layerL@ladderS@sensor@view",
+                 "peakTime in @layer.@ladder.@sensor @view/@side",
+                 255, -0.5, 254.5);
+  hPeakTime.GetXaxis()->SetTitle("strip peakTime (ns)");
+  m_hPeakTime = new SVDHistograms<TH1F>(hPeakTime);
+
+  TH2F h2PeakTime_512("peakTime2D_512_L@layerL@ladderS@sensor@view",
+                      "peakTime in @layer.@ladder.@sensor @view/@side VS strip number",
+                      128 * 4, -0.5, 128 * 4 - 0.5, 255, -0.5, 254.5);
+  h2PeakTime_512.GetYaxis()->SetTitle("strip peakTime (ns)");
+  h2PeakTime_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2PeakTime_768("peakTime2D_768_L@layerL@ladderS@sensor@view",
+                      "peakTime in @layer.@ladder.@sensor @view/@side VS strip number",
+                      128 * 6, -0.5, 128 * 6 - 0.5, 255, -0.5, 254.5);
+  h2PeakTime_768.GetYaxis()->SetTitle("strip peakTime (ns)");
+  h2PeakTime_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2PeakTime = new SVDHistograms<TH2F>(h2PeakTime_768, h2PeakTime_768, h2PeakTime_768, h2PeakTime_512);
+
+  // PULSE WIDTH (ns)
+  TH1F hPulseWidth("pulseWidth_L@layerL@ladderS@sensor@view",
+                   "pulseWidth in @layer.@ladder.@sensor @view/@side",
+                   255, -0.5, 254.5);
+  hPulseWidth.GetXaxis()->SetTitle("strip pulseWidth (ns)");
+  m_hPulseWidth = new SVDHistograms<TH1F>(hPulseWidth);
+
+  TH2F h2PulseWidth_512("pulseWidth2D_512_L@layerL@ladderS@sensor@view",
+                        "pulseWidth in @layer.@ladder.@sensor @view/@side VS strip number",
+                        128 * 4, -0.5, 128 * 4 - 0.5, 255, -0.5, 254.5);
+  h2PulseWidth_512.GetYaxis()->SetTitle("strip pulseWidth (ns)");
+  h2PulseWidth_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2PulseWidth_768("pulseWidth2D_768_L@layerL@ladderS@sensor@view",
+                        "pulseWidth in @layer.@ladder.@sensor @view/@side VS strip number",
+                        128 * 6, -0.5, 128 * 6 - 0.5, 255, -0.5, 254.5);
+  h2PulseWidth_768.GetYaxis()->SetTitle("strip pulseWidth (ns)");
+  h2PulseWidth_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2PulseWidth = new SVDHistograms<TH2F>(h2PulseWidth_768, h2PulseWidth_768, h2PulseWidth_768, h2PulseWidth_512);
+
 }
 
 void SVDCalibrationsMonitorModule::event()
@@ -430,16 +457,19 @@ void SVDCalibrationsMonitorModule::event()
             m_h2Pedestal->fill(theVxdID, m_side, m_strip, m_pedestal);
 
             m_gain = -1;
-            if (m_PulseShapeCal.isValid())
+            if (m_PulseShapeCal.isValid()) {
               m_gain = m_PulseShapeCal.getChargeFromADC(theVxdID, m_side, m_strip, 1/*ADC*/);
+              m_peakTime = m_PulseShapeCal.getPeakTime(theVxdID, m_side, m_strip);
+              m_pulseWidth = m_PulseShapeCal.getWidth(theVxdID, m_side, m_strip);
+            }
             m_hGain->fill(theVxdID, m_side, m_gain);
             m_h2Gain->fill(theVxdID, m_side, m_strip, m_gain);
+            m_hPeakTime->fill(theVxdID, m_side, m_peakTime);
+            m_h2PeakTime->fill(theVxdID, m_side, m_strip, m_peakTime);
+            m_hPulseWidth->fill(theVxdID, m_side, m_pulseWidth);
+            m_h2PulseWidth->fill(theVxdID, m_side, m_strip, m_pulseWidth);
 
 
-            float time = m_PulseShapeCal.getPeakTime(theVxdID, m_side, m_strip);
-            h_peakTime[layer][ladder][sensor][m_side]->Fill(time);
-            float width =  m_PulseShapeCal.getWidth(theVxdID, m_side, m_strip);
-            h_pulseWidth[layer][ladder][sensor][m_side]->Fill(width);
             float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, m_side, m_strip);
             h_timeshift[layer][ladder][sensor][m_side]->Fill(time_shift);
             float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, m_side, m_strip,
@@ -465,8 +495,6 @@ void SVDCalibrationsMonitorModule::event()
             float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, m_side);
             h_clsTimeFuncVersion[layer][ladder][sensor][m_side]->Fill(clsTimeFunc);
 
-            m_pulseWidth = width;
-            m_peakTime = time;
             m_treeDetailed->Fill();
 
           }
@@ -479,10 +507,10 @@ void SVDCalibrationsMonitorModule::event()
           m_noiseRMS = -1; //h_noise[layer][ladder][sensor][m_side]->GetRMS();
           m_gainAVE = -1;//h_gainInElectrons[layer][ladder][sensor][m_side]->GetMean();
           m_gainRMS = -1;//h_gainInElectrons[layer][ladder][sensor][m_side]->GetRMS();
-          m_peakTimeAVE = h_peakTime[layer][ladder][sensor][m_side]->GetMean();
-          m_peakTimeRMS = h_peakTime[layer][ladder][sensor][m_side]->GetRMS();
-          m_pulseWidthAVE = h_pulseWidth[layer][ladder][sensor][m_side]->GetMean();
-          m_pulseWidthRMS = h_pulseWidth[layer][ladder][sensor][m_side]->GetRMS();
+          m_peakTimeAVE = -1; //h_peakTime[layer][ladder][sensor][m_side]->GetMean();
+          m_peakTimeRMS = -1; //h_peakTime[layer][ladder][sensor][m_side]->GetRMS();
+          m_pulseWidthAVE = -1;//h_pulseWidth[layer][ladder][sensor][m_side]->GetMean();
+          m_pulseWidthRMS = -1;//h_pulseWidth[layer][ladder][sensor][m_side]->GetRMS();
           m_tree->Fill();
 
           /*
@@ -548,6 +576,9 @@ void SVDCalibrationsMonitorModule::terminate()
     m_rootFilePtr->mkdir("noise_ADCunits");
     m_rootFilePtr->mkdir("noise_electronsCharge");
     m_rootFilePtr->mkdir("gain_electronsCharge");
+    m_rootFilePtr->mkdir("peakTime");
+    m_rootFilePtr->mkdir("pulseWidth");
+
     VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
     for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
@@ -579,23 +610,18 @@ void SVDCalibrationsMonitorModule::terminate()
             m_rootFilePtr->cd("gain_electronsCharge");
             (m_hGain->getHistogram(sensor, view))->Write();
             (m_h2Gain->getHistogram(sensor, view))->Write();
+
+            //writing the histogram list for the peak times in ns
+            m_rootFilePtr->cd("peakTime");
+            (m_hPeakTime->getHistogram(sensor, view))->Write();
+            (m_h2PeakTime->getHistogram(sensor, view))->Write();
+
+            //writing the histogram list for the pulse widths in ns
+            m_rootFilePtr->cd("pulseWidth");
+            (m_hPulseWidth->getHistogram(sensor, view))->Write();
+            (m_h2PulseWidth->getHistogram(sensor, view))->Write();
+
           }
-
-    //writing the histogram list for the peak times in ns
-    m_rootFilePtr->mkdir("peakTime");
-    m_rootFilePtr->cd("peakTime");
-
-    TIter nextH_peakTime(m_histoList_peakTime);
-    while ((obj = nextH_peakTime()))
-      obj->Write();
-
-    //writing the histogram list for the pulse widths in ns
-    m_rootFilePtr->mkdir("pulseWidth");
-    m_rootFilePtr->cd("pulseWidth");
-
-    TIter nextH_width(m_histoList_pulseWidth);
-    while ((obj = nextH_width()))
-      obj->Write();
 
     //writing the histogram list for the time shift correction in ns
     m_rootFilePtr->mkdir("CoG_ShiftMeanToZero");

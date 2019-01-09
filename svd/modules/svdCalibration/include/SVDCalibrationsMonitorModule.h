@@ -133,7 +133,6 @@ namespace Belle2 {
     static const int m_maxSides = 2;
 
 
-    TList* m_histoList_peakTime;
     TList* m_histoList_pulseWidth;
     TList* m_histoList_timeshift;
     TList* m_histoList_cluster;
@@ -146,23 +145,26 @@ namespace Belle2 {
     //    SVDHistograms<TProfile>* m_pMask = NULL; /**< masked strips profile */
 
     //NOISE
-    SVDHistograms<TH1F>* m_hNoise = NULL; /**< noise histo */
-    SVDHistograms<TH2F>* m_h2Noise = NULL; /**< noise VS strip 2D histo */
+    SVDHistograms<TH1F>* m_hNoise = NULL; /**< noise (ADC) histo */
+    SVDHistograms<TH2F>* m_h2Noise = NULL; /**< noise (ADC) VS strip 2D histo */
     SVDHistograms<TH1F>* m_hNoiseEl = NULL; /**< noise in e- histo */
     SVDHistograms<TH2F>* m_h2NoiseEl = NULL; /**< noise in e- VS strip 2D histo */
 
     //PEDESTAL
-    SVDHistograms<TH1F>* m_hPedestal = NULL; /**< pedestal histo */
-    SVDHistograms<TH2F>* m_h2Pedestal = NULL; /**< pedestal VS strip 2D histo */
+    SVDHistograms<TH1F>* m_hPedestal = NULL; /**< pedestal (ADC) histo */
+    SVDHistograms<TH2F>* m_h2Pedestal = NULL; /**< pedestal (ADC) VS strip 2D histo */
 
     //GAIN
-    SVDHistograms<TH1F>* m_hGain = NULL; /**< gain histo */
-    SVDHistograms<TH2F>* m_h2Gain = NULL; /**< gain VS strip 2D histo */
+    SVDHistograms<TH1F>* m_hGain = NULL; /**< gain (e-/ADC) histo */
+    SVDHistograms<TH2F>* m_h2Gain = NULL; /**< gain (e-/ADC) VS strip 2D histo */
 
+    //PEAKTIME
+    SVDHistograms<TH1F>* m_hPeakTime = NULL; /**< peakTime (ns) histo */
+    SVDHistograms<TH2F>* m_h2PeakTime = NULL; /**< peakTime (ns) VS strip 2D histo */
 
-    //PULSE PEAK (peak Time and Width)
-    TH1F* h_peakTime[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**<peakTime in ns*/
-    TH1F* h_pulseWidth[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**<pulse width in ns*/
+    //PULSEWIDTH
+    SVDHistograms<TH1F>* m_hPulseWidth = NULL; /**< peakTime (ns) histo */
+    SVDHistograms<TH2F>* m_h2PulseWidth = NULL; /**< peakTime (ns) VS strip 2D histo */
 
     //CoG OLD Corrections (Michael)
     //CoG TIME SHIFT

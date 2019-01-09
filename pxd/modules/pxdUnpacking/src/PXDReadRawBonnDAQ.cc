@@ -39,6 +39,7 @@ PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
   //setPropertyFlags(c_Input);
 
   addParam("FileName", m_filename, "file name");
+  addParam("SubRunNr", m_subRunNr, "sub-run number", 0u);
   addParam("RunNr", m_runNr, "run number", 0u);
   addParam("ExpNr", m_expNr, "exp number", 0u);
   m_nread = 0;

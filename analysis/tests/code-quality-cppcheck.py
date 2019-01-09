@@ -11,31 +11,39 @@ import re
 import sys
 
 
-def check_error_free(log, tool, toolname, filter=lambda x: True):
-    """Check that the provided code tool's log has no comments or warnings"""
-    clean_log = [e for e in str(log).split('\\n') if e and filter(e)]
-    if clean_log:
-        message = """\
-The analysis package has some {toolname} issues, which is now not allowed.
+def check_error_free(tool, toolname, package, filter=lambda x: False):
+    """
+    Check that the provided code tool doesn't procude comments or warnings
+
+    Arguments:
+        tool(str): executable to call
+        toolname(str): human readable name of the tool
+        package(str): package to run over. Also the first argument to the tool
+        filter(lambda): function which gets called for each line of output and
+           if it returns True the line will be ignored.
+    """
+    try:
+        output = subprocess.check_output([tool, package], encoding="utf8")
+    except subprocess.CalledProcessError as error:
+        print(error)
+        output = error.output
+
+    print(output)
+    clean_log = [e for e in output.splitlines() if e and not filter(e)]
+    if len(clean_log) > 0:
+        print(f"""\
+The {package} package has some {toolname} issues, which is now not allowed.
 Please run:
 
-  $ {tool} analysis
+  $ {tool} {package}
 
-and fix any issues you have introduced. Here is what the test {toolname} found:\
-    """.format(toolname=toolname, tool=tool)
-        print(message, file=sys.stderr)
-        for line in clean_log:
-            print(line, file=sys.stderr)
+and fix any issues you have introduced. Here is what {toolname} found:\n""")
+        print("\n".join(clean_log))
         sys.exit(1)
-    return
 
-# run cppcheck
-try:
-    cppcheck_output = subprocess.check_output(["b2code-cppcheck", "analysis"])
-except subprocess.CalledProcessError as error:
-    cppcheck_output = error.output
 
-# ignore the nofile .. [missingInclude] that is always at the end of cppcheck
-ignoreme = 'Cppcheck cannot find all the include files'
-check_error_free(cppcheck_output, "b2code-cppcheck", "cppcheck",
-                 lambda x: not re.findall(ignoreme, x) and x is not "'")
+if __name__ == "__main__":
+    # ignore the nofile .. [missingInclude] that is always at the end of cppcheck
+    ignoreme = 'Cppcheck cannot find all the include files'
+    check_error_free("b2code-cppcheck", "cppcheck", "analysis",
+                     lambda x: re.findall(ignoreme, x) or x is "'")

@@ -13,6 +13,9 @@ import json
 from validationfunctions import strip_ext, index_from_revision, get_style
 
 
+# todo: use os.path and clean up confusing of Plotuple.work_folder, Plotuple.path etc.
+
+
 class Plotuple:
 
     """!
@@ -207,15 +210,12 @@ class Plotuple:
         mop = metaoptions.MetaOptionParser(self.metaoptions)
         return mop.has_option("expert")
 
-    def chi2test(self, canvas):
+    def chi2test(self):
         """!
         Takes the reference (self.reference.object) and the newest revision
         (self.newest.object) and a canvas. Performs a Chi^2-Test on the
         two histograms and sets the background of the canvas correspondingly.
         Sets self.pvalue to the p-value of the Chi^2-Test.
-        @param canvas: Reference to the canvas on which we will draw (chi2test
-            may change the background color of the plot depending on the
-            p-value)
         @return: None
         """
         mop = metaoptions.MetaOptionParser(self.metaoptions)
@@ -259,7 +259,6 @@ class Plotuple:
 
         if no_comparison_but_still_different:
             self.comparison_result = "error"
-            canvas.SetFillColor(ROOT.kRed)
             self.pvalue = 0.0
 
         if pvalue is not None:
@@ -275,17 +274,12 @@ class Plotuple:
             # If pvalue < 0.01: Very strong presumption against neutral
             # hypothesis
             if pvalue < self.pvalue_error:
-                canvas.SetFillColor(ROOT.kRed)
                 self.comparison_result = "error"
             # If pvalue < 1: Deviations at least exists
             elif pvalue < self.pvalue_warn:
                 self.comparison_result = "warning"
-                canvas.SetFillColor(ROOT.kOrange)
             else:
                 self.comparison_result = "equal"
-                # use light green to show that the plot was compared and
-                # that the result was equal
-                canvas.SetFillColor(ROOT.kGreen - 3)
 
             self.chi2test_result = \
                 'Performed Chi^2-Test between reference and {} (Chi^2 = {} ' \
@@ -294,6 +288,29 @@ class Plotuple:
             self.pvalue = pvalue
         else:
             self.pvalue = None
+
+    def set_background(self, canvas):
+
+        colors = {
+            "error": ROOT.kRed,
+            "warning": ROOT.kOrange,
+            "equal": ROOT.kGreen - 3,
+            "not_compared": ROOT.kBlue - 7
+        }
+        colors_expert = {
+            "error": ROOT.kRed - 10,
+            "warning": ROOT.kOrange - 10,
+            "equal": ROOT.kGreen - 10,
+            "not_compared": ROOT.kBlue - 10
+        }
+
+        if self.is_expert():
+            color = colors_expert[self.comparison_result]
+        else:
+            color = colors[self.comparison_result]
+
+        canvas.SetFillColor(color)
+        canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
     def draw_ref(self, canvas):
         """!
@@ -469,11 +486,10 @@ class Plotuple:
         # Create a ROOT canvas on which we will draw our histograms
         self.width = 700
         if mode == '2D' and len(self.elements) > 4:
-            canvas = ROOT.TCanvas('', '', 700, 1050)
             self.height = 1050
         else:
-            canvas = ROOT.TCanvas('', '', 700, 525)
             self.height = 525
+        canvas = ROOT.TCanvas('', '', self.width, self.height)
 
         # Allow possibility to turn off the stats box
         if 'nostats' in self.metaoptions:
@@ -481,15 +497,16 @@ class Plotuple:
         else:
             ROOT.gStyle.SetOptStat("nemr")
 
-        if self.is_expert():
-            canvas.SetFillStyle(3004)
-            ROOT.gStyle.SetHatchesLineWidth(2)
-
         # If there is a reference object, and the list of plots is not empty,
         # perform a Chi^2-Test on the reference object and the first object in
         # the plot list:
         if self.reference is not None and self.newest:
-            self.chi2test(canvas)
+            self.chi2test()
+
+        # A variable which holds whether we
+        # have drawn on the canvas already or not
+        # (only used for the 1D case)
+        drawn = False
 
         # Now we distinguish between 1D and 2D histograms
         # If we have a 1D histogram
@@ -501,10 +518,6 @@ class Plotuple:
                 canvas.SetLogx()
             if 'logy' in self.metaoptions:
                 canvas.SetLogy()
-
-            # A variable which holds whether we
-            # have drawn on the canvas already or not
-            drawn = False
 
             # If there is a reference object, plot it first
             if self.reference is not None:
@@ -553,27 +566,29 @@ class Plotuple:
 
             # If we have a one-dimensional histogram
             if mode == '1D':
+                options_str = ""
                 if not drawn:
-
                     # Get additional options for 1D histograms
-                    additional_options = ''
-                    for _ in ['C']:
-                        if _ in self.metaoptions:
-                            additional_options += ' ' + _
-
-                    # Draw the reference on the canvas
-                    self.draw_root_object(
-                        self.type,
-                        plot.object,
-                        plot.object.GetOption() + additional_options
+                    # (Intersection with self.metaoptions)
+                    additional_options = ['C']
+                    additional_options = list(
+                        set(additional_options) & set(self.metaoptions)
                     )
+
+                    options_str = plot.object.GetOption() + ' '.join(additional_options)
                     drawn = True
                 else:
-                    self.draw_root_object(self.type, plot.object, "SAME")
+                    options_str = "SAME"
+
+                print(options_str)
+                self.draw_root_object(self.type, plot.object, options_str)
 
                 # redraw grid ontop of histogram, if selected
                 if 'nogrid' not in self.metaoptions:
                     canvas.RedrawAxis("g")
+
+                canvas.Update()
+                canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
             # If we have a two-dimensional histogram
             elif mode == '2D':
@@ -608,6 +623,12 @@ class Plotuple:
                 if title:
                     title.SetTextColor(style.GetLineColor())
 
+        if self.newest:
+            # if there is at least one revision
+            self.set_background(canvas)
+
+        canvas.GetFrame().SetFillColor(ROOT.kWhite)
+
         # Create the folder in which the plot is then stored
         path = './plots/{}/{}'.format(
             '_'.join(sorted(self.list_of_revisions)),
@@ -616,7 +637,7 @@ class Plotuple:
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        # refactor wtih the code from create_image_plot
+        # todo: refactor wtih the code from create_image_plot
         # Save the plot as PNG and PDF
         canvas.Print('{0}/{1}_{2}.png'.format(path, strip_ext(self.rootfile),
                                               self.key))
@@ -636,8 +657,8 @@ class Plotuple:
 
         # Create a ROOT canvas on which we will draw our plots
         self.width = 700
-        canvas = ROOT.TCanvas('', '', 700, 525)
         self.height = 525
+        canvas = ROOT.TCanvas('', '', self.width, self.height)
 
         # Allow possibility to turn off the stats box
         if 'nostats' in self.metaoptions:
@@ -649,7 +670,7 @@ class Plotuple:
         # perform a Chi^2-Test on the reference object and the first object in
         # the plot list:
         if self.reference is not None and self.newest:
-            self.chi2test(canvas)
+            self.chi2test()
 
         if 'nogrid' not in self.metaoptions:
             canvas.SetGrid()
@@ -685,6 +706,7 @@ class Plotuple:
             # If we have a one-dimensional histogram
             if not drawn:
 
+                # todo: refactor like in plot hist
                 # Get additional options for 1D histograms
                 additional_options = ''
                 for _ in ['C']:
@@ -704,6 +726,13 @@ class Plotuple:
             # redraw grid ontop of histogram, if selected
             if 'nogrid' not in self.metaoptions:
                 canvas.RedrawAxis("g")
+
+            canvas.Update()
+            canvas.GetFrame().SetFillColor(ROOT.kWhite)
+
+        if self.newest:
+            # if there is at least one revision
+            self.set_background(canvas)
 
         # Create the folder in which the plot is then stored
         path = './plots/{}/{}'.format(
@@ -736,7 +765,8 @@ class Plotuple:
                                  "</p>" + \
                                  elem.object.GetTitle()
 
-        # there is no file storing this, because it is directly in the json file
+        # there is no file storing this, because it is directly in the json
+        # file
         self.file = None
 
     def create_ntuple_table_json(self):

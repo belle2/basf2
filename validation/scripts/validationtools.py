@@ -9,7 +9,6 @@ import subprocess
 import pickle
 import sys
 import os
-import glob
 
 from basf2 import B2FATAL
 

@@ -34,7 +34,7 @@ def main():
         # run validation server
         fail = False
         try:
-            validationserver.run_server(dryRun=True)
+            validationserver.run_server(dry_run=True)
             fail = True
         except SystemExit:
             # we expect it to exit
@@ -54,7 +54,7 @@ def main():
         # run validation server
         fail = False
         try:
-            validationserver.run_server(dryRun=True)
+            validationserver.run_server(dry_run=True)
             fail = True
         except SystemExit:
             # we expect it to exit
@@ -75,7 +75,7 @@ def main():
 
         # run validation server
         # should not raise any exit exceptions
-        validationserver.run_server(dryRun=True)
+        validationserver.run_server(dry_run=True)
 
 if __name__ == "__main__":
     main()

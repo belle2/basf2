@@ -1133,7 +1133,7 @@ def execute(tag=None, isTest=None):
 
         # Now we process the command line arguments.
         # First of all, we read them in:
-        cmd_arguments = parse_cmd_line_arguments(tag=tag, isTest=isTest,
+        cmd_arguments = parse_cmd_line_arguments(tag=tag, is_test=isTest,
                                                  modes=Validation.get_available_job_control_names())
 
         # overwrite with default settings with parameters give in method
@@ -1266,7 +1266,7 @@ def execute(tag=None, isTest=None):
 
         if cmd_arguments.view:
             # run local webserver
-            validationserver.run_server(openSite=True)
+            validationserver.run_server(open_site=True)
 
     except KeyboardInterrupt:
         validation.log.note('Validation terminated by user!')

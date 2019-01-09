@@ -49,7 +49,7 @@ def main():
 
         # run validation server
         # must setup all content in the html folder required
-        validationserver.run_server(dryRun=True)
+        validationserver.run_server(dry_run=True)
 
         # check if all files have been copied and the symbolic links properly set
         path_to_check = [os.path.join(str(tmpdir), validationpath.folder_name_html),

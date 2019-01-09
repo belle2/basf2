@@ -44,8 +44,8 @@ process(main)
 print(statistics)
 
 statistics_plots('EvtRec_statistics.root', contact='tkuhr',
-                 jobDesc='a standard reconstruction job with generic EvtGen events',
+                 job_desc='a standard reconstruction job with generic EvtGen events',
                  prefix='EvtRec')
 event_timing_plot('../EvtRec.root', 'EvtRec_statistics.root', contact='tkuhr',
-                  jobDesc='a standard reconstruction job with generic EvtGen events',
+                  job_desc='a standard reconstruction job with generic EvtGen events',
                   prefix='EvtRec')

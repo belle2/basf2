@@ -62,7 +62,7 @@ print(statistics)
 
 from validation import *
 statistics_plots('KLongGenSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with generic KLongGenSimNoBkg events', prefix='KLongGenSimNoBkg')
+                 job_desc='a standard simulation job with generic KLongGenSimNoBkg events', prefix='KLongGenSimNoBkg')
 event_timing_plot('../KLongGenSimNoBkg.root', 'KLongGenSimNoBkg_statistics.root',
                   contact='tkuhr',
-                  jobDesc='a standard simulation job with Klong events', prefix='KLongGenSimNoBkg')
+                  job_desc='a standard simulation job with Klong events', prefix='KLongGenSimNoBkg')

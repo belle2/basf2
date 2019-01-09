@@ -61,7 +61,7 @@ print(statistics)
 
 from validation import *
 statistics_plots('EvtGenSimRecLarge_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation and reconstruction job with generic EvtGen events', prefix='EvtGenSimRecLarge')
+                 job_desc='a standard simulation and reconstruction job with generic EvtGen events', prefix='EvtGenSimRecLarge')
 event_timing_plot('../EvtGenSimRecLarge.root', 'EvtGenSimRecLarge_statistics.root',
                   contact='tkuhr',
-                  jobDesc='a standard simulation and reconstruction job with generic EvtGen events', prefix='EvtGenSimRecLarge')
+                  job_desc='a standard simulation and reconstruction job with generic EvtGen events', prefix='EvtGenSimRecLarge')

@@ -53,8 +53,8 @@ process(main)
 print(statistics)
 
 statistics_plots('EvtGenSimRec_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation and reconstruction job with generic EvtGen events',
+                 job_desc='a standard simulation and reconstruction job with generic EvtGen events',
                  prefix='EvtGenSimRec')
 event_timing_plot('../EvtGenSimRec.root', 'EvtGenSimRec_statistics.root', contact='tkuhr',
-                  jobDesc='a standard simulation and reconstruction job with generic EvtGen events',
+                  job_desc='a standard simulation and reconstruction job with generic EvtGen events',
                   prefix='EvtGenSimRec')

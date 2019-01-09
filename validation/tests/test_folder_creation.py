@@ -33,7 +33,7 @@ def main():
         # switch to this folder
         os.chdir(str(tmpdir))
 
-        validation.execute(tag=rev_to_gen, isTest=True)
+        validation.execute(tag=rev_to_gen, is_test=True)
 
         # todo: check if results folder has been created and is filled
         path_to_check = [os.path.join(validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen)),

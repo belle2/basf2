@@ -62,10 +62,10 @@ process(main)
 print(statistics)
 
 statistics_plots('BabayagaNLOBhabhaSimRec_statistics.root', contact='ferber',
-                 jobDesc='a standard simulation and reconstruction job with '
+                 job_desc='a standard simulation and reconstruction job with '
                  'radiative Bhabha events using Babayaga.NLO',
                  prefix='BabayagaNLOBhabhaSimRec')
 event_timing_plot('../BabayagaNLOBhabhaSimRec.root', 'BabayagaNLOBhabhaSimRec_statistics.root', contact='ferber',
-                  jobDesc='a standard simulation and reconstruction job with '
+                  job_desc='a standard simulation and reconstruction job with '
                   'radiative Bhabha events using Babayaga.NLO',
                   prefix='BabayagaNLOBhabhaSimRec')

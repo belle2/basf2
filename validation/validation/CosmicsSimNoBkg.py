@@ -39,8 +39,8 @@ process(main)
 print(statistics)
 
 statistics_plots('CosmicsSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with Cosmics events',
+                 job_desc='a standard simulation job with Cosmics events',
                  prefix='CosmicsSimNoBkg')
 event_timing_plot('../CosmicsSimNoBkg.root', 'CosmicsSimNoBkg_statistics.root', contact='tkuhr',
-                  jobDesc='a standard simulation job with Cosmics events',
+                  job_desc='a standard simulation job with Cosmics events',
                   prefix='CosmicsSimNoBkg')

@@ -51,7 +51,7 @@ print(statistics)
 
 from validation import *
 statistics_plots('KShortGenSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with KShortGenSimNoBkg particleGun', prefix='KShortGenSimNoBkg')
+                 job_desc='a standard simulation job with KShortGenSimNoBkg particleGun', prefix='KShortGenSimNoBkg')
 event_timing_plot('../KShortGenSimNoBkg.root', 'KShortGenSimNoBkg_statistics.root',
                   contact='tkuhr',
-                  jobDesc='a standard simulation job with Klong particleGun', prefix='KShortGenSimNoBkg')
+                  job_desc='a standard simulation job with Klong particleGun', prefix='KShortGenSimNoBkg')

@@ -57,7 +57,7 @@ print(statistics)
 
 from validation import *
 statistics_plots('MuonGenSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with generic MuonGenSimNoBkg events', prefix='MuonGenSimNoBkg')
+                 job_desc='a standard simulation job with generic MuonGenSimNoBkg events', prefix='MuonGenSimNoBkg')
 event_timing_plot('../MuonGenSimNoBkg.root', 'MuonGenSimNoBkg_statistics.root',
                   contact='tkuhr',
-                  jobDesc='a standard simulation job with Muon events', prefix='MuonGenSimNoBkg')
+                  job_desc='a standard simulation job with Muon events', prefix='MuonGenSimNoBkg')

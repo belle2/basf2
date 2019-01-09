@@ -120,7 +120,6 @@ namespace TreeFitter {
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {
     ParticleBase* rc = 0;
-    const int pdgcode = particle->getPDGCode();
 
     if (!mother) { // 'head of tree' particles
       if (!particle->getMdstArrayIndex()) { //0 means it's a composite

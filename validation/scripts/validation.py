@@ -668,10 +668,12 @@ class Validation:
         """
 
         # Get all folders that contain steering files, first the local ones
-        validation_folders = get_validation_folders('local', self.basepaths, self.log)
+        validation_folders = get_validation_folders(
+            'local', self.basepaths, self.log)
 
         # Then add those central folders that do not have a local match
-        for (package, folder) in get_validation_folders('central', self.basepaths, self.log).items():
+        for (package, folder) in get_validation_folders(
+                'central', self.basepaths, self.log).items():
             if package not in validation_folders:
                 validation_folders[package] = folder
 
@@ -763,27 +765,27 @@ class Validation:
         """!
         This method sets runtime property of each script.
         """
-        # Set up temporary dict
+
         run_times = {}
+        path = validationpath.get_results_runtime_file(self.work_folder)
+        with open(path, "r") as runtimes:
 
-        # Open the data
-        runtimes = open(validationpath.get_results_runtime_file(self.work_folder), "r")
+            # Get our data
+            for line in runtimes:
+                run_times[line.split("=")[0].strip()] = \
+                    line.split("=")[1].strip()
 
-        # Get our data
-        for line in runtimes:
-            run_times[line.split("=")[0].strip()] = line.split("=")[1].strip()
-
-        # And try to set a property for each script
-        for script in self.list_of_scripts:
-            try:
-                script.runtime = float(run_times[script.name])
-            # If we don't have runtime data, then set it to an average of all runtimes
-            except KeyError:
-                suma = 0.0
-                for dict_key in run_times:
-                    suma += float(run_times[dict_key])
-                script.runtime = suma / len(run_times)
-        runtimes.close()
+            # And try to set a property for each script
+            for script in self.list_of_scripts:
+                try:
+                    script.runtime = float(run_times[script.name])
+                # If we don't have runtime data, then set it to an average of
+                # all runtimes
+                except KeyError:
+                    suma = 0.0
+                    for dict_key in run_times:
+                        suma += float(run_times[dict_key])
+                    script.runtime = suma / len(run_times)
 
     def get_script_by_name(self, name):
         """!
@@ -917,12 +919,20 @@ class Validation:
         # scripts
         json_package = []
         for p in self.list_of_packages:
-            this_package_scrits = [s for s in self.list_of_scripts if s.package == p]
+            this_package_scrits = [
+                s for s in self.list_of_scripts if s.package == p
+            ]
             json_scripts = [s.to_json(self.tag) for s in this_package_scrits]
 
             # count the failed scripts
-            fail_count = sum([s.status == ScriptStatus.failed for s in this_package_scrits])
-            json_package.append(json_objects.Package(p, scriptfiles=json_scripts, fail_count=fail_count))
+            fail_count = sum([
+                s.status == ScriptStatus.failed for s in this_package_scrits
+            ])
+            json_package.append(json_objects.Package(
+                p,
+                scriptfiles=json_scripts,
+                fail_count=fail_count)
+            )
 
         # todo: assign correct color here
         rev = json_objects.Revision(
@@ -932,12 +942,17 @@ class Validation:
             packages=json_package,
             git_hash=git_hash
         )
-        json_objects.dump(validationpath.get_results_tag_revision_file(self.work_folder, self.tag), rev)
+        json_objects.dump(
+            validationpath.get_results_tag_revision_file(
+                self.work_folder, self.tag
+            ),
+            rev
+        )
 
     def add_script(self, script):
         """!
-        Explictly add a script object. In normal operation, scripts are auto-discovered
-        but this method is useful for testing
+        Explictly add a script object. In normal operation, scripts are
+        auto-discovered but this method is useful for testing
         """
 
         self.list_of_scripts.append(script)

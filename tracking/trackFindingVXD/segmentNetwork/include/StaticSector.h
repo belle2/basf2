@@ -36,10 +36,14 @@ namespace Belle2 {
     /// CONSTRUCTORS
 
     /** standard constructor */
-    StaticSector() : m_secID(FullSecID()), m_compactSecIDsMap(nullptr) { }
+    StaticSector() :
+      m_secID(FullSecID()), m_compactSecIDsMap(nullptr)
+    {}
 
     /** constructor */
-    StaticSector(FullSecID secID) : m_secID(secID), m_compactSecIDsMap(nullptr) {}
+    explicit StaticSector(FullSecID secID) :
+      m_secID(secID), m_compactSecIDsMap(nullptr)
+    {}
 
 
     // ACCESSOR FUNCTIONS

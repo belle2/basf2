@@ -9,10 +9,12 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/ckf/pxd/filters/results/BasePXDResultFilter.h>
 #include <tracking/ckf/pxd/filters/results/PXDResultFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
+  extern template class TrackFindingCDC::Chooseable<BasePXDResultFilter>;
   extern template class TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;
   using ChooseablePXDResultFilter = TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;
 }

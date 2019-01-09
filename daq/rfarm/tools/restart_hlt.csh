@@ -1,6 +1,8 @@
 #! /bin/tcsh
-set hltunit = "hlt03"
-set configname = "PHASE2"
+#set hltunit = "hlt03"
+set hltunit = $1
+#set configname = "PHASE3"
+set configname = $2
 
 # Stop HLT
 stop_hlt_globalif $hltunit $configname

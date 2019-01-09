@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
@@ -75,6 +76,7 @@ namespace Belle2 {
     TBranch* b_sensor;
     TBranch* b_side;
     TBranch* b_strip;
+    TBranch* b_mask;
     TBranch* b_gain;
     TBranch* b_gainAVE;
     TBranch* b_gainRMS;
@@ -95,6 +97,7 @@ namespace Belle2 {
     int m_sensor;
     int m_side;
     int m_strip;
+    float m_mask;
     float m_noise;
     float m_noiseAVE;
     float m_noiseRMS;
@@ -110,6 +113,7 @@ namespace Belle2 {
 
   private:
 
+    SVDFADCMaskedStrips m_MaskedStr;
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
     //    SVDPedestalCalibrations m_PedCal;
@@ -123,6 +127,7 @@ namespace Belle2 {
     static const int m_maxSides = 2;
 
 
+    TList* m_histoList_mask;
     TList* m_histoList_noise;
     TList* m_histoList_noiseInElectrons;
     TList* m_histoList_gainInElectrons;
@@ -132,6 +137,11 @@ namespace Belle2 {
     TList* m_histoList_cluster;
     /* the following is currently not needed because this correction is not implemented yet*/
     TList* m_histoList_triggerbin;
+
+    /** MASKS */
+    TProfile* p_mask[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**< mask*/
+    TH1F* h_mask[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**< mask*/
+
 
     /** NOISES */
     TProfile* p_noise[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**< noise in ADC units*/

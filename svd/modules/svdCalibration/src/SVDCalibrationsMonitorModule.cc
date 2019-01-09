@@ -39,7 +39,7 @@ void SVDCalibrationsMonitorModule::initialize()
 {
 
 
-  //  for (int i = 0; i < m_maxLayers; i++) {
+  m_histoList_mask = new TList;
   m_histoList_noise = new TList;
   m_histoList_noiseInElectrons = new TList;
   m_histoList_gainInElectrons = new TList;
@@ -48,7 +48,6 @@ void SVDCalibrationsMonitorModule::initialize()
   m_histoList_timeshift = new TList;
   m_histoList_triggerbin = new TList;
   m_histoList_cluster = new TList;
-  //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   //tree initialization
@@ -74,6 +73,7 @@ void SVDCalibrationsMonitorModule::initialize()
   b_sensor = m_treeDetailed->Branch("sensor", &m_sensor, "sensor/i");
   b_side = m_treeDetailed->Branch("side", &m_side, "side/i");
   b_strip = m_treeDetailed->Branch("strip", &m_strip, "strip/i");
+  b_mask = m_treeDetailed->Branch("mask", &m_mask, "mask/F");
   b_noise = m_treeDetailed->Branch("noise", &m_noise, "noise/F");
   b_gain = m_treeDetailed->Branch("gain", &m_gain, "gain/F");
   b_peakTime = m_treeDetailed->Branch("peakTime", &m_peakTime, "peakTime/F");
@@ -124,6 +124,26 @@ void SVDCalibrationsMonitorModule::initialize()
           else if (side == 0)
             nameSide = "V";
 
+
+
+          Int_t mult = 6;
+          if ((side == 0) && (layer != 3))
+            mult = 4;
+
+
+          ///MASKS
+
+          NameOfHisto = "masked_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "strip mask (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
+          h_mask[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 80, -0.5, 9.5, "strip masked",
+                                                                  m_histoList_mask);
+
+          NameOfProf = "prof_masked_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfProf = "strip mask (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                        " side) VS strip";
+          p_mask[layer][ladder][sensor][side] = createProfile(NameOfProf, TitleOfProf, 128 * mult, -0.5, 128 * mult - 0.5, "strip",
+                                                              "masked", m_histoList_mask);
+
           ///NOISES
 
           NameOfHisto = "noiseADC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
@@ -135,9 +155,6 @@ void SVDCalibrationsMonitorModule::initialize()
           TitleOfHisto = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
           h_noiseInElectrons[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 600, 199.5, 1499.5,
                                                             "strip noise (e-)", m_histoList_noiseInElectrons);
-          Int_t mult = 6;
-          if ((side == 0) && (layer != 3))
-            mult = 4;
 
           NameOfProf = "prof_noiseADC_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfProf = "strip noise (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
@@ -165,6 +182,8 @@ void SVDCalibrationsMonitorModule::initialize()
           TitleOfHisto = "Pulse width (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide + " side)";
           h_pulseWidth[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5, "Pulse width (ns)",
                                                       m_histoList_pulseWidth);
+
+          //------ OFFLINE CALIBRATION CONSTANTS ------
 
           //CoG TIME SHIFT
           NameOfHisto = "CoG_ShiftMeanToZero_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
@@ -263,6 +282,8 @@ void SVDCalibrationsMonitorModule::initialize()
 
 void SVDCalibrationsMonitorModule::beginRun()
 {
+  if (!m_MaskedStr.isValid())
+    B2WARNING("No valid SVDFADCMaskedStrip for the requested IoV");
   if (!m_NoiseCal.isValid())
     B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
@@ -316,6 +337,10 @@ void SVDCalibrationsMonitorModule::event()
 
         for (int Ustrip = 0; Ustrip < currentSensorInfo->getUCells(); Ustrip++) {
           //fill your histogram for U side
+          m_mask = -1;
+          if (m_MaskedStr.isValid())
+            m_mask = m_MaskedStr.isMasked(theVxdID, 1, Ustrip);
+          h_mask[layer][ladder][sensor][1]->Fill(m_mask);
 
           float ADCnoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
           h_noise[layer][ladder][sensor][1]->Fill(ADCnoise);
@@ -367,6 +392,9 @@ void SVDCalibrationsMonitorModule::event()
           //fill your histogram for V side
 
 
+          m_mask = -1;
+          if (m_MaskedStr.isValid())
+            m_mask = m_MaskedStr.isMasked(theVxdID, 1, Vstrip);
 
           float ADCnoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
           h_noise[layer][ladder][sensor][0]->Fill(ADCnoise);
@@ -436,10 +464,22 @@ void SVDCalibrationsMonitorModule::event()
             nameSide = "U";
           else if (s == 0)
             nameSide = "V";
-          //
+
+          //mask
+          sprintf(profName, "prof_masked_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
+          sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, s);
+          m_treeDetailed->Project(profName, "mask:strip", selection);
+
+          //noise
           sprintf(profName, "prof_noiseADC_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
           sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, s);
           m_treeDetailed->Project(profName, "noise:strip", selection);
+
+
+          //gain
+          sprintf(profName, "prof_gain_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
+          sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, s);
+          m_treeDetailed->Project(profName, "gain:strip", selection);
 
         }
         ++itSvdSensors;
@@ -458,6 +498,7 @@ void SVDCalibrationsMonitorModule::endRun()
   B2RESULT("******************************************");
   B2RESULT("** UNIQUE IDs of calibration DB objects **");
   B2RESULT("");
+  B2RESULT("   - SVDFADCMaskedStrips:" << m_MaskedStr.getUniqueID());
   B2RESULT("   - SVDNoiseCalibrations:" << m_NoiseCal.getUniqueID());
   B2RESULT("   - SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
   B2RESULT("   - SVDClusterCalibrations:" << m_ClusterCal.getUniqueID());
@@ -472,10 +513,17 @@ void SVDCalibrationsMonitorModule::terminate()
     m_treeDetailed->Write();
     m_tree->Write();
 
+    //writing the histogram list for the masks in ADC units
+    m_rootFilePtr->mkdir("masked_strips");
+    m_rootFilePtr->cd("masked_strips");
+
+    TIter nextH_mask(m_histoList_mask);
+    while ((obj = nextH_mask()))
+      obj->Write();
+
     //writing the histogram list for the noises in ADC units
     m_rootFilePtr->mkdir("noise_ADCunits");
     m_rootFilePtr->cd("noise_ADCunits");
-
     TIter nextH_noise(m_histoList_noise);
     while ((obj = nextH_noise()))
       obj->Write();

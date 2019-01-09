@@ -104,11 +104,6 @@ void ROIDQMModule::event()
   double redFactor = 0;
 
   for (auto& it : m_roiIDs) {
-    int minU;
-    int minV;
-    int maxU;
-    int maxV;
-
     fillSensorROIHistos(&it);
 
     const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());

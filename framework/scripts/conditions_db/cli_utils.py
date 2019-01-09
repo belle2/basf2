@@ -157,7 +157,7 @@ class PayloadInformation:
                 return f"exp {e1} - forever"
             elif e2 == -1:
                 return f"exp {e1}, run {r1} - forever"
-            if r1 == 0 and r2 == -1:
+            elif r1 == 0 and r2 == -1:
                 return f"exp {e1}-{e2}, all runs"
             elif r2 == -1:
                 return f"exp {e1}, run {r1} - exp {e2}, all runs"

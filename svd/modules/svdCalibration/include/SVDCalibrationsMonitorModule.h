@@ -79,8 +79,11 @@ namespace Belle2 {
     TBranch* b_side;
     TBranch* b_strip;
     TBranch* b_mask;
-    TBranch* b_gain;
+    TBranch* b_maskAVE;
     TBranch* b_pedestal;
+    TBranch* b_pedestalAVE;
+    TBranch* b_pedestalRMS;
+    TBranch* b_gain;
     TBranch* b_gainAVE;
     TBranch* b_gainRMS;
     TBranch* b_noise;
@@ -102,11 +105,14 @@ namespace Belle2 {
     int m_side;
     int m_strip;
     float m_mask;
+    float m_maskAVE;
     float m_noise;
     float m_noiseEl;
     float m_noiseAVE;
     float m_noiseRMS;
     float m_pedestal;
+    float m_pedestalAVE;
+    float m_pedestalRMS;
     float m_gain;
     float m_gainAVE;
     float m_gainRMS;
@@ -132,12 +138,7 @@ namespace Belle2 {
     static const int m_maxSensors = 5;
     static const int m_maxSides = 2;
 
-
-    TList* m_histoList_pulseWidth;
-    TList* m_histoList_timeshift;
     TList* m_histoList_cluster;
-    /* the following is currently not needed because this correction is not implemented yet*/
-    TList* m_histoList_triggerbin;
 
     /** MASKS */
     SVDHistograms<TH1F>* m_hMask = NULL; /**< masked strips histo */
@@ -165,15 +166,6 @@ namespace Belle2 {
     //PULSEWIDTH
     SVDHistograms<TH1F>* m_hPulseWidth = NULL; /**< peakTime (ns) histo */
     SVDHistograms<TH2F>* m_h2PulseWidth = NULL; /**< peakTime (ns) VS strip 2D histo */
-
-    //CoG OLD Corrections (Michael)
-    //CoG TIME SHIFT
-    TH1F* h_timeshift[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors + 1][m_maxSides]; /**<time shift in ns*/
-
-    //CoG TRIGGER BIN CORRECTION
-    TH1F* h_triggerbin[m_maxLayers + 1][m_maxLadders + 1][m_maxSensors +
-                                                          1][m_maxSides]; /**< time shift due to the trigger bin correction in ns*/
-
 
     //Clusters
     //CLUSTER SNR

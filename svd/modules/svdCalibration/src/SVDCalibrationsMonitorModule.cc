@@ -38,9 +38,6 @@ SVDCalibrationsMonitorModule::SVDCalibrationsMonitorModule() : Module()
 void SVDCalibrationsMonitorModule::initialize()
 {
 
-
-  m_histoList_timeshift = new TList;
-  m_histoList_triggerbin = new TList;
   m_histoList_cluster = new TList;
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -51,6 +48,9 @@ void SVDCalibrationsMonitorModule::initialize()
   b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
   b_sensor = m_tree->Branch("sensor", &m_sensor, "sensor/i");
   b_side = m_tree->Branch("side", &m_side, "side/i");
+  b_maskAVE = m_tree->Branch("maskAVE", &m_maskAVE, "maskAVE/F");
+  b_pedestalAVE = m_tree->Branch("pedestalAVE", &m_pedestalAVE, "pedestalAVE/F");
+  b_pedestalRMS = m_tree->Branch("pedestalRMS", &m_pedestalRMS, "pedestalRMS/F");
   b_noiseAVE = m_tree->Branch("noiseAVE", &m_noiseAVE, "noiseAVE/F");
   b_noiseRMS = m_tree->Branch("noiseRMS", &m_noiseRMS, "noiseRMS/F");
   b_gainAVE = m_tree->Branch("gainAVE", &m_gainAVE, "gainAVE/F");
@@ -123,21 +123,6 @@ void SVDCalibrationsMonitorModule::initialize()
 
 
           //------ OFFLINE CALIBRATION CONSTANTS ------
-
-          //CoG TIME SHIFT
-          NameOfHisto = "CoG_ShiftMeanToZero_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "CoG_ShiftMeanToZero (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
-                         " side)";
-          h_timeshift[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,
-                                                     "CoG_ShiftMeanToZero (ns)",
-                                                     m_histoList_timeshift);
-          //CoG TRIGGER BIN CORRECTION
-          NameOfHisto = "CoG_ShiftMeanToZeroTBDep_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
-          TitleOfHisto = "CoG_ShiftMeanToZeroTBDep (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
-                         " side)";
-          h_triggerbin[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,
-                                                      "CoG_ShiftMeanToZeroTBDep (ns)",
-                                                      m_histoList_triggerbin);
 
           //CLUSTER SNR
           NameOfHisto = "cls_ClusterSNR_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
@@ -396,6 +381,7 @@ void SVDCalibrationsMonitorModule::event()
   StoreObjPtr<EventMetaData> meta;
   m_run = meta->getRun();
 
+
   //call for a geometry instance
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
@@ -470,12 +456,6 @@ void SVDCalibrationsMonitorModule::event()
             m_h2PulseWidth->fill(theVxdID, m_side, m_strip, m_pulseWidth);
 
 
-            float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, m_side, m_strip);
-            h_timeshift[layer][ladder][sensor][m_side]->Fill(time_shift);
-            float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, m_side, m_strip,
-                                     0); /*reading by default the trigger bin #0*/
-            h_triggerbin[layer][ladder][sensor][m_side]->Fill(triggerbin_shift);
-
             float clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, m_side);
             h_clsSNR[layer][ladder][sensor][m_side]->Fill(clsSNR);
             float clsSeedSNR = m_ClusterCal.getMinSeedSNR(theVxdID, m_side);
@@ -498,47 +478,6 @@ void SVDCalibrationsMonitorModule::event()
             m_treeDetailed->Fill();
 
           }
-
-        }
-
-        //compute averages adn RMS
-        for (m_side = 0; m_side < 2; m_side++) {
-          m_noiseAVE = -1; //h_noise[layer][ladder][sensor][m_side]->GetMean();
-          m_noiseRMS = -1; //h_noise[layer][ladder][sensor][m_side]->GetRMS();
-          m_gainAVE = -1;//h_gainInElectrons[layer][ladder][sensor][m_side]->GetMean();
-          m_gainRMS = -1;//h_gainInElectrons[layer][ladder][sensor][m_side]->GetRMS();
-          m_peakTimeAVE = -1; //h_peakTime[layer][ladder][sensor][m_side]->GetMean();
-          m_peakTimeRMS = -1; //h_peakTime[layer][ladder][sensor][m_side]->GetRMS();
-          m_pulseWidthAVE = -1;//h_pulseWidth[layer][ladder][sensor][m_side]->GetMean();
-          m_pulseWidthRMS = -1;//h_pulseWidth[layer][ladder][sensor][m_side]->GetRMS();
-          m_tree->Fill();
-
-          /*
-                //fill TProfiles
-                char profName[128];
-                char selection[128];
-                TString nameSide = "";
-                if (m_side == 1)
-                  nameSide = "U";
-                else if (m_side == 0)
-                  nameSide = "V";
-
-                //mask
-                sprintf(profName, "prof_masked_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
-                sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, m_side);
-          //          m_treeDetailed->Project(profName, "mask:strip", selection);
-
-                //noise
-                sprintf(profName, "prof_noiseADC_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
-                sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, m_side);
-          m_treeDetailed->Project(profName, "noise:strip", selection);
-
-
-                //gain
-                sprintf(profName, "prof_gain_%d.%d.%d.%s", layer, ladder, sensor, nameSide.Data());
-                sprintf(selection, "layer==%d&&ladder==%d&&sensor==%d&&side==%d", layer, ladder, sensor, m_side);
-                m_treeDetailed->Project(profName, "gain:strip", selection);
-          */
         }
         ++itSvdSensors;
       }
@@ -547,7 +486,54 @@ void SVDCalibrationsMonitorModule::event()
     ++itSvdLayers;
   }
 
-  //  B2INFO("iscluster in time if t0 = 0? "<< );
+  B2INFO("now computing Mean and RMS of calibration constants");
+
+  //compute averages and RMS
+
+  itSvdLayers = svdLayers.begin();
+
+  while ((itSvdLayers != svdLayers.end()) && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
+
+    std::set<Belle2::VxdID> svdLadders = aGeometry.getLadders(*itSvdLayers);
+    std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();
+
+    while (itSvdLadders != svdLadders.end()) { //loop on Ladders
+
+      std::set<Belle2::VxdID> svdSensors = aGeometry.getSensors(*itSvdLadders);
+      std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
+      B2DEBUG(1, "    svd sensor info " << * (svdSensors.begin()));
+
+      while (itSvdSensors != svdSensors.end()) { //loop on sensors
+        B2DEBUG(1, "    svd sensor info " << *itSvdSensors);
+
+        m_layer = itSvdSensors->getLayerNumber();
+        m_ladder =  itSvdSensors->getLadderNumber();
+        m_sensor = itSvdSensors->getSensorNumber();
+        Belle2::VxdID theVxdID(m_layer, m_ladder, m_sensor);
+
+
+        for (m_side = 0; m_side < 2; m_side++) {
+          m_maskAVE = (m_hMask->getHistogram(theVxdID, m_side))->GetMean();
+          m_pedestalAVE = (m_hPedestal->getHistogram(theVxdID, m_side))->GetMean();
+          m_pedestalRMS = (m_hPedestal->getHistogram(theVxdID, m_side))->GetRMS();
+          m_noiseAVE = (m_hNoise->getHistogram(theVxdID, m_side))->GetMean();
+          m_noiseRMS = (m_hNoise->getHistogram(theVxdID, m_side))->GetRMS();
+          m_gainAVE = (m_hGain->getHistogram(theVxdID, m_side))->GetMean();
+          m_gainRMS = (m_hGain->getHistogram(theVxdID, m_side))->GetRMS();
+          m_peakTimeAVE = (m_hPeakTime->getHistogram(theVxdID, m_side))->GetMean();
+          m_peakTimeRMS = (m_hPeakTime->getHistogram(theVxdID, m_side))->GetRMS();
+          m_pulseWidthAVE = (m_hPulseWidth->getHistogram(theVxdID, m_side))->GetMean();
+          m_pulseWidthRMS = (m_hPulseWidth->getHistogram(theVxdID, m_side))->GetRMS();
+          m_tree->Fill();
+
+        }
+        ++itSvdSensors;
+      }
+      ++itSvdLadders;
+    }
+    ++itSvdLayers;
+  }
+
 
 }
 
@@ -622,23 +608,6 @@ void SVDCalibrationsMonitorModule::terminate()
             (m_h2PulseWidth->getHistogram(sensor, view))->Write();
 
           }
-
-    //writing the histogram list for the time shift correction in ns
-    m_rootFilePtr->mkdir("CoG_ShiftMeanToZero");
-    m_rootFilePtr->cd("CoG_ShiftMeanToZero");
-
-    TIter nextH_timeshift(m_histoList_timeshift);
-    while ((obj = nextH_timeshift()))
-      obj->Write();
-
-    //writing the histogram list for the trigger bin correction in ns
-    m_rootFilePtr->mkdir("CoG_ShiftMeanToZeroTBDep");
-    m_rootFilePtr->cd("CoG_ShiftMeanToZeroTBDep");
-
-    TIter nextH_triggerbin(m_histoList_triggerbin);
-    while ((obj = nextH_triggerbin()))
-      obj->Write();
-
 
     //writing the histogram list for the clusters
     m_rootFilePtr->mkdir("cluster");

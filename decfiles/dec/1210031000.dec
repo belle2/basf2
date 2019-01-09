@@ -1,4 +1,4 @@
-# EventType: XXX
+# EventType: 1210031000
 # Descriptor: Y(4S) -> B+ B-
 #                     [B+ -> (eta' -> rho(pi+pi-) gamma) K+]
 #                      B- -> anything
@@ -17,7 +17,7 @@
 
 Alias      Etapsig    eta'
 ChargeConj Etapsig    Etapsig
-Alias      Rhosig     rho
+Alias      Rhosig     rho0
 ChargeConj Rhosig     Rhosig
 
 #
@@ -39,14 +39,14 @@ Enddecay
 CDecay B-sig
 
 #
-# eta' -> rho gamma
+# eta' -> rho0 gamma
 #
 Decay Etapsig
 1.000         Rhosig       gamma             SVP_HELAMP  1.0 0.0 1.0 0.0;
 Enddecay
 
 #
-# rho -> pi+ pi-
+# rho0 -> pi+ pi-
 #
 Decay Rhosig
 1.000  pi+  pi-                       VSS;

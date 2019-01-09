@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * ECL Data Quality Monitor (First Module)                                *
  *                                                                        *
@@ -139,7 +139,7 @@ namespace Belle2 {
     /** Histogram: Fraction of ADC samples in event (w/o 8736 ADC samples). */
     TH1F* h_adc_hits{nullptr};
     /** Histogram vector: Reconstructed signal time for all ECL crates above the threshold = 1 GeV. */
-    std::vector<TH1F*> h_time_crate_Thr1GeV;
+    std::vector<TH1F*> h_time_crate_Thr1GeV = {nullptr};
     /** Histogram: Trigger time vs. Trig Cell ID.  */
     TH2F* h_trigtime_trigid{nullptr};
     /** Histogram: Trigger tag flag #2 vs. Trig Cell ID.   */

@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Mikhail Remnev                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 namespace Belle2 {
   namespace ECL {
     /**

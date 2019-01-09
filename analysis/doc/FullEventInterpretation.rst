@@ -673,37 +673,6 @@ The tag-side efficiencies are (on the events which survive the skim-cut)
 Troubleshooting
 ###############
 
-Bad variable name
-*****************
-
-If you encounter a bad variable name
-
-.. code-block:: c
-
-        [WARNING] Encountered bad variable name 'Kid'. Maybe you misspelled it?  { module: MVAExpert }
-
-and afterwards a segmentation fault
-
-.. code-block:: c
-
-	===========================================================
-	There was a crash.
-	This is the entire stack trace of all threads:
-	===========================================================
-	#0  0x00007f2c98a9b07a in waitpid () from /lib/x86_64-linux-gnu/libc.so.6
-	#1  0x00007f2c98a13fbb in ?? () from /lib/x86_64-linux-gnu/libc.so.6
-	#2  0x00007f2c98683762 in TUnixSystem::StackTrace() () from /local/scratch/ssd/tkeck/externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so
-	#3  0x00007f2c98685c1c in TUnixSystem::DispatchSignals(ESignals) () from /local/scratch/ssd/tkeck/externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so
-	#4  <signal handler called>
-	#5  0x00007f2c7df1dc18 in std::_Function_handler<double (Belle2::Particle const*), Belle2::Variable::daughter(std::vector<std::string, std::allocator<std::string> > const&)::{lambda(Belle2::Particle const*)#1}>::_M_invoke(std::_Any_data const&, Belle2::Particle const*&&) () from /local/scratch/ssd/tkeck/release/lib/Linux_x86_64/opt/libanalysis.so
-	#6  0x00007f2c7a9dd553 in Belle2::MVAExpertModule::analyse(Belle2::Particle*) () from /local/scratch/ssd/tkeck/release/modules/Linux_x86_64/opt/libMVAExpert.so
-
-::
-
-   from variables import variables as v
-   v.addAlias('Kid_belle', 'kIDBelle')
-
-
 Crash in the Neurobayes Library
 *******************************
 

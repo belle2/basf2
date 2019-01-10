@@ -11,7 +11,6 @@ log levels or switching to an empty working directory
 
 import sys
 import os
-import re
 import tempfile
 from contextlib import contextmanager
 import multiprocessing
@@ -146,8 +145,12 @@ def safe_process(*args, **kwargs):
 
 
 def check_error_free(tool, toolname, package, filter=lambda x: False):
-    """
-    Check that the provided code tool doesn't produce comments or warnings
+    """Calls the `tool` with argument `package` and check that the output is
+    error-free. Optionally `filter` the output in case of error messages that
+    can be ignored.
+
+    In case there is some output left, then prints the error message and exits
+    (failing the test).
 
     Arguments:
         tool(str): executable to call

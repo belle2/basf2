@@ -302,6 +302,7 @@ namespace Belle2 {
       }
 
       //== Estimate chi^2
+      long long chi_sq = 0;
 
       if (!skip_fit) {
         //== Get actual threshold for chi^2, based on amplitude fit.
@@ -313,7 +314,6 @@ namespace Belle2 {
 
         //== Get chi^2
         //
-        long long chi_sq;
         long long chi;
 
         chi = z00 - n_16 * C1;

@@ -242,15 +242,17 @@ def get_reference_files():
     return results['local'] + results['central']
 
 
-def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
+def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
+                       root_error_ignore_level=ROOT.kWarning):
     """
-    Creates the plots that
-    contain the requested revisions. Each plot (or n-tuple, for that matter)
-    is stored in an object of class Plot.
+    Creates the plots that contain the requested revisions. Each plot (or
+    n-tuple, for that matter) is stored in an object of class Plot.
     @param list_of_revisions
-    @param work_folder
+    @param work_folder: Folder containing results
     @param process_queue: communication queue object, which is used in
            multi-processing mode to report the progress of the plot creating.
+    @param root_error_ignore_level: Value for gErrorIgnoreLevel. Default:
+        ROOT.kWarning. If set to None, global level will be left unchanged.
     @return: No return value
     """
 
@@ -258,6 +260,10 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
     ROOT.gROOT.SetBatch()
     ROOT.gStyle.SetOptStat(1110)
     ROOT.gStyle.SetOptFit(101)
+
+    # Prevent cluttering with ROOT info messages
+    if root_error_ignore_level is not None:
+        ROOT.gErrorIgnoreLevel = root_error_ignore_level
 
     # Before we can start plotting, we of course need to collect all
     # ROOT-files that contain data for the plot that we want, e.g. we need to
@@ -311,12 +317,12 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
     comparison_packages = []
 
     # for every package
-    i = 0
-    for package in sorted(list_of_packages):
-        i = i + 1
+    for i, package in enumerate(sorted(list_of_packages)):
 
         # Some information to be printed out while the plots are created
-        print('Now creating plots for package: {0}'.format(package))
+        print("*" * 80)
+        print('Creating plots for package: {0}'.format(package))
+        print("*" * 80)
 
         # A list of all objects (including reference objects) that
         # belong to the current package
@@ -345,7 +351,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
 
             # Some more information to be printed out while plots are
             # being created
-            print('\nNow creating plots for file: {0}'.format(rootfile))
+            print('Creating plots for file: {0}'.format(rootfile))
 
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
@@ -382,13 +388,11 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
 
             # Now loop over ALL keys (within a file, objects will be
             # sorted by key)
-            i_key = 0
             compare_plots = []
             compare_ntuples = []
             compare_html_content = []
             has_reference = False
             for key in sorted(list_of_keys):
-                i_key = i_key + 1
 
                 # Find all objects for the Plotuple that is defined by the
                 # package, the file and the key
@@ -469,9 +473,9 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
                 plotfiles=compare_files)
         )
         # Make the command line output more readable
-        print(2 * '\n')
+        print()
 
-    print("storing to {}".format(comparison_json_file))
+    print("Storing to {}".format(comparison_json_file))
 
     # create objects for all revisions
     comparison_revs = []

@@ -231,15 +231,13 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
 
   h->GetYaxis()->SetRangeUser(0.00001, 1);
 
-  double num = 0;
-  double den = 0;
   Int_t bin = 0;
   Int_t nBins = 0;
 
   for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
 
-    num = 0;
-    den = 0 ;
+    double num = 0;
+    double den = 0;
 
     for (int other1_bin = 1; other1_bin < the_other1->GetNbins() + 1; other1_bin++)
       for (int other2_bin = 1; other2_bin < the_other2->GetNbins() + 1; other2_bin++) {
@@ -345,18 +343,16 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_den, TH1F* h1_num, cons
                                                 bool geo_accettance, TList* histoList)
 {
 
-  const char* name1 = "_noGeoAcc";
-  const char* name2 = "_withGeoAcc";
 
   std::string total;
   std::string trueTitle;
 
   if (geo_accettance == false) {
+    const char* name1 = "_noGeoAcc";
     total = std::string(name) + std::string(name1);
     trueTitle = std::string(title) + std::string(name1);
-  }
-
-  else {
+  } else {
+    const char* name2 = "_withGeoAcc";
     total = std::string(name) + std::string(name2);
     trueTitle = std::string(title) + std::string(name2);
   }
@@ -446,8 +442,6 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack,
 TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
                                                 const char* name, const char* title, bool geo_accettance, TList* histoList)
 {
-  const char* name1 = "_noGeoAcc";
-  const char* name2 = "_withGeoAcc";
   const char* err_char = "_error_";
   const char* addTitle = "Errors, ";
 
@@ -458,12 +452,12 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
   std::string titleErr = std::string(addTitle) + std::string(title);
 
   if (geo_accettance == false) {
+    const char* name1 = "_noGeoAcc";
     total = std::string(name) + std::string(name1);
     trueTitle = std::string(title) + std::string(name1);
     error = std::string(name) + std::string(err_char) + std::string(name1);
-  }
-
-  else {
+  } else {
+    const char* name2 = "_withGeoAcc";
     total = std::string(name) + std::string(name2);
     trueTitle = std::string(title) + std::string(name2);
     error = std::string(name) + std::string(err_char) + std::string(name2);

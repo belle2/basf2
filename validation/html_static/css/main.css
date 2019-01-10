@@ -33,11 +33,13 @@
 
 .fail_count_zero {
 	display: inline-block;
-	width: 30px;
-	background-color: green;
+	width: 45px;
+	background-color: #33cc33;
 	border-radius: 10px !important;
 	border: 0px none !important;
 	text-align: center;
+	font-size: 14px;
+	color: white;
 }
 
 .no_reference {
@@ -46,12 +48,24 @@
 
 .fail_count_greater_zero {
 	display: inline-block;
-	width: 50px;
+	width: 45px;
 	background-color: red;
 	border-radius: 10px !important;
 	border: 0px none !important;
 	text-align: center;
 	font-size: 14px;
+	color: white;
+}
+
+.fail_count_zero_rootfile {
+	display: inline-block;
+	width: 30px;
+	background-color: #33cc33;
+	border-radius: 10px !important;
+	border: 0px none !important;
+	text-align: center;
+	font-size: 14px;
+	color: white;
 }
 
 .fail_count_greater_zero_rootfile {
@@ -62,6 +76,7 @@
 	border: 0px none !important;
 	text-align: center;
 	font-size: 14px;
+	color: white;
 }
 
 .failed_script {
@@ -504,8 +519,8 @@ just use spans /klieret */
     border: none;
     display: inline-block;
     text-align: center;
-    font-weight: bold;
     color: white;
+    font-weight: bold;
 }
 
 .swatch-text{
@@ -546,6 +561,39 @@ just use spans /klieret */
 
 #swatch-nocomp {
     background: #ccccff;
+}
+
+/* NEWS */
+/* ======================================================================== */
+/* from: https://www.w3schools.com/howto/howto_js_alert.asp*/
+
+ /* The alert message box */
+.infobox {
+    padding: 20px;
+    background-color: #46a7f5; /* Red */
+    color: white;
+    margin-bottom: 15px;
+}
+
+.infobox a {
+    color: white;
+}
+
+/* The close button */
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
 }
 
 /* ======================================================================== */

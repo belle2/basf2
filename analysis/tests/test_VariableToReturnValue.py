@@ -2,35 +2,25 @@
 # -*- coding: utf-8 -*-
 
 import os
-import tempfile
-from basf2 import *
+import basf2
 import ROOT
+import b2test_utils
 from ROOT import Belle2
 
-filepath = 'analysis/tests/mdst7.root'
-inputFile = Belle2.FileSystem.findFile(filepath)
-if len(inputFile) == 0:
-    sys.stderr.write(
-        "TEST SKIPPED: input file " +
-        filepath +
-        " not found. You can retrieve it via 'wget https://www.desy.de/~scunliff/mdst7.root'\n")
-    sys.exit(-1)
-
-path = create_path()
-path.add_module('RootInput', inputFileName=inputFile)
+path = basf2.create_path()
+path.add_module('RootInput', inputFileName=basf2.find_file("mdst12.root"))
 
 # Add path for high multiplicity events
-mod = register_module('VariableToReturnValue')
+mod = basf2.register_module('VariableToReturnValue')
 mod.param('variable', 'nTracks')
-high_multiplicity_path = create_path()
+high_multiplicity_path = basf2.create_path()
 high_multiplicity_path.add_module('VariablesToNtuple', particleList='', variables=['nTracks'], fileName='highMultiplicity.root')
-mod.if_value('>= 12', high_multiplicity_path, AfterConditionPath.CONTINUE)
+mod.if_value('>= 12', high_multiplicity_path, basf2.AfterConditionPath.CONTINUE)
 path.add_module(mod)
 
 
-with tempfile.TemporaryDirectory() as tempdir:
-    os.chdir(tempdir)
-    process(path)
+with b2test_utils.clean_working_directory():
+    basf2.process(path)
 
     # Testing
     assert os.path.isfile('highMultiplicity.root'), "highMultiplicity.root wasn't created"

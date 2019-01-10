@@ -11,10 +11,12 @@ log levels or switching to an empty working directory
 
 import sys
 import os
+import re
 import tempfile
 from contextlib import contextmanager
 import multiprocessing
 import basf2
+import subprocess
 
 
 def skip_test(reason):
@@ -141,3 +143,34 @@ def safe_process(*args, **kwargs):
     It will return the exitcode of the child process which should be 0 in case of no error
     """
     return run_in_subprocess(target=basf2.process, *args, **kwargs)
+
+
+def check_error_free(tool, toolname, package, filter=lambda x: False):
+    """
+    Check that the provided code tool doesn't produce comments or warnings
+
+    Arguments:
+        tool(str): executable to call
+        toolname(str): human readable name of the tool
+        package(str): package to run over. Also the first argument to the tool
+        filter(lambda): function which gets called for each line of output and
+           if it returns True the line will be ignored.
+    """
+    with local_software_directory():
+        try:
+            output = subprocess.check_output([tool, package], encoding="utf8")
+        except subprocess.CalledProcessError as error:
+            print(error)
+            output = error.output
+
+    clean_log = [e for e in output.splitlines() if e and not filter(e)]
+    if len(clean_log) > 0:
+        print(f"""\
+The {package} package has some {toolname} issues, which is now not allowed.
+Please run:
+
+  $ {tool} {package}
+
+and fix any issues you have introduced. Here is what {toolname} found:\n""")
+        print("\n".join(clean_log))
+        sys.exit(1)

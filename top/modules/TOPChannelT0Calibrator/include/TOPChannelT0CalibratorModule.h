@@ -19,6 +19,7 @@
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/utilities/TrackSelector.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
+#include <top/reconstruction/TOPreco.h>
 
 #include <string>
 #include <vector>
@@ -33,6 +34,7 @@ namespace Belle2 {
   /**
    * A module for alternative channel T0 calibration with collision data
    * Note: after this kind of calibration one cannot do the geometrical alignment
+   * This module can also be used to check the calibration
    */
   class TOPChannelT0CalibratorModule : public Module {
 
@@ -100,10 +102,12 @@ namespace Belle2 {
     double m_minZ; /**< minimal local z of extrapolated hit */
     double m_maxZ; /**< maximal local z of extrapolated hit */
     std::string m_outFileName; /**< Root output file name containing results */
+    std::string m_pdfOption;   /**< PDF option name */
 
     // procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
     TOP::Chi2MinimumFinder1D m_finders[2][c_numModules][c_numChannels]; /**< finders */
+    TOP::TOPreco::PDFoption m_PDFOption = TOP::TOPreco::c_Rough; /**< PDF option */
 
     // datastore objects
     StoreArray<TOPDigit> m_digits; /**< collection of digits */

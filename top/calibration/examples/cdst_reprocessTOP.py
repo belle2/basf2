@@ -27,12 +27,13 @@ class ReplaceTOPLikelihoods(Module):
 
         for track in Belle2.PyStoreArray('Tracks'):
             pid = track.getRelated('PIDLikelihoods')
+            # should unset TOP in PIDLikelihoods first, but such function is not available
             top = track.getRelated('TOPLikelihoods')
             if top and pid:
-                # for chargedStable in Belle2.Const.chargedStableSet: # not working!
-                for chargedStable in chargedStableSet:
-                    logL = top.getLogL(chargedStable)
-                    pid.setLogLikelihood(Belle2.Const.TOP, chargedStable, logL)
+                if top.getFlag() == 1:
+                    for chargedStable in chargedStableSet:
+                        logL = top.getLogL(chargedStable)
+                        pid.setLogLikelihood(Belle2.Const.TOP, chargedStable, logL)
 
 # Database:
 # - replace the name and location of the local DB before running!

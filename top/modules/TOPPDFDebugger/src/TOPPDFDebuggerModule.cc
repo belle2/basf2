@@ -54,9 +54,8 @@ namespace Belle2 {
   TOPPDFDebuggerModule::TOPPDFDebuggerModule() : Module()
   {
     // Set description
-    setDescription("Reconstruction for TOP counter. Uses reconstructed tracks "
-                   "extrapolated to TOP and TOPDigits to calculate log likelihoods "
-                   "for charged stable particles");
+    setDescription("This module makes an analytic PDF available in "
+                   "a store array TOPPDFCollections, related from Tracks");
 
     // Set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
@@ -69,8 +68,8 @@ namespace Belle2 {
     addParam("minTime", m_minTime,
              "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use full TDC range)", 0.0);
-    /* not implemented yet
+             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
+    /* not implemented
     addParam("writeNPdfs", m_writeNPdfs,
        "Write out the PDF for the first N events. -1 is for all.", 0);
     addParam("writeNPulls", m_writeNPulls,

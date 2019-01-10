@@ -19,6 +19,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -47,17 +48,19 @@ namespace Belle2 {
   TOPChannelT0CalibratorModule::TOPChannelT0CalibratorModule() : Module()
 
   {
-    // set module description (e.g. insert text)
-    setDescription("Alternative channel T0 calibration with collision data. \n"
+    // set module description
+    setDescription("Alternative channel T0 calibration with dimuons or bhabhas. "
+                   "This module can also be used to check the calibration "
+                   "(channel, module and common T0).\n"
                    "Note: after this kind of calibration one cannot do the alignment.");
     //    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("numBins", m_numBins, "number of bins of the search region", 200);
     addParam("timeRange", m_timeRange,
-             "time range in which to search  for the minimum [ns]", 10.0);
+             "time range in which to search for the minimum [ns]", 10.0);
     addParam("minBkgPerBar", m_minBkgPerBar,
-             "Minimal number of background photons per module", 0.0);
+             "minimal number of background photons per module", 0.0);
     addParam("scaleN0", m_scaleN0,
              "Scale factor for figure-of-merit N0", 1.0);
     addParam("sigmaSmear", m_sigmaSmear,
@@ -75,8 +78,11 @@ namespace Belle2 {
     addParam("maxZ", m_maxZ,
              "maximal local z of extrapolated hit", 130.0);
     addParam("outFileName", m_outFileName,
-             "Root output file name containing calibration results",
-             std::string("channelT0alternative.root"));
+             "Root output file name containing calibration results. "
+             "If not given, it will be constructed as 'calibrationT0_r<runNo>.root'",
+             std::string(""));
+    addParam("pdfOption", m_pdfOption,
+             "PDF option, one of 'rough', 'fine', 'optimal'", std::string("rough"));
 
   }
 
@@ -94,6 +100,17 @@ namespace Belle2 {
 
     // Configure TOP detector for reconstruction
     TOPconfigure config;
+
+    // Parse PDF option
+    if (m_pdfOption == "rough") {
+      m_PDFOption = TOPreco::c_Rough;
+    } else if (m_pdfOption == "fine") {
+      m_PDFOption = TOPreco::c_Fine;
+    } else if (m_pdfOption == "optimal") {
+      m_PDFOption = TOPreco::c_Optimal;
+    } else {
+      B2ERROR("TOPPDFDebuggerModule: unknown PDF option '" << m_pdfOption << "'");
+    }
 
     // set track selector
     m_selector = TrackSelector(m_sample);
@@ -113,8 +130,20 @@ namespace Belle2 {
       }
     }
 
+    // if file name not given, construct it
+    if (m_outFileName.empty()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      auto run = std::to_string(evtMetaData->getRun());
+      while (run.size() < 5) run = "0" + run;
+      m_outFileName = "calibrationT0_r" + run + ".root";
+    }
+
     // open root file for ntuple and histogram output
     m_file = TFile::Open(m_outFileName.c_str(), "RECREATE");
+    if (not m_file) {
+      B2ERROR("Cannot open output file '" << m_outFileName << "'");
+      return;
+    }
 
     // histograms
     for (unsigned module = 0; module < c_numModules; module++) {
@@ -180,7 +209,7 @@ namespace Belle2 {
     int Nhyp = 1;
     double mass = m_selector.getChargedStable().getMass();
     TOPreco reco(Nhyp, &mass, m_minBkgPerBar, m_scaleN0);
-    reco.setPDFoption(TOPreco::c_Rough); // TODO: c_Fine?
+    reco.setPDFoption(m_PDFOption);
     const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
     double timeMin = tdc.getTimeMin();
     double timeMax = tdc.getTimeMax();
@@ -360,6 +389,8 @@ namespace Belle2 {
 
     m_tree->Write();
     m_file->Close();
+
+    B2RESULT("Results available in " << m_outFileName);
   }
 
 

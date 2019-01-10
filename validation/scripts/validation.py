@@ -654,15 +654,15 @@ class Validation:
             failed_log_path
         ))
 
-        with open(failed_log_path, "w+") as list_failed:
-            # Select only failed scripts
-            list_of_failed_scripts = [
-                script for script in self.list_of_scripts
-                if script.status == ScriptStatus.failed
-            ]
+        # Select only failed scripts
+        failed_scripts = [
+            script for script in self.list_of_scripts
+            if script.status == ScriptStatus.failed
+        ]
 
+        with open(failed_log_path, "w+") as list_failed:
             # log the name of all failed scripts
-            for script in list_of_failed_scripts:
+            for script in failed_scripts:
                 list_failed.write(script.path.split("/")[-1] + "\n")
 
     def log_skipped(self):
@@ -679,16 +679,48 @@ class Validation:
             skipped_log_path
         ))
 
-        with open(skipped_log_path, "w+") as list_skipped:
-            # Select only failed scripts
-            list_of_skipped_scripts = [
-                script for script in self.list_of_scripts
-                if script.status == ScriptStatus.skipped
-            ]
+        # Select only failed scripts
+        skipped_scripts = [
+            script for script in self.list_of_scripts
+            if script.status == ScriptStatus.skipped
+        ]
 
+        with open(skipped_log_path, "w+") as list_skipped:
             # log the name of all failed scripts
-            for script in list_of_skipped_scripts:
+            for script in skipped_scripts:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
+
+    def report_on_scripts(self):
+        failed_scripts = [
+            script.name for script in self.list_of_scripts
+            if script.status == ScriptStatus.failed
+        ]
+        skipped_scripts = [
+            script.name for script in self.list_of_scripts
+            if script.status == ScriptStatus.skipped
+        ]
+        print()
+        print("*" * 80)
+        print("Summary")
+        print("*" * 80)
+        print()
+        if skipped_scripts:
+            print("{}/{} scripts were skipped:".format(
+                len(skipped_scripts), len(self.list_of_scripts)))
+            print("\n".join(skipped_scripts))
+            print()
+        else:
+            print("No scripts were skipped.")
+            print()
+
+        if failed_scripts:
+            print("{}/{} scripts failed:".format(
+                len(failed_scripts), len(self.list_of_scripts)))
+            print("\n".join(failed_scripts))
+            print()
+        else:
+            print("No scripts failed.")
+            print()
 
     def set_runtime_data(self):
         """!
@@ -1259,6 +1291,8 @@ def execute(tag=None, isTest=None):
                 mails.write_log()
         else:
             validation.log.note('Skipping plot creation (dry run)...')
+
+        validation.report_on_scripts()
 
         # Log that everything is finished
         validation.log.note('Validation finished! Total runtime: {0}s'

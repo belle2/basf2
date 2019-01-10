@@ -765,13 +765,23 @@ class Plotuple:
     def create_ntuple_table_json(self):
         """!
         If the Plotuple-object contains n-tuples, this will create the
-        corresponding HTML-table for it.
+        a JSON file, which is later converted to HTML by the javascript
+        function fill_ntuple_table.
         """
 
         json_nutple = {}
 
-        # { "ref": { "one": 1, "two" : 2},
-        #   "run1: { "one": 1, "two" : 2} }
+        # The dictionary will have the following form
+        # {
+        #     "reference (if exist)": [
+        #         ('variable 1', 'reference value for variable 1'),
+        #         ('variable 2', 'reference value for variable 2'),
+        #         ...
+        #     ],
+        #     "revision": [
+        #         ...
+        #     ]
+        # }
 
         colum_names = []
         for key in list(self.newest.object.keys()):

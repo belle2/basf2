@@ -298,15 +298,15 @@ class Plotuple:
 
         colors = {
             "error": ROOT.kRed,
-            "warning": ROOT.kOrange,
+            "warning": ROOT.kOrange + 1,
             "equal": ROOT.kGreen - 3,
-            "not_compared": ROOT.kBlue - 7
+            "not_compared": ROOT.kAzure
         }
         colors_expert = {
-            "error": ROOT.kRed - 10,
-            "warning": ROOT.kOrange - 10,
+            "error": ROOT.kRed - 9,
+            "warning": ROOT.kOrange - 9,
             "equal": ROOT.kGreen - 10,
-            "not_compared": ROOT.kBlue - 10
+            "not_compared": ROOT.kAzure - 9
         }
 
         if self.is_expert():

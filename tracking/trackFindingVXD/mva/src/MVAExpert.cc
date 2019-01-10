@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-MVAExpert::MVAExpert(std::string identifier,
+MVAExpert::MVAExpert(const std::string& identifier,
                      std::vector<Named<float*>>& namedVariables)
   : m_namedVariables(namedVariables)
   , m_identifier(identifier)

@@ -45,6 +45,7 @@ void SVDClusterCalibrationsMonitorModule::beginRun()
   b_layer = m_tree->Branch("layer", &m_layer, "layer/i");
   b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
   b_sensor = m_tree->Branch("sensor", &m_sensor, "sensor/i");
+  b_side = m_tree->Branch("side", &m_side, "side/i");
   b_clsSNR = m_tree->Branch("clsSNR", &m_clsSNR, "clsSNR/F");
   b_clsSeedSNR = m_tree->Branch("clsSeedSNR", &m_clsSeedSNR, "clsSeedSNR/F");
   b_clsAdjSNR = m_tree->Branch("clsAdjSNR", &m_clsAdjSNR, "clsAdjSNR/F");

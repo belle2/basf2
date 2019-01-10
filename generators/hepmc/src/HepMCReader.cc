@@ -41,13 +41,16 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
   HepMC::GenEvent evt;
   bool go_on = readNextEvent(evt);
+  eventID = evt.event_number();
+  eventWeight = 1; // why is evt.weights() a std::vector?
+  const int nparticles = evt.particles_size();
 
-
-  int nparticles = 0;
+  B2DEBUG(10, "Found eventID " << eventID << " with " << nparticles << " particles.");
+  evt.print(); // TODO delete me
   if (nparticles <= 0) {
     throw (HepMCEmptyEventError() << nparticles);
   }
-
+  //TODO fill graph
   return eventID;
 }
 

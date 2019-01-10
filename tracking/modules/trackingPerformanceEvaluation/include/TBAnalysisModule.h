@@ -51,60 +51,56 @@ namespace Belle2 {
 
   private:
 
-    int m_goodL1inter; /**< good intercept */
-    int m_goodL2inter; /**< good intercept */
+    int m_goodL1inter = 0; /**< good intercept */
+    int m_goodL2inter = 0; /**< good intercept */
 
-    TH1F* m_h1_pValue; /**< pValue TH1F*/
-    TH1F* m_h1_mom; /**< pValue TH1F*/
+    TH1F* m_h1_pValue = nullptr; /**< pValue TH1F*/
+    TH1F* m_h1_mom = nullptr; /**< pValue TH1F*/
 
-    TH1F* m_h1_nROIs_odd; /**< n ROIs */
-    TH1F* m_h1_nROIs_even; /**< n ROIs */
+    TH1F* m_h1_nROIs_odd = nullptr; /**< n ROIs */
+    TH1F* m_h1_nROIs_even = nullptr; /**< n ROIs */
 
-    TH1F* m_h1_uwidthROI_odd; /**< ROI width */
-    TH1F* m_h1_vwidthROI_odd; /**< ROI width */
-    TH1F* m_h1_uwidthROI_even; /**< ROI width */
-    TH1F* m_h1_vwidthROI_even; /**< ROI width */
+    TH1F* m_h1_uwidthROI_odd = nullptr; /**< ROI width */
+    TH1F* m_h1_vwidthROI_odd = nullptr; /**< ROI width */
+    TH1F* m_h1_uwidthROI_even = nullptr; /**< ROI width */
+    TH1F* m_h1_vwidthROI_even = nullptr; /**< ROI width */
 
-    TH2F* m_h2_uvResidCluster_L1; /**< residuals */
-    TH2F* m_h2_uvResidCluster_L2; /**< residuals */
-    TH2F* m_h2_uvResidDigit_L1; /**< residuals */
-    TH2F* m_h2_uvResidDigit_L2; /**< residuals*/
+    TH2F* m_h2_uvResidCluster_L1 = nullptr; /**< residuals */
+    TH2F* m_h2_uvResidCluster_L2 = nullptr; /**< residuals */
+    TH2F* m_h2_uvResidDigit_L1 = nullptr; /**< residuals */
+    TH2F* m_h2_uvResidDigit_L2 = nullptr; /**< residuals*/
 
 
-    //    TH2F*  m_h2_PXDCluster_L1;
-    //    TH2F*  m_h2_PXDCluster_L2;
-    TH2F*  m_h2_Intercepts_L1; /**< intecepts */
-    TH2F*  m_h2_Intercepts_L2; /**< intercepts */
+    TH2F*  m_h2_Intercepts_L1 = nullptr; /**< intecepts */
+    TH2F*  m_h2_Intercepts_L2 = nullptr; /**< intercepts */
 
-    TH1F* m_h1_uResid_L1_odd; /**< residuals */
-    TH1F* m_h1_vResid_L1_odd; /**< residuals */
-    TH1F* m_h1_uResid_L2_odd; /**< residuals */
-    TH1F* m_h1_vResid_L2_odd; /**< residuals */
-    TH1F* m_h1_uResid_L1_even; /**< residuals */
-    TH1F* m_h1_vResid_L1_even; /**< residuals */
-    TH1F* m_h1_uResid_L2_even; /**< residuals */
-    TH1F* m_h1_vResid_L2_even; /**< residuals */
-    TH1F* m_h1_uResid_L2_future_even; /**< residuals */
-    TH1F* m_h1_vResid_L2_future_even; /**< residuals */
+    TH1F* m_h1_uResid_L1_odd = nullptr; /**< residuals */
+    TH1F* m_h1_vResid_L1_odd = nullptr; /**< residuals */
+    TH1F* m_h1_uResid_L2_odd = nullptr; /**< residuals */
+    TH1F* m_h1_vResid_L2_odd = nullptr; /**< residuals */
+    TH1F* m_h1_uResid_L1_even = nullptr; /**< residuals */
+    TH1F* m_h1_vResid_L1_even = nullptr; /**< residuals */
+    TH1F* m_h1_uResid_L2_even = nullptr; /**< residuals */
+    TH1F* m_h1_vResid_L2_even = nullptr; /**< residuals */
+    TH1F* m_h1_uResid_L2_future_even = nullptr; /**< residuals */
+    TH1F* m_h1_vResid_L2_future_even = nullptr; /**< residuals */
 
-    TH2F* m_h2_hitMap_vL1_uL1; /**< L1 hitmap*/
-    TH2F* m_h2_hitMap_vL2_uL2; /**< L2 hitmap*/
+    TH2F* m_h2_hitMap_vL1_uL1 = nullptr; /**< L1 hitmap*/
+    TH2F* m_h2_hitMap_vL2_uL2 = nullptr; /**< L2 hitmap*/
 
-    TH2F* m_h2_interMap_vL1_uL1; /**< L1 hitmap*/
-    TH2F* m_h2_interMap_vL2_uL2; /**< L2 hitmap*/
+    TH2F* m_h2_interMap_vL1_uL1 = nullptr; /**< L1 hitmap*/
+    TH2F* m_h2_interMap_vL2_uL2 = nullptr; /**< L2 hitmap*/
 
-    TH2F* m_h2_corr_vL3_vL1; /**< correlations */
-    TH2F* m_h2_corr_vL3_vL2; /**< correlations */
-    TH2F* m_h2_corr_uL3_uL1_even; /**< correlations */
-    TH2F* m_h2_corr_uL3_uL2_even; /**< correlations */
-    TH2F* m_h2_corr_uL3_uL1_odd; /**< correlations */
-    TH2F* m_h2_corr_uL3_uL2_odd;/**< correlations */
-    TH2F* m_h2_corr_uL4_uL1; /**< correlations */
-    TH2F* m_h2_corr_uL3_uL4; /**< correlations */
-    TH2F* m_h2_corr_vL3_vL4; /**< correlations */
-    TH2F* m_h2_corr_vL3_uL1; /**< correlations */
-    //    TH2F* m_h2_corr_uL1_uL2;
-    //    TH2F* m_h2_corr_vL1_vL2;
+    TH2F* m_h2_corr_vL3_vL1 = nullptr; /**< correlations */
+    TH2F* m_h2_corr_vL3_vL2 = nullptr; /**< correlations */
+    TH2F* m_h2_corr_uL3_uL1_even = nullptr; /**< correlations */
+    TH2F* m_h2_corr_uL3_uL2_even = nullptr; /**< correlations */
+    TH2F* m_h2_corr_uL3_uL1_odd = nullptr; /**< correlations */
+    TH2F* m_h2_corr_uL3_uL2_odd = nullptr;/**< correlations */
+    TH2F* m_h2_corr_uL4_uL1 = nullptr; /**< correlations */
+    TH2F* m_h2_corr_uL3_uL4 = nullptr; /**< correlations */
+    TH2F* m_h2_corr_vL3_vL4 = nullptr; /**< correlations */
+    TH2F* m_h2_corr_vL3_uL1 = nullptr; /**< correlations */
   };
 }
 

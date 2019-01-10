@@ -62,20 +62,20 @@ namespace Belle2 {
       std::map <int, std::vector <int>> m_dhc_mapto_dhe;
 
       /** Event counter */
-      unsigned int m_packed_events = 0;
+      unsigned int m_packed_events{0};
       /** Trigger Nr */
-      unsigned int m_trigger_nr = 0;
+      unsigned int m_trigger_nr{0};
       /** Run+Subrun Nr */
-      unsigned short m_run_nr_word1 = 0;
+      unsigned short m_run_nr_word1{0};
       /** Exp+Run Nr */
-      unsigned short m_run_nr_word2 = 0;
+      unsigned short m_run_nr_word2{0};
       /** Time(Tag) from MetaInfo */
-      unsigned long long int m_meta_time = 0;
+      unsigned long long int m_meta_time{0};
 
       /** DHP Readout Frame Nr for DHP and DHE headers */
-      unsigned int m_trigger_dhp_framenr = 0;
+      unsigned int m_trigger_dhp_framenr{0};
       /** DHE Trigger Gate for DHE headers */
-      unsigned int m_trigger_dhe_gate = 0;
+      unsigned int m_trigger_dhe_gate{0};
 
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
@@ -127,10 +127,10 @@ namespace Belle2 {
       std::map <VxdID , int> startOfVxdID;
 
       /** temporary hitmap buffer for pixel to raw data conversion */
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] = {0};
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] {0};
 
-      unsigned int dhe_byte_count = 0; /**< Byte count in current DHE package */
-      unsigned int dhc_byte_count = 0; /**< Byte count in current DHC package */
+      unsigned int dhe_byte_count{0}; /**< Byte count in current DHE package */
+      unsigned int dhc_byte_count{0}; /**< Byte count in current DHC package */
 
     };//end class declaration
 

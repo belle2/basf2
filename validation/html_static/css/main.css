@@ -480,6 +480,67 @@ textarea {
 	cursor: pointer;
 }
 
+.swatch-line{
+    vertical-align: middle;
+    display: block;
+}
+
+/* Temporary workaround the inheritance from inheritance #menu div:first-child etc:
+just use spans /klieret */
+.swatch {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.swatch-text{
+}
+
+.swatch.header {
+    font-style: italic;
+}
+
+#swatch-fail-expert {
+    background: red;
+    color: white;
+}
+
+#swatch-warn-expert {
+    background: orange;
+    color: white;
+}
+
+#swatch-pass-expert {
+    background: #33cc33;
+    color: white;
+}
+
+#swatch-nocomp-expert {
+    background: #0033ff;
+    color: white;
+}
+
+#swatch-fail {
+    background: red;
+    color: white;
+}
+
+#swatch-warn {
+    background: #ffcc00;
+    color: black;
+}
+
+#swatch-pass {
+    background: #ccffcc;
+    color: black;
+}
+
+#swatch-nocomp {
+    background: #6666ff;
+    color: white;
+}
+
 .object {
 	margin-bottom: 10px;
 	order: 2;

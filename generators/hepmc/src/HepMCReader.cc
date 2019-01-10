@@ -22,12 +22,14 @@
 
 #include <TLorentzVector.h>
 
+
 using namespace std;
 using namespace Belle2;
 
 
 void HepMCReader::open(const string& filename)
 {
+  B2INFO("Reading HEPMC inputfile at " << filename);
   m_input.open(filename.c_str());
   if (!m_input) { throw (HepMCCouldNotOpenFileError() << filename); }
 }
@@ -36,6 +38,11 @@ void HepMCReader::open(const string& filename)
 int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 {
   int eventID = -1;
+
+  HepMC::GenEvent evt;
+  bool go_on = readNextEvent(evt);
+
+
   int nparticles = 0;
   if (nparticles <= 0) {
     throw (HepMCEmptyEventError() << nparticles);
@@ -44,6 +51,21 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
   return eventID;
 }
 
+bool HepMCReader::readNextEvent(HepMC::GenEvent& evt)
+{
+  // walk through the IOStream
+  if (m_input) {
+    evt.read(m_input);
+    if (evt.is_valid()) {
+      B2DEBUG(10, "Found valid event.");
+      return true;
+    } else {
+      B2DEBUG(10, "The next event was invalid.");
+    }
+  }
+  B2DEBUG(10, "Could not skip to next event.");
+  return false;
+}
 
 //===================================================================
 //                  Protected methods

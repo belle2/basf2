@@ -20,6 +20,7 @@
 
 #include <TLorentzRotation.h>
 
+#include "HepMC/GenEvent.h"
 namespace Belle2 {
 
   /**
@@ -84,6 +85,7 @@ namespace Belle2 {
 
   protected:
 
+    bool readNextEvent(HepMC::GenEvent& evt); /**< read the next event from the IO stream and write into evt */
     std::ifstream m_input; /**< The input stream of the ascii file. */
 
   };

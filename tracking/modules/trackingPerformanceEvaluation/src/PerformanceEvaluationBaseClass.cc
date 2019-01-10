@@ -343,18 +343,17 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_den, TH1F* h1_num, cons
                                                 bool geo_accettance, TList* histoList)
 {
 
-
   std::string total;
   std::string trueTitle;
 
   if (geo_accettance == false) {
-    const char* name1 = "_noGeoAcc";
-    total = std::string(name) + std::string(name1);
-    trueTitle = std::string(title) + std::string(name1);
+    std::string name1 = "_noGeoAcc";
+    total = std::string(name) + name1;
+    trueTitle = std::string(title) + name1;
   } else {
-    const char* name2 = "_withGeoAcc";
-    total = std::string(name) + std::string(name2);
-    trueTitle = std::string(title) + std::string(name2);
+    std::string name2 = "_withGeoAcc";
+    total = std::string(name) + name2;
+    trueTitle = std::string(title) + name2;
   }
 
   TH1F* h = (TH1F*)duplicateHistogram(total.c_str(), trueTitle.c_str(), h1_den, histoList);
@@ -386,14 +385,14 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack,
 {
   if (h1_Track == NULL) B2INFO("h_Track missing");
 
-  const char* name1 = "_noGeoAcc";
-  const char* name2 = "_withGeoAcc";
+  std::string name1 = "_noGeoAcc";
+  std::string name2 = "_withGeoAcc";
 
-  std::string total1 = std::string(name) + std::string(name1);
-  std::string total2 = std::string(name) + std::string(name2);
+  std::string total1 = std::string(name) + name1;
+  std::string total2 = std::string(name) + name2;
 
-  std::string title1 = std::string(title) + std::string(name1);
-  std::string title2 = std::string(title) + std::string(name2);
+  std::string title1 = std::string(title) + name1;
+  std::string title2 = std::string(title) + name2;
 
   TH1F* h[2];
 
@@ -442,25 +441,25 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack,
 TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
                                                 const char* name, const char* title, bool geo_accettance, TList* histoList)
 {
-  const char* err_char = "_error_";
-  const char* addTitle = "Errors, ";
+  std::string err_char = "_error_";
+  std::string addTitle = "Errors, ";
 
   std::string total;
   std::string error;
   std::string trueTitle;
 
-  std::string titleErr = std::string(addTitle) + std::string(title);
+  std::string titleErr = addTitle + std::string(title);
 
   if (geo_accettance == false) {
-    const char* name1 = "_noGeoAcc";
-    total = std::string(name) + std::string(name1);
-    trueTitle = std::string(title) + std::string(name1);
-    error = std::string(name) + std::string(err_char) + std::string(name1);
+    std::string name1 = "_noGeoAcc";
+    total = std::string(name) + name1;
+    trueTitle = std::string(title) + name1;
+    error = std::string(name) + err_char + std::string(name1);
   } else {
-    const char* name2 = "_withGeoAcc";
-    total = std::string(name) + std::string(name2);
-    trueTitle = std::string(title) + std::string(name2);
-    error = std::string(name) + std::string(err_char) + std::string(name2);
+    std::string name2 = "_withGeoAcc";
+    total = std::string(name) + name2;
+    trueTitle = std::string(title) + name2;
+    error = std::string(name) + err_char + std::string(name2);
   }
 
   TH2F* h2[2];
@@ -500,20 +499,20 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack,
 {
   if (h2_Track == NULL) B2INFO("h_Track missing");
 
-  const char* name1 = "_noGeoAcc";
-  const char* name2 = "_withGeoAcc";
-  const char* err_char = "_error_";
-  const char* addTitle = "Errors, ";
+  std::string name1 = "_noGeoAcc";
+  std::string name2 = "_withGeoAcc";
+  std::string err_char = "_error_";
+  std::string addTitle = "Errors, ";
 
-  std::string total1 = std::string(name) + std::string(name1);
-  std::string total2 = std::string(name) + std::string(name2);
+  std::string total1 = std::string(name) + name1;
+  std::string total2 = std::string(name) + name2;
 
-  std::string title1 = std::string(title) + std::string(name1);
-  std::string title2 = std::string(title) + std::string(name2);
+  std::string title1 = std::string(title) + name1;
+  std::string title2 = std::string(title) + name2;
 
-  std::string error1 = std::string(name) + std::string(err_char) + std::string(name1);
-  std::string error2 = std::string(name) + std::string(err_char) + std::string(name2);
-  std::string titleErr = std::string(addTitle) + std::string(title);
+  std::string error1 = std::string(name) + err_char + name1;
+  std::string error2 = std::string(name) + err_char + name2;
+  std::string titleErr = addTitle + std::string(title);
 
   TH2F* h2[4];
 
@@ -597,11 +596,11 @@ TH1F* PerformanceEvaluationBaseClass::geoAcc1D(TH1F* h1_den, TH1F* h1_num, const
 TH2F* PerformanceEvaluationBaseClass::geoAcc2D(TH2F* h2_den, TH2F* h2_num,
                                                const char* name, const char* title, TList* histoList)
 {
-  const char* err_char = "_err";
-  const char* addTitle = "Errors, ";
+  std::string err_char = "_err";
+  std::string addTitle = "Errors, ";
 
-  std::string error = std::string(name) + std::string(err_char);
-  std::string titleErr = std::string(addTitle) + std::string(title);
+  std::string error = std::string(name) + err_char;
+  std::string titleErr = addTitle + std::string(title);
 
   TH2F* h2[2];
   h2[0] = (TH2F*)duplicateHistogram(name, title, h2_den, histoList);

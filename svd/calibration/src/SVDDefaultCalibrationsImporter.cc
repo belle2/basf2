@@ -49,13 +49,6 @@
 #include <sstream>
 #include <TFile.h>
 #include <TVectorF.h>
-/*
-#include <fstream>
-
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-*/
 
 using namespace std;
 using namespace Belle2;
@@ -76,68 +69,6 @@ void SVDDefaultCalibrationsImporter::importSVDChannelMapping(const std::string& 
 }
 
 
-void SVDDefaultCalibrationsImporter::importSVDTimeShiftCorrections()
-{
-  DBImportObjPtr<SVDPulseShapeCalibrations::t_time_payload > svdTimeShiftCal(SVDPulseShapeCalibrations::time_name);
-
-  svdTimeShiftCal.construct(25);
-
-  m_firstExperiment = 3;
-  //  m_firstRun = 111;
-  m_firstRun = 400;
-  m_lastExperiment = 3;
-  //  m_lastRun = 111;
-  m_lastRun = 400;
-
-  B2INFO("importing values for run 111 of test beam (evaluated on 10k events of run111");
-
-  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
-  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
-    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
-    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
-      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
-
-        //U side
-        bool side = 1 ;
-
-        /*  //run111
-              float valueToFill = 31.5; //all layers except L6
-        //RMS = 6 for all layers
-        if(layer == 6)
-          valueToFill = 25.5;
-        */
-
-        float valueToFill = 42; //all layers except L6
-        //RMS = 6 for all layers
-        if (layer == 6)
-          valueToFill = 34.5;
-
-        for (int strip = 0; strip < 768; strip++)
-          svdTimeShiftCal->set(layer, ladder, sensor, side, strip, valueToFill);
-
-
-        //V side
-        side = 0;
-        valueToFill = 30.5;
-        //RMS = 5 for all layers
-
-        int maxStripNumber = 512;
-        if (layer == 3) maxStripNumber = 768;
-
-        for (int strip = 0; strip < maxStripNumber; strip++)
-          svdTimeShiftCal->set(layer, ladder, sensor, side, strip, valueToFill);
-
-      }
-    }
-  }
-
-  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
-                         m_lastExperiment, m_lastRun);
-
-  svdTimeShiftCal.import(iov);
-
-  B2RESULT("SVDTimeShiftCorrections imported to database.");
-}
 //only for Phase2 Geometry!
 
 void SVDDefaultCalibrationsImporter::importSVDFADCMaskedStrips()

@@ -296,11 +296,24 @@ class Plotuple:
 
     def set_background(self, canvas):
 
+        # kRed         #FF0000 Red
+        # kRed - 9     #FF9999 Sweet pink
+
+        # kOrange + 1  #FF9832 Sun
+        # kOrange - 9  #FFCC9A Manhattan
+
+        # kGreen - 3   #33CC33 Lime green
+        # kGreen - 10  #CCFFCC Chinook
+
+        # kAzure       #0032FE Medium blue
+        # kAzure - 2   #3265FE Medium slate blue
+        # kAzure - 9   #98CBFF Jordy blue
+
         colors = {
             "error": ROOT.kRed,
             "warning": ROOT.kOrange + 1,
             "equal": ROOT.kGreen - 3,
-            "not_compared": ROOT.kAzure
+            "not_compared": ROOT.kAzure - 2
         }
         colors_expert = {
             "error": ROOT.kRed - 9,

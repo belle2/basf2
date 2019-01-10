@@ -507,60 +507,63 @@ textarea {
 .swatch-line-header{
     vertical-align: middle;
     display: block;
-    padding: 5px 0px 5px 0px;
+    padding: 3px 0px 3px 0px;
 }
 
 /* Temporary workaround the inheritance from inheritance #menu div:first-child etc:
 just use spans /klieret */
 .swatch {
-    height: 25px;
-    width: 25px;
+    height: 22px;
+    width: 22px;
     border-radius: 50%;
     border: none;
     display: inline-block;
     text-align: center;
     color: white;
     font-weight: bold;
+    font-size: 13px;
 }
 
 .swatch-text{
+    line-height: 20px;
+    font-size: 14px;
 }
 
 
 #swatch-fail-nonexpert {
-    background: red;
+    background: #FF0000;
     color: white;
 }
 
 #swatch-warn-nonexpert {
-    background: orange;
+    background: #FF9832;
     color: white;
 }
 
 #swatch-pass-nonexpert {
-    background: #33cc33;
+    background: #33CC33;
     color: white;
 }
 
 #swatch-nocomp-nonexpert {
-    background: #3333ff;
+    background: #3265FE;
     color: white;
 }
 
 #swatch-fail {
-    background: #ff9999;
+    background: #FF9999;
 }
 
 #swatch-warn {
-    background: #ffcc99;
+    background: #FFCC9A;
 }
 
 #swatch-pass {
-    background: #ccffcc;
+    background: #CCFFCC;
 }
 
 #swatch-nocomp {
-    background: #ccccff;
+    background: #98CBFF;
 }
 
 /* NEWS */

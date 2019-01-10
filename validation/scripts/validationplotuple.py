@@ -13,9 +13,6 @@ import json
 from validationfunctions import strip_ext, index_from_revision, get_style
 
 
-# todo: use os.path and clean up confusing of Plotuple.work_folder, Plotuple.path etc.
-
-
 class Plotuple:
 
     """!
@@ -170,6 +167,14 @@ class Plotuple:
         if self.contact == '' or self.contact is None:
             self.contact = 'n/a'
             self.warnings.append('No Contact Person')
+
+        self.plot_folder = os.path.join(
+            "plots",
+            "_".join(sorted(self.list_of_revisions)),
+            self.package
+        )
+        if not os.path.isdir(self.plot_folder):
+            os.makedirs(self.plot_folder)
 
         # Create the actual plot or n-tuple-table
         self.create_plotuple()
@@ -426,29 +431,21 @@ class Plotuple:
             if title:
                 title.SetTextColor(style.GetLineColor())
 
-        # Create the folder in which the plot is then stored
-        path = './plots/{}/{}'.format(
-            '_'.join(sorted(self.list_of_revisions)),
-            self.package
-        )
-        if not os.path.isdir(path):
-            os.makedirs(path)
-
         # Save the plot as PNG and PDF
-        canvas.Print(os.path.join(path, self.get_png_filename()))
-        canvas.Print(os.path.join(path, self.get_pdf_filename()))
+        canvas.Print(os.path.join(self.plot_folder, self.get_png_filename()))
+        canvas.Print(os.path.join(self.plot_folder, self.get_pdf_filename()))
 
-        # todo: use the self.work_folder here
-        self.path = path
-        self.file = './{0}/{1}_{2}'.format(
-            '/'.join(path.split('/')[2:]),
-            strip_ext(self.rootfile),
-            self.key
+        self.file = os.path.join(
+            self.plot_folder,
+            "{}_{}".format(
+                strip_ext(self.rootfile),
+                self.key
+            )
         )
 
     # todo: not super elegant, this is why you should use os.path.join etc. /klieret
     def get_plot_path(self):
-        return self.path + "/"
+        return self.plot_folder + "/"
 
     def get_png_filename(self):
         return '{}_{}.png'.format(strip_ext(self.rootfile), self.key)
@@ -566,7 +563,6 @@ class Plotuple:
 
             # If we have a one-dimensional histogram
             if mode == '1D':
-                options_str = ""
                 if not drawn:
                     # Get additional options for 1D histograms
                     # (Intersection with self.metaoptions)
@@ -575,12 +571,12 @@ class Plotuple:
                         set(additional_options) & set(self.metaoptions)
                     )
 
-                    options_str = plot.object.GetOption() + ' '.join(additional_options)
+                    options_str = plot.object.GetOption() + \
+                        ' '.join(additional_options)
                     drawn = True
                 else:
                     options_str = "SAME"
 
-                print(options_str)
                 self.draw_root_object(self.type, plot.object, options_str)
 
                 # redraw grid ontop of histogram, if selected
@@ -629,25 +625,17 @@ class Plotuple:
 
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
-        # Create the folder in which the plot is then stored
-        path = './plots/{}/{}'.format(
-            '_'.join(sorted(self.list_of_revisions)),
-            self.package
-        )
-        if not os.path.isdir(path):
-            os.makedirs(path)
-
-        # todo: refactor wtih the code from create_image_plot
         # Save the plot as PNG and PDF
-        canvas.Print('{0}/{1}_{2}.png'.format(path, strip_ext(self.rootfile),
-                                              self.key))
-        canvas.Print('{0}/{1}_{2}.pdf'.format(path, strip_ext(self.rootfile),
-                                              self.key))
+        canvas.Print(os.path.join(self.plot_folder, self.get_png_filename()))
+        canvas.Print(os.path.join(self.plot_folder, self.get_pdf_filename()))
 
-        self.path = path
-
-        self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
-                                           strip_ext(self.rootfile), self.key)
+        self.file = os.path.join(
+            self.plot_folder,
+            "{}_{}".format(
+                strip_ext(self.rootfile),
+                self.key
+            )
+        )
 
     def create_graph_plot(self):
         """!
@@ -734,25 +722,17 @@ class Plotuple:
             # if there is at least one revision
             self.set_background(canvas)
 
-        # Create the folder in which the plot is then stored
-        path = './plots/{}/{}'.format(
-            '_'.join(sorted(self.list_of_revisions)),
-            self.package
-        )
-        if not os.path.isdir(path):
-            os.makedirs(path)
-
-        # refactor wtih the code from create_image_plot
         # Save the plot as PNG and PDF
-        canvas.Print('{0}/{1}_{2}.png'.format(path, strip_ext(self.rootfile),
-                                              self.key))
-        canvas.Print('{0}/{1}_{2}.pdf'.format(path, strip_ext(self.rootfile),
-                                              self.key))
+        canvas.Print(os.path.join(self.plot_folder, self.get_png_filename()))
+        canvas.Print(os.path.join(self.plot_folder, self.get_pdf_filename()))
 
-        self.path = path
-
-        self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
-                                           strip_ext(self.rootfile), self.key)
+        self.file = os.path.join(
+            self.plot_folder,
+            "{}_{}".format(
+                strip_ext(self.rootfile),
+                self.key
+            )
+        )
 
     def create_html_content(self):
 
@@ -811,20 +791,12 @@ class Plotuple:
                 else:
                     json_nutple[ntuple.revision].append((column, None))
 
-        # Create the folder in which the plot is then stored
-        path = './plots/{}/{}'.format(
-            '_'.join(sorted(self.list_of_revisions)),
-            self.package
-        )
-        if not os.path.isdir(path):
-            os.makedirs(path)
-
-        self.path = path
-
-        json_ntuple_file = '{0}/{1}_{2}.json'.format(
-            path,
-            strip_ext(self.rootfile),
-            self.key
+        json_ntuple_file = os.path.join(
+            self.plot_folder,
+            "{}_{}.json".format(
+                strip_ext(self.rootfile),
+                self.key
+            )
         )
 
         with open(json_ntuple_file, 'w+') as json_file:
@@ -834,7 +806,7 @@ class Plotuple:
 
     def get_plot_title(self):
         if self.file:
-            return self.file.split("/")[-1].replace(".", "_").strip()
+            return os.path.basename(self.file).replace(".", "_").strip()
         else:
             # this is for html content which is not stored in any file
             return self.key

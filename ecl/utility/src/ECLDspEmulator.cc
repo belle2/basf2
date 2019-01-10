@@ -345,7 +345,12 @@ namespace Belle2 {
       //==
 
       m_AmpFit = A1;
-      m_TimeFit = T;
+      if (validity_code != c_LowAmp) {
+        m_TimeFit = T;
+      } else {
+        // Quality flag is 2, sending chi^2 instead of time
+        m_TimeFit = chi_sq;
+      }
       m_QualityFit = validity_code;
 
       return ;

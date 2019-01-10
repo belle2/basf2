@@ -380,6 +380,7 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0, Ahard, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres, m_AmpFit, m_TimeFit,
          m_QualityFit);
 
+  if (m_QualityFit == 2) m_TimeFit = 0;
 }
 
 void ECLDQMEXTENDEDModule::beginRun()

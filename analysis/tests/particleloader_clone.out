@@ -32,7 +32,6 @@
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
 [INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
@@ -120,22 +119,22 @@ Lambda0:frommc( 6)	|	  0.1330	  1.1244	  0.0967	  0.8175	  0.0363	  0.3069	  0.0
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13155962
+Total Number of Particles created in the DataStore: 12028729
 =======================================================
 
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
 			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8| Unique 
-            e+( 0)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.9996	0.9999	0.0000
-           pi+( 1)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.9996	0.9999	0.0000
-            K+( 2)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.9996	0.9999	0.0000
-            p+( 3)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.9996	0.9999	0.0000
-           mu+( 4)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.9996	0.9999	0.0000
-          K_S0( 5)	|	0.4915	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.9961	0.9997	1.0000	0.0000
-       Lambda0( 6)	|	0.5560	1.0000	1.0000	1.0000	1.0000	1.0000	0.8805	1.0000	0.9996	0.9999	0.0000
-          K_L0( 7)	|	0.9996	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	1.0000	1.0000	0.0000
-         gamma( 8)	|	0.9999	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.9997	1.0000	0.0000
+            e+( 0)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.2450	0.9999	0.0000
+           pi+( 1)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.2450	0.9999	0.0000
+            K+( 2)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.2450	0.9999	0.0000
+            p+( 3)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.2450	0.9999	0.0000
+           mu+( 4)	|	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.2450	0.9999	0.0000
+          K_S0( 5)	|	0.4915	1.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.9961	0.2325	1.0000	0.0000
+       Lambda0( 6)	|	0.5560	1.0000	1.0000	1.0000	1.0000	1.0000	0.8805	1.0000	0.2328	0.9999	0.0000
+          K_L0( 7)	|	0.2450	1.0000	1.0000	1.0000	1.0000	1.0000	0.4663	0.5284	1.0000	1.0000	0.0000
+         gamma( 8)	|	0.9999	1.0000	1.0000	1.0000	1.0000	1.0000	0.4915	0.5560	0.2450	1.0000	0.0000
 
 [INFO] 
 ======================================================================
@@ -149,13 +148,13 @@ Total Number of Particles created in the DataStore: 13155962
            mu+( 4)	|	 12.4571	 12.4571	  6.4894	  6.4894	  5.9677	  5.9677	  0.0000	  0.0000
           K_S0( 5)	|	  1.0219	  2.0793	  0.0000	  0.0000	  0.0000	  0.0000	  1.0219	  2.0793
        Lambda0( 6)	|	  2.3568	  4.2391	  1.1833	  2.1283	  1.1735	  2.1108	  0.0000	  0.0000
-          K_L0( 7)	|	 12.8209	 12.8260	  0.0000	  0.0000	  0.0000	  0.0000	 12.8209	 12.8260
+          K_L0( 7)	|	  0.2961	  1.2083	  0.0000	  0.0000	  0.0000	  0.0000	  0.2961	  1.2083
          gamma( 8)	|	 15.2537	 15.2551	  0.0000	  0.0000	  0.0000	  0.0000	 15.2537	 15.2551
 
 [INFO] 
 =======================================================
 Total Retention: 1.0000
-Total Number of Particles created in the DataStore: 13155962
+Total Number of Particles created in the DataStore: 12028729
 =======================================================
 
 [WARNING] There were 500 tracks skipped because of zero charge for mu+  { module: ParticleLoader }
@@ -205,7 +204,6 @@ Total Number of Particles created in the DataStore: 13155962
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
 [INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
@@ -1229,90 +1227,14 @@ Total Number of Particles created in the DataStore: 13155962
 [INFO]  ParticleLists: Lambda0 (0+0) + anti-Lambda0 (0+0)
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
-[INFO]  ParticleList : K_L0 (0+4)
-[INFO] collection=Particles
- PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=12 arrayIndex=50 identifier=1001 daughterIndices:  (none)
- mass=0.4976
- momentum=(-0.01, -0.02, 0.09) p=0.09314
- position=(0.00, 0.00, 0.00)
- p-value of fit (if done): 1
- error matrix (px, py, pz, E, x, y ,z):
-    8.7e-13    1.2e-12      4e-13          0          0          0          0
-    1.2e-12    1.8e-12    5.8e-13          0          0          0          0
-      4e-13    5.8e-13    1.9e-13          0          0          0          0
-          0          0          0          0          0          0          0
-          0          0          0          0    4.1e-07          0   -2.6e-06
-          0          0          0          0          0    1.7e-11          0
-          0          0          0          0   -2.6e-06          0    0.00024
-
- extra info=( ) 
-
-[INFO] collection=Particles
- PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=17 arrayIndex=51 identifier=6001 daughterIndices:  (none)
- mass=0.4976
- momentum=(-0.00, -0.02, 0.02) p=0.02535
- position=(0.00, 0.00, 0.00)
- p-value of fit (if done): 1
- error matrix (px, py, pz, E, x, y ,z):
-    5.7e-14    2.3e-13    3.1e-13          0          0          0          0
-    2.3e-13    1.1e-12    1.4e-12          0          0          0          0
-    3.1e-13    1.4e-12    1.9e-12          0          0          0          0
-          0          0          0          0          0          0          0
-          0          0          0          0    4.1e-07          0   -2.6e-06
-          0          0          0          0          0    1.7e-11          0
-          0          0          0          0   -2.6e-06          0    0.00024
-
- extra info=( ) 
-
-[INFO] collection=Particles
- PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=19 arrayIndex=52 identifier=8001 daughterIndices:  (none)
- mass=0.4976
- momentum=(0.04, 0.09, 0.07) p=0.1225
- position=(0.00, 0.00, 0.00)
- p-value of fit (if done): 1
- error matrix (px, py, pz, E, x, y ,z):
-    4.1e-12    9.5e-12   -1.4e-11          0          0          0          0
-    9.5e-12    2.3e-11   -3.5e-11          0          0          0          0
-   -1.4e-11   -3.5e-11    5.2e-11          0          0          0          0
-          0          0          0          0          0          0          0
-          0          0          0          0    4.1e-07          0   -2.6e-06
-          0          0          0          0          0    1.7e-11          0
-          0          0          0          0   -2.6e-06          0    0.00024
-
- extra info=( ) 
-
-[INFO] collection=Particles
- PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=23 arrayIndex=53 identifier=13001 daughterIndices:  (none)
- mass=0.4976
- momentum=(0.06, -0.12, -0.15) p=0.1977
- position=(0.00, 0.00, 0.00)
- p-value of fit (if done): 1
- error matrix (px, py, pz, E, x, y ,z):
-    1.6e-11   -3.5e-11    3.5e-11          0          0          0          0
-   -3.5e-11      8e-11   -7.8e-11          0          0          0          0
-    3.5e-11   -7.8e-11    7.7e-11          0          0          0          0
-          0          0          0          0          0          0          0
-          0          0          0          0    4.1e-07          0   -2.6e-06
-          0          0          0          0          0    1.7e-11          0
-          0          0          0          0   -2.6e-06          0    0.00024
-
- extra info=( ) 
-
+[INFO]  ParticleList : K_L0 (0+0)
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleList : gamma (0+4)
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=0 arrayIndex=54 identifier=1001 daughterIndices:  (none)
+ mdstIndex=0 arrayIndex=50 identifier=1001 daughterIndices:  (none)
  mass=0
  momentum=(-0.01, -0.02, 0.09) p=0.09314
  position=(0.00, 0.00, 0.00)
@@ -1331,7 +1253,7 @@ Total Number of Particles created in the DataStore: 13155962
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=5 arrayIndex=55 identifier=6001 daughterIndices:  (none)
+ mdstIndex=5 arrayIndex=51 identifier=6001 daughterIndices:  (none)
  mass=0
  momentum=(-0.00, -0.02, 0.02) p=0.02579
  position=(0.00, 0.00, 0.00)
@@ -1350,7 +1272,7 @@ Total Number of Particles created in the DataStore: 13155962
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=7 arrayIndex=56 identifier=8001 daughterIndices:  (none)
+ mdstIndex=7 arrayIndex=52 identifier=8001 daughterIndices:  (none)
  mass=0
  momentum=(0.04, 0.10, 0.07) p=0.1263
  position=(0.00, 0.00, 0.00)
@@ -1369,7 +1291,7 @@ Total Number of Particles created in the DataStore: 13155962
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
  flavorType=0 particleType=2 particleTypeUsedForFit=0
- mdstIndex=11 arrayIndex=57 identifier=13001 daughterIndices:  (none)
+ mdstIndex=11 arrayIndex=53 identifier=13001 daughterIndices:  (none)
  mass=0
  momentum=(0.06, -0.12, -0.15) p=0.2045
  position=(0.00, 0.00, 0.00)
@@ -1422,22 +1344,22 @@ Lambda0:frommc( 6)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0
 [INFO] 
 =======================================================
 Total Retention: 0.0000
-Total Number of Particles created in the DataStore: 103
+Total Number of Particles created in the DataStore: 99
 =======================================================
 
 [INFO] ParticleStats Summary: 
 
 [INFO] =======================================================================
 			|Retention|	    0|	    1|	    2|	    3|	    4|	    5|	    6|	    7|	    8| Unique 
-            e+( 0)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000
-           pi+( 1)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000
-            K+( 2)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000
-            p+( 3)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000
-           mu+( 4)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000
+            e+( 0)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	0.0000
+           pi+( 1)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	0.0000
+            K+( 2)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	0.0000
+            p+( 3)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	0.0000
+           mu+( 4)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	0.0000
           K_S0( 5)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000	0.0000
        Lambda0( 6)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000	0.0000
-          K_L0( 7)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000
-         gamma( 8)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	1.0000	1.0000	0.0000
+          K_L0( 7)	|	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	1.0000	0.0000	0.0000
+         gamma( 8)	|	0.0000	1.0000	1.0000	1.0000	1.0000	1.0000	0.0000	0.0000	0.0000	1.0000	0.0000
 
 [INFO] 
 ======================================================================
@@ -1451,12 +1373,12 @@ Total Number of Particles created in the DataStore: 103
            mu+( 4)	|	  0.0001	 10.0000	  0.0001	  5.0000	  0.0001	  5.0000	  0.0000	  0.0000
           K_S0( 5)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
        Lambda0( 6)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-          K_L0( 7)	|	  0.0000	  4.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.0000	  4.0000
+          K_L0( 7)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
          gamma( 8)	|	  0.0000	  4.0000	  0.0000	  0.0000	  0.0000	  0.0000	  0.0000	  4.0000
 
 [INFO] 
 =======================================================
 Total Retention: 0.0000
-Total Number of Particles created in the DataStore: 103
+Total Number of Particles created in the DataStore: 99
 =======================================================
 

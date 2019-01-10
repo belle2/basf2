@@ -9,6 +9,12 @@ wherever the validation-data are visible  (it's also a bit slower).
 
 import sys
 import basf2
+import b2test_utils
+
+try:
+    inputFile = basf2.find_file("mdst12.root")
+except FileNotFoundError as fnf:
+    b2test_utils.skip_test("Cannot find: %s" % fnf.filename)
 
 basf2.set_random_seed("1337")
 fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
@@ -16,8 +22,7 @@ fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 
 ###############################################################################
 # a new ParticleLoader for each fsp
 testpath = basf2.create_path()
-testpath.add_module('RootInput', inputFileName=basf2.find_file('mdst12.root'),
-                    logLevel=basf2.LogLevel.ERROR)
+testpath.add_module('RootInput', inputFileName=inputFile, logLevel=basf2.LogLevel.ERROR)
 for fsp in fsps:
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
 

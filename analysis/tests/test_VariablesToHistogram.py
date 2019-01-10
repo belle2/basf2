@@ -7,8 +7,13 @@ import ROOT
 import b2test_utils
 from ROOT import Belle2
 
+try:
+    inputFile = basf2.find_file("mdst12.root")
+except FileNotFoundError as fnf:
+    b2test_utils.skip_test("Cannot find: %s" % fnf.filename)
+
 path = basf2.create_path()
-path.add_module('RootInput', inputFileName=basf2.find_file("mdst12.root"))
+path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
 
 # Write out electron id and mc information of all electron candidates into histograms

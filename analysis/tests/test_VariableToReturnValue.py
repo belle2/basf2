@@ -2,13 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import basf2
 import ROOT
 import b2test_utils
 from ROOT import Belle2
 
+try:
+    inputFile = basf2.find_file("mdst12.root")
+except FileNotFoundError as fnf:
+    b2test_utils.skip_test("Cannot find: %s" % fnf.filename)
+
 path = basf2.create_path()
-path.add_module('RootInput', inputFileName=basf2.find_file("mdst12.root"))
+path.add_module('RootInput', inputFileName=inputFile)
 
 # Add path for high multiplicity events
 mod = basf2.register_module('VariableToReturnValue')

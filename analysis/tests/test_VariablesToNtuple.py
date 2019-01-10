@@ -7,8 +7,13 @@ import ROOT
 import b2test_utils
 from ROOT import Belle2
 
+try:
+    inputFile = basf2.find_file("mdst12.root")
+except FileNotFoundError as fnf:
+    b2test_utils.skip_test("Cannot find: %s" % fnf.filename)
+
 path = basf2.create_path()
-path.add_module('RootInput', inputFileName=basf2.find_file("mdst12.root"))
+path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
 path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma', 'clusterE > 2.5')])
 

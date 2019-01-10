@@ -19,10 +19,7 @@
 #include <top/reconstruction/TOPconfigure.h>
 
 // Hit classes
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPPDFCollection.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 
@@ -32,9 +29,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-//##include <framework/gearbox/Unit.h>
-//##include <framework/gearbox/Const.h>
-//##include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 // ROOT
 #include <TVector3.h>
@@ -73,14 +70,14 @@ namespace Belle2 {
              "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
              "time limit for photons [ns] (0 = use full TDC range)", 0.0);
+    /* not implemented yet
     addParam("writeNPdfs", m_writeNPdfs,
-             "Write out the PDF for the first N events. -1 is for all.", 0);
+       "Write out the PDF for the first N events. -1 is for all.", 0);
     addParam("writeNPulls", m_writeNPulls,
-             "Write out pulls for the first N events. -1 is for all.", 0);
-
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_pdgCodes[i] = 0;}
-
+       "Write out pulls for the first N events. -1 is for all.", 0);
+    */
+    addParam("pdfOption", m_pdfOption,
+             "PDF option, one of 'rough', 'fine', 'optimal'", std::string("fine"));
   }
 
 
@@ -92,11 +89,8 @@ namespace Belle2 {
   void TOPPDFDebuggerModule::initialize()
   {
     // input
-    StoreArray<TOPDigit> digits;
-    digits.isRequired();
-
-    StoreArray<Track> tracks;
-    tracks.isRequired();
+    m_digits.isRequired();
+    m_tracks.isRequired();
 
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
@@ -108,9 +102,8 @@ namespace Belle2 {
     barHits.isOptional();
 
     // output
-    StoreArray<TOPPDFCollection> pdfCollection;
-    pdfCollection.registerInDataStore();
-    tracks.registerRelationTo(pdfCollection);
+    m_pdfCollection.registerInDataStore();
+    m_tracks.registerRelationTo(m_pdfCollection);
 
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
@@ -126,6 +119,18 @@ namespace Belle2 {
     // Configure TOP detector
     TOPconfigure config;
     if (m_debugLevel > 0) config.print();
+
+    // Parse PDF option
+    if (m_pdfOption == "rough") {
+      m_PDFOption = TOPreco::c_Rough;
+    } else if (m_pdfOption == "fine") {
+      m_PDFOption = TOPreco::c_Fine;
+    } else if (m_pdfOption == "optimal") {
+      m_PDFOption = TOPreco::c_Optimal;
+    } else {
+      B2ERROR("TOPPDFDebuggerModule: unknown PDF option '" << m_pdfOption << "'");
+    }
+
   }
 
   void TOPPDFDebuggerModule::beginRun()
@@ -134,14 +139,12 @@ namespace Belle2 {
 
   void TOPPDFDebuggerModule::event()
   {
-    // output: pdfs
-    StoreArray<TOPPDFCollection> pdfCollection;
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // create reconstruction object
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
     reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
-    reco.setPDFoption(TOPreco::c_Fine);
+    reco.setPDFoption(m_PDFOption);
 
     // set time limit for photons lower than that given by TDC range (optional)
     if (m_maxTime > m_minTime) {
@@ -149,8 +152,7 @@ namespace Belle2 {
     }
 
     // add photons
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
         reco.addData(digit.getModuleID(), digit.getPixelID(),
                      digit.getTime(), digit.getTimeError());
@@ -158,23 +160,23 @@ namespace Belle2 {
     }
 
     // reconstruct track-by-track and store the results
-    StoreArray<Track> tracks;
-    for (const auto& track : tracks) {
+    for (const auto& track : m_tracks) {
       // construct TOPtrack from mdst track
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 
       // add this vector of vector of triplets to the TOPPDFCollection
-      TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
+      TOPPDFCollection* topPDFColl = m_pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
       topPDFColl->setLocalPositionMomentum(
         module.pointToLocal(trk.getPosition()),
-        module.momentumToLocal(trk.getMomentum())
+        module.momentumToLocal(trk.getMomentum()),
+        trk.getModuleID()
       );
-      for (size_t ihypothesis = 0; ihypothesis < Const::ChargedStable::c_SetSize; ++ihypothesis) {
-        double iMass = m_masses[ihypothesis];
-        int iPDGCode = m_pdgCodes[ihypothesis];
-        reco.setMass(iMass);
+      for (const auto& chargedStable : Const::chargedStableSet) {
+        double mass = chargedStable.getMass();
+        int iPDGCode = abs(chargedStable.getPDGCode());
+        reco.setMass(mass);
         reco.reconstruct(trk); // will run reconstruction only for this mass hypothesis
         if (reco.getFlag() != 1) break; // track is not in the acceptance of TOP
 
@@ -189,7 +191,7 @@ namespace Belle2 {
             // get this peak
             reco.getPDFPeak(pixelID, k, position, width, numPhotons);
 
-            auto tp = make_tuple(position, width, numPhotons);
+            auto tp = TOPPDFCollection::Gaussian(position, width, numPhotons);
             channelPDFCollection.at(pixelID - 1).push_back(tp);
 
           } // end loop over peaks in the pdf for this pixel
@@ -197,7 +199,7 @@ namespace Belle2 {
 
         topPDFColl->addHypothesisPDF(channelPDFCollection, iPDGCode);
       }
-      track.addRelationTo(topPDFColl);
+      if (reco.getFlag() == 1) track.addRelationTo(topPDFColl);
     } // end loop over tracks
     ++m_iEvent;
   }

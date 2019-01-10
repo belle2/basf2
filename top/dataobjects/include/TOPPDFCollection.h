@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sam Cunliffe Jan Strube                                  *
+ * Contributors: Sam Cunliffe, Jan Strube, Marko Staric                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,20 +20,30 @@
 namespace Belle2 {
 
   /**
-   * Class to store TOP log likelihoods (output of TOPReconstructor).
+   * Class to store analytical PDF
    * relation from Tracks
-   * filled in top/modules/TOPReconstruction/src/TOPReconstructorModule.cc
+   * filled top/modules/TOPPDFDebugger/src/TOPPDFDebuggerModule.cc
    */
 
   class TOPPDFCollection : public RelationsObject {
 
   public:
+
     /**
-     * typedef for parameters to describe a Gaussian
-     * position, peak width, nphotons (area)
+     * parameters to describe a Gaussian
      */
-    typedef std::tuple<float, float, float> gaussian_t; /**< representation of a Gaussian as the triplet mean, width, area*/
-    typedef std::vector<gaussian_t> channelPDF_t; /**< the PDF in a given channel is a list of Gaussians*/
+    struct Gaussian {
+      float mean = 0;  /**< position */
+      float width = 0; /**< width (sigma) */
+      float area = 0;  /**< area (number of photons) */
+      /**
+       * useful constructor
+       */
+      Gaussian(float m, float w, float a): mean(m), width(w), area(a)
+      {}
+    };
+
+    typedef std::vector<Gaussian> channelPDF_t; /**< the PDF in a given channel is a list of Gaussians*/
     typedef std::array<channelPDF_t, 512> modulePDF_t; /**< the PDF of the module is a list of 512 channel PDFs*/
 
     /**
@@ -64,10 +74,11 @@ namespace Belle2 {
     /**
      * sets the position and momentum of the exthit in local coordinates
      */
-    void setLocalPositionMomentum(const TVector3& pos, const TVector3& mom)
+    void setLocalPositionMomentum(const TVector3& pos, const TVector3& mom, int moduleID)
     {
       m_localHitPosition.SetXYZ(pos.X(), pos.Y(), pos.Z());
       m_localHitMomentum.SetXYZ(mom.X(), mom.Y(), mom.Z());
+      m_moduleID = moduleID;
     }
 
     /**
@@ -86,13 +97,19 @@ namespace Belle2 {
       return m_localHitMomentum;
     }
 
+    /**
+     * returns slot ID of the associated exthit
+     */
+    int getModuleID() const {return m_moduleID;}
+
   private:
     std::map<int, modulePDF_t> m_data; /**< collection of samples of the pdf */
     // The following two members are useful for python modules (with no access
     // to TOPGeometryPar)
     TVector3 m_localHitPosition; /**< position of the exthit in local coordinates */
     TVector3 m_localHitMomentum; /**< momentum of the exthit in local coordinates */
-    ClassDef(TOPPDFCollection, 2); /**< ClassDef */
+    int m_moduleID = 0; /**< slot ID of the exthit */
+    ClassDef(TOPPDFCollection, 3); /**< ClassDef */
   };
 } // end namespace Belle2
 

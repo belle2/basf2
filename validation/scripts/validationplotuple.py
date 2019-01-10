@@ -783,6 +783,14 @@ class Plotuple:
         #     ]
         # }
 
+        mop = metaoptions.MetaOptionParser(self.metaoptions)
+        precision = mop.int_value("float-precision", default=4)
+        format_str = "{{0:.{}f}}".format(precision)
+
+        def value2str(obj):
+            # assuming that I have a float
+            return format_str.format(obj)
+
         colum_names = []
         for key in list(self.newest.object.keys()):
             colum_names.append(key)
@@ -795,8 +803,9 @@ class Plotuple:
             key_list = list(self.reference.object.keys())
             for column in colum_names:
                 if column in key_list:
+                    value_str = value2str(self.reference.object[column])
                     json_nutple['reference'].append(
-                        (column, self.reference.object[column])
+                        (column, value_str)
                     )
                 else:
                     json_nutple['reference'].append((column, None))
@@ -808,8 +817,9 @@ class Plotuple:
 
             for column in colum_names:
                 if column in ntuple.object:
+                    value_str = value2str(ntuple.object[column])
                     json_nutple[ntuple.revision].append(
-                        (column, ntuple.object[column])
+                        (column, value_str)
                     )
                 else:
                     json_nutple[ntuple.revision].append((column, None))

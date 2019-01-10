@@ -6,6 +6,7 @@ Perform code quality checks for every commit to the analysis package.
 Eventually these checks can be included as git hooks.
 """
 
+from b2test_utils import local_software_directory
 import subprocess
 import re
 import sys
@@ -22,13 +23,13 @@ def check_error_free(tool, toolname, package, filter=lambda x: False):
         filter(lambda): function which gets called for each line of output and
            if it returns True the line will be ignored.
     """
-    try:
-        output = subprocess.check_output([tool, package], encoding="utf8")
-    except subprocess.CalledProcessError as error:
-        print(error)
-        output = error.output
+    with local_software_directory():
+        try:
+            output = subprocess.check_output([tool, package], encoding="utf8")
+        except subprocess.CalledProcessError as error:
+            print(error)
+            output = error.output
 
-    print(output)
     clean_log = [e for e in output.splitlines() if e and not filter(e)]
     if len(clean_log) > 0:
         print(f"""\

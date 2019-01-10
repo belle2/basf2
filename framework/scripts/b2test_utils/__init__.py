@@ -97,6 +97,24 @@ def clean_working_directory():
             yield tempdir
 
 
+@contextmanager
+def local_software_directory():
+    """Context manager to make sure we are executed in the top software
+    directory by switching to $BELLE2_LOCAL_DIR.
+
+    >>> with local_software_directory():
+    >>>    assert(os.listdir().contains("analysis"))
+    """
+    try:
+        directory = os.environ["BELLE2_LOCAL_DIR"]
+    except KeyError:
+        raise RuntimeError("Cannot find local Belle 2 software directory, "
+                           "have you setup the software correctly?")
+
+    with working_directory(directory):
+        yield directory
+
+
 def run_in_subprocess(*args, target, **kwargs):
     """Run the given ``target`` function in a child process using `multiprocessing.Process`
 

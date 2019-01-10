@@ -774,15 +774,13 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
 
   h->GetYaxis()->SetRangeUser(0.00001, 1);
 
-  double num = 0;
-  double den = 0;
   Int_t bin = 0;
   Int_t nBins = 0;
 
   for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
 
-    num = 0;
-    den = 0 ;
+    double num = 0;
+    double den = 0 ;
 
     for (int other1_bin = 1; other1_bin < the_other1->GetNbins() + 1; other1_bin++)
       for (int other2_bin = 1; other2_bin < the_other2->GetNbins() + 1; other2_bin++) {

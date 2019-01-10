@@ -35,14 +35,14 @@ SVDLocalCalibrationsMonitorModule::SVDLocalCalibrationsMonitorModule() : Module(
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDLocalCalibrationMonitor_output.root"));
 }
 
-void SVDLocalCalibrationsMonitorModule::initialize()
+void SVDLocalCalibrationsMonitorModule::beginRun()
 {
 
   // create new root file
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
   //tree initialization
-  m_tree = new TTree("calib", "RECREATE");
+  m_tree = new TTree("calibLocal", "RECREATE");
   b_run = m_tree->Branch("run", &m_run, "run/i");
   b_layer = m_tree->Branch("layer", &m_layer, "layer/i");
   b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
@@ -60,7 +60,7 @@ void SVDLocalCalibrationsMonitorModule::initialize()
   b_pulseWidthAVE = m_tree->Branch("pulseWidthAVE", &m_pulseWidthAVE, "pulseWidthAVE/F");
   b_pulseWidthRMS = m_tree->Branch("pulseWidthRMS", &m_pulseWidthRMS, "pulseWidthRMS/F");
 
-  m_treeDetailed = new TTree("calibDetailed", "RECREATE");
+  m_treeDetailed = new TTree("calibLocalDetailed", "RECREATE");
   b_run = m_treeDetailed->Branch("run", &m_run, "run/i");
   b_layer = m_treeDetailed->Branch("layer", &m_layer, "layer/i");
   b_ladder = m_treeDetailed->Branch("ladder", &m_ladder, "ladder/i");
@@ -75,10 +75,7 @@ void SVDLocalCalibrationsMonitorModule::initialize()
   b_peakTime = m_treeDetailed->Branch("peakTime", &m_peakTime, "peakTime/F");
   b_pulseWidth = m_treeDetailed->Branch("pulseWidth", &m_pulseWidth, "pulseWidth/F");
 
-}
 
-void SVDLocalCalibrationsMonitorModule::beginRun()
-{
   if (!m_MaskedStr.isValid())
     B2WARNING("No valid SVDFADCMaskedStrip for the requested IoV");
   if (!m_NoiseCal.isValid())
@@ -413,12 +410,14 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     B2RESULT("   - SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
   else
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
-}
+  //}
 
-void SVDLocalCalibrationsMonitorModule::terminate()
-{
+  //void SVDLocalCalibrationsMonitorModule::terminate()
+  //{
 
   if (m_rootFilePtr != NULL) {
+
+    m_rootFilePtr->cd();
 
     //write the tree
     m_treeDetailed->Write();
@@ -431,6 +430,7 @@ void SVDLocalCalibrationsMonitorModule::terminate()
     m_rootFilePtr->mkdir("gain_electronsCharge");
     m_rootFilePtr->mkdir("peakTime");
     m_rootFilePtr->mkdir("pulseWidth");
+
 
     VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -477,9 +477,8 @@ void SVDLocalCalibrationsMonitorModule::terminate()
           }
 
     m_rootFilePtr->Close();
-    B2RESULT("The rootfile containing the list of histograms has been filled and closed.");
+    B2RESULT("The rootfile containing the list of histograms has been filled and closed [Local].");
 
 
   }
 }
-

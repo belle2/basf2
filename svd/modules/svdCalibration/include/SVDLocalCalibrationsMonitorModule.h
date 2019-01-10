@@ -42,21 +42,14 @@ namespace Belle2 {
      */
     SVDLocalCalibrationsMonitorModule();
 
-    /** initialize the TTrees */
-    virtual void initialize() override;
-
-    /**  check validities of payloads*/
+    /** initialize the TTrees and check validities of payloads*/
     virtual void beginRun() override;
 
     /** fill trees and histograms */
     virtual void event() override;
 
-    /** print the payloads uniqueID */
+    /** print the payloads uniqueID and write trees and histograms to the rootfile  */
     virtual void endRun() override;
-
-    /** write trees and histograms to the rootfile */
-    virtual void terminate() override;
-
 
     /* ROOT file related parameters */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */

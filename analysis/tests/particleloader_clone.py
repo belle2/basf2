@@ -12,7 +12,7 @@ import basf2
 import b2test_utils
 
 try:
-    inputFile = basf2.find_file("mdst12.root")
+    inputFile = basf2.find_file('mdst12.root', 'validation')
 except FileNotFoundError as fnf:
     b2test_utils.skip_test("Cannot find: %s" % fnf.filename)
 

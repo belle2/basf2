@@ -25,11 +25,11 @@ def _stdChargedEffCuts(particletype, listtype):
     effindex = _effnames.index(listtype)
 
     # efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
-    effcuts = [[0.002, 0.075, 0.275],
-               [0.002, 0.043, 0.218],
-               [0.000, 0.061, 1.000],
-               [0.047, 1.000, 1.000],
-               [0.008, 1.000, 1.000]]
+    effcuts = [[0.001, 0.019, 0.098],
+               [5e-6,  0.027, 0.167],
+               [0.000, 0.043, 0.251],
+               [0.093, 0.301, 0.709],
+               [0.187, 0.418, 0.909]]
     #
     return effcuts[particleindex][effindex]
 

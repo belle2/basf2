@@ -480,9 +480,19 @@ textarea {
 	cursor: pointer;
 }
 
+/* LEGEND/PALETTE/SWATCHES */
+/* ======================================================================== */
+
 .swatch-line{
     vertical-align: middle;
     display: block;
+    padding: 1.5px 0px 1.5px 0px;
+}
+
+.swatch-line-header{
+    vertical-align: middle;
+    display: block;
+    padding: 5px 0px 5px 0px;
 }
 
 /* Temporary workaround the inheritance from inheritance #menu div:first-child etc:
@@ -491,55 +501,54 @@ just use spans /klieret */
     height: 25px;
     width: 25px;
     border-radius: 50%;
+    border: none;
     display: inline-block;
+    text-align: center;
+    font-weight: bold;
+    color: white;
 }
 
 .swatch-text{
 }
 
-.swatch.header {
-    font-style: italic;
-}
 
-#swatch-fail-expert {
+#swatch-fail-nonexpert {
     background: red;
     color: white;
 }
 
-#swatch-warn-expert {
+#swatch-warn-nonexpert {
     background: orange;
     color: white;
 }
 
-#swatch-pass-expert {
+#swatch-pass-nonexpert {
     background: #33cc33;
     color: white;
 }
 
-#swatch-nocomp-expert {
-    background: #0033ff;
+#swatch-nocomp-nonexpert {
+    background: #3333ff;
     color: white;
 }
 
 #swatch-fail {
-    background: red;
-    color: white;
+    background: #ff9999;
 }
 
 #swatch-warn {
-    background: #ffcc00;
-    color: black;
+    background: #ffcc99;
 }
 
 #swatch-pass {
     background: #ccffcc;
-    color: black;
 }
 
 #swatch-nocomp {
-    background: #6666ff;
-    color: white;
+    background: #ccccff;
 }
+
+/* ======================================================================== */
 
 .object {
 	margin-bottom: 10px;

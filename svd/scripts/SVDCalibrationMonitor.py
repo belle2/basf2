@@ -12,7 +12,7 @@ Then execute the script:
 where:
 local -> local calibration (from xml)
 cluster -> cluster parameters
-cog -> cog calibration parameters (not available!)
+cog -> cog calibration parameters
 """
 
 from basf2 import *
@@ -34,7 +34,8 @@ print('')
 args = parser.parse_args()
 
 # check the global tag first:
-GLOBAL_TAG = "svd_Belle2_20181221"  # data_reprocessing_proc7"
+# GLOBAL_TAG = "svd_Belle2_20181221"
+GLOBAL_TAG = "data_reprocessing_proc7"
 
 reset_database()
 use_database_chain()
@@ -45,7 +46,7 @@ RunList = args.run
 ExpList = args.exp
 
 filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
-filenameCoG = "SVDCoGCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
+filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 filenameCluster = "SVDClusterCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 
 
@@ -59,10 +60,6 @@ main.add_module("Geometry")
 
 # add calibration monitor modules
 
-if args.doCluster:
-    cluster = register_module('SVDClusterCalibrationsMonitor')
-    cluster. param('outputFileName', filenameCluster)
-    main.add_module(cluster)
 
 if args.doLocal:
     local = register_module('SVDLocalCalibrationsMonitor')
@@ -70,9 +67,14 @@ if args.doLocal:
     main.add_module(local)
 
 if args.doCoG:
-    cog = register_module('SVDCogCalibrationsMonitor')
+    cog = register_module('SVDCoGTimeCalibrationsMonitor')
     cog. param('outputFileName', filenameCoG)
     main.add_module(cog)
+
+if args.doCluster:
+    cluster = register_module('SVDClusterCalibrationsMonitor')
+    cluster. param('outputFileName', filenameCluster)
+    main.add_module(cluster)
 
 # process single event
 print_path(main)

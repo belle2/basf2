@@ -22,6 +22,7 @@
 #include <string.h>
 #include <unistd.h>
 
+
 using namespace Belle2;
 using namespace GDL;
 
@@ -41,41 +42,87 @@ void TRGGDLDSTModule::initialize()
 
   GDLResult.registerInDataStore();
 
+  for (int i = 0; i < 320; i++) {
+    LeafBitMap[i] = m_unpacker->getLeafMap(i);
+  }
+  for (int i = 0; i < 320; i++) {
+    strcpy(LeafNames[i], m_unpacker->getLeafnames(i));
+  }
+  _e_timtype   = 0;
+  _e_gdll1rvc  = 0;
+  _e_coml1rvc  = 0;
+  _e_toprvc    = 0;
+  _e_eclrvc    = 0;
+  _e_cdcrvc    = 0;
+  _e_toptiming = 0;
+  _e_ecltiming = 0;
+  _e_cdctiming = 0;
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(LeafNames[i], "timtype") == 0)    _e_timtype  = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "gdll1rvc") == 0)   _e_gdll1rvc = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "coml1rvc") == 0)   _e_coml1rvc = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "toprvc") == 0)     _e_toprvc   = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "eclrvc") == 0)     _e_eclrvc   = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "cdcrvc") == 0)     _e_cdcrvc   = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "toptiming") == 0)  _e_toptiming = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "ecltiming") == 0)  _e_ecltiming = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "cdctiming") == 0)  _e_cdctiming = LeafBitMap[i];
+  }
 }
 
 void TRGGDLDSTModule::event()
 {
 
-  StoreArray<TRGGDLUnpackerStore> entAry;
+  int n_leafs = 0;
+  n_leafs  = m_unpacker->getnLeafs();
+  int n_leafsExtra = 0;
+  n_leafsExtra = m_unpacker->getnLeafsExtra();
+  int n_clocks = m_unpacker->getnClks();
+  //int nconf = m_unpacker->getconf(); // unused
 
-  std::vector<std::vector<int> > _data(GDL::nLeafs + GDL::nLeafsExtra);
-  for (int leaf = 0; leaf < GDL::nLeafs + GDL::nLeafsExtra; leaf++) {
-    std::vector<int> _v(GDL::nClks);
+
+  StoreArray<TRGGDLUnpackerStore> entAry;
+  if (!entAry || !entAry.getEntries()) return;
+
+  //prepare entAry adress
+  int clk_map = 0;
+  for (int i = 0; i < 320; i++) {
+    if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;
+  }
+
+  std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
+  for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
+    std::vector<int> _v(n_clocks);
     _data[leaf] = _v;
   }
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[GDL::nLeafs + GDL::nLeafsExtra];
-    setLeafPointersArray(entAry[ii], Bits);
-    for (int leaf = 0; leaf < GDL::nLeafs + GDL::nLeafsExtra; leaf++) {
-      _data[leaf][entAry[ii]->m_clk] =  *Bits[leaf];
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
+    //set pointer
+    for (int i = 0; i < 320; i++) {
+      if (LeafBitMap[i] != -1) {
+        Bits[LeafBitMap[i]] = &(entAry[ii]->m_unpacker[i]);
+      }
+    }
+    for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
+      _data[leaf][entAry[ii]->m_unpacker[clk_map]] =  *Bits[leaf];
     }
   }
 
   GDLResult.create();
 
-  GDLResult->setGdlL1Time(_data[GDL::e_l1rvc][GDL::nClks - 1]);
-  GDLResult->setComL1Time(_data[GDL::e_coml1][GDL::nClks - 1]);
-  GDLResult->setTimsrcGdlTime(_data[GDL::e_toprvc][GDL::nClks - 1],
-                              _data[GDL::e_etm0rvc][GDL::nClks - 1],
-                              _data[GDL::e_etfvdrvc][GDL::nClks - 1]);
-  GDLResult->setT0(_data[GDL::e_topt0][GDL::nClks - 1],
-                   (_data[GDL::e_eclmsb7][GDL::nClks - 1] << 7) +
-                   _data[GDL::e_ecllsb7][GDL::nClks - 1],
-                   _data[GDL::e_etfout][GDL::nClks - 1]);
+  GDLResult->setGdlL1Time(_data[_e_gdll1rvc][n_clocks - 1]);
+  GDLResult->setComL1Time(_data[_e_coml1rvc][n_clocks - 1]);
+  GDLResult->setTimsrcGdlTime(_data[_e_toprvc][n_clocks - 1],
+                              _data[_e_eclrvc][n_clocks - 1],
+                              _data[_e_cdcrvc][n_clocks - 1]);
+  GDLResult->setT0(_data[_e_toptiming][n_clocks - 1],
+                   _data[_e_ecltiming][n_clocks - 1],
+                   _data[_e_cdctiming][n_clocks - 1]);
 
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[GDL::e_timtype][GDL::nClks - 1];
+
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;

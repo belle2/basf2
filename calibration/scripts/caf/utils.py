@@ -17,6 +17,7 @@ from functools import singledispatch, update_wrapper
 import contextlib
 import enum
 import shutil
+import itertools
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
@@ -37,6 +38,15 @@ def B2INFO_MULTILINE(lines):
     """
     log_string = b2info_newline.join(lines)
     B2INFO(log_string)
+
+
+def grouper(n, iterable):
+    it = iter(iterable)
+    while True:
+        chunk = tuple(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
 
 
 def find_gaps_in_iov_list(iov_list):
@@ -109,7 +119,7 @@ class IoV(namedtuple('IoV_Factory', ['exp_low', 'run_low', 'exp_high', 'run_high
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
     It is derived from a namedtuple created class.
 
-    We use the name 'ExpRun_Factory' in the factory creation so that
+    We use the name 'IoV_Factory' in the factory creation so that
     the MRO doesn't contain two of the same class names which is probably fine
     but feels wrong.
 
@@ -165,18 +175,85 @@ class AlgResult(enum.Enum):
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
 
 
+class LocalDatabase():
+    """
+    Simple class to hold the information about a basf2 Local database.
+    Does a bit of checking that the file path entered is valid etc.
+
+    Paramters:
+        filepath (str): The file path of the database.txt file of the localdb
+
+    Keyword Arguments:
+        payload_dir (str): If the payload directory is different to the directory containing the filepath, you can set it here.
+    """
+    db_type = "local"
+
+    def __init__(self, filepath, payload_dir=''):
+        f = pathlib.Path(filepath)
+        if f.exists():
+            self.filepath = f.resolve()
+            if not payload_dir:
+                self.payload_dir = pathlib.Path(self.filepath.parent)
+            else:
+                p = pathlib.Path(payload_dir)
+                if p.exists():
+                    self.payload_dir = p.resolve()
+                else:
+                    raise ValueError("The LocalDatabase payload_dir: {} does not exist.".format(p))
+        else:
+            raise ValueError("The LocalDatabase filepath: {} does not exist.".format(f))
+
+
+class CentralDatabase():
+    """
+    Simple class to hold the information about a bas2 Central database.
+    Does no checking that a global tag exists.
+    This class could be made much simpler, but it's made to be similar to LocalDatabase.
+
+    Parameters:
+        global_tag (str): The Global Tag of the central database
+    """
+    db_type = "central"
+
+    def __init__(self, global_tag):
+        self.global_tag = global_tag
+
+
+def split_runs_by_exp(runs):
+    """
+    Parameters:
+      runs (list[ExpRun]): Ordered list of ExpRuns we want to split by Exp value
+
+    Returns:
+      list[list[ExpRun]]: Same as original list but sublists are generated for each Exp value
+    """
+    split_by_runs = []
+    current_exp = runs[0].exp
+    exp_list = []
+    for exprun in runs:
+        if exprun.exp != current_exp:
+            split_by_runs.append(exp_list)
+            exp_list = [exprun]
+        else:
+            exp_list.append(exprun)
+        current_exp = exprun.exp
+    else:
+        split_by_runs.append(exp_list)
+    return split_by_runs
+
+
 def runs_overlapping_iov(iov, runs):
     """
-    Takes an overall IoV() object and a list of Exp,Run tuples (i,j)
-    and returns the list of Exp,Run tuples containing only those runs that overlap
-    with the IoV range.
+    Takes an overall IoV() object and a list of ExpRun
+    and returns the set of ExpRun containing only those runs that overlap
+    with the IoV.
     """
-    overlapping_runs = []
+    overlapping_runs = set()
     for run in runs:
         # Construct an IOV of one run
-        run_iov = IoV(run[0], run[1], run[0], run[1])
+        run_iov = run.make_iov()
         if run_iov.overlaps(iov):
-            overlapping_runs.append(run)
+            overlapping_runs.add(run)
     return overlapping_runs
 
 
@@ -189,7 +266,7 @@ def iov_from_runs(runs):
         exprun_low, exprun_high = runs[0], runs[-1]
     else:
         exprun_low, exprun_high = runs[0], runs[0]
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
 
 
 def iov_from_runvector(iov_vector):
@@ -199,12 +276,12 @@ def iov_from_runvector(iov_vector):
     an IoV() object. It assumes that the vector was in order to begin with.
     """
     import copy
-    exprun_list = [list((iov.first, iov.second)) for iov in iov_vector]
+    exprun_list = [list(ExpRun(iov.first, iov.second)) for iov in iov_vector]
     if len(exprun_list) > 1:
         exprun_low, exprun_high = exprun_list[0], exprun_list[-1]
     else:
         exprun_low, exprun_high = exprun_list[0], copy.deepcopy(exprun_list[0])
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
 
 
 def runs_from_vector(exprun_vector):
@@ -212,7 +289,7 @@ def runs_from_vector(exprun_vector):
     Takes a vector of ExpRun from CalibrationAlgorithm and returns
     a Python list of (exp,run) tuples in the same order.
     """
-    return [(exprun.first, exprun.second) for exprun in exprun_vector]
+    return [ExpRun(exprun.first, exprun.second) for exprun in exprun_vector]
 
 
 def find_sources(dependencies):
@@ -488,7 +565,7 @@ def get_file_iov_tuple(file_path):
     return (file_path, get_iov_from_file(file_path))
 
 
-def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
+def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None, filterfalse=None):
     """
     Takes a list of file path patterns (things that glob would understand) and runs b2file-metadata-show over them to
     extract the IoV.
@@ -500,11 +577,19 @@ def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
         polling_time (int): Time between checking if our results are ready.
         pool: Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
             We don't close or join the Pool as you might want to use it yourself, we just wait until the results are ready.
+        filterfalse (function): An optional function object that will be called on each absolute filepath found from your patterns.
+            If True is returned the file will have its metadata returned. If False it will be skipped.
+            The filter function should take the filepath string as its only argument.
 
     Returns:
-        dict: Maping of matching input file paths (Key) to their IoV (Value)
+        dict: Mapping of matching input file paths (Key) to their IoV (Value)
     """
     absolute_file_paths = find_absolute_file_paths(file_path_patterns)
+    # Optionally filter out files matching our filter function
+    if filterfalse:
+        import itertools
+        absolute_file_paths = list(itertools.filterfalse(filterfalse, absolute_file_paths))
+
     file_to_iov = {}
     if not pool:
         for file_path in absolute_file_paths:
@@ -589,3 +674,38 @@ def parse_raw_data_iov(file_path):
         return IoV(path_exp, path_run, path_exp, path_run)
     else:
         raise ValueError("Filename and directory gave different IoV after parsing for: {}".format(file_path))
+
+
+def create_directories(path, overwrite=True):
+    """
+    Creates a new directory path. If it already exists it will either leave it as is (including any contents),
+    or delete it and re-create it fresh. It will only delete the end point, not any intermediate directories created
+    """
+    # Delete if overwriting and it exists
+    if (path.exists() and overwrite):
+        shutil.rmtree(path)
+    # If it never existed or we just deleted it, make it now
+    if not path.exists():
+        os.makedirs(path)
+
+
+def find_int_dirs(dir_path):
+    """
+    If you previously ran a Calibration and are now re-running after failure, you may have iteration directories
+    from iterations above your current one. This function will find directories that match an integer.
+
+    Parameters:
+        dir_path(`pathlib.Path`): The dircetory to search inside.
+
+    Returns:
+        list[`pathlib.Path`]: The matching Path objects to the directories that are valid ints
+    """
+    paths = []
+    all_dirs = [sub_dir for sub_dir in dir_path.glob("*") if sub_dir.is_dir()]
+    for directory in all_dirs:
+        try:
+            int(directory.name)
+            paths.append(directory)
+        except ValueError as err:
+            pass
+    return paths

@@ -85,10 +85,11 @@ variables = {
 }
 
 
-def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
+def plot_pidEfficiency(pid, sample, vs='P', isExpertMode=False, detector=""):
     """
-    Plots the efficiencies for a given sample for a all pid
-    @param pid For which pid we would like to know efficiency.
+    Plots the efficiency of desired PID requirement for a given sample
+    @param pid Which pid to apply
+    @param sample Which sample to use
     @param vs momentum (P) or angle (cosTheta)
     @param isExpertMode Should the plots be made for the default variables or expert ones?
     @param detector The PID subdetector to be used in expert mode (or ALL for combined)
@@ -124,7 +125,12 @@ def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
 
     s.tree.Project(hist['total'].GetName(), f"{track}_{vs}", cuts)
     s.tree.Project(hist['passed'].GetName(), f"{track}_{vs}", selection)
-    h = TEfficiency(hist['passed'], hist['total'])
+    eff = TEfficiency(hist['passed'], hist['total'])
+    canv = ROOT.TCanvas()
+    canv.cd()
+    eff.Draw()
+    canv.Update()
+    h = eff.GetPaintedGraph()  # TEfficiency itself stores only original histograms, the graph object is created only after drawing
     h.SetName(f"{pid}_{pidString}_efficiency_vs_{vs}")
     h.SetTitle(f"{pid} {pidString} efficiency vs {vs} ({pidcut:.2f} PID cut);\
               {axisName};\
@@ -174,15 +180,20 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
             s.tree.GetEntries(selection) / total
         )
         h.GetXaxis().SetBinLabel(bin + 1, pid)
-        h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
-        h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
-        h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
-        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
+    h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
+    h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
+    h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
+    h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
     outputFile.WriteTObject(h)
     # printout(h)
 
 
 def set_pidCutsForGivenEfficiency(pid, targetEff=0.5):
+    """
+    Sets the PID cuts for a given target efficiency.
+    @param pid the PID variable
+    @param targetEff the target efficiency
+    """
     pid_vals[pid]
     step = 0.13
     currentEff = 1.1
@@ -204,6 +215,11 @@ def set_pidCutsForGivenEfficiency(pid, targetEff=0.5):
 
 
 def printout(hist, postfix=""):
+    """
+    Save a histogram to a canvas
+    @param hist the histogram to print out
+    @param postfix an identifying string
+    """
     canv = ROOT.TCanvas()
     canv.cd()
     hist.Draw()
@@ -214,8 +230,8 @@ for detector in ("_ALL",):
     for sample in samples:
         # plot_pidEfficiency(sample, 'P', True, detector)
         # plot_pidEfficiency(sample, 'cosTheta', True, detector)
-        plot_pidEfficiency(sample, 'P')
-        plot_pidEfficiency(sample, 'cosTheta')
-        set_pidCutsForGivenEfficiency(sample, targetEff=eff_vals[sample])
+        plot_pidEfficiency(sample, sample, 'P')
+        plot_pidEfficiency(sample, sample, 'cosTheta')
+        set_pidCutsForGivenEfficiency(sample, eff_vals[sample])
         plot_pidEfficienciesInSample(sample, True, detector)
         plot_pidEfficienciesInSample(sample)

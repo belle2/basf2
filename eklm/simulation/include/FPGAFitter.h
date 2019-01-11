@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FPGAFITTER_H
-#define FPGAFITTER_H
+#pragma once
 
 #include <eklm/dataobjects/EKLMFPGAFit.h>
 
@@ -34,7 +33,7 @@ namespace Belle2 {
        * Constructor.
        * @param[in]  nPoints Number of points in amplitude arrays.
        */
-      FPGAFitter(int nPoints);
+      explicit FPGAFitter(int nPoints);
 
       /**
        * Destructor.
@@ -60,6 +59,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

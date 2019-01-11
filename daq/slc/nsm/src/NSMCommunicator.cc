@@ -34,7 +34,7 @@ NSMCommunicatorList NSMCommunicator::g_comm;
 Mutex NSMCommunicator::g_mutex;
 Mutex NSMCommunicator::g_mutex_select;
 
-NSMCommunicator& NSMCommunicator::select(double usec) throw(IOException)
+NSMCommunicator& NSMCommunicator::select(double usec)
 {
   fd_set fds;
   int ret;
@@ -84,7 +84,6 @@ NSMCommunicator& NSMCommunicator::select(double usec) throw(IOException)
 }
 
 NSMCommunicator& NSMCommunicator::connected(const std::string& node)
-throw(NSMNotConnectedException)
 {
   for (NSMCommunicatorList::iterator it = g_comm.begin();
        it != g_comm.end(); it++) {
@@ -95,9 +94,9 @@ throw(NSMNotConnectedException)
 }
 
 bool NSMCommunicator::send(const NSMMessage& msg)
-throw(NSMHandlerException)
 {
   bool sent = false;
+  bool alive = false;
 #if NSM_PACKAGE_VERSION >= 1914
   g_mutex.lock();
   std::string emsg;
@@ -106,6 +105,7 @@ throw(NSMHandlerException)
     NSMCommunicator& com(*(*it));
     const char* node = msg.getNodeName();
     if (com.isConnected(node)) {
+      alive = true;
       const char* req = msg.getRequestName();
       if (node != NULL && req != NULL &&
           strlen(node) > 0 && strlen(req) > 0) {
@@ -119,7 +119,7 @@ throw(NSMHandlerException)
     }
   }
   g_mutex.unlock();
-  if (!sent) {
+  if (alive && !sent) {
     throw (NSMHandlerException("Failed to send request: " + emsg));
   }
 #else
@@ -128,7 +128,7 @@ throw(NSMHandlerException)
   return sent;
 }
 
-NSMCommunicator::NSMCommunicator(const std::string& host, int port) throw()
+NSMCommunicator::NSMCommunicator(const std::string& host, int port)
 {
   m_id = -1;
   m_nsmc = NULL;
@@ -137,7 +137,7 @@ NSMCommunicator::NSMCommunicator(const std::string& host, int port) throw()
   m_port = port;
 }
 
-NSMCommunicator::NSMCommunicator(NSMcontext* nsmc) throw()
+NSMCommunicator::NSMCommunicator(NSMcontext* nsmc)
 {
   m_nsmc = nsmc;
   m_id = m_nsmc->nodeid;
@@ -146,7 +146,6 @@ NSMCommunicator::NSMCommunicator(NSMcontext* nsmc) throw()
 
 void NSMCommunicator::init(const NSMNode& node,
                            const std::string& host, int port)
-throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   g_mutex.lock();
@@ -173,7 +172,7 @@ throw(NSMHandlerException)
 #endif
 }
 
-NSMCallback& NSMCommunicator::getCallback() throw(std::out_of_range)
+NSMCallback& NSMCommunicator::getCallback()
 {
   if (m_callback) {
     return *m_callback;
@@ -181,7 +180,7 @@ NSMCallback& NSMCommunicator::getCallback() throw(std::out_of_range)
   throw (std::out_of_range("No callback was registered"));
 }
 
-void NSMCommunicator::setCallback(NSMCallback* callback) throw(NSMHandlerException)
+void NSMCommunicator::setCallback(NSMCallback* callback)
 {
   b2nsm_context(m_nsmc);
   if (callback != NULL) {
@@ -199,7 +198,7 @@ void NSMCommunicator::setCallback(NSMCallback* callback) throw(NSMHandlerExcepti
   }
 }
 
-void NSMCommunicator::callContext() throw(NSMHandlerException)
+void NSMCommunicator::callContext()
 {
 #if NSM_PACKAGE_VERSION >= 1914
   if (!m_nsmc) {
@@ -217,7 +216,6 @@ void NSMCommunicator::callContext() throw(NSMHandlerException)
 }
 
 int NSMCommunicator::getNodeIdByName(const std::string& name)
-throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(m_nsmc);
@@ -228,7 +226,6 @@ throw(NSMHandlerException)
 }
 
 const std::string NSMCommunicator::getNodeNameById(int id)
-throw(NSMHandlerException)
 {
   const char* name = nsmlib_nodename(m_nsmc, id);
   if (name == NULL) return "";
@@ -236,7 +233,6 @@ throw(NSMHandlerException)
 }
 
 int NSMCommunicator::getNodePidByName(const std::string& name)
-throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(m_nsmc);
@@ -246,7 +242,7 @@ throw(NSMHandlerException)
 #endif
 }
 
-bool NSMCommunicator::isConnected(const std::string& node) throw()
+bool NSMCommunicator::isConnected(const std::string& node)
 {
   bool is_online = getNodeIdByName(node) >= 0 &&
                    getNodePidByName(node) > 0;
@@ -254,7 +250,6 @@ bool NSMCommunicator::isConnected(const std::string& node) throw()
 }
 
 const std::string NSMCommunicator::getNodeHost(const std::string& nodename)
-throw()
 {
 #if NSM_PACKAGE_VERSION >= 1914
   NSMsys* sys = m_nsmc->sysp;
@@ -273,7 +268,7 @@ throw()
   return "";
 }
 
-const std::string NSMCommunicator::getNodeHost() throw()
+const std::string NSMCommunicator::getNodeHost()
 {
 #if NSM_PACKAGE_VERSION >= 1914
   if (!getMessage().getMsg()) return "";
@@ -299,7 +294,7 @@ NSMMessage NSMCommunicator::popQueue()
   return msg;
 }
 
-void NSMCommunicator::setMessage(const NSMMessage& msg) throw()
+void NSMCommunicator::setMessage(const NSMMessage& msg)
 {
   m_message = msg;
 }

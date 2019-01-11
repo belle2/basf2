@@ -230,6 +230,10 @@ def get_argument_parser(modes=["local"]):
                         "that produces plots based on the output of its "
                         "dependencies.",
                         type=str, nargs='*')
+    parser.add_argument("--send-mails", help="Send email to the contact persons"
+                        "who have failed comparison plots. Mail is sent from"
+                        "b2soft@mail.desy.de via /usr/sbin/sendmail.",
+                        action='store_true')
     parser.add_argument("-q", "--quiet", help="Suppress the progress bar",
                         action='store_true')
     parser.add_argument("-t", "--tag", help="The name that will be used for "
@@ -382,3 +386,18 @@ def index_from_revision(revision, work_folder):
         index = None
 
     return index
+
+
+def get_log_file_paths(logger):
+    """
+    Returns list of paths that the FileHandlers of logger write to.
+    :param logger: logging.logger object.
+    :return: List of paths
+    """
+    ret = []
+    for handler in logger.handlers:
+        try:
+            ret.append(handler.baseFilename)
+        except AttributeError:
+            pass
+    return ret

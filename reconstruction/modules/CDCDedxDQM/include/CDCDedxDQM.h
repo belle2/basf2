@@ -14,10 +14,22 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
 
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TF1.h"
+#include "TString.h"
+#include "TDirectory.h"
+
+
+//import some useful namespace
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
 
 namespace Belle2 {
 
@@ -33,31 +45,47 @@ namespace Belle2 {
     /** Destructor */
     virtual ~CDCDedxDQMModule();
 
+    /** Defination of histograms */
+    virtual void defineHisto() override;
+
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each run */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** This method is called at the end of each run */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
-    /** Function to define histograms. */
-    virtual void defineHisto();
+
 
   private:
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    TH1F* m_h_dedxmeans = nullptr; /**< Histogram for dE/dx electron means */
-    TH2F* m_h_dedxbands = nullptr; /**< Histogram for dE/dx band plot */
+    Int_t fCurrentEventNum; /**< variable to get run number */
+
+    Bool_t isHadronfile; /**< Parameter-1 to switch binning */
+    TString fCollType; /**< Parameter-2 to switch binning */
+
+    TH1F* temp1D; /**< Dedx histogram per run */
+    TH2F* temp2D; /**< Dedx vs P histogram per run */
+
+    Int_t    nBinsdedx; /**< nbin of dedx range */
+    Double_t nBinsdedxLE; /**< Lowedge of dedx */
+    Double_t nBinsdedxUE; /**< Upedge of dedx */
+
+    Int_t    nBinsP; /**< nbins of P range */
+    Double_t nBinsPLE; /**< Lowedge of P range */
+    Double_t nBinsPUE; /**< Upedge of P range */
 
   };
+
 } // Belle2 namespace

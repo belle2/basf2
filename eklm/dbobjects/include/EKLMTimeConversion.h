@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECONVERSION_H
-#define EKLMTIMECONVERSION_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -46,12 +45,12 @@ namespace Belle2 {
     /**
      * Get time by TDC.
      */
-    double getTimeByTDC(uint16_t tdc);
+    double getTimeByTDC(uint16_t tdc) const;
 
     /**
      * Get TDC by time.
      */
-    uint16_t getTDCByTime(double time);
+    uint16_t getTDCByTime(double time) const;
 
   private:
 
@@ -61,12 +60,9 @@ namespace Belle2 {
     /** Time offset. */
     double m_TimeOffset;
 
-    /** Needed to make objects storable, */
+    /** Class version, */
     ClassDef(EKLMTimeConversion, 1);
 
   };
 
 }
-
-#endif
-

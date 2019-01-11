@@ -39,19 +39,19 @@ namespace Belle2 {
     virtual ~TRGGRLProjectsModule() {};
 
     /// Initilizes TRGGRLProjectsModule.
-    virtual void initialize();
+    virtual void initialize() override;
 
     /// Called when new run started.
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /// Called event by event.
-    virtual void event();
+    virtual void event() override;
 
     /// Called when run ended.
-    virtual void endRun();
+    virtual void endRun() override;
 
     /// Called when processing ended.
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   public:
@@ -111,7 +111,7 @@ namespace Belle2 {
     double m_eclClusterTimeWindow;
 
     /**convert the unit of angle from rad to degree*/
-    double m_RtD;
+    //double m_RtD;
 
 
   };

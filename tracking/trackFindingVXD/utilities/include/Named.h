@@ -19,16 +19,24 @@ namespace Belle2 {
   class Named {
   public:
     /// Constructor taking the name and the desired value.
-    Named(std::string name, T value): m_name(name), m_value(value) {};
+    Named(const std::string& name, T value):
+      m_name(name), m_value(value)
+    {};
 
     /// get name of the object
     std::string getName() const {return m_name;}
 
     /// set name of the object
-    void setName(std::string name) {m_name = name;}
+    void setName(const std::string& name)
+    {
+      m_name = name;
+    }
 
     /// get the object
-    T getValue() {return m_value;}
+    T getValue()
+    {
+      return m_value;
+    }
 
   protected:
     /// name associated with object m_value

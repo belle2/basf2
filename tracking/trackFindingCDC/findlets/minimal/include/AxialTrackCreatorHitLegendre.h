@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
- *               Nils Braun, Oliver Frost                                 *
+ *               Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -47,7 +47,10 @@ namespace Belle2 {
         NonCurlersWithIncreasingThreshold,
         /// Pass corresponds to full pt range and even more rough quadtree
         /// (non-ip tracks, tracks with energy losses etc)
-        FullRange
+        FullRange,
+        /// Pass corresponds to very High-pt track and very rough quadtree
+        /// (monopole tracks, including those with low hit count)
+        Straight
       };
 
     public:
@@ -71,6 +74,9 @@ namespace Belle2 {
                  std::vector<CDCTrack>& tracks) final;
 
     private:
+      // Method to create QTProcessor that performs the search
+      std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor(EPass pass);
+
       using CandidateReceiver = AxialHitQuadTreeProcessor::CandidateReceiver;
       /**
        * Performs quadtree search
@@ -88,7 +94,10 @@ namespace Belle2 {
       const double m_param_stepScale = 0.75;
 
       /// Parameter to define minimal threshold of hit
-      const int m_param_minNHits = 10;
+      int m_param_minNHits = 10;
+
+      // Parameter to define precision of quadtree search in case of straight pass
+      double m_param_precision = 0.00000001;
     };
   }
 }

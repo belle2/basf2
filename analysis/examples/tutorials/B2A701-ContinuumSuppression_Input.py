@@ -13,64 +13,112 @@
 #   basf2 B2A701-ContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>
 #
 # Contributors: P. Goldenzweig (October 2016)
+#               I. Komarov (September 2018)
 #
 ################################################################################
 
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
+import sys
+import glob
+import os
 
-set_log_level(LogLevel.ERROR)
 
 # --I/O----------------------------------------------------------------------------------------
-if (len(sys.argv) < 2 or sys.argv[1] not in ['train', 'test', 'apply_signal', 'apply_qqbar']):
-    sys.exit("usage:\n\tbasf2 B2A701-ContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>")
+# Please note that the files here are quite small and needed just to test the script.
+# To obtain meaningful output to be used in B2A702 and B2A703 please use grid.
+# > gbasf2 B2A701-ContinuumSuppression_Input.py -i <.mdst file addresses> -p <project name> -s <release_number>
+#
+# For B2A70{2|3} you need four sets of ntuples:
+# -Train dataset composed of signal (B->KsPi0 ) and background MC (continuum MC) samples
+# -Test dataset composed of signal (B->KsPi0 ) and background MC (continuum MC) samples
+# -Signal dataset only
+# -Background dataset only
+# For each of this four sets you need to submit separate grid job.
+# (Or use files that are already prepared for B2A702 and B2A703).
 
-step = str(sys.argv[1])
 
-path = '/group/belle2/tutorial/release_01-00-00/Bd_KsPi0/mdst/'
-input = ''
+input_file_list = []
+# Plesae pick meaningful output name when run on grid
+outfile = "B2A702_output.root"
 
-if step == 'train':
-    input = [path + '*_train/*']
-elif step == 'test':
-    input = [path + '*_test/*']
-elif step == 'apply_signal':
-    input = [path + 'Bd_KsPi0_expert/*']
-elif step == 'apply_qqbar':
-    input = [path + '*bar_expert/*']
-else:
-    sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
+magnetic_field = 'default'
 
-outfile = step + '.root'
+if len(sys.argv) == 2:
+    if sys.argv[1] not in ['train', 'test', 'apply_signal', 'apply_qqbar']:
+        sys.exit("usage:\n\tbasf2 B2A701-ContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>")
+    else:
+        step = str(sys.argv[1])
+        if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
+            b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
+
+        path = os.getenv('BELLE2_EXAMPLES_DATA_DIR') + '/'
+
+        # MC11 is not ready yet, so we have to manually put MC10 as a magnetic field config.
+        magnetic_field = 'MC10'
+        if step == 'train':
+            input_file_list = [path + 'ccbar_sample_to_train.root',
+                               path + 'Bd2K0spi0_to_train.root']
+        elif step == 'test':
+            input_file_list = [path + 'ccbar_sample_to_test.root',
+                               path + 'Bd2K0spi0_to_test.root']
+        elif step == 'apply_signal':
+            input_file_list = [path + 'Bd2K0spi0_to_test.root']
+        elif step == 'apply_qqbar':
+            input_file_list = [path + 'ccbar_sample_to_test.root', ]
+        else:
+            sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
+        outfile = step + '.root'
+
 # ---------------------------------------------------------------------------------------------
 
 # Perform analysis.
-main = create_path()
+my_path = b2.create_path()
 
-inputMdstList('default', input, path=main)
+ma.inputMdstList(environmentType=magnetic_field,
+                 filelist=input_file_list,
+                 path=my_path)
 
-fillParticleList('gamma:all', '', path=main)
-fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
-fillParticleList('pi-:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
+ma.fillParticleList(decayString='gamma:all',
+                    cut='',
+                    path=my_path)
+ma.fillParticleList(decayString='pi+:good',
+                    cut='chiProb > 0.001 and pionID > 0.5',
+                    path=my_path)
+ma.fillParticleList(decayString='pi-:good',
+                    cut='chiProb > 0.001 and pionID > 0.5',
+                    path=my_path)
 
-reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', 1, path=main)
-reconstructDecay('pi0  -> gamma:all gamma:all', '0.115<=M<=0.152', 1, path=main)
-reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=main)
+ma.reconstructDecay(decayString='K_S0 -> pi+:good pi-:good',
+                    cut='0.480<=M<=0.516',
+                    dmID=1,
+                    path=my_path)
+ma.reconstructDecay(decayString='pi0  -> gamma:all gamma:all',
+                    cut='0.115<=M<=0.152',
+                    dmID=1,
+                    path=my_path)
+ma.reconstructDecay(decayString='B0   -> K_S0 pi0',
+                    cut='5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2',
+                    path=my_path)
 
-matchMCTruth('B0', path=main)
-buildRestOfEvent('B0', path=main)
+ma.matchMCTruth(list_name='B0', path=my_path)
+ma.buildRestOfEvent(target_list_name='B0', path=my_path)
 
 # The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
 # via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-appendROEMasks('B0', [cleanMask], path=main)
+ma.appendROEMasks(list_name='B0',
+                  mask_tuples=[cleanMask],
+                  path=my_path)
 
-buildContinuumSuppression('B0', 'cleanMask', path=main)
+ma.buildContinuumSuppression(list_name='B0',
+                             roe_mask='cleanMask',
+                             path=my_path)
 
 # Define the variables for training.
 #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
 #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
 #  signal-B final state particles.
-#  CleoCone also takes the optional additional argument ROE, to return the cones calculated from ROE particles only.
 trainVars = [
     'R2',
     'thrustBm',
@@ -93,22 +141,26 @@ trainVars = [
     'KSFWVariables(hoo2)',
     'KSFWVariables(hoo3)',
     'KSFWVariables(hoo4)',
-    'CleoCone(1)',
-    'CleoCone(2)',
-    'CleoCone(3)',
-    'CleoCone(4)',
-    'CleoCone(5)',
-    'CleoCone(6)',
-    'CleoCone(7)',
-    'CleoCone(8)',
-    'CleoCone(9)'
+    'cleoConeThrust0',
+    'cleoConeThrust1',
+    'cleoConeThrust2',
+    'cleoConeThrust3',
+    'cleoConeThrust4',
+    'cleoConeThrust5',
+    'cleoConeThrust6',
+    'cleoConeThrust7',
+    'cleoConeThrust8',
 ]
 
 # Save target variable necessary for training.
 targetVar = ['isNotContinuumEvent']
 
 # Create output file.
-variablesToNTuple('B0', trainVars + targetVar, treename='tree', filename=outfile, path=main)
+ma.variablesToNtuple(decayString='B0',
+                     variables=trainVars + targetVar,
+                     treename='tree',
+                     filename=outfile,
+                     path=my_path)
 
-process(main)
-print(statistics)
+b2.process(my_path)
+print(b2.statistics)

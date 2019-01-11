@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTRANSFORMDATA_H
-#define EKLMTRANSFORMDATA_H
+#pragma once
 
 /* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
@@ -51,6 +50,16 @@ namespace Belle2 {
        * @param[in] displacementType Displacement type.
        */
       TransformData(bool global, Displacement displacementType);
+
+      /**
+       * Copy constructor (disabled).
+       */
+      TransformData(const TransformData&) = delete;
+
+      /**
+       * Operator = (disabled).
+       */
+      TransformData& operator=(const TransformData&) = delete;
 
       /**
        * Destructor.
@@ -153,19 +162,41 @@ namespace Belle2 {
 
       /**
        * Check if strips intersect, and find intersection point if yes.
-       * @param[in] hit1   First hit.
-       * @param[in] hit2   Second hit.
-       * @param[out] cross Crossing point (coordinate unit is cm).
-       * @param[out] d1    Distance from hit to SiPM of strip 1, cm.
-       * @param[out] d2    Distance from hit to SiPM of strip 2, cm.
-       * @param[out] sd    Shortest distance between strips, cm.
-       *                   Or if second strip is closer to interaction point,
-       *                   then (- shortest distance).
+       * @param[in]  hit1     First hit.
+       * @param[in]  hit2     Second hit.
+       * @param[out] cross    Crossing point (coordinate unit is cm).
+       * @param[out] d1       Distance from hit to SiPM of strip 1, cm.
+       * @param[out] d2       Distance from hit to SiPM of strip 2, cm.
+       * @param[out] sd       Shortest distance between strips, cm.
+       *                      Or if second strip is closer to interaction point,
+       *                      then (- shortest distance).
+       * @param[in]  segments Check if segments intersect (may need to turn this
+       *                      check off for debugging).
        * @return True if strips intersect.
        */
       bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                         HepGeom::Point3D<double>* cross,
-                        double* d1, double* d2, double* sd);
+                        double* d1, double* d2, double* sd,
+                        bool segments = true) const;
+
+      /**
+       * Get sector by position.
+       * @param[in] endcap   Endcap number.
+       * @param[in] position Position.
+       */
+      int getSectorByPosition(int endcap,
+                              const HepGeom::Point3D<double>& position) const;
+
+
+      /**
+       * Find strips by intersection.
+       * @param[in]  intersection Intersection point.
+       * @param[out] strip1       Strip 1 global number.
+       * @param[out] strip2       Strip 2 global number.
+       * @return 0 on success, -1 on error.
+       */
+      int getStripsByIntersection(const HepGeom::Point3D<double>& intersection,
+                                  int* strip1, int* strip2) const;
 
     private:
 
@@ -207,6 +238,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

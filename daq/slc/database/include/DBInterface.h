@@ -19,36 +19,35 @@ namespace Belle2 {
                 const std::string& database,
                 const std::string& user,
                 const std::string& password,
-                int port) throw();
-    virtual ~DBInterface() throw();
+                int port);
+    virtual ~DBInterface();
 
   public:
-    virtual void connect() throw(DBHandlerException) = 0;
-    virtual bool isConnected() throw() = 0;
-    virtual void execute_imp(const char* command) throw(DBHandlerException) = 0;
-    void execute(const char* command, ...) throw(DBHandlerException);
-    void execute(const std::string& command) throw(DBHandlerException);
-    virtual void close() throw(DBHandlerException) = 0;
-    virtual void clear() throw() = 0;
-    virtual DBRecordList loadRecords() throw(DBHandlerException) = 0;
-    virtual bool checkTable(const std::string& tablename) throw(DBHandlerException) = 0;
-    virtual DBFieldTypeList getTableContents(const std::string& tablename)
-    throw(DBHandlerException) = 0;
-    void clearRecords() throw(DBHandlerException) { m_record_v.resize(0); }
-    DBRecordList& getRecords() throw(DBHandlerException) { return m_record_v; }
-    const std::string& getHostName() const throw() { return m_host; }
-    const std::string& getDatabase() const throw() { return m_database; }
-    const std::string& getUserName() const throw() { return m_user; }
-    const std::string& getPassword() const throw() { return m_password; }
-    int getPort() const throw() { return m_port; }
+    virtual void connect() = 0;
+    virtual bool isConnected() = 0;
+    virtual void execute_imp(const char* command) = 0;
+    void execute(const char* command, ...);
+    void execute(const std::string& command);
+    virtual void close() = 0;
+    virtual void clear() = 0;
+    virtual DBRecordList loadRecords() = 0;
+    virtual bool checkTable(const std::string& tablename) = 0;
+    virtual DBFieldTypeList getTableContents(const std::string& tablename) = 0;
+    void clearRecords() { m_record_v.resize(0); }
+    DBRecordList& getRecords() { return m_record_v; }
+    const std::string& getHostName() const { return m_host; }
+    const std::string& getDatabase() const { return m_database; }
+    const std::string& getUserName() const { return m_user; }
+    const std::string& getPassword() const { return m_password; }
+    int getPort() const { return m_port; }
 
   protected:
-    DBInterface() throw() {}
+    DBInterface() {}
     void init(const std::string& host,
               const std::string& database,
               const std::string& user,
               const std::string& password,
-              int port) throw();
+              int port);
 
   protected:
     DBRecordList m_record_v;

@@ -33,12 +33,12 @@ void ParticleWeightingLookUpTable::defineOutOfRangeWeight(WeightInfo entryValue)
 }
 
 
-std::vector<std::string> ParticleWeightingLookUpTable::getAxesNames()
+std::vector<std::string> ParticleWeightingLookUpTable::getAxesNames() const
 {
   return m_KeyMap.getNames();
 }
 
-WeightInfo ParticleWeightingLookUpTable::getInfo(std::map<std::string, double> values)
+WeightInfo ParticleWeightingLookUpTable::getInfo(std::map<std::string, double> values) const
 {
   int id = m_KeyMap.getKey(values);
   auto it = m_WeightMap.find(id);
@@ -50,7 +50,7 @@ WeightInfo ParticleWeightingLookUpTable::getInfo(std::map<std::string, double> v
   }
 }
 
-void ParticleWeightingLookUpTable::printParticleWeightingLookUpTable()
+void ParticleWeightingLookUpTable::printParticleWeightingLookUpTable() const
 {
   m_KeyMap.printKeyMap();
   B2INFO("Printing the table");

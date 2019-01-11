@@ -33,7 +33,8 @@ SVDROIGeometry::~SVDROIGeometry()
 }
 
 void
-SVDROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
+SVDROIGeometry::fillPlaneList(double toleranceZ,
+                              double tolerancePhi)
 {
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
@@ -52,12 +53,11 @@ SVDROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
 
       std::set<Belle2::VxdID> svdSensors = geoCache.getSensors(*itSvdLadders);
       std::set<Belle2::VxdID>::iterator itSvdSensors = svdSensors.begin();
-      //      B2DEBUG(1, "    svd sensor info " << * (svdSensors.begin()));
 
       while (itSvdSensors != svdSensors.end()) {
-        B2DEBUG(1, "    svd sensor info " << *itSvdSensors);
+        B2DEBUG(20, "    svd sensor info " << *itSvdSensors);
 
-        ROIDetPlane plane(*itSvdSensors);//, toleranceZ, tolerancePhi);
+        ROIDetPlane plane(*itSvdSensors, toleranceZ, tolerancePhi);
         genfit::SharedPlanePtr sharedPlane(new ROIDetPlane(plane));
         plane.setSharedPlanePtr(sharedPlane);
 
@@ -70,7 +70,7 @@ SVDROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
     ++itSvdLayers;
   }
 
-  B2DEBUG(1, "just filled the plane list with " << m_planeList.size() << "planes");
+  B2DEBUG(20, "just filled the plane list with " << m_planeList.size() << "planes");
 };
 
 
@@ -81,22 +81,22 @@ SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVe
 
   std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
 
-  B2DEBUG(1, " ..-append Planes, checking " << m_planeList.size() << " planes");
+  B2DEBUG(20, " ..-append Planes, checking " << m_planeList.size() << " planes");
 
   while (itPlanes != m_planeList.end()) {
 
     if (itPlanes->isSensorInRange(recoTrackPosition, layer))
       selectedPlanes->push_back(*itPlanes);
 
-    itPlanes++;
+    ++itPlanes;
 
   }
 
-  B2DEBUG(1, " ..--list of sensor IDs of the selected planes for this track:");
+  B2DEBUG(20, " ..--list of sensor IDs of the selected planes for this track:");
   itPlanes = selectedPlanes->begin();
   while (itPlanes != selectedPlanes->end()) {
-    B2DEBUG(1, "     " << (itPlanes->getSensorInfo()));
-    itPlanes++;
+    B2DEBUG(20, "     " << (itPlanes->getVxdID()));
+    ++itPlanes;
   }
 
 }

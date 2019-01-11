@@ -93,11 +93,6 @@ bool PyStoreObj::hasValidClass() const
   return objClass and objClass != TObject::Class();
 }
 
-void PyStoreObj::ensureCreated()
-{
-  create(false);
-}
-
 bool PyStoreObj::create(bool replace)
 {
   ensureAttached();

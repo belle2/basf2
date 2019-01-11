@@ -39,9 +39,9 @@ def reconstruction_path(inputfiles):
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
     fillParticleLists([('K-', 'atcPIDBelle(3,2) > 0.2 and dr < 2 and abs(dz) < 4'),
                        ('pi+', 'atcPIDBelle(3,2) < 0.2 and dr < 2 and abs(dz) < 4')], path=path)
-    massVertexKFit('pi0:mdst', 0.1, path=path)
+    massVertexKFit('pi0:mdst', 0.1, path=path, silence_warning=True)
     reconstructDecay('D0 -> K- pi+ pi0:mdst', '1.7 < M < 2.0', path=path)
-    fitVertex('D0', 0.1, fitter='kfitter', path=path)
+    vertexKFit('D0', 0.1, path=path, silence_warning=True)
     applyCuts('D0', '1.7 < M < 2.0', path=path)
     matchMCTruth('D0', path=path)
     return path
@@ -49,5 +49,5 @@ def reconstruction_path(inputfiles):
 
 if __name__ == "__main__":
     path = reconstruction_path([])
-    variablesToNTuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
     process(path)

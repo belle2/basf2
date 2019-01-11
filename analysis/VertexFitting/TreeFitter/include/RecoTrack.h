@@ -20,54 +20,54 @@ namespace TreeFitter {
   class RecoTrack : public RecoParticle {
 
   public:
-    /**    */
+    /** constructor */
     RecoTrack(Belle2::Particle* bc, const ParticleBase* mother) ;
 
-    /**    */
+    /** destructor */
     virtual ~RecoTrack() {};
 
     /**   init with mother particle (replacing initPar2)  */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init without mother particle   */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** init covariance matrix of this particle constraint */
-    ErrCode initCovariance(FitParams* fitparams) const;
+    ErrCode initCovariance(FitParams& fitparams) const override;
 
     /** update m_flt */
-    ErrCode updFltToMotherCopy(const FitParams& fitparams);
+    ErrCode updFltToMotherCopy(const FitParams* fitparams);
 
     /**   project the constraint (calculate residuals)  */
-    virtual ErrCode projectRecoConstraint(const FitParams&, Projection&) const;
+    virtual ErrCode projectRecoConstraint(const FitParams&, Projection&) const override;
 
     /** updated the cahed parameters */
     ErrCode updateParams(double flt);
 
-    /**    */
-    virtual int dimM() const { return 5 ; }
+    /** dimension (5) */
+    virtual int dimM() const override { return 5 ; }
 
     /**  type of the constraint   */
-    virtual int type() const { return kRecoTrack ; }
+    virtual int type() const override { return kRecoTrack ; }
 
-    /**    */
-    virtual int nFinalChargedCandidates() const { return 1 ; }
+    /** number of final charged candidates */
+    virtual int nFinalChargedCandidates() const override { return 1 ; }
 
-    /**    */
-    virtual void addToConstraintList(constraintlist& alist, int depth) const
+    /** add to the list of constraints */
+    virtual void addToConstraintList(constraintlist& alist, int depth) const override
     {
-      alist.push_back(Constraint(this, Constraint::track, depth, dimM())) ;
+      alist.push_back(Constraint(this, Constraint::track, depth, dimM(), 1)) ;
     }
 
-    /**    */
+    /** update flight length to mother */
     ErrCode updFltToMother(const FitParams& fitparams) ;
 
-    /**    */
+    /** setter for the flight length */
     void setFlightLength(double flt) { m_flt = flt ; }
 
   private:
 
-    /**  b filed along z   */
+    /**  B field along z   */
     double m_bfield; //Bfield along Z
 
     /**  trackfit result from reconstruction   */
@@ -76,7 +76,7 @@ namespace TreeFitter {
     /** flag to mark the particle as initialised   */
     bool m_cached ;
 
-    /**    */
+    /** helix arc length at vertex */
     double m_flt ;
 
     /** column vector to store the measurement */

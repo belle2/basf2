@@ -3,6 +3,7 @@
 
 from basf2 import *
 from softwaretrigger.hltdqm import standard_hltdqm
+from analysisDQM import add_analysis_dqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -21,11 +22,22 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if dqm_environment == "expressreco":
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
+            path.add_module('PXDDAQDQM')
             pxddqm = register_module('PXDDQMExpressReco')
             path.add_module(pxddqm)
+            pxdeff = register_module('PXDDQMEfficiency')
+            path.add_module(pxdeff)
         # SVD
         if components is None or 'SVD' in components:
+            # ZeroSuppression Emulator
+            path.add_module(
+                'SVDZeroSuppressionEmulator',
+                SNthreshold=5,
+                ShaperDigits='SVDShaperDigits',
+                ShaperDigitsIN='SVDShaperDigitsZS5',
+                FADCmode=True)
             svddqm = register_module('SVDDQMExpressReco')
+            svddqm.param('ShaperDigits', 'SVDShaperDigitsZS5')
             path.add_module(svddqm)
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
@@ -35,11 +47,20 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if dqm_environment == "hlt":
         # HLT
         standard_hltdqm(path)
+        # SVD DATA FORMAT
+        if components is None or 'SVD' in components:
+            svdunpackerdqm = register_module('SVDUnpackerDQM')
+            path.add_module(svdunpackerdqm)
 
     # CDC
     if components is None or 'CDC' in components:
         cdcdqm = register_module('cdcDQM7')
         path.add_module(cdcdqm)
+
+        cdcdedxdqm = register_module('CDCDedxDQM')
+        cdcdedxdqm.param("UsingHadronfiles", True)
+        path.add_module(cdcdedxdqm)
+
     # ECL
     if components is None or 'ECL' in components:
         ecldqm = register_module('ECLDQM')
@@ -60,6 +81,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'TRG' in components:
         trgecldqm = register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+        trggdldqm = register_module('TRGGDLDQM')
+        path.add_module(trggdldqm)
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if components is None or 'SVD' in components or 'PXD' in components:
         trackDqm = register_module('TrackDQM')
@@ -67,3 +90,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # ARICH
     if components is None or 'ARICH' in components:
         path.add_module('ARICHDQM')
+    # PhysicsObjectsDQM
+    add_analysis_dqm(path)

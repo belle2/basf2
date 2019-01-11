@@ -22,17 +22,22 @@ namespace Belle2 {
   public:
     // some typedefs to increase readability
     typedef int MCRecoTrackIndex; /**< typedef for MCRecoTrackIndex */
-    typedef int NMatches; /**< typedef for counter of number of matches */
+    typedef unsigned int NMatches; /**< typedef for counter of number of matches */
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo; /**< typedef for MatchInfo */
 
     /** Constructor
      * @param mcRecoTracksStoreArrayName : Name of the MCRecoTracks StoreArray
      * @param strictQualityIndicator : boolean whether to perform strict estimation
+     * @param mva_target : Boolean whether to perform quality estimation for MVA QE training.
+     *                     This overwrites the strictQualityIndicator option!
      */
-    QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
-                       bool strictQualityIndicator = true):
-      QualityEstimatorBase(), m_strictQualityIndicator(strictQualityIndicator), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
-    { };
+    QualityEstimatorMC(const std::string& mcRecoTracksStoreArrayName = "MCRecoTracks",
+                       bool strictQualityIndicator = true, bool mva_target = false):
+      QualityEstimatorBase(), m_strictQualityIndicator(strictQualityIndicator), m_mva_target(mva_target),
+      m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
+    {
+      m_mcRecoTracks.isRequired(m_mcRecoTracksStoreArrayName);
+    };
 
     /** Performing MC based quality estimation
      * @param measurements : SPs of the track candidate to be evaluate
@@ -47,7 +52,7 @@ namespace Belle2 {
      * @param svdClustersName : SVD cluster StoreArray name
      * @param pxdClustersName : PXD cluster StoreArray name
      */
-    void setClustersNames(std::string svdClustersName, std::string pxdClustersName)
+    void setClustersNames(const std::string& svdClustersName, const std::string& pxdClustersName)
     { m_svdClustersName = svdClustersName; m_pxdClustersName = pxdClustersName; };
 
   protected:
@@ -63,13 +68,19 @@ namespace Belle2 {
      * @param match : MatchInfo for the best match
      * @return qualityIndicator
      */
-    double calculateQualityIndicator(int nClusters, MatchInfo& match);
+    double calculateQualityIndicator(unsigned int nClusters, MatchInfo& match);
 
     // parameters
     /** If true only SPTCs containing SVDClusters corresponding to a single MCRecoTrack get a QI != 0.
      *  If a SVDCluster corresponds to several MCRecoTracks it is still valid as long as the correct MCRecoTrack is one of them.
      */
     bool m_strictQualityIndicator;
+
+    /** If true the SPTCs containing all the SVDCluster of the corresponding MCRecoTrack and no other SVDCluster
+     *  receive a Quality Index larger than one. To be used for MVA QE training if both high hit purity and hit
+     *  efficiency is desired.
+     */
+    bool m_mva_target;
 
     // module members
     std::string m_mcRecoTracksStoreArrayName; /**< MCRecoTracks StoreArray name */

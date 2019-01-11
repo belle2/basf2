@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_GEOMETRYDATA_H
-#define EKLM_GEOMETRYDATA_H
+#pragma once
 
 /* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
@@ -53,7 +52,7 @@ namespace Belle2 {
        * @param[in] dataSource Data source.
        */
       static const GeometryData& Instance(enum DataSource dataSource =
-                                            c_Gearbox);
+                                            c_Database);
 
       /**
        * Save geometry data to database.
@@ -153,7 +152,7 @@ namespace Belle2 {
        * Constructor.
        * @param[in] dataSource Data source.
        */
-      GeometryData(enum DataSource dataSource);
+      explicit GeometryData(enum DataSource dataSource);
 
       /**
        * Destructor.
@@ -219,6 +218,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

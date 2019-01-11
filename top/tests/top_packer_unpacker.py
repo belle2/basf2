@@ -169,6 +169,8 @@ main.add_module(unPacker)
 converter = register_module('TOPRawDigitConverter')
 converter.param('inputRawDigitsName', 'TOPRawDigitsUnpacked')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
+converter.param('minPulseWidth', 0.0)
+converter.param('maxPulseWidth', 1000.0)
 main.add_module(converter)
 
 main.add_module(RawDigitsTest())

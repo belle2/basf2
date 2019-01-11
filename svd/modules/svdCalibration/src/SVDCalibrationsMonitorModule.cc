@@ -47,6 +47,7 @@ void SVDCalibrationsMonitorModule::initialize()
   m_histoList_pulseWidth = new TList;
   m_histoList_timeshift = new TList;
   m_histoList_triggerbin = new TList;
+  m_histoList_cluster = new TList;
   //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -145,19 +146,86 @@ void SVDCalibrationsMonitorModule::initialize()
                                                       m_histoList_pulseWidth);
 
           //CoG TIME SHIFT
-          NameOfHisto = "CoG_ShiftMeanToZero" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          NameOfHisto = "CoG_ShiftMeanToZero_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfHisto = "CoG_ShiftMeanToZero (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
                          " side)";
           h_timeshift[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,
                                                      "CoG_ShiftMeanToZero (ns)",
                                                      m_histoList_timeshift);
           //CoG TRIGGER BIN CORRECTION
-          NameOfHisto = "CoG_ShiftMeanToZeroTBDep" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          NameOfHisto = "CoG_ShiftMeanToZeroTBDep_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
           TitleOfHisto = "CoG_ShiftMeanToZeroTBDep (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
                          " side)";
           h_triggerbin[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 255, -0.5, 254.5,
                                                       "CoG_ShiftMeanToZeroTBDep (ns)",
                                                       m_histoList_triggerbin);
+
+          //CLUSTER SNR
+          NameOfHisto = "cls_ClusterSNR_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Minimum SNR (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_clsSNR[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, -0.5, 99.5,
+                                                                    "cls min SNR",
+                                                                    m_histoList_cluster);
+
+          //CLUSTER Seed SNR
+          NameOfHisto = "cls_SeedSNR_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Seed SNR (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_clsSeedSNR[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, -0.5, 99.5,
+                                                      "cls seed SNR",
+                                                      m_histoList_cluster);
+          //CLUSTER Adj SNR
+          NameOfHisto = "cls_AdjSNR_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Adj SNR (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_clsAdjSNR[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, -0.5, 99.5,
+                                                     "cls seed SNR",
+                                                     m_histoList_cluster);
+
+          //CLUSTER Scale Error size 1
+          NameOfHisto = "cls_ScaleErr1_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Position Error Scale Factor for Size 1 (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" +
+                         nameSensor + "," + nameSide +
+                         " side)";
+          h_clsScaleErr1[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, 0, 10,
+                                                        "scale factor",
+                                                        m_histoList_cluster);
+          //CLUSTER Scale Error size 2
+          NameOfHisto = "cls_ScaleErr2_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Position Error Scale Factor for Size 2 (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" +
+                         nameSensor + "," + nameSide +
+                         " side)";
+          h_clsScaleErr2[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, 0, 10,
+                                                        "scale factor",
+                                                        m_histoList_cluster);
+          //CLUSTER Scale Error size > 2
+          NameOfHisto = "cls_ScaleErr3_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Position Error Scale Factor for Size > 2 (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" +
+                         nameSensor + "," + nameSide +
+                         " side)";
+          h_clsScaleErr3[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, 0, 10,
+                                                        "scale factor",
+                                                        m_histoList_cluster);
+
+
+
+          //CLUSTER Time Selection Function
+          NameOfHisto = "cls_ClusterTimeSelFunction_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Time Selection Function Version(Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + ","
+                         + nameSide +
+                         " side)";
+          h_clsTimeFuncVersion[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 5, -0.5, 4.5,
+                                                              "cls time Sel Function ID", m_histoList_cluster);
+
+          //CLUSTER Time
+          NameOfHisto = "cls_ClusterTime_" + nameLayer + "." + nameLadder + "." + nameSensor + "." + nameSide;
+          TitleOfHisto = "Cluster Minimum Time (Layer" + nameLayer + ", Ladder" + nameLadder + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_clsTimeMin[layer][ladder][sensor][side] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100,
+                                                      "cls min Time",
+                                                      m_histoList_cluster);
+
 
         }
         //histogram created
@@ -178,6 +246,8 @@ void SVDCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
+  if (! m_ClusterCal.isValid())
+    B2WARNING("No valid SVDClusterCalibrations for the requested IoV");
   /*  if(!m_PedCal.isValid())
     B2WARNING("No valid SVDPedestalCalibrations for the requested IoV");
   if(!m_OccCal.isValid())
@@ -222,27 +292,42 @@ void SVDCalibrationsMonitorModule::event()
         for (int Ustrip = 0; Ustrip < currentSensorInfo->getUCells(); Ustrip++) {
           //fill your histogram for U side
 
-
-
           float ADCnoise = m_NoiseCal.getNoise(theVxdID, 1, Ustrip);
+          h_noise[layer][ladder][sensor][1]->Fill(ADCnoise);
           double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 1, Ustrip);
+          h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
 
           float ELECgain = m_PulseShapeCal.getChargeFromADC(theVxdID, 1, Ustrip, 1);
-
+          h_gainInElectrons[layer][ladder][sensor][1]->Fill(ELECgain);
           float time = m_PulseShapeCal.getPeakTime(theVxdID, 1, Ustrip);
+          h_peakTime[layer][ladder][sensor][1]->Fill(time);
           float width =  m_PulseShapeCal.getWidth(theVxdID, 1, Ustrip);
+          h_pulseWidth[layer][ladder][sensor][1]->Fill(width);
           float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, 1, Ustrip);
-
+          h_timeshift[layer][ladder][sensor][1]->Fill(time_shift);
           float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 1, Ustrip,
                                    0); /*reading by default the trigger bin #0*/
-
-          h_noise[layer][ladder][sensor][1]->Fill(ADCnoise);
-          h_noiseInElectrons[layer][ladder][sensor][1]->Fill(noiseInElectrons);
-          h_gainInElectrons[layer][ladder][sensor][1]->Fill(ELECgain);
-          h_peakTime[layer][ladder][sensor][1]->Fill(time);
-          h_pulseWidth[layer][ladder][sensor][1]->Fill(width);
-          h_timeshift[layer][ladder][sensor][1]->Fill(time_shift);
           h_triggerbin[layer][ladder][sensor][1]->Fill(triggerbin_shift);
+
+          float clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, 1);
+          h_clsSNR[layer][ladder][sensor][1]->Fill(clsSNR);
+          float clsSeedSNR = m_ClusterCal.getMinSeedSNR(theVxdID, 1);
+          h_clsSeedSNR[layer][ladder][sensor][1]->Fill(clsSeedSNR);
+          float clsAdjSNR = m_ClusterCal.getMinAdjSNR(theVxdID, 1);
+          h_clsAdjSNR[layer][ladder][sensor][1]->Fill(clsAdjSNR);
+          float clsScaleErr1 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 1, 1);
+          h_clsScaleErr1[layer][ladder][sensor][1]->Fill(clsScaleErr1);
+          float clsScaleErr2 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 2, 1);
+          h_clsScaleErr2[layer][ladder][sensor][1]->Fill(clsScaleErr2);
+          float clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 1, 3, 1);
+          h_clsScaleErr3[layer][ladder][sensor][1]->Fill(clsScaleErr3);
+
+          float clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, 1);
+          h_clsTimeMin[layer][ladder][sensor][1]->Fill(clsTimeMin);
+
+          float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 1);
+          h_clsTimeFuncVersion[layer][ladder][sensor][1]->Fill(clsTimeFunc);
+
 
         } //histogram filled for U side
 
@@ -252,25 +337,41 @@ void SVDCalibrationsMonitorModule::event()
 
 
           float ADCnoise = m_NoiseCal.getNoise(theVxdID, 0, Vstrip);
-
+          h_noise[layer][ladder][sensor][0]->Fill(ADCnoise);
           double noiseInElectrons = m_NoiseCal.getNoiseInElectrons(theVxdID, 0, Vstrip);
+          h_noiseInElectrons[layer][ladder][sensor][0]->Fill(noiseInElectrons);
 
           float ELECgain = m_PulseShapeCal.getChargeFromADC(theVxdID, 0, Vstrip, 1);
-
+          h_gainInElectrons[layer][ladder][sensor][0]->Fill(ELECgain);
           float time = m_PulseShapeCal.getPeakTime(theVxdID, 0, Vstrip);
+          h_peakTime[layer][ladder][sensor][0]->Fill(time);
           float width =  m_PulseShapeCal.getWidth(theVxdID, 0, Vstrip);
+          h_pulseWidth[layer][ladder][sensor][0]->Fill(width);
           float time_shift = m_PulseShapeCal.getTimeShiftCorrection(theVxdID, 0, Vstrip);
+          h_timeshift[layer][ladder][sensor][0]->Fill(time_shift);
           float triggerbin_shift = m_PulseShapeCal.getTriggerBinDependentCorrection(theVxdID, 0, Vstrip,
                                    0); /*reading by default the trigger bin #0*/
-
-
-          h_noise[layer][ladder][sensor][0]->Fill(ADCnoise);
-          h_noiseInElectrons[layer][ladder][sensor][0]->Fill(noiseInElectrons);
-          h_gainInElectrons[layer][ladder][sensor][0]->Fill(ELECgain);
-          h_peakTime[layer][ladder][sensor][0]->Fill(time);
-          h_pulseWidth[layer][ladder][sensor][0]->Fill(width);
-          h_timeshift[layer][ladder][sensor][0]->Fill(time_shift);
           h_triggerbin[layer][ladder][sensor][0]->Fill(triggerbin_shift);
+
+          float clsSNR = m_ClusterCal.getMinClusterSNR(theVxdID, 0);
+          h_clsSNR[layer][ladder][sensor][0]->Fill(clsSNR);
+          float clsSeedSNR = m_ClusterCal.getMinSeedSNR(theVxdID, 0);
+          h_clsSeedSNR[layer][ladder][sensor][0]->Fill(clsSeedSNR);
+          float clsAdjSNR = m_ClusterCal.getMinAdjSNR(theVxdID, 0);
+          h_clsAdjSNR[layer][ladder][sensor][0]->Fill(clsAdjSNR);
+          float clsScaleErr1 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 0, 1, 1);
+          h_clsScaleErr1[layer][ladder][sensor][0]->Fill(clsScaleErr1);
+          float clsScaleErr2 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 0, 2, 1);
+          h_clsScaleErr2[layer][ladder][sensor][0]->Fill(clsScaleErr2);
+          float clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, 0, 3, 1);
+          h_clsScaleErr3[layer][ladder][sensor][0]->Fill(clsScaleErr3);
+
+          float clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, 0);
+          h_clsTimeMin[layer][ladder][sensor][0]->Fill(clsTimeMin);
+
+          float clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, 0);
+          h_clsTimeFuncVersion[layer][ladder][sensor][0]->Fill(clsTimeFunc);
+
 
         } //histogram filled for V side
 
@@ -298,6 +399,8 @@ void SVDCalibrationsMonitorModule::event()
     ++itSvdLayers;
   }
 
+  //  B2INFO("iscluster in time if t0 = 0? "<< );
+
 }
 
 void SVDCalibrationsMonitorModule::endRun()
@@ -307,6 +410,7 @@ void SVDCalibrationsMonitorModule::endRun()
   B2RESULT("");
   B2RESULT("   - SVDNoiseCalibrations:" << m_NoiseCal.getUniqueID());
   B2RESULT("   - SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
+  B2RESULT("   - SVDClusterCalibrations:" << m_ClusterCal.getUniqueID());
 }
 
 void SVDCalibrationsMonitorModule::terminate()
@@ -375,6 +479,13 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_triggerbin()))
       obj->Write();
 
+
+    //writing the histogram list for the clusters
+    m_rootFilePtr->mkdir("cluster");
+    m_rootFilePtr->cd("cluster");
+    TIter nextH_clusters(m_histoList_cluster);
+    while ((obj = nextH_clusters()))
+      obj->Write();
 
 
     m_rootFilePtr->Close();

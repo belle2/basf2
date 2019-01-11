@@ -16,26 +16,32 @@
 #   basf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>
 #
 # Contributors: P. Goldenzweig (October 2016)
+#               I. Komarov (September 2018)
 #
 ################################################################################
 
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
+import sys
 
-set_log_level(LogLevel.ERROR)
 
 # --I/O----------------------------------------------------------------------------------------
 if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
     sys.exit("usage:\n\tbasf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>")
 
+import os
+if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
+
 step = str(sys.argv[1])
 
-path = '/group/belle2/tutorial/release_01-00-00/Bd_KsPi0/mdst/'
-input = ''
+path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/'
+input_file = ''
 
 if step == 'signal':
-    input = [path + 'Bd_KsPi0_expert/*']
+    input_file = [path + 'Bd_KsPi0_expert/*']
 elif step == 'qqbar':
-    input = [path + '*bar_expert/*']
+    input_file = [path + '*bar_expert/*']
 else:
     sys.exit('Step does not match any of the available samples: `signal` or `qqbar`')
 
@@ -43,27 +49,46 @@ outfile = 'MVAExpert_fullNTuple_' + step + '.root'
 # ---------------------------------------------------------------------------------------------
 
 # Perform analysis.
-main = create_path()
+main = b2.create_path()
 
-inputMdstList('MC5', input, path=main)
+ma.inputMdst(environmentType='default',
+             filename=input_file,
+             path=main)
 
-fillParticleList('gamma:all', '', path=main)
-fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
-fillParticleList('pi-:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
+ma.fillParticleList(decayString='gamma:all',
+                    cut='', path=main)
+ma.fillParticleList(decayString='pi+:good',
+                    cut='chiProb > 0.001 and pionID > 0.5',
+                    path=main)
+ma.fillParticleList(decayString='pi-:good',
+                    cut='chiProb > 0.001 and pionID > 0.5',
+                    path=main)
 
-reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', 1, path=main)
-reconstructDecay('pi0  -> gamma:all gamma:all', '0.115<=M<=0.152', 1, path=main)
-reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=main)
+ma.reconstructDecay(decayString='K_S0 -> pi+:good pi-:good',
+                    cut='0.480<=M<=0.516',
+                    dmID=1,
+                    path=main)
+ma.reconstructDecay(decayString='pi0  -> gamma:all gamma:all',
+                    cut='0.115<=M<=0.152',
+                    dmID=1,
+                    path=main)
+ma.reconstructDecay(decayString='B0   -> K_S0 pi0',
+                    cut='5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2',
+                    path=main)
 
-matchMCTruth('B0', path=main)
-buildRestOfEvent('B0', path=main)
+ma.matchMCTruth(list_name='B0', path=main)
+ma.buildRestOfEvent(list_name='B0', path=main)
 
 # The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
 # via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-appendROEMasks('B0', [cleanMask], path=main)
+ma.appendROEMasks(list_name='B0',
+                  mask_tuples=[cleanMask],
+                  path=main)
 
-buildContinuumSuppression('B0', 'cleanMask', path=main)
+ma.buildContinuumSuppression(list_name='B0',
+                             roe_mask='cleanMask',
+                             path=main)
 
 # Define the variables for training.
 #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
@@ -113,7 +138,11 @@ main.add_module('MVAExpert', listNames=['B0'], extraInfoName='FastBDT', identifi
 expertVars = ['extraInfo(FastBDT)', 'transformedNetworkOutput(FastBDT,0.1,1.0)']
 
 # Create output file with all sets of variables.
-variablesToNTuple('B0', trainVars + targetVar + expertVars, treename='tree', filename=outfile, path=main)
+ma.variablesToNtuple(decayString='B0',
+                     variables=trainVars + targetVar + expertVars,
+                     treename='tree',
+                     filename=outfile,
+                     path=main)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

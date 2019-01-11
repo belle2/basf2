@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yinghui GUAN                                             *
+ * Contributors: Yinghui GUAN, VIPIN GAUR, Z. S. Stottler                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -76,8 +76,8 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
 
           int MaxiChannel = 0;
           if (isForward == 0 && sector == 3 && plane == 0) {
-            if (plane == 0 && layer < 3) MaxiChannel = 38;
-            if (plane == 0 && layer > 2) MaxiChannel = 34;
+            if (layer < 3) MaxiChannel = 38;
+            if (layer > 2) MaxiChannel = 34;
           } else {
             if (layer == 1 && plane == 1) MaxiChannel = 37;
             if (layer == 2 && plane == 1) MaxiChannel = 42;
@@ -138,10 +138,9 @@ void BKLMDatabaseImporter::exportBklmElectronicMapping()
 
 void BKLMDatabaseImporter::importBklmGeometryPar()
 {
-  GearDir content("/Detector/DetectorComponent/Geometry/BKLM/Content");
+  GearDir content("/Detector/DetectorComponent[@name=\"BKLM\"]/Content");
 
   // define the data
-  // TObject bklmGeometryPar("Belle2::BKLMGeometryPar");
   BKLMGeometryPar bklmGeometryPar;
 
   // Get Gearbox parameters for BKLM
@@ -173,7 +172,6 @@ void BKLMDatabaseImporter::importBklmSimulationPar()
   GearDir content("/Detector/DetectorComponent/Geometry/BKLM/Content/SimulationParameters");
 
   // define the data
-  // TObject bklmGeometryPar("Belle2::BKLMGeometryPar");
   BKLMSimulationPar bklmSimulationPar;
 
   // Get Gearbox simulation parameters for BKLM
@@ -201,24 +199,36 @@ void BKLMDatabaseImporter::exportBklmSimulationPar()
 
 }
 
-void BKLMDatabaseImporter::importBklmBadChannels()
+void BKLMDatabaseImporter::importBklmBadChannels(int expNoStart, int runStart, int expNoStop, int runStop, std::string fileName)
 {
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
 
   BKLMBadChannels bklmBadChannels;
-  //bklmBadChannels.appendDeadChannel(1, 1, 1, 0, 20);
-  //bklmBadChannels.appendHotChannel(1, 1, 1, 0, 21);
 
+  int isForward(0), sector(0), layer(0), plane(0), strip(0);
+
+  while (true) {
+    stream >> isForward >> sector >> layer >> plane >> strip;
+    if (stream.eof()) break;
+    B2INFO("Read in line" << isForward << ", " << sector << ", " << layer  << ", " << plane  << ", " << strip << ".");
+    bklmBadChannels.appendDeadChannel(isForward, sector, layer, plane, strip);
+  }
+  stream.close();
   // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
+  IntervalOfValidity iov(expNoStart, runStart, expNoStop, runStop);
   Database::Instance().storeData("BKLMBadChannels", &bklmBadChannels, iov);
-
 }
 
 void BKLMDatabaseImporter::exportBklmBadChannels()
 {
   DBObjPtr<BKLMBadChannels> element("BKLMBadChannels");
 
-  element->printHotChannels();
   element->printDeadChannels();
 
   B2INFO("is (1,1,1,0,20) dead ? " << element->isDeadChannel(1, 1, 1, 0, 20) << "; is (1,1,1,0,21) hot ? " << element->isHotChannel(1,
@@ -229,7 +239,6 @@ void BKLMDatabaseImporter::exportBklmBadChannels()
 void BKLMDatabaseImporter::importBklmMisAlignment()
 {
 
-  //auto bklm = new BKLMMisAlignment;
   DBImportObjPtr<BKLMMisAlignment> mal;
   mal.construct();
   for (int i = 0; i < 2; i++) {
@@ -247,10 +256,7 @@ void BKLMDatabaseImporter::importBklmMisAlignment()
   }
 
   IntervalOfValidity Iov(0, 0, -1, -1);
-//auto IoV = IntervalOfValidity(0, 0, -1, -1);
   mal.import(Iov);
-//Database::Instance().storeData(mal, IoV);
-
 }
 
 void BKLMDatabaseImporter::exportBklmMisAlignment()
@@ -276,7 +282,6 @@ void BKLMDatabaseImporter::exportBklmMisAlignment()
 void BKLMDatabaseImporter::importBklmAlignment()
 {
 
-  //auto bklm = new BKLMAlignment;
   DBImportObjPtr<BKLMAlignment> al;
   al.construct();
   for (int i = 0; i < 2; i++) {
@@ -294,10 +299,7 @@ void BKLMDatabaseImporter::importBklmAlignment()
   }
 
   IntervalOfValidity Iov(0, 0, -1, -1);
-//auto IoV = IntervalOfValidity(0, 0, -1, -1);
   al.import(Iov);
-//Database::Instance().storeData(mal, IoV);
-
 }
 
 void BKLMDatabaseImporter::exportBklmAlignment()
@@ -324,7 +326,6 @@ void BKLMDatabaseImporter::exportBklmAlignment()
 void BKLMDatabaseImporter::importBklmDisplacement()
 {
 
-  //DBImportObjPtr<BKLMDisplacement> dis;
   DBImportArray<BKLMDisplacement> m_displacement;
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 8; j++) {
@@ -336,18 +337,12 @@ void BKLMDatabaseImporter::importBklmDisplacement()
   }
 
   IntervalOfValidity Iov(0, 0, -1, -1);
-  //auto IoV = IntervalOfValidity(0, 0, -1, -1);
   m_displacement.import(Iov);
-  //Database::Instance().storeData(mal, Iov); // *not* IoV);
-
 }
 
 void BKLMDatabaseImporter::exportBklmDisplacement()
 {
-
-  //DBObjPtr<BKLMDisplacement> element("BKLMDisplacement");
   DBArray<BKLMDisplacement> displacements;
-
   for (const auto& disp : displacements) {
     unsigned short bklmElementID = disp.getElementID();
     BKLMElementID bklmid(bklmElementID);
@@ -357,7 +352,6 @@ void BKLMDatabaseImporter::exportBklmDisplacement()
     B2INFO("displacement of " << isForward << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
            ", " <<
            disp.getWShift() << ", " << disp.getAlphaRotation() << ", " << disp.getBetaRotation() << ", " << disp.getGammaRotation());
-    //B2INFO(" " << endl);
   }//end loop layer
 }
 
@@ -378,7 +372,6 @@ void BKLMDatabaseImporter::importBklmDigitizationParams()
   scinDigitzationParm->setFiberDeExcitationTime(dig.getDouble("FiberDeExTime"));
   scinDigitzationParm->setFiberLightSpeed(dig.getDouble("FiberLightSpeed"));
   scinDigitzationParm->setAttenuationLength(dig.getDouble("AttenuationLength"));
-  //scinDigitzationParm->setPEAttenuationFrequency(dig.getDouble("PEAttenuationFreq"));
   scinDigitzationParm->setPEAttenuationFrequency(1.0 / 8.75); // from T2K paper by F. Retiere: PoS (PD07) 017)
   scinDigitzationParm->setMeanSiPMNoise(dig.getDouble("MeanSiPMNoise"));
   scinDigitzationParm->setEnableConstBkg(dig.getDouble("EnableConstBkg") > 0);

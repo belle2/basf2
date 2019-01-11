@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
-#define EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
+#pragma once
 
 /* C++ headers. */
 #include <string>
@@ -42,6 +41,18 @@ namespace Belle2 {
     EKLMAlignmentAlongStripsCollectorModule();
 
     /**
+     * Copy constructor (disabled).
+     */
+    EKLMAlignmentAlongStripsCollectorModule(
+      const EKLMAlignmentAlongStripsCollectorModule&) = delete;
+
+    /**
+     * Operator = (disabled).
+     */
+    EKLMAlignmentAlongStripsCollectorModule& operator=(
+      const EKLMAlignmentAlongStripsCollectorModule&) = delete;
+
+    /**
      * Destructor.
      */
     ~EKLMAlignmentAlongStripsCollectorModule();
@@ -49,17 +60,17 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void prepare();
+    void prepare() override;
 
     /**
      * This method is called for each event.
      */
-    void collect();
+    void collect() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void finish();
+    void finish() override;
 
   private:
 
@@ -81,6 +92,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

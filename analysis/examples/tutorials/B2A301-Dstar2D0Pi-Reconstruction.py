@@ -17,58 +17,64 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
-from stdCharged import *
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
+import stdCharged as stdc
+from stdV0s import stdKshorts
+from stdPi0s import stdPi0s
 
+# create path
+my_path = b2.create_path()
 
-# Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/group/belle2/tutorial/release_01-00-00/mdst-dstars.root'
-     ]
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('Dst2D0pi.root', 'examples', False),
+             path=my_path)
 
-inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #
 # creates "pi+:all" ParticleList (and c.c.)
-stdPi('all')
+stdc.stdPi(listtype='all', path=my_path)
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
+stdc.stdPi(listtype='loose', path=my_path)
 # creates "K+:loose" ParticleList (and c.c.)
-stdLooseK()
+stdc.stdK(listtype='loose', path=my_path)
 
 # reconstruct D0 -> K- pi+ decay
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
-reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
+ma.reconstructDecay(decayString='D0:kpi -> K-:loose pi+:loose', cut='1.8 < M < 1.9', path=my_path)
 
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
 # and D* CMS momentum > 2.5 GeV
-reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5')
+ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('D*+')
+ma.matchMCTruth(list_name='D*+', path=my_path)
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['InvMass', '^D*+ -> ^D0 pi+']
-toolsDST += ['CMSKinematics', '^D*+']
-toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
+# Select variables that we want to store to ntuple
+dstar_vars = vc.inv_mass + vc.mc_truth
 
-# write out the flat ntuple
-ntupleFile('B2A301-Dstar2D0Pi-Reconstruction.root')
-ntupleTree('dsttree', 'D*+', toolsDST)
+fs_hadron_vars = vu.create_aliases_for_selected(
+    list_of_variables=vc.pid + vc.track + vc.mc_truth,
+    decay_string='D*+ -> [D0 -> ^K- ^pi+] ^pi+')
+
+d0_vars = vu.create_aliases_for_selected(
+    list_of_variables=vc.inv_mass + vc.mc_truth,
+    decay_string='D*+ -> ^D0 pi+',
+    prefix='D0')
+
+
+# Saving variables to ntuple
+output_file = 'B2A301-Dstar2D0Pi-Reconstruction.root'
+ma.variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
+                     filename=output_file, treename='dsttree', path=my_path)
 
 # Process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

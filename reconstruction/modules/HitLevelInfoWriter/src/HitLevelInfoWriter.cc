@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jake Bennett, Jitendra Kumar
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,6 +22,7 @@ HitLevelInfoWriterModule::HitLevelInfoWriterModule() : Module()
 
   addParam("outputBaseName", m_strOutputBaseName, "Suffix for output file name", std::string("HLInfo.root"));
   addParam("particleLists", m_strParticleList, "Vector of ParticleLists to save", std::vector<std::string>());
+  addParam("variableHitLevel", IsHitLevel, "True or False for Hit level variables", false);
 }
 
 HitLevelInfoWriterModule::~HitLevelInfoWriterModule() { }
@@ -48,7 +49,7 @@ void HitLevelInfoWriterModule::initialize()
   for (unsigned int i = 0; i < m_strParticleList.size(); i++) {
     // strip the name of the particle lists to make this work
     std::string pdg = pdgMap[m_strParticleList[i].substr(0, m_strParticleList[i].find(":"))];
-    std::string filename = std::string(m_strOutputBaseName + pdg + ".root");
+    std::string filename = std::string(m_strOutputBaseName + "_PID" + pdg + ".root");
     bookOutput(filename);
   }
 }
@@ -120,7 +121,7 @@ void HitLevelInfoWriterModule::event()
     // make sure the list exists and is not empty
     StoreObjPtr<ParticleList> particlelist(m_strParticleList[iList]);
     if (!particlelist or particlelist->getListSize(true) == 0) {
-      B2WARNING("ParticleList " << m_strParticleList[iList] << " not found or empty, skipping");
+      //B2WARNING("ParticleList " << m_strParticleList[iList] << " not found or empty, skipping");
       continue;
     }
 
@@ -211,6 +212,7 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   TVector3 trackMom = fitResult->getMomentum();
   TVector3 trackPos = fitResult->getPosition();
 
+  m_pIP = trackMom.Mag();
   m_phi = trackMom.Phi();
 
   m_vx0 = trackPos.x();
@@ -235,7 +237,10 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_PDG = dedxTrack->getPDG();
 
   m_p = dedxTrack->getMomentum();
-  if (m_charge < 0) m_p *= -1;
+  if (m_charge < 0) {
+    m_p *= -1;
+    m_pIP *= -1;
+  }
 
   h_nhits = dedxTrack->size();
   l_nhits = dedxTrack->getNLayerHits();
@@ -243,6 +248,7 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
 
   m_mean = dedxTrack->getDedxMean();
   m_trunc = dedxTrack->getDedx();
+  m_truncNoSat = dedxTrack->getDedxNoSat();
   m_error = dedxTrack->getDedxError();
 
   // Get the calibration constants
@@ -277,21 +283,26 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_ioasym = (lout - lin) / increment;
 
   // Get the vector of dE/dx values for all hits
-  for (int ihit = 0; ihit < h_nhits; ++ihit) {
-    h_lwire[ihit] = dedxTrack->getWireInLayer(ihit);
-    h_wire[ihit] = dedxTrack->getWire(ihit);
-    h_layer[ihit] = dedxTrack->getHitLayer(ihit);
-    h_path[ihit] = dedxTrack->getPath(ihit);
-    h_dedx[ihit] = dedxTrack->getDedx(ihit);
-    h_adcraw[ihit] = dedxTrack->getADCCount(ihit);
-    h_doca[ihit] = dedxTrack->getDoca(ihit);
-    h_enta[ihit] = dedxTrack->getEnta(ihit);
-    h_driftT[ihit] = dedxTrack->getDriftT(ihit);
+  if (IsHitLevel) {
+    for (int ihit = 0; ihit < h_nhits; ++ihit) {
+      h_lwire[ihit] = dedxTrack->getWireInLayer(ihit);
+      h_wire[ihit] = dedxTrack->getWire(ihit);
+      h_layer[ihit] = dedxTrack->getHitLayer(ihit);
+      h_path[ihit] = dedxTrack->getPath(ihit);
+      h_dedx[ihit] = dedxTrack->getDedx(ihit);
+      h_adcraw[ihit] = dedxTrack->getADCCount(ihit);
+      h_doca[ihit] = dedxTrack->getDoca(ihit);
+      h_ndoca[ihit] = h_doca[ihit] / dedxTrack->getCellHalfWidth(ihit);
+      h_docaRS[ihit] = dedxTrack->getDocaRS(ihit) / dedxTrack->getCellHalfWidth(ihit);
+      h_enta[ihit] = dedxTrack->getEnta(ihit);
+      h_entaRS[ihit] = dedxTrack->getEntaRS(ihit);
+      h_driftT[ihit] = dedxTrack->getDriftT(ihit);
 
-    // Get the calibration constants
-    h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
-    h_twodCor[ihit] = m_DB2DCell->getMean(h_layer[ihit], h_doca[ihit], h_enta[ihit]);
-    h_onedCor[ihit] = m_DB1DCell->getMean(h_layer[ihit], h_enta[ihit]);
+      // Get the calibration constants
+      h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
+      h_twodCor[ihit] = m_DB2DCell->getMean(h_layer[ihit], h_docaRS[ihit], h_entaRS[ihit]);
+      h_onedCor[ihit] = m_DB1DCell->getMean(h_layer[ihit], h_entaRS[ihit]);
+    }
   }
 }
 
@@ -306,19 +317,24 @@ HitLevelInfoWriterModule::clearEntries()
     l_dedx[il] = 0;
   }
 
-  for (int ihit = 0; ihit < 200; ++ihit) {
-    h_lwire[ihit] = 0;
-    h_wire[ihit] = 0;
-    h_layer[ihit] = 0;
-    h_path[ihit] = 0;
-    h_dedx[ihit] = 0;
-    h_adcraw[ihit] = 0;
-    h_doca[ihit] = 0;
-    h_enta[ihit] = 0;
-    h_driftT[ihit] = 0;
-    h_wireGain[ihit] = 0;
-    h_twodCor[ihit] = 0;
-    h_onedCor[ihit] = 0;
+  if (IsHitLevel) {
+    for (int ihit = 0; ihit < 200; ++ihit) {
+      h_lwire[ihit] = 0;
+      h_wire[ihit] = 0;
+      h_layer[ihit] = 0;
+      h_path[ihit] = 0;
+      h_dedx[ihit] = 0;
+      h_adcraw[ihit] = 0;
+      h_doca[ihit] = 0;
+      h_ndoca[ihit] = 0;
+      h_docaRS[ihit] = 0;
+      h_enta[ihit] = 0;
+      h_entaRS[ihit] = 0;
+      h_driftT[ihit] = 0;
+      h_wireGain[ihit] = 0;
+      h_twodCor[ihit] = 0;
+      h_onedCor[ihit] = 0;
+    }
   }
 }
 
@@ -367,7 +383,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   // track level dE/dx measurements
   m_tree[i]->Branch("mean", &m_mean, "mean/D");
   m_tree[i]->Branch("dedx", &m_trunc, "dedx/D");
-  m_tree[i]->Branch("dedxsat", &m_trunc, "dedxsat/D"); // placeholder for Widget
+  m_tree[i]->Branch("dedxnosat", &m_truncNoSat, "dedxnosat/D");
   m_tree[i]->Branch("dedxerr", &m_error, "dedxerr/D");
 
   // PID values
@@ -388,17 +404,23 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("lDedx", l_dedx, "lDedx[lNHits]/D");
 
   // hit level information
-  m_tree[i]->Branch("hNHits", &h_nhits, "hNHits/I");
-  m_tree[i]->Branch("hLWire", h_lwire, "hLWire[hNHits]/I");
-  m_tree[i]->Branch("hWire", h_wire, "hWire[hNHits]/I");
-  m_tree[i]->Branch("hLayer", h_layer, "hLayer[hNHits]/I");
-  m_tree[i]->Branch("hPath", h_path, "hPath[hNHits]/D");
-  m_tree[i]->Branch("hDedx", h_dedx, "hDedx[hNHits]/D");
-  m_tree[i]->Branch("hADCRaw", h_adcraw, "hADCRaw[hNHits]/D");
-  m_tree[i]->Branch("hDoca", h_doca, "hDoca[hNHits]/D");
-  m_tree[i]->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
-  m_tree[i]->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
-  m_tree[i]->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
-  m_tree[i]->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
-  m_tree[i]->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");
+  if (IsHitLevel) {
+    m_tree[i]->Branch("hNHits", &h_nhits, "hNHits/I");
+    m_tree[i]->Branch("hLWire", h_lwire, "hLWire[hNHits]/I");
+    m_tree[i]->Branch("hWire", h_wire, "hWire[hNHits]/I");
+    m_tree[i]->Branch("hLayer", h_layer, "hLayer[hNHits]/I");
+    m_tree[i]->Branch("hPath", h_path, "hPath[hNHits]/D");
+    m_tree[i]->Branch("hDedx", h_dedx, "hDedx[hNHits]/D");
+    m_tree[i]->Branch("hADCRaw", h_adcraw, "hADCRaw[hNHits]/D");
+    m_tree[i]->Branch("hDoca", h_doca, "hDoca[hNHits]/D");
+    m_tree[i]->Branch("hNDoca", h_ndoca, "hNDoca[hNHits]/D");
+    m_tree[i]->Branch("hNDocaRS", h_docaRS, "hNDocaRS[hNHits]/D");
+    m_tree[i]->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
+    m_tree[i]->Branch("hEntaRS", h_entaRS, "hEntaRS[hNHits]/D");
+    m_tree[i]->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
+    m_tree[i]->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
+    m_tree[i]->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
+    m_tree[i]->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");
+  }
+
 }

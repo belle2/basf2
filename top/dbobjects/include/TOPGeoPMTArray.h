@@ -64,6 +64,28 @@ namespace Belle2 {
     void setDecoupledPMT(unsigned pmtID) {m_decoupledPMTs.push_back(pmtID);}
 
     /**
+     * Sets silicone cookie
+     * @param thickness thickness
+     * @param material material name
+     */
+    void setSiliconeCookie(double thickness, const std::string& material)
+    {
+      m_cookieThickness = thickness;
+      m_cookieMaterial = material;
+    }
+
+    /**
+     * Sets wavelength filter
+     * @param thickness thickness
+     * @param material material name
+     */
+    void setWavelengthFilter(double thickness, const std::string& material)
+    {
+      m_filterThickness = thickness;
+      m_filterMaterial = material;
+    }
+
+    /**
      * Generate randomly a fraction of PMT's to be optically decoupled
      * @param fraction decoupled fraction
      */
@@ -130,6 +152,30 @@ namespace Belle2 {
     double getGapY() const {return m_gy / s_unit;}
 
     /**
+     * Returns silicone cookie thickness
+     * @return thickness
+     */
+    double getCookieThickness() const {return m_cookieThickness / s_unit;}
+
+    /**
+     * Returns silicone cookie material
+     * @return material name
+     */
+    const std::string& getCookieMaterial() const {return m_cookieMaterial;}
+
+    /**
+     * Returns wavelength filter thickness
+     * @return thickness
+     */
+    double getFilterThickness() const {return m_filterThickness / s_unit;}
+
+    /**
+     * Returns wavelenght filter material
+     * @return material name
+     */
+    const std::string& getFilterMaterial() const {return m_filterMaterial;}
+
+    /**
      * Returns array volume dimension in x
      * @return size in x
      */
@@ -145,7 +191,10 @@ namespace Belle2 {
      * Returns array volume dimension in z
      * @return size in z
      */
-    double getSizeZ() const {return m_pmt.getSizeZ() + getAirGap();}
+    double getSizeZ() const
+    {
+      return m_pmt.getSizeZ() + getAirGap() + getCookieThickness() + getFilterThickness();
+    }
 
     /**
      * Returns x coordinate of column center
@@ -211,6 +260,14 @@ namespace Belle2 {
     int getPixelID(double x, double y, unsigned pmtID) const;
 
     /**
+     * Returns pixel ID (1-based)
+     * @param pmtID PMT ID (1-based)
+     * @param pmtPixelID PMT pixel ID (1-based)
+     * @return pixel ID or 0 for invalid input ID's
+     */
+    int getPixelID(unsigned pmtID, unsigned pmtPixelID) const;
+
+    /**
      * Returns air gap
      * @return gap thickness
      */
@@ -232,13 +289,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "PMT array geometry parameters") const;
+    void print(const std::string& title = "PMT array geometry parameters") const override;
 
   private:
 
@@ -252,8 +309,12 @@ namespace Belle2 {
     TOPGeoPMT m_pmt; /**< PMT geometry parameters */
     float m_airGap = 0; /**< air gap thickness for decoupled PMT's */
     std::vector<unsigned> m_decoupledPMTs; /**< ID's of decoupled PMT's */
+    float m_cookieThickness = 0; /**< silicone cookie thickness */
+    std::string m_cookieMaterial; /**< silicone cookie material */
+    float m_filterThickness = 0; /**< wavelength filter thickness */
+    std::string m_filterMaterial; /**< wavelength filter material */
 
-    ClassDef(TOPGeoPMTArray, 2); /**< ClassDef */
+    ClassDefOverride(TOPGeoPMTArray, 3); /**< ClassDef */
 
   };
 

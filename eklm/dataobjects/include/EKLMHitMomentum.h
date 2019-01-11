@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMHITMOMENTUM_H
-#define EKLMHITMOMENTUM_H
+#pragma once
 
 /* External headers. */
 #include <TLorentzVector.h>
@@ -62,12 +61,9 @@ namespace Belle2 {
 
   private:
 
-    /** Needed to make objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMHitMomentum, 1);
 
   };
 
 }
-
-#endif
-

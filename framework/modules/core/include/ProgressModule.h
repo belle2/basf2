@@ -31,13 +31,13 @@ namespace Belle2 {
     ProgressModule();
 
     /** Init the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Show beginRun message */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Show progress */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Maximum order of magnitude for interval between showing progress */

@@ -9,7 +9,7 @@
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
 #    sampleType     one of: study, usual, PXD, ECL
-#    phase          2 or 3
+#    phase          2, 31 (= early phase 3) or 3
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ if argc == 3:
     equivTime = argvs[1]  # equivalent SuperKEKB running time in micro-seconds
     num = argvs[2]        # output file number
     sampleType = 'usual'  # study, usual, PXD, ECL
-    phase = 3             # 2 or 3
+    phase = 3             # phase number
     outdir = 'output'     # output directory path
 elif argc == 4:
     equivTime = argvs[1]
@@ -54,7 +54,7 @@ else:
     print('  equivTime_us  equivalent SuperKEKB running time in micro-seconds')
     print('  num           output file number')
     print('  sampleType    one of: study, usual, PXD, ECL')
-    print('  phase         2 or 3')
+    print('  phase         2, 31 (=early phase 3) or 3')
     print('  outdir        output directory path')
     sys.exit()
 
@@ -65,6 +65,8 @@ crossect = 7.28e6  # nb
 
 if phase == 3:
     lumi = 800  # /nb/s
+elif phase == 31:
+    lumi = 250  # /nb/s
 elif phase == 2:
     lumi = 20   # /nb/s
 else:
@@ -106,6 +108,8 @@ main.add_module(eventinfosetter)
 gearbox = register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
+elif phase == 31:
+    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
 if sampleType == 'study':
     gearbox.param('override', [
         ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),
@@ -135,6 +139,7 @@ main.add_module(aafh)
 
 # Geant geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param({"excludedComponents": ["MagneticField"],
                 "additionalComponents": ["MagneticField3dQuadBeamline"], })
 main.add_module(geometry)
@@ -153,6 +158,8 @@ progress = register_module('Progress')
 main.add_module(progress)
 
 # Output
+if phase == 31:
+    phase = 3
 add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile)
 
 # Process events

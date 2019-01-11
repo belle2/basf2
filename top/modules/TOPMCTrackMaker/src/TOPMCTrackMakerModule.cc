@@ -22,6 +22,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/BFieldManager.h>
 
 // dataobjects
 #include <mdst/dataobjects/Track.h>
@@ -102,6 +103,7 @@ namespace Belle2 {
 
     for (const auto& mcParticle : mcParticles) {
       if (mcParticle.getStatus(MCParticle::c_PrimaryParticle) == 0) continue;
+      if (mcParticle.getCharge() == 0) continue;
       const auto* barHit = mcParticle.getRelated<TOPBarHit>();
       if (!barHit) continue;
 
@@ -112,7 +114,7 @@ namespace Belle2 {
                            mcParticle.getCharge(),
                            Const::pion,
                            1.0,            // pValue
-                           1.5,            // B field (?)
+                           BFieldManager::getField(0, 0, 0).Z() / Unit::T,
                            0,
                            0);
       auto* track = tracks.appendNew();

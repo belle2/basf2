@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef SKIMFILTERMODULE_H
-#define SKIMFILTERMODULE_H
+#pragma once
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -46,5 +45,4 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // SKIMFILTERMODULE_H
 

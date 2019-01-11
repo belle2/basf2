@@ -12,8 +12,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <string>
 
 namespace Belle2 {
@@ -34,13 +36,15 @@ namespace Belle2 {
       PXDRawHitSorterModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the sorting */
-      virtual void event();
+      virtual void event() override;
 
     private:
       /**< Required input for PXDRawHit */
       StoreArray<PXDRawHit> m_storeRawHits;
+      /**< Required input for PXD Daq Status */
+      StoreObjPtr<PXDDAQStatus> m_storeDaqStatus;
       /** Output array for PXDDigits. */
       StoreArray<PXDDigit> m_storeDigits;
 
@@ -59,8 +63,6 @@ namespace Belle2 {
       std::string m_storeDigitsName;
       /** Mode: if true, merge duplicate pixels, otherwise only keep the first. */
       bool m_mergeDuplicates;
-      /** Mode: if true, merge frames, otherwise keep separate frames */
-      bool m_mergeFrames;
       /** Minimum charge for a digit to carry */
       int m_0cut;
       /** Discard out-of-range hits. */

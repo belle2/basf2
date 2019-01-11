@@ -30,6 +30,7 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
   }
   callback->setNode(NSMNode(name));
   std::string rcconfig = config.get("rcconfig");
+  callback->setRunTypeRecord(config.get("runtype.record"));
   if (rcconfig.size() > 0) {
     callback->setRCConfig(rcconfig);
   } else {
@@ -39,12 +40,14 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
   if (timeout > 0) {
     callback->setTimeout(timeout);
   }
+  callback->setCategory(config.get("log.category"));
   std::string file = config.get("file");
   std::string dbtable = config.get("dbtable");
   if (file.size() > 0) {
     LogFile::info("read file %s", file.c_str());
     callback->setDBFile(file);
-  } else if (dbtable.size() > 0) {
+  }
+  if (dbtable.size() > 0) {
     LogFile::debug("database.use=%s", config.getBool("database.use") ? "TRUE" : "FALSE");
     if (config.getBool("database.use") && db != NULL) {
       callback->setDB(db, dbtable);

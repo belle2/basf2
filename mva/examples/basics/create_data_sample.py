@@ -35,9 +35,9 @@ def reconstruction_path(inputfiles):
                         ' and minC2HDist > 35')],
                       path=path)
     reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 1.6', path=path)
-    massVertexKFit('pi0', 0.1, path=path)
+    massVertexKFit('pi0', 0.1, path=path, silence_warning=True)
     reconstructDecay('D0 -> K- pi+ pi0', '1.8 < M < 1.9', path=path)
-    fitVertex('D0', 0.1, fitter='kfitter', path=path)
+    vertexKFit('D0', 0.1, path=path, silence_warning=True)
     applyCuts('D0', '1.7 < M < 1.9', path=path)
     matchMCTruth('D0', path=path)
     return path
@@ -49,15 +49,15 @@ if __name__ == "__main__":
     # Add your root files here
     f = 'mdst_002001_prod00000789_task00004203.root'
     path = reconstruction_path([f])
-    variablesToNTuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
     path = reconstruction_path([f])
-    variablesToNTuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
     process(path)
 
     # Add your root files here
     path = reconstruction_path([f])
-    variablesToNTuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
     process(path)

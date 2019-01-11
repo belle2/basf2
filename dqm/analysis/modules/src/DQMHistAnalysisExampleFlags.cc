@@ -31,12 +31,9 @@ DQMHistAnalysisExampleFlagsModule::DQMHistAnalysisExampleFlagsModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   B2DEBUG(20, "DQMHistAnalysisExampleFlags: Constructor done.");
 }
 
-
-DQMHistAnalysisExampleFlagsModule::~DQMHistAnalysisExampleFlagsModule() { }
 
 void DQMHistAnalysisExampleFlagsModule::initialize()
 {
@@ -54,42 +51,6 @@ void DQMHistAnalysisExampleFlagsModule::beginRun()
 
   m_cFlagtest->Clear();
   m_hFlagtest->Reset();
-}
-
-
-TH1* DQMHistAnalysisExampleFlagsModule::findHistLocal(TString& a)
-{
-  B2DEBUG(20, "Histo " << a << " not in memfile");
-  // the following code sux ... is there no root function for that?
-  TDirectory* d = gROOT;
-  TString myl = a;
-  TString tok;
-  Ssiz_t from = 0;
-  while (myl.Tokenize(tok, from, "/")) {
-    TString dummy;
-    Ssiz_t f;
-    f = from;
-    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-      auto e = d->GetDirectory(tok);
-      if (e) {
-        B2DEBUG(20, "Cd Dir " << tok);
-        d = e;
-      }
-      d->cd();
-    } else {
-      break;
-    }
-  }
-  TObject* obj = d->FindObject(tok);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      B2DEBUG(20, "Histo " << a << " found in mem");
-      return (TH1*)obj;
-    }
-  } else {
-    B2DEBUG(20, "Histo " << a << " NOT found in mem");
-  }
-  return NULL;
 }
 
 void DQMHistAnalysisExampleFlagsModule::event()

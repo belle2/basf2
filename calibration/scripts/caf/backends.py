@@ -2,18 +2,20 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 from abc import ABC, abstractmethod
-import subprocess
-import multiprocessing as mp
-from collections import defaultdict
-import shutil
-from itertools import repeat
-import glob
-from .utils import method_dispatch
 import pickle
 import configparser
-from .utils import decode_json_string
 import pathlib
+import glob
+from collections import defaultdict
+import shutil
+import subprocess
+import multiprocessing as mp
+
+from .utils import method_dispatch
+from .utils import decode_json_string
+from .utils import grouper
 
 import ROOT
 
@@ -138,38 +140,56 @@ class Job:
             """
             return self.name
 
-    def __init__(self, name, config_file=""):
+    def __init__(self, name, config_file="", job_dict=None):
         """
         """
         #: Job object's name. Only descriptive, not necessarily unique.
         self.name = name
-        #: Files to be tarballed and sent along with the job (NOT the input root files)
-        self.input_sandbox_files = []
-        #: Working directory of the job (str). Default is '.', mostly used in Local() backend
-        self.working_dir = '.'
-        #: Output directory (str), where we will download our output_files to. Default is '.'
-        self.output_dir = '.'
-        #: Files that we produce during the job and want to be returned. Can use wildcard (*)
-        self.output_patterns = []
-        #: Command and arguments as a list that wil be run by the job on the backend
-        self.cmd = []
-        #: Input files to job, a list of these is copied to the working directory.
-        self.input_files = []
-        #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
-        self.setup_cmds = []
-        #: ConfigParser object that sets the defaults (mainly for basf2 setup) and is used as the store
-        #: of configuration variables. Some other attributes reference this object via properties.
-        self.config = configparser.ConfigParser()
-        if not config_file:
-            config_file = default_config_file
-        self.config.read(config_file)
-        #: Config dictionary for the backend to use when submitting the job. Saves us from having multiple attributes that may or
-        #: may not be used.
-        self.backend_args = {}
-        #: Maximum number of files to place in a subjob (Not applicable to Local processing). -1 means don't split into subjobs
-        self.max_files_per_subjob = -1
-        #: dict of subjobs assigned to this job
-        self.subjobs = {}
+
+        if not job_dict:
+            #: Files to be tarballed and sent along with the job (NOT the input root files)
+            self.input_sandbox_files = []
+            #: Working directory of the job (str). Default is '.', mostly used in Local() backend
+            self.working_dir = '.'
+            #: Output directory (str), where we will download our output_files to. Default is '.'
+            self.output_dir = '.'
+            #: Files that we produce during the job and want to be returned. Can use wildcard (*)
+            self.output_patterns = []
+            #: Command and arguments as a list that wil be run by the job on the backend
+            self.cmd = []
+            #: Input files to job, a list of these is copied to the working directory.
+            self.input_files = []
+            #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
+            self.setup_cmds = []
+            #: ConfigParser object that sets the defaults (mainly for basf2 setup) and is used as the store
+            #: of configuration variables. Some other attributes reference this object via properties.
+            self.config = configparser.ConfigParser()
+            if not config_file:
+                config_file = default_config_file
+            self.config.read(config_file)
+            #: Config dictionary for the backend to use when submitting the job.
+            #: Saves us from having multiple attributes that may or may not be used.
+            self.backend_args = {}
+            #: Maximum number of files to place in a subjob (Not applicable to Local processing). -1 means don't split into subjobs
+            self.max_files_per_subjob = -1
+            #: dict of subjobs assigned to this job
+            self.subjobs = {}
+        elif job_dict:
+            self.input_sandbox_files = job_dict["input_sandbox_files"]
+            self.working_dir = pathlib.Path(job_dict["working_dir"])
+            self.output_dir = pathlib.Path(job_dict["output_dir"])
+            self.output_patterns = job_dict["output_patterns"]
+            self.cmd = job_dict["cmd"]
+            self.input_files = job_dict["input_files"]
+            self.setup_cmds = job_dict["setup_cmds"]
+            self.config = configparser.ConfigParser()
+            self.config.read_dict(job_dict["config"])
+            self.backend_args = job_dict["backend_args"]
+            self.max_files_per_subjob = job_dict["max_files_per_subjob"]
+            self.subjobs = {}
+            for subjob_num in range(job_dict["num_subjobs"]):
+                self.create_subjob(subjob_num)
+
         #: The result object of this Job. Only filled once the job is submitted to a backend since the backend creates a special
         #: result class depending on its type. This is also only filled for an overall `Job()` if there are no subjobs.
         #: If there are subjobs, those will contain the result instead.
@@ -299,6 +319,38 @@ class Job:
         else:
             for subjob in job.subjobs:
                 subjob.post_process()
+
+    def dump_to_json(self, file_path):
+        """
+        Dumps the Job object configuration to a JSON file so that it can be read in again later.
+
+        Parameters:
+          file_path(`pathlib.Path`): The filepath we'll dump to
+        """
+        job_dict = {}
+        job_dict["name"] = self.name
+        job_dict["input_sandbox_files"] = self.input_sandbox_files
+        job_dict["working_dir"] = str(self.working_dir)
+        job_dict["output_dir"] = str(self.output_dir)
+        job_dict["output_patterns"] = self.output_patterns
+        job_dict["cmd"] = self.cmd
+        job_dict["input_files"] = self.input_files
+        job_dict["setup_cmds"] = self.setup_cmds
+        job_dict["config"] = self.config._sections
+        job_dict["backend_args"] = self.backend_args
+        job_dict["max_files_per_subjob"] = self.max_files_per_subjob
+        job_dict["num_subjobs"] = len(self.subjobs)
+
+        import json
+        with open(file_path, "w") as job_file:
+            json.dump(job_dict, job_file)
+
+    @classmethod
+    def from_json(cls, file_path):
+        import json
+        with open(file_path, "r") as job_file:
+            job_dict = json.load(job_file)
+        return cls(job_dict["name"], job_dict=job_dict)
 
 
 class Backend(ABC):
@@ -505,16 +557,6 @@ class Local(Backend):
                 B2INFO("No valid input file paths found for job {0}".format(job.name))
 
             if job.max_files_per_subjob > 0 and existing_input_files:
-                import itertools
-
-                def grouper(n, iterable):
-                    it = iter(iterable)
-                    while True:
-                        chunk = tuple(itertools.islice(it, n))
-                        if not chunk:
-                            return
-                        yield chunk
-
                 for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
                     subjob = job.create_subjob(i)
                     subjob.input_files = subjob_input_files
@@ -593,7 +635,7 @@ class Local(Backend):
         # Create unix command to redirect stdour and stderr
         B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(name, stdout_file_path))
         with open(stdout_file_path, 'w', buffering=1) as f_out:
-            with Popen(["/bin/bash", "-l", script],
+            with Popen(["/bin/bash", script],
                        stdout=PIPE,
                        stderr=STDOUT,
                        bufsize=1,
@@ -685,16 +727,6 @@ class Batch(Backend):
                 B2INFO("No valid input file paths found for job {0}".format(job.name))
 
             if job.max_files_per_subjob > 0 and existing_input_files:
-                import itertools
-
-                def grouper(n, iterable):
-                    it = iter(iterable)
-                    while True:
-                        chunk = tuple(itertools.islice(it, n))
-                        if not chunk:
-                            return
-                        yield chunk
-
                 for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
                     subjob = job.create_subjob(i)
                     subjob.input_files = subjob_input_files
@@ -805,7 +837,7 @@ class PBS(Batch):
         print("# --- Start PBS ---", file=batch_file)
         print(" ".join([PBS.cmd_queue, batch_queue]), file=batch_file)
         print(" ".join([PBS.cmd_name, job.name]), file=batch_file)
-        print(" ".join([PBS.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([PBS.cmd_wkdir, str(job.working_dir)]), file=batch_file)
         print(" ".join([PBS.cmd_stdout, os.path.join(job.working_dir, "stdout")]), file=batch_file)
         print(" ".join([PBS.cmd_stderr, os.path.join(job.working_dir, "stderr")]), file=batch_file)
         print("# --- End PBS ---", file=batch_file)
@@ -929,7 +961,7 @@ class LSF(Batch):
         print("# --- Start LSF ---", file=batch_file)
         print(" ".join([LSF.cmd_queue, batch_queue]), file=batch_file)
         print(" ".join([LSF.cmd_name, job.name]), file=batch_file)
-        print(" ".join([LSF.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([LSF.cmd_wkdir, str(job.working_dir)]), file=batch_file)
         print(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")]), file=batch_file)
         print(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")]), file=batch_file)
         print("# --- End LSF ---", file=batch_file)

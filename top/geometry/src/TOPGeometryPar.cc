@@ -15,8 +15,12 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
+#include <framework/geometry/BFieldManager.h>
 #include <geometry/Materials.h>
 #include <iostream>
+#include <TSpline.h>
+#include <algorithm>
+#include <set>
 
 using namespace std;
 
@@ -25,6 +29,7 @@ namespace Belle2 {
   namespace TOP {
 
     TOPGeometryPar* TOPGeometryPar::s_instance = 0;
+    const double TOPGeometryPar::c_hc = 1239.84193; // [eV*nm]
 
     TOPGeometryPar::~TOPGeometryPar()
     {
@@ -73,14 +78,10 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         return;
       }
-
-      // print geometry if the debug level for 'top' is set 10000
-      const auto& logSystem = LogSystem::Instance();
-      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
-        m_geo->print();
-      }
-
       m_valid = true;
+
+      finalizeInitialization();
+
     }
 
 
@@ -95,6 +96,13 @@ namespace Belle2 {
       if (!m_geoDB->isValid()) {
         B2ERROR("TOPGeometry: no payload found in database");
         return;
+      }
+      if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
+        m_oldPayload = true;
+        B2WARNING("TOPGeometry: old payload found, pixel dependent PDE will not be used");
+      }
+      if ((*m_geoDB)->getTTSes().empty()) {
+        B2WARNING("TOPGeometry: old payload found, nominal TTS will be used");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -114,16 +122,41 @@ namespace Belle2 {
         B2ERROR("TOPChannelMaps: no payload found in database");
         return;
       }
+      m_valid = true;
+
+      finalizeInitialization();
+
+    }
+
+    void TOPGeometryPar::finalizeInitialization()
+    {
+      // set B field flag
+      m_BfieldOn = (BFieldManager::getField(0, 0, 0).Mag() / Unit::T) > 0.1;
+
+      // add call backs for PMT data
+      m_pmtInstalled.addCallback(this, &TOPGeometryPar::clearCache);
+      m_pmtQEData.addCallback(this, &TOPGeometryPar::clearCache);
 
       // print geometry if the debug level for 'top' is set 10000
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
-        m_geo->print();
+        getGeometry()->print();
+        if (m_oldPayload) {
+          cout << "Envelope QE same as nominal quantum efficiency" << endl << endl;
+          return;
+        }
+        if (m_envelopeQE.isEmpty()) setEnvelopeQE();
+        m_envelopeQE.print("Envelope QE");
       }
-
-      m_valid = true;
     }
 
+    void TOPGeometryPar::clearCache()
+    {
+      m_envelopeQE.clear();
+      m_pmts.clear();
+      m_relEfficiencies.clear();
+      m_pmtTypes.clear();
+    }
 
     const TOPGeometry* TOPGeometryPar::getGeometry() const
     {
@@ -137,14 +170,264 @@ namespace Belle2 {
       }
     }
 
+    double TOPGeometryPar::getPMTEfficiencyEnvelope(double energy) const
+    {
+      double lambda = c_hc / energy;
+
+      if (m_oldPayload) { // filter transmittance is included in nominal QE, return it!
+        return getGeometry()->getNominalQE().getEfficiency(lambda);
+      }
+
+      if (m_envelopeQE.isEmpty()) setEnvelopeQE();
+      return m_envelopeQE.getEfficiency(lambda);
+    }
+
+    double TOPGeometryPar::getPMTEfficiency(double energy,
+                                            int moduleID, int pmtID,
+                                            double x, double y) const
+    {
+      const auto* geo = getGeometry();
+      if (!geo->isModuleIDValid(moduleID)) return 0;
+
+      double lambda = c_hc / energy;
+
+      if (m_oldPayload) { // filter transmittance is included in nominal QE, return it!
+        return geo->getNominalQE().getEfficiency(lambda);
+      }
+
+      if (m_pmts.empty()) mapPmtQEToPositions();
+
+      int id = getUniquePmtID(moduleID, pmtID);
+      const auto* pmtQE = m_pmts[id];
+      if (!pmtQE) return 0;
+
+      const auto& pmtArray = geo->getModule(moduleID).getPMTArray();
+      auto pmtPixel = pmtArray.getPMT().getPixelID(x, y);
+      if (pmtPixel == 0) return 0;
+
+      auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
+      auto channel = getChannelMapper().getChannel(pixelID);
+
+      double RQE = 1.0;
+      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+
+      return pmtQE->getEfficiency(pmtPixel, lambda, m_BfieldOn) * RQE;
+
+    }
+
+
+    double TOPGeometryPar::getRelativePixelEfficiency(int moduleID, int pixelID) const
+    {
+
+      auto channel = getChannelMapper().getChannel(pixelID);
+
+      double RQE = 1.0;
+      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+
+      double thrEffi = 1.0;
+      if (m_thresholdEff.isValid()) thrEffi = m_thresholdEff->getThrEff(moduleID, channel);
+
+      if (m_oldPayload) { // nominal QE is used
+        return RQE * thrEffi;
+      }
+
+      if (m_relEfficiencies.empty()) prepareRelEfficiencies();
+
+      int id = getUniquePixelID(moduleID, pixelID);
+      return m_relEfficiencies[id] * RQE * thrEffi;
+    }
+
+
+    unsigned TOPGeometryPar::getPMTType(int moduleID, int pmtID) const
+    {
+      if (m_pmtTypes.empty()) mapPmtTypeToPositions();
+
+      int id = getUniquePmtID(moduleID, pmtID);
+      return m_pmtTypes[id];
+    }
+
+
+    const TOPNominalTTS& TOPGeometryPar::getTTS(int moduleID, int pmtID) const
+    {
+      auto pmtType = getPMTType(moduleID, pmtID);
+      return getGeometry()->getTTS(pmtType);
+    }
+
+
+    void TOPGeometryPar::setEnvelopeQE() const
+    {
+      if (m_pmtQEData.getEntries() == 0) {
+        B2ERROR("DBArray TOPPmtQEs is empty");
+        return;
+      }
+
+      double lambdaFirst = 0;
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaFirst() > 0) {
+          lambdaFirst = pmt.getLambdaFirst();
+          break;
+        }
+      }
+      if (lambdaFirst == 0) {
+        B2ERROR("DBArray TOPPmtQEs: lambdaFirst of all PMT found to be less or equal 0");
+        return;
+      }
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaFirst() > 0) {
+          lambdaFirst = std::min(lambdaFirst, pmt.getLambdaFirst());
+        }
+      }
+
+      double lambdaStep = 0;
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaStep() > 0) {
+          lambdaStep = pmt.getLambdaStep();
+          break;
+        }
+      }
+      if (lambdaStep == 0) {
+        B2ERROR("DBArray TOPPmtQEs: lambdaStep of all PMT found to be less or equal 0");
+        return;
+      }
+      for (const auto& pmt : m_pmtQEData) {
+        if (pmt.getLambdaStep() > 0) {
+          lambdaStep = std::min(lambdaStep, pmt.getLambdaStep());
+        }
+      }
+
+      std::vector<float> envelopeQE;
+      for (const auto& pmt : m_pmtQEData) {
+        float ce = pmt.getCE(m_BfieldOn);
+        if (pmt.getLambdaFirst() == lambdaFirst and pmt.getLambdaStep() == lambdaStep) {
+          const auto& envelope = pmt.getEnvelopeQE();
+          if (envelopeQE.size() < envelope.size()) {
+            envelopeQE.resize(envelope.size() - envelopeQE.size(), 0);
+          }
+          for (size_t i = 0; i < std::min(envelopeQE.size(), envelope.size()); i++) {
+            envelopeQE[i] = std::max(envelopeQE[i], envelope[i] * ce);
+          }
+        } else {
+          double lambdaLast = pmt.getLambdaLast();
+          int nExtra = (lambdaLast - lambdaFirst) / lambdaStep + 1 - envelopeQE.size();
+          if (nExtra > 0) envelopeQE.resize(nExtra, 0);
+          for (size_t i = 0; i < envelopeQE.size(); i++) {
+            float qe = pmt.getEnvelopeQE(lambdaFirst + lambdaStep * i);
+            envelopeQE[i] = std::max(envelopeQE[i], qe * ce);
+          }
+        }
+      }
+
+      m_envelopeQE.set(lambdaFirst, lambdaStep, 1.0, envelopeQE, "EnvelopeQE");
+
+      B2INFO("TOPGeometryPar: envelope of PMT dependent QE has been set");
+
+    }
+
+
+    void TOPGeometryPar::mapPmtQEToPositions() const
+    {
+      m_pmts.clear();
+
+      std::map<std::string, const TOPPmtQE*> map;
+      for (const auto& pmt : m_pmtQEData) {
+        map[pmt.getSerialNumber()] = &pmt;
+      }
+      for (const auto& pmt : m_pmtInstalled) {
+        int id = getUniquePmtID(pmt.getSlotNumber(), pmt.getPosition());
+        m_pmts[id] = map[pmt.getSerialNumber()];
+      }
+
+      B2INFO("TOPGeometryPar: QE of PMT's mapped to positions, size = " << m_pmts.size());
+    }
+
+
+    void TOPGeometryPar::mapPmtTypeToPositions() const
+    {
+      for (const auto& pmt : m_pmtInstalled) {
+        int id = getUniquePmtID(pmt.getSlotNumber(), pmt.getPosition());
+        m_pmtTypes[id] = pmt.getType();
+      }
+
+      B2INFO("TOPGeometryPar: PMT types mapped to positions, size = "
+             << m_pmtTypes.size());
+
+
+      std::set<unsigned> types;
+      for (const auto& pmt : m_pmtInstalled) {
+        types.insert(pmt.getType());
+      }
+      const auto* geo = getGeometry();
+      for (const auto& type : types) {
+        if (geo->getTTS(type).getPMTType() != type) {
+          B2WARNING("No TTS found for an installed PMT type. Nominal one will be used."
+                    << LogVar("PMT type", type));
+        }
+      }
+
+    }
+
+
+    void TOPGeometryPar::prepareRelEfficiencies() const
+    {
+      m_relEfficiencies.clear();
+      if (m_pmts.empty()) mapPmtQEToPositions();
+
+      const auto* geo = getGeometry();
+
+      const auto& nominalQE = geo->getNominalQE();
+      double s0 = integralOfQE(nominalQE.getQE(), nominalQE.getCE(),
+                               nominalQE.getLambdaFirst(), nominalQE.getLambdaStep());
+
+      for (const auto& module : geo->getModules()) {
+        auto moduleID = module.getModuleID();
+        const auto& pmtArray = module.getPMTArray();
+        int numPMTs = pmtArray.getSize();
+        int numPMTPixels = pmtArray.getPMT().getNumPixels();
+        for (int pmtID = 1; pmtID <= numPMTs; pmtID++) {
+          const auto* pmtQE = m_pmts[getUniquePmtID(moduleID, pmtID)];
+          for (int pmtPixel = 1; pmtPixel <= numPMTPixels; pmtPixel++) {
+            double s = 0;
+            if (pmtQE) {
+              s = integralOfQE(pmtQE->getQE(pmtPixel), pmtQE->getCE(m_BfieldOn),
+                               pmtQE->getLambdaFirst(), pmtQE->getLambdaStep());
+            }
+            auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
+            auto id = getUniquePixelID(moduleID, pixelID);
+            m_relEfficiencies[id] = s / s0;
+          }
+        }
+      }
+
+      B2INFO("TOPGeometryPar: pixel relative quantum efficiencies have been set, size = "
+             << m_relEfficiencies.size());
+    }
+
+
+    double TOPGeometryPar::integralOfQE(const std::vector<float>& qe, double ce,
+                                        double lambdaFirst, double lambdaStep) const
+    {
+      if (qe.empty()) return 0;
+
+      double s = 0;
+      double lambda = lambdaFirst;
+      double f1 = qe[0] / (lambda * lambda);
+      for (size_t i = 1; i < qe.size(); i++) {
+        lambda += lambdaStep;
+        double f2 = qe[i] / (lambda * lambda);
+        s += (f1 + f2) / 2;
+        f1 = f2;
+      }
+      return s * c_hc * lambdaStep * ce;
+    }
+
 
     TOPGeometry* TOPGeometryPar::createConfiguration(const GearDir& content)
     {
-      TOPGeometry* geo = new TOPGeometry("TOPGeometryIdealized");
+      TOPGeometry* geo = new TOPGeometry("TOPGeometry");
 
       // PMT array
 
-      GearDir pmtParams(content, "PMTs/Module");
+      GearDir pmtParams(content, "PMTs/PMT");
       TOPGeoPMT pmt(pmtParams.getLength("ModuleXSize"),
                     pmtParams.getLength("ModuleYSize"),
                     pmtParams.getLength("ModuleZSize") +
@@ -177,78 +460,55 @@ namespace Belle2 {
                               arrayParams.getLength("Ygap"),
                               arrayParams.getString("stackMaterial"),
                               pmt);
+      pmtArray.setSiliconeCookie(arrayParams.getLength("siliconeCookie/thickness"),
+                                 arrayParams.getString("siliconeCookie/material"));
+      pmtArray.setWavelengthFilter(arrayParams.getLength("wavelengthFilter/thickness"),
+                                   arrayParams.getString("wavelengthFilter/material"));
       pmtArray.setAirGap(arrayParams.getLength("airGap", 0));
       double decoupledFraction = arrayParams.getDouble("decoupledFraction", 0);
 
       // modules
 
-      GearDir barParams(content, "Bars");
-      GearDir barSurfParams(barParams, "Surface");
-      auto barSurface = materials.createOpticalSurfaceConfig(barSurfParams);
-      double sigmaAlpha = barSurfParams.getDouble("SigmaAlpha");
+      GearDir moduleParams(content, "Modules");
+      GearDir glueParams(moduleParams, "Glue");
+      int numModules = moduleParams.getNumberNodes("Module");
+      for (int slotID = 1; slotID <= numModules; slotID++) {
+        std::string gearName = "Module[@slotID='" + std::to_string(slotID) + "']";
+        GearDir slotParams(moduleParams, gearName);
+        TOPGeoModule module(slotID,
+                            slotParams.getLength("Radius"),
+                            slotParams.getAngle("Phi"),
+                            slotParams.getLength("BackwardZ"));
+        int cNumber = slotParams.getInt("ConstructionNumber");
+        module.setModuleCNumber(cNumber);
+        module.setName(addNumber(module.getName(), cNumber));
 
-      TOPGeoBarSegment bar1(barParams.getLength("QWidth"),
-                            barParams.getLength("QThickness"),
-                            barParams.getLength("QBar1Length"),
-                            barParams.getString("BarMaterial"));
-      bar1.setGlue(barParams.getLength("Glue/Thicknes2"),
-                   barParams.getString("Glue/GlueMaterial"));
-      bar1.setSurface(barSurface, sigmaAlpha);
-      bar1.setName(bar1.getName() + "1");
-
-      TOPGeoBarSegment bar2(barParams.getLength("QWidth"),
-                            barParams.getLength("QThickness"),
-                            barParams.getLength("QBar2Length"),
-                            barParams.getString("BarMaterial"));
-      bar2.setGlue(barParams.getLength("Glue/Thicknes1"),
-                   barParams.getString("Glue/GlueMaterial"));
-      bar2.setSurface(barSurface, sigmaAlpha);
-      bar2.setName(bar2.getName() + "2");
-
-      TOPGeoMirrorSegment mirror(barParams.getLength("QWidth"),
-                                 barParams.getLength("QThickness"),
-                                 barParams.getLength("QBarMirror"),
-                                 barParams.getString("BarMaterial"));
-      mirror.setGlue(barParams.getLength("Glue/Thicknes3"),
-                     barParams.getString("Glue/GlueMaterial"));
-      mirror.setSurface(barSurface, sigmaAlpha);
-      GearDir mirrorParams(content, "Mirror");
-      mirror.setRadius(mirrorParams.getLength("Radius"));
-      mirror.setCenterOfCurvature(mirrorParams.getLength("Xpos"),
-                                  mirrorParams.getLength("Ypos"));
-      GearDir mirrorSurfParams(mirrorParams, "Surface");
-      mirror.setCoating(mirrorParams.getLength("mirrorThickness"),
-                        mirrorParams.getString("Material"),
-                        materials.createOpticalSurfaceConfig(mirrorSurfParams));
-
-      TOPGeoPrism prism(barParams.getLength("QWedgeWidth"),
-                        barParams.getLength("QThickness"),
-                        barParams.getLength("QWedgeLength"),
-                        barParams.getLength("QWedgeDown") +
-                        barParams.getLength("QThickness"),
-                        barParams.getLength("QWedgeFlat"),
-                        barParams.getString("BarMaterial"));
-      prism.setGlue(arrayParams.getLength("dGlue"),
-                    arrayParams.getString("glueMaterial"));
-      prism.setSurface(barSurface, sigmaAlpha);
-
-      double R = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
-      double phi = barParams.getLength("Phi0");
-      double backwardZ = barParams.getLength("QZBackward");
-      int numModules = barParams.getInt("Nbar");
-      for (int i = 0; i < numModules; i++) {
-        unsigned id = i + 1;
-        TOPGeoModule module(id, R, phi, backwardZ);
-        module.setName(addNumber(module.getName(), id));
-        module.setBarSegment1(bar1);
-        module.setBarSegment2(bar2);
-        module.setMirrorSegment(mirror);
+        auto prism = createPrism(content, slotParams.getString("Prism"));
+        prism.setName(addNumber(prism.getName(), cNumber));
         module.setPrism(prism);
+
+        auto barSegment2 = createBarSegment(content, slotParams.getString("BarSegment2"));
+        barSegment2.setName(addNumber(barSegment2.getName() + "2-", cNumber));
+        barSegment2.setGlue(glueParams.getLength("Thicknes1"),
+                            glueParams.getString("GlueMaterial"));
+        module.setBarSegment2(barSegment2);
+
+        auto barSegment1 = createBarSegment(content, slotParams.getString("BarSegment1"));
+        barSegment1.setName(addNumber(barSegment1.getName() + "1-", cNumber));
+        barSegment1.setGlue(glueParams.getLength("Thicknes2"),
+                            glueParams.getString("GlueMaterial"));
+        module.setBarSegment1(barSegment1);
+
+        auto mirror = createMirrorSegment(content, slotParams.getString("Mirror"));
+        mirror.setName(addNumber(mirror.getName(), cNumber));
+        mirror.setGlue(glueParams.getLength("Thicknes3"),
+                       glueParams.getString("GlueMaterial"));
+        module.setMirrorSegment(mirror);
+
         module.setPMTArray(pmtArray);
         if (decoupledFraction > 0) module.generateDecoupledPMTs(decoupledFraction);
-        // module.setModuleCNumber(num);
+
         geo->appendModule(module);
-        phi += 2 * M_PI / numModules;
       }
 
       // displaced geometry (if defined)
@@ -260,8 +520,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedGeometry.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoModuleDisplacement moduleDispl(slot.getLength("x"),
@@ -285,8 +545,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedPMTArrays.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoPMTArrayDisplacement arrayDispl(slot.getLength("x"),
@@ -307,7 +567,8 @@ namespace Belle2 {
           for (const GearDir& slot : brokenGlues.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID " << moduleID);
+              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -332,8 +593,8 @@ namespace Belle2 {
           for (const GearDir& slot : peelOff.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -475,6 +736,22 @@ namespace Belle2 {
       nominalTTS.normalize();
       geo->setNominalTTS(nominalTTS);
 
+      // PMT type dependent TTS
+
+      GearDir pmtTTSParams(content, "TTSofPMTs");
+      for (const GearDir& ttsPar : pmtTTSParams.getNodes("TTSpar")) {
+        int type = ttsPar.getInt("type");
+        TOPNominalTTS tts("TTS of " + ttsPar.getString("@name") + " PMT");
+        tts.setPMTType(type);
+        for (const GearDir& Gauss : ttsPar.getNodes("Gauss")) {
+          tts.appendGaussian(Gauss.getDouble("fraction"),
+                             Gauss.getTime("mean"),
+                             Gauss.getTime("sigma"));
+        }
+        tts.normalize();
+        geo->appendTTS(tts);
+      }
+
       // nominal TDC
 
       GearDir tdcParams(content, "TDC");
@@ -528,9 +805,128 @@ namespace Belle2 {
         geo->setCalPulseShape(shape);
       }
 
+      // wavelength filter bulk transmittance
+
+      std::string materialNode = "Materials/Material[@name='TOPWavelengthFilterIHU340']";
+      GearDir filterMaterial(content, materialNode);
+      if (!filterMaterial) {
+        B2FATAL("TOPGeometry: " << materialNode << " not found");
+      }
+      GearDir property(filterMaterial, "Property[@name='ABSLENGTH']");
+      if (!property) {
+        B2FATAL("TOPGeometry: " << materialNode << ", Property ABSLENGTH not found");
+      }
+      int numNodes = property.getNumberNodes("value");
+      if (numNodes > 1) {
+        double conversion = Unit::convertValue(1, property.getString("@unit", "GeV"));
+        std::vector<double> energies;
+        std::vector<double> absLengths;
+        for (int i = 0; i < numNodes; i++) {
+          GearDir value(property, "value", i + 1);
+          energies.push_back(value.getDouble("@energy") * conversion / Unit::eV);// [eV]
+          absLengths.push_back(value.getDouble() * Unit::mm); // [cm]
+        }
+        TSpline3 spline("absLen", energies.data(), absLengths.data(), energies.size());
+        double lambdaFirst = c_hc / energies.back();
+        double lambdaLast = c_hc / energies[0];
+        double lambdaStep = 5; // [nm]
+        int numSteps = (lambdaLast - lambdaFirst) / lambdaStep + 1;
+        const double filterThickness = arrayParams.getLength("wavelengthFilter/thickness");
+        std::vector<float> bulkTransmittances;
+        for (int i = 0; i < numSteps; i++) {
+          double wavelength = lambdaFirst + lambdaStep * i;
+          double energy = c_hc / wavelength;
+          double absLen = spline.Eval(energy);
+          bulkTransmittances.push_back(exp(-filterThickness / absLen));
+        }
+        TOPWavelengthFilter filter(lambdaFirst, lambdaStep, bulkTransmittances);
+        geo->setWavelengthFilter(filter);
+      } else {
+        B2FATAL("TOPGeometry: " << materialNode
+                << ", Property ABSLENGTH has less than 2 nodes");
+      }
+
       return geo;
     }
 
+
+    TOPGeoBarSegment TOPGeometryPar::createBarSegment(const GearDir& content,
+                                                      const std::string& SN)
+    {
+      // dimensions and material
+      GearDir params(content, "QuartzBars/QuartzBar[@SerialNumber='" + SN + "']");
+      TOPGeoBarSegment bar(params.getLength("Width"),
+                           params.getLength("Thickness"),
+                           params.getLength("Length"),
+                           params.getString("Material"));
+      bar.setVendorData(params.getString("Vendor"), SN);
+
+      // optical surface
+      std::string surfaceName = params.getString("OpticalSurface");
+      double sigmaAlpha = params.getDouble("SigmaAlpha");
+      GearDir surfaceParams(content, "Modules/Surface[@name='" + surfaceName + "']");
+      auto& materials = geometry::Materials::getInstance();
+      auto quartzSurface = materials.createOpticalSurfaceConfig(surfaceParams);
+      bar.setSurface(quartzSurface, sigmaAlpha);
+
+      return bar;
+    }
+
+
+    TOPGeoMirrorSegment TOPGeometryPar::createMirrorSegment(const GearDir& content,
+                                                            const std::string& SN)
+    {
+      // dimensions and material
+      GearDir params(content, "Mirrors/Mirror[@SerialNumber='" + SN + "']");
+      TOPGeoMirrorSegment mirror(params.getLength("Width"),
+                                 params.getLength("Thickness"),
+                                 params.getLength("Length"),
+                                 params.getString("Material"));
+      mirror.setVendorData(params.getString("Vendor"), SN);
+      mirror.setRadius(params.getLength("Radius"));
+      mirror.setCenterOfCurvature(params.getLength("Xpos"), params.getLength("Ypos"));
+
+      // mirror reflective coating
+      auto& materials = geometry::Materials::getInstance();
+      GearDir coatingParams(params, "Surface");
+      mirror.setCoating(params.getLength("mirrorThickness"), "Al",
+                        materials.createOpticalSurfaceConfig(coatingParams));
+
+      // optical surface
+      std::string surfaceName = params.getString("OpticalSurface");
+      double sigmaAlpha = params.getDouble("SigmaAlpha");
+      GearDir surfaceParams(content, "Modules/Surface[@name='" + surfaceName + "']");
+      auto quartzSurface = materials.createOpticalSurfaceConfig(surfaceParams);
+      mirror.setSurface(quartzSurface, sigmaAlpha);
+
+      return mirror;
+    }
+
+
+    TOPGeoPrism TOPGeometryPar::createPrism(const GearDir& content,
+                                            const std::string& SN)
+    {
+      // dimensions and material
+      GearDir params(content, "Prisms/Prism[@SerialNumber='" + SN + "']");
+      TOPGeoPrism prism(params.getLength("Width"),
+                        params.getLength("Thickness"),
+                        params.getLength("Length"),
+                        params.getLength("ExitThickness"),
+                        0.,
+                        params.getString("Material"));
+      prism.setAngle(params.getAngle("Angle"));
+      prism.setVendorData(params.getString("Vendor"), SN);
+
+      // optical surface
+      std::string surfaceName = params.getString("OpticalSurface");
+      double sigmaAlpha = params.getDouble("SigmaAlpha");
+      GearDir surfaceParams(content, "Modules/Surface[@name='" + surfaceName + "']");
+      auto& materials = geometry::Materials::getInstance();
+      auto quartzSurface = materials.createOpticalSurfaceConfig(surfaceParams);
+      prism.setSurface(quartzSurface, sigmaAlpha);
+
+      return prism;
+    }
 
     std::string TOPGeometryPar::addNumber(const std::string& str, unsigned number)
     {
@@ -544,6 +940,8 @@ namespace Belle2 {
       ss >> out;
       return out;
     }
+
+
 
   } // End namespace TOP
 } // End namespace Belle2

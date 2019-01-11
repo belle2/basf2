@@ -27,7 +27,7 @@ DBObject::DBObject(const DBObject& obj)
   copy(obj);
 }
 
-const DBObject& DBObject::operator=(const DBObject& obj) throw()
+const DBObject& DBObject::operator=(const DBObject& obj)
 {
   copy(obj);
   return *this;
@@ -59,19 +59,19 @@ void DBObject::copy(const DBObject& obj)
   }
 }
 
-DBObject::~DBObject() throw()
+DBObject::~DBObject()
 {
   reset();
 }
 
-int DBObject::getNObjects(const std::string& name) const throw()
+int DBObject::getNObjects(const std::string& name) const
 {
   FieldObjectList::const_iterator it = m_obj_v_m.find(name);
   if (it != m_obj_v_m.end()) return it->second.size();
   return 0;
 }
 
-DBObjectList& DBObject::getObjects(const std::string& name) throw(std::out_of_range)
+DBObjectList& DBObject::getObjects(const std::string& name)
 {
   FieldObjectList::iterator it = m_obj_v_m.find(name);
   if (it != m_obj_v_m.end()) return it->second;
@@ -80,7 +80,7 @@ DBObjectList& DBObject::getObjects(const std::string& name) throw(std::out_of_ra
                                                    __FILE__, __LINE__)));
 }
 
-const DBObjectList& DBObject::getObjects(const std::string& name) const throw(std::out_of_range)
+const DBObjectList& DBObject::getObjects(const std::string& name) const
 {
   FieldObjectList::const_iterator it = m_obj_v_m.find(name);
   if (it != m_obj_v_m.end()) return it->second;
@@ -89,7 +89,7 @@ const DBObjectList& DBObject::getObjects(const std::string& name) const throw(st
                                                    __FILE__, __LINE__)));
 }
 
-DBObject& DBObject::getObject(const std::string& name, int i) throw(std::out_of_range)
+DBObject& DBObject::getObject(const std::string& name, int i)
 {
   FieldObjectList::iterator it = m_obj_v_m.find(name);
   if (it != m_obj_v_m.end()) return it->second[i];
@@ -98,7 +98,7 @@ DBObject& DBObject::getObject(const std::string& name, int i) throw(std::out_of_
                                                    __FILE__, __LINE__)));
 }
 
-const DBObject& DBObject::getObject(const std::string& name, int i) const throw(std::out_of_range)
+const DBObject& DBObject::getObject(const std::string& name, int i) const
 {
   FieldObjectList::const_iterator it = m_obj_v_m.find(name);
   if (it != m_obj_v_m.end()) return it->second[i];
@@ -107,7 +107,7 @@ const DBObject& DBObject::getObject(const std::string& name, int i) const throw(
                                                    __FILE__, __LINE__)));
 }
 
-void DBObject::reset() throw()
+void DBObject::reset()
 {
   const DBField::NameList& name_v(getFieldNames());
   for (size_t ii = 0; ii < name_v.size(); ii++) {
@@ -127,7 +127,7 @@ void DBObject::reset() throw()
   AbstractDBObject::reset();
 }
 
-void DBObject::readObject(Reader& reader) throw(IOException)
+void DBObject::readObject(Reader& reader)
 {
   reset();
   setPath(reader.readString());
@@ -161,7 +161,7 @@ void DBObject::readObject(Reader& reader) throw(IOException)
   }
 }
 
-void DBObject::writeObject(Writer& writer) const throw(IOException)
+void DBObject::writeObject(Writer& writer) const
 {
   writer.writeString(getPath());
   writer.writeString(getName());
@@ -195,7 +195,7 @@ void DBObject::writeObject(Writer& writer) const throw(IOException)
   }
 }
 
-const void* DBObject::getValue(const std::string& name) const throw(std::out_of_range)
+const void* DBObject::getValue(const std::string& name) const
 {
   if (!hasValue(name)) return NULL;
   FieldValueList::const_iterator it = m_value_m.find(name);
@@ -203,7 +203,7 @@ const void* DBObject::getValue(const std::string& name) const throw(std::out_of_
   else throw (std::out_of_range(StringUtil::form("value %s not found", name.c_str())));
 }
 
-const std::string& DBObject::getText(const std::string& name) const throw(std::out_of_range)
+const std::string& DBObject::getText(const std::string& name) const
 {
   if (!hasText(name)) return m_empty;
   FieldTextList::const_iterator it = m_text_m.find(name);
@@ -212,7 +212,7 @@ const std::string& DBObject::getText(const std::string& name) const throw(std::o
 }
 
 void DBObject::addValue(const std::string& name, const void* value,
-                        DBField::Type type, int) throw()
+                        DBField::Type type, int)
 {
   DBField::Property pro(type, 0, 0);
   int size = pro.getTypeSize();
@@ -228,7 +228,7 @@ void DBObject::addValue(const std::string& name, const void* value,
 }
 
 void DBObject::setValue(const std::string& name,
-                        const void* value, int) throw()
+                        const void* value, int)
 {
   const DBField::Property& pro(getProperty(name));
   int size = pro.getTypeSize();
@@ -238,7 +238,7 @@ void DBObject::setValue(const std::string& name,
 }
 
 void DBObject::addText(const std::string& name,
-                       const std::string& value) throw()
+                       const std::string& value)
 {
   if (!hasField(name)) {
     add(name, DBField::Property(DBField::TEXT, 0));
@@ -249,7 +249,7 @@ void DBObject::addText(const std::string& name,
 }
 
 void DBObject::addObject(const std::string& name,
-                         const DBObject& obj) throw()
+                         const DBObject& obj)
 {
   if (!hasField(name)) {
     add(name, DBField::Property(DBField::OBJECT, 0));
@@ -260,7 +260,7 @@ void DBObject::addObject(const std::string& name,
 }
 
 void DBObject::addObjects(const std::string& name,
-                          const DBObjectList& obj_v) throw()
+                          const DBObjectList& obj_v)
 {
   if (!hasField(name)) {
     add(name, DBField::Property(DBField::OBJECT, obj_v.size()));
@@ -270,7 +270,7 @@ void DBObject::addObjects(const std::string& name,
   }
 }
 
-void DBObject::print(bool isfull) const throw()
+void DBObject::print(bool isfull) const
 {
   const std::string& name_in = "";
   NameValueList map;
@@ -306,7 +306,7 @@ void DBObject::print(bool isfull) const throw()
   printf("#\n");
 }
 
-const std::string DBObject::sprint(bool isfull) const throw()
+const std::string DBObject::sprint(bool isfull) const
 {
   std::stringstream ss;
   const std::string& name_in = "";
@@ -344,7 +344,7 @@ const std::string DBObject::sprint(bool isfull) const throw()
   return ss.str();
 }
 
-void DBObject::printHTML(bool isfull) const throw()
+void DBObject::printHTML(bool isfull) const
 {
   const std::string& name_in = "";
   NameValueList map;
@@ -381,7 +381,7 @@ void DBObject::printHTML(bool isfull) const throw()
   printf("</table>\n");
 }
 
-StringList DBObject::getNameList(bool isfull) const throw()
+StringList DBObject::getNameList(bool isfull) const
 {
   const std::string& name_in = "";
   NameValueList map;
@@ -395,7 +395,7 @@ StringList DBObject::getNameList(bool isfull) const throw()
 }
 
 void DBObject::search(NameValueList& map, const std::string& name_in, bool isfull)
-const throw()
+const
 {
   const DBField::NameList& name_v(getFieldNames());
   for (DBField::NameList::const_iterator it = name_v.begin();
@@ -408,12 +408,8 @@ const throw()
     std::string ptype;
     switch (pro.getType()) {
       case DBField::BOOL: ptype = "bool"; break;
-      case DBField::CHAR:  ptype = "char"; break;
-      case DBField::SHORT: ptype = "short"; break;
       case DBField::INT:  ptype = "int"; break;
-      case DBField::LONG:  ptype = "long"; break;
       case DBField::FLOAT:  ptype = "float"; break;
-      case DBField::DOUBLE: ptype = "double"; break;
       default : break;
     }
     if (pro.getType() == DBField::OBJECT) {
@@ -453,7 +449,7 @@ const throw()
       }
     } else {
       std::string value = getValueText(name);
-      //if (ptype.size() > 0) value = ptype + "(" + value + ")";
+      if (ptype.size() > 0) value = ptype + "(" + value + ")";
       NameValue nv;
       nv.name = name_out;
       nv.value = value;
@@ -468,79 +464,53 @@ const throw()
   }
 }
 
-void DBObject::printSQL(const std::string& table, std::ostream& out,
-                        const std::string& name_inc, int index)  const throw()
+const std::string DBObject::printSQL(const std::string& table, int id) const
 {
-  const std::string& name_in = (name_inc.size() == 0) ? getName() : name_inc;
-  if (index >= 0) {
-    out << StringUtil::form("insert into %s (name, path) values ('%s[%d]', '.%s.');",
-                            table.c_str(), getName().c_str(), index, name_in.c_str()) << std::endl;
-  } else {
-    out << StringUtil::form("insert into %s (name, path) values ('%s', '.%s.');",
-                            table.c_str(), getName().c_str(), name_in.c_str()) << std::endl;
-  }
-  const DBField::NameList& name_v(getFieldNames());
-  for (DBField::NameList::const_iterator it = name_v.begin();
-       it != name_v.end(); it++) {
-    const std::string& name(*it);
-    const DBField::Property& pro(getProperty(name));
-    std::string name_out = name_in;
-    if (name_in.size() > 0) name_out += ".";
-    name_out += name;
+  std::stringstream ss;
+  const std::string& name_in = "";
+  NameValueList map;
+  bool isfull = false;
+  search(map, name_in, isfull);
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    NameValue& nv(*it);
     std::string ptype;
-    switch (pro.getType()) {
-      case DBField::BOOL: ptype = "value_b"; break;
-      case DBField::CHAR:  ptype = "value_c"; break;
-      case DBField::SHORT: ptype = "value_s"; break;
-      case DBField::INT:  ptype = "value_i"; break;
-      case DBField::LONG:  ptype = "value_l"; break;
-      case DBField::FLOAT:  ptype = "value_f"; break;
-      case DBField::DOUBLE: ptype = "value_d"; break;
-      case DBField::TEXT: ptype = "value_t"; break;
+    std::string value = nv.value;
+    std::string::size_type pos = value.find_first_of("(");
+    DBField::Type type = DBField::TEXT;
+    if (pos != std::string::npos) {
+      std::string type_s = value.substr(0, pos);
+      if (type_s == "bool") type = DBField::BOOL;
+      else if (type_s == "char") type = DBField::CHAR;
+      else if (type_s == "short") type = DBField::SHORT;
+      else if (type_s == "int") type = DBField::INT;
+      else if (type_s == "float") type = DBField::FLOAT;
+      else if (type_s == "double") type = DBField::DOUBLE;
+      else if (type_s == "object") type = DBField::OBJECT;
+      if (type != DBField::TEXT) {
+        value = StringUtil::replace(value.substr(pos + 1), ")", "");
+      }
+    }
+    switch (nv.type) {
+      case DBField::BOOL:
+        ss << "insert into " << table << " (pid,name,value_b) values "
+           << "(" << id << ",'" << nv.name << "'," << value << ");" << std::endl;
+        break;
+      case DBField::INT:
+        ss << "insert into " << table << " (pid,name,value_i) values "
+           << "(" << id << ",'" << nv.name << "'," << value << ");" << std::endl;
+        break;
+      case DBField::FLOAT:
+        ss << "insert into " << table << " (pid,name,value_f) values "
+           << "(" << id << ",'" << nv.name << "'," << value << ");" << std::endl;
+        break;
+      case DBField::TEXT:
+        ss << "insert into " << table << " (pid,name,value_t) values "
+           << "(" << id << ",'" << nv.name << "','" << value << "');" << std::endl;
+        break;
       default : break;
     }
-    if (pro.getType() == DBField::OBJECT) {
-      int length = getNObjects(name);
-      if (length > 1) {
-        const DBObjectList& objs(getObjects(name));
-        if (objs[0].getPath().size() > 0) {
-          if (objs[1].getPath().size() == 0 || objs[0].getPath() == objs[1].getPath()) {
-            out << StringUtil::form("insert into %s (name, path, value_o) values ('%s', '.%s.', '%s');",
-                                    table.c_str(), objs[0].getName().c_str(),
-                                    name_out.c_str(), objs[0].getPath().c_str()) << std::endl;
-          } else {
-            for (int i = 0; i < length; i++) {
-              std::string oname = objs[i].getName();
-              if (oname.size() == 0) oname = objs[0].getName();
-              std::string opath = objs[i].getPath();
-              if (opath.size() == 0) opath = objs[0].getPath();
-              out << StringUtil::form("insert into %s (name, path, value_o) values ('%s[%d]', '.%s[%d].', '%s');",
-                                      table.c_str(), oname.c_str(),
-                                      i, name_out.c_str(), i, opath.c_str()) << std::endl;
-            }
-          }
-        } else {
-          for (int i = 0; i < length; i++) {
-            objs[i].printSQL(table, out, StringUtil::form("%s[%d]", name_out.c_str(), i), i);
-          }
-        }
-      } else {
-        const DBObject& obj(getObject(name));
-        if (obj.getPath().size() > 0) {
-          out << StringUtil::form("insert into %s (name, path, value_o) values ('%s', '.%s.', '%s');",
-                                  table.c_str(), obj.getName().c_str(),
-                                  name_out.c_str(), obj.getPath().c_str()) << std::endl;
-        } else {
-          obj.printSQL(table, out, name_out);
-        }
-      }
-    } else {
-      std::string value = getValueText(name);
-      if (pro.getType() == DBField::TEXT) value = "'" + value + "'";
-      out << StringUtil::form("insert into %s (name, path, %s) values ('%s', '.%s.', %s);",
-                              table.c_str(), ptype.c_str(), name.c_str(),
-                              name_out.c_str(), value.c_str()) << std::endl;
-    }
   }
+  return ss.str();
 }
 

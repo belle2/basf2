@@ -23,43 +23,46 @@ namespace Belle2 {
     virtual ~SeqRootInputModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
   private:
     //! File name
-    std::string m_inputFileName;
+    std::string m_inputFileName{""};
     //! List of all file names to read
     std::vector<std::string> m_filelist;
 
     //! If true the output filename will be interpreted as a boost::format pattern
-    bool m_fileNameIsPattern;
+    bool m_fileNameIsPattern{false};
+
+    //! Is the input real data?
+    bool m_realData{false};
 
     //! Blocked file handler
-    SeqFile* m_file;
+    SeqFile* m_file{nullptr};
 
     //! Number of files to read (aka m_filelist.size())
-    int m_nfile;
+    int m_nfile{0};
     //! Index of current file in m_filelist
-    int m_fileptr;
+    int m_fileptr{0};
 
     //! Total nr. of events in the file
-    int m_nevt;
+    int m_nevt{ -1};
 
     //! DataStoreStreamer
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer{nullptr};
 
     //! Time
     struct timeval m_t0; /**< time at begin of current run. */
     struct timeval m_tend; /**< time at end of current run. */
 
     // Data flow
-    double m_size; /**< total transferred data, in kB. */
-    double m_size2; /**< sum of squares of data transferred in each event, in kB^2. */
+    double m_size{0}; /**< total transferred data, in kB. */
+    double m_size2{0}; /**< sum of squares of data transferred in each event, in kB^2. */
   };
 } // end namespace Belle2

@@ -85,7 +85,7 @@ namespace Belle2 {
       double normCoef = static_cast<double>(storedProbArrayNorm) / inputNorm;
       std::transform(probabilities.begin(), probabilities.end(),
                      std::back_inserter(m_probabilities),
-                     [this, normCoef](typename T::value_type x)->StoredProbType
+                     [normCoef](typename T::value_type x)->StoredProbType
       { return static_cast<StoredProbType>(normCoef * x); }
                     );
     }
@@ -155,7 +155,7 @@ namespace Belle2 {
       if (normCoef < 1.0e-15) normCoef = 1.0;
       std::transform(m_probabilities.begin(), m_probabilities.end(),
                      std::back_inserter(outputPdf),
-                     [this, normCoef](StoredProbType x)-> OutputProbType
+                     [normCoef](StoredProbType x)-> OutputProbType
       { return static_cast<OutputProbType>(normCoef * x); }
                     );
       return outputPdf;
@@ -195,7 +195,7 @@ namespace Belle2 {
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU; /**< True if U, false if V. */
     short m_cellID; /**< Strip coordinate in pitch units. */
-    float m_stripNoise; /**< Noise of the strip, from calibration. */
+    //    float m_stripNoise; /**< Noise of the strip, from calibration. */
     float m_fittedAmplitude; /**< Fitted amplitude of the signal ("charge") */
     float m_fittedAmplitudeError; /** Error estimate of amplitude fit. */
     float m_fittedTime; /** Fitted arrival time of the signal. */

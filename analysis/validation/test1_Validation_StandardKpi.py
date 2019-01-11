@@ -23,7 +23,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdFSParticles import *
+from stdCharged import stdPi, stdK
 from variables import variables
 
 set_log_level(LogLevel.ERROR)
@@ -41,7 +41,8 @@ inputMdst('default', '../2610030000.dst.root')
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-loadStdCharged()
+stdPi('all')
+stdK('all')
 # creates "pi+:all" ParticleList (and c.c.)
 copyList('pi+:slow', 'pi+:all')
 applyCuts('pi+:slow', 'd0<1.5 and -10 < z0 < 10 and useCMSFrame(p) < 0.5 and pt > 0.1 ')

@@ -36,40 +36,40 @@ namespace Belle2 {
       virtual ~ISRPhotonFitObject();
 
       /// Return a new copy of itself
-      virtual ISRPhotonFitObject* copy() const;
+      virtual ISRPhotonFitObject* copy() const override;
 
       /// Assign from anther object, if of same type
       virtual ISRPhotonFitObject& assign(const BaseFitObject& source    ///< The source object
-                                        );
+                                        ) override;
 
       /// Get name of parameter ilocal
       virtual const char* getParamName(int ilocal      ///< Local parameter number
-                                      ) const;
+                                      ) const override;
 
       /// Read values from global vector, readjust vector; return: significant change
       virtual bool   updateParams(double p[],    ///< The parameter vector
                                   int idim      ///< Length of the vector
-                                 );
+                                 ) override;
 
 
       // // these depend on actual parametrisation!
-      virtual double getDPx(int ilocal) const;
-      virtual double getDPy(int ilocal) const;
-      virtual double getDPz(int ilocal) const;
-      virtual double getDE(int ilocal) const;
+      virtual double getDPx(int ilocal) const override;
+      virtual double getDPy(int ilocal) const override;
+      virtual double getDPz(int ilocal) const override;
+      virtual double getDE(int ilocal) const override;
 
-      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const;
-      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal, int metaSet) const;
+      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const override;
+      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal, int metaSet) const override;
 
-      virtual int getNPar() const {return NPAR;}
+      virtual int getNPar() const override {return NPAR;}
 
     protected:
 
       enum {NPAR = 3}; // well, it's actually 1...Daniel should update
 
-      virtual double PgFromPz(double pz);
+      double PgFromPz(double pz);
 
-      void updateCache() const;
+      void updateCache() const override;
 
       mutable bool cachevalid;
 

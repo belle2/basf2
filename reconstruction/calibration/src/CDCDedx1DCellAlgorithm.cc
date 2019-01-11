@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: jvbennett                                                *
+ * Contributors: jikumar, jvbennett                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,6 +15,7 @@
 #include <TH1F.h>
 #include <TLine.h>
 #include <TTree.h>
+#include <TMath.h>
 
 #include <reconstruction/calibration/CDCDedx1DCellAlgorithm.h>
 
@@ -25,7 +26,15 @@ using namespace Belle2;
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
+CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
+  CalibrationAlgorithm("CDCDedxElectronCollector"),
+  fnEntaBinG(128),
+  fnEntaBinL(64),
+  feaLE(-TMath::Pi() / 2),
+  feaUE(+TMath::Pi() / 2),
+  IsLocalBin(true),
+  IsMakePlots(false),
+  IsRS(true)
 {
   // Set module properties
   setDescription("A calibration algorithm for the CDC dE/dx entrance angle cleanup correction");
@@ -37,120 +46,318 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() : CalibrationAlgorithm("CDCDedx
 
 CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 {
-  // Get data objects
-  auto ttree = getObjectPtr<TTree>("tree");
 
-  // require at least 100 tracks (arbitrary for now)
-  if (ttree->GetEntries() < 100)
-    return c_NotEnoughData;
+  //reading electron collector TREE
+  auto ttree = getObjectPtr<TTree>("tree");
+  if (ttree->GetEntries() < 100)return c_NotEnoughData;
 
   std::vector<double>* dedxhit = 0, *enta = 0;
+  std::vector<int>* layer = 0;
 
-  ttree->SetBranchAddress("enta", &enta);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
+  ttree->SetBranchAddress("layer", &layer);
+  ttree->SetBranchAddress("entaRS", &enta);
 
-  // make histograms to store dE/dx values in bins of entrance angle
-  const int nbins = 20;
-  double binsize = 2.0 / nbins;
-  std::vector<std::vector<double>> entadedx(nbins, std::vector<double>());
-  for (int i = 0; i < ttree->GetEntries(); ++i) {
-    ttree->GetEvent(i);
-    for (unsigned int j = 0; j < dedxhit->size(); ++j) {
-      if (dedxhit->at(j) == 0) continue;
-      double myenta = enta->at(j);
+  // Setting up bins for entra angle
+  feaBS = (feaUE - feaLE) / fnEntaBinG;
 
-      // assume rotational symmetry
-      if (myenta < -3.1416 / 2.0) myenta += 3.1416 / 2.0;
-      else if (myenta > 3.1416 / 2.0) myenta -= 3.1416 / 2.0;
-      if (abs(myenta) > 3.1416 / 2) continue;
+  std::vector<int> globalbins;
+  for (int ibin = 0; ibin < fnEntaBinG; ibin++)globalbins.push_back(ibin);
 
-      int bin = std::floor((sin(myenta) + 1) / binsize);
-      if (bin < 0 || bin >= nbins) continue;
-      entadedx[bin].push_back(dedxhit->at(j));
-    }
+  if (!IsLocalBin) {
+    fEntaBinNums = globalbins;
+    fnEntaBinL = fnEntaBinG;
+  } else {
+    GetVariableBin(fnEntaBinG, fEntaBinNums);
+    fnEntaBinL =  fEntaBinNums.at(fEntaBinNums.size() - 1) + 1;
   }
 
-  // Print the histograms for quality control
-  TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
-  ctmp->Divide(3, 3);
-  std::stringstream psname; psname << "dedx_1dcell.ps[";
-  ctmp->Print(psname.str().c_str());
-  psname.str(""); psname << "dedx_1dcell.ps";
+  //enta dedx distributions for inner and outer layer
+  std::vector<TH1F*> hILdEdxhitInEntaBin(fnEntaBinL, 0);
+  std::vector<TH1F*> hOLdEdxhitInEntaBin(fnEntaBinL, 0);
+  Double_t ifeaLE = 0, ifeaUE = 0;
 
-  TH1F* base = new TH1F("base", "", 250, 0, 5);
-  TLine* tl = new TLine();
+  for (int iea = 0; iea < fnEntaBinL; iea++) {
 
-  // fit histograms to get gains in bins of entrance angle
-  std::vector<double> onedcor;
-  for (unsigned int i = 0; i < entadedx.size(); ++i) {
-    ctmp->cd(i % 9 + 1); // each canvas is 9x9
-    for (unsigned int j = 0; j < entadedx[i].size(); ++j) {
-      base->Fill(entadedx[i][j]);
-    }
-    base->DrawCopy("hist");
-
-    double mean = 1.0;
-    if (entadedx[i].size() < 10) {
-      onedcor.push_back(mean); // <-- FIX ME, should return not enough data
+    if (IsLocalBin) {
+      ifeaLE = fEntaBinValues.at(iea);
+      ifeaUE = fEntaBinValues.at(iea + 1);
     } else {
-      mean *= calculateMean(entadedx[i], 0.05, 0.25);
-      onedcor.push_back(mean);
+      ifeaLE = iea * feaBS - feaUE; //- because of -ive range shifting
+      ifeaUE = ifeaLE + feaBS;
     }
 
-    tl->SetX1(mean); tl->SetX2(mean);
-    tl->SetY1(0); tl->SetY2(base->GetMaximum());
-    tl->DrawClone("same");
+    hILdEdxhitInEntaBin[iea] = new TH1F(Form("hILdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0., 5.);
+    hILdEdxhitInEntaBin[iea]->SetTitle(Form("IL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
+    hILdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Inner Layer");
+    hILdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
 
-    base->Reset();
-    if ((i + 1) % 9 == 0 || i + 1 == entadedx.size())
-      ctmp->Print(psname.str().c_str());
+    hOLdEdxhitInEntaBin[iea] = new TH1F(Form("hOLdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0., 5.);
+    hOLdEdxhitInEntaBin[iea]->SetTitle(Form("OL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
+    hOLdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Outer Layer");
+    hOLdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
   }
 
-  psname.str(""); psname << "dedx_1dcell.ps]";
-  ctmp->Print(psname.str().c_str());
-  delete ctmp;
+  // Enta stats
+  TH1F* hILEntaG = new TH1F("hILEntaG", "EntA: Inner Layer", fnEntaBinG, feaLE, feaUE);
+  hILEntaG->GetXaxis()->SetTitle("Entrance angle (#theta)");
+  hILEntaG->GetYaxis()->SetTitle("Entries");
 
-  std::vector<std::vector<double>> onedcors;
-  onedcors.push_back(onedcor);
+  TH1F* hOLEntaG = new TH1F("hOLEntaG", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
+  hOLEntaG->GetXaxis()->SetTitle("Entrance angle (#theta)");
+  hOLEntaG->GetYaxis()->SetTitle("Entries");
+
+  //rebinned histogram
+  Double_t* RmapEntaValue = &fEntaBinValues[0];
+
+  TH1F* hILEntaL = new TH1F("hILEntaL", "EntA: Inner Layer (assym bin)", fnEntaBinL, RmapEntaValue);
+  hILEntaL->GetXaxis()->SetTitle("Entrance angle (#theta)");
+  hILEntaL->GetYaxis()->SetTitle("Entries");
+
+  TH1F* hOLEntaL = new TH1F("hOLEntaL", "EntA: Outer Layer (assym bin)", fnEntaBinL, RmapEntaValue);
+  hOLEntaL->GetYaxis()->SetTitle("Entries");
+  hOLEntaL->GetXaxis()->SetTitle("Entrance angle (#theta)");
+
+  TH1F* hILdEdx_all = new TH1F("hILdEdx_all", "", 250, 0., 5.);
+  TH1F* hOLdEdx_all = new TH1F("hOLdEdx_all", "", 250, 0., 5.);
+
+  Int_t ibinEA = 0;
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+
+    ttree->GetEvent(i);
+
+    for (unsigned int j = 0; j < dedxhit->size(); ++j) {
+
+      if (dedxhit->at(j) == 0) continue;
+
+      Double_t ieaHit = enta->at(j);
+      if (ieaHit < -TMath::Pi() / 2.0) ieaHit += TMath::Pi() / 2.0;
+      else if (ieaHit > TMath::Pi() / 2.0) ieaHit -= TMath::Pi() / 2.0;
+      if (abs(ieaHit) > TMath::Pi() / 2.0) continue;
+
+      //Bin corresponds to enta
+      ibinEA = (ieaHit - feaLE) / feaBS ; //from 0
+      if (ibinEA >= fnEntaBinL) continue; //bin stats from 0
+
+      if (IsLocalBin) ibinEA = fEntaBinNums.at(ibinEA);
+
+      if (layer->at(j) < 8) {
+        hILEntaG->Fill(ieaHit);
+        if (IsLocalBin)hILEntaL->Fill(ieaHit);
+        hILdEdx_all->Fill(dedxhit->at(j));
+        hILdEdxhitInEntaBin[ibinEA]->Fill(dedxhit->at(j));
+      } else {
+        hOLEntaG->Fill(ieaHit);
+        if (IsLocalBin)hOLEntaL->Fill(ieaHit);
+        hOLdEdx_all->Fill(dedxhit->at(j));
+        hOLdEdxhitInEntaBin[ibinEA]->Fill(dedxhit->at(j));
+      }
+    }
+  }
+
+  if (IsMakePlots) {
+    TCanvas* ctmpde = new TCanvas("hEntaDist", "Enta distributions", 400, 400);
+    if (IsLocalBin) {
+      ctmpde->SetCanvasSize(800, 400);
+      ctmpde->Divide(2, 1);
+      ctmpde->cd(1);  gPad->SetLogy(); hOLEntaG->SetMarkerColor(kBlue); hOLEntaG->Draw(""); hILEntaG->Draw("same");
+      ctmpde->cd(2);  gPad->SetLogy(); hOLEntaL->SetMarkerColor(kBlue); hOLEntaL->Draw(""); hILEntaL->Draw("same");
+    } else {
+      hOLEntaG->Draw(""); hILEntaG->Draw("same");
+    }
+    ctmpde->SaveAs("hEntaDistributions.pdf");
+
+  }
+
+  double InsumPer5 = 0.0, InsumPer75 = 0.0;
+  double OutsumPer5 = 0.0, OutsumPer75 = 0.0;
+  double InLayInt = hILdEdx_all->Integral();
+  double OutLayInt = hOLdEdx_all->Integral();
+
+  Int_t lBinInLayer = 1,  hBinInLayer = 1;
+  Int_t lBinOutLayer = 1,  hBinOutLayer = 1;
+
+  for (int ibin = 1; ibin <= hILdEdx_all->GetNbinsX(); ibin++) {
+
+    if (InsumPer5  <= 0.05 * InLayInt) {
+      InsumPer5 += hILdEdx_all->GetBinContent(ibin);
+      lBinInLayer = ibin;
+    }
+
+    if (InsumPer75  <= 0.75 * InLayInt) {
+      InsumPer75 += hILdEdx_all->GetBinContent(ibin);
+      hBinInLayer = ibin;
+    }
+
+    if (OutsumPer5 <= 0.05 * OutLayInt) {
+      OutsumPer5 += hOLdEdx_all->GetBinContent(ibin);
+      lBinOutLayer = ibin;
+    }
+
+    if (OutsumPer75 <= 0.75 * OutLayInt) {
+      OutsumPer75 += hOLdEdx_all->GetBinContent(ibin);
+      hBinOutLayer = ibin;
+    }
+  }
+
+
+
+  if (IsMakePlots) {
+
+    std::cout << "Used bins for truncation from 5 to 75 per #" << std::endl;
+    std::cout << "Inner Layes Bins = # from" << lBinInLayer << ", to " << hBinInLayer << std::endl;
+    std::cout << "Outer Layes Bins = # from" << lBinOutLayer << ", to " << hBinOutLayer << std::endl;
+
+    TCanvas* ctem = new TCanvas("Layerhisto", "Inner and Outer Histo", 1200, 600);
+    ctem->Divide(2, 1);
+    ctem->cd(1);
+    hILdEdx_all->SetMarkerColor(kBlue);
+    hILdEdx_all->Draw("histo");
+
+    TLine* tlInF = new TLine();
+    tlInF->SetLineColor(kBlue);
+    tlInF->SetX1(InsumPer5); tlInF->SetX2(InsumPer5);
+    tlInF->SetY1(0); tlInF->SetY2(hILdEdx_all->GetMaximum());
+    tlInF->DrawClone("same");
+
+    TLine* tlInL = new TLine();
+    tlInL->SetLineColor(kBlue);
+    tlInL->SetX1(InsumPer75); tlInL->SetX2(InsumPer75);
+    tlInL->SetY1(0); tlInL->SetY2(hILdEdx_all->GetMaximum());
+    tlInL->DrawClone("same");
+
+    ctem->cd(2);
+    hOLdEdx_all->Draw("histo");
+    hOLdEdx_all->SetMarkerColor(kRed);
+
+    TLine* tlOutF = new TLine();
+    tlOutF->SetLineColor(kBlue);
+    tlOutF->SetX1(OutsumPer5); tlOutF->SetX2(OutsumPer5);
+    tlOutF->SetY1(0); tlOutF->SetY2(hOLdEdx_all->GetMaximum());
+    tlOutF->DrawClone("same");
+
+    TLine* tlOutL = new TLine();
+    tlOutL->SetLineColor(kBlue);
+    tlOutL->SetX1(OutsumPer75); tlOutL->SetX2(OutsumPer75);
+    tlOutL->SetY1(0); tlOutL->SetY2(hOLdEdx_all->GetMaximum());
+    tlOutL->DrawClone("same");
+    ctem->SaveAs("Layerhistodedxhit_OneDCorr.pdf");
+  }
+
+
+
+  //short version = 0;
+  TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 1200);
+  ctmp->Divide(4, 4);
+  std::stringstream psname; psname << "dedx_1dcell.pdf[";
+  TLine* tl = new TLine();
+  tl->SetLineColor(kRed);
+
+  if (IsMakePlots) {
+    ctmp->Print(psname.str().c_str());
+    psname.str(""); psname << "dedx_1dcell.pdf";
+  }
+
+  TH1F* htemp = 0x0;
+  std::vector<std::vector<double>> onedcors; // prev->std::vector<std::vector<double>> ones;
+  std::vector<double> onedcorIorOL, onedcorIorOLtemp;
+
+  TH1F* hILEntaConst = new TH1F("hILEntaConst", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
+  hILEntaConst->GetXaxis()->SetTitle("Entrance angle (#theta)");
+  hILEntaConst->GetYaxis()->SetTitle("Constant");
+
+  TH1F* hOLEntaConst = new TH1F("hOLEntaConst", "EntA: Outer Layer", fnEntaBinG, feaLE, feaUE);
+  hOLEntaConst->GetXaxis()->SetTitle("Entrance angle (#theta)");
+  hOLEntaConst->GetYaxis()->SetTitle("Constant");
+
+  for (int iIOLayer = 0; iIOLayer <= 1; iIOLayer++) {
+
+    int startfrom = 1, endat = 1;
+
+    if (iIOLayer == 0) {
+      startfrom = lBinInLayer; endat = hBinInLayer;
+    } else if (iIOLayer == 1)  {
+      startfrom = lBinOutLayer; endat = hBinOutLayer;
+    } else continue;
+
+    //std::cout << "Layer I/O # = " << iIOLayer << std::endl;
+    for (int iea = 1; iea <= fnEntaBinL; iea++) {
+
+      Int_t ieaprime = iea; //rotation symmtery for 1<->3 and 4<->2
+
+      if (IsRS)ieaprime = GetRotationSymmericBin(fnEntaBinL, iea);
+
+      if (iIOLayer == 0)htemp = (TH1F*)hILdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
+      else if (iIOLayer == 1)htemp = (TH1F*)hOLdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
+      else continue;
+
+      double truncMean = 1.0;
+      if (htemp->Integral() < 100) truncMean  = 1.0; //low stats
+      else {
+        double binweights = 0.0;
+        int sumofbc = 0;
+        for (int ibin = startfrom; ibin <= endat; ibin++) {
+          //std::cout << " dedxhit bin = " << ibin << ", Entries =" << htemp->GetBinContent(ibin) << std::endl;
+          if (htemp->GetBinContent(ibin) > 0) {
+            binweights += (htemp->GetBinContent(ibin) * htemp->GetBinCenter(ibin));
+            sumofbc += htemp->GetBinContent(ibin);
+          }
+        }
+        if (sumofbc > 0)truncMean  = (double)(binweights / sumofbc);
+        else truncMean = 1.0;
+      }
+
+      if (truncMean <= 0)truncMean = 1.0; //protection only
+      onedcorIorOLtemp.push_back(truncMean);
+
+      if (IsMakePlots) {
+        ctmp->cd(((iea - 1) % 16) + 1);
+        htemp->SetFillColor(kYellow);
+        htemp->SetTitle(Form("%s, #mean = %0.2f", htemp->GetTitle(), truncMean));
+        htemp->DrawClone("hist"); //clone is nessesory for pointer survival
+        tl->SetX1(truncMean); tl->SetX2(truncMean);
+        tl->SetY1(0); tl->SetY2(htemp->GetMaximum());
+        tl->DrawClone("same");
+        if (iea % 16 == 0)ctmp->Print(psname.str().c_str());
+      }
+
+      htemp->Reset();
+    }
+
+    ibinEA = 0;
+    for (int iea = 0; iea < fnEntaBinG; iea++) {
+      ibinEA = iea;
+      if (IsLocalBin)ibinEA = fEntaBinNums.at(iea);
+      onedcorIorOL.push_back(onedcorIorOLtemp.at(ibinEA));
+      if (iIOLayer == 0)hILEntaConst->SetBinContent(iea + 1, onedcorIorOLtemp.at(ibinEA));
+      else if (iIOLayer == 1)hOLEntaConst->SetBinContent(iea + 1, onedcorIorOLtemp.at(ibinEA));
+    }
+
+    onedcors.push_back(onedcorIorOL);
+    onedcorIorOL.clear();
+    onedcorIorOLtemp.clear();
+  }
+
+
+  if (IsMakePlots) {
+    psname.str(""); psname << "dedx_1dcell.pdf]";
+    ctmp->Print(psname.str().c_str());
+
+    // //Drawing final constants
+    TCanvas* cconst = new TCanvas("FinalConstantHistoMap", "Inner and Outer Histo", 800, 400);
+    cconst->Divide(2, 1);
+    cconst->cd(1); hILEntaConst->Draw();
+    cconst->cd(2); hOLEntaConst->Draw();
+    cconst->SaveAs("FinalOneDConstantMap.pdf");
+  }
 
   B2INFO("dE/dx Calibration done for 1D cleanup correction");
-
   CDCDedx1DCell* gain = new CDCDedx1DCell(0, onedcors);
   saveCalibration(gain, "CDCDedx1DCell");
 
+  delete htemp;
+  delete ctmp;
+  delete tl;
   return c_OK;
-}
 
-double CDCDedx1DCellAlgorithm::calculateMean(const std::vector<double>& dedx,
-                                             double removeLowest, double removeHighest) const
-{
-  // Calculate the truncated average by skipping the lowest & highest
-  // events in the array of dE/dx values
-  std::vector<double> sortedDedx = dedx;
-  std::sort(sortedDedx.begin(), sortedDedx.end());
-
-  double truncatedMean = 0.0;
-  double mean = 0.0;
-  double sumOfSquares = 0.0;
-  int numValuesTrunc = 0;
-  const int numDedx = sortedDedx.size();
-
-  // add a factor of 0.5 here to make sure we are rounding appropriately...
-  const int lowEdgeTrunc = int(numDedx * removeLowest + 0.5);
-  const int highEdgeTrunc = int(numDedx * (1 - removeHighest) + 0.5);
-  for (int i = 0; i < numDedx; i++) {
-    mean += sortedDedx[i];
-    if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
-      truncatedMean += sortedDedx[i];
-      sumOfSquares += sortedDedx[i] * sortedDedx[i];
-      numValuesTrunc++;
-    }
-  }
-
-  if (numDedx != 0) mean /= numDedx;
-
-  if (numValuesTrunc != 0) truncatedMean /= numValuesTrunc;
-  else truncatedMean = mean;
-
-  return truncatedMean;
 }

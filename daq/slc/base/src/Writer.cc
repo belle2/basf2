@@ -6,7 +6,7 @@
 
 using namespace Belle2;
 
-void Writer::reverse(void* buf, size_t len) throw()
+void Writer::reverse(void* buf, size_t len)
 {
   char tmp;
   for (int c = 0 ; c < (int)len / 2 ; c ++) {
@@ -16,22 +16,22 @@ void Writer::reverse(void* buf, size_t len) throw()
   }
 }
 
-void Writer::writeBool(bool v) throw(IOException)
+void Writer::writeBool(bool v)
 {
   write(&v, sizeof(bool));
 }
 
-void Writer::writeChar(char v) throw(IOException)
+void Writer::writeChar(char v)
 {
   write(&v, sizeof(char));
 }
 
-void Writer::writeUChar(unsigned char v) throw(IOException)
+void Writer::writeUChar(unsigned char v)
 {
   write(&v, sizeof(unsigned char));
 }
 
-void Writer::writeShort(short v) throw(IOException)
+void Writer::writeShort(short v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(short));
@@ -39,7 +39,7 @@ void Writer::writeShort(short v) throw(IOException)
   write(&v, sizeof(short));
 }
 
-void Writer::writeUShort(unsigned short v) throw(IOException)
+void Writer::writeUShort(unsigned short v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(unsigned short));
@@ -47,7 +47,7 @@ void Writer::writeUShort(unsigned short v) throw(IOException)
   write(&v, sizeof(unsigned short));
 }
 
-void Writer::writeInt(int v) throw(IOException)
+void Writer::writeInt(int v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(int));
@@ -55,7 +55,7 @@ void Writer::writeInt(int v) throw(IOException)
   write(&v, sizeof(int));
 }
 
-void Writer::writeUInt(unsigned int v) throw(IOException)
+void Writer::writeUInt(unsigned int v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(unsigned int));
@@ -63,7 +63,7 @@ void Writer::writeUInt(unsigned int v) throw(IOException)
   write(&v, sizeof(unsigned int));
 }
 
-void Writer::writeLong(long long v) throw(IOException)
+void Writer::writeLong(long long v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(long long));
@@ -71,7 +71,7 @@ void Writer::writeLong(long long v) throw(IOException)
   write(&v, sizeof(long long));
 }
 
-void Writer::writeULong(unsigned long long v) throw(IOException)
+void Writer::writeULong(unsigned long long v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(unsigned long long));
@@ -79,7 +79,7 @@ void Writer::writeULong(unsigned long long v) throw(IOException)
   write(&v, sizeof(unsigned long long));
 }
 
-void Writer::writeFloat(float v) throw(IOException)
+void Writer::writeFloat(float v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(float));
@@ -87,7 +87,7 @@ void Writer::writeFloat(float v) throw(IOException)
   write(&v, sizeof(float));
 }
 
-void Writer::writeDouble(double v) throw(IOException)
+void Writer::writeDouble(double v)
 {
 #if defined(__ENDIAN_L__)
   reverse(&v, sizeof(double));
@@ -95,13 +95,13 @@ void Writer::writeDouble(double v) throw(IOException)
   write(&v, sizeof(double));
 }
 
-void Writer::writeString(const std::string& v) throw(IOException)
+void Writer::writeString(const std::string& v)
 {
   writeInt((int)v.size());
   write(v.data(), v.size());
 }
 
-void Writer::writeObject(const Serializable& v) throw(IOException)
+void Writer::writeObject(const Serializable& v)
 {
   return v.writeObject(*this);
 }

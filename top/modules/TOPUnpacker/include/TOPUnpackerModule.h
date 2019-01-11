@@ -14,6 +14,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawTOP.h>
+#include <top/RawDataTypes.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPRawDigit.h>
@@ -180,30 +181,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -266,7 +267,7 @@ namespace Belle2 {
      * @param pedestalSubtracted true, if pedestal is subtracted in waveforms
      * @return number of words remaining in data buffer
      */
-    int unpackProdDebug(const int* buffer, int bufferSize, bool pedestalSubtracted);
+    int unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat, bool pedestalSubtracted);
 
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */

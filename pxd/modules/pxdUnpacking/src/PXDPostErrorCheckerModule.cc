@@ -30,7 +30,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   constexpr uint64_t defaulterrormask =
-//         c_XXXXTB_IDS | // unused
+    c_EVENT_STRUCT |
     c_FRAME_TNR_MM |
     c_META_MM |
     c_ONSEN_TRG_FIRST |
@@ -46,7 +46,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHE_CRC |
     //
     c_DHC_UNKNOWN |
-//         c_XXXMERGER_CRC | unused
+    c_HEADERTYPE_INV |
     c_PACKET_SIZE |
     c_MAGIC |
     //
@@ -102,8 +102,10 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     //
 //         c_EVT_TRG_GATE_DIFFER | // still a bug in DHE FW
 //         c_EVT_TRG_FRM_NR_DIFFER | // still a bug in DHE FW
-//         c_DHP_ROW_WO_PIX |
-    c_DHE_START_THIRD ;
+//         c_DHP_ROW_WO_PIX | // still a bug in DHE FW?
+    c_DHE_START_THIRD |
+    //
+    c_FAKE_NO_FAKE_DATA ;
 
   // other bits not used yet
 
@@ -114,6 +116,10 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of input PXDClusters", std::string(""));
 
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
+
+  addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);
+  addParam("IgnoreDHPFrame", m_ignoreDHPFrame, "Ignore different dhp frame between DHEs", true);
+
 
 }
 
@@ -154,11 +160,13 @@ void PXDPostErrorCheckerModule::event()
         B2DEBUG(20, "Iterate DHP in DHE " << dhe.getDHEID() << " TrigGate " << dhe.getTriggerGate() << " FrameNr " << dhe.getFrameNr());
         if (had_dhe) {
           if (dhe.getTriggerGate() != triggergate) {
-            B2ERROR("Trigger Gate of DHEs not identical" << triggergate << " != " << dhe.getTriggerGate());
+            if (!m_ignoreTriggerGate) B2ERROR("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
+                                                triggergate) << LogVar("TriggerGate 2", dhe.getTriggerGate()));
             mask |= EPXDErrMask::c_EVT_TRG_GATE_DIFFER;
           }
           if (dhe.getFrameNr() != dheframenr) {
-            B2ERROR("Frame Nr of DHEs not identical" << dheframenr << " != " << dhe.getFrameNr());
+            if (!m_ignoreDHPFrame) B2ERROR("Frame Nr of DHEs not identical" << LogVar("FrameNr 1", dheframenr) << LogVar("FrameNr 2",
+                                             dhe.getFrameNr()));
             mask |= EPXDErrMask::c_EVT_TRG_FRM_NR_DIFFER;
           }
         } else {
@@ -169,6 +177,7 @@ void PXDPostErrorCheckerModule::event()
         for (auto& dhp : dhe) {
           B2DEBUG(20, "DHP " << dhp.getChipID() << " Framenr " << dhp.getFrameNr());
           // TODO check against other DHP (full bits) and DHE (limited bits)
+          // TODO We know that this will fail with current firmware and most likely will not be fixed...
         }
       }
     }

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMRECONSTRUCTORMODULE_H
-#define EKLMRECONSTRUCTORMODULE_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMAlignmentHit.h>
@@ -47,27 +46,27 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * Get 2d hit time corresponding to EKLMDigit.
@@ -85,6 +84,12 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Check if segments intersect. Normally should be true, but it may be
+     * necessary to turn this check off for debugging.
+     */
+    bool m_CheckSegmentIntersection;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
@@ -101,7 +106,7 @@ namespace Belle2 {
     DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;
 
     /** Time calibration data for individual strips. */
-    EKLMTimeCalibrationData** m_TimeCalibrationData;
+    const EKLMTimeCalibrationData** m_TimeCalibrationData;
 
     /** Default time calibration data. */
     EKLMTimeCalibrationData m_DefaultTimeCalibrationData;
@@ -118,6 +123,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

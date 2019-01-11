@@ -21,6 +21,7 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
     "the z-vertex for each track using a neural network.\n"
     "Requires one or several trained networks stored in a file.\n"
   );
+  setPropertyFlags(c_ParallelProcessingCertified);
   // parameters for saving / loading
   addParam("filename", m_filename,
            "Name of the files where the NeuroTrigger parameters are saved "

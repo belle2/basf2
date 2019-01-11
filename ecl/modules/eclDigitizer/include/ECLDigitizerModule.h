@@ -40,7 +40,7 @@ namespace Belle2 {
   /** The ECLDigitizer module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
-   * First, we simualte the sampling array by waveform and amplitude of hit, and
+   * First, we simulate the sampling array by waveform and amplitude of hit, and
    * smear this sampling array by corresponding error matrix.
    * We then fit the array as hardware of shaper DSP board to obtain the fit result
    * of amplitude, time and quality.
@@ -72,33 +72,33 @@ namespace Belle2 {
 
 
     /** Initialize variables  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Nothing so far.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Actual digitization of all hits in the ECL.
      *
      *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Nothing so far. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Free memory */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
-    using algoparams_t   = ECL::EclConfiguration::algoparams_t;
-    using fitparams_t    = ECL::EclConfiguration::fitparams_t;
-    using signalsample_t = ECL::EclConfiguration::signalsample_t;
-    using adccounts_t    = ECL::EclConfiguration::adccounts_t;
+    using algoparams_t   = ECL::EclConfiguration::algoparams_t;   /**< algorithm parameters */
+    using fitparams_t    = ECL::EclConfiguration::fitparams_t;    /**< fit parameters */
+    using signalsample_t = ECL::EclConfiguration::signalsample_t; /**< signal sample */
+    using adccounts_t    = ECL::EclConfiguration::adccounts_t;    /**< ADC counts */
 
     using int_array_192x16_t = fitparams_t::int_array_192x16_t; /**<  weighting coefficients for time and amplitude calculation */
     using int_array_24x16_t  =
       fitparams_t::int_array_24x16_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
-    using uint_pair_t        = std::pair<unsigned int, unsigned int>;
+    using uint_pair_t        = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
 
     /** ffsets for storages of ECL channels */
     struct crystallinks_t {
@@ -157,6 +157,7 @@ namespace Belle2 {
     StoreArray<ECLSimHit> m_eclSimHits; /**< SimHits array  */
     StoreObjPtr<ECLWaveforms> m_eclWaveforms; /**< compressed waveforms  */
     bool m_HadronPulseShape; /**< hadron pulse shape flag */
+
     /** Output Arrays */
     StoreArray<ECLDigit>  m_eclDigits;/**<  waveform fit result */
     StoreArray<ECLDsp>    m_eclDsps;/**<  generated waveforms */
@@ -168,6 +169,7 @@ namespace Belle2 {
     bool m_inter; /**< internuclear counter effect */
     bool m_waveformMaker; /**< produce only waveform digits */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
+    int m_ADCThreshold; /**< ADC threshold for wavefom fits*/
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
   };
 }//Belle2

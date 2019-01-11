@@ -29,7 +29,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdFSParticles import *
+from stdCharged import stdE
 from variables import variables
 from ROOT import Belle2
 from glob import glob
@@ -44,16 +44,15 @@ inputMdst('default', input_mdst)
 # with releases with release-00-08-00 or newer
 
 
-loadStdCharged()
-stdLooseE()
+stdE('loose')
 cutAndCopyList('e+:Jp', 'e+:loose', '')
 
 reconstructDecay('J/psi -> e-:Jp e+:Jp', '2.8 < M < 3.3')
 vertexRave('J/psi', 0.0, "J/psi -> ^e-:Jp ^e+:Jp")
 matchMCTruth('J/psi')
 
-fillParticleList('K_S0', '0.3 < M < 0.7')
-vertexRave('K_S0', 0.0, "K_S0 -> ^pi+:all ^pi-:all")
+fillParticleList('K_S0 -> pi+ pi-', '0.3 < M < 0.7')
+vertexRave('K_S0', 0.0, "K_S0 -> ^pi+ ^pi-")
 matchMCTruth('K_S0')
 
 # Prepare the B candidates

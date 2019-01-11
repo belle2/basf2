@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VERTEX_H
-#define VERTEX_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -258,5 +257,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif

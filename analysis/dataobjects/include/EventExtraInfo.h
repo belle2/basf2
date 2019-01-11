@@ -51,6 +51,9 @@ namespace Belle2 {
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;
 
+    /** Grab the names in this event extra info (for printing etc) */
+    std::vector<std::string> getNames() const;
+
   private:
     std::map<std::string, float> eventExtraInfo; /**< map variable names to values. */
 

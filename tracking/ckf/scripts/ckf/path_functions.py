@@ -110,17 +110,17 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
                 overlap_cut = 0.2
 
         module_parameters = dict(
-            firstHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_1.xml",
+            firstHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_1",
                                        "direction": direction},
             firstHighUseNStates=use_best_seeds,
 
-            secondHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_2.xml"},
+            secondHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_2"},
             secondHighUseNStates=use_best_seeds,
 
-            thirdHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_ToPXDStateFilter_3.xml"},
+            thirdHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_3"},
             thirdHighUseNStates=use_best_seeds,
 
-            filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_PXDTrackCombination.xml"},
+            filterParameters={"cut": overlap_cut, "identifier": "ckf_PXDTrackCombination"},
             useBestNInSeed=use_best_results,
         )
 
@@ -146,8 +146,6 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
 
 def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
-    if "SVDSpacePointCreator" not in [m.name() for m in path.modules()]:
-        path.add_module("SVDSpacePointCreator")
 
     phase2_path = basf2.create_path()
     _add_svd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
@@ -195,17 +193,17 @@ def _add_svd_ckf_implementation(path, cdc_reco_tracks, svd_reco_tracks, phase2=F
         )
     else:
         module_parameters = dict(
-            firstHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_1.xml", "cut": filter_cut,
+            firstHighFilterParameters={"identifier": "ckf_CDCSVDStateFilter_1", "cut": filter_cut,
                                        "direction": direction},
             firstHighUseNStates=use_best_seeds,
 
-            secondHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_2.xml", "cut": filter_cut},
+            secondHighFilterParameters={"identifier": "ckf_CDCSVDStateFilter_2", "cut": filter_cut},
             secondHighUseNStates=use_best_seeds,
 
-            thirdHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_3.xml", "cut": filter_cut},
+            thirdHighFilterParameters={"identifier": "ckf_CDCSVDStateFilter_3", "cut": filter_cut},
             thirdHighUseNStates=use_best_seeds,
 
-            filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_CDCToSVDResult.xml"},
+            filterParameters={"cut": overlap_cut, "identifier": "ckf_CDCToSVDResult"},
             useBestNInSeed=use_best_results,
         )
 

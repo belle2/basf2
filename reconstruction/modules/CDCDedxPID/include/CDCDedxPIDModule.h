@@ -80,14 +80,14 @@ namespace Belle2 {
     virtual ~CDCDedxPIDModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -163,6 +163,7 @@ namespace Belle2 {
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */
     double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
     double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
+    bool m_backHalfCurlers; /**< Whether to use the back half of curlers */
     bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
 
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

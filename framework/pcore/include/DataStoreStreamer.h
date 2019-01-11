@@ -39,6 +39,10 @@ namespace Belle2 {
      *  @param maxthread  maximal number of threads, 0 to disable
      */
     explicit DataStoreStreamer(int complevel = 0, bool handleMergeable = true, int maxthread = 0);
+    /** No copying */
+    DataStoreStreamer(const DataStoreStreamer&) = delete;
+    /** No assignment */
+    DataStoreStreamer& operator=(const DataStoreStreamer&) = delete;
 
     /** destructor */
     ~DataStoreStreamer();
@@ -156,7 +160,7 @@ namespace Belle2 {
     int m_threadin;
     //int m_threadout;
     /** thread decoder status. */
-    int m_decoderStatus[c_maxThreads];
+    int m_decoderStatus[c_maxThreads] {0};
     //MsgHandler* m_pmsghandler[c_maxThreads];
     //    char* m_evtbuf[c_maxThreads];
     //std::queue<char*> m_evtbuf[c_maxThreads];

@@ -117,12 +117,12 @@ class TestTrainingDataInformation(unittest.TestCase):
         path = basf2.create_path()
         path.add_module('VariablesToHistogram', fileName='mcParticlesCount.root',
                         variables=[
-                                   ('NumberOfMCParticlesInEvent(321)', 100, -0.5, 99.5),
-                                   ('NumberOfMCParticlesInEvent(421)', 100, -0.5, 99.5),
-                                   ('NumberOfMCParticlesInEvent(13)', 100, -0.5, 99.5),
-                                   ('NumberOfMCParticlesInEvent(111)', 100, -0.5, 99.5),
-                                   ('NumberOfMCParticlesInEvent(211)', 100, -0.5, 99.5),
-                                   ('NumberOfMCParticlesInEvent(22)', 100, -0.5, 99.5)]
+                            ('NumberOfMCParticlesInEvent(321)', 100, -0.5, 99.5),
+                            ('NumberOfMCParticlesInEvent(421)', 100, -0.5, 99.5),
+                            ('NumberOfMCParticlesInEvent(13)', 100, -0.5, 99.5),
+                            ('NumberOfMCParticlesInEvent(111)', 100, -0.5, 99.5),
+                            ('NumberOfMCParticlesInEvent(211)', 100, -0.5, 99.5),
+                            ('NumberOfMCParticlesInEvent(22)', 100, -0.5, 99.5)]
                         )
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
@@ -187,13 +187,13 @@ class TestTrainingDataInformation(unittest.TestCase):
         x = fei.core.TrainingDataInformation(particles)
 
         mcCounts = {
-                211: {'max': 5.0, 'min': 3.0, 'sum': 79.0, 'avg': 4.3888888888888893, 'std': 0.7556372504852998},
-                321: {'max': 7.0, 'min': 2.0, 'sum': 77.0, 'avg': 4.2777777777777777, 'std': 1.8798804795209585},
-                13: {'max': 5.0, 'min': 5.0, 'sum': 90.0, 'avg': 5.0, 'std': 0.0},
-                22: {'max': 0.0, 'min': 0.0, 'sum': 0.0, 'avg': 0.0, 'std': 0.0},
-                111: {'max': 5.0, 'min': 3.0, 'sum': 74.0, 'avg': 4.1111111111111107, 'std': 0.6573421981221816},
-                421: {'max': 9.0, 'min': 0.0, 'sum': 93.0, 'avg': 5.166666666666667, 'std': 4.2979323194092087},
-                0: {'sum': 18.0}}
+            211: {'max': 5.0, 'min': 3.0, 'sum': 79.0, 'avg': 4.3888888888888893, 'std': 0.7556372504852998},
+            321: {'max': 7.0, 'min': 2.0, 'sum': 77.0, 'avg': 4.2777777777777777, 'std': 1.8798804795209585},
+            13: {'max': 5.0, 'min': 5.0, 'sum': 90.0, 'avg': 5.0, 'std': 0.0},
+            22: {'max': 0.0, 'min': 0.0, 'sum': 0.0, 'avg': 0.0, 'std': 0.0},
+            111: {'max': 5.0, 'min': 3.0, 'sum': 74.0, 'avg': 4.1111111111111107, 'std': 0.6573421981221816},
+            421: {'max': 9.0, 'min': 0.0, 'sum': 93.0, 'avg': 5.166666666666667, 'std': 4.2979323194092087},
+            0: {'sum': 18.0}}
         self.assertDictEqual(x.get_mc_counts(), mcCounts)
 
 
@@ -206,10 +206,14 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
+                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0', '')], addDaughters=True, writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
 
@@ -220,10 +224,14 @@ class TestFSPLoader(unittest.TestCase):
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')],
+                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
+                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0', '')], addDaughters=True, writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
+                        writeOut=True)
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
@@ -284,10 +292,10 @@ class TestTrainingData(unittest.TestCase):
 
     def setUp(self):
         self.mc_counts = {
-                    211: {'sum': 79, 'avg': 4.3888888888888893, 'max': 5, 'min': 3, 'std': 0.75563725048530228},
-                    321: {'sum': 77, 'avg': 4.2777777777777777, 'max': 7, 'min': 2, 'std': 1.8798804795209592},
-                    421: {'sum': 93, 'avg': 5.166666666666667, 'max': 9, 'min': 0, 'std': 4.2979323194092087},
-                    0: {'sum': 18}}
+            211: {'sum': 79, 'avg': 4.3888888888888893, 'max': 5, 'min': 3, 'std': 0.75563725048530228},
+            321: {'sum': 77, 'avg': 4.2777777777777777, 'max': 7, 'min': 2, 'std': 1.8798804795209592},
+            421: {'sum': 93, 'avg': 5.166666666666667, 'max': 9, 'min': 0, 'std': 4.2979323194092087},
+            0: {'sum': 18}}
 
     def test_without_monitoring(self):
         particles = get_small_unittest_channels()
@@ -361,20 +369,17 @@ class TestPreReconstruction(unittest.TestCase):
         path.add_module('VariablesToExtraInfo', particleList='pi+:generic_0', variables={'constant(0)': 'decayModeID'})
         path.add_module('BestCandidateSelection', particleList='pi+:generic_0', variable='piid', selectLowest=False,
                         numBest=20, outputVariable='preCut_rank')
-        path.add_module('MCMatcherParticles', listName='pi+:generic_0')
 
         path.add_module('ParticleListManipulator', inputListNames=['K+:FSP'], outputListName='K+:generic_0',
                         cut='[dr < 2] and [abs(dz) < 4]', writeOut=True)
         path.add_module('VariablesToExtraInfo', particleList='K+:generic_0', variables={'constant(0)': 'decayModeID'})
         path.add_module('BestCandidateSelection', particleList='K+:generic_0', variable='Kid', selectLowest=False,
                         numBest=20, outputVariable='preCut_rank')
-        path.add_module('MCMatcherParticles', listName='K+:generic_0')
 
         path.add_module('ParticleCombiner', decayString='D0:generic_0 ==> K-:generic pi+:generic', writeOut=True,
                         decayMode=0, cut='1.7 < M < 1.95')
         path.add_module('BestCandidateSelection', particleList='D0:generic_0',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
-        path.add_module('MCMatcherParticles', listName='D0:generic_0')
         path.add_module('ParticleVertexFitter', listName='D0:generic_0', confidenceLevel=-2.0,
                         vertexFitter='kfitter', fitType='vertex')
 
@@ -382,7 +387,6 @@ class TestPreReconstruction(unittest.TestCase):
                         decayMode=1, cut='1.7 < M < 1.95')
         path.add_module('BestCandidateSelection', particleList='D0:generic_1',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
-        path.add_module('MCMatcherParticles', listName='D0:generic_1')
         path.add_module('ParticleVertexFitter', listName='D0:generic_1', confidenceLevel=-2.0,
                         vertexFitter='kfitter', fitType='vertex')
 
@@ -741,8 +745,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking_pi+:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_pi+:generic.root', treeName='variables',
-                        variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
-                                   'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                        variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
+                                   'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='pi+:generic')
 
         path.add_module('MVAExpert', identifier='UNITTEST_K+:generic ==> K+:FSP', extraInfoName='SignalProbability',
@@ -795,8 +799,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking_K+:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_K+:generic.root', treeName='variables',
-                        variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
-                                   'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                        variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
+                                   'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='K+:generic')
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> K-:generic pi+:generic',
@@ -868,8 +872,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
                         fileName='Monitor_PostReconstruction_AfterRanking_D0:generic.root')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final_D0:generic.root', treeName='variables',
-                        variables=['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', 'isSignal',
-                                   'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
+                        variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isSignal',
+                                   'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='D0:generic')
 
         print_path(path, x.reconstruct())
@@ -893,7 +897,7 @@ class TestTeacher(unittest.TestCase):
         for i in range(1000):
             isSignal[0] = i % 2
             p[0] = i
-            pt[0] = i*2
+            pt[0] = i * 2
             tree.Fill()
         f.Write("variables")
 
@@ -913,7 +917,7 @@ class TestTeacher(unittest.TestCase):
         for i in range(10):
             isSignal[0] = i % 2
             p[0] = i
-            pt[0] = i*2
+            pt[0] = i * 2
             tree.Fill()
         f.Write("variables")
 
@@ -929,7 +933,7 @@ class TestTeacher(unittest.TestCase):
         for i in range(1000):
             isSignal[0] = i % 2
             p[0] = i
-            pt[0] = i*2
+            pt[0] = i * 2
             tree.Fill()
         f.Write("variables")
 

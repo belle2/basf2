@@ -23,7 +23,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdFSParticles import *
+from stdCharged import stdMu
 from variables import variables
 from ROOT import Belle2
 from glob import glob
@@ -44,14 +44,15 @@ inputMdst('default', input_mdst)
 # with releases with release-00-08-00 or newer
 
 
-loadStdCharged()
+stdMu('all')
 
 reconstructDecay('J/psi -> mu-:all mu+:all', '2.8 < M < 3.3')
 vertexRave('J/psi', 0.0, "J/psi -> ^mu-:all ^mu+:all")
 matchMCTruth('J/psi')
 
-fillParticleList('K_S0', '0.3 < M < 0.7')
-vertexRave('K_S0', 0.0, "K_S0 -> ^pi+:all ^pi-:all")
+# load V0 Kshorts
+fillParticleList('K_S0 -> pi+ pi-', '0.3 < M < 0.7')
+vertexRave('K_S0', 0.0, "K_S0 -> ^pi+ ^pi-")
 matchMCTruth('K_S0')
 
 # Prepare the B candidates

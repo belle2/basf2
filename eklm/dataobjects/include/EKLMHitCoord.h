@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMHITCOORD_H
-#define EKLMHITCOORD_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -82,12 +81,9 @@ namespace Belle2 {
 
   private:
 
-    /** Needed to make objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMHitCoord, 1);
 
   };
 
 }
-
-#endif
-

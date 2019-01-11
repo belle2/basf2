@@ -34,6 +34,9 @@ namespace Belle2 {
       /** Return the neighbours for a given cell ID.*/
       const std::vector<short int>& getNeighbours(short int cid) const;
 
+      /** return number of crystals in a given theta ring */
+      short int getCrystalsPerRing(const short int thetaid) const { return m_crystalsPerRing[thetaid]; }
+
     private:
       /** list of list of neighbour cids. */
       std::vector < std::vector < short int > > m_neighbourMap;

@@ -51,7 +51,7 @@ void test2_1150720000() {
   t->Project("h_deltae_clean","B0_sigDE1","B0_isSignalAcceptMissingNeutrino == 1");
   t->Project("h_mbc","B0_sigMbc0","B0_isSignalAcceptMissingNeutrino == 1");
   t->Project("h_mbc_clean","B0_sigMbc1","B0_isSignalAcceptMissingNeutrino == 1");
-  t->Project("h_costheta","B0_cosThetaBetweenParticleAndTrueB","B0_isSignalAcceptMissingNeutrino == 1");
+  t->Project("h_costheta","B0_cosThetaBetweenParticleAndNominalB","B0_isSignalAcceptMissingNeutrino == 1");
 
   h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "B^{0} #rightarrow #pi l #nu  #DeltaE [GeV]"));
   h_deltae->GetListOfFunctions()->Add(new TNamed("Contact" , "mario.merola@na.infn.it"));

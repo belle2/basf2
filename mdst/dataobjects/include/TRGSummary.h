@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Hideyuki Nakazawa, Thomas Hauth                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,9 @@
 #ifndef TRGSUMMARY_H
 #define TRGSUMMARY_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
+
+#include <string>
 
 namespace Belle2 {
 
@@ -26,9 +28,15 @@ namespace Belle2 {
    *   timType
    *     types of trigger timing source defined in b2tt firmware
    */
-  class TRGSummary : public TObject {
+  class TRGSummary final : public RelationsObject {
 
   public:
+
+    /** size of a l1 trigger word */
+    static const unsigned int c_trgWordSize = 32;
+
+    /** number of l1 trigger words */
+    static const unsigned int c_ntrgWords = 10;
 
     /** types of trigger timing source defined in b2tt firmware */
     enum ETimingType {
@@ -67,29 +75,56 @@ namespace Belle2 {
     };
 
     /*! default constructor: xxx */
-    TRGSummary() {;}
+    TRGSummary() = default;
 
     /*! constructor: xxx */
     TRGSummary(unsigned int inputBits[10],
                unsigned int ftdlBits[10],
                unsigned int psnmBits[10],
-               ETimingType timType)
-    {
-      for (int i = 0; i < 10; i++) {
-        m_inputBits[i] = inputBits[i];
-        m_ftdlBits[i] = ftdlBits[i];
-        m_psnmBits[i] = psnmBits[i];
-      }
-      m_timType = timType;
-    }
+               ETimingType timType);
 
-    /** Destructor.
+    /** check whether any psnm bit is set
+     * @return True if triggered by L1
      */
-    ~TRGSummary() {}
+    bool test() const;
 
-    /*! setter
-     * @param xxx explanation
+    /** check whether an input bit is set
+     * @param bit index of input bit.
+     * @return True if the bit is set
      */
+    bool testInput(unsigned int bit) const;
+
+    /** check whether an input bit is set
+     * @param name name of input bit.
+     * @return True if the bit is set
+     */
+    bool testInput(const std::string& name) const {return testInput(getInputBitNumber(name));}
+
+    /** check whether a ftdl bit is set
+     * @param bit index of ftdl bit.
+     * @return True if the bit is set
+     */
+    bool testFtdl(unsigned int bit) const;
+
+    /** check whether a ftdl bit is set
+     * @param name name of ftdl bit.
+     * @return True if the bit is set
+     */
+    bool testFtdl(const std::string& name) const {return testFtdl(getOutputBitNumber(name));}
+
+    /** check whether a psnm bit is set
+     * @param bit index of psnm bit.
+     * @return True if the bit is set
+     */
+    bool testPsnm(unsigned int bit) const;
+
+    /** check whether a psnm bit is set
+     * @param name name of psnm bit.
+     * @return True if the bit is set
+     */
+    bool testPsnm(const std::string& name) const {return testPsnm(getOutputBitNumber(name));}
+
+    /**set the Final Trigger Decision Logic bit*/
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
 
     /**set the prescale factor of each bit*/
@@ -105,10 +140,10 @@ namespace Belle2 {
     void setPsnmBits(int i, int word) {m_psnmBits[i] = word;}
 
     /** get the trigger result, each word has 32 bits*/
-    unsigned int getTRGSummary(int i) {return m_ftdlBits[i];}
+    unsigned int getTRGSummary(int i) const {return m_ftdlBits[i];}
 
     /** get the prescale factor which the bit is corresponding*/
-    unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
+    unsigned int getPreScale(int i, int bit) const {return m_prescaleBits[i][bit];}
 
     /**set the timType */
     void setTimType(ETimingType timType) {m_timType = timType;}
@@ -148,7 +183,25 @@ namespace Belle2 {
       return m_timType;
     }
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const override;
+
   private:
+
+    /** get number of an input trigger bit
+     * @param name input trigger bit name
+     * @return     input trigger bit number
+    */
+    unsigned int getInputBitNumber(const std::string& name) const;
+
+    /** get number of an output trigger bit
+     * @param name output trigger bit name
+     * @return     output trigger bit number
+    */
+    unsigned int getOutputBitNumber(const std::string& name) const;
+
+    /** return the td part of an HTML table with green of the bit is > 0 */
+    std::string outputBitWithColor(bool bit) const;
 
     /**
      * version of this code
@@ -156,25 +209,24 @@ namespace Belle2 {
     static const int c_Version = 1;
 
     /** input bits from subdetectors */
-    unsigned int m_inputBits[10] = {0};
+    unsigned int m_inputBits[c_ntrgWords] = {0};
 
     /** ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
-    unsigned int m_ftdlBits[10] = {0};
+    unsigned int m_ftdlBits[c_ntrgWords] = {0};
 
     /*! psnm (PreScale aNd Mask) bits. Prescaled ftdl bits
      * For instance, if the prescale factor is 20 of a ftdl bit, only 1/20 of its psnm bit would be fired.
      */
-    unsigned int m_psnmBits[10] = {0};
+    unsigned int m_psnmBits[c_ntrgWords] = {0};
 
     /** types of trigger timing source defined in b2tt firmware */
     ETimingType m_timType = TTYP_NONE;
 
     /** the prescale factor of each bit*/
-    unsigned int m_prescaleBits[10][32] = {0};
+    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
-    ClassDef(TRGSummary, 3);
-
+    ClassDefOverride(TRGSummary, 5);
   };
 
 

@@ -7,8 +7,8 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-#ifndef DECAYSTRINGPARTICLE_H
-#define DECAYSTRINGPARTICLE_H
+
+#pragma once
 #include <string>
 #include <boost/fusion/include/adapt_struct.hpp>
 
@@ -36,6 +36,3 @@ BOOST_FUSION_ADAPT_STRUCT(
   (std::string, m_strName)
   (std::string, m_strLabel)
 )
-
-#endif // DECAYSTRINGPARTICLE_H
-

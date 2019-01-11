@@ -50,49 +50,7 @@ REG_MODULE(ECLBackground)
 //-----------------------------------------------------------------
 
 
-ECLBackgroundModule::ECLBackgroundModule() :
-  HistoModule(),
-  m_nEvent(0),
-  h_nECLSimHits(0),
-  h_CrystalRadDoseTheta(0),
-  h_CrystalRadDose(0),
-  h_CrystalThetaID2(0),
-  h_CrystalThetaID67(0),
-  h_HitLocations(0),
-  h_BarrelDose(0),
-  h_DiodeRadDose(0),
-  h_NeutronFlux(0),
-  h_NeutronFluxThetaID2(0),
-  h_NeutronFluxThetaID67(0),
-  h_NeutronE(0),
-  h_NeutronEThetaID0(0),
-  h_PhotonE(0),
-  h_ShowerVsTheta(0),
-  h_Shower(0),
-  h_ProdVert(0),
-  h_ProdVertvsThetaId(0),
-  Crystal{0},
-  m_arichgp(0),
-  nHAPDperRing{0},
-  hEMDose(0),
-  hEnergyPerCrystal(0),
-  hDiodeFlux(0),
-  hEgamma(0),
-  hEneu(0),
-  hARICHDoseBB(0),
-  hHAPDFlux(0),
-  hEnergyPerCrystalECF(0),
-  hEnergyPerCrystalECB(0),
-  hEnergyPerCrystalBAR(0),
-  hEnergyPerCrystalWideTID(0),
-  hEMDoseECF(0),
-  hEMDoseECB(0),
-  hEMDoseBAR(0),
-  hEMDoseWideTID(0),
-  hDiodeFluxECF(0),
-  hDiodeFluxECB(0),
-  hDiodeFluxBAR(0),
-  hDiodeFluxWideTID(0)
+ECLBackgroundModule::ECLBackgroundModule() : HistoModule()
 {
   //Set module properties
   setDescription("Processes background campaigns and produces histograms. Requires HistoManager");
@@ -227,9 +185,8 @@ void ECLBackgroundModule::event()
 
 
   //some variables that will be used many times
-  int m_cellID, m_thetaID, m_phiID, pid, NperRing, SubDet;
-  double edep, theta, dose, damage, Energy, diodeDose, weightedFlux;
-  float Mass;
+  int m_cellID, m_thetaID, m_phiID, pid, NperRing;
+  double edep, theta, Energy, diodeDose, weightedFlux;
   TVector3 rHit;
 
   //ignore events with huge number of SimHits (usually a glitchy event)
@@ -262,15 +219,15 @@ void ECLBackgroundModule::event()
   int hitNum = m_eclArray.getEntries();
   for (int i = 0; i < hitNum; i++) { //loop over ECLSimHits
     ECLSimHit* aECLHit = m_eclArray[i];
-    m_cellID  = aECLHit->getCellId() - 1; //cell ID
-    edep      = aECLHit->getEnergyDep();  //energy deposited
+    m_cellID    = aECLHit->getCellId() - 1; //cell ID
+    edep        = aECLHit->getEnergyDep();  //energy deposited
     G4ThreeVector hitPosn   = aECLHit->getPosition();   //position of hit
-    pid       = aECLHit->getPDGCode();
-    Mass      = Crystal[m_cellID]->GetMass();
-    m_thetaID = Crystal[m_cellID]->GetThetaID();
-    m_phiID   = Crystal[m_cellID]->GetPhiID();
-    NperRing  = Crystal[m_cellID]->GetNperThetaID();   //number of crystals in this theta ring
-    theta     = Crystal[m_cellID]->GetTheta();
+    pid         = aECLHit->getPDGCode();
+    float Mass  = Crystal[m_cellID]->GetMass();
+    m_thetaID   = Crystal[m_cellID]->GetThetaID();
+    m_phiID     = Crystal[m_cellID]->GetPhiID();
+    NperRing    = Crystal[m_cellID]->GetNperThetaID();   //number of crystals in this theta ring
+    theta       = Crystal[m_cellID]->GetTheta();
 
 
     //get Track ID of photons which create the SimHits
@@ -285,7 +242,7 @@ void ECLBackgroundModule::event()
 
     //fill histograms
     //radiation dose for this SimHit
-    dose = edep * GeVtoJ * usInYr / (m_sampleTime * Mass);
+    double dose = edep * GeVtoJ * usInYr / (m_sampleTime * Mass);
 
     h_CrystalRadDoseTheta->Fill(theta, dose / NperRing);
     h_CrystalRadDose->AddBinContent(m_thetaID + 1,  dose / NperRing);
@@ -351,12 +308,12 @@ void ECLBackgroundModule::event()
 
     //get relevant values
     m_cellID = aBeamBackSimHit->getIdentifier();
-    damage   = aBeamBackSimHit->getNeutronWeight();
-    edep     = aBeamBackSimHit->getEnergyDeposit();
-    pid      = aBeamBackSimHit->getPDG();
-    SubDet   = aBeamBackSimHit->getSubDet();
-    Energy   = aBeamBackSimHit->getEnergy();
-    rHit     = aBeamBackSimHit->getPosition();
+    double damage = aBeamBackSimHit->getNeutronWeight();
+    edep          = aBeamBackSimHit->getEnergyDeposit();
+    pid           = aBeamBackSimHit->getPDG();
+    int SubDet    = aBeamBackSimHit->getSubDet();
+    Energy = aBeamBackSimHit->getEnergy();
+    rHit          = aBeamBackSimHit->getPosition();
 
 
     if (SubDet == 6) { //ECL
@@ -538,10 +495,9 @@ int ECLBackgroundModule::SetPosHistos(TH1F* h, TH2F* hFWD, TH2F* hBAR, TH2F* hBW
   sprintf(BWDname, "%sBWD", h->GetName());
   sprintf(BARname, "%sBAR", h->GetName());
 
-  float value = 0;
   // Fill 2D histograms with the values in the 1D histogram
   for (int i = 0; i < nECLCrystalTot; i++)  {
-    value = h->GetBinContent(i + 1);
+    float value = h->GetBinContent(i + 1);
 
     if (i < nECLCrystalECF) {
       hFWD->Fill(floor(Crystal[i]->GetX()), floor(Crystal[i]->GetY()), value);

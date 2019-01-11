@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# @cond
+
 # Thomas Keck 2016
 
 """
@@ -72,7 +74,7 @@ PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to ke
 DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
 DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
-DecayChannel.name.__doc__ = "Name of the channel e.g. D0:generic_0"
+DecayChannel.name.__doc__ = "str:Name of the channel e.g. D0:generic_0"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weightfiles independent of decayModeID"
 DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"
@@ -97,7 +99,7 @@ MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'isPrimarySignal': ('isPrimarySignal', 2, -0.5, 1.5),
                              'chiProb': ('chiProb', 100, 0.0, 1.0),
                              'Mbc': ('Mbc', 100, 5.1, 5.4),
-                             'cosThetaBetweenParticleAndTrueB': ('cosThetaBetweenParticleAndTrueB', 100, -10.0, 10.0),
+                             'cosThetaBetweenParticleAndNominalB': ('cosThetaBetweenParticleAndNominalB', 100, -10.0, 10.0),
                              'extraInfo(SignalProbability)': ('extraInfo(SignalProbability)', 100, 0.0, 1.0),
                              'extraInfo(decayModeID)': ('extraInfo(decayModeID)', 101, -0.5, 100.5),
                              'extraInfo(uniqueSignal)': ('extraInfo(uniqueSignal)', 2, -0.5, 1.5),

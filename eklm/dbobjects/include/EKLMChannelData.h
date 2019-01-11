@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMCHANNELDATA_H
-#define EKLMCHANNELDATA_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -74,6 +73,16 @@ namespace Belle2 {
     void setThreshold(int threshold);
 
     /**
+     * Get voltage.
+     */
+    float getVoltage() const;
+
+    /**
+     * Set voltage.
+     */
+    void setVoltage(float voltage);
+
+    /**
      * Get adjustment voltage.
      */
     int getAdjustmentVoltage() const;
@@ -84,14 +93,24 @@ namespace Belle2 {
     void setAdjustmentVoltage(int adjustmentVoltage);
 
     /**
-     * Get lookback window.
+     * Get lookback time (unit is 32 TDC counts).
      */
-    int getLookbackWindow() const;
+    int getLookbackTime() const;
 
     /**
-     * Set lookback window.
+     * Set lookback time (unit is 32 TDC counts).
      */
-    void setLookbackWindow(int lookbackWindow);
+    void setLookbackTime(int lookbackTime);
+
+    /**
+     * Get lookback window width (unit is 32 TDC counts).
+     */
+    int getLookbackWindowWidth() const;
+
+    /**
+     * Set lookback window width (unit is 32 TDC counts).
+     */
+    void setLookbackWindowWidth(int lookbackWindowWidth);
 
   private:
 
@@ -107,18 +126,21 @@ namespace Belle2 {
     /** Threshold (maximal EKLMDigit.m_Charge). */
     int m_Threshold;
 
+    /** Voltage. */
+    float m_Voltage;
+
     /** Adjustment voltage. */
     int m_AdjustmentVoltage;
 
-    /** Lookback window. */
-    int m_LookbackWindow;
+    /** Lookback time (unit is 32 TDC counts). */
+    int m_LookbackTime;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMChannelData, 2);
+    /** Lookback window width (unit is 32 TDC counts). */
+    int m_LookbackWindowWidth;
+
+    /** Class version. */
+    ClassDef(Belle2::EKLMChannelData, 4);
 
   };
 
 }
-
-#endif
-

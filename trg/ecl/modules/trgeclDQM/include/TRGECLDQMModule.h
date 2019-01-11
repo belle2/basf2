@@ -3,6 +3,7 @@
 
 #include <framework/core/HistoModule.h>
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
+#include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
 #include <trg/ecl/TrgEclCluster.h>
@@ -13,7 +14,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
-using namespace std;
+//using namespace std;
 
 namespace Belle2 {
 
@@ -27,23 +28,23 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun();
+    virtual void endRun() override;
     //! terminate
-    virtual void terminate();
+    virtual void terminate() override;
     //! Define Histogram
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
     /** Object of TC Clustering */
     TrgEclCluster* _TCCluster;
     //! TCId histogram
-    TH2* h_TC2d;
+    //TH2* h_TC2d;
     //! TCId histogram
     TH1* h_TCId;
     //! TCthetaId histogram
@@ -86,6 +87,7 @@ namespace Belle2 {
 
     //!
     StoreArray<TRGECLUnpackerStore> trgeclHitArray;
+    StoreArray<TRGECLUnpackerEvtStore> trgeclEvtArray;
     StoreArray<TRGECLCluster> trgeclCluster;
   };
 

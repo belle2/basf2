@@ -82,9 +82,13 @@ class Chi2Test(ComparisonBase):
         self.debug = debug
 
         # Those will only be accessed via methods.
+        #: pvalue
         self._pvalue = None
+        #: chi2
         self._chi2 = None
+        #: chi2 / number of degrees of freedom
         self._chi2ndf = None
+        #: number of degrees of freedom
         self._ndf = None
 
     def can_compare(self):
@@ -352,10 +356,12 @@ class TablePrinter(object):
         @param ncols: Number of columns
         @param width: Width of each column. Either int or list.
         """
+        #: the number of columns
         self.ncols = ncols
         if not width:
             width = 10
         if isinstance(width, int):
+            #: width of each column
             self.widths = [width] * ncols
         elif isinstance(width, list) or isinstance(width, tuple):
             # let's hope this is a list then.

@@ -678,13 +678,13 @@ Bad variable name
 
 If you encounter a bad variable name
 
-.. code-block:: c
+.. code-block:: text
 
         [WARNING] Encountered bad variable name 'Kid'. Maybe you misspelled it?  { module: MVAExpert }
 
 and afterwards a segmentation fault
 
-.. code-block:: c
+.. code-block:: text
 
 	===========================================================
 	There was a crash.

@@ -60,7 +60,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
            "0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by >50%, higher levels have no noticeable effect. On typical hard disks, disabling compression reduces write time by 10-20 %, but almost doubles read time, so you probably should leave this turned on.",
            m_compressionLevel);
   addParam("compressionAlgorithm", m_compressionAlgorithm,
-           "Set the Compression algorithm. Recommended values are 0 for default, 1 for zlib and 4 for lz4", m_compressionAlgorithm);
+           "Set the Compression algorithm. Recommended values are 0 for default, 1 for zlib and 4 for lz4\n\n"
+           ".. versionadded:: release-03-00-00" , m_compressionAlgorithm);
   addParam("splitLevel", m_splitLevel,
            "Branch split level: determines up to which depth object members will be saved in separate sub-branches in the tree. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used. The default (99) usually gives the highest read performance with RootInput.",
            99);
@@ -100,9 +101,10 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
            m_keepParents);
   addParam("outputSplitSize", m_outputSplitSize, R"DOC(
 If given split the output file once the file has reached the given size in MB.
-If set the filename will end in ``.f{index:05d}.root``. So if ``outputFileName="RootOutput.root"``
-then the files will be named ``RootOutput.f00000.root, RootOutput.f00001.root,
-RootOutput.f00002.root, ...``.
+If set the filename will end in ``.f{index:05d}.root``. So if for example
+``outputFileName`` is set to "RootOutput.root" then the files will be named
+``RootOutput.f00000.root``, ``RootOutput.f00001.root``,
+``RootOutput.f00002.root``, ...
 
 All created output files are complete and independent files and can
 subsequently processed completely independent.
@@ -111,8 +113,15 @@ Note:
   The output files will be approximately of the size given by
   ``outputSplitSize`` but they will be slightly larger since
   additional information has to be written at the end of the file. If necessary
-  please account for this. Also, using `buildIndex=False` might be beneficial
+  please account for this. Also, using ``buildIndex=False`` might be beneficial
   to reduce the overshoot.
+
+Warning:
+  This will set the amount of generated events stored in the file metadata to
+  zero as it is not possible to determine which fraction ends up in which
+  output file.
+
+.. versionadded:: release-03-00-00
 )DOC", m_outputSplitSize);
 }
 

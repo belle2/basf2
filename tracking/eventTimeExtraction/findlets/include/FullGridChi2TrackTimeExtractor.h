@@ -17,6 +17,9 @@
 namespace Belle2 {
   class RecoTrack;
 
+  // Guard to prevent repeated instantiations
+  extern template class GridEventTimeExtractor<Chi2BasedEventTimeExtractor>;
+
   class FullGridChi2TrackTimeExtractor final : public BaseEventTimeExtractor<RecoTrack*> {
   private:
     /// Type of the base class

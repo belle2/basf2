@@ -19,7 +19,8 @@ Recommended final-state particle list builder functions
 -------------------------------------------------------
 
 .. autofunction:: stdPhotons.stdPhotons
-.. autofunction:: stdPhotons.stdPi0s
+.. broken as it doesn't exist
+   .. autofunction:: stdPhotons.stdPi0s
 .. autofunction:: stdCharged.stdPi
 .. autofunction:: stdCharged.stdK
 .. autofunction:: stdCharged.stdPr

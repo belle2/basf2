@@ -41,13 +41,11 @@ namespace QualityEstimatorTests {
     auto spacePoint2 = SpacePoint(position2, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
     auto spacePoint3 = SpacePoint(position3, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
 
-
     std::vector<SpacePoint const*> hitlist;
     hitlist.reserve(3);
     hitlist.push_back(&spacePoint1);
     hitlist.push_back(&spacePoint2);
     hitlist.push_back(&spacePoint3);
-
 
     // Perform fit
     auto result = qualityEstimator.estimateQualityAndProperties(hitlist);
@@ -59,6 +57,10 @@ namespace QualityEstimatorTests {
     position1 = B2Vector3<double>(0., 0., 0.);
     position2 = B2Vector3<double>(1., 1., 1.);
     position3 = B2Vector3<double>(2., 0., 2.);
+
+    spacePoint1 = SpacePoint(position1, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
+    spacePoint2 = SpacePoint(position2, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
+    spacePoint3 = SpacePoint(position3, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
 
     hitlist.clear();
     hitlist.push_back(&spacePoint1);
@@ -75,7 +77,6 @@ namespace QualityEstimatorTests {
     position3 = B2Vector3<double>(2., 0., 2. + 1e-6);
     spacePoint3 = SpacePoint(position3, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
 
-
     hitlist.clear();
     hitlist.push_back(&spacePoint1);
     hitlist.push_back(&spacePoint2);
@@ -88,7 +89,6 @@ namespace QualityEstimatorTests {
     // Move one hit away from circle
     position3 = B2Vector3<double>(2. + 1e-6, 0., 2.);
     spacePoint3 = SpacePoint(position3, sigma, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
-
 
     hitlist.clear();
     hitlist.push_back(&spacePoint1);

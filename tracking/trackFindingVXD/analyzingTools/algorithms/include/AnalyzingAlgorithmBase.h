@@ -32,7 +32,7 @@ namespace Belle2 {
     /** minimal struct for keeping track which tc is which */
     struct TcPair {
       /** standard constructor sets NULL-ptrs. */
-      TcPair() : refTC(NULL), testTC(NULL) {}
+      TcPair() : refTC(nullptr), testTC(nullptr) {}
 
       /** constructor sets valid values */
       TcPair(const TCInfoType& aRefTC, const TCInfoType& aTestTC) : refTC(&aRefTC), testTC(&aTestTC) {}
@@ -63,16 +63,15 @@ namespace Belle2 {
 
 
     /** constructor used for inheriting classes */
-    AnalyzingAlgorithmBase(AlgoritmType::Type newID) : m_iD(newID) {}
+    explicit AnalyzingAlgorithmBase(const AlgoritmType::Type& newID) : m_iD(newID) {}
 
     /** constructor used for inheriting classes */
-    AnalyzingAlgorithmBase(std::string newID) : m_iD(AlgoritmType::getTypeEnum(newID)) {}
+    explicit AnalyzingAlgorithmBase(const std::string& newID) : m_iD(AlgoritmType::getTypeEnum(newID)) {}
 
-    /** copy constructor */
-    AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) : m_iD(algo.m_iD)
-    {
-      B2ERROR("AnalyzingAlgorithmBase-copy-constructor has been called!");
-    }
+    /** copy constructor should not be used so delete it*/
+    AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) = delete;
+    /** also assignement constructor should not be used */
+    AnalyzingAlgorithmBase& operator = (const AnalyzingAlgorithmBase& algo) = delete;
 
 
     /** virtual class to determine the correct TC to be used for algorithm calculation.
@@ -169,25 +168,25 @@ namespace Belle2 {
 
   /** non-memberfunction Comparison for equality with a std::string */
   template <class DataType, class TCInfoType, class VectorType>
-  inline bool operator == (const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& a, std::string b)
+  inline bool operator == (const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& a, const std::string& b)
   { return (a.getIDName() == b); }
 
 
   /** non-memberfunction Comparison for equality with a std::string */
   template <class DataType, class TCInfoType, class VectorType>
-  inline bool operator == (std::string a, const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& b)
+  inline bool operator == (const std::string& a, const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& b)
   { return (a == b.getIDName()); }
 
 
   /** non-memberfunction Comparison for equality with a AlgoritmType::Type */
   template <class DataType, class TCInfoType, class VectorType>
-  inline bool operator == (const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& a, AlgoritmType::Type b)
+  inline bool operator == (const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& a, const AlgoritmType::Type& b)
   { return (a.getID() == b); }
 
 
   /** non-memberfunction Comparison for equality with a AlgoritmType::Type */
   template <class DataType, class TCInfoType, class VectorType>
-  inline bool operator == (AlgoritmType::Type a, const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& b)
+  inline bool operator == (const AlgoritmType::Type& a, const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& b)
   { return (a == b.getID()); }
 
 }

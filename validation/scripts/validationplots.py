@@ -2,38 +2,30 @@
 # -*- coding: utf-8 -*-
 
 # Normal imports
-import argparse
 import glob
-import datetime
-import glob
-import math
 import os
-import pickle
 import re
-import shutil
 import sys
-import time
-import numbers
 import queue
+
 # Load ROOT
 import ROOT
-# In case some ROOT files loaded by the validation scripts contain some RooFit objects,
-# ROOT will auto-load RooFit. Due to some (yet not understood) tear down problem, this results
-# in this errror
-# Fatal in <TClass::SetUnloaded>: The TClass for map<TString,double> is being unloaded when in state 3
-# To prevent this, we are loading RooFit here before ROOT has a chance to do this
+# In case some ROOT files loaded by the validation scripts contain some
+# RooFit objects, ROOT will auto-load RooFit. Due to some (yet not
+# understood) tear down problem, this results in this errror:
+# Fatal in <TClass::SetUnloaded>: The TClass for map<TString,double> is being
+# unloaded when in state 3 To prevent this, we are loading RooFit here
+# before ROOT has a chance to do this
 from ROOT import RooFit
+
 # The pretty printer. Print prettier :)
 import pprint
-import time
-import json
 import json_objects
 
-import validationcomparison
 import validationpath
 from validationplotuple import Plotuple
-import metaoptions
-from validationfunctions import strip_ext, index_from_revision, get_style, available_revisions
+from validationfunctions import index_from_revision, get_style, \
+    available_revisions
 
 try:
     import simplejson as json
@@ -56,19 +48,20 @@ PackageSeperatorToken = "__:__"
 
 
 def largest_name(name):
-    nameArr = []
+    name_arr = []
     for plts in os.listdir(name):
         plts = plts.strip()
         if plts.endswith(".png"):
-            nameArr.append(len(plts[:-4]))
-    return max(nameArr)
+            name_arr.append(len(plts[:-4]))
+    return max(name_arr)
 
 
-def nPvLT(pValDict, number):
-    for pval in pValDict.values():
-        if isinstance(pval, numbers.Number) and pval <= number:
-            return 0
-    return 1
+# Doesn't seem to be used, leaving it here for now /klieret
+# def nPvLT(pValDict, number):
+#     for pval in pValDict.values():
+#         if isinstance(pval, numbers.Number) and pval <= number:
+#             return 0
+#     return 1
 
 
 def date_from_revision(revision, work_folder):
@@ -189,8 +182,8 @@ def get_reference_files():
     # This is where we store the paths of reference ROOT files we've found
     results = {'local': [], 'central': []}
 
-    # validation folder name used by the packages to keep the validation reference
-    # plots
+    # validation folder name used by the packages to keep the validation
+    # reference plots
     validation_folder_name = 'validation'
     validation_test_folder_name = 'validation-test'
 
@@ -204,13 +197,24 @@ def get_reference_files():
 
         # list all available packages
         root = basepaths[location]
-        # searches for a validation folder in any top-most folder (package folders) and
-        # lists all root-files within
+        # searches for a validation folder in any top-most folder (package
+        # folders) and lists all root-files within
         glob_search = os.path.join(root, "*", validation_folder_name, "*.root")
-        revision_root_files = [os.path.abspath(f) for f in glob.glob(glob_search) if os.path.isfile(f)]
+        revision_root_files = [
+            os.path.abspath(f) for f in glob.glob(glob_search)
+            if os.path.isfile(f)
+        ]
         # also look in the folder containing the validation tests
-        glob_search = os.path.join(root, "*", validation_test_folder_name, "*.root")
-        revision_root_files += [os.path.abspath(f) for f in glob.glob(glob_search) if os.path.isfile(f)]
+        glob_search = os.path.join(
+            root,
+            "*",
+            validation_test_folder_name,
+            "*.root"
+        )
+        revision_root_files += [
+            os.path.abspath(f) for f in glob.glob(glob_search)
+            if os.path.isfile(f)
+        ]
 
         # this looks very much like a root file, store
         results[location] += revision_root_files
@@ -238,20 +242,28 @@ def get_reference_files():
     return results['local'] + results['central']
 
 
-def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
+def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
+                       root_error_ignore_level=ROOT.kWarning):
     """
-    Creates the plots that
-    contain the requested revisions. Each plot (or n-tuple, for that matter)
-    is stored in an object of class Plot.
+    Creates the plots that contain the requested revisions. Each plot (or
+    n-tuple, for that matter) is stored in an object of class Plot.
+    @param list_of_revisions
+    @param work_folder: Folder containing results
     @param process_queue: communication queue object, which is used in
            multi-processing mode to report the progress of the plot creating.
-    :return: No return value
+    @param root_error_ignore_level: Value for gErrorIgnoreLevel. Default:
+        ROOT.kWarning. If set to None, global level will be left unchanged.
+    @return: No return value
     """
 
     # Since we are going to plot, we need to initialize ROOT
     ROOT.gROOT.SetBatch()
     ROOT.gStyle.SetOptStat(1110)
     ROOT.gStyle.SetOptFit(101)
+
+    # Prevent cluttering with ROOT info messages
+    if root_error_ignore_level is not None:
+        ROOT.gErrorIgnoreLevel = root_error_ignore_level
 
     # Before we can start plotting, we of course need to collect all
     # ROOT-files that contain data for the plot that we want, e.g. we need to
@@ -270,8 +282,18 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
 
     # Now create the ROOT objects for the plot and the reference objects,
     # and get the lists of keys and packages
-    plot_objects, plot_keys, plot_packages = create_RootObjects_from_list(list_of_plot_files, False, work_folder)
-    reference_objects, reference_keys, reference_packages = create_RootObjects_from_list(list_of_reference_files, True, work_folder)
+    plot_objects, plot_keys, plot_packages = \
+        create_tobjects_from_list(
+            list_of_plot_files,
+            False,
+            work_folder
+        )
+    reference_objects, reference_keys, reference_packages = \
+        create_tobjects_from_list(
+            list_of_reference_files,
+            True,
+            work_folder
+        )
 
     # Get the joint lists (and remove duplicates if applicable)
     list_of_root_objects = plot_objects + reference_objects
@@ -280,8 +302,14 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
 
     # Open the output file
     # First: Create destination directory if it does not yet exist
-    content_dir = validationpath.get_html_plots_tag_comparison_folder(work_folder, list_of_revisions)
-    comparison_json_file = validationpath.get_html_plots_tag_comparison_json(work_folder, list_of_revisions)
+    content_dir = validationpath.get_html_plots_tag_comparison_folder(
+        work_folder,
+        list_of_revisions
+    )
+    comparison_json_file = validationpath.get_html_plots_tag_comparison_json(
+        work_folder,
+        list_of_revisions
+    )
 
     if not os.path.exists(content_dir):
         os.makedirs(content_dir)
@@ -289,12 +317,12 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
     comparison_packages = []
 
     # for every package
-    i = 0
-    for package in sorted(list_of_packages):
-        i = i + 1
+    for i, package in enumerate(sorted(list_of_packages)):
 
         # Some information to be printed out while the plots are created
-        print('Now creating plots for package: {0}'.format(package))
+        print("*" * 80)
+        print('Creating plots for package: {0}'.format(package))
+        print("*" * 80)
 
         # A list of all objects (including reference objects) that
         # belong to the current package
@@ -319,20 +347,24 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
         for rootfile in files_in_pkg:
             # todo: remove, only for debugging
             # time.sleep(2.5)
-            fileName, fileExt = os.path.splitext(rootfile)
+            file_name, file_ext = os.path.splitext(rootfile)
 
             # Some more information to be printed out while plots are
             # being created
-            print('\nNow creating plots for file: {0}'.format(rootfile))
+            print('Creating plots for file: {0}'.format(rootfile))
 
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
-            objects_in_pkg_and_file = find_root_object(objects_in_pkg,
-                                                       rootfile=".*/" + rootfile + ".*")
+            objects_in_pkg_and_file = find_root_object(
+                objects_in_pkg,
+                rootfile=".*/" + rootfile + ".*"
+            )
 
             # And then the reference objects
-            objects_in_pkg_and_file += find_root_object(reference_objects,
-                                                        rootfile=".*/" + rootfile + ".*")
+            objects_in_pkg_and_file += find_root_object(
+                reference_objects,
+                rootfile=".*/" + rootfile + ".*"
+            )
 
             # A list in which we keep all the plotuples for this file
             list_of_plotuples = []
@@ -340,21 +372,27 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
             # report the progress over the queue object, if available
             if process_queue:
                 try:
-                    process_queue.put_nowait({"current_package": i, "total_package": len(list_of_packages),
-                                              "status": "running", "package_name": package, "file_name": fileName})
+                    process_queue.put_nowait(
+                        {
+                            "current_package": i,
+                            "total_package": len(list_of_packages),
+                            "status": "running",
+                            "package_name": package,
+                            "file_name": file_name
+                        }
+                    )
                 except queue.Full:
-                    # message could not be placed, but no problem next message will maybe work
+                    # message could not be placed, but no problem next message
+                    # will maybe work
                     pass
 
             # Now loop over ALL keys (within a file, objects will be
             # sorted by key)
-            i_key = 0
             compare_plots = []
             compare_ntuples = []
             compare_html_content = []
             has_reference = False
             for key in sorted(list_of_keys):
-                i_key = i_key + 1
 
                 # Find all objects for the Plotuple that is defined by the
                 # package, the file and the key
@@ -366,56 +404,78 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
                     continue
 
                 # Otherwise we can generate Plotuple object
-                plotuple = Plotuple(root_objects, list_of_revisions, work_folder)
+                plotuple = Plotuple(
+                    root_objects,
+                    list_of_revisions,
+                    work_folder
+                )
                 list_of_plotuples.append(plotuple)
                 has_reference = plotuple.has_reference()
 
-                if (plotuple.type == 'TNtuple'):
-                    compare_ntuples.append(json_objects.ComparisonNTuple(title=plotuple.get_plot_title(),
-                                                                         description=plotuple.description,
-                                                                         contact=plotuple.contact,
-                                                                         check=plotuple.check,
-                                                                         is_expert=plotuple.is_expert(),
-                                                                         json_file_path=plotuple.file))
+                if plotuple.type == 'TNtuple':
+                    compare_ntuples.append(
+                        json_objects.ComparisonNTuple(
+                            title=plotuple.get_plot_title(),
+                            description=plotuple.description,
+                            contact=plotuple.contact,
+                            check=plotuple.check,
+                            is_expert=plotuple.is_expert(),
+                            json_file_path=plotuple.file
+                        )
+                    )
                 elif plotuple.type == 'TNamed':
-                    compare_html_content.append(json_objects.ComparisonHtmlContent(title=plotuple.get_plot_title(),
-                                                                                   description=plotuple.description,
-                                                                                   contact=plotuple.contact,
-                                                                                   check=plotuple.check,
-                                                                                   is_expert=plotuple.is_expert(),
-                                                                                   html_content=plotuple.html_content))
+                    compare_html_content.append(
+                        json_objects.ComparisonHtmlContent(
+                            title=plotuple.get_plot_title(),
+                            description=plotuple.description,
+                            contact=plotuple.contact,
+                            check=plotuple.check,
+                            is_expert=plotuple.is_expert(),
+                            html_content=plotuple.html_content
+                        )
+                    )
                 else:
-                    compare_plots.append(json_objects.ComparisonPlot(title=plotuple.get_plot_title(),
-                                                                     comparison_result=plotuple.comparison_result,
-                                                                     comparison_text=plotuple.chi2test_result,
-                                                                     comparison_pvalue=plotuple.pvalue,
-                                                                     comparison_pvalue_warn=plotuple.pvalue_warn,
-                                                                     comparison_pvalue_error=plotuple.pvalue_error,
-                                                                     description=plotuple.description,
-                                                                     contact=plotuple.contact,
-                                                                     check=plotuple.check,
-                                                                     height=plotuple.height,
-                                                                     width=plotuple.width,
-                                                                     is_expert=plotuple.is_expert(),
-                                                                     plot_path=plotuple.get_plot_path(),
-                                                                     png_filename=plotuple.get_png_filename(),
-                                                                     pdf_filename=plotuple.get_pdf_filename()))
+                    compare_plots.append(
+                        json_objects.ComparisonPlot(
+                            title=plotuple.get_plot_title(),
+                            comparison_result=plotuple.comparison_result,
+                            comparison_text=plotuple.chi2test_result,
+                            comparison_pvalue=plotuple.pvalue,
+                            comparison_pvalue_warn=plotuple.pvalue_warn,
+                            comparison_pvalue_error=plotuple.pvalue_error,
+                            description=plotuple.description,
+                            contact=plotuple.contact,
+                            check=plotuple.check,
+                            height=plotuple.height,
+                            width=plotuple.width,
+                            is_expert=plotuple.is_expert(),
+                            plot_path=plotuple.get_plot_path(),
+                            png_filename=plotuple.get_png_filename(),
+                            pdf_filename=plotuple.get_pdf_filename()
+                        )
+                    )
 
-            compare_file = json_objects.ComparisonPlotFile(title=fileName,
-                                                           package=package,
-                                                           rootfile=fileName,
-                                                           compared_revisions=list_of_revisions,
-                                                           plots=compare_plots,
-                                                           has_reference=has_reference,
-                                                           ntuples=compare_ntuples,
-                                                           html_content=compare_html_content)
+            compare_file = json_objects.ComparisonPlotFile(
+                title=file_name,
+                package=package,
+                rootfile=file_name,
+                compared_revisions=list_of_revisions,
+                plots=compare_plots,
+                has_reference=has_reference,
+                ntuples=compare_ntuples,
+                html_content=compare_html_content
+            )
             compare_files.append(compare_file)
 
-        comparison_packages.append(json_objects.ComparisonPackage(name=package, plotfiles=compare_files))
+        comparison_packages.append(
+            json_objects.ComparisonPackage(
+                name=package,
+                plotfiles=compare_files)
+        )
         # Make the command line output more readable
-        print(2 * '\n')
+        print()
 
-    print("storing to {}".format(comparison_json_file))
+    print("Storing to {}".format(comparison_json_file))
 
     # create objects for all revisions
     comparison_revs = []
@@ -431,15 +491,20 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
         print("For {} index {} color {}".format(r, index, line_color))
 
         # todo the creation date and git_hash of the original revision should be transferred here
-        comparison_revs.append(json_objects.ComparisonRevision(label=r,
-                                                               color=line_color))
+        comparison_revs.append(json_objects.ComparisonRevision(
+            label=r,
+            color=line_color)
+        )
 
     # todo: refactor this information extracion -> json inside a specific class / method after the
     # plots have been created
-    json_objects.dump(comparison_json_file, json_objects.Comparison(comparison_revs, comparison_packages))
+    json_objects.dump(
+        comparison_json_file,
+        json_objects.Comparison(comparison_revs, comparison_packages)
+    )
 
 
-def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):
+def create_tobjects_from_list(list_of_root_files, is_reference, work_folder):
     """
     Takes a list of root files, loops over them and creates the RootObjects
     for it. It then returns the list of RootObjects, a list of all keys,
@@ -464,9 +529,9 @@ def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):
         # Create the RootObjects from this file and store them, as well as the
         file_objects, \
             file_keys, \
-            file_package = create_RootObjects_from_file(root_file,
-                                                        is_reference,
-                                                        work_folder)
+            file_package = create_tobjects_from_file(root_file,
+                                                     is_reference,
+                                                     work_folder)
 
         # Append results to the global results
         list_objects += file_objects
@@ -480,7 +545,7 @@ def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):
     return list_objects, list_keys, list_packages
 
 
-def create_RootObjects_from_file(root_file, is_reference, work_folder):
+def create_tobjects_from_file(root_file, is_reference, work_folder):
     """
     Takes a root file, loops over its contents and creates the RootObjects
     for it. It then returns the list of RootObjects, a list of all keys,
@@ -512,10 +577,10 @@ def create_RootObjects_from_file(root_file, is_reference, work_folder):
     dir_date = date_from_revision(revision, work_folder)
 
     # Open the file with ROOT
-    ROOT_Tfile = ROOT.TFile(root_file)
+    tfile = ROOT.TFile(root_file)
 
     # Loop over all Keys in that ROOT-File
-    for key in ROOT_Tfile.GetListOfKeys():
+    for key in tfile.GetListOfKeys():
 
         # Get the name of the Key and save it in file_keys
         name = key.GetName()
@@ -530,7 +595,7 @@ def create_RootObjects_from_file(root_file, is_reference, work_folder):
 
         # Get the ROOT object that belongs to that Key. If there is no
         # object, continue
-        root_object = ROOT_Tfile.Get(name)
+        root_object = tfile.Get(name)
         if (not root_object) or (root_object is None):
             continue
 
@@ -649,14 +714,25 @@ def create_RootObjects_from_file(root_file, is_reference, work_folder):
             continue
 
         # Create the RootObject and append it to the results
-        file_objects.append(RootObject(revision, package, root_file,
-                                       name, root_object,
-                                       root_object_type, dir_date,
-                                       description, check, contact,
-                                       metaoptions, is_reference))
+        file_objects.append(
+            RootObject(
+                revision,
+                package,
+                root_file,
+                name,
+                root_object,
+                root_object_type,
+                dir_date,
+                description,
+                check,
+                contact,
+                metaoptions,
+                is_reference
+            )
+        )
 
     # Close the ROOT file before we open the next one!
-    ROOT_Tfile.Close()
+    tfile.Close()
 
     return file_objects, file_keys, package
 
@@ -805,7 +881,8 @@ class RootObject:
 ##############################################################################
 
 
-def create_plots(revisions=None, force=False, process_queue=None, work_folder="."):
+def create_plots(revisions=None, force=False, process_queue=None,
+                 work_folder="."):
     """!
     This function generates the plots and html
     page for the requested revisions.
@@ -817,6 +894,7 @@ def create_plots(revisions=None, force=False, process_queue=None, work_folder=".
         of them (which may me deprecated, though)
     @param process_queue: communication Queue object, which is used in
            multi-processing mode to report the progress of the plot creating.
+    @param work_folder: The work folder
     """
 
     # Initialize the list of revisions which we will plot
@@ -832,7 +910,8 @@ def create_plots(revisions=None, force=False, process_queue=None, work_folder=".
             # 'reference' needs to be treated
             # separately, because it is always a viable option, but will never
             # be listed in 'available_revisions()'
-            if revision in available_revisions(work_folder) or revision == 'reference':
+            if revision in available_revisions(work_folder) \
+                    or revision == 'reference':
                 list_of_revisions.append(revision)
 
     # In case no valid revisions were given, fall back to default and use all
@@ -845,7 +924,10 @@ def create_plots(revisions=None, force=False, process_queue=None, work_folder=".
     # generated before or not. In the path we use the alphabetical order of the
     # revisions, not the chronological one
     # (easier to work with on the web server side)
-    expected_path = validationpath.get_html_plots_tag_comparison_json(work_folder, list_of_revisions)
+    expected_path = validationpath.get_html_plots_tag_comparison_json(
+        work_folder,
+        list_of_revisions
+    )
 
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive

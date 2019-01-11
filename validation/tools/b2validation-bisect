@@ -2,34 +2,38 @@
 # -*- coding: utf-8 -*-
 
 """
-Utility script to be used in conjuction with the git bisect functionality [1]_ to
-search for degredations in validation variables. To use it, you can set the last known
-good git commit and the first known bad commit and start the bistecting process.
-Git will then checkout commits between the good and the bad and perform a binary search
-to arrive at the first bad commit.
+Utility script to be used in conjuction with the git bisect functionality 
+[1]_ to search for degredations in validation variables. To use it, you can 
+set the last known good git commit and the first known bad commit and start 
+the bistecting process. Git will then checkout commits between the good and 
+the bad and perform a binary search to arrive at the first bad commit. 
 
-To give feed back to git, which is first bad commit, this script either returns the
-exit code 0 for good commit, code 125 to ignore the current commit or code 1 for a bad commit.
+To give feed back to git, which is first bad commit, this script either 
+returns the exit code 0 for good commit, code 125 to ignore the current 
+commit or code 1 for a bad commit. 
 
-Information contained within .root files produced by the official validation scripcts or your
-custom scripts can be used to distingush between good and bad commits.
+Information contained within .root files produced by the official validation 
+scripcts or your custom scripts can be used to distingush between good and 
+bad commits. 
 
-The syntax of the ``--check-quantity`` option is the following: ``<root filename>:<quantity>:<compare op>:<value>``
+The syntax of the ``--check-quantity`` option is the following: ``<root 
+filename>:<quantity>:<compare op>:<value>`` 
 
-- ``quantity``   is the name of a histogram in the given root file. For histograms, the 
-  quantity to check for can be given in square brackets, for regular histograms,
-  this is one of this strings:
+- ``quantity``   is the name of a histogram in the given root file. For 
+  histograms, the quantity to check for can be given in square brackets, for 
+  regular histograms, this is one of this strings:
 
   - ``mean_x`` = mean of the histogram
   - ``entries`` = number of entries in all bins
   - ``mean_y`` = the mean of the bin content
-  - ``mean_y_zero_suppressed`` = the mean of the bin content, only with bins with > 0 filling
+  - ``mean_y_zero_suppressed`` = the mean of the bin content, only with bins
+     with > 0 filling
 
 - ``compare op`` can be ``>`` or ``<``
 - ``value`` is the reference value as a float to compare to
 
-As an example, to identfiy the commit which made the tracking efficiency drop below 0.93, the
-following snippet can be used::
+As an example, to identfiy the commit which made the tracking efficiency drop 
+below 0.93, the following snippet can be used:: 
 
   git bisect good <last good release>
   git bisect bad <first bad release>
@@ -38,25 +42,28 @@ following snippet can be used::
 
 :Authors: Thomas Hauth
 
-
 .. [1] http://git-scm.com/docs/git-bisect
 """
 
+# std
 import os
 import json
 import sys
 import shutil
 import subprocess
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
-import ROOT
-
 import argparse
 from functools import reduce
 
+# 3rd party
+from ROOT import PyConfig
+import ROOT
+
+# ours
 import quantity_extract
 import validationtools
 import validationpath
+
+PyConfig.IgnoreCommandLineOptions = True
 
 
 def get_error_count_from_json(file_name):
@@ -86,7 +93,8 @@ def extract_information_from_file(file_name, results):
         name = graph_or_table.GetName()
 
         if name in results.keys():
-            # As the naming convention is that simple in the validation output, this single line should do the job
+            # As the naming convention is that simple in the validation
+            # output, this single line should do the job
             root_obj = root_file.Get(name)
             values = qe.extract(root_obj)
 
@@ -100,12 +108,13 @@ def extract_information_from_file(file_name, results):
     return results
 
 
-def parseCheckQuantity(quantString):
+def parse_check_quantity(quant_string):
     """!
-    parses the quantity string, including its brackets
+    Parses the quantity string (as explained above), including its brackets
+    :returns filename, quantity, comparison value, value
     """
 
-    fragments = quantString.split(":")
+    fragments = quant_string.split(":")
     if len(fragments) == 4:
         filename = fragments[0].strip()
         quant = (fragments[1].strip('"').strip(), None)
@@ -114,50 +123,91 @@ def parseCheckQuantity(quantString):
 
         # parse quantity further ?
         if "[" in quant[0] and "]" in quant[0]:
-            splitQuant = [x for x in quant[0].replace("[", "]").split("]") if len(x) > 0]
-            spiltQuant = [x.strip() for x in splitQuant]
-            quant = (splitQuant[0], splitQuant[1])
+            split_quant = [
+                x for x in quant[0].replace("[", "]").split("]")
+                if len(x) > 0
+            ]
+            # fixme: is this a typo? /klieret
+            spilt_quant = [x.strip() for x in split_quant]
+            quant = (split_quant[0], split_quant[1])
 
     else:
-        print("cannot parse quantity expression " + str(quantString))
+        print("cannot parse quantity expression " + str(quant_string))
         sys.exit(1)
 
-    return (filename, quant, comp, val)
+    return filename, quant, comp, val
 
 
 def get_argument_parser():
     """setup argument parser options"""
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--skip-compile', action='store_true',
-                        default=False,
-                        help='Do not trigger a compile, useful for saving time when '
-                        'setting up the quantity checks.')
-    parser.add_argument('--report-compile-fail', action='store_true',
-                        default=False,
-                        help='Report a bad revision to git if the code base did not'
-                             'compile. By default, failing compiles are ignored.')
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        '--skip-compile',
+        action='store_true',
+        default=False,
+        help='Do not trigger a compile, useful for saving time when setting '
+             'up the quantity checks.'
+    )
+    parser.add_argument(
+        '--report-compile-fail',
+        action='store_true',
+        default=False,
+        help='Report a bad revision to git if the code base did not compile. '
+             'By default, failing compiles are ignored.'
+    )
     parser.add_argument(
         '--report-execution-fail',
         action='store_true',
         default=False,
         help='Report a bad revision to git if the provided script has an '
-             'error code != 0. By default, this is reported to git.')
-    parser.add_argument('--check-quantity', action="append",
-                        help='Check for a quantity in validation files')
-    parser.add_argument('--check-failed-comparison', action='store_true', default=False,
-                        help='Check if one comparison to a reference plot failed')
-    parser.add_argument('--max-failed-comparison', type=int, default=0,
-                        help='Maximum number of comparisons allowed to fail')
-    parser.add_argument('--test-check', action='store_true', default=False,
-                        help='Just check for the quantity, but do not run any git or compile commands')
-    parser.add_argument('--execute', action="append",
-                        help='File to execute after the compile and before the quantity check')
-    parser.add_argument('--script', action="append",
-                        help='Name of validation script to run after the compile '
-                             'and before the quantity check. Only this validation script and '
-                             'all scripts it depends on are executed.')
-    parser.add_argument('--keep', action='store_true', default=False,
-                        help='Keep the result folder of each bisect step for later examination')
+             'error code != 0. By default, this is reported to git.'
+    )
+    parser.add_argument(
+        '--check-quantity',
+        action="append",
+        help='Check for a quantity in validation files'
+    )
+    parser.add_argument(
+        '--check-failed-comparison',
+        action='store_true',
+        default=False,
+        help='Check if one comparison to a reference plot failed'
+    )
+    parser.add_argument(
+        '--max-failed-comparison',
+        type=int,
+        default=0,
+        help='Maximum number of comparisons allowed to fail'
+    )
+    parser.add_argument(
+        '--test-check',
+        action='store_true',
+        default=False,
+        help='Just check for the quantity, but do not run any git or compile '
+             'commands'
+    )
+    parser.add_argument(
+        '--execute',
+        action="append",
+        help='File to execute after the compile and before the quantity check'
+    )
+    parser.add_argument(
+        '--script',
+        action="append",
+        help='Name of validation script to run after the compile and before '
+             'the quantity check. Only this validation script and all scripts '
+             'it depends on are executed.'
+    )
+    parser.add_argument(
+        '--keep',
+        action='store_true',
+        default=False,
+        help='Keep the result folder of each bisect step for later '
+             'examination'
+    )
     return parser
 
 
@@ -168,13 +218,14 @@ if __name__ == "__main__":
     c_parsed = []
     if not argsVar["check_quantity"] is None:
         for c_string in argsVar["check_quantity"]:
-            c_parsed = c_parsed + [parseCheckQuantity(c_string)]
+            c_parsed = c_parsed + [parse_check_quantity(c_string)]
 
     # try to get git revision
     current_git_commit = None
     try:
         # get git rev, decode and remove possible newline at end
-        current_git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().rstrip()
+        current_git_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"]).decode().rstrip()
     except subprocess.CalledProcessError:
         current_git_commit = None
         print("Cannot get git commit hash of HEAD")
@@ -182,10 +233,11 @@ if __name__ == "__main__":
     if argsVar["test_check"] is False:
         # output current git commit and svn revision
         os.system("echo -n 'git commit ' && git rev-parse HEAD")
-        os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse HEAD`")
+        os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse "
+                  "HEAD`")
 
-        # make sure the proper environment is setup. If for example
-        # the externals version was changed between two commits, this is required
+        # make sure the proper environment is setup. If for example the
+        # externals version was changed between two commits, this is required
         validationtools.update_env()
 
         # see if quantities must be checked and
@@ -209,7 +261,11 @@ if __name__ == "__main__":
         if argsVar["script"] is None:
             argsVar["script"] = []
 
-        validation_scripts = reduce(lambda x, y: x + " " + y, argsVar["script"], "")
+        validation_scripts = reduce(
+            lambda x, y: x + " " + y,
+            argsVar["script"],
+            ""
+        )
         if len(validation_scripts) > 0:
             validation_call = "validate_basf2 -s " + validation_scripts
             exitCode = os.system(validation_call)
@@ -218,9 +274,11 @@ if __name__ == "__main__":
 
             if exitCode > 0:
                 if argsVar["report_execution_fail"]:
-                    sys.exit(1)  # tell git about this failed run ...
+                    # tell git about this failed run ...
+                    sys.exit(1)
                 else:
-                    sys.exit(125)  # tell git to ignore this failed validation
+                    # tell git to ignore this failed validation
+                    sys.exit(125)
 
         # execute provided file
         if argsVar["execute"] is None:
@@ -233,9 +291,11 @@ if __name__ == "__main__":
 
             if exitCode > 0:
                 if argsVar["report_execution_fail"]:
-                    sys.exit(1)  # tell git about this failed run ...
+                    # tell git about this failed run ...
+                    sys.exit(1)
                 else:
-                    sys.exit(125)  # tell git to ignore this failed validation
+                    # tell git to ignore this failed validation
+                    sys.exit(125)
     else:
         print("Skipping checkout and compile, performing only check")
 
@@ -254,14 +314,33 @@ if __name__ == "__main__":
         plots_result_folder = "html/plots/"
         comparsion_json_filename = validationpath.file_name_comparison_json
 
-        comparison_folders = [(x, os.lstat(os.path.join(plots_result_folder, x, comparsion_json_filename)))
-                            for x in os.listdir(plots_result_folder) if os.path.isdir(os.path.join(plots_result_folder, x))]
+        comparison_folders = [
+            (
+                x,
+                os.lstat(
+                    os.path.join(
+                        plots_result_folder,
+                        x,
+                        comparsion_json_filename
+                    )
+                )
+            )
+            for x in os.listdir(plots_result_folder)
+            if os.path.isdir(os.path.join(plots_result_folder, x))
+        ]
         if len(comparison_folders) > 0:
             # sort by newest folder
-            comparison_folders = sorted(comparison_folders, key=lambda x: x[1].st_mtime)
+            comparison_folders = sorted(
+                comparison_folders,
+                key=lambda x: x[1].st_mtime
+            )
 
             # taking the newest (last in list) folder
-            result_file_name = os.path.join(plots_result_folder, comparison_folders[-1][0], comparsion_json_filename)
+            result_file_name = os.path.join(
+                plots_result_folder,
+                comparison_folders[-1][0],
+                comparsion_json_filename
+            )
             ecount = get_error_count_from_json(result_file_name)
 
             print("This revision has {} failed comparisons".format(ecount))
@@ -270,12 +349,14 @@ if __name__ == "__main__":
             if ecount > argsVar["max_failed_comparison"]:
                 sys.exit(1)
         else:
-            print("Cannot check for failed comparisons, no output folder in {}".format(plots_result_folder))
+            print("Cannot check for failed comparisons, "
+                  "no output folder in {}".format(plots_result_folder))
 
     # perform checks
     for c in c_parsed:
 
-        print("Running check on file " + str(c[0]) + " for quantity " + str(c[1]) + " " + str(c[2]) + " " + str(c[3]))
+        print("Running check on file " + str(c[0]) + " for quantity " +
+              str(c[1]) + " " + str(c[2]) + " " + str(c[3]))
 
         file_name = c[0]
 

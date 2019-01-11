@@ -6,8 +6,16 @@ import functools
 # execute code from mother classes?? This seems to only have been done for
 # some of the subclasses here... /klieret
 
+"""
+Define datatypes for later serialization by json
+"""
 
 # todo: write a short overview over the many classes and their relationships here /klieret
+
+# ==============================================================================
+# Data classes
+# ==============================================================================
+
 
 class JsonBase:
 
@@ -187,7 +195,6 @@ class Package(JsonBase):
     """
     One high-level package of the validation suites which contains a set of
     scripts and output plot files
-
     """
 
     def __init__(self, name, plotfiles=None, scriptfiles=None, fail_count=0):
@@ -500,6 +507,10 @@ class Comparison(JsonBase):
             sorted_revs, ""
         )[1:]
 
+
+# ==============================================================================
+# Functions
+# ==============================================================================
 
 def dump(file_name, obj):
     """

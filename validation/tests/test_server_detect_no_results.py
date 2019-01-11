@@ -3,17 +3,9 @@
 
 import sys
 import os
-import subprocess
-import shutil
 import tempfile
-import validation
-import validationserver
 import validationpath
 import validationserver
-import validationfunctions
-import subprocess
-
-from validationtestutil import check_excecute, check_path_exists
 
 
 def main():
@@ -21,10 +13,6 @@ def main():
     Test if the validationserver is able to detect if there is no
     results folder available
     """
-    success = True
-
-    rev_to_gen = "test_folder_creation"
-    all_tags = ["reference", rev_to_gen]
 
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -61,7 +49,8 @@ def main():
             pass
 
         if fail:
-            sys.exit("did not exit, even though there is no folders in results folder")
+            sys.exit("did not exit, even though there is no folders in "
+                     "results folder")
 
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -76,6 +65,7 @@ def main():
         # run validation server
         # should not raise any exit exceptions
         validationserver.run_server(dry_run=True)
+
 
 if __name__ == "__main__":
     main()

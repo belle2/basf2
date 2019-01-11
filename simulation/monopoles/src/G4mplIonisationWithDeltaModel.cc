@@ -13,6 +13,8 @@
 //     S.P. Ahlen, Rev. Mod. Phys 52(1980), p121
 // [2] K.A. Milton arXiv:hep-ex/0602040
 // [3] S.P. Ahlen and K. Kinoshita, Phys. Rev. D26 (1982) 2347
+// [4] Y. Kazama et al., Phys. Rev. D15 (1977) 2287-2299
+// [5] S.P. Ahlen, Phys. Rev. D17 (1978) 229-233
 
 // modified from GEANT4 exoticphysics/monopole/*
 // works only for low magnetic charge, higher charge corrections are not used
@@ -159,7 +161,7 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
 //     1.0 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon double ionisation
 
 
-  G4double k = 0;   // Kazama et al. cross-section correction
+  G4double k = 0;   // Cross-section correction
   if (nmpl >= 0.5) { k = 0.406; }
   if (nmpl >= 1) { k = 0.346; }
   if (nmpl >= 1.5) { k = 0.3; }

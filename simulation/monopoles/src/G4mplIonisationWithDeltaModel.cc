@@ -55,7 +55,9 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
   dedxlim = 45. * chargeSquare * GeV * cm2 / g;
   fParticleChange = nullptr;
   theElectron = G4Electron::Electron();
-  B2INFO("### Monopole ionisation model with d-electron production, Gmag= "  << magCharge / eplus); 
+  B2INFO("### Monopole ionisation model with d-electron production, Gmag= "  << magCharge / eplus);
+  if (nmpl >= 6)
+    B2WARNING("Monopole charge Gmag= " << magCharge / eplus << "e not reasonable. Please choose a value smaller than 411e.");
   monopole = nullptr;
   mass = 0.0;
 }
@@ -166,7 +168,9 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
   if (nmpl >= 1) { k = 0.346; }
   if (nmpl >= 1.5) { k = 0.3; }
   const G4double B[7] = { 0.0, 0.248, 0.672, 1.022, 1.243, 1.464, 1.685};   // Bloch correction
-  dedx += 0.5 * k - B[int(floor(nmpl + 0.5))];
+  if (nmpl < 6)
+    dedx += 0.5 * k - B[int(floor(nmpl + 0.5))];
+
 
   // density effect correction
   G4double x = G4Log(bg2) / twoln10;

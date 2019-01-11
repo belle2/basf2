@@ -36,7 +36,8 @@ namespace Belle2 {
   protected:
     /** ************************* CONSTRUCTORS ************************* */
     /** Protected constructor. accepts an entry which can not be changed any more */
-    DirectedNode(EntryType& entry) : m_entry(entry), m_metaInfo(MetaInfoType()), m_family(-1)
+    explicit DirectedNode(EntryType& entry) :
+      m_entry(entry), m_metaInfo(MetaInfoType()), m_family(-1)
     {
       // Reserve some space for the vectors, TODO: can still be fine-tuned
       m_innerNodes.reserve(10);

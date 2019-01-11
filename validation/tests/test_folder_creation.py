@@ -36,14 +36,22 @@ def main():
         validation.execute(tag=rev_to_gen, is_test=True)
 
         # todo: check if results folder has been created and is filled
-        path_to_check = [os.path.join(validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen)),
-                         os.path.join(validationpath.get_results_tag_revision_file(str(tmpdir), rev_to_gen)),
-                         os.path.join(validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
-                                      "validation-test", "validationTestPlotsA.py.log"),
-                         os.path.join(validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
-                                      "validation-test", "validationTestPlotsA.root"),
-                         expect_html_plots_comparison_json,
-                         expect_html_plots_comparison_folder]
+        path_to_check = [
+            validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
+            validationpath.get_results_tag_revision_file(str(tmpdir), rev_to_gen),
+            os.path.join(
+                validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
+                "validation-test",
+                "validationTestPlots.py.log"
+            ),
+            os.path.join(
+                validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
+                "validation-test",
+                "validationTestPlots.root"
+            ),
+            expect_html_plots_comparison_json,
+            expect_html_plots_comparison_folder
+        ]
 
         check_path_exists(path_to_check)
 
@@ -52,8 +60,10 @@ def main():
         validationserver.run_server(dry_run=True)
 
         # check if all files have been copied and the symbolic links properly set
-        path_to_check = [os.path.join(str(tmpdir), validationpath.folder_name_html),
-                         os.path.join(str(tmpdir), validationpath.folder_name_html, validationpath.folder_name_plots)]
+        path_to_check = [
+            os.path.join(str(tmpdir), validationpath.folder_name_html),
+            os.path.join(str(tmpdir), validationpath.folder_name_html, validationpath.folder_name_plots)
+        ]
         check_path_exists(path_to_check)
 
         # remove generated plots and use create_validation_plots script to regenerate

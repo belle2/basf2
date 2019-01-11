@@ -51,7 +51,6 @@ namespace Belle2 {
     std::vector <std::string>  m_inputFileNames; /**< The list of filenames of input HepMCfile. */
     std::string m_inputFileName;   /**< The Name of the current input HepMC file. */
     uint m_iFile;                     /**< Index of the current HepMC input file. */
-    int m_skipEventNumber;           /**< The number of events which should be skipped at the start of reading. */
     int m_nVirtual;                  /**< The number of particles in each event that should be made virtual */
     HepMCReader m_hepmcreader;           /**< An instance of the HepMC reader. */
     MCParticleGraph mcParticleGraph;             /**< The MCParticle graph object. */

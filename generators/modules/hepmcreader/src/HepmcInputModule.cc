@@ -31,7 +31,7 @@ REG_MODULE(HepMCInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(-1), m_initial(0)
+HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_initial(0)
 {
   //Set module properties
   setDescription("HepMC file input. This module loads an event record from HEPMC2 format and store the content into the MCParticle collection. HEPMC format is used by for example pythia8.");
@@ -42,7 +42,6 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(-1), m_initial(0)
   addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", false);
   addParam("runNum", m_runNum, "run number (should be set if makeMaster=true)", 0);
   addParam("expNum", m_expNum, "ExpNum (should be set if makeMaster=true)", 0);
-  addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
@@ -82,14 +81,13 @@ void HepMCInputModule::initialize()
 
   //are we the master module? And do we have all infos?
   if (m_makeMaster) {
-    B2INFO("HEPEVT reader acts as master module for data processing.");
-    if (m_runNum == 0 && m_expNum == 0)
+    B2INFO("HEPMC reader acts as master module for data processing.");
+    if (m_runNum == 0 && m_expNum == 0) {
       B2WARNING("HEPMC reader acts as master module, but no run and experiment number set. Using defaults.");
-
+    }
     //register EventMetaData object in data store
-    StoreArray<MCParticle> mcparticle;
-    mcparticle.registerInDataStore();
-
+    StoreObjPtr<EventMetaData> eventmetadata;
+    eventmetadata.registerInDataStore();
   }
 
   //Initialize MCParticle collection
@@ -101,23 +99,20 @@ void HepMCInputModule::initialize()
 
 void HepMCInputModule::event()
 {
-
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
-  if (!eventMetaDataPtr) eventMetaDataPtr.create();
-  B2DEBUG(100, "HEPMC processes event nr " << eventMetaDataPtr->getEvent());
-
+  if (!eventMetaDataPtr) { eventMetaDataPtr.create(); }
   try {
     mcParticleGraph.clear();
     double weight = 1;
     int id = m_hepmcreader.getEvent(mcParticleGraph, weight);
-
+    //int id2 = m_hepmcreader.getEvent(mcParticleGraph, weight);
     if (m_makeMaster) {
       if (id > -1) {
         m_evtNum = id;
       } else {
         id = ++m_evtNum;
       }
-
+      B2DEBUG(10, "Setting exp " << m_expNum << " run " << m_runNum << " event " << id << ".");
       eventMetaDataPtr->setExperiment(m_expNum);
       eventMetaDataPtr->setRun(m_runNum);
       eventMetaDataPtr->setEvent(id);
@@ -125,7 +120,7 @@ void HepMCInputModule::event()
     if (m_useWeights) { eventMetaDataPtr->setGeneratedWeight(weight); }
     mcParticleGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (HepMCReader::HepMCEmptyEventError&) {
-    B2DEBUG(100, "Reached end of HepMC file.");
+    B2DEBUG(10, "Reached end of HepMC file.");
     m_hepmcreader.closeCurrentInputFile();
     m_iFile++;
     if (m_iFile < m_inputFileNames.size()) {
@@ -138,12 +133,11 @@ void HepMCInputModule::event()
       }
     } else {
       eventMetaDataPtr->setEndOfData();
-      B2DEBUG(100, "Reached end of all HepMC files.");
+      B2DEBUG(10, "Reached end of all HepMC files.");
     }
   } catch (runtime_error& e) {
     B2ERROR(e.what());
   }
-
 }
 
 

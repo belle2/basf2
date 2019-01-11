@@ -324,7 +324,7 @@ def event_timing_plot(
     save_dir.cd()
 
 
-def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
+def draw_progress_bar(delete_lines, scripts, barlength=50):
     """
     This function plots a progress bar of the validation, i.e. it shows which
     percentage of the scripts has been executed yet.
@@ -340,14 +340,14 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
 
     # Get statistics: Number of finished scripts + number of scripts in total
     finished_scripts = len([
-        _ for _ in list_of_scripts
+        _ for _ in scripts
         if _.status in [
             validationscript.ScriptStatus.finished,
             validationscript.ScriptStatus.failed,
             validationscript.ScriptStatus.skipped
         ]
     ])
-    all_scripts = len(list_of_scripts)
+    all_scripts = len(scripts)
     percent = 100.0 * finished_scripts / all_scripts
 
     # Get the runtime of the script
@@ -372,7 +372,7 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
     print('Runtime: {0}s'.format(runtime))
 
     # Print the list of currently running scripts:
-    running = [os.path.basename(__.path) for __ in list_of_scripts
+    running = [os.path.basename(__.path) for __ in scripts
                if __.status == validationscript.ScriptStatus.running]
 
     # If nothing is repeatedly running
@@ -436,8 +436,8 @@ class Validation:
     @var tag: The name of the folder within the results directory
     @var log: Reference to the logging object for this validation instance
     @var basepaths: The paths to the local and central release directory
-    @var list_of_scripts: List of all Script objects for steering files
-    @var list_of_packages: List of all packages which contributed scripts
+    @var scripts: List of all Script objects for steering files
+    @var packages: List of all packages which contributed scripts
     @var packages: The packages to be included in the validation (from cmd arg)
     @var basf2_options: The options to be given to the basf2 command
     @var mode: Whether to run locally or on a cluster
@@ -470,10 +470,10 @@ class Validation:
 
         # The list which holds all steering file objects
         # (as instances of class Script)
-        self.list_of_scripts = []
+        self.scripts = []
 
         # A list of all packages from which we have collected steering files
-        self.list_of_packages = []
+        self.packages = []
 
         # The list of packages to be included in the validation. If we are
         # running a complete validation, this will be None.
@@ -542,37 +542,37 @@ class Validation:
 
     def build_dependencies(self):
         """!
-        This method loops over all Script objects in self.list_of_scripts and
+        This method loops over all Script objects in self.scripts and
         calls their compute_dependencies()-method.
         @return: None
         """
-        for script_object in self.list_of_scripts:
-            script_object.compute_dependencies(self.list_of_scripts)
+        for script_object in self.scripts:
+            script_object.compute_dependencies(self.scripts)
 
         # The following code is only necessary while there are still a lot of
         # steering files without proper headers.
         # It adds all steering files from the validation-folder as a default
         # dependency, because a lot of scripts depend on one data script that
         # is created by a steering file in the validation-folder.
-        default_depend = [script for script in self.list_of_scripts
+        default_depend = [script for script in self.scripts
                           if script.package == 'validation']
-        for script_object in self.list_of_scripts:
+        for script_object in self.scripts:
             if not script_object.header and script_object.package != \
                     'validation':
                 script_object.dependencies += default_depend
 
         # Make sure dependent scripts of skipped scripts are skipped, too.
-        for script_object in self.list_of_scripts:
+        for script_object in self.scripts:
             if script_object.status == ScriptStatus.skipped:
                 self.skip_script(script_object)
 
     def build_headers(self):
         """!
-        This method loops over all Script objects in self.list_of_scripts and
+        This method loops over all Script objects in self.scripts and
         calls their load_header()-method.
         @return: None
         """
-        for script_object in self.list_of_scripts:
+        for script_object in self.scripts:
             script_object.load_header()
 
     def skip_script(self, script_object):
@@ -589,7 +589,7 @@ class Validation:
             script_object.status = ScriptStatus.skipped
 
         # Also skip all dependent scripts.
-        for dependent_script in self.list_of_scripts:
+        for dependent_script in self.scripts:
             if script_object in dependent_script.dependencies:
                 self.skip_script(dependent_script)
 
@@ -682,8 +682,8 @@ class Validation:
             if ignored in validation_folders:
                 del validation_folders[ignored]
 
-        # Now write to self.list_of_packages which packages we have collected
-        self.list_of_packages = list(validation_folders.keys())
+        # Now write to self.packages which packages we have collected
+        self.packages = list(validation_folders.keys())
 
         # Finally, we collect the steering files from each folder we have
         # collected:
@@ -698,10 +698,10 @@ class Validation:
                 script.load_header()
                 # only select this script, if this interval has been selected
                 if interval_selector.in_interval(script):
-                    self.list_of_scripts.append(script)
+                    self.scripts.append(script)
 
         # Thats it, now there is a complete list of all steering files on
-        # which we are going to perform the validation in self.list_of_scripts
+        # which we are going to perform the validation in self.scripts
 
     def get_log_folder(self):
         """!
@@ -727,13 +727,13 @@ class Validation:
 
         with open(failed_log_path, "w+") as list_failed:
             # Select only failed scripts
-            list_of_failed_scripts = [
-                script for script in self.list_of_scripts
+            failed_scripts = [
+                script for script in self.scripts
                 if script.status == ScriptStatus.failed
             ]
 
             # log the name of all failed scripts
-            for script in list_of_failed_scripts:
+            for script in failed_scripts:
                 list_failed.write(script.path.split("/")[-1] + "\n")
 
     def log_skipped(self):
@@ -752,13 +752,13 @@ class Validation:
 
         with open(skipped_log_path, "w+") as list_skipped:
             # Select only failed scripts
-            list_of_skipped_scripts = [
-                script for script in self.list_of_scripts
+            skipped_scripts = [
+                script for script in self.scripts
                 if script.status == ScriptStatus.skipped
             ]
 
             # log the name of all failed scripts
-            for script in list_of_skipped_scripts:
+            for script in skipped_scripts:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
 
     def set_runtime_data(self):
@@ -776,7 +776,7 @@ class Validation:
                     line.split("=")[1].strip()
 
             # And try to set a property for each script
-            for script in self.list_of_scripts:
+            for script in self.scripts:
                 try:
                     script.runtime = float(run_times[script.name])
                 # If we don't have runtime data, then set it to an average of
@@ -792,7 +792,7 @@ class Validation:
 
         """
 
-        l = [s for s in self.list_of_scripts if s.name == name]
+        l = [s for s in self.scripts if s.name == name]
         if len(l) == 1:
             return l[0]
         else:
@@ -810,19 +810,19 @@ class Validation:
         # compile the dependencies of selected scripts
         # todo: won't work for nested dependencies
         if not ignore_dependencies:
-            for script_obj in self.list_of_scripts:
+            for script_obj in self.scripts:
                 if script_obj.package in selected_packages:
                     for dep in script_obj.dependencies:
                         to_keep_dependencies.add(dep.unique_name())
         # now, remove all scripts from the script list, which are either
         # not in the selected packages or have a dependency to them
-        self.list_of_scripts = [
-            s for s in self.list_of_scripts if (
+        self.scripts = [
+            s for s in self.scripts if (
                 s.package in selected_packages) or (
                 s.unique_name() in to_keep_dependencies)]
 
         # Check if some of the selected_packages were not found.
-        packages = set(s.package for s in self.list_of_scripts)
+        packages = set(s.package for s in self.scripts)
         packages_not_found = list(set(selected_packages) - packages)
         if packages_not_found:
             msg = "You asked to select the package(s) {}, but they were not " \
@@ -859,12 +859,12 @@ class Validation:
                                .format(script))
                 continue
 
-            others = script_obj.get_recursive_dependencies(self.list_of_scripts)
+            others = script_obj.get_recursive_dependencies(self.scripts)
             if not ignore_dependencies:
                 scripts_to_enable = scripts_to_enable.union(others)
 
         # enable all selections and dependencies
-        for script_obj in self.list_of_scripts:
+        for script_obj in self.scripts:
             if script_obj.name in scripts_to_enable:
                 self.log.warning("Enabling script {0} because it was selected "
                                  "or a selected script depends on it."
@@ -878,7 +878,7 @@ class Validation:
 
         # Check if some of the selected_packages were not found.
         script_names = set(
-            Script.sanitize_file_name(s.name) for s in self.list_of_scripts
+            Script.sanitize_file_name(s.name) for s in self.scripts
         )
         scripts_not_found = set(script_selection) - script_names
         if scripts_not_found:
@@ -888,7 +888,7 @@ class Validation:
             self.log.warning(msg)
 
     def apply_script_caching(self):
-        cacheable_scripts = [s for s in self.list_of_scripts if s.is_cacheable()]
+        cacheable_scripts = [s for s in self.scripts if s.is_cacheable()]
 
         output_dir_datafiles = validationpath.get_results_tag_folder(self.work_folder, self.tag)
 
@@ -906,7 +906,7 @@ class Validation:
         # Remove all cached scripts from the dependencies
         # of dependent script objects, they will not be
         # executed and no one needs to wait for them
-        for script in self.list_of_scripts:
+        for script in self.scripts:
             for dep_script in script.dependencies:
                 # check if the script this one is depending on is
                 # in cached execution
@@ -918,9 +918,9 @@ class Validation:
         # retrieve the git hash which was used for executing this validation
         # scripts
         json_package = []
-        for p in self.list_of_packages:
+        for p in self.packages:
             this_package_scrits = [
-                s for s in self.list_of_scripts if s.package == p
+                s for s in self.scripts if s.package == p
             ]
             json_scripts = [s.to_json(self.tag) for s in this_package_scrits]
 
@@ -955,7 +955,7 @@ class Validation:
         auto-discovered but this method is useful for testing
         """
 
-        self.list_of_scripts.append(script)
+        self.scripts.append(script)
 
     @staticmethod
     def sort_scripts(script_list):
@@ -1033,7 +1033,7 @@ class Validation:
             print()
 
         # The list of scripts that have to be processed
-        remaining_scripts = [script for script in self.list_of_scripts
+        remaining_scripts = [script for script in self.scripts
                              if script.status == ScriptStatus.waiting]
 
         # Sort the list of scripts that have to be processed by runtime,
@@ -1203,7 +1203,7 @@ class Validation:
             if not self.quiet:
                 progress_bar_lines = draw_progress_bar(
                     progress_bar_lines,
-                    self.list_of_scripts
+                    self.scripts
                 )
 
         # Log failed and skipped scripts

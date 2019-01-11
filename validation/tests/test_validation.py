@@ -113,9 +113,9 @@ class ValidationTest(unittest.TestCase):
         # test with honoring dependencies
         val.apply_package_selection(["tracking"], False)
 
-        self.assertEqual(3, len(val.list_of_scripts))
-        self.assertTrue(len([s for s in val.list_of_scripts if s.unique_name() == script3.unique_name()]) == 1)
-        self.assertTrue(len([s for s in val.list_of_scripts if s.unique_name() == script4.unique_name()]) == 0)
+        self.assertEqual(3, len(val.scripts))
+        self.assertTrue(len([s for s in val.scripts if s.unique_name() == script3.unique_name()]) == 1)
+        self.assertTrue(len([s for s in val.scripts if s.unique_name() == script4.unique_name()]) == 0)
 
         valNoDeps = validation.Validation()
 
@@ -127,8 +127,8 @@ class ValidationTest(unittest.TestCase):
         # test with honoring dependencies
         valNoDeps.apply_package_selection(["tracking"], True)
 
-        self.assertEqual(2, len(valNoDeps.list_of_scripts))
-        self.assertTrue(len([s for s in valNoDeps.list_of_scripts if s.unique_name() == script3.unique_name()]) == 0)
+        self.assertEqual(2, len(valNoDeps.scripts))
+        self.assertTrue(len([s for s in valNoDeps.scripts if s.unique_name() == script3.unique_name()]) == 0)
 
     def test_parse_header(self):
         """

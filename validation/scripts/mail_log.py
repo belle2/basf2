@@ -76,11 +76,11 @@ class Mails:
 
         # read contents from comparison.json
         work_folder = self.validator.work_folder
-        list_of_revisions = ['reference'] + available_revisions(work_folder)
+        revisions = ['reference'] + available_revisions(work_folder)
         comparison_json_file = \
             validationpath.get_html_plots_tag_comparison_json(
                 work_folder,
-                list_of_revisions
+                revisions
             )
         with open(comparison_json_file) as f:
             self.comparison_json = json.load(f)
@@ -105,11 +105,11 @@ class Mails:
         # get failed scripts
         with open(os.path.join(self.validator.get_log_folder(),
                                "list_of_failed_scripts.log")) as f:
-            list_of_failed_scripts = f.read().splitlines()
+            failed_scripts = f.read().splitlines()
 
         # collect information about failed scripts
         mail_log = {}
-        for failed_script in list_of_failed_scripts:
+        for failed_script in failed_scripts:
 
             # get_script_by_name works with _ only ...
             failed_script = failed_script.replace(".py", "_py").replace(".C", "_C")

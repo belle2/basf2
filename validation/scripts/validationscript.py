@@ -158,7 +158,7 @@ class Script:
             return_code=self.returncode
         )
 
-    def get_recursive_dependencies(self, list_of_scripts, level=0):
+    def get_recursive_dependencies(self, scripts, level=0):
         """!
         Loops over all dependencies of this script and recursively retrieves
         their sub-dependencies
@@ -179,11 +179,11 @@ class Script:
             next_level = level + 1
 
             # find script object
-            dep_script = [x for x in list_of_scripts if x.name == dep.name]
+            dep_script = [x for x in scripts if x.name == dep.name]
             rec_deps = []
             if len(dep_script) == 1:
                 rec_deps = dep_script[0].get_recursive_dependencies(
-                    list_of_scripts, next_level)
+                    scripts, next_level)
             else:
                 self.log.error(
                     'Depending script with the name {0} could not be found '
@@ -203,7 +203,7 @@ class Script:
         """
         return "script_unique_name_{}_{}".format(self.package, self.name)
 
-    def compute_dependencies(self, list_of_scripts):
+    def compute_dependencies(self, scripts):
         """!
         Loops over the input files given in the header and tries to find the
         corresponding Script objects, which will then be stored in the
@@ -221,7 +221,7 @@ class Script:
                 creator = find_creator(
                     root_file,
                     self.package,
-                    list_of_scripts,
+                    scripts,
                     self.log
                 )
 
@@ -246,7 +246,7 @@ class Script:
             # is presumed as a dependency
 
             # Get a list of all the script in the same directory
-            in_same_pkg = [script for script in list_of_scripts
+            in_same_pkg = [script for script in scripts
                            if script.package == self.package]
 
             # Divide that list into .py and .c files, because .py files are

@@ -110,7 +110,7 @@ def get_start_time():
     return g_start_time
 
 
-def find_creator(outputfile, package, list_of_scripts, log):
+def find_creator(outputfile, package, scripts, log):
     """!
     This function receives the name of a file and tries to find the file
     in the given package which produces this file, i.e. find the file in
@@ -124,7 +124,7 @@ def find_creator(outputfile, package, list_of_scripts, log):
 
     # Get a list of all Script objects for scripts in the given package as well
     # as from the validation-folder
-    candidates = [script for script in list_of_scripts
+    candidates = [script for script in scripts
                   if script.package in [package, 'validation']]
 
     # Reserve some space for the results we will return

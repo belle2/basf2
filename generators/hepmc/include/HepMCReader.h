@@ -40,16 +40,18 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(HepMCCouldNotOpenFileError, "Could not open file %1% !");
     /** Exception is thrown if the given indices of the daughters are not valid. */
     BELLE2_DEFINE_EXCEPTION(HepMCInvalidDaughterIndicesError,
-                            "Line %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
+                            "Event %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
     /** Exception is thrown if the header specifying the event header could not be parsed. */
-    BELLE2_DEFINE_EXCEPTION(HepMCHeaderNotValidError, "Line %1%: Event header not understood: %2%");
+    BELLE2_DEFINE_EXCEPTION(HepMCHeaderNotValidError, "Event %1%: Event header not understood: %2%");
     /** Exception is thrown if a field in the HepMC file could not be converted to a number. */
-    BELLE2_DEFINE_EXCEPTION(HepMCConvertFieldError, "Line %1%: Could not convert field %2%: %3%");
+    BELLE2_DEFINE_EXCEPTION(HepMCConvertFieldError, "Event %1%: Could not convert field %2%: %3%");
     /** Exception is thrown if the format of a line of the HepMC file could not be parsed. */
-    BELLE2_DEFINE_EXCEPTION(HepMCParticleFormatError, "Line %1%: Particle format not understood, got %2% fields !");
+    BELLE2_DEFINE_EXCEPTION(HepMCParticleFormatError, "Event %1%: Particle format not understood, got %2% fields !");
+    /** Exception is thrown if the format of a line of the HepMC file could not be parsed. */
+    BELLE2_DEFINE_EXCEPTION(HepMCInvalidEventError, "Event is invalid.");
     /** Exception is thrown if the number of particles for this event is 0 or less.  */
     BELLE2_DEFINE_EXCEPTION(HepMCEmptyEventError,
-                            "Line %1%: Number of particles in event is %2% ! (This could mean EOF is reached.) ");
+                            "Event %1%: Number of particles in event is %2% ! (This could mean EOF is reached.) ");
     /**
      * Constructor.
      */
@@ -85,7 +87,7 @@ namespace Belle2 {
 
   protected:
 
-    bool readNextEvent(HepMC::GenEvent& evt); /**< read the next event from the IO stream and write into evt */
+    void readNextEvent(HepMC::GenEvent& evt); /**< read the next event from the IO stream and write into evt */
     std::ifstream m_input; /**< The input stream of the ascii file. */
 
   };

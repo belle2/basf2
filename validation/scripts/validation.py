@@ -4,6 +4,7 @@
 # basf2 specific imports
 from basf2 import statistics
 from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
 import ROOT
 
 # Normal library imports
@@ -39,7 +40,6 @@ import clustercontrolsge
 import clustercontroldrmaa
 
 
-PyConfig.IgnoreCommandLineOptions = True
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 

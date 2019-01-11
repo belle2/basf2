@@ -56,14 +56,13 @@ from functools import reduce
 
 # 3rd party
 from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
 import ROOT
 
 # ours
 import quantity_extract
 import validationtools
 import validationpath
-
-PyConfig.IgnoreCommandLineOptions = True
 
 
 def get_error_count_from_json(file_name):

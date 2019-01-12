@@ -113,7 +113,17 @@ void ECLFinalizerModule::event()
       // set all variables
       eclCluster->setStatus(eclShower.getStatus());
       eclCluster->setConnectedRegionId(eclShower.getConnectedRegionId());
-      eclCluster->setHypothesisId(eclShower.getHypothesisId());
+
+      const int hyp = eclShower.getHypothesisId();
+      eclCluster->setHypothesisId(hyp);
+
+      // dont add (they are initializd as photons)
+      if (hyp == ECLCluster::c_nPhotons) {
+        eclCluster->setHypothesis(ECLCluster::c_nPhotonsBit);
+      } else if (hyp == ECLCluster::c_neutralHadron) {
+        eclCluster->setHypothesis(ECLCluster::c_neutralHadronBit);
+      }
+
       eclCluster->setClusterId(eclShower.getShowerId());
 
       eclCluster->setEnergy(eclShower.getEnergy());

@@ -16,6 +16,7 @@
 
 using namespace Belle2;
 
+
 TVector3 ECLCluster::getClusterPosition() const
 {
   const double cluster_x =  getR() * sin(getTheta()) * cos(getPhi());

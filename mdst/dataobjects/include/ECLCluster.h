@@ -43,6 +43,24 @@ namespace Belle2 {
       c_mergedPi0 = 7
     };
 
+    /** The hypothis bits for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
+    enum HypothesisBit {
+      /** None as initializer */
+      c_noneBit = 1 << 0,
+      /** CR is split into a muon and n photons (T1) */
+      c_muonNPhotonsBit = 1 << 1,
+      /** CR is reconstructed as a charged hadron (T2) */
+      c_chargedHadronBit = 1 << 2,
+      /** CR is split into an electron and n photons (T3) */
+      c_electronNPhotonsBit = 1 << 3,
+      /** CR is split into n photons (N1) */
+      c_nPhotonsBit = 1 << 4,
+      /** CR is reconstructed as a neutral hadron (N2) */
+      c_neutralHadronBit = 1 << 5,
+      /** CR is reconstructed as merged pi0 (N3) */
+      c_mergedPi0Bit = 1 << 6
+    };
+
     /** The status information for the ECLCluster. */
     enum StatusBit {
       /** bit 0: ECLCluster is matched to a ECL trigger cluster */
@@ -59,6 +77,7 @@ namespace Belle2 {
     ECLCluster() :
       m_isTrack(false),
       m_status(0),
+      m_hypothesis(c_nPhotonsBit), // set to c_nPhotonsBit for b2bii
       m_connectedRegionId(0),
       m_hypothesisId(c_nPhotons), // set to c_nPhotons for b2bii
       m_clusterId(0),
@@ -109,10 +128,30 @@ namespace Belle2 {
      */
     void removeStatus(unsigned short int bitmask) { m_status &= (~bitmask); }
 
+
+
+
+    /** Set hypothesis. */
+    void setHypothesis(unsigned short hypothesis) { m_hypothesis = hypothesis; }
+
+    /**
+     * Add bitmask to current hypothesis.
+     * @param bitmask The status code which should be added.
+     */
+    void addHypothesis(unsigned short int bitmask) { m_hypothesis |= bitmask; }
+
+    /**
+     * Remove bitmask from current hypothesis.
+     * @param bitmask The hypothesis code which should be removed.
+
+     */
+    void removeHypothesis(unsigned short int bitmask) { m_hypothesis &= (~bitmask); }
+
     /** Set connected region id. */
     void setConnectedRegionId(int crid) { m_connectedRegionId = crid; }
 
     /** Set hypothesis id. */
+    [[deprecated("Please use setHypothesis() or addHypothesis().")]]
     void setHypothesisId(int hypothesisid) { m_hypothesisId = hypothesisid; }
 
     /** Set cluster id. */
@@ -164,6 +203,7 @@ namespace Belle2 {
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
 
     /** set Cluster Hadron Component Intensity. */
+    [[deprecated("will be removed in release-04.")]]
     void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
 
     /** set Pulse Shape Discrimination MVA */
@@ -214,10 +254,14 @@ namespace Belle2 {
     /** Return status. */
     unsigned short getStatus() const {return m_status;}
 
+    /** Return hypothesis. */
+    unsigned short getHypothesis() const {return m_hypothesis;}
+
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
 
     /** Return hypothesis id */
+    [[deprecated("Please use hasHypothesis().")]]
     int getHypothesisId() const {return m_hypothesisId;}
 
     /** Return cluster id */
@@ -245,6 +289,7 @@ namespace Belle2 {
     double getE9oE21() const { return m_E9oE21; }
 
     /** Return Cluster hadron intensity*/
+    [[deprecated("will be removed in release-04.")]]
     double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
 
     /** Return MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.*/
@@ -277,10 +322,10 @@ namespace Belle2 {
     /** Return R. */
     double getR() const { return m_r; }
 
-    /** Return Corrected Energy (GeV). */
+    /** Return Energy (GeV). */
     double getEnergy() const {return exp(m_logEnergy);}
 
-    /** Return Uncorrect Energy deposited (GeV) */
+    /** Return Uncorrected Energy deposited (GeV) */
     double getEnergyRaw() const {return exp(m_logEnergyRaw);}
 
     /** Return energy of highest energetic crystal in cluster (GeV) */
@@ -314,6 +359,13 @@ namespace Belle2 {
      */
     bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
 
+    /**
+     * Return if specific hypothesis bit is set.
+     * @param bitmask The bitmask which is compared to the hypothesis of the cluster.
+     * @return Returns true if the bitmask matches the hypothesis code of the cluster.
+     */
+    bool hasHypothesis(unsigned short int bitmask) const { return (m_hypothesis & bitmask) == bitmask; }
+
     /** Check if ECLCluster is matched to an ECLTRGCluster */
     bool isTriggerCluster() const {return hasStatus(c_TriggerCluster);}
 
@@ -330,6 +382,9 @@ namespace Belle2 {
 
     /** Cluster status. */
     unsigned short m_status;
+
+    /** Hypothesis. */
+    unsigned short m_hypothesis;
 
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
@@ -427,7 +482,8 @@ namespace Belle2 {
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 12);
+    ClassDef(ECLCluster, 13);
+    // 13: Added m_hypothesis
     // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.
     // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables
     // 10: Added status enum, added status setter

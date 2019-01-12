@@ -6,6 +6,7 @@ Perform code quality cppchecks for every commit to the analysis package.
 Eventually these checks can be included as git hooks.
 """
 
+import os
 import re
 from b2test_utils import skip_test, check_error_free
 

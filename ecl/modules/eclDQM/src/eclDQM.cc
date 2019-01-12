@@ -163,7 +163,6 @@ void ECLDQMModule::defineHisto()
     h->GetXaxis()->SetTitle("time [ns]");
     h->SetOption("LIVE");
     h_time_crate_Thr1GeV.push_back(h);
-    delete h;
   }
 
   //2D histograms creation.

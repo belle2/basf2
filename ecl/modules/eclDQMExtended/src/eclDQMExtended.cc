@@ -35,7 +35,6 @@
 #include <ecl/utility/ECLDspEmulator.h>
 
 //STL
-#include <boost/filesystem.hpp>
 #include <regex>
 #include <map>
 #include <vector>
@@ -47,6 +46,9 @@
 #include <TH2F.h>
 #include <TDirectory.h>
 
+//BOOST
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 
 
 //NAMESPACE(S)
@@ -107,35 +109,51 @@ void ECLDQMEXTENDEDModule::defineHisto()
 
   //1D histograms creation.
 
-  h_amp_timefail_q0  = new TH1F("amp_timefail_q0", "Amp for time mismatches w/ Quality=0", 1200, 0, 262144);
-  h_amp_timefail_q0->GetXaxis()->SetTitle("Amplitude");
-  h_amp_timefail_q0->SetOption("LIVE");
+  std::vector<TH1F*> h_amp_qualityfail_raw, h_time_qualityfail_raw;
 
-  h_amp_timefail_q3  = new TH1F("amp_timefail_q3", "Amp for time mismatches w/ Quality=3", 1200, 0, 262144);
-  h_amp_timefail_q3->GetXaxis()->SetTitle("Amplitude");
-  h_amp_timefail_q3->SetOption("LIVE");
+  for (int i = 0; i < 4; i++) {
+    std::string h_name_a, h_title_a, h_name_t, h_title_t;
+    h_name_a = str(boost::format("amp_timefail_q%1%") % i);
+    h_title_a = str(boost::format("Amp for time mismatches w/ QualityData=%1%") % i);
+    h_name_t = str(boost::format("time_ampfail_q%1%") % i);
+    h_title_t = str(boost::format("Time for amp mismatches w/ QualityData=%1%") % i);
+    TH1F* h_a = new TH1F(h_name_a.c_str(), h_title_a.c_str(), 1200, 0, 262144);
+    TH1F* h_t = new TH1F(h_name_t.c_str(), h_title_t.c_str(), 240, -2050, 2050);
+    h_a->SetOption("LIVE");
+    h_t->SetOption("LIVE");
+    h_amp_timefail.push_back(h_a);
+    h_time_ampfail.push_back(h_t);
+  }
 
-  h_amp_qf0_qd3  = new TH1F("amp_qf0_qd3", "Amp for QualityFit=0 and QualityData=3", 240, 0, 262144);
-  h_amp_qf0_qd3->GetXaxis()->SetTitle("Amplitude");
-  h_amp_qf0_qd3->SetOption("LIVE");
-
-  h_amp_qf3_qd0  = new TH1F("amp_qf3_qd0", "Amp for QualityFit=3 and QualityData=0", 240, 0, 262144);
-  h_amp_qf3_qd0->GetXaxis()->SetTitle("Amplitude");
-  h_amp_qf3_qd0->SetOption("LIVE");
-
-  h_time_qf0_qd3  = new TH1F("time_qf0_qd3", "Time for QualityFit=0 and QualityData=3", 240, -2050, 2050);
-  h_time_qf0_qd3->GetXaxis()->SetTitle("Time");
-  h_time_qf0_qd3->SetOption("LIVE");
-
-  h_time_qf3_qd0  = new TH1F("time_qf3_qd0", "Time for QualityFit=3 and QualityData=0", 240, -2050, 2050);
-  h_time_qf3_qd0->GetXaxis()->SetTitle("Time");
-  h_time_qf3_qd0->SetOption("LIVE");
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if (j != i) {
+        std::string h_name_a, h_title_a, h_name_t, h_title_t;
+        h_name_a = str(boost::format("amp_qf%1%_qd%2%") % i % j);
+        h_title_a = str(boost::format("Amp for QualityFit=%1% and QualityData=%2%") % i % j);
+        h_name_t = str(boost::format("time_qf%1%_qd%2%") % i % j);
+        h_title_t = str(boost::format("Time for QualityFit=%1% and QualityData=%2%") % i % j);
+        TH1F* h_a = new TH1F(h_name_a.c_str(), h_title_a.c_str(), 1200, 0, 262144);
+        TH1F* h_t = new TH1F(h_name_t.c_str(), h_title_t.c_str(), 240, -2050, 2050);
+        h_a->SetOption("LIVE");
+        h_t->SetOption("LIVE");
+        h_amp_qualityfail_raw.push_back(h_a);
+        h_time_qualityfail_raw.push_back(h_t);
+      }
+    }
+    h_amp_qualityfail.push_back(h_amp_qualityfail_raw);
+    h_time_qualityfail.push_back(h_time_qualityfail_raw);
+    h_amp_qualityfail_raw.clear();
+    h_time_qualityfail_raw.clear();
+  }
 
   h_ampfail_quality  = new TH1F("ampfail_quality", "Amp. control flags in bins of QualityData", 5, -1, 4);
   h_ampfail_quality->GetXaxis()->SetTitle("QualityData");
+  h_ampfail_quality->SetFillColor(kPink - 4);
   h_ampfail_quality->SetOption("LIVE");
 
   h_timefail_quality  = new TH1F("timefail_quality", "Time control flags in bins of QualityData", 5, -1, 4);
+  h_timefail_quality->SetFillColor(kPink - 4);
   h_timefail_quality->GetXaxis()->SetTitle("QualityData");
   h_timefail_quality->SetOption("LIVE");
 
@@ -146,6 +164,34 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_cellid = new TH1F("timefail_cellid", "CellIDs w/ failed time", 8736, 1, 8737);
   h_timefail_cellid->GetXaxis()->SetTitle("Cell ID");
   h_timefail_cellid->SetOption("LIVE");
+
+  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "CellIDs w/ failed times and amps", 8736, 1, 8737);
+  h_amptimefail_cellid->GetXaxis()->SetTitle("Cell ID");
+  h_amptimefail_cellid->SetOption("LIVE");
+
+  h_ampfail_shaperid = new TH1F("ampfail_shaperid", "Shaper IDs w/ failed amps", 624, 1, 625);
+  h_ampfail_shaperid->GetXaxis()->SetTitle("Shaper ID");
+  h_ampfail_shaperid->SetOption("LIVE");
+
+  h_timefail_shaperid = new TH1F("timefail_shaperid", "Shaper IDs w/ failed time", 624, 1, 625);
+  h_timefail_shaperid->GetXaxis()->SetTitle("Shaper ID");
+  h_timefail_shaperid->SetOption("LIVE");
+
+  h_amptimefail_shaperid = new TH1F("amptimefail_shaperid", "Shaper IDs w/ failed times and amps", 624, 1, 625);
+  h_amptimefail_shaperid->GetXaxis()->SetTitle("Shaper ID");
+  h_amptimefail_shaperid->SetOption("LIVE");
+
+  h_ampfail_crateid = new TH1F("ampfail_crateid", "Shaper IDs w/ failed amps", 52, 1, 53);
+  h_ampfail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_ampfail_crateid->SetOption("LIVE");
+
+  h_timefail_crateid = new TH1F("timefail_crateid", "Shaper IDs w/ failed time", 52, 1, 53);
+  h_timefail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_timefail_crateid->SetOption("LIVE");
+
+  h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Shaper IDs w/ failed times and amps", 52, 1, 53);
+  h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_amptimefail_crateid->SetOption("LIVE");
 
   h_qualityfail_cellid = new TH1F("qualityfail_cellid", "CellIDs w/ failed qualities", 8736, 1, 8737);
   h_qualityfail_cellid->GetXaxis()->SetTitle("Cell ID");
@@ -175,17 +221,18 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timediff_quality->GetYaxis()->SetTitle("Time difference");
   h_timediff_quality->SetOption("LIVE");
 
-  h_ampdiff_shaper = new TH2F("ampdiff_shaper", "Amp. diff. (Emulator-Data) for amp. fails in bins of Shaper Id", 624, 1, 625, 239,
-                              -262143, 262143);
-  h_ampdiff_shaper->GetXaxis()->SetTitle("Shaper Id");
-  h_ampdiff_shaper->GetYaxis()->SetTitle("Amplitude difference");
-  h_ampdiff_shaper->SetOption("LIVE");
+  h_ampdiff_shaperid = new TH2F("ampdiff_shaper", "Amp. diff. (Emulator-Data) for amp. fails in bins of Shaper Id", 624, 1, 625, 239,
+                                -262143, 262143);
+  h_ampdiff_shaperid->GetXaxis()->SetTitle("Shaper Id");
+  h_ampdiff_shaperid->GetYaxis()->SetTitle("Amplitude difference");
+  h_ampdiff_shaperid->SetOption("LIVE");
 
-  h_timediff_shaper = new TH2F("timediff_shaper", "Time diff. (Emulator-Data) for time fails in bins of Shaper Id", 624, 1, 625, 239,
-                               -4095, 4095);
-  h_timediff_shaper->GetXaxis()->SetTitle("Shaper Id");
-  h_timediff_shaper->GetYaxis()->SetTitle("Time difference");
-  h_timediff_shaper->SetOption("LIVE");
+  h_timediff_shaperid = new TH2F("timediff_shaper", "Time diff. (Emulator-Data) for time fails in bins of Shaper Id", 624, 1, 625,
+                                 239,
+                                 -4095, 4095);
+  h_timediff_shaperid->GetXaxis()->SetTitle("Shaper Id");
+  h_timediff_shaperid->GetYaxis()->SetTitle("Time difference");
+  h_timediff_shaperid->SetOption("LIVE");
 
   h_quality_fit_data = new TH2F("quality_fit_data", "QualityFit vs QualityData for quality fails", 4, 0, 4, 4, 0, 4);
   h_quality_fit_data->GetXaxis()->SetTitle("QualityFit");
@@ -226,7 +273,6 @@ void ECLDQMEXTENDEDModule::initialize()
   if (m_InitKey == "DB")  initDspfromDB();
   else if (m_InitKey == "File") initDspfromFile();
   else B2FATAL(" No way to initialize DSP coeffs!!! Please choose InitKey = DB or InitKey = File");
-
 }
 
 void ECLDQMEXTENDEDModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<short int>& constants)
@@ -385,23 +431,34 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
 
 void ECLDQMEXTENDEDModule::beginRun()
 {
-  h_amp_timefail_q0->Reset();
-  h_amp_timefail_q3->Reset();
-  h_amp_qf0_qd3->Reset();
-  h_amp_qf3_qd0->Reset();
-  h_time_qf0_qd3->Reset();
-  h_time_qf3_qd0->Reset();
+  for (int i = 0; i < 4; i++) {
+    h_amp_timefail[i]->Reset();
+    h_time_ampfail[i]->Reset();
+  }
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 3; j++) {
+      h_amp_qualityfail[i][j]->Reset();
+      h_time_qualityfail[i][j]->Reset();
+    }
+  }
   h_ampfail_quality->Reset();
   h_timefail_quality->Reset();
   h_ampfail_cellid->Reset();
   h_timefail_cellid->Reset();
+  h_amptimefail_cellid->Reset();
+  h_ampfail_shaperid->Reset();
+  h_timefail_shaperid->Reset();
+  h_amptimefail_shaperid->Reset();
+  h_ampfail_crateid->Reset();
+  h_timefail_crateid->Reset();
+  h_amptimefail_crateid->Reset();
   h_qualityfail_cellid->Reset();
   h_ampdiff_cellid->Reset();
   h_timediff_cellid->Reset();
   h_ampdiff_quality->Reset();
   h_timediff_quality->Reset();
-  h_ampdiff_shaper->Reset();
-  h_timediff_shaper->Reset();
+  h_ampdiff_shaperid->Reset();
+  h_timediff_shaperid->Reset();
   h_quality_fit_data->Reset();
   h_ampflag_qualityfail->Reset();
   h_timeflag_qualityfail->Reset();
@@ -428,22 +485,41 @@ void ECLDQMEXTENDEDModule::event()
       emulator(m_CellId, m_TrigTime, DspArray);
 
       if (m_AmpFit != m_AmpData) {
+        for (int i = 0; i < 4; i++) if (m_QualityData == i && m_TimeFit == m_TimeData) h_time_ampfail[i]->Fill(m_TimeData);
         h_ampfail_quality->Fill(m_QualityData);
         h_ampfail_cellid->Fill(m_CellId);
+        h_ampfail_shaperid->Fill(conversion(m_CellId));
+        h_ampfail_crateid->Fill(mapper.getCrateID(m_CellId));
         h_ampdiff_cellid->Fill(m_CellId, m_AmpFit - m_AmpData);
         h_ampdiff_quality->Fill(m_QualityData, m_AmpFit - m_AmpData);
-        h_ampdiff_shaper->Fill(conversion(m_CellId), m_AmpFit - m_AmpData);
+        h_ampdiff_shaperid->Fill(conversion(m_CellId), m_AmpFit - m_AmpData);
       }
       if (m_TimeFit != m_TimeData) {
-        if (m_QualityData == 0) h_amp_timefail_q0->Fill(m_AmpData);
-        if (m_QualityData == 3) h_amp_timefail_q3->Fill(m_AmpData);
+        for (int i = 0; i < 4; i++) if (m_QualityData == i && m_AmpFit == m_AmpData) h_amp_timefail[i]->Fill(m_AmpData);
         h_timefail_quality->Fill(m_QualityData);
         h_timefail_cellid->Fill(m_CellId);
+        h_timefail_shaperid->Fill(conversion(m_CellId));
+        h_timefail_crateid->Fill(mapper.getCrateID(m_CellId));
         h_timediff_cellid->Fill(m_CellId, m_TimeFit - m_TimeData);
         h_timediff_quality->Fill(m_QualityData, m_TimeFit - m_TimeData);
-        h_timediff_shaper->Fill(conversion(m_CellId), m_TimeFit - m_TimeData);
+        h_timediff_shaperid->Fill(conversion(m_CellId), m_TimeFit - m_TimeData);
+      }
+      if (m_AmpFit != m_AmpData && m_TimeFit != m_TimeData) {
+        h_amptimefail_cellid->Fill(m_CellId);
+        h_amptimefail_shaperid->Fill(conversion(m_CellId));
+        h_amptimefail_crateid->Fill(mapper.getCrateID(m_CellId));
       }
       if (m_QualityFit != m_QualityData) {
+        for (int i = 0; i < 4; i++) {
+          for (int j = 0; j < 3; j++) {
+            int k = 0;
+            if (i == 0) k = j + 1;
+            if (i == 1) { if (j == 0) k = j; else k = j + 1; }
+            if (i == 2) { if (j == 2) k = j + 1; else k = j; }
+            if (i == 3) k = j;
+            if (m_QualityFit == i && m_QualityData == k) { h_amp_qualityfail[i][j]->Fill(m_AmpData); h_time_qualityfail[i][j]->Fill(m_TimeData); }
+          }
+        }
         if (m_AmpFit != m_AmpData) iAmpflag_qualityfail = 1;
         if (m_TimeFit != m_TimeData) iTimeflag_qualityfail = 1;
         h_qualityfail_cellid->Fill(m_CellId);

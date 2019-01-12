@@ -108,9 +108,9 @@ namespace Belle2 {
     std::map<int, std::map<std::string, short int>> map_container_coef;
 
     /** Vector to store Low amplitude thresholds. */
-    std::vector<short int>  v_totalthrA0;
+    std::vector<short int>  v_totalthrA0 = {};
     /** Vector to store hit thresholds. */
-    std::vector<short int>  v_totalthrAhard;
+    std::vector<short int>  v_totalthrAhard = {};
 
     /** Signal amplitude obtaining from DSP emulator. */
     int m_AmpFit{0};
@@ -131,29 +131,44 @@ namespace Belle2 {
     /** Trigger time value. */
     int m_TrigTime{0};
 
-    /** Histogram: Amplitude for time mismatches w/ QualityData == 0. */
-    TH1F* h_amp_timefail_q0{nullptr};
-    /** Histogram: Amplitude for time mismathes w/ QualityData == 3. */
-    TH1F* h_amp_timefail_q3{nullptr};
-    /** Histogram: Amplitude for QualityFit == 0 && QualityData == 3. */
-    TH1F* h_amp_qf0_qd3{nullptr};
-    /** Histogram: Amplitude for QualityFit == 3 && QualityData == 0. */
-    TH1F* h_amp_qf3_qd0{nullptr};
-    /** Histogram: Time for QualityFit == 0 && QualityData == 3. */
-    TH1F* h_time_qf0_qd3{nullptr};
-    /** Histogram: Time for QualityFit == 3 && QualityData == 0. */
-    TH1F* h_time_qf3_qd0{nullptr};
+    /** Histogram vector: Amplitude for time mismacthes (AmplitudeFit == AmplitudeData) w/ various QualityData values. */
+    std::vector<TH1F*> h_amp_timefail = {};
+    /** Histogram vector: Time for amplitude mismathces (TimeFit == TimeData) w/ various QualityData values. */
+    std::vector<TH1F*> h_time_ampfail = {};
+    /** Histogram vector: AmplitudeData for quality mismathes w/ various QualityFit (raw) and QualityData (column) values. */
+    std::vector<std::vector<TH1F*>> h_amp_qualityfail = {};
+    /** Histogram vector: TimeData for quality mismacthes w/ various QualitFit (raw) and QualityData (column) values. */
+    std::vector<std::vector<TH1F*>> h_time_qualityfail = {};
 
     /**  Histogram: Amp. Control flags in bins of QualityData. */
     TH1F* h_ampfail_quality{nullptr};
     /** Histogram: Time control flags in bins of QualityData. */
     TH1F* h_timefail_quality{nullptr};
+
     /** Histogram: CellIDs w/ failed amplitudes. */
     TH1F* h_ampfail_cellid{nullptr};
     /** Histogram: CellIDs w/ failed times. */
     TH1F* h_timefail_cellid{nullptr};
+    /** Histogram: CellIDs w/ failed amplitudes and times. */
+    TH1F* h_amptimefail_cellid{nullptr};
     /** Histogram: CellIDs w/ failed qualities. */
     TH1F* h_qualityfail_cellid{nullptr};
+    /** Histogram: ShaperIDs w/ failed amplitudes. */
+    TH1F* h_ampfail_shaperid{nullptr};
+    /** Histogram: ShaperIDs w/ failed times. */
+    TH1F* h_timefail_shaperid{nullptr};
+    /** Histogram: ShaperIDs w/ failed amplitudes and times. */
+    TH1F* h_amptimefail_shaperid{nullptr};
+    /** Histogram: ShaperIDs w/ failed qualities. */
+    TH1F* h_qualityfail_shaperid{nullptr};
+    /** Histogram: CrateIDs w/ failed amplitudes. */
+    TH1F* h_ampfail_crateid{nullptr};
+    /** Histogram: CellIDs w/ failed times. */
+    TH1F* h_timefail_crateid{nullptr};
+    /** Histogram: CellIDs w/ failed amplitudes and times. */
+    TH1F* h_amptimefail_crateid{nullptr};
+    /** Histogram: CellIDs w/ failed qualities. */
+    TH1F* h_qualityfail_crateid{nullptr};
 
     /** Histogram: Amplitude diff. (Emulator - Data) for amp. fails. */
     TH2F* h_ampdiff_cellid{nullptr};
@@ -164,9 +179,9 @@ namespace Belle2 {
     /** Histogram: Time diff. (Emulator-Data) for time fails in bins of QualityData. */
     TH2F* h_timediff_quality{nullptr};
     /** Histogram: Amp. diff. (Emulator-Data) for amp. fails in bins of Shaper Id. */
-    TH2F* h_ampdiff_shaper{nullptr};
+    TH2F* h_ampdiff_shaperid{nullptr};
     /** Histogram: Time diff. (Emulator-Data) for time fails in bins of Shaper Id. */
-    TH2F* h_timediff_shaper{nullptr};
+    TH2F* h_timediff_shaperid{nullptr};
     /** Histogram: QualityFit vs QualityData for quality fails. */
     TH2F* h_quality_fit_data{nullptr};
     /** Histogram: Amp flag (0/1) w/ failed qualities in bins of QualityData. */

@@ -83,7 +83,7 @@ namespace Belle2 {
     const double highestEnergy = 32.1;
     const double lat = 0.5;
     const double   nOfCrystals = 4;
-    const int   status = 1;
+    const ECLCluster::EStatusBit status = ECLCluster::EStatusBit::c_PulseShapeDiscrimination;
     // Energy->[0], Phi->[2], Theta->[5]
     double error[6] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
 
@@ -111,7 +111,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(time, myECLCluster.getTime());
     EXPECT_FLOAT_EQ(deltaTime99, myECLCluster.getDeltaTime99());
     EXPECT_FLOAT_EQ(highestEnergy, myECLCluster.getEnergyHighestCrystal());
-    EXPECT_EQ(status, myECLCluster.getStatus());
+    EXPECT_EQ(static_cast<unsigned short>(status), myECLCluster.hasStatus(status));
     EXPECT_FLOAT_EQ(nOfCrystals, myECLCluster.getNumberOfCrystals());
     EXPECT_FLOAT_EQ(lat, myECLCluster.getLAT());
 

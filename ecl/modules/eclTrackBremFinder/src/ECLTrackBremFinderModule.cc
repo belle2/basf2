@@ -141,8 +141,7 @@ void ECLTrackBremFinderModule::event()
       track.getRelationsWith<ECLCluster>
       (m_param_eclClustersStoreArrayName);       //check the cluster hypothesis ID here (take c_nPhotons hypothesis)!!
     for (auto& relatedCluster : relatedClustersToTrack) {
-      auto particleHypothesisID = relatedCluster.getHypothesisId();
-      if (particleHypothesisID == ECLCluster::c_nPhotons) {
+      if (relatedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         primaryClusterOfTrack = &relatedCluster;
       }
     }
@@ -208,8 +207,7 @@ void ECLTrackBremFinderModule::event()
     // iterate over full cluster list to find possible compatible clusters
     for (ECLCluster& cluster : m_eclClusters) {
       //check if the cluster belongs to a photon or electron
-      int particleHypothesisID = cluster.getHypothesisId();
-      if (particleHypothesisID != ECLCluster::c_nPhotons) {
+      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         B2DEBUG(20, "Cluster has wrong hypothesis!");
         continue;
       }

@@ -58,10 +58,10 @@ void ECLTriggerClusterMatcherModule::event()
     const double eclclusterE = eclcluster.getEnergy();
 
     // Users can re-run this with different settings, remove this bit.
-    eclcluster.removeStatus(ECLCluster::c_TriggerCluster);
+    eclcluster.removeStatus(ECLCluster::EStatusBit::c_TriggerCluster);
 
     // Add status bit that shows that the matcher has run
-    eclcluster.addStatus(ECLCluster::c_TriggerClusterMatching);
+    eclcluster.addStatus(ECLCluster::EStatusBit::c_TriggerClusterMatching);
 
     if (eclclusterE < m_minClusterEnergy) continue;  // skip low energy cluster
 
@@ -85,7 +85,7 @@ void ECLTriggerClusterMatcherModule::event()
 
       // set relation(s) and status bit
       if (angle < m_maxAngle and fracEnergy > m_minFracEnergy and fracEnergy < m_maxFracEnergy) {
-        eclcluster.addStatus(ECLCluster::c_TriggerCluster);
+        eclcluster.addStatus(ECLCluster::EStatusBit::c_TriggerCluster);
         eclcluster.addRelationTo(&ecltrigger);
       }
 

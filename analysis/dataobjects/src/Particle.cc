@@ -553,7 +553,7 @@ const ECLCluster* Particle::getECLCluster() const
     // loop over all clusters matched to this track
     for (const ECLCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<ECLCluster>()) {
       // ignore everything except the nPhotons hypothesis
-      if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+      if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
         continue;
       // check if we're most energetic thus far
       if (cluster.getEnergy() > highestEnergy) {

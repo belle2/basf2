@@ -120,7 +120,7 @@ namespace Belle2 {
       double result = 0;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
         // sum only momentum of N1 (n photons) ECLClusters
-        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 
         result += eclClusters[i]->getEnergy();

@@ -201,19 +201,19 @@ namespace {
     ECLCluster* eclGamma1 = eclClusters. appendNew(ECLCluster());
     eclGamma1->setConnectedRegionId(1);
     eclGamma1->setClusterId(1);
-    eclGamma1->setHypothesisId(5);
+    eclGamma1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma2 = eclClusters. appendNew(ECLCluster());
     eclGamma2->setConnectedRegionId(1);
     eclGamma2->setClusterId(2);
-    eclGamma2->setHypothesisId(5);
+    eclGamma2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma3 = eclClusters. appendNew(ECLCluster());
     eclGamma3->setConnectedRegionId(2);
     eclGamma3->setClusterId(1);
-    eclGamma3->setHypothesisId(5);
+    eclGamma3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclKL = eclClusters. appendNew(ECLCluster());
     eclKL->setConnectedRegionId(2);
     eclKL->setClusterId(1);
-    eclKL->setHypothesisId(6);
+    eclKL->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
 
 
 

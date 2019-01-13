@@ -277,7 +277,7 @@ namespace Belle2 {
           for (const auto& cluster : clusters)
           {
             // look only at momentum of N1 (n photons) ECLClusters
-            if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+            if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
               continue;
 
             Particle particle(&cluster);

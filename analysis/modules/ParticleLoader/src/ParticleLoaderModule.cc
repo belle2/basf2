@@ -499,8 +499,7 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
-      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
-        continue;
+      if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles

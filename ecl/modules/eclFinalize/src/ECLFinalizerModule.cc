@@ -50,6 +50,9 @@ ECLFinalizerModule::ECLFinalizerModule() : Module()
            20.0 * Belle2::Unit::MeV);
   addParam("clusterTimeCutMaxEnergy", m_clusterTimeCutMaxEnergy, "All clusters above this energy are kept.",
            50.0 * Belle2::Unit::MeV);
+  addParam("clusterLossyFraction", m_clusterLossyFraction,
+           "Keep N2 clusters only if #(crystals) is different from N1 by this fraction.",
+           1e-4);
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
@@ -92,88 +95,21 @@ void ECLFinalizerModule::event()
     eventT0 = m_eventT0->getEventT0();
   }
 
-  // loop over all ECLShowers
+  // map connected regions to different cluster hypothesis: key (CRId, HypothesisID) -> list arrayindex of shower
+  std::map<std::pair<int, int>, std::vector<int>> hypoShowerMap;
   for (const auto& eclShower : m_eclShowers) {
-
+    // if they pass cuts, put them in this map
     // get shower time, energy and highest energy for cuts
     const double showerTime = eclShower.getTime() - eventT0;
     const double showerdt99 = eclShower.getDeltaTime99();
     const double showerEnergy = eclShower.getEnergy();
 
-    // only keep showers above an energy threshold (~20MeV) and if their time is within
-    // the 99% coverage of the time resolution (failed fits pass as well)
-    // high energetic clusters (~50MeV+) pass as well in order to keep all out of time
-    // background events that may damage real clusters
-    if (showerEnergy > m_clusterEnergyCutMin
-        and ((fabs(showerTime) < showerdt99) or (showerEnergy > m_clusterTimeCutMaxEnergy))) {
+    if (showerEnergy > m_clusterEnergyCutMin and ((fabs(showerTime) < showerdt99) or (showerEnergy > m_clusterTimeCutMaxEnergy))) {
+      hypoShowerMap[std::make_pair(eclShower.getConnectedRegionId(), eclShower.getHypothesisId())].push_back(eclShower.getArrayIndex());
+    } else {
+      if (eclShower.getHypothesisId() == Belle2::ECLShower::c_nPhotons) {
 
-      // create an mdst cluster for each ecl shower
-      const auto eclCluster = m_eclClusters.appendNew();
-
-      // set all variables
-      eclCluster->setStatus(eclShower.getStatus());
-      eclCluster->setConnectedRegionId(eclShower.getConnectedRegionId());
-
-      const int hyp = eclShower.getHypothesisId();
-      eclCluster->setHypothesisId(hyp);
-
-      // dont add (they are initializd as photons)
-      if (hyp == ECLCluster::c_nPhotons) {
-        eclCluster->setHypothesis(ECLCluster::c_nPhotonsBit);
-      } else if (hyp == ECLCluster::c_neutralHadron) {
-        eclCluster->setHypothesis(ECLCluster::c_neutralHadronBit);
-      }
-
-      eclCluster->setClusterId(eclShower.getShowerId());
-
-      eclCluster->setEnergy(eclShower.getEnergy());
-      eclCluster->setEnergyRaw(eclShower.getEnergyRaw());
-      eclCluster->setEnergyHighestCrystal(eclShower.getEnergyHighestCrystal());
-
-      double covmat[6] = {
-        eclShower.getUncertaintyEnergy()* eclShower.getUncertaintyEnergy(),
-        0.0,
-        eclShower.getUncertaintyPhi()* eclShower.getUncertaintyPhi(),
-        0.0,
-        0.0,
-        eclShower.getUncertaintyTheta()* eclShower.getUncertaintyTheta()
-      };
-      eclCluster->setCovarianceMatrix(covmat);
-
-      eclCluster->setAbsZernike40(eclShower.getAbsZernike40());
-      eclCluster->setAbsZernike51(eclShower.getAbsZernike51());
-      eclCluster->setZernikeMVA(eclShower.getZernikeMVA());
-      eclCluster->setE1oE9(eclShower.getE1oE9());
-      eclCluster->setE9oE21(eclShower.getE9oE21());
-      eclCluster->setSecondMoment(eclShower.getSecondMoment());
-      eclCluster->setLAT(eclShower.getLateralEnergy());
-      eclCluster->setNumberOfCrystals(eclShower.getNumberOfCrystals());
-      eclCluster->setTime(showerTime);
-      eclCluster->setDeltaTime99(eclShower.getDeltaTime99());
-      eclCluster->setTheta(eclShower.getTheta());
-      eclCluster->setPhi(eclShower.getPhi());
-      eclCluster->setR(eclShower.getR());
-      eclCluster->setPulseShapeDiscriminationMVA(eclShower.getPulseShapeDiscriminationMVA());
-      eclCluster->setClusterHadronIntensity(eclShower.getShowerHadronIntensity());
-      eclCluster->setNumberOfHadronDigits(eclShower.getNumberOfHadronDigits());
-
-      // set relation to ECLShower
-      eclCluster->addRelationTo(&eclShower);
-
-      // set relation to ECLCalDigits
-      auto showerDigitRelations = eclShower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
-      for (unsigned int iRel = 0; iRel < showerDigitRelations.size(); ++iRel) {
-        const auto calDigit = showerDigitRelations.object(iRel);
-        const auto weight = showerDigitRelations.weight(iRel);
-
-        eclCluster->addRelationTo(calDigit, weight);
-      }
-
-    } else { // Count number of c_nPhotons showers that aren't converted into clusters for monitoring
-
-      // Get detector region
-      if (eclShower.getHypothesisId() == Belle2::ECLCluster::c_nPhotons) {
-
+        // Get detector region
         const auto detectorRegion = eclShower.getDetectorRegion();
 
         B2DEBUG(39, "ECLFinalizerModule::event: Rejected shower with energy " << showerEnergy << ", time = " << showerTime << ", theta = "
@@ -186,6 +122,49 @@ void ECLFinalizerModule::event()
           ++rejectedShowersBrl;
         } else if (detectorRegion == ECL::DetectorRegion::BWD) {
           ++rejectedShowersBwd;
+        }
+      }
+    }
+  }
+
+  std::map<std::pair<int, int>, std::vector<int>> hypoClusterMap;
+
+  // now loop over all photon showers from the map and make clusters for those
+  for (const auto & [keypair, indexlist] : hypoShowerMap) {
+    if (keypair.second == Belle2::ECLShower::c_nPhotons) {
+      for (const auto& index : indexlist) {
+        hypoClusterMap[keypair].push_back(makeCluster(index, eventT0));
+      }
+    }
+  }
+
+  // now loop over all other showers
+  for (const auto & [keypair, indexlist] : hypoShowerMap) {
+    if (keypair.second != Belle2::ECLShower::c_nPhotons) { //  c_nPhotons
+      for (const auto& index : indexlist) {
+        // no photon entry exists (maybe we did not run the splitter or selection cuts failed)
+        if (hypoShowerMap.count(std::make_pair(keypair.first, Belle2::ECLShower::c_nPhotons)) < 1) {
+          hypoClusterMap[keypair].push_back(makeCluster(index, eventT0));
+        }
+        // there is more than one photon cluster, i.e. CR is split into multiple clusters
+        else if (hypoShowerMap[std::make_pair(keypair.first, Belle2::ECLShower::c_nPhotons)].size() > 1) {
+          hypoClusterMap[keypair].push_back(makeCluster(index, eventT0));
+        } else {
+          // get the already existing N1 cluster index
+          const int n1idx = hypoClusterMap[std::make_pair(keypair.first, Belle2::ECLShower::c_nPhotons)][0];
+          double lossfraction = fabs(m_eclClusters[n1idx]->getNumberOfCrystals() - m_eclShowers[index]->getNumberOfCrystals());
+
+          B2DEBUG(35, "ECLFinalizerModule::event lossfraction = " << lossfraction);
+
+          if (lossfraction > m_clusterLossyFraction) {
+            hypoClusterMap[keypair].push_back(makeCluster(index, eventT0));
+          } else {
+            if (keypair.second == ECLShower::c_neutralHadron) m_eclClusters[n1idx]->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+            else {
+              B2ERROR("This ECLShower hypothesis is not supported yet: " << keypair.second);
+            }
+          }
+          // else add(!) flag
         }
       }
     }
@@ -206,3 +185,77 @@ void ECLFinalizerModule::event()
 void ECLFinalizerModule::endRun() { ; }
 
 void ECLFinalizerModule::terminate() { ; }
+
+
+int ECLFinalizerModule::makeCluster(int index, double evtt0)
+{
+
+  const auto eclShower = m_eclShowers[index];
+
+  // create an mdst cluster for each ecl shower
+  const auto eclCluster = m_eclClusters.appendNew();
+
+  // status between showers and clusters may be different:
+  if (eclShower->hasPulseShapeDiscrimination()) {
+    eclCluster->addStatus(ECLCluster::EStatusBit::c_PulseShapeDiscrimination);
+  }
+
+  eclCluster->setConnectedRegionId(eclShower->getConnectedRegionId());
+
+  // ECLShowers have *one* hypothesisID...
+  const int hyp = eclShower->getHypothesisId();
+  // ECLClusters can have *multiple*, but not at the creation of an ECLCluster: use "set" and not "add"
+  if (hyp == ECLShower::c_nPhotons) eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+  else if (hyp == ECLShower::c_neutralHadron) eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+  else {
+    B2ERROR("This ECLShower hypothesis is not supported yet: " << hyp);
+  }
+
+  eclCluster->setClusterId(eclShower->getShowerId());
+
+  eclCluster->setEnergy(eclShower->getEnergy());
+  eclCluster->setEnergyRaw(eclShower->getEnergyRaw());
+  eclCluster->setEnergyHighestCrystal(eclShower->getEnergyHighestCrystal());
+
+  double covmat[6] = {
+    eclShower->getUncertaintyEnergy()* eclShower->getUncertaintyEnergy(),
+    0.0,
+    eclShower->getUncertaintyPhi()* eclShower->getUncertaintyPhi(),
+    0.0,
+    0.0,
+    eclShower->getUncertaintyTheta()* eclShower->getUncertaintyTheta()
+  };
+  eclCluster->setCovarianceMatrix(covmat);
+
+  eclCluster->setAbsZernike40(eclShower->getAbsZernike40());
+  eclCluster->setAbsZernike51(eclShower->getAbsZernike51());
+  eclCluster->setZernikeMVA(eclShower->getZernikeMVA());
+  eclCluster->setE1oE9(eclShower->getE1oE9());
+  eclCluster->setE9oE21(eclShower->getE9oE21());
+  eclCluster->setSecondMoment(eclShower->getSecondMoment());
+  eclCluster->setLAT(eclShower->getLateralEnergy());
+  eclCluster->setNumberOfCrystals(eclShower->getNumberOfCrystals());
+  eclCluster->setTime(eclShower->getTime() - evtt0);
+  eclCluster->setDeltaTime99(eclShower->getDeltaTime99());
+  eclCluster->setTheta(eclShower->getTheta());
+  eclCluster->setPhi(eclShower->getPhi());
+  eclCluster->setR(eclShower->getR());
+  eclCluster->setPulseShapeDiscriminationMVA(eclShower->getPulseShapeDiscriminationMVA());
+  eclCluster->setClusterHadronIntensity(eclShower->getShowerHadronIntensity());
+  eclCluster->setNumberOfHadronDigits(eclShower->getNumberOfHadronDigits());
+
+  // set relation to ECLShower
+  eclCluster->addRelationTo(eclShower);
+
+  // set relation to ECLCalDigits
+  auto showerDigitRelations = eclShower->getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
+  for (unsigned int iRel = 0; iRel < showerDigitRelations.size(); ++iRel) {
+    const auto calDigit = showerDigitRelations.object(iRel);
+    const auto weight = showerDigitRelations.weight(iRel);
+
+    eclCluster->addRelationTo(calDigit, weight);
+  }
+
+  return eclCluster->getArrayIndex();
+
+}

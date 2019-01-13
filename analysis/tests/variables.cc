@@ -417,7 +417,7 @@ namespace {
     myECL.setIsTrack(false);
     float eclREC = 0.5;
     myECL.setEnergy(eclREC);
-    myECL.setHypothesisId(5);
+    myECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* savedECL = myECLClusters.appendNew(myECL);
 
     // Particle on reconstructed side from ECLCluster
@@ -429,7 +429,7 @@ namespace {
     myROEECL.setIsTrack(false);
     float eclROE = 1.0;
     myROEECL.setEnergy(eclROE);
-    myROEECL.setHypothesisId(5);
+    myROEECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
     Particle* roeECLParticle = myParticles.appendNew(savedROEECL);
     // Create KLMCluster on ROE side
@@ -1767,14 +1767,14 @@ namespace {
     // set relations between particles and eclClusters
     ECLCluster* eclst0 = eclclusters.appendNew(ECLCluster());
     eclst0->setEnergy(dau0_4vec_Lab.E());
-    eclst0->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+    eclst0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     eclst0->setClusterId(1);
     eclst0->setTheta(dau0_4vec_Lab.Theta());
     eclst0->setPhi(dau0_4vec_Lab.Phi());
     eclst0->setR(148.4);
     ECLCluster* eclst1 = eclclusters.appendNew(ECLCluster());
     eclst1->setEnergy(dau1_4vec_Lab.E());
-    eclst1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+    eclst1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     eclst1->setClusterId(2);
     eclst1->setTheta(dau1_4vec_Lab.Theta());
     eclst1->setPhi(dau1_4vec_Lab.Phi());
@@ -2699,7 +2699,7 @@ namespace {
       // add some ECL clusters
       ECLCluster* e1 = eclclusters.appendNew(ECLCluster());
       e1->setEnergy(0.3);
-      e1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e1->setClusterId(1);
       // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
@@ -2707,34 +2707,34 @@ namespace {
       e2->setTheta(1.0); // somewhere in the barrel
       e2->setPhi(2.0);
       e2->setR(148.5);
-      e2->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e2->setClusterId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
       e3->setTheta(0.2); // somewhere in the fwd encap
       e3->setPhi(1.5);
       e3->setR(200.0);
-      e3->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e3->setClusterId(3);
 
       // aaand add clusters related to the tracks
       ECLCluster* e4 = eclclusters.appendNew(ECLCluster());
       e4->setEnergy(0.2);
-      e4->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e4->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e4->setClusterId(4);
       t1->addRelationTo(e4);
       e4->setIsTrack(true);
 
       ECLCluster* e5 = eclclusters.appendNew(ECLCluster());
       e5->setEnergy(0.3);
-      e5->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e5->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e5->setClusterId(5);
       t2->addRelationTo(e5);
       e5->setIsTrack(true);
 
       ECLCluster* e6 = eclclusters.appendNew(ECLCluster());
       e6->setEnergy(0.2);
-      e6->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e6->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e6->setClusterId(6);
       t3->addRelationTo(e6);
       t4->addRelationTo(e6);

@@ -145,7 +145,7 @@ void ECLTRGInformationModule::event()
   for (const auto& cluster : m_eclClusters) {
 
     // only photon clusters
-    if (cluster.getHypothesisId() != ECLCluster::c_nPhotons) continue;
+    if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
     // map TCId, energy
     tcmap TCMap;
@@ -230,7 +230,7 @@ void ECLTRGInformationModule::event()
 
             const auto cluster = rel.object(irel);
 
-            if (cluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
+            if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
             const auto weight = rel.weight(irel);
             float clusterenergy = cluster->getEnergy();

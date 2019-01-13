@@ -239,8 +239,8 @@
 #pragma read sourceClass="Belle2::ECLCluster" version="[-12]" \
   source="int m_hypothesisId" \
   targetClass="Belle2::ECLCluster" target="m_hypothesis" \
-  code="{ if(onfile.m_hypothesisId == Belle2::ECLCluster::c_nPhotons) m_hypothesis = Belle2::ECLCluster::c_nPhotonsBit; \
-        else if(onfile.m_hypothesisId == Belle2::ECLCluster::c_neutralHadron) m_hypothesis = Belle2::ECLCluster::c_neutralHadronBit; \
+  code="{ if(onfile.m_hypothesisId == 5) m_hypothesis = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_nPhotons); \
+        else if(onfile.m_hypothesisId == 6) m_hypothesis = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron); \
         else m_hypothesis = 0;}"
 
 #endif

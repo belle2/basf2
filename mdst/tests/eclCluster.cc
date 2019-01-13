@@ -111,7 +111,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(time, myECLCluster.getTime());
     EXPECT_FLOAT_EQ(deltaTime99, myECLCluster.getDeltaTime99());
     EXPECT_FLOAT_EQ(highestEnergy, myECLCluster.getEnergyHighestCrystal());
-    EXPECT_EQ(static_cast<unsigned short>(status), myECLCluster.hasStatus(status));
+    EXPECT_TRUE(myECLCluster.hasStatus(status));
     EXPECT_FLOAT_EQ(nOfCrystals, myECLCluster.getNumberOfCrystals());
     EXPECT_FLOAT_EQ(lat, myECLCluster.getLAT());
 

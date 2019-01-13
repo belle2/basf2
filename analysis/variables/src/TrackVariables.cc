@@ -251,7 +251,7 @@ namespace Belle2 {
       // count the number of nPhotons hypothesis ecl clusters
       int count = 0;
       for (const ECLCluster& cluster : track->getRelationsTo<ECLCluster>())
-        if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+        if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           count++;
       return double(count);
     }

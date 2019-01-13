@@ -58,10 +58,8 @@ namespace Belle2 {
     template<typename T>
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID,
                    T samples[c_nAPVSamples]):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID)
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
-      m_totalCharge = 0;
-      m_maxSampleIndex = 0;
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
                      [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
                     );
@@ -75,10 +73,8 @@ namespace Belle2 {
     */
     template<typename T>
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, T samples) :
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID)
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
     {
-      m_totalCharge = 0;
-      m_maxSampleIndex = 0;
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
                      [](typename T::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
@@ -90,12 +86,12 @@ namespace Belle2 {
         0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
     )
     {
-      m_sensorID = 0;
-      m_isU = true;
-      m_cellID = 0;
-      m_totalCharge = 0;
-      m_maxSampleIndex = 0;
-      m_maxSampleCharge = 0;
+//       m_sensorID = 0;
+//       m_isU = true;
+//       m_cellID = 0;
+//       m_totalCharge = 0;
+//       m_maxSampleIndex = 0;
+//       m_maxSampleCharge = 0;
     }
 
     /** Getter for the sensor ID. */

@@ -64,7 +64,7 @@ namespace Belle2 {
       * @param charge particle charge (-1, 0, +1) of hough track estimated by hough trafo algorithm
       * @param curvsign usual way to define track curvature
       */
-    DATCONTrack(std::vector<unsigned int>& hitIDList, unsigned int ID, double radius, double phi, double zzero, double theta,
+    DATCONTrack(const std::vector<unsigned int>& hitIDList, unsigned int ID, double radius, double phi, double zzero, double theta,
                 int charge, int curvsign):
       m_HitIDList(hitIDList), trackID(ID), trackRadius(radius), trackPhi(phi), trackZzero(zzero), trackTheta(theta), trackCharge(charge),
       trackCurvsign(curvsign) {}
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     /** Set functions */
     /** Set list of hits assigned to the track */
-    void setHitIDList(std::vector<unsigned int>& hitIDList) { m_HitIDList = hitIDList; }
+    void setHitIDList(const std::vector<unsigned int>& hitIDList) { m_HitIDList = hitIDList; }
 
 
   private:

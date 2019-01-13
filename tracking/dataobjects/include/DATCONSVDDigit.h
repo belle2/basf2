@@ -203,9 +203,9 @@ namespace Belle2 {
     bool m_isU;                       /**< True if U, false if V. */
     short m_cellID;                   /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples;          /**< 6 APV signals from the strip. */
-    unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
-    unsigned short m_maxSampleCharge; /**< Charge of sample max */
     unsigned short m_totalCharge;     /**< Total charge of this DATCONSVDDigit */
+    unsigned short m_maxSampleCharge; /**< Charge of sample max */
+    unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
 
     ClassDef(DATCONSVDDigit, 1)
 

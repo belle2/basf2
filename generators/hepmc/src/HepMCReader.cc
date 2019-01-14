@@ -145,11 +145,27 @@ void HepMCReader::readNextEvent(HepMC::GenEvent& evt)
   if (m_input) {
     evt.read(m_input);
     if (evt.is_valid()) {
-      B2DEBUG(10, "Found valid event.");
+      const int nparticles = evt.particles_size();
+      B2DEBUG(10, "Found valid event.i N particles " << nparticles);
       return; //
     } else {
-      B2DEBUG(10, "The next event was invalid.");
+      B2DEBUG(10, "The next event was invalid. Will stop reading now.");
     }
   }
   return;
 }
+int HepMCReader::countEvents(const std::string& filename)
+{
+  //different way to read file for consitency check
+  HepMC::IO_GenEvent ascii_in(filename.c_str(), std::ios::in);
+  int count = 0;
+  HepMC::GenEvent* evt = ascii_in.read_next_event();
+  while (evt) {
+    evt = ascii_in.read_next_event();
+    count++;
+  }
+  B2INFO("Counted " << count  << " events in  " << filename << ".");
+  return count;
+}
+
+

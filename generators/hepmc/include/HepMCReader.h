@@ -21,6 +21,7 @@
 #include <TLorentzRotation.h>
 
 #include "HepMC/GenEvent.h"
+#include "HepMC/IO_GenEvent.h"
 namespace Belle2 {
 
   /**
@@ -84,7 +85,7 @@ namespace Belle2 {
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
-
+    int countEvents(const std::string& filename); /**< Count events in file */
   protected:
 
     void readNextEvent(HepMC::GenEvent& evt); /**< read the next event from the IO stream and write into evt */

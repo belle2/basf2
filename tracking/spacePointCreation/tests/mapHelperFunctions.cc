@@ -148,7 +148,6 @@ namespace Belle2 {
       }
     }
 
-    i2dMap::iterator _nanMapIt;
     for (unsigned int i = 0; i < N; ++i) {
       auto range = _nanMap.equal_range(i);
       i2dMap::iterator mapIt = range.first;

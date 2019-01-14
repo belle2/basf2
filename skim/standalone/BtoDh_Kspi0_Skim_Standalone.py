@@ -15,7 +15,7 @@ from stdPi0s import *
 from stdV0s import *
 from skim.standardlists.charm import *
 from skimExpertFunctions import encodeSkimName, setSkimLogging
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 kspi0path = Path()
 
@@ -46,4 +46,4 @@ setSkimLogging()
 process(kspi0path)
 
 # print out the summary
-print(statistics, path=kspi0path)
+print(statistics)

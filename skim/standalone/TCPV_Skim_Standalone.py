@@ -47,7 +47,7 @@ from stdV0s import *
 from skim.standardlists.lightmesons import *
 from skim.standardlists.dileptons import loadStdDiLeptons
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-00-00'
 set_log_level(LogLevel.INFO)
 
 

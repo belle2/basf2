@@ -15,7 +15,7 @@ from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from skimExpertFunctions import setSkimLogging, encodeSkimName
 
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-00-00'
 
 # create a path
 darkskimpath = Path()

@@ -519,7 +519,7 @@ namespace Belle2 {
     double m_imgTubeThickness =
       0.0; /**< imaginary tube thikness just after aerogel layers used as volume to which tracks are extrapolated */
 
-    double m_compensationARICHairVolumeThick_min; /**< Minimum thickness of the compensation volume with ARICH air */
+    double m_compensationARICHairVolumeThick_min = 0; /**< Minimum thickness of the compensation volume with ARICH air */
 
     ClassDefOverride(ARICHGeoAerogelPlane, 3); /**< ClassDef */
 

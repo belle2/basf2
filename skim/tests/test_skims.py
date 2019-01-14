@@ -134,9 +134,6 @@ add_skim('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKs(path=skimpath), path=skimpat
 from skim.charm import CharmRareList
 add_skim('CharmRare', CharmRareList(path=skimpath), path=skimpath)
 
-from skim.charm import CharmSemileptonicList
-add_skim('CharmSemileptonic', CharmSemileptonicList(path=skimpath), path=skimpath)
-
 
 # Systematics skim
 from skim.systematics import SystematicsList

@@ -220,7 +220,7 @@ namespace Belle2 {
       }
 
       // add vertex (but without real vertexPosition, since origin is assumed)
-      SecMapTrainerHit newVirtualHit(FullSecID().getFullSecString(), m_config.vIP);
+      SecMapTrainerHit newVirtualHit(FullSecID(), m_config.vIP);
 
       newTrack.addHit(std::move(newVirtualHit));
 

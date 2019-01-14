@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 
 """
 <header>
@@ -6,8 +9,6 @@
   <contact>reem.rasheed@iphc.cnrs.fr</contact>
 </header>
 """
-
-__author__ = "Reem Rasheed"
 
 
 import sys

@@ -534,6 +534,20 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
 
+    REGISTER_VARIABLE("date", eventYearMonthDay,
+                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
+                      " See also eventYear, provided for convenience."
+                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+    REGISTER_VARIABLE("year", eventYear,
+                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
+                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+    REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
+                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
+    REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
+                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
+                      "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
+
+    VARIABLE_GROUP("EventKinematics");
 
     REGISTER_VARIABLE("missingMomentumOfEvent", missingMomentumOfEvent,
                       "[Eventbased] The magnitude of the missing momentum in lab obtained with EventKinematics module")
@@ -563,18 +577,6 @@ namespace Belle2 {
                       "[Eventbased] The visible energy in CMS obtained with EventKinematics module")
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
                       "[Eventbased] The energy in lab of all the photons obtained with EventKinematics module");
-    REGISTER_VARIABLE("date", eventYearMonthDay,
-                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
-                      " See also eventYear, provided for convenience."
-                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
-    REGISTER_VARIABLE("year", eventYear,
-                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
-                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
-    REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
-                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
-    REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
-                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
-                      "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0,

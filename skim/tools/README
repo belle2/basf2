@@ -1,7 +1,9 @@
 Description of each item:
 
-skimRun.csh: runs the skims on each MC generic sample. 
-printSkimStats.py: prints the statistics of each skim using information from the log files and the output uDST files after having run each skim using skimRun.csh.
+runSkims.py: runs the skims on each MC generic sample at kekcc. 
+printSkimStats.py: prints the statistics of each skim using information from the log files and the output uDST files after having run each skim using runSkims.py.
+runCombinedSkims.py : runs the combined skims on each MC generic sample at kekcc. 
+printCombinedStats.py: print the statistics for each combined skims using the information from the log files and the output uDST files. 
 
 inputFiles/McCampaign: a directory with a list of .txt file. Each .txt file contains the kekcc location of a file from each generic MC sample. Only one file is used from each MC sample. In general the generic MC samples:mixed charge, uubar, ccbar, ddbar, taupair,  need to be tested. 
 (Ofcourse you can just use getTestFile(sample,campaign) to get these locations. 
@@ -34,12 +36,12 @@ If you have the samples ready for testing, then you need to first run your skim
 
 Run the skim on all the different samples.
 Make sure you edit skimRun.csh to include the samples you want to test your skim on. 
-   ./skimRun.csh
+   basf2 runSkims.pu
 
 
 After the completion of all the jobs, to find the statistics of your skim, run printSkimStats.py:
 
-  ./printSkimStats.py
+  basf2 printSkimStats.py
 
 
 For every new release you need to copy the statistics to the Skimming Homepage, under the headline Skim Statistics. 

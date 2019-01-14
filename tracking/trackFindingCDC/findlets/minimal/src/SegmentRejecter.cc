@@ -20,6 +20,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::Chooseable<BaseSegmentFilter>;
 template class TrackFindingCDC::ChooseableFilter<SegmentFilterFactory>;
 
 SegmentRejecter::SegmentRejecter(const std::string& defaultFilterName)

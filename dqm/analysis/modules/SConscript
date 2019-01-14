@@ -12,7 +12,7 @@ if option != 'clang':
     env['EPICS_BASE']=os.environ['EPICS_BASE']
     env['EPICS_HOST_ARCH']=os.environ['EPICS_HOST_ARCH']
 
-    env.Append(CPPDEFINES=['_BELLE2_EPICS'])
+    env.Append( CPPDEFINES=['_BELLE2_EPICS'])
     env.Append( CPPPATH=['$EPICS_BASE/include'] )
     env.Append( CPPPATH=['$EPICS_BASE/include/os/Linux'] )
 

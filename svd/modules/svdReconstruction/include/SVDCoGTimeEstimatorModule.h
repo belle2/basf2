@@ -138,11 +138,8 @@ namespace Belle2 {
     std::string m_relRecoDigitShaperDigitName;
 
     /** Parameters for the corrections */
-    bool Correction_1;
-    bool Correction_2;
-    bool Correction_3;
-    bool Correction_4;
-    bool Correction_Using_CDC;
+    bool m_calEventT0; /**< calibration with EventT0*/
+    bool m_corrPeakTime; /**< correction of peakTime per strip from local calibrations*/
 
     /** Name of the relation between SVDShaperDigits and MCParticles */
     std::string m_relShaperDigitMCParticleName;

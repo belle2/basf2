@@ -58,3 +58,15 @@ def printVars():
             rows.append([group])
         rows.append([name, description])
     b2utils.pretty_print_description_list(rows)
+
+
+def getAllTrgNames():
+    """
+    Return all PSNM trigger bit names
+    """
+
+    bits = Belle2.PyDBObj('TRGGDLDBFTDLBits')
+    evt = Belle2.EventMetaData()
+    Belle2.DBStore.Instance().update(evt)
+    size = Belle2.TRGSummary.c_ntrgWords * Belle2.TRGSummary.c_trgWordSize
+    return [bits.getoutbitname(i) for i in range(size) if bits.getoutbitname(i) != '']

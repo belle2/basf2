@@ -73,14 +73,14 @@ namespace Belle2 {
     unsigned int calword(const int* buf);
 
   protected:
-    TH2* h_rate2D[100];
+    TH2* h_rate2D[100] = {NULL};
     int m_nrun;
     int m_nevents;
     double m_dth;
     double m_th0;
     bool m_debugmode;
     std::string m_daqdb;
-    unsigned int m_ibyte;
+    unsigned int m_ibyte = 0;
 
   };
 

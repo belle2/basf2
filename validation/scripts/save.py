@@ -264,5 +264,5 @@ def merge_multiple_plots(package, pdfs):
         return 1
 
     # If we can't merge them, return false
-    except:
+    except BaseException:
         return 0

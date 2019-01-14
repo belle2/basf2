@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: jvbennett                                                *
+ * Contributors: jikumar, jvbennett                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,8 +33,8 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
   feaLE(-TMath::Pi() / 2),
   feaUE(+TMath::Pi() / 2),
   IsLocalBin(true),
-  IsPrintBinMap(true),
-  IsMakePlots(false)
+  IsMakePlots(false),
+  IsRS(true)
 {
   // Set module properties
   setDescription("A calibration algorithm for the CDC dE/dx entrance angle cleanup correction");
@@ -61,13 +61,20 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   // Setting up bins for entra angle
   feaBS = (feaUE - feaLE) / fnEntaBinG;
 
-  if (IsLocalBin)GlobalToLocalEntaBinMap(IsPrintBinMap);
-  else fnEntaBinL =  fnEntaBinG;
+  std::vector<int> globalbins;
+  for (int ibin = 0; ibin < fnEntaBinG; ibin++)globalbins.push_back(ibin);
+
+  if (!IsLocalBin) {
+    fEntaBinNums = globalbins;
+    fnEntaBinL = fnEntaBinG;
+  } else {
+    GetVariableBin(fnEntaBinG, fEntaBinNums);
+    fnEntaBinL =  fEntaBinNums.at(fEntaBinNums.size() - 1) + 1;
+  }
 
   //enta dedx distributions for inner and outer layer
-  TH1F* hILdEdxhitInEntaBin[fnEntaBinL];
-  TH1F* hOLdEdxhitInEntaBin[fnEntaBinL];
-
+  std::vector<TH1F*> hILdEdxhitInEntaBin(fnEntaBinL, 0);
+  std::vector<TH1F*> hOLdEdxhitInEntaBin(fnEntaBinL, 0);
   Double_t ifeaLE = 0, ifeaUE = 0;
 
   for (int iea = 0; iea < fnEntaBinL; iea++) {
@@ -80,12 +87,12 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       ifeaUE = ifeaLE + feaBS;
     }
 
-    hILdEdxhitInEntaBin[iea] = new TH1F(Form("hILdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
+    hILdEdxhitInEntaBin[iea] = new TH1F(Form("hILdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0., 5.);
     hILdEdxhitInEntaBin[iea]->SetTitle(Form("IL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
     hILdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Inner Layer");
     hILdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
 
-    hOLdEdxhitInEntaBin[iea] = new TH1F(Form("hOLdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0, 5);
+    hOLdEdxhitInEntaBin[iea] = new TH1F(Form("hOLdEdxhitInEntaBin%d", iea), "bla-bla", 250, 0., 5.);
     hOLdEdxhitInEntaBin[iea]->SetTitle(Form("OL: dedxhit in EntA = (%0.03f to %0.03f)", ifeaLE, ifeaUE));
     hOLdEdxhitInEntaBin[iea]->GetXaxis()->SetTitle("dedxhits in Outer Layer");
     hOLdEdxhitInEntaBin[iea]->GetYaxis()->SetTitle("Entries");
@@ -103,17 +110,16 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   //rebinned histogram
   Double_t* RmapEntaValue = &fEntaBinValues[0];
 
-  TH1F* hILEntaL = new TH1F("hILEntaL", "EntA: Inner Layer (rebin)", fnEntaBinL, RmapEntaValue);
+  TH1F* hILEntaL = new TH1F("hILEntaL", "EntA: Inner Layer (assym bin)", fnEntaBinL, RmapEntaValue);
   hILEntaL->GetXaxis()->SetTitle("Entrance angle (#theta)");
   hILEntaL->GetYaxis()->SetTitle("Entries");
 
-  TH1F* hOLEntaL = new TH1F("hOLEntaL", "EntA: Outer Layer (rebin)", fnEntaBinL, RmapEntaValue);
+  TH1F* hOLEntaL = new TH1F("hOLEntaL", "EntA: Outer Layer (assym bin)", fnEntaBinL, RmapEntaValue);
   hOLEntaL->GetYaxis()->SetTitle("Entries");
   hOLEntaL->GetXaxis()->SetTitle("Entrance angle (#theta)");
 
-  TH1F* hILdEdx_all = new TH1F("hILdEdx_all", "", 250, 0, 5);
-  TH1F* hOLdEdx_all = new TH1F("hOLdEdx_all", "", 250, 0, 5);
-
+  TH1F* hILdEdx_all = new TH1F("hILdEdx_all", "", 250, 0., 5.);
+  TH1F* hOLdEdx_all = new TH1F("hOLdEdx_all", "", 250, 0., 5.);
 
   Int_t ibinEA = 0;
   for (int i = 0; i < ttree->GetEntries(); ++i) {
@@ -131,10 +137,9 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
       //Bin corresponds to enta
       ibinEA = (ieaHit - feaLE) / feaBS ; //from 0
-      if (ibinEA >= fnEntaBinG) continue; //bin stats from 0
+      if (ibinEA >= fnEntaBinL) continue; //bin stats from 0
 
       if (IsLocalBin) ibinEA = fEntaBinNums.at(ibinEA);
-
 
       if (layer->at(j) < 8) {
         hILEntaG->Fill(ieaHit);
@@ -155,18 +160,13 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     if (IsLocalBin) {
       ctmpde->SetCanvasSize(800, 400);
       ctmpde->Divide(2, 1);
-      ctmpde->cd(1); hOLEntaG->SetMarkerColor(kBlue); hOLEntaG->Draw(""); hILEntaG->Draw("same");
-      ctmpde->cd(2); hOLEntaL->SetMarkerColor(kBlue); hOLEntaL->Draw(""); hILEntaL->Draw("same");
+      ctmpde->cd(1);  gPad->SetLogy(); hOLEntaG->SetMarkerColor(kBlue); hOLEntaG->Draw(""); hILEntaG->Draw("same");
+      ctmpde->cd(2);  gPad->SetLogy(); hOLEntaL->SetMarkerColor(kBlue); hOLEntaL->Draw(""); hILEntaL->Draw("same");
     } else {
       hOLEntaG->Draw(""); hILEntaG->Draw("same");
     }
     ctmpde->SaveAs("hEntaDistributions.pdf");
 
-    TCanvas* ctem = new TCanvas("Layerhisto", "Inner and Outer Histo", 600, 600);
-    hOLdEdx_all->Draw("histo");
-    hILdEdx_all->SetMarkerColor(kRed);
-    hILdEdx_all->Draw("same histo");
-    ctem->SaveAs("Layerhistodedxhit_OneDCorr.pdf");
   }
 
   double InsumPer5 = 0.0, InsumPer75 = 0.0;
@@ -200,6 +200,52 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     }
   }
 
+
+
+  if (IsMakePlots) {
+
+    std::cout << "Used bins for truncation from 5 to 75 per #" << std::endl;
+    std::cout << "Inner Layes Bins = # from" << lBinInLayer << ", to " << hBinInLayer << std::endl;
+    std::cout << "Outer Layes Bins = # from" << lBinOutLayer << ", to " << hBinOutLayer << std::endl;
+
+    TCanvas* ctem = new TCanvas("Layerhisto", "Inner and Outer Histo", 1200, 600);
+    ctem->Divide(2, 1);
+    ctem->cd(1);
+    hILdEdx_all->SetMarkerColor(kBlue);
+    hILdEdx_all->Draw("histo");
+
+    TLine* tlInF = new TLine();
+    tlInF->SetLineColor(kBlue);
+    tlInF->SetX1(InsumPer5); tlInF->SetX2(InsumPer5);
+    tlInF->SetY1(0); tlInF->SetY2(hILdEdx_all->GetMaximum());
+    tlInF->DrawClone("same");
+
+    TLine* tlInL = new TLine();
+    tlInL->SetLineColor(kBlue);
+    tlInL->SetX1(InsumPer75); tlInL->SetX2(InsumPer75);
+    tlInL->SetY1(0); tlInL->SetY2(hILdEdx_all->GetMaximum());
+    tlInL->DrawClone("same");
+
+    ctem->cd(2);
+    hOLdEdx_all->Draw("histo");
+    hOLdEdx_all->SetMarkerColor(kRed);
+
+    TLine* tlOutF = new TLine();
+    tlOutF->SetLineColor(kBlue);
+    tlOutF->SetX1(OutsumPer5); tlOutF->SetX2(OutsumPer5);
+    tlOutF->SetY1(0); tlOutF->SetY2(hOLdEdx_all->GetMaximum());
+    tlOutF->DrawClone("same");
+
+    TLine* tlOutL = new TLine();
+    tlOutL->SetLineColor(kBlue);
+    tlOutL->SetX1(OutsumPer75); tlOutL->SetX2(OutsumPer75);
+    tlOutL->SetY1(0); tlOutL->SetY2(hOLdEdx_all->GetMaximum());
+    tlOutL->DrawClone("same");
+    ctem->SaveAs("Layerhistodedxhit_OneDCorr.pdf");
+  }
+
+
+
   //short version = 0;
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 1200);
   ctmp->Divide(4, 4);
@@ -211,9 +257,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     ctmp->Print(psname.str().c_str());
     psname.str(""); psname << "dedx_1dcell.pdf";
   }
-
-  double truncMean = 1.0, binweights = 1.0;
-  int sumofbc = 1;
 
   TH1F* htemp = 0x0;
   std::vector<std::vector<double>> onedcors; // prev->std::vector<std::vector<double>> ones;
@@ -227,8 +270,9 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   hOLEntaConst->GetXaxis()->SetTitle("Entrance angle (#theta)");
   hOLEntaConst->GetYaxis()->SetTitle("Constant");
 
-  int startfrom = 1, endat = 1;
   for (int iIOLayer = 0; iIOLayer <= 1; iIOLayer++) {
+
+    int startfrom = 1, endat = 1;
 
     if (iIOLayer == 0) {
       startfrom = lBinInLayer; endat = hBinInLayer;
@@ -239,18 +283,19 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     //std::cout << "Layer I/O # = " << iIOLayer << std::endl;
     for (int iea = 1; iea <= fnEntaBinL; iea++) {
 
-      Int_t ieaprime = 1; //rotation symmtery for 1<->3 and 4<->2
-      if (iea <= int(0.25 * fnEntaBinL))ieaprime = iea + (0.50 * fnEntaBinL);
-      else if (iea > int(0.75 * fnEntaBinL))ieaprime = iea - (0.50 * fnEntaBinL);
-      else ieaprime = iea;
+      Int_t ieaprime = iea; //rotation symmtery for 1<->3 and 4<->2
+
+      if (IsRS)ieaprime = GetRotationSymmericBin(fnEntaBinL, iea);
 
       if (iIOLayer == 0)htemp = (TH1F*)hILdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
       else if (iIOLayer == 1)htemp = (TH1F*)hOLdEdxhitInEntaBin[ieaprime - 1]->Clone(Form("hL%d_Ea%d", iIOLayer, iea));
       else continue;
 
-      truncMean  = 1.0; binweights = 0.0; sumofbc = 0;
+      double truncMean = 1.0;
       if (htemp->Integral() < 100) truncMean  = 1.0; //low stats
       else {
+        double binweights = 0.0;
+        int sumofbc = 0;
         for (int ibin = startfrom; ibin <= endat; ibin++) {
           //std::cout << " dedxhit bin = " << ibin << ", Entries =" << htemp->GetBinContent(ibin) << std::endl;
           if (htemp->GetBinContent(ibin) > 0) {
@@ -268,6 +313,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       if (IsMakePlots) {
         ctmp->cd(((iea - 1) % 16) + 1);
         htemp->SetFillColor(kYellow);
+        htemp->SetTitle(Form("%s, #mean = %0.2f", htemp->GetTitle(), truncMean));
         htemp->DrawClone("hist"); //clone is nessesory for pointer survival
         tl->SetX1(truncMean); tl->SetX2(truncMean);
         tl->SetY1(0); tl->SetY2(htemp->GetMaximum());
@@ -309,92 +355,9 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   CDCDedx1DCell* gain = new CDCDedx1DCell(0, onedcors);
   saveCalibration(gain, "CDCDedx1DCell");
 
-
   delete htemp;
   delete ctmp;
   delete tl;
   return c_OK;
 
-}
-
-//----------------------------------------------------------------------------
-void CDCDedx1DCellAlgorithm::GlobalToLocalEntaBinMap(Bool_t seeMap)
-{
-
-  if (fnEntaBinG % 16 != 0) {
-    std::cout << "-- Fix bins: enta should multiple of 16.. Exiting.." << std::endl;
-    return;
-  }
-
-  //Configuration in 1/4 bins only and rest symmetry
-  const Int_t fnEntaBinG1by4 = fnEntaBinG / 4;
-
-  std::vector<int> EntaBinNumsFH; //FirstHalf (pi/4 to pi/2)
-  Int_t ibinL = 0 , ibinH = 0 , iBinLocal = 0, Factor = 1, jbin = 1;
-  Int_t a = 0, b = 0, c = 0;
-  Int_t L1 = 0, L2 = 0, L3 = 0;
-
-  for (Int_t ibin = 1; ibin <= fnEntaBinG1by4; ibin++) {
-
-    if (ibin <= fnEntaBinG1by4 / 4) {
-      Factor = 1;
-      ibinL = 0;
-      ibinH = fnEntaBinG1by4 / 4;
-      L1 = int((ibinH - ibinL) / Factor);
-      jbin = L1 - int((ibinH - ibin) / Factor);
-      a = jbin;
-      iBinLocal = a;
-    } else if (ibin > fnEntaBinG1by4 / 4 && ibin <= fnEntaBinG1by4 / 2) {
-      Factor = 2;
-      ibinL = fnEntaBinG1by4 / 4;
-      ibinH = fnEntaBinG1by4 / 2;
-      L2 = int((ibinH - ibinL) / Factor);
-      jbin = L2 - int((ibinH - ibin) / Factor);
-      b = a + jbin;
-      iBinLocal = b;
-    } else if (ibin > fnEntaBinG1by4 / 2 && ibin <= fnEntaBinG1by4) {
-      Factor = 4;
-      ibinL = fnEntaBinG1by4 / 2;
-      ibinH = fnEntaBinG1by4 / 1;
-      L3 = int((ibinH - ibinL) / Factor);
-      jbin = L3 - int((ibinH - ibin) / Factor);
-      c = b + jbin;
-      iBinLocal = c;
-    }
-    EntaBinNumsFH.push_back(iBinLocal);
-  }
-
-  Int_t L = L1 + L2 + L3;
-
-  std::vector<int> temp2 = EntaBinNumsFH;
-  std::reverse(temp2.begin(), temp2.end());
-
-  std::vector<int> EntaBinNumsSH; //second half (0 to pi/2)
-  for (unsigned int it = 0; it < temp2.size(); ++it)EntaBinNumsSH.push_back(2 * L - temp2.at(it) + 1);
-
-  std::vector<int> EntaBinNums1 = EntaBinNumsFH;
-  EntaBinNums1.insert(EntaBinNums1.end(), EntaBinNumsSH.begin(), EntaBinNumsSH.end());
-  for (unsigned int it = 0; it < EntaBinNums1.size(); ++it)EntaBinNums1.at(it) = EntaBinNums1.at(it) - 1;
-
-  std::vector<int> EntaBinNums2;
-  for (unsigned int it = 0; it < EntaBinNums1.size(); ++it)EntaBinNums2.push_back(2 * L + EntaBinNums1.at(it));
-
-  //Final Vector of bin array
-  fEntaBinNums = EntaBinNums1;
-  fEntaBinNums.insert(fEntaBinNums.end(), EntaBinNums2.begin(), EntaBinNums2.end());
-  if (seeMap)for (unsigned int it = 0; it < fEntaBinNums.size();
-                    ++it)std::cout << "1DCell-EntA: GlobalBin = " << it << ", LocalBin = " << fEntaBinNums.at(it) << std::endl;
-
-
-  TH1F* tempEnta = new TH1F("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
-  fEntaBinValues.push_back(tempEnta->GetBinLowEdge(1)); //first and last manual
-  for (unsigned int i = 0; i < fEntaBinNums.size() - 1; ++i) {
-    if (fEntaBinNums.at(i) < fEntaBinNums.at(i + 1)) {
-      double binval = tempEnta->GetBinLowEdge(i + 1) + tempEnta->GetBinWidth(i + 1);
-      if (TMath::Abs(binval) < 10e-5)binval = 0; //avoid infinite deep
-      fEntaBinValues.push_back(binval);
-    } else continue;
-  }
-  fEntaBinValues.push_back(tempEnta->GetBinLowEdge(fnEntaBinG) + tempEnta->GetBinWidth(fnEntaBinG));
-  delete tempEnta;
 }

@@ -32,15 +32,11 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** constructor */
     SignalSideVariablesToExtraInfoModule();
-
     /** Register input and output data */
     virtual void initialize() override;
-
-    /**  */
+    /** process event */
     virtual void event() override;
 
 

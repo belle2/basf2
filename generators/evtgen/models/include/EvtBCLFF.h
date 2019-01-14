@@ -15,12 +15,13 @@
 
 namespace Belle2 {
 
-  /***
+  /**
    * BCL Form Factors.
    */
   class EvtBCLFF : public EvtSemiLeptonicFF {
 
   public:
+    /** constructor */
     EvtBCLFF(int numarg, double* arglist);
 
     /**

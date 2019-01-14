@@ -93,10 +93,10 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_FlightTime; /**< database object */
     std::vector<float> FlightTime; /**< vector obtained from DB object */
 
-    int m_tracks;            /**< Number of good tracks */
-    double m_track_chi2[30]; /**< chi2 of good tracks */
-    double m_track_ndf[30];  /**< ndf of good tracks */
-    double en_sum;           /**< Total energy in event, GeV */
+    int m_tracks{ -1};            /**< Number of good tracks */
+    double m_track_chi2[30] = {}; /**< chi2 of good tracks */
+    double m_track_ndf[30] = {}; /**< ndf of good tracks */
+    double en_sum{ -1.0};    /**< Total energy in event, GeV */
 
     /**
      * Output tree with detailed event data.
@@ -105,17 +105,16 @@ namespace Belle2 {
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
-    int m_tree_evtn;    /**< Event number for debug TTree output*/
-    int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
-    int m_tree_amp;     /**< Fitting amplitude from ECL for debug TTree output */
-    double m_tree_en;     /**< ECL hit energy, GeV for debug TTree output */
-    int m_tree_quality; /**< ECL fit quality for debug TTree output */
-    double m_tree_time; /**< ECL fitting time for debug TTree output */
-    double m_tree_t0;   /**< CDC eventT0 for debug TTree output */
+    int m_tree_evtn{ -1};     /**< Event number for debug TTree output*/
+    int m_tree_cid{ -1};      /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_amp{ -1};      /**< Fitting amplitude from ECL for debug TTree output */
+    double m_tree_en{ -1.0};  /**< ECL hit energy, GeV for debug TTree output */
+    int m_tree_quality{ -1};  /**< ECL fit quality for debug TTree output */
+    double m_tree_time{ -1.0}; /**< ECL fitting time for debug TTree output */
+    double m_tree_t0{ -1.0};  /**< CDC eventT0 for debug TTree output */
     /*** tree branches END ***/
 
   };
 }
 
 #endif /* ECLBHABHATCOLLECTORMODULE_H */
-

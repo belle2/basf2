@@ -64,7 +64,7 @@ namespace Belle2 {
   public:
 
     /**Constructor */
-    VXDSlotsPar(const std::string& type = ""): m_type(type) {}
+    explicit VXDSlotsPar(const std::string& type = ""): m_type(type) {}
     //! Get type
     const std::string& getType(void) const { return m_type; }
     //! Get slot numbers
@@ -135,7 +135,7 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    VXDServiceGeometryPar(bool recordBackground = false): m_recordBackground(recordBackground) {}
+    explicit VXDServiceGeometryPar(bool recordBackground = false): m_recordBackground(recordBackground) {}
     //! Record background
     bool getRecordBackground(void) const { return m_recordBackground; }
     //! Get boxes

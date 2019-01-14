@@ -71,7 +71,7 @@ namespace Belle2 {
        * module ID. Note: An invalid ID causes an undefined behaviour!
        * @param id is a valid module ID
        */
-      ModuleID_t(const uint16_t id) noexcept : m_ID(id) {}
+      explicit ModuleID_t(const uint16_t id) noexcept : m_ID(id) {}
 
       /**
        * @brief isValidID check is constructed id is valid

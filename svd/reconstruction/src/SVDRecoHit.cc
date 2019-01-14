@@ -198,7 +198,7 @@ std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlan
 
     if (applyDeformation and m_sensorID == VxdID("4.3.2")) { // Choose testing SVD sensor
 
-      std::vector<double> planarParameters;
+      /*std::vector<double> planarParameters;
       string fileName = "planarParammeters";
       ifstream file;
       file.open(fileName.c_str());
@@ -217,6 +217,13 @@ std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlan
         }
         file.close();
       }
+      */
+
+      std::vector<double> planarParameters = {
+        0.01, 0.00, 0.01,
+        0.00, 0.00, 0.00, 0.00,
+        0.00, 0.00, 0.00, 0.00, 0.00
+      };
 
       TVectorD pos = applyPlanarDeformation(planarParameters, state);
 

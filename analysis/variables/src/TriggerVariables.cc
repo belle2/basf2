@@ -134,6 +134,13 @@ namespace Belle2 {
       return prescale;
     }
 
+    double getTimType(const Particle*)
+    {
+      StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
+      return trg->getTimType();
+    }
+
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args)
     {
       /* The analyst has to know the name of the trigger she wants
@@ -207,6 +214,8 @@ namespace Belle2 {
                       "Returns the input bit status of the i-th input trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
                       "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
+    REGISTER_VARIABLE("L1TimType", getTimType ,
+                      "Returns ETimingType time type.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
     REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult,

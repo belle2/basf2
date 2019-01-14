@@ -47,6 +47,12 @@ namespace Belle2 {
     double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);
 
     /**
+     * returns true L1 time type
+     */
+    double getTimType(const Particle*);
+
+
+    /**
      * returns 1 if the event passes a given software trigger identifier
      */
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args);

@@ -167,7 +167,7 @@ void ECLDQMModule::defineHisto()
 
   //2D histograms creation.
 
-  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Trig. Cell ID", 52, 1, 53, 11, -1, 10);
+  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Crate ID", 52, 1, 53, 11, -1, 10);
   h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID");
   h_trigtag2_trigid->GetYaxis()->SetTitle("Trigger tag flag #2");
   h_trigtag2_trigid->SetOption("LIVE");
@@ -184,7 +184,7 @@ void ECLDQMModule::defineHisto()
   h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms error");
   h_pedrms_cellid->SetOption("LIVE");
 
-  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Trig. Cell ID", 52, 1, 53, 145, 0, 145);
+  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Crate ID", 52, 1, 53, 145, 0, 145);
   h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID");
   h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time");
   h_trigtime_trigid->SetOption("LIVE");

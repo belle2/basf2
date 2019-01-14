@@ -220,26 +220,28 @@ void ECLTrackClusterMatchingModule::event()
       for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
         if (!isECLHit(extHit)) continue;
         ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
-        if (eclCluster != nullptr) {
-          // accept only cluster from region matching track direction, exception for gaps
-          int eclDetectorRegion = eclCluster->getDetectorRegion();
+        if (!eclCluster) continue;
+        ECLShower* eclShower = eclCluster->getRelatedTo<ECLShower>();
+        if (eclShower != nullptr) {
+          // accept only shower from region matching track direction, exception for gaps
+          int eclDetectorRegion = eclShower->getDetectorRegion();
           if (abs(eclDetectorRegion - trackDetectorRegion) == 1) continue;
-          // never match low-pt tracks with clusters in the barrel
+          // never match low-pt tracks with showers in the barrel
           if (pt < m_matchingPTThreshold && eclDetectorRegion == ECL::DetectorRegion::BRL) continue;
           double phiHit = extHit.getPosition().Phi();
-          double phiCluster = eclCluster->getPhi();
-          double deltaPhi = phiHit - phiCluster;
+          double phiShower = eclShower->getPhi();
+          double deltaPhi = phiHit - phiShower;
           if (deltaPhi > M_PI) {
             deltaPhi = deltaPhi - 2 * M_PI;
           } else if (deltaPhi < -M_PI) {
             deltaPhi = deltaPhi + 2 * M_PI;
           }
           double thetaHit = extHit.getPosition().Theta();
-          double thetaCluster = eclCluster->getTheta();
-          double deltaTheta = thetaHit - thetaCluster;
+          double thetaShower = eclShower->getTheta();
+          double deltaTheta = thetaHit - thetaShower;
           ExtHitStatus extHitStatus = extHit.getStatus();
-          double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion, extHitStatus);
-          int hypothesisId = eclCluster->getHypothesisId();
+          double quality = showerQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion, extHitStatus);
+          int hypothesisId = eclShower->getHypothesisId();
           bool inserted = (uniqueHypothesisIds.insert(hypothesisId)).second;
           if (inserted) {
             hypothesisIdBestQualityCROSSArrayIndexMap.insert(make_pair(hypothesisId, make_pair(0, -1)));
@@ -248,15 +250,15 @@ void ECLTrackClusterMatchingModule::event()
           }
           if (extHitStatus == EXT_ECLCROSS) {
             if (quality > hypothesisIdBestQualityCROSSArrayIndexMap.at(hypothesisId).first) {
-              hypothesisIdBestQualityCROSSArrayIndexMap[hypothesisId] = make_pair(quality, eclCluster->getArrayIndex());
+              hypothesisIdBestQualityCROSSArrayIndexMap[hypothesisId] = make_pair(quality, eclShower->getArrayIndex());
             }
           } else if (extHitStatus == EXT_ECLDL) {
             if (quality > hypothesisIdBestQualityDLArrayIndexMap.at(hypothesisId).first) {
-              hypothesisIdBestQualityDLArrayIndexMap[hypothesisId] = make_pair(quality, eclCluster->getArrayIndex());
+              hypothesisIdBestQualityDLArrayIndexMap[hypothesisId] = make_pair(quality, eclShower->getArrayIndex());
             }
           } else {
             if (quality > hypothesisIdBestQualityNEARArrayIndexMap.at(hypothesisId).first) {
-              hypothesisIdBestQualityNEARArrayIndexMap[hypothesisId] = make_pair(quality, eclCluster->getArrayIndex());
+              hypothesisIdBestQualityNEARArrayIndexMap[hypothesisId] = make_pair(quality, eclShower->getArrayIndex());
             }
           }
         }
@@ -271,15 +273,15 @@ void ECLTrackClusterMatchingModule::event()
         for (const auto& hypothesisIdBestQualityArrayIndexMap : hypothesisIdBestQualityArrayIndexMaps) {
           if (hypothesisIdBestQualityArrayIndexMap.at(uniqueHypothesisId).first > m_matchingConsistency
               && hypothesisIdBestQualityArrayIndexMap.at(uniqueHypothesisId).second > -1) {
-            auto cluster = m_eclClusters[hypothesisIdBestQualityArrayIndexMap.at(uniqueHypothesisId).second];
-            cluster->setIsTrack(true);
-            track.addRelationTo(cluster);
-            track.addRelationTo(cluster, 1.0, "AngularDistance");
-            ECLShower* shower = cluster->getRelatedTo<ECLShower>();
-            if (shower != nullptr) {
-              shower->setIsTrack(true);
-              track.addRelationTo(shower);
-              track.addRelationTo(shower, 1.0, "AngularDistance");
+            auto shower = m_eclShowers[hypothesisIdBestQualityArrayIndexMap.at(uniqueHypothesisId).second];
+            shower->setIsTrack(true);
+            track.addRelationTo(shower);
+            track.addRelationTo(shower, 1.0, "AngularDistance");
+            ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
+            if (cluster != nullptr) {
+              cluster->setIsTrack(true);
+              track.addRelationTo(cluster);
+              track.addRelationTo(cluster, 1.0, "AngularDistance");
             }
             break;
           }
@@ -309,8 +311,8 @@ bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
   else return false;
 }
 
-double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double deltaTheta, double pt,
-                                                     int eclDetectorRegion, int hitStatus) const
+double ECLTrackClusterMatchingModule::showerQuality(double deltaPhi, double deltaTheta, double pt,
+                                                    int eclDetectorRegion, int hitStatus) const
 {
   double phi_consistency = phiConsistency(deltaPhi, pt, eclDetectorRegion, hitStatus);
   double theta_consistency = thetaConsistency(deltaTheta, pt, eclDetectorRegion, hitStatus);

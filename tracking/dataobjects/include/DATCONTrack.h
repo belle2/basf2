@@ -69,9 +69,6 @@ namespace Belle2 {
       m_HitIDList(hitIDList), trackID(ID), trackRadius(radius), trackPhi(phi), trackZzero(zzero), trackTheta(theta), trackCharge(charge),
       trackCurvsign(curvsign) {}
 
-    /** Standard deconstructor */
-    virtual ~DATCONTrack() {}
-
     /** Get track ID */
     unsigned int getTrackID() const { return trackID; }
 

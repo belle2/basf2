@@ -79,7 +79,6 @@ DATCONROICalculationModule::event()
   for (auto& datconmph : storeDATCONMPHs) {
     VxdID MPHSensorID = datconmph.getSensorID();
     TVector2 localPosition = datconmph.getLocalCoordinate();
-//     qualityOfHit = datconmph.getQualityOfHit();
 
     double uCoordinate = localPosition.X();
     double vCoordinate = localPosition.Y();

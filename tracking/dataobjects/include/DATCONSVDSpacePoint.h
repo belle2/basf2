@@ -74,8 +74,6 @@ namespace Belle2 {
       m_vxdID(sensorID), m_sensorType(detID)
     {}
 
-    /** Default Destructor. */
-//     virtual ~DATCONSVDSpacePoint() {}
     //-----------------------------------------------------------------------------------------------------------------
 
     /** overloaded '<<' stream operator. Print secID to stream by converting it to string */

@@ -152,16 +152,28 @@ DATCONTrackingModule::compareList(std::vector<unsigned int>& aList, std::vector<
 void
 DATCONTrackingModule::mergeIdList(std::vector<unsigned int>& mergedList, std::vector<unsigned int>& mergeme)
 {
-  for (auto mergemeit = mergeme.begin(); mergemeit != mergeme.end(); ++mergemeit) {
+//   for (auto mergemeit = mergeme.begin(); mergemeit != mergeme.end(); ++mergemeit) {
+//     bool found = false;
+//     for (auto mergedit = mergedList.begin(); mergedit != mergedList.end(); ++mergedit) {
+//       if (*mergedit == *mergemeit) {
+//         found = true;
+//         break;
+//       }
+//     }
+//     if (!found) {
+//       mergedList.push_back(*mergemeit);
+//     }
+//   }
+  for (auto& mergemeit : mergeme) {
     bool found = false;
-    for (auto mergedit = mergedList.begin(); mergedit != mergedList.end(); ++mergedit) {
-      if (*mergedit == *mergemeit) {
+    for (auto& mergedit : mergedList) {
+      if (mergedit == mergemeit) {
         found = true;
         break;
       }
     }
     if (!found) {
-      mergedList.push_back(*mergemeit);
+      mergedList.push_back(mergemeit);
     }
   }
 }

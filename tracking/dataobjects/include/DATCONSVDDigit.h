@@ -85,14 +85,7 @@ namespace Belle2 {
     DATCONSVDDigit() : DATCONSVDDigit(
         0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
     )
-    {
-//       m_sensorID = 0;
-//       m_isU = true;
-//       m_cellID = 0;
-//       m_totalCharge = 0;
-//       m_maxSampleIndex = 0;
-//       m_maxSampleCharge = 0;
-    }
+    {}
 
     /** Getter for the sensor ID. */
     VxdID getSensorID() const { return m_sensorID; }

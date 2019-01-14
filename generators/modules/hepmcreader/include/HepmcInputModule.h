@@ -43,8 +43,11 @@ namespace Belle2 {
     /** Initializes the module. */
     virtual void initialize() override;
 
-    /** Method is called for each event. */
+    /** method is called for each event. */
     virtual void event() override;
+
+    /** method is called at end */
+    virtual void terminate() override;
 
   protected:
 
@@ -53,18 +56,18 @@ namespace Belle2 {
     uint m_iFile;                     /**< Index of the current HepMC input file. */
     int m_nVirtual;                  /**< The number of particles in each event that should be made virtual */
     HepMCReader m_hepmcreader;           /**< An instance of the HepMC reader. */
-    MCParticleGraph mcParticleGraph;             /**< The MCParticle graph object. */
+    MCParticleGraph m_mcParticleGraph;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
     bool m_boost2Lab;                /**< Parameter to switch on/off boost to LAB system */
     bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
-    bool m_makeMaster;               /**< Parameter to signal if the modul should act as master */
+    bool m_ignorereadEventNr;               /**< Count event numbers 'manually' */
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
-
+    int m_totalEvents;                    /**< totla number of events to read */
   private:
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
-
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
   };
 
 } // end namespace Belle2

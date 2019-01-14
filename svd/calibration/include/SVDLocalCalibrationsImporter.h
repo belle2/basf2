@@ -53,6 +53,12 @@ namespace Belle2 {
      */
     virtual ~SVDLocalCalibrationsImporter()
     {}
+    /**
+         * This method import to the database the channel mapping which is always
+         * required to properly fulfilled the other payloads.
+         */
+
+    void importSVDChannelMapping(const std::string& fileName = std::string("svd/data/svd_mapping.xml"));
 
     /**
      * This method import to the database the strip

@@ -275,7 +275,7 @@ void ECLTrackClusterMatchingModule::event()
             cluster->setIsTrack(true);
             track.addRelationTo(cluster);
             track.addRelationTo(cluster, 1.0, "AngularDistance");
-            ECLShower* shower = cluster->getRelatedFrom<ECLShower>();
+            ECLShower* shower = cluster->getRelatedTo<ECLShower>();
             if (shower != nullptr) {
               shower->setIsTrack(true);
               track.addRelationTo(shower);

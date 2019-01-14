@@ -57,13 +57,13 @@ namespace Belle2 {
 
     // +1 in dimensions to protect against noisy VXDID values.
     /** Correlation Sensor 1 vs 2 */
-    TH2F* m_CorrelationU = {};
+    TH2F* m_CorrelationU{};
     /** Correlation Sensor 1 vs 2 */
-    TH2F* m_CorrelationV = {};
+    TH2F* m_CorrelationV{};
     /** Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaU = {};
+    TH1F* m_DeltaU{};
     /** Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaV = {};
+    TH1F* m_DeltaV{};
   };
 
 }

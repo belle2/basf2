@@ -21,7 +21,7 @@ eventinfosetter.param('evtNumList', [10000])
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 geometry.param('components', ['PXD', 'SVD'])
-geometry.param('useDB', False)
+# geometry.param('useDB', False)
 
 particlegun = register_module('ParticleGun')
 particlegun.param('nTracks', 1)

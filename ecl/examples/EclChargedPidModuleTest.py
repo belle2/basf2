@@ -24,7 +24,7 @@
 #
 # Usage:
 #
-# basf2 ecl/examples/EclChargedPIDModuleTest.py /path/to/input/DST/file.root -n N
+# basf2 n N EclChargedPIDModuleTest.py /path/to/input/DST/file.root [OPTIONAL] CONDDBTAG
 #
 ########################################################
 
@@ -34,13 +34,10 @@ from modularAnalysis import *
 import os
 import sys
 
-# Choose the DB
-use_local_database("localdb/database.txt")
-
 # Register necessary modules to this path.
 main_path = create_path()
 
-if len(sys.argv) != 2:
+if len(sys.argv) < 2:
     os.sys.exit("ERROR: input file not given. Specify it as an argument")
 
 # Add module to read input *DST file.
@@ -49,9 +46,17 @@ simpleinput = register_module('RootInput')
 simpleinput.param('inputFileNames', inputfile)
 main_path.add_module(simpleinput)
 
+# Choose the DB
+if sys.argv[2]:
+    use_central_database(sys.argv[2], LogLevel.WARNING)
+else:
+    use_local_database('localdb/database.txt')
+
+
 # Add eclChargedPID/ECLChargedPIDModule.
 eclid = register_module('ECLChargedPID')
 main_path.add_module(eclid)
+
 eclid.logging.log_level = LogLevel.DEBUG
 eclid.logging.debug_level = 10
 

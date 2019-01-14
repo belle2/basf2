@@ -38,6 +38,10 @@ void ECLChargedPIDModule::initialize()
 
   m_pdfs.addCallback([this]() { checkDB(); });
   checkDB();
+
+  m_count_tracks_has_good_fit = 0;
+  m_count_tracks_has_ecl_rel = 0;
+
 }
 
 void ECLChargedPIDModule::beginRun() {}
@@ -45,14 +49,19 @@ void ECLChargedPIDModule::beginRun() {}
 void ECLChargedPIDModule::event()
 {
 
+  B2DEBUG(20, "N tracks = " << m_tracks.getEntries());
+
   for (const auto& track : m_tracks) {
 
     // Load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
     // (the tracking will not always successfully fit with a pion hypothesis).
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
+    ++m_count_tracks_has_good_fit;
+
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
+    ++m_count_tracks_has_ecl_rel;
 
     const double p     = fitRes->getMomentum().Mag();
     const double theta = fitRes->getMomentum().Theta();
@@ -124,6 +133,7 @@ void ECLChargedPIDModule::event()
     track.addRelationTo(eclPidLikelihood);
 
   } // end loop on tracks
+
 }
 
 void ECLChargedPIDModule::endRun()
@@ -132,4 +142,8 @@ void ECLChargedPIDModule::endRun()
 
 void ECLChargedPIDModule::terminate()
 {
+  B2DEBUG(10, "Nr. good tracks = " << m_count_tracks_has_good_fit);
+  B2DEBUG(10, "Nr. tracks w/ cluster rel = " << m_count_tracks_has_ecl_rel);
+  B2DEBUG(10, "Fraction of tracks w/o cluster match = " << ((float)m_count_tracks_has_ecl_rel / m_count_tracks_has_good_fit) * 1e2 <<
+          " [%]");
 }

@@ -81,7 +81,7 @@ DATCONPXDExtrapolationModule::event()
     /** Loop over both PXD layer */
     for (int layer = 1; layer <= 2; layer++) {
       /** Loop over all ladders of layer */
-      for (int ladder = 1; ladder <= 12; ladder++) {
+      for (int ladder = 1; ladder <= (layer == 1 ? 8 : 12); ladder++) {
         /** Loop over both modules of a ladder */
         for (int sensor = 1; sensor <= 2; sensor++) {
 
@@ -160,11 +160,6 @@ DATCONPXDExtrapolationModule::event()
             continue;
           }
         }
-
-        if (layer == 1 && ladder == 8) {
-          ladder = 13; // don't loop over non-existing layer 1 ladders
-        }
-
       }
     }
   }

@@ -34,8 +34,6 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   int** ArrayOfActiveHoughSpaceSectors;
 
   if (m_usePhase2Simulation) {
-    // ATTENTION TODO FIXME : This still has to be implemented!!!
-    // So far no phase 2 specific algorithms have been implemented and tested!
     B2WARNING("This mode is not yet implemented, nothing will happen! Return...");
     return;
   } else {
@@ -104,8 +102,7 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
 
 void
 DATCONTrackingModule::DepthFirstSearch(bool uSide, int** ArrayOfActiveHoughSpaceSectors, int angleSectors, int vertSectors,
-                                       int actualPositionX, int actualPositionY,
-                                       vector<unsigned int>& mergedList)
+                                       int actualPositionX, int actualPositionY, vector<unsigned int>& mergedList)
 {
   vector<unsigned int> mergeMeIDList;
   int maximumClusterSize;
@@ -144,8 +141,8 @@ DATCONTrackingModule::DepthFirstSearch(bool uSide, int** ArrayOfActiveHoughSpace
 
           m_clusterCenterOfGravity += TVector2(l, k);
           m_clusterSize++;
-          if (m_clusterSize >= maximumClusterSize || fabs((int)m_clusterInitialPosition.X() - actualPositionX) >= maximumClusterSizeX
-              || fabs((int)m_clusterInitialPosition.Y() - actualPositionY) >= maximumClusterSizeY) {
+          if (m_clusterSize >= maximumClusterSize || abs((int)m_clusterInitialPosition.X() - actualPositionX) >= maximumClusterSizeX
+              || abs((int)m_clusterInitialPosition.Y() - actualPositionY) >= maximumClusterSizeY) {
             return;
           }
           DepthFirstSearch(uSide, ArrayOfActiveHoughSpaceSectors, angleSectors, vertSectors, l, k, mergedList);

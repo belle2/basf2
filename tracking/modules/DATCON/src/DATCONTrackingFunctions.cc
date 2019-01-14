@@ -204,7 +204,6 @@ DATCONTrackingModule::trackCandMerger()
       }
 
       /* Add to list */
-//       uTrackCandMerged.push_back(DATCONTrackCand(idList, TVector2(TrackPhi / ((double) count), (1.0 / (TrackRadius / ((double) count))))));
       uTrackCandMerged.push_back(DATCONTrackCand(idList, TVector2(TrackPhi / ((double) count), inverseTrackRadius / ((double) count))));
     }
     uTrackCand = uTrackCandMerged;

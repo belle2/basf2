@@ -77,12 +77,12 @@ namespace Belle2 {
     }
 
     /** LOCAL CONFIGURATION PARAMETERS:
-     * Return the time units retireved form the accelerator RF
+     * Return the time units of the measured peak time of the pulse shape given in term of accelerator RFC
      *
      * Input:
      * no input parameters are required since it is a detector based payload
      *
-     * Output: float corresponding to the time units [ns]
+     * Output: float corresponding to the time units [RFC]
      */
     float getTimeUnits()
     {
@@ -109,7 +109,7 @@ namespace Belle2 {
      * Input:
      * no input parameters are required since it is a detector based payload
      *
-     * Output: string corresponding to the date_hour of when the calibration has been taken
+     * Output: string corresponding to the date_hour (yyyymmdd_hhmm) of when the calibration has been taken
      */
     string getCalibDate()
     {

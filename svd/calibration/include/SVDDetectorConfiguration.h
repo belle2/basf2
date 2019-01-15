@@ -13,8 +13,9 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDCalibrationsBase.h>
+#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDLocalConfigParameters.h>
-#include <svd/dbobjects/SVDGlocalConfigParameters.h>
+#include <svd/dbobjects/SVDGlobalConfigParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <string>
@@ -26,13 +27,12 @@ namespace Belle2 {
 
   /** This class defines the dbobject and the methods to access the
    * parameters to configure SVD for data taking with:
-   * - a std string storing the complete xml file configuring SVD for global runs
    * - float zero suppression value (global run)
    * - int latency (global run)
    * - string: date and time time of the calibration run
    * - float injected charge (local cal run)
    * - time units (local cal run)
-   * - masking bitmap
+   * - masking bitmap (local cal run)
    *
    */
   class SVDDetectorConfiguration {
@@ -41,9 +41,9 @@ namespace Belle2 {
     static std::string svdLocalConfig_name;
     static std::string svdGlobalConfig_name;
 
-    typedef SVDCalibrationsBase< SVDLocalConfigParameters > t_svdLocalConfig_payload;
-    typedef SVDCalibrationsBase< SVDGlobalConfigParameters > t_svdGlobalConfig_payload;
-    typedef SVDCalibrationsBase< std::string> > t_xml_payload;
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar <SVDLocalConfigParameters > > t_svdLocalConfig_payload;
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar <SVDGlobalConfigParameters > >t_svdGlobalConfig_payload;
+
 
 
     /** Constructor, no input argument is required */
@@ -57,7 +57,7 @@ namespace Belle2 {
         B2INFO("SVDDetectorConfiguration, global run parameters: from now on we are using " <<
         this->m_svdGlobalConfig_aDBObjPtr -> get_uniqueID()); });
 
-      m_svdLobalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+      m_svdLocalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2INFO("SVDDetectorConfiguration, local run parameters: from now on we are using " <<
         this->m_svdLocalConfig_aDBObjPtr -> get_uniqueID()); });
     }
@@ -111,7 +111,7 @@ namespace Belle2 {
      *
      * Output: string corresponding to the date_hour (yyyymmdd_hhmm) of when the calibration has been taken
      */
-    string getCalibDate()
+    std::string getCalibDate()
     {
       return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).calibDate;
     }
@@ -137,7 +137,7 @@ namespace Belle2 {
      *
      * Output: int corresponding to the latency cut applied during data taking
      */
-    int getZeroSuppression()
+    int getLatency()
     {
       return m_svdGlobalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).latency;
     }
@@ -151,14 +151,6 @@ namespace Belle2 {
       return m_svdLocalConfig_aDBObjPtr.isValid();
     }
 
-    /** returns the unique ID of the payload */
-    TString getUniqueID() { return m_svdGlobalConfig_aDBObjPtr->get_uniqueID(); }
-
-    /** returns true if the m_aDBObtPtr is valid in the requested IoV */
-    bool isValid()
-    {
-      return m_svdGlobalConfig_aDBObjPtr.isValid();
-    }
 
 
   private:

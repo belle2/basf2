@@ -40,7 +40,7 @@ namespace Belle2 {
 
     static std::string svdLocalConfig_name;
     static std::string svdGlobalConfig_name;
-    static std::string xml_name;
+
     typedef SVDCalibrationsBase< SVDLocalConfigParameters > t_svdLocalConfig_payload;
     typedef SVDCalibrationsBase< SVDGlobalConfigParameters > t_svdGlobalConfig_payload;
     typedef SVDCalibrationsBase< std::string> > t_xml_payload;
@@ -50,7 +50,7 @@ namespace Belle2 {
     SVDDetectorConfiguration()
       : m_svdLocalConfig_aDBObjPtr(svdLocalConfig_name)
       , m_svdGlobalConfig_aDBObjPtr(svdGlobalConfig_name)
-      , m_xml_aDBObjPtr(xml_name)
+
 
     {
       m_svdGlobalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
@@ -164,7 +164,6 @@ namespace Belle2 {
   private:
     DBObjPtr< t_svdLocalConfig_payload > m_svdLocalConfig_aDBObjPtr;
     DBObjPtr< t_svdGlobalConfig_payload > m_svdGlobalConfig_aDBObjPtr;
-    DBObjPtr< t_xml_payload > m_xml_aDBObjPtr;
 
 
   };

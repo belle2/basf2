@@ -98,7 +98,15 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       m_clusterIsChargedStable = int(found_charged_stable);
       m_clusterPhi = eclCluster.getPhi();
       m_clusterTheta = eclCluster.getTheta();
-      m_clusterHypothesis = -1; // FIXME
+      if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
+          m_clusterHypothesis = 56;
+        } else {
+          m_clusterHypothesis = 5;
+        }
+      } else if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
+        m_clusterHypothesis = 6;
+      }
       m_clusterEnergy = eclCluster.getEnergy();
       m_clusterErrorTiming = eclCluster.getDeltaTime99();
       m_clusterE1E9 = eclCluster.getE1oE9();

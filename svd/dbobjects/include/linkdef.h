@@ -47,12 +47,11 @@
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDHitTimeSelectionFunction> +;
 #pragma link C++ class Belle2::SVDHitTimeSelectionFunction +;
 
-#pragma link C++ class Belle2::SVDCalibrationsBase< Belle2::SVDCalibrationsScalar< Belle2::SVDLocalConfigParameters>> +;
-#pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDLocalConfigParameters> +;
+
+
 #pragma link C++ class Belle2::SVDLocalConfigParameters +;
 
-#pragma link C++ class Belle2::SVDCalibrationsBase< Belle2::SVDCalibrationsScalar< Belle2::SVDGlobalConfigParameters>> +;
-#pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDGlobalConfigParameters> +;
+
 #pragma link C++ class Belle2::SVDGlobalConfigParameters +;
 
 #endif

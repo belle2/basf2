@@ -41,8 +41,8 @@ namespace Belle2 {
     static std::string svdLocalConfig_name;
     static std::string svdGlobalConfig_name;
 
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar <SVDLocalConfigParameters > > t_svdLocalConfig_payload;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar <SVDGlobalConfigParameters > >t_svdGlobalConfig_payload;
+    typedef SVDLocalConfigParameters t_svdLocalConfig_payload;
+    typedef SVDGlobalConfigParameters t_svdGlobalConfig_payload;
 
 
 
@@ -53,6 +53,7 @@ namespace Belle2 {
 
 
     {
+      /*
       m_svdGlobalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2INFO("SVDDetectorConfiguration, global run parameters: from now on we are using " <<
         this->m_svdGlobalConfig_aDBObjPtr -> get_uniqueID()); });
@@ -60,8 +61,9 @@ namespace Belle2 {
       m_svdLocalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2INFO("SVDDetectorConfiguration, local run parameters: from now on we are using " <<
         this->m_svdLocalConfig_aDBObjPtr -> get_uniqueID()); });
+      */
     }
-
+  private:
     /** LOCAL CONFIGURATION PARAMETERS:
      * Return the charge injected on each strip for the pulse
      *  shape calibration during the calibration local runs
@@ -73,7 +75,7 @@ namespace Belle2 {
      */
     float getInjectedCharged()
     {
-      return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).injectedCharge;
+      return m_svdLocalConfig_aDBObjPtr->getInjectedCharge();
     }
 
     /** LOCAL CONFIGURATION PARAMETERS:
@@ -86,7 +88,7 @@ namespace Belle2 {
      */
     float getTimeUnits()
     {
-      return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).timeUnits;
+      return m_svdLocalConfig_aDBObjPtr->getTimeUnits();
     }
 
     /**  LOCAL CONFIGURATION PARAMETERS:
@@ -99,7 +101,7 @@ namespace Belle2 {
      */
     float getMaskFilter()
     {
-      return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).maskFilter;
+      return m_svdLocalConfig_aDBObjPtr->getMaskFilter();
     }
 
 
@@ -113,7 +115,7 @@ namespace Belle2 {
      */
     std::string getCalibDate()
     {
-      return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).calibDate;
+      return m_svdLocalConfig_aDBObjPtr->getCalibDate();
     }
 
     /** GLOBAL CONFIGURATION PARAMETERS:
@@ -126,7 +128,7 @@ namespace Belle2 {
      */
     float getZeroSuppression()
     {
-      return m_svdGlobalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).zeroSuppression;
+      return m_svdGlobalConfig_aDBObjPtr->getZeroSuppression();
     }
 
     /** GLOBAL CONFIGURATION PARAMETERS:
@@ -139,11 +141,12 @@ namespace Belle2 {
      */
     int getLatency()
     {
-      return m_svdGlobalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).latency;
+      return m_svdGlobalConfig_aDBObjPtr->getLatency();
     }
 
+
     /** returns the unique ID of the payload */
-    TString getUniqueID() { return m_svdLocalConfig_aDBObjPtr->get_uniqueID(); }
+    //    TString getUniqueID() { return m_svdLocalConfig_aDBObjPtr->get_uniqueID(); }
 
     /** returns true if the m_aDBObtPtr is valid in the requested IoV */
     bool isValid()

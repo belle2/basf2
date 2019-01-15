@@ -13,8 +13,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDCalibrationsBase.h>
-#include <svd/dbobjects/SVDCalibrationsVector.h>
-#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDLocalConfigParameters.h>
 #include <svd/dbobjects/SVDGlocalConfigParameters.h>
 #include <framework/database/DBObjPtr.h>
@@ -45,7 +43,6 @@ namespace Belle2 {
     static std::string xml_name;
     typedef SVDCalibrationsBase< SVDLocalConfigParameters > t_svdLocalConfig_payload;
     typedef SVDCalibrationsBase< SVDGlobalConfigParameters > t_svdGlobalConfig_payload;
-
     typedef SVDCalibrationsBase< std::string> > t_xml_payload;
 
 
@@ -54,7 +51,7 @@ namespace Belle2 {
       : m_svdLocalConfig_aDBObjPtr(svdLocalConfig_name)
       , m_svdGlobalConfig_aDBObjPtr(svdGlobalConfig_name)
       , m_xml_aDBObjPtr(xml_name)
-      , m_xml_aDBObjPtr(date_name)
+
     {
       m_svdGlobalConfig_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2INFO("SVDDetectorConfiguration, global run parameters: from now on we are using " <<
@@ -65,7 +62,8 @@ namespace Belle2 {
         this->m_svdLocalConfig_aDBObjPtr -> get_uniqueID()); });
     }
 
-    /** Return the charge injected on each strip for the pulse
+    /** LOCAL CONFIGURATION PARAMETERS:
+     * Return the charge injected on each strip for the pulse
      *  shape calibration during the calibration local runs
      *
      * Input:
@@ -78,7 +76,8 @@ namespace Belle2 {
       return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).injectedCharge;
     }
 
-    /** Return the time units retireved form the accelerator RF
+    /** LOCAL CONFIGURATION PARAMETERS:
+     * Return the time units retireved form the accelerator RF
      *
      * Input:
      * no input parameters are required since it is a detector based payload
@@ -90,7 +89,8 @@ namespace Belle2 {
       return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).timeUnits;
     }
 
-    /** Return the masking bitmap applied to mask strips at FADC level (only taken into account for cm-section)
+    /**  LOCAL CONFIGURATION PARAMETERS:
+     * Return the masking bitmap applied to mask strips at FADC level (only taken into account for cm-section)
      *
      * Input:
      * no input parameters are required since it is a detector based payload
@@ -103,18 +103,44 @@ namespace Belle2 {
     }
 
 
-    /** Return the time stamp (date, hour) of the calibration
+    /** LOCAL CONFIGURATION PARAMETERS:
+     * Return the time stamp (date, hour) of the calibration
      *
      * Input:
      * no input parameters are required since it is a detector based payload
      *
      * Output: string corresponding to the date_hour of when the calibration has been taken
      */
-    float getCalibDate()
+    string getCalibDate()
     {
       return m_svdLocalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).calibDate;
     }
 
+    /** GLOBAL CONFIGURATION PARAMETERS:
+     * Return the zero suppression cut applied during data taking
+     *
+     * Input:
+     * no input parameters are required since it is a detector based payload
+     *
+     * Output: float corresponding to the zero suppression cut applied during data taking
+     */
+    float getZeroSuppression()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).zeroSuppression;
+    }
+
+    /** GLOBAL CONFIGURATION PARAMETERS:
+     * Return the latency during applied during data taking
+     *
+     * Input:
+     * no input parameters are required since it is a detector based payload
+     *
+     * Output: int corresponding to the latency cut applied during data taking
+     */
+    int getZeroSuppression()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->get(0, 0, 0, 0, 0).latency;
+    }
 
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_svdLocalConfig_aDBObjPtr->get_uniqueID(); }

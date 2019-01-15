@@ -430,6 +430,8 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_hasT0 = true;
     } else {
       B2ERROR("No ETF output, but forced to use ETF!");
+      m_hasT0 = false;
+      m_T0 = 0;
     }
   } else if (et_option == "etf_or_zero") {
     bool hasT0 = m_eventTime->hasBinnedEventT0(Const::CDC);
@@ -437,8 +439,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      m_T0 = 0;
-      m_hasT0 = false;
+      getEventTime(isector, track, "zero";
     }
   }
 

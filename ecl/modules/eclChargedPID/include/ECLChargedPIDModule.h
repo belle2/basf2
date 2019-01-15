@@ -104,10 +104,6 @@ namespace Belle2 {
      */
     bool m_applyClusterTimingSel;
 
-    /** TEMP */
-    unsigned int m_count_tracks_has_good_fit;
-    unsigned int m_count_tracks_has_ecl_rel;
-
   };
 
 } //Belle2

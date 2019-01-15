@@ -51,6 +51,9 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_initial(0)
 
 void HepMCInputModule::initialize()
 {
+  if (m_runNum != 0 || m_expNum != 0) {
+    B2WARNING("Initialising the first read events with expNr or runNr != 0. This can lead to downloading the wrong payloads from the database if you are using MC!");
+  }
   //Beam Parameters, initial particl
   m_initial.initialize();
   m_eventMetaDataPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
@@ -90,11 +93,16 @@ void HepMCInputModule::initialize()
   mcparticle.registerInDataStore();
   m_totalEvents = m_hepmcreader.countEvents(m_inputFileName);
   Environment::Instance().setNumberOfMCEvents(m_totalEvents);
+
 }
 
 
 void HepMCInputModule::event()
 {
+  if (m_beamParams.hasChanged()) {
+    B2FATAL("HepmcInputModule::event(): BeamParameters have changed within a job, this is not supported (yet?)!");
+  }
+
   if (!m_eventMetaDataPtr) { m_eventMetaDataPtr.create(); }
   try {
     m_mcParticleGraph.clear();

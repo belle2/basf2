@@ -65,6 +65,8 @@ namespace Belle2 {
     int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
     int m_totalEvents;                    /**< totla number of events to read */
+    int m_skipNEvents;                    /**< skip events in the file */
+    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
   private:
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;

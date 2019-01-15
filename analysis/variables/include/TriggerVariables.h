@@ -51,7 +51,6 @@ namespace Belle2 {
      */
     double getTimType(const Particle*);
 
-
     /**
      * returns 1 if the event passes a given software trigger identifier
      */

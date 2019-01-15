@@ -16,10 +16,15 @@
 #include <mdst/dataobjects/TRGSummary.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
+// trigger dbobjects
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+#include <mdst/dbobjects/TRGGDLDBPrescales.h>
+
 // framework
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <cmath>
 #include <bitset> // bitwise stuff for L1
@@ -29,15 +34,75 @@ namespace Belle2 {
 
     double L1Trigger(const Particle*)
     {
-      const unsigned int ntrgWords = 10;
-
       StoreObjPtr<TRGSummary> trg;
       if (!trg) return std::numeric_limits<float>::quiet_NaN();
-      for (unsigned int i = 0; i < ntrgWords; ++i) {
-        if (trg->getPsnmBits(i) > 0) return 1.0;
-      }
+      return trg->test();
+    }
 
-      return 0.0;
+    Manager::FunctionPtr L1PSNM(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto name = arguments[0];
+        auto func = [name](const Particle*) -> double {
+          StoreObjPtr<TRGSummary> trg;
+          if (!trg) return std::numeric_limits<float>::quiet_NaN();
+          return trg->testPsnm(name);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1PSNM function. The only argument must be the name of the PSNM trigger bit.");
+      }
+    }
+
+    Manager::FunctionPtr L1FTDL(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto name = arguments[0];
+        auto func = [name](const Particle*) -> double {
+          StoreObjPtr<TRGSummary> trg;
+          if (!trg) return std::numeric_limits<float>::quiet_NaN();
+          return trg->testFtdl(name);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1FTDL function. The only argument must be the name of the FTDL trigger bit.");
+      }
+    }
+
+    Manager::FunctionPtr L1Input(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto name = arguments[0];
+        auto func = [name](const Particle*) -> double {
+          StoreObjPtr<TRGSummary> trg;
+          if (!trg) return std::numeric_limits<float>::quiet_NaN();
+          return trg->testInput(name);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1Input function. The only argument must be the name of the input trigger bit.");
+      }
+    }
+
+    Manager::FunctionPtr L1Prescale(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto name = arguments[0];
+        auto func = [name](const Particle*) -> double {
+          static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
+          static DBObjPtr<TRGGDLDBPrescales> prescales;
+          for (unsigned int bit = 0; bit < TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords; bit++)
+          {
+            if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {
+              return prescales->getprescales(bit);
+            }
+          }
+          return std::numeric_limits<float>::quiet_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1Prescale function. The only argument must be the name of the PSNM trigger bit.");
+      }
     }
 
     double L1PSNMBit(const Particle*, const std::vector<double>& bit)
@@ -211,6 +276,14 @@ namespace Belle2 {
     VARIABLE_GROUP("L1 Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
                       "Returns 1 if at least one PSNM L1 trigger bit is true.");
+    REGISTER_VARIABLE("L1PSNM(name)", L1PSNM ,
+                      "Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.");
+    REGISTER_VARIABLE("L1FTDL(name)", L1FTDL ,
+                      "Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.");
+    REGISTER_VARIABLE("L1Input(name)", L1Input,
+                      "Returns the input bit status of the trigger bit with the given name.");
+    REGISTER_VARIABLE("L1Prescale(name)", L1Prescale,
+                      "Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.");
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit ,
                       "Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.");
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit ,

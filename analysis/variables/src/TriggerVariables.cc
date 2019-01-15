@@ -32,6 +32,7 @@ namespace Belle2 {
       const unsigned int ntrgWords = 10;
 
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       for (unsigned int i = 0; i < ntrgWords; ++i) {
         if (trg->getPsnmBits(i) > 0) return 1.0;
       }
@@ -55,6 +56,7 @@ namespace Belle2 {
 
       // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       const unsigned int trgWord = trg->getPsnmBits(ntrgWord);
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
       isL1Trigger = (trgWord >> bitInWord) & 1;
@@ -81,6 +83,7 @@ namespace Belle2 {
       // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
 
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       const unsigned int trgWord = trg->getFtdlBits(ntrgWord);
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
       isL1Trigger = (trgWord >> bitInWord) & 1;
@@ -105,6 +108,7 @@ namespace Belle2 {
 
       // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       const unsigned int trgWord = trg->getInputBits(ntrgWord);
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
       isL1Trigger = (trgWord >> bitInWord) & 1;
@@ -129,6 +133,7 @@ namespace Belle2 {
       const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
 
       StoreObjPtr<TRGSummary> trg;
+      if (!trg) return std::numeric_limits<float>::quiet_NaN();
       prescale = trg->getPreScale(ntrgWord, bitInWord);
 
       return prescale;

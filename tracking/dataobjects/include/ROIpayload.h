@@ -47,7 +47,7 @@ namespace Belle2 {
      */
     virtual ~ROIpayload() { delete[] m_rootdata; };
 
-    int m_packetLengthByte; /**< packet length  in byte*/
+    int m_packetLengthByte = 0; /**< packet length  in byte*/
     int m_length; /**< packet length*/
     int*  m_rootdata; //[m_length] /**< */
 
@@ -144,6 +144,6 @@ namespace Belle2 {
 
   private:
     //! Needed to make the ROOT object storable
-    ClassDef(ROIpayload, 1)
+    ClassDef(ROIpayload, 2)
   };
 }

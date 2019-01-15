@@ -33,7 +33,7 @@ namespace Belle2 {
   public:
 
     /** constructor */
-    ActivatedSector(Sector* mySector) { m_myStaticSector = mySector; }
+    explicit ActivatedSector(Sector* mySector) { m_myStaticSector = mySector; }
 
     /** stores a spacePoint */
     void addSpacePoint(const SpacePoint* aPoint) { m_mySpacePoints.push_back(aPoint); }

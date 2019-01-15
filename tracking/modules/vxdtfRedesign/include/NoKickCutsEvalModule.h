@@ -111,7 +111,7 @@ namespace Belle2 {
     bool c_fitMethod; /**< flag to activate the fit method to evaluate the cuts */
 
     NoKickRTSel m_trackSel; /**< auxiliary variable to use methods of NoKickRTSel */
-    TFile* m_outputFile; /**< output file of cuts */
+    TFile* m_outputFile = nullptr; /**< output file of cuts */
     std::vector<double> m_histoLim; /**< limits of DeltaX histograms */
     std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> m_histo; /**< DeltaX histograms */
 

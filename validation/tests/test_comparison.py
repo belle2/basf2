@@ -38,7 +38,8 @@ class TestComparison(unittest.TestCase):
 
         for i in range(0, 5000):
             passed = random.uniform(0, 1.0) < eff
-            p.Fill(passed, i)
+            bin_content = random.uniform(0.0, 50.0)
+            p.Fill(passed, bin_content)
 
         return p
 
@@ -63,6 +64,10 @@ class TestComparison(unittest.TestCase):
         Setup method to generate profiles and histograms for tests
         """
         random.seed(23)
+
+        # if we would at some point later want to implement several runs, we
+        # use this as a counter variable to set up different names.
+        # However not implemented yet.
         self.call_iteration = 0
 
         p_a = self.create_profile(self.root_name("profileA"))
@@ -106,22 +111,21 @@ class TestComparison(unittest.TestCase):
             sigma=0.4
         )
         #: store for later use
-        self.profile_aequal = p_aequal
+        self.profileAequal = p_aequal
 
         p_bequal = self.create_profile(
             self.root_name("profileB_almostequal"),
             sigma=0.4
         )
         #: store for later use
-        self.profile_bequal = p_bequal
+        self.profileBequal = p_bequal
 
         #: store for later use
-        self.profile_different_bins = \
-            ROOT.TProfile(
-                self.root_name("profileDifferentBins"),
-                self.root_name("profileDifferentBins"),
-                40, 0, 50.0
-            )
+        self.profileDifferentBins = ROOT.TProfile(
+            self.root_name("profileDifferentBins"),
+            self.root_name("profileDifferentBins"),
+            40, 0, 50.0
+        )
 
         p_a = self.create_teff(self.root_name("teffA"))
         #: store for later use
@@ -130,8 +134,6 @@ class TestComparison(unittest.TestCase):
         p_b = self.create_teff(self.root_name("teffB"))
         #: store for later use
         self.teffB = p_b
-
-        self.call_iteration += 1
 
     def test_compare_profiles(self):
         """
@@ -147,9 +149,7 @@ class TestComparison(unittest.TestCase):
         Test if the comparison of two TProfiles with very similar content works
         """
         c = validationcomparison.Chi2Test(
-            self.profile_aequal,
-            self.profile_bequal
-        )
+            self.profileAequal, self.profileBequal)
 
         self.assertTrue(c.can_compare())
         self.assertAlmostEqual(c.pvalue(), 0.43093514577898634)
@@ -170,8 +170,7 @@ class TestComparison(unittest.TestCase):
         # not doing the comparison at all
         c = validationcomparison.Chi2Test(
             self.profileZeroErrorBins,
-            self.profileZeroErrorBinsTwo
-        )
+            self.profileZeroErrorBinsTwo)
 
         self.assertTrue(c.can_compare())
         pvalue = c.pvalue()
@@ -180,7 +179,7 @@ class TestComparison(unittest.TestCase):
 
         self.assertAlmostEqual(pvalue, 0.4835651485797353)
         # should still be only 49 ndf
-        self.assertAlmostEqual(c.ndf(), 49)
+        self.assertEqual(c.ndf(), 49)
 
     def test_compare_histograms(self):
         """
@@ -193,7 +192,7 @@ class TestComparison(unittest.TestCase):
         self.assertAlmostEqual(c.pvalue(), 0.371600562118221)
         self.assertAlmostEqual(c.chi2(), 42.308970111484086)
         self.assertAlmostEqual(c.chi2ndf(), 1.0577242527871022)
-        self.assertAlmostEqual(c.ndf(), 40)
+        self.assertEqual(c.ndf(), 40)
 
     def test_compare_unsupported_object(self):
         """
@@ -220,12 +219,13 @@ class TestComparison(unittest.TestCase):
         """
 
         c = validationcomparison.Chi2Test(self.teffA, self.teffB)
+
         self.assertTrue(c.can_compare())
 
-        self.assertAlmostEqual(c.pvalue(), 0.9999987236358295)
-        self.assertAlmostEqual(c.chi2(), 2.0313602336641985)
-        self.assertAlmostEqual(c.chi2ndf(), 0.11285334631467769)
-        self.assertAlmostEqual(c.ndf(), 18)
+        self.assertAlmostEqual(c.pvalue(), 0.9760318312199932)
+        self.assertAlmostEqual(c.chi2(), 8.16784873)
+        self.assertAlmostEqual(c.chi2ndf(), 0.45376937)
+        self.assertEqual(c.ndf(), 18)
 
     def test_compare_tefficiencies_same(self):
         """
@@ -240,7 +240,7 @@ class TestComparison(unittest.TestCase):
         self.assertAlmostEqual(c.pvalue(), 1.0)
         self.assertAlmostEqual(c.chi2(), 0.0)
         self.assertAlmostEqual(c.chi2ndf(), 0.0)
-        self.assertAlmostEqual(c.ndf(), 18)
+        self.assertEqual(c.ndf(), 18)
 
     def test_compare_differing_bins(self):
         """
@@ -249,7 +249,7 @@ class TestComparison(unittest.TestCase):
         """
         c = validationcomparison.Chi2Test(
             self.profileA,
-            self.profile_different_bins
+            self.profileDifferentBins
         )
         self.assertFalse(c.can_compare())
 
@@ -258,4 +258,4 @@ class TestComparison(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

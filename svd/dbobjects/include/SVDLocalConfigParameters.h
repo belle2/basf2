@@ -12,26 +12,70 @@
  **************************************************************************/
 
 #pragma once
+#include "TObject.h"
 
 namespace Belle2 {
+  /**
+   * This class defines the payload which stores to the central DB the
+   * SVD local configuring parameters, and the methods to import and retrieve
+   * these parameters.
+   *
+   */
+  class SVDLocalConfigParameters : public TObject {
+  public:
 
-  struct SVDLocalConfigParameters {
+    /**
+    * Default constructor
+    */
+    SVDLocalConfigParameters()
+    {};
+    /**
+     * Returns the injected charge during the calibration run
+     * @param none
+     * @return float corresponding to injected charge
+     */
+    float getInjectedCharge(void) const { return m_injectedCharge; };
+
+    /**
+     * Returns the time units in which the peak time of the pulse
+     * shape is provided.
+     * @param none
+     * @return float corresponding to time units [Accelerator RFC]
+     */
+    float getTimeUnits(void) const { return m_timeUnits; };
+
+    /**
+     * Returns the masking bitmap used to mask the strips at FADC level (only for CM-section)
+     * @param none
+     * @return int corresponding to the mask filter applied at FADC level
+     */
+    int getMaskFilter(void) const { return m_maskFilter; };
+
+    /**
+     * Returns the time stamp date_hour (yyyymmdd_hhmm) of the current calibration     * @param none
+     * @return string corresponding to the time stamp of the current calibration in the format yyyymmdd_hhmm.
+     */
+    std::string getCalibDate(void) const { return m_calibDate; };
+
+  private:
+
+
 
     /** charge in electrons injected in each strip to calibrate the pulse gain during the calibration run
      */
-    float injectedCharge;
+    float m_injectedCharge;
 
     /** Time units of the measured pulse shape peak time expressed in accelerator RFC
      */
-    float timeUnits;
+    float m_timeUnits;
 
     /** masking bitmap
      */
-    int maskFilter;
+    int m_maskFilter;
 
     /** time stamp with date and hour(yyyymmdd_hhmm) of when the local runs for the current calibration have been taken
      */
-    std::string calibDate;
+    std::string m_calibDate;
 
     ClassDef(SVDLocalConfigParameters, 1);
 

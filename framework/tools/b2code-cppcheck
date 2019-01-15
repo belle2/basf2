@@ -1,14 +1,18 @@
 #!/bin/bash
 
 # make sure belle2 is setup
-if [ -z ${BELLE2_LOCAL_DIR} ]; then
-  echo "No local belle2 directory set, please run b2setup in a local code checkout"
+if [ -z ${BELLE2_LOCAL_DIR} ] && [ -z ${BELLE2_RELEASE_DIR} ]; then
+  echo "Please setup the Belle 2 Software before calling this script by sourcing b2setup"
   exit 1
 fi
 
-# set default argument in case of no arguments
+# take release directory or local directory as base
+SOFTWARE_DIR=${BELLE2_RELEASE_DIR:-${BELLE2_LOCAL_DIR}}
+
+# set default argument in case of no arguments: either $BELLE2_LOCAL_DIR or the
+# local directory if that is not defined
 if [ $# -eq 0 ]; then
-  set -- ${BELLE2_LOCAL_DIR}
+  set -- ${BELLE2_LOCAL_DIR:-`pwd`}
 fi
 
 # check for help argument
@@ -33,8 +37,8 @@ EOT
     exit 1;
 fi
 
-cppcheck -q --enable=all --template=gcc --suppress=unusedFunction --inline-suppr --force --relative-paths=${BELLE2_LOCAL_DIR} \
+cppcheck -q --enable=all --template=gcc --suppress=unusedFunction --inline-suppr --force --relative-paths=${SOFTWARE_DIR} \
          -D_PACKAGE_=PACKAGE -ULOG_NO_B2DEBUG -ULOG_NO_B2METHOD -ULOG_NO_B2INFO -ULOG_NO_B2WARNING -ULOG_NO_B2ASSERT -ULOG_NO_B2RESULT \
-         -I ${BELLE2_LOCAL_DIR}/include/ -I ${BELLE2_LOCAL_DIR}/framework/data/cppcheck-includes/ \
-         -i ${BELLE2_LOCAL_DIR}/build/ -i ${BELLE2_LOCAL_DIR}/include/ -i ${BELLE2_LOCAL_DIR}/framework/utilities/sha3hash \
+         -I ${SOFTWARE_DIR}/include/ -I ${SOFTWARE_DIR}/framework/data/cppcheck-includes/ \
+         -i ${SOFTWARE_DIR}/build/ -i ${SOFTWARE_DIR}/include/ -i ${SOFTWARE_DIR}/framework/utilities/sha3hash \
          "$@"  2>&1

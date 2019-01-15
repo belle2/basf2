@@ -29,6 +29,10 @@ namespace Belle2 {
      */
     int maskFilter;
 
+    /** time stamp with date and hour of whne the local runs for the current calibration have been taken
+     */
+    std::string calibDate;
+
     ClassDef(SVDLocalConfigParameters, 1);
 
   };

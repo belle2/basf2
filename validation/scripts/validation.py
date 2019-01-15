@@ -438,7 +438,6 @@ class Validation:
     @var basepaths: The paths to the local and central release directory
     @var scripts: List of all Script objects for steering files
     @var packages: List of all packages which contributed scripts
-    @var packages: The packages to be included in the validation (from cmd arg)
     @var basf2_options: The options to be given to the basf2 command
     @var mode: Whether to run locally or on a cluster
     @var quiet: No progress bar in quiet mode
@@ -474,10 +473,6 @@ class Validation:
 
         # A list of all packages from which we have collected steering files
         self.packages = []
-
-        # The list of packages to be included in the validation. If we are
-        # running a complete validation, this will be None.
-        self.packages = None
 
         # This list of packages which will be ignored by default. This is
         # only the validation package itself, because it only creates
@@ -1252,7 +1247,18 @@ class Validation:
 def execute(tag=None, is_test=None):
     """!
     Parses the command line and executes the full validation suite
+    :param tag The name that will be used for the current revision.
+        Default None means automatic.
+    :param is_test Run in test mode? Default None means that we read this
+        from the command line arguments (which default to False).
+    :returns None
     """
+
+    # Note: Do not test tag and is_test, but rather cmd_arguments.tag
+    # and cmd_arguments.is_test!
+    # Also note that we modify some cmd_arguments below
+    # (e.g. cmd_arguments.packages is updated if cmd_arguments.test is
+    # specified).
 
     # If there is no release of basf2 set up, we can stop the execution
     # right here!
@@ -1278,10 +1284,7 @@ def execute(tag=None, is_test=None):
         if is_test is not None:
             cmd_arguments.test = is_test
 
-        # Create the validation object. 'validation' holds all global variables
-        # and provides the logger!
-        # Argument is the tag, i.e. the name which will be used for the folder
-        # within the results directory to store the steering file outputs
+        # Create the validation object.
         validation = Validation(cmd_arguments.tag)
 
         # Write to log that we have started the validation process
@@ -1295,19 +1298,13 @@ def execute(tag=None, is_test=None):
                             "unexpected results, as most of the warnings and "
                             "errors are not written to stdout/stderr.")
 
-        # Now we check whether we are running a complete validation or only
-        # validating a certain set of packages:
-        if validation.packages:
-            validation.log.note('Only validating package(s): {0}'
-                                .format(', '.join(validation.packages)))
-        else:
-            validation.log.note('Performing complete validation...')
-
         # Check if we received additional arguments for basf2
         if cmd_arguments.options:
             validation.basf2_options = ' '.join(cmd_arguments.options)
-            validation.log.note('Received arguments for basf2: {0}'
-                                .format(validation.basf2_options))
+            validation.log.note(
+                'Received arguments for basf2: {0}'.format(
+                    validation.basf2_options)
+            )
 
         # Check if we are using the cluster or local multiprocessing:
         validation.mode = cmd_arguments.mode
@@ -1317,25 +1314,29 @@ def execute(tag=None, is_test=None):
 
         # Check if we are running in quiet mode (no progress bar)
         if cmd_arguments.quiet:
+            validation.log.note("Running in quiet mode (no progress bar).")
             validation.quiet = True
 
         # Check if we are performing a dry run (don't actually start scripts)
         if cmd_arguments.dry:
+            validation.log.note("Performing a dry run; no scripts will be "
+                                "started.")
             validation.dry = True
 
         # If running in test mode, only execute scripts in validation packgase
         if cmd_arguments.test:
-            validation.ignored_packages = []
-            validation.packages = ["validation-test"]
             validation.log.note('Running in test mode')
+            validation.ignored_packages = []
+            cmd_arguments.packages = ["validation-test"]
 
         validation.log.note(
-            "Release Folder: {} Local Folder:{}".format(
-                validation.basepaths["central"],
-                validation.basepaths["local"]
-            )
+            "Release Folder: {}".format(validation.basepaths["central"])
+        )
+        validation.log.note(
+            "Local Folder: {}".format(validation.basepaths["local"])
         )
 
+        # fixme: list_of_sf_paths doesn't exist
         # Now collect the steering files which will be used in this validation.
         # This will fill validation.list_of_sf_paths with values.
         validation.log.note('Collecting steering files...')
@@ -1353,10 +1354,11 @@ def execute(tag=None, is_test=None):
             validation.build_dependencies()
 
         if cmd_arguments.packages:
-            validation.packages = cmd_arguments.packages
-
-        if validation.packages:
-            validation.apply_package_selection(validation.packages)
+            validation.log.note(
+                "Applying package selection for the following package(s): " +
+                ", ".join(cmd_arguments.packages)
+            )
+            validation.apply_package_selection(cmd_arguments.packages)
 
         # select only specific scripts, if this option has been set
         if cmd_arguments.select:
@@ -1393,7 +1395,7 @@ def execute(tag=None, is_test=None):
             # send mails
             if cmd_arguments.send_mails:
                 mails = mail_log.Mails(validation)
-                validation.log.note('Send mails...')
+                validation.log.note('Start sending mails...')
                 # send mails to all users with failed scripts/comparison
                 mails.send_all_mails()
                 validation.log.note(
@@ -1404,7 +1406,8 @@ def execute(tag=None, is_test=None):
                 # save json with data about outgoing mails
                 mails.write_log()
         else:
-            validation.log.note('Skipping plot creation (dry run)...')
+            validation.log.note('Skipping plot creation and mailing '
+                                '(dry run)...')
 
         # Log that everything is finished
         validation.log.note(

@@ -46,23 +46,6 @@ PackageSeperatorToken = "__:__"
 #                          Function definitions                              #
 ##############################################################################
 
-# Doesn't seem to be used, leaving it here for now /klieret
-# def largest_name(name):
-#     name_arr = []
-#     for plts in os.listdir(name):
-#         plts = plts.strip()
-#         if plts.endswith(".png"):
-#             name_arr.append(len(plts[:-4]))
-#     return max(name_arr)
-
-
-# Doesn't seem to be used, leaving it here for now /klieret
-# def nPvLT(pValDict, number):
-#     for pval in pValDict.values():
-#         if isinstance(pval, numbers.Number) and pval <= number:
-#             return 0
-#     return 1
-
 
 def date_from_revision(revision, work_folder):
     """
@@ -118,7 +101,7 @@ def find_root_object(root_objects, **kwargs):
         return []
 
 
-def serve_existing_plots(revisions):
+def serve_existing_plots():
     """
     Goes to the folder where
     the plots for the given selection are stored, and replaces the current
@@ -932,7 +915,7 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
-        serve_existing_plots(revisions)
+        serve_existing_plots()
         print('Served existing plots.')
     # Otherwise: Create the requested plots
     else:

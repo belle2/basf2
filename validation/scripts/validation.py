@@ -657,8 +657,7 @@ class Validation:
     def collect_steering_files(self, interval_selector):
         """!
         This function will collect all steering files from the local and
-        central release directory and will store the corresponding paths in
-        self.list_of_sf_paths.
+        central release directory.
         @return: None
         """
 
@@ -1336,9 +1335,7 @@ def execute(tag=None, is_test=None):
             "Local Folder: {}".format(validation.basepaths["local"])
         )
 
-        # fixme: list_of_sf_paths doesn't exist
         # Now collect the steering files which will be used in this validation.
-        # This will fill validation.list_of_sf_paths with values.
         validation.log.note('Collecting steering files...')
         intervals = cmd_arguments.intervals.split(",")
         validation.collect_steering_files(IntervalSelector(intervals))

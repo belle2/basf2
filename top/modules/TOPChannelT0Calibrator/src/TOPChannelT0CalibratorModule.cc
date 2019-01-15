@@ -77,10 +77,11 @@ namespace Belle2 {
              "minimal local z of extrapolated hit", -130.0);
     addParam("maxZ", m_maxZ,
              "maximal local z of extrapolated hit", 130.0);
-    addParam("outFileName", m_outFileName,
+    addParam("outputFileName", m_outFileName,
              "Root output file name containing calibration results. "
-             "If not given, it will be constructed as 'calibrationT0_r<runNo>.root'",
-             std::string(""));
+             "File name can include *'s; "
+             "they will be replaced with a run number from the first input file",
+             std::string("calibrationT0_r*.root"));
     addParam("pdfOption", m_pdfOption,
              "PDF option, one of 'rough', 'fine', 'optimal'", std::string("rough"));
 
@@ -130,12 +131,16 @@ namespace Belle2 {
       }
     }
 
-    // if file name not given, construct it
-    if (m_outFileName.empty()) {
+    // if file name includes *'s replace them with a run number
+    auto pos = m_outFileName.find("*");
+    if (pos != std::string::npos) {
       StoreObjPtr<EventMetaData> evtMetaData;
       auto run = std::to_string(evtMetaData->getRun());
       while (run.size() < 5) run = "0" + run;
-      m_outFileName = "calibrationT0_r" + run + ".root";
+      while (pos != std::string::npos) {
+        m_outFileName.replace(pos, 1, run);
+        pos = m_outFileName.find("*");
+      }
     }
 
     // open root file for ntuple and histogram output

@@ -9,6 +9,7 @@ from reconstruction import add_top_modules, add_cdst_output
 # Example of reprocessing cdst files with new TOP calibration constants
 #
 # Note: replace local database name/location before running or comment it out
+#       check the global tag: it must be the same as used in production of input file(s)
 # ---------------------------------------------------------------------------------------
 
 
@@ -37,12 +38,12 @@ class ReplaceTOPLikelihoods(Module):
 
 # Database:
 # - replace the name and location of the local DB before running!
+# - payloads are searched for in the reverse order of DB's given below;
+#   therefore the new calibration, if provided, is taken from the local DB.
 # - one can even use several local DB's
-# - payloads are searched for in the reverse order of DB's given below; therefore the new
-#   calibration, if provided, is taken from the local DB.
-use_central_database('development')  # some new stuff not in production tag
+use_central_database('development')  # some new stuff not in prod6 tag
 use_central_database('data_reprocessing_prod6')  # global tag used in production of cdst
-use_local_database('zzTBCdb/localDB/localDB.txt', 'zzTBCdb/localDB/')  # new calibration
+use_local_database('localDB/localDB.txt', 'localDB/')  # new calibration
 
 # Create path
 main = create_path()

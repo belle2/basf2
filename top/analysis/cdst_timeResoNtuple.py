@@ -35,7 +35,10 @@ gROOT.ProcessLine('struct TreeStruct {\
    int pixel ;    /* pixel ID */ \
    float time;    /* photon time */ \
    float timeErr; /* photon time uncertainty */ \
-   int sample;    /* sample number modulu 256 */ \
+   int pulseHeight; /* photon pulse height */ \
+   float pulseWidth; /* photon pulse width */ \
+   int sample;    /* sample number modulo 256 */ \
+   int status;    /* calibration status bits */ \
    float t0;      /* leading PDF peak: position */ \
    float wid0;    /* leading PDF peak: width w/o TTS */ \
    float nph0;    /* leading PDF peak: number of photons */ \
@@ -134,7 +137,10 @@ class Ntuple(Module):
                     self.data.pixel = digit.getPixelID()
                     self.data.time = digit.getTime()
                     self.data.timeErr = digit.getTimeError()
+                    self.data.pulseHeight = digit.getPulseHeight()
+                    self.data.pulseWidth = digit.getPulseWidth()
                     self.data.sample = digit.getModulo256Sample()
+                    self.data.status = digit.getStatus()
                     sorted_peaks = self.sortPeaks(peaks)
                     self.data.t0 = sorted_peaks[0].mean
                     self.data.wid0 = sorted_peaks[0].width

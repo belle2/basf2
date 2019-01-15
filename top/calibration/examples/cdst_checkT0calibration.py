@@ -8,11 +8,10 @@
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *
-import glob
 import sys
 
 # Global tag
-use_central_database('data_reprocessing_proc7')  # use the correct global tag
+use_central_database('data_reprocessing_proc7')
 
 # Create path
 main = create_path()
@@ -34,9 +33,10 @@ main.add_module(geometry)
 # Channel masking
 main.add_module('TOPChannelMasker')
 
-# Calibration checker: results saved in calibrationT0_r<runNo>.root
+# Calibration checker
 calibrator = register_module('TOPChannelT0Calibrator')
 calibrator.param('sample', 'bhabha')
+calibrator.param('outputFileName', 'checkT0cal_r*.root')
 main.add_module(calibrator)
 
 # Print progress

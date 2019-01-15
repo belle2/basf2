@@ -21,7 +21,7 @@ namespace Belle2 {
      */
     float injectedCharge;
 
-    /** Accelerator RF expressed in ns used as APV clock time unit
+    /** Time units of the measured pulse shape peak time expressed in accelerator RFC
      */
     float timeUnits;
 
@@ -29,7 +29,7 @@ namespace Belle2 {
      */
     int maskFilter;
 
-    /** time stamp with date and hour of whne the local runs for the current calibration have been taken
+    /** time stamp with date and hour(yyyymmdd_hhmm) of when the local runs for the current calibration have been taken
      */
     std::string calibDate;
 

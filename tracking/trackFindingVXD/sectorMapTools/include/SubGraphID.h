@@ -65,7 +65,7 @@ namespace Belle2 {
 
 
     /** constructor, mandatory iDChain musst at least contain one iD. Sectors should be sorted from outer to inner sectors, please take care of that yourself since this is not checked internally. */
-    SubGraphID(const std::vector<unsigned>& idChain) : m_idChain(idChain)
+    explicit SubGraphID(const std::vector<unsigned>& idChain) : m_idChain(idChain)
     {
       if (m_idChain.empty()) { B2FATAL("SubGraphID-Constructor, given idChain is empty - illegal usage!"); }
     }

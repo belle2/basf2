@@ -33,11 +33,13 @@
 
 .fail_count_zero {
 	display: inline-block;
-	width: 30px;
-	background-color: green;
+	width: 45px;
+	background-color: #33cc33;
 	border-radius: 10px !important;
 	border: 0px none !important;
 	text-align: center;
+	font-size: 14px;
+	color: white;
 }
 
 .no_reference {
@@ -46,12 +48,24 @@
 
 .fail_count_greater_zero {
 	display: inline-block;
-	width: 50px;
+	width: 45px;
 	background-color: red;
 	border-radius: 10px !important;
 	border: 0px none !important;
 	text-align: center;
 	font-size: 14px;
+	color: white;
+}
+
+.fail_count_zero_rootfile {
+	display: inline-block;
+	width: 30px;
+	background-color: #33cc33;
+	border-radius: 10px !important;
+	border: 0px none !important;
+	text-align: center;
+	font-size: 14px;
+	color: white;
 }
 
 .fail_count_greater_zero_rootfile {
@@ -62,6 +76,7 @@
 	border: 0px none !important;
 	text-align: center;
 	font-size: 14px;
+	color: white;
 }
 
 .failed_script {
@@ -479,6 +494,112 @@ textarea {
 	background: #f5f5f5 !important;
 	cursor: pointer;
 }
+
+/* LEGEND/PALETTE/SWATCHES */
+/* ======================================================================== */
+
+.swatch-line{
+    vertical-align: middle;
+    display: block;
+    padding: 1.5px 0px 1.5px 0px;
+}
+
+.swatch-line-header{
+    vertical-align: middle;
+    display: block;
+    padding: 3px 0px 3px 0px;
+}
+
+/* Temporary workaround the inheritance from inheritance #menu div:first-child etc:
+just use spans /klieret */
+.swatch {
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    border: none;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.swatch-text{
+    line-height: 20px;
+    font-size: 14px;
+}
+
+
+#swatch-fail-nonexpert {
+    background: #FF0000;
+    color: white;
+}
+
+#swatch-warn-nonexpert {
+    background: #FF9832;
+    color: white;
+}
+
+#swatch-pass-nonexpert {
+    background: #33CC33;
+    color: white;
+}
+
+#swatch-nocomp-nonexpert {
+    background: #3265FE;
+    color: white;
+}
+
+#swatch-fail {
+    background: #FF9999;
+}
+
+#swatch-warn {
+    background: #FFCC9A;
+}
+
+#swatch-pass {
+    background: #CCFFCC;
+}
+
+#swatch-nocomp {
+    background: #98CBFF;
+}
+
+/* NEWS */
+/* ======================================================================== */
+/* from: https://www.w3schools.com/howto/howto_js_alert.asp*/
+
+ /* The alert message box */
+.infobox {
+    padding: 20px;
+    background-color: #46a7f5; /* Red */
+    color: white;
+    margin-bottom: 15px;
+}
+
+.infobox a {
+    color: white;
+}
+
+/* The close button */
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}
+
+/* ======================================================================== */
 
 .object {
 	margin-bottom: 10px;

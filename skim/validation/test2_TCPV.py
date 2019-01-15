@@ -1,6 +1,13 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+"""
+<header>
+  <input>../TDCP.udst.root</input>
+  <output>../TCPV_Validation.root</output>
+  <contact>reem.rasheed@iphc.cnrs.fr</contact>
+</header>
+"""
 from basf2 import *
 from modularAnalysis import *
 

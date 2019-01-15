@@ -44,20 +44,37 @@ class MetaOptionParser:
         """
         return self.float_value("pvalue-error")
 
-    def float_value(self, key):
+    def float_value(self, key, default=None):
         """
         Extract the float value from a meta option list
         @param key: the key to identify the value from the list
-        @return: The float value or None if this key did not exist
+        @param default: default value
+        @return: The float value or the default value if this key did not exist
                  or the float value could not be parsed.
         """
         v = self.parse_key_value(key)
         if v is None:
-            return None
+            return default
         try:
             return float(v)
         except ValueError:
-            return None
+            return default
+
+    def int_value(self, key, default=None):
+        """
+        Extract the int value from a meta option list
+        @param key: the key to identify the value from the list
+        @param default: default value
+        @return: The int value or None if this key did not exist
+                 or the float value could not be parsed.
+        """
+        v = self.parse_key_value(key)
+        if v is None:
+            return default
+        try:
+            return int(v)
+        except ValueError:
+            return default
 
     def parse_key_value(self, key):
         """

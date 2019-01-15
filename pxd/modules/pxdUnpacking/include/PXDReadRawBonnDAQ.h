@@ -75,8 +75,9 @@ namespace Belle2 {
 
       unsigned int m_expNr;// set by Param
       unsigned int m_runNr;// set by Param
+      unsigned int m_subRunNr;// set by Param
 
-      void endian_swapper(void* a, unsigned int len);
+      void endian_swapper(void* a, unsigned int len);//! swaps memory region, quick and dirty
       int readOneEvent(void);//! Read data of one Event from File
       int read_data(char* data, size_t len);//! Read amount of data (len bytes) from file to ptr data
     };

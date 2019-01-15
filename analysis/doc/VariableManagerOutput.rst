@@ -1,3 +1,5 @@
+.. _variablemanageroutput:
+
 Variable Manager Output 
 =======================
 
@@ -26,6 +28,7 @@ And here is the full function documentation of the modular analysis convenience 
 
 .. autofunction:: modularAnalysis.variablesToHistogram
 
+.. _v2nt:
 
 VariablesToNtuple
 -----------------
@@ -60,6 +63,8 @@ Here is an example of event-wise usage:
 And here is the full function documentation of the modular analysis convenience function:
 
 .. autofunction:: modularAnalysis.variablesToNtuple
+
+.. _v2ebt:
 
 VariablesToEventBasedTree 
 -------------------------

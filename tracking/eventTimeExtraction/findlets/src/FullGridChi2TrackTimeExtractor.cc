@@ -17,6 +17,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class Belle2::GridEventTimeExtractor<Chi2BasedEventTimeExtractor>;
+
 FullGridChi2TrackTimeExtractor::FullGridChi2TrackTimeExtractor()
 {
   addProcessingSignalListener(&m_finalExtractor);

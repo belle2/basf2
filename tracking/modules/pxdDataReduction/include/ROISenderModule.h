@@ -3,7 +3,7 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ * Contributors: Giulia Casarosa, Eugenio Paoloni, Bjoern Spruck          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIpayload.h>
 #include <string>
 
 #include <fcntl.h>           /* For O_* constants */
@@ -37,6 +40,12 @@ namespace Belle2 {
 
   private:
 
+    /** Input ptr for RoiPayload. */
+    StoreObjPtr<ROIpayload> m_roiPayload;
+    /** Input ptr for EventMetaData. */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+    /** poor mans histogramming in a vector */
+    std::vector <int> m_histo;
 
     /**
      *Initializes the Module.
@@ -62,6 +71,7 @@ namespace Belle2 {
 
     void openMessageQueue(const char* log_string); /**< open message queue*/
     void closeMessageQueue(const char* log_string); /**< close message queue*/
+    /* cppcheck-suppress unusedPrivateFunction */
     void unlinkMessageQueue(const char* log_string); /**< unlink message queue*/
   };
 }

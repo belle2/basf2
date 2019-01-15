@@ -16,14 +16,24 @@ import io
 
 class Pager(object):
     """
-    Context manager providing page-wise output using ``less`` for
-    some Python code. Output is delayed until all commands are
-    finished. Paging will only be active if the output is to a terminal and not
-    piped into a file or to a different program.
+    Context manager providing page-wise output using ``less``, similar to how
+    git handles long output of for example ``git diff``.  Paging will only be
+    active if the output is to a terminal and not piped into a file or to a
+    different program.
 
-    You can set the environment variable ``$PAGER`` to an empty string to
-    disable paging or to a different program (for example ``more``) which should
-    retrieve the output and display it.
+    Warning:
+        To be able to see `basf2` log messages like `B2INFO() <basf2.B2INFO>`
+        on the paged output you have to set
+        `basf2.logging.enable_python_logging = True
+        <basf2.LogPythonInterface.enable_python_logging>`
+
+    .. versionchanged:: release-03-00-00
+       the pager no longer waits until all output is complete but can
+       incrementally show output. It can also show output generated in C++
+
+    You can set the environment variable ``$PAGER`` to an empty string or to
+    ``cat`` to disable paging or to a different program (for example ``more``)
+    which should retrieve the output and display it.
 
     >>> with Pager():
     >>>     for i in range(30):
@@ -43,15 +53,15 @@ class Pager(object):
     def __init__(self, prompt=None, quit_if_one_screen=False):
         """ constructor just remembering the arguments """
         #: pager program to use
-        self.pager = os.environ.get("PAGER", "less")
+        self._pager = os.environ.get("PAGER", "less")
         # treat "cat" as no pager at all
-        if self.pager == "cat":
-            self.pager = ""
+        if self._pager == "cat":
+            self._pager = ""
         #: prompt string
-        self.prompt = prompt
+        self._prompt = prompt
         #: flag indicating whether the pager should automatically exit if the
         # content fits on one screen
-        self.quit_if_one_screen = quit_if_one_screen
+        self._quit_if_one_screen = quit_if_one_screen
         #: Pager subprocess
         self._pager_process = None
         #: Original file descriptor for stdout before entering the context
@@ -65,7 +75,7 @@ class Pager(object):
 
     def __enter__(self):
         """ entering context """
-        if not sys.stdout.isatty() or self.pager == "":
+        if not sys.stdout.isatty() or self._pager == "":
             return
 
         # save old sys.__stderr__ and sys.__stdout__ objects
@@ -97,13 +107,13 @@ class Pager(object):
         sys.__stderr__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
 
         # fine, everything is saved, start the pager
-        pager_cmd = [self.pager]
-        if self.pager == "less":
-            if self.prompt is None:
-                self.prompt = ''  # same as default prompt
-            self.prompt += ' (press h for help or q to quit)'
-            pager_cmd += ['-R', '-Ps' + self.prompt.strip()]
-            if self.quit_if_one_screen:
+        pager_cmd = [self._pager]
+        if self._pager == "less":
+            if self._prompt is None:
+                self._prompt = ''  # same as default prompt
+            self._prompt += ' (press h for help or q to quit)'
+            pager_cmd += ['-R', '-Ps' + self._prompt.strip()]
+            if self._quit_if_one_screen:
                 pager_cmd += ['-F', '-X']
         self._pager_process = subprocess.Popen(pager_cmd + ["-"], restore_signals=True,
                                                stdin=subprocess.PIPE)

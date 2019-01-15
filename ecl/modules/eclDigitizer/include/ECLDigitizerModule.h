@@ -40,7 +40,7 @@ namespace Belle2 {
   /** The ECLDigitizer module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
-   * First, we simualte the sampling array by waveform and amplitude of hit, and
+   * First, we simulate the sampling array by waveform and amplitude of hit, and
    * smear this sampling array by corresponding error matrix.
    * We then fit the array as hardware of shaper DSP board to obtain the fit result
    * of amplitude, time and quality.
@@ -157,6 +157,7 @@ namespace Belle2 {
     StoreArray<ECLSimHit> m_eclSimHits; /**< SimHits array  */
     StoreObjPtr<ECLWaveforms> m_eclWaveforms; /**< compressed waveforms  */
     bool m_HadronPulseShape; /**< hadron pulse shape flag */
+
     /** Output Arrays */
     StoreArray<ECLDigit>  m_eclDigits;/**<  waveform fit result */
     StoreArray<ECLDsp>    m_eclDsps;/**<  generated waveforms */
@@ -168,6 +169,7 @@ namespace Belle2 {
     bool m_inter; /**< internuclear counter effect */
     bool m_waveformMaker; /**< produce only waveform digits */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
+    int m_ADCThreshold; /**< ADC threshold for wavefom fits*/
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
   };
 }//Belle2

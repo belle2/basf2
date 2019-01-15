@@ -43,6 +43,9 @@ namespace Belle2 {
       }
 
       m_current = 0; //firstVersion is the default //m_implementations.size() - 1;
+      m_deltaT = 100; //ns
+      m_nSigma = 100;
+      m_tMin = -999; //ns
     };
 
     /** copy constructor */
@@ -61,9 +64,9 @@ namespace Belle2 {
     float getMinTime() { return m_tMin; };
 
     //implementation secondVersion, setters and getters
-    /** set the minimum deltaT */
+    /** set the minimum time distance wrt t0 */
     void setDeltaTime(double deltaT) { m_deltaT = deltaT; }
-    /** returns the  minimum cluster time */
+    /** returns the minimum time distnace wrt t0 */
     float getDeltaTime() { return m_deltaT; };
 
     //implementation thirdVersion, setters and getters

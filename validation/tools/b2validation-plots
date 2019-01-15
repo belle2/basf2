@@ -6,6 +6,9 @@ import argparse
 import os
 import sys
 
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
 from validationplots import create_plots
 
 # Only execute the program if a basf2 release is set up!

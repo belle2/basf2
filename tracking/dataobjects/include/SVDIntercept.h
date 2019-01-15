@@ -20,6 +20,8 @@ namespace Belle2 {
   class SVDIntercept : public VXDIntercept {
 
   public:
+    //! dummy constructor to silence cpp-check
+    SVDIntercept() {};
 
     double getUprime() const { return m_Uprime; } /**< return the U direction tangent of the track extrapolated to the sensor */
     double getVprime() const { return m_Vprime; } /**< return the V direction tangent of the track extrapolated to the sensor */
@@ -33,6 +35,6 @@ namespace Belle2 {
     double m_Vprime; /**< V direction tangent of the track extrapolated to the sensor */
 
     //! Needed to make the ROOT object storable
-    ClassDef(SVDIntercept, 3);
+    ClassDef(SVDIntercept, 4);
   };
 }

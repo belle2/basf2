@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Pulvermacher                                   *
@@ -65,18 +65,28 @@ void BestCandidateSelectionModule::initialize()
 
 void BestCandidateSelectionModule::event()
 {
+  // input list
   StoreArray<Particle> particles;
-
   if (!m_inputList) {
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
   }
-  std::function<bool(double, double)> betterThan = [](double a, double b) -> bool { return a > b; };
+
+  // what is the criteria for "best"? sometimes variables can be NaN
+  std::function<bool(double, double)> betterThan = [](double a, double b) -> bool {
+    if (std::isnan(a)) return false;
+    if (std::isnan(b)) return true;
+    return a > b;
+  };
   if (m_selectLowest) {
-    betterThan = [](double a, double b) -> bool { return a < b; };
+    betterThan = [](double a, double b) -> bool {
+      if (std::isnan(a)) return false;
+      if (std::isnan(b)) return true;
+      return a < b;
+    };
   }
 
-  //create list of particle index and the corresponding value of variable
+  // create list of particle index and the corresponding value of variable
   std::multimap<double, unsigned int, decltype(betterThan)> valueToIndex(betterThan);
   const unsigned int numParticles = m_inputList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {
@@ -92,7 +102,8 @@ void BestCandidateSelectionModule::event()
   } else {
     extraInfoName = m_outputVariableName;
   }
-  //remove everything but best candidates
+
+  // assign ranks and (optionally) remove everything but best candidates
   m_inputList->clear();
   int rank = 1;
   double previous_val = std::nan("0");

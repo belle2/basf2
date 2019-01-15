@@ -16,7 +16,7 @@ from skimExpertFunctions import *
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-01'
+gb2_setuprel = 'release-03-00-00'
 
 syspath = Path()
 fileList = [
@@ -45,7 +45,8 @@ if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), ResonanceList, path=syspath)
 else:
     skimOutputUdst(skimCode, ResonanceList, path=syspath)
-summaryOfLists(ResonanceList)
+summaryOfLists(ResonanceList, path=syspath)
+
 if 'Validation' in argvs:
     if argc > 2:
         ntupleFile('Validation_%s_%s.root' % (skimCode, (argvs[argvs.index('Validation') + 1])))
@@ -114,4 +115,4 @@ if 'Validation' in argvs:
 setSkimLogging(path=syspath)
 process(syspath)
 
-print(statistics, path=syspath)
+print(statistics)

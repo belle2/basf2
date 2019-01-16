@@ -22,7 +22,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay MyB0
-1.000    MyK*0  gamma  HELAMP 1.0 0.0 1.0 0.0;
+1.000    MyK*0  gamma  SVP_HELAMP 1.0 0.0 1.0 0.0;
 Enddecay
 CDecay Myanti-B0
 

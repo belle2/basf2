@@ -439,7 +439,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      getEventTime(isector, track, "zero";
+      getEventTime(isector, track, "zero");
     }
   }
 

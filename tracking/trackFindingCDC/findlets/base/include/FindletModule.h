@@ -68,7 +68,7 @@ namespace Belle2 {
 
     public:
       /// Constructor of the module
-      FindletModule(const std::array<std::string, c_nTypes>& storeVectorNames = {})
+      explicit FindletModule(const std::array<std::string, c_nTypes>& storeVectorNames = {})
         : m_param_storeVectorNames(storeVectorNames)
       {
         this->setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);

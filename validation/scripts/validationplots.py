@@ -881,7 +881,8 @@ def create_plots(revisions=None, force=False, process_queue=None,
     """
 
     # Initialize the list of revisions which we will plot
-    revisions = []
+    if not revisions:
+        revisions = []
 
     # Retrieve the desired revisions from the command line arguments and store
     # them in 'revisions'

@@ -50,7 +50,7 @@ ma.reconstructDecay(decayString='D0:kpi -> K-:loose pi+:loose', cut='1.8 < M < 1
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
 # and D* CMS momentum > 2.5 GeV
-ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
+ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.2', path=my_path)
 
 # perform MC matching (MC truth asociation)
 ma.matchMCTruth(list_name='D*+', path=my_path)

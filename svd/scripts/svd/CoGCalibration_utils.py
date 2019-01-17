@@ -42,18 +42,19 @@ from ROOT.Belle2 import SVDCoGTimeCalibrations
 
 import matplotlib.pyplot as plt
 
-hasCluster = True
-hasRecoDigits = True
-
 svd_recoDigits = "SVDRecoDigitsFromTracks"
 cdc_Time0 = "EventT0"
 svd_Clusters = "SVDClustersFromTracks"
 
 gROOT.SetBatch(True)
-gStyle.SetOptFit(11111111)
+
+applyCDCLatencyCorrection = True
 
 
 class SVDCoGTimeCalibrationImporterModule(basf2.Module):
+
+    def notApplyCorrectForCDCLatency(self):
+        applyCDCLatencyCorrection = False
 
     def fillLists(self, svdRecoDigits_rel_Clusters, svdClusters_rel_RecoTracks_cl):
 
@@ -280,6 +281,9 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         timeCal = SVDCoGCalibrationFunction()
         # Bias and Scale
         tbBias = [-50, -50, -50, -50]
+        tbBiasPlusCDCLat = [-45, -45, -45, -45]
+        if(notApplyCorrectForCDCLatency):
+            tbBiasPlusCDCLat = [0, 0, 0, 0]
         tbScale = [1, 1, 1, 1]
         tbBias_err = [1, 1, 1, 1]
         tbScale_err = [1, 1, 1, 1]

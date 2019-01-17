@@ -52,6 +52,11 @@ class TestVariableUtilities(unittest.TestCase):
         with self.assertRaises(ValueError):
             create_aliases_for_selected(["p"], "B0 -> ^pi0", prefix=["one", "two"])
 
+    def test_prefixes_repeated(self):
+        """Make sure we got an error if the supplied provided prefixes are not unique"""
+        with self.assertRaises(ValueError):
+            create_aliases_for_selected(["p"], "^B0 -> ^pi0", prefix=["mine", "mine"])
+
     def test_named_daughter(self):
         """Check daughter can be selected for an specific named alias"""
         self.assertAliases('B0 -> [^D0 -> pi+ K-] pi0', ['dzero'], prefix='dzero')

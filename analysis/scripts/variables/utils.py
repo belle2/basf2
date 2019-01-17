@@ -424,6 +424,10 @@ def create_aliases_for_selected(list_of_variables, decay_string, prefix=None, *,
         # and make sure we have the correct amount
         if len(prefix) != len(prefixes):
             raise ValueError("Number of selected particles does not match number of supplied custom prefixes")
+        # final check: make sure we don't have duplicate prefixes in here
+        prefix_counts = co.Counter(prefix)
+        if max(prefix_counts.values()) > 1:
+            raise ValueError("Prefixes need to be unique")
         # ok, just override calculated prefixes
         prefixes = prefix
     elif not use_names:

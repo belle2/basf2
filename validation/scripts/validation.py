@@ -333,6 +333,7 @@ def draw_progress_bar(delete_lines, scripts, barlength=50):
 
     @param delete_lines: The amount of lines which need to be deleted before
         we can redraw the progress bar
+    @param scripts: List of all Script obejcts
     @param barlength: The length of the progess bar (in characters)
     @return: The number of lines that were printed by this function call.
         Usefule if this function is called repeatedly.
@@ -756,6 +757,11 @@ class Validation:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
 
     def report_on_scripts(self):
+        """!
+        Print a summary about all scripts, especially highlighting
+        skipped and failed scripts.
+        """
+
         failed_scripts = [
             script.name for script in self.scripts
             if script.status == ScriptStatus.failed
@@ -764,28 +770,29 @@ class Validation:
             script.name for script in self.scripts
             if script.status == ScriptStatus.skipped
         ]
-        print()
-        print("*" * 80)
-        print("Summary")
-        print("*" * 80)
-        print()
+
+        self.log.note("")
+        self.log.note("*" * 80)
+        self.log.note("Summary")
+        self.log.note("*" * 80)
+        self.log.note("")
         if skipped_scripts:
-            print("{}/{} scripts were skipped:".format(
+            self.log.note("{}/{} scripts were skipped:".format(
                 len(skipped_scripts), len(self.scripts)))
-            print("\n".join(skipped_scripts))
-            print()
+            self.log.note("\n".join(skipped_scripts))
+            self.log.note("")
         else:
-            print("No scripts were skipped.")
-            print()
+            self.log.note("No scripts were skipped.")
+            self.log.note("")
 
         if failed_scripts:
-            print("{}/{} scripts failed:".format(
+            self.log.note("{}/{} scripts failed:".format(
                 len(failed_scripts), len(self.scripts)))
-            print("\n".join(failed_scripts))
-            print()
+            self.log.note("\n".join(failed_scripts))
+            self.log.note("")
         else:
-            print("No scripts failed.")
-            print()
+            self.log.note("No scripts failed.")
+            self.log.note("")
 
     def set_runtime_data(self):
         """!
@@ -916,7 +923,8 @@ class Validation:
     def apply_script_caching(self):
         cacheable_scripts = [s for s in self.scripts if s.is_cacheable()]
 
-        output_dir_datafiles = validationpath.get_results_tag_folder(self.work_folder, self.tag)
+        output_dir_datafiles = validationpath.get_results_tag_folder(
+            self.work_folder, self.tag)
 
         for s in cacheable_scripts:
             # for for all output files

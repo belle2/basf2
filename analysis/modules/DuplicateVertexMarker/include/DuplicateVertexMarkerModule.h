@@ -7,8 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-//Identify duplicate vertices (distinct particles, but built from the same daughters) and mark the one with best chi2.
-//Only works if the particle has exactly two daughters. Mainly used to deal when merging V0 vertices with hand-built ones.
 
 #pragma once
 
@@ -19,7 +17,10 @@
 namespace Belle2 {
 
   /**
-
+   * Identify duplicate vertices (distinct particles, but built from the same
+   * daughters) and mark the one with best chi2.Only works if the particle has
+   * exactly two daughters. Mainly used to deal when merging V0 vertices with
+   * hand-built ones.
    */
   class DuplicateVertexMarkerModule : public Module {
 

@@ -43,9 +43,13 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
-
+    /** process event */
     virtual void event() override;
 
+    /**
+     * Terminate the Module.
+     * This method is called at the end of data processing.
+     */
     virtual void terminate() override;
 
 

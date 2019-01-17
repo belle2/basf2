@@ -69,19 +69,19 @@ namespace Belle2 {
       StoreArray<PXDRawCluster> m_storeRawCluster;
 
       /** Histogram number of hardware cluster packets */
-      TH1F* hHardClusterPerHalfLadder;
+      TH1F* hHardClusterPerHalfLadder {};
       /** Histogram hardware cluster packet size */
-      TH1F* hHardClusterPacketSize;
+      TH1F* hHardClusterPacketSize {};
       /** Histogram pixel in cluster count/??? */
-      TH1F* hHardClusterHitsCount;
+      TH1F* hHardClusterHitsCount {};
       /** Histogram 2d hitmap (all)*/
-      TH2F* hHardClusterHitMapAll;
+      TH2F* hHardClusterHitMapAll {};
       /** Histogram Adc of cluster pixels */
-      TH1F* hHardClusterPixelAdc;
+      TH1F* hHardClusterPixelAdc {};
       /** Histogram Adc of full cluster */
-      TH1F* hHardClusterAdc;
+      TH1F* hHardClusterAdc {};
       /** Histogram Adc of seed pixels */
-      TH1F* hHardClusterSeedAdc;
+      TH1F* hHardClusterSeedAdc {};
 
 
     };//end class declaration

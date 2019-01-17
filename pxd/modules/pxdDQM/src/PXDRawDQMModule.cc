@@ -68,9 +68,7 @@ void PXDRawDQMModule::defineHisto()
 
     // Check if sensor exist
     if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(layer, ladder, sensor))) {
-      //cppcheck-suppress zerodiv
       string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh)") % layer % ladder % sensor % i);
-      //cppcheck-suppress zerodiv
       string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
 
       hrawPxdHitMap[i] = new TH2F(("hrawPxdHitMap" + s2).c_str(),

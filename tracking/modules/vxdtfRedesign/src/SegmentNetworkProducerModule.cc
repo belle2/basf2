@@ -181,7 +181,7 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
 {
   std::vector<RawSectorData> collectedData; // contains the raw sectors to be activated
   std::deque<TrackNode>& trackNodes = m_network->accessTrackNodes(); // collects trackNodes
-  int nSPsFound = 0, nSPsLost = 0, nCollected = 0;
+  int nCollected = 0;
 
   for (StoreArray<SpacePoint>& storeArray : m_spacePoints) {
     // match all SpacePoints with the sectors:
@@ -194,10 +194,8 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
 
       if (sectorFound == nullptr) {
         B2WARNING("SpacePoint in sensor " << aSP.getVxdID() << " no sector found, SpacePoint discarded!");
-        nSPsLost++;
         continue;
       }
-      nSPsFound++;
 
       trackNodes.emplace_back(&aSP);
 
@@ -320,7 +318,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
     m_network->accessActiveSectorNetwork();
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
 
-  unsigned int nAccepted = 0, nRejected = 0, nLinked = 0, nAdded = 0;
+  unsigned int nLinked = 0, nAdded = 0;
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
   for (auto* outerSector : activeSectorNetwork.getNodes()) {
@@ -368,10 +366,8 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
           if (!accepted) {
-            nRejected++;
             continue;
           }
-          nAccepted++;
 
           std::int32_t innerNodeID = innerHit->getID();
           hitNetwork.addNode(innerNodeID, *innerHit);
@@ -426,7 +422,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
   DirectedNodeNetwork<Segment<Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
   std::deque<Belle2::Segment<Belle2::TrackNode>>& segments = m_network->accessSegments();
-  unsigned int nAccepted = 0, nRejected = 0, nLinked = 0, nAdded = 0;
+  unsigned int nLinked = 0, nAdded = 0;
 
   for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
@@ -475,10 +471,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
         if (!accepted) {
-          nRejected++;
           continue;
         }
-        nAccepted++;
 
         std::int64_t innerSegmentID = static_cast<std::int64_t>(centerHit->getEntry().getID()) << 32 | static_cast<std::int64_t>
                                       (innerHit->getEntry().getID());

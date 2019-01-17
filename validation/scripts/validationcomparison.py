@@ -52,6 +52,7 @@ class ComparisonBase:
     pass
 
 
+# fixme: This currently returns lists for chi2, ndf, and chi2/ndf. This surely isn't what we wanted
 class Chi2Test(ComparisonBase):
 
     """
@@ -82,9 +83,13 @@ class Chi2Test(ComparisonBase):
         self.debug = debug
 
         # Those will only be accessed via methods.
+        #: pvalue
         self._pvalue = None
+        #: chi2
         self._chi2 = None
+        #: chi2 / number of degrees of freedom
         self._chi2ndf = None
+        #: number of degrees of freedom
         self._ndf = None
 
     def can_compare(self):
@@ -95,8 +100,8 @@ class Chi2Test(ComparisonBase):
 
     def correct_types(self):
         """
-        @return: True if the two objects have a) a type supported for comparison
-            and b) can be compared with each other
+        @return: True if the two objects have a) a type supported for
+            comparison and b) can be compared with each other
         """
         if self.object_a is None or self.object_b is None:
             return False
@@ -340,7 +345,7 @@ class Chi2Test(ComparisonBase):
 
         res_chi2ndf = res_chi2 / res_ndf
 
-        return res_pvalue, res_chi2, res_chi2ndf, res_ndf
+        return res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
 
 
 class TablePrinter(object):
@@ -352,10 +357,12 @@ class TablePrinter(object):
         @param ncols: Number of columns
         @param width: Width of each column. Either int or list.
         """
+        #: the number of columns
         self.ncols = ncols
         if not width:
             width = 10
         if isinstance(width, int):
+            #: width of each column
             self.widths = [width] * ncols
         elif isinstance(width, list) or isinstance(width, tuple):
             # let's hope this is a list then.

@@ -514,9 +514,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   }
   */
   /* // TODO removed because data format error is not to be fixed soon
-    if (last_dhp_readout_frame_lo[dhp_dhp_id] != -1) {
-    if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[dhp_dhp_id]) & 0xFFFF) > m_maxDHPFrameDiff) {
-      if(!m_suppressErrorMask&c_DHP_NOT_CONT ) B2WARNING("Two DHP Frames per sensor which frame number differ more than one! " << last_dhp_readout_frame_lo[dhp_dhp_id] << ", " <<
+    if (m_last_dhp_readout_frame_lo[dhp_dhp_id] != -1) {
+    if (((dhp_readout_frame_lo - m_last_dhp_readout_frame_lo[dhp_dhp_id]) & 0xFFFF) > m_maxDHPFrameDiff) {
+      if(!m_suppressErrorMask&c_DHP_NOT_CONT ) B2WARNING("Two DHP Frames per sensor which frame number differ more than one! " << m_last_dhp_readout_frame_lo[dhp_dhp_id] << ", " <<
               dhp_readout_frame_lo);
       m_errorMask |= c_DHP_NOT_CONT;
     }
@@ -534,9 +534,9 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   /* // TODO removed because the data is not ordered as expected in current firmware
   for (auto j = 0; j < 4; j++) {
-    if (last_dhp_readout_frame_lo[j] != -1) {
-      if (((dhp_readout_frame_lo - last_dhp_readout_frame_lo[j]) & 0xFFFF) > m_maxDHPFrameDiff) {
-        if(!m_suppressErrorMask&c_DHP_DHP_FRAME_DIFFER ) B2WARNING("Two DHP Frames (different DHP) per sensor which frame number differ more than one! " << last_dhp_readout_frame_lo[j] <<
+    if (m_last_dhp_readout_frame_lo[j] != -1) {
+      if (((dhp_readout_frame_lo - m_last_dhp_readout_frame_lo[j]) & 0xFFFF) > m_maxDHPFrameDiff) {
+        if(!m_suppressErrorMask&c_DHP_DHP_FRAME_DIFFER ) B2WARNING("Two DHP Frames (different DHP) per sensor which frame number differ more than one! " << m_last_dhp_readout_frame_lo[j] <<
                 ", " <<
                 dhp_readout_frame_lo);
         m_errorMask |= c_DHP_DHP_FRAME_DIFFER;
@@ -545,7 +545,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     }
   }
   */
-  last_dhp_readout_frame_lo[dhp_dhp_id] = dhp_readout_frame_lo;
+  m_last_dhp_readout_frame_lo[dhp_dhp_id] = dhp_readout_frame_lo;
 
 // TODO Please check if this can happen by accident with valid data!
   if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
@@ -1040,10 +1040,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     case EDHCFrameHeaderDataType::c_DHE_START: {
       countedBytesInDHE = 0;
       cancheck_countedBytesInDHE = true;
-      last_dhp_readout_frame_lo[0] = -1;
-      last_dhp_readout_frame_lo[1] = -1;
-      last_dhp_readout_frame_lo[2] = -1;
-      last_dhp_readout_frame_lo[3] = -1;
+      m_last_dhp_readout_frame_lo[0] = -1;
+      m_last_dhp_readout_frame_lo[1] = -1;
+      m_last_dhp_readout_frame_lo[2] = -1;
+      m_last_dhp_readout_frame_lo[3] = -1;
       if (m_verbose) dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
       dhe_first_triggergate = dhc.data_dhe_start_frame->getTriggerGate();

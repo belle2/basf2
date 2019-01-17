@@ -40,10 +40,13 @@ class TestVariableUtilities(unittest.TestCase):
             create_aliases_for_selected(["p"], "eeh <- ok")
 
     def test_no_particle_selected(self):
+        """Make sure we get an error if o particle is selected"""
         with self.assertRaises(ValueError):
             create_aliases_for_selected(["p"], "B0 -> pi0")
 
     def test_number_of_prefix_mismatch(self):
+        """Make sure we get an error if the number of supplied prefixes doesn't
+        match the number of selected particles"""
         with self.assertRaises(ValueError):
             create_aliases_for_selected(["p"], "^B0 -> ^pi0", prefix="one")
         with self.assertRaises(ValueError):

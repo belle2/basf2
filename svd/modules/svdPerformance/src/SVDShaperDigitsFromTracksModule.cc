@@ -41,7 +41,7 @@ SVDShaperDigitsFromTracksModule::SVDShaperDigitsFromTracksModule() : Module()
   addParam("outputINArrayName", m_outputINArrayName, "StoreArray with the output shaperdigits",
            std::string("SVDShaperDigitsFromTracks"));
   addParam("outputOUTArrayName", m_outputOUTArrayName, "StoreArray with the output shaperdigits",
-           std::string(""));
+           std::string("SVDShaperDigitsNotFromTracks"));
 }
 
 SVDShaperDigitsFromTracksModule::~SVDShaperDigitsFromTracksModule()
@@ -71,10 +71,10 @@ void SVDShaperDigitsFromTracksModule::initialize()
   recoTracks.isRequired();
   tracks.isRequired();
   m_selectedShaperDigits.registerSubset(ShaperDigits, m_outputINArrayName);
-  m_selectedShaperDigits.inheritAllRelations();
+  //  m_selectedShaperDigits.inheritAllRelations();
   if (m_outputOUTArrayName != "") {
     m_notSelectedShaperDigits.registerSubset(ShaperDigits, m_outputOUTArrayName);
-    m_notSelectedShaperDigits.inheritAllRelations();
+    //    m_notSelectedShaperDigits.inheritAllRelations();
   }
 
 }

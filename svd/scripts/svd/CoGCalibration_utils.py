@@ -1,6 +1,14 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''reminder:
+in svd/scripts/dbImporters/
+
+uno script
+- calibrazione da cdst
+- calibrazione dalla ricostruzione dopo SVDShaperTracks
+'''
+
 #################################################################################
 #
 # evaluates the CoG corrections, create a localDB
@@ -33,34 +41,13 @@ from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
 
 import matplotlib.pyplot as plt
-import simulation
 
 hasCluster = True
 hasRecoDigits = True
 
-
-localdb = sys.argv[1]
-outputFile = "CoGCorrectionMonitor_" + localdb + ".root"
-trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
-nSVD = 6
-nCDC = 1
-pVal = 0.0  # 0001
-
-filename = sys.argv[2]
-inputFileList = []
-if filename.rfind(".root") != -1:
-    inputFileList.append(filename)
-else:
-    with open(filename, 'r') as f:
-        inputFileList = [line.strip() for line in f]
-
-
-svd_recoDigits = "SVDRecoDigits"
+svd_recoDigits = "SVDRecoDigitsFromTracks"
 cdc_Time0 = "EventT0"
-svd_Clusters = "SVDClusters"
-svd_Tracks = "Tracks"
-# svd_Tracks = "SelectedTracks"
-svd_RecoTracks = "RecoTracks"
+svd_Clusters = "SVDClustersFromTracks"
 
 gROOT.SetBatch(True)
 gStyle.SetOptFit(11111111)
@@ -68,8 +55,54 @@ gStyle.SetOptFit(11111111)
 
 class SVDCoGTimeCalibrationImporterModule(basf2.Module):
 
+    def fillLists(self, svdRecoDigits_rel_Clusters, svdClusters_rel_RecoTracks_cl):
+
+        timeCluster = svdClusters_rel_RecoTracks_cl.getClsTime()
+        snrCluster = svdClusters_rel_RecoTracks_cl.getSNR()
+        layerCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getLayerNumber()
+        layerIndex = layerCluster - 3
+        sensorCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getSensorNumber()
+        sensorIndex = sensorCluster - 1
+        ladderCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getLadderNumber()
+        ladderIndex = ladderCluster - 1
+        sideCluster = svdClusters_rel_RecoTracks_cl.isUCluster()
+        if sideCluster:
+            sideIndex = 1
+        else:
+            sideIndex = 0
+
+        hasTimezero = self.cdcEventT0.hasEventT0()
+        # print("Time: " + str(hasTimezero))
+        if hasTimezero:
+            TBClusters = svdRecoDigits_rel_Clusters.getModeByte().getTriggerBin()
+            TBIndex = ord(TBClusters)
+            tZero = self.cdcEventT0.getEventT0()
+            # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
+            tZero_err = 5.1
+            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+# print(str(tZero_err))
+
+            resHist = self.resList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
+            resHist.Fill(timeCluster - tZeroSync)
+            spHist = self.spList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
+            # spHist.Fill(timeCluster, 1.3*timeCluster - 50 + random.gauss(0,10))
+            spHist.Fill(timeCluster, tZeroSync)
+            cogHist = self.cogList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
+            cogHist.Fill(timeCluster)
+            cdcHist = self.cdcList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
+            cdcHist.Fill(tZeroSync)
+            snrHist = self.snrList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
+            snrHist.Fill(snrCluster)
+
+            n = self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
+            n = n + 1
+            self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = n
+
+    def set_localdb(self, localDB):
+        self.localdb = localDB
+
     def initialize(self):
-        self.outputFileName = outputFile
+        self.outputFileName = "CoGCorrectionMonitor_" + self.localdb + ".root"
 
         self.resList = []
         self.spList = []
@@ -229,69 +262,13 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         TBIndexV = 0
         self.Evt = self.Evt + 1
 
-        svdTracks_list = Belle2.PyStoreArray(svd_Tracks)
-        svdRecoTracks_list = Belle2.PyStoreArray(svd_RecoTracks)
-        cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
+        self.cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
+        svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
+        svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
 
-        for i, tracks in enumerate(svdTracks_list):
-            svdTracks = tracks
-            svdTracks_rel_RecoTracks = svdTracks.getRelatedTo("RecoTracks")
-            svdClusters_rel_RecoTracks = svdTracks_rel_RecoTracks.getRelationsFrom("SVDClusters")
-
-            if len(svdClusters_rel_RecoTracks) == 0:
-                hasCluster = False
-            else:
-                hasCluster = True
-                # print("Cluster: " + str(hasCluster))
-            if hasCluster:
-                for svdClusters_rel_RecoTracks_cl in svdClusters_rel_RecoTracks:
-                    svdRecoDigits_rel_Clusters = svdClusters_rel_RecoTracks_cl.getRelatedTo("SVDRecoDigits")
-                    if svdRecoDigits_rel_Clusters is None:
-                        hasRecoDigits = False
-                    else:
-                        hasRecoDigits = True
-                    # print("Reco: " + str(hasRecoDigits))
-                    # CLUSTERS
-                    timeCluster = svdClusters_rel_RecoTracks_cl.getClsTime()
-                    snrCluster = svdClusters_rel_RecoTracks_cl.getSNR()
-                    layerCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getLayerNumber()
-                    layerIndex = layerCluster - 3
-                    sensorCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getSensorNumber()
-                    sensorIndex = sensorCluster - 1
-                    ladderCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getLadderNumber()
-                    ladderIndex = ladderCluster - 1
-                    sideCluster = svdClusters_rel_RecoTracks_cl.isUCluster()
-                    if sideCluster:
-                        sideIndex = 1
-                    else:
-                        sideIndex = 0
-
-                    hasTimezero = cdcEventT0.hasEventT0()
-                    # print("Time: " + str(hasTimezero))
-                    if hasTimezero and hasCluster and hasRecoDigits:
-                        TBClusters = svdRecoDigits_rel_Clusters.getModeByte().getTriggerBin()
-                        TBIndex = ord(TBClusters)
-                        tZero = cdcEventT0.getEventT0()
-                        # tZero_err = cdcEventT0.getEventT0Uncertainty()
-                        tZero_err = 5.1
-                        tZeroSync = tZero - 7.8625 * (3 - TBIndex)
-                        # print(str(tZero_err))
-
-                        resHist = self.resList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-                        resHist.Fill(timeCluster - tZeroSync)
-                        spHist = self.spList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-                        # spHist.Fill(timeCluster, 1.3*timeCluster - 50 + random.gauss(0,10))
-                        spHist.Fill(timeCluster, tZeroSync)
-                        cogHist = self.cogList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-                        cogHist.Fill(timeCluster)
-                        cdcHist = self.cdcList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-                        cdcHist.Fill(tZeroSync)
-                        snrHist = self.snrList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-                        snrHist.Fill(snrCluster)
-
-                        n = self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-                        n = n + 1
-                        self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = n
+        for svdCluster in svdCluster_list:
+            svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
+            self.fillLists(svdRecoDigit, svdCluster)
 
     def terminate(self):
 
@@ -410,40 +387,3 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
         tfile.Close()
-
-
-use_database_chain()
-use_local_database(localdb + "/database.txt", localdb, invertLogging=True)
-
-main = create_path()
-
-rootinput = register_module('RootInput')
-rootinput.param('inputFileNames', inputFileList)
-main.add_module(rootinput)
-
-main.add_module("Gearbox")
-main.add_module("Geometry", useDB=True)
-
-# Track selection - NOT YET
-trkFlt = register_module('TrackFilter')
-trkFlt.param('outputFileName', trk_outputFile)
-trkFlt.param('outputINArrayName', 'SelectedTracks')
-trkFlt.param('outputOUTArrayName', 'ExcludedTracks')
-trkFlt.param('min_NumHitSVD', nSVD)
-trkFlt.param('min_NumHitCDC', nCDC)
-trkFlt.param('min_Pvalue', pVal)
-# trkFlt.logging.log_level = LogLevel.DEBUG
-# main.add_module(trkFlt)
-
-main.add_module(SVDCoGTimeCalibrationImporterModule())
-
-# Show progress of processing
-progress = register_module('ProgressBar')
-main.add_module(progress)
-
-print_path(main)
-
-# Process events
-process(main)
-
-print(statistics)

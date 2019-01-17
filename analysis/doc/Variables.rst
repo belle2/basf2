@@ -332,7 +332,7 @@ to help to easily create aliases.
    because the remaining functions will not be helpful for users and this is a
    user manual after all.
 
-.. autofunction:: variales.utils.create_aliases
-.. autofunction:: variales.utils.create_daughter_aliases
-.. autofunction:: variales.utils.create_aliases_for_selected
-.. autofunction:: variales.utils.make_mc
+.. autofunction:: variables.utils.create_aliases
+.. autofunction:: variables.utils.create_daughter_aliases
+.. autofunction:: variables.utils.create_aliases_for_selected
+.. autofunction:: variables.utils.make_mc

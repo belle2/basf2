@@ -756,7 +756,7 @@ class Validation:
             for script in skipped_scripts:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
 
-    def report_on_scripts(self):
+    def report_on_scripts(self, verbosity=2):
         """!
         Print a summary about all scripts, especially highlighting
         skipped and failed scripts.
@@ -773,11 +773,11 @@ class Validation:
 
         self.log.note("")
         self.log.note("*" * 80)
-        self.log.note("Summary")
+        self.log.note("Summary of script execution")
         self.log.note("*" * 80)
         self.log.note("")
         if skipped_scripts:
-            self.log.note("{}/{} scripts were skipped:".format(
+            self.log.note("{}/{} scripts were skipped".format(
                 len(skipped_scripts), len(self.scripts)))
             self.log.note("\n".join(skipped_scripts))
             self.log.note("")
@@ -786,13 +786,18 @@ class Validation:
             self.log.note("")
 
         if failed_scripts:
-            self.log.note("{}/{} scripts failed:".format(
+            self.log.note("{}/{} scripts failed".format(
                 len(failed_scripts), len(self.scripts)))
             self.log.note("\n".join(failed_scripts))
             self.log.note("")
         else:
             self.log.note("No scripts failed.")
             self.log.note("")
+
+        print(validationfunctions.congratulator(
+            total=len(self.scripts),
+            failure=len(failed_scripts)+len(skipped_scripts)
+        ))
 
     def set_runtime_data(self):
         """!

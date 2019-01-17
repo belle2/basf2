@@ -473,3 +473,55 @@ def get_log_file_paths(logger):
         except AttributeError:
             pass
     return ret
+
+
+def congratulator(success=None, failure=None, total=None, just_comment=False,
+                  rate_name="Success rate"):
+    """ Keeping the morale up. """
+
+    if not total:
+        assert success and failure
+        total = success + failure
+    if not failure:
+        assert success and total
+        failure = total - success
+    if not success:
+        assert failure and total
+        success = total - failure
+
+    # Beware of zero division errors.
+    if total == 0:
+        return "That wasn't really exciting, was it?"
+
+    success_rate = 100 * success / total
+
+    comments = {
+        00.0: "You're grounded!",
+        10.0: "Infernal...",
+        20.0: "That's terrible!",
+        40.0: "You can do better than that.",
+        50.0: "That still requires some work.",
+        75.0: "Three quarters! Almost there!",
+        80.0: "Way to go ;)",
+        90.0: "Gold medal!",
+        95.0: "Legendary!",
+        99.0: "Nobel price!",
+        99.9: "Godlike!"
+    }
+
+    for value in sorted(comments.keys(), reverse=True):
+        if success_rate >= value:
+            comment = comments[value]
+            break
+    else:
+        # below minimum?
+        comment = comments[0]
+
+    if just_comment:
+        return comment
+    else:
+        return "{} {}%. {}".format(
+            rate_name,
+            int(success_rate),
+            comment
+        )

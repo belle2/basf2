@@ -228,7 +228,8 @@ namespace Belle2 {
      *
      *  @param fromArray  Origin of the relation
      *  @param toArray    Target of the relation
-     *  @param namedRelation Additional name for the relation, or "" for the default naming
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming.
      *  @return           True if there is a registered relation.
      *  @sa DependencyMap
      */

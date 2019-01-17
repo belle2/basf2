@@ -227,14 +227,26 @@ namespace Belle2 {
 
     /** Check for the existence of a relation to the given StoreArray.
      *
-     * @param toArray    Array the relation should point to (from this StoreArray)
-     * @param durability Durability of the relation.
+     * @param toArray       Array the relation should point to (from this StoreArray)
+     * @param durability    Durability of the relation.
      * @param namedRelation Additional name for the relation, or "" for the default naming
      */
     template <class TO> bool hasRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event,
                                            const std::string& namedRelation = "") const
     {
       return DataStore::Instance().hasRelation(*this, toArray, durability, namedRelation);
+    }
+
+    /** Check for the existence of a relation from the given StoreArray.
+     *
+     * @param fromArray     Array the relation should point to (from this StoreArray)
+     * @param durability    Durability of the relation.
+     * @param namedRelation Additional name for the relation, or "" for the default naming
+     */
+    template <class FROM> bool hasRelationFrom(const StoreArray<FROM>& fromArray,
+                                               DataStore::EDurability durability = DataStore::c_Event, const std::string& namedRelation = "") const
+    {
+      return DataStore::Instance().hasRelation(fromArray, *this, durability, namedRelation);
     }
 
     /** Delete all entries in this array.

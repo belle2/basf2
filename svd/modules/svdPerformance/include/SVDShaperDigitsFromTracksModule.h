@@ -62,10 +62,10 @@ namespace Belle2 {
     std::string m_track;
 
     std::string m_outputINArrayName;  /**< StoreArray with the selected output shaperdigits*/
-    // std::string m_outputOUTArrayName;  /**< StoreArray with the NOT selected output shaperdigits */
+    std::string m_outputOUTArrayName;  /**< StoreArray with the NOT selected output shaperdigits */
 
     SelectSubset<SVDShaperDigit> m_selectedShaperDigits; /** all shaperdigits */
-    // SelectSubset<SVDShaperDigit> m_notSelectedShaperDigits; /** all shaperdigits from tracks */
+    SelectSubset<SVDShaperDigit> m_notSelectedShaperDigits; /** all shaperdigits from tracks */
   };
 }
 

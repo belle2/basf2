@@ -34,13 +34,14 @@ SVDShaperDigitsFromTracksModule::SVDShaperDigitsFromTracksModule() : Module()
 
   // Parameter definitions
   addParam("SVDShaperDigits", m_svdshaper, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));
-  addParam("SVDRecoDigits", m_svdreco, "StoreArray with the input shaperdigits", std::string("SVDRecoDigits"));
-  addParam("SVDClusters", m_svdcluster, "StoreArray with the input shaperdigits", std::string("SVDClusters"));
-  addParam("Tracks", m_track, "StoreArray with the input shaperdigits", std::string("Tracks"));
-  addParam("RecoTracks", m_recotrack, "StoreArray with the input shaperdigits", std::string("RecoTracks"));
+  addParam("SVDRecoDigits", m_svdreco, "StoreArray with the input recodigits", std::string("SVDRecoDigits"));
+  addParam("SVDClusters", m_svdcluster, "StoreArray with the input clusters", std::string("SVDClusters"));
+  addParam("Tracks", m_track, "StoreArray with the input tracks", std::string("Tracks"));
+  addParam("RecoTracks", m_recotrack, "StoreArray with the input recotracks", std::string("RecoTracks"));
   addParam("outputINArrayName", m_outputINArrayName, "StoreArray with the output shaperdigits",
-           std::string("ShaperDigitsRelatedToTracks"));
-
+           std::string("SVDShaperDigitsFromTracks"));
+  addParam("outputOUTArrayName", m_outputOUTArrayName, "StoreArray with the output shaperdigits",
+           std::string(""));
 }
 
 SVDShaperDigitsFromTracksModule::~SVDShaperDigitsFromTracksModule()
@@ -59,19 +60,23 @@ void SVDShaperDigitsFromTracksModule::initialize()
   B2DEBUG(10, "RecoTracks: " << m_recotrack);
   B2DEBUG(1, "outputINArrayName: " <<  m_outputINArrayName);
 
-  StoreArray<SVDShaperDigit> SVDShaperDigits(m_svdshaper);
-  StoreArray<SVDCluster> SVDClusters(m_svdcluster);
-  StoreArray<SVDRecoDigit> SVDRecoDigits(m_svdcluster);
-  StoreArray<RecoTrack> RecoTracks(m_recotrack);
-  StoreArray<Track> Tracks(m_track);
-  SVDShaperDigits.isRequired();
-  SVDClusters.isRequired();
-  SVDRecoDigits.isRequired();
-  RecoTracks.isRequired();
-  Tracks.isRequired();
-
-  m_selectedShaperDigits.registerSubset(SVDShaperDigits, m_outputINArrayName);
+  StoreArray<SVDShaperDigit> ShaperDigits(m_svdshaper);
+  StoreArray<SVDCluster> Clusters(m_svdcluster);
+  StoreArray<SVDRecoDigit> RecoDigits(m_svdreco);
+  StoreArray<RecoTrack> recoTracks(m_recotrack);
+  StoreArray<Track> tracks(m_track);
+  ShaperDigits.isRequired();
+  Clusters.isRequired();
+  RecoDigits.isRequired();
+  recoTracks.isRequired();
+  tracks.isRequired();
+  m_selectedShaperDigits.registerSubset(ShaperDigits, m_outputINArrayName);
   m_selectedShaperDigits.inheritAllRelations();
+  if (m_outputOUTArrayName != "") {
+    m_notSelectedShaperDigits.registerSubset(ShaperDigits, m_outputOUTArrayName);
+    m_notSelectedShaperDigits.inheritAllRelations();
+  }
+
 }
 
 
@@ -84,22 +89,43 @@ void SVDShaperDigitsFromTracksModule::event()
 {
 
   StoreArray<SVDShaperDigit> ShaperDigits(m_svdshaper);
-  StoreArray<SVDCluster> Clusters(m_svdcluster);
-  StoreArray<SVDRecoDigit> RecoDigits(m_svdreco);
-  StoreArray<RecoTrack> recoTracks(m_recotrack);
-  StoreArray<Track> tracks(m_track);
 
   m_selectedShaperDigits.select([this](const SVDShaperDigit * theSVDShaperDigit) {
     RelationVector<SVDRecoDigit> reco_rel_shape = theSVDShaperDigit->getRelationsFrom<SVDRecoDigit>();
     if (reco_rel_shape.size() == 0) {return false;}
-    RelationVector<SVDCluster> cluster_rel_reco = reco_rel_shape[0]->getRelationsFrom<SVDCluster>();
-    if (cluster_rel_reco.size() == 0) {return false;}
-    RelationVector<RecoTrack> recotrack_rel_cluster = cluster_rel_reco[0]->getRelationsTo<RecoTrack>();
-    if (recotrack_rel_cluster.size() == 0) {return false;}
-    RelationVector<Track> track_rel_recotrack = recotrack_rel_cluster[0]->getRelationsFrom<Track>();
-    if (track_rel_recotrack.size() == 0) {return true;}
-    else return false;
+    else {
+      RelationVector<SVDCluster> cluster_rel_reco = reco_rel_shape[0]->getRelationsFrom<SVDCluster>();
+      if (cluster_rel_reco.size() == 0) {return false;}
+      else {
+        RelationVector<RecoTrack> recotrack_rel_cluster = cluster_rel_reco[0]->getRelationsTo<RecoTrack>();
+        if (recotrack_rel_cluster.size() == 0) {return false;}
+        else {
+          RelationVector<Track> track_rel_recotrack = recotrack_rel_cluster[0]->getRelationsFrom<Track>();
+          if (track_rel_recotrack.size() == 0) {return false;}
+          else {return true;}
+        }
+      }
+    }
   });
+
+  m_notSelectedShaperDigits.select([this](const SVDShaperDigit * theSVDShaperDigit) {
+    RelationVector<SVDRecoDigit> reco_rel_shape = theSVDShaperDigit->getRelationsFrom<SVDRecoDigit>();
+    if (reco_rel_shape.size() == 0) {return true;}
+    else {
+      RelationVector<SVDCluster> cluster_rel_reco = reco_rel_shape[0]->getRelationsFrom<SVDCluster>();
+      if (cluster_rel_reco.size() == 0) {return true;}
+      else {
+        RelationVector<RecoTrack> recotrack_rel_cluster = cluster_rel_reco[0]->getRelationsTo<RecoTrack>();
+        if (recotrack_rel_cluster.size() == 0) {return true;}
+        else {
+          RelationVector<Track> track_rel_recotrack = recotrack_rel_cluster[0]->getRelationsFrom<Track>();
+          if (track_rel_recotrack.size() == 0) {return true;}
+          else {return false;}
+        }
+      }
+    }
+  });
+
 }
 
 void SVDShaperDigitsFromTracksModule::endRun()

@@ -333,6 +333,6 @@ to help to easily create aliases.
    user manual after all.
 
 .. autofunction:: variables.utils.create_aliases
-.. autofunction:: variables.utils.create_daughter_aliases
 .. autofunction:: variables.utils.create_aliases_for_selected
-.. autofunction:: variables.utils.make_mc
+.. autofunction:: variables.utils.create_daughter_aliases
+.. autofunction:: variables.utils.create_mctruth_aliases

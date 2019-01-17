@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from functools import reduce
-import collections as co
-from variables import variables as cpp_variables
-from variables import std_vector
+import functools
+import collections
+from variables import variables as _variablemanager
+from variables import std_vector as _std_vector
 
 
 def create_aliases(list_of_variables, wrapper, prefix):
@@ -35,7 +35,7 @@ def create_aliases(list_of_variables, wrapper, prefix):
     """
     aliases = [f"{prefix}_{e}" for e in list_of_variables]
     for var, alias in zip(list_of_variables, aliases):
-        cpp_variables.addAlias(alias, wrapper.format(variable=var))
+        _variablemanager.addAlias(alias, wrapper.format(variable=var))
 
     return aliases
 
@@ -134,13 +134,13 @@ def create_daughter_aliases(list_of_variables, indices, prefix="", include_indic
 
     """
 
-    if not isinstance(indices, co.Iterable):
+    if not isinstance(indices, collections.Iterable):
         indices = [indices]
 
     if include_indices:
-        prefix = reduce(lambda x, y: f"{x}_d{y}", indices, prefix).lstrip("_")
+        prefix = functools.reduce(lambda x, y: f"{x}_d{y}", indices, prefix).lstrip("_")
 
-    template = reduce(lambda x, y: f"daughter({y},{x})", reversed(indices), "{variable}")
+    template = functools.reduce(lambda x, y: f"daughter({y},{x})", reversed(indices), "{variable}")
     return create_aliases(list_of_variables, template, prefix)
 
 
@@ -212,9 +212,9 @@ class DecayParticleNode:
 
         # count the particle names of all daughters so that we know which ones we
         # have to index
-        names = co.Counter(e.name for e in self.children.values())
+        names = collections.Counter(e.name for e in self.children.values())
         # if we use relative indices start counting them at zero
-        relative_indices = co.defaultdict(int)
+        relative_indices = collections.defaultdict(int)
 
         # now loop over all children
         for index, c in sorted(self.children.items()):
@@ -425,7 +425,7 @@ def create_aliases_for_selected(list_of_variables, decay_string, prefix=None, *,
         if len(prefix) != len(prefixes):
             raise ValueError("Number of selected particles does not match number of supplied custom prefixes")
         # final check: make sure we don't have duplicate prefixes in here
-        prefix_counts = co.Counter(prefix)
+        prefix_counts = collections.Counter(prefix)
         if max(prefix_counts.values()) > 1:
             raise ValueError("Prefixes need to be unique")
         # ok, just override calculated prefixes
@@ -453,19 +453,19 @@ def create_aliases_for_selected(list_of_variables, decay_string, prefix=None, *,
     return alias_list
 
 
-def make_mc(list_of_variables):
+def create_mctruth_aliases(list_of_variables, prefix="mc"):
     """
     The function wraps variables from the list with 'matchedMC()'.
 
     >>> list_of_variables = ['M','p']
-    >>> print(make_mc(list_of_variables))
-    ['mmc_M', 'mmc_p']
+    >>> create_mctruth_aliases(list_of_variables)
+    ['mc_M', 'mc_p']
     >>> from variables import variables
     >>> variables.printAliases()
     [INFO] =========================
     [INFO] Following aliases exists:
-    [INFO] 'mmc_M' --> 'matchedMC(M)'
-    [INFO] 'mmc_p' --> 'matchedMC(p)'
+    [INFO] 'mc_M' --> 'matchedMC(M)'
+    [INFO] 'mc_p' --> 'matchedMC(p)'
     [INFO] =========================
 
 
@@ -473,16 +473,14 @@ def make_mc(list_of_variables):
         list_of_variables (list(str)): list of variable names
 
     Returns:
-        list(str): new variables list
+        list(str): list of created aliases
     """
-    return create_aliases(list_of_variables,
-                          'matchedMC({variable})',
-                          'mmc')
+    return create_aliases(list_of_variables, 'matchedMC({variable})', prefix)
 
 
 def add_collection(list_of_variables, collection_name):
     """
-    The function creates variable collection from tne list of variables
+    The function creates variable collection from the given list of variables
 
     Note: This is kept for compatibility.
 
@@ -495,5 +493,5 @@ def add_collection(list_of_variables, collection_name):
         str: name of the variable collection
     """
 
-    cpp_variables.addCollection(collection_name, std_vector(*tuple(list_of_variables)))
+    _variablemanager.addCollection(collection_name, _std_vector(*tuple(list_of_variables)))
     return collection_name

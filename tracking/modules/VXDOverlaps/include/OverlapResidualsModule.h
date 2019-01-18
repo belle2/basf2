@@ -72,36 +72,36 @@ namespace Belle2 {
 
     TH1F* h_SVDstrips_Mult = 0;
 
-    TH1F* h_U_Cl1Cl2_Res[10] = 0;
-    TH1F* h_V_Cl1Cl2_Res[10] = 0;
+    TH1F* h_U_Cl1Cl2_Res[10] = {0};
+    TH1F* h_V_Cl1Cl2_Res[10] = {0};
 
-    TH2F* h_Lyr6[17][6] = 0;
-    TH2F* h_Lyr5[13][5] = 0;
-    TH2F* h_Lyr4[11][4] = 0;
-    TH2F* h_Lyr3[8][3] = 0; //[Ladder][sensor number]
-    TH2F* h_Lyr2[13][3] = 0; //[Ladder][sensor number]
-    TH2F* h_Lyr1[9][3] = 0; //[Ladder][sensor number]
+    TH2F* h_Lyr6[17][6] = {0};
+    TH2F* h_Lyr5[13][5] = {0};
+    TH2F* h_Lyr4[11][4] = {0};
+    TH2F* h_Lyr3[8][3] = {0}; //[Ladder][sensor number]
+    TH2F* h_Lyr2[13][3] = {0}; //[Ladder][sensor number]
+    TH2F* h_Lyr1[9][3] = {0}; //[Ladder][sensor number]
 
-    TCanvas* c_Lyr6[6] = 0;
-    TCanvas* c_Lyr5[5] = 0;
-    TCanvas* c_Lyr4[4] = 0;
-    TCanvas* c_Lyr3[3] = 0;
-    TCanvas* c_Lyr2[3] = 0;
-    TCanvas* c_Lyr1[3] = 0;
+    TCanvas* c_Lyr6[6] = {0};
+    TCanvas* c_Lyr5[5] = {0};
+    TCanvas* c_Lyr4[4] = {0};
+    TCanvas* c_Lyr3[3] = {0};
+    TCanvas* c_Lyr2[3] = {0};
+    TCanvas* c_Lyr1[3] = {0};
 
-    TH2F* h_Fit_Lyr6[17][6] = 0;
-    TH2F* h_Fit_Lyr5[13][5] = 0;
-    TH2F* h_Fit_Lyr4[11][4] = 0;
-    TH2F* h_Fit_Lyr3[8][3] = 0; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr2[13][3] = 0; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr1[9][3] = 0; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr6[17][6] = {0};
+    TH2F* h_Fit_Lyr5[13][5] = {0};
+    TH2F* h_Fit_Lyr4[11][4] = {0};
+    TH2F* h_Fit_Lyr3[8][3] = {0}; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr2[13][3] = {0}; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr1[9][3] = {0}; //[Ladder][sensor number]
 
-    TCanvas* c_Fit_Lyr6[6] = 0;
-    TCanvas* c_Fit_Lyr5[5] = 0;
-    TCanvas* c_Fit_Lyr4[4] = 0;
-    TCanvas* c_Fit_Lyr3[3] = 0;
-    TCanvas* c_Fit_Lyr2[3] = 0;
-    TCanvas* c_Fit_Lyr1[3] = 0;
+    TCanvas* c_Fit_Lyr6[6] = {0};
+    TCanvas* c_Fit_Lyr5[5] = {0};
+    TCanvas* c_Fit_Lyr4[4] = {0};
+    TCanvas* c_Fit_Lyr3[3] = {0};
+    TCanvas* c_Fit_Lyr2[3] = {0};
+    TCanvas* c_Fit_Lyr1[3] = {0};
 
 
   };

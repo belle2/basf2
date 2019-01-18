@@ -1012,7 +1012,7 @@ void OverlapResidualsModule::terminate()
 
     for (int i = 1; i <= 9; i++) {
 
-      if (i == 5 || i == 7 || i == 8) continue; //The product of cluster sizes cannot be 5, 7, 9
+      if (i == 5 || i == 7 || i == 8) continue; //The product of cluster sizes cannot be 5, 7, 8
 
       h_U_Cl1Cl2_Res[i]->Scale(1. / h_U_Cl1Cl2_Res[i]->Integral());
       h_U_Cl1Cl2_Res[i]->Write();

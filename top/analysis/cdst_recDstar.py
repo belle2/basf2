@@ -5,25 +5,34 @@
 # Example of Dstar reconstruction where output ntuple includes some additional variables
 # from group "TOP Calibration". Input must be a cdst file.
 #
-# usage: basf2 cdst_recDstar.py -i <cdst_file.root>
+# usage: basf2 cdst_recDstar.py -i <cdst_file.root> [-- (see argument parser)]
 # ---------------------------------------------------------------------------------------
 
-import sys
-from basf2 import *
+import basf2
 from modularAnalysis import *
 from variables import variables
 from ROOT import gSystem
+import argparse
 
-gSystem.Load('libtop.so')
+# Argument parser
+ap = argparse.ArgumentParser()
+ap.add_argument("--mc", help="Input file is MC", action='store_true', default=False)
+ap.add_argument("--vfit", help="Do vertex fit", action='store_true', default=False)
+ap.add_argument("--tag", help="Global tag (data only)", default="data_reprocessing_proc7")
+ap.add_argument("--out", help="Output file", default="Dstar.root")
+args = ap.parse_args()
 
-MC = False
-VFit = False
+MC = args.mc
+VFit = args.vfit
 
 if not MC:
-    use_central_database("data_reprocessing_proc7", LogLevel.WARNING)
+    use_central_database(args.tag, LogLevel.WARNING)
+
+# Load top library
+gSystem.Load('libtop.so')
 
 # Create path
-main = create_path()
+main = basf2.create_path()
 
 # Just a dummy input file, use basf2 -i option
 inputMdstList('default', 'Input.root', path=main)
@@ -46,7 +55,7 @@ if VFit:
 if MC:
     matchMCTruth('D*+', path=main)
 
-# Output ntuple
+# Output ntuple (extend the list if you need more)
 variables.addAlias('isBunch', 'isTopRecBunchReconstructed')
 variables.addAlias('bunchOffset', 'topRecBunchCurrentOffset')
 variables.addAlias('M_D0', 'daughter(0, M)')
@@ -68,10 +77,10 @@ varlist = ['M_D0', 'Q', 'dQ', 'p_cms', 'isBunch', 'bunchOffset', 'p_K', 'p_pi',
            'kaonLL_K', 'pionLL_K', 'flag_K', 'slotID_K',
            'kaonLL_pi', 'pionLL_pi', 'flag_pi', 'slotID_pi']
 
-variablesToNtuple('D*+', varlist, 'dstar', 'Dstar.root', path=main)
+variablesToNtuple('D*+', varlist, 'dstar', args.out, path=main)
 
 # Process events
-process(main)
+basf2.process(main)
 
 # Print statistics
-print(statistics)
+print(basf2.statistics)

@@ -51,6 +51,28 @@ namespace Belle2 {
 
 
 
+    /**
+     * Set the zero suppression
+     * Input:
+     * @param float
+     *
+     */
+    void setZeroSuppression(float zeroSuppression)
+    {
+      m_zeroSuppression = zeroSuppression;
+    }
+
+    /**
+     * Set the latency
+     * Input:
+     * @param int
+     *
+     */
+    void setLatency(float latency)
+    {
+      m_latency = latency;
+    }
+
 
   private:
 

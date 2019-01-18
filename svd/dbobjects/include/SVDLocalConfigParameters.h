@@ -57,6 +57,49 @@ namespace Belle2 {
      */
     std::string getCalibDate(void) const { return m_calibDate; };
 
+    /**
+     * Set the injected charge
+     * Input:
+     * @param float
+     *
+     */
+    void setInjectedCharge(float injectedCharge)
+    {
+      m_injectedCharge = injectedCharge;
+    }
+
+    /**
+     * Set the time units
+     * Input:
+     * @param float
+     *
+     */
+    void setTimeUnits(float timeUnits)
+    {
+      m_timeUnits = timeUnits;
+    }
+
+    /**
+     * Set the masking bitmap
+     * Input:
+     * @param int
+     *
+     */
+    void setMaskFilter(int maskFilter)
+    {
+      m_maskFilter = maskFilter;
+    }
+
+    /**
+     * Set the date_hour (yyyymmdd_hhmm) of the current calibration
+     * Input:
+     * @param std::string
+     *
+     */
+    void setCalibDate(std::string date)
+    {
+      m_calibDate = date;
+    }
   private:
 
 

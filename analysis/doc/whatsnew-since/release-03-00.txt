@@ -5,3 +5,14 @@ Modules
 +++++++
 
 * Removal of the unsupported ECLClusterInfoModule.
+
+
+Variables
++++++++++
+
+* The function to create variable aliases for particles selected from a decay
+  string has been fixed and extended to allow better
+  customization (:issue:`BII-4437`)
+
+  .. seealso::
+     `variables.utils.create_aliases_for_selected()`

@@ -416,7 +416,8 @@ namespace Belle2 {
               // set the relation only if the MCParticle's energy contribution
               // to this cluster amounts to at least 25%
               if (relMCParticle)
-                if (weight / roeECL[i]->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30 && relMCParticle->getPDG() == 22)
+                if (weight / roeECL[i]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30
+                    && relMCParticle->getPDG() == 22)
                   mcROEObjects.insert(relMCParticle);
             }
           }
@@ -717,7 +718,7 @@ namespace Belle2 {
         double extraE = 0.0;
 
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          extraE += roeClusters[iEcl]->getEnergy();
+          extraE += roeClusters[iEcl]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
         return extraE;
       };

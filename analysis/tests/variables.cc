@@ -644,7 +644,7 @@ namespace {
 
     var = Manager::Instance().getVariable("ROE_eextra(mask1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), savedROEECL->getEnergy());
+    EXPECT_FLOAT_EQ(var->function(part), savedROEECL->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
 
     var = Manager::Instance().getVariable("ROE_eextra(mask2)");
     ASSERT_NE(var, nullptr);
@@ -2895,7 +2895,7 @@ namespace {
     // make the photons from clusters (and sum up the total ecl energy)
     double eclEnergy = 0.0;
     for (int i = 0; i < eclclusters.getEntries(); ++i) {
-      eclEnergy += eclclusters[i]->getEnergy();
+      eclEnergy += eclclusters[i]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       if (!eclclusters[i]->isTrack()) {
         const Particle* p = particles.appendNew(Particle(eclclusters[i]));
         gammalist->addParticle(p);

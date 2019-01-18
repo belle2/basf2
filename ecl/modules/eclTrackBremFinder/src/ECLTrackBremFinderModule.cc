@@ -229,7 +229,7 @@ void ECLTrackBremFinderModule::event()
 
       // check if the cluster energy is higher than the track momentum itself
       // also check that cluster has more than 2% of the track momentum
-      double relativeEnergy = cluster.getEnergy() / trackMomentum;
+      double relativeEnergy = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / trackMomentum;
       if (relativeEnergy > 1 || relativeEnergy < m_relativeClusterEnergy) {
         B2DEBUG(20, "Relative energy of cluster higher than 1 or below threshold!");
         continue;
@@ -299,7 +299,7 @@ void ECLTrackBremFinderModule::event()
 
         if (fitted_pos.Perp() <= 16 && clusterDistance <= m_clusterDistanceCut) {
           m_bremHits.appendNew(recoTrack, bremCluster,
-                               fitted_pos, bremCluster->getEnergy(),
+                               fitted_pos, bremCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons),
                                clusterDistance, effAcceptanceFactor);
 
           // add a relation between the bremsstrahlung cluster and the track to transfer the information to the analysis

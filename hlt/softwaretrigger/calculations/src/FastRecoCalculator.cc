@@ -55,7 +55,7 @@ namespace Belle2 {
       sortedECLEnergies.reserve(static_cast<unsigned long>(m_eclClustersWithPhotonHypothesis.size()));
 
       for (const ECLCluster& eclCluster : m_eclClustersWithPhotonHypothesis) {
-        sortedECLEnergies.push_back(eclCluster.getEnergy());
+        sortedECLEnergies.push_back(eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
       }
 
       std::sort(sortedECLEnergies.begin(), sortedECLEnergies.end(), std::greater<double>());
@@ -81,7 +81,7 @@ namespace Belle2 {
                                         std::end(m_eclClustersWithPhotonHypothesis), visibleEnergy,
         [](const double & value, const ECLCluster & eclCluster) {
           ClusterUtils C;
-          return value + C.Get4MomentumFromCluster(&eclCluster).Vect().Mag();
+          return value + C.Get4MomentumFromCluster(&eclCluster, ECLCluster::EHypothesisBit::c_nPhotons).Vect().Mag();
         });
       }
 
@@ -91,7 +91,7 @@ namespace Belle2 {
         std::accumulate(std::begin(m_eclClustersWithPhotonHypothesis),
                         std::end(m_eclClustersWithPhotonHypothesis), static_cast<double>(0.0),
       [](const double & value, const ECLCluster & eclCluster) {
-        const double& energy = eclCluster.getEnergy();
+        const double& energy = eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
         if (energy > 0.05) {
           return value + energy;
         } else {
@@ -102,14 +102,14 @@ namespace Belle2 {
         std::accumulate(std::begin(m_eclClustersWithPhotonHypothesis),
                         std::end(m_eclClustersWithPhotonHypothesis), static_cast<double>(0.0),
       [](const double & value, const ECLCluster & eclCluster) {
-        return value + eclCluster.getEnergy();
+        return value + eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       });
 
       calculationResult["number_of_high_energy_ecl_clusters"] =
         std::count_if(std::begin(m_eclClustersWithPhotonHypothesis),
                       std::end(m_eclClustersWithPhotonHypothesis),
       [](const ECLCluster & eclCluster) {
-        return eclCluster.getEnergy() > 0.05;
+        return eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > 0.05;
       });
 
       calculationResult["number_of_cdc_tracks"] = momenta.size();

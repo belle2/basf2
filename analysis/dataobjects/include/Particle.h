@@ -12,6 +12,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
@@ -24,7 +25,6 @@ class TClonesArray;
 namespace Belle2 {
 
   // forward declarations
-  class ECLCluster;
   class KLMCluster;
   class Track;
   class TrackFitResult;
@@ -589,10 +589,18 @@ namespace Belle2 {
 
     /**
      * Returns the pointer to the ECLCluster object that was used to create this Particle (ParticleType == c_ECLCluster).
-     * NULL pointer is returned, if the Particle was not made from ECLCluster.
+     * or the track-matched cluster otherwise.
+     * NULL pointer is returned, if the Particle has no ECLCluster source or relation.
      * @return const pointer to the ECLCluster
      */
     const ECLCluster* getECLCluster() const;
+
+    /**
+     * Returns the energy of the ECLCluster for the particle.
+     * The return value depends on the ECLCluster hypothesis.
+     * @return energy of the ECLCluster
+     */
+    double getECLClusterEnergy() const;
 
     /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
@@ -697,6 +705,27 @@ namespace Belle2 {
     bool wasExactFitHypothesisUsed() const
     {
       return std::abs(m_pdgCodeUsedForFit) == std::abs(m_pdgCode);
+    }
+
+    /**
+    * Returns the ECLCluster EHypothesisBit for this Particle.
+    */
+    ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const
+    {
+      switch (abs(getPDGCode())) {
+        case 22: // photon
+        case 11: // electron
+        case 13: // muon
+        case 211: // pion
+        case 321: // kaon
+        case 2122: //proton
+        case 1000010020: //deuteron
+          return ECLCluster::EHypothesisBit::c_nPhotons;
+        case 130: //K0L
+          return ECLCluster::EHypothesisBit::c_neutralHadron;
+        default:
+          return ECLCluster::EHypothesisBit::c_none;
+      }
     }
 
   private:

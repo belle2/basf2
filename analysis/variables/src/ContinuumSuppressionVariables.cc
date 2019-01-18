@@ -71,7 +71,7 @@ namespace Belle2 {
           continue;
 
         ClusterUtils C;
-        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i]);
+        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i], ECLCluster::EHypothesisBit::c_nPhotons);
         if (momECLCluster == momECLCluster) {
           if (eclClusters[i]->isNeutral()) {
             Particle particle(eclClusters[i]);

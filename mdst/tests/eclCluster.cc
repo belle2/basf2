@@ -22,7 +22,7 @@ namespace Belle2 {
   {
     ECLCluster myECLCluster;
 
-    EXPECT_EQ(exp(-5.), myECLCluster.getEnergy());
+    EXPECT_EQ(exp(-5.), myECLCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
     EXPECT_EQ(exp(-5.), myECLCluster.getEnergyRaw());
     EXPECT_EQ(exp(-5.), myECLCluster.getEnergyHighestCrystal());
     EXPECT_EQ(0, myECLCluster.getTheta());
@@ -101,8 +101,9 @@ namespace Belle2 {
     myECLCluster.setLAT(lat);
     myECLCluster.setCovarianceMatrix(error);
     myECLCluster.setIsTrack(isTrack);
+    myECLCluster.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
 
-    EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy());
+    EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
     EXPECT_FLOAT_EQ(E9oE21, myECLCluster.getE9oE21());
     EXPECT_FLOAT_EQ(energyDepSum, myECLCluster.getEnergyRaw());
     EXPECT_FLOAT_EQ(theta, myECLCluster.getTheta());

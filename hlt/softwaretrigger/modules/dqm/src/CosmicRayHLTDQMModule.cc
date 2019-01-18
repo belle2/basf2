@@ -163,7 +163,7 @@ void CosmicRayHLTDQMModule::event()
     int nECLClusters = 0;
     for (const auto& eclCluster : eclClusters) {
       if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-        h_e_eclcluster->Fill(eclCluster.getEnergy());
+        h_e_eclcluster->Fill(eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
         h_phi_eclcluster->Fill(eclCluster.getPhi());
         h_theta_eclcluster->Fill(eclCluster.getTheta());
         h_E1oE9_eclcluster->Fill(eclCluster.getE1oE9());

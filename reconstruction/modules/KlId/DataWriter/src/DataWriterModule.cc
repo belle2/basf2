@@ -275,7 +275,7 @@ void DataWriterModule::event()
     m_KLMECLDist = get<1>(closestECLAndDist);
 
     if (!(closestECLCluster == nullptr)) {
-      m_KLMECLE              = closestECLCluster->getEnergy();
+      m_KLMECLE              = closestECLCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       m_KLMECLE9oE25         = closestECLCluster->getE9oE21();
       m_KLMECLEerror         = closestECLCluster->getUncertaintyEnergy();
       m_KLMECLTerror         = closestECLCluster->getDeltaTime99();
@@ -352,11 +352,11 @@ void DataWriterModule::event()
 // ---------------   ECL CLUSTERS
   for (const ECLCluster& cluster : m_eclClusters) {
 
-    if (!m_useECL) {continue;}
+    if (!m_useECL or !cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {continue;}
 
     m_ECLminTrkDistance = cluster.getMinTrkDistance();
     m_ECLdeltaL         = cluster.getDeltaL();
-    m_ECLE              = cluster.getEnergy();
+    m_ECLE              = cluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
     m_ECLE9oE25         = cluster.getE9oE21();
     m_ECLTiming         = cluster.getTime();
     m_ECLR              = cluster.getR();
@@ -398,7 +398,7 @@ void DataWriterModule::event()
     m_ECLZ                 = clusterPos.Z();
 
     ClusterUtils C;
-    m_ECLMom               = C.Get4MomentumFromCluster(&cluster).Vect().Mag2();
+    m_ECLMom               = C.Get4MomentumFromCluster(&cluster, ECLCluster::EHypothesisBit::c_nPhotons).Vect().Mag2();
     m_ECLDeltaTime         = cluster.getDeltaTime99();
 
     m_ECLUncertaintyEnergy = cluster.getUncertaintyEnergy();

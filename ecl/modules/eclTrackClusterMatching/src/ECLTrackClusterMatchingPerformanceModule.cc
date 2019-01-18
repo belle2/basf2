@@ -81,10 +81,17 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       const double weight = relatedMCParticles.weight(index);
       // check that at least 50% of the generated energy of the particle is contained in this ECLCluster
       // and check that the total cluster energy is greater than 50% of the energy coming from the particle
-      if (eclCluster.getEnergy() >= 0.5 * relatedMCParticle->getEnergy()) {
+
+      ECLCluster::EHypothesisBit hypo = ECLCluster::EHypothesisBit::c_nPhotons;
+      if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)
+          and not eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        hypo = ECLCluster::EHypothesisBit::c_neutralHadron;
+      }
+
+      if (eclCluster.getEnergy(hypo) >= 0.5 * relatedMCParticle->getEnergy()) {
         if (isChargedStable(*relatedMCParticle) && weight >= 0.5 * relatedMCParticle->getEnergy()) {
           found_charged_stable = true;
-        } else if (relatedMCParticle->getPDG() == 22 && weight >= 0.5 * eclCluster.getEnergy() && !found_photon) {
+        } else if (relatedMCParticle->getPDG() == 22 && weight >= 0.5 * eclCluster.getEnergy(hypo) && !found_photon) {
           found_photon = true;
           m_photonEnergy = relatedMCParticle->getEnergy();
         }
@@ -104,10 +111,12 @@ void ECLTrackClusterMatchingPerformanceModule::event()
         } else {
           m_clusterHypothesis = 5;
         }
+        m_clusterEnergy = eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       } else if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
         m_clusterHypothesis = 6;
+        m_clusterEnergy = eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
       }
-      m_clusterEnergy = eclCluster.getEnergy();
+
       m_clusterErrorTiming = eclCluster.getDeltaTime99();
       m_clusterE1E9 = eclCluster.getE1oE9();
       m_clusterDetectorRegion = eclCluster.getDetectorRegion();

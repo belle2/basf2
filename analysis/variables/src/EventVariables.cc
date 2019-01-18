@@ -123,7 +123,7 @@ namespace Belle2 {
         if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 
-        result += eclClusters[i]->getEnergy();
+        result += eclClusters[i]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       }
       return result;
     }

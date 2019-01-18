@@ -55,7 +55,13 @@ void ECLTriggerClusterMatcherModule::event()
   for (auto& eclcluster : m_eclClusters) {
     const double eclclusterTheta = eclcluster.getTheta();
     const double eclclusterPhi = eclcluster.getPhi();
-    const double eclclusterE = eclcluster.getEnergy();
+
+    double eclclusterE = 0.0;
+    if (eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+      eclclusterE = eclcluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+    } else if (eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
+      eclclusterE = eclcluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
+    } else continue;
 
     // Users can re-run this with different settings, remove this bit.
     eclcluster.removeStatus(ECLCluster::EStatusBit::c_TriggerCluster);

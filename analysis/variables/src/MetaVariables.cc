@@ -910,10 +910,12 @@ endloop:
               const auto& frame = ReferenceFrame::GetCurrent();
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
+              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
               if (clusteri and clusterj) {
                 ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
                 return pi.Angle(pj);
               }
               return std::numeric_limits<float>::quiet_NaN();
@@ -927,11 +929,15 @@ endloop:
               const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
               const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
               const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
+              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
+              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
+              const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
+
               if (clusteri and clusterj and clusterk) {
                 ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
-                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk)).Vect();
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
                 return pk.Angle(pi + pj);
               }
               return std::numeric_limits<float>::quiet_NaN();
@@ -1621,8 +1627,9 @@ endloop:
           {
             const Particle* part = listOfParticles->getParticle(i);
             const ECLCluster* cluster = part->getECLCluster();
+            const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
             if (cluster != nullptr) {
-              totalEnergy += cluster->getEnergy();
+              totalEnergy += cluster->getEnergy(clusterHypothesis);
             }
           }
           return totalEnergy;

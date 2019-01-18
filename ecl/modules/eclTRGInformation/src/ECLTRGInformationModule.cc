@@ -233,7 +233,7 @@ void ECLTRGInformationModule::event()
             if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
             const auto weight = rel.weight(irel);
-            float clusterenergy = cluster->getEnergy();
+            float clusterenergy = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
             B2DEBUG(28, irel << " " << clusterenergy << " " << m_clusterEnergyThreshold);
 

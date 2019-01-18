@@ -103,7 +103,7 @@ namespace Belle2 {
       // nECLMatchTracksLE
       const unsigned int numberOfTracksWithECLMatch = std::count_if(m_pionParticles->begin(), m_pionParticles->end(),
       [](const Particle & particle) {
-        return getECLCluster(particle, true) != nullptr;
+        return getECLCluster(particle) != nullptr;
       });
       calculationResult["nECLMatchTracksLE"] = numberOfTracksWithECLMatch;
 
@@ -113,7 +113,8 @@ namespace Belle2 {
       if (eclClusters.isValid()) {
         const unsigned int numberOfECLClusters = std::count_if(eclClusters.begin(), eclClusters.end(),
         [](const ECLCluster & eclcluster) {
-          return eclcluster.getEnergy() > 0.1;
+          return (eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+                  and eclcluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > 0.1);
         });
         neclClusters = numberOfECLClusters;
       }
@@ -124,16 +125,14 @@ namespace Belle2 {
       int nb2bcc_3D = 0;
       ClusterUtils C;
       for (int i = 0; i < eclClusters.getEntries() - 1; i++) {
-        if (eclClusters[i]->getHypothesisId() != 1 &&
-            eclClusters[i]->getHypothesisId() != 5)
+        if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
-        TLorentzVector V4g1 = C.Get4MomentumFromCluster(eclClusters[i]);
+        TLorentzVector V4g1 = C.Get4MomentumFromCluster(eclClusters[i], ECLCluster::EHypothesisBit::c_nPhotons);
         double Eg1 = V4g1.E();
         for (int j = i + 1; j < eclClusters.getEntries(); j++) {
-          if (eclClusters[j]->getHypothesisId() != 1 &&
-              eclClusters[j]->getHypothesisId() != 5)
+          if (!eclClusters[j]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
             continue;
-          TLorentzVector V4g2 = C.Get4MomentumFromCluster(eclClusters[j]);
+          TLorentzVector V4g2 = C.Get4MomentumFromCluster(eclClusters[j], ECLCluster::EHypothesisBit::c_nPhotons);
           double Eg2 = V4g2.E();
           const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
           const TVector3 V3g2 = (PCmsLabTransform::labToCms(V4g2)).Vect();
@@ -229,9 +228,9 @@ namespace Belle2 {
       const unsigned int nEidLE = std::count_if(m_pionParticles->begin(), m_pionParticles->end(), [](const Particle & p) {
         const double& momentum  = p.getMomentumMagnitude();
         const double& r_rho = getRho(&p);
-        const ECLCluster* eclTrack = getECLCluster(p, true);
+        const ECLCluster* eclTrack = getECLCluster(p);
         if (eclTrack) {
-          const double& energyOverMomentum = eclTrack->getEnergy() / momentum;
+          const double& energyOverMomentum = eclTrack->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum;
           double r_rhotoebeam = r_rho / BeamEnergyCMS();
           return (r_rhotoebeam) > 0.35 && energyOverMomentum > 0.8;
         }
@@ -257,11 +256,11 @@ namespace Belle2 {
       // EtotLE
       const double eTotTracks = std::accumulate(m_pionParticles->begin(), m_pionParticles->end(), 0.0,
       [](const double & eTot, const Particle & p) {
-        const ECLCluster* eclCluster = getECLCluster(p, true);
+        const ECLCluster* eclCluster = getECLCluster(p);
         if (eclCluster) {
-          const double eclEnergy = eclCluster->getEnergy();
+          const double eclEnergy = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
           if (eclEnergy > 0.1) {
-            return eTot + eclCluster->getEnergy();
+            return eTot + eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
           }
         }
         return eTot;

@@ -68,7 +68,7 @@ void NtupleRecoStatsTool::eval(const  Particle*)
 
       delete gamma;
     } else {
-      m_chargedECLEnergy += cluster->getEnergy();
+      m_chargedECLEnergy += cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       m_iChargedClusters++;
     }
   }

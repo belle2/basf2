@@ -91,19 +91,6 @@ namespace Belle2 {
       return m_svdLocalConfig_aDBObjPtr->getTimeUnits();
     }
 
-    /**  LOCAL CONFIGURATION PARAMETERS:
-     * Return the masking bitmap applied to mask strips at FADC level (only taken into account for cm-section)
-     *
-     * Input:
-     * no input parameters are required since it is a detector based payload
-     *
-     * Output: int corresponding to the filtering mask applied to the field <masks>
-     */
-    float getMaskFilter()
-    {
-      return m_svdLocalConfig_aDBObjPtr->getMaskFilter();
-    }
-
 
     /** LOCAL CONFIGURATION PARAMETERS:
      * Return the time stamp (date, hour) of the calibration
@@ -142,6 +129,20 @@ namespace Belle2 {
     int getLatency()
     {
       return m_svdGlobalConfig_aDBObjPtr->getLatency();
+    }
+
+
+    /**  GLOBAL CONFIGURATION PARAMETERS:
+     * Return the masking bitmap applied to mask strips at FADC level (only taken into account for cm-section)
+     *
+     * Input:
+     * no input parameters are required since it is a detector based payload
+     *
+     * Output: int corresponding to the filtering mask applied to the field <masks>
+     */
+    float getMaskFilter()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->getMaskFilter();
     }
 
 

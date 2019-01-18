@@ -45,13 +45,6 @@ namespace Belle2 {
     float getTimeUnits(void) const { return m_timeUnits; };
 
     /**
-     * Returns the masking bitmap used to mask the strips at FADC level (only for CM-section)
-     * @param none
-     * @return int corresponding to the mask filter applied at FADC level
-     */
-    int getMaskFilter(void) const { return m_maskFilter; };
-
-    /**
      * Returns the time stamp date_hour (yyyymmdd_hhmm) of the current calibration     * @param none
      * @return string corresponding to the time stamp of the current calibration in the format yyyymmdd_hhmm.
      */
@@ -80,17 +73,6 @@ namespace Belle2 {
     }
 
     /**
-     * Set the masking bitmap
-     * Input:
-     * @param int
-     *
-     */
-    void setMaskFilter(int maskFilter)
-    {
-      m_maskFilter = maskFilter;
-    }
-
-    /**
      * Set the date_hour (yyyymmdd_hhmm) of the current calibration
      * Input:
      * @param std::string
@@ -111,10 +93,6 @@ namespace Belle2 {
     /** Time units of the measured pulse shape peak time expressed in accelerator RFC
      */
     float m_timeUnits;
-
-    /** masking bitmap
-     */
-    int m_maskFilter;
 
     /** time stamp with date and hour(yyyymmdd_hhmm) of when the local runs for the current calibration have been taken
      */

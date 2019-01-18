@@ -49,6 +49,13 @@ namespace Belle2 {
      */
     int getLatency(void) const { return m_latency; };
 
+    /**
+     * Returns the masking bitmap used to mask the strips at FADC level (only for CM-section)
+     * @param none
+     * @return int corresponding to the mask filter applied at FADC level
+     */
+    int getMaskFilter(void) const { return m_maskFilter; };
+
 
 
     /**
@@ -74,6 +81,18 @@ namespace Belle2 {
     }
 
 
+    /**
+     * Set the masking bitmap
+     * Input:
+     * @param int
+     *
+     */
+    void setMaskFilter(int maskFilter)
+    {
+      m_maskFilter = maskFilter;
+    }
+
+
   private:
 
     /** zero suppression value which defines the S/N threshold of data mode acquisition during global run in ZS mode
@@ -83,6 +102,11 @@ namespace Belle2 {
     /** integer number of buffer cells to go back in the buffer ring to correctly sampling the signal pulse when the trigger is received.
      */
     int m_latency;
+
+    /** masking bitmap
+     */
+    int m_maskFilter;
+
 
     ClassDef(SVDGlobalConfigParameters, 1);
 

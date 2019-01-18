@@ -40,19 +40,23 @@ namespace Belle2 {
 
   public:
 
+    /** Module name */
     OverlapResidualsModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize override();
 
     /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
-    virtual void event();
-    void terminate();
+    virtual void event override();
 
-    /* user-defined parameters */
-    std::string m_rootFileName; /**< root file name */
+    /** Ends run*/
+    void terminate override();
 
-    TFile* m_rootFilePtr;
+    /** user-defined parameters */
+    std::string m_rootFileName;
+
+    /** root file name */
+    TFile* m_rootFilePtr = 0;
 
 
   private:
@@ -63,41 +67,41 @@ namespace Belle2 {
     StoreArray<SVDCluster> m_svdcluster;
 
 
-    TH1F* h_U_Res;
-    TH1F* h_V_Res;
+    TH1F* h_U_Res = 0;
+    TH1F* h_V_Res = 0;
 
-    TH1F* h_SVDstrips_Mult;
+    TH1F* h_SVDstrips_Mult = 0;
 
-    TH1F* h_U_Cl1Cl2_Res[10];
-    TH1F* h_V_Cl1Cl2_Res[10];
+    TH1F* h_U_Cl1Cl2_Res[10] = 0;
+    TH1F* h_V_Cl1Cl2_Res[10] = 0;
 
-    TH2F* h_Lyr6[17][6];
-    TH2F* h_Lyr5[13][5];
-    TH2F* h_Lyr4[11][4];
-    TH2F* h_Lyr3[8][3]; //[Ladder][sensor number]
-    TH2F* h_Lyr2[13][3]; //[Ladder][sensor number]
-    TH2F* h_Lyr1[9][3]; //[Ladder][sensor number]
+    TH2F* h_Lyr6[17][6] = 0;
+    TH2F* h_Lyr5[13][5] = 0;
+    TH2F* h_Lyr4[11][4] = 0;
+    TH2F* h_Lyr3[8][3] = 0; //[Ladder][sensor number]
+    TH2F* h_Lyr2[13][3] = 0; //[Ladder][sensor number]
+    TH2F* h_Lyr1[9][3] = 0; //[Ladder][sensor number]
 
-    TCanvas* c_Lyr6[6];
-    TCanvas* c_Lyr5[5];
-    TCanvas* c_Lyr4[4];
-    TCanvas* c_Lyr3[3];
-    TCanvas* c_Lyr2[3];
-    TCanvas* c_Lyr1[3];
+    TCanvas* c_Lyr6[6] = 0;
+    TCanvas* c_Lyr5[5] = 0;
+    TCanvas* c_Lyr4[4] = 0;
+    TCanvas* c_Lyr3[3] = 0;
+    TCanvas* c_Lyr2[3] = 0;
+    TCanvas* c_Lyr1[3] = 0;
 
-    TH2F* h_Fit_Lyr6[17][6];
-    TH2F* h_Fit_Lyr5[13][5];
-    TH2F* h_Fit_Lyr4[11][4];
-    TH2F* h_Fit_Lyr3[8][3]; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr2[13][3]; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr1[9][3]; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr6[17][6] = 0;
+    TH2F* h_Fit_Lyr5[13][5] = 0;
+    TH2F* h_Fit_Lyr4[11][4] = 0;
+    TH2F* h_Fit_Lyr3[8][3] = 0; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr2[13][3] = 0; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr1[9][3] = 0; //[Ladder][sensor number]
 
-    TCanvas* c_Fit_Lyr6[6];
-    TCanvas* c_Fit_Lyr5[5];
-    TCanvas* c_Fit_Lyr4[4];
-    TCanvas* c_Fit_Lyr3[3];
-    TCanvas* c_Fit_Lyr2[3];
-    TCanvas* c_Fit_Lyr1[3];
+    TCanvas* c_Fit_Lyr6[6] = 0;
+    TCanvas* c_Fit_Lyr5[5] = 0;
+    TCanvas* c_Fit_Lyr4[4] = 0;
+    TCanvas* c_Fit_Lyr3[3] = 0;
+    TCanvas* c_Fit_Lyr2[3] = 0;
+    TCanvas* c_Fit_Lyr1[3] = 0;
 
 
   };

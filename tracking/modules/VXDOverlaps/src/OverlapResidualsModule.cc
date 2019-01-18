@@ -368,10 +368,7 @@ void OverlapResidualsModule::event()
 
     const vector<SVDCluster* > svdClusters = recoTrack[j]->getSVDHitList();
 
-    const vector< RecoHitInformation* > RHinfos = recoTrack[j]->getRecoHitInformations();
-
-    std::cout << "FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size() <<
-              std::endl;
+    B2INFO("FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
 
     //LOOP ON PXD HITS OF j-TRACK
     for (int i = 0; i < pxdClusters.size(); i++) {
@@ -420,7 +417,7 @@ void OverlapResidualsModule::event()
 
         if (PXDLayer_1 == PXDLayer_2) {
 
-          std::cout << " ========== 2 consecutive PXD hits in a same layer ========= " << std::endl;
+          B2INFO(" ========== 2 consecutive PXD hits in a same layer ========= ");
 
           const TVectorD& PXDpredIntersect_1 = recoTrack[j]->getMeasuredStateOnPlaneFromRecoHit(infoPXD_1).getState();
 
@@ -439,7 +436,7 @@ void OverlapResidualsModule::event()
 
           float Over_V_PXD = Res_V_2 - Res_V_1;
 
-          std::cout << "PXD residuals " << Over_U_PXD << "   " << Over_V_PXD << std::endl;
+          B2INFO("PXD residuals " << Over_U_PXD << "   " << Over_V_PXD);
 
           h_U_Res->Fill(Over_U_PXD);
 
@@ -565,7 +562,7 @@ void OverlapResidualsModule::event()
 
         if (SVDLayer_1 == SVDLayer_2) {
 
-          std::cout << " ========== 2 consecutive SVD hits in a same layer ========= " << std::endl;
+          B2INFO(" ========== 2 consecutive SVD hits in a same layer ========= ");
 
           const TVectorD& SVDpredIntersect_1 = recoTrack[j]->getMeasuredStateOnPlaneFromRecoHit(infoSVD_1).getState();
 
@@ -587,7 +584,7 @@ void OverlapResidualsModule::event()
 
             float Over_U_SVD = Res_U_2 - Res_U_1;
 
-            std::cout << "SVD U residual =========> " << Over_U_SVD <<  std::endl;
+            B2INFO("SVD U residual =========> " << Over_U_SVD);
 
             h_U_Res->Fill(Over_U_SVD);
 
@@ -761,9 +758,9 @@ void OverlapResidualsModule::event()
 
             float Over_V_SVD = Res_V_2 - Res_V_1;
 
-            std::cout << "SVD V residual =========> " << Over_V_SVD <<  std::endl;
+            B2INFO("SVD V residual =========> " << Over_V_SVD);
 
-            std::cout << "SVD V residual =========> " << Over_V_SVD <<  std::endl;
+            B2INFO("SVD V residual =========> " << Over_V_SVD);
 
             h_V_Res->Fill(Over_V_SVD);
 
@@ -936,7 +933,7 @@ void OverlapResidualsModule::event()
 void OverlapResidualsModule::terminate()
 {
 
-  std::cout << "________________________ FILL OUTPUT FILE ____________________" << std::endl;
+  B2INFO("________________________ FILL OUTPUT FILE ____________________");
 
 
   h_SVDstrips_Mult->Scale(1. / h_SVDstrips_Mult->Integral());

@@ -48,13 +48,13 @@ svd_Clusters = "SVDClustersFromTracks"
 
 gROOT.SetBatch(True)
 
-applyCDCLatencyCorrection = True
+mode = True
 
 
 class SVDCoGTimeCalibrationImporterModule(basf2.Module):
 
-    def notApplyCorrectForCDCLatency(self):
-        applyCDCLatencyCorrection = False
+    def notApplyCorrectForCDCLatency(self, mode):
+        self.notApplyCDCLatencyCorrection = mode
 
     def fillLists(self, svdRecoDigits_rel_Clusters, svdClusters_rel_RecoTracks_cl):
 
@@ -81,6 +81,8 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             tZero_err = 5.1
             tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            et0 = self.EventT0Hist
+            et0.Fill(tZeroSync)
 # print(str(tZero_err))
 
             resHist = self.resList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
@@ -99,6 +101,12 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             n = n + 1
             self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = n
 
+            cog = self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
+            cog = cog + timeCluster
+            self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = cog
+
+            self.NTOT = self.NTOT + 1
+
     def set_localdb(self, localDB):
         self.localdb = localDB
 
@@ -111,6 +119,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         self.cdcList = []
         self.snrList = []
         self.nList = []
+        self.sumCOGList = []
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -131,6 +140,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             self.cdcList.append(layerList3)
             self.snrList.append(layerList4)
             self.nList.append(layerList8)
+            self.sumCOGList.append(layerList7)
             # layerNumber = layer.getLayerNumber()
             for ladder in geoCache.getLadders(layer):
                 ladderList0 = []
@@ -214,7 +224,9 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                             self.snrList[li][ldi][si][s].append(
                                 TH1F("snr" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 100, 0, 100))
                             self.nList[li][ldi][si][s].append(0)
+                            self.sumCOGList[li][ldi][si][s].append(0)
 
+        self.EventT0Hist = TH1F("EventT0", " ", 200, -100, 100)
         self.AlphaUTB = TH2F("alphaVsTB_U", " ", 400, 0.5, 2, 4, 0, 4)
         self.AlphaUTB.GetXaxis().SetTitle("alpha")
         self.AlphaUTB.GetYaxis().SetTitle("trigger bin")
@@ -255,6 +267,8 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
 
         self.gaus = TF1("gaus", 'gaus(0)', -150, 100)
 
+        self.NTOT = 0
+
     def event(self):
         timeClusterU = 0
         timeClusterV = 0
@@ -281,14 +295,34 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         timeCal = SVDCoGCalibrationFunction()
         # Bias and Scale
         tbBias = [-50, -50, -50, -50]
-        tbBiasPlusCDCLat = [-45, -45, -45, -45]
-        if(notApplyCorrectForCDCLatency):
-            tbBiasPlusCDCLat = [0, 0, 0, 0]
         tbScale = [1, 1, 1, 1]
         tbBias_err = [1, 1, 1, 1]
         tbScale_err = [1, 1, 1, 1]
         tbCovScaleBias = [1, 1, 1, 1]
 
+        tbBiasPlusCDCLat = [-45, -45, -45, -45]
+        TCOGMEAN = 0
+        # NTOT = 0
+        T0MEAN = 0
+
+        if(self.notApplyCDCLatencyCorrection):
+            tbBiasPlusCDCLat = tbBias
+        '''
+        geoCache = Belle2.VXD.GeoCache.getInstance()
+        for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
+            layerNumber = layer.getLayerNumber()
+            li = layerNumber - 3
+            for ladder in geoCache.getLadders(layer):
+                ladderNumber = ladder.getLadderNumber()
+                ldi = ladderNumber - 1
+                for sensor in geoCache.getSensors(ladder):
+                    sensorNumber = sensor.getSensorNumber()
+                    si = sensorNumber - 1
+                    for side in range(2):
+                        for tb in range(4):
+                            n = self.nList[li][ldi][si][side][tb]
+                            NTOT += n
+        '''
         geoCache = Belle2.VXD.GeoCache.getInstance()
         gDirectory.mkdir("plots")
         gDirectory.cd("plots")
@@ -368,6 +402,32 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                             tbBias_err[tb] = q_err
                             tbScale_err[tb] = m_err
 
+                            TCOGMEAN += n * (m * self.sumCOGList[li][ldi][si][side][tb] / n + q) / self.NTOT
+
+                        T0MEAN = self.EventT0Hist.GetMean()
+
+                        print(
+                            "Mean of the CoG corrected distribution: " +
+                            str(TCOGMEAN) +
+                            " Mean of the T0 distribution: " +
+                            str(T0MEAN))
+                        print("Not Correct for CDC latency: " + str(self.notApplyCDCLatencyCorrection))
+                        tbBiasPlusCDCLat[0] = tbBias[0] - T0MEAN
+                        tbBiasPlusCDCLat[1] = tbBias[1] - T0MEAN
+                        tbBiasPlusCDCLat[2] = tbBias[2] - T0MEAN
+                        tbBiasPlusCDCLat[3] = tbBias[3] - T0MEAN
+                        print(tbBiasPlusCDCLat)
+                        print(tbBias)
+                        if(self.notApplyCDCLatencyCorrection):
+                            print("Not Correct for CDC latency: " + str(self.notApplyCDCLatencyCorrection))
+                            tbBiasPlusCDCLat = tbBias
+                            print(tbBiasPlusCDCLat)
+                            print(tbBias)
+
+                        print(tbBiasPlusCDCLat)
+                        print(tbBias)
+                        timeCal.set_bias(tbBiasPlusCDCLat[0], tbBiasPlusCDCLat[1], tbBiasPlusCDCLat[2], tbBiasPlusCDCLat[3])
+
                         timeCal.set_bias(tbBias[0], tbBias[1], tbBias[2], tbBias[3])
                         timeCal.set_scale(tbScale[0], tbScale[1], tbScale[2], tbScale[3])
                         print("setting CoG calibration for " + str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
@@ -387,6 +447,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         self.MeanHistVTB.Write()
         self.RMSHistUTB.Write()
         self.RMSHistVTB.Write()
+        self.EventT0Hist.Write()
 
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 

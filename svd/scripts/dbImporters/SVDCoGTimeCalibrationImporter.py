@@ -116,6 +116,7 @@ for moda in main.modules():
 
 calib = SVDCoGTimeCalibrationImporterModule()
 calib.set_localdb(localdb)
+calib.notApplyCorrectForCDCLatency(False)
 main.add_module(calib)
 
 # Show progress of processing

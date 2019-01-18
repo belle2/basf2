@@ -15,8 +15,8 @@ namespace Belle2 {
      *
      * @param[in] f[16][192]    Array with tabulated signal waveform.
      * @param[in] f1[16][192]   Array with tabulated derivative of signal waveform
-     * @param[in] fg41[16][192] Alternative for FG31 for signals with small amplitude
-     * @param[in] fg43[16][192] Alternative for FG33 for signals with small amplitude
+     * @param[in] fg41[16][24]  Alternative for FG31 for signals with small amplitude
+     * @param[in] fg43[16][24]  Alternative for FG33 for signals with small amplitude
      * @param[in] fg31[16][192] Array used to estimate signal amplitude.
      * @param[in] fg32[16][192] Array used to estimate Amplitude * delta_t.
      * @param[in] fg33[16][192] Array used to estimate pedestal height in signal.

@@ -279,7 +279,7 @@ namespace Belle2 {
        *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2 are supported.
        *  @param input Should the parameter name state that this is an input.
        */
-      std::string getStoreVectorParameterDescription(const std::string classMnenomic, int order, bool input) const
+      std::string getStoreVectorParameterDescription(const std::string& classMnenomic, int order, bool input) const
       {
         std::string orderPrefix;
         if (order == 1) {

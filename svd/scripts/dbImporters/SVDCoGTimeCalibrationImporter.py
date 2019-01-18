@@ -19,13 +19,8 @@
 
 from basf2 import *
 from svd import *
-import ROOT
-from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
-from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory
 import os
-import numpy
 import math
-import random
 from array import array
 import basf2
 import sys

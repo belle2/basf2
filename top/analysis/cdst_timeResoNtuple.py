@@ -26,6 +26,8 @@ if len(sys.argv) > 1:
 
 gROOT.ProcessLine('struct TreeStruct {\
    int run;       /* run number */ \
+   float offset;  /* current bunch offset */ \
+   int usedTrk; /* number of tracks used for bunch reconstruction */ \
    int slot;      /* slot ID */ \
    float p;       /* extHit momentum */ \
    float cth;     /* extHit cos(theta) */ \
@@ -114,6 +116,8 @@ class Ntuple(Module):
 
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
         self.data.run = evtMetaData.getRun()
+        self.data.offset = recBunch.getCurrentOffset()
+        self.data.usedTrk = recBunch.getUsedTracks()
 
         for track in Belle2.PyStoreArray('Tracks'):
             pdfs = track.getRelated('TOPPDFCollections')
@@ -126,7 +130,11 @@ class Ntuple(Module):
             self.data.cth = momentum.CosTheta()
             self.data.z = position.Z()
             self.data.x = position.X()
-            pdf = pdfs.getHypothesisPDF(13)
+            try:
+                pdf = pdfs.getHypothesisPDF(13)
+            except:
+                B2ERROR("No PDF available for PDG = 13")
+                continue
             self.pdfHistogram(pdf)
             for digit in Belle2.PyStoreArray('TOPDigits'):
                 if digit.getModuleID() == self.data.slot:
@@ -186,8 +194,8 @@ main.add_module(geometry)
 # Channel masking
 main.add_module('TOPChannelMasker')
 
-# Make a PDF available at datastore
-main.add_module('TOPPDFDebugger')
+# Make a muon PDF available at datastore
+main.add_module('TOPPDFDebugger', pdgCodes=[13])
 
 # Write ntuple
 main.add_module(Ntuple())

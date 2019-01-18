@@ -77,6 +77,10 @@ namespace Belle2 {
     */
     addParam("pdfOption", m_pdfOption,
              "PDF option, one of 'rough', 'fine', 'optimal'", std::string("fine"));
+    addParam("pdgCodes", m_pdgCodes,
+             "PDG codes of charged stable particles for which to construct PDF. "
+             "Empty list means all charged stable particles.",
+             m_pdgCodes);
   }
 
 
@@ -109,10 +113,18 @@ namespace Belle2 {
       m_debugLevel = getLogConfig().getDebugLevel();
     }
 
-    // Initialize masses
-    for (const auto& part : Const::chargedStableSet) {
-      m_masses[part.getIndex()] = part.getMass();
-      m_pdgCodes[part.getIndex()] = abs(part.getPDGCode());
+    // particle hypotheses
+    if (m_pdgCodes.empty()) {
+      for (const auto& part : Const::chargedStableSet) {
+        m_pdgCodes.push_back(abs(part.getPDGCode()));
+        m_masses.push_back(part.getMass());
+      }
+    } else {
+      for (auto& pdg : m_pdgCodes) pdg = abs(pdg);
+      for (auto pdg : m_pdgCodes) {
+        auto part = Const::ChargedStable(pdg); //throws runtime error for invalid pdg
+        m_masses.push_back(part.getMass());
+      }
     }
 
     // Configure TOP detector
@@ -141,8 +153,8 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // create reconstruction object
-    TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
-    reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
+    TOPreco reco(m_masses.size(), m_masses.data(), m_minBkgPerBar, m_scaleN0);
+    reco.setHypID(m_pdgCodes.size(), m_pdgCodes.data());
     reco.setPDFoption(m_PDFOption);
 
     // set time limit for photons lower than that given by TDC range (optional)
@@ -172,9 +184,9 @@ namespace Belle2 {
         module.momentumToLocal(trk.getMomentum()),
         trk.getModuleID()
       );
-      for (const auto& chargedStable : Const::chargedStableSet) {
-        double mass = chargedStable.getMass();
-        int iPDGCode = abs(chargedStable.getPDGCode());
+      for (unsigned i = 0; i < m_pdgCodes.size(); i++) {
+        double mass = m_masses[i];
+        int iPDGCode = m_pdgCodes[i];
         reco.setMass(mass);
         reco.reconstruct(trk); // will run reconstruction only for this mass hypothesis
         if (reco.getFlag() != 1) break; // track is not in the acceptance of TOP

@@ -85,6 +85,7 @@ namespace Belle2 {
     int m_writeNPdfs = 0;      /**< write out pdfs for the first N events */
     int m_writeNPulls = 0;     /**< write out pulls for the furst N events */
     std::string m_pdfOption;   /**< PDF option name */
+    std::vector<int> m_pdgCodes;   /**< particle codes */
 
     // others
     int m_debugLevel = 0;       /**< debug level from logger */
@@ -93,8 +94,7 @@ namespace Belle2 {
 
     // Masses of particle hypotheses
 
-    double m_masses[Const::ChargedStable::c_SetSize] = {0};  /**< particle masses */
-    int m_pdgCodes[Const::ChargedStable::c_SetSize] = {0};   /**< particle codes */
+    std::vector<double> m_masses;  /**< particle masses */
 
     // collections
 

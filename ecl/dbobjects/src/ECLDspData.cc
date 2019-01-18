@@ -25,7 +25,7 @@ void ECLDspData::packCoefVector(const std::vector<short int>& src, std::vector<s
     }
   }
 }
-void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst)
+void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst) const
 {
   const int N_CHANNELS = 16;
   int size = src.size();

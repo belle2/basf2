@@ -61,11 +61,21 @@ namespace Belle2 {
     void importSVDChannelMapping(const std::string& fileName = std::string("svd/data/svd_mapping.xml"));
 
     /**
+     * This method import to the database the global configuration xml file
+     * used during data taking
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+
+    void importSVDGlobalXMLFile(const std::string& fileName = std::string("svd/data/global.xml"));
+
+    /**
      * This method import to the database the strip
      * noise from the noise local runs.
      * @param xmlFileName is the file name of the xml file
      * @param errorTollerant if true bypasses sanity checks
      */
+
     void importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
 
     /**

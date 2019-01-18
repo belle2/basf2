@@ -75,6 +75,20 @@ void SVDLocalCalibrationsImporter::importSVDChannelMapping(const std::string& fi
     B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
 }
 
+void SVDLocalCalibrationsImporter::importSVDGlobalXMLFile(const std::string& fileName)
+{
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
+  const std::string filename = FileSystem::findFile(fileName); //phase 3 xmlMapping
+  B2INFO("Importing the svd online -> offline map " << fileName << "\n");
+  //  const std::string filename = FileSystem::findFile("testbeam/vxd/data/2017_svd_mapping.xml");
+  const std::string payloadname = "SVDGlobalXMLFile.xml";
+  if (Database::Instance().addPayload(payloadname, filename, iov))
+    B2INFO("Success!");
+  else
+    B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
+}
+
 
 void SVDLocalCalibrationsImporter::importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {

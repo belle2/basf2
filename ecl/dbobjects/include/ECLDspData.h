@@ -90,7 +90,7 @@ namespace Belle2 {
     std::vector<short int> m_extraData;
 
     /** Version of packer used in [un]packCoefVector by default */
-    static const short int c_packerVersion = 1;
+    static const short int c_packerVersion = 2;
 
   public:
     /**

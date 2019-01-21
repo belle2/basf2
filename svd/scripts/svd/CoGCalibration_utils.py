@@ -48,13 +48,14 @@ svd_Clusters = "SVDClustersFromTracks"
 
 gROOT.SetBatch(True)
 
-mode = True
+# mode = True
 
 
 class SVDCoGTimeCalibrationImporterModule(basf2.Module):
 
     def notApplyCorrectForCDCLatency(self, mode):
         self.notApplyCDCLatencyCorrection = mode
+        print("Not Correct for CDC latency: " + str(mode) + " " + str(self.notApplyCDCLatencyCorrection))
 
     def fillLists(self, svdRecoDigits_rel_Clusters, svdClusters_rel_RecoTracks_cl):
 
@@ -83,7 +84,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             tZeroSync = tZero - 7.8625 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
-# print(str(tZero_err))
+            # print(str(tZero_err))
 
             resHist = self.resList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
             resHist.Fill(timeCluster - tZeroSync)
@@ -300,13 +301,9 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         tbScale_err = [1, 1, 1, 1]
         tbCovScaleBias = [1, 1, 1, 1]
 
-        tbBiasPlusCDCLat = [-45, -45, -45, -45]
         TCOGMEAN = 0
-        # NTOT = 0
         T0MEAN = 0
 
-        if(self.notApplyCDCLatencyCorrection):
-            tbBiasPlusCDCLat = tbBias
         '''
         geoCache = Belle2.VXD.GeoCache.getInstance()
         for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
@@ -401,32 +398,21 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                             tbScale[tb] = m
                             tbBias_err[tb] = q_err
                             tbScale_err[tb] = m_err
-
                             TCOGMEAN += n * (m * self.sumCOGList[li][ldi][si][side][tb] / n + q) / self.NTOT
 
                         T0MEAN = self.EventT0Hist.GetMean()
-
+                        '''
                         print(
                             "Mean of the CoG corrected distribution: " +
                             str(TCOGMEAN) +
                             " Mean of the T0 distribution: " +
                             str(T0MEAN))
-                        print("Not Correct for CDC latency: " + str(self.notApplyCDCLatencyCorrection))
-                        tbBiasPlusCDCLat[0] = tbBias[0] - T0MEAN
-                        tbBiasPlusCDCLat[1] = tbBias[1] - T0MEAN
-                        tbBiasPlusCDCLat[2] = tbBias[2] - T0MEAN
-                        tbBiasPlusCDCLat[3] = tbBias[3] - T0MEAN
-                        print(tbBiasPlusCDCLat)
-                        print(tbBias)
-                        if(self.notApplyCDCLatencyCorrection):
-                            print("Not Correct for CDC latency: " + str(self.notApplyCDCLatencyCorrection))
-                            tbBiasPlusCDCLat = tbBias
-                            print(tbBiasPlusCDCLat)
-                            print(tbBias)
-
-                        print(tbBiasPlusCDCLat)
-                        print(tbBias)
-                        timeCal.set_bias(tbBiasPlusCDCLat[0], tbBiasPlusCDCLat[1], tbBiasPlusCDCLat[2], tbBiasPlusCDCLat[3])
+                        '''
+                        if not self.notApplyCDCLatencyCorrection:
+                            tbBias[0] = tbBias[0] - T0MEAN
+                            tbBias[1] = tbBias[1] - T0MEAN
+                            tbBias[2] = tbBias[2] - T0MEAN
+                            tbBias[3] = tbBias[3] - T0MEAN
 
                         timeCal.set_bias(tbBias[0], tbBias[1], tbBias[2], tbBias[3])
                         timeCal.set_scale(tbScale[0], tbScale[1], tbScale[2], tbScale[3])

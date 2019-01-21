@@ -41,7 +41,7 @@ namespace Belle2 {
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate() override;
+    virtual EResult calibrate();
 
   private:
 

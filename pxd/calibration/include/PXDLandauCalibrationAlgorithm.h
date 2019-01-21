@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Benjamin Schwenker                                      *
+ * Contributors:  Benjamin Schwenker, Jonas Roetter                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,12 +16,12 @@
 
 namespace Belle2 {
   /**
-   * Class implementing the PXD median cluster charge calibration algorithm
+   * Class implementing the PXD Landau calibration algorithm
    */
   class  PXDLandauCalibrationAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /// Constructor set the prefix to PXDMedianChargeCalibrationAlgorithm
+    /// Constructor set the prefix to PXDLandauCalibrationAlgorithm
     PXDLandauCalibrationAlgorithm();
 
     /// Minimum number of collected clusters for estimating median charge
@@ -43,11 +43,11 @@ namespace Belle2 {
 
   private:
 
-    /// Estimate median charge form collected clusters on part of PXD
-    std::pair<float, float> EstimateLandau(VxdID sensorID, unsigned short uBin, unsigned short vBin);
+    /// Estimate Landau parameters from collected clusters on part of PXD
+    double EstimateLandau(VxdID sensorID, unsigned short uBin, unsigned short vBin);
 
-    /// Calculate a median from unsorted signal vector. The input vector gets sorted.
-    std::pair<float, float> FitLandau(std::vector<double>& signals);
+    /// fit a Landau to an unsorted signal vector.
+    double FitLandau(std::vector<double>& signals, const char* histname);
   };
 } // namespace Belle2
 

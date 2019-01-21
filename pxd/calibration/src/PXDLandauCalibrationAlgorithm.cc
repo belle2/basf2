@@ -3,19 +3,19 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Benjamin Schwenker                                       *
+ * Contributors: Benjamin Schwenker, Jonas Roetter                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <pxd/calibration/PXDLandauCalibrationAlgorithm.h>
-#include <pxd/dbobjects/PXDClusterLandauMapPar.h>
+#include <pxd/dbobjects/PXDClusterChargeMapPar.h>
 
 #include <string>
 #include <algorithm>
 #include <map>
 #include <set>
-//#include <pair>
+
 
 #include <sstream>
 #include <iostream>
@@ -26,7 +26,8 @@
 
 //ROOT
 #include <TRandom.h>
-#include <TH1I.h>
+#include <TH1.h>
+#include <TF1.h>
 
 using namespace std;
 using boost::format;
@@ -38,6 +39,9 @@ namespace {
 
   /** Signal in ADU of collected clusters */
   int m_signal;
+  int m_run;
+
+  PXDClusterChargeMapPar m_landauMap;
 
   /** Helper function to extract number of bins along u side and v side from counter histogram labels. */
   void getNumberOfBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
@@ -140,8 +144,9 @@ CalibrationAlgorithm::EResult PXDLandauCalibrationAlgorithm::calibrate()
 
   B2INFO("Start calibration using a " << nBinsU << "x" << nBinsV << " grid per sensor.");
 
-  // This is the PXD charge calibration payload for conditions DB
-  PXDClusterLandauMapPar* landauMapPar = new PXDClusterLandauMapPar(nBinsU, nBinsV);
+  // This is the PXD Landau calibration payload for conditions DB
+  PXDClusterChargeMapPar* landauMapPar = new PXDClusterChargeMapPar(nBinsU, nBinsV);
+
 
   // Loop over all bins of input histo
   for (auto histoBin = 1; histoBin <= cluster_counter->GetXaxis()->GetNbins(); histoBin++) {
@@ -165,36 +170,40 @@ CalibrationAlgorithm::EResult PXDLandauCalibrationAlgorithm::calibrate()
 
     // Only perform fitting, when enough data is available
     if (numberOfDataHits >= minClusters) {
-/// HEERERERERERERERER
-      // Compute the median cluster charge for the part of PXD
+
+      // fit landau function for the part of PXD
       auto landau_par = EstimateLandau(sensorID, uBin, vBin);
 
-      // Store the charge
+      // Store the fit results
       landauMapPar->setContent(sensorID.getID(), uBin, vBin, landau_par);
+
     } else {
       B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
                 "). Use default value.");
+      landauMapPar->setContent(sensorID.getID(), uBin, vBin, 1.0);
     }
   }
 
-  // Save the charge map to database. Note that this will set the database object name to the same as the collector but you
+  // Save the landau map to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
-  saveCalibration(landauMapPar, "PXDLandauMapPar");
+  saveCalibration(landauMapPar, "PXDClusterChargeMapPar");
 
   B2INFO("PXD Cluster Charge Calibration Successful");
   return c_OK;
 }
 
 
-std::pair<float, float> PXDLandauCalibrationAlgorithm::EstimateLandau(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+double PXDLandauCalibrationAlgorithm::EstimateLandau(VxdID sensorID, unsigned short uBin, unsigned short vBin)
 {
 
   // Construct a tree name for requested part of PXD
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
-  const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
-
+  std::string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
+  std::string histname_s = str(format("hist_%1%_%2%_%3%_%4%_%5%_%6%") % m_run % layerNumber % ladderNumber % sensorNumber % uBin %
+                               vBin);
+  const char* histname = histname_s.c_str();
   // Vector with cluster signals from collected data
   vector<double> signals;
 
@@ -211,19 +220,48 @@ std::pair<float, float> PXDLandauCalibrationAlgorithm::EstimateLandau(VxdID sens
     signals.push_back(m_signal + noise);
   }
 
-  return FitLandau(signals);
+
+
+  return FitLandau(signals, histname);
 }
 
 
-std::pair<float, float> PXDLandauCalibrationAlgorithm::FitLandau(vector<double>& signals)
+double PXDLandauCalibrationAlgorithm::FitLandau(vector<double>& signals, const char* histname)
 {
   auto size = signals.size();
+  // get max and min values of vector
+  int max = *max_element(signals.begin(), signals.end());
+  int min = *min_element(signals.begin(), signals.end());
+
+
+  // create histogram to hold signals
+  TH1D* hist_signals = new TH1D(histname, "", max - min, min, max);
+  // create fit function
+  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
+  landau->SetParNames("MPV", "sigma", "scale");
+  landau->SetParameters(100, 1, 1000);
+  // fill histrogram
+  for (auto it = signals.begin(); it != signals.end(); ++it) {
+    hist_signals->Fill(*it);
+  }
 
   if (size == 0) {
-    return std::make_pair(0, 0); // Undefined, really.
+    return 1.0; // Undefined, really.
   } else {
-    // implement Fit here
-    return std::make_pair(0, 0);
+// need to restrict fit to cut low charge peak
+    Int_t status = hist_signals->Fit("landau", "Lq", "", 30, 350);
+    double MPV = landau->GetParameter("MPV");
+
+    delete hist_signals;
+    delete landau;
+
+    // check fit status
+    if (status == 0) return MPV;
+
+    else {
+      B2WARNING(histname << ": Fit failed! using default value.");
+      return 1.0;
+    }
   }
 }
 

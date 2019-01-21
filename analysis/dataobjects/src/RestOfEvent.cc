@@ -64,7 +64,7 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
       && roeParticle->getECLCluster()->getArrayIndex() != toAddParticle->getECLCluster()->getArrayIndex()) {
 
     // if either is a track then they must be different
-    if (roeParticle->getECLCluster()->isTrack() or roeParticle->getECLCluster()->isTrack())
+    if (roeParticle->getECLCluster()->isTrack() or toAddParticle->getECLCluster()->isTrack())
       return false;
 
     // if they are both the same hypothesis then they are different
@@ -408,9 +408,6 @@ std::vector<double> RestOfEvent::getChargedStableFractions(const std::string& ma
     }
   }
   return maskFractions;
-  //TLorentzVector roe4Vector = RestOfEvent::get4VectorTracks(maskName) + RestOfEvent::get4VectorNeutralECLClusters(maskName);
-  // FIXME what is happening about KLM clusters ...?  nothing
-  //return roe4Vector;
 }
 
 //

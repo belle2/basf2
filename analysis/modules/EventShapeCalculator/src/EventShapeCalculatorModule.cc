@@ -264,10 +264,10 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
           }
           // KLongs added from ECLClusters will clash with photons from the
           // same connected region... so they are "copies" in this sense
-          if (testPart.getECLCluster() and part.getECLCluster()
-              and testPart.getECLCluster()->isNeutral() and part.getECLCluster()->isNeutral()
-              and (testPart.getECLCluster()->getHypothesisId() != part.getECLCluster()->getHypothesisId())) {
-            if (testPart.getECLCluster()->getConnectedRegionId() == part.getECLCluster()->getConnectedRegionId()) {
+          if (testPart.getECLCluster() and part->getECLCluster()
+              and testPart.getECLCluster()->isNeutral() and part->getECLCluster()->isNeutral()
+              and (testPart.getECLCluster()->getHypothesisId() != part->getECLCluster()->getHypothesisId())) {
+            if (testPart.getECLCluster()->getConnectedRegionId() == part->getECLCluster()->getConnectedRegionId()) {
               B2WARNING("Overlapping cluster found. The new one won't be used for the calculation of the event shape variables. Please, double check your input lists and try to make them mutually exclusive.");
               isDuplicate = true;
 

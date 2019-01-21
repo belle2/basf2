@@ -6,6 +6,11 @@ Modules
 
 * Removal of the unsupported ECLClusterInfoModule.
 
+Standard Particle Lists
++++++++++++++++++++++++
+
+* Updated charged standard PID cut values to reflect the correct efficiencies.
+  This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
 
 Variables
 +++++++++

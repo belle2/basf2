@@ -347,6 +347,13 @@ namespace {
 
     Particle* part = myParticles.appendNew(savedTrack, Const::ChargedStable(11));
 
+    const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
+    const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
+    const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+
+    EXPECT_TRUE(vIsFromTrack->function(part));
+    EXPECT_FALSE(vIsFromECL->function(part));
+    EXPECT_FALSE(vIsFromKLM->function(part));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -2864,12 +2871,30 @@ namespace {
 
   }
 
+  TEST_F(ECLVariableTest, IsFromECL)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+
+    const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
+    const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
+    const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+
+    for (int i = 0; i < eclclusters.getEntries(); ++i)
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        EXPECT_TRUE(vIsFromECL->function(p));
+        EXPECT_FALSE(vIsFromKLM->function(p));
+        EXPECT_FALSE(vIsFromTrack->function(p));
+      }
+  }
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
     // we need the particles, tracks, and ECLClusters StoreArrays
     StoreArray<Particle> particles;
-    StoreArray<Track> tracks; StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+    StoreArray<ECLCluster> eclclusters;
 
     // create a photon (clusters) and pion (tracks) lists
     StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
@@ -2901,6 +2926,7 @@ namespace {
         gammalist->addParticle(p);
       }
     }
+
 
     // make the pions from tracks
     for (int i = 0; i < tracks.getEntries(); ++i) {

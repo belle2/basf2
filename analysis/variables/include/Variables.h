@@ -233,16 +233,6 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part);
 
     /**
-     * return StoreArray index (0-based) of the MDST object from which the Particle was created
-     */
-    double particleMdstArrayIndex(const Particle* part);
-
-    /**
-     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
-     */
-    double particleMdstSource(const Particle* part);
-
-    /**
      * return prob(chi^2,ndf) of fit
      */
     double particlePvalue(const Particle* part);

@@ -577,7 +577,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster)
+        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -587,7 +587,17 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     .. code-block:: python
 
         v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
-        fillParticleLists([kaons, pions, v0lambdas])
+        fillParticleLists([kaons, pions, v0lambdas], path=mypath)
+
+    Tip:
+        For "K_L0" it is now possible to load from ECLClusters, to revert to
+        the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
+
+    .. code-block:: python
+
+        klongs = ('K_L0', 'isFromKLM > 0')
+        fillParticleLists([kaons, pions, klongs], path=mypath)
+
 
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
@@ -640,7 +650,7 @@ def fillParticleList(
     * neutral final state particles
         - "gamma"           (input ``mdst`` type = ECLCluster)
         - "K_S0", "Lambda0" (input ``mdst`` type = V0)
-        - "K_L0"            (input ``mdst`` type = KLMCluster)
+        - "K_L0"            (input ``mdst`` type = KLMCluster or ECLCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
@@ -649,8 +659,15 @@ def fillParticleList(
 
     .. code-block:: python
 
-        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
-        fillParticleLists([kaons, pions, v0lambdas])
+        fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
+
+    Tip:
+        For "K_L0" it is now possible to load from ECLClusters, to revert to
+        the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
+
+    .. code-block:: python
+
+        fillParticleList('K_L0', 'isFromKLM > 0', path=mypath)
 
     Parameters:
         decayString (str):           Type of Particle and determines the name of the ParticleList.

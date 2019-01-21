@@ -757,16 +757,6 @@ namespace Belle2 {
 
 // other ------------------------------------------------------------
 
-    double particleMdstArrayIndex(const Particle* part)
-    {
-      return part->getMdstArrayIndex();
-    }
-
-    double particleMdstSource(const Particle* part)
-    {
-      return part->getMdstSource();
-    }
-
     double particlePvalue(const Particle* part)
     {
       return part->getPValue();
@@ -1266,10 +1256,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
                       "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
                       "called connected - region(CR) track match");
-    REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
-                      "StoreArray index(0 - based) of the MDST object from which the Particle was created");
-    REGISTER_VARIABLE("mdstSource", particleMdstSource,
-                      "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"

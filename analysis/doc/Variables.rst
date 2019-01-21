@@ -55,6 +55,12 @@ More information in `this confluence page <https://confluence.desy.de/display/BI
 .. b2-variables::
    :group: PID   
 
+Basic particle information
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. b2-variables::
+   :group: Basic Particle Information
+
 PID for expert
 """"""""""""""
 These expert-level variables are metavariable that allow the used to access the

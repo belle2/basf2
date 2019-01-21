@@ -10,26 +10,27 @@
 #
 ########################################################
 
-from basf2 import *
-from modularAnalysis import *
+from modularAnalysis import fillParticleList, cutAndCopyList
 
 
 def stdKlongs(listtype='veryLoose', path=analysis_main):
     """
-    Function to prepare one of several standardized types of Klong lists:
+    Function to prepare one of several standardized types of Klong lists, with
+    the followung choices for ``listtype``:
 
-    - 'K_L0:all' with no cuts
-    - 'K_L0:veryLoose' (default) with some (very)loose quality selections
-    - 'K_L0:loose' with KlongID requirements
-    - 'K_L0:tight' like loose but with higher ID cut
+    - 'all' all neutral KLMClusters with no cuts
+    - 'veryLoose' (default) with some (very)loose quality selections
+    - 'loose' with KlongID requirements
+    - 'tight' like loose but with higher ID cut
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    Parameters:
+        listtype (str) name of standard list options as above
+        param path (basf2.Path) modules are added to this path
     """
 
     # all KLM clusters
     if listtype == 'all':
-        fillParticleList('K_L0:all', '', True, path)
+        fillParticleList('K_L0:all', 'isFromKLM > 0', True, path)
 
     # loose KLs, removes buggy KLM clusters
     elif listtype == 'veryLoose':
@@ -64,6 +65,11 @@ def stdKlongs(listtype='veryLoose', path=analysis_main):
 
 # Used in skimming code
 def loadStdSkimKL0(path=analysis_main):
+    """Load KLongs for skimming.
+
+    Parameters:
+        path (belle2.Path) modules are added to this path
+    """
     stdKlongs('loose', path)
     cutAndCopyList(
         'K_L0:skim',
@@ -71,6 +77,3 @@ def loadStdSkimKL0(path=analysis_main):
         '',
         True,
         path)
-
-# Only used for Belle via b2bii
-# ?

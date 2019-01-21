@@ -89,40 +89,40 @@ namespace Belle2 {
     double m_fraction;
 
     /// Counter for hits on wedged sensors.
-    int nWedge;
+    int nWedge = 0;
     /// Counter for hits on barrel sensors.
-    int nBarrel;
+    int nBarrel = 0;
 
     /// Pointer to root file used for storing histograms
-    TFile* m_rootFilePtr;
+    TFile* m_rootFilePtr = nullptr;
 
-    TList* m_histoList; /** Histogram */
-    TH3F* m_h3_MCParticle; /** Histogram */
-    TH3F* m_h3_idealMCTrackCand; /** Histogram */
-    TH3F* m_h3_MCTrackCand; /** Histogram */
+    TList* m_histoList = nullptr; /** Histogram */
+    TH3F* m_h3_MCParticle = nullptr; /** Histogram */
+    TH3F* m_h3_idealMCTrackCand = nullptr; /** Histogram */
+    TH3F* m_h3_MCTrackCand = nullptr; /** Histogram */
 
-    TH1F* m_h1_thetaMS_SVD; /** Histogram */
-    TH1F* m_h1_thetaMS_PXD; /** Histogram */
-    TH1F* m_h1_dR; /** Histogram */
-    TH1F* m_h1_dRoverR; /** Histogram */
-    TH1F* m_h1_distOVERdR; /** Histogram */
-    TH1F* m_h1_hitRadius_accepted; /** Histogram */
-    TH1F* m_h1_hitRadius_rejected; /** Histogram */
-    TH1F* m_h1_hitDistance_accepted; /** Histogram */
-    TH1F* m_h1_hitDistance_rejected; /** Histogram */
+    TH1F* m_h1_thetaMS_SVD = nullptr; /** Histogram */
+    TH1F* m_h1_thetaMS_PXD = nullptr; /** Histogram */
+    TH1F* m_h1_dR = nullptr; /** Histogram */
+    TH1F* m_h1_dRoverR = nullptr; /** Histogram */
+    TH1F* m_h1_distOVERdR = nullptr; /** Histogram */
+    TH1F* m_h1_hitRadius_accepted = nullptr; /** Histogram */
+    TH1F* m_h1_hitRadius_rejected = nullptr; /** Histogram */
+    TH1F* m_h1_hitDistance_accepted = nullptr; /** Histogram */
+    TH1F* m_h1_hitDistance_rejected = nullptr; /** Histogram */
 
-    TH1F* m_h1_MCTrackCandNhits; /** Histogram */
-    TH1F* m_h1_firstRejectedHit; /** Histogram */
-    TH1F* m_h1_firstRejectedOVERMCHit; /** Histogram */
+    TH1F* m_h1_MCTrackCandNhits = nullptr; /** Histogram */
+    TH1F* m_h1_firstRejectedHit = nullptr; /** Histogram */
+    TH1F* m_h1_firstRejectedOVERMCHit = nullptr; /** Histogram */
 
-    TH1F* m_h1_lapTime; /** Histogram */
-    TH1F* m_h1_timeDifference; /** Histogram */
-    TH1F* m_h1_diffOVERlap; /** Histogram */
+    TH1F* m_h1_lapTime = nullptr; /** Histogram */
+    TH1F* m_h1_timeDifference = nullptr; /** Histogram */
+    TH1F* m_h1_diffOVERlap = nullptr; /** Histogram */
 
-    TH1F* m_h1_nGoodTrueHits; /** Histogram */
-    TH1F* m_h1_nBadTrueHits; /** Histogram */
-    TH1F* m_h1_nGood1dInfo; /** Histogram */
-    TH1F* m_h1_nBad1dInfo; /** Histogram */
+    TH1F* m_h1_nGoodTrueHits = nullptr; /** Histogram */
+    TH1F* m_h1_nBadTrueHits = nullptr; /** Histogram */
+    TH1F* m_h1_nGood1dInfo = nullptr; /** Histogram */
+    TH1F* m_h1_nBad1dInfo = nullptr; /** Histogram */
 
   private:
 

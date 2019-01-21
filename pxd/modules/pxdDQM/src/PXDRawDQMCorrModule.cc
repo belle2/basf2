@@ -50,10 +50,6 @@ PXDRawDQMCorrModule::PXDRawDQMCorrModule() : HistoModule(), m_storeRawHits()
 }
 
 
-PXDRawDQMCorrModule::~PXDRawDQMCorrModule()
-{
-}
-
 //------------------------------------------------------------------
 // Function to define histograms
 //-----------------------------------------------------------------
@@ -137,19 +133,15 @@ void PXDRawDQMCorrModule::event()
 {
   for (auto& hit1 : m_storeRawHits) {
     int iPlane1 = hit1.getSensorID().getLayerNumber();
-    if ((iPlane1 < c_firstPXDPlane) || (iPlane1 > c_lastPXDPlane)) continue;
-    int index1 = planeToIndex(iPlane1);
-    if (index1 == 0) {
+    if (iPlane1 == 0) {
       for (auto& hit2 : m_storeRawHits) {
         int iPlane2 = hit2.getSensorID().getLayerNumber();
-        if ((iPlane2 < c_firstPXDPlane) || (iPlane2 > c_lastPXDPlane)) continue;
-        int index2 = planeToIndex(iPlane2);
-        if (index2 == 1) {
+        if (iPlane2 == 1) {
           m_CorrelationU->Fill(hit1.getColumn(), hit2.getColumn());
           m_CorrelationV->Fill(hit1.getRow(), hit2.getRow());
           m_DeltaU->Fill(hit2.getColumn() - hit1.getColumn());
           m_DeltaV->Fill(hit2.getRow() - hit1.getRow());
-        } else { // index2=0
+        } else { // iPlane2=0
           if (hit1.getColumn() != hit2.getColumn()) {
             m_In1CorrelationU->Fill(hit1.getColumn(), hit2.getColumn());
             m_In1DeltaU->Fill(hit2.getColumn() - hit1.getColumn());
@@ -163,9 +155,7 @@ void PXDRawDQMCorrModule::event()
     } else { // index 1=1
       for (auto& hit2 : m_storeRawHits) {
         int iPlane2 = hit2.getSensorID().getLayerNumber();
-        if ((iPlane2 < c_firstPXDPlane) || (iPlane2 > c_lastPXDPlane)) continue;
-        int index2 = planeToIndex(iPlane2);
-        if (index2 == 1) {
+        if (iPlane2 == 1) {
           if (hit1.getColumn() != hit2.getColumn()) {
             m_In2CorrelationU->Fill(hit1.getColumn(), hit2.getColumn());
             m_In2DeltaU->Fill(hit2.getColumn() - hit1.getColumn());
@@ -178,14 +168,4 @@ void PXDRawDQMCorrModule::event()
       }
     }
   }
-}
-
-
-void PXDRawDQMCorrModule::endRun()
-{
-}
-
-
-void PXDRawDQMCorrModule::terminate()
-{
 }

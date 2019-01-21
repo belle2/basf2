@@ -122,10 +122,8 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
-        fitter.param('Correction_StripCalPeakTime', True)
-        fitter.param('Correction_TBTimeWindow', False)
-        fitter.param('Correction_ShiftMeanToZero', False)
-        fitter.param('Correction_ShiftMeanToZeroTBDep', False)
+        fitter.param('StripPeakTimeCorrection', True)
+        fitter.param('CalibrationWithEventT0', True)
         fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 

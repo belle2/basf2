@@ -1,0 +1,17 @@
+Changes in the framework package
+--------------------------------
+
+Python Interface
+++++++++++++++++
+
+* Additional utility function `b2test_utils.check_error_free` used to
+  automate a code quality (or indeed any) tool check. It requires
+  execution without any output as part of the unit tests. For example the
+  analysis package now requires no doxygen or cppcheck warnings.
+
+Core Framework
+++++++++++++++
+
+* Addition of helpful `StoreArray::hasRelationTo` and
+  `StoreArray::hasRelationFrom` methods.
+  

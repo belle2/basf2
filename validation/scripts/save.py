@@ -4,8 +4,6 @@
 import math
 import os
 import glob
-import sys
-import time
 
 
 def create_image_matrix(imidzes, package, size):
@@ -264,5 +262,5 @@ def merge_multiple_plots(package, pdfs):
         return 1
 
     # If we can't merge them, return false
-    except:
+    except BaseException:
         return 0

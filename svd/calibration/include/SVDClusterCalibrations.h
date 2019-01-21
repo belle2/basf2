@@ -38,7 +38,7 @@ namespace Belle2 {
       , m_time_aDBObjPtr(time_name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDClusterCalibrations: from now one we are using " <<
+        B2INFO("SVDClusterCalibrations: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
 

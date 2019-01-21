@@ -19,9 +19,9 @@ class Plotuple:
     A Plotuple is either a Plot or an N-Tuple
 
     @var work_folder: the work folder containing the results and plots
-    @var list_of_root_objects: A list of Root-objects which belong
+    @var root_objects: A list of Root-objects which belong
         together (i.e. should be drawn into one histogram or one table)
-    @var list_of_revisions: The list of revisions
+    @var revisions: The list of revisions
     @var warnings: A list of warnings that occured while creating the
         plots/tables for this Plotuple object
     @var reference: The reference RootObject for this Plotuple
@@ -43,22 +43,22 @@ class Plotuple:
         n-tuples) are stored (without the file extension!)
     """
 
-    def __init__(self, list_of_root_objects, list_of_revisions, work_folder):
+    def __init__(self, root_objects, revisions, work_folder):
         """!
         The default constructor for a Plotuple-object.
-        @param list_of_root_objects: A list of Root-objects which belong
+        @param root_objects: A list of Root-objects which belong
             together (i.e. should be drawn into one histogram or one table)
-        @param list_of_revisions: The list of revisions (Duh!)
+        @param revisions: The list of revisions (Duh!)
         """
 
         # the work folder containing the results and plots
         self.work_folder = work_folder
 
         # The list of Root objects in this Plotuple-object
-        self.list_of_root_objects = list_of_root_objects
+        self.root_objects = root_objects
 
         # The list of revisions
-        self.list_of_revisions = list_of_revisions
+        self.revisions = revisions
 
         # A list of all problems that occured with this Plotuple,
         # e.g. missing reference object, missing meta-information...
@@ -67,7 +67,7 @@ class Plotuple:
         # Find the reference element. If we can't find one, set it to 'None'
         # The reference-object for this Plotuple object
         self.reference = None
-        for root_object in self.list_of_root_objects:
+        for root_object in self.root_objects:
             if root_object.is_reference:
                 self.reference = root_object
                 break
@@ -80,7 +80,7 @@ class Plotuple:
         # Get the elements, i.e. all RootObjects except for the
         # reference object. May be either histograms or n-tuples.
         self.elements = sorted(
-            [_ for _ in list_of_root_objects if _ is not self.reference],
+            [_ for _ in root_objects if _ is not self.reference],
             key=lambda _: _.date,
             reverse=True
         )
@@ -170,7 +170,7 @@ class Plotuple:
 
         self.plot_folder = os.path.join(
             "plots",
-            "_".join(sorted(self.list_of_revisions)),
+            "_".join(sorted(self.revisions)),
             self.package
         )
         if not os.path.isdir(self.plot_folder):
@@ -387,14 +387,14 @@ class Plotuple:
         # Find numbers x and y so that x*y = N (number of histograms to be
         # plotted), and x,y close to sqrt(N)
 
-        if len(self.list_of_root_objects) == 1:
+        if len(self.root_objects) == 1:
             x = y = 1
-        elif len(self.list_of_root_objects) == 2:
+        elif len(self.root_objects) == 2:
             x = 2
             y = 1
         else:
             x = 2
-            y = int(math.floor((len(self.list_of_root_objects) + 1) / 2))
+            y = int(math.floor((len(self.root_objects) + 1) / 2))
 
         # Actually split the canvas and go to the first pad ('sub-canvas')
         canvas.Divide(x, y)
@@ -541,14 +541,14 @@ class Plotuple:
             # Find numbers x and y so that x*y = N (number of histograms to be
             # plotted), and x,y close to sqrt(N)
 
-            if len(self.list_of_root_objects) == 1:
+            if len(self.root_objects) == 1:
                 x = y = 1
-            elif len(self.list_of_root_objects) == 2:
+            elif len(self.root_objects) == 2:
                 x = 2
                 y = 1
             else:
                 x = 2
-                y = int(math.floor((len(self.list_of_root_objects) + 1) / 2))
+                y = int(math.floor((len(self.root_objects) + 1) / 2))
 
             # Actually split the canvas and go to the first pad ('sub-canvas')
             canvas.Divide(x, y)
@@ -765,13 +765,31 @@ class Plotuple:
     def create_ntuple_table_json(self):
         """!
         If the Plotuple-object contains n-tuples, this will create the
-        corresponding HTML-table for it.
+        a JSON file, which is later converted to HTML by the javascript
+        function fill_ntuple_table.
         """
 
         json_nutple = {}
 
-        # { "ref": { "one": 1, "two" : 2},
-        #   "run1: { "one": 1, "two" : 2} }
+        # The dictionary will have the following form
+        # {
+        #     "reference (if exist)": [
+        #         ('variable 1', 'reference value for variable 1'),
+        #         ('variable 2', 'reference value for variable 2'),
+        #         ...
+        #     ],
+        #     "revision": [
+        #         ...
+        #     ]
+        # }
+
+        mop = metaoptions.MetaOptionParser(self.metaoptions)
+        precision = mop.int_value("float-precision", default=4)
+        format_str = "{{0:.{}f}}".format(precision)
+
+        def value2str(obj):
+            # assuming that I have a float
+            return format_str.format(obj)
 
         colum_names = []
         for key in list(self.newest.object.keys()):
@@ -779,14 +797,15 @@ class Plotuple:
 
         # If there is a reference object, print the reference values as the
         # first row of the table
-        if self.reference and 'reference' in self.list_of_revisions:
+        if self.reference and 'reference' in self.revisions:
             json_nutple['reference'] = []
 
             key_list = list(self.reference.object.keys())
             for column in colum_names:
                 if column in key_list:
+                    value_str = value2str(self.reference.object[column])
                     json_nutple['reference'].append(
-                        (column, self.reference.object[column])
+                        (column, value_str)
                     )
                 else:
                     json_nutple['reference'].append((column, None))
@@ -798,8 +817,9 @@ class Plotuple:
 
             for column in colum_names:
                 if column in ntuple.object:
+                    value_str = value2str(ntuple.object[column])
                     json_nutple[ntuple.revision].append(
-                        (column, ntuple.object[column])
+                        (column, value_str)
                     )
                 else:
                     json_nutple[ntuple.revision].append((column, None))

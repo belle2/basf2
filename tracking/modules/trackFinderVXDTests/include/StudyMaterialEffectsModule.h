@@ -53,7 +53,7 @@ namespace Belle2 {
     StoreObjPtr<RootMergeable<TTree>> m_tree;
 
     /** a pointer to the file where the Tree shall be stored. */
-    TFile* m_file;
+    TFile* m_file = nullptr;
 
     /** residual of hit.phi between layer 3 begin and 3 end. */
     double m_PhiL3L3 = 0;

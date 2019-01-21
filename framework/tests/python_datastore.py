@@ -92,6 +92,11 @@ class PythonDataStoreTests(unittest.TestCase):
 
         array.registerRelationTo(otherArray)
 
+        self.assertTrue(array.hasRelationTo(otherArray))
+        self.assertTrue(otherArray.hasRelationFrom(array))
+        self.assertFalse(array.hasRelationFrom(otherArray))
+        self.assertFalse(otherArray.hasRelationTo(array))
+
         obj = array.appendNew()
         self.assertTrue(obj)
         self.assertEqual(1, len(array))

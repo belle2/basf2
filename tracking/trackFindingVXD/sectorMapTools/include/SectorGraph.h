@@ -31,7 +31,7 @@ namespace Belle2 {
   public:
 
     /** constructor expects filterIDs. */
-    SectorGraph(std::vector<FilterType>& fIDs) : m_filterIDs(fIDs)
+    explicit SectorGraph(std::vector<FilterType>& fIDs) : m_filterIDs(fIDs)
     { if (m_filterIDs.empty()) { B2FATAL("SectorGraph-constructor: passed filterIDs are empty, this is an illegal usage of this class!"); } }
 
     /** for better readability. */

@@ -15,6 +15,7 @@ import tempfile
 from contextlib import contextmanager
 import multiprocessing
 import basf2
+import subprocess
 
 
 def skip_test(reason):
@@ -97,6 +98,24 @@ def clean_working_directory():
             yield tempdir
 
 
+@contextmanager
+def local_software_directory():
+    """Context manager to make sure we are executed in the top software
+    directory by switching to $BELLE2_LOCAL_DIR.
+
+    >>> with local_software_directory():
+    >>>    assert(os.listdir().contains("analysis"))
+    """
+    try:
+        directory = os.environ["BELLE2_LOCAL_DIR"]
+    except KeyError:
+        raise RuntimeError("Cannot find local Belle 2 software directory, "
+                           "have you setup the software correctly?")
+
+    with working_directory(directory):
+        yield directory
+
+
 def run_in_subprocess(*args, target, **kwargs):
     """Run the given ``target`` function in a child process using `multiprocessing.Process`
 
@@ -123,3 +142,52 @@ def safe_process(*args, **kwargs):
     It will return the exitcode of the child process which should be 0 in case of no error
     """
     return run_in_subprocess(target=basf2.process, *args, **kwargs)
+
+
+def check_error_free(tool, toolname, package, filter=lambda x: False):
+    """Calls the `tool` with argument `package` and check that the output is
+    error-free. Optionally `filter` the output in case of error messages that
+    can be ignored.
+
+    In case there is some output left, then prints the error message and exits
+    (failing the test).
+
+    The test is only executed for a full local checkout: If the ``BELLE2_RELEASE_DIR``
+    environment variable is set or if ``BELLE2_LOCAL_DIR`` is unset the test is
+    skipped: The program exits with an appropriate message.
+
+    Warnings:
+        If the test is skipped or the test contains errors this function does
+        not return but will directly end the program.
+
+    Arguments:
+        tool(str): executable to call
+        toolname(str): human readable name of the tool
+        package(str): package to run over. Also the first argument to the tool
+        filter(lambda): function which gets called for each line of output and
+           if it returns True the line will be ignored.
+    """
+
+    if "BELLE2_RELEASE_DIR" in os.environ:
+        skip_test("Central release is setup")
+    if "BELLE2_LOCAL_DIR" not in os.environ:
+        skip_test("No local release is setup")
+
+    with local_software_directory():
+        try:
+            output = subprocess.check_output([tool, package], encoding="utf8")
+        except subprocess.CalledProcessError as error:
+            print(error)
+            output = error.output
+
+    clean_log = [e for e in output.splitlines() if e and not filter(e)]
+    if len(clean_log) > 0:
+        print(f"""\
+The {package} package has some {toolname} issues, which is now not allowed.
+Please run:
+
+  $ {tool} {package}
+
+and fix any issues you have introduced. Here is what {toolname} found:\n""")
+        print("\n".join(clean_log))
+        sys.exit(1)

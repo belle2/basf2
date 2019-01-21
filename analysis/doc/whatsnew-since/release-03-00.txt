@@ -5,3 +5,19 @@ Modules
 +++++++
 
 * Removal of the unsupported ECLClusterInfoModule.
+
+Standard Particle Lists
++++++++++++++++++++++++
+
+* Updated charged standard PID cut values to reflect the correct efficiencies.
+  This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
+
+Variables
++++++++++
+
+* The function to create variable aliases for particles selected from a decay
+  string has been fixed and extended to allow better
+  customization (:issue:`BII-4437`)
+
+  .. seealso::
+     `variables.utils.create_aliases_for_selected()`

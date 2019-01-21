@@ -379,16 +379,16 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
                 # Find all objects for the Plotuple that is defined by the
                 # package, the file and the key
-                root_objects = find_root_object(objects_in_pkg_and_file,
-                                                key=key)
+                root_objects_key = find_root_object(objects_in_pkg_and_file,
+                                                    key=key)
 
                 # If this list is empty, we can continue right away
-                if not root_objects:
+                if not root_objects_key:
                     continue
 
                 # Otherwise we can generate Plotuple object
                 plotuple = Plotuple(
-                    root_objects,
+                    root_objects_key,
                     revisions,
                     work_folder
                 )

@@ -162,7 +162,6 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
     B2DEBUG(10, "\t" << daughter->getArrayIndex() << ": pdg " << daughter->getPDGCode());
     B2DEBUG(10, "\t\t Store array particle: " << particlesArray[daughter->getArrayIndex()]->getPDGCode());
   }
-  <<< <<< < HEAD
   unsigned int nExcludedParticles = 0;
   std::vector<const Particle* > particlesToAdd;
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
@@ -177,153 +176,90 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
       bool toAdd = true;
       for (auto* daughter : fsdaughters) {
         if (RestOfEvent::compareParticles(storedParticle, daughter)) {
-          B2DEBUG(10, "Ignoring Particle with PDG " << storedParticle->getPDGCode() << " index " << storedParticle->getMdstArrayIndex() <<
-                  " to "
-                  <<
-                  daughter->getMdstArrayIndex());
+          B2DEBUG(10, "Ignoring Particle with PDG " << storedParticle->getPDGCode()
+                  << " index " << storedParticle->getMdstArrayIndex()
+                  << " to " << daughter->getMdstArrayIndex());
           B2DEBUG(10, "Is copy " << storedParticle->isCopyOf(daughter));
           toAdd = false;
           nExcludedParticles++;
           break;
         }
-        == == == =
       }
-
-      void RestOfEventBuilderModule::addRemainingECLClusters(const Particle * particle, RestOfEvent * roe) {
-        StoreArray<ECLCluster> eclClusters;
-        StoreArray<Track>      tracks;
-
-        // vector of all final state particle daughters created from energy cluster or charged track
-        std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
-        std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
-
-        // vectors of all final state particle daughters' connected regions and hypotheses (needed to
-        // check for double counting K_L0s)
-        std::vector<int> connectedregions;
-        std::vector<int> hypotheses;
-        connectedregions.clear();
-        hypotheses.clear();
-
-        std::vector<const Particle*> fsps = particle->getFinalStateDaughters();
-        for (unsigned ifsp = 0; ifsp < fsps.size(); ++ifsp) {
-          const Particle* fsp = fsps[ifsp];
-          if (fsp->getParticleType() == Particle::EParticleType::c_ECLCluster) {
-            auto* fspCluster = fsp->getECLCluster();
-            int crid = fspCluster->getConnectedRegionId();
-            int hypo = fspCluster->getHypothesisId();
-            connectedregions.push_back(crid);
-            hypotheses.push_back(hypo);
-          }
-        }
-
-        // loop over ECLClusters to check if we can add them to the ROE
-        for (int i = 0; i < eclClusters.getEntries(); i++) {
-          const ECLCluster* cluster = eclClusters[i];
-
-          // allow only N1 and N2 (n photons and neutral hadron) cluster hypotheses to enter
-          if ((cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
-              and (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_neutralHadron))
-            continue;
-
-          // check that we don't add the cluster of our candidate
-          bool remainingCluster = true;
-          for (unsigned j = 0; j < eclFSPs.size(); j++) {
-            if (cluster->getArrayIndex() == eclFSPs[j]) {
-              remainingCluster = false;
-              break;
-            }
-            if (toAdd) {
-              //roe->addParticle(storedParticle);
-              particlesToAdd.push_back(storedParticle);
-            }
-          }
-
-          // check (the rare case) that connected regions of the candidate clash with this cluster
-          for (unsigned icr = 0; icr < connectedregions.size(); ++icr) {
-            if (connectedregions[icr] == cluster->getConnectedRegionId()) {
-              if (hypotheses[icr] != cluster->getHypothesisId()) {
-                //B2RESULT("hello");
-                //" connectedregions[icr]=" << connectedregions[icr]
-                //<< " cluster->getConnectedRegionId()=" << cluster->getConnectedRegionId()
-                //" hypotheses[icr]=" << hypotheses[icr]
-                //<< " cluster->getHypothesisId()=" << cluster->getHypothesisId()
-                //);
-                remainingCluster = false;
-                break;
-              }
-            }
-          }
-
-          if (remainingCluster)
-            roe->addECLCluster(cluster);
-        }
-        if (fsdaughters.size() > nExcludedParticles) {
-          B2WARNING("Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete");
-        }
-        roe->addParticles(particlesToAdd);
+      if (toAdd) {
+        //roe->addParticle(storedParticle);
+        particlesToAdd.push_back(storedParticle);
       }
-      void RestOfEventBuilderModule::printEvent() {
-        StoreArray<ECLCluster> eclClusters;
-        StoreArray<KLMCluster> klmClusters;
-        StoreArray<Track>      tracks;
+    }
+  }
+  if (fsdaughters.size() > nExcludedParticles) {
+    B2WARNING("Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete");
+  }
+  roe->addParticles(particlesToAdd);
+}
+void RestOfEventBuilderModule::printEvent()
+{
+  StoreArray<ECLCluster> eclClusters;
+  StoreArray<KLMCluster> klmClusters;
+  StoreArray<Track>      tracks;
 
-        B2INFO("[RestOfEventBuilderModule] *** Print Event ***");
-        B2INFO("[RestOfEventBuilderModule] Tracks: " << tracks.getEntries());
-        for (int i = 0; i < tracks.getEntries(); i++) {
-          const Track* track = tracks[i];
-          const ECLCluster* trackECLCluster = track->getRelated<ECLCluster>();
-          const KLMCluster* trackKLMCluster = track->getRelated<KLMCluster>();
-          if (trackECLCluster) {
-            B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster " << trackECLCluster->getArrayIndex());
-          } else {
-            B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster (NO RELATION)");
-          }
-          if (trackKLMCluster) {
-            B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> KLMCluster " << trackKLMCluster->getArrayIndex());
-          } else {
-            B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> KLMCluster (NO RELATION)");
-          }
-        }
+  B2INFO("[RestOfEventBuilderModule] *** Print Event ***");
+  B2INFO("[RestOfEventBuilderModule] Tracks: " << tracks.getEntries());
+  for (int i = 0; i < tracks.getEntries(); i++) {
+    const Track* track = tracks[i];
+    const ECLCluster* trackECLCluster = track->getRelated<ECLCluster>();
+    const KLMCluster* trackKLMCluster = track->getRelated<KLMCluster>();
+    if (trackECLCluster) {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster " << trackECLCluster->getArrayIndex());
+    } else {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster (NO RELATION)");
+    }
+    if (trackKLMCluster) {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> KLMCluster " << trackKLMCluster->getArrayIndex());
+    } else {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> KLMCluster (NO RELATION)");
+    }
+  }
 
-        B2INFO("[RestOfEventBuilderModule] ECLCluster: " << eclClusters.getEntries());
-        for (int i = 0; i < eclClusters.getEntries(); i++) {
-          const ECLCluster* eclCluster = eclClusters[i];
+  B2INFO("[RestOfEventBuilderModule] ECLCluster: " << eclClusters.getEntries());
+  for (int i = 0; i < eclClusters.getEntries(); i++) {
+    const ECLCluster* eclCluster = eclClusters[i];
 
-          B2INFO("[RestOfEventBuilderModule]  -> cluster " << eclCluster->getArrayIndex());
-        }
+    B2INFO("[RestOfEventBuilderModule]  -> cluster " << eclCluster->getArrayIndex());
+  }
 
-        B2INFO("[RestOfEventBuilderModule] KLMCluster: " << klmClusters.getEntries());
-        for (int i = 0; i < klmClusters.getEntries(); i++) {
-          const KLMCluster* klmCluster = klmClusters[i];
+  B2INFO("[RestOfEventBuilderModule] KLMCluster: " << klmClusters.getEntries());
+  for (int i = 0; i < klmClusters.getEntries(); i++) {
+    const KLMCluster* klmCluster = klmClusters[i];
 
-          B2INFO("[RestOfEventBuilderModule]  -> cluster " << klmCluster->getArrayIndex());
-        }
-      }
+    B2INFO("[RestOfEventBuilderModule]  -> cluster " << klmCluster->getArrayIndex());
+  }
+}
 
-      void RestOfEventBuilderModule::printParticle(const Particle * particle) {
-        std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
-        std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_KLMCluster);
-        std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
+void RestOfEventBuilderModule::printParticle(const Particle* particle)
+{
+  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
+  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_KLMCluster);
+  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
-        B2INFO("[RestOfEventBuilderModule] tracks  : ");
+  B2INFO("[RestOfEventBuilderModule] tracks  : ");
 
-        std::string printout;
-        for (unsigned i = 0; i < trackFSPs.size(); i++)
-          printout += std::to_string(trackFSPs[i]) + " ";
-        B2INFO(printout);
+  std::string printout;
+  for (unsigned i = 0; i < trackFSPs.size(); i++)
+    printout += std::to_string(trackFSPs[i]) + " ";
+  B2INFO(printout);
 
-        printout.clear();
+  printout.clear();
 
-        B2INFO("[RestOfEventBuilderModule] eclFSPs : ");
-        for (unsigned i = 0; i < eclFSPs.size(); i++)
-          printout += std::to_string(eclFSPs[i]) + " ";
-        B2INFO(printout);
+  B2INFO("[RestOfEventBuilderModule] eclFSPs : ");
+  for (unsigned i = 0; i < eclFSPs.size(); i++)
+    printout += std::to_string(eclFSPs[i]) + " ";
+  B2INFO(printout);
 
-        printout.clear();
+  printout.clear();
 
-        B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
-        for (unsigned i = 0; i < klmFSPs.size(); i++)
-          printout += std::to_string(klmFSPs[i]) + " ";
-        B2INFO(printout);
+  B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
+  for (unsigned i = 0; i < klmFSPs.size(); i++)
+    printout += std::to_string(klmFSPs[i]) + " ";
+  B2INFO(printout);
 
-      }
+}

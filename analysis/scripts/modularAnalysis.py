@@ -2162,6 +2162,7 @@ def buildEventShape(inputListNames=[],
     @param harmonicMoments   Enables the calculation of the Harmonic moments.
     @param sphericity  Enables the calculation of the sphericity-related quantities.
     @param thrust  Enables the calculation of thust-related quantities.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them.
 
     """
     if not inputListNames:

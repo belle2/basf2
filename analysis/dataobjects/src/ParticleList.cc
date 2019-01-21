@@ -81,9 +81,7 @@ void ParticleList::bindAntiParticleList(ParticleList& antiList, bool includingAn
 void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorType type, bool includingAntiList)
 {
   if (abs(pdg) != abs(getPDGCode())) {
-    B2RESULT(pdg << ", " << getPDGCode());
     B2ERROR("ParticleList::addParticle PDG codes do not match, not added");
-    B2FATAL("ParticleList::addParticle PDG codes do not match, not added");
     return;
   }
 

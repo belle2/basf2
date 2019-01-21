@@ -54,13 +54,30 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
       roeParticle->getTrack()->getArrayIndex() != toAddParticle->getTrack()->getArrayIndex()) {
     return false;
   }
-  if (roeParticle->getECLCluster() && toAddParticle->getECLCluster()
-      && roeParticle->getECLCluster()->getArrayIndex() != toAddParticle->getECLCluster()->getArrayIndex()) {
-    return false;
-  }
   if (roeParticle->getKLMCluster() && toAddParticle->getKLMCluster()
       && roeParticle->getKLMCluster()->getArrayIndex() != toAddParticle->getKLMCluster()->getArrayIndex()) {
     return false;
+  }
+
+  // It can be a bit more complicated for ECLClusters as we might also have to ensure they are connected-region unique
+  if (roeParticle->getECLCluster() && toAddParticle->getECLCluster()
+      && roeParticle->getECLCluster()->getArrayIndex() != toAddParticle->getECLCluster()->getArrayIndex()) {
+
+    // if either is a track then they must be different
+    if (roeParticle->getECLCluster()->isTrack() or roeParticle->getECLCluster()->isTrack())
+      return false;
+
+    // if they are both the same hypothesis then they are different
+    // (two photons from the same connected region is legal and two Klongs will
+    // not come from the same connected region)
+    if (roeParticle->getECLCluster()->getHypothesisId() == toAddParticle->getECLCluster()->getHypothesisId())
+      return false;
+
+    // in the rare case that both are neutral and the hypotheses are different,
+    // we must also check that they are from different connected regions
+    // otherwise they come from the "same" underlying ECLShower
+    if (roeParticle->getECLCluster()->getConnectedRegionId() != toAddParticle->getECLCluster()->getConnectedRegionId())
+      return false;
   }
   return true;
 }

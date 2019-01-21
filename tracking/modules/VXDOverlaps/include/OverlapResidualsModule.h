@@ -44,13 +44,13 @@ namespace Belle2 {
     OverlapResidualsModule();
 
     /** Register input and output data */
-    virtual void initialize override();
+    virtual void initialize();
 
     /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
-    virtual void event override();
+    virtual void event();
 
     /** Ends run*/
-    void terminate override();
+    void terminate();
 
     /** user-defined parameters */
     std::string m_rootFileName;

@@ -39,9 +39,7 @@ namespace {
 
   /** Signal in ADU of collected clusters */
   int m_signal;
-  //int m_run;
-  //int m_exp;
-  //PXDClusterChargeMapPar m_chargeMap;
+  int m_run;
 
   PXDClusterChargeMapPar m_landauMap;
 
@@ -172,19 +170,17 @@ CalibrationAlgorithm::EResult PXDLandauCalibrationAlgorithm::calibrate()
 
     // Only perform fitting, when enough data is available
     if (numberOfDataHits >= minClusters) {
-/// HEERERERERERERERER
+
       // fit landau function for the part of PXD
       auto landau_par = EstimateLandau(sensorID, uBin, vBin);
 
       // Store the fit results
       landauMapPar->setContent(sensorID.getID(), uBin, vBin, landau_par);
-      float mpv = (landauMapPar->getContent(sensorID.getID(), uBin, vBin));
-      B2INFO("Fit values: " << mpv);
 
     } else {
       B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
                 "). Use default value.");
-      landauMapPar->setContent(sensorID.getID(), uBin, vBin, 0.0);
+      landauMapPar->setContent(sensorID.getID(), uBin, vBin, 1.0);
     }
   }
 
@@ -205,7 +201,8 @@ double PXDLandauCalibrationAlgorithm::EstimateLandau(VxdID sensorID, unsigned sh
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
   std::string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
-  std::string histname_s = str(format("hist_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
+  std::string histname_s = str(format("hist_%1%_%2%_%3%_%4%_%5%_%6%") % m_run % layerNumber % ladderNumber % sensorNumber % uBin %
+                               vBin);
   const char* histname = histname_s.c_str();
   // Vector with cluster signals from collected data
   vector<double> signals;
@@ -251,29 +248,21 @@ double PXDLandauCalibrationAlgorithm::FitLandau(vector<double>& signals, const c
   if (size == 0) {
     return 1.0; // Undefined, really.
   } else {
-    Int_t status = hist_signals->Fit("landau", "L0", "", 30, 350);
+// need to restrict fit to cut low charge peak
+    Int_t status = hist_signals->Fit("landau", "Lq", "", 30, 350);
     double MPV = landau->GetParameter("MPV");
-    double sigma = landau->GetParameter("sigma");
-    cout << "Status=" << status << " " << MPV << " " << sigma << endl;
-
-// save output signals and fit in root file for inspection
-    TFile* f1 = new TFile("signals.root", "UPDATE");
-    f1->cd();
-    hist_signals->Write();
-    f1->Close();
-    // check if fit converged
 
     delete hist_signals;
     delete landau;
-    delete f1;
+
+    // check fit status
     if (status == 0) return MPV;
 
     else {
       B2WARNING(histname << ": Fit failed! using default value.");
-      return 0.0;
+      return 1.0;
     }
   }
 }
 
-//
 

@@ -54,11 +54,11 @@ namespace Belle2 {
     SVDB4CommissioningPlotsModule();
 
     virtual ~SVDB4CommissioningPlotsModule();
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     std::string m_ShaperDigitName; /**< */
     std::string m_RecoDigitName; /**< */
@@ -70,11 +70,11 @@ namespace Belle2 {
     std::string m_rootFileName;   /**< root file name */
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = NULL; /**< pointer at root file used for storing histograms */
 
   private:
 
-    int m_nEvents;
+    int m_nEvents = 0;
 
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
@@ -85,33 +85,33 @@ namespace Belle2 {
     StoreArray<Track> m_Tracks;
     StoreArray<TrackFitResult> m_tfr;
 
-    int m_ntracks;
+    int m_ntracks = 0;
 
     //TRACKS
-    TH1F* m_nTracks; /**< number of tracks*/
-    TH1F* m_Pvalue; /**< track p value*/
-    TH1F* m_mom; /**< track momentum*/
-    TH1F* m_nSVDhits; /**< track momentum*/
+    TH1F* m_nTracks = NULL; /**< number of tracks*/
+    TH1F* m_Pvalue = NULL; /**< track p value*/
+    TH1F* m_mom = NULL; /**< track momentum*/
+    TH1F* m_nSVDhits = NULL; /**< track momentum*/
 
     //RECO
-    SVDHistograms<TH1F>* h_recoCharge; /**< SVDRecoDigits Charge */
-    SVDHistograms<TH1F>* h_recoEnergy; /**< SVDRecoDigits Energy */
-    SVDHistograms<TH1F>* h_recoTime; /**< SVDRecoDigits Time */
-    SVDHistograms<TH1F>* h_recoNoise; /**< SVDRecoDigits Noise */
+    SVDHistograms<TH1F>* h_recoCharge = NULL; /**< SVDRecoDigits Charge */
+    SVDHistograms<TH1F>* h_recoEnergy = NULL; /**< SVDRecoDigits Energy */
+    SVDHistograms<TH1F>* h_recoTime = NULL; /**< SVDRecoDigits Time */
+    SVDHistograms<TH1F>* h_recoNoise = NULL; /**< SVDRecoDigits Noise */
 
     //CLUSTER
-    SVDHistograms<TH1F>* h_clusterCharge; /**< SVDClusters Charge */
-    SVDHistograms<TH1F>* h_clusterSize; /**< SVDClusters Size */
-    SVDHistograms<TH1F>* h_clusterSNR; /**< SVDClusters SNR */
-    SVDHistograms<TH1F>* h_clusterEnergy; /**< SVDClusters Energy */
-    SVDHistograms<TH1F>* h_clusterTime; /**< SVDClusters Time */
+    SVDHistograms<TH1F>* h_clusterCharge = NULL; /**< SVDClusters Charge */
+    SVDHistograms<TH1F>* h_clusterSize = NULL; /**< SVDClusters Size */
+    SVDHistograms<TH1F>* h_clusterSNR = NULL; /**< SVDClusters SNR */
+    SVDHistograms<TH1F>* h_clusterEnergy = NULL; /**< SVDClusters Energy */
+    SVDHistograms<TH1F>* h_clusterTime = NULL; /**< SVDClusters Time */
 
     //CLUSTER RELATED TO TRACKS
-    SVDHistograms<TH1F>* h_clusterTrkCharge; /**< SVDClusters Charge */
-    SVDHistograms<TH1F>* h_clusterTrkSize; /**< SVDClusters Size */
-    SVDHistograms<TH1F>* h_clusterTrkSNR; /**< SVDClusters SNR */
-    SVDHistograms<TH1F>* h_clusterTrkEnergy; /**< SVDClusters Energy */
-    SVDHistograms<TH1F>* h_clusterTrkTime; /**< SVDClusters Time */
+    SVDHistograms<TH1F>* h_clusterTrkCharge = NULL; /**< SVDClusters Charge */
+    SVDHistograms<TH1F>* h_clusterTrkSize = NULL; /**< SVDClusters Size */
+    SVDHistograms<TH1F>* h_clusterTrkSNR = NULL; /**< SVDClusters SNR */
+    SVDHistograms<TH1F>* h_clusterTrkEnergy = NULL; /**< SVDClusters Energy */
+    SVDHistograms<TH1F>* h_clusterTrkTime = NULL; /**< SVDClusters Time */
 
   };
 }

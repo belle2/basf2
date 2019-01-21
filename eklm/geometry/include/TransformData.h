@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTRANSFORMDATA_H
-#define EKLMTRANSFORMDATA_H
+#pragma once
 
 /* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
@@ -56,6 +55,11 @@ namespace Belle2 {
        * Copy constructor (disabled).
        */
       TransformData(const TransformData&) = delete;
+
+      /**
+       * Operator = (disabled).
+       */
+      TransformData& operator=(const TransformData&) = delete;
 
       /**
        * Destructor.
@@ -234,6 +238,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

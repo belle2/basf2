@@ -46,30 +46,22 @@ namespace Belle2 {
      */
     PXDDQMEfficiencyModule();
 
-    /**
-     * destructor
-     */
-    virtual ~PXDDQMEfficiencyModule();
+  private:
 
     /**
      * main function which fills trees and histograms
      */
-    virtual void event();
+    void event() override final;
 
     /**
      * initializes the need store arrays, trees and histograms
      */
-    virtual void initialize();
+    void initialize() override final;
 
     /**
      * actually defines the trees and histograms
      */
-    virtual void defineHisto();
-
-    /**
-     * Do the initialization here
-     */
-    virtual void beginRun();
+    void defineHisto() override final;
 
 
 

@@ -18,6 +18,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/utility/MCMatching.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -29,8 +30,8 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
+#include <analysis/dataobjects/EventShapeContainer.h>
 #include <analysis/dataobjects/Vertex.h>
-#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -428,6 +429,21 @@ namespace Belle2 {
       return func;
     }
 
+
+    double cosToThrustOfEvent(const Particle* part)
+    {
+      StoreObjPtr<EventShapeContainer> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to load the event shape calculation?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      PCmsLabTransform T;
+      TVector3 th = evtShape->getThrustAxis();
+      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      return std::cos(th.Angle(particleMomentum));
+    }
+
+
     double cosHelicityAngle(const Particle* part)
     {
 
@@ -641,19 +657,6 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
-    double cosToThrustOfEvent(const Particle* part)
-    {
-      StoreObjPtr<EventShape> evtShape;
-      if (!evtShape) {
-        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-      PCmsLabTransform T;
-      TVector3 th = evtShape->getThrustAxis();
-      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
-      return std::cos(th.Angle(particleMomentum));
-    }
-
     double b2bTheta(const Particle* part)
     {
       PCmsLabTransform T;
@@ -667,6 +670,42 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Phi();
+    }
+
+    double b2bClusterTheta(const Particle* part)
+    {
+      // get associated ECLCluster
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      // get 4 momentum from cluster
+      ClusterUtils clutls;
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+      // find the vector that balances this in the CMS
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Theta();
+    }
+
+    double b2bClusterPhi(const Particle* part)
+    {
+      // get associated ECLCluster
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+
+      // get 4 momentum from cluster
+      ClusterUtils clutls;
+      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+
+      // find the vector that balances this in the CMS
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Vect().Phi();
@@ -777,39 +816,6 @@ namespace Belle2 {
       return 0.0;
     }
 
-    double mcParticleSecondaryPhysicsProcess(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        return mcp->getSecondaryPhysicsProcess();
-      } else {
-        return -1;
-      }
-    }
-
-    double mcParticleStatus(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        return mcp->getStatus();
-      } else {
-        return -1;
-      }
-    }
-
-    double particleMCPrimaryParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_PrimaryParticle;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
 
     double particleMCMomentumTransfer2(const Particle* part)
     {
@@ -1175,6 +1181,10 @@ namespace Belle2 {
                       "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
                       "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
                       "automatically loaded by the function, given the accelerators conditions.");
+
+    REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
+                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable")
+
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"
@@ -1212,9 +1222,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass(determined from particle's daughter 4-momentum vectors) from its nominal mass");
 
-    REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
-                      "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
-
     REGISTER_VARIABLE("pxRecoil", recoilPx,
                       "component x of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("pyRecoil", recoilPy,
@@ -1242,6 +1249,10 @@ namespace Belle2 {
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
                       "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
@@ -1266,13 +1277,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
-    REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
-                      "Returns the secondary physics process flag.");
-    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
-                      "Returns status bits of related MCParticle or - 1 if MCParticle relation is not set.");
-    REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
-                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle,"
-                      "-1 if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
                       "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.");
     REGISTER_VARIABLE("False", False,

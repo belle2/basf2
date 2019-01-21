@@ -28,8 +28,17 @@ parser.add_argument('--maps', dest='maps', action="store_true", help='Create map
 args = parser.parse_args()
 
 
-sensor_list = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
-
+sensor_list = [
+    Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"),
+    Belle2.VxdID("1.2.1"), Belle2.VxdID("1.2.2"),
+    Belle2.VxdID("1.3.1"), Belle2.VxdID("1.3.2"),
+    Belle2.VxdID("1.4.1"), Belle2.VxdID("1.4.2"),
+    Belle2.VxdID("1.5.1"), Belle2.VxdID("1.5.2"),
+    Belle2.VxdID("1.6.1"), Belle2.VxdID("1.6.2"),
+    Belle2.VxdID("1.7.1"), Belle2.VxdID("1.7.2"),
+    Belle2.VxdID("1.8.1"), Belle2.VxdID("1.8.2"),
+    Belle2.VxdID("2.4.1"), Belle2.VxdID("2.4.2"),
+    Belle2.VxdID("2.5.1"), Belle2.VxdID("2.5.2")]
 
 # Create output file wíth histos and plots
 histofile = ROOT.TFile('deadpixel_histos.root', 'RECREATE')

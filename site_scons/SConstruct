@@ -35,38 +35,38 @@ if analysis:
 
 # get the sub directory name for architecture and build option dependent files
 if 'BELLE2_SUBDIR' not in os.environ:
-    print 'Belle II software environment is not set up.'
-    print setup_message
+    print('Belle II software environment is not set up.')
+    print(setup_message)
     Exit(1)
 subdir = os.environ['BELLE2_SUBDIR']
 
 # check for the externals
 if 'BELLE2_EXTERNALS_DIR' not in os.environ:
-    print 'externals are not set up.'
-    print setup_message
+    print('externals are not set up.')
+    print(setup_message)
     Exit(1)
 extsubdir = os.environ.get('BELLE2_EXTERNALS_SUBDIR', subdir)
 
 # check for root
 if 'ROOTSYS' not in os.environ:
-    print 'root is not set up.'
-    print setup_message
+    print('root is not set up.')
+    print(setup_message)
     Exit(1)
 
 if GetOption("check_externals"):
     if "BELLE2_EXTERNALS_VERSION" in os.environ and os.path.exists(".externals"):
         ext_version = open(".externals").read().strip()
         if ext_version != os.environ["BELLE2_EXTERNALS_VERSION"]:
-            print "externals version (%s) differs from the one defined in .externals (%s)" \
-                % (os.environ["BELLE2_EXTERNALS_VERSION"], ext_version)
-            print "Please run b2setup again."
+            print("externals version (%s) differs from the one defined in .externals (%s)" \
+                % (os.environ["BELLE2_EXTERNALS_VERSION"], ext_version))
+            print("Please run b2setup again.")
             Exit(1)
 
 # create construction environment
 global_env = Environment(
     ENV=os.environ,
     tools=['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir',
-           'check_libraries'],
+           'check_libraries', 'strip_debug'],
     BUILDERS={},
     BUILDDIR=os.path.join('#build', subdir),
     INCDIR='#include',
@@ -83,7 +83,8 @@ global_env = Environment(
     # for now, add the include folder here, as the path set via
     # CPPPATH below seems to be ignored for C file compiles
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
-    CXXFLAGS=['-std=c++14'],
+    CXXFLAGS=['-std=c++17'],
+    FORTRANFLAGS=['-std=legacy'],
     # disable warnings when compiling dictionaries, too much root problems
     # involved
     ROOTCLING_EXTRA_CCFLAGS=["-w"],
@@ -112,11 +113,14 @@ global_env = Environment(
     ],
 )
 
-# recalculate MD5 sums only if the time stamp differs
-global_env.Decider('MD5-timestamp')
+# recalculate MD5 sums only if the file changed in the last 10 minutes
+SetOption("max_drift", 600)
 
 # cache implicit dependencies (#includes)
 SetOption('implicit_cache', 1)
+
+# disable source code checks
+global_env.SourceCode(".", None)
 
 # include extra library paths and compiler flags
 if GetOption('extralibpath'):
@@ -130,8 +134,16 @@ if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
     global_env.Append(FORTRANFLAGS='-O3')
+    # Parallel LTO avoids sequential bottlenecks when large libraries are
+    # linked, but causes oversubscription when linking libraries concurrently.
+    # Performance and RAM usage measurements suggest that between these two
+    # evils, oversubscription is the better choice.
+    global_env.Append(LINKFLAGS='-flto=' + str(GetOption('num_jobs')))
+    # LTO requires some binutils wrappers that preserve the GCC IR
+    global_env['AR'] = 'gcc-ar'
+    global_env['RANLIB'] = 'gcc-ranlib'
 elif option == 'intel':
     intel_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
@@ -139,7 +151,7 @@ elif option == 'intel':
             intel_dir = dir
             break
     if not intel_dir:
-        print 'Intel compiler not found.'
+        print('Intel compiler not found.')
         Exit(1)
     (base_dir, bin, arch) = intel_dir.rsplit(os.sep, 2)
     global_env.PrependENVPath('INCLUDE', os.path.join(base_dir, 'include'))
@@ -161,7 +173,7 @@ elif option == 'clang':
             clang_dir = dir
             break
     if not clang_dir:
-        print 'clang compiler not found.'
+        print('clang compiler not found.')
         Exit(1)
     # clang has trouble with c-files under SL5 due to a problem with the glibc.
     # https://llvm.org/bugs/show_bug.cgi?id=5960
@@ -178,9 +190,8 @@ elif option == 'clang':
     # now let's look what gcc uses as includes. Let's call the g++ to give us
     # the search path. But we have to make sure that gcc is set to english so
     # that the search path works
-    gcc_search_path = subprocess.Popen(["g++", "-v", "-x", "c++", "--syntax-only", "/dev/null"],
-                                       env=dict(os.environ, LC_ALL="C"), stderr=subprocess.STDOUT,
-                                       stdout=subprocess.PIPE).communicate()[0]
+    gcc_search_path = subprocess.check_output(["g++", "-v", "-x", "c++", "--syntax-only", "/dev/null"],
+                                              stderr=subprocess.STDOUT, env=dict(os.environ, LC_ALL="C"), encoding="utf8")
     is_search_path = False
     for line in gcc_search_path.splitlines():
         if line.startswith("End of search list"):
@@ -193,18 +204,18 @@ elif option == 'clang':
         if line.startswith("#include <...> search starts here:"):
             is_search_path = True
 else:
-    print 'Aborted because of unknown build option:', option
+    print('Aborted because of unknown build option:', option)
     Exit(1)
 
 # allow overriding some things from command line (e.g. to enable scan-build)
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
     if v in os.environ:
-        print "Note: Overriding variable %s ('%s') from environment ($%s='%s')." % (v, global_env[v], v, os.environ[v])
+        print("Note: Overriding variable %s ('%s') from environment ($%s='%s')." % (v, global_env[v], v, os.environ[v]))
         global_env[v] = os.environ[v]
 
 if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1"]:
-    print "Note: Using ccache to memorize the build."
+    print("Note: Using ccache to memorize the build.")
     global_env["CC"] = "ccache " + global_env["CC"]
     global_env["CXX"] = "ccache " + global_env["CXX"]
     global_env["ENV"]["CCACHE_BASEDIR"] = Dir("#.").abspath
@@ -234,7 +245,7 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
 
 # cling remembers include paths to be able to find them at run-time, so only use -I here
 # remove all compiler warnings
-global_env['CLINGFLAGS'] = ["-std=c++14"] + [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
+global_env['CLINGFLAGS'] = ["-std=c++17"] + [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
                                              if not (s.startswith("-W") or s.startswith('-wd'))] + \
                            ["-noIncludePaths"]
 
@@ -336,8 +347,8 @@ if global_env.GetOption("sphinx"):
 # built/installed by scons
 
 if explicit_package_targets:
-    print "Performing a quick build for given packages. Note that any removed targets " \
-        "(e.g. modules, include files) will remain until you run a full build without any explicit target packages."
+    print("Performing a quick build for given packages. Note that any removed targets " \
+        "(e.g. modules, include files) will remain until you run a full build without any explicit target packages.")
 elif not global_env.GetOption('help'):
     # make sure we don't do cleanup on --help
     global_env.RemoveNonTargets(global_env["INCDIR"])

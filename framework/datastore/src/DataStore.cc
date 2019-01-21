@@ -242,14 +242,18 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
 }
 
 bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
-                                 EStoreFlags storeFlags)
+                                 EStoreFlags storeFlags, const std::string& namedRelation)
 {
   if (!fromArray.isArray())
     B2FATAL(fromArray.readableName() << " is not an array!");
   if (!toArray.isArray())
     B2FATAL(toArray.readableName() << " is not an array!");
 
-  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  // check the the namedRelation only contains regular characters
+  if (!std::regex_match(namedRelation, m_regexNamedRelationCheck))
+    B2FATAL("Named Relations can only contain alphabetic characters, given was: " << namedRelation);
+
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName(), namedRelation);
   /*
   if ((fromArray.notWrittenOut() or toArray.notWrittenOut()) and !(storeFlags & c_DontWriteOut)) {
     B2WARNING("You're trying to register a persistent relation " << relName << " from/to an array which is not written out (DataStore::c_DontWriteOut flag)! Relation will also not be saved!");
@@ -264,6 +268,28 @@ bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const Store
   return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, storeFlags);
 }
 
+bool DataStore::hasRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                            const std::string& namedRelation)
+{
+  // check that the input makes sense
+  if (!fromArray.isArray())
+    B2FATAL(fromArray.readableName() << " is not an array!");
+  if (!toArray.isArray())
+    B2FATAL(toArray.readableName() << " is not an array!");
+
+  // check the the namedRelation only contains regular characters
+  if (!std::regex_match(namedRelation, m_regexNamedRelationCheck))
+    B2FATAL("Named Relations can only contain alphabetic characters, given was: " << namedRelation);
+
+  // get the internal relation name from the name provided
+  const std::string& realname = relationName(fromArray.getName(), toArray.getName(), namedRelation);
+
+  // check whether the map entry exists
+  const auto& it = m_storeEntryMap[durability].find(realname);
+  if (it != m_storeEntryMap[durability].end()) return true;
+
+  return false;
+}
 
 DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 {
@@ -464,7 +490,7 @@ const std::vector<std::string>& DataStore::getArrayNames(const std::string& name
 }
 
 void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject,
-                            StoreEntry*& toEntry, int& toIndex, float weight)
+                            StoreEntry*& toEntry, int& toIndex, float weight, const std::string& namedRelation)
 {
   if (!fromObject or !toObject)
     return;
@@ -482,7 +508,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   }
 
   // get the relations from -> to
-  const string& relationsName = relationName(fromEntry->name, toEntry->name);
+  const string& relationsName = relationName(fromEntry->name, toEntry->name, namedRelation);
   const StoreEntryIter& it = m_storeEntryMap[c_Event].find(relationsName);
   if (it == m_storeEntryMap[c_Event].end()) {
     B2FATAL("No relation '" << relationsName <<
@@ -517,11 +543,11 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 }
 
 RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry,
-                                               int& index, const TClass* withClass, const std::string& withName)
+                                               int& index, const TClass* withClass, const std::string& withName, const std::string& namedRelation)
 {
   if (searchSide == c_BothSides) {
-    auto result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName);
-    const auto& fromResult = getRelationsWith(c_FromSide, object, entry, index, withClass, withName);
+    auto result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName, namedRelation);
+    const auto& fromResult = getRelationsWith(c_FromSide, object, entry, index, withClass, withName, namedRelation);
     result.add(fromResult);
     return result;
   }
@@ -538,7 +564,8 @@ RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TOb
   // loop over found store arrays
   for (const std::string& name : names) {
     // get the relations from -> to
-    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name, namedRelation) : relationName(name,
+                                  entry->name, namedRelation);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
@@ -568,12 +595,12 @@ RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TOb
 }
 
 RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry, int& index,
-                                         const TClass* withClass, const std::string& withName)
+                                         const TClass* withClass, const std::string& withName, const std::string& namedRelation)
 {
   if (searchSide == c_BothSides) {
-    RelationEntry result = getRelationWith(c_ToSide, object, entry, index, withClass, withName);
+    RelationEntry result = getRelationWith(c_ToSide, object, entry, index, withClass, withName, namedRelation);
     if (!result.object) {
-      result = getRelationWith(c_FromSide, object, entry, index, withClass, withName);
+      result = getRelationWith(c_FromSide, object, entry, index, withClass, withName, namedRelation);
     }
     return result;
   }
@@ -587,7 +614,8 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   // loop over found store arrays
   for (const std::string& name : names) {
     // get the relations from -> to
-    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
+    const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name, namedRelation) : relationName(name,
+                                  entry->name, namedRelation);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
@@ -691,7 +719,8 @@ bool DataStore::optionalInput(const StoreAccessorBase& accessor)
   return (getEntry(accessor) != nullptr);
 }
 
-bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability)
+bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                                std::string const& namedRelation)
 {
   if (!m_initializeActive) {
     B2FATAL("Attempt to require relation " << fromArray.readableName() << " -> " << toArray.readableName() <<
@@ -703,18 +732,19 @@ bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreA
   if (!toArray.isArray())
     B2FATAL(toArray.readableName() << " is not an array!");
 
-  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName(), namedRelation);
   return DataStore::Instance().requireInput(StoreAccessorBase(relName, durability, RelationContainer::Class(), false));
 }
 
-bool DataStore::optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability)
+bool DataStore::optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                                 std::string const& namedRelation)
 {
   if (!fromArray.isArray())
     B2FATAL(fromArray.readableName() << " is not an array!");
   if (!toArray.isArray())
     B2FATAL(toArray.readableName() << " is not an array!");
 
-  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName(), namedRelation);
   return DataStore::Instance().optionalInput(StoreAccessorBase(relName, durability, RelationContainer::Class(), false));
 }
 

@@ -14,6 +14,7 @@
 
 #include <framework/core/RandomNumbers.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/ProcHelper.h>
 #include <framework/logging/Logger.h>
 
 

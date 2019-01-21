@@ -33,6 +33,7 @@
 
 // utility
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 #include <TRandom.h>
 #include <TMath.h>
@@ -148,15 +149,12 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
         return 0.0;
-      std::vector<const Track*> roeTracks = roe->getTracks(maskName);
       int n_roe_tracks = roe->getNTracks(maskName);
       int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
-        int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212) {
-          if (std::find(roeTracks.begin(), roeTracks.end(), daughter->getTrack()) != roeTracks.end())
-            n_par_tracks++;
+        if (daughter->getParticleType() == Particle::EParticleType::c_Track && roe->hasParticle(daughter, maskName)) {
+          n_par_tracks++;
         }
       }
       return n_roe_tracks - n_par_tracks;
@@ -188,7 +186,7 @@ namespace Belle2 {
     double nROE_KLMClusters(const Particle* particle)
     {
       // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      const RestOfEvent* roe = getRelatedROEObject(particle);
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
@@ -203,12 +201,14 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
-
-      return boostvec.Energy() - mcp->getEnergy();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+      return frameMCRoe4Vector.Energy();
     }
 
     double ROE_MC_P(const Particle* particle)
@@ -216,12 +216,14 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
-
-      return (boostvec.Vect() - mcp->getMomentum()).Mag();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+      return frameMCRoe4Vector.Vect().Mag();
     }
 
     double ROE_MC_Px(const Particle* particle)
@@ -229,12 +231,15 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return boostvec.Vect().X() - mcp->getMomentum().X();
+      return frameMCRoe4Vector.Vect().X();
     }
 
     double ROE_MC_Py(const Particle* particle)
@@ -242,12 +247,15 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return boostvec.Vect().Y() - mcp->getMomentum().Y();
+      return frameMCRoe4Vector.Vect().Y();
     }
 
     double ROE_MC_Pz(const Particle* particle)
@@ -255,20 +263,55 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
 
-      return boostvec.Vect().Z() - mcp->getMomentum().Z();
+      return frameMCRoe4Vector.Vect().Z();
     }
+    double ROE_MC_Pt(const Particle* particle)
+    {
+      const MCParticle* mcp = particle->getRelated<MCParticle>();
+
+      if (!mcp)
+        return -999;
+
+      PCmsLabTransform T;
+      TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+
+      return frameMCRoe4Vector.Vect().Perp();
+    }
+    double ROE_MC_PTheta(const Particle* particle)
+    {
+      const MCParticle* mcp = particle->getRelated<MCParticle>();
+
+      if (!mcp)
+        return -999;
+
+      PCmsLabTransform T;
+      TLorentzVector boostvec = T.getBoostVector();
+      auto mcroe4vector = boostvec - mcp->get4Vector();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
+
+      return frameMCRoe4Vector.Theta();
+    }
+
+
 
     double ROE_MC_M(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999.9;
+        return -999;
 
       PCmsLabTransform T;
       TLorentzVector boostvec = T.getBoostVector();
@@ -317,18 +360,19 @@ namespace Belle2 {
           mcROE = mcDaughters[0];
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         // Load ROE Tracks
         std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
         // Add tracks in ROE V0 list, if they exist
-        std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
+        //TODO: replace this!
+        /*std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
         for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
         {
           roeTracks.push_back(particles[v0List[iV0]]->getDaughter(0)->getTrack());
           roeTracks.push_back(particles[v0List[iV0]]->getDaughter(1)->getTrack());
-        }
+        }*/
 
         // Load ROE ECLClusters
         std::vector<const ECLCluster*> roeECL = roe->getECLClusters(maskName);
@@ -400,7 +444,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -427,7 +471,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -454,7 +498,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -476,6 +520,97 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr nROE_Photons(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() > 1) {
+        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Photons");
+      }
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->getPhotons(maskName).size();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() > 1) {
+        B2FATAL("Wrong number of arguments (1 optional only) for meta function nROE_NeutralHadrons");
+      }
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->getHadrons(maskName).size();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr nROE_ChargedParticles(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+      int pdgCode = 0;
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() == 2) {
+        maskName = arguments[0];
+        try {
+          pdgCode = std::stoi(arguments[1]);
+        } catch (std::invalid_argument& e) {
+          B2ERROR("First argument of nROE_ChargedParticles must be a PDG code");
+          return nullptr;
+        }
+      }
+      if (arguments.size() > 2)  {
+        B2FATAL("Wrong number of arguments (2 optional) for meta function nROE_ChargedParticles");
+      }
+      auto func = [maskName, pdgCode](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        return roe->getChargedParticles(maskName, abs(pdgCode)).size();
+      };
+      return func;
+    }
+
+
+
+
+
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
       std::string pListName;
@@ -493,7 +628,7 @@ namespace Belle2 {
       auto func = [pListName, maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -534,7 +669,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -543,13 +678,12 @@ namespace Belle2 {
         }
 
         // Get tracks in ROE
-        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
+        auto roeParticles = roe->getParticles(maskName);
         int roeCharge = 0;
 
-        for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
+        for (auto* roeParticle : roeParticles)
         {
-          auto closestMassTrackFitResult = roeTracks[iTrack]->getTrackFitResultWithClosestMass(Const::pion);
-          roeCharge += closestMassTrackFitResult->getChargeSign();
+          roeCharge += roeParticle->getCharge();
         }
 
         return roeCharge;
@@ -571,7 +705,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -604,22 +738,22 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
           return -1;
         }
-
-        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
-        double extraE = 0.0;
-
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          if (roeClusters[iEcl]->isNeutral())
-            extraE += roeClusters[iEcl]->getEnergy();
-
-        return extraE;
+        auto roephotons = roe->getPhotons(maskName);
+        TLorentzVector total4vector;
+        for (auto* photon : roephotons)
+        {
+          total4vector += photon->get4Vector();
+        }
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(total4vector);
+        return frameRoe4Vector.Energy();
       };
       return func;
     }
@@ -640,29 +774,9 @@ namespace Belle2 {
           B2ERROR("Relation between particle and ROE doesn't exist!");
           return -1;
         }
-        return roe->get4Vector(maskName).Energy();
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr ROE_Ecms(const std::vector<std::string>& arguments)
-    {
-      std::string maskName;
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
-        maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Ecms");
-      auto func = [maskName](const Particle * particle) -> double {
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-        if (!roe)
-        {
-          B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
-        }
-        PCmsLabTransform T;
-        return (T.rotateLabToCms() * roe->get4Vector(maskName)).Energy();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Energy();
       };
       return func;
     }
@@ -681,7 +795,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -708,7 +822,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -716,7 +830,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Mag();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Mag();
       };
       return func;
     }
@@ -735,7 +851,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -743,7 +859,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().X();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().X();
       };
       return func;
     }
@@ -762,7 +880,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -770,34 +888,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Y();
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr ROE_Pcms(const std::vector<std::string>& arguments)
-    {
-      std::string maskName;
-
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
-        maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Pcms");
-
-      auto func = [maskName](const Particle * particle) -> double {
-
-        // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-        if (!roe)
-        {
-          B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
-        }
-        PCmsLabTransform T;
-        return (T.rotateLabToCms() * roe->get4Vector(maskName)).Vect().Mag();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Y();
       };
       return func;
     }
@@ -817,7 +910,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -825,7 +918,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Perp();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Perp();
       };
       return func;
     }
@@ -844,7 +939,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -852,7 +947,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Vect().Z();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Vect().Z();
       };
       return func;
     }
@@ -871,7 +968,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -879,34 +976,9 @@ namespace Belle2 {
           return -1;
         }
 
-        return roe->get4Vector(maskName).Theta();
-      };
-      return func;
-    }
-
-    Manager::FunctionPtr ROE_PThetacms(const std::vector<std::string>& arguments)
-    {
-      std::string maskName;
-
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
-        maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_PThetacms");
-
-      auto func = [maskName](const Particle * particle) -> double {
-
-        // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-        if (!roe)
-        {
-          B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
-        }
-        PCmsLabTransform T;
-        return (T.rotateLabToCms() * roe->get4Vector(maskName)).Theta();
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
+        return frameRoe4Vector.Theta();
       };
       return func;
     }
@@ -925,7 +997,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -935,7 +1007,6 @@ namespace Belle2 {
 
         PCmsLabTransform T;
         TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
-
         return vec.E() - T.getCMSEnergy() / 2;
       };
       return func;
@@ -955,7 +1026,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1165,7 +1236,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1195,7 +1266,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1225,7 +1296,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1255,7 +1326,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1285,7 +1356,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1315,7 +1386,7 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1342,7 +1413,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1386,7 +1457,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1522,7 +1593,7 @@ namespace Belle2 {
       auto func = [maskName, option](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1560,7 +1631,7 @@ namespace Belle2 {
       auto func = [arguments, maskName](const Particle * particle) -> double {
 
         // Get related ROE object
-        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+        const RestOfEvent* roe = getRelatedROEObject(particle);
 
         if (!roe)
         {
@@ -1698,32 +1769,11 @@ namespace Belle2 {
 
         if (maskName == "")
           return 1.0;
-        else {
-          if (particle->getParticleType() == Particle::c_Track)
-          {
-            const Track* track = particle->getTrack();
-
-            std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
-
-            auto it = trackMask.find(track->getArrayIndex());
-            if (it == trackMask.end())
-              B2ERROR("Something is wrong, track not found in map of ROE tracks!");
-            else
-              result = trackMask[track->getArrayIndex()];
-          } else if (particle->getParticleType() == Particle::c_ECLCluster)
-          {
-            const ECLCluster* ecl = particle->getECLCluster();
-
-            std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
-
-            auto it = eclClusterMask.find(ecl->getArrayIndex());
-            if (it == eclClusterMask.end())
-              B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
-            else
-              result = eclClusterMask[ecl->getArrayIndex()];
-          } else
-            B2ERROR("Particle used is not an ECLCluster or Track type particle!");
+        if (roe->hasParticle(particle, maskName))
+        {
+          return 1.0;
         }
+
         return result;
       };
       return func;
@@ -1736,7 +1786,7 @@ namespace Belle2 {
     TLorentzVector missing4Vector(const Particle* particle, std::string maskName, const std::string& opt)
     {
       // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      const RestOfEvent* roe = getRelatedROEObject(particle);
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
@@ -1891,32 +1941,23 @@ namespace Belle2 {
       if (particle->getParticleType() == Particle::c_Composite) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
         for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isInThisRestOfEvent(fspDaug[i], roe) == 0)
+          if (isInThisRestOfEvent(fspDaug[i], roe, maskName) == 0)
             return 0;
         }
         return 1.0;
-      } else {
-        // Check for Tracks
-        const auto& tracks = roe->getTracks(maskName);
-        if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
-          return 1.0;
-        }
-
-        // Check for KLMClusters
-        const auto& klm = roe->getKLMClusters();
-        if (std::find(klm.begin(), klm.end(), particle->getKLMCluster()) != klm.end()) {
-          return 1.0;
-        }
-
-        // Check for ECLClusters
-        const auto& ecl = roe->getECLClusters(maskName);
-        if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
-          return 1.0;
-        }
       }
-      return 0;
+      return roe->hasParticle(particle, maskName);
     }
+    const RestOfEvent* getRelatedROEObject(const Particle* particle, bool returnHostOnly)
+    {
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      if (!roe && !returnHostOnly) {
+        roe = particle->getRelatedTo<RestOfEvent>("NestedRestOfEvents");
 
+      }
+      return roe;
+    }
 
     VARIABLE_GROUP("Rest Of Event");
 
@@ -1945,27 +1986,45 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
+    REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
+                      "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
+                      "Second argument is a PDG code to count only one charged particle species, independently of charge. "
+                      "For example: nROE_Charged(cleanMask, 321) will output number of kaons in Rest Of Event with 'cleanMask'. "
+                      "PDG code 0 is used to count all charged particles");
+
+    REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,
+                      "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
+
+    REGISTER_VARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
+                      "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ");
+
     REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
                       "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("ROE_MC_E", ROE_MC_E,
-                      "Returns true energy of unused tracks and clusters in ROE");
+                      "Returns true energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_M", ROE_MC_M,
                       "Returns true invariant mass of unused tracks and clusters in ROE");
 
     REGISTER_VARIABLE("ROE_MC_P", ROE_MC_P,
-                      "Returns true momentum of unused tracks and clusters in ROE");
+                      "Returns true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE");
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE");
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE");
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+
+    REGISTER_VARIABLE("ROE_MC_Pt", ROE_MC_Pt,
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+
+    REGISTER_VARIABLE("ROE_MC_PTheta", ROE_MC_PTheta,
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_MC_MissFlags(maskName)", ROE_MC_MissingFlags,
                       "Returns flags corresponding to missing particles on ROE side.");
@@ -1990,40 +2049,31 @@ namespace Belle2 {
                       "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle");
 
     REGISTER_VARIABLE("ROE_neextra(maskName)", ROE_NeutralExtraEnergy,
-                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle");
+                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_E(maskName)", ROE_E,
-                      "Returns energy of unused tracks and clusters in ROE");
-
-    REGISTER_VARIABLE("ROE_Ecms(maskName)", ROE_Ecms,
-                      "Returns energy of unused tracks and clusters in ROE in cms fame");
+                      "Returns energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_M(maskName)", ROE_M,
                       "Returns invariant mass of unused tracks and clusters in ROE");
 
     REGISTER_VARIABLE("ROE_P(maskName)", ROE_P,
-                      "Returns momentum of unused tracks and clusters in ROE");
-
-    REGISTER_VARIABLE("ROE_Pcms(maskName)", ROE_Pcms,
-                      "Returns momentum of unused tracks and clusters in ROE in cms");
+                      "Returns momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Pt(maskName)", ROE_Pt,
-                      "Returns transverse component of momentum of unused tracks and clusters in ROE");
+                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Px(maskName)", ROE_Px,
-                      "Returns x component of momentum of unused tracks and clusters in ROE");
+                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Py(maskName)", ROE_Py,
-                      "Returns y component of momentum of unused tracks and clusters in ROE");
+                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_Pz(maskName)", ROE_Pz,
-                      "Returns z component of momentum of unused tracks and clusters in ROE");
+                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_PTheta(maskName)", ROE_PTheta,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE");
-
-    REGISTER_VARIABLE("ROE_PThetacms(maskName)", ROE_PThetacms,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE in cms");
+                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("ROE_deltae(maskName)", ROE_DeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");

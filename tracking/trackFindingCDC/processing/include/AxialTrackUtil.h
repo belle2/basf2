@@ -31,9 +31,10 @@ namespace Belle2 {
 
     public:
       /// Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it.
-      static void addCandidateFromHitsWithPostprocessing(const std::vector<const CDCWireHit*>& foundAxialWireHits,
-                                                         const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                         std::vector<CDCTrack>& axialTracks);
+      static void addCandidateFromHits(const std::vector<const CDCWireHit*>& foundAxialWireHits,
+                                       const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                       std::vector<CDCTrack>& axialTracks,
+                                       bool withPostprocessing = true);
 
       /// Perform all track postprocessing - return whether the track is considered good after the postprocessing
       static bool postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits);

@@ -14,7 +14,8 @@
 #pragma link C++ class Belle2::FlavorTaggerInfo+;
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+;
 #pragma link C++ class Belle2::StringWrapper+;
-#pragma link C++ class Belle2::EventShape+;
+#pragma link C++ class Belle2::EventShapeContainer+;
+#pragma link C++ class Belle2::EventKinematics+;
 #pragma link C++ class Belle2::TauPairDecay+;
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+;
 #pragma link C++ class Belle2::ECLTRGInformation+;

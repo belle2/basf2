@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_ARC2D_H
-#define EKLM_ARC2D_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/geometry/Circle2D.h>
@@ -66,6 +65,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

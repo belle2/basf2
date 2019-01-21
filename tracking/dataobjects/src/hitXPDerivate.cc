@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster cluster, const MCParticle& particle,
+hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, const MCParticle& particle,
                              const VXD::SensorInfoBase& sensor)
 {
   m_positionMid = sensor.pointToGlobal(TVector3(hit.getU(), hit.getV(), hit.getW()), false); /** position at midpoint */

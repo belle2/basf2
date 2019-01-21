@@ -24,6 +24,9 @@
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <ecl/dbobjects/ECLAutoCovariance.h>
 
+//FRAMEWORK
+#include <framework/core/Environment.h>
+
 //ROOT
 #include <TMinuit.h>
 #include <TMatrixD.h>
@@ -189,9 +192,7 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   // Set module properties
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("TriggerThreshold", m_TriggerThreshold,
-           "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
-  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.02);
+  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.03);
   addParam("Chi2Threshold", m_chi2Threshold, "chi2 threshold to classify offline fit as good fit.", 60.0);
   addParam("CovarianceMatrix", m_CovarianceMatrix,
            "Option to use crystal dependent covariance matrices (false uses identity matrix).", true);
@@ -203,12 +204,12 @@ ECLWaveformFitModule::~ECLWaveformFitModule()
 }
 
 //callback for loading templates from database
-void ECLWaveformFitModule::loadTemplateParameterArray(bool IsDataFlag)
+void ECLWaveformFitModule::loadTemplateParameterArray()
 {
 
   m_TemplatesLoaded = true;
 
-  if (IsDataFlag) {
+  if (m_IsMCFlag == 0) {
     //load data templates
     DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
     std::vector<double>  Ptemp(11), Htemp(11), Dtemp(11);
@@ -240,6 +241,7 @@ void ECLWaveformFitModule::loadTemplateParameterArray(bool IsDataFlag)
 void ECLWaveformFitModule::beginRun()
 {
 
+  m_IsMCFlag = Environment::Instance().isMC();
   m_TemplatesLoaded = false;
 
   DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
@@ -323,7 +325,7 @@ void ECLWaveformFitModule::event()
 
   if (!m_TemplatesLoaded) {
     //load templates once per run in first event that has saved waveforms.
-    if (m_eclDSPs.getEntries() > 0)  loadTemplateParameterArray(m_eclDSPs[0]->getIsData());
+    if (m_eclDSPs.getEntries() > 0)  loadTemplateParameterArray();
   }
 
   for (auto& aECLDsp : m_eclDSPs) {
@@ -332,6 +334,9 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentHadronAmp(-1);
     aECLDsp.setTwoComponentDiodeAmp(-1);
     aECLDsp.setTwoComponentChi2(-1);
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, -1);
     aECLDsp.setTwoComponentTime(-1);
     aECLDsp.setTwoComponentBaseline(-1);
     aECLDsp.setTwoComponentFitType(ECLDsp::poorChi2);
@@ -340,17 +345,6 @@ void ECLWaveformFitModule::event()
 
     //Filling array with ADC values.
     for (int j = 0; j < ec.m_nsmp; j++) fitA[j] = aECLDsp.getDspA()[j];
-
-    //Trigger check to remove noise pulses in random trigger events.
-    //In random trigger events all eclDSP saved but only eclDigits above online threshold are saved.
-    //Set 10 MeV threshold for now.
-    //Trigger amplitude is computed with algorithm described in slide 5 of:
-    //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
-    //note the trigger check is a temporary workaround to ensure all eclDsp's have a corresponding eclDigit.
-    double baselineADC = 0.25 * (fitA[12] + fitA[13] + fitA[14] + fitA[15]),
-           maxADC = 0.5 * (fitA[20] + fitA[21]),
-           triggerAmp = (maxADC - baselineADC) * m_ADCtoEnergy[id];
-    if (triggerAmp < m_TriggerThreshold) continue;
 
     //setting relation of eclDSP to aECLDigit
     const ECLDigit* d = NULL;
@@ -367,7 +361,7 @@ void ECLWaveformFitModule::event()
     if (d->getAmp() * m_ADCtoEnergy[id] < m_EnergyThreshold)  continue;
 
     //loading template for waveform
-    if (aECLDsp.getIsData()) {
+    if (m_IsMCFlag == 0) {
       //data cell id dependent
       g_si = &m_si[id][0];
       g_sih = &m_si[id][1];
@@ -385,7 +379,7 @@ void ECLWaveformFitModule::event()
     ECLDsp::TwoComponentFitType fitType = ECLDsp::photonHadron;
     p2_chi2 = -1;
     Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
-
+    aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadron, p2_chi2);
 
     //if hadron fit failed try hadron + background photon (fit type = 1)
     if (p2_chi2 >= m_chi2Threshold) {
@@ -393,6 +387,7 @@ void ECLWaveformFitModule::event()
       fitType = ECLDsp::photonHadronBackgroundPhoton;
       p2_chi2 = -1;
       Fit2hExtraPhoton(p2_b, p2_a, p2_t, p2_a1, p_extraPhotonEnergy, p_extraPhotonTime, p2_chi2);
+      aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, p2_chi2);
 
       //hadron + background photon fit failed try diode fit (fit type = 2)
       if (p2_chi2 >= m_chi2Threshold) {
@@ -400,6 +395,7 @@ void ECLWaveformFitModule::event()
         fitType = ECLDsp::photonDiodeCrossing;
         p2_chi2 = -1;
         Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
+        aECLDsp.setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, p2_chi2);
       }
 
     }

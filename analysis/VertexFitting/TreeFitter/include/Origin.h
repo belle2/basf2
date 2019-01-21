@@ -27,55 +27,55 @@ namespace TreeFitter {
     /** Constructor */
     Origin(Belle2::Particle* particle,
            const bool forceFitAll,
-           const std::vector<double> customOriginVertex,
-           const std::vector<double> customOriginCovariance,
+           const std::vector<double>& customOriginVertex,
+           const std::vector<double>& customOriginCovariance,
            const bool isBeamSpot
           );
 
     /** Constructor */
-    Origin(Belle2::Particle* daughter);
+    explicit Origin(Belle2::Particle* daughter);
 
     /** destructor */
     virtual ~Origin() {};
 
     /** init particle, used if it has a mother */
-    virtual  ErrCode initParticleWithMother(FitParams& fitparams);
+    virtual  ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init particle, used if it has no mother */
-    virtual  ErrCode initMotherlessParticle(FitParams& fitparams);
+    virtual  ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** init the origin "particle"  */
     ErrCode initOrigin();
 
     /** space reserved in fit pars*/
-    virtual int dim() const { return m_constraintDimension; }
+    virtual int dim() const override { return m_constraintDimension; }
 
     /** init covariance matrix of the constraint  */
-    virtual ErrCode initCovariance(FitParams& fitpar) const;
+    virtual ErrCode initCovariance(FitParams& fitpar) const override;
 
     /* particle type */
-    virtual int type() const { return kOrigin; }
+    virtual int type() const override { return kOrigin; }
 
     /** the actuall constraint projection  */
     ErrCode projectOriginConstraint(const FitParams& fitpar, Projection&) const;
 
     /** the abstract projection  */
-    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
+    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const override;
 
     /** adds the origin as a particle to the constraint list  */
-    virtual void addToConstraintList(constraintlist& list, int depth) const;
+    virtual void addToConstraintList(constraintlist& list, int depth) const override;
 
     /** vertex position index in the statevector */
-    virtual int posIndex() const { return index(); }
+    virtual int posIndex() const override { return index(); }
 
     /**  momentum index in the statevector. no value for beamspot as a particle */
-    virtual int momIndex() const { return -1; }
+    virtual int momIndex() const override { return -1; }
 
     /**  the lifetime index. the origin does not have a lifetime */
-    virtual int tauIndex() const { return -1; }
+    virtual int tauIndex() const override { return -1; }
 
     /** has energy  */
-    virtual bool hasEnergy() const { return false; }
+    virtual bool hasEnergy() const override { return false; }
 
     /** get name  */
     virtual std::string name() const { return "Origin"; }

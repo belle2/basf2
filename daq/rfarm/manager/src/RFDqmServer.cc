@@ -190,3 +190,10 @@ void RFDqmServer::server()
   }
 }
 
+void RFDqmServer::cleanup()
+{
+  printf("RFDqmServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFDqmServer: Done. Exitting\n");
+  exit(-1);
+}

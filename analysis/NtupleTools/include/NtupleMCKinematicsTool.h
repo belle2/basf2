@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEMCKINEMATICSTOOL_H
-#define NTUPLEMCKINEMATICSTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -32,7 +31,7 @@ namespace Belle2 {
     /** Mass. */
     float* m_fTruthM;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
     /** delete all 'new's */
     void deallocateMemory();
   public:
@@ -41,9 +40,8 @@ namespace Belle2 {
     /** Destructor */
     ~NtupleMCKinematicsTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLEMCKINEMATICSTOOL_H

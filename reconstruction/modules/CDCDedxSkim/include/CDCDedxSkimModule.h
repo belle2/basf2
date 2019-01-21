@@ -43,13 +43,13 @@ namespace Belle2 {
     virtual ~CDCDedxSkimModule();
 
     /** Initialize routine **/
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Check the event and track quality and apply clean up cuts */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** A method to check whether a track passes some nominal cuts */
     bool isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable);

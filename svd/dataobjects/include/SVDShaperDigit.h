@@ -179,7 +179,7 @@ namespace Belle2 {
     * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), and
     * strip number (18-28)
     */
-    unsigned int getUniqueChannelID() const
+    unsigned int getUniqueChannelID() const override
     { return m_cellID + ((m_isU ? 1 : 0) << 11) + (m_sensorID << 12); }
 
     /**
@@ -189,7 +189,7 @@ namespace Belle2 {
     * @param bg beam background digit
     * @return append status
     */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override
     {
       // Don't modify and don't append when bg points nowhere.
       if (!bg) return DigitBase::c_DontAppend;
@@ -268,7 +268,7 @@ namespace Belle2 {
     /**< Mode byte, trigger FADCTime + DAQ mode */
 
 
-    ClassDef(SVDShaperDigit, 3)
+    ClassDefOverride(SVDShaperDigit, 3)
 
   }; // class SVDShaperDigit
 

@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
 #include <framework/gearbox/Const.h>
 
 #include <string>
@@ -47,30 +48,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -124,6 +125,8 @@ namespace Belle2 {
     float m_phi = 0; /**< track: extrapolated hit momentum in local (module) frame */
     float m_pocaR = 0; /**< r of POCA */
     float m_pocaZ = 0; /**< z of POCA */
+    float m_pocaX = 0; /**< x of POCA */
+    float m_pocaY = 0; /**< y of POCA */
     float m_cmsE = 0; /**< c.m.s. energy if dimuon or bhabha */
     int m_charge = 0; /**< track charge */
     int m_PDG = 0; /**< track MC truth (simulated data only) */
@@ -132,6 +135,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreArray<Track> m_tracks;    /**< collection of tracks */
     StoreArray<ExtHit> m_extHits;  /**< collection of extrapolated hits */
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
 
   };
 

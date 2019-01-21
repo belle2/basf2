@@ -33,7 +33,8 @@ main = create_path()
 
 # input file, sequential root
 narg = len(sys.argv)
-inputfile = "/hsm/belle2/bdata/users/kuzmin/05399/cosmic.0001.05399.HLT1.f00000.sroot"
+inputfile = "/hsm/belle2/bdata/users/kuzmin/05399/cosmic.0001.05399.HLT1.f00000.sroot"  # Larger file for cosmic run (slower)
+# inputfile = "/hsm/belle2/bdata/users/kuzmin/11362/cosmic.0001.11362.HLT4.f00000.sroot"  # Smaller file for cosmic run (faster)
 if(narg >= 2):
     inputfiles = glob.glob(sys.argv[1])
     main.add_module('SeqRootInput', inputFileNames=inputfiles)

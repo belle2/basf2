@@ -21,10 +21,10 @@ namespace Belle2 {
     virtual ~CDCTriggerRecoMatcherModule() {}
 
     /** Initialize the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called once for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Name of the RecoTrack StoreArray to be matched */

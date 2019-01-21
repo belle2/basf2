@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDQMMODULE_H
-#define EKLMDQMMODULE_H
+#pragma once
 
 /* External headers. */
 #include <TH1F.h>
@@ -44,32 +43,32 @@ namespace Belle2 {
     /**
      * Definition of the histograms.
      */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /**
      * Initializer.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -94,6 +93,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif
-

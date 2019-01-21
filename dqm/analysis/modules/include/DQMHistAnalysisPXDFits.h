@@ -40,22 +40,46 @@ namespace Belle2 {
     void endRun() override final;
     void terminate() override final;
 
-    // Data members
+    /** Histogram doirectory */
     std::string m_histogramDirectoryName;
+    /** maps from VXDid to index */
     std::map <int, int> m_id_to_inx;
+    /** maps from index to VXDid*/
     std::map <int, int> m_inx_to_id;
 
-    TH1F* m_hSignalAll, *m_hCommonAll, *m_hCountsAll, *m_hOccupancyAll;
-    TCanvas* m_cSignalAll, *m_cCommonAll, *m_cCountsAll, *m_cOccupancyAll;
+    /** Histogram */
+    TH1F* m_hSignalAll = nullptr;
+    /** Histogram */
+    TH1F* m_hCommonAll = nullptr;
+    /** Histogram */
+    TH1F* m_hCountsAll = nullptr;
+    /** Histogram */
+    TH1F* m_hOccupancyAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cSignalAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cCommonAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cCountsAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cOccupancyAll = nullptr;
 
+    /** Histograms */
     TH2F* m_hSignal[NUM_MODULES];
+    /** Histograms */
     TH2F* m_hCommon[NUM_MODULES];
+    /** Histograms */
     TH2F* m_hCounts[NUM_MODULES];
+    /** Canvases */
     TCanvas* m_cSignal[NUM_MODULES];
+    /** Canvases */
     TCanvas* m_cCommon[NUM_MODULES];
+    /** Canvases */
     TCanvas* m_cCounts[NUM_MODULES];
-    TF1* m_fLandau;// only one fit function
-    TF1* m_fGaus;// only one fit function
+    /** Fit functions */
+    TF1* m_fLandau = nullptr; // only one fit function
+    /** Fit functions */
+    TF1* m_fGaus = nullptr; // only one fit function
 
   };
 } // end namespace Belle2

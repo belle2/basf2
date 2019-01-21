@@ -31,6 +31,7 @@ namespace Belle2 {
     typedef struct {
       TH1* histo;
       TCanvas* canvas;
+      int stale;
     } SSNODE;
 
     // Public functions
@@ -41,13 +42,13 @@ namespace Belle2 {
     virtual ~DQMHistSnapshotsModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
     SSNODE* find_snapshot(TString a);
     TCanvas* find_canvas(TString s);
 
@@ -56,9 +57,7 @@ namespace Belle2 {
     /** Struct for extracted parameters */
     std::vector<SSNODE*> m_ssnode;
     int m_check_interval;
-    time_t m_last_check;
-
-    TH1* GetHisto(TString histoname);
+    time_t m_last_check = 0;
 
   };
 } // end namespace Belle2

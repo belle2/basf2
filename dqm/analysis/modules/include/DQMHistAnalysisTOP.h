@@ -16,6 +16,9 @@
 
 #include <TCanvas.h>
 #include <TH1.h>
+#include <TString.h>
+#include <TLine.h>
+#include <TPaveText.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -30,14 +33,16 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisTOPModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
+    TH1* find_histo_in_canvas(TString);
+    TCanvas* find_canvas(TString);
     //! Data members
   private:
     TCanvas* m_c_goodHitsMean = nullptr;
@@ -50,6 +55,9 @@ namespace Belle2 {
     TH1F* m_h_badHitsMean = nullptr;
     TH1F* m_h_badHitsRMS = nullptr;
 
+    TLine* m_line1 = nullptr;
+    TLine* m_line2 = nullptr;
+    TPaveText* m_text1 = nullptr;
   };
 } // end namespace Belle2
 

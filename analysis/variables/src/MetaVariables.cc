@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2010 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Thomas Keck                                              *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 
 #include <analysis/variables/MetaVariables.h>
@@ -19,6 +19,8 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
+#include <analysis/variables/VariableFormulaConstructor.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -218,173 +220,12 @@ namespace Belle2 {
     // and operations, but for now cbf.
     Manager::FunctionPtr formula(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
-
-        // First use shunting algorithm to change to RPN
-        std::map<std::string, int> operators;
-        operators["^"] = 4;
-        operators["*"] = 3;
-        operators["/"] = 3;
-        operators["+"] = 2;
-        operators["-"] = 2;
-
-        std::vector<std::string> brackets;
-        brackets.push_back("[");
-        brackets.push_back("]");
-
-        std::string seperators("^*/+-[]");
-        std::string next_arg;
-        std::size_t prev_pos = 0;
-        std::size_t pos = 0;
-
-        // Putting an initial parser here so later we can make this smarter and
-        // not have strict requirements on the input format
-        std::vector<std::string> input_queue;
-
-        while ((pos = arguments[0].find_first_of(seperators, prev_pos)) != std::string::npos) {
-          next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
-
-          // Ignore everything inside another function's arguments (mostly particle lists we want to avoid)
-          if (arguments[0].find_first_of("(", prev_pos) != std::string::npos && arguments[0].find_first_of("(", prev_pos) < pos) {
-            if (arguments[0].find_first_of(")", prev_pos) > pos) {
-              pos = arguments[0].find_first_of(")", prev_pos);
-              pos = arguments[0].find_first_of(seperators, pos + 1);
-              if (pos == std::string::npos) {
-                // Reached end of the input
-                next_arg = arguments[0].substr(prev_pos);
-                break;
-              } else {
-                next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
-              }
-            }
-          }
-          boost::trim(next_arg);
-          // Add argument and following operand unless it's just an empty space
-          if (next_arg.size() != 0) {
-            input_queue.push_back(next_arg);
-          }
-          input_queue.push_back(arguments[0].substr(pos, 1));
-          prev_pos = pos + 1;
-        }
-        next_arg = arguments[0].substr(prev_pos);
-        boost::trim(next_arg);
-        if (next_arg.size() != 0) {
-          input_queue.push_back(next_arg);
-        }
-
-        std::string rpn_inqueue;
-        for (auto const& in : input_queue) {
-          rpn_inqueue += in;
-        }
-        // B2INFO("RPN formula input stack: " << rpn_inqueue);
-
-        std::vector<std::string> output_queue;
-        std::vector<std::string> operator_stack;
-
-        // B2INFO("Entering RPN converter.");
-        for (auto const& input : input_queue) {
-
-          std::map<std::string, int>::iterator op = operators.find(input);
-          std::vector<std::string>::iterator bra = std::find(std::begin(brackets), std::end(brackets), input);
-
-          // Check if it's a number first
-          if (op == operators.end() && bra == brackets.end()) {
-            output_queue.push_back(input);
-
-            // Check if it's an operation
-          } else if (op != operators.end()) {
-            // Check if operator on top of op stack has higher precedence than the one we found
-            // But needs to be left associative (i.e. not a ^)
-            // Also needs to handle last operator being a bracket
-            while (
-              operator_stack.size() > 0 &&
-              operators.find(operator_stack.back()) != operators.end() &&
-              (operators.find(operator_stack.back())->second > operators.find(op->first)->second ||
-               (operators.find(operator_stack.back())->second == operators.find(op->first)->second &&
-                operators.find(operator_stack.back())->second != 4))) {
-              output_queue.push_back(operator_stack.back());
-              operator_stack.pop_back();
-            }
-            // Now can read next operator onto the operator stack
-            operator_stack.push_back(input);
-            // Open bracket case
-          } else if (bra != brackets.end() && input.compare(brackets[0]) == 0) {
-            operator_stack.push_back(input);
-            // Close bracket case
-          } else if (bra != std::end(brackets) && input.compare(brackets[1]) == 0) {
-            while (
-              operator_stack.size() > 0 &&
-              operator_stack.back().compare(brackets[0]) != 0) {
-              output_queue.push_back(operator_stack.back());
-              operator_stack.pop_back();
-            }
-            // Should only be left bracket on top now, if not unmatched parenthesis.
-            // Should add error check for this.
-            operator_stack.pop_back();
-          }
-
-          // Get the next argument
-          std::string cur_queue;
-          for (auto const& out : output_queue) {
-            cur_queue += out;
-          }
-          // B2INFO("Current RPN formula output queue: " << cur_queue);
-        }
-
-        // No more arguments to read, clean up:
-        while (operator_stack.size() > 0) {
-          output_queue.push_back(operator_stack.back());
-          operator_stack.pop_back();
-        }
-
-        // Display to screen (debugging purposes)
-        std::string rpn_queue;
-        for (auto const& out : output_queue) {
-          rpn_queue += out;
-        }
-        // B2INFO("RPN formula output stack: " << rpn_queue);
-
-
-        // Then can do normal RPN calculation
-        //B2INFO("Entering RPN calculator.");
-        // Need to use a stack of FunctionPtr for this I think
-        std::vector<Belle2::Variable::Manager::FunctionPtr> operand_stack;
-
-        for (auto const& output : output_queue) {
-
-          std::map<std::string, int>::iterator op = operators.find(output);
-
-          if (op != operators.end()) {
-            Manager::FunctionPtr rhs = operand_stack.back();
-            operand_stack.pop_back();
-            Variable::Manager::FunctionPtr lhs = operand_stack.back();
-            operand_stack.pop_back();
-
-            char operation = op->first.front();
-
-            auto func = [lhs, operation, rhs](const Particle * particle) -> double {
-              switch (operation)
-              {
-                case '+': return lhs(particle) + rhs(particle);
-                case '-': return lhs(particle) - rhs(particle);
-                case '*': return lhs(particle) * rhs(particle);
-                case '/': return lhs(particle) / rhs(particle);
-                case '^': return std::pow(lhs(particle), rhs(particle));
-              }
-              B2INFO("No operation match.");
-              return 0;
-            };
-            operand_stack.push_back(func);
-
-          } else {
-            operand_stack.push_back(Manager::Instance().getVariable(output)->function);
-          }
-
-        }
-
-        return operand_stack.back();
-      } else {
-        B2FATAL("Wrong number of arguments for meta function formula");
+      if (arguments.size() != 1) B2FATAL("Wrong number of arguments for meta function formula");
+      FormulaParser<VariableFormulaConstructor> parser;
+      try {
+        return parser.parse(arguments[0]);
+      } catch (std::runtime_error& e) {
+        B2FATAL(e.what());
       }
     }
 
@@ -709,9 +550,14 @@ endloop:
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
+          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -737,9 +583,14 @@ endloop:
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
+          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -772,12 +623,153 @@ endloop:
       }
     }
 
-    Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 3) {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
+              return std::numeric_limits<float>::quiet_NaN();
+
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfClusterPhi");
+      }
+    }
+
+
+    Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(phi)");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
+    Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(clusterPhi)");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            if (std::isnan(var->function(particle->getDaughter(iDaughterNumber))) or std::isnan(var->function(particle->getDaughter(jDaughterNumber))))
+              return std::numeric_limits<float>::quiet_NaN();
+
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfClusterPhi");
+      }
+    }
+
+    Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          // cppcheck-suppress unreadVariable
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
@@ -897,6 +889,62 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2 || arguments.size() == 3) {
+        std::vector<int> daughterIndices;
+        try {
+          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The arguments of daughterClusterAngleInBetween meta function must be integers!");
+          return nullptr;
+        }
+        auto func = [daughterIndices](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterIndices.size() == 2)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
+              return -998;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              if (clusteri and clusterj) {
+                ClusterUtils clusutils;
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                return pi.Angle(pj);
+              }
+              return std::numeric_limits<float>::quiet_NaN();
+            }
+          } else if (daughterIndices.size() == 3)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
+                || daughterIndices[2] >= int(particle->getNDaughters())) return -997;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+              const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
+              if (clusteri and clusterj and clusterk) {
+                ClusterUtils clusutils;
+                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri)).Vect();
+                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj)).Vect();
+                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk)).Vect();
+                return pk.Angle(pi + pj);
+              }
+              return std::numeric_limits<float>::quiet_NaN();
+            }
+          } else return -996;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterClusterAngleInBetween");
+      }
+    }
+
     Manager::FunctionPtr daughterInvM(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 1) {
@@ -917,7 +965,7 @@ endloop:
             for (auto& index : daughterIndices)
             {
               if (index >= int(particle->getNDaughters())) {
-                return -999; break;
+                return -999;
               } else pSum += frame.getMomentum(particle->getDaughter(index));
             }
 
@@ -1107,21 +1155,15 @@ endloop:
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr)
+          if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            if (particle->getMCParticle()) {
-              if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
-                return -999;
-              Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
-              return var->function(&tempParticle);
-            } else
+            if (daughterNumber >= int(particle->getMCParticle()->getNDaughters())) {
               return -999;
-          }
-          if (daughterNumber >= int(particle->getRelated<MCParticle>()->getNDaughters()))
-            return -999;
-          else {
-            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getDaughters().at(daughterNumber));
+            }
+            Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
             return var->function(&tempParticle);
+          } else {
+            return -999;
           }
         };
         return func;
@@ -1137,26 +1179,76 @@ endloop:
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getRelated<MCParticle>() == nullptr)
+          if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            if (particle->getMCParticle()) {
-              if (particle->getMCParticle()->getMother() == nullptr)
-                return -999;
-              Particle tempParticle = Particle(particle->getMCParticle()->getMother());
-              return var->function(&tempParticle);
-            } else
+            if (particle->getMCParticle()->getMother() == nullptr) {
               return -999;
-          }
-          if (particle->getRelated<MCParticle>()->getMother() == nullptr)
-            return -999;
-          else {
-            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getMother());
+            }
+            Particle tempParticle = Particle(particle->getMCParticle()->getMother());
             return var->function(&tempParticle);
+          } else {
+            return -999;
           }
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function mcMother");
+      }
+    }
+
+    Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int particleNumber = 0;
+        try {
+          particleNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of genParticle meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+
+        auto func = [var, particleNumber](const Particle*) -> double {
+          StoreArray<MCParticle> mcParticles("MCParticles");
+          if (particleNumber >= mcParticles.getEntries())
+          {
+            return -999;
+          }
+
+          MCParticle* mcParticle = mcParticles[particleNumber];
+          Particle part = Particle(mcParticle);
+          return var->function(&part);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function genParticle");
+      }
+    }
+
+    Manager::FunctionPtr genUpsilon4S(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        auto func = [var](const Particle*) -> double {
+          StoreArray<MCParticle> mcParticles("MCParticles");
+          if (mcParticles.getEntries() == 0)
+          {
+            return -999;
+          }
+
+          MCParticle* mcUpsilon4S = mcParticles[0];
+          if (mcUpsilon4S->getPDG() != 300553)
+          {
+            return -999;
+          }
+
+          Particle upsilon4S = Particle(mcUpsilon4S);
+          return var->function(&upsilon4S);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function genUpsilon4S");
       }
     }
 
@@ -1167,6 +1259,10 @@ endloop:
         std::string rankedVariableName = arguments[1];
         std::string returnVariableName = arguments[2];
         std::string extraInfoName = rankedVariableName + "_rank";
+        // 'rank' is correctly scoped, but cppcheck support the lambda
+        // function syntax and throws a (wrong) variableScope error
+
+        // cppcheck-suppress variableScope
         int rank = 1;
         try {
           rank = Belle2::convertString<int>(arguments[3]);
@@ -1326,10 +1422,11 @@ endloop:
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          const MCParticle* mcp = particle->getRelated<MCParticle>();
-          if (!mcp)
+          const MCParticle* mcp = particle->getMCParticle();
+          if (!mcp)   // Has no MC match and is no MCParticle
+          {
             return -999;
-
+          }
           Particle tmpPart(mcp);
           return var->function(&tmpPart);
         };
@@ -1570,11 +1667,21 @@ endloop:
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
                       "[Eventbased] Returns the number of clean Tracks in the event\n"
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
-    REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula,
-                      "Returns the result of the given formula, where v1-v6 are variables.\n"
-                      "Parenthesis MUST be in the form of square brackets: [v1 * v2].\n"
-                      "Currently only supports one level of round parentheses () in variable names,"
-                      " i.e. passesCut(cut) as an input variable will fail if the cut also contains ( or ).");
+    REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula, R"DOCSTRING(
+Returns the result of the given formula, where v1 to vN are variables or floating
+point numbers. Currently the only supported operations are addtion (``+``),
+subtraction (``-``), multiplication (``*``), division (``/``) and power (``^``
+or ``**``). Parenthesis can be in the form of square brackets ``[v1 * v2]``
+or normal brackets ``(v1 * v2)``. It will work also with variables taking
+arguments. Operator precedence is taken into account. For example ::
+
+    (daughter(0, E) + daughter(1, E))**2 - p**2 + 0.138
+
+.. versionchanged:: release-03-00-00
+   now both, ``[]`` and ``()`` can be used for grouping operations, ``**`` can
+   be used for exponent and float literals are possible directly in the
+   formula.
+)DOCSTRING");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
                       "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");
@@ -1630,6 +1737,25 @@ endloop:
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
                       "The meta variable can also be nested: mcMother(mcMother(PDG)).")
+    REGISTER_VARIABLE("genParticle(i, variable)", genParticle,
+                      "[Eventbased] Returns function which returns the variable for the ith generator particle.\n"
+                      "The arguments of the function must be:\n"
+                      "    argument 1: Index of the particle in the MCParticle Array\n"
+                      "    argument 2: Valid basf2 variable name of the function that shall be evaluated.\n"
+                      "If the provided index goes beyond the length of the mcParticles array, -999 will be returned."
+                      "E.g. genParticle(0, p) returns the total momentum of the first MC Particle, which is "
+                      "the Upsilon(4S) in a generic decay.\n"
+                      "     genParticle(0, mcDaughter(1, p) returns the total momentum of the second daughter of "
+                      "the first MC Particle, which is the momentum of the second B meson in a generic decay.");
+    REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S,
+                      "[Eventbased] Returns function which returns the variable evaluated for the generator level"
+                      "Upsilon(4S).\n"
+                      "The argument of the function must be a valid basf2 variable name of the function "
+                      "that shall be evaluated.\n"
+                      "If no generator level Upsilon(4S) exists for the event, -999 will be returned.\n"
+                      "E.g. genUpsilon4S(p) returns the total momentum of the Upsilon(4S) in a generic decay.\n"
+                      "     genUpsilon4S(mcDaughter(1, p) returns the total momentum of the second daughter of "
+                      "the generator level Upsilon(4S), which is the momentum of the second B meson in a generic decay.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
                       "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");
@@ -1652,6 +1778,23 @@ endloop:
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
+                      "Returns the difference in phi between the ECLClusters of two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
+                      "Returns the difference in phi between the two given daughters in the CMS frame.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
+                      "Returns the difference in phi between the ECLClusters of two given daughters in the CMS frame.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
@@ -1666,6 +1809,13 @@ endloop:
                       "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
                       "which is the sum of the first two daughter momenta.\n"
                       "E.g. useLabFrame(daughterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
+    REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
+                      "Returns function which returns the angle between clusters associated to the two daughters."
+                      "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
+                      "If three indices given: returns the angle between the momentum of the third particle's cluster and a vector "
+                      "which is the sum of the first two daughter's cluster momenta."
+                      "Returns nan if any of the daughters specified don't have an associated cluster."
+                      "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
                       "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");

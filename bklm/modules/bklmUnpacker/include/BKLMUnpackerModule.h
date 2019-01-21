@@ -1,33 +1,32 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anselm Vossen                                             *
+ * Contributors: Anselm Vossen                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef BLKMUnpackerModule_H
-#define BLKMUnpackerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dbobjects/BKLMADCThreshold.h>
-#include <rawdata/dataobjects/RawKLM.h>
-
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+
+#include <rawdata/dataobjects/RawKLM.h>
+#include <bklm/dataobjects/BKLMDigit.h>
+#include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <bklm/dataobjects/BKLMDigitRaw.h>
+#include <bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <bklm/dataobjects/BKLMDigitEventInfo.h>
+
 #include <map>
 #include <string>
 #include <iostream>
-
-
 
 namespace Belle2 {
 
@@ -39,15 +38,15 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMUnpackerModule();
     //! Initialize at start of job
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin run stuff
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Unpack one event and create digits
-    virtual void event();
+    virtual void event() override;
     //! end run stuff
-    virtual void endRun();
+    virtual void endRun() override;
     //! Terminate at the end of job
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -91,6 +90,7 @@ namespace Belle2 {
 
     //! the flag to keep the Even packages
     bool m_keepEvenPackages = false;
+
     //!use default module id, if not found in mapping file
     bool m_useDefaultModuleId = false;
 
@@ -122,14 +122,23 @@ namespace Belle2 {
     DBObjPtr<BKLMADCThreshold> m_ADCParams;
 
     //! rawKLM StoreArray
-    StoreArray<RawKLM> rawKLM;
+    StoreArray<RawKLM> m_rawKLMs;
 
     //! BKLMDigit Array
-    StoreArray<BKLMDigit>bklmDigits;
+    StoreArray<BKLMDigit> m_bklmDigits;
+
+    //! BKLMDigitDebug StoreArray
+    StoreArray<BKLMDigitRaw> m_bklmDigitRaws;
+
+    //! BKLMDigitOutOfRange StoreArray
+    StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;
+
+    //! BKLMDigitEventInfo StoreArray
+    StoreArray<BKLMDigitEventInfo> m_bklmDigitEventInfos;
+
+    //! trigger ctime of the previous event
+    unsigned int m_triggerCTimeOfPreviousEvent;
 
   };
 
-
-
 }
-#endif

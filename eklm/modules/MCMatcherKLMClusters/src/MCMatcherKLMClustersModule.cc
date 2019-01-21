@@ -60,6 +60,7 @@ void MCMatcherKLMClustersModule::beginRun()
 void MCMatcherKLMClustersModule::event()
 {
   double weightSum;
+  /* cppcheck-suppress variableScope */
   int i1, i2, i3, i4, i5, i6, n1, n2, n3, n4, n5, n6;
   std::map<MCParticle*, double> mcParticles, mcParticlesHit;
   std::map<MCParticle*, double>::iterator it;

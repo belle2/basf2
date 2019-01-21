@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMFIBERANDELECTRONICS_H
-#define EKLMFIBERANDELECTRONICS_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
@@ -51,6 +50,11 @@ namespace Belle2 {
        * Copy constructor (disabled).
        */
       FiberAndElectronics(const FiberAndElectronics&) = delete;
+
+      /**
+       * Operator = (disabled).
+       */
+      FiberAndElectronics& operator=(const FiberAndElectronics&) = delete;
 
       /**
        * Destructor.
@@ -223,6 +227,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

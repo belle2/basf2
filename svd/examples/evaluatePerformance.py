@@ -57,8 +57,8 @@ add_tracking_reconstruction(
 
 
 tag = "_Y4S_jitter10ns_wBKG_noROI_MCTF.root"
-clseval = register_module('SVDClusterEvaluation')
-clseval.param('outputFileName', "ClusterEvaluation" + str(tag))
+clseval = register_module('SVDClusterEvaluationTrueInfo')
+clseval.param('outputFileName', "ClusterEvaluationTrueInfo" + str(tag))
 main.add_module(clseval)
 
 svdperf = register_module('SVDPerformance')

@@ -66,6 +66,15 @@ namespace Belle2 {
     void printFEElectronics();
 
     /**
+     * Import edep-to-adc params. to the data base.
+     */
+    void importEDepToADC(std::string fileName);
+    /**
+     * Get edep-to-adc params. from the database and print.
+     */
+    void printEDepToADC();
+
+    /**
      * Import t0 table to the data base.
      */
     void importTimeZero(std::string fileName);
@@ -140,6 +149,16 @@ namespace Belle2 {
      * print it.
      */
     void printSigma();
+
+    /**
+     * Import fudge factor table to the database.
+     */
+    void importFFactor(std::string fileName);
+    /**
+     * Get the fudge factor table from the database and
+     * print it.
+     */
+    void printFFactor();
 
     /**
      * Import displacement of wire position to the database.

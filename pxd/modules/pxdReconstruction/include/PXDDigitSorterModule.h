@@ -34,9 +34,9 @@ namespace Belle2 {
       PXDDigitSorterModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the sorting */
-      virtual void event();
+      virtual void event() override;
 
     private:
       /** Utility function to check pixel coordinates */

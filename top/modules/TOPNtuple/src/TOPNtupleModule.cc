@@ -66,7 +66,7 @@ namespace Belle2 {
   void TOPNtupleModule::initialize()
   {
 
-    m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
+    m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
       return;

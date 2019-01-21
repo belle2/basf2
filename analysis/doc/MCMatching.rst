@@ -83,8 +83,9 @@ You can also make use of ``MCMatching::explainFlags()``` which prints a human-re
 If instead only binary decision (1 = signal, 0 = background) is needed, then it for convenience one can use ``isSignal`` (or ``isSignalAcceptMissingNeutrino`` for semileptonic decays).
 
 .. code-block:: python
-
-        ntupleTools = ['CustomFloats[isSignal]', '^X -> ^Y Z']
+        
+        from modularAnalysis import variablesToNtuple
+        variablesToNtuple("X:mycandidates -> Y Z", variables = ["isSignal"] + other_interesting_variables)
         
 assuming you have reconstructed :code:`X -> Y Z` :
 
@@ -98,7 +99,6 @@ MC decay finder module `MCDecayFinder`
 --------------------------------------
 
 Analysis module to search for a given decay in the list of generated particles (MCParticle).
-See more at `confluence page <https://confluence.desy.de/display/BI/Physics+MCDecayFinder>`_.
 
 The module can be used for:
 
@@ -111,10 +111,10 @@ Steering file snippet
  
 .. code-block:: python
 
-  from basf2 import *
+  import basf2
   
   # Create main path
-  main = create_path()
+  main = basf2.create_path()
   
   # Modules to generate events, etc.
   ...
@@ -141,7 +141,7 @@ Skipping of intermediate states in decay chain not supported yet, e.g. $B \to \p
 MC decay string
 ---------------
 
-See more at `confluence page <https://confluence.desy.de/display/BI/Physics+MCDecayString#PhysicsMCDecayString-Status>`
+See more at `confluence page <https://confluence.desy.de/display/BI/Physics+MCDecayString#PhysicsMCDecayString-Status>`_
 
 Analysis module to search for a generator-level decay string for given particle.
 
@@ -157,7 +157,7 @@ Using decay hashes
 
 The use of decay hashes is demonstrated in :code:`B2A502-WriteOutDecayHash.py` and :code:`B2A503-ReadDecayHash.py`.
 
-B2A502-WriteOutDecayHash.py creates one ROOT file, via variablesToNtuple containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes, and the full decay string.  The decay strings can be related to the candidates that they are associated with by matching up the decay hashes.  An example of this using python is shown in B2A503-ReadDecayHash.py.
+B2A502-WriteOutDecayHash.py creates one ROOT file, via `variablesToNtuple` containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes, and the full decay string.  The decay strings can be related to the candidates that they are associated with by matching up the decay hashes.  An example of this using python is shown in B2A503-ReadDecayHash.py.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Including the NtupleTool
@@ -167,7 +167,7 @@ To use the MCDecayString as an NtupleTool, it is necessary to include the module
 
 .. code-block:: python
 
-  analysis_main.add_module('ParticleMCDecayString', listName='D*+')
+  main.add_module('ParticleMCDecayString', listName='D*+')
 
 The NtupleTool can then be added, as follows:
 
@@ -223,7 +223,7 @@ The decay string format is rather long, and it is possible to use a shorter form
 
 .. code-block:: python
 
-  analysis_main.add_module('ParticleMCDecayString', listName='D*+', conciseString = True)
+  path.add_module('ParticleMCDecayString', listName='D*+', conciseString = True)
 
 The concise string has the following format:
 
@@ -252,7 +252,7 @@ To run ParticleMCDecayString and include information in the NtupleFile created f
 
 .. code-block:: python
 
-  analysis_main.add_module('ParticleMCDecayString', listName='my_particle_list', fileName='my_hashmap.root')
+  path.add_module('ParticleMCDecayString', listName='my_particle_list', fileName='my_hashmap.root')
 
 This will produce a file with all of the decay strings in it, along with the decayHash (hashes the MC decay string of the mother particle) and decayHashExtended (hashes the decay string of the mother and daughter particles).  The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 

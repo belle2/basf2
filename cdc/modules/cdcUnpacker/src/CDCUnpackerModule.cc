@@ -200,7 +200,6 @@ void CDCUnpackerModule::event()
         }
 
         const int c_headearWords = 3;
-
         if (nWord < c_headearWords) {
           if (m_enablePrintOut == true) {
             B2WARNING("CDCUnpacker : No CDC block header.");
@@ -221,9 +220,10 @@ void CDCUnpackerModule::event()
 
 
         if (dataLength != (nWord - c_headearWords)) {
-          B2ERROR("Inconsistent data size between COPPER and CDC FEE.");
-          B2ERROR("data length " << dataLength << " nWord " << nWord);
-          B2ERROR("CDCUnpacker : Node ID " << iNode << ", Finness ID " << iFiness);
+          B2ERROR("Inconsistent data size between COPPER and CDC FEE."
+                  << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+                  << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
+
           continue;
         }
         if (m_enablePrintOut == true) {
@@ -365,8 +365,8 @@ void CDCUnpackerModule::event()
 
             if (!((length == 4) || (length == 5))) {
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
-              B2ERROR("CDCUnpacker : length " << length << " words.");
-              B2ERROR("board= " << board << " ch= " << ch);
+              B2ERROR("CDCUnpacker : length " << LogVar("data length", length) << " words.");
+              B2ERROR("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
               it += length;
               break;
             }
@@ -430,14 +430,14 @@ void CDCUnpackerModule::event()
                 }
 
               } else {
-                B2WARNING("Undefined board id is fired: " << board << " " << ch);
+                B2WARNING("Undefined board id is fired: " << LogVar("board id", board) << " " << LogVar("channel", ch));
               }
             }
             it += static_cast<int>(length);
           }
 
         } else {
-          B2WARNING("CDCUnpacker :  Undefined CDC Data Block : Block #  " << i);
+          B2WARNING("CDCUnpacker :  Undefined CDC Data Block : Block #  " << LogVar("block id", i));
         }
       }
     }
@@ -495,7 +495,7 @@ void CDCUnpackerModule::loadMap()
     std::string fileName = FileSystem::findFile(m_xmlMapFileName);
     std::cout << fileName << std::endl;
     if (fileName == "") {
-      B2ERROR("CDC unpacker can't find a filename: " << fileName);
+      B2ERROR("CDC unpacker can't find a filename: " << LogVar("file name", fileName));
       exit(1);
     }
 

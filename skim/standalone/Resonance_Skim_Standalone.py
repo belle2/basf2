@@ -9,42 +9,43 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
+from stdCharged import stdPi, stdK, stdMu, stdPr
 from stdPi0s import *
 from stdPhotons import *
 from skimExpertFunctions import *
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-02-00-00'
+gb2_setuprel = 'release-03-00-00'
 
-import sys
-import os
-import glob
-
+syspath = Path()
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
-inputMdstList('MC9', fileList)
+inputMdstList('MC9', fileList, path=syspath)
 
 argvs = sys.argv
 argc = len(argvs)
 
-loadStdCharged()
-stdPi0s('looseFit')
+stdPi('loose', path=syspath)
+stdK('loose', path=syspath)
+stdMu('loose', path=syspath)
+stdPr('loose', path=syspath)
+stdPi0s('looseFit', path=syspath)
 
 
 skimCode = encodeSkimName('Resonance')
 
-from Resonance_List import *
-ResonanceList = ResonanceList()
-if 'Validation' in argvs and argc > 2:
-    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), ResonanceList)
-else:
-    skimOutputUdst(skimCode, ResonanceList)
+from skim.systematics import *
+ResonanceList = ResonanceList(path=syspath)
 
-summaryOfLists(ResonanceList)
+
+if 'Validation' in argvs and argc > 2:
+    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), ResonanceList, path=syspath)
+else:
+    skimOutputUdst(skimCode, ResonanceList, path=syspath)
+summaryOfLists(ResonanceList, path=syspath)
 
 if 'Validation' in argvs:
     if argc > 2:
@@ -111,7 +112,7 @@ if 'Validation' in argvs:
     ntupleTree('vpho', 'vpho:resonance0', toolsv)
 
 
-setSkimLogging()
-process(analysis_main)
+setSkimLogging(path=syspath)
+process(syspath)
 
 print(statistics)

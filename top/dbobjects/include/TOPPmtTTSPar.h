@@ -48,7 +48,7 @@ namespace Belle2 {
      * Full constructor
      * @param serialNumber serial number
      */
-    TOPPmtTTSPar(const std::string& serialNumber):
+    explicit TOPPmtTTSPar(const std::string& serialNumber):
       m_serialNumber(serialNumber)
     {}
 
@@ -62,7 +62,8 @@ namespace Belle2 {
     {
       pmtPixel--;
       if (pmtPixel >= c_NumPmtPixels) {
-        B2ERROR("TOPPmtTTSPar::appendGaussian: invalid PMT pixel " << pmtPixel + 1);
+        B2ERROR("TOPPmtTTSPar::appendGaussian: invalid PMT pixel "
+                << LogVar("PMT pixel", pmtPixel + 1));
         return;
       }
       m_gaussians[pmtPixel].push_back(gaus);
@@ -107,8 +108,9 @@ namespace Belle2 {
     {
       pmtPixel--;
       if (pmtPixel >= c_NumPmtPixels) {
-        B2ERROR("TOPPmtTTSPar::getGaussians: invalid PMT pixel " << pmtPixel + 1
-                << ". Returning data for pixel 1");
+        B2ERROR("TOPPmtTTSPar::getGaussians: invalid PMT pixel. "
+                "Returning data for pixel 1."
+                << LogVar("PMT pixel", pmtPixel + 1));
         pmtPixel = 0;
       }
       return m_gaussians[pmtPixel];

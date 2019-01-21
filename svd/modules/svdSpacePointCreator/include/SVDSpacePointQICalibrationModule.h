@@ -39,15 +39,15 @@ namespace Belle2 {
     *
     * prepares histograms and storeArrays.
     */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
     /** event */
-    virtual void event();
+    virtual void event() override;
 
 
     /** final output  */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
 

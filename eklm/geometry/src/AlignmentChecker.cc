@@ -52,7 +52,7 @@ EKLM::AlignmentChecker::AlignmentChecker(bool printOverlaps) :
       new Polygon2D*[m_GeoDat->getNSegments() + 1];
     for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
          iSegmentSupport++)
-      m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] = NULL;
+      m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] = nullptr;
   }
 }
 
@@ -67,7 +67,7 @@ EKLM::AlignmentChecker::~AlignmentChecker()
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
     for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
          iSegmentSupport++) {
-      if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] != NULL)
+      if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] != nullptr)
         delete m_SegmentSupport[iPlane - 1][iSegmentSupport - 1];
     }
     delete[] m_SegmentSupport[iPlane - 1];
@@ -122,7 +122,7 @@ checkSectorAlignment(int endcap, int layer, int sector,
                              CLHEP::rad / Unit::rad) * t;
       for (j = 0; j < 4; j++)
         supportRectangle[j] = t * supportRectangle[j];
-      if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] != NULL)
+      if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] != nullptr)
         delete m_SegmentSupport[iPlane - 1][iSegmentSupport - 1];
       m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] =
         new Polygon2D(supportRectangle, 4);
@@ -134,41 +134,46 @@ checkSectorAlignment(int endcap, int layer, int sector,
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_LineCorner1)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", corner 1.");
+          B2ERROR("Segment support overlaps with corner 1."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_ArcOuter)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", outer arc.");
+          B2ERROR("Segment support overlaps with outer arc."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_Line23)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", line 2-3.");
+          B2ERROR("Segment support overlaps with line 2-3."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_ArcInner)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", inner arc.");
+          B2ERROR("Segment support overlaps with inner arc."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
             *m_Line41)) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << "): segment support " <<
-                  iSegmentSupport << ", line 4-1.");
+          B2ERROR("Segment support overlaps with line 4-1."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector)
+                  << LogVar("Segment support", iSegmentSupport));
         return false;
       }
     }
@@ -189,11 +194,12 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
                       const EKLMAlignmentData* segmentAlignment,
                       bool calledFromSectorCheck) const
 {
+  /* cppcheck-suppress variableScope */
   int i, j, iStrip;
+  /* cppcheck-suppress variableScope */
   double lx, ly;
   HepGeom::Point3D<double> stripRectangle[4];
   HepGeom::Transform3D t;
-  const EKLMGeometry::ElementPosition* stripPosition;
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
   if (!calledFromSectorCheck) {
@@ -203,7 +209,8 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
   ly = 0.5 * stripGeometry->getWidth();
   for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
     iStrip = m_GeoDat->getNStripsSegment() * (segment - 1) + i;
-    stripPosition = m_GeoDat->getStripPosition(iStrip);
+    const EKLMGeometry::ElementPosition* stripPosition =
+      m_GeoDat->getStripPosition(iStrip);
     lx = 0.5 * stripPosition->getLength();
     stripRectangle[0].setX(lx);
     stripRectangle[0].setY(ly);
@@ -236,46 +243,58 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
     Polygon2D stripPolygon(stripRectangle, 4);
     if (stripPolygon.hasIntersection(*m_LineCorner1)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", corner 1.");
+        B2ERROR("Strip overlaps with corner 1."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
       return false;
     }
     if (stripPolygon.hasIntersection(*m_ArcOuter)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", outer arc.");
+        B2ERROR("Strip overlaps with outer arc."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
+      B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
+              ", sector " << sector << ", plane " << plane <<
+              "): strip " << iStrip << ", outer arc.");
       return false;
     }
     if (stripPolygon.hasIntersection(*m_Line23)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", line 2-3.");
+        B2ERROR("Strip overlaps with line 2-3."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
       return false;
     }
     if (stripPolygon.hasIntersection(*m_ArcInner)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", inner arc.");
+        B2ERROR("Strip overlaps with inner arc."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
+      B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
+              ", sector " << sector << ", plane " << plane <<
+              "): strip " << iStrip << ", inner arc.");
       return false;
     }
     if (stripPolygon.hasIntersection(*m_Line41)) {
       if (m_PrintOverlaps)
-        B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                ", sector " << sector << ", plane " << plane <<
-                "): strip " << iStrip << ", line 4-1.");
+        B2ERROR("Strip overlaps with line 4-1."
+                << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                << LogVar("Sector", sector) << LogVar("Plane", plane)
+                << LogVar("Strip", iStrip));
       return false;
     }
     for (j = 0; j <= m_GeoDat->getNSegments(); j++) {
       if (stripPolygon.hasIntersection(*m_SegmentSupport[plane - 1][j])) {
         if (m_PrintOverlaps)
-          B2ERROR("Overlap (endcap " << endcap << ", layer " << layer <<
-                  ", sector " << sector << ", plane " << plane <<
-                  "): strip " << iStrip <<
-                  ", segment support" << j + 1 << ".");
+          B2ERROR("Strip overlaps with segment support."
+                  << LogVar("Endcap", endcap) << LogVar("Layer", layer)
+                  << LogVar("Sector", sector) << LogVar("Plane", plane)
+                  << LogVar("Strip", iStrip)
+                  << LogVar("Segment support", j + 1));
         return false;
       }
     }
@@ -294,7 +313,7 @@ bool EKLM::AlignmentChecker::checkAlignment(
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
         sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
         sectorAlignment = alignment->getSectorAlignment(sector);
-        if (sectorAlignment == NULL)
+        if (sectorAlignment == nullptr)
           B2FATAL("Incomplete alignment data.");
         if (!checkSectorAlignment(iEndcap, iLayer, iSector, sectorAlignment))
           return false;
@@ -303,7 +322,7 @@ bool EKLM::AlignmentChecker::checkAlignment(
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
             segmentAlignment = alignment->getSegmentAlignment(segment);
-            if (segmentAlignment == NULL)
+            if (segmentAlignment == nullptr)
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iEndcap, iLayer, iSector, iPlane,
                                        iSegment, sectorAlignment,

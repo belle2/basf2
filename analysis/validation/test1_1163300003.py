@@ -25,13 +25,6 @@ from beamparameters import add_beamparameters
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-gb2_setuprel = "build-2017-09-08"
-
-# reset_database()
-use_local_database('/cvmfs/belle.cern.ch/conditions/GT_gen_prod_003.01_Master-20170721-132500-FEI-skim-a.txt', readonly=True)
-
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
 
 # their names in the ntuple are human readable
 from variables import variables
@@ -90,13 +83,6 @@ variables.addAlias('d1_d0_M', 'daughter(1,daughter(0,InvM))')
 variables.addAlias('d0_M', 'daughter(0,InvM)')
 variables.addAlias('d1_M', 'daughter(1,InvM)')
 
-variables.addAlias('d0_d0_costheta', 'daughter(0,daughter(0,cosTheta))')
-variables.addAlias('d0_costheta', 'daughter(0,cosTheta)')
-variables.addAlias('d0_costhetaCMS', 'daughter(0,useCMSFrame(cosTheta))')
-variables.addAlias('d0_d0_costhetaCMS', 'daughter(0,daughter(0,useCMSFrame(cosTheta)))')
-variables.addAlias('d0_d1_costhetaCMS', 'daughter(0,daughter(1,useCMSFrame(cosTheta)))')
-variables.addAlias('d1_costheta', 'daughter(1,cosTheta)')
-
 variables.addAlias('d0_d0_E', 'daughter(0,daughter(0,E))')
 variables.addAlias('d0_d1_E', 'daughter(0,daughter(1,E))')
 variables.addAlias('d0_E', 'daughter(0,E)')
@@ -116,42 +102,21 @@ variables.addAlias('d1_deltaE', 'daughter(1,deltaE)')
 variables.addAlias('d1_Mbc', 'daughter(1,Mbc)')
 
 
-# PDG ID
-variables.addAlias('d0_PDG', 'daughter(0,PDG)')
-variables.addAlias('d1_PDG', 'daughter(1,PDG)')
-variables.addAlias('d2_PDG', 'daughter(2,PDG)')
-variables.addAlias('d3_PDG', 'daughter(3,PDG)')
-variables.addAlias('d0_d0_PDG', 'daughter(0,daughter(0,PDG))')
-variables.addAlias('d0_d1_PDG', 'daughter(0,daughter(1,PDG))')
-variables.addAlias('d0_d2_PDG', 'daughter(0,daughter(2,PDG))')
-variables.addAlias('d0_d3_PDG', 'daughter(0,daughter(3,PDG))')
-variables.addAlias('d0_d1_d0_PDG', 'daughter(0,daughter(1,daughter(0,PDG)))')
-variables.addAlias('d0_d1_d1_PDG', 'daughter(0,daughter(1,daughter(1,PDG)))')
-variables.addAlias('d0_d0_d2_PDG', 'daughter(0,daughter(0,daughter(2,PDG)))')
-variables.addAlias('d0_d0_d3_PDG', 'daughter(0,daughter(0,daughter(3,PDG)))')
-
-
-variables.addAlias('d0_mcPDG', 'daughter(0,mcPDG)')
-variables.addAlias('d1_mcPDG', 'daughter(1,mcPDG)')
-variables.addAlias('d1_d0_mcPDG', 'daughter(1,daughter(0,mcPDG))')
-variables.addAlias('d0_d0_mcPDG', 'daughter(0,daughter(0,mcPDG))')
-variables.addAlias('d0_d1_mcPDG', 'daughter(0,daughter(1,mcPDG))')
-
-
 outputRootFile = '../1163300003.ntup.root'
 
 
 path = create_path()
 
-import fei
-particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
-feistate = fei.get_path(particles, configuration)
-path.add_path(feistate.path)
-
 
 fileList = ['../1163300003.dst.root']
 inputMdstList('default', fileList)
+
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+import fei
+particles = fei.get_default_channels()
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
+feistate = fei.get_path(particles, configuration)
+analysis_main.add_path(feistate.path)
 
 # execute path and return back to the analysis_main
 # the skim condition is TRUE for all events
@@ -238,9 +203,9 @@ appendROEMasks('Upsilon(4S):BslBsig0', [ROEclusters, ROETracks])
 
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
-variables.addAlias('ROE_mcMissFlagsSel', 'ROE_mcMissFlags(ROEclusters)')
+variables.addAlias('ROE_mcMissFlagsSel', 'ROE_MC_MissFlags(ROEclusters)')
 variables.addAlias('ROE_chargeSel', 'ROE_charge(ROEclusters)')
-variables.addAlias('nAllROETracks', 'nROETracks(ROETracks)')
+variables.addAlias('nAllROETracks', 'nROE_Tracks(ROETracks)')
 variables.addAlias('nROEECLClustersSel', 'nROEECLClusters(ROEclusters)')
 variables.addAlias('nROENeutralECLClustersSel', 'nROENeutralECLClusters(ROEclusters)')
 
@@ -293,9 +258,9 @@ tools4SB0Had += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BhadBsig0 -> ^B0:gen
 tools4SB0Had += ['CustomFloats[d0_E:d0_eCMS:d1_E:d1_eCMS:d1_d0_E:d1_d0_eCMS:d0_d0_E:d0_d0_eCMS:d0_d1_E:d0_d1_eCMS]',
                  'Upsilon(4S):BhadBsig0 ->  B0:genericRank ^anti-B0:all']
 
-tools4SB0Had += ['CustomFloats[missPx(ROEclusters,0):missPy(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
-tools4SB0Had += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
-tools4SB0Had += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
+tools4SB0Had += ['CustomFloats[WE_MissPx(ROEclusters,0):WE_MissPy(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[WE_MissPz(ROEclusters,0):WE_MissP(ROEclusters,0)]', '^Upsilon(4S):BhadBsig0']
+tools4SB0Had += ['CustomFloats[WE_MissPTheta(ROEclusters,0):WE_MissE(ROEclusters,0):m2RecoilSignalSide:WE_MissM2(ROEclusters,0)]',
                  '^Upsilon(4S):BhadBsig0']
 tools4SB0Had += ['CustomFloats[d0_M:d1_M:d0_d0_M:d0_d1_M:d1_d0_M]', 'Upsilon(4S):BhadBsig0 ->  B0:genericRank ^anti-B0:all']
 tools4SB0Had += ['CustomFloats[d0_p:d0_pCMS:d1_p:d1_pCMS:d0_d0_p:d0_d0_pCMS:d0_d1_p:d0_d1_pCMS:d1_d0_pCMS:d1_d0_p]',
@@ -325,8 +290,8 @@ tools4SB0SL += ['CustomFloats[cosThetaBetweenParticleAndNominalB:R2EventLevel:R2
 tools4SB0SL += ['CustomFloats[sigProb:rank]', 'Upsilon(4S):BslBsig0 -> ^B0:semileptonicRank anti-B0:all']
 
 
-tools4SB0SL += ['CustomFloats[missPz(ROEclusters,0):missP(ROEclusters,0)]', '^Upsilon(4S):BslBsig0']
-tools4SB0SL += ['CustomFloats[missPTheta(ROEclusters,0):missE(ROEclusters,0):m2RecoilSignalSide:missM2(ROEclusters,0)]',
+tools4SB0SL += ['CustomFloats[WE_MissPz(ROEclusters,0):WE_MissP(ROEclusters,0)]', '^Upsilon(4S):BslBsig0']
+tools4SB0SL += ['CustomFloats[WE_MissPTheta(ROEclusters,0):WE_MissE(ROEclusters,0):m2RecoilSignalSide:WE_MissM2(ROEclusters,0)]',
                 '^Upsilon(4S):BslBsig0']
 tools4SB0SL += ['CustomFloats[d0_E:d0_eCMS:d1_E:d1_eCMS:d1_d0_E:d1_d0_eCMS:d0_d0_E:d0_d0_eCMS:d0_d1_E:d0_d1_eCMS]',
                 'Upsilon(4S):BslBsig0 ->  B0:semileptonicRank ^anti-B0:all']

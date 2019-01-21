@@ -21,15 +21,16 @@ namespace Belle2 {
 
     ChannelMapper::ChannelMapper()
     {
+      static_assert(c_numRows * c_numColumns == c_numAsics * c_numChannels,
+                    "TOP::ChannelMapper: bug in coding (enum) - "
+                    "number of channels and number of pixels disagree");
+
       for (auto& channels : m_channels) {
         for (auto& channel : channels) channel = 0;
       }
       for (auto& pixels : m_pixels) {
         for (auto& pixel : pixels) pixel = 0;
       }
-      if (c_numRows * c_numColumns != c_numAsics * c_numChannels)
-        B2FATAL("TOP::ChannelMapper: bug in coding (enum) - "
-                "number of channels and number of pixels disagree");
     }
 
 
@@ -53,8 +54,8 @@ namespace Belle2 {
       } else if (m_typeName == "IRSX") {
         m_type = c_IRSX;
       } else {
-        B2ERROR("TOP::ChannelMapper: unknown electronic type '" << m_typeName
-                << "'");
+        B2ERROR("TOP::ChannelMapper: unknown electronic type."
+                << LogVar("type", m_typeName));
       }
 
       // get parameters from Gearbox
@@ -88,33 +89,57 @@ namespace Belle2 {
         unsigned asic = map.getASICNumber();
         unsigned chan = map.getASICChannel();
         if (row >= c_numRows) {
-          B2ERROR("TOP::ChannelMapper: pixel row out of range, node=" << ii
-                  << ": " << row << " " << col << " " << asic << " " << chan);
+          B2ERROR("TOP::ChannelMapper: pixel row out of range."
+                  << LogVar("node", ii)
+                  << LogVar("row", row)
+                  << LogVar("column", col)
+                  << LogVar("ASIC", asic)
+                  << LogVar("channel", chan));
           ok = false;
         }
         if (col >= c_numColumns) {
-          B2ERROR("TOP::ChannelMapper: pixel column out of range, node=" << ii
-                  << ": " << row << " " << col << " " << asic << " " << chan);
+          B2ERROR("TOP::ChannelMapper: pixel column out of range."
+                  << LogVar("node", ii)
+                  << LogVar("row", row)
+                  << LogVar("column", col)
+                  << LogVar("ASIC", asic)
+                  << LogVar("channel", chan));
           ok = false;
         }
         if (asic >= c_numAsics) {
-          B2ERROR("TOP::ChannelMapper: asic number out of range, node=" << ii
-                  << ": " << row << " " << col << " " << asic << " " << chan);
+          B2ERROR("TOP::ChannelMapper: ASIC number out of range."
+                  << LogVar("node", ii)
+                  << LogVar("row", row)
+                  << LogVar("column", col)
+                  << LogVar("ASIC", asic)
+                  << LogVar("channel", chan));
           ok = false;
         }
         if (chan >= c_numChannels) {
-          B2ERROR("TOP::ChannelMapper: asic channel number out of range, node=" << ii
-                  << ": " << row << " " << col << " " << asic << " " << chan);
+          B2ERROR("TOP::ChannelMapper: ASIC channel number out of range."
+                  << LogVar("node", ii)
+                  << LogVar("row", row)
+                  << LogVar("column", col)
+                  << LogVar("ASIC", asic)
+                  << LogVar("channel", chan));
           ok = false;
         }
         if (!pixels.insert(col + row * c_numColumns).second) {
-          B2ERROR("TOP::ChannelMapper: pixel already mapped, node=" << ii
-                  << ": " << row << " " << col << " " << asic << " " << chan);
+          B2ERROR("TOP::ChannelMapper: pixel already mapped."
+                  << LogVar("node", ii)
+                  << LogVar("row", row)
+                  << LogVar("column", col)
+                  << LogVar("ASIC", asic)
+                  << LogVar("channel", chan));
           ok = false;
         }
         if (!channels.insert(chan + asic * c_numChannels).second) {
-          B2ERROR("TOP::ChannelMapper: channel already mapped, node=" << ii
-                  << ": " << row << " " << col << " " << asic << " " << chan);
+          B2ERROR("TOP::ChannelMapper: channel already mapped."
+                  << LogVar("node", ii)
+                  << LogVar("row", row)
+                  << LogVar("column", col)
+                  << LogVar("ASIC", asic)
+                  << LogVar("channel", chan));
           ok = false;
         }
       }
@@ -192,7 +217,8 @@ namespace Belle2 {
 
       const auto& map = m_channels[row][col];
       if (!map) {
-        B2WARNING("TOP::ChannelMapper: no channel mapped to pixel " << pixel);
+        B2WARNING("TOP::ChannelMapper: no channel mapped to pixel. Return invalid channel."
+                  << LogVar("pixelID", pixel));
         return c_invalidChannel;
       }
       unsigned asic = map->getASICNumber();
@@ -230,7 +256,8 @@ namespace Belle2 {
 
       const auto& map = m_pixels[asic][chan];
       if (!map) {
-        B2ERROR("TOP::ChannelMapper: no pixel mapped to channel " << channel);
+        B2ERROR("TOP::ChannelMapper: no pixel mapped to channel. Return invalid pixel."
+                << LogVar("channel", channel));
         return c_invalidPixelID;
       }
       unsigned row = map->getRow();

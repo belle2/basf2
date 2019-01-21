@@ -125,7 +125,12 @@ def plot_pidEfficiency(pid, sample, vs='P', isExpertMode=False, detector=""):
 
     s.tree.Project(hist['total'].GetName(), f"{track}_{vs}", cuts)
     s.tree.Project(hist['passed'].GetName(), f"{track}_{vs}", selection)
-    h = TEfficiency(hist['passed'], hist['total'])
+    eff = TEfficiency(hist['passed'], hist['total'])
+    canv = ROOT.TCanvas()
+    canv.cd()
+    eff.Draw()
+    canv.Update()
+    h = eff.GetPaintedGraph()  # TEfficiency itself stores only original histograms, the graph object is created only after drawing
     h.SetName(f"{pid}_{pidString}_efficiency_vs_{vs}")
     h.SetTitle(f"{pid} {pidString} efficiency vs {vs} ({pidcut:.2f} PID cut);\
               {axisName};\
@@ -175,10 +180,10 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
             s.tree.GetEntries(selection) / total
         )
         h.GetXaxis().SetBinLabel(bin + 1, pid)
-        h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
-        h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
-        h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
-        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
+    h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
+    h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
+    h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
+    h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
     outputFile.WriteTObject(h)
     # printout(h)
 

@@ -31,10 +31,12 @@ class TestTreeFits(unittest.TestCase):
         reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
         matchMCTruth('B0:rec', path=main)
 
+        conf = 0.1
         main.add_module('TreeFitter',
                         particleList='B0:rec',
-                        confidenceLevel=-1,
+                        confidenceLevel=conf,
                         massConstraintList=[],
+                        massConstraintListParticlename=[],
                         expertUseReferencing=True,
                         ipConstraint=True,
                         updateAllDaughters=True)
@@ -58,6 +60,8 @@ class TestTreeFits(unittest.TestCase):
         truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
         falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
 
+        mustBeZero = ntuple.GetEntries("(chiProb < {})".format(conf))
+
         print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
         print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
 
@@ -66,8 +70,7 @@ class TestTreeFits(unittest.TestCase):
         self.assertFalse(falsePositives == 0, "No background survived the fit. This is weird.")
 
         self.assertTrue(truePositives > (allSig / 2.), "More than 50% of signal did not survived the fit.")
-
-        self.assertFalse(allBkg == falsePositives, "All background candidates survived the fit.")
+        self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")
 

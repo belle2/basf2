@@ -14,7 +14,7 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dataobjects/WireID.h>
 #include <framework/database/DBObjPtr.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TLine.h>
 #include <TCanvas.h>
 #include <iostream>
@@ -85,7 +85,7 @@ namespace Belle2 {
     /**
      * Wire gain algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
 
   private:

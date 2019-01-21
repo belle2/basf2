@@ -33,8 +33,8 @@ namespace TreeFitter {
                bool forceFitAll = false,
                const bool ipConstraint = false,
                const bool customOrigin = false,
-               const std::vector<double> customOriginVertex = {0, 0, 0},
-               const std::vector<double> customOriginCovariance = {0, 0, 0, 0, 0, 0, 0, 0, 0,}
+               const std::vector<double>& customOriginVertex = {0, 0, 0},
+               const std::vector<double>& customOriginCovariance = {0, 0, 0, 0, 0, 0, 0, 0, 0,}
               );
 
     /**  destructor   */

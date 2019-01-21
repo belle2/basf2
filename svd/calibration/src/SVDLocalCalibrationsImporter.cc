@@ -1,4 +1,4 @@
-/**************************************************************************
+/*****************************************************svd/scripts/dbImporters/SVDCalibrationsImporter.py*********************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
@@ -79,9 +79,9 @@ void SVDLocalCalibrationsImporter::importSVDGlobalXMLFile(const std::string& fil
 {
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun, m_lastExperiment, m_lastRun);
-  const std::string filename = FileSystem::findFile(fileName); //phase 3 xmlMapping
-  B2INFO("Importing the svd online -> offline map " << fileName << "\n");
-  //  const std::string filename = FileSystem::findFile("testbeam/vxd/data/2017_svd_mapping.xml");
+  const std::string filename = FileSystem::findFile(fileName);
+  B2INFO("Importing the global run configuration xml file " << fileName << "\n");
+
   const std::string payloadname = "SVDGlobalXMLFile.xml";
   if (Database::Instance().addPayload(payloadname, filename, iov))
     B2INFO("Success!");

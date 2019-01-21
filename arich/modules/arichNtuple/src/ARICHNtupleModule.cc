@@ -82,6 +82,7 @@ namespace Belle2 {
 
     m_tree->Branch("evt", &m_arich.evt, "evt/I");
     m_tree->Branch("run", &m_arich.run, "run/I");
+    m_tree->Branch("exp", &m_arich.exp, "exp/I");
 
     m_tree->Branch("charge", &m_arich.charge, "charge/S");
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
@@ -170,6 +171,10 @@ namespace Belle2 {
       if (lkh->getFlag() != 1) continue;
 
       m_arich.clear();
+
+      m_arich.evt = evtMetaData->getEvent();
+      m_arich.run = evtMetaData->getRun();
+      m_arich.exp = evtMetaData->getExperiment();
 
       // set hapd window hit if available
       if (arichTrack.hitsWindow()) {

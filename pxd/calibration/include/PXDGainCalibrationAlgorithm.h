@@ -53,10 +53,10 @@ namespace Belle2 {
     double CalculateMedian(std::vector<double>& signals);
 
     /// Calculate MPC from signal vector using a landau fit.
-    double FitLandau(std::vector<double>& signals, const char* histname);
+    double FitLandau(std::vector<double>& signals);
 
     /// Retrive charge median value from pulled in data base payload
-    double GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
+    double GetChargeFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
   };
 } // namespace Belle2
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/calibration/PXDMedianChargeCalibrationAlgorithm.h>
+#include <pxd/calibration/PXDChargeCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDClusterChargeMapPar.h>
 
 #include <string>
@@ -26,13 +26,15 @@
 //ROOT
 #include <TRandom.h>
 #include <TH1I.h>
+#include <TF1.h>
+
 
 using namespace std;
 using boost::format;
 using namespace Belle2;
 
 
-// Anonymous namespace for data objects used by PXDMedianChargeCalibrationAlgorithm class
+// Anonymous namespace for data objects used by PXDChargeCalibrationAlgorithm class
 namespace {
 
   /** Signal in ADU of collected clusters */
@@ -95,22 +97,22 @@ namespace {
 }
 
 
-PXDMedianChargeCalibrationAlgorithm::PXDMedianChargeCalibrationAlgorithm():
+PXDChargeCalibrationAlgorithm::PXDChargeCalibrationAlgorithm():
   CalibrationAlgorithm("PXDClusterChargeCollector"),
-  minClusters(5000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false)
+  minClusters(5000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(false), strategy(0)
 {
   setDescription(
-    " -------------------------- PXDMedianChargeCalibrationAlgorithm -------------------------------\n"
+    " ------------------------------ PXDChargeCalibrationAlgorithm -----------------------------------\n"
     "                                                                                               \n"
-    "  Algorithm for estimating pxd median cluster charges for different position on sensor in ADU  \n"
-    " ----------------------------------------------------------------------------------------------\n"
+    "  Algorithm for estimating pxd median/MPV cluster charges for different position on sensor in ADU \n"
+    " ------------------------------------------------------------------------------------------------\n"
   );
 }
 
 
 
 
-CalibrationAlgorithm::EResult PXDMedianChargeCalibrationAlgorithm::calibrate()
+CalibrationAlgorithm::EResult PXDChargeCalibrationAlgorithm::calibrate()
 {
 
   // Get counter histogram
@@ -166,10 +168,10 @@ CalibrationAlgorithm::EResult PXDMedianChargeCalibrationAlgorithm::calibrate()
     if (numberOfDataHits >= minClusters) {
 
       // Compute the median cluster charge for the part of PXD
-      auto medianCharge = EstimateMedianCharge(sensorID, uBin, vBin);
+      auto Charge = EstimateCharge(sensorID, uBin, vBin);
 
       // Store the charge
-      chargeMapPar->setContent(sensorID.getID(), uBin, vBin, medianCharge);
+      chargeMapPar->setContent(sensorID.getID(), uBin, vBin, Charge);
     } else {
       B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
                 "). Use default value.");
@@ -185,7 +187,7 @@ CalibrationAlgorithm::EResult PXDMedianChargeCalibrationAlgorithm::calibrate()
 }
 
 
-double PXDMedianChargeCalibrationAlgorithm::EstimateMedianCharge(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+double PXDChargeCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigned short uBin, unsigned short vBin)
 {
 
   // Construct a tree name for requested part of PXD
@@ -209,12 +211,16 @@ double PXDMedianChargeCalibrationAlgorithm::EstimateMedianCharge(VxdID sensorID,
     double noise = gRandom->Gaus(0.0, noiseSigma);
     signals.push_back(m_signal + noise);
   }
-
-  return CalculateMedian(signals);
+  if (strategy == 0) return CalculateMedian(signals);
+  if (strategy == 1) return FitLandau(signals);
+  else {
+    B2ERROR("strategy unavailable, use 0 for medians or 1 for landau fit!");
+    return 1.0;
+  }
 }
 
 
-double PXDMedianChargeCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
+double PXDChargeCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 {
   auto size = signals.size();
 
@@ -230,3 +236,42 @@ double PXDMedianChargeCalibrationAlgorithm::CalculateMedian(vector<double>& sign
   }
 }
 
+double PXDChargeCalibrationAlgorithm::FitLandau(vector<double>& signals)
+{
+  auto size = signals.size();
+
+  // get max and min values of vector
+  int max = *max_element(signals.begin(), signals.end());
+  int min = *min_element(signals.begin(), signals.end());
+
+
+  // create histogram to hold signals
+  TH1D* hist_signals = new TH1D("", "", max - min, min, max);
+  // create fit function
+  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
+  landau->SetParNames("MPV", "sigma", "scale");
+  landau->SetParameters(100, 1, 1000);
+  // fill histrogram
+  for (auto it = signals.begin(); it != signals.end(); ++it) {
+    hist_signals->Fill(*it);
+  }
+
+  if (size == 0) {
+    return 1.0; // Undefined, really.
+  } else {
+    // restrict fit range to exclude low charge peak
+    Int_t status = hist_signals->Fit("landau", "Lq", "", 30, 350);
+    double MPV = landau->GetParameter("MPV");
+
+    delete hist_signals;
+    delete landau;
+
+    // check fit status
+    if (status == 0) return MPV;
+
+    else {
+      B2WARNING("Fit failed! using default value.");
+      return 1.0;
+    }
+  }
+}

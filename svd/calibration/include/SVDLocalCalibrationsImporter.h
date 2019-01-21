@@ -63,11 +63,27 @@ namespace Belle2 {
     /**
      * This method import to the database the global configuration xml file
      * used during data taking
+     */
+
+    void importSVDGlobalXMLFile(const std::string& fileName = std::string("svd/data/global.xml"));
+
+    /**
+     * This method import to the database the global configuration parameters
+     * used during data taking
      * @param xmlFileName is the file name of the xml file
      * @param errorTollerant if true bypasses sanity checks
      */
 
-    void importSVDGlobalXMLFile(const std::string& fileName = std::string("svd/data/global.xml"));
+    void importSVDGlobalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant = false);
+
+    /**
+     * This method import to the database the local configuration parameters
+     * used during data taking
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+
+    void importSVDLocalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant = false);
 
     /**
      * This method import to the database the strip

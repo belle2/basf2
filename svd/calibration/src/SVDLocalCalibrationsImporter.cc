@@ -37,6 +37,8 @@
 #include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
+
+#include <svd/calibration/SVDDetectorConfiguration.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -87,6 +89,50 @@ void SVDLocalCalibrationsImporter::importSVDGlobalXMLFile(const std::string& fil
     B2INFO("Success!");
   else
     B2INFO("Failure :( ua uaa uaa uaa uaaaa)");
+}
+
+
+void importSVDGlobalConfigParametersFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  // This is the property tree
+  ptree pt;
+
+  // Load the XML file into the property tree. If reading fails
+  // (cannot open file, parse error), an exception is thrown.
+  read_xml(xmlFileName, pt);
+
+
+  for (ptree::value_type const& cfgDocumentChild :
+       pt.get_child("cfg_document")) {
+
+    if (cfgDocumentChild.first == "noise_run") {
+      std::cout << "Masking bitmap is an attribute of the node <noise_run>!" << endl;
+      int  maskFilter = cfgDocumentChild.second.get<int>("<xmlattr>.mask") ;
+      std::cout << " masking bitmap    = " << maskFilter << endl;
+
+    }
+    if (cfgDocumentChild.first == "hardware_run") {
+      std::cout << "Zero suppression is an attribute of the node <hardware_run>!" << endl;
+      float  zeroSuppression = cfgDocumentChild.second.get<int>("<xmlattr>.zs_cut") ;
+      std::cout << " zero suppression cut    = " << zeroSuppression << endl;
+
+    }
+
+    if (cfgDocumentChild.first == "i2c") {
+      std::cout << "Latency is an attribute of the node <i2c>!" << endl;
+      float  latency = cfgDocumentChild.second.get<int>("<xmlattr>.lat") ;
+      std::cout << " latency  = " << latency << endl;
+
+    }
+  }
+
+
+}
+
+void importSVDLocalConfigParametersFromXML(const std::string& xmlfileName, bool errorTollerant)
+{
+
+
 }
 
 

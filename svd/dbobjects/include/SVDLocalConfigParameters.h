@@ -40,9 +40,19 @@ namespace Belle2 {
      * Returns the time units in which the peak time of the pulse
      * shape is provided.
      * @param none
-     * @return float corresponding to time units [Accelerator RFC]
+     * @return float corresponding to calibration time units [Accelerator RFC converted in ns]
      */
-    float getTimeUnits(void) const { return m_timeUnits; };
+    float getCalibrationTimeUnitsInNs(void) const
+    {
+      float rfcToNs =
+        2; /** the conversion for accelerator radio frequency counst to ns is temporarly hardcoded. IT should be also read from the DB. */
+      TString aux(m_calibrationTimeUnits);
+      aux = aux.Remove(aux.First(" "), aux.Sizeof());
+
+      std::string auxString(aux);
+      int calibrationTimeCoeff = std::atoi(auxString.c_str());
+      return calibrationTimeCoeff * rfcToNs ;
+    }
 
     /**
      * Returns the time stamp date_hour (yyyymmdd_hhmm) of the current calibration     * @param none
@@ -53,7 +63,7 @@ namespace Belle2 {
     /**
      * Set the injected charge
      * Input:
-     * @param float
+     * @param std::string [e]
      *
      */
     void setInjectedCharge(float injectedCharge)
@@ -64,12 +74,12 @@ namespace Belle2 {
     /**
      * Set the time units
      * Input:
-     * @param float
+     * @param std::string coeff+ [RFC]
      *
      */
-    void setTimeUnits(float timeUnits)
+    void setCalibrationTimeUnits(std::string calibrationTimeUnits)
     {
-      m_timeUnits = timeUnits;
+      m_calibrationTimeUnits = calibrationTimeUnits;
     }
 
     /**
@@ -92,7 +102,7 @@ namespace Belle2 {
 
     /** Time units of the measured pulse shape peak time expressed in accelerator RFC
      */
-    float m_timeUnits;
+    std::string m_calibrationTimeUnits;
 
     /** time stamp with date and hour(yyyymmdd_hhmm) of when the local runs for the current calibration have been taken
      */

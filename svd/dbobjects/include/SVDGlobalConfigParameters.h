@@ -56,6 +56,26 @@ namespace Belle2 {
      */
     int getMaskFilter(void) const { return m_maskFilter; };
 
+    /**
+     * Returns the masking bitmap used to mask the strips at FADC level (only for CM-section)
+     * @param none
+     * @return flaot corresponding to the APV clock units in [ns]
+     */
+    float getAPVClockUnitsInNs(void) const
+    {
+
+      float rfcToNs =
+        2; /** the conversion for accelerator radio frequency counst to ns is temporarly hardcoded. IT should be also read from the DB. */
+      TString aux(m_APVClockUnits);
+      aux = aux.Remove(aux.First(" "), aux.Sizeof());
+      //    std::cout << "aux = " << aux <<endl;
+      std::string auxString(aux);
+      int APVClockUnitsCoeff = std::atoi(auxString.c_str());
+      //    std::cout<<"time units coefficient = " << timeUnitsCoeff<<endl;
+
+      return APVClockUnitsCoeff * rfcToNs;
+    }
+
 
 
     /**
@@ -92,6 +112,17 @@ namespace Belle2 {
       m_maskFilter = maskFilter;
     }
 
+    /**
+     * Set the APV Clock units
+     * Input:
+     * @param std::string coeff + units [RFC]
+     *
+     */
+    void setAPVClockUnits(std::string APVClockUnits)
+    {
+      m_APVClockUnits = APVClockUnits;
+    }
+
 
   private:
 
@@ -107,6 +138,10 @@ namespace Belle2 {
      */
     int m_maskFilter;
 
+    /** APVclock units
+     *
+     */
+    std::string m_APVClockUnits;
 
     ClassDef(SVDGlobalConfigParameters, 1);
 

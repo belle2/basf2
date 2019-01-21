@@ -86,9 +86,9 @@ namespace Belle2 {
      *
      * Output: float corresponding to the time units [RFC]
      */
-    float getTimeUnits()
+    float getCalibrationTimeUnitsInNs()
     {
-      return m_svdLocalConfig_aDBObjPtr->getTimeUnits();
+      return m_svdLocalConfig_aDBObjPtr->getCalibrationTimeUnitsInNs();
     }
 
 
@@ -146,6 +146,19 @@ namespace Belle2 {
     }
 
 
+    /** GLOBAL CONFIGURATION PARAMETERS:
+     * Return the APV clock units [ns] in term of accelerator RFC converted to ns
+     *
+     * Input:none
+     *
+     * Output: float corresponding to the APV Clock units [ns]
+     */
+    float getAPVClockUnitsInNs()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->getAPVClockUnitsInNs();
+    }
+
+
     /** returns the unique ID of the payload */
     //    TString getUniqueID() { return m_svdLocalConfig_aDBObjPtr->get_uniqueID(); }
 
@@ -164,4 +177,3 @@ namespace Belle2 {
 
   };
 }
-

@@ -117,13 +117,12 @@ void BestCandidateSelectionModule::event()
     }
     if (first_candidate) {
       first_candidate = false;
-      previous_val = candidate.first;
+    } else {
+      if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
     }
 
     p->addExtraInfo(extraInfoName, rank);
     m_inputList->addParticle(p);
-
-    if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
 
     previous_val = candidate.first;
 

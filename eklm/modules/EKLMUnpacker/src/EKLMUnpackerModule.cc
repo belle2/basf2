@@ -218,7 +218,6 @@ void EKLMUnpackerModule::event()
           eklmDigit = m_Digits.appendNew();
           eklmDigit->addRelationTo(eklmDigitEventInfo);
           eklmDigit->setCTime(ctime);
-          eklmDigit->setTriggerCTime(triggerCTime);
           eklmDigit->setTDC(tdc);
           eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
           eklmDigit->setEndcap(endcap);

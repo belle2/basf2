@@ -72,28 +72,28 @@ void BestCandidateSelectionModule::event()
     return;
   }
 
-  // what is the criteria for "best"? sometimes variables can be NaN
-  std::function<bool(double, double)> betterThan = [](double a, double b) -> bool {
-    if (std::isnan(a)) return false;
-    if (std::isnan(b)) return true;
-    return a > b;
+  typedef std::pair<double, unsigned int> ValueIndexPair;
+  auto betterThan = [this](const ValueIndexPair & a, const ValueIndexPair & b) -> bool {
+    // always sory NaN to the high ranks: it's never a good thing to have nan in front
+    if (std::isnan(a.first)) return false;
+    if (std::isnan(b.first)) return true;
+    if (m_selectLowest)
+      return a.first < b.first;
+    else
+      return a.first > b.first;
   };
-  if (m_selectLowest) {
-    betterThan = [](double a, double b) -> bool {
-      if (std::isnan(a)) return false;
-      if (std::isnan(b)) return true;
-      return a < b;
-    };
-  }
 
   // create list of particle index and the corresponding value of variable
-  std::multimap<double, unsigned int, decltype(betterThan)> valueToIndex(betterThan);
+  std::vector<ValueIndexPair> valueToIndex;
   const unsigned int numParticles = m_inputList->getListSize();
-  for (unsigned int i = 0; i < numParticles; i++) {
-    const Particle* p = m_inputList->getParticle(i);
-    double value = m_variable->function(p);
-    valueToIndex.insert(std::make_pair(value, p->getArrayIndex()));
+  valueToIndex.reserve(numParticles);
+  for (const Particle& p : *m_inputList) {
+    double value = m_variable->function(&p);
+    valueToIndex.emplace_back(value, p.getArrayIndex());
   }
+  // Use stable sort to make sure we keep the relative order of elements with
+  // same value as it was before
+  std::stable_sort(valueToIndex.begin(), valueToIndex.end(), betterThan);
 
   std::string extraInfoName;
   if (m_outputVariableName.empty()) {
@@ -105,9 +105,9 @@ void BestCandidateSelectionModule::event()
 
   // assign ranks and (optionally) remove everything but best candidates
   m_inputList->clear();
-  int rank = 1;
-  double previous_val = std::nan("0");
-  bool first_candidate = true;
+  int rank{1};
+  double previous_val{0};
+  bool first_candidate{true};
   for (const auto& candidate : valueToIndex) {
     Particle* p = particles[candidate.second];
     if (!m_cut->check(p)) {

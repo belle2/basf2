@@ -27,12 +27,14 @@ if len(sys.argv) > 1:
 gROOT.ProcessLine('struct TreeStruct {\
    int run;       /* run number */ \
    float offset;  /* current bunch offset */ \
-   int usedTrk; /* number of tracks used for bunch reconstruction */ \
+   int usedTrk;   /* number of tracks used for bunch reconstruction */ \
    int slot;      /* slot ID */ \
    float p;       /* extHit momentum */ \
-   float cth;     /* extHit cos(theta) */ \
+   float cth;     /* extHit local cos(theta) (global must be pretty much the same) */ \
+   float phi;     /* extHit local phi */ \
    float z;       /* extHit local z */ \
-   float x;       /* extHit x */ \
+   float x;       /* extHit local x */ \
+   int charge;    /* particle charge */ \
    int channel ;  /* channel */ \
    int pixel ;    /* pixel ID */ \
    float time;    /* photon time */ \
@@ -70,6 +72,27 @@ class Ntuple(Module):
 
         #: file object
         self.file = ROOT.TFile(outName, 'recreate')
+        #: histogram of bunch offset
+        self.bunchOffset = TH1F("bunchOffset", "bunch offset", 100, -1.0, 1.0)
+        self.bunchOffset.SetXTitle("bunch offset [ns]")
+        #: histogram of momentum
+        self.h_momentum = TH1F("momentum", "momentum", 100, 0.0, 10.0)
+        self.h_momentum.SetXTitle("p [GeV/c]")
+        #: histogram of cos(theta)
+        self.h_cth = TH1F("cos_theta", "local cos(theta)", 100, -1.0, 1.0)
+        self.h_cth.SetXTitle("cos #theta")
+        #: histogram of local phi
+        self.h_phi = TH1F("local_phi", "local phi", 100, -math.pi, math.pi)
+        self.h_phi.SetXTitle("local #phi")
+        #: histogram of local z
+        self.h_z = TH1F("local_z", "local z", 100, -140.0, 140.0)
+        self.h_z.SetXTitle("local z [cm]")
+        #: histogram of local x
+        self.h_x = TH1F("local_x", "local x", 100, -23.0, 23.0)
+        self.h_x.SetXTitle("local x [cm]")
+        #: histogram of charge
+        self.h_charge = TH1F("charge", "charge", 3, -1.5, 1.5)
+        self.h_charge.SetXTitle("charge")
         #: tree object
         self.tree = ROOT.TTree('tree', '')
         #: data structure
@@ -113,6 +136,7 @@ class Ntuple(Module):
             return
         if not recBunch.isReconstructed():
             return
+        self.bunchOffset.Fill(recBunch.getCurrentOffset())
 
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
         self.data.run = evtMetaData.getRun()
@@ -128,8 +152,21 @@ class Ntuple(Module):
             position = pdfs.getAssociatedLocalHit()
             self.data.p = momentum.Mag()
             self.data.cth = momentum.CosTheta()
+            self.data.phi = momentum.Phi()
             self.data.z = position.Z()
             self.data.x = position.X()
+            try:
+                tfit = track.getTrackFitResultWithClosestMass(Belle2.Const.muon)
+                self.data.charge = tfit.getChargeSign()
+            except:
+                B2ERROR("No trackFitResult available")
+                continue
+            self.h_momentum.Fill(self.data.p)
+            self.h_cth.Fill(self.data.cth)
+            self.h_phi.Fill(self.data.phi)
+            self.h_z.Fill(self.data.z)
+            self.h_x.Fill(self.data.x)
+            self.h_charge.Fill(self.data.charge)
             try:
                 pdf = pdfs.getHypothesisPDF(13)
             except:

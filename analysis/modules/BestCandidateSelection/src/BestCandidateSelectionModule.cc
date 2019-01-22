@@ -3,7 +3,7 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Pulvermacher                                   *
+ * Contributors: Christian Pulvermacher, Martin Ritter                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -61,6 +61,12 @@ void BestCandidateSelectionModule::initialize()
     B2ERROR("value of numBest must be >= 0!");
   }
   m_cut = Variable::Cut::compile(m_cutParameter);
+
+  // parse the name that the rank will be stored under
+  if (m_outputVariableName.empty()) {
+    std::string root_compatible_VariableName = makeROOTCompatible(m_variableName);
+    m_outputVariableName = root_compatible_VariableName + "_rank";
+  }
 }
 
 void BestCandidateSelectionModule::event()
@@ -72,9 +78,10 @@ void BestCandidateSelectionModule::event()
     return;
   }
 
+  // define the criteria for "best"
   typedef std::pair<double, unsigned int> ValueIndexPair;
   auto betterThan = [this](const ValueIndexPair & a, const ValueIndexPair & b) -> bool {
-    // always sory NaN to the high ranks: it's never a good thing to have nan in front
+    // always sort NaN to the high ranks: it's never a good thing to have nan in front
     if (std::isnan(a.first)) return false;
     if (std::isnan(b.first)) return true;
     if (m_selectLowest)
@@ -91,17 +98,10 @@ void BestCandidateSelectionModule::event()
     double value = m_variable->function(&p);
     valueToIndex.emplace_back(value, p.getArrayIndex());
   }
-  // Use stable sort to make sure we keep the relative order of elements with
+
+  // use stable sort to make sure we keep the relative order of elements with
   // same value as it was before
   std::stable_sort(valueToIndex.begin(), valueToIndex.end(), betterThan);
-
-  std::string extraInfoName;
-  if (m_outputVariableName.empty()) {
-    std::string root_compatible_VariableName = makeROOTCompatible(m_variableName);
-    extraInfoName = root_compatible_VariableName + "_rank";
-  } else {
-    extraInfoName = m_outputVariableName;
-  }
 
   // assign ranks and (optionally) remove everything but best candidates
   m_inputList->clear();
@@ -111,7 +111,7 @@ void BestCandidateSelectionModule::event()
   for (const auto& candidate : valueToIndex) {
     Particle* p = particles[candidate.second];
     if (!m_cut->check(p)) {
-      p->addExtraInfo(extraInfoName, -1);
+      p->addExtraInfo(m_outputVariableName, -1);
       m_inputList->addParticle(p);
       continue;
     }
@@ -121,7 +121,7 @@ void BestCandidateSelectionModule::event()
       if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
     }
 
-    p->addExtraInfo(extraInfoName, rank);
+    p->addExtraInfo(m_outputVariableName, rank);
     m_inputList->addParticle(p);
 
     previous_val = candidate.first;

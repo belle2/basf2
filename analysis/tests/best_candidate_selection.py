@@ -53,6 +53,10 @@ class RankChecker(basf2.Module):
             for n in names:
                 einfo[n].append(p.getExtraInfo(n))
 
+        # check the default name is set correctly if we don't specify an output variable
+        print(list(einfo.keys()))
+        assert 'M_rank' in einfo.keys(), "Default name is not as expected"
+
         # Now determine the correct ranks if multiple values are allowed:
         # create a dictionary which will be value -> rank for all unique values
         # in theory we just need loop over the sorted(set(values)) but we have
@@ -98,6 +102,7 @@ path.add_module(Generator())
 # load these electrons
 anal.fillParticleListFromMC("e-", "", path=path)
 # and sort them ...
+anal.rankByHighest("e-", "M", path=path)
 anal.rankByHighest("e-", "px", allowMultiRank=False, outputVariable="px_high_single", path=path)
 anal.rankByHighest("e-", "px", allowMultiRank=True, outputVariable="px_high_multi", path=path)
 anal.rankByLowest("e-", "py", allowMultiRank=False, outputVariable="py_low_single", path=path)

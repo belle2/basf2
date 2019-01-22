@@ -48,6 +48,14 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
   B2INFO("minEntries = " << m_minEntries);
   B2INFO("payloadName = " << m_payloadName);
   B2INFO("storeConst = " << m_storeConst);
+  if (m_payloadName == "ECLeedPhiData" or m_payloadName == "ECLeedPhiMC" or m_payloadName == "None") {
+    B2INFO("fracLo = " << m_fracLo);
+    B2INFO("fracHiSym = " << m_fracHiSym);
+    B2INFO("fracHiASym = " << m_fracHiASym);
+    B2INFO("nsigLo = " << m_nsigLo);
+    B2INFO("nsigHiSym = " << m_nsigHiSym);
+    B2INFO("nsigHiASym = " << m_nsigHiASym);
+  }
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Histograms containing the data collected by eclee5x5CollectorModule */
@@ -81,14 +89,9 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       AverageInitCalib->SetBinContent(cellID, InitialCalibvsCrys->GetBinContent(cellID) / TotEntries);
     }
 
-    float entries = EntriesvsCrys->GetBinContent(cellID);
-    if (entries > 5.5) {
-      TH1D* En = EnVsCrysID->ProjectionY("En", cellID, cellID);
-      float meanEn = En->GetMean();
-      float stdDevEn = En->GetStdDev();
-      meanEnvsCrysID->SetBinContent(cellID, meanEn);
-      meanEnvsCrysID->SetBinError(cellID, stdDevEn);
-    }
+    TH1D* En = EnVsCrysID->ProjectionY("En", cellID, cellID);
+    meanEnvsCrysID->SetBinContent(cellID, En->GetMean());
+    meanEnvsCrysID->SetBinError(cellID, En->GetStdDev());
   }
 
   /**-----------------------------------------------------------------------------------------------*/
@@ -128,6 +131,12 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
     }
   }
 
+
+  /**-----------------------------------------------------------------------------------------------*/
+  /** need crystal per ring for the dPhi payloads */
+  m_eclNeighbours5x5 = new ECL::ECLNeighbours("N", 2);
+
+
   /**-----------------------------------------------------------------------------------------------*/
   /** Ready to find new calibration constants */
   bool foundConst = false;
@@ -145,7 +154,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       float mean = meanEnvsCrysID->GetBinContent(cellID);
       float stdDev = meanEnvsCrysID->GetBinError(cellID);
       float inputE = AverageExpECrys->GetBinContent(cellID);
-      if (mean > 0.) {
+      if (mean > 0. and stdDev > 0.) {
         ExpEnergyperCrys->SetBinContent(cellID, mean * abs(inputE));
         ExpEnergyperCrys->SetBinError(cellID, stdDev * abs(inputE));
       } else {
@@ -237,14 +246,6 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
     /** Obtain new values for dPhi* selection, either data or mc */
   } else if (m_payloadName == "ECLeedPhiData" or m_payloadName == "ECLeedPhiMC") {
 
-    //..Parameters to control fits and cut ranges
-    double fracLo = 0.2; /** start fit where data is > fraclo*peak */
-    double fracHiSym = 0.2; /** end fit where data is > fracHiSym*peak */
-    double fracHiASym = 0.4; /** or fracHiASym*peak, at low values of thetaID */
-    double nsigLo = 2.5; /** dPhi region is mean - nsigLo*sigma */
-    double nsigHiSym = 2.5; /** to mean + nsigHiSym*sigma */
-    double nsigHiASym = 2.0; /** or mean+nsigHiASym*sigma at low thetaID */
-
     //..Find mean and sigma of Gaussian fit to ThetaID projections with sufficient statistics
     float dPhiCenter[69] = {};
     float dPhiHalfWidth[69] = {};
@@ -253,32 +254,44 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
     const int nbins = dPhivsThetaID->GetNbinsX();
     for (int ib = 1; ib <= nbins; ib++) {
       TH1D* proj = dPhivsThetaID->ProjectionY("proj", ib, ib);
-      if (proj->GetEntries() < 100) {continue;}
+      if (proj->Integral() < 100) {continue;}
       int thetaID = (int)dPhivsThetaID->GetXaxis()->GetBinCenter(ib);
       if (firstID == 0) { firstID = thetaID; }
       lastID = thetaID;
 
       //..Find the fit limits
-      double fracHi = fracHiSym;
-      double nsigHi = nsigHiSym;
-      if (thetaID <= 4) {
-        fracHi = fracHiASym;
-        nsigHi = nsigHiASym;
+      double fracHi = m_fracHiSym;
+      double nsigHi = m_nsigHiSym;
+      if (thetaID <= m_lastLoThetaID) {
+        fracHi = m_fracHiASym;
+        nsigHi = m_nsigHiASym;
       }
 
-      //..Fit range is from where the histogram drops below fracLo*peak to fracHi*peak
+      //..Fit range includes all bins with entries>m_fracLo*peak on the low side of the
+      //  peak, and entries>m_fracHi*peak on the high side.
+      //  i.e. low edge of bin on low side, high edge on high side = low edge of bin+1
       double peak = proj->GetMaximum();
-      int bin = 1;
+      int nPhiBins = proj->GetNbinsX();
+      int binLo = 1;
       do  {
-        bin++;
-      } while (proj->GetBinContent(bin) < fracLo * peak);
-      double xfitLo = proj->GetBinLowEdge(bin - 1);
+        binLo++;
+      } while (proj->GetBinContent(binLo) < m_fracLo * peak and binLo < nPhiBins);
+      double xfitLo = proj->GetBinLowEdge(binLo);
 
-      bin = proj->GetXaxis()->FindBin(175.1);
+      //..Start search for the upper edge of the fit range at 175 deg to avoid gamma gamma
+      // and e gamma peaks
+      int binHi = proj->GetXaxis()->FindBin(175.01);
       do {
-        bin--;
-      } while (proj->GetBinContent(bin) < fracHi * peak);
-      double xfitHi = proj->GetBinLowEdge(bin + 2);
+        binHi--;
+      } while (proj->GetBinContent(binHi)<fracHi* peak and binHi>1);
+      double xfitHi = proj->GetBinLowEdge(binHi + 1);
+
+      //..Check that the fit region is sensible
+      int peakBin = proj->GetMaximumBin();
+      if (binLo >= peakBin or binHi <= peakBin) {
+        B2ERROR("Flawed dPhi fit range for thetaID = " << thetaID << " peakBin = " << peakBin << " binLo = " << binLo << "binHi = " <<
+                binHi);
+      }
 
       //..Now fit a Gaussian to the selected region
       proj->Fit("gaus", "", "", xfitLo, xfitHi);
@@ -287,7 +300,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       TF1* fitGaus = proj->GetFunction("gaus");
       float mean = fitGaus->GetParameter(1);
       float sigma = fitGaus->GetParameter(2);
-      float dPhiLo = mean - nsigLo * sigma;
+      float dPhiLo = mean - m_nsigLo * sigma;
       float dPhiHi = mean + nsigHi * sigma;
       dPhiCenter[thetaID] = 0.5 * (dPhiLo + dPhiHi); /** not equal to mean at low thetaID */
       dPhiHalfWidth[thetaID] = 0.5 * (dPhiHi - dPhiLo);
@@ -303,15 +316,16 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       dPhiHalfWidth[thetaID] = dPhiHalfWidth[lastID];
     }
 
-    //..Now copy these to each crystal to generate the payload and fill the output histogram
-    const short m_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 96, 96, 96, 96, 96, 64, 64, 64};
+    //..Now copy these to each crystal to generate the payload and fill the output histogram.
+    //  We will use ECLNeighours to get the number of crystals in each theta ring
+    m_eclNeighbours5x5 = new ECL::ECLNeighbours("N", 2);
     std::vector<float> tempCalib;
     std::vector<float> tempCalibWidth;
     tempCalib.resize(8736);
     tempCalibWidth.resize(8736);
     int crysID = 0;
     for (int thetaID = 0; thetaID < 69; thetaID++) {
-      for (int ic = 0; ic < m_crystalsPerRing[thetaID]; ic++) {
+      for (int ic = 0; ic < m_eclNeighbours5x5->getCrystalsPerRing(thetaID); ic++) {
         tempCalib.at(crysID) = dPhiCenter[thetaID];
         tempCalibWidth.at(crysID) = dPhiHalfWidth[thetaID];
         dPhiperCrys->SetBinContent(crysID + 1, dPhiCenter[thetaID]);

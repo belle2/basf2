@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Lueck                                             *
+ * Contributors: Giulia Casarosa & Luigi Corona                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,7 +22,7 @@
 
 namespace Belle2 {
   /**
-   * generates a new StoreArray from the input StoreArray which has all specified ShaperDigits removed
+   * generates two new StoreArray from the input StoreArray. One contains all ShaperDigits related to Tracks and the other contains all SahperDigits not related to tracks
    *
    *
    */
@@ -61,11 +61,16 @@ namespace Belle2 {
     std::string m_recotrack;
     std::string m_track;
 
+    bool m_inheritance;
+
     std::string m_outputINArrayName;  /**< StoreArray with the selected output shaperdigits*/
     std::string m_outputOUTArrayName;  /**< StoreArray with the NOT selected output shaperdigits */
 
     SelectSubset<SVDShaperDigit> m_selectedShaperDigits; /** all shaperdigits */
     SelectSubset<SVDShaperDigit> m_notSelectedShaperDigits; /** all shaperdigits from tracks */
+
+    static bool isRelatedToTrack(const SVDShaperDigit* shaperdigit); /** select the shaperdigits related to tracks **/
+
   };
 }
 

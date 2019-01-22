@@ -33,9 +33,14 @@ void KLMTimeConversion::setTimeOffset(double offset)
   m_TimeOffset = offset;
 }
 
-double KLMTimeConversion::getTimeByTDC(uint16_t tdc) const
+double KLMTimeConversion::getTime(int ctime, int tdc, int triggerCTime) const
 {
-  return m_TDCPeriod * tdc + m_TimeOffset;
+  int relativeCTime;
+  if (ctime < triggerCTime)
+    relativeCTime = ctime - triggerCTime;
+  else
+    relativeCTime = ctime - triggerCTime - 0x10000;
+  return relativeCTime;
 }
 
 uint16_t KLMTimeConversion::getTDCByTime(double time) const

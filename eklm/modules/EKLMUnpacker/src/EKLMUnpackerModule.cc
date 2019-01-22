@@ -219,7 +219,8 @@ void EKLMUnpackerModule::event()
           eklmDigit->addRelationTo(eklmDigitEventInfo);
           eklmDigit->setCTime(ctime);
           eklmDigit->setTDC(tdc);
-          eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
+          eklmDigit->setTime(
+            m_TimeConversion->getTime(ctime, tdc, triggerCTime));
           eklmDigit->setEndcap(endcap);
           eklmDigit->setLayer(layer);
           eklmDigit->setSector(sector);

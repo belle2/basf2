@@ -584,7 +584,7 @@ namespace Belle2 {
           if (!bkgAdded) {
             for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
               std::vector<double> pars = {momentum / sqrt(p_mass[iHyp]*p_mass[iHyp] + momentum * momentum), double(arichTrack.hitsWindow())};
-              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_all[0], pars);
+              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_all[1], pars);
             }
             bkgAdded = true;
           }

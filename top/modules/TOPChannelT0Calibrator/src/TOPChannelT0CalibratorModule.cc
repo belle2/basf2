@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <top/modules/TOPCommonT0Calibrator/TOPCommonT0CalibratorModule.h>
+#include <top/modules/TOPChannelT0Calibrator/TOPChannelT0CalibratorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
@@ -29,6 +29,7 @@
 // root
 #include <TRandom.h>
 
+
 using namespace std;
 
 namespace Belle2 {
@@ -38,17 +39,20 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCommonT0Calibrator)
+  REG_MODULE(TOPChannelT0Calibrator)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPCommonT0CalibratorModule::TOPCommonT0CalibratorModule() : Module()
+  TOPChannelT0CalibratorModule::TOPChannelT0CalibratorModule() : Module()
 
   {
     // set module description
-    setDescription("Common T0 calibration with dimuons or bhabhas.");
+    setDescription("Alternative channel T0 calibration with dimuons or bhabhas. "
+                   "This module can also be used to check the calibration "
+                   "(channel, module and common T0).\n"
+                   "Note: after this kind of calibration one cannot do the alignment.");
     //    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -77,17 +81,17 @@ namespace Belle2 {
              "Root output file name containing calibration results. "
              "File name can include *'s; "
              "they will be replaced with a run number from the first input file",
-             std::string("commonT0_r*.root"));
+             std::string("calibrationT0_r*.root"));
     addParam("pdfOption", m_pdfOption,
              "PDF option, one of 'rough', 'fine', 'optimal'", std::string("rough"));
 
   }
 
-  TOPCommonT0CalibratorModule::~TOPCommonT0CalibratorModule()
+  TOPChannelT0CalibratorModule::~TOPChannelT0CalibratorModule()
   {
   }
 
-  void TOPCommonT0CalibratorModule::initialize()
+  void TOPChannelT0CalibratorModule::initialize()
   {
     // input collections
     m_digits.isRequired();
@@ -116,11 +120,15 @@ namespace Belle2 {
     m_selector.setCutOnPOCA(m_dr, m_dz);
     m_selector.setCutOnLocalZ(m_minZ, m_maxZ);
 
-    // Chi2 minimum finders
+    // minimum finders
     double tmin = -m_timeRange / 2;
     double tmax =  m_timeRange / 2;
-    for (unsigned i = 0; i < c_numSets; i++) {
-      m_finders[i] = Chi2MinimumFinder1D(m_numBins, tmin, tmax);
+    for (unsigned i = 0; i < 2; i++) {
+      for (unsigned m = 0; m < c_numModules; m++) {
+        for (unsigned c = 0; c < c_numChannels; c++) {
+          m_finders[i][m][c] = Chi2MinimumFinder1D(m_numBins, tmin, tmax);
+        }
+      }
     }
 
     // if file name includes *'s replace them with a run number
@@ -142,18 +150,31 @@ namespace Belle2 {
       return;
     }
 
-    // control histograms
-    m_hits1D = TH1F("numHits", "Number of photons per slot",
-                    c_numModules, 0.5, c_numModules + 0.5);
-    m_hits1D.SetXTitle("slot number");
-    m_hits1D.SetYTitle("hits per slot");
+    // histograms
+    for (unsigned module = 0; module < c_numModules; module++) {
+      int moduleID = module + 1;
 
-    m_hits2D = TH2F("timeHits", "Photon times vs. boardstacks",
-                    c_numModules * 4, 0.5, c_numModules + 0.5, 200, 0.0, 20.0);
-    m_hits2D.SetXTitle("slot number");
-    m_hits2D.SetYTitle("time [ns]");
+      std::string slotNum = std::to_string(moduleID);
+      if (moduleID < 10) slotNum = "0" + slotNum;
+
+      std::string name = "numHits_slot" + slotNum;
+      std::string title = "Number of hits per channel for slot " + slotNum;
+      TH1F h1(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels);
+      h1.SetXTitle("channel number");
+      h1.SetYTitle("hits per channel");
+      m_hits1D.push_back(h1);
+
+      name = "timeHits_slot" + slotNum;
+      title = "hit time vs. channel for slot " + slotNum;
+      TH2F h2(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels,
+              200, 0.0, 20.0);
+      h2.SetXTitle("channel number");
+      h2.SetYTitle("time [ns]");
+      m_hits2D.push_back(h2);
+    }
 
     // create output tree
+
     m_tree = new TTree("tree", "Channel T0 calibration results");
     m_tree->Branch("slot", &m_moduleID);
     m_tree->Branch("numPhotons", &m_numPhotons);
@@ -173,11 +194,11 @@ namespace Belle2 {
 
   }
 
-  void TOPCommonT0CalibratorModule::beginRun()
+  void TOPChannelT0CalibratorModule::beginRun()
   {
   }
 
-  void TOPCommonT0CalibratorModule::event()
+  void TOPChannelT0CalibratorModule::event()
   {
     /* check bunch reconstruction status and run alignment:
        - if object exists and bunch is found (collision data w/ bunch finder in the path)
@@ -197,6 +218,8 @@ namespace Belle2 {
     const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
     double timeMin = tdc.getTimeMin();
     double timeMax = tdc.getTimeMax();
+
+    const auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
 
     // add photon hits to reconstruction object
 
@@ -221,12 +244,20 @@ namespace Belle2 {
       if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
 
       // minimization procedure: accumulate
-      int sub = gRandom->Integer(c_numSets); // generate sub-sample number
-      auto& finder = m_finders[sub];
-      const auto& binCenters = finder.getBinCenters();
+      const unsigned module = trk.getModuleID() - 1;
+      if (module >= c_numModules) continue;
+      int sub = gRandom->Integer(2); // generate sub-sample number
+      auto& finders = m_finders[sub][module];
+      const auto& binCenters = finders[0].getBinCenters();
       for (unsigned ibin = 0; ibin < binCenters.size(); ibin++) {
         double t0 = binCenters[ibin];
-        finder.add(ibin, -2 * reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear));
+        std::vector<float> logL;
+        logL.resize(c_numChannels, 0);
+        reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear, logL.data());
+        for (unsigned channel = 0; channel < c_numChannels; channel++) {
+          int pix = chMapper.getPixelID(channel) - 1;
+          finders[channel].add(ibin, -2 * logL[pix]);
+        }
       }
 
       // fill histograms of hits
@@ -235,9 +266,10 @@ namespace Belle2 {
         if (digit.getModuleID() != trk.getModuleID()) continue;
         if (digit.getTime() < timeMin) continue;
         if (digit.getTime() > timeMax) continue;
-        m_hits1D.Fill(digit.getModuleID());
-        int bs = digit.getBoardstackNumber();
-        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+        auto& h1 = m_hits1D[module];
+        h1.Fill(digit.getChannel());
+        auto& h2 = m_hits2D[module];
+        h2.Fill(digit.getChannel(), digit.getTime());
       }
 
       // fill output tree
@@ -265,45 +297,90 @@ namespace Belle2 {
   }
 
 
-  void TOPCommonT0CalibratorModule::endRun()
+  void TOPChannelT0CalibratorModule::endRun()
   {
   }
 
-  void TOPCommonT0CalibratorModule::terminate()
+  void TOPChannelT0CalibratorModule::terminate()
   {
 
     // determine scaling factor for errors from two statistically independent results
 
-    TH1F h_pulls("pulls", "Pulls of statistically independent results",
+    TH1F h_pulls("pulls", "Pulls of the two statistically independent results",
                  200, -15.0, 15.0);
     h_pulls.SetXTitle("pulls");
-    std::vector<double> pos, err;
-    for (int i = 0; i < c_numSets; i++) {
-      const auto& minimum = m_finders[i].getMinimum();
-      if (not minimum.valid) continue;
-      pos.push_back(minimum.position);
-      err.push_back(minimum.error);
-    }
-    for (unsigned i = 0; i < pos.size(); i++) {
-      for (unsigned j = i + 1; j < pos.size(); j++) {
-        double pull = (pos[i] - pos[j]) / sqrt(err[i] * err[i] + err[j] * err[j]);
+    for (unsigned module = 0; module < c_numModules; module++) {
+      for (unsigned channel = 0; channel < c_numChannels; channel++) {
+        std::vector<double> pos, err;
+        for (int i = 0; i < 2; i++) {
+          const auto& minimum = m_finders[i][module][channel].getMinimum();
+          if (not minimum.valid) continue;
+          pos.push_back(minimum.position);
+          err.push_back(minimum.error);
+        }
+        if (pos.size() < 2) continue;
+        double pull = (pos[0] - pos[1]) / sqrt(err[0] * err[0] + err[1] * err[1]);
         h_pulls.Fill(pull);
       }
     }
     h_pulls.Write();
-    double scaleError = 1;
-    if (h_pulls.GetEntries() > 1) scaleError = h_pulls.GetRMS();
+    double scaleError = h_pulls.GetRMS();
 
-    // merge statistically independent finders and store results into histograms
+    // merge two statistically independent finders and store results into histograms
 
-    TH1F h_commonT0("commonT0", "Common T0", 1, 0, 1);
-    h_commonT0.SetYTitle("common T0 [ns]");
+    for (unsigned module = 0; module < c_numModules; module++) {
+      int moduleID = module + 1;
 
-    auto finder = m_finders[0];
-    for (int i = 1; i < c_numSets; i++) {
-      finder.add(m_finders[i]);
+      std::string slotNum = std::to_string(moduleID);
+      if (moduleID < 10) slotNum = "0" + slotNum;
+
+      std::string name = "channelT0_slot" + slotNum;
+      std::string title = "Relative channel T0 for slot " + slotNum;
+      TH1F h_channelT0(name.c_str(), title.c_str(), c_numChannels, 0, c_numChannels);
+      h_channelT0.SetXTitle("channel number");
+      h_channelT0.SetYTitle("relative channel T0 [ns]");
+
+      for (unsigned channel = 0; channel < c_numChannels; channel++) {
+        auto& finder = m_finders[0][module][channel].add(m_finders[1][module][channel]);
+        const auto& minimum = finder.getMinimum();
+        if (minimum.valid) {
+          h_channelT0.SetBinContent(channel + 1, minimum.position);
+          h_channelT0.SetBinError(channel + 1, minimum.error * scaleError);
+        }
+      }
+
+      h_channelT0.Write();
+
     }
-    const auto& minimum = finder.getMinimum();
+
+    // merge all finders of a slot to find module T0
+
+    TH1F h_moduleT0("moduleT0", "Relative module T0",
+                    c_numModules, 0.5, c_numModules + 0.5);
+    h_moduleT0.SetXTitle("slot number");
+    h_moduleT0.SetYTitle("relative module T0 [ns]");
+    auto finderCommon = m_finders[0][0][0];
+    finderCommon.clear();
+    for (unsigned module = 0; module < c_numModules; module++) {
+      auto finder = m_finders[0][module][0];
+      finder.clear();
+      for (unsigned channel = 0; channel < c_numChannels; channel++) {
+        finder.add(m_finders[0][module][channel]);
+      }
+      finderCommon.add(finder);
+      const auto& minimum = finder.getMinimum();
+      if (minimum.valid) {
+        h_moduleT0.SetBinContent(module + 1, minimum.position);
+        h_moduleT0.SetBinError(module + 1, minimum.error * scaleError);
+      }
+    }
+    h_moduleT0.Write();
+
+    // find common T0
+
+    TH1F h_commonT0("commonT0", "Relative common T0", 1, 0, 1);
+    h_commonT0.SetYTitle("relative common T0 [ns]");
+    const auto& minimum = finderCommon.getMinimum();
     if (minimum.valid) {
       h_commonT0.SetBinContent(1, minimum.position);
       h_commonT0.SetBinError(1, minimum.error * scaleError);
@@ -312,13 +389,15 @@ namespace Belle2 {
 
     // write other histograms and ntuple; close the file
 
-    m_hits1D.Write();
-    m_hits2D.Write();
+    for (auto& h : m_hits1D) h.Write();
+    for (auto& h : m_hits2D) h.Write();
+
     m_tree->Write();
     m_file->Close();
 
     B2RESULT("Results available in " << m_outFileName);
   }
+
 
 } // end Belle2 namespace
 

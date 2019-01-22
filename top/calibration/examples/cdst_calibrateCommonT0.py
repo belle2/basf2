@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------------
-# Calibrate module T0 with Bhabha (or dimuon) events using new constants from local DB
+# Calibrate common T0 with Bhabha (or dimuon) events using new constants from local DB.
 #
-# usage: cdst_calibrateModuleT0.py -i <cdst_file.root>
+# usage: cdst_calibrateCommonT0.py -i <cdst_file.root>
 #
 # Note: replace local database name/location before running or comment it out
 #       check global tag: it must be the same as used in production of input file(s)
@@ -42,18 +42,18 @@ main.add_module(geometry)
 recalibrator = register_module('TOPTimeRecalibrator')
 recalibrator.param('useSampleTimeCalibration', True)
 recalibrator.param('useChannelT0Calibration', True)
-recalibrator.param('useModuleT0Calibration', False)
-recalibrator.param('useCommonT0Calibration', True)
+recalibrator.param('useModuleT0Calibration', True)
+recalibrator.param('useCommonT0Calibration', False)
 recalibrator.param('subtractBunchTime', True)
 main.add_module(recalibrator)
 
 # Channel masking
 main.add_module('TOPChannelMasker')
 
-# Module T0 calibration
-calibrator = register_module('TOPModuleT0Calibrator')
+# Common T0 calibration
+calibrator = register_module('TOPCommonT0Calibrator')
 calibrator.param('sample', 'bhabha')
-calibrator.param('outputFileName', 'moduleT0_r*.root')
+calibrator.param('outputFileName', 'commonT0_r*.root')
 main.add_module(calibrator)
 
 # Print progress

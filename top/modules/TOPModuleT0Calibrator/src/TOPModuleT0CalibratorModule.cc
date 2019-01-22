@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <top/modules/TOPCommonT0Calibrator/TOPCommonT0CalibratorModule.h>
+#include <top/modules/TOPModuleT0Calibrator/TOPModuleT0CalibratorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
@@ -38,17 +38,18 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCommonT0Calibrator)
+  REG_MODULE(TOPModuleT0Calibrator)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPCommonT0CalibratorModule::TOPCommonT0CalibratorModule() : Module()
+  TOPModuleT0CalibratorModule::TOPModuleT0CalibratorModule() : Module()
 
   {
     // set module description
-    setDescription("Common T0 calibration with dimuons or bhabhas.");
+    setDescription("Module T0 calibration with dimuons or bhabhas. "
+                   "Useful when the geometrical alignment is fine.");
     //    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -77,17 +78,17 @@ namespace Belle2 {
              "Root output file name containing calibration results. "
              "File name can include *'s; "
              "they will be replaced with a run number from the first input file",
-             std::string("commonT0_r*.root"));
+             std::string("moduleT0_r*.root"));
     addParam("pdfOption", m_pdfOption,
              "PDF option, one of 'rough', 'fine', 'optimal'", std::string("rough"));
 
   }
 
-  TOPCommonT0CalibratorModule::~TOPCommonT0CalibratorModule()
+  TOPModuleT0CalibratorModule::~TOPModuleT0CalibratorModule()
   {
   }
 
-  void TOPCommonT0CalibratorModule::initialize()
+  void TOPModuleT0CalibratorModule::initialize()
   {
     // input collections
     m_digits.isRequired();
@@ -119,8 +120,10 @@ namespace Belle2 {
     // Chi2 minimum finders
     double tmin = -m_timeRange / 2;
     double tmax =  m_timeRange / 2;
-    for (unsigned i = 0; i < c_numSets; i++) {
-      m_finders[i] = Chi2MinimumFinder1D(m_numBins, tmin, tmax);
+    for (unsigned i = 0; i < 2; i++) {
+      for (unsigned m = 0; m < c_numModules; m++) {
+        m_finders[i][m] = Chi2MinimumFinder1D(m_numBins, tmin, tmax);
+      }
     }
 
     // if file name includes *'s replace them with a run number
@@ -142,7 +145,7 @@ namespace Belle2 {
       return;
     }
 
-    // control histograms
+    // histograms
     m_hits1D = TH1F("numHits", "Number of photons per slot",
                     c_numModules, 0.5, c_numModules + 0.5);
     m_hits1D.SetXTitle("slot number");
@@ -173,11 +176,11 @@ namespace Belle2 {
 
   }
 
-  void TOPCommonT0CalibratorModule::beginRun()
+  void TOPModuleT0CalibratorModule::beginRun()
   {
   }
 
-  void TOPCommonT0CalibratorModule::event()
+  void TOPModuleT0CalibratorModule::event()
   {
     /* check bunch reconstruction status and run alignment:
        - if object exists and bunch is found (collision data w/ bunch finder in the path)
@@ -221,8 +224,10 @@ namespace Belle2 {
       if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
 
       // minimization procedure: accumulate
-      int sub = gRandom->Integer(c_numSets); // generate sub-sample number
-      auto& finder = m_finders[sub];
+      const unsigned module = trk.getModuleID() - 1;
+      if (module >= c_numModules) continue;
+      int sub = gRandom->Integer(2); // generate sub-sample number
+      auto& finder = m_finders[sub][module];
       const auto& binCenters = finder.getBinCenters();
       for (unsigned ibin = 0; ibin < binCenters.size(); ibin++) {
         double t0 = binCenters[ibin];
@@ -265,50 +270,48 @@ namespace Belle2 {
   }
 
 
-  void TOPCommonT0CalibratorModule::endRun()
+  void TOPModuleT0CalibratorModule::endRun()
   {
   }
 
-  void TOPCommonT0CalibratorModule::terminate()
+  void TOPModuleT0CalibratorModule::terminate()
   {
-
     // determine scaling factor for errors from two statistically independent results
 
-    TH1F h_pulls("pulls", "Pulls of statistically independent results",
+    TH1F h_pulls("pulls", "Pulls of the two statistically independent results",
                  200, -15.0, 15.0);
     h_pulls.SetXTitle("pulls");
-    std::vector<double> pos, err;
-    for (int i = 0; i < c_numSets; i++) {
-      const auto& minimum = m_finders[i].getMinimum();
-      if (not minimum.valid) continue;
-      pos.push_back(minimum.position);
-      err.push_back(minimum.error);
-    }
-    for (unsigned i = 0; i < pos.size(); i++) {
-      for (unsigned j = i + 1; j < pos.size(); j++) {
-        double pull = (pos[i] - pos[j]) / sqrt(err[i] * err[i] + err[j] * err[j]);
-        h_pulls.Fill(pull);
+    for (unsigned module = 0; module < c_numModules; module++) {
+      std::vector<double> pos, err;
+      for (int i = 0; i < 2; i++) {
+        const auto& minimum = m_finders[i][module].getMinimum();
+        if (not minimum.valid) continue;
+        pos.push_back(minimum.position);
+        err.push_back(minimum.error);
       }
+      if (pos.size() < 2) continue;
+      double pull = (pos[0] - pos[1]) / sqrt(err[0] * err[0] + err[1] * err[1]);
+      h_pulls.Fill(pull);
     }
     h_pulls.Write();
-    double scaleError = 1;
-    if (h_pulls.GetEntries() > 1) scaleError = h_pulls.GetRMS();
+    double scaleError = h_pulls.GetRMS();
 
-    // merge statistically independent finders and store results into histograms
+    // merge two statistically independent finders and store results into histograms
 
-    TH1F h_commonT0("commonT0", "Common T0", 1, 0, 1);
-    h_commonT0.SetYTitle("common T0 [ns]");
+    TH1F h_moduleT0("moduleT0", "Module T0",
+                    c_numModules, 0.5, c_numModules + 0.5);
+    h_moduleT0.SetXTitle("slot number");
+    h_moduleT0.SetYTitle("module T0 [ns]");
 
-    auto finder = m_finders[0];
-    for (int i = 1; i < c_numSets; i++) {
-      finder.add(m_finders[i]);
+    for (unsigned module = 0; module < c_numModules; module++) {
+      auto& finder = m_finders[0][module].add(m_finders[1][module]);
+      const auto& minimum = finder.getMinimum();
+      if (minimum.valid) {
+        h_moduleT0.SetBinContent(module + 1, minimum.position);
+        h_moduleT0.SetBinError(module + 1, minimum.error * scaleError);
+      }
     }
-    const auto& minimum = finder.getMinimum();
-    if (minimum.valid) {
-      h_commonT0.SetBinContent(1, minimum.position);
-      h_commonT0.SetBinError(1, minimum.error * scaleError);
-    }
-    h_commonT0.Write();
+    h_moduleT0.Write();
 
     // write other histograms and ntuple; close the file
 
@@ -319,6 +322,7 @@ namespace Belle2 {
 
     B2RESULT("Results available in " << m_outFileName);
   }
+
 
 } // end Belle2 namespace
 

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -32,21 +32,23 @@
 namespace Belle2 {
 
   /**
-   * A module for common T0 calibration with collision data (dimuons or bhabhas)
+   * A module for alternative channel T0 calibration with collision data
+   * Note: after this kind of calibration one cannot do the geometrical alignment
+   * This module can also be used to check the calibration
    */
-  class TOPCommonT0CalibratorModule : public Module {
+  class TOPChannelT0CalibratorModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    TOPCommonT0CalibratorModule();
+    TOPChannelT0CalibratorModule();
 
     /**
      * Destructor
      */
-    virtual ~TOPCommonT0CalibratorModule();
+    virtual ~TOPChannelT0CalibratorModule();
 
     /**
      * Initialize the Module.
@@ -82,8 +84,8 @@ namespace Belle2 {
     /**
      * Sizes
      */
-    enum {c_numModules = 16, /**< number of modules */
-          c_numSets = 32,  /**< number of statistically independent subsamples */
+    enum {c_numModules = 16,  /**< number of modules */
+          c_numChannels = 512 /**< number of channels per module */
          };
 
     // module parameters
@@ -104,7 +106,7 @@ namespace Belle2 {
 
     // procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
-    TOP::Chi2MinimumFinder1D m_finders[c_numSets]; /**< finders */
+    TOP::Chi2MinimumFinder1D m_finders[2][c_numModules][c_numChannels]; /**< finders */
     TOP::TOPreco::PDFoption m_PDFOption = TOP::TOPreco::c_Rough; /**< PDF option */
 
     // datastore objects
@@ -116,9 +118,9 @@ namespace Belle2 {
     // output root file
     TFile* m_file = 0;                 /**< TFile */
 
-    // control histograms
-    TH1F m_hits1D;  /**< number of photon hits in a slot */
-    TH2F m_hits2D;  /**< hit times vs. slot */
+    // histograms
+    std::vector<TH1F> m_hits1D;  /**< number photon hits in a channel */
+    std::vector<TH2F> m_hits2D;  /**< hit times vs. channel */
 
     // tree and its variables
     TTree* m_tree = 0;  /**< TTree containing selected track parameters etc */

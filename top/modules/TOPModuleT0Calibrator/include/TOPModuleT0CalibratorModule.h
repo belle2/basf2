@@ -32,21 +32,22 @@
 namespace Belle2 {
 
   /**
-   * A module for common T0 calibration with collision data (dimuons or bhabhas)
+   * A module for module T0 calibration with collision data (dimuons or bhabhas)
+   * Useful when the geometrical alignment need not to be repeated
    */
-  class TOPCommonT0CalibratorModule : public Module {
+  class TOPModuleT0CalibratorModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    TOPCommonT0CalibratorModule();
+    TOPModuleT0CalibratorModule();
 
     /**
      * Destructor
      */
-    virtual ~TOPCommonT0CalibratorModule();
+    virtual ~TOPModuleT0CalibratorModule();
 
     /**
      * Initialize the Module.
@@ -82,8 +83,7 @@ namespace Belle2 {
     /**
      * Sizes
      */
-    enum {c_numModules = 16, /**< number of modules */
-          c_numSets = 32,  /**< number of statistically independent subsamples */
+    enum {c_numModules = 16,  /**< number of modules */
          };
 
     // module parameters
@@ -104,7 +104,7 @@ namespace Belle2 {
 
     // procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
-    TOP::Chi2MinimumFinder1D m_finders[c_numSets]; /**< finders */
+    TOP::Chi2MinimumFinder1D m_finders[2][c_numModules]; /**< finders */
     TOP::TOPreco::PDFoption m_PDFOption = TOP::TOPreco::c_Rough; /**< PDF option */
 
     // datastore objects
@@ -116,8 +116,8 @@ namespace Belle2 {
     // output root file
     TFile* m_file = 0;                 /**< TFile */
 
-    // control histograms
-    TH1F m_hits1D;  /**< number of photon hits in a slot */
+    // histograms
+    TH1F m_hits1D;  /**< number photon hits in a slot */
     TH2F m_hits2D;  /**< hit times vs. slot */
 
     // tree and its variables

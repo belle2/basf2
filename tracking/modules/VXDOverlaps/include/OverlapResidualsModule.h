@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: fdattola                                                 *
+ * Contributors: Filippo Dattola                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,6 @@
 #ifndef OVERLAPRESIDUALSMODULE_H
 #define OVERLAPRESIDUALSMODULE_H
 
-#pragma once
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -21,11 +20,8 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <TFile.h>
-#include <TList.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TTree.h>
-#include <TCanvas.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 
 
@@ -33,30 +29,32 @@
 namespace Belle2 {
 
 
-  /**
+  /**The module studies VXD hits from overlapping sensors of a same VXD layer.
+   * In particular, it computes residuals differences sensitive to possible detector misalignments.
+   *
    * Overlapping residuals
    */
   class OverlapResidualsModule : public Module {
 
   public:
 
-    /** Module name */
+    /** Constructor */
     OverlapResidualsModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
-    virtual void event();
+    virtual void event() override;
 
-    /** Ends run*/
-    void terminate();
+    /** Terminate basf2*/
+    void terminate() override;
 
-    /** user-defined parameters */
+    /** Root filename */
     std::string m_rootFileName;
 
-    /** root file name */
-    TFile* m_rootFilePtr = 0;
+    /** Pointer to the root file */
+    TFile* m_rootFilePtr = NULL;
 
 
   private:
@@ -67,42 +65,27 @@ namespace Belle2 {
     StoreArray<SVDCluster> m_svdcluster;
 
 
-    TH1F* h_U_Res = 0;
-    TH1F* h_V_Res = 0;
+    TH1F* h_U_Res = NULL;
+    TH1F* h_V_Res = NULL;
 
-    TH1F* h_SVDstrips_Mult = 0;
+    TH1F* h_SVDstrips_Mult = NULL;
 
-    TH1F* h_U_Cl1Cl2_Res[10] = {0};
-    TH1F* h_V_Cl1Cl2_Res[10] = {0};
+    TH1F* h_U_Cl1Cl2_Res[10] = {NULL};
+    TH1F* h_V_Cl1Cl2_Res[10] = {NULL};
 
-    TH2F* h_Lyr6[17][6] = {0};
-    TH2F* h_Lyr5[13][5] = {0};
-    TH2F* h_Lyr4[11][4] = {0};
-    TH2F* h_Lyr3[8][3] = {0}; //[Ladder][sensor number]
-    TH2F* h_Lyr2[13][3] = {0}; //[Ladder][sensor number]
-    TH2F* h_Lyr1[9][3] = {0}; //[Ladder][sensor number]
+    TH2F* h_Lyr6[17][6] = {NULL};
+    TH2F* h_Lyr5[13][5] = {NULL};
+    TH2F* h_Lyr4[11][4] = {NULL};
+    TH2F* h_Lyr3[8][3] = {NULL}; //[Ladder][sensor number]
+    TH2F* h_Lyr2[13][3] = {NULL}; //[Ladder][sensor number]
+    TH2F* h_Lyr1[9][3] = {NULL}; //[Ladder][sensor number]
 
-    TCanvas* c_Lyr6[6] = {0};
-    TCanvas* c_Lyr5[5] = {0};
-    TCanvas* c_Lyr4[4] = {0};
-    TCanvas* c_Lyr3[3] = {0};
-    TCanvas* c_Lyr2[3] = {0};
-    TCanvas* c_Lyr1[3] = {0};
-
-    TH2F* h_Fit_Lyr6[17][6] = {0};
-    TH2F* h_Fit_Lyr5[13][5] = {0};
-    TH2F* h_Fit_Lyr4[11][4] = {0};
-    TH2F* h_Fit_Lyr3[8][3] = {0}; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr2[13][3] = {0}; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr1[9][3] = {0}; //[Ladder][sensor number]
-
-    TCanvas* c_Fit_Lyr6[6] = {0};
-    TCanvas* c_Fit_Lyr5[5] = {0};
-    TCanvas* c_Fit_Lyr4[4] = {0};
-    TCanvas* c_Fit_Lyr3[3] = {0};
-    TCanvas* c_Fit_Lyr2[3] = {0};
-    TCanvas* c_Fit_Lyr1[3] = {0};
-
+    TH2F* h_Fit_Lyr6[17][6] = {NULL};
+    TH2F* h_Fit_Lyr5[13][5] = {NULL};
+    TH2F* h_Fit_Lyr4[11][4] = {NULL};
+    TH2F* h_Fit_Lyr3[8][3] = {NULL}; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr2[13][3] = {NULL}; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr1[9][3] = {NULL}; //[Ladder][sensor number]
 
   };
 }

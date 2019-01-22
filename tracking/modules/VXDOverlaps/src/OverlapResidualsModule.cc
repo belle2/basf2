@@ -3,8 +3,10 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: fdattola                                                 *
+ * Contributors: Filippo Dattola                                          *
  *                                                                        *
+
+ * Module to study VXD hits from overlapping sensors of a same VXD layer. *                                                                     *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -78,8 +80,8 @@ void OverlapResidualsModule::initialize()
   for (int i = 1; i < 10; i++) {
 
     //The name is the product of cluster sizes for 2 consecutive hits
-    TString h_name_U = "h_U_Cl1Cl2_ " + std::to_string(i);
-    TString h_name_V = "h_V_Cl1Cl2_ " + std::to_string(i);
+    TString h_name_U = "h_U_Cl1Cl2_" + std::to_string(i);
+    TString h_name_V = "h_V_Cl1Cl2_" + std::to_string(i);
 
     TString title_U = "U residuals: SVDClusterSize_1 x SVDClusterSize_2 = " + std::to_string(i);
     TString title_V = "V residuals: SVDClusterSize_1 x SVDClusterSize_2 = " + std::to_string(i);
@@ -94,14 +96,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 5; i++) {
 
-    TString c_name = "LayerSensor = 6" + std::to_string(i);
-
-    c_Lyr6[i] = new TCanvas(c_name, c_name, 500, 700);
-    c_Lyr6[i]->Divide(4, 4);
-
     for (int j = 1; j <= 16; j++) {
 
-      TString h_name = "h_LayerLadderSensor = 6" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_6" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 6:" + std::to_string(j) + ":" + std::to_string(i);
 
 
@@ -115,15 +112,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 4; i++) {
 
-    TString c_name = "LayerSensor = 5" + std::to_string(i);
-
-    c_Lyr5[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Lyr5[i]->Divide(4, 3);
-
     for (int j = 1; j <= 12; j++) {
 
-      TString h_name = "h_LayerLadderSensor = 5" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_5" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 5:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
@@ -136,15 +127,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 3; i++) {
 
-    TString c_name = "LayerSensor = 4" + std::to_string(i);
-
-    c_Lyr4[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Lyr4[i]->Divide(5, 2);
-
     for (int j = 1; j <= 10; j++) {
 
-      TString h_name = "h_LayerLadderSensor = 4" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_4" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 4:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
@@ -158,16 +143,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 2; i++) {
 
-    TString c_name = "LayerSensor = 3" + std::to_string(i);
-
-    c_Lyr3[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Lyr3[i]->Divide(7, 1);
-
-
     for (int j = 1; j <= 7; j++) {
 
-      TString h_name = "h_LayerLadderSensor = 3" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_3" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 3:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Lyr3[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
@@ -180,15 +158,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 2; i++) {
 
-    TString c_name = "LayerSensor = 2" + std::to_string(i);
-
-    c_Lyr2[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Lyr2[i]->Divide(6, 2);
-
     for (int j = 1; j <= 12; j++) {
 
-      TString h_name = "h_LayerLadderSensor = 2" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_2" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 2:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.5, 2.5);
@@ -200,15 +172,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 2; i++) {
 
-    TString c_name = "LayerSensor = 1" + std::to_string(i);
-
-    c_Lyr1[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Lyr1[i]->Divide(4, 2);
-
     for (int j = 1; j <= 8; j++) {
 
-      TString h_name = "h_LayerLadderSensor = 1" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_1" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 1:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.5, 2.5);
@@ -226,14 +192,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 5; i++) {
 
-    TString c_name = "Fit_LayerSensor = 6" + std::to_string(i);
-
-    c_Fit_Lyr6[i] = new TCanvas(c_name, c_name, 500, 700);
-    c_Fit_Lyr6[i]->Divide(4, 4);
-
     for (int j = 1; j <= 16; j++) {
 
-      TString h_name = "h_Fit_LayerLadderSensor = 6" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_Fit_6" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 6:" + std::to_string(j) + ":" + std::to_string(i);
 
 
@@ -247,15 +208,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 4; i++) {
 
-    TString c_name = "Fit_LayerSensor = 5" + std::to_string(i);
-
-    c_Fit_Lyr5[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Fit_Lyr5[i]->Divide(4, 3);
-
     for (int j = 1; j <= 12; j++) {
 
-      TString h_name = "h_Fit_LayerLadderSensor = 5" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_Fit_5" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 5:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Fit_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
@@ -268,15 +223,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 3; i++) {
 
-    TString c_name = "Fit_LayerSensor = 4" + std::to_string(i);
-
-    c_Fit_Lyr4[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Fit_Lyr4[i]->Divide(5, 2);
-
     for (int j = 1; j <= 10; j++) {
 
-      TString h_name = "h_Fit_LayerLadderSensor = 4" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_Fit_4" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 4:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Fit_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
@@ -290,16 +239,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 2; i++) {
 
-    TString c_name = "Fit_LayerSensor = 3" + std::to_string(i);
-
-    c_Fit_Lyr3[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Fit_Lyr3[i]->Divide(7, 1);
-
-
     for (int j = 1; j <= 7; j++) {
 
-      TString h_name = "h_Fit_LayerLadderSensor = 3" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_Fit_3" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 3:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Fit_Lyr3[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
@@ -312,15 +254,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 2; i++) {
 
-    TString c_name = "Fit_LayerSensor = 2" + std::to_string(i);
-
-    c_Fit_Lyr2[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Fit_Lyr2[i]->Divide(6, 2);
-
     for (int j = 1; j <= 12; j++) {
 
-      TString h_name = "h_Fit_LayerLadderSensor = 2" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_Fit_2" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 2:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Fit_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.1, 2.1);
@@ -332,15 +268,9 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 2; i++) {
 
-    TString c_name = "Fit_LayerSensor = 1" + std::to_string(i);
-
-    c_Fit_Lyr1[i] = new TCanvas(c_name, c_name, 500, 700);
-
-    c_Fit_Lyr1[i]->Divide(4, 2);
-
     for (int j = 1; j <= 8; j++) {
 
-      TString h_name = "h_Fit_LayerLadderSensor = 1" + std::to_string(j) + std::to_string(i);
+      TString h_name = "h_Fit_1" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 1:" + std::to_string(j) + ":" + std::to_string(i);
 
       h_Fit_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.1, 2.1);
@@ -367,6 +297,7 @@ void OverlapResidualsModule::event()
     const vector<PXDCluster* > pxdClusters = recoTrack[j]->getPXDHitList();
 
     const vector<SVDCluster* > svdClusters = recoTrack[j]->getSVDHitList();
+
 
     B2INFO("FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
 
@@ -446,32 +377,12 @@ void OverlapResidualsModule::event()
 
             h_Lyr1[PXDLadder_1][PXDSensor_1]->Fill(PXD_1->getU(), PXD_1->getV());
 
-            c_Lyr1[PXDSensor_1]->cd(PXDLadder_1);
-
-            h_Lyr1[PXDLadder_1][PXDSensor_1]->Draw("COLZ");
-
-
-
             h_Fit_Lyr1[PXDLadder_1][PXDSensor_1]->Fill(PXDpredIntersect_1[3], PXDpredIntersect_1[4]);
-
-            c_Fit_Lyr1[PXDSensor_1]->cd(PXDLadder_1);
-
-            h_Fit_Lyr1[PXDLadder_1][PXDSensor_1]->Draw("COLZ");
-
-
 
             h_Lyr1[PXDLadder_2][PXDSensor_2]->Fill(PXD_2->getU(), PXD_2->getV());
 
-            c_Lyr1[PXDSensor_2]->cd(PXDLadder_2);
-
-            h_Lyr1[PXDLadder_2][PXDSensor_2]->Draw("COLZ");
-
-
             h_Fit_Lyr1[PXDLadder_2][PXDSensor_2]->Fill(PXDpredIntersect_2[3], PXDpredIntersect_2[4]);
 
-            c_Fit_Lyr1[PXDSensor_2]->cd(PXDLadder_2);
-
-            h_Fit_Lyr1[PXDLadder_2][PXDSensor_2]->Draw("COLZ");
 
           }
 
@@ -480,32 +391,12 @@ void OverlapResidualsModule::event()
 
             h_Lyr2[PXDLadder_1][PXDSensor_1]->Fill(PXD_1->getU(), PXD_1->getV());
 
-            c_Lyr2[PXDSensor_1]->cd(PXDLadder_1);
-
-            h_Lyr2[PXDLadder_1][PXDSensor_1]->Draw("COLZ");
-
-
-
             h_Fit_Lyr2[PXDLadder_1][PXDSensor_1]->Fill(PXDpredIntersect_1[3], PXDpredIntersect_1[4]);
-
-            c_Fit_Lyr2[PXDSensor_1]->cd(PXDLadder_1);
-
-            h_Fit_Lyr2[PXDLadder_1][PXDSensor_1]->Draw("COLZ");
-
-
 
             h_Lyr2[PXDLadder_2][PXDSensor_2]->Fill(PXD_2->getU(), PXD_2->getV());
 
-            c_Lyr2[PXDSensor_2]->cd(PXDLadder_2);
-
-            h_Lyr2[PXDLadder_2][PXDSensor_2]->Draw("COLZ");
-
-
             h_Fit_Lyr2[PXDLadder_2][PXDSensor_2]->Fill(PXDpredIntersect_2[3], PXDpredIntersect_2[4]);
 
-            c_Fit_Lyr2[PXDSensor_2]->cd(PXDLadder_2);
-
-            h_Fit_Lyr2[PXDLadder_2][PXDSensor_2]->Draw("COLZ");
 
           }
 
@@ -599,33 +490,11 @@ void OverlapResidualsModule::event()
 
               h_Lyr3[SVDLadder_1][SVDSensor_1]->Fill(SVD_1->getPosition(), 0.);
 
-              c_Lyr3[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr3[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
               h_Fit_Lyr3[SVDLadder_1][SVDSensor_1]->Fill(SVDpredIntersect_1[3], 0.);
-
-              c_Fit_Lyr3[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr3[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
 
               h_Lyr3[SVDLadder_2][SVDSensor_2]->Fill(SVD_2->getPosition(), 0.);
 
-              c_Lyr3[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Lyr3[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
-
-
               h_Fit_Lyr3[SVDLadder_2][SVDSensor_2]->Fill(SVDpredIntersect_2[3], 0.);
-
-              c_Fit_Lyr3[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr3[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
 
             }
 
@@ -633,35 +502,11 @@ void OverlapResidualsModule::event()
 
               h_Lyr4[SVDLadder_1][SVDSensor_1]->Fill(SVD_1->getPosition(), 0.);
 
-              c_Lyr4[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr4[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr4[SVDLadder_1][SVDSensor_1]->Fill(SVDpredIntersect_1[3], 0.);
-
-              c_Fit_Lyr4[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr4[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
 
               h_Lyr4[SVDLadder_2][SVDSensor_2]->Fill(SVD_2->getPosition(), 0.);
 
-              c_Lyr4[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Lyr4[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr4[SVDLadder_2][SVDSensor_2]->Fill(SVDpredIntersect_2[3], 0.);
-
-              c_Fit_Lyr4[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr4[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
 
             }
 
@@ -669,35 +514,11 @@ void OverlapResidualsModule::event()
 
               h_Lyr5[SVDLadder_1][SVDSensor_1]->Fill(SVD_1->getPosition(), 0.);
 
-              c_Lyr5[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr5[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr5[SVDLadder_1][SVDSensor_1]->Fill(SVDpredIntersect_1[3], 0.);
-
-              c_Fit_Lyr5[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr5[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
 
               h_Lyr5[SVDLadder_2][SVDSensor_1]->Fill(SVD_1->getPosition(), 0.);
 
-              c_Lyr5[SVDSensor_1]->cd(SVDLadder_2);
-
-              h_Lyr5[SVDLadder_2][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr5[SVDLadder_2][SVDSensor_2]->Fill(SVDpredIntersect_2[3], 0.);
-
-              c_Fit_Lyr5[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr5[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
 
             }
 
@@ -705,36 +526,12 @@ void OverlapResidualsModule::event()
 
               h_Lyr6[SVDLadder_1][SVDSensor_1]->Fill(SVD_1->getPosition(), 0.);
 
-              c_Lyr6[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr6[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr6[SVDLadder_1][SVDSensor_1]->Fill(SVDpredIntersect_1[3], 0.);
-
-              c_Fit_Lyr6[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr6[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
 
               h_Lyr6[SVDLadder_2][SVDSensor_2]->Fill(SVD_2->getPosition(), 0.);
 
-              c_Lyr6[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Lyr6[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr6[SVDLadder_2][SVDSensor_2]->Fill(SVDpredIntersect_2[3], 0.);
 
-              c_Fit_Lyr6[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr6[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
 
             }
 
@@ -758,9 +555,11 @@ void OverlapResidualsModule::event()
 
             float Over_V_SVD = Res_V_2 - Res_V_1;
 
+
             B2INFO("SVD V residual =========> " << Over_V_SVD);
 
             B2INFO("SVD V residual =========> " << Over_V_SVD);
+
 
             h_V_Res->Fill(Over_V_SVD);
 
@@ -774,35 +573,11 @@ void OverlapResidualsModule::event()
 
               h_Lyr3[SVDLadder_1][SVDSensor_1]->Fill(0., SVD_1->getPosition());
 
-              c_Lyr3[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr3[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr3[SVDLadder_1][SVDSensor_1]->Fill(0., SVDpredIntersect_1[4]);
-
-              c_Fit_Lyr3[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr3[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
 
               h_Lyr3[SVDLadder_2][SVDSensor_2]->Fill(0., SVD_2->getPosition());
 
-              c_Lyr3[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Lyr3[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr3[SVDLadder_2][SVDSensor_2]->Fill(0., SVDpredIntersect_2[4]);
-
-              c_Fit_Lyr3[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr3[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
 
 
             }
@@ -811,35 +586,11 @@ void OverlapResidualsModule::event()
 
               h_Lyr4[SVDLadder_1][SVDSensor_1]->Fill(0., SVD_1->getPosition());
 
-              c_Lyr4[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr4[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr4[SVDLadder_1][SVDSensor_1]->Fill(0., SVDpredIntersect_1[4]);
-
-              c_Fit_Lyr4[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr4[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
 
               h_Lyr4[SVDLadder_2][SVDSensor_2]->Fill(0., SVD_2->getPosition());
 
-              c_Lyr4[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Lyr4[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr4[SVDLadder_2][SVDSensor_2]->Fill(0., SVDpredIntersect_2[4]);
-
-              c_Fit_Lyr4[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr4[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
 
             }
 
@@ -847,35 +598,12 @@ void OverlapResidualsModule::event()
 
               h_Lyr5[SVDLadder_1][SVDSensor_1]->Fill(0., SVD_1->getPosition());
 
-              c_Lyr5[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr5[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr5[SVDLadder_1][SVDSensor_1]->Fill(0., SVDpredIntersect_1[4]);
-
-              c_Fit_Lyr5[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr5[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
 
               h_Lyr5[SVDLadder_2][SVDSensor_2]->Fill(0., SVD_2->getPosition());
 
-              c_Lyr5[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Lyr5[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr5[SVDLadder_2][SVDSensor_2]->Fill(0., SVDpredIntersect_2[4]);
 
-              c_Fit_Lyr5[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr5[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
 
             }
 
@@ -883,35 +611,11 @@ void OverlapResidualsModule::event()
 
               h_Lyr6[SVDLadder_1][SVDSensor_1]->Fill(0., SVD_1->getPosition());
 
-              c_Lyr6[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Lyr6[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr6[SVDLadder_1][SVDSensor_1]->Fill(0., SVDpredIntersect_1[4]);
-
-              c_Fit_Lyr6[SVDSensor_1]->cd(SVDLadder_1);
-
-              h_Fit_Lyr6[SVDLadder_1][SVDSensor_1]->Draw("COLZ");
-
-
 
               h_Lyr6[SVDLadder_2][SVDSensor_2]->Fill(0., SVD_2->getPosition());
 
-              c_Lyr6[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Lyr6[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
-
-
-
-
               h_Fit_Lyr6[SVDLadder_2][SVDSensor_2]->Fill(0., SVDpredIntersect_2[4]);
-
-              c_Fit_Lyr6[SVDSensor_2]->cd(SVDLadder_2);
-
-              h_Fit_Lyr6[SVDLadder_2][SVDSensor_2]->Draw("COLZ");
 
 
             }
@@ -944,65 +648,66 @@ void OverlapResidualsModule::terminate()
 
     for (int i = 1; i <= 5; i++) {
 
-      c_Lyr6[i]->Write();
+      for (int j = 1; j <= 16; j++) {
+
+        h_Lyr6[j][i]->Write();
+        h_Fit_Lyr6[j][i]->Write();
+
+      }
 
     }
 
 
+
     for (int i = 1; i <= 4; i++) {
 
-      c_Lyr5[i]->Write();
+      for (int j = 1; j <= 12; j++) {
+
+        h_Lyr5[j][i]->Write();
+        h_Fit_Lyr5[j][i]->Write();
+
+      }
 
     }
 
 
     for (int i = 1; i <= 3; i++) {
 
-      c_Lyr4[i]->Write();
+      for (int j = 1; j <= 10; j++) {
+
+        h_Lyr4[j][i]->Write();
+        h_Fit_Lyr4[j][i]->Write();
+
+      }
 
     }
 
 
     for (int i = 1; i <= 2; i++) {
 
-      c_Lyr3[i]->Write();
-      c_Lyr2[i]->Write();
-      c_Lyr1[i]->Write();
+      for (int j = 1; j <= 7; j++) {
+
+        h_Lyr3[j][i]->Write();
+        h_Fit_Lyr3[j][i]->Write();
+
+      }
+
+      for (int j = 1; j <= 12; j++) {
+
+        h_Lyr2[j][i]->Write();
+        h_Fit_Lyr2[j][i]->Write();
+
+      }
+
+      for (int j = 1; j <= 8; j++) {
+
+        h_Lyr1[j][i]->Write();
+        h_Fit_Lyr1[j][i]->Write();
+      }
+
 
     }
 
-
-    //-------- FITTED HITS -------
-
-
-    for (int i = 1; i <= 5; i++) {
-
-      c_Fit_Lyr6[i]->Write();
-
-    }
-
-
-    for (int i = 1; i <= 4; i++) {
-
-      c_Fit_Lyr5[i]->Write();
-
-    }
-
-
-    for (int i = 1; i <= 3; i++) {
-
-      c_Fit_Lyr4[i]->Write();
-
-    }
-
-
-    for (int i = 1; i <= 2; i++) {
-
-      c_Fit_Lyr3[i]->Write();
-      c_Fit_Lyr2[i]->Write();
-      c_Fit_Lyr1[i]->Write();
-
-    }
 
     h_U_Res->Scale(1. / h_U_Res->Integral());
     h_U_Res->Write();
@@ -1012,7 +717,7 @@ void OverlapResidualsModule::terminate()
 
     for (int i = 1; i <= 9; i++) {
 
-      if (i == 5 || i == 7 || i == 8) continue; //The product of cluster sizes cannot be 5, 7, 8
+      if (i == 5 || i == 7 || i == 8) continue; //The product of cluster sizes cannot be 5, 7, 9
 
       h_U_Cl1Cl2_Res[i]->Scale(1. / h_U_Cl1Cl2_Res[i]->Integral());
       h_U_Cl1Cl2_Res[i]->Write();

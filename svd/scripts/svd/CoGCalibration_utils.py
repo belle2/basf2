@@ -98,13 +98,15 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             snrHist = self.snrList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
             snrHist.Fill(snrCluster)
 
-            n = self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-            n = n + 1
-            self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = n
+            self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += 1
+            # n = self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += 1
+            # n = n + 1
+            # self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = n
 
-            cog = self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex]
-            cog = cog + timeCluster
-            self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = cog
+            self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += timeCluster
+            # cog = self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += timeCluster
+            # cog = cog + timeCluster
+            # self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = cog
 
             self.NTOT = self.NTOT + 1
 

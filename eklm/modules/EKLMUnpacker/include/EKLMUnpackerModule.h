@@ -22,6 +22,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
@@ -108,6 +109,9 @@ namespace Belle2 {
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
+
+    /** Event information. */
+    StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
 
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;

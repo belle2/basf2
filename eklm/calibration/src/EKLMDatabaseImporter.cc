@@ -22,7 +22,6 @@
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
-#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -31,6 +30,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 
 using namespace Belle2;
 
@@ -202,7 +202,7 @@ void EKLMDatabaseImporter::importElectronicsMap()
 
 void EKLMDatabaseImporter::importTimeConversion()
 {
-  DBImportObjPtr<EKLMTimeConversion> timeConversion;
+  DBImportObjPtr<KLMTimeConversion> timeConversion;
   timeConversion.construct();
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
              "Content/TimeConversion");

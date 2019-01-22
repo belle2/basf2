@@ -18,19 +18,19 @@ namespace Belle2 {
   /**
    * EKLM data concentrator lane identifier.
    */
-  class EKLMTimeConversion : public TObject {
+  class KLMTimeConversion : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMTimeConversion();
+    KLMTimeConversion();
 
     /**
      * Destructor.
      */
-    ~EKLMTimeConversion();
+    ~KLMTimeConversion();
 
     /**
      * Set TDC frequency.
@@ -61,7 +61,7 @@ namespace Belle2 {
     double m_TimeOffset;
 
     /** Class version, */
-    ClassDef(EKLMTimeConversion, 1);
+    ClassDef(KLMTimeConversion, 1);
 
   };
 

@@ -9,36 +9,36 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dbobjects/EKLMTimeConversion.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 
 using namespace Belle2;
 
-EKLMTimeConversion::EKLMTimeConversion()
+KLMTimeConversion::KLMTimeConversion()
 {
   m_TDCPeriod = 0;
   m_TimeOffset = 0;
 }
 
-EKLMTimeConversion::~EKLMTimeConversion()
+KLMTimeConversion::~KLMTimeConversion()
 {
 }
 
-void EKLMTimeConversion::setTDCFrequency(double frequency)
+void KLMTimeConversion::setTDCFrequency(double frequency)
 {
   m_TDCPeriod = 1.0 / frequency;
 }
 
-void EKLMTimeConversion::setTimeOffset(double offset)
+void KLMTimeConversion::setTimeOffset(double offset)
 {
   m_TimeOffset = offset;
 }
 
-double EKLMTimeConversion::getTimeByTDC(uint16_t tdc) const
+double KLMTimeConversion::getTimeByTDC(uint16_t tdc) const
 {
   return m_TDCPeriod * tdc + m_TimeOffset;
 }
 
-uint16_t EKLMTimeConversion::getTDCByTime(double time) const
+uint16_t KLMTimeConversion::getTDCByTime(double time) const
 {
   return (time - m_TimeOffset) / m_TDCPeriod;
 }

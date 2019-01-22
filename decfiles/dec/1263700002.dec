@@ -1,0 +1,38 @@
+Alias  D0tag D0
+Alias  anti-D0tag anti-D0
+ChargeConj D0tag  anti-D0tag
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+
+Decay B+sig
+
+0.00757       anti-D_10    e+   nu_e        LLSW 0.71 -1.6 -0.5 2.9;
+0.00389       anti-D_0*0   e+   nu_e        LLSW 0.68 -0.2 0.3;
+0.00431       anti-D'_10   e+   nu_e        LLSW 0.68 -0.2 0.3;
+0.00373       anti-D_2*0   e+   nu_e        LLSW 0.71 -1.6 -0.5 2.9;
+
+0.00757       anti-D_10    mu+  nu_mu        LLSW 0.71 -1.6 -0.5 2.9;
+0.00389       anti-D_0*0   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
+0.00431       anti-D'_10   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
+0.00373       anti-D_2*0   mu+  nu_mu        LLSW 0.71 -1.6 -0.5 2.9;
+
+Enddecay
+CDecay B-sig
+
+
+Decay B-
+1.00 D0tag  pi-   PHOTOS                 PHSP;
+Enddecay
+CDecay B+
+
+Decay D0tag
+1.00 K- pi+   PHOTOS   PHSP;
+Enddecay
+CDecay anti-D0tag 
+
+#
+End

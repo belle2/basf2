@@ -1,0 +1,39 @@
+Alias myD+ D+
+Alias myD- D-
+ChargeConj myD- myD+
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+
+#central values from HFAG average
+
+Decay B0sig
+
+0.00704    D_1-    e+   nu_e               LLSW 0.71 -1.6 -0.5 2.9;
+0.00362    D_0*-   e+   nu_e               LLSW 0.68 -0.2 0.3;
+0.00401    D'_1-   e+   nu_e               LLSW 0.68 -0.2 0.3;
+0.00347    D_2*-   e+   nu_e               LLSW 0.71 -1.6 -0.5 2.9;
+
+0.00704  D_1-    mu+  nu_mu                LLSW 0.71 -1.6 -0.5 2.9;
+0.00362  D_0*-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
+0.00401  D'_1-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
+0.00347  D_2*-   mu+  nu_mu                LLSW 0.71 -1.6 -0.5 2.9;
+
+Enddecay
+CDecay anti-B0sig
+#
+
+
+Decay B0
+1.00 myD- pi+        PHOTOS            PHSP;
+Enddecay
+CDecay anti-B0
+
+Decay myD-
+1.00 K+ pi- pi-    PHOTOS       D_DALITZ;
+Enddecay
+CDecay myD+
+
+End

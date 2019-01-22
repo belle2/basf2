@@ -1,14 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-'''reminder:
-in svd/scripts/dbImporters/
-
-uno script
-- calibrazione da cdst
-- calibrazione dalla ricostruzione dopo SVDShaperTracks
-'''
-
 #################################################################################
 #
 # evaluates the CoG corrections, create a localDB

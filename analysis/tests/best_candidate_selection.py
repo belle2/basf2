@@ -10,8 +10,10 @@ class Generator(basf2.Module):
     """Generate a list of 10 electrons which have stupid momenta just to sort
     them later. And then add one electron where all momentum components are
     nan"""
+
     def initialize(self):
         """We need to register the mc particles"""
+        #: MCParticle array
         self.mcp = Belle2.PyStoreArray("MCParticles")
         self.mcp.registerInDataStore()
 
@@ -32,8 +34,10 @@ class Generator(basf2.Module):
 
 class RankChecker(basf2.Module):
     """Check if the ranks are actually what we want"""
+
     def initialize(self):
         """Create particle list object"""
+        #: particle list object
         self.plist = Belle2.PyStoreObj("e-")
 
     def event(self):
@@ -75,13 +79,14 @@ class RankChecker(basf2.Module):
         # of the previous sorts. But we can at least check if all the ranks
         # form a range from 1..n if we sort them
         simple_range = list(range(len(px)))
-        px_single_ranks = list(sorted(int(r)-1 for r in einfo["px_high_single"]))
+        px_single_ranks = list(sorted(int(r) - 1 for r in einfo["px_high_single"]))
         assert simple_range == px_single_ranks, "sorted ranks don't form a range from 1..n"
         # but the second two rankings are on the same variable in the same
         # order so they need to keep the order stable. so for py_low_single the
         # ranks need to be the range without sorting
-        py_single_ranks = list(int(r)-1 for r in einfo["py_low_single"])
+        py_single_ranks = list(int(r) - 1 for r in einfo["py_low_single"])
         assert simple_range == py_single_ranks, "ranks don't form a range from 1..n"
+
 
 # fixed random numbers
 random.seed(5)

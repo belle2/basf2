@@ -21,6 +21,7 @@ extern "C" {
   void get_time_window_(float*, float*);
   void set_pdf_opt_(int*, int*, int*);
   float get_logl_(float*, float*, float*, float*);
+  void get_logl_ch_(float*, float*, float*, float*, float*);
   int data_getnum_();
   void set_channel_mask_(int*, int*, int*);
   void print_channel_mask_();
@@ -216,6 +217,25 @@ namespace Belle2 {
         float tmax = (float) timeMax;
         float sigt = (float) sigma;
         return get_logl_(&t0, &tmin, &tmax, &sigt);
+      }
+
+      /**
+       * Return pixel log likelihoods for the last mass hypothesis using time-shifted PDF
+       * If timeMax <= timeMin use those set by setTimeWindow(double Tmin, double Tmax)
+       * @param timeShift time shift of PDF
+       * @param timeMin lower edge of time window within which the photons are accepted
+       * @param timeMax upper edge of time window within which the photons are accepted
+       * @param sigma additional time smearing sigma
+       * @param logL return array of pixel log likelihood values (must be zeroed on input)
+       */
+      void getLogL(double timeShift, double timeMin, double timeMax, double sigma,
+                   float* logL)
+      {
+        float t0 = (float) timeShift;
+        float tmin = (float) timeMin;
+        float tmax = (float) timeMax;
+        float sigt = (float) sigma;
+        get_logl_ch_(&t0, &tmin, &tmax, &sigt, logL);
       }
 
       /**

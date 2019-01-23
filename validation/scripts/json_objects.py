@@ -393,8 +393,8 @@ class ComparisonNTuple(NTuple):
         self.title = title
         #: name of contact person
         self.contact = contact
-        # : path to the json file which contains the individual numbers of
-        # : the ntuple
+        #: path to the json file which contains the individual numbers of
+        #: the ntuple
         self.json_file_path = json_file_path
 
 
@@ -422,8 +422,8 @@ class ComparisonHtmlContent(HtmlContent):
         self.title = title
         #: name of contact person
         self.contact = contact
-        # : path to the json file which contains the individual numbers of
-        # : the ntuple
+        #: path to the json file which contains the individual numbers of
+        #: the ntuple
         self.html_content = html_content
 
 

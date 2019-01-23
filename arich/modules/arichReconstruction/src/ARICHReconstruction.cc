@@ -522,7 +522,7 @@ namespace Belle2 {
           fi_cer_all[iAerogel] = fi_cer;
 
           // skip photons with irrelevantly large/small Cherenkov angle
-          if ((th_cer > 0.5 || th_cer < 0.1) && iAerogel == 0) break;
+          if (th_cer > 0.5 || th_cer < 0.1) continue;
 
           // count photons with 0.1<thc<0.5
           if (nfoo == nDetPhotons) nDetPhotons++;
@@ -584,13 +584,13 @@ namespace Belle2 {
           if (!bkgAdded) {
             for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
               std::vector<double> pars = {momentum / sqrt(p_mass[iHyp]*p_mass[iHyp] + momentum * momentum), double(arichTrack.hitsWindow())};
-              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_all[0], pars);
+              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_all[1], pars);
             }
             bkgAdded = true;
           }
         }
         // create ARICHPhoton if desired
-        if (m_storePhot && th_cer_all[0] > 0 && th_cer_all[0] < 0.6) {
+        if (m_storePhot && th_cer_all[1] > 0 && th_cer_all[1] < 0.6) {
           double n_cos_theta_ch[c_noOfHypotheses] = {0.0};
           double phi_ch[c_noOfHypotheses] = {0.0};
           for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
@@ -606,7 +606,7 @@ namespace Belle2 {
               phi_ch[iHyp] = -99999.;
             }
           }
-          ARICHPhoton phot(iPhoton, th_cer_all[0], fi_cer_all[0], mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
+          ARICHPhoton phot(iPhoton, th_cer_all[1], fi_cer_all[1], mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
           phot.setBkgExp(ebgri); // store expected number of background hits
           phot.setSigExp(sigExpArr); // store expected number of signal hits
           phot.setNCosThetaCh(n_cos_theta_ch); // store n cos(theta_th) for all particle hypotheses

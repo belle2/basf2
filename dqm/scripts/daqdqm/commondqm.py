@@ -77,12 +77,32 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'EKLM' in components:
         eklmdqm = register_module('EKLMDQM')
         path.add_module(eklmdqm)
-    # ECLTRG
+    # TRG
     if components is None or 'TRG' in components:
+        # TRGECL
         trgecldqm = register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+        # TRGGDL
         trggdldqm = register_module('TRGGDLDQM')
         path.add_module(trggdldqm)
+        # TRGCDCTSF
+        trgcdctsfdqm = register_module('TRGCDCTSFDQM')
+        path.add_module(trgcdctsfdqm)
+        # TRGCDC3D
+        path.add_module('TRGCDCT3DConverter',
+                        hitCollectionName='FirmCDCTriggerSegmentHits',
+                        addTSToDatastore=True,
+                        EventTimeName='FirmBinnedEventT0',
+                        addEventTimeToDatastore=True,
+                        inputCollectionName='FirmTRGCDC2DFinderTracks',
+                        add2DFinderToDatastore=True,
+                        outputCollectionName='FirmTRGCDC3DFitterTracks',
+                        add3DToDatastore=True,
+                        fit3DWithTSIM=0,
+                        firmwareResultCollectionName='TRGCDCT3DUnpackerStores',
+                        isVerbose=0)
+        trgcdct3ddqm = register_module('TRGCDCT3DDQM')
+        path.add_module(trgcdct3ddqm, generatePostscript=False)
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if components is None or 'SVD' in components or 'PXD' in components:
         trackDqm = register_module('TrackDQM')

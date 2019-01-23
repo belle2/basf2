@@ -219,27 +219,36 @@ For example,
 
 would create a path [ A -> [ contents of otherPath ] -> B ].)")
   .def("modules", &_getModulesPython, "Returns an ordered list of all modules in this path.")
-  .def("for_each", &Path::forEach, R"(Similar to `add_path()`, this will execute path at the current position, but
-will run it once for each object in the given array ``arrayName``, and set the loop variable
-``loopObjectName`` (a StoreObjPtr of same type as array) to the current object.
+  .def("for_each", &Path::forEach, R"(Similar to `add_path()`, this will
+execute the given ``path`` at the current position, but in each event it will
+execute it once for each object in the given StoreArray ``arrayName``. It will
+create a StoreObject named ``loopObjectName``  of same type as array which will
+point to each element in turn for each execution.
 
-Main use case is after using the RestOfEventBuilder on a ParticeList, where
-you can use this feature to perform actions on only a part of the event
-for a given list of candidates:
+The main use case is to use it after using the RestOfEventBuilder on a
+ParticeList, where you can use this feature to perform actions on only a part
+of the event for a given list of candidates:
 
     >>> path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-    read: for each  $objName   in $arrayName   run over $path
 
-If 'RestOfEvents' contains two elements, during the execution of roe_path a StoreObjectPtr 'RestOfEvent'
-will be available, which will point to the first element in the first run, and the second element
-in the second run. You can use the variable 'isInRestOfEvent' to select Particles that
-originate from this part of the event.
+You can read this as
 
-Changes to existing arrays / objects will be available to all modules after the for_each(),
-including those made to the loop variable (it will simply modify the i'th item in the array looped over.)
-Arrays / objects of event durability created inside the loop will however be limited to the validity of the loop variable. That is,
-creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
-to the next MCParticle or exiting the loop.)", args("loopObjectName", "arrayName", "path"))
+  "for each "RestOfEvent" in the array of "RestOfEvents", execute ``roe_path``"
+
+For example, if 'RestOfEvents' contains two elements then ``roe_path`` will be
+executed twice and during the execution a StoreObjectPtr 'RestOfEvent' will be
+available, which will point to the first element in the first execution, and
+the second element in the second execution.
+
+Changes to existing arrays / objects will be available to all modules after the
+`for_each()`, including those made to the loop variable (it will simply modify
+the i'th item in the array looped over.)
+
+StoreArrays / StoreObjects (of event durability) *created* inside the loop will
+be removed at the end of each iteration. So if you create a new particle list
+inside a for_each() path execution the particle list will not exist for the
+next iteration or after the for_each() is complete.)",
+       args("loopObjectName", "arrayName", "path"))
   .def("do_while", &Path::doWhile, R"(
 Similar to `add_path()` this will execute a path at the current position but it
 will repeat execution of this path as long as the return value of the last

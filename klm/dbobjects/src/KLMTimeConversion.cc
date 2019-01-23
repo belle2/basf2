@@ -74,6 +74,12 @@ double KLMTimeConversion::getTime(int ctime, int tdc, int triggerCTime,
   return relativeTime * m_TDCPeriod;
 }
 
+double KLMTimeConversion::getTimeSimulation(int tdc, bool scintillator) const
+{
+  (void)scintillator;
+  return tdc * m_TDCPeriod + m_TimeOffset;
+}
+
 uint16_t KLMTimeConversion::getTDCByTime(double time) const
 {
   return (time - m_TimeOffset) / m_TDCPeriod;

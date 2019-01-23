@@ -60,6 +60,13 @@ namespace Belle2 {
                    bool scintillator) const;
 
     /**
+     * Get time for simulation.
+     * @param[in] tdc          TDC.
+     * @param[in] scintillator Scintillator (true) or RPC (false).
+     */
+    double getTimeSimulation(int tdc, bool scintillator) const;
+
+    /**
      * Get TDC by time.
      */
     uint16_t getTDCByTime(double time) const;

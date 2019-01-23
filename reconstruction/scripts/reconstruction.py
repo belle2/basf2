@@ -312,8 +312,6 @@ def add_cdst_output(
         'SoftwareTriggerVariables',
         'BKLMDigits',
         'BKLMHit1ds',
-        'BKLMTracks',
-        'BKLMTracksToBKLMHit2ds',
         'BKLMHit2dsToBKLMHit1ds',
         'BKLMHit1dsToBKLMDigits'
     ]

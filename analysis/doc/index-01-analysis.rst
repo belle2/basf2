@@ -88,6 +88,13 @@ How to Veto
 
 .. toctree:: HowToVeto
 
+
+for_each
+===========
+
+.. toctree:: ForEach
+
+
 Advanced Topics
 ===============
 

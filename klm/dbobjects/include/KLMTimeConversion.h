@@ -39,13 +39,25 @@ namespace Belle2 {
 
     /**
      * Set time offset.
+     * @param[in] offset Offset in ns.
      */
     void setTimeOffset(double offset);
 
     /**
-     * Get time by TDC.
+     * Set CTIME shift.
+     * @param[in] shift Shift in bits.
      */
-    double getTime(int ctime, int tdc, int triggerCTime) const;
+    void setCTimeShift(int shift);
+
+    /**
+     * Get time.
+     * @param[in] ctime        CTIME.
+     * @param[in] tdc          TDC.
+     * @param[in] triggerCTime Trigger CTIME.
+     * @param[in] scintillator Scintillator (true) or RPC (false).
+     */
+    double getTime(int ctime, int tdc, int triggerCTime,
+                   bool scintillator) const;
 
     /**
      * Get TDC by time.
@@ -59,6 +71,9 @@ namespace Belle2 {
 
     /** Time offset. */
     double m_TimeOffset;
+
+    /** CTIME shift in bits. */
+    int m_CTimeShift;
 
     /** Class version, */
     ClassDef(KLMTimeConversion, 1);

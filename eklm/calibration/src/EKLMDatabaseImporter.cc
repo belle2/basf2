@@ -208,6 +208,7 @@ void EKLMDatabaseImporter::importTimeConversion()
              "Content/TimeConversion");
   timeConversion->setTDCFrequency(gd.getDouble("TDCFrequency"));
   timeConversion->setTimeOffset(gd.getDouble("TimeOffset"));
+  timeConversion->setCTimeShift(0);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   timeConversion.import(iov);

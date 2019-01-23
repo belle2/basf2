@@ -355,6 +355,9 @@ void SVDUnpackerModule::event()
 
           if (m_FADCTrailer.check == 14)  { // FADC trailer
 
+            //additional check if we have a faulty/fake FADC that is not in the map
+            if (APVmap->find(fadc) == APVmap->end()) badMapping = true;
+
             //comparing number of APV chips and the number of APV headers, for the current FADC
             unsigned short nAPVs = APVmap->count(fadc);
 

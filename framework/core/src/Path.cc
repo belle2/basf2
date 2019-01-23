@@ -247,7 +247,14 @@ the i'th item in the array looped over.)
 StoreArrays / StoreObjects (of event durability) *created* inside the loop will
 be removed at the end of each iteration. So if you create a new particle list
 inside a for_each() path execution the particle list will not exist for the
-next iteration or after the for_each() is complete.)",
+next iteration or after the `for_each()` is complete.
+
+Parameters:
+  loopObjectName (str): The name of the object in the datastore during each execution
+  arrayName (str): The name of the StoreArray to loop over where the i-th
+    element will be available as ``loopObjectName`` during the i-th execution
+    of ``path``
+  path (basf2.Path): The path to execute for each element in ``arrayName``)",
        args("loopObjectName", "arrayName", "path"))
   .def("do_while", &Path::doWhile, R"(
 Similar to `add_path()` this will execute a path at the current position but it

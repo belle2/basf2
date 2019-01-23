@@ -16,13 +16,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
 
 
 
@@ -37,57 +33,47 @@ namespace Belle2 {
   class OverlapResidualsModule : public Module {
 
   public:
-
     /** Constructor */
     OverlapResidualsModule();
-
     /** Register input and output data */
-    virtual void initialize() override;
-
+    void initialize() override;
     /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
-    virtual void event() override;
-
+    void event() override;
     /** Terminate basf2*/
     void terminate() override;
 
-    /** Root filename */
-    std::string m_rootFileName;
-
-    /** Pointer to the root file */
-    TFile* m_rootFilePtr = NULL;
-
-
   private:
-    StoreArray<SVDTrueHit> m_truhits;
-    StoreArray<PXDTrueHit> m_pxdtruhits;
+    /** Root filename */
+    std::string m_rootFileName = "VXDOverlappingHits.root";
+    /** Pointer to the root file */
+    TFile* m_rootFilePtr = nullptr;
+    /** Array storing reconstructed tracks */
     StoreArray<RecoTrack> recoTrack;
+    /** Array storing PXD clusters */
     StoreArray<PXDCluster> m_pxdcluster;
+    /** Array storing SVD clusters */
     StoreArray<SVDCluster> m_svdcluster;
-
-
-    TH1F* h_U_Res = NULL;
-    TH1F* h_V_Res = NULL;
-
-    TH1F* h_SVDstrips_Mult = NULL;
-
-    TH1F* h_U_Cl1Cl2_Res[10] = {NULL};
-    TH1F* h_V_Cl1Cl2_Res[10] = {NULL};
-
-    TH2F* h_Lyr6[17][6] = {NULL};
-    TH2F* h_Lyr5[13][5] = {NULL};
-    TH2F* h_Lyr4[11][4] = {NULL};
-    TH2F* h_Lyr3[8][3] = {NULL}; //[Ladder][sensor number]
-    TH2F* h_Lyr2[13][3] = {NULL}; //[Ladder][sensor number]
-    TH2F* h_Lyr1[9][3] = {NULL}; //[Ladder][sensor number]
-
-    TH2F* h_Fit_Lyr6[17][6] = {NULL};
-    TH2F* h_Fit_Lyr5[13][5] = {NULL};
-    TH2F* h_Fit_Lyr4[11][4] = {NULL};
-    TH2F* h_Fit_Lyr3[8][3] = {NULL}; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr2[13][3] = {NULL}; //[Ladder][sensor number]
-    TH2F* h_Fit_Lyr1[9][3] = {NULL}; //[Ladder][sensor number]
+    /** Histograms of residuals */
+    TH1F* h_U_Res = nullptr;
+    TH1F* h_V_Res = nullptr;
+    TH1F* h_SVDstrips_Mult = nullptr;
+    TH1F* h_U_Cl1Cl2_Res[10] = {nullptr};
+    TH1F* h_V_Cl1Cl2_Res[10] = {nullptr};
+    /** Sensor hit-maps from reconstructed u and v coordinates */
+    TH2F* h_Lyr6[17][6] = {nullptr};
+    TH2F* h_Lyr5[13][5] = {nullptr};
+    TH2F* h_Lyr4[11][4] = {nullptr};
+    TH2F* h_Lyr3[8][3] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr2[13][3] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr1[9][3] = {nullptr}; //[Ladder][sensor number]
+    /** Sensor hit-maps from fitted u and v coordinates */
+    TH2F* h_Fit_Lyr6[17][6] = {nullptr};
+    TH2F* h_Fit_Lyr5[13][5] = {nullptr};
+    TH2F* h_Fit_Lyr4[11][4] = {nullptr};
+    TH2F* h_Fit_Lyr3[8][3] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr2[13][3] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Fit_Lyr1[9][3] = {nullptr}; //[Ladder][sensor number]
 
   };
 }
-
 #endif /* OVERLAPRESIDUALS_H */

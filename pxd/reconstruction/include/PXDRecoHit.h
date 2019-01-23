@@ -14,7 +14,8 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-
+#include <framework/database/DBObjPtr.h>
+#include <alignment/dbobjects/VXDAlignment.h>
 
 // ROOT includes
 #include <TMatrixD.h>
@@ -140,6 +141,12 @@ namespace Belle2 {
 
     /** Set up Detector plane information */
     void setDetectorPlane();
+
+    /** Apply planar deformation of sensors*/
+    TVectorD applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
+
+    /** DBObjPtr for the alignment */
+    DBObjPtr<VXDAlignment> m_vxdAlignments;
 
     ClassDefOverride(PXDRecoHit, 8)
   };

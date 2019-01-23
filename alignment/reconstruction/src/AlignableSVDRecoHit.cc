@@ -33,7 +33,8 @@ std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit::globalDerivatives(con
 
   bool applyDeformation(true); // To determine planar deformation
 
-  if (applyDeformation and getSensorID() == VxdID("4.3.2")) { // Choose testing SVD sensor
+  //if (applyDeformation and getSensorID() == VxdID("4.3.2")) {
+  if (applyDeformation) {
 
     const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(getSensorID()));
 
@@ -60,20 +61,20 @@ std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit::globalDerivatives(con
     u = u * 2 / width;                       // Legendre parametrization required U in (-1, 1)
     v = v * 2 / length;                      // Legendre parametrization required V in (-1, 1)
 
-    globals.add(31, std::vector<double> {L2(u)*du_dw,       L2(u)*dv_dw});
-    globals.add(32, std::vector<double> {L1(u)*L1(v)*du_dw, L1(u)*L1(v)*dv_dw});
-    globals.add(33, std::vector<double> {L2(v)*du_dw,       L2(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 31), std::vector<double> {L2(u)*du_dw,       L2(u)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 32), std::vector<double> {L1(u)*L1(v)*du_dw, L1(u)*L1(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 33), std::vector<double> {L2(v)*du_dw,       L2(v)*dv_dw});
 
-    globals.add(41, std::vector<double> {L3(u)*du_dw,       L3(u)*dv_dw});
-    globals.add(42, std::vector<double> {L2(u)*L1(v)*du_dw, L2(u)*L1(v)*dv_dw});
-    globals.add(43, std::vector<double> {L1(u)*L2(v)*du_dw, L1(u)*L2(v)*dv_dw});
-    globals.add(44, std::vector<double> {L3(v)*du_dw,       L3(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 41), std::vector<double> {L3(u)*du_dw,       L3(u)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 42), std::vector<double> {L2(u)*L1(v)*du_dw, L2(u)*L1(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 43), std::vector<double> {L1(u)*L2(v)*du_dw, L1(u)*L2(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 44), std::vector<double> {L3(v)*du_dw,       L3(v)*dv_dw});
 
-    globals.add(51, std::vector<double> {L4(u)*du_dw,       L4(u)*dv_dw});
-    globals.add(52, std::vector<double> {L3(u)*L1(v)*du_dw, L3(u)*L1(v)*dv_dw});
-    globals.add(53, std::vector<double> {L2(u)*L2(v)*du_dw, L2(u)*L2(v)*dv_dw});
-    globals.add(54, std::vector<double> {L1(u)*L3(v)*du_dw, L1(u)*L3(v)*dv_dw});
-    globals.add(55, std::vector<double> {L4(v)*du_dw,       L4(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 51), std::vector<double> {L4(u)*du_dw,       L4(u)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 52), std::vector<double> {L3(u)*L1(v)*du_dw, L3(u)*L1(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 53), std::vector<double> {L2(u)*L2(v)*du_dw, L2(u)*L2(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 54), std::vector<double> {L1(u)*L3(v)*du_dw, L1(u)*L3(v)*dv_dw});
+    globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 55), std::vector<double> {L4(v)*du_dw,       L4(v)*dv_dw});
   }
   return globals;
 }

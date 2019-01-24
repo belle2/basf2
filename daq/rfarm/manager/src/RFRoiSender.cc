@@ -6,7 +6,9 @@
 // Date : 18 - Dec - 2015
 //-
 
-#include "daq/rfarm/manager/RFRoiSender.h"
+#include <daq/rfarm/manager/RFRoiSender.h>
+#include <string>
+
 
 using namespace Belle2;
 using namespace std;
@@ -114,10 +116,12 @@ int RFRoiSender::UnConfigure(NSMmsg*, NSMcontext*)
   if (m_pid_sender != 0) {
     kill(m_pid_sender, SIGINT);
     waitpid(m_pid_sender, &statx, 0);
+    m_pid_sender = 0;
   }
   if (m_pid_merger != 0) {
     kill(m_pid_merger, SIGINT);
     waitpid(m_pid_merger, &statx, 0);
+    m_pid_merger = 0;
   }
   printf("UnConfigure : done\n");
   return 0;
@@ -160,10 +164,13 @@ void RFRoiSender::server()
     pid_t pid = m_proc->CheckProcess();
     if (pid > 0) {
       printf("RFRoiSender : process dead. pid=%d\n", pid);
-      if (pid == m_pid_sender)
+      if (pid == m_pid_sender) {
         m_log->Fatal("RFRoiSender : hltout2merger dead. pid = %d\n", pid);
-      else if (pid == m_pid_merger)
+        // RFNSM_Status::Instance().set_state(RFSTATE_ERROR); // << will this really set the state? ERROR is not defined anyway
+      } else if (pid == m_pid_merger) {
         m_log->Fatal("RFRoiSender : merger2merge dead. pid = %d\n", pid);
+        // RFNSM_Status::Instance().set_state(RFSTATE_ERROR); // << will this really set the state? ERROR is not defined anyway
+      }
     }
 
     int st = m_proc->CheckOutput();

@@ -44,13 +44,12 @@ double KLMTimeConversion::getTime(int ctime, int tdc, int triggerCTime,
 {
   /* Relative time in TDC periods. */
   int relativeTime;
-  /*
-   * All time values were shifted by 2 bits for the phase2 data.
-   */
-  int correctedCTime = (ctime << m_CTimeShift) & 0xFFFF;
-  int correctedTriggerCTime = (triggerCTime << m_CTimeShift) & 0xFFFF;
-  int correctedTdc = (tdc << m_CTimeShift) & 0x07FF;
   if (scintillator) {
+    /*
+     * All time values were shifted by 2 bits for the phase2 data.
+     */
+    int correctedCTime = (ctime << m_CTimeShift) & 0xFFFF;
+    int correctedTriggerCTime = (triggerCTime << m_CTimeShift) & 0xFFFF;
     /* Scintillator: 16-bit CTIME. */
     if (correctedCTime <= correctedTriggerCTime)
       relativeTime = correctedCTime - correctedTriggerCTime;
@@ -64,8 +63,8 @@ double KLMTimeConversion::getTime(int ctime, int tdc, int triggerCTime,
      * on trigger CTIME. TDC frequency is 8 times greater than CTIME frequency.
      * The 2 last bits are zero, thus, the precision is 4 * (TDC period).
      */
-    int trigger = (correctedTriggerCTime & 0x7F) << 3;
-    int tdcReduced = correctedTdc & 0x3FF;
+    int trigger = (triggerCTime & 0x7F) << 3;
+    int tdcReduced = tdc & 0x3FF;
     if (tdcReduced <= trigger)
       relativeTime = tdcReduced - trigger;
     else

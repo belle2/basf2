@@ -258,8 +258,8 @@ void eclee5x5CollectorModule::collect()
   double maxClustE[2] = { -1., -1.};
   int nclust = m_eclClusterArray.getEntries();
   for (int ic = 0; ic < nclust; ic++) {
-    if (m_eclClusterArray[ic]->hasHypothesis(Belle2::ECLCluster::c_nPhotons)) {
-      double eClust = m_eclClusterArray[ic]->getEnergy();
+    if (m_eclClusterArray[ic]->hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons)) {
+      double eClust = m_eclClusterArray[ic]->getEnergy(Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
       if (eClust > maxClustE[0]) {
         maxClustE[1] = maxClustE[0];
         icMax[1] = icMax[0];
@@ -299,13 +299,15 @@ void eclee5x5CollectorModule::collect()
   TVector3 p30(0., 0., maxClustE[0]);
   p30.SetTheta(theta0);
   p30.SetPhi(phi0);
-  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex);
+  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex,
+                                                           ECLCluster::EHypothesisBit::c_nPhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
   TVector3 p31(0., 0., maxClustE[1]);
   p31.SetTheta(theta1);
   p31.SetPhi(phi1);
-  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex);
+  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex,
+                                                           ECLCluster::EHypothesisBit::c_nPhotons);
 
   /** Check how back-to-back in theta* */
   TLorentzVector p40COM = m_boostrotate.rotateLabToCms() * p40;

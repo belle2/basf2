@@ -30,7 +30,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <klm/dbobjects/KLMTimeConversion.h>
 
 using namespace Belle2;
 
@@ -199,18 +198,3 @@ void EKLMDatabaseImporter::importElectronicsMap()
                          m_ExperimentHigh, m_RunHigh);
   m_ElectronicsMap.import(iov);
 }
-
-void EKLMDatabaseImporter::importTimeConversion()
-{
-  DBImportObjPtr<KLMTimeConversion> timeConversion;
-  timeConversion.construct();
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
-             "Content/TimeConversion");
-  timeConversion->setTDCFrequency(gd.getDouble("TDCFrequency"));
-  timeConversion->setTimeOffset(gd.getDouble("TimeOffset"));
-  timeConversion->setCTimeShift(0);
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  timeConversion.import(iov);
-}
-

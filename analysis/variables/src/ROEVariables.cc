@@ -362,66 +362,16 @@ namespace Belle2 {
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
 
-        // Load ROE Tracks
-        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
-
-        // Add tracks in ROE V0 list, if they exist
-        //TODO: replace this!
-        /*std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
-        for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
-        {
-          roeTracks.push_back(particles[v0List[iV0]]->getDaughter(0)->getTrack());
-          roeTracks.push_back(particles[v0List[iV0]]->getDaughter(1)->getTrack());
-        }*/
-
-        // Load ROE ECLClusters
-        std::vector<const ECLCluster*> roeECL = roe->getECLClusters(maskName);
-
-        StoreArray<MCParticle> mcParticles;
         std::set<const MCParticle*> mcROEObjects;
 
-        // Fill Track MCParticles to std::set
-        for (unsigned i = 0; i < roeTracks.size(); i++)
-          if (roeTracks[i]->getRelated<MCParticle>())
-            mcROEObjects.insert(roeTracks[i]->getRelated<MCParticle>());
-
-        // Fill only photon MCParticles which have good relations, copied from ParticleLoader until a better solution is established
-        for (unsigned i = 0; i < roeECL.size(); i++)
+        auto roeParticles = roe->getParticles(maskName);
+        for (auto* roeParticle : roeParticles)
         {
-          if (roeECL[i]->isNeutral()) {
-            // ECLCluster can be matched to multiple MCParticles
-            // order the relations by weights and set Particle -> multiple MCParticle relation
-            // preserve the weight
-            RelationVector<MCParticle> mcRelations = roeECL[i]->getRelationsTo<MCParticle>();
-            // order relations by weights
-            std::vector<std::pair<int, double>> weightsAndIndices;
-            for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
-              const MCParticle* relMCParticle = mcRelations[iMCParticle];
-              double weight = mcRelations.weight(iMCParticle);
-              if (relMCParticle)
-                weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
-            }
-            // sort descending by weight
-            std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
-            const std::pair<int, double>& right) {
-              return left.second > right.second;
-            });
-
-            // insert MCParticle based on relation strength
-            for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
-              const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
-              double weight = weightsAndIndices[j].second;
-
-              // TODO: study this further and avoid hardcoded values
-              // set the relation only if the MCParticle's energy contribution
-              // to this cluster amounts to at least 25%
-              if (relMCParticle)
-                if (weight / roeECL[i]->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30 && relMCParticle->getPDG() == 22)
-                  mcROEObjects.insert(relMCParticle);
-            }
+          auto* mcroeParticle = roeParticle->getRelated<MCParticle>();
+          if (mcroeParticle != nullptr) {
+            mcROEObjects.insert(mcroeParticle);
           }
         }
-
         int flags = 0;
         checkMCParticleMissingFlags(mcROE, mcROEObjects, flags);
 

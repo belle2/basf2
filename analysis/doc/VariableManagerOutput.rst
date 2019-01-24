@@ -3,11 +3,88 @@
 Variable Manager Output 
 =======================
 
-A common task is to write out quantities from the VariableManager to a `ROOT`_ file to analyse it outside of the ``basf2`` framework (e.g. to perform a fit, and extract a physical observable). 
+A common task is to write out information to a `ROOT`_ file to analyse it outside of the ``basf2`` framework (e.g. to perform a fit, and extract a physical observable). 
 
 .. _ROOT: https://root.cern.ch
 
-There are several modules which write out Variables in one form or another:
+There are several modules which write out variables in one form or another.
+And several helpful functions to set up your output TTree in a format you like.
+
+.. _v2nt:
+
+VariablesToNtuple
+-----------------
+
+Writes out Variables to a flat `ROOT`_ TTree (it is also possible to write out several trees to one file).
+
+.. note:: 
+        New since release-03: event, run, and experiment numbers are now automatically included. 
+        If you have are writing candidates, you will also see a candidate counter and the number of candidates (ncandidates).
+
+Candidate-wise
+~~~~~~~~~~~~~~
+For each candidate in the given `ParticleList`, there will be one entry in the TTree containing the desired Variables. 
+In other words, this produces a candidate-based ROOT file.
+Here is an example of use:
+
+.. code-block:: python
+ 
+        from modularAnalysis import variablesToNtuple
+        list_of_interesting_variables = [
+                'E', 'px', 'py', 'pz', 'isSignal',  # related to the candidate
+                'nTracks', # related to the event
+        ]
+        variablesToNtuple('pi+:all', list_of_interesting_variables, path=mypath)
+
+Event-wise
+~~~~~~~~~~
+This module will also work even when provided with *no* ParticleList name.
+In this case it will be filled once per event.
+Here is an example of event-wise usage:
+
+.. code-block:: python
+
+        from modularAnalysis import variablesToNtuple
+        list_of_interesting_event_variables = [
+                'L1Trigger', 'HighLevelTrigger', 'nTracks' # purely event
+        ]
+        variablesToNtuple('', list_of_interesting_event_variables, path=mypath)
+
+
+Multiple TTress
+~~~~~~~~~~~~~~~
+
+You can write several trees to the same file by calling the module several times with the same ``treeName``.
+
+.. code-block:: python
+
+        from modularAnalysis import variablesToNtuple
+        variablesToNtuple('', list_of_interesting_event_variables, 
+                          treeName="event", fileName="myoutput.root", 
+                          path=mypath)
+        variablesToNtuple('pi+:all', list_of_interesting_variables, 
+                          treeName='pions', fileName='myoutput.root', # <-- same file
+                          path=mypath)
+        variablesToNtuple('K+:all', list_of_interesting_variables, 
+                          treeName='kaons', fileName='anotheroutput.root', # <-- different file
+                          path=mypath)
+
+
+Modular analysis convenience function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Here is the full function documentation of the modular analysis convenience function:
+
+.. autofunction:: modularAnalysis.variablesToNtuple
+
+.. _v2ebt:
+
+VariablesToEventBasedTree 
+-------------------------
+
+Writes out Variables to a structured `ROOT`_ TTree.
+For each **event** an entry is written into the Tree containing one array (for each Particle in the ParticleList) for each Variable.
+
+.. seealso:: More information for working event-wise is given in the section about `EventBased`.
 
 VariablesToHistogram
 --------------------
@@ -27,50 +104,3 @@ Here is an example of use:
 And here is the full function documentation of the modular analysis convenience function:
 
 .. autofunction:: modularAnalysis.variablesToHistogram
-
-.. _v2nt:
-
-VariablesToNtuple
------------------
-
-Writes out Variables to a flat `ROOT`_ TTree.
-For each candidate in the given ParticleList, there will be one entry in the TTree containing the desired Variables. 
-In other words, this produces a candidate-based ROOT file.
-Here is an example of use:
-
-.. code-block:: python
- 
-        from modularAnalysis import variablesToNtuple
-        list_of_interesting_variables = [
-                'expNum', 'runNum', 'evtNum', 
-                'E', 'px', 'py', 'pz', 'isSignal', 
-        ]
-        variablesToNtuple('pi+:all', list_of_interesting_variables)
-
-This module will also work even when provided with *no* ParticleList name.
-In this case it will be filled once per event.
-Here is an example of event-wise usage:
-
-.. code-block:: python
-
-        from modularAnalysis import variablesToNtuple
-        list_of_interesting_event_variables = [
-                'expNum', 'runNum', 'evtNum', 
-                'L1Trigger', 'HighLevelTrigger', 'nTracks' 
-        ]
-        variablesToNtuple('', list_of_interesting_event_variables)
-
-And here is the full function documentation of the modular analysis convenience function:
-
-.. autofunction:: modularAnalysis.variablesToNtuple
-
-.. _v2ebt:
-
-VariablesToEventBasedTree 
--------------------------
-
-Writes out Variables to a structured `ROOT`_ TTree.
-For each **event** an entry is written into the Tree containing one array (for each Particle in the ParticleList) for each Variable.
-
-.. seealso:: More information for working event-wise is given in the section about `EventBased`.
-

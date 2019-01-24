@@ -368,7 +368,6 @@ namespace Belle2 {
 
     double eclClusterConnectedRegionId(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getConnectedRegionId();
@@ -378,7 +377,6 @@ namespace Belle2 {
 
     double eclClusterUniqueId(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getUniqueId();
@@ -388,7 +386,6 @@ namespace Belle2 {
 
     double eclClusterId(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getClusterId();
@@ -398,17 +395,42 @@ namespace Belle2 {
 
     double eclClusterHypothesisId(const Particle* particle)
     {
-
+      // Hypothesis ID is deprecated, this function should be removed in release-05.
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getHypothesisId();
+        if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+            and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          return 56.0;
+        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+          return 5.0;
+        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          return 6.0;
+        else
+          return -1.0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclClusterHasNPhotonsHypothesis(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclClusterHasNeutralHadronHypothesis(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
 
     double eclClusterHasPulseShapeDiscrimination(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->hasPulseShapeDiscrimination();
@@ -418,7 +440,6 @@ namespace Belle2 {
 
     double eclClusterTrigger(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         const bool matcher = cluster->hasTriggerClusterMatching();
@@ -1127,8 +1148,19 @@ namespace Belle2 {
                       "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
                       "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
-    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,
-                      "Returns the hypothesis ID of this ECL cluster.");
+    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId, R"DOCSTRING(
+Emulates the deprecated hypothesis ID of this ECL cluster in as-backward-compatible way as possible..
+Returns 5 for the nPhotons hypothesis, 6 for the neutralHadron hypothesis.
+Since release-04-00-00 it is possible for a cluster to have both hypotheses so if both are set it will return 56.
+
+.. warning::
+   This variable is a legacy variable and will be removed in release-05. 
+   You probably want to use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron` instead of this variable.
+)DOCSTRING");
+    REGISTER_VARIABLE("clusterHasNPhotons", eclClusterHasNPhotonsHypothesis, 
+                      "Returns 1.0 if the cluster has the 'N photons' hypothesis (historically called 'N1'), 0.0 if not, and NaN if no cluster is associated to the particle.");
+    REGISTER_VARIABLE("clusterHasNeutralHadron", eclClusterHasNeutralHadronHypothesis,
+                      "Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis (historically called 'N2'), 0.0 if not, and NaN if no cluster is associated to the particle.");
     REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
                       "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
@@ -1208,14 +1240,3 @@ namespace Belle2 {
 
   }
 }
-
-
-
-
-
-
-
-
-
-
-

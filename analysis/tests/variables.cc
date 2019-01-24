@@ -2715,6 +2715,10 @@ namespace {
       e3->setPhi(1.5);
       e3->setR(200.0);
       e3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      e3->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      // lets suppose this cluster could also be due to a neutral hadron. In
+      // this case, the c_neuralHadron hypothesis bit would hopefully also have
+      // been set by the reconstruction... arbirarily choose cluster 3
       e3->setClusterId(3);
 
       // aaand add clusters related to the tracks
@@ -2860,10 +2864,49 @@ namespace {
     // test cluster quantities directly (lab system only)
     EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(0)), eclclusters[0]->getPhi());
     EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(0)), eclclusters[0]->getTheta());
-
-
   }
 
+  TEST_F(ECLVariableTest, HypothesisVariables)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i)
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+
+    // grab variables for testing
+    const Manager::Var* vHasNPhotons = Manager::Instance().getVariable("clusterHasNPhotons");
+    const Manager::Var* vHasNeutHadr = Manager::Instance().getVariable("clusterHasNeutralHadron");
+    const Manager::Var* vHypothsisID = Manager::Instance().getVariable("clusterHypothesis");
+    // TODO: remove hypothesis id after release-04 (should be gone by -05)
+
+    // check that the hypotheses are correcltly propagated to the VM.
+    for (size_t i = 0; i < gammalist->getListSize(); ++i) {
+      EXPECT_FLOAT_EQ(vHasNPhotons->function(gammalist->getParticle(i)), 1.0);
+      if (i == 2) { // third cluster arbitrarily chosen to test the behaviour of dual hypothesis clusters
+        EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 1.0);
+        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 56.0);
+      } else {
+        EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 0.0);
+        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 5.0);
+      }
+    } // end loop over test list
+  }
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
@@ -2901,6 +2944,7 @@ namespace {
         gammalist->addParticle(p);
       }
     }
+
 
     // make the pions from tracks
     for (int i = 0; i < tracks.getEntries(); ++i) {

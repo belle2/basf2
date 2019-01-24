@@ -1,3 +1,16 @@
+# EventType: 1163700003
+# Descriptor: [B0 -> D** l nu ]cc
+# NickName: B0_D**lnu
+# Documentation: B0->D** l nu process
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Sourav Dey
+# Email: souravdey@tauex.tau.ac.il
+# Cuts: None
+# Date: 20190124
+#
+#
+
 Alias myD+ D+
 Alias myD- D-
 ChargeConj myD- myD+

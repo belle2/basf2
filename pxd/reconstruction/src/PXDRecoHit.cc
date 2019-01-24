@@ -204,6 +204,9 @@ TVectorD PXDRecoHit::applyPlanarDeformation(TVectorD hitCoords, std::vector<doub
 
 std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
+
+  DBObjPtr<VXDAlignment> vxdAlignment;
+
   // Track-based update only takes place when the RecoHit has an associated cluster
   if (this->getCluster()) {
     // Check if we can correct position coordinates based on track info
@@ -233,18 +236,18 @@ std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlan
       };
 
       planarParameters = {
-        m_vxdAlignments->get(m_sensorID, 31),
-        m_vxdAlignments->get(m_sensorID, 32),
-        m_vxdAlignments->get(m_sensorID, 33),
-        m_vxdAlignments->get(m_sensorID, 41),
-        m_vxdAlignments->get(m_sensorID, 42),
-        m_vxdAlignments->get(m_sensorID, 43),
-        m_vxdAlignments->get(m_sensorID, 44),
-        m_vxdAlignments->get(m_sensorID, 51),
-        m_vxdAlignments->get(m_sensorID, 52),
-        m_vxdAlignments->get(m_sensorID, 53),
-        m_vxdAlignments->get(m_sensorID, 54),
-        m_vxdAlignments->get(m_sensorID, 55),
+        vxdAlignment->get(m_sensorID, 31),
+        vxdAlignment->get(m_sensorID, 32),
+        vxdAlignment->get(m_sensorID, 33),
+        vxdAlignment->get(m_sensorID, 41),
+        vxdAlignment->get(m_sensorID, 42),
+        vxdAlignment->get(m_sensorID, 43),
+        vxdAlignment->get(m_sensorID, 44),
+        vxdAlignment->get(m_sensorID, 51),
+        vxdAlignment->get(m_sensorID, 52),
+        vxdAlignment->get(m_sensorID, 53),
+        vxdAlignment->get(m_sensorID, 54),
+        vxdAlignment->get(m_sensorID, 55),
       };
 
       TVectorD pos = applyPlanarDeformation(hitCoords, planarParameters, state);
@@ -262,18 +265,18 @@ std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlan
   };
 
   planarParameters = {
-    m_vxdAlignments->get(m_sensorID, 31),
-    m_vxdAlignments->get(m_sensorID, 32),
-    m_vxdAlignments->get(m_sensorID, 33),
-    m_vxdAlignments->get(m_sensorID, 41),
-    m_vxdAlignments->get(m_sensorID, 42),
-    m_vxdAlignments->get(m_sensorID, 43),
-    m_vxdAlignments->get(m_sensorID, 44),
-    m_vxdAlignments->get(m_sensorID, 51),
-    m_vxdAlignments->get(m_sensorID, 52),
-    m_vxdAlignments->get(m_sensorID, 53),
-    m_vxdAlignments->get(m_sensorID, 54),
-    m_vxdAlignments->get(m_sensorID, 55),
+    vxdAlignment->get(m_sensorID, 31),
+    vxdAlignment->get(m_sensorID, 32),
+    vxdAlignment->get(m_sensorID, 33),
+    vxdAlignment->get(m_sensorID, 41),
+    vxdAlignment->get(m_sensorID, 42),
+    vxdAlignment->get(m_sensorID, 43),
+    vxdAlignment->get(m_sensorID, 44),
+    vxdAlignment->get(m_sensorID, 51),
+    vxdAlignment->get(m_sensorID, 52),
+    vxdAlignment->get(m_sensorID, 53),
+    vxdAlignment->get(m_sensorID, 54),
+    vxdAlignment->get(m_sensorID, 55),
   };
 
   TVectorD pos = applyPlanarDeformation(rawHitCoords_, planarParameters, state);

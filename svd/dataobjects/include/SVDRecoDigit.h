@@ -204,7 +204,7 @@ namespace Belle2 {
     float m_fitChi2Ndf; /** Standardized chi2 of the fit. */
     SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
 
-    ClassDef(SVDRecoDigit, 1)
+    ClassDef(SVDRecoDigit, 2)
 
   }; // class SVDRecoDigit
 

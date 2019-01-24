@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -19,22 +19,15 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// Hit classes
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <top/dbobjects/TOPCalCommonT0.h>
-
-// Root
-#include "TFile.h"
-
+// root
+#include <TRandom.h>
 
 using namespace std;
 
@@ -54,18 +47,39 @@ namespace Belle2 {
   TOPCommonT0CalibratorModule::TOPCommonT0CalibratorModule() : Module()
 
   {
-    // set module description (e.g. insert text)
-    setDescription("On-line common T0 calibrator (under development!)");
+    // set module description
+    setDescription("Common T0 calibration with dimuons or bhabhas.");
     //    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("numBins", m_numBins, "number of bins", 200);
-    addParam("timeRange", m_timeRange, "time range in which to search [ns]", 1.0);
-    addParam("minTime", m_minTime,
-             "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
-    addParam("maxTime", m_maxTime,
-             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
-    addParam("numEvents", m_numEvents, "number of events to merge", 100);
+    addParam("numBins", m_numBins, "number of bins of the search region", 200);
+    addParam("timeRange", m_timeRange,
+             "time range in which to search for the minimum [ns]", 10.0);
+    addParam("minBkgPerBar", m_minBkgPerBar,
+             "minimal number of background photons per module", 0.0);
+    addParam("scaleN0", m_scaleN0,
+             "Scale factor for figure-of-merit N0", 1.0);
+    addParam("sigmaSmear", m_sigmaSmear,
+             "sigma in [ns] for additional smearing of PDF", 0.0);
+    addParam("sample", m_sample,
+             "sample type: one of dimuon, bhabha or cosmics", std::string("dimuon"));
+    addParam("minMomentum", m_minMomentum,
+             "minimal track momentum if sample is cosmics", 1.0);
+    addParam("deltaEcms", m_deltaEcms,
+             "c.m.s energy window (half size) if sample is dimuon or bhabha", 0.1);
+    addParam("dr", m_dr, "cut on POCA in r", 2.0);
+    addParam("dz", m_dz, "cut on POCA in abs(z)", 4.0);
+    addParam("minZ", m_minZ,
+             "minimal local z of extrapolated hit", -130.0);
+    addParam("maxZ", m_maxZ,
+             "maximal local z of extrapolated hit", 130.0);
+    addParam("outputFileName", m_outFileName,
+             "Root output file name containing calibration results. "
+             "File name can include *'s; "
+             "they will be replaced with a run number from the first input file",
+             std::string("commonT0_r*.root"));
+    addParam("pdfOption", m_pdfOption,
+             "PDF option, one of 'rough', 'fine', 'optimal'", std::string("rough"));
 
   }
 
@@ -75,35 +89,87 @@ namespace Belle2 {
 
   void TOPCommonT0CalibratorModule::initialize()
   {
-    m_logLikelihood.resize(m_numBins);
-    m_dt = m_timeRange / m_numBins;
-    for (int i = 0; i < m_numBins; i++) {
-      m_t0.push_back((2 * i - m_numBins + 1) * m_dt / 2.0);
-    }
+    // input collections
+    m_digits.isRequired();
+    m_tracks.isRequired();
+    m_extHits.isRequired();
+    m_recBunch.isOptional();
 
-    // input
-
-    StoreArray<TOPDigit> topDigits;
-    topDigits.isRequired();
-
-    StoreArray<Track> tracks;
-    tracks.isRequired();
-
-    StoreArray<ExtHit> extHits;
-    extHits.isRequired();
-
-    StoreArray<MCParticle> mcParticles;
-    mcParticles.isOptional();
-
-    // output
-
-    StoreArray<TOPCalCommonT0> commonT0;
-    commonT0.registerInDataStore();
-
-    // Configure TOP detector
-
+    // Configure TOP detector for reconstruction
     TOPconfigure config;
 
+    // Parse PDF option
+    if (m_pdfOption == "rough") {
+      m_PDFOption = TOPreco::c_Rough;
+    } else if (m_pdfOption == "fine") {
+      m_PDFOption = TOPreco::c_Fine;
+    } else if (m_pdfOption == "optimal") {
+      m_PDFOption = TOPreco::c_Optimal;
+    } else {
+      B2ERROR("TOPPDFDebuggerModule: unknown PDF option '" << m_pdfOption << "'");
+    }
+
+    // set track selector
+    m_selector = TrackSelector(m_sample);
+    m_selector.setMinMomentum(m_minMomentum);
+    m_selector.setDeltaEcms(m_deltaEcms);
+    m_selector.setCutOnPOCA(m_dr, m_dz);
+    m_selector.setCutOnLocalZ(m_minZ, m_maxZ);
+
+    // Chi2 minimum finders
+    double tmin = -m_timeRange / 2;
+    double tmax =  m_timeRange / 2;
+    for (unsigned i = 0; i < c_numSets; i++) {
+      m_finders[i] = Chi2MinimumFinder1D(m_numBins, tmin, tmax);
+    }
+
+    // if file name includes *'s replace them with a run number
+    auto pos = m_outFileName.find("*");
+    if (pos != std::string::npos) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      auto run = std::to_string(evtMetaData->getRun());
+      while (run.size() < 5) run = "0" + run;
+      while (pos != std::string::npos) {
+        m_outFileName.replace(pos, 1, run);
+        pos = m_outFileName.find("*");
+      }
+    }
+
+    // open root file for ntuple and histogram output
+    m_file = TFile::Open(m_outFileName.c_str(), "RECREATE");
+    if (not m_file) {
+      B2ERROR("Cannot open output file '" << m_outFileName << "'");
+      return;
+    }
+
+    // control histograms
+    m_hits1D = TH1F("numHits", "Number of photons per slot",
+                    c_numModules, 0.5, c_numModules + 0.5);
+    m_hits1D.SetXTitle("slot number");
+    m_hits1D.SetYTitle("hits per slot");
+
+    m_hits2D = TH2F("timeHits", "Photon times vs. boardstacks",
+                    c_numModules * 4, 0.5, c_numModules + 0.5, 200, 0.0, 20.0);
+    m_hits2D.SetXTitle("slot number");
+    m_hits2D.SetYTitle("time [ns]");
+
+    // create output tree
+    m_tree = new TTree("tree", "Channel T0 calibration results");
+    m_tree->Branch("slot", &m_moduleID);
+    m_tree->Branch("numPhotons", &m_numPhotons);
+    m_tree->Branch("x", &m_x);
+    m_tree->Branch("y", &m_y);
+    m_tree->Branch("z", &m_z);
+    m_tree->Branch("p", &m_p);
+    m_tree->Branch("theta", &m_theta);
+    m_tree->Branch("phi", &m_phi);
+    m_tree->Branch("r_poca", &m_pocaR);
+    m_tree->Branch("z_poca", &m_pocaZ);
+    m_tree->Branch("x_poca", &m_pocaX);
+    m_tree->Branch("y_poca", &m_pocaY);
+    m_tree->Branch("Ecms", &m_cmsE);
+    m_tree->Branch("charge", &m_charge);
+    m_tree->Branch("PDG", &m_PDG);
 
   }
 
@@ -113,79 +179,88 @@ namespace Belle2 {
 
   void TOPCommonT0CalibratorModule::event()
   {
+    /* check bunch reconstruction status and run alignment:
+       - if object exists and bunch is found (collision data w/ bunch finder in the path)
+       - if object doesn't exist (cosmic data and other cases w/o bunch finder)
+    */
+
+    if (m_recBunch.isValid()) {
+      if (!m_recBunch->isReconstructed()) return;
+    }
 
     // create reconstruction object and set various options
 
     int Nhyp = 1;
-    double mass = Const::muon.getMass();
-    TOPreco reco(Nhyp, &mass);
-    reco.setPDFoption(TOPreco::c_Rough);
-
-    // set time window if given, otherwise use the default one from TOPNominalTDC
-
-    if (m_maxTime > m_minTime) {
-      reco.setTimeWindow(m_minTime, m_maxTime);
-    }
+    double mass = m_selector.getChargedStable().getMass();
+    TOPreco reco(Nhyp, &mass, m_minBkgPerBar, m_scaleN0);
+    reco.setPDFoption(m_PDFOption);
+    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
+    double timeMin = tdc.getTimeMin();
+    double timeMax = tdc.getTimeMax();
 
     // add photon hits to reconstruction object
 
-    StoreArray<TOPDigit> topDigits;
-    for (const auto& digit : topDigits) {
+    for (const auto& digit : m_digits) {
       if (digit.getHitQuality() == TOPDigit::c_Good)
         reco.addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
                      digit.getTimeError());
     }
 
-    // loop over reconstructed tracks and make sum of log likelihoods for diff. bunches
-    std::vector<TOPtrack> topTracks;
-    StoreArray<Track> tracks;
-    for (const auto& track : tracks) {
+    // loop over reconstructed tracks, make a selection and accumulate log likelihoods
+
+    for (const auto& track : m_tracks) {
+
+      // track selection
       TOPtrack trk(&track);
-      if (trk.getP() < 3) continue;
-      if (abs(trk.getPDGcode()) != 13) continue;
-      if (trk.isValid()) topTracks.push_back(trk);
-    }
-    if (topTracks.size() != 2) return;
+      if (!trk.isValid()) continue;
 
-    for (auto& trk : topTracks) {
+      if (!m_selector.isSelected(trk)) continue;
+
+      // run reconstruction
       reco.reconstruct(trk);
-      if (reco.getFlag() != 1) return;
+      if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
 
-      for (int i = 0; i < m_numBins; i++) {
-        m_logLikelihood[i] += reco.getLogL(m_t0[i], m_minTime, m_maxTime);
+      // minimization procedure: accumulate
+      int sub = gRandom->Integer(c_numSets); // generate sub-sample number
+      auto& finder = m_finders[sub];
+      const auto& binCenters = finder.getBinCenters();
+      for (unsigned ibin = 0; ibin < binCenters.size(); ibin++) {
+        double t0 = binCenters[ibin];
+        finder.add(ibin, -2 * reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear));
       }
+
+      // fill histograms of hits
+      for (const auto& digit : m_digits) {
+        if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+        if (digit.getModuleID() != trk.getModuleID()) continue;
+        if (digit.getTime() < timeMin) continue;
+        if (digit.getTime() > timeMax) continue;
+        m_hits1D.Fill(digit.getModuleID());
+        int bs = digit.getBoardstackNumber();
+        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+      }
+
+      // fill output tree
+      m_moduleID = trk.getModuleID();
+      m_numPhotons = reco.getNumOfPhotons();
+      const auto& localPosition = m_selector.getLocalPosition();
+      m_x = localPosition.X();
+      m_y = localPosition.Y();
+      m_z = localPosition.Z();
+      const auto& localMomentum = m_selector.getLocalMomentum();
+      m_p = localMomentum.Mag();
+      m_theta = localMomentum.Theta();
+      m_phi = localMomentum.Phi();
+      const auto& pocaPosition = m_selector.getPOCAPosition();
+      m_pocaR = pocaPosition.Perp();
+      m_pocaZ = pocaPosition.Z();
+      m_pocaX = pocaPosition.X();
+      m_pocaY = pocaPosition.Y();
+      m_cmsE = m_selector.getCMSEnergy();
+      m_charge = trk.getCharge();
+      m_PDG = trk.getPDGcode();
+      m_tree->Fill();
     }
-    m_iEvent++;
-    if (m_iEvent < m_numEvents) return;
-
-    /*
-    if(m_histograms.size() < 10) {
-      std::string name = "h" + std::to_string(m_histograms.size());
-      TH1F* h = new TH1F(name.c_str(), "di-muon log Likelihood vs. t0",
-           m_numBins, -m_timeRange / 2, m_timeRange / 2);
-      m_histograms.push_back(h);
-      h->GetXaxis()->SetTitle("t_{0} [ns]");
-      h->GetYaxis()->SetTitle("log L_{#mu+} + log L_{#mu-}");
-      for(int i = 0; i < m_numBins; i++) h->SetBinContent(i + 1, m_logLikelihood[i]);
-    }
-    */
-
-
-    // find maximum
-
-    int i0 = 0;
-    for (int i = 0; i < m_numBins; i++) {
-      if (m_logLikelihood[i] > m_logLikelihood[i0]) i0 = i;
-    }
-
-    PointWithError t0 = getParabolicMaximum(i0);
-
-    StoreArray<TOPCalCommonT0> commonT0;
-    commonT0.appendNew(t0.value, t0.error);
-
-    // reset
-    for (auto& logL : m_logLikelihood) logL = 0;
-    m_iEvent = 0;
 
   }
 
@@ -196,39 +271,54 @@ namespace Belle2 {
 
   void TOPCommonT0CalibratorModule::terminate()
   {
-    if (!m_histograms.empty()) {
-      TFile* file = new TFile("commonT0Histo.root", "RECREATE");
-      for (auto& h : m_histograms) h->Write();
-      file->Close();
+
+    // determine scaling factor for errors from two statistically independent results
+
+    TH1F h_pulls("pulls", "Pulls of statistically independent results",
+                 200, -15.0, 15.0);
+    h_pulls.SetXTitle("pulls");
+    std::vector<double> pos, err;
+    for (int i = 0; i < c_numSets; i++) {
+      const auto& minimum = m_finders[i].getMinimum();
+      if (not minimum.valid) continue;
+      pos.push_back(minimum.position);
+      err.push_back(minimum.error);
     }
+    for (unsigned i = 0; i < pos.size(); i++) {
+      for (unsigned j = i + 1; j < pos.size(); j++) {
+        double pull = (pos[i] - pos[j]) / sqrt(err[i] * err[i] + err[j] * err[j]);
+        h_pulls.Fill(pull);
+      }
+    }
+    h_pulls.Write();
+    double scaleError = 1;
+    if (h_pulls.GetEntries() > 1) scaleError = h_pulls.GetRMS();
 
+    // merge statistically independent finders and store results into histograms
+
+    TH1F h_commonT0("commonT0", "Common T0", 1, 0, 1);
+    h_commonT0.SetYTitle("common T0 [ns]");
+
+    auto finder = m_finders[0];
+    for (int i = 1; i < c_numSets; i++) {
+      finder.add(m_finders[i]);
+    }
+    const auto& minimum = finder.getMinimum();
+    if (minimum.valid) {
+      h_commonT0.SetBinContent(1, minimum.position);
+      h_commonT0.SetBinError(1, minimum.error * scaleError);
+    }
+    h_commonT0.Write();
+
+    // write other histograms and ntuple; close the file
+
+    m_hits1D.Write();
+    m_hits2D.Write();
+    m_tree->Write();
+    m_file->Close();
+
+    B2RESULT("Results available in " << m_outFileName);
   }
-
-
-  PointWithError TOPCommonT0CalibratorModule::getParabolicMaximum(unsigned i0)
-  {
-    if (i0 == 0) i0++;
-    if (i0 == m_t0.size() - 1) i0--;
-
-    PointWithError x = getParabolicMaximum(m_logLikelihood[i0 - 1],
-                                           m_logLikelihood[i0],
-                                           m_logLikelihood[i0 + 1]);
-    return PointWithError(m_t0[i0] + x.value * m_dt, x.error * m_dt);
-  }
-
-
-  PointWithError TOPCommonT0CalibratorModule::getParabolicMaximum(double yLeft,
-      double yCenter,
-      double yRight)
-  {
-    double D21 = yCenter - yLeft;
-    double D32 = yRight - yCenter;
-    double A = (D32 - D21) / 2;
-    if (A == 0) return PointWithError(0, 0);
-    double B = (D32 + D21) / 2;
-    return PointWithError(- B / 2 / A, sqrt(-2 / A)); // TODO: check error calculation!!
-  }
-
 
 } // end Belle2 namespace
 

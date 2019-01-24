@@ -4,8 +4,6 @@
 import math
 import os
 import glob
-import sys
-import time
 
 
 def create_image_matrix(imidzes, package, size):

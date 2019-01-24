@@ -47,23 +47,6 @@ PackageSeperatorToken = "__:__"
 ##############################################################################
 
 
-def largest_name(name):
-    name_arr = []
-    for plts in os.listdir(name):
-        plts = plts.strip()
-        if plts.endswith(".png"):
-            name_arr.append(len(plts[:-4]))
-    return max(name_arr)
-
-
-# Doesn't seem to be used, leaving it here for now /klieret
-# def nPvLT(pValDict, number):
-#     for pval in pValDict.values():
-#         if isinstance(pval, numbers.Number) and pval <= number:
-#             return 0
-#     return 1
-
-
 def date_from_revision(revision, work_folder):
     """
     Takes the name of a revision and returns the 'last modified'-timestamp of
@@ -88,7 +71,7 @@ def date_from_revision(revision, work_folder):
             return None
 
 
-def find_root_object(list_of_root_objects, **kwargs):
+def find_root_object(root_objects, **kwargs):
     """
     Receives a list of RootObject objects and a filter KEYWORD=['accepted,
     values'] and return the sublist that matches this filter
@@ -104,7 +87,7 @@ def find_root_object(list_of_root_objects, **kwargs):
         # Holds the lists of matches we have found
         results = []
 
-        for rootobject in list_of_root_objects:
+        for rootobject in root_objects:
             for value in desired_values:
                 try:
                     __ = re.search("^" + value + "$", rootobject.data[sieve])
@@ -118,7 +101,7 @@ def find_root_object(list_of_root_objects, **kwargs):
         return []
 
 
-def serve_existing_plots(list_of_revisions):
+def serve_existing_plots():
     """
     Goes to the folder where
     the plots for the given selection are stored, and replaces the current
@@ -129,10 +112,10 @@ def serve_existing_plots(list_of_revisions):
     print("File exists already and will be served from archive!")
 
 
-def get_plot_files(list_of_revisions, work_folder):
+def get_plot_files(revisions, work_folder):
     """
     Returns a list of all plot files as absolute paths. For this purpose,
-    it loops over all revisions in 'list_of_revisions', finds the
+    it loops over all revisions in 'revisions', finds the
     corresponding results folder and collects the plot ROOT files.
     :rtype: list
     :return: A list of all plot files, i.e. plot ROOT files from the
@@ -145,7 +128,7 @@ def get_plot_files(list_of_revisions, work_folder):
 
     # Loop over all requested revisions and look for root files
     # in their package folders
-    for revision in list_of_revisions:
+    for revision in revisions:
 
         rev_result_folder = os.path.join(results_foldername, revision)
         if not os.path.isdir(rev_result_folder):
@@ -242,12 +225,12 @@ def get_reference_files():
     return results['local'] + results['central']
 
 
-def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
+def generate_new_plots(revisions, work_folder, process_queue=None,
                        root_error_ignore_level=ROOT.kWarning):
     """
     Creates the plots that contain the requested revisions. Each plot (or
     n-tuple, for that matter) is stored in an object of class Plot.
-    @param list_of_revisions
+    @param revisions
     @param work_folder: Folder containing results
     @param process_queue: communication queue object, which is used in
            multi-processing mode to report the progress of the plot creating.
@@ -267,48 +250,48 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
 
     # Before we can start plotting, we of course need to collect all
     # ROOT-files that contain data for the plot that we want, e.g. we need to
-    # collect all plot ROOT files from the revisions in 'list_of_revisions'.
+    # collect all plot ROOT files from the revisions in 'revisions'.
     # The 'reference'-plots, if requested, require special treatment, as they
     # are stored on a different location than the regular plot ROOT files.
 
     # Collect all plot files, i.e. plot ROOT files from the requested revisions
-    list_of_plot_files = get_plot_files(list_of_revisions, work_folder)
+    plot_files = get_plot_files(revisions, work_folder)
 
     # If we also want a reference plot, collect the reference ROOT files
-    if 'reference' in list_of_revisions:
-        list_of_reference_files = get_reference_files()
+    if 'reference' in revisions:
+        reference_files = get_reference_files()
     else:
-        list_of_reference_files = []
+        reference_files = []
 
     # Now create the ROOT objects for the plot and the reference objects,
     # and get the lists of keys and packages
     plot_objects, plot_keys, plot_packages = \
         create_tobjects_from_list(
-            list_of_plot_files,
+            plot_files,
             False,
             work_folder
         )
     reference_objects, reference_keys, reference_packages = \
         create_tobjects_from_list(
-            list_of_reference_files,
+            reference_files,
             True,
             work_folder
         )
 
     # Get the joint lists (and remove duplicates if applicable)
-    list_of_root_objects = plot_objects + reference_objects
-    list_of_keys = sorted(list(set(plot_keys)))
-    list_of_packages = sorted(list(set(plot_packages)))
+    root_objects = plot_objects + reference_objects
+    keys = sorted(list(set(plot_keys)))
+    packages = sorted(list(set(plot_packages)))
 
     # Open the output file
     # First: Create destination directory if it does not yet exist
     content_dir = validationpath.get_html_plots_tag_comparison_folder(
         work_folder,
-        list_of_revisions
+        revisions
     )
     comparison_json_file = validationpath.get_html_plots_tag_comparison_json(
         work_folder,
-        list_of_revisions
+        revisions
     )
 
     if not os.path.exists(content_dir):
@@ -317,7 +300,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
     comparison_packages = []
 
     # for every package
-    for i, package in enumerate(sorted(list_of_packages)):
+    for i, package in enumerate(sorted(packages)):
 
         # Some information to be printed out while the plots are created
         print("*" * 80)
@@ -326,7 +309,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
 
         # A list of all objects (including reference objects) that
         # belong to the current package
-        objects_in_pkg = find_root_object(list_of_root_objects,
+        objects_in_pkg = find_root_object(root_objects,
                                           package=package)
 
         # Find all ROOT files that were created in the scope of this
@@ -367,7 +350,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
             )
 
             # A list in which we keep all the plotuples for this file
-            list_of_plotuples = []
+            plotuples = []
 
             # report the progress over the queue object, if available
             if process_queue:
@@ -375,7 +358,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
                     process_queue.put_nowait(
                         {
                             "current_package": i,
-                            "total_package": len(list_of_packages),
+                            "total_package": len(packages),
                             "status": "running",
                             "package_name": package,
                             "file_name": file_name
@@ -392,24 +375,24 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
             compare_ntuples = []
             compare_html_content = []
             has_reference = False
-            for key in sorted(list_of_keys):
+            for key in sorted(keys):
 
                 # Find all objects for the Plotuple that is defined by the
                 # package, the file and the key
-                root_objects = find_root_object(objects_in_pkg_and_file,
-                                                key=key)
+                root_objects_key = find_root_object(objects_in_pkg_and_file,
+                                                    key=key)
 
                 # If this list is empty, we can continue right away
-                if not root_objects:
+                if not root_objects_key:
                     continue
 
                 # Otherwise we can generate Plotuple object
                 plotuple = Plotuple(
-                    root_objects,
-                    list_of_revisions,
+                    root_objects_key,
+                    revisions,
                     work_folder
                 )
-                list_of_plotuples.append(plotuple)
+                plotuples.append(plotuple)
                 has_reference = plotuple.has_reference()
 
                 if plotuple.type == 'TNtuple':
@@ -459,7 +442,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
                 title=file_name,
                 package=package,
                 rootfile=file_name,
-                compared_revisions=list_of_revisions,
+                compared_revisions=revisions,
                 plots=compare_plots,
                 has_reference=has_reference,
                 ntuples=compare_ntuples,
@@ -480,7 +463,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
     # create objects for all revisions
     comparison_revs = []
 
-    for r in list_of_revisions:
+    for r in revisions:
         index = index_from_revision(r, work_folder)
 
         # revision has black by default
@@ -504,12 +487,12 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None,
     )
 
 
-def create_tobjects_from_list(list_of_root_files, is_reference, work_folder):
+def create_tobjects_from_list(root_files, is_reference, work_folder):
     """
     Takes a list of root files, loops over them and creates the RootObjects
     for it. It then returns the list of RootObjects, a list of all keys,
     and a list of all packages for those objects.
-    :param list_of_root_files: The list of all *.root files which shall be
+    :param root_files: The list of all *.root files which shall be
         read in and for which the corresponding RootObjects shall be created
     :param is_reference: Boolean value indicating if the objects are
         reference objects or not.
@@ -524,7 +507,7 @@ def create_tobjects_from_list(list_of_root_files, is_reference, work_folder):
     list_packages = []
 
     # Now loop over all given
-    for root_file in list_of_root_files:
+    for root_file in root_files:
 
         # Create the RootObjects from this file and store them, as well as the
         file_objects, \
@@ -898,10 +881,11 @@ def create_plots(revisions=None, force=False, process_queue=None,
     """
 
     # Initialize the list of revisions which we will plot
-    list_of_revisions = []
+    if not revisions:
+        revisions = []
 
     # Retrieve the desired revisions from the command line arguments and store
-    # them in 'list_of_revisions'
+    # them in 'revisions'
     if revisions:
         # Loop over all revisions given on the command line
         for revision in revisions:
@@ -912,13 +896,13 @@ def create_plots(revisions=None, force=False, process_queue=None,
             # be listed in 'available_revisions()'
             if revision in available_revisions(work_folder) \
                     or revision == 'reference':
-                list_of_revisions.append(revision)
+                revisions.append(revision)
 
     # In case no valid revisions were given, fall back to default and use all
     # available revisions and reference. The order should now be [reference,
     # newest_revision, ..., oldest_revision].
-    if not list_of_revisions:
-        list_of_revisions = ['reference'] + available_revisions(work_folder)
+    if not revisions:
+        revisions = ['reference'] + available_revisions(work_folder)
 
     # Now we check whether the plots for the selected revisions have been
     # generated before or not. In the path we use the alphabetical order of the
@@ -926,17 +910,17 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # (easier to work with on the web server side)
     expected_path = validationpath.get_html_plots_tag_comparison_json(
         work_folder,
-        list_of_revisions
+        revisions
     )
 
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
-        serve_existing_plots(list_of_revisions)
+        serve_existing_plots()
         print('Served existing plots.')
     # Otherwise: Create the requested plots
     else:
-        generate_new_plots(list_of_revisions, work_folder, process_queue)
+        generate_new_plots(revisions, work_folder, process_queue)
 
     # signal the main process that the plot creation is complete
     if process_queue:

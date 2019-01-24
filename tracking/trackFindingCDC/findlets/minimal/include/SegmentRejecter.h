@@ -37,7 +37,7 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      SegmentRejecter(const std::string& defaultFilterName = "all");
+      explicit SegmentRejecter(const std::string& defaultFilterName = "all");
 
       /// Short description of the findlet
       std::string getDescription() final;

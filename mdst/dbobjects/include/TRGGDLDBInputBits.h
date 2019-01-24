@@ -44,20 +44,22 @@ namespace Belle2 {
       }
       return *this;
     }
-
+    /** set name of i-th input trigger bit**/
     void setinbitname(int i, const char* c)
     {
       strcpy(m_inbitname[i], c);
     }
+    /** set the number of input trigger bits**/
     void setninbit(int i)
     {
       m_ninbit = i;
     }
-
+    /** get name of i-th input trigger bit**/
     const char* getinbitname(int i) const
     {
       return m_inbitname[i];
     }
+    /** get the number of input trigger bits**/
     int getninbit() const
     {
       return m_ninbit;

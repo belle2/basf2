@@ -160,7 +160,7 @@ void PXDPackerModule::event()
   VxdID lastVxdId = -1; /// invalid ... force to set first itertor/index
   /// We assume the Digits are sorted by VxdID (P.K. says they are)
   /// This saves some iterating lateron
-  for (auto it = m_storeDigits.begin() ; it != m_storeDigits.end(); it++) {
+  for (auto it = m_storeDigits.begin() ; it != m_storeDigits.end(); ++it) {
     VxdID currentVxdId;
     currentVxdId = it->getSensorID();
     currentVxdId.setSegmentNumber(0);
@@ -194,15 +194,6 @@ void PXDPackerModule::event()
   m_packed_events++;
 }
 
-void PXDPackerModule::endian_swap_frame(unsigned short* dataptr, int len)
-{
-  boost::spirit::endian::ubig16_t* p = (boost::spirit::endian::ubig16_t*)dataptr;
-
-  /// swap endianess of all shorts in frame BUT not the CRC (2 shorts)
-  for (int i = 0; i < len / 2 - 2; i++) {
-    p[i] = dataptr[i];// Endian Swap! (it doesnt matter if you swap from little to big or vice versa)
-  }
-}
 
 void PXDPackerModule::pack_event(void)
 {
@@ -398,7 +389,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
       auto it = m_storeDigits.begin();
       B2DEBUG(20, "Advance: " << startOfVxdID[currentVxdId]);
       advance(it, startOfVxdID[currentVxdId]);
-      for (; it != m_storeDigits.end(); it++) {
+      for (; it != m_storeDigits.end(); ++it) {
         auto id = it->getSensorID();
         id.setSegmentNumber(0);
         if (currentVxdId != id) break; /// another sensor starts

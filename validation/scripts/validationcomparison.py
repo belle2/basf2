@@ -52,6 +52,7 @@ class ComparisonBase:
     pass
 
 
+# fixme: This currently returns lists for chi2, ndf, and chi2/ndf. This surely isn't what we wanted
 class Chi2Test(ComparisonBase):
 
     """
@@ -99,8 +100,8 @@ class Chi2Test(ComparisonBase):
 
     def correct_types(self):
         """
-        @return: True if the two objects have a) a type supported for comparison
-            and b) can be compared with each other
+        @return: True if the two objects have a) a type supported for
+            comparison and b) can be compared with each other
         """
         if self.object_a is None or self.object_b is None:
             return False
@@ -344,7 +345,7 @@ class Chi2Test(ComparisonBase):
 
         res_chi2ndf = res_chi2 / res_ndf
 
-        return res_pvalue, res_chi2, res_chi2ndf, res_ndf
+        return res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
 
 
 class TablePrinter(object):

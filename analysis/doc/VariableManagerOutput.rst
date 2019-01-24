@@ -21,6 +21,7 @@ Writes out Variables to a flat `ROOT`_ TTree (it is also possible to write out s
         New since release-03: event, run, and experiment numbers are now automatically included. 
         If you have are writing candidates, you will also see a candidate counter and the number of candidates (ncandidates).
 
+
 Candidate-wise
 ~~~~~~~~~~~~~~
 For each candidate in the given `ParticleList`, there will be one entry in the TTree containing the desired Variables. 
@@ -54,19 +55,19 @@ Here is an example of event-wise usage:
 Multiple TTress
 ~~~~~~~~~~~~~~~
 
-You can write several trees to the same file by calling the module several times with the same ``treeName``.
+You can write several trees to the same file by calling the module several times with the different ``treename`` and the same ``filename``.
 
 .. code-block:: python
 
         from modularAnalysis import variablesToNtuple
         variablesToNtuple('', list_of_interesting_event_variables, 
-                          treeName="event", fileName="myoutput.root", 
+                          treename="event", filename="myoutput.root", 
                           path=mypath)
         variablesToNtuple('pi+:all', list_of_interesting_variables, 
-                          treeName='pions', fileName='myoutput.root', # <-- same file
+                          treename='pions', filename='myoutput.root', # <-- same file
                           path=mypath)
         variablesToNtuple('K+:all', list_of_interesting_variables, 
-                          treeName='kaons', fileName='anotheroutput.root', # <-- different file
+                          treename='kaons', filename='anotheroutput.root', # <-- different file
                           path=mypath)
 
 
@@ -101,6 +102,9 @@ Here is an example of use:
         ]
         variablesToHistogram('pi+:all', list_of_variables_and_bins)
 
-And here is the full function documentation of the modular analysis convenience function:
+Modular analysis convenience function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is the full function documentation of the modular analysis convenience function:
 
 .. autofunction:: modularAnalysis.variablesToHistogram

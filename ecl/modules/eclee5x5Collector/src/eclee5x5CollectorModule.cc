@@ -258,7 +258,7 @@ void eclee5x5CollectorModule::collect()
   double maxClustE[2] = { -1., -1.};
   int nclust = m_eclClusterArray.getEntries();
   for (int ic = 0; ic < nclust; ic++) {
-    if (m_eclClusterArray[ic]->getHypothesisId() == Belle2::ECLCluster::c_nPhotons) {
+    if (m_eclClusterArray[ic]->hasHypothesis(Belle2::ECLCluster::c_nPhotons)) {
       double eClust = m_eclClusterArray[ic]->getEnergy();
       if (eClust > maxClustE[0]) {
         maxClustE[1] = maxClustE[0];

@@ -60,7 +60,6 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'clusterUniqueID',
     'eclExtPhi',
     'eclExtPhiId',
     'eclExtTheta',

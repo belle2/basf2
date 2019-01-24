@@ -478,18 +478,15 @@ void OverlapResidualsModule::terminate()
 
     }
 
-    h_U_Res->Scale(1. / h_U_Res->Integral());
     h_U_Res->Write();
-    h_V_Res->Scale(1. / h_V_Res->Integral());
     h_V_Res->Write();
-    h_SVDstrips_Mult->Write();
+
     for (int i = 1; i <= 9; i++) {
       if (i == 5 || i == 7 || i == 8) {
         continue; //The product of cluster sizes cannot be 5, 7, 9
       }
-      h_U_Cl1Cl2_Res[i]->Scale(1. / h_U_Cl1Cl2_Res[i]->Integral());
+
       h_U_Cl1Cl2_Res[i]->Write();
-      h_V_Cl1Cl2_Res[i]->Scale(1. / h_V_Cl1Cl2_Res[i]->Integral());
       h_V_Cl1Cl2_Res[i]->Write();
     }
 

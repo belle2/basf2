@@ -232,6 +232,8 @@ std::vector<genfit::MeasurementOnPlane*> SVDRecoHit2D::constructMeasurementsOnPl
 
   //if (applyDeformation) {
 
+  DBObjPtr<VXDAlignment> vxdAlignment;
+
   std::vector<double> planarParameters = {
     0.00, 0.00, 0.00,
     0.00, 0.00, 0.00, 0.00,
@@ -239,19 +241,20 @@ std::vector<genfit::MeasurementOnPlane*> SVDRecoHit2D::constructMeasurementsOnPl
   };
 
   planarParameters = {
-    m_vxdAlignments->get(m_sensorID, 31),
-    m_vxdAlignments->get(m_sensorID, 32),
-    m_vxdAlignments->get(m_sensorID, 33),
-    m_vxdAlignments->get(m_sensorID, 41),
-    m_vxdAlignments->get(m_sensorID, 42),
-    m_vxdAlignments->get(m_sensorID, 43),
-    m_vxdAlignments->get(m_sensorID, 44),
-    m_vxdAlignments->get(m_sensorID, 51),
-    m_vxdAlignments->get(m_sensorID, 52),
-    m_vxdAlignments->get(m_sensorID, 53),
-    m_vxdAlignments->get(m_sensorID, 54),
-    m_vxdAlignments->get(m_sensorID, 55),
+    vxdAlignment->get(m_sensorID, 31),
+    vxdAlignment->get(m_sensorID, 32),
+    vxdAlignment->get(m_sensorID, 33),
+    vxdAlignment->get(m_sensorID, 41),
+    vxdAlignment->get(m_sensorID, 42),
+    vxdAlignment->get(m_sensorID, 43),
+    vxdAlignment->get(m_sensorID, 44),
+    vxdAlignment->get(m_sensorID, 51),
+    vxdAlignment->get(m_sensorID, 52),
+    vxdAlignment->get(m_sensorID, 53),
+    vxdAlignment->get(m_sensorID, 54),
+    vxdAlignment->get(m_sensorID, 55),
   };
+
   /*
   string fileName = "planarParammeters";
   ifstream file;

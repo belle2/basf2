@@ -77,6 +77,23 @@ namespace {
       EXPECT_EQ(Particle::c_MCParticle, p.getParticleType());
       EXPECT_EQ(123u, p.getMdstArrayIndex());
     }
+    {
+      // test constructor from ECLClusters
+      // (for now we can only create a photon this way)
+      StoreArray<ECLCluster> clusters;
+      ECLCluster* cluster = clusters.appendNew(ECLCluster());
+      cluster->setIsTrack(false);
+      cluster->addHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setEnergy(1337);
+
+      Particle p(cluster);
+      EXPECT_EQ(22, p.getPDGCode());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_EQ(Particle::c_ECLCluster, p.getParticleType());
+      EXPECT_FLOAT_EQ(1337, p.getEnergy());
+      EXPECT_EQ(cluster, p.getECLCluster());
+      EXPECT_EQ(nullptr, p.getTrack());
+    }
   }
 
   TEST_F(ParticleTest, Daughters)
@@ -546,4 +563,28 @@ namespace {
 
   }
 
+  /** test cluster based functionality: hypotheses and such (relatively simple
+   * for now but will become more complex with BII-3099 */
+  TEST_F(ParticleTest, ECLClusterBased)
+  {
+    StoreArray<ECLCluster> eclclusters;
+    ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+    cluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+    cluster->setEnergy(1337);
+    cluster->setEnergyRaw(42);
+
+    Particle p(cluster);
+    EXPECT_FLOAT_EQ(1337, p.getECLClusterEnergy());
+    EXPECT_FLOAT_EQ(1337, p.getEnergy());
+    EXPECT_EQ(ECLCluster::EHypothesisBit::c_nPhotons, p.getECLClusterEHypothesisBit());
+
+    // when 3099 is introduced
+    /*
+    cluster->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+    Particle p2(cluster);
+    EXPECT_EQUAL(130, p2.getPDGCode());
+    EXPECT_EQUAL(42, p2.getECLClusterEnergy());
+    EXPECT_EQUAL(42, p2.getEnergy());
+    */
+  }
 }  // namespace

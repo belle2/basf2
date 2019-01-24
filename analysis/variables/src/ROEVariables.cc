@@ -45,46 +45,6 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double isCompletelyInRestOfEvent(const Particle* particle)
-    {
-      // It can happen that for example a cluster is in the rest of event,
-      // which is CR - matched to a nearby track which is not in the ROE
-      // Hence this variable checks if all MdstObjects are in the ROE
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (not roe.isValid())
-        return 0;
-
-      if (particle->getParticleType() == Particle::c_Composite) {
-        std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
-        for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isCompletelyInRestOfEvent(fspDaug[i]) == 0) {
-            return 0;
-          }
-        }
-        return 1.0;
-      } else {
-        // Check for Tracks
-        const auto& tracks = roe->getTracks();
-        if (particle->getTrack() and std::find(tracks.begin(), tracks.end(), particle->getTrack()) == tracks.end()) {
-          return 0.0;
-        }
-
-        // Check for KLMClusters
-        const auto& klm = roe->getKLMClusters();
-        if (particle->getKLMCluster() and std::find(klm.begin(), klm.end(), particle->getKLMCluster()) == klm.end()) {
-          return 0.0;
-        }
-
-        // Check for ECLClusters
-        const auto& ecl = roe->getECLClusters();
-        if (particle->getECLCluster() and std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) == ecl.end()) {
-          return 0.0;
-        }
-      }
-
-      return 1.0;
-    }
-
     double isInRestOfEvent(const Particle* particle)
     {
 
@@ -1825,44 +1785,46 @@ namespace Belle2 {
           int pdg = abs(daughters[i]->getPDG());
 
           // photon
-          if (pdg == 22 and (missingFlags & 1) == 0)
+          if (pdg == Const::photon.getPDGCode() and (missingFlags & 1) == 0)
             missingFlags += 1;
 
           // electrons
-          else if (pdg == 11 and (missingFlags & 2) == 0)
+          else if (pdg == Const::electron.getPDGCode() and (missingFlags & 2) == 0)
             missingFlags += 2;
 
           // muons
-          else if (pdg == 13 and (missingFlags & 4) == 0)
+          else if (pdg == Const::muon.getPDGCode() and (missingFlags & 4) == 0)
             missingFlags += 4;
 
           // pions
-          else if (pdg == 211 and (missingFlags & 8) == 0)
+          else if (pdg == Const::pion.getPDGCode() and (missingFlags & 8) == 0)
             missingFlags += 8;
 
           // kaons
-          else if (pdg == 321 and (missingFlags & 16) == 0)
+          else if (pdg == Const::kaon.getPDGCode() and (missingFlags & 16) == 0)
             missingFlags += 16;
 
           // protons
-          else if (pdg == 2212 and (missingFlags & 32) == 0)
+          else if (pdg == Const::proton.getPDGCode() and (missingFlags & 32) == 0)
             missingFlags += 32;
 
           // neutrons
-          else if (pdg == 1000010020 and (missingFlags & 64) == 0)
+          else if (pdg == Const::neutron.getPDGCode() and (missingFlags & 64) == 0)
             missingFlags += 64;
 
           // kshort
-          else if (pdg == 310 and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
+          else if (pdg == Const::Kshort.getPDGCode() and ((missingFlags & 128) == 0 or (missingFlags & 256) == 0)) {
             std::vector<MCParticle*> ksDaug = daughters[i]->getDaughters();
             if (ksDaug.size() == 2) {
               // K_S0 -> pi+ pi-
-              if (abs(ksDaug[0]->getPDG()) == 211 and abs(ksDaug[1]->getPDG()) == 211 and (missingFlags & 128) == 0) {
+              if (abs(ksDaug[0]->getPDG()) == Const::pion.getPDGCode() and abs(ksDaug[1]->getPDG()) == Const::pion.getPDGCode()
+                  and (missingFlags & 128) == 0) {
                 if (mcROEObjects.find(ksDaug[0]) == mcROEObjects.end() or mcROEObjects.find(ksDaug[1]) == mcROEObjects.end())
                   missingFlags += 128;
               }
               // K_S0 -> pi0 pi0
-              else if (abs(ksDaug[0]->getPDG()) == 111 and abs(ksDaug[1]->getPDG()) == 111 and (missingFlags & 256) == 0) {
+              else if (abs(ksDaug[0]->getPDG()) == Const::pi0.getPDGCode() and abs(ksDaug[1]->getPDG()) == Const::pi0.getPDGCode()
+                       and (missingFlags & 256) == 0) {
                 std::vector<MCParticle*> pi0Daug0 = ksDaug[0]->getDaughters();
                 std::vector<MCParticle*> pi0Daug1 = ksDaug[1]->getDaughters();
                 if (mcROEObjects.find(pi0Daug0[0]) == mcROEObjects.end() or
@@ -1875,10 +1837,10 @@ namespace Belle2 {
           }
 
           // klong
-          else if (pdg == 130 and (missingFlags & 512) == 0)
+          else if (pdg == Const::Klong.getPDGCode() and (missingFlags & 512) == 0)
             missingFlags += 512;
 
-          // neutrino
+          // neutrinos, which are not in the Const::
           else if ((pdg == 12 or pdg == 14 or pdg == 16) and (missingFlags & 1024) == 0)
             missingFlags += 1024;
         }
@@ -1914,11 +1876,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
-
-    REGISTER_VARIABLE("isCompletelyInRestOfEvent", isCompletelyInRestOfEvent,
-                      "Similar to isInRestOfEvent, but checks if all Mdst objects of the particle are in the RestOfEvent"
-                      "One can use this to distinguish ECLClusters with a connected-region matched Track outside the ROE,"
-                      "from ordinary ECLClusters in the ROE mask for ECLClusters.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
                       "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."

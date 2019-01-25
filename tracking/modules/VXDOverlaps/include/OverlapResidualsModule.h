@@ -56,6 +56,10 @@ namespace Belle2 {
     /** Histograms of residuals */
     TH1F* h_U_Res = nullptr;
     TH1F* h_V_Res = nullptr;
+    TH1F* h_U_Res_PXD = nullptr;
+    TH1F* h_V_Res_PXD = nullptr;
+    TH1F* h_U_Res_SVD = nullptr;
+    TH1F* h_V_Res_SVD = nullptr;
     TH1F* h_SVDstrips_Mult = nullptr;
     TH1F* h_U_Cl1Cl2_Res[10] = {nullptr};
     TH1F* h_V_Cl1Cl2_Res[10] = {nullptr};

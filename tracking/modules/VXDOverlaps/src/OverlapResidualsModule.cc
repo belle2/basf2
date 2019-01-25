@@ -53,23 +53,23 @@ OverlapResidualsModule::OverlapResidualsModule() : Module()
 {
   // Set module properties
   setDescription("The module studies consecutive hits in overlapping sensors of a same VXD layer, and the differences of their residuals, to monitor the detector alignment.");
-
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string(""));
-
-
 }
 
 void OverlapResidualsModule::initialize()
 {
-  //set the ROOT File
-
+  //Set the ROOT File
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
+  //Define histograms
   h_U_Res = new TH1F("h_U_Res", "Histrogram of overlapping hits residuals", 100, -0.1, 0.1);
   h_V_Res = new TH1F("h_V_Res", "Histrogram of overlapping hits residuals", 100, -0.1, 0.1);
+  h_U_Res_PXD = new TH1F("h_U_Res_PXD", "Histrogram of overlapping PXD hits residuals", 100, -0.1, 0.1);
+  h_V_Res_PXD = new TH1F("h_V_Res_PXD", "Histrogram of overlapping PXD hits residuals", 100, -0.1, 0.1);
+  h_U_Res_SVD = new TH1F("h_U_Res_SVD", "Histrogram of overlapping SVD hits residuals", 100, -0.1, 0.1);
+  h_V_Res_SVD = new TH1F("h_V_Res_SVD", "Histrogram of overlapping SVD hits residuals", 100, -0.1, 0.1);
   h_SVDstrips_Mult = new TH1F("h_SVDstrips_Mult", "SVD strips multipicity for SVD clusters in overlapping sensors", 15, 0.5, 15.5);
 
   for (int i = 1; i < 10; i++) {
-
     //The name is the product of cluster sizes for 2 consecutive hits
     TString h_name_U = "h_U_Cl1Cl2_" + std::to_string(i);
     TString h_name_V = "h_V_Cl1Cl2_" + std::to_string(i);
@@ -77,15 +77,13 @@ void OverlapResidualsModule::initialize()
     TString title_V = "V residuals: SVDClusterSize_1 x SVDClusterSize_2 = " + std::to_string(i);
     h_U_Cl1Cl2_Res[i] = new TH1F(h_name_U, title_U, 100, -0.1, 0.1);
     h_V_Cl1Cl2_Res[i] = new TH1F(h_name_V, title_V, 100, -0.1, 0.1);
-
   }
-
+  //Create 2D sensor hit-maps for reconstructed hits
   for (int i = 1; i <= 5; i++) {
     for (int j = 1; j <= 16; j++) {
-
       TString h_name = "h_6" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 6:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr6[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.1, 6.1);
+      h_Lyr6[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
       h_Lyr6[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Lyr6[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
     }
@@ -93,46 +91,39 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 4; i++) {
     for (int j = 1; j <= 12; j++) {
-
       TString h_name = "h_5" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 5:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
+      h_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
       h_Lyr5[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Lyr5[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
   for (int i = 1; i <= 3; i++) {
     for (int j = 1; j <= 10; j++) {
-
       TString h_name = "h_4" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 4:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
+      h_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.14, 6.14);
       h_Lyr4[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Lyr4[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
   for (int i = 1; i <= 2; i++) {
     for (int j = 1; j <= 7; j++) {
-
       TString h_name = "h_3" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 3:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr3[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
+      h_Lyr3[j][i] = new TH2F(h_name, title, 100, -1.92, 1.92, 100, -6.14, 6.14);
       h_Lyr3[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Lyr3[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
   for (int i = 1; i <= 2; i++) {
     for (int j = 1; j <= 12; j++) {
-
       TString h_name = "h_2" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 2:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.5, 2.5);
+      h_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -3.072, 3.072);
       h_Lyr2[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Lyr2[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
     }
@@ -140,24 +131,17 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 2; i++) {
     for (int j = 1; j <= 8; j++) {
-
       TString h_name = "h_1" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 1:" + std::to_string(j) + ":" + std::to_string(i);
-      h_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.5, 2.5);
+      h_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.625, 0.625, 100, -2.24, 2.24);
       h_Lyr1[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Lyr1[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
-
-
-  //HISTOGRAMS OF PREDICTED HITS FROM THE TRACK FIT
-
-
+  //Create 2D sensor hit-maps for predicted (by track fit) hits
   for (int i = 1; i <= 5; i++) {
     for (int j = 1; j <= 16; j++) {
-
       TString h_name = "h_Fit_6" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 6:" + std::to_string(j) + ":" + std::to_string(i);
       h_Fit_Lyr6[j][i] = new TH2F(h_name, title, 100, -2.88, 2.88, 100, -6.1, 6.1);
@@ -169,62 +153,52 @@ void OverlapResidualsModule::initialize()
 
   for (int i = 1; i <= 4; i++) {
     for (int j = 1; j <= 12; j++) {
-
       TString h_name = "h_Fit_5" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 5:" + std::to_string(j) + ":" + std::to_string(i);
       h_Fit_Lyr5[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
       h_Fit_Lyr5[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Fit_Lyr5[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
   for (int i = 1; i <= 3; i++) {
     for (int j = 1; j <= 10; j++) {
-
       TString h_name = "h_Fit_4" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 4:" + std::to_string(j) + ":" + std::to_string(i);
       h_Fit_Lyr4[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
       h_Fit_Lyr4[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Fit_Lyr4[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
 
   for (int i = 1; i <= 2; i++) {
     for (int j = 1; j <= 7; j++) {
-
       TString h_name = "h_Fit_3" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 3:" + std::to_string(j) + ":" + std::to_string(i);
       h_Fit_Lyr3[j][i] = new TH2F(h_name, title, 100, -2.8, 2.8, 100, -6.1, 6.1);
       h_Fit_Lyr3[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Fit_Lyr3[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
   for (int i = 1; i <= 2; i++) {
     for (int j = 1; j <= 12; j++) {
-
       TString h_name = "h_Fit_2" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 2:" + std::to_string(j) + ":" + std::to_string(i);
       h_Fit_Lyr2[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.1, 2.1);
       h_Fit_Lyr2[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Fit_Lyr2[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
   for (int i = 1; i <= 2; i++) {
     for (int j = 1; j <= 8; j++) {
-
       TString h_name = "h_Fit_1" + std::to_string(j) + std::to_string(i);
       TString title = "Layer:Ladder:Sensor = 1:" + std::to_string(j) + ":" + std::to_string(i);
       h_Fit_Lyr1[j][i] = new TH2F(h_name, title, 100, -0.8, 0.8, 100, -2.1, 2.1);
       h_Fit_Lyr1[j][i]->GetXaxis()->SetTitle("u (10 x mm)");
       h_Fit_Lyr1[j][i]->GetYaxis()->SetTitle("v (10 x mm)");
-
     }
   }
 
@@ -241,10 +215,8 @@ void OverlapResidualsModule::event()
     const vector<PXDCluster* > pxdClusters = trk.getPXDHitList();
     const vector<SVDCluster* > svdClusters = trk.getSVDHitList();
     B2INFO("FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
-
     //LOOKING FOR 2 CONSECUTIVE PXD HITS IN OVERLAPPING MODULES OF A SAME LAYER
     for (int i = 0; i < pxdClusters.size(); i++) {
-
       const PXDCluster* pxd_1 = pxdClusters[i];
       const RecoHitInformation* infoPXD_1 = trk.getRecoHitInformation(pxd_1);
       if (!infoPXD_1) {
@@ -260,7 +232,6 @@ void OverlapResidualsModule::event()
       const unsigned short pxd_Ladder_1 = pxd_id_1.getLadderNumber();
       const unsigned short pxd_Sensor_1 = pxd_id_1.getSensorNumber();
       for (int l = i + 1; l < pxdClusters.size(); l++) {
-
         const PXDCluster* pxd_2 = pxdClusters[l];
         const RecoHitInformation* infoPXD_2 = trk.getRecoHitInformation(pxd_2);
         if (!infoPXD_2) {
@@ -286,8 +257,12 @@ void OverlapResidualsModule::event()
           float over_U_PXD = res_U_2 - res_U_1;
           float over_V_PXD = res_V_2 - res_V_1;
           B2INFO("PXD residuals " << over_U_PXD << "   " << over_V_PXD);
+          //Fill histograms of residuals with PXD clusters
           h_U_Res->Fill(over_U_PXD);
           h_V_Res->Fill(over_V_PXD);
+          h_U_Res_PXD->Fill(over_U_PXD);
+          h_V_Res_PXD->Fill(over_V_PXD);
+          //Fill hit-maps with PXD clusters
           if (pxd_Layer_1 == 1 && pxd_Layer_2 == 1) {
             h_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
             h_Fit_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_predIntersect_1[3], pxd_predIntersect_1[4]);
@@ -350,10 +325,13 @@ void OverlapResidualsModule::event()
             const double res_U_2 = svd_2->getPosition() - svd_predIntersect_2[3];
             float over_U_SVD = res_U_2 - res_U_1;
             B2INFO("SVD U residual =========> " << over_U_SVD);
+            //Fill histograms of residuals with SVD u clusters
             h_U_Res->Fill(over_U_SVD);
+            h_U_Res_SVD->Fill(over_U_SVD);
             if (svd_1->getSize() < 3 && svd_2->getSize() < 3) { //Consider only clusters with 3 or less strips involved
               h_U_Cl1Cl2_Res[svd_1->getSize() * svd_2->getSize()]->Fill(over_U_SVD);
             }
+            //Fill sensor hit-maps with u-u clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
               h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
               h_Fit_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_predIntersect_1[3], 0.);
@@ -390,10 +368,13 @@ void OverlapResidualsModule::event()
             float over_V_SVD = res_V_2 - res_V_1;
             B2INFO("SVD V residual =========> " << over_V_SVD);
             B2INFO("SVD V residual =========> " << over_V_SVD);
+            //Fill histograms of residuals with SVD v clusters
             h_V_Res->Fill(over_V_SVD);
+            h_V_Res_SVD->Fill(over_V_SVD);
             if (svd_1->getSize() < 3 && svd_2->getSize() < 3) {  //Consider only clusters with 3 or less strips involved
               h_V_Cl1Cl2_Res[svd_1->getSize() * svd_2->getSize()]->Fill(over_V_SVD);
             }
+            //Fill sensor hit-maps with v-v clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
               h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
               h_Fit_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_predIntersect_1[4]);
@@ -437,7 +418,7 @@ void OverlapResidualsModule::terminate()
   h_SVDstrips_Mult->Scale(1. / h_SVDstrips_Mult->Integral());
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
-
+    //Store sensor hit maps
     for (int i = 1; i <= 5; i++) {
       for (int j = 1; j <= 16; j++) {
         h_Lyr6[j][i]->Write();
@@ -460,32 +441,31 @@ void OverlapResidualsModule::terminate()
     }
 
     for (int i = 1; i <= 2; i++) {
-
       for (int j = 1; j <= 7; j++) {
         h_Lyr3[j][i]->Write();
         h_Fit_Lyr3[j][i]->Write();
       }
-
       for (int j = 1; j <= 12; j++) {
         h_Lyr2[j][i]->Write();
         h_Fit_Lyr2[j][i]->Write();
       }
-
       for (int j = 1; j <= 8; j++) {
         h_Lyr1[j][i]->Write();
         h_Fit_Lyr1[j][i]->Write();
       }
-
     }
-
+    //Store histohrams of residuals
     h_U_Res->Write();
     h_V_Res->Write();
+    h_U_Res_PXD->Write();
+    h_V_Res_PXD->Write();
+    h_U_Res_SVD->Write();
+    h_V_Res_SVD->Write();
 
     for (int i = 1; i <= 9; i++) {
       if (i == 5 || i == 7 || i == 8) {
-        continue; //The product of cluster sizes cannot be 5, 7, 9
+        continue; //The product of cluster sizes cannot be 5, 7, 8
       }
-
       h_U_Cl1Cl2_Res[i]->Write();
       h_V_Cl1Cl2_Res[i]->Write();
     }

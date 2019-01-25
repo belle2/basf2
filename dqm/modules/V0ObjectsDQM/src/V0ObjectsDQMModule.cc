@@ -7,7 +7,6 @@
 //-
 
 #include <dqm/modules/V0ObjectsDQM/V0ObjectsDQMModule.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TLorentzVector.h>
 #include <TDirectory.h>
 #include <iostream>
@@ -33,8 +32,6 @@ V0ObjectsDQMModule::V0ObjectsDQMModule() : HistoModule()
   setDescription("Monitor displaced vertices");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("TriggerIdentifier", m_triggerIdentifier,
-           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&hlt&accept_hadron"));
   addParam("V0PListName", m_V0PListName, "Name of the vertexed particle list", std::string("K_S0:V0DQM"));
 }
 
@@ -57,8 +54,6 @@ void V0ObjectsDQMModule::initialize()
 {
   REG_HISTOGRAM
 
-  StoreObjPtr<SoftwareTriggerResult> result;
-  result.isRequired();
 }
 
 
@@ -82,15 +77,6 @@ void V0ObjectsDQMModule::terminate()
 
 void V0ObjectsDQMModule::event()
 {
-
-  StoreObjPtr<SoftwareTriggerResult> result;
-  if (!result.isValid()) {
-    B2FATAL("SoftwareTriggerResult object not available but needed to select events for the histograms.");
-  }
-
-  const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
-
-  if (accepted == false) return;
 
   StoreObjPtr<ParticleList> V0Particles(m_V0PListName);
 

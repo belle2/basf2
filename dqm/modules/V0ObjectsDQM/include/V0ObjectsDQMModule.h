@@ -37,8 +37,6 @@ namespace Belle2 {
 
     /* x vs. y in slices of z */
     TH2F* m_h_xvsy[32] = {nullptr};
-    /** Trigger identifier string used to select events for the histograms */
-    std::string m_triggerIdentifier = "";
 
     /** Name of the V0 particle list */
     std::string m_V0PListName = "";

@@ -49,6 +49,7 @@ namespace Belle2 {
   private:
 
     TCanvas* m_c_xvsy[32] = {nullptr};
+    std::string m_OverlayPath = "";
 
   };
 } // end namespace Belle2

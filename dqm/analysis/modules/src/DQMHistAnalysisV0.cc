@@ -34,7 +34,7 @@ DQMHistAnalysisV0Module::DQMHistAnalysisV0Module()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  B2INFO("DQMHistAnalysisV0: Constructor done.");
+  addParam("OverlayPath", m_OverlayPath, "Path to CAD drawings", std::string(""));
 
 }
 
@@ -66,7 +66,7 @@ void DQMHistAnalysisV0Module::event()
 
   for (int i = 0; i < 32; i++) {
     TH2* h = (TH2*) findHist(Form("V0Objects/xvsy[%i]", i));
-    TImage* img = TImage::Open(Form("CAD/%ic.png", i));
+    TImage* img = TImage::Open(Form("%s/%ic.png", m_OverlayPath.c_str(), i));
     img->SetConstRatio(kTRUE);
     m_c_xvsy[i]->cd();
     img->Draw("x");

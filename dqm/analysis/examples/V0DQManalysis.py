@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from ROOT import Belle2
 import sys
 
 # Set the log level to show only error and fatal messages
@@ -19,6 +20,7 @@ inroot.param('InputRootFile', sys.argv[1])
 main.add_module(inroot)
 
 v0a = register_module('DQMHistAnalysisV0')
+v0a.param('OverlayPath', Belle2.FileSystem.findFile('/dqm/analysis/CAD'))
 main.add_module(v0a)
 
 outroot = register_module('DQMHistAnalysisOutputFile')

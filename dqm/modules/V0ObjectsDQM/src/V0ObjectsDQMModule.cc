@@ -41,9 +41,10 @@ void V0ObjectsDQMModule::defineHisto()
   oldDir->mkdir("V0Objects")->cd();
 
   for (int j = 0; j < 32; j++) {
-    m_h_xvsy[j] = new TH2F(Form("xvsy[%i]", j), Form("xvsy[%i]", j), 1000, -10, 10, 1000, -10, 10);
+    m_h_xvsy[j] = new TH2F(Form("xvsy[%i]", j), Form("xvsy[%i]", j), 200, -10, 10, 200, -10, 10);
     m_h_xvsy[j]->SetXTitle("x [cm]");
     m_h_xvsy[j]->SetYTitle("y [cm]");
+    m_h_xvsy[j]->SetStats(kFALSE);
   }
 
   oldDir->cd();

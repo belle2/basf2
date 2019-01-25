@@ -185,17 +185,25 @@ TEST_F(TrackFindingCDCTestWithTopology, basicTrackVarSet_test_empty_s_for_three_
   const WireID& cWireID = wireTopology.getWire(0, 0, 2).getWireID();
   std::vector<WireID> wireIDs = {aWireID, bWireID, cWireID};
 
-  std::vector<double> arc_length_2Ds = { -2.0, 0.0, 3.0}; // -> empty_s hit gaps = [2, 3]
+  // -> empty_s hit gaps = {2, 3}
+  std::vector<double> arc_length_2Ds = { -2.0, 0.0, 3.0};
 
   std::vector<CDCHit> cdcHits;
+  cdcHits.reserve(wireIDs.size());
   std::vector<CDCWireHit> cdcWireHits;
+  cdcWireHits.reserve(wireIDs.size());
   std::vector<CDCRecoHit3D> cdcRecoHits;
+  cdcRecoHits.reserve(wireIDs.size());
 
-  for (size_t i = 0; i < arc_length_2Ds.size(); i++) {
-    cdcHits.emplace_back(128, 0, wireIDs.at(i));
-    cdcWireHits.emplace_back(&cdcHits.at(i), 0);
-    CDCRLWireHit aRLWireHit(&cdcWireHits.at(i), ERightLeft::c_Unknown);
-    Vector3D aRecoPos(aRLWireHit.getRefPos2D(), 0.0);
+  for (const WireID& wireID : wireIDs) {
+    cdcHits.emplace_back(128, 0, wireID);
+  }
+  for (const CDCHit& cdcHit : cdcHits) {
+    cdcWireHits.emplace_back(&cdcHit, 0);
+  }
+  for (std::size_t i = 0; i < cdcWireHits.size(); i++) {
+    const CDCRLWireHit aRLWireHit(&cdcWireHits.at(i), ERightLeft::c_Unknown);
+    const Vector3D aRecoPos(aRLWireHit.getRefPos2D(), 0.0);
     cdcRecoHits.emplace_back(aRLWireHit, aRecoPos, arc_length_2Ds.at(i));
   }
 

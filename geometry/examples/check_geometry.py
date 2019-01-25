@@ -6,10 +6,10 @@
 # geometry and checks for overlaps
 ######################################################
 
-from basf2 import *
+from basf2 import Path, process
 
 # Create main path
-main = create_path()
+main = Path()
 # Add modules to main path
 main.add_module("EventInfoSetter")
 # Geometry parameter loader

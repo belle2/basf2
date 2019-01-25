@@ -6,23 +6,13 @@
 # result overlayed over the Material distribution
 ##############################################################################
 
-import math
-import sys
 import os
-from basf2 import *
+from basf2 import Path, process
 import ROOT as root
 import numpy as np
 
-try:
-    import matplotlib as mpl
-    mpl.use("Agg")
-except ImportError:
-    print("""\
-Could not find matplotlib which is required to create the charts. Please
-install it using
-    pip install matplotlib""")
-    sys.exit(1)
-
+import matplotlib as mpl
+# switch to non-interactive backend
 mpl.use("Agg")
 from matplotlib import pyplot as pl
 from matplotlib.backends.backend_pdf import PdfPages
@@ -68,21 +58,22 @@ elif scan_type == "zx":
 elif scan_type == "zy":
     material_plane = [-0.1, 0, 0, 0, 0, 1, 0, 1, 0]
 
+main = Path()
 # create modules
-evtinfo = register_module('EventInfoSetter')
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
-simulation = register_module('FullSim')
+main.add_module('EventInfoSetter')
+main.add_module('Gearbox')
+geometry = main.add_module('Geometry')
+main.add_module('FullSim')
 # override field if we want something different than the default
 if fieldtype != "MagneticField":
     geometry.param({
+        "useDB": False,
         "excludedComponents": ["MagneticField"],
         "additionalComponents": [fieldtype],
     })
 
 # Field map creator
-fieldmap = register_module('CreateFieldMap')
-fieldmap.param({
+main.add_module('CreateFieldMap', **{
     'filename': fieldmap_file,
     "type": scan_type,
     "nU": stepsU[0],
@@ -94,8 +85,7 @@ fieldmap.param({
 })
 
 # Material map creator
-materialscan = register_module('MaterialScan')
-materialscan.param({
+main.add_module('MaterialScan', **{
     'Filename': material_file,
     'spherical': False,
     'planar': True,
@@ -111,17 +101,6 @@ materialscan.param({
     'planar.splitByMaterials': False,
     'planar.ignored': ['Air', 'Vacuum', 'G4_AIR', 'ColdAir'],
 })
-
-# Create main path
-main = create_path()
-
-# Add modules to main path
-main.add_module(evtinfo)
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(simulation)
-main.add_module(fieldmap)
-main.add_module(materialscan)
 
 # Process one event to perform the scans
 process(main)

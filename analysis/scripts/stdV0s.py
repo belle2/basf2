@@ -21,7 +21,7 @@ def stdKshorts(path=analysis_main):
         path (basf2.Path): the path to load the modules
     """
     fillParticleList('K_S0:all -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-    vertexKFit('K_S0:all', 0.0, '', '', path)
+    vertexTree('K_S0:all', 0.0, updateAllDaughters=False, path=path)
     applyCuts('K_S0:all', '0.450 < M < 0.550', path)
 
 
@@ -46,7 +46,7 @@ def mergedKshorts(prioritiseV0=True, path=analysis_main):
     stdPi('all', path=path)  # no quality cuts
     reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path)
     V0ListMerger('K_S0:V0', 'K_S0:RD', prioritiseV0, path)  # outputs K_S0:merged
-    vertexKFit('K_S0:merged', 0.0, '', '', path)
+    vertexTree('K_S0:merged', 0.0, updateAllDaughters=False, path=path)
     applyCuts('K_S0:merged', '0.450 < M < 0.550', path)
 
 
@@ -61,7 +61,7 @@ def goodBelleKshort(path=analysis_main):
         path (basf2.Path): the path to load the modules
     """
     fillParticleList('K_S0:legacyGoodKS -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-    vertexKFit('K_S0:legacyGoodKS', 0.0, '', '', path)
+    vertexTree('K_S0:legacyGoodKS', 0.0, updateAllDaughters=False, path=path)
     applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path)
 
 
@@ -81,7 +81,7 @@ def stdLambdas(path=analysis_main):
         path (basf2.Path): the path to load the modules
     """
     fillParticleList('Lambda0:all -> p+ pi-', '0.9 < M < 1.3', True, path=path)
-    vertexKFit('Lambda0:all', 0.0, '', '', path)
+    vertexTree('Lambda0:all', 0.0, updateAllDaughters=False, path=path)
     applyCuts('Lambda0:all', '1.10 < M < 1.13', path)
 
 
@@ -107,5 +107,5 @@ def mergedLambdas(prioritiseV0=True, path=analysis_main):
     stdPr('all', path=path)  # no quality cuts
     reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.3 < M < 0.7', 1, True, path)
     V0ListMerger('Lambda0:V0', 'Lambda0:RD', prioritiseV0, path)  # outputs Lambda0:merged
-    vertexKFit('Lambda0:merged', 0.0, '', '', path)
+    vertexTree('Lambda0:merged', 0.0, updateAllDaughters=False, path=path)
     applyCuts('Lambda0:merged', '1.10 < M < 1.13', path)

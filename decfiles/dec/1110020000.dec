@@ -7,7 +7,7 @@
 # Responsible: Benedikt Wach
 # Email: wach@mpp.mpg.de
 # Cuts: None
-# Date: 15/01/2019
+# Date: 25/01/2019
 
 Decay Upsilon(4S)
 1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
@@ -18,4 +18,5 @@ Decay B0sig
 Enddecay
 CDecay anti-B0sig
 
-End 
+End
+ 

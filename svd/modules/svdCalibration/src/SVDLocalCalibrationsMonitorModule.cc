@@ -476,6 +476,15 @@ void SVDLocalCalibrationsMonitorModule::endRun()
 
           }
 
+    m_rootFilePtr->mkdir("expert");
+
+    m_rootFilePtr->cd("expert");
+    m_h2Noise->Write("h2Noise");
+    m_h2PulseWidth->Write("h2PulseShape");
+    m_h2Pedestal->Write("h2Pedestal");
+    m_h2Gain->Write("h2Gain");
+    m_h2PeakTime->Write("h2PeakTime");
+
     m_rootFilePtr->Close();
     B2RESULT("The rootfile containing the list of histograms has been filled and closed [Local].");
 

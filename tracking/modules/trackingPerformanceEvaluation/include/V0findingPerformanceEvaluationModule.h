@@ -68,45 +68,45 @@ namespace Belle2 {
 
     /* list of histograms filled per MCParticle found in the event */
 
-    TH1F* m_multiplicityV0s; /**< number of V0s per MCParticles*/
-    TH1F* m_multiplicityMCParticles;  /**< number of MCParticles per fitted Track*/
-    TH1F* m_MCParticlePDGcode;  /**< MCParticle PDG code*/
+    TH1F* m_multiplicityV0s = nullptr; /**< number of V0s per MCParticles*/
+    TH1F* m_multiplicityMCParticles = nullptr;  /**< number of MCParticles per fitted Track*/
+    TH1F* m_MCParticlePDGcode = nullptr;  /**< MCParticle PDG code*/
 
     //error on track parameters
-    TH1F* m_h1_vtxX_err; /**< vtx error*/
-    TH1F* m_h1_vtxY_err; /**< vtx error*/
-    TH1F* m_h1_vtxZ_err; /**< vtx error*/
-    TH2F* m_h2_vtxTvsR_err; /**< vtx error on transverse plane VS transverse flight length*/
+    TH1F* m_h1_vtxX_err = nullptr; /**< vtx error*/
+    TH1F* m_h1_vtxY_err = nullptr; /**< vtx error*/
+    TH1F* m_h1_vtxZ_err = nullptr; /**< vtx error*/
+    TH2F* m_h2_vtxTvsR_err = nullptr; /**< vtx error on transverse plane VS transverse flight length*/
     //    TH1F* m_h1_mom_err; /**< mom error*/
     //    TH1F* m_h1_mass_err; /**< mom error*/
     //residuals on track parameters
-    TH1F* m_h1_vtxX_res; /**< vtx resid*/
-    TH1F* m_h1_vtxY_res; /**< vtx resid*/
-    TH1F* m_h1_vtxZ_res; /**< vtx resid*/
-    TH1F* m_h1_mom_res; /**< mom resid*/
-    TH2F* m_h2_mom; /**< mom reco VS true*/
-    TH1F* m_h1_mass_res; /**< mom resid*/
-    TH2F* m_h2_mass; /**< mass reco VS true*/
+    TH1F* m_h1_vtxX_res = nullptr; /**< vtx resid*/
+    TH1F* m_h1_vtxY_res = nullptr; /**< vtx resid*/
+    TH1F* m_h1_vtxZ_res = nullptr; /**< vtx resid*/
+    TH1F* m_h1_mom_res = nullptr; /**< mom resid*/
+    TH2F* m_h2_mom = nullptr; /**< mom reco VS true*/
+    TH1F* m_h1_mass_res = nullptr; /**< mom resid*/
+    TH2F* m_h2_mass = nullptr; /**< mass reco VS true*/
     //pulls on track parameters
-    TH1F* m_h1_vtxX_pll; /**< vtx pull*/
-    TH1F* m_h1_vtxY_pll; /**< vtx pull*/
-    TH1F* m_h1_vtxZ_pll; /**< vtx pull*/
+    TH1F* m_h1_vtxX_pll = nullptr; /**< vtx pull*/
+    TH1F* m_h1_vtxY_pll = nullptr; /**< vtx pull*/
+    TH1F* m_h1_vtxZ_pll = nullptr; /**< vtx pull*/
     //    TH1F* m_h1_mom_pll; /**< mom pull*/
     //    TH1F* m_h1_mass_pll; /**< mom pull*/
 
-    TH1F* m_h1_ChiSquare; /**< TH1F chi square */
+    TH1F* m_h1_ChiSquare = nullptr; /**< TH1F chi square */
 
-    TH1F* m_h1_nMatchedDau; /**< TH1F n matched daughters*/
+    TH1F* m_h1_nMatchedDau = nullptr; /**< TH1F n matched daughters*/
 
     //histograms used for efficiency plots
-    TH3F* m_h3_MCParticle; /**< */
-    TH3F* m_h3_V0sPerMCParticle; /**< */
-    TH1F* m_h1_MCParticle_R; /**< */
-    TH1F* m_h1_V0sPerMCParticle_R; /**< */
+    TH3F* m_h3_MCParticle = nullptr; /**< */
+    TH3F* m_h3_V0sPerMCParticle = nullptr; /**< */
+    TH1F* m_h1_MCParticle_R = nullptr; /**< */
+    TH1F* m_h1_V0sPerMCParticle_R = nullptr; /**< */
 
     //histograms used for purity plots
-    TH3F* m_h3_V0s; /**< */
-    TH3F* m_h3_MCParticlesPerV0; /**< */
+    TH3F* m_h3_V0s = nullptr; /**< */
+    TH3F* m_h3_MCParticlesPerV0 = nullptr; /**< */
 
   };
 } // end of namespace

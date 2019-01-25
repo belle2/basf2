@@ -119,7 +119,7 @@ namespace Belle2 {
       StoreArray<ECLCluster> eclClusters;
       double result = 0;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of N1 (n photons) ECLClusters
+        // sum only ECLClusters which have the N1 (n photons) hypothesis
         if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 

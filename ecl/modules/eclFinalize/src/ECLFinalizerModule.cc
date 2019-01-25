@@ -124,7 +124,7 @@ void ECLFinalizerModule::event()
       } else if (eclShower.getHypothesisId() == ECLShower::c_neutralHadron) {
         eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
       } else {
-        B2ERROR("ECLShower hypothesis is not supported.");
+        B2ERROR("ECLShower hypothesis " << eclShower.getHypothesisId()  << " is not supported.");
         eclCluster->setHypothesis(ECLCluster::EHypothesisBit::c_none);
       }
 

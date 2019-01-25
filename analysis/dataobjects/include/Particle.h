@@ -712,19 +712,18 @@ namespace Belle2 {
     */
     ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const
     {
-      switch (abs(getPDGCode())) {
-        case 22: // photon
-        case 11: // electron
-        case 13: // muon
-        case 211: // pion
-        case 321: // kaon
-        case 2122: //proton
-        case 1000010020: //deuteron
-          return ECLCluster::EHypothesisBit::c_nPhotons;
-        case 130: //K0L
-          return ECLCluster::EHypothesisBit::c_neutralHadron;
-        default:
-          return ECLCluster::EHypothesisBit::c_none;
+      const int pdg = abs(getPDGCode());
+      if ((pdg == Const::photon.getPDGCode())
+          or (pdg == Const::electron.getPDGCode())
+          or (pdg == Const::muon.getPDGCode())
+          or (pdg == Const::kaon.getPDGCode())
+          or (pdg == Const::proton.getPDGCode())
+          or (pdg == Const::deuteron.getPDGCode())) {
+        return ECLCluster::EHypothesisBit::c_nPhotons;
+      } else if (pdg == Const::Klong.getPDGCode()) {
+        return ECLCluster::EHypothesisBit::c_neutralHadron;
+      } else {
+        return ECLCluster::EHypothesisBit::c_none;
       }
     }
 

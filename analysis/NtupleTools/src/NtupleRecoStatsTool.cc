@@ -57,7 +57,7 @@ void NtupleRecoStatsTool::eval(const  Particle*)
   for (int i = 0; i < ECLClusters.getEntries(); i++) {
     const ECLCluster* cluster      = ECLClusters[i];
 
-    // Only use one hypothesis ID for ECLClusters
+    // use only ECLClusters which have the nPhotons hypothesis bit set
     if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
     if (cluster->isNeutral()) {

@@ -201,7 +201,8 @@ void ECLTrackClusterMatchingPerformanceModule::event()
             m_matchedPhotonHypothesisClusterMinTrkDistance = eclCluster.getMinTrkDistance();
             m_matchedPhotonHypothesisClusterDeltaL = eclCluster.getDeltaL();
             eclCluster_PhotonHypothesis_track_related = &eclCluster;
-          } else if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
+          }
+          if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {
             m_matchedToHadronHypothesisECLCluster = 1;
             m_matchedHadronHypothesisClusterDetectorRegion = eclCluster.getDetectorRegion();
             m_matchedHadronHypothesisClusterTheta = eclCluster.getTheta();

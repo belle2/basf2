@@ -51,6 +51,7 @@ void ECLChargedPIDModule::event()
     // (the tracking will not always successfully fit with a pion hypothesis).
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
+
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
 
@@ -124,6 +125,7 @@ void ECLChargedPIDModule::event()
     track.addRelationTo(eclPidLikelihood);
 
   } // end loop on tracks
+
 }
 
 void ECLChargedPIDModule::endRun()

@@ -11,6 +11,9 @@
 #pragma link C++ class Belle2::SVDClusterCalibrations+;
 #pragma link C++ class Belle2::SVDNoiseCalibrations;
 #pragma link C++ class Belle2::SVDPulseShapeCalibrations;
+#pragma link C++ class Belle2::SVDPedestalCalibrations;
+#pragma link C++ class Belle2::SVDFADCMaskedStrips;
+#pragma link C++ class Belle2::SVDHotStripsCalibrations;
 #pragma link C++ class Belle2::SVDLocalCalibrationsImporter+;
 
 #endif

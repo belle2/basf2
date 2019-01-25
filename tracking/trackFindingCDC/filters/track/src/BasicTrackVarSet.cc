@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Michael Eliachevitch                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,6 +20,10 @@
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <numeric>
+
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
@@ -33,98 +37,59 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
     return false;
   }
 
+  // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
+  // data that they accumulate (i.e. are "filled" with).
+  statistics_accumulator drift_length_acc;
+  statistics_accumulator adc_acc;
+  statistics_accumulator empty_s_acc;
+
   unsigned int size = track->size();
-  double drift_length_sum = 0;
-  double drift_length_sum_squared = 0;
-  double drift_length_variance = 0;
-  double drift_length_max = -1000;
-  double drift_length_min = 1000;
-  double adc_sum = 0;
-  double adc_sum_squared = 0;
-  double adc_variance = 0;
-  double adc_max = -1000;
-  double adc_min = 1000;
-  double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
-  double empty_s_sum = 0;
-  double empty_s_sum_squared = 0;
-  double empty_s_variance = 0;
-  double empty_s_max = 0;
-  double empty_s_min = 0;
 
-  double last_perp_s = NAN;
-
+  // Fill accumulators with ADC and drift circle information
   for (const CDCRecoHit3D& recoHit : *track) {
-    // Drift circle information
-    double driftLength = recoHit.getWireHit().getRefDriftLength();
-    drift_length_sum += driftLength;
-    drift_length_sum_squared += driftLength * driftLength;
-
-    if (driftLength < drift_length_min) {
-      drift_length_min = driftLength;
-    }
-
-    if (driftLength > drift_length_max) {
-      drift_length_max = driftLength;
-    }
-
-    // ADC information
-    double adc = static_cast<double>(recoHit.getWireHit().getHit()->getADCCount());
-    adc_sum += adc;
-    adc_sum_squared += adc * adc;
-
-    if (adc < adc_min) {
-      adc_min = adc;
-    }
-
-    if (adc > adc_max) {
-      adc_max = adc;
-    }
-
-    // perpS Information
-    double currentPerpS = recoHit.getArcLength2D();
-    if (not std::isnan(last_perp_s)) {
-      double perp_s_difference = currentPerpS - last_perp_s;
-      empty_s_sum += perp_s_difference;
-      empty_s_sum_squared += perp_s_difference * perp_s_difference;
-
-      if (perp_s_difference < empty_s_min) {
-        empty_s_min = perp_s_difference;
-      }
-
-      if (perp_s_difference > empty_s_max) {
-        empty_s_max = perp_s_difference;
-      }
-    }
-    last_perp_s = currentPerpS;
+    drift_length_acc(recoHit.getWireHit().getRefDriftLength());
+    adc_acc(static_cast<unsigned int>(recoHit.getWireHit().getHit()->getADCCount()));
   }
 
+  // Extract empty_s (ArcLength2D gap) information
+  double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
+
+  // fill a vector with all 2D arc lengths in track
+  std::vector<double> arc_lengths;
+  auto get_arc_length = [](const CDCRecoHit3D & recoHit) { return recoHit.getArcLength2D(); };
+  std::transform(begin(*track), end(*track), back_inserter(arc_lengths), get_arc_length);
+  // Remove all NAN elements. For some reason, last hit in track is sometimes NAN
+  erase_remove_if(arc_lengths, IsNaN());
+
+  // calculate gaps in arc length s between adjacent hits
+  // beware: first element not a difference but mapped onto itself, empty_s_gaps[0] = arc_lengths[0]
+  if (arc_lengths.size() > 1) {
+    std::vector<double> empty_s_gaps;
+    std::adjacent_difference(begin(arc_lengths), end(arc_lengths), back_inserter(empty_s_gaps));
+
+    // Wrap a reference to empty_s_acc in a lambda, b/c it is passed by value to the following
+    // for_each. If used directly, only a copy would filled in the for_each.
+    auto empty_s_acc_ref = [&empty_s_acc](double s) { empty_s_acc(s); };
+    // start filling accumulator with hit gaps, but skip first which is not a difference
+    std::for_each(next(begin(empty_s_gaps)), end(empty_s_gaps), empty_s_acc_ref);
+  }
+
+  unsigned int empty_s_size = bacc::count(empty_s_acc);
+
+  // Overwrite boost-accumulator behavior for containers with 0 or 1 elements
+  // Set variances containers with for 0/1 elements to -1 (boost default: nan/0 respectively)
+  double drift_length_variance = -1;
+  double adc_variance = -1;
   if (size > 1) {
-    double driftLengthVarianceSquared = (drift_length_sum_squared - drift_length_sum * drift_length_sum / size)  / (size - 1.0) ;
-    double adcVarianceSquared = (adc_sum_squared - adc_sum * adc_sum / size)  / (size - 1.0) ;
-    double emptySVarianceSquared = (empty_s_sum_squared - empty_s_sum * empty_s_sum / size)  / (size - 1.0) ;
-
-    if (driftLengthVarianceSquared > 0) {
-      drift_length_variance = std::sqrt(driftLengthVarianceSquared);
-    } else {
-      drift_length_variance = 0;
-    }
-
-    if (adcVarianceSquared > 0) {
-      adc_variance = std::sqrt(adcVarianceSquared);
-    } else {
-      adc_variance = 0;
-    }
-
-    if (emptySVarianceSquared > 0) {
-      empty_s_variance = std::sqrt(emptySVarianceSquared);
-    } else {
-      empty_s_variance = 0;
-    }
-
-  } else {
-    drift_length_variance = -1;
-    adc_variance = -1;
-    empty_s_variance = -1;
+    // for more than two elements, calculate variance with bessel correction
+    double bessel_corr = (double)size / (size - 1.0);
+    drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * bessel_corr);
+    adc_variance = std::sqrt(bacc::variance(adc_acc) * bessel_corr);
+  }
+  double empty_s_variance = -1;
+  if (empty_s_size > 1) {
+    double empty_s_bessel_corr = (double)empty_s_size / (empty_s_size - 1.0);
+    empty_s_variance = std::sqrt(bacc::variance(empty_s_acc) * empty_s_bessel_corr);
   }
 
   const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
@@ -133,30 +98,28 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   var<named("size")>() = size;
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
-  //var<named("fit_prob_3d")>() = trajectory3D.getPValue();
-  //var<named("fit_prob_2d")>() = trajectory2D.getPValue();
-  //var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
-  var<named("drift_length_mean")>() = toFinite(drift_length_sum / size, 0);
+  var<named("drift_length_mean")>() = toFinite(bacc::mean(drift_length_acc), 0);
   var<named("drift_length_variance")>() = toFinite(drift_length_variance, 0);
-  var<named("drift_length_max")>() = toFinite(drift_length_max, 0);
-  var<named("drift_length_min")>() = toFinite(drift_length_min, 0);
-  var<named("drift_length_sum")>() = toFinite(drift_length_sum, 0);
+  var<named("drift_length_max")>() = toFinite(bacc::max(drift_length_acc), 0);
+  var<named("drift_length_min")>() = toFinite(bacc::min(drift_length_acc), 0);
+  var<named("drift_length_sum")>() = toFinite(bacc::sum(drift_length_acc), 0);
 
-  var<named("adc_mean")>() = toFinite(adc_sum / size, 0);
+  var<named("adc_mean")>() = toFinite(bacc::mean(adc_acc), 0);
   var<named("adc_variance")>() = toFinite(adc_variance, 0);
-  var<named("adc_max")>() = toFinite(adc_max, 0);
-  var<named("adc_min")>() = toFinite(adc_min, 0);
-  var<named("adc_sum")>() = toFinite(adc_sum, 0);
+  var<named("adc_max")>() = toFinite(bacc::max(adc_acc), 0);
+  var<named("adc_min")>() = toFinite(bacc::min(adc_acc), 0);
+  var<named("adc_sum")>() = toFinite(bacc::sum(adc_acc), 0);
 
   var<named("has_matching_segment")>() = track->getHasMatchingSegment();
 
-  var<named("empty_s_mean")>() = toFinite(empty_s_sum / size, 0);
-  var<named("empty_s_sum")>() = toFinite(empty_s_sum, 0);
+  var<named("empty_s_mean")>() = toFinite(bacc::mean(empty_s_acc), 0);
+  var<named("empty_s_sum")>() = toFinite(bacc::sum(empty_s_acc), 0);
   var<named("empty_s_variance")>() = toFinite(empty_s_variance, 0);
-  var<named("empty_s_max")>() = toFinite(empty_s_max, 0);
-  var<named("empty_s_min")>() = toFinite(empty_s_min, 0);
+
+  var<named("empty_s_max")>() = toFinite(bacc::max(empty_s_acc), 0);
+  var<named("empty_s_min")>() = toFinite(bacc::min(empty_s_acc), 0);
   var<named("s_range")>() = toFinite(s_range, 0);
 
   return true;

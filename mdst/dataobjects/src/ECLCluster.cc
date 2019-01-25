@@ -10,6 +10,7 @@
 
 /* External headers. */
 #include <TMatrixD.h>
+#include <bitset>
 
 /* Belle2 headers. */
 #include <mdst/dataobjects/ECLCluster.h>
@@ -21,15 +22,18 @@ double ECLCluster::getEnergy(const ECLCluster::EHypothesisBit& hypothesis) const
 {
   // check if cluster has the requested hypothesis
   if (!hasHypothesis(hypothesis)) {
-    B2ERROR("This cluster does not support the requested hypothesis: " << getHypothesis() << " " <<  hasHypothesis(
-              ECLCluster::EHypothesisBit::c_nPhotons) << " " <<  hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron) << ", request: " <<
-            static_cast<unsigned short>(hypothesis));
+    B2FATAL("This cluster does not support the requested hypothesis,"
+            << "\n it has the nPhotons hypothesis (y/n = 1/0): " <<  hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+            << "\n and it has the neutralHadron hypothesis (y/n = 1/0): " <<  hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)
+            << "\n You requested the hypothesis bitmask: " << std::bitset<16>(static_cast<unsigned short>(hypothesis)));
     return std::numeric_limits<double>::quiet_NaN();
   }
 
+  // return the sensible answers
   if (hypothesis == ECLCluster::EHypothesisBit::c_nPhotons) return exp(m_logEnergy);
   else if (hypothesis == ECLCluster::EHypothesisBit::c_neutralHadron) return exp(m_logEnergyRaw);
   else {
+    // throw error if the cluster is not supported
     B2ERROR("EHypothesisBit is not supported yet: " << static_cast<unsigned short>(hypothesis));
     return std::numeric_limits<double>::quiet_NaN();
   };

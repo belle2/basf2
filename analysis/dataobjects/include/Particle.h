@@ -716,6 +716,7 @@ namespace Belle2 {
       if ((pdg == Const::photon.getPDGCode())
           or (pdg == Const::electron.getPDGCode())
           or (pdg == Const::muon.getPDGCode())
+          or (pdg == Const::pion.getPDGCode())
           or (pdg == Const::kaon.getPDGCode())
           or (pdg == Const::proton.getPDGCode())
           or (pdg == Const::deuteron.getPDGCode())) {

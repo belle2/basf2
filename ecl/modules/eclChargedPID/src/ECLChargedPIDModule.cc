@@ -58,7 +58,7 @@ void ECLChargedPIDModule::event()
     const double p     = fitRes->getMomentum().Mag();
     const double theta = fitRes->getMomentum().Theta();
 
-    double energy(0), maxEnergy(0), e9e21(0);
+    double maxEnergy(0), e9e21(0);
     double lat(0), dist(0), trkdepth(0), shdepth(0);
     double nCrystals = 0;
     int nClusters = relShowers.size();
@@ -71,7 +71,6 @@ void ECLChargedPIDModule::event()
       }
 
       const double shEnergy = eclShower.getEnergy();
-      energy += shEnergy;
       if (shEnergy > maxEnergy) {
         maxEnergy = shEnergy;
         e9e21 = eclShower.getE9oE21();
@@ -85,7 +84,7 @@ void ECLChargedPIDModule::event()
 
     float likelihoods[Const::ChargedStable::c_SetSize];
 
-    double eop = energy / p;
+    double eop = maxEnergy / p;
     const auto charge = fitRes->getChargeSign();
 
     B2DEBUG(20, "P = " << p << " [GeV]");
@@ -113,7 +112,7 @@ void ECLChargedPIDModule::event()
     }
 
     const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods,
-                                                                energy,
+                                                                maxEnergy,
                                                                 eop,
                                                                 e9e21,
                                                                 lat,

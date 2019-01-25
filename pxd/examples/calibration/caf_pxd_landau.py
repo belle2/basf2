@@ -48,7 +48,7 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 
 from ROOT.Belle2 import PXDGainCalibrationAlgorithm
-from ROOT.Belle2 import PXDLandauCalibrationAlgorithm
+from ROOT.Belle2 import PXDChargeCalibrationAlgorithm
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
@@ -63,7 +63,7 @@ parser = argparse.ArgumentParser(description="Compute gain correction maps for P
 parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--maxSubRuns', default=10, type=int, help='Maximum number of subruns to use')
+parser.add_argument('--maxSubRuns', default=20, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
 
 
@@ -91,7 +91,7 @@ print('Number selected input files:  {}'.format(len(input_files)))
 
 
 # Access files_to_iovs for MC runs
-with open("mc_file_iov_map2.pkl", 'br') as map_file:
+with open("mc_file_iov_map.pkl", 'br') as map_file:
     mc_files_to_iovs = pickle.load(map_file)
 
 mc_input_files = list(mc_files_to_iovs.keys())
@@ -171,19 +171,19 @@ pre_charge_collector_path.add_module("PXDRawHitSorter")
 pre_charge_collector_path.add_module("PXDClusterizer")
 
 
-landau_algo = PXDLandauCalibrationAlgorithm()
+landau_algo = PXDChargeCalibrationAlgorithm()
 
 # We can play around with algo parameters
 landau_algo.minClusters = 5000      # Minimum number of collected clusters for estimating gains
 landau_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
 landau_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
-
+landau_algo.strategy = 1
 # We want to use a specific collector
 landau_algo.setPrefix("PXDClusterChargeCollector")
 
 # create calibration
 charge_cal = Calibration(
-    name="PXDLandauCalibrationAlgorithm",
+    name="PXDChargeCalibrationAlgorithm",
     collector=charge_collector,
     algorithms=landau_algo,
     input_files=input_files)
@@ -265,7 +265,7 @@ cal_fw = CAF()
 cal_fw.add_calibration(hotpixel_cal)
 cal_fw.add_calibration(charge_cal)
 cal_fw.add_calibration(gain_cal)
-cal_fw.backend = backends.Local(max_processes=20)
-# cal_fw.backend = LSF()
+# cal_fw.backend = backends.Local(max_processes=20)
+cal_fw.backend = LSF()
 cal_fw.output_dir = 'pxd_calibration_results_range_{}_{}_{}'.format(args.runLow, args.runHigh, args.expNo)
 cal_fw.run(iov=iov_to_calibrate)

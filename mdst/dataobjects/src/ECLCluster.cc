@@ -82,7 +82,10 @@ int ECLCluster::getUniqueId() const
 {
   const int crid     = getConnectedRegionId();
   const int showerid = getClusterId();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const int hypoid   = getHypothesisId();
+#pragma GCC diagnostic pop
 
   return 100000 * crid + 1000 * hypoid + showerid;
 }

@@ -35,8 +35,11 @@ Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
 Untested method PIDLikelihood::printArray
 Untested method PIDLikelihood::setLogLikelihood
+Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
+Untested method ECLCluster::getHypothesisId
 Untested method ECLCluster::hasStatus
+Untested method ECLCluster::removeHypothesis
 Untested method ECLCluster::removeStatus
 Untested method ECLCluster::setAbsZernike40
 Untested method ECLCluster::setAbsZernike51
@@ -50,7 +53,7 @@ Untested method ECLCluster::setE9oE21
 Untested method ECLCluster::setEnergy
 Untested method ECLCluster::setEnergyHighestCrystal
 Untested method ECLCluster::setEnergyRaw
-Untested method ECLCluster::setHypothesisId
+Untested method ECLCluster::setHypothesis
 Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
 Untested method ECLCluster::setMinTrkDistance
@@ -1546,10 +1549,15 @@ ECLCluster#0:
   getDetectorRegion(): 1
   getE1oE9(): 0.463867
   getE9oE21(): 1
-  getEnergy(): 0.103597
+  getEnergy(16): 0.103597
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 1
+ and it has the neutralHadron hypothesis (y/n = 1/0): 0
+ You requested the hypothesis bitmask: 0000000000100000  { module: PrintObjectsModule }
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0480965
   getEnergyRaw(): 0.103597
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.183594
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 2.92969
@@ -1569,6 +1577,8 @@ ECLCluster#0:
   getUncertaintyTheta(): 0.00527344
   getUniqueId(): 105001
   getZernikeMVA(): 0.251953
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -1590,10 +1600,11 @@ ECLCluster#1:
   getDetectorRegion(): 1
   getE1oE9(): 0.521484
   getE9oE21(): 0.961914
-  getEnergy(): 0.300309
+  getEnergy(16): 0.300309
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.150724
   getEnergyRaw(): 0.290484
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.371094
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 6.05469
@@ -1613,6 +1624,8 @@ ECLCluster#1:
   getUncertaintyTheta(): 0.00390625
   getUniqueId(): 205001
   getZernikeMVA(): 0.606445
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -1634,10 +1647,11 @@ ECLCluster#2:
   getDetectorRegion(): 1
   getE1oE9(): 0.450195
   getE9oE21(): 0.985352
-  getEnergy(): 0.133946
+  getEnergy(16): 0.133946
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0594475
   getEnergyRaw(): 0.130644
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.274414
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 3.32031
@@ -1658,6 +1672,8 @@ ECLCluster#2:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 405001
   getZernikeMVA(): 0.126953
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -1679,10 +1695,11 @@ ECLCluster#3:
   getDetectorRegion(): 1
   getE1oE9(): 0.732422
   getE9oE21(): 0.931641
-  getEnergy(): 0.0740061
+  getEnergy(16): 0.0740061
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.050494
   getEnergyRaw(): 0.0723845
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.21582
   getMinTrkDistance(): 14.1602
   getNumberOfCrystals(): 5.66406
@@ -1703,6 +1720,8 @@ ECLCluster#3:
   getUncertaintyTheta(): 0.00566406
   getUniqueId(): 405002
   getZernikeMVA(): 0.0849609
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -1724,10 +1743,11 @@ ECLCluster#4:
   getDetectorRegion(): 1
   getE1oE9(): 0.775391
   getE9oE21(): 1
-  getEnergy(): 0.0233903
+  getEnergy(16): 0.0233903
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0181399
   getEnergyRaw(): 0.0227185
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.244141
   getMinTrkDistance(): 74.2188
   getNumberOfCrystals(): 3.90625
@@ -1747,6 +1767,8 @@ ECLCluster#4:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 505001
   getZernikeMVA(): 0.664062
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -1768,10 +1790,11 @@ ECLCluster#5:
   getDetectorRegion(): 2
   getE1oE9(): 0.666992
   getE9oE21(): 1
-  getEnergy(): 0.203572
+  getEnergy(16): 0.203572
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.135728
   getEnergyRaw(): 0.195755
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.117188
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 3.90625
@@ -1791,6 +1814,8 @@ ECLCluster#5:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 605001
   getZernikeMVA(): 0.268555
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -1812,10 +1837,11 @@ ECLCluster#6:
   getDetectorRegion(): 2
   getE1oE9(): 0.542969
   getE9oE21(): 1
-  getEnergy(): 0.184812
+  getEnergy(16): 0.184812
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.100413
   getEnergyRaw(): 0.177001
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.208984
   getMinTrkDistance(): 13.916
   getNumberOfCrystals(): 2.92969
@@ -1835,6 +1861,8 @@ ECLCluster#6:
   getUncertaintyTheta(): 0.00664062
   getUniqueId(): 705001
   getZernikeMVA(): 0.242188
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -1856,10 +1884,11 @@ ECLCluster#7:
   getDetectorRegion(): 2
   getE1oE9(): 0.668945
   getE9oE21(): 0.953125
-  getEnergy(): 0.357847
+  getEnergy(16): 0.357847
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.228373
   getEnergyRaw(): 0.346277
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.433594
   getMinTrkDistance(): 55.9082
   getNumberOfCrystals(): 10.9375
@@ -1879,6 +1908,8 @@ ECLCluster#7:
   getUncertaintyTheta(): 0.00527344
   getUniqueId(): 805001
   getZernikeMVA(): 0.683594
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -1900,10 +1931,11 @@ ECLCluster#8:
   getDetectorRegion(): 2
   getE1oE9(): 0.704102
   getE9oE21(): 0.96875
-  getEnergy(): 0.141584
+  getEnergy(16): 0.141584
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.096587
   getEnergyRaw(): 0.136964
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.317383
   getMinTrkDistance(): 110.596
   getNumberOfCrystals(): 9.96094
@@ -1923,6 +1955,8 @@ ECLCluster#8:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 1005001
   getZernikeMVA(): 0.755859
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -1944,10 +1978,11 @@ ECLCluster#9:
   getDetectorRegion(): 2
   getE1oE9(): 0.680664
   getE9oE21(): 0.917969
-  getEnergy(): 0.419197
+  getEnergy(16): 0.419197
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.261703
   getEnergyRaw(): 0.400856
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.499023
   getMinTrkDistance(): 152.588
   getNumberOfCrystals(): 15.0391
@@ -1970,6 +2005,8 @@ ECLCluster#9:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 1105001
   getZernikeMVA(): 0.421875
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -1991,10 +2028,11 @@ ECLCluster#10:
   getDetectorRegion(): 2
   getE1oE9(): 0.602539
   getE9oE21(): 0.931641
-  getEnergy(): 0.118334
+  getEnergy(16): 0.118334
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0664359
   getEnergyRaw(): 0.11537
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.286133
   getMinTrkDistance(): 119.141
   getNumberOfCrystals(): 8.00781
@@ -2014,6 +2052,8 @@ ECLCluster#10:
   getUncertaintyTheta(): 0.00742187
   getUniqueId(): 1205001
   getZernikeMVA(): 0.425781
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2035,10 +2075,11 @@ ECLCluster#11:
   getDetectorRegion(): 2
   getE1oE9(): 0.767578
   getE9oE21(): 0.985352
-  getEnergy(): 0.128321
+  getEnergy(16): 0.128321
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0970865
   getEnergyRaw(): 0.124013
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.15625
   getMinTrkDistance(): 97.4121
   getNumberOfCrystals(): 5.07812
@@ -2058,6 +2099,8 @@ ECLCluster#11:
   getUncertaintyTheta(): 0.00722656
   getUniqueId(): 1305001
   getZernikeMVA(): 0.59082
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2079,10 +2122,11 @@ ECLCluster#12:
   getDetectorRegion(): 3
   getE1oE9(): 0.794922
   getE9oE21(): 0.987305
-  getEnergy(): 0.093313
+  getEnergy(16): 0.093313
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0732065
   getEnergyRaw(): 0.0902353
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.176758
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
@@ -2102,6 +2146,8 @@ ECLCluster#12:
   getUncertaintyTheta(): 0.00878906
   getUniqueId(): 1505001
   getZernikeMVA(): 0.767578
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2123,10 +2169,11 @@ ECLCluster#13:
   getDetectorRegion(): 3
   getE1oE9(): 0.614258
   getE9oE21(): 0.927734
-  getEnergy(): 0.941278
+  getEnergy(16): 0.941278
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.536046
   getEnergyRaw(): 0.898695
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.520508
   getMinTrkDistance(): 14.1602
   getNumberOfCrystals(): 15.0391
@@ -2146,6 +2193,8 @@ ECLCluster#13:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 1405001
   getZernikeMVA(): 0.416016
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2167,10 +2216,11 @@ ECLCluster#14:
   getDetectorRegion(): 3
   getE1oE9(): 0.536133
   getE9oE21(): 0.987305
-  getEnergy(): 0.347494
+  getEnergy(16): 0.347494
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.184058
   getEnergyRaw(): 0.33227
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.313477
   getMinTrkDistance(): 18.3105
   getNumberOfCrystals(): 10.7422
@@ -2193,6 +2243,8 @@ ECLCluster#14:
   getUncertaintyTheta(): 0.00605469
   getUniqueId(): 1605001
   getZernikeMVA(): 0.236328
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2214,10 +2266,11 @@ ECLCluster#15:
   getDetectorRegion(): 3
   getE1oE9(): 0.80957
   getE9oE21(): 0.981445
-  getEnergy(): 0.54757
+  getEnergy(16): 0.54757
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.435231
   getEnergyRaw(): 0.526095
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.206055
   getMinTrkDistance(): 10.2539
   getNumberOfCrystals(): 9.17969
@@ -2240,6 +2293,8 @@ ECLCluster#15:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 1605002
   getZernikeMVA(): 0.298828
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2261,10 +2316,11 @@ ECLCluster#16:
   getDetectorRegion(): 3
   getE1oE9(): 0.574219
   getE9oE21(): 1
-  getEnergy(): 0.0470756
+  getEnergy(16): 0.0470756
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0270506
   getEnergyRaw(): 0.0459444
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.0839844
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 3.90625
@@ -2284,6 +2340,8 @@ ECLCluster#16:
   getUncertaintyTheta(): 0.0101563
   getUniqueId(): 1805001
   getZernikeMVA(): 0.485352
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2305,10 +2363,16 @@ ECLCluster#17:
   getDetectorRegion(): 1
   getE1oE9(): 0.463867
   getE9oE21(): 1
-  getEnergy(): 0.103597
+ ... message repeated 16 times
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 0
+ and it has the neutralHadron hypothesis (y/n = 1/0): 1
+ You requested the hypothesis bitmask: 0000000000010000  { module: PrintObjectsModule }
+  getEnergy(16): nan
+  getEnergy(32): 0.103597
   getEnergyHighestCrystal(): 0.0480965
   getEnergyRaw(): 0.103597
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.183594
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 2.92969
@@ -2328,6 +2392,8 @@ ECLCluster#17:
   getUncertaintyTheta(): 0
   getUniqueId(): 106001
   getZernikeMVA(): 0.748047
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2349,10 +2415,11 @@ ECLCluster#18:
   getDetectorRegion(): 1
   getE1oE9(): 0.521484
   getE9oE21(): 0.961914
-  getEnergy(): 0.291301
+  getEnergy(16): nan
+  getEnergy(32): 0.291301
   getEnergyHighestCrystal(): 0.145793
   getEnergyRaw(): 0.291301
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.382812
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 7.03125
@@ -2372,6 +2439,8 @@ ECLCluster#18:
   getUncertaintyTheta(): 0
   getUniqueId(): 206001
   getZernikeMVA(): 0.393555
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2393,10 +2462,11 @@ ECLCluster#19:
   getDetectorRegion(): 1
   getE1oE9(): 0.448242
   getE9oE21(): 0.714844
-  getEnergy(): 0.203045
+  getEnergy(16): nan
+  getEnergy(32): 0.203045
   getEnergyHighestCrystal(): 0.0579836
   getEnergyRaw(): 0.203045
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.670898
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 8.98438
@@ -2417,6 +2487,8 @@ ECLCluster#19:
   getUncertaintyTheta(): 0
   getUniqueId(): 406001
   getZernikeMVA(): 0.989258
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2438,10 +2510,11 @@ ECLCluster#20:
   getDetectorRegion(): 1
   getE1oE9(): 0.775391
   getE9oE21(): 1
-  getEnergy(): 0.0227185
+  getEnergy(16): nan
+  getEnergy(32): 0.0227185
   getEnergyHighestCrystal(): 0.0176188
   getEnergyRaw(): 0.0227185
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.244141
   getMinTrkDistance(): 74.2188
   getNumberOfCrystals(): 3.90625
@@ -2461,6 +2534,8 @@ ECLCluster#20:
   getUncertaintyTheta(): 0
   getUniqueId(): 506001
   getZernikeMVA(): 0.335938
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2482,10 +2557,11 @@ ECLCluster#21:
   getDetectorRegion(): 2
   getE1oE9(): 0.666992
   getE9oE21(): 1
-  getEnergy(): 0.195755
+  getEnergy(16): nan
+  getEnergy(32): 0.195755
   getEnergyHighestCrystal(): 0.130517
   getEnergyRaw(): 0.195755
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.117188
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 3.90625
@@ -2505,6 +2581,8 @@ ECLCluster#21:
   getUncertaintyTheta(): 0
   getUniqueId(): 606001
   getZernikeMVA(): 0.731445
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2526,10 +2604,11 @@ ECLCluster#22:
   getDetectorRegion(): 2
   getE1oE9(): 0.542969
   getE9oE21(): 1
-  getEnergy(): 0.177001
+  getEnergy(16): nan
+  getEnergy(32): 0.177001
   getEnergyHighestCrystal(): 0.0961694
   getEnergyRaw(): 0.177001
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.208984
   getMinTrkDistance(): 13.916
   getNumberOfCrystals(): 2.92969
@@ -2549,6 +2628,8 @@ ECLCluster#22:
   getUncertaintyTheta(): 0
   getUniqueId(): 706001
   getZernikeMVA(): 0.757812
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2570,10 +2651,11 @@ ECLCluster#23:
   getDetectorRegion(): 2
   getE1oE9(): 0.668945
   getE9oE21(): 0.953125
-  getEnergy(): 0.346277
+  getEnergy(16): nan
+  getEnergy(32): 0.346277
   getEnergyHighestCrystal(): 0.220989
   getEnergyRaw(): 0.346277
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.433594
   getMinTrkDistance(): 55.9082
   getNumberOfCrystals(): 10.9375
@@ -2593,6 +2675,8 @@ ECLCluster#23:
   getUncertaintyTheta(): 0
   getUniqueId(): 806001
   getZernikeMVA(): 0.316406
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2614,10 +2698,11 @@ ECLCluster#24:
   getDetectorRegion(): 2
   getE1oE9(): 0.704102
   getE9oE21(): 0.96875
-  getEnergy(): 0.139921
+  getEnergy(16): nan
+  getEnergy(32): 0.139921
   getEnergyHighestCrystal(): 0.0934355
   getEnergyRaw(): 0.139921
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.405273
   getMinTrkDistance(): 110.596
   getNumberOfCrystals(): 10.9375
@@ -2637,6 +2722,8 @@ ECLCluster#24:
   getUncertaintyTheta(): 0
   getUniqueId(): 1006001
   getZernikeMVA(): 0.244141
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2658,10 +2745,11 @@ ECLCluster#25:
   getDetectorRegion(): 2
   getE1oE9(): 0.680664
   getE9oE21(): 0.917969
-  getEnergy(): 0.405977
+  getEnergy(16): nan
+  getEnergy(32): 0.405977
   getEnergyHighestCrystal(): 0.250245
   getEnergyRaw(): 0.405977
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.549805
   getMinTrkDistance(): 152.588
   getNumberOfCrystals(): 17.9688
@@ -2684,6 +2772,8 @@ ECLCluster#25:
   getUncertaintyTheta(): 0
   getUniqueId(): 1106001
   getZernikeMVA(): 0.578125
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2705,10 +2795,11 @@ ECLCluster#26:
   getDetectorRegion(): 2
   getE1oE9(): 0.602539
   getE9oE21(): 0.931641
-  getEnergy(): 0.11537
+  getEnergy(16): nan
+  getEnergy(32): 0.11537
   getEnergyHighestCrystal(): 0.0647723
   getEnergyRaw(): 0.11537
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.286133
   getMinTrkDistance(): 119.141
   getNumberOfCrystals(): 8.00781
@@ -2728,6 +2819,8 @@ ECLCluster#26:
   getUncertaintyTheta(): 0
   getUniqueId(): 1206001
   getZernikeMVA(): 0.574219
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2749,10 +2842,11 @@ ECLCluster#27:
   getDetectorRegion(): 2
   getE1oE9(): 0.767578
   getE9oE21(): 0.985352
-  getEnergy(): 0.124013
+  getEnergy(16): nan
+  getEnergy(32): 0.124013
   getEnergyHighestCrystal(): 0.093827
   getEnergyRaw(): 0.124013
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.15625
   getMinTrkDistance(): 97.4121
   getNumberOfCrystals(): 5.07812
@@ -2772,6 +2866,8 @@ ECLCluster#27:
   getUncertaintyTheta(): 0
   getUniqueId(): 1306001
   getZernikeMVA(): 0.40918
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2793,10 +2889,11 @@ ECLCluster#28:
   getDetectorRegion(): 3
   getE1oE9(): 0.794922
   getE9oE21(): 0.987305
-  getEnergy(): 0.0902353
+  getEnergy(16): nan
+  getEnergy(32): 0.0902353
   getEnergyHighestCrystal(): 0.0707919
   getEnergyRaw(): 0.0902353
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.176758
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
@@ -2816,6 +2913,8 @@ ECLCluster#28:
   getUncertaintyTheta(): 0
   getUniqueId(): 1506001
   getZernikeMVA(): 0.232422
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -2837,10 +2936,11 @@ ECLCluster#29:
   getDetectorRegion(): 3
   getE1oE9(): 0.614258
   getE9oE21(): 0.927734
-  getEnergy(): 0.908706
+  getEnergy(16): nan
+  getEnergy(32): 0.908706
   getEnergyHighestCrystal(): 0.511795
   getEnergyRaw(): 0.908706
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.561523
   getMinTrkDistance(): 14.1602
   getNumberOfCrystals(): 19.9219
@@ -2860,6 +2960,8 @@ ECLCluster#29:
   getUncertaintyTheta(): 0
   getUniqueId(): 1406001
   getZernikeMVA(): 0.583984
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2881,10 +2983,11 @@ ECLCluster#30:
   getDetectorRegion(): 3
   getE1oE9(): 0.645508
   getE9oE21(): 0.758789
-  getEnergy(): 0.858431
+  getEnergy(16): nan
+  getEnergy(32): 0.858431
   getEnergyHighestCrystal(): 0.418468
   getEnergyRaw(): 0.858431
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.509766
   getMinTrkDistance(): 13.1836
   getNumberOfCrystals(): 19.9219
@@ -2907,6 +3010,8 @@ ECLCluster#30:
   getUncertaintyTheta(): 0
   getUniqueId(): 1606001
   getZernikeMVA(): 0.929688
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -2928,10 +3033,11 @@ ECLCluster#31:
   getDetectorRegion(): 3
   getE1oE9(): 0.574219
   getE9oE21(): 1
-  getEnergy(): 0.0459444
+  getEnergy(16): nan
+  getEnergy(32): 0.0459444
   getEnergyHighestCrystal(): 0.0264014
   getEnergyRaw(): 0.0459444
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.0839844
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 3.90625
@@ -2951,6 +3057,8 @@ ECLCluster#31:
   getUncertaintyTheta(): 0
   getUniqueId(): 1806001
   getZernikeMVA(): 0.514648
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -3010,6 +3118,7 @@ KLMCluster#1:
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 1)
   getTime(): 2.62976
+ ... message repeated 14 times
 [ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
 SoftwareTriggerResult:
   getResults(): size(25)
@@ -7071,10 +7180,15 @@ ECLCluster#0:
   getDetectorRegion(): 1
   getE1oE9(): 0.993164
   getE9oE21(): 1
-  getEnergy(): 0.215514
+  getEnergy(16): 0.215514
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 1
+ and it has the neutralHadron hypothesis (y/n = 1/0): 0
+ You requested the hypothesis bitmask: 0000000000100000  { module: PrintObjectsModule }
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.214085
   getEnergyRaw(): 0.209471
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.0078125
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 2.92969
@@ -7094,6 +7208,8 @@ ECLCluster#0:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 105001
   getZernikeMVA(): 0.189453
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -7115,10 +7231,11 @@ ECLCluster#1:
   getDetectorRegion(): 1
   getE1oE9(): 0.657227
   getE9oE21(): 0.786133
-  getEnergy(): 0.225059
+  getEnergy(16): 0.225059
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.116275
   getEnergyRaw(): 0.218875
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.390625
   getMinTrkDistance(): 52.7344
   getNumberOfCrystals(): 5.07812
@@ -7140,6 +7257,8 @@ ECLCluster#1:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 205001
   getZernikeMVA(): 0.0664062
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7161,10 +7280,11 @@ ECLCluster#2:
   getDetectorRegion(): 2
   getE1oE9(): 0.871094
   getE9oE21(): 0.989258
-  getEnergy(): 0.258922
+  getEnergy(16): 0.258922
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.223185
   getEnergyRaw(): 0.246328
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.192383
   getMinTrkDistance(): 79.5898
   getNumberOfCrystals(): 9.96094
@@ -7184,6 +7304,8 @@ ECLCluster#2:
   getUncertaintyTheta(): 0.00585938
   getUniqueId(): 405001
   getZernikeMVA(): 0.861328
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7205,10 +7327,11 @@ ECLCluster#3:
   getDetectorRegion(): 2
   getE1oE9(): 0.555664
   getE9oE21(): 0.967773
-  getEnergy(): 0.337585
+  getEnergy(16): 0.337585
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.181642
   getEnergyRaw(): 0.323851
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.421875
   getMinTrkDistance(): 23.6816
   getNumberOfCrystals(): 11.5234
@@ -7230,6 +7353,8 @@ ECLCluster#3:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 305001
   getZernikeMVA(): 0.167969
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -7251,10 +7376,11 @@ ECLCluster#4:
   getDetectorRegion(): 2
   getE1oE9(): 0.568359
   getE9oE21(): 1
-  getEnergy(): 0.0512939
+  getEnergy(16): 0.0512939
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0291346
   getEnergyRaw(): 0.0500415
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.414062
   getMinTrkDistance(): 20.752
   getNumberOfCrystals(): 6.44531
@@ -7276,6 +7402,8 @@ ECLCluster#4:
   getUncertaintyTheta(): 0.00898437
   getUniqueId(): 305002
   getZernikeMVA(): 0.160156
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7297,10 +7425,11 @@ ECLCluster#5:
   getDetectorRegion(): 2
   getE1oE9(): 0.901367
   getE9oE21(): 0.996094
-  getEnergy(): 0.565936
+  getEnergy(16): 0.565936
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.508278
   getEnergyRaw(): 0.544687
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.137695
   getMinTrkDistance(): 138.916
   getNumberOfCrystals(): 9.96094
@@ -7320,6 +7449,8 @@ ECLCluster#5:
   getUncertaintyTheta(): 0.0046875
   getUniqueId(): 505001
   getZernikeMVA(): 0.765625
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7341,10 +7472,11 @@ ECLCluster#6:
   getDetectorRegion(): 2
   getE1oE9(): 0.80957
   getE9oE21(): 0.978516
-  getEnergy(): 0.281349
+  getEnergy(16): 0.281349
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.222865
   getEnergyRaw(): 0.269541
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.217773
   getMinTrkDistance(): 106.201
   getNumberOfCrystals(): 8.00781
@@ -7364,6 +7496,8 @@ ECLCluster#6:
   getUncertaintyTheta(): 0.00585938
   getUniqueId(): 605001
   getZernikeMVA(): 0.765625
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7385,10 +7519,11 @@ ECLCluster#7:
   getDetectorRegion(): 2
   getE1oE9(): 0.701172
   getE9oE21(): 1
-  getEnergy(): 0.0568378
+  getEnergy(16): 0.0568378
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0398783
   getEnergyRaw(): 0.0551665
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.204102
   getMinTrkDistance(): 123.779
   getNumberOfCrystals(): 5.07812
@@ -7409,6 +7544,8 @@ ECLCluster#7:
   getUncertaintyTheta(): 0.00878906
   getUniqueId(): 805001
   getZernikeMVA(): 0.791992
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7430,10 +7567,11 @@ ECLCluster#8:
   getDetectorRegion(): 2
   getE1oE9(): 0.49707
   getE9oE21(): 1
-  getEnergy(): 0.0279681
+  getEnergy(16): 0.0279681
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.013896
   getEnergyRaw(): 0.0272079
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.0859375
   getMinTrkDistance(): 181.152
   getNumberOfCrystals(): 2.92969
@@ -7453,6 +7591,8 @@ ECLCluster#8:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1005001
   getZernikeMVA(): 0.150391
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7474,10 +7614,11 @@ ECLCluster#9:
   getDetectorRegion(): 2
   getE1oE9(): 0.874023
   getE9oE21(): 0.989258
-  getEnergy(): 0.0573798
+  getEnergy(16): 0.0573798
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0495854
   getEnergyRaw(): 0.0559703
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.120117
   getMinTrkDistance(): 108.154
   getNumberOfCrystals(): 3.125
@@ -7498,6 +7639,8 @@ ECLCluster#9:
   getUncertaintyTheta(): 0.00878906
   getUniqueId(): 905001
   getZernikeMVA(): 0.508789
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7519,10 +7662,11 @@ ECLCluster#10:
   getDetectorRegion(): 2
   getE1oE9(): 0.694336
   getE9oE21(): 0.978516
-  getEnergy(): 0.425421
+  getEnergy(16): 0.425421
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.289069
   getEnergyRaw(): 0.411566
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.331055
   getMinTrkDistance(): 96.1914
   getNumberOfCrystals(): 11.9141
@@ -7543,6 +7687,8 @@ ECLCluster#10:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 905002
   getZernikeMVA(): 0.410156
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7564,10 +7710,11 @@ ECLCluster#11:
   getDetectorRegion(): 2
   getE1oE9(): 0.512695
   getE9oE21(): 0.643555
-  getEnergy(): 0.135761
+  getEnergy(16): 0.135761
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0484397
   getEnergyRaw(): 0.132116
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.125
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 3.90625
@@ -7588,6 +7735,8 @@ ECLCluster#11:
   getUncertaintyTheta(): 0.00722656
   getUniqueId(): 1105001
   getZernikeMVA(): 0.0078125
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -7609,10 +7758,11 @@ ECLCluster#12:
   getDetectorRegion(): 2
   getE1oE9(): 0.350586
   getE9oE21(): 0.99707
-  getEnergy(): 0.153444
+  getEnergy(16): 0.153444
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0536081
   getEnergyRaw(): 0.149182
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.443359
   getMinTrkDistance(): 29.0527
   getNumberOfCrystals(): 3.90625
@@ -7634,6 +7784,8 @@ ECLCluster#12:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 1105002
   getZernikeMVA(): 0.00976562
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -7655,10 +7807,11 @@ ECLCluster#13:
   getDetectorRegion(): 2
   getE1oE9(): 0.789062
   getE9oE21(): 1
-  getEnergy(): 0.0213232
+  getEnergy(16): 0.0213232
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0168192
   getEnergyRaw(): 0.0208986
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.0546875
   getMinTrkDistance(): 116.699
   getNumberOfCrystals(): 2.92969
@@ -7678,6 +7831,8 @@ ECLCluster#13:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1205001
   getZernikeMVA(): 0.739258
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7699,10 +7854,11 @@ ECLCluster#14:
   getDetectorRegion(): 2
   getE1oE9(): 1
   getE9oE21(): 1
-  getEnergy(): 0.0626933
+  getEnergy(16): 0.0626933
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0626933
   getEnergyRaw(): 0.0613757
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0
   getMinTrkDistance(): 140.381
   getNumberOfCrystals(): 0.976562
@@ -7722,6 +7878,8 @@ ECLCluster#14:
   getUncertaintyTheta(): 0.00859375
   getUniqueId(): 1505001
   getZernikeMVA(): 0.210938
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7743,10 +7901,11 @@ ECLCluster#15:
   getDetectorRegion(): 2
   getE1oE9(): 0.819336
   getE9oE21(): 1
-  getEnergy(): 0.0220034
+  getEnergy(16): 0.0220034
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0180245
   getEnergyRaw(): 0.0215114
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0
   getMinTrkDistance(): 136.963
   getNumberOfCrystals(): 1.95312
@@ -7768,6 +7927,8 @@ ECLCluster#15:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1405001
   getZernikeMVA(): 0.436523
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7789,10 +7950,11 @@ ECLCluster#16:
   getDetectorRegion(): 2
   getE1oE9(): 0.859375
   getE9oE21(): 1
-  getEnergy(): 0.156638
+  getEnergy(16): 0.156638
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.134614
   getEnergyRaw(): 0.15136
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.0585938
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 5.07812
@@ -7813,6 +7975,8 @@ ECLCluster#16:
   getUncertaintyTheta(): 0.00683594
   getUniqueId(): 1705001
   getZernikeMVA(): 0.731445
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -7834,10 +7998,11 @@ ECLCluster#17:
   getDetectorRegion(): 2
   getE1oE9(): 0.430664
   getE9oE21(): 0.955078
-  getEnergy(): 0.317084
+  getEnergy(16): 0.317084
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.130509
   getEnergyRaw(): 0.304862
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.396484
   getMinTrkDistance(): 135.986
   getNumberOfCrystals(): 10.9375
@@ -7858,6 +8023,8 @@ ECLCluster#17:
   getUncertaintyTheta(): 0.00566406
   getUniqueId(): 1605001
   getZernikeMVA(): 0.749023
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7879,10 +8046,11 @@ ECLCluster#18:
   getDetectorRegion(): 2
   getE1oE9(): 0.951172
   getE9oE21(): 1
-  getEnergy(): 0.0619232
+  getEnergy(16): 0.0619232
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0589003
   getEnergyRaw(): 0.060426
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0
   getMinTrkDistance(): 30.2734
   getNumberOfCrystals(): 1.95312
@@ -7902,6 +8070,8 @@ ECLCluster#18:
   getUncertaintyTheta(): 0.00859375
   getUniqueId(): 1805001
   getZernikeMVA(): 0.488281
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -7923,10 +8093,11 @@ ECLCluster#19:
   getDetectorRegion(): 2
   getE1oE9(): 0.40918
   getE9oE21(): 0.882812
-  getEnergy(): 0.0347093
+  getEnergy(16): 0.0347093
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0125437
   getEnergyRaw(): 0.0339094
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.639648
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 8.00781
@@ -7947,6 +8118,8 @@ ECLCluster#19:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1905001
   getZernikeMVA(): 0.0136719
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -7968,10 +8141,11 @@ ECLCluster#20:
   getDetectorRegion(): 2
   getE1oE9(): 0.746094
   getE9oE21(): 0.974609
-  getEnergy(): 0.341648
+  getEnergy(16): 0.341648
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.248586
   getEnergyRaw(): 0.329051
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.327148
   getMinTrkDistance(): 162.109
   getNumberOfCrystals(): 10.9375
@@ -7991,6 +8165,8 @@ ECLCluster#20:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 2005001
   getZernikeMVA(): 0.884766
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8012,10 +8188,11 @@ ECLCluster#21:
   getDetectorRegion(): 3
   getE1oE9(): 0.708984
   getE9oE21(): 1
-  getEnergy(): 0.222348
+  getEnergy(16): 0.222348
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.157698
   getEnergyRaw(): 0.214451
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.125
   getMinTrkDistance(): 52.9785
   getNumberOfCrystals(): 6.05469
@@ -8035,6 +8212,8 @@ ECLCluster#21:
   getUncertaintyTheta(): 0.00683594
   getUniqueId(): 2105001
   getZernikeMVA(): 0.725586
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8056,10 +8235,11 @@ ECLCluster#22:
   getDetectorRegion(): 3
   getE1oE9(): 0.991211
   getE9oE21(): 1
-  getEnergy(): 0.0668978
+  getEnergy(16): 0.0668978
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0663346
   getEnergyRaw(): 0.0652405
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 1.95312
@@ -8082,6 +8262,8 @@ ECLCluster#22:
   getUncertaintyTheta(): 0.00957031
   getUniqueId(): 2205001
   getZernikeMVA(): 0.237305
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8103,10 +8285,11 @@ ECLCluster#23:
   getDetectorRegion(): 3
   getE1oE9(): 0.8125
   getE9oE21(): 0.935547
-  getEnergy(): 0.0859404
+  getEnergy(16): 0.0859404
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0652982
   getEnergyRaw(): 0.0859404
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.22168
   getMinTrkDistance(): 100.098
   getNumberOfCrystals(): 6.05469
@@ -8126,6 +8309,8 @@ ECLCluster#23:
   getUncertaintyTheta(): 0.00898437
   getUniqueId(): 2405001
   getZernikeMVA(): 0.5
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8147,10 +8332,16 @@ ECLCluster#24:
   getDetectorRegion(): 1
   getE1oE9(): 0.993164
   getE9oE21(): 1
-  getEnergy(): 0.209471
+ ... message repeated 23 times
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 0
+ and it has the neutralHadron hypothesis (y/n = 1/0): 1
+ You requested the hypothesis bitmask: 0000000000010000  { module: PrintObjectsModule }
+  getEnergy(16): nan
+  getEnergy(32): 0.209471
   getEnergyHighestCrystal(): 0.208088
   getEnergyRaw(): 0.209471
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.0078125
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 2.92969
@@ -8170,6 +8361,8 @@ ECLCluster#24:
   getUncertaintyTheta(): 0
   getUniqueId(): 106001
   getZernikeMVA(): 0.810547
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -8191,10 +8384,11 @@ ECLCluster#25:
   getDetectorRegion(): 1
   getE1oE9(): 0.657227
   getE9oE21(): 0.786133
-  getEnergy(): 0.218875
+  getEnergy(16): nan
+  getEnergy(32): 0.218875
   getEnergyHighestCrystal(): 0.113077
   getEnergyRaw(): 0.218875
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.390625
   getMinTrkDistance(): 52.7344
   getNumberOfCrystals(): 5.07812
@@ -8216,6 +8410,8 @@ ECLCluster#25:
   getUncertaintyTheta(): 0
   getUniqueId(): 206001
   getZernikeMVA(): 0.933594
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8237,10 +8433,11 @@ ECLCluster#26:
   getDetectorRegion(): 2
   getE1oE9(): 0.871094
   getE9oE21(): 0.989258
-  getEnergy(): 0.246328
+  getEnergy(16): nan
+  getEnergy(32): 0.246328
   getEnergyHighestCrystal(): 0.212328
   getEnergyRaw(): 0.246328
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.192383
   getMinTrkDistance(): 79.5898
   getNumberOfCrystals(): 9.96094
@@ -8260,6 +8457,8 @@ ECLCluster#26:
   getUncertaintyTheta(): 0
   getUniqueId(): 406001
   getZernikeMVA(): 0.138672
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8281,10 +8480,11 @@ ECLCluster#27:
   getDetectorRegion(): 2
   getE1oE9(): 0.549805
   getE9oE21(): 0.867188
-  getEnergy(): 0.373912
+  getEnergy(16): nan
+  getEnergy(32): 0.373912
   getEnergyHighestCrystal(): 0.174252
   getEnergyRaw(): 0.373912
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.62793
   getMinTrkDistance(): 22.2168
   getNumberOfCrystals(): 17.9688
@@ -8306,6 +8506,8 @@ ECLCluster#27:
   getUncertaintyTheta(): 0
   getUniqueId(): 306001
   getZernikeMVA(): 0.973633
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -8327,10 +8529,11 @@ ECLCluster#28:
   getDetectorRegion(): 2
   getE1oE9(): 0.901367
   getE9oE21(): 0.996094
-  getEnergy(): 0.544687
+  getEnergy(16): nan
+  getEnergy(32): 0.544687
   getEnergyHighestCrystal(): 0.489194
   getEnergyRaw(): 0.544687
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.137695
   getMinTrkDistance(): 138.916
   getNumberOfCrystals(): 9.96094
@@ -8350,6 +8553,8 @@ ECLCluster#28:
   getUncertaintyTheta(): 0
   getUniqueId(): 506001
   getZernikeMVA(): 0.234375
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8371,10 +8576,11 @@ ECLCluster#29:
   getDetectorRegion(): 2
   getE1oE9(): 0.80957
   getE9oE21(): 0.978516
-  getEnergy(): 0.269541
+  getEnergy(16): nan
+  getEnergy(32): 0.269541
   getEnergyHighestCrystal(): 0.213511
   getEnergyRaw(): 0.269541
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.217773
   getMinTrkDistance(): 106.201
   getNumberOfCrystals(): 8.00781
@@ -8394,6 +8600,8 @@ ECLCluster#29:
   getUncertaintyTheta(): 0
   getUniqueId(): 606001
   getZernikeMVA(): 0.234375
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8415,10 +8623,11 @@ ECLCluster#30:
   getDetectorRegion(): 2
   getE1oE9(): 0.701172
   getE9oE21(): 1
-  getEnergy(): 0.0551665
+  getEnergy(16): nan
+  getEnergy(32): 0.0551665
   getEnergyHighestCrystal(): 0.0387068
   getEnergyRaw(): 0.0551665
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.204102
   getMinTrkDistance(): 123.779
   getNumberOfCrystals(): 5.07812
@@ -8439,6 +8648,8 @@ ECLCluster#30:
   getUncertaintyTheta(): 0
   getUniqueId(): 806001
   getZernikeMVA(): 0.208008
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8460,10 +8671,11 @@ ECLCluster#31:
   getDetectorRegion(): 2
   getE1oE9(): 0.49707
   getE9oE21(): 1
-  getEnergy(): 0.0272079
+  getEnergy(16): nan
+  getEnergy(32): 0.0272079
   getEnergyHighestCrystal(): 0.0135187
   getEnergyRaw(): 0.0272079
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.0859375
   getMinTrkDistance(): 181.152
   getNumberOfCrystals(): 2.92969
@@ -8483,6 +8695,8 @@ ECLCluster#31:
   getUncertaintyTheta(): 0
   getUniqueId(): 1006001
   getZernikeMVA(): 0.849609
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8504,10 +8718,11 @@ ECLCluster#32:
   getDetectorRegion(): 2
   getE1oE9(): 0.694336
   getE9oE21(): 0.967773
-  getEnergy(): 0.467562
+  getEnergy(16): nan
+  getEnergy(32): 0.467562
   getEnergyHighestCrystal(): 0.279646
   getEnergyRaw(): 0.467562
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.646484
   getMinTrkDistance(): 98.3887
   getNumberOfCrystals(): 15.0391
@@ -8528,6 +8743,8 @@ ECLCluster#32:
   getUncertaintyTheta(): 0
   getUniqueId(): 906001
   getZernikeMVA(): 0.791016
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8549,10 +8766,11 @@ ECLCluster#33:
   getDetectorRegion(): 2
   getE1oE9(): 0.34668
   getE9oE21(): 0.758789
-  getEnergy(): 0.282735
+  getEnergy(16): nan
+  getEnergy(32): 0.282735
   getEnergyHighestCrystal(): 0.0521207
   getEnergyRaw(): 0.282735
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.913086
   getMinTrkDistance(): 22.2168
   getNumberOfCrystals(): 8.00781
@@ -8575,6 +8793,8 @@ ECLCluster#33:
   getUncertaintyTheta(): 0
   getUniqueId(): 1106001
   getZernikeMVA(): 1
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -8596,10 +8816,11 @@ ECLCluster#34:
   getDetectorRegion(): 2
   getE1oE9(): 0.789062
   getE9oE21(): 1
-  getEnergy(): 0.0208986
+  getEnergy(16): nan
+  getEnergy(32): 0.0208986
   getEnergyHighestCrystal(): 0.0164843
   getEnergyRaw(): 0.0208986
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.0546875
   getMinTrkDistance(): 116.699
   getNumberOfCrystals(): 2.92969
@@ -8619,6 +8840,8 @@ ECLCluster#34:
   getUncertaintyTheta(): 0
   getUniqueId(): 1206001
   getZernikeMVA(): 0.260742
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8640,10 +8863,11 @@ ECLCluster#35:
   getDetectorRegion(): 2
   getE1oE9(): 1
   getE9oE21(): 1
-  getEnergy(): 0.0613757
+  getEnergy(16): nan
+  getEnergy(32): 0.0613757
   getEnergyHighestCrystal(): 0.0613757
   getEnergyRaw(): 0.0613757
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0
   getMinTrkDistance(): 140.381
   getNumberOfCrystals(): 0.976562
@@ -8663,6 +8887,8 @@ ECLCluster#35:
   getUncertaintyTheta(): 0
   getUniqueId(): 1506001
   getZernikeMVA(): 0.789062
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8684,10 +8910,11 @@ ECLCluster#36:
   getDetectorRegion(): 2
   getE1oE9(): 0.819336
   getE9oE21(): 1
-  getEnergy(): 0.0215114
+  getEnergy(16): nan
+  getEnergy(32): 0.0215114
   getEnergyHighestCrystal(): 0.0176215
   getEnergyRaw(): 0.0215114
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0
   getMinTrkDistance(): 136.963
   getNumberOfCrystals(): 1.95312
@@ -8709,6 +8936,8 @@ ECLCluster#36:
   getUncertaintyTheta(): 0
   getUniqueId(): 1406001
   getZernikeMVA(): 0.563477
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8730,10 +8959,11 @@ ECLCluster#37:
   getDetectorRegion(): 2
   getE1oE9(): 0.859375
   getE9oE21(): 1
-  getEnergy(): 0.15136
+  getEnergy(16): nan
+  getEnergy(32): 0.15136
   getEnergyHighestCrystal(): 0.130079
   getEnergyRaw(): 0.15136
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.0585938
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 5.07812
@@ -8754,6 +8984,8 @@ ECLCluster#37:
   getUncertaintyTheta(): 0
   getUniqueId(): 1706001
   getZernikeMVA(): 0.268555
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -8775,10 +9007,11 @@ ECLCluster#38:
   getDetectorRegion(): 2
   getE1oE9(): 0.430664
   getE9oE21(): 0.955078
-  getEnergy(): 0.306616
+  getEnergy(16): nan
+  getEnergy(32): 0.306616
   getEnergyHighestCrystal(): 0.125478
   getEnergyRaw(): 0.306616
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.416992
   getMinTrkDistance(): 135.986
   getNumberOfCrystals(): 11.9141
@@ -8799,6 +9032,8 @@ ECLCluster#38:
   getUncertaintyTheta(): 0
   getUniqueId(): 1606001
   getZernikeMVA(): 0.250977
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8820,10 +9055,11 @@ ECLCluster#39:
   getDetectorRegion(): 2
   getE1oE9(): 0.951172
   getE9oE21(): 1
-  getEnergy(): 0.060426
+  getEnergy(16): nan
+  getEnergy(32): 0.060426
   getEnergyHighestCrystal(): 0.0574762
   getEnergyRaw(): 0.060426
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0
   getMinTrkDistance(): 30.2734
   getNumberOfCrystals(): 1.95312
@@ -8843,6 +9079,8 @@ ECLCluster#39:
   getUncertaintyTheta(): 0
   getUniqueId(): 1806001
   getZernikeMVA(): 0.511719
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8864,10 +9102,11 @@ ECLCluster#40:
   getDetectorRegion(): 2
   getE1oE9(): 0.40918
   getE9oE21(): 0.882812
-  getEnergy(): 0.0367219
+  getEnergy(16): nan
+  getEnergy(32): 0.0367219
   getEnergyHighestCrystal(): 0.0122546
   getEnergyRaw(): 0.0367219
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.729492
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 8.98438
@@ -8888,6 +9127,8 @@ ECLCluster#40:
   getUncertaintyTheta(): 0
   getUniqueId(): 1906001
   getZernikeMVA(): 0.986328
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -8909,10 +9150,11 @@ ECLCluster#41:
   getDetectorRegion(): 2
   getE1oE9(): 0.746094
   getE9oE21(): 0.974609
-  getEnergy(): 0.329051
+  getEnergy(16): nan
+  getEnergy(32): 0.329051
   getEnergyHighestCrystal(): 0.23942
   getEnergyRaw(): 0.329051
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.327148
   getMinTrkDistance(): 162.109
   getNumberOfCrystals(): 10.9375
@@ -8932,6 +9174,8 @@ ECLCluster#41:
   getUncertaintyTheta(): 0
   getUniqueId(): 2006001
   getZernikeMVA(): 0.115234
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8953,10 +9197,11 @@ ECLCluster#42:
   getDetectorRegion(): 3
   getE1oE9(): 0.708984
   getE9oE21(): 1
-  getEnergy(): 0.214451
+  getEnergy(16): nan
+  getEnergy(32): 0.214451
   getEnergyHighestCrystal(): 0.152097
   getEnergyRaw(): 0.214451
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.125
   getMinTrkDistance(): 52.9785
   getNumberOfCrystals(): 6.05469
@@ -8976,6 +9221,8 @@ ECLCluster#42:
   getUncertaintyTheta(): 0
   getUniqueId(): 2106001
   getZernikeMVA(): 0.274414
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -8997,10 +9244,11 @@ ECLCluster#43:
   getDetectorRegion(): 3
   getE1oE9(): 0.991211
   getE9oE21(): 1
-  getEnergy(): 0.0652405
+  getEnergy(16): nan
+  getEnergy(32): 0.0652405
   getEnergyHighestCrystal(): 0.0646933
   getEnergyRaw(): 0.0652405
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 1.95312
@@ -9023,6 +9271,8 @@ ECLCluster#43:
   getUncertaintyTheta(): 0
   getUniqueId(): 2206001
   getZernikeMVA(): 0.762695
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -9044,10 +9294,11 @@ ECLCluster#44:
   getDetectorRegion(): 3
   getE1oE9(): 0.8125
   getE9oE21(): 0.935547
-  getEnergy(): 0.0859404
+  getEnergy(16): nan
+  getEnergy(32): 0.0859404
   getEnergyHighestCrystal(): 0.0652982
   getEnergyRaw(): 0.0859404
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.22168
   getMinTrkDistance(): 100.098
   getNumberOfCrystals(): 6.05469
@@ -9067,11 +9318,14 @@ ECLCluster#44:
   getUncertaintyTheta(): 0
   getUniqueId(): 2406001
   getZernikeMVA(): 0.5
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+ ... message repeated 20 times
 [ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
 SoftwareTriggerResult:
   getResults(): size(25)
@@ -13628,10 +13882,15 @@ ECLCluster#0:
   getDetectorRegion(): 1
   getE1oE9(): 0.405273
   getE9oE21(): 0.988281
-  getEnergy(): 0.247654
+  getEnergy(16): 0.247654
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 1
+ and it has the neutralHadron hypothesis (y/n = 1/0): 0
+ You requested the hypothesis bitmask: 0000000000100000  { module: PrintObjectsModule }
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.099204
   getEnergyRaw(): 0.239216
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.245117
   getMinTrkDistance(): 45.8984
   getNumberOfCrystals(): 8.98438
@@ -13651,6 +13910,8 @@ ECLCluster#0:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 105001
   getZernikeMVA(): 0.367188
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -13672,10 +13933,11 @@ ECLCluster#1:
   getDetectorRegion(): 1
   getE1oE9(): 0.90332
   getE9oE21(): 1
-  getEnergy(): 0.142598
+  getEnergy(16): 0.142598
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.128784
   getEnergyRaw(): 0.138633
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.119141
   getMinTrkDistance(): 52.2461
   getNumberOfCrystals(): 8.00781
@@ -13695,6 +13957,8 @@ ECLCluster#1:
   getUncertaintyTheta(): 0.00488281
   getUniqueId(): 205001
   getZernikeMVA(): 0.782227
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -13716,10 +13980,11 @@ ECLCluster#2:
   getDetectorRegion(): 1
   getE1oE9(): 0.728516
   getE9oE21(): 1
-  getEnergy(): 0.171383
+  getEnergy(16): 0.171383
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.124825
   getEnergyRaw(): 0.166709
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
@@ -13739,6 +14004,8 @@ ECLCluster#2:
   getUncertaintyTheta(): 0.0046875
   getUniqueId(): 305001
   getZernikeMVA(): 0.246094
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -13760,10 +14027,11 @@ ECLCluster#3:
   getDetectorRegion(): 1
   getE1oE9(): 0.895508
   getE9oE21(): 1
-  getEnergy(): 0.205068
+  getEnergy(16): 0.205068
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.183665
   getEnergyRaw(): 0.199257
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.146484
   getMinTrkDistance(): 34.4238
   getNumberOfCrystals(): 7.03125
@@ -13783,6 +14051,8 @@ ECLCluster#3:
   getUncertaintyTheta(): 0.00449219
   getUniqueId(): 405001
   getZernikeMVA(): 0.728516
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -13804,10 +14074,11 @@ ECLCluster#4:
   getDetectorRegion(): 2
   getE1oE9(): 0.880859
   getE9oE21(): 1
-  getEnergy(): 0.14286
+  getEnergy(16): 0.14286
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.125781
   getEnergyRaw(): 0.137634
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.15332
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
@@ -13827,6 +14098,8 @@ ECLCluster#4:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 505001
   getZernikeMVA(): 0.539062
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -13848,10 +14121,11 @@ ECLCluster#5:
   getDetectorRegion(): 2
   getE1oE9(): 0.969727
   getE9oE21(): 1
-  getEnergy(): 0.14387
+  getEnergy(16): 0.14387
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.139448
   getEnergyRaw(): 0.13854
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0
   getMinTrkDistance(): 36.377
   getNumberOfCrystals(): 1.95312
@@ -13873,6 +14147,8 @@ ECLCluster#5:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 605001
   getZernikeMVA(): 0.419922
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -13894,10 +14170,11 @@ ECLCluster#6:
   getDetectorRegion(): 2
   getE1oE9(): 0.787109
   getE9oE21(): 1
-  getEnergy(): 0.0478535
+  getEnergy(16): 0.0478535
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0376501
   getEnergyRaw(): 0.0465769
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.078125
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 3.90625
@@ -13917,6 +14194,8 @@ ECLCluster#6:
   getUncertaintyTheta(): 0.00898437
   getUniqueId(): 705001
   getZernikeMVA(): 0.560547
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -13938,10 +14217,11 @@ ECLCluster#7:
   getDetectorRegion(): 2
   getE1oE9(): 0.469727
   getE9oE21(): 0.852539
-  getEnergy(): 0.226388
+  getEnergy(16): 0.226388
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0906078
   getEnergyRaw(): 0.215225
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.496094
   getMinTrkDistance(): 20.0195
   getNumberOfCrystals(): 6.05469
@@ -13961,6 +14241,8 @@ ECLCluster#7:
   getUncertaintyTheta(): 0.00625
   getUniqueId(): 805001
   getZernikeMVA(): 0.331055
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -13982,10 +14264,11 @@ ECLCluster#8:
   getDetectorRegion(): 2
   getE1oE9(): 0.487305
   getE9oE21(): 0.853516
-  getEnergy(): 0.340794
+  getEnergy(16): 0.340794
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.14177
   getEnergyRaw(): 0.32876
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.539062
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 3.90625
@@ -14005,6 +14288,8 @@ ECLCluster#8:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 1005001
   getZernikeMVA(): 0.204102
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -14026,10 +14311,11 @@ ECLCluster#9:
   getDetectorRegion(): 2
   getE1oE9(): 0.527344
   getE9oE21(): 0.876953
-  getEnergy(): 0.19022
+  getEnergy(16): 0.19022
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0880026
   getEnergyRaw(): 0.184547
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.651367
   getMinTrkDistance(): 107.422
   getNumberOfCrystals(): 11.9141
@@ -14050,6 +14336,8 @@ ECLCluster#9:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 1105001
   getZernikeMVA(): 0.115234
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14071,10 +14359,11 @@ ECLCluster#10:
   getDetectorRegion(): 2
   getE1oE9(): 0.68457
   getE9oE21(): 1
-  getEnergy(): 0.0778637
+  getEnergy(16): 0.0778637
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0532786
   getEnergyRaw(): 0.0755119
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.329102
   getMinTrkDistance(): 98.6328
   getNumberOfCrystals(): 6.05469
@@ -14095,6 +14384,8 @@ ECLCluster#10:
   getUncertaintyTheta(): 0.00820313
   getUniqueId(): 1205001
   getZernikeMVA(): 0.591797
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14116,10 +14407,11 @@ ECLCluster#11:
   getDetectorRegion(): 2
   getE1oE9(): 0.717773
   getE9oE21(): 0.983398
-  getEnergy(): 0.737736
+  getEnergy(16): 0.737736
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.520728
   getEnergyRaw(): 0.70742
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.245117
   getMinTrkDistance(): 30.7617
   getNumberOfCrystals(): 10.9375
@@ -14139,6 +14431,8 @@ ECLCluster#11:
   getUncertaintyTheta(): 0.00429688
   getUniqueId(): 1305001
   getZernikeMVA(): 0.799805
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14160,10 +14454,11 @@ ECLCluster#12:
   getDetectorRegion(): 2
   getE1oE9(): 0.732422
   getE9oE21(): 0.949219
-  getEnergy(): 0.421377
+  getEnergy(16): 0.421377
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.293057
   getEnergyRaw(): 0.405705
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.266602
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 13.0859
@@ -14183,6 +14478,8 @@ ECLCluster#12:
   getUncertaintyTheta(): 0.00507813
   getUniqueId(): 1405001
   getZernikeMVA(): 0.686523
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -14204,10 +14501,11 @@ ECLCluster#13:
   getDetectorRegion(): 2
   getE1oE9(): 0.644531
   getE9oE21(): 0.991211
-  getEnergy(): 0.521587
+  getEnergy(16): 0.521587
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.333143
   getEnergyRaw(): 0.501789
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.230469
   getMinTrkDistance(): 96.1914
   getNumberOfCrystals(): 11.9141
@@ -14229,6 +14527,8 @@ ECLCluster#13:
   getUncertaintyTheta(): 0.0046875
   getUniqueId(): 1505001
   getZernikeMVA(): 0.874023
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14250,10 +14550,11 @@ ECLCluster#14:
   getDetectorRegion(): 2
   getE1oE9(): 0.628906
   getE9oE21(): 0.926758
-  getEnergy(): 0.165009
+  getEnergy(16): 0.165009
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0960843
   getEnergyRaw(): 0.16044
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.331055
   getMinTrkDistance(): 113.77
   getNumberOfCrystals(): 8.00781
@@ -14273,6 +14574,8 @@ ECLCluster#14:
   getUncertaintyTheta(): 0.00683594
   getUniqueId(): 1605001
   getZernikeMVA(): 0.619141
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14294,10 +14597,11 @@ ECLCluster#15:
   getDetectorRegion(): 2
   getE1oE9(): 0.682617
   getE9oE21(): 1
-  getEnergy(): 0.0316205
+  getEnergy(16): 0.0316205
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0215831
   getEnergyRaw(): 0.0310601
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.170898
   getMinTrkDistance(): 98.1445
   getNumberOfCrystals(): 2.92969
@@ -14317,6 +14621,8 @@ ECLCluster#15:
   getUncertaintyTheta(): 0.009375
   getUniqueId(): 1705001
   getZernikeMVA(): 0.277344
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14338,10 +14644,11 @@ ECLCluster#16:
   getDetectorRegion(): 2
   getE1oE9(): 0.908203
   getE9oE21(): 1
-  getEnergy(): 0.125272
+  getEnergy(16): 0.125272
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.113793
   getEnergyRaw(): 0.121826
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.0996094
   getMinTrkDistance(): 140.625
   getNumberOfCrystals(): 6.05469
@@ -14361,6 +14668,8 @@ ECLCluster#16:
   getUncertaintyTheta(): 0.00742187
   getUniqueId(): 1805001
   getZernikeMVA(): 0.732422
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14382,10 +14691,11 @@ ECLCluster#17:
   getDetectorRegion(): 2
   getE1oE9(): 0.897461
   getE9oE21(): 1
-  getEnergy(): 0.114256
+  getEnergy(16): 0.114256
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.102572
   getEnergyRaw(): 0.111365
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.0634766
   getMinTrkDistance(): 128.662
   getNumberOfCrystals(): 3.90625
@@ -14405,6 +14715,8 @@ ECLCluster#17:
   getUncertaintyTheta(): 0.00761719
   getUniqueId(): 2005001
   getZernikeMVA(): 0.757812
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14426,10 +14738,11 @@ ECLCluster#18:
   getDetectorRegion(): 2
   getE1oE9(): 0.864258
   getE9oE21(): 1
-  getEnergy(): 0.262551
+  getEnergy(16): 0.262551
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.226858
   getEnergyRaw(): 0.254737
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.169922
   getMinTrkDistance(): 73.4863
   getNumberOfCrystals(): 7.03125
@@ -14450,6 +14763,8 @@ ECLCluster#18:
   getUncertaintyTheta(): 0.00585938
   getUniqueId(): 1905001
   getZernikeMVA(): 0.750977
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14471,10 +14786,11 @@ ECLCluster#19:
   getDetectorRegion(): 2
   getE1oE9(): 0.408203
   getE9oE21(): 0.988281
-  getEnergy(): 0.0932589
+  getEnergy(16): 0.0932589
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0375893
   getEnergyRaw(): 0.091132
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.360352
   getMinTrkDistance(): 17.8223
   getNumberOfCrystals(): 2.92969
@@ -14494,6 +14810,8 @@ ECLCluster#19:
   getUncertaintyTheta(): 0.00800781
   getUniqueId(): 2105001
   getZernikeMVA(): 0.0146484
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14515,10 +14833,11 @@ ECLCluster#20:
   getDetectorRegion(): 2
   getE1oE9(): 0.577148
   getE9oE21(): 0.717773
-  getEnergy(): 0.145358
+  getEnergy(16): 0.145358
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0602107
   getEnergyRaw(): 0.141566
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.464844
   getMinTrkDistance(): 30.7617
   getNumberOfCrystals(): 3.90625
@@ -14539,6 +14858,8 @@ ECLCluster#20:
   getUncertaintyTheta(): 0.00703125
   getUniqueId(): 2105002
   getZernikeMVA(): 0.0117188
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14560,10 +14881,11 @@ ECLCluster#21:
   getDetectorRegion(): 2
   getE1oE9(): 0.317383
   getE9oE21(): 0.958008
-  getEnergy(): 0.458393
+  getEnergy(16): 0.458393
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.139521
   getEnergyRaw(): 0.444289
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.689453
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 10.9375
@@ -14588,6 +14910,8 @@ ECLCluster#21:
   getUncertaintyTheta(): 0.00488281
   getUniqueId(): 2205001
   getZernikeMVA(): 0.0224609
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -14609,10 +14933,11 @@ ECLCluster#22:
   getDetectorRegion(): 2
   getE1oE9(): 0.764648
   getE9oE21(): 0.936523
-  getEnergy(): 0.135154
+  getEnergy(16): 0.135154
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0967345
   getEnergyRaw(): 0.13138
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.367188
   getMinTrkDistance(): 20.9961
   getNumberOfCrystals(): 6.05469
@@ -14636,6 +14961,8 @@ ECLCluster#22:
   getUncertaintyTheta(): 0.00722656
   getUniqueId(): 2205002
   getZernikeMVA(): 0.0605469
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -14657,10 +14984,11 @@ ECLCluster#23:
   getDetectorRegion(): 2
   getE1oE9(): 0.739258
   getE9oE21(): 0.835938
-  getEnergy(): 0.339041
+  getEnergy(16): 0.339041
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.209541
   getEnergyRaw(): 0.327778
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.392578
   getMinTrkDistance(): 19.043
   getNumberOfCrystals(): 10.9375
@@ -14680,6 +15008,8 @@ ECLCluster#23:
   getUncertaintyTheta(): 0.00546875
   getUniqueId(): 2305001
   getZernikeMVA(): 0.180664
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -14701,10 +15031,11 @@ ECLCluster#24:
   getDetectorRegion(): 13
   getE1oE9(): 0.746094
   getE9oE21(): 0.992188
-  getEnergy(): 0.108377
+  getEnergy(16): 0.108377
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0802496
   getEnergyRaw(): 0.108377
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.283203
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
@@ -14724,6 +15055,8 @@ ECLCluster#24:
   getUncertaintyTheta(): 0.00761719
   getUniqueId(): 2505001
   getZernikeMVA(): 0.426758
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14745,10 +15078,11 @@ ECLCluster#25:
   getDetectorRegion(): 3
   getE1oE9(): 0.542969
   getE9oE21(): 0.988281
-  getEnergy(): 0.267288
+  getEnergy(16): 0.267288
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.14355
   getEnergyRaw(): 0.256994
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.34375
   getMinTrkDistance(): 65.6738
   getNumberOfCrystals(): 9.96094
@@ -14768,6 +15102,8 @@ ECLCluster#25:
   getUncertaintyTheta(): 0.00644531
   getUniqueId(): 2605001
   getZernikeMVA(): 0.59375
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14789,10 +15125,11 @@ ECLCluster#26:
   getDetectorRegion(): 3
   getE1oE9(): 0.849609
   getE9oE21(): 0.993164
-  getEnergy(): 0.49994
+  getEnergy(16): 0.49994
+  getEnergy(32): nan
   getEnergyHighestCrystal(): 0.421583
   getEnergyRaw(): 0.49994
-  getHypothesisId(): 5
+  getHypothesis(): 16
   getLAT(): 0.195312
   getMinTrkDistance(): 86.1816
   getNumberOfCrystals(): 10.9375
@@ -14812,6 +15149,8 @@ ECLCluster#26:
   getUncertaintyTheta(): 0.00527344
   getUniqueId(): 2705001
   getZernikeMVA(): 0.783203
+  hasHypothesis(16): True
+  hasHypothesis(32): False
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14833,10 +15172,16 @@ ECLCluster#27:
   getDetectorRegion(): 1
   getE1oE9(): 0.405273
   getE9oE21(): 0.988281
-  getEnergy(): 0.239216
+ ... message repeated 26 times
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 0
+ and it has the neutralHadron hypothesis (y/n = 1/0): 1
+ You requested the hypothesis bitmask: 0000000000010000  { module: PrintObjectsModule }
+  getEnergy(16): nan
+  getEnergy(32): 0.239216
   getEnergyHighestCrystal(): 0.0958266
   getEnergyRaw(): 0.239216
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.245117
   getMinTrkDistance(): 45.8984
   getNumberOfCrystals(): 8.98438
@@ -14856,6 +15201,8 @@ ECLCluster#27:
   getUncertaintyTheta(): 0
   getUniqueId(): 106001
   getZernikeMVA(): 0.632812
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14877,10 +15224,11 @@ ECLCluster#28:
   getDetectorRegion(): 1
   getE1oE9(): 0.90332
   getE9oE21(): 1
-  getEnergy(): 0.138633
+  getEnergy(16): nan
+  getEnergy(32): 0.138633
   getEnergyHighestCrystal(): 0.125203
   getEnergyRaw(): 0.138633
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.119141
   getMinTrkDistance(): 52.2461
   getNumberOfCrystals(): 8.00781
@@ -14900,6 +15248,8 @@ ECLCluster#28:
   getUncertaintyTheta(): 0
   getUniqueId(): 206001
   getZernikeMVA(): 0.217773
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -14921,10 +15271,11 @@ ECLCluster#29:
   getDetectorRegion(): 1
   getE1oE9(): 0.728516
   getE9oE21(): 1
-  getEnergy(): 0.166709
+  getEnergy(16): nan
+  getEnergy(32): 0.166709
   getEnergyHighestCrystal(): 0.121421
   getEnergyRaw(): 0.166709
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
@@ -14944,6 +15295,8 @@ ECLCluster#29:
   getUncertaintyTheta(): 0
   getUniqueId(): 306001
   getZernikeMVA(): 0.753906
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -14965,10 +15318,11 @@ ECLCluster#30:
   getDetectorRegion(): 1
   getE1oE9(): 0.895508
   getE9oE21(): 1
-  getEnergy(): 0.199257
+  getEnergy(16): nan
+  getEnergy(32): 0.199257
   getEnergyHighestCrystal(): 0.178466
   getEnergyRaw(): 0.199257
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.146484
   getMinTrkDistance(): 34.4238
   getNumberOfCrystals(): 7.03125
@@ -14988,6 +15342,8 @@ ECLCluster#30:
   getUncertaintyTheta(): 0
   getUniqueId(): 406001
   getZernikeMVA(): 0.271484
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15009,10 +15365,11 @@ ECLCluster#31:
   getDetectorRegion(): 2
   getE1oE9(): 0.880859
   getE9oE21(): 1
-  getEnergy(): 0.137634
+  getEnergy(16): nan
+  getEnergy(32): 0.137634
   getEnergyHighestCrystal(): 0.121181
   getEnergyRaw(): 0.137634
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.15332
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
@@ -15032,6 +15389,8 @@ ECLCluster#31:
   getUncertaintyTheta(): 0
   getUniqueId(): 506001
   getZernikeMVA(): 0.460938
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15053,10 +15412,11 @@ ECLCluster#32:
   getDetectorRegion(): 2
   getE1oE9(): 0.969727
   getE9oE21(): 1
-  getEnergy(): 0.13854
+  getEnergy(16): nan
+  getEnergy(32): 0.13854
   getEnergyHighestCrystal(): 0.134282
   getEnergyRaw(): 0.13854
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0
   getMinTrkDistance(): 36.377
   getNumberOfCrystals(): 1.95312
@@ -15078,6 +15438,8 @@ ECLCluster#32:
   getUncertaintyTheta(): 0
   getUniqueId(): 606001
   getZernikeMVA(): 0.580078
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15099,10 +15461,11 @@ ECLCluster#33:
   getDetectorRegion(): 2
   getE1oE9(): 0.787109
   getE9oE21(): 1
-  getEnergy(): 0.0465769
+  getEnergy(16): nan
+  getEnergy(32): 0.0465769
   getEnergyHighestCrystal(): 0.0366458
   getEnergyRaw(): 0.0465769
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.078125
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 3.90625
@@ -15122,6 +15485,8 @@ ECLCluster#33:
   getUncertaintyTheta(): 0
   getUniqueId(): 706001
   getZernikeMVA(): 0.439453
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15143,10 +15508,11 @@ ECLCluster#34:
   getDetectorRegion(): 2
   getE1oE9(): 0.469727
   getE9oE21(): 0.852539
-  getEnergy(): 0.215225
+  getEnergy(16): nan
+  getEnergy(32): 0.215225
   getEnergyHighestCrystal(): 0.0861373
   getEnergyRaw(): 0.215225
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.496094
   getMinTrkDistance(): 20.0195
   getNumberOfCrystals(): 6.05469
@@ -15166,6 +15532,8 @@ ECLCluster#34:
   getUncertaintyTheta(): 0
   getUniqueId(): 806001
   getZernikeMVA(): 0.668945
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -15187,10 +15555,11 @@ ECLCluster#35:
   getDetectorRegion(): 2
   getE1oE9(): 0.487305
   getE9oE21(): 0.853516
-  getEnergy(): 0.32876
+  getEnergy(16): nan
+  getEnergy(32): 0.32876
   getEnergyHighestCrystal(): 0.136768
   getEnergyRaw(): 0.32876
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.539062
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 3.90625
@@ -15210,6 +15579,8 @@ ECLCluster#35:
   getUncertaintyTheta(): 0
   getUniqueId(): 1006001
   getZernikeMVA(): 0.795898
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -15231,10 +15602,11 @@ ECLCluster#36:
   getDetectorRegion(): 2
   getE1oE9(): 0.527344
   getE9oE21(): 0.876953
-  getEnergy(): 0.186877
+  getEnergy(16): nan
+  getEnergy(32): 0.186877
   getEnergyHighestCrystal(): 0.0853783
   getEnergyRaw(): 0.186877
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.676758
   getMinTrkDistance(): 107.422
   getNumberOfCrystals(): 14.0625
@@ -15255,6 +15627,8 @@ ECLCluster#36:
   getUncertaintyTheta(): 0
   getUniqueId(): 1106001
   getZernikeMVA(): 0.884766
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15276,10 +15650,11 @@ ECLCluster#37:
   getDetectorRegion(): 2
   getE1oE9(): 0.68457
   getE9oE21(): 1
-  getEnergy(): 0.0755119
+  getEnergy(16): nan
+  getEnergy(32): 0.0755119
   getEnergyHighestCrystal(): 0.0516693
   getEnergyRaw(): 0.0755119
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.329102
   getMinTrkDistance(): 98.6328
   getNumberOfCrystals(): 6.05469
@@ -15300,6 +15675,8 @@ ECLCluster#37:
   getUncertaintyTheta(): 0
   getUniqueId(): 1206001
   getZernikeMVA(): 0.408203
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15321,10 +15698,11 @@ ECLCluster#38:
   getDetectorRegion(): 2
   getE1oE9(): 0.717773
   getE9oE21(): 0.983398
-  getEnergy(): 0.70742
+  getEnergy(16): nan
+  getEnergy(32): 0.70742
   getEnergyHighestCrystal(): 0.49933
   getEnergyRaw(): 0.70742
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.245117
   getMinTrkDistance(): 30.7617
   getNumberOfCrystals(): 10.9375
@@ -15344,6 +15722,8 @@ ECLCluster#38:
   getUncertaintyTheta(): 0
   getUniqueId(): 1306001
   getZernikeMVA(): 0.200195
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15365,10 +15745,11 @@ ECLCluster#39:
   getDetectorRegion(): 2
   getE1oE9(): 0.732422
   getE9oE21(): 0.949219
-  getEnergy(): 0.406597
+  getEnergy(16): nan
+  getEnergy(32): 0.406597
   getEnergyHighestCrystal(): 0.282158
   getEnergyRaw(): 0.406597
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.27832
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 14.0625
@@ -15388,6 +15769,8 @@ ECLCluster#39:
   getUncertaintyTheta(): 0
   getUniqueId(): 1406001
   getZernikeMVA(): 0.313477
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -15409,10 +15792,11 @@ ECLCluster#40:
   getDetectorRegion(): 2
   getE1oE9(): 0.644531
   getE9oE21(): 0.991211
-  getEnergy(): 0.501789
+  getEnergy(16): nan
+  getEnergy(32): 0.501789
   getEnergyHighestCrystal(): 0.320498
   getEnergyRaw(): 0.501789
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.230469
   getMinTrkDistance(): 96.1914
   getNumberOfCrystals(): 11.9141
@@ -15434,6 +15818,8 @@ ECLCluster#40:
   getUncertaintyTheta(): 0
   getUniqueId(): 1506001
   getZernikeMVA(): 0.125977
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15455,10 +15841,11 @@ ECLCluster#41:
   getDetectorRegion(): 2
   getE1oE9(): 0.628906
   getE9oE21(): 0.926758
-  getEnergy(): 0.16044
+  getEnergy(16): nan
+  getEnergy(32): 0.16044
   getEnergyHighestCrystal(): 0.0934213
   getEnergyRaw(): 0.16044
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.331055
   getMinTrkDistance(): 113.77
   getNumberOfCrystals(): 8.00781
@@ -15478,6 +15865,8 @@ ECLCluster#41:
   getUncertaintyTheta(): 0
   getUniqueId(): 1606001
   getZernikeMVA(): 0.380859
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15499,10 +15888,11 @@ ECLCluster#42:
   getDetectorRegion(): 2
   getE1oE9(): 0.682617
   getE9oE21(): 1
-  getEnergy(): 0.0310601
+  getEnergy(16): nan
+  getEnergy(32): 0.0310601
   getEnergyHighestCrystal(): 0.0212005
   getEnergyRaw(): 0.0310601
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.170898
   getMinTrkDistance(): 98.1445
   getNumberOfCrystals(): 2.92969
@@ -15522,6 +15912,8 @@ ECLCluster#42:
   getUncertaintyTheta(): 0
   getUniqueId(): 1706001
   getZernikeMVA(): 0.722656
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15543,10 +15935,11 @@ ECLCluster#43:
   getDetectorRegion(): 2
   getE1oE9(): 0.908203
   getE9oE21(): 1
-  getEnergy(): 0.121826
+  getEnergy(16): nan
+  getEnergy(32): 0.121826
   getEnergyHighestCrystal(): 0.110663
   getEnergyRaw(): 0.121826
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.0996094
   getMinTrkDistance(): 140.625
   getNumberOfCrystals(): 6.05469
@@ -15566,6 +15959,8 @@ ECLCluster#43:
   getUncertaintyTheta(): 0
   getUniqueId(): 1806001
   getZernikeMVA(): 0.267578
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15587,10 +15982,11 @@ ECLCluster#44:
   getDetectorRegion(): 2
   getE1oE9(): 0.897461
   getE9oE21(): 1
-  getEnergy(): 0.111365
+  getEnergy(16): nan
+  getEnergy(32): 0.111365
   getEnergyHighestCrystal(): 0.0999759
   getEnergyRaw(): 0.111365
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.0634766
   getMinTrkDistance(): 128.662
   getNumberOfCrystals(): 3.90625
@@ -15610,6 +16006,8 @@ ECLCluster#44:
   getUncertaintyTheta(): 0
   getUniqueId(): 2006001
   getZernikeMVA(): 0.242188
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15631,10 +16029,11 @@ ECLCluster#45:
   getDetectorRegion(): 2
   getE1oE9(): 0.864258
   getE9oE21(): 1
-  getEnergy(): 0.254737
+  getEnergy(16): nan
+  getEnergy(32): 0.254737
   getEnergyHighestCrystal(): 0.220107
   getEnergyRaw(): 0.254737
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.169922
   getMinTrkDistance(): 73.4863
   getNumberOfCrystals(): 7.03125
@@ -15655,6 +16054,8 @@ ECLCluster#45:
   getUncertaintyTheta(): 0
   getUniqueId(): 1906001
   getZernikeMVA(): 0.249023
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15676,10 +16077,11 @@ ECLCluster#46:
   getDetectorRegion(): 2
   getE1oE9(): 0.577148
   getE9oE21(): 0.711914
-  getEnergy(): 0.233041
+  getEnergy(16): nan
+  getEnergy(32): 0.233041
   getEnergyHighestCrystal(): 0.0586384
   getEnergyRaw(): 0.233041
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.816406
   getMinTrkDistance(): 24.1699
   getNumberOfCrystals(): 7.03125
@@ -15700,6 +16102,8 @@ ECLCluster#46:
   getUncertaintyTheta(): 0
   getUniqueId(): 2106001
   getZernikeMVA(): 1
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15721,10 +16125,11 @@ ECLCluster#47:
   getDetectorRegion(): 2
   getE1oE9(): 0.302734
   getE9oE21(): 0.789062
-  getEnergy(): 0.585274
+  getEnergy(16): nan
+  getEnergy(32): 0.585274
   getEnergyHighestCrystal(): 0.135282
   getEnergyRaw(): 0.585274
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.833008
   getMinTrkDistance(): 15.625
   getNumberOfCrystals(): 19.9219
@@ -15749,6 +16154,8 @@ ECLCluster#47:
   getUncertaintyTheta(): 0
   getUniqueId(): 2206001
   getZernikeMVA(): 0.999023
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -15770,10 +16177,11 @@ ECLCluster#48:
   getDetectorRegion(): 2
   getE1oE9(): 0.739258
   getE9oE21(): 0.835938
-  getEnergy(): 0.349878
+  getEnergy(16): nan
+  getEnergy(32): 0.349878
   getEnergyHighestCrystal(): 0.20258
   getEnergyRaw(): 0.349878
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.491211
   getMinTrkDistance(): 18.0664
   getNumberOfCrystals(): 11.9141
@@ -15793,6 +16201,8 @@ ECLCluster#48:
   getUncertaintyTheta(): 0
   getUniqueId(): 2306001
   getZernikeMVA(): 0.819336
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): False
@@ -15814,10 +16224,11 @@ ECLCluster#49:
   getDetectorRegion(): 13
   getE1oE9(): 0.746094
   getE9oE21(): 0.992188
-  getEnergy(): 0.108377
+  getEnergy(16): nan
+  getEnergy(32): 0.108377
   getEnergyHighestCrystal(): 0.0802496
   getEnergyRaw(): 0.108377
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.283203
   getMinTrkDistance(): 37.1094
   getNumberOfCrystals(): 6.05469
@@ -15837,6 +16248,8 @@ ECLCluster#49:
   getUncertaintyTheta(): 0
   getUniqueId(): 2506001
   getZernikeMVA(): 0.573242
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15858,10 +16271,11 @@ ECLCluster#50:
   getDetectorRegion(): 3
   getE1oE9(): 0.542969
   getE9oE21(): 0.988281
-  getEnergy(): 0.256994
+  getEnergy(16): nan
+  getEnergy(32): 0.256994
   getEnergyHighestCrystal(): 0.138021
   getEnergyRaw(): 0.256994
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.34375
   getMinTrkDistance(): 65.6738
   getNumberOfCrystals(): 9.96094
@@ -15881,6 +16295,8 @@ ECLCluster#50:
   getUncertaintyTheta(): 0
   getUniqueId(): 2606001
   getZernikeMVA(): 0.40625
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15902,10 +16318,11 @@ ECLCluster#51:
   getDetectorRegion(): 3
   getE1oE9(): 0.849609
   getE9oE21(): 0.993164
-  getEnergy(): 0.49994
+  getEnergy(16): nan
+  getEnergy(32): 0.49994
   getEnergyHighestCrystal(): 0.421583
   getEnergyRaw(): 0.49994
-  getHypothesisId(): 6
+  getHypothesis(): 32
   getLAT(): 0.195312
   getMinTrkDistance(): 86.1816
   getNumberOfCrystals(): 10.9375
@@ -15925,6 +16342,8 @@ ECLCluster#51:
   getUncertaintyTheta(): 0
   getUniqueId(): 2706001
   getZernikeMVA(): 0.216797
+  hasHypothesis(16): False
+  hasHypothesis(32): True
   hasPulseShapeDiscrimination(): False
   hasTriggerClusterMatching(): False
   isNeutral(): True
@@ -15957,6 +16376,7 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#70 (weight: 1)
   getTime(): 2.63636
+ ... message repeated 24 times
 [ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!  { module: PrintObjectsModule }
 SoftwareTriggerResult:
   getResults(): size(25)
@@ -18648,7 +19068,17 @@ MCParticle#89:
 [INFO] <<< End run: 0
 [INFO] ========================================================================
 [INFO] ================================================================================
-[INFO] Error summary: 3 errors and 0 warnings occurred.
+[INFO] Error summary: 132 errors and 0 warnings occurred.
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 1
+ and it has the neutralHadron hypothesis (y/n = 1/0): 0
+ You requested the hypothesis bitmask: 0000000000100000
+[INFO]  (last message occurred 68 times in total)
+[ERROR] This cluster does not support the requested hypothesis,
+ it has the nPhotons hypothesis (y/n = 1/0): 0
+ and it has the neutralHadron hypothesis (y/n = 1/0): 1
+ You requested the hypothesis bitmask: 0000000000010000
+[INFO]  (last message occurred 61 times in total)
 [ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
 [INFO]  (last message occurred 3 times in total)
 [INFO] ================================================================================

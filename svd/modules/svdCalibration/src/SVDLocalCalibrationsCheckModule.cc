@@ -127,6 +127,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   template_noise.GetXaxis()->SetTitle("( ref - check )/ ref");
   m_hNoiseDIFF = new SVDAPVHistograms<TH1F>(template_noise);
   setAPVHistoStyles(m_hNoiseDIFF);
+  m_hNoiseSummary = new SVDSummaryPlots("noiseSummary@view", "Noise Summary for @view/@side Side");
 
   ///GAINS
   m_h2GainREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Gain");
@@ -135,10 +136,11 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   TH1F template_gain("gainDIFF_L@layerL@ladderS@sensor@view@apv",
                      //         "Gain Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                      "Gain Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                     100, -1, 1);
+                     100, -2, 2);
   template_gain.GetXaxis()->SetTitle("( ref - check )/ ref");
   m_hGainDIFF = new SVDAPVHistograms<TH1F>(template_gain);
   setAPVHistoStyles(m_hGainDIFF);
+  m_hGainSummary = new SVDSummaryPlots("gainSummary@view", "Gain Summary for @view/@side Side");
 
   ///PEDESTALS
   m_h2PedestalREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Pedestal");
@@ -151,6 +153,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   template_pedestal.GetXaxis()->SetTitle("( ref - check )/ ref");
   m_hPedestalDIFF = new SVDAPVHistograms<TH1F>(template_pedestal);
   setAPVHistoStyles(m_hPedestalDIFF);
+  m_hPedestalSummary = new SVDSummaryPlots("pedestalSummary@view", "Pedestal Summary for @view/@side Side");
 
   createLegends();
 }
@@ -246,6 +249,7 @@ void SVDLocalCalibrationsCheckModule::event()
               needPlot = true;
               B2INFO("WARNING, ONE APV has Noise problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
                      ", APV number =" << m_APV << " problem ID = " << problem);
+              m_hNoiseSummary->fill(theVxdID, side, 1);
               if (side == 0)
                 listNoiseVBAD->Add(hNoise);
               else
@@ -264,6 +268,7 @@ void SVDLocalCalibrationsCheckModule::event()
               needPlot = true;
               B2INFO("WARNING, ONE APV has Gain problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
                      ", APV number =" << m_APV << " problem ID = " << problem);
+              m_hGainSummary->fill(theVxdID, side, 1);
               if (side == 0)
                 listGainVBAD->Add(hGain);
               else
@@ -282,6 +287,7 @@ void SVDLocalCalibrationsCheckModule::event()
               needPlot = true;
               B2INFO("WARNING, ONE APV has Pedestal problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
                      ", APV number =" << m_APV << " problem ID = " << problem);
+              m_hPedestalSummary->fill(theVxdID, side, 1);
               if (side == 0)
                 listPedestalVBAD->Add(hPedestal);
               else
@@ -309,6 +315,7 @@ void SVDLocalCalibrationsCheckModule::event()
     ++itSvdLayers;
   }
 
+  printSummaryPages();
   printLastPage();
 
 }
@@ -586,9 +593,9 @@ int SVDLocalCalibrationsCheckModule::hasAnyProblem(TH1F* h, float cutAve, float 
 
   B2DEBUG(1, bin1 << " -> " << bin2 << " with " << xaxis->GetNbins() << " bins");
 
-  if (h->Integral(1, bin1) > m_cutN_out) return 2;
+  if (h->Integral(1, bin1) > m_cutN_out - 1) return 2;
 
-  if (h->Integral(bin2, xaxis->GetNbins()) > m_cutN_out) return 3;
+  if (h->Integral(bin2, xaxis->GetNbins()) > m_cutN_out - 1) return 3;
 
   return 0;
 }
@@ -629,7 +636,6 @@ void SVDLocalCalibrationsCheckModule::setAPVHistoStyles(SVDAPVHistograms<TH1F>* 
 
           for (int m_APV = 0; m_APV < Napv; m_APV++) {
 
-            //put analysis here
             TH1F* h = m_APVhistos->getHistogram(theVxdID, side, m_APV);
 
             h->SetFillColor(m_apvColors[m_APV]);
@@ -649,6 +655,37 @@ void SVDLocalCalibrationsCheckModule::setAPVHistoStyles(SVDAPVHistograms<TH1F>* 
 }
 
 
+void SVDLocalCalibrationsCheckModule::printSummaryPages()
+{
+
+  TCanvas* noise = new TCanvas();
+  noise->SetGridx();
+  noise->Divide(2, 2);
+  noise->cd(1);
+  m_hNoiseSummary->getHistogram(1)->Draw("colztext");
+  noise->cd(3);
+  m_hNoiseSummary->getHistogram(0)->Draw("colztext");
+  noise->Print(m_outputPdfName.c_str());
+
+  TCanvas* gain = new TCanvas();
+  gain->Divide(2, 2);
+  gain->cd(1);
+  m_hGainSummary->getHistogram(1)->Draw("colztext");
+  gain->cd(3);
+  m_hGainSummary->getHistogram(0)->Draw("colztext");
+  gain->Print(m_outputPdfName.c_str());
+
+  TCanvas* pedestal = new TCanvas();
+  pedestal->Divide(2, 2);
+  pedestal->cd(1);
+  m_hPedestalSummary->getHistogram(1)->Draw("text");
+  pedestal->cd(3);
+  m_hPedestalSummary->getHistogram(0)->Draw("text");
+  pedestal->Print(m_outputPdfName.c_str());
+
+
+}
+
 void SVDLocalCalibrationsCheckModule::printLastPage()
 {
 
@@ -658,6 +695,7 @@ void SVDLocalCalibrationsCheckModule::printLastPage()
 
 
 }
+
 
 void SVDLocalCalibrationsCheckModule::createLegends()
 {

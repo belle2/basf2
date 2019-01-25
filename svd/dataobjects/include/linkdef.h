@@ -31,4 +31,6 @@
 #pragma link C++ class Belle2::SVDAPVHistograms< TH2D > +;
 #pragma link C++ class Belle2::SVDAPVHistograms< TProfile > +;
 
+#pragma link C++ class Belle2::SVDSummaryPlots +;
+
 #endif

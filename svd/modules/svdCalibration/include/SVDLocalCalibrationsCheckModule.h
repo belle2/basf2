@@ -15,6 +15,7 @@
 
 #include <svd/dataobjects/SVDHistograms.h>
 #include <svd/dataobjects/SVDAPVHistograms.h>
+#include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <string>
 #include <TFile.h>
@@ -145,6 +146,7 @@ namespace Belle2 {
     void printFirstPage();
     void printLayerPage(int layer);
     void printPage(VxdID theVxdID, TList* listUBAD, TList* listVBAD, TList* listUGOOD, TList* listVGOOD, TString variable);
+    void printSummaryPages();
     void printLastPage();
 
     int hasAnyProblem(TH1F* h, float cutAve, float cutCOUNT);
@@ -158,16 +160,19 @@ namespace Belle2 {
     SVDHistograms<TH2F>* m_h2NoiseREF = nullptr; /**< noise VS strip 2D histo */
     SVDHistograms<TH2F>* m_h2NoiseCHECK = nullptr; /**< noise VS strip 2D histo */
     SVDAPVHistograms<TH1F>* m_hNoiseDIFF = nullptr; /**< noise histo */
+    SVDSummaryPlots* m_hNoiseSummary = nullptr; /**< noise summary  histo */
 
     /** GAINS */
     SVDHistograms<TH2F>* m_h2GainREF = nullptr; /**< gain VS strip 2D histo */
     SVDHistograms<TH2F>* m_h2GainCHECK = nullptr; /**< gain VS strip 2D histo */
     SVDAPVHistograms<TH1F>* m_hGainDIFF = nullptr; /**< gain histo */
+    SVDSummaryPlots* m_hGainSummary = nullptr; /**< gain summary  histo */
 
     /** PEDESTALS */
     SVDHistograms<TH2F>* m_h2PedestalREF = nullptr; /**< pedestal VS strip 2D histo */
     SVDHistograms<TH2F>* m_h2PedestalCHECK = nullptr; /**< pedestal VS strip 2D histo */
     SVDAPVHistograms<TH1F>* m_hPedestalDIFF = nullptr; /**< pedestal histo */
+    SVDSummaryPlots* m_hPedestalSummary = nullptr; /**< pedestal summary  histo */
 
   };
 }

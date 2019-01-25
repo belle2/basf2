@@ -1,56 +1,25 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Vipin Gaur, Prof. Leo Piilonen                           *
+ * Contributors: Kirill Chilikin                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Module manager
-#include <framework/core/HistoModule.h>
+/* External headers. */
+#include <TDirectory.h>
 
-// Own include
-#include <bklm/modules/bklmDQM/BKLMDQMModule.h>
+/* Belle2 headers. */
+#include <klm/modules/KLMDQM/KLMDQMModule.h>
 
-// framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
-// dataobject classes
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <mdst/dataobjects/Track.h>
-
-// root
-#include "TVector3.h"
-#include "TDirectory.h"
-
-// boost
-#include <boost/format.hpp>
-#include "TH1F.h"
-#include <stdio.h>
-
-using namespace std;
-using boost::format;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-REG_MODULE(BKLMDQM)
+REG_MODULE(KLMDQM)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-BKLMDQMModule::BKLMDQMModule() : HistoModule(),
+KLMDQMModule::KLMDQMModule() :
+  HistoModule(),
   h_layerHits(nullptr),
   h_ctime(nullptr),
   h_simtime(nullptr),
@@ -70,21 +39,66 @@ BKLMDQMModule::BKLMDQMModule() : HistoModule(),
   h_xvszBKLMHit2ds(nullptr),
   h_yvszBKLMHit2ds(nullptr)
 {
-  // set module description (e.g. insert text)
-  setDescription("BKLM DQM histogrammer");
+  setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
+  addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
+           "Directory for EKLM DQM histograms in ROOT file.",
+           std::string("EKLM"));
+  addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
+           "Directory for BKLM DQM histograms in ROOT file.",
+           std::string("BKLM"));
+  addParam("outputDigitsName", m_outputDigitsName,
+           "Name of BKLMDigit store array", std::string("BKLMDigits"));
+  m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
+  m_Sector = nullptr;
+  m_Time = nullptr;
+  m_StripLayer = nullptr;
 }
 
-BKLMDQMModule::~BKLMDQMModule()
+KLMDQMModule::~KLMDQMModule()
 {
+  if (m_StripLayer != nullptr)
+    delete m_StripLayer;
 }
 
-void BKLMDQMModule::defineHisto()
+void KLMDQMModule::defineHistoEKLM()
+{
+  int i;
+  /* cppcheck-suppress variableScope */
+  int endcap, layer, detectorLayer, stripMin, stripMax;
+  int maxLayerGlobal, maxSector, maxPlane, maxStrip;
+  std::string str, str2;
+  TDirectory* oldDirectory, *newDirectory;
+  oldDirectory = gDirectory;
+  newDirectory = oldDirectory->mkdir(m_HistogramDirectoryNameEKLM.c_str());
+  newDirectory->cd();
+  m_Sector = new TH1F("sector", "Sector number", 104, 0.5, 104.5);
+  m_Time = new TH1F("time", "Hit time", 50, 0, 50);
+  maxLayerGlobal = m_Elements->getMaximalLayerGlobalNumber();
+  maxSector = m_Elements->getMaximalSectorNumber();
+  maxPlane = m_Elements->getMaximalPlaneNumber();
+  maxStrip = m_Elements->getMaximalStripNumber();
+  m_StripLayer = new TH1F*[maxLayerGlobal];
+  for (i = 0; i < maxLayerGlobal; i++) {
+    detectorLayer = i + 1;
+    str = "strip_layer_" + std::to_string(detectorLayer);
+    str2 = "Strip number (layer " + std::to_string(detectorLayer) + ")";
+    m_Elements->layerNumberToElementNumbers(detectorLayer, &endcap, &layer);
+    stripMin = m_Elements->stripNumber(endcap, layer, 1, 1, 1);
+    stripMax = m_Elements->stripNumber(endcap, layer,
+                                       maxSector, maxPlane, maxStrip);
+    m_StripLayer[i] = new TH1F(str.c_str(), str2.c_str(),
+                               stripMax - stripMin + 1,
+                               stripMin - 0.5, stripMax + 0.5);
+  }
+  oldDirectory->cd();
+}
+
+void KLMDQMModule::defineHistoBKLM()
 {
 
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("BKLM")->cd();
+  oldDir->mkdir(m_HistogramDirectoryNameBKLM.c_str())->cd();
 
   h_layerHits = new TH1F("layer hits", "layer hits",
                          40, 0, 15);
@@ -155,27 +169,64 @@ void BKLMDQMModule::defineHisto()
   h_yvszBKLMHit2ds->SetOption("LIVE");
 
   oldDir->cd();
-
 }
 
-
-void BKLMDQMModule::initialize()
+void KLMDQMModule::defineHisto()
 {
-  REG_HISTOGRAM   // required to register histograms to HistoManager
+  defineHistoEKLM();
+  defineHistoBKLM();
+}
+
+void KLMDQMModule::initialize()
+{
+  REG_HISTOGRAM
+  m_Digits.isRequired();
   StoreArray<BKLMDigit> digits(m_outputDigitsName);
   digits.isRequired();
-  digits.registerInDataStore();
-  StoreArray<BKLMHit2d> hits(m_outputHitsName);
-  hits.registerInDataStore();
 }
-void BKLMDQMModule::beginRun()
+
+void KLMDQMModule::beginRun()
 {
+  int i, n;
+  m_Sector->Reset();
+  m_Time->Reset();
+  n = m_Elements->getMaximalLayerGlobalNumber();
+  for (i = 0; i < n; i++)
+    m_StripLayer[i]->Reset();
 }
-void BKLMDQMModule::event()
+
+void KLMDQMModule::event()
 {
+  int i, n;
+  int endcap, layer, sector, plane, strip;
+  int detectorLayer, sectorGlobal, stripGlobal;
+  EKLMDigit* eklmDigit;
+  n = m_Digits.getEntries();
+  /* EKLM. */
+  for (i = 0; i < n; i++) {
+    eklmDigit = m_Digits[i];
+    /*
+     * Reject digits that are below the threshold (such digits may appear
+     * for simulated events).
+     */
+    if (!eklmDigit->isGood())
+      continue;
+    endcap = eklmDigit->getEndcap();
+    layer = eklmDigit->getLayer();
+    sector = eklmDigit->getSector();
+    plane = eklmDigit->getPlane();
+    strip = eklmDigit->getStrip();
+    detectorLayer = m_Elements->detectorLayerNumber(endcap, layer);
+    sectorGlobal = m_Elements->sectorNumber(endcap, layer, sector);
+    stripGlobal = m_Elements->stripNumber(endcap, layer, sector, plane, strip);
+    m_Sector->Fill(sectorGlobal);
+    m_StripLayer[detectorLayer - 1]->Fill(stripGlobal);
+    m_Time->Fill(eklmDigit->getTime());
+  }
+  /* BKLM. */
   StoreArray<BKLMDigit> digits(m_outputDigitsName);
   int nent = digits.getEntries();
-  for (int i = 0; i < nent; i++) {
+  for (i = 0; i < nent; i++) {
     BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
     h_layerHits->Fill(digit->getModuleID());
     h_ctime->Fill(digit->getCTime());
@@ -188,7 +239,7 @@ void BKLMDQMModule::event()
   }
   StoreArray<BKLMHit2d> hits(m_outputHitsName);
   int nnent = hits.getEntries();
-  for (int i = 0; i < nnent; i++) {
+  for (i = 0; i < nnent; i++) {
     BKLMHit2d* hit = static_cast<BKLMHit2d*>(hits[i]);
     h_moduleID->Fill(hit->getModuleID());
     h_zStrips->Fill(hit->getZStripAve());
@@ -202,10 +253,11 @@ void BKLMDQMModule::event()
     h_yvszBKLMHit2ds->Fill(hit->getGlobalPosition().Y(), hit->getGlobalPosition().Z());
   }
 }
-void BKLMDQMModule::endRun()
+
+void KLMDQMModule::endRun()
 {
 }
 
-void BKLMDQMModule::terminate()
+void KLMDQMModule::terminate()
 {
 }

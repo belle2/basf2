@@ -42,7 +42,7 @@ namespace Belle2 {
     /** constructor for SVD hit
     * with arguments:  hit, cluster, particle, sensor info)
     */
-    hitXPDerivate(const SVDTrueHit& hit, const SVDCluster cluster, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
+    hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
 
     /** constructor for PXD hit
     * with arguments:  hit, particle, sensor info)

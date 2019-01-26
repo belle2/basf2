@@ -8,7 +8,6 @@ This file contains example for generating validation plots using python
 import basf2
 import array
 import numpy as np
-from datetime import datetime
 from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed, TEfficiency, TGraphErrors
 
 basf2.set_random_seed(1337)
@@ -87,6 +86,7 @@ for i in range(5000):
     passed = gRandom.Uniform(ratio * 0.45, 1.0)
     pos = gRandom.Uniform(ratio * 30.0, 49.5)
     gaus_total.Fill(pos)
+# fixme
 if passed > 0.5:
     gaus_passed.Fill(pos)
 
@@ -107,6 +107,7 @@ for i in range(50):
     ratio = float(i) / 50.0
     passed = gRandom.Uniform(ratio * 0.45, 1.0)
 
+# fixme
 graph_err.SetPoint(i, i + 1.0, passed)
 
 graph_err.SetName("TGraphErrors")

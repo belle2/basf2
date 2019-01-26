@@ -42,7 +42,7 @@ namespace Belle2 {
     }
 
     // Helper function for flight distance and its uncertainty (provided as it is)
-    inline double getFlightInfoBtw(const Particle* particle, const Particle* daughter, double& outErr, const std::string mode,
+    inline double getFlightInfoBtw(const Particle* particle, const Particle* daughter, double& outErr, const std::string& mode,
                                    const bool motherToGranddaughter = false)
     {
       if (!particle || !daughter) {

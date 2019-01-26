@@ -220,7 +220,7 @@ namespace Belle2 {
       }
 
       // add vertex (but without real vertexPosition, since origin is assumed)
-      SecMapTrainerHit newVirtualHit(FullSecID().getFullSecString(), m_config.vIP);
+      SecMapTrainerHit newVirtualHit(FullSecID(), m_config.vIP);
 
       newTrack.addHit(std::move(newVirtualHit));
 
@@ -231,7 +231,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(std::string setupName , std::string appendix = "") :
+    SecMapTrainer(const std::string& setupName , const std::string& appendix = "") :
       m_nameSetup(setupName),
       m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(

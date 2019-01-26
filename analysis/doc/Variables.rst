@@ -312,26 +312,27 @@ There are several predefined lists of variables and for each predefined list it 
 Operations with variable lists
 ==============================
 
-It is possible to create new variable lists using meta-variables. 
-For example, one can define list of kinematical variables in LAB frame and create another lists of kinematic variabels 
-in CMS using ``useCMSFrame(variable)`` meta-variable:
+It is possible to create new variable lists using meta-variables.  For example,
+one can define list of kinematic variables in LAB frame and create another
+lists of kinematic variables in CMS using ``useCMSFrame(variable)`` meta-variable:
 
 .. code:: python
 
+  from variables.utils import create_aliases
   # Replacement to Kinematics tool
-  kinematics = ['px',
-                'py',
-                'pz',
-                'pt',
-                'p',
-                'E']
+  kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
   # Kinematic variables in CMS
-  ckm_kinematics = wrap_list(kinematics,
-                             "useCMSFrame(variable)",
-                             "CMS")
+  cms_kinematics = create_aliases(kinematics, "useCMSFrame({variable})", "CMS")
 
-Functions for list operations are stored below.
+Now we can use the list of aliases ``cms_kinematics`` and add them to the
+output in one go or modify them further. The following functions are provided
+to help to easily create aliases.
 
-.. automodule:: variables.utils
-   :members:
+.. we don't document all of the stuff on this module and we choose the order
+   because the remaining functions will not be helpful for users and this is a
+   user manual after all.
 
+.. autofunction:: variables.utils.create_aliases
+.. autofunction:: variables.utils.create_aliases_for_selected
+.. autofunction:: variables.utils.create_daughter_aliases
+.. autofunction:: variables.utils.create_mctruth_aliases

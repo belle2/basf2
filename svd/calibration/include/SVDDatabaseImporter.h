@@ -55,12 +55,6 @@ namespace Belle2 {
     {}
 
     /**
-     * This method import to the database the list of hot strips to
-     * be masked offline.
-     */
-    void importSVDHotStripsCalibrations();
-
-    /**
      * This method import to the database the list of strips
      * to be masked because hot.
      * @param xmlFileName is the file name of the xml file

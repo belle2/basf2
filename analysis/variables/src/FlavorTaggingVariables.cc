@@ -1377,7 +1377,7 @@ namespace Belle2 {
           // if KaonPion
           if (index == 9)
           {
-            const MCParticle* mcSlowPionMother;
+            const MCParticle* mcSlowPionMother = nullptr;
             StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
             Particle* targetSlowPion = nullptr;
             if (SlowPionList.isValid()) {

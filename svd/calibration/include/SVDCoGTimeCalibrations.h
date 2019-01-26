@@ -31,9 +31,12 @@ namespace Belle2 {
     typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDCoGCalibrationFunction > > t_payload;
 
     /** Constructor, no input argument is required */
-    SVDCoGTimeCalibrations()
-      : m_aDBObjPtr(name)
-    {}
+    SVDCoGTimeCalibrations() : m_aDBObjPtr(name)
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDCoGTimeCalibrations: from now on we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
     /** Return the charge (number of electrons/holes) collected on a specific
      * strip, given the number of ADC counts.

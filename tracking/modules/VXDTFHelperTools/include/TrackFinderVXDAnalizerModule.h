@@ -102,12 +102,6 @@ namespace Belle2 {
       /** depending on what value you set it, it will print data like momentum residuals or any other interesting info during endrun... (currently not in use). */
       std::string m_PARAMprintData;
 
-      /** to narrow down the relevant mcTracks, this minFilter can be set to filter tracks having lower transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
-      double m_PARAMminTMomentumFilter;
-
-      /** to narrow down the relevant mcTracks, this maxFilter can be set to filter tracks having higher transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
-      double m_PARAMmaxTMomentumFilter;
-
       /** set here all parameters to be tracked which use an algorithm storing one double per tc.
        *
        * Accepts a vector of vector of vector of strings of entries.

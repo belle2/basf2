@@ -2,29 +2,27 @@
 # -*- coding: utf-8 -*-
 
 """
-A clone of the test of the ParticleLoader using a larger test file (mdst7.root)
-this is not present on the bamboo server so this test only runs on buildbot
-(it's also a bit slower).
+A clone of the test of the ParticleLoader using a larger test file (mdst12.root)
+this is not present on the bamboo server so this test only runs on buildbot or
+wherever the validation-data are visible  (it's also a bit slower).
 """
 
 import sys
-from ROOT import Belle2
-from basf2 import set_random_seed, create_path, process, LogLevel
+import basf2
+import b2test_utils
 
-set_random_seed("1337")
-testinput = [Belle2.FileSystem.findFile('analysis/tests/mdst7.root')]
-if len(testinput[0]) == 0:
-    sys.stderr.write(
-        "TEST SKIPPED: input file analysis/tests/mdst7.root"
-        " not found. You can retrieve it via 'wget https://www.desy.de/~scunliff/mdst7.root'\n")
-    sys.exit(-1)
+try:
+    inputFile = basf2.find_file('mdst12.root', 'validation')
+except FileNotFoundError as fnf:
+    b2test_utils.skip_test("Cannot find: %s" % fnf.filename)
 
+basf2.set_random_seed("1337")
 fsps = ['e+', 'pi+', 'K+', 'p+', 'mu+', 'K_S0 -> pi+ pi-', 'Lambda0 -> p+ pi-', 'K_L0', 'gamma']
 
 ###############################################################################
 # a new ParticleLoader for each fsp
-testpath = create_path()
-testpath.add_module('RootInput', inputFileNames=testinput, logLevel=LogLevel.ERROR)
+testpath = basf2.create_path()
+testpath.add_module('RootInput', inputFileName=inputFile, logLevel=basf2.LogLevel.ERROR)
 for fsp in fsps:
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
 
@@ -41,9 +39,9 @@ for mcp in mcps:
 
 testpath.add_module('ParticleStats', particleLists=fsps)
 testpath.add_module('ParticleStats', particleLists=mcps)
-process(testpath)
+basf2.process(testpath)
 
 # process the first event (again) with the verbose ParticlePrinter
 for fsp in fsps:
     testpath.add_module('ParticlePrinter', listName=fsp, fullPrint=True)
-process(testpath, 1)
+basf2.process(testpath, 1)

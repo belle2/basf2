@@ -258,7 +258,7 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   double dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
   double mcMedian = 1;
   if (strategy == 0) mcMedian = CalculateMedian(mc_signals);
-  if (strategy == 1) mcMedian = FitLandau(mc_signals);
+  else if (strategy == 1) mcMedian = FitLandau(mc_signals);
   else {
     B2ERROR("strategy unavailable, use 0 for medians or 1 for landau fit!");
     return 1.0;
@@ -367,7 +367,7 @@ double PXDGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
 
 
   // create histogram to hold signals
-  TH1D* hist_signals = new TH1D("landau", "", max - min, min, max);
+  TH1D* hist_signals = new TH1D("", "", max - min, min, max);
   // create fit function
   TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
   landau->SetParNames("MPV", "sigma", "scale");
@@ -384,10 +384,8 @@ double PXDGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
     Int_t status = hist_signals->Fit("landau", "Lq", "", 0, 350);
     double MPV = landau->GetParameter("MPV");
 
-
     delete hist_signals;
     delete landau;
-
     // check fit status
     if (status == 0) return MPV;
 

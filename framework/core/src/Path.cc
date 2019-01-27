@@ -225,20 +225,29 @@ execute it once for each object in the given StoreArray ``arrayName``. It will
 create a StoreObject named ``loopObjectName``  of same type as array which will
 point to each element in turn for each execution.
 
-The main use case is to use it after using the RestOfEventBuilder on a
-ParticeList, where you can use this feature to perform actions on only a part
+This has the effect of calling the ``event()`` methods of modules in ``path`` 
+for each entry in ``arrayName``.
+
+The main use case is to use it after using the `RestOfEventBuilder` on a
+``ParticeList``, where you can use this feature to perform actions on only a part
 of the event for a given list of candidates:
 
     >>> path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 You can read this as
 
-  "for each "RestOfEvent" in the array of "RestOfEvents", execute ``roe_path``"
+  "for each ``RestOfEvent`` in the array of "RestOfEvents", execute ``roe_path``"
 
 For example, if 'RestOfEvents' contains two elements then ``roe_path`` will be
 executed twice and during the execution a StoreObjectPtr 'RestOfEvent' will be
 available, which will point to the first element in the first execution, and
 the second element in the second execution.
+
+.. seealso:: 
+    A worked example of this `for_each` RestOfEvent is to build a veto against 
+    photons from :math:`\pi^0\to\gamma\gamma`. It is described in `HowToVeto`.
+
+.. note:: This feature is used by both the `FlavorTagger` and `FullEventInterpretation` algorithms.
 
 Changes to existing arrays / objects will be available to all modules after the
 `for_each()`, including those made to the loop variable (it will simply modify
@@ -246,7 +255,7 @@ the i'th item in the array looped over.)
 
 StoreArrays / StoreObjects (of event durability) *created* inside the loop will
 be removed at the end of each iteration. So if you create a new particle list
-inside a for_each() path execution the particle list will not exist for the
+inside a `for_each()` path execution the particle list will not exist for the
 next iteration or after the `for_each()` is complete.
 
 Parameters:

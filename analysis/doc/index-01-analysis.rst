@@ -83,22 +83,12 @@ Truth-matching
 
 .. toctree:: MCMatching
 
-How to Veto
-===========
-
-.. toctree:: HowToVeto
-
-
-for_each
-===========
-
-.. toctree:: ForEach
-
-
 Advanced Topics
 ===============
 
 .. toctree:: RestOfEvent
+
+.. toctree:: HowToVeto
 
 .. toctree:: FlavorTagger
 

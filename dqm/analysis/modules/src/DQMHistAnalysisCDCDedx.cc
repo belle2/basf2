@@ -58,12 +58,8 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   tLine->SetLineColor(4);
   tLine->SetLineStyle(9);
 
-  c_CDCdedxSigma = new TCanvas("c_CDCdedxSigma");
-
-  c_CDCdedxMean = new TCanvas("c_CDCdedxMean");
-  h_CDCdedxMean = new TH1F("h_CDCdedxMean", "dEdx distribution", 200, 0.0, 2.0);
-  h_CDCdedxMean->SetDirectory(0);// dont mess with it, this is MY histogram
-  h_CDCdedxMean->SetStats(false);
+  c_CDCdedxSigma = new TCanvas("CDCDedx/c_CDCdedxSigma");
+  c_CDCdedxMean = new TCanvas("CDCDedx/c_CDCdedxMean");
 
   f_fGaus = new TF1("f_Gaus", "gaus", 0.0, 2.0);
   f_fGaus->SetParameter(1, 1.00);
@@ -77,7 +73,6 @@ void DQMHistAnalysisCDCDedxModule::initialize()
 
 void DQMHistAnalysisCDCDedxModule::beginRun()
 {
-  h_CDCdedxMean->Clear();
   B2DEBUG(1, "DQMHistAnalysisCDCDedx: beginRun called.");
 }
 
@@ -89,14 +84,16 @@ void DQMHistAnalysisCDCDedxModule::event()
 
 void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
 {
-  h_CDCdedxMean->Reset(); // dont sum up!!!
   runstatus.clear();
   tLine->Clear();
 
   TH1* hh1 = findHist("CDCDedx/hdEdx_PerRun");
   if (hh1 != NULL) {
 
-    h_CDCdedxMean = (TH1F*)hh1->Clone("hdEdx_PerRun");
+    if (h_CDCdedxMean != NULL) delete h_CDCdedxMean;
+
+    h_CDCdedxMean = (TH1F*)hh1->Clone("CDCDedx/h_CDCdedxMean");
+    h_CDCdedxMean->SetStats(false);
     h_CDCdedxMean->Fit(f_fGaus, "Q");
 
     runnumber = h_CDCdedxMean->GetTitle();
@@ -119,7 +116,8 @@ void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
     c_CDCdedxMean->Clear();
     c_CDCdedxMean->cd();
     h_CDCdedxMean->GetXaxis()->SetRangeUser(0.0, 2.0);
-    h_CDCdedxMean->SetTitle(Form("Run #: %s, Status: %s, dEdx mean: %0.04f", runnumber.data(), runstatus.data(), dedxmean));
+    h_CDCdedxMean->SetTitle(Form("Run #: %s, Status: %s, mean: %0.04f, sigma: %0.04f", runnumber.data(), runstatus.data(), dedxmean,
+                                 dedxsigma));
     h_CDCdedxMean->SetFillColor(kYellow);
     h_CDCdedxMean->Draw("hist");
 

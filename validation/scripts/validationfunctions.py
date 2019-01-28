@@ -10,12 +10,12 @@ g_start_time = timeit.default_timer()
 import argparse
 import glob
 import os
-import shutil
 import subprocess
 import time
 
 # 3rd party
 import ROOT
+from basf2.utils import get_terminal_width
 
 # ours
 import validationpath
@@ -544,11 +544,6 @@ def congratulator(success=None, failure=None, total=None, just_comment=False,
         )
 
 
-def get_terminal_linewidth():
-    """ Returns linewidth of terminal. """
-    return shutil.get_terminal_size(fallback=(80, 100)).columns
-
-
 def terminal_title_line(title="", subtitle="", level=0):
     """ Print a title line in the terminal.
 
@@ -558,7 +553,7 @@ def terminal_title_line(title="", subtitle="", level=0):
         subtitle (str): Subtitle.
         level (int): The lower, the more dominantly the line will be styled.
     """
-    linewidth = get_terminal_linewidth()
+    linewidth = get_terminal_width()
 
     # using the markdown title underlining chars for lack of better
     # alternatives

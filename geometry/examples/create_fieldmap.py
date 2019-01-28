@@ -6,25 +6,17 @@
 # field and saves it as a set of 2D histograms in a root file
 ##############################################################################
 
+import os
 import math
-from basf2 import *
+from basf2 import Path, process
 import subprocess
 
 commit = subprocess.check_output(["git", "--git-dir=%s/.git" % os.environ["BELLE2_LOCAL_DIR"],
                                   "rev-parse", "--short", "HEAD"]).decode().strip()
 
-evtinfo = register_module('EventInfoSetter')
-# Geometry parameter loader
-gearbox = register_module('Gearbox')
-# Geometry builder
-geometry = register_module('Geometry')
-# We only need the Magnetic field, no other geometry
-geometry.param({
-    "components": ["MagneticField"],
-})
-# Fieldmap creator
-fieldmap = register_module('CreateFieldMap')
-fieldmap.param({
+path = Path()
+path.add_module("EventInfoSetter")
+path.add_module("CreateFieldMap", **{
     # Filename for the histograms
     'filename': 'FieldMap-%s.root' % commit,
     # type of the scan: along xy, zx or zy
@@ -53,15 +45,4 @@ fieldmap.param({
     # if true here store all sampled points in a TTree
     "saveAllPoints": False,
 })
-
-# Create main path
-main = create_path()
-
-# Add modules to main path
-main.add_module(evtinfo)
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(fieldmap)
-
-# Process one event
-process(main)
+process(path)

@@ -31,7 +31,6 @@ Variables
   .. seealso::
      `variables.utils.create_aliases_for_selected()`
 
-
 Modules
 +++++++
 
@@ -41,3 +40,11 @@ Modules
 
   This affects all users of `modularAnalysis.rankByLowest()` and
   `modularAnalysis.rankByHighest()` if they passed ``allowMultiRank=True``
+
+* Removal of the unsupported ECLClusterInfoModule.
+
+FEI
++++
+
+* Removed the backward compatibility layer (``pid_renaming_oktober_2017``). 
+  Only FEI trainings from release-02 are supported. Please update to ``FEIv4_2018_MC9_release_02_00_01`` or newer.

@@ -8,7 +8,7 @@ import re
 shutil.rmtree("localdb", ignore_errors=True)
 
 # create phase3 geometry: This is the default in Belle2.xml
-phase3 = basf2.create_path()
+phase3 = basf2.Path()
 phase3.add_module("EventInfoSetter")
 phase3.add_module("Gearbox")
 phase3.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, -1, -1])
@@ -30,7 +30,7 @@ basf2.process(phase2)
 # general configuration and PXD and SVD
 varying = ["GeoConfiguration", "PXDGeometryPar", "SVDGeometryPar", "BeamPipeGeo"]
 database_content = []
-line_match = re.compile("^dbstore/(.*?) (\d+)")
+line_match = re.compile(r"^dbstore/(.*?) (\d+)")
 with open("localdb/database.txt") as dbfile:
     for line in dbfile:
         match = line_match.search(line)

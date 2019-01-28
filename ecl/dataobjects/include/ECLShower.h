@@ -28,7 +28,7 @@ namespace Belle2 {
   class ECLShower : public RelationsObject {
   public:
 
-    /** The hypothis ID for  ECLShowers */
+    /** The hypothesis ID for  ECLShowers. Unlike ECLClusters, ECLShowers have one and only one hypothesis ID. */
     enum Hypothesis : unsigned int {
       /** CR is split into a muon and n photons (T1) */
       c_muonNPhotons = 1,
@@ -514,6 +514,7 @@ namespace Belle2 {
     // 10: added getUniqueId()
     // 11: added m_ShowerHadronIntensity and m_NumberOfHadronDigits variables (SL)
     // 12: added m_PulseShapeDiscriminationMVA.  Noted m_ShowerHadronIntensity will be removed in release-04 (SL)
+    // 13: made enums strongly typed
     ClassDef(ECLShower, 13);/**< ClassDef */
 
   };

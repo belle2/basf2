@@ -27,7 +27,7 @@ namespace Belle2 {
   class ECLCluster : public RelationsObject {
   public:
 
-    /** The hypothis bits for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
+    /** The hypothesis bits for this ECLCluster (Connected region (CR) is split using this hypothesis.*/
     enum class EHypothesisBit : short unsigned int {
       /** None as initializer */
       c_none = 1 << 0,

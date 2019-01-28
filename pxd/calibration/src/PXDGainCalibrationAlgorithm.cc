@@ -182,7 +182,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     } else {
       B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfHits << " < " << minClusters <<
                 "). Use default gain.");
-      gainMapPar->setContent(sensorID.getID(), uBin, vBin, 1.0);
+      gainMapPar->setContent(sensorID.getID(), uBin, vBin, 0.0);
     }
     pxdSensors.insert(sensorID);
   }
@@ -198,7 +198,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
       for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
         auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
         // Filter default gains
-        if (gain != 1.0) {
+        if (gain != 0.0) {
           nGood += 1;
           meanGain += gain;
         } else {
@@ -213,7 +213,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
         meanGain /= nGood;
         for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
           auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
-          if (gain == 1.0) {
+          if (gain == 0.0) {
             gainMapPar->setContent(sensorID.getID(), uBin, vBin, meanGain);
             B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin << ": Replace default gain wih average "
                      << meanGain);
@@ -257,20 +257,19 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
 
   double dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
   double mcMedian = 1;
+  if (dataMedian < 0) {
+    B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
+              ". Set gain to default value (=0.0) as well.");
+    return 0.0;
+  }
   if (strategy == 0) mcMedian = CalculateMedian(mc_signals);
   else if (strategy == 1) mcMedian = FitLandau(mc_signals);
   else {
-    B2ERROR("strategy unavailable, use 0 for medians or 1 for landau fit!");
-    return 1.0;
+    B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
   }
+
 
   double gain =  dataMedian / mcMedian;
-  if (gain <= 0) {
-    B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
-              ". Set gain to default value (=1.0) as well.");
-    gain = 1.0;
-  }
-
   double gainFromDB = GetCurrentGainFromDB(sensorID, uBin, vBin);
   B2DEBUG(10, "Gain from db used in PXDDigitizer is " << gainFromDB);
   B2DEBUG(10, "New gain correction derived is " << gain);

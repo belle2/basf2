@@ -174,7 +174,8 @@ CalibrationAlgorithm::EResult PXDChargeCalibrationAlgorithm::calibrate()
       chargeMapPar->setContent(sensorID.getID(), uBin, vBin, Charge);
     } else {
       B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
-                "). Use default value.");
+                "). Use default value of 0.");
+      chargeMapPar->setContent(sensorID.getID(), uBin, vBin, 0.0);
     }
   }
 
@@ -213,8 +214,7 @@ double PXDChargeCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigned sh
   if (strategy == 0) return CalculateMedian(signals);
   if (strategy == 1) return FitLandau(signals);
   else {
-    B2ERROR("strategy unavailable, use 0 for medians or 1 for landau fit!");
-    return 1.0;
+    B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
   }
 }
 
@@ -224,7 +224,7 @@ double PXDChargeCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
   auto size = signals.size();
 
   if (size == 0) {
-    return 0;  // Undefined, really.
+    return 0.0;  // Undefined, really.
   } else {
     sort(signals.begin(), signals.end());
     if (size % 2 == 0) {
@@ -238,7 +238,7 @@ double PXDChargeCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 double PXDChargeCalibrationAlgorithm::FitLandau(vector<double>& signals)
 {
   auto size = signals.size();
-  if (size == 0) return 1.0; // Undefined, really.
+  if (size == 0) return 0.0; // Undefined, really.
 
   // get max and min values of vector
   int max = *max_element(signals.begin(), signals.end());
@@ -267,7 +267,7 @@ double PXDChargeCalibrationAlgorithm::FitLandau(vector<double>& signals)
   // check fit status
   if (status == 0) return MPV;
   else {
-    B2WARNING("Fit failed! using default value.");
-    return 1.0;
+    B2WARNING("Fit failed! using default value 0.0!");
+    return 0.0;
   }
 }

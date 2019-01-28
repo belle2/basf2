@@ -585,9 +585,3 @@ def terminal_title_line(title="", subtitle="", level=0):
         ret += subtitle + "\n"
     ret += line
     return ret
-
-
-if __name__ == "__main__":
-    print(terminal_title_line("test"))
-    print("test")
-    print(terminal_title_line())

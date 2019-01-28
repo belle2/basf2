@@ -52,7 +52,7 @@ namespace Belle2 {
     /// Calculate a median from unsorted signal vector. The input vector gets sorted.
     double CalculateMedian(std::vector<double>& signals);
 
-    /// Calculate MPC from signal vector using a landau fit.
+    /// Calculate MPV from signal vector using a landau fit.
     double FitLandau(std::vector<double>& signals);
 
     /// Retrive charge median value from pulled in data base payload

@@ -3,36 +3,35 @@
 
 """
 <header>
-    <output>EKLMK0LOutput.root</output>
+    <output>KLMK0LOutput.root</output>
     <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
-    <description>Generation of 500 muons for EKLM validation.</description>
+    <description>Generation of 1000 B -> J/psi K_L0 events for KLM validation.</description>
 </header>
 """
 
 import os
 import random
 from basf2 import *
+from ROOT import Belle2
+from beamparameters import add_beamparameters
 
 set_log_level(LogLevel.WARNING)
 
 # Fixed random seed
-set_random_seed(123456)
+set_random_seed(12345)
+
+# Create main path
+main = create_path()
 
 # Event data
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [2000])
+eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
 
-# Particle gun
-particlegun = register_module('ParticleGun')
-particlegun.param('nTracks', 1)
-particlegun.param('pdgCodes', [130])
-particlegun.param('momentumGeneration', 'uniform')
-particlegun.param('momentumParams', [1, 1])
-particlegun.param('thetaGeneration', 'uniform')
-particlegun.param('thetaParams', [30, 30])
-particlegun.param('phiGeneration', 'uniform')
-particlegun.param('phiParams', [0, 360])
+# Evtgen and beam parameters.
+evtgen = register_module('EvtGenInput')
+evtgen.param('userDECFile', Belle2.FileSystem.findFile('klm/validation/btojpsikl0.dec'))
+beamparameters = add_beamparameters(main, "Y4S")
 
 # Geometry and Geant simulation
 paramloader = register_module('Gearbox')
@@ -55,14 +54,11 @@ mc_matcher = register_module('MCMatcherKLMClusters')
 
 # Output
 output = register_module('RootOutput')
-output.param('outputFileName', '../EKLMK0LOutput.root')
-
-# Create main path
-main = create_path()
+output.param('outputFileName', '../KLMK0LOutput.root')
 
 # Add modules to main path
 main.add_module(eventinfosetter)
-main.add_module(particlegun)
+main.add_module(evtgen)
 main.add_module(paramloader)
 main.add_module(geometry)
 main.add_module(g4sim)

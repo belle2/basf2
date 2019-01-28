@@ -477,16 +477,27 @@ def get_log_file_paths(logger):
 
 def congratulator(success=None, failure=None, total=None, just_comment=False,
                   rate_name="Success rate"):
-    """ Keeping the morale up. """
+    """ Keeping the morale up by commenting on success rates.
+
+    Args:
+        success: Number of successes
+        failure: Number of failures
+        total: success + failures (out of success, failure and total, exactly
+            2 have to be spefified. If you want to use your own figure of
+            merit, just set total = 1. and set success to a number between 0.0
+            (infernal) to 1.0 (stellar))
+        just_comment: Do not add calculated percentage to return string.
+        rate_name: How to refer to the calculated success rate.
+
+    Returns:
+        Comment on your success rate (str).
+    """
 
     if not total:
-        assert success and failure
         total = success + failure
     if not failure:
-        assert success and total
         failure = total - success
     if not success:
-        assert failure and total
         success = total - failure
 
     # Beware of zero division errors.

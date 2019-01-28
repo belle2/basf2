@@ -55,8 +55,10 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   b_noiseRMS = m_tree->Branch("noiseRMS", &m_noiseRMS, "noiseRMS/F");
   b_gainAVE = m_tree->Branch("gainAVE", &m_gainAVE, "gainAVE/F");
   b_gainRMS = m_tree->Branch("gainRMS", &m_gainRMS, "gainRMS/F");
-  b_peakTimeAVE = m_tree->Branch("peakTimeAVE", &m_peakTimeAVE, "peakTimeAVE/F");
-  b_peakTimeRMS = m_tree->Branch("peakTimeRMS", &m_peakTimeRMS, "peakTimeRMS/F");
+  b_calPeakADCAVE = m_tree->Branch("calPeakADCAVE", &m_calPeakADCAVE, "calPeakADCAVE/F");
+  b_calPeakADCRMS = m_tree->Branch("calPeakADCRMS", &m_calPeakADCRMS, "calPeakADCRMS/F");
+  b_calPeakTimeAVE = m_tree->Branch("calPeakTimeAVE", &m_calPeakTimeAVE, "calPeakTimeAVE/F");
+  b_calPeakTimeRMS = m_tree->Branch("calPeakTimeRMS", &m_calPeakTimeRMS, "calPeakTimeRMS/F");
   b_pulseWidthAVE = m_tree->Branch("pulseWidthAVE", &m_pulseWidthAVE, "pulseWidthAVE/F");
   b_pulseWidthRMS = m_tree->Branch("pulseWidthRMS", &m_pulseWidthRMS, "pulseWidthRMS/F");
 
@@ -72,7 +74,8 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   b_noiseEl = m_treeDetailed->Branch("noiseEl", &m_noiseEl, "noiseEl/F");
   b_gain = m_treeDetailed->Branch("gain", &m_gain, "gain/F");
   b_pedestal = m_treeDetailed->Branch("pedestal", &m_pedestal, "pedestal/F");
-  b_peakTime = m_treeDetailed->Branch("peakTime", &m_peakTime, "peakTime/F");
+  b_calPeakTime = m_treeDetailed->Branch("calPeakTime", &m_calPeakTime, "calPeakTime/F");
+  b_calPeakADC = m_treeDetailed->Branch("calPeakADC", &m_calPeakADC, "calPeakADC/F");
   b_pulseWidth = m_treeDetailed->Branch("pulseWidth", &m_pulseWidth, "pulseWidth/F");
 
 
@@ -100,13 +103,13 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_hMask = new SVDHistograms<TH1F>(hMask);
 
   TH2F h2Mask_512("masked2D_512_L@layerL@ladderS@sensor@view",
-                  "masked strip in @layer.@ladder.@sensor @view/@side VS strip number",
+                  "masked strip in @layer.@ladder.@sensor @view/@side VS cellID",
                   128 * 4, -0.5, 128 * 4 - 0.5, 2, -0.5, 1.5);
   h2Mask_512.GetYaxis()->SetTitle("isMasked");
   h2Mask_512.GetXaxis()->SetTitle("cellID");
 
   TH2F h2Mask_768("masked2D_768_L@layerL@ladderS@sensor@view",
-                  "masked strip in @layer.@ladder.@sensor @view/@side VS strip number",
+                  "masked strip in @layer.@ladder.@sensor @view/@side VS cellID",
                   128 * 6, -0.5, 128 * 6 - 0.5, 2, -0.5, 1.5);
   h2Mask_768.GetYaxis()->SetTitle("isMasked");
   h2Mask_768.GetXaxis()->SetTitle("cellID");
@@ -121,13 +124,13 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_hNoise = new SVDHistograms<TH1F>(hNoise);
 
   TH2F h2Noise_512("noise2D_512_L@layerL@ladderS@sensor@view",
-                   "noise in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                   "noise in ADC in @layer.@ladder.@sensor @view/@side VS cellID",
                    128 * 4, -0.5, 128 * 4 - 0.5, 80, -0.5, 9.5);
   h2Noise_512.GetYaxis()->SetTitle("strip noise (ADC)");
   h2Noise_512.GetXaxis()->SetTitle("cellID");
 
   TH2F h2Noise_768("noise2D_768_L@layerL@ladderS@sensor@view",
-                   "noise in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                   "noise in ADC in @layer.@ladder.@sensor @view/@side VS cellID",
                    128 * 6, -0.5, 128 * 6 - 0.5, 80, -0.5, 9.5);
   h2Noise_768.GetYaxis()->SetTitle("strip noise (ADC)");
   h2Noise_768.GetXaxis()->SetTitle("cellID");
@@ -143,13 +146,13 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_hNoiseEl = new SVDHistograms<TH1F>(hNoiseEl);
 
   TH2F h2NoiseEl_512("noiseEl2D_512_L@layerL@ladderS@sensor@view",
-                     "noise in e- in @layer.@ladder.@sensor @view/@side VS strip number",
+                     "noise in e- in @layer.@ladder.@sensor @view/@side VS cellID",
                      128 * 4, -0.5, 128 * 4 - 0.5, 600, -199.5, 1499.5);
   h2NoiseEl_512.GetYaxis()->SetTitle("strip noise (e-)");
   h2NoiseEl_512.GetXaxis()->SetTitle("cellID");
 
   TH2F h2NoiseEl_768("noiseEl2D_768_L@layerL@ladderS@sensor@view",
-                     "noise in e- in @layer.@ladder.@sensor @view/@side VS strip number",
+                     "noise in e- in @layer.@ladder.@sensor @view/@side VS cellID",
                      128 * 6, -0.5, 128 * 6 - 0.5, 600, -199.5, 1499.5);
   h2NoiseEl_768.GetYaxis()->SetTitle("strip noise (e-)");
   h2NoiseEl_768.GetXaxis()->SetTitle("cellID");
@@ -165,13 +168,13 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_hPedestal = new SVDHistograms<TH1F>(hPedestal);
 
   TH2F h2Pedestal_512("pedestal2D_512_L@layerL@ladderS@sensor@view",
-                      "pedestal in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                      "pedestal in ADC in @layer.@ladder.@sensor @view/@side VS cellID",
                       128 * 4, -0.5, 128 * 4 - 0.5, 200, -199.5, 599.5);
   h2Pedestal_512.GetYaxis()->SetTitle("strip pedestal (ADC)");
   h2Pedestal_512.GetXaxis()->SetTitle("cellID");
 
   TH2F h2Pedestal_768("pedestal2D_768_L@layerL@ladderS@sensor@view",
-                      "pedestal in ADC in @layer.@ladder.@sensor @view/@side VS strip number",
+                      "pedestal in ADC in @layer.@ladder.@sensor @view/@side VS cellID",
                       128 * 6, -0.5, 128 * 6 - 0.5, 200, -199.5, 599.5);
   h2Pedestal_768.GetYaxis()->SetTitle("strip pedestal (ADC)");
   h2Pedestal_768.GetXaxis()->SetTitle("cellID");
@@ -186,13 +189,13 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_hGain = new SVDHistograms<TH1F>(hGain);
 
   TH2F h2Gain_512("gain2D_512_L@layerL@ladderS@sensor@view",
-                  "1/gain in @layer.@ladder.@sensor @view/@side VS strip number",
+                  "1/gain in @layer.@ladder.@sensor @view/@side VS cellID",
                   128 * 4, -0.5, 128 * 4 - 0.5, 300, -0.5, 499.5);
   h2Gain_512.GetYaxis()->SetTitle("strip 1/gain (e-/ADC)");
   h2Gain_512.GetXaxis()->SetTitle("cellID");
 
   TH2F h2Gain_768("gain2D_768_L@layerL@ladderS@sensor@view",
-                  "1/gain in @layer.@ladder.@sensor @view/@side VS strip number",
+                  "1/gain in @layer.@ladder.@sensor @view/@side VS cellID",
                   128 * 6, -0.5, 128 * 6 - 0.5, 300, -0.5, 499.5);
   h2Gain_768.GetYaxis()->SetTitle("strip 1/gain (e-/ADC)");
   h2Gain_768.GetXaxis()->SetTitle("cellID");
@@ -200,25 +203,46 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_h2Gain = new SVDHistograms<TH2F>(h2Gain_768, h2Gain_768, h2Gain_768, h2Gain_512);
 
   // PEAKTIME (ns)
-  TH1F hPeakTime("peakTime_L@layerL@ladderS@sensor@view",
-                 "peakTime in @layer.@ladder.@sensor @view/@side",
-                 255, -0.5, 254.5);
-  hPeakTime.GetXaxis()->SetTitle("strip peakTime (ns)");
-  m_hPeakTime = new SVDHistograms<TH1F>(hPeakTime);
+  TH1F hCalPeakTime("calPeakTime_L@layerL@ladderS@sensor@view",
+                    "calPeakTime in @layer.@ladder.@sensor @view/@side",
+                    255, -0.5, 254.5);
+  hCalPeakTime.GetXaxis()->SetTitle("strip calPeakTime (ns)");
+  m_hCalPeakTime = new SVDHistograms<TH1F>(hCalPeakTime);
 
-  TH2F h2PeakTime_512("peakTime2D_512_L@layerL@ladderS@sensor@view",
-                      "peakTime in @layer.@ladder.@sensor @view/@side VS strip number",
-                      128 * 4, -0.5, 128 * 4 - 0.5, 255, -0.5, 254.5);
-  h2PeakTime_512.GetYaxis()->SetTitle("strip peakTime (ns)");
-  h2PeakTime_512.GetXaxis()->SetTitle("cellID");
+  TH2F h2CalPeakTime_512("calPeakTime2D_512_L@layerL@ladderS@sensor@view",
+                         "calPeakTime in @layer.@ladder.@sensor @view/@side VS cellID",
+                         128 * 4, -0.5, 128 * 4 - 0.5, 255, -0.5, 254.5);
+  h2CalPeakTime_512.GetYaxis()->SetTitle("strip calPeakTime (ns)");
+  h2CalPeakTime_512.GetXaxis()->SetTitle("cellID");
 
-  TH2F h2PeakTime_768("peakTime2D_768_L@layerL@ladderS@sensor@view",
-                      "peakTime in @layer.@ladder.@sensor @view/@side VS strip number",
-                      128 * 6, -0.5, 128 * 6 - 0.5, 255, -0.5, 254.5);
-  h2PeakTime_768.GetYaxis()->SetTitle("strip peakTime (ns)");
-  h2PeakTime_768.GetXaxis()->SetTitle("cellID");
+  TH2F h2CalPeakTime_768("calPeakTime2D_768_L@layerL@ladderS@sensor@view",
+                         "calPeakTime in @layer.@ladder.@sensor @view/@side VS cellID",
+                         128 * 6, -0.5, 128 * 6 - 0.5, 255, -0.5, 254.5);
+  h2CalPeakTime_768.GetYaxis()->SetTitle("strip calPeakTime (ns)");
+  h2CalPeakTime_768.GetXaxis()->SetTitle("cellID");
 
-  m_h2PeakTime = new SVDHistograms<TH2F>(h2PeakTime_768, h2PeakTime_768, h2PeakTime_768, h2PeakTime_512);
+  m_h2CalPeakTime = new SVDHistograms<TH2F>(h2CalPeakTime_768, h2CalPeakTime_768, h2CalPeakTime_768, h2CalPeakTime_512);
+
+  //CALPEAK ADC
+  TH1F hCalPeakADC("calPeakADC_L@layerL@ladderS@sensor@view",
+                   "calPeakADC in @layer.@ladder.@sensor @view/@side",
+                   80, 44.5, 124.5);
+  hCalPeakADC.GetXaxis()->SetTitle("strip calPeakADC (ADC)");
+  m_hCalPeakADC = new SVDHistograms<TH1F>(hCalPeakADC);
+
+  TH2F h2CalPeakADC_512("calPeakADC2D_512_L@layerL@ladderS@sensor@view",
+                        "calPeakADC in @layer.@ladder.@sensor @view/@side VS cellID",
+                        128 * 4, -0.5, 128 * 4 - 0.5, 80, 44.5, 124.5);
+  h2CalPeakADC_512.GetYaxis()->SetTitle("strip calPeakADC (ADC)");
+  h2CalPeakADC_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2CalPeakADC_768("calPeakADC2D_768_L@layerL@ladderS@sensor@view",
+                        "calPeakADC in @layer.@ladder.@sensor @view/@side VS cellID",
+                        128 * 6, -0.5, 128 * 6 - 0.5, 80, 44.5, 124.5);
+  h2CalPeakADC_768.GetYaxis()->SetTitle("strip calPeakADC (ADC)");
+  h2CalPeakADC_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2CalPeakADC = new SVDHistograms<TH2F>(h2CalPeakADC_768, h2CalPeakADC_768, h2CalPeakADC_768, h2CalPeakADC_512);
 
   // PULSE WIDTH (ns)
   TH1F hPulseWidth("pulseWidth_L@layerL@ladderS@sensor@view",
@@ -228,13 +252,13 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   m_hPulseWidth = new SVDHistograms<TH1F>(hPulseWidth);
 
   TH2F h2PulseWidth_512("pulseWidth2D_512_L@layerL@ladderS@sensor@view",
-                        "pulseWidth in @layer.@ladder.@sensor @view/@side VS strip number",
+                        "pulseWidth in @layer.@ladder.@sensor @view/@side VS cellID",
                         128 * 4, -0.5, 128 * 4 - 0.5, 255, -0.5, 254.5);
   h2PulseWidth_512.GetYaxis()->SetTitle("strip pulseWidth (ns)");
   h2PulseWidth_512.GetXaxis()->SetTitle("cellID");
 
   TH2F h2PulseWidth_768("pulseWidth2D_768_L@layerL@ladderS@sensor@view",
-                        "pulseWidth in @layer.@ladder.@sensor @view/@side VS strip number",
+                        "pulseWidth in @layer.@ladder.@sensor @view/@side VS cellID",
                         128 * 6, -0.5, 128 * 6 - 0.5, 255, -0.5, 254.5);
   h2PulseWidth_768.GetYaxis()->SetTitle("strip pulseWidth (ns)");
   h2PulseWidth_768.GetXaxis()->SetTitle("cellID");
@@ -313,13 +337,16 @@ void SVDLocalCalibrationsMonitorModule::event()
             m_gain = -1;
             if (m_PulseShapeCal.isValid()) {
               m_gain = m_PulseShapeCal.getChargeFromADC(theVxdID, m_side, m_strip, 1/*ADC*/);
-              m_peakTime = m_PulseShapeCal.getPeakTime(theVxdID, m_side, m_strip);
+              m_calPeakADC = 22500. / m_PulseShapeCal.getChargeFromADC(theVxdID, m_side, m_strip, 1/*ADC*/);
+              m_calPeakTime = m_PulseShapeCal.getPeakTime(theVxdID, m_side, m_strip);
               m_pulseWidth = m_PulseShapeCal.getWidth(theVxdID, m_side, m_strip);
             }
             m_hGain->fill(theVxdID, m_side, m_gain);
             m_h2Gain->fill(theVxdID, m_side, m_strip, m_gain);
-            m_hPeakTime->fill(theVxdID, m_side, m_peakTime);
-            m_h2PeakTime->fill(theVxdID, m_side, m_strip, m_peakTime);
+            m_hCalPeakTime->fill(theVxdID, m_side, m_calPeakTime);
+            m_h2CalPeakTime->fill(theVxdID, m_side, m_strip, m_calPeakTime);
+            m_hCalPeakADC->fill(theVxdID, m_side, m_calPeakADC);
+            m_h2CalPeakADC->fill(theVxdID, m_side, m_strip, m_calPeakADC);
             m_hPulseWidth->fill(theVxdID, m_side, m_pulseWidth);
             m_h2PulseWidth->fill(theVxdID, m_side, m_strip, m_pulseWidth);
 
@@ -368,8 +395,10 @@ void SVDLocalCalibrationsMonitorModule::event()
           m_noiseRMS = (m_hNoise->getHistogram(theVxdID, m_side))->GetRMS();
           m_gainAVE = (m_hGain->getHistogram(theVxdID, m_side))->GetMean();
           m_gainRMS = (m_hGain->getHistogram(theVxdID, m_side))->GetRMS();
-          m_peakTimeAVE = (m_hPeakTime->getHistogram(theVxdID, m_side))->GetMean();
-          m_peakTimeRMS = (m_hPeakTime->getHistogram(theVxdID, m_side))->GetRMS();
+          m_calPeakTimeAVE = (m_hCalPeakTime->getHistogram(theVxdID, m_side))->GetMean();
+          m_calPeakTimeRMS = (m_hCalPeakTime->getHistogram(theVxdID, m_side))->GetRMS();
+          m_calPeakADCAVE = (m_hCalPeakADC->getHistogram(theVxdID, m_side))->GetMean();
+          m_calPeakADCRMS = (m_hCalPeakADC->getHistogram(theVxdID, m_side))->GetRMS();
           m_pulseWidthAVE = (m_hPulseWidth->getHistogram(theVxdID, m_side))->GetMean();
           m_pulseWidthRMS = (m_hPulseWidth->getHistogram(theVxdID, m_side))->GetRMS();
           m_tree->Fill();
@@ -428,7 +457,8 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     m_rootFilePtr->mkdir("noise_ADCunits");
     m_rootFilePtr->mkdir("noise_electronsCharge");
     m_rootFilePtr->mkdir("gain_electronsCharge");
-    m_rootFilePtr->mkdir("peakTime");
+    m_rootFilePtr->mkdir("calPeakTime");
+    m_rootFilePtr->mkdir("calPeakADC");
     m_rootFilePtr->mkdir("pulseWidth");
 
 
@@ -465,9 +495,14 @@ void SVDLocalCalibrationsMonitorModule::endRun()
             (m_h2Gain->getHistogram(sensor, view))->Write();
 
             //writing the histogram list for the peak times in ns
-            m_rootFilePtr->cd("peakTime");
-            (m_hPeakTime->getHistogram(sensor, view))->Write();
-            (m_h2PeakTime->getHistogram(sensor, view))->Write();
+            m_rootFilePtr->cd("calPeakTime");
+            (m_hCalPeakTime->getHistogram(sensor, view))->Write();
+            (m_h2CalPeakTime->getHistogram(sensor, view))->Write();
+
+            //writing the histogram list for the peak in ADC
+            m_rootFilePtr->cd("calPeakADC");
+            (m_hCalPeakADC->getHistogram(sensor, view))->Write();
+            (m_h2CalPeakADC->getHistogram(sensor, view))->Write();
 
             //writing the histogram list for the pulse widths in ns
             m_rootFilePtr->cd("pulseWidth");
@@ -483,7 +518,8 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     m_h2PulseWidth->Write("h2PulseShape");
     m_h2Pedestal->Write("h2Pedestal");
     m_h2Gain->Write("h2Gain");
-    m_h2PeakTime->Write("h2PeakTime");
+    m_h2CalPeakADC->Write("h2CalPeakADC");
+    m_h2CalPeakTime->Write("h2CalPeakTime");
 
     m_rootFilePtr->Close();
     B2RESULT("The rootfile containing the list of histograms has been filled and closed [Local].");

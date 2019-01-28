@@ -37,7 +37,7 @@ SVDLocalCalibrationsCheckModule::SVDLocalCalibrationsCheckModule() : Module()
   setDescription("Module to produce a list of histograms showing the uploaded calibration constants");
 
   // Parameter definitions
-  addParam("outputPdfName", m_outputPdfName, "output pdf filename", std::string("SVDLocalCalibrationCheck.pdf"));
+  addParam("outputPdfName", m_outputPdfName, "output pdf filename", std::string("SVDLocalCalibrationsCheck.pdf"));
   addParam("reference_root", m_rootFileNameREF, "Name of REFERENCE root file.",
            std::string("SVDLocalCalibrationMonitor_experiment5_run92.root"));
   addParam("check_root", m_rootFileNameCHECK, "Name of CHECK root file.",
@@ -47,9 +47,9 @@ SVDLocalCalibrationsCheckModule::SVDLocalCalibrationsCheckModule() : Module()
   addParam("cutN_outliers", m_cutN_out, "Max number of outliers allowed", int(0));
   addParam("cutNoise_average", m_cutNoise_ave, "Max relative deviation of average noise per APV", float(0.1));
   addParam("cutNoise_outliers", m_cutNoise_out, "Max relative deviation of single strip", float(0.3));
-  addParam("cutGain_average", m_cutGain_ave, "Max relative deviation of average gain per APV", float(0.1));
-  addParam("cutGain_outliers", m_cutGain_out, "Max relative deviation of single strip", float(0.3));
-  addParam("cutPedestal_average", m_cutPedestal_ave, "Max relative deviation of average pedestal per APV", float(0.1));
+  addParam("cutCalPeakADC_average", m_cutCalpeakADC_ave, "Max relative deviation of average CalPeakADC per APV", float(0.02));
+  addParam("cutCalPeakADC_outliers", m_cutCalpeakADC_out, "Max relative deviation of single strip", float(0.3));
+  addParam("cutPedestal_average", m_cutPedestal_ave, "Max relative deviation of average pedestal per APV", float(0.03));
   addParam("cutPedestal_outliers", m_cutPedestal_out, "Max relative deviation of single strip", float(0.3));
 
 }
@@ -79,7 +79,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   m_treeREF->SetBranchAddress("noiseEl", &m_noiseElREF, &b_noiseElREF);
   m_treeREF->SetBranchAddress("gain", &m_gainREF,  &b_gainREF);
   m_treeREF->SetBranchAddress("pedestal", &m_pedestalREF, &b_pedestalREF);
-  m_treeREF->SetBranchAddress("peakTime", &m_peakTimeREF, &b_peakTimeREF);
+  m_treeREF->SetBranchAddress("calPeakADC", &m_calPeakADCREF, &b_calPeakADCREF);
+  m_treeREF->SetBranchAddress("calPeakTime", &m_calPeakTimeREF, &b_calPeakTimeREF);
   m_treeREF->SetBranchAddress("pulseWidth", &m_pulseWidthREF, &b_pulseWidthREF);
 
   // read CHECK root file
@@ -99,22 +100,10 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   m_treeCHECK->SetBranchAddress("noiseEl", &m_noiseElCHECK, &b_noiseElCHECK);
   m_treeCHECK->SetBranchAddress("gain", &m_gainCHECK,  &b_gainCHECK);
   m_treeCHECK->SetBranchAddress("pedestal", &m_pedestalCHECK, &b_pedestalCHECK);
-  m_treeCHECK->SetBranchAddress("peakTime", &m_peakTimeCHECK, &b_peakTimeCHECK);
+  m_treeCHECK->SetBranchAddress("calPeakTime", &m_calPeakTimeCHECK, &b_calPeakTimeCHECK);
+  m_treeCHECK->SetBranchAddress("calPeakADC", &m_calPeakADCCHECK, &b_calPeakADCCHECK);
   m_treeCHECK->SetBranchAddress("pulseWidth", &m_pulseWidthCHECK, &b_pulseWidthCHECK);
 
-  /*
-  ///MASKS
-  m_h2MaskREF =  (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Mask");
-  m_h2MaskCHECK =  (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Mask");
-
-  TH1F template_mask("maskedDIFF_L@layerL@ladderS@sensor@view@apv",
-         //        "masked strip in @layer.@ladder.@sensor @view/@side APV @apv",
-         "masked strip in @layer.@ladder.@sensor @view/@side",
-         100, -1, 1);
-  template_mask.GetXaxis()->SetTitle("( ref - check )/ ref");
-  m_hMaskDIFF = new SVDAPVHistograms<TH1F>(template_mask);
-  setAPVHistoStyles(m_hMaskDIFF);
-  */
 
   ///NOISES
   m_h2NoiseREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Noise");
@@ -123,24 +112,41 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   TH1F template_noise("noiseDIFF_L@layerL@ladderS@sensor@view@apv",
                       //         "Noise Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                       "Noise Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                      100, -1, 1);
+                      200, -1, 1);
   template_noise.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hNoiseDIFF = new SVDAPVHistograms<TH1F>(template_noise);
   setAPVHistoStyles(m_hNoiseDIFF);
   m_hNoiseSummary = new SVDSummaryPlots("noiseSummary@view", "Noise Summary for @view/@side Side");
 
-  ///GAINS
-  m_h2GainREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Gain");
-  m_h2GainCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Gain");
 
-  TH1F template_gain("gainDIFF_L@layerL@ladderS@sensor@view@apv",
-                     //         "Gain Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
-                     "Gain Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                     100, -1, 1);
-  template_gain.GetXaxis()->SetTitle("( ref - check ) / ref");
-  m_hGainDIFF = new SVDAPVHistograms<TH1F>(template_gain);
-  setAPVHistoStyles(m_hGainDIFF);
-  m_hGainSummary = new SVDSummaryPlots("gainSummary@view", "Gain Summary for @view/@side Side");
+
+
+  ///CALPEAKTIMES
+  m_h2CalpeakTimeREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2CalPeakTime");
+  m_h2CalpeakTimeCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2CalPeakTime");
+
+  TH1F template_calpeakTime("calpeakTimeDIFF_L@layerL@ladderS@sensor@view@apv",
+                            //         "CalpeakTime Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
+                            "CalPeakTime Deviation Distribution in @layer.@ladder.@sensor @view/@side",
+                            500, -0.5, 0.5);
+  template_calpeakTime.GetXaxis()->SetTitle("( ref - check ) / ref");
+  m_hCalpeakTimeDIFF = new SVDAPVHistograms<TH1F>(template_calpeakTime);
+  setAPVHistoStyles(m_hCalpeakTimeDIFF);
+  m_hCalpeakTimeSummary = new SVDSummaryPlots("calPeakTimeSummary@view", "CalPeakTime Summary for @view/@side Side");
+
+  ///CALPEAKTIMES
+  m_h2CalpeakADCREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2CalPeakADC");
+  m_h2CalpeakADCCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2CalPeakADC");
+
+  TH1F template_calpeakADC("calpeakADCDIFF_L@layerL@ladderS@sensor@view@apv",
+                           //         "CalpeakADC Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
+                           "CalPeakADC Deviation Distribution in @layer.@ladder.@sensor @view/@side",
+                           500, -0.5, 0.5);
+  template_calpeakADC.GetXaxis()->SetTitle("( ref - check ) / ref");
+  m_hCalpeakADCDIFF = new SVDAPVHistograms<TH1F>(template_calpeakADC);
+  setAPVHistoStyles(m_hCalpeakADCDIFF);
+  m_hCalpeakADCSummary = new SVDSummaryPlots("calPeakADCSummary@view", "CalPeakADC Summary for @view/@side Side");
+
 
   ///PEDESTALS
   m_h2PedestalREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Pedestal");
@@ -149,7 +155,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   TH1F template_pedestal("pedestalDIFF_L@layerL@ladderS@sensor@view@apv",
                          //         "Pedestal Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                          "Pedestal Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                         100, -1, 1);
+                         100, -0.5, 0.5);
   template_pedestal.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hPedestalDIFF = new SVDAPVHistograms<TH1F>(template_pedestal);
   setAPVHistoStyles(m_hPedestalDIFF);
@@ -170,14 +176,15 @@ void SVDLocalCalibrationsCheckModule::event()
     VxdID theVxdID(m_layerREF, m_ladderREF, m_sensorREF);
     float diff = 0;
 
-    //    diff = (m_maskREF - m_maskCHECK)/ m_maskREF;
-    //    m_hMaskDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
 
     diff = (m_noiseREF - m_noiseCHECK) / m_noiseREF;
     m_hNoiseDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
 
-    diff = (m_gainREF - m_gainCHECK) / m_gainREF;
-    m_hGainDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
+    diff = (m_calPeakTimeREF - m_calPeakTimeCHECK) / m_calPeakTimeREF;
+    m_hCalpeakTimeDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
+
+    diff = (m_calPeakADCREF - m_calPeakADCCHECK) / m_calPeakADCREF;
+    m_hCalpeakADCDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
 
     diff = (m_pedestalREF - m_pedestalCHECK) / m_pedestalREF;
     m_hPedestalDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
@@ -216,17 +223,24 @@ void SVDLocalCalibrationsCheckModule::event()
         Belle2::VxdID theVxdID(layer, ladder, sensor);
         const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
 
+        TList* listEmpty = new TList;
+
         //noise
         TList* listNoiseUBAD = new TList;
         TList* listNoiseUGOOD = new TList;
         TList* listNoiseVBAD = new TList;
         TList* listNoiseVGOOD = new TList;
 
-        //gain
-        TList* listGainUBAD = new TList;
-        TList* listGainUGOOD = new TList;
-        TList* listGainVBAD = new TList;
-        TList* listGainVGOOD = new TList;
+
+        //calpeak
+        TList* listCalpeakADCUBAD = new TList;
+        TList* listCalpeakADCUGOOD = new TList;
+        TList* listCalpeakADCVBAD = new TList;
+        TList* listCalpeakADCVGOOD = new TList;
+
+        //calpeak
+        TList* listCalpeakTimeUGOOD = new TList;
+        TList* listCalpeakTimeVGOOD = new TList;
 
         //pedestal
         TList* listPedestalUBAD = new TList;
@@ -253,7 +267,7 @@ void SVDLocalCalibrationsCheckModule::event()
             if (problem)   {
               needPlot = true;
               B2INFO("WARNING, ONE APV has Noise problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
-                     ", APV number =" << m_APV << " problem ID = " << problem);
+                     ", APV number = " << m_APV << ", problem ID = " << problem);
               m_hNoiseSummary->fill(theVxdID, side, 1);
               if (side == 0)
                 listNoiseVBAD->Add(hNoise);
@@ -266,24 +280,34 @@ void SVDLocalCalibrationsCheckModule::event()
                 listNoiseUGOOD->Add(hNoise);
             }
 
-            //gain analysis
-            TH1F* hGain = m_hGainDIFF->getHistogram(theVxdID, side, m_APV);
-            problem = hasAnyProblem(hGain, m_cutGain_ave, m_cutGain_out);
+
+
+            //calpeak analysis
+            TH1F* hCalpeakADC = m_hCalpeakADCDIFF->getHistogram(theVxdID, side, m_APV);
+            problem = hasAnyProblem(hCalpeakADC, m_cutCalpeakADC_ave, m_cutCalpeakADC_out);
             if (problem)   {
               needPlot = true;
-              B2INFO("WARNING, ONE APV has Gain problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
+              B2INFO("WARNING, ONE APV has CalpeakADC problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
                      ", APV number =" << m_APV << " problem ID = " << problem);
-              m_hGainSummary->fill(theVxdID, side, 1);
+              m_hCalpeakADCSummary->fill(theVxdID, side, 1);
               if (side == 0)
-                listGainVBAD->Add(hGain);
+                listCalpeakADCVBAD->Add(hCalpeakADC);
               else
-                listGainUBAD->Add(hGain);
+                listCalpeakADCUBAD->Add(hCalpeakADC);
             } else {
               if (side == 0)
-                listGainVGOOD->Add(hGain);
+                listCalpeakADCVGOOD->Add(hCalpeakADC);
               else
-                listGainUGOOD->Add(hGain);
+                listCalpeakADCUGOOD->Add(hCalpeakADC);
             }
+
+            //calpeak plot
+            TH1F* hCalpeakTime = m_hCalpeakTimeDIFF->getHistogram(theVxdID, side, m_APV);
+            if (side == 0)
+              listCalpeakTimeVGOOD->Add(hCalpeakTime);
+            else
+              listCalpeakTimeUGOOD->Add(hCalpeakTime);
+
 
             //pedestal analysis
             TH1F* hPedestal = m_hPedestalDIFF->getHistogram(theVxdID, side, m_APV);
@@ -310,7 +334,8 @@ void SVDLocalCalibrationsCheckModule::event()
         }
         if (needPlot) {
           printPage(theVxdID, listNoiseUBAD, listNoiseVBAD, listNoiseUGOOD, listNoiseVGOOD, "Noise", isL3);
-          printPage(theVxdID, listGainUBAD, listGainVBAD, listGainUGOOD, listGainVGOOD, "Gain", isL3);
+          printPage(theVxdID, listCalpeakADCUBAD, listCalpeakADCVBAD, listCalpeakADCUGOOD, listCalpeakADCVGOOD, "CalpeakADC", isL3);
+          printPage(theVxdID, listEmpty, listEmpty, listCalpeakTimeUGOOD, listCalpeakTimeVGOOD, "CalpeakTime", isL3);
           printPage(theVxdID, listPedestalUBAD, listPedestalVBAD, listPedestalUGOOD, listPedestalVGOOD, "Pedestal", isL3);
         }
         ++itSvdSensors;
@@ -370,39 +395,56 @@ void SVDLocalCalibrationsCheckModule::printFirstPage()
   pt_input->Draw();
 
   TPaveText* pt_cuts_title = new TPaveText(.05, .65, .95, .7);
-  TPaveText* pt_cuts = new TPaveText(.05, .35, .8, .55);
+  TPaveText* pt_cuts = new TPaveText(.05, .15, .8, .60);
   char cuts[512];
-  sprintf(cuts, "%s", "algorithm parameters");
+  sprintf(cuts, "%s", "selection criteria");
   pt_cuts_title->AddText(cuts);
   pt_cuts_title->SetShadowColor(0);
   pt_cuts_title->SetBorderSize(0);
   pt_cuts_title->SetTextSize(0.03);
-  sprintf(cuts, "  An APV chip is selected as problematic if passes the criteria on Noise or Gain or Padestal");
+  sprintf(cuts, "  An APV chip is selected as problematic if passes the criteria on Noise or CalPeakADC or Pedestal");
   pt_cuts->AddText(cuts);
   // NOISE
-  sprintf(cuts, "  Selection criteria based on Noise: 1. or 2.");
+  sprintf(cuts, "  Noise: an APV is problematic if 1. or 2. or 3.");
   pt_cuts->AddText(cuts);
   sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutNoise_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with abs( (ref - check) / ref) ) > %1.2f",  m_cutN_out, m_cutNoise_out);
+  sprintf(cuts, "         2. more than %d strips with a value %1.2f higher than the value of the ref calibration",  m_cutN_out,
+          m_cutNoise_out);
   pt_cuts->AddText(cuts);
-  // GAIN
-  sprintf(cuts, "  Gain: ");
+  sprintf(cuts, "         3. more than %d strips with a value %1.2f lower than the value of the ref calibration",  m_cutN_out,
+          m_cutNoise_out);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutGain_ave);
+  // CALPEAK ADC
+  sprintf(cuts, "  CalPeakADC: an APV is problematic if 1. or 2. or 3.");
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with abs( (ref - check) / ref) ) > %1.2f",  m_cutN_out, m_cutGain_out);
+  sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutCalpeakADC_ave);
+  pt_cuts->AddText(cuts);
+  sprintf(cuts, "         2. more than %d strips with a value %1.2f higher than the value of the ref calibration",  m_cutN_out,
+          m_cutCalpeakADC_out);
+  pt_cuts->AddText(cuts);
+  sprintf(cuts, "         3. more than %d strips with a value %1.2f lower than the value of the ref calibration",  m_cutN_out,
+          m_cutCalpeakADC_out);
   pt_cuts->AddText(cuts);
   // PEDESTAL
-  sprintf(cuts, "  Pedestal: ");
+  sprintf(cuts, "  Pedestal: an APV is problematic if 1. or 2. or 3.");
   pt_cuts->AddText(cuts);
   sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutPedestal_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with abs( (ref - check) / ref) ) > %1.2f",  m_cutN_out,
+  sprintf(cuts, "         2. more than %d strips with a value %1.2f higher than the value of the ref calibration",  m_cutN_out,
+          m_cutPedestal_out);
+  pt_cuts->AddText(cuts);
+  sprintf(cuts, "         3. more than %d strips with a value %1.2f lower than the value of the ref calibration",  m_cutN_out,
           m_cutPedestal_out);
   pt_cuts->AddText(cuts);
   sprintf(cuts,
-          "where {ref,check}_ave is the variable averaged on one APV chip of the reference or the check calibration");
+          "  where:");
+  pt_cuts->AddText(cuts);
+  sprintf(cuts,
+          "        - {ref,check}_ave is the variable averaged on one APV chip of the reference or the check calibration");
+  pt_cuts->AddText(cuts);
+  sprintf(cuts,
+          "        - 1 2 and 3 are the problem ID printed on screen while running the python script");
   pt_cuts->AddText(cuts);
   pt_cuts->SetTextSize(0.02);
   pt_cuts->SetShadowColor(0);
@@ -455,40 +497,52 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   TH2F* checkU = nullptr;
   TH2F* checkV = nullptr;
 
-  //  listUBAD->Print();
-  //  listUGOOD->Print();
-  //  listVBAD->Print();
-  //  listVGOOD->Print();
+  Int_t minY = 0;
+  Int_t maxY = 0;
 
   if (variable == "Noise") {
     refU = m_h2NoiseREF->getHistogram(theVxdID, 1);
     refV = m_h2NoiseREF->getHistogram(theVxdID, 0);
     checkU = m_h2NoiseCHECK->getHistogram(theVxdID, 1);
     checkV = m_h2NoiseCHECK->getHistogram(theVxdID, 0);
-  } else   if (variable == "Gain") {
-    refU = m_h2GainREF->getHistogram(theVxdID, 1);
-    refV = m_h2GainREF->getHistogram(theVxdID, 0);
-    checkU = m_h2GainCHECK->getHistogram(theVxdID, 1);
-    checkV = m_h2GainCHECK->getHistogram(theVxdID, 0);
+    minY = refU->GetYaxis()->GetXmin();
+    maxY = refU->GetYaxis()->GetXmax();
+  } else   if (variable == "CalpeakADC") {
+    refU = m_h2CalpeakADCREF->getHistogram(theVxdID, 1);
+    refV = m_h2CalpeakADCREF->getHistogram(theVxdID, 0);
+    checkU = m_h2CalpeakADCCHECK->getHistogram(theVxdID, 1);
+    checkV = m_h2CalpeakADCCHECK->getHistogram(theVxdID, 0);
+    minY = refU->GetYaxis()->GetXmin();
+    maxY = refU->GetYaxis()->GetXmax();
+  } else   if (variable == "CalpeakTime") {
+    refU = m_h2CalpeakTimeREF->getHistogram(theVxdID, 1);
+    refV = m_h2CalpeakTimeREF->getHistogram(theVxdID, 0);
+    checkU = m_h2CalpeakTimeCHECK->getHistogram(theVxdID, 1);
+    checkV = m_h2CalpeakTimeCHECK->getHistogram(theVxdID, 0);
+    minY = refU->GetYaxis()->GetXmin();
+    maxY = refU->GetYaxis()->GetXmax();
   } else   if (variable == "Pedestal") {
     refU = m_h2PedestalREF->getHistogram(theVxdID, 1);
     refV = m_h2PedestalREF->getHistogram(theVxdID, 0);
     checkU = m_h2PedestalCHECK->getHistogram(theVxdID, 1);
     checkV = m_h2PedestalCHECK->getHistogram(theVxdID, 0);
-  } /*else if(variable == "Mask"){
-    refU = m_h2MaskREF->getHistogram(theVxdID, 1);
-    refV = m_h2MaskREF->getHistogram(theVxdID, 0);
-    checkU = m_h2MaskCHECK->getHistogram(theVxdID, 1);
-    checkV = m_h2MaskCHECK->getHistogram(theVxdID, 0);
-    } */
+    minY = refU->GetYaxis()->GetXmin();
+    maxY = refU->GetYaxis()->GetXmax();
+    minY = 250;
+    maxY = 500;
+  }
+  refU->GetYaxis()->SetRangeUser(minY, maxY);
+  refV->GetYaxis()->SetRangeUser(minY, maxY);
+  checkU->GetYaxis()->SetRangeUser(minY, maxY);
+  checkV->GetYaxis()->SetRangeUser(minY, maxY);
 
   refU->SetMarkerColor(kRed);
   refV->SetMarkerColor(kRed);
   checkU->SetMarkerColor(kBlue);
   checkV->SetMarkerColor(kBlue);
 
-  float min = refU->GetYaxis()->GetXmin();
-  float max = refU->GetYaxis()->GetXmax();
+  float min = minY;
+  float max = maxY;
 
   //create APVlines
   TLine l1(128, min, 128, max);
@@ -588,12 +642,12 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
       objDiff->Draw("same");
     count++;
   }
-  if (count > 0)
+  if (count > 0) {
     if (isL3)
       m_legU->Draw("same");
     else
       m_legV->Draw("same");
-
+  }
   c->cd();
   if (variable == "Noise")
     pt_sensorID->Draw("same");
@@ -684,6 +738,27 @@ void SVDLocalCalibrationsCheckModule::setAPVHistoStyles(SVDAPVHistograms<TH1F>* 
 void SVDLocalCalibrationsCheckModule::printSummaryPages()
 {
 
+  TPaveText* pt_cuts_title = new TPaveText(.05, .6, .95, .65);
+  TPaveText* pt_cuts = new TPaveText(.25, .5, .75, .6);
+  char cuts[512];
+  sprintf(cuts, "%s", "SUMMARY");
+  pt_cuts_title->SetShadowColor(0);
+  pt_cuts_title->SetBorderSize(0);
+  pt_cuts_title->SetTextSize(0.03);
+  pt_cuts_title->AddText(cuts);
+  sprintf(cuts, "each bin of the plots in the next pages contains the number of problematic  APV chips");
+  pt_cuts->AddText(cuts);
+  pt_cuts->SetTextSize(0.02);
+  pt_cuts->SetShadowColor(0);
+  pt_cuts->SetBorderSize(0);
+  pt_cuts->SetFillColor(10);
+  pt_cuts->SetTextAlign(12);
+
+  TCanvas* explain = new TCanvas();
+  pt_cuts_title->Draw();
+  pt_cuts->Draw();
+  explain->Print(m_outputPdfName.c_str());
+
   TCanvas* noise = new TCanvas();
   noise->SetGridx();
   noise->Divide(2, 2);
@@ -693,20 +768,22 @@ void SVDLocalCalibrationsCheckModule::printSummaryPages()
   m_hNoiseSummary->getHistogram(0)->Draw("colztext");
   noise->Print(m_outputPdfName.c_str());
 
-  TCanvas* gain = new TCanvas();
-  gain->Divide(2, 2);
-  gain->cd(1);
-  m_hGainSummary->getHistogram(1)->Draw("colztext");
-  gain->cd(3);
-  m_hGainSummary->getHistogram(0)->Draw("colztext");
-  gain->Print(m_outputPdfName.c_str());
+  TCanvas* calpeakADC = new TCanvas();
+  calpeakADC->Divide(2, 2);
+  calpeakADC->cd(1);
+  m_hCalpeakADCSummary->getHistogram(1)->Draw("colztext");
+  calpeakADC->cd(3);
+  m_hCalpeakADCSummary->getHistogram(0)->Draw("colztext");
+  calpeakADC->Print(m_outputPdfName.c_str());
+
+
 
   TCanvas* pedestal = new TCanvas();
   pedestal->Divide(2, 2);
   pedestal->cd(1);
-  m_hPedestalSummary->getHistogram(1)->Draw("text");
+  m_hPedestalSummary->getHistogram(1)->Draw("colztext");
   pedestal->cd(3);
-  m_hPedestalSummary->getHistogram(0)->Draw("text");
+  m_hPedestalSummary->getHistogram(0)->Draw("colztext");
   pedestal->Print(m_outputPdfName.c_str());
 
 

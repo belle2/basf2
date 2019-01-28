@@ -67,7 +67,8 @@ namespace Belle2 {
     TBranch* b_gainREF = nullptr; /**< strip gain*/
     TBranch* b_noiseREF = nullptr; /**< strip noise (ADC)*/
     TBranch* b_noiseElREF = nullptr; /**< strip noise (e-)*/
-    TBranch* b_peakTimeREF = nullptr; /**< strip peakTime*/
+    TBranch* b_calPeakADCREF = nullptr; /**< strip calPeakADC*/
+    TBranch* b_calPeakTimeREF = nullptr; /**< strip calPeakTime*/
     TBranch* b_pulseWidthREF = nullptr; /**< strip pulse width*/
 
     //branches CHECK
@@ -82,7 +83,8 @@ namespace Belle2 {
     TBranch* b_gainCHECK = nullptr; /**< strip gain*/
     TBranch* b_noiseCHECK = nullptr; /**< strip noise (ADC)*/
     TBranch* b_noiseElCHECK = nullptr; /**< strip noise (e-)*/
-    TBranch* b_peakTimeCHECK = nullptr; /**< strip peakTime*/
+    TBranch* b_calPeakTimeCHECK = nullptr; /**< strip calPeakTime*/
+    TBranch* b_calPeakADCCHECK = nullptr; /**< strip calPeakADC*/
     TBranch* b_pulseWidthCHECK = nullptr; /**< strip pulse width*/
 
 
@@ -98,7 +100,8 @@ namespace Belle2 {
     float m_noiseElREF = -1; /**< strip noise (e-)*/
     float m_pedestalREF = -1; /**< strip pedestal*/
     float m_gainREF = -1; /**< strip gain*/
-    float m_peakTimeREF = -1; /**< strip peak time*/
+    float m_calPeakTimeREF = -1; /**< strip peak time*/
+    float m_calPeakADCREF = -1; /**< strip peak time*/
     float m_pulseWidthREF = -1; /**< strip pulse width */
 
 
@@ -114,7 +117,8 @@ namespace Belle2 {
     float m_noiseElCHECK = -1; /**< strip noise (e-)*/
     float m_pedestalCHECK = -1; /**< strip pedestal*/
     float m_gainCHECK = -1; /**< strip gain*/
-    float m_peakTimeCHECK = -1; /**< strip peak time*/
+    float m_calPeakTimeCHECK = -1; /**< strip peak time*/
+    float m_calPeakADCCHECK = -1; /**< strip peak time*/
     float m_pulseWidthCHECK = -1; /**< strip pulse width */
 
     std::string m_rootFileNameREF = "SVDLocalCalibrationMonitor_experiment5_run92.root";   /**< root file name */
@@ -128,8 +132,8 @@ namespace Belle2 {
     int m_cutN_out = -1; /**< maximum number of allowed outliers */
     float m_cutNoise_ave = -1; /**< maximum relative deviation APV-average (noise)*/
     float m_cutNoise_out = -1; /**< maximum relative deviation strip  (noise)*/
-    float m_cutGain_ave = -1; /**< maximum relative deviation APV-average (gain)*/
-    float m_cutGain_out = -1; /**< maximum relative deviation strip  (gain)*/
+    float m_cutCalpeakADC_ave = -1; /**< maximum relative deviation APV-average (calpeak)*/
+    float m_cutCalpeakADC_out = -1; /**< maximum relative deviation strip  (calpeak)*/
     float m_cutPedestal_ave = -1; /**< maximum relative deviation APV-average (pedestal)*/
     float m_cutPedestal_out = -1; /**< maximum relative deviation strip  (pedestal)*/
 
@@ -167,6 +171,18 @@ namespace Belle2 {
     SVDHistograms<TH2F>* m_h2GainCHECK = nullptr; /**< gain VS strip 2D histo */
     SVDAPVHistograms<TH1F>* m_hGainDIFF = nullptr; /**< gain histo */
     SVDSummaryPlots* m_hGainSummary = nullptr; /**< gain summary  histo */
+
+    /** CALPEAKS */
+    SVDHistograms<TH2F>* m_h2CalpeakADCREF = nullptr; /**< calpeakADC VS strip 2D histo */
+    SVDHistograms<TH2F>* m_h2CalpeakADCCHECK = nullptr; /**< calpeakADC VS strip 2D histo */
+    SVDAPVHistograms<TH1F>* m_hCalpeakADCDIFF = nullptr; /**< calpeakADC histo */
+    SVDSummaryPlots* m_hCalpeakADCSummary = nullptr; /**< calpeakADC summary  histo */
+
+    /** CALPEAKS */
+    SVDHistograms<TH2F>* m_h2CalpeakTimeREF = nullptr; /**< calpeakTime VS strip 2D histo */
+    SVDHistograms<TH2F>* m_h2CalpeakTimeCHECK = nullptr; /**< calpeakTime VS strip 2D histo */
+    SVDAPVHistograms<TH1F>* m_hCalpeakTimeDIFF = nullptr; /**< calpeakTime histo */
+    SVDSummaryPlots* m_hCalpeakTimeSummary = nullptr; /**< calpeakTime summary  histo */
 
     /** PEDESTALS */
     SVDHistograms<TH2F>* m_h2PedestalREF = nullptr; /**< pedestal VS strip 2D histo */

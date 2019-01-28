@@ -111,6 +111,7 @@ pre_hotpixel_collector_path = create_path()
 pre_hotpixel_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
 pre_hotpixel_collector_path.add_module("Geometry", useDB=False)
 pre_hotpixel_collector_path.add_module('PXDUnpacker')
+pre_hotpixel_collector_path.add_module('PXDPostErrorChecker')
 pre_hotpixel_collector_path.add_module('Progress')
 # Create and configure the calibration algorithm
 hotpixel_algo = PXDHotPixelMaskCalibrationAlgorithm()
@@ -167,6 +168,7 @@ pre_charge_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2
 pre_charge_collector_path.add_module("Geometry", useDB=False)
 pre_charge_collector_path.add_module("ActivatePXDPixelMasker")
 pre_charge_collector_path.add_module("PXDUnpacker")
+pre_charge_collector_path.add_module('PXDPostErrorChecker')
 pre_charge_collector_path.add_module("PXDRawHitSorter")
 pre_charge_collector_path.add_module("PXDClusterizer")
 
@@ -177,7 +179,7 @@ landau_algo = PXDChargeCalibrationAlgorithm()
 landau_algo.minClusters = 5000      # Minimum number of collected clusters for estimating gains
 landau_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
 landau_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
-landau_algo.strategy = 1
+landau_algo.strategy = 1	    # 0: medians, 1: landau fit
 # We want to use a specific collector
 landau_algo.setPrefix("PXDClusterChargeCollector")
 
@@ -228,7 +230,7 @@ gain_algo = PXDGainCalibrationAlgorithm()
 gain_algo.minClusters = 3000      # Minimum number of collected clusters for estimating gains
 gain_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
 gain_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
-gain_algo.strategy = 1		 # use landau fit strategy
+gain_algo.strategy = 1		 # 0: median, 1: landau fit
 # We want to use a specific collector
 gain_algo.setPrefix("PXDClusterChargeCollector")
 

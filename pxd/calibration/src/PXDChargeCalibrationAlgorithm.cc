@@ -195,7 +195,6 @@ double PXDChargeCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigned sh
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
   const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
-
   // Vector with cluster signals from collected data
   vector<double> signals;
 
@@ -239,39 +238,36 @@ double PXDChargeCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 double PXDChargeCalibrationAlgorithm::FitLandau(vector<double>& signals)
 {
   auto size = signals.size();
+  if (size == 0) return 1.0; // Undefined, really.
 
   // get max and min values of vector
   int max = *max_element(signals.begin(), signals.end());
   int min = *min_element(signals.begin(), signals.end());
 
 
-  // create histogram to hold signals
+  // create histogram to hold signals and fill it
   TH1D* hist_signals = new TH1D("", "", max - min, min, max);
-  // create fit function
-  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
-  landau->SetParNames("MPV", "sigma", "scale");
-  landau->SetParameters(100, 1, 1000);
-  // fill histrogram
   for (auto it = signals.begin(); it != signals.end(); ++it) {
     hist_signals->Fill(*it);
   }
 
-  if (size == 0) {
-    return 1.0; // Undefined, really.
-  } else {
-    // restrict fit range to exclude low charge peak
-    Int_t status = hist_signals->Fit("landau", "Lq", "", 30, 350);
-    double MPV = landau->GetParameter("MPV");
+  // create fit function
+  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
+  landau->SetParNames("MPV", "sigma", "scale");
+  landau->SetParameters(100, 1, 1000);
 
-    delete hist_signals;
-    delete landau;
+  //do fit and get results, fit range restricted to exclude low charge peak
+  Int_t status = hist_signals->Fit("landau", "Lq", "", 30, 350);
+  double MPV = landau->GetParameter("MPV");
 
-    // check fit status
-    if (status == 0) return MPV;
+  // clean up
+  delete hist_signals;
+  delete landau;
 
-    else {
-      B2WARNING("Fit failed! using default value.");
-      return 1.0;
-    }
+  // check fit status
+  if (status == 0) return MPV;
+  else {
+    B2WARNING("Fit failed! using default value.");
+    return 1.0;
   }
 }

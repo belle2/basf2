@@ -361,37 +361,35 @@ double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 double PXDGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
 {
   auto size = signals.size();
-  // get max and min values of vector
+  if (size == 0) return 1.0; // Undefined, really.
+
+  // get max and min values of signal vector
   int max = *max_element(signals.begin(), signals.end());
   int min = *min_element(signals.begin(), signals.end());
 
-
-  // create histogram to hold signals
+  // create histogram to hold signals and fill it
   TH1D* hist_signals = new TH1D("", "", max - min, min, max);
-  // create fit function
-  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
-  landau->SetParNames("MPV", "sigma", "scale");
-  landau->SetParameters(100, 1, 1000);
-  // fill histrogram
   for (auto it = signals.begin(); it != signals.end(); ++it) {
     hist_signals->Fill(*it);
   }
 
-  if (size == 0) {
-    return 1.0; // Undefined, really.
-  } else {
+  // create fit function
+  TF1* landau = new TF1("landau", "TMath::Landau(x,[0],[1])*[2]", min, max);
+  landau->SetParNames("MPV", "sigma", "scale");
+  landau->SetParameters(100, 1, 1000);
 
-    Int_t status = hist_signals->Fit("landau", "Lq", "", 0, 350);
-    double MPV = landau->GetParameter("MPV");
+  // do fit and get results
+  Int_t status = hist_signals->Fit("landau", "Lq", "", 0, 350);
+  double MPV = landau->GetParameter("MPV");
 
-    delete hist_signals;
-    delete landau;
-    // check fit status
-    if (status == 0) return MPV;
+  // clean up
+  delete hist_signals;
+  delete landau;
 
-    else {
-      B2WARNING("Fit failed! using default value.");
-      return 1.0;
-    }
+  // check fit status
+  if (status == 0) return MPV;
+  else {
+    B2WARNING("Fit failed!. using default value.");
+    return 1.0;
   }
 }

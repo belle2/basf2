@@ -77,6 +77,7 @@ void KLMDQMModule::defineHistoEKLM()
   newDirectory = oldDirectory->mkdir(m_HistogramDirectoryNameEKLM.c_str());
   newDirectory->cd();
   m_Sector = new TH1F("sector", "Sector number", 104, 0.5, 104.5);
+  m_Sector->SetOption("LIVE");
   maxLayerGlobal = m_Elements->getMaximalLayerGlobalNumber();
   maxSector = m_Elements->getMaximalSectorNumber();
   maxPlane = m_Elements->getMaximalPlaneNumber();
@@ -93,6 +94,7 @@ void KLMDQMModule::defineHistoEKLM()
     m_StripLayer[i] = new TH1F(str.c_str(), str2.c_str(),
                                stripMax - stripMin + 1,
                                stripMin - 0.5, stripMax + 0.5);
+    m_StripLayer[i]->SetOption("LIVE");
   }
   oldDirectory->cd();
 }
@@ -179,14 +181,17 @@ void KLMDQMModule::defineHisto()
   /* Time histograms. */
   m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1023.5, 0.5);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
+  m_TimeRPC->SetOption("LIVE");
   m_TimeScintillatorBKLM =
     new TH1F("time_scintillator_bklm", "Scintillator hit time (BKLM)",
              100, -5000, -4000);
   m_TimeScintillatorBKLM->GetXaxis()->SetTitle("Time, ns");
+  m_TimeScintillatorBKLM->SetOption("LIVE");
   m_TimeScintillatorEKLM =
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
              100, -5000, -4000);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
+  m_TimeScintillatorEKLM->SetOption("LIVE");
   oldDirectory->cd();
   /* EKLM histograms. */
   defineHistoEKLM();

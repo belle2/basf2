@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# EKLM data quality monitor test.
+# KLM data quality monitor test.
 
 import basf2
 from daqdqm.commondqm import add_common_dqm

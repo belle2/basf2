@@ -89,7 +89,7 @@ namespace Belle2 {
     /** Directory for EKLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryNameEKLM;
 
-    /** Directory for EKLM DQM histograms in ROOT file. */
+    /** Directory for BKLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryNameBKLM;
 
     /** name of BKLMDigit store array. */

@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * EKLM data concentrator lane identifier.
+   * KLM time conversion.
    */
   class KLMTimeConversion : public TObject {
 

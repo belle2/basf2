@@ -525,3 +525,58 @@ def congratulator(success=None, failure=None, total=None, just_comment=False,
             int(success_rate),
             comment
         )
+
+
+def get_terminal_linewidth():
+    """ Returns linewidth of terminal. """
+    try:
+        linewidth = os.get_terminal_size(0)[0]
+    except OSError:
+        linewidth = os.get_terminal_size(1)[0]
+    return linewidth
+
+
+def terminal_title_line(title="", subtitle="", level=0):
+    """ Print a title line in the terminal.
+
+    Args:
+        title (str): The title. If no title is given, only a separating line
+            is printed.
+        level (int): The lower, the more dominantly the line will be styled.
+    """
+    linewidth = get_terminal_linewidth()
+
+    # using the markdown title underlining chars for lack of better
+    # alternatives
+    char_dict = {
+        0: "=",
+        1: "-",
+        2: "~"
+    }
+
+    for key in sorted(char_dict.keys(), reverse=True):
+        if level >= key:
+            char = char_dict[key]
+            break
+    else:
+        # below minimum, shouldn't happen but anyway
+        char = char_dict[0]
+
+    line = char * linewidth
+    if not title:
+        return line
+
+    # guess we could make a bit more effort with indenting/handling long titles
+    # capitalization etc., but for now:
+    ret = line + "\n"
+    ret += title.capitalize() + "\n"
+    if subtitle:
+        ret += subtitle + "\n"
+    ret += line
+    return ret
+
+
+if __name__ == "__main__":
+    print(terminal_title_line("test"))
+    print("test")
+    print(terminal_title_line())

@@ -26,7 +26,7 @@ import json_objects
 import validationpath
 from validationplotuple import Plotuple
 from validationfunctions import index_from_revision, get_style, \
-    available_revisions
+    available_revisions, terminal_title_line
 import validationfunctions
 try:
     import simplejson as json
@@ -307,9 +307,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     for i, package in enumerate(sorted(packages)):
 
         # Some information to be printed out while the plots are created
-        print("*" * 80)
-        print('Creating plots for package: {0}'.format(package))
-        print("*" * 80)
+        print(terminal_title_line(
+            'Creating plots for package: {0}'.format(package),
+            level=1
+        ))
 
         # A list of all objects (including reference objects) that
         # belong to the current package
@@ -508,10 +509,10 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
     :return: None
     """
     print()
-    print("*" * 80)
-    print("Summary of plotting")
-    print("*" * 80)
-    print()
+    print(terminal_title_line(
+        "Summary of plotting",
+        level=0
+    ))
 
     print("Total number of plotuples considered: {}".format(len(plotuples)))
 

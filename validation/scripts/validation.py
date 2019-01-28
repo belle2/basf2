@@ -25,7 +25,8 @@ import pprint
 
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, \
-    scripts_in_dir, parse_cmd_line_arguments, get_log_file_paths
+    scripts_in_dir, parse_cmd_line_arguments, get_log_file_paths, \
+    terminal_title_line
 import validationfunctions
 
 import validationserver
@@ -772,9 +773,9 @@ class Validation:
         ]
 
         self.log.note("")
-        self.log.note("*" * 80)
-        self.log.note("Summary of script execution")
-        self.log.note("*" * 80)
+        self.log.note(terminal_title_line(
+            "Summary of script execution", level=0
+        ))
         self.log.note("")
         if skipped_scripts:
             self.log.note("{}/{} scripts were skipped".format(

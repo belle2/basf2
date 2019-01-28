@@ -20,10 +20,12 @@ REG_MODULE(KLMDQM)
 
 KLMDQMModule::KLMDQMModule() :
   HistoModule(),
+  m_TimeRPC(nullptr),
+  m_TimeScintillatorBKLM(nullptr),
+  m_TimeScintillatorEKLM(nullptr),
   h_layerHits(nullptr),
   h_ctime(nullptr),
   h_simtime(nullptr),
-  h_time(nullptr),
   h_simEDep(nullptr),
   h_eDep(nullptr),
   h_simNPixel(nullptr),
@@ -41,6 +43,9 @@ KLMDQMModule::KLMDQMModule() :
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("histogramDirectoryName", m_HistogramDirectoryName,
+           "Directory for KLM DQM histograms in ROOT file.",
+           std::string("KLM"));
   addParam("histogramDirectoryNameEKLM", m_HistogramDirectoryNameEKLM,
            "Directory for EKLM DQM histograms in ROOT file.",
            std::string("EKLM"));
@@ -51,7 +56,6 @@ KLMDQMModule::KLMDQMModule() :
            "Name of BKLMDigit store array", std::string("BKLMDigits"));
   m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
   m_Sector = nullptr;
-  m_Time = nullptr;
   m_StripLayer = nullptr;
 }
 
@@ -73,7 +77,6 @@ void KLMDQMModule::defineHistoEKLM()
   newDirectory = oldDirectory->mkdir(m_HistogramDirectoryNameEKLM.c_str());
   newDirectory->cd();
   m_Sector = new TH1F("sector", "Sector number", 104, 0.5, 104.5);
-  m_Time = new TH1F("time", "Hit time", 50, 0, 50);
   maxLayerGlobal = m_Elements->getMaximalLayerGlobalNumber();
   maxSector = m_Elements->getMaximalSectorNumber();
   maxPlane = m_Elements->getMaximalPlaneNumber();
@@ -108,10 +111,6 @@ void KLMDQMModule::defineHistoBKLM()
   h_simtime = new TH1F("simtime", "MC simulation event hit time",
                        100, 0, 1000);
   h_simtime->GetXaxis()->SetTitle("time [ns]");
-  h_time = new TH1F("time", "Reconstructed hit time relative to trigger",
-                    100, 0, 1000);
-  h_time->GetXaxis()->SetTitle("time [ns]");
-  h_time->SetOption("LIVE");
   h_simEDep = new TH1F("simEDep", "MC simulation pulse height",
                        25, 0, 25);
   h_simEDep->GetXaxis()->SetTitle("pulse height [MeV]");
@@ -173,7 +172,25 @@ void KLMDQMModule::defineHistoBKLM()
 
 void KLMDQMModule::defineHisto()
 {
+  TDirectory* oldDirectory, *newDirectory;
+  oldDirectory = gDirectory;
+  newDirectory = oldDirectory->mkdir(m_HistogramDirectoryName.c_str());
+  newDirectory->cd();
+  /* Time histograms. */
+  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1023.5, 0.5);
+  m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
+  m_TimeScintillatorBKLM =
+    new TH1F("time_scintillator_bklm", "Scintillator hit time (BKLM)",
+             100, -5000, -4000);
+  m_TimeScintillatorBKLM->GetXaxis()->SetTitle("Time, ns");
+  m_TimeScintillatorEKLM =
+    new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
+             100, -5000, -4000);
+  m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
+  oldDirectory->cd();
+  /* EKLM histograms. */
   defineHistoEKLM();
+  /* BKLM histograms. */
   defineHistoBKLM();
 }
 
@@ -188,11 +205,33 @@ void KLMDQMModule::initialize()
 void KLMDQMModule::beginRun()
 {
   int i, n;
+  /* Common histograms. */
+  m_TimeRPC->Reset();
+  m_TimeScintillatorBKLM->Reset();
+  m_TimeScintillatorEKLM->Reset();
+  /* EKLM. */
   m_Sector->Reset();
-  m_Time->Reset();
   n = m_Elements->getMaximalLayerGlobalNumber();
   for (i = 0; i < n; i++)
     m_StripLayer[i]->Reset();
+  /* BKLN. */
+  h_layerHits->Reset();
+  h_ctime->Reset();
+  h_simtime->Reset();
+  h_simEDep->Reset();
+  h_eDep->Reset();
+  h_simNPixel->Reset();
+  h_nPixel->Reset();
+  h_moduleID->Reset();
+  h_zStrips->Reset();
+  h_phiStrip->Reset();
+  h_sector->Reset();
+  h_layer->Reset();
+  h_rBKLMHit2ds->Reset();
+  h_zBKLMHit2ds->Reset();
+  h_yvsxBKLMHit2ds->Reset();
+  h_xvszBKLMHit2ds->Reset();
+  h_yvszBKLMHit2ds->Reset();
 }
 
 void KLMDQMModule::event()
@@ -221,7 +260,7 @@ void KLMDQMModule::event()
     stripGlobal = m_Elements->stripNumber(endcap, layer, sector, plane, strip);
     m_Sector->Fill(sectorGlobal);
     m_StripLayer[detectorLayer - 1]->Fill(stripGlobal);
-    m_Time->Fill(eklmDigit->getTime());
+    m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
   }
   /* BKLM. */
   StoreArray<BKLMDigit> digits(m_outputDigitsName);
@@ -231,7 +270,10 @@ void KLMDQMModule::event()
     h_layerHits->Fill(digit->getModuleID());
     h_ctime->Fill(digit->getCTime());
     h_simtime->Fill(digit->getSimTime());
-    h_time->Fill(digit->getTime());
+    if (digit->inRPC())
+      m_TimeRPC->Fill(digit->getTime());
+    else
+      m_TimeScintillatorBKLM->Fill(digit->getTime());
     h_simEDep->Fill(digit->getSimEDep());
     h_eDep->Fill(digit->getEDep());
     h_simNPixel->Fill(digit->getSimNPixel());

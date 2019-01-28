@@ -83,6 +83,9 @@ namespace Belle2 {
      */
     void defineHistoBKLM();
 
+    /** Directory for KLM DQM histograms in ROOT file. */
+    std::string m_HistogramDirectoryName;
+
     /** Directory for EKLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryNameEKLM;
 
@@ -101,11 +104,17 @@ namespace Belle2 {
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
 
+    /** Time: BKLM RPCs. */
+    TH1F* m_TimeRPC;
+
+    /** Time: BKLM scintillators. */
+    TH1F* m_TimeScintillatorBKLM;
+
+    /** Time: EKLM scintillators. */
+    TH1F* m_TimeScintillatorEKLM;
+
     /** Sector number. */
     TH1F* m_Sector;
-
-    /** Hit time. */
-    TH1F* m_Time;
 
     /** Strip number within a layer. */
     TH1F** m_StripLayer;
@@ -118,9 +127,6 @@ namespace Belle2 {
 
     /** Histogram: MC simulation event hit time. */
     TH1F* h_simtime;
-
-    /** Histogram: Reconstructed hit time relative to trigger. */
-    TH1F* h_time;
 
     /** Histogram: MC simulation pulse height. */
     TH1F* h_simEDep;

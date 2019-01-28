@@ -3,7 +3,8 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Alon Hershenhorn, Torben Ferber                          *
+ * Contributors: Torben Ferber                                            *
+ *               Alon Hershenhorn                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -240,12 +241,12 @@ namespace Belle2 {
     double eclEnergy3BWDEndcap(const Particle* particle);
 
     /**
-     * Returns the ECL weighted average time of the photon daughters of the provided particle
+     * Returns the ECL weighted average time of the daughters of the provided particle
      */
     double weightedAverageECLTime(const Particle* particle);
 
     /**
-     * Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time
+     * Returns the maximum weighted distance between the individual ECL time and the ECL average time of all daughters
      */
     double maxWeightedDistanceFromAverageECLTime(const Particle* particle);
 

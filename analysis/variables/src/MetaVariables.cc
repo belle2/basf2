@@ -1673,10 +1673,14 @@ point numbers. Currently the only supported operations are addtion (``+``),
 subtraction (``-``), multiplication (``*``), division (``/``) and power (``^``
 or ``**``). Parenthesis can be in the form of square brackets ``[v1 * v2]``
 or normal brackets ``(v1 * v2)``. It will work also with variables taking
-arguments. Operator precedence is taken into account. For example::
+arguments. Operator precedence is taken into account. For example ::
 
     (daughter(0, E) + daughter(1, E))**2 - p**2 + 0.138
 
+.. versionchanged:: release-03-00-00
+   now both, ``[]`` and ``()`` can be used for grouping operations, ``**`` can
+   be used for exponent and float literals are possible directly in the
+   formula.
 )DOCSTRING");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"

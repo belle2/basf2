@@ -1,6 +1,6 @@
-=========
+========
 Analysis
-=========
+========
 
 The analysis package collects modules and tools for high-level analysis of Belle II data.
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
@@ -83,15 +83,12 @@ Truth-matching
 
 .. toctree:: MCMatching
 
-How to Veto
-===========
-
-.. toctree:: HowToVeto
-
 Advanced Topics
 ===============
 
 .. toctree:: RestOfEvent
+
+.. toctree:: HowToVeto
 
 .. toctree:: FlavorTagger
 

@@ -326,7 +326,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 
   vector< vector< FullSecID > > sectors;
 
-//   sectors.resize(uSup.size() + 1);
   sectors.resize(config.uSectorDivider.size());
   unsigned nSectorsInU = config.uSectorDivider.size(),
            nSectorsInV = config.vSectorDivider.size();
@@ -365,7 +364,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   if (std::find(config.allowedLayers.begin(), config.allowedLayers.end(), 0) != config.allowedLayers.end()) {
     std::vector<double> uCuts4vIP = {}, vCuts4vIP = {};
     sectors.clear();
-    sectors = {{0}};
+    sectors = {{ FullSecID(0) }};
     segmentFilters->addSectorsOnSensor(uCuts4vIP, vCuts4vIP, sectors);
   }
 

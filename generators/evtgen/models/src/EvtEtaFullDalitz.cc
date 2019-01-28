@@ -27,6 +27,7 @@
 
 namespace Belle2 {
 
+  /** register the model in EvtGen */
   B2_EVTGEN_REGISTER_MODEL(EvtEtaFullDalitz);
 
 

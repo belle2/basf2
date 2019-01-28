@@ -1,0 +1,53 @@
+# EventType: 114306010
+# Descriptor: [B0 -> D- pi+ pi- pi+ ]cc
+# NickName: Bd_D-_pi+pi-pi+
+# Documentation: One of the neutral B decays needed for flavorTag validation and
+#                B lifetime studies on data
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Sviatoslav Bilokin
+# Email:  sviatoslav.bilokin@iphc.cnrs.fr 
+# Cuts: None
+# Date: 20190122
+
+Alias MyD- D-
+Alias MyD+ D+
+ChargeConj MyD+ MyD- 
+
+Alias MyB0 B0
+Alias Myanti-B0 anti-B0
+ChargeConj MyB0 Myanti-B0
+
+Alias Mya_1- a_1-
+Alias Mya_1+ a_1+
+ChargeConj Mya_1+ Mya_1- 
+
+Alias MyK_S0 K_S0
+
+Decay Upsilon(4S)
+1.000    MyB0 Myanti-B0 B0  anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay MyB0
+1.000    MyD-  a_1+  PHSP;
+Enddecay
+CDecay Myanti-B0
+
+Decay MyD-
+0.50    MyK_S0  pi-        PHSP;
+0.50    K+      pi-   pi-  D_DALITZ;
+Enddecay
+CDecay MyD+
+
+Decay Mya_1-
+1.000    pi- pi- pi+  PHSP;
+Enddecay
+CDecay Mya_1+
+
+Decay MyK_S0
+1.000    pi- pi+ PHSP;
+Enddecay
+
+
+End
+

@@ -31,18 +31,13 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** Constructor */
     InclusiveBtagReconstructionModule();
-
-    /**  */
+    /** Destructor */
     virtual ~InclusiveBtagReconstructionModule();
-
-    /**  */
+    /** initialize the module (setup the data store) */
     virtual void initialize() override;
-
-    /**  */
+    /** process event */
     virtual void event() override;
 
 

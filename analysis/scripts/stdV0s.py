@@ -95,8 +95,8 @@ def mergedLambdas(prioritiseV0=True, path=analysis_main):
 
     ::
 
-        from stdV0s import stdKshorts
-        help(stdKshorts)
+        from stdV0s import stdLambdas
+        help(stdLambdas)
 
     Parameters:
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?

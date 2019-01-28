@@ -2,15 +2,15 @@ import subprocess
 from skimExpertFunctions import *
 
 all_skims = [
-    "BtoPi0Pi0", "ALP3Gamma", "BottomoniumEtabExclusive", "BottomoniumUpsilon", "TauGeneric", "Semileptonic", "Quarkonium",
+    "BtoPi0Pi0", "ALP3Gamma", "BottomoniumEtabExclusive", "BottomoniumUpsilon", "TauGeneric",
     "SystematicsRadMuMu", "SystematicsRadEE", "LFVZpInvisible", "LFVZpVisible",
     "SinglePhotonDark", "SystematicsTracking", "BottomoniumUpsilon",
     "BottomoniumEtabExclusive", "SystematicsLambda", "Systematics",
     "Resonance", "ISRpipicc", "BtoDh_Kspipipi0", "BtoPi0Pi0",
-    "BottomoniumEtabExclusive", "BottomoniumUpsilon",
+    "CharmSemileptonic", "BottomoniumEtabExclusive", "BottomoniumUpsilon",
     "feiSLB0WithOneLep", "feiBplusWithOneLep", "feiHadronicB0",
-    "feiHadronicBplus", "Charm3BodyHadronic2",
-    "Charm3BodyHadronic", "Charm3BodyHadronicD0", "Charm2BodyHadronic",
+    "feiHadronicBplus", "Charm3BodyHadronic", "Charm3BodyHadronic2",
+    "Charm3BodyHadronic1", "Charm3BodyHadronic3", "Charm2BodyHadronic",
     "Charm2BodyNeutrals", "Charm2BodyNeutralsD0", "BtoDh_Kspi0", "BtoDh_hh",
     "BtoDh_Kshh", "PRsemileptonicUntagged", "SLUntagged",
     "LeptonicUntagged", "TCPV", "CharmRare", "BtoXll", "BtoXgamma", "TauLFV",

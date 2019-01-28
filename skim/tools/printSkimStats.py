@@ -21,7 +21,7 @@
       (taking into account the total number of input mdst files available per sample.)
 
  To run printSkimStats.py, you need to have run your skim on a set of input mDST files
- (you can use skimRun.csh), and produce a set of uDST and log files with the following
+ (you can use runSkims.py), and produce a set of uDST and log files with the following
  name scheme:
   SkimName_SampleName.udst.root
   SkimName_SampleName.out

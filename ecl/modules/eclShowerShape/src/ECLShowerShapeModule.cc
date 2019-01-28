@@ -107,8 +107,8 @@ void ECLShowerShapeModule::initializeMVAweightFiles(const std::string& identifie
 void ECLShowerShapeModule::initialize()
 {
   // Initialize neighbour maps.
-  m_neighbourMap9 = new ECLNeighbours("N", 1);
-  m_neighbourMap21 = new ECLNeighbours("NC", 2);
+  m_neighbourMap9 = std::unique_ptr<ECL::ECLNeighbours>(new ECL::ECLNeighbours("N", 1));
+  m_neighbourMap21 = std::unique_ptr<ECL::ECLNeighbours>(new ECL::ECLNeighbours("NC", 2));
 
   initializeMVAweightFiles(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD);
   initializeMVAweightFiles(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL);
@@ -362,8 +362,7 @@ void ECLShowerShapeModule::endRun()
 
 void ECLShowerShapeModule::terminate()
 {
-  if (m_neighbourMap9) delete m_neighbourMap9;
-  if (m_neighbourMap21) delete m_neighbourMap21;
+
 }
 
 double ECLShowerShapeModule::computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits,

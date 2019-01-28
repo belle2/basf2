@@ -231,11 +231,11 @@ namespace Belle2 {
         (dynamic_cast<NewFitterGSL*>(pfitter))->setDebug(debugfitter);
       } else {
         B2FATAL("ParticleKinematicFitterModule:  " << m_orcaFitterEngine << " is an invalid OrcaKinFit fitter engine!");
+        return false;
       }
 
       if (!pfitter) return false;
-
-      BaseFitter& fitter = *pfitter;
+      BaseFitter& fitter(*pfitter);
 
       // reset fitter
       resetFitter(fitter);
@@ -313,7 +313,7 @@ namespace Belle2 {
         }
       }
 
-      if (pfitter) delete pfitter;
+      delete pfitter;
       return true;
     }
 

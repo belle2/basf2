@@ -50,7 +50,7 @@ class VariablesToHDF5(basf2.Module):
         self._plist = Belle2.PyStoreObj(self._listname)
         self._plist.isRequired()
 
-        # create hdf5 file
+        #: The hdf5 file
         self._hdf5file = tables.open_file(self._filename, mode="w", title="Belle2 Variables to HDF5")
         if not self._hdf5file:
             basf2.B2ERROR("Cannot create output file")
@@ -61,12 +61,14 @@ class VariablesToHDF5(basf2.Module):
             # only float variables for now
             dtype.append((v.name, np.float64))
 
+        #: The data type
         self._dtype = dtype
         filters = tables.Filters(complevel=1, complib='blosc:lz4', fletcher32=False)
         # some variable names are not just A-Za-z0-9 so pytables complains but
         # seems to work. Ignore warning
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
+            #: The pytable
             self._table = self._hdf5file.create_table("/", self._listname, obj=np.zeros(0, dtype), filters=filters)
 
     def event(self):

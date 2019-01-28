@@ -6,6 +6,9 @@ import argparse
 import os
 import sys
 
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
 from validationplots import create_plots
 
 # Only execute the program if a basf2 release is set up!
@@ -14,14 +17,18 @@ if os.environ.get('BELLE2_RELEASE', None) is None:
 
 # Define the accepted command line flags and read them in
 parser = argparse.ArgumentParser()
-parser.add_argument("-r", "--revisions", help="Takes a list of revisions ("
-                                              "separated by spaces) and "
-                                              "generates the plots for them",
-                    type=str, nargs='*')
-parser.add_argument("-f", "--force", help="Regenerates plots even if the "
-                                          "requested combination exists "
-                                          "already",
-                    action='store_true')
+parser.add_argument(
+    "-r",
+    "--revisions",
+    help="Takes a list of revisions (separated by spaces) and generates the "\
+         "plots for them",
+    type=str, nargs='*')
+parser.add_argument(
+    "-f",
+    "--force",
+    help="Regenerates plots even if the requested combination exists already",
+    action='store_true'
+)
 args = parser.parse_args()
 
 # Go to the html directory and call the create_plots function

@@ -135,7 +135,7 @@ namespace Belle2 {
 
   private:
 
-    const int m_apvColors[6] = { 1, 2, 8 , 9, 6, 28};
+    const int m_apvColors[6] = { 1, 2, 8 , kBlue, 6, 28};
     void   setAPVHistoStyles(SVDAPVHistograms<TH1F>* m_APVhistos);
 
     void createLegends();
@@ -145,7 +145,7 @@ namespace Belle2 {
 
     void printFirstPage();
     void printLayerPage(int layer);
-    void printPage(VxdID theVxdID, TList* listUBAD, TList* listVBAD, TList* listUGOOD, TList* listVGOOD, TString variable);
+    void printPage(VxdID theVxdID, TList* listUBAD, TList* listVBAD, TList* listUGOOD, TList* listVGOOD, TString variable, bool isL3);
     void printSummaryPages();
     void printLastPage();
 

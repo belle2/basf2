@@ -124,7 +124,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
                       //         "Noise Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                       "Noise Deviation Distribution in @layer.@ladder.@sensor @view/@side",
                       100, -1, 1);
-  template_noise.GetXaxis()->SetTitle("( ref - check )/ ref");
+  template_noise.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hNoiseDIFF = new SVDAPVHistograms<TH1F>(template_noise);
   setAPVHistoStyles(m_hNoiseDIFF);
   m_hNoiseSummary = new SVDSummaryPlots("noiseSummary@view", "Noise Summary for @view/@side Side");
@@ -136,8 +136,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   TH1F template_gain("gainDIFF_L@layerL@ladderS@sensor@view@apv",
                      //         "Gain Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                      "Gain Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                     100, -2, 2);
-  template_gain.GetXaxis()->SetTitle("( ref - check )/ ref");
+                     100, -1, 1);
+  template_gain.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hGainDIFF = new SVDAPVHistograms<TH1F>(template_gain);
   setAPVHistoStyles(m_hGainDIFF);
   m_hGainSummary = new SVDSummaryPlots("gainSummary@view", "Gain Summary for @view/@side Side");
@@ -150,7 +150,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
                          //         "Pedestal Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                          "Pedestal Deviation Distribution in @layer.@ladder.@sensor @view/@side",
                          100, -1, 1);
-  template_pedestal.GetXaxis()->SetTitle("( ref - check )/ ref");
+  template_pedestal.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hPedestalDIFF = new SVDAPVHistograms<TH1F>(template_pedestal);
   setAPVHistoStyles(m_hPedestalDIFF);
   m_hPedestalSummary = new SVDSummaryPlots("pedestalSummary@view", "Pedestal Summary for @view/@side Side");
@@ -191,8 +191,13 @@ void SVDLocalCalibrationsCheckModule::event()
 
   while ((itSvdLayers != svdLayers.end()) && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
 
+    bool isL3 = false;
+
     int layer = itSvdLayers->getLayerNumber();
     printLayerPage(layer);
+
+    if (layer == 3)
+      isL3 = true;
 
     std::set<Belle2::VxdID> svdLadders = aGeometry.getLadders(*itSvdLayers);
     std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();
@@ -304,9 +309,9 @@ void SVDLocalCalibrationsCheckModule::event()
           }
         }
         if (needPlot) {
-          printPage(theVxdID, listNoiseUBAD, listNoiseVBAD, listNoiseUGOOD, listNoiseVGOOD, "Noise");
-          printPage(theVxdID, listGainUBAD, listGainVBAD, listGainUGOOD, listGainVGOOD, "Gain");
-          printPage(theVxdID, listPedestalUBAD, listPedestalVBAD, listPedestalUGOOD, listPedestalVGOOD, "Pedestal");
+          printPage(theVxdID, listNoiseUBAD, listNoiseVBAD, listNoiseUGOOD, listNoiseVGOOD, "Noise", isL3);
+          printPage(theVxdID, listGainUBAD, listGainVBAD, listGainUGOOD, listGainVGOOD, "Gain", isL3);
+          printPage(theVxdID, listPedestalUBAD, listPedestalVBAD, listPedestalUGOOD, listPedestalVGOOD, "Pedestal", isL3);
         }
         ++itSvdSensors;
       }
@@ -372,34 +377,32 @@ void SVDLocalCalibrationsCheckModule::printFirstPage()
   pt_cuts_title->SetShadowColor(0);
   pt_cuts_title->SetBorderSize(0);
   pt_cuts_title->SetTextSize(0.03);
+  sprintf(cuts, "  An APV chip is selected as problematic if passes the criteria on Noise or Gain or Padestal");
+  pt_cuts->AddText(cuts);
   // NOISE
-  sprintf(cuts, "  Noise: ");
+  sprintf(cuts, "  Selection criteria based on Noise: 1. or 2.");
   pt_cuts->AddText(cuts);
   sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutNoise_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutN_out, m_cutNoise_out);
-  pt_cuts->AddText(cuts);
-  sprintf(cuts, "           where {ref,check}_ave is the noise averaged on one APV chip of the reference or the check calibration");
+  sprintf(cuts, "         2. more than %d strips with abs( (ref - check) / ref) ) > %1.2f",  m_cutN_out, m_cutNoise_out);
   pt_cuts->AddText(cuts);
   // GAIN
   sprintf(cuts, "  Gain: ");
   pt_cuts->AddText(cuts);
   sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutGain_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutN_out, m_cutGain_out);
-  pt_cuts->AddText(cuts);
-  sprintf(cuts, "           where {ref,check}_ave is the gain averaged on one APV chip of the reference or the check calibration");
+  sprintf(cuts, "         2. more than %d strips with abs( (ref - check) / ref) ) > %1.2f",  m_cutN_out, m_cutGain_out);
   pt_cuts->AddText(cuts);
   // PEDESTAL
   sprintf(cuts, "  Pedestal: ");
   pt_cuts->AddText(cuts);
   sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutPedestal_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutN_out,
+  sprintf(cuts, "         2. more than %d strips with abs( (ref - check) / ref) ) > %1.2f",  m_cutN_out,
           m_cutPedestal_out);
   pt_cuts->AddText(cuts);
   sprintf(cuts,
-          "           where {ref,check}_ave is the pedestal averaged on one APV chip of the reference or the check calibration");
+          "where {ref,check}_ave is the variable averaged on one APV chip of the reference or the check calibration");
   pt_cuts->AddText(cuts);
   pt_cuts->SetTextSize(0.02);
   pt_cuts->SetShadowColor(0);
@@ -444,7 +447,7 @@ void SVDLocalCalibrationsCheckModule::printLayerPage(int layer)
 }
 
 void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD, TList* listVBAD, TList* listUGOOD,
-                                                TList* listVGOOD, TString variable)
+                                                TList* listVGOOD, TString variable, bool isL3)
 {
 
   TH2F* refU = nullptr;
@@ -499,6 +502,18 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   l4.SetLineColor(15);
   l5.SetLineColor(15);
   TCanvas* c = new TCanvas();
+  TPaveText* pt_sensorID = new TPaveText(.495, 0.485, .505, 0.505, "blNDC");
+  char name[50];
+  sprintf(name, "%d.%d.%.d", theVxdID.getLayerNumber(), theVxdID.getLadderNumber(), theVxdID.getSensorNumber());
+  pt_sensorID->AddText(name);
+  pt_sensorID->SetTextFont(82);
+  pt_sensorID->SetTextColor(kBlack);
+  pt_sensorID->SetShadowColor(0);
+  pt_sensorID->SetFillColor(10);
+  pt_sensorID->SetBorderSize(0);
+  pt_sensorID->SetTextSize(0.08);
+
+
   c->Divide(2, 2);
   c->cd(1);
   refU->Draw();
@@ -542,6 +557,11 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   l1.Draw("same");
   l2.Draw("same");
   l3.Draw("same");
+  if (isL3) {
+    l4.Draw("same");
+    l5.Draw("same");
+  }
+
   refV->Draw("same");
   checkV->Draw("same");
   m_leg2D->Draw("same");
@@ -569,8 +589,14 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     count++;
   }
   if (count > 0)
-    m_legV->Draw("same");
+    if (isL3)
+      m_legU->Draw("same");
+    else
+      m_legV->Draw("same");
 
+  c->cd();
+  if (variable == "Noise")
+    pt_sensorID->Draw("same");
   c->Print(m_outputPdfName.c_str());
 
 }

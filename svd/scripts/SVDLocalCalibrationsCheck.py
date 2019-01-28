@@ -36,11 +36,11 @@ mod.param('reference_root', str(the_ref))
 mod.param('check_root', str(the_check))
 mod.param('outputPdfName', 'SVDLocalCalibrationCheck.pdf')
 mod.param('cutN_outliers', 1)
-mod.param('cutNoise_average', 0.1)
+mod.param('cutNoise_average', 0.05)
 mod.param('cutNoise_outliers', 0.3)
-mod.param('cutGain_average', 0.1)
+mod.param('cutGain_average', 0.01)  # 0.025
 mod.param('cutGain_outliers', 0.3)
-mod.param('cutPedestal_average', 0.1)
+mod.param('cutPedestal_average', 0.01)  # 0.02
 mod.param('cutPedestal_outliers', 0.3)
 main.add_module(mod)
 

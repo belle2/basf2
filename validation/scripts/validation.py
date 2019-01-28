@@ -776,23 +776,26 @@ class Validation:
         self.log.note(terminal_title_line(
             "Summary of script execution", level=0
         ))
+        self.log.note("Total number of scripts: {}".format(len(self.scripts)))
         self.log.note("")
         if skipped_scripts:
             self.log.note("{}/{} scripts were skipped".format(
                 len(skipped_scripts), len(self.scripts)))
-            self.log.note("\n".join(skipped_scripts))
+            for s in skipped_scripts:
+                self.log.note("* {}".format(s))
             self.log.note("")
         else:
-            self.log.note("No scripts were skipped.")
+            self.log.note("No scripts were skipped. Nice!")
             self.log.note("")
 
         if failed_scripts:
             self.log.note("{}/{} scripts failed".format(
                 len(failed_scripts), len(self.scripts)))
-            self.log.note("\n".join(failed_scripts))
+            for s in failed_scripts:
+                self.log.note("* {}".format(s))
             self.log.note("")
         else:
-            self.log.note("No scripts failed.")
+            self.log.note("No scripts failed. Nice!")
             self.log.note("")
 
         print(validationfunctions.congratulator(

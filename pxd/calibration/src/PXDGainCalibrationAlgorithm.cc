@@ -182,14 +182,15 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     } else {
       B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfHits << " < " << minClusters <<
                 "). Use default gain.");
-      gainMapPar->setContent(sensorID.getID(), uBin, vBin, 0.0);
+      gainMapPar->setContent(sensorID.getID(), uBin, vBin, 1.0);
     }
     pxdSensors.insert(sensorID);
   }
 
   // Post processing of gain map. It is possible that the gain
   // computation failed on some parts. Here, we replace default
-  // values by local averages of neighboring sensor parts.
+  // values (1.0) by local averages of neighboring sensor parts.
+
   for (const auto& sensorID : pxdSensors) {
     for (unsigned short vBin = 0; vBin < nBinsV; ++vBin) {
       float meanGain = 0;
@@ -198,7 +199,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
       for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
         auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
         // Filter default gains
-        if (gain != 0.0) {
+        if (gain != 1.0) {
           nGood += 1;
           meanGain += gain;
         } else {
@@ -213,7 +214,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
         meanGain /= nGood;
         for (unsigned short uBin = 0; uBin < nBinsU; ++uBin) {
           auto gain = gainMapPar->getContent(sensorID.getID(), uBin, vBin);
-          if (gain == 0.0) {
+          if (gain == 1.0) {
             gainMapPar->setContent(sensorID.getID(), uBin, vBin, meanGain);
             B2RESULT("Gain calibration on sensor=" << sensorID << ", vBin=" << vBin << " uBin " << uBin << ": Replace default gain wih average "
                      << meanGain);
@@ -256,16 +257,24 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   }
 
   double dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
-  double mcMedian = 1;
-  if (dataMedian < 0) {
+  double mcMedian;
+  // check if dataMedian makes sense
+  if (dataMedian <= 0.0) {
     B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
-              ". Set gain to default value (=0.0) as well.");
-    return 0.0;
+              ". Set gain to default value (=1.0) as well.");
+    return 1.0;
   }
   if (strategy == 0) mcMedian = CalculateMedian(mc_signals);
   else if (strategy == 1) mcMedian = FitLandau(mc_signals);
   else {
     B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
+  }
+
+  // check if mcMedian makes sense
+  if (mcMedian <= 0.0) {
+    B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
+              ". Set gain to default value (=1.0) as well.");
+    return 1.0;
   }
 
 
@@ -346,7 +355,7 @@ double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
   auto size = signals.size();
 
   if (size == 0) {
-    return 1.0;  // Undefined, really.
+    return 0.0;  // Undefined, really.
   } else {
     sort(signals.begin(), signals.end());
     if (size % 2 == 0) {
@@ -360,7 +369,7 @@ double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 double PXDGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
 {
   auto size = signals.size();
-  if (size == 0) return 1.0; // Undefined, really.
+  if (size == 0) return 0.0; // Undefined, really.
 
   // get max and min values of signal vector
   int max = *max_element(signals.begin(), signals.end());
@@ -389,6 +398,6 @@ double PXDGainCalibrationAlgorithm::FitLandau(vector<double>& signals)
   if (status == 0) return MPV;
   else {
     B2WARNING("Fit failed!. using default value.");
-    return 1.0;
+    return 0.0;
   }
 }

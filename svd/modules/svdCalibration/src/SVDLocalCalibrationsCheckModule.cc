@@ -116,7 +116,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   template_noise.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hNoiseDIFF = new SVDAPVHistograms<TH1F>(template_noise);
   setAPVHistoStyles(m_hNoiseDIFF);
-  m_hNoiseSummary = new SVDSummaryPlots("noiseSummary@view", "Noise Summary for @view/@side Side");
+  m_hNoiseSummary = new SVDSummaryPlots("noiseSummary@view", "Number of problematic APV chips due to Noise for @view/@side Side");
 
 
 
@@ -132,7 +132,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   template_calpeakTime.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hCalpeakTimeDIFF = new SVDAPVHistograms<TH1F>(template_calpeakTime);
   setAPVHistoStyles(m_hCalpeakTimeDIFF);
-  m_hCalpeakTimeSummary = new SVDSummaryPlots("calPeakTimeSummary@view", "CalPeakTime Summary for @view/@side Side");
+  m_hCalpeakTimeSummary = new SVDSummaryPlots("calPeakTimeSummary@view",
+                                              "Number of problematic APV chips due to CalPeakTime for @view/@side Side for @view/@side Side");
 
   ///CALPEAKTIMES
   m_h2CalpeakADCREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2CalPeakADC");
@@ -145,7 +146,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   template_calpeakADC.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hCalpeakADCDIFF = new SVDAPVHistograms<TH1F>(template_calpeakADC);
   setAPVHistoStyles(m_hCalpeakADCDIFF);
-  m_hCalpeakADCSummary = new SVDSummaryPlots("calPeakADCSummary@view", "CalPeakADC Summary for @view/@side Side");
+  m_hCalpeakADCSummary = new SVDSummaryPlots("calPeakADCSummary@view",
+                                             "Number of problematic APV chips due to CalPeakADC for @view/@side Side");
 
 
   ///PEDESTALS
@@ -159,7 +161,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   template_pedestal.GetXaxis()->SetTitle("( ref - check ) / ref");
   m_hPedestalDIFF = new SVDAPVHistograms<TH1F>(template_pedestal);
   setAPVHistoStyles(m_hPedestalDIFF);
-  m_hPedestalSummary = new SVDSummaryPlots("pedestalSummary@view", "Pedestal Summary for @view/@side Side");
+  m_hPedestalSummary = new SVDSummaryPlots("pedestalSummary@view",
+                                           "Number of problematic APV chips due to Pedestal for @view/@side Side");
 
   createLegends();
 }
@@ -765,14 +768,16 @@ void SVDLocalCalibrationsCheckModule::printSummaryPages()
 {
 
   TPaveText* pt_cuts_title = new TPaveText(.05, .6, .95, .65);
-  TPaveText* pt_cuts = new TPaveText(.25, .5, .75, .6);
+  TPaveText* pt_cuts = new TPaveText(.15, .5, .85, .55);
   char cuts[512];
   sprintf(cuts, "%s", "SUMMARY");
   pt_cuts_title->SetShadowColor(0);
   pt_cuts_title->SetBorderSize(0);
   pt_cuts_title->SetTextSize(0.03);
   pt_cuts_title->AddText(cuts);
-  sprintf(cuts, "each bin of the plots in the next pages contains the number of problematic  APV chips");
+  sprintf(cuts, "each bin of the plots in the next pages contains the number of problematic  APV chips of the sensor");
+  pt_cuts->AddText(cuts);
+  sprintf(cuts, "corresponding to the combination of column (ladder number) and row (layer and sensor number)");
   pt_cuts->AddText(cuts);
   pt_cuts->SetTextSize(0.02);
   pt_cuts->SetShadowColor(0);

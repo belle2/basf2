@@ -3,14 +3,20 @@
 
 #######################################################
 #
-# This script validates the flavor tagger using
-# the Rest Of Event of the following decay chain:
+# This script produces nTuple files using input mdst files
+# to validate the flavor tagger and the vertex
+# reconstrcution of B0 mesons.
+# The Rest Of Event of the following decay chain is built:
 #
 # B0 -> J/psi Ks
 #        |    |
 #        |    +-> pi+ pi-
 #        |
 #        +-> mu+ mu-
+#
+# The procedure for the benchmark channel
+# B0 -> nu_tau anti-nu_tau
+# is also defined.
 #
 # Contributor: F. Abudinen (Dec 2018)
 #
@@ -29,25 +35,29 @@ import os
 
 belleOrBelle2Flag = str(sys.argv[1])  # "Belle" or "Belle2"
 mode = str(sys.argv[2])  # "Sampler", "Teacher" or "Expert"
-decayChannel = str(sys.argv[3])  # "JPsiKs" or "nunubar"
-MCtype = str(sys.argv[4])  # BGx0 for background free MC otherwise BGx1, BelleDataConv for Converted Belle Data
-fileNumber = str(sys.argv[5])  # A file number (when sampling in parallel)
-workingDirectory = str(sys.argv[6])  # Place where the training samples and the weight files are saved
-savingDirectory = str(sys.argv[7])  # Place where the analyzed files are saved
-doVertex = str(sys.argv[8])  # Reconstruct B vertices True or False
+decayChannelTrainedOn = str(sys.argv[3])  # Decay channel of the weight files "JPsiKs" or "nunubar"
+decayChannel = str(sys.argv[4])  # Decay channel that will be reconstructed "JPsiKs" or "nunubar"
+MCtype = str(sys.argv[5])  # BGx0 for background free MC otherwise BGx1, BelleDataConv for Converted Belle Data
+fileNumber = str(sys.argv[6])  # A file number (when sampling in parallel)
+workingDirectory = str(sys.argv[7])  # Place where the training samples and the weight files are saved
+savingDirectory = str(sys.argv[8])  # Place where the analyzed files are saved
+doVertex = str(sys.argv[9])  # Reconstruct B vertices True or False
 
 belleData = ''
-if len(sys.argv) > 9:
-    if sys.argv[9] != "BelleDataConv":
-        B2FATAL("argv[9] only for Belle Data in Expert mode")
-    elif sys.argv[9] == "BelleDataConv" and belleOrBelle2Flag != "Belle" and mode != "Expert":
-        B2FATAL("argv[9]=BelleDataConv only for Belle Data in Expert mode")
+if len(sys.argv) > 10:
+    if sys.argv[10] != "BelleDataConv":
+        B2FATAL("argv[10] only for Belle Data in Expert mode")
+    elif sys.argv[10] == "BelleDataConv" and belleOrBelle2Flag != "Belle" and mode != "Expert":
+        B2FATAL("argv[10]=BelleDataConv only for Belle Data in Expert mode")
     else:
-        belleData = sys.argv[9]
+        belleData = sys.argv[10]
 
 if belleOrBelle2Flag == "Belle":
     from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
 
+
+if decayChannelTrainedOn == 'JPsiKs':
+    decayChannelTrainedOn = 'JpsiKs_mu'
 
 # workingDirectory = '.'
 
@@ -134,7 +144,7 @@ def applyCPVTools(mode='Expert'):
         ft.flavorTagger(
             particleLists=['B0:sig'],
             mode=mode,
-            weightFiles='B2JpsiKs_mu' + MCtype,
+            weightFiles='B2' + decayChannelTrainedOn + MCtype,
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
             belleOrBelle2=belleOrBelle2Flag,
             workingDirectory=workingDirectory,
@@ -146,7 +156,7 @@ def applyCPVTools(mode='Expert'):
         ft.flavorTagger(
             particleLists=['B0:sig'],
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-            weightFiles='B2JpsiKs_mu' + MCtype,
+            weightFiles='B2' + decayChannelTrainedOn + MCtype,
             belleOrBelle2=belleOrBelle2Flag,
             downloadFromDatabaseIfNotfound=True,
             workingDirectory=workingDirectory,
@@ -156,8 +166,9 @@ def applyCPVTools(mode='Expert'):
     if doVertex == 'True' or mode == 'Expert':
 
         if doVertex == 'True':
-            vx.vertexRave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
-                          constraint='', path=ft_val_path)
+            if decayChannel == "JPsiKs":
+                vx.vertexRave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+                              constraint='', path=ft_val_path)
             vx.TagV(list_name='B0:sig', MCassociation='breco', path=ft_val_path)
             print("TagV will be used")
 
@@ -165,21 +176,23 @@ def applyCPVTools(mode='Expert'):
     fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
     jpsiandk0s_vars = vc.mc_truth
     vertex_vars = vc.vertex + vc.mc_vertex + vc.kinematics + vc.mc_kinematics
-    bvars = vc.event_meta_data + \
-        vc.reco_stats + \
+    bvars = vc.reco_stats + \
         vc.deltae_mbc + \
         vc.mc_truth + \
         vc.roe_multiplicities + \
         vc.flavor_tagging + \
         vc.tag_vertex + \
         vc.mc_tag_vertex + \
-        vertex_vars + \
-        vu.create_aliases_for_selected(list_of_variables=fs_vars,
-                                       decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
-        vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
-                                       decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]') + \
-        vu.create_aliases_for_selected(list_of_variables=vertex_vars,
-                                       decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
+        vertex_vars
+
+    if decayChannel == "JPsiKs":
+        bvars = bvars + \
+            vu.create_aliases_for_selected(list_of_variables=fs_vars,
+                                           decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+            vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
+                                           decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]') + \
+            vu.create_aliases_for_selected(list_of_variables=vertex_vars,
+                                           decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
 
     # Saving variables to ntuple
     ma.variablesToNtuple(decayString='B0:sig',
@@ -211,7 +224,7 @@ if mode == "Teacher":
     ft.flavorTagger(
         particleLists=[],
         mode='Teacher',
-        weightFiles='B2JpsiKs_mu' + MCtype,
+        weightFiles='B2' + decayChannelTrainedOn + MCtype,
         combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
         belleOrBelle2=belleOrBelle2Flag,
         downloadFromDatabaseIfNotfound=True,

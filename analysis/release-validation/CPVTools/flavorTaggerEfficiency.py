@@ -694,7 +694,6 @@ for method in methods:
 
 print(ft.eventLevelParticleLists)
 
-# needs the B0Tagger.root-file from combiner teacher
 
 print('******************************************* MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES ' +
       '**********************************************')

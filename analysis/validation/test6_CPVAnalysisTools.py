@@ -14,70 +14,81 @@
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
-from basf2 import *
-from flavorTagger import *
-from variables import variables
+import basf2 as b2
+import modularAnalysis as ma
+import flavorTagger as ft
+import vertex as vx
+import variables.collections as vc
+import variables.utils as vu
 import sys
+import os
+
+# create path
+cp_val_path = b2.create_path()
 
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)
 inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst10_BGx1_b2jpsiks.root')
-inputMdst('default', inputFile)
+ma.inputMdst(environmentType='default', filename=inputFile, path=cp_val_path)
 
-# inputMdst('default', '../mdst10_BGx1_b2jpsiks.root')
+# ma.inputMdst(environmentType='default', filename='../mdst10_BGx1_b2jpsiks.root', path=cp_val_path)
 
 # Reconstruction of signal side and MC match
-fillParticleList('pi+:all', '')
-fillParticleList('mu+:all', '')
+ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
+ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)
 
-reconstructDecay('K_S0:pipi -> pi+:all pi-:all', 'dM<0.25')
-reconstructDecay('J/psi:mumu -> mu+:all mu-:all', 'dM<0.11')
-reconstructDecay('B0:jpsiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.2 and abs(deltaE)<0.2')
+ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
+ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=cp_val_path)
+ma.reconstructDecay(decayString='B0:jpsiks -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.2', path=cp_val_path)
 
-matchMCTruth('B0:jpsiks')
+ma.matchMCTruth(list_name='B0:jpsiks', path=cp_val_path)
 
 # build the rest of the event associated to the B0
-buildRestOfEvent('B0:jpsiks')
+ma.buildRestOfEvent(target_list_name='B0:jpsiks', path=cp_val_path)
 
 # Get Special GT for the flavor tagger weight files
-use_central_database("analysis_AAT-parameters_release-01-02-03")
+b2.use_central_database("analysis_AAT-parameters_release-01-02-03")
 
 # Flavor Tagger, Vertex of Signal Side and TagV
-flavorTagger(
+ft.flavorTagger(
     particleLists=['B0:jpsiks'],
-    weightFiles='B2JpsiKs_muBGx1')
+    weightFiles='B2JpsiKs_muBGx1',
+    path=cp_val_path)
 
-vertexRave('B0:jpsiks', 0.0, 'B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', '')
-TagV('B0:jpsiks', MCassociation='breco')
+vx.vertexRave(list_name='B0:jpsiks', conf_level=0.0,
+              decay_string='B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', constraint='', path=cp_val_path)
+vx.TagV(list_name='B0:jpsiks', MCassociation='breco', path=cp_val_path)
 
-toolsDST = ['EventMetaData', '^B0']
-toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
-toolsDST += ['RecoStats', '^B0']
-toolsDST += ['MCVertex', '^B0']
-toolsDST += ['Vertex', '^B0']
-toolsDST += ['MCTagVertex', '^B0']
-toolsDST += ['TagVertex', '^B0']
-toolsDST += ['MCDeltaT', '^B0']
-toolsDST += ['DeltaT', '^B0']
-toolsDST += ['DeltaEMbc', '^B0']
-toolsDST += ['InvMass', '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]']
-toolsDST += ['CustomFloats[isSignal]', '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]']
-toolsDST += ['PDGCode', '^B0']
-toolsDST += ['CMSKinematics', '^B0']
-toolsDST += ['MCHierarchy', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['TrackHits', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['ROEMultiplicities', '^B0']
+# Select variables that will be stored to ntuple
+fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
+jpsiandk0s_vars = vc.mc_truth
+vertex_vars = vc.vertex + vc.mc_vertex + vc.kinematics + vc.mc_kinematics
+bvars = vc.reco_stats + \
+    vc.deltae_mbc + \
+    vc.mc_truth + \
+    vc.roe_multiplicities + \
+    vc.flavor_tagging + \
+    vc.tag_vertex + \
+    vc.mc_tag_vertex + \
+    vertex_vars + \
+    vu.create_aliases_for_selected(list_of_variables=fs_vars,
+                                   decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
+                                   decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]') + \
+    vu.create_aliases_for_selected(list_of_variables=vertex_vars,
+                                   decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
 
-ntupleFile('../CPVToolsOutput.root')
-ntupleTree('B0tree', 'B0:jpsiks', toolsDST)
+# Saving variables to ntuple
+ma.variablesToNtuple(decayString='B0:jpsiks',
+                     variables=bvars,
+                     filename='../CPVToolsOutput.root',
+                     treename='B0tree',
+                     path=cp_val_path)
 
-summaryOfLists(['B0:jpsiks'])
+ma.summaryOfLists(particleLists=['B0:jpsiks'], path=cp_val_path)
 
 # Process the events
-process(analysis_main)
+ma.process(cp_val_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

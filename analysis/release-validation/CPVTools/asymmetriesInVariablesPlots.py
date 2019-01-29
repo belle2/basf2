@@ -20,8 +20,9 @@ import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 from ROOT import Belle2
+import sys
 import flavorTagger as ft
-from flavorTaggerEfficiency import r_subsample, r_size, categories
+from defaultEvaluationParameters import r_subsample, r_size, categories
 from inputVariablesPlots import variablesPlotParamsDict
 import basf2_mva
 from array import array
@@ -35,8 +36,8 @@ mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 import math
-import sys
 import glob
+import os
 
 if len(sys.argv) != 4:
     sys.exit("Must provide 3 arguments: [Belle or Belle2] [BGx0 or BGx1] [workingDirectory]"
@@ -50,35 +51,9 @@ filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
 weightFiles = 'B2JpsiKs_mu' + MCtype
 
-
-class Quiet:
-    """Context handler class to quiet errors in a 'with' statement"""
-
-    def __init__(self, level=ROOT.kInfo + 1):
-        """Class constructor"""
-        #: the level to quiet
-        self.level = level
-
-    def __enter__(self):
-        """Enter the context"""
-        #: the previously set level to be ignored
-        self.oldlevel = ROOT.gErrorIgnoreLevel
-        ROOT.gErrorIgnoreLevel = self.level
-
-    def __exit__(self, type, value, traceback):
-        """Exit the context"""
-        ROOT.gErrorIgnoreLevel = self.oldlevel
-
-
 ROOT.TH1.SetDefaultSumw2()
 
 allInputVariables = []
-
-
-ft.setBelleOrBelle2(belleOrBelle2)
-ft.WhichCategories(categories)
-
-ft.setVariables()
 
 belleOrBelle2Flag = belleOrBelle2
 
@@ -144,7 +119,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
                 continue
 
             categoryInputVariables.append(managerVariableName)
-            if managerVariableName in variables[category]:
+            if managerVariableName in ft.variables[category]:
                 allInputVariables.append((category, managerVariableName))
                 trulyUsedInputVariables.append((category, managerVariableName))
 

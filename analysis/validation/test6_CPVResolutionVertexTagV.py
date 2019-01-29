@@ -17,16 +17,10 @@
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
-from basf2 import *
-from flavorTagger import *
 import numpy as np
-import matplotlib as mpl
-mpl.use('Agg')
-mpl.rcParams['text.usetex'] = True
-mpl.rcParams['text.latex.unicode'] = True
-import matplotlib.pyplot as plt
 import pylab
 import sys
+import glob
 import math
 import random
 import array
@@ -65,14 +59,14 @@ outputNtuple.SetAlias('Contact', "abudinen@mpp.mpg.de, ligioi@mpp.mpg.de")
 
 # No PXD hit equired: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
 # Hit required for both muon tracks: PXD2 (SVD2)"
-PXDReqs = ["PXD0", "PXD2"]
+VXDReqs = ["PXD0", "PXD2"]
 
 
 fitResults = []
 fitResultsForNtuple = []
 numberOfEntries = []
 
-for PXDReq in PXDReqs:
+for VXDReq in VXDReqs:
     iResult = []
 
     tdat = ROOT.TChain(treename)
@@ -82,34 +76,23 @@ for PXDReq in PXDReqs:
 
     evt_no = ROOT.RooRealVar("evt_no", "evt_no", 0., -10., 10000000.)
 
-    B0_DeltaT = ROOT.RooRealVar("B0_DeltaT", "B0_DeltaT", 0.)
-    deltaTErr = ROOT.RooRealVar("B0_DeltaTErr", "B0_DeltaTErr", 0, limDeltaTErr, "ps")
-    B0_TruthDeltaT = ROOT.RooRealVar("B0_TruthDeltaT", "B0_TruthDeltaT", 0.)
+    B0_DeltaT = ROOT.RooRealVar("DeltaT", "DeltaT", 0.)
+    deltaTErr = ROOT.RooRealVar("DeltaTErr", "DeltaTErr", 0, limDeltaTErr, "ps")
+    B0_TruthDeltaT = ROOT.RooRealVar("MCDeltaT", "MCDeltaT", 0.)
 
-    B0_mcPDG = ROOT.RooRealVar("B0_mcPDG", "B0_mcPDG", 0., -1000., 1000.)
-    B0_mcTagPDG = ROOT.RooRealVar("B0_mcTagPDG", "B0_mcTagPDG", 0., -1000., 1000.)
-    B0_qrMC = ROOT.RooRealVar("B0_qrMC", "B0_qrMC", 0., -100, 100)
-    B0_mcErrors = ROOT.RooRealVar("B0_mcErrors", "B0_mcErrors", 0., 0., 512.)
-    B0_isSignal = ROOT.RooRealVar("B0_isSignal", "B0_isSignal", 0., 0., 512.)
+    B0_qrMC = ROOT.RooRealVar("qrMC", "qrMC", 0., -100, 100)
+    B0_isSignal = ROOT.RooRealVar("isSignal", "isSignal", 0., 0., 512.)
 
-    B0_TagVx = ROOT.RooRealVar("B0_TagVx", "B0_TagVx", 0., -100, 100, "cm")
-    B0_TruthTagVx = ROOT.RooRealVar("B0_TruthTagVx", "B0_TruthTagVx", 0., -100, 100, "cm")
-    B0_TagVy = ROOT.RooRealVar("B0_TagVy", "B0_TagVy", 0., -100, 100, "cm")
-    B0_TruthTagVy = ROOT.RooRealVar("B0_TruthTagVy", "B0_TruthTagVy", 0., -100, 100, "cm")
-    B0_TagVz = ROOT.RooRealVar("B0_TagVz", "B0_TagVz", 0., -100, 100, "cm")
-    B0_TruthTagVz = ROOT.RooRealVar("B0_TruthTagVz", "B0_TruthTagVz", 0., -100, 100, "cm")
+    B0_TagVz = ROOT.RooRealVar("TagVz", "TagVz", 0., -100, 100, "cm")
+    B0_TruthTagVz = ROOT.RooRealVar("mcTagVz", "mcTagVz", 0., -100, 100, "cm")
 
-    B0_X = ROOT.RooRealVar("B0_X", "B0_X", 0., -100, 100, "cm")
-    B0_TruthX = ROOT.RooRealVar("B0_TruthX", "B0_TruthX", 0., -100, 100, "cm")
-    B0_Y = ROOT.RooRealVar("B0_Y", "B0_Y", 0., -100, 100, "cm")
-    B0_TruthY = ROOT.RooRealVar("B0_TruthY", "B0_TruthY", 0., -100, 100, "cm")
-    B0_Z = ROOT.RooRealVar("B0_Z", "B0_Z", 0., -100, 100, "cm")
-    B0_TruthZ = ROOT.RooRealVar("B0_TruthZ", "B0_TruthZ", 0., -100, 100, "cm")
+    B0_Z = ROOT.RooRealVar("z", "z", 0., -100, 100, "cm")
+    B0_TruthZ = ROOT.RooRealVar("mcZ", "mcZ", 0., -100, 100, "cm")
 
-    B0_Jpsi_mu0_nPXDHits = ROOT.RooRealVar("B0_Jpsi_mu0_nPXDHits", "B0_Jpsi_mu0_nPXDHits", 1., -10., 100.)
-    B0_Jpsi_mu1_nPXDHits = ROOT.RooRealVar("B0_Jpsi_mu1_nPXDHits", "B0_Jpsi_mu1_nPXDHits", 1., -10., 100.)
-    B0_Jpsi_mu0_nSVDHits = ROOT.RooRealVar("B0_Jpsi_mu0_nSVDHits", "B0_Jpsi_mu0_nSVDHits", 1., -10., 100.)
-    B0_Jpsi_mu1_nSVDHits = ROOT.RooRealVar("B0_Jpsi_mu1_nSVDHits", "B0_Jpsi_mu1_nSVDHits", 1., -10., 100.)
+    B0_Jpsi_mu0_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_0_d0_d0_nPXDHits", "Jpsi_mu_0_0_d0_d0_nPXDHits", 1., -10., 100.)
+    B0_Jpsi_mu1_nPXDHits = ROOT.RooRealVar("Jpsi_mu_0_1_d0_d1_nPXDHits", "Jpsi_mu_0_1_d0_d1_nPXDHits", 1., -10., 100.)
+    B0_Jpsi_mu0_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_0_d0_d0_nSVDHits", "Jpsi_mu_0_0_d0_d0_nSVDHits", 1., -10., 100.)
+    B0_Jpsi_mu1_nSVDHits = ROOT.RooRealVar("Jpsi_mu_0_1_d0_d1_nSVDHits", "Jpsi_mu_0_1_d0_d1_nSVDHits", 1., -10., 100.)
 
     # B0_Jpsi_mu0_firstSVDLayer = ROOT.RooRealVar("B0_Jpsi_mu0__firstSVDLayer", "B0_pi0_e1__firstSVDLayer", 1., -10., 100.)
     # B0_Jpsi_mu1_firstSVDLayer = ROOT.RooRealVar("B0_Jpsi_mu1__firstSVDLayer", "B0_pi0_e0__firstSVDLayer", 1., -10., 100.)
@@ -120,31 +103,31 @@ for PXDReq in PXDReqs:
     DTagZ = ROOT.RooRealVar("DSigZ", "DSigZ", 0., -limZTag, limZTag, "cm")
     # DTagZ = ROOT.RooFormulaVar("DTagZ", "DTagZ", "@@0-@@1", ROOT.RooArgList(B0_TagVz, B0_TruthTagVz))
 
-    histo_DeltaT = ROOT.TH1F('B0_DeltaT_' + PXDReq, 'Residual of DeltaT',
+    histo_DeltaT = ROOT.TH1F('B0_DeltaT_' + VXDReq, 'Residual of DeltaT',
                              100, -limDeltaT, limDeltaT)
-    histo_DeltaTErr = ROOT.TH1F('B0_DeltaTErr_' + PXDReq, 'Residual of DeltaZsig',
+    histo_DeltaTErr = ROOT.TH1F('B0_DeltaTErr_' + VXDReq, 'Residual of DeltaZsig',
                                 100, 0, 30)
-    histo_DeltaZSig = ROOT.TH1F('B0_DeltaZsig_' + PXDReq, 'Residual of DeltaZsig',
+    histo_DeltaZSig = ROOT.TH1F('B0_DeltaZsig_' + VXDReq, 'Residual of DeltaZsig',
                                 100, -limZSig, limZSig)
-    histo_DeltaZTag = ROOT.TH1F('B0_DeltaZtag_' + PXDReq, 'Residual of DeltaZsig',
+    histo_DeltaZTag = ROOT.TH1F('B0_DeltaZtag_' + VXDReq, 'Residual of DeltaZsig',
                                 100, -limZTag, limZTag)
 
-    cut = "B0_isSignal == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
+    cut = "isSignal == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
 
-    if PXDReq == 'PXD1':
-        cut = cut + "&& (B0_Jpsi_mu0_nPXDHits> 0 || B0_Jpsi_mu1_nPXDHits> 0) "
-    if PXDReq == 'PXD2':
-        cut = cut + "&& B0_Jpsi_mu0_nPXDHits> 0 && B0_Jpsi_mu1_nPXDHits> 0 "
+    if VXDReq == 'PXD1':
+        cut = cut + "&& (Jpsi_mu_0_0_d0_d0_nPXDHits> 0 || Jpsi_mu_0_1_d0_d1_nPXDHits> 0) "
+    if VXDReq == 'PXD2':
+        cut = cut + "&& Jpsi_mu_0_0_d0_d0_nPXDHits> 0 && Jpsi_mu_0_1_d0_d1_nPXDHits> 0 "
 
-    if PXDReq == 'SVD1':
-        cut = cut + "&& (B0_Jpsi_mu0_nSVDHits> 0 || B0_Jpsi_mu1_nSVDHits> 0) "
-    if PXDReq == 'SVD2':
-        cut = cut + "&& B0_Jpsi_mu0_nSVDHits> 0 && B0_Jpsi_mu1_nSVDHits> 0 "
+    if VXDReq == 'SVD1':
+        cut = cut + "&& (Jpsi_mu_0_0_d0_d0_nSVDHits> 0 || Jpsi_mu_0_1_d0_d1_nSVDHits> 0) "
+    if VXDReq == 'SVD2':
+        cut = cut + "&& Jpsi_mu_0_0_d0_d0_nSVDHits> 0 && Jpsi_mu_0_1_d0_d1_nSVDHits> 0 "
 
-    tdat.Draw("B0_DeltaT - B0_TruthDeltaT >> B0_DeltaT_" + PXDReq, cut)
-    tdat.Draw("B0_DeltaTErr >> B0_DeltaTErr_" + PXDReq, cut)
-    tdat.Draw("B0_Z - B0_TruthZ >> B0_DeltaZsig_" + PXDReq, cut)
-    tdat.Draw("B0_TagVz - B0_TruthTagVz >> B0_DeltaZtag_" + PXDReq, cut)
+    tdat.Draw("DeltaT - MCDeltaT >> B0_DeltaT_" + VXDReq, cut)
+    tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)
+    tdat.Draw("z - mcZ >> B0_DeltaZsig_" + VXDReq, cut)
+    tdat.Draw("TagVz - mcTagVz >> B0_DeltaZtag_" + VXDReq, cut)
 
     # Validation Plot 1
     histo_DeltaT.GetXaxis().SetLabelSize(0.04)
@@ -153,10 +136,10 @@ for PXDReq in PXDReqs:
     histo_DeltaT.GetXaxis().SetTitleOffset(0.7)
     histo_DeltaT.GetXaxis().SetTitleSize(0.06)
     histo_DeltaT.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaT.SetTitle('DeltaT Residual for PXD requirement ' + PXDReq + '; #Deltat - Gen. #Deltat / ps ; Events')
+    histo_DeltaT.SetTitle('DeltaT Residual for PXD requirement ' + VXDReq + '; #Deltat - Gen. #Deltat / ps ; Events')
 
     histo_DeltaT.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaT Residual for PXD requirement ' + PXDReq +
+        ROOT.TNamed('Description', 'DeltaT Residual for PXD requirement ' + VXDReq +
                     '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
     histo_DeltaT.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
     histo_DeltaT.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
@@ -169,11 +152,11 @@ for PXDReq in PXDReqs:
     histo_DeltaTErr.GetXaxis().SetTitleOffset(0.7)
     histo_DeltaTErr.GetXaxis().SetTitleSize(0.06)
     histo_DeltaTErr.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaTErr.SetTitle('DeltaT error for PXD requirement ' + PXDReq + ' ; #sigma_{#Deltat} / ps ; Events')
+    histo_DeltaTErr.SetTitle('DeltaT error for PXD requirement ' + VXDReq + ' ; #sigma_{#Deltat} / ps ; Events')
 
     histo_DeltaTErr.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'logy'))
     histo_DeltaTErr.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaT error for PXD requirement ' + PXDReq +
+        ROOT.TNamed('Description', 'DeltaT error for PXD requirement ' + VXDReq +
                     '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
     histo_DeltaTErr.GetListOfFunctions().Add(
         ROOT.TNamed(
@@ -189,10 +172,10 @@ for PXDReq in PXDReqs:
     histo_DeltaZSig.GetXaxis().SetTitleOffset(0.7)
     histo_DeltaZSig.GetXaxis().SetTitleSize(0.06)
     histo_DeltaZSig.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaZSig.SetTitle('DeltaZ Residual on signal side for requirement ' + PXDReq + '; B0_Z - Gen. B0_Z / cm ; Events')
+    histo_DeltaZSig.SetTitle('DeltaZ Residual on signal side for requirement ' + VXDReq + '; B0_Z - Gen. B0_Z / cm ; Events')
 
     histo_DeltaZSig.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaZ Residual on signal side for PXD requirement ' + PXDReq +
+        ROOT.TNamed('Description', 'DeltaZ Residual on signal side for PXD requirement ' + VXDReq +
                     '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
     histo_DeltaZSig.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
     histo_DeltaZSig.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
@@ -205,10 +188,10 @@ for PXDReq in PXDReqs:
     histo_DeltaZTag.GetXaxis().SetTitleOffset(0.7)
     histo_DeltaZTag.GetXaxis().SetTitleSize(0.06)
     histo_DeltaZTag.GetYaxis().SetTitleSize(0.07)
-    histo_DeltaZTag.SetTitle('DeltaZ Residual on tag side for requirement ' + PXDReq + '; B0_TagVz - Gen. B0_TagVz / cm; Events')
+    histo_DeltaZTag.SetTitle('DeltaZ Residual on tag side for requirement ' + VXDReq + '; B0_TagVz - Gen. B0_TagVz / cm; Events')
 
     histo_DeltaZTag.GetListOfFunctions().Add(
-        ROOT.TNamed('Description', 'DeltaZ Residual on tag side for PXD requirement ' + PXDReq +
+        ROOT.TNamed('Description', 'DeltaZ Residual on tag side for PXD requirement ' + VXDReq +
                     '. PXD0 means no PXD hit required. PXD2 means both muon tracks are required to have a PXD hit.'))
     histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
     histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de, ligioi@mpp.mpg.de'))
@@ -252,10 +235,10 @@ for PXDReq in PXDReqs:
         argSet,
         cut)
 
-    if PXDReq == 'PXD1' or PXDReq == 'PXD2':
+    if VXDReq == 'PXD1' or VXDReq == 'PXD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
             B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
-    elif PXDReq == 'SVD1' or PXDReq == 'SVD2':
+    elif VXDReq == 'SVD1' or VXDReq == 'SVD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
             B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
     else:
@@ -271,18 +254,18 @@ for PXDReq in PXDReqs:
 
         row = data.get(i)
 
-        tDT = row.getRealValue("B0_DeltaT", 0, ROOT.kTRUE) - row.getRealValue("B0_TruthDeltaT", 0, ROOT.kTRUE)
+        tDT = row.getRealValue("DeltaT", 0, ROOT.kTRUE) - row.getRealValue("MCDeltaT", 0, ROOT.kTRUE)
         if abs(tDT) < limDeltaT:
             DT.setVal(tDT)
             fitDataDT.add(ROOT.RooArgSet(DT))
 
-        tDSigZ = row.getRealValue("B0_Z", 0, ROOT.kTRUE) - row.getRealValue("B0_TruthZ", 0, ROOT.kTRUE)
+        tDSigZ = row.getRealValue("z", 0, ROOT.kTRUE) - row.getRealValue("mcZ", 0, ROOT.kTRUE)
 
         if abs(tDSigZ) < limZSig:
             DSigZ.setVal(tDSigZ)
             fitDataSigZ.add(ROOT.RooArgSet(DSigZ))
 
-        tDTagZ = row.getRealValue("B0_TagVz", 0, ROOT.kTRUE) - row.getRealValue("B0_TruthTagVz", 0, ROOT.kTRUE)
+        tDTagZ = row.getRealValue("TagVz", 0, ROOT.kTRUE) - row.getRealValue("mcTagVz", 0, ROOT.kTRUE)
 
         if abs(tDTagZ) < limZTag:
             DTagZ.setVal(tDTagZ)
@@ -350,7 +333,7 @@ for PXDReq in PXDReqs:
             dtErrCBS, gErr1, gErr2), ROOT.RooArgList(
             fracErr1, fracErr2))
 
-    if PXDReq == 'PXD0' or PXDReq == 'PXD1' or PXDReq == 'PXD2':
+    if VXDReq == 'PXD0' or VXDReq == 'PXD1' or VXDReq == 'PXD2':
         CBSFitRes = modelTErr.fitTo(
             fitDataDTErr,
             ROOT.RooFit.Minos(ROOT.kFALSE), ROOT.RooFit.Extended(ROOT.kFALSE),
@@ -443,7 +426,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaT" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaT" + VXDReq + ".pdf"
     c1.SaveAs(nPlot)
     c1.Clear()
 
@@ -479,7 +462,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     # l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaTError" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaTError" + VXDReq + ".pdf"
     c1.SaveAs(nPlot)
     c1.Clear()
 
@@ -594,7 +577,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaZsig" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaZsig" + VXDReq + ".pdf"
     cSig.SaveAs(nPlot)
     cSig.Clear()
 
@@ -707,7 +690,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaZtag" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaZtag" + VXDReq + ".pdf"
     cTag.SaveAs(nPlot)
     cTag.Clear()
 
@@ -746,7 +729,7 @@ print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
 print('*                                                             *')
 print('* Efficiency                                                  *')
 print('*                                                             *')
-print('* N_' + PXDReqs[1] + '/N_' + PXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
+print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
       '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%             *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')

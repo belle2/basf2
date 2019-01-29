@@ -117,6 +117,10 @@ unitImp = "mm"
 
 
 def makePlotsForEachParticleKind(cutOnUpsilonFourS=""):
+    """
+    Makes plots showing the distribution of the impact parameters and vertices
+    for positively and negatively charged particles.
+    """
 
     unitImp = "mm"
 
@@ -426,6 +430,9 @@ particleCondsB0tag = {
 
 
 def makeZtagDecayPlot(cutOnUpsilonFourS="", asymplot=True):
+    """
+    Plots the distribution of the decay z-vertex of the tag-side B0 meson.
+    """
 
     withOrWithoutCut = ""
 

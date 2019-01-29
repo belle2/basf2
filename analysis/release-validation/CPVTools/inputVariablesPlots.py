@@ -35,6 +35,7 @@ from matplotlib.ticker import FormatStrFormatter
 import math
 import sys
 import glob
+import os
 
 ROOT.gROOT.SetBatch(True)
 
@@ -51,33 +52,13 @@ filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 weightFiles = 'B2JpsiKs_mu' + MCtype
 
 
-class Quiet:
-    """Context handler class to quiet errors in a 'with' statement"""
-
-    def __init__(self, level=ROOT.kInfo + 1):
-        """Class constructor"""
-        #: the level to quiet
-        self.level = level
-
-    def __enter__(self):
-        """Enter the context"""
-        #: the previously set level to be ignored
-        self.oldlevel = ROOT.gErrorIgnoreLevel
-        ROOT.gErrorIgnoreLevel = self.level
-
-    def __exit__(self, type, value, traceback):
-        """Exit the context"""
-        ROOT.gErrorIgnoreLevel = self.oldlevel
-
-
 ROOT.TH1.SetDefaultSumw2()
 
 allInputVariables = []
 
 
-ft.setBelleOrBelle2(belleOrBelle2)
 ft.WhichCategories(categories)
-
+ft.setBelleOrBelle2(belleOrBelle2)
 ft.setVariables()
 
 belleOrBelle2Flag = belleOrBelle2
@@ -85,16 +66,15 @@ belleOrBelle2Flag = belleOrBelle2
 identifiersExtraInfosDict = dict()
 identifiersExtraInfosKaonPion = []
 
+if belleOrBelle2 == "Belle":
+    unitImp = "cm"
+
 dBw = 50
 
 pBins = 50
 fBins = 100
 
 unitImp = "mm"
-
-if belleOrBelle2 == "Belle":
-    unitImp = "cm"
-
 
 variablesPlotParamsDict = {
     'useCMSFrame(p)': ['useCMSFrame__bop__bc', pBins, 0, 3, r'$p^*\ [{\rm GeV}/c]$', r"{\rm GeV}/c\, "],
@@ -174,252 +154,266 @@ variablesPlotParamsDict = {
     'daughter(1,protonID)': ['daughter__bo1__cmprotonID__bc', dBw, 0, 1.01, r'$\mathcal{L}_{p}$', ""],
     'daughter(0,pionID)': ['daughter__bo0__cmpionID__bc', dBw, 0, 1.01, r'$\mathcal{L}_{\pi}$', ""]}
 
-
 if not Belle2.FileSystem.findFile('./InputVariablesPlots', True):
     os.mkdir('./InputVariablesPlots')
 
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
 
-    # if category != "SlowPion":
-    #     continue
+def plotInputVariablesOfFlavorTagger():
+    """
+    Makes plots of the distribution of the input variables of the flavor tagger
+    for each category distinguishing between the target particles of the category (signal)
+    and all the other (bkg.)
+    """
 
-    if not Belle2.FileSystem.findFile('./InputVariablesPlots/' + category, True):
-        os.mkdir('./InputVariablesPlots/' + category)
+    for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
 
-    if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
-        identifiersExtraInfosDict[particleList] = []
+        # if category != "SlowPion":
+        #     continue
 
-    methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
-    treeName = methodPrefixEventLevel + "_tree"
-    targetVariable = 'isRightCategory(' + category + ')'
+        if not Belle2.FileSystem.findFile('./InputVariablesPlots/' + category, True):
+            os.mkdir('./InputVariablesPlots/' + category)
 
-    tree = ROOT.TChain(treeName)
+        if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
+            identifiersExtraInfosDict[particleList] = []
 
-    workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled*.root')
-    # workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled1?.root')
+        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        treeName = methodPrefixEventLevel + "_tree"
+        targetVariable = 'isRightCategory(' + category + ')'
 
-    for iFile in workingFiles:
-        # if Belle2.FileSystem.findFile(workingFile):
-        tree.AddFile(iFile)
+        tree = ROOT.TChain(treeName)
 
-    categoryInputVariables = []
-    trulyUsedInputVariables = []
-    for iVariable in tree.GetListOfBranches():
+        workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled*.root')
+        # workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled1?.root')
 
-        managerVariableName = str(Belle2.invertMakeROOTCompatible(iVariable.GetName()))
+        for iFile in workingFiles:
+            # if Belle2.FileSystem.findFile(workingFile):
+            tree.AddFile(iFile)
 
-        if managerVariableName in ft.variables[category] or managerVariableName == 'distance' or \
-           managerVariableName == 'z0' or managerVariableName == 'ImpactXY' or \
-           managerVariableName == 'y' or managerVariableName == 'OBoost':
-            if managerVariableName in categoryInputVariables:
-                continue
+        categoryInputVariables = []
+        trulyUsedInputVariables = []
+        for iVariable in tree.GetListOfBranches():
 
-            categoryInputVariables.append(managerVariableName)
-            if managerVariableName in ft.variables[category]:
-                allInputVariables.append((category, managerVariableName))
-                trulyUsedInputVariables.append((category, managerVariableName))
+            managerVariableName = str(Belle2.invertMakeROOTCompatible(iVariable.GetName()))
 
-                if managerVariableName not in identifiersExtraInfosDict[particleList] and category != 'KaonPion':
-                    identifiersExtraInfosDict[particleList].append(managerVariableName)
+            if managerVariableName in ft.variables[category] or managerVariableName == 'distance' or \
+               managerVariableName == 'z0' or managerVariableName == 'ImpactXY' or \
+               managerVariableName == 'y' or managerVariableName == 'OBoost':
+                if managerVariableName in categoryInputVariables:
+                    continue
 
-                elif category == 'KaonPion' and managerVariableName not in identifiersExtraInfosKaonPion:
-                    identifiersExtraInfosKaonPion.append(managerVariableName)
+                categoryInputVariables.append(managerVariableName)
+                if managerVariableName in ft.variables[category]:
+                    allInputVariables.append((category, managerVariableName))
+                    trulyUsedInputVariables.append((category, managerVariableName))
 
-                # if managerVariableName not in variablesPlotParamsDict:
-                #     variablesPlotParamsDict[managerVariableName] = [iVariable.GetName(), 100, 0, 2, iVariable.GetName(), "unit"]
+                    if managerVariableName not in identifiersExtraInfosDict[particleList] and category != 'KaonPion':
+                        identifiersExtraInfosDict[particleList].append(managerVariableName)
 
-    print("The number of variables used in " + category + " is = ", len(trulyUsedInputVariables))
+                    elif category == 'KaonPion' and managerVariableName not in identifiersExtraInfosKaonPion:
+                        identifiersExtraInfosKaonPion.append(managerVariableName)
 
-    if category != 'KaonPion' and category != 'FSC' and category != 'MaximumPstar' and \
-       category != 'FastHadron' and category != 'Lambda':
-        categoryInputVariables.append('BtagToWBosonVariables(recoilMass)')
+                    # if managerVariableName not in variablesPlotParamsDict:
+                    #     variablesPlotParamsDict[managerVariableName] =
+                    #                     [iVariable.GetName(), 100, 0, 2, iVariable.GetName(), "unit"]
 
-    for inputVariable in categoryInputVariables:
+        print("The number of variables used in " + category + " is = ", len(trulyUsedInputVariables))
 
-        print(inputVariable)
+        if category != 'KaonPion' and category != 'FSC' and category != 'MaximumPstar' and \
+           category != 'FastHadron' and category != 'Lambda':
+            categoryInputVariables.append('BtagToWBosonVariables(recoilMass)')
 
-        nBins = variablesPlotParamsDict[inputVariable][1]
-        limXmin = variablesPlotParamsDict[inputVariable][2]
-        limXmax = variablesPlotParamsDict[inputVariable][3]
+        for inputVariable in categoryInputVariables:
 
-        if category == "SlowPion":
-            if inputVariable == 'p' or inputVariable == 'useCMSFrame(p)' or \
-               inputVariable == 'pt' or inputVariable == 'useCMSFrame(pt)':
-                nBins = 150
-                limXmax = 1.5
+            print(inputVariable)
 
-            if inputVariable == 'distance':
-                nBins = 80
-                limXmax = 2.4
+            nBins = variablesPlotParamsDict[inputVariable][1]
+            limXmin = variablesPlotParamsDict[inputVariable][2]
+            limXmax = variablesPlotParamsDict[inputVariable][3]
 
-            if inputVariable == 'ImpactXY':
-                nBins = 80
-                limXmax = 0.8
+            if category == "SlowPion":
+                if inputVariable == 'p' or inputVariable == 'useCMSFrame(p)' or \
+                   inputVariable == 'pt' or inputVariable == 'useCMSFrame(pt)':
+                    nBins = 150
+                    limXmax = 1.5
 
-        if category == "Lambda":
-            if inputVariable == 'distance':
-                # nBins = 25
-                limXmax = 10
+                if inputVariable == 'distance':
+                    nBins = 80
+                    limXmax = 2.4
 
-            if inputVariable == 'chiProb':
-                nBins = 25
+                if inputVariable == 'ImpactXY':
+                    nBins = 80
+                    limXmax = 0.8
 
-        signalHistogram = ROOT.TH1F("signal" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
-                                    nBins,
-                                    limXmin,
-                                    limXmax)
-        backgroundHistogram = ROOT.TH1F("bkg" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
+            if category == "Lambda":
+                if inputVariable == 'distance':
+                    # nBins = 25
+                    limXmax = 10
+
+                if inputVariable == 'chiProb':
+                    nBins = 25
+
+            signalHistogram = ROOT.TH1F("signal" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
                                         nBins,
                                         limXmin,
                                         limXmax)
+            backgroundHistogram = ROOT.TH1F("bkg" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
+                                            nBins,
+                                            limXmin,
+                                            limXmax)
 
-        factorMultiplication = str()
+            factorMultiplication = str()
 
-        if belleOrBelle2 == "Belle2" and ((category != "Lambda" and inputVariable == 'distance') or inputVariable ==
-                                          'z0' or inputVariable == 'ImpactXY' or inputVariable == 'y' or inputVariable == 'OBoost'):
-            factorMultiplication = "*10 "
+            if belleOrBelle2 == "Belle2" and ((category != "Lambda" and inputVariable == 'distance') or inputVariable ==
+                                              'z0' or inputVariable == 'ImpactXY' or inputVariable ==
+                                              'y' or inputVariable == 'OBoost'):
+                factorMultiplication = "*10 "
 
-        tree.Draw(variablesPlotParamsDict[inputVariable][0] + factorMultiplication + ">> signal" + category +
-                  str(Belle2.makeROOTCompatible(inputVariable)), Belle2.makeROOTCompatible(targetVariable) + " > 0")
+            tree.Draw(variablesPlotParamsDict[inputVariable][0] + factorMultiplication + ">> signal" + category +
+                      str(Belle2.makeROOTCompatible(inputVariable)), Belle2.makeROOTCompatible(targetVariable) + " > 0")
 
-        tree.Draw(variablesPlotParamsDict[inputVariable][0] + factorMultiplication + ">> bkg" + category +
-                  str(Belle2.makeROOTCompatible(inputVariable)), Belle2.makeROOTCompatible(targetVariable) + " < 1")
+            tree.Draw(variablesPlotParamsDict[inputVariable][0] + factorMultiplication + ">> bkg" + category +
+                      str(Belle2.makeROOTCompatible(inputVariable)), Belle2.makeROOTCompatible(targetVariable) + " < 1")
 
-        signalScalingFactor = signalHistogram.Integral()
-        backgroundScalingFactor = backgroundHistogram.Integral()
+            signalScalingFactor = signalHistogram.Integral()
+            backgroundScalingFactor = backgroundHistogram.Integral()
 
-        if signalScalingFactor == 0:
-            signalScalingFactor = 1
+            if signalScalingFactor == 0:
+                signalScalingFactor = 1
 
-        if backgroundScalingFactor == 0:
-            backgroundScalingFactor = 1
+            if backgroundScalingFactor == 0:
+                backgroundScalingFactor = 1
 
-        signalHistogram.Scale(1 / signalScalingFactor)
-        backgroundHistogram.Scale(1 / backgroundScalingFactor)
+            signalHistogram.Scale(1 / signalScalingFactor)
+            backgroundHistogram.Scale(1 / backgroundScalingFactor)
 
-        signalArray = np.zeros((signalHistogram.GetNbinsX(), 2))
-        backgroundArray = np.zeros((backgroundHistogram.GetNbinsX(), 2))
+            signalArray = np.zeros((signalHistogram.GetNbinsX(), 2))
+            backgroundArray = np.zeros((backgroundHistogram.GetNbinsX(), 2))
 
-        for i in range(0, signalHistogram.GetNbinsX()):
-            signalArray[i] = np.array([signalHistogram.GetBinCenter(i + 1), signalHistogram.GetBinContent(i + 1)])
-            backgroundArray[i] = np.array([backgroundHistogram.GetBinCenter(i + 1), backgroundHistogram.GetBinContent(i + 1)])
+            for i in range(0, signalHistogram.GetNbinsX()):
+                signalArray[i] = np.array([signalHistogram.GetBinCenter(i + 1), signalHistogram.GetBinContent(i + 1)])
+                backgroundArray[i] = np.array([backgroundHistogram.GetBinCenter(i + 1), backgroundHistogram.GetBinContent(i + 1)])
 
-        fig1 = plt.figure(1, figsize=(11, 10))
+            fig1 = plt.figure(1, figsize=(11, 10))
 
-        # if inputVariable == 'Kid_dEdx' or inputVariable == 'muid_dEdx':
-        #     ax1 = plt.axes([0.18, 0.17, 0.75, 0.8])
-        # if inputVariable == 'pi_vs_edEdxid':
-        #     ax1 = plt.axes([0.18, 0.187, 0.75, 0.805])
-        # else:
-        ax1 = plt.axes([0.18, 0.2, 0.76, 0.705])
+            # if inputVariable == 'Kid_dEdx' or inputVariable == 'muid_dEdx':
+            #     ax1 = plt.axes([0.18, 0.17, 0.75, 0.8])
+            # if inputVariable == 'pi_vs_edEdxid':
+            #     ax1 = plt.axes([0.18, 0.187, 0.75, 0.805])
+            # else:
+            ax1 = plt.axes([0.18, 0.2, 0.76, 0.705])
 
-        # print(signalArray.shape, signalHistogram.GetNbinsX(), )
-        # print(signalArray)
-        ax1.hist(
-            signalArray[:, 0], weights=signalArray[:, 1], bins=signalHistogram.GetNbinsX(),
-            histtype='step',
-            edgecolor='r',
-            linewidth=4,
-            alpha=0.9,
-            label=r'${\rm Signal}$')
+            # print(signalArray.shape, signalHistogram.GetNbinsX(), )
+            # print(signalArray)
+            ax1.hist(
+                signalArray[:, 0], weights=signalArray[:, 1], bins=signalHistogram.GetNbinsX(),
+                histtype='step',
+                edgecolor='r',
+                linewidth=4,
+                alpha=0.9,
+                label=r'${\rm Signal}$')
 
-        ax1.hist(backgroundArray[:, 0], weights=backgroundArray[:, 1], bins=backgroundHistogram.GetNbinsX(),
-                 histtype='step',
-                 edgecolor='b', linewidth=4.5, linestyle='dashed', label=r'${\rm Background}$')  # hatch='.',
+            ax1.hist(backgroundArray[:, 0], weights=backgroundArray[:, 1], bins=backgroundHistogram.GetNbinsX(),
+                     histtype='step',
+                     edgecolor='b', linewidth=4.5, linestyle='dashed', label=r'${\rm Background}$')  # hatch='.',
 
-        p1, =  ax1.plot([], label=r'${\rm Signal}$', linewidth=5, linestyle='solid', alpha=0.9, c='r')
-        p2, =  ax1.plot([], label=r'${\rm Background}$', linewidth=5.5, linestyle='dashed', c='b')
+            p1, =  ax1.plot([], label=r'${\rm Signal}$', linewidth=5, linestyle='solid', alpha=0.9, c='r')
+            p2, =  ax1.plot([], label=r'${\rm Background}$', linewidth=5.5, linestyle='dashed', c='b')
 
-        binWidth = signalHistogram.GetBinWidth(2)
+            binWidth = signalHistogram.GetBinWidth(2)
 
-        if inputVariable == 'lambdaZError':  # or inputVariable == 'ImpactXY' or\
-            # (category != "Lambda" and inputVariable == 'distance'):
-            binWidth = binWidth * 10
+            if inputVariable == 'lambdaZError':  # or inputVariable == 'ImpactXY' or\
+                # (category != "Lambda" and inputVariable == 'distance'):
+                binWidth = binWidth * 10
 
-        if inputVariable == 'M':
-            binWidth = binWidth * 1000
+            if inputVariable == 'M':
+                binWidth = binWidth * 1000
 
-        if category == "Lambda" and inputVariable == 'distance':
-            variablesPlotParamsDict[inputVariable][5] = r"{\rm cm}\, "
+            if category == "Lambda" and inputVariable == 'distance':
+                variablesPlotParamsDict[inputVariable][5] = r"{\rm cm}\, "
 
-        binWidth = '{:8.2f}'.format(binWidth)
+            binWidth = '{:8.2f}'.format(binWidth)
 
-        xLabel = variablesPlotParamsDict[inputVariable][4]
-        legendLocation = 1
+            xLabel = variablesPlotParamsDict[inputVariable][4]
+            legendLocation = 1
 
-        if category == "FSC":
-            if inputVariable == 'cosTPTO':
-                xLabel = r'$\vert\cos{\theta^*_{\rm T, Slow}}\vert$'
-            if inputVariable == 'useCMSFrame(p)':
-                xLabel = r'$p^*_{\rm Slow}\ [{\rm GeV}/c]$'
-        if category == 'Lambda':
-            if inputVariable == 'useCMSFrame(p)':
-                xLabel = r'$p^*_{\Lambda}\ [{\rm GeV}/c]$'
-            if inputVariable == 'p':
-                xLabel = r'$p_{\Lambda}\ [{\rm GeV}/c]$'
+            if category == "FSC":
+                if inputVariable == 'cosTPTO':
+                    xLabel = r'$\vert\cos{\theta^*_{\rm T, Slow}}\vert$'
+                if inputVariable == 'useCMSFrame(p)':
+                    xLabel = r'$p^*_{\rm Slow}\ [{\rm GeV}/c]$'
+            if category == 'Lambda':
+                if inputVariable == 'useCMSFrame(p)':
+                    xLabel = r'$p^*_{\Lambda}\ [{\rm GeV}/c]$'
+                if inputVariable == 'p':
+                    xLabel = r'$p_{\Lambda}\ [{\rm GeV}/c]$'
 
-        ax1.set_ylabel(r'${\rm Fraction\hspace{0.25em} of\hspace{0.25em} Events}\, /\, (\, ' + binWidth + r'\, ' +
-                       variablesPlotParamsDict[inputVariable][5] + r')$', fontsize=46)
-        ax1.set_xlabel(xLabel, fontsize=65)
-        # plt.xticks([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
-        #           [r'$-1$', r'', r'$-0.5$', r'', r'$0$', r'', r'$0.5$', r'', r'$1$'], rotation=0, size=40)
-        if inputVariable == 'extraInfo(isRightCategory(Kaon))' or \
-           inputVariable == 'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))':
-            legendLocation = 3
-            ax1.set_yscale('log', nonposy='clip')
-        else:
-            ax1.yaxis.set_major_formatter(FormatStrFormatter(r'$%.2f$'))
+            ax1.set_ylabel(r'${\rm Fraction\hspace{0.25em} of\hspace{0.25em} Events}\, /\, (\, ' + binWidth + r'\, ' +
+                           variablesPlotParamsDict[inputVariable][5] + r')$', fontsize=46)
+            ax1.set_xlabel(xLabel, fontsize=65)
+            # plt.xticks([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
+            #           [r'$-1$', r'', r'$-0.5$', r'', r'$0$', r'', r'$0.5$', r'', r'$1$'], rotation=0, size=40)
+            if inputVariable == 'extraInfo(isRightCategory(Kaon))' or \
+               inputVariable == 'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))':
+                legendLocation = 3
+                ax1.set_yscale('log', nonposy='clip')
+            else:
+                ax1.yaxis.set_major_formatter(FormatStrFormatter(r'$%.2f$'))
 
-        ax1.tick_params(axis='x', labelsize=50)
-        ax1.tick_params(axis='y', labelsize=40)
+            ax1.tick_params(axis='x', labelsize=50)
+            ax1.tick_params(axis='y', labelsize=40)
 
-        if inputVariable == 'pi_vs_edEdxid':
-            ax1.xaxis.labelpad = 5
-        else:
-            ax1.xaxis.labelpad = 15
+            if inputVariable == 'pi_vs_edEdxid':
+                ax1.xaxis.labelpad = 5
+            else:
+                ax1.xaxis.labelpad = 15
 
-        if inputVariable.find('ARICH') != -1 or inputVariable.find('TOP') != -1 or \
-                inputVariable == 'cosTPTO' or inputVariable.find('KLM') != -1 or \
-                inputVariable == 'cosTheta' or inputVariable == 'FSCVariables(cosTPTOFast)' or \
-                inputVariable == 'KaonPionVariables(cosKaonPion)':
-            legendLocation = 2
+            if inputVariable.find('ARICH') != -1 or inputVariable.find('TOP') != -1 or \
+                    inputVariable == 'cosTPTO' or inputVariable.find('KLM') != -1 or \
+                    inputVariable == 'cosTheta' or inputVariable == 'FSCVariables(cosTPTOFast)' or \
+                    inputVariable == 'KaonPionVariables(cosKaonPion)':
+                legendLocation = 2
 
-        elif inputVariable == 'FSCVariables(SlowFastHaveOpositeCharges)' or \
-                inputVariable == 'KaonPionVariables(HaveOpositeCharges)' or inputVariable == "eid_ECL" or \
-                inputVariable.find('ID') != -1 or inputVariable.find('dEdx') != -1:
-            legendLocation = 9
+            elif inputVariable == 'FSCVariables(SlowFastHaveOpositeCharges)' or \
+                    inputVariable == 'KaonPionVariables(HaveOpositeCharges)' or inputVariable == "eid_ECL" or \
+                    inputVariable.find('ID') != -1 or inputVariable.find('dEdx') != -1:
+                legendLocation = 9
 
-        if inputVariable == 'muid_dEdx':
-            if category != 'KinLepton':
-                legendLocation = 8
+            if inputVariable == 'muid_dEdx':
+                if category != 'KinLepton':
+                    legendLocation = 8
 
-        ax1.legend([p1, p2], [r'${\rm Signal}$', r'${\rm Bkgr.}$'], prop={
-                   'size': 50}, loc=legendLocation, numpoints=1, handlelength=1)
-        ax1.grid(True)
-        # ax1.set_ylim(0, 1.4)
-        ax1.set_xlim(limXmin, limXmax)
-        plt.savefig('./InputVariablesPlots/' + category + '/' + category +
-                    "_" + str(Belle2.makeROOTCompatible(inputVariable)) + '.pdf')
-        fig1.clear()
+            ax1.legend([p1, p2], [r'${\rm Signal}$', r'${\rm Bkgr.}$'], prop={
+                       'size': 50}, loc=legendLocation, numpoints=1, handlelength=1)
+            ax1.grid(True)
+            # ax1.set_ylim(0, 1.4)
+            ax1.set_xlim(limXmin, limXmax)
+            plt.savefig('./InputVariablesPlots/' + category + '/' + category +
+                        "_" + str(Belle2.makeROOTCompatible(inputVariable)) + '.pdf')
+            fig1.clear()
 
-        signalHistogram.Delete()
-        backgroundHistogram.Delete()
+            signalHistogram.Delete()
+            backgroundHistogram.Delete()
 
-totalNumberOfVariables = 0
 
-for category in ft.variables:
-    totalNumberOfVariables += len(ft.variables[category])
+if __name__ == '__main__':
 
-print("Total number of variables = ", totalNumberOfVariables)
+    plotInputVariablesOfFlavorTagger()
 
-totalNumberOfCalculatedVariables = len(identifiersExtraInfosKaonPion)
+    totalNumberOfVariables = 0
 
-print("Calculations for Kaon-Pion Category = ", totalNumberOfCalculatedVariables)
+    for category in ft.variables:
+        totalNumberOfVariables += len(ft.variables[category])
 
-print("Variables per particle list:")
-for particleList in identifiersExtraInfosDict:
-    print(particleList)
-    print(identifiersExtraInfosDict[particleList])
-    totalNumberOfCalculatedVariables += len(identifiersExtraInfosDict[particleList])
+    print("Total number of variables = ", totalNumberOfVariables)
 
-print("Total number of calculated variables = ", totalNumberOfCalculatedVariables)
+    totalNumberOfCalculatedVariables = len(identifiersExtraInfosKaonPion)
+
+    print("Calculations for Kaon-Pion Category = ", totalNumberOfCalculatedVariables)
+
+    print("Variables per particle list:")
+    for particleList in identifiersExtraInfosDict:
+        print(particleList)
+        print(identifiersExtraInfosDict[particleList])
+        totalNumberOfCalculatedVariables += len(identifiersExtraInfosDict[particleList])
+
+    print("Total number of calculated variables = ", totalNumberOfCalculatedVariables)

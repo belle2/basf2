@@ -15,20 +15,14 @@
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
-from basf2 import *
-from flavorTagger import *
-import pdg
-import basf2_mva
-import math
-import re
-import subprocess
-import copy
-from string import Template
-from modularAnalysis import *
-# from ROOT import PyConfig
-# PyConfig.IgnoreCommandLineOptions = True
-# PyConfig.StartGuiThread = False
+from ROOT import Belle2
+from basf2 import B2INFO, B2FATAL
+import flavorTagger as ft
 from array import array
+import pickle
+import math
+import glob
+import sys
 import shutil
 
 ROOT.gROOT.SetBatch(True)
@@ -107,7 +101,7 @@ class Quiet:
 tree = ROOT.TChain(treeName)
 
 mcstatus = array('d', [-511.5, 0.0, 511.5])
-# ROOT.TH1.SetDefaultSumw2()
+ROOT.TH1.SetDefaultSumw2()
 
 for iFile in workingFiles:
     # if Belle2.FileSystem.findFile(workingFile):
@@ -117,23 +111,23 @@ totalBranches = []
 for branch in tree.GetListOfBranches():
     totalBranches.append(branch.GetName())
 
-if 'B0_FBDT_qrCombined' in totalBranches:
+if 'FBDT_qrCombined' in totalBranches:
     methods.append("FBDT")
 
-if 'B0_FANN_qrCombined' in totalBranches:
+if 'FANN_qrCombined' in totalBranches:
     methods.append("FANN")
 
 usedCategories = []
 for cat in categories:
-    catBranch = 'B0_qp' + cat
+    catBranch = 'qp' + cat
     if catBranch in totalBranches:
         usedCategories.append(cat)
 
 if len(usedCategories) > 1:
-    WhichCategories(usedCategories)
+    ft.WhichCategories(usedCategories)
 
 categoriesNtupleList = str()
-for (particleList, category, combinerVariable) in eventLevelParticleLists:
+for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     categoriesNtupleList = categoriesNtupleList + "Eff_%s:" % category
 
 
@@ -159,7 +153,6 @@ efficienciesForNtuple = []
 YmaxForQrPlot = 0
 
 for method in methods:
-    # bekommt man mit GetBinError(), setzten mit SetBinError()
     # histogram contains the average r in each of 6 bins -> calculation see below
     histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins (B0 and B0bar)', 6,
                             r_subsample)
@@ -224,34 +217,34 @@ for method in methods:
 
     # filling the histograms
 
-    tree.Draw('B0_' + method + '_qrCombined>>qr_' + method + '_B0', 'B0_qrMC == 1')
-    tree.Draw('B0_' + method + '_qrCombined>>qr_' + method + '_B0Bar', 'B0_qrMC == -1')
-    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_NoCut', 'abs(B0_qrMC) == 1')
-    tree.Draw('B0_' + method + '_qrCombined>>qr_' + method + '_B0Both', 'abs(B0_qrMC) == 1')
+    tree.Draw(method + '_qrCombined>>qr_' + method + '_B0', 'qrMC == 1')
+    tree.Draw(method + '_qrCombined>>qr_' + method + '_B0Bar', 'qrMC == -1')
+    tree.Draw(method + '_qrCombined>>BellePlot_NoCut', 'abs(qrMC) == 1')
+    tree.Draw(method + '_qrCombined>>qr_' + method + '_B0Both', 'abs(qrMC) == 1')
 
-    tree.Draw('B0_' + method + '_qrCombined>>Calibration_' + method + '_B0', 'B0_qrMC == 1')
-    tree.Draw('B0_' + method + '_qrCombined>>Calibration_' + method + '_B0Bar', 'B0_qrMC == -1')
+    tree.Draw(method + '_qrCombined>>Calibration_' + method + '_B0', 'qrMC == 1')
+    tree.Draw(method + '_qrCombined>>Calibration_' + method + '_B0Bar', 'qrMC == -1')
 
     # filling histograms wrong efficiency calculation
-    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0_m0',
-              'B0_qrMC == 1 && B0_' + method + '_qrCombined>0')
-    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0_m1',
-              'B0_qrMC == 1 && B0_' + method + '_qrCombined<0')
-    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0_m2',
-              'B0_qrMC == -1 && B0_' + method + '_qrCombined>0 ')
+    tree.Draw(method + '_qrCombined>>BellePlot_B0_m0',
+              'qrMC == 1 && ' + method + '_qrCombined>0')
+    tree.Draw(method + '_qrCombined>>BellePlot_B0_m1',
+              'qrMC == 1 && ' + method + '_qrCombined<0')
+    tree.Draw(method + '_qrCombined>>BellePlot_B0_m2',
+              'qrMC == -1 && ' + method + '_qrCombined>0 ')
 
     # filling with abs(qr) in one of 6 bins with its weight
     # separate calculation for B0 and B0bar
 
-    tree.Project('Average_r', 'abs(B0_' + method + '_qrCombined)',
-                 'abs(B0_' + method + '_qrCombined)')
-    tree.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==1)')
-    tree.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==-1)')
+    tree.Project('Average_r', 'abs(' + method + '_qrCombined)',
+                 'abs(' + method + '_qrCombined)')
+    tree.Project('Average_rB0', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==1)')
+    tree.Project('Average_rB0bar', 'abs(' + method + '_qrCombined)', 'abs(' + method + '_qrCombined)*(qrMC==-1)')
 
     # filling with abs(qr) in one of 6 bins
-    tree.Project('entries_per_bin', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_qrMC) == 1')
-    tree.Project('entries_per_binB0', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC == 1')
-    tree.Project('entries_per_binB0bar', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC == -1')
+    tree.Project('entries_per_bin', 'abs(' + method + '_qrCombined)', 'abs(qrMC) == 1')
+    tree.Project('entries_per_binB0', 'abs(' + method + '_qrCombined)', 'qrMC == 1')
+    tree.Project('entries_per_binB0bar', 'abs(' + method + '_qrCombined)', 'qrMC == -1')
 
     # producing the average r histograms
     histo_avr_r.Divide(histo_entries_per_bin)
@@ -611,18 +604,12 @@ for method in methods:
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
 # **********************************************
 
-# keep in mind:
-# the individual efficiency is determind on basis of the combiner training.
-# Whereas the efficiency is determined on basis of the final expert output.
-
-# needs the B0Tagger.root-file from combiner teacher
-
 print('************************* MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES *********************************')
 print('*                                                                                                                 *')
 # input: Classifier input from event-level. Output of event-level is recalculated for input on combiner-level.
 # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
 
-for (particleList, category, combinerVariable) in eventLevelParticleLists:
+for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
     hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' +
                             category + ' (binning 50)', 50, -1.0, 1.0)
@@ -659,19 +646,19 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # for calibration plot we want to have
     hist_all = ROOT.TH1F('All_' + category, 'Input Signal (B0) and Background (B0Bar)' +
                          category + ' (binning 50)', 50, 0.0, 1.0)
-    tree.Draw('B0_qp' + category + '>>All_' + category, 'B0_qrMC!=0')
+    tree.Draw('qp' + category + '>>All_' + category, 'qrMC!=0')
     hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category, 'Calibration Plot for true B0' +
                               category + ' (binning 50)', 50, 0.0, 1.0)
-    tree.Draw('B0_qp' + category + '>>Calib_B0_' + category, 'B0_qrMC == 1.0')
+    tree.Draw('qp' + category + '>>Calib_B0_' + category, 'qrMC == 1.0')
     hist_calib_B0.Divide(hist_all)
 
     # fill signal
-    tree.Draw('B0_qp' + category + '>>Signal_' + category, 'B0_qrMC == 1.0')
+    tree.Draw('qp' + category + '>>Signal_' + category, 'qrMC == 1.0')
     # fill background
-    tree.Draw('B0_qp' + category + '>>Background_' + category, 'B0_qrMC == -1.0'
+    tree.Draw('qp' + category + '>>Background_' + category, 'qrMC == -1.0'
               )
     # fill both
-    tree.Draw('B0_qp' + category + '>>qp_' + category, 'abs(B0_qrMC) == 1.0'
+    tree.Draw('qp' + category + '>>qp_' + category, 'abs(qrMC) == 1.0'
               )
 
     # ***** TEST OF CALIBRATION ******

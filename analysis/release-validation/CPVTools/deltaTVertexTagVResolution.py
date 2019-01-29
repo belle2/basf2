@@ -19,11 +19,11 @@
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
-from basf2 import *
-from flavorTagger import *
+from basf2 import B2INFO, B2FATAL
 import numpy as np
 import pylab
 import sys
+import glob
 import math
 import random
 import array
@@ -322,8 +322,8 @@ for VXDReq in VXDReqs:
     c1.SaveAs(nPlot)
     c1.Clear()
 
-    iResult.append(['mu = ' + '{: 4.2f}'.format(shift) + ' +- ' + '{:4.2f}'.format(shiftErr) + ' ps',
-                    'sigma =' + '{: 4.2f}'.format(resolution) + ' +- ' + '{:4.2f}'.format(resolutionErr) + ' ps'])
+    iResult.append(['mu = ' + '{: 4.3f}'.format(shift) + ' +- ' + '{:4.3f}'.format(shiftErr) + ' ps',
+                    'sigma =' + '{: 4.3f}'.format(resolution) + ' +- ' + '{:4.3f}'.format(resolutionErr) + ' ps'])
 
     resFrameDtErr.SetTitle("")
     sXtitleLandau = "#sigma_{#Deltat} / ps"
@@ -474,8 +474,8 @@ for VXDReq in VXDReqs:
     fitResSigZ.Clear()
     modelSigZ.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftSigZ) + ' +- ' + '{:^4.1f}'.format(shiftErrSigZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionSigZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrSigZ) + ' mum'])
+    iResult.append(['mu = ' + '{:^5.3f}'.format(shiftSigZ) + ' +- ' + '{:^4.3f}'.format(shiftErrSigZ) + ' mum',
+                    'sigma = ' + '{:^4.3f}'.format(resolutionSigZ) + ' +- ' + '{:^4.3f}'.format(resolutionErrSigZ) + ' mum'])
 
     # Fit of Delta z for B0_Tag
 
@@ -582,8 +582,8 @@ for VXDReq in VXDReqs:
     cTag.SaveAs(nPlot)
     cTag.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftTagZ) + ' +- ' + '{:^4.1f}'.format(shiftErrTagZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionTagZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrTagZ) + ' mum'])
+    iResult.append(['mu = ' + '{:^5.3f}'.format(shiftTagZ) + ' +- ' + '{:^4.3f}'.format(shiftErrTagZ) + ' mum',
+                    'sigma = ' + '{:^4.3f}'.format(resolutionTagZ) + ' +- ' + '{:^4.3f}'.format(resolutionErrTagZ) + ' mum'])
 
     fitResults.append(iResult)
 
@@ -597,17 +597,17 @@ print('**************** WITHOUT PXD HIT REQUIREMENT ******************')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')
-print('*    ' + fitResults[0][0][0] + '         ' + fitResults[0][0][1] + '    *')
+print('*   ' + fitResults[0][0][0] + '         ' + fitResults[0][0][1] + ' *')
 print('*                                                             *')
 print('* SigZ - Gen. SigZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[0][1][0] + '        ' + fitResults[0][1][1] + '   *')
+print('* ' + fitResults[0][1][0] + '        ' + fitResults[0][1][1] + ' *')
 print('*                                                             *')
 print('* TagZ - Gen. TagZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[0][2][0] + '        ' + fitResults[0][2][1] + '   *')
+print('* ' + fitResults[0][2][0] + '        ' + fitResults[0][2][1] + ' *')
 print('*                                                             *')
-print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
+print('********REQUIRING BOTH MUON TRACKS TO HAVE A ' + sys.argv[3] + ' HIT***********')
 print('*                                                             *')
 print('* Efficiency                                                  *')
 print('*                                                             *')
@@ -616,14 +616,14 @@ print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1])
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')
-print('*    ' + fitResults[1][0][0] + '         ' + fitResults[1][0][1] + '    *')
+print('*   ' + fitResults[1][0][0] + '         ' + fitResults[1][0][1] + ' *')
 print('*                                                             *')
 print('* SigZ - Gen. SigZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[1][1][0] + '        ' + fitResults[1][1][1] + '   *')
+print('* ' + fitResults[1][1][0] + '        ' + fitResults[1][1][1] + ' *')
 print('*                                                             *')
 print('* TagZ - Gen. TagZ                                            *')
 print('*                                                             *')
-print('*    ' + fitResults[1][2][0] + '        ' + fitResults[1][2][1] + '   *')
+print('* ' + fitResults[1][2][0] + '        ' + fitResults[1][2][1] + ' *')
 print('*                                                             *')
 print('***************************************************************')

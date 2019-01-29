@@ -174,7 +174,7 @@ class InputEditor():
         self.initial_content = initial_content
         self.comment_string = commentlines_start_with
 
-    def input(self, fallback_to_terminal: bool = True):
+    def input(self):
         """
         Get user input via editing a temporary file in an editor. If opening the editor fails, fall
         back to command line input
@@ -189,14 +189,11 @@ class InputEditor():
                 input_string = tmpfile.read().strip()
             input_string = self._remove_comment_lines(input_string)
 
-        except (FileNotFoundError or subprocess.CalledProcessError):
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
                 # If editor not found or other problem with subprocess call, fall back to terminal input
-                print("Could not open editor {}".format(self.get_editor_command()))
-                if fallback_to_terminal:
-                    print("Provide input via command line and hit CTRL-D to finish:")
-                    input_string = sys.stdin.readlines()
-                else:
-                    sys.exit(0)
+                print("Could not open {}.".format(self.get_editor_command()))
+                print("Try to set your $VISUAL or $EDITOR environment variables properly.\n")
+                sys.exit(1)
 
         return input_string
 

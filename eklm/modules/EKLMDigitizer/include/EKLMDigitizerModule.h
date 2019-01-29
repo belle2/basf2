@@ -16,11 +16,11 @@
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 
 namespace Belle2 {
 
@@ -89,7 +89,7 @@ namespace Belle2 {
     DBObjPtr<EKLMDigitizationParameters> m_DigPar;
 
     /** Time conversion. */
-    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+    DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
     /** Channel data. */
     DBObjPtr<EKLMChannels> m_Channels;

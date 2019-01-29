@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Particle gun muon events for EKLM, full reconstruction (all detectors).
+# Particle gun muon events.
 
-import os
-from basf2 import *
-from simulation import *
-from reconstruction import *
+import basf2
+from simulation import add_simulation
+from reconstruction import add_reconstruction
 
-set_log_level(LogLevel.WARNING)
+basf2.set_log_level(basf2.LogLevel.WARNING)
 
-main = create_path()
-
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 
-pGun = register_module('ParticleGun')
+pGun = basf2.register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [13, -13],
     'nTracks': 1,
@@ -35,16 +32,17 @@ param_pGun = {
 
 pGun.param(param_pGun)
 
-output = register_module('RootOutput')
-output.param('outputFileName', 'ParticleGunMuonsFull.root')
+output = basf2.register_module('RootOutput')
+output.param('outputFileName', 'ParticleGunMuons.root')
 
-# Create paths
-main = create_path()
+# Create path
+main = basf2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(pGun)
 add_simulation(main)
 add_reconstruction(main)
 main.add_module(output)
+main.add_module('Progress')
 
-process(main)
-print(statistics)
+basf2.process(main)
+print(basf2.statistics)

@@ -288,7 +288,7 @@ void SVDLocalCalibrationsCheckModule::event()
             if (problem)   {
               needPlot = true;
               B2INFO("WARNING, ONE APV has CalpeakADC problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
-                     ", APV number =" << m_APV << " problem ID = " << problem);
+                     ", APV number = " << m_APV << " problem ID = " << problem);
               m_hCalpeakADCSummary->fill(theVxdID, side, 1);
               if (side == 0)
                 listCalpeakADCVBAD->Add(hCalpeakADC);
@@ -315,7 +315,7 @@ void SVDLocalCalibrationsCheckModule::event()
             if (problem)   {
               needPlot = true;
               B2INFO("WARNING, ONE APV has Pedestal problems in: L" << layer << "L" << ladder << "S" << sensor << " side = " << side <<
-                     ", APV number =" << m_APV << " problem ID = " << problem);
+                     ", APV number = " << m_APV << " problem ID = " << problem);
               m_hPedestalSummary->fill(theVxdID, side, 1);
               if (side == 0)
                 listPedestalVBAD->Add(hPedestal);
@@ -500,6 +500,10 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   Int_t minY = 0;
   Int_t maxY = 0;
 
+  Float_t leftLine = 0;
+  Float_t rightLine = 0;
+  Float_t topLine = 0;
+
   if (variable == "Noise") {
     refU = m_h2NoiseREF->getHistogram(theVxdID, 1);
     refV = m_h2NoiseREF->getHistogram(theVxdID, 0);
@@ -507,6 +511,9 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     checkV = m_h2NoiseCHECK->getHistogram(theVxdID, 0);
     minY = refU->GetYaxis()->GetXmin();
     maxY = refU->GetYaxis()->GetXmax();
+    leftLine = -m_cutNoise_out;
+    rightLine = m_cutNoise_out;
+    topLine = 5;
   } else   if (variable == "CalpeakADC") {
     refU = m_h2CalpeakADCREF->getHistogram(theVxdID, 1);
     refV = m_h2CalpeakADCREF->getHistogram(theVxdID, 0);
@@ -514,6 +521,9 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     checkV = m_h2CalpeakADCCHECK->getHistogram(theVxdID, 0);
     minY = refU->GetYaxis()->GetXmin();
     maxY = refU->GetYaxis()->GetXmax();
+    leftLine = -m_cutCalpeakADC_out;
+    rightLine = m_cutCalpeakADC_out;
+    topLine = 15;
   } else   if (variable == "CalpeakTime") {
     refU = m_h2CalpeakTimeREF->getHistogram(theVxdID, 1);
     refV = m_h2CalpeakTimeREF->getHistogram(theVxdID, 0);
@@ -530,6 +540,9 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     maxY = refU->GetYaxis()->GetXmax();
     minY = 250;
     maxY = 500;
+    leftLine = -m_cutPedestal_out;
+    rightLine = m_cutPedestal_out;
+    topLine = 25;
   }
   refU->GetYaxis()->SetRangeUser(minY, maxY);
   refV->GetYaxis()->SetRangeUser(minY, maxY);
@@ -543,6 +556,14 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
 
   float min = minY;
   float max = maxY;
+
+  //create outliers lines
+  TLine lLeft(leftLine, 0, leftLine, topLine);
+  TLine lRight(rightLine, 0, rightLine, topLine);
+  lLeft.SetLineColor(15);
+  lRight.SetLineColor(15);
+  lLeft.SetLineStyle(kDashed);
+  lRight.SetLineStyle(kDashed);
 
   //create APVlines
   TLine l1(128, min, 128, max);
@@ -603,8 +624,11 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
       objDiff->Draw("same");
     count++;
   }
-  if (count > 0)
+  if (count > 0) {
+    lLeft.Draw("same");
+    lRight.Draw("same");
     m_legU->Draw("same");
+  }
 
   c->cd(3);
   refV->Draw();
@@ -643,6 +667,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     count++;
   }
   if (count > 0) {
+    lLeft.Draw("same");
+    lRight.Draw("same");
     if (isL3)
       m_legU->Draw("same");
     else
@@ -845,6 +871,3 @@ void SVDLocalCalibrationsCheckModule::createLegends()
   m_leg2D->SetFillStyle(0);
 }
 
-void SVDLocalCalibrationsCheckModule::endRun()
-{
-}

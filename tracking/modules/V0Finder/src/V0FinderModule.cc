@@ -99,10 +99,16 @@ void V0FinderModule::event()
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+      try {
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair
+        B2DEBUG(27, "Genfit exception caught: " << e.what() << "skip the track pair and continue");
+        continue;
+      }
     }
   }
 }

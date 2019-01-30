@@ -142,37 +142,37 @@ namespace Belle2 {
     /**
      * Array with tabulated signal waveform.
      */
-    void getF(std::vector<short int>& dst) { unpackCoefVector(m_f, dst); }
+    void getF(std::vector<short int>& dst) const { unpackCoefVector(m_f, dst); }
     /**
      * Array with tabulated derivative of signal waveform
      */
-    void getF1(std::vector<short int>& dst) { unpackCoefVector(m_f1, dst); }
+    void getF1(std::vector<short int>& dst) const { unpackCoefVector(m_f1, dst); }
     /**
      * Array FG31, used to estimate signal amplitude.
      * Calculated from F and covariance matrix.
      */
-    void getF31(std::vector<short int>& dst) { unpackCoefVector(m_fg31, dst); }
+    void getF31(std::vector<short int>& dst) const { unpackCoefVector(m_fg31, dst); }
     /**
      * Array FG32, used to estimate A * delta_t.
      * (A -- amplitude, delta_t -- time shift for linearization)
      *
      * Calculated from F and covariance matrix.
      */
-    void getF32(std::vector<short int>& dst) { unpackCoefVector(m_fg32, dst); }
+    void getF32(std::vector<short int>& dst) const { unpackCoefVector(m_fg32, dst); }
     /**
      * Array FG33, used to estimate pedestal height in signal.
      *
      * Calculated from F and covariance matrix.
      */
-    void getF33(std::vector<short int>& dst) { unpackCoefVector(m_fg33, dst); }
+    void getF33(std::vector<short int>& dst) const { unpackCoefVector(m_fg33, dst); }
     /**
      * Alternative for FG31 for signals with small amplitude.
      */
-    void getF41(std::vector<short int>& dst) { unpackCoefVector(m_fg41, dst); }
+    void getF41(std::vector<short int>& dst) const { unpackCoefVector(m_fg41, dst); }
     /**
      * Alternative for FG33 for signals with small amplitude.
      */
-    void getF43(std::vector<short int>& dst) { unpackCoefVector(m_fg43, dst); }
+    void getF43(std::vector<short int>& dst) const { unpackCoefVector(m_fg43, dst); }
     /** @return Major version of DSP coefficients */
     unsigned char getverMaj() const { return m_verMaj; }
     /** @return Minor version of DSP coefficients */
@@ -306,7 +306,7 @@ namespace Belle2 {
      *        internal format (dst).
      * See documentation for packCoefVector on why this was necessary.
      */
-    void unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst);
+    void unpackCoefVector(const std::vector<short int>& src, std::vector<short int>& dst) const;
 
     ClassDef(ECLDspData, 1); /**< ClassDef */
   };

@@ -23,6 +23,8 @@ parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1,
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
+parser.add_argument('--global_xml', metavar='globalFile', dest='globalXml',
+                    type=str, nargs=1, help='Global run configuration XML file')
 parser.add_argument('--nomask', metavar='maskField', dest='mask', type=int, nargs=1,
                     help='When in the local calibrations xml there is NOT the attribute <masks>, set --nomask 1')
 
@@ -53,6 +55,12 @@ if args.mapp is not None:
 else:
     mappingfile = args.mapp
 
+if args.globalXml is not None:
+    globalXMLfile = args.globalXml[0]
+else:
+    globalXMLfile = args.globalXml
+
+
 if args.mask is not None:
     masking = args.mask[0]
 else:
@@ -63,6 +71,7 @@ print('experiment number = ' + str(experiment))
 print('       run number = ' + str(run))
 print('  calibration xml = ' + str(calibfile))
 print('      mapping xml = ' + str(mappingfile))
+print('      global xml = ' + str(globalXMLfile))
 print('      no_masks = ' + str(masking))
 
 reset_database()
@@ -116,7 +125,10 @@ class dbImporterModule(Module):
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
             print("Channel Mapping Imported")
-
+        if args.globalXml is not None:
+            # import channel mapping
+            dbImporter.importSVDGlobalXMLFile(globalXMLfile)
+            print("Global Run Configuration xml file Imported")
 
 main.add_module(dbImporterModule())
 

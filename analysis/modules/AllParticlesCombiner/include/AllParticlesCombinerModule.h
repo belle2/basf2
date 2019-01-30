@@ -44,7 +44,6 @@ namespace Belle2 {
 
     std::string m_inputListName;  /**< List of particles which are supposed to be combined */
     StoreObjPtr<ParticleList> m_inputList;  /**< input particle list */
-    std::vector<int> m_indices;  /**< Indices of the particles that are combined */
 
     bool m_isSelfConjugatedParticle;  /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 

@@ -89,9 +89,10 @@ void AllParticlesCombinerModule::event()
   double py = 0;
   double pz = 0;
   double E = 0;
+  std::vector<int> daughterIndices(plist->getListSize(), 0);
   for (unsigned int i = 0; i < plist->getListSize(); ++i) {
     Particle* particle = plist->getParticle(i, true);
-    m_indices[i] = particle->getArrayIndex();
+    daughterIndices[i] = particle->getArrayIndex();
     px += particle->getPx();
     py += particle->getPy();
     pz += particle->getPz();
@@ -100,12 +101,10 @@ void AllParticlesCombinerModule::event()
   const TLorentzVector vec(px, py, pz, E);
 
   Particle combinedParticle = Particle(vec, m_pdgCode, m_isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
-                                       m_indices);//, m_particleArray.getPtr());
+                                       daughterIndices, particles.getPtr());
 
   Particle* newParticle = particles.appendNew(combinedParticle);
   if (m_cut->check(newParticle)) {
     outputList->addParticle(newParticle);
   }
-  // int iparticle = particles.getEntries() - 1;
-  // outputList->addParticle(iparticle, combinedParticle.getPDGCode(), combinedParticle.getFlavorType());
 }

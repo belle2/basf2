@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-
 # This steering file computes PXD calibrations for hot pixels, dead pixels, hit occupancy and
 # energy loss (gain). The script uses the CAF framework. This script uses by default the
 # SequentialRunByRun strategy and is designed to try to compute new calibration constants
@@ -30,7 +26,7 @@
 #
 # Finally, a CAF script for the calibration needs to be started:
 #
-# basf2 caf_pxd_sequential.py -- --runLow=4000 --runHigh=6522 --expNo=3
+# basf2 caf_pxd_landau.py -- --runLow=5613 --runHigh=5613 --expNo=3
 #
 # The results will be collected in a folder 'pxd_calibration_results_range_XY'. In order to complete the
 # process, the check and uploads the outputdbs to a global tag (GT).
@@ -41,6 +37,7 @@
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
+
 from basf2 import *
 set_log_level(LogLevel.INFO)
 
@@ -48,16 +45,18 @@ import pickle
 import glob
 import os
 import ROOT
+ROOT.gROOT.SetBatch(True)
+
 from ROOT.Belle2 import PXDGainCalibrationAlgorithm
-from ROOT.Belle2 import PXDMedianChargeCalibrationAlgorithm
+from ROOT.Belle2 import PXDChargeCalibrationAlgorithm
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
+from caf.backends import LSF
 from caf.utils import ExpRun, IoV
 from caf.utils import get_iov_from_file
 from caf.utils import find_absolute_file_paths
 from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-
 
 import argparse
 parser = argparse.ArgumentParser(description="Compute gain correction maps for PXD from beam data")
@@ -68,11 +67,12 @@ parser.add_argument('--maxSubRuns', default=20, type=int, help='Maximum number o
 args = parser.parse_args()
 
 
-# Ignoring runs
+# input files
 pxd_ignore_run_list = [ExpRun(3, 484), ExpRun(3, 485), ExpRun(3, 486), ExpRun(3, 524)]
 
 # Set the IoV range for this calibration
 iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
+
 
 # Access files_to_iovs for beam runs
 with open("file_iov_map.pkl", 'br') as map_file:
@@ -89,14 +89,18 @@ for file_iov in input_file_iov_set:
 
 print('Number selected input files:  {}'.format(len(input_files)))
 
+
 # Access files_to_iovs for MC runs
 with open("mc_file_iov_map.pkl", 'br') as map_file:
     mc_files_to_iovs = pickle.load(map_file)
 
-
 mc_input_files = list(mc_files_to_iovs.keys())
 
+
 print('Number selected mc input files:  {}'.format(len(mc_input_files)))
+
+
+# HOTPIXEl CALIBRATION
 
 # Create and configure the collector and its pre collector path
 hotpixel_collector = register_module("PXDRawHotPixelMaskCollector")
@@ -105,15 +109,16 @@ hotpixel_collector.param("granularity", "run")
 # The pre collector path must contain geometry and unpacker
 pre_hotpixel_collector_path = create_path()
 pre_hotpixel_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
-pre_hotpixel_collector_path.add_module("Geometry", components=['PXD'])
+pre_hotpixel_collector_path.add_module("Geometry", useDB=False)
 pre_hotpixel_collector_path.add_module('PXDUnpacker')
-
+pre_hotpixel_collector_path.add_module('PXDPostErrorChecker')
+pre_hotpixel_collector_path.add_module('Progress')
 # Create and configure the calibration algorithm
 hotpixel_algo = PXDHotPixelMaskCalibrationAlgorithm()
 
 # We can play around with hotpixelkiller parameters
 hotpixel_algo.forceContinueMasking = False  # Continue masking even when few/no events were collected
-hotpixel_algo.minEvents = 30000             # Minimum number of collected events for masking
+hotpixel_algo.minEvents = 10000             # Minimum number of collected events for masking
 hotpixel_algo.minHits = 15                  # Only consider dead pixel masking when median number of hits per pixel is higher
 hotpixel_algo.pixelMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
 hotpixel_algo.maskDrains = True             # Set True to allow masking of hot drain lines
@@ -144,6 +149,9 @@ hotpixel_cal.ignored_runs = pxd_ignore_run_list
 hotpixel_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
 
 
+# Landau Fit on DATA
+
+
 # Create and configure the collector on beam data and its pre collector path
 charge_collector = register_module("PXDClusterChargeCollector")
 charge_collector.param("granularity", "run")
@@ -153,33 +161,35 @@ charge_collector.param("maxClusterSize", 6)
 charge_collector.param("nBinsU", 4)
 charge_collector.param("nBinsV", 6)
 
+
 # The pre collector path on data
 pre_charge_collector_path = create_path()
 pre_charge_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
-pre_charge_collector_path.add_module("Geometry")
+pre_charge_collector_path.add_module("Geometry", useDB=False)
 pre_charge_collector_path.add_module("ActivatePXDPixelMasker")
 pre_charge_collector_path.add_module("PXDUnpacker")
+pre_charge_collector_path.add_module('PXDPostErrorChecker')
 pre_charge_collector_path.add_module("PXDRawHitSorter")
 pre_charge_collector_path.add_module("PXDClusterizer")
 
 
-# Create and configure the calibration algorithm
-charge_algo = PXDMedianChargeCalibrationAlgorithm()
+landau_algo = PXDChargeCalibrationAlgorithm()
 
 # We can play around with algo parameters
-charge_algo.minClusters = 5000      # Minimum number of collected clusters for estimating gains
-charge_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
-charge_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
-
+landau_algo.minClusters = 5000      # Minimum number of collected clusters for estimating gains
+landau_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
+landau_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
+landau_algo.strategy = 1	    # 0: medians, 1: landau fit
 # We want to use a specific collector
-charge_algo.setPrefix("PXDClusterChargeCollector")
+landau_algo.setPrefix("PXDClusterChargeCollector")
 
-# Create a charge calibration
+# create calibration
 charge_cal = Calibration(
-    name="PXDMedianChargeCalibrationAlgorithm",
+    name="PXDChargeCalibrationAlgorithm",
     collector=charge_collector,
-    algorithms=charge_algo,
+    algorithms=landau_algo,
     input_files=input_files)
+
 charge_cal.pre_collector_path = pre_charge_collector_path
 
 # Apply the map to this calibration, now the CAF doesn't have to do it
@@ -194,7 +204,9 @@ charge_cal.ignored_runs = pxd_ignore_run_list
 
 charge_cal.use_central_database("Calibration_Offline_Development")
 
-# Create and configure the collector on mc data and its pre collector path
+
+# gain calibration on mc
+
 gain_collector = register_module("PXDClusterChargeCollector")
 gain_collector.param("granularity", "run")
 gain_collector.param("minClusterCharge", 8)
@@ -206,8 +218,7 @@ gain_collector.param("nBinsV", 6)
 # The pre collector path on mc files
 pre_gain_collector_path = create_path()
 pre_gain_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
-pre_gain_collector_path.add_module("Geometry")
-pre_gain_collector_path.add_module("ActivatePXDGainCalibrator")
+pre_gain_collector_path.add_module("Geometry", useDB=False)
 pre_gain_collector_path.add_module("PXDDigitizer")
 pre_gain_collector_path.add_module("PXDClusterizer")
 
@@ -216,19 +227,20 @@ pre_gain_collector_path.add_module("PXDClusterizer")
 gain_algo = PXDGainCalibrationAlgorithm()
 
 # We can play around with algo parameters
-gain_algo.minClusters = 2000      # Minimum number of collected clusters for estimating gains
+gain_algo.minClusters = 3000      # Minimum number of collected clusters for estimating gains
 gain_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
 gain_algo.forceContinue = False   # Force continue algorithm instead of c_notEnoughData
-
+gain_algo.strategy = 1		 # 0: median, 1: landau fit
 # We want to use a specific collector
 gain_algo.setPrefix("PXDClusterChargeCollector")
 
 # Create a charge calibration
 gain_cal = Calibration(
-    name="PXDGainChargeCalibrationAlgorithm",
+    name="PXDGainCalibrationAlgorithm",
     collector=gain_collector,
     algorithms=gain_algo,
     input_files=mc_input_files)
+
 gain_cal.pre_collector_path = pre_gain_collector_path
 
 # Apply the map to this calibration, now the CAF doesn't have to do it
@@ -239,24 +251,23 @@ gain_cal.strategies = SequentialRunByRun
 gain_cal.max_files_per_collector_job = 1
 
 gain_cal.algorithms[0].params["iov_coverage"] = iov_to_calibrate
-gain_cal.max_iterations = 2
 gain_cal.ignored_runs = pxd_ignore_run_list
 
 gain_cal.use_central_database("Calibration_Offline_Development")
+
+
+# CAF
 
 # Define dependencies. In this case: hotpixel_cal -> charge_cal -> gain_cal
 charge_cal.depends_on(hotpixel_cal)
 gain_cal.depends_on(charge_cal)
 
-
-# Create a CAF instance and add the calibration to it.
+# create a CAF instance and add the calibration
 cal_fw = CAF()
 cal_fw.add_calibration(hotpixel_cal)
 cal_fw.add_calibration(charge_cal)
 cal_fw.add_calibration(gain_cal)
-cal_fw.backend = backends.Local(max_processes=20)
-# Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
-cal_fw.heartbeat = 30
-# Can change where your calibration runs
+# cal_fw.backend = backends.Local(max_processes=20)
+cal_fw.backend = LSF()
 cal_fw.output_dir = 'pxd_calibration_results_range_{}_{}_{}'.format(args.runLow, args.runHigh, args.expNo)
 cal_fw.run(iov=iov_to_calibrate)

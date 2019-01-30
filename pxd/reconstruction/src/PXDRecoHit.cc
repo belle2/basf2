@@ -198,7 +198,6 @@ TVectorD PXDRecoHit::applyPlanarDeformation(TVectorD hitCoords, std::vector<doub
 
 std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-
   // Track-based update only takes place when the RecoHit has an associated cluster
   if (this->getCluster()) {
     // Check if we can correct position coordinates based on track info

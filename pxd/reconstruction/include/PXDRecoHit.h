@@ -14,8 +14,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <framework/database/DBObjPtr.h>
-#include <alignment/dbobjects/VXDAlignment.h>
 
 // ROOT includes
 #include <TMatrixD.h>

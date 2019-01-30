@@ -172,11 +172,6 @@ void SVDRecoHit2D::setDetectorPlane()
   setPlane(detPlane, m_sensorID);
 }
 
-/**********************************************/
-/* Applying planar deformation of SVD sensors */
-/*  Contributors: Tadeas Bilka, Jakub Kandra  */
-/**********************************************/
-
 TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters,
                                               const genfit::StateOnPlane& state) const
 {
@@ -188,24 +183,23 @@ TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<doubl
 
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
-  double u = rawHit[0];
-  double v = rawHit[1];
-  double width = geometry.getWidth(v);              // Width of sensor (U side)
-  double length = geometry.getLength();             // Length of sensor (V side)
-  u = u * 2 / width;                                // Legendre parametrization required U in (-1, 1)
-  v = v * 2 / length;                               // Legendre parametrization required V in (-1, 1)
+  double u = rawHit[0];                 // U coordinate of hit
+  double v = rawHit[1];                 // V coordinate of hit
+  double width = geometry.getWidth(v);  // Width of sensor (U side)
+  double length = geometry.getLength(); // Length of sensor (V side)
+  u = u * 2 / width;                    // Legendre parametrization required U in (-1, 1)
+  v = v * 2 / length;                   // Legendre parametrization required V in (-1, 1)
 
-  /*if (abs(u) > 1.0 or abs(v) > 1.0) {
-    B2WARNING("The hit or his extrapolation is outside of sensor.");
-    }*/
-
-  // Planar deformation using Legendre parametrization
+  /* Planar deformation using Legendre parametrization
+     w(u, v) = L_{31} * L2(u) + L_{32} * L1(u) * L1(v) + L_{33} * L2(v) +
+               L_{41} * L3(u) + L_{42} * L2(u) * L1(v) + L_{43} * L1(u) * L2(v) + L_{44} * L3(v) +
+               L_{51} * L4(u) + L_{52} * L3(u) * L1(v) + L_{53} * L2(u) * L2(v) + L_{54} * L1(u) * L3(v) + L_{55} * L4(v); */
   double dw =
-    /* 1st level of deformation: */ planarParameters[0] * L2(u) + planarParameters[1] * L1(u) * L1(v) + planarParameters[2] * L2(v) +
-    /* 2nd level of deformation: */ planarParameters[3] * L3(u) + planarParameters[4] * L2(u) * L1(v) + planarParameters[5] * L1(
-      u) * L2(v) + planarParameters[6] * L3(v) +
-    /* 3rd level of deformation: */ planarParameters[7] * L4(u) + planarParameters[8] * L3(u) * L1(v) + planarParameters[9] * L2(
-      u) * L2(v) + planarParameters[10] * L1(u) * L3(v) + planarParameters[11] * L4(v);
+    planarParameters[0] * L2(u) + planarParameters[1] * L1(u) * L1(v) + planarParameters[2] * L2(v) +
+    planarParameters[3] * L3(u) + planarParameters[4] * L2(u) * L1(v) + planarParameters[5] * L1(u) * L2(v) + planarParameters[6] * L3(
+      v) +
+    planarParameters[7] * L4(u) + planarParameters[8] * L3(u) * L1(v) + planarParameters[9] * L2(u) * L2(v) + planarParameters[10] * L1(
+      u) * L3(v) + planarParameters[11] * L4(v);
 
   double du_dw = state.getState()[1]; // slope in U direction
   double dv_dw = state.getState()[2]; // slope in V direction
@@ -221,68 +215,13 @@ TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<doubl
   return pos;
 }
 
-/**********************************************/
-/*       The function of applying planar      */
-/*  deformation of SVD sensors are finished.  */
-/**********************************************/
-
 std::vector<genfit::MeasurementOnPlane*> SVDRecoHit2D::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-  //bool applyDeformation(true); // To apply planar deformation
-
-  //if (applyDeformation) {
-
-  DBObjPtr<VXDAlignment> vxdAlignment;
-
-  std::vector<double> planarParameters = {
-    0.00, 0.00, 0.00,
-    0.00, 0.00, 0.00, 0.00,
-    0.00, 0.00, 0.00, 0.00, 0.00
-  };
-
-  planarParameters = {
-    vxdAlignment->get(m_sensorID, 31),
-    vxdAlignment->get(m_sensorID, 32),
-    vxdAlignment->get(m_sensorID, 33),
-    vxdAlignment->get(m_sensorID, 41),
-    vxdAlignment->get(m_sensorID, 42),
-    vxdAlignment->get(m_sensorID, 43),
-    vxdAlignment->get(m_sensorID, 44),
-    vxdAlignment->get(m_sensorID, 51),
-    vxdAlignment->get(m_sensorID, 52),
-    vxdAlignment->get(m_sensorID, 53),
-    vxdAlignment->get(m_sensorID, 54),
-    vxdAlignment->get(m_sensorID, 55),
-  };
-
-  /*
-  string fileName = "planarParammeters";
-  ifstream file;
-  file.open(fileName.c_str());
-  string line;
-
-  if (file.is_open()) {
-    std::cout << "The planar deformation for 4.3.2 sensor is read from text file\n";
-    for (int n = 0; getline(file, line) && n < 4; n++) {
-  if (n == 3) {
-  stringstream ss_line(line);
-  while (!ss_line.fail()) {
-    double d;
-    ss_line >> d;
-    if (!ss_line.fail()) planarParameters.push_back(d);
-  }
-  }
-    }
-    file.close();
-    }*/
-
-  TVectorD pos = applyPlanarDeformation(rawHitCoords_, planarParameters, state);
+  // Apply planar deformation
+  TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
 
   return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(pos, rawHitCov_, state.getPlane(),
                                                   state.getRep(), this->constructHMatrix(state.getRep())));
-
-  /*return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
-    state.getRep(), this->constructHMatrix(state.getRep())));*/
 }
 
 genfit::AbsMeasurement* SVDRecoHit2D::clone() const

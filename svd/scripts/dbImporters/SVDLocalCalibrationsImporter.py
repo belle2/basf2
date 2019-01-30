@@ -71,6 +71,11 @@ sys.stdout.write(RESET)
 
 print('')
 
+proceed = input("Do you want to proceed? y/n ")
+if not str(proceed) == 'y':
+    print(colored(str(proceed) + ' != y, therefore we exit now', 'red'))
+    exit(1)
+
 reset_database()
 use_database_chain()
 # central DB needed for the channel mapping DB object
@@ -102,12 +107,6 @@ class dbImporterModule(Module):
         # call the importer class
         dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
         if args.calib is not None:
-            # import FADCMasked strips only if NOT --nomask
-            if not args.mask:
-                dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
-                print(colored("V) FADC Masked Strips Imported", 'green'))
-            else:
-                print(colored("(X) FADC Masked Strips are NOT imported.", 'red'))
             # import the noises
             dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
             print(colored("V) Noise Imported", 'green'))
@@ -117,16 +116,23 @@ class dbImporterModule(Module):
             # import pulse shape calibrations
             dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
             print(colored("V) Pulse Shape Calibrations Imported", 'green'))
+            if not args.localXml:
+                # import channel mapping
+                dbImporter.importSVDGlobalXMLFile(calibfile)
+                print(colored("V) Global Run Configuration xml payload file Imported", 'green'))
+            else:
+                print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
+            # import FADCMasked strips only if NOT --nomask
+            if not args.mask:
+                dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
+                print(colored("V) FADC Masked Strips Imported", 'green'))
+            else:
+                print(colored("(X) FADC Masked Strips are NOT imported.", 'red'))
+
         if args.mapp is not None:
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
             print(colored("V) Channel Mapping Imported", 'green'))
-        if not args.localXml:
-            # import channel mapping
-            dbImporter.importSVDGlobalXMLFile(calibfile)
-            print(colored("V) Global Run Configuration xml payload file Imported", 'green'))
-        else:
-            print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
 
 
 main.add_module(dbImporterModule())

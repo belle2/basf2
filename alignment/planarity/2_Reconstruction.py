@@ -6,7 +6,6 @@ import random
 from basf2 import *
 import simulation
 import reconstruction
-from CosmicAnalysis import CosmicAnalysis
 import svd
 import pxd
 
@@ -60,10 +59,7 @@ main.add_module(
     useClosestHitToIP=True,
     useBFieldAtHit=True)
 
-CosmicAnalysis = CosmicAnalysis(Belle2.Environment.Instance().getOutputFileOverride())
-main.add_module(CosmicAnalysis)
-
-# main.add_module('RootOutput')
+main.add_module('RootOutput')
 
 main.add_module('ProgressBar')
 # main.add_module('Progress')

@@ -1,4 +1,4 @@
-/*****************************************************svd/scripts/dbImporters/SVDCalibrationsImporter.py*********************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *

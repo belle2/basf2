@@ -1512,7 +1512,7 @@ void ECLDataAnalysisModule::event()
     m_eclClusterLAT->push_back(aECLClusters->getLAT());
     m_eclClusterDeltaTime99->push_back(aECLClusters->getDeltaTime99());
     m_eclClusterDetectorRegion->push_back(aECLClusters->getDetectorRegion());
-    m_eclClusterHypothesisId->push_back(aECLClusters->getHypothesis());
+    m_eclClusterHypothesisId->push_back(aECLClusters->getHypotheses());
 
     if (aECLClusters->getRelated<ECLShower>() != (nullptr)) {
       const ECLShower* shower_cluster = aECLClusters->getRelated<ECLShower>();
@@ -1824,7 +1824,7 @@ void ECLDataAnalysisModule::event()
       m_eclPureClusterE1oE9->push_back(aECLClusters->getE1oE9());
       m_eclPureClusterDeltaTime99->push_back(aECLClusters->getDeltaTime99());
       m_eclPureClusterDetectorRegion->push_back(aECLClusters->getDetectorRegion());
-      m_eclPureClusterHypothesisId->push_back(aECLClusters->getHypothesis());
+      m_eclPureClusterHypothesisId->push_back(aECLClusters->getHypotheses());
 
       //Dump MC Info - Multiple Matching
       double sumHit = 0;

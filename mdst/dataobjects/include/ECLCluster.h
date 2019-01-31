@@ -62,7 +62,7 @@ namespace Belle2 {
     ECLCluster() :
       m_isTrack(false),
       m_status(0),
-      m_hypothesis(static_cast<unsigned short>(EHypothesisBit::c_nPhotons)), // set to c_nPhotons for b2bii
+      m_hypotheses(static_cast<unsigned short>(EHypothesisBit::c_nPhotons)), // set to c_nPhotons for b2bii
       m_connectedRegionId(0),
       m_clusterId(0),
       m_sqrtcovmat_00(0.),
@@ -112,21 +112,21 @@ namespace Belle2 {
      */
     void removeStatus(EStatusBit bitmask) { m_status &= (~static_cast<short unsigned>(bitmask)); }
 
-    /** Set hypothesis. */
-    void setHypothesis(EHypothesisBit hypothesis) { m_hypothesis = static_cast<short unsigned>(hypothesis); }
+    /** Set hypotheses. */
+    void setHypothesis(EHypothesisBit hypothesis) { m_hypotheses = static_cast<short unsigned>(hypothesis); }
 
     /**
      * Add bitmask to current hypothesis.
      * @param bitmask The status code which should be added.
      */
-    void addHypothesis(EHypothesisBit bitmask) { m_hypothesis |= static_cast<short unsigned>(bitmask); }
+    void addHypothesis(EHypothesisBit bitmask) { m_hypotheses |= static_cast<short unsigned>(bitmask); }
 
     /**
      * Remove bitmask from current hypothesis.
      * @param bitmask The hypothesis code which should be removed.
 
      */
-    void removeHypothesis(EHypothesisBit bitmask) { m_hypothesis &= (~static_cast<short unsigned>(bitmask)); }
+    void removeHypothesis(EHypothesisBit bitmask) { m_hypotheses &= (~static_cast<short unsigned>(bitmask)); }
 
     /** Set connected region id. */
     void setConnectedRegionId(int crid) { m_connectedRegionId = crid; }
@@ -231,8 +231,8 @@ namespace Belle2 {
     /** Return status. */
     unsigned short getStatus() const {return m_status;}
 
-    /** Return hypothesis. */
-    unsigned short getHypothesis() const {return m_hypothesis;}
+    /** Return hypothesis (expert only, this returns a bti pattern). */
+    unsigned short getHypotheses() const {return m_hypotheses;}
 
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
@@ -347,7 +347,7 @@ namespace Belle2 {
      * @param bitmask The bitmask which is compared to the hypothesis of the cluster.
      * @return Returns true if the bitmask matches the hypothesis code of the cluster.
      */
-    bool hasHypothesis(EHypothesisBit bitmask) const { return (m_hypothesis & static_cast<short unsigned>(bitmask)) == static_cast<short unsigned>(bitmask); }
+    bool hasHypothesis(EHypothesisBit bitmask) const { return (m_hypotheses & static_cast<short unsigned>(bitmask)) == static_cast<short unsigned>(bitmask); }
 
     /** Check if ECLCluster is matched to an ECLTRGCluster */
     bool isTriggerCluster() const {return hasStatus(EStatusBit::c_TriggerCluster);}
@@ -367,7 +367,7 @@ namespace Belle2 {
     unsigned short m_status;
 
     /** Hypothesis. */
-    unsigned short m_hypothesis;
+    unsigned short m_hypotheses;
 
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
@@ -463,7 +463,7 @@ namespace Belle2 {
 
     /** Class definition */
     ClassDef(ECLCluster, 13);
-    // 13: Added m_hypothesis
+    // 13: Added m_hypotheses
     // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.
     // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables
     // 10: Added status enum, added status setter

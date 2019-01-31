@@ -287,7 +287,7 @@ void DataWriterModule::event()
       m_KLMECLZ51            = closestECLCluster->getAbsZernike51();
       m_KLMECLUncertaintyPhi = closestECLCluster->getUncertaintyPhi();
       m_KLMECLUncertaintyTheta = closestECLCluster->getUncertaintyTheta();
-      m_KLMECLHypo = closestECLCluster->getHypothesis();
+      m_KLMECLHypo = closestECLCluster->getHypotheses();
     } else {
       m_KLMECLdeltaL         = -999;
       m_KLMECLminTrackDist   = -999;

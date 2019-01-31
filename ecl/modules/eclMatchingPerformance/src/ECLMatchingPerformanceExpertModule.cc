@@ -116,7 +116,7 @@ void ECLMatchingPerformanceExpertModule::event()
         if (!eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
         if (!(eclCluster.isTrack())) continue;
         m_matchedToECLCluster = 1;
-        m_hypothesisOfMatchedECLCluster = eclCluster.getHypothesis();
+        m_hypothesisOfMatchedECLCluster = eclCluster.getHypotheses();
         break;
       }
 

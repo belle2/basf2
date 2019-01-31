@@ -15,5 +15,6 @@
 #pragma link C++ class Belle2::SVDFADCMaskedStrips;
 #pragma link C++ class Belle2::SVDHotStripsCalibrations;
 #pragma link C++ class Belle2::SVDLocalCalibrationsImporter+;
+#pragma link C++ class Belle2::SVDDetectorConfiguration+;
 
 #endif

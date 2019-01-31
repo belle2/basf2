@@ -20,8 +20,8 @@
 /* Belle2 headers. */
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 #include <framework/datastore/RelationArray.h>
+#include <klm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 
 using namespace Belle2;
 

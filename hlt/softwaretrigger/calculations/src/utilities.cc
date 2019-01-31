@@ -11,11 +11,6 @@
 
 namespace Belle2 {
   namespace SoftwareTrigger {
-    const ECLCluster* getECLCluster(const Particle& particle)
-    {
-      return particle.getECLCluster();
-    }
-
     double getRhoOfECLClusterWithMaximumRhoBelow(const StoreObjPtr<ParticleList>& pions,
                                                  const StoreObjPtr<ParticleList>& gammas,
                                                  const double belowLimit)
@@ -23,7 +18,7 @@ namespace Belle2 {
       double maximumRho = -1.;
 
       for (const Particle& particle : *pions) {
-        const ECLCluster* tmpCluster = getECLCluster(particle);
+        const ECLCluster* tmpCluster = particle.getECLCluster();
         if (not tmpCluster) {
           continue;
         }
@@ -40,7 +35,7 @@ namespace Belle2 {
       }
 
       for (const Particle& particle : *gammas) {
-        const ECLCluster* tmpCluster = getECLCluster(particle);
+        const ECLCluster* tmpCluster = particle.getECLCluster();
         if (not tmpCluster) {
           continue;
         }

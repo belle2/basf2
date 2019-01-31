@@ -588,9 +588,9 @@ namespace Belle2 {
     const PIDLikelihood* getPIDLikelihood() const;
 
     /**
-     * Returns the pointer to the ECLCluster object that was used to create this Particle (ParticleType == c_ECLCluster).
-     * or the track-matched cluster otherwise.
-     * NULL pointer is returned, if the Particle has no ECLCluster source or relation.
+     * Returns the pointer to the ECLCluster object that was used to create this Particle (if ParticleType == c_ECLCluster).
+     * Returns the pointer to the most energetic ECLCluster matched to the track (if ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle has no relation to an ECLCluster (either the particle is a different type or there was no track match).
      * @return const pointer to the ECLCluster
      */
     const ECLCluster* getECLCluster() const;

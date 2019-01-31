@@ -103,7 +103,7 @@ namespace Belle2 {
       // nECLMatchTracksLE
       const unsigned int numberOfTracksWithECLMatch = std::count_if(m_pionParticles->begin(), m_pionParticles->end(),
       [](const Particle & particle) {
-        return getECLCluster(particle) != nullptr;
+        return particle.getECLCluster() != nullptr;
       });
       calculationResult["nECLMatchTracksLE"] = numberOfTracksWithECLMatch;
 
@@ -228,7 +228,7 @@ namespace Belle2 {
       const unsigned int nEidLE = std::count_if(m_pionParticles->begin(), m_pionParticles->end(), [](const Particle & p) {
         const double& momentum  = p.getMomentumMagnitude();
         const double& r_rho = getRho(&p);
-        const ECLCluster* eclTrack = getECLCluster(p);
+        const ECLCluster* eclTrack = p.getECLCluster();
         if (eclTrack) {
           const double& energyOverMomentum = eclTrack->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / momentum;
           double r_rhotoebeam = r_rho / BeamEnergyCMS();
@@ -256,7 +256,7 @@ namespace Belle2 {
       // EtotLE
       const double eTotTracks = std::accumulate(m_pionParticles->begin(), m_pionParticles->end(), 0.0,
       [](const double & eTot, const Particle & p) {
-        const ECLCluster* eclCluster = getECLCluster(p);
+        const ECLCluster* eclCluster = p.getECLCluster();
         if (eclCluster) {
           const double eclEnergy = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
           if (eclEnergy > 0.1) {

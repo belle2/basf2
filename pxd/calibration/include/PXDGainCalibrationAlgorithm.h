@@ -36,6 +36,9 @@ namespace Belle2 {
     /// Force continue in low statistics runs instead of returning c_NotEnoughData
     bool forceContinue;
 
+    /// strategy to used for gain calibration, 0 for medians, 1 for landau fit
+    int strategy;
+
   protected:
 
     /// Run algo on data
@@ -48,6 +51,9 @@ namespace Belle2 {
 
     /// Calculate a median from unsorted signal vector. The input vector gets sorted.
     double CalculateMedian(std::vector<double>& signals);
+
+    /// Calculate MPV from signal vector using a landau fit.
+    double FitLandau(std::vector<double>& signals);
 
     /// Retrive charge median value from pulled in data base payload
     double GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);

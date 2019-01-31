@@ -12,9 +12,9 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/modules/KLMK0LReconstructor/KLMHit2d.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/modules/KLMK0LReconstructor/KLMHit2d.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {

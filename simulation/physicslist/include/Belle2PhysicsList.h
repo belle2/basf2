@@ -12,7 +12,6 @@
 #define BELLE2PHYSICSLIST_H
 
 #include "G4VModularPhysicsList.hh"
-#include "globals.hh"
 
 namespace Belle2 {
 
@@ -20,16 +19,27 @@ namespace Belle2 {
 
     /**
      * Custom Geant4 physics list for Belle II with options to
-     * add optical physics and high precision neutrons
+     * add optical physics, standard EM physics and high precision
+     * neutrons
      */
     class Belle2PhysicsList: public G4VModularPhysicsList {
+
     public:
-      Belle2PhysicsList();
+      Belle2PhysicsList(const G4String& physicsListName);
       ~Belle2PhysicsList();
 
       virtual void ConstructParticle();
       virtual void SetCuts();
 
+      void SetVerbosity(G4int verb);
+      void SetProductionCutValue(G4double);
+
+      void UseStandardEMPhysics(G4bool);
+      void UseOpticalPhysics(G4bool);
+      void UseHighPrecisionNeutrons(G4bool);
+
+    private:
+      G4double m_globalCutValue;
     };
 
   } // end of namespace Simulation

@@ -23,7 +23,6 @@ parser = argparse.ArgumentParser(description="SVD Local Calibrations Importer")
 parser.add_argument('--exp', metavar='experiment', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='run', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cfgXML', metavar='config xml', dest='calib', type=str, nargs=1, help='GlobalRun Calibration XML file')
-parser.add_argument('--mapXML', metavar='channel map xml', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 parser.add_argument('--isLocalXML', dest='localXml', action='store_const', const=True, default=False,
                     help='Add this parameter if the XML is a Local run configuration instead of a Global Run Configuration')
 parser.add_argument('--nomask', dest='mask', action='store_const', default=False, const=True,
@@ -45,10 +44,6 @@ if args.calib is not None:
 else:
     calibfile = args.calib
 
-if args.mapp is not None:
-    mappingfile = args.mapp[0]
-else:
-    mappingfile = args.mapp
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -63,7 +58,6 @@ print('| ---> CHECK HERE: <---')
 print('|     experiment number = ' + str(experiment))
 print('|first valid run number = ' + str(run))
 print('|       calibration xml = ' + str(calibfile))
-print('|           mapping xml = ' + str(mappingfile))
 print('|   is a global run xml = ' + str(not args.localXml))
 print('|          import masks = ' + str(not args.mask))
 print('| --->   THANKS!   <---')
@@ -79,8 +73,8 @@ if not str(proceed) == 'y':
 reset_database()
 use_database_chain()
 # central DB needed for the channel mapping DB object
-GLOBAL_TAG = "vxd_commissioning_20181030"
-# GLOBAL_TAG="svd_Belle2_20181221"
+# GLOBAL_TAG = "vxd_commissioning_20181030"
+GLOBAL_TAG = "svd_Belle2_20181221"
 use_central_database(GLOBAL_TAG)
 use_local_database("localDB/database.txt", "localDB", invertLogging=True)
 
@@ -99,8 +93,6 @@ main.add_module("Gearbox")
 
 run = int(run)
 
-# TO DO, enable calibration of calib or mapping, depending on the user input
-
 
 class dbImporterModule(Module):
     def beginRun(self):
@@ -116,23 +108,18 @@ class dbImporterModule(Module):
             # import pulse shape calibrations
             dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
             print(colored("V) Pulse Shape Calibrations Imported", 'green'))
-            if not args.localXml:
-                # import channel mapping
-                dbImporter.importSVDGlobalXMLFile(calibfile)
-                print(colored("V) Global Run Configuration xml payload file Imported", 'green'))
-            else:
-                print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
             # import FADCMasked strips only if NOT --nomask
             if not args.mask:
                 dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
                 print(colored("V) FADC Masked Strips Imported", 'green'))
             else:
-                print(colored("(X) FADC Masked Strips are NOT imported.", 'red'))
-
-        if args.mapp is not None:
-            # import channel mapping
-            dbImporter.importSVDChannelMapping(mappingfile)
-            print(colored("V) Channel Mapping Imported", 'green'))
+                print(colored("X) FADC Masked Strips are NOT imported.", 'red'))
+            if not args.localXml:
+                # import XML file only if NOT --isLocalXML
+                dbImporter.importSVDGlobalXMLFile(calibfile)
+                print(colored("V) Global Run Configuration xml payload file Imported", 'green'))
+            else:
+                print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
 
 
 main.add_module(dbImporterModule())

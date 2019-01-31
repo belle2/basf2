@@ -37,15 +37,17 @@ using namespace Simulation;
 
 
 HyperonPhysics::HyperonPhysics()
+  : m_ftfp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
+    m_fragModel(nullptr), m_preCompoundModel(nullptr)
 {}
 
 
 HyperonPhysics::~HyperonPhysics()
 {
-  delete stringDecay;
-  delete stringModel;
-  delete fragModel;
-  delete preCompoundModel;
+  delete m_stringDecay;
+  delete m_stringModel;
+  delete m_fragModel;
+  delete m_preCompoundModel;
 }
 
 
@@ -66,17 +68,17 @@ void HyperonPhysics::ConstructProcess()
   loInelModel->SetMaxEnergy(6.0 * GeV);
 
   // Use FTFP for high energies   ==>>   eventually replace this with new class FTFPInterface
-  ftfp = new G4TheoFSGenerator("FTFP");
-  stringModel = new G4FTFModel;
-  stringDecay =
-    new G4ExcitedStringDecay(fragModel = new G4LundStringFragmentation);
-  stringModel->SetFragmentationModel(stringDecay);
-  preCompoundModel = new G4GeneratorPrecompoundInterface();
+  m_ftfp = new G4TheoFSGenerator("FTFP");
+  m_stringModel = new G4FTFModel;
+  m_stringDecay =
+    new G4ExcitedStringDecay(m_fragModel = new G4LundStringFragmentation);
+  m_stringModel->SetFragmentationModel(m_stringDecay);
+  m_preCompoundModel = new G4GeneratorPrecompoundInterface();
 
-  ftfp->SetHighEnergyGenerator(stringModel);
-  ftfp->SetTransport(preCompoundModel);
-  ftfp->SetMinEnergy(4 * GeV);
-  ftfp->SetMaxEnergy(100 * TeV);
+  m_ftfp->SetHighEnergyGenerator(m_stringModel);
+  m_ftfp->SetTransport(m_preCompoundModel);
+  m_ftfp->SetMinEnergy(4 * GeV);
+  m_ftfp->SetMaxEnergy(100 * TeV);
 
   // Inelastic cross section set
   G4ChipsHyperonInelasticXS* chipsInelastic = new G4ChipsHyperonInelasticXS;
@@ -95,7 +97,7 @@ void HyperonPhysics::ConstructProcess()
   // inelastic
   G4LambdaInelasticProcess* lamProcInel = new G4LambdaInelasticProcess;
   lamProcInel->RegisterMe(loInelModel);
-  lamProcInel->RegisterMe(ftfp);
+  lamProcInel->RegisterMe(m_ftfp);
   lamProcInel->AddDataSet(chipsInelastic);
   procMan->AddDiscreteProcess(lamProcInel);
 
@@ -113,7 +115,7 @@ void HyperonPhysics::ConstructProcess()
   // inelastic
   G4SigmaPlusInelasticProcess* spProcInel = new G4SigmaPlusInelasticProcess;
   spProcInel->RegisterMe(loInelModel);
-  spProcInel->RegisterMe(ftfp);
+  spProcInel->RegisterMe(m_ftfp);
   spProcInel->AddDataSet(chipsInelastic);
   procMan->AddDiscreteProcess(spProcInel);
 
@@ -131,7 +133,7 @@ void HyperonPhysics::ConstructProcess()
   // inelastic
   G4SigmaMinusInelasticProcess* smProcInel = new G4SigmaMinusInelasticProcess;
   smProcInel->RegisterMe(loInelModel);
-  smProcInel->RegisterMe(ftfp);
+  smProcInel->RegisterMe(m_ftfp);
   smProcInel->AddDataSet(chipsInelastic);
   procMan->AddDiscreteProcess(smProcInel);
 
@@ -153,7 +155,7 @@ void HyperonPhysics::ConstructProcess()
   // inelastic
   G4XiZeroInelasticProcess* xzProcInel = new G4XiZeroInelasticProcess;
   xzProcInel->RegisterMe(loInelModel);
-  xzProcInel->RegisterMe(ftfp);
+  xzProcInel->RegisterMe(m_ftfp);
   xzProcInel->AddDataSet(chipsInelastic);
   procMan->AddDiscreteProcess(xzProcInel);
 
@@ -171,7 +173,7 @@ void HyperonPhysics::ConstructProcess()
   // inelastic
   G4XiMinusInelasticProcess* xmProcInel = new G4XiMinusInelasticProcess;
   xmProcInel->RegisterMe(loInelModel);
-  xmProcInel->RegisterMe(ftfp);
+  xmProcInel->RegisterMe(m_ftfp);
   xmProcInel->AddDataSet(chipsInelastic);
   procMan->AddDiscreteProcess(xmProcInel);
 
@@ -193,7 +195,7 @@ void HyperonPhysics::ConstructProcess()
   // inelastic
   G4OmegaMinusInelasticProcess* omProcInel = new G4OmegaMinusInelasticProcess;
   omProcInel->RegisterMe(loInelModel);
-  omProcInel->RegisterMe(ftfp);
+  omProcInel->RegisterMe(m_ftfp);
   omProcInel->AddDataSet(chipsInelastic);
   procMan->AddDiscreteProcess(omProcInel);
 

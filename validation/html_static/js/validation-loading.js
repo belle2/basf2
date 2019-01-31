@@ -159,7 +159,7 @@ function fill_ntuple_table(dom_id, json_loading_path ) {
         for ( var rev in data) {
         	for ( var fig in data[rev]) {
         		val_pair = data[rev][fig];
-        		console.log(val_pair);
+//        		console.log(val_pair);
         		items.push("<th>"+val_pair[0]+"</th>");
         	}
             break;
@@ -188,7 +188,7 @@ function fill_ntuple_table(dom_id, json_loading_path ) {
             items.push("<td>" + key + "</td>");
         	for ( var fig in data[key]) {
         		val_pair = data[key][fig];
-        		console.log(val_pair);
+//        		console.log(val_pair);
         		items.push("<td>" + val_pair[1] + "</td>");    
         	}            
             items.push("</tr>");}

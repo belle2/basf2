@@ -153,7 +153,7 @@
 {{#partial plot_description}}
     <div class="wrap_boxes_descriptions">
         <span><strong>Package: </strong>{{ package }}</span><br>
-        <span><strong>Description: </strong>{{ description }}</span><br>
+        <span><strong>Description: </strong>{{{ description }}}</span><br>
         <span><strong>ROOT file: </strong>{{ rootfile }}.root</span><br>
         <span><strong>Chi^2 Test: </strong>{{ comparison_text }}</span><br>
         {{! if the warning has not been set, no pvalue is available either }}
@@ -169,7 +169,7 @@
 {{#partial ntuple_description}}
     <div class="wrap_boxes_descriptions">
         <span><strong>Package: </strong>{{ package }}</span><br>
-        <span><strong>Description: </strong>{{ description }}</span><br>
+        <span><strong>Description: </strong>{{{ description }}}</span><br>
         <span><strong>Contact: </strong>{{ contact }}</span><br>
         <span><strong>Check for: </strong>{{ check }}</span><br>
         <!-- todo: share this plot -->

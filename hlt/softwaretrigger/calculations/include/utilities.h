@@ -120,9 +120,6 @@ namespace Belle2 {
       return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity)).Rho();
     }
 
-    /// Helper function to extract the ECL cluster from a particle - either directly or via the attached track.
-    extern const ECLCluster* getECLCluster(const Particle& particle, const bool fromTrack);
-
     /**
      * Helper function to get the element with the maximal rho in the CMS frame in the particle list, which has a rho
      * value below a given threshold.

@@ -71,14 +71,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'TOP' in components:
         topdqm = register_module('TOPDQM')
         path.add_module(topdqm)
-    # BKLM
-    if components is None or 'BKLM' in components:
-        bklmdqm = register_module("BKLMDQM")
-        path.add_module(bklmdqm)
-    # EKLM
-    if components is None or 'EKLM' in components:
-        eklmdqm = register_module('EKLMDQM')
-        path.add_module(eklmdqm)
+    # KLM
+    if components is None or 'BKLM' or 'EKLM' in components:
+        klmdqm = register_module("KLMDQM")
+        path.add_module(klmdqm)
     # TRG
     if components is None or 'TRG' in components:
         # TRGECL

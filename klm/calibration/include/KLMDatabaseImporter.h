@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018  Belle II Collaboration                              *
+ * Copyright(C) 2016  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -10,58 +10,52 @@
 
 #pragma once
 
-/* External headers. */
-#include <TObject.h>
+/* Belle2 headers. */
+#include <framework/database/DBImportObjPtr.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 
 namespace Belle2 {
 
   /**
-   * EKLM data concentrator lane identifier.
+   * KLM database importer.
    */
-  class EKLMTimeConversion : public TObject {
+  class KLMDatabaseImporter {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMTimeConversion();
+    KLMDatabaseImporter();
 
     /**
      * Destructor.
      */
-    ~EKLMTimeConversion();
+    ~KLMDatabaseImporter();
 
     /**
-     * Set TDC frequency.
+     * Set interval of validity.
      */
-    void setTDCFrequency(double frequency);
+    void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     /**
-     * Set time offset.
+     * Import time conversion parameters.
      */
-    void setTimeOffset(double offset);
-
-    /**
-     * Get time by TDC.
-     */
-    double getTimeByTDC(uint16_t tdc) const;
-
-    /**
-     * Get TDC by time.
-     */
-    uint16_t getTDCByTime(double time) const;
+    void importTimeConversion(const KLMTimeConversion* timeConversion);
 
   private:
 
-    /** TDC period in ns. */
-    double m_TDCPeriod;
+    /** Low experiment. */
+    int m_ExperimentLow;
 
-    /** Time offset. */
-    double m_TimeOffset;
+    /** Low run. */
+    int m_RunLow;
 
-    /** Class version, */
-    ClassDef(EKLMTimeConversion, 1);
+    /** High experiment. */
+    int m_ExperimentHigh;
+
+    /** High run. */
+    int m_RunHigh;
 
   };
 

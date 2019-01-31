@@ -37,11 +37,11 @@ namespace Belle2 {
       virtual void ConstructParticle() override;
 
     private:
-      G4TheoFSGenerator* qgsp;
-      G4QGSModel<G4GammaParticipants>* stringModel;
-      G4ExcitedStringDecay* stringDecay;
-      G4QGSMFragmentation* fragModel;
-      G4GeneratorPrecompoundInterface* preCompoundModel;
+      G4TheoFSGenerator* m_qgsp;
+      G4QGSModel<G4GammaParticipants>* m_stringModel;
+      G4ExcitedStringDecay* m_stringDecay;
+      G4QGSMFragmentation* m_fragModel;
+      G4GeneratorPrecompoundInterface* m_preCompoundModel;
 
     };
 

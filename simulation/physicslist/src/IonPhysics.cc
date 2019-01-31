@@ -36,18 +36,20 @@ using namespace Simulation;
 
 
 IonPhysics::IonPhysics()
+  : m_ftfp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
+    m_fragModel(nullptr), m_preCompoundModel(nullptr)
 {}
 
 
 IonPhysics::~IonPhysics()
 {
-  delete stringDecay;
-  delete stringModel;
-  delete fragModel;
-  delete preCompoundModel;
+  delete m_stringDecay;
+  delete m_stringModel;
+  delete m_fragModel;
+  delete m_preCompoundModel;
 
-  delete theGGNuclNuclXS;
-  delete ionGGXS;
+  delete m_theGGNuclNuclXS;
+  delete m_ionGGXS;
 }
 
 
@@ -64,17 +66,17 @@ void IonPhysics::ConstructProcess()
   ionElastic->SetMinEnergy(0.0);
 
   // FTFP    ==>>   eventually replace this with new class FTFPInterface
-  ftfp = new G4TheoFSGenerator("FTFP");
-  stringModel = new G4FTFModel;
-  stringDecay =
-    new G4ExcitedStringDecay(fragModel = new G4LundStringFragmentation);
-  stringModel->SetFragmentationModel(stringDecay);
-  preCompoundModel = new G4GeneratorPrecompoundInterface();
+  m_ftfp = new G4TheoFSGenerator("FTFP");
+  m_stringModel = new G4FTFModel;
+  m_stringDecay =
+    new G4ExcitedStringDecay(m_fragModel = new G4LundStringFragmentation);
+  m_stringModel->SetFragmentationModel(m_stringDecay);
+  m_preCompoundModel = new G4GeneratorPrecompoundInterface();
 
-  ftfp->SetHighEnergyGenerator(stringModel);
-  ftfp->SetTransport(preCompoundModel);
-  ftfp->SetMinEnergy(10.01 * GeV);
-  ftfp->SetMaxEnergy(1.0 * TeV);
+  m_ftfp->SetHighEnergyGenerator(m_stringModel);
+  m_ftfp->SetTransport(m_preCompoundModel);
+  m_ftfp->SetMinEnergy(10.01 * GeV);
+  m_ftfp->SetMaxEnergy(1.0 * TeV);
 
   // QMD model
   G4QMDReaction* qmd = new G4QMDReaction;
@@ -92,14 +94,14 @@ void IonPhysics::ConstructProcess()
   ionBC->SetMaxEnergy(110.0 * MeV);
 
   // Elastic cross section set
-  ionGGXS = new G4ComponentGGNuclNuclXsc;
-  G4VCrossSectionDataSet* ionElasticXS = new G4CrossSectionElastic(ionGGXS);
+  m_ionGGXS = new G4ComponentGGNuclNuclXsc;
+  G4VCrossSectionDataSet* ionElasticXS = new G4CrossSectionElastic(m_ionGGXS);
   ionElasticXS->SetMinKinEnergy(0.0);
 
   // Inelastic cross section set
-  theGGNuclNuclXS = new G4ComponentGGNuclNuclXsc();
+  m_theGGNuclNuclXS = new G4ComponentGGNuclNuclXsc();
   G4VCrossSectionDataSet* nuclNuclXS =
-    new G4CrossSectionInelastic(theGGNuclNuclXS);
+    new G4CrossSectionInelastic(m_theGGNuclNuclXS);
 
   //////////////////////////////////////////////////////////////////////////////
   //   Deuteron                                                               //
@@ -115,7 +117,7 @@ void IonPhysics::ConstructProcess()
     new G4HadronInelasticProcess("DeuteronInelProcess", G4Deuteron::Deuteron());
   deutProcInel->RegisterMe(ionBC);
   deutProcInel->RegisterMe(qmd);
-  deutProcInel->RegisterMe(ftfp);
+  deutProcInel->RegisterMe(m_ftfp);
   deutProcInel->AddDataSet(nuclNuclXS);
   procMan->AddDiscreteProcess(deutProcInel);
 
@@ -133,7 +135,7 @@ void IonPhysics::ConstructProcess()
     new G4HadronInelasticProcess("TritonInelProcess", G4Triton::Triton());
   tritProcInel->RegisterMe(ionBC);
   tritProcInel->RegisterMe(qmd);
-  tritProcInel->RegisterMe(ftfp);
+  tritProcInel->RegisterMe(m_ftfp);
   tritProcInel->AddDataSet(nuclNuclXS);
   procMan->AddDiscreteProcess(tritProcInel);
 
@@ -151,7 +153,7 @@ void IonPhysics::ConstructProcess()
     new G4HadronInelasticProcess("He3InelProcess", G4He3::He3());
   he3ProcInel->RegisterMe(ionBC);
   he3ProcInel->RegisterMe(qmd);
-  he3ProcInel->RegisterMe(ftfp);
+  he3ProcInel->RegisterMe(m_ftfp);
   he3ProcInel->AddDataSet(nuclNuclXS);
   procMan->AddDiscreteProcess(he3ProcInel);
 
@@ -169,7 +171,7 @@ void IonPhysics::ConstructProcess()
     new G4HadronInelasticProcess("AlphaInelProcess", G4Alpha::Alpha());
   alphProcInel->RegisterMe(ionBC);
   alphProcInel->RegisterMe(qmd);
-  alphProcInel->RegisterMe(ftfp);
+  alphProcInel->RegisterMe(m_ftfp);
   alphProcInel->AddDataSet(nuclNuclXS);
   procMan->AddDiscreteProcess(alphProcInel);
 
@@ -190,7 +192,7 @@ void IonPhysics::ConstructProcess()
     new G4HadronInelasticProcess("IonInelProcess", G4GenericIon::GenericIon());
   genIonProcInel->RegisterMe(ionBC);
   genIonProcInel->RegisterMe(qmd);
-  genIonProcInel->RegisterMe(ftfp);
+  genIonProcInel->RegisterMe(m_ftfp);
   genIonProcInel->AddDataSet(nuclNuclXS);
   procMan->AddDiscreteProcess(genIonProcInel);
 

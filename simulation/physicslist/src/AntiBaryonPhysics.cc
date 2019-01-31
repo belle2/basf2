@@ -47,17 +47,20 @@ using namespace Simulation;
 
 
 AntiBaryonPhysics::AntiBaryonPhysics()
+  : m_ftfp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
+    m_fragModel(nullptr), m_preCompoundModel(nullptr),
+    m_theAntiNucleonXS(nullptr)
 {}
 
 
 AntiBaryonPhysics::~AntiBaryonPhysics()
 {
-  delete stringDecay;
-  delete stringModel;
-  delete fragModel;
-  delete preCompoundModel;
+  delete m_stringDecay;
+  delete m_stringModel;
+  delete m_fragModel;
+  delete m_preCompoundModel;
 
-  delete theAntiNucleonXS;
+  delete m_theAntiNucleonXS;
 }
 
 
@@ -80,26 +83,26 @@ void AntiBaryonPhysics::ConstructProcess()
   anucEl->SetMinEnergy(100.0 * MeV);
 
   // Use FTFP for all energies   ==>>   eventually replace this with new class FTFPInterface
-  ftfp = new G4TheoFSGenerator("FTFP");
-  stringModel = new G4FTFModel;
-  stringDecay =
-    new G4ExcitedStringDecay(fragModel = new G4LundStringFragmentation);
-  stringModel->SetFragmentationModel(stringDecay);
-  preCompoundModel = new G4GeneratorPrecompoundInterface();
+  m_ftfp = new G4TheoFSGenerator("FTFP");
+  m_stringModel = new G4FTFModel;
+  m_stringDecay =
+    new G4ExcitedStringDecay(m_fragModel = new G4LundStringFragmentation);
+  m_stringModel->SetFragmentationModel(m_stringDecay);
+  m_preCompoundModel = new G4GeneratorPrecompoundInterface();
 
-  ftfp->SetHighEnergyGenerator(stringModel);
-  ftfp->SetTransport(preCompoundModel);
-  ftfp->SetMinEnergy(0.0);
-  ftfp->SetMaxEnergy(100 * TeV);
+  m_ftfp->SetHighEnergyGenerator(m_stringModel);
+  m_ftfp->SetTransport(m_preCompoundModel);
+  m_ftfp->SetMinEnergy(0.0);
+  m_ftfp->SetMaxEnergy(100 * TeV);
 
   // Elastic data set
   G4CrossSectionElastic* anucElxs =
     new G4CrossSectionElastic(anucEl->GetComponentCrossSection());
 
   // Inelastic cross section sets
-  theAntiNucleonXS = new G4ComponentAntiNuclNuclearXS;
+  m_theAntiNucleonXS = new G4ComponentAntiNuclNuclearXS;
   G4VCrossSectionDataSet* antiNucleonData =
-    new G4CrossSectionInelastic(theAntiNucleonXS);
+    new G4CrossSectionInelastic(m_theAntiNucleonXS);
 
   G4ChipsHyperonInelasticXS* hchipsInelastic = new G4ChipsHyperonInelasticXS;
 
@@ -118,7 +121,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiProtonInelasticProcess* apProcInel = new G4AntiProtonInelasticProcess;
-  apProcInel->RegisterMe(ftfp);
+  apProcInel->RegisterMe(m_ftfp);
   apProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(apProcInel);
 
@@ -139,7 +142,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiNeutronInelasticProcess* anProcInel = new G4AntiNeutronInelasticProcess;
-  anProcInel->RegisterMe(ftfp);
+  anProcInel->RegisterMe(m_ftfp);
   anProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(anProcInel);
 
@@ -158,7 +161,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiDeuteronInelasticProcess* adProcInel = new G4AntiDeuteronInelasticProcess;
-  adProcInel->RegisterMe(ftfp);
+  adProcInel->RegisterMe(m_ftfp);
   adProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(adProcInel);
 
@@ -181,7 +184,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiTritonInelasticProcess* atProcInel = new G4AntiTritonInelasticProcess;
-  atProcInel->RegisterMe(ftfp);
+  atProcInel->RegisterMe(m_ftfp);
   atProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(atProcInel);
 
@@ -204,7 +207,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiHe3InelasticProcess* ahe3ProcInel = new G4AntiHe3InelasticProcess;
-  ahe3ProcInel->RegisterMe(ftfp);
+  ahe3ProcInel->RegisterMe(m_ftfp);
   ahe3ProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(ahe3ProcInel);
 
@@ -227,7 +230,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiAlphaInelasticProcess* aaProcInel = new G4AntiAlphaInelasticProcess;
-  aaProcInel->RegisterMe(ftfp);
+  aaProcInel->RegisterMe(m_ftfp);
   aaProcInel->AddDataSet(antiNucleonData);
   procMan->AddDiscreteProcess(aaProcInel);
 
@@ -248,7 +251,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiLambdaInelasticProcess* alamProcInel = new G4AntiLambdaInelasticProcess;
-  alamProcInel->RegisterMe(ftfp);
+  alamProcInel->RegisterMe(m_ftfp);
   alamProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(alamProcInel);
 
@@ -265,7 +268,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiSigmaPlusInelasticProcess* aspProcInel = new G4AntiSigmaPlusInelasticProcess;
-  aspProcInel->RegisterMe(ftfp);
+  aspProcInel->RegisterMe(m_ftfp);
   aspProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(aspProcInel);
 
@@ -286,7 +289,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiSigmaMinusInelasticProcess* asmProcInel = new G4AntiSigmaMinusInelasticProcess;
-  asmProcInel->RegisterMe(ftfp);
+  asmProcInel->RegisterMe(m_ftfp);
   asmProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(asmProcInel);
 
@@ -303,7 +306,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiXiZeroInelasticProcess* axzProcInel = new G4AntiXiZeroInelasticProcess;
-  axzProcInel->RegisterMe(ftfp);
+  axzProcInel->RegisterMe(m_ftfp);
   axzProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(axzProcInel);
 
@@ -320,7 +323,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiXiMinusInelasticProcess* axmProcInel = new G4AntiXiMinusInelasticProcess;
-  axmProcInel->RegisterMe(ftfp);
+  axmProcInel->RegisterMe(m_ftfp);
   axmProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(axmProcInel);
 
@@ -337,7 +340,7 @@ void AntiBaryonPhysics::ConstructProcess()
 
   // inelastic
   G4AntiOmegaMinusInelasticProcess* aomProcInel = new G4AntiOmegaMinusInelasticProcess;
-  aomProcInel->RegisterMe(ftfp);
+  aomProcInel->RegisterMe(m_ftfp);
   aomProcInel->AddDataSet(hchipsInelastic);
   procMan->AddDiscreteProcess(aomProcInel);
 

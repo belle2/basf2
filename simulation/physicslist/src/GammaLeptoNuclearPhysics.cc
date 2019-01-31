@@ -32,15 +32,17 @@ using namespace Simulation;
 
 
 GammaLeptoNuclearPhysics::GammaLeptoNuclearPhysics()
+  : m_qgsp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
+    m_fragModel(nullptr), m_preCompoundModel(nullptr)
 {}
 
 
 GammaLeptoNuclearPhysics::~GammaLeptoNuclearPhysics()
 {
-  delete stringDecay;
-  delete stringModel;
-  delete fragModel;
-  delete preCompoundModel;
+  delete m_stringDecay;
+  delete m_stringModel;
+  delete m_fragModel;
+  delete m_preCompoundModel;
 }
 
 
@@ -52,17 +54,17 @@ void GammaLeptoNuclearPhysics::ConstructProcess()
   theGammaReaction->SetMaxEnergy(3.5 * GeV);
 
   // Use QGSP for high energies
-  qgsp = new G4TheoFSGenerator("QGSP");
-  stringModel = new G4QGSModel<G4GammaParticipants>;
-  stringDecay =
-    new G4ExcitedStringDecay(fragModel = new G4QGSMFragmentation);
-  stringModel->SetFragmentationModel(stringDecay);
-  preCompoundModel = new G4GeneratorPrecompoundInterface();
+  m_qgsp = new G4TheoFSGenerator("QGSP");
+  m_stringModel = new G4QGSModel<G4GammaParticipants>;
+  m_stringDecay =
+    new G4ExcitedStringDecay(m_fragModel = new G4QGSMFragmentation);
+  m_stringModel->SetFragmentationModel(m_stringDecay);
+  m_preCompoundModel = new G4GeneratorPrecompoundInterface();
 
-  qgsp->SetHighEnergyGenerator(stringModel);
-  qgsp->SetTransport(preCompoundModel);
-  qgsp->SetMinEnergy(3 * GeV);
-  qgsp->SetMaxEnergy(100 * TeV);
+  m_qgsp->SetHighEnergyGenerator(m_stringModel);
+  m_qgsp->SetTransport(m_preCompoundModel);
+  m_qgsp->SetMinEnergy(3 * GeV);
+  m_qgsp->SetMaxEnergy(100 * TeV);
 
   // Lepto-nuclear models
   G4ElectroVDNuclearModel* evdn = new G4ElectroVDNuclearModel;
@@ -75,7 +77,7 @@ void GammaLeptoNuclearPhysics::ConstructProcess()
   procMan = G4Gamma::Gamma()->GetProcessManager();
   G4PhotoNuclearProcess* pnProc = new G4PhotoNuclearProcess;
   pnProc->RegisterMe(theGammaReaction);
-  pnProc->RegisterMe(qgsp);
+  pnProc->RegisterMe(m_qgsp);
   procMan->AddDiscreteProcess(pnProc);
 
   // Electron

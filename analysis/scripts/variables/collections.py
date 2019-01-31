@@ -211,7 +211,6 @@ momentum_uncertainty = [
 
 #: Replacement for RecoStats tool
 reco_stats = [
-    'nECLClusters',
     'nTracks',
 ]
 

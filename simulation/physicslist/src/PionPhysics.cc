@@ -37,15 +37,17 @@ using namespace Simulation;
 
 
 PionPhysics::PionPhysics()
+  : m_ftfp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
+    m_fragModel(nullptr), m_preCompoundModel(nullptr)
 {}
 
 
 PionPhysics::~PionPhysics()
 {
-  delete stringDecay;
-  delete stringModel;
-  delete fragModel;
-  delete preCompoundModel;
+  delete m_stringDecay;
+  delete m_stringModel;
+  delete m_fragModel;
+  delete m_preCompoundModel;
 }
 
 
@@ -71,17 +73,17 @@ void PionPhysics::ConstructProcess()
   loInelModel->SetMaxEnergy(12.0 * GeV);
 
   // Use FTFP for high energies   ==>>   eventually replace this with new class FTFPInterface
-  ftfp = new G4TheoFSGenerator("FTFP");
-  stringModel = new G4FTFModel;
-  stringDecay =
-    new G4ExcitedStringDecay(fragModel = new G4LundStringFragmentation);
-  stringModel->SetFragmentationModel(stringDecay);
-  preCompoundModel = new G4GeneratorPrecompoundInterface();
+  m_ftfp = new G4TheoFSGenerator("FTFP");
+  m_stringModel = new G4FTFModel;
+  m_stringDecay =
+    new G4ExcitedStringDecay(m_fragModel = new G4LundStringFragmentation);
+  m_stringModel->SetFragmentationModel(m_stringDecay);
+  m_preCompoundModel = new G4GeneratorPrecompoundInterface();
 
-  ftfp->SetHighEnergyGenerator(stringModel);
-  ftfp->SetTransport(preCompoundModel);
-  ftfp->SetMinEnergy(10 * GeV);
-  ftfp->SetMaxEnergy(100 * TeV);
+  m_ftfp->SetHighEnergyGenerator(m_stringModel);
+  m_ftfp->SetTransport(m_preCompoundModel);
+  m_ftfp->SetMinEnergy(10 * GeV);
+  m_ftfp->SetMaxEnergy(100 * TeV);
 
   // Inelastic cross section
   G4VCrossSectionDataSet* piCS = new G4CrossSectionPairGG(new G4PiNuclearCrossSection, 91 * GeV);
@@ -102,7 +104,7 @@ void PionPhysics::ConstructProcess()
   // inelastic
   G4PionPlusInelasticProcess* pipProcInel = new G4PionPlusInelasticProcess;
   pipProcInel->RegisterMe(loInelModel);
-  pipProcInel->RegisterMe(ftfp);
+  pipProcInel->RegisterMe(m_ftfp);
   pipProcInel->AddDataSet(piCS);
   procMan->AddDiscreteProcess(pipProcInel);
 
@@ -122,7 +124,7 @@ void PionPhysics::ConstructProcess()
   // inelastic
   G4PionMinusInelasticProcess* pimProcInel = new G4PionMinusInelasticProcess;
   pimProcInel->RegisterMe(loInelModel);
-  pimProcInel->RegisterMe(ftfp);
+  pimProcInel->RegisterMe(m_ftfp);
   pimProcInel->AddDataSet(piCS);
   procMan->AddDiscreteProcess(pimProcInel);
 

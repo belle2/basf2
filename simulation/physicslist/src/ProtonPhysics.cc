@@ -32,15 +32,17 @@ using namespace Simulation;
 
 
 ProtonPhysics::ProtonPhysics()
+  : m_ftfp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
+    m_fragModel(nullptr), m_preCompoundModel(nullptr)
 {}
 
 
 ProtonPhysics::~ProtonPhysics()
 {
-  delete stringDecay;
-  delete stringModel;
-  delete fragModel;
-  delete preCompoundModel;
+  delete m_stringDecay;
+  delete m_stringModel;
+  delete m_fragModel;
+  delete m_preCompoundModel;
 }
 
 
@@ -55,17 +57,17 @@ void ProtonPhysics::ConstructProcess()
   loInelModel->SetMaxEnergy(12.0 * GeV);
 
   // Use FTFP for high energies   ==>>   eventually replace this with new class FTFPInterface
-  ftfp = new G4TheoFSGenerator("FTFP");
-  stringModel = new G4FTFModel;
-  stringDecay =
-    new G4ExcitedStringDecay(fragModel = new G4LundStringFragmentation);
-  stringModel->SetFragmentationModel(stringDecay);
-  preCompoundModel = new G4GeneratorPrecompoundInterface();
+  m_ftfp = new G4TheoFSGenerator("FTFP");
+  m_stringModel = new G4FTFModel;
+  m_stringDecay =
+    new G4ExcitedStringDecay(m_fragModel = new G4LundStringFragmentation);
+  m_stringModel->SetFragmentationModel(m_stringDecay);
+  m_preCompoundModel = new G4GeneratorPrecompoundInterface();
 
-  ftfp->SetHighEnergyGenerator(stringModel);
-  ftfp->SetTransport(preCompoundModel);
-  ftfp->SetMinEnergy(5 * GeV);
-  ftfp->SetMaxEnergy(100 * TeV);
+  m_ftfp->SetHighEnergyGenerator(m_stringModel);
+  m_ftfp->SetTransport(m_preCompoundModel);
+  m_ftfp->SetMinEnergy(5 * GeV);
+  m_ftfp->SetMaxEnergy(100 * TeV);
 
   // Inelastic cross section
   G4BGGNucleonInelasticXS* inelCS = new G4BGGNucleonInelasticXS(G4Proton::Proton());
@@ -82,7 +84,7 @@ void ProtonPhysics::ConstructProcess()
   // Inelastic process
   G4ProtonInelasticProcess* pProcInel = new G4ProtonInelasticProcess;
   pProcInel->RegisterMe(loInelModel);
-  pProcInel->RegisterMe(ftfp);
+  pProcInel->RegisterMe(m_ftfp);
   pProcInel->AddDataSet(inelCS);
   procMan->AddDiscreteProcess(pProcInel);
 }

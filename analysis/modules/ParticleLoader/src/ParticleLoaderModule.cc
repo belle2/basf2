@@ -383,7 +383,7 @@ namespace Belle2 {
     if (m_Tracks2Plists.empty()) // nothing to do
       return;
 
-    // create all lists
+    // create and initialize the particle lists
     for (auto track2Plist : m_Tracks2Plists) {
       string listName = get<c_PListName>(track2Plist);
       string antiListName = get<c_AntiPListName>(track2Plist);
@@ -394,6 +394,7 @@ namespace Belle2 {
       plist.create();
       plist->initialize(pdgCode, listName);
 
+      // if cc exists then also create and bind that list
       if (!isSelfConjugatedParticle) {
         StoreObjPtr<ParticleList> antiPlist(antiListName);
         antiPlist.create();
@@ -403,21 +404,25 @@ namespace Belle2 {
       }
     }
 
+    // grab the StoreArray for tracks and particles
     StoreArray<Track> Tracks;
     StoreArray<Particle> particles;
 
+    // the outer loop over all tracks from which Particles
+    // are created, and get sorted in the particle lists
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
       const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
 
+      // inner loop over the ParticleLists
       for (size_t ilist = 0; ilist < m_Tracks2Plists.size(); ilist++) {
         auto track2Plist = m_Tracks2Plists[ilist];
         string listName = get<c_PListName>(track2Plist);
         auto& cut = get<c_CutPointer>(track2Plist);
         StoreObjPtr<ParticleList> plist(listName);
 
-        //if no track hypothesis is requested, use the particle's own
+        // if no track hypothesis is requested, use the particle's own
         int pdgCode;
         if (m_trackHypothesis == 0)
           pdgCode = get<c_PListPDGCode>(track2Plist);
@@ -428,7 +433,7 @@ namespace Belle2 {
         // the one with the closest mass
         const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
 
-        if (!trackFit) {
+        if (!trackFit) { // should never happen with the "closest mass" getter - leave as a sanity check
           B2WARNING("Track returned null TrackFitResult pointer for ChargedStable::getPDGCode()  = " << type.getPDGCode());
           continue;
         }
@@ -438,6 +443,8 @@ namespace Belle2 {
           continue;
         }
 
+        // charge zero tracks can appear, filter them and
+        // count number of tracks filtered out
         int charge = trackFit->getChargeSign();
         if (charge == 0) {
           B2DEBUG(19, "Track with charge = 0 skipped!");
@@ -459,9 +466,10 @@ namespace Belle2 {
 
           if (cut->check(newPart))
             plist->addParticle(newPart);
-        }
-      }
-    }
+
+        } // sanity check correct particle type
+      } // particle lists
+    } // loop over tracks
   }
 
   void ParticleLoaderModule::eclClustersToParticles()

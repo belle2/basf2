@@ -10,7 +10,8 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
 
-globalTag = 'vxd_commissioning_20181030'
+# globalTag = 'vxd_commissioning_20181030'
+globalTag = 'data_reprocessing_prompt'
 
 reset_database()
 use_database_chain()
@@ -41,23 +42,23 @@ main.add_module(gearbox, fileName="/geometry/Belle2_earlyPhase3.xml")
 main.add_module(geometry)  # , useDB=True)
 
 pxd_charge = register_module('DQMHistAnalysisPXDCharge')
-pxd_charge.param('histogramDirectoryName', 'PXDExpReco')
+pxd_charge.param('histogramDirectoryName', 'PXDER')
 main.add_module(pxd_charge)
 
 pxd_commode = register_module('DQMHistAnalysisPXDCM')
-pxd_commode.param('histogramDirectoryName', 'pxdDAQ')
+pxd_commode.param('histogramDirectoryName', 'PXDDAQ')
 
 main.add_module(pxd_commode)
 
 pxd_effi = register_module('DQMHistAnalysisPXDEff')
-pxd_effi.param('histogramDirectoryName', 'pxdeff')
+pxd_effi.param('histogramDirectoryName', 'PXDEFF')
 pxd_effi.param("binsU", 16)
 pxd_effi.param("binsV", 24)
 pxd_effi.param("singleHists", False)
 main.add_module(pxd_effi)
 
 pxd_redu = register_module('DQMHistAnalysisPXDReduction')
-pxd_redu.param('histogramDirectoryName', 'pxdDAQ')
+pxd_redu.param('histogramDirectoryName', 'PXDDAQ')
 main.add_module(pxd_redu)
 
 # output = register_module('DQMHistAnalysisOutputFile')

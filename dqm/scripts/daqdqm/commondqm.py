@@ -22,11 +22,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if dqm_environment == "expressreco":
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
-            path.add_module('PXDDAQDQM')
-            pxddqm = register_module('PXDDQMExpressReco')
-            path.add_module(pxddqm)
-            pxdeff = register_module('PXDDQMEfficiency')
-            path.add_module(pxdeff)
+            path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
+            path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
+            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
         # SVD
         if components is None or 'SVD' in components:
             # ZeroSuppression Emulator

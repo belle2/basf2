@@ -39,15 +39,17 @@ using namespace Simulation;
 
 
 KaonPhysics::KaonPhysics()
+  : m_ftfp(nullptr), m_stringModel(nullptr), m_stringDecay(nullptr),
+    m_fragModel(nullptr), m_preCompoundModel(nullptr)
 {}
 
 
 KaonPhysics::~KaonPhysics()
 {
-  delete stringDecay;
-  delete stringModel;
-  delete fragModel;
-  delete preCompoundModel;
+  delete m_stringDecay;
+  delete m_stringModel;
+  delete m_fragModel;
+  delete m_preCompoundModel;
 }
 
 
@@ -68,17 +70,17 @@ void KaonPhysics::ConstructProcess()
   loInelModel->SetMaxEnergy(12.0 * GeV);
 
   // Use FTFP for high energies   ==>>   eventually replace this with new class FTFPInterface
-  ftfp = new G4TheoFSGenerator("FTFP");
-  stringModel = new G4FTFModel;
-  stringDecay =
-    new G4ExcitedStringDecay(fragModel = new G4LundStringFragmentation);
-  stringModel->SetFragmentationModel(stringDecay);
-  preCompoundModel = new G4GeneratorPrecompoundInterface();
+  m_ftfp = new G4TheoFSGenerator("FTFP");
+  m_stringModel = new G4FTFModel;
+  m_stringDecay =
+    new G4ExcitedStringDecay(m_fragModel = new G4LundStringFragmentation);
+  m_stringModel->SetFragmentationModel(m_stringDecay);
+  m_preCompoundModel = new G4GeneratorPrecompoundInterface();
 
-  ftfp->SetHighEnergyGenerator(stringModel);
-  ftfp->SetTransport(preCompoundModel);
-  ftfp->SetMinEnergy(10 * GeV);
-  ftfp->SetMaxEnergy(100 * TeV);
+  m_ftfp->SetHighEnergyGenerator(m_stringModel);
+  m_ftfp->SetTransport(m_preCompoundModel);
+  m_ftfp->SetMinEnergy(10 * GeV);
+  m_ftfp->SetMaxEnergy(100 * TeV);
 
   // Inelastic cross section sets
   G4VCrossSectionDataSet* kpCS =
@@ -107,7 +109,7 @@ void KaonPhysics::ConstructProcess()
   // inelastic
   G4KaonPlusInelasticProcess* kpProcInel = new G4KaonPlusInelasticProcess;
   kpProcInel->RegisterMe(loInelModel);
-  kpProcInel->RegisterMe(ftfp);
+  kpProcInel->RegisterMe(m_ftfp);
   kpProcInel->AddDataSet(kpCS);
   procMan->AddDiscreteProcess(kpProcInel);
 
@@ -126,7 +128,7 @@ void KaonPhysics::ConstructProcess()
   // inelastic
   G4KaonMinusInelasticProcess* kmProcInel = new G4KaonMinusInelasticProcess;
   kmProcInel->RegisterMe(loInelModel);
-  kmProcInel->RegisterMe(ftfp);
+  kmProcInel->RegisterMe(m_ftfp);
   kmProcInel->AddDataSet(kmCS);
   procMan->AddDiscreteProcess(kmProcInel);
 
@@ -149,7 +151,7 @@ void KaonPhysics::ConstructProcess()
   // inelastic
   G4KaonZeroLInelasticProcess* k0LProcInel = new G4KaonZeroLInelasticProcess;
   k0LProcInel->RegisterMe(loInelModel);
-  k0LProcInel->RegisterMe(ftfp);
+  k0LProcInel->RegisterMe(m_ftfp);
   k0LProcInel->AddDataSet(kzCS);
   procMan->AddDiscreteProcess(k0LProcInel);
 
@@ -168,7 +170,7 @@ void KaonPhysics::ConstructProcess()
   // inelastic
   G4KaonZeroSInelasticProcess* k0SProcInel = new G4KaonZeroSInelasticProcess;
   k0SProcInel->RegisterMe(loInelModel);
-  k0SProcInel->RegisterMe(ftfp);
+  k0SProcInel->RegisterMe(m_ftfp);
   k0SProcInel->AddDataSet(kzCS);
   procMan->AddDiscreteProcess(k0SProcInel);
 }

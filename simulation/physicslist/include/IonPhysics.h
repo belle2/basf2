@@ -37,14 +37,14 @@ namespace Belle2 {
       virtual void ConstructProcess() override;
 
     private:
-      G4TheoFSGenerator* ftfp;
-      G4FTFModel* stringModel;
-      G4ExcitedStringDecay* stringDecay;
-      G4LundStringFragmentation* fragModel;
-      G4GeneratorPrecompoundInterface* preCompoundModel;
+      G4TheoFSGenerator* m_ftfp;
+      G4FTFModel* m_stringModel;
+      G4ExcitedStringDecay* m_stringDecay;
+      G4LundStringFragmentation* m_fragModel;
+      G4GeneratorPrecompoundInterface* m_preCompoundModel;
 
-      G4VComponentCrossSection* theGGNuclNuclXS;
-      G4ComponentGGNuclNuclXsc* ionGGXS;
+      G4VComponentCrossSection* m_theGGNuclNuclXS;
+      G4ComponentGGNuclNuclXsc* m_ionGGXS;
     };
 
   } // end of namespace Simulation

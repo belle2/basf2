@@ -53,7 +53,7 @@ OverlapResidualsModule::OverlapResidualsModule() : Module()
 {
   // Set module properties
   setDescription("The module studies consecutive hits in overlapping sensors of a same VXD layer, and the differences of their residuals, to monitor the detector alignment.");
-  addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string(""));
+  addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("VXDOverlappingHits.root"));
 }
 
 void OverlapResidualsModule::initialize()

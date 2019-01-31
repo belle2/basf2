@@ -14,6 +14,7 @@
 
 // EM and decay physics
 #include "G4EmStandardPhysics.hh"
+#include "G4EmStandardPhysics_option1.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4EmParameters.hh"
 #include "G4DecayPhysics.hh"
@@ -40,16 +41,10 @@ using namespace Belle2;
 using namespace Simulation;
 
 
-Belle2PhysicsList::Belle2PhysicsList()
-  : G4VModularPhysicsList()
+Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
+  : G4VModularPhysicsList(), m_globalCutValue(0.07)
 {
-  G4int verb = 1;
-  SetVerboseLevel(verb);
-
-  // EM physics
-  RegisterPhysics(new G4EmStandardPhysics());
-//  G4EmParameters* param = G4EmParameters::Instance();
-//  param->SetAugerCascade(true);
+  G4cout << " Using " << physicsListName << " physics list " << G4endl;
 
   // Decay
   RegisterPhysics(new G4DecayPhysics());
@@ -63,9 +58,6 @@ Belle2PhysicsList::Belle2PhysicsList()
   RegisterPhysics(new AntiBaryonPhysics());
   RegisterPhysics(new IonPhysics());
   RegisterPhysics(new GammaLeptoNuclearPhysics());
-
-  // Optical physics
-  RegisterPhysics(new G4OpticalPhysics());
 }
 
 
@@ -97,9 +89,45 @@ void Belle2PhysicsList::ConstructParticle()
 
 void Belle2PhysicsList::SetCuts()
 {
-  SetCutValue(0.7 * mm, "proton");
-  SetCutValue(0.7 * mm, "e-");
-  SetCutValue(0.7 * mm, "e+");
-  SetCutValue(0.7 * mm, "gamma");
+  // Belle2 assumes input units are cm
+  SetCutValue(m_globalCutValue * cm, "proton");
+  SetCutValue(m_globalCutValue * cm, "e-");
+  SetCutValue(m_globalCutValue * cm, "e+");
+  SetCutValue(m_globalCutValue * cm, "gamma");
 }
+
+
+void Belle2PhysicsList::SetVerbosity(G4int verb)
+{
+  SetVerboseLevel(verb);
+}
+
+
+void Belle2PhysicsList::SetProductionCutValue(G4double value)
+{
+  m_globalCutValue = value;
+}
+
+
+void Belle2PhysicsList::UseStandardEMPhysics(G4bool yesno)
+{
+  if (yesno) {
+    RegisterPhysics(new G4EmStandardPhysics());
+  } else {
+    RegisterPhysics(new G4EmStandardPhysics_option1());
+  }
+}
+
+
+void Belle2PhysicsList::UseOpticalPhysics(G4bool yesno)
+{
+  if (yesno) RegisterPhysics(new G4OpticalPhysics());
+}
+
+
+void Belle2PhysicsList::UseHighPrecisionNeutrons(G4bool yesno)
+{
+  if (yesno) G4cout << " High precision neutron option not yet ready " << G4endl;
+}
+
 

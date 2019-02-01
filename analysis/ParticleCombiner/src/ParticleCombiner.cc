@@ -448,7 +448,7 @@ namespace Belle2 {
     unsigned nECLSource = 0;
     std::vector<Particle*> stack = m_particles;
     static std::vector<int> connectedregions;
-    static std::vector<int> hypotheses;
+    static std::vector<ECLCluster::EHypothesisBit> hypotheses;
     connectedregions.clear();
     hypotheses.clear();
 
@@ -474,10 +474,8 @@ namespace Belle2 {
         if (p->getParticleType() == Particle::EParticleType::c_ECLCluster) {
           nECLSource++;
           auto* cluster = p->getECLCluster();
-          int crid = cluster->getConnectedRegionId();
-          int hypo = cluster->getHypothesisId(); // FIXME
-          connectedregions.push_back(crid);
-          hypotheses.push_back(hypo);
+          connectedregions.push_back(cluster->getConnectedRegionId());
+          hypotheses.push_back(p->getECLClusterEHypothesisBit());
         }
       } else {
         for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(m_particleArray[daughters[i]]);

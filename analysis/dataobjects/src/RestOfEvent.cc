@@ -69,7 +69,7 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
 
     // we cannot combine two particles of different hypotheses from the same
     // connected region (as their energies overlap)
-    if (roeParticle->getECLCluster()->getHypothesisId() == toAddParticle->getECLCluster()->getHypothesisId())
+    if (roeParticle->getECLClusterEHypothesisBit() == toAddParticle->getECLClusterEHypothesisBit())
       return false;
 
     // in the rare case that both are neutral and the hypotheses are different,

@@ -69,6 +69,8 @@ namespace Belle2 {
      *  @param fileName   Name of ROOT file to which should be written.
      *  @param treeName       Name of the TTree in the ROOT file.
      */
+    // cppcheck does not recognize that m_tfile is initialized by calling the other constructor
+    // cppcheck-suppress uninitMemberVar
     SimpleVariableRecorder(std::vector<Named<float*>>& namedVariables, const std::string& fileName,
                            const std::string& treeName) :
       SimpleVariableRecorder([ & namedVariables](TTree & tree)
@@ -91,6 +93,12 @@ namespace Belle2 {
         }
       }
     }
+
+    // copy constructor and "=" operator need to be implemented if needed as class has dynamic memory/resource allocation
+    // (as pointed out by cppcheck)
+    SimpleVariableRecorder(SimpleVariableRecorder&) = delete;
+    SimpleVariableRecorder& operator=(SimpleVariableRecorder&) = delete;
+
 
     /// Record varibles by filling the TTree
     void record() { m_tTree->get().Fill();}

@@ -42,6 +42,13 @@ namespace Belle2 {
     /** copy constructor */
     DecorrelationMatrix(const DecorrelationMatrix& matrix) : m_matrix(matrix.getMatrix()) { }
 
+    /** assignment operator, requested by cppcheck as class has a custom copy constructor */
+    DecorrelationMatrix& operator=(const DecorrelationMatrix& rhs)
+    {
+      m_matrix = rhs.getMatrix();
+      return *this;
+    }
+
     const MatrixT& getMatrix() const { return m_matrix; } /**< get the currently stored matrix */
 
     /**

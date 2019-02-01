@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,7 +33,9 @@ const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clu
   TVector3 direction = cluster->getClusterPosition() - vertex;
 
   const double E  = cluster->getEnergy(hypo);
-  const double p = sqrt(E * E - mass * mass);
+  double p = sqrt(E * E - mass * mass);
+  if (std::isnan(p)) // then the cluster was less energetic than the mass provided
+    p = E;
   const double px = p * sin(direction.Theta()) * cos(direction.Phi());
   const double py = p * sin(direction.Theta()) * sin(direction.Phi());
   const double pz = p * cos(direction.Theta());

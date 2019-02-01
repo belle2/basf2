@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de)                    *

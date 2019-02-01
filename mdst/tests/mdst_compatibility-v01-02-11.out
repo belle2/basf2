@@ -3903,13 +3903,13 @@ ECLCluster#0:
   getE9oE21(): 1
   getEnergy(16): 0.0393884
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 1
- and it has the neutralHadron hypothesis (y/n = 1/0): 0
- You requested the hypothesis bitmask: 0000000000100000  { module: PrintObjectsModule }
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
+	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0258387
   getEnergyRaw(): 0.0393884
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
@@ -3956,7 +3956,7 @@ ECLCluster#1:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.292316
   getEnergyRaw(): 0.347293
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.142578
   getMinTrkDistance(): 60.791
   getNumberOfCrystals(): 8.00781
@@ -4003,7 +4003,7 @@ ECLCluster#2:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0678725
   getEnergyRaw(): 0.262535
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.74707
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 9.96094
@@ -4050,7 +4050,7 @@ ECLCluster#3:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0599411
   getEnergyRaw(): 0.174502
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.762695
   getMinTrkDistance(): 52.2461
   getNumberOfCrystals(): 6.05469
@@ -4099,7 +4099,7 @@ ECLCluster#4:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0539642
   getEnergyRaw(): 0.16443
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.608398
   getMinTrkDistance(): 43.2129
   getNumberOfCrystals(): 4.88281
@@ -4148,7 +4148,7 @@ ECLCluster#5:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0614788
   getEnergyRaw(): 0.13524
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.557617
   getMinTrkDistance(): 20.0195
   getNumberOfCrystals(): 5.07812
@@ -4196,7 +4196,7 @@ ECLCluster#6:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.220329
   getEnergyRaw(): 0.318179
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.355469
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 6.05469
@@ -4243,7 +4243,7 @@ ECLCluster#7:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0799489
   getEnergyRaw(): 0.131801
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.423828
   getMinTrkDistance(): 27.0996
   getNumberOfCrystals(): 8.00781
@@ -4290,7 +4290,7 @@ ECLCluster#8:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0238619
   getEnergyRaw(): 0.0385747
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0673828
   getMinTrkDistance(): 109.619
   getNumberOfCrystals(): 2.92969
@@ -4337,7 +4337,7 @@ ECLCluster#9:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0272378
   getEnergyRaw(): 0.0267607
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0
   getMinTrkDistance(): 62.7441
   getNumberOfCrystals(): 0.976562
@@ -4384,7 +4384,7 @@ ECLCluster#10:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0601427
   getEnergyRaw(): 0.219557
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.756836
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 7.03125
@@ -4432,7 +4432,7 @@ ECLCluster#11:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0614469
   getEnergyRaw(): 0.190516
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.685547
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 5.07812
@@ -4479,7 +4479,7 @@ ECLCluster#12:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0495053
   getEnergyRaw(): 0.0594257
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0800781
   getMinTrkDistance(): 65.918
   getNumberOfCrystals(): 3.90625
@@ -4527,7 +4527,7 @@ ECLCluster#13:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0685971
   getEnergyRaw(): 0.0742074
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.111328
   getMinTrkDistance(): 42.9688
   getNumberOfCrystals(): 7.03125
@@ -4575,7 +4575,7 @@ ECLCluster#14:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.105973
   getEnergyRaw(): 0.211049
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.191406
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 3.90625
@@ -4622,7 +4622,7 @@ ECLCluster#15:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.307225
   getEnergyRaw(): 0.493211
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.320312
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 8.98438
@@ -4669,7 +4669,7 @@ ECLCluster#16:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0781541
   getEnergyRaw(): 0.0953977
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0908203
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 5.07812
@@ -4716,7 +4716,7 @@ ECLCluster#17:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0902215
   getEnergyRaw(): 0.0972288
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0322266
   getMinTrkDistance(): 63.9648
   getNumberOfCrystals(): 2.92969
@@ -4763,7 +4763,7 @@ ECLCluster#18:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0636398
   getEnergyRaw(): 0.0814412
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.109375
   getMinTrkDistance(): 52.002
   getNumberOfCrystals(): 5.07812
@@ -4811,7 +4811,7 @@ ECLCluster#19:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0515355
   getEnergyRaw(): 0.0714147
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.145508
   getMinTrkDistance(): 104.736
   getNumberOfCrystals(): 6.05469
@@ -4858,7 +4858,7 @@ ECLCluster#20:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0869773
   getEnergyRaw(): 0.12454
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.195312
   getMinTrkDistance(): 106.445
   getNumberOfCrystals(): 8.00781
@@ -4905,7 +4905,7 @@ ECLCluster#21:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0680093
   getEnergyRaw(): 0.0710994
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0810547
   getMinTrkDistance(): 38.5742
   getNumberOfCrystals(): 5.07812
@@ -4952,7 +4952,7 @@ ECLCluster#22:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0551816
   getEnergyRaw(): 0.123157
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.382812
   getMinTrkDistance(): 13.6719
   getNumberOfCrystals(): 3.90625
@@ -5002,7 +5002,7 @@ ECLCluster#23:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0954792
   getEnergyRaw(): 0.168726
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.147461
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
@@ -5049,7 +5049,7 @@ ECLCluster#24:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0311826
   getEnergyRaw(): 0.033703
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0
   getMinTrkDistance(): 80.3223
   getNumberOfCrystals(): 1.95312
@@ -5097,7 +5097,7 @@ ECLCluster#25:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0346701
   getEnergyRaw(): 0.0729634
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0732422
   getMinTrkDistance(): 13.4277
   getNumberOfCrystals(): 2.92969
@@ -5142,14 +5142,14 @@ ECLCluster#26:
   getE9oE21(): 1
  ... message repeated 25 times
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 0
- and it has the neutralHadron hypothesis (y/n = 1/0): 1
- You requested the hypothesis bitmask: 0000000000010000  { module: PrintObjectsModule }
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
+	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
   getEnergy(16): nan
   getEnergy(32): 0.0393884
   getEnergyHighestCrystal(): 0.0258387
   getEnergyRaw(): 0.0393884
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
@@ -5196,7 +5196,7 @@ ECLCluster#27:
   getEnergy(32): 0.347293
   getEnergyHighestCrystal(): 0.282106
   getEnergyRaw(): 0.347293
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.142578
   getMinTrkDistance(): 60.791
   getNumberOfCrystals(): 8.00781
@@ -5243,7 +5243,7 @@ ECLCluster#28:
   getEnergy(32): 0.26567
   getEnergyHighestCrystal(): 0.0655918
   getEnergyRaw(): 0.26567
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.761719
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 11.9141
@@ -5290,7 +5290,7 @@ ECLCluster#29:
   getEnergy(32): 0.476057
   getEnergyHighestCrystal(): 0.0599411
   getEnergyRaw(): 0.476057
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.974609
   getMinTrkDistance(): 47.8516
   getNumberOfCrystals(): 16.9922
@@ -5341,7 +5341,7 @@ ECLCluster#30:
   getEnergy(32): 0.318179
   getEnergyHighestCrystal(): 0.210226
   getEnergyRaw(): 0.318179
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.355469
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 6.05469
@@ -5388,7 +5388,7 @@ ECLCluster#31:
   getEnergy(32): 0.131801
   getEnergyHighestCrystal(): 0.0755718
   getEnergyRaw(): 0.131801
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.423828
   getMinTrkDistance(): 27.0996
   getNumberOfCrystals(): 8.00781
@@ -5435,7 +5435,7 @@ ECLCluster#32:
   getEnergy(32): 0.0385747
   getEnergyHighestCrystal(): 0.0232516
   getEnergyRaw(): 0.0385747
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0673828
   getMinTrkDistance(): 109.619
   getNumberOfCrystals(): 2.92969
@@ -5482,7 +5482,7 @@ ECLCluster#33:
   getEnergy(32): 0.0267607
   getEnergyHighestCrystal(): 0.0267607
   getEnergyRaw(): 0.0267607
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0
   getMinTrkDistance(): 62.7441
   getNumberOfCrystals(): 0.976562
@@ -5529,7 +5529,7 @@ ECLCluster#34:
   getEnergy(32): 0.219557
   getEnergyHighestCrystal(): 0.0583849
   getEnergyRaw(): 0.219557
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.756836
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 7.03125
@@ -5577,7 +5577,7 @@ ECLCluster#35:
   getEnergy(32): 0.190516
   getEnergyHighestCrystal(): 0.0588841
   getEnergyRaw(): 0.190516
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.685547
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 5.07812
@@ -5624,7 +5624,7 @@ ECLCluster#36:
   getEnergy(32): 0.0594257
   getEnergyHighestCrystal(): 0.0484057
   getEnergyRaw(): 0.0594257
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0800781
   getMinTrkDistance(): 65.918
   getNumberOfCrystals(): 3.90625
@@ -5672,7 +5672,7 @@ ECLCluster#37:
   getEnergy(32): 0.0742074
   getEnergyHighestCrystal(): 0.0669386
   getEnergyRaw(): 0.0742074
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.111328
   getMinTrkDistance(): 42.9688
   getNumberOfCrystals(): 7.03125
@@ -5720,7 +5720,7 @@ ECLCluster#38:
   getEnergy(32): 0.211049
   getEnergyHighestCrystal(): 0.102534
   getEnergyRaw(): 0.211049
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.191406
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 3.90625
@@ -5767,7 +5767,7 @@ ECLCluster#39:
   getEnergy(32): 0.493211
   getEnergyHighestCrystal(): 0.296657
   getEnergyRaw(): 0.493211
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.320312
   getMinTrkDistance(): 17.0898
   getNumberOfCrystals(): 8.98438
@@ -5814,7 +5814,7 @@ ECLCluster#40:
   getEnergy(32): 0.0953977
   getEnergyHighestCrystal(): 0.0762855
   getEnergyRaw(): 0.0953977
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0908203
   getMinTrkDistance(): 76.1719
   getNumberOfCrystals(): 5.07812
@@ -5861,7 +5861,7 @@ ECLCluster#41:
   getEnergy(32): 0.0972288
   getEnergyHighestCrystal(): 0.0878121
   getEnergyRaw(): 0.0972288
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0322266
   getMinTrkDistance(): 63.9648
   getNumberOfCrystals(): 2.92969
@@ -5908,7 +5908,7 @@ ECLCluster#42:
   getEnergy(32): 0.0814412
   getEnergyHighestCrystal(): 0.0621883
   getEnergyRaw(): 0.0814412
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.109375
   getMinTrkDistance(): 52.002
   getNumberOfCrystals(): 5.07812
@@ -5956,7 +5956,7 @@ ECLCluster#43:
   getEnergy(32): 0.0714147
   getEnergyHighestCrystal(): 0.0503463
   getEnergyRaw(): 0.0714147
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.145508
   getMinTrkDistance(): 104.736
   getNumberOfCrystals(): 6.05469
@@ -6003,7 +6003,7 @@ ECLCluster#44:
   getEnergy(32): 0.12454
   getEnergyHighestCrystal(): 0.0838318
   getEnergyRaw(): 0.12454
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.195312
   getMinTrkDistance(): 106.445
   getNumberOfCrystals(): 8.00781
@@ -6050,7 +6050,7 @@ ECLCluster#45:
   getEnergy(32): 0.0710994
   getEnergyHighestCrystal(): 0.0662598
   getEnergyRaw(): 0.0710994
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0810547
   getMinTrkDistance(): 38.5742
   getNumberOfCrystals(): 5.07812
@@ -6097,7 +6097,7 @@ ECLCluster#46:
   getEnergy(32): 0.123157
   getEnergyHighestCrystal(): 0.0534202
   getEnergyRaw(): 0.123157
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.382812
   getMinTrkDistance(): 13.6719
   getNumberOfCrystals(): 3.90625
@@ -6147,7 +6147,7 @@ ECLCluster#47:
   getEnergy(32): 0.168726
   getEnergyHighestCrystal(): 0.0921556
   getEnergyRaw(): 0.168726
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.147461
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
@@ -6194,7 +6194,7 @@ ECLCluster#48:
   getEnergy(32): 0.033703
   getEnergyHighestCrystal(): 0.0311826
   getEnergyRaw(): 0.033703
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0
   getMinTrkDistance(): 80.3223
   getNumberOfCrystals(): 1.95312
@@ -6242,7 +6242,7 @@ ECLCluster#49:
   getEnergy(32): 0.0729634
   getEnergyHighestCrystal(): 0.0346701
   getEnergyRaw(): 0.0729634
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0732422
   getMinTrkDistance(): 13.4277
   getNumberOfCrystals(): 2.92969
@@ -13222,13 +13222,13 @@ ECLCluster#0:
   getE9oE21(): 0.97168
   getEnergy(16): 0.0387778
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 1
- and it has the neutralHadron hypothesis (y/n = 1/0): 0
- You requested the hypothesis bitmask: 0000000000100000  { module: PrintObjectsModule }
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
+	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0172933
   getEnergyRaw(): 0.0387778
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.265625
   getMinTrkDistance(): 36.6211
   getNumberOfCrystals(): 5.07812
@@ -13275,7 +13275,7 @@ ECLCluster#1:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0880939
   getEnergyRaw(): 0.197996
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.332031
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 5.07812
@@ -13322,7 +13322,7 @@ ECLCluster#2:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.116552
   getEnergyRaw(): 0.11841
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0175781
   getMinTrkDistance(): 24.4141
   getNumberOfCrystals(): 2.92969
@@ -13371,7 +13371,7 @@ ECLCluster#3:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0743661
   getEnergyRaw(): 0.10057
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.292969
   getMinTrkDistance(): 115.967
   getNumberOfCrystals(): 7.03125
@@ -13418,7 +13418,7 @@ ECLCluster#4:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.152631
   getEnergyRaw(): 0.239603
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.337891
   getMinTrkDistance(): 83.9844
   getNumberOfCrystals(): 8.98438
@@ -13466,7 +13466,7 @@ ECLCluster#5:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.246794
   getEnergyRaw(): 0.304574
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.198242
   getMinTrkDistance(): 96.9238
   getNumberOfCrystals(): 10.9375
@@ -13514,7 +13514,7 @@ ECLCluster#6:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.121529
   getEnergyRaw(): 0.206538
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0830078
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 5.07812
@@ -13561,7 +13561,7 @@ ECLCluster#7:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.635891
   getEnergyRaw(): 0.716437
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.196289
   getMinTrkDistance(): 55.1758
   getNumberOfCrystals(): 14.0625
@@ -13609,7 +13609,7 @@ ECLCluster#8:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.140251
   getEnergyRaw(): 0.262767
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
@@ -13656,7 +13656,7 @@ ECLCluster#9:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0489883
   getEnergyRaw(): 0.130832
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.380859
   getMinTrkDistance(): 32.959
   getNumberOfCrystals(): 2.92969
@@ -13705,7 +13705,7 @@ ECLCluster#10:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0282831
   getEnergyRaw(): 0.0494796
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.237305
   getMinTrkDistance(): 17.5781
   getNumberOfCrystals(): 2.92969
@@ -13752,7 +13752,7 @@ ECLCluster#11:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0649148
   getEnergyRaw(): 0.126312
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.177734
   getMinTrkDistance(): 35.6445
   getNumberOfCrystals(): 6.05469
@@ -13799,7 +13799,7 @@ ECLCluster#12:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0640607
   getEnergyRaw(): 0.083681
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0498047
   getMinTrkDistance(): 113.525
   getNumberOfCrystals(): 2.92969
@@ -13846,7 +13846,7 @@ ECLCluster#13:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.130955
   getEnergyRaw(): 0.152217
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.189453
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
@@ -13895,7 +13895,7 @@ ECLCluster#14:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0830298
   getEnergyRaw(): 0.116641
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.267578
   getMinTrkDistance(): 101.074
   getNumberOfCrystals(): 8.00781
@@ -13942,7 +13942,7 @@ ECLCluster#15:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.139227
   getEnergyRaw(): 0.140251
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0166016
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
@@ -13990,7 +13990,7 @@ ECLCluster#16:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.070779
   getEnergyRaw(): 0.0735334
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0605469
   getMinTrkDistance(): 40.5273
   getNumberOfCrystals(): 3.90625
@@ -14037,7 +14037,7 @@ ECLCluster#17:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.056935
   getEnergyRaw(): 0.0774041
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.216797
   getMinTrkDistance(): 48.584
   getNumberOfCrystals(): 6.05469
@@ -14084,7 +14084,7 @@ ECLCluster#18:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.191817
   getEnergyRaw(): 0.280287
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.208008
   getMinTrkDistance(): 107.91
   getNumberOfCrystals(): 7.03125
@@ -14131,7 +14131,7 @@ ECLCluster#19:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.19983
   getEnergyRaw(): 0.3568
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.402344
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 7.03125
@@ -14180,7 +14180,7 @@ ECLCluster#20:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.344822
   getEnergyRaw(): 0.552387
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.299805
   getMinTrkDistance(): 16.6016
   getNumberOfCrystals(): 10.9375
@@ -14229,7 +14229,7 @@ ECLCluster#21:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.416646
   getEnergyRaw(): 0.637737
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.477539
   getMinTrkDistance(): 32.4707
   getNumberOfCrystals(): 12.5
@@ -14279,7 +14279,7 @@ ECLCluster#22:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.050043
   getEnergyRaw(): 0.125486
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.456055
   getMinTrkDistance(): 21.2402
   getNumberOfCrystals(): 4.6875
@@ -14330,7 +14330,7 @@ ECLCluster#23:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0750913
   getEnergyRaw(): 0.116194
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.310547
   getMinTrkDistance(): 134.033
   getNumberOfCrystals(): 8.98438
@@ -14377,14 +14377,14 @@ ECLCluster#24:
   getE9oE21(): 0.97168
  ... message repeated 23 times
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 0
- and it has the neutralHadron hypothesis (y/n = 1/0): 1
- You requested the hypothesis bitmask: 0000000000010000  { module: PrintObjectsModule }
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
+	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
   getEnergy(16): nan
   getEnergy(32): 0.0387778
   getEnergyHighestCrystal(): 0.0172933
   getEnergyRaw(): 0.0387778
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.265625
   getMinTrkDistance(): 36.6211
   getNumberOfCrystals(): 5.07812
@@ -14431,7 +14431,7 @@ ECLCluster#25:
   getEnergy(32): 0.197996
   getEnergyHighestCrystal(): 0.0880939
   getEnergyRaw(): 0.197996
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.332031
   getMinTrkDistance(): 14.6484
   getNumberOfCrystals(): 5.07812
@@ -14478,7 +14478,7 @@ ECLCluster#26:
   getEnergy(32): 0.11841
   getEnergyHighestCrystal(): 0.113443
   getEnergyRaw(): 0.11841
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0175781
   getMinTrkDistance(): 24.4141
   getNumberOfCrystals(): 2.92969
@@ -14527,7 +14527,7 @@ ECLCluster#27:
   getEnergy(32): 0.10057
   getEnergyHighestCrystal(): 0.0743661
   getEnergyRaw(): 0.10057
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.292969
   getMinTrkDistance(): 115.967
   getNumberOfCrystals(): 7.03125
@@ -14574,7 +14574,7 @@ ECLCluster#28:
   getEnergy(32): 0.239603
   getEnergyHighestCrystal(): 0.152631
   getEnergyRaw(): 0.239603
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.337891
   getMinTrkDistance(): 83.9844
   getNumberOfCrystals(): 8.98438
@@ -14622,7 +14622,7 @@ ECLCluster#29:
   getEnergy(32): 0.304574
   getEnergyHighestCrystal(): 0.237195
   getEnergyRaw(): 0.304574
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.198242
   getMinTrkDistance(): 96.9238
   getNumberOfCrystals(): 10.9375
@@ -14670,7 +14670,7 @@ ECLCluster#30:
   getEnergy(32): 0.206538
   getEnergyHighestCrystal(): 0.11751
   getEnergyRaw(): 0.206538
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0830078
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 5.07812
@@ -14717,7 +14717,7 @@ ECLCluster#31:
   getEnergy(32): 0.716437
   getEnergyHighestCrystal(): 0.613175
   getEnergyRaw(): 0.716437
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.196289
   getMinTrkDistance(): 55.1758
   getNumberOfCrystals(): 14.0625
@@ -14765,7 +14765,7 @@ ECLCluster#32:
   getEnergy(32): 0.262767
   getEnergyHighestCrystal(): 0.134
   getEnergyRaw(): 0.262767
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0
   getMinTrkDistance(): 15.8691
   getNumberOfCrystals(): 1.95312
@@ -14812,7 +14812,7 @@ ECLCluster#33:
   getEnergy(32): 0.181127
   getEnergyHighestCrystal(): 0.0476887
   getEnergyRaw(): 0.181127
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.832031
   getMinTrkDistance(): 26.3672
   getNumberOfCrystals(): 6.05469
@@ -14861,7 +14861,7 @@ ECLCluster#34:
   getEnergy(32): 0.126312
   getEnergyHighestCrystal(): 0.0632603
   getEnergyRaw(): 0.126312
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.177734
   getMinTrkDistance(): 35.6445
   getNumberOfCrystals(): 6.05469
@@ -14908,7 +14908,7 @@ ECLCluster#35:
   getEnergy(32): 0.083681
   getEnergyHighestCrystal(): 0.062529
   getEnergyRaw(): 0.083681
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0498047
   getMinTrkDistance(): 113.525
   getNumberOfCrystals(): 2.92969
@@ -14955,7 +14955,7 @@ ECLCluster#36:
   getEnergy(32): 0.152217
   getEnergyHighestCrystal(): 0.126977
   getEnergyRaw(): 0.152217
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.189453
   getMinTrkDistance(): 77.8809
   getNumberOfCrystals(): 7.03125
@@ -15004,7 +15004,7 @@ ECLCluster#37:
   getEnergy(32): 0.116641
   getEnergyHighestCrystal(): 0.0802325
   getEnergyRaw(): 0.116641
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.267578
   getMinTrkDistance(): 101.074
   getNumberOfCrystals(): 8.00781
@@ -15051,7 +15051,7 @@ ECLCluster#38:
   getEnergy(32): 0.140251
   getEnergyHighestCrystal(): 0.1356
   getEnergyRaw(): 0.140251
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0166016
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.92969
@@ -15099,7 +15099,7 @@ ECLCluster#39:
   getEnergy(32): 0.0735334
   getEnergyHighestCrystal(): 0.0692006
   getEnergyRaw(): 0.0735334
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0605469
   getMinTrkDistance(): 40.5273
   getNumberOfCrystals(): 3.90625
@@ -15146,7 +15146,7 @@ ECLCluster#40:
   getEnergy(32): 0.0774041
   getEnergyHighestCrystal(): 0.0553841
   getEnergyRaw(): 0.0774041
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.216797
   getMinTrkDistance(): 48.584
   getNumberOfCrystals(): 6.05469
@@ -15193,7 +15193,7 @@ ECLCluster#41:
   getEnergy(32): 0.280287
   getEnergyHighestCrystal(): 0.185473
   getEnergyRaw(): 0.280287
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.208008
   getMinTrkDistance(): 107.91
   getNumberOfCrystals(): 7.03125
@@ -15240,7 +15240,7 @@ ECLCluster#42:
   getEnergy(32): 0.3568
   getEnergyHighestCrystal(): 0.188641
   getEnergyRaw(): 0.3568
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.402344
   getMinTrkDistance(): 14.4043
   getNumberOfCrystals(): 7.03125
@@ -15289,7 +15289,7 @@ ECLCluster#43:
   getEnergy(32): 1.31572
   getEnergyHighestCrystal(): 0.402019
   getEnergyRaw(): 1.31572
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.915039
   getMinTrkDistance(): 26.123
   getNumberOfCrystals(): 27.9297
@@ -15341,7 +15341,7 @@ ECLCluster#44:
   getEnergy(32): 0.116194
   getEnergyHighestCrystal(): 0.0727899
   getEnergyRaw(): 0.116194
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.310547
   getMinTrkDistance(): 134.033
   getNumberOfCrystals(): 8.98438
@@ -22142,13 +22142,13 @@ ECLCluster#0:
   getE9oE21(): 0.999023
   getEnergy(16): 0.111766
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 1
- and it has the neutralHadron hypothesis (y/n = 1/0): 0
- You requested the hypothesis bitmask: 0000000000100000  { module: PrintObjectsModule }
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
+	 You requested the hypothesis bitmask:  = 0000000000100000  { module: PrintObjectsModule }
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.10096
   getEnergyRaw(): 0.109167
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.00390625
   getMinTrkDistance(): 16.6016
   getNumberOfCrystals(): 1.5625
@@ -22195,7 +22195,7 @@ ECLCluster#1:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0774183
   getEnergyRaw(): 0.0841009
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0175781
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 2.34375
@@ -22242,7 +22242,7 @@ ECLCluster#2:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.368228
   getEnergyRaw(): 0.508417
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.239258
   getMinTrkDistance(): 68.6035
   getNumberOfCrystals(): 9.96094
@@ -22289,7 +22289,7 @@ ECLCluster#3:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0298428
   getEnergyRaw(): 0.0562751
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.140625
   getMinTrkDistance(): 105.713
   getNumberOfCrystals(): 5.07812
@@ -22337,7 +22337,7 @@ ECLCluster#4:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.102754
   getEnergyRaw(): 0.107925
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.124023
   getMinTrkDistance(): 120.361
   getNumberOfCrystals(): 5.07812
@@ -22384,7 +22384,7 @@ ECLCluster#5:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.084106
   getEnergyRaw(): 0.104203
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.233398
   getMinTrkDistance(): 118.652
   getNumberOfCrystals(): 8.00781
@@ -22432,7 +22432,7 @@ ECLCluster#6:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.464008
   getEnergyRaw(): 0.505154
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.157227
   getMinTrkDistance(): 128.174
   getNumberOfCrystals(): 11.9141
@@ -22479,7 +22479,7 @@ ECLCluster#7:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.103597
   getEnergyRaw(): 0.10362
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.0126953
   getMinTrkDistance(): 125.244
   getNumberOfCrystals(): 2.92969
@@ -22527,7 +22527,7 @@ ECLCluster#8:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.119637
   getEnergyRaw(): 0.191069
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
@@ -22574,7 +22574,7 @@ ECLCluster#9:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.100757
   getEnergyRaw(): 0.110404
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.125977
   getMinTrkDistance(): 49.0723
   getNumberOfCrystals(): 5.07812
@@ -22621,7 +22621,7 @@ ECLCluster#10:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0470771
   getEnergyRaw(): 0.0478593
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0
   getMinTrkDistance(): 18.0664
   getNumberOfCrystals(): 1.95312
@@ -22668,7 +22668,7 @@ ECLCluster#11:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.655536
   getEnergyRaw(): 0.74575
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.285156
   getMinTrkDistance(): 166.992
   getNumberOfCrystals(): 16.0156
@@ -22716,7 +22716,7 @@ ECLCluster#12:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 1.42698
   getEnergyRaw(): 1.67653
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.279297
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 17.9688
@@ -22763,7 +22763,7 @@ ECLCluster#13:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0616799
   getEnergyRaw(): 0.144363
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.674805
   getMinTrkDistance(): 18.7988
   getNumberOfCrystals(): 4.88281
@@ -22810,7 +22810,7 @@ ECLCluster#14:
   getEnergy(32): nan
   getEnergyHighestCrystal(): 0.0472931
   getEnergyRaw(): 0.133869
-  getHypothesis(): 16
+  getHypotheses(): 16
   getLAT(): 0.421875
   getMinTrkDistance(): 34.1797
   getNumberOfCrystals(): 4.10156
@@ -22855,14 +22855,14 @@ ECLCluster#15:
   getE9oE21(): 0.603516
  ... message repeated 14 times
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 0
- and it has the neutralHadron hypothesis (y/n = 1/0): 1
- You requested the hypothesis bitmask: 0000000000010000  { module: PrintObjectsModule }
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
+	 You requested the hypothesis bitmask:  = 0000000000010000  { module: PrintObjectsModule }
   getEnergy(16): nan
   getEnergy(32): 0.19328
   getEnergyHighestCrystal(): 0.0986726
   getEnergyRaw(): 0.19328
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.015625
   getMinTrkDistance(): 15.1367
   getNumberOfCrystals(): 3.90625
@@ -22909,7 +22909,7 @@ ECLCluster#16:
   getEnergy(32): 0.512124
   getEnergyHighestCrystal(): 0.352375
   getEnergyRaw(): 0.512124
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.28125
   getMinTrkDistance(): 68.6035
   getNumberOfCrystals(): 11.9141
@@ -22956,7 +22956,7 @@ ECLCluster#17:
   getEnergy(32): 0.0562751
   getEnergyHighestCrystal(): 0.0291747
   getEnergyRaw(): 0.0562751
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.140625
   getMinTrkDistance(): 105.713
   getNumberOfCrystals(): 5.07812
@@ -23004,7 +23004,7 @@ ECLCluster#18:
   getEnergy(32): 0.107925
   getEnergyHighestCrystal(): 0.0980632
   getEnergyRaw(): 0.107925
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.124023
   getMinTrkDistance(): 120.361
   getNumberOfCrystals(): 5.07812
@@ -23051,7 +23051,7 @@ ECLCluster#19:
   getEnergy(32): 0.104203
   getEnergyHighestCrystal(): 0.084106
   getEnergyRaw(): 0.104203
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.233398
   getMinTrkDistance(): 118.652
   getNumberOfCrystals(): 8.00781
@@ -23099,7 +23099,7 @@ ECLCluster#20:
   getEnergy(32): 0.505154
   getEnergyHighestCrystal(): 0.444941
   getEnergyRaw(): 0.505154
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.157227
   getMinTrkDistance(): 128.174
   getNumberOfCrystals(): 11.9141
@@ -23146,7 +23146,7 @@ ECLCluster#21:
   getEnergy(32): 0.10362
   getEnergyHighestCrystal(): 0.100567
   getEnergyRaw(): 0.10362
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.0126953
   getMinTrkDistance(): 125.244
   getNumberOfCrystals(): 2.92969
@@ -23194,7 +23194,7 @@ ECLCluster#22:
   getEnergy(32): 0.191069
   getEnergyHighestCrystal(): 0.115776
   getEnergyRaw(): 0.191069
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0
   getMinTrkDistance(): 15.3809
   getNumberOfCrystals(): 1.95312
@@ -23241,7 +23241,7 @@ ECLCluster#23:
   getEnergy(32): 0.110404
   getEnergyHighestCrystal(): 0.0979824
   getEnergyRaw(): 0.110404
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.125977
   getMinTrkDistance(): 49.0723
   getNumberOfCrystals(): 5.07812
@@ -23288,7 +23288,7 @@ ECLCluster#24:
   getEnergy(32): 0.0478593
   getEnergyHighestCrystal(): 0.0461764
   getEnergyRaw(): 0.0478593
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0
   getMinTrkDistance(): 18.0664
   getNumberOfCrystals(): 1.95312
@@ -23335,7 +23335,7 @@ ECLCluster#25:
   getEnergy(32): 0.74575
   getEnergyHighestCrystal(): 0.635154
   getEnergyRaw(): 0.74575
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.285156
   getMinTrkDistance(): 166.992
   getNumberOfCrystals(): 16.0156
@@ -23383,7 +23383,7 @@ ECLCluster#26:
   getEnergy(32): 1.67653
   getEnergyHighestCrystal(): 1.37689
   getEnergyRaw(): 1.67653
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.279297
   getMinTrkDistance(): 14.8926
   getNumberOfCrystals(): 17.9688
@@ -23430,7 +23430,7 @@ ECLCluster#27:
   getEnergy(32): 0.27825
   getEnergyHighestCrystal(): 0.0587423
   getEnergyRaw(): 0.27825
-  getHypothesis(): 32
+  getHypotheses(): 32
   getLAT(): 0.896484
   getMinTrkDistance(): 24.9023
   getNumberOfCrystals(): 8.98438
@@ -25861,14 +25861,14 @@ MCParticle#63:
 [INFO] ================================================================================
 [INFO] Error summary: 123 errors and 0 warnings occurred.
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 1
- and it has the neutralHadron hypothesis (y/n = 1/0): 0
- You requested the hypothesis bitmask: 0000000000100000
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 1
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 0
+	 You requested the hypothesis bitmask:  = 0000000000100000
 [INFO]  (last message occurred 65 times in total)
 [ERROR] This cluster does not support the requested hypothesis,
- it has the nPhotons hypothesis (y/n = 1/0): 0
- and it has the neutralHadron hypothesis (y/n = 1/0): 1
- You requested the hypothesis bitmask: 0000000000010000
+	 it has the nPhotons hypothesis (y/n = 1/0):  = 0
+	 and it has the neutralHadron hypothesis (y/n = 1/0):  = 1
+	 You requested the hypothesis bitmask:  = 0000000000010000
 [INFO]  (last message occurred 58 times in total)
 [INFO] ================================================================================
 

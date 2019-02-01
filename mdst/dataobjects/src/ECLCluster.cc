@@ -23,9 +23,9 @@ double ECLCluster::getEnergy(const ECLCluster::EHypothesisBit& hypothesis) const
   // check if cluster has the requested hypothesis
   if (!hasHypothesis(hypothesis)) {
     B2ERROR("This cluster does not support the requested hypothesis,"
-            << "\n it has the nPhotons hypothesis (y/n = 1/0): " <<  hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
-            << "\n and it has the neutralHadron hypothesis (y/n = 1/0): " <<  hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)
-            << "\n You requested the hypothesis bitmask: " << std::bitset<16>(static_cast<unsigned short>(hypothesis)));
+            << LogVar(" it has the nPhotons hypothesis (y/n = 1/0): ", hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+            << LogVar(" and it has the neutralHadron hypothesis (y/n = 1/0): ", hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+            << LogVar(" You requested the hypothesis bitmask: ", std::bitset<16>(static_cast<unsigned short>(hypothesis)).to_string()));
     return std::numeric_limits<double>::quiet_NaN();
   }
 

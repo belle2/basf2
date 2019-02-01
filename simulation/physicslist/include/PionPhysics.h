@@ -31,14 +31,26 @@ namespace Belle2 {
       PionPhysics();
       ~PionPhysics();
 
+      /** Build processes, models, cross sections used in physics list */
       virtual void ConstructParticle() override;
+
+      /** Build all particle types used in physics list (empty in this class) */
       virtual void ConstructProcess() override;
 
     private:
+      /** Final state generator for QCD string models */
       G4TheoFSGenerator* m_ftfp;
+
+      /** Fritiof string model */
       G4FTFModel* m_stringModel;
+
+      /** Model to decay strings into hadrons */
       G4ExcitedStringDecay* m_stringDecay;
+
+      /** Lund string fragmentation model */
       G4LundStringFragmentation* m_fragModel;
+
+      /** Precompound model to deexcite post-collision nucleus */
       G4GeneratorPrecompoundInterface* m_preCompoundModel;
 
     };

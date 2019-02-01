@@ -25,20 +25,33 @@ namespace Belle2 {
     class Belle2PhysicsList: public G4VModularPhysicsList {
 
     public:
+      /** Constructor and destructor */
       Belle2PhysicsList(const G4String& physicsListName);
       ~Belle2PhysicsList();
 
+      /** Build all particle types used in physics list */
       virtual void ConstructParticle();
+
+      /** Set the secondary particle production thresholds */
       virtual void SetCuts();
 
+      /** Run/event verbosity level */
       void SetVerbosity(G4int verb);
+
+      /** Use parameter to set cut value */
       void SetProductionCutValue(G4double);
 
+      /** Use standard EM physics instead of EM option1 */
       void UseStandardEMPhysics(G4bool);
+
+      /** Add optical photon physics */
       void UseOpticalPhysics(G4bool);
+
+      /** Use high precision neutron models below 20 MeV */
       void UseHighPrecisionNeutrons(G4bool);
 
     private:
+      /** Secondary production threshold */
       G4double m_globalCutValue;
     };
 

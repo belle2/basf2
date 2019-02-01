@@ -33,14 +33,26 @@ namespace Belle2 {
       GammaLeptoNuclearPhysics();
       ~GammaLeptoNuclearPhysics();
 
+      /** Build processes, models, cross sections used in physics list */
       virtual void ConstructProcess() override;
+
+      /** Build all particle types used in physics list (empty in this class) */
       virtual void ConstructParticle() override;
 
     private:
+      /** Final state generator for QCD string models */
       G4TheoFSGenerator* m_qgsp;
+
+      /** Quark Gluon String model */
       G4QGSModel<G4GammaParticipants>* m_stringModel;
+
+      /** Model to decay strings into hadrons */
       G4ExcitedStringDecay* m_stringDecay;
+
+      /** Quark Gluon String fragmentation model */
       G4QGSMFragmentation* m_fragModel;
+
+      /** Precompound model to deexcite post-collision nucleus */
       G4GeneratorPrecompoundInterface* m_preCompoundModel;
 
     };

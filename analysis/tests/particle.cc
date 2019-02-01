@@ -563,28 +563,52 @@ namespace {
 
   }
 
-  /** test cluster based functionality: hypotheses and such (relatively simple
-   * for now but will become more complex with BII-3099 */
+  /** test cluster based functionality: hypotheses and such */
   TEST_F(ParticleTest, ECLClusterBased)
   {
     StoreArray<ECLCluster> eclclusters;
-    ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
-    cluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
-    cluster->setEnergy(1337);
-    cluster->setEnergyRaw(42);
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
 
-    Particle p(cluster);
-    EXPECT_FLOAT_EQ(1337, p.getECLClusterEnergy());
-    EXPECT_FLOAT_EQ(1337, p.getEnergy());
-    EXPECT_EQ(ECLCluster::EHypothesisBit::c_nPhotons, p.getECLClusterEHypothesisBit());
+      Particle p(cluster);
+      EXPECT_FLOAT_EQ(1., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(1., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_nPhotons, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0, p.getMass());
+    }
 
-    // when 3099 is introduced
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::Klong);
+      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+    }
+
     /*
-    cluster->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
-    Particle p2(cluster);
-    EXPECT_EQUAL(130, p2.getPDGCode());
-    EXPECT_EQUAL(42, p2.getECLClusterEnergy());
-    EXPECT_EQUAL(42, p2.getEnergy());
+    // when neutrons exist
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::neutron);
+      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0.939565, p.getMass());
+    }
     */
   }
 }  // namespace

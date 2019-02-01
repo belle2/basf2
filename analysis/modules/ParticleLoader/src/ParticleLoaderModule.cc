@@ -510,21 +510,21 @@ namespace Belle2 {
       // for now
       if (!cluster->isNeutral()) continue;
       if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
-          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)
-          continue;
+          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+        continue;
 
-          // ECLCluster can be matched to multiple MCParticles
-          // order the relations by weights and set Particle -> multiple MCParticle relation
-          // preserve the weight
-          RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
-          // order relations by weights
-          std::vector<std::pair<int, double>> weightsAndIndices;
+      // ECLCluster can be matched to multiple MCParticles
+      // order the relations by weights and set Particle -> multiple MCParticle relation
+      // preserve the weight
+      RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
+      // order relations by weights
+      std::vector<std::pair<int, double>> weightsAndIndices;
       for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
         const MCParticle* relMCParticle = mcRelations[iMCParticle];
-          double weight = mcRelations.weight(iMCParticle);
-          if (relMCParticle)
-            weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
-        }
+        double weight = mcRelations.weight(iMCParticle);
+        if (relMCParticle)
+          weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
+      }
       // sort descending by weight
       std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
       const std::pair<int, double>& right) {
@@ -534,20 +534,20 @@ namespace Belle2 {
       // inner loop over ParticleLists: fill each relevant list with Particles
       // created from ECLClusters
       for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-      string listName = get<c_PListName>(eclCluster2Plist);
+        string listName = get<c_PListName>(eclCluster2Plist);
         int listPdgCode = get<c_PListPDGCode>(eclCluster2Plist);
         Const::ParticleType thisType(listPdgCode);
 
         // don't fill photon list with clusters that don't have
         // the nPhotons hypothesis (ECL people call this N1)
         if (listPdgCode == Const::photon.getPDGCode()
-            && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 
         // don't fill a KLong list with clusters that don't have the neutral
         // hadron hypothesis set (ECL people call this N2)
         if (listPdgCode == Const::Klong.getPDGCode()
-            && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_neutralHadron)
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
         // create particle and check it before adding to list

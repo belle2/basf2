@@ -139,7 +139,7 @@ namespace Belle2 {
 
       for (const ECLCluster* cluster : roeECLClusters) {
 
-        if (cluster->isNeutral() and cluster->getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons) {
+        if (cluster->isNeutral() and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
           // Create particle from ECLCluster with gamma hypothesis
           Particle gamma_particle(cluster, Const::photon);
 

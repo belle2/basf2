@@ -475,7 +475,7 @@ namespace Belle2 {
           nECLSource++;
           auto* cluster = p->getECLCluster();
           int crid = cluster->getConnectedRegionId();
-          int hypo = cluster->getHypothesisId();
+          int hypo = cluster->getHypothesisId(); // FIXME
           connectedregions.push_back(crid);
           hypotheses.push_back(hypo);
         }

@@ -511,12 +511,12 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& mask
   std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
   TLorentzVector roe4VectorECLClusters;
 
-  // Add all momenta from neutral ECLClusters
+  // Add all momenta from neutral ECLClusters which have the nPhotons hypothesis
   ClusterUtils C;
   for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
     if (roeClusters[iEcl]->isNeutral())
-      if (roeClusters[iEcl]->getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons)
-        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl]);
+      if (roeClusters[iEcl]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl], ECLCluster::EHypothesisBit::c_nPhotons);
   }
 
   return roe4VectorECLClusters;

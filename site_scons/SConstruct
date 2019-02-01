@@ -74,6 +74,13 @@ global_env = Environment(
     BINDIR=os.path.join('#bin', subdir),
     MODDIR=os.path.join('#modules', subdir),
     DATADIR='#data',
+    # get list of directories (aka packages or subfolders thereof) for which to
+    # disable compiler warnings when compiling. For example if
+    # BELLE2_DISABLE_COMPILER_WARNINGS="daq framework/utilities" there will be no
+    # compiler warnings for any targets defined in daq or any of its subfolders
+    # as well as framework/utilities or any of its subfolders. There is are no
+    # checks or warnings if the given directories don't exist.
+    DISABLE_COMPILER_WARNINGS=os.environ.get("BELLE2_DISABLE_COMPILER_WARNINGS", "").split(),
     EXTDIR=os.environ['BELLE2_EXTERNALS_DIR'],
     EXTINCDIR=os.path.join('$EXTDIR', 'include'),
     EXTLIBDIR=os.path.join('$EXTDIR', 'lib', extsubdir),

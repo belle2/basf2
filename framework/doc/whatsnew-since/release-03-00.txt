@@ -14,4 +14,27 @@ Core Framework
 
 * Addition of helpful `StoreArray::hasRelationTo` and
   `StoreArray::hasRelationFrom` methods.
-  
+
+Command line Tools
+++++++++++++++++++
+
+* :ref:`b2file-metadata-add <b2file-metadata-add>` will now only update the
+  file in the FileCatalog if it is already registered. It will also now
+  correctly remove the old LFN from the file catalog.
+* :ref:`b2file-merge <b2file-merge>` will by default no longer register files
+  in the file catalog. You can either supply ``--add-to-catalog`` as argument
+  or run ``b2file-catalog-add`` on the output file. Use the latter if you want
+  to write scripts which work also with older releases.
+
+
+Modules
++++++++
+
+* b2:mod:`RootOutput` module: changed default value for ``updateFileCatalog``
+  to False. This will avoid creating `Belle2FileCatalog.xml` or warning about
+  overwriting entries in the file catalog by default. The file catalog is only
+  needed when loading parent files and can always be created later using
+  ``b2file-catalog-add``
+
+  .. seealso::
+     :ref:`b2file-catalog-add <b2file-catalog-add>`

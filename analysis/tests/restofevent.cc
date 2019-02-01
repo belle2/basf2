@@ -105,7 +105,7 @@ namespace {
       float eclREC = momentum[3];
       myECL.setConnectedRegionId(m_photonIndex++);
       myECL.setEnergy(eclREC);
-      myECL.setHypothesisId(5);
+      myECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       //This is necessary to avoid isCopyOf == true for ECLClusters:
       myECL.setClusterId(m_photonIndex++);
       ECLCluster* savedECL = myECLClusters.appendNew(myECL);

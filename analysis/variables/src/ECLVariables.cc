@@ -40,19 +40,6 @@
 namespace Belle2 {
   namespace Variable {
 
-    double eclClusterHadronIntensity(const Particle* particle)
-    {
-      B2WARNING("eclClusterHadronIntensity will be removed in release-04.  eclPulseShapeDiscriminationMVA variable introduced in release-03 should be used in place of eclClusterHadronIntensity.");
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        if (eclClusterHasPulseShapeDiscrimination(particle)) {
-          return cluster->getClusterHadronIntensity();
-        } else
-          return -1.0;
-      }
-      return std::numeric_limits<float>::quiet_NaN();
-    }
-
     double eclPulseShapeDiscriminationMVA(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
@@ -164,7 +151,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).E();
       }
@@ -208,7 +195,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Theta();
       }
@@ -242,7 +229,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster);
+        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Phi();
       }
@@ -368,7 +355,6 @@ namespace Belle2 {
 
     double eclClusterConnectedRegionId(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getConnectedRegionId();
@@ -376,19 +362,8 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-    double eclClusterUniqueId(const Particle* particle)
-    {
-
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        return cluster->getUniqueId();
-      }
-      return std::numeric_limits<float>::quiet_NaN();
-    }
-
     double eclClusterId(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getClusterId();
@@ -398,17 +373,42 @@ namespace Belle2 {
 
     double eclClusterHypothesisId(const Particle* particle)
     {
-
+      // Hypothesis ID is deprecated, this function should be removed in release-05.
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getHypothesisId();
+        if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+            and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          return 56.0;
+        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+          return 5.0;
+        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          return 6.0;
+        else
+          return -1.0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclClusterHasNPhotonsHypothesis(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclClusterHasNeutralHadronHypothesis(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
 
     double eclClusterHasPulseShapeDiscrimination(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->hasPulseShapeDiscrimination();
@@ -418,7 +418,6 @@ namespace Belle2 {
 
     double eclClusterTrigger(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         const bool matcher = cluster->hasTriggerClusterMatching();
@@ -1115,22 +1114,25 @@ namespace Belle2 {
     REGISTER_VARIABLE("PulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA,
                       "Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. \n"
                       "Value is 1.0 for electromagnetic showers and 0.0 for hadronic showers. \n");
-    REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
-                      "Returns ECL cluster's Cluster Hadron Component Intensity (pulse shape discrimination variable). \n"
-                      "Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission. \n"
-                      "Computed only using cluster digits with energy greater than 30 MeV and good offline waveform fit chi2. \n"
-                      "eclClusterHadronIntensity will be removed in release-04.  eclPulseShapeDiscriminationMVA variable introduced in release-03 \n"
-                      "should be used in place of eclClusterHadronIntensity. \n");
     REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
                       "Returns ECL cluster's Number of hadron digits in cluster (pulse shape discrimination variable). \n"
                       "Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. \n"
                       "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
-                      "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
-    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,
-                      "Returns the hypothesis ID of this ECL cluster.");
-    REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
-                      "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
+                      "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to.");
+    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId, R"DOCSTRING(
+Emulates the deprecated hypothesis ID of this ECL cluster in as-backward-compatible way as possible..
+Returns 5 for the nPhotons hypothesis, 6 for the neutralHadron hypothesis.
+Since release-04-00-00 it is possible for a cluster to have both hypotheses so if both are set it will return 56.
+
+.. warning::
+   This variable is a legacy variable and will be removed in release-05. 
+   You probably want to use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron` instead of this variable.
+)DOCSTRING");
+    REGISTER_VARIABLE("clusterHasNPhotons", eclClusterHasNPhotonsHypothesis, 
+                      "Returns 1.0 if the cluster has the 'N photons' hypothesis (historically called 'N1'), 0.0 if not, and NaN if no cluster is associated to the particle.");
+    REGISTER_VARIABLE("clusterHasNeutralHadron", eclClusterHasNeutralHadronHypothesis,
+                      "Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis (historically called 'N2'), 0.0 if not, and NaN if no cluster is associated to the particle.");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, "Returns extrapolated phi.");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi Id.");

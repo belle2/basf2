@@ -181,19 +181,28 @@ namespace Belle2 {
     double eclClusterConnectedRegionId(const Particle* particle);
 
     /**
-    * return the unique Cluster ID of this cluster
-    */
-    double eclClusterUniqueId(const Particle* particle);
-
-    /**
      * return the Cluster ID within the connected region of this cluster
      */
     double eclClusterId(const Particle* particle);
 
     /**
-     * return the Hypothesis ID of this cluster
+     * [deprecated] return the Hypothesis ID of this cluster
      */
     double eclClusterHypothesisId(const Particle* particle);
+
+    /**
+     * Returns 1.0 if the cluster has the 'N photons' hypothesis (historically
+     * called 'N1'), 0.0 if not, and NaN if no cluster is associated to the
+     * particle.
+     */
+    double eclClusterHasNPhotonsHypothesis(const Particle* particle);
+
+    /**
+     * Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis
+     * (historically called 'N2'), 0.0 if not, and NaN if no cluster is
+     * associated to the particle.
+     */
+    double eclClusterHasNeutralHadronHypothesis(const Particle* particle);
 
     /**
      * return 1 if cluster has pulse shape discrimination variables computed

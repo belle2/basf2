@@ -424,7 +424,7 @@ namespace {
     myECL.setIsTrack(false);
     float eclREC = 0.5;
     myECL.setEnergy(eclREC);
-    myECL.setHypothesisId(5);
+    myECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* savedECL = myECLClusters.appendNew(myECL);
 
     // Particle on reconstructed side from ECLCluster
@@ -436,7 +436,7 @@ namespace {
     myROEECL.setIsTrack(false);
     float eclROE = 1.0;
     myROEECL.setEnergy(eclROE);
-    myROEECL.setHypothesisId(5);
+    myROEECL.setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
     Particle* roeECLParticle = myParticles.appendNew(savedROEECL);
     // Create KLMCluster on ROE side
@@ -651,7 +651,7 @@ namespace {
 
     var = Manager::Instance().getVariable("ROE_eextra(mask1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), savedROEECL->getEnergy());
+    EXPECT_FLOAT_EQ(var->function(part), savedROEECL->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
 
     var = Manager::Instance().getVariable("ROE_eextra(mask2)");
     ASSERT_NE(var, nullptr);
@@ -1774,14 +1774,14 @@ namespace {
     // set relations between particles and eclClusters
     ECLCluster* eclst0 = eclclusters.appendNew(ECLCluster());
     eclst0->setEnergy(dau0_4vec_Lab.E());
-    eclst0->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+    eclst0->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     eclst0->setClusterId(1);
     eclst0->setTheta(dau0_4vec_Lab.Theta());
     eclst0->setPhi(dau0_4vec_Lab.Phi());
     eclst0->setR(148.4);
     ECLCluster* eclst1 = eclclusters.appendNew(ECLCluster());
     eclst1->setEnergy(dau1_4vec_Lab.E());
-    eclst1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+    eclst1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     eclst1->setClusterId(2);
     eclst1->setTheta(dau1_4vec_Lab.Theta());
     eclst1->setPhi(dau1_4vec_Lab.Phi());
@@ -2706,7 +2706,7 @@ namespace {
       // add some ECL clusters
       ECLCluster* e1 = eclclusters.appendNew(ECLCluster());
       e1->setEnergy(0.3);
-      e1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e1->setClusterId(1);
       // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
@@ -2714,34 +2714,38 @@ namespace {
       e2->setTheta(1.0); // somewhere in the barrel
       e2->setPhi(2.0);
       e2->setR(148.5);
-      e2->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e2->setClusterId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
       e3->setTheta(0.2); // somewhere in the fwd encap
       e3->setPhi(1.5);
       e3->setR(200.0);
-      e3->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      e3->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      // lets suppose this cluster could also be due to a neutral hadron. In
+      // this case, the c_neuralHadron hypothesis bit would hopefully also have
+      // been set by the reconstruction... arbirarily choose cluster 3
       e3->setClusterId(3);
 
       // aaand add clusters related to the tracks
       ECLCluster* e4 = eclclusters.appendNew(ECLCluster());
       e4->setEnergy(0.2);
-      e4->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e4->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e4->setClusterId(4);
       t1->addRelationTo(e4);
       e4->setIsTrack(true);
 
       ECLCluster* e5 = eclclusters.appendNew(ECLCluster());
       e5->setEnergy(0.3);
-      e5->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e5->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e5->setClusterId(5);
       t2->addRelationTo(e5);
       e5->setIsTrack(true);
 
       ECLCluster* e6 = eclclusters.appendNew(ECLCluster());
       e6->setEnergy(0.2);
-      e6->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e6->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e6->setClusterId(6);
       t3->addRelationTo(e6);
       t4->addRelationTo(e6);
@@ -2867,8 +2871,48 @@ namespace {
     // test cluster quantities directly (lab system only)
     EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(0)), eclclusters[0]->getPhi());
     EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(0)), eclclusters[0]->getTheta());
+  }
 
+  TEST_F(ECLVariableTest, HypothesisVariables)
+  {
+    // we need the particles and ECLClusters arrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
 
+    // register in the datastore
+    StoreObjPtr<ParticleList> gammalist("gamma");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i)
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+
+    // grab variables for testing
+    const Manager::Var* vHasNPhotons = Manager::Instance().getVariable("clusterHasNPhotons");
+    const Manager::Var* vHasNeutHadr = Manager::Instance().getVariable("clusterHasNeutralHadron");
+    const Manager::Var* vHypothsisID = Manager::Instance().getVariable("clusterHypothesis");
+    // TODO: remove hypothesis id after release-04 (should be gone by -05)
+
+    // check that the hypotheses are correcltly propagated to the VM.
+    for (size_t i = 0; i < gammalist->getListSize(); ++i) {
+      EXPECT_FLOAT_EQ(vHasNPhotons->function(gammalist->getParticle(i)), 1.0);
+      if (i == 2) { // third cluster arbitrarily chosen to test the behaviour of dual hypothesis clusters
+        EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 1.0);
+        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 56.0);
+      } else {
+        EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 0.0);
+        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 5.0);
+      }
+    } // end loop over test list
   }
 
   TEST_F(ECLVariableTest, IsFromECL)
@@ -2920,7 +2964,7 @@ namespace {
     // make the photons from clusters (and sum up the total ecl energy)
     double eclEnergy = 0.0;
     for (int i = 0; i < eclclusters.getEntries(); ++i) {
-      eclEnergy += eclclusters[i]->getEnergy();
+      eclEnergy += eclclusters[i]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
       if (!eclclusters[i]->isTrack()) {
         const Particle* p = particles.appendNew(Particle(eclclusters[i]));
         gammalist->addParticle(p);

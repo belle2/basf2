@@ -18,20 +18,21 @@ ClusterUtils::ClusterUtils()
 { }
 
 // -----------------------------------------------------------------------------
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster)
+const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
   // Use the default vertex from the beam parameters if none is given.
-  return Get4MomentumFromCluster(cluster, GetIPPosition());
+  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo);
 }
 
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex)
+const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex,
+                                                           ECLCluster::EHypothesisBit hypo)
 {
 
   // Get particle direction from vertex and reconstructed cluster position.
   TVector3 direction = cluster->getClusterPosition() - vertex;
 
-  const double E  = cluster->getEnergy();
+  const double E  = cluster->getEnergy(hypo);
   const double px = E * sin(direction.Theta()) * cos(direction.Phi());
   const double py = E * sin(direction.Theta()) * sin(direction.Phi());
   const double pz = E * cos(direction.Theta());
@@ -43,14 +44,14 @@ const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clu
 
 // -----------------------------------------------------------------------------
 
-const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster)
+const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
-  return GetCovarianceMatrix4x4FromCluster(cluster, GetIPPosition(), GetIPPositionCovarianceMatrix());
+  return GetCovarianceMatrix4x4FromCluster(cluster, GetIPPosition(), GetIPPositionCovarianceMatrix(), hypo);
 }
 
 const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-    const TMatrixDSym& covmatvertex)
+    const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo)
 {
 
   // Get the covariance matrix (theta, phi, energy) from the ECL cluster.
@@ -71,7 +72,7 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   TMatrixD jacobian(4, 6);
 
   const double R      = cluster->getR();
-  const double energy = cluster->getEnergy();
+  const double energy = cluster->getEnergy(hypo);
   const double theta  = cluster->getTheta();
   const double phi    = cluster->getPhi();
 
@@ -139,17 +140,17 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
 
 // -----------------------------------------------------------------------------
 
-const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster)
+const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
-  return GetCovarianceMatrix7x7FromCluster(cluster, GetIPPosition(), GetIPPositionCovarianceMatrix());
+  return GetCovarianceMatrix7x7FromCluster(cluster, GetIPPosition(), GetIPPositionCovarianceMatrix(), hypo);
 }
 
 const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-    const TMatrixDSym& covmatvertex)
+    const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo)
 {
 
-  TMatrixDSym covmat4x4 = GetCovarianceMatrix4x4FromCluster(cluster, vertex, covmatvertex);
+  TMatrixDSym covmat4x4 = GetCovarianceMatrix4x4FromCluster(cluster, vertex, covmatvertex, hypo);
 
   TMatrixDSym covmatCart(7);
 

@@ -720,8 +720,8 @@ namespace Belle2 {
             ClusterUtils C;
             for (auto& x : ecl) {
               if (x == nullptr) continue;
-              if (x->getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons) continue;
-              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x);
+              if (not x->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x, ECLCluster::EHypothesisBit::c_nPhotons);
               if (iMomECLCluster == iMomECLCluster) { // FIXME: this check does nothing!?
                 if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
                 else if (!(x->isNeutral())) {
@@ -753,10 +753,11 @@ namespace Belle2 {
               float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
               for (auto& x : ecl) {
                 if (x == nullptr) continue;
-                float iEnergy = x -> getEnergy();
+                float iEnergy = x -> getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
                 if (iEnergy == iEnergy) {
                   ClusterUtils cluster_util;
-                  if ((T.rotateLabToCms() * cluster_util.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                  if ((T.rotateLabToCms() * cluster_util.Get4MomentumFromCluster(x,
+                       ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
                 //       for (auto & i : klm) {
                 //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;

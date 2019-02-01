@@ -25,7 +25,8 @@ import pprint
 
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, \
-    scripts_in_dir, parse_cmd_line_arguments, get_log_file_paths
+    scripts_in_dir, parse_cmd_line_arguments, get_log_file_paths, \
+    terminal_title_line
 import validationfunctions
 
 import validationserver
@@ -333,6 +334,7 @@ def draw_progress_bar(delete_lines, scripts, barlength=50):
 
     @param delete_lines: The amount of lines which need to be deleted before
         we can redraw the progress bar
+    @param scripts: List of all Script obejcts
     @param barlength: The length of the progess bar (in characters)
     @return: The number of lines that were printed by this function call.
         Usefule if this function is called repeatedly.
@@ -719,13 +721,13 @@ class Validation:
             failed_log_path
         ))
 
-        with open(failed_log_path, "w+") as list_failed:
-            # Select only failed scripts
-            failed_scripts = [
-                script for script in self.scripts
-                if script.status == ScriptStatus.failed
-            ]
+        # Select only failed scripts
+        failed_scripts = [
+            script for script in self.scripts
+            if script.status == ScriptStatus.failed
+        ]
 
+        with open(failed_log_path, "w+") as list_failed:
             # log the name of all failed scripts
             for script in failed_scripts:
                 list_failed.write(script.path.split("/")[-1] + "\n")
@@ -744,16 +746,62 @@ class Validation:
             skipped_log_path
         ))
 
-        with open(skipped_log_path, "w+") as list_skipped:
-            # Select only failed scripts
-            skipped_scripts = [
-                script for script in self.scripts
-                if script.status == ScriptStatus.skipped
-            ]
+        # Select only failed scripts
+        skipped_scripts = [
+            script for script in self.scripts
+            if script.status == ScriptStatus.skipped
+        ]
 
+        with open(skipped_log_path, "w+") as list_skipped:
             # log the name of all failed scripts
             for script in skipped_scripts:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
+
+    def report_on_scripts(self, verbosity=2):
+        """!
+        Print a summary about all scripts, especially highlighting
+        skipped and failed scripts.
+        """
+
+        failed_scripts = [
+            script.name for script in self.scripts
+            if script.status == ScriptStatus.failed
+        ]
+        skipped_scripts = [
+            script.name for script in self.scripts
+            if script.status == ScriptStatus.skipped
+        ]
+
+        self.log.note("")
+        self.log.note(terminal_title_line(
+            "Summary of script execution", level=0
+        ))
+        self.log.note("Total number of scripts: {}".format(len(self.scripts)))
+        self.log.note("")
+        if skipped_scripts:
+            self.log.note("{}/{} scripts were skipped".format(
+                len(skipped_scripts), len(self.scripts)))
+            for s in skipped_scripts:
+                self.log.note("* {}".format(s))
+            self.log.note("")
+        else:
+            self.log.note("No scripts were skipped. Nice!")
+            self.log.note("")
+
+        if failed_scripts:
+            self.log.note("{}/{} scripts failed".format(
+                len(failed_scripts), len(self.scripts)))
+            for s in failed_scripts:
+                self.log.note("* {}".format(s))
+            self.log.note("")
+        else:
+            self.log.note("No scripts failed. Nice!")
+            self.log.note("")
+
+        print(validationfunctions.congratulator(
+            total=len(self.scripts),
+            failure=len(failed_scripts)+len(skipped_scripts)
+        ))
 
     def set_runtime_data(self):
         """!
@@ -884,7 +932,8 @@ class Validation:
     def apply_script_caching(self):
         cacheable_scripts = [s for s in self.scripts if s.is_cacheable()]
 
-        output_dir_datafiles = validationpath.get_results_tag_folder(self.work_folder, self.tag)
+        output_dir_datafiles = validationpath.get_results_tag_folder(
+            self.work_folder, self.tag)
 
         for s in cacheable_scripts:
             # for for all output files
@@ -1405,6 +1454,8 @@ def execute(tag=None, is_test=None):
         else:
             validation.log.note('Skipping plot creation and mailing '
                                 '(dry run)...')
+
+        validation.report_on_scripts()
 
         # Log that everything is finished
         validation.log.note(

@@ -91,7 +91,7 @@ void ECLShowerCorrectorModule::event()
   for (auto& eclShower : m_eclShowers) {
 
     // Only correct EM showers! Other showers keep the raw energy!
-    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
+    if (eclShower.getHypothesisId() == ECLShower::c_nPhotons) {
 
       const double energy        = eclShower.getEnergy();
       const double energyHighest = eclShower.getEnergyHighestCrystal();

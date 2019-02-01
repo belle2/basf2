@@ -37,6 +37,7 @@ Essentially: it is forbidden from now onwards for any other analysis modules to 
 
 .. include:: framework/doc/whatsnew-since/release-03-00.txt
 
+.. include:: ecl/doc/whatsnew-since/release-03-00.txt
 
 
 Changes since release-02-01

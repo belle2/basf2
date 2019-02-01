@@ -162,8 +162,8 @@ void CosmicRayHLTDQMModule::event()
   if (eclClusters.isValid()) {
     int nECLClusters = 0;
     for (const auto& eclCluster : eclClusters) {
-      if (eclCluster.getHypothesisId() == 5) {
-        h_e_eclcluster->Fill(eclCluster.getEnergy());
+      if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        h_e_eclcluster->Fill(eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
         h_phi_eclcluster->Fill(eclCluster.getPhi());
         h_theta_eclcluster->Fill(eclCluster.getTheta());
         h_E1oE9_eclcluster->Fill(eclCluster.getE1oE9());
@@ -179,7 +179,7 @@ void CosmicRayHLTDQMModule::event()
   if (eclShowers.isValid()) {
     int nECLShowers = 0;
     for (const auto& eclShower : eclShowers) {
-      if (eclShower.getHypothesisId() == 5) {
+      if (eclShower.getHypothesisId() == ECLShower::c_nPhotons) {
         h_e_eclshower->Fill(eclShower.getEnergy());
         h_time_eclshower->Fill(eclShower.getTime());
         nECLShowers++;

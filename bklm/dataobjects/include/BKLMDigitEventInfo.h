@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
 
 namespace Belle2 {
 
   /**
    * Class to store debugging informations from the unpacker (event based).
    */
-  class BKLMDigitEventInfo : public RelationsObject {
+  class BKLMDigitEventInfo : public KLMDigitEventInfo {
 
   public:
 
@@ -25,10 +25,10 @@ namespace Belle2 {
      * Default constructor
      */
     BKLMDigitEventInfo():
+      KLMDigitEventInfo(),
       m_nOutOfRangeHits(0),
       m_nRPCHits(0),
       m_nSciHits(0),
-      m_triggerCTime(0),
       m_triggerUTime(0),
       m_windowStart(0),
       m_triggerCTimeOfPreviousEvent(0)
@@ -65,11 +65,6 @@ namespace Belle2 {
     void increaseSciHits(int hits) { m_nSciHits += hits; }
 
     /**
-     * Set trigger CTime
-     */
-    void setTriggerCTime(unsigned int triggerCTime) { m_triggerCTime = triggerCTime; }
-
-    /**
      * Set trigger UTime
      */
     void setTriggerUTime(unsigned int triggerUTime) { m_triggerUTime = triggerUTime; }
@@ -101,12 +96,6 @@ namespace Belle2 {
      * @return nSciHits
      */
     int getSciHits() const { return m_nSciHits; }
-
-    /**
-     * Returns trigger CTime
-     * @return trigger CTime
-     */
-    unsigned int getTriggerCTime() const { return m_triggerCTime; }
 
     /**
      * Returns trigger CTime as int
@@ -153,7 +142,7 @@ namespace Belle2 {
 
     unsigned int m_triggerCTimeOfPreviousEvent; /**< trigger CTime of previous event */
 
-    ClassDef(BKLMDigitEventInfo, 1); /**< ClassDef */
+    ClassDef(BKLMDigitEventInfo, 2); /**< ClassDef */
 
   };
 

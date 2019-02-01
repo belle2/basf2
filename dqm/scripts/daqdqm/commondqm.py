@@ -29,6 +29,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             path.add_module(pxdeff)
         # SVD
         if components is None or 'SVD' in components:
+            # SVD DATA FORMAT
+            svdunpackerdqm = register_module('SVDUnpackerDQM')
+            path.add_module(svdunpackerdqm)
             # ZeroSuppression Emulator
             path.add_module(
                 'SVDZeroSuppressionEmulator',

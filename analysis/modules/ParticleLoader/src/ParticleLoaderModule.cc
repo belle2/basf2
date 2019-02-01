@@ -472,7 +472,7 @@ namespace Belle2 {
     if (m_ECLClusters2Plists.empty()) // nothing to do
       return;
 
-    // create all lists
+    // create and register all ParticleLists
     for (auto eclCluster2Plist : m_ECLClusters2Plists) {
       string listName = get<c_PListName>(eclCluster2Plist);
       string antiListName = get<c_AntiPListName>(eclCluster2Plist);
@@ -485,6 +485,7 @@ namespace Belle2 {
         plist->initialize(pdgCode, listName);
       }
 
+      // create anti-particle list if necessary
       if (!isSelfConjugatedParticle) {
         StoreObjPtr<ParticleList> antiPlist(antiListName);
         antiPlist.create();
@@ -494,28 +495,29 @@ namespace Belle2 {
       }
     }
 
+    // StoreArrays needed to load eclclusters as particles
+    // (and mcmatching)
     StoreArray<ECLCluster> ECLClusters;
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcParticles;
 
+    // outer loop over all ECLClusters
     for (int i = 0; i < ECLClusters.getEntries(); i++) {
       const ECLCluster* cluster      = ECLClusters[i];
 
-      // ecl clusters can be photons or neutral hadrons (i.e. Klong)
+      // ECLClusters can be reconstructed under different hypotheses, for
+      // example photons or neutral hadrons, we only load particles from these
+      // for now
       if (!cluster->isNeutral()) continue;
       if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons
           && cluster->getHypothesisId() != ECLCluster::Hypothesis::c_neutralHadron)
         continue;
 
-      // SAM: what happens if this is run on data? probably the RelationVector
-      // has length zero and we skip to "create Particle"
-
-      // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles
       // order the relations by weights and set Particle -> multiple MCParticle relation
       // preserve the weight
       RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
-      // order relations bt weights
+      // order relations by weights
       std::vector<std::pair<int, double>> weightsAndIndices;
       for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
         const MCParticle* relMCParticle = mcRelations[iMCParticle];
@@ -529,7 +531,8 @@ namespace Belle2 {
         return left.second > right.second;
       });
 
-      // create Particle
+      // inner loop over ParticleLists: fill each relevant list with Particles
+      // created from ECLClusters
       for (auto eclCluster2Plist : m_ECLClusters2Plists) {
         string listName = get<c_PListName>(eclCluster2Plist);
         int listPdgCode = get<c_PListPDGCode>(eclCluster2Plist);
@@ -550,7 +553,7 @@ namespace Belle2 {
         // create particle and check it before adding to list
         Particle particle(cluster, thisType);
         if (particle.getParticleType() != Particle::c_ECLCluster) {
-          B2WARNING("Particle created from ECLCluster does not have ECLCluster type: skipping");
+          B2FATAL("Particle created from ECLCluster does not have ECLCluster type.");
           continue;
         }
         Particle* newPart = particles.appendNew(particle);

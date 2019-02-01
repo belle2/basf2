@@ -67,9 +67,8 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
     if (roeParticle->getECLCluster()->isTrack() or toAddParticle->getECLCluster()->isTrack())
       return false;
 
-    // if they are both the same hypothesis then they are different
-    // (two photons from the same connected region is legal and two Klongs will
-    // not come from the same connected region)
+    // we cannot combine two particles of different hypotheses from the same
+    // connected region (as their energies overlap)
     if (roeParticle->getECLCluster()->getHypothesisId() == toAddParticle->getECLCluster()->getHypothesisId())
       return false;
 

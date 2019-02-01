@@ -55,7 +55,7 @@ namespace Belle2 {
     if (m_iCombination > 0) {
 
       // TF SC this does not yet account for double counting so will produce:
-      // { 000, 100, 200, ... 010, 110, .... } event if the first and second
+      // { 000, 100, 200, ... 010, 110, .... } even if the first and second
       // place are the same particle list
       for (unsigned int i = 0; i < m_numberOfLists; i++) {
         indices[i]++;
@@ -460,9 +460,14 @@ namespace Belle2 {
 
       if (daughters.empty()) {
         // Only test if the particle was created from an ECLCluster at source.
-        // This can be changed if we change the cluster <--> track matching, in
-        // which case one needs to extend the check to ALL particles with an
-        // associated ECLCluster. Then replace the following active line with two lines...
+        // This CAN CHANGE if we change the cluster <--> track matching,
+        // (currently we match nPhotons clusters to all track type particles,
+        // i.e. electrons, pions, kaons etc. We might gain by matching
+        // neutralHadron hypothesis clusters to kaons, for example).
+        //
+        // In the above case one would need to extend the check to ALL
+        // particles with an associated ECLCluster. Then replace the following
+        // active line with two lines...
         //
         // auto cluster = p->getECLCluster();
         // if (cluster) { // then do stuff
@@ -482,12 +487,6 @@ namespace Belle2 {
     // less than two particles from an ECL source is fine
     // (unless cluster <--> track matching changes)
     if (nECLSource < 2) return true;
-
-    // if all crs are unique the throw true (maybe a fast way to prechreck this)
-    // FIXME?
-
-    // if all hyps are the same the throw true (maybe a fast way to prechreck this)
-    // FIXME?
 
     // yes this is a nested for loop but it's fast, we promise
     for (unsigned icr = 0; icr < connectedregions.size(); ++icr)

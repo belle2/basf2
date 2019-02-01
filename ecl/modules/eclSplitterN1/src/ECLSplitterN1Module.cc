@@ -360,7 +360,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
     // Fill shower Ids
     aECLShower->setShowerId(1); // always one (only this single shower in the CR)
-    aECLShower->setHypothesisId(Belle2::ECLCluster::c_nPhotons);
+    aECLShower->setHypothesisId(Belle2::ECLShower::c_nPhotons);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     // Add relations of all CalDigits of the CR to the local maximum (here: all weights = 1).
@@ -745,7 +745,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // Get unique ID
       aECLShower->setShowerId(iShower);
       ++iShower;
-      aECLShower->setHypothesisId(ECLCluster::c_nPhotons);
+      aECLShower->setHypothesisId(Belle2::ECLShower::c_nPhotons);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 
       // Add relation to the CR.

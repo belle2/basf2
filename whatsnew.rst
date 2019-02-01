@@ -26,6 +26,7 @@ Changes since release-03-00
 
 .. include:: framework/doc/whatsnew-since/release-03-00.txt
 
+.. include:: ecl/doc/whatsnew-since/release-03-00.txt
 
 
 Changes since release-02-01

@@ -76,8 +76,8 @@ void ECLCovarianceMatrixModule::event()
   // loop over all ECLShowers
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct for photon showers and high energey electrons
-    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
+    // Only calculate for photon showers
+    if (eclShower.getHypothesisId() == ECLShower::c_nPhotons) {
 
       const double energy = eclShower.getEnergy();
 

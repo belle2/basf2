@@ -719,23 +719,23 @@ namespace {
     ECLCluster* eclGamma1 = eclClusters. appendNew(ECLCluster());
     eclGamma1->setConnectedRegionId(1);
     eclGamma1->setClusterId(1);
-    eclGamma1->setHypothesisId(5);
+    eclGamma1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma2 = eclClusters. appendNew(ECLCluster());
     eclGamma2->setConnectedRegionId(1);
     eclGamma2->setClusterId(2);
-    eclGamma2->setHypothesisId(5);
+    eclGamma2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma3 = eclClusters. appendNew(ECLCluster());
     eclGamma3->setConnectedRegionId(2);
     eclGamma3->setClusterId(1);
-    eclGamma3->setHypothesisId(5);
+    eclGamma3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma4 = eclClusters. appendNew(ECLCluster());
     eclGamma4->setConnectedRegionId(3);
     eclGamma4->setClusterId(1);
-    eclGamma4->setHypothesisId(5);
+    eclGamma4->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclKL = eclClusters. appendNew(ECLCluster());
     eclKL->setConnectedRegionId(3);
     eclKL->setClusterId(1);
-    eclKL->setHypothesisId(6);
+    eclKL->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
 
     Particle* pip_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 2));
     Particle* pip_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 4));

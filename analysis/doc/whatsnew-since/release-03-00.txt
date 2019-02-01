@@ -1,6 +1,20 @@
 Changes in the analysis package
 -------------------------------
 
+Variables
++++++++++
+
+* Deprecated :b2:var:`clusterHypothesis` following changes to the ECLCluster storage on mdst. 
+  Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
+
+* Removed ClusterHadronIntensity and clusterUniqueID.
+
+Modules
++++++++
+
+* Removal of the unsupported ECLClusterInfoModule.
+
+
 Standard Particle Lists
 +++++++++++++++++++++++
 

@@ -65,7 +65,7 @@ void ECLChargedPIDModule::event()
 
     for (const auto& eclShower : relShowers) {
 
-      if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
+      if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) continue;
       if (m_applyClusterTimingSel) {
         if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
       }

@@ -86,8 +86,10 @@ class DataStorePrinter(object):
                     # and add (name,args,display,callback) tuple
                     self.object_members.append((member, args, None, None))
 
-        # sort them to have fixed order
-        self.object_members.sort(key=lambda x: repr(x))
+        # sort them by member name to have fixed order: python sort is
+        # guaranteed to be stable so different calls to the same member will
+        # remain in same relative order
+        self.object_members.sort(key=lambda x: x[0])
 
     def add_member(self, name, arguments=[], print_callback=None, display=None):
         """

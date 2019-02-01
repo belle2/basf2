@@ -18,24 +18,25 @@ ClusterUtils::ClusterUtils()
 { }
 
 // -----------------------------------------------------------------------------
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass)
 {
 
   // Use the default vertex from the beam parameters if none is given.
-  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo);
+  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo, mass);
 }
 
 const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                           ECLCluster::EHypothesisBit hypo)
+                                                           ECLCluster::EHypothesisBit hypo, double mass)
 {
 
   // Get particle direction from vertex and reconstructed cluster position.
   TVector3 direction = cluster->getClusterPosition() - vertex;
 
   const double E  = cluster->getEnergy(hypo);
-  const double px = E * sin(direction.Theta()) * cos(direction.Phi());
-  const double py = E * sin(direction.Theta()) * sin(direction.Phi());
-  const double pz = E * cos(direction.Theta());
+  const double p = sqrt(E * E - mass * mass);
+  const double px = p * sin(direction.Theta()) * cos(direction.Phi());
+  const double py = p * sin(direction.Theta()) * sin(direction.Phi());
+  const double pz = p * cos(direction.Theta());
 
   const TLorentzVector l(px, py, pz, E);
   return l;
@@ -75,9 +76,11 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   const double energy = cluster->getEnergy(hypo);
   const double theta  = cluster->getTheta();
   const double phi    = cluster->getPhi();
+  // FIXME propagate possibly massive particles through the Jacobian
+  //const double p      = sqrt(energy * energy - mass * mass); // momentum
 
-  const double st    = sin(theta);
-  const double ct    = cos(theta);
+  const double st  = sin(theta);
+  const double ct  = cos(theta);
   const double sp  = sin(phi);
   const double cp  = cos(phi);
 

@@ -42,13 +42,14 @@ namespace Belle2 {
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass = 0.);
 
     /**
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo,
+                                                 double mass = 0.);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)

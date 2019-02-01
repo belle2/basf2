@@ -38,6 +38,9 @@ AllParticlesCombinerModule::AllParticlesCombinerModule() : Module()
   addParam("outputListName", m_outputListName,
            "Name of the output list created by the combination of all particles in the input list.", std::string(""));
 
+  // initializing the rest of private members
+  m_pdgCode   = 0;
+  m_isSelfConjugatedParticle = 0;
 }
 
 void AllParticlesCombinerModule::initialize()

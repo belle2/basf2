@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['klm_dataobjects', 'simulation_dataobjects', 'framework', 'Core']
+env['LIBS'] = ['simulation_dataobjects', 'framework', 'Core']
 
 Return('env')

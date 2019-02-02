@@ -4,7 +4,7 @@
 #############################################################
 # Simple steering file to demonstrate how to run:
 #   PXD, SVD, VXD and Track DQM on BelleII or Phase2 geometry
-#   for ExpressReco on-line
+#   for ExpressReco on-line use Min modules without analysis
 #   Base on module from Martin Ritter:
 #               tracking/examples/DQMTracking_Phase2.py
 # Contributors: Peter Kodys                                              *
@@ -16,9 +16,6 @@ from reconstruction import add_reconstruction
 from L1trigger import add_tsim
 import glob
 
-from reconstruction import add_cosmics_reconstruction
-from daqdqm.commondqm import add_common_dqm
-
 # background (collision) files
 # bg = glob.glob('./BG/*.root')
 # on KEKCC: (choose one of the sets)
@@ -29,7 +26,7 @@ bg = None
 # number of events to generate, can be overriden with -n
 num_events = 100
 # output filename, can be overriden with -o
-output_filename = "RootOutput_Phase2.root"
+output_filename = "RootOutput_Phase3Early.root"
 
 # create path
 main = create_path()
@@ -37,7 +34,8 @@ main = create_path()
 # specify number of events to be generated
 # main.add_module('EventInfoSetter', evtNumList=num_events)
 # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
-main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_events)
+# main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_events)
+main.add_module("EventInfoSetter", evtNumList=num_events)
 
 # in case you need to fix seed of random numbers
 # set_random_seed('some fixed value')
@@ -45,8 +43,10 @@ main.add_module("EventInfoSetter", expList=1002, runList=1, evtNumList=num_event
 
 # generate BBbar events
 main.add_module('EvtGenInput')
-# generate cosmics events
-# main.add_module('Cosmics')
+
+main.add_module("Gearbox", fileName='/geometry/Belle2_earlyPhase3.xml')
+main.add_module("Geometry", useDB=False)
+
 
 # detector simulation
 add_simulation(main, bkgfiles=bg)
@@ -54,29 +54,25 @@ add_simulation(main, bkgfiles=bg)
 # trigger simulation
 add_tsim(main)
 
-# reconstruction - set pruneTracks=False to store RecoHits for TrackDQM
-add_reconstruction(main, pruneTracks=False)
-# reconstruction fo cosmics - set pruneTracks=False to store RecoHits for TrackDQM
-# add_cosmics_reconstruction(main, pruneTracks=False, data_taking_period = 'phase2')
+# reconstruction
+add_reconstruction(main)
 
 # histomanager: use DqmHistoManager for in-line monitoring, or HistoManager for offline training
 # main.add_module('DqmHistoManager', Port=7777)
-main.add_module('HistoManager', histoFileName='Histos_DQMTracks_Phase2.root')
+main.add_module('HistoManager', histoFileName='Histos_DQMVXD_Phase3Early.root')
 # main.add_module('HistoManager', histoFileName='Histos_DQMTracks_BelleII.root')
 
 pxddqmExpReco = register_module('PXDDQMExpressReco')
 svddqmExpReco = register_module('SVDDQMExpressReco')
 vxddqmExpReco = register_module('VXDDQMExpressReco')
+
 main.add_module(pxddqmExpReco)
 main.add_module(svddqmExpReco)
 main.add_module(vxddqmExpReco)
-# # The following should do the same as above
-# add_common_dqm(main,['PXD', 'SVD'])
 
 # DQM of tracking
-main.add_module('TrackDQM')
+trackDQM = main.add_module('TrackDQM')
 # In case to see more details:
-# trackDQM = main.add_module('TrackDQM')
 # trackDQM = main.add_module('TrackDQM', debugLevel=250)
 # trackDQM.logging.log_level = LogLevel.DEBUG
 

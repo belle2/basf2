@@ -31,7 +31,7 @@ DelayDQMModule::DelayDQMModule() : HistoModule()
   //Set module properties
   setDescription("Processing Delay DQM module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string(""));
   addParam("title", m_title, "Prefix for Title (ERECO, HLT, ...)", std::string("Processing "));
 }

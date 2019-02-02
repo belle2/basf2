@@ -34,6 +34,7 @@
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
+#include <G4EllipticalTube.hh>
 #include <G4UnionSolid.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
@@ -696,6 +697,33 @@ namespace Belle2 {
       G4Tubs* geo_rvcL = new G4Tubs("geo_rvcL", 60, 60 + 60, (-560 - (-620)) / 2., 0, 2 * M_PI);
       G4LogicalVolume* logi_rvcL = new G4LogicalVolume(geo_rvcL, Materials::get("SUS316L"), "logi_rvcL_name");
       new G4PVPlacement(0, G4ThreeVector(0, 0, (-620 - 560) / 2.), logi_rvcL, "phys_rvcL_name", &topVolume, false, 0);
+
+      // Added 10 Nov 2018
+      // Elliptical inner surface around QC1LE
+      G4EllipticalTube* geo_elp_QC1LEx = new G4EllipticalTube("geo_elp_QC1LEx", 10.5, 13.5, (-675 - (-1225)) / 2.); //in mm
+      G4IntersectionSolid* geo_elp_QC1LE = new G4IntersectionSolid("geo_elp_QC1LE", elements["D2wal1"].geo, geo_elp_QC1LEx,
+          G4Translate3D(0, 0, (-675 - 1225) / 2.));
+      G4LogicalVolume* logi_elp_QC1LE = new G4LogicalVolume(geo_elp_QC1LE, Materials::get("Vacuum"), "logi_elp_QC1LE_name");
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1LE, "phys_elp_QC1LE_name", elements["D2wal1"].logi, false, 0);
+      // Elliptical inner surface around QC1LP
+      G4EllipticalTube* geo_elp_QC1LPx = new G4EllipticalTube("geo_elp_QC1LPx", 10.5, 13.5, (-675 - (-1225)) / 2.); //in mm
+      G4IntersectionSolid* geo_elp_QC1LP = new G4IntersectionSolid("geo_elp_QC1LP", elements["E2wal1"].geo, geo_elp_QC1LPx,
+          G4Translate3D(0, 0, (-675 - 1225) / 2.));
+      G4LogicalVolume* logi_elp_QC1LP = new G4LogicalVolume(geo_elp_QC1LP, Materials::get("Vacuum"), "logi_elp_QC1LP_name");
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1LP, "phys_elp_QC1LP_name", elements["E2wal1"].logi, false, 0);
+      // Elliptical inner surface around QC1RE
+      G4EllipticalTube* geo_elp_QC1REx = new G4EllipticalTube("geo_elp_QC1REx", 10.5, 13.5, (1225 - 675) / 2.); //in mm
+      G4IntersectionSolid* geo_elp_QC1RE = new G4IntersectionSolid("geo_elp_QC1RE", elements["A2wal1"].geo, geo_elp_QC1REx,
+          G4Translate3D(0, 0, (1225 + 675) / 2.));
+      G4LogicalVolume* logi_elp_QC1RE = new G4LogicalVolume(geo_elp_QC1RE, Materials::get("Vacuum"), "logi_elp_QC1RE_name");
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1RE, "phys_elp_QC1RE_name", elements["A2wal1"].logi, false, 0);
+      // Elliptical inner surface around QC1RP
+      G4EllipticalTube* geo_elp_QC1RPx = new G4EllipticalTube("geo_elp_QC1RPx", 10.5, 13.5, (1225 - 675) / 2.); //in mm
+      G4IntersectionSolid* geo_elp_QC1RP = new G4IntersectionSolid("geo_elp_QC1RP", elements["B2wal1"].geo, geo_elp_QC1RPx,
+          G4Translate3D(0, 0, (1225 + 675) / 2.));
+      G4LogicalVolume* logi_elp_QC1RP = new G4LogicalVolume(geo_elp_QC1RP, Materials::get("Vacuum"), "logi_elp_QC1RP_name");
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1RP, "phys_elp_QC1RP_name", elements["B2wal1"].logi, false, 0);
+
 
       //---------------------------
       // for dose simulation

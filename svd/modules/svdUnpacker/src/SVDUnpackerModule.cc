@@ -422,7 +422,6 @@ void SVDUnpackerModule::event()
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
             for (auto p : vDiagnostic_ptr) {
-              //if (p.getFADCNumber() != fadc) continue;
               // adding remaining info to Diagnostic object
               p->setFTBFlags(ftbFlags);
               p->setEmuPipelineAddress(emuPipAddr);

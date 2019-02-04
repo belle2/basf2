@@ -136,6 +136,8 @@ void SVDUnpackerModule::event()
             << "set the silentlyAppend parameter of SVDUnpacker to true.");
 
   SVDDAQDiagnostic* currentDAQDiagnostic;
+  vector<SVDDAQDiagnostic*> vDiagnostic_ptr;
+
   map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
   // Store encountered pipeline addresses with APVs in which they were observed
   map<unsigned short, set<pair<unsigned short, unsigned short> > > apvsByPipeline;
@@ -155,6 +157,8 @@ void SVDUnpackerModule::event()
   bool nFADCmatch = true;
   bool nAPVmatch = true;
   bool badMapping = false;
+  bool badHeader = false;
+  bool badTrailer = false;
 
   unsigned short nAPVheaders = 999;
   set<short> seenAPVHeaders = {};
@@ -217,10 +221,6 @@ void SVDUnpackerModule::event()
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
 
-            nAPVheaders = 0; // start counting APV headers for this FADC
-            nAPVmatch = true; //assume correct # of APV headers
-            badMapping = false; //assume correct mapping
-
             data32_it++; // go to 2nd part of FTB header
             crc16vec.push_back(*data32_it);
 
@@ -270,6 +270,12 @@ void SVDUnpackerModule::event()
             trgType = m_MainHeader.trgType;
             trgNumber = m_MainHeader.trgNumber;
 
+            nAPVheaders = 0; // start counting APV headers for this FADC
+            nAPVmatch = true; //assume correct # of APV headers
+            badMapping = false; //assume correct mapping
+            badHeader = false;
+            badTrailer = false;
+
             is3sampleData = false;
             if (m_MainHeader.DAQMode == 1) is3sampleData = true;
 
@@ -279,6 +285,9 @@ void SVDUnpackerModule::event()
               B2ERROR(" Found a wrong FTB header of the SVD FADC " << LogVar("Event number", m_eventMetaDataPtr->getEvent()) << LogVar("FADC",
                       fadc) << LogVar("Trigger number LSByte reported by the FADC", m_MainHeader.trgNumber) << LogVar("+ offset",
                           m_FADCTriggerNumberOffset) << LogVar("expected", (m_eventMetaDataPtr->getEvent() & 0xFF)));
+              badHeader = true;
+              currentDAQDiagnostic = DAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, fadc, 0);
+              vDiagnostic_ptr.push_back(currentDAQDiagnostic);
             }
 
             // create SVDModeByte object from MainHeader vars
@@ -301,7 +310,10 @@ void SVDUnpackerModule::event()
 
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
             currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, nAPVmatch,
+                                                            badHeader,
                                                             fadc, apv);
+            vDiagnostic_ptr.push_back(currentDAQDiagnostic);
+
             apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
           }
 
@@ -361,6 +373,11 @@ void SVDUnpackerModule::event()
             //comparing number of APV chips and the number of APV headers, for the current FADC
             unsigned short nAPVs = APVmap->count(fadc);
 
+            if (nAPVheaders == 0) {
+              currentDAQDiagnostic = DAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, fadc, 0);
+              vDiagnostic_ptr.push_back(currentDAQDiagnostic);
+            }
+
             if (nAPVs != nAPVheaders) {
               // There is an APV missing, detect which it is.
               for (const auto& fadcApv : *APVmap) {
@@ -383,14 +400,15 @@ void SVDUnpackerModule::event()
                                          ));
                     B2WARNING("missing APV header! " << LogVar("Event number", eventNo) << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
                               int(fadcApv.first)));
-                    nAPVmatch = false;
                   }
                 }
               }
+              nAPVmatch = false;
             }
             seenAPVHeaders.clear();
 
             ftbFlags = m_FADCTrailer.FTBFlags;
+            if ((ftbFlags >> 5) != 0) badTrailer = true;
             if (ftbFlags != 0) {
               B2WARNING(" FTB Flags variable has an active error bit(s)" << LogVar("on FADC number", fadc));
 
@@ -403,14 +421,16 @@ void SVDUnpackerModule::event()
 
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
-            for (auto& p : DAQDiagnostics) {
-              if (p.getFADCNumber() != fadc) continue;
+            for (auto p : vDiagnostic_ptr) {
+              //if (p.getFADCNumber() != fadc) continue;
               // adding remaining info to Diagnostic object
-              p.setFTBFlags(ftbFlags);
-              p.setEmuPipelineAddress(emuPipAddr);
-              p.setApvErrorOR(apvErrorsOR);
-              p.setAPVMatch(nAPVmatch);
-              p.setBadMapping(badMapping);
+              p->setFTBFlags(ftbFlags);
+              p->setEmuPipelineAddress(emuPipAddr);
+              p->setApvErrorOR(apvErrorsOR);
+              p->setAPVMatch(nAPVmatch);
+              p->setBadMapping(badMapping);
+              p->setBadTrailer(badTrailer);
+              vDiagnostic_ptr.clear();
             }
 
           }// FADC trailer
@@ -478,6 +498,7 @@ void SVDUnpackerModule::event()
                                make_pair(eventNo, eventNo)
                              ));
           for (auto& pp : DAQDiagnostics) {
+
             if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
               pp.setUpsetAPV(true);
           }
@@ -490,6 +511,7 @@ void SVDUnpackerModule::event()
   // Here we can delete digits coming from upset APVs. We detect them by comparing
   // actual and emulated pipeline address fields in DAQDiagnostics.
   for (auto& p : diagnosticMap) {
+
     if ((m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress()) || p.second->getFTBError() != 240
         || p.second->getFTBFlags()) continue;
     shaperDigits.appendNew(p.first)->addRelationTo(p.second);

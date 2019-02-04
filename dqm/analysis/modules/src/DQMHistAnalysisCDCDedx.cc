@@ -45,7 +45,6 @@ DQMHistAnalysisCDCDedxModule::~DQMHistAnalysisCDCDedxModule() { }
 
 void DQMHistAnalysisCDCDedxModule::initialize()
 {
-
   gROOT->cd(); // this seems to be important, or strange things happen
 
   B2DEBUG(1, "DQMHistAnalysisCDCDedx: initialized.");
@@ -59,15 +58,16 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   tLine->SetLineStyle(9);
 
   c_CDCdedxSigma = new TCanvas("CDCDedx/c_CDCdedxSigma");
+
   c_CDCdedxMean = new TCanvas("CDCDedx/c_CDCdedxMean");
+  h_CDCdedxMean = new TH1F("CDCDedx/h_CDCdedxMean", "dEdx distribution", 200, 0.0, 2.0);
+  h_CDCdedxMean->SetDirectory(0);
+  h_CDCdedxMean->SetStats(false);
 
   f_fGaus = new TF1("f_Gaus", "gaus", 0.0, 2.0);
   f_fGaus->SetParameter(1, 1.00);
   f_fGaus->SetParameter(2, 0.06);
   f_fGaus->SetLineColor(kRed);
-  // f_fGaus->SetNpx(256);
-  // f_fGaus->SetNumberFitPoints(256);
-
 }
 
 
@@ -84,16 +84,20 @@ void DQMHistAnalysisCDCDedxModule::event()
 
 void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
 {
+
   runstatus.clear();
   tLine->Clear();
 
   TH1* hh1 = findHist("CDCDedx/hdEdx_PerRun");
   if (hh1 != NULL) {
+    //Copy bins and X ranges as well as bin-content (Clone and Copy histogram not working here)
+    h_CDCdedxMean->SetBins(int(hh1->GetXaxis()->GetNbins()), double(hh1->GetXaxis()->GetXmin()), double(hh1->GetXaxis()->GetXmax()));
+    h_CDCdedxMean->SetTitle(hh1->GetTitle());
+    for (Int_t i = 1; i <= hh1->GetXaxis()->GetNbins(); i++) {
+      h_CDCdedxMean->SetBinContent(i, hh1->GetBinContent(i));
+      h_CDCdedxMean->SetBinError(i, hh1->GetBinError(i));
+    }
 
-    if (h_CDCdedxMean != NULL) delete h_CDCdedxMean;
-
-    h_CDCdedxMean = (TH1F*)hh1->Clone("CDCDedx/h_CDCdedxMean");
-    h_CDCdedxMean->SetStats(false);
     h_CDCdedxMean->Fit(f_fGaus, "Q");
 
     runnumber = h_CDCdedxMean->GetTitle();

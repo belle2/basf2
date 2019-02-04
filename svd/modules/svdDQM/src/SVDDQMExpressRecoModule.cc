@@ -131,11 +131,11 @@ void SVDDQMExpressRecoModule::defineHisto()
   // basic counters per chip:
   m_hitMapCountsChip = new TH1I("DQMER_SVD_StripCountsChip", "DQM ER SVD Integrated number of fired strips per chip",
                                 nSVDChips, 0, nSVDChips);
-  m_hitMapCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
   m_hitMapClCountsChip = new TH1I("DQMER_SVD_ClusterCountsChip", "DQM ER SVD Integrated number of clusters per chip",
                                   nSVDChips, 0, nSVDChips);
-  m_hitMapClCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapClCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
 
 

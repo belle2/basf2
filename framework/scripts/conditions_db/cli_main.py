@@ -445,9 +445,9 @@ def command_diff(args, db):
             """Add a list of payloads to the table, filling the first column with opcode"""
             for p in payloads:
                 if args.human_readable:
-                    table.append([opcode, p.name, p.rev, p.readable_iov()])
+                    table.append([opcode, p.name, p.revision, p.readable_iov()])
                 else:
-                    table.append([opcode, p.name, p.rev] + list(p.iov))
+                    table.append([opcode, p.name, p.revision] + list(p.iov))
 
         for tag, i1, i2, j1, j2 in diff.get_opcodes():
             if tag == "equal":
@@ -578,7 +578,7 @@ def command_iov(args, db):
             payloads.sort()
             if args.human_readable:
                 table = [["Name", "Rev", "IoV", "IovId", "PayloadId"]]
-                table += [[p.name, p.rev, p.readable_iov(), p.payload_id, p.iov_id] for p in payloads]
+                table += [[p.name, p.revision, p.readable_iov(), p.payload_id, p.iov_id] for p in payloads]
                 columns = ["+", -8, -32, 6, 9]
                 # strip repeated names, revision, payloadid, to make it more readable
                 last_name = None
@@ -594,7 +594,7 @@ def command_iov(args, db):
 
             else:
                 table = [["Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run", "IovId", "PayloadId"]]
-                table += [[p.name, p.rev] + list(p.iov) + [p.iov_id, p.payload_id] for p in payloads]
+                table += [[p.name, p.revision] + list(p.iov) + [p.iov_id, p.payload_id] for p in payloads]
                 columns = ["+", -8, 6, 6, 6, 6, 6, 9]
 
             pretty_print_table(table, columns)

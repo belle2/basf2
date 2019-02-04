@@ -119,7 +119,7 @@ class PayloadInformation:
         #: interval of validity
         self.iov = iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
         #: revision, not used for comparisons
-        self.rev = payload["revision"]
+        self.revision = payload["revision"]
         #: payload id in CDB, not used for comparisons
         self.payload_id = payload["payloadId"]
         #: iov id in CDB, not used for comparisons
@@ -135,7 +135,7 @@ class PayloadInformation:
 
     def __lt__(self, other):
         """Sort payloads by name, iov, revision"""
-        return (self.name.lower(), self.iov, self.rev) < (other.name.lower(), other.iov, other.rev)
+        return (self.name.lower(), self.iov, self.revision) < (other.name.lower(), other.iov, other.revision)
 
     def readable_iov(self):
         """return a human readable name for the IoV"""

@@ -195,6 +195,7 @@ def DeepFlavorTagger(particle_list, mode='expert', working_dir='', uniqueIdentif
         # mod_ft_info_filler = register_module('FlavorTaggerInfoFiller')
 
         expert_module = register_module('MVAExpert')
+        expert_module.param('listNames', [particle_list])
         expert_module.param('identifier', uniqueIdentifier)
 
         expert_module.param('extraInfoName', output_variable)

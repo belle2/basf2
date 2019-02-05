@@ -120,11 +120,16 @@ def apply(state, X):
     """
 
     binning.transform_ndarray(X, state.binning_parameters)
-    r = state.session.run(state.activation,
-                          feed_dict={state.x: X}).flatten()
-
+    chunk_size = 1000000
+    if len(X) > chunk_size:
+        results = list()
+        for i in range(0, len(X), chunk_size):
+            results.append(state.session.run(state.activation, feed_dict={state.x: X[i: i + chunk_size]}))
+        r = np.concatenate(results).flatten()
+    else:
+        r = state.session.run(state.activation, feed_dict={state.x: X}).flatten()
     if state.transform_to_probability:
-        binning.transform_array_to_sf(r, state.sig_back_tupe, signal_fraction=.5)
+        binning.transform_array_to_sf(r, state.sig_back_tuple, signal_fraction=.5)
 
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
@@ -229,7 +234,7 @@ def end_fit(state):
 
     # sample pdfs of trained model on test_dataset, return test df
     state.get_from_collection()
-    y_hat = apply(state, state.Xtest)
+    y_hat = state(*state.Xtest)
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
 

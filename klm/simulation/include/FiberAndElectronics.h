@@ -15,7 +15,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dbobjects/EKLMChannelData.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <eklm/simulation/FPGAFitter.h>
+#include <klm/simulation/FPGAFitter.h>
 
 namespace Belle2 {
 

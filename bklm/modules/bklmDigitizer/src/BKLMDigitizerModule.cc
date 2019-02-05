@@ -17,7 +17,7 @@
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMDigit.h>
-#include <eklm/simulation/FPGAFitter.h>
+#include <klm/simulation/FPGAFitter.h>
 
 #include <TRandom.h>
 

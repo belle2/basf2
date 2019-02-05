@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include <bklm/dbobjects/BKLMScinDigitizationParams.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
 #include <framework/database/DBObjPtr.h>

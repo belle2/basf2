@@ -13,7 +13,7 @@
 #include <TH1F.h>
 
 /* Belle2 headers. */
-#include <eklm/simulation/FPGAFitter.h>
+#include <klm/simulation/FPGAFitter.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 

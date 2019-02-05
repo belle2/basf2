@@ -16,11 +16,11 @@
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/simulation/FPGAFitter.h>
 
 namespace Belle2 {
 

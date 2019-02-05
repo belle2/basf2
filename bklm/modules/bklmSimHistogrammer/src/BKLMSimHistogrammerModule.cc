@@ -20,7 +20,6 @@
 
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <bklm/dataobjects/BKLMDigit.h>
-#include <eklm/simulation/FPGAFitter.h>
 #include <simulation/dataobjects/SimHitBase.h>
 
 #include <TRandom.h>

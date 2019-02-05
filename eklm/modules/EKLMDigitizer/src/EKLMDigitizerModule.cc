@@ -11,7 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
-#include <eklm/simulation/FiberAndElectronics.h>
+#include <klm/simulation/FiberAndElectronics.h>
 
 using namespace Belle2;
 

@@ -17,7 +17,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/simulation/FiberAndElectronics.h>
+#include <klm/simulation/FiberAndElectronics.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>

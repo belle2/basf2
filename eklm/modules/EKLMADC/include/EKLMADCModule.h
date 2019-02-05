@@ -14,7 +14,7 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <eklm/simulation/FiberAndElectronics.h>
+#include <klm/simulation/FiberAndElectronics.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 

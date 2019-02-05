@@ -105,7 +105,7 @@ class DataStorePrinter(object):
                 valus for the callable are:
 
                 * a `list` of arguments to be passed to the member. An empty
-                  `list` means to call the member with no arguments.  * returning
+                  `list` means to call the member with no arguments.
                 * a `tuple` of `lists <list>` to call the member once for each
                   list of arguments in the tuple
                 * `None` or an empty tuple to not call the member at all

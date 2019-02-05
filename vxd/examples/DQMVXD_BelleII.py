@@ -2,19 +2,28 @@
 # -*- coding: utf-8 -*-
 
 #############################################################
-# Simple steering file to demonstrate how to run Track DQM on BelleII geometry
+# Simple steering file to demonstrate how to run DQM on BelleII geometry
 # Valid for Phase 2, Phase 3 Early and Phase 3 regular as well as for testbeams
+#   PXD, SVD, VXD and Track DQM
+#   for ExpressReco on-line use Min modules without analysis
+#   Base on module from Martin Ritter:
+#               tracking/examples/DQMTracking_Phase2.py
+# Contributors: Peter Kodys                                              *
 #############################################################
 
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
+from daqdqm.commondqm import add_common_dqm
+
+import PXDROIUnpackerModule
+
 import glob
 
 import argparse
 parser = argparse.ArgumentParser(
-    description="Tracking DQM Belle II for Phase 2 (Exp=1), Phase 3 Early (Exp=2) and Phase 3 regular (Exp=3)")
+    description="VXD DQM Belle II for Phase 2 (Exp=1), Phase 3 Early (Exp=2) and Phase 3 regular (Exp=3), show all possible histos")
 parser.add_argument('--experiment-type', dest='ExperimentType', action='store',
                     default=2, type=int,
                     help='Set which experiment you want: 1 (Phase 2), 2 (Phase 3 Early) or 3 (Phase 3 regular), default = 2')
@@ -64,23 +73,67 @@ add_simulation(main, bkgfiles=bg)
 # trigger simulation
 add_tsim(main)
 
+# PXD digitization module
+# main.add_module('PXDDigitizer')
+# Convert digits to raw pxd data
+PXDPACKER = register_module('PXDPacker')
+# ============================================================================
+# [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
+# -1 is disable port
+PXDPACKER.param('dhe_to_dhc', [
+    [0, 2, 4, 34, 36, 38],
+    [1, 6, 8, 40, 42, 44],
+    [2, 10, 12, 46, 48, 50],
+    [3, 14, 16, 52, 54, 56],
+    [4, 3, 5, 35, 37, 39],
+    [5, 7, 9, 41, 43, 45],
+    [6, 11, 13, 47, 49, 51],
+    [7, 15, 17, 53, 55, 57],
+])
+main.add_module(PXDPACKER)
+# Convert digits from raw pxd data
+main.add_module('PXDUnpacker')
+'''Unpack ROIs from ONSEN output'''
+main.add_module(PXDROIUnpackerModule.PXDRawROIUnpackerModule())
+'''Unpack ROIs from HLT Payload (depends if there are in the sroot file)'''
+# main.add_module(PXDROIUnpackerModule.PXDPayloadROIUnpackerModule())
+
 # reconstruction
 add_reconstruction(main)
 
 # histomanager: use DqmHistoManager for in-line monitoring, or HistoManager for offline training
 # main.add_module('DqmHistoManager', Port=7777)
-Histos_filename = "Histos_DQMTracks.root"
+Histos_filename = "Histos_DQMVXD.root"
 if (args.ExperimentType is 1):
-    Histos_filename = "Histos_DQMTracks_Phase2.root"
+    Histos_filename = "Histos_DQMVXD_Phase2.root"
 if (args.ExperimentType is 2):
-    Histos_filename = "Histos_DQMTracks_Phase3Early.root"
+    Histos_filename = "Histos_DQMVXD_Phase3Early.root"
 if (args.ExperimentType is 3):
-    Histos_filename = "Histos_DQMTracks_Phase3.root"
+    Histos_filename = "Histos_DQMVXD_Phase3.root"
 main.add_module('HistoManager', histoFileName=Histos_filename)
 
+main.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
+main.add_module('PXDDQMClusters', histogramDirectoryName='PXDCls')
+main.add_module('PXDDQMCorr', histgramDirectoryName='PXDCor')
+main.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEff')
+# main.add_module('PXDHardwareClusterDQM', histgramDirectoryName='PXDHCl')
+main.add_module('PXDRawDQMChips', histogramDirectoryName='PXDRCh')
+main.add_module('PXDRawDQMCorr', histgramDirectoryName='PXDRCo')
+main.add_module('PXDRawDQM', histgramDirectoryName='PXDRaw')
+main.add_module('PXDROIDQM', histgramDirectoryName='PXDROI')
+
+pxddqmExpReco = register_module('PXDDQMExpressReco')
+svddqmExpReco = register_module('SVDDQMExpressReco')
+vxddqmExpReco = register_module('VXDDQMExpressReco')
+
+main.add_module(pxddqmExpReco)
+main.add_module(svddqmExpReco)
+main.add_module(vxddqmExpReco)
+
 # DQM of tracking
-trackDQM = main.add_module('TrackDQM', debugLevel=250)
+trackDQM = main.add_module('TrackDQM')
 # In case to see more details:
+# trackDQM = main.add_module('TrackDQM', debugLevel=250)
 # trackDQM.logging.log_level = LogLevel.DEBUG
 
 # Finally add output, if you need

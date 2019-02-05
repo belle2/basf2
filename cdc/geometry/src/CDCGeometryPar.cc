@@ -650,12 +650,12 @@ void CDCGeometryPar::setWirPosAlignParams()
 
       // Aligned positions of wire-ends are obtained by rotating "nominal+displacement" positions and shifting them using
       // common parameters for layer rotation and shifts (at corresponding end-caps)
-      m_BWirPosAlign[iL][iC][0] = d_layerXbwd + cos(d_layerPhiBwd) * wireXbwd - sin(d_layerPhiBwd) * wireYbwd;
-      m_BWirPosAlign[iL][iC][1] = d_layerYbwd + sin(d_layerPhiBwd) * wireXbwd + cos(d_layerPhiBwd) * wireYbwd;
+      m_BWirPosAlign[iL][iC][0] = d_layerXbwd + cos(d_layerPhiBwd) * wireXbwd + sin(d_layerPhiBwd) * wireYbwd;
+      m_BWirPosAlign[iL][iC][1] = d_layerYbwd - sin(d_layerPhiBwd) * wireXbwd + cos(d_layerPhiBwd) * wireYbwd;
       m_BWirPosAlign[iL][iC][2] = wireZbwd;
 
-      m_FWirPosAlign[iL][iC][0] = d_layerXfwd + cos(d_layerPhiFwd) * wireXfwd - sin(d_layerPhiFwd) * wireYfwd;
-      m_FWirPosAlign[iL][iC][1] = d_layerYfwd + sin(d_layerPhiFwd) * wireYfwd + cos(d_layerPhiFwd) * wireYfwd;
+      m_FWirPosAlign[iL][iC][0] = d_layerXfwd + cos(d_layerPhiFwd) * wireXfwd + sin(d_layerPhiFwd) * wireYfwd;
+      m_FWirPosAlign[iL][iC][1] = d_layerYfwd - sin(d_layerPhiFwd) * wireXfwd + cos(d_layerPhiFwd) * wireYfwd;
       m_FWirPosAlign[iL][iC][2] = wireZfwd;
     } //end of  cell loop
   } //end of layer loop

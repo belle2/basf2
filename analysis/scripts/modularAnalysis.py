@@ -2230,17 +2230,27 @@ def tagCurlTracks(particleLists,
 
       .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
-    @param particleLists: list of particle lists to check for curls
-    @param belle:         bool flag for belle or belle2 data/mc
-    @param mcTruth:       bool flag to output some truth based information
+
+    The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
+    bundles based on the response of the chosen **selector** and the required minimum response set by the
+    **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
+    with extraInfo(isCurl=1) to allow for later removal  by cutting the list or removing these from ROE as
+    applicable.
+
+
+    @param particleLists: list of particle lists to check for curls.
+    @param belle:         bool flag for Belle or Belle II data/mc.
+    @param mcTruth:       bool flag to additionally assign particles with extraInfo(isTruthCurl) and
+                          extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
+                          genParticleIndex then ranked and tagged as normal.
     @param responseCut:   float min classifier response that considers two tracks to come from the same particle.
-                          Note 'cut' selector is binary 0/1
+                          Note 'cut' selector is binary 0/1.
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
     @param ptCut:         pre-selection cut on transverse momentum.
-    @param train:         flag to set training mode if selector has a training mode (mva)
-    @param path:          module is added to this path
+    @param train:         flag to set training mode if selector has a training mode (mva).
+    @param path:          module is added to this path.
     """
 
     if (not isinstance(particleLists, list)):

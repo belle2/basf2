@@ -578,7 +578,7 @@ def command_iov(args, db):
             payloads.sort()
             if args.human_readable:
                 table = [["Name", "Rev", "IoV", "IovId", "PayloadId"]]
-                table += [[p.name, p.rev, p.readable_iov(), p.payload_id, p.iov_id] for p in payloads]
+                table += [[p.name, p.rev, p.readable_iov(), p.iov_id, p.payload_id] for p in payloads]
                 columns = ["+", -8, -32, 6, 9]
                 # strip repeated names, revision, payloadid, to make it more readable
                 last_name = None

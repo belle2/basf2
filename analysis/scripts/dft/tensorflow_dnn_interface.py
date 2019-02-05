@@ -234,7 +234,7 @@ def end_fit(state):
 
     # sample pdfs of trained model on test_dataset, return test df
     state.get_from_collection()
-    y_hat = state(*state.Xtest)
+    y_hat = apply(state, state.Xtest)
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
 

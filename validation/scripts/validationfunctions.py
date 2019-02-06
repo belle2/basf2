@@ -15,7 +15,6 @@ import time
 
 # 3rd party
 import ROOT
-from basf2.utils import get_terminal_width
 
 # ours
 import validationpath
@@ -479,6 +478,17 @@ def get_log_file_paths(logger):
         except AttributeError:
             pass
     return ret
+
+
+def get_terminal_width():
+    """
+    Returns width of terminal in characters, or 80 if unknown.
+
+    Copied from basf2 utils. However, we only compile the validation package
+    on b2master, so copy this here.
+    """
+    from shutil import get_terminal_size
+    return get_terminal_size(fallback=(80, 24)).columns
 
 
 def congratulator(success=None, failure=None, total=None, just_comment=False,

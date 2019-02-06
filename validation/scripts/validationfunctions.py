@@ -512,15 +512,20 @@ def congratulator(success=None, failure=None, total=None, just_comment=False,
 
     n_nones = [success, failure, total].count(None)
 
-    if n_nones == 0:
-        assert(total == success + failure)
-    elif n_nones >= 2:
+    if n_nones == 0 and total != success + failure:
         print(
-            "ERROR (congratulator): Specify at 2 of the arguments 'success',"
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
             "'failure', 'total'.",
             file=sys.stderr
         )
-        return
+        return ""
+    elif n_nones >= 2:
+        print(
+            "ERROR (congratulator): Specify 2 of the arguments 'success',"
+            "'failure', 'total'.",
+            file=sys.stderr
+        )
+        return ""
     else:
         if total is None:
             total = success + failure

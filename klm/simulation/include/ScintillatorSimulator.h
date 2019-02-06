@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  namespace EKLM {
+  namespace KLM {
 
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
@@ -75,7 +75,7 @@ namespace Belle2 {
        * Get fit status.
        * @return Status of the fit.
        */
-      enum FPGAFitStatus getFitStatus() const;
+      enum ScintillatorFirmwareFitStatus getFitStatus() const;
 
       /**
        * Get number of photoelectrons (fit result).
@@ -168,7 +168,7 @@ namespace Belle2 {
       int m_PhotoelectronBufferSize;
 
       /** FPGA fit status. */
-      enum FPGAFitStatus m_FPGAStat;
+      enum ScintillatorFirmwareFitStatus m_FPGAStat;
 
       /** FPGA fit data. */
       KLMScintillatorFirmwareFitResult m_FPGAFit;

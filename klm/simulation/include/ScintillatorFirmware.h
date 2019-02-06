@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  namespace EKLM {
+  namespace KLM {
 
     /**
      * FPGA fitter class.
@@ -47,7 +47,7 @@ namespace Belle2 {
        * @param[out] fitData   Fit data.
        * @return Fit status.
        */
-      enum FPGAFitStatus fit(int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData);
+      enum ScintillatorFirmwareFitStatus fit(int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData);
 
     private:
 

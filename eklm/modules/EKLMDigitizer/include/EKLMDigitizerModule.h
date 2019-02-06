@@ -116,7 +116,7 @@ namespace Belle2 {
     std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;
 
     /** FPGA fitter. */
-    EKLM::ScintillatorFirmware* m_Fitter;
+    KLM::ScintillatorFirmware* m_Fitter;
 
     /** Simulation hits. */
     StoreArray<EKLMSimHit> m_SimHits;

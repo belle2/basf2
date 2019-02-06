@@ -28,7 +28,7 @@ using namespace Belle2;
 
 static const char MemErr[] = "Memory allocation error.";
 
-void EKLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
+void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
 {
   m_PhotoelectronBufferSize = size;
   /*
@@ -52,12 +52,12 @@ void EKLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
   }
 }
 
-EKLM::ScintillatorSimulator::ScintillatorSimulator(
+KLM::ScintillatorSimulator::ScintillatorSimulator(
   const EKLMDigitizationParameters* digPar, ScintillatorFirmware* fitter,
   double digitizationInitialTime, bool debug) :
   m_DigPar(digPar), m_fitter(fitter),
   m_DigitizationInitialTime(digitizationInitialTime), m_Debug(debug),
-  m_FPGAStat(c_FPGANoSignal), m_npe(0)
+  m_FPGAStat(c_ScintillatorFirmwareNoSignal), m_npe(0)
 {
   int i;
   /* cppcheck-suppress variableScope */
@@ -106,7 +106,7 @@ EKLM::ScintillatorSimulator::ScintillatorSimulator(
 }
 
 
-EKLM::ScintillatorSimulator::~ScintillatorSimulator()
+KLM::ScintillatorSimulator::~ScintillatorSimulator()
 {
   free(m_amplitudeDirect);
   free(m_amplitudeReflected);
@@ -119,7 +119,7 @@ EKLM::ScintillatorSimulator::~ScintillatorSimulator()
   free(m_PhotoelectronIndex2);
 }
 
-void EKLM::ScintillatorSimulator::setHitRange(
+void KLM::ScintillatorSimulator::setHitRange(
   std::multimap<int, EKLMSimHit*>::iterator& it,
   std::multimap<int, EKLMSimHit*>::iterator& end)
 {
@@ -128,7 +128,7 @@ void EKLM::ScintillatorSimulator::setHitRange(
   m_stripName = "strip_" + std::to_string(it->first);
 }
 
-void EKLM::ScintillatorSimulator::setChannelData(
+void KLM::ScintillatorSimulator::setChannelData(
   const EKLMChannelData* channelData)
 {
   m_Pedestal = channelData->getPedestal();
@@ -136,7 +136,7 @@ void EKLM::ScintillatorSimulator::setChannelData(
   m_Threshold = channelData->getThreshold();
 }
 
-void EKLM::ScintillatorSimulator::processEntry()
+void KLM::ScintillatorSimulator::processEntry()
 {
   int i;
   /* cppcheck-suppress variableScope */
@@ -157,8 +157,8 @@ void EKLM::ScintillatorSimulator::processEntry()
     /* Poisson mean for number of photons. */
     nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
-    l = GeometryData::Instance().getStripLength(hit->getStrip()) / CLHEP::mm *
-        Unit::mm;
+    l = EKLM::GeometryData::Instance().getStripLength(hit->getStrip()) /
+        CLHEP::mm * Unit::mm;
     d = 0.5 * l - hit->getLocalPosition().x();
     t = hit->getTime() + d / m_DigPar->getFiberLightSpeed();
     if (m_MCTime < 0)
@@ -184,14 +184,14 @@ void EKLM::ScintillatorSimulator::processEntry()
     addRandomSiPMNoise();
   simulateADC();
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_Threshold, &m_FPGAFit);
-  if (m_FPGAStat != c_FPGASuccessfulFit)
+  if (m_FPGAStat != c_ScintillatorFirmwareSuccessfulFit)
     return;
   if (m_Debug)
     if (m_npe >= 10)
       debugOutput();
 }
 
-void EKLM::ScintillatorSimulator::addRandomSiPMNoise()
+void KLM::ScintillatorSimulator::addRandomSiPMNoise()
 {
   int i;
   for (i = 0; i < m_DigPar->getNDigitizations(); i++)
@@ -199,7 +199,7 @@ void EKLM::ScintillatorSimulator::addRandomSiPMNoise()
                      gRandom->Poisson(m_DigPar->getMeanSiPMNoise());
 }
 
-int* EKLM::ScintillatorSimulator::sortPhotoelectrons(int nPhotoelectrons)
+int* KLM::ScintillatorSimulator::sortPhotoelectrons(int nPhotoelectrons)
 {
   int* currentIndexArray, *newIndexArray, *tmpIndexArray;
   int i, i1, i2, i1Max, i2Max, j, mergeSize;
@@ -247,7 +247,7 @@ int* EKLM::ScintillatorSimulator::sortPhotoelectrons(int nPhotoelectrons)
   return currentIndexArray;
 }
 
-void EKLM::ScintillatorSimulator::generatePhotoelectrons(
+void KLM::ScintillatorSimulator::generatePhotoelectrons(
   double stripLen, double distSiPM, int nPhotons, double timeShift,
   bool isReflected)
 {
@@ -346,8 +346,8 @@ void EKLM::ScintillatorSimulator::generatePhotoelectrons(
  *
  * where N_i is the number of hits in this (i-th) bin.
  */
-void EKLM::ScintillatorSimulator::fillSiPMOutput(float* hist, bool useDirect,
-                                                 bool useReflected)
+void KLM::ScintillatorSimulator::fillSiPMOutput(float* hist, bool useDirect,
+                                                bool useReflected)
 {
   /* cppcheck-suppress variableScope */
   int i, bin, maxBin;
@@ -398,7 +398,7 @@ void EKLM::ScintillatorSimulator::fillSiPMOutput(float* hist, bool useDirect,
   }
 }
 
-void EKLM::ScintillatorSimulator::simulateADC()
+void KLM::ScintillatorSimulator::simulateADC()
 {
   int i;
   /* cppcheck-suppress variableScope */
@@ -413,17 +413,17 @@ void EKLM::ScintillatorSimulator::simulateADC()
   }
 }
 
-KLMScintillatorFirmwareFitResult* EKLM::ScintillatorSimulator::getFPGAFit()
+KLMScintillatorFirmwareFitResult* KLM::ScintillatorSimulator::getFPGAFit()
 {
   return &m_FPGAFit;
 }
 
-enum EKLM::FPGAFitStatus EKLM::ScintillatorSimulator::getFitStatus() const
+enum KLM::ScintillatorFirmwareFitStatus KLM::ScintillatorSimulator::getFitStatus() const
 {
   return m_FPGAStat;
 }
 
-double EKLM::ScintillatorSimulator::getNPE()
+double KLM::ScintillatorSimulator::getNPE()
 {
   double intg;
   intg = m_FPGAFit.getAmplitude();
@@ -431,12 +431,12 @@ double EKLM::ScintillatorSimulator::getNPE()
          m_PhotoelectronAmplitude;
 }
 
-int EKLM::ScintillatorSimulator::getGeneratedNPE()
+int KLM::ScintillatorSimulator::getGeneratedNPE()
 {
   return m_npe;
 }
 
-void EKLM::ScintillatorSimulator::debugOutput()
+void KLM::ScintillatorSimulator::debugOutput()
 {
   int i;
   std::string str;

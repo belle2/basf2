@@ -15,14 +15,19 @@
 
 namespace Belle2 {
 
-  namespace EKLM {
+  namespace KLM {
 
     /**
-     * FPGA fit status.
+     * Scintillator firmware fit status.
      */
-    enum FPGAFitStatus {
-      c_FPGASuccessfulFit, /**< Successful fit. */
-      c_FPGANoSignal,      /**< Signal is too small to do any fitting. */
+    enum ScintillatorFirmwareFitStatus {
+
+      /** Successful fit. */
+      c_ScintillatorFirmwareSuccessfulFit,
+
+      /** Signal is too small to do any fitting. */
+      c_ScintillatorFirmwareNoSignal,
+
     };
 
   }

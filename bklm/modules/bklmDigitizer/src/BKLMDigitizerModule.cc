@@ -180,7 +180,7 @@ void BKLMDigitizerModule::digitize(const std::map<int, std::vector<std::pair<int
 void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, BKLMDigit* bklmDigit)
 {
 
-  bklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+  bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
   bklmDigit->setTime(0.0);
   bklmDigit->setEDep(0.0);
   bklmDigit->setSimNPixel(0);
@@ -237,7 +237,7 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
 
   if (first == m_nDigitizations) return;
 
-  bklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+  bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
   bklmDigit->setTime(first * m_ADCSamplingTime);
   bklmDigit->setSimNPixel(nPE);
 

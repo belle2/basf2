@@ -28,13 +28,6 @@ from stdPi0s import *
 from stdV0s import *
 gb2_setuprel = "build-2017-09-08"
 
-# reset_database()
-use_local_database('/cvmfs/belle.cern.ch/conditions/GT_gen_prod_003.01_Master-20170721-132500-FEI-skim-a.txt', readonly=True)
-
-
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
-
 # their names in the ntuple are human readable
 from variables import variables
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
@@ -125,8 +118,9 @@ variables.addAlias('d0_d0_d1_kaonID', 'daughter(0,daughter(0,daughter(1,kaonID))
 path = create_path()
 
 import fei
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_01', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 path.add_path(feistate.path)
 

@@ -178,7 +178,8 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
       if (!isECLHit(extHit)) continue;
       ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
       if (eclCluster != nullptr) {
-        if (eclCluster->getHypothesisId() != 5) continue;
+        // only use c_nPhotons clusters
+        if (!eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
         double errorPhi = extHit.getErrorPhi();
         double errorTheta = extHit.getErrorTheta();
         double phiHit = extHit.getPosition().Phi();

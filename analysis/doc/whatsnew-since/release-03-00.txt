@@ -1,16 +1,34 @@
 Changes in the analysis package
 -------------------------------
 
+Variables
++++++++++
+
+* Deprecated :b2:var:`clusterHypothesis` following changes to the ECLCluster storage on mdst. 
+  Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
+
+* Removed ClusterHadronIntensity and clusterUniqueID.
+
 Modules
 +++++++
 
 * Removal of the unsupported ECLClusterInfoModule.
 
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
+* Updated V0 standard lists to use TreeFitter and simplified the merged list merging logic.
+
+* Fixed a bug in the merged Lambda list, which used an incorrect mass window.
+
 * Updated charged standard PID cut values to reflect the correct efficiencies.
   This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
+
+Unit Tests
+++++++++++
+
+* Added unit tests for the standard V0 lists.
 
 Variables
 +++++++++
@@ -22,7 +40,6 @@ Variables
   .. seealso::
      `variables.utils.create_aliases_for_selected()`
 
-
 Modules
 +++++++
 
@@ -32,3 +49,11 @@ Modules
 
   This affects all users of `modularAnalysis.rankByLowest()` and
   `modularAnalysis.rankByHighest()` if they passed ``allowMultiRank=True``
+
+* Removal of the unsupported ECLClusterInfoModule.
+
+FEI
++++
+
+* Removed the backward compatibility layer (``pid_renaming_oktober_2017``). 
+  Only FEI trainings from release-02 are supported. Please update to ``FEIv4_2018_MC9_release_02_00_01`` or newer.

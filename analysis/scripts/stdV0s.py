@@ -22,7 +22,7 @@ def stdKshorts(path=analysis_main):
     """
     fillParticleList('K_S0:all -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
     vertexTree('K_S0:all', 0.0, updateAllDaughters=False, path=path)
-    applyCuts('K_S0:all', '0.450 < M < 0.550', path)
+    applyCuts('K_S0:all', '0.450 < M < 0.550', path=path)
 
 
 def mergedKshorts(prioritiseV0=True, path=analysis_main):
@@ -46,13 +46,13 @@ def mergedKshorts(prioritiseV0=True, path=analysis_main):
     fillParticleList('K_S0:V0 -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
     # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
-    reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path)
+    reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
     # Create merged list, vertex it and run duplicate marker
-    copyLists('K_S0:merged', ['K_S0:V0', 'K_S0:RD'], False, path)
+    copyLists('K_S0:merged', ['K_S0:V0', 'K_S0:RD'], False, path=path)
     vertexTree('K_S0:merged', 0.0, updateAllDaughters=False, path=path)
-    markDuplicate('K_S0:merged', prioritiseV0, path)
+    markDuplicate('K_S0:merged', prioritiseV0, path=path)
     # Select good duplicates with tighter mass window
-    applyCuts('K_S0:merged', 'extraInfo(highQualityVertex) and 0.450 < M < 0.550', path)
+    applyCuts('K_S0:merged', 'extraInfo(highQualityVertex) and 0.450 < M < 0.550', path=path)
 
 
 def goodBelleKshort(path=analysis_main):
@@ -67,7 +67,7 @@ def goodBelleKshort(path=analysis_main):
     """
     fillParticleList('K_S0:legacyGoodKS -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
     vertexTree('K_S0:legacyGoodKS', 0.0, updateAllDaughters=False, path=path)
-    applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path)
+    applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path=path)
 
 
 def stdLambdas(path=analysis_main):
@@ -87,7 +87,7 @@ def stdLambdas(path=analysis_main):
     """
     fillParticleList('Lambda0:all -> p+ pi-', '0.9 < M < 1.3', True, path=path)
     vertexTree('Lambda0:all', 0.0, updateAllDaughters=False, path=path)
-    applyCuts('Lambda0:all', '1.10 < M < 1.13', path)
+    applyCuts('Lambda0:all', '1.10 < M < 1.13', path=path)
 
 
 def mergedLambdas(prioritiseV0=True, path=analysis_main):
@@ -112,10 +112,10 @@ def mergedLambdas(prioritiseV0=True, path=analysis_main):
     # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
     stdPr('all', path=path)  # no quality cuts
-    reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, True, path)
+    reconstructDecay('Lambda0:RD -> p+:all pi-:all', '0.9 < M < 1.3', 1, True, path=path)
     # Create merged list, vertex it and run duplicate marker
-    copyLists('Lambda0:merged', ['Lambda0:V0', 'Lambda0:RD'], False, path)
+    copyLists('Lambda0:merged', ['Lambda0:V0', 'Lambda0:RD'], False, path=path)
     vertexTree('Lambda0:merged', 0.0, updateAllDaughters=False, path=path)
-    markDuplicate('Lambda0:merged', prioritiseV0, path)
+    markDuplicate('Lambda0:merged', prioritiseV0, path=path)
     # Select good duplicates with tighter mass window
-    applyCuts('Lambda0:merged', 'extraInfo(highQualityVertex) and 1.10 < M < 1.13', path)
+    applyCuts('Lambda0:merged', 'extraInfo(highQualityVertex) and 1.10 < M < 1.13', path=path)

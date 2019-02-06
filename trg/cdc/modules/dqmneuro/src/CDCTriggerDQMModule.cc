@@ -11,6 +11,7 @@
 #include "trg/cdc/modules/dqmneuro/CDCTriggerDQMModule.h"
 
 #include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include "TDirectory.h"
 
@@ -466,7 +467,10 @@ void CDCTriggerDQMModule::event()
           m_simDiffTS->Fill(ndiffTS);
           // only calculate deltas if the same TS are selected in unpacker and TSIM
           // TODO allow less then 9 TS per track
-          if (ndiffTS == 0 && nsameTS > 8) {
+
+          StoreObjPtr<EventMetaData> eventMetaData;
+
+          if (abs(ndiffTS) >= 0 && nsameTS >= 8) {
             m_neuroDeltaZ->Fill(neuroTrack.getZ0() - neuroSimTrack->getZ0());
             m_neuroDeltaTheta->Fill(neuroTrack.getDirection().Theta() * 180. / M_PI -
                                     neuroSimTrack->getDirection().Theta() * 180. / M_PI);
@@ -480,6 +484,100 @@ void CDCTriggerDQMModule::event()
               neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputName)->getSector();
             m_neuroSector->Fill(unpackedSector);
             m_neuroDeltaSector->Fill(unpackedSector - simSector);
+
+            cout << endl;
+            cout << "--------------------------------------------------------------------------"
+                 << endl;
+            cout << "Experiment " << eventMetaData->getExperiment() << "  Run " <<
+                 eventMetaData->getRun() << "  Event " << eventMetaData->getEvent();
+
+            cout << endl << endl;
+            cout << "Global values (angles in degrees)" << endl;
+            cout << "HW (pt, omega, phi, theta, z) = (" << setw(8) << neuroTrack.getPt() << ", " << setw(8) << neuroTrack.getOmega() << ", " <<
+                 setw(8) << neuroTrack.getPhi0() * 180. / M_PI << ", " <<  setw(8) << neuroTrack.getDirection().Theta() * 180. / M_PI << ", " <<
+                 setw(8) << neuroTrack.getZ0() << ")" << endl;
+            cout << "SW (pt, omega, phi, theta, z) = (" <<  setw(8) << neuroSimTrack->getPt() << ", " <<  setw(
+                   8) << neuroSimTrack->getOmega() << ", " <<
+                 setw(8) << neuroSimTrack->getPhi0() * 180. / M_PI << ", " <<  setw(8) << neuroSimTrack->getDirection().Theta() * 180. / M_PI << ", "
+                 <<  setw(8) << neuroSimTrack->getZ0() << ")" << endl;
+
+            const double BField = 1.5e-4;
+            cout << "quadrant values" << endl;
+
+            double quadphi = neuroTrack.getPhi0();
+            if (quadphi > M_PI) quadphi -= M_PI;
+            double rawphi = (quadphi - M_PI / 4) * (2 * 80) / M_PI - 1;
+            double omegaRaw = neuroTrack.getOmega() * 0.3 * 34 / (Const::speedOfLight * BField);
+            cout << "HW (phi quadrant, phi raw, omega raw) = (" << quadphi * 180. / M_PI << ", " << rawphi << ", " << omegaRaw << ")" << endl;
+
+            quadphi = neuroSimTrack->getPhi0();
+            if (quadphi > M_PI) quadphi -= M_PI;
+            rawphi = (quadphi - M_PI / 4) * (2 * 80) / M_PI - 1;
+            omegaRaw = neuroSimTrack->getOmega() * 0.3 * 34 / (Const::speedOfLight * BField);
+            cout << "SW (phi quadrant, phi raw, omega raw) = (" << quadphi * 180. / M_PI << ", " << rawphi << ", " << omegaRaw << ")" << endl;
+
+
+            cout << "Selected TS (segment id, relative id in SL,  priority position, left right, priority time, raw Tracker ID)" << endl;
+
+            /* number of wires in a super layer*/
+            static constexpr std::array<int, 9> nWiresInSuperLayer = {
+              160, 160, 192, 224, 256, 288, 320, 352, 384
+            };
+            for (const CDCTriggerSegmentHit& xhit :
+                 neuroSimTrack->getRelationsTo<CDCTriggerSegmentHit>(m_unpackedNeuroInputSegmentsName)) {
+              cout << "(" << setw(5) << xhit.getSegmentID() << ", " << setw(5) << xhit.getIWire() << ", " << setw(
+                     5) << xhit.getPriorityPosition() << ", " << setw(5) << xhit.getLeftRight() << ", " <<
+                   setw(5) << xhit.priorityTime();
+              int iSL = xhit.getISuperLayer();
+              int iTS = xhit.getIWire();
+              int nwires = nWiresInSuperLayer[ iSL ];
+              if (iSL == 8) {
+                iTS += 16;
+                if (iTS > nwires) {
+                  iTS -= nwires;
+                }
+              }
+              int tsIDInTracker = iTS;
+              if (iTS > nwires / 2) {
+                tsIDInTracker -= (nwires / 2);
+              }
+              cout << ", " << setw(5) << tsIDInTracker << ")" << endl;
+            }
+            cout << "Unpacked sector " << unpackedSector << ", sim sector " << simSector << endl;
+            cout << "Input Vector unpacked (id, t, alpha), sim (id, t, alpha), delta (id, t, alpha):" << endl;
+            for (unsigned ii = 0; ii < unpackedInput.size(); ii += 3) {
+              cout << endl;
+              cout << ii / 3 << ") ";
+              cout <<  "(" << setw(11) << unpackedInput[ii]  << ", "               << setw(11) << unpackedInput[ii + 1] << ", "
+                   << setw(11) << unpackedInput[ii + 2] << "), ";
+              cout <<  "(" << setw(11) << simInput[ii]       << ", "               << setw(11) << simInput[ii + 1]      << ", "
+                   << setw(11) << simInput[ii + 2] << "), ";
+              cout <<  "(" << setw(11) << unpackedInput[ii] - simInput[ii] << ", " << setw(11) << unpackedInput[ii + 1] - simInput[ii + 1] << ", "
+                   << setw(11) << unpackedInput[ii + 2] - simInput[ii + 2] << "), " << endl;
+              cout << "   (" << setw(11) << unpackedInput[ii] * 4096 << ", "                        << setw(
+                     11) << unpackedInput[ii + 1] * 4096 << ", "                           << setw(11) << unpackedInput[ii + 2] * 4096 << "), ";
+              cout << "(" << setw(11) << simInput[ii]      * 4096 << ", "                        << setw(11) << simInput[ii + 1]      * 4096 <<
+                   ", "                           << setw(11) << simInput[ii + 2]      * 4096 << "), ";
+              cout << "(" << setw(11) << unpackedInput[ii] * 4096 - simInput[ii] * 4096  << ", " << setw(11) << unpackedInput[ii + 1] * 4096 -
+                   simInput[ii + 1] * 4096 << ", " << setw(11) << unpackedInput[ii + 2] * 4096 - simInput[ii + 2] * 4096 << "), " << endl;
+
+              cout << hex;
+              cout.setf(ios::showbase);
+              cout << "   (" << setw(11) << (int)(unpackedInput[ii]  * 4096) << ", "                       << setw(11) << (int)(
+                     unpackedInput[ii + 1] * 4096) << ", "                            << setw(11) << (int)(unpackedInput[ii + 2] * 4096) << "), ";
+              cout << "(" << setw(11) << (int)(simInput[ii]       * 4096) << ", "                       << setw(11) << (int)(
+                     simInput[ii + 1]      * 4096) << ", "                            << setw(11) << (int)(simInput[ii + 2]      * 4096) << "), ";
+              cout << "(" << setw(11) << (int)(unpackedInput[ii] * 4096 - simInput[ii] * 4096)  << ", " << setw(11) << (int)(
+                     unpackedInput[ii + 1] * 4096 - simInput[ii + 1] * 4096) << ", "  << setw(11) << (int)(unpackedInput[ii + 2] * 4096 - simInput[ii +
+                         2] * 4096) << "), " << endl;
+              cout.unsetf(ios::showbase);
+              cout << dec;
+              //std::cout << " (" << simInput[ii] / unpackedInput[ii] << std::endl << ", " << simInput[ii + 1] /  unpackedInput[ii + 1] << ", " <<
+              //          simInput[ii + 2] / unpackedInput[ii + 2] << ")" << std::endl;
+            }
+            cout << endl;
+
+
             for (unsigned ii = 0; ii < unpackedInput.size(); ii += 3) {
               m_neuroDeltaInputID->Fill(unpackedInput[ii] - simInput[ii]);
               m_neuroDeltaInputT->Fill(unpackedInput[ii + 1] - simInput[ii + 1]);

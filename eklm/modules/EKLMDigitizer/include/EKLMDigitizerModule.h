@@ -20,7 +20,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
-#include <klm/simulation/FPGAFitter.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
 
@@ -109,14 +109,14 @@ namespace Belle2 {
     /** Save FPGA fit data (EKLMFPGAFit). */
     bool m_SaveFPGAFit;
 
-    /** Use debug mode in EKLM::FiberAndElectronics or not. */
+    /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
     /** Map for EKLMSimHit sorting according sensitive volumes. */
     std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;
 
     /** FPGA fitter. */
-    EKLM::FPGAFitter* m_Fitter;
+    EKLM::ScintillatorFirmware* m_Fitter;
 
     /** Simulation hits. */
     StoreArray<EKLMSimHit> m_SimHits;

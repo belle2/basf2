@@ -14,7 +14,7 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <klm/simulation/FiberAndElectronics.h>
+#include <klm/simulation/ScintillatorSimulator.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 

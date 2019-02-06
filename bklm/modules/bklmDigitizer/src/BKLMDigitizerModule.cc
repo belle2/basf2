@@ -17,7 +17,7 @@
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMDigit.h>
-#include <klm/simulation/FPGAFitter.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 
 #include <TRandom.h>
 

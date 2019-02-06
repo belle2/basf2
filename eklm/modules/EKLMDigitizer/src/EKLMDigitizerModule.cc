@@ -11,7 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
-#include <klm/simulation/FiberAndElectronics.h>
+#include <klm/simulation/ScintillatorSimulator.h>
 
 using namespace Belle2;
 
@@ -47,7 +47,7 @@ void EKLMDigitizerModule::initialize()
     m_FPGAFits.registerInDataStore();
     m_Digits.registerRelationTo(m_FPGAFits);
   }
-  m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
+  m_Fitter = new EKLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
   if (m_SimulationMode == "Generic") {
     /* Nothing to do. */
   } else if (m_SimulationMode == "ChannelSpecific") {
@@ -128,14 +128,14 @@ void EKLMDigitizerModule::readAndSortSimHits()
 
 /*
  * Light propagation into the fiber, SiPM and electronics effects
- * are simulated in EKLM::FiberAndElectronics class.
+ * are simulated in EKLM::ScintillatorSimulator class.
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
   uint16_t tdc;
   int strip;
-  EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
-                                m_DigitizationInitialTime, m_Debug);
+  EKLM::ScintillatorSimulator fes(&(*m_DigPar), m_Fitter,
+                                  m_DigitizationInitialTime, m_Debug);
   const EKLMChannelData* channelData;
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();

@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# *****************************************************************************
+
+# title       : 2_Reconstruction.py
+# description : Reconstruct cosmic tracks in VXD (VXD commissioning)
+# author      : Jakub Kandra (jakub.kandra@karlov.mff.cunni.cz)
+# date        : 7. 2. 2019
+
+# *****************************************************************************
+
+
 from basf2 import *
 import sys
 import os

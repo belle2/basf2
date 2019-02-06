@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# *****************************************************************************
+
+# title       : 1_Generate.py
+# description : Simple generator of muons passing sensor 4.3.2 and simulation
+# author      : Jakub Kandra (jakub.kandra@karlov.mff.cunni.cz)
+# date        : 7. 2. 2019
+
+# *****************************************************************************
+
 from basf2 import *
 import sys
 import os
 import simulation
-import reconstruction
 
 from ROOT import Belle2
 import ROOT

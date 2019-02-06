@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# *****************************************************************************
+
+# title       : 3_Collection.py
+# description : Collection data for VXD alignment
+# author      : Jakub Kandra (jakub.kandra@karlov.mff.cunni.cz)
+# date        : 7. 2. 2019
+
+# *****************************************************************************
+
+
 from basf2 import *
 import ROOT
 from ROOT import Belle2

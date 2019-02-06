@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 # *****************************************************************************
 
-# title           : 3B_CalculateAlignment.py
+# title           : 4_CalculateAlignment.py
 # description     : Calculate alignment using collected data
 # author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 8. 2. 2018
+# date            : 7. 2. 2019
 
 # *****************************************************************************
 

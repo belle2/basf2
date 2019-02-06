@@ -11,8 +11,9 @@
 #pragma once
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dbobjects/EKLMChannelData.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <klm/simulation/ScintillatorFirmware.h>
@@ -43,7 +44,8 @@ namespace Belle2 {
        * @param[in] debug                   Use debug mode.
        */
       ScintillatorSimulator(const EKLMDigitizationParameters* digPar,
-                            ScintillatorFirmware* fitter, double digitizationInitialTime,
+                            ScintillatorFirmware* fitter,
+                            double digitizationInitialTime,
                             bool debug);
 
       /**
@@ -62,9 +64,20 @@ namespace Belle2 {
       ~ScintillatorSimulator();
 
       /**
-       * Process.
+       * Simulate BKLM strip.
+       * @param[in] firstHit First hit in this strip.
+       * @param[in] end      End of hit range.
        */
-      void processEntry();
+      void simulate(std::multimap<int, BKLMSimHit*>::iterator& firstHit,
+                    std::multimap<int, BKLMSimHit*>::iterator& end);
+
+      /**
+       * Simulate EKLM strip.
+       * @param[in] firstHit First hit in this strip.
+       * @param[in] end      End of hit range.
+       */
+      void simulate(std::multimap<int, EKLMSimHit*>::iterator& firstHit,
+                    std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.
@@ -86,14 +99,6 @@ namespace Belle2 {
        * Get generated number of photoelectrons.
        */
       int getGeneratedNPE();
-
-      /**
-       * Set hit range.
-       * @param[in] it  First hit in this strip.
-       * @param[in] end End of hit range.
-       */
-      void setHitRange(std::multimap<int, EKLMSimHit*>::iterator& it,
-                       std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
        * Set channel data.
@@ -176,12 +181,6 @@ namespace Belle2 {
       /** Number of photoelectrons (generated). */
       int m_npe;
 
-      /** First hit. */
-      std::multimap<int, EKLMSimHit*>::iterator m_hit;
-
-      /** End of hits. */
-      std::multimap<int, EKLMSimHit*>::iterator m_hitEnd;
-
       /** Name of the strip. */
       std::string m_stripName;
 
@@ -199,6 +198,16 @@ namespace Belle2 {
        * @param[in] size New size of buffers.
        */
       void reallocPhotoElectronBuffers(int size);
+
+      /**
+       * Prepare simulation.
+       */
+      void prepareSimulation();
+
+      /**
+       *  Perform common simulation stage.
+       */
+      void performSimulation();
 
       /**
        * Sort photoelectrons.

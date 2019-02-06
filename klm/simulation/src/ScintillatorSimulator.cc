@@ -16,6 +16,7 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
+#include <bklm/geometry/GeometryPar.h>
 #include <eklm/geometry/GeometryData.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 #include <framework/core/RandomNumbers.h>
@@ -119,15 +120,6 @@ KLM::ScintillatorSimulator::~ScintillatorSimulator()
   free(m_PhotoelectronIndex2);
 }
 
-void KLM::ScintillatorSimulator::setHitRange(
-  std::multimap<int, EKLMSimHit*>::iterator& it,
-  std::multimap<int, EKLMSimHit*>::iterator& end)
-{
-  m_hit = it;
-  m_hitEnd = end;
-  m_stripName = "strip_" + std::to_string(it->first);
-}
-
 void KLM::ScintillatorSimulator::setChannelData(
   const EKLMChannelData* channelData)
 {
@@ -136,46 +128,94 @@ void KLM::ScintillatorSimulator::setChannelData(
   m_Threshold = channelData->getThreshold();
 }
 
-void KLM::ScintillatorSimulator::processEntry()
+void KLM::ScintillatorSimulator::prepareSimulation()
 {
-  int i;
-  /* cppcheck-suppress variableScope */
-  double l, d, t, nPhotons;
-  std::multimap<int, EKLMSimHit*>::iterator it;
-  EKLMSimHit* hit;
   m_MCTime = -1;
   m_npe = 0;
-  for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
+  for (int i = 0; i < m_DigPar->getNDigitizations(); i++) {
     if (m_Debug) {
       m_amplitudeDirect[i] = 0;
       m_amplitudeReflected[i] = 0;
     } else
       m_amplitude[i] = 0;
   }
-  for (it = m_hit; it != m_hitEnd; ++it) {
+}
+
+void KLM::ScintillatorSimulator::simulate(
+  std::multimap<int, BKLMSimHit*>::iterator& firstHit,
+  std::multimap<int, BKLMSimHit*>::iterator& end)
+{
+  m_stripName = "strip_" + std::to_string(firstHit->first);
+  prepareSimulation();
+  bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
+  const BKLMSimHit* hit = firstHit->second;
+  const bklm::Module* module = geoPar->findModule(
+                                 hit->isForward(), hit->getSector(), hit->getLayer());
+  double stripLength =
+    2.0 * (hit->isPhiReadout() ?
+           module->getPhiScintHalfLength(hit->getStrip()) :
+           module->getZScintHalfLength(hit->getStrip()));
+  for (std::multimap<int, BKLMSimHit*>::iterator it = firstHit;
+       it != end; ++it) {
     hit = it->second;
     /* Poisson mean for number of photons. */
-    nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
+    double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
-    l = EKLM::GeometryData::Instance().getStripLength(hit->getStrip()) /
-        CLHEP::mm * Unit::mm;
-    d = 0.5 * l - hit->getLocalPosition().x();
-    t = hit->getTime() + d / m_DigPar->getFiberLightSpeed();
+    double sipmDistance = hit->getPropagationTime() *
+                          m_DigPar->getFiberLightSpeed();
+    double time = hit->getTime() + hit->getPropagationTime();
     if (m_MCTime < 0)
-      m_MCTime = t;
+      m_MCTime = time;
     else
-      m_MCTime = t < m_MCTime ? t : m_MCTime;
-    generatePhotoelectrons(l, d, gRandom->Poisson(nPhotons), hit->getTime(),
-                           false);
+      m_MCTime = time < m_MCTime ? time : m_MCTime;
+    generatePhotoelectrons(stripLength, sipmDistance,
+                           gRandom->Poisson(nPhotons), hit->getTime(), false);
     if (m_DigPar->getMirrorReflectiveIndex() > 0) {
-      generatePhotoelectrons(l, d, gRandom->Poisson(nPhotons), hit->getTime(),
-                             true);
+      generatePhotoelectrons(stripLength, sipmDistance,
+                             gRandom->Poisson(nPhotons), hit->getTime(), true);
     }
   }
+  performSimulation();
+}
+
+void KLM::ScintillatorSimulator::simulate(
+  std::multimap<int, EKLMSimHit*>::iterator& firstHit,
+  std::multimap<int, EKLMSimHit*>::iterator& end)
+{
+  m_stripName = "strip_" + std::to_string(firstHit->first);
+  prepareSimulation();
+  const EKLMSimHit* hit = firstHit->second;
+  double stripLength = EKLM::GeometryData::Instance().getStripLength(
+                         hit->getStrip()) / CLHEP::mm * Unit::mm;
+  for (std::multimap<int, EKLMSimHit*>::iterator it = firstHit;
+       it != end; ++it) {
+    hit = it->second;
+    /* Poisson mean for number of photons. */
+    double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
+    /* Fill histograms. */
+    double sipmDistance = 0.5 * stripLength - hit->getLocalPosition().x();
+    double time = hit->getTime() +
+                  sipmDistance / m_DigPar->getFiberLightSpeed();
+    if (m_MCTime < 0)
+      m_MCTime = time;
+    else
+      m_MCTime = time < m_MCTime ? time : m_MCTime;
+    generatePhotoelectrons(stripLength, sipmDistance,
+                           gRandom->Poisson(nPhotons), hit->getTime(), false);
+    if (m_DigPar->getMirrorReflectiveIndex() > 0) {
+      generatePhotoelectrons(stripLength, sipmDistance,
+                             gRandom->Poisson(nPhotons), hit->getTime(), true);
+    }
+  }
+  performSimulation();
+}
+
+void KLM::ScintillatorSimulator::performSimulation()
+{
   if (m_Debug) {
     fillSiPMOutput(m_amplitudeDirect, true, false);
     fillSiPMOutput(m_amplitudeReflected, false, true);
-    for (i = 0; i < m_DigPar->getNDigitizations(); i++)
+    for (int i = 0; i < m_DigPar->getNDigitizations(); i++)
       m_amplitude[i] = m_amplitudeDirect[i] + m_amplitudeReflected[i];
   } else
     fillSiPMOutput(m_amplitude, true, true);
@@ -186,9 +226,10 @@ void KLM::ScintillatorSimulator::processEntry()
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_Threshold, &m_FPGAFit);
   if (m_FPGAStat != c_ScintillatorFirmwareSuccessfulFit)
     return;
-  if (m_Debug)
+  if (m_Debug) {
     if (m_npe >= 10)
       debugOutput();
+  }
 }
 
 void KLM::ScintillatorSimulator::addRandomSiPMNoise()

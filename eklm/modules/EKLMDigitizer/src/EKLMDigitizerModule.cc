@@ -134,8 +134,8 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
   uint16_t tdc;
   int strip;
-  KLM::ScintillatorSimulator fes(&(*m_DigPar), m_Fitter,
-                                 m_DigitizationInitialTime, m_Debug);
+  KLM::ScintillatorSimulator simulator(&(*m_DigPar), m_Fitter,
+                                       m_DigitizationInitialTime, m_Debug);
   const EKLMChannelData* channelData;
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
@@ -143,7 +143,6 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     EKLMSimHit* simHit = it->second;
     ub = m_SimHitVolumeMap.upper_bound(it->first);
     /* Set hits. */
-    fes.setHitRange(it, ub);
     if (m_ChannelSpecificSimulation) {
       strip = m_ElementNumbers->stripNumber(
                 simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
@@ -151,32 +150,32 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       channelData = m_Channels->getChannelData(strip);
       if (channelData == nullptr)
         B2FATAL("Incomplete EKLM channel data.");
-      fes.setChannelData(channelData);
+      simulator.setChannelData(channelData);
     }
     /* Simulation for a strip. */
-    fes.processEntry();
-    if (fes.getGeneratedNPE() == 0)
+    simulator.simulate(it, ub);
+    if (simulator.getGeneratedNPE() == 0)
       continue;
     EKLMDigit* eklmDigit = m_Digits.appendNew(simHit);
     eklmDigit->setMCTime(simHit->getTime());
-    eklmDigit->setSiPMMCTime(fes.getMCTime());
+    eklmDigit->setSiPMMCTime(simulator.getMCTime());
     eklmDigit->setPosition(simHit->getPosition());
-    eklmDigit->setGeneratedNPE(fes.getGeneratedNPE());
+    eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
     eklmDigit->addRelationTo(simHit);
-    if (fes.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
-      tdc = fes.getFPGAFit()->getStartTime();
-      eklmDigit->setCharge(fes.getFPGAFit()->getMinimalAmplitude());
+    if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
+      tdc = simulator.getFPGAFit()->getStartTime();
+      eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
     } else {
       tdc = 0;
       eklmDigit->setCharge(0);
     }
     eklmDigit->setTDC(tdc);
     eklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
-    eklmDigit->setFitStatus(fes.getFitStatus());
-    if (fes.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
+    eklmDigit->setFitStatus(simulator.getFitStatus());
+    if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
         m_SaveFPGAFit) {
       KLMScintillatorFirmwareFitResult* fit =
-        m_FPGAFits.appendNew(*fes.getFPGAFit());
+        m_FPGAFits.appendNew(*simulator.getFPGAFit());
       eklmDigit->addRelationTo(fit);
     }
   }

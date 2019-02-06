@@ -260,9 +260,14 @@ namespace Belle2 {
         return;
       }
 
-      // Loop over VXD sensors are read parameters for description of planar defomration
+      // Loop over VXD sensors to read parameters for description of planar defomration
       for (auto& sensorID : getListOfSensors()) {
         std::vector<double> planarParameters = {
+          // Numbering of VXD alignment parameters:
+          //  -> 0-6:   Rigid body alignment
+          //  -> 31-33: First level of surface deformation
+          //  -> 41-44: Second level of surface deformation
+          //  -> 51-55: Third level of surface deformation
           m_vxdAlignments->get(sensorID, 31),
           m_vxdAlignments->get(sensorID, 32),
           m_vxdAlignments->get(sensorID, 33),

@@ -9,10 +9,9 @@
 
 # *****************************************************************************
 
-import os
-import inspect
 from basf2 import *
 import sys
+import os
 from ROOT import Belle2
 
 import alignment

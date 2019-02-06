@@ -51,8 +51,8 @@ main = create_path()
 main.add_module('RootInput')
 main.add_module('Gearbox')
 
-main.add_module('Geometry', components=['PXD', 'SVD'], excludedComponents=['MagneticField'],
-                # useDB=False
+main.add_module('Geometry', components=['PXD', 'SVD'], excludedComponents=['MagneticField']
+                # , useDB=False
                 )
 
 MomentumSetup = MomentumSetup()

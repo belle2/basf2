@@ -35,9 +35,9 @@ std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit::globalDerivatives(con
 
   // Legendre parametrization of deformation
   auto L1 = [](double x) {return x;};
-  auto L2 = [](double x) {return (3 * pow(x, 2) - 1) / 2;};
-  auto L3 = [](double x) {return (5 * pow(x, 3) - 3 * x) / 2;};
-  auto L4 = [](double x) {return (35 * pow(x, 4) - 30 * pow(x, 2) + 3) / 8;};
+  auto L2 = [](double x) {return (3 * x * x - 1) / 2;};
+  auto L3 = [](double x) {return (5 * x * x * x - 3 * x) / 2;};
+  auto L4 = [](double x) {return (35 * x * x * x * x - 30 * x * x + 3) / 8;};
 
   double du_dw = sop->getState()[1]; // slope in U direction
   double dv_dw = sop->getState()[2]; // slope in V direction
@@ -57,7 +57,13 @@ std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit::globalDerivatives(con
   u = u * 2 / width;                       // Legendre parametrization required U in (-1, 1)
   v = v * 2 / length;                      // Legendre parametrization required V in (-1, 1)
 
-  // Add parameters of planar deformation to alignment
+  // Add parameters of surface deformation to alignment
+  // Numbering of VXD alignment parameters:
+  //  -> 0-6:   Rigid body alignment
+  //  -> 31-33: First level of surface deformation
+  //  -> 41-44: Second level of surface deformation
+  //  -> 51-55: Third level of surface deformation
+
   globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 31), std::vector<double> {L2(u)*du_dw,       L2(u)*dv_dw});
   globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 32), std::vector<double> {L1(u)*L1(v)*du_dw, L1(u)*L1(v)*dv_dw});
   globals.add(GlobalLabel::construct<VXDAlignment>(getSensorID(), 33), std::vector<double> {L2(v)*du_dw,       L2(v)*dv_dw});

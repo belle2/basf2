@@ -177,9 +177,9 @@ TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<doubl
 {
   // Legendre parametrization of deformation
   auto L1 = [](double x) {return x;};
-  auto L2 = [](double x) {return (3 * pow(x, 2) - 1) / 2;};
-  auto L3 = [](double x) {return (5 * pow(x, 3) - 3 * x) / 2;};
-  auto L4 = [](double x) {return (35 * pow(x, 4) - 30 * pow(x, 2) + 3) / 8;};
+  auto L2 = [](double x) {return (3 * x * x - 1) / 2;};
+  auto L3 = [](double x) {return (5 * x * x * x - 3 * x) / 2;};
+  auto L4 = [](double x) {return (35 * x * x * x * x - 30 * x * x + 3) / 8;};
 
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 

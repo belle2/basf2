@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import random
 from basf2 import *
+import sys
+import os
 import simulation
 import reconstruction
-import svd
-import pxd
 
 from ROOT import Belle2
-from ROOT import TVector3
 import ROOT
+
+# inname = "reconstruction.root"
+outname = "simulated.root"
+
+if len(sys.argv) == 2:
+    # inname = sys.argv[1]
+    outname = sys.argv[1]
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -20,7 +24,7 @@ eventinfosetter.param('evtNumList', [10000])
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('components', ['PXD', 'SVD'])
+# geometry.param('components', ['PXD', 'SVD'])
 # geometry.param('useDB', False)
 
 particlegun = register_module('ParticleGun')
@@ -56,7 +60,7 @@ main.add_module(geometry)
 main.add_module(particlegun)
 simulation.add_simulation(main, components=['SVD', 'PXD'], usePXDDataReduction=False)
 
-main.add_module('RootOutput')
+main.add_module('RootOutput', outputFileName=outname)
 
 main.add_module('ProgressBar')
 # main.add_module('Progress')

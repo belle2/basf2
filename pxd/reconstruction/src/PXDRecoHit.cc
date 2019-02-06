@@ -191,11 +191,6 @@ TVectorD PXDRecoHit::applyPlanarDeformation(TVectorD hitCoords, std::vector<doub
   return pos;
 }
 
-/**********************************************/
-/*       The function of applying planar      */
-/*  deformation of SVD sensors are finished.  */
-/**********************************************/
-
 std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   // Track-based update only takes place when the RecoHit has an associated cluster

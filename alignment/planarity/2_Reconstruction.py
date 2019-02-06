@@ -14,10 +14,12 @@ import ROOT
 
 inname = "simulated.root"
 outname = "reconstructed.root"
+dqmname = "dqm.root"
 
-if len(sys.argv) == 3:
+if len(sys.argv) == 4:
     inname = sys.argv[1]
     outname = sys.argv[2]
+    dqmname = sys.argv[3]
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -68,10 +70,10 @@ main.add_module(
 
 
 # CosmicAnalysis = CosmicAnalysis(Belle2.Environment.Instance().getOutputFileOverride())
-CosmicAnalysis = CosmicAnalysis(outname)
+CosmicAnalysis = CosmicAnalysis(dqmname)
 main.add_module(CosmicAnalysis)
 
-# main.add_module('RootOutput', outputFileName=outname)
+main.add_module('RootOutput', outputFileName=outname)
 
 main.add_module('ProgressBar')
 # main.add_module('Progress')

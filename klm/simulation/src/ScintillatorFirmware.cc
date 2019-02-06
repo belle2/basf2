@@ -13,23 +13,23 @@
 #include <TH1F.h>
 
 /* Belle2 headers. */
-#include <klm/simulation/FPGAFitter.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-EKLM::FPGAFitter::FPGAFitter(int nPoints)
+EKLM::ScintillatorFirmware::ScintillatorFirmware(int nPoints)
 {
   m_nPoints = nPoints;
 }
 
-EKLM::FPGAFitter::~FPGAFitter()
+EKLM::ScintillatorFirmware::~ScintillatorFirmware()
 {
 }
 
-enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
-                                               EKLMFPGAFit* fitData)
+enum EKLM::FPGAFitStatus EKLM::ScintillatorFirmware::fit(int* amp, int threshold,
+                                                         KLMScintillatorFirmwareFitResult* fitData)
 {
   /*
    * Upper bound of the background region: number of points before threshold

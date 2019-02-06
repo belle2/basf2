@@ -9,8 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
 using namespace Belle2;
@@ -174,7 +174,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     eklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
     eklmDigit->setFitStatus(fes.getFitStatus());
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
-      EKLMFPGAFit* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());
+      KLMScintillatorFirmwareFitResult* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());
       eklmDigit->addRelationTo(fit);
     }
   }

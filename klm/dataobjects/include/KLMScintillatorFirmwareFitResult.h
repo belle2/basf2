@@ -30,19 +30,19 @@ namespace Belle2 {
   /**
    * FPGA fit simulation data.
    */
-  class EKLMFPGAFit : public RelationsObject {
+  class KLMScintillatorFirmwareFitResult : public RelationsObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMFPGAFit();
+    KLMScintillatorFirmwareFitResult();
 
     /**
      * Destructor.
      */
-    ~EKLMFPGAFit();
+    ~KLMScintillatorFirmwareFitResult();
 
     /**
      * Get signal start time (in TDC counts).
@@ -102,7 +102,7 @@ namespace Belle2 {
     int m_MinimalAmplitude;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMFPGAFit, 2);
+    ClassDef(Belle2::KLMScintillatorFirmwareFitResult, 1);
 
   };
 

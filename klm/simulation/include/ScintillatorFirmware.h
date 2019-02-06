@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <eklm/dataobjects/EKLMFPGAFit.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 /**
  * @file
@@ -25,7 +25,7 @@ namespace Belle2 {
     /**
      * FPGA fitter class.
      */
-    class FPGAFitter {
+    class ScintillatorFirmware {
 
     public:
 
@@ -33,12 +33,12 @@ namespace Belle2 {
        * Constructor.
        * @param[in]  nPoints Number of points in amplitude arrays.
        */
-      explicit FPGAFitter(int nPoints);
+      explicit ScintillatorFirmware(int nPoints);
 
       /**
        * Destructor.
        */
-      ~FPGAFitter();
+      ~ScintillatorFirmware();
 
       /**
        * FPGA fitter.
@@ -47,7 +47,7 @@ namespace Belle2 {
        * @param[out] fitData   Fit data.
        * @return Fit status.
        */
-      enum FPGAFitStatus fit(int* amp, int threshold, EKLMFPGAFit* fitData);
+      enum FPGAFitStatus fit(int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData);
 
     private:
 

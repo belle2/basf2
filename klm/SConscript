@@ -1,5 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['eklm_dataobjects', 'eklm', 'eklm_dbobjects', 'klm_dbobjects', 'framework', '$ROOT_LIBS']
+env['LIBS'] = ['eklm_dataobjects', 'eklm', 'eklm_dbobjects',
+               'klm_dataobjects', 'klm_dbobjects', 'framework', '$ROOT_LIBS']
 
 Return('env')

@@ -15,7 +15,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dbobjects/EKLMChannelData.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
-#include <klm/simulation/FPGAFitter.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
 
@@ -24,7 +24,7 @@ namespace Belle2 {
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
-    class FiberAndElectronics : public EKLMHitMCTime {
+    class ScintillatorSimulator : public EKLMHitMCTime {
 
     public:
 
@@ -42,24 +42,24 @@ namespace Belle2 {
        * @param[in] fitter                  Fitter.
        * @param[in] debug                   Use debug mode.
        */
-      FiberAndElectronics(const EKLMDigitizationParameters* digPar,
-                          FPGAFitter* fitter, double digitizationInitialTime,
-                          bool debug);
+      ScintillatorSimulator(const EKLMDigitizationParameters* digPar,
+                            ScintillatorFirmware* fitter, double digitizationInitialTime,
+                            bool debug);
 
       /**
        * Copy constructor (disabled).
        */
-      FiberAndElectronics(const FiberAndElectronics&) = delete;
+      ScintillatorSimulator(const ScintillatorSimulator&) = delete;
 
       /**
        * Operator = (disabled).
        */
-      FiberAndElectronics& operator=(const FiberAndElectronics&) = delete;
+      ScintillatorSimulator& operator=(const ScintillatorSimulator&) = delete;
 
       /**
        * Destructor.
        */
-      ~FiberAndElectronics();
+      ~ScintillatorSimulator();
 
       /**
        * Process.
@@ -69,7 +69,7 @@ namespace Belle2 {
       /**
        * Get fit data.
        */
-      EKLMFPGAFit* getFPGAFit();
+      KLMScintillatorFirmwareFitResult* getFPGAFit();
 
       /**
        * Get fit status.
@@ -126,7 +126,7 @@ namespace Belle2 {
       const EKLMDigitizationParameters* m_DigPar;
 
       /** Fitter. */
-      FPGAFitter* m_fitter;
+      ScintillatorFirmware* m_fitter;
 
       /** Initial digitization time. */
       double m_DigitizationInitialTime;
@@ -171,7 +171,7 @@ namespace Belle2 {
       enum FPGAFitStatus m_FPGAStat;
 
       /** FPGA fit data. */
-      EKLMFPGAFit m_FPGAFit;
+      KLMScintillatorFirmwareFitResult m_FPGAFit;
 
       /** Number of photoelectrons (generated). */
       int m_npe;

@@ -106,7 +106,7 @@ namespace Belle2 {
     /** Initial digitization time. */
     double m_DigitizationInitialTime;
 
-    /** Save FPGA fit data (EKLMFPGAFit). */
+    /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
 
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
@@ -125,7 +125,7 @@ namespace Belle2 {
     StoreArray<EKLMDigit> m_Digits;
 
     /** FPGA fits. */
-    StoreArray<EKLMFPGAFit> m_FPGAFits;
+    StoreArray<KLMScintillatorFirmwareFitResult> m_FPGAFits;
 
   };
 

@@ -9,12 +9,12 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <framework/logging/Logger.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 using namespace Belle2;
 
-EKLMFPGAFit::EKLMFPGAFit()
+KLMScintillatorFirmwareFitResult::KLMScintillatorFirmwareFitResult()
 {
   m_StartTime = -1;
   m_Amplitude = -1;
@@ -22,46 +22,46 @@ EKLMFPGAFit::EKLMFPGAFit()
   m_MinimalAmplitude = -1;
 }
 
-EKLMFPGAFit::~EKLMFPGAFit()
+KLMScintillatorFirmwareFitResult::~KLMScintillatorFirmwareFitResult()
 {
 }
 
-int EKLMFPGAFit::getStartTime() const
+int KLMScintillatorFirmwareFitResult::getStartTime() const
 {
   return m_StartTime;
 }
 
-void EKLMFPGAFit::setStartTime(int startTime)
+void KLMScintillatorFirmwareFitResult::setStartTime(int startTime)
 {
   m_StartTime = startTime;
 }
 
-float EKLMFPGAFit::getAmplitude() const
+float KLMScintillatorFirmwareFitResult::getAmplitude() const
 {
   return m_Amplitude;
 }
 
-void EKLMFPGAFit::setAmplitude(float amplitude)
+void KLMScintillatorFirmwareFitResult::setAmplitude(float amplitude)
 {
   m_Amplitude = amplitude;
 }
 
-float EKLMFPGAFit::getBackgroundAmplitude() const
+float KLMScintillatorFirmwareFitResult::getBackgroundAmplitude() const
 {
   return m_BackgroundAmplitude;
 }
 
-void EKLMFPGAFit::setBackgroundAmplitude(float amplitude)
+void KLMScintillatorFirmwareFitResult::setBackgroundAmplitude(float amplitude)
 {
   m_BackgroundAmplitude = amplitude;
 }
 
-int EKLMFPGAFit::getMinimalAmplitude() const
+int KLMScintillatorFirmwareFitResult::getMinimalAmplitude() const
 {
   return m_MinimalAmplitude;
 }
 
-void EKLMFPGAFit::setMinimalAmplitude(int amplitude)
+void KLMScintillatorFirmwareFitResult::setMinimalAmplitude(int amplitude)
 {
   m_MinimalAmplitude = amplitude;
 }

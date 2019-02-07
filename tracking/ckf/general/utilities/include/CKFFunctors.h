@@ -35,4 +35,16 @@ namespace Belle2 {
       return t->getHits().size();
     }
   };
+
+  struct GetArcLength {
+    /// Make it a functor
+    explicit operator TrackFindingCDC::FunctorTag();
+
+    /// Returns the weight of an object.
+    template<class T, class SFINAE = decltype(&T::getArcLength)>
+    double operator()(const T& t) const
+    {
+      return t.getArcLength();
+    }
+  };
 }

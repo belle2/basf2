@@ -74,6 +74,13 @@ RFEventProcessor::RFEventProcessor(string conffile)
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
 
+  // 7. Clear PID list
+  m_pid_sender = 0;
+  m_pid_basf2 = 0;
+  m_pid_receiver = 0;
+  m_pid_hrecv = 0;
+  m_pid_hrelay = 0;
+
 }
 
 RFEventProcessor::~RFEventProcessor()
@@ -222,8 +229,8 @@ int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
   char* hport = m_conf->getconf("processor", "historecv", "port");
 
   // 1. Clear RingBuffers
-  //  m_rbufout->forceClear();
-  //  m_rbufin->forceClear();
+  m_rbufout->forceClear();
+  m_rbufin->forceClear();
 
   // 2. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
@@ -333,6 +340,14 @@ void RFEventProcessor::server()
     m_flow->fillProcessStatus(GetNodeInfo(), m_pid_receiver, m_pid_sender, m_pid_basf2,
                               m_pid_hrecv, m_pid_hrelay);
   }
+}
+
+void RFEventProcessor::cleanup()
+{
+  printf("RFEventProcessor : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFEventProcessor: Done. Exitting\n");
+  exit(-1);
 }
 
 

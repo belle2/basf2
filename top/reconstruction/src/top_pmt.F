@@ -13,8 +13,12 @@
       INTEGER NX, NY            ! PMT number of channels in x, y
       REAL TTS                  ! PMT time resolution [ns] (single Gaussian)
 #include "TOP_PMT.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_PMTTYPE.fi"
       DATA PMT_INI /.FALSE./
-
+      INTEGER I, K
+      
       PMT_A=A
       PMT_B=B
       PMT_AA=AA
@@ -28,10 +32,19 @@
       SIG_XCH=PMT_DXCH/SQRT(12.)
       SIG_YCH=PMT_DYCH/SQRT(12.)
       NMA_PMT=0
-      TTS_NG=1
-      TTS_FRAC(1)=1.
-      TTS_T0(1)=0.
-      TTS_SIG(1)=TTS
+      DO K=0,MAX_TTS
+         TTS_TYP(K)=0
+         TTS_NG(K)=1
+         TTS_FRAC(1,K)=1.
+         TTS_T0(1,K)=0.
+         TTS_SIG(1,K)=TTS
+      ENDDO
+      DO K=0,NSIZ_MOD-1
+         DO I=0,NUM_CHA-1
+            PMT_TYPE(I,K)=0     ! nominal one
+         ENDDO
+      ENDDO
+      
       PMT_INI=.TRUE.
 
       END
@@ -45,23 +58,137 @@
       REAL T0(*)                ! positions [ns]
       REAL SIG(*)               ! sigmas [ns]
 #include "TOP_PMT.fi"
-      INTEGER I
+      INTEGER I, K, NUMG
       REAL S
       
+      NUMG=MIN(NG,MAX_G)
       S=0.
-      DO I=1,MIN(NG,MAX_G)
+      DO I=1,NUMG
          S=S+FRAC(I)
       ENDDO
       IF(S.EQ.0) RETURN
-      DO I=1,MIN(NG,MAX_G)
-         TTS_NG=I
-         TTS_FRAC(I)=FRAC(I)/S
-         TTS_T0(I)=T0(I)
-         TTS_SIG(I)=SIG(I)
+
+      DO K=0,MAX_TTS
+         TTS_TYP(K)=0
+         TTS_NG(K)=NUMG
+         DO I=1,NUMG
+            TTS_FRAC(I,K)=FRAC(I)/S
+            TTS_T0(I,K)=T0(I)
+            TTS_SIG(I,K)=SIG(I)
+         ENDDO
       ENDDO
 
       END
 
+
+      INTEGER FUNCTION SET_TTS_TYPE(TYP,NG,FRAC,T0,SIG)
+c--   return value: 0 = OK, 1 = sum of fractions is zero, 2 = invalid TYP
+
+      IMPLICIT NONE
+      INTEGER TYP               ! TTS type
+      INTEGER NG                ! number of Gaussians
+      REAL FRAC(*)              ! fractions
+      REAL T0(*)                ! positions [ns]
+      REAL SIG(*)               ! sigmas [ns]
+#include "TOP_PMT.fi"
+      INTEGER I, NUMG
+      REAL S
+
+      SET_TTS_TYPE=2
+      IF(TYP.LT.0.OR.TYP.GT.MAX_TTS) RETURN
+      
+      SET_TTS_TYPE=1
+      NUMG=MIN(NG,MAX_G)
+      S=0.
+      DO I=1,NUMG
+         S=S+FRAC(I)
+      ENDDO
+      IF(S.EQ.0) RETURN
+
+      SET_TTS_TYPE=0
+      TTS_TYP(TYP)=TYP
+      TTS_NG(TYP)=NUMG
+      DO I=1,NUMG
+         TTS_FRAC(I,TYP)=FRAC(I)/S
+         TTS_T0(I,TYP)=T0(I)
+         TTS_SIG(I,TYP)=SIG(I)
+      ENDDO
+
+      END
+
+
+      INTEGER FUNCTION SET_PMT_TYPE(MDN,ICH,TYP)
+c--   return value: 0 = OK, 1 = invalid TYP, 2 = invalid MDN or ICH
+
+      IMPLICIT NONE
+      INTEGER MDN               ! module number (e.g. slot-1)
+      INTEGER ICH               ! channel (e.g pixel-1)
+      INTEGER TYP               ! PMT type to be set
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_PMTTYPE.fi"
+#include "TOP_PMT.fi"
+
+      SET_PMT_TYPE=2
+      IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
+
+      SET_PMT_TYPE=1
+      IF(TYP.LT.0.OR.TYP.GT.MAX_TTS) RETURN
+
+      SET_PMT_TYPE=0
+      PMT_TYPE(ICH,MDN)=TYP
+      
+      END
+
+
+      SUBROUTINE PRINT_PMT_TYPES
+
+      IMPLICIT NONE
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_PMTTYPE.fi"
+
+      INTEGER MDN, ICH, ACTIVE, NROW, I, K
+      REAL P
+      CHARACTER*64 TXT
+
+      PRINT*,'Installed PMT types (pixel row vs. column)'
+      PRINT*,'=========================================='
+      
+      DO MDN=0,NUM_MOD-1
+         ACTIVE=0
+         DO ICH=0,NUM_CHA-1
+            IF(PMT_TYPE(ICH,MDN).NE.0) ACTIVE=ACTIVE+1
+         ENDDO
+         P=ACTIVE*100./NUM_CHA
+         PRINT '(A,I3,A,F6.1,A)','Slot',MDN+1,': ',P,'% installed'
+         NROW=NUM_CHA/64
+         DO K=NROW,1,-1
+            DO I=1,64
+               ICH=I-1+(K-1)*64
+               WRITE(TXT(I:I), '(I1)') PMT_TYPE(ICH,MDN)
+            ENDDO
+            PRINT '(I2,A,A)',K,'|',TXT
+         ENDDO
+         DO I=1,64
+            TXT(I:I)='-'
+         ENDDO
+         PRINT '(A,A)','  +',TXT
+         DO I=1,64
+            WRITE(TXT(I:I),'(I1)') I/10
+         ENDDO
+         PRINT '(A,A)','   ',TXT
+         DO I=1,64
+            WRITE(TXT(I:I),'(I1)') MOD(I,10)
+         ENDDO
+         PRINT '(A,A)','   ',TXT
+         PRINT*
+      ENDDO
+
+      
+      END
+      
 
       SUBROUTINE READ_QEFFI(QE_FILE, CE)
 
@@ -112,6 +239,7 @@
       REAL LAM(*), QEF(*)       ! QE datapoints: lambda [nm], QE
       INTEGER NT                ! number of datapoints
       REAL CE                   ! collection efficiency
+#include "TOP_CONS.fi"
 #include "TOP_QEFF.fi"      
       REAL X, S, LIN_INTERP
       INTEGER I
@@ -122,13 +250,13 @@
          IF(QEF(I).GT.0) EXIT
       ENDDO
       I=MAX(I-1,1)
-      EMA=1240./LAM(I)
+      EMA=C_HC/LAM(I)
 
       DO I=NT,1,-1
          IF(QEF(I).GT.0) EXIT
       ENDDO
       I=MIN(I+1,NT)
-      EMI=1240./LAM(I)
+      EMI=C_HC/LAM(I)
 
       IF(EMA.LE.EMI) RETURN
       E_STEP=(EMA-EMI)/(MAX_NT-1)
@@ -136,7 +264,7 @@
       S=0.
       QEMAX=0.
       DO I=1,MAX_NT
-         QE(I)=MAX(LIN_INTERP(LAM,QEF,NT,1240./X),0.)*CE
+         QE(I)=MAX(LIN_INTERP(LAM,QEF,NT,C_HC/X),0.)*CE
          QEMAX=MAX(QEMAX,QE(I))
          S=S+QE(I)
          QE_E(I)=X

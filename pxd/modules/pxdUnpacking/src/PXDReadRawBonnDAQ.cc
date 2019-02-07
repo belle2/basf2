@@ -39,6 +39,7 @@ PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
   //setPropertyFlags(c_Input);
 
   addParam("FileName", m_filename, "file name");
+  addParam("SubRunNr", m_subRunNr, "sub-run number", 0u);
   addParam("RunNr", m_runNr, "run number", 0u);
   addParam("ExpNr", m_expNr, "exp number", 0u);
   m_nread = 0;
@@ -103,6 +104,11 @@ int PXDReadRawBonnDAQModule::readOneEvent()
   struct EvtHeader {
     ulittle16_t size;
     ulittle16_t header;
+    unsigned int get_size(void) { return (unsigned int) size + (((unsigned int)(header & 0x000F)) << 16);};
+    unsigned int get_size_group(void) { return (unsigned int) size + (((unsigned int)((header & 0x003F) ^ 0x0020)) << 16);};
+    unsigned int get_header12(void) { return (header & 0xFFF0);};
+    unsigned int get_header10(void) { return (header & 0xFFC0);};
+    unsigned int get_header8(void) { return (header & 0xFF00);};
   };
 
   char* data = (char*)m_buffer;
@@ -114,26 +120,33 @@ int PXDReadRawBonnDAQModule::readOneEvent()
     // Read 8 bytes header (group)
     int br = read_data(data, 4);
     if (br <= 0) return br;
-    B2DEBUG(1, "Header $" << std::hex << evt->header << " Chunk size " << std::dec << evt->size);
-    if (evt->size <= 1) return 0;
-    br = read_data(data + 4, evt->size * 4 - 4);
+    unsigned int chunk_size = 0;
+    if (evt->get_header8() == 0) {
+      B2DEBUG(1, "Group Header $" << std::hex << evt->get_header10() << " Chunk size " << std::dec << evt->get_size());
+      chunk_size = evt->get_size_group();
+    } else {
+      B2DEBUG(1, "Header $" << std::hex << evt->get_header12() << " Chunk size " << std::dec << evt->get_size());
+      chunk_size = evt->get_size();
+    }
+    if (chunk_size <= 1) return 0;
+    br = read_data(data + 4, chunk_size * 4 - 4);
     if (br <= 0) return br;
-    if (evt->header == 0xe230) {
-      B2DEBUG(1, "File info " << std::hex << evt->header << " Events " << std::dec << data32[1]);
+    if (evt->get_header12() == 0xe230) {
+      B2DEBUG(1, "File info " << std::hex << evt->get_header12() << " Events " << std::dec << data32[1]);
       continue;
-    } else if (evt->header == 0xe100) {
-      B2DEBUG(1, "Info Event " << std::hex << evt->header << " RunNr $" << std::hex << data32[1]);
+    } else if (evt->get_header12() == 0xe100) {
+      B2DEBUG(1, "Info Event " << std::hex << evt->get_header12() << " RunNr $" << std::hex << data32[1]);
       if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
       continue;
-    } else if (evt->header == 0x0020) {
-      B2DEBUG(1, "Run Event Group " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
+    } else if (evt->get_header10() == 0x0000) { // war 0x0020
+      B2DEBUG(1, "Run Event Group " << std::hex << evt->get_header10() << " Magic $" << std::hex << data32[1]);
       continue;
-    } else if (evt->header == 0xbb00) {
-      B2DEBUG(1, "Run Event " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
+    } else if (evt->get_header12() == 0xbb00) {
+      B2DEBUG(1, "Run Event " << std::hex << evt->get_header12() << " Magic $" << std::hex << data32[1]);
       continue;
-    } else if (evt->header == 0x00a0) {
-      int togo = evt->size;
-      B2DEBUG(1, "Data Event Group " << std::hex << evt->header << " TriggerNr $" << std::hex << data32[1]);
+    } else if (evt->get_header10() == 0x0080) { // war 0x00A0
+      int togo = chunk_size;
+      B2DEBUG(1, "Data Event Group " << std::hex << evt->get_header10() << " TriggerNr $" << std::hex << data32[1]);
       triggernr = data32[1];
       togo -= 2;
       data32 += 2;
@@ -217,10 +230,12 @@ int PXDReadRawBonnDAQModule::readOneEvent()
       m_eventMetaDataPtr->setExperiment(m_expNr);
       m_eventMetaDataPtr->setRun(m_runNr);
       m_eventMetaDataPtr->setEvent(triggernr);
+      // we cannot recover time tag here. this would need further decoding from DHH header
+      // m_eventMetaDataPtr->setTime((unsigned long long int)((time_tag_hi<<1) +(time_tag_mid &0x8000?1:0))*1000000000+(int)std::round(tt / 0.127216));
 
       return 1;
     } else {
-      B2ERROR("Undefine Header $" << std::hex << evt->header);
+      B2ERROR("Undefine Header $" << std::hex << evt->get_header12());
       continue;
     }
     continue;

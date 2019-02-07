@@ -168,7 +168,7 @@ namespace Belle2 {
       //    virtual const char *getName () const { return name ? name : "???";}
       virtual const char* getName() const;  // { return name ? name : "???";}
       /// Set object's name
-      virtual void setName(const char* name_);
+      void setName(const char* name_);
       /// Get measured value of parameter ilocal
       virtual double getMParam(int ilocal      ///< Local parameter number
                               ) const;
@@ -234,7 +234,7 @@ namespace Belle2 {
 
 
       /// invalidate any cached quantities
-      virtual void invalidateCache() const {cachevalid = false;};
+      void invalidateCache() const {cachevalid = false;};
       virtual void updateCache() const = 0;
 
       // these are the mothods that fill the fitter's matrices/vectors
@@ -246,9 +246,9 @@ namespace Belle2 {
                                ) const;
 
       /// Add derivatives of chi squared to global derivative vector
-      virtual void addToGlobalChi2DerVector(double* y,    ///< Vector of chi2 derivatives
-                                            int idim     ///< Vector size
-                                           ) const;
+      virtual int addToGlobalChi2DerVector(double* y,    ///< Vector of chi2 derivatives
+                                           int idim     ///< Vector size
+                                          ) const;
 
       /// Add 2nd derivatives of chi squared to global derivative matrix
       virtual void addToGlobalChi2DerMatrix(double* M,    ///< Global derivative matrix

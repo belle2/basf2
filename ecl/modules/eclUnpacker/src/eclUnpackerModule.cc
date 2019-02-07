@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Shebalin Vasily, Mikhail Remnev                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 //This module
 #include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
@@ -20,6 +29,11 @@
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
+
+#define B2DEBUG_eclunpacker(level, msg) \
+  if (m_debugLevel >= level) {\
+    B2DEBUG(level, msg); \
+  }
 
 /*
 
@@ -67,7 +81,18 @@ ADC_NUM*SAMPLES_NUM |                                                           
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_eclDigits("", DataStore::c_Event)
+  m_EvtNum(0),
+  m_bufPtr(0),
+  m_bufPos(0),
+  m_bufLength(0),
+  m_bitPos(0),
+  m_storeTrigTime(0),
+  m_storeUnmapped(0),
+  m_tagsReportedMask(0),
+  m_phasesReportedMask(0),
+  m_badHeaderReportedMask(0),
+  m_eclDigits("", DataStore::c_Event),
+  m_debugLevel(0)
 {
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
 
@@ -92,6 +117,9 @@ ECLUnpackerModule::~ECLUnpackerModule()
 
 void ECLUnpackerModule::initialize()
 {
+  // Get cached debug level to improve performance
+  auto& config = LogSystem::Instance().getCurrentLogConfig(PACKAGENAME());
+  m_debugLevel = config.getLogLevel() == LogConfig::c_Debug ? config.getDebugLevel() : 0;
 
   // require input data
   m_rawEcl.isRequired();
@@ -103,29 +131,21 @@ void ECLUnpackerModule::initialize()
     m_eclDigits.registerRelationTo(m_eclTrigs);
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
+  m_eclDigits.registerRelationTo(m_eclDsps);
   m_eclDsps.registerRelationTo(m_eclDigits);
 
-  // make full name of the initialization file
-  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
-  if (! FileSystem::fileExists(ini_file_name)) {
-    B2FATAL("ECL Unpacker : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-  }
-
-  // initialize channel mapper from file (temporary)
-  if (! m_eclMapper.initFromFile(ini_file_name.data())) {
-    B2FATAL("ECL Unpacker:: Can't initialize eclChannelMapper");
-  }
-
-  B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
-
-  // or initialize it from DB TODO
 }
 
 void ECLUnpackerModule::beginRun()
 {
-  //TODO
-  m_tagsReported   = false;
-  m_phasesReported = false;
+  m_tagsReportedMask      = 0;
+  m_phasesReportedMask    = 0;
+  m_badHeaderReportedMask = 0;
+  // Initialize channel mapper at run start to account for possible
+  // changes in ECL mapping between runs.
+  if (!m_eclMapper.initFromDB()) {
+    B2FATAL("ECL Unpacker: Can't initialize eclChannelMapper!");
+  }
 }
 
 void ECLUnpackerModule::event()
@@ -138,7 +158,7 @@ void ECLUnpackerModule::event()
 
   int nRawEclEntries = m_rawEcl.getEntries();
 
-  B2DEBUG(50, "Ecl unpacker event called N_RAW = " << nRawEclEntries);
+  B2DEBUG_eclunpacker(22, "Ecl unpacker event called N_RAW = " << nRawEclEntries);
 
   for (int i = 0; i < nRawEclEntries; i++) {
     for (int n = 0; n < m_rawEcl[i]->GetNumEntries(); n++) {
@@ -163,7 +183,7 @@ void ECLUnpackerModule::terminate()
 unsigned int ECLUnpackerModule::readNextCollectorWord()
 {
   if (m_bufPos == m_bufLength) {
-    B2DEBUG(50, "Reached the end of the FINESSE buffer");
+    B2DEBUG_eclunpacker(22, "Reached the end of the FINESSE buffer");
     throw Unexpected_end_of_FINESSE_buffer();
   }
   unsigned int value = m_bufPtr[m_bufPos];
@@ -225,15 +245,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   // loop over FINESSEs in the COPPER
   for (int iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
 
-    ECLTrig* eclTrig = 0;
-
     m_bitPos = 0;
     m_bufPos = 0;
-
-    // trigger phase of the Collector connected to this FINESSE
-    // -1 if there are no triggered shapers
-    int triggerPhase0 = -1;
-    int triggerTag0   = -1;
 
     m_bufLength = rawCOPPERData->GetDetectorNwords(n, iFINESSE);
 
@@ -245,14 +258,13 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     // pointer to data from COPPER/FINESSE
     m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
 
-    B2DEBUG(15, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
+    B2DEBUG_eclunpacker(21, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
 
     // dump buffer data
     for (int i = 0; i < m_bufLength; i++) {
-      B2DEBUG(500, "" << std::hex << setfill('0') << setw(8) << m_bufPtr[i]);
-
+      B2DEBUG_eclunpacker(29, "" << std::hex << setfill('0') << setw(8) << m_bufPtr[i]);
     }
-    B2DEBUG(15, "***** ");
+    B2DEBUG_eclunpacker(21, "***** ");
 
 
     m_bufPos = 0; // set read position to the 1-st word
@@ -268,12 +280,18 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
     try {
 
+      ECLTrig* eclTrig = 0;
+      // trigger phase of the Collector connected to this FINESSE
+      // -1 if there are no triggered shapers
+      int triggerPhase0 = -1;
+      int triggerTag0   = -1;
+
       // read the collector header
       value = readNextCollectorWord();
       shapersMask = value & 0xFFF;           // mask of active shapers
       compressMode = (value & 0xF000) >> 12; // compression mode for ADC data, 0 -- disabled, 1 -- enabled
 
-      B2DEBUG(50, "ShapersMask = " << std::hex << shapersMask << " compressMode =  "  <<  compressMode);
+      B2DEBUG_eclunpacker(22, "ShapersMask = " << std::hex << shapersMask << " compressMode =  "  <<  compressMode);
 
       // make new eclTrig oject to store trigger time for crate if there are triggered shapers in the crate
       if (m_storeTrigTime && shapersMask != 0) eclTrig = m_eclTrigs.appendNew();
@@ -288,11 +306,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         // read the shaper header
         value = readNextCollectorWord();
         shaperDataLength = value & 0xFFFF; // amount of words in DATA section (without COLLECTOR HEADER)
-        B2DEBUG(50, "iCrate = " << iCrate << " iShaper = " << iShaper);
-        B2DEBUG(50, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
+        B2DEBUG_eclunpacker(22, "iCrate = " << iCrate << " iShaper = " << iShaper);
+        B2DEBUG_eclunpacker(22, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
         // check shaperDSP header
         if ((value & 0x00FF0000) != 0x00100000) {
-          B2ERROR("Ecl Unpacker:: bad shaper header");
+          doBadHeaderReport(iCrate);
           throw Bad_ShaperDSP_header();
         }
 
@@ -304,35 +322,30 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         // check that trigger phases for all shapers in the crate are equal
         if (triggerPhase0 == -1) triggerPhase0 = triggerPhase;
-        else if (triggerPhase != triggerPhase0 && !m_phasesReported) {
-          B2ERROR("Different trigger phases for crate " << iCrate << " :: " << triggerPhase << " != " << triggerPhase0
-                  << " ECL data is corrupted for whole run probably") ;
-          m_phasesReported = true;
+        else if (triggerPhase != triggerPhase0) {
+          doPhasesReport(iCrate, triggerPhase0, triggerPhase);
         }
 
-        B2DEBUG(50, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel << " nActiveDSPChannels "
-                << nActiveDSPChannels);
+        B2DEBUG_eclunpacker(22, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel <<
+                            " nActiveDSPChannels "
+                            << nActiveDSPChannels);
 
         value = readNextCollectorWord();
 
         dspMask    = (value >> 16) & 0xFFFF;  // Active DSP channels mask
         triggerTag = value & 0xFFFF;          // trigger tag
-        B2DEBUG(50, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
+        B2DEBUG_eclunpacker(22, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
         else if (triggerTag != triggerTag0) {
-          if (!m_tagsReported) {
-            B2ERROR("Different trigger tags for crate " << iCrate << " :: " << triggerTag << " != " << triggerTag0
-                    << " ECL data is corrupted for whole run probably") ;
-            m_tagsReported = true;
-          }
+          doTagsReport(iCrate, triggerTag0, triggerTag);
           triggerTag0 |= (1 << 16);
         }
 
         value = readNextCollectorWord();
         adcMask = value & 0xFFFF; // mask for channels with ADC data
         adcHighMask = (value >> 16) & 0xFFFF;
-        B2DEBUG(50, "ADCMASK = 0x" << std::hex << adcMask << " adcHighMask = 0x" << adcHighMask);
+        B2DEBUG_eclunpacker(22, "ADCMASK = 0x" << std::hex << adcMask << " adcHighMask = 0x" << adcHighMask);
 
         nRead = 0;
         // read DSP data (quality, fitted time, amplitude)
@@ -351,8 +364,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           if (cellID < 1) continue; // channel is not connected to crystal
 
           // fill eclDigits data object
-          B2DEBUG(100, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
-                  dspQualityFlag);
+          B2DEBUG_eclunpacker(23, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
+                              dspQualityFlag);
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
@@ -380,8 +393,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
 
         if (nRead != nActiveDSPChannels) {
-          B2ERROR("Number of active DSP channels and number of read channels don't match (Corrupted data?)" << " nRead = " << nRead <<
-                  " nActiveDSP = " << nActiveDSPChannels);
+          B2ERROR("Number of active DSP channels and number of read channels don't match (Corrupted data?)"
+                  << LogVar("nRead", nRead) << LogVar("nActiveDSP", nActiveDSPChannels));
           // do something (throw an exception etc.) TODO
         }
 
@@ -401,13 +414,13 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
               if (indSample == 0) {
                 value = readNBits(18);
                 adcDataBase = value;
-                B2DEBUG(200, "adcDataBase = " << adcDataBase);
+                B2DEBUG_eclunpacker(24, "adcDataBase = " << adcDataBase);
                 value = readNBits(5);
                 adcDataDiffWidth = value;
-                B2DEBUG(200, "adcDataDiffWidth = " << adcDataDiffWidth);
+                B2DEBUG_eclunpacker(24, "adcDataDiffWidth = " << adcDataDiffWidth);
               }
               value = readNBits(adcDataDiffWidth);
-              B2DEBUG(200, "adcDataOffset = " << value);
+              B2DEBUG_eclunpacker(24, "adcDataOffset = " << value);
               value += adcDataBase;
             }
             // fill waveform data for single channel
@@ -419,13 +432,18 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             if (eclWaveformSamples.size() != nADCSamplesPerChannel)
               B2ERROR("Wrong number of ADC samples. Actual number of read samples "
-                      << eclWaveformSamples.size() << " != number of samples in header "
-                      << nADCSamplesPerChannel);
+                      " != number of samples in header "
+                      << LogVar("Actual number of read samples", eclWaveformSamples.size())
+                      << LogVar("Number of samples in header", nADCSamplesPerChannel));
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
+              ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
+              // Add relation from ECLDigit to ECLDsp
+              for (auto& newEclDigit : m_eclDigits) {
+                if (newEclDsp->getCellId() == newEclDigit.getCellId()) newEclDigit.addRelationTo(newEclDsp);
+              }
             }
 
           }
@@ -439,8 +457,10 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         }
 
         if (nRead != nActiveChannelsWithADCData) {
-          B2ERROR("Number of channels with ADC data " << nActiveChannelsWithADCData << " and number of read channels " << nRead <<
-                  " don't match (Corrupted data?) ");
+          B2ERROR("Number of channels with ADC data and "
+                  "number of read channels don't match (Corrupted data?)"
+                  << LogVar("active channels", nActiveChannelsWithADCData)
+                  << LogVar("read channels", nRead));
           // do something (throw an exception etc.) TODO
         }
 
@@ -455,10 +475,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         eclTrig->setTrigTag(triggerTag0);
       }
 
-
-
-
-
     } // try
     catch (...) {
       // errors while reading data block
@@ -469,3 +485,31 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   }// loop ove FINESSes
 
 }
+
+void ECLUnpackerModule::doTagsReport(unsigned int iCrate, int tag0, int tag1)
+{
+  if (!tagsReported(iCrate)) {
+    B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger tag0", tag0) << LogVar("trigger tag1", tag1));
+    m_tagsReportedMask |= 1 << (iCrate - 1);
+  }
+}
+void ECLUnpackerModule::doPhasesReport(unsigned int iCrate, int phase0, int phase1)
+{
+  if (!phasesReported(iCrate)) {
+    B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger phase0", phase0) << LogVar("trigger phase1", phase1));
+    m_phasesReportedMask |= 1 << (iCrate - 1);
+  }
+}
+void ECLUnpackerModule::doBadHeaderReport(unsigned int iCrate)
+{
+  if (!badHeaderReported(iCrate)) {
+    B2ERROR("Bad shaper header."
+            << LogVar("crate", iCrate));
+    m_badHeaderReportedMask |= 1 << (iCrate - 1);
+  }
+}
+

@@ -23,7 +23,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdFSParticles import *
+from stdCharged import stdPi, stdPr
 from variables import variables
 
 variables.addAlias('piExpertPID_ALL', 'pidProbabilityExpert(211, ALL)')
@@ -41,7 +41,8 @@ set_log_level(LogLevel.ERROR)
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-loadStdCharged()
+stdPi('all')
+stdPr('all')
 # reconstruct Lambda:ppi
 reconstructDecay('Lambda0:ppi -> p+:all pi-:all', '1.100 < M < 1.130')
 massVertexRave('Lambda0:ppi', 0.001)

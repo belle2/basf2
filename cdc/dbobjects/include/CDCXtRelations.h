@@ -189,7 +189,7 @@ namespace Belle2 {
     /**
      * Get xt parameterization mode
      */
-    unsigned short getXtParamMode()
+    unsigned short getXtParamMode() const
     {
       return m_xtParamMode;
     }
@@ -381,7 +381,7 @@ namespace Belle2 {
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 29;}
     /// Get global parameter FIXME does nothing because CDC is not ready
-    double getGlobalParam(unsigned short xtId, unsigned short xtParam)
+    double getGlobalParam(unsigned short xtId, unsigned short xtParam) const
     {
       return getXtParams(xtId).at(xtParam);
     }
@@ -393,7 +393,7 @@ namespace Belle2 {
       setXtParams(xtId, allParams);
     }
     /// list stored global parameters TODO FIXME CDC not ready
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() const
     {
       return {};
     }

@@ -44,13 +44,13 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void initialize();
+      void initialize()  override;
 
       /**
        * Begin run action.
        */
 
-      virtual void event();
+      void event()  override;
 
     private:
       /**

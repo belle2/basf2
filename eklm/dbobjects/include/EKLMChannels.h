@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMCHANNELS_H
-#define EKLMCHANNELS_H
+#pragma once
 
 /* C++ headers. */
 #include <cstdint>
@@ -51,19 +50,16 @@ namespace Belle2 {
      * Get channel data.
      * @param[in] strip Strip (channel) number.
      */
-    EKLMChannelData* getChannelData(uint16_t strip);
+    const EKLMChannelData* getChannelData(uint16_t strip) const;
 
   private:
 
     /** Channel data. */
     std::map<uint16_t, EKLMChannelData> m_Channels;
 
-    /** Makes objects storable. */
+    /** Class version. */
     ClassDef(Belle2::EKLMChannels, 1);
 
   };
 
 }
-
-#endif
-

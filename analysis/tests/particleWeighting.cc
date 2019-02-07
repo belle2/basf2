@@ -105,7 +105,6 @@ namespace {
     ParticleWeightingBinLimits* bl3 = new ParticleWeightingBinLimits(1, 3);
     string a1 = "Axis1";
     string a2 = "Axis2";
-    string a3 = "Axis3";
     string v1 = "Var1";
     string v2 = "Var2";
     NDBin bin1;

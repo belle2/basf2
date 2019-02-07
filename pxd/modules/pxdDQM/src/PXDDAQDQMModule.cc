@@ -83,13 +83,12 @@ void PXDDAQDQMModule::defineHisto()
                                         40);// If max changed, check overflow copy below
     hDAQCM[avxdid] = new TH2F("PXDDAQCM_" + bufful, "Common Mode on DHE " + buff + "; Gate+Chip*192; Common Mode", 192 * 4, 0, 192 * 4,
                               64, 0, 64);
+    hDAQCM2[avxdid] = new TH1F("PXDDAQCM2_" + bufful, "Common Mode on DHE " + buff + "; Common Mode", 64, 0, 64);
   }
   for (int i = 0; i < 16; i++) {
-    //cppcheck-suppress zerodiv
     hDAQDHCReduction[i] = new TH1F(("PXDDAQDHCDataReduction_" + str(format("%d") % i)).c_str(),
                                    ("Data Reduction DHC " + str(format(" %d") % i) + "; Raw/Red; Counts").c_str(), 200, 0,
                                    40); // If max changed, check overflow copy below
-    //cppcheck-suppress zerodiv
   }
 //   hDAQErrorEvent->LabelsDeflate("X");
 //   hDAQErrorEvent->LabelsOption("v");
@@ -155,6 +154,7 @@ void PXDDAQDQMModule::event()
         for (auto cm = dhe.cm_begin(); cm < dhe.cm_end(); ++cm) {
           // uint8_t, uint16_t, uint8_t ; tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
           if (hDAQCM[dhe.getSensorID()]) hDAQCM[dhe.getSensorID()]->Fill(std::get<0>(*cm) * 192 + std::get<1>(*cm) / 4, std::get<2>(*cm));
+          if (hDAQCM2[dhe.getSensorID()]) hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
         }
       }
     }

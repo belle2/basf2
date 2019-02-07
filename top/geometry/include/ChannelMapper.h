@@ -175,10 +175,17 @@ namespace Belle2 {
     private:
 
       /**
-       * copy constructor
+       * Copy constructor
        */
       ChannelMapper(const ChannelMapper&)
       {}
+
+      /**
+       * Assignment operator
+       */
+      ChannelMapper& operator=(const ChannelMapper&)
+      {return *this;}
+
 
       /**
        * Clear
@@ -197,8 +204,8 @@ namespace Belle2 {
       bool m_valid = false;                    /**< true if mapping available */
       bool m_fromDB = false;                   /**< true, if from database */
 
-      const TOPChannelMap* m_channels[c_numRows][c_numColumns]; /**< conversion array */
-      const TOPChannelMap* m_pixels[c_numAsics][c_numChannels]; /**< conversion array */
+      const TOPChannelMap* m_channels[c_numRows][c_numColumns] = {{0}}; /**< conversion array */
+      const TOPChannelMap* m_pixels[c_numAsics][c_numChannels] = {{0}}; /**< conversion array */
 
     };
 

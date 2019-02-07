@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef MCDECAYFINDERMODULE_H
-#define MCDECAYFINDERMODULE_H
+#pragma once
 #include <framework/core/Module.h>
 #include <analysis/modules/MCDecayFinder/DecayTree.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -45,4 +44,3 @@ namespace Belle2 {
     int write(DecayTree<MCParticle>* decay);
   };
 }
-#endif // MCDECAYFINDERMODULE_H

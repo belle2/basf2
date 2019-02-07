@@ -27,6 +27,8 @@ SVDZeroSuppressionEmulatorModule::SVDZeroSuppressionEmulatorModule() : Module()
   setDescription("Filters out SVDShaperDigit with less than 1 (default) sample is below a certain threshold, by default set at SN = 3.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("FADCmode", m_FADCmode,
+           "FADC mode: if true the approximation to integer is done", bool(true));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
   addParam("ShaperDigitsIN", m_SVDShaperDigitsIN,
@@ -39,6 +41,7 @@ SVDZeroSuppressionEmulatorModule::SVDZeroSuppressionEmulatorModule() : Module()
            "number of samples above threshold to be kept ", int(1));
   addParam("createOUTStripsList", m_createOutside,
            "create the StoreArray of outside strips", bool(false));
+
 
 }
 
@@ -95,6 +98,12 @@ bool SVDZeroSuppressionEmulatorModule::passesZS(const SVDShaperDigit* shaper)
   float noise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
   float cutMinSignal = m_cutSN * noise;
 
+  //  B2INFO("before = "<<cutMinSignal);
+  if (m_FADCmode) {
+    cutMinSignal = cutMinSignal + 0.5;
+    cutMinSignal = (int)cutMinSignal;
+  }
+  //  B2INFO("after = "<<cutMinSignal);
   if (shaper->passesZS(m_nSample, cutMinSignal))
     return true;
 

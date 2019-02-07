@@ -37,50 +37,50 @@ namespace Belle2 {
      */
     virtual ~ARICHRateCalModule();
 
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
     unsigned int calbyte(const int* buf);
     unsigned int calword(const int* buf);
 
   protected:
-    TH2* h_rate2D[100];
+    TH2* h_rate2D[100] = {NULL};
     int m_nrun;
     int m_nevents;
     double m_dth;
     double m_th0;
     bool m_debugmode;
     std::string m_daqdb;
-    unsigned int m_ibyte;
+    unsigned int m_ibyte = 0;
 
   };
 

@@ -146,6 +146,9 @@ def process_dir(
     if 'LIBS' in env.Dictionary():
         del env.Dictionary()['LIBS']
 
+    if dir_name in env.get('DISABLE_COMPILER_WARNINGS', []):
+        env.AppendUnique(CXXFLAGS=['-w'], CCFLAGS=['-w'], FORTRANFLAGS=['-w'], LINKFLAGS=['-w'])
+
     # link dataobjects to analysis modules
     if dir_name == '.':
         env.Append(LIBS=['dataobjects'])
@@ -247,35 +250,19 @@ def process_dir(
         for linkdef_file in env['LINKDEF_FILES']:
             # set the name of library generated at this stage
             # will be read by the RootDict builder
-            env["ROOTCLING_ROOTMAP_LIB"] = lib_name
-            dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] \
-                + 'Dict.cc'
-            dict_file = env.RootDict(os.path.join(env['BUILDDIR'],
-                                                  dict_filename), linkdef_file)
+            dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] + 'Dict.cc'
+            dict_file, rootmap_file, rootpcm_file = env.RootDict(os.path.join(env['BUILDDIR'], dict_filename), linkdef_file,
+                                                                 ROOTCLING_ROOTMAP_LIB=lib_name)
             # add the extra cxxflags
             dict_ccflags = env["CCFLAGS"] + env["ROOTCLING_EXTRA_CCFLAGS"]
             # add current directory to include path for dictionary compilation
             dict_files.append(env.SharedObject(dict_file, CPPPATH=['.'] + env['CPPPATH'], CCFLAGS=dict_ccflags))
 
             # install corresponding pcm file in lib (for cling)
-            pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
-            pcm_name = os.path.basename(pcm_path)
-            pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
-                                       pcm_path)
+            aux_dict_targets.append(env.Copy(os.path.join(env['LIBDIR'], rootpcm_file.name), rootpcm_file))
             # install corresponding rootmap files to support auto-loading of libraries
             # once used via ROOT
-            rootmap_path = str(dict_file[0])[:-3] + '.rootmap'
-            rootmap_name = os.path.basename(rootmap_path)
-
-            rootmap_target = env.InstallAs(os.path.join(env['LIBDIR'], rootmap_name),
-                                           rootmap_path)
-
-            # Ensure InstallAs() comes after the dictionary build
-            env.Depends(rootmap_path, dict_file)
-            env.Depends(pcm_path, dict_file)
-
-            aux_dict_targets.append(pcm_target)
-            aux_dict_targets.append(rootmap_target)
+            aux_dict_targets.append(env.Copy(os.path.join(env['LIBDIR'], rootmap_file.name), rootmap_file))
 
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0 or len(dict_files) > 0:
@@ -294,8 +281,9 @@ def process_dir(
             # create library and map for modules
             lib = env.SharedLibrary(os.path.join(lib_dir_name, lib_name),
                                     [env['SRC_FILES'], dict_files])
+            debug = env.StripDebug(lib)
 
-            lib_files = [lib] + aux_dict_targets
+            lib_files = [lib, debug] + aux_dict_targets
             if is_module_dir:
                 map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.b2modmap')
                 # Adding lib_files is important to ensure we load local module
@@ -358,10 +346,11 @@ def process_dir(
         tool = bin_env.Program(os.path.join(bin_env['BINDIR'], bin_filename),
                                os.path.join(bin_env['BUILDDIR'],
                                             str(bin_file)))
-        env.Alias(os.path.join(dir_name, 'tools', bin_filename), tool)
-        env.Alias(os.path.join(dir_name, 'tools'), tool)
-        env.Alias(os.path.join(dir_name, bin_filename), tool)
-        define_aliases(env, tool, dir_name, 'bin')
+        debug = bin_env.StripDebug(tool)
+        env.Alias(os.path.join(dir_name, 'tools', bin_filename), [tool, debug])
+        env.Alias(os.path.join(dir_name, 'tools'), [tool, debug])
+        env.Alias(os.path.join(dir_name, bin_filename), [tool, debug])
+        define_aliases(env, [tool, debug], dir_name, 'bin')
 
     # restore original environment
     env = save_env
@@ -389,6 +378,7 @@ def process_dir(
         test_env['LIBS'] = env['TEST_LIBS']
         test = test_env.Program(os.path.join(test_env['BINDIR'],
                                              test_filename), env['TEST_FILES'])
+        env.StripDebug(test)
         env.Alias(os.path.join(dir_name, 'tests', test_filename), test)
         env.Alias(os.path.join(dir_name, 'tests'), test)
         env.Alias(os.path.join(dir_name, test_filename), test)

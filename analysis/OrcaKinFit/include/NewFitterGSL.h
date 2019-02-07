@@ -52,19 +52,19 @@ namespace Belle2 {
       virtual ~NewFitterGSL();
 
       /// The fit method, returns  the fit probability
-      virtual double fit();
+      virtual double fit() override;
 
       /// Get the error code of the last fit: 0=OK, 1=failed
-      virtual int getError() const;
+      virtual int getError() const override;
 
       /// Get the fit probability of the last fit
-      virtual double getProbability() const;
+      virtual double getProbability() const override;
       /// Get the chi**2 of the last fit
-      virtual double getChi2() const;
+      virtual double getChi2() const override;
       /// Get the number of degrees of freedom of the last fit
-      virtual int    getDoF() const;
+      virtual int    getDoF() const override;
       /// Get the number of iterations of the last fit
-      virtual int  getIterations() const;
+      virtual int  getIterations() const override;
 
       /// Get the number of hard constraints of the last fit
       virtual int    getNcon() const;
@@ -79,19 +79,19 @@ namespace Belle2 {
       virtual int    getNunm() const;
 
       /// Initialize the fitter
-      virtual bool initialize();
+      virtual bool initialize() override;
 
       /// Set the Debug Level
       virtual void setDebug(int debuglevel);
 
       /// Determine best lambda values
-      virtual void determineLambdas(gsl_vector* vecxnew,         ///< vector with new lambda values
-                                    const gsl_matrix* MatM,     ///< matrix with constraint derivatives
-                                    const gsl_vector* vecx,     ///< vector with current x values
-                                    gsl_matrix* MatW,           ///< work matrix
-                                    gsl_vector* vecw,           ///< work vector
-                                    double eps = 0              ///< Singular values < eps*(max(abs(s_i))) are set to 0
-                                   );
+      virtual int determineLambdas(gsl_vector* vecxnew,         ///< vector with new lambda values
+                                   const gsl_matrix* MatM,     ///< matrix with constraint derivatives
+                                   const gsl_vector* vecx,     ///< vector with current x values
+                                   gsl_matrix* MatW,           ///< work matrix
+                                   gsl_vector* vecw,           ///< work vector
+                                   double eps = 0              ///< Singular values < eps*(max(abs(s_i))) are set to 0
+                                  );
 
       /// Calculate 2nd order correction step
       virtual void calc2ndOrderCorr(gsl_vector* vecdxhat,        ///< the correction step
@@ -158,7 +158,7 @@ namespace Belle2 {
       void scaley(gsl_vector* vecyscal, const gsl_vector* vecy, const gsl_vector* vece);
 
       // Fill chi2 derivatives into vector y
-      void assembleChi2Der(gsl_vector* vecy);
+      int assembleChi2Der(gsl_vector* vecy);
 
       // Fill vector y with values of constraints
       void addConstraints(gsl_vector* vecy);
@@ -243,7 +243,7 @@ namespace Belle2 {
 
       int invertM();
 
-      void calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, gsl_vector* vecx);
+      int calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, gsl_vector* vecx);
 
       enum {NPARMAX = 50, NCONMAX = 10, NUNMMAX = 10};
 

@@ -1,8 +1,8 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
- *  ECL Data Quality Monitor                                              *
+ *  ECL Data Quality Monitor (First Module)                               *
  *                                                                        *
  *  This module provides histograms for ECL Data Quality Monitoring       *
  *                                                                        *
@@ -36,11 +36,12 @@
 #include <TH2F.h>
 #include <TDirectory.h>
 
+//STL
+#include <iostream>
+
 //NAMESPACE(S)
 using namespace Belle2;
 using namespace ECL;
-using namespace std;
-using boost::format;
 
 REG_MODULE(ECLDQM)
 
@@ -50,13 +51,13 @@ ECLDQMModule::ECLDQMModule() : HistoModule()
   setDescription("ECL Data Quality Monitor");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify parallel processing.
   addParam("histogramDirectoryName", m_histogramDirectoryName,
-           "histogram directory in ROOT file", string("ECL"));
-  addParam("NHitsUpperThr1", m_NHitsUpperThr1, "Upper threshold of number of hits in event", 200);
-  addParam("NHitsUpperThr2", m_NHitsUpperThr2, "Upper threshold of number of hits in event (w/ Thr=10 MeV)", 100);
-  addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 1.5 * Belle2::Unit::GeV);
-  addParam("PedestalMeanUpperThr", m_PedestalMeanUpperThr, "Upper threshold of pedestal distribution", 7000);
-  addParam("PedestalMeanLowerThr", m_PedestalMeanLowerThr, "Lower threshold of pedestal distribution", -1000);
-  addParam("PedestalRmsUpperThr", m_PedestalRmsUpperThr, "Upper threshold of pedestal rms error distribution", 100.);
+           "histogram directory in ROOT file", std::string("ECL"));
+  addParam("NHitsUpperThr1", m_NHitsUpperThr1, "Upper threshold of number of hits in event", 10000);
+  addParam("NHitsUpperThr2", m_NHitsUpperThr2, "Upper threshold of number of hits in event (w/ Thr=10 MeV)", 1000);
+  addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 10.0 * Belle2::Unit::GeV);
+  addParam("PedestalMeanUpperThr", m_PedestalMeanUpperThr, "Upper threshold of pedestal distribution", 15000);
+  addParam("PedestalMeanLowerThr", m_PedestalMeanLowerThr, "Lower threshold of pedestal distribution", -15000);
+  addParam("PedestalRmsUpperThr", m_PedestalRmsUpperThr, "Upper threshold of pedestal rms error distribution", 1000.);
 }
 
 ECLDQMModule::~ECLDQMModule()
@@ -70,8 +71,7 @@ void ECLDQMModule::defineHisto()
 
   // Create a separate histogram directory and cd into it.
 
-  TDirectory* dirDAQ = NULL;
-  dirDAQ = dynamic_cast<TDirectory*>(oldDir->Get(m_histogramDirectoryName.c_str()));
+  TDirectory* dirDAQ = dynamic_cast<TDirectory*>(oldDir->Get(m_histogramDirectoryName.c_str()));
   if (!dirDAQ) dirDAQ = oldDir->mkdir(m_histogramDirectoryName.c_str());
   dirDAQ->cd();
 
@@ -93,7 +93,7 @@ void ECLDQMModule::defineHisto()
   h_cid_Thr50MeV->GetXaxis()->SetTitle("Cell ID");
   h_cid_Thr50MeV->SetOption("LIVE");
 
-  h_ncev = new TH1F("ncev", "Number of hits in event", m_NHitsUpperThr1, 0, m_NHitsUpperThr1);
+  h_ncev = new TH1F("ncev", "Number of hits in event", (int)(m_NHitsUpperThr1 / 10), 0, m_NHitsUpperThr1);
   h_ncev->GetXaxis()->SetTitle("Number of hits");
   h_ncev->SetOption("LIVE");
 
@@ -154,10 +154,21 @@ void ECLDQMModule::defineHisto()
   h_adc_hits->GetXaxis()->SetTitle("Fraction of ADC samples");
   h_adc_hits->SetOption("LIVE");
 
+  for (int i = 0; i < ECL_CRATES; i++) {
+    int crate = i + 1;
+    std::string h_name, h_title;
+    h_name = str(boost::format("time_crate_%1%_Thr1GeV") % (crate));
+    h_title = str(boost::format("Reconstructed time for ECL crate #%1% with Thr = 1 GeV") % (crate));
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8240, -1030, 1030);
+    h->GetXaxis()->SetTitle("time [ns]");
+    h->SetOption("LIVE");
+    h_time_crate_Thr1GeV.push_back(h);
+  }
+
   //2D histograms creation.
 
-  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Trig. Cell ID", 52, 1, 53, 11, -1, 10);
-  h_trigtag2_trigid->GetXaxis()->SetTitle("Trigger Cell ID");
+  h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Crate ID", 52, 1, 53, 11, -1, 10);
+  h_trigtag2_trigid->GetXaxis()->SetTitle("Crate ID");
   h_trigtag2_trigid->GetYaxis()->SetTitle("Trigger tag flag #2");
   h_trigtag2_trigid->SetOption("LIVE");
 
@@ -173,8 +184,8 @@ void ECLDQMModule::defineHisto()
   h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms error");
   h_pedrms_cellid->SetOption("LIVE");
 
-  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Trig. Cell ID", 52, 1, 53, 145, 0, 145);
-  h_trigtime_trigid->GetXaxis()->SetTitle("Trigger Cell ID");
+  h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Crate ID", 52, 1, 53, 145, 0, 145);
+  h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID");
   h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time");
   h_trigtime_trigid->SetOption("LIVE");
 
@@ -186,18 +197,16 @@ void ECLDQMModule::defineHisto()
 void ECLDQMModule::initialize()
 {
   REG_HISTOGRAM;   // required to register histograms to HistoManager.
-
   m_ECLDigits.isRequired();
-
   m_ECLCalDigits.isOptional();
-
   m_ECLTrigs.isOptional();
-
   m_ECLDsps.isOptional();
+  if (!mapper.initFromDB()) B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
 }
 
 void ECLDQMModule::beginRun()
 {
+  for (int i = 0; i < ECL_CRATES; i++) h_time_crate_Thr1GeV[i]->Reset();
   h_cid->Reset();
   h_cid_Thr5MeV->Reset();
   h_cid_Thr10MeV->Reset();
@@ -280,6 +289,9 @@ void ECLDQMModule::event()
           && cid < ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrel_Thr50MeV->Fill(timing);
       else h_time_endcaps_Thr50MeV->Fill(timing); //Time histogram filling.
     }
+
+    if (energy > 1.000) h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+
     ecletot += energy;
   }
 
@@ -303,8 +315,8 @@ void ECLDQMModule::event()
   if (m_ECLDsps.getEntries() == ECL_TOTAL_CHANNELS) h_adc_flag->Fill(1); //ADC flag histogram filling.
   if (m_ECLDsps.getEntries() > 0 && m_ECLDsps.getEntries() < ECL_TOTAL_CHANNELS) h_adc_flag->Fill(2); //ADC flag histogram filling.
   for (int i = 0; i < 3; i++) adc_flag_bin[i] = h_adc_flag->GetBinContent(i + 1);
-  string adc_flag_title = str(format("Flag of ADC samples (%1%, %2%)") % (adc_flag_bin[1] / adc_flag_bin[0]) %
-                              (adc_flag_bin[2] / adc_flag_bin[0]));
+  std::string adc_flag_title = str(boost::format("Flag of ADC samples (%1%, %2%)") % (adc_flag_bin[1] / adc_flag_bin[0]) %
+                                   (adc_flag_bin[2] / adc_flag_bin[0]));
   h_adc_flag->SetTitle(adc_flag_title.c_str());
   if (m_ECLDsps.getEntries() > 0 && m_ECLDsps.getEntries() < ECL_TOTAL_CHANNELS && m_ECLDigits.getEntries() > 0)
     h_adc_hits->Fill((double)m_ECLDsps.getEntries() / (double)m_ECLDigits.getEntries()); //ADC hits histogram filling.

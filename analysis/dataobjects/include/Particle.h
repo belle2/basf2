@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
@@ -25,7 +25,6 @@ class TClonesArray;
 namespace Belle2 {
 
   // forward declarations
-  class ECLCluster;
   class KLMCluster;
   class Track;
   class TrackFitResult;
@@ -589,22 +588,33 @@ namespace Belle2 {
     const PIDLikelihood* getPIDLikelihood() const;
 
     /**
-     * Returns the pointer to the ECLCluster object that was used to create this Particle (ParticleType == c_ECLCluster).
-     * NULL pointer is returned, if the Particle was not made from ECLCluster.
+     * Returns the pointer to the ECLCluster object that was used to create this Particle (if ParticleType == c_ECLCluster).
+     * Returns the pointer to the most energetic ECLCluster matched to the track (if ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle has no relation to an ECLCluster (either the particle is a different type or there was no track match).
      * @return const pointer to the ECLCluster
      */
     const ECLCluster* getECLCluster() const;
 
     /**
+     * Returns the energy of the ECLCluster for the particle.
+     * The return value depends on the ECLCluster hypothesis.
+     * @return energy of the ECLCluster
+     */
+    double getECLClusterEnergy() const;
+
+    /**
      * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
-     * NULL pointer is returned, if the Particle was not made from KLMCluster.
+     * Returns the pointer to the largest KLMCluster object associated to this Particle if ParticleType == c_Track.
+     * NULL pointer is returned, if the Particle has no relation to the KLMCluster.
      * @return const pointer to the KLMCluster
      */
     const KLMCluster* getKLMCluster() const;
 
     /**
      * Returns the pointer to the MCParticle object that was used to create this Particle (ParticleType == c_MCParticle).
-     * NULL pointer is returned, if the Particle was not made from MCParticle.
+     * Returns the best MC match for this particle (if ParticleType == c_Track or c_ECLCluster or c_KLMCluster)
+     * NULL pointer is returned, if the Particle was not made from MCParticle or not matched.
+     *
      * @return const pointer to the MCParticle
      */
     const MCParticle* getMCParticle() const;
@@ -619,6 +629,9 @@ namespace Belle2 {
      * Prints the contents of a Particle object to standard output.
      */
     void print() const;
+
+    /** get a list of the extra info names */
+    std::vector<std::string> getExtraInfoNames() const;
 
     /**
      * Remove all stored extra info fields
@@ -645,6 +658,11 @@ namespace Belle2 {
     {
       return m_extraInfo.size();
     }
+
+    /**
+     * Sets the user defined extraInfo. Adds it if necessary, overwrites existing ones if they share the same name.
+     * */
+    void writeExtraInfo(const std::string& name, const float value);
 
     /** Sets the user-defined data of given name to the given value.
      *
@@ -687,6 +705,27 @@ namespace Belle2 {
     bool wasExactFitHypothesisUsed() const
     {
       return std::abs(m_pdgCodeUsedForFit) == std::abs(m_pdgCode);
+    }
+
+    /**
+    * Returns the ECLCluster EHypothesisBit for this Particle.
+    */
+    ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const
+    {
+      const int pdg = abs(getPDGCode());
+      if ((pdg == Const::photon.getPDGCode())
+          or (pdg == Const::electron.getPDGCode())
+          or (pdg == Const::muon.getPDGCode())
+          or (pdg == Const::pion.getPDGCode())
+          or (pdg == Const::kaon.getPDGCode())
+          or (pdg == Const::proton.getPDGCode())
+          or (pdg == Const::deuteron.getPDGCode())) {
+        return ECLCluster::EHypothesisBit::c_nPhotons;
+      } else if (pdg == Const::Klong.getPDGCode()) {
+        return ECLCluster::EHypothesisBit::c_neutralHadron;
+      } else {
+        return ECLCluster::EHypothesisBit::c_none;
+      }
     }
 
   private:
@@ -788,5 +827,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

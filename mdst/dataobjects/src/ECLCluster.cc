@@ -10,11 +10,34 @@
 
 /* External headers. */
 #include <TMatrixD.h>
+#include <bitset>
 
 /* Belle2 headers. */
 #include <mdst/dataobjects/ECLCluster.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
+
+double ECLCluster::getEnergy(const ECLCluster::EHypothesisBit& hypothesis) const
+{
+  // check if cluster has the requested hypothesis
+  if (!hasHypothesis(hypothesis)) {
+    B2ERROR("This cluster does not support the requested hypothesis,"
+            << LogVar(" it has the nPhotons hypothesis (y/n = 1/0): ", hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+            << LogVar(" and it has the neutralHadron hypothesis (y/n = 1/0): ", hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+            << LogVar(" You requested the hypothesis bitmask: ", std::bitset<16>(static_cast<unsigned short>(hypothesis)).to_string()));
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+  // return the sensible answers
+  if (hypothesis == ECLCluster::EHypothesisBit::c_nPhotons) return exp(m_logEnergy);
+  else if (hypothesis == ECLCluster::EHypothesisBit::c_neutralHadron) return exp(m_logEnergyRaw);
+  else {
+    // throw error if the cluster is not supported
+    B2ERROR("EHypothesisBit is not supported yet: " << static_cast<unsigned short>(hypothesis));
+    return std::numeric_limits<double>::quiet_NaN();
+  };
+}
 
 TVector3 ECLCluster::getClusterPosition() const
 {
@@ -41,16 +64,6 @@ TMatrixDSym ECLCluster::getCovarianceMatrix3x3() const
   return covmatecl;
 }
 
-void ECLCluster::getCovarianceMatrixAsArray(double covArray[6]) const
-{
-  covArray[0] = m_sqrtcovmat_00 * m_sqrtcovmat_00;
-  covArray[1] = m_covmat_10;
-  covArray[2] = m_sqrtcovmat_11 * m_sqrtcovmat_11;
-  covArray[3] = m_covmat_20;
-  covArray[4] = m_covmat_21;
-  covArray[5] = m_sqrtcovmat_22 * m_sqrtcovmat_22;
-}
-
 
 int ECLCluster::getDetectorRegion() const
 {
@@ -69,7 +82,10 @@ int ECLCluster::getUniqueId() const
 {
   const int crid     = getConnectedRegionId();
   const int showerid = getClusterId();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const int hypoid   = getHypothesisId();
+#pragma GCC diagnostic pop
 
   return 100000 * crid + 1000 * hypoid + showerid;
 }

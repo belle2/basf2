@@ -70,7 +70,7 @@ double ParticleWeightingKeyMap::addKey(NDBin bin)
 }
 
 
-double ParticleWeightingKeyMap::getKey(std::map<std::string, double> values)
+double ParticleWeightingKeyMap::getKey(std::map<std::string, double> values) const
 {
   if (values.size() != m_axes.size()) {
     B2FATAL("Inconsistent dimensionality of requested value map");
@@ -95,7 +95,7 @@ double ParticleWeightingKeyMap::getKey(std::map<std::string, double> values)
 }
 
 
-std::vector<std::string> ParticleWeightingKeyMap::getNames()
+std::vector<std::string> ParticleWeightingKeyMap::getNames() const
 {
   std::vector<std::string> names;
   for (auto i_axis : m_axes) {
@@ -105,7 +105,7 @@ std::vector<std::string> ParticleWeightingKeyMap::getNames()
 }
 
 
-void ParticleWeightingKeyMap::printKeyMap()
+void ParticleWeightingKeyMap::printKeyMap() const
 {
   std::string axes_names = "";
   for (auto i_axis : m_axes) {

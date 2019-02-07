@@ -43,8 +43,9 @@ namespace Belle2 {
       c_ModuleT0Calibrated =  4,
       c_CommonT0Calibrated =  8,
       c_FullyCalibrated = c_TimeBaseCalibrated | c_ChannelT0Calibrated | c_ModuleT0Calibrated | c_CommonT0Calibrated,
-      c_OffsetSubtracted = 16,
+      c_OffsetSubtracted = 16,       // offset used in MC
       c_EventT0Subtracted = 32,
+      c_BunchOffsetSubtracted = 64,  // reconstructed average bunch offset
     };
 
     /**
@@ -85,6 +86,18 @@ namespace Belle2 {
      * @param time pile-up time in [ns]
      */
     static void setPileupTime(double time) {s_pileupTime = time;}
+
+    /**
+     * Sets module ID
+     * @param moduleID  module ID (1-based)
+     */
+    void setModuleID(int moduleID) {m_moduleID = moduleID;}
+
+    /**
+     * Sets pixel ID
+     * @param pixelID   pixel ID (1-based)
+     */
+    void setPixelID(int pixelID) {m_pixelID = pixelID;}
 
     /**
      * Sets hardware channel number (0-based)
@@ -181,6 +194,12 @@ namespace Belle2 {
      * @return hit quality
      */
     EHitQuality getHitQuality() const {return m_quality; }
+
+    /**
+     * Returns calibration status bits
+     * @return status bits
+     */
+    unsigned short getStatus() const {return m_status;}
 
     /**
      * Returns calibration status
@@ -382,7 +401,7 @@ namespace Belle2 {
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
      * @return unique channel ID, composed of pixel ID (1-512) and module ID (1-16)
      */
-    unsigned int getUniqueChannelID() const {return m_pixelID + (m_moduleID << 16);}
+    unsigned int getUniqueChannelID() const override {return m_pixelID + (m_moduleID << 16);}
 
     /**
      * Implementation of the base class function.
@@ -390,7 +409,7 @@ namespace Belle2 {
      * @param bg BG digit
      * @return append status
      */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override;
 
 
   private:
@@ -411,7 +430,7 @@ namespace Belle2 {
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 15); /**< ClassDef */
+    ClassDefOverride(TOPDigit, 15); /**< ClassDef */
 
   };
 

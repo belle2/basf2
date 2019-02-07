@@ -40,6 +40,9 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDUnpackerModule();
 
+      static PXDError::PXDErrorFlags getSilenceMask(void) { return PXDError::c_ALL_ERROR;};
+      static PXDError::PXDErrorFlags getVerboseMask(void) { return PXDError::c_NO_ERROR;};
+
     private:
 
       /** Initialize the module */
@@ -56,45 +59,47 @@ namespace Belle2 {
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
-      /**  Swap the endianess of the ONSEN header yes/no */
-      bool m_headerEndianSwap;
-      /**  ignore missing DATCON */
-      bool m_ignoreDATCON;
-      /**  ignore some not set Meta Flags */
-      bool m_ignoreMetaFlags;
       /** Only unpack, but Do Not Store anything to file */
-      bool m_doNotStore;
+      bool m_doNotStore{false};
       /** Check for susp. Padding/CRC, default off because of many false positive */
-      bool m_checkPaddingCRC;
-      /** Ignore Phase2 FW erro */
-      bool m_ignoreDHPMask;
-      /** Ignore Phase2 FW error */
-      bool m_ignoreDHELength;
+      bool m_checkPaddingCRC{false};
       /** Force Mapping even if DHH bit is not requesting it */
-      bool m_forceMapping;
+      bool m_forceMapping{false};
       /** Force No Mapping even if DHH bit is requesting it */
-      bool m_forceNoMapping;
+      bool m_forceNoMapping{false};
       /** Maximum DHP frame difference until error is reported */
-      unsigned int m_maxDHPFrameDiff;
+      unsigned int m_maxDHPFrameDiff{0};
 
       /** Critical error mask which defines return value of task */
-      uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      uint64_t m_criticalErrorMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      /** Mask for suppressing selected error messages */
+      uint64_t m_suppressErrorMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      /** Mask for error which stop package unpacking directly */
+      uint64_t m_errorSkipPacketMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
 
       /** Event Number from MetaInfo */
-      unsigned long m_meta_event_nr;
+      unsigned long m_meta_event_nr{0};
       /** Run Number from MetaInfo */
-      unsigned long m_meta_run_nr;
+      unsigned long m_meta_run_nr{0};
       /** Subrun Number from MetaInfo */
-      unsigned long m_meta_subrun_nr;
+      unsigned long m_meta_subrun_nr{0};
       /** Experiment from MetaInfo */
-      unsigned long m_meta_experiment;
+      unsigned long m_meta_experiment{0};
       /** Time(Tag) from MetaInfo */
-      unsigned long long int m_meta_time;
+      unsigned long long int m_meta_time{0};
+      /** Time(Tag) from MetaInfo, seconds (masked to lower bits) */
+      unsigned int m_meta_sec{0};
+      /** Time(Tag) from MetaInfo, Ticks of 127MHz */
+      unsigned int m_meta_ticks{0};
 
       /** Event counter */
-      unsigned int m_unpackedEventsCount;
+      unsigned int m_unpackedEventsCount{0};
       /** Error counters */
-      unsigned int m_errorCounter[PXDError::ONSEN_MAX_TYPE_ERR];
+      unsigned int m_errorCounter[PXDError::ONSEN_MAX_TYPE_ERR] {};
+      /** give verbose unpacking information */
+      bool m_verbose{false};
+      /** flag continue unpacking of frames even after error (for debugging) */
+      bool m_continueOnError{false};
 
       /** Input array for PXD Raw. */
       StoreArray<RawPXD> m_storeRawPXD;
@@ -157,17 +162,15 @@ namespace Belle2 {
       void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
       /** Error Mask set per packet / frame*/
-      PXDError::PXDErrorFlags m_errorMask;
+      PXDError::PXDErrorFlags m_errorMask{0};
       /** Error Mask set per packet / DHE */
-      PXDError::PXDErrorFlags m_errorMaskDHE;
+      PXDError::PXDErrorFlags m_errorMaskDHE{0};
       /** Error Mask set per packet / DHC */
-      PXDError::PXDErrorFlags m_errorMaskDHC;
+      PXDError::PXDErrorFlags m_errorMaskDHC{0};
       /** Error Mask set per packet / packet */
-      PXDError::PXDErrorFlags m_errorMaskPacket;
+      PXDError::PXDErrorFlags m_errorMaskPacket{0};
       /** Error Mask set per packet / event */
-      PXDError::PXDErrorFlags m_errorMaskEvent;
-      /** give verbose unpacking information -> TODO will be a parameter in next release */
-      bool verbose = true;
+      PXDError::PXDErrorFlags m_errorMaskEvent{0};
 
       /** counter for not accepted events... should not happen TODO discussion ongoing with DAQ group */
       unsigned int m_notaccepted{0};
@@ -175,12 +178,11 @@ namespace Belle2 {
       unsigned int m_sendrois{0};
       /** counter for send unfiltered */
       unsigned int m_sendunfiltered{0};
-      /** flag send unfiltered */
-      bool m_event_unfiltered{false};
       /** flag ONSEN or BonnDAQ format */
       bool m_formatBonnDAQ{false};
 
-      int last_dhp_readout_frame_lo[4];// signed because -1 means undefined
+      /** some workaround check for continouous frame ids */
+      int m_last_dhp_readout_frame_lo[4] { -1}; // signed because -1 means undefined
 
     public:
       /** helper function to "count" nr of set bits within lower 5 bits.

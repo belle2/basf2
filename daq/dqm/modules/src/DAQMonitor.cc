@@ -41,20 +41,24 @@ DAQMonitorModule::~DAQMonitorModule()
 
 void DAQMonitorModule::defineHisto()
 {
+  TDirectory* oldDir = gDirectory;
+  oldDir->mkdir("DAQ")->cd();
+
   h_nevt = new TH1F("Nevent", "Number of Events", 10, 0.0, 10.0);
 
-  h_size = new TH1F("Total Data Size", "Total Data Size", 100, 0.0, 300000.0);
-  h_hltsize = new TH1F("HLT Data Size", "HLT Data Size", 100, 0.0, 300000.0);
+  h_size = new TH1F("TotalDataSize", "Total Data Size", 100, 0.0, 300000.0);
+  h_hltsize = new TH1F("HLTDataSize", "HLT Data Size", 100, 0.0, 300000.0);
 
-  h_pxdsize = new TH1F("PXD Data Size", "PXD Data Size", 100, 0.0, 100000.0);
-  h_svdsize = new TH1F("SVD Data Size", "SVD Data Size", 100, 0.0, 100000.0);
-  h_cdcsize = new TH1F("CDC Data Size", "CDC Data Size", 100, 0.0, 100000.0);
-  h_topsize = new TH1F("TOP Data Size", "TOP Data Size", 100, 0.0, 100000.0);
-  h_arichsize = new TH1F("ARICH Data Size", "ARICH Data Size", 100, 0.0, 100000.0);
-  h_eclsize = new TH1F("ECL Data Size", "ECL Data Size", 100, 0.0, 100000.0);
-  h_klmsize = new TH1F("KLM Data Size", "KLM Data Size", 100, 0.0, 100000.0);
-  h_trgsize = new TH1F("TRG Data Size", "TRG Data Size", 100, 0.0, 200000.0);
+  h_pxdsize = new TH1F("PXDDataSize", "PXD Data Size", 100, 0.0, 100000.0);
+  h_svdsize = new TH1F("SVDDataSize", "SVD Data Size", 100, 0.0, 100000.0);
+  h_cdcsize = new TH1F("CDCDataSize", "CDC Data Size", 100, 0.0, 100000.0);
+  h_topsize = new TH1F("TOPDataSize", "TOP Data Size", 100, 0.0, 100000.0);
+  h_arichsize = new TH1F("ARICHDataSize", "ARICH Data Size", 100, 0.0, 100000.0);
+  h_eclsize = new TH1F("ECLDataSize", "ECL Data Size", 100, 0.0, 100000.0);
+  h_klmsize = new TH1F("KLMDataSize", "KLM Data Size", 100, 0.0, 100000.0);
+  h_trgsize = new TH1F("TRGDataSize", "TRG Data Size", 100, 0.0, 200000.0);
 
+  oldDir->cd();
 }
 
 

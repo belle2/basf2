@@ -21,6 +21,7 @@ namespace TreeFitter {
       m_dim(dim),
       m_chiSquare(1e10),
       m_nConstraints(0),
+      m_dimensionReduction(0),
       m_nConstraintsVec(dim, 0)
   {
     resetStateVector();
@@ -44,16 +45,24 @@ namespace TreeFitter {
 
   bool FitParams::testCovariance() const
   {
-    bool okay = true;
-    for (int row = 0; row < m_dim && okay; ++row) {
-      okay = (m_globalCovariance(row, row) > 0);
+    bool ok = true;
+    for (int row = 0; row < m_dim; ++row) {
+      ok = (m_globalCovariance(row, row) > 0);
+      if (!ok) break;
     }
-    return okay;
+    return ok;
   }
 
   double FitParams::chiSquare() const
   {
     return m_chiSquare;
+  }
+
+  int FitParams::nDof() const
+  {
+    const double ndf = nConstraints() - dim();
+    if (ndf < 1) { B2FATAL("Not enough constraints for this fit, cannot guarantee convergence. Add a mass or beam constraint. N constraints (equations) = " << nConstraints() << "; N free parameters = " << dim()); }
+    return ndf;
   }
 
 } //TreeFitter namespace

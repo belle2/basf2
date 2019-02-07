@@ -24,6 +24,11 @@ namespace Belle2 {
    * node to the ONSEN system, containing the trigger decision and the Region od Interest (ROI)
    * for data selection on the PXD modules
    * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+   *
+   * Warning: The class does not allow to be updated in data store! (BII-3191)
+   * -> a module might corrupt entries in the data store if a previous ROIpayload is already in the DataStore
+   * A complete rewrite of gthe class might be needed for that. For now, you have to check that there
+   * is no object in data store before, and raise a FATAL if so.
    */
 
   class ROIpayload : public TObject {
@@ -42,7 +47,7 @@ namespace Belle2 {
      */
     virtual ~ROIpayload() { delete[] m_rootdata; };
 
-    int m_packetLengthByte; /**< packet length  in byte*/
+    int m_packetLengthByte = 0; /**< packet length  in byte*/
     int m_length; /**< packet length*/
     int*  m_rootdata; //[m_length] /**< */
 
@@ -139,6 +144,6 @@ namespace Belle2 {
 
   private:
     //! Needed to make the ROOT object storable
-    ClassDef(ROIpayload, 1)
+    ClassDef(ROIpayload, 2)
   };
 }

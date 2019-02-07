@@ -18,6 +18,11 @@
 
 namespace Belle2 {
 
+  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
+  typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+  using Belle2::PXD::PXDError::EPXDErrMask;
+
   /**
    * The PXD DAQ DHE Status class
    *
@@ -25,11 +30,6 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHE) is useable.
    *
    */
-
-  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
-  typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
-  using Belle2::PXD::PXDError::PXDErrorFlags;
-
   class PXDDAQDHEStatus {
   public:
 
@@ -53,6 +53,10 @@ namespace Belle2 {
      * @return conclusion if data is useable
      */
     bool isUsable() const { return m_usable; }
+
+    /** Mark Data in DHE as Unusable
+     */
+    void markUnusable() { m_usable = false; m_errorMask |= EPXDErrMask::c_UNUSABLE_DATA;}
 
     /** Set Error bit mask
      * @param m Bit Mask to set
@@ -79,7 +83,7 @@ namespace Belle2 {
      * the PXD data from this DHE is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0ull && (m_errorMask & EPXDErrMask::c_UNUSABLE_DATA) == 0ull;}
 
     /** Set VxdID and DHE ID of sensor */
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
@@ -122,12 +126,13 @@ namespace Belle2 {
       return m_pxdDHP.back();
     }
 
-    /** iterator-based iteration for DHEs */
+    /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator begin()  { return m_pxdDHP.begin(); };
-    /** iterator-based iteration for DHEs */
+    /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator end()  { return m_pxdDHP.end(); };
-
+    /** Returns PXDDAQDHPStatus for the last DHP */
     PXDDAQDHPStatus& dhp_back()  { return m_pxdDHP.back(); };
+    /** Returns number of DHPs */
     size_t dhp_size() const { return m_pxdDHP.size(); };
 
     /** Add Common Mode information
@@ -139,8 +144,9 @@ namespace Belle2 {
     std::vector<PXDDAQDHPComMode>::iterator cm_begin()  { return m_commode.begin(); };
     /** iterator-based iteration for Common Mode */
     std::vector<PXDDAQDHPComMode>::iterator cm_end()  { return m_commode.end(); };
-
+    /** Returns last Common Mode for this event */
     PXDDAQDHPComMode& cm_back()  { return m_commode.back(); };
+    /** Returns number of Common Mode blocks in this event */
     size_t cm_size() const { return m_commode.size(); };
 
   private:

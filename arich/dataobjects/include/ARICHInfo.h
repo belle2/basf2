@@ -33,7 +33,7 @@ namespace Belle2 {
     /*!
       \param trgtype obtained from B2L data
     */
-    ARICHInfo(int trgtype)
+    explicit ARICHInfo(int trgtype)
     {
       m_trgtype = trgtype;
     }
@@ -64,10 +64,10 @@ namespace Belle2 {
 
   private:
 
-    int m_trgtype;            /**< trigger type */
-    int m_n_track;            /**< number of tracks of this event */
-    int m_n_exthit;            /**< number of eligible ExtHits of this event */
-    int m_n_hit;            /**< number of ARICHHits of this event */
+    int m_trgtype = 0;            /**< trigger type */
+    int m_n_track = 0;            /**< number of tracks of this event */
+    int m_n_exthit = 0;            /**< number of eligible ExtHits of this event */
+    int m_n_hit = 0;            /**< number of ARICHHits of this event */
 
 
     ClassDef(ARICHInfo, 1); /**< the class title */

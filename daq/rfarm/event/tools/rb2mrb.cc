@@ -16,7 +16,7 @@
 #include "framework/pcore/RingBuffer.h"
 #include "framework/pcore/EvtMessage.h"
 
-#define RBUFSIZE 100000000
+#define RBUFSIZE 10000000
 #define MAXEVTSIZE  400000000
 
 using namespace Belle2;
@@ -29,15 +29,18 @@ int main(int argc, char** argv)
     exit(-1);
   }
 
-  //  RingBuffer* rbufin = new RingBuffer(argv[1], RBUFSIZE);
-  RingBuffer* rbufin = new RingBuffer(argv[1]);
+  printf("rb2mrb : allocating %s with size=%d (KBytes)\n", argv[1], RBUFSIZE * 4 / 1000);
+  RingBuffer* rbufin = new RingBuffer(argv[1], RBUFSIZE);
+  //  RingBuffer* rbufin = new RingBuffer(argv[1]);
   //  RingBuffer* rbufout = new RingBuffer(argv[2], RBUFSIZE);
 
   int nout = argc - 2;
 
   vector<RingBuffer*> rbufout;
   for (int i = 0; i < nout; i++) {
-    rbufout.push_back(new RingBuffer(argv[i + 2]));
+    //    rbufout.push_back(new RingBuffer(argv[i + 2]));
+    printf("rb2mrb : allocating %s with size=%d (KBytes)\n", argv[i + 2], RBUFSIZE * 4 / 1000);
+    rbufout.push_back(new RingBuffer(argv[i + 2], RBUFSIZE));
   }
 
   char* evbuf = new char[MAXEVTSIZE];

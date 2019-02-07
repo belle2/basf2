@@ -99,6 +99,9 @@ namespace Belle2 {
       //! Copy constructor
       Module(const Module& m);
 
+      //! Assignment operator: utilizes copy constructor
+      Module& operator=(const Module& m);
+
       //! Destructor
       ~Module();
 

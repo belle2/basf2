@@ -12,6 +12,9 @@
 
 #include <TTree.h>
 #include "arich/dataobjects/ARICHPhoton.h"
+#include "arich/dataobjects/ARICHInfo.h"
+
+//#define ALIGNMENT_USING_BHABHA
 
 namespace Belle2 {
   namespace ARICH {
@@ -79,10 +82,17 @@ namespace Belle2 {
     struct ARICHTree {
       Int_t evt; /**< event number */
       Int_t run; /**< run number */
+      Int_t exp; /**< exp number */
 
+      Short_t charge;    /**< charge */
       Float_t pValue; /**< p-value of Track fit */
       Float_t z0;     /**< track z0 */
       Float_t d0;     /**< track d0 */
+#ifdef ALIGNMENT_USING_BHABHA
+      Float_t eop;    /**< E/p for bhabha */
+      Float_t e9e21;    /**< E9/E21 for bhabha */
+      Float_t etot;    /**< total energy of ECL clusters */
+#endif
 
       Int_t PDG;       /**< PDG code of related MCParticle */
       Int_t motherPDG; /**< PDG code of related mother MCParticle */
@@ -102,17 +112,23 @@ namespace Belle2 {
       ParticlesArray expPhot;      /**< number of expected photons (signal + bkg) */
       ParticlesArray logL;   /**< log likelihoods */
 
+
       TrackHit recHit;  /**< extrapolated Track hit */
       TrackHit mcHit;  /**< related MC particle hit */
       Int_t nRec; /**< number of reconstructed photons */
       std::vector<Belle2::ARICHPhoton>  photons; /** vector of reconstructed photons */
       Float_t winHit[2];                         /** track hit on hapd window (x,y coordinates) */
+      Int_t trgtype; /**< event trigger type */
+
 
 
       /**
        * Default constructor
        */
-      ARICHTree(): evt(0), run(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
+      ARICHTree(): evt(0), run(0), exp(0), charge(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
+#ifdef ALIGNMENT_USING_BHABHA
+        eop(0), e9e21(0), etot(0),
+#endif
         status(0), primary(0), seen(0), rhoProd(0), zProd(0), phiProd(0), rhoDec(0), zDec(0),
         phiDec(0), scatter(0), nRec(0)
       {
@@ -126,10 +142,19 @@ namespace Belle2 {
       {
         evt = 0;
         run = 0;
+        exp = 0;
+        trgtype = 0;
 
         pValue = 0;
         z0 = 0;
         d0 = 0;
+        charge = 0;
+
+#ifdef ALIGNMENT_USING_BHABHA
+        eop = 0;
+        e9e21 = 0;
+        etot = 0;
+#endif
 
         PDG = 0;
         motherPDG = 0;

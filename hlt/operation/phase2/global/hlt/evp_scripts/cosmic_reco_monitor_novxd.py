@@ -14,7 +14,7 @@ reco_components.remove("SVD")
 # no reconstruction or software trigger added at all
 add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode="monitoring",
                    reco_components=reco_components,
-                   data_taking_period="phase2", make_crashsafe=False)
+                   data_taking_period="phase2")
 
 finalize_hlt_path(path, args)
 basf2.print_path(path)

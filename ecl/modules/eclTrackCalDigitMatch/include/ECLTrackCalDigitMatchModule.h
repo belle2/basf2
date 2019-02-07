@@ -33,10 +33,10 @@ namespace Belle2 {
     ECLTrackCalDigitMatchModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** event */
-    virtual void event();
+    virtual void event() override;
 
   private:
 
@@ -57,7 +57,7 @@ namespace Belle2 {
     std::map <int , std::vector<int> > m_BWD3Barrel; /**< map between phi id and BWD3 cell ids on the barrel side */
     std::map <int , std::vector<int> > m_BWD3Endcap; /**< map between phi id and BWD3 cell ids on the endcap side */
 
-    ECL::ECLGeometryPar* geom; /**<ECL geometry */
+    ECL::ECLGeometryPar* geom{nullptr}; /**<ECL geometry */
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits  */
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */

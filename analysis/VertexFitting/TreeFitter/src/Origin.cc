@@ -19,8 +19,8 @@ namespace TreeFitter {
 
   Origin::Origin(Belle2::Particle* daughter,
                  bool forceFitAll,
-                 const std::vector<double> customOriginVertex,
-                 const std::vector<double> customOriginCovariance,
+                 const std::vector<double>& customOriginVertex,
+                 const std::vector<double>& customOriginCovariance,
                  const bool isBeamSpot
                 ) :
     ParticleBase("Origin"),
@@ -35,16 +35,16 @@ namespace TreeFitter {
     initOrigin();
   }
 
-  ErrCode Origin::initParticleWithMother([[gnu::unused]] FitParams* fitparams)
+  ErrCode Origin::initParticleWithMother([[gnu::unused]] FitParams& fitparams)
   {
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode Origin::initMotherlessParticle(FitParams* fitparams)
+  ErrCode Origin::initMotherlessParticle(FitParams& fitparams)
   {
     ErrCode status;
     const int posindex = posIndex();
-    fitparams->getStateVector().segment(posindex, m_constraintDimension) = m_posVec.segment(0, 3);
+    fitparams.getStateVector().segment(posindex, m_constraintDimension) = m_posVec.segment(0, 3);
 
     for (auto daughter : m_daughters) {
       status |= daughter->initMotherlessParticle(fitparams);
@@ -75,8 +75,8 @@ namespace TreeFitter {
       if (!(m_customOriginVertex.size() == 3) || !(m_customOriginCovariance.size() == 9)) {
         B2FATAL("Incorrect dimension of customOriginVertex or customOriginCovariance. customOriginVertex dim = "
                 << m_customOriginVertex.size() << " customOriginCovariance dim = " << m_customOriginCovariance.size());
-      } else if (std::any_of(m_customOriginCovariance.begin(), m_customOriginCovariance.end(), [](double element) {return element < 0;})) {
-        B2WARNING("An element of customOriginCovariance is smaller than 0.");
+      } else if ((m_customOriginCovariance.at(0) < 0) || (m_customOriginCovariance.at(4) < 0) || (m_customOriginCovariance.at(8) < 0)) {
+        B2WARNING("An element of customOriginCovariance diagonal is smaller than 0.");
         return ErrCode(ErrCode::Status::badsetup);
       }
 
@@ -99,12 +99,12 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode Origin::initCovariance(FitParams* fitpar) const
+  ErrCode Origin::initCovariance(FitParams& fitpar) const
   {
     ErrCode status;
     const int posindex = posIndex();
     for (int row = 0; row < m_constraintDimension; ++row) {
-      fitpar->getCovariance()(posindex + row, posindex + row) = 1000 * m_covariance(row, row);
+      fitpar.getCovariance()(posindex + row, posindex + row) = 1000 * m_covariance(row, row);
     }
     for (auto daughter : m_daughters) {
       status |= daughter->initCovariance(fitpar);

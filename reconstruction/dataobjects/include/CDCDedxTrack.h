@@ -40,7 +40,7 @@ namespace Belle2 {
       m_scale(0), m_cosCor(0), m_runGain(0),
       m_lNHitsUsed(0)
     {
-      m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedErr = 0.0;
+      m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedNoSat = m_dedxAvgTruncatedErr = 0.0;
 
       // set default values for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
@@ -64,10 +64,12 @@ namespace Belle2 {
     }
 
     /** Add a single hit to the object */
-    void addHit(int lwire, int wire, int layer, double doca, double enta, int adcCount, double dE, double path, double dedx,
+    void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS, int adcCount, double dE,
+                double path, double dedx,
                 double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
                 double onedcor)
     {
+
       m_hLWire.push_back(lwire);
       m_hWire.push_back(wire);
       m_hLayer.push_back(layer);
@@ -75,15 +77,15 @@ namespace Belle2 {
       m_hDedx.push_back(dedx);
       m_hADCCount.push_back(adcCount);
       m_hDoca.push_back(doca);
+      m_hDocaRS.push_back(docaRS);
       m_hEnta.push_back(enta);
+      m_hEntaRS.push_back(entaRS);
       m_hDriftT.push_back(driftT);
-
       m_hdE.push_back(dE);
       m_hCellHeight.push_back(cellHeight);
       m_hCellHalfWidth.push_back(cellHalfWidth);
       m_hDriftD.push_back(driftD);
       m_hDriftDRes.push_back(driftDRes);
-
       m_hWireGain.push_back(wiregain);
       m_hTwodCor.push_back(twodcor);
       m_hOnedCor.push_back(onedcor);
@@ -97,6 +99,8 @@ namespace Belle2 {
 
     /** Get dE/dx truncated mean for this track */
     double getDedx() const { return m_dedxAvgTruncated; }
+    /** Get dE/dx truncated mean without the saturation correction for this track */
+    double getDedxNoSat() const { return m_dedxAvgTruncatedNoSat; }
     /** Get the error on the dE/dx truncated mean for this track */
     double getDedxError() const { return m_dedxAvgTruncatedErr; }
     /** Get the dE/dx mean for this track */
@@ -124,6 +128,8 @@ namespace Belle2 {
 
     /** Set the dE/dx truncated average for this track */
     void setDedx(double mean) { m_dedxAvgTruncated = mean; }
+    /** Set the dE/dx truncated average without the saturation correction for this track */
+    void setDedxNoSat(double mean) { m_dedxAvgTruncatedNoSat = mean; }
     /** Set the error on the dE/dx truncated mean for this track */
     void setDedxError(double error) { m_dedxAvgTruncatedErr = error; }
     /** Set the dE/dx mean for this track */
@@ -177,6 +183,12 @@ namespace Belle2 {
     double getDoca(int i) const { return m_hDoca[i]; }
     /** Return the entrance angle in the CDC cell for this hit */
     double getEnta(int i) const { return m_hEnta[i]; }
+
+    /** Return rescaled doca value for cell height=width assumption */
+    double getDocaRS(int i) const { return m_hDocaRS[i]; }
+    /** Return rescaled enta value for cell height=width assumption */
+    double getEntaRS(int i) const { return m_hEntaRS[i]; }
+
     /** Return the drift time for this hit */
     int getDriftT(int i) const { return m_hDriftT[i]; }
 
@@ -237,6 +249,7 @@ namespace Belle2 {
     // track level dE/dx measurements
     double m_dedxAvg;             /**< dE/dx mean value per track */
     double m_dedxAvgTruncated;    /**< dE/dx truncated mean per track */
+    double m_dedxAvgTruncatedNoSat;    /**< dE/dx truncated mean per track without the saturation correction */
     double m_dedxAvgTruncatedErr; /**< standard deviation of m_dedxAvgTruncated */
     double m_cdcChi[Const::ChargedStable::c_SetSize];  /**< chi values for each particle type */
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
@@ -259,6 +272,8 @@ namespace Belle2 {
     std::vector<int> m_hADCCount; /**< adcCount per hit */
     std::vector<double> m_hDoca;  /**< distance of closest approach to sense wire */
     std::vector<double> m_hEnta;  /**< entrance angle in CDC cell */
+    std::vector<double> m_hDocaRS;/**< distance of closest approach to sense wire after rescalling cell L=W */
+    std::vector<double> m_hEntaRS;/**< entrance angle in CDC cell after rescalling cell L=W */
     std::vector<double> m_hdE;    /**< charge per hit */
     std::vector<int> m_hDriftT;       /**< drift time for each hit */
     std::vector<double> m_hDriftD;    /**< drift distance for each hit */
@@ -267,7 +282,7 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 11); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 13); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

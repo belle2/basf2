@@ -113,10 +113,10 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
     }
   }
 
-  delete[] clusterCount;
-  delete[] clusterSize;
-  delete[] initialPositionX;
-  delete[] initialPositionY;
+  delete clusterCount;
+  delete clusterSize;
+  delete initialPositionX;
+  delete initialPositionY;
 
 }
 

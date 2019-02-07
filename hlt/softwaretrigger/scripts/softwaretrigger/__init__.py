@@ -1,9 +1,10 @@
 import modularAnalysis
-import stdFSParticles
 import vertex
 import basf2
 
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "development"
+
+from tracking.path_utils import add_cdc_monopole_track_finding
 
 
 def add_fast_reco_software_trigger(path, store_array_debug_prescale=0):
@@ -88,12 +89,12 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
 
     # Lambda0->p pi-, Xi-->Lambda0 pi-
     modularAnalysis.reconstructDecay('Lambda0:calib -> pi-:calib p+:calib', '', path=path)
-    vertex.fitVertex('Lambda0:calib', 0.001, fitter='kfitter', path=path)
+    vertex.vertexKFit('Lambda0:calib', 0.001, path=path, silence_warning=True)
     modularAnalysis.rankByHighest('Lambda0:calib', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('Lambda0:calib', {'chiProb': 'Lambda0_chiProb'}, path=path)
 
     modularAnalysis.reconstructDecay('Xi-:calib -> Lambda0:calib pi-:calib', '', path=path)
-    vertex.fitVertex('Xi-:calib', 0.001, fitter='kfitter', path=path)
+    vertex.vertexKFit('Xi-:calib', 0.001, path=path, silence_warning=True)
     modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
     calib_particle_list.append('Xi-:calib')
@@ -104,7 +105,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("K-:dqm", 'kaonID > 0.5 and chiProb > 0.001', path=path)
     # D0->K- pi+
     modularAnalysis.reconstructDecay('D0:dqm -> K-:dqm pi+:dqm', '1.8 < M < 1.92', path=path)
-    vertex.vertexKFit('D0:dqm', 0.0, path=path)
+    vertex.vertexKFit('D0:dqm', 0.0, path=path, silence_warning=True)
     modularAnalysis.rankByHighest('D0:dqm', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('D0:dqm', {'M': 'dqm_D0_M'}, path=path)
     calib_particle_list.append('D0:dqm')
@@ -113,7 +114,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     # D*+->D0 pi-
     modularAnalysis.reconstructDecay('D*+:dqm -> D0:dqm pi+:dqm',
                                      '1.95 < M <2.05 and 0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=path)
-    vertex.vertexKFit('D*+:dqm', 0.0, path=path)
+    vertex.vertexKFit('D*+:dqm', 0.0, path=path, silence_warning=True)
     modularAnalysis.rankByHighest('D*+:dqm', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('D*+:dqm', {'M': 'dqm_Dstar_M'}, path=path)
     calib_particle_list.append('D*+:dqm')
@@ -121,7 +122,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
 
     # D+ -> K- pi+ pi+
     modularAnalysis.reconstructDecay('D+:dqm -> K-:dqm pi+:dqm pi+:dqm', '1.8 < M < 1.92', path=path)
-    vertex.vertexKFit('D+:dqm', 0.0, path=path)
+    vertex.vertexKFit('D+:dqm', 0.0, path=path, silence_warning=True)
     modularAnalysis.rankByHighest('D+:dqm', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('D+:dqm', {'M': 'dqm_Dplus_M'}, path=path)
     calib_particle_list.append('D+:dqm')
@@ -130,7 +131,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     # Jpsi-> ee
     modularAnalysis.fillParticleList('e+:good', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_ee -> e+:good e-:good', '2.9 < M < 3.2', path=path)
-    vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path)
+    vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path, silence_warning=True)
     modularAnalysis.rankByHighest('J/psi:dqm_ee', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('J/psi:dqm_ee', {'M': 'dqm_Jpsiee_M'}, path=path)
     calib_particle_list.append('J/psi:dqm_ee')
@@ -139,11 +140,15 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     # Jpsi-> mumu
     modularAnalysis.fillParticleList('mu+:good', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_mumu -> mu+:good mu-:good', '2.9 < M < 3.2', path=path)
-    vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path)
+    vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path, silence_warning=True)
     modularAnalysis.rankByHighest('J/psi:dqm_mumu', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'dqm_Jpsimumu_M'}, path=path)
     calib_particle_list.append('J/psi:dqm_mumu')
     calib_extraInfo_list.append('dqm_Jpsimumu_M')
+
+    # monopoles
+    add_cdc_monopole_track_finding(path)
+
     calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib",
                                              preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
                                              calibParticleListName=calib_particle_list,

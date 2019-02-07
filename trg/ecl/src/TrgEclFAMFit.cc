@@ -33,7 +33,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclFAMFit::TrgEclFAMFit(): _BeamBkgTag(0), _AnaTag(0), _Threshold(100.0), EventId(0) //, bin(0)
+TrgEclFAMFit::TrgEclFAMFit(): _BeamBkgTag(0), _AnaTag(0), EventId(0) //, bin(0)
 {
 
   CoeffSigPDF0.clear();
@@ -45,6 +45,8 @@ TrgEclFAMFit::TrgEclFAMFit(): _BeamBkgTag(0), _AnaTag(0), _Threshold(100.0), Eve
   _TCMap = new TrgEclMapping();
   _DataBase = new TrgEclDataBase();
 
+  Threshold.clear();
+
   TCFitEnergy.clear();
   TCFitTiming.clear();
   TCRawEnergy.clear();
@@ -52,6 +54,7 @@ TrgEclFAMFit::TrgEclFAMFit(): _BeamBkgTag(0), _AnaTag(0), _Threshold(100.0), Eve
   BeamBkgTag.clear();
   TCLatency.clear();
 
+  Threshold.resize(576, 100.0);
   TCFitEnergy.resize(576);
   TCFitTiming.resize(576);
   TCRawEnergy.resize(576);
@@ -113,7 +116,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   int Nsmalldt = 10;
   int SmallOffset = 1;
   double IntervaldT  = 125 * 0.001 / Nsmalldt;
-  double EThreshold = _Threshold; //[MeV]
+  //  double EThreshold = _Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
   double FitE = 0;
@@ -164,8 +167,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
       //-------
       double condition_t = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
 
-
-      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && FitE > EThreshold) {
+      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && FitE > Threshold[iTCIdm]) {
         FitT = condition_t + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
 
 
@@ -209,7 +211,7 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
     int noutput = 0;
 
-    double threshold = _Threshold * 0.001; //GeV
+    //    double threshold = _Threshold * 0.001; //GeV
     int maxId[500] = {0};
     for (int iii = 0 ; iii < 500 ; iii++) {
 
@@ -236,7 +238,7 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
         count_down++;
         if (count_down >= flag_down) {
           if (count_up >= flag_up) {
-            if (threshold < max) {
+            if (Threshold[iTCIdm] * 0.001 < max) {
               max = 0;
               count_up = 0;
               count_down = 0;
@@ -254,12 +256,12 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
               //** Peak point is the Energy */
               TCFitEnergy[iTCIdm].push_back(TCDigiE[iTCIdm][maxId[noutput]] - NoiseLevel);
               if (!(maxId[noutput] - 1)) {
-                for (int iSampling = 1; iSampling < maxId[noutput] + 3; iSampling++) {
-                  TCDigiE[iTCIdm][iSampling] -= NoiseLevel;
+                for (int jSampling = 1; jSampling < maxId[noutput] + 3; jSampling++) {
+                  TCDigiE[iTCIdm][jSampling] -= NoiseLevel;
                 }
               } else {
-                for (int iSampling = maxId[noutput] - 1; iSampling < maxId[noutput] + 3; iSampling++) {
-                  TCDigiE[iTCIdm][iSampling] -= NoiseLevel;
+                for (int jSampling = maxId[noutput] - 1; jSampling < maxId[noutput] + 3; jSampling++) {
+                  TCDigiE[iTCIdm][jSampling] -= NoiseLevel;
                 }
               }
               //@ Search T_a ID
@@ -322,7 +324,7 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vecto
   // (03)Peak search
   //==================
   float max_shape_time = 563.48; // [ns], time between peak of PDF and t0.
-  double threshold = _Threshold * 0.001; //GeV
+  //  double threshold = _Threshold * 0.001; //GeV
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
     int noutput = 0;
     int maxId[500] = {0};
@@ -343,7 +345,7 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vecto
         count_down++;
         if (count_down >= flag_down) {
           if (count_up >= flag_up) {
-            if (threshold < max) {
+            if (Threshold[iTCIdm] * 0.001 < max) {
               max = 0;
               count_up = 0;
               count_down = 0;

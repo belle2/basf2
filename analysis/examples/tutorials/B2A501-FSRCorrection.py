@@ -24,48 +24,62 @@
 #
 # Contributors: Moritz Gelb (February 2017)
 #               I. Komarov (Demeber 2017)
+#               I. Komarov (September 2018)
 #
-######################################################
+################################################################################
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
+import variables.collections as vc
+import variables.utils as vu
 
-# set the log level
-set_log_level(LogLevel.WARNING)
+# create path
+my_path = b2.create_path()
 
-# Bd_JpsiKL_ee Signal MC file
-# Generated for release-01-00-00
-inputFile = "/group/belle2/tutorial/release_01-00-00/1111540100.dst.root"
-
-inputMdstList('default', inputFile)
+# load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('JPsi2ee_e2egamma.root', 'examples', False),
+             path=my_path)
 
 
 # fill particleLists
-fillParticleList('e+:uncorrected', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4')
-fillParticleList('gamma:all', 'E < 1.0', False)
+ma.fillParticleList(decayString='e+:uncorrected',
+                    cut='electronID > 0.2 and d0 < 2 and abs(z0) < 4',
+                    path=my_path)
+ma.fillParticleList(decayString='gamma:all',
+                    cut='E < 1.0',
+                    writeOut=False,
+                    path=my_path)
 
 # loose mc matching (recommended)
-looseMCTruth('e+:uncorrected')
-looseMCTruth('gamma:all')
+ma.looseMCTruth(list_name='e+:uncorrected', path=my_path)
+ma.looseMCTruth(list_name='gamma:all', path=my_path)
 
 # fsr correction
-correctFSR('e+:corrected', 'e+:uncorrected', 'gamma:all', 5.0, 1.0, False)
-looseMCTruth('e+:corrected')
+ma.correctFSR(outputListName='e+:corrected',
+              inputListName='e+:uncorrected',
+              gammaListName='gamma:all',
+              angleThreshold=5.0,
+              energyThreshold=1.0,
+              writeOut=False,
+              path=my_path)
+ma.looseMCTruth(list_name='e+:corrected',
+                path=my_path)
 
 # uncorrected
-reconstructDecay('J/psi:uncorrected -> e+:uncorrected e-:uncorrected', '')
-reconstructDecay('J/psi:corrected -> e+:corrected e-:corrected', '')
-
-# vertex fit
-# vertexRave('J/psi:uncorrected', 0.0)
-# vertexRave('J/psi:corrected', 0.0)
+ma.reconstructDecay(decayString='J/psi:uncorrected -> e+:uncorrected e-:uncorrected',
+                    cut='',
+                    path=my_path)
+ma.reconstructDecay(decayString='J/psi:corrected -> e+:corrected e-:corrected',
+                    cut='',
+                    path=my_path)
 
 # loose MC matching
-looseMCTruth('J/psi:uncorrected')
-looseMCTruth('J/psi:corrected')
+ma.looseMCTruth(list_name='J/psi:uncorrected', path=my_path)
+ma.looseMCTruth(list_name='J/psi:corrected', path=my_path)
 
 # get all MC particles
-fillParticleListFromMC('J/psi:MC', '', False, False)
+ma.fillParticleListFromMC(decayString='J/psi:MC', cut="", path=my_path)
 
 # write out ntuples
 
@@ -118,14 +132,29 @@ var1 = ['M',
         'extraInfo(looseMCWrongDaughterBiB)',
         ]
 
-variablesToNTuple('e+:uncorrected', var0, filename='e_uncorrected.root')
-variablesToNTuple('e+:corrected', var0, filename='e_corrected.root')
-variablesToNTuple('J/psi:uncorrected', var1, filename='Jpsi_uncorrected.root')
-variablesToNTuple('J/psi:corrected', var1, filename='Jpsi_corrected.root')
-variablesToNTuple('J/psi:MC', var1, filename='Jpsi_MC.root')
+ma.variablesToNtuple(decayString='e+:uncorrected',
+                     variables=var0,
+                     filename='e_uncorrected.root',
+                     path=my_path)
+ma.variablesToNtuple(decayString='e+:corrected',
+                     variables=var0,
+                     filename='e_corrected.root',
+                     path=my_path)
+ma.variablesToNtuple(decayString='J/psi:uncorrected',
+                     variables=var1,
+                     filename='Jpsi_uncorrected.root',
+                     path=my_path)
+ma.variablesToNtuple(decayString='J/psi:corrected',
+                     variables=var1,
+                     filename='Jpsi_corrected.root',
+                     path=my_path)
+ma.variablesToNtuple(decayString='J/psi:MC',
+                     variables=var1,
+                     filename='Jpsi_MC.root',
+                     path=my_path)
 
 # process the events
-process(analysis_main)
+b2.process(my_path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

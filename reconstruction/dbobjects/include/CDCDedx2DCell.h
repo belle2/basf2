@@ -115,15 +115,17 @@ namespace Belle2 {
       int dbin = std::floor((doca - m_twodgains[mylayer].GetXaxis()->GetBinLowEdge(1)) / dbinsize) + 1;
 
       double ebinsize = m_twodgains[mylayer].GetYaxis()->GetBinCenter(2) - m_twodgains[mylayer].GetYaxis()->GetBinCenter(1);
-      int ebin = std::floor((std::sin(enta) - m_twodgains[mylayer].GetYaxis()->GetBinLowEdge(1)) / ebinsize) + 1;
+      // int ebin = std::floor((std::sin(enta) - m_twodgains[mylayer].GetYaxis()->GetBinLowEdge(1)) / ebinsize) + 1;
+      int ebin = std::floor((enta - m_twodgains[mylayer].GetYaxis()->GetBinLowEdge(1)) / ebinsize) + 1;
 
       double mean = 1.0;
       if (dbin > 0 && dbin <= m_twodgains[mylayer].GetNbinsX() && ebin > 0 && ebin <= m_twodgains[mylayer].GetNbinsY())
-        m_twodgains[mylayer].GetBinContent(dbin, ebin);
+        mean = m_twodgains[mylayer].GetBinContent(dbin, ebin);
       else if (dbin > m_twodgains[mylayer].GetNbinsX() && ebin > 0 && ebin <= m_twodgains[mylayer].GetNbinsY())
-        m_twodgains[mylayer].GetBinContent(m_twodgains[mylayer].GetNbinsX(), ebin);
+        mean = m_twodgains[mylayer].GetBinContent(m_twodgains[mylayer].GetNbinsX(), ebin);
       else
-        B2WARNING("Problem with 2D CDC dE/dx calibration! " << doca << "\t" << dbin << "\t" << std::sin(enta) << "\t" << ebin);
+        // B2WARNING("Problem with 2D CDC dE/dx calibration! " << doca << "\t" << dbin << "\t" << std::sin(enta) << "\t" << ebin);
+        B2WARNING("Problem with 2D CDC dE/dx calibration! " << doca << "\t" << dbin << "\t" << enta << "\t" << ebin);
 
       return mean;
     };
@@ -135,6 +137,6 @@ namespace Belle2 {
     short m_version; /**< version number for 2D correction */
     std::vector<TH2F> m_twodgains; /**< 2D histograms of doca/enta gains, layer dependent */
 
-    ClassDef(CDCDedx2DCell, 2); /**< ClassDef */
+    ClassDef(CDCDedx2DCell, 3); /**< ClassDef */
   };
 } // end namespace Belle2

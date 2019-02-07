@@ -36,12 +36,12 @@ namespace Belle2 {
       EXPECT_EQ(rect.getVCellPosition(3), 0.75);
       for (double u = -1.0 + 0.05; u <= 1.0; u += 0.1) {
         EXPECT_EQ(rect.getUCellID(u), (int)((u / 1.0 + 0.5) * 2));
-        if (u < -0.5) EXPECT_EQ(rect.getUCellID(u, 0, true), 0);
-        if (u > 0.5) EXPECT_EQ(rect.getUCellID(u, 0, true), rect.getUCells() - 1);
+        if (u < -0.5) {EXPECT_EQ(rect.getUCellID(u, 0, true), 0); }
+        if (u > 0.5) {EXPECT_EQ(rect.getUCellID(u, 0, true), rect.getUCells() - 1);}
         for (double v = -2.0 + 0.11; v <= 2.0; v += 0.2) {
           EXPECT_EQ(rect.getVCellID(v), (int)((v / 2.0 + 0.5) * 4));
-          if (v < -1.0) EXPECT_EQ(rect.getVCellID(v, true), 0);
-          if (v > 1.0) EXPECT_EQ(rect.getVCellID(v, true), rect.getVCells() - 1);
+          if (v < -1.0) {EXPECT_EQ(rect.getVCellID(v, true), 0);}
+          if (v > 1.0) {EXPECT_EQ(rect.getVCellID(v, true), rect.getVCells() - 1);}
           EXPECT_EQ(rect.inside(u, v), fabs(u) <= 0.5 && fabs(v) <= 1.0);
         }
       }

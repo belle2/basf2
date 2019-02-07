@@ -68,7 +68,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
-                     [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
+                     [](T x)->APVRawSampleType { return trimToSampleRange(x); }
                     );
     }
 
@@ -88,7 +88,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
-                     [this](typename T::value_type x)->APVRawSampleType
+                     [](typename T::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
                     );
     }
@@ -167,8 +167,8 @@ namespace Belle2 {
       os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
-                std::ostream_iterator<APVRawSampleType>(os, " "));
-      os << "FADC time: " << m_FADCTime << " " << thisMode << std::endl;
+                std::ostream_iterator<unsigned int>(os, " "));
+      os << "FADC time: " << (unsigned int)m_FADCTime << " " << thisMode << std::endl;
       return os.str();
     }
 
@@ -179,7 +179,7 @@ namespace Belle2 {
     * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), and
     * strip number (18-28)
     */
-    unsigned int getUniqueChannelID() const
+    unsigned int getUniqueChannelID() const override
     { return m_cellID + ((m_isU ? 1 : 0) << 11) + (m_sensorID << 12); }
 
     /**
@@ -189,7 +189,7 @@ namespace Belle2 {
     * @param bg beam background digit
     * @return append status
     */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override
     {
       // Don't modify and don't append when bg points nowhere.
       if (!bg) return DigitBase::c_DontAppend;
@@ -197,7 +197,7 @@ namespace Belle2 {
       // Add background samples to the digit's and trim back to range
       std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
                      m_samples.begin(),
-                     [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+                     [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
       { return trimToSampleRange(x + y); }
                     );
       // FIXME: Reset FADC time flag in mode byte.
@@ -230,7 +230,7 @@ namespace Belle2 {
       int nOKSamples = 0;
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
       for (int k = 0; k < this->getNSamples(); k ++)
-        if (samples_vec[k] > cutMinSignal)
+        if (samples_vec[k] >= cutMinSignal)
           nOKSamples++;
 
       if (nOKSamples >= nSamples)
@@ -268,7 +268,7 @@ namespace Belle2 {
     /**< Mode byte, trigger FADCTime + DAQ mode */
 
 
-    ClassDef(SVDShaperDigit, 3)
+    ClassDefOverride(SVDShaperDigit, 3)
 
   }; // class SVDShaperDigit
 

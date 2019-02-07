@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEDELTAEMBCTOOL_H
-#define NTUPLEDELTAEMBCTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -27,14 +26,13 @@ namespace Belle2 {
     /** beam constraint mass. */
     float m_fMbc;
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
   public:
     /** Constructor. */
     NtupleDeltaEMbcTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLEDELTAEMBCTOOL_H

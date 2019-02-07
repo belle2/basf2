@@ -16,7 +16,6 @@
 #include <svd/dbobjects/SVDCalibrationsVector.h>
 #include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDStripCalAmp.h>
-#include <svd/dbobjects/SVDTriggerBinDependentConstants.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <string>
@@ -34,19 +33,17 @@ namespace Belle2 {
    */
   class SVDPulseShapeCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_payload;
-    static std::string time_name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_time_payload;
-    static std::string bin_name;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDTriggerBinDependentConstants > > t_bin_payload;
+    static std::string calAmp_name;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_calAmp_payload;
 
     /** Constructor, no input argument is required */
     SVDPulseShapeCalibrations()
-      : m_aDBObjPtr(name)
-      , m_time_aDBObjPtr(time_name)
-      , m_bin_aDBObjPtr(bin_name)
-    {}
+      : m_calAmp_aDBObjPtr(calAmp_name)
+    {
+      m_calAmp_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDPulseShapeCalibrations: from now on we are using " <<
+        this->m_calAmp_aDBObjPtr -> get_uniqueID()); });
+    }
 
     /** Return the charge (number of electrons/holes) collected on a specific
      * strip, given the number of ADC counts.
@@ -136,9 +133,9 @@ namespace Belle2 {
     inline float getPeakTime(const VxdID& sensorID, const bool& isU,
                              const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                              strip).peakTime;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                                     sensorID.getSensorNumber(), m_calAmp_aDBObjPtr->sideIndex(isU),
+                                     strip).peakTime;
     }
 
     /** Return the width of the pulse shape for a given strip.
@@ -160,67 +157,19 @@ namespace Belle2 {
     inline float getWidth(const VxdID& sensorID, const bool& isU,
                           const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
 
-    }
-
-    /** Return the time shift to be applied to theCoG time estimator
-     * (weighted average of the time)
-     *
-     * Input:
-     * @param sensorID: identity of the sensor for which the
-     * calibration is required
-     * @param isU: sensor side, true for p side, false for n side
-     * @param strip: strip number
-     *
-     * Output: a float number corresponding to the time shift width in ns.
-     */
-    inline float getTimeShiftCorrection(const VxdID& sensorID, const bool& isU,
-                                        const unsigned short& strip) const
-    {
-      return m_time_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                   m_time_aDBObjPtr->sideIndex(isU), strip);
-
-    }
-
-    /** return the trigger bin dependent correction for the CoG time estimator
-     *
-     * Input:
-     * @param sensorID: identity of the sensor for which the
-     * calibration is required
-     * @param isU: sensor side, true for p side, false for n side
-     * @param strip: strip number - NOT USED
-     *
-     * Output: a float number corresponding to the time correction in ns.
-     */
-    inline float getTriggerBinDependentCorrection(const VxdID& sensorID, const bool& isU,
-                                                  const unsigned short& strip, const int& bin) const
-    {
-      float correction = 0;
-      if (bin == 0)
-        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin0;
-      else if (bin == 1)
-        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin1;
-      else if (bin == 2)
-        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin2;
-      else if (bin == 3)
-        correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                                          m_bin_aDBObjPtr->sideIndex(isU), strip).bin3;
-      else
-        B2WARNING("SVDPulseShapeCalibrations: you ar asking for a non existing trigger bin! Return 0.");
-
-      return correction;
     }
 
     /** returns the unique ID of the payload */
-    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+    TString getUniqueID() { return m_calAmp_aDBObjPtr->get_uniqueID(); }
 
     /** returns true if the m_aDBObtPtr is valid in the requested IoV */
-    bool isValid() { return m_aDBObjPtr.isValid(); }
+    bool isValid()
+    {
+      return m_calAmp_aDBObjPtr.isValid();
+    }
 
   private:
 
@@ -234,15 +183,13 @@ namespace Belle2 {
     inline float getGain(const VxdID& sensorID, const bool& isU,
                          const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU), strip).gain ;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).gain ;
 
     }
 
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
-    DBObjPtr< t_time_payload > m_time_aDBObjPtr;
-    DBObjPtr< t_bin_payload > m_bin_aDBObjPtr;
+    DBObjPtr< t_calAmp_payload > m_calAmp_aDBObjPtr;
 
   };
 }

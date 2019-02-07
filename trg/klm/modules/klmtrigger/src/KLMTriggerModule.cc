@@ -43,6 +43,7 @@ REG_MODULE(KLMTrigger)
 KLMTriggerModule::KLMTriggerModule() : Module()
 {
   setDescription("KLM trigger simulation");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("MaxChisq", m_maxChisq,
            "Maximum chi squared for a track",
            double(7.0));

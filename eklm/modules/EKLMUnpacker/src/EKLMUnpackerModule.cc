@@ -31,6 +31,13 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   addParam("PrintData", m_PrintData, "Print data.", false);
   addParam("CheckCalibration", m_CheckCalibration,
            "Check calibration-mode data.", false);
+  addParam("WriteWrongHits", m_WriteWrongHits,
+           "Record wrong hits (e.g. for debugging).", false);
+  addParam("IgnoreWrongHits", m_IgnoreWrongHits,
+           "Ignore wrong hits (i.e. no B2ERROR).", false);
+  addParam("IgnoreStrip0", m_IgnoreStrip0,
+           "Ignore hits with strip = 0 (normally expected for certain firmware "
+           "versions).", true);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
@@ -42,6 +49,8 @@ void EKLMUnpackerModule::initialize()
 {
   m_RawKLMs.isRequired();
   m_Digits.registerInDataStore(m_outputDigitsName);
+  m_DigitEventInfos.registerInDataStore();
+  m_Digits.registerRelationTo(m_DigitEventInfos);
 }
 
 void EKLMUnpackerModule::beginRun()
@@ -62,20 +71,22 @@ void EKLMUnpackerModule::event()
    */
   const int hitLength = 2;
   int i1, i2;
-  int endcap, layer, sector, stripGlobal;
+  bool correctHit;
+  int endcap, layer, sector, strip = 0, stripGlobal;
   int laneNumber;
   int nBlocks;
   uint16_t dataWords[4];
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
-  EKLMChannelData* channelData;
+  const EKLMChannelData* channelData;
   if (m_PrintData)
     printf("  w1   w2   w3   w4 e la s p st\n");
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
     if (m_RawKLMs[i]->GetNumEvents() != 1) {
-      B2ERROR("RawKLM with index " << i << " has " <<
-              m_RawKLMs[i]->GetNumEvents() << " entries (should be 1). ");
+      B2ERROR("RawKLM a wrong number of entries (should be 1)."
+              << LogVar("RawKLM index", i)
+              << LogVar("Number of entries", m_RawKLMs[i]->GetNumEvents()));
       continue;
     }
     /*
@@ -89,22 +100,27 @@ void EKLMUnpackerModule::event()
       uint16_t copperN = copperId - EKLM_ID;
       lane.setCopper(copperN);
       m_RawKLMs[i]->GetBuffer(j);
+      KLMDigitEventInfo* eklmDigitEventInfo = m_DigitEventInfos.appendNew();
+      int triggerCTime = m_RawKLMs[i]->GetTTCtime(j) & 0xFFFF;
+      eklmDigitEventInfo->setTriggerCTime(triggerCTime);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
         lane.setDataConcentrator(finesse_num);
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
-          B2ERROR("Incorrect number of data words: " << numDetNwords);
+          B2ERROR("Incorrect number of data words."
+                  << LogVar("Number of data words", numDetNwords));
           continue;
         }
         if (m_CheckCalibration) {
           std::map<int, int> blockLanes;
           std::map<int, int>::iterator it;
+          /* cppcheck-suppress variableScope */
           uint16_t blockData[15];
           if (numHits % 75 != 0) {
-            B2ERROR("The number of hits in the calibration mode (" <<
-                    numHits << ") is not a multiple of 75.");
+            B2ERROR("The number of hits in the calibration mode is not a "
+                    "multiple of 75." << LogVar("Number of hits", numHits));
           } else {
             nBlocks = numHits / 15;
             for (i1 = 0; i1 < nBlocks; i1++) {
@@ -121,22 +137,21 @@ void EKLMUnpackerModule::event()
               }
               if (blockLanes.size() != 1) {
                 char buf[1024];
-                std::string errorMessage;
-                errorMessage = "Corrupted data block found. Lane numbers:\n";
+                std::string errorMessage1, errorMessage2;
                 for (it = blockLanes.begin(); it != blockLanes.end(); ++it) {
-                  errorMessage += (std::string("Lane ") +
-                                   std::to_string(it->first) + ": " +
-                                   std::to_string(it->second) + " time(s).\n");
+                  errorMessage1 += (std::string("Lane ") +
+                                    std::to_string(it->first) + ": " +
+                                    std::to_string(it->second) + " time(s).\n");
                 }
-                errorMessage += "All first data words:\n";
                 for (i2 = 0; i2 < 15; i2++) {
                   snprintf(buf, 1024, "%04x", blockData[i2]);
-                  errorMessage += buf;
-                  if (i2 < 15)
-                    errorMessage += " ";
+                  errorMessage2 += buf;
+                  if (i2 < 14)
+                    errorMessage2 += " ";
                 }
-                errorMessage += "\n";
-                B2ERROR(errorMessage);
+                B2ERROR("Corrupted data block found."
+                        << LogVar("Lane numbers", errorMessage1)
+                        << LogVar("All first data words", errorMessage2));
               }
             }
           }
@@ -146,14 +161,25 @@ void EKLMUnpackerModule::event()
           dataWords[1] =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
           dataWords[2] = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
           dataWords[3] =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          uint16_t strip = dataWords[0] & 0x7F;
+          uint16_t stripFirmware = dataWords[0] & 0x7F;
           /**
            * The possible values of the strip number in the raw data are
            * from 0 to 127, while the actual range of strip numbers is from
-           * 1 to 75. A check is required.
+           * 1 to 75. A check is required. The unpacker continues to work
+           * with B2ERROR because otherwise debugging is not possible.
            */
-          if (!m_ElementNumbers->checkStrip(strip, false)) {
-            B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+          correctHit = m_ElementNumbers->checkStrip(stripFirmware, false);
+          if (!correctHit) {
+            if (!(m_IgnoreWrongHits ||
+                  (stripFirmware == 0 && m_IgnoreStrip0))) {
+              B2ERROR("Incorrect strip number in raw data."
+                      << LogVar("Strip number", strip));
+            }
+            if (!m_WriteWrongHits)
+              continue;
+            strip = stripFirmware;
+          } else {
+            strip = m_ElementNumbers->getStripSoftwareByFirmware(stripFirmware);
           }
           uint16_t plane = ((dataWords[0] >> 7) & 1) + 1;
           /*
@@ -167,39 +193,51 @@ void EKLMUnpackerModule::event()
           uint16_t tdc = dataWords[2] & 0x7FF;
           uint16_t charge = dataWords[3] & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
-          if (sectorGlobal == NULL) {
-            B2ERROR("Lane with copper = " << lane.getCopper() <<
-                    ", data concentrator = " << lane.getDataConcentrator() <<
-                    ", lane = " << lane.getLane() << " does not exist in the "
-                    "EKLM electronics map.");
-            continue;
+          if (sectorGlobal == nullptr) {
+            if (!m_IgnoreWrongHits) {
+              B2ERROR("Lane does not exist in the EKLM electronics map."
+                      << LogVar("Copper", lane.getCopper())
+                      << LogVar("Data concentrator", lane.getDataConcentrator())
+                      << LogVar("Lane", lane.getLane()));
+            }
+            if (!m_WriteWrongHits)
+              continue;
+            endcap = 0;
+            layer = 0;
+            sector = 0;
+            correctHit = false;
+          } else {
+            m_ElementNumbers->sectorNumberToElementNumbers(
+              *sectorGlobal, &endcap, &layer, &sector);
           }
-          m_ElementNumbers->sectorNumberToElementNumbers(
-            *sectorGlobal, &endcap, &layer, &sector);
           if (m_PrintData) {
             printf("%04x %04x %04x %04x %1d %2d %1d %1d %2d\n",
                    dataWords[0], dataWords[1], dataWords[2], dataWords[3],
                    endcap, layer, sector, plane, strip);
           }
-          stripGlobal = m_ElementNumbers->stripNumber(
-                          endcap, layer, sector, plane, strip);
-          channelData = m_Channels->getChannelData(stripGlobal);
-          if (channelData == NULL)
-            B2FATAL("Incomplete EKLM channel data.");
           eklmDigit = m_Digits.appendNew();
+          eklmDigit->addRelationTo(eklmDigitEventInfo);
           eklmDigit->setCTime(ctime);
           eklmDigit->setTDC(tdc);
-          eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
+          eklmDigit->setTime(
+            m_TimeConversion->getTime(ctime, tdc, triggerCTime, true));
           eklmDigit->setEndcap(endcap);
           eklmDigit->setLayer(layer);
           eklmDigit->setSector(sector);
           eklmDigit->setPlane(plane);
           eklmDigit->setStrip(strip);
-          if (charge < channelData->getThreshold())
-            eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
-          else
-            eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
           eklmDigit->setCharge(charge);
+          if (correctHit) {
+            stripGlobal = m_ElementNumbers->stripNumber(
+                            endcap, layer, sector, plane, strip);
+            channelData = m_Channels->getChannelData(stripGlobal);
+            if (channelData == nullptr)
+              B2FATAL("Incomplete EKLM channel data.");
+            if (charge < channelData->getThreshold())
+              eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+            else
+              eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+          }
         }
       }
     }

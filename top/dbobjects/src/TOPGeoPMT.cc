@@ -30,6 +30,15 @@ namespace Belle2 {
     return int((y + m_sensSizeY / 2) / m_sensSizeY * m_numRows) + 1;
   }
 
+  unsigned TOPGeoPMT::getPixelID(double x, double y) const
+  {
+    auto col = getPixelColumn(x);
+    if (col == 0) return 0;
+    auto row = getPixelRow(y);
+    if (row == 0) return 0;
+
+    return (row - 1) * m_numColumns + col;
+  }
 
   bool TOPGeoPMT::isConsistent() const
   {

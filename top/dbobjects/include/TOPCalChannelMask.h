@@ -134,7 +134,29 @@ namespace Belle2 {
       return (m_status[module][channel] == c_Active);
     }
 
+    /**
+     * Returns number of all channels
+     */
+    int getNumOfChannels() const {return c_numChannels * c_numModules;}
+
+    /**
+     * Returns number of active channels
+     */
+    int getNumOfActiveChannels() const {return getNumOf(c_Active);}
+
+    /**
+     * Returns number of dead channels
+     */
+    int getNumOfDeadChannels() const {return getNumOf(c_Dead);}
+
+    /**
+     * Returns number of noisy channels
+     */
+    int getNumOfNoisyChannels() const {return getNumOf(c_Noisy);}
+
+
   private:
+
     /**
      * Check input module and channel arguments are sane
      */
@@ -153,6 +175,22 @@ namespace Belle2 {
         return false;
       }
       return true;
+    }
+
+    /**
+     * Counts and returns the number of channels having a given status
+     * @param check status to be checked
+     * @return number of channels of this status
+     */
+    int getNumOf(EStatus check) const
+    {
+      int n = 0;
+      for (const auto& statuses : m_status) {
+        for (const auto status : statuses) {
+          if (status == check) n++;
+        }
+      }
+      return n;
     }
 
     /**

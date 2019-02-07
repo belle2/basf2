@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLECLUSTERTOOL_H
-#define NTUPLECLUSTERTOOL_H
+#pragma once
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -54,8 +53,8 @@ namespace Belle2 {
     /**  ratio of energies in central cell and 3x3 cells */
     float* m_e1e9;
 
-    /**  cluster hadron scintillation component intensity*/
-    float* m_ClusterHadronIntensity;
+    /**  Pulse Shape Discrimination based MVA classifier*/
+    float* m_PulseShapeDiscriminationMVA;
 
     /**  number of cluster digits with significant (>3 MeV) hadron component light output*/
     float* m_NumberOfHadronDigits;
@@ -64,7 +63,7 @@ namespace Belle2 {
     float* m_e9e21;
 
     /** number of hits associated to this cluster */
-    int* m_nHits;
+    float* m_nHits;
 
     /**  Status of pulse shape discrimination variables. 0 = no PSD  information (no waveforms), 1 = PSD cluster has PSD information */
     int* m_ClusterHasPSD;
@@ -76,7 +75,7 @@ namespace Belle2 {
     float* m_secondMoment;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
-    void setupTree();
+    void setupTree() override;
 
     /** Delete the 'new's */
     void deallocateMemory();
@@ -90,9 +89,8 @@ namespace Belle2 {
     ~NtupleClusterTool() {deallocateMemory();}
 
     /** Set branch variables to properties of the provided Particle. */
-    void eval(const Particle* p);
+    void eval(const Particle* p) override;
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLECLUSTERTOOL_H

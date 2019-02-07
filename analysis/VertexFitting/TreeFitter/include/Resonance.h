@@ -14,10 +14,10 @@
 namespace TreeFitter {
   class FitParams;
 
-  /** **/
+  /** class for resonances as internal particles */
   class Resonance : public InternalParticle {
   public:
-    /** **/
+    /** constructor */
     Resonance(Belle2::Particle* particle,
               const ParticleBase* mother,
               bool forceFitAll);
@@ -25,27 +25,27 @@ namespace TreeFitter {
     /** destructor  */
     virtual ~Resonance() ;
 
-    /**  */
-    ErrCode initMotherlessParticle(FitParams* fitparams);
+    /** initialise a motherless particle */
+    ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
-    /**  */
-    ErrCode initParticleWithMother(FitParams* fitparams);
+    /** initialise a particle with a mother */
+    ErrCode initParticleWithMother(FitParams& fitparams) override;
 
-    /** **/
-    virtual int dim() const { return 4; }
-    /** **/
-    virtual int type() const { return kResonance; }
-    /** **/
-    virtual std::string parname(int index) const;
+    /** dimension (4) */
+    virtual int dim() const override { return 4; }
+    /** particle type */
+    virtual int type() const override { return kResonance; }
+    /** parameter name */
+    virtual std::string parname(int index) const override;
 
-    /** **/
-    virtual int posIndex() const { return mother()->posIndex(); }
-    /** **/
-    virtual int momIndex() const { return index(); }
-    /** **/
-    virtual int tauIndex() const { return -1; }
-    /** **/
-    virtual bool hasPosition() const { return false; }
+    /** get position index in statevector x,y,z,tau,px,py,pz */
+    virtual int posIndex() const override { return mother()->posIndex(); }
+    /** get momentum index in statevector */
+    virtual int momIndex() const override { return index(); }
+    /** get tau (lifetime) index in statevector */
+    virtual int tauIndex() const override { return -1; }
+    /** does this class have position? NO */
+    virtual bool hasPosition() const override { return false; }
 
   private:
   };

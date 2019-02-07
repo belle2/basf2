@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDIGIT_H
-#define EKLMDIGIT_H
+#pragma once
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
@@ -39,7 +38,7 @@ namespace Belle2 {
      * Constructor from the EKLMSim2Hit.
      * @param[in] Hit EKLMSim2Hit.
      */
-    EKLMDigit(const EKLMSimHit* Hit);
+    explicit EKLMDigit(const EKLMSimHit* Hit);
 
     /**
      * Destructor.
@@ -49,12 +48,12 @@ namespace Belle2 {
     /**
      * Get unique channel identifier.
      */
-    unsigned int getUniqueChannelID() const;
+    unsigned int getUniqueChannelID() const override;
 
     /**
      * The pile-up method.
      */
-    EAppendStatus addBGDigit(const DigitBase* bg);
+    EAppendStatus addBGDigit(const DigitBase* bg) override;
 
     /**
      * Get charge.
@@ -193,12 +192,9 @@ namespace Belle2 {
     /** MC time at SiPM. */
     float m_sMCTime;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 9);
+    /** Class version. */
+    ClassDefOverride(Belle2::EKLMDigit, 11);
 
   };
 
 }
-
-#endif
-

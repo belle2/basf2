@@ -19,4 +19,18 @@
 #pragma link C++ class Belle2::SVDNeutronFluxEvent+;
 #pragma link C++ class Belle2::SVDOccupancyEvent+;
 
+#pragma link C++ class Belle2::SVDHistograms< TH1F > +;
+#pragma link C++ class Belle2::SVDHistograms< TH1D > +;
+#pragma link C++ class Belle2::SVDHistograms< TH2F > +;
+#pragma link C++ class Belle2::SVDHistograms< TH2D > +;
+#pragma link C++ class Belle2::SVDHistograms< TProfile > +;
+
+#pragma link C++ class Belle2::SVDAPVHistograms< TH1F > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TH1D > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TH2F > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TH2D > +;
+#pragma link C++ class Belle2::SVDAPVHistograms< TProfile > +;
+
+#pragma link C++ class Belle2::SVDSummaryPlots +;
+
 #endif

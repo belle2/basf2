@@ -46,9 +46,9 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDChannelMappingModule();
 
-    void initialize();
-    void event();
-    void terminate();
+    void initialize() override;
+    void event() override;
+    void terminate() override;
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
     std::string m_SVDClustersName; /**< reco digit list name*/
@@ -78,7 +78,6 @@ namespace Belle2 {
     void createHistosDictionaries(); /**< create the dictionary*/
     void fillSensorInterHistos(const SVDIntercept* inter); /**< fill histograms per sensor, filled once per intercept */
 
-    int m_numModules; /**< number of modules*/
 
     int n_events; /**< number of events*/
 

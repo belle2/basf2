@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef TAUDECAYMARKERMODULE_H
-#define TAUDECAYMARKERMODULE_H
+#pragma once
 
 #include <TMath.h>
 #include <string>
@@ -42,10 +40,10 @@ namespace Belle2 {
     TauDecayMarkerModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   private:
 
@@ -76,5 +74,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif // TAUDECAYMARKERMODULE_H

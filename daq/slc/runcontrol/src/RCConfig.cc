@@ -15,6 +15,6 @@ RCConfig::RCConfig(const RCConfig& config)
 
 }
 
-void RCConfig::print() throw()
+void RCConfig::print()
 {
 }

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Shebalin Vasily                                          *
+ * Contributors: Shebalin Vasily, Mikhail Remnev                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,21 +20,24 @@ namespace Belle2 {
   class ECLTrig;
   class ECLDsp;
 
+  /** the ECL unpacker module */
   class ECLUnpackerModule : public Module {
   public:
+    /** constructor */
     ECLUnpackerModule();
+    /** destructor */
     virtual ~ECLUnpackerModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
     /** beginRun */
-    virtual void beginRun();
+    virtual void beginRun() override;
     /** event */
-    virtual void event();
+    virtual void event() override;
     /** endRun */
-    virtual void endRun();
+    virtual void endRun() override;
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** exeption should be thrown when the unexpected      */
     BELLE2_DEFINE_EXCEPTION(Unexpected_end_of_FINESSE_buffer,
@@ -61,12 +64,47 @@ namespace Belle2 {
 
     /** flag for whether or not to store collection with trigger times */
     bool m_storeTrigTime;
-    /** flag for whether or not to store ECLDsp data for unmapped channels*/
+    /** flag for whether or not to store ECLDsp data for unmapped channels */
     bool m_storeUnmapped;
-    /* report only once about problem with different trg tags*/
-    bool m_tagsReported;
-    /* report only once about problem with different trg phases*/
-    bool m_phasesReported;
+
+    /** report only once per crate about problem with different trg tags */
+    long m_tagsReportedMask;
+    /** report only once per crate about problem with different trg phases */
+    long m_phasesReportedMask;
+    /** report only once per crate about problem with shaper header */
+    long m_badHeaderReportedMask;
+
+    /**
+     * Report the problem with trigger tags and exclude the crate
+     * from further reports of this type.
+     */
+    void doTagsReport(unsigned int iCrate, int tag0, int tag1);
+    /**
+     * Report the problem with trigger phases and exclude the crate
+     * from further reports of this type.
+     */
+    void doPhasesReport(unsigned int iCrate, int phase0, int phase1);
+    /**
+     * Report the problem with bad shaper header and exclude the crate
+     * from further reports of this type.
+     */
+    void doBadHeaderReport(unsigned int iCrate);
+
+    /**
+     * Check if the problem with different trigger tags was already reported
+     * for crate iCrate.
+     */
+    bool tagsReported(unsigned int iCrate) { return m_tagsReportedMask & (1 << (iCrate - 1)); }
+    /**
+     * Check if the problem with different trigger phases was already reported
+     * for crate iCrate.
+     */
+    bool phasesReported(unsigned int iCrate) { return m_phasesReportedMask & (1 << (iCrate - 1)); }
+    /**
+     * Check if the problem with bad shaper header was already reported
+     * for crate iCrate.
+     */
+    bool badHeaderReported(unsigned int iCrate) { return m_badHeaderReportedMask & (1 << (iCrate - 1)); }
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;
@@ -89,6 +127,9 @@ namespace Belle2 {
     StoreArray<ECLDsp>   m_eclDsps;
     /** store array for RawECL**/
     StoreArray<RawECL>   m_rawEcl;
+
+    /** Cached debug level from LogSystem */
+    int m_debugLevel;
 
     /** read nex word from COPPER data, check if the end of data is reached  */
     unsigned int readNextCollectorWord();

@@ -73,11 +73,11 @@ namespace Belle2 {
     /** Return the end point of the electron deposition in local coordinates as float array */
     const float* getPosArrayOut() const { return m_posOut; }
     /** Return the time of the electron deposition */
-    float getGlobalTime() const { return m_globalTime; }
+    float getGlobalTime() const override { return m_globalTime; }
     /** Shift the SimHit in time
      * @param delta The value of the time shift.
      */
-    virtual void shiftInTime(float delta) { m_globalTime += delta; }
+    virtual void shiftInTime(float delta) override { m_globalTime += delta; }
 
     /** Return the number of created electrons */
     float getElectrons() const;
@@ -132,7 +132,7 @@ namespace Belle2 {
     /** ID of the sensor the electron was deposited in */
     unsigned short m_sensorID;
 
-    ClassDef(VXDSimHit, 1)
+    ClassDefOverride(VXDSimHit, 1)
   };
 } // end namespace Belle2
 

@@ -103,10 +103,10 @@ void TouschekTURTLEInputModule::initialize()
 
 void TouschekTURTLEInputModule::event()
 {
-  int readHERParticles = 0;
-  int readLERParticles = 0;
-
   try {
+    int readHERParticles = 0;
+    int readLERParticles = 0;
+
     //Read the data
     MCParticleGraph mpg;
     if (m_readHER) readHERParticles = m_readerHER->getParticles(m_maxParticles, mpg); //HER: electrons

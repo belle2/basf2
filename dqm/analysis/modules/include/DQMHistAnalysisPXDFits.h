@@ -22,36 +22,64 @@ namespace Belle2 {
 
   class DQMHistAnalysisPXDFitsModule : public DQMHistAnalysisModule {
 
+    enum { NUM_MODULES = 40}; // we want that from geometry
     // Public functions
   public:
 
     //! Constructor / Destructor
     DQMHistAnalysisPXDFitsModule();
-    virtual ~DQMHistAnalysisPXDFitsModule();
+
+  private:
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
-    // Data members
-  private:
-//     std::string m_histoname;
+    /** Histogram doirectory */
+    std::string m_histogramDirectoryName;
+    /** maps from VXDid to index */
+    std::map <int, int> m_id_to_inx;
+    /** maps from index to VXDid*/
+    std::map <int, int> m_inx_to_id;
 
-    TH2F* m_hSignal[64];
-    TH2F* m_hCommon[64];
-    TH2F* m_hCounts[64];
-    TCanvas* m_cSignal[64];
-    TCanvas* m_cCommon[64];
-    TCanvas* m_cCounts[64];
-    TF1* m_fLandau;// only one fit function
-    TF1* m_fGaus;// only one fit function
+    /** Histogram */
+    TH1F* m_hSignalAll = nullptr;
+    /** Histogram */
+    TH1F* m_hCommonAll = nullptr;
+    /** Histogram */
+    TH1F* m_hCountsAll = nullptr;
+    /** Histogram */
+    TH1F* m_hOccupancyAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cSignalAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cCommonAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cCountsAll = nullptr;
+    /** Canvas */
+    TCanvas* m_cOccupancyAll = nullptr;
 
-    TH1* findHistLocal(TString& a);
+    /** Histograms */
+    TH2F* m_hSignal[NUM_MODULES];
+    /** Histograms */
+    TH2F* m_hCommon[NUM_MODULES];
+    /** Histograms */
+    TH2F* m_hCounts[NUM_MODULES];
+    /** Canvases */
+    TCanvas* m_cSignal[NUM_MODULES];
+    /** Canvases */
+    TCanvas* m_cCommon[NUM_MODULES];
+    /** Canvases */
+    TCanvas* m_cCounts[NUM_MODULES];
+    /** Fit functions */
+    TF1* m_fLandau = nullptr; // only one fit function
+    /** Fit functions */
+    TF1* m_fGaus = nullptr; // only one fit function
 
   };
 } // end namespace Belle2

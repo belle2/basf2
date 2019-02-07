@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleParentRestKinematicsTool.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/variables/Variables.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <iostream>
 #include <TBranch.h>

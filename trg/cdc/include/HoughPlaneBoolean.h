@@ -44,10 +44,10 @@ namespace Belle2 {
   public:// Selectors
 
     /// returns entry in a cell.
-    unsigned entry(unsigned id) const;
+    unsigned entry(unsigned id) const override;
 
-    unsigned entry(unsigned x, unsigned y) const;
-    int maxEntry(void) const;
+    unsigned entry(unsigned x, unsigned y) const override;
+    int maxEntry(void) const override;
 
     /// returns pattern ID which activates specified cell.
     const std::vector<unsigned>& patternId(unsigned cellId) const;
@@ -55,17 +55,18 @@ namespace Belle2 {
   public:// Modifiers
 
     /// Sets entry.
-    unsigned setEntry(unsigned serialId, unsigned n);
+    unsigned setEntry(unsigned serialId, unsigned n) override;
 
     /// clear all entries.
-    void clear(void);
+    void clear(void) override;
 
     /// Votes.
     void vote(float rx,
               float ry,
-              int weight = 1);
+              int weight = 1) override;
 
     /// Votes with charge decision.
+    // using TRGCDCHoughPlaneBase::vote; // to be checked
     void vote(float rx,
               float ry,
               float charge,
@@ -78,10 +79,11 @@ namespace Belle2 {
                           int weight = 1);
 
     /// Votes using registered pattern.
+    // using TRGCDCHoughPlaneBase::vote; // to be checked
     void vote(unsigned patternId, int weight);
 
     /// registers a pattern..
-    void registerPattern(unsigned id);
+    void registerPattern(unsigned id) override;
 
     /// allocate memory for patterns.
     void preparePatterns(unsigned nPatterns);
@@ -89,7 +91,7 @@ namespace Belle2 {
   protected:
 
     /// Add to a cell.
-    void add(unsigned cellId, int weight);
+    void add(unsigned cellId, int weight) override;
 
   private:
     unsigned _n;

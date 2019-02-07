@@ -34,54 +34,24 @@ SVDLatencyCalibrationModule::SVDLatencyCalibrationModule() : Module()
 
 }
 
+
 void SVDLatencyCalibrationModule::initialize()
 {
   m_digits.isRequired(m_shapersListName);
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
-  m_histoList = new TList;
+  //  m_histoList = new TList;
 
-  TString NameOfHisto = "";
-  TString TitleOfHisto = "";
+}
 
-  NameOfHisto = "ladder";
-  TitleOfHisto = "SVD Ladder Number";
-  h_ladder = createHistogram1D(NameOfHisto, TitleOfHisto, 16, -0.5, 15.5, "ladder", m_histoList);
+void SVDLatencyCalibrationModule::beginRun()
+{
+  TH1F h_maxAmplitude("maxAmpl_L@layerL@ladderS@sensor@view",
+                      "bin containing the max of the sampled Amplitude for L@layerL@ladder@sensor@view", 6, -0.5, 5.5);
+  h_maxAmplitude.GetXaxis()->SetTitle("max bin");
 
-  NameOfHisto = "maxAmpliU";
-  TitleOfHisto = "bin containing the max of the sampled Amplitude - U side";
-  h_maxAmplitudeU = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-
-  NameOfHisto = "maxAmpliU_L3fw";
-  h_maxAmplitudeU_L3fw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliU_L3bw";
-  h_maxAmplitudeU_L3bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliU_L4bw";
-  h_maxAmplitudeU_L4bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliU_L5bw";
-  h_maxAmplitudeU_L5bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliU_L6bw";
-  h_maxAmplitudeU_L6bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-
-  NameOfHisto = "maxAmpliV";
-  TitleOfHisto = "bin containing the max of the sampled Amplitude - V side";
-  h_maxAmplitudeV = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-
-  NameOfHisto = "maxAmpliV_L3fw";
-  h_maxAmplitudeV_L3fw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliV_L3bw";
-  h_maxAmplitudeV_L3bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliV_L4bw";
-  h_maxAmplitudeV_L4bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliV_L5bw";
-  h_maxAmplitudeV_L5bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-  NameOfHisto = "maxAmpliV_L6bw";
-  h_maxAmplitudeV_L6bw = createHistogram1D(NameOfHisto, TitleOfHisto, 6, -0.5, 5.5, "max bin", m_histoList);
-
-
-
-
+  m_histo_maxAmplitude = new SVDHistograms<TH1F>(h_maxAmplitude);
 }
 
 void SVDLatencyCalibrationModule::event()
@@ -105,85 +75,29 @@ void SVDLatencyCalibrationModule::event()
         maxbin = k;
       }
     }
-    if (!shaper.isUStrip()) {
-      h_maxAmplitudeV->Fill(maxbin);
 
-      if (sensorID.getLayerNumber() == 3) {
-        if (sensorID.getSensorNumber() == 1)
-          h_maxAmplitudeV_L3fw->Fill(maxbin);
-        else
-          h_maxAmplitudeV_L3bw->Fill(maxbin);
-      }
+    m_histo_maxAmplitude->fill(sensorID, shaper.isUStrip() ? 1 : 0, maxbin);
 
-      if (sensorID.getLayerNumber() == 4)
-        if (sensorID.getSensorNumber() == 3)
-          h_maxAmplitudeV_L4bw->Fill(maxbin);
-
-      if (sensorID.getLayerNumber() == 5)
-        if (sensorID.getSensorNumber() == 4)
-          h_maxAmplitudeV_L5bw->Fill(maxbin);
-
-      if (sensorID.getLayerNumber() == 6)
-        if (sensorID.getSensorNumber() == 5)
-          h_maxAmplitudeV_L6bw->Fill(maxbin);
-
-    } else {
-      h_maxAmplitudeU->Fill(maxbin);
-
-      if (sensorID.getLayerNumber() == 3) {
-        if (sensorID.getSensorNumber() == 1)
-          h_maxAmplitudeU_L3fw->Fill(maxbin);
-        else
-          h_maxAmplitudeU_L3bw->Fill(maxbin);
-      }
-
-      if (sensorID.getLayerNumber() == 4)
-        if (sensorID.getSensorNumber() == 3)
-          h_maxAmplitudeU_L4bw->Fill(maxbin);
-
-      if (sensorID.getLayerNumber() == 5)
-        if (sensorID.getSensorNumber() == 4)
-          h_maxAmplitudeU_L5bw->Fill(maxbin);
-
-      if (sensorID.getLayerNumber() == 6)
-        if (sensorID.getSensorNumber() == 5)
-          h_maxAmplitudeU_L6bw->Fill(maxbin);
-    }
-
-    int ladder = shaper.getSensorID().getLadderNumber();
-    h_ladder->Fill(ladder);
   }
 }
 
-void SVDLatencyCalibrationModule::terminate()
+void SVDLatencyCalibrationModule::endRun()
 {
 
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
 
-    TObject* obj;
-
-    TIter nextH(m_histoList);
-    while ((obj = nextH()))
-      obj->Write();
-
+    VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+    for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+      for (auto ladder : geoCache.getLadders(layer))
+        for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+          for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++)
+            (m_histo_maxAmplitude->getHistogram(sensor, view))->Write();
   }
+
   m_rootFilePtr->Close();
 
+  //  m_histo_maxAmplitude->clean();
+
 }
 
-
-TH1F*  SVDLatencyCalibrationModule::createHistogram1D(const char* name, const char* title,
-                                                      Int_t nbins, Double_t min, Double_t max,
-                                                      const char* xtitle, TList* histoList)
-{
-
-  TH1F* h = new TH1F(name, title, nbins, min, max);
-
-  h->GetXaxis()->SetTitle(xtitle);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}

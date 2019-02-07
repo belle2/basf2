@@ -2,7 +2,7 @@
 
 using namespace Belle2;
 
-void DBObjCalibrationConstMapBase::dump()
+void DBObjCalibrationConstMapBase::dump() const
 {
   for (auto& elementParam : m_constants) {
     std::cout << " Element " << elementParam.first.first << " Param " << elementParam.first.second << " Value = " << elementParam.second

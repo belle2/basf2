@@ -21,8 +21,8 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
   setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = NULL;
   m_NEvents = 0;
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 EKLMRawPackerModule::~EKLMRawPackerModule()
@@ -33,7 +33,6 @@ void EKLMRawPackerModule::initialize()
 {
   m_Digits.isRequired();
   m_RawKLMs.registerInDataStore();
-  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 void EKLMRawPackerModule::beginRun()
@@ -42,7 +41,6 @@ void EKLMRawPackerModule::beginRun()
 
 void EKLMRawPackerModule::event()
 {
-  int n_Gdidgits = 0;
   const EKLMDataConcentratorLane* lane;
   int i, j, k, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
   vector<uint32_t> dataWords[4][4]; // Indices: copper - 1, data concentrator.
@@ -50,7 +48,6 @@ void EKLMRawPackerModule::event()
   uint32_t buf[2];
   uint16_t bword1, bword2, bword3, bword4;
   RawCOPPERPackerInfo packerInfo;
-  RawKLM* rawKlm;
   EKLMDigit* eklmDigit;
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
@@ -58,7 +55,6 @@ void EKLMRawPackerModule::event()
     eklmDigit = m_Digits[i];
     if (!(eklmDigit->isGood()))
       continue;
-    n_Gdidgits++;
     buf[0] = 0;
     buf[1] = 0;
     bword1 = 0;
@@ -68,9 +64,9 @@ void EKLMRawPackerModule::event()
     endcap = eklmDigit->getEndcap();
     layer = eklmDigit->getLayer();
     sector = eklmDigit->getSector();
-    sectorGlobal = m_GeoDat->sectorNumber(endcap, layer, sector);
+    sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
-    if (lane == NULL)
+    if (lane == nullptr)
       B2FATAL("Incomplete EKLM electronics map.");
     formatData(lane, eklmDigit->getPlane(),
                eklmDigit->getStrip(), eklmDigit->getCharge(),
@@ -92,10 +88,10 @@ void EKLMRawPackerModule::event()
     packerInfo.run_subrun_num = 2;
     packerInfo.eve_num = m_NEvents;
     packerInfo.node_id = EKLM_ID + 1 + i;
-    packerInfo.tt_ctime = 0x7123456;
-    packerInfo.tt_utime = 0xF1234567;  //Triger info may be required
-    packerInfo.b2l_ctime = 0x7654321;
-    rawKlm = m_RawKLMs.appendNew();
+    packerInfo.tt_ctime = 0;
+    packerInfo.tt_utime = 0;
+    packerInfo.b2l_ctime = 0;
+    RawKLM* rawKlm = m_RawKLMs.appendNew();
     for (j = 0; j < 4; j++) {
       nWords[j] = dataWords[i][j].size();
       detectorBuf[j] = new int[nWords[j] + 1];
@@ -130,11 +126,13 @@ void EKLMRawPackerModule::formatData(
   int charge, uint16_t ctime, uint16_t tdc,
   uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4)
 {
+  int stripFirmware;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
   bword4 = 0;
-  bword1 |= (strip & 0x7F);
+  stripFirmware = m_ElementNumbers->getStripFirmwareBySoftware(strip);
+  bword1 |= (stripFirmware & 0x7F);
   bword1 |= (((plane - 1) & 1) << 7);
   bword1 |= ((lane->getLane() & 0x1F) << 8);
   bword1 |= (4 << 13);

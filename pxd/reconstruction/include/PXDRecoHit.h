@@ -15,7 +15,6 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-
 // ROOT includes
 #include <TMatrixD.h>
 
@@ -89,11 +88,11 @@ namespace Belle2 {
     PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Creating a deep copy of this hit. */
-    genfit::AbsMeasurement* clone() const;
+    genfit::AbsMeasurement* clone() const override;
 
     /** Methods that actually interface to Genfit.  */
     /* This method allows to provide hit position dependent on track direction. */
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -124,7 +123,7 @@ namespace Belle2 {
     /** Get the likelyhood that cluster shape is likely to be created from track state. */
     float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
 
-    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
+    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { return new genfit::HMatrixUV(); };
 
   private:
 
@@ -141,7 +140,10 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 8)
+    /** Apply planar deformation of sensors*/
+    TVectorD applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
+
+    ClassDefOverride(PXDRecoHit, 8)
   };
 
 } // namespace Belle2

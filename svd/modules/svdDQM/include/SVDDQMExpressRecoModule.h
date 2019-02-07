@@ -54,7 +54,7 @@ namespace Belle2 {
     /** cut for accepting to hitmap histogram, using strips only, default = 0 ADU (was 22 ADU) */
     float m_CutSVDCharge = 0.0;
     /** cut for accepting clusters to hitmap histogram, default = 5 ke- */
-    float m_CutSVDClusterCharge = 5000;
+    float m_CutSVDClusterCharge = 0.0;
 
     /** No of FADCs, for Phase2: 5,
      *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
@@ -72,50 +72,57 @@ namespace Belle2 {
     /** SVD diagnostics module name */
     std::string m_svdDAQDiagnosticsListName;
 
+    /** number of events */
+    TH1I* m_nEvents = nullptr;
+
     /** Hitmaps u of Digits */
-    TH1I* m_hitMapCountsU;
+    TH1I* m_hitMapCountsU = nullptr;
     /** Hitmaps v of Digits */
-    TH1I* m_hitMapCountsV;
+    TH1I* m_hitMapCountsV = nullptr;
     /** Hitmaps u of Clusters*/
-    TH1I* m_hitMapClCountsU;
+    TH1I* m_hitMapClCountsU = nullptr;
     /** Hitmaps v of Clusters*/
-    TH1I* m_hitMapClCountsV;
+    TH1I* m_hitMapClCountsV = nullptr;
     /** Hitmaps of digits on chips */
-    TH1I* m_hitMapCountsChip;
+    TH1I* m_hitMapCountsChip = nullptr;
     /** Hitmaps of clusters on chips */
-    TH1I* m_hitMapClCountsChip;
+    TH1I* m_hitMapClCountsChip = nullptr;
     /** Fired u strips per event */
-    TH1F** m_firedU;
+    TH1F** m_firedU = nullptr;
     /** Fired v strips per event */
-    TH1F** m_firedV;
+    TH1F** m_firedV = nullptr;
     /** u clusters per event */
-    TH1F** m_clustersU;
+    TH1F** m_clustersU = nullptr;
     /** v clusters per event */
-    TH1F** m_clustersV;
+    TH1F** m_clustersV = nullptr;
     /** u charge of clusters */
-    TH1F** m_clusterChargeU;
+    TH1F** m_clusterChargeU = nullptr;
     /** v charge of clusters */
-    TH1F** m_clusterChargeV;
+    TH1F** m_clusterChargeV = nullptr;
     /** u charge of clusters for all sensors */
-    TH1F* m_clusterChargeUAll;
+    TH1F* m_clusterChargeUAll = nullptr;
     /** v charge of clusters for all sensors */
-    TH1F* m_clusterChargeVAll;
+    TH1F* m_clusterChargeVAll = nullptr;
     /** u charge of strips */
-    TH1F** m_stripSignalU;
+    TH1F** m_stripSignalU = nullptr;
     /** v charge of strips */
-    TH1F** m_stripSignalV;
+    TH1F** m_stripSignalV = nullptr;
+    /** u strip count */
+    TH1F** m_stripCountU = nullptr;
+    /** v strip count */
+    TH1F** m_stripCountV = nullptr;
     /** u size */
-    TH1F** m_clusterSizeU;
+    TH1F** m_clusterSizeU = nullptr;
     /** v size */
-    TH1F** m_clusterSizeV;
+    TH1F** m_clusterSizeV = nullptr;
     /** u time */
-    TH1F** m_clusterTimeU;
+    TH1F** m_clusterTimeU = nullptr;
     /** v time */
-    TH1F** m_clusterTimeV;
+    TH1F** m_clusterTimeV = nullptr;
     /** u time of clusters for all sensors */
-    TH1F* m_clusterTimeUAll;
+    TH1F* m_clusterTimeUAll = nullptr;
     /** v time of clusters for all sensors */
-    TH1F* m_clusterTimeVAll;
+    TH1F* m_clusterTimeVAll = nullptr;
 
     /** Counter of APV errors (16) */
     // --for future-- TH1I** m_CounterAPVErrors;
@@ -131,22 +138,22 @@ namespace Belle2 {
     //----------------------------------------------------------------
 
     /** Hitmaps pixels for u */
-    TH2F** m_hitMapU;
+    TH2F** m_hitMapU = nullptr;
     /** Hitmaps pixels for v */
-    TH2F** m_hitMapV;
+    TH2F** m_hitMapV = nullptr;
     /** Hitmaps clusters for u */
-    TH1F** m_hitMapUCl;
+    TH1F** m_hitMapUCl = nullptr;
     /** Hitmaps clusters for v */
-    TH1F** m_hitMapVCl;
+    TH1F** m_hitMapVCl = nullptr;
 
     /** u charge of clusters for layer 3 sensors */
-    TH1F* m_clusterChargeU3;
+    TH1F* m_clusterChargeU3 = nullptr;
     /** v charge of clusters for layer 3  sensors */
-    TH1F* m_clusterChargeV3;
+    TH1F* m_clusterChargeV3 = nullptr;
     /** u charge of clusters for layer 4,5,6 sensors */
-    TH1F* m_clusterChargeU456;
+    TH1F* m_clusterChargeU456 = nullptr;
     /** v charge of clusters for layer 4,5,6 sensors */
-    TH1F* m_clusterChargeV456;
+    TH1F* m_clusterChargeV456 = nullptr;
 
 
   };

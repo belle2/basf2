@@ -52,11 +52,11 @@ namespace Belle2 {
     SVDPerformanceModule();
 
     virtual ~SVDPerformanceModule();
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     std::string m_ShaperDigitName; /**< */
     std::string m_RecoDigitName; /**< */
@@ -129,6 +129,7 @@ namespace Belle2 {
     TH2F* h_clEnergyVSMaxbin[m_nLayers][m_nSensors][m_nSides]; //energy VS maxbin seed
     TH2F* h_clEnergyVSCoorU[m_nLayers][m_nSensors][m_nSides]; //energy VS position U
     TH2F* h_clEnergyVSCoorV[m_nLayers][m_nSensors][m_nSides]; //energy VS position V
+    TH2F* h_clNuVSNv[m_nLayers][m_nSensors]; //N U culsters VS N V clusters
     TH2F* h_clCoorUVSCoorV[m_nLayers][m_nSensors]; //energy VS position
     TH1F* h_clCoor1VSCoor2[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
     TH2F* h_clEnergy12VSdelta[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
@@ -151,6 +152,10 @@ namespace Belle2 {
     TH1F* h_cltrkEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
     TH1F* h_cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
     TH1F* h_cltrkTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH1F* h_cltrkTime_TB1[m_nLayers][m_nSensors][m_nSides];  //time
+    TH1F* h_cltrkTime_TB2[m_nLayers][m_nSensors][m_nSides];  //time
+    TH1F* h_cltrkTime_TB3[m_nLayers][m_nSensors][m_nSides];  //time
+    TH1F* h_cltrkTime_TB4[m_nLayers][m_nSensors][m_nSides];  //time
     TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_cltrkSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_cltrkTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size

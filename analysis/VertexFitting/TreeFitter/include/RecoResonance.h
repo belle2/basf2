@@ -14,7 +14,7 @@
 
 namespace TreeFitter {
 
-  /** */
+  /** A class for resonances */
   class RecoResonance : public RecoComposite {
 
   public:
@@ -23,37 +23,37 @@ namespace TreeFitter {
     RecoResonance(Belle2::Particle* bc, const ParticleBase* mother);
 
     /** init particle in case it has a mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init particle in case it has no mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
-    /**  */
+    /** destructor */
     virtual ~RecoResonance() {};
 
-    /** */
-    virtual int dim() const { return hasEnergy() ? 4 : 3;} // (px,py,pz,(E))
+    /** dimenstion of the vector */
+    virtual int dim() const override { return hasEnergy() ? 4 : 3;} // (px,py,pz,(E))
 
-    /** */
-    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
+    /** project the constraint */
+    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const override;
 
-    /** */
-    virtual int type() const { return kRecoResonance; }
+    /** get type */
+    virtual int type() const override { return kRecoResonance; }
 
-    /** */
-    virtual int posIndex() const { return mother()->posIndex(); }
+    /** get position index in statevector x,y,z,tau,px,py,pz */
+    virtual int posIndex() const override { return mother()->posIndex(); }
 
-    /** */
-    virtual int momIndex() const { return index(); }
+    /** get momentum index in statevector */
+    virtual int momIndex() const override { return index(); }
 
-    /** */
-    virtual int tauIndex() const { return -1; }
+    /** get tau (decay time) index in statevector */
+    virtual int tauIndex() const override { return -1; }
 
-    /** */
-    virtual std::string parname(int index) const;
+    /** parameter name */
+    virtual std::string parname(int index) const override;
 
-    /** */
-    virtual void addToConstraintList(constraintlist& list, int depth) const
+    /** add to the list of constraints */
+    virtual void addToConstraintList(constraintlist& list, int depth) const override
     {
       list.push_back(Constraint(this, Constraint::resonance, depth, dimM()));
     }

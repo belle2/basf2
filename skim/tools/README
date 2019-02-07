@@ -1,0 +1,47 @@
+Description of each item:
+
+runSkims.py: runs the skims on each MC generic sample at kekcc. 
+printSkimStats.py: prints the statistics of each skim using information from the log files and the output uDST files after having run each skim using runSkims.py.
+runCombinedSkims.py : runs the combined skims on each MC generic sample at kekcc. 
+printCombinedStats.py: print the statistics for each combined skims using the information from the log files and the output uDST files. 
+
+inputFiles/McCampaign: a directory with a list of .txt file. Each .txt file contains the kekcc location of a file from each generic MC sample. Only one file is used from each MC sample. In general the generic MC samples:mixed charge, uubar, ccbar, ddbar, taupair,  need to be tested. 
+(Ofcourse you can just use getTestFile(sample,campaign) to get these locations. 
+
+To test your skim you need to have:
+a. Have basf2 installed .
+b. Ensure the samples you want to test your skim on are available on kekcc. All skim testing is done on samples downloaded from the GRID to kekcc. These samples are usually stored under
+   /ghi/fs01/belle2/bdata/MC/
+
+The filename then depends on the MC campaign and release, for instance mixed BGx1 sample from MC9 is stored at kekcc under:
+
+ release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00
+
+
+To download samples you need
+1. a working gbasf2 installation
+2. make the necessary edits in the script sampleDownload.csh and run it:
+ 
+./sampleDownload.csh
+
+
+
+For every skim campaign, a sample from each generic MC sample is usually downloaded (mixed, charged, ccbar, ddbar, uubar, ssbar, taupair).
+This is done for  BGx0 and BGx1 samples.
+
+
+
+If you have the samples ready for testing, then you need to first run your skim
+
+
+Run the skim on all the different samples.
+Make sure you edit skimRun.csh to include the samples you want to test your skim on. 
+   basf2 runSkims.pu
+
+
+After the completion of all the jobs, to find the statistics of your skim, run printSkimStats.py:
+
+  basf2 printSkimStats.py
+
+
+For every new release you need to copy the statistics to the Skimming Homepage, under the headline Skim Statistics. 

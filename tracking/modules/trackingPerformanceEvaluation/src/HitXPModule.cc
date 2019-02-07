@@ -176,13 +176,9 @@ void HitXPModule::event()
 
 
   for (const MCParticle& particle : MCParticles) {
-    int hit_iterator = 0;
     m_Eprimary = particle.getStatus();
-    // for (const SVDCluster& cluster : particle.getRelationsFrom<SVDCluster>()) {
-    //   for (const SVDTrueHit& hit : cluster.getRelationsTo<SVDTrueHit>()) {
     for (const SVDTrueHit& hit : particle.getRelationsTo<SVDTrueHit>()) {
       if (hit.getRelationsFrom<SVDCluster>().size() > 0) {
-        hit_iterator++;
         VxdID trueHitSensorID = hit.getSensorID();
         const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
         const SVDCluster* cluster = hit.getRelationsFrom<SVDCluster>()[0];
@@ -203,8 +199,6 @@ void HitXPModule::event()
         m_hitXPSet.insert(entry);
       }
     }
-    //}
-    //}
     m_trackNumber = m_trackIterator;
     m_EtrackNumber = m_trackIterator; //----------------External Tree ----------------//
     m_trackIterator = m_trackIterator + 1;
@@ -296,28 +290,28 @@ void HitXPModule::event()
     //-------------------------------------------------------------------------------------------------//
     //------------------------------------Selected Tree creation--------------------------------------//
     //-------------------------------------------------------------------------------------------------//
-    /** this selecation take tracks that has at least one hit on each layer, and make 4-hit-trakcs selecting first hit found on each layer. */
+    /** this selection take tracks that have at least one hit in each layer, and make 4-hit-tracks selecting first hit found on each layer. */
     int f3 = 0, f4 = 0, f5 = 0, f6 = 0;
     int layer_flag = 0;
-    int j = 0;
+    unsigned int j = 0;
     int brk = 0;
     std::vector<hitXP> temp_hitXP;
-    while (j < (int)m_hitXP.size() && brk == 0) {
+    while (j < m_hitXP.size() && brk == 0) {
       if (m_hitXP[j].m_sensorLayer == 3) {
         f3 = 1;
         temp_hitXP.push_back(m_hitXP[j]);
         j++;
-        while (j < (int)m_hitXP.size() && brk == 0) {
+        while (j < m_hitXP.size() && brk == 0) {
           if (m_hitXP[j].m_sensorLayer == 4) {
             f4 = 1;
             temp_hitXP.push_back(m_hitXP[j]);
             j++;
-            while (j < (int)m_hitXP.size() && brk == 0) {
+            while (j < m_hitXP.size() && brk == 0) {
               if (m_hitXP[j].m_sensorLayer == 5) {
                 f5 = 1;
                 temp_hitXP.push_back(m_hitXP[j]);
                 j++;
-                while (j < (int)m_hitXP.size() && brk == 0) {
+                while (j < m_hitXP.size() && brk == 0) {
                   if (m_hitXP[j].m_sensorLayer == 6) {
                     f6 = 1;
                     temp_hitXP.push_back(m_hitXP[j]);

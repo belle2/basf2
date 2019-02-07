@@ -14,6 +14,8 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/core/InputController.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 #include <boost/filesystem.hpp>
 #include <memory>
@@ -50,6 +52,13 @@ unsigned int Environment::getNumberOfEvents() const
     return numEventsFromArgument;
   else
     return numEventsFromInput;
+}
+
+bool Environment::isMC() const
+{
+  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+  if (fileMetaData) return fileMetaData->isMC();
+  return true;
 }
 
 std::string Environment::consumeOutputFileOverride(const std::string& module)
@@ -143,7 +152,7 @@ Environment::~Environment()
 
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {
-  const std::list<ModulePtr>& modules = path->getModules();
+  const std::list<ModulePtr>& modules = path->buildModulePathList(true);
 
   for (ModulePtr m : modules) {
     if (m->hasProperties(Module::c_Input)) {
@@ -153,7 +162,6 @@ void Environment::setJobInformation(const std::shared_ptr<Path>& path)
       }
     }
     if (m->hasProperties(Module::c_Output)) {
-      std::string out = Environment::Instance().getOutputFileOverride();
       std::vector<std::string> outputFiles = m->getFileNames(true);
       for (const string& file : outputFiles) {
         m_jobInfoOutput += "OUTPUT FILE: " + file + "\n";

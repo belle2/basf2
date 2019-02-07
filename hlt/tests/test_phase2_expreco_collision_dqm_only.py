@@ -5,6 +5,6 @@ from softwaretrigger.test_support import create_test_path, finalize_test_path
 
 path, tempfolder = create_test_path(runtype="collision", expNum=1002, location="expressreco")
 
-add_expressreco_processing(path, run_type="collision", do_reconstruction=False, clean_wrapped_path=True)
+add_expressreco_processing(path, run_type="collision", do_reconstruction=False)
 
 finalize_test_path(path, tempfolder, has_softwaretriggerresult=False)

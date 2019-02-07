@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_POLYGON2D_H
-#define EKLM_POLYGON2D_H
+#pragma once
 
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
@@ -35,6 +34,16 @@ namespace Belle2 {
        * @param[in] n      Number of points.
        */
       Polygon2D(const HepGeom::Point3D<double>* points, int n);
+
+      /**
+       * Copy constructor (disabled).
+       */
+      Polygon2D(const Polygon2D&) = delete;
+
+      /**
+       * Operator = (disabled).
+       */
+      Polygon2D& operator=(const Polygon2D&) = delete;
 
       /**
        * Destructor.
@@ -85,6 +94,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif
-

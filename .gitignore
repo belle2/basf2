@@ -72,7 +72,8 @@ centraldb/
 Belle2FileCatalog.xml
 /results/
 /html/
-/runtime.dat
+/runtimes.dat
+/runtimes-old.dat
 
 
 # Python byte code #
@@ -102,3 +103,8 @@ Belle2FileCatalog.xml
 .dir-locals.el
 .project
 .idea
+
+# Compiler output #
+# ############### #
+*.o
+*.os

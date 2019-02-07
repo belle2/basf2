@@ -4,10 +4,9 @@
 
 using namespace Belle2;
 
-Buffer::Buffer()
-throw() : m_memory(NULL), m_size(0), m_allocated(false) {}
+Buffer::Buffer() : m_memory(NULL), m_size(0), m_allocated(false) {}
 
-Buffer::Buffer(unsigned int size, unsigned char* memory) throw()
+Buffer::Buffer(unsigned int size, unsigned char* memory)
   : m_memory(memory), m_size(size), m_allocated(false)
 {
   if (memory == NULL && size > 0) {
@@ -17,7 +16,7 @@ Buffer::Buffer(unsigned int size, unsigned char* memory) throw()
   }
 }
 
-Buffer::Buffer(const Buffer& buf) throw()
+Buffer::Buffer(const Buffer& buf)
   : m_memory(NULL), m_size(buf.m_size),
     m_allocated(buf.m_allocated)
 {
@@ -31,7 +30,7 @@ Buffer::Buffer(const Buffer& buf) throw()
   m_size = buf.m_size;
 }
 
-Buffer::~Buffer() throw()
+Buffer::~Buffer()
 {
   if (m_allocated && m_memory != NULL) {
     delete [] m_memory;
@@ -40,7 +39,7 @@ Buffer::~Buffer() throw()
   }
 }
 
-const Buffer& Buffer::operator=(const Buffer& buf) throw()
+const Buffer& Buffer::operator=(const Buffer& buf)
 {
   if (m_allocated) {
     delete [] m_memory;

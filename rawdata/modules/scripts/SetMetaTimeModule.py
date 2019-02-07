@@ -16,8 +16,10 @@ class SetMetaTimeModule(Module):
 
     #: List of detector names to check in that order (for fallback)
     detectorlist = "SVD CDC ECL TOP"
+
     #: pointer to event meta data
     meta = None
+
     #: array of pointers to the detector raw data arrays
     raws = []
 
@@ -27,13 +29,12 @@ class SetMetaTimeModule(Module):
         if not self.meta:
             B2FATAL("no EventMetaData object")
             return
-
         self.raws = [Belle2.PyStoreArray(f"Raw{e}s") for e in self.detectorlist.split()]
 
     def calc_time(self, it):
         """Calculate the time in ns since epoch from UnixTime and Accelerator Clock count"""
         # t = it.GetTTTimeNs(0)
-        return it.GetTTUtime(0) * 1000000000 + int(it.GetTTCtime(0) / 0.127216)
+        return it.GetTTUtime(0) * 1000000000 + int(round(it.GetTTCtime(0) / 0.127216))
 
     def event(self):
         """event"""

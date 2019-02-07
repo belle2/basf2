@@ -6,11 +6,13 @@
   <output>CosmicsSimNoBkg.root</output>
   <contact>tkuhr</contact>
   <cacheable/>
-  <description>This steering file produces 10000 cosmic ray events without background.</description>
+  <description>
+    This steering file produces 10000 cosmic ray events without background.
+  </description>
 </header>
 """
 
-from basf2 import *
+from basf2 import create_path, statistics, set_random_seed, process
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
 
@@ -19,7 +21,7 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[1])
+main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[0])
 
 # generate BBbar events
 main.add_module('Cosmics')
@@ -38,9 +40,15 @@ process(main)
 # Print call statistics
 print(statistics)
 
-statistics_plots('CosmicsSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with Cosmics events',
-                 prefix='CosmicsSimNoBkg')
-event_timing_plot('../CosmicsSimNoBkg.root', 'CosmicsSimNoBkg_statistics.root', contact='tkuhr',
-                  jobDesc='a standard simulation job with Cosmics events',
-                  prefix='CosmicsSimNoBkg')
+statistics_plots(
+    'CosmicsSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with Cosmics events',
+    prefix='CosmicsSimNoBkg'
+)
+event_timing_plot(
+    '../CosmicsSimNoBkg.root', 'CosmicsSimNoBkg_statistics.root',
+    contact='tkuhr',
+    job_desc='a standard simulation job with Cosmics events',
+    prefix='CosmicsSimNoBkg'
+)

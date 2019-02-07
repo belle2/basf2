@@ -24,6 +24,9 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+// magnetic field manager
+#include <framework/geometry/BFieldManager.h>
+
 #include <background/dataobjects/BackgroundInfo.h>
 
 
@@ -61,8 +64,8 @@ namespace Belle2 {
 
     // Add parameters
     addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
-    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.2);
-
+    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.066);
+    addParam("MagneticFieldDistorsion", m_bdistort, "Apply image distortion due to non-perp. magnetic field", 0);
   }
 
   ARICHDigitizerModule::~ARICHDigitizerModule()
@@ -134,15 +137,19 @@ namespace Belle2 {
       // Get id of module
       int moduleID = aSimHit->getModuleID();
 
+      if (m_bdistort) magFieldDistorsion(locpos, moduleID);
+
       // skip if not active
       if (!m_modInfo->isActive(moduleID)) continue;
 
       // Get id number of hit channel
       int chX, chY;
-      m_geoPar->getHAPDGeometry().getXYChannel(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y(), chX, chY);
+      m_geoPar->getHAPDGeometry().getXYChannel(locpos.X(), locpos.Y(), chX, chY);
+
       if (chX < 0 && chY < 0) continue;
 
       int asicChannel = m_chnMap->getAsicFromXY(chX, chY);
+
 
       // eliminate un-active channels
       if (asicChannel < 0 || !m_chnMask->isActive(moduleID, asicChannel)) continue;
@@ -198,6 +205,25 @@ namespace Belle2 {
       }
     }
 
+  }
+
+  void ARICHDigitizerModule::magFieldDistorsion(TVector2& hit, int copyno)
+  {
+
+    TVector2 hitGlob;
+    double phi = m_geoPar->getDetectorPlane().getSlotPhi(copyno);
+    double r = m_geoPar->getDetectorPlane().getSlotR(copyno);
+    double z = m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness();
+    hitGlob.SetMagPhi(r, phi);
+    TVector2 shift = hit;
+    hitGlob += shift.Rotate(phi);
+    TVector3 Bfield = BFieldManager::getField(m_geoPar->getMasterVolume().pointToGlobal(TVector3(hitGlob.X(), hitGlob.Y(), z)));
+    double cc = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z());
+    shift.SetX(cc * Bfield.X());
+    shift.SetY(cc * Bfield.Y());
+    shift = shift.Rotate(-phi);
+    hit.SetX(hit.X() + shift.X());
+    hit.SetY(hit.Y() + shift.Y());
   }
 
   void ARICHDigitizerModule::endRun()

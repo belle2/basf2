@@ -45,16 +45,16 @@ namespace Belle2 {
     virtual ~BKLMRawPackerModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! begin run functions to be called from main process
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     //! end run functions to be called from main process
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    virtual void event() override;
 
 
   private:

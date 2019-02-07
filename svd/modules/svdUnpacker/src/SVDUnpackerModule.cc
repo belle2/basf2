@@ -135,7 +135,6 @@ void SVDUnpackerModule::event()
             << "remember to use SVDShaperDigitSorter in your path and \n"
             << "set the silentlyAppend parameter of SVDUnpacker to true.");
 
-  vector<SVDDAQDiagnostic*> diagnosticVector;
   SVDDAQDiagnostic* currentDAQDiagnostic;
   map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
   // Store encountered pipeline addresses with APVs in which they were observed
@@ -155,18 +154,19 @@ void SVDUnpackerModule::event()
 
   bool nFADCmatch = true;
   bool nAPVmatch = true;
+  bool badMapping = false;
+
   unsigned short nAPVheaders = 999;
   set<short> seenAPVHeaders = {};
 
   unsigned short nEntries_rawSVD = rawSVDList.getEntries();
 
   if (nEntries_rawSVD != nFADCboards) {
-    B2WARNING(" On event number: " << m_eventMetaDataPtr->getEvent() << " --> number of RawSVD data objects (" << nEntries_rawSVD <<
-              ") do not match the number of FADC boards (" << nFADCboards << ")!");
+    B2WARNING("Number of RawSVD data objects do not match the number of FADC boards" << LogVar("#RawSVD",
+              nEntries_rawSVD)  << LogVar("#FADCs", nFADCboards) << LogVar("Event number", m_eventMetaDataPtr->getEvent()));
 
     nFADCmatch = false;
   }
-
 
   for (unsigned int i = 0; i < nEntries_rawSVD; i++) {
 
@@ -214,12 +214,12 @@ void SVDUnpackerModule::event()
 
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header
-            diagnosticVector.clear(); // new set of objects for the current FTB
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
 
             nAPVheaders = 0; // start counting APV headers for this FADC
             nAPVmatch = true; //assume correct # of APV headers
+            badMapping = false; //assume correct mapping
 
             data32_it++; // go to 2nd part of FTB header
             crc16vec.push_back(*data32_it);
@@ -228,31 +228,36 @@ void SVDUnpackerModule::event()
 
             ftbError = m_FTBHeader.errorsField;
 
+            if (ftbError != 240) {
+              switch (ftbError - 240) {
+                case 3:
+                  B2WARNING("FADC Event Number is different from (FTB & TTD) Event Numbers");
+                  break;
+                case 5:
+                  B2WARNING("TTD Event Number is different from (FTB & FADC) Event Numbers");
+                  break;
+                case 6:
+                  B2WARNING("FTB Event Number is different from (TTD & FADC) Event Numbers");
+                  break;
+                case 7:
+                  B2WARNING("(FTB, TTD & FADC) Event Numbers are different from each other");
+                  break;
+                default:
+                  B2WARNING("Problem with errorsField variable in FTB Header" << LogVar("abnormal value", ftbError));
+              }
+            }
+
             if (m_FTBHeader.eventNumber !=
                 (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) {
               if (m_shutUpFTBError) { //
                 m_shutUpFTBError -= 1 ;
-                B2ERROR(
-                  "Trigger number mismatch." << std::endl <<
-                  "Expected trigger number & 0xFFFFFF   = 0x" <<
-                  std::hex  <<
-                  (m_eventMetaDataPtr->getEvent() & 0xFFFFFF) <<
-                  std::endl <<
-                  "Trigger number in the FTB            = 0x" <<
-                  std::hex <<
-                  m_FTBHeader.eventNumber);
+
+                B2ERROR("Trigger number mismatch detected!" << LogVar("Expected trigger number & 0xFFFFFF",
+                                                                      (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) << LogVar("Trigger number in the FTB", m_FTBHeader.eventNumber));
+
               }
             }
 
-            if (m_FTBHeader.errorsField != 0xf0) {
-              if (m_shutUpFTBError) {
-                m_shutUpFTBError -= 1 ;
-                B2ERROR(
-                  "Error on SVD FTB : 0x" << std::hex <<
-                  m_FTBHeader.errorsField
-                );
-              }
-            }
             continue;
           }
 
@@ -271,21 +276,12 @@ void SVDUnpackerModule::event()
             if (
               m_MainHeader.trgNumber !=
               ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF)) {
-              B2ERROR(" On event number: " << m_eventMetaDataPtr->getEvent() <<
-                      std::endl <<
-                      " Found a wrong FTB header of the SVD FADC " <<
-                      std::endl <<
-                      " FADC: " << fadc << std::endl <<
-                      " Trigger number LSByte reported by the FADC: " <<
-                      m_MainHeader.trgNumber << " + offset " <<
-                      m_FADCTriggerNumberOffset <<
-                      std::endl <<
-                      " expected: " << (m_eventMetaDataPtr->getEvent() & 0xFF)
-                     );
+              B2ERROR(" Found a wrong FTB header of the SVD FADC " << LogVar("Event number", m_eventMetaDataPtr->getEvent()) << LogVar("FADC",
+                      fadc) << LogVar("Trigger number LSByte reported by the FADC", m_MainHeader.trgNumber) << LogVar("+ offset",
+                          m_FADCTriggerNumberOffset) << LogVar("expected", (m_eventMetaDataPtr->getEvent() & 0xFF)));
             }
 
             // create SVDModeByte object from MainHeader vars
-            //B2INFO("Filling SVDModeByte object");
             m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
           }
 
@@ -300,10 +296,12 @@ void SVDUnpackerModule::event()
             apvErrors = m_APVHeader.apvErr;
             pipAddr = m_APVHeader.pipelineAddr;
 
+            if (apvErrors != 0) B2WARNING("APV error has been detected." << LogVar("FADC", fadc) << LogVar("APV", apv) << LogVar("Error value",
+                                            apvErrors));
+
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
-            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, fadc,
-                                                            apv);
-            diagnosticVector.push_back(currentDAQDiagnostic);
+            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, nAPVmatch,
+                                                            fadc, apv);
             apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
           }
 
@@ -346,13 +344,19 @@ void SVDUnpackerModule::event()
             if (newShaperDigit) {
               diagnosticMap.insert(make_pair(*newShaperDigit, currentDAQDiagnostic));
               delete newShaperDigit;
-            } else if (m_badMappingFatal)
+            } else if (m_badMappingFatal) {
               B2FATAL("Respective FADC/APV combination not found -->> incorrect payload in the database! ");
+            } else {
+              badMapping = true;
+            }
 
           }  //is data frame
 
 
           if (m_FADCTrailer.check == 14)  { // FADC trailer
+
+            //additional check if we have a faulty/fake FADC that is not in the map
+            if (APVmap->find(fadc) == APVmap->end()) badMapping = true;
 
             //comparing number of APV chips and the number of APV headers, for the current FADC
             unsigned short nAPVs = APVmap->count(fadc);
@@ -377,7 +381,8 @@ void SVDUnpackerModule::event()
                                            make_pair(fadcApv.first, fadcApv.second),
                                            make_pair(eventNo, eventNo)
                                          ));
-                    B2WARNING(" Event number " << eventNo << ": missing APV header " << int(fadcApv.second) << " on FADC " << int(fadcApv.first));
+                    B2WARNING("missing APV header! " << LogVar("Event number", eventNo) << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
+                              int(fadcApv.first)));
                     nAPVmatch = false;
                   }
                 }
@@ -386,14 +391,26 @@ void SVDUnpackerModule::event()
             seenAPVHeaders.clear();
 
             ftbFlags = m_FADCTrailer.FTBFlags;
+            if (ftbFlags != 0) {
+              B2WARNING(" FTB Flags variable has an active error bit(s)" << LogVar("on FADC number", fadc));
+
+              if (ftbFlags & 16) B2WARNING("----> CRC error has been detected. Data might be corrupted!");
+              if (ftbFlags & 8) B2WARNING("----> Bad Event indication has been detected. Data might be corrupted!");
+              if (ftbFlags & 4) B2WARNING("----> Double Header has been detected. Data might be corrupted!");
+              if (ftbFlags & 2) B2WARNING("----> Time Out has been detected. Data might be corrupted!");
+              if (ftbFlags & 1) B2WARNING("----> Event Too Long! Data might be corrupted!");
+            }
+
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
-            for (auto* finalDAQDiagnostic : diagnosticVector) {
+            for (auto& p : DAQDiagnostics) {
+              if (p.getFADCNumber() != fadc) continue;
               // adding remaining info to Diagnostic object
-              finalDAQDiagnostic->setFTBFlags(ftbFlags);
-              finalDAQDiagnostic->setEmuPipelineAddress(emuPipAddr);
-              finalDAQDiagnostic->setApvErrorOR(apvErrorsOR);
-              finalDAQDiagnostic->setAPVMatch(nAPVmatch);
+              p.setFTBFlags(ftbFlags);
+              p.setEmuPipelineAddress(emuPipAddr);
+              p.setApvErrorOR(apvErrorsOR);
+              p.setAPVMatch(nAPVmatch);
+              p.setBadMapping(badMapping);
             }
 
           }// FADC trailer
@@ -403,7 +420,6 @@ void SVDUnpackerModule::event()
             //check CRC16
             crc16vec.pop_back();
             unsigned short iCRC = crc16vec.size();
-            //uint32_t *crc16input = new uint32_t[iCRC];
             uint32_t crc16input[iCRC];
 
             for (unsigned short icrc = 0; icrc < iCRC; icrc++)
@@ -415,7 +431,7 @@ void SVDUnpackerModule::event()
             unsigned int checkCRC = bcrc.checksum();
 
             if (checkCRC != m_FTBTrailer.crc16) {
-              B2WARNING("FTB CRC16 checksum DOES NOT MATCH for FADC no. " << fadc);
+              B2WARNING("FTB CRC16 checksum DOES NOT MATCH" << LogVar("for FADC no.", fadc));
               m_wrongFTBcrc++;
             }
 
@@ -429,7 +445,8 @@ void SVDUnpackerModule::event()
 
     } // end event loop
 
-  }
+  }// end loop over RawSVD objects
+
   // Detect upset APVs and report/treat
   auto major_apv = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
                                [](const decltype(apvsByPipeline)::value_type & p1,
@@ -460,8 +477,12 @@ void SVDUnpackerModule::event()
                                make_pair(fadcApv.first, fadcApv.second),
                                make_pair(eventNo, eventNo)
                              ));
-          B2WARNING(" Event number " << eventNo << ": upset APV: " <<
-                    int(fadcApv.second) << " on FADC " << int(fadcApv.first));
+          for (auto& pp : DAQDiagnostics) {
+            if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
+              pp.setUpsetAPV(true);
+          }
+          B2WARNING("Upset APV detected!!!" << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
+                    int(fadcApv.first)) << LogVar("Event number", eventNo));
         }
       }
     }
@@ -469,10 +490,11 @@ void SVDUnpackerModule::event()
   // Here we can delete digits coming from upset APVs. We detect them by comparing
   // actual and emulated pipeline address fields in DAQDiagnostics.
   for (auto& p : diagnosticMap) {
-    if (m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress())
-      continue;
+    if ((m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress()) || p.second->getFTBError() != 240
+        || p.second->getFTBFlags()) continue;
     shaperDigits.appendNew(p.first)->addRelationTo(p.second);
   }
+
 } //end event function
 #ifndef __clang__
 #pragma GCC diagnostic pop
@@ -480,21 +502,18 @@ void SVDUnpackerModule::event()
 
 void SVDUnpackerModule::endRun()
 {
-// B2INFO("   m_wrongFTBcrc = " << m_wrongFTBcrc);
   // Summary report on missing APVs
   if (m_missingAPVs.size() > 0) {
     B2WARNING("SVDUnpacker summary 1: Missing APVs");
     for (const auto& miss : m_missingAPVs)
-      B2WARNING("Missing APV " << miss.first.second << " on FADC " <<
-                miss.first.first << " since event " << miss.second.first <<
-                " to event " << miss.second.second);
+      B2WARNING(LogVar("Missing APV", miss.first.second) << LogVar("FADC", miss.first.first) << LogVar("since event",
+                miss.second.first) << LogVar("to event", miss.second.second));
   }
   if (m_upsetAPVs.size() > 0) {
     B2WARNING("SVDUnpacker summary 2: Upset APVs");
     for (const auto& upst : m_upsetAPVs)
-      B2WARNING("Upset APV " << upst.first.second << " on FADC " <<
-                upst.first.first << " since event " << upst.second.first <<
-                " to event " << upst.second.second);
+      B2WARNING(LogVar("Upset APV", upst.first.second) << LogVar("FADC", upst.first.first) <<
+                LogVar("since event", upst.second.first) << LogVar("to event", upst.second.second));
   }
 }
 
@@ -506,28 +525,16 @@ void SVDUnpackerModule::printB2Debug(uint32_t* data32, uint32_t* data32_min, uin
   uint32_t* min = std::max((data32 - nWords), data32_min);
   uint32_t* max = std::min((data32 + nWords), data32_max);
 
-  uint32_t* ptr = min;
-  int counter = 0;
-
-  char message[256] = "";
-  ostringstream os;
-  os << endl;
-
-  while (ptr < max + 1) {
-    char prev_message[256] = "";
-    strcpy(prev_message, message);
-    sprintf(message, "%s%.8x ", prev_message, *ptr);
-    if (counter++ % 10 == 9) {
-      os << message << endl;
-      //sprintf(message,"");
-      strcpy(message, "");
-    }
-
-    ptr++;
+  size_t counter{0};
+  std::stringstream os;
+  os << std::hex << std::setfill('0');
+  for (uint32_t* ptr = min; ptr <= max; ++ptr) {
+    os << std::setw(8) << *ptr;
+    if (++counter % 10 == 0) os << std::endl;
+    else os << " ";
   }
 
-  os << message << endl;
-  //B2DEBUG(1, os.str());
+  os << std::endl;
   B2INFO(os.str());
   return;
 

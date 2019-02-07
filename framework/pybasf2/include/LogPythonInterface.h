@@ -1,18 +1,18 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Thomas Kuhr                               *
+ * Contributors: Martin Ritter, Thomas Kuhr, Thomas Hauth                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-#include <boost/python/dict.hpp>
-
 #include <framework/logging/LogConfig.h>
+
+#include <boost/python/dict.hpp>
 
 #include <string>
 
@@ -133,6 +133,14 @@ namespace Belle2 {
     void addLogConsole();
 
     /**
+     * Add the console as output connection but print the log messages as json
+     * objects so that they can be parsed easily
+     * @param complete if true ignore the log info configuration and print all
+     *                 parts of the log message.
+     */
+    void addLogJSON(bool complete);
+
+    /**
      * Add the console as output connection
      *
      * @param color Flag whether color should be used
@@ -153,48 +161,59 @@ namespace Belle2 {
     void enableErrorSummary(bool on);
 
     /**
+     * Set flag if logging should be done via python `sys.stdout`
+     */
+    void setPythonLoggingEnabled(bool enabled) const;
+
+    /**
+     * Get flag if logging should be done via python `sys.stdout`
+     */
+    bool getPythonLoggingEnabled() const;
+
+    /**
      * Produce debug message
      *
-     * @param level The debug level
-     * @param msg The debug message text
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logDebug(int level, const std::string& msg);
-
+    static boost::python::object logDebug(boost::python::tuple args, boost::python::dict kwargs);
     /**
      * Produce info message
      *
-     * @param msg The info message text
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logInfo(const std::string& msg);
+    static boost::python::object logInfo(boost::python::tuple args, boost::python::dict kwargs);
 
     /**
      * Produce result message
      *
-     * @param msg The result message text
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logResult(const std::string& msg);
-
+    static boost::python::object logResult(boost::python::tuple args, boost::python::dict kwargs);
     /**
      * Produce warning message
      *
-     * @param msg The warning message
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logWarning(const std::string& msg);
-
+    static boost::python::object logWarning(boost::python::tuple args, boost::python::dict kwargs);
     /**
      * Produce error message
      *
-     * @param msg The error message text
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logError(const std::string& msg);
+    static boost::python::object logError(boost::python::tuple args, boost::python::dict kwargs);
 
     /**
      * Produce fatal message
      *
-     * @param msg The fatal message text
+     * @param args positional arguments, concatenated to form message
+     * @param kwargs keyword arguments to be converted to log variables
      */
-    static void logFatal(const std::string& msg);
-
+    static boost::python::object logFatal(boost::python::tuple args, boost::python::dict kwargs);
 
     /** return dict with log statistics */
     boost::python::dict getLogStatistics();

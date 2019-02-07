@@ -19,8 +19,9 @@ extern "C" {
   void set_beta_rq_(float*);
   void set_time_window_(float*, float*);
   void get_time_window_(float*, float*);
-  void set_pdf_opt_(int*);
+  void set_pdf_opt_(int*, int*, int*);
   float get_logl_(float*, float*, float*, float*);
+  void get_logl_ch_(float*, float*, float*, float*, float*);
   int data_getnum_();
   void set_channel_mask_(int*, int*, int*);
   void print_channel_mask_();
@@ -67,6 +68,11 @@ namespace Belle2 {
        */
       static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
                                  bool printMask = false);
+
+      /**
+       * Set relative efficiencies of pixels
+       */
+      static void setChannelEffi();
 
       /**
        * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
@@ -116,11 +122,13 @@ namespace Belle2 {
       /**
        * Set PDF option
        * @param opt option - see definition of PDFoption
+       * @param NP number of emission positions along track segment (equidistant)
+       * @param NC number of Cerenkov angles (equdistant in photon energies)
        */
-      void setPDFoption(PDFoption opt)
+      void setPDFoption(PDFoption opt, int NP = 0, int NC = 0)
       {
         int iopt = opt;
-        set_pdf_opt_(&iopt);
+        set_pdf_opt_(&iopt, &NP, &NC);
       }
 
       /**
@@ -209,6 +217,25 @@ namespace Belle2 {
         float tmax = (float) timeMax;
         float sigt = (float) sigma;
         return get_logl_(&t0, &tmin, &tmax, &sigt);
+      }
+
+      /**
+       * Return pixel log likelihoods for the last mass hypothesis using time-shifted PDF
+       * If timeMax <= timeMin use those set by setTimeWindow(double Tmin, double Tmax)
+       * @param timeShift time shift of PDF
+       * @param timeMin lower edge of time window within which the photons are accepted
+       * @param timeMax upper edge of time window within which the photons are accepted
+       * @param sigma additional time smearing sigma
+       * @param logL return array of pixel log likelihood values (must be zeroed on input)
+       */
+      void getLogL(double timeShift, double timeMin, double timeMax, double sigma,
+                   float* logL)
+      {
+        float t0 = (float) timeShift;
+        float tmin = (float) timeMin;
+        float tmax = (float) timeMax;
+        float sigt = (float) sigma;
+        get_logl_ch_(&t0, &tmin, &tmax, &sigt, logL);
       }
 
       /**

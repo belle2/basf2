@@ -12,19 +12,19 @@ namespace Belle2 {
     Date(time_t time);
     Date(const Date& date);
     Date();
-    ~Date() throw();
+    ~Date();
 
   public:
-    void set() throw();
-    void set(time_t time) throw();
-    time_t get() const throw() { return m_time; }
-    int getSecond() const throw();
-    int getMinitue() const throw();
-    int getHour() const throw();
-    int getDay() const throw();
-    int getMonth() const throw();
-    int getYear() const throw();
-    const char* toString(const char* format = NULL) const throw();
+    void set();
+    void set(time_t time);
+    time_t get() const { return m_time; }
+    int getSecond() const;
+    int getMinitue() const;
+    int getHour() const;
+    int getDay() const;
+    int getMonth() const;
+    int getYear() const;
+    const char* toString(const char* format = NULL) const;
 
   public:
     const Date& operator=(const Date& date)

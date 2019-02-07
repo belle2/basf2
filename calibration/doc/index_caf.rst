@@ -69,6 +69,73 @@ before running, and assigns some default options to calibrations if they weren't
 .. autoclass:: caf.framework.CAF
     :members:
 
+
+Restarting The CAF From Failure
+-------------------------------
+
+During development you will likely find that sometimes your Calibration fails to complete due to problems in the code.
+When using the full `caf.framework.CAF` class this can be quite problematic.
+For example, if your algorithm fails after the collector step has already completed (which may take a long time depending
+on how much data you're using) then you might have to re-run your entire CAF process again.
+
+In order to prevent this issue, the CAF uses a checkpoint system to save the state of each Calibration once it reaches a
+recoverable position in the workflow.
+If you run the CAF using the same output directory again the CAF will restart each Calibration requested from the *checkpoint*
+state of that Calibration i.e. the last recoverable state.
+
+Put simply, if you get a failure when running the CAF try to fix the problem and then re-run your Python CAF script.
+The CAF should restart from a safe position and try to run the (now fixed) code again.
+
+
+Multiple Collections
+--------------------
+
+Sometimes you may have multiple data types which you want to use as input to your `Calibration`.
+In this case you essentially want to run your Collector module with different pre-collection reconstruction
+parameters and use all the data merged as input to the algorithm.
+By using the `Calibration.add_collection` function you can add multiple different `Collection` objects to your
+`Calibration`.
+
+.. autoclass:: caf.framework.Collection
+    :members:
+
+.. warning:: If you are merging different data types in this way it is likely that they come from very different run ranges.
+             Therefore your should take care that your AlgorithmStrategy setup makes sense and that you have checked that the
+             output IoVs of the payloads are correct.
+
+
+The b2caf-status Tool
+---------------------
+
+In order to save these checkpoint states the CAF is creating a SQLite3 database file in your `CAF.output_dir` directory.
+The b2caf-status command line tool lets you show the current status of the Calibrations *even while the CAF is running*.
+It also lets you change the values in this database, so an advanced user could choose to reset a Calibration back to an earlier
+iteration or checkpoint state.
+This could be useful if a Collector step succeeded previously, but now needs to be re-run with different parameter values. 
+
+.. argparse::
+    :filename: calibration/tools/b2caf-status
+    :func: get_argparser
+    :prog: b2caf-status
+
+
+The b2caf-filemap Tool
+----------------------
+
+Sometimes you will want to run over many input files. If you are ignoring certain runs from these files the CAF requires
+that it knows which IoV each file corresponds to.
+This is handled automatically by the CAF during startup, however this can take a long time to process if you have many files.
+A better solution is to use the `caf.framework.Calibration.files_to_iovs` attribute and set a pre-calculated dictionary
+manually.
+To create this dictionary the b2caf-filemap tool can be used (though it isn't necessary to use it) to create a pickle file
+containing the dictionary.
+
+.. argparse::
+    :filename: calibration/tools/b2caf-filemap
+    :func: get_argparser
+    :prog: b2caf-filemap
+
+
 Job Submission Backends
 -----------------------
 

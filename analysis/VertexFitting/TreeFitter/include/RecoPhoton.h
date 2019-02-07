@@ -24,34 +24,34 @@ namespace TreeFitter {
     virtual ~RecoPhoton() {};
 
     /** init particle with mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init particle without mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** init covariance */
-    ErrCode initCovariance(FitParams* fitparams) const;
+    ErrCode initCovariance(FitParams& fitparams) const override;
 
     /** update or init params */
     ErrCode initParams();
 
     /** project photon consztraint */
-    ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const;
+    ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const override;
 
     /** sets the size of the corresponding residual projection */
-    virtual int dimM() const { return dim(); }
+    virtual int dimM() const override { return dim(); }
 
     /** how should the energy be calculated ? from momentum or from E ?  */
-    virtual bool hasEnergy() const { return false; }
+    virtual bool hasEnergy() const override { return false; }
 
     /**set the size of the particle in the statevector */
-    virtual int dim() const { return m_dim; }
+    virtual int dim() const override { return m_dim; }
 
     /** type */
-    virtual int type()     const { return kRecoPhoton ; }
+    virtual int type()     const override { return kRecoPhoton ; }
 
     /** add to list */
-    virtual void addToConstraintList(constraintlist& alist, int depth) const
+    virtual void addToConstraintList(constraintlist& alist, int depth) const override
     {
       alist.push_back(Constraint(this, Constraint::photon, depth, dimM())) ;
     }

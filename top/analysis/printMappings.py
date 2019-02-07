@@ -11,7 +11,7 @@ import sys
 # Usage:  basf2 top/analysis/printMappings.py
 #
 # The filename of the main xml file can be specified as an optional argument
-#   example: basf2 top/analysis/printMappings.py testbeam/top/LEPS2013-6/TOP.xml
+#   example: basf2 top/analysis/printMappings.py top/TOPSpareModule.xml
 #            (hint: omit 'data' from the path)
 # ---------------------------------------------------------------------------
 
@@ -39,6 +39,7 @@ main.add_module(gearbox)
 
 # Geometry
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 

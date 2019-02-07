@@ -35,6 +35,11 @@
 					style='display: block; position: relative;'>
 				Loading ...
 				</div>
+				
+				<div class='JIRA menuhead'><a href="https://agira.desy.de/browse/BII-3309">
+				    <img src="images/link.png" alt="JIRA issue">&nbsp; JIRA issue</a>
+				  <div><a class='blue_link' href="https://confluence.desy.de/display/BI/Validation+Monitoring%2C+How-to">How-to for SWQShifters</a></div>
+				</div>
 
 				<div class='packages menuhead'>
 					<img src="images/cubes.png" alt="Packages">&nbsp; Packages
@@ -42,9 +47,49 @@
 				<div id='packages' class='packages_submenu'>
 				Loading ...
 				</div>
-                <div class='menuhead reportbug'><a target="_blank" href="https://agira.desy.de/secure/CreateIssue!default.jspa">
-                <img src="images/bug.png" alt="Report Bug">&nbsp; Report Bug</a></div>
-                
+                <div class='menuhead reportbug'>
+					<a target="_blank" href="https://agira.desy.de/secure/CreateIssue!default.jspa">
+                		<img src="images/bug.png" alt="Report Bug">&nbsp; Report Bug
+					</a>
+				</div>
+				<div class="menuhead">
+					<img src="images/list.png" alt="Palette">
+					&nbsp;Palette
+					<div class="swatch-line-header">Non-expert plot</div>
+					<div>
+						<span class="swatch" id="swatch-fail-nonexpert">&#10060;</span>
+						<span class="swatch-text">Comparison Fail</span>
+					</div>
+					<div class="swatch-line">
+						<span class="swatch" id="swatch-warn-nonexpert">!</span>
+						<span class="swatch-text">Comparison Warn</span>
+					</div>
+					<div class="swatch-line">
+						<span class="swatch" id="swatch-pass-nonexpert">&#10004;</span>
+						<span class="swatch-text">Comparison Pass</span>
+					</div>
+					<div class="swatch-line">
+						<span class="swatch" id="swatch-nocomp-nonexpert">?</span>
+						<span class="swatch-text">No comparison</span>
+					</div>
+					<div class="swatch-line-header">Expert plot</div>
+					<div class="swatch-line">
+						<span class="swatch" id="swatch-fail">&#10060;</span>
+						<span class="swatch-text">Comparison Fail</span>
+					</div>
+					<div class="swatch-line">
+						<span class="swatch" id="swatch-warn">!</span>
+						<span class="swatch-text">Comparison Warn</span>
+					</div>
+					<div class="swatch-line">
+						<span class="swatch" id="swatch-pass">&#10004;</span>
+						<span class="swatch-text">Comparison Pass</span>
+					</div>
+					<div class="swatch-line">
+						<span class="swatch" id="swatch-nocomp">?</span>
+						<span class="swatch-text">No comparison</span>
+					</div>
+				</div>
 			</div>
 
 		</div>

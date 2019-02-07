@@ -98,13 +98,13 @@ namespace Belle2 {
       };
 
       /// Returns the value of the constraint function
-      virtual double getValue() const = 0;
+      virtual double getValue() const override = 0;
 
       /// Returns the chi2
-      virtual double getChi2() const;
+      virtual double getChi2() const override;
 
       /// Returns the error on the value of the constraint
-      virtual double getError() const;
+      virtual double getError() const override;
 
       /// Returns the Gamma
       virtual double getGamma() const;
@@ -117,20 +117,20 @@ namespace Belle2 {
       /// Call this with a predefined array "der" with the necessary number of entries!
       virtual void getDerivatives(int idim,      ///< First dimension of the array
                                   double der[]   ///< Array of derivatives, at least idim x idim
-                                 ) const = 0;
+                                 ) const override = 0;
       /// Adds second order derivatives to global covariance matrix M
       virtual void add2ndDerivativesToMatrix(double* M,     ///< Covariance matrix, at least idim x idim
                                              int idim       ///< First dimension of the array
-                                            ) const;
+                                            ) const override;
 
       /// Add derivatives of chi squared to global derivative matrix
       virtual void addToGlobalChi2DerVector(double* y,    ///< Vector of chi2 derivatives
                                             int idim     ///< Vector size
-                                           ) const;
+                                           ) const override;
 
 
       /// Invalidates any cached values for the next event
-      virtual void invalidateCache() const;
+      void invalidateCache() const;
 
       /// Recalculates any cached values for the next event
       virtual void updateCache() const;

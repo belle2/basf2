@@ -26,7 +26,16 @@ namespace Belle2 {
     explicit DBObjPtr(const std::string& name = "", bool required = true):
       DBAccessorBase(DBStore::objectName<T>(name), T::Class(), false, required) {}
 
-    inline /*const*/ T& operator *()  const {return *const_cast<T*>(getObject<T>()); }  /**< Imitate pointer functionality. */
-    inline /*const*/ T* operator ->() const {return const_cast<T*>(getObject<T>()); }   /**< Imitate pointer functionality. */
+#ifndef DISABLE_CONST_DBOBJECTS
+    inline const T& operator *()  const {return *getObject<T>(); }  /**< Imitate pointer functionality. */
+    inline const T* operator ->() const {return getObject<T>(); }   /**< Imitate pointer functionality. */
+#else
+    [[deprecated("Non-Const DBObjPtr access is deprecated. Please remove `env.Append(CPPDEFINES=['DISABLE_CONST_DBOBJECTS']) "
+                 "and fix any compilation problems you might have")]]
+    inline T& operator *()  const {return *const_cast<T*>(getObject<T>()); }  /**< Imitate pointer functionality. */
+    [[deprecated("Non-Const DBObjPtr access is deprecated. Please remove `env.Append(CPPDEFINES=['DISABLE_CONST_DBOBJECTS']) "
+                 "and fix any compilation problems you might have")]]
+    inline T* operator ->() const {return const_cast<T*>(getObject<T>()); }   /**< Imitate pointer functionality. */
+#endif
   };
 }

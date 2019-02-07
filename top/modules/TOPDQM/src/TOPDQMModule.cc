@@ -70,6 +70,7 @@ namespace Belle2 {
              "track p-value cut used to histogram pulls etc.", 0.001);
     addParam("usePionID", m_usePionID,
              "use pion ID from TOP to histogram pulls etc.", true);
+    addParam("cutNphot", m_cutNphot, "Cut on total number of photons", 3);
   }
 
 
@@ -86,7 +87,7 @@ namespace Belle2 {
     // variables needed for booking
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
-    int numTDCbins = geo->getNominalTDC().getNumWindows() * 64;
+    double bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
 
     m_recoTime = new TH1F("recoTime", "reco: time distribution",
                           500, 0, 50);
@@ -125,25 +126,69 @@ namespace Belle2 {
     m_badHits = new TH1F("bad_hits", "Number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_goodHits->SetOption("LIVE");
     m_badHits->SetOption("LIVE");
+    m_goodHits->SetMinimum(0);
+    m_badHits->SetMinimum(0);
 
     m_goodHits->GetXaxis()->SetTitle("slot no.");
-    m_goodHits->GetYaxis()->SetTitle("hits / event");
-    m_badHits->GetXaxis()->SetTitle("slot no.");
-    m_badHits->GetYaxis()->SetTitle("hits / event");
+    m_goodHits->GetYaxis()->SetTitle("hits / slot");
+    m_badHits->GetXaxis()->SetTitle("slot number");
+    m_badHits->GetYaxis()->SetTitle("hits / slot");
+
+    // New histograms
+    m_window_vs_slot = new TH2F("window_vs_slot", "Distribution of hits: raw timing",
+                                16, 0.5, 16.5, 512, 0, 512);
+    m_window_vs_slot->SetXTitle("slot number");
+    m_window_vs_slot->SetYTitle("window number w.r.t reference window");
+    m_window_vs_slot->SetOption("LIVE");
+    m_window_vs_slot->SetStats(kFALSE);
+
+    m_bunchOffset = new TH1F("bunchOffset", "Reconstructed bunch: current offset",
+                             100, -bunchTimeSep / 2, bunchTimeSep / 2);
+    m_bunchOffset->SetXTitle("offset [ns]");
+    m_bunchOffset->SetYTitle("events/bin");
+    m_bunchOffset->SetOption("LIVE");
+    m_bunchOffset->SetMinimum(0);
+
+    m_time = new TH1F("goodHitTimes", "Time distribution of good hits",
+                      1000, -20, 80);
+    m_time->SetXTitle("time [ns]");
+    m_time->SetYTitle("hits/bin");
+    m_time->SetOption("LIVE");
+    m_time->SetMinimum(0);
+
+    m_hitsPerEvent = new TProfile("hitsPerEvent", "Good hits per event vs. slot number",
+                                  16, 0.5, 16.5, 0, 1000);
+    m_hitsPerEvent->SetXTitle("slot number");
+    m_hitsPerEvent->SetYTitle("hits per event");
+    m_hitsPerEvent->SetOption("LIVE");
+    m_hitsPerEvent->SetStats(kFALSE);
+    m_hitsPerEvent->SetMinimum(0);
 
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
       string name, title;
-      TH1F* h1;
-      TH2F* h2;
+      TH1F* h1 = 0;
+      TH2F* h2 = 0;
+      TProfile2D* h3 = 0;
+
+      name = str(format("window_vs_asic_%1%") % (module));
+      title = str(format("Distribution of hits: raw timing for slot #%1%") % (module));
+      h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 512, 0, 512);
+      h2->SetOption("LIVE");
+      h2->SetStats(kFALSE);
+      h2->SetXTitle("ASIC number");
+      h2->SetYTitle("window number w.r.t reference window");
+      h2->SetMinimum(0);
+      m_window_vs_asic.push_back(h2);
 
       name = str(format("good_hits_xy_%1%") % (module));
       title = str(format("Number of good hits in x-y for slot #%1%") % (module));
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
-      h2->GetXaxis()->SetTitle("column");
-      h2->GetYaxis()->SetTitle("row");
+      h2->GetXaxis()->SetTitle("pixel column");
+      h2->GetYaxis()->SetTitle("pixel row");
+      h2->SetMinimum(0);
       m_goodHitsXY.push_back(h2);
 
       name = str(format("bad_hits_xy_%1%") % (module));
@@ -151,8 +196,9 @@ namespace Belle2 {
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
-      h2->GetXaxis()->SetTitle("column");
-      h2->GetYaxis()->SetTitle("row");
+      h2->GetXaxis()->SetTitle("pixel column");
+      h2->GetYaxis()->SetTitle("pixel row");
+      h2->SetMinimum(0);
       m_badHitsXY.push_back(h2);
 
       name = str(format("good_hits_asics_%1%") % (module));
@@ -160,8 +206,9 @@ namespace Belle2 {
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
       h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
-      h2->GetXaxis()->SetTitle("column");
-      h2->GetYaxis()->SetTitle("row");
+      h2->GetXaxis()->SetTitle("ASIC number");
+      h2->GetYaxis()->SetTitle("ASIC channel");
+      h2->SetMinimum(0);
       m_goodHitsAsics.push_back(h2);
 
       name = str(format("bad_hits_asics_%1%") % (module));
@@ -169,22 +216,28 @@ namespace Belle2 {
       h2 = new TH2F(name.c_str(), title.c_str(), 64, 0, 64, 8, 0, 8);
       h2->SetOption("LIVE");
       h2->SetStats(kFALSE);
-      h2->GetXaxis()->SetTitle("column");
-      h2->GetYaxis()->SetTitle("row");
+      h2->GetXaxis()->SetTitle("ASIC number");
+      h2->GetYaxis()->SetTitle("ASIC channel");
+      h2->SetMinimum(0);
       m_badHitsAsics.push_back(h2);
 
       name = str(format("good_TDC_%1%") % (module));
-      title = str(format("TDC distribution of good hits for slot #%1%") % (module));
+      title = str(format("Raw time distribution of good hits for slot #%1%") % (module));
+      int numTDCbins = 2000;
       h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
       h1->SetOption("LIVE");
-      h1->GetXaxis()->SetTitle("TDC");
+      h1->GetXaxis()->SetTitle("raw time [samples]");
+      h1->GetYaxis()->SetTitle("hits per sample");
+      h1->SetMinimum(0);
       m_goodTdc.push_back(h1);
 
       name = str(format("bad_TDC_%1%") % (module));
-      title = str(format("TDC distribution of bad hits for slot #%1%") % (module));
+      title = str(format("Raw time distribution of bad hits for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numTDCbins, 0, numTDCbins);
       h1->SetOption("LIVE");
-      h1->GetXaxis()->SetTitle("TDC");
+      h1->GetXaxis()->SetTitle("raw time [samples]");
+      h1->GetYaxis()->SetTitle("hits per sample");
+      h1->SetMinimum(0);
       m_badTdc.push_back(h1);
 
       name = str(format("good_timing_%1%") % (module));
@@ -192,6 +245,8 @@ namespace Belle2 {
       h1 = new TH1F(name.c_str(), title.c_str(), 100, -20, 80);
       h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("time [ns]");
+      h1->GetYaxis()->SetTitle("hits per time bin");
+      h1->SetMinimum(0);
       m_goodTiming.push_back(h1);
 
       name = str(format("good_channel_hits_%1%") % (module));
@@ -199,29 +254,55 @@ namespace Belle2 {
       int numPixels = geo->getModule(i + 1).getPMTArray().getNumPixels();
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->SetOption("LIVE");
-      h1->GetXaxis()->SetTitle("pixel");
+      h1->GetXaxis()->SetTitle("channel number");
+      h1->GetYaxis()->SetTitle("hits pre channel");
+      h1->SetMinimum(0);
       m_goodChannelHits.push_back(h1);
 
       name = str(format("bad_channel_hits_%1%") % (module));
       title = str(format("Number of bad hits by channel for slot #%1%") % (module));
       h1 = new TH1F(name.c_str(), title.c_str(), numPixels, 0, numPixels);
       h1->SetOption("LIVE");
-      h1->GetXaxis()->SetTitle("pixel");
+      h1->GetXaxis()->SetTitle("channel number");
+      h1->GetYaxis()->SetTitle("hits pre channel");
+      h1->SetMinimum(0);
       m_badChannelHits.push_back(h1);
 
       name = str(format("good_hits_per_event%1%") % (module));
       title = str(format("Number of good hits per event for slot #%1%") % (module));
-      h1 = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+      h1 = new TH1F(name.c_str(), title.c_str(), 250, 0, 250);
       h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("hits / event");
+      h1->SetMinimum(0);
       m_goodHitsPerEvent.push_back(h1);
 
       name = str(format("bad_hits_per_event%1%") % (module));
       title = str(format("Number of bad hits per event for slot #%1%") % (module));
-      h1 = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+      h1 = new TH1F(name.c_str(), title.c_str(), 250, 0, 250);
       h1->SetOption("LIVE");
       h1->GetXaxis()->SetTitle("hits / event");
+      h1->SetMinimum(0);
       m_badHitsPerEvent.push_back(h1);
+
+      name = str(format("good_hits_xy_track_%1%") % (module));
+      title = str(format("Hits per track, each channel, slot #%1%") % (module));
+      h3 = new TProfile2D(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5, 0, 1000);
+      h3->SetOption("LIVE");
+      h3->SetStats(kFALSE);
+      h3->GetXaxis()->SetTitle("pixel column");
+      h3->GetYaxis()->SetTitle("pixel row");
+      h3->SetMinimum(0);
+      m_goodHitsXYTrack.push_back(h3);
+
+      name = str(format("good_hits_xy_track_bkg_%1%") % (module));
+      title = str(format("Hits per bkg track, each channel, slot #%1%") % (module));
+      h3 = new TProfile2D(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5, 0, 1000);
+      h3->SetOption("LIVE");
+      h3->SetStats(kFALSE);
+      h3->GetXaxis()->SetTitle("pixel column");
+      h3->GetYaxis()->SetTitle("pixel row");
+      h3->SetMinimum(0);
+      m_goodHitsXYTrackBkg.push_back(h3);
     }
 
     // cd back to root directory
@@ -235,6 +316,7 @@ namespace Belle2 {
 
     // register dataobjects
     m_digits.isRequired();
+    m_recBunch.isOptional();
     m_tracks.isOptional();
 
   }
@@ -251,7 +333,13 @@ namespace Belle2 {
 
     m_goodHits->Reset();
     m_badHits->Reset();
+    m_window_vs_slot->Reset();
+    m_bunchOffset->Reset();
+    m_time->Reset();
+    m_hitsPerEvent->Reset();
+
     for (int i = 0; i < m_numModules; i++) {
+      m_window_vs_asic[i]->Reset();
       m_goodHitsXY[i]->Reset();
       m_badHitsXY[i]->Reset();
       m_goodHitsAsics[i]->Reset();
@@ -263,14 +351,29 @@ namespace Belle2 {
       m_badChannelHits[i]->Reset();
       m_goodHitsPerEvent[i]->Reset();
       m_badHitsPerEvent[i]->Reset();
+      m_goodHitsXYTrack[i]->Reset();
+      m_goodHitsXYTrackBkg[i]->Reset();
     }
   }
 
   void TOPDQMModule::event()
   {
 
+    bool recBunchValid = false;
+    if (m_recBunch.isValid()) {
+      recBunchValid = m_recBunch->isReconstructed();
+    }
+
+    if (recBunchValid) {
+      m_bunchOffset->Fill(m_recBunch->getCurrentOffset());
+    }
+
     std::vector<int> n_good(16, 0);
     std::vector<int> n_bad(16, 0);
+    std::vector<int> n_good_first(16, 0);
+    std::vector<int> n_good_second(16, 0);
+    std::vector<int> n_good_pixel_hits(16 * 512, 0);
+
     for (const auto& digit : m_digits) {
       int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_numModules) {
@@ -281,13 +384,22 @@ namespace Belle2 {
       int ch = digit.getChannel();
       int asic_no = ch / 8, asic_ch = ch % 8;
 
+      m_window_vs_slot->Fill(digit.getModuleID(), digit.getRawTime() / 64 + 220);
+      m_window_vs_asic[i]->Fill(digit.getChannel() / 8, digit.getRawTime() / 64 + 220);
+
       if (digit.getHitQuality() == TOPDigit::c_Good) { // good hits
         m_goodHits->Fill(i + 1);
         m_goodHitsXY[i]->Fill(digit.getPixelCol(), digit.getPixelRow());
         m_goodHitsAsics[i]->Fill(asic_no, asic_ch);
         m_goodTdc[i]->Fill(digit.getRawTime());
-        m_goodTiming[i]->Fill(digit.getTime());
+        if (recBunchValid) {
+          m_goodTiming[i]->Fill(digit.getTime());
+          m_time->Fill(digit.getTime());
+        }
         m_goodChannelHits[i]->Fill(digit.getChannel());
+        if (digit.getTime() > 0 && digit.getTime() < 20) n_good_first[i]++;
+        if (digit.getTime() > 20 && digit.getTime() < 50) n_good_second[i]++;
+        n_good_pixel_hits[(digit.getModuleID() - 1) * 512 + (digit.getPixelID() - 1)]++;
         n_good[i]++;
       } else { // other hits = background hits
         m_badHits->Fill(i + 1);
@@ -300,10 +412,18 @@ namespace Belle2 {
     }
 
     for (int i = 0; i < 16; i++) {
-      if (n_good[i] != 0)
-        m_goodHitsPerEvent[i]->Fill(n_good[i]);
-      if (n_bad[i] != 0)
-        m_badHitsPerEvent[i]->Fill(n_bad[i]);
+      m_hitsPerEvent->Fill(i + 1, n_good[i]);
+      m_goodHitsPerEvent[i]->Fill(n_good[i]);
+      m_badHitsPerEvent[i]->Fill(n_bad[i]);
+
+      bool slot_has_track = (n_good_first[i] + n_good_second[i]) > m_cutNphot;
+      for (int j = 0; j < 512; j++) {
+        int col = j % 64 + 1, row = j / 64 + 1;
+        if (slot_has_track)
+          m_goodHitsXYTrack[i]->Fill(col, row, n_good_pixel_hits[i * 512 + j]);
+        else
+          m_goodHitsXYTrackBkg[i]->Fill(col, row, n_good_pixel_hits[i * 512 + j]);
+      }
     }
 
     for (const auto& track : m_tracks) {

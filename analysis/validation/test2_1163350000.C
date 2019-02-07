@@ -45,7 +45,7 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_DeltaE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_DeltaE->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_EExtra = new TH1F("h_had_EExtra",title,50,0,5);
-  ptree->Project("h_had_EExtra", "Upsilon4S_Eextra");
+  ptree->Project("h_had_EExtra", "Upsilon4S_ROE_neextra");
   h_EExtra->GetXaxis()->SetTitle("E_{extra} (GeV)");
   h_EExtra->GetListOfFunctions()->Add(new TNamed("Description", "Extra energy in the event"));
   h_EExtra->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
@@ -65,7 +65,7 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_R2->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_R2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_cosTBTO = new TH1F("h_had_cosTBTO",title,20,0,1);
-  ptree->Project("h_had_cosTBTO", "Upsilon4S_cosTBTO");
+  ptree->Project("h_had_cosTBTO", "Upsilon4S_B0_cosTBTO");
   h_cosTBTO->GetXaxis()->SetTitle("cos(#theta_{thrust})");
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Description", "Cosine of the angle between the B and the thrust axis of the event"));
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
@@ -216,9 +216,9 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_Dmass_Mode1->Write();
   h_Dmass_Mode2->Write();
   h_Dmass_Mode3->Write();
-  h_Dmass_Mode4->Write();
+  //  h_Dmass_Mode4->Write();
   h_Dmass_Mode5->Write();
-  h_Dmass_Mode6->Write();
+  //  h_Dmass_Mode6->Write();
   h_Dmass_Mode7->Write();
   h_Dmass_Mode8->Write();
   h_Dmass_Mode9->Write();

@@ -1,10 +1,23 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo                                       *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-// class to replace POD 2D array to save stack usage
-// since it just allocates memory dynamically.
+#pragma once
+
 
 namespace Belle2 {
   namespace ECL {
     template <typename T>
+    /**
+     * class to replace POD 2D array to save stack usage
+     * since it just allocates memory dynamically.
+     */
     class WrapArray2D {
     public:
       /** replace POD 2D array  */
@@ -12,13 +25,11 @@ namespace Belle2 {
         m_data(new T[rows * cols]), m_ncols(cols)
       {}
 
-      /** copy */
-      WrapArray2D(const WrapArray2D& obj)
-      {
-        m_data = new T;
-        *m_data = *obj.m_data;
-        m_ncols = obj.m_ncols;
-      }
+      /** no copy */
+      WrapArray2D(const WrapArray2D&) = delete;
+
+      /** no assignment */
+      WrapArray2D& operator=(const WrapArray2D&) = delete;
 
       /** destructor */
       ~WrapArray2D()
@@ -28,13 +39,6 @@ namespace Belle2 {
       T* operator[](int irow)
       {
         return m_data + irow * m_ncols;
-      }
-
-      /** = assign operator */
-      T& operator=(const T& x)
-      {
-        *m_data = x.m_data;
-        return *this;
       }
 
       /** return */

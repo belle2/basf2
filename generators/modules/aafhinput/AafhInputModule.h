@@ -36,13 +36,13 @@ namespace Belle2 {
     AafhInputModule();
 
     /** initialize generator */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** generate event */
-    virtual void event();
+    virtual void event() override;
 
     /** calculate cross section */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /** Generator mode */

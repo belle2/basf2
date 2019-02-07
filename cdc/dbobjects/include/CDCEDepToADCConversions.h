@@ -38,16 +38,16 @@ namespace Belle2 {
 
     /**
      * Set group id (parameterized per group)
-     * id=0: layerID; =1: wireID
+     * id=0: superLayerID; =1: layerID; =1: wireID
      */
-    void setGroupId(unsigned short mode)
+    void setGroupID(unsigned short mode)
     {
-      m_groupId = mode;
+      m_groupID = mode;
     }
 
     /**
      * Set the conv. paramseters in the list
-     * @param id laerID(0-55) or wireID
+     * @param id superLayerid(0-8), laerID(0-55) or wireID
      * @param params parameters for conversion
      */
     void setParams(unsigned short id, const std::vector<float>& params)
@@ -58,7 +58,7 @@ namespace Belle2 {
     /**
      * Get mode of conversion parameterization
      */
-    unsigned short getParamMode()
+    unsigned short getParamMode() const
     {
       return m_paramMode;
     }
@@ -66,9 +66,9 @@ namespace Belle2 {
     /**
      * Get group id
      */
-    unsigned short getGroupId()
+    unsigned short getGroupID() const
     {
-      return m_groupId;
+      return m_groupID;
     }
 
     /**
@@ -149,10 +149,10 @@ namespace Belle2 {
 
   private:
     unsigned short m_paramMode = 0; /*!< Mode for parameterization */
-    unsigned short m_groupId = 0;   /*!< Group id (parameterized per group) */
+    unsigned short m_groupID = 0;   /*!< Group id (parameterized per group) */
     std::map<unsigned short, std::vector<float>> m_cvs; /**< cv list */
 
-    ClassDef(CDCEDepToADCConversions, 1); /**< ClassDef */
+    ClassDef(CDCEDepToADCConversions, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

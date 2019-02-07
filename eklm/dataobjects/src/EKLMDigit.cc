@@ -11,6 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <framework/logging/Logger.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
 
 using namespace Belle2;
 
@@ -82,9 +83,9 @@ uint16_t EKLMDigit::getCTime() const
   return m_CTime;
 }
 
-void EKLMDigit::setCTime(uint16_t charge)
+void EKLMDigit::setCTime(uint16_t ctime)
 {
-  m_CTime = charge;
+  m_CTime = ctime;
 }
 
 uint16_t EKLMDigit::getTDC() const

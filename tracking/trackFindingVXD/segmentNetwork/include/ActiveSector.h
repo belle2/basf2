@@ -44,9 +44,9 @@ namespace Belle2 {
     ActiveSector(): m_staticSector(NULL), m_identifier(-1) {}
 
     /** Constructor.
-    *      //      * @param staticSector pointer to static sector associated with this one.
-     *      //      */
-    ActiveSector(const StaticSectorType* staticSector):
+     * @param staticSector pointer to static sector associated with this one.
+     */
+    explicit ActiveSector(const StaticSectorType* staticSector):
       m_staticSector(staticSector), m_identifier(staticSector->getFullSecID())
     {}
 
@@ -74,7 +74,7 @@ namespace Belle2 {
     }
 
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
-/// getters:
+    /// getters:
 
     /** return ID of this sector */
     std::int32_t getID() const { return m_identifier; }
@@ -112,7 +112,7 @@ namespace Belle2 {
     inline FullSecID getFullSecID() const { return m_staticSector->getFullSecID(); }
 
 
-/// setters:
+    /// setters:
 
     /** adds new Hit to vector of Hits */
     inline void addHit(HitType* newHit) { m_hits.push_back(newHit); }

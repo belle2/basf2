@@ -368,16 +368,6 @@ void PXDPackerErrModule::event()
   }
 }
 
-void PXDPackerErrModule::endian_swap_frame(unsigned short* dataptr, int len)
-{
-  boost::spirit::endian::ubig16_t* p = (boost::spirit::endian::ubig16_t*)dataptr;
-
-  /// swap endianess of all shorts in frame BUT not the CRC (2 shorts)
-  for (int i = 0; i < len / 2 - 2; i++) {
-    p[i] = dataptr[i];// Endian Swap! (it doesnt matter if you swap from little to big or vice versa)
-  }
-}
-
 void PXDPackerErrModule::pack_event(void)
 {
   int dhe_ids[5] = {0, 0, 0, 0, 0};
@@ -542,11 +532,13 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
     if (!isErrorIn(58)) append_int16(m_trigger_nr >> 16);
     else  append_int16((m_trigger_nr >> 16) + 1);
 
-    uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
+    uint32_t mm = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216); // in 127MHz Ticks
+    uint32_t ss = (unsigned int)(m_meta_time / 1000000000ull) ; // in seconds
     if (isErrorIn(70)) mm++;
+    if (isErrorIn(70)) ss++;
     append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
-    append_int16((mm >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
-    append_int16((mm >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
+    append_int16(((mm >> 12) & 0x7FFF) | ((ss & 1) ? 0x8000 : 0x0)); // TT 27-12 ... not clear if completely filled by DHC
+    append_int16((ss >> 1) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
     if (!isErrorIn(7)) {
       append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
       append_int16(m_run_nr_word2);  // Exp NR 9-0 | Run Nr 13-8
@@ -687,10 +679,6 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
 // we fake the framenr and startframenr until we find some better solution
 
   if (dhp_active != 0) { /// is there any hardware switched on?
-    // const int ladder_min_row = 0; Hardware counts from 0, only include if it does not.
-    const int ladder_max_row = PACKER_NUM_ROWS - 1;
-    // const int ladder_min_col = 0;
-    const int ladder_max_col = PACKER_NUM_COLS - 1;
 
     /// clear pixelmap
     bzero(halfladder_pixmap, sizeof(halfladder_pixmap));

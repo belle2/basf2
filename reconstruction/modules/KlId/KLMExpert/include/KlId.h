@@ -216,6 +216,9 @@ namespace KlId {
       unsigned int index = 0;
       unsigned int indexOfClosestCluster = 0;
       for (Belle2::ECLCluster& eclcluster : eclClusters) {
+
+        if (!eclcluster.hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)) continue;
+
         const TVector3& eclclusterPos = eclcluster.getClusterPosition();
         angularDist = eclclusterPos.Angle(klmClusterPosition);
         if (angularDist < closestECLAngleDist) {

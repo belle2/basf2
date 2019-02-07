@@ -12,18 +12,18 @@ namespace Belle2 {
 
   public:
     NSMNode(const std::string& name = "");
-    virtual ~NSMNode() throw() {}
+    virtual ~NSMNode() {}
 
   public:
-    const std::string& getName() const throw() { return m_name; }
-    int getId() const throw() { return m_id; }
-    bool isUsed() const throw() { return m_used; }
-    NSMState& getState() throw() { return m_state; }
-    const NSMState& getState() const throw() { return m_state; }
-    void setName(const std::string& name) throw();
-    void setUsed(bool used) throw() { m_used = used; }
-    void setState(const NSMState& state) throw() { m_state = state; }
-    void setId(int id) throw() { m_id = id; }
+    const std::string& getName() const { return m_name; }
+    int getId() const { return m_id; }
+    bool isUsed() const { return m_used; }
+    NSMState& getState() { return m_state; }
+    const NSMState& getState() const { return m_state; }
+    void setName(const std::string& name);
+    void setUsed(bool used) { m_used = used; }
+    void setState(const NSMState& state) { m_state = state; }
+    void setId(int id) { m_id = id; }
 
   protected:
     std::string m_name;

@@ -67,10 +67,10 @@ namespace Belle2 {
     int getNZMultiplicity(int division) const {return m_NZMultiplicity[division];}
 
     //!Get weight table for phi
-    double getPhiWeight(int division, int nmutiplicity) { return m_PhiWeight[division][nmutiplicity]; }
+    double getPhiWeight(int division, int nmutiplicity) const { return m_PhiWeight[division][nmutiplicity]; }
 
     //!Get weight table for z
-    double getZWeight(int division, int nmutiplicity) { return m_ZWeight[division][nmutiplicity]; }
+    double getZWeight(int division, int nmutiplicity) const { return m_ZWeight[division][nmutiplicity]; }
 
     //! Get the RPC phi-strip cumulative prob density function
     double getPhiMultiplicityCDF(double stripDiv, int mult) const;

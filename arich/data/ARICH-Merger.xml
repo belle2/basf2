@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MergerPCB desc="Parameters of merger PCB and assembly envelope">
+  <merger desc="Parameters of merger PCB">
+    <material desc="Material of merger PCB">merger_pcb</material>
+    <sizeL desc="Size of merger PCB : length" unit="mm">150</sizeL>
+    <sizeW desc="Size of merger PCB : width" unit="mm">100</sizeW>
+    <thickness desc="Thickenss of merger PCB" unit="mm">2</thickness>
+    <!-- Merger slot number -->
+    <mergerSlotID>
+       1       2       3       4       5       6       7       8       9      10
+      11      12      13      14      15      16      17      18      19      20
+      21      22      23      24      25      26      27      28      29      30
+      31      32      33      34      35      36      37      38      39      40
+      41      42      43      44      45      46      47      48      49      50
+      51      52      53      54      55      56      57      58      59      60
+      61      62      63      64      65      66      67      68      69      70
+      71      72
+    </mergerSlotID>
+    <!-- Distance from the center in mm -->
+    <mergerPosR>
+      584.2   584.2   584.2   741.7   741.7   741.7   741.7     911     911     911
+        911  1077.7   584.2   584.2   584.2   741.7   741.7   741.7   741.7     911
+        911     911     911  1077.7   584.2   584.2   584.2   741.7   741.7   741.7
+      741.7     911     911     911     911  1077.7   584.2   584.2   584.2   741.7
+      741.7   741.7   741.7     911     911     911     911  1077.7   584.2   584.2
+      584.2   741.7   741.7   741.7   741.7     911     911     911     911  1077.7
+      584.2   584.2   584.2   741.7   741.7   741.7   741.7     911     911     911
+        911  1077.7
+    </mergerPosR>
+    <!-- Azimuthal angle of the merger PCB center in polar coordinate system in deg -->
+    <mergerAngle>
+        9      30      51       7      21      39      53      11      22      38
+       49      32      69      90     111      67      81      99     113      71
+       82      98     109      92     129     150     171     127     141     159
+      173     131     142     158     169     152     189     210     231     187
+      201     219     233     191     202     218     229     212     249     270
+      291     247     261     279     293     251     262     278     289     272
+      309     330     351     307     321     339     353     311     322     338
+      349     332
+    </mergerAngle>
+  </merger>
+  <mergerEnvelope desc="Parameters of merger PCB assembly envelope">
+    <!-- Detector support plate + 4 mm -->
+    <outerRadius desc="Outer radius of merger PCB assembly envelope" unit="mm">1136</outerRadius>
+    <!-- Same as detector support plate -->
+    <innerRadius desc="Inner radius of merger PCB assembly envelope" unit="mm">435</innerRadius>
+    <!-- The assembly envelope 0.5 mm thicker than merger PCB -->
+    <thickness desc="Thickness of merger PCB assembly envelope" unit="mm">2.5</thickness>
+    <x0 desc="x0 of the merger PCB assembly envelope center" unit="mm">0</x0>
+    <y0 desc="y0 of the merger PCB assembly envelope center" unit="mm">0</y0>
+    <!--             260.5 +                      3.0/2.0 +                      2.5/2.0 + 0.5 = 263.75 -->
+    <!-- cablesEnvelope.z0 + cablesEnvelope.thickness/2.0 + mergerEnvelope.thickness/2.0 + 0.5 -->
+    <!-- We need to subtract half length of the ARICH envelope since we define position within ARICH envelope frame -->
+    <!-- 263.75 - 280/2 = 123.75 -->
+    <z0 desc="z0 of the merger PCB assembly envelope center" unit="mm">123.75</z0>
+  </mergerEnvelope>
+</MergerPCB>

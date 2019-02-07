@@ -1,6 +1,11 @@
-/** This file is a copy of Pythia8Plugins/EvtGen.h from Pythia 8 but slightly
- * modified for extended evtgen models
- */
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * This file is a copy of Pythia8Plugins/EvtGen.h from Pythia 8 but       *
+ * slightly modified for extended evtgen models                           *
+ *                                                                        *
+ * Adapted by: Martin Ritter                                              *
+ *                                                                        *
+ **************************************************************************/
 
 // EvtGen.h is a part of the PYTHIA event generator.
 // Copyright (C) 2016 Torbjorn Sjostrand.
@@ -25,80 +30,80 @@
 
 //==========================================================================
 
-// A class to wrap the Pythia random number generator for use by EvtGen.
-
+/** A class to wrap the Pythia random number generator for use by EvtGen. */
 class EvtGenRandom : public EvtRandomEngine {
 
 public:
 
-  // Constructor.
-  EvtGenRandom(Pythia8::Rndm* rndmPtrIn) {rndmPtr = rndmPtrIn;}
+  /** Constructor. */
+  explicit EvtGenRandom(Pythia8::Rndm* rndmPtrIn) {rndmPtr = rndmPtrIn;}
 
-  // Return a random number.
+  /** Return a random number. */
   double random() {if (rndmPtr) return rndmPtr->flat(); else return -1.0;}
 
-  // The random number pointer.
+  /** The random number pointer. */
   Pythia8::Rndm* rndmPtr;
 
 };
 
 //==========================================================================
 
-// A class to perform decays via the external EvtGen decay program,
-// see http://evtgen.warwick.ac.uk/, the program manual provided with
-// the EvtGen distribution, and D. J. Lange,
-// Nucl. Instrum. Meth. A462, 152 (2001) for details.
-
-// EvtGen performs a series of decays from some initial particle
-// decay, rather than just a single decay, and so EvtGen cannot be
-// interfaced through the standard external DecayHandler class without
-// considerable complication. Consequently, EvtGen is called on the
-// complete event record after all steps of Pythia are completed.
-
-// Oftentimes a specific "signal" decay is needed to occur once in an
-// event, and all other decays performed normally. This is possible
-// via reading in a user decay file (with readDecayFile) and creating
-// aliased particles with names ending with signalSuffix. By default,
-// this is "_SIGNAL". When decay() is called, all particles in the
-// Pythia event record that are of the same types as the signal
-// particles are collected. One is selected at random and decayed via
-// the channel(s) defined for that aliased signal particle. All other
-// particles are decayed normally. The weight for the event is
-// calculated and returned.
-
-// It is also possible to specify a status needed to consider a
-// particle as a signal candidate. This can be done by modifying the
-// signals map, e.g. if the tau- is a signal candidate, then
-//     EvtGenDecays.signals[15].status = 201
-// will only only select as candidates any tau- with this status. This
-// allows the event record to be changed before decays, so only
-// certain particles are selected as possible signal candidates
-// (e.g. passing kinematic requirements).
-
-// Please note that particles produced from a signal candidate decay
-// are not searched for additional signal candidates. This means that
-// if B0 and tau- have been designated as signal, then a tau- from a
-// W- decay would be a signal candidate, while a tau- from a B0 decay
-// would not. This restriction arises from the additional complexity
-// of allowing recursive signal decays. The following statuses are
-// used: 93 for particles decayed with EvtGen, 94 for particles
-// oscillated with EvtGen, 95 for signal particles, and 96 for signal
-// particles from an oscillation.
-
+/**
+ * A class to perform decays via the external EvtGen decay program,
+ * see http://evtgen.warwick.ac.uk/, the program manual provided with
+ * the EvtGen distribution, and D. J. Lange,
+ * Nucl. Instrum. Meth. A462, 152 (2001) for details.
+ *
+ * EvtGen performs a series of decays from some initial particle
+ * decay, rather than just a single decay, and so EvtGen cannot be
+ * interfaced through the standard external DecayHandler class without
+ * considerable complication. Consequently, EvtGen is called on the
+ * complete event record after all steps of Pythia are completed.
+ *
+ * Oftentimes a specific "signal" decay is needed to occur once in an
+ * event, and all other decays performed normally. This is possible
+ * via reading in a user decay file (with readDecayFile) and creating
+ * aliased particles with names ending with signalSuffix. By default,
+ * this is "_SIGNAL". When decay() is called, all particles in the
+ * Pythia event record that are of the same types as the signal
+ * particles are collected. One is selected at random and decayed via
+ * the channel(s) defined for that aliased signal particle. All other
+ * particles are decayed normally. The weight for the event is
+ * calculated and returned.
+ *
+ * It is also possible to specify a status needed to consider a
+ * particle as a signal candidate. This can be done by modifying the
+ * signals map, e.g. if the tau- is a signal candidate, then
+ *     EvtGenDecays.signals[15].status = 201
+ * will only only select as candidates any tau- with this status. This
+ * allows the event record to be changed before decays, so only
+ * certain particles are selected as possible signal candidates
+ * (e.g. passing kinematic requirements).
+ *
+ * Please note that particles produced from a signal candidate decay
+ * are not searched for additional signal candidates. This means that
+ * if B0 and tau- have been designated as signal, then a tau- from a
+ * W- decay would be a signal candidate, while a tau- from a B0 decay
+ * would not. This restriction arises from the additional complexity
+ * of allowing recursive signal decays. The following statuses are
+ * used: 93 for particles decayed with EvtGen, 94 for particles
+ * oscillated with EvtGen, 95 for signal particles, and 96 for signal
+ * particles from an oscillation.
+ */
 class EvtGenDecays {
 
 public:
 
-  // Expert constructor which takes an already initialized EvtGen instance
+  /** Expert constructor which takes an already initialized EvtGen instance */
   EvtGenDecays(Pythia8::Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit = true);
 
-  // Constructor.
+  /** Constructor. */
   EvtGenDecays(Pythia8::Pythia* pythiaPtrIn, std::string decayFile, std::string particleDataFile,
                EvtExternalGenList* extPtrIn = 0, EvtAbsRadCorr* fsrPtrIn = 0,
                int mixing = 1, bool xml = false, bool limit = true,
                bool extUse = true, bool fsrUse = true);
 
-  // Destructor.
+  /** Destructor. */
   ~EvtGenDecays()
   {
     if (evtgen) delete evtgen;
@@ -106,87 +111,107 @@ public:
     if (fsrOwner && fsrPtr) delete fsrPtr;
   }
 
-  // Get the Decay limits from Pythia
+  /** forbid copy */
+  EvtGenDecays(const EvtGenDecays&) = delete;
+
+  /** forbid assignment */
+  EvtGenDecays& operator=(const EvtGenDecays&) = delete;
+
+  /** Get the Decay limits from Pythia */
   void getDecayLimits(bool limit);
 
-  // Perform all decays and return the event weight.
+  /** Perform all decays and return the event weight. */
   double decay();
 
-  // Stop EvtGen decaying a particle.
+  /** Stop EvtGen decaying a particle. */
   void exclude(int id) {excIds.insert(id);}
 
-  // Update the Pythia particle database from EvtGen.
+  /** Update the Pythia particle database from EvtGen. */
   void updatePythia();
 
-  // Update the EvtGen particle database from Pythia.
+  /** Update the EvtGen particle database from Pythia. */
   void updateEvtGen();
 
-  // Read an EvtGen user decay file.
+  /** Read an EvtGen user decay file. */
   void readDecayFile(std::string decayFile, bool xml = false)
   {
     evtgen->readUDecay(decayFile.c_str(), xml); updateData();
   }
 
-  // External model pointer and FSR model pointer.
-  bool extOwner, fsrOwner;
-  EvtExternalGenList* extPtr;
-  EvtAbsRadCorr*      fsrPtr;
-  std::list<EvtDecayBase*> models;
+  bool extOwner; /**< bool has external model */
+  bool fsrOwner; /**< bool has FSR model */
+  EvtExternalGenList* extPtr;      /**< External model pointer */
+  EvtAbsRadCorr*      fsrPtr;      /**< FSR model pointer. */
+  std::list<EvtDecayBase*> models; /**< list of model pointers */
 
-  // Map of signal particle info.
+  /** Map of signal particle info. */
   struct Signal {
-    int status; EvtId egId; std::vector<double> bfs; std::vector<int> map;
-    EvtParticleDecayList modes;
+    int status;                 /**< status needed to consider a particle a signal */
+    EvtId egId;                 /**< the Lund ID */
+    std::vector<double> bfs;    /**< branching fractions */
+    std::vector<int> map;       /**< the map for statuses */
+    EvtParticleDecayList modes; /**< list of decay modes &*/
   };
+  /** signal particles and statuses */
   std::map<int, Signal> signals;
 
-  // The suffix indicating an EvtGen particle or alias is signal.
+  /** The suffix indicating an EvtGen particle or alias is signal. */
   std::string signalSuffix;
 
 protected:
 
-  // Update the particles to decay with EvtGen, and the selected signals.
+  /** Update the particles to decay with EvtGen, and the selected signals. */
   void updateData(bool final = false);
 
-  // Update the Pythia event record with an EvtGen decay tree.
+  /** Update the Pythia event record with an EvtGen decay tree. */
   void updateEvent(Pythia8::Particle* pyPro, EvtParticle* egPro,
                    std::vector<int>* pySigs = 0, std::vector<EvtParticle*>* egSigs = 0,
                    std::vector<double>* bfs = 0, double* wgt = 0);
 
-  // Check if a particle can decay.
+  /** Check if a particle can decay. */
   bool checkVertex(Pythia8::Particle* pyPro);
 
-  // Check if a particle is signal.
+  /** Check if a particle is signal. */
   bool checkSignal(Pythia8::Particle* pyPro);
 
-  // Check if an EvtGen particle has oscillated.
+  /** Check if an EvtGen particle has oscillated. */
   bool checkOsc(EvtParticle* egPro);
 
-  // Number of times to try a decay sampling (constant).
+  /** Number of times to try a decay sampling (constant). */
   static const int NTRYDECAY = 1000;
 
-  // The pointer to the associated Pythia object.
+  /** The pointer to the associated Pythia object. */
   Pythia8::Pythia* pythiaPtr;
 
-  // Random number wrapper for EvtGen.
+  /** Random number wrapper for EvtGen. */
   EvtGenRandom rndm;
 
-  // The EvtGen object.
+  /** The EvtGen object. */
   EvtGen* evtgen;
 
-  // Set of particle IDs to include and exclude decays with EvtGen.
-  std::set<int> incIds, excIds;
+  std::set<int> incIds; /**< Set of particle IDs to include decays with EvtGen. */
+  std::set<int> excIds; /**< Set of particle IDs to exclude decays with EvtGen. */
 
-  // Flag whether the final particle update has been performed.
+  /** Flag whether the final particle update has been performed. */
   bool updated;
 
-  // The selected signal iterator.
+  /** The selected signal iterator. */
   std::map<int, Signal>::iterator signal;
 
-  // Parameters used to check if a particle should decay (as set via Pythia).
-  double tau0Max, tauMax, rMax, xyMax, zMax;
-  bool limitTau0, limitTau, limitRadius, limitCylinder, limitDecay;
-
+  /**
+   * Parameters used to check if a particle should decay (as set via Pythia).
+   * http://home.thep.lu.se/Pythia/pythia82html/ParticleDecays.html
+   */
+  double tau0Max;     /**< the pythia parameter ParticleDecays:tau0Max */
+  double tauMax;      /**< the pythia parameter ParticleDecays:tauMax */
+  double rMax;        /**< the pythia parameter ParticleDecays:rMax */
+  double xyMax;       /**< the pythia parameter ParticleDecays:xyMax */
+  double zMax;        /**< the pythia parameter ParticleDecays:zMax */
+  bool limitTau0;     /**< the pythia parameter ParticleDecays:limitTau0 */
+  bool limitTau;      /**< the pythia parameter ParticleDecays:limitTau */
+  bool limitRadius;   /**< the pythia parameter ParticleDecays:limitRadius */
+  bool limitCylinder; /**< the pythia parameter ParticleDecays:limitCylinder */
+  bool limitDecay;    /**< is the decay limited */
 };
 
 //--------------------------------------------------------------------------
@@ -361,8 +386,10 @@ double EvtGenDecays::decay()
   }
 
   // Determine the decays of the signal particles (signal or background).
-  std::vector<int> modes; int force(-1), n(0);
+  std::vector<int> modes; int force(-1);
   for (int iTry = 1; iTry <= NTRYDECAY; ++iTry) {
+    int n(0);
+
     modes.clear(); force = pythiaPtr->rndm.pick(bfs); n = 0;
     for (int iSig = 0; iSig < (int)pySigs.size(); ++iSig) {
       if (iSig == force) modes.push_back(0);

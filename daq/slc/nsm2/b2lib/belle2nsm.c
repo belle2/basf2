@@ -18,9 +18,10 @@
    20140921 1940 flushmem
    20160420 1946 debugflag separately from corelib
    20180121 1957 b2nsm_nodename is added
+   20180709 1974 b2nsm_reqid is added
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.57";
+const char *belle2nsm_version = "belle2nsm 1.9.74";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,6 +73,22 @@ xt()
 	  cur->tm_hour, cur->tm_min, cur->tm_sec, (int)now.tv_usec/1000);
   return buf;
 }
+/* -- b2nsm_getwrapptr -------------------------------------------------- */
+const void *
+b2nsm_getwrapptr()
+{
+  if (! nsm) return 0;
+  return nsm->wrapptr;
+}
+/* -- b2nsm_setwrapptr -------------------------------------------------- */
+int
+b2nsm_setwrapptr(const void *ptr)
+{
+  if (! nsm) return -1;
+  if (nsm->wrapptr && ptr) return -2;
+  nsm->wrapptr = ptr;
+  return 1;
+}
 /* -- b2nsm_addincpath -------------------------------------------------- */
 int
 b2nsm_addincpath(const char *path)
@@ -99,6 +116,14 @@ b2nsm_nodepid(const char *nodename)
   int inod = b2nsm_nodeid(nodename);
   if (inod < 0) return -1;
   return ntohl(nsm->sysp->nod[inod].nodpid);
+}
+/* -- b2nsm_reqid ------------------------------------------------------- */
+int 
+b2nsm_reqid(const char *reqname)
+{
+  char reqname_uprcase[NSMSYS_NAME_SIZ + 1];
+  xuprcpy(reqname_uprcase, reqname, NSMSYS_NAME_SIZ + 1);
+  return nsmlib_reqid(nsm, reqname_uprcase);
 }
 /* -- b2nsm_loghook ----------------------------------------------------- */
 int

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
+#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <vector>
 
 namespace TreeFitter {
@@ -28,51 +29,51 @@ namespace TreeFitter {
     virtual ~InternalParticle() {};
 
     /** init covariance */
-    virtual ErrCode initCovariance(FitParams*) const;
+    virtual ErrCode initCovariance(FitParams&) const override;
 
     /** project kinematical constraint */
     ErrCode projectKineConstraint(const FitParams&, Projection&) const;
 
     /** enforce conservation of momentum sum*/
-    virtual void forceP4Sum(FitParams&) const;
+    virtual void forceP4Sum(FitParams&) const override;
 
     /** init particle in case it has a mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init particle in case it has no mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** find out which constraint it is and project */
-    ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
+    ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const override;
 
     /** space reserved in fit params, if has mother then it has tau */
-    virtual int dim() const { return mother() ? 8 : 7 ; }
+    virtual int dim() const override { return mother() && !isAResonance(m_particle) ? 8 : 7 ;}
 
     /**  type */
-    virtual int type() const { return kInternalParticle ; }
+    virtual int type() const override { return kInternalParticle ; }
 
-    /**   posintion index in fit params*/
-    virtual int posIndex() const { return index()   ; }
+    /**   position index in fit params*/
+    virtual int posIndex() const override { return index()   ; }
 
     /** tau index in fit params only if it has a mother */
-    virtual int tauIndex() const { return mother() ? index() + 3 : -1 ; }
+    virtual int tauIndex() const override { return mother() ? index() + 3 : -1; }
 
-    /** momentum index in fit params depending on wheter it has a mother  */
-    virtual int momIndex() const { return mother() ? index() + 4 : index() + 3 ; }
+    /** momentum index in fit params depending on whether it has a mother  */
+    virtual int momIndex() const override { return mother() ? index() + 4 : index() + 3 ; }
 
     /** has energy in fitparams  */
-    virtual bool hasEnergy() const { return true ; }
+    virtual bool hasEnergy() const override { return true ; }
 
-    /** has postion index  */
-    virtual bool hasPosition() const { return true ; }
+    /** has position index  */
+    virtual bool hasPosition() const override { return true ; }
 
     /** name  */
-    virtual std::string parname(int index) const ;
+    virtual std::string parname(int index) const override ;
 
     /** add to constraint list  */
-    virtual void addToConstraintList(constraintlist& list, int depth) const ;
+    virtual void addToConstraintList(constraintlist& list, int depth) const override ;
 
-    /** set mass cosntraint flag */
+    /** set mass constraint flag */
     void setMassConstraint(bool b) { m_massconstraint = b ; }
 
     /** rotate in positive phi domain  */
@@ -81,9 +82,12 @@ namespace TreeFitter {
   protected:
 
     /** init momentum of *this and daughters */
-    ErrCode initMomentum(FitParams* fitparams) const ;
+    ErrCode initMomentum(FitParams& fitparams) const ;
 
   private:
+
+    /** compare transverse track momentum*/
+    bool static compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs);
 
     /** has mass cosntraint */
     bool m_massconstraint ;

@@ -195,6 +195,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_trackFitResults.registerInDataStore();
   m_v0s.registerInDataStore();
   m_particles.registerInDataStore();
+  m_eclHits.registerInDataStore();
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
@@ -324,6 +325,9 @@ void B2BIIConvertMdstModule::event()
 
   // 10. Convert KLong information
   convertMdstKLongTable();
+
+  // 11. Convert ECL crystal energy
+  convertECLHitTable();
 }
 
 
@@ -1132,6 +1136,31 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 
 }
 
+void B2BIIConvertMdstModule::convertECLHitTable()
+{
+  if (m_realData)
+    return;
+
+  // check if the Datecl_mc_hits table has any entries
+  Belle::Datecl_mc_ehits_Manager& ehitsMgr = Belle::Datecl_mc_ehits_Manager::get_manager();
+  if (ehitsMgr.count() == 0) {
+    return;
+  }
+
+  // Loop over all Belle Datecl_mc_ehits
+  for (Belle::Datecl_mc_ehits_Manager::iterator ehitIterator = ehitsMgr.begin(); ehitIterator != ehitsMgr.end(); ++ehitIterator) {
+
+    // Pull Datecl_mc_ehits from manager
+    Belle::Datecl_mc_ehits datECLMCEHit = *ehitIterator;
+
+    // Create Belle II ECLHit
+    auto B2EclHit = m_eclHits.appendNew();
+
+    // Convert Datecl_mc_ehit -> ECLHit
+    convertECLHitObject(datECLMCEHit, B2EclHit);
+  }
+}
+
 //-----------------------------------------------------------------------------
 // CONVERT OBJECTS
 //-----------------------------------------------------------------------------
@@ -1682,6 +1711,13 @@ void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster&
   klmCluster->setLayers(klm_cluster.layers());
   klmCluster->setInnermostLayer(klm_cluster.first_layer());
 
+}
+
+void B2BIIConvertMdstModule::convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit)
+{
+  // note: average time was not available in Belle
+  eclHit->setCellId(ecl_mc_ehit.cId());
+  eclHit->setEnergyDep(ecl_mc_ehit.energy());
 }
 
 //-----------------------------------------------------------------------------

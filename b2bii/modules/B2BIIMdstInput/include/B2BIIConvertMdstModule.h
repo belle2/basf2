@@ -20,6 +20,7 @@
 // Belle objects (Panther tables)
 #include "belle_legacy/tables/belletdf.h"
 #include "belle_legacy/tables/mdst.h"
+#include "belle_legacy/tables/ecl.h"
 
 #include "belle_legacy/helix/Helix.h"
 
@@ -38,6 +39,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Const.h>
+
+#include <ecl/dataobjects/ECLHit.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/LorentzVector.h"
@@ -181,6 +184,11 @@ namespace Belle2 {
      */
     void convertMdstVee2Table();
 
+    /**
+     * Reads and converts all entries of Datecl_mc_ehits Panther table to ECLHit dataobjects and adds them to StoreArray<ECLHit>.
+     */
+    void convertECLHitTable();
+
     /** Stores beam parameters (energy, angles) in BeamParameters (currently in the DataStore). */
     void convertBeamEnergy();
 
@@ -213,6 +221,11 @@ namespace Belle2 {
      * If running on MC, the Track -> MCParticle relation is set as well.
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
+
+    /**
+     * Converts Datecl_mc_ehits record to ECLHit object.
+     */
+    void convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit);
 
     /**
      * Creates TrackFitResult and fills it.
@@ -361,6 +374,9 @@ namespace Belle2 {
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
+
+    /** ECL hits */
+    StoreArray<ECLHit> m_eclHits;
 
     /** BeamParameters */
     DBObjPtr<BeamParameters> m_beamParamsDB;

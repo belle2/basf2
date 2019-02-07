@@ -18,19 +18,19 @@ namespace Belle2 {
   /**
    * Class to store KLM scintillator simulation parameters in the database.
    */
-  class KLMScintillatorSimulationParameters : public TObject {
+  class KLMScintillatorDigitizationParameters : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    KLMScintillatorSimulationParameters();
+    KLMScintillatorDigitizationParameters();
 
     /**
      * Destructor.
      */
-    ~KLMScintillatorSimulationParameters();
+    ~KLMScintillatorDigitizationParameters();
 
     /**
      * Get ADC range.
@@ -268,7 +268,7 @@ namespace Belle2 {
     bool m_EnableConstBkg;
 
     /** Class version. */
-    ClassDef(Belle2::KLMScintillatorSimulationParameters, 1);
+    ClassDef(Belle2::KLMScintillatorDigitizationParameters, 1);
 
   };
 

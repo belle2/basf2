@@ -15,7 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <bklm/dbobjects/BKLMADCThreshold.h>
 #include <framework/database/DBObjPtr.h>
-#include <klm/dbobjects/KLMScintillatorSimulationParameters.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -63,7 +63,7 @@ namespace Belle2 {
     KLM::ScintillatorFirmware* m_Fitter;
 
     //! Scintillator digitization params read from database
-    DBObjPtr<KLMScintillatorSimulationParameters> m_digitParams;
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_digitParams;
 
     //! Time conversion.
     DBObjPtr<KLMTimeConversion> m_TimeConversion;

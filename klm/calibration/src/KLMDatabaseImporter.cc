@@ -20,7 +20,7 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/gearbox/GearDir.h>
 #include <klm/calibration/KLMDatabaseImporter.h>
-#include <klm/dbobjects/KLMScintillatorSimulationParameters.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 
 using namespace Belle2;
 
@@ -47,7 +47,7 @@ void KLMDatabaseImporter::setIOV(int experimentLow, int runLow,
 
 void KLMDatabaseImporter::importScintillatorSimulationParameters()
 {
-  DBImportObjPtr<KLMScintillatorSimulationParameters> simPar;
+  DBImportObjPtr<KLMScintillatorDigitizationParameters> simPar;
   simPar.construct();
   GearDir d("/Detector/DetectorComponent[@name=\"KLM\"]/"
             "Content/ScintillatorSimulationParams");

@@ -85,10 +85,10 @@ namespace Belle2 {
     TFile* m_fout;
 
     /** Scintillator simulation parameters. */
-    DBObjPtr<KLMScintillatorSimulationParameters> m_SciSimParDatabase;
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_SciSimParDatabase;
 
     /** Scintillator simulation parameters. */
-    KLMScintillatorSimulationParameters* m_SciSimPar;
+    KLMScintillatorDigitizationParameters* m_SciSimPar;
 
     /** Direct histogram. */
     float* m_hDir;

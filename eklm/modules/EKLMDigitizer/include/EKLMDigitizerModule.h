@@ -18,7 +18,7 @@
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <klm/dbobjects/KLMScintillatorSimulationParameters.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -86,7 +86,7 @@ namespace Belle2 {
     void mergeSimHitsToStripHits();
 
     /** Digitization parameters. */
-    DBObjPtr<KLMScintillatorSimulationParameters> m_DigPar;
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
 
     /** Time conversion. */
     DBObjPtr<KLMTimeConversion> m_TimeConversion;

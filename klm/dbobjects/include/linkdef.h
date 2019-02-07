@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::KLMScintillatorSimulationParameters+;
+#pragma link C++ class Belle2::KLMScintillatorDigitizationParameters+;
 #pragma link C++ class Belle2::KLMTimeConversion+;
 
 #endif

@@ -15,7 +15,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dbobjects/EKLMChannelData.h>
-#include <klm/dbobjects/KLMScintillatorSimulationParameters.h>
+#include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
@@ -43,7 +43,7 @@ namespace Belle2 {
        * @param[in] fitter                  Fitter.
        * @param[in] debug                   Use debug mode.
        */
-      ScintillatorSimulator(const KLMScintillatorSimulationParameters* digPar,
+      ScintillatorSimulator(const KLMScintillatorDigitizationParameters* digPar,
                             ScintillatorFirmware* fitter,
                             double digitizationInitialTime,
                             bool debug);
@@ -128,7 +128,7 @@ namespace Belle2 {
     private:
 
       /** Parameters. */
-      const KLMScintillatorSimulationParameters* m_DigPar;
+      const KLMScintillatorDigitizationParameters* m_DigPar;
 
       /** Fitter. */
       ScintillatorFirmware* m_fitter;

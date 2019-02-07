@@ -77,7 +77,7 @@ void EKLMADCModule::initialize()
   double l;
   if (!m_SciSimParDatabase.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
-  m_SciSimPar = new KLMScintillatorSimulationParameters(*m_SciSimParDatabase);
+  m_SciSimPar = new KLMScintillatorDigitizationParameters(*m_SciSimParDatabase);
   const EKLM::GeometryData* geoDat = &EKLM::GeometryData::Instance();
   try {
     m_fout = new TFile(m_out.c_str(), "recreate");

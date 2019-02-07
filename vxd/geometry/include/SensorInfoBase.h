@@ -307,6 +307,18 @@ namespace Belle2 {
         else return m_transform;
       }
 
+      /** Fill parameters of planar deformation to vector */
+      void setSurfaceParameters(std::vector<double> planarParameters)
+      {
+        m_surfaceDeformationParameters = planarParameters;
+      }
+
+      /** Return parameters of planar deformation */
+      const std::vector<double>& getSurfaceParameters() const
+      {
+        return m_surfaceDeformationParameters;
+      }
+
     protected:
       /** Type of the Sensor */
       SensorType m_type;
@@ -332,6 +344,8 @@ namespace Belle2 {
       TGeoHMatrix m_transform;
       /** Alignment-corrected transformation matrix of the Sensor for use in reconstruction */
       TGeoHMatrix m_recoTransform;
+      /** Vector contains all parameter needed for description planar deformation of sensors */
+      std::vector<double> m_surfaceDeformationParameters = std::vector<double>(12, 0.0);
     };
 
     inline void SensorInfoBase::forceInside(TVector3& local) const

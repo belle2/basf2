@@ -13,7 +13,7 @@
 #pragma once
 
 #include <G4EquationOfMotion.hh>
-#include <G4ElectroMagneticField.hh>
+#include <G4MagneticField.hh>
 
 namespace Belle2 {
 
@@ -31,9 +31,9 @@ namespace Belle2 {
       /**
        * Constructor.
        *
-       * @param emField Pointer to the field in which the particle will propagate.
+       * @param mField Pointer to the field in which the particle will propagate.
        */
-      explicit G4MonopoleEquation(G4ElectroMagneticField* emField);
+      explicit G4MonopoleEquation(G4MagneticField* mField);
 
       /**
        * Destructor.

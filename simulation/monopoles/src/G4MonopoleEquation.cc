@@ -21,8 +21,8 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
 
-G4MonopoleEquation::G4MonopoleEquation(G4ElectroMagneticField* emField)
-  : G4EquationOfMotion(emField)
+G4MonopoleEquation::G4MonopoleEquation(G4MagneticField* mField)
+  : G4EquationOfMotion(mField)
 {}
 
 G4MonopoleEquation::~G4MonopoleEquation()

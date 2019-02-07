@@ -388,17 +388,17 @@ namespace Belle2 {
       unsigned iTS = TSIDInSL(ts[0], iSL, iTracker);
       // check if hit is already existing in datastore
       CDCTriggerSegmentHit* hit = nullptr;
-      for (int ihit = 0; ihit < tsHits->getEntries(); ++ihit) {
-        CDCTriggerSegmentHit* compare = (*tsHits)[ihit];
-        if (compare->getISuperLayer() == iSL &&
-            compare->getIWireCenter() == iTS &&
-            compare->getPriorityPosition() == ts[3] &&
-            compare->getLeftRight() == ts[2] &&
-            compare->priorityTime() == int(ts[1])) {
-          hit = compare;
-          break;
-        }
-      }
+      //for (int ihit = 0; ihit < tsHits->getEntries(); ++ihit) {
+      //  CDCTriggerSegmentHit* compare = (*tsHits)[ihit];
+      //  if (compare->getISuperLayer() == iSL &&
+      //      compare->getIWireCenter() == iTS &&
+      //      compare->getPriorityPosition() == ts[3] &&
+      //      compare->getLeftRight() == ts[2] &&
+      //      compare->priorityTime() == int(ts[1])) {
+      //    hit = compare;
+      //    break;
+      //  }
+      //}
       if (!hit) {
         hit = tsHits->appendNew(iSL, iTS, ts[3], ts[2], ts[1], 0, foundTime);
         B2DEBUG(15, "make hit at SL " << iSL << " ID " << iTS << " clock " << foundTime);
@@ -593,14 +593,14 @@ namespace Belle2 {
                 << ", at clock " << iclock << ", tracker " << iTracker);
         // check if 2D track is already in list, otherwise add it
         CDCTriggerTrack* track2D = nullptr;
-        for (int itrack = 0; itrack < store2DTracks->getEntries(); ++itrack) {
-          if ((*store2DTracks)[itrack]->getPhi0() == trk2D->phi0 &&
-              (*store2DTracks)[itrack]->getOmega() == trk2D->omega) {
-            track2D = (*store2DTracks)[itrack];
-            B2DEBUG(15, "found 2D track in store with phi " << trk2D->phi0 << " omega " << trk2D->omega);
-            break;
-          }
-        }
+        //for (int itrack = 0; itrack < store2DTracks->getEntries(); ++itrack) {
+        //  if ((*store2DTracks)[itrack]->getPhi0() == trk2D->phi0 &&
+        //      (*store2DTracks)[itrack]->getOmega() == trk2D->omega) {
+        //    track2D = (*store2DTracks)[itrack];
+        //    B2DEBUG(15, "found 2D track in store with phi " << trk2D->phi0 << " omega " << trk2D->omega);
+        //    break;
+        //  }
+        //}
         if (!track2D) {
           B2DEBUG(15, "make new 2D track with phi " << trk2D->phi0 << " omega " << trk2D->omega << " clock " << iclock);
           track2D = store2DTracks->appendNew(trk2D->phi0, trk2D->omega, 0., iclock);
@@ -708,17 +708,22 @@ namespace Belle2 {
       constexpr short delayNNSelect = 3;
       for (short iclock = 0; iclock < bitsFromNN->getEntries(); ++iclock) {
         NNInputBitStream* bitsIn = (*bitsToNN)[iclock];
+        NNOutputBitStream* bitsOutEnable = (*bitsFromNN)[iclock];
         for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
-          TRG2DFinderTrack trk2D;
-          bool has2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits, &trk2D);
-          if (has2D) {
-            short foundTime = iclock + delayNNOutput;
-            if (foundTime  < bitsFromNN->getEntries()) {
-              NNOutputBitStream* bitsOut = (*bitsFromNN)[foundTime];
-              NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect];
-              decodeNNOutput(iclock, iTracker, bitsOut, bitsSelectTS,
-                             storeNNTracks, store2DTracks, tsHits, storeNNInputs,
-                             &trk2D);
+          const auto slvOutEnable = bitsOutEnable->signal()[iTracker];
+          std::string stringOutEnable = slv_to_bin_string(slvOutEnable);
+          if (stringOutEnable.c_str()[0] == '1') {
+            TRG2DFinderTrack trk2D;
+            bool has2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits, &trk2D);
+            if (has2D) {
+              short foundTime = iclock + delayNNOutput;
+              if (foundTime  < bitsFromNN->getEntries()) {
+                NNOutputBitStream* bitsOut = (*bitsFromNN)[foundTime];
+                NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect];
+                decodeNNOutput(iclock, iTracker, bitsOut, bitsSelectTS,
+                               storeNNTracks, store2DTracks, tsHits, storeNNInputs,
+                               &trk2D);
+              }
             }
           }
         }

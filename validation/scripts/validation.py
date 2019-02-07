@@ -1025,11 +1025,14 @@ class Validation:
         """
 
         # Use the local execution for all plotting scripts
+        self.log.note("Initializing local job control for plotting.")
         local_control = localcontrol.\
             Local(max_number_of_processes=self.parallel)
 
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
+
+        self.log.note("Selecting job control for all other jobs.")
 
         selected_controls = [
             c for c in self.get_available_job_control()
@@ -1042,19 +1045,26 @@ class Validation:
 
         selected_control = selected_controls[0]
 
-        self.log.note(selected_control.description())
+        self.log.note("Controller: {} ({})".format(
+            selected_control.name(),
+            selected_control.description()
+        ))
+
         if not selected_control.is_supported():
             print("Selected mode {} is not supported on your system".format(
                 self.mode))
             sys.exit(1)
 
         # instantiate the selected job control backend
-        control = selected_control()
+        if selected_control.name() == "local":
+            control = selected_control(max_number_of_processes=self.parallel)
+        else:
+            control = selected_control()
 
         # read the git hash which is used to produce this validation
         src_basepath = self.get_useable_basepath()
         git_hash = validationfunctions.get_compact_git_hash(src_basepath)
-        self.log.note("Git hash of repository located at {} is {}".format(
+        self.log.debug("Git hash of repository located at {} is {}".format(
             src_basepath, git_hash))
 
         # todo: perhaps we want to have these files in the results folder, don't we? /klieret

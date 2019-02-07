@@ -67,8 +67,9 @@ void drawHitmap(TString inputFile)
 
   for(int i = 0; i < 8; i++)
   {
-    canvasDetailed->cd(1);
     TString histoName;
+    /*
+    canvasDetailed->cd(1);
     histoName.Form("PlaneZBF%i", i);
     file->GetObject(histoName.Data(), hist);
     hist->Draw("colz");
@@ -79,7 +80,7 @@ void drawHitmap(TString inputFile)
     hist->Draw("colz");
 
     canvasDetailed->SaveAs("run" + runNumber + ".pdf");
-
+    */
     canvasDetailed->cd(1);
     histoName.Form("PlaneZStripBF%i", i);
     file->GetObject(histoName.Data(), hist);
@@ -90,7 +91,7 @@ void drawHitmap(TString inputFile)
     file->GetObject(histoName.Data(), hist);
     hist->Draw("colz");
 
-    canvasDetailed->SaveAs("run" + runNumber + ".pdf");
+    canvasDetailed->SaveAs("run" + runNumber + ".pdf");    
   }
 
   canvasGeneral->cd();
@@ -100,19 +101,31 @@ void drawHitmap(TString inputFile)
 
   for(int i = 0; i < 8; i++)
   {
+    TString histoName;
+    /*
     canvasDetailed->cd(1);
-    TString planeZ;
-    planeZ.Form("PlaneZBB%i", i);
-    file->GetObject(planeZ.Data(), hist);
+    histoName.Form("PlaneZBB%i", i);
+    file->GetObject(histoName.Data(), hist);
     hist->Draw("colz");
  
     canvasDetailed->cd(2);
-    TString planePhi;
-    planePhi.Form("PlanePhiBB%i", i);
-    file->GetObject(planePhi.Data(), hist);
+    histoName.Form("PlanePhiBB%i", i);
+    file->GetObject(histoName.Data(), hist);
     hist->Draw("colz");
 
     canvasDetailed->SaveAs("run" + runNumber + ".pdf");
+    */
+    canvasDetailed->cd(1);
+    histoName.Form("PlaneZStripBB%i", i);
+    file->GetObject(histoName.Data(), hist);
+    hist->Draw("colz");
+    
+    canvasDetailed->cd(2);
+    histoName.Form("PlanePhiStripBB%i", i);
+    file->GetObject(histoName.Data(), hist);
+    hist->Draw("colz");
+
+    canvasDetailed->SaveAs("run" + runNumber + ".pdf");    
   }
 
   TCanvas* empty = new TCanvas("empty", "empty", 800, 800);

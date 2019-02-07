@@ -19,7 +19,7 @@ import basf2
 
 # Set the input file names
 inputRoot = ['/ghi/fs01/belle2/bdata/Data/Raw/e0003/r05184/sub00/physics.0003.05184.HLT2.f00000.root']
-inputSRoot = ['/home/belle2/giacomo/ghi/BKLM/190204-ut3trg-afterbf2recovery4.sroot']
+inputSRoot = ['/home/belle2/giacomo/ghi/BKLM/190207-ut3trg-afterBB0oper4.sroot']
 
 # Create the main path
 main = basf2.create_path()

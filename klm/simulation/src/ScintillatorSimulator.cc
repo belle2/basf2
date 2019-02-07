@@ -54,7 +54,8 @@ void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
 }
 
 KLM::ScintillatorSimulator::ScintillatorSimulator(
-  const EKLMDigitizationParameters* digPar, ScintillatorFirmware* fitter,
+  const KLMScintillatorSimulationParameters* digPar,
+  ScintillatorFirmware* fitter,
   double digitizationInitialTime, bool debug) :
   m_DigPar(digPar), m_fitter(fitter),
   m_DigitizationInitialTime(digitizationInitialTime), m_Debug(debug),

@@ -15,10 +15,10 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dbobjects/KLMScintillatorSimulationParameters.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -86,7 +86,7 @@ namespace Belle2 {
     void mergeSimHitsToStripHits();
 
     /** Digitization parameters. */
-    DBObjPtr<EKLMDigitizationParameters> m_DigPar;
+    DBObjPtr<KLMScintillatorSimulationParameters> m_DigPar;
 
     /** Time conversion. */
     DBObjPtr<KLMTimeConversion> m_TimeConversion;

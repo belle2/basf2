@@ -84,11 +84,11 @@ namespace Belle2 {
     /** Output file. */
     TFile* m_fout;
 
-    /** Digitization parameters. */
-    DBObjPtr<EKLMDigitizationParameters> m_DigParDatabase;
+    /** Scintillator simulation parameters. */
+    DBObjPtr<KLMScintillatorSimulationParameters> m_SciSimParDatabase;
 
-    /** Digitization parameters. */
-    EKLMDigitizationParameters* m_DigPar;
+    /** Scintillator simulation parameters. */
+    KLMScintillatorSimulationParameters* m_SciSimPar;
 
     /** Direct histogram. */
     float* m_hDir;

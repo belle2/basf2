@@ -142,7 +142,6 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
        it = m_SimHitVolumeMap.upper_bound(it->first)) {
     EKLMSimHit* simHit = it->second;
     ub = m_SimHitVolumeMap.upper_bound(it->first);
-    /* Set hits. */
     if (m_ChannelSpecificSimulation) {
       strip = m_ElementNumbers->stripNumber(
                 simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
@@ -157,11 +156,11 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     if (simulator.getGeneratedNPE() == 0)
       continue;
     EKLMDigit* eklmDigit = m_Digits.appendNew(simHit);
+    eklmDigit->addRelationTo(simHit);
     eklmDigit->setMCTime(simHit->getTime());
     eklmDigit->setSiPMMCTime(simulator.getMCTime());
     eklmDigit->setPosition(simHit->getPosition());
     eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
-    eklmDigit->addRelationTo(simHit);
     if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
       tdc = simulator.getFPGAFit()->getStartTime();
       eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());

@@ -39,7 +39,13 @@ namespace Belle2 {
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     /**
+     * Import scintillator simulation parameters.
+     */
+    void importScintillatorSimulationParameters();
+
+    /**
      * Import time conversion parameters.
+     * @param[in] timeConversion Time conversion parameters.
      */
     void importTimeConversion(const KLMTimeConversion* timeConversion);
 

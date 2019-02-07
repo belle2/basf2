@@ -170,9 +170,9 @@ TVectorD SVDRecoHit::applyPlanarDeformation(TVectorD rawHit, std::vector<double>
   TVectorD pos(1);
 
   if (m_isU) {
-    pos[0] = u - dw * du_dw;
+    pos[0] = u + dw * du_dw;
   } else {
-    pos[0] = v - dw * dv_dw;
+    pos[0] = v + dw * dv_dw;
   }
 
   return pos;

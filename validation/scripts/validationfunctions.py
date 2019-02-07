@@ -217,6 +217,7 @@ def get_argument_parser(modes=None):
              "actually executing thesteering files (for debugging purposes).",
         action='store_true'
     )
+    # todo: use the options keyword here?
     parser.add_argument(
         "-m",
         "--mode",

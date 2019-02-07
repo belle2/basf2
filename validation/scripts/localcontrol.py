@@ -54,14 +54,14 @@ class Local:
         @param max_number_of_processes: The maximum number of processes
         """
 
-        #: A dict which holds the connections between the jobs (=Script objects)
-        # and the processes that were spawned for them
+        #: A dict which holds the connections between the jobs (=Script
+        #: objects) and the processes that were spawned for them
         self.jobs_processes = {}
 
         #: Contains a reference to the logger-object from validate_basf2
-        # Set up the logging functionality for the 'local execution'-Class,
-        # so we can log to validate_basf2.py's log what is going on in
-        # .execute and .is_finished
+        #: Set up the logging functionality for the 'local execution'-Class,
+        #: so we can log to validate_basf2.py's log what is going on in
+        #: .execute and .is_finished
         self.logger = logging.getLogger('validate_basf2')
 
         # Parameter for maximal number of parallel processes, use system CPU
@@ -69,12 +69,19 @@ class Local:
         # is not supported on current platform
         try:
             if max_number_of_processes is None:
-                self.max_number_of_processes = multiprocessing.cpu_count()
-            else:
-                self.max_number_of_processes = max_number_of_processes
+                max_number_of_processes = multiprocessing.cpu_count()
+                self.logger.debug(
+                    "Number of parallel processes has been set to CPU count"
+                )
+            self.max_number_of_processes = max_number_of_processes
         except NotImplementedError:
+            self.logger.debug(
+                "Number of CPUs could not be determined, number of parallel "
+                "processes set to default value."
+            )
             self.max_number_of_processes = 10
 
+        # noinspection PyUnresolvedReferences
         self.logger.note("Executing validation with {0} parallel processes.".
                          format(self.max_number_of_processes))
 
@@ -105,18 +112,21 @@ class Local:
 
         # Remember current working directory (to make sure the cwd is the same
         # after this function has finished)
-        current_cwd = os.getcwd()
+        cwd = os.getcwd()
 
         # Define the folder in which the results (= the ROOT files) should be
         # created. This is where the files containing plots will end up. By
         # convention, data files will be stored in the parent dir.
         # Then make sure the folder exists (create if it does not exist) and
         # change to cwd to this folder.
-        output_dir = validationpath.get_results_tag_package_folder(current_cwd, tag, job.package)
+        output_dir = validationpath.get_results_tag_package_folder(
+            cwd, tag, job.package
+        )
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         os.chdir(output_dir)
 
+        # fixme: Don't we need to close this later? /klieret
         # Create a logfile for this job and make sure it's empty!
         log = open(os.path.basename(job.path) + '.log', 'w+')
 
@@ -130,7 +140,9 @@ class Local:
             # 'options' contains an option-string for basf2, e.g. '-n 100 -p
             # 8'. This string will be split on white-spaces and added to the
             # params-list, since subprocess.Popen does not like strings...
-            params = validationfunctions.basf2_command_builder(job.path, options.split())
+            params = validationfunctions.basf2_command_builder(
+                job.path, options.split()
+            )
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
@@ -140,7 +152,9 @@ class Local:
         # If we are performing a dry run, just start an empty process.
         if dry:
             params = ['echo', '"Performing a dry run!"']
-        process = subprocess.Popen(params, stdout=log, stderr=subprocess.STDOUT)
+        process = subprocess.Popen(
+            params, stdout=log, stderr=subprocess.STDOUT
+        )
 
         # Save the connection between the job and the given process-ID
         self.jobs_processes[job] = process
@@ -149,7 +163,7 @@ class Local:
         self.current_number_of_processes += 1
 
         # Return to previous cwd
-        os.chdir(current_cwd)
+        os.chdir(cwd)
 
     def is_job_finished(self, job):
         """!

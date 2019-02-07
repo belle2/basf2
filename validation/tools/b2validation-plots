@@ -33,7 +33,16 @@ args = parser.parse_args()
 
 # Go to the html directory and call the create_plots function
 save_dir = os.path.abspath(os.getcwd())
+
+if not os.path.exists("results"):
+    print("Please run b2validation before running b2validation-plots.")
+    sys.exit(164)
+
+if not os.path.exists("html"):
+    os.mkdir("html")
+
 os.chdir('html')
+
 create_plots(revisions=args.revisions, force=args.force, work_folder=save_dir)
 
 # restore original working directory

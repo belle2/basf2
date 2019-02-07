@@ -15,7 +15,6 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-
 // ROOT includes
 #include <TMatrixD.h>
 
@@ -140,6 +139,9 @@ namespace Belle2 {
 
     /** Set up Detector plane information */
     void setDetectorPlane();
+
+    /** Apply planar deformation of sensors*/
+    TVectorD applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
 
     ClassDefOverride(PXDRecoHit, 8)
   };

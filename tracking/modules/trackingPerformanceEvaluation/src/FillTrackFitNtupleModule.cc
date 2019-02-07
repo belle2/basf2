@@ -62,8 +62,8 @@ FillTrackFitNtupleModule::~FillTrackFitNtupleModule()
 void FillTrackFitNtupleModule::initialize()
 {
   // Tracks, RecoTracks needed for this module
-  StoreArray<RecoTrack>::required(m_RecoTracksName);
-  StoreArray<Track>::required(m_TracksName);
+  m_RecoTracks.isRequired();
+  m_Tracks.isRequired();
 
   //set the ROOT File
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -83,13 +83,13 @@ void FillTrackFitNtupleModule::event()
 {
 
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
-  int event_num = eventMetaData->getEvent();
-  int event_run = eventMetaData->getRun();
-  int event_exp = eventMetaData->getExperiment();
-  int event_prod = eventMetaData->getProduction();
+  Float_t event_num = eventMetaData->getEvent();
+  Float_t event_run = eventMetaData->getRun();
+  Float_t event_exp = eventMetaData->getExperiment();
+  Float_t event_prod = eventMetaData->getProduction();
 
   B2DEBUG(99, "+++++ Loop on Tracks");
-  StoreArray<Track> tracks(m_TracksName);
+  StoreArray<Track> tracks(m_Tracks);
 
   BOOST_FOREACH(Track & track, tracks) {
 
@@ -102,7 +102,7 @@ void FillTrackFitNtupleModule::event()
     const TrackFitResult* fitResult_p = track.getTrackFitResult(Const::ChargedStable(2212));
     const TrackFitResult* fitResult_d = track.getTrackFitResult(Const::ChargedStable(1000010020));
 
-    Bool_t flag_pi = kTRUE, flag_k = kTRUE, flag_p = kTRUE, flag_d = kTRUE;
+    Float_t flag_pi = kTRUE, flag_k = kTRUE, flag_p = kTRUE, flag_d = kTRUE;
     if ((fitResult_pi == NULL) || (fitResult_pi->getParticleType() != Const::ChargedStable(211))) flag_pi = kFALSE;
     if ((fitResult_k == NULL) || (fitResult_k->getParticleType() != Const::ChargedStable(321))) flag_k = kFALSE;
     if ((fitResult_p == NULL) || (fitResult_p->getParticleType() != Const::ChargedStable(2212))) flag_p = kFALSE;
@@ -129,10 +129,10 @@ void FillTrackFitNtupleModule::event()
     nsvd = recoTrack->getNumberOfSVDHits();
     Float_t nhits_p = 0, ncdc_p = 0, npxd_p = 0, nsvd_p = 0;
     Float_t nhits_d = 0, ncdc_d = 0, npxd_d = 0, nsvd_d = 0;
-    Int_t first_cdc_pi = -100, last_cdc_pi = -100, first_svd_pi = -100, last_svd_pi;
-    Int_t first_cdc_k = -100, last_cdc_k = -100, first_svd_k = -100, last_svd_k;
-    Int_t first_cdc_p = -100, last_cdc_p = -100, first_svd_p = -100, last_svd_p;
-    Int_t first_cdc_d = -100, last_cdc_d = -100, first_svd_d = -100, last_svd_d;
+    Float_t first_cdc_pi = -100, last_cdc_pi = -100, first_svd_pi = -100, last_svd_pi = -100;
+    Float_t first_cdc_k = -100, last_cdc_k = -100, first_svd_k = -100, last_svd_k = -100;
+    Float_t first_cdc_p = -100, last_cdc_p = -100, first_svd_p = -100, last_svd_p = -100;
+    Float_t first_cdc_d = -100, last_cdc_d = -100, first_svd_d = -100, last_svd_d = -100;
     const auto& trackReps = recoTrack->getRepresentations();
     for (const auto& trackRep : trackReps) {
       int PDG = std::abs(trackRep->getPDG());
@@ -264,9 +264,9 @@ void FillTrackFitNtupleModule::event()
     }
     Float_t buffer[] = {event_num, event_run, event_exp, event_prod,
                         nhits, ncdc, npxd, nsvd,
-                        recoTrack->getPositionSeed().X(), recoTrack->getPositionSeed().Y(), recoTrack->getPositionSeed().Z(),
-                        recoTrack->getMomentumSeed().X(), recoTrack->getMomentumSeed().Y(), recoTrack->getMomentumSeed().Z(), recoTrack->getMomentumSeed().Mag(), recoTrack->getMomentumSeed().Perp(),
-                        recoTrack->getMomentumSeed().Theta()* TMath::RadToDeg(), recoTrack->getMomentumSeed().Phi()* TMath::RadToDeg(), recoTrack->getChargeSeed(),
+                        (Float_t)recoTrack->getPositionSeed().X(), (Float_t)recoTrack->getPositionSeed().Y(), (Float_t)recoTrack->getPositionSeed().Z(),
+                        (Float_t)recoTrack->getMomentumSeed().X(), (Float_t)recoTrack->getMomentumSeed().Y(), (Float_t)recoTrack->getMomentumSeed().Z(), (Float_t)recoTrack->getMomentumSeed().Mag(), (Float_t)recoTrack->getMomentumSeed().Perp(),
+                        (Float_t)(recoTrack->getMomentumSeed().Theta()* TMath::RadToDeg()), (Float_t)(recoTrack->getMomentumSeed().Phi()* TMath::RadToDeg()), (Float_t)recoTrack->getChargeSeed(),
                         nhits_pi, ncdc_pi, npxd_pi, nsvd_pi, nhits_k, ncdc_k, npxd_k, nsvd_k, nhits_p, ncdc_p, npxd_p, nsvd_p, nhits_d, ncdc_d, npxd_d, nsvd_d,
                         flag_pi, flag_k, flag_p, flag_d,
                         trk_x_pi, trk_y_pi, trk_z_pi,

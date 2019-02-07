@@ -20,6 +20,8 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 // forward declarations
 namespace Belle2 {
   class Track;
@@ -59,6 +61,8 @@ namespace Belle2 {
     //Ntuple for multi hypothesis particle
     TNtuple* m_n_MultiParticle;  /**< Multi particle ntuple*/
 
+    StoreArray<RecoTrack> m_RecoTracks; /**< RecoTrack StoreArray */
+    StoreArray<Track> m_Tracks; /**< Track StoreArray */
   };
 } // end of namespace
 

@@ -209,8 +209,8 @@ TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<doubl
 
   TVectorD pos(2);
 
-  pos[0] = u - dw * du_dw;
-  pos[1] = v - dw * dv_dw;
+  pos[0] = u + dw * du_dw;
+  pos[1] = v + dw * dv_dw;
 
   return pos;
 }

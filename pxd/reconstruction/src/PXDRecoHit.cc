@@ -185,8 +185,8 @@ TVectorD PXDRecoHit::applyPlanarDeformation(TVectorD hitCoords, std::vector<doub
 
   TVectorD pos(2);
 
-  pos[0] = u - dw * du_dw;
-  pos[1] = v - dw * dv_dw;
+  pos[0] = u + dw * du_dw;
+  pos[1] = v + dw * dv_dw;
 
   return pos;
 }

@@ -507,9 +507,12 @@ class Validation:
         # prints every 30 minutes which scripts are still running
         self.running_script_reporting_interval = 30
 
-        # The maximum time before a script is skipped, if it does not terminate
-        # The curren limit is 10h
+        #: The maximum time before a script is skipped, if it does not
+        #: terminate The current limit is 10h
         self.script_max_runtime_in_minutes = 720
+
+        #: Number of parallel processes
+        self.parallel = None
 
     def get_useable_basepath(self):
         """
@@ -800,7 +803,7 @@ class Validation:
 
         print(validationfunctions.congratulator(
             total=len(self.scripts),
-            failure=len(failed_scripts)+len(skipped_scripts)
+            failure=len(failed_scripts) + len(skipped_scripts)
         ))
 
     def set_runtime_data(self):
@@ -1028,23 +1031,25 @@ class Validation:
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
 
-        selected_control = [
-            (c.name(), c.description(), c) for c in self.get_available_job_control()
+        selected_controls = [
+            c for c in self.get_available_job_control()
             if c.name() == self.mode
         ]
 
-        if not len(selected_control) == 1:
+        if not len(selected_controls) == 1:
             print("Selected mode {} does not exist".format(self.mode))
             sys.exit(1)
 
-        self.log.note(selected_control[0][1])
-        if not selected_control[0][2].is_supported():
+        selected_control = selected_controls[0]
+
+        self.log.note(selected_control.description())
+        if not selected_control.is_supported():
             print("Selected mode {} is not supported on your system".format(
                 self.mode))
             sys.exit(1)
 
         # instantiate the selected job control backend
-        control = selected_control[0][2]()
+        control = selected_control()
 
         # read the git hash which is used to produce this validation
         src_basepath = self.get_useable_basepath()
@@ -1315,6 +1320,8 @@ def execute(tag=None, is_test=None):
 
     # Otherwise we can start the execution. The mainpart is wrapped in a
     # try/except-contruct to fetch keyboard interrupts
+    # fixme: except instructions make only sense after Validation obj is
+    # initialized ==> Pull everything until there out of try statement
     try:
 
         # Now we process the command line arguments.

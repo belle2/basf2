@@ -66,7 +66,6 @@ def add_pxd_ckf(path, *args, **kwargs):
     phase2_and_early_phase3_iovs = [(1, 0, 6, -1), (1002, 0, 1002, -1), (1003, 0, 1003, -1)]
     make_conditional_at(path=path, iov_list=phase2_and_early_phase3_iovs,
                         path_when_in_iov=phase2_path, path_when_not_in_iov=phase3_path)
-    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
 
 
 def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False,

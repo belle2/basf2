@@ -43,13 +43,14 @@ namespace Belle2 {
 
     virtual ~FillTrackFitNtupleModule();
 
-    virtual void initialize();
+    /// Require the store arrays and create the output root file
+    virtual void initialize() override;
 
-    virtual void beginRun();
+    /// Loop over Track objects and fill ntuples with tracking parameters
+    virtual void event() override;
 
-    virtual void event();
-
-    virtual void terminate();
+    /// Save output root file with ntuple
+    virtual void terminate() override;
 
   private:
 
@@ -59,7 +60,7 @@ namespace Belle2 {
     int m_ParticleHypothesis;  /**< Particle Hypothesis for the track fit (default: 211) */
 
     //Ntuple for multi hypothesis particle
-    TNtuple* m_n_MultiParticle;  /**< Multi particle ntuple*/
+    TNtuple* m_n_MultiParticle = nullptr;  /**< Multi particle ntuple*/
 
     StoreArray<RecoTrack> m_RecoTracks; /**< RecoTrack StoreArray */
     StoreArray<Track> m_Tracks; /**< Track StoreArray */

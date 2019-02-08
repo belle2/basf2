@@ -74,11 +74,6 @@ void FillTrackFitNtupleModule::initialize()
                                   "evt:run:exp:prod:nhits:ncdc:npxd:nsvd:seed_x:seed_y:seed_z:seed_px:seed_py:seed_pz:seed_p:seed_pt:seed_theta:seed_phi:seed_charge:nhits_pi:ncdc_pi:npxd_pi:nsvd_pi:nhits_k:ncdc_k:npxd_k:nsvd_k:nhits_p:ncdc_p:npxd_p:nsvd_p:nhits_d:ncdc_d:npxd_d:nsvd_d:flag_pi:flag_k:flag_p:flag_d:trk_x_pi:trk_y_pi:trk_z_pi:trk_px_pi:trk_py_pi:trk_pz_pi:trk_p_pi:trk_pt_pi:trk_theta_pi:trk_phi_pi:trk_charge_pi:trk_chi2_pi:trk_ndf_pi:trk_pvalue_pi:nfailed_pi:trk_x_k:trk_y_k:trk_z_k:trk_px_k:trk_py_k:trk_pz_k:trk_p_k:trk_pt_k:trk_theta_k:trk_phi_k:trk_charge_k:trk_chi2_k:trk_ndf_k:trk_pvalue_k:nfailed_k:trk_x_p:trk_y_p:trk_z_p:trk_px_p:trk_py_p:trk_pz_p:trk_p_p:trk_pt_p:trk_theta_p:trk_phi_p:trk_charge_p:trk_chi2_p:trk_ndf_p:trk_pvalue_p:nfailed_p:trk_x_d:trk_y_d:trk_z_d:trk_px_d:trk_py_d:trk_pz_d:trk_p_d:trk_pt_d:trk_theta_d:trk_phi_d:trk_charge_d:trk_chi2_d:trk_ndf_d:trk_pvalue_d:nfailed_d:cdcf_pi:cdcl_pi:svdf_pi:svdl_pi:cdcf_k:cdcl_k:svdf_k:svdl_k:cdcf_p:cdcl_p:svdf_p:svdl_p:cdcf_d:cdcl_d:svdf_d:svdl_d");
 }
 
-void FillTrackFitNtupleModule::beginRun()
-{
-
-}
-
 void FillTrackFitNtupleModule::event()
 {
 
@@ -93,9 +88,8 @@ void FillTrackFitNtupleModule::event()
 
   BOOST_FOREACH(Track & track, tracks) {
 
-    //RelationVector<RecoTrack> recoTrack_fromTrack = DataStore::getRelationsWithObj<RecoTrack>(&track);
     const RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
-    if (recoTrack == NULL) std::cout << "pippo!!!!" << std::endl;
+    if (recoTrack == NULL) B2WARNING(" the RecoTrack associated to Track is NULL!");
 
     const TrackFitResult* fitResult_pi = track.getTrackFitResult(Const::ChargedStable(211));
     const TrackFitResult* fitResult_k = track.getTrackFitResult(Const::ChargedStable(321));

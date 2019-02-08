@@ -45,32 +45,14 @@ void KLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunHigh = runHigh;
 }
 
-void KLMDatabaseImporter::importScintillatorSimulationParameters()
+void KLMDatabaseImporter::importScintillatorDigitizationParameters(
+  const KLMScintillatorDigitizationParameters* digitizationParameters)
 {
-  DBImportObjPtr<KLMScintillatorDigitizationParameters> simPar;
-  simPar.construct();
-  GearDir d("/Detector/DetectorComponent[@name=\"KLM\"]/"
-            "Content/ScintillatorSimulationParams");
-  simPar->setADCRange(d.getInt("ADCRange"));
-  simPar->setADCSamplingFrequency(d.getDouble("ADCSamplingFrequency"));
-  simPar->setNDigitizations(d.getInt("nDigitizations"));
-  simPar->setADCPedestal(d.getDouble("ADCPedestal"));
-  simPar->setADCPEAmplitude(d.getDouble("ADCPEAmplitude"));
-  simPar->setADCThreshold(d.getInt("ADCThreshold"));
-  simPar->setADCSaturation(d.getInt("ADCSaturation"));
-  simPar->setNPEperMeV(d.getDouble("nPEperMeV"));
-  simPar->setMinCosTheta(cos(d.getDouble("MaxTotalIRAngle") / 180.0 * M_PI));
-  simPar->setMirrorReflectiveIndex(d.getDouble("MirrorReflectiveIndex"));
-  simPar->setScintillatorDeExcitationTime(d.getDouble("ScintDeExTime"));
-  simPar->setFiberDeExcitationTime(d.getDouble("FiberDeExTime"));
-  simPar->setFiberLightSpeed(d.getDouble("FiberLightSpeed"));
-  simPar->setAttenuationLength(d.getDouble("AttenuationLength"));
-  simPar->setPEAttenuationFrequency(d.getDouble("PEAttenuationFreq"));
-  simPar->setMeanSiPMNoise(d.getDouble("MeanSiPMNoise"));
-  simPar->setEnableConstBkg(d.getDouble("EnableConstBkg") > 0);
+  DBImportObjPtr<KLMScintillatorDigitizationParameters> digPar;
+  digPar.construct(*digitizationParameters);
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
-  simPar.import(iov);
+  digPar.import(iov);
 }
 
 void KLMDatabaseImporter::importTimeConversion(

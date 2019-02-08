@@ -81,8 +81,6 @@ namespace Belle2 {
     StoreArray<ROIid> m_rois; /**< rois store array */
     StoreArray<SVDIntercept> m_intercepts; /**< svd intercept store array */
 
-    // int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
-
     double m_toleranceZ; /**< determination of interesting planes, tolerance along Z*/
     double m_tolerancePhi;  /**< determination of interesting planes, tolerance in phi*/
 

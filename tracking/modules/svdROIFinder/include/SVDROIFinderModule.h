@@ -61,9 +61,9 @@ namespace Belle2 {
     void terminate() override;
 
   protected:
-    ROIStripTranslator* m_theStripTranslator; /**< the strip translator object*/
+    ROIStripTranslator* m_theStripTranslator = nullptr; /**< the strip translator object*/
 
-    SVDInterceptor* m_theSVDInterceptor; /**< the svd interceptor object*/
+    SVDInterceptor* m_theSVDInterceptor = nullptr; /**< the svd interceptor object*/
     std::string m_SVDInterceptListName; /**< intercept list name*/
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
@@ -72,7 +72,7 @@ namespace Belle2 {
     StoreArray<ROIid> m_rois; /**< rois store array */
     StoreArray<SVDIntercept> m_intercepts; /**< svd intercept store array */
 
-    int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
+    // int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
 
     double m_toleranceZ; /**< determination of interesting planes, tolerance along Z*/
     double m_tolerancePhi;  /**< determination of interesting planes, tolerance in phi*/
@@ -84,7 +84,7 @@ namespace Belle2 {
     double m_maxWidthU;  /**< maximum U width of the ROI */
     double m_maxWidthV;  /**< maximum V width of the ROI */
 
-    ROIinfo m_ROIinfo; /**< contains the parameters that can be changed by the user*/
+    ROIinfo m_ROIinfo = {0, 0, 0, 0, 0, 0, "", "", "", ""}; /**< contains the parameters that can be changed by the user*/
 
   private:
 

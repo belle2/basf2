@@ -124,10 +124,6 @@ void SVDROIDQMModule::event()
 
   int ROIarea = 0;
   double redFactor = 0;
-  int minU;
-  int minV;
-  int maxU;
-  int maxV;
 
   for (auto& it : m_ROIs) {
 
@@ -137,10 +133,10 @@ void SVDROIDQMModule::event()
     const int nPixelsU = aSensorInfo.getUCells();
     const int nPixelsV = aSensorInfo.getVCells();
 
-    minU = it.getMinUid();
-    minV = it.getMinVid();
-    maxU = it.getMaxUid();
-    maxV = it.getMaxVid();
+    int minU = it.getMinUid();
+    int minV = it.getMinVid();
+    int maxU = it.getMaxUid();
+    int maxV = it.getMaxVid();
 
     int tmpROIarea = (maxU - minU) * (maxV - minV);
     ROIarea += tmpROIarea;
@@ -581,11 +577,11 @@ void SVDROIDQMModule::createHistosDictionaries()
 
         //--------------------------
 
-        itSvdSensors++;
+        ++itSvdSensors;
       }
-      itSvdLadders++;
+      ++itSvdLadders;
     }
-    itSvdLayers++;
+    ++itSvdLayers;
   }
 
 }

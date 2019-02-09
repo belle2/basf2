@@ -42,7 +42,6 @@ namespace Belle2 {
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
 
-    //TH1* findHistLocal(TString a);
     /**
      * Get histogram by its name.
      * @param a The name of the histogram.

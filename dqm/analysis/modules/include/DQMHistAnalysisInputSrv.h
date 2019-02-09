@@ -49,7 +49,6 @@ namespace Belle2 {
     int m_memsize;
     /** The refresh interval in ms. */
     int m_interval;
-    //  THttpServer* m_serv;
 
     /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;

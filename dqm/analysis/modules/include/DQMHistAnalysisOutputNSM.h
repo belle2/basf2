@@ -12,7 +12,7 @@
 
 namespace Belle2 {
 
-  /** Class definition for the output module of Sequential ROOT I/O */
+  /** Class declaration for output NSMCallback */
   class NSMCallback;
 
   /**

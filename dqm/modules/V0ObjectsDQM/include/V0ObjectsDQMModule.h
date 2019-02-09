@@ -7,15 +7,8 @@
 //-
 
 #include <framework/core/HistoModule.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <string>
 #include "TH2F.h"
-#include "TH1F.h"
 
 namespace Belle2 {
 
@@ -25,15 +18,13 @@ namespace Belle2 {
 
     V0ObjectsDQMModule();
 
-    void initialize() override;
-    void beginRun() override;
-    void event() override;
-    void endRun() override;
-    void terminate() override;
-
-    void defineHisto() override;
-
   private:
+
+    void initialize() override final;
+    void beginRun() override final;
+    void event() override final;;
+
+    void defineHisto() override final;
 
     /* x vs. y in slices of z */
     TH2F* m_h_xvsy[32] = {nullptr};

@@ -7,12 +7,10 @@
 //-
 
 #include <dqm/modules/V0ObjectsDQM/V0ObjectsDQMModule.h>
-#include <TLorentzVector.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <TDirectory.h>
-#include <iostream>
-#include <cmath>
-#include "TH2F.h"
-#include "TH1F.h"
 
 using namespace Belle2;
 
@@ -38,7 +36,8 @@ V0ObjectsDQMModule::V0ObjectsDQMModule() : HistoModule()
 void V0ObjectsDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("V0Objects")->cd();
+  oldDir->mkdir("V0Objects");
+  oldDir->cd("V0Objects");
 
   for (int j = 0; j < 32; j++) {
     m_h_xvsy[j] = new TH2F(Form("xvsy[%i]", j), Form("xvsy[%i]", j), 200, -10, 10, 200, -10, 10);
@@ -63,16 +62,6 @@ void V0ObjectsDQMModule::beginRun()
   for (int j = 0; j < 32; j++) {
     m_h_xvsy[j]->Reset();
   }
-}
-
-
-void V0ObjectsDQMModule::endRun()
-{
-}
-
-
-void V0ObjectsDQMModule::terminate()
-{
 }
 
 

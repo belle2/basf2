@@ -10,9 +10,15 @@
 
 // ECL
 #include <ecl/utility/ECLDspUtilities.h>
+#include <ecl/utility/ECLDspEmulator.h>
+#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/dbobjects/ECLDspData.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLDigit.h>
 // Framework
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -225,6 +231,94 @@ namespace Belle2 {
         fwrite(&(*(f1.begin() + i * nsiz1)), nsiz, nsiz1, fl);
       }
       fclose(fl);
+    }
+
+    /**********************************************/
+    /*                SHAPE FITTER                */
+
+    short int* vectorsplit(std::vector<short int>& vectorFrom, int channel)
+    {
+      size_t size = vectorFrom.size();
+      if (size % 16) B2ERROR("Split is impossible!" << "Vector size" << size);
+      return (vectorFrom.data() + (size / 16) * (channel - 1));
+    }
+
+    ECLDigit shapeFitter(int cid, std::vector<int> adc, int ttrig)
+    {
+      ECLChannelMapper mapper;
+      mapper.initFromDB();
+
+      //== Get mapping data
+
+      int crate   = mapper.getCrateID(cid);
+      int shaper  = mapper.getShaperPosition(cid);
+      int channel = mapper.getShaperChannel(cid);
+
+      //== Get DSP data
+
+      int dsp_group = (crate - 1) / 18;
+      int dsp_id = (crate - 1) % 18;
+      std::string payload_name = "ECLDSPPars" + std::to_string(dsp_group);
+      DBArray<ECLDspData> dsp_data(payload_name);
+      const ECLDspData* data = dsp_data[dsp_id * 12 + shaper - 1];
+
+      std::vector<short> vec_f;    data->getF(vec_f);
+      std::vector<short> vec_f1;   data->getF1(vec_f1);
+      std::vector<short> vec_fg31; data->getF31(vec_fg31);
+      std::vector<short> vec_fg32; data->getF32(vec_fg32);
+      std::vector<short> vec_fg33; data->getF33(vec_fg33);
+      std::vector<short> vec_fg41; data->getF41(vec_fg41);
+      std::vector<short> vec_fg43; data->getF43(vec_fg43);
+
+      short* f    = vectorsplit(vec_f,    channel);
+      short* f1   = vectorsplit(vec_f1,   channel);
+      short* fg31 = vectorsplit(vec_fg31, channel);
+      short* fg32 = vectorsplit(vec_fg32, channel);
+      short* fg33 = vectorsplit(vec_fg33, channel);
+      short* fg41 = vectorsplit(vec_fg41, channel);
+      short* fg43 = vectorsplit(vec_fg43, channel);
+
+      int k_a = data->getka();
+      int k_b = data->getkb();
+      int k_c = data->getkc();
+      int k_1 = data->getk1();
+      int k_2 = data->getk2();
+      int k_16 = data->gety0Startr();
+      int chi_thres = data->getchiThresh();
+
+      //== Get ADC data
+      int* y = adc.data();
+
+      //== Get trigger time
+      int ttrig2 = ttrig - 2 * (ttrig / 8);
+
+      //== Get thresholds
+      DBObjPtr<ECLCrystalCalib> thr_LowAmp("ECL_FPGA_LowAmp");
+      DBObjPtr<ECLCrystalCalib> thr_HitThresh("ECL_FPGA_HitThresh");
+
+      int A0 = thr_LowAmp->getCalibVector()[cid - 1];
+      int Ahard = thr_HitThresh->getCalibVector()[cid - 1];
+
+      //== Perform fit
+      int ampFit, timeFit, qualityFit;
+
+      lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0, Ahard, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres,
+             ampFit, timeFit, qualityFit);
+
+      //== Return fit results
+      ECLDigit ret;
+      ret.setCellId(cid);
+      ret.setAmp(ampFit);
+      ret.setQuality(qualityFit);
+      if (qualityFit != 2) {
+        ret.setTimeFit(timeFit);
+        ret.setChi(0);
+      } else {
+        ret.setTimeFit(0);
+        ret.setChi(timeFit);
+      }
+
+      return ret;
     }
   }
 }

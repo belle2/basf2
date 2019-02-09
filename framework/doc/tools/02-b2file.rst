@@ -19,11 +19,21 @@ look for the file in a local xml file catalog using an logical file name (LFN)::
                    Implies ``--all`` and ``--steering``.
 -s, --steering     print steering file contents
 
+
+.. _b2file-metadata-add:
+
 ``b2file-metadata-add``: Add/Edit LFN in given file
 ---------------------------------------------------
 
 This tools allows to modify the LFN and the data descriptions stored in a given
-basf2 output file. It will also update the xml file catalog.
+basf2 output file. It will also update the xml file catalog if the file was
+registered in it before.
+
+.. versionchanged:: after release-03-00-00
+
+   Previously the file was always registered in the file catalog so even new
+   file catalog was always created if none was existing. Now it only updates
+   the file catalog when the file is already registered.
 
 The keys and values for the data descriptions can take any value and are not
 used by the offline software in any way. They can be used for bookkeeping or
@@ -55,6 +65,8 @@ skimDecayMode
                    data description to set of the form key=value. If the
                    argument does not contain an equal sign it's interpeted as a
                    key to delete from the dataDescriptions.
+
+.. _b2file-catalog-add:
 
 ``b2file-catalog-add``: Add a file to a local XML file catalog
 --------------------------------------------------------------
@@ -127,14 +139,16 @@ restrictions apply:
 
 ::
 
-    usage: b2file-merge [-h] [-f] [-q] [--no-catalog] OUTPUTFILENAME
+    usage: b2file-merge [-h] [-f] [-q] [--no-catalog] [--add-to-catalog] OUTPUTFILENAME
                         INPUTFILENAME [INPUTFILENAME ...]
 
 .. rubric:: Optional Arguments
 
--f, --force   overwrite the output file if already present
--q, --quiet   if given only warnings and errors are printed
---no-catalog  don't register output file in file catalog
+-f, --force        overwrite the output file if already present
+-q, --quiet        if given only warnings and errors are printed
+--no-catalog       don't register output file in file catalog. This is now the
+                   default and just kept for backwards compatibility.g
+--add-to-catalog   add the output file to the file catalog
 
 .. rubric:: Examples
 
@@ -151,6 +165,11 @@ restrictions apply:
 .. versionchanged:: release-03-00-00
    the tool now checks for consistency of the real/MC flag for all input files
    and refues to merge mixed sets of real and MC data.
+
+.. versionchanged:: after release-03-00-00
+   files will by default no longer be registered in a file catalog. To get the
+   old behavior please supply the ``--add-to-catalog`` command line option or
+   run ``b2file-catalaog-add`` on the output file.
 
 
 ``b2file-mix``: Create a run of mixed data from a set of input files

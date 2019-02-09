@@ -8,8 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <vector>
+
 namespace Belle2 {
 
+  class ECLDigit;
   class ECLDspData;
 
   namespace ECL {
@@ -28,6 +31,17 @@ namespace Belle2 {
      * @param[in] obj      Object to be written
      */
     void writeEclDsp(const char* raw_file, ECLDspData* obj);
+
+    /**
+     * @brief Emulate shape fitting algorithm from ShaperDSP
+     *        using algorithm from ecl/utility/src/ECLDspEmulator.cc
+     *        See ecl/examples/eclShapeFitter.py for usage example.
+     *
+     * @param[in] cid      CellID, 1..8736
+     * @param[in] adc[31]  Waveform data from ECLDsp dataobject
+     * @param[in] ttrig    Trigger time from ECLTrig dataobject
+     */
+    ECLDigit shapeFitter(int cid, std::vector<int> adc, int ttrig);
   }
 }
 

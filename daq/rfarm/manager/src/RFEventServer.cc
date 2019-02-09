@@ -184,7 +184,7 @@ int RFEventServer::Start(NSMmsg*, NSMcontext*)
 
 int RFEventServer::Stop(NSMmsg*, NSMcontext*)
 {
-  //  m_rbufin->clear();
+  m_rbufin->clear();
   return 0;
 }
 

@@ -46,7 +46,7 @@ namespace Belle2 {
        * Useful constructor
        * @param sampleName data sample name, one of dimuon, bhabha or cosmics
        */
-      TrackSelector(const std::string& sampleName);
+      explicit TrackSelector(const std::string& sampleName);
 
       /**
        * Sets momentum cut (used for "cosmics" only)

@@ -25,7 +25,8 @@ import pprint
 
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, \
-    scripts_in_dir, parse_cmd_line_arguments, get_log_file_paths
+    scripts_in_dir, parse_cmd_line_arguments, get_log_file_paths, \
+    terminal_title_line
 import validationfunctions
 
 import validationserver
@@ -333,6 +334,7 @@ def draw_progress_bar(delete_lines, scripts, barlength=50):
 
     @param delete_lines: The amount of lines which need to be deleted before
         we can redraw the progress bar
+    @param scripts: List of all Script obejcts
     @param barlength: The length of the progess bar (in characters)
     @return: The number of lines that were printed by this function call.
         Usefule if this function is called repeatedly.
@@ -505,9 +507,12 @@ class Validation:
         # prints every 30 minutes which scripts are still running
         self.running_script_reporting_interval = 30
 
-        # The maximum time before a script is skipped, if it does not terminate
-        # The curren limit is 10h
+        #: The maximum time before a script is skipped, if it does not
+        #: terminate The current limit is 10h
         self.script_max_runtime_in_minutes = 720
+
+        #: Number of parallel processes
+        self.parallel = None
 
     def get_useable_basepath(self):
         """
@@ -719,13 +724,13 @@ class Validation:
             failed_log_path
         ))
 
-        with open(failed_log_path, "w+") as list_failed:
-            # Select only failed scripts
-            failed_scripts = [
-                script for script in self.scripts
-                if script.status == ScriptStatus.failed
-            ]
+        # Select only failed scripts
+        failed_scripts = [
+            script for script in self.scripts
+            if script.status == ScriptStatus.failed
+        ]
 
+        with open(failed_log_path, "w+") as list_failed:
             # log the name of all failed scripts
             for script in failed_scripts:
                 list_failed.write(script.path.split("/")[-1] + "\n")
@@ -744,16 +749,62 @@ class Validation:
             skipped_log_path
         ))
 
-        with open(skipped_log_path, "w+") as list_skipped:
-            # Select only failed scripts
-            skipped_scripts = [
-                script for script in self.scripts
-                if script.status == ScriptStatus.skipped
-            ]
+        # Select only failed scripts
+        skipped_scripts = [
+            script for script in self.scripts
+            if script.status == ScriptStatus.skipped
+        ]
 
+        with open(skipped_log_path, "w+") as list_skipped:
             # log the name of all failed scripts
             for script in skipped_scripts:
                 list_skipped.write(script.path.split("/")[-1] + "\n")
+
+    def report_on_scripts(self, verbosity=2):
+        """!
+        Print a summary about all scripts, especially highlighting
+        skipped and failed scripts.
+        """
+
+        failed_scripts = [
+            script.name for script in self.scripts
+            if script.status == ScriptStatus.failed
+        ]
+        skipped_scripts = [
+            script.name for script in self.scripts
+            if script.status == ScriptStatus.skipped
+        ]
+
+        self.log.note("")
+        self.log.note(terminal_title_line(
+            "Summary of script execution", level=0
+        ))
+        self.log.note("Total number of scripts: {}".format(len(self.scripts)))
+        self.log.note("")
+        if skipped_scripts:
+            self.log.note("{}/{} scripts were skipped".format(
+                len(skipped_scripts), len(self.scripts)))
+            for s in skipped_scripts:
+                self.log.note("* {}".format(s))
+            self.log.note("")
+        else:
+            self.log.note("No scripts were skipped. Nice!")
+            self.log.note("")
+
+        if failed_scripts:
+            self.log.note("{}/{} scripts failed".format(
+                len(failed_scripts), len(self.scripts)))
+            for s in failed_scripts:
+                self.log.note("* {}".format(s))
+            self.log.note("")
+        else:
+            self.log.note("No scripts failed. Nice!")
+            self.log.note("")
+
+        print(validationfunctions.congratulator(
+            total=len(self.scripts),
+            failure=len(failed_scripts) + len(skipped_scripts)
+        ))
 
     def set_runtime_data(self):
         """!
@@ -884,7 +935,8 @@ class Validation:
     def apply_script_caching(self):
         cacheable_scripts = [s for s in self.scripts if s.is_cacheable()]
 
-        output_dir_datafiles = validationpath.get_results_tag_folder(self.work_folder, self.tag)
+        output_dir_datafiles = validationpath.get_results_tag_folder(
+            self.work_folder, self.tag)
 
         for s in cacheable_scripts:
             # for for all output files
@@ -973,34 +1025,46 @@ class Validation:
         """
 
         # Use the local execution for all plotting scripts
+        self.log.note("Initializing local job control for plotting.")
         local_control = localcontrol.\
             Local(max_number_of_processes=self.parallel)
 
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
 
-        selected_control = [
-            (c.name(), c.description(), c) for c in self.get_available_job_control()
+        self.log.note("Selecting job control for all other jobs.")
+
+        selected_controls = [
+            c for c in self.get_available_job_control()
             if c.name() == self.mode
         ]
 
-        if not len(selected_control) == 1:
+        if not len(selected_controls) == 1:
             print("Selected mode {} does not exist".format(self.mode))
             sys.exit(1)
 
-        self.log.note(selected_control[0][1])
-        if not selected_control[0][2].is_supported():
+        selected_control = selected_controls[0]
+
+        self.log.note("Controller: {} ({})".format(
+            selected_control.name(),
+            selected_control.description()
+        ))
+
+        if not selected_control.is_supported():
             print("Selected mode {} is not supported on your system".format(
                 self.mode))
             sys.exit(1)
 
         # instantiate the selected job control backend
-        control = selected_control[0][2]()
+        if selected_control.name() == "local":
+            control = selected_control(max_number_of_processes=self.parallel)
+        else:
+            control = selected_control()
 
         # read the git hash which is used to produce this validation
         src_basepath = self.get_useable_basepath()
         git_hash = validationfunctions.get_compact_git_hash(src_basepath)
-        self.log.note("Git hash of repository located at {} is {}".format(
+        self.log.debug("Git hash of repository located at {} is {}".format(
             src_basepath, git_hash))
 
         # todo: perhaps we want to have these files in the results folder, don't we? /klieret
@@ -1266,6 +1330,8 @@ def execute(tag=None, is_test=None):
 
     # Otherwise we can start the execution. The mainpart is wrapped in a
     # try/except-contruct to fetch keyboard interrupts
+    # fixme: except instructions make only sense after Validation obj is
+    # initialized ==> Pull everything until there out of try statement
     try:
 
         # Now we process the command line arguments.
@@ -1405,6 +1471,8 @@ def execute(tag=None, is_test=None):
         else:
             validation.log.note('Skipping plot creation and mailing '
                                 '(dry run)...')
+
+        validation.report_on_scripts()
 
         # Log that everything is finished
         validation.log.note(

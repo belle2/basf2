@@ -65,9 +65,13 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam("splitLevel", m_splitLevel,
            "Branch split level: determines up to which depth object members will be saved in separate sub-branches in the tree. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used. The default (99) usually gives the highest read performance with RootInput.",
            99);
-  addParam("updateFileCatalog", m_updateFileCatalog,
-           "Flag that specifies whether the file metadata catalog (Belle2FileCatalog.xml) is updated. (You can also set the BELLE2_FILECATALOG environment variable to NONE to get the same effect.)",
-           true);
+  addParam("updateFileCatalog", m_updateFileCatalog, R"DOC(
+Flag that specifies whether the file metadata catalog is updated or created.
+This is only necessary in special cases and can always be done afterwards using
+``b2file-catalog-add filename.root``"
+
+(You can also set the ``BELLE2_FILECATALOG`` environment variable to NONE to get
+the same effect as setting this to false))DOC", false);
 
   vector<string> emptyvector;
   addParam(c_SteerBranchNames[0], m_branchNames[0],
@@ -393,6 +397,12 @@ void RootOutputModule::fillFileMetaData()
   for (const auto& item : m_additionalDataDescription) {
     m_fileMetaData->setDataDescription(item.first, item.second);
   }
+  // Set the LFN to the filename: if it's a URL to directly, otherwise make sure it's absolute
+  std::string lfn = m_file->GetName();
+  if(m_regularFile) {
+    lfn = boost::filesystem::absolute(lfn, boost::filesystem::initial_path()).string();
+  }
+  m_fileMetaData->setLfn(lfn);
   //register the file in the catalog
   if (m_updateFileCatalog) {
     FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);

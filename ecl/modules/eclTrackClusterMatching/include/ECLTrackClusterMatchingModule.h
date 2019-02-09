@@ -63,7 +63,7 @@ namespace Belle2 {
     bool isECLHit(const ExtHit& extHit) const;
 
     /** Calculate matching quality based on phi and theta consistencies */
-    double clusterQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;
+    double showerQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;
 
     /** Calculate phi consistency based on difference in azimuthal angle.
      *

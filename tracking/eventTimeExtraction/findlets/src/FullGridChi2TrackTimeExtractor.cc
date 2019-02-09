@@ -32,7 +32,6 @@ void FullGridChi2TrackTimeExtractor::exposeParameters(ModuleParamList* modulePar
   m_finalExtractor.exposeParameters(moduleParamList, prefixed("Refiner", prefix));
 
   moduleParamList->getParameter<unsigned int>("GridIterations").setDefaultValue(1);
-  moduleParamList->getParameter<unsigned int>("RefinerIterations").setDefaultValue(1);
   moduleParamList->getParameter<bool>("RefinerUseLastEventT0").setDefaultValue(true);
 }
 

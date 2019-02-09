@@ -12,6 +12,7 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/EnvironmentVariables.h>
 #include <boost/filesystem.hpp>
 #include <fstream>
 
@@ -31,44 +32,24 @@ FileCatalog& FileCatalog::Instance()
 FileCatalog::FileCatalog() : m_fileName("")
 {
   // check for BELLE2_FILECATALOG environment variable
-  const char* fileCatalog = getenv("BELLE2_FILECATALOG");
-  if (fileCatalog && (strcmp(fileCatalog, "NONE") == 0)) return;
+  std::string fileCatalog = EnvironmentVariables::get("BELLE2_FILECATALOG", "");
+  if (fileCatalog == "NONE") return;
 
   // check for file catalog in home directory
-  if (!fileCatalog) {
-    const char* path = "~/Belle2FileCatalog.xml";
+  if (fileCatalog.empty()) {
+    const std::string path{"~/Belle2FileCatalog.xml"};
     if (fs::exists(path)) {
       fileCatalog = path;
     }
   }
 
   // use file catalog in current directory if nothing else found
-  if (!fileCatalog) {
+  if (fileCatalog.empty()) {
     fileCatalog = "Belle2FileCatalog.xml";
   }
 
   // get absolute path name
   m_fileName = fs::absolute(fileCatalog, fs::initial_path<fs::path>()).c_str();
-
-  // check whether file exists and is readable, otherwise try to create it
-  std::ifstream ifile(m_fileName.c_str());
-  if (!ifile.good()) {
-    B2DEBUG(100, "Creating file catalog " << m_fileName);
-    FileSystem::Lock lock(m_fileName);
-    if (!lock.lock()) {
-      B2ERROR("Creation of file catalog " << m_fileName << " failed.");
-      m_fileName = "";
-    }
-    std::ofstream ofile(m_fileName.c_str());
-    if (!ofile.is_open()) {
-      B2ERROR("Creation of file catalog " << m_fileName << " failed.");
-      m_fileName = "";
-    } else {
-      ofile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-      ofile << "<FileCatalog>\n";
-      ofile << "</FileCatalog>\n";
-    }
-  }
 }
 
 
@@ -108,10 +89,15 @@ bool FileCatalog::writeCatalog(const FileCatalog::FileMap& fileMap)
   return true;
 }
 
-
-bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
+bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData, const std::string& oldLFN)
 {
   if (m_fileName.empty()) return false;
+
+  // make sure we have an LFN
+  if (metaData.getLfn().empty()) {
+    B2ERROR("Cannot register a file without a valid LFN");
+    return false;
+  }
 
   // get lock for write access to file catalog
   FileSystem::Lock lock(m_fileName);
@@ -127,23 +113,25 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
     return false;
   }
 
-  // use absolute path as LFN if it is not set
-  fileName = fs::absolute(fileName, fs::initial_path<fs::path>()).c_str();
-  if (metaData.getLfn().empty()) {
-    metaData.setLfn(fileName);
-  }
-
-  // check whether a file with this name is already registered
-  for (auto entry : fileMap) {
-    if (fileName.compare(entry.second.second.getLfn()) == 0) {
-      B2WARNING("A file " << fileName << " is already registered and will be overwritten in the catalog.");
-      fileMap.erase(entry.first);
+  // check whether a file with this name is already registered and remove if so
+  for (auto it = fileMap.begin(); it != fileMap.end(); ++it) {
+    auto&& [lfn, value] = *it;
+    if (!oldLFN.empty() and oldLFN == lfn) {
+      // old LFN exists and we requested an update so no warning, just remove
+      fileMap.erase(it);
+      break;
+    }
+    if (metaData.getLfn() == lfn) {
+      B2WARNING("A file with the same LFN is already registered and will be overwritten in the catalog."
+                << LogVar("LFN", lfn) << LogVar("old PFN", value.first) << LogVar("new PFN", fileName));
+      fileMap.erase(it);
       break;
     }
   }
 
   // add the new entry and write the file catalog
   fileMap[metaData.getLfn()] = std::make_pair(fileName, metaData);
+
   if (!writeCatalog(fileMap)) {
     B2ERROR("Failed to write file catalog " << m_fileName);
     return false;
@@ -157,6 +145,7 @@ bool FileCatalog::getMetaData(std::string& fileName, FileMetaData& metaData)
 {
   metaData = FileMetaData();
   if (m_fileName.empty()) return false;
+  if (!fs::exists(m_fileName)) return false;
 
   // get lock for read access to file catalog
   FileSystem::Lock lock(m_fileName, true);

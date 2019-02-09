@@ -45,7 +45,7 @@ PXDRawDQMCorrModule::PXDRawDQMCorrModule() : HistoModule(), m_storeRawHits()
   setDescription("PXD DQM Correlation module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("PXDRawHitsName", m_storeRawHitsName, "The name of the StoreArray of PXDRawHits to be processed", string(""));
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxdrawcorr"));
 }
 

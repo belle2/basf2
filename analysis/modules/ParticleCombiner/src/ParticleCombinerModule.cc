@@ -189,6 +189,25 @@ namespace Belle2 {
         break;
       }
 
+      // append covariance matrix
+      if (particle.getPDGCode() == 111) {
+        const std::vector<Particle*> daughters = particle.getDaughters();
+        std::vector<TMatrixFSym> daughter_matrices;
+        for (unsigned int i = 0; i < daughters.size(); i++) {
+          daughter_matrices.push_back(daughters[i]->getMomentumVertexErrorMatrix());
+        }
+        TMatrixFSym pi0_errMatrix(7);
+        for (int i = 0; i < 7; i++) {
+          for (int j = 0; j < 7; j++) {
+            for (unsigned int k = 0; k < daughters.size(); k++) {
+              pi0_errMatrix[i][j] += daughter_matrices[k][i][j];
+            }
+          }
+        }
+        particle.setMomentumVertexErrorMatrix(pi0_errMatrix);
+      }
+      // append covariance matrix
+
       Particle* newParticle = particles.appendNew(particle);
       int iparticle = particles.getEntries() - 1;
 

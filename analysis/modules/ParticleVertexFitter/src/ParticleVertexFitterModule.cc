@@ -344,8 +344,11 @@ namespace Belle2 {
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFitter does not support fit with multiple pi0s (yet).");
     }
 
+    bool pi0_2body = false;
     if (fitChildren.size() < 2) {
-      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      //  B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      B2WARNING("vertexKFitter is fitting a 2 body decay with one pi0. ErrorMatrix of this pi0 is calculated in [ParticleCombinerModule] as sum of the two covariance matrices of its daughter gamma");
+      pi0_2body = true;
       return false;
     }
 
@@ -353,22 +356,29 @@ namespace Belle2 {
     analysis::VertexFitKFit kv;
     kv.setMagneticField(m_Bfield);
 
-    for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-      kv.addParticle(mother->getDaughter(fitChildren[iChild]));
-
-    if (ipProfileConstraint)
-      addIPProfileToKFitter(kv);
-
-    // Perform vertex fit using only the particles with valid error matrices
-    int err = kv.doFit();
-    if (err != 0)
-      return false;
 
     bool ok = false;
-    if (pi0Children.size() == 0)
-      // in the case daughters do not inlude pi0 - this is it (fit done)
+    if (pi0Children.size() == 0 || pi0_2body == true) {
+      // Initialise the Fitter
+
+      for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
+        kv.addParticle(mother->getDaughter(fitChildren[iChild]));
+
+      for (unsigned ipi0 = 0; ipi0 < pi0Children.size(); ipi0++)
+        kv.addParticle(mother->getDaughter(pi0Children[ipi0]));
+
+      if (ipProfileConstraint)
+        addIPProfileToKFitter(kv);
+
+      // Perform vertex fit using only the particles with valid error matrices
+      int err = kv.doFit();
+      if (err != 0)
+        return false;
+
+      // in the case daughters do not inlude pi0 or a 2 body decay with one pi0 - this is it (fit done)
       ok = makeKVertexMother(kv, mother);
-    else if (pi0Children.size() == 1) {
+
+    } else if (pi0Children.size() == 1 && fitChildren.size() > 1) {
       // the daughters contain pi0:
       // 1. refit pi0 to previously determined vertex
       // 2. redo the fit using all particles (including pi0 this time)
@@ -399,8 +409,7 @@ namespace Belle2 {
       if (ipProfileConstraint)
         addIPProfileToKFitter(kv2);
 
-      err = kv2.doFit();
-
+      int err = kv2.doFit();
       if (err != 0)
         return false;
 
@@ -425,14 +434,15 @@ namespace Belle2 {
     if (pi0Children.size() > 1) {
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFitter does not support fit with multiple pi0s (yet).");
     }
-
+    bool pi0_2body = false;
     if (fitChildren.size() < 2) {
-      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      B2WARNING("massVertexKFitter is fitting a 2 body decay with one pi0. ErrorMatrix of this pi0 is calculated in [ParticleCombinerModule] as sum of the two covariance matrices of its daughter gamma");
+      pi0_2body = true;
       return false;
     }
 
     bool ok = false;
-    if (pi0Children.size() == 0) {
+    if (pi0Children.size() == 0 || pi0_2body == true) {
       // Initialise the Fitter
       analysis::MassVertexFitKFit kmv;
       kmv.setMagneticField(m_Bfield);
@@ -440,14 +450,17 @@ namespace Belle2 {
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
         kmv.addParticle(mother->getDaughter(fitChildren[iChild]));
 
+      for (unsigned ipi0 = 0; ipi0 < pi0Children.size(); ipi0++)
+        kmv.addParticle(mother->getDaughter(pi0Children[ipi0]));
+
       kmv.setInvariantMass(mother->getPDGMass());
       int err = kmv.doFit();
       if (err != 0)
         return false;
 
-      // in the case daughters do not inlude pi0 - this is it (fit done)
+      // in the case daughters do not inlude pi0 or a 2 body decay with one pi0 - this is it (fit done)
       ok = makeKMassVertexMother(kmv, mother);
-    } else if (pi0Children.size() == 1) {
+    } else if (pi0Children.size() == 1 && fitChildren.size() > 1) {
       // the daughters contain pi0:
       // 1. refit pi0 to previously determined vertex
       // 2. redo the fit using all particles (including pi0 this time)

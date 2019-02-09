@@ -72,6 +72,11 @@ namespace Belle2 {
     double m_minSBRatio;  /**< minimal signal-to-background ratio */
     double m_minDERatio;  /**< minimal ratio of detected over expected photons */
     double m_maxDERatio;  /**< maximal ratio of detected over expected photons */
+    double m_minPt; /**< minimal p_T of track */
+    double m_maxPt; /**< maximal p_T of track */
+    double m_maxD0; /**< maximal absolute value of helix perigee distance */
+    double m_maxZ0; /**< maximal absolute value of helix perigee z coordnate */
+    int m_minNHitsCDC; /**< minimal number of hits in CDC */
     bool m_useMCTruth;    /**< use MC truth for mass instead of dEdx most probable */
     bool m_saveHistograms; /**< flag to save histograms */
     double m_tau; /**< first order filter time constant [events] */

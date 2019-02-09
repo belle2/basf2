@@ -17,8 +17,10 @@
 #include <top/reconstruction/TOP1Dpdf.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
 
-// Hit classes
+// Dataobject classes
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -75,6 +77,11 @@ namespace Belle2 {
              "minimal ratio of detected-to-expected photons to accept track", 0.4);
     addParam("maxDERatio", m_maxDERatio,
              "maximal ratio of detected-to-expected photons to accept track", 2.5);
+    addParam("minPt", m_minPt, "minimal p_T of the track", 0.3);
+    addParam("maxPt", m_maxPt, "maximal p_T of the track", 6.0);
+    addParam("maxD0", m_maxD0, "maximal absolute value of helix perigee distance", 2.0);
+    addParam("maxZ0", m_maxZ0, "maximal absolute value of helix perigee z coordinate", 4.0);
+    addParam("minNHitsCDC", m_minNHitsCDC, "minimal number of hits in CDC", 20);
     addParam("useMCTruth", m_useMCTruth,
              "if true, use MC truth for particle mass instead of the most probable from dEdx",
              false);
@@ -214,6 +221,18 @@ namespace Belle2 {
     for (const auto& track : m_tracks) {
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
+
+      // track selection
+      const auto* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
+      if (not fitResult) {
+        B2ERROR("No TrackFitResult available. Must be a bug somewhere.");
+        continue;
+      }
+      if (fitResult->getHitPatternCDC().getNHits() < m_minNHitsCDC) continue;
+      if (fabs(fitResult->getD0()) > m_maxD0) continue;
+      if (fabs(fitResult->getZ0()) > m_maxZ0) continue;
+      auto pt = fitResult->getTransverseMomentum();
+      if (pt < m_minPt or pt > m_maxPt) continue;
 
       // determine most probable particle mass
       double mass = 0;

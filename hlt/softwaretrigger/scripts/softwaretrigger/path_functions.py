@@ -334,7 +334,6 @@ def add_hlt_processing(path, run_type="collision",
                                            components=reco_components,
                                            softwaretrigger_mode=softwaretrigger_mode,
                                            run_type=run_type,
-                                           roi_take_fullframe=roi_take_fullframe,
                                            calcROIs=calcROIs,
                                            RejectByZeroROI=RejectByZeroROI,
                                            addDqmModules=True, **kwargs)
@@ -414,7 +413,6 @@ def add_softwaretrigger_reconstruction(
         additonal_store_arrays_to_keep=[],
         pruneDataStore=True,
         calcROIs=True,
-        roi_take_fullframe=False,
         RejectByZeroROI=True):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
@@ -489,9 +487,6 @@ def add_softwaretrigger_reconstruction(
                       " is not a supported software trigger" +
                       "mode [softwaretrigger_off, monitoring, fast_reco_filter, hlt_filter]" +
                       "the default is mode hlt_filter")
-
-    if roi_take_fullframe:
-        add_pxd_fullframe_phase3_early(fast_reco_reconstruction_path)
 
     # Add fast reco reconstruction
     if softwaretrigger_mode in ['monitoring', 'fast_reco_filter', 'hlt_filter']:

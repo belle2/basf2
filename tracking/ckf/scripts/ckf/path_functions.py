@@ -54,21 +54,21 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
 
 
 def add_pxd_ckf(path, *args, **kwargs):
-    """Function basically calling _add_pxd_ckf_implementation for phase2 or 3 differently"""
+    """Function basically calling _add_pxd_ckf_implementation for strict and loose settings (depending on the PXD setup)"""
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
-    phase2_path = basf2.create_path()
-    _add_pxd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)
-    phase3_path = basf2.create_path()
-    _add_pxd_ckf_implementation(phase3_path, *args, phase2=False, **kwargs)
+    loose_settings_path = basf2.create_path()
+    _add_pxd_ckf_implementation(loose_settings_path, *args, loose_settings=True, **kwargs)
+    strict_settings_path = basf2.create_path()
+    _add_pxd_ckf_implementation(strict_settings_path, *args, loose_settings=False, **kwargs)
 
-    phase2_and_early_phase3_iovs = [(1, 0, 6, -1), (1002, 0, 1002, -1), (1003, 0, 1003, -1)]
-    make_conditional_at(path=path, iov_list=phase2_and_early_phase3_iovs,
-                        path_when_in_iov=phase2_path, path_when_not_in_iov=phase3_path)
+    strict_settings_iovs = [(0, 0, 0, -1)]
+    make_conditional_at(path=path, iov_list=strict_settings_iovs,
+                        path_when_in_iov=strict_settings_iovs, path_when_not_in_iov=loose_settings_path)
 
 
-def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False,
+def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loose_settings=False, use_mc_truth=False,
                                 filter_cut=0.03, overlap_cut=None, use_best_seeds=10, use_best_results=2,
                                 direction="backward"):
     """
@@ -76,7 +76,7 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
     :param path: The path to add the module to
     :param svd_cdc_reco_tracks: The name of the already created SVD+CDC reco tracks
     :param pxd_reco_tracks: The name to output the PXD reco tracks to
-    :param phase2: If true, use the setup for phase 2 (instead of phase 3)
+    :param loose_settings: If true, use the setup used during phase 2 (instead of full PXD setup)
     :param use_mc_truth: Use the MC information in the CKF
     :param filter_cut: CKF parameter for MVA state filter
     :param overlap_cut: CKF parameter for MVA overlap filter. Default is 0.2 for phase 3 and 0 for phase 2.
@@ -106,7 +106,7 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
         )
     else:
         if overlap_cut is None:
-            if phase2:
+            if loose_settings:
                 overlap_cut = 0.0
             else:
                 overlap_cut = 0.2
@@ -126,7 +126,7 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
             useBestNInSeed=use_best_results,
         )
 
-    if phase2:
+    if loose_settings:
         module_parameters["seedHitJumping"] = 1
         module_parameters["onlyUseTracksWithSVD"] = False
 

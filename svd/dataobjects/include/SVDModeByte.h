@@ -96,11 +96,11 @@ namespace Belle2 {
 
     };
 
-    /** Default / non-informative id 10010111 = 151
+    /** Default / non-informative id 1001000 = 72
      * Run type: zero-suppressed, 2
      * Event type: global run, 0
      * DAQ mode: 6-samples, 2
-     * Trigger invalid 111 = 7
+     * Trigger bin 0 - no "not set" or neutral option available
      */
     static const baseType c_DefaultID;
 

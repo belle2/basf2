@@ -3,7 +3,10 @@
 import basf2
 from softwaretrigger.path_functions import setup_basf2_and_db, add_hlt_dqm, create_hlt_path, finalize_hlt_path
 
+# set basf2 settings and configure local DB access
 args = setup_basf2_and_db(dbfile="/dev/shm/LocalDB.rel0101/database.txt")
+
+# create the HLT path and add the Ring Buffer input and DQM modules
 path = create_hlt_path(args)
 
 # no reconstruction or software trigger added at all

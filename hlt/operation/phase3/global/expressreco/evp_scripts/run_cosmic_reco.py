@@ -32,8 +32,7 @@ histport = argvs[3]
 # ncore = argvs[4]
 ncore = "20"
 
-script = "cosmic_reco_novxd.py"
-# script = "cosmic_reco.py"
+script = "cosmic_reco.py"
 
 # run basf2
 proc = subprocess.Popen("basf2 --no-stats " + script + " " + inputrb + " " + outputrb +

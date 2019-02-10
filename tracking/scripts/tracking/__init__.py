@@ -258,7 +258,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
         if is_svd_used(components):
             add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                                   output_reco_tracks=svd_cdc_reco_tracks,
-                                  svd_ckf_mode="only_ckf", add_both_directions=True)
+                                  svd_ckf_mode="cosmics", add_both_directions=True)
             latest_reco_tracks = svd_cdc_reco_tracks
 
         if is_pxd_used(components):

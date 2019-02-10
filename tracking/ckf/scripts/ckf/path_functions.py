@@ -65,7 +65,7 @@ def add_pxd_ckf(path, *args, **kwargs):
 
     strict_settings_iovs = [(0, 0, 0, -1)]
     make_conditional_at(path=path, iov_list=strict_settings_iovs,
-                        path_when_in_iov=strict_settings_iovs, path_when_not_in_iov=loose_settings_path)
+                        path_when_in_iov=strict_settings_path, path_when_not_in_iov=loose_settings_path)
 
 
 def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loose_settings=False, use_mc_truth=False,

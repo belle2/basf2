@@ -260,7 +260,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
     $.get(comparisonLoadPath).done(function(data) {
         loaded_package = null
 
-        // get the newest revision within the selection
+        // Get the newest revision within the selection
         // to get information about failed scripts and the
         // log files
         newest_rev = getNewestRevision(rev_data);
@@ -270,25 +270,51 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
         // enrich the comparison data with the newest revision in this comparison
         data["newest_revision"] = newest_rev
 
-        // Update the packages with the information from the newest revision
+        // We have two sources of information for scripts and plots:
+        // * The comparison object from comparisonLoadPath
+        // * The revision object from comparisonLoadPath
+        // We update the data from the comparison object with additional data
+        // from the revision object.
         if (newest_rev != null) {
             console.debug("Updating package information.")
-            // Identify data about the same data by matching the package name
-            // Todo: This double loop and check isn't too clever....
+
+            // We now go through all of the packages in the revision object
+            // and add the corresponding information to the comparison object.
+            // object. For this we create a lookup table
+            //    'package name' -> 'index in list'
+            // for the comparison object.
+            comparison_data_pkg2index = {};
+            for (var index in data["packages"]) {
+                var name = data["packages"][index]["name"];
+                comparison_data_pkg2index[name] = index;
+            }
+
             for (var irev in newest_rev["packages"]) {
-                var found=false;
-                for (var ipkg in data["packages"]) {
-                    if ( data["packages"][ipkg]["name"] == newest_rev["packages"][irev]["name"] ) {
-                        data["packages"][ipkg]["fail_count"] = newest_rev["packages"][irev]["fail_count"];
-                        data["packages"][ipkg]["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"];
-                        // Also store the label of the newest revision as this is needed
-                        // to stich together the loading path of log files
-                        data["packages"][ipkg]["newest_revision"] = newest_rev["label"];
-                        found=true;
-                        break;
-                    }
+
+                // Information to be copied from the revision object:
+                var name = newest_rev["packages"][irev]["name"];
+                var fail_count = newest_rev["packages"][irev]["fail_count"];
+                var scriptfiles = newest_rev["packages"][irev]["scriptfiles"];
+                var label = newest_rev["label"];
+
+                if ( name in comparison_data_pkg2index ){
+                    // Found the package in the comparison object
+                    // ==> Just add the information
+                    ipkg = comparison_data_pkg2index [name]
+
+                    data["packages"][ipkg]["fail_count"] = fail_count;
+                    data["packages"][ipkg]["scriptfiles"] = scriptfiles;
+                    // Also store the label of the newest revision as this
+                    // is needed to stich together the loading path of
+                    // log files
+                    data["packages"][ipkg]["newest_revision"] = label;
                 }
-                if (!found){
+                else {
+                    // Did not find the package in the comparison object
+                    // ==> If there's a reason to display it on the homepage
+                    //     (e.g. failed scripts whose logs we want to make
+                    //     available, then we need to add a new item to the
+                    //     package list of the comparison object).
                     console.debug(
                         "Package '" + newest_rev["packages"][irev]["name"] +
                         "' was found in the revision file, but not in the" +
@@ -300,12 +326,13 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
                             "However it did have failing scripts, so we " +
                             "will make it visible on the validation page. "
                         );
+                        // Create a new empty entry with the same information
+                        // as above and add it to the data
                         pkg_dict = {};
-                        // Add the same information as above
-                        pkg_dict["name"] = newest_rev["packages"][irev]["name"];
-                        pkg_dict["fail_count"] = newest_rev["packages"][irev]["fail_count"];
-                        pkg_dict["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"];
-                        pkg_dict["newest_revision"] = newest_rev["label"];
+                        pkg_dict["name"] = name;
+                        pkg_dict["fail_count"] = fail_count;
+                        pkg_dict["scriptfiles"] = scriptfiles;
+                        pkg_dict["newest_revision"] = label;
                         // Also add keys that usually come from the
                         // comparison file:
                         pkg_dict["visible"] = true;
@@ -318,9 +345,6 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
         else {
             console.debug("Newest rev is null.")
         }
-
-
-        console.debug("packages: ", data["packages"]);
 
         setupRactive("package", '#packages', data,
         // Wire the clicks on package names

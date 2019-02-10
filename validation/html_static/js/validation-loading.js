@@ -1,14 +1,18 @@
-
-
-
+/* The package that is opened, when the validation page is opened.
+ Currently that's just picking the page first in alphabetic order
+ (i.e. analysis) or false if no packages are available. */
 function getDefaultPackageName( package_list ) {
-    if (package_list.length == 0)
+    if (package_list.length == 0){
+        console.debug("getDefaultPackageName: No packages available.")
         return false;
+    }
 
    first_package_name = package_list[0].name
    if (first_package_name !='undefined') {
         return first_package_name;
-   }else {
+   }
+   else {
+        console.debug("getDefaultPackageName: Name of first package undefined.")
         return false;
    }
 
@@ -26,121 +30,125 @@ get created */
 function trigger_popup( item_id) {
     $('#' + item_id).magnificPopup({
       type:'inline',
-      midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
+      // Allow opening popup on middle mouse click. Always set it to true if
+      // you don't provide alternative source in href.
+      midClick: true
     });
 }
 
 function loadValidationPlots(package_load_name, data) {
-    console.log("Loading plots for package " + package_load_name);
+    console.log("loadValidationPlots: Loading plots for package '" + package_load_name + "'.");
 
     // make dynamic
-    var revCompare = get_selected_revs_string()
-    var revCompare_list = get_selected_revs_list()
-    var comparisonLoadPath = "../comparisons/" + revCompare
-    var createComparisonUrl = "../create_comparison"
+    var revCompare = get_selected_revs_string();
+    var revCompare_list = get_selected_revs_list();
+    var comparisonLoadPath = "../comparisons/" + revCompare;
+    var createComparisonUrl = "../create_comparison";
 
-        loaded_package = null
+    loaded_package = null;
 
-        console.log("Comparison data for package " + package_load_name + " loaded");
+    console.log("loadValidationPlots: Comparison data for package '" + package_load_name + "' loaded");
 
 
-        selected_list = get_selected_revs_list();
-        // update the already displayed revision labels with the correct colors
-        $( ".revision-label" ).each(function( index ) {
-            
-            label = $( this ).text();
-            // find the revision with the same label
-            for ( i in data["revisions"]) {
-                if (data["revisions"][i].label == label) {
-                    $(this).css("color", data["revisions"][i].color);
-                }
-            }
+    selected_list = get_selected_revs_list();
+    // update the already displayed revision labels with the correct colors
+    $( ".revision-label" ).each(function( index ) {
 
-            if (selected_list.indexOf(label) < 0) {
-                // the one which are not selected will be grayed out
-                $(this).css("color", "grey");            
-            }
-        });
-
-        if (package_load_name == ""){
-            package_load_name = getDefaultPackageName(data["packages"]);
-        }
-
-        for ( i in data["packages"]) {
-            if (data["packages"][i].name == package_load_name) {
-                loaded_package = data["packages"][i];
-                break;
+        label = $( this ).text();
+        // find the revision with the same label
+        for ( i in data["revisions"]) {
+            if (data["revisions"][i].label == label) {
+                $(this).css("color", data["revisions"][i].color);
             }
         }
 
-        if (loaded_package == null) {
+        if (selected_list.indexOf(label) < 0) {
+            // the one which are not selected will be grayed out
+            $(this).css("color", "grey");
         }
+    });
 
-        // create unique ids for each plot, which can be used to create
-        // links to individual plot images
-        uniq_plot_id = 1
-        for ( var i in loaded_package["plotfiles"] ) {
-            for (var ploti in loaded_package["plotfiles"][i]["plots"]) {
-                loaded_package["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
+    if (package_load_name == ""){
+        package_load_name = getDefaultPackageName(data["packages"]);
+    }
+
+    // Find data of the package by package name
+    for ( i in data["packages"]) {
+        if (data["packages"][i].name == package_load_name) {
+            loaded_package = data["packages"][i];
+            break;
+        }
+    }
+
+    // fixme: Shouldn't something happen here??
+    if (loaded_package == null) {
+    }
+
+    // create unique ids for each plot, which can be used to create
+    // links to individual plot images
+    uniq_plot_id = 1
+    for ( var i in loaded_package["plotfiles"] ) {
+        for (var ploti in loaded_package["plotfiles"][i]["plots"]) {
+            loaded_package["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
+        }
+    }
+
+    wrapped_package = {packages: [loaded_package]};
+
+    setupRactive("plot_container", '#content', wrapped_package, null,
+        // on complete
+        function(ractive) {
+            // todo: make sure the empty entries in the script accordion are properly filled
+            ractive_value_recover(ractive, "show_overview");
+            ractive_value_recover(ractive, "show_expert_plots");
+
+            // setup the jquery ui toggle buttons
+            // this can only be done here, otherwise the initial values of the toggle buttons
+            // will not be correct
+            /*
+            do not enable jquery ui buttons atm, because the toggle option
+            cannot be properly initialized with color
+            $("#check_show_overview").button();
+            $("#check_show_expert_plots").button();*/
+
+            // make sure changes to the viewing settings are stored right away
+            ractive.observe( 'show_overview', function ( newValue, oldValue, keypath ) {
+                  ractive_value_preserve(ractive,"show_overview");
+            });
+            ractive.observe( 'show_expert_plots', function ( newValue, oldValue, keypath ) {
+                  ractive_value_preserve(ractive,"show_expert_plots");
+            });
+
+            // check if an "empty" entry needs to be added to the script accordion
+            var count = $('.failed_script').length;
+            if (count > 0 ){
+                $("#no_failed_scripts").hide();
             }
-        }        
 
-        wrapped_package = {packages: [loaded_package]};
-
-        setupRactive("plot_container", '#content', wrapped_package, null,
-            // on complete
-            function(ractive) {
-                // todo: make sure the empty entries in the script accordion are properly filled
-                ractive_value_recover(ractive, "show_overview");
-                ractive_value_recover(ractive, "show_expert_plots");
-
-                // setup the jquery ui toggle buttons
-                // this can only be done here, otherwise the initial values of the toggle buttons 
-                // will not be correct
-                /* 
-                do not enable jquery ui buttons atm, because the toggle option
-                cannot be properly initialized with color
-                $("#check_show_overview").button();
-                $("#check_show_expert_plots").button();*/
-
-                // make sure changes to the viewing settings are stored right away
-                ractive.observe( 'show_overview', function ( newValue, oldValue, keypath ) {
-                      ractive_value_preserve(ractive,"show_overview");
-                });
-                ractive.observe( 'show_expert_plots', function ( newValue, oldValue, keypath ) {
-                      ractive_value_preserve(ractive,"show_expert_plots");
-                });
-
-                // check if an "empty" entry needs to be added to the script accordion
-                var count = $('.failed_script').length;
-                if (count > 0 ){
-                    $("#no_failed_scripts").hide();
-                } 
-
-                var count = $('.finished_script').length;
-                if (count > 0 ){
-                    $("#no_finished_scripts").hide();
-                } 
-
-                var count = $('.skipped_script').length;
-                if (count > 0 ){
-                    $("#no_skipped_scripts").hide();
-                } 
-
-            },
-            // on teardown
-            function(ractive) { 
-            },
-            // on render
-            function(ractive) {
-                $("#accordion_script_files").accordion({
-                     heightStyle: "content"
-                });
-            },
-            // on change
-            function(ra) {
+            var count = $('.finished_script').length;
+            if (count > 0 ){
+                $("#no_finished_scripts").hide();
             }
-        );
+
+            var count = $('.skipped_script').length;
+            if (count > 0 ){
+                $("#no_skipped_scripts").hide();
+            }
+
+        },
+        // on teardown
+        function(ractive) {
+        },
+        // on render
+        function(ractive) {
+            $("#accordion_script_files").accordion({
+                 heightStyle: "content"
+            });
+        },
+        // on change
+        function(ra) {
+        }
+    );
 }
 
 
@@ -159,7 +167,6 @@ function fill_ntuple_table(dom_id, json_loading_path ) {
         for ( var rev in data) {
         	for ( var fig in data[rev]) {
         		val_pair = data[rev][fig];
-        		console.log(val_pair);
         		items.push("<th>"+val_pair[0]+"</th>");
         	}
             break;
@@ -175,8 +182,7 @@ function fill_ntuple_table(dom_id, json_loading_path ) {
             items.push("<td>" + key + "</td>");
         	for ( var fig in data[key]) {
         		val_pair = data[key][fig];
-        		console.log(val_pair);
-        		items.push("<td>" + val_pair[1] + "</td>");    
+        		items.push("<td>" + val_pair[1] + "</td>");
         	}            
             items.push("</tr>");}
           });
@@ -188,8 +194,7 @@ function fill_ntuple_table(dom_id, json_loading_path ) {
             items.push("<td>" + key + "</td>");
         	for ( var fig in data[key]) {
         		val_pair = data[key][fig];
-        		console.log(val_pair);
-        		items.push("<td>" + val_pair[1] + "</td>");    
+        		items.push("<td>" + val_pair[1] + "</td>");
         	}            
             items.push("</tr>");}
           });
@@ -249,7 +254,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
     var comparisonLoadPath = "../comparisons/" + rev_string
     var createComparisonUrl = "../create_comparison"
 
-    console.log("Loading Comparison " + comparisonLoadPath);
+    console.log("Loading Comparison '" + comparisonLoadPath + "'");
 
     $.get(comparisonLoadPath).done(function(data) {
         loaded_package = null
@@ -259,34 +264,45 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
         // log files
         newest_rev = getNewestRevision(rev_data);
 
+        console.debug("Newest revision is '" + newest_rev["label"] + "'")
+
         // enrich the comparison data with the newest revision in this comparison
         data["newest_revision"] = newest_rev
-        // update the packages with the information from the newest revision
-        // if there are no validation results at all, packages entry might not exist
-        if (newest_rev != null) {
 
+        // Update the packages with the information from the newest revision
+        if (newest_rev != null) {
+            console.debug("Updating package information.")
+            // Identify data about the same data by matching the package name
             for (var irev in newest_rev["packages"]) {
                 for (var ipkg in data["packages"]) {
                     if ( data["packages"][ipkg]["name"] == newest_rev["packages"][irev]["name"] ) {
-                        data["packages"][ipkg]["fail_count"] = newest_rev["packages"][irev]["fail_count"]
-                        data["packages"][ipkg]["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"]
-                        // also store the label of the newest revision as this is needed
+                        data["packages"][ipkg]["fail_count"] = newest_rev["packages"][irev]["fail_count"];
+                        data["packages"][ipkg]["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"];
+                        // Also store the label of the newest revision as this is needed
                         // to stich together the loading path of log files
-                        data["packages"][ipkg]["newest_revision"] = newest_rev["label"]
+                        data["packages"][ipkg]["newest_revision"] = newest_rev["label"];
+                        break;
                     }
                 }
             }
         }
+        else {
+            console.debug("Newest rev is null.")
+        }
 
         setupRactive("package", '#packages', data,
-        // wire the clicks on package names
+        // Wire the clicks on package names
         function(ractive) {
 
             if ( "packages" in data) {
                 // todo: load the package which was last time viewn by the users
                 first_package_name = getDefaultPackageName(data["packages"])
-                if (first_package_name != false)
+                if (first_package_name != false){
                     loadValidationPlots(first_package_name, data);
+                }
+                else {
+                    console.warn("No package could be loaded.")
+                }
             }
             ractive.on({
                 load_validation_plots : function( evt ) {

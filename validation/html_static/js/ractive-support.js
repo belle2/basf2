@@ -74,7 +74,7 @@ function setupRactive(templateName,
                 if (onRactiveCreated != null){
                     onRactiveCreated(ractive);
                     }
-                console.log("Ractive setup with " + templateName + " complete");
+                console.log("Ractive setup with template '" + templateName + "' complete.");
             }).fail(
             function() {
                 alert("Cannot load ractive template " + templateName

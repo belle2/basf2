@@ -224,7 +224,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
                          merge_tracks=True, use_second_cdc_hits=False):
     import cdc.cr as cosmics_setup
 
-    if data_taking_period != "phase2":
+    if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
 
         # track finding

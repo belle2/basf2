@@ -100,7 +100,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
            (assuming PMT is put at -z of the counter).
     """
 
-    if data_taking_period != "phase2":
+    if data_taking_period not in ["phase2", "phase3", "early_phase3"]:
         import cdc.cr as cosmics_setup
 
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)

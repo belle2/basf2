@@ -77,7 +77,7 @@ void DQMHistAnalysisV0Module::event()
     p->SetFrameFillStyle(4000);
     p->Draw();
     p->cd();
-    h->Draw("COLZ");
+    if (h) h->Draw("COLZ");
 
     m_c_xvsy[i]->Modified();
     m_c_xvsy[i]->Update();

@@ -246,6 +246,7 @@ function getNewestRevision( rev_data) {
 
 function setupRactiveFromRevision(rev_data, rev_string, rev_list)
 {
+
 	// don't event attempt to show comparisons for empty revisions
 	if (rev_string == "")
 		return;
@@ -273,7 +274,9 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
         if (newest_rev != null) {
             console.debug("Updating package information.")
             // Identify data about the same data by matching the package name
+            // Todo: This double loop and check isn't too clever....
             for (var irev in newest_rev["packages"]) {
+                var found=false;
                 for (var ipkg in data["packages"]) {
                     if ( data["packages"][ipkg]["name"] == newest_rev["packages"][irev]["name"] ) {
                         data["packages"][ipkg]["fail_count"] = newest_rev["packages"][irev]["fail_count"];
@@ -281,7 +284,33 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
                         // Also store the label of the newest revision as this is needed
                         // to stich together the loading path of log files
                         data["packages"][ipkg]["newest_revision"] = newest_rev["label"];
+                        found=true;
                         break;
+                    }
+                }
+                if (!found){
+                    console.debug(
+                        "Package '" + newest_rev["packages"][irev]["name"] +
+                        "' was found in the revision file, but not in the" +
+                        "comparison file. Probably this package did not " +
+                        "create a single output file."
+                    )
+                    if ( newest_rev["packages"][irev]["fail_count"] > 0){
+                        console.debug(
+                            "However it did have failing scripts, so we " +
+                            "will make it visible on the validation page. "
+                        );
+                        pkg_dict = {};
+                        // Add the same information as above
+                        pkg_dict["name"] = newest_rev["packages"][irev]["name"];
+                        pkg_dict["fail_count"] = newest_rev["packages"][irev]["fail_count"];
+                        pkg_dict["scriptfiles"] = newest_rev["packages"][irev]["scriptfiles"];
+                        pkg_dict["newest_revision"] = newest_rev["label"];
+                        // Also add keys that usually come from the
+                        // comparison file:
+                        pkg_dict["visible"] = true;
+                        data["packages"].push(pkg_dict);
+
                     }
                 }
             }
@@ -289,6 +318,9 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
         else {
             console.debug("Newest rev is null.")
         }
+
+
+        console.debug("packages: ", data["packages"]);
 
         setupRactive("package", '#packages', data,
         // Wire the clicks on package names
@@ -306,11 +338,15 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
             }
             ractive.on({
                 load_validation_plots : function( evt ) {
-                    // hide all packages sub-e
+                    // This gets called if the user clicks on a package in the
+                    // package-selection side menu.
+
+                    // Hide all sub-packages
                     ractive.set( 'packages.*.display_setting', 'none' );
                     
-                    pkgs = ractive.get( 'packages');
-                    
+                    pkgs = ractive.get('packages');
+
+                    // Display sub-packages for this one.
                     if (pkgs != null) {
                         for (var ipkg in pkgs) {
                         	if ( pkgs[ipkg].name == evt.context.name ) {

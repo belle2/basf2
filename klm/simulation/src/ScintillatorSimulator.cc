@@ -99,7 +99,8 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
   for (i = 0; i <= m_DigPar->getNDigitizations(); i++) {
     time = digPar->getADCSamplingTime() * i;
     m_SignalTimeDependence[i] =
-      exp(-digPar->getPEAttenuationFrequency() * time) * attenuationTime;
+      exp(-digPar->getPEAttenuationFrequency() * time) * attenuationTime /
+      digPar->getADCSamplingTime();
     if (i > 0) {
       m_SignalTimeDependenceDiff[i - 1] = m_SignalTimeDependence[i - 1] -
                                           m_SignalTimeDependence[i];
@@ -387,13 +388,20 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
  * I = \sum_{hits before this bin} B2 * exp(tau_j / t0) +
  *     \sum_{hits in this bin} t0 - B1 * exp(tau_j / t0),
  *
- * where tau_j is the time of j-th hit. The bindependent expresions B1 and B2
+ * where tau_j is the time of j-th hit. The bin-dependent expresions B1 and B2
  * are the same for all hits:
  *
  * I = B2 * \sum_{hits before this bin} exp(tau_j / t0) +
  *     N_i * t0 - B1 * \sum_{hits in this bin} exp(tau_j / t0).
  *
  * where N_i is the number of hits in this (i-th) bin.
+ *
+ * In order to get the approximation of the function value, the integrals
+ * over bins are normalized:
+ *
+ * I -> I / t_dig.
+ *
+ * The normalization (1 / t_dig) is included into the definitions of B1 and B2.
  */
 void KLM::ScintillatorSimulator::fillSiPMOutput(float* hist, bool useDirect,
                                                 bool useReflected)

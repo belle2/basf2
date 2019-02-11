@@ -740,6 +740,7 @@ def TagV(
     useFitAlgorithm='standard_PXD',
     askMCInfo=False,
     reqPXDHits=0,
+    maskName='',
     path=analysis_main,
 ):
     """
@@ -752,12 +753,14 @@ def TagV(
     @param MCassociation: use standard MC association or the internal one
     @param useConstraint: choose constraint for the tag vertes fit
     @param reqPXDHits: minimum N PXD hits for a track
+    @param maskName: get particles from a specified ROE mask
     @param path      modules are added to this path
     """
 
     tvfit = register_module('TagVertex')
     tvfit.set_name('TagVertex_' + list_name)
     tvfit.param('listName', list_name)
+    tvfit.param('maskName', maskName)
     tvfit.param('confidenceLevel', confidenceLevel)
     tvfit.param('MCAssociation', MCassociation)
     tvfit.param('useFitAlgorithm', useFitAlgorithm)

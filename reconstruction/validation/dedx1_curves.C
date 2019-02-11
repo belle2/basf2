@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
   <description>Plot dE/dx over momentum</description>
 </header>
 */
@@ -58,7 +58,7 @@ void plot(const TString &input_filename)
     } else { //PXD/SVD
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1GeV, minimal ionisation for higher p. Some misreconstructed tracks at very low dE/dx values."));
     }
-    hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+    hist->GetListOfFunctions()->Add(new TNamed("Contact","jkumar@andrew.cmu.edu"));
     hist->Write();
 
   }

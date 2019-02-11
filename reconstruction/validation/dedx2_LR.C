@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jvbennett@cmu.edu</contact>
+  <contact>jkumar@andrew.cmu.edu</contact>
   <description>check PID performance of each particle vs. all others</description>
 </header>
 */
@@ -71,7 +71,7 @@ void plot(const TString &input_filename)
     } else {
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at 1"));
     }
-    hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+    hist->GetListOfFunctions()->Add(new TNamed("Contact","jkumar@andrew.cmu.edu"));
     hist->Write();
 
   }

@@ -12,7 +12,6 @@ path = create_hlt_path(args)
 
 # no reconstruction or software trigger added at all
 add_hlt_dqm(path, run_type="collision", standalone=True)
-add_pxd_fullframe_phase3_early(path)
 add_roi_payload_assembler(path)
 
 finalize_hlt_path(path, args)

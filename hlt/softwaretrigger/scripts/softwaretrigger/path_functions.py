@@ -130,7 +130,7 @@ def add_roi_payload_assembler(path, alwaysAcceptEvents=True):
         SendAllDownscaler=0,
         SendROIsDownscaler=1,
         AcceptAll=alwaysAcceptEvents,
-        NoRejectFlag=True)
+        NoRejectFlag=False)
 
 
 def create_path_common(args, inputbuffer_module, inputfile='DAQ', dqmfile='DAQ'):

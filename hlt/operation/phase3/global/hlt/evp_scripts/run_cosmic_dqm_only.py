@@ -33,7 +33,7 @@ histport = argvs[3]
 # ncore = argvs[4]
 ncore = "20"
 
-script = "beam_reco_monitor.py"
+script = "cosmic_dqm_only.py"
 
 # run basf2
 proc = subprocess.Popen("basf2 --no-stats " + script + " " + inputrb + " " + outputrb +

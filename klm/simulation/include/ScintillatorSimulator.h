@@ -101,6 +101,11 @@ namespace Belle2 {
       int getGeneratedNPE();
 
       /**
+       * Get total energy deposited in the strip (sum over ssimulation hits).
+       */
+      double getEnergy();
+
+      /**
        * Set channel data.
        */
       void setChannelData(const EKLMChannelData* channelData);
@@ -180,6 +185,9 @@ namespace Belle2 {
 
       /** Number of photoelectrons (generated). */
       int m_npe;
+
+      /** Total energy deposited in the strip. */
+      double m_Energy;
 
       /** Name of the strip. */
       std::string m_stripName;

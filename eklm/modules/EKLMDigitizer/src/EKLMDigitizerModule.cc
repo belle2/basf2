@@ -161,6 +161,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     eklmDigit->setSiPMMCTime(simulator.getMCTime());
     eklmDigit->setPosition(simHit->getPosition());
     eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
+    eklmDigit->setEDep(simulator.getEnergy());
     if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
       tdc = simulator.getFPGAFit()->getStartTime();
       eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());

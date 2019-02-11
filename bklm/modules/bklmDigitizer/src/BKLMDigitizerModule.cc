@@ -141,8 +141,6 @@ void BKLMDigitizerModule::digitize(std::multimap<int, BKLMSimHit*>& volIDToSimHi
     bklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
     bklmDigit->setFitStatus(simulator.getFitStatus());
     bklmDigit->setNPixel(simulator.getNPE());
-    // Not implemented in simulator (original BKLM definition is wrong!). */
-    // bklmDigit->setEDep(bklmDigit->getNPixel() / m_nPEperMeV);
-    bklmDigit->setEDep(0);
+    bklmDigit->setEDep(simulator.getEnergy());
   }
 }

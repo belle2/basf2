@@ -57,9 +57,13 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
   const KLMScintillatorDigitizationParameters* digPar,
   ScintillatorFirmware* fitter,
   double digitizationInitialTime, bool debug) :
-  m_DigPar(digPar), m_fitter(fitter),
-  m_DigitizationInitialTime(digitizationInitialTime), m_Debug(debug),
-  m_FPGAStat(c_ScintillatorFirmwareNoSignal), m_npe(0)
+  m_DigPar(digPar),
+  m_fitter(fitter),
+  m_DigitizationInitialTime(digitizationInitialTime),
+  m_Debug(debug),
+  m_FPGAStat(c_ScintillatorFirmwareNoSignal),
+  m_npe(0),
+  m_Energy(0)
 {
   int i;
   /* cppcheck-suppress variableScope */
@@ -133,6 +137,7 @@ void KLM::ScintillatorSimulator::prepareSimulation()
 {
   m_MCTime = -1;
   m_npe = 0;
+  m_Energy = 0;
   for (int i = 0; i < m_DigPar->getNDigitizations(); i++) {
     if (m_Debug) {
       m_amplitudeDirect[i] = 0;
@@ -150,8 +155,8 @@ void KLM::ScintillatorSimulator::simulate(
   prepareSimulation();
   bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
   const BKLMSimHit* hit = firstHit->second;
-  const bklm::Module* module = geoPar->findModule(
-                                 hit->isForward(), hit->getSector(), hit->getLayer());
+  const bklm::Module* module =
+    geoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
   double stripLength =
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :
@@ -159,6 +164,7 @@ void KLM::ScintillatorSimulator::simulate(
   for (std::multimap<int, BKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
+    m_Energy = m_Energy + hit->getEDep();
     /* Poisson mean for number of photons. */
     double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
@@ -191,6 +197,7 @@ void KLM::ScintillatorSimulator::simulate(
   for (std::multimap<int, EKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
+    m_Energy = m_Energy + hit->getEDep();
     /* Poisson mean for number of photons. */
     double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
@@ -476,6 +483,11 @@ double KLM::ScintillatorSimulator::getNPE()
 int KLM::ScintillatorSimulator::getGeneratedNPE()
 {
   return m_npe;
+}
+
+double KLM::ScintillatorSimulator::getEnergy()
+{
+  return m_Energy;
 }
 
 void KLM::ScintillatorSimulator::debugOutput()

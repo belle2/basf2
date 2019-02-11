@@ -257,6 +257,20 @@ namespace Belle2 {
       Belle2::Database::Instance().storeData(makeSaveForDatabase(identifier), &database_representation_of_weightfile, iov);
     }
 
+    void Weightfile::saveArrayToDatabase(std::vector<Weightfile>& weightfiles, const std::string& identifier,
+                                         const Belle2::IntervalOfValidity& iov)
+    {
+      DBImportArray<DatabaseRepresentationOfWeightfile> dbArray(makeSaveForDatabase(identifier));
+
+      for (auto weightfile : weightfiles) {
+        std::stringstream ss;
+        Weightfile::saveToStream(weightfile, ss);
+        dbArray.appendNew(ss.str());
+      }
+
+      dbArray.import(iov);
+    }
+
     Weightfile Weightfile::loadFromDatabase(const std::string& identifier, const Belle2::EventMetaData& emd)
     {
       auto pair = Belle2::Database::Instance().getData(emd, makeSaveForDatabase(identifier));

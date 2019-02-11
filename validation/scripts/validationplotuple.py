@@ -287,8 +287,8 @@ class Plotuple:
                 self.comparison_result = "equal"
 
             self.chi2test_result = \
-                'Performed Chi^2-Test between reference and {} ' \
-                '(Chi^2 = {:.4f}; NDF = {}; Chi^2/NDF = {:.4f})'.format(
+                r'Performed $\chi^2$-Test between reference and {} ' \
+                r'($\chi^2$ = {:.4f}; NDF = {}; $\chi^2/\text{{NDF}}$ = {:.4f})'.format(
                     self.newest.revision,
                     chi2,
                     ndf,

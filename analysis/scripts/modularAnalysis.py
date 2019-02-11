@@ -879,6 +879,37 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def combineAllParticles(
+    inputParticleLists,
+    outputList,
+    cut='',
+    writeOut=False,
+    path=analysis_main
+):
+    """
+    Creates a new Particle as the combination of all Particles from all
+    provided inputParticleLists. However, each particle is used only once
+    (even if duplicates are provided and the combination has to pass the
+    specified selection criteria to be saved in the newly created (mother)
+    ParticleList.
+
+    @param inputParticleLists List of input particle lists which are combined to the new Particle
+    @param outputList         Name of the particle combination created with this module
+    @param cut                created (mother) Particle is added to the mother ParticleList if it passes
+                              these given cuts (in VariableManager style) and is rejected otherwise
+    @param writeOut           whether RootOutput module should save the created ParticleList
+    @param path               module is added to this path
+    """
+
+    pmake = register_module('AllParticleCombiner')
+    pmake.set_name('AllParticleCombiner_' + outputList)
+    pmake.param('inputParticleLists', inputListNames)
+    pmake.param('outputListName', outputList)
+    pmake.param('cut', cut)
+    pmake.param('writeOut', writeOut)
+    path.add_module(pmake)
+
+
 def reconstructMissingKlongDecayExpert(
     decayString,
     cut,
@@ -907,7 +938,7 @@ def reconstructMissingKlongDecayExpert(
     pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
     pcalc.param('recoList', recoList)
-    analysis_main.add_module(pcalc)
+    path.add_module(pcalc)
 
     rmake = register_module('KlongDecayReconstructorExpert')
     rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
@@ -916,7 +947,7 @@ def reconstructMissingKlongDecayExpert(
     rmake.param('decayMode', dmID)
     rmake.param('writeOut', writeOut)
     rmake.param('recoList', recoList)
-    analysis_main.add_module(rmake)
+    path.add_module(rmake)
 
 
 def replaceMass(

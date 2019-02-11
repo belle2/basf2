@@ -24,14 +24,14 @@ namespace Belle2 {
    * This module combines all particles of the provided list to one mother particle.
    *
    */
-  class AllParticlesCombinerModule : public Module {
+  class AllParticleCombinerModule : public Module {
 
   public:
 
     /**
     * Constructor: Sets the description, the properties and the parameters of the module.
     */
-    AllParticlesCombinerModule();
+    AllParticleCombinerModule();
 
     /** Register input and output data */
     virtual void initialize() override;
@@ -42,8 +42,7 @@ namespace Belle2 {
 
   private:
 
-    std::string m_inputListName;  /**< List of particles which are supposed to be combined */
-    StoreObjPtr<ParticleList> m_inputList;  /**< input particle list */
+    std::vector<std::string> m_inputListNames;  /**< List of ParticleLists which are supposed to be combined */
 
     bool m_isSelfConjugatedParticle;  /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 

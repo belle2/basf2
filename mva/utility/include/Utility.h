@@ -46,6 +46,18 @@ namespace Belle2 {
     void upload(const std::string& filename, const std::string& identifier, int exp1 = 0, int run1 = 0, int exp2 = -1, int run2 = -1);
 
     /**
+     * Convenience function which uploads an array of weightfiles to the database
+     * @param filenames array of names of the weightfiles
+     * @param identifier identifier in the database
+     * @param exp1 first valid experiment
+     * @param run1 first valid run
+     * @param exp2 last valid experiment
+     * @param run2 last valid run
+     */
+    void upload_array(std::vector<std::string>& filenames, const std::string& identifier, int exp1 = 0, int run1 = 0, int exp2 = -1,
+                      int run2 = -1);
+
+    /**
      * Convenience function which checks if an experise is available
      * @param filename or identifier of the expertise
      * @param experiment current experiment
@@ -66,6 +78,15 @@ namespace Belle2 {
      * @param filename of the weightfile
      */
     std::string info(const std::string& filename);
+
+    /**
+     * Convenience function which saves a pre-existing weightfile in a mva package-compliant format.
+     * @param general_options shared options
+     * @param specific_options method specific options
+     * @param custom_weightfile path to the pre-existing weightfile
+     */
+    void save_custom_weightfile(const GeneralOptions& general_options, const SpecificOptions& specific_options,
+                                const std::string& custom_weightfile);
 
     /**
      * Convenience function which performs a training with the given options

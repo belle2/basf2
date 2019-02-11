@@ -60,6 +60,27 @@ namespace Belle2 {
       Belle2::MVA::Weightfile::saveToDatabase(weightfile, identifier, iov);
     }
 
+    void upload_array(std::vector<std::string>& filenames, const std::string& identifier, int exp1, int run1, int exp2, int run2)
+    {
+      Belle2::IntervalOfValidity iov(exp1, run1, exp2, run2);
+
+      std::vector<Belle2::MVA::Weightfile> weightfiles;
+      for (const auto& filename : filenames) {
+
+        Belle2::MVA::Weightfile weightfile;
+        if (boost::ends_with(filename, ".root")) {
+          weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(filename);
+        } else  if (boost::ends_with(filename, ".xml")) {
+          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
+        } else {
+          std::cerr << "Unkown file extension, fallback to xml" << std::endl;
+          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
+        }
+        weightfiles.push_back(weightfile);
+      }
+      Belle2::MVA::Weightfile::saveArrayToDatabase(weightfiles, identifier, iov);
+    }
+
     void extract(const std::string& filename, const std::string& directory)
     {
 
@@ -195,6 +216,16 @@ namespace Belle2 {
       tree.SetEntries();
       file.Write("variables");
 
+    }
+
+    void save_custom_weightfile(const GeneralOptions& general_options, const SpecificOptions& specific_options,
+                                const std::string& custom_weightfile)
+    {
+      Weightfile weightfile;
+      weightfile.addOptions(general_options);
+      weightfile.addOptions(specific_options);
+      weightfile.addFile(general_options.m_identifier + "_Weightfile", custom_weightfile);
+      Weightfile::save(weightfile, general_options.m_identifier);
     }
 
     void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options, const MetaOptions& meta_options)

@@ -22,13 +22,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if dqm_environment == "expressreco":
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
-            path.add_module('PXDDAQDQM')
-            pxddqm = register_module('PXDDQMExpressReco')
-            path.add_module(pxddqm)
-            pxdeff = register_module('PXDDQMEfficiency')
-            path.add_module(pxdeff)
+            path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
+            path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
+            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
         # SVD
         if components is None or 'SVD' in components:
+            # SVD DATA FORMAT
+            svdunpackerdqm = register_module('SVDUnpackerDQM')
+            path.add_module(svdunpackerdqm)
             # ZeroSuppression Emulator
             path.add_module(
                 'SVDZeroSuppressionEmulator',
@@ -71,14 +72,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'TOP' in components:
         topdqm = register_module('TOPDQM')
         path.add_module(topdqm)
-    # BKLM
-    if components is None or 'BKLM' in components:
-        bklmdqm = register_module("BKLMDQM")
-        path.add_module(bklmdqm)
-    # EKLM
-    if components is None or 'EKLM' in components:
-        eklmdqm = register_module('EKLMDQM')
-        path.add_module(eklmdqm)
+    # KLM
+    if components is None or 'BKLM' or 'EKLM' in components:
+        klmdqm = register_module("KLMDQM")
+        path.add_module(klmdqm)
     # TRG
     if components is None or 'TRG' in components:
         # TRGECL

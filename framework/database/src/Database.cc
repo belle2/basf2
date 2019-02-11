@@ -37,7 +37,7 @@
 #include <cstdlib>
 #include <iomanip>
 
-#define CURRENT_DEFAULT_TAG "master_2019-01-25"
+#define CURRENT_DEFAULT_TAG "master_2019-02-02"
 
 using namespace std;
 using namespace Belle2;

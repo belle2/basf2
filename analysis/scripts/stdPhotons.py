@@ -35,7 +35,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
 
     # all photons (reconstructed using the N1 clustering)
     if listtype == 'all':
-        fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path)
+        fillParticleList('gamma:all', 'clusterHasNPhotons', True, path)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':

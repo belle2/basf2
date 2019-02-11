@@ -92,8 +92,8 @@ void HitLevelInfoWriterModule::event()
 
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
-      if (eclCluster) {
-        m_eop = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+      if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
 
         // fill the muon depth
         const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();
@@ -173,8 +173,8 @@ void HitLevelInfoWriterModule::event()
 
       // fill the E/P
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
-      if (eclCluster) {
-        m_eop = (eclCluster->getEnergy()) / (fitResult->getMomentum().Mag());
+      if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        m_eop = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
 
         // fill the muon depth
         const KLMCluster* klmCluster = eclCluster->getRelated<KLMCluster>();

@@ -123,6 +123,9 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
+    /** Apply planar deformation of sensors */
+    TVectorD applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
+
     ClassDefOverride(SVDRecoHit, 7)
   };
 

@@ -60,7 +60,8 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
                                       std::vector<CDCTrack>& tracks)
 {
   for (const ECLCluster* cluster : eclClusters) {
-    if (cluster->getEnergy() < m_param_minEnergy) continue;
+    if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+    if (cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) < m_param_minEnergy) continue;
     float phi = cluster->getPhi();
     UncertainPerigeeCircle circle(0, Vector2D::Phi(phi), 0); //no covariance matrix (yet?)
     CDCTrajectory2D guidingTrajectory2D(circle);

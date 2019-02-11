@@ -370,7 +370,7 @@ namespace Belle2 {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
-        double startingE = particle -> getECLCluster() -> getEnergy();
+        double startingE = particle -> getECLCluster() -> getEnergy(particle -> getECLClusterEHypothesisBit());
         double startingPhi = particle -> getECLCluster() -> getPhi();
         double startingTheta = particle -> getECLCluster() -> getTheta();
 

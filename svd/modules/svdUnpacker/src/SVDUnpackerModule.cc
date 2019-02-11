@@ -199,7 +199,6 @@ void SVDUnpackerModule::event()
       unsigned short apvErrors;
       unsigned short pipAddr;
       unsigned short ftbFlags;
-      unsigned short emuPipAddr;
       unsigned short apvErrorsOR;
 
       bool is3sampleData = false;
@@ -419,12 +418,10 @@ void SVDUnpackerModule::event()
               if (ftbFlags & 1) B2WARNING("----> Event Too Long! Data might be corrupted!");
             }
 
-            emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
             for (auto p : vDiagnostic_ptr) {
               // adding remaining info to Diagnostic object
               p->setFTBFlags(ftbFlags);
-              p->setEmuPipelineAddress(emuPipAddr);
               p->setApvErrorOR(apvErrorsOR);
               p->setAPVMatch(nAPVmatch);
               p->setBadMapping(badMapping);

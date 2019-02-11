@@ -195,7 +195,7 @@ function fill_ntuple_table(dom_id, json_loading_path ) {
         	for ( var fig in data[key]) {
         		val_pair = data[key][fig];
         		items.push("<td>" + val_pair[1] + "</td>");
-        	}            
+        	}
             items.push("</tr>");}
           });
 

@@ -549,18 +549,6 @@ class Validation:
         for script_object in self.scripts:
             script_object.compute_dependencies(self.scripts)
 
-        # The following code is only necessary while there are still a lot of
-        # steering files without proper headers.
-        # It adds all steering files from the validation-folder as a default
-        # dependency, because a lot of scripts depend on one data script that
-        # is created by a steering file in the validation-folder.
-        default_depend = [script for script in self.scripts
-                          if script.package == 'validation']
-        for script_object in self.scripts:
-            if not script_object.header and script_object.package != \
-                    'validation':
-                script_object.dependencies += default_depend
-
         # Make sure dependent scripts of skipped scripts are skipped, too.
         for script_object in self.scripts:
             if script_object.status == ScriptStatus.skipped:

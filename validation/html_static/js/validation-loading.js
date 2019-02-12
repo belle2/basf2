@@ -93,14 +93,15 @@ function loadValidationPlots(package_load_name, data) {
         }
     }
 
+
     wrapped_package = {packages: [loaded_package]};
 
     setupRactive("plot_container", '#content', wrapped_package, null,
         // on complete
         function(ractive) {
             // todo: make sure the empty entries in the script accordion are properly filled
-            ractive_value_recover(ractive, "show_overview");
-            ractive_value_recover(ractive, "show_expert_plots");
+            ractive_value_recover_session(ractive, "show_overview");
+            ractive_value_recover_session(ractive, "show_expert_plots");
 
             // setup the jquery ui toggle buttons
             // this can only be done here, otherwise the initial values of the toggle buttons
@@ -113,10 +114,10 @@ function loadValidationPlots(package_load_name, data) {
 
             // make sure changes to the viewing settings are stored right away
             ractive.observe( 'show_overview', function ( newValue, oldValue, keypath ) {
-                  ractive_value_preserve(ractive,"show_overview");
+                  ractive_value_preserve_session(ractive,"show_overview");
             });
             ractive.observe( 'show_expert_plots', function ( newValue, oldValue, keypath ) {
-                  ractive_value_preserve(ractive,"show_expert_plots");
+                  ractive_value_preserve_session(ractive,"show_expert_plots");
             });
 
             // check if an "empty" entry needs to be added to the script accordion

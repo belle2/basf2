@@ -99,8 +99,15 @@ void HepMCInputModule::initialize()
 
 void HepMCInputModule::event()
 {
+  B2DEBUG(10,
+          "Event ________________________________________________________________________________________________________________________________________________________________________________________________");
   if (m_beamParams.hasChanged()) {
-    B2FATAL("HepmcInputModule::event(): BeamParameters have changed within a job, this is not supported (yet?)!");
+    if (m_boost2Lab) {
+      MCInitialParticles& initial = m_initial.generate();
+      TLorentzRotation boost = initial.getCMSToLab();
+      m_hepmcreader.m_labboost = boost;
+    }
+    B2WARNING("HepmcInputModule::event(): BeamParameters have changed within a job!");
   }
 
   if (!m_eventMetaDataPtr) { m_eventMetaDataPtr.create(); }

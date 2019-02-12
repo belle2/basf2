@@ -111,11 +111,20 @@ namespace Belle2 {
     double m_distcut; //distance cut in cm!
     double m_pcut; //pValue-Cut for tracks
     double m_momCut; //Cut on fitted track momentum
+    double m_pTCut; //Cut on fitted track pT
     unsigned int m_minSVDHits; //Required hits in SVD strips for tracks
     int m_maskedDistance; //Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency
     std::map<VxdID, TH2D*> m_h_track_hits;
     std::map<VxdID, TH2D*> m_h_matched_cluster;
+    std::map<VxdID, TH1D*> m_h_p;
+    std::map<VxdID, TH1D*> m_h_pt;
+    std::map<VxdID, TH1D*> m_h_su;
+    std::map<VxdID, TH1D*> m_h_sv;
+    std::map<VxdID, TH1D*> m_h_p2;
+    std::map<VxdID, TH1D*> m_h_pt2;
+    std::map<VxdID, TH1D*> m_h_su2;
+    std::map<VxdID, TH1D*> m_h_sv2;
   };
 }

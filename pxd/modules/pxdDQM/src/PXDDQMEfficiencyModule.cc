@@ -60,6 +60,8 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
 
+  addParam("pTCut", m_pTCut, "Set a cut on the track pT", double(0));
+
   addParam("cutBorders", m_cutBorders, "Do not use tracks near the borders of the sensor", bool(true));
 
   addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
@@ -108,6 +110,7 @@ void PXDDQMEfficiencyModule::event()
     genfit::MeasuredStateOnPlane trackstate;
     trackstate = a_track.getMeasuredStateOnPlaneFromFirstHit();
     if (trackstate.getMom().Mag() < m_momCut) continue;
+    if (trackstate.getMom().Pt() < m_pTCut) continue;
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
@@ -127,6 +130,12 @@ void PXDDQMEfficiencyModule::event()
       if (!isgood) {
         continue;//track does not go through this sensor-> nothing to measure anyway
       } else {
+        m_h_p[aVxdID]->Fill(trackstate.getMom().Mag());
+        m_h_pt[aVxdID]->Fill(trackstate.getMom().Pt());
+        m_h_su[aVxdID]->Fill(sigu);
+        m_h_sv[aVxdID]->Fill(sigv);
+        if (2.0 * sigu > m_distcut) continue; // Error 2*SigmaU > cut
+        if (2.0 * sigv > m_distcut) continue; // Error 2*SigmaV > cut
 
         double u_fit = intersec_buff.X();
         double v_fit = intersec_buff.Y();
@@ -177,6 +186,10 @@ void PXDDQMEfficiencyModule::event()
           TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
           if (dist_clus.Mag() <= m_distcut)  {
             m_h_matched_cluster[aVxdID]->Fill(ucell_fit, vcell_fit);
+            m_h_p2[aVxdID]->Fill(trackstate.getMom().Mag());
+            m_h_pt2[aVxdID]->Fill(trackstate.getMom().Pt());
+            m_h_su2[aVxdID]->Fill(sigu);
+            m_h_sv2[aVxdID]->Fill(sigv);
           }
         }
       }
@@ -271,6 +284,15 @@ void PXDDQMEfficiencyModule::defineHisto()
                                       m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_h_matched_cluster[avxdid] = new TH2D("matched_cluster_" + buff, "clusters matched to track intersections " + buff,
                                            m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
+
+    m_h_p[avxdid] = new TH1D("p_" + buff, "p " + buff, 100, 0, 10);
+    m_h_pt[avxdid] = new TH1D("pt_" + buff, "pt " + buff, 100, 0, 10);
+    m_h_su[avxdid] = new TH1D("su_" + buff, "su " + buff, 1000, 0, 1);
+    m_h_sv[avxdid] = new TH1D("sv_" + buff, "sv " + buff, 1000, 0, 1);
+    m_h_p2[avxdid] = new TH1D("p2_" + buff, "p2 " + buff, 100, 0, 10);
+    m_h_pt2[avxdid] = new TH1D("pt2_" + buff, "pt2 " + buff, 100, 0, 10);
+    m_h_su2[avxdid] = new TH1D("su2_" + buff, "su2 " + buff, 1000, 0, 1);
+    m_h_sv2[avxdid] = new TH1D("sv2_" + buff, "sv2 " + buff, 1000, 0, 1);
   }
   // cd back to root directory
   oldDir->cd();

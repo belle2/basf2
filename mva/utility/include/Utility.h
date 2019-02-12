@@ -84,9 +84,10 @@ namespace Belle2 {
      * @param general_options shared options
      * @param specific_options method specific options
      * @param custom_weightfile path to the pre-existing weightfile
+     * @param output_identifier an optional string to append to the output file name. By default the function overwrites the input file.
      */
     void save_custom_weightfile(const GeneralOptions& general_options, const SpecificOptions& specific_options,
-                                const std::string& custom_weightfile);
+                                const std::string& custom_weightfile, const std::string& output_identifier = "");
 
     /**
      * Convenience function which performs a training with the given options

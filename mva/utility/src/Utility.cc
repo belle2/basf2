@@ -25,6 +25,7 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <regex>
 
 namespace Belle2 {
   namespace MVA {
@@ -219,13 +220,19 @@ namespace Belle2 {
     }
 
     void save_custom_weightfile(const GeneralOptions& general_options, const SpecificOptions& specific_options,
-                                const std::string& custom_weightfile)
+                                const std::string& custom_weightfile, const std::string& output_identifier)
     {
       Weightfile weightfile;
       weightfile.addOptions(general_options);
       weightfile.addOptions(specific_options);
       weightfile.addFile(general_options.m_identifier + "_Weightfile", custom_weightfile);
-      Weightfile::save(weightfile, general_options.m_identifier);
+      std::string output_weightfile(custom_weightfile);
+      if (!output_identifier.empty()) {
+        std::regex to_replace("(\\.\\S+$)");
+        std::string replacement = "_" + output_identifier + "$0";
+        output_weightfile = std::regex_replace(output_weightfile, to_replace, replacement);
+      }
+      Weightfile::save(weightfile, output_weightfile);
     }
 
     void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options, const MetaOptions& meta_options)

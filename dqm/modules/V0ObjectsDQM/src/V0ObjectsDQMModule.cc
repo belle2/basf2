@@ -45,6 +45,10 @@ void V0ObjectsDQMModule::defineHisto()
     m_h_xvsy[j]->SetYTitle("y [cm]");
     m_h_xvsy[j]->SetStats(kFALSE);
   }
+  m_h_xvsz = new TH2F("xvsz", "xvsz", 1500, -75, 75, 400, -10, 10);
+  m_h_xvsz->SetXTitle("z [cm]");
+  m_h_xvsz->SetYTitle("x [cm]");
+  m_h_xvsz->SetStats(kFALSE);
 
   oldDir->cd();
 }
@@ -62,6 +66,7 @@ void V0ObjectsDQMModule::beginRun()
   for (int j = 0; j < 32; j++) {
     m_h_xvsy[j]->Reset();
   }
+  m_h_xvsz->Reset();
 }
 
 
@@ -74,9 +79,12 @@ void V0ObjectsDQMModule::event()
     for (unsigned int i = 0; i < V0Particles->getListSize(); i++) {
       Particle* V0 = V0Particles->getParticle(i);
       //Get the vertex position, fill accordingly
+      float vtxx = V0->getX();
+      float vtxy = V0->getY();
       float vtxz = V0->getZ();
-      if (vtxz > -75 && vtxz < 75) {
-        m_h_xvsy[int(floor((vtxz + 75) / 5))]->Fill(V0->getX(), V0->getY());
+      if (fabs(vtxz) < 75 && fabs(vtxx) < 10 && fabs(vtxy) < 10) {
+        m_h_xvsy[int(floor((vtxz + 75) / 5))]->Fill(vtxx, vtxy);
+        m_h_xvsz->Fill(vtxz, vtxx);
       }
     }
   }

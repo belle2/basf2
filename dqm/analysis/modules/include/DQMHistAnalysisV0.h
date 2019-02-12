@@ -15,6 +15,8 @@
 #include <TCanvas.h>
 #include <TH2.h>
 #include <TH1.h>
+#include <TImage.h>
+#include <TPad.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -49,6 +51,10 @@ namespace Belle2 {
   private:
 
     TCanvas* m_c_xvsy[32] = {nullptr};
+    TCanvas* m_c_xvsz = nullptr;
+    TImage* m_img[32] = {nullptr};
+    TImage* m_img_xz = nullptr;
+    TPad* p, *pxz;
     std::string m_OverlayPath = "";
 
   };

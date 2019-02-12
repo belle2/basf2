@@ -29,6 +29,9 @@ namespace Belle2 {
     /* x vs. y in slices of z */
     TH2F* m_h_xvsy[32] = {nullptr};
 
+    /* x vs. z*/
+    TH2F* m_h_xvsz = nullptr;
+
     /** Name of the V0 particle list */
     std::string m_V0PListName = "";
   };

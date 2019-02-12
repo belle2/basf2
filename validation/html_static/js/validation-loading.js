@@ -100,8 +100,8 @@ function loadValidationPlots(package_load_name, data) {
         // on complete
         function(ractive) {
             // todo: make sure the empty entries in the script accordion are properly filled
-            ractive_value_recover(ractive, "show_overview");
-            ractive_value_recover(ractive, "show_expert_plots");
+            ractive_value_recover_session(ractive, "show_overview");
+            ractive_value_recover_session(ractive, "show_expert_plots");
 
             // setup the jquery ui toggle buttons
             // this can only be done here, otherwise the initial values of the toggle buttons

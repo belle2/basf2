@@ -42,60 +42,40 @@ function convert_string_values ( val ){
     return val;
 }
 
-function ractive_value_recover( ractive, keypath ) {
-    // Finds value corresponding to $keypath either in the localStorage or the
-    // sessionStorage. If a non-null value is found in both of them,
-    // preference is given to the value frmo the sessionStorage.
-    // If the value is found in neither, a default value from the
+function ractive_value_recover_session( ractive, keypath ){
+    // Finds value corresponding to $keypath in the sessionStorage.
+    // If the key does not exist in storage, the default value from the
     // default_values function is taken.
     // The value is then set in ractive using ractive.set
-
     var key = get_storage_id(keypath);
-
-    var val_local = convert_string_values(localStorage.getItem(key));
-    var val_session = convert_string_values(sessionStorage.getItem(key));
-    var val = null;
-
-    if (val_local !== null && val_session !== null){
+    var val = convert_string_values(sessionStorage.getItem(key));
+    if (val === null){
+        val = default_values(keypath);
         console.debug(
-          "Key " + key + " was found in both local storage (value = " +
-            val_local + ") and session storage (value = " + val_session +
-            "). Session storage is taking precedence."
+          "Did not find key '" + key + "' in session storage, so it was set " +
+            "to default value '" + val + "'."
         );
-        val = val_session;
     }
-    else if ( val_local !== null ){
-        console.debug(
-          "Key " + key + " was found in local storage (value = " +
-            val_local + ")."
-        );
-        val = val_local;
-    }
-    else if ( val_session !== null ){
-        console.debug(
-          "Key " + key + " was found in session storage (value = " +
-            val_session + ")."
-        );
-        val = val_session;
-    }
-    else {
-        // simply did not find the key at all
-        var val_default = default_values(keypath);
-        console.debug(
-          "key " + key + " was set to default value " + val_default + "."
-        );
-        val = val_default;
-    }
-
     ractive.set(keypath, val);
 }
 
-//function ractive_value_preserve_local( ractive, keypath ) {
-//    val = ractive.get(keypath);
-//    key = get_storage_id(keypath);
-//    localStorage.setItem(key, val );
-//    console.log("Storing key " + key + " with value " + val + " to local storage");
-//}
+function ractive_value_recover_local( ractive, keypath ){
+    // Finds value corresponding to $keypath either in the localStorage.
+    // If the key does not exist in storage, the default value from the
+    // default_values function is taken.
+    // The value is then set in ractive using ractive.set
+    var key = get_storage_id(keypath);
+    var val = convert_string_values(localStorage.getItem(key));
+    if (val === null){
+        val = default_values(keypath);
+        console.debug(
+          "Did not find key '" + key + "' in local storage, so it was set " +
+            "to default value '" + val + "'."
+        );
+    }
+    ractive.set(keypath, val);
+}
+
 
 function ractive_value_preserve_session( ractive, keypath ) {
     // Saves value associated with $keypath in ractive to sessionStorage.
@@ -104,6 +84,13 @@ function ractive_value_preserve_session( ractive, keypath ) {
     sessionStorage.setItem(key, val );
     console.debug("Storing key " + key + " with value " + val +
         " to session storage");
+}
+
+function ractive_value_preserve_local( ractive, keypath ) {
+   val = ractive.get(keypath);
+   key = get_storage_id(keypath);
+   localStorage.setItem(key, val );
+   console.log("Storing key " + key + " with value " + val + " to local storage");
 }
 
 function setupRactive(templateName, 

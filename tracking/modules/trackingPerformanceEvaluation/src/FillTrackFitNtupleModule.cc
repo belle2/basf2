@@ -83,13 +83,13 @@ void FillTrackFitNtupleModule::event()
   Float_t event_exp = eventMetaData->getExperiment();
   Float_t event_prod = eventMetaData->getProduction();
 
-  B2DEBUG(99, "+++++ Loop on Tracks");
+  B2DEBUG(29, "+++++ Loop on Tracks");
   StoreArray<Track> tracks(m_Tracks);
 
   BOOST_FOREACH(Track & track, tracks) {
 
     const RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
-    if (recoTrack == NULL) B2WARNING(" the RecoTrack associated to Track is NULL!");
+    if (recoTrack == nullptr) B2WARNING(" the RecoTrack associated to Track is nullptr!");
 
     const TrackFitResult* fitResult_pi = track.getTrackFitResult(Const::ChargedStable(211));
     const TrackFitResult* fitResult_k = track.getTrackFitResult(Const::ChargedStable(321));
@@ -97,10 +97,10 @@ void FillTrackFitNtupleModule::event()
     const TrackFitResult* fitResult_d = track.getTrackFitResult(Const::ChargedStable(1000010020));
 
     Float_t flag_pi = kTRUE, flag_k = kTRUE, flag_p = kTRUE, flag_d = kTRUE;
-    if ((fitResult_pi == NULL) || (fitResult_pi->getParticleType() != Const::ChargedStable(211))) flag_pi = kFALSE;
-    if ((fitResult_k == NULL) || (fitResult_k->getParticleType() != Const::ChargedStable(321))) flag_k = kFALSE;
-    if ((fitResult_p == NULL) || (fitResult_p->getParticleType() != Const::ChargedStable(2212))) flag_p = kFALSE;
-    if ((fitResult_d == NULL) || (fitResult_d->getParticleType() != Const::ChargedStable(1000010020))) flag_d = kFALSE;
+    if ((fitResult_pi == nullptr) || (fitResult_pi->getParticleType() != Const::ChargedStable(211))) flag_pi = kFALSE;
+    if ((fitResult_k == nullptr) || (fitResult_k->getParticleType() != Const::ChargedStable(321))) flag_k = kFALSE;
+    if ((fitResult_p == nullptr) || (fitResult_p->getParticleType() != Const::ChargedStable(2212))) flag_p = kFALSE;
+    if ((fitResult_d == nullptr) || (fitResult_d->getParticleType() != Const::ChargedStable(1000010020))) flag_d = kFALSE;
 
     Float_t trk_x_pi = 0, trk_y_pi = 0, trk_z_pi = 0, trk_px_pi = 0, trk_py_pi = 0, trk_pz_pi = 0, trk_p_pi = 0, trk_pt_pi = 0,
             trk_theta_pi = 0, trk_phi_pi = 0,
@@ -291,7 +291,7 @@ void FillTrackFitNtupleModule::event()
 void FillTrackFitNtupleModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     m_n_MultiParticle->Write();
 

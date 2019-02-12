@@ -15,6 +15,11 @@
 #include <framework/gearbox/Const.h>
 
 #include <cmath>
+#include <algorithm>
+#include <iterator>
+
+/* defines */
+#define CDC_SUPER_LAYERS 9
 
 using namespace std;
 using namespace Belle2;
@@ -104,6 +109,10 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
   addParam("testFilename", m_testFilename,
            "If not empty, a file with input (hits) and output (tracks) "
            "for each event is written (for firmware debugging).", string(""));
+
+  addParam("suppressClone", m_suppressClone,
+           "Switch to send only the first found track and suppress the "
+           "subsequent clones." , false);
 }
 
 void
@@ -133,6 +142,10 @@ CDCTrigger2DFinderModule::initialize()
 
   if (m_testFilename != "") {
     testFile.open(m_testFilename);
+  }
+
+  if (m_suppressClone) {
+    B2INFO("2D finder will exit with the first track candidate in time.");
   }
 }
 
@@ -205,12 +218,67 @@ CDCTrigger2DFinderModule::event()
     m_houghPlane->ResizeTo(m_nCellsPhi, m_nCellsR);
   }
 
-  /* find track candidates in Hough plane */
-  fastInterceptFinder(hitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);
+  // hit map containing only the early hits
+  cdcMap fastHitMap;
+  if (m_suppressClone && !hitMap.empty()) {
+    // find the first track candidates in Hough plane
+    // only for z0 resolution study with single-track events
+    // This will surely fail with multi-track ones,
+    // in which case we really need tick-by-tick simulation for all hits.
+
+    /** Pair of <counter, cdcPair>, for hits with indices */
+    typedef pair<int, cdcPair> cdcHitPair;
+    // sequential hit map, ordered by TS found time
+    typedef vector<cdcHitPair> cdcSeqMap;
+    cdcSeqMap seqHitMap;
+    // copy hit map to sequential hit map and sort it by TS found time
+    for (auto hit : hitMap) {
+      seqHitMap.push_back(hit);
+    }
+    sort(seqHitMap.begin(), seqHitMap.end(), [tsHits](cdcHitPair i, cdcHitPair j) {
+      return tsHits[i.first]->foundTime() < tsHits[j.first]->foundTime();
+    });
+    auto seqHitItr = seqHitMap.begin();
+    /* layer filter */
+    vector<bool> layerHit(CDC_SUPER_LAYERS, false);
+    // data clock cycle in unit of 2ns
+    short period = 16;
+    short firstTick = tsHits[(*seqHitMap.begin()).first]->foundTime() / period + 1;
+    short lastTick = tsHits[(*(seqHitMap.end() - 1)).first]->foundTime() / period + 1;
+    // add TS hits in every clock cycle until a track candidate is found
+    for (auto tick = firstTick * period; tick < lastTick * period; tick += period) {
+      int nHitInCycle = 0;
+      for (auto itr = seqHitItr; itr < seqHitMap.end(); ++itr) {
+        cdcHitPair currentHit = *itr;
+        // start from the first hit over SL threshold
+        if (count(layerHit.begin(), layerHit.end(), true) >= m_minHits &&
+            tsHits[currentHit.first]->foundTime() > tick) {
+          break;
+        }
+        nHitInCycle++;
+        layerHit[tsHits[currentHit.first]->getISuperLayer()] = true;
+      }
+      copy_n(seqHitItr, nHitInCycle, inserter(fastHitMap, fastHitMap.end()));
+      fastInterceptFinder(fastHitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);
+      B2DEBUG(20, "at tick " << tick << ", number of candidates: " << houghCand.size());
+      if (!houghCand.empty()) {
+        B2DEBUG(10, "found a track at clock " << tick << " with "
+                << fastHitMap.size() << "hits");
+        break;
+      }
+      advance(seqHitItr, nHitInCycle);
+    }
+  } else {
+    /* find track candidates in Hough plane using all TS hits */
+    fastInterceptFinder(hitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);
+    if (!houghCand.empty()) {
+      B2DEBUG(10, "found a track with " << hitMap.size() << "hits");
+    }
+  }
 
   /* merge track candidates */
   if (m_clusterPattern)
-    patternClustering();
+    patternClustering(fastHitMap);
   else
     connectedRegions();
 

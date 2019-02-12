@@ -1,10 +1,10 @@
-# EventType: 1111440100
+# EventType: 1111440110
 # Descriptor: [B0 -> (KS0 -> pi+ pi-) (J/psi(1S) -> mu+ mu-)]
-# NickName: Bd_JpsiKS_mumu
-# Documentation: Control channel for analysis package
+# NickName: Bd_JpsiKS_mumu_noCPV
+# Documentation: Golden mode with *** NO CP violation ***
 # Tested: Yes
 # Physics WG: TDCPV
-# Responsible: L. Li Gioi
+# Responsible: A. Gaz
 # Cuts: None
 # Date: 20190208
 #
@@ -19,7 +19,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.000   K_S0sig      J/psisig   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0. -1.0 0.;
+1.000   K_S0sig      J/psisig   SSD_CP dm 0.0 1.0 0.0 1.0 0. -1.0 0.;
 Enddecay
 CDecay anti-B0sig
 #

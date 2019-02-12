@@ -986,9 +986,9 @@ def create_plots(revisions=None, force=False, process_queue=None,
             # 'reference' needs to be treated
             # separately, because it is always a viable option, but will never
             # be listed in 'available_revisions()'
-            if revision in available_revisions(work_folder) \
-                    or revision == 'reference':
-                revisions.append(revision)
+            if revision not in available_revisions(work_folder) \
+                    and not revision == 'reference':
+                revisions.pop(revision)
 
     # In case no valid revisions were given, fall back to default and use all
     # available revisions and reference. The order should now be [reference,

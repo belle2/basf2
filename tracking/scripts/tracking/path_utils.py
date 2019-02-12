@@ -333,16 +333,17 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     """
-    # Init the geometry for cdc tracking and the hits
+    # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
-                    flightTimeEstimation="outwards")
+                    flightTimeEstimation="outwards",
+                    noiseChargeDeposit=6.0e-7)
 
-    # Constructs clusters and reduce background hits
+    # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
-                    ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2})
+                    ClusterFilter="all",
+                    ClusterFilterParameters={})
 
     # Find segments within the clusters
     path.add_module("TFCDC_SegmentFinderFacetAutomaton")

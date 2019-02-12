@@ -69,7 +69,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'basf2'
-copyright = '2010-2017, Belle II Collaboration'
+copyright = '2010-2019, Belle II Collaboration'
 author = 'Belle2 Software Group'
 
 # The version info for the project you're documenting, acts as replacement for

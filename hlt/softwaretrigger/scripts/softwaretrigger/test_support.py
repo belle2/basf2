@@ -15,6 +15,25 @@ from ROOT import Belle2
 from L1trigger import add_tsim
 find_file = Belle2.FileSystem.findFile
 
+import ROOT
+import basf2
+
+
+class CheckForCorrectHLTResults(basf2.Module):
+    """test"""
+
+    def event(self):
+        """reimplementation of Module::event()."""
+        sft_trigger = ROOT.Belle2.PyStoreObj("SoftwareTriggerResult")
+
+        if not sft_trigger.isValid():
+            basf2.B2FATAL("SoftwareTriggerResult object not created")
+        elif len(sft_trigger.getResults()) == 0:
+            basf2.B2FATAL("SoftwareTriggerResult exists but has no entries")
+
+        if not ROOT.Belle2.PyStoreObj("ROIs").isValid():
+            basf2.B2FATAL("ROIs are not present")
+
 
 def generate_input_file(run_type, location, output_file_name, exp_number):
     if os.path.exists(output_file_name):
@@ -78,6 +97,13 @@ def test_script(script_location, input_file_name, temp_dir):
            input_buffer, output_buffer, str(histo_port), str(num_processes)]
 
     subprocess.check_call(cmd)
+
+    test_path = basf2.Path()
+    test_path.add_module("RootInput", inputFileName=output_file_name)
+    test_path.add_module(CheckForCorrectHLTResults())
+
+    if "only_dqm" not in script_location:
+        basf2.process(test_path)
 
 
 def test_folder(location, run_type, exp_number):

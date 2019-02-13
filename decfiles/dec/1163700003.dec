@@ -1,7 +1,7 @@
 # EventType: 1163700003
 # Descriptor: [B0 -> D** l nu ]cc
 # NickName: B0_D**lnu
-# Documentation: B0->D** l nu process
+# Documentation: B0->D** l nu process, tag B decays exclusively as B->(D->Kpi(pi))pi
 # Tested: No
 # PhysicsWG: SL
 # Responsible: Sourav Dey
@@ -39,10 +39,10 @@ CDecay anti-B0sig
 #
 
 
-Decay B0
+Decay B0tag
 1.00 myD- pi+        PHOTOS            PHSP;
 Enddecay
-CDecay anti-B0
+CDecay anti-B0tag
 
 Decay myD-
 1.00 K+ pi- pi-    PHOTOS       D_DALITZ;

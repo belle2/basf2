@@ -1,7 +1,7 @@
 # EventType: 1263700002
 # Descriptor: [B+ -> D** l nu ]cc
 # NickName: B+_D**lnu
-# Documentation: B0->D** l nu process
+# Documentation: B0->D** l nu process, tag B decays exclusively as B->(D->Kpi(pi))pi
 # Tested: No
 # PhysicsWG: SL
 # Responsible: Sourav Dey
@@ -37,10 +37,10 @@ Enddecay
 CDecay B-sig
 
 
-Decay B-
+Decay B-tag
 1.00 D0tag  pi-   PHOTOS                 PHSP;
 Enddecay
-CDecay B+
+CDecay B+tag
 
 Decay D0tag
 1.00 K- pi+   PHOTOS   PHSP;

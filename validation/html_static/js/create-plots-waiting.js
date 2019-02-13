@@ -11,7 +11,7 @@
 function install_plotting_progress(rev_string, joined_revisions, progress_key, wait_time, rev_data) {
 
     // query every second
-    var defaultWaitTime = 1000;
+    let defaultWaitTime = 1000;
 
     setTimeout(function () {
 
@@ -41,15 +41,16 @@ function install_plotting_progress(rev_string, joined_revisions, progress_key, w
                         // todo: the revision selection seems to be kept, why ?
                         //loadRevisions( rev_string, joined_revisions );
                         console.log("Plot creation for revisions " + rev_string + " complete");
+                        // fixme: rev_list unknown??
                         setupRactiveFromRevision(rev_data, rev_string, rev_list);
                         $("#outer").hide();
                     } else {
                         // detailed progress message
 
                         // extract information from the json dict
-                        var current_package = parseInt(ajax_result["current_package"]);
-                        var total_package = parseInt(ajax_result["total_package"]);
-                        var package_name = ajax_result["package_name"];
+                        let current_package = parseInt(ajax_result["current_package"]);
+                        let total_package = parseInt(ajax_result["total_package"]);
+                        let package_name = ajax_result["package_name"];
 
                         // display infos on the waiting dialog
                         $("#plot_creation_progress").text("Processing " + current_package + " of " + total_package + " packages");

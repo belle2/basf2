@@ -9,7 +9,7 @@ function default_values(keypath) {
     // a configuration value in localStorage and sessionStorage.
     // Null is returned, if no default value was set. In this case, also
     // a warning is issued to the log.
-    var defaults = {
+    let defaults = {
         "show_overview": true,
         "show_expert_plots": false
     };
@@ -43,8 +43,8 @@ function ractive_value_recover_session(ractive, keypath) {
     // If the key does not exist in storage, the default value from the
     // default_values function is taken.
     // The value is then set in ractive using ractive.set
-    var key = get_storage_id(keypath);
-    var val = convert_string_values(sessionStorage.getItem(key));
+    let key = get_storage_id(keypath);
+    let val = convert_string_values(sessionStorage.getItem(key));
     if (val === null) {
         val = default_values(keypath);
         console.debug(
@@ -60,8 +60,8 @@ function ractive_value_recover_local(ractive, keypath) {
     // If the key does not exist in storage, the default value from the
     // default_values function is taken.
     // The value is then set in ractive using ractive.set
-    var key = get_storage_id(keypath);
-    var val = convert_string_values(localStorage.getItem(key));
+    let key = get_storage_id(keypath);
+    let val = convert_string_values(localStorage.getItem(key));
     if (val === null) {
         val = default_values(keypath);
         console.debug(
@@ -75,16 +75,16 @@ function ractive_value_recover_local(ractive, keypath) {
 
 function ractive_value_preserve_session(ractive, keypath) {
     // Saves value associated with $keypath in ractive to sessionStorage.
-    var val = ractive.get(keypath);
-    var key = get_storage_id(keypath);
+    let val = ractive.get(keypath);
+    let key = get_storage_id(keypath);
     sessionStorage.setItem(key, val);
     console.debug("Storing key " + key + " with value " + val +
         " to session storage");
 }
 
 function ractive_value_preserve_local(ractive, keypath) {
-    val = ractive.get(keypath);
-    key = get_storage_id(keypath);
+    let val = ractive.get(keypath);
+    let key = get_storage_id(keypath);
     localStorage.setItem(key, val);
     console.log("Storing key " + key + " with value " + val + " to local storage");
 }
@@ -101,6 +101,7 @@ function setupRactive(templateName,
     console.log("Setting up Ractive with template " + templateName);
     $.get('templates/' + templateName + '.html').then(
         function (html_template) {
+            // IMPORTANT: DO NOT CHANGE THIS 'var' TO 'let'!
             var ractive = new Ractive({
                 // The `el` option can be a node, an ID, or a CSS selector.
                 el: element,
@@ -141,9 +142,9 @@ function setupRactive(templateName,
             // but it's not costly performance wise anyhow, so let's just do it.
             // In fact, because MathJax replaces the DOMs with pictures, it will
             // not regenerate things twice.
-            var t0 = performance.now();
+            let t0 = performance.now();
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-            var t1 = performance.now();
+            let t1 = performance.now();
             console.log("Re-Typeset all using MathJax. This took " + (t1 - t0) + "ms.");
 
             console.log("Ractive setup with " + templateName + " complete");

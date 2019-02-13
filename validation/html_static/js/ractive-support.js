@@ -1,14 +1,18 @@
 /*
-
-Support functions for using Ractive in Validation website
-
+Support functions for using Ractive on the validation website
 */
 
+// ============================================================================
+// Saving configuration to local or session storage
+// ============================================================================
+
+/**
+ * Default configuration values. This is what we use when we can't find
+ * a configuration value in localStorage and sessionStorage.
+ * @param keypath
+ * @returns  Null is returned, if no default value was set, else the default value
+ */
 function default_values(keypath) {
-    // Default configuration values. This is what we use when we can't find
-    // a configuration value in localStorage and sessionStorage.
-    // Null is returned, if no default value was set. In this case, also
-    // a warning is issued to the log.
     let defaults = {
         "show_overview": true,
         "show_expert_plots": false
@@ -23,8 +27,12 @@ function default_values(keypath) {
     }
 }
 
+/**
+ * Converts a string representation back to boolean/null/string
+ * @param val the string value to be converted
+ * @returns
+ */
 function convert_string_values(val) {
-    // string representations of true and false need to be converted back
     if (val === "false") {
         return false;
     } else if (val === "true") {
@@ -38,11 +46,16 @@ function convert_string_values(val) {
     return val;
 }
 
+/**
+ * Finds value corresponding to $keypath in the sessionStorage.
+ * If the key does not exist in storage, the default value from the
+ * default_values function is taken.
+ * The value is then set in ractive using ractive.set
+ * @param ractive
+ * @param keypath
+ * @returns None
+ */
 function ractive_value_recover_session(ractive, keypath) {
-    // Finds value corresponding to $keypath in the sessionStorage.
-    // If the key does not exist in storage, the default value from the
-    // default_values function is taken.
-    // The value is then set in ractive using ractive.set
     let key = get_storage_id(keypath);
     let val = convert_string_values(sessionStorage.getItem(key));
     if (val === null) {
@@ -55,11 +68,16 @@ function ractive_value_recover_session(ractive, keypath) {
     ractive.set(keypath, val);
 }
 
+/**
+ * Finds value corresponding to $keypath either in the localStorage.
+ * If the key does not exist in storage, the default value from the
+ * default_values function is taken.
+ * The value is then set in ractive using ractive.set
+ * @param ractive
+ * @param keypath
+ * @returns None
+ */
 function ractive_value_recover_local(ractive, keypath) {
-    // Finds value corresponding to $keypath either in the localStorage.
-    // If the key does not exist in storage, the default value from the
-    // default_values function is taken.
-    // The value is then set in ractive using ractive.set
     let key = get_storage_id(keypath);
     let val = convert_string_values(localStorage.getItem(key));
     if (val === null) {
@@ -72,15 +90,23 @@ function ractive_value_recover_local(ractive, keypath) {
     ractive.set(keypath, val);
 }
 
-
+/**
+ * Saves value associated with $keypath in ractive to sessionStorage.
+ * @param ractive
+ * @param keypath
+ */
 function ractive_value_preserve_session(ractive, keypath) {
-    // Saves value associated with $keypath in ractive to sessionStorage.
     let val = ractive.get(keypath);
     let key = get_storage_id(keypath);
     sessionStorage.setItem(key, val);
     console.debug(`Storing key '${key}' with value '${val}' to session storage`);
 }
 
+/**
+ * Saves value associated with $keypath in ractive to localStorage.
+ * @param ractive
+ * @param keypath
+ */
 function ractive_value_preserve_local(ractive, keypath) {
     let val = ractive.get(keypath);
     let key = get_storage_id(keypath);
@@ -89,6 +115,21 @@ function ractive_value_preserve_local(ractive, keypath) {
 
 }
 
+// ============================================================================
+// Setting up ractive element from template.
+// ============================================================================
+
+/**
+ * Sets up ractive element from template
+ * @param templateName
+ * @param element
+ * @param data
+ * @param onRactiveCreated
+ * @param onRactiveTemplateComplete
+ * @param onRactiveTeardown
+ * @param onRactiveRender
+ * @param onRactiveChange
+ */
 function setupRactive(templateName,
                       element,
                       data,
@@ -153,5 +194,3 @@ function setupRactive(templateName,
             alert(`Cannot load ractive template '${templateName}' from webserver.`);
         });
 }
-
-

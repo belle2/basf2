@@ -1,6 +1,10 @@
-/* The package that is opened, when the validation page is opened.
- Currently that's just picking the page first in alphabetic order
- (i.e. analysis) or false if no packages are available. */
+/**
+ * The package that is opened, when the validation page is opened.
+ *  Currently that's just picking the page first in alphabetic order
+ *  (i.e. analysis) or false if no packages are available.
+ * @param package_list
+ * @return {*}
+ */
 function getDefaultPackageName(package_list) {
     if (package_list.length === 0) {
         console.debug("getDefaultPackageName: No packages available.");
@@ -17,16 +21,26 @@ function getDefaultPackageName(package_list) {
 
 }
 
+/**
+ * Returns storage id from keypath
+ * @param keypath
+ * @return {string}
+ */
 function get_storage_id(keypath) {
-    return "validation_config_" + keypath;
+    return `validation_config_${keypath}`;
 }
 
-/* the popup must be installed when the user clicks the item. If the popup
-is installed once Ractive is done creating the template the popups do not work 
-any more if the user clicked on the "Overview" checkbox because new DOM items
-get created */
+// todo: doc
+/**
+ * the popup must be installed when the user clicks the item. If the popup
+ * is installed once Ractive is done creating the template the popups do not work
+ * any more if the user clicked on the "Overview" checkbox because new DOM items
+ * get created
+ * @param item_id
+ */
 function trigger_popup(item_id) {
-    $('#' + item_id).magnificPopup({
+
+    $(`#${item_id}`).magnificPopup({
         type: 'inline',
         // Allow opening popup on middle mouse click. Always set it to true if
         // you don't provide alternative source in href.
@@ -34,20 +48,18 @@ function trigger_popup(item_id) {
     });
 }
 
+// todo: doc
+/**
+ *
+ * @param package_load_name
+ * @param data
+ */
 function loadValidationPlots(package_load_name, data) {
     console.log(`loadValidationPlots: Loading plots for package '${package_load_name}'`);
-
-    // todo: remove this ?
-    // make dynamic
-    // let revCompare = get_selected_revs_string();
-    // let revCompare_list = get_selected_revs_list();
-    // let comparisonLoadPath = "../comparisons/" + revCompare;
-    // let createComparisonUrl = "../create_comparison";
 
     let loaded_package = null;
 
     console.log(`loadValidationPlots: Comparison data for package '${package_load_name}' loaded`);
-
 
     let selected_list = get_selected_revs_list();
     // update the already displayed revision labels with the correct colors
@@ -91,7 +103,6 @@ function loadValidationPlots(package_load_name, data) {
             loaded_package["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
         }
     }
-
 
     let wrapped_package = {packages: [loaded_package]};
 
@@ -149,11 +160,15 @@ function loadValidationPlots(package_load_name, data) {
 }
 
 
-// Load the Ntuple json file from a server and transfer
-// it into a HTML table
+/**
+ * Load the Ntuple json file from a server and transfer
+ * it into a HTML table
+ * @param dom_id
+ * @param json_loading_path
+ */
 function fill_ntuple_table(dom_id, json_loading_path) {
     // move out of the static folder 
-    $.getJSON("../" + json_loading_path, function (data) {
+    $.getJSON(`../${json_loading_path}`, function (data) {
         let items = [];
 
         // add header 
@@ -198,10 +213,15 @@ function fill_ntuple_table(dom_id, json_loading_path) {
             }
         });
 
-        $("#" + dom_id).after(items);
+        $(`#${dom_id}`).after(items);
     });
 }
 
+// todo: doc
+/**
+ *
+ * @return {Array}
+ */
 function get_selected_revs_list() {
     let selected_rev = [];
     $('.reference-checkbox').each(function (i, obj) {
@@ -213,22 +233,32 @@ function get_selected_revs_list() {
     return selected_rev;
 }
 
+// todo: doc
+/**
+ *
+ * @return {string}
+ */
 function get_selected_revs_string() {
     let rev_string = "";
     let selected_rev = get_selected_revs_list();
     for (let i in selected_rev) {
         if (i > 0)
-            rev_string = rev_string + "_";
-        rev_string = rev_string + selected_rev[i];
+            rev_string += "_";
+        rev_string += selected_rev[i];
     }
     return rev_string;
 }
 
+// todo: doc
+/**
+ *
+ * @param rev_data
+ * @return {*}
+ */
 function getNewestRevision(rev_data) {
     let newest = null;
     let newest_date = "2000-00-00 00:00:00";
     let rev_list = rev_data["revisions"];
-
 
     for (let i in rev_list) {
         // todo: have a is_reference entry
@@ -243,6 +273,13 @@ function getNewestRevision(rev_data) {
     return newest
 }
 
+// todo: doc
+/**
+ *
+ * @param rev_data
+ * @param rev_string
+ * @param rev_list
+ */
 function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
 
     // don't event attempt to show comparisons for empty revisions
@@ -255,6 +292,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
 
     console.log(`Loading Comparison 'comparisonLoadPath'`);
 
+    // todo: This SCREAMS to be refactored in some way....
     $.get(comparisonLoadPath).done(function (data) {
 
         // Get the newest revision within the selection
@@ -400,9 +438,10 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
     });
 }
 
-/* this function call is triggered by the button 
-   under the revisions list
-*/
+/**
+ * this function call is triggered by the button under the revisions list
+ * @param data
+ */
 function loadSelectedRevisions(data) {
 
     let rev_string = get_selected_revs_string();
@@ -417,6 +456,12 @@ function loadSelectedRevisions(data) {
     setupRactiveFromRevision(data, rev_string, rev_list);
 }
 
+// todo: doc
+/**
+ *
+ * @param rev_string
+ * @param rev_list
+ */
 function loadRevisions(rev_string, rev_list) {
     if (typeof rev_string === 'undefined') {
         rev_string = null;

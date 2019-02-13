@@ -17,7 +17,7 @@ function default_values(keypath) {
         return defaults[keypath];
     } else {
         console.warn(
-            "No default value found for keypath " + keypath + ". Returning null."
+            `No default value found for keypath '${keypath}'. Returning null.`
         );
         return null;
     }
@@ -48,8 +48,8 @@ function ractive_value_recover_session(ractive, keypath) {
     if (val === null) {
         val = default_values(keypath);
         console.debug(
-            "Did not find key '" + key + "' in session storage, so it was set " +
-            "to default value '" + val + "'."
+            `Did not find key '${key}' in session storage, so it was set ` +
+            `to default value '${val}'.`
         );
     }
     ractive.set(keypath, val);
@@ -65,8 +65,8 @@ function ractive_value_recover_local(ractive, keypath) {
     if (val === null) {
         val = default_values(keypath);
         console.debug(
-            "Did not find key '" + key + "' in local storage, so it was set " +
-            "to default value '" + val + "'."
+            `Did not find key '${key}' in local storage, so it was set ` +
+            `to default value '${val}'.`
         );
     }
     ractive.set(keypath, val);
@@ -78,15 +78,15 @@ function ractive_value_preserve_session(ractive, keypath) {
     let val = ractive.get(keypath);
     let key = get_storage_id(keypath);
     sessionStorage.setItem(key, val);
-    console.debug("Storing key " + key + " with value " + val +
-        " to session storage");
+    console.debug(`Storing key '${key}' with value '${val}' to session storage`);
 }
 
 function ractive_value_preserve_local(ractive, keypath) {
     let val = ractive.get(keypath);
     let key = get_storage_id(keypath);
     localStorage.setItem(key, val);
-    console.log("Storing key " + key + " with value " + val + " to local storage");
+    console.debug(`Storing key '${key}' with value '${val}' to local storage`);
+
 }
 
 function setupRactive(templateName,
@@ -98,8 +98,8 @@ function setupRactive(templateName,
                       onRactiveRender,
                       onRactiveChange) {
 
-    console.log("Setting up Ractive with template " + templateName);
-    $.get('templates/' + templateName + '.html').then(
+    console.log(`Setting up Ractive with template '${templateName}'.`);
+    $.get(`templates/${templateName}.html`).then(
         function (html_template) {
             // IMPORTANT: DO NOT CHANGE THIS 'var' TO 'let'!
             var ractive = new Ractive({
@@ -145,13 +145,12 @@ function setupRactive(templateName,
             let t0 = performance.now();
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             let t1 = performance.now();
-            console.log("Re-Typeset all using MathJax. This took " + (t1 - t0) + "ms.");
+            console.log(`Re-Typeset all using MathJax. This took ${t1 - t0}ms.`);
 
-            console.log("Ractive setup with " + templateName + " complete");
+            console.log(`Ractive setup with template '${templateName}' complete.`);
         }).fail(
         function () {
-            alert("Cannot load ractive template " + templateName
-                + " from webserver.");
+            alert(`Cannot load ractive template '${templateName}' from webserver.`);
         });
 }
 

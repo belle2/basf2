@@ -35,7 +35,7 @@ function trigger_popup(item_id) {
 }
 
 function loadValidationPlots(package_load_name, data) {
-    console.log("loadValidationPlots: Loading plots for package '" + package_load_name + "'.");
+    console.log(`loadValidationPlots: Loading plots for package '${package_load_name}'`);
 
     // todo: remove this ?
     // make dynamic
@@ -46,7 +46,7 @@ function loadValidationPlots(package_load_name, data) {
 
     let loaded_package = null;
 
-    console.log("loadValidationPlots: Comparison data for package '" + package_load_name + "' loaded");
+    console.log(`loadValidationPlots: Comparison data for package '${package_load_name}' loaded`);
 
 
     let selected_list = get_selected_revs_list();
@@ -164,7 +164,7 @@ function fill_ntuple_table(dom_id, json_loading_path) {
         for (let rev in data) {
             for (let fig in data[rev]) {
                 let val_pair = data[rev][fig];
-                items.push("<th>" + val_pair[0] + "</th>");
+                items.push(`<th>${val_pair[0]}</th>`);
             }
             break;
         }
@@ -176,10 +176,10 @@ function fill_ntuple_table(dom_id, json_loading_path) {
 
             if (key === "reference") {
                 items.push("<tr>");
-                items.push("<td>" + key + "</td>");
+                items.push(`<td>${key}</td>`);
                 for (let fig in data[key]) {
                     let val_pair = data[key][fig];
-                    items.push("<td>" + val_pair[1] + "</td>");
+                    items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
             }
@@ -189,10 +189,10 @@ function fill_ntuple_table(dom_id, json_loading_path) {
         $.each(data, function (key) {
             if (key !== "reference") {
                 items.push("<tr>");
-                items.push("<td>" + key + "</td>");
+                items.push(`<td>${key}</td>`);
                 for (let fig in data[key]) {
                     let val_pair = data[key][fig];
-                    items.push("<td>" + val_pair[1] + "</td>");
+                    items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
             }
@@ -250,10 +250,10 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
         return;
 
     // make dynamic
-    let comparisonLoadPath = "../comparisons/" + rev_string;
+    let comparisonLoadPath = `../comparisons/${rev_string}`;
     let createComparisonUrl = "../create_comparison";
 
-    console.log("Loading Comparison '" + comparisonLoadPath + "'");
+    console.log(`Loading Comparison 'comparisonLoadPath'`);
 
     $.get(comparisonLoadPath).done(function (data) {
 
@@ -262,7 +262,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
         // log files
         let newest_rev = getNewestRevision(rev_data);
 
-        console.debug("Newest revision is '" + newest_rev["label"] + "'");
+        console.debug(`Newest revision is '${newest_rev["label"]}'`);
 
         // enrich the comparison data with the newest revision in this comparison
         data["newest_revision"] = newest_rev;
@@ -312,7 +312,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                     //     available, then we need to add a new item to the
                     //     package list of the comparison object).
                     console.debug(
-                        "Package '" + newest_rev["packages"][irev]["name"] +
+                        `Package '${newest_rev["packages"][irev]["name"]}` +
                         "' was found in the revision file, but not in the" +
                         "comparison file. Probably this package did not " +
                         "create a single output file."
@@ -369,7 +369,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                             for (let ipkg in pkgs) {
                                 if (pkgs[ipkg].name === evt.context.name) {
                                     // disaplay this one
-                                    ractive.set('packages.' + ipkg + '.display_setting', 'block');
+                                    ractive.set(`packages.${ipkg}.display_setting`, 'block');
                                     break;
                                 }
                             }
@@ -383,7 +383,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
             });
     }).fail(function () {
 
-        console.log("Comparison " + rev_string + " does not exist yet, requesting it");
+        console.log(`Comparison '${rev_string}' does not exist yet, requesting it`);
 
         $.ajax({
             url: createComparisonUrl,
@@ -412,7 +412,7 @@ function loadSelectedRevisions(data) {
         alert("Please select at least one tag!");
     }
 
-    console.log("Loading rev via string " + rev_string);
+    console.log(`Loading rev via string '${rev_string}'.`);
 
     setupRactiveFromRevision(data, rev_string, rev_list);
 }
@@ -422,11 +422,11 @@ function loadRevisions(rev_string, rev_list) {
         rev_string = null;
     }
 
-    console.log("loading revisions from server");
+    console.log("Loading revisions from server");
     let rev_load_path = "../revisions";
 
     $.get(rev_load_path).then(function (data) {
-        console.log("loading done !");
+        console.log("Loading done!");
 
         function setupRevisionLoader(ractive) {
 

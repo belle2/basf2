@@ -11,8 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/ckf/general/findlets/ECLTrackCreator.h>
-#include <tracking/ckf/cdc/findlets/CDCfromEclCKFSeedCreator.h>
+#include <tracking/ckf/cdc/findlets/CDCCKFEclSeedCreator.h>
 #include <tracking/ckf/cdc/findlets/StackTreeSearcher.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFResultFinalizer.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFResultStorer.h>
@@ -53,9 +52,7 @@ namespace Belle2 {
   private:
     // Findlets
     /// Findlet for retrieving the ecl showers and creating recoTracks out of it
-    ECLTrackCreator m_trackCreator;
-    /// Seed Creator
-    CDCfromEclCKFSeedCreator m_seedCreator;
+    CDCCKFEclSeedCreator m_seedCreator;
     /// Tree Searcher
     StackTreeSearcher m_treeSearcher;
     /// Result Finalizer
@@ -64,8 +61,6 @@ namespace Belle2 {
     CDCCKFResultStorer m_resultStorer;
 
     // Object pools
-    /// Pointers to the CDC Reco tracks as a vector
-    std::vector<RecoTrack*> m_eclRecoTrackVector;
     /// Current list of paths
     std::vector<CDCCKFPath> m_paths;
     /// Current list of seeds

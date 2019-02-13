@@ -7,23 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/general/findlets/ECLTrackCreator.h>
+#include <tracking/ckf/cdc/findlets/CDCCKFEclSeedCreator.h>
 #include <tracking/ckf/general/utilities/SearchDirection.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/ckf/cdc/entities/CDCCKFState.h>
 
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 
-ECLTrackCreator::ECLTrackCreator() : Super()
+CDCCKFEclSeedCreator::CDCCKFEclSeedCreator() : Super()
 {
 
 }
 
-void ECLTrackCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void CDCCKFEclSeedCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "inputECLshowersStoreArrayName"),
                                 m_param_inputEclShowerStoreArrayName,
@@ -39,21 +40,20 @@ void ECLTrackCreator::exposeParameters(ModuleParamList* moduleParamList, const s
                                 m_param_minimalEnRequirement);
 }
 
-void ECLTrackCreator::initialize()
+void CDCCKFEclSeedCreator::initialize()
 {
   Super::initialize();
 
   m_inputECLshowers.isRequired(m_param_inputEclShowerStoreArrayName);
 
-  StoreArray<RecoTrack> relationRecoTracks(m_param_eclSeedRecoTrackStoreArrayName);
-  relationRecoTracks.registerRelationTo(m_eclSeedRecoTracks);
+  m_eclSeedRecoTracks.registerInDataStore(m_param_eclSeedRecoTrackStoreArrayName);
+  RecoTrack::registerRequiredRelations(m_eclSeedRecoTracks);
+
+  // TODO: add relation to ECL shower
 }
 
-void ECLTrackCreator::apply(std::vector<RecoTrack*>& seeds)
+void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 {
-  // only reserve for photon hypothesis (/2)
-  seeds.reserve(seeds.size() + m_inputECLshowers.getEntries() / 2);
-
   for (auto& shower : m_inputECLshowers) {
     // TODO: TrackLoader checks if RecoTrack present in relatedRecoTrackStoreArrayName. Does this have to be done?
     // Also does relationCheckForDirection, is this necessary?
@@ -81,8 +81,10 @@ void ECLTrackCreator::apply(std::vector<RecoTrack*>& seeds)
     RecoTrack* eclSeedEle = m_eclSeedRecoTracks.appendNew(pos, mom, -1);
     RecoTrack* eclSeedPos = m_eclSeedRecoTracks.appendNew(pos, mom, +1);
 
-    seeds.push_back(eclSeedEle);
-    seeds.push_back(eclSeedPos);
+    CDCCKFState seedStateEle(eclSeedEle, nullptr);
+    seeds.push_back({seedStateEle});
+    CDCCKFState seedStatePos(eclSeedPos, nullptr);
+    seeds.push_back({seedStatePos});
 
     // TODO: add relation to ECL shower
   }

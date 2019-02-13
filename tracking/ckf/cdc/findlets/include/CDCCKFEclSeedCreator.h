@@ -11,11 +11,9 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-//#include <analysis/ClusterUtility/ClusterUtils.h>
+#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <ecl/dataobjects/ECLShower.h>
-//#include <ecl/dataobjects/ECLSimHit.h>
 #include <framework/datastore/StoreArray.h>
-//#include <mdst/dataobjects/ECLCluster.h>
 
 #include <string>
 #include <vector>
@@ -28,13 +26,13 @@ namespace Belle2 {
   /**
    * Findlet for
    */
-  class ECLTrackCreator : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class CDCCKFEclSeedCreator : public TrackFindingCDC::Findlet<CDCCKFPath> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<RecoTrack*>;
+    using Super = TrackFindingCDC::Findlet<CDCCKFPath>;
 
   public:
     /// Add the subfindlets
-    ECLTrackCreator();
+    CDCCKFEclSeedCreator();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -43,7 +41,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the reco tracks and the hits
-    void apply(std::vector<RecoTrack*>& seeds) override;
+    void apply(std::vector<CDCCKFPath>& seeds) override;
 
   private:
     // Findlets

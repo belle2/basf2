@@ -23,7 +23,6 @@ CKFToCDCFromEclFindlet::~CKFToCDCFromEclFindlet() = default;
 
 CKFToCDCFromEclFindlet::CKFToCDCFromEclFindlet()
 {
-  addProcessingSignalListener(&m_trackCreator);
   addProcessingSignalListener(&m_seedCreator);
   addProcessingSignalListener(&m_treeSearcher);
   addProcessingSignalListener(&m_resultFinalizer);
@@ -34,7 +33,6 @@ void CKFToCDCFromEclFindlet::exposeParameters(ModuleParamList* moduleParamList, 
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  m_trackCreator.exposeParameters(moduleParamList, prefix);
   m_seedCreator.exposeParameters(moduleParamList, prefix);
   m_treeSearcher.exposeParameters(moduleParamList, prefix);
   m_resultFinalizer.exposeParameters(moduleParamList, prefix);
@@ -51,7 +49,6 @@ void CKFToCDCFromEclFindlet::beginEvent()
 {
   Super::beginEvent();
 
-  m_eclRecoTrackVector.clear();
   m_paths.clear();
   m_seeds.clear();
   m_results.clear();
@@ -59,8 +56,7 @@ void CKFToCDCFromEclFindlet::beginEvent()
 
 void CKFToCDCFromEclFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wireHits)
 {
-  m_trackCreator.apply(m_eclRecoTrackVector);
-  m_seedCreator.apply(m_eclRecoTrackVector, m_seeds);
+  m_seedCreator.apply(m_seeds);
 
   const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
 

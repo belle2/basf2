@@ -144,7 +144,7 @@ function setupRactive(templateName,
             var t0 = performance.now();
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             var t1 = performance.now();
-            console.log("Re-Typeset all using MathJax. This took " + (t1 - t0) + "ms.")
+            console.log("Re-Typeset all using MathJax. This took " + (t1 - t0) + "ms.");
 
             console.log("Ractive setup with " + templateName + " complete");
         }).fail(

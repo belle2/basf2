@@ -3,22 +3,22 @@
  (i.e. analysis) or false if no packages are available. */
 function getDefaultPackageName(package_list) {
     if (package_list.length == 0) {
-        console.debug("getDefaultPackageName: No packages available.")
+        console.debug("getDefaultPackageName: No packages available.");
         return false;
     }
 
-    first_package_name = package_list[0].name
+    first_package_name = package_list[0].name;
     if (first_package_name != 'undefined') {
         return first_package_name;
     } else {
-        console.debug("getDefaultPackageName: Name of first package undefined.")
+        console.debug("getDefaultPackageName: Name of first package undefined.");
         return false;
     }
 
 }
 
 function get_storage_id(keypath) {
-    storage_id = "validation_config_" + keypath
+    storage_id = "validation_config_" + keypath;
     return storage_id
 }
 
@@ -85,7 +85,7 @@ function loadValidationPlots(package_load_name, data) {
 
     // create unique ids for each plot, which can be used to create
     // links to individual plot images
-    uniq_plot_id = 1
+    uniq_plot_id = 1;
     for (var i in loaded_package["plotfiles"]) {
         for (var ploti in loaded_package["plotfiles"][i]["plots"]) {
             loaded_package["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
@@ -171,7 +171,6 @@ function fill_ntuple_table(dom_id, json_loading_path) {
             }
             break;
         }
-        ;
 
         items.push("</tr>");
 
@@ -229,8 +228,8 @@ function get_selected_revs_string() {
 }
 
 function getNewestRevision(rev_data) {
-    newest = null
-    newest_date = "2000-00-00 00:00:00"
+    newest = null;
+    newest_date = "2000-00-00 00:00:00";
     rev_list = rev_data["revisions"];
 
 
@@ -254,23 +253,23 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
         return;
 
     // make dynamic
-    var comparisonLoadPath = "../comparisons/" + rev_string
-    var createComparisonUrl = "../create_comparison"
+    var comparisonLoadPath = "../comparisons/" + rev_string;
+    var createComparisonUrl = "../create_comparison";
 
     console.log("Loading Comparison '" + comparisonLoadPath + "'");
 
     $.get(comparisonLoadPath).done(function (data) {
-        loaded_package = null
+        loaded_package = null;
 
         // Get the newest revision within the selection
         // to get information about failed scripts and the
         // log files
         newest_rev = getNewestRevision(rev_data);
 
-        console.debug("Newest revision is '" + newest_rev["label"] + "'")
+        console.debug("Newest revision is '" + newest_rev["label"] + "'");
 
         // enrich the comparison data with the newest revision in this comparison
-        data["newest_revision"] = newest_rev
+        data["newest_revision"] = newest_rev;
 
         // We have two sources of information for scripts and plots:
         // * The comparison object from comparisonLoadPath
@@ -278,7 +277,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
         // We update the data from the comparison object with additional data
         // from the revision object.
         if (newest_rev != null) {
-            console.debug("Updating package information.")
+            console.debug("Updating package information.");
 
             // We now go through all of the packages in the revision object
             // and add the corresponding information to the comparison object.
@@ -302,7 +301,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                 if (name in comparison_data_pkg2index) {
                     // Found the package in the comparison object
                     // ==> Just add the information
-                    ipkg = comparison_data_pkg2index [name]
+                    ipkg = comparison_data_pkg2index [name];
 
                     data["packages"][ipkg]["fail_count"] = fail_count;
                     data["packages"][ipkg]["scriptfiles"] = scriptfiles;
@@ -321,7 +320,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                         "' was found in the revision file, but not in the" +
                         "comparison file. Probably this package did not " +
                         "create a single output file."
-                    )
+                    );
                     if (newest_rev["packages"][irev]["fail_count"] > 0) {
                         console.debug(
                             "However it did have failing scripts, so we " +
@@ -428,7 +427,7 @@ function loadRevisions(rev_string, rev_list) {
     }
 
     console.log("loading revisions from server");
-    rev_load_path = "../revisions"
+    rev_load_path = "../revisions";
 
     $.get(rev_load_path).then(function (data) {
         console.log("loading done !");

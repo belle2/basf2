@@ -47,9 +47,9 @@ function install_plotting_progress(rev_string, joined_revisions, progress_key, w
                         // detailed progress message
 
                         // extract information from the json dict
-                        var current_package = parseInt(ajax_result["current_package"])
-                        var total_package = parseInt(ajax_result["total_package"])
-                        var package_name = ajax_result["package_name"]
+                        var current_package = parseInt(ajax_result["current_package"]);
+                        var total_package = parseInt(ajax_result["total_package"]);
+                        var package_name = ajax_result["package_name"];
 
                         // display infos on the waiting dialog
                         $("#plot_creation_progress").text("Processing " + current_package + " of " + total_package + " packages");

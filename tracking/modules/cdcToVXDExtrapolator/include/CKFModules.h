@@ -14,6 +14,7 @@
 #include <tracking/ckf/pxd/findlets/CKFToPXDFindlet.h>
 #include <tracking/ckf/cdc/findlets/CKFToCDCFindlet.h>
 #include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
+#include <tracking/ckf/cdc/findlets/CKFToCDCFromEclFindlet.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
@@ -67,4 +68,14 @@ namespace Belle2 {
     }
   };
 
+  class ToCDCFromEclCKFModule : public TrackFindingCDC::FindletModule<CKFToCDCFromEclFindlet> {
+
+  public:
+    /// Set description
+    ToCDCFromEclCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFromEclFindlet>( {"CDCWireHitVector"})
+    {
+      setDescription("Combinatorical Kalman Filter used for extracting Ecl showers into "
+                     "CDC and create merged tracks.");
+    }
+  };
 }

@@ -68,6 +68,8 @@ namespace Belle2 {
              "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
     addParam("useFitAlgorithm", m_useFitAlgorithm,
              "Choose the fit algorithm: boost,breco, standard, standard_pxd, singleTrack, singleTrack_pxd, no ", string("standard"));
+    addParam("maskName", m_roeMaskName,
+             "Choose ROE mask to get particles from ", string(""));
     addParam("askMCInformation", m_MCInfo,
              "TRUE when requesting MC Information from the tracks performing the vertex fit", false);
     addParam("reqPXDHits", m_reqPXDHits,
@@ -666,10 +668,10 @@ namespace Belle2 {
     // REST OF EVENT MC MATCHING
     /* In this part of the code the tracks from the RestOfEvent are taken into account. The same MC analysis is performed as
      before with the exact same criteria */
-    std::vector<const Track*> ROETracks = roe->getTracks();
+    std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     int ROEGoodTracks = 0;
     bool exitROEWhile = false;
-    int ROETotalTracks = roe->getNTracks();
+    int ROETotalTracks = ROETracks.size();
     for (int i = 0; i < ROETotalTracks; i++) {
       MCParticle* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
       MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
@@ -745,7 +747,7 @@ namespace Belle2 {
 
     FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
     if (!flavorTagInfo) return false;
-    std::vector<const Track*> ROETracks = roe->getTracks();
+    std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     std::vector<float> listMomentum = flavorTagInfo->getP(); // Momentum of the tracks
     std::vector<float> listTargetP = flavorTagInfo->getTargProb(); // Probability of a track to come directly from B_tag
     std::vector<float> listCategoryP = flavorTagInfo->getCatProb(); // Probability of a track to belong to a given category
@@ -886,7 +888,7 @@ namespace Belle2 {
   {
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     if (!roe) return false;
-    std::vector<const Track*> ROETracks = roe->getTracks();
+    std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
     if (ROETracks.size() == 0) return false;
     std::vector<const Track*> fitTracks;
     for (unsigned i = 0; i < ROETracks.size(); i++) {

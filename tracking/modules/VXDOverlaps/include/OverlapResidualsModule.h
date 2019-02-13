@@ -53,14 +53,18 @@ namespace Belle2 {
     StoreArray<PXDCluster> m_pxdcluster;
     /** Array storing SVD clusters */
     StoreArray<SVDCluster> m_svdcluster;
-    /** Histograms of residuals */
+    /** Histograms of VXD ( PXD + SVD ) residuals*/
     TH1F* h_U_Res = nullptr;
     TH1F* h_V_Res = nullptr;
+    /** Histograms of PXD residuals */
     TH1F* h_U_Res_PXD = nullptr;
     TH1F* h_V_Res_PXD = nullptr;
+    /** Histograms of SVD residuals */
     TH1F* h_U_Res_SVD = nullptr;
     TH1F* h_V_Res_SVD = nullptr;
+    /** Histograms of SVD strips multiplicity */
     TH1F* h_SVDstrips_Mult = nullptr;
+    /** Histograms of SVD residuals grouped by clusters sizes */
     TH1F* h_U_Cl1Cl2_Res[10] = {nullptr};
     TH1F* h_V_Cl1Cl2_Res[10] = {nullptr};
     /** Sensor hit-maps from reconstructed u and v coordinates */

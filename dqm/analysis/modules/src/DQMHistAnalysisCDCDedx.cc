@@ -45,7 +45,6 @@ DQMHistAnalysisCDCDedxModule::~DQMHistAnalysisCDCDedxModule() { }
 
 void DQMHistAnalysisCDCDedxModule::initialize()
 {
-
   gROOT->cd(); // this seems to be important, or strange things happen
 
   B2DEBUG(1, "DQMHistAnalysisCDCDedx: initialized.");
@@ -58,26 +57,22 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   tLine->SetLineColor(4);
   tLine->SetLineStyle(9);
 
-  c_CDCdedxSigma = new TCanvas("c_CDCdedxSigma");
+  c_CDCdedxSigma = new TCanvas("CDCDedx/c_CDCdedxSigma");
 
-  c_CDCdedxMean = new TCanvas("c_CDCdedxMean");
-  h_CDCdedxMean = new TH1F("h_CDCdedxMean", "dEdx distribution", 200, 0.0, 2.0);
-  h_CDCdedxMean->SetDirectory(0);// dont mess with it, this is MY histogram
+  c_CDCdedxMean = new TCanvas("CDCDedx/c_CDCdedxMean");
+  h_CDCdedxMean = new TH1F("CDCDedx/h_CDCdedxMean", "dEdx distribution", 200, 0.0, 2.0);
+  h_CDCdedxMean->SetDirectory(0);
   h_CDCdedxMean->SetStats(false);
 
   f_fGaus = new TF1("f_Gaus", "gaus", 0.0, 2.0);
   f_fGaus->SetParameter(1, 1.00);
   f_fGaus->SetParameter(2, 0.06);
   f_fGaus->SetLineColor(kRed);
-  // f_fGaus->SetNpx(256);
-  // f_fGaus->SetNumberFitPoints(256);
-
 }
 
 
 void DQMHistAnalysisCDCDedxModule::beginRun()
 {
-  h_CDCdedxMean->Clear();
   B2DEBUG(1, "DQMHistAnalysisCDCDedx: beginRun called.");
 }
 
@@ -89,14 +84,20 @@ void DQMHistAnalysisCDCDedxModule::event()
 
 void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
 {
-  h_CDCdedxMean->Reset(); // dont sum up!!!
+
   runstatus.clear();
   tLine->Clear();
 
   TH1* hh1 = findHist("CDCDedx/hdEdx_PerRun");
   if (hh1 != NULL) {
+    //Copy bins and X ranges as well as bin-content (Clone and Copy histogram not working here)
+    h_CDCdedxMean->SetBins(int(hh1->GetXaxis()->GetNbins()), double(hh1->GetXaxis()->GetXmin()), double(hh1->GetXaxis()->GetXmax()));
+    h_CDCdedxMean->SetTitle(hh1->GetTitle());
+    for (Int_t i = 1; i <= hh1->GetXaxis()->GetNbins(); i++) {
+      h_CDCdedxMean->SetBinContent(i, hh1->GetBinContent(i));
+      h_CDCdedxMean->SetBinError(i, hh1->GetBinError(i));
+    }
 
-    h_CDCdedxMean = (TH1F*)hh1->Clone("hdEdx_PerRun");
     h_CDCdedxMean->Fit(f_fGaus, "Q");
 
     runnumber = h_CDCdedxMean->GetTitle();
@@ -119,7 +120,8 @@ void DQMHistAnalysisCDCDedxModule::computedEdxMeanSigma()
     c_CDCdedxMean->Clear();
     c_CDCdedxMean->cd();
     h_CDCdedxMean->GetXaxis()->SetRangeUser(0.0, 2.0);
-    h_CDCdedxMean->SetTitle(Form("Run #: %s, Status: %s, dEdx mean: %0.04f", runnumber.data(), runstatus.data(), dedxmean));
+    h_CDCdedxMean->SetTitle(Form("Run #: %s, Status: %s, mean: %0.04f, sigma: %0.04f", runnumber.data(), runstatus.data(), dedxmean,
+                                 dedxsigma));
     h_CDCdedxMean->SetFillColor(kYellow);
     h_CDCdedxMean->Draw("hist");
 

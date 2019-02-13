@@ -18,10 +18,11 @@
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
@@ -101,13 +102,16 @@ namespace Belle2 {
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
 
     /** Time conversion. */
-    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+    DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
     /** Channels. */
     DBObjPtr<EKLMChannels> m_Channels;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
+
+    /** Event information. */
+    StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
 
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;

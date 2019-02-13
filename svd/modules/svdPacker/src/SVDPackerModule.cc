@@ -206,7 +206,7 @@ void SVDPackerModule::event()
     m_MainHeader.trgNumber = ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF);
     m_MainHeader.trgType = 0xf;
     m_MainHeader.trgTiming = 0;
-    m_MainHeader.onebit = 0;
+    m_MainHeader.xTalk = 0;
     m_MainHeader.FADCnum = FADCorg; // write original FADC number
     m_MainHeader.evtType = 0;
 
@@ -273,7 +273,8 @@ void SVDPackerModule::event()
 
     // here goes FADC trailer
     m_FADCTrailer.FTBFlags = 0;
-    m_FADCTrailer.emPipeAddr = 0;
+    m_FADCTrailer.dataSizeCut = 0;
+    m_FADCTrailer.nullDigits = 0;
     m_FADCTrailer.fifoErrOR = 0;
     m_FADCTrailer.frameErrOR = 0;
     m_FADCTrailer.detectErrOR = 0;

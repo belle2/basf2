@@ -40,7 +40,7 @@ PXDDQMCorrModule::PXDDQMCorrModule() : HistoModule()
   //Set module properties
   setDescription("PXD DQM Correlation module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxd"));
 }
 

@@ -30,7 +30,7 @@ REG_MODULE(TRGECLDQM);
 TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
 {
 
-  _TCCluster = new TrgEclCluster();
+
   setDescription("DQM for ECL Trigger system");
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -46,7 +46,7 @@ TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
 
 TRGECLDQMModule::~TRGECLDQMModule()
 {
-  delete _TCCluster;
+
 }
 
 
@@ -149,12 +149,10 @@ void TRGECLDQMModule::event()
   //----------------------
   //
 
-  _TCCluster = new TrgEclCluster();
-  _TCCluster -> setICN(TCId, TCEnergy, TCTiming);
-  int icnfwd = _TCCluster -> getICNSub(0);
-  int icnbr = _TCCluster -> getICNSub(1);
-  int icnbwd = _TCCluster -> getICNSub(2);
-  int c = icnfwd + icnbr + icnbwd;
+  TrgEclCluster  _TCCluster ;
+  _TCCluster.setICN(TCId, TCEnergy, TCTiming);
+
+  int c = _TCCluster.getNofCluster();
   h_Cluster->Fill(c);
 
   //

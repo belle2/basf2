@@ -202,7 +202,10 @@ class ValidationRoot(object):
         """
 
         # get list of available revision
-        rev_list = get_json_object_list(self.results_folder, "revision.json")
+        rev_list = get_json_object_list(
+            self.results_folder,
+            validationpath.file_name_results_json
+        )
 
         # always add the reference revision
         combined_list = []
@@ -214,7 +217,11 @@ class ValidationRoot(object):
 
         # load and combine
         for r in rev_list:
-            full_path = os.path.join(self.results_folder, r, "revision.json")
+            full_path = os.path.join(
+                self.results_folder,
+                r,
+                validationpath.file_name_results_json
+            )
 
             # update label, if dir has been moved
             lbl_folder = get_revision_label_from_json_filename(full_path)
@@ -223,7 +230,8 @@ class ValidationRoot(object):
             combined_list.append(j)
 
         # sort by name
-        combined_list.sort(key=lambda rev: rev["label"])
+        combined_list.sort(key=lambda rev: rev["creation_date"], reverse=True)
+
         # reference always on top
         combined_list = [reference_revision] + combined_list
 

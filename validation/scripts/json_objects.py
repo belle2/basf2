@@ -347,20 +347,32 @@ class ComparisonPlot(Plot):
         )
         #: tile used to display this plot
         self.title = title
+
         #: text string for the comparison outcome
         self.comparison_result = comparison_result
+
         #: verbose text describing the outcome of the comparison
         self.comparison_text = comparison_text
+
+        if isinstance(comparison_pvalue, float):
+            pvalue_str = "{:.6f}".format(comparison_pvalue)
+        else:
+            pvalue_str = str(comparison_pvalue)
         #: the p-value computed during the comparison
-        self.comparison_pvalue = comparison_pvalue
+        self.comparison_pvalue = pvalue_str
+
         #: the p-value at below which a warning is indicated on the website
         self.comparison_pvalue_warn = comparison_pvalue_warn
+
         #: the p-value at below which an error is indicated on the website
         self.comparison_pvalue_error = comparison_pvalue_error
+
         #: the filename of the png file plotted with the comparison graphs
         self.png_filename = png_filename
+
         #: the filename of the pdf file plotted with the comparison graphs
         self.pdf_filename = pdf_filename
+
         #: path were the png and pdf files are located
         self.plot_path = plot_path
 
@@ -393,8 +405,8 @@ class ComparisonNTuple(NTuple):
         self.title = title
         #: name of contact person
         self.contact = contact
-        # : path to the json file which contains the individual numbers of
-        # : the ntuple
+        #: path to the json file which contains the individual numbers of
+        #: the ntuple
         self.json_file_path = json_file_path
 
 
@@ -422,8 +434,8 @@ class ComparisonHtmlContent(HtmlContent):
         self.title = title
         #: name of contact person
         self.contact = contact
-        # : path to the json file which contains the individual numbers of
-        # : the ntuple
+        #: path to the json file which contains the individual numbers of
+        #: the ntuple
         self.html_content = html_content
 
 

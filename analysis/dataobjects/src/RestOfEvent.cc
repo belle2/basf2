@@ -499,7 +499,7 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& mask
   ClusterUtils C;
   for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
     if (roeClusters[iEcl]->isNeutral())
-      roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl]);
+      roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl], ECLCluster::EHypothesisBit::c_nPhotons);
   }
 
   return roe4VectorECLClusters;

@@ -4,10 +4,13 @@ import basf2
 from softwaretrigger.path_functions import setup_basf2_and_db
 from softwaretrigger.path_functions import create_expressreco_path, add_expressreco_processing, finalize_expressreco_path
 
-db_on_ram = "/dev/shm/LocalDB.rel0101/database.txt"
-args = setup_basf2_and_db(dbfile=db_on_ram)
+# set basf2 settings and configure local DB access
+args = setup_basf2_and_db(dbfile="/dev/shm/LocalDB.rel0101/database.txt")
+
+# create the expressreco path and add the Ring Buffer input and DQM modules
 path = create_expressreco_path(args)
 
+# no reconstruction or software trigger added at all
 add_expressreco_processing(path, run_type="collision", do_reconstruction=False)
 
 finalize_expressreco_path(path, args, show_progress_bar=True)

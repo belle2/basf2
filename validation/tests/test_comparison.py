@@ -65,9 +65,9 @@ class TestComparison(unittest.TestCase):
         """
         random.seed(23)
 
-        # if we would at some point later want to implement several runs, we
-        # use this as a counter variable to set up different names.
-        # However not implemented yet.
+        #: if we would at some point later want to implement several runs, we
+        #: use this as a counter variable to set up different names.
+        #: However not implemented yet.
         self.call_iteration = 0
 
         p_a = self.create_profile(self.root_name("profileA"))

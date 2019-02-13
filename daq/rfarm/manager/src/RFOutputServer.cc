@@ -206,8 +206,8 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
 int RFOutputServer::Start(NSMmsg*, NSMcontext*)
 {
   // Clear RingBuffer
+  m_rbufout->forceClear();
   //  m_rbufin->forceClear();
-  //  m_rbufout->forceClear();
   return 0;
 }
 

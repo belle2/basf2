@@ -146,6 +146,9 @@ def process_dir(
     if 'LIBS' in env.Dictionary():
         del env.Dictionary()['LIBS']
 
+    if dir_name in env.get('DISABLE_COMPILER_WARNINGS', []):
+        env.AppendUnique(CXXFLAGS=['-w'], CCFLAGS=['-w'], FORTRANFLAGS=['-w'], LINKFLAGS=['-w'])
+
     # link dataobjects to analysis modules
     if dir_name == '.':
         env.Append(LIBS=['dataobjects'])

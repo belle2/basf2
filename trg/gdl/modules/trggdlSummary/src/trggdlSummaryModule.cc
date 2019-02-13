@@ -199,14 +199,11 @@ void TRGGDLSummaryModule::event()
     GDLResult->setPreScale(bit1, bit2, m_prescales->getprescales(i));
   }
 
-  /*
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
-  } else if (gtt == GDL::e_tt_top) {
-    tt = TRGSummary::TTYP_PID0;
   } else if (gtt == GDL::e_tt_ecl) {
-    tt = TRGSummary::TTYP_ECL;
+    tt = TRGSummary::TTYP_PID0;
   } else if (gtt == GDL::e_tt_dphy) {
     tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {
@@ -214,8 +211,7 @@ void TRGGDLSummaryModule::event()
   } else {
     tt = TRGSummary::TTYP_NONE;
   }
-  */
 
-  GDLResult->setTimType((TRGSummary::ETimingType)gtt);
+  GDLResult->setTimType(tt);
 
 }

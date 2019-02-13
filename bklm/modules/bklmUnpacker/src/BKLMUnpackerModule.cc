@@ -295,6 +295,8 @@ void BKLMUnpackerModule::event()
           moduleId |= (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
           BKLMDigit* bklmDigit = m_bklmDigits.appendNew(moduleId, ctime, tdc, m_scintADCOffset - charge);
+          bklmDigit->setTime(
+            m_TimeConversion->getTime(ctime, tdc, triggerCTime, layer <= 1));
           if (layer < 2 && ((m_scintADCOffset - charge) > m_scintThreshold))
             bklmDigit->isAboveThreshold(true);
 

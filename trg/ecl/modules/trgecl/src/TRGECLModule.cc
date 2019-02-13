@@ -18,6 +18,8 @@
 #include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <G4RunManager.hh>
 #include "trg/ecl/TrgEclMaster.h"

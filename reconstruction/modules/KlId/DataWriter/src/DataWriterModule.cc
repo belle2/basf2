@@ -211,6 +211,8 @@ void DataWriterModule::endRun()
 
 void DataWriterModule::event()
 {
+  // Use the neutralHadron hypothesis for the ECL
+  const ECLCluster::EHypothesisBit eclHypothesis = ECLCluster::EHypothesisBit::c_neutralHadron;
 
   for (const KLMCluster& cluster : m_klmClusters) {
 
@@ -269,13 +271,13 @@ void DataWriterModule::event()
     if (isnan(m_KLMTrackRotationAngle))   { m_KLMTrackRotationAngle   = -999;}
     if (isnan(m_KLMTrackClusterSepAngle)) { m_KLMTrackClusterSepAngle = -999;}
 
-    // findClosestECLCluster will return a c_neutralHAdron cluster (if any)
-    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
+    // findClosestECLCluster with the c_neutralHadron hypothesis
+    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos, eclHypothesis);
     ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
     m_KLMECLDist = get<1>(closestECLAndDist);
 
     if (!(closestECLCluster == nullptr)) {
-      m_KLMECLE              = closestECLCluster->getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
+      m_KLMECLE              = closestECLCluster->getEnergy(eclHypothesis);
       m_KLMECLE9oE25         = closestECLCluster->getE9oE21();
       m_KLMECLEerror         = closestECLCluster->getUncertaintyEnergy();
       m_KLMECLTerror         = closestECLCluster->getDeltaTime99();
@@ -352,11 +354,11 @@ void DataWriterModule::event()
 // ---------------   ECL CLUSTERS
   for (const ECLCluster& cluster : m_eclClusters) {
 
-    if (!m_useECL or !cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron)) {continue;}
+    if (!m_useECL or !cluster.hasHypothesis(eclHypothesis)) {continue;}
 
     m_ECLminTrkDistance = cluster.getMinTrkDistance();
     m_ECLdeltaL         = cluster.getDeltaL();
-    m_ECLE              = cluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
+    m_ECLE              = cluster.getEnergy(eclHypothesis);
     m_ECLE9oE25         = cluster.getE9oE21();
     m_ECLTiming         = cluster.getTime();
     m_ECLR              = cluster.getR();
@@ -398,7 +400,7 @@ void DataWriterModule::event()
     m_ECLZ                 = clusterPos.Z();
 
     ClusterUtils C;
-    m_ECLMom               = C.Get4MomentumFromCluster(&cluster, ECLCluster::EHypothesisBit::c_neutralHadron).Vect().Mag2();
+    m_ECLMom               = C.Get4MomentumFromCluster(&cluster, eclHypothesis).Vect().Mag2();
     m_ECLDeltaTime         = cluster.getDeltaTime99();
 
     m_ECLUncertaintyEnergy = cluster.getUncertaintyEnergy();

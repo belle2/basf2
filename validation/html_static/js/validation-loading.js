@@ -51,7 +51,7 @@ function loadValidationPlots(package_load_name, data) {
 
     let selected_list = get_selected_revs_list();
     // update the already displayed revision labels with the correct colors
-    $(".revision-label").each(function (index) {
+    $(".revision-label").each(function () {
 
         let label = $(this).text();
         // find the revision with the same label
@@ -112,10 +112,10 @@ function loadValidationPlots(package_load_name, data) {
             $("#check_show_expert_plots").button();*/
 
             // make sure changes to the viewing settings are stored right away
-            ractive.observe('show_overview', function (newValue, oldValue, keypath) {
+            ractive.observe('show_overview', function () {
                 ractive_value_preserve_session(ractive, "show_overview");
             });
-            ractive.observe('show_expert_plots', function (newValue, oldValue, keypath) {
+            ractive.observe('show_expert_plots', function () {
                 ractive_value_preserve_session(ractive, "show_expert_plots");
             });
 
@@ -137,7 +137,7 @@ function loadValidationPlots(package_load_name, data) {
         function (ractive) {
         },
         // on render
-        function (ractive) {
+        function () {
             $("#accordion_script_files").accordion({
                 heightStyle: "content"
             });
@@ -172,7 +172,7 @@ function fill_ntuple_table(dom_id, json_loading_path) {
         items.push("</tr>");
 
         // reference first, if available
-        $.each(data, function (key, val) {
+        $.each(data, function (key) {
 
             if (key === "reference") {
                 items.push("<tr>");
@@ -186,7 +186,7 @@ function fill_ntuple_table(dom_id, json_loading_path) {
         });
 
         // now the rest
-        $.each(data, function (key, val) {
+        $.each(data, function (key) {
             if (key !== "reference") {
                 items.push("<tr>");
                 items.push("<td>" + key + "</td>");
@@ -297,7 +297,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                 if (name in comparison_data_pkg2index) {
                     // Found the package in the comparison object
                     // ==> Just add the information
-                    ipkg = comparison_data_pkg2index [name];
+                    let ipkg = comparison_data_pkg2index [name];
 
                     data["packages"][ipkg]["fail_count"] = fail_count;
                     data["packages"][ipkg]["scriptfiles"] = scriptfiles;

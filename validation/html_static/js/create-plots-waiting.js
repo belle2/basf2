@@ -31,7 +31,7 @@ function install_plotting_progress(rev_string, joined_revisions, progress_key, w
                 } else {
                     // is it only a status message or a message with detailed information
                     // on the current progress ?
-                    if (ajax_result["status"] == "complete") {
+                    if (ajax_result["status"] === "complete") {
                         // is the plotting complete and the overlay can be hidden again ?
                         //loadcontent(joined_revisions, true);
                         //alert("complete !!");

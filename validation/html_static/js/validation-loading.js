@@ -2,13 +2,13 @@
  Currently that's just picking the page first in alphabetic order
  (i.e. analysis) or false if no packages are available. */
 function getDefaultPackageName(package_list) {
-    if (package_list.length == 0) {
+    if (package_list.length === 0) {
         console.debug("getDefaultPackageName: No packages available.");
         return false;
     }
 
     first_package_name = package_list[0].name;
-    if (first_package_name != 'undefined') {
+    if (first_package_name !== 'undefined') {
         return first_package_name;
     } else {
         console.debug("getDefaultPackageName: Name of first package undefined.");
@@ -56,7 +56,7 @@ function loadValidationPlots(package_load_name, data) {
         label = $(this).text();
         // find the revision with the same label
         for (i in data["revisions"]) {
-            if (data["revisions"][i].label == label) {
+            if (data["revisions"][i].label === label) {
                 $(this).css("color", data["revisions"][i].color);
             }
         }
@@ -67,13 +67,13 @@ function loadValidationPlots(package_load_name, data) {
         }
     });
 
-    if (package_load_name == "") {
+    if (package_load_name === "") {
         package_load_name = getDefaultPackageName(data["packages"]);
     }
 
     // Find data of the package by package name
     for (i in data["packages"]) {
-        if (data["packages"][i].name == package_load_name) {
+        if (data["packages"][i].name === package_load_name) {
             loaded_package = data["packages"][i];
             break;
         }
@@ -177,7 +177,7 @@ function fill_ntuple_table(dom_id, json_loading_path) {
         // reference first, if available
         $.each(data, function (key, val) {
 
-            if (key == "reference") {
+            if (key === "reference") {
                 items.push("<tr>");
                 items.push("<td>" + key + "</td>");
                 for (var fig in data[key]) {
@@ -190,7 +190,7 @@ function fill_ntuple_table(dom_id, json_loading_path) {
 
         // now the rest
         $.each(data, function (key, val) {
-            if (key != "reference") {
+            if (key !== "reference") {
                 items.push("<tr>");
                 items.push("<td>" + key + "</td>");
                 for (var fig in data[key]) {
@@ -208,7 +208,7 @@ function fill_ntuple_table(dom_id, json_loading_path) {
 function get_selected_revs_list() {
     var selected_rev = [];
     $('.reference-checkbox').each(function (i, obj) {
-        if (obj.checked == true) {
+        if (obj.checked === true) {
             selected_rev.push(obj.value)
         }
     });
@@ -235,7 +235,7 @@ function getNewestRevision(rev_data) {
 
     for (var i in rev_list) {
         // todo: have a is_reference entry
-        if (rev_list[i]["label"] != "reference") {
+        if (rev_list[i]["label"] !== "reference") {
             if (rev_list[i]["creation_date"] > newest_date) {
                 newest_date = rev_list[i]["creation_date"]
                 newest = rev_list[i]
@@ -249,7 +249,7 @@ function getNewestRevision(rev_data) {
 function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
 
     // don't event attempt to show comparisons for empty revisions
-    if (rev_string == "")
+    if (rev_string === "")
         return;
 
     // make dynamic
@@ -352,7 +352,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                 if ("packages" in data) {
                     // todo: load the package which was last time viewn by the users
                     first_package_name = getDefaultPackageName(data["packages"])
-                    if (first_package_name != false) {
+                    if (first_package_name !== false) {
                         loadValidationPlots(first_package_name, data);
                     } else {
                         console.warn("No package could be loaded.")
@@ -371,7 +371,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                         // Display sub-packages for this one.
                         if (pkgs != null) {
                             for (var ipkg in pkgs) {
-                                if (pkgs[ipkg].name == evt.context.name) {
+                                if (pkgs[ipkg].name === evt.context.name) {
                                     // disaplay this one
                                     ractive.set('packages.' + ipkg + '.display_setting', 'block');
                                     break;
@@ -412,7 +412,7 @@ function loadSelectedRevisions(data) {
     rev_string = get_selected_revs_string();
     rev_list = get_selected_revs_list();
 
-    if (rev_string == "") {
+    if (rev_string === "") {
         alert("Please select at least one tag!");
     }
 

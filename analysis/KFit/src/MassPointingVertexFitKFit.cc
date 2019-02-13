@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  * Contributors: Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  * Contributors: Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -13,12 +13,6 @@
 #include <analysis/KFit/KFitConst.h>
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitBase.h>
-
-
-#ifndef ENABLE_BACKWARDS_COMPATIBILITY
-typedef HepGeom::Point3D<double> HepPoint3D;
-#endif
-
 
 namespace Belle2 {
 

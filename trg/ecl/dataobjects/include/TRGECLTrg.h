@@ -290,6 +290,8 @@ namespace Belle2 {
     double getEtot() { return m_etot; }
     //! Get Event Timing
     double getEventTiming() { return m_eventtiming; }
+    //! Get bits for GDL
+    int getECLtoGDL(int i) { return m_bitECLtoGDL[i]; }
 
 
 

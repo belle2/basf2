@@ -94,11 +94,11 @@ namespace Belle2 {
       }
     }
 
-    // copy constructor needs to be implemented if needed as class has dynamic memory/resource allocation
-    // (as pointed out by cppcheck)
+    /** copy constructor needs to be implemented if needed as class has dynamic memory/resource allocation
+      (as pointed out by cppcheck) */
     SimpleVariableRecorder(SimpleVariableRecorder&) = delete;
-    // assignment operator ("=") needs to be implemented if needed as class has dynamic memory/resource allocation
-    // (as pointed out by cppcheck)
+    /** assignment operator ("=") needs to be implemented if needed as class has dynamic memory/resource allocation
+      (as pointed out by cppcheck)*/
     SimpleVariableRecorder& operator=(SimpleVariableRecorder&) = delete;
 
 

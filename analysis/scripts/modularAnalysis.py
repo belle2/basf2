@@ -132,7 +132,7 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
                       'MC6': True,
                       'MC7': True,
                       'default': False,
-                      'Belle': False}
+                      'Belle': True}
 
     if environmentType in environToMagneticField:
         fieldType = environToMagneticField[environmentType]
@@ -1514,10 +1514,10 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], path=analysis_main
     @param path      modules are added to this path
     """
     # if (len(inputParticlelists) < 3):
-    fillParticleList('pi+:roe_default', '', path=path)
-    fillParticleList('gamma:roe_default', '', path=path)
-    fillParticleList('K_L0:roe_default', '', path=path)
-    inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+    fillParticleList('pi+:mdst', '', path=path)
+    fillParticleList('gamma:mdst', '', path=path)
+    fillParticleList('K_L0:mdst', '', path=path)
+    inputParticlelists += ['pi+:mdst', 'gamma:mdst', 'K_L0:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)

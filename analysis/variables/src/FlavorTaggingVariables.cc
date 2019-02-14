@@ -694,9 +694,10 @@ namespace Belle2 {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
           PCmsLabTransform T;
-          TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
-          TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
-          TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+          ClusterUtils C;
+          TLorentzVector momXChargedTracks; //Momentum of charged X tracks in CMS-System
+          TLorentzVector momXChargedClusters; //Momentum of charged X clusters in CMS-System
+          TLorentzVector momXNeutralClusters; //Momentum of neutral X clusters in CMS-System
           TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
 
           double output = 0.0;
@@ -710,19 +711,17 @@ namespace Belle2 {
               const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
               const TrackFitResult* iTrack = track->getTrackFitResultWithClosestMass(charged);
               if (iTrack == nullptr) continue;
-              TLorentzVector momtrack(iTrack->getMomentum(), 0);
-              if (momtrack == momtrack) momXchargedtracks += momtrack;
+              if (track != particle->getTrack()) {
+                TLorentzVector iTrackMom = iTrack->get4Momentum();
+                if (iTrackMom == iTrackMom) momXChargedTracks += iTrackMom;
+              }
             }
             const auto& ecl = roe->getECLClusters();
-            ClusterUtils C;
             for (auto& x : ecl) {
               if (x == nullptr) continue;
               TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x);
               if (iMomECLCluster == iMomECLCluster) {
-                if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
-                else if (!(x->isNeutral())) {
-                  if (x -> getRelated<Track>() != particle->getRelated<Track>()) momXchargedclusters += iMomECLCluster;
-                }
+                if (x->isNeutral()) momXNeutralClusters += iMomECLCluster;
               }
             }
             const auto& klm = roe->getKLMClusters();
@@ -731,14 +730,14 @@ namespace Belle2 {
               TLorentzVector iMomKLMCluster = x -> getMomentum();
               if (iMomKLMCluster == iMomKLMCluster) {
                 if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
-                  momXneutralclusters += iMomKLMCluster;
+                  momXNeutralClusters += iMomKLMCluster;
                 }
               }
             }
 
-            TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-            TLorentzVector momX = T.rotateLabToCms() * (momXcharged + momXneutralclusters) -
-                                  momTarget; //Total Momentum of the recoiling X in CMS-System
+            // TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+            TLorentzVector momX = T.rotateLabToCms() * (momXChargedTracks +
+                                                        momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
             if (requestedVariable == "recoilMass") output = momX.M();
             if (requestedVariable == "recoilMassSqrd") output = momX.M2();
@@ -750,14 +749,28 @@ namespace Belle2 {
               for (auto& x : ecl) {
                 if (x == nullptr) continue;
                 float iEnergy = x -> getEnergy();
-                if (iEnergy == iEnergy) {
-                  ClusterUtils cluster_util;
-                  if ((T.rotateLabToCms() * cluster_util.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                if (x->isNeutral() && iEnergy == iEnergy) {
+                  if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
-                //       for (auto & i : klm) {
-                //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
-                //         }
               }
+              for (auto& track : tracks) {
+                if (track != particle->getTrack()) {
+                  for (const ECLCluster& chargedCluster : track->getRelationsWith<ECLCluster>()) {
+                    // ignore everything except the nPhotons hypothesis
+                    if (chargedCluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+                      continue;
+                    float iEnergy = chargedCluster.getEnergy();
+                    if (iEnergy == iEnergy) {
+                      if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                    }
+                  }
+                }
+              }
+
+              //       for (auto & i : klm) {
+              //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
+              //         }
+
               output = E_W_90;
             } else {
               B2FATAL("Wrong variable  " << requestedVariable <<

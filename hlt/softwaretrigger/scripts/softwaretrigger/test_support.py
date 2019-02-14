@@ -1,7 +1,6 @@
 import subprocess
 import os
 import sys
-import argparse
 import tempfile
 from glob import glob
 
@@ -9,33 +8,39 @@ import basf2
 import generators
 from simulation import add_simulation
 from rawdata import add_packers
-from softwaretrigger.path_functions import get_store_only_rawdata_path, DEFAULT_HLT_COMPONENTS
-from softwaretrigger.path_functions import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS
-from ROOT import Belle2
 from L1trigger import add_tsim
+from softwaretrigger.path_functions import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
+from ROOT import Belle2
 find_file = Belle2.FileSystem.findFile
-
-import ROOT
-import basf2
 
 
 class CheckForCorrectHLTResults(basf2.Module):
-    """test"""
+    """Test module for assuring correct data store content"""
 
     def event(self):
         """reimplementation of Module::event()."""
-        sft_trigger = ROOT.Belle2.PyStoreObj("SoftwareTriggerResult")
+        sft_trigger = Belle2.PyStoreObj("SoftwareTriggerResult")
 
         if not sft_trigger.isValid():
             basf2.B2FATAL("SoftwareTriggerResult object not created")
         elif len(sft_trigger.getResults()) == 0:
             basf2.B2FATAL("SoftwareTriggerResult exists but has no entries")
 
-        if not ROOT.Belle2.PyStoreObj("ROIs").isValid():
+        if not Belle2.PyStoreArray("ROIs").isValid():
             basf2.B2FATAL("ROIs are not present")
 
 
 def generate_input_file(run_type, location, output_file_name, exp_number):
+    """
+    Generate an input file for usage in the test.
+    Simulate uubar for "beam" and two muons for "cosmic" setting.
+
+    Only raw data will be stored to the given output file.
+    :param run_type: Whether to simulate cosmic or beam
+    :param location: Whether to simulate expressreco (with ROIs) or hlt (no PXD)
+    :param output_file_name: where to store the result file
+    :param exp_number: which experiment number to simulate
+    """
     if os.path.exists(output_file_name):
         return
 
@@ -52,7 +57,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
         # simulation top volume than the default geometry from the database.
         path.add_module("ParticleGun", pdgCodes=[-13, 13], momentumParams=[10, 200])
 
-    add_simulation(path, usePXDDataReduction=False)
+    add_simulation(path, usePXDDataReduction=(location == "expressreco"))
     add_tsim(path)
 
     if location == "hlt":
@@ -71,14 +76,27 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     if location == "hlt":
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")
+
+    # There us no packer for these objects :-(
     branch_names.remove("RawTRGs")
     branch_names.remove("RawFTSWs")
+
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
     basf2.process(path)
 
 
 def test_script(script_location, input_file_name, temp_dir):
+    """
+    Test a script with the given file path using the given input file.
+    Raises an exception if the execution fails or if the needed output is not in
+    the output file.
+    The results are stored in the temporary directory location.
+
+    :param script_location: the script to test
+    :param input_file_name: the file path of the input file
+    :param temp_dir: where to store and run
+    """
     input_buffer = "UNUSED"   # unused
     output_buffer = "UNUSED"  # unused
     histo_port = 6666         # unused
@@ -106,12 +124,28 @@ def test_script(script_location, input_file_name, temp_dir):
         basf2.process(test_path)
 
 
-def test_folder(location, run_type, exp_number):
+def test_folder(location, run_type, exp_number, phase):
+    """
+    Run all hlt operation scripts in a given folder
+    and test the outputs of the files.
+
+    Will call the test_script function on all files in the folder given
+    by the location after having created a suitable input file with the given
+    experiment number.
+
+    :param location: hlt or expressreco, depending on which operation files to run
+                     and which input to simulate
+    :param run_type: cosmic or beam, depending on which operation files to run
+                     and which input to simulate
+    :param exp_number: which experiment number to simulate
+    :param phase:    where to look for the operation files (will search in the folder
+                     hlt/operation/{phase}/global/{location}/evp_scripts/)
+    """
     temp_dir = tempfile.mkdtemp()
     output_file_name = os.path.join(temp_dir, f"{location}_{run_type}.root")
     generate_input_file(run_type=run_type, location=location,
                         output_file_name=output_file_name, exp_number=exp_number)
 
-    script_dir = find_file(f"hlt/operation/phase3/global/{location}/evp_scripts/")
+    script_dir = find_file(f"hlt/operation/{phase}/global/{location}/evp_scripts/")
     for script_location in glob(os.path.join(script_dir, f"{run_type}_*.py")):
         test_script(script_location, input_file_name=output_file_name, temp_dir=temp_dir)

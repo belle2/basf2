@@ -129,7 +129,8 @@ def add_hlt_processing(path,
                                                              softwaretrigger_mode=softwaretrigger_mode,
                                                              **kwargs)
         elif run_type == constants.RunTypes.cosmic:
-            basf2.B2ASSERT("There is no trigger menu for the run type cosmic!", softwaretrigger_mode == "monitor")
+            if softwaretrigger_mode != constants.SoftwareTriggerModes.monitor:
+                basf2.B2FATAL("There is no trigger menu for the run type cosmic!")
 
             accept_path = add_cosmic_softwaretrigger_reconstruction(path, components=reco_components,
                                                                     **kwargs)
@@ -150,7 +151,7 @@ def add_hlt_processing(path,
     # Normally, the payload assembler dismisses the event if the software trigger says "no"
     # However, if (a) there is is software trigger (because there is no reconstruction) or
     # (b) we are running in monitoring mode, we ignore the decision
-    pxd_ignores_hlt_decision = softwaretrigger_mode == "monitor" or not do_reconstruction
+    pxd_ignores_hlt_decision = softwaretrigger_mode == constants.SoftwareTriggerModes.monitor or not do_reconstruction
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)
 
     if prune_output:

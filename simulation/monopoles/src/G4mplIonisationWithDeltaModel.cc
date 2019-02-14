@@ -196,7 +196,7 @@ G4mplIonisationWithDeltaModel::ComputeCrossSectionPerElectron(
   G4double maxEnergy = std::min(tmax, maxKinEnergy);
   G4double cutEnergy = std::max(LowEnergyLimit(), cut);
   if (cutEnergy < maxEnergy) {
-    cross = (0.5 / cutEnergy - 0.5 / maxEnergy) * pi_hbarc2_over_mc2 * chargeSquare;
+    cross = (1.0 / cutEnergy - 1.0 / maxEnergy) * twopi_mc2_rcl2 * chargeSquare;
   }
   return cross;
 }

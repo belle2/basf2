@@ -2,7 +2,7 @@ import ROOT
 from ROOT import TCanvas, TH2F
 
 
-# Takes the output of module OverlapResiduals as input, and plots hit-maps for overlapping hits.
+# Takes the output of module OverlapResiduals as input, and plots hit-maps for overlapping VXD hits in Layer:Sensor canvases.
 def Store_LayerSensor_plots(filename):
 
     f = ROOT.TFile.Open(filename, 'read')
@@ -137,5 +137,9 @@ def Store_LayerSensor_plots(filename):
 
     return
 
+
+# Root output of module OverlapResiduals
 filename = 'VXDOverlappingHits.root'
-Store_LayerSensor_plots(filename)
+
+if __name__ == "__main__":
+    Store_LayerSensor_plots(filename)

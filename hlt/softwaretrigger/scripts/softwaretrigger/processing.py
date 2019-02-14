@@ -185,7 +185,7 @@ def add_expressreco_processing(path,
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
             add_reconstruction(path, components=reco_components, pruneTracks=False,
-                               skipGeometryAdding=True, **kwargs)
+                               skipGeometryAdding=True, add_trigger_calculation=False, **kwargs)
         elif run_type == constants.RunTypes.cosmic:
             add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False,
                                        skipGeometryAdding=True, **kwargs)

@@ -51,7 +51,8 @@ def add_softwaretrigger_reconstruction(
     add_skim_software_trigger(skim_reconstruction_path, store_array_debug_prescale)
 
     # Add the default reconstruction for now
-    reconstruction.add_reconstruction(path, skipGeometryAdding=True, pruneTracks=False, components=components, **kwargs)
+    reconstruction.add_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
+                                      add_trigger_calculation=False, components=components, **kwargs)
 
     # Add the module doing the filter decision
     hlt_filter_module = add_filter_software_trigger(path, store_array_debug_prescale)

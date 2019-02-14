@@ -35,7 +35,7 @@ inputFiles = []
 Xlim1 = 0
 Xlim2 = 999
 
-validation_path = b2.create_path()
+validation_path = b2.Path()
 
 ma.inputMdstList("default", inputFiles, path=validation_path)
 

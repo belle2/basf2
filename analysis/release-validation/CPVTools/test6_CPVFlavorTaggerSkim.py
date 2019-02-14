@@ -33,7 +33,7 @@ outRootFileName = sys.argv[2]
 
 
 # create path
-cp_val_path = b2.create_path()
+cp_val_path = b2.Path()
 
 environmentType = "default"
 
@@ -117,7 +117,7 @@ cp_val_path.add_module(skimfilter)
 
 
 # Create a new path for the skim output
-B0skim_path = b2.create_path()
+B0skim_path = b2.Path()
 # The filter provides a boolean, which is true if any of the argument particle lists are not empty
 # skimfilter.if_value('=1', B0skim_path, AfterConditionPath.CONTINUE)
 skimfilter.if_value('=0', B0skim_path)

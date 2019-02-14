@@ -62,7 +62,7 @@ if decayChannelTrainedOn == 'JPsiKs':
 # workingDirectory = '.'
 
 # create path
-ft_val_path = b2.create_path()
+cp_val_path = b2.Path()
 
 
 def setEnvironment(belleOrBelle2Flag="Belle2"):
@@ -84,7 +84,7 @@ def setEnvironment(belleOrBelle2Flag="Belle2"):
 
         environmentType = "Belle"
 
-    ma.inputMdstList(environmentType=environmentType, filelist=[], path=ft_val_path)
+    ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
 
 
 def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
@@ -95,26 +95,26 @@ def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
     """
 
     # reconstruct J/psi -> mu+ mu- decay using standard muon list and perform MC association
-    ma.fillParticleList(decayString='mu+:all', cut='', path=ft_val_path)
-    ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=ft_val_path)
-    ma.matchMCTruth(list_name='J/psi:mumu', path=ft_val_path)
+    ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)
+    ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=cp_val_path)
+    ma.matchMCTruth(list_name='J/psi:mumu', path=cp_val_path)
 
     if belleOrBelle2Flag == "Belle":
 
         # use the existent K_S0:mdst list
-        ma.matchMCTruth(list_name='K_S0:mdst', path=ft_val_path)
+        ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
 
         # reconstruct B0 -> J/psi Ks decay
-        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=ft_val_path)
+        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
 
     if belleOrBelle2Flag == "Belle2":
 
         # reconstruct Ks from standard pi+ particle list
-        ma.fillParticleList(decayString='pi+:all', cut='', path=ft_val_path)
-        ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=ft_val_path)
+        ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
+        ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
 
         # reconstruct B0 -> J/psi Ks decay
-        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=ft_val_path)
+        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
 
 
 def reconstructB2nunubar():
@@ -122,7 +122,7 @@ def reconstructB2nunubar():
     Defines the procedure to create a B0 list for the benchmark channel 'B0 -> nu_tau anti-nu_tau'
     """
 
-    ma.findMCDecay(list_name='B0:sig', decay='B0 -> nu_tau anti-nu_tau', writeOut=True, path=ft_val_path)
+    ma.findMCDecay(list_name='B0:sig', decay='B0 -> nu_tau anti-nu_tau', writeOut=True, path=cp_val_path)
 
 
 def applyCPVTools(mode='Expert'):
@@ -134,10 +134,10 @@ def applyCPVTools(mode='Expert'):
     """
 
     # perform MC matching (MC truth asociation). Always before TagV
-    ma.matchMCTruth(list_name='B0:sig', path=ft_val_path)
+    ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
     # build the rest of the event associated to the B0
-    ma.buildRestOfEvent(target_list_name='B0:sig', path=ft_val_path)
+    ma.buildRestOfEvent(target_list_name='B0:sig', inputParticlelists=[], path=cp_val_path)
 
     if mode == 'Sampler':
 
@@ -149,7 +149,7 @@ def applyCPVTools(mode='Expert'):
             belleOrBelle2=belleOrBelle2Flag,
             workingDirectory=workingDirectory,
             samplerFileId=str(fileNumber),
-            path=ft_val_path)
+            path=cp_val_path)
 
     if mode == 'Expert':
 
@@ -161,15 +161,15 @@ def applyCPVTools(mode='Expert'):
             downloadFromDatabaseIfNotfound=True,
             workingDirectory=workingDirectory,
             samplerFileId=str(fileNumber),
-            path=ft_val_path)
+            path=cp_val_path)
 
     if doVertex == 'True' or mode == 'Expert':
 
         if doVertex == 'True':
             if decayChannel == "JPsiKs":
                 vx.vertexRave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
-                              constraint='', path=ft_val_path)
-            vx.TagV(list_name='B0:sig', MCassociation='breco', path=ft_val_path)
+                              constraint='', path=cp_val_path)
+            vx.TagV(list_name='B0:sig', MCassociation='breco', path=cp_val_path)
             print("TagV will be used")
 
     # Select variables that will be stored to ntuple
@@ -200,9 +200,9 @@ def applyCPVTools(mode='Expert'):
                          filename=savingDirectory + '/' + 'B2A801-FlavorTagger' +
                          mode + str(fileNumber) + belleOrBelle2Flag + MCtype + belleData + '.root',
                          treename='B0tree',
-                         path=ft_val_path)
+                         path=cp_val_path)
 
-    ma.summaryOfLists(particleLists=['B0:sig'], path=ft_val_path)
+    ma.summaryOfLists(particleLists=['B0:sig'], path=cp_val_path)
 
 
 if mode == "Sampler" or mode == "Expert":
@@ -216,7 +216,7 @@ if mode == "Sampler" or mode == "Expert":
         reconstructB2JpsiKs_mu(belleOrBelle2Flag=belleOrBelle2Flag)
 
     applyCPVTools(mode=mode)
-    ma.process(ft_val_path)
+    ma.process(cp_val_path)
     print(b2.statistics)
 
 if mode == "Teacher":
@@ -230,4 +230,4 @@ if mode == "Teacher":
         downloadFromDatabaseIfNotfound=True,
         uploadToDatabaseAfterTraining=True,
         workingDirectory=workingDirectory,
-        path=ft_val_path)
+        path=cp_val_path)

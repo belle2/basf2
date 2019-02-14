@@ -24,14 +24,14 @@ import sys
 import os
 
 # create path
-cp_val_path = b2.create_path()
+cp_val_path = b2.Path()
 
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)
-inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst10_BGx1_b2jpsiks.root')
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst11_BGx1_b2jpsiks.root')
 ma.inputMdst(environmentType='default', filename=inputFile, path=cp_val_path)
 
-# ma.inputMdst(environmentType='default', filename='../mdst10_BGx1_b2jpsiks.root', path=cp_val_path)
+# ma.inputMdst(environmentType='default', filename='../mdst11_BGx1_b2jpsiks.root', path=cp_val_path)
 
 # Reconstruction of signal side and MC match
 ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
@@ -47,7 +47,7 @@ ma.matchMCTruth(list_name='B0:jpsiks', path=cp_val_path)
 ma.buildRestOfEvent(target_list_name='B0:jpsiks', path=cp_val_path)
 
 # Get Special GT for the flavor tagger weight files
-b2.use_central_database("analysis_AAT-parameters_release-01-02-03")
+b2.use_central_database("analysis_tools_release-03")
 
 # Flavor Tagger, Vertex of Signal Side and TagV
 ft.flavorTagger(

@@ -47,7 +47,7 @@ def stdKlongs(listtype='veryLoose', path=analysis_main):
         cutAndCopyList(
             'K_L0:loose',
             'K_L0:all',
-            'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100. and klongID_KLM > 0.04',
+            'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100. and klmClusterKlId > 0.04',
             True,
             path)
 
@@ -57,7 +57,7 @@ def stdKlongs(listtype='veryLoose', path=analysis_main):
         cutAndCopyList(
             'K_L0:tight',
             'K_L0:loose',
-            'klongID_KLM > 0.2',
+            'klmClusterKlId > 0.2',
             True,
             path)
 

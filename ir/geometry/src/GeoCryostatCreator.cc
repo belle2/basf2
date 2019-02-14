@@ -3,8 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
- *                                                                        *
+ * Contributors: Hiroyuki Nakayama                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -650,12 +649,12 @@ namespace Belle2 {
         string geo_polyconex_name = "geo_" + name + "x_name";
         string geo_polycone_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_polyconexx, *geo_polyconex, *geo_polycone;
+        G4VSolid* geo_polyconexx, *geo_polycone;
 
         if (subtract != "" && intersect != "") {
           geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, &(Z[0]), &(r[0]), &(R[0]));
-          geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
-                                                 elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
+          G4VSolid* geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
+                                                           elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
           geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo,
                                                  elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "") {

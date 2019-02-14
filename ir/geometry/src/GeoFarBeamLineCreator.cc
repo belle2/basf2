@@ -3,8 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
- *                                                                        *
+ * Contributors: Hiroyuki Nakayama, Luka Santelj                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -201,7 +200,7 @@ namespace Belle2 {
         string geo_polyconex_name = "geo_" + name + "x_name";
         string geo_polycone_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_polyconexx(NULL), *geo_polyconex(NULL), *geo_polycone(NULL);
+        G4VSolid* geo_polyconexx(NULL), *geo_polycone(NULL);
 
         if (subtract != "" || intersect != "")
           if (type == "pipe") // for pipes inner space will be created as vacuum
@@ -215,8 +214,8 @@ namespace Belle2 {
 
 
         if (subtract != "" && intersect != "") {
-          geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
-                                                 polycone.transform.inverse()*elements[subtract].transform);
+          G4VSolid* geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
+                                                           polycone.transform.inverse()*elements[subtract].transform);
           geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo,
                                                  polycone.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "")
@@ -311,7 +310,7 @@ namespace Belle2 {
         string geo_torusx_name = "geo_" + name + "x_name";
         string geo_torus_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_torusxx(NULL), *geo_torusx(NULL), *geo_torus(NULL);
+        G4VSolid* geo_torusxx(NULL), *geo_torus(NULL);
 
         if (subtract != "" || intersect != "")
           if (type == "pipe") // for pipes inner space will be created as vacuum
@@ -324,8 +323,8 @@ namespace Belle2 {
           geo_torus = new G4Torus(geo_torus_name, torus_r, torus_R, torus_RT, torus_SPHI, torus_DPHI);
 
         if (subtract != "" && intersect != "") {
-          geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo,
-                                              torus.transform.inverse()*elements[subtract].transform);
+          G4VSolid* geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo,
+                                                        torus.transform.inverse()*elements[subtract].transform);
           geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusx, elements[intersect].geo,
                                               torus.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "")
@@ -427,7 +426,6 @@ namespace Belle2 {
       new G4PVPlacement(transform_ROT, logi_GateShield, "phys_GateShield_name", &topVolume, false, 0);
 
 
-      bool radiation_study = false;
 
       //--------------
       //-   Tube (virtual tube for radiation level study)
@@ -440,6 +438,8 @@ namespace Belle2 {
       //put volume
       setColor(*logi_Tube, "#CC0000");
       //setVisibility(*logi_Tube, false);
+      bool radiation_study = false;
+      // cppcheck-suppress knownConditionTrueFalse
       if (radiation_study) {
         new G4PVPlacement(transform_ROT, logi_Tube, "phys_Tube_name", &topVolume, false, 0);
       }
@@ -607,6 +607,8 @@ namespace Belle2 {
       //logi_GateShield->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1005));
 
       //virtual material outsire gate-shield
+
+      // cppcheck-suppress knownConditionTrueFalse
       if (radiation_study) {
         logi_Tube->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1006));
       }

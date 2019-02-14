@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <display/HtmlClassInspector.h>
 
 #include <framework/utilities/HTML.h>
@@ -177,7 +187,7 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
         }
       }
       if (isPrintable) {
-        strncpy(line + kvalue, *ppointer, i);
+        strncpy(line + kvalue, *ppointer, i); //
         line[kvalue + i] = 0;
       } else {
         line[kvalue] = 0;

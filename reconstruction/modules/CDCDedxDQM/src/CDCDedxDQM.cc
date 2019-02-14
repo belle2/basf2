@@ -14,6 +14,12 @@
 
 using namespace Belle2;
 
+//import some useful namespace
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
+
 
 REG_MODULE(CDCDedxDQM)
 

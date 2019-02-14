@@ -280,7 +280,7 @@ void CDCDedxPIDModule::event()
     int tpcounter = 0;
     const std::vector< genfit::TrackPoint* >& gftrackPoints = recoTrack->getHitPointsWithMeasurement();
     for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
-         tp != gftrackPoints.end(); tp++) {
+         tp != gftrackPoints.end(); ++tp) {
       tpcounter++;
 
       // should also be possible to use this for svd and pxd hits...

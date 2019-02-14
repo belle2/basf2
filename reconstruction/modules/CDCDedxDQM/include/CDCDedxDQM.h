@@ -25,12 +25,6 @@
 #include "TDirectory.h"
 
 
-//import some useful namespace
-using std::cout;
-using std::endl;
-using std::vector;
-using std::string;
-
 namespace Belle2 {
 
   /** Extracts dE/dx information for calibration testing. Writes a ROOT file.
@@ -75,8 +69,8 @@ namespace Belle2 {
     Bool_t isHadronfile; /**< Parameter-1 to switch binning */
     TString fCollType; /**< Parameter-2 to switch binning */
 
-    TH1F* temp1D; /**< Dedx histogram per run */
-    TH2F* temp2D; /**< Dedx vs P histogram per run */
+    TH1F* temp1D{nullptr}; /**< Dedx histogram per run */
+    TH2F* temp2D{nullptr}; /**< Dedx vs P histogram per run */
 
     Int_t    nBinsdedx; /**< nbin of dedx range */
     Double_t nBinsdedxLE; /**< Lowedge of dedx */

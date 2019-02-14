@@ -4,7 +4,7 @@
 from basf2 import *
 from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_mdst_output
-from softwaretrigger.path_functions import add_softwaretrigger_reconstruction
+from softwaretrigger.softwaretrigger_reconstruction import add_softwaretrigger_reconstruction
 
 # create path
 main = create_path()

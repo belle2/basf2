@@ -15,10 +15,9 @@ from tracking import (
     add_prune_tracks,
 )
 
-from softwaretrigger import (
-    add_fast_reco_software_trigger,
-    add_hlt_software_trigger,
-    add_calibration_software_trigger,
+from softwaretrigger.path_utils import (
+    add_filter_software_trigger,
+    add_skim_software_trigger
 )
 
 import mdst
@@ -82,9 +81,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     # Add the modules calculating the software trigger cuts (but not performing them)
     if trigger_mode == "all" and (not components or (
             "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
-        add_fast_reco_software_trigger(path)
-        add_hlt_software_trigger(path)
-        add_calibration_software_trigger(path)
+        add_filter_software_trigger(path)
+        add_skim_software_trigger(path)
 
 
 def add_cosmics_reconstruction(

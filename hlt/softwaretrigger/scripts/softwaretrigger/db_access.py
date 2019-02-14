@@ -1,5 +1,4 @@
 from ROOT import Belle2
-from softwaretrigger import SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 
 
 def list_to_vector(l):

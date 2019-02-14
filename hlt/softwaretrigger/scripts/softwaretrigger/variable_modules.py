@@ -6,7 +6,6 @@ import collections
 from ROOT import Belle2
 
 from tracking.harvest.harvesting import HarvestingModule, coroutine
-from tracking.root_utils import root_save_name
 
 
 # Helper modules to get the stored information of the SoftwareTriggerModule from the data store after the processing

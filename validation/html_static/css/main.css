@@ -326,6 +326,8 @@ textarea {
     padding: 2px;
 }
 
+
+
 #menu>div {
     background: #FFF;
     border: 1px solid gray;
@@ -339,8 +341,21 @@ textarea {
     border-top-right-radius: 4px;
 }
 
-#menu div:last-child {
+#revisions div:last-child {
     border-bottom: 1px solid gray;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#packages div:last-child {
+    border-bottom: 1px solid gray;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#palette {
+    /* Need the important, else we'll be overwritten by #menu>div */
+    border-bottom: 1px solid gray !important;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 }
@@ -672,8 +687,7 @@ td.show {
 }
 
 .plot_matrix_item {
-    /* not working for some weird reason */
-    margin: 10 px;
+    margin: 0;
 }
 
 .noplots, .hidebutton {

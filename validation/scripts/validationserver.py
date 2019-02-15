@@ -312,7 +312,11 @@ class ValidationRoot(object):
         return {
             "last_restart":
                 self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],
-            "version": self.version
+            "version_restart": self.version,
+            "version_current":
+                validationfunctions.get_compact_git_hash(
+                    os.environ["BELLE2_LOCAL_DIR"]
+                )
         }
 
 

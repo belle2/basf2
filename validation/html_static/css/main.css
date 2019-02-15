@@ -501,13 +501,13 @@ textarea {
 .swatch-line{
     vertical-align: middle;
     display: block;
-    padding: 1.5px 0px 1.5px 0px;
+    padding: 2px 0 2px 0;
 }
 
 .swatch-line-header{
     vertical-align: middle;
     display: block;
-    padding: 3px 0px 3px 0px;
+    padding: 3px 0 3px 0;
 }
 
 /* Temporary workaround the inheritance from inheritance #menu div:first-child etc:
@@ -519,6 +519,7 @@ just use spans /klieret */
     border: none;
     display: inline-block;
     text-align: center;
+    vertical-align: middle;
     color: white;
     font-weight: bold;
     font-size: 13px;
@@ -527,6 +528,7 @@ just use spans /klieret */
 .swatch-text{
     line-height: 20px;
     font-size: 14px;
+    vertical-align: middle;
 }
 
 

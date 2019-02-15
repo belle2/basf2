@@ -1,33 +1,46 @@
-/* The package that is opened, when the validation page is opened.
- Currently that's just picking the page first in alphabetic order
- (i.e. analysis) or false if no packages are available. */
+/**
+ * The package that is opened, when the validation page is opened.
+ *  Currently that's just picking the page first in alphabetic order
+ *  (i.e. analysis) or false if no packages are available.
+ * @param package_list
+ * @return {*}
+ */
 function getDefaultPackageName(package_list) {
-    if (package_list.length == 0) {
-        console.debug("getDefaultPackageName: No packages available.")
+    if (package_list.length === 0) {
+        console.debug("getDefaultPackageName: No packages available.");
         return false;
     }
 
-    first_package_name = package_list[0].name
-    if (first_package_name != 'undefined') {
+    let first_package_name = package_list[0].name;
+    if (first_package_name !== 'undefined') {
         return first_package_name;
     } else {
-        console.debug("getDefaultPackageName: Name of first package undefined.")
+        console.debug("getDefaultPackageName: Name of first package undefined.");
         return false;
     }
 
 }
 
+/**
+ * Returns storage id from keypath
+ * @param keypath
+ * @return {string}
+ */
 function get_storage_id(keypath) {
-    storage_id = "validation_config_" + keypath
-    return storage_id
+    return `validation_config_${keypath}`;
 }
 
-/* the popup must be installed when the user clicks the item. If the popup
-is installed once Ractive is done creating the template the popups do not work 
-any more if the user clicked on the "Overview" checkbox because new DOM items
-get created */
+/**
+ * Gets called from plot_container, if plot is clicked.
+ * the popup must be installed when the user clicks the item. If the popup
+ * is installed once Ractive is done creating the template the popups do not work
+ * any more if the user clicked on the "Overview" checkbox because new DOM items
+ * get created
+ * @param item_id
+ */
 function trigger_popup(item_id) {
-    $('#' + item_id).magnificPopup({
+
+    $(`#${item_id}`).magnificPopup({
         type: 'inline',
         // Allow opening popup on middle mouse click. Always set it to true if
         // you don't provide alternative source in href.
@@ -35,28 +48,27 @@ function trigger_popup(item_id) {
     });
 }
 
+/**
+ * Sets up the plot containers with the correct plots corresponding to the
+ * selection of the revisions.
+ * @param package_load_name
+ * @param data
+ */
 function loadValidationPlots(package_load_name, data) {
-    console.log("loadValidationPlots: Loading plots for package '" + package_load_name + "'.");
+    console.log(`loadValidationPlots: Loading plots for package '${package_load_name}'`);
 
-    // make dynamic
-    var revCompare = get_selected_revs_string();
-    var revCompare_list = get_selected_revs_list();
-    var comparisonLoadPath = "../comparisons/" + revCompare;
-    var createComparisonUrl = "../create_comparison";
+    let loaded_package = null;
 
-    loaded_package = null;
+    console.log(`loadValidationPlots: Comparison data for package '${package_load_name}' loaded`);
 
-    console.log("loadValidationPlots: Comparison data for package '" + package_load_name + "' loaded");
-
-
-    selected_list = get_selected_revs_list();
+    let selected_list = get_selected_revs_list();
     // update the already displayed revision labels with the correct colors
-    $(".revision-label").each(function (index) {
+    $(".revision-label").each(function () {
 
-        label = $(this).text();
+        let label = $(this).text();
         // find the revision with the same label
-        for (i in data["revisions"]) {
-            if (data["revisions"][i].label == label) {
+        for (let i in data["revisions"]) {
+            if (data["revisions"][i].label === label) {
                 $(this).css("color", data["revisions"][i].color);
             }
         }
@@ -67,13 +79,13 @@ function loadValidationPlots(package_load_name, data) {
         }
     });
 
-    if (package_load_name == "") {
+    if (package_load_name === "") {
         package_load_name = getDefaultPackageName(data["packages"]);
     }
 
     // Find data of the package by package name
-    for (i in data["packages"]) {
-        if (data["packages"][i].name == package_load_name) {
+    for (let i in data["packages"]) {
+        if (data["packages"][i].name === package_load_name) {
             loaded_package = data["packages"][i];
             break;
         }
@@ -85,20 +97,18 @@ function loadValidationPlots(package_load_name, data) {
 
     // create unique ids for each plot, which can be used to create
     // links to individual plot images
-    uniq_plot_id = 1
-    for (var i in loaded_package["plotfiles"]) {
-        for (var ploti in loaded_package["plotfiles"][i]["plots"]) {
+    let uniq_plot_id = 1;
+    for (let i in loaded_package["plotfiles"]) {
+        for (let ploti in loaded_package["plotfiles"][i]["plots"]) {
             loaded_package["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
         }
     }
 
-
-    wrapped_package = {packages: [loaded_package]};
+    let wrapped_package = {packages: [loaded_package]};
 
     setupRactive("plot_container", '#content', wrapped_package, null,
         // on complete
         function (ractive) {
-            // todo: make sure the empty entries in the script accordion are properly filled
             ractive_value_recover_session(ractive, "show_overview");
             ractive_value_recover_session(ractive, "show_expert_plots");
 
@@ -112,26 +122,23 @@ function loadValidationPlots(package_load_name, data) {
             $("#check_show_expert_plots").button();*/
 
             // make sure changes to the viewing settings are stored right away
-            ractive.observe('show_overview', function (newValue, oldValue, keypath) {
+            ractive.observe('show_overview', function () {
                 ractive_value_preserve_session(ractive, "show_overview");
             });
-            ractive.observe('show_expert_plots', function (newValue, oldValue, keypath) {
+            ractive.observe('show_expert_plots', function () {
                 ractive_value_preserve_session(ractive, "show_expert_plots");
             });
 
             // check if an "empty" entry needs to be added to the script accordion
-            var count = $('.failed_script').length;
-            if (count > 0) {
+            if ( $('.failed_script').length > 0) {
                 $("#no_failed_scripts").hide();
             }
 
-            var count = $('.finished_script').length;
-            if (count > 0) {
+            if ( $('.finished_script').length > 0) {
                 $("#no_finished_scripts").hide();
             }
 
-            var count = $('.skipped_script').length;
-            if (count > 0) {
+            if ( $('.skipped_script').length > 0) {
                 $("#no_skipped_scripts").hide();
             }
 
@@ -140,7 +147,7 @@ function loadValidationPlots(package_load_name, data) {
         function (ractive) {
         },
         // on render
-        function (ractive) {
+        function () {
             $("#accordion_script_files").accordion({
                 heightStyle: "content"
             });
@@ -152,64 +159,71 @@ function loadValidationPlots(package_load_name, data) {
 }
 
 
-// Load the Ntuple json file from a server and transfer
-// it into a HTML table
+/**
+ * Load the Ntuple json file from a server and transfer
+ * it into a HTML table
+ * @param dom_id
+ * @param json_loading_path
+ */
 function fill_ntuple_table(dom_id, json_loading_path) {
     // move out of the static folder 
-    $.getJSON("../" + json_loading_path, function (data) {
-        var items = [];
+    $.getJSON(`../${json_loading_path}`, function (data) {
+        let items = [];
 
         // add header 
         items.push("<tr>");
         items.push("<th>tag</th>");
 
         // get the name of each value which is plotted
-        for (var rev in data) {
-            for (var fig in data[rev]) {
-                val_pair = data[rev][fig];
-                items.push("<th>" + val_pair[0] + "</th>");
+        for (let rev in data) {
+            for (let fig in data[rev]) {
+                let val_pair = data[rev][fig];
+                items.push(`<th>${val_pair[0]}</th>`);
             }
             break;
         }
-        ;
 
         items.push("</tr>");
 
         // reference first, if available
-        $.each(data, function (key, val) {
+        $.each(data, function (key) {
 
-            if (key == "reference") {
+            if (key === "reference") {
                 items.push("<tr>");
-                items.push("<td>" + key + "</td>");
-                for (var fig in data[key]) {
-                    val_pair = data[key][fig];
-                    items.push("<td>" + val_pair[1] + "</td>");
+                items.push(`<td>${key}</td>`);
+                for (let fig in data[key]) {
+                    let val_pair = data[key][fig];
+                    items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
             }
         });
 
         // now the rest
-        $.each(data, function (key, val) {
-            if (key != "reference") {
+        $.each(data, function (key) {
+            if (key !== "reference") {
                 items.push("<tr>");
-                items.push("<td>" + key + "</td>");
-                for (var fig in data[key]) {
-                    val_pair = data[key][fig];
-                    items.push("<td>" + val_pair[1] + "</td>");
+                items.push(`<td>${key}</td>`);
+                for (let fig in data[key]) {
+                    let val_pair = data[key][fig];
+                    items.push(`<td>${val_pair[1]}</td>`);
                 }
                 items.push("</tr>");
             }
         });
 
-        $("#" + dom_id).after(items);
+        $(`#${dom_id}`).after(items);
     });
 }
 
+/**
+ * Returns array with the names of the selected revisions.
+ * @return {Array}
+ */
 function get_selected_revs_list() {
-    var selected_rev = [];
+    let selected_rev = [];
     $('.reference-checkbox').each(function (i, obj) {
-        if (obj.checked == true) {
+        if (obj.checked === true) {
             selected_rev.push(obj.value)
         }
     });
@@ -217,28 +231,37 @@ function get_selected_revs_list() {
     return selected_rev;
 }
 
+/**
+ * Returns a string representation of the array of selected revisions.
+ * We need that to create folder names & queries
+ * @return {string}
+ */
 function get_selected_revs_string() {
-    var rev_string = ""
-    selected_rev = get_selected_revs_list();
-    for (var i in selected_rev) {
+    let rev_string = "";
+    let selected_rev = get_selected_revs_list();
+    for (let i in selected_rev) {
         if (i > 0)
-            rev_string = rev_string + "_";
-        rev_string = rev_string + selected_rev[i];
+            rev_string += "_";
+        rev_string += selected_rev[i];
     }
     return rev_string;
 }
 
+/**
+ * Return the newest revision that is included in the dataset.
+ * @param rev_data
+ * @return {*}
+ */
 function getNewestRevision(rev_data) {
-    newest = null
-    newest_date = "2000-00-00 00:00:00"
-    rev_list = rev_data["revisions"];
+    let newest = null;
+    // deliberately super early date
+    let newest_date = "2000-00-00 00:00:00";
+    let rev_list = rev_data["revisions"];
 
-
-    for (var i in rev_list) {
-        // todo: have a is_reference entry
-        if (rev_list[i]["label"] != "reference") {
+    for (let i in rev_list) {
+        if (rev_list[i]["label"] !== "reference") {
             if (rev_list[i]["creation_date"] > newest_date) {
-                newest_date = rev_list[i]["creation_date"]
+                newest_date = rev_list[i]["creation_date"];
                 newest = rev_list[i]
             }
         }
@@ -247,62 +270,73 @@ function getNewestRevision(rev_data) {
     return newest
 }
 
+/**
+ * Gets information about the comparisons and plots (generated when
+ * we generate the plots), merges it with the information about the revisions
+ * and uses that to set up the package template.
+ * If we cannot get the comparison/plot information, then the plots for the
+ * current selection of revisions haven't yet been generated and we
+ * request them.
+ * @param rev_data
+ * @param rev_string
+ * @param rev_list
+ */
 function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
 
     // don't event attempt to show comparisons for empty revisions
-    if (rev_string == "")
+    if (rev_string === "")
         return;
 
     // make dynamic
-    var comparisonLoadPath = "../comparisons/" + rev_string
-    var createComparisonUrl = "../create_comparison"
+    let comparisonLoadPath = `../comparisons/${rev_string}`;
+    let createComparisonUrl = "../create_comparison";
 
-    console.log("Loading Comparison '" + comparisonLoadPath + "'");
+    console.log(`Loading Comparison 'comparisonLoadPath'`);
 
+    // todo: This SCREAMS to be refactored in some way....
     $.get(comparisonLoadPath).done(function (data) {
-        loaded_package = null
 
         // Get the newest revision within the selection
         // to get information about failed scripts and the
         // log files
-        newest_rev = getNewestRevision(rev_data);
+        let newest_rev = getNewestRevision(rev_data);
 
-        console.debug("Newest revision is '" + newest_rev["label"] + "'")
+        console.debug(`Newest revision is '${newest_rev["label"]}'`);
 
         // enrich the comparison data with the newest revision in this comparison
-        data["newest_revision"] = newest_rev
+        data["newest_revision"] = newest_rev;
 
         // We have two sources of information for scripts and plots:
         // * The comparison object from comparisonLoadPath
-        // * The revision object from comparisonLoadPath
+        // * The revision object
         // We update the data from the comparison object with additional data
         // from the revision object.
         if (newest_rev != null) {
-            console.debug("Updating package information.")
+            console.debug("Updating package information.");
 
             // We now go through all of the packages in the revision object
             // and add the corresponding information to the comparison object.
             // object. For this we create a lookup table
             //    'package name' -> 'index in list'
             // for the comparison object.
-            comparison_data_pkg2index = {};
-            for (var index in data["packages"]) {
-                var name = data["packages"][index]["name"];
+            let comparison_data_pkg2index = {};
+            for (let index in data["packages"]) {
+                let name = data["packages"][index]["name"];
                 comparison_data_pkg2index[name] = index;
             }
 
-            for (var irev in newest_rev["packages"]) {
+            for (let irev in newest_rev["packages"]) {
 
                 // Information to be copied from the revision object:
-                var name = newest_rev["packages"][irev]["name"];
-                var fail_count = newest_rev["packages"][irev]["fail_count"];
-                var scriptfiles = newest_rev["packages"][irev]["scriptfiles"];
-                var label = newest_rev["label"];
+                let name = newest_rev["packages"][irev]["name"];
+                let fail_count = newest_rev["packages"][irev]["fail_count"];
+                let scriptfiles = newest_rev["packages"][irev]["scriptfiles"];
+                let label = newest_rev["label"];
 
                 if (name in comparison_data_pkg2index) {
                     // Found the package in the comparison object
                     // ==> Just add the information
-                    ipkg = comparison_data_pkg2index [name]
+                    let ipkg = comparison_data_pkg2index [name];
 
                     data["packages"][ipkg]["fail_count"] = fail_count;
                     data["packages"][ipkg]["scriptfiles"] = scriptfiles;
@@ -317,11 +351,11 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                     //     available, then we need to add a new item to the
                     //     package list of the comparison object).
                     console.debug(
-                        "Package '" + newest_rev["packages"][irev]["name"] +
+                        `Package '${newest_rev["packages"][irev]["name"]}` +
                         "' was found in the revision file, but not in the" +
                         "comparison file. Probably this package did not " +
                         "create a single output file."
-                    )
+                    );
                     if (newest_rev["packages"][irev]["fail_count"] > 0) {
                         console.debug(
                             "However it did have failing scripts, so we " +
@@ -329,7 +363,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                         );
                         // Create a new empty entry with the same information
                         // as above and add it to the data
-                        pkg_dict = {};
+                        let pkg_dict = {};
                         pkg_dict["name"] = name;
                         pkg_dict["fail_count"] = fail_count;
                         pkg_dict["scriptfiles"] = scriptfiles;
@@ -352,8 +386,8 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
 
                 if ("packages" in data) {
                     // todo: load the package which was last time viewn by the users
-                    first_package_name = getDefaultPackageName(data["packages"])
-                    if (first_package_name != false) {
+                    let first_package_name = getDefaultPackageName(data["packages"]);
+                    if (first_package_name !== false) {
                         loadValidationPlots(first_package_name, data);
                     } else {
                         console.warn("No package could be loaded.")
@@ -367,14 +401,14 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                         // Hide all sub-packages
                         ractive.set('packages.*.display_setting', 'none');
 
-                        pkgs = ractive.get('packages');
+                        let pkgs = ractive.get('packages');
 
                         // Display sub-packages for this one.
                         if (pkgs != null) {
-                            for (var ipkg in pkgs) {
-                                if (pkgs[ipkg].name == evt.context.name) {
+                            for (let ipkg in pkgs) {
+                                if (pkgs[ipkg].name === evt.context.name) {
                                     // disaplay this one
-                                    ractive.set('packages.' + ipkg + '.display_setting', 'block');
+                                    ractive.set(`packages.${ipkg}.display_setting`, 'block');
                                     break;
                                 }
                             }
@@ -388,7 +422,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
             });
     }).fail(function () {
 
-        console.log("Comparison " + rev_string + " does not exist yet, requesting it");
+        console.log(`Comparison '${rev_string}' does not exist yet, requesting it`);
 
         $.ajax({
             url: createComparisonUrl,
@@ -399,39 +433,49 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
                 "revision_list": rev_list
             })
         }).done(function (data) {
-            key = data["progress_key"];
+            let key = data["progress_key"];
             beginCreatePlotWait(rev_string, rev_list, key, rev_data);
         });
     });
 }
 
-/* this function call is triggered by the button 
-   under the revisions list
-*/
+/**
+ * This function call is triggered by the button under the revisions list
+ * "Load selected" and sets up the page with the new set of revisions.
+ * @param data revision data
+ */
 function loadSelectedRevisions(data) {
 
-    rev_string = get_selected_revs_string();
-    rev_list = get_selected_revs_list();
+    let rev_string = get_selected_revs_string();
+    let rev_list = get_selected_revs_list();
 
-    if (rev_string == "") {
+    if (rev_string === "") {
         alert("Please select at least one tag!");
     }
 
-    console.log("Loading rev via string " + rev_string);
+    console.log(`Loading rev via string '${rev_string}'.`);
 
     setupRactiveFromRevision(data, rev_string, rev_list);
 }
 
+/**
+ * This function gets called from the main page validation.html and sets up the
+ * page with the initial selection of revisions.
+ * @param rev_string
+ * @param rev_list
+ */
 function loadRevisions(rev_string, rev_list) {
     if (typeof rev_string === 'undefined') {
+        // fixme: shouldn't that be an empty string?
         rev_string = null;
     }
+    // fixme: this was a workaround for default values. But shouldn't rev list then also have a default value? Also note that JS support default values!
 
-    console.log("loading revisions from server");
-    rev_load_path = "../revisions"
+    console.log("Loading revisions from server");
+    let rev_load_path = "../revisions";
 
     $.get(rev_load_path).then(function (data) {
-        console.log("loading done !");
+        console.log("Loading done!");
 
         function setupRevisionLoader(ractive) {
 

@@ -1,15 +1,19 @@
 /*
-
-Support functions for using Ractive in Validation website
-
+Support functions for using Ractive on the validation website
 */
 
+// ============================================================================
+// Saving configuration to local or session storage
+// ============================================================================
+
+/**
+ * Default configuration values. This is what we use when we can't find
+ * a configuration value in localStorage and sessionStorage.
+ * @param keypath
+ * @returns  Null is returned, if no default value was set, else the default value
+ */
 function default_values(keypath) {
-    // Default configuration values. This is what we use when we can't find
-    // a configuration value in localStorage and sessionStorage.
-    // Null is returned, if no default value was set. In this case, also
-    // a warning is issued to the log.
-    var defaults = {
+    let defaults = {
         "show_overview": true,
         "show_expert_plots": false
     };
@@ -17,14 +21,18 @@ function default_values(keypath) {
         return defaults[keypath];
     } else {
         console.warn(
-            "No default value found for keypath " + keypath + ". Returning null."
+            `No default value found for keypath '${keypath}'. Returning null.`
         );
         return null;
     }
 }
 
+/**
+ * Converts a string representation back to boolean/null/string
+ * @param val the string value to be converted
+ * @returns
+ */
 function convert_string_values(val) {
-    // string representations of true and false need to be converted back
     if (val === "false") {
         return false;
     } else if (val === "true") {
@@ -38,57 +46,90 @@ function convert_string_values(val) {
     return val;
 }
 
+/**
+ * Finds value corresponding to $keypath in the sessionStorage.
+ * If the key does not exist in storage, the default value from the
+ * default_values function is taken.
+ * The value is then set in ractive using ractive.set
+ * @param ractive
+ * @param keypath
+ * @returns None
+ */
 function ractive_value_recover_session(ractive, keypath) {
-    // Finds value corresponding to $keypath in the sessionStorage.
-    // If the key does not exist in storage, the default value from the
-    // default_values function is taken.
-    // The value is then set in ractive using ractive.set
-    var key = get_storage_id(keypath);
-    var val = convert_string_values(sessionStorage.getItem(key));
+    let key = get_storage_id(keypath);
+    let val = convert_string_values(sessionStorage.getItem(key));
     if (val === null) {
         val = default_values(keypath);
         console.debug(
-            "Did not find key '" + key + "' in session storage, so it was set " +
-            "to default value '" + val + "'."
+            `Did not find key '${key}' in session storage, so it was set ` +
+            `to default value '${val}'.`
         );
     }
     ractive.set(keypath, val);
 }
 
+/**
+ * Finds value corresponding to $keypath either in the localStorage.
+ * If the key does not exist in storage, the default value from the
+ * default_values function is taken.
+ * The value is then set in ractive using ractive.set
+ * @param ractive
+ * @param keypath
+ * @returns None
+ */
 function ractive_value_recover_local(ractive, keypath) {
-    // Finds value corresponding to $keypath either in the localStorage.
-    // If the key does not exist in storage, the default value from the
-    // default_values function is taken.
-    // The value is then set in ractive using ractive.set
-    var key = get_storage_id(keypath);
-    var val = convert_string_values(localStorage.getItem(key));
+    let key = get_storage_id(keypath);
+    let val = convert_string_values(localStorage.getItem(key));
     if (val === null) {
         val = default_values(keypath);
         console.debug(
-            "Did not find key '" + key + "' in local storage, so it was set " +
-            "to default value '" + val + "'."
+            `Did not find key '${key}' in local storage, so it was set ` +
+            `to default value '${val}'.`
         );
     }
     ractive.set(keypath, val);
 }
 
-
+/**
+ * Saves value associated with $keypath in ractive to sessionStorage.
+ * @param ractive
+ * @param keypath
+ */
 function ractive_value_preserve_session(ractive, keypath) {
-    // Saves value associated with $keypath in ractive to sessionStorage.
-    var val = ractive.get(keypath);
-    var key = get_storage_id(keypath);
+    let val = ractive.get(keypath);
+    let key = get_storage_id(keypath);
     sessionStorage.setItem(key, val);
-    console.debug("Storing key " + key + " with value " + val +
-        " to session storage");
+    console.debug(`Storing key '${key}' with value '${val}' to session storage`);
 }
 
+/**
+ * Saves value associated with $keypath in ractive to localStorage.
+ * @param ractive
+ * @param keypath
+ */
 function ractive_value_preserve_local(ractive, keypath) {
-    val = ractive.get(keypath);
-    key = get_storage_id(keypath);
+    let val = ractive.get(keypath);
+    let key = get_storage_id(keypath);
     localStorage.setItem(key, val);
-    console.log("Storing key " + key + " with value " + val + " to local storage");
+    console.debug(`Storing key '${key}' with value '${val}' to local storage`);
+
 }
 
+// ============================================================================
+// Setting up ractive element from template.
+// ============================================================================
+
+/**
+ * Sets up ractive element from template
+ * @param templateName
+ * @param element
+ * @param data
+ * @param onRactiveCreated
+ * @param onRactiveTemplateComplete
+ * @param onRactiveTeardown
+ * @param onRactiveRender
+ * @param onRactiveChange
+ */
 function setupRactive(templateName,
                       element,
                       data,
@@ -98,9 +139,10 @@ function setupRactive(templateName,
                       onRactiveRender,
                       onRactiveChange) {
 
-    console.log("Setting up Ractive with template " + templateName);
-    $.get('templates/' + templateName + '.html').then(
+    console.log(`Setting up Ractive with template '${templateName}'.`);
+    $.get(`templates/${templateName}.html`).then(
         function (html_template) {
+            // IMPORTANT: DO NOT CHANGE THIS 'var' TO 'let'!
             var ractive = new Ractive({
                 // The `el` option can be a node, an ID, or a CSS selector.
                 el: element,
@@ -148,13 +190,8 @@ function setupRactive(templateName,
                 console.log("Re-Typeset all using MathJax. This took " + (t1 - t0) + "ms.")
             }
             console.log("Ractive setup with " + templateName + " complete");
-
-
         }).fail(
         function () {
-            alert("Cannot load ractive template " + templateName
-                + " from webserver.");
+            alert(`Cannot load ractive template '${templateName}' from webserver.`);
         });
 }
-
-

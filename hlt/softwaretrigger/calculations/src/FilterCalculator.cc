@@ -103,6 +103,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["eeFlat7"] = 0;
   calculationResult["eeFlat8"] = 0;
 
+  calculationResult["true"] = 1;
+  calculationResult["false"] = 0;
+
   // Some utilities
   // TODO: into constructor
   ClusterUtils cUtil;

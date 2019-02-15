@@ -15,20 +15,17 @@ using namespace SoftwareTrigger;
 
 bool FinalTriggerDecisionCalculator::getFinalTriggerDecision(const SoftwareTriggerResult& result)
 {
-  const std::string& fastRecoTotalResultName = SoftwareTriggerDBHandler::makeTotalCutName("fast_reco");
-  const std::string& hltTotalResultName = SoftwareTriggerDBHandler::makeTotalCutName("hlt");
+  const std::string& hltTotalResultName = SoftwareTriggerDBHandler::makeTotalCutName("filter");
 
-  for (const auto& cutResultWithName : result.getResults()) {
-    const std::string& resultName = cutResultWithName.first;
-    const SoftwareTriggerCutResult& cutResult = static_cast<SoftwareTriggerCutResult>(cutResultWithName.second);
-
-    if ((resultName == fastRecoTotalResultName or resultName == hltTotalResultName)
-        and cutResult == SoftwareTriggerCutResult::c_reject) {
-      return false;
-    }
+  const auto& results = result.getResults();
+  auto hltTotalResultIterator = results.find(hltTotalResultName);
+  if (hltTotalResultIterator == results.end()) {
+    return true;
   }
 
-  return true;
+  const auto& hltTotalResult = static_cast<SoftwareTriggerCutResult>(hltTotalResultIterator->second);
+
+  return hltTotalResult != SoftwareTriggerCutResult::c_reject;
 }
 
 

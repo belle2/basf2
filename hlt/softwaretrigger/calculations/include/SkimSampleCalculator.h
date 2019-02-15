@@ -11,7 +11,6 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
-#include <hlt/softwaretrigger/calculations/HLTCalculator.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -22,19 +21,15 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     /**
      * Implementation of a calculator used in the SoftwareTriggerModule
-     * to fill a SoftwareTriggerObject for selecting particles for calibration and data quality monitoring.
+     * to fill a SoftwareTriggerObject for selecting particles for skimming and data quality monitoring.
      *
      * This class implements the two main functions requireStoreArrays and doCalculation of the
      * SoftwareTriggerCalculation class.
      */
-    class CalibSampleCalculator : public SoftwareTriggerCalculation {
+    class SkimSampleCalculator : public SoftwareTriggerCalculation {
     public:
       /// Set the default names for the store object particle lists.
-      CalibSampleCalculator() {}
-
-      /// Set the default names for the store object particle lists.
-      CalibSampleCalculator(const std::vector<std::string>& prt, const std::vector<std::string>& ext) :
-        m_particlelist(prt), m_extrainfoname(ext) {}
+      SkimSampleCalculator();
 
       /// Require the particle list. We do not need more here.
       void requireStoreArrays() override;
@@ -42,25 +37,13 @@ namespace Belle2 {
       /// Actually write out the variables into the map.
       void doCalculation(SoftwareTriggerObject& calculationResult) override;
 
-
     private:
-      /** required input for ParticleList */
-      StoreObjPtr<ParticleList> m_particleList;
-
-      /** required input for monopoles*/
-      StoreArray<RecoTrack> m_recoTracksMpl;
-
-      /** the name of particle list */
-      std::vector<std::string> m_particlelist;
-
-      /** the name of extra info */
-      std::vector<std::string> m_extrainfoname;
-
-      /**
-       * Also include the variables of the HLT calculator. This is just a temporary fix
-       * until both the HLT and calibration menu is actually fixed.
-       * */
-      HLTCalculator m_hltCalculator;
+      /// Internal storage of the monopole tracks as particles.
+      StoreArray<RecoTrack> m_monopoleRecoTracks;
+      /// Internal storage of the tracks as particles.
+      StoreObjPtr<ParticleList> m_pionParticles;
+      /// Internal storage of the ECL clusters as particles.
+      StoreObjPtr<ParticleList> m_gammaParticles;
     };
   }
 }

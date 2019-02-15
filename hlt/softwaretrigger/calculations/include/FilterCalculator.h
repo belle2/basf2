@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Chris Hearty                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,31 +20,22 @@ namespace Belle2 {
      * Implementation of a calculator used in the SoftwareTriggerModule
      * to fill a SoftwareTriggerObject for doing HLT cuts.
      *
-     * This calculator exports variables needed for the HLT part
-     * of the path, e.g.
-     * * AngGTHLT
-     * * EC12CMSHLT
-     * * etc.
+     * This calculator exports variables needed for the trigger HLT part
+     * of the path.
      *
      * This class implements the two main functions requireStoreArrays and doCalculation of the
      * SoftwareTriggerCalculation class.
      */
-    class HLTCalculator : public SoftwareTriggerCalculation {
+    class FilterCalculator : public SoftwareTriggerCalculation {
     public:
       /// Set the default names for the store object particle lists.
-      HLTCalculator() : m_pionParticles("pi+:HLT"), m_gammaParticles("gamma:HLT") {}
+      FilterCalculator() {}
 
       /// Require the particle list. We do not need more here.
       void requireStoreArrays() override;
 
       /// Actually write out the variables into the map.
       void doCalculation(SoftwareTriggerObject& calculationResult) override;
-
-    private:
-      /// Internal storage of the tracks as particles.
-      StoreObjPtr<ParticleList> m_pionParticles;
-      /// Internal storage of the ECL clusters as particles.
-      StoreObjPtr<ParticleList> m_gammaParticles;
     };
   }
 }

@@ -52,10 +52,10 @@ namespace Belle2 {
 
       /**
        * Handy function to create the cut name related to the total cut result of a specific
-       * trigger stage (either fast_reco, hlt or calib) in the stored results. It is in the form
+       * trigger stage (either trigger or skim) in the stored results. It is in the form
        *   <package_identifier>&<base_name>&total_result
        *
-       * @param baseIdentifier The baseIdentifier (either fast_reco, calib or hlt)
+       * @param baseIdentifier The baseIdentifier (either trigger or skim)
        * @return then name.
        */
       static std::string makeTotalCutName(const std::string& baseIdentifier);

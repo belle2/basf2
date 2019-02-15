@@ -771,3 +771,13 @@ if __name__ == '__main__':
     pretty_print_module(__name__, "vertex", {
         repr(analysis_main): "analysis_main",
     })
+
+
+def fitPseudo(
+    list_name,
+    path=analysis_main,
+):
+    pseudofit = register_module('PseudoVertexFitter')
+    pseudofit.set_name('PseudoVertexFitter_' + list_name)
+    pseudofit.param('listName', list_name)
+    path.add_module(pseudofit)

@@ -11,33 +11,14 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <string>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-
-// DataStore
 #include <framework/database/DBObjPtr.h>
-
-// DataObjects
-#include <framework/dbobjects/BeamParameters.h>
-
-// kfitter
-#include <analysis/KFit/MassFitKFit.h>
-#include <analysis/KFit/FourCFitKFit.h>
-#include <analysis/KFit/MassVertexFitKFit.h>
-#include <analysis/KFit/VertexFitKFit.h>
-#include <analysis/KFit/MakeMotherKFit.h>
-
-// rave
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
-#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 namespace Belle2 {
 
   class Particle;
 
   /**
-   * Vertex fitter module
+   * Pseudo Vertex fitter module
    */
   class PseudoVertexFitterModule : public Module {
 
@@ -56,7 +37,6 @@ namespace Belle2 {
 
     /**
      * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
      */
     virtual void beginRun() override;
 
@@ -71,10 +51,10 @@ namespace Belle2 {
     std::string m_decayString;    /**< daughter particles selection */
 
     /**
-       * Main steering routine
-       * @param p pointer to particle
-       * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
-       */
+    * Main steering routine
+    * @param p pointer to particle
+    * @return true for successfully adding the covariance matrix
+    */
     bool add_matrix(Particle* p);
   };
 } // Belle2 namespace

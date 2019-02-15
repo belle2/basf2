@@ -119,12 +119,12 @@ def get1DBinningFromReference(name, refFileName):
     tfile = ROOT.TFile(refFileName)
     if tfile.IsOpen():
         objptr = tfile.Get(name)
-        if objptr:
+        if objptr and objptr.InheritsFrom("TH1"):
             nbins = objptr.GetNbinsX()
             x_min = objptr.GetXaxis().GetXmin()
             x_max = objptr.GetXaxis().GetXmax()
         else:
-            basf2.B2WARNING('requested object with name: ' + name + ' not found in file: ' + refFileName)
+            basf2.B2WARNING('Requested object with name: ' + name + ' not found in file: ' + refFileName + " (or not a TH1)")
     else:
         basf2.B2WARNING('Requested file: ' + refFileName + ' could not be opened')
 

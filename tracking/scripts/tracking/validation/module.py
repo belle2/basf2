@@ -29,6 +29,8 @@ import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
+import os
+
 # contains all informations necessary for track filters to decide whether
 # track will be included into the processed list of tracks
 # This class is used for both providing information on pattern reco and
@@ -124,6 +126,18 @@ class TrackingValidationModule(basf2.Module):
 
         # default binning used for resolution plots over pt
         self.resolution_pt_binning = [0.05, 0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
+
+        # If this variable is set the code will open the file with same name as the file created here
+        # and will read the binning from the TH1/TProfile with same name as the one created here. If you
+        # do not want this feature either remove the corresponding root files from the validation
+        # directory (this will trigger the default behaviour) or set the environmental variable DO_NOT_READ_BINNING
+        self.referenceFileName = None
+        if "DO_NOT_READ_BINNING" not in os.environ:
+            self.referenceFileName = os.getenv("BELLE2_LOCAL_DIR") + "/tracking/validation/" + self.output_file_name
+            basf2.B2INFO("Will read binning from: " + self.referenceFileName)
+            basf2.B2INFO("If this is not wanted set the environment variable DO_NOT_READ_BINNING or remove reference files.")
+        else:
+            basf2.B2INFO("Will not read binning from reference files.")
 
     def initialize(self):
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
@@ -427,7 +441,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
             curvature_pull_analysis = PullAnalysis('#omega', unit='1/cm',
                                                    plot_name_prefix=plot_name_prefix + '_omega',
-                                                   plot_title_postfix=self.plot_title_postfix)
+                                                   plot_title_postfix=self.plot_title_postfix,
+                                                   referenceFileName=self.referenceFileName)
 
             curvature_pull_analysis.analyse(pr_omega_truths,
                                             pr_omega_estimates,
@@ -444,7 +459,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
             curvature_pull_analysis = PullAnalysis('tan #lambda',
                                                    plot_name_prefix=plot_name_prefix + '_tan_lambda',
-                                                   plot_title_postfix=self.plot_title_postfix)
+                                                   plot_title_postfix=self.plot_title_postfix,
+                                                   referenceFileName=self.referenceFileName)
 
             curvature_pull_analysis.analyse(pr_tan_lambda_truths,
                                             pr_tan_lambda_estimates,
@@ -457,7 +473,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             # d0 pull
             curvature_pull_analysis = PullAnalysis('d0',
                                                    plot_name_prefix=plot_name_prefix + '_d0',
-                                                   plot_title_postfix=self.plot_title_postfix)
+                                                   plot_title_postfix=self.plot_title_postfix,
+                                                   referenceFileName=self.referenceFileName)
 
             curvature_pull_analysis.analyse(np.array(self.pr_d0_truths),
                                             np.array(self.pr_d0_estimates),
@@ -475,7 +492,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                         self.resolution_pt_binning,
                                                         'Pt',
                                                         plot_name_prefix=plot_name_prefix + '_d0_res',
-                                                        plot_title_postfix=self.plot_title_postfix)
+                                                        plot_title_postfix=self.plot_title_postfix,
+                                                        referenceFileName=self.referenceFileName)
             d0_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                            np.array(self.pr_d0_truths),
                                            np.array(self.pr_d0_estimates))
@@ -487,7 +505,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                         self.resolution_pt_binning,
                                                         "Pt",
                                                         plot_name_prefix=plot_name_prefix + '_z0_res',
-                                                        plot_title_postfix=self.plot_title_postfix)
+                                                        plot_title_postfix=self.plot_title_postfix,
+                                                        referenceFileName=self.referenceFileName)
             z0_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                            np.array(self.pr_z0_truths),
                                            np.array(self.pr_z0_estimates))
@@ -499,7 +518,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                            self.resolution_pt_binning,
                                                            "Pt",
                                                            plot_name_prefix=plot_name_prefix + '_omega_res',
-                                                           plot_title_postfix=self.plot_title_postfix)
+                                                           plot_title_postfix=self.plot_title_postfix,
+                                                           referenceFileName=self.referenceFileName)
             omega_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                               np.array(self.pr_omega_truths),
                                               np.array(self.pr_omega_estimates))
@@ -511,7 +531,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                         self.resolution_pt_binning,
                                                         "Pt",
                                                         plot_name_prefix=plot_name_prefix + '_pt_res',
-                                                        plot_title_postfix=self.plot_title_postfix)
+                                                        plot_title_postfix=self.plot_title_postfix,
+                                                        referenceFileName=self.referenceFileName)
             pt_resolution_analysis.analyse(np.array(self.pr_bining_pt),
                                            np.array(self.pr_pt_truths),
                                            np.array(self.pr_pt_estimates))
@@ -636,7 +657,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         if make_hist:
             # Histogram of the quantity
-            histogram = ValidationPlot(plot_name_prefix)
+            histogram = ValidationPlot(plot_name_prefix, self.referenceFileName)
             histogram.hist(xs, weights=weights)
 
             histogram.xlabel = quantity_name
@@ -670,7 +691,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
-                profile_plot = ValidationPlot(profile_plot_name)
+                profile_plot = ValidationPlot(profile_plot_name, self.referenceFileName)
                 profile_plot.profile(parameter_values,
                                      xs,
                                      weights=weights,

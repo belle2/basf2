@@ -50,6 +50,7 @@ class PullAnalysis(object):
         plot_name_prefix='',  # depricated use plot_name instead
         plot_name_postfix='',  # depricated use plot_name instead
         plot_title_postfix='',  # depricated use plot_title instead
+        referenceFileName=None  # if set binnings of plots will be read from corresponding histograms
     ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
@@ -72,6 +73,8 @@ class PullAnalysis(object):
 
         self._contact = contact
         self.plots = collections.OrderedDict()
+
+        self.referenceFileName = referenceFileName
 
     def analyse(
         self,
@@ -161,7 +164,7 @@ class PullAnalysis(object):
         if "truths" in which_plots:
             # Distribution of truths
             truths_hist_name = formatter.format(plot_name, subplot_name="truths")
-            truths_hist = ValidationPlot(truths_hist_name)
+            truths_hist = ValidationPlot(truths_hist_name, self.referenceFileName)
             truths_hist.hist(truths,
                              outlier_z_score=outlier_z_score,
                              is_expert=is_expert)
@@ -176,7 +179,7 @@ class PullAnalysis(object):
         if "estimates" in which_plots:
             # Distribution of estimates
             estimates_hist_name = formatter.format(plot_name, subplot_name="estimates")
-            estimates_hist = ValidationPlot(estimates_hist_name)
+            estimates_hist = ValidationPlot(estimates_hist_name, self.referenceFileName)
             estimates_hist.hist(estimates,
                                 outlier_z_score=outlier_z_score,
                                 is_expert=is_expert)
@@ -190,7 +193,7 @@ class PullAnalysis(object):
         if "diag_scatter" in which_plots:
             # Estimates versus truths scatter plot
             estimates_by_truths_scatter_name = formatter.format(plot_name, subplot_name="diag_scatter")
-            estimates_by_truths_scatter = ValidationPlot(estimates_by_truths_scatter_name)
+            estimates_by_truths_scatter = ValidationPlot(estimates_by_truths_scatter_name, self.referenceFileName)
             estimates_by_truths_scatter.scatter(truths,
                                                 estimates,
                                                 outlier_z_score=outlier_z_score,
@@ -204,7 +207,7 @@ class PullAnalysis(object):
         if "diag_profile" in which_plots:
             # Estimates versus truths profile plot
             estimates_by_truths_profile_name = formatter.format(plot_name, subplot_name="diag_profile")
-            estimates_by_truths_profile = ValidationPlot(estimates_by_truths_profile_name)
+            estimates_by_truths_profile = ValidationPlot(estimates_by_truths_profile_name, self.referenceFileName)
 
             # Fill residuals and correct afterwards
             estimates_by_truths_profile.profile(truths,
@@ -241,7 +244,7 @@ class PullAnalysis(object):
         if "residuals" in which_plots:
             # Distribution of the residuals
             residuals_hist_name = formatter.format(plot_name, subplot_name="residuals")
-            residuals_hist = ValidationPlot(residuals_hist_name)
+            residuals_hist = ValidationPlot(residuals_hist_name, self.referenceFileName)
             residuals_hist.hist(residuals,
                                 outlier_z_score=outlier_z_score,
                                 is_expert=is_expert)
@@ -256,7 +259,7 @@ class PullAnalysis(object):
 
             # Distribution of sigmas
             sigmas_hist_name = formatter.format(plot_name, subplot_name="sigmas")
-            sigmas_hist = ValidationPlot(sigmas_hist_name)
+            sigmas_hist = ValidationPlot(sigmas_hist_name, self.referenceFileName)
             sigmas_hist.hist(sigmas,
                              lower_bound=0,
                              outlier_z_score=outlier_z_score,
@@ -272,7 +275,7 @@ class PullAnalysis(object):
 
             # Distribution of pulls
             pulls_hist_name = formatter.format(plot_name, subplot_name="pulls")
-            pulls_hist = ValidationPlot(pulls_hist_name)
+            pulls_hist = ValidationPlot(pulls_hist_name, self.referenceFileName)
             pulls_hist.hist(pulls, outlier_z_score=outlier_z_score, is_expert=is_expert)
             pulls_hist.xlabel = "pull (" + quantity_name + ")"
             pulls_hist.title = formatter.format(plot_title, subplot_title='Pull distribution')
@@ -286,7 +289,7 @@ class PullAnalysis(object):
 
             # Distribution of p_values
             p_values_hist_name = formatter.format(plot_name, subplot_name="p-values")
-            p_values_hist = ValidationPlot(p_values_hist_name)
+            p_values_hist = ValidationPlot(p_values_hist_name, self.referenceFileName)
             p_values_hist.hist(p_values, lower_bound=0, upper_bound=1, is_expert=is_expert)
             p_values_hist.xlabel = "p-value (" + quantity_name + ")"
             p_values_hist.title = formatter.format(plot_title, subplot_title='P-value distribution')
@@ -301,7 +304,7 @@ class PullAnalysis(object):
                 # Distribution of the residuals over auxiliary variable
                 aux_residuals_hist2d_name = formatter.format(plot_name,
                                                              subplot_name="residuals over {}".format(aux_name))
-                aux_residuals_hist2d = ValidationPlot(aux_residuals_hist2d_name)
+                aux_residuals_hist2d = ValidationPlot(aux_residuals_hist2d_name, self.referenceFileName)
                 aux_residuals_hist2d.hist2d(aux_values,
                                             residuals,
                                             outlier_z_score=outlier_z_score,
@@ -318,7 +321,7 @@ class PullAnalysis(object):
                 # Distribution of the residuals over auxiliary variable
                 aux_residuals_profile_name = formatter.format(plot_name,
                                                               subplot_name="residuals profile over {}".format(aux_name))
-                aux_residuals_profile = ValidationPlot(aux_residuals_profile_name)
+                aux_residuals_profile = ValidationPlot(aux_residuals_profile_name, self.referenceFileName)
                 aux_residuals_profile.profile(aux_values,
                                               residuals,
                                               outlier_z_score=outlier_z_score,
@@ -337,7 +340,7 @@ class PullAnalysis(object):
                 # Distribution of the pulls over auxiliary variable
                 aux_pulls_hist2d_name = formatter.format(plot_name,
                                                          subplot_name="pulls over {}".format(aux_name))
-                aux_pulls_hist2d = ValidationPlot(aux_pulls_hist2d_name)
+                aux_pulls_hist2d = ValidationPlot(aux_pulls_hist2d_name, self.referenceFileName)
                 aux_pulls_hist2d.hist2d(aux_values,
                                         pulls,
                                         outlier_z_score=outlier_z_score,
@@ -354,7 +357,7 @@ class PullAnalysis(object):
                 # Distribution of the pulls over auxiliary variable
                 aux_pulls_profile_name = formatter.format(plot_name,
                                                           subplot_name="pull profile over {}".format(aux_name))
-                aux_pulls_profile = ValidationPlot(aux_pulls_profile_name)
+                aux_pulls_profile = ValidationPlot(aux_pulls_profile_name, self.referenceFileName)
                 aux_pulls_profile.profile(aux_values,
                                           pulls,
                                           outlier_z_score=outlier_z_score,

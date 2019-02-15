@@ -18,9 +18,14 @@ formatter = TolerateMissingKeyFormatter()
 
 
 class PullAnalysis(object):
+    """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
+    #: default outlier z score
     default_outlier_z_score = 5.0
+    #: default plot name
     default_plot_name = "{plot_name_prefix}_{subplot_name}{plot_name_postfix}"
+    #: default plot title
     default_plot_title = "{subplot_title} of {quantity_name}{plot_title_postfix}"
+    #: default list of plots to be created in this analysis
     default_which_plots = [
         "truths",
         "estimates",
@@ -36,6 +41,7 @@ class PullAnalysis(object):
         "aux_pull_profile",
     ]
 
+    #: if true the plots created here are declared as expert plots in the validation
     default_is_expert = True
 
     def __init__(
@@ -54,26 +60,38 @@ class PullAnalysis(object):
     ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
 
+        #: name of the quantity the analysis is performed on
         self.quantity_name = quantity_name
+        #: unit the quanitity is given in
         self.unit = unit or get_unit(quantity_name)
 
+        #: the outlier score defines in terms of how many std deviations a data point is considered as an outlier
         if outlier_z_score is None:
             self.outlier_z_score = self.default_outlier_z_score
         else:
             self.outlier_z_score = outlier_z_score
 
+        #: if true only the absolute value is compared
         self.absolute = absolute
 
+        #: name of the plot
         self.plot_name = plot_name
+        #: title of the plot
         self.plot_title = plot_title
 
+        #: prefix to be prepended to the plot name
         self.plot_name_prefix = plot_name_prefix or root_save_name(quantity_name)
+        #: post fix to be append after the plot name
         self.plot_name_postfix = plot_name_postfix
+        #: postfix to be appended after the title
         self.plot_title_postfix = plot_title_postfix
 
+        #: contact information
         self._contact = contact
+        #: dictionary to store the plots
         self.plots = collections.OrderedDict()
 
+        #: name of the reference file, if set the binnings of plots will be read from the corresponding object in that file
         self.referenceFileName = referenceFileName
 
     def analyse(
@@ -119,7 +137,7 @@ class PullAnalysis(object):
         outlier_z_score = self.outlier_z_score
 
         absolute = self.absolute
-        # Compare only the absolute value by taking the absolute of hte curvature truth
+        # Compare only the absolute value by taking the absolute of the curvature truth
         # and flip the sign of the estimate
         if absolute:
             absolute_truths = truths.copy()
@@ -371,20 +389,30 @@ class PullAnalysis(object):
 
                 self.plots['aux_pulls_profile_' + aux_name] = aux_pulls_profile
 
-        # Forward the contract to all plots by reassigning the contact.
+        #: Forward the contract to all plots by reassigning the contact.
         self.contact = self.contact
 
     @property
     def contact(self):
+        """ returns the contact """
         return self._contact
 
     @contact.setter
     def contact(self, contact):
+        """
+          sets the contact
+
+          parameters:
+          contact: new contact information
+        """
         self._contact = contact
         for validation_plot in list(self.plots.values()):
             validation_plot.contact = contact
 
     def write(self, tDirectory=None):
-        # Write all validation plot to the given Root directory
+        """ Write all validation plot to the given Root directory
+            parameters:
+            tDirectory - the root directory were to write to
+        """
         for validation_plot in list(self.plots.values()):
             validation_plot.write(tDirectory)

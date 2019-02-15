@@ -124,13 +124,13 @@ class TrackingValidationModule(basf2.Module):
         self.trackCandidatesColumnName = trackCandidatesColumnName
         self.mcTrackCandidatesColumnName = mcTrackCandidatesColumName
 
-        # default binning used for resolution plots over pt
+        #: default binning used for resolution plots over pt
         self.resolution_pt_binning = [0.05, 0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
 
-        # If this variable is set the code will open the file with same name as the file created here
-        # and will read the binning from the TH1/TProfile with same name as the one created here. If you
-        # do not want this feature either remove the corresponding root files from the validation
-        # directory (this will trigger the default behaviour) or set the environmental variable DO_NOT_READ_BINNING
+        #: If this variable is set the code will open the file with same name as the file created here
+        #: and will read the binning from the TH1/TProfile with same name as the one created here. If you
+        #: do not want this feature either remove the corresponding root files from the validation
+        #: directory (this will trigger the default behaviour) or set the environmental variable DO_NOT_READ_BINNING
         self.referenceFileName = None
         if "DO_NOT_READ_BINNING" not in os.environ:
             self.referenceFileName = os.getenv("BELLE2_LOCAL_DIR") + "/tracking/validation/" + self.output_file_name
@@ -142,7 +142,7 @@ class TrackingValidationModule(basf2.Module):
     def initialize(self):
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
-        # Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+        #: Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
         self.pr_clones_and_matches = collections.deque()
         self.pr_matches = collections.deque()
         self.pr_fakes = collections.deque()
@@ -175,9 +175,9 @@ class TrackingValidationModule(basf2.Module):
         self.mc_primaries = collections.deque()
         self.mc_d0s = collections.deque()
         self.mc_tan_lambdas = collections.deque()
-        # direction of the track in theta
+        #: direction of the track in theta
         self.mc_theta = collections.deque()
-        # direction of the track in phi
+        #: direction of the track in phi
         self.mc_phi = collections.deque()
         self.mc_pts = collections.deque()
         self.mc_hit_efficiencies = collections.deque()

@@ -107,7 +107,13 @@ def compose_axis_label(quantity_name, unit=None):
 
 
 def get1DBinningFromReference(name, refFileName):
-    """ returns nbins, lowerbound, upperbound for TH1 / TProfile with name "name" found in the file "refFileName" """
+    """ returns nbins, lowerbound, upperbound for TH1 / TProfile with name "name" found in the file "refFileName"
+
+        @param name : name of the TH1 object to be looked for in the file
+        @param refFileName : name of the reference file where the object is searched for
+
+        @return int nbin, float xmin, float xmax  of the TH1
+    """
 
     nbins = None
     x_min = None
@@ -2215,7 +2221,9 @@ class ValidationPlot(object):
         """Reassign the special attributes of the plot forwarding them to the ROOT plot."""
         # Forward the attributes to the plot by auto assignment
         self.check = self.check
+        #: contact information for this plot
         self.contact = self.contact
+        #: description of the plot
         self.description = self.description
 
         self.xlabel = self.xlabel

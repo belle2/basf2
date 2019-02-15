@@ -30,8 +30,8 @@ function get_storage_id(keypath) {
     return `validation_config_${keypath}`;
 }
 
-// todo: doc
 /**
+ * Gets called from plot_container, if plot is clicked.
  * the popup must be installed when the user clicks the item. If the popup
  * is installed once Ractive is done creating the template the popups do not work
  * any more if the user clicked on the "Overview" checkbox because new DOM items
@@ -48,9 +48,9 @@ function trigger_popup(item_id) {
     });
 }
 
-// todo: doc
 /**
- *
+ * Sets up the plot containers with the correct plots corresponding to the
+ * selection of the revisions.
  * @param package_load_name
  * @param data
  */
@@ -109,7 +109,6 @@ function loadValidationPlots(package_load_name, data) {
     setupRactive("plot_container", '#content', wrapped_package, null,
         // on complete
         function (ractive) {
-            // todo: make sure the empty entries in the script accordion are properly filled
             ractive_value_recover_session(ractive, "show_overview");
             ractive_value_recover_session(ractive, "show_expert_plots");
 
@@ -217,9 +216,8 @@ function fill_ntuple_table(dom_id, json_loading_path) {
     });
 }
 
-// todo: doc
 /**
- *
+ * Returns array with the names of the selected revisions.
  * @return {Array}
  */
 function get_selected_revs_list() {
@@ -233,9 +231,9 @@ function get_selected_revs_list() {
     return selected_rev;
 }
 
-// todo: doc
 /**
- *
+ * Returns a string representation of the array of selected revisions.
+ * We need that to create folder names & queries
  * @return {string}
  */
 function get_selected_revs_string() {
@@ -249,19 +247,18 @@ function get_selected_revs_string() {
     return rev_string;
 }
 
-// todo: doc
 /**
- *
+ * Return the newest revision that is included in the dataset.
  * @param rev_data
  * @return {*}
  */
 function getNewestRevision(rev_data) {
     let newest = null;
+    // deliberately super early date
     let newest_date = "2000-00-00 00:00:00";
     let rev_list = rev_data["revisions"];
 
     for (let i in rev_list) {
-        // todo: have a is_reference entry
         if (rev_list[i]["label"] !== "reference") {
             if (rev_list[i]["creation_date"] > newest_date) {
                 newest_date = rev_list[i]["creation_date"];
@@ -273,9 +270,13 @@ function getNewestRevision(rev_data) {
     return newest
 }
 
-// todo: doc
 /**
- *
+ * Gets information about the comparisons and plots (generated when
+ * we generate the plots), merges it with the information about the revisions
+ * and uses that to set up the package template.
+ * If we cannot get the comparison/plot information, then the plots for the
+ * current selection of revisions haven't yet been generated and we
+ * request them.
  * @param rev_data
  * @param rev_string
  * @param rev_list
@@ -307,7 +308,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
 
         // We have two sources of information for scripts and plots:
         // * The comparison object from comparisonLoadPath
-        // * The revision object from comparisonLoadPath
+        // * The revision object
         // We update the data from the comparison object with additional data
         // from the revision object.
         if (newest_rev != null) {
@@ -439,8 +440,9 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
 }
 
 /**
- * this function call is triggered by the button under the revisions list
- * @param data
+ * This function call is triggered by the button under the revisions list
+ * "Load selected" and sets up the page with the new set of revisions.
+ * @param data revision data
  */
 function loadSelectedRevisions(data) {
 
@@ -456,16 +458,18 @@ function loadSelectedRevisions(data) {
     setupRactiveFromRevision(data, rev_string, rev_list);
 }
 
-// todo: doc
 /**
- *
+ * This function gets called from the main page validation.html and sets up the
+ * page with the initial selection of revisions.
  * @param rev_string
  * @param rev_list
  */
 function loadRevisions(rev_string, rev_list) {
     if (typeof rev_string === 'undefined') {
+        // fixme: shouldn't that be an empty string?
         rev_string = null;
     }
+    // fixme: this was a workaround for default values. But shouldn't rev list then also have a default value? Also note that JS support default values!
 
     console.log("Loading revisions from server");
     let rev_load_path = "../revisions";

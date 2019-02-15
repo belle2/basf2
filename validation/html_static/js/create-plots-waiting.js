@@ -1,5 +1,5 @@
 /**
- * this function installs a timer with wait_time ( in ms ) which
+ * This function installs a timer with wait_time ( in ms ) which
  * will check for the plot creation progress on the server
  * To identify a specific plotting request, the progress_key
  * handed out by the server must be passed here
@@ -72,9 +72,9 @@ function install_plotting_progress(rev_string, joined_revisions, progress_key, w
 }
 
 
-// todo: doc
 /**
- *
+ * This function gets called from setupRactiveFromRevision, if we see that we
+ * need to generate new plots.
  * @param rev_string
  * @param joined_revisions
  * @param progress_key

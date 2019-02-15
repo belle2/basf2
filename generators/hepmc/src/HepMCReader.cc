@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/hepmc/HepMCReader.h>
+# include <generators/hepmc/HepMCReader.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -26,23 +26,39 @@ void HepMCReader::open(const string& filename)
   if (!m_input) { throw (HepMCCouldNotOpenFileError() << filename); }
 }
 
+int HepMCReader::nextValidEvent(HepMC::GenEvent& evt)
+{
+  readNextEvent(evt);
+  int eventID = evt.event_number();
+  // if eventID is not in the valid bounds get next event
+  if (eventID < m_minEvent) {
+    while (!(eventID >= m_minEvent)) {
+      readNextEvent(evt);
+      eventID = evt.event_number();
+    }
+  }
+  if (eventID > m_maxEvent) { return -999; } // went too far; there is no int nan
+  return eventID;
+}
 
 int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 {
   int eventID = -1;
 
   HepMC::GenEvent evt;
+  // read event number once
+  eventID = nextValidEvent(evt); // check if this event is in the bounds if not go to next one in bounds
+  if (eventID == -999) { throw HepMCInvalidEventError(); }
 
-  readNextEvent(evt);
-
-  eventID = evt.event_number();
   eventWeight = 1; // why is evt.weights() a std::vector?
   const int nparticles = evt.particles_size();
 
   B2DEBUG(10, "Found eventID " << eventID << " with " << nparticles << " particles.");
   //evt.print(); // print pythia event content
+
+  //this tellt the module to stop processing the events
   if (nparticles <= 0) {
-    throw (HepMCEmptyEventError() << nparticles);
+    throw (HepMCInvalidEventError() << nparticles);
   }
 
   // Fill particle graph with this event

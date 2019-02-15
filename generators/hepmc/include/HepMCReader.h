@@ -29,7 +29,7 @@ namespace Belle2 {
    *
    * The reader supports retrieving the HepMC2 information from an ascii text file as provided by for example pythia8.
    *
-   * The events are read sequentially with the option of skipping a certain number of
+   * the events are read sequentially with the option of skipping a certain number of
    * events. Random access of events is not possible.
    */
   class HepMCReader {
@@ -56,7 +56,8 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    HepMCReader(): m_nVirtual(0), m_wrongSignPz(false) {}
+    HepMCReader(const int minEvent = 0, const int maxEvent = INT_MAX): m_nVirtual(0), m_wrongSignPz(false), m_minEvent(minEvent),
+      m_maxEvent(maxEvent) {}
 
     /**
      * Destructor.
@@ -75,6 +76,11 @@ namespace Belle2 {
     void closeCurrentInputFile() {m_input.close();}
 
     /**
+     * Got to next event in bounds.
+     * Throw InvalidEventException if we went over the bounds
+     * */
+    int nextValidEvent(HepMC::GenEvent& evt);
+    /**
      * Reads the next event and stores the result in the given MCParticle graph.
      * @param graph Reference to the graph which should be filled with the information from the Hepevt file and the Reference to the event weight which can be filled from the file.
      * @return event numer if the event could be read and the number was provided in the file.
@@ -83,6 +89,8 @@ namespace Belle2 {
 
     int m_nVirtual;        /**< The number of particles in each event with a set Virtual flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
+    const int m_minEvent; /**< min event nr to process */
+    const int m_maxEvent; /**< max events to process */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
     int countEvents(const std::string& filename); /**< Count events in file */

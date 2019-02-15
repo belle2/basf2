@@ -55,7 +55,7 @@ namespace Belle2 {
     std::string m_inputFileName;   /**< The Name of the current input HepMC file. */
     uint m_iFile;                     /**< Index of the current HepMC input file. */
     int m_nVirtual;                  /**< The number of particles in each event that should be made virtual */
-    HepMCReader m_hepmcreader;           /**< An instance of the HepMC reader. */
+    std::unique_ptr<HepMCReader> m_hepmcreader;           /**< An instance of the HepMC reader. */
     MCParticleGraph m_mcParticleGraph;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
     bool m_boost2Lab;                /**< Parameter to switch on/off boost to LAB system */
@@ -64,6 +64,8 @@ namespace Belle2 {
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
+    int m_minEvent;                    /**< Start at event number x. */
+    int m_maxEvent;                    /**< Stop after processing n events. */
     int m_totalEvents;                    /**< totla number of events to read */
     int m_skipNEvents;                    /**< skip events in the file */
     DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */

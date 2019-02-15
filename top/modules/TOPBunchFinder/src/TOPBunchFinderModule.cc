@@ -138,6 +138,8 @@ namespace Belle2 {
     // output
 
     m_recBunch.registerInDataStore();
+    m_timeZeros.registerInDataStore();
+    m_timeZeros.registerRelationTo(extHits);
 
     // Configure TOP detector for reconstruction
 
@@ -177,6 +179,7 @@ namespace Belle2 {
     } else {
       m_recBunch->clearReconstructed();
     }
+    m_timeZeros.clear();
 
     // set MC truth if available
 
@@ -307,6 +310,8 @@ namespace Belle2 {
 
     // find precise T0
 
+    std::vector<Chi2MinimumFinder1D> finders;
+    std::vector<int> numPhotons;
     if (m_fineSearch) {
 
       const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
@@ -314,23 +319,32 @@ namespace Belle2 {
       double timeMax = tdc.getTimeMax() + t0Rough.position;
       double t0min = t0Rough.position - m_timeRange / 2;
       double t0max = t0Rough.position + m_timeRange / 2;
-      Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
 
       for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
+        finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
         auto& trk = topTracks[itrk];
         auto mass = masses[itrk];
         reco.setMass(mass);
         reco.reconstruct(trk);
+        numPhotons.push_back(reco.getNumOfPhotons());
         if (reco.getFlag() != 1) {
           B2ERROR("TOPBunchFinder: track is not in the acceptance -> must be a bug");
           continue;
         }
+        auto& finder = finders.back();
         const auto& binCenters = finder.getBinCenters();
         for (unsigned i = 0; i < binCenters.size(); i++) {
           double t0 = binCenters[i];
           finder.add(i, -2 * reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear));
         }
       }
+
+      if (finders.size() == 0) return; // just in case
+      auto finder = finders[0];
+      for (size_t i = 1; i < finders.size(); i++) {
+        finder.add(finders[i]);
+      }
+
       const auto& t0Fine = finder.getMinimum();
       if (m_saveHistograms) {
         m_recBunch->addHistogram(finder.getHistogram("chi2_fine_",
@@ -410,6 +424,19 @@ namespace Belle2 {
           digit.addStatus(TOPDigit::c_BunchOffsetSubtracted);
         }
       }
+    }
+
+    // store T0 of single tracks (bunchTime is subtracted)
+
+    for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
+      const auto& trk = topTracks[itrk];
+      auto& finder = finders[itrk];
+      const auto& t0trk = finder.getMinimum();
+      auto* timeZero = m_timeZeros.appendNew(trk.getModuleID(), t0trk.position - bunchTime,
+                                             t0trk.error, numPhotons[itrk]);
+      timeZero->setAssumedMass(masses[itrk]);
+      if (not t0trk.valid) timeZero->setInvalid();
+      timeZero->addRelationTo(trk.getExtHit());
     }
 
   }

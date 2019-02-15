@@ -255,9 +255,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       }
     }
   }
-  // TODO!!!!!!
-  // if (nstoreClust > 1) { std::sort(ECOMPair.rbegin(), ECOMPair.rend()); }
-
+  std::sort(selectedClusters.begin(), selectedClusters.end(), [](const auto & rhs, const auto & lhs) {
+    return lhs.energyCMS > rhs.energyCMS;
+  });
 
   // -- Bhabha and two-photon lepton preparation -- //
   for (short charge : { -1, 1}) {

@@ -3,16 +3,18 @@ from glob import glob
 import json
 import json_objects
 import os.path
-import time
 import argparse
 import logging
 import sys
 import queue
 import webbrowser
+import datetime
 from multiprocessing import Process, Queue
 from validationplots import create_plots
+import validationfunctions
 import validationpath
 import functools
+import time
 
 g_plottingProcesses = {}
 
@@ -159,6 +161,14 @@ class ValidationRoot(object):
         #: folder where the comparison plots and json result files are located
         self.comparison_folder = comparison_folder
 
+        #: Date when this object was instantiated
+        self.last_restart = datetime.datetime.now()
+
+        #: Git version
+        self.version = validationfunctions.get_compact_git_hash(
+            os.environ["BELLE2_LOCAL_DIR"]
+        )
+
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -293,6 +303,17 @@ class ValidationRoot(object):
             )
 
         return deliver_json(full_path)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def system_info(self):
+        # note: for some reason %Z doesn't work like this, so we use time.tzname
+        # for the time zone.
+        return {
+            "last_restart":
+                self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],
+            "version": self.version
+        }
 
 
 def setup_gzip_compression(path, cherry_config):

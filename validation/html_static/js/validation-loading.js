@@ -453,3 +453,17 @@ function loadRevisions(rev_string, rev_list) {
         setupRactive("revision", '#revisions', data, null, setupRevisionLoader);
     });
 }
+
+function setSystemInfo() {
+    console.log("Setting system info.");
+    $.get("../system_info").done(
+        function(data) {
+            setupRactive("system_info", '#systeminfo', data);
+        }
+
+    ).fail(
+        function (){
+            console.warn("Could not get system info.")
+        }
+    );
+}

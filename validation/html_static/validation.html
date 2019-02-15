@@ -60,9 +60,11 @@
                 		<img src="images/bug.png" alt="Report Bug">&nbsp; Report Bug
 					</a>
 				</div>
-				<div class="menuhead" id="palette">
+				<div class="menuhead">
 					<img src="images/list.png" alt="Palette">
 					&nbsp;Palette
+				</div>
+				<div class="trivial-submenu" id="palette">
 					<div class="swatch-line-header">Non-expert plot</div>
 					<div>
 						<span class="swatch" id="swatch-fail-nonexpert">x</span>
@@ -98,6 +100,12 @@
 						<span class="swatch-text">No comparison</span>
 					</div>
 				</div>
+				<div class="menuhead">
+					<img src="images/link.png" alt="systeminfo">&nbsp; System Info
+				</div>
+				<div class="system-submenu" id="systeminfo">
+					Loading...
+				</div>
 			</div>
 
 		</div>
@@ -127,7 +135,8 @@
 
 	<script type="text/javascript">
 	$( document ).ready(function() {
-	    console.log("Document loaded, starting RestAPI calls");            
+	    console.log("Document loaded, starting RestAPI calls");
+		setSystemInfo();
 		loadRevisions();
 	});
 	</script>

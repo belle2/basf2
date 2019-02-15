@@ -699,6 +699,11 @@ td.show {
     width: 100%;
 }
 
+.trivial-submenu {
+    background: #f5f5f5 !important;
+    border-top: 1px solid gray;
+}
+
 .submenu {
     background: #f5f5f5 !important;
     border-top: 1px solid gray;

@@ -38,24 +38,57 @@ SVDLocalCalibrationsCheckModule::SVDLocalCalibrationsCheckModule() : Module()
 
   // Parameter definitions
   addParam("outputPdfName", m_outputPdfName, "output pdf filename", std::string("SVDLocalCalibrationsCheck.pdf"));
+  addParam("referenceID", m_idFileNameREF, "ID of REFERENCE xml file.",
+           std::string("refID"));
+  addParam("checkID", m_idFileNameCHECK, "ID of CHECK xml file.",
+           std::string("checkID"));
   addParam("reference_root", m_rootFileNameREF, "Name of REFERENCE root file.",
-           std::string("SVDLocalCalibrationMonitor_experiment5_run92.root"));
+           std::string("/home/svd/calibrationQA/autoCalibrationCheck/tmp_files/SVDLocalCalibrationsMonitor_ref.root"));
   addParam("check_root", m_rootFileNameCHECK, "Name of CHECK root file.",
-           std::string("SVDLocalCalibrationMonitor_experiment5_run408.root"));
+           std::string("/home/svd/calibrationQA/autoCalibrationCheck/tmp_files/SVDLocalCalibrationsMonitor_check.root"));
   addParam("plotGoodAPVs", m_plotGoodAPVs, "If true draw 1D plots also for good APVs", bool(false));
 
-  addParam("cutN_outliers", m_cutN_out, "Max number of outliers allowed", int(0));
-  addParam("cutNoise_average", m_cutNoise_ave, "Max relative deviation of average noise per APV", float(0.1));
-  addParam("cutNoise_outliers", m_cutNoise_out, "Max relative deviation of single strip", float(0.3));
-  addParam("cutCalPeakADC_average", m_cutCalpeakADC_ave, "Max relative deviation of average CalPeakADC per APV", float(0.02));
-  addParam("cutCalPeakADC_outliers", m_cutCalpeakADC_out, "Max relative deviation of single strip", float(0.3));
-  addParam("cutPedestal_average", m_cutPedestal_ave, "Max relative deviation of average pedestal per APV", float(0.03));
-  addParam("cutPedestal_outliers", m_cutPedestal_out, "Max relative deviation of single strip", float(0.3));
+  addParam("cutN_outliers", m_cutN_out, "Max number of outliers allowed", int(5));
+  addParam("cutNoise_average", m_cutNoise_ave, "Max deviation of average noise per APV, in ADC", float(0.1));
+  addParam("cutNoise_outliers", m_cutNoise_out, "Max deviation of single strip, in ADC", float(2));
+  addParam("cutCalPeakADC_average", m_cutCalpeakADC_ave, "Max deviation of average CalPeakADC per APV, in ADC", float(4));
+  addParam("cutCalPeakADC_outliers", m_cutCalpeakADC_out, "Max deviation of single strip, in ADC", float(10));
+  addParam("cutPedestal_average", m_cutPedestal_ave, "Max deviation of average pedestal per APV, in ADC", float(4));
+  addParam("cutPedestal_outliers", m_cutPedestal_out, "Max deviation of single strip, in ADC", float(10));
 
+}
+
+void SVDLocalCalibrationsCheckModule::printConfiguration()
+{
+  B2INFO("SVD Local Calibration Check Configuration");
+  B2INFO("-----------------------------------------");
+  B2INFO("");
+  B2INFO("- input files:");
+  B2INFO("        reference: " << m_idFileNameREF);
+  B2INFO("            check: " << m_idFileNameCHECK);
+  B2INFO("- output file:");
+  B2INFO("         output pdf: " << m_outputPdfName);
+  B2INFO("");
+  B2INFO("- analysis parameters:");
+  B2INFO("           outliers (Noise, Pedestal, CalPeakADC)");
+  B2INFO("              max allowed outliers = " << m_cutN_out);
+  B2INFO("           Noise");
+  B2INFO("              max difference on the APV averages = " << m_cutNoise_ave << " ADC");
+  B2INFO("              max to mark a strip as outlier = " << m_cutNoise_out << " ADC");
+  B2INFO("           CalPeakADC");
+  B2INFO("              max difference on the APV averages = " << m_cutCalpeakADC_ave << " ADC");
+  B2INFO("              max to mark a strip as outlier = " << m_cutCalpeakADC_out << " ADC");
+  B2INFO("           Pedestal");
+  B2INFO("              max difference on the APV averages = " << m_cutPedestal_ave << " ADC");
+  B2INFO("              max to mark a strip as outlier = " << m_cutPedestal_out << " ADC");
+  B2INFO("--------------------------------------------------------------");
+  B2INFO("");
 }
 
 void SVDLocalCalibrationsCheckModule::beginRun()
 {
+
+  printConfiguration();
 
   gStyle->SetOptStat(0);
   gStyle->SetLegendBorderSize(0);
@@ -110,10 +143,11 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   m_h2NoiseCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Noise");
 
   TH1F template_noise("noiseDIFF_L@layerL@ladderS@sensor@view@apv",
-                      //         "Noise Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                       "Noise Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                      200, -1, 1);
-  template_noise.GetXaxis()->SetTitle("( ref - check ) / ref");
+                      //                      200, -1, 1);
+                      200, -5, 5);
+  //  template_noise.GetXaxis()->SetTitle("( ref - check ) / ref");
+  template_noise.GetXaxis()->SetTitle("ref - check (ADC)");
   m_hNoiseDIFF = new SVDAPVHistograms<TH1F>(template_noise);
   setAPVHistoStyles(m_hNoiseDIFF);
   m_hNoiseSummary = new SVDSummaryPlots("noiseSummary@view", "Number of problematic APV chips due to Noise for @view/@side Side");
@@ -142,8 +176,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   TH1F template_calpeakADC("calpeakADCDIFF_L@layerL@ladderS@sensor@view@apv",
                            //         "CalpeakADC Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                            "CalPeakADC Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                           500, -0.5, 0.5);
-  template_calpeakADC.GetXaxis()->SetTitle("( ref - check ) / ref");
+                           400, -20, 20);
+  template_calpeakADC.GetXaxis()->SetTitle("ref - check (ADC)");
   m_hCalpeakADCDIFF = new SVDAPVHistograms<TH1F>(template_calpeakADC);
   setAPVHistoStyles(m_hCalpeakADCDIFF);
   m_hCalpeakADCSummary = new SVDSummaryPlots("calPeakADCSummary@view",
@@ -155,10 +189,11 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   m_h2PedestalCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Pedestal");
 
   TH1F template_pedestal("pedestalDIFF_L@layerL@ladderS@sensor@view@apv",
-                         //         "Pedestal Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
                          "Pedestal Deviation Distribution in @layer.@ladder.@sensor @view/@side",
-                         100, -0.5, 0.5);
-  template_pedestal.GetXaxis()->SetTitle("( ref - check ) / ref");
+                         //                         100, -0.5, 0.5);
+                         100, -15, 15);
+  //  template_pedestal.GetXaxis()->SetTitle("( ref - check ) / ref");
+  template_pedestal.GetXaxis()->SetTitle("( ref - check)  (ADC)");
   m_hPedestalDIFF = new SVDAPVHistograms<TH1F>(template_pedestal);
   setAPVHistoStyles(m_hPedestalDIFF);
   m_hPedestalSummary = new SVDSummaryPlots("pedestalSummary@view",
@@ -180,16 +215,16 @@ void SVDLocalCalibrationsCheckModule::event()
     float diff = 0;
 
 
-    diff = (m_noiseREF - m_noiseCHECK) / m_noiseREF;
+    diff = (m_noiseREF - m_noiseCHECK);// / m_noiseREF;
     m_hNoiseDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
 
     diff = (m_calPeakTimeREF - m_calPeakTimeCHECK) / m_calPeakTimeREF;
     m_hCalpeakTimeDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
 
-    diff = (m_calPeakADCREF - m_calPeakADCCHECK) / m_calPeakADCREF;
+    diff = (m_calPeakADCREF - m_calPeakADCCHECK);// / m_calPeakADCREF;
     m_hCalpeakADCDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
 
-    diff = (m_pedestalREF - m_pedestalCHECK) / m_pedestalREF;
+    diff = (m_pedestalREF - m_pedestalCHECK);// / m_pedestalREF;
     m_hPedestalDIFF->fill(theVxdID, (int)m_sideREF, (int)m_stripREF / 128, diff);
   }
 
@@ -382,10 +417,16 @@ void SVDLocalCalibrationsCheckModule::printFirstPage()
   pt_input_title->SetShadowColor(0);
   pt_input_title->SetBorderSize(0);
   pt_input_title->SetTextSize(0.03);
-  sprintf(input, "reference = %s",  m_rootFileNameREF.c_str());
+  if (m_idFileNameREF == "refID")
+    sprintf(input, "reference rootfile = %s",  m_rootFileNameREF.c_str());
+  else
+    sprintf(input, " reference ID = %s",  m_idFileNameREF.c_str());
   pt_input->AddText(input);
   ((TText*)pt_input->GetListOfLines()->Last())->SetTextColor(kRed);
-  sprintf(input, "calibration = %s", m_rootFileNameCHECK.c_str());
+  if (m_idFileNameCHECK == "checkID")
+    sprintf(input, "calibration rootfile = %s", m_rootFileNameCHECK.c_str());
+  else
+    sprintf(input, "calibration ID = %s", m_idFileNameCHECK.c_str());
   pt_input->AddText(input);
   ((TText*)pt_input->GetListOfLines()->Last())->SetTextColor(kBlue);
   pt_input->SetTextSize(0.02);
@@ -410,34 +451,34 @@ void SVDLocalCalibrationsCheckModule::printFirstPage()
   // NOISE
   sprintf(cuts, "  Noise: an APV is problematic if 1. or 2. or 3.");
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutNoise_ave);
+  sprintf(cuts, "         1. abs(ref_ave - check_ave) > %1.2f ADC",  m_cutNoise_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with a value %1.2f higher than the value of the ref calibration",  m_cutN_out,
+  sprintf(cuts, "         2. more than %d strips with a value %1.2f ADC higher than the value of the ref calibration",  m_cutN_out,
           m_cutNoise_out);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         3. more than %d strips with a value %1.2f lower than the value of the ref calibration",  m_cutN_out,
+  sprintf(cuts, "         3. more than %d strips with a value %1.2f ADC lower than the value of the ref calibration",  m_cutN_out,
           m_cutNoise_out);
   pt_cuts->AddText(cuts);
   // CALPEAK ADC
   sprintf(cuts, "  CalPeakADC: an APV is problematic if 1. or 2. or 3.");
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutCalpeakADC_ave);
+  sprintf(cuts, "         1. abs(ref_ave - check_ave) > %1.2f ADC",  m_cutCalpeakADC_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with a value %1.2f higher than the value of the ref calibration",  m_cutN_out,
+  sprintf(cuts, "         2. more than %d strips with a value %1.1f ADC higher than the value of the ref calibration",  m_cutN_out,
           m_cutCalpeakADC_out);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         3. more than %d strips with a value %1.2f lower than the value of the ref calibration",  m_cutN_out,
+  sprintf(cuts, "         3. more than %d strips with a value %1.1f ADC lower than the value of the ref calibration",  m_cutN_out,
           m_cutCalpeakADC_out);
   pt_cuts->AddText(cuts);
   // PEDESTAL
   sprintf(cuts, "  Pedestal: an APV is problematic if 1. or 2. or 3.");
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.2f",  m_cutPedestal_ave);
+  sprintf(cuts, "         1. abs( (ref_ave - check_ave) / ref_ave) ) > %1.1f ADC",  m_cutPedestal_ave);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         2. more than %d strips with a value %1.2f higher than the value of the ref calibration",  m_cutN_out,
+  sprintf(cuts, "         2. more than %d strips with a value %1.1f ADC higher than the value of the ref calibration",  m_cutN_out,
           m_cutPedestal_out);
   pt_cuts->AddText(cuts);
-  sprintf(cuts, "         3. more than %d strips with a value %1.2f lower than the value of the ref calibration",  m_cutN_out,
+  sprintf(cuts, "         3. more than %d strips with a value %1.1f ADC lower than the value of the ref calibration",  m_cutN_out,
           m_cutPedestal_out);
   pt_cuts->AddText(cuts);
   sprintf(cuts,
@@ -460,7 +501,7 @@ void SVDLocalCalibrationsCheckModule::printFirstPage()
 
   TPaveText* pt_tag_title = new TPaveText(.05, .03, .95, .07);
   char tag[100];
-  sprintf(tag, "analysis algorithm ID 0.0");
+  sprintf(tag, "analysis algorithm ID 1.0");
   pt_tag_title->AddText(tag);
   //  pt_tag_title->SetTextFont(62);
   pt_tag_title->SetShadowColor(0);
@@ -688,7 +729,7 @@ int SVDLocalCalibrationsCheckModule::hasAnyProblem(TH1F* h, float cutAve, float 
 {
 
   float average = h->GetMean();
-  if (average > cutAve)
+  if (abs(average) > cutAve)
     return 1;
 
   TAxis* xaxis = h->GetXaxis();

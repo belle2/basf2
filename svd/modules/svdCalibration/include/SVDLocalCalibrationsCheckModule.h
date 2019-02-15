@@ -121,6 +121,9 @@ namespace Belle2 {
     std::string m_rootFileNameREF = "SVDLocalCalibrationMonitor_experiment5_run92.root";   /**< root file name REFERENCE*/
     std::string m_rootFileNameCHECK = "SVDLocalCalibrationMonitor_experiment5_run408.root";   /**< root file name CHECK*/
 
+    std::string m_idFileNameREF = "refID";   /**< ID of the xml file name REFERENCE*/
+    std::string m_idFileNameCHECK = "checkID";   /**< ID of the xml file name CHECK*/
+
     std::string m_outputPdfName = "SVDLocalCalibrationCheck.pdf"; /**< output pdf filename*/
 
     bool m_plotGoodAPVs = false; /**< if true also the good APVs are plotted on the DIFF canvas*/
@@ -135,6 +138,8 @@ namespace Belle2 {
     float m_cutPedestal_out = -1; /**< maximum relative deviation strip  (pedestal)*/
 
   private:
+
+    void printConfiguration();
 
     const int m_apvColors[6] = { 1, 2, 8 , kBlue, 6, 28}; /**< color palette*/
     void   setAPVHistoStyles(SVDAPVHistograms<TH1F>* m_APVhistos); /**< set style of APV histograms*/

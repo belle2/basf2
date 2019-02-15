@@ -31,22 +31,29 @@
 					<table width="100%" border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 					    <td width="36%" align="left"><img id="menu_main_logo" src="images/belle2-logo.png"></td>
-					    <td align="left" id="menu_main_text">Belle II <br\>Validation</td>
+					    <td align="left" id="menu_main_text">Belle II <br>Validation</td>
 					  </tr>
 					</table>
-					<div><a class='blue_link' href="https://confluence.desy.de/display/BI/Software+Validation">Read the friendly Manual</a></div>
 				</div>
 				<div class='revisions menuhead'>
 					<img src="images/list.png" alt="Tags">&nbsp; Tags
 				</div>
-				<div id='revisions' class='submenu'
+				<div id='revisions' class='submenu underlineditems'
 					style='display: block; position: relative;'>
 				Loading ...
 				</div>
 				
-				<div class='JIRA menuhead'><a href="https://agira.desy.de/browse/BII-3309">
-				    <img src="images/link.png" alt="JIRA issue">&nbsp; JIRA issue</a>
-				  <div><a class='blue_link' href="https://confluence.desy.de/display/BI/Validation+Monitoring%2C+How-to">How-to for SWQShifters</a></div>
+				<div class='menuhead'>
+					<img src="images/link.png" alt="JIRA issue">&nbsp; Useful links
+
+				</div>
+				<div class="trivial-submenu">
+						<div><a href="https://confluence.desy.de/display/BI/Software+Validation">Read the friendly Manual</a></div>
+						<div><a href="https://confluence.desy.de/display/BI/News">News</a></div>
+						<div><a href="https://confluence.desy.de/display/BI/Validation+FAQ">FAQ</a></div>
+						<div><a href="https://confluence.desy.de/display/BI/Validation+Monitoring%2C+How-to">How-to for SWQShifters</a></div>
+						<div><a href="https://agira.desy.de/browse/BII-3309">JIRA Issue</a></div>
+						<div><a target="_blank" href="https://agira.desy.de/secure/CreateIssue!default.jspa">Report Bug</a></div>
 				</div>
 
 				<div class='packages menuhead'>
@@ -55,17 +62,14 @@
 				<div id='packages' class='packages_submenu'>
 				Loading ...
 				</div>
-                <div class='menuhead reportbug'>
-					<a target="_blank" href="https://agira.desy.de/secure/CreateIssue!default.jspa">
-                		<img src="images/bug.png" alt="Report Bug">&nbsp; Report Bug
-					</a>
-				</div>
-				<div class="menuhead">
+				<div class="menuhead" >
 					<img src="images/list.png" alt="Palette">
 					&nbsp;Palette
+				</div>
+				<div class="trivial-submenu " id="palette">
 					<div class="swatch-line-header">Non-expert plot</div>
 					<div>
-						<span class="swatch" id="swatch-fail-nonexpert">&#10060;</span>
+						<span class="swatch" id="swatch-fail-nonexpert">x</span>
 						<span class="swatch-text">Comparison Fail</span>
 					</div>
 					<div class="swatch-line">
@@ -73,7 +77,7 @@
 						<span class="swatch-text">Comparison Warn</span>
 					</div>
 					<div class="swatch-line">
-						<span class="swatch" id="swatch-pass-nonexpert">&#10004;</span>
+						<span class="swatch" id="swatch-pass-nonexpert">o</span>
 						<span class="swatch-text">Comparison Pass</span>
 					</div>
 					<div class="swatch-line">
@@ -82,7 +86,7 @@
 					</div>
 					<div class="swatch-line-header">Expert plot</div>
 					<div class="swatch-line">
-						<span class="swatch" id="swatch-fail">&#10060;</span>
+						<span class="swatch" id="swatch-fail">x</span>
 						<span class="swatch-text">Comparison Fail</span>
 					</div>
 					<div class="swatch-line">
@@ -90,13 +94,19 @@
 						<span class="swatch-text">Comparison Warn</span>
 					</div>
 					<div class="swatch-line">
-						<span class="swatch" id="swatch-pass">&#10004;</span>
+						<span class="swatch" id="swatch-pass">o</span>
 						<span class="swatch-text">Comparison Pass</span>
 					</div>
 					<div class="swatch-line">
 						<span class="swatch" id="swatch-nocomp">?</span>
 						<span class="swatch-text">No comparison</span>
 					</div>
+				</div>
+				<div class="menuhead">
+					<img src="images/link.png" alt="systeminfo">&nbsp; System Info
+				</div>
+				<div class="system-submenu" id="systeminfo">
+					Loading...
 				</div>
 			</div>
 
@@ -127,7 +137,8 @@
 
 	<script type="text/javascript">
 	$( document ).ready(function() {
-	    console.log("Document loaded, starting RestAPI calls");            
+	    console.log("Document loaded, starting RestAPI calls");
+		setSystemInfo();
 		loadRevisions();
 	});
 	</script>

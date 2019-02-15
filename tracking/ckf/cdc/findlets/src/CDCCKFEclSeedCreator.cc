@@ -61,7 +61,7 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 
     // choose photon hypothesis since electrons not used?! Talk to Torben.
     if (shower.getHypothesisId() != ECLShower::c_nPhotons) {
-      return;
+      continue;
     }
 
     const double Eclus  = shower.getEnergy();

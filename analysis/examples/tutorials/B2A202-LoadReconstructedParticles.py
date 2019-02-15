@@ -65,7 +65,7 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts(path=my_path)
 stdPi0s(listtype='looseFit', path=my_path)
-stdKlongs(listtype='loose', path=my_path)  # also creates the 'all' list with no cuts
+stdKlongs(listtype='all', path=my_path)  # only create the 'all' list with no cuts
 
 # print contents of the DataStore after loading Particles
 ma.printDataStore()
@@ -86,7 +86,6 @@ ma.printList('anti-p-:good', False, path=my_path)
 ma.printList('K_S0:all', False, path=my_path)
 ma.printList('pi0:looseFit', False, path=my_path)
 ma.printList('K_L0:all', False, path=my_path)
-ma.printList('K_L0:loose', False, path=my_path)
 
 
 # Select variables that we want to store to ntuple

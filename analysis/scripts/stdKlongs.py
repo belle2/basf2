@@ -34,30 +34,40 @@ def stdKlongs(listtype='veryLoose', path=analysis_main):
     # loose KLs, removes buggy KLM clusters
     elif listtype == 'veryLoose':
         stdKlongs('all', path)
+        selection = 'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100.'
+        B2WARNING("The standard Klong lists are not studied or optimised yet. ")
+        B2WARNING("Beware that anything more complex than the 'all' list may not work as desired (or at all).")
+        B2WARNING("You will have the following cuts applied: %s" % selection)
         cutAndCopyList(
             'K_L0:veryLoose',
             'K_L0:all',
-            'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100.',
+            selection,
             True,
             path)
 
     # additional cuts on KL_ID
     elif listtype == 'loose':
         stdKlongs('all', path)
+        selection = 'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100. and klmClusterKlId > 0.04'
+        B2WARNING("The standard Klong lists are not studied or optimised yet. ")
+        B2WARNING("Beware that anything more complex than the 'all' list may not work as desired (or at all).")
+        B2WARNING("You will have the following cuts applied: %s" % selection)
         cutAndCopyList(
             'K_L0:loose',
             'K_L0:all',
-            'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100. and klmClusterKlId > 0.04',
+            selection,
             True,
             path)
 
     # additional cuts on KL_ID
     elif listtype == 'tight':
         stdKlongs('loose', path)
+        tight_selection = 'klmClusterKlId > 0.2'
+        B2WARNING("With the following additional tight selection: %s" % tight_selection)
         cutAndCopyList(
             'K_L0:tight',
             'K_L0:loose',
-            'klmClusterKlId > 0.2',
+            tight_selection,
             True,
             path)
 

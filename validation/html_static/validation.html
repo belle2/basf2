@@ -31,7 +31,7 @@
 					<table width="100%" border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 					    <td width="36%" align="left"><img id="menu_main_logo" src="images/belle2-logo.png"></td>
-					    <td align="left" id="menu_main_text">Belle II <br\>Validation</td>
+					    <td align="left" id="menu_main_text">Belle II <br>Validation</td>
 					  </tr>
 					</table>
 				</div>
@@ -102,6 +102,12 @@
 						<span class="swatch-text">No comparison</span>
 					</div>
 				</div>
+				<div class="menuhead">
+					<img src="images/link.png" alt="systeminfo">&nbsp; System Info
+				</div>
+				<div class="system-submenu" id="systeminfo">
+					Loading...
+				</div>
 			</div>
 
 		</div>
@@ -131,7 +137,8 @@
 
 	<script type="text/javascript">
 	$( document ).ready(function() {
-	    console.log("Document loaded, starting RestAPI calls");            
+	    console.log("Document loaded, starting RestAPI calls");
+		setSystemInfo();
 		loadRevisions();
 	});
 	</script>

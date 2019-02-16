@@ -104,6 +104,28 @@ class SummarizeTriggerVariables(PickleHarvestingModule):
         """
         yield {identifier: value for identifier, value in variables.get()}
 
+
+class SoftwareTriggerOverview(basf2.Module):
+    """Write out the final results (summed over all events) into the output file in pickled format"""
+
+    def __init__(self, output_file_name):
+        super().__init__()
+
+        self.trigger_results = collections.defaultdict(int)
+        self.output_file_name = output_file_name
+
+    def event(self):
+        result = Belle2.PyStoreObj("SoftwareTriggerResult")
+        for identifier, result in result.getResults():
+            self.trigger_results[identifier] += (result != 0)
+
+        self.trigger_results["events"] += 1
+
+    def terminate(self):
+        with open(self.output_file_name, "wb") as f:
+            pickle.dump(self.trigger_results, f)
+
+
 if __name__ == "__main__":
     path = basf2.create_path()
 

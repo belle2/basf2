@@ -17,10 +17,10 @@ namespace Belle2 {
     public:
       /**
        * Calculate the final cut decision using all "total_results" of all sub triggers in the software trigger
-       * (fast reco and HLT). The return value is a bool, which has the values accept (true) and reject (false):
-       * * accept if and only if both the fast_reco and the HLT has accepted the event or (in the case HLT was not
-       *   already evaluated) fast_reco accepted the event. The event is also accepted if none of the triggers have run.
-       * * reject if fast_reco or HLT rejected the event
+       * (trigger and skim). The return value is a bool, which has the values accept (true) and reject (false):
+       * * accept if and only if the trigger stage has accepted the event.
+       *   The event is also accepted if none of the triggers have run.
+       * * reject if the trigger stage rejected the event
        */
       static bool getFinalTriggerDecision(const SoftwareTriggerResult& result);
 

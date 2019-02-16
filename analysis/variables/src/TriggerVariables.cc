@@ -255,21 +255,10 @@ namespace Belle2 {
       // for HLT, a c_accept is a pass and all other cases are fail
       // see mdst/dataobjects/include/SoftwareTriggerResult.h
       std::vector<std::string> hardcodedname
-        = { "software_trigger_cut&hlt&total_result" };
+        = { "software_trigger_cut&trigger&total_result" };
       double swtcr = softwareTriggerResult(hardcodedname)(p);
       if (swtcr > 0.5) return 1.0; // 1
       else             return 0.0; // 0 or -1
-    }
-
-    double passesAnyFastRecoTrigger(const Particle* p)
-    {
-      // for fast reco, a c_accept and c_noResult is a pass, c_reject is a fail
-      // see mdst/dataobjects/include/SoftwareTriggerResult.h
-      std::vector<std::string> hardcodedname
-        = { "software_trigger_cut&fast_reco&total_result" };
-      double swtcr = softwareTriggerResult(hardcodedname)(p);
-      if (swtcr < -0.5) return 0.0; // -1
-      else              return 1.0; // 1 or 0
     }
 
     //-------------------------------------------------------------------------
@@ -299,12 +288,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult,
                       "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
                       "defined as reject (-1), accept (1), or noResult (0). Note "
-                      "that the meanings of these change depending if using FastReco "
-                      "or the HLT, hence expert.");
+                      "that the meanings of these change depending if using trigger "
+                      "or the skim stage, hence expert.");
     REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
                       "[Eventbased] 1.0 if event passes the HLT trigger, 0.0 if not");
-    REGISTER_VARIABLE("FastRecoTrigger", passesAnyFastRecoTrigger,
-                      "[Eventbased] 1.0 if event passes the fastreco trigger, 0.0 if not");
     //-------------------------------------------------------------------------
   }
 }

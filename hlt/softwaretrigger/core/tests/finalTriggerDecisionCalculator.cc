@@ -112,11 +112,11 @@ namespace Belle2 {
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // No total results should not change anything.
-      result.addResult(SoftwareTriggerDBHandler::makeFullCutName("fast_reco", "some_cut"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeFullCutName("trigger", "some_cut"), SoftwareTriggerCutResult::c_reject);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // fast reco has accepted -> accept
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("trigger"), SoftwareTriggerCutResult::c_accept);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // filter has rejected -> reject

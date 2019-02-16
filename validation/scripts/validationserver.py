@@ -68,7 +68,7 @@ def deliver_json(file_name):
     return data
 
 
-def create_revsion_key(revision_names):
+def create_revision_key(revision_names):
     """
     Create a string key out of a revision list, which is handed to tho browser
     in form of a progress key
@@ -107,7 +107,7 @@ def start_plotting_request(revision_names, results_folder):
     Start a new comparison between the supplied revisions
     """
 
-    rev_key = create_revsion_key(revision_names)
+    rev_key = create_revision_key(revision_names)
 
     # still running a plotting for this combination ?
     if rev_key in g_plottingProcesses:

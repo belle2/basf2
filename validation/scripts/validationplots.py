@@ -976,19 +976,17 @@ def create_plots(revisions=None, force=False, process_queue=None,
     if not revisions:
         revisions = []
 
-    # Retrieve the desired revisions from the command line arguments and store
-    # them in 'revisions'
-    if revisions:
-        # Loop over all revisions given on the command line
-        for revision in revisions:
-            # If it is a valid (i.e. available) revision, append it to the list
-            # of revisions that we will include in our plots
-            # 'reference' needs to be treated
-            # separately, because it is always a viable option, but will never
-            # be listed in 'available_revisions()'
-            if revision not in available_revisions(work_folder) \
-                    and not revision == 'reference':
-                revisions.pop(revision)
+    # Loop over all revisions given on the command line
+    for revision in revisions:
+        # If it is a valid (i.e. available) revision, append it to the list
+        # of revisions that we will include in our plots
+        # 'reference' needs to be treated
+        # separately, because it is always a viable option, but will never
+        # be listed in 'available_revisions()'
+        if revision not in available_revisions(work_folder) \
+                and not revision == 'reference':
+            print("Warning: Removing invalid revision '{}'.".format(revision))
+            revisions.pop(revision)
 
     # In case no valid revisions were given, fall back to default and use all
     # available revisions and reference. The order should now be [reference,

@@ -10,40 +10,128 @@ from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 
 from validationplots import create_plots
+import validationfunctions
 
-# Only execute the program if a basf2 release is set up!
-if os.environ.get('BELLE2_RELEASE', None) is None:
-    sys.exit('Error: No basf2 release set up!')
 
-# Define the accepted command line flags and read them in
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-r",
-    "--revisions",
-    help="Takes a list of revisions (separated by spaces) and generates the "\
-         "plots for them",
-    type=str, nargs='*')
-parser.add_argument(
-    "-f",
-    "--force",
-    help="Regenerates plots even if the requested combination exists already",
-    action='store_true'
-)
-args = parser.parse_args()
+def cli():
+    """ Define the accepted command line flags and read them in """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-r",
+        "--revisions",
+        help="Takes a list of revisions (separated by spaces) and generates "
+             "the plots for them",
+        type=str,
+        nargs='*'
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        help="Regenerates plots even if the requested combination exists "
+             "already",
+        action='store_true'
+    )
+    parser.add_argument(
+        "--popular",
+        help="Creates several sets of plots for popular combinations of "
+             "revisions.",
+        action="store_true",
+        dest="popular"
+    )
 
-# Go to the html directory and call the create_plots function
-save_dir = os.path.abspath(os.getcwd())
+    return parser.parse_args()
 
-if not os.path.exists("results"):
-    print("Please run b2validation before running b2validation-plots.")
-    sys.exit(164)
 
-if not os.path.exists("html"):
-    os.mkdir("html")
+def get_popular_revision_combinations(work_folder):
+    """ Returns several combinations of available revisions that we might
+    want to pre-build on the server.
 
-os.chdir('html')
+    Returns:
+        List[List of revisions (str)]
+    """
+    available = validationfunctions.available_revisions(work_folder)
+    available_releases = sorted([
+        revision for revision in available
+        if revision.startswith("release")
+    ])
+    available_builds = sorted([
+        revision for revision in available
+        if revision.startswith("build")
+    ])
+    available_nightlies = sorted([
+        revision for revision in available
+        if revision.startswith("nightly")
+    ])
 
-create_plots(revisions=args.revisions, force=args.force, work_folder=save_dir)
+    # Return value
+    ret = [
+        # All revisions
+        ["reference"] + available,
 
-# restore original working directory
-os.chdir(save_dir)
+        # Latest X + reference
+        ["reference", available_releases[0]],
+        ["reference", available_builds[0]],
+        ["reference", available_nightlies[0]],
+
+        # All latest + reference
+        [
+            "reference",
+            available_releases[0],
+            available_builds[0],
+            available_nightlies[0]
+        ],
+
+        # All nightlies + reference
+        ["reference"] + available_nightlies
+    ]
+    return ret
+
+
+if __name__ == "__main__":
+    # Only execute the program if a basf2 release is set up!
+    if os.environ.get('BELLE2_RELEASE', None) is None:
+        sys.exit('Error: No basf2 release set up!')
+
+    args = cli()
+
+    # Go to the html directory and call the create_plots function
+    save_dir = os.path.abspath(os.getcwd())
+
+    if not os.path.exists("results"):
+        print(
+            "Please run b2validation before running b2validation-plots.",
+            file=sys.stderr
+        )
+        sys.exit(164)
+
+    if not os.path.exists("html"):
+        os.mkdir("html")
+
+    os.chdir('html')
+
+    if not args.popular:
+        # Generate plot for the revisions specified in CLI
+        create_plots(
+            revisions=args.revisions,
+            force=args.force,
+            work_folder=save_dir
+        )
+    else:
+        # Generate several sets of plots
+        # Type: List[List of revisions]
+        revision_combinations = get_popular_revision_combinations(save_dir)
+        if args.revisions:
+            print(
+                "Warning: --revisions has no effect when --popular is "
+                "specified.",
+                file=sys.stderr
+            )
+        for revision_combination in revision_combinations:
+            create_plots(
+                revisions=revision_combination,
+                force=args.force,
+                work_folder=save_dir
+            )
+
+    # restore original working directory
+    os.chdir(save_dir)

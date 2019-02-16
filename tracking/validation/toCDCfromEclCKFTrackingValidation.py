@@ -59,9 +59,11 @@ class toCDCfromEclCKF(TrackingValidationRun):
                         #                relationCheckForDirection="forward",
                         eclSeedRecoTrackStoreArrayName='EclSeedRecoTracks',
                         outputRecoTrackStoreArrayName="CKFCDCfromEclRecoTracks",
-                        outputRelationRecoTrackStoreArrayName="ECLShowers",
+                        outputRelationRecoTrackStoreArrayName="EclSeedRecoTracks",
                         writeOutDirection="backward",
                         stateBasicFilterParameters={"maximalHitDistance": 0.75},
+                        stateExtrapolationFilterParameters={
+                            "extrapolationDirection": "backward", "maximalHitDistanceEclSeed": 30.0},
                         pathFilter="arc_length",
                         inputECLshowersStoreArrayName="ECLShowers")
 

@@ -22,6 +22,7 @@
 
 #include <tracking/ckf/cdc/filters/states/MCTruthCDCStateFilter.h>
 #include <tracking/ckf/cdc/filters/states/RoughCDCStateFilter.h>
+#include <tracking/ckf/cdc/filters/states/RoughCDCfromEclStateFilter.h>
 #include <tracking/ckf/cdc/filters/states/ExtrapolateAndUpdateCDCStateFilter.h>
 #include <tracking/ckf/cdc/filters/states/DistanceCDCStateFilter.h>
 
@@ -53,6 +54,7 @@ std::map<std::string, std::string> CDCStateFilterFactory::getValidFilterNamesAnd
     {"all", "set all track combinations as good"},
     {"mc_truth", "filtering based on the mc truth information"},
     {"rough", "very rough filtering"},
+    {"roughEclSeed", "very rough filtering, seed created from ECL shower"},
     {"extrapolate_and_update", "Extrapolation and update"},
     {"distance", "Give a weight based on the distance"},
   };
@@ -67,6 +69,8 @@ CDCStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::AllFilter<BaseCDCStateFilter>>();
   } else if (filterName == "rough") {
     return std::make_unique<RoughCDCStateFilter>();
+  } else if (filterName == "roughEclSeed") {
+    return std::make_unique<RoughCDCfromEclStateFilter>();
   } else if (filterName == "mc_truth") {
     return std::make_unique<MCTruthCDCStateFilter>();
   } else if (filterName == "extrapolate_and_update") {

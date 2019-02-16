@@ -3,11 +3,11 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Simon Kurz, Nils Braun                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/cdc/filters/states/RoughCDCStateFilter.h>
+#include <tracking/ckf/cdc/filters/states/RoughCDCfromEclStateFilter.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
@@ -17,7 +17,7 @@
 
 using namespace Belle2;
 
-TrackFindingCDC::Weight RoughCDCStateFilter::operator()(const BaseCDCStateFilter::Object& pair)
+TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStateFilter::Object& pair)
 {
   const CDCCKFPath* path = pair.first;
   const CDCCKFState& state = *(pair.second);
@@ -28,7 +28,10 @@ TrackFindingCDC::Weight RoughCDCStateFilter::operator()(const BaseCDCStateFilter
   B2INFO("arcLength: " << arcLength << " (" << state.getArcLength() << " - " << lastState.getArcLength() << ")");
 
   // TODO: magic number
-  if (arcLength <= 0 or arcLength > 20) {
+  if (!lastState.isSeed() and (arcLength >= 0 or arcLength < -20)) {
+    return NAN;
+  }
+  if (lastState.isSeed() and (arcLength >= 0 or arcLength < -150)) {
     return NAN;
   }
 
@@ -36,7 +39,10 @@ TrackFindingCDC::Weight RoughCDCStateFilter::operator()(const BaseCDCStateFilter
 
   B2INFO("hitDistance: " << hitDistance);
 
-  if (std::abs(hitDistance) > m_maximalHitDistance) {
+  if (!lastState.isSeed() and std::abs(hitDistance) > m_maximalHitDistance) {
+    return NAN;
+  }
+  if (lastState.isSeed() and std::abs(hitDistance) > m_maximalHitDistanceSeed) {
     return NAN;
   }
 
@@ -44,10 +50,14 @@ TrackFindingCDC::Weight RoughCDCStateFilter::operator()(const BaseCDCStateFilter
 }
 
 
-void RoughCDCStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void RoughCDCfromEclStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitDistance"),
                                 m_maximalHitDistance,
                                 "Maximal allowed hit distance",
                                 m_maximalHitDistance);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitDistanceEclSeed"),
+                                m_maximalHitDistanceSeed,
+                                "Maximal allowed hit distance",
+                                m_maximalHitDistanceSeed);
 }

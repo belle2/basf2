@@ -38,9 +38,8 @@ void CKFToCDCFromEclFindlet::exposeParameters(ModuleParamList* moduleParamList, 
   m_resultFinalizer.exposeParameters(moduleParamList, prefix);
   m_resultStorer.exposeParameters(moduleParamList, prefix);
 
-  // TODO: these filters might be have to set to 'all' for testing
   moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all");
-  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough");
+  moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("roughEclSeed");
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
   moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
 }

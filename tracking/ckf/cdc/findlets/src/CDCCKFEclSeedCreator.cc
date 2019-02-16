@@ -61,7 +61,7 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
 
     // choose photon hypothesis since electrons not used?! Talk to Torben.
     if (shower.getHypothesisId() != ECLShower::c_nPhotons) {
-      return;
+      continue;
     }
 
     const double Eclus  = shower.getEnergy();
@@ -113,12 +113,12 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     double dpx2 = 0.25 * mom.X() * mom.X();
     double dpy2 = 0.25 * mom.Y() * mom.Y();
     double dpz2 = 0.25 * mom.Z() * mom.Z();
-    cov(0, 0) = dx2;
-    cov(1, 1) = dy2;
-    cov(2, 2) = dz2;
-    cov(3, 3) = dpx2;
-    cov(4, 4) = dpy2;
-    cov(5, 5) = dpz2;
+    cov(0, 0) = dx2 * 10;
+    cov(1, 1) = dy2 * 10;
+    cov(2, 2) = dz2 * 10;
+    cov(3, 3) = dpx2 * 10;
+    cov(4, 4) = dpy2 * 10;
+    cov(5, 5) = dpz2 * 10;
     // TODO: this is a shared pointer, so do I need to create two instances for Neg/Pos hypothesis?
     genfit::SharedPlanePtr plane(new genfit::DetPlane(pos, pos));
     msopNeg.setPosMomCov(pos, mom, cov);

@@ -92,6 +92,7 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
     if (not seed) {
       continue;
     }
+
     seed->addRelationTo(newRecoTrack, m_param_writeOutDirection);
   }
 }

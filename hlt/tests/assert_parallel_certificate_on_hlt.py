@@ -11,6 +11,8 @@ import basf2
 import reconstruction
 from softwaretrigger.path_functions import add_hlt_processing, add_expressreco_processing
 
+from softwaretrigger.constants import SoftwareTriggerModes
+
 
 def test_path(path):
     # Assert that all modules have a parallel processing certified flag.
@@ -33,13 +35,13 @@ if __name__ == "__main__":
     test_path(path)
 
     # Add various modes of HLT
-    for trigger in ["monitoring", "hlt_filter"]:
+    for trigger in SoftwareTriggerModes:
         path = basf2.create_path()
         path.add_module("HistoManager")
         add_hlt_processing(path, run_type="collision", softwaretrigger_mode=trigger)
         test_path(path)
 
-    for trigger in ["monitoring", "hlt_filter"]:
+    for trigger in SoftwareTriggerModes:
         path = basf2.create_path()
         path.add_module("HistoManager")
         add_hlt_processing(path, run_type="cosmics", softwaretrigger_mode=trigger, data_taking_period="phase3")

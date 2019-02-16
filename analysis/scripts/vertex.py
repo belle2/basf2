@@ -297,11 +297,18 @@ def vertexRaveDaughtersUpdate(
     path=analysis_main,
 ):
     """
-    Perform vertex fit using RAVE for each Particle in the given ParticleList and update the Daughters.
+    Performs a vertex fit using RAVE for each Particle in the given ParticleList and updating fully the Daughters.
+    The mother is only used in the fit if all daugthers (charged and neutral) are selected.
+    For this leave the decay_string empty.
+    Attention: for vertices with a single track the mother is not used.
+    When a particle is fully updated its 4momentum, 3D vertex, covariance Matrix
+    and p-value are updated.
+    When the mother is not used in the fit, only its 3D vertex, covariance Matrix
+    and p-value are updated.
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit
-    @param decay_string select particles used for the vertex fit
+    @param decay_string select particles used for the vertex fit (if given, only the selected particles are updated)
     @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
     @param path         modules are added to this path
     """
@@ -412,7 +419,7 @@ def vertexTree(
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
     :Example:
-        An example of usage for decay chain :math:`B\\to\pi^+\pi^-\pi^0` is the following:
+        An example of usage for the decay chain: "B0 -> pi+ pi- pi0"  is the following:
 
     ::
 

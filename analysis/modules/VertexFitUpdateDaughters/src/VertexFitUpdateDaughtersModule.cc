@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi                                            *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -145,16 +145,23 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
   } else {
     std::vector<const Particle*> ctracksVertex = m_decaydescriptor.getSelectionParticles(mother);
     for (unsigned itrack = 0; itrack < ctracksVertex.size(); itrack++) {
-      tracksVertex.push_back(const_cast<Particle*>(ctracksVertex[itrack]));
+      if (ctracksVertex[itrack] == mother) B2FATAL("VertexFitUpdateDaughtersModule: Selected Mother is not used in the fit. " <<
+                                                     "The Mother is used only if all daughters are used. " <<
+                                                     "If you want to use and update the mother you " <<
+                                                     "just leave the decay string argument " <<
+                                                     "empty (this selects the mother and all daughters). But attention! The mother is not used in fits with a single track.");
+      else tracksVertex.push_back(const_cast<Particle*>(ctracksVertex[itrack]));
     }
   }
+
+
 
   std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
 
   int nvert = 0;
 
   if (tracksVertex.size() == 0) {
-    B2ERROR("VertexFitUpdateDaughtersModule: no track selected");
+    B2ERROR("VertexFitUpdateDaughtersModule: no track selected.");
     return false;
   }
 
@@ -166,17 +173,17 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
     if (m_decayString == "") rsf.setMother(mother);
 
     for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
-      if (tracksVertex[itrack] != mother) {
-        rsf.addTrack(tracksVertex[itrack]);
-        B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
-      }
-      if (tracksVertex[itrack] == mother) B2WARNING("VertexFitUpdateDaughtersModule: Selected Mother not used in the fit");
+      rsf.addTrack(tracksVertex[itrack]);
+      B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << tracksVertex[itrack] -> getName() << " to the vertex fit.");
     }
+
 
 
     TVector3 pos; TMatrixDSym RerrMatrix(7);
 
     nvert = rsf.fit();
+
+
 
     if (nvert > 0) {
 
@@ -198,21 +205,22 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
           }
         }
         mother->updateMomentum(mom, pos, errMatrix, prob);
-        rsf.updateDaughters();
       }
+
+      rsf.updateDaughters();
 
     } else {return false;}
   }
 
 
   if (tracksVertex.size() == 1) {
-    if (m_withConstraint == "") B2FATAL("VertexFitUpdateDaughtersModule: sigle track fit needs a valid constraint");
+    if (m_withConstraint == "") B2FATAL("VertexFitUpdateDaughtersModule: A single track fit needs a valid constraint.");
 
     // One track fit cannot be kinematic
     analysis::RaveVertexFitter rsg;
     rsg.addTrack(tracksVertex[0]);
-    B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[0] << " to vertex fit ");
-    if (tracksVertex[0] == mother) B2FATAL("VertexFitUpdateDaughtersModule: Selected Mother not used in sigle track fit");
+    B2DEBUG(10, "VertexFitUpdateDaughtersModule: Adding particle " << tracksVertex[0] -> getName()  << " with name "  << tracksName[0]
+            << " to vertex fit.");
 
     TVector3 pos; TMatrixDSym RerrMatrix(3);
 

@@ -33,109 +33,111 @@ import variables.utils as vu
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 
+
 # create path
-my_path = b2.create_path()
+cp_val_path = b2.Path()
 
-# load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B2JPsipi0_JPsi2mumu.root', 'examples', False),
-             path=my_path)
+# Environment of the MC or data sample
+environmentType = "default"
 
-# use standard final state particle lists
-#
-# creates "pi0:looseFit" ParticleList
-# https://confluence.desy.de/display/BI/Physics+StandardParticles
-stdPi0s(listtype='looseFit', path=my_path)
-# creates "highPID" ParticleLists (and c.c.)
-ma.fillParticleList(decayString='mu+:highPID',
-                    cut='muonID > 0.2 and d0 < 2 and abs(z0) < 4',
-                    path=my_path)
+# If you want to use converted Belle data or MC set here "Belle"
+# Attention! If you set Belle you need to have the Belle database locally
+belleOrBelle2Flag = "Belle2"
 
+
+if belleOrBelle2Flag == "Belle":
+    from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
+    import os
+
+    isBelleMC = True  # False for Belle Data True for Belle MC
+    setupB2BIIDatabase(isBelleMC)
+    os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
+    os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
+
+    environmentType = "Belle"
+
+    # You use Belle MC/data as input calling this script as basf2 -i 'YourConvertedBelleData*.root' B2A801-FlavorTagger.p
+    ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
+
+if belleOrBelle2Flag == "Belle2":
+
+    # load input ROOT file
+    ma.inputMdst(environmentType='default',
+                 filename=b2.find_file('mdst11_BGx1_b2jpsiks.root', 'examples', False),
+                 path=cp_val_path)
+
+
+# Creates Muon particle list
+ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)
 
 # reconstruct J/psi -> mu+ mu- decay
 # keep only candidates with dM<0.11
-ma.reconstructDecay(decayString='J/psi:mumu -> mu+:highPID mu-:highPID',
-                    cut='dM<0.11 and 3.07 < M < 3.11',
-                    path=my_path)
+ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=cp_val_path)
 
-# reconstruct B0 -> J/psi Ks decay
-# keep only candidates with Mbc > 5.1 and abs(deltaE)<0.15
-ma.reconstructDecay(decayString='B0:jspipi0 -> J/psi:mumu pi0:looseFit',
-                    cut='Mbc > 5.1 and abs(deltaE)<0.15',
-                    path=my_path)
+if belleOrBelle2Flag == "Belle":
 
-vx.vertexTree(list_name='B0:jspipi0',
-              conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
-              ipConstraint=True,
-              # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
-              updateAllDaughters=True,  # update momenta off ALL particles
-              path=my_path
-              )
+    # use the existent K_S0:mdst list
+    ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
 
-# perform MC matching (MC truth asociation). Always before TagV
-ma.matchMCTruth(list_name='B0:jspipi0', path=my_path)
+    # reconstruct B0 -> J/psi Ks decay
+    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+
+if belleOrBelle2Flag == "Belle2":
+
+    # reconstruct Ks from standard pi+ particle list
+    ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
+    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
+
+    # reconstruct Ks from standard pi+ particle list
+    ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
+    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
+
+    # reconstruct B0 -> J/psi Ks decay
+    ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+
+# Does the matching between reconstructed and MC particles
+ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
 # build the rest of the event associated to the B0
-ma.buildRestOfEvent(target_list_name='B0:jspipi0',
-                    path=my_path)
+ma.buildRestOfEvent(target_list_name='B0:sig',
+                    path=cp_val_path)
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
-# You just have to use a special global tag of the conditions database. Check in
-# https://confluence.desy.de/display/BI/Physics+FlavorTagger
-# E.g. for release-00-09-01
+# For this, you have to append a special global tag of the conditions database just before loading the flavor tagger.
+# Check the database matching your release in
+# https://b2-master.belle2.org/software/development/sphinx/analysis/doc/FlavorTagger.html
+# E.g. for release-03-01-00 and later versions
 
-# use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
+b2.use_central_database("analysis_tools_release-03")
 
 # The default working directory is '.'
-# If you have an own analysis package it is recomended to use
-# workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'.
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.
 # To save CPU time the weight files should be saved in the same server were you run.
 #
 # NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
 #
-# Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
+# BGx1 stays for MC generated with machine Background. Only this kind of weight files are supported since release-03
+# The official weight files are trained using B0-> nu_tau anti-nu_tau as signal channel (no CP violation)
+# to avoid that the flavor tagger learns asymmetries on the tag side. Belle is not sensitive to this effect
+# and therefore JpsiKs is ok.
+weightfiles = 'B2nunubarBGx1'
+if belleOrBelle2Flag == "Belle":
+    weightfiles = 'B2JpsiKs_muBGx1'
+
+# Flavor Tagging Function. Default Expert mode to use the official weight files.
 ft.flavorTagger(
-    particleLists=['B0:jspipi0'],
-    weightFiles='B2JpsiKs_muBGx1',
-    path=my_path)
+    particleLists=['B0:sig'],
+    weightFiles=weightfiles,
+    belleOrBelle2=belleOrBelle2Flag,
+    path=cp_val_path)
 
-# NOTE: for Belle data, (i.e. b2bii users) should use modified line:
-# ft.flavorTagger(
-#     particleLists=['B0:jspipi0'],
-#     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-#     belleOrBelle2='Belle')
-
-#
-# BGx0 stays for MC generated without machine Background.
-# Please use B2JpsiKs_muBGx1 if you use MC generated with machine background.
 # By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
 # If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
 #
 # combinerMethods=['TMVA-FBDT']
 #
 # With the belleOrBelle2 argument you specify if you are using Belle MC (also Belle Data) or Belle2 MC.
-# If you want to use Belle MC please follow the dedicated tutorial B2A802-FlavorTagger-BelleMC.py
-# since you need to follow a special module order.
-#
-# _______________________________________________________________________________________________________________
-# The following will be updated in a new Tutorial:
-# If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
-# you want to use like:
-#
-# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Sampler', weightFiles='B2JpsiKs_mu',
-# categories=['Electron', 'Muon', 'Kaon', ... etc.]
-# )
-#
-# After the Sampling process:
-#
-# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Teacher', weightFiles='B2JpsiKs_mu',
-# categories=['Electron', 'Muon', 'Kaon', ... etc.]
-# )
-#
-# Instead of the default name 'B2JpsiKs_mu' is better to use the abbreviation of your decay channel.
-# If you do not specify any category combination, the default one (all categories) is choosed either in 'Teacher' or 'Expert' mode:
 #
 # All available categories are:
 # [
@@ -153,81 +155,86 @@ ft.flavorTagger(
 # 'MaximumPstar',
 # 'KaonPion']
 #
-# If you train by yourself you need to run this file 6 times alternating between "Sampler" and "Teacher" modes
-# in order to train event and combiner levels.
-# with 3 different samples of at least 500k events (one for each sampler).
-# Three different 500k events samples are needed in order to avoid biases between levels.
+# If you want to train yourself, have a look at the scritps under analysis/release-validation/CPVTools/
+# in principle you need only to run CPVToolsValidatorInParalell.sh
+# If you train the  event and combiner levels, you need two different samples of at least 500k events (one for each sampler).
+# The different samples are needed to avoid biases between levels.
 # We mean 500k of correctly corrected and MC matched neutral Bs. (isSignal > 0)
-# You can also train track and event level for all categories (1st to 4th runs) and then train the combiner
+# You can also train the event level for all categories and then train the combiner
 # for a specific combination (last two runs).
 # It is also possible to train different combiners consecutively using the same weightFiles name.
 # You just need always to specify the desired category combination while using the expert mode as:
 #
-# flavorTagger(particleLists=['B0:jspipi0'], mode = 'Expert', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:sig'], mode = 'Expert', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
-
+#
+# Attention to train the flavor tagger you need MC samples generated withou CP violation!
+# The best sample for this is B0-> nu_tau anti-nu_tau .
 # You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
 # provide flavor information using the tag side
-ma.applyCuts(list_name='B0:jspipi0',
+ma.applyCuts(list_name='B0:sig',
              cut='qrOutput(FBDT) > -2',
-             path=my_path)
+             path=cp_val_path)
 
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
-ma.rankByHighest(particleList='B0:jspipi0',
+ma.rankByHighest(particleList='B0:sig',
                  variable='abs(qrOutput(FBDT))',
                  numBest=0,
                  outputVariable='Dilution_rank',
-                 path=my_path)
+                 path=cp_val_path)
+
+# Fit vertex of the B0 on the signal side
+vx.vertexRave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+              constraint='', path=cp_val_path)
+
 
 # Fit Vertex of the B0 on the tag side
-vx.TagV(list_name='B0:jspipi0',
-        MCassociation='breco',
-        confidenceLevel=0.001,
-        useFitAlgorithm='standard_PXD',
-        path=my_path)
+vx.TagV(list_name='B0:sig', MCassociation='breco', path=cp_val_path)
 
-# Select variables that we want to store to ntuple
-fs_vars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
+# Select variables that will be stored to ntuple
+fs_vars = vc.pid + vc.track + vc.track_hits + vc.mc_truth
 jpsiandk0s_vars = vc.mc_truth
-bvars = vc.event_meta_data + \
-    vc.reco_stats + \
+vertex_vars = vc.vertex + vc.mc_vertex + vc.kinematics + vc.mc_kinematics
+bvars = vc.reco_stats + \
     vc.deltae_mbc + \
-    vc.ckm_kinematics + \
     vc.mc_truth + \
     vc.roe_multiplicities + \
     vc.flavor_tagging + \
     vc.tag_vertex + \
     vc.mc_tag_vertex + \
-    vu.create_aliases_for_selected(list_of_variables=fs_vars,
-                                   decay_string='B0 -> [J/psi -> ^mu+ ^mu-] pi0') + \
-    vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
-                                   decay_string='B0 -> [^J/psi -> mu+ mu-] ^pi0')
+    vertex_vars
 
+# Create aliases to save information for different particles
+bvars = bvars + \
+    vu.create_aliases_for_selected(list_of_variables=fs_vars,
+                                   decay_string='B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    vu.create_aliases_for_selected(list_of_variables=jpsiandk0s_vars,
+                                   decay_string='B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]') + \
+    vu.create_aliases_for_selected(list_of_variables=vertex_vars,
+                                   decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
 
 # Saving variables to ntuple
 output_file = 'B2A801-FlavorTagger.root'
-ma.variablesToNtuple(decayString='B0:jspipi0',
+ma.variablesToNtuple(decayString='B0:sig',
                      variables=bvars,
                      filename=output_file,
                      treename='B0tree',
-                     path=my_path)
+                     path=cp_val_path)
 
 # Summary of created Lists
-ma.summaryOfLists(particleLists=['J/psi:mumu', 'pi0:looseFit', 'B0:jspipi0'],
-                  path=my_path)
+ma.summaryOfLists(particleLists=['J/psi:mumu', 'B0:sig'],
+                  path=cp_val_path)
 
 # Process the events
-b2.process(my_path)
+b2.process(cp_val_path)
 
 # print out the summary
 print(b2.statistics)
 
 # If you want to calculate the efficiency of the FlavorTagger on your own
-# File use the script analysis/examples/FlavorTaggerEfficiency.py giving
-# your file as argument:
+# File use the script analysis/release-validation/CPVTools/flavorTaggerEfficiency.py giving
+# your file and the treename as arguments:
 
-# basf2 FlavorTaggerEfficiency.py YourFile.root
-
-# Note: This efficiency script needs MCParticles. If the name of your tree is not 'B0tree' please change line 65.
+# basf2 flavorTaggerEfficiency.py 'YourFilesWithWildCards.root' 'B0tree'

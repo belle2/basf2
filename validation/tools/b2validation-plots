@@ -102,12 +102,23 @@ def get_popular_revision_combinations(work_folder):
         ["reference"] + available_nightlies
     ]
 
-    # Remove all Nones
+    # Remove all Nones from the sublists
     ret = [
         sorted(list(filter(None, comb))) for comb in ret
     ]
+    # Remove all empty lists
+    ret = list(filter(None, ret))
 
+    # Remove duplicates
     ret = remove_duplicates_lstlst(ret)
+
+    if not ret:
+        sys.exit("No revisions seem to be available. Exit.")
+
+    print("Plots for the following combinations of revisions will be created:")
+    for r in ret:
+        print(" * " + ", ".join(r))
+    print()
 
     return ret
 

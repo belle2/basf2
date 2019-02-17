@@ -240,6 +240,10 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     @return: No return value
     """
 
+    print(validationfunctions.terminal_title_line(
+        "Creating plots for the revision(s) " + ", ".join(revisions) + "."
+    ))
+
     # Since we are going to plot, we need to initialize ROOT
     ROOT.gROOT.SetBatch()
     ROOT.gStyle.SetOptStat(1110)
@@ -478,7 +482,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
         if index is not None:
             style = get_style(index)
             line_color = ROOT.gROOT.GetColor(style.GetLineColor()).AsHexString()
-        print("For {} index {} color {}".format(r, index, line_color))
+        # print("For {} index {} color {}".format(r, index, line_color))
 
         # todo the creation date and git_hash of the original revision should be transferred here
         comparison_revs.append(json_objects.ComparisonRevision(
@@ -559,8 +563,9 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
     if chi2_verbosity:
-        print()
-        print("Chi2 comparisons:")
+        if not warning_verbosity:
+            print()
+        print("Chi2 comparisons")
         for result, perpetrators in plotuples_by_comparison_result.items():
             print("* '{}' was the result of {} comparisons".format(
                 result, len(perpetrators)

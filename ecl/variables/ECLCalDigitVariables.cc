@@ -304,6 +304,16 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
     }
 
+    //! @returns the eclcaldigit cell id by digit energy rank
+    double getCellIdByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::cellId};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
     //! @returns the eclcaldigit fit type by digit energy rank
     double getTwoComponentFitTypeByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
@@ -880,6 +890,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclcaldigitWeightByEnergyRank(i)", getWeightByEnergyRank,
                       "[calibration] Returns the weight of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitCellIdByEnergyRank(i)", getCellIdByEnergyRank,
+                      "[calibration] Returns the cell id of the i-th highest energy caldigit in the cluster (i>=0)");
 
   }
 

@@ -7,6 +7,15 @@ Support functions for using Ractive on the validation website
 // ============================================================================
 
 /**
+ * Returns storage id from keypath
+ * @param keypath
+ * @return {string}
+ */
+function getStorageId(keypath) {
+    return `validation_config_${keypath}`;
+}
+
+/**
  * Default configuration values. This is what we use when we can't find
  * a configuration value in localStorage and sessionStorage.
  * @param keypath

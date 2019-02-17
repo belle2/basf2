@@ -3,7 +3,7 @@ Support functions for using Ractive on the validation website
 */
 
 // ============================================================================
-// Saving configuration to local or session storage
+// Saving ractive values to local or session storage
 // ============================================================================
 
 /**

@@ -63,27 +63,52 @@ def get_popular_revision_combinations(work_folder):
         if revision.startswith("nightly")
     ])
 
+    def try_or_none(lst, *sliceargs):
+        """ Returns slice of list or None if an error occured"""
+        try:
+            return lst[slice(*sliceargs)]
+        except (KeyError, IndexError):
+            return None
+
+    def remove_duplicates_lstlst(lstlst):
+        """ Removes duplicate lists in a list of lists """
+        # The standard recipe for removing duplicates from a
+        # list $lst is list(set(lst)) (i.e. converting it to a set
+        # and then back to a list). However, lists, themselves are
+        # not hashable, so we cannot convert them to a set. Therefore we
+        # first convert all of the 'inner' lists to tuples, apply set and
+        # then convert back to list of lists.
+        return list(map(list, set(map(tuple, lstlst))))
+
     # Return value
     ret = [
         # All revisions
         ["reference"] + available,
 
         # Latest X + reference
-        ["reference", available_releases[0]],
-        ["reference", available_builds[0]],
-        ["reference", available_nightlies[0]],
+        ["reference", try_or_none(available_releases, 0)],
+        ["reference", try_or_none(available_builds, 0)],
+        ["reference", try_or_none(available_nightlies, 0)],
 
         # All latest + reference
         [
             "reference",
-            available_releases[0],
-            available_builds[0],
-            available_nightlies[0]
+            try_or_none(available_releases, 0),
+            try_or_none(available_builds, 0),
+            try_or_none(available_nightlies, 0)
         ],
 
         # All nightlies + reference
         ["reference"] + available_nightlies
     ]
+
+    # Remove all Nones
+    ret = [
+        sorted(list(filter(None, comb))) for comb in ret
+    ]
+
+    ret = remove_duplicates_lstlst(ret)
+
     return ret
 
 

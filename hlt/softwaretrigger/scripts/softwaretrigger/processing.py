@@ -127,6 +127,7 @@ def add_hlt_processing(path,
         if run_type == constants.RunTypes.beam:
             accept_path = add_softwaretrigger_reconstruction(path, components=reco_components,
                                                              softwaretrigger_mode=softwaretrigger_mode,
+                                                             store_array_debug_prescale=1,
                                                              **kwargs)
         elif run_type == constants.RunTypes.cosmic:
             if softwaretrigger_mode != constants.SoftwareTriggerModes.monitor:

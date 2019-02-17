@@ -49,25 +49,28 @@ def get_popular_revision_combinations(work_folder):
     Returns:
         List[List of revisions (str)]
     """
-    available = validationfunctions.available_revisions(work_folder)
-    available_releases = sorted([
+    available = sorted(
+        validationfunctions.available_revisions(work_folder),
+        reverse=True
+    )
+    available_releases = [
         revision for revision in available
         if revision.startswith("release")
-    ])
-    available_builds = sorted([
+    ]
+    available_builds = [
         revision for revision in available
         if revision.startswith("build")
-    ])
-    available_nightlies = sorted([
+    ]
+    available_nightlies = [
         revision for revision in available
         if revision.startswith("nightly")
-    ])
+    ]
 
-    def try_or_none(lst, *sliceargs):
-        """ Returns slice of list or None if an error occured"""
+    def atindex_or_none(lst, index):
+        """ Returns item at index from lst or None"""
         try:
-            return lst[slice(*sliceargs)]
-        except (KeyError, IndexError):
+            return lst[index]
+        except IndexError:
             return None
 
     def remove_duplicates_lstlst(lstlst):
@@ -86,16 +89,16 @@ def get_popular_revision_combinations(work_folder):
         ["reference"] + available,
 
         # Latest X + reference
-        ["reference", try_or_none(available_releases, 0)],
-        ["reference", try_or_none(available_builds, 0)],
-        ["reference", try_or_none(available_nightlies, 0)],
+        ["reference", atindex_or_none(available_releases, 0)],
+        ["reference", atindex_or_none(available_builds, 0)],
+        ["reference", atindex_or_none(available_nightlies, 0)],
 
         # All latest + reference
         [
             "reference",
-            try_or_none(available_releases, 0),
-            try_or_none(available_builds, 0),
-            try_or_none(available_nightlies, 0)
+            atindex_or_none(available_releases, 0),
+            atindex_or_none(available_builds, 0),
+            atindex_or_none(available_nightlies, 0)
         ],
 
         # All nightlies + reference

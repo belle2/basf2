@@ -102,7 +102,7 @@ def find_root_object(root_objects, **kwargs):
         return []
 
 
-def serve_existing_plots():
+def serve_existing_plots(revisions):
     """
     Goes to the folder where
     the plots for the given selection are stored, and replaces the current
@@ -110,7 +110,8 @@ def serve_existing_plots():
     :return: No return value
     """
 
-    print("File exists already and will be served from archive!")
+    print("Plots for the revision(s) {} have already been created before "
+          "and will be served from the archive.".format(", ".join(revisions)))
 
 
 def get_plot_files(revisions, work_folder):
@@ -1011,7 +1012,7 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
-        serve_existing_plots()
+        serve_existing_plots(revisions)
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(revisions, work_folder, process_queue)

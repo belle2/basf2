@@ -8,13 +8,13 @@
  * This method will either start a new time, if the plots are
  * not complete yet or will hide the wait dialog if the plotting
  * is complete.
- * @param rev_string
- * @param joined_revisions
- * @param progress_key
- * @param wait_time
- * @param rev_data
+ * @param revString
+ * @param joinedRevisions
+ * @param progressKey
+ * @param waitTime
+ * @param revData
  */
-function install_plotting_progress(rev_string, joined_revisions, progress_key, wait_time, rev_data) {
+function installPlottingProgress(revString, joinedRevisions, progressKey, waitTime, revData) {
 
     // query every second
     let defaultWaitTime = 1000;
@@ -28,16 +28,16 @@ function install_plotting_progress(rev_string, joined_revisions, progress_key, w
             timeout: 1600,
             contentType: "application/json",
             dataType: "json",
-            data: JSON.stringify({"input": progress_key})
+            data: JSON.stringify({"input": progressKey})
         })
-            .success(function (ajax_result) {
-                if (!ajax_result) {
+            .success(function (ajaxResult) {
+                if (!ajaxResult) {
                     // no status yet, keep on querying
-                    install_plotting_progress(rev_string, joined_revisions, progress_key, defaultWaitTime, rev_data);
+                    installPlottingProgress(revString, joinedRevisions, progressKey, defaultWaitTime, revData);
                 } else {
                     // is it only a status message or a message with detailed information
                     // on the current progress ?
-                    if (ajax_result["status"] === "complete") {
+                    if (ajaxResult["status"] === "complete") {
                         // is the plotting complete and the overlay can be hidden again ?
                         //loadcontent(joined_revisions, true);
                         //alert("complete !!");
@@ -46,41 +46,41 @@ function install_plotting_progress(rev_string, joined_revisions, progress_key, w
                         // trigger complete reload !
                         // todo: the revision selection seems to be kept, why ?
                         //loadRevisions( rev_string, joined_revisions );
-                        console.log("Plot creation for revisions " + rev_string + " complete");
-                        // fixme: rev_list unknown??
-                        setupRactiveFromRevision(rev_data, rev_string, rev_list);
+                        console.log("Plot creation for revisions " + revString + " complete");
+                        // fixme: revList unknown??
+                        setupRactiveFromRevision(revData, revString, revList);
                         $("#outer").hide();
                     } else {
                         // detailed progress message
 
                         // extract information from the json dict
-                        let current_package = parseInt(ajax_result["current_package"]);
-                        let total_package = parseInt(ajax_result["total_package"]);
-                        let package_name = ajax_result["package_name"];
+                        let currentPackage = parseInt(ajaxResult["current_package"]);
+                        let totalPackage = parseInt(ajaxResult["total_package"]);
+                        let packageName = ajaxResult["package_name"];
 
                         // display infos on the waiting dialog
-                        $("#plot_creation_progress").text("Processing " + current_package + " of " + total_package + " packages");
-                        $("#plot_creation_package").text("Current Package: " + package_name);
+                        $("#plot_creation_progress").text("Processing " + currentPackage + " of " + totalPackage + " packages");
+                        $("#plot_creation_package").text("Current Package: " + packageName);
 
                         // re-install the timer to check back on the progress
-                        install_plotting_progress(rev_string, joined_revisions, progress_key, defaultWaitTime, rev_data);
+                        installPlottingProgress(revString, joinedRevisions, progressKey, defaultWaitTime, revData);
                     }
                 }
 
             });
-    }, wait_time);
+    }, waitTime);
 }
 
 
 /**
  * This function gets called from setupRactiveFromRevision, if we see that we
  * need to generate new plots.
- * @param rev_string
- * @param joined_revisions
- * @param progress_key
- * @param rev_data
+ * @param revString
+ * @param joinedRevisions
+ * @param progressKey
+ * @param revData
  */
-function beginCreatePlotWait(rev_string, joined_revisions, progress_key, rev_data) {
+function beginCreatePlotWait(revString, joinedRevisions, progressKey, revData) {
 
     // reset status display from previous execution
     $("#plot_creation_progress").text("");
@@ -90,5 +90,5 @@ function beginCreatePlotWait(rev_string, joined_revisions, progress_key, rev_dat
     $("#outer").show();
 
     // check for a change already very quick, if the plots are already available
-    install_plotting_progress(rev_string, joined_revisions, progress_key, 0, rev_data)
+    installPlottingProgress(revString, joinedRevisions, progressKey, 0, revData)
 }

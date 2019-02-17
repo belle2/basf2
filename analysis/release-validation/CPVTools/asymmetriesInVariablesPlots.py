@@ -39,17 +39,22 @@ import math
 import glob
 import os
 
-if len(sys.argv) != 4:
-    sys.exit("Must provide 3 arguments: [Belle or Belle2] [BGx0 or BGx1] [workingDirectory]"
+
+if len(sys.argv) != 5:
+    sys.exit("Must provide 4 arguments: [Belle or Belle2] [BGx0 or BGx1] [training] [workingDirectory]"
              )
 
 belleOrBelle2 = sys.argv[1]
 MCtype = str(sys.argv[2])
-workingDirectory = sys.argv[3]
+decayChannelTrainedOn = str(sys.argv[3])  # Decay channel of the weight files "JPsiKs" or "nunubar"
+workingDirectory = sys.argv[4]
 
 filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
-weightFiles = 'B2JpsiKs_mu' + MCtype
+if decayChannelTrainedOn == 'JPsiKs':
+    decayChannelTrainedOn = 'JpsiKs_mu'
+
+weightFiles = 'B2' + decayChannelTrainedOn + MCtype
 
 ROOT.TH1.SetDefaultSumw2()
 

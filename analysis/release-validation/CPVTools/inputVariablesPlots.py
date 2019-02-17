@@ -39,17 +39,21 @@ import os
 
 ROOT.gROOT.SetBatch(True)
 
-if len(sys.argv) != 4:
-    sys.exit("Must provide 3 arguments: [Belle or Belle2] [BGx0 or BGx1] [workingDirectory]"
+if len(sys.argv) != 5:
+    sys.exit("Must provide 4 arguments: [Belle or Belle2] [BGx0 or BGx1] [training] [workingDirectory]"
              )
 
 belleOrBelle2 = sys.argv[1]
 MCtype = str(sys.argv[2])
-workingDirectory = sys.argv[3]
+decayChannelTrainedOn = str(sys.argv[3])  # Decay channel of the weight files "JPsiKs" or "nunubar"
+workingDirectory = sys.argv[4]
 
 filesDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
-weightFiles = 'B2JpsiKs_mu' + MCtype
+if decayChannelTrainedOn == 'JPsiKs':
+    decayChannelTrainedOn = 'JpsiKs_mu'
+
+weightFiles = 'B2' + decayChannelTrainedOn + MCtype
 
 
 ROOT.TH1.SetDefaultSumw2()
@@ -89,7 +93,7 @@ variablesPlotParamsDict = {
     'eid_ARICH': ['eid_ARICH', dBw, 0, 1.01, r'$\mathcal{L}_{e}^{\rm ARICH}$', ""],
     'eid_ECL': ['eid_ECL', dBw, 0, 1.01, r'$\mathcal{L}_{e}^{\rm ECL}$', ""],
     'BtagToWBosonVariables(recoilMassSqrd)': ['BtagToWBosonVariables__borecoilMassSqrd__bc', fBins,
-                                              -20, 40, r'$M_{\rm rec}^2\ [{\rm GeV}^2/c^4]$', r"{\rm GeV}^2/c^4"],
+                                              0, 100, r'$M_{\rm rec}^2\ [{\rm GeV}^2/c^4]$', r"{\rm GeV}^2/c^4"],
     'BtagToWBosonVariables(pMissCMS)': [
         'BtagToWBosonVariables__bopMissCMS__bc', 60, 0, 3.6,
         r'$p^*_{\rm miss}\ [{\rm GeV}/c]$', r"{\rm GeV}/c\, "],
@@ -98,7 +102,7 @@ variablesPlotParamsDict = {
     'BtagToWBosonVariables(EW90)': ['BtagToWBosonVariables__boEW90__bc',
                                     dBw, 0, 4, r'$E_{90}^{W}\ [{\rm GeV}]$', r"{\rm GeV}\, "],
     'BtagToWBosonVariables(recoilMass)': ['sqrt(abs(BtagToWBosonVariables__borecoilMassSqrd__bc))',
-                                          dBw, 0, 7.5, r'$M_{\rm rec}\ [{\rm GeV}/c^2]$', r"{\rm GeV}/c^2\, "],
+                                          dBw, 0, 12, r'$M_{\rm rec}\ [{\rm GeV}/c^2]$', r"{\rm GeV}/c^2\, "],
     'cosTPTO': ['cosTPTO', dBw, 0, 1.01, r'$\vert\cos{\theta^*_{\rm T}}\vert$', ""],
     'ImpactXY': ['ImpactXY', dBw, 0, 0.5, r'$d_0\ [{\rm ' + unitImp + '}]$', r"{\rm " + unitImp + r"}\, "],
     'z0': ['z0', dBw, 0, 1.0, r'$z_0\ [{\rm ' + unitImp + '}]$', r"{\rm " + unitImp + r"}\, "],
@@ -183,6 +187,7 @@ def plotInputVariablesOfFlavorTagger():
         tree = ROOT.TChain(treeName)
 
         workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled*.root')
+        print("workingFiles = ", workingFiles)
         # workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled1?.root')
 
         for iFile in workingFiles:
@@ -370,7 +375,8 @@ def plotInputVariablesOfFlavorTagger():
             if inputVariable.find('ARICH') != -1 or inputVariable.find('TOP') != -1 or \
                     inputVariable == 'cosTPTO' or inputVariable.find('KLM') != -1 or \
                     inputVariable == 'cosTheta' or inputVariable == 'FSCVariables(cosTPTOFast)' or \
-                    inputVariable == 'KaonPionVariables(cosKaonPion)':
+                    inputVariable == 'KaonPionVariables(cosKaonPion)' or \
+                    inputVariable == 'BtagToWBosonVariables(recoilMass)':
                 legendLocation = 2
 
             elif inputVariable == 'FSCVariables(SlowFastHaveOpositeCharges)' or \

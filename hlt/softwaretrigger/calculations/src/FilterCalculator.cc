@@ -258,7 +258,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       }
     }
   }
-  std::sort(selectedClusters.begin(), selectedClusters.end(), [](const auto & rhs, const auto & lhs) {
+  std::sort(selectedClusters.begin(), selectedClusters.end(), [](const auto & lhs, const auto & rhs) {
     return lhs.energyCMS > rhs.energyCMS;
   });
 
@@ -407,20 +407,22 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["gg2clst"] = 1;
     }
 
-    if ((calculationResult["ee2clst"] == 1 or calculationResult["gg2clst"] == 1) and calculationResult["ee1leg"] == 1) {
+    if ((calculationResult["ee2clst"] == 1 or calculationResult["gg2clst"] == 1) and
+        calculationResult["ee1leg"] == 1) {
       calculationResult["ee1leg1clst"] = 1;
     }
+
+    const double Elab0 = firstCluster.p4Lab.E();
+    const double Elab1 = secondCluster.p4Lab.E();
 
     // gg and mumu accept triggers using ECL
     if (firstEnergy > 2 and secondEnergy > 2) {
       const double thetaLab0 = firstCluster.p4Lab.Theta() * TMath::RadToDeg();
       const double thetaLab1 = secondCluster.p4Lab.Theta() * TMath::RadToDeg();
-      const double Elab0 = firstCluster.p4Lab.E();
-      const double Elab1 = secondCluster.p4Lab.E();
 
       const bool barrel0 = thetaLab0 > 32. and thetaLab0 < 130.;
       const bool barrel1 = thetaLab1 > 32. and thetaLab1 < 130.;
-      const bool bothClustersAbove4 = firstEnergy > 4 or secondEnergy > 4;
+      const bool oneClustersAbove4 = firstEnergy > 4 or secondEnergy > 4;
       const bool oneIsNeutral = not firstCluster.isTrack or not secondCluster.isTrack;
       const bool bothAreNeutral = not firstCluster.isTrack and not secondCluster.isTrack;
       const bool oneIsBarrel = barrel0 or barrel1;
@@ -431,29 +433,28 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       if (dphiCutExtraLoose and oneIsNeutral and oneIsBarrel) {
         calculationResult["ggBarrelVL"] = 1;
       }
-      if (bothClustersAbove4 and dphiCutLoose and oneIsNeutral and oneIsBarrel) {
+      if (oneClustersAbove4 and dphiCutLoose and oneIsNeutral and oneIsBarrel) {
         calculationResult["ggBarrelLoose"] = 1;
       }
-      if (bothClustersAbove4 and dphiCutTight and bothAreNeutral and oneIsBarrel) {
+      if (oneClustersAbove4 and dphiCutTight and bothAreNeutral and oneIsBarrel) {
         calculationResult["ggBarrelTight"] = 1;
       }
       if (dphiCutExtraLoose and oneIsNeutral and not oneIsBarrel) {
         calculationResult["ggEndcapVL"] = 1;
       }
-      if (bothClustersAbove4 and dphiCutLoose and oneIsNeutral and not oneIsBarrel) {
+      if (oneClustersAbove4 and dphiCutLoose and oneIsNeutral and not oneIsBarrel) {
         calculationResult["ggEndcapLoose"] = 1;
       }
-      if (bothClustersAbove4 and dphiCutTight and bothAreNeutral and not oneIsBarrel) {
+      if (oneClustersAbove4 and dphiCutTight and bothAreNeutral and not oneIsBarrel) {
         calculationResult["ggEndcapTight"] = 1;
       }
+    }
 
-      const double minEnergy = std::min(Elab0, Elab1);
-      const double maxEnergy = std::max(Elab0, Elab1);
-      // TODO: Hä? minEnergy & maxEnergy the same cut?
-      if (dphi > 155 and thetaSum > 165 and thetaSum < 195 and minEnergy > 0.15 and minEnergy < 0.5 and
-          maxEnergy > 0.15 and maxEnergy < 0.5) {
-        calculationResult["muonPairECL"] = 1;
-      }
+    const double minEnergy = std::min(Elab0, Elab1);
+    const double maxEnergy = std::max(Elab0, Elab1);
+    if (dphi > 155 and thetaSum > 165 and thetaSum < 195 and minEnergy > 0.15 and minEnergy < 0.5 and
+        maxEnergy > 0.15 and maxEnergy < 0.5) {
+      calculationResult["muonPairECL"] = 1;
     }
 
   }

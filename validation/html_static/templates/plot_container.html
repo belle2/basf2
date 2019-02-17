@@ -56,7 +56,7 @@
     <h2 class="persistent-header">NTuple: {{title}}</h2>
     <table id={{title}}></table>
     <script type="text/javascript">
-        fill_ntuple_table("{{title}}","{{json_file_path}}");
+        fillNtupleTable("{{title}}","{{json_file_path}}");
     </script>
     {{>ntuple_description}}
     </div>
@@ -111,7 +111,7 @@
 	{{#if !is_expert || show_expert_plots }}
         <div class="plot_matrix_item">
         <a class="open-popup-link" id="trigger-popup-{{unique_id}}" href="#popup-{{unique_id}}">
-        <img class="plot_matrix_image" onclick="trigger_popup('trigger-popup-{{unique_id}}');" height="150px" width="210px" src="../{{ plot_path }}{{ png_filename }}">
+        <img class="plot_matrix_image" onclick="triggerPopup('trigger-popup-{{unique_id}}');" height="150px" width="210px" src="../{{ plot_path }}{{ png_filename }}">
         </a>
         </div>
         {{! hidden segment which is only shown (as a popup) if the user clicks on the element}}

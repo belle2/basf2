@@ -26,7 +26,7 @@ function getDefaultPackageName(package_list) {
  * @param keypath
  * @return {string}
  */
-function get_storage_id(keypath) {
+function getStorageId(keypath) {
     return `validation_config_${keypath}`;
 }
 
@@ -38,7 +38,7 @@ function get_storage_id(keypath) {
  * get created
  * @param item_id
  */
-function trigger_popup(item_id) {
+function triggerPopup(item_id) {
 
     $(`#${item_id}`).magnificPopup({
         type: 'inline',
@@ -61,7 +61,7 @@ function loadValidationPlots(package_load_name, data) {
 
     console.log(`loadValidationPlots: Comparison data for package '${package_load_name}' loaded`);
 
-    let selected_list = get_selected_revs_list();
+    let selected_list = getSelectedRevsList();
     // update the already displayed revision labels with the correct colors
     $(".revision-label").each(function () {
 
@@ -109,8 +109,8 @@ function loadValidationPlots(package_load_name, data) {
     setupRactive("plot_container", '#content', wrapped_package, null,
         // on complete
         function (ractive) {
-            ractive_value_recover_session(ractive, "show_overview");
-            ractive_value_recover_session(ractive, "show_expert_plots");
+            ractiveValueRecoverSession(ractive, "show_overview");
+            ractiveValueRecoverSession(ractive, "show_expert_plots");
 
             // setup the jquery ui toggle buttons
             // this can only be done here, otherwise the initial values of the toggle buttons
@@ -123,10 +123,10 @@ function loadValidationPlots(package_load_name, data) {
 
             // make sure changes to the viewing settings are stored right away
             ractive.observe('show_overview', function () {
-                ractive_value_preserve_session(ractive, "show_overview");
+                ractiveValuePreserveSession(ractive, "show_overview");
             });
             ractive.observe('show_expert_plots', function () {
-                ractive_value_preserve_session(ractive, "show_expert_plots");
+                ractiveValuePreserveSession(ractive, "show_expert_plots");
             });
 
             // check if an "empty" entry needs to be added to the script accordion
@@ -165,7 +165,7 @@ function loadValidationPlots(package_load_name, data) {
  * @param dom_id
  * @param json_loading_path
  */
-function fill_ntuple_table(dom_id, json_loading_path) {
+function fillNtupleTable(dom_id, json_loading_path) {
     // move out of the static folder 
     $.getJSON(`../${json_loading_path}`, function (data) {
         let items = [];
@@ -220,7 +220,7 @@ function fill_ntuple_table(dom_id, json_loading_path) {
  * Returns array with the names of the selected revisions.
  * @return {Array}
  */
-function get_selected_revs_list() {
+function getSelectedRevsList() {
     let selected_rev = [];
     $('.reference-checkbox').each(function (i, obj) {
         if (obj.checked === true) {
@@ -236,9 +236,9 @@ function get_selected_revs_list() {
  * We need that to create folder names & queries
  * @return {string}
  */
-function get_selected_revs_string() {
+function getSelectedRevsString() {
     let rev_string = "";
-    let selected_rev = get_selected_revs_list();
+    let selected_rev = getSelectedRevsList();
     for (let i in selected_rev) {
         if (i > 0)
             rev_string += "_";
@@ -446,8 +446,8 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list) {
  */
 function loadSelectedRevisions(data) {
 
-    let rev_string = get_selected_revs_string();
-    let rev_list = get_selected_revs_list();
+    let rev_string = getSelectedRevsString();
+    let rev_list = getSelectedRevsList();
 
     if (rev_string === "") {
         alert("Please select at least one tag!");

@@ -12,7 +12,7 @@ Support functions for using Ractive on the validation website
  * @param keypath
  * @returns  Null is returned, if no default value was set, else the default value
  */
-function default_values(keypath) {
+function defaultValues(keypath) {
     let defaults = {
         "show_overview": true,
         "show_expert_plots": false
@@ -32,7 +32,7 @@ function default_values(keypath) {
  * @param val the string value to be converted
  * @returns
  */
-function convert_string_values(val) {
+function convertStringValues(val) {
     if (val === "false") {
         return false;
     } else if (val === "true") {
@@ -49,17 +49,17 @@ function convert_string_values(val) {
 /**
  * Finds value corresponding to $keypath in the sessionStorage.
  * If the key does not exist in storage, the default value from the
- * default_values function is taken.
+ * defaultValues function is taken.
  * The value is then set in ractive using ractive.set
  * @param ractive
  * @param keypath
  * @returns None
  */
-function ractive_value_recover_session(ractive, keypath) {
-    let key = get_storage_id(keypath);
-    let val = convert_string_values(sessionStorage.getItem(key));
+function ractiveValueRecoverSession(ractive, keypath) {
+    let key = getStorageId(keypath);
+    let val = convertStringValues(sessionStorage.getItem(key));
     if (val === null) {
-        val = default_values(keypath);
+        val = defaultValues(keypath);
         console.debug(
             `Did not find key '${key}' in session storage, so it was set ` +
             `to default value '${val}'.`
@@ -71,17 +71,17 @@ function ractive_value_recover_session(ractive, keypath) {
 /**
  * Finds value corresponding to $keypath either in the localStorage.
  * If the key does not exist in storage, the default value from the
- * default_values function is taken.
+ * defaultValues function is taken.
  * The value is then set in ractive using ractive.set
  * @param ractive
  * @param keypath
  * @returns None
  */
-function ractive_value_recover_local(ractive, keypath) {
-    let key = get_storage_id(keypath);
-    let val = convert_string_values(localStorage.getItem(key));
+function ractiveValueRecoverLocal(ractive, keypath) {
+    let key = getStorageId(keypath);
+    let val = convertStringValues(localStorage.getItem(key));
     if (val === null) {
-        val = default_values(keypath);
+        val = defaultValues(keypath);
         console.debug(
             `Did not find key '${key}' in local storage, so it was set ` +
             `to default value '${val}'.`
@@ -95,9 +95,9 @@ function ractive_value_recover_local(ractive, keypath) {
  * @param ractive
  * @param keypath
  */
-function ractive_value_preserve_session(ractive, keypath) {
+function ractiveValuePreserveSession(ractive, keypath) {
     let val = ractive.get(keypath);
-    let key = get_storage_id(keypath);
+    let key = getStorageId(keypath);
     sessionStorage.setItem(key, val);
     console.debug(`Storing key '${key}' with value '${val}' to session storage`);
 }
@@ -107,9 +107,9 @@ function ractive_value_preserve_session(ractive, keypath) {
  * @param ractive
  * @param keypath
  */
-function ractive_value_preserve_local(ractive, keypath) {
+function ractiveValuePreserveLocal(ractive, keypath) {
     let val = ractive.get(keypath);
-    let key = get_storage_id(keypath);
+    let key = getStorageId(keypath);
     localStorage.setItem(key, val);
     console.debug(`Storing key '${key}' with value '${val}' to local storage`);
 

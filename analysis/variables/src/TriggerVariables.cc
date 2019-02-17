@@ -255,7 +255,7 @@ namespace Belle2 {
       // for HLT, a c_accept is a pass and all other cases are fail
       // see mdst/dataobjects/include/SoftwareTriggerResult.h
       std::vector<std::string> hardcodedname
-        = { "software_trigger_cut&trigger&total_result" };
+        = { "software_trigger_cut&filter&total_result" };
       double swtcr = softwareTriggerResult(hardcodedname)(p);
       if (swtcr > 0.5) return 1.0; // 1
       else             return 0.0; // 0 or -1

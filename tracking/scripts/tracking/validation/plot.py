@@ -243,9 +243,6 @@ class ValidationPlot(object):
 
         # if referenceFileName was set the binning will taken from there
         if self.referenceFileName is not None:
-            n = None
-            xmin = None
-            xmax = None
             n, xmin, xmax = get1DBinningFromReference(self.name, self.referenceFileName)
             if n is not None and xmin is not None and xmax is not None:
                 bins = n

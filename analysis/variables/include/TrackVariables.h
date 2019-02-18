@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck                   *
+ * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck, Torben Ferber    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -166,6 +166,18 @@ namespace Belle2 {
      * a track in the event missed by the tracking
      */
     double trackFindingFailureFlag(const Particle*);
+
+    /**
+    * returns extrapolated theta position based on helix parameters
+    * parameters are the radius and z values to stop extrapolation
+    */
+    double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars);
+
+    /**
+    * returns extrapolated phi position based on helix parameters
+    * parameters are the radius and z values to stop extrapolation
+    */
+    double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars);
 
   }
 } // Belle2 namespace

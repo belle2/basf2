@@ -37,7 +37,7 @@ int HepMCReader::nextValidEvent(HepMC::GenEvent& evt)
       eventID = evt.event_number();
     }
   }
-  if (eventID > m_maxEvent) { return -999; } // went too far; there is no int nan
+  if (eventID >= m_maxEvent) { return -999; } // went too far; there is no int nan
   return eventID;
 }
 
@@ -58,9 +58,8 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
   //this tellt the module to stop processing the events
   if (nparticles <= 0) {
-    throw (HepMCInvalidEventError() << nparticles);
+    throw (HepMCInvalidEventError());
   }
-
   // Fill particle graph with this event
   const int event_offset = graph.size(); //offset
   //Make list of particles; Prepare graph

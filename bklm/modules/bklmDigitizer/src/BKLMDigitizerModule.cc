@@ -133,7 +133,7 @@ void BKLMDigitizerModule::digitize(std::multimap<int, BKLMSimHit*>& volIDToSimHi
       bklmDigit->isAboveThreshold(true);
     } else {
       tdc = 0;
-      bklmDigit->setCharge(0);
+      bklmDigit->setCharge(m_digitParams->getADCRange() - 1);
       bklmDigit->isAboveThreshold(false);
     }
     // Not implemented in BKLMDigit.

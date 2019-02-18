@@ -15,7 +15,6 @@
 #include <bklm/dbobjects/BKLMBadChannels.h>
 #include <bklm/dbobjects/BKLMMisAlignment.h>
 #include <bklm/dbobjects/BKLMDisplacement.h>
-#include <bklm/dbobjects/BKLMADCThreshold.h>
 #include <bklm/dbobjects/BKLMTimeWindow.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
@@ -354,19 +353,12 @@ void BKLMDatabaseImporter::exportBklmDisplacement()
   }//end loop layer
 }
 
-void BKLMDatabaseImporter::importBklmADCThreshold()
+void BKLMDatabaseImporter::importBklmADCThreshold(BKLMADCThreshold* threshold)
 {
-
-  DBImportObjPtr<BKLMADCThreshold> m_ADCParam;
-  m_ADCParam.construct();
-  GearDir params("/Detector/DetectorComponent[@name=\"BKLM\"]/"
-                 "Content/DigitizationParams");
-  m_ADCParam->setMPPCGain(params.getDouble("MPPCGain"));
-  m_ADCParam->setADCOffset(params.getInt("ADCOffset"));
-  m_ADCParam->setADCThreshold(params.getDouble("ADCThreshold"));
-
+  DBImportObjPtr<BKLMADCThreshold> adcParam;
+  adcParam.construct(*threshold);
   IntervalOfValidity iov(0, 0, -1, -1);
-  m_ADCParam.import(iov);
+  adcParam.import(iov);
 }
 
 void BKLMDatabaseImporter::exportBklmADCThreshold()

@@ -167,7 +167,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
     } else {
       tdc = 0;
-      eklmDigit->setCharge(0);
+      eklmDigit->setCharge(m_DigPar->getADCRange() - 1);
     }
     eklmDigit->setTDC(tdc);
     eklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));

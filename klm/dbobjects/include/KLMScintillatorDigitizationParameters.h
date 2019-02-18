@@ -3,13 +3,12 @@
  * Copyright(C) 2016  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yinghui GUAN                                             *
+ * Contributors: Kirill Chilikin                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BKLMSCINDIGITIZATIONPARAMS_DB_H
-#define BKLMSCINDIGITIZATIONPARAMS_DB_H
+#pragma once
 
 /* External headers. */
 #include <TObject.h>
@@ -17,21 +16,21 @@
 namespace Belle2 {
 
   /**
-   * Class to store BKLM sinctillator simulation in the database.
+   * Class to store KLM scintillator simulation parameters in the database.
    */
-  class BKLMScinDigitizationParams : public TObject {
+  class KLMScintillatorDigitizationParameters : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    BKLMScinDigitizationParams();
+    KLMScintillatorDigitizationParameters();
 
     /**
      * Destructor.
      */
-    ~BKLMScinDigitizationParams();
+    ~KLMScintillatorDigitizationParameters();
 
     /**
      * Get ADC range.
@@ -44,12 +43,22 @@ namespace Belle2 {
     void setADCRange(int range);
 
     /**
-     * Get ADC sampling time.
+     * Get ADC sampling frequency in GHz.
+     */
+    float getADCSamplingFrequency() const;
+
+    /**
+     * Set ADC sampling frequency in GHz.
+     */
+    void setADCSamplingFrequency(float frequency);
+
+    /**
+     * Get ADC sampling time in ns.
      */
     float getADCSamplingTime() const;
 
     /**
-     * Set ADC sampling time.
+     * Set ADC sampling time in ns.
      */
     void setADCSamplingTime(float time);
 
@@ -64,6 +73,46 @@ namespace Belle2 {
     void setNDigitizations(int digitizations);
 
     /**
+     * Get ADC pedestal.
+     */
+    float getADCPedestal() const;
+
+    /**
+     * Set ADC pedestal.
+     */
+    void setADCPedestal(float pedestal);
+
+    /**
+     * Get ADC photoelectron amplitude.
+     */
+    float getADCPEAmplitude() const;
+
+    /**
+     * Set ADC photoelectron amplitude.
+     */
+    void setADCPEAmplitude(float amplitude);
+
+    /**
+     * Get ADC readout corresponding to saturation.
+     */
+    int getADCThreshold() const;
+
+    /**
+     * Set ADC readout corresponding to saturation.
+     */
+    void setADCThreshold(int threshold);
+
+    /**
+     * Get ADC readout corresponding to saturation.
+     */
+    int getADCSaturation() const;
+
+    /**
+     * Set ADC readout corresponding to saturation.
+     */
+    void setADCSaturation(int saturation);
+
+    /**
      * Get number of photoelectrons / 1 MeV.
      */
     float getNPEperMeV() const;
@@ -74,8 +123,8 @@ namespace Belle2 {
     void setNPEperMeV(float npe);
 
     /**
-    * Get cosine of maximal light capture angle (by fiber).
-    */
+     * Get cosine of maximal light capture angle (by fiber).
+     */
     float getMinCosTheta() const;
 
     /**
@@ -163,16 +212,6 @@ namespace Belle2 {
      */
     void setEnableConstBkg(bool enable);
 
-    /**
-     * get time resolution
-     */
-    float getTimeResolution() const {return m_timeResolution;}
-
-    /**
-     * set time resolution
-     */
-    void setTimeResolution(float timeResolution)  { m_timeResolution = timeResolution; }
-
   private:
 
     /** ADC range: 2**(resolution in bits). */
@@ -185,13 +224,16 @@ namespace Belle2 {
     int m_NDigitizations;
 
     /** ADC pedestal. */
-    //float m_ADCPedestal;
+    float m_ADCPedestal;
 
     /** ADC photoelectron amplitude. */
-    //float m_ADCPEAmplitude;
+    float m_ADCPEAmplitude;
+
+    /** ADC threshold. */
+    float m_ADCThreshold;
 
     /** ADC readout corresponding to saturation. */
-    //float m_ADCSaturation;
+    int m_ADCSaturation;
 
     /** Number of photoelectrons / 1 MeV. */
     float m_NPEperMeV;
@@ -225,15 +267,9 @@ namespace Belle2 {
     /** Enable background in fitting. */
     bool m_EnableConstBkg;
 
-    /** time resolution */
-    float m_timeResolution;
-
-    /** Makes objects storable. */
-    ClassDef(Belle2::BKLMScinDigitizationParams, 1);
+    /** Class version. */
+    ClassDef(Belle2::KLMScintillatorDigitizationParameters, 1);
 
   };
 
 }
-
-#endif
-

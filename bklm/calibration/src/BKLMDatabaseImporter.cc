@@ -15,8 +15,6 @@
 #include <bklm/dbobjects/BKLMBadChannels.h>
 #include <bklm/dbobjects/BKLMMisAlignment.h>
 #include <bklm/dbobjects/BKLMDisplacement.h>
-#include <bklm/dbobjects/BKLMScinDigitizationParams.h>
-#include <bklm/dbobjects/BKLMADCThreshold.h>
 #include <bklm/dbobjects/BKLMTimeWindow.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <bklm/dataobjects/BKLMElementID.h>
@@ -355,68 +353,12 @@ void BKLMDatabaseImporter::exportBklmDisplacement()
   }//end loop layer
 }
 
-void BKLMDatabaseImporter::importBklmDigitizationParams()
+void BKLMDatabaseImporter::importBklmADCThreshold(BKLMADCThreshold* threshold)
 {
-
-  DBImportObjPtr<BKLMScinDigitizationParams> scinDigitzationParm;
-  scinDigitzationParm.construct();
-  GearDir dig("/Detector/DetectorComponent[@name=\"BKLM\"]/"
-              "Content/DigitizationParams");
-  scinDigitzationParm->setADCRange(dig.getInt("ADCRange"));
-  scinDigitzationParm->setADCSamplingTime(dig.getDouble("ADCSamplingTime"));
-  scinDigitzationParm->setNDigitizations(dig.getInt("nDigitizations"));
-  scinDigitzationParm->setNPEperMeV(dig.getDouble("nPEperMeV"));
-  scinDigitzationParm->setMinCosTheta(cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI));
-  scinDigitzationParm->setMirrorReflectiveIndex(dig.getDouble("MirrorReflectiveIndex"));
-  scinDigitzationParm->setScintillatorDeExcitationTime(dig.getDouble("ScintDeExTime"));
-  scinDigitzationParm->setFiberDeExcitationTime(dig.getDouble("FiberDeExTime"));
-  scinDigitzationParm->setFiberLightSpeed(dig.getDouble("FiberLightSpeed"));
-  scinDigitzationParm->setAttenuationLength(dig.getDouble("AttenuationLength"));
-  scinDigitzationParm->setPEAttenuationFrequency(1.0 / 8.75); // from T2K paper by F. Retiere: PoS (PD07) 017)
-  scinDigitzationParm->setMeanSiPMNoise(dig.getDouble("MeanSiPMNoise"));
-  scinDigitzationParm->setEnableConstBkg(dig.getDouble("EnableConstBkg") > 0);
-  scinDigitzationParm->setTimeResolution(dig.getDouble("TimeResolution"));
-
+  DBImportObjPtr<BKLMADCThreshold> adcParam;
+  adcParam.construct(*threshold);
   IntervalOfValidity iov(0, 0, -1, -1);
-  scinDigitzationParm.import(iov);
-
-}
-
-void BKLMDatabaseImporter::exportBklmDigitizationParams()
-{
-
-  DBObjPtr<BKLMScinDigitizationParams> element("BKLMScinDigitizationParams");
-  B2INFO(" scintillator Digitization parameters: ");
-  B2INFO("ADC range " << element->getADCRange());
-  B2INFO("ADCSamplingTime " << element->getADCSamplingTime());
-  B2INFO("nDigitizations " << element->getNDigitizations());
-  B2INFO("nPEperMeV "      << element->getNPEperMeV());
-  B2INFO("minCosTheta "    << element->getMinCosTheta());
-  B2INFO("MirrorReflectiveIndex " << element->getMirrorReflectiveIndex());
-  B2INFO("scintillatorDeExcitationTime " << element->getScintillatorDeExcitationTime());
-  B2INFO("fiberDeExcitationTime " << element->getFiberDeExcitationTime());
-  B2INFO("fiberLightSpeed " << element->getFiberLightSpeed());
-  B2INFO("attenuationLength " << element->getAttenuationLength());
-  B2INFO("PEAttenuationFreq " << element->getPEAttenuationFrequency());
-  B2INFO("meanSiPMNoise " << element->getMeanSiPMNoise());
-  B2INFO("enableConstBkg " << element->getEnableConstBkg());
-  B2INFO("timeResolution " << element->getTimeResolution());
-
-}
-
-void BKLMDatabaseImporter::importBklmADCThreshold()
-{
-
-  DBImportObjPtr<BKLMADCThreshold> m_ADCParam;
-  m_ADCParam.construct();
-  GearDir params("/Detector/DetectorComponent[@name=\"BKLM\"]/"
-                 "Content/DigitizationParams");
-  m_ADCParam->setMPPCGain(params.getDouble("MPPCGain"));
-  m_ADCParam->setADCOffset(params.getInt("ADCOffset"));
-  m_ADCParam->setADCThreshold(params.getDouble("ADCThreshold"));
-
-  IntervalOfValidity iov(0, 0, -1, -1);
-  m_ADCParam.import(iov);
+  adcParam.import(iov);
 }
 
 void BKLMDatabaseImporter::exportBklmADCThreshold()

@@ -13,23 +13,23 @@
 #include <TH1F.h>
 
 /* Belle2 headers. */
-#include <eklm/simulation/FPGAFitter.h>
+#include <klm/simulation/ScintillatorFirmware.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-EKLM::FPGAFitter::FPGAFitter(int nPoints)
+KLM::ScintillatorFirmware::ScintillatorFirmware(int nPoints)
 {
   m_nPoints = nPoints;
 }
 
-EKLM::FPGAFitter::~FPGAFitter()
+KLM::ScintillatorFirmware::~ScintillatorFirmware()
 {
 }
 
-enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
-                                               EKLMFPGAFit* fitData)
+enum KLM::ScintillatorFirmwareFitStatus KLM::ScintillatorFirmware::fit(
+  int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData)
 {
   /*
    * Upper bound of the background region: number of points before threshold
@@ -57,12 +57,12 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
   }
   /* No signal. */
   if (ithr < 0)
-    return c_FPGANoSignal;
+    return c_ScintillatorFirmwareNoSignal;
   /* Region for background (pedestal) level. */
   ibg = std::max(ithr - nPointsSigBg, 0);
   /* Cannot determine background level, no data before signal. */
   if (ibg == 0)
-    return c_FPGANoSignal;
+    return c_ScintillatorFirmwareNoSignal;
   /* Determine background (pedestal) level. */
   for (i = 0; i < ibg; i++)
     bgSum = bgSum + amp[i];
@@ -74,6 +74,6 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
   fitData->setBackgroundAmplitude(bg);
   fitData->setAmplitude(sigAmp);
   fitData->setMinimalAmplitude(min);
-  return c_FPGASuccessfulFit;
+  return c_ScintillatorFirmwareSuccessfulFit;
 }
 

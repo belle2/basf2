@@ -24,7 +24,7 @@ class PackerUnpackerTest(Module):
         """
 
         # first convert to a python-list to be able to sort
-        py_list = [x for x in unsortedPyStoreArray if x.isGood()]
+        py_list = [x for x in unsortedPyStoreArray]
 
         # sort via a hierachy of sort keys
         return sorted(

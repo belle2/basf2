@@ -53,8 +53,6 @@ void EKLMRawPackerModule::event()
     B2FATAL("No EKLM electronics map.");
   for (i = 0; i < m_Digits.getEntries(); i++) {
     eklmDigit = m_Digits[i];
-    if (!(eklmDigit->isGood()))
-      continue;
     buf[0] = 0;
     buf[1] = 0;
     bword1 = 0;

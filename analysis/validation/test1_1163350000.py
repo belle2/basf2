@@ -117,7 +117,6 @@ ma.cutAndCopyList('pi+:lowp', 'pi+:95effptcut', '0.06<useCMSFrame(p)<0.25', path
 # tag side reconstruction
 ma.reconstructDecay('D-:tag ->K-:good pi+:sig pi-:sig', '1.8<M<1.9', path=my_path)
 ma.reconstructDecay('B0:tag ->D-:tag pi+:sig', 'Mbc>5.27 and abs(deltaE)<0.2', path=my_path)
-
 # KSs
 stdv0.stdKshorts(path=my_path)
 # vx.vertexKFit('K_S0:all', 0.001)  Please do not remove the comment for the time being

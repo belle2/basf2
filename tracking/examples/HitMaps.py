@@ -2,13 +2,15 @@ import ROOT
 from ROOT import TCanvas, TH2F, TDirectory
 
 
-# Takes the output of combined OverlapResiduals and HistoManager modules,
-# as input, and plots hit-maps for overlapping VXD hits in Layer:Sensor
-# canvases.
+'''Takes the output of combined OverlapResiduals and HistoManager modules,
+   as input, and plots hit-maps for overlapping VXD hits in Layer:Sensor
+   canvases.'''
+
+
 def Store_LayerSensor_plots(filename):
 
     f = ROOT.TFile.Open(filename, 'read')
-    # Move to TDirectory containing VXD hit-maps for overlapping hits
+    ''' Access the TDirectory containing VXD hit-maps for overlapping hits '''
     hm = f.Get('HitMaps_VXDOverlaps')
     l_Lyr6 = []
     l_Fit_Lyr6 = []
@@ -142,7 +144,7 @@ def Store_LayerSensor_plots(filename):
     return
 
 
-# Root output of module OverlapResiduals
+'''Root output of module OverlapResiduals'''
 filename = 'histofile.root'
 
 if __name__ == "__main__":

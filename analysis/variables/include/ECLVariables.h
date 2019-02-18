@@ -388,7 +388,7 @@ namespace Belle2 {
     /**
      * Returns cluster mdst array index
      */
-    double eclMdstIndex(const Particle* particle);
+    double eclClusterMdstIndex(const Particle* particle);
 
   }
 } // Belle2 namespace

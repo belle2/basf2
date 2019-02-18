@@ -672,13 +672,14 @@ namespace Belle2 {
       }
     }
 
-    double eclMdstIndex(const Particle* particle)
+    double eclClusterMdstIndex(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getArrayIndex();
-      } else std::numeric_limits<double>::quiet_NaN();
+      } else return std::numeric_limits<double>::quiet_NaN();
 
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
 
@@ -1150,7 +1151,7 @@ Since release-04-00-00 it is possible for a cluster to have both hypotheses so i
                       "Returns the ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters (of any generation) of the provided particle");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime,
                       "Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time, amongst the clusters (neutrals) and matched clusters (charged) of daughters (of all generations) of the provided particle");
-    REGISTER_VARIABLE("clusterMdstIndex", eclMdstIndex,
+    REGISTER_VARIABLE("clusterMdstIndex", eclClusterMdstIndex,
                         "StoreArray index(0 - based) of the MDST ECLCluster (useful for track based particles matched to a cluster)");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals,

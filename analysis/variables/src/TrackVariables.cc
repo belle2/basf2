@@ -280,8 +280,8 @@ namespace Belle2 {
       const Helix h = trackFit->getHelix();
 
       // extrapolate to radius
-      const double lHelixRadius = h.getArcLength2DAtCylindricalR(r) > 0 ? h.getArcLength2DAtCylindricalR(
-                                    r) : std::numeric_limits<double>::max();
+      const double arcLength = h.getArcLength2DAtCylindricalR(r);
+      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
 
       // extrapolate to FWD z
       const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
@@ -317,8 +317,8 @@ namespace Belle2 {
       const Helix h = trackFit->getHelix();
 
       // extrapolate to radius
-      const double lHelixRadius = h.getArcLength2DAtCylindricalR(r) > 0 ? h.getArcLength2DAtCylindricalR(
-                                    r) : std::numeric_limits<double>::max();
+      const double arcLength = h.getArcLength2DAtCylindricalR(r);
+      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
 
       // extrapolate to FWD z
       const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
@@ -440,8 +440,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,
                       "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.");
-    REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta, "Returns theta of extrapolated helix parameters");
-    REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi, "Returns phi of extrapolated helix parameters");
+    REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,
+                      "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
+    REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi,
+                      "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track");
     REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning,

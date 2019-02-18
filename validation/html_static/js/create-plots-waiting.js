@@ -21,6 +21,7 @@ function installPlottingProgress(revList, joinedRevisions, progressKey, waitTime
 
     let revString = selectedRevsListToString(revList);
 
+    // Wait for $waitTime, then query for changes and display them.
     setTimeout(function () {
 
         // ajax request to check for change
@@ -41,15 +42,8 @@ function installPlottingProgress(revList, joinedRevisions, progressKey, waitTime
                     // on the current progress ?
                     if (ajaxResult["status"] === "complete") {
                         // is the plotting complete and the overlay can be hidden again ?
-                        //loadcontent(joined_revisions, true);
-                        //alert("complete !!");
                         // load the newly generated plots
-
-                        // trigger complete reload !
-                        // todo: the revision selection seems to be kept, why ?
-                        //loadRevisions( rev_string, joined_revisions );
                         console.log("Plot creation for revisions " + revString + " complete");
-                        // fixme: revList unknown??
                         setupRactiveFromRevision(revData, revString, revList);
                         $("#outer").hide();
                     } else {
@@ -61,8 +55,8 @@ function installPlottingProgress(revList, joinedRevisions, progressKey, waitTime
                         let packageName = ajaxResult["package_name"];
 
                         // display infos on the waiting dialog
-                        $("#plot_creation_progress").text("Processing " + currentPackage + " of " + totalPackage + " packages");
-                        $("#plot_creation_package").text("Current Package: " + packageName);
+                        $("#plot_creation_progress").text(`Processing ${currentPackage} of ${totalPackage} packages`);
+                        $("#plot_creation_package").text(`Current Package: ${packageName}`);
 
                         // re-install the timer to check back on the progress
                         installPlottingProgress(revList, joinedRevisions, progressKey, defaultWaitTime, revData);
@@ -71,6 +65,7 @@ function installPlottingProgress(revList, joinedRevisions, progressKey, waitTime
 
             });
     }, waitTime);
+
 }
 
 

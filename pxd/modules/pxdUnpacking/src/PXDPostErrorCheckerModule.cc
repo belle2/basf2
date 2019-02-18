@@ -63,10 +63,10 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHE_START_END_ID |
     c_DHE_START_ID |
     c_DHE_START_WO_END |
-    c_NO_PXD |
+//    c_NO_PXD | // THEN we anyway have no data
     //
 //         c_NO_DATCON |  // does not affect pixel data
-    c_FAKE_NO_DATA_TRIG |
+//         c_FAKE_NO_DATA_TRIG | // this will trigger always!!!!
     c_DHE_ACTIVE |
 //         c_DHP_ACTIVE | // GHOST problem ... bit always set
     //
@@ -98,7 +98,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_META_MM_DHC_ERS |
 //         c_META_MM_DHC_TT | // time tag is not set correctly in EvtMeta
     c_META_MM_ONS_HLT |
-    c_META_MM_ONS_DC |
+//         c_META_MM_ONS_DC | // problem with NO-DATCON
     //
 //         c_EVT_TRG_GATE_DIFFER | // still a bug in DHE FW
 //         c_EVT_TRG_FRM_NR_DIFFER | // still a bug in DHE FW
@@ -116,6 +116,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of input PXDClusters", std::string(""));
 
   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
+  B2DEBUG(1, "The default error mask is $" << std::hex << defaulterrormask);
 
   addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);
   addParam("IgnoreDHPFrame", m_ignoreDHPFrame, "Ignore different dhp frame between DHEs", true);
@@ -132,6 +133,8 @@ void PXDPostErrorCheckerModule::initialize()
   m_storeRawAdc.isOptional(m_PXDRawAdcsName);
   m_storeROIs.isOptional(m_PXDRawROIsName);
   m_storeRawCluster.isOptional(m_RawClusterName);
+
+  B2DEBUG(1, "The set error mask is $" << std::hex << m_criticalErrorMask);
 }
 
 void PXDPostErrorCheckerModule::event()

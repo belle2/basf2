@@ -190,7 +190,7 @@ function setupRactiveFromRevision(revData, revList) {
                         "comparison file. Probably this package did not " +
                         "create a single output file."
                     );
-                    if (newestRev["packages"][irev]["fail_count"] > 0) {
+                    if (newestRev["packages"][irev]["scriptfiles"].length > 0) {
                         console.debug(
                             "However it did have failing scripts, so we " +
                             "will make it visible on the validation page. "

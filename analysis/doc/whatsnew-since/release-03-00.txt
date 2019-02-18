@@ -31,6 +31,9 @@ Variables
   .. seealso::
      `variables.utils.create_aliases_for_selected()`
 
+* The variables for the fast reco HLT trigger stage have been removed,
+  as we are currently not planning to have it in the early data taking.
+
 Modules
 +++++++
 

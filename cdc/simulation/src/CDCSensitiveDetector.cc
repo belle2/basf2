@@ -211,9 +211,9 @@ namespace Belle2 {
     const unsigned layerId = v.GetCopyNo();
     B2DEBUG(150, "LayerID in continuous counting method: " << layerId);
 
-    // If neutral particles, ignore them.
+    // If neutral particles, ignore them, unless monopoles.
 
-    if (charge == 0.) return false;
+    if ((charge == 0.) && (abs(pid) != 99666)) return false;
 
     // Calculate cell ID
     TVector3 tposIn(posIn.x() / CLHEP::cm, posIn.y() / CLHEP::cm, posIn.z() / CLHEP::cm);
@@ -299,7 +299,7 @@ namespace Belle2 {
 
         const HepPoint3D  x(pos[0] / CLHEP::cm, pos[1] / CLHEP::cm, pos[2] / CLHEP::cm);
         const HepVector3D p(momIn.x() / CLHEP::GeV, momIn.y() / CLHEP::GeV, momIn.z() / CLHEP::GeV);
-        Helix tmp(x, p, charge);
+        Helix tmp(x, p, charge + 0.001);
         tmp.bFieldZ(B_kG[2]);
         tmp.ignoreErrorMatrix();
 

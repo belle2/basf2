@@ -85,23 +85,26 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         trggdldqm = register_module('TRGGDLDQM')
         path.add_module(trggdldqm)
         # TRGCDCTSF
-        trgcdctsfdqm = register_module('TRGCDCTSFDQM')
-        path.add_module(trgcdctsfdqm)
+        nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
+        for mod_tsf in nmod_tsf:
+            path.add_module('TRGCDCTSFDQM', TSFMOD=mod_tsf)
         # TRGCDC3D
-        path.add_module('TRGCDCT3DConverter',
-                        hitCollectionName='FirmCDCTriggerSegmentHits',
-                        addTSToDatastore=True,
-                        EventTimeName='FirmBinnedEventT0',
-                        addEventTimeToDatastore=True,
-                        inputCollectionName='FirmTRGCDC2DFinderTracks',
-                        add2DFinderToDatastore=True,
-                        outputCollectionName='FirmTRGCDC3DFitterTracks',
-                        add3DToDatastore=True,
-                        fit3DWithTSIM=0,
-                        firmwareResultCollectionName='TRGCDCT3DUnpackerStores',
-                        isVerbose=0)
-        trgcdct3ddqm = register_module('TRGCDCT3DDQM')
-        path.add_module(trgcdct3ddqm, generatePostscript=False)
+        nmod_t3d = [0, 1, 2, 3]
+        for mod_t3d in nmod_t3d:
+            path.add_module('TRGCDCT3DConverter',
+                            hitCollectionName='FirmCDCTriggerSegmentHits' + str(mod_t3d),
+                            addTSToDatastore=True,
+                            EventTimeName='FirmBinnedEventT0' + str(mod_t3d),
+                            addEventTimeToDatastore=True,
+                            inputCollectionName='FirmTRGCDC2DFinderTracks' + str(mod_t3d),
+                            add2DFinderToDatastore=True,
+                            outputCollectionName='FirmTRGCDC3DFitterTracks' + str(mod_t3d),
+                            add3DToDatastore=True,
+                            fit3DWithTSIM=0,
+                            firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
+                            isVerbose=0)
+            path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if components is None or 'SVD' in components or 'PXD' in components:
         trackDqm = register_module('TrackDQM')

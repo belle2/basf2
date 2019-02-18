@@ -18,11 +18,11 @@ argc = len(argvs)  # of arg
 
 set_log_level(LogLevel.DEBUG)
 
-use_central_database("TRGGDL_201811")
+use_central_database("online")
 
 main = create_path()
 
-if argc == 2 and argvs[1][-6:0] == ".sroot":
+if argc == 2 and argvs[1][-6:] == ".sroot":
     f_in_root = argvs[1]
     input = register_module('SeqRootInput')
     matchobj = re.search("([^\/]+)\.sroot", f_in_root)

@@ -307,8 +307,12 @@ class ValidationRoot(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def system_info(self):
-        # note: for some reason %Z doesn't work like this, so we use time.tzname
-        # for the time zone.
+        """
+        Returns:
+            JSON file containing git versions and time of last restart
+        """
+        # note: for some reason %Z doesn't work like this, so we use
+        # time.tzname for the time zone.
         return {
             "last_restart":
                 self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],

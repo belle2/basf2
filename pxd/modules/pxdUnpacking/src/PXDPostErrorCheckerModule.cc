@@ -41,7 +41,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DATA_OUTSIDE |
     //
     c_DHC_START_SECOND |
-    c_DHE_WRONG_ID_SEQ |
+//    c_DHE_WRONG_ID_SEQ | // until this is fixed in FW, we have to live with this
     c_FIX_SIZE |
     c_DHE_CRC |
     //

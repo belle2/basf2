@@ -144,11 +144,9 @@ void SVDUnpackerDQMModule::beginRun()
 
 void SVDUnpackerDQMModule::event()
 {
-  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) {
-    B2ERROR("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD monitoring disabled");
-  }
-
-  if (m_eventMetaDataPtr->getEvent() % 1000 == 0) B2INFO("event number: " << m_eventMetaDataPtr->getEvent());
+  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) if (m_eventMetaDataPtr->getEvent() % 1000 == 0) {
+      B2ERROR("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD monitoring disabled");
+    }
 
   unsigned int nDiagnostics = m_svdDAQDiagnostics.getEntries();
 

@@ -79,7 +79,7 @@ class PackerUnpackerTest(Module):
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10]})
+eventinfosetter.param({'evtNumList': [50]})
 main.add_module(eventinfosetter)
 
 particlegun = register_module('ParticleGun')

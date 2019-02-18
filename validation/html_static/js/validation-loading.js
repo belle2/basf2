@@ -5,34 +5,32 @@
 // HTML or triggered from there.
 // ============================================================================
 
-// todo: maybe have a normal landing page in the future and just use loadSelectedRevisions instead?
 /**
  * This function gets called from the main page validation.html at the
  * beginning and sets up the * page with the initial selection of revisions.
- * @param revString
  * @param revList
  */
-function loadRevisions(revString, revList) {
-    if (typeof revString === 'undefined') {
-        // fixme: shouldn't that be an empty string?
-        revString = null;
+function loadRevisions(revList) {
+    if (!Array.isArray(revList) || !revList.length) {
+        revList = [];
     }
-    // fixme: this was a workaround for default values. But shouldn't rev list then also have a default value? Also note that JS support default values!
+
+    let revString = selectedRevsListToString(revList);
 
     console.log("Loading revisions from server");
-    let rev_load_path = "../revisions";
+    let revLoadPath = "../revisions";
 
-    $.get(rev_load_path).then(function (data) {
+    $.get(revLoadPath).then(function (data) {
         console.log("Loading done!");
 
         function setupRevisionLoader(ractive) {
 
             // load the defaults for the first time
-            if (revString == null) {
+            if (revString === "") {
                 loadSelectedRevisions(data);
             } else {
                 // otherwise, load a specific selection
-                setupRactiveFromRevision(data, revString, revList);
+                setupRactiveFromRevision(data, revList);
             }
 
             // be ready to load any other revision configuration if user desires
@@ -69,11 +67,11 @@ function setSystemInfo() {
  * is installed once Ractive is done creating the template the popups do not work
  * any more if the user clicked on the "Overview" checkbox because new DOM items
  * get created
- * @param item_id
+ * @param itemId
  */
-function triggerPopup(item_id) {
+function triggerPopup(itemId) {
 
-    $(`#${item_id}`).magnificPopup({
+    $(`#${itemId}`).magnificPopup({
         type: 'inline',
         // Allow opening popup on middle mouse click. Always set it to true if
         // you don't provide alternative source in href.
@@ -89,8 +87,8 @@ function triggerPopup(item_id) {
  */
 function loadSelectedRevisions(data) {
 
-    let revString = getSelectedRevsString();
     let revList = getSelectedRevsList();
+    let revString = selectedRevsListToString(revList);
 
     if (revString === "") {
         alert("Please select at least one tag!");
@@ -98,7 +96,7 @@ function loadSelectedRevisions(data) {
 
     console.log(`Loading rev via string '${revString}'.`);
 
-    setupRactiveFromRevision(data, revString, revList);
+    setupRactiveFromRevision(data, revList);
 }
 
 // ============================================================================
@@ -113,14 +111,15 @@ function loadSelectedRevisions(data) {
  * current selection of revisions haven't yet been generated and we
  * request them.
  * @param revData
- * @param revString
  * @param revList
  */
-function setupRactiveFromRevision(revData, revString, revList) {
+function setupRactiveFromRevision(revData, revList) {
 
     // don't event attempt to show comparisons for empty revisions
-    if (revString === "")
+    if (!Array.isArray(revList) || !revList.length)
         return;
+
+    let revString = selectedRevsListToString(revList);
 
     // make dynamic
     let comparisonLoadPath = `../comparisons/${revString}`;
@@ -269,7 +268,7 @@ function setupRactiveFromRevision(revData, revString, revList) {
             })
         }).done(function (data) {
             let key = data["progress_key"];
-            beginCreatePlotWait(revString, revList, key, revData);
+            beginCreatePlotWait(revList, revList, key, revData);
         });
     });
 }
@@ -493,15 +492,13 @@ function getSelectedRevsList() {
 /**
  * Returns a string representation of the array of selected revisions.
  * We need that to create folder names & queries
- * @return {string}
  */
-function getSelectedRevsString() {
+function selectedRevsListToString(selectedRevs) {
     let revString = "";
-    let selectedRev = getSelectedRevsList();
-    for (let i in selectedRev) {
+    for (let i in selectedRevs) {
         if (i > 0)
             revString += "_";
-        revString += selectedRev[i];
+        revString += selectedRevs[i];
     }
     return revString;
 }

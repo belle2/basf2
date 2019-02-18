@@ -22,19 +22,15 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <genfit/TrackPoint.h>
 #include <framework/gearbox/Const.h>
-
 #include <set>
-
 #include <root/TObject.h>
 #include <root/TROOT.h>
-
 #include <boost/foreach.hpp>
-
 #include <typeinfo>
 #include <cxxabi.h>
-
 #include <TMath.h>
 #include <TVector3.h>
+#include <TDirectory.h>
 
 using namespace Belle2;
 using namespace std;
@@ -49,18 +45,29 @@ REG_MODULE(OverlapResiduals)
 //                 Implementation
 //-----------------------------------------------------------------
 
-OverlapResidualsModule::OverlapResidualsModule() : Module()
+OverlapResidualsModule::OverlapResidualsModule() : HistoModule()
 {
-  // Set module properties
+  //Set module properties
   setDescription("The module studies consecutive hits in overlapping sensors of a same VXD layer, and the differences of their residuals, to monitor the detector alignment.");
-  addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("VXDOverlappingHits.root"));
 }
 
 void OverlapResidualsModule::initialize()
 {
-  //Set the ROOT File
-  m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
-  //Define histograms
+  //Register histograms (calls back defineHisto)
+  REG_HISTOGRAM
+}
+
+void OverlapResidualsModule::defineHisto()
+{
+  //Create a separate histogram directories
+  TDirectory* oldDir = gDirectory;
+  TDirectory* HMDir = NULL;
+  HMDir = oldDir->mkdir("HitMaps_VXDOverlaps");
+  TDirectory* ResDir = NULL;
+  ResDir = oldDir->mkdir("MonitoringResiduals_VXDOverlaps");
+
+  //Define histograms of residuals
+  ResDir->cd();
   h_U_Res = new TH1F("h_U_Res", "Histrogram of overlapping hits residuals", 100, -0.1, 0.1);
   h_V_Res = new TH1F("h_V_Res", "Histrogram of overlapping hits residuals", 100, -0.1, 0.1);
   h_U_Res_PXD = new TH1F("h_U_Res_PXD", "Histrogram of overlapping PXD hits residuals", 100, -0.1, 0.1);
@@ -69,8 +76,8 @@ void OverlapResidualsModule::initialize()
   h_V_Res_SVD = new TH1F("h_V_Res_SVD", "Histrogram of overlapping SVD hits residuals", 100, -0.1, 0.1);
   h_SVDstrips_Mult = new TH1F("h_SVDstrips_Mult", "SVD strips multipicity for SVD clusters in overlapping sensors", 15, 0.5, 15.5);
 
-  for (int i = 1; i < 10; i++) {
-    //The name is the product of cluster sizes for 2 consecutive hits
+  for (int i = 1; i < 5; i++) {
+    //The name is the product of cluster sizes for 2 consecutive hits (maximum size considered is 2)
     TString h_name_U = "h_U_Cl1Cl2_" + std::to_string(i);
     TString h_name_V = "h_V_Cl1Cl2_" + std::to_string(i);
     TString title_U = "U residuals: SVDClusterSize_1 x SVDClusterSize_2 = " + std::to_string(i);
@@ -78,6 +85,8 @@ void OverlapResidualsModule::initialize()
     h_U_Cl1Cl2_Res[i] = new TH1F(h_name_U, title_U, 100, -0.1, 0.1);
     h_V_Cl1Cl2_Res[i] = new TH1F(h_name_V, title_V, 100, -0.1, 0.1);
   }
+
+  HMDir->cd();
   //Create 2D sensor hit-maps for reconstructed hits
   for (int i = 1; i <= 5; i++) {
     for (int j = 1; j <= 16; j++) {
@@ -400,76 +409,10 @@ void OverlapResidualsModule::event()
               h_Fit_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_predIntersect_2[4]);
             }
           }
-
         }
       }
     }
-
-  }
-
-}
-
-
-
-
-void OverlapResidualsModule::terminate()
-{
-  B2INFO("________________________ FILL OUTPUT FILE ____________________");
-  h_SVDstrips_Mult->Scale(1. / h_SVDstrips_Mult->Integral());
-  if (m_rootFilePtr != NULL) {
-    m_rootFilePtr->cd();
-    //Store sensor hit maps
-    for (int i = 1; i <= 5; i++) {
-      for (int j = 1; j <= 16; j++) {
-        h_Lyr6[j][i]->Write();
-        h_Fit_Lyr6[j][i]->Write();
-      }
-    }
-
-    for (int i = 1; i <= 4; i++) {
-      for (int j = 1; j <= 12; j++) {
-        h_Lyr5[j][i]->Write();
-        h_Fit_Lyr5[j][i]->Write();
-      }
-    }
-
-    for (int i = 1; i <= 3; i++) {
-      for (int j = 1; j <= 10; j++) {
-        h_Lyr4[j][i]->Write();
-        h_Fit_Lyr4[j][i]->Write();
-      }
-    }
-
-    for (int i = 1; i <= 2; i++) {
-      for (int j = 1; j <= 7; j++) {
-        h_Lyr3[j][i]->Write();
-        h_Fit_Lyr3[j][i]->Write();
-      }
-      for (int j = 1; j <= 12; j++) {
-        h_Lyr2[j][i]->Write();
-        h_Fit_Lyr2[j][i]->Write();
-      }
-      for (int j = 1; j <= 8; j++) {
-        h_Lyr1[j][i]->Write();
-        h_Fit_Lyr1[j][i]->Write();
-      }
-    }
-    //Store histohrams of residuals
-    h_U_Res->Write();
-    h_V_Res->Write();
-    h_U_Res_PXD->Write();
-    h_V_Res_PXD->Write();
-    h_U_Res_SVD->Write();
-    h_V_Res_SVD->Write();
-
-    for (int i = 1; i <= 9; i++) {
-      if (i == 5 || i == 7 || i == 8) {
-        continue; //The product of cluster sizes cannot be 5, 7, 8
-      }
-      h_U_Cl1Cl2_Res[i]->Write();
-      h_V_Cl1Cl2_Res[i]->Write();
-    }
-
-    m_rootFilePtr->Close();
   }
 }
+
+

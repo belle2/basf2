@@ -1,11 +1,15 @@
 import ROOT
-from ROOT import TCanvas, TH2F
+from ROOT import TCanvas, TH2F, TDirectory
 
 
-# Takes the output of module OverlapResiduals as input, and plots hit-maps for overlapping VXD hits in Layer:Sensor canvases.
+# Takes the output of combined OverlapResiduals and HistoManager modules,
+# as input, and plots hit-maps for overlapping VXD hits in Layer:Sensor
+# canvases.
 def Store_LayerSensor_plots(filename):
 
     f = ROOT.TFile.Open(filename, 'read')
+    # Move to TDirectory containing VXD hit-maps for overlapping hits
+    hm = f.Get('HitMaps_VXDOverlaps')
     l_Lyr6 = []
     l_Fit_Lyr6 = []
     l_Lyr5 = []
@@ -71,10 +75,10 @@ def Store_LayerSensor_plots(filename):
         if j == 1:
             for i in range(1, 3):
                 for k in range(1, 9):
-                    histo = f.Get('h_' + str(j) + str(k) + str(i))
+                    histo = hm.Get('h_' + str(j) + str(k) + str(i))
                     l_Lyr1[i - 1].cd(k)
                     histo.Draw('COLZ')
-                    histo_fit = f.Get('h_Fit_' + str(j) + str(k) + str(i))
+                    histo_fit = hm.Get('h_Fit_' + str(j) + str(k) + str(i))
                     l_Fit_Lyr1[i - 1].cd(k)
                     histo_fit.Draw('COLZ')
                 l_Lyr1[i - 1].SaveAs('c_Layer:Sensor_' + str(j) + str(i) + '.root')
@@ -82,10 +86,10 @@ def Store_LayerSensor_plots(filename):
         if j == 2:
             for i in range(1, 3):
                 for k in range(1, 13):
-                    histo = f.Get('h_' + str(j) + str(k) + str(i))
+                    histo = hm.Get('h_' + str(j) + str(k) + str(i))
                     l_Lyr2[i - 1].cd(k)
                     histo.Draw('COLZ')
-                    histo_fit = f.Get('h_Fit_' + str(j) + str(k) + str(i))
+                    histo_fit = hm.Get('h_Fit_' + str(j) + str(k) + str(i))
                     l_Fit_Lyr2[i - 1].cd(k)
                     histo_fit.Draw('COLZ')
                 l_Lyr2[i - 1].SaveAs('c_Layer:Sensor_' + str(j) + str(i) + '.root')
@@ -93,10 +97,10 @@ def Store_LayerSensor_plots(filename):
         if j == 3:
             for i in range(1, 3):
                 for k in range(1, 8):
-                    histo = f.Get('h_' + str(j) + str(k) + str(i))
+                    histo = hm.Get('h_' + str(j) + str(k) + str(i))
                     l_Lyr3[i - 1].cd(k)
                     histo.Draw('COLZ')
-                    histo_fit = f.Get('h_Fit_' + str(j) + str(k) + str(i))
+                    histo_fit = hm.Get('h_Fit_' + str(j) + str(k) + str(i))
                     l_Fit_Lyr3[i - 1].cd(k)
                     histo_fit.Draw('COLZ')
                 l_Lyr3[i - 1].SaveAs('c_Layer:Sensor_' + str(j) + str(i) + '.root')
@@ -104,10 +108,10 @@ def Store_LayerSensor_plots(filename):
         if j == 4:
             for i in range(1, 4):
                 for k in range(1, 11):
-                    histo = f.Get('h_' + str(j) + str(k) + str(i))
+                    histo = hm.Get('h_' + str(j) + str(k) + str(i))
                     l_Lyr4[i - 1].cd(k)
                     histo.Draw('COLZ')
-                    histo_fit = f.Get('h_Fit_' + str(j) + str(k) + str(i))
+                    histo_fit = hm.Get('h_Fit_' + str(j) + str(k) + str(i))
                     l_Fit_Lyr4[i - 1].cd(k)
                     histo_fit.Draw('COLZ')
                 l_Lyr4[i - 1].SaveAs('c_Layer:Sensor_' + str(j) + str(i) + '.root')
@@ -115,10 +119,10 @@ def Store_LayerSensor_plots(filename):
         if j == 5:
             for i in range(1, 5):
                 for k in range(1, 13):
-                    histo = f.Get('h_' + str(j) + str(k) + str(i))
+                    histo = hm.Get('h_' + str(j) + str(k) + str(i))
                     l_Lyr5[i - 1].cd(k)
                     histo.Draw('COLZ')
-                    histo_fit = f.Get('h_Fit_' + str(j) + str(k) + str(i))
+                    histo_fit = hm.Get('h_Fit_' + str(j) + str(k) + str(i))
                     l_Fit_Lyr5[i - 1].cd(k)
                     histo_fit.Draw('COLZ')
                 l_Lyr5[i - 1].SaveAs('c_Layer:Sensor_' + str(j) + str(i) + '.root')
@@ -126,10 +130,10 @@ def Store_LayerSensor_plots(filename):
         if j == 6:
             for i in range(1, 6):
                 for k in range(1, 17):
-                    histo = f.Get('h_' + str(j) + str(k) + str(i))
+                    histo = hm.Get('h_' + str(j) + str(k) + str(i))
                     l_Lyr6[i - 1].cd(k)
                     histo.Draw('COLZ')
-                    histo_fit = f.Get('h_Fit_' + str(j) + str(k) + str(i))
+                    histo_fit = hm.Get('h_Fit_' + str(j) + str(k) + str(i))
                     l_Fit_Lyr6[i - 1].cd(k)
                     histo_fit.Draw('COLZ')
                 l_Lyr6[i - 1].SaveAs('c_Layer:Sensor_' + str(j) + str(i) + '.root')
@@ -139,7 +143,7 @@ def Store_LayerSensor_plots(filename):
 
 
 # Root output of module OverlapResiduals
-filename = 'VXDOverlappingHits.root'
+filename = 'histofile.root'
 
 if __name__ == "__main__":
     Store_LayerSensor_plots(filename)

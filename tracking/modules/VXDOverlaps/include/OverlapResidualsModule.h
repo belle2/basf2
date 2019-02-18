@@ -11,12 +11,11 @@
 #ifndef OVERLAPRESIDUALSMODULE_H
 #define OVERLAPRESIDUALSMODULE_H
 
-
+#include <framework/core/HistoModule.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
 
@@ -30,7 +29,7 @@ namespace Belle2 {
    *
    * Overlapping residuals
    */
-  class OverlapResidualsModule : public Module {
+  class OverlapResidualsModule : public HistoModule {  // <- derived from HistoModule
 
   public:
     /** Constructor */
@@ -39,14 +38,11 @@ namespace Belle2 {
     void initialize() override;
     /** Compute the difference of coordinate residuals between two hits in overlapping sensors of a same VXD layer */
     void event() override;
-    /** Terminate basf2*/
-    void terminate() override;
+
+    /**                                                                                                                                                                                                         * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed                                                                                                                          * to be placed in this function.                                                                                                                                                                           */
+    void defineHisto() override;
 
   private:
-    /** Root filename */
-    std::string m_rootFileName = "VXDOverlappingHits.root";
-    /** Pointer to the root file */
-    TFile* m_rootFilePtr = nullptr;
     /** Array storing reconstructed tracks */
     StoreArray<RecoTrack> recoTrack;
     /** Array storing PXD clusters */
@@ -65,8 +61,8 @@ namespace Belle2 {
     /** Histograms of SVD strips multiplicity */
     TH1F* h_SVDstrips_Mult = nullptr;
     /** Histograms of SVD residuals grouped by clusters sizes */
-    TH1F* h_U_Cl1Cl2_Res[10] = {nullptr};
-    TH1F* h_V_Cl1Cl2_Res[10] = {nullptr};
+    TH1F* h_U_Cl1Cl2_Res[5] = {nullptr};
+    TH1F* h_V_Cl1Cl2_Res[5] = {nullptr};
     /** Sensor hit-maps from reconstructed u and v coordinates */
     TH2F* h_Lyr6[17][6] = {nullptr};
     TH2F* h_Lyr5[13][5] = {nullptr};

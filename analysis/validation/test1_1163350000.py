@@ -29,7 +29,6 @@ import vertex as vx
 import variables.utils as vu
 import variables.collections as vc
 
-<< << << < HEAD
 # create path
 
 my_path = b2.create_path()
@@ -38,12 +37,10 @@ gb2_setuprel = "release-03-00-02"
 
 from variables import variables
 
-== == == =
 # their names in the ntuple are human readable
 from variables import variables
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
->>>>>> > origin
 variables.addAlias('ROE_neextra', 'ROE_neextra(simple)')
 variables.addAlias('abs_dM', 'abs(dM)')
 variables.addAlias('dmID', 'extraInfo(decayModeID)')

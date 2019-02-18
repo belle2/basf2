@@ -224,10 +224,12 @@ function setupRactiveFromRevision(revData, revList) {
                     if (firstPackageName !== false) {
                         loadValidationPlots(firstPackageName, data);
                     } else {
-                        console.warn("No package could be loaded.")
+                        console.warn("No package could be loaded.");
+                        $("content").text("No package could be loaded");
                     }
                 }
                 ractive.on({
+                    // todo: why does pycharm complain about this being unused? It's used in package.html
                     load_validation_plots: function (evt) {
                         // This gets called if the user clicks on a package in the
                         // package-selection side menu.
@@ -237,10 +239,12 @@ function setupRactiveFromRevision(revData, revList) {
 
                         let pkgs = ractive.get('packages');
 
+                        let package_name = evt.context.name;
+
                         // Display sub-packages for this one.
                         if (pkgs != null) {
                             for (let ipkg in pkgs) {
-                                if (pkgs[ipkg].name === evt.context.name) {
+                                if (pkgs[ipkg].name === package_name) {
                                     // disaplay this one
                                     ractive.set(`packages.${ipkg}.display_setting`, 'block');
                                     break;
@@ -251,6 +255,9 @@ function setupRactiveFromRevision(revData, revList) {
                             // used to create this template instance
                             loadValidationPlots(evt.context.name, data);
                         }
+
+                        // Remember that this package was open last
+                        localStorage.setItem(getStorageId("packageList"), package_name);
                     }
                 });
             });
@@ -463,6 +470,12 @@ function getDefaultPackageName(packageList) {
         return false;
     }
 
+    let last_package = localStorage.getItem(getStorageId("packageList"));
+    if (last_package !== null){
+        console.debug(`Opening package '${last_package}' because it was opened last`);
+        return last_package
+    }
+
     let firstPackageName = packageList[0].name;
     if (firstPackageName !== 'undefined') {
         return firstPackageName;
@@ -470,7 +483,6 @@ function getDefaultPackageName(packageList) {
         console.debug("getDefaultPackageName: Name of first package undefined.");
         return false;
     }
-
 }
 
 

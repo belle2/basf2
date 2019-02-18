@@ -82,7 +82,7 @@ def add_time_extraction(path, components=None):
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
-                                   data_taking_period="gcr2017", top_in_counter=False,
+                                   data_taking_period="early_phase3", top_in_counter=False,
                                    merge_tracks=False, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
@@ -220,7 +220,7 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
                 path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
 
-def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='gcr2017',
+def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
                          merge_tracks=True, use_second_cdc_hits=False):
     import cdc.cr as cosmics_setup
 

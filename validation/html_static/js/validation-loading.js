@@ -203,8 +203,9 @@ function setupRactiveFromRevision(revData, revList) {
                         pkgDict["scriptfiles"] = scriptfiles;
                         pkgDict["newest_revision"] = label;
                         // Also add keys that usually come from the
-                        // comparison file:
+                        // comparison file and are nescessary for things to work
                         pkgDict["visible"] = true;
+                        pkgDict["comparison_error"] = 0; // else problems in package template
                         data["packages"].push(pkgDict);
 
                     }

@@ -8,16 +8,18 @@
  * This method will either start a new time, if the plots are
  * not complete yet or will hide the wait dialog if the plotting
  * is complete.
- * @param revString
+ * @param revList
  * @param joinedRevisions
  * @param progressKey
  * @param waitTime
  * @param revData
  */
-function installPlottingProgress(revString, joinedRevisions, progressKey, waitTime, revData) {
+function installPlottingProgress(revList, joinedRevisions, progressKey, waitTime, revData) {
 
     // query every second
     let defaultWaitTime = 1000;
+
+    let revString = selectedRevsListToString(revList);
 
     setTimeout(function () {
 
@@ -33,7 +35,7 @@ function installPlottingProgress(revString, joinedRevisions, progressKey, waitTi
             .success(function (ajaxResult) {
                 if (!ajaxResult) {
                     // no status yet, keep on querying
-                    installPlottingProgress(revString, joinedRevisions, progressKey, defaultWaitTime, revData);
+                    installPlottingProgress(revList, joinedRevisions, progressKey, defaultWaitTime, revData);
                 } else {
                     // is it only a status message or a message with detailed information
                     // on the current progress ?
@@ -63,7 +65,7 @@ function installPlottingProgress(revString, joinedRevisions, progressKey, waitTi
                         $("#plot_creation_package").text("Current Package: " + packageName);
 
                         // re-install the timer to check back on the progress
-                        installPlottingProgress(revString, joinedRevisions, progressKey, defaultWaitTime, revData);
+                        installPlottingProgress(revList, joinedRevisions, progressKey, defaultWaitTime, revData);
                     }
                 }
 
@@ -75,12 +77,12 @@ function installPlottingProgress(revString, joinedRevisions, progressKey, waitTi
 /**
  * This function gets called from setupRactiveFromRevision, if we see that we
  * need to generate new plots.
- * @param revString
+ * @param revList
  * @param joinedRevisions
  * @param progressKey
  * @param revData
  */
-function beginCreatePlotWait(revString, joinedRevisions, progressKey, revData) {
+function beginCreatePlotWait(revList, joinedRevisions, progressKey, revData) {
 
     // reset status display from previous execution
     $("#plot_creation_progress").text("");
@@ -90,5 +92,5 @@ function beginCreatePlotWait(revString, joinedRevisions, progressKey, revData) {
     $("#outer").show();
 
     // check for a change already very quick, if the plots are already available
-    installPlottingProgress(revString, joinedRevisions, progressKey, 0, revData)
+    installPlottingProgress(revList, joinedRevisions, progressKey, 0, revData)
 }

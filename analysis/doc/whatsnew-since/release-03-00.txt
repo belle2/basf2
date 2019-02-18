@@ -8,6 +8,8 @@ Variables
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
 
 * Removed ClusterHadronIntensity and clusterUniqueID.
+* Added helix extrapolation from charged tracks
+* Added clusterMdstIndex variable to get ECLCluster MDST index for particles that do not originate from ECLCluster
 
 Modules
 +++++++

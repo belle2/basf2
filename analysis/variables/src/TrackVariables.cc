@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck, Torben Ferber    *
@@ -259,11 +259,12 @@ namespace Belle2 {
     }
 
     // returns extrapolated theta position based on helix parameters
-    // default extrapolation to ECL crystal centers
     double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars)
     {
-      if (pars.size() != 3) B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
-      else return std::numeric_limits<double>::quiet_NaN();
+      if (pars.size() != 3) {
+        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
 
       const double r = pars[0];
       const double zfwd = pars[1];
@@ -295,11 +296,12 @@ namespace Belle2 {
     }
 
     // returns extrapolated phi position based on helix parameters
-    // default extrapolation to ECL crystal centers
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars)
     {
-      if (pars.size() != 3) B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
-      else return std::numeric_limits<double>::quiet_NaN();
+      if (pars.size() != 3) {
+        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
 
       const double r = pars[0];
       const double zfwd = pars[1];
@@ -440,8 +442,6 @@ namespace Belle2 {
                       "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.");
     REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta, "Returns theta of extrapolated helix parameters");
     REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi, "Returns phi of extrapolated helix parameters");
-
-    VARIABLE_GROUP("Tracking [Eventbased]");
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track");
     REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning,
